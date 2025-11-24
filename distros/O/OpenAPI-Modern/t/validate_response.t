@@ -113,7 +113,8 @@ subtest $::TYPE.': validation errors in responses' => sub {
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
-    post: {}
+    post:
+      operationId: foo_operation
 YAML
 
   my $result = $openapi->validate_response(response(200), { operation_id => 'foo' });
@@ -156,9 +157,23 @@ YAML
 
     $response->request(request('POST', 'http://example.com/foo'));
     cmp_result(
-      $openapi->validate_response($response)->TO_JSON,
+      $openapi->validate_response($response, my $options = {})->TO_JSON,
       { valid => true },
       'operation is successfully found using the request on the response',
+    );
+    cmp_deeply(
+      $options,
+      {
+        request => isa('Mojo::Message::Request'),
+        uri => isa('Mojo::URL'),
+        path_template => '/foo',
+        method => 'POST',
+        path_captures => {},
+        uri_captures => {},
+        operation_id => 'foo_operation',
+        operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo post)))),
+      },
+      'additional information is filled in in $options',
     );
   }
 };
@@ -175,19 +190,29 @@ components:
 paths:
   /foo:
     post:
+      operationId: foo_operation
       responses:
         200: {}
         2XX: {}
 YAML
 
   cmp_result(
-    $openapi->validate_response(response(404), { operation_id => 'bar_operation' })->TO_JSON,
+    $openapi->validate_response(response(404), my $options = { operation_id => 'bar_operation' })->TO_JSON,
     { valid => true },
     'no responses object - nothing to validate against',
   );
+  cmp_deeply(
+    $options,
+    {
+      method => 'POST',
+      operation_id => 'bar_operation',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/components pathItems bar post)))),
+    },
+    'additional information is filled in in $options',
+  );
 
   cmp_result(
-    $openapi->validate_response(response(404), { path_template => '/foo', method => 'POST' })->TO_JSON,
+    $openapi->validate_response(response(404), $options = { path_template => '/foo', method => 'POST' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -200,6 +225,16 @@ YAML
       ],
     },
     'response code not found - nothing to validate against',
+  );
+  cmp_deeply(
+    $options,
+    {
+      path_template => '/foo',
+      method => 'POST',
+      operation_id => 'foo_operation',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo post)))),
+    },
+    'additional information is filled in in $options',
   );
 
   cmp_result(

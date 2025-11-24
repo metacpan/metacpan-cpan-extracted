@@ -11,6 +11,7 @@ class Mojo::Util {
   use Digest::SHA;
   use Format;
   use Getopt::Long;
+  use Mojo::ByteStream;
   
   our $QUOTED_VALUE_RE : string;
   INIT {
@@ -25,6 +26,13 @@ class Mojo::Util {
   our $EXPIRES_RE : string;
   INIT {
     $EXPIRES_RE = "(\w+\W+\d+\W+\w+\W+\d+\W+\d+:\d+:\d+\W*\w+)";
+  }
+  
+  our $XML : Hash of string;
+  INIT {
+    $XML = Hash->new({
+      "&" => "&amp;", "<" => "&lt;", ">" => "&gt;", "\"" => "&quot;", "'" => "&#39;"
+    });
   }
   
   static method b64_encode : string ($string : string, $eol : string = undef) {
@@ -62,6 +70,21 @@ class Mojo::Util {
     });
     
     return $string;
+  }
+  
+  static method xml_escape : string ($string : string) {
+    
+    unless ($string) {
+      die "The string \$string must be defined.";
+    }
+    
+    my $escaped = copy $string;
+    
+    Re->s((mutable string)$escaped, ["([&<>\"'])", "g"], method : string ($regex : Regex, $match : Regex::Match) {
+      return $XML->{$match->cap1};
+    });
+    
+    return $escaped;
   }
   
   static method url_unescape : string ($string : string) {

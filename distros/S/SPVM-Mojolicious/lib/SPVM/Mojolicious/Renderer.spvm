@@ -19,13 +19,9 @@ class Mojolicious::Renderer {
   
   has handlers : rw Hash of Mojo::Callback;
   
-  has helpers : rw Hash of Mojo::Callback;
-  
   has min_compress_size : rw int;
   
   has paths : rw string[];
-  
-  has data_section : rw string;
   
   # Undocumented Fields
   has templates : Hash of string[];
@@ -39,9 +35,9 @@ class Mojolicious::Renderer {
     
     $self->{default_format} = "html";
     
-    $self->{handlers} = Hash->new;
+    $self->{default_handler} = "ep";
     
-    $self->{helpers} = Hash->new;
+    $self->{handlers} = Hash->new;
     
     $self->{min_compress_size} = 860;
     
@@ -87,12 +83,7 @@ class Mojolicious::Renderer {
     $self->{handlers}->set($name, $cb);
   }
   
-  method add_helper : void ($name : string, $cb : Mojo::Callback) {
-    
-    $self->{helpers}->set($name, $cb);
-  }
-  
-  method get_data_template : string ($options : object[]) {
+  method get_data_template : string ($options : object[], $data : string = undef) {
     
     my $template = $self->template_name($options);
     
@@ -100,7 +91,7 @@ class Mojolicious::Renderer {
       return undef;
     }
     
-    return Mojo::Util->get_data_template($self->data_section, $template);
+    return Mojo::Util->get_data_template($data, $template);
   }
   
   method template_name : string ($options : Hash|object[]) {
@@ -123,11 +114,6 @@ class Mojolicious::Renderer {
     my $handler = $options_h->{"handler"}->(string);
     
     return $handler ? "$template.$handler" : $template;
-  }
-  
-  method get_helper : Mojo::Callback ($name : string) {
-    
-    return $self->{helpers}->get($name);
   }
   
   method render : string[] ($c : Mojolicious::Controller) {

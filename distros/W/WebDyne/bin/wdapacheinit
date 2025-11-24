@@ -18,6 +18,11 @@
 #
 use strict qw(vars);
 use vars   qw($VERSION);
+use warnings;
+
+
+#  External modules
+#
 use Cwd    qw(realpath);
 use WebDyne::Util;
 use Getopt::Long;
@@ -29,7 +34,7 @@ $Data::Dumper::Indent=1;
 
 #  Version info
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Get command line options, add them to environment so picked up
@@ -59,8 +64,9 @@ pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS', -exitval => 1)
     if $opt{'help'};
 pod2usage(-verbose => 2) if $opt{'man'};
 $opt{'version'} && do {print "$Script version: $VERSION\n"; exit 0};
+## no critic (Variables::RequireLocalizedPunctuationVars)
 map {$ENV{uc($_)}=$opt{$_}} keys %opt;
-
+## use critic
 
 #  By default the WebDyne::Install::Apache::Constant module will issue a
 #  warning if something not found, but will continue. In this case we want

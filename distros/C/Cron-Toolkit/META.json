@@ -1,7 +1,7 @@
 {
-   "abstract" : "Cron parser, describer, and scheduler with full Quartz support",
+   "abstract" : "Quartz-compatible cron parser with unique extensions and over 400 tests",
    "author" : [
-      "Nathaniel J Graham <ngraham@cpan.org>"
+      "Nathaniel Graham <nathaniel.graham@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -32,15 +32,18 @@
       },
       "runtime" : {
          "requires" : {
+            "DateTime::Duration" : "0",
             "DateTime::TimeZone" : "0",
             "JSON::MaybeXS" : "0",
             "List::Util" : "0",
-            "Test::More" : "0",
-            "Time::Moment" : "0"
+            "Time::Moment" : "0",
+            "perl" : "5.012"
          }
       },
       "test" : {
          "requires" : {
+            "JSON::PP" : "0",
+            "Test::More" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0"
          }
@@ -48,12 +51,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nathanielgraham/cron-toolkit-perl/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/nathanielgraham/cron-toolkit-perl.git",
          "web" : "https://github.com/nathanielgraham/cron-toolkit-perl"
       }
    },
-   "version" : 0.04,
+   "version" : 0.09,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

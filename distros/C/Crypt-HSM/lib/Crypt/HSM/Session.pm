@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.023';
+$Crypt::HSM::Session::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ Create an object with the given C<$attribute> hash. This returns a L<Crypt::HSM:
 
 Decrypt C<$ciphertext> with C<$mechanism> and C<$key>. This may take mechanism dependent additional arguments such as an IV.
 
-=head2 derive_key($mechanism, $key, $attributes, ...)
+=head2 derive_key($mechanism, $key, $attributes = {}, ...)
 
 Derive a new key from C<$key>, using mechanism and setting C<$attributes> on it. This may take mechanism dependent additional arguments. This returns a L<Crypt::HSM::Object|Crypt::HSM::Object> object.
 
@@ -90,11 +90,11 @@ Digest C<$input> with C<$mechanism> and C<$key>. This may take mechanism depende
 
 Encrypt C<$plaintext> with C<$mechanism> and C<$key>. This may take mechanism dependent additional arguments such as an IV.
 
-=head2 find_objects($attributes)
+=head2 find_objects($attributes = {})
 
 Find all objects that satisfy the given C<$attributes>. This returns a list of L<Crypt::HSM::Object|Crypt::HSM::Object> objects.
 
-=head2 generate_key($mechanism, \%attributes)
+=head2 generate_key($mechanism, $attributes = {})
 
 Generate a new key for C<$mechanism> with C<$attributes>. Some relevant attributes are:
 
@@ -250,17 +250,25 @@ This changes the PIN from C<$old_pin> to C<$new_pin>.
 
 This creates a signature over C<$input> using C<$mechanism> and C<$key>. This may take mechanism dependent additional arguments.
 
+=head2 sign_recover($mechanism, $key, $input, ...)
+
+This creates a signature over C<$input> using C<$mechanism> and C<$key>, the mechanism must support recovery. This may take mechanism dependent additional arguments.
+
 =head2 slot()
 
 Returns the slot identifier used for this session.
 
-=head2 unwrap_key($mechanism, $unwrap_key, $wrapped_key, $attributes, ...)
+=head2 unwrap_key($mechanism, $unwrap_key, $wrapped_key, $attributes = {}, ...)
 
 This unwraps the key wrapped in the bytearray C<$wrapped_key> using C<mechanism> and key C<$unwrap_key>, setting C<$attributes> on the new key. This returns a L<Crypt::HSM::Object|Crypt::HSM::Object> object.
 
 =head2 verify($mechanism, $key, $data, $signature, ...)
 
 Verify that C<$signature> matches C<$data>, using C<$mechanism> and C<$key>. This may take mechanism dependent additional arguments
+
+=head2 verify_recover($mechanism, $key, $signature, ...)
+
+Verify that C<$signature> is valid and using C<$mechanism> and C<$key>, returning the signed data. This may take mechanism dependent additional arguments
 
 =head2 wrap_key($mechanism, $wrap_key, $key, ...)
 

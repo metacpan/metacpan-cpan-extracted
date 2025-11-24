@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.107     2025-11-23 18:56:54Z
+          - efficiency improvements in validate_response() when provided with
+            an operationId for lookup
+          - prereq bump on Test2::Warnings for an import fix
+
 0.106     2025-11-19 20:28:01Z
           - fix invalid restriction on trailing '/' in server urls (added in
             v0.086)

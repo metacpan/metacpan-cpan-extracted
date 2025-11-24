@@ -10,8 +10,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
-license: gpl
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,7 +27,7 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::OYOULE:
     file: lib/Dist/Zilla/PluginBundle/OYOULE.pm
-    version: v1.1.1
+    version: v2.0.0
 requires:
   Dist::Zilla::Plugin::PodWeaver: '0'
   Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE/issues
   repository: https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE.git
-version: 1.1.1
-x_generated_by_perl: v5.40.2
+version: 2.0.0
+x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
-x_spdx_expression: GPL-3.0-only
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

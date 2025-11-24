@@ -4,6 +4,19 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.00:
+
+	Changes:
+	- maintenance release with Mail::Box version 3 compatibility.
+
+	Improvements:
+	- add bugtracker to meta
+	- bump version to show it is not compatible with MailBox 4
+
 version 1.03: Fri 12 Sep 15:25:39 CEST 2025
 
 	Changes:

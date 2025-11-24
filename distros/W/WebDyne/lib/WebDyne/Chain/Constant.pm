@@ -15,33 +15,32 @@
 #  Constants
 #
 package WebDyne::Chain::Constant;
+
+
+#  Pragma
+#
 use strict qw(vars);
-#use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
 use vars qw($VERSION @ISA %Constant);
-no warnings qw(uninitialized);
-local $^W=0;
+use warnings;
+
+
+#  Does the heavy liftying of importing into caller namespace
+#
+require WebDyne::Constant;
+@ISA=qw(WebDyne::Constant);
 
 
 #  Version information. Must be all on one line
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
-#  Constants are empty, but havin this file allows for import of DEBUG and othe
-#  vars from /etc/constant;
+#  Constants are empty, but having this file allows for import of DEBUG and othe
+#  vars from /etc/webdyne.conf.pl;
 #
 %Constant=();
 
 
-#  Export constants to namespace, place in export tags
+#  Done
 #
-#require Exporter;
-require WebDyne::Constant;
-#@ISA=qw(Exporter WebDyne::Constant);
-@ISA=qw(WebDyne::Constant);
-#+__PACKAGE__->local_constant_load(\%Constant);
-#foreach (keys %Constant) {${$_}=$Constant{$_}}
-#@EXPORT=map {'$' . $_} keys %Constant;
-#@EXPORT_OK=@EXPORT;
-#%EXPORT_TAGS=(all => [@EXPORT_OK]);
-#$_=\%Constant;
+1;

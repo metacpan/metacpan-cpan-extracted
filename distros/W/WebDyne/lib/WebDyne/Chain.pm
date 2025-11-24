@@ -37,7 +37,7 @@ use Data::Dumper;
 #  Version information in a formate suitable for CPAN etc. Must be
 #  all on one line
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Debug using WebDyne debug handler
@@ -464,7 +464,7 @@ sub UNIVERSAL::AUTOLOAD {
 
     #  Return err
     #
-        err ("method '$method_autoload' not found in call chain: %s", join(',', @caller));
+    err ("method '$method_autoload' not found in call chain: %s", join(',', @caller));
     goto RENDER_ERROR;
 
 }

@@ -23,6 +23,7 @@ package main;
 #
 use strict qw(vars);
 use vars   qw($VERSION);
+use warnings;
 
 
 #  Use the base module
@@ -42,15 +43,15 @@ use FindBin qw($RealBin $Script);
 use URI::Escape;
 
 
-#  Error handling
+#  Error handling and environment
 #
 use Carp;
-$SIG{__DIE__}=\&Carp::confess;
+local $SIG{__DIE__}=\&Carp::confess;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Run main
@@ -143,8 +144,10 @@ sub main {
             push @query_string, join('=', map { uri_escape($_) } ($key, $value));
         }
         my $query_string=join('&', @query_string );
+        ## no critic (Variables::RequireLocalizedPunctuationVars)
         $ENV{'QUERY_STRING'}=$query_string;
         $ENV{'REQUEST_METHOD'}='GET';
+        ## use critic
     }
 
 
@@ -185,7 +188,9 @@ sub main {
 
             #  Load up whichever handler we are using
             #
-            eval("require $handler") ||
+            (my $handler_pm = $handler) =~ s{::}{/}g;
+            $handler_pm.='.pm';
+            eval {require $handler_pm} ||
                 return err("$Script: unable to load handler $handler, $@");
 
 
@@ -229,7 +234,7 @@ sub main {
 
     #  Done, return success
     #
-    \undef;
+    return \0;
 
 }
 

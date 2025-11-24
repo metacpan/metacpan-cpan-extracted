@@ -13,30 +13,21 @@
   <section>
     <title>Introduction</title>
 
-    <para>WebDyne is a dynamic content generation engine for Apache/mod_perl
-    and PSGI web servers (such as Plack and Starman). HTML documents with
-    embedded Perl code are processed to produce dynamic HTML output. </para>
+    <para>WebDyne is a dynamic content generation engine for Apache/mod_perl and PSGI web servers (such as Plack and Starman). HTML documents with embedded Perl code are processed to produce
+    dynamic HTML output.</para>
 
-    <para>An installer is included in the base WebDyne module for Apache, or a
-    PSGI variant is included for use with Plack. Once WebDyne is installed any
-    file with a <filename>.psp</filename> extension is treated as a WebDyne
-    source file. It is parsed for WebDyne tags (such as
-    <tag>&lt;perl&gt;</tag> and <tag>&lt;block&gt;</tag>) which are
-    interpreted and executed on the server as appropriate to generate a
-    compliant HTML document. The resulting output is then sent to the browser.
-    </para>
+    <para>An installer is included in the base WebDyne module for Apache, or a PSGI variant is included for use with Plack. Once WebDyne is installed any file with a <filename>.psp</filename>
+    extension is treated as a WebDyne source file. It is parsed for WebDyne tags (such as <tag>&lt;perl&gt;</tag> and <tag>&lt;block&gt;</tag>) which are interpreted and executed on the server
+    as appropriate to generate a compliant HTML document. The resulting output is then sent to the browser.</para>
 
-    <para>Once parsed paged are are optionally stored in a partially compiled
-    format, speeding up subsequent processing. The aim of WebDyne is to make
-    coding web pages with Perl components a faster, easier and more enjoyable
-    experience.</para>
+    <para>Once parsed paged are are optionally stored in a partially compiled format, speeding up subsequent processing. The aim of WebDyne is to make coding web pages with Perl components a
+    faster, easier and more enjoyable experience.</para>
   </section>
 
   <section>
     <title>Getting Started</title>
 
-    <para>Install the WebDyne module from CPAN using cpanminus or cpan, and
-    install Plack for the PSGI version.</para>
+    <para>Install the WebDyne module from CPAN using cpanminus (cpanm) or cpan, and install Plack for the PSGI version.</para>
 
     <programlisting language="bash">#  Use cpan if you don't have cpanm
 #
@@ -44,17 +35,14 @@ $ cpanm WebDyne
 Building and testing Webdyne-2.04 ... OK
 
 $ cpanm Plack
-Building and testing Webdyne-1.0051 ... OK</programlisting>
+Building and testing Plack-1.0051 ... OK</programlisting>
 
-    <para>Run the PSGI variant in test mode and connect to the server to check
-    that it is working</para>
+    <para>Run the PSGI variant in test mode and connect to the server to check that it is working.</para>
 
     <programlisting language="bash">$ webdyne.psgi --test
 HTTP::Server::PSGI: Accepting connections at http://0:5000/</programlisting>
 
-    <para>Create an app.psp file in the appropriate web server home directory.
-    Don't be put off by the shortcut &lt;start_html&gt; tag, you can still use
-    traditional tags if you like.</para>
+    <para>Create an app.psp file in the appropriate web server home directory. Don't be put off by the shortcut &lt;start_html&gt; tag, you can still use traditional tags if you like.</para>
 
     <programlisting language="html"># Create file called app.psp with this content.
 #
@@ -68,6 +56,6 @@ $ webdyne.psgi /location/of/app.psp
 HTTP::Server::PSGI: Accepting connections at http://0:5000/
 </programlisting>
 
-    <para/>
+    <para>See the documentation at <link xlink:href="https://webdyne.org" xmlns:xlink="http://www.w3.org/1999/xlink">https://webdyne.org</link> for more examples and information.</para>
   </section>
 </article>

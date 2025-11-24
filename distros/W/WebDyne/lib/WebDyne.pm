@@ -32,7 +32,7 @@ use WebDyne::HTML::Tiny;
 #  External Modules
 #
 use Storable;
-use HTTP::Status qw(is_success is_error is_redirect RC_OK RC_FOUND RC_NOT_FOUND);
+use HTTP::Status qw(:constants is_success is_error is_redirect);
 use Fcntl;
 use Tie::IxHash;
 use Digest::MD5 qw(md5_hex);
@@ -59,7 +59,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.031';
+$VERSION='2.034';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -277,8 +277,8 @@ sub handler : method {    # no subsort
     #  Debug
     #
     debug(
-        "in WebDyne::handler. class $class, self $self, r $r, param_hr %s",
-        Dumper($param_hr));
+        "in WebDyne::handler. class $class, self $self, r $r (%s), param_hr %s",
+        Dumper($r, $param_hr));
 
 
     #  Skip all processing if header request only
@@ -295,14 +295,20 @@ sub handler : method {    # no subsort
 
     #  Get full path, mtime of source file, check file exists
     #
-    my $srce_pn=$r->filename() ||
-        return $self->err_html('unable to get request filename');
+    my $srce_pn=$r->filename() || do {
+    
+        #  Couldn't find file in request, decline
+        #
+        debug('could not find file, returning');
+        return $MP2 ? &Apache::DECLINED : $r->status(HTTP_NOT_FOUND);
+    };
     my $srce_mtime=(-f $srce_pn && (stat(_))[9]) || do {
 
-        #  File not found, we don't want to handle this anymore ..
+        #  Found file but couldn't stat or similar issue
         #
         debug("srce_mtime for file '$srce_pn' not found, could not stat !");
-        return &Apache::DECLINED;
+        return $MP2 ? &Apache::DECLINED : $r->status(HTTP_NOT_FOUND);
+        # return &Apache::DECLINED;
 
     };
     debug("srce_pn $srce_pn, srce_mtime (real) $srce_mtime");
@@ -796,7 +802,7 @@ sub handler : method {    # no subsort
 
     #  If no error, status must be ok unless otherwise set
     #
-    $r->status(RC_OK) unless $r->status();
+    $r->status(HTTP_OK) unless $r->status();
     debug('r status set, %s', $r->status());
 
 
@@ -903,7 +909,7 @@ sub handler : method {    # no subsort
     #  Complete
     #
     HANDLER_COMPLETE:
-    return &Apache::OK;
+    return $MP2 ? &Apache::OK : HTTP_OK;
 
 
 }
@@ -1910,7 +1916,7 @@ sub redirect {
 
         #  Set status, send header
         #
-        $r->status(RC_OK);
+        $r->status(HTTP_OK);
         $r->send_http_header() if !$MP2;
 
 
@@ -1961,7 +1967,7 @@ sub subrequest {
             #
             debug('handler does redirect, handing off');
             $r->redirect($location);    # no return value
-            return RC_FOUND;
+            return HTTP_FOUND;
 
         }
         else {
@@ -1972,9 +1978,9 @@ sub subrequest {
             debug('doing redirect ourselves');
             my $headers_out_hr=$r->headers_out || return err();
             $headers_out_hr->{'Location'}=$location;
-            $r->status(RC_FOUND);
+            $r->status(HTTP_FOUND);
             $r->send_http_header if !$MP2;
-            return RC_FOUND;
+            return HTTP_FOUND;
 
         }
     }

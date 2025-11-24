@@ -1,3 +1,57 @@
+commit acc41d9deb2b0cf2e077e8e3792f266d7e18515e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 23 21:54:19 2025 +1030
+
+    VERSION increment: 2.034
+
+commit a1a336bfdf204826c9d8e0c7311ae3538c381e44
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 23 21:53:43 2025 +1030
+
+    Try to streamline error handling in webdyne.psgi, update HTTP::Status vars to HTTP_<something> not RC_<something>, bunch of other minor fixes
+
+commit 142964ca384b8f093cd3e1b1d6cec231c0f0def5
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 22 17:52:22 2025 +1030
+
+    VERSION increment: 2.033
+
+commit 5b115971c999dfcd5fc0c0153ab3eca4c72b2fed
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 22 17:52:06 2025 +1030
+
+    Add Test::Deep dependency for tests
+
+commit 57f8af2e9e9a24682f8be51a1a142892296d486e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 22 17:41:49 2025 +1030
+
+    VERSION increment: 2.032
+
+commit c2f1b4c5938015ae19c84df37cc54e800b2c6110
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 22 17:40:40 2025 +1030
+
+    Improve dir_config and location code, add dir_config test and add WebDyne::Filter code
+
+commit 1cf63a362e878ce30cff748b84fc3d20580504c0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 22 00:03:25 2025 +1030
+
+    Initial commit of WebDyne::Filter file
+
+commit 912a3ecad5b376022f8861475913a93f35431349
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Nov 19 23:13:22 2025 +1030
+
+    Clean up Constants files, fix error where anything other than WebDyne::Constant wasn't reading from local webdyne.conf.pl file
+
+commit 6b1d5af8d8b7f54fc4bec338cd016b98d6a218ad
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 22:34:30 2025 +1030
+
+    Initial check-in, non working code
+
 commit 67602dfa2d235cc65942d7cb349794ee2116f86e
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Sun Nov 16 20:20:31 2025 +1030

@@ -5,17 +5,38 @@ You can install the base WebDyne module, and all prerequisites, with:
 
 perl -MCPAN -e 'install WebDyne'
 
-This assumes you have already setup and initialised CPAN appropriately for
-your environment.
+or 
 
-Note that WebDyne will not be automatically usable after this - you must
-modify your Web server configuration to make it active.  You may do this
-manually (referring to the documentation available in the doc directory, or
-at http://webdyne.org) or via an installer module which will do the work for
-you.
+cpanm WebDyne
 
-The base WebDyne module comes with an installer module for Apache. It will
-be installed into whichever bin location (usually /usr/local/bin) your CPAN
+This assumes you have already setup and initialised CPAN appropriately for your
+environment.
+
+Note that WebDyne will not be automatically usable after this - you must modify
+your Web server configuration to make it active or install the Plack PSGI
+version.  You may do this manually (referring to the documentation available in
+the doc directory, or at http://webdyne.org) or via an installer module which
+will do the work for you.
+
+
+== INSTALLATION OF PSGI VERSION =================================================
+
+To use the PSGI version of WebDyne install the Plack module via:
+
+cpanm Plack
+
+You can then start the WebDyne server via the command
+
+webdyne.psgi --test
+
+To validate it is working.  See instruction at https://webdyne.org for
+additional usage information
+
+
+== INSTALLATION OF APACHE VERSION ===============================================
+
+The base WebDyne module comes with an installer module for Apache.  It will be
+installed into whichever bin location (usually /usr/local/bin) your CPAN
 configuration defaults to.
 
 You can run the installer with the command:
@@ -27,38 +48,17 @@ config, Webdyne cache dir.  etc.  If you need to alter the defaults do a
 
 wdapacheinit --help
 
-Other installer modules are available for FastCGI server such as Lighttpd.
-If you wish to download an installer module - which will add Webdyne hooks
-into your Web server - download the WebDyne::Install module appropriate for
-your server type, e.g:
 
-perl -MCPAN -e 'install WebDyne::Install::Lighttpd'
+== INSTALLATION VIA MANUAL BUILD ==============================================
 
-You may then run the installer script, e.g.:
+You can download and install the base WebDyne module with the following
+commands after it is unpacked:
 
-wdlighttpdinit
+perl Makefile.PL make make test make install
 
-The actual location of the installer script will be distribution dependent -
-you may have to search for it after module installation.
-
-The following installer modules and their installation scripts are currently
-available:
-
-WebDyne::Install::Lighttpd      bin/wdlighttpdinit 
-
-
-== INSTALLATION VIA MANUAL BUILD ===============================================
-
-You can download and install the base WebDyne module with the following commands
-after it is unpacked:
-
-perl Makefile.PL
-make
-make test
-make install
-
-You will need to download and install all prerequisite modules manually. Modules
-required should be listed when you run the "perl Makefile.PL" command above.
+You will need to download and install all prerequisite modules manually. 
+Modules required should be listed when you run the "perl Makefile.PL" command
+above.
 
 Similarly to the CPAN install you will either need to adjust your Web server
 config manually to serve WebDyne pages, or run/download the appropriate

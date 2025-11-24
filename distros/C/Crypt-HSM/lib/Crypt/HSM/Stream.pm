@@ -1,5 +1,5 @@
 package Crypt::HSM::Stream;
-$Crypt::HSM::Stream::VERSION = '0.023';
+$Crypt::HSM::Stream::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Stream - A PKCS11 ongoing operation
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

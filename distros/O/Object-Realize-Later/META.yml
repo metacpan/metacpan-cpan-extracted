@@ -22,9 +22,10 @@ no_index:
 requires:
   Scalar::Util: '0'
 resources:
+  bugtracker: https://github.com/markov2/perl5-Object-Realize-Later/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Object-Realize-Later.git
-version: 0.22
+version: '3.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

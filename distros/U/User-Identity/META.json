@@ -49,6 +49,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-User-Identity/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
       "repository" : {
          "type" : "git",
@@ -56,7 +59,7 @@
          "web" : "https://github.com/markov2/perl5-User-Identity"
       }
    },
-   "version" : "1.03",
+   "version" : "3.00",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2003,

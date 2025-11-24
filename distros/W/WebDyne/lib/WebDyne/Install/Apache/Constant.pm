@@ -16,14 +16,16 @@ package WebDyne::Install::Apache::Constant;
 #  Pragma
 #
 use strict qw(vars);
+use vars qw($VERSION @ISA %Constant);
 use warnings;
 no warnings qw(uninitialized);
 
 
-#  Vars to use
+#  Does the heavy liftying of importing into caller namespace
 #
-#use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
-use vars qw($VERSION @ISA %Constant);
+require WebDyne::Constant;
+@ISA=qw(WebDyne::Constant);
+
 
 
 #  External modules
@@ -60,7 +62,7 @@ my $ServerRoot;
 
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #------------------------------------------------------------------------------
@@ -568,25 +570,6 @@ sub mp2_installed {
 }
 
 
-sub import {
-    
-    goto &WebDyne::Constant::import;
-    
-}
-
-
-#  Finalise and export vars
+#  Done
 #
-debug('final constants: %s', Dumper(\%Constant));
-#require Exporter;
-require WebDyne::Constant;
-#@ISA=qw(Exporter WebDyne::Constant);
-@ISA=qw(WebDyne::Constant);
-
-#  Local constants override globals
-#+__PACKAGE__->local_constant_load(\%Constant);
-#foreach (keys %Constant) {${$_}=$Constant{$_}}
-#@EXPORT=map {'$' . $_} keys %Constant;
-#@EXPORT_OK=@EXPORT;
-#%EXPORT_TAGS=(all => [@EXPORT_OK]);
-#$_=\%Constant;
+1;

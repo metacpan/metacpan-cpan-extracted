@@ -1,5 +1,5 @@
 package Crypt::HSM;
-$Crypt::HSM::VERSION = '0.023';
+$Crypt::HSM::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Crypt::HSM - A PKCS11 interface for Perl
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

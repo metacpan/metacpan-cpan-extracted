@@ -18,5 +18,6 @@ $ENV{'REQUEST_METHOD'}='GET';
 #  And run on the cgi file
 #
 my $ret;
-capture { $ret=system($^X, 't/02-render.t', 't/cgi.psp') };
+my ($stdout, $stderr)=capture { $ret=system($^X, 't/02-render.t', 't/cgi.psp') };
+#diag("ret: $ret, stdout: $stdout, stderr: $stderr");
 ok($ret==0);

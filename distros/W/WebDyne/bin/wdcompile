@@ -21,15 +21,9 @@ package main;
 
 #  Compiler pragma, load library path
 #
-sub BEGIN {
-
-    #  Massage warnings and @INC path
-    $^W=0;
-    use File::Spec;
-    use FindBin qw($RealBin $Script);
-}
 use strict qw(vars);
 use vars   qw($VERSION);
+use warnings;
 
 
 #  Use the base modules
@@ -43,6 +37,8 @@ use WebDyne::Compile;
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use File::Spec;
+use FindBin qw($RealBin $Script);
 $Data::Dumper::Indent=1;
 $Data::Dumper::Terse=1;
 $Data::Dumper::Sortkeys=1;
@@ -52,7 +48,7 @@ $Data::Dumper::Purity=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Run main
@@ -159,7 +155,7 @@ sub main {
 
     #  Return success
     #
-    \undef;
+    return \0;
 
 
 }

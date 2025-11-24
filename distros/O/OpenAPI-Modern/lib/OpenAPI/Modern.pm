@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.105-9-g21a5ea59
+package OpenAPI::Modern; # git description: v0.106-6-g819d02fa
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 use 5.020;
 use utf8;
@@ -241,18 +241,22 @@ sub validate_response ($self, $response, $options = {}) {
   my $state = { data_path => '/response' };
 
   try {
-    # FIXME: if the operation is shared by multiple paths, path_template may not be inferrable, and
-    # we also don't need path_captures
-    my $path_ok = $self->find_path_item($options, $state);
-    delete $options->{errors};
-    return $self->_result($state, 1, 1) if not $path_ok;
+    # we only need the operation location, and do not need to verify the request uri, path template
+    # and path_captures, so do not pass unnecessary information to find_path_item
+    my $fp_options = +{ %$options };
+    delete $fp_options->@{qw(request uri method path_template path_captures)} if exists $options->{operation_id};
+    delete $fp_options->@{qw(request uri path_captures)} if exists $options->{path_template} and exists $options->{method};
+    my $path_ok = $self->find_path_item($fp_options, $state);
+    $options->@{keys $fp_options->%*} = values $fp_options->%*;
 
-    my $path_item = delete $options->{_path_item};
+    delete $options->@{qw(errors _path_item)};
     my $operation = delete $options->{_operation};
 
-    return $self->_result($state, 0, 1) if not exists $operation->{responses};
+    return $self->_result($state, 1, 1) if not $path_ok;
 
     $state->{keyword_path} .= delete $options->{_operation_path_suffix};  # jsonp-encoded
+    return $self->_result($state, 0, 1) if not exists $operation->{responses};
+
     $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
 
     if ($response->headers->header('Transfer-Encoding')) {
@@ -746,9 +750,9 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
         if not any { $captures{$name} eq $_ } $server->{variables}{$name}{enum}->@*;
     }
 
-    @captures{@path_capture_names} = @path_capture_values;
-
     return if not $valid;
+
+    @captures{@path_capture_names} = @path_capture_values;
     return \%captures;
   }
 
@@ -1232,7 +1236,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.106
+version 0.107
 
 =head1 SYNOPSIS
 

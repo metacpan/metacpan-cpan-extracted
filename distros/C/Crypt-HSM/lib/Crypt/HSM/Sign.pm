@@ -1,5 +1,5 @@
 package Crypt::HSM::Sign;
-$Crypt::HSM::Sign::VERSION = '0.023';
+$Crypt::HSM::Sign::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Sign - A PKCS11 ongoing signing operation.
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

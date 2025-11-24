@@ -39,6 +39,8 @@ class Mojo::Template {
   
   has tag_end : rw string;
   
+  has auto_escape : rw byte;
+  
   # Undocumented Fields
   has tree : rw string[][];
 
@@ -51,6 +53,14 @@ class Mojo::Template {
     
     $self->{unparsed} = "";
     
+    $self->{tag_start} = "<%";
+    
+    $self->{tag_end} = "%>";
+    
+    $self->{line_start} = "%";
+    
+    $self->{expression_mark} = "=";
+    
     $self->{capture_end} = "end";
     
     $self->{capture_start} = "begin";
@@ -59,19 +69,11 @@ class Mojo::Template {
     
     $self->{escape_mark} = "=";
     
-    $self->{expression_mark} = "=";
-    
     $self->{trim_mark} = "=";
-    
-    $self->{line_start} = "%";
     
     $self->{replace_mark} = "%";
     
     $self->{name} = "template";
-    
-    $self->{tag_start} = "<%";
-    
-    $self->{tag_end} = "%>";
     
     $self->{tree} = new string[][0];
     
@@ -85,164 +87,310 @@ class Mojo::Template {
   
   method parse : void ($template : string) {
     
-    # Clean start
     $self->set_unparsed($template);
-    my $tree = (List of string[])List->new_ref(new string[][0]);
-    $self->set_tree($tree->get_array);
-    $self->set_compiled(0);
+    $self->set_compiled(undef);
     
-    my $tag     = $self->tag_start;
-    my $replace = $self->replace_mark;
-    my $expr    = $self->expression_mark;
-    my $escp    = $self->escape_mark;
-    my $cpen    = $self->capture_end;
-    my $cmnt    = $self->comment_mark;
-    my $cpst    = $self->capture_start;
-    my $trim    = $self->trim_mark;
-    my $end     = $self->tag_end;
-    my $start   = $self->line_start;
+    my $tree = $self->tokenize($template);
     
-    my $line_re  = "^(\s*)\Q$start\E(?:(\Q$replace\E)|(\Q$cmnt\E)|(\Q$expr\E))?(.*)$";
-    my $token_re = "(\Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)|\Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?|\Q$tag\E(?:\s*\Q$cpen\E(?!\w))?|(?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E)?\Q$end\E)";
-    my $cpen_re = "^\Q$tag\E(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(.*)$";
-    my $end_re  = "^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$";
+    $tree = $self->check($tree);
+    
+    $self->set_tree($tree);
+  }
+  
+  private method tokenize : string[][] ($template : string) {
+    
+    my $tree = (List of string[])List->new(new string[][0]);
+    
+    my $line_start = $self->line_start;           # %
+    my $tag_start = $self->tag_start;             # <%
+    my $replace_mark = $self->replace_mark;       # %
+    my $comment_mark = $self->comment_mark;       # #
+    my $expression_mark = $self->expression_mark; # =
+    my $escape_mark = $self->escape_mark;         # =
+    
+    my $trim_mark = $self->trim_mark;             # =
+    my $tag_end = $self->tag_end;                 # %>
+    
+    my $capture_start = $self->capture_start;     # begin
+    my $capture_end = $self->capture_end;         # end
+    
+    my $line_code_re  = "^(\s*)\Q$line_start\E(?:(\Q$replace_mark\E)|(\Q$comment_mark\E)|(\Q$expression_mark\E))?(.*)$";
+    
+    my $code_re = "(\Q$tag_start\E(?:\Q$replace_mark\E|\Q$comment_mark\E)|\Q$tag_start$expression_mark\E(?:\Q$escape_mark\E)?(?:\s*\Q$capture_end\E\b)?|\Q$tag_start\E(?:\s*\Q$capture_end\E\b)?|(?:\b\Q$capture_start\E\s*(?:\([^\)]*\))?\s*)?(?:\Q$trim_mark\E)?\Q$tag_end\E)";
+    
+    my $tag_end_re  = "^(?:(\Q$capture_start\E)\s*(\([^\)]*\))?\s*)?(\Q$trim_mark\E)?\Q$tag_end\E$";
+    my $capture_end_re = "^\Q$tag_start\E(?:\Q$expression_mark\E)?(?:\Q$escape_mark\E)?\s*\Q$capture_end\E(.*)$";
     
     # Split lines
+    my $lines = Fn->split("\n", $template);
+    
     my $op = "text";
-    my $trimming = (string)undef;
-    my $capture = 0;
-    for my $line (@{Fn->split("\n", $template)}) {
+    my $is_capture_end = 0;
+    for (my $line_index = 0; $line_index < @$lines; $line_index++) {
+      
+      my $line = $lines->[$line_index];
+      
+      $tree->push(["line_start", undef, $line_index + 1]);
+      
+      if (is_read_only $line) {
+        $line = copy $line;
+      }
       
       # Turn Perl line into mixed line
-      if ($op eq "text" && (my $m = Re->m($line, $line_re))) {
+      if ($op eq "text" && (my $m = Re->m($line, $line_code_re))) {
         
         # Escaped start
-        if ($m->cap2) { $line = $m->cap1 . $start . $m->cap5; }
+        if (length $m->cap2) { $line = $m->cap1 . $line_start . $m->cap5; }
         
         # Comment
-        elsif ($m->cap3) { $line = $tag . $m->cap3 . "$trim$end"; }
+        elsif (length $m->cap3) { $line = $tag_start . $m->cap3 . "$trim_mark$tag_end"; }
         
         # Expression or code
-        else { $line = $m->cap4 ? $m->cap1 . $tag . $m->cap4 . $m->cap5 . $end : $tag . $m->cap5 . "$trim$end"; }
+        else { $line = length $m->cap4 ? $m->cap1 . $tag_start . $m->cap4 . $m->cap5 . $tag_end : $tag_start . $m->cap5 . "$trim_mark$tag_end"; }
       }
       
       # Escaped line ending
-      if (!Re->s((mutable string)$line, "\\\\\\\\$", "\\\\\n")) {
-        if (Re->s((mutable string)$line, "\\$", "")) {
-          $line .= "\n";
+      my $escape_line_ending = 0;
+      if (!Re->s((mutable string)$line, "\\\\\\\\$", "\\")) {
+        if (Re->s((mutable string)$line, "\\\\$", "")) {
+          $escape_line_ending = 1;
         }
       }
       
       # Mixed line
-      for my $token (@{Re->split($token_re, $line)}) {
-        
+      my $tokens = Re->split($code_re, $line);
+      for my $token (@$tokens) {
         # Capture end
-        if (my $m = Re->m($token, $cpen_re)) {
-          $token = $tag . $m->cap1;
-          $capture = 1;
+        if (my $m = Re->m($token, $capture_end_re)) {
+          $token = $tag_start . $m->cap1;
+          $is_capture_end = 1;
         }
         
-        # End
-        if ($op ne "text" && (my $m = Re->m($token, $end_re))) {
+        # Tag End
+        if ($op ne "text" && (my $m = Re->m($token, $tag_end_re))) {
           
           # Capture start
-          if ($m->cap1) {
-            $tree->splice($tree->length - 1, 0, ["cpst"]);
+          if (length $m->cap1) {
+            $tree->push(["capture_start", $m->cap2, $line_index + 1]);
           }
           
-          # Trim left side
-          if (($trimming = $m->cap2) && $tree->length > 1) {
-            &_trim($tree);
+          my $trim = (string)undef;
+          if (length $m->cap3) {
+            $trim = "trim";
           }
+          $tree->push(["tag_end", $trim, $line_index + 1]);
           
-          # Hint at end
-          $tree->push([$op = "text", ""]);
+          $op = "text";
         }
         
-        # Code
-        elsif ($token eq $tag) { $op = "code"; }
+        # Tag start - Comment
+        elsif ($token eq "$tag_start$comment_mark") {
+          $op = "cmnt";
+          $tree->push(["tag_start", $op, $line_index + 1]);
+        }
         
-        # Expression
-        elsif ($token eq "$tag$expr") { $op = "expr"; }
+        # Tag start - Expression that needs to be escaped
+        elsif ($token eq "$tag_start$expression_mark$escape_mark") {
+          $op = "excaped_expression";
+          $tree->push(["tag_start", $op, $line_index + 1]);
+        }
         
-        # Expression that needs to be escaped
-        elsif ($token eq "$tag$expr$escp") { $op = "escp"; }
+        # Tag start - Expression
+        elsif ($token eq "$tag_start$expression_mark") {
+          $op = "expression";
+          $tree->push(["tag_start", $op, $line_index + 1]);
+        }
         
-        # Comment
-        elsif ($token eq "$tag$cmnt") { $op = "cmnt"; }
+        # Tag start
+        elsif ($token eq $tag_start) {
+          $op = "code";
+          $tree->push(["tag_start", $op, $line_index + 1]);
+        }
         
-        # Text (comments are just ignored)
-        elsif ($op ne "cmnt") {
-          
-          # Replace
-          if ($token eq "$tag$replace") {
-            $token = $tag ;
-          }
-          
-          # Trim right side (convert whitespace to line noise)
-          if ($trimming && (my $r = Re->s((mutable string)$token, "^(\s+)", ""))) {
-            $tree->push(["code", $r->match->cap1]);
-            $trimming = 0;
-          }
-          
+        # Text
+        else {
           # Token (with optional capture end)
-          $tree->push($capture ? ["cpen"] : [$op, $token]);
-          $capture = 0;
+          if ($is_capture_end) {
+            $tree->push(["capture_end", undef, $line_index + 1]);
+          }
+          else {
+            # Replace
+            if ($token eq "$tag_start$replace_mark") {
+              $token = $tag_start ;
+            }
+            
+            $tree->push([$op, $token, $line_index + 1]);
+          }
+          $is_capture_end = 0;
         }
       }
       
-      # Optimize successive text lines separated by a newline
-      my $len = $tree->length;
-      if ($tree->get($len - 4) && $tree->get($len - 4)->[0] ne "line"
-        || (!$tree->get($len - 3) || $tree->get($len - 3)->[0] ne "text" || !Re->m($tree->get($len - 3)->[1], "\n$")
-        || ($tree->get($len - 2)->[0] ne "line" || $tree->get($len - 1)->[0] ne "text")))
-      {
-        $tree->push(["line"]);
-        next;
+      unless ($escape_line_ending) {
+        $tree->push([$op, "\n", $line_index + 1]);
+        $tree->push(["line_end", undef, $line_index + 1]);
       }
+    }
+    
+    return $tree->to_array;
+  }
+  
+  private method check : string[][] ($tree : string[][]) {
+    
+    my $tree = (string[][])Array->copy_object_address($tree);
+    
+    # Process trim mark
+    for (my $tree_index = 0; $tree_index < @$tree; $tree_index++) {
       
-      my $_ = $tree->get($len - 3);
-      $_->[1] .= $tree->pop->[1];
+      my $token = $tree->[$tree_index];
+      
+      my $op = $token->[0];
+      
+      if ($op eq "tag_end") {
+        my $trim = $token->[1];
+        
+        if ($trim) {
+          # Remove previous spaces
+          my $tag_start_index = -1;
+          for (my $tree_index_prev = $tree_index - 1; $tree_index_prev >= 0; $tree_index_prev--) {
+            my $token_prev = $tree->[$tree_index_prev];
+            my $op_prev = $token_prev->[0];
+            
+            if ($op_prev eq "tag_start") {
+              $tag_start_index = $tree_index_prev;
+              last;
+            }
+          }
+          
+          if ($tag_start_index >= 0) {
+            for (my $tree_index_prev = $tag_start_index - 1; $tree_index_prev >= 0; $tree_index_prev--) {
+              my $token_prev = $tree->[$tree_index_prev];
+              my $op_prev = $token_prev->[0];
+              
+              if ($op_prev eq "text") {
+                if (my $m = Re->m($token_prev->[1], "(.*?)\s+$")) {
+                  $token_prev->[1] = $m->cap1;
+                }
+                if (length $token_prev->[1]) {
+                  last;
+                }
+              }
+              else {
+                last;
+              }
+            }
+          }
+          
+          # Remove later spaces
+          for (my $tree_index_later = $tree_index + 1; $tree_index_later < @$tree; $tree_index_later++) {
+            my $token_later = $tree->[$tree_index_later];
+            
+            my $op_later = $token_later->[0];
+            unless ($op_later eq "text" | $op_later eq "line_end") {
+              last;
+            }
+            
+            if ($op_later eq "text") {
+              if (my $m = Re->m($token_later->[1], "^\s+(.*)")) {
+                $token_later->[1] = $m->cap1;
+              }
+              if (length $token_later->[1]) {
+                last;
+              }
+            }
+            else {
+              last;
+            }
+          }
+        }
+      }
     }
     
+    # Merge text and expression
+    for my $target_op (@{["text", "excaped_expression", "expression"]}) {
+      my $tree_index = 0;
+      while (1) {
+        
+        if ($tree_index == @$tree) {
+          last;
+        }
+        
+        my $base_tree_index = -1;
+        
+        my $token = $tree->[$tree_index];
+        my $op = $token->[0];
+        
+        if ($op eq $target_op) {
+          $base_tree_index = $tree_index;
+          my $next = 0;
+          while (1) {
+            $tree_index++;
+            if ($tree_index + 2 < @$tree && $tree->[$tree_index][0] eq "line_end" && $tree->[$tree_index + 1][0] eq "line_start" && $tree->[$tree_index + 2][0] eq $target_op) {
+              $tree->[$base_tree_index][1] .= $tree->[$tree_index + 2][1];
+              $tree->[$tree_index][0] = "none";
+              $tree->[$tree_index][1] = "";
+              $tree->[$tree_index + 1][0] = "none";
+              $tree->[$tree_index + 1][1] = "";
+              $tree->[$tree_index + 2][0] = "none";
+              $tree->[$tree_index + 2][1] = "";
+              $tree_index += 2;
+            }
+            elsif ($tree->[$tree_index][0] eq $target_op) {
+              $tree->[$base_tree_index][1] .= $tree->[$tree_index][1];
+              $tree->[$tree_index][0] = "none";
+              $tree->[$tree_index][1] = "";
+            }
+            else {
+              $next = 1;
+              last;
+            }
+          }
+          
+          if ($next) {
+            next;
+          }
+        }
+        
+        $tree_index++;
+      }
+    }
+    
+    my $new_tree = (List of string[])List->new(new string[][0]);
+    for (my $tree_index = 0; $tree_index < @$tree; $tree_index++) {
+      
+      my $token = $tree->[$tree_index];
+      
+      my $op = $token->[0];
+      
+      unless ($op eq "none") {
+        $new_tree->push($token);
+      }
+    }
+    
+    return $new_tree->to_array;
   }
   
-  static method _trim : void ($tree : List of string[]) {
+  method process : string ($options : Hash|object[] = undef, $c : Mojolicious::Controller = undef) {
     
-    # Skip captures
-    my $len = $tree->length;
-    my $i = $tree->get($len - 2)->[0] eq "cpst" || $tree->get($len - 2)->[0] eq "cpen" ? $len - 3 : $len - 2;
-    
-    # Only trim text
-    unless ($tree->get($i)->[0] eq "text") {
-      return;
-    }
-    
-    # Convert whitespace text to line noise
-    if (my $r = Re->s((mutable string)$tree->get($i)->[1], "(\s+)$", "")) {
-      $tree->splice($i, 0, ["code", $r->match->cap1]);
-    }
-    
-  }
-  
-  method process : string ($args : object[]) {
+    my $options = Fn->to_hash($options);
     
     # Use a local stack trace for compile exceptions
     my $compiled = $self->compiled;
     unless ($compiled) {
+    
       $self->_compile;
+      
       my $code = $self->code;
       
-      unless ($compiled = Native->use_anon_class($code)) {
-        # TODO 
-        # return Mojo::Exception->new($@)->inspect($self->unparsed, $code)->trace->verbose(1)
-        die $self->unparsed;
+      eval { $compiled = Native->use_anon_class($code); }
+      if ($@) {
+        my $name = $self->name;
+        die "$@\n[Template:$name]\n" . $self->unparsed;
       }
       
       $self->set_compiled($compiled);
     }
     
-    my $output = (string)Native::MethodCall->call_class_method($compiled, "", $args);
+    my $output = (string)Native::MethodCall->call_class_method($compiled, "code", [(object)$options, $c]);
     
     return $output;
   }
@@ -250,98 +398,84 @@ class Mojo::Template {
   private method _compile : void () {
     
     my $tree = (List of string[])List->new($self->tree);
-    my $escape = 1;
+    my $escape = $self->auto_escape;
     
-    my $blocks = StringList->new;
+    my $name = $self->name;
+    
+    my $code = StringBuffer->new;
+    
+    $code->push("#file \"$name\"\n");
+    $code->push("class {\n");
+    $code->push("  use Mojo::Util;\n");
+    $code->push("  use Mojo::ByteStream;\n");
+    $code->push("  use Mojolicious::Controller;\n");
+    $code->push("static method code : string (\$options : Hash = undef, \$c : Mojolicious::Controller = undef) {\n");
+    $code->push("my \$_O = \"\";\n");
+    
     my $i = 0;
     my $capture = (string)undef;
-    my $multi = 0;
-    while (++$i <= $tree->length && (my $next = $tree->get($i))) {
-      my $_ = $tree->get($i - 1);
+    
+    for (my $i = 0; $i < @$tree; $i++) {
       
-      my $op = $_->[0];
-      my $value = $_->[1];
+      my $token = $tree->[$i];
+      my $op = $token->[0];
+      my $value = $token->[1];
+      my $line = $token->[2];
       
-      if ($op eq "line") {
-        $blocks->push("");
-        next;
-      }
-      
-      my $value_length = length $value;
-      Fn->chomp((mutable string)$value);
-      
-      my $newline = length $value != $value_length;
-      
-      # Text (quote and fix line ending)
+      # Text
       if ($op eq "text") {
-        if (length $value) {
-          my $_ = $blocks->get($blocks->length - 1);
-          $_ .= "\$_O .= <<'END_OF_STRING';\n" . $value . "END_OF_STRING\n" ;
-          $blocks->set($blocks->length - 1, $_ );
-        }
-      }
-      
-      # Code or multi-line expression
-      elsif ($op eq "code" || $multi) {
-        my $_ = $blocks->get($blocks->length - 1);
-        $_ .= $value;
-        $blocks->set($blocks->length - 1, $_);
-      }
-# Capture end
-      elsif ($op eq "cpen") {
-        my $_ = $blocks->get($blocks->length - 1);
-        $_ .= "return Mojo::ByteStream->new(\$_O) }";
-        $blocks->set($blocks->length - 1, $_);
+        my $lines = Fn->split("\n", $value, -1);
         
-        # No following code
-        my $_ = $blocks->get($blocks->length - 1);
-        if ($next->[0] ne "cpst" && (Re->m($next->[1] // "", "^\s*$"))) {
-          $_ .= ";" ;
+        $code->push("\$_O .= <<'END_OF_STRING';\n");
+        
+        for my $line (@$lines) {
+          $code->push("$line\n");
         }
-        $blocks->set($blocks->length - 1, $_);
+        
+        $code->push("END_OF_STRING\n");
+        
+        $code->push("Fn->chomp((mutable string)\$_O);\n");
       }
       
-      # Expression
-      if ($op eq "expr" || $op eq "escp") {
-
-        # Escaped
-        if (!$multi && ($op eq "escp" && !$escape || $op eq "expr" && $escape)) {
-          my $_ = $blocks->get($blocks->length - 1);
-          $_ .= "\$_O .= Mojo::Util->xml_escape($value)";
-          $blocks->set($blocks->length - 1, $_);
-        }
-
-        # Raw
-        elsif (!$multi) {
-          my $_ = $blocks->get($blocks->length - 1);
-          $_ .= "\$_O .= $value";
-          $blocks->set($blocks->length - 1, $_);
-        }
-
-        # Multi-line
-        $multi = !$next || $next->[0] ne "text";
-
-        # Append semicolon
-        my $_ = $blocks->get($blocks->length - 1);
-        unless ($multi || $capture) {
-          $_ .= ";";
-        }
-        $blocks->set($blocks->length - 1, $_);
+      # Code
+      elsif ($op eq "code") {
+        $code->push("#line $line\n");
+        $code->push("$value\n");
       }
-
-      # Capture start
-      if    ($op eq "cpst") { $capture = 1; }
-      elsif ($capture) {
-        my $_ = $blocks->get($blocks->length - 1);
-        $_ .= "method : void () { my \$_O = \"\"; ";
-        $blocks->set($blocks->length - 1, $_);
-        $capture = 0;
+      # Expression or escapaced expr
+      elsif ($op eq "expression" || $op eq "excaped_expression") {
+        
+        $code->push("#line $line\n");
+        
+        # Escaped
+        if ($op eq "excaped_expression" && !$escape || $op eq "expression" && $escape) {
+          $code->push("my \$_ = (object)$value;\$_O .= \$_ isa Mojo::ByteStream ? \$_->(Mojo::ByteStream)->to_string : Mojo::Util->xml_escape((string)\$_);\n");
+        }
+        
+        # Raw
+        else {
+          $code->push("\$_O .= $value;\n");
+        }
+      }
+      elsif ($op eq "capture_start") {
+        my $capture_args = $value;
+        unless (length $capture_args) {
+          $capture_args = "()";
+        }
+        $code->push("[\$c : Mojolicious::Controller] method : string $capture_args {\n");
+        $code->push("my \$_O = \"\";\n");
+      }
+      elsif ($op eq "capture_end") {
+        $code->push("return \$_O;\n");
+        $code->push("};\n");
       }
     }
     
-    $self->set_code(Fn->join("\n", $blocks->to_array));
+    $code->push("return \$_O;\n");
+    $code->push("} # End of method\n");
+    $code->push("} # End of class\n");
     
-    $self->set_tree(new string[][0]);
+    $self->set_code($code->get_string);
   }
   
   method render : string ($template : string, $args : object[] = undef) {

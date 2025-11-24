@@ -1,21 +1,35 @@
-Revision history for Cron::Toolkit
+# Changes — Revision history for Cron::Toolkit
 
-0.04  2025-10-22
-    - Added new_from_crontab for multi-line tabs (@aliases mapped to Quartz).
-    - Symmetric bounded next/previous (auto-clamp defaults to begin/end).
-    - time_zone setter with DateTime::TimeZone validate/recalc (DST-aware).
-    - next_n max_iter guard (default 10000, die on exceed).
-    - Phase 2: next_occurrences alias, as_string/to_json, dump_tree, locale stub in describe.
-    - 50+ tests green; aliases/TZ edges covered.
+0.08 2025-11-23
+    - Final pre-1.0 release
+    - Over 400 data-driven tests covering every token, leap years, DST, all time zones
+    - Full Unicode support in POD (=encoding utf-8)
+    - Beautiful field reference table
+    - Comprehensive documentation with SYNOPSIS showing wrapped ranges and Feb 29 + Monday
+    - Added BUGS AND CONTRIBUTIONS section
+    - Ready for CPAN
 
-0.03  2025-10-15
-    - Renamed from Cron::Describe; full Quartz L/W/# support.
-    - Bounded searches, natural English fusions.
-    - AST architecture with extensible visitors.
+0.04 2025-10-22
+    - Added new_from_crontab() with environment expansion and user extraction
+    - @aliases mapped to full Quartz equivalents
+    - Symmetric bounded next()/previous() with auto-clamping
+    - time_zone() now validates via DateTime::TimeZone and recalculates offset (DST-aware)
+    - next() gains max_iter guard (prevents infinite loops)
+    - Added next_occurrences(), as_string(), to_json(), dump_tree()
+    - English descriptions now fuse naturally across fields
+    - 50+ new tests
 
-0.02  2025-10-10
-    - Initial Quartz support (seconds, L/W/#).
-    - Unix auto-convert.
+0.03 2025-10-15
+    - Renamed from Cron::Describe → Cron::Toolkit
+    - Full Quartz support: L, LW, W, #, wrapped DOW ranges (6→2), step-on-range
+    - Both DOM and DOW may be specified → AND logic (unique!)
+    - Natural-language English descriptions via AST visitors
+    - Bounded searches with begin_epoch / end_epoch
 
-0.01  2025-10-01
-    - First release.
+0.02 2025-10-10
+    - Initial Quartz syntax support (seconds, year field, L/W/#)
+    - Automatic Unix → Quartz conversion
+    - AST-based parsing with pattern classes
+
+0.01 2025-10-01
+    - First release

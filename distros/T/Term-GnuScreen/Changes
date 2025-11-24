@@ -1,5 +1,9 @@
 Revision history for Term-GnuScreen
 
+0.06 2025-11-24
+
+     upload identical version
+
 0.05 2013-07-26
 
      older moo versions fail if default is not a coderef

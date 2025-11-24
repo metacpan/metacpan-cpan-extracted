@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::NwFilter v0.1.8;
+class Sys::Async::Virt::NwFilter v0.1.9;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.1.8;
+use Protocol::Sys::Virt::Remote::XDR v0.1.9;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 
@@ -54,7 +54,7 @@ Sys::Async::Virt::NwFilter - Client side proxy to remote LibVirt network filter
 
 =head1 VERSION
 
-v0.1.8
+v0.1.9
 
 =head1 SYNOPSIS
 

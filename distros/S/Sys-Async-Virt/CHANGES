@@ -1,5 +1,10 @@
 -----
 
+0.1.9    2025-11-23
+   [Fixed]
+       * SSH URL query parameter handling ignores 'keyfile',
+         'no_tty', 'mode' and 'command' parameters
+
 0.1.8    2025-11-07
    [Changed]
        * Updated libvirt to v11.9.0 (from v11.8.0)

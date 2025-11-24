@@ -30,7 +30,7 @@ use WebDyne::Util;
 
 #  External modules
 #
-use HTTP::Status qw(is_success is_error RC_INTERNAL_SERVER_ERROR);
+use HTTP::Status qw(:constants is_error);
 use File::Spec;
 use Data::Dumper;
 $Data::Dumper::Indent=1;
@@ -38,7 +38,7 @@ $Data::Dumper::Indent=1;
 
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Debug
@@ -129,9 +129,11 @@ sub err_html {
     $r->log_error($errstr);
 
 
-    #  Status must be internal error
+    #  Status must be internal error if not set to something else already
     #
-    $r->status(RC_INTERNAL_SERVER_ERROR);
+    unless ($r->status() && (is_error($r->status()))) {
+        $r->status(HTTP_INTERNAL_SERVER_ERROR);
+    }
 
 
     #  Do not run any more handlers
@@ -139,8 +141,9 @@ sub err_html {
     $r->set_handlers(PerlHandler => undef);
 
 
-    #  Optionally kill this Apache process afterwards to make sure it does not behave
-    #  badly after this error, if that is what the user has configured
+    #  Optionally kill this Apache process afterwards to make sure it does
+    #  not behave badly after this error, if that is what the user has
+    #  configured
     #
     if ($WEBDYNE_ERROR_EXIT) {
         my $cr=sub {CORE::exit()};
@@ -268,7 +271,7 @@ sub err_html {
 
             #  Clear error stack again, make sure all is clean before we return.
             #
-            errclr(); eval {undef} if $@;
+            errclr(); eval {} if $@;
 
         };
 
@@ -289,6 +292,7 @@ sub err_html {
 
         #  Return result
         #
+        debug("return status: $status");
         return $status
 
     }

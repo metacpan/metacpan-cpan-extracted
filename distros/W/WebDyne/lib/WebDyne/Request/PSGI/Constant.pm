@@ -20,20 +20,20 @@ package WebDyne::Request::PSGI::Constant;
 #  Pragma
 #
 use strict qw(vars);
-#use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
 use vars qw($VERSION @ISA %Constant);
 use warnings;
 
 
+#  Does the heavy liftying of importing into caller namespace
+#
+require WebDyne::Constant;
+@ISA=qw(WebDyne::Constant);
+
+
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
-
-#  Get module file name and path, derive name of file to store local constants
-#
-use Cwd qw(abs_path);
-my $local_fn=abs_path(__FILE__) . '.local';
 
 
 #  Hash of constants
@@ -60,16 +60,16 @@ my $local_fn=abs_path(__FILE__) . '.local';
     #
     #  Serve any static file except .psp
     #
-    #WEBDYNE_PLACK_MIDDLEWARE_STATIC => qr{^(?!.*\.psp$).*\.\w+$},
+    #WEBDYNE_PSGI_MIDDLEWARE_STATIC => qr{^(?!.*\.psp$).*\.\w+$},
     #
     #  Just common files
     #
-    WEBDYNE_PLACK_MIDDLEWARE_STATIC => qr{\.(?:css|js|jpg|jpeg|png|gif|svg|ico|woff2?|ttf|eot|otf|webp|map|txt|inc|htm|html)$}i,
+    WEBDYNE_PSGI_MIDDLEWARE_STATIC => qr{\.(?:css|js|jpg|jpeg|png|gif|svg|ico|woff2?|ttf|eot|otf|webp|map|txt|inc|htm|html)$}i,
     
     
     #  All other middleware. Uncomment/modify as required
     #
-    WEBDYNE_PLACK_MIDDLEWARE_AR => [
+    WEBDYNE_PSGI_MIDDLEWARE => [
         
         #{ 'Debug' => 
         #    { panels => [ qw(Environment) ] } 
@@ -84,9 +84,10 @@ my $local_fn=abs_path(__FILE__) . '.local';
     ],
     
     
-    #  Dir Config
+    #  Environment variables to keep, needs to be array ref
     #
-    WEBDYNE_PSGI_DIR_CONFIG => undef,
+    WEBDYNE_PSGI_ENV_KEEP => [qw(DOCUMENT_ROOT DOCUMENT_DEFAULT)],
+    WEBDYNE_PSGI_ENV_SET  => {},
     
     
     #  Warn on error ?
@@ -98,20 +99,8 @@ my $local_fn=abs_path(__FILE__) . '.local';
 # >>>
 
 
-sub import {
-    
-    goto &WebDyne::Constant::import;
-    
-}
-
-
-#  Export constants to namespace, place in export tags
-#
-require WebDyne::Constant;
-@ISA=qw(WebDyne::Constant);
-
-
-#  All done
+#  Done
 #
 1;
-#===================================================================================================
+__END__
+

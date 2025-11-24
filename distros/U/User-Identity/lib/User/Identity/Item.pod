@@ -96,7 +96,7 @@ collection at hand, and is returned.  C<$role> typically is a list of
 parameters for one role, or a reference to an array containing these
 values.
 
-example: 
+» example: 
 
   my $ui   = User::Identity->new(...);
   my $home = $ui->add(location => [home => street => '27 Roadstreet', ...] );
@@ -132,7 +132,7 @@ Predefined type nicknames are C<email>, C<system>, and C<location>.
 
 =back
 
-example: 
+» example: 
 
   my $me   = User::Identity->new(...);
   my $locs = User::Identity::Collection::Locations->new();
@@ -146,7 +146,7 @@ example:
 In scalar context the collection object with the C<$name> is returned.
 In list context, all the roles within the collection are returned.
 
-example: 
+» example: 
 
   my @roles = $me->collection('email');        # list of collected items
   my @roles = $me->collection('email')->roles; # same of collected items
@@ -171,7 +171,7 @@ Go from this object to its parent, to its parent, and so on, until a
 L<User::Identity|User::Identity> is found or the top of the object tree has been
 reached.
 
-example: 
+» example: 
 
   print $email->user->fullName;
 
@@ -186,7 +186,7 @@ example:
 Returns the object with the specified C<$role> within the named collection.
 The collection can be specified as name or object.
 
-example: 
+» example: 
 
   my $role  = $me->find(location => 'work');       # one location
   my $role  = $me->collection('location')->find('work'); # same
@@ -205,7 +205,7 @@ example:
 
 The first argument is an object, but not of a class which extends
 L<User::Identity::Collection|User::Identity::Collection>.
-Cast by addCollection()
+Cast by C<addCollection()>
 
 =item Error: Cannot load collection module for $type ($class).
 
@@ -213,50 +213,50 @@ Either the specified C<$type> does not exist, or that module named C<$class> ret
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
-Cast by addCollection()
+Cast by C<addCollection()>
 
 =item Error: Creation of a collection via $class failed.
 
 The C<$class> did compile, but it was not possible to create an object
 of that class using the options you specified.
-Cast by addCollection()
+Cast by C<addCollection()>
 
 =item Error: Don't know what type of collection you want to add.
 
 If you add a collection, it must either by a collection object or a
 list of options which can be used to create a collection object.  In
 the latter case, the type of collection must be specified.
-Cast by addCollection()
+Cast by C<addCollection()>
 
 =item Error: Each item requires a name
 
 You have to specify a name for each item.  These names need to be
 unique within one collection, but feel free to give the same name
 to an e-mail address and a location.
-Cast by new()
+Cast by C<new()>
 
 =item Warning: No collection $name
 
 The collection with C<$name> does not exist and can not be created.
-Cast by add()
+Cast by C<add()>
 
 =item Warning: Unknown option $name for a $class
 
 One used option is not defined.  Check the manual page of the class to
 see which options are accepted.
-Cast by new()
+Cast by C<new()>
 
 =item Warning: Unknown options @names for a $class
 
 More than one option is not defined.
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity version 1.03,
-built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 3.00,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

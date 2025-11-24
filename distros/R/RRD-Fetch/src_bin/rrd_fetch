@@ -1,0 +1,152 @@
+#!perl
+
+=head1 NAME
+
+rrd_fetch - A wrapper for "rrdtool fetch" that dumps the results to JSON.
+
+=head1 SYNOPSIS
+
+rrd_fetch B<-f> <file> B<-s> <start> B<-e> <end>  [B<-c> <CF>] [B<-r> <resolution>]
+[B<-b> <backoff>] [B<-R> <retries>] [B<-B> <by>] [B<-p>]
+
+rrd_fetch B<-f> --ds <file> B<-s> <start> [B<-F> <days>] [B<-c> <CF>] [B<-r> <resolution>]
+[B<-b> <backoff>] [B<-R> <retries>] [B<-B> <by>] [B<-p>]
+
+=head1 DESCRIPTION
+
+For information on the JSON output, see fetch_joined for L<RRD::Fetch>.
+
+=head1 FLAGS
+
+=head2 --ds
+
+Print out daily stats information.
+
+=head2 -f <config file>
+
+The config file to use.
+
+=head2 -F <days>
+
+How many days daily stat stuff should be done for.
+
+Default :: 7
+
+=head2 -s <start>
+
+When to start.
+
+=head2 -e <end>
+
+When to end.
+
+=head2 -c <CF>
+
+The CF setting to use.
+
+    AVERAGE (default)
+    MIN
+    MAX
+    LAST
+
+=head2 -r <resolution>
+
+What to use for the resolution.
+
+Default is undef.
+
+=head2 -R <retries>
+
+If it is a non-zero exit how many times to retry.
+Defaults to 3. Set to 0 to disable.
+
+=head2 -b <backoff>
+
+How long to back off in seconds if attempting a retry.
+Defaults to 1.
+
+=head2 -B <by>
+
+Which format to use for the results. See L<RRD::Fetch> for more
+info. The default is column.
+
+=head2 -p
+
+Pretty print the results.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use JSON         ();
+use Pod::Usage   qw( pod2usage );
+use RRD::Fetch   ();
+
+sub main::VERSION_MESSAGE {
+	print 'rrd_fetch v. ' . $RRD::Fetch::VERSION . "\n";
+	exit 255;
+}
+
+sub main::HELP_MESSAGE {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
+
+my $help;
+my $version;
+my $rrd_file;
+my $CF;
+my $resolution;
+my $backoff;
+my $retries;
+my $by;
+my $start;
+my $end;
+my $pretty = 0;
+my $for;
+my $daily_stats = 0;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'f=s'     => \$rrd_file,
+	'c=s'     => \$CF,
+	'r=s'     => \$resolution,
+	'b=s'     => \$backoff,
+	'R=s'     => \$retries,
+	'B=s'     => \$by,
+	's=s'     => \$start,
+	'e=s'     => \$end,
+	'F=s'     => \$for,
+	'ds'      => \$daily_stats,
+	'p'       => \$pretty,
+);
+
+my $rrd_fetch = RRD::Fetch->new(
+	'rrd_file'   => $rrd_file,
+	'CF'         => $CF,
+	'resolution' => $resolution,
+	'backoff'    => $backoff,
+	'retries'    => $retries,
+);
+
+my $results;
+if ($daily_stats) {
+	$results = $rrd_fetch->daily_stats(
+		'start' => $start,
+		'for'   => $for,
+	);
+} else {
+	$results = $rrd_fetch->fetch_joined(
+		'start' => $start,
+		'end'   => $end,
+	);
+}
+
+print JSON->new->utf8->pretty($pretty)->canonical(1)->encode($results);
+if ( !$pretty ) {
+	print "\n";
+}

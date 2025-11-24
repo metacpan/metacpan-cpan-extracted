@@ -3,6 +3,12 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+version 3.00: Wed 19 Nov 19:38:18 CET 2025
+
+	Improvements:
+	- add bugtracker to meta
+	- bump version number to refect it depends on Mail-Box 3
+
 version 0.22: Mon 15 Sep 14:43:11 CEST 2025
 
 	Changes:

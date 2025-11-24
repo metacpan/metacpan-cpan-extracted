@@ -6,7 +6,7 @@ use autodie qw(:all);
 use File::Which;
 use IO::CaptureOutput qw(capture);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 BEGIN {
 
@@ -111,7 +111,7 @@ Term::GnuScreen - control GNU screen
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 

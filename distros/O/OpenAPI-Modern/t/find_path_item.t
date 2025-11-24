@@ -2799,7 +2799,7 @@ YAML
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
-  /login/{username}:  # { ascii-sorts ahead of ~, so a simple string comparison would match this first
+  /login/{username}:  # { ascii-sorts ahead of ~, so a simple string comparison would match this first }
     get: {}
   /login/~ether:      # concrete components should always match first ahead of templated ones
     get: {}

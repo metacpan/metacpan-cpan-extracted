@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::Deep" : "0"
          }
       },
       "configure" : {
@@ -65,7 +65,7 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "2.031",
+   "version" : "2.034",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

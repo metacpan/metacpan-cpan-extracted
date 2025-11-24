@@ -2,7 +2,7 @@ NAME
     Term::GnuScreen - control GNU screen
 
 VERSION
-    Version 0.05
+    Version 0.06
 
 SYNOPSIS
     Term::GnuScreen provides a simple interface to control a GNU screen

@@ -1,27 +1,33 @@
 {
-   "abstract" : "control GNU screen",
+   "abstract" : "unknown",
    "author" : [
-      "Mario Domgoergen <dom@math.uni-bonn.de>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-GnuScreen",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -31,24 +37,12 @@
             "IO::CaptureOutput" : "0",
             "IPC::System::Simple" : "0",
             "Moo" : "0",
+            "Test::More" : "0",
             "autodie" : "0"
          }
       }
    },
-   "provides" : {
-      "Term::GnuScreen" : {
-         "file" : "lib/Term/GnuScreen.pm",
-         "version" : "0.05"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "url" : "http://github.com/mdom/term-gnuscreen"
-      }
-   },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1149,6 +1149,8 @@ typedef struct Attributes {
 	CK_ATTRIBUTE* member;
 } Attributes;
 
+static const Attributes empty = { 0, NULL };
+
 enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigintAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, ProfileIdAttr, MechanismAttr, OtpFormatAttr, OtpParamAttr, TokenFlagsAttr, SecurityDomainAttr, IntArrayAttr, MechanismArrayAttr, AttrAttr };
 
 typedef struct { const char* key; size_t length; CK_ULONG value; enum Attribute_type type; } attribute_entry;
@@ -1218,8 +1220,8 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("modifiable"), CKA_MODIFIABLE, BoolAttr },
 	{ STR_WITH_LEN("copyable"), CKA_COPYABLE, BoolAttr },
 	{ STR_WITH_LEN("destroyable"), CKA_DESTROYABLE, BoolAttr },
-	{ STR_WITH_LEN("ecdsa-params"), CKA_ECDSA_PARAMS, BigintAttr },
-	{ STR_WITH_LEN("ec-params"), CKA_EC_PARAMS, BigintAttr },
+	{ STR_WITH_LEN("ecdsa-params"), CKA_ECDSA_PARAMS, ByteAttr },
+	{ STR_WITH_LEN("ec-params"), CKA_EC_PARAMS, ByteAttr },
 	{ STR_WITH_LEN("ec-point"), CKA_EC_POINT, BigintAttr },
 	{ STR_WITH_LEN("secondary-auth"), CKA_SECONDARY_AUTH, BoolAttr },
 	{ STR_WITH_LEN("auth-pin-flags"), CKA_AUTH_PIN_FLAGS, TokenFlagsAttr },
@@ -1358,13 +1360,13 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 							croak("Invalid Bigint attribute value");
 						AV* input = (AV*) SvRV(value);
 						char* array;
-						Newxz(array, av_len(input) + 1, char);
+						Newxz(array, av_count(input), char);
 						SAVEFREEPV(array);
 						size_t i;
 						for (i = 0; i < av_count(input); ++i)
 							array[i] = (char)SvUV(*av_fetch(input, i, FALSE));
 						current->pValue = array;
-						current->ulValueLen = av_len(input) + 1;
+						current->ulValueLen = av_count(input);
 						break;
 					}
 					// FALLTHROUGH
@@ -1421,12 +1423,12 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 						croak("Invalid IntArray attribute value");
 					AV* array = (AV*) SvRV(value);
 					CK_ULONG* values, i;
-					Newxz(values, av_len(array) + 1, CK_ULONG);
+					Newxz(values, av_count(array), CK_ULONG);
 					SAVEFREEPV(values);
 					for (i = 0; i < av_count(array); ++i)
 						values[i] = (CK_ULONG)SvUV(*av_fetch(array, i, FALSE));
 					current->pValue = value;
-					current->ulValueLen = av_len(array) + 1;
+					current->ulValueLen = av_count(array);
 					break;
 				}
 				case MechanismArrayAttr: {
@@ -1434,12 +1436,12 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 						croak("Invalid MechanismArray attribute value");
 					AV* array = (AV*) SvRV(value);
 					CK_ULONG* values, i;
-					Newxz(values, av_len(array) + 1, CK_ULONG);
+					Newxz(values, av_count(array), CK_ULONG);
 					SAVEFREEPV(values);
 					for (i = 0; i < av_count(array); ++i)
 						values[i] = (CK_ULONG)get_mechanism_type(*av_fetch(array, i, FALSE));
 					current->pValue = value;
-					current->ulValueLen = av_len(array) + 1;
+					current->ulValueLen = av_count(array);
 					break;
 				}
 				case AttrAttr: {
@@ -1543,7 +1545,7 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 		}
 		case SecurityDomainAttr: {
 			CK_ULONG integer = get_intval(pointer);
-			return reverse_flags(security_domains, integer);
+			return entry_to_sv(map_reverse_find(security_domains, integer));
 		}
 		case IntArrayAttr: {
 			AV* result = newAV();
@@ -2203,7 +2205,7 @@ OUTPUT:
 	RETVAL
 
 
-void find_objects(Crypt::HSM::Session self, Attributes attributes)
+void find_objects(Crypt::HSM::Session self, Attributes attributes = empty)
 PPCODE:
 	CK_RV result = self->provider->funcs->C_FindObjectsInit(self->handle, attributes.member, attributes.length);
 	if (result != CKR_OK)
@@ -2239,7 +2241,7 @@ PPCODE:
 	mXPUSHs(new_object(self, privateKey));
 
 
-SV* generate_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Attributes keyTemplate, ...)
+SV* generate_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Attributes keyTemplate = empty, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
 	CK_OBJECT_HANDLE handle;
@@ -2368,6 +2370,31 @@ OUTPUT:
 	RETVAL
 
 
+SV* sign_recover(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
+	CK_RV result = self->provider->funcs->C_SignRecoverInit(self->handle, &mechanism, key->handle);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize signing", result);
+
+	CK_ULONG dataLen, signedDataLen;
+	CK_BYTE* dataPV = get_buffer(data, &dataLen);
+	result = self->provider->funcs->C_SignRecover(self->handle, dataPV, dataLen, NULL, &signedDataLen);
+	if (result != CKR_OK)
+		croak_with("Couldn't compute signed length", result);
+
+	RETVAL = newSV(signedDataLen);
+	SvPOK_only(RETVAL);
+	result = self->provider->funcs->C_SignRecover(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
+	if (result != CKR_OK) {
+		SvREFCNT_dec(RETVAL);
+		croak_with("Couldn't sign", result);
+	}
+	SvCUR(RETVAL) = signedDataLen;
+OUTPUT:
+	RETVAL
+
+
 bool verify(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, SV* signature, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 5);
@@ -2401,6 +2428,33 @@ CODE:
 	Newxz(RETVAL, 1, struct Stream);
 	RETVAL->session = session_refcount_increment(self);
 	RETVAL->sign_key = key->handle;
+OUTPUT:
+	RETVAL
+
+
+SV* verify_recover(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* signedData, ...)
+CODE:
+	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
+	CK_RV result = self->provider->funcs->C_VerifyRecoverInit(self->handle, &mechanism, key->handle);
+	if (result != CKR_OK)
+		croak_with("Couldn't initialize verifying", result);
+
+	CK_ULONG signedDataLen, dataLen;
+	CK_BYTE* signedDataPV = get_buffer(signedData, &signedDataLen);
+	result = self->provider->funcs->C_VerifyRecover(self->handle, signedDataPV, signedDataLen, NULL, &dataLen);
+	if (result == CKR_OK) {
+		RETVAL = newSV(dataLen);
+		SvPOK_only(RETVAL);
+		result = self->provider->funcs->C_VerifyRecover(self->handle, signedDataPV, signedDataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &dataLen);
+		if (result != CKR_OK) {
+			SvREFCNT_dec(RETVAL);
+			croak_with("Couldn't verify", result);
+		}
+		SvCUR(RETVAL) = dataLen;
+	} else if (result == CKR_SIGNATURE_INVALID)
+		RETVAL = &PL_sv_undef;
+	else
+		croak_with("Couldn't verify", result);
 OUTPUT:
 	RETVAL
 
@@ -2462,7 +2516,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-SV* unwrap_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object unwrappingKey, SV* wrapped, Attributes attributes, ...)
+SV* unwrap_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object unwrappingKey, SV* wrapped, Attributes attributes = empty, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 5);
 	CK_ULONG wrappedLen;
@@ -2475,7 +2529,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-SV* derive_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object baseKey, Attributes attributes, ...)
+SV* derive_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object baseKey, Attributes attributes = empty, ...)
 CODE:
 	CK_OBJECT_HANDLE handle;
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
@@ -2518,7 +2572,7 @@ void DESTROY(Crypt::HSM::Object self)
 CODE:
 	session_refcount_decrement(self->session);
 
-SV* copy_object(Crypt::HSM::Object self, Attributes template)
+SV* copy_object(Crypt::HSM::Object self, Attributes template = empty)
 CODE:
 	CK_OBJECT_HANDLE handle;
 	CK_RV result = self->session->provider->funcs->C_CopyObject(self->session->handle, self->handle, template.member, template.length, &handle);
@@ -2574,7 +2628,7 @@ OUTPUT:
 HV* get_attributes(Crypt::HSM::Object self, AV* attributes_av)
 CODE:
 	Attributes attributes;
-	attributes.length = av_len(attributes_av) + 1;
+	attributes.length = av_count(attributes_av);
 	Newxz(attributes.member, attributes.length, CK_ATTRIBUTE);
 	SAVEFREEPV(attributes.member);
 

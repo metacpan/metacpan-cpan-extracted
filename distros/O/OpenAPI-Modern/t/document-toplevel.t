@@ -10,7 +10,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
-use Test2::Warnings qw(:no_end_test warnings had_no_warnings);
+use Test2::Warnings 0.038 qw(:no_end_test warnings had_no_warnings);
 
 use lib 't/lib';
 use Helper;

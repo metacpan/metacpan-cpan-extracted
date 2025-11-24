@@ -184,7 +184,7 @@ Dist::Zilla::PluginBundle::OYOULE - Dist::Zilla plugin configuration for Author/
 
 =head1 VERSION
 
-version 1.1.1
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -256,10 +256,9 @@ Oliver Youle <oliver@youle.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Oliver Youle.
+This software is copyright (c) 2025 by Oliver Youle.
 
-This is free software, licensed under:
-
-  The GNU General Public License, Version 3, June 2007
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

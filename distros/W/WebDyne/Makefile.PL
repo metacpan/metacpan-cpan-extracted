@@ -46,6 +46,9 @@ my %WriteMakefile=(
         'Env::Path'      => 0,
 
     },
+    BUILD_REQUIRES  => {
+        'Test::Deep'     => 0
+    },
     META_MERGE => {
         'meta-spec' => {
             version => 2

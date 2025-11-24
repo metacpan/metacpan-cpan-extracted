@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Object-Realize-Later version 0.22.
+# This code is part of Perl distribution Object-Realize-Later version 3.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package Object::Realize::Later;{
-our $VERSION = '0.22';
+our $VERSION = '3.00';
 }
 
 
@@ -26,6 +22,8 @@ use strict;
 no strict 'refs';
 
 #--------------------
+
+#------------
 
 my $named  = 'ORL_realization_method';
 my $helper = 'ORL_fake_realized';
@@ -205,8 +203,7 @@ sub import(@)
 		. can_code($args)
 		. AUTOLOAD_code($args)
 		. realize_code($args)
-		. will_realize_code($args)
-		;
+		. will_realize_code($args);
 #warn $eval;
 
 	# Install the code

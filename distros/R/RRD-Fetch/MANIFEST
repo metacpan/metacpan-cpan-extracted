@@ -1,0 +1,17 @@
+Changes
+lib/RRD/Fetch.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+src_bin/rrd_fetch
+t/00-load.t
+t/data/ucd_load-20251101-20251102-column.json
+t/data/ucd_load-20251101-20251102-time.json
+t/data/ucd_load.rrd
+t/fetch.t
+t/manifest.t
+t/new.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

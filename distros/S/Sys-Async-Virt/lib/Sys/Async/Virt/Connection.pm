@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection v0.1.8;
+class Sys::Async::Virt::Connection v0.1.9;
 
 # inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
 inherit IO::Async::Notifier;
@@ -86,7 +86,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.1.8
+v0.1.9
 
 =head1 SYNOPSIS
 

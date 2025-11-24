@@ -1071,6 +1071,10 @@ examples/var1.psp
 examples/var2.psp                        
 examples/var3.psp                        
 examples/var4.psp                        
+examples/README.md                       
+lib/WebDyne/Filter.pm                    
+t/07-dir_config.t                        
+t/webdyne_dir-config.conf.pl             
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 ChangeLog                                Module ChangeLog (added by ExtUtils::Git)

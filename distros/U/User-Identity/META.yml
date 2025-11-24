@@ -22,9 +22,10 @@ no_index:
 requires:
   Hash::Ordered: '0.014'
 resources:
+  bugtracker: https://github.com/markov2/perl5-User-Identity/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-User-Identity.git
-version: '1.03'
+version: '3.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2003

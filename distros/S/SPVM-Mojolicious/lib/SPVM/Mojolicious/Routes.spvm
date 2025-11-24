@@ -88,15 +88,11 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
       
       $continue = $cb->($c);
     }
-    elsif (my $template = $r->template) {
+    elsif (my $template = $r->pattern->defaults->{"template"}->(string)) {
       
-      my $format = $r->format;
+      # $c->log->trace("Routing to the template $template.$format.$handler");
       
-      my $handler = $r->handler;
-      
-      $c->log->trace("Routing to the template $template.$format.$handler");
-      
-      my $output = $c->render($template, {format => $format, handler => $handler});
+      my $output = $c->render($template, $r->pattern->defaults->to_options);
       
       if ($output) {
         $c->set_rendered(1);

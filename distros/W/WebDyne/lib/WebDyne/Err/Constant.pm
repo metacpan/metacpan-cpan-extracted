@@ -16,11 +16,14 @@ package WebDyne::Err::Constant;
 #  Pragma
 #
 use strict qw(vars);
-#use vars   qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
 use vars   qw($VERSION @ISA %Constant);
 use warnings;
-no warnings qw(uninitialized);
-local $^W=0;
+
+
+#  Does the heavy liftying of importing into caller namespace
+#
+require WebDyne::Constant;
+@ISA=qw(WebDyne::Constant);
 
 
 #  Need the File::Spec module
@@ -30,7 +33,7 @@ use File::Spec;
 
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Hash of constants
@@ -63,7 +66,7 @@ sub class_dn {
 
     #  Get package file name so we can look up in inc
     #
-    (my $class_fn="${class}.pm")=~s/::/\//g;
+    (my $class_fn="${class}.pm")=~s{::}{/}g;
     $class_fn=$INC{$class_fn} ||
         die("unable to find location for $class in \%INC");
 
@@ -75,22 +78,6 @@ sub class_dn {
 }
 
 
-sub import {
-    
-    goto &WebDyne::Constant::import;
-    
-}
-
-
-#  Export constants to namespace, place in export tags
+#  Done
 #
-#require Exporter;
-require WebDyne::Constant;
-#@ISA=qw(Exporter WebDyne::Constant);
-@ISA=qw(WebDyne::Constant);
-#+__PACKAGE__->local_constant_load(\%Constant);
-#foreach (keys %Constant) {${$_}=$Constant{$_}}
-#@EXPORT=map {'$' . $_} keys %Constant;
-#@EXPORT_OK=@EXPORT;
-#%EXPORT_TAGS=(all => [@EXPORT_OK]);
-#$_=\%Constant;
+1;

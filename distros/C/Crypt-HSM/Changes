@@ -1,5 +1,12 @@
 Revision history for Crypt-HSM
 
+0.024     2025-11-24 11:48:42+01:00 Europe/Brussels
+          - Add sign_recover and verify_recover methods
+          - Allow empty attributes argument in various methods
+          - Correct value returned in java-midp-security-domain
+          - Document most attributes on objects
+          - Correctly mark EC params as octet strings
+
 0.023     2025-11-19 19:09:44+01:00 Europe/Brussels
           - [BREAKING] Turn open_session argument into named arguments
           - Fix session state field to a scalar

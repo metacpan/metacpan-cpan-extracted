@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Connection::SSH v0.1.8;
+class Sys::Async::Virt::Connection::SSH v0.1.9;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
@@ -73,22 +73,22 @@ async method connect() {
     my @args =  ('-e', 'none');
     push @args, ('-p', $c{port}) if $c{port};
     push @args, ('-l', $c{username}) if $c{username};
-    push @args, ('-i', $c{keyfile}) if $c{keyfile};
-    push @args, ('-o', 'StrictHostKeyChecking=no') if $c{no_verify};
-    push @args, ('-T') if $c{no_tty};
+    push @args, ('-i', $c{query}->{keyfile}) if $c{query}->{keyfile};
+    push @args, ('-o', 'StrictHostKeyChecking=no') if $c{query}->{no_verify};
+    push @args, ('-T') if $c{query}->{no_tty};
 
     my $remote_cmd;
     my $proxy_mode  = $c{query}->{proxy} // 'auto';
     my $socket_path = $_socket // $c{query}->{socket} //
         socket_path(readonly => $_readonly,
                     hypervisor => $c{hypervisor},
-                    mode => $c{mode},
+                    mode => $c{query}->{mode},
                     type => $c{type});
 
     my $nc_command = sprintf($nc_proxy,
                              $c{query}->{netcat} // 'nc',
                              $socket_path);
-    my $native_command = 'virt-ssh-helper ' . shell_escape($c{proxy});
+    my $native_command = 'virt-ssh-helper ' . shell_escape("$c{proxy}");
     if ($proxy_mode eq 'netcat') {
         $remote_cmd = sprintf(q|sh -c %s|, shell_escape($nc_command));
     }
@@ -105,7 +105,7 @@ async method connect() {
         croak $log->fatal( "Unknown proxy mode '$proxy_mode'" );
     }
 
-    my $local_cmd  = $c{command} // 'ssh';
+    my $local_cmd  = $c{query}->{command} // 'ssh';
     my @cmd = ($local_cmd, @args, '--', $c{host}, $remote_cmd);
     $log->trace("SSH remote command: $remote_cmd");
     $log->trace("SSH total command: " . join(' ', @cmd) );
@@ -147,7 +147,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.1.8
+v0.1.9
 
 =head1 SYNOPSIS
 

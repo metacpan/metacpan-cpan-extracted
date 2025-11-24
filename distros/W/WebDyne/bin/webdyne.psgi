@@ -18,11 +18,13 @@ package WebDyne::Request::PSGI::Run;
 #
 use strict qw(vars);
 use vars   qw($VERSION);
+use warnings;
+no warnings qw(uninitialized);
 
 
 #  External Modules
 #
-use HTTP::Status qw(RC_INTERNAL_SERVER_ERROR RC_NOT_FOUND HTTP_OK);
+use HTTP::Status qw(:constants is_success is_error);
 use IO::String;
 use Data::Dumper;
 use Cwd qw(cwd);
@@ -39,7 +41,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  API file name cache
@@ -186,8 +188,8 @@ sub handler_static {
     #  Used when starting webdyne.psgi from command line without plackup or via starman - presumably for dev
     #  purposes so include the Plack static middleware to allow serving non-psp files such as css
     #
-    my $handler_cr=shift();
-    if (my $qr=$WEBDYNE_PLACK_MIDDLEWARE_STATIC) {
+    my ($handler_cr, @param)=@_;
+    if (my $qr=$WEBDYNE_PSGI_MIDDLEWARE_STATIC) {
         my $root_dn;
         if (-f $DOCUMENT_ROOT) {
             #  DOCUMENT_ROOT is actually a file. Get the directory name
@@ -213,8 +215,8 @@ sub handler_build {
     
     #  Check for any additional Plack middleware handlers requested in config and wrap them if needed
     #
-    my $handler_cr=shift();
-    if (my $middleware_ar=$WEBDYNE_PLACK_MIDDLEWARE_AR) {
+    my ($handler_cr, @param)=@_;
+    if (my $middleware_ar=$WEBDYNE_PSGI_MIDDLEWARE) {
         #  Yes, middleware requested
         #
         foreach my $middleware_hr (@{$middleware_ar}) {
@@ -222,8 +224,10 @@ sub handler_build {
                 if ($middleware !~ /^Plack::Middleware/) {
                     $middleware = "Plack::Middleware::${middleware}";
                 }
-                (my $middleware_fn = $middleware) =~ s|::|/|g;
-                require "${middleware_fn}.pm";
+                (my $middleware_pm = $middleware) =~ s{::}{/}g;
+                $middleware_pm.='.pm';
+                eval { require $middleware_pm } ||
+                    return err("error loading Plack middleware: $middleware ($middleware_pm), $@");
                 if (ref($opt_hr) eq 'CODE') {
                     #  If opt_hr is code ref means we want DOCUMENT_ROOT built in
                     $opt_hr=$opt_hr->($DOCUMENT_ROOT);
@@ -231,6 +235,13 @@ sub handler_build {
                 $handler_cr=$middleware->wrap($handler_cr, %{$opt_hr});
             }
         }
+    }
+    if ($WEBDYNE_PSGI_ENV_KEEP || $WEBDYNE_PSGI_ENV_SET) {
+        require Plack::Middleware::ForceEnv;
+        $handler_cr=Plack::Middleware::ForceEnv->wrap($handler_cr, 
+            %{$WEBDYNE_PSGI_ENV_SET},
+            map {$_=>$ENV{$_}} @{$WEBDYNE_PSGI_ENV_KEEP}
+        )
     }
     return $handler_cr;
     
@@ -244,10 +255,10 @@ sub handler {
 
     #  Get env
     #
-    my $env_hr=shift();
+    my ($env_hr, @param)=@_;
     local *ENV=$env_hr;
-    debug('in handler, env: %s', Dumper(\%ENV));
-
+    debug('in handler, env: %s, param:%s', Dumper(\%ENV, \@param));
+    
 
     #  Cache handler for a location
     #
@@ -259,7 +270,7 @@ sub handler {
     #
     my $html;
     my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, @_) ||
+    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, @param) ||
         return err('unable to create new WebDyne::Request::PSGI object: %s', 
 			$@ || errclr() || 'unknown error');
     debug("r: $r");
@@ -272,7 +283,9 @@ sub handler {
             $r->dir_config('WebDyneHandler') || $ENV{'WebDyneHandler'};
         if ($handler_package) {
             local $SIG{'__DIE__'};
-            unless (eval("require $handler_package")) {
+            (my $handler_package_pm=$handler_package)=~s{::}{/}g;
+            $handler_package_pm.='.pm';
+            unless (eval {require $handler_package_pm}) {
                 #  Didn't load - let Webdyne handle the error.
                 $handler='WebDyne';
             }
@@ -289,7 +302,7 @@ sub handler {
 
     #  Call handler and evaluate results
     #
-    my $status=eval {$handler->handler($r)} if $handler;
+    my $status=eval {$handler->handler($r)};
     debug("handler returned status: $status");
 
 
@@ -303,63 +316,83 @@ sub handler {
 	#  common and quickest test, other 200 codes will fall through the if/else statements and still work
 	#
 	unless ($status == HTTP_OK) {
-        if (!defined($status)) {
-            debug('undefined status returned, looking for error handler');
-            if (($status=$r->status) ne RC_INTERNAL_SERVER_ERROR) {
-                my $error=errdump() || $@; errclr();
-                debug("request handler status:$status, detected error: $error, calling err_html");
-                $r->status(RC_INTERNAL_SERVER_ERROR),
+	    
+	    
+	    #  OK. Most common match didn't happen. Is it an error ?
+	    #
+	    if (!defined($status) || ($status < 0) ||  is_error($status)) {
+	
+	    
+            #  Something went wrong. Let's start working through it
+            #
+            if (($status eq HTTP_NOT_FOUND) && !(-f (my $fn=$r->filename()))) {
+
+            
+                #  We couldn't find file but this might be an API request. Go back through
+                #  file paths looking for a file that matches the apu request, e.g. if URI
+                #  is /api/user/42 go back looking for /api/user.psp or /api.psp in the treet
+                #
+                debug("status: $status, fn: $fn");
+                my $document_root=$r->document_root;
+                if ($WEBDYNE_API_ENABLE) {
+                    debug("status: $status, fn:$fn (%s), looking for API match", $r->filename());
+                    #(my $api_dn=$fn)=~s/^${document_root}//;
+                    (my $api_dn=$ENV{'PATH_INFO'})=~s/^${document_root}//;
+                    my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
+                    my @api_fn;
+                    while (my $dn=shift @api_dn) {
+                        push @api_fn, $dn;
+                        my $api_fn=File::Spec->catfile($document_root, @api_fn) . WEBDYNE_PSP_EXT;
+                        debug("check $api_fn");
+                        #  Check of outside docroot
+                        last if (index($api_fn, $document_root) !=0);
+                        if ($API_fn{$api_fn} || (-f $api_fn)) {
+                            debug("found api file name: $api_fn, %s, dispatching", Dumper(\%API_fn));
+                            $API_fn{$api_fn}++; # Cache so not stat()ing on file system
+                            return &handler($env_hr, filename=>$api_fn);
+                        }
+                    }
+                }
+                
+                
+                #  If get here nothing found, send 404 error
+                #
+                debug("status: $status, fn:$fn, setting HTTP_NOT_FOUND");
+                $r->status(HTTP_NOT_FOUND);
+                my $error=errdump() || "File not found, status ($status)"; errclr();
                 $html=$r->err_html($status, $error)
             }
+            elsif (is_error($status)) {
+            
+                #  Some other error besides 404
+                #
+                debug("returning custom error: $status");
+                $html=$r->custom_response($status) ||
+                    "Error $status with no content - try server error logs ?";
+            }
             else {
-                debug('status fall through !')
+            
+                #  Weird non HTTP status code, something has gone wrong along way
+                #
+                debug('undefined status returned, looking for error handler');
+                my $error=errdump() || $@; errclr();
+                $error ||=  "Unexpected return status ($status) from handler $handler";
+                debug("request handler status:$status, detected error: $error, calling err_html");
+                $r->status(HTTP_INTERNAL_SERVER_ERROR);
+                $html=$r->err_html($status, $error)
+
             }
+                
         }
-        elsif (($status < 0) && !(-f (my $fn=$r->filename())) && !$WEBDYNE_API_ENABLE) {
-            my $document_root=$r->document_root;
-            (my $fn_display=$fn)=~s/^${document_root}//;
-            $fn_display ||= '/';
-            debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
-            $r->status(RC_NOT_FOUND);
-            my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
-            $html=$r->err_html($status, $error)
-            #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
+        else {
+        
+        
+            #  Not an error, but not HTTP_OK
+            #
+            debug("status: $status is not an error, proceeding");
+            
         }
-        elsif (($status < 0) && !(-f (my $fn=$r->filename())) && $WEBDYNE_API_ENABLE) {
-            my $document_root=$r->document_root;
-            (my $api_dn=$fn)=~s/^${document_root}//;
-            my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
-            my @api_fn;
-            while (my $dn=shift @api_dn) {
-                push @api_fn, $dn;
-                #my $api_fn=File::Spec->catfile($document_root, @api_fn) . '.psp';
-                my $api_fn=File::Spec->catfile($document_root, @api_fn) . WEBDYNE_PSP_EXT;
-                debug("check $api_fn");
-                #  Check of outside docroot
-                last if (index($api_fn, $document_root) !=0);
-                if ($API_fn{$api_fn} || (-f $api_fn)) {
-                    debug("found api file name: $api_fn, %s", Dumper(\%API_fn));
-                    $API_fn{$api_fn}++; # Cache so not stat()ing on file system
-                    return &handler($env_hr, filename=>$api_fn);
-                }
-            }
-            (my $fn_display=$fn)=~s/^${document_root}//;
-            $fn_display ||= '/';
-            debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
-            $r->status(RC_NOT_FOUND);
-            my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
-            $html=$r->err_html($status, $error)
-            #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
-        }
-        elsif ($status < 0) {
-            debug("status: $status, setting RC_INTERNAL_SERVER_ERROR");
-            $r->status($status=RC_INTERNAL_SERVER_ERROR),
-            $html=$r->err_html($status, "Unexpected return status ($status) from handler $handler")
-        }
-        elsif (($status eq RC_INTERNAL_SERVER_ERROR) && !$html) {
-            $html=$r->custom_response($status) ||
-                "Error $status with no content - try server error logs ?";
-        }
+
     }
     debug("final handler status is $status, html:$html");
 
@@ -373,7 +406,7 @@ sub handler {
 	#  Return structure
 	#
 	my @return=(
-        $r->status() || RC_INTERNAL_SERVER_ERROR,
+        $r->status() || HTTP_INTERNAL_SERVER_ERROR,
         [
 			%{$r->headers_out()}
 		],
@@ -402,13 +435,14 @@ sub error {
 	#  Get and return error string as last resort. Test function not used 
 	#  in main handler.
 	#
-	my $error=sprintf(shift(), @_) ||
+	my @error=@_;
+	my $error=sprintf(shift(), @error) ||
 		'Unknown error';
 
 	#  Basic error response
 	#
     return [
-        RC_INTERNAL_SERVER_ERROR,
+        HTTP_INTERNAL_SERVER_ERROR,
         ['Content-Type' => 'text/plain'],
         [join($/,
 			'Internal Server Error:',
@@ -419,6 +453,8 @@ sub error {
 
 }
 
+#  DO NOT END WITH 1; Here - will break Apache PSGI 
+#
 __END__
 
 # Documentation in Markdown. Convert to POD using markpod from 

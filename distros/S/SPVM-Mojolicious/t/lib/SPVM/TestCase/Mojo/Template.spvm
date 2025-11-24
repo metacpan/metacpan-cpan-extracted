@@ -1,0 +1,481 @@
+class TestCase::Mojo::Template {
+  use Mojolicious;
+  use Mojo::Home;
+  use Mojo::Log;
+  
+  use Mojolicious::Static;
+  use Mojolicious::Types;
+  use Mojolicious::Lite;
+  use Mojolicious::Plugin;
+  use Mojolicious::Plugins;
+  use Mojolicious::Lite;
+  use Mojolicious::Routes::Pattern;
+  use Mojolicious::Routes::Match;
+  use Mojolicious::Controller;
+  use Mojo::Message::Request;
+  use Mojo::Template;
+  
+  static method basic : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% for (my $i = 0; $i < 3; $i++) {
+  a
+% }
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "  a\n  a\n  a\n")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = "";
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+a
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^a\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+  a
+  a
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "  a\n  a\n")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+\"'
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\\\\\"'\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+a
+<%
+  my $num = 1;
+%>
+b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*a\s+b\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+<%= 123 %>
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*123\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+a
+% my $num = 1;
+b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*a\s+b\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+a
+%= 123
+b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "a\s*123\s*b")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+a<%= 123 %>b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*a123b\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+      my $code = <<'EOS';
+a<%= 2 +
+10 %>b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*a12b\s*$")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method xml_escape : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      $mt->set_auto_escape(1);
+      
+      my $code = <<'EOS';
+<%= "&<>\"'" %>
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*&amp;&lt;&gt;&quot;&#39;\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      $mt->set_auto_escape(1);
+      
+      my $code = <<'EOS';
+<%== "&<>" %>
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*&<>\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      $mt->set_auto_escape(1);
+      
+      my $code = <<'EOS';
+<%= Mojo::ByteStream->new("&<>") %>
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*&<>\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      $mt->set_auto_escape(1);
+      
+      my $code = <<'EOS';
+%== "&<>"
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*&<>\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+<%= compile_type_name $c %>
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "Mojolicious::Controller")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method comment : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% my $num = 123;
+%= $num
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "123")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% my $num = 123;
+%# my $num = 456;
+%= $num
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "123")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+<% my $num = 123; %>
+<%# my $num = 456; %>
+%= $num
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "123")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method escape_line_ending : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+a\
+b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "\s*ab\s*")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+a\\
+b
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "\s*a\\\\\s+b\s*")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method replace_mark : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+%%
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*%\s*$")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+<%%
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "^\s*<%\s*$")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method trim_mark : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% for (my $i = 0; $i < 3; $i++) {
+  <%= "a" =%>  
+% }
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "aaa")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method capture : int () {
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% my $block = begin
+  % my $num = 123;
+  a<%= $num %>b
+% end
+
+%= $block->();
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "a123b")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% my $block = begin ($string : string)
+  % my $num = 123;
+  a<%= $num %><%= $string %>b
+% end
+
+%= $block->("d");
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "a123db")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $mt = Mojo::Template->new;
+      
+    my $code = <<'EOS';
+% my $block = begin
+  <%= compile_type_name $c %>
+% end
+
+%= $block->();
+EOS
+      
+      my $output = $mt->render($code);
+      
+      unless (Re->m($output, "Mojolicious::Controller")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+}

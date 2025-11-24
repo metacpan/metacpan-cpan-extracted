@@ -1,303 +1,197 @@
 # NAME
 
-Cron::Toolkit - Cron parser, describer, and scheduler with full Quartz support
+Cron::Toolkit - Quartz-compatible cron parser with unique extensions and over 400 tests
 
 # SYNOPSIS
 
     use Cron::Toolkit;
-    use Time::Moment; # For epoch examples
+    use feature qw(say);
 
-    # Standard constructor (auto-detects Unix/Quartz)
-    my $cron = Cron::Toolkit->new(
-        expression => "0 30 14 * * 1#3 ?",
-        time_zone => "America/New_York" # Or utc_offset => -300
+    my $c = Cron::Toolkit->new(
+        expression => "0 30 14 ? * 6-2 *",
+        time_zone  => "Europe/London",
     );
 
-    # Unix-specific constructor
-    my $unix_cron = Cron::Toolkit->new_from_unix(
-        expression => "30 14 * * MON" # Unix 5-field
-    );
+    say $c->describe;
+    # 2:30 PM every day from Saturday to Tuesday of every month
 
-    # Quartz-specific constructor
-    my $quartz_cron = Cron::Toolkit->new_from_quartz(
-        expression => "0 30 14 * * MON 2025" # Quartz 6/7-field
-    );
+    # next occurence in epoch seconds
+    say $c->next;
 
-    # Crontab file or string (supports @aliases)
-    my @crons = Cron::Toolkit->new_from_crontab('/etc/crontab');
+    # previous occurence in epoch seconds
+    say $c->previous;
 
-    $cron->begin_epoch(Time::Moment->new(year => 2025, month => 1, day => 1)->epoch); # Bound to 2025-01-01
-    $cron->end_epoch(Time::Moment->new(year => 2025, month => 12, day => 31)->epoch); # Bound to 2025-12-31
+    # Question: when does February 29th next land on a Monday? 
+    say Cron::Toolkit->new(expression => "0 0 0 29 2 1 *")->next;
+    # Mon Feb 29 00:00:00 2044
 
-    say $cron->describe; # "at 2:30 PM on the third Sunday of every month"
-    say $cron->describe(locale => 'en'); # English (stub for locales like 'fr')
-
-    say $cron->is_match(time) ? "RUN NOW!" : "WAIT";
-
-    say $cron->next; # Next matching epoch after begin_epoch or now (within end)
-    say $cron->previous; # Previous matching epoch before now
-
-    my $nexts = $cron->next_n(3); # Or $cron->next_occurrences(3)
-    say join ", ", map { Time::Moment->from_epoch($_)->strftime('%Y-%m-%d %H:%M:%S') } @$nexts;
-
-    # Utils
-    say $cron->as_string; # "0 30 14 * * ? *"
-    use JSON::MaybeXS; say decode_json($cron->to_json); # Hash of attrs
-    $cron->dump_tree; # Pretty-print AST
+    # See exactly what was parsed
+    $c->dump_tree;
+    # ┌─ second: 0
+    # ├─ minute: 30
+    # ├─ hour:   14
+    # ├─ dom:    ?
+    # ├─ month:  *
+    # ├─ dow:    6-2 
+    # └─ year:   *
 
 # DESCRIPTION
 
-Cron::Toolkit is a comprehensive Perl module for parsing, describing, and scheduling cron expressions. It evolved from a descriptive focus into a versatile toolkit for cron manipulation, featuring timezone-aware matching, bounded searches, and complete Quartz enterprise syntax support (seconds field, L/W/#, steps, ranges, lists).
+`Cron::Toolkit` implements a complete, rigorously-tested cron expression parser that supports the full Quartz Scheduler syntax plus several useful extensions not found in other implementations.
 
-Key features:
+Notable features include:
 
-- Natural Language Descriptions: Generates readable English like "at 2:30 PM on the third Monday of every month in 2025". Extensible for locales via Composer/Visitor.
-- Timezone Awareness: Supports time\_zone (e.g., "America/New\_York") or utc\_offset (-300 minutes) for local-time matching and next/previous calculations. Uses DateTime::TimeZone for DST handling.
-- Bounded Searches: Optional begin\_epoch/end\_epoch limits next/previous to a time window, preventing infinite loops or off-by-one errors.
-- AST Architecture: Tree-based parsing with Pattern nodes (Single, Range, Step, List, Last, Nth, NearestWeekday). Dual visitors for description (Composer + EnglishVisitor) and matching (Matcher + MatchVisitor)—easy to extend for custom patterns or locales.
-- Quartz Compatibility: Full support for seconds field, L (last day), W (nearest weekday), # (nth DOW), steps/ranges/lists. Unix 5-field auto-converts to Quartz (adds seconds=0, year=\*).
-- Production-Ready: 50+ tests covering edges like leap years, month lengths, DOW normalization, DST flips, and bounded clamps. Handles @aliases (@hourly, etc.) in expressions and crontabs.
+- Full 7-field Quartz syntax (seconds and year fields)
+- Both day-of-month and day-of-week may be specified simultaneously (AND logic)
+- Wrapped day-of-week ranges (e.g. `6-2` = Saturday through Tuesday)
+- Proper Quartz-compatible DST handling
+- Time-zone support via IANA names or fixed UTC offsets
+- Natural-language English descriptions
+- Complete crontab parsing with environment variable expansion
+- Full abstract syntax tree and `dump_tree()` for debugging
 
-# TREE ARCHITECTURE
+# RELIABILITY
 
-Cron::Toolkit employs an Abstract Syntax Tree (AST) for robust expression handling:
+The distribution ships with over 400 data-driven tests covering every supported token, leap years, DST transitions, all time zones from UTC−12 to UTC+14, and every edge case discovered during development.
 
-- Parse: TreeParser constructs Pattern nodes from fields (Single for 15, Range for 1-5, Step for \*/15, List for 1,15, Last for L, Nth for 1#3, NearestWeekday for 15W).
-- Describe: Composer fuses node outputs via templates, using EnglishVisitor (or locale subclass) for human-readable text.
-- Match: Matcher evaluates recursively against timestamps, using MatchVisitor for field-by-field checks (context-aware for L/nth/W).
+If it parses, the result is correct.
 
-This separation enables extensibility: Subclass Visitor for new locales (e.g., FrenchVisitor) or patterns (add parse clause + visit method).
+# UNIQUE EXTENSIONS
+
+- DOM + DOW = AND logic
+
+        Allows queries such as "next February 29 that falls on a Monday".
+
+- Wrapped day-of-week ranges
+
+        C<6-2> → Saturday, Sunday, Monday, Tuesday
+
+- Internal day-of-week: 1–7 = Monday–Sunday
+
+        Matches L<Time::Moment> and L<DateTime>. C<as_quartz_string()> converts back to Quartz's 1=Sunday convention.
+
+# FIELD REFERENCE & ALLOWED VALUES
+
+    Field            Allowed values         Allowed special characters 
+    -------------------------------------------------------------------
+    Second           0–59                   *,/,-                     
+    Minute           0–59                   *,/,-,
+    Hour             0–23                   *,/,-,
+    Day of month     1–31                   *,/,-,?,L,LW,W
+    Month            1–12 or JAN–DEC        *,/,-                          
+    Day of week      1–7 or SUN–SAT         *,/,-,?,L,#
+    Year (optional)  1970–2099              *,/,-
+
+    Legend:
+      *    wildcard
+      ,    list
+      -    range
+      /    step
+      ?    no specific value (DOM or DOW only)
+      L    last (day or day-of-week)
+      L-n  n to last day of the month
+      nL   last n-day of the month 
+      LW   last weekday of month
+      nW   nearest weekday to n
+      #    nth day-of-week (e.g. 3#2 = 2nd Wednesday)
+
+    @aliases: @yearly @annually @monthly @weekly @daily @hourly (Quartz standard)
 
 # METHODS
 
-## new
+- `Cron::Toolkit->new( expression => $expr, %options )`
 
-    my $cron = Cron::Toolkit->new(
-        expression => "0 30 14 * * ?",
-        time_zone => "America/New_York", # Auto-calculates offset (DST-aware)
-        utc_offset => -300, # Minutes from UTC (overrides time_zone if both set)
-        begin_epoch => 1640995200, # Optional: Start bound (default: time)
-        end_epoch => 1672531200, # Optional: End bound (default: undef/unbounded)
-    );
+    Main constructor; auto-detects Unix vs Quartz format.
 
-Primary constructor. Auto-detects Unix (5 fields) or Quartz (6/7 fields). Supports @aliases (@hourly → "0 0 \* \* \* ? \*"). Normalizes to 7-field Quartz internally.
+- `Cron::Toolkit->new_from_unix( expression => $expr, %options )`
 
-Parameters:
+    Force traditional 5-field Unix interpretation.
 
-- expression: Required cron string or @alias.
-- time\_zone: Optional TZ string (e.g., "America/New\_York"); auto-calculates utc\_offset if not set.
-- utc\_offset: Optional minutes from UTC (-1080 to +1080); overrides time\_zone calc.
-- begin\_epoch: Optional non-negative epoch; floors searches (default: time).
-- end\_epoch: Optional non-negative epoch; caps searches (default: unbounded).
+- `Cron::Toolkit->new_from_quartz( expression => $expr, %options )`
 
-Returns: Blessed Cron::Toolkit object.
+    Force Quartz interpretation.
 
-## new\_from\_unix
+- `Cron::Toolkit->new_from_crontab( $string )`
 
-    my $unix_cron = Cron::Toolkit->new_from_unix(
-        expression => "30 14 * * MON"
-    );
+    Parse a full crontab; returns a list of `Cron::Toolkit` objects.
+    Supports `$VAR` expansion, user field, and comments.
 
-Unix-specific constructor for 5-field expressions. Auto-converts to Quartz (adds seconds=0, year=\*, normalizes DOW: MON=1→2, SUN=0→1).
+- `$c->as_string`
 
-Parameters: Same as ["new"](#new), but expression must be 5 fields.
+    Normalized 7-field representation (DOW 1–7 = Mon–Sun).
 
-## new\_from\_quartz
+- `$c->as_quartz_string`
 
-    my $quartz_cron = Cron::Toolkit->new_from_quartz(
-        expression => "0 30 14 * * MON 2025"
-    );
+    Quartz-compatible string (DOW 1=Sunday).
 
-Quartz-specific constructor for 6/7-field expressions. Validates and normalizes (adds year=\* if 6 fields, DOW names to numbers).
+- `$c->describe`
 
-Parameters: Same as ["new"](#new), but expression must be 6/7 fields.
+    Human-readable English description.
 
-## new\_from\_crontab
+- `$c->next( [$from_epoch] )`
 
-    my @crons = Cron::Toolkit->new_from_crontab('/etc/crontab');  # Or string
+    Next occurrence after `$from_epoch` or `time`.
 
-Parses a crontab file or string into array of Cron::Toolkit objects. Skips comments (#), empty lines, invalid exprs (warns). Supports @aliases (@hourly → "0 0 \* \* \* ? \*").
+- `$c->previous( [$from_epoch] )`
 
-Parameters:
+    Previous occurrence before `$from_epoch` or `time`.
 
-- input: File path or multi-line string.
+- `$c->is_match( $epoch )`
 
-Returns: Array of valid objects (empty if none).
+    Returns true if `$epoch` matches the expression.
 
-## describe
+- `$c->dump_tree`
 
-    my $english = $cron->describe;
-    my $french = $cron->describe(locale => 'fr');  # Stub; falls back to English
+    Pretty-printed abstract syntax tree (invaluable for debugging).
 
-Returns human-readable description with fused combos (e.g., "at 2:30 PM on the third Monday of every month"). Defaults to English; locale param for extensibility (warns on unsupported, e.g., 'fr'—extend via Visitor subclass).
+- `$c->to_json`
 
-## is\_match
+    JSON representation of the object (expression, description, bounds, etc.).
 
-    my $match = $cron->is_match($epoch_seconds); # True/false
+- Accessors
 
-Returns true if the timestamp matches the cron in the object's timezone (local time, DST-aware).
+        $c->time_zone("Europe/Berlin")
+        $c->utc_offset(+180)          # minutes
+        $c->begin_epoch($epoch)
+        $c->end_epoch($epoch)         # undef = no limit
 
-Parameters:
+# TIME ZONES AND DST
 
-- epoch\_seconds: Non-negative Unix timestamp (UTC).
+All calculations are performed in the configured time zone.
+DST transitions follow Quartz Scheduler rules exactly:
 
-## next
+- Spring forward — times that do not exist are skipped
+- Fall back — repeated local times fire twice
 
-    my $next_epoch = $cron->next($epoch_seconds);
-    my $next_epoch = $cron->next; # Defaults to begin_epoch or time
+# BUGS AND CONTRIBUTIONS
 
-Returns the next matching epoch after the given/current time, clamped >= begin\_epoch and <= end\_epoch (undef if none).
+This module is under active development and has not yet reached a 1.0 release.
 
-Parameters:
+The test suite currently contains over 400 data-driven tests covering every supported token, DST transitions, leap years, all time zones, and many edge cases — but real-world cron expressions can be surprisingly creative.
 
-- epoch\_seconds: Optional non-negative timestamp (defaults: begin\_epoch // time, clamped to bounds).
+If you find:
 
-## previous
+- an expression that should be valid but dies or is rejected
+- a next/previous occurrence that is wrong
+- a description that is misleading or unclear
+- any behaviour that differs from Quartz Scheduler (when using Quartz syntax)
 
-    my $prev_epoch = $cron->previous($epoch_seconds);
-    my $prev_epoch = $cron->previous; # Defaults to time
+...please file a bug report at
+[https://github.com/nathanielgraham/cron-toolkit-perl/issues](https://github.com/nathanielgraham/cron-toolkit-perl/issues)
 
-Returns the previous matching epoch before the given/current time, clamped <= end\_epoch and >= begin\_epoch (undef if none).
+Pull requests with failing test cases are especially welcome — they are the fastest way to get a fix merged.
 
-Parameters:
+Feature requests (e.g. more natural-language locales, RRULE export, etc.) are also very much appreciated.
 
-- epoch\_seconds: Optional non-negative timestamp (defaults: time, clamped to bounds).
-
-## next\_n
-
-    my $next_epochs = $cron->next_n($epoch_seconds, $n, $max_iter);
-    my $next_epochs = $cron->next_n(undef, $n); # Defaults: time, n=1, max_iter=10000
-
-Returns arrayref of the next $n matching epochs after the given/current time, clamped to bounds. Guards against loops with max\_iter (dies on exceed).
-
-Parameters:
-
-- epoch\_seconds: Optional start timestamp (defaults: time).
-- n: Number of occurrences (defaults: 1).
-- max\_iter: Max iterations (defaults: 10000; dies if exceeded).
-
-Returns: Arrayref of epochs (empty if none).
-
-## next\_occurrences
-
-Alias for ["next\_n"](#next_n). Same parameters and return.
-
-## begin\_epoch (GETTER/SETTER)
-
-    say $cron->begin_epoch; # Current value
-    $cron->begin_epoch(1640995200); # Set to 2022-01-01 UTC
-
-Gets/sets the start epoch for bounded searches (non-negative integer or undef). Clamps next/previous from this time onward (defaults: time if undef).
-
-## end\_epoch (GETTER/SETTER)
-
-    say $cron->end_epoch; # undef or current value
-    $cron->end_epoch(1672531200); # Set to 2023-01-01 UTC
-    $cron->end_epoch(undef); # Unbounded
-
-Gets/sets the end epoch for bounded searches (non-negative integer or undef). Caps next/previous at this time (defaults: unbounded if undef).
-
-## utc\_offset (GETTER/SETTER)
-
-    say $cron->utc_offset; # -300
-    $cron->utc_offset(-480); # Switch to PST
-
-Gets/sets UTC offset in minutes (-1080 to +1080). Validates input; overrides time\_zone calc.
-
-## time\_zone (GETTER/SETTER)
-
-    say $cron->time_zone; # "America/New_York"
-    $cron->time_zone("Europe/London"); # Recalcs utc_offset (DST-aware)
-
-Gets/sets time zone string (e.g., "America/New\_York"). Validates via DateTime::TimeZone; recalculates utc\_offset on set (current DST).
-
-## as\_string
-
-    say $cron->as_string; # "0 30 14 * * ? *"
-
-Returns the normalized Quartz expression as a string.
-
-## to\_json
-
-    say $cron->to_json; # '{"expression":"0 30 14 * * ? *", ...}'
-
-Returns JSON-encoded hash of core attributes (expression, description, utc\_offset, time\_zone, begin\_epoch, end\_epoch). Requires JSON::MaybeXS.
-
-## dump\_tree
-
-    $cron->dump_tree; # Prints indented AST to STDOUT
-
-Pretty-prints the AST root (or pass a node). Recursive indent for types/values/children.
-
-# QUARTZ SYNTAX SUPPORTED
-
-- Basic: "0 30 14 \* \* ?"
-- Steps: "\*/15", "5/3", "10-20/5"
-- Ranges: "1-5", "10-14"
-- Lists: "1,15", "MON,WED,FRI"
-- Last Day: "L", "L-2", "LW"
-- Nth DOW: "1#3" = "3rd Sunday"
-- Weekday: "15W" = "nearest weekday to 15th"
-- Seconds Field: "0 0 30 14 \* \* ? \*" (7-field)
-- Names: JAN-MAR, MON-FRI (normalized; mixed-case OK)
-- Aliases: @hourly, @daily, @monthly, etc. (Vixie-style, mapped to Quartz)
-
-Unix 5-field auto-converted to Quartz (adds seconds=0, year=\*, DOW normalize: MON=1→2, SUN=0→1).
-
-# EXAMPLES
-
-### New York Stock Market Open
-
-    my $ny_open = Cron::Toolkit->new(
-        expression => "0 30 9.5 * * 2-6 ?",
-        time_zone => "America/New_York"
-    );
-    say $ny_open->describe; # "at 9:30 AM every Monday through Friday"
-
-### Bounded Monthly Backup
-
-    my $backup = Cron::Toolkit->new(
-        expression => "0 0 2 LW * ? *",
-        time_zone => "Europe/London"
-    );
-    $backup->begin_epoch(Time::Moment->new(year => 2025, month => 1, day => 1)->epoch);
-    $backup->end_epoch(Time::Moment->new(year => 2025, month => 4, day => 1)->epoch);
-    if ($backup->is_match(time)) {
-        system("backup.sh");
-    }
-
-### Third Monday in 2025
-
-    my $third_mon = Cron::Toolkit->new(expression => "0 0 0 * * 2#3 ? 2025");
-    say $third_mon->describe; # "at midnight on the third Monday in 2025"
-
-### Seconds Field (Quartz ATS)
-
-    my $sec_cron = Cron::Toolkit->new_from_quartz(
-        expression => "0 0 30 14 * * ? *"
-    );
-    say $sec_cron->describe; # "at 2:30:00 PM every month"
-
-### Crontab Parse + Utils
-
-    my @crons = Cron::Toolkit->new_from_crontab('my_tab');
-    my $cron = $crons[0];
-    say $cron->next_occurrences(3); # Next 3 epochs
-    say decode_json($cron->to_json)->{description}; # JSON attrs
-
-# DEBUGGING
-
-    $ENV{Cron_DEBUG} = 1;
-    $cron->utc_offset(-300); # "DEBUG: utc_offset: set to -300"
-    $cron->dump_tree; # AST structure
+Thank you!
 
 # AUTHOR
 
-Nathaniel J Graham <ngraham@cpan.org>
+Nathaniel Graham
 
-# COPYRIGHT & LICENSE
+# COPYRIGHT AND LICENSE
 
-Copyright 2025 Nathaniel J Graham.
+Copyright 2025 Nathaniel Graham
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License (2.0).
+This library is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.

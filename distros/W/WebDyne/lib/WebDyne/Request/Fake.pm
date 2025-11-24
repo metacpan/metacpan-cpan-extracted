@@ -29,6 +29,7 @@ use Cwd qw(cwd);
 use Data::Dumper;
 use HTTP::Status (RC_OK);
 use WebDyne::Util;
+use WebDyne::Constant;
 
 
 #  Var to hold package wide hash, for data shared across package
@@ -36,9 +37,14 @@ use WebDyne::Util;
 my %Package;
 
 
+#  Snapshot environment for Dir_config
+#
+#my %Dir_config_env;
+
+
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Debug load
@@ -84,10 +90,146 @@ sub _init {
 }
 
 
-sub dir_config {
+sub dir_config0 {
 
+    #  Old very simplistic dir_config
+    #
     my ($r, $key)=@_;
     return $ENV{$key};
+
+}
+
+
+sub dir_config {
+
+    
+    #  Newer more comprehensive dir_config that pulls from WEBDYNE_CONF
+    #
+    my ($r, $key)=@_;
+    debug("r: $r, caller: %s", Dumper([caller(0)]));
+    
+
+    #  Get hash ref from config file
+    #
+    my $constant_hr=$WEBDYNE_DIR_CONFIG;
+    debug('using constant_hr: %s', Dumper($constant_hr));
+    
+
+    #  OK - heirarchy is this:
+    #
+    #  If WEBDYNE_PSGI_DIR_CONFIG=$hr order of return
+    #
+    #  $ENV{$key} # Wins everything
+    #  $hr->{$servername}{$location}{$key}
+    #  $hr->{$location}{$key}
+    #  $hr->{''}{$key} # Legacy - "/" preferred
+    #  $hr->{$key}
+    #
+
+    if ($key) {
+    
+        #  Key specified, returning just that value
+        #
+        #if (exists $Dir_config_env{$key}) {
+        if (exists $ENV{$key}) {
+        
+            #  $ENV{$key} # Wins everything
+            #
+            #debug('found $ENV{%s}, returning %s', $key, $Dir_config_env{$key});
+            debug('found $ENV{%s}, returning %s', $key, $ENV{$key});
+            #return $Dir_config_env{$key};
+            return $ENV{$key};
+            
+        }
+        else {
+            
+
+            #  Get location we are operating in
+            #
+            my $location=$r->location();
+            debug("in dir_config looking for key $key at location $location");
+
+
+            #  Do we have $hr->{$servername}{$location} ?
+            #
+            my $constant_server_hr;
+            #if (my $server=($Dir_config_env{'WebDyneServer'} || $ENV{'HOSTNAME'} ||  $ENV{'SERVER_NAME'})) {
+            if (my $server=($ENV{'WebDyneServer'} || $ENV{'HOSTNAME'} ||  $ENV{'SERVER_NAME'})) {
+
+                #  Have $servername
+                #
+                debug("using server: $server");
+                if (exists $constant_hr->{$server}) {
+                
+                    #  Have $hr->{$servername}
+                    #
+                    my $constant_server_hr=$constant_hr->{$server};
+                    debug("found constant_server_hr: $constant_server_hr (%s)", Dumper($constant_server_hr));
+                    if (exists $constant_server_hr->{$location}) {
+                    
+                        #  Have $hr->{$servername}{$location} 
+                        #
+                        debug("found location: $location in constant_server_hr, looking for key: $key");
+                        if (exists $constant_server_hr->{$location}{$key}) {
+                            debug("found key: $key in constant_server_hr, returning value: %s", $constant_server_hr->{$location}{$key});
+                            
+                            #  Have Have $hr->{$servername}{$location}{$key}, return it
+                            #
+                            return $constant_server_hr->{$location}{$key};
+                        }
+                    }
+                }
+                debug('fell through server code');
+            }
+            
+            
+            #  No. Do we have $hr->{$location}{$key} ?
+            #
+            if (exists $constant_hr->{$location}) {
+                debug('found $constant_hr->{%s}', $location);
+                return $constant_hr->{$location}{$key} if exists($constant_hr->{$location}{$key});
+            }
+            
+            
+            #  No. Do we have $hr->{''}{$key} 
+            #
+            elsif (exists $constant_hr->{''}) {
+                debug('found $constant_hr->{\'\'}');
+                return $constant_hr->{''}{$key} if exists($constant_hr->{''}{$key});
+            }
+            
+            
+            #  No $hr->{$key} is last chance
+            #
+            elsif (exists $constant_hr->{$key}) {
+                debug('found $constant_hr->{%s}', $key);
+                return $constant_hr->{$key}
+            }
+            
+            
+            #  Nothing found
+            #
+            debug("no key found for location: $location, %s");
+            return undef;
+            
+        }
+                
+    }
+    else {
+
+        #  Return dump of whole thing with ENV vars taking precendence at top level. Scrub mixing in ENV at moment, exposes
+        #  too many non WebDyne vars if called with dir_config(). Do properly with Plack::Middleware::AddEnv or similar later
+        #
+        #my %dir_config=(%{$constant_hr}, %Dir_config_env);
+        my %dir_config=(
+            %{$constant_hr}, 
+            (map { $_=>$ENV{$_} } grep {/^WebDyne/i} keys %ENV), 
+            (map { $_=>$ENV{$_} } grep {exists $ENV{$_} } keys %{$constant_hr})
+            #(map { $_=>$ENV{$_} } @{$WEBDYNE_PSGI_ENV_KEEP},
+            #%{$WEBDYNE_PSGI_ENV_SET}
+        );
+        return \%dir_config;
+    }
 
 }
 
@@ -303,8 +445,14 @@ sub output_filters {
 
 sub location {
 
-    #  Stub
-    shift()->{'location'}
+    #  Get/set location
+    my ($self, $location)=@_;
+    if ($location) {
+        return $self->{'location'}=$location;
+    }
+    else {
+        return $self->{'location'} || $ENV{'WebDyneLocation'}
+    }
 
 }
 

@@ -18,6 +18,8 @@ package WebDyne::Request::PSGI;
 #
 use strict qw(vars);
 use vars   qw($VERSION @ISA);
+use warnings;
+no warnings qw(uninitialized);
 
 
 #  External modules
@@ -44,7 +46,7 @@ use WebDyne::Request::Fake;
 
 #  Version information
 #
-$VERSION='2.031';
+$VERSION='2.034';
 
 
 #  Debug load
@@ -55,7 +57,11 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 #  Save local copy of environment for ref by Dir_config handler. ENV is reset for each request,
 #  so must use a snapshot for simulating r->dir_config
 #
-my %Dir_config_env=%ENV;
+my %Dir_config_env=%{$WEBDYNE_PSGI_ENV_SET}, (map { $_=>$ENV{$_} } (
+    qw(DOCUMENT_DEFAULT DOCUMENT_ROOT),
+    @{$WEBDYNE_PSGI_ENV_KEEP},
+    grep {/WebDyne/i} keys %ENV
+));
 
 
 #  All done. Positive return
@@ -119,60 +125,39 @@ sub headers_in {
 }
 
 
-sub dir_config {
-
-    my ($r, $key)=@_;
-
-    my $constant_hr=$WEBDYNE_PSGI_DIR_CONFIG;
-
-    my $constant_server_hr;
-    if (my $server=$Dir_config_env{'WebDyneServer'} || $ENV{'SERVER_NAME'}) {
-        $constant_server_hr=$constant_hr->{$server} if exists($constant_hr->{$server})
-    }
-
-    my $location=$r->location();
-    debug("in dir_config looking for key $key at location $location");
-
-    if (exists $constant_server_hr->{$location}) {
-        return $constant_server_hr->{$location}{$key}
-    }
-    elsif (exists $constant_hr->{$location}) {
-        return $constant_hr->{$location}{$key}
-
-        #|| $constant_hr->{undef()}{$key} || $Dir_config_env{$key}
-    }
-    else {
-        debug("explicit location key $key not found, returning top level");
-        return $constant_hr->{''}{$key} || $Dir_config_env{$key}
-    }
-
-}
-
-
 sub location {
+
 
     #  Equiv to Apache::RequestUtil->location;
     #
+    my $r=shift();
+    debug("r: $r, caller: %s", Dumper([caller(0)]));
     my $location;
-    my $constant_hr=$WEBDYNE_PSGI_DIR_CONFIG;
+    my $constant_hr=$WEBDYNE_DIR_CONFIG;
     my $constant_server_hr;
     if (my $server=$Dir_config_env{'WebDyneServer'} || $ENV{'SERVER_NAME'}) {
         $constant_server_hr=$constant_hr->{$server} if exists($constant_hr->{$server})
     }
     if ($Dir_config_env{'WebDyneLocation'} || $ENV{'APPL_MD_PATH'}) {
 
-        #  APPL_MD_PATH is IIS virtual dir
+        #  APPL_MD_PATH is IIS virtual dir. If that or a fixed location set use it.
         #
         $location=$Dir_config_env{'WebDyneLocation'} || $ENV{'APPL_MD_PATH'};
     }
-    elsif ($ENV{'SCRIPT_NAME'}) {
-        my $path=(File::Spec::Unix->splitpath($ENV{'SCRIPT_NAME'}))[1];
-        my @location=grep {$_}
-            File::Spec::Unix->rootdir(), File::Spec::Unix->splitdir($path);
+    elsif (my $uri_path=join('', grep {$_} @ENV{qw(SCRIPT_NAME PATH_INFO)})) {
+        
+        #  Strip file name
+        #
+        $uri_path=~s{[^/]+\Q@{[WEBDYNE_PSP_EXT]}\E$}{}x; #\
+        debug("uri_path: $uri_path");
+        my @location=('/', grep {$_} File::Spec::Unix->splitdir($uri_path));
+        
+        #  Start iterating through directories
+        #
         while ($location=File::Spec::Unix->catdir(@location)) {
-            debug("location $location");
+            debug("location: $location");
             last if exists($constant_hr->{$location}) || exists($constant_server_hr->{$location});
-            $location.=File::Spec::Unix->rootdir();
+            $location.='/' unless ($location eq '/');
             last if exists($constant_hr->{$location}) || exists($constant_server_hr->{$location});
             pop @location;
         }
@@ -183,6 +168,9 @@ sub location {
         #
         #$location=File::Spec::Unix->rootdir();
     }
+    
+    #  
+    #
     return $location;
 
 }
@@ -201,9 +189,6 @@ sub lookup_file {
     my $r_child;
     #if ($fn!~/\.psp$/) { # fastest
     if ($fn!~WEBDYNE_PSP_EXT_RE) { # fastest
-    #if ($fn=~/\.html$/) {
-    #  If not psp file serve as static
-    #unless (substr($fn, -WEBDYNE_PSP_EXT_LEN) eq WEBDYNE_PSP_EXT) {
 
 
         #  Static file
@@ -243,7 +228,7 @@ sub new {
     #  New PSGI request
     #
     my ($class, %r)=@_;
-    debug("$class, r: %s", Dumper(\%r));
+    debug("$class, r: %s, calller:%s", Dumper(\%r, [caller(0)]));
     
     
     #  Try to figure out filename user wants
@@ -269,16 +254,19 @@ sub new {
             
                 #  Get from URI and location
                 #
-                my $uri=$r{'uri'} || $ENV{'REQUEST_URI'};
+                ##my $uri=$r{'uri'} || $ENV{'REQUEST_URI'};
+                my $uri=$r{'uri'} || $ENV{'PATH_INFO'};
                 debug("uri: $uri");
-                if (my $location=$class->location()) {
-                    debug("location: $location");
-                    $uri=~s/^\Q$location\E//;
-                    debug("uri now: $uri");
-                }
-                my $uri_or=URI->new($uri);
+                #  Not sure why I did this ? Why strip location ?
+                #if (my $location=$class->location()) {
+                #    debug("location: $location");
+                #    $uri=~s/^\Q$location\E//;
+                #    debug("uri now: $uri");
+                #}
+                ##my $uri_or=URI->new($uri);
                 #$fn=File::Spec->catfile($dn, $uri_or->path());
-                $fn=File::Spec->catfile($dn, split m{/+}, $uri_or->path());
+                ##$fn=File::Spec->catfile($dn, split m{/+}, $uri_or->path());
+                $fn=File::Spec->catfile($dn, split m{/+}, $uri); #/
                 debug("fn: $fn from dn: $dn, uri: $uri");
                 
                 #  If PSP file spec'd on command line get rid of trailing /
@@ -299,10 +287,8 @@ sub new {
             
             #  Need to add default psp file ?
             #
-            #if ($fn=~/\/$/) {
             #unless ($fn=~/\.psp$/) { # fastest
             unless ($fn=~WEBDYNE_PSP_EXT_RE) { # fastest
-            #unless (substr($fn, -WEBDYNE_PSP_EXT_LEN ) eq WEBDYNE_PSP_EXT ) {
 
                 #  Is it a directory that exists ? Only append default document if that is the case, else let the api code
                 #  handle it
@@ -338,6 +324,7 @@ sub new {
                 }
             }
         }
+
 
         #  Final sanity check
         #
@@ -441,7 +428,7 @@ sub err_html {
         ),
         $html_or->end_html()
     );
-    return join(undef, @message);
+    return join('', @message);
 
 }
 
@@ -478,4 +465,5 @@ sub env {
 
 }
 
+1;
 __END__
