@@ -2,8 +2,8 @@ use strict;
 use warnings;
 
 use Test::More tests => 8;
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use File::Basename;
+use lib dirname(__FILE__) . '\lib';
 
 BEGIN {
   use_ok 'TestConsole', qw( GetConsoleOutputHandle );

@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.028'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-10-30'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.029'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-11-24'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -31,7 +31,6 @@ our @EXPORT_OK = qw/can_cvt_spreadsheets can_extract_allsheets can_extract_named
 use version ();
 use Carp;
 
-use File::Find ();
 use File::Copy ();
 use File::Copy::Recursive ();
 use File::Glob qw/bsd_glob/;
@@ -382,163 +381,140 @@ sub openlibreoffice_path() {
   # from a .deb or other archive) will be
   #   somwehere/opt/libreofficeA.B/...
   # and "..." is the same standard hierarchy on all platforms.
-  #
-  # If multiple are found try to pick the "latest".
-  my sub _cmp_subpaths($$) {
-    my ($sp1, $sp2) = @_;
-    oops     if !defined($sp1);
-    return 1 if !defined($sp2);
-    # Use longest version in the (sub-)path, e.g. "4.4.1/opt/openoffice4/..."
-    my (@v1) = sort { length($a) <=> length($b) } ($sp1 =~ /(\d[.\da-z]*)/ag);
-    my (@v2) = sort { length($a) <=> length($b) } ($sp2 =~ /(\d[.\da-z]*)/ag);
-    my $v1 = $v1[-1]//0;
-    my $v2 = $v2[-1]//0;
-    if ($v1 =~ s/alpha/0/) {
-      return -1 unless $v2 =~ s/alpha/0/;
-    }
-    if ($v2 =~ /alpha/) {
-      return +1
-    }
-    version->parse($v1) <=> version->parse($v2)
-  }
 
-  # I tried just doing File::Glob::bsd_glob('/*/*/*/opt/libre*/program') but
-  # it silently failed even though the same glob works from the shell. Mmff...
-  no warnings FATAL => 'all';
+  # Previously this did 'require Path::Iterator::Rule' only if needed,
+  # but we need to disable warnings (actually they throw exceptions!)
+  # for unreadable directories.
+  # Doing "warnings->unimport('Path::Iterator::Rule');" doesn't seem to work.
+  # So now Path::Iterator::Rule is loaded unconditionally
+  use Path::Iterator::Rule v1.015 ();
+  no warnings 'Path::Iterator::Rule';
+
+  #require Path::Iterator::Rule;
+  #warnings->unimport('Path::Iterator::Rule'); # silence if unreadable dir
+
   state $is_MSWin = ($^O eq "MSWin32");
+  my $debug = $ENV{SPREADSHEET_EDIT_FINDDEBUG};
+
   my @search_specs;
   if ($is_MSWin) {
     @search_specs = (
-       {start => "C:\\Program Files", re => qr/^Program Files/, maxdepth => 1},
+       # [startdir, pdir_name, pdir_maxdepth]
+       ["C:\\Program Files", "Program Files",  0],
        # depth: C:\Program Files\libreofficeXXX/program/
-       #              1
+       #           1
     );
-    push @search_specs, { %{$search_specs[0]},
-                          start => "C:\\Program Files (x86)" };
+    push @search_specs, [ "C:\\Program Files (x86)", @{$search_specs[0]}[1,2] ];
   } else {
     @search_specs = (
-       {start => File::Spec->rootdir(), re => qr/^opt$/, maxdepth => 4}
-       # depth: /*/*/<unpackparent>/opt/libreofficeXXX/program/
-       #         1 2    3            4
+       [ File::Spec->rootdir(), "opt", 5 ],
+       # depth: /home/admin/lotest/<unpackparent>/opt/libreofficeXXX/program/
+       #         1    2     3      4              5
     );
-    push @search_specs, { %{$search_specs[0]}, start => $ENV{HOME} }
-      if $ENV{HOME};
+    # depth: /path/.../to/homedir/local/opt/libreofficeXXX/program/
+    #                             1     2
+    push @search_specs, [ $ENV{HOME}, "opt", 2 ] if $ENV{HOME};
   }
 
-  my $debug = $ENV{SPREADSHEET_EDIT_FINDDEBUG};
-  my sub _Findvarsmsg() {
-    if (u($_) eq u($File::Find::name) && u($_) eq u($File::Find::fullname)) {
-      return qsh($_)."\n"
-    }
-    if (u($_) eq u($File::Find::name)) {
-      return "\$_=name=".qsh($_)." -> ".qsh($File::Find::fullname)."\n";
-    }
-    "\$_=".qsh($_)." name=".qsh($File::Find::name)." fullname=".qsh($File::Find::fullname)."\n";
-  }
+  foreach (@search_specs) {
+    my ($start_dir, $pdir_name, $pdir_maxdepth) = @$_;
+    next if $ENV{SPREADSHEET_EDIT_NOLOSEARCH};
 
-  warn dvis '@search_specs\n' if $debug;
+    my $start_dir_depth = scalar(() = path($start_dir)->stringify =~ m#(/[^/])#g);
+    my $rule = Path::Iterator::Rule->new
+      ->not_dangling()
+      ->and( sub{
+          local $_ = path($_)->stringify;  # get rid of extra leading /
+          # Immediately prune dirs we know won't contain an LO installation
+          if (m#^/(bin|boot|dev|etc|lib|lib32|lost\+found|media|proc|run|sys|tmp|usr/(bin|doc|games|include|libexec|sbin|share|src)|var)$#
+              || m#^/snap/(?!.*ffice)#  # other than e.g. /snap/libreoffice
+              || /\$/                   # $WINDOWS_SPECIAL_THINGS$
+              || (! -r _)               # unreadable
+              || (! -s _ && !$is_MSWin) # zero size ==> /proc etc.
+             ) {
+            warn "### prelim prune: $_\n" if $debug;
+            return \0  # omit and prune if directory
+          }
+          my $depth = scalar(() = m#(/)#ag) - $start_dir_depth;
+          # Find an installation parentdir anywhere at $pdir_maxdepth or below
+          if (! m#/$pdir_name(?:/(.*))?$#) {
+            if ($depth == $pdir_maxdepth) {
+              warn "### prune pdir_maxdepth ($pdir_name)(d=$depth md=$pdir_maxdepth sdd=$start_dir_depth): $_\n" if $debug;
+              return \0; # omit and, if directory, prune
+            }
+            warn "#   continue search for pdir (d=$depth md=$pdir_maxdepth): $_\n" if $debug;
+            return 0; # omit but keep searching
+          }
+          if (! $1) {
+            warn "### found pdir, continuing.  $_\n" if $debug;
+            return 0; # Found pdir, continue searching
+          }
+          # Found .../<pdir>/<some install dir>
+          my $instdir = $1;
+          if ($instdir !~ m#^(?:libre|open)office#) {
+            warn "### prune non-LO/OO instdir: $_\n" if $debug;
+            return \0;  # prune install subtrees for other programs
+          }
+          return \1; # emit this instdir and do not descend further
+     } ) ;
 
-  my %results;
-  if (! $ENV{SPREADSHEET_EDIT_NOLOSEARCH}) {
-    # Search each of @search_dirs separately so we can check $maxdepth
-    # relative to the starting directory.
-    for (@search_specs) {
-      my ($start_dir, $basename_re, $maxdepth) = @$_{qw/start re maxdepth/};
-      my $start_dir_depth = scalar(() = path($start_dir)->stringify =~ m#(/)#g);
-      File::Find::find(
-        { wanted => sub{
-            # Undef fullname OR invalid "_" filehandle implies a broken symlink,
-            #   see https://github.com/Perl/perl5/issues/21122
-            # Zero size on *nix implies /proc or similar; do not enter.
-            # File::Find::fullname unreadable => followed link to inaccessable.
-            # (The initial "_" stat may be invalid, so "-l _" is useless)
-            $! = 0;
-            # https://github.com/Perl/perl5/issues/21143
-            my $fullname = $File::Find::fullname;
-            if (!defined($fullname) && $is_MSWin) {
-                warn "# _ MSWin undef fullname! ",_Findvarsmsg() if $debug;
-                stat($_); # lstat was not done. Grr...
-                $fullname = $File::Find::name;
-                unless (-d _) {
-                  $File::Find::prune = 1; # in case it really is a dir
-                  return;
-                }
-            } else {
-              unless (-d _ or -l _) {
-                warn "# _ notdir/symlink: ",_Findvarsmsg() if $debug;
-                $File::Find::prune = 1; # in case it really is
-                return;
-              }
-            }
-            if (
-                m#^/(boot|dev|etc|lib|lib32|lost\+found|proc|run|sys|tmp|usr/(include|src)|var)$#
-                || m#^/snap/(?!.*ffice)#  # other than e.g. /snap/libreoffice
-                || !defined($fullname) # broken link, per docs
-                || (! -r _) # unreadable item or invalid "_" handle
-                            # https://github.com/Perl/perl5/issues/21122
-                || (! -x _)   # or unsearchable dir
-                #|| (!$is_MSWin && (stat(_))[7] == 0) # zero size ==> /proc etc.
-                || (! -s _ && !$is_MSWin) # zero size ==> /proc etc.
-                || /\$/ # $some_windows_special_thing$
-                || ! -r $fullname # presumably a symlink to unreadable
-               ) {
-              warn "# PRUNING ",_Findvarsmsg() if $debug;
-              $File::Find::prune = 1;
-              return
-            }
-            warn "# DIR: ",_Findvarsmsg() if $debug;
-            # Maximum depth: /*/*/<unpackparent>/opt/libreofficeXXX/program/
-            my $path = path($_); # full path because of 'no_chdir'
-            my $depth = scalar(() = $path->stringify =~ m#(/)#g);
-            if (basename($_) =~ $basename_re) { # ^opt$ or ^Program Files
-              my $prefix = path($_)->parent->parent;
-              for my $o_l (qw/libre open/) {
-                my $glob
-                     = path($_)->child("${o_l}*/program/soffice*")->canonpath;
-                # eval because I'm suspicious of the glob on Windows
-                my @hits; eval{ @hits = sort +bsd_glob($glob, GLOB_NOCASE) };
-                if (@hits) {
-                  # On windows, use soffice.com not .exe because it writes
-                  # messages to stdout not a window.  See https://help.libreoffice.org/7.5/en-GB/text/shared/guide/start_parameters.html?&DbPAR=SHARED&System=WIN
-                  my $path = (first{ /soffice\.com$/ } @hits) ||
-                             (first{ /soffice$/      } @hits);
-                  if ($path) {
-                    $prefix->subsumes($path) or oops dvis '$prefix $path';
-                    my $subpath = path($path)->relative($prefix);
-                    if (_cmp_subpaths($subpath, $results{$o_l}{subpath}) >= 0) {
-                      @{$results{$o_l}}{qw/path subpath/} = ($path, $subpath);
-                      # We found where installations are, don't look deeper
-                      $maxdepth = $depth - $start_dir_depth;
-                      warn "# maxdepth=$maxdepth FROM ",qsh($_),"\n" if $debug;
-                    }
-                  }
-                }
-                else { btw dvis '##glob failed: $glob\n$@' if $@; }
-              }
-            }
-            if (($depth-$start_dir_depth) == $maxdepth) {
-              warn "# pruning at maxdepth $depth ",qsh($_),"\n" if $debug;
-              $File::Find::prune = 1;
-              return;
-            }
-            elsif (($depth-$start_dir_depth) > $maxdepth) {
-              oops dvis '$depth $maxdepth $_'
-            }
-          },
-          follow_fast => 1,
-          follow_skip => 2,
-          dangling_symlinks => 0,
-          no_chdir => 1
-        },
-        $start_dir
-      );
+    my @instdirs = $rule->all(
+      $start_dir,
+      {depthfirst => -1, follow_symlinks => 1, loop_safe => 1, sorted => 1,
+       error_handler => undef, # ignore errors e.g. unreadable dirs
+      }
+    );
+
+    my @candidates = map {
+      my ($exe, $version);
+      # Screen out any instdirs without program/soffice
+      # On Windows both soffice.exe and soffice.com exist; use the .com because
+      # it writes to stdout/err instead of popping up windows.
+      if ($is_MSWin && -e "$_/program/soffice.com") {
+        $exe = "$_/program/soffice.com";
+      }
+      elsif (-x "$_/program/soffice") {
+        $exe = "$_/program/soffice";
+      }
+      else {
+        warn "INCOMPLETE INSTALL: No soffice exe in $_\n";
+      }
+      # Extract version from the path
+      #   For isolated non-standard installations, the <pdir> e.g. "/opt"
+      #   is itself under some directory dedicated to a single install,
+      #   and this directory may encode the exact version.  For example
+      #     /home/admin/lotest/5.2.5.1/opt/libreoffice5.2
+      #   encodes version 5.2.5.1 .
+      #   If a standard install was found then this will not be the case, and
+      #   there may not even be a version in the installdir name (defaults to "0")
+      $version =
+        m#/(\d+\.[.\da-z_]+)/# ? $1 :
+        m#.*(\d+\.[.\da-z_]+)# ? $1 :
+        0 ;
+      warn ivis '# Found version $version in $exe\n' if $debug;
+      $version = (/libre/ ? 1 : 0).".".$version;  # prefer libreoffice
+      $exe ? ([$exe, $version]) : ();
+    } @instdirs;
+
+    # Pick the "highest" version
+    @candidates = sort {
+      my $v1 = $a->[1];
+      my $v2 = $b->[1];
+      foreach ($v1, $v2) {
+        s/[a-z]+$/.0/        # 1.2.3alpha => 1.2.3.0
+        ||
+        s/[a-z]+(\d.*)/0$1/; # 1.2.3.alpha2 => 1.2.3.02
+      }
+      warn dvis '## $v1 $v2\n' if $debug;
+      version->parse($v1) <=> version->parse($v2)
+    } @candidates;
+
+    if (@candidates) {
+      $OLpath_answer = path($candidates[-1][0])->realpath->canonpath;
+      return $OLpath_answer;
     }
-  }
-  $OLpath_answer = path(
-     $results{libre}{path} // $results{open}{path}
-       || (!$ENV{SPREADSHEET_EDIT_IGNPATH} && which("soffice")) # installed OO?
-       || return(undef)
-     )->realpath->canonpath
+  } #foreach @search_specs
+  return undef;
 }#openlibreoffice_path
 
 sub _openlibre_features() {

@@ -35,6 +35,7 @@ my %_default_style = (
     tag_ise_no_ise_retry        => undef,
     tag_ise_no_ise_one          => 1,
     tag_ise_no_ise_no_uriid     => 1,
+    comment_column              => 168,
 );
 
 my %_generator_comments = (
@@ -60,7 +61,7 @@ my %_old_style_relation = (
     'd926eb95-6984-415f-8892-233c13491931' => 'tag-links',
 );
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 
@@ -230,6 +231,13 @@ sub write {
 
     local $, = ' ';
     if ($self->{no_eol}) {
+        if (defined(my $width = $self->{style}{comment_column})) {
+            my $line = join($,, @line);
+            my $l = length($line);
+            $width--;
+            $line .= ' ' x ($width - $l) if $width > $l;
+            @line = ($line);
+        }
         $self->{fh}->print(@line);
     } else {
         $self->{fh}->say(@line);
@@ -371,6 +379,7 @@ sub write_tag_ise {
 
     croak 'No ISEs found' unless scalar(keys(%{$collected{uuid}})) + scalar(keys(%{$collected{oid}})) +  scalar(keys(%{$collected{uri}}));
 
+    local $self->{style}{comment_column} = undef;
     $self->write_with_comment('tag-ise', keys(%{$collected{uuid}}), keys(%{$collected{oid}}), keys(%{$collected{uri}}), $displayname);
 }
 
@@ -573,7 +582,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 
@@ -660,6 +669,14 @@ This method C<die>s if it detects any error.
 The following styles are supported:
 
 =over
+
+=item C<comment_column>
+
+The column used for comments. A positive offset or C<undef> for none.
+Defaults to 168.
+
+B<Note:>
+This is not applied by L</write_tag_ise> as per convention.
 
 =item C<degenerate_generator_hint>
 

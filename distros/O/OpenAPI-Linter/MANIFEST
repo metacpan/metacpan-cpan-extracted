@@ -1,5 +1,6 @@
 Changes
 lib/OpenAPI/Linter.pm
+lib/OpenAPI/Linter/Location.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -15,6 +16,7 @@ t/05_complete_spec.t
 t/06_file_loading.t
 t/07_edge_cases.t
 t/08_validate_schema.t
+t/09_error_line_col.t
 t/data/minimal.yaml
 t/data/missing_descriptions.yaml
 t/data/missing_info.yaml

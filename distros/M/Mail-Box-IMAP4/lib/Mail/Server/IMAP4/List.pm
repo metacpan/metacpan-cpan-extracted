@@ -1,126 +1,123 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Server::IMAP4::List;{
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 }
 
 
 use strict;
 use warnings;
 
+#--------------------
 
 sub new($)
-{   my ($class, %args) = @_;
-
-    my $self = bless {}, $class;
-
-    my $user = $self->{MSIL_user}  = $args{user};
-    $self->{MSIL_folders} = $args{folders};
-    $self->{MSIL_inbox}   = $args{inbox};
-    $self->{MSIL_delim}   = exists $args{delimiter} ? $args{delimiter} : '/';
-    $self;
+{	my ($class, %args) = @_;
+	(bless {}, $class)->init(\%args);
 }
 
-#------------------------------------------
+sub init($)
+{	my ($self, $args) = @_;
+	my $user = $self->{MSIL_user} = $args->{user};
+	$self->{MSIL_folders} = $args->{folders};
+	$self->{MSIL_inbox}   = $args->{inbox};
+	$self->{MSIL_delim}   = exists $args->{delimiter} ? $args->{delimiter} : '/';
+	$self;
+}
 
+#--------------------
 
 sub delimiter(;$)
-{   my $delim = shift->{MSIL_delim};
-    ref $delim ? $delim->(shift) : $delim;
+{	my $delim = shift->{MSIL_delim};
+	ref $delim ? $delim->(shift) : $delim;
 }
 
-#------------------------------------------
 
-
-sub user() { shift->{MSIL_user} }
-
-#------------------------------------------
+sub user() { $_[0]->{MSIL_user} }
 
 
 sub folders()
-{   my $self = shift;
-    $self->{MSIL_folders} || $self->user->topfolder;
+{	my $self = shift;
+	$self->{MSIL_folders} || $self->user->topfolder;
 }
-
-#------------------------------------------
 
 
 sub inbox()
-{   my $self = shift;
-    $self->{MSIL_inbox} || $self->user->inbox;
+{	my $self = shift;
+	$self->{MSIL_inbox} || $self->user->inbox;
 }
 
-#------------------------------------------
-
+#--------------------
 
 sub list($$)
-{   my ($self, $base, $pattern) = @_;
-    
-    return [ '(\Noselect)', $self->delimiter($base), '' ]
-       if $pattern eq '';
+{	my ($self, $base, $pattern) = @_;
 
-    my $delim  = $self->delimiter($base);
-    my @path   = split $delim, $base;
-    my $folder = $self->folders;
+	return [ '(\Noselect)', $self->delimiter($base), '' ]
+		if $pattern eq '';
 
-    while(@path && defined $folder)
-    {   $folder = $folder->folder(shift @path);
-    }
-    defined $folder or return ();
+	my $delim  = $self->delimiter($base);
+	my @path   = split $delim, $base;
+	my $folder = $self->folders;
 
-    my @pattern = split $delim, $pattern;
-    return $self->_list($folder, $delim, @pattern);
+	while(@path && defined $folder)
+	{	$folder = $folder->folder(shift @path);
+	}
+	defined $folder or return ();
+
+	my @pattern = split $delim, $pattern;
+	return $self->_list($folder, $delim, @pattern);
 }
 
 sub _list($$@)
-{   my ($self, $folder, $delim) = (shift, shift, shift);
+{	my ($self, $folder, $delim) = (shift, shift, shift);
 
-    if(!@_)
-    {   my @flags;
-        push @flags, '\Noselect'
-           if $folder->onlySubfolders || $folder->deleted;
+	if(!@_)
+	{	my @flags;
+		push @flags, '\Noselect'
+			if $folder->onlySubfolders || $folder->deleted;
 
-        push @flags, '\Noinferiors' unless $folder->inferiors;
-        my $marked = $folder->marked;
-        push @flags, ($marked ? '\Marked' : '\Unmarked')
-            if defined $marked;
+		push @flags, '\Noinferiors' unless $folder->inferiors;
+		my $marked = $folder->marked;
+		push @flags, ($marked ? '\Marked' : '\Unmarked')
+			if defined $marked;
 
-        local $" = ' ';
+		local $" = ' ';
 
-        # This is not always correct... should compose the name from the
-        # parts... but in nearly all cases, the following is sufficient.
-        my $name = $folder->fullname;
-        for($name)
-        {    s/^=//;
-             s![/\\]!$delim!g;
-        }
-        return [ "(@flags)", $delim, $name ];
-    }
+		# This is not always correct... should compose the name from the
+		# parts... but in nearly all cases, the following is sufficient.
+		my $name = $folder->fullname;
+		for($name)
+		{	s/^=//;
+			s![/\\]!$delim!g;
+		}
+		return [ "(@flags)", $delim, $name ];
+	}
 
-    my $pat = shift;
-    if($pat eq '%')
-    {   my $subs = $folder->subfolders
-             or return $self->_list($folder, $delim);
-        return map { $self->_list($_, $delim, @_) } $subs->sorted;
-    }
+	my $pat = shift;
+	if($pat eq '%')
+	{	my $subs = $folder->subfolders
+			or return $self->_list($folder, $delim);
+		return map $self->_list($_, $delim, @_), $subs->sorted;
+	}
 
-    if($pat eq '*')
-    {   my @own = $self->_list($folder, $delim, @_);
-        my $subs = $folder->subfolders or return @own;
-        return @own, map { $self->_list($_, $delim, '*', @_) } $subs->sorted;
-    }
+	if($pat eq '*')
+	{	my @own = $self->_list($folder, $delim, @_);
+		my $subs = $folder->subfolders or return @own;
+		return @own, map $self->_list($_, $delim, '*', @_), $subs->sorted;
+	}
 
-    $folder = $folder->find(subfolders => $pat) or return ();
-    $self->_list($folder, $delim, @_);
+	$folder = $folder->find(subfolders => $pat) or return ();
+	$self->_list($folder, $delim, @_);
 }
 
-#------------------------------------------
-
+#--------------------
 
 1;

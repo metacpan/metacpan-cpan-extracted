@@ -12,8 +12,8 @@ Mail::Server::IMAP4 - IMAP4 server implementation (not completed)
 
 =head1 SYNOPSIS
 
- !!!Partially implemented!!!!
- my $server = Mail::Server::IMAP4->new($msg);
+  !!!Partially implemented!!!!
+  my $server = Mail::Server::IMAP4->new($msg);
 
 =head1 DESCRIPTION
 
@@ -42,11 +42,11 @@ the SEARCH request.  Not implemented yet... looking for a volunteer.
 =back
 
 Extends L<"DESCRIPTION" in Mail::Server|Mail::Server/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Server|Mail::Server/"METHODS">.
- 
+
 =head1 DETAILS
 
 See
@@ -58,7 +58,7 @@ See
 =back
 
 Extends L<"DETAILS" in Mail::Server|Mail::Server/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -70,19 +70,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.009,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 3.010,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

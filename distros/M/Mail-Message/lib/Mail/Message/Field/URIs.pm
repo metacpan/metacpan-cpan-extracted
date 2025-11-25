@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Field::URIs;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Message::Field::Structured';
@@ -15,67 +18,68 @@ use base 'Mail::Message::Field::Structured';
 use warnings;
 use strict;
 
-use URI;
+use URI          ();
+use Scalar::Util qw/blessed/;
 
+#--------------------
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
+{	my ($self, $args) = @_;
 
-    my ($body, @body);
-    if($body = delete $args->{body})
-    {   @body = ref $body eq 'ARRAY' ? @$body : ($body);
-        return () unless @body;
-    }
+	my ($body, @body);
+	if($body = delete $args->{body})
+	{	@body = ref $body eq 'ARRAY' ? @$body : ($body);
+		@body or return ();
+	}
 
-    $self->{MMFU_uris} = [];
+	$self->{MMFU_uris} = [];
 
-    if(@body > 1 || ref $body[0])
-    {   $self->addURI($_) foreach @body;
-    }
-    elsif(defined $body)
-    {   $body = "<$body>\n" unless index($body, '<') >= 0;
-        $args->{body} = $body;
-    }
+	if(@body > 1 || blessed $body[0])
+	{	$self->addURI($_) for @body;
+	}
+	elsif(defined $body)
+	{	$body = "<$body>\n" unless index($body, '<') >= 0;
+		$args->{body} = $body;
+	}
 
-    $self->SUPER::init($args);
+	$self->SUPER::init($args);
 }
 
 sub parse($)
-{   my ($self, $string) = @_;
-    my @raw = $string =~ m/\<([^>]+)\>/g;  # simply ignore all but <>
-    $self->addURI($_) foreach @raw;
-    $self;
+{	my ($self, $string) = @_;
+	my @raw = $string =~ m/\<([^>]+)\>/g;  # simply ignore all but <>
+	$self->addURI($_) for @raw;
+	$self;
 }
 
 sub produceBody()
-{  my @uris = sort map { $_->as_string } shift->URIs;
-   local $" = '>, <';
-   @uris ? "<@uris>" : undef;
+{	my @uris = sort map $_->as_string, $_[0]->URIs;
+	local $" = '>, <';
+	@uris ? "<@uris>" : undef;
 }
 
-#------------------------------------------
-
+#--------------------
 
 sub addURI(@)
-{   my $self  = shift;
-    my $uri   = ref $_[0] ? shift : URI->new(@_);
-    push @{$self->{MMFU_uris}}, $uri->canonical if defined $uri;
-    delete $self->{MMFF_body};
-    $uri;
+{	my $self  = shift;
+	my $uri   = blessed $_[0] ? shift : URI->new(@_);
+	push @{$self->{MMFU_uris}}, $uri->canonical if defined $uri;
+	delete $self->{MMFF_body};
+	$uri;
 }
 
 
-sub URIs() { @{shift->{MMFU_uris}} }
+sub URIs() { @{ $_[0]->{MMFU_uris}} }
 
 
 sub addAttribute($;@)
-{   my $self = shift;
-    $self->log(ERROR => 'No attributes for URI fields.');
-    $self;
+{	my $self = shift;
+	$self->log(ERROR => 'No attributes for URI fields.');
+	$self;
 }
 
-#------------------------------------------
-
+#--------------------
 
 1;

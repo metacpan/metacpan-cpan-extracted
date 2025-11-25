@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Field::Fast;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Message::Field';
@@ -17,8 +20,8 @@ use warnings;
 
 use Scalar::Util  qw/blessed/;
 
+#--------------------
 
-#------------------------------------------
 #
 # The DATA is stored as:   [ NAME, FOLDED-BODY ]
 # The body is kept in a folded fashion, where each line starts with
@@ -26,67 +29,64 @@ use Scalar::Util  qw/blessed/;
 
 
 sub new($;$@)
-{   my $class = shift;
+{	my $class = shift;
 
-    my ($name, $body) = $class->consume(@_==1 ? (shift) : (shift, shift));
-    return () unless defined $body;
+	my ($name, $body) = $class->consume(@_==1 ? (shift) : (shift, shift));
+	defined $body or return ();
 
-    my $self = bless [$name, $body], $class;
+	my $self = bless +[$name, $body], $class;
 
-    # Attributes
-    $self->comment(shift)             if @_==1;   # one attribute line
-    $self->attribute(shift, shift) while @_ > 1;  # attribute pairs
-
-    $self;
+	# Attributes
+	$self->comment(shift)             if @_==1;   # one attribute line
+	$self->attribute(shift, shift) while @_ > 1;  # attribute pairs
+	$self;
 }
 
 sub clone()
-{   my $self = shift;
-    bless [ @$self ], ref $self;
+{	my $self = shift;
+	bless +[ @$self ], ref $self;
 }
 
 sub length()
-{   my $self = shift;
-    length($self->[0]) + 1 + length($self->[1]);
+{	my $self = shift;
+	length($self->[0]) + 1 + length($self->[1]);
 }
 
 sub name() { lc shift->[0] }
-sub Name() { shift->[0] }
+sub Name() { $_[0]->[0] }
 
 sub folded()
-{   my $self = shift;
-    return $self->[0].':'.$self->[1]
-        unless wantarray;
+{	my $self = shift;
+	wantarray or return $self->[0] .':'. $self->[1];
 
-    my @lines = $self->foldedBody;
-    my $first = $self->[0]. ':'. shift @lines;
-    ($first, @lines);
+	my @lines = $self->foldedBody;
+	my $first = $self->[0]. ':'. shift @lines;
+	($first, @lines);
 }
 
 sub unfoldedBody($;@)
-{   my $self = shift;
+{	my $self = shift;
 
-    $self->[1] = $self->fold($self->[0], @_)
-       if @_;
+	$self->[1] = $self->fold($self->[0], @_)
+		if @_;
 
-    $self->unfold($self->[1]);
+	$self->unfold($self->[1]);
 }
 
 sub foldedBody($)
-{   my ($self, $body) = @_;
-    if(@_==2) { $self->[1] = $body }
-    else      { $body = $self->[1] }
-     
-    wantarray ? (split m/^/, $body) : $body;
+{	my ($self, $body) = @_;
+	if(@_==2) { $self->[1] = $body }
+	else      { $body = $self->[1] }
+
+	wantarray ? (split m/^/, $body) : $body;
 }
 
 # For performance reasons only
 sub print(;$)
-{   my $self = shift;
-    my $fh   = shift || select;
-    if(ref $fh eq 'GLOB') { print $fh $self->[0].':'.$self->[1]   }
-    else                  { $fh->print($self->[0].':'.$self->[1]) }
-    $self;
+{	my $self = shift;
+	my $fh   = shift || select;
+	$fh->print($self->[0].':'.$self->[1]);
+	$self;
 }
 
 1;

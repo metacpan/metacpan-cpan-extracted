@@ -248,10 +248,10 @@ _MSG
 
 {   my $head     = $msg->head;
     my @from     = $head->study('from');  # list context
-    cmp_ok(scalar @from, '==', 3);
-    cmp_ok(scalar $from[0]->addresses, '==', 0, 'invalid address');
-    cmp_ok(scalar $from[1]->addresses, '==', 2, 'valid addresses');
-    cmp_ok(scalar $from[2]->addresses, '==', 0, 'invalid address');
+    cmp_ok(scalar @from, '==', 3, '3 from fields');
+    cmp_ok(scalar $from[0]->addresses, '==', 0, '... invalid address');
+    cmp_ok(scalar $from[1]->addresses, '==', 2, '... valid addresses');
+    cmp_ok(scalar $from[2]->addresses, '==', 0, '... invalid address');
     my $from     = $head->study('from');  # scalar context
 # returns last, but only invalid
 #   is($from, $two, 'scalar');

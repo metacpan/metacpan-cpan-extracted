@@ -4,6 +4,8 @@ author:
   - 'Mark Overmeer'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -27,23 +29,44 @@ requires:
   File::Temp: '0.19'
   IO::Socket::IP: '0'
   List::Util: '0'
-  Mail::Box: '3.007'
-  Mail::Box::Manage::User: '3'
-  Mail::Box::Net: '3'
-  Mail::Box::Search: '3'
-  Mail::Box::Test: '3'
+  Mail::Box: '>= 3.007, < 4.0'
+  Mail::Box::Manage::User: '>= 3, < 4.0'
+  Mail::Box::Net: '>= 3, < 4.0'
+  Mail::Box::Search: '>= 3, < 4.0'
+  Mail::Box::Test: '>= 3, < 4.0'
   Mail::IMAPClient: '3.42'
-  Mail::Message: '3.013'
-  Mail::Message::Body::Lines: '3'
-  Mail::Message::Head::Complete: '3'
-  Mail::Message::Head::Delayed: '3'
-  Mail::Server: '3'
-  Mail::Transport::Receive: '3.004'
+  Mail::Message: '>= 3.013, < 4.0'
+  Mail::Message::Body::Lines: '>= 3, < 4.0'
+  Mail::Message::Head::Complete: '>= 3, < 4.0'
+  Mail::Message::Head::Delayed: '>= 3, < 4.0'
+  Mail::Server: '>= 3, < 4.0'
+  Mail::Transport::Receive: '>= 3.004, < 4.0'
   Scalar::Util: '0'
   Test::More: '0'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Box-IMAP4.git
-version: '3.009'
+version: '3.010'
+x_oodist:
+  email: perl@overmeer.net
+  first_year: 2001
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include:
+    - ../Mail-Box
+    - ../Mail-Message
+    - ../Mail-Transport
+  oodoc_version: 3.05
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/mail-box-imap4/raw
+  release:
+    publish: ../public_html/mail-box-imap4/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

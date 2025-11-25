@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.028'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-10-30'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.029'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-11-24'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;

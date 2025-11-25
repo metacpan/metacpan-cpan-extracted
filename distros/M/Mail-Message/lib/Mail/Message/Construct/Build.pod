@@ -6,19 +6,21 @@ Mail::Message::Construct::Build - building a Mail::Message from components
 
 =head1 SYNOPSIS
 
- my $msg1 = Mail::Message->build
-   ( From => 'me', data => "only two\nlines\n");
+  my $msg1 = Mail::Message->build(
+    From => 'me',
+    data => "only two\nlines\n",
+  );
 
- my $msg2 = Mail::Message->buildFromBody($body);
+  my $msg2 = Mail::Message->buildFromBody($body);
 
- Mail::Message->build
-   ( From     => 'me@myhost.com'
-   , To       => 'you@yourhost.com'
-   , Subject  => "Read our folder!"
+  Mail::Message->build(
+    From     => 'me@myhost.com',
+    To       => 'you@yourhost.com',
+    Subject  => "Read our folder!",
 
-   , data     => \@lines
-   , file     => 'folder.pdf'
-   )->send(via => 'postfix');
+    data     => \@lines,
+    file     => 'folder.pdf',
+  )->send(via => 'postfix');
 
 =head1 DESCRIPTION
 
@@ -32,17 +34,21 @@ building of messages from various simpler components.
 
 =over 4
 
-=item Mail::Message-E<gt>B<build>( [$message|$part|$body], $content )
+=item $class-E<gt>B<build>( [$message|$part|$body], @fields, %options )
 
-Simplified message object builder.  In case a $message or message $part is
+Simplified message object builder.  In case a C<$message> or message C<$part> is
 specified, a new message is created with the same body to start with, but
-new headers.  A $body may be specified as well.  However, there are more
+new headers.  A C<$body> may be specified as well.  However, there are more
 ways to add data simply.
 
-The $content is a list of key-value pairs and header field objects.
-The keys which start with a capital are used as header-lines.  Lower-cased
-fields are used for other purposes as listed below.  Each field may be used
-more than once.  Pairs where the value is C<undef> are ignored.
+You may pass C<@fields> as objects, even mixed with option PAIRS.  The
+fields will be transmitted in the order they were created, so that
+might be needed.
+
+In the C<%options> LIST, the keys which start with a capital are used
+as header-lines.  Lower-cased fields are used for other purposes as
+listed below.  Each field may be used more than once.  Pairs where the
+value is C<undef> are ignored.
 
 If more than one C<data>, C<file>, and C<attach> is specified,
 a multi-parted message is created.  Some C<Content-*> fields are
@@ -64,84 +70,80 @@ been constructed.  Together, they produce your message.
 
 =over 2
 
-=item attach => BODY|PART|MESSAGE|ARRAY
+=item attach => $body|$part|$message|\@attach
 
-One attachment to the message.  Each attachment can be full $message, a
-$part, or a $body.
-Any $message will get encapsulated into a C<message/rfc822> body.
-You can specify many items (may be of different types) at once.
+One attachment to the message.  Each attachment can be full C<$message>,
+a C<$part>, or a C<$body>.  Any C<$message> will get encapsulated into a
+C<message/rfc822> body.  You can specify many items (may be of different
+types) at once.
 
- attach => $folder->message(3)->decoded  # body
- attach => $folder->message(3)           # message
- attach => [ $msg1, $msg2->part(6), $msg3->body ];
+  attach => $folder->message(3)->decoded  # body
+  attach => $folder->message(3)           # message
+  attach => [ $msg1, $msg2->part(6), $msg3->body ];
 
-=item data => STRING|ARRAY-OF-LINES
+=item data => $text|\@lines
 
-The text for one part, specified as one STRING, or an ARRAY of lines.  Each
-line, including the last, must be terminated by a newline.  This argument
-is passed to L<Mail::Message::Body::new(data)|Mail::Message::Body/"Constructors"> to
-construct one.
+The C<$text> for one part, specified as one string, or an ARRAY of C<@lines>.
+Each line, including the last, must be terminated by a newline.  This
+argument is passed to L<Mail::Message::Body::new(data)|Mail::Message::Body/"Constructors"> to construct one.
 
-  data => [ "line 1\n", "line 2\n" ]     # array of lines
-  data => <<'TEXT'                       # string
+  data => [ "line 1\n", "line 2\n" ] # array of lines
+  data => <<'TEXT'                   # string
  line 1
  line 2
  TEXT
 
-=item file => FILENAME|FILEHANDLE|IOHANDLE|ARRAY
+=item file => $file|$fh|$io|\@files
 
-Create a body where the data is read from the specified FILENAME,
-FILEHANDLE, or object of type IO::Handle.  Also this body is used
+Create a body where the data is read from the specified C<$file> by name,
+filehandle C<$fh>, or C<$io> object of type IO::Handle.  Also this body is used
 to create a L<Mail::Message::Body|Mail::Message::Body>. [2.119] You may even pass more
 than one file at once: 'file' and 'files' option are equivalent.
 
- my $in = IO::File->new('/etc/passwd', 'r');
+  my $in = IO::File->new('/etc/passwd', 'r');
 
- file  => 'picture.jpg'                   # filename
- file  => \*MYINPUTFILE                   # file handle
- file  => $in                             # any IO::Handle
- files => [ 'picture.jpg', \*MYINPUTFILE, $in ]
+  file  => 'picture.jpg'              # filename
+  file  => $fh                        # IO::File or GLOB
+  files => [ 'picture.jpg', $fh ]
 
- open my $in, '<:raw', '/etc/passwd';    # alternative for IO::File
-
-=item files => ARRAY-OF-FILE
+=item files => \@files
 
 Alias for option C<file>.
 
-=item head => HEAD
+=item head => $head
 
 Start with a prepared header, otherwise one is created.
 
 =back
 
-example: 
+» example: 
 
- my $msg = Mail::Message->build
-  ( From    => 'me@home.nl'
-  , To      => Mail::Address->new('your name', 'you@yourplace.aq')
-  , Cc      => 'everyone@example.com'
-  , Subject => "Let's talk",
-  , $other_message->get('Bcc')
+  my $msg = Mail::Message->build(
+    From    => 'me@home.nl',
+    To      => Mail::Address->new('your name', 'you@yourplace.aq'),
+    Cc      => 'everyone@example.com',
+    Subject => "Let's talk",,
+    $other_message->get('Bcc'),
 
-  , data   => [ "This is\n", "the first part of\n", "the message\n" ]
-  , file   => 'myself.gif'
-  , file   => 'you.jpg'
-  , attach => $signature
+    data   => [ "This is\n", "the first part of\n", "the message\n" ],
+    file   => 'myself.gif',
+    file   => 'you.jpg',
+    attach => $signature,
   );
 
- my $msg = Mail::Message->build
-  ( To     => 'you'
-  , 'Content-Type' => 'text/html'
-  , data   => "<html></html>"
+  my $msg = Mail::Message->build(
+    To     => 'you',
+    'Content-Type' => 'text/html',
+    data   => "<html></html>",
   );
 
-=item Mail::Message-E<gt>B<buildFromBody>($body, [$head], $headers)
+=item $class-E<gt>B<buildFromBody>($body, [$head], $headers)
 
-Shape a message around a $body.  Bodies have information about their
+Shape a message around a C<$body>.  Bodies have information about their
 content in them, which is used to construct a header for the message.
-You may specify a $head object which is pre-initialized, or one is
-created for you (also when $head is C<undef>).
-Next to that, more $headers can be specified which are stored in that
+You may specify a C<$head> object which is pre-initialized, or one is
+created for you (also when C<$head> is C<undef>).
+Next to that, more C<$headers> can be specified which are stored in that
 header.
 
 Header fields are added in order, and before the header lines as
@@ -153,21 +155,21 @@ string, address (L<Mail::Address|Mail::Address> object), or array of addresses.
 A C<Date>, C<Message-Id>, and C<MIME-Version> field are added unless
 supplied.
 
-example: 
+» example: 
 
- my $type = Mail::Message::Field->new('Content-Type', 'text/html'
-   , 'charset="us-ascii"');
+  my $type = Mail::Message::Field->new('Content-Type', 'text/html',
+    'charset="us-ascii"');
 
- my @to   = ( Mail::Address->new('Your name', 'you@example.com')
-            , 'world@example.info'
-            );
+  my @to   = (
+    Mail::Address->new('Your name', 'you@example.com'),
+    'world@example.info',
+  );
 
- my $msg  = Mail::Message->buildFromBody
-   ( $body
-   , From => 'me@example.nl'
-   , To   => \@to
-   , $type
-   );
+  my $msg  = Mail::Message->buildFromBody($body,
+    From => 'me@example.nl',
+    To   => \@to,
+    $type,
+  );
 
 =back
 
@@ -208,34 +210,38 @@ Hum, reading the list above... what is equivalent?  L<MIME::Entity> is
 not that simple after all!  Let's look at an example from MIME::Entity's
 manual page:
 
- ### Create the top-level, and set up the mail headers:
- $top = MIME::Entity->build(Type     => "multipart/mixed",
-                            From     => 'me@myhost.com',
-                            To       => 'you@yourhost.com',
-                            Subject  => "Hello, nurse!");
-                                                                                
- ### Attachment #1: a simple text document:
- $top->attach(Path=>"./testin/short.txt");
-                                                                                
- ### Attachment #2: a GIF file:
- $top->attach(Path        => "./docs/mime-sm.gif",
-              Type        => "image/gif",
-              Encoding    => "base64");
-                                                                                
- ### Attachment #3: text we'll create with text we have on-hand:
- $top->attach(Data => $contents);
-                                                                                
+  ### Create the top-level, and set up the mail headers:
+  $top = MIME::Entity->build(
+    Type     => "multipart/mixed",
+    From     => 'me@myhost.com',
+    To       => 'you@yourhost.com',
+    Subject  => "Hello, nurse!",
+  );
+
+  ### Attachment #1: a simple text document:
+  $top->attach(Path=>"./testin/short.txt");
+
+  ### Attachment #2: a GIF file:
+  $top->attach(
+    Path        => "./docs/mime-sm.gif",
+    Type        => "image/gif",
+    Encoding    => "base64",
+  );
+
+  ### Attachment #3: text we'll create with text we have on-hand:
+  $top->attach(Data => $contents);
+
 The MailBox equivalent could be
 
- my $msg = Mail::Message->build
-   ( From     => 'me@myhost.com'
-   , To       => 'you@yourhost.com'
-   , Subject  => "Hello, nurse!"
+  my $msg = Mail::Message->build(
+    From     => 'me@myhost.com',
+    To       => 'you@yourhost.com',
+    Subject  => "Hello, nurse!",
 
-   , file     => "./testin/short.txt"
-   , file     => "./docs/mime-sm.gif"
-   , data     => $contents
-   );
+    file     => "./testin/short.txt",
+    file     => "./docs/mime-sm.gif",
+    data     => $contents,
+  );
 
 One of the simplifications is that L<MIME::Types|MIME::Types> is used to lookup
 the right content type and optimal transfer encoding.  Good values
@@ -257,14 +263,14 @@ transfer encoding.
 
 When a message is built this way:
 
- my $msg = Mail::Message->build
-  ( 'Content-Type' => 'video/mpeg3'
-  , 'Content-Transfer-Encoding' => 'base64'
-  , 'Content-Disposition' => 'attachment'
-  , file => '/etc/passwd'
+  my $msg = Mail::Message->build(
+    'Content-Type' => 'video/mpeg3',
+    'Content-Transfer-Encoding' => 'base64',
+    'Content-Disposition' => 'attachment',
+    file => '/etc/passwd',
   );
 
-then first a C<text/plain> body is constructed (MIME::Types does not
+then first a C<text/plain> body is constructed (L<MIME::Types|MIME::Types> does not
 find an extension on the filename so defaults to C<text/plain>), with
 no encoding.  Only when that body is ready, the new type and requested
 encodings are set.  The content of the body will get base64 encoded,
@@ -272,25 +278,25 @@ because it is requested that way.
 
 What basically happens is this:
 
- my $head = ...other header lines...;
- my $body = Mail::Message::Body::Lines->new(file => '/etc/passwd');
- $body->type('video/mpeg3');
- $body->transferEncoding('base64');
- $body->disposition('attachment');
- my $msg  = Mail::Message->buildFromBody($body, $head);
- 
+  my $head = ...other header lines...;
+  my $body = Mail::Message::Body::Lines->new(file => '/etc/passwd');
+  $body->type('video/mpeg3');
+  $body->transferEncoding('base64');
+  $body->disposition('attachment');
+  my $msg  = Mail::Message->buildFromBody($body, $head);
+
 A safer way to construct the message is:
 
- my $body = Mail::Message::Body::Lines->new
-  ( file              => '/etc/passwd'
-  , mime_type         => 'video/mpeg3'
-  , transfer_encoding => 'base64'
-  , disposition       => 'attachment'
+  my $body = Mail::Message::Body::Lines->new(
+    file              => '/etc/passwd',
+    mime_type         => 'video/mpeg3',
+    transfer_encoding => 'base64',
+    disposition       => 'attachment',
   );
 
- my $msg  = Mail::Message->buildFromBody
-  ( $body
-  , ...other header lines...
+  my $msg  = Mail::Message->buildFromBody(
+    $body,
+    ...other header lines...
   );
 
 In the latter program, you will immediately start with a body of
@@ -307,19 +313,21 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

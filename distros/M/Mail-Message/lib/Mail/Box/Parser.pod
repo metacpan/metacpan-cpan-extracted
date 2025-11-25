@@ -11,11 +11,12 @@ Mail::Box::Parser - reading and writing messages
 
  Mail::Box::Parser is extended by
    Mail::Box::Parser::C
+   Mail::Box::Parser::Lines
    Mail::Box::Parser::Perl
 
 =head1 SYNOPSIS
 
- # Not instatiatiated itself
+  # Not instatiatiated itself
 
 =head1 DESCRIPTION
 
@@ -23,14 +24,9 @@ The C<Mail::Box::Parser> manages the parsing of folders.  Usually, you won't
 need to know anything about this module, except the options which are
 involved with this code.
 
-There are two implementations of this module planned:
+There are currently three implementations of this module:
 
 =over 4
-
-=item * L<Mail::Box::Parser::Perl|Mail::Box::Parser::Perl>
-
-A slower parser which only uses plain Perl.  This module is a bit slower,
-and does less checking and less recovery.
 
 =item * L<Mail::Box::Parser::C|Mail::Box::Parser::C>
 
@@ -40,97 +36,103 @@ handle XS files which are not located in the root directory of the
 module tree.  If a C compiler is available on your system, it will be
 used automatically.
 
+=item * L<Mail::Box::Parser::Perl|Mail::Box::Parser::Perl>
+
+A slower parser when the message is in a file, like mbox, which only
+uses plain Perl.  This module is a bit slower, and does less checking
+and less recovery.
+
+=item * L<Mail::Box::Parser::Lines|Mail::Box::Parser::Lines>
+
+Useful when the message is already in memory.  When you plan to use this
+yourself, you probably need to use L<Mail::Message::Construct::Read|Mail::Message::Construct::Read>.
+
 =back
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Parser-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a parser object which can handle one file.  For
 mbox-like mailboxes, this object can be used to read a whole folder.  In
 case of MH-like mailboxes, each message is contained in a single file,
 so each message has its own parser object.
+Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option  --Defined in     --Default
-  file                       undef
-  filename                   <required>
-  log       Mail::Reporter   'WARNINGS'
-  mode                       'r'
-  trace     Mail::Reporter   'WARNINGS'
+ -Option           --Defined in     --Default
+  fix_header_errors                   false
+  log                Mail::Reporter   'WARNINGS'
+  trace              Mail::Reporter   'WARNINGS'
+  trusted                             false
 
 =over 2
 
-=item file => FILE-HANDLE
+=item fix_header_errors => BOOLEAN
 
-Any C<IO::File> or C<GLOB> which can be used to read the data from.  In
-case this option is specified, the C<filename> is informational only.
-
-=item filename => FILENAME
-
-The name of the file to be read.
+When header errors are detected, the parsing of the header will
+be stopped.  Other header lines will become part of the body of
+the message.  Set this flag to have the erroneous line added to
+the previous header line.
 
 =item log => LEVEL
 
-=item mode => OPENMODE
-
-File-open mode, which defaults to C<'r'>, which means `read-only'.
-See C<perldoc -f open> for possible modes.  Only applicable 
-when no C<file> is specified.
-
 =item trace => LEVEL
 
-=back
+=item trusted => BOOLEAN
+
+Is the input from the file to be trusted, or does it require extra
+tests.  Related to L<Mail::Box::new(trusted)|Mail::Box/"Constructors">.
 
 =back
 
-=head2 The parser
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
 =over 4
 
-=item $obj-E<gt>B<fileChanged>()
+=item $any-E<gt>B<defaultParserType>( [$class] )
 
-Returns whether the file which is parsed has changed after the last
-time takeFileInfo() was called.
+Returns the parser to be used to parse all subsequent
+messages, possibly first setting the parser using the optional argument.
+Usually, the parser is autodetected; the C<C>-based parser will be used
+when it can be, and the Perl-based parser will be used otherwise.
 
-=item $obj-E<gt>B<filename>()
+The C<$class> argument allows you to specify a package name to force a
+particular parser to be used (such as your own custom parser). You have
+to C<use> or C<require> the package yourself before calling this method
+with an argument. The parser must be a sub-class of C<Mail::Box::Parser>.
 
-Returns the name of the file this parser is working on.
+=item $obj-E<gt>B<fixHeaderErrors>( [BOOLEAN] )
 
-=item $obj-E<gt>B<restart>()
+If set to C<true>, parsing of a header will not stop on an error, but
+attempt to add the erroneous this line to previous field.  Without C<BOOLEAN>,
+the current setting is returned.
 
-Restart the parser on a certain file, usually because the content has
-changed.
+» example: 
 
-=item $obj-E<gt>B<start>(%options)
+  $folder->parser->fixHeaderErrors(1);
+  my $folder = $mgr->open('folder', fix_header_errors => 1);
 
-Start the parser by opening a file.
+=item $obj-E<gt>B<logSettings>()
 
- -Option--Default
-  file    undef
+Inherited, see L<Mail::Reporter/"Attributes">
 
-=over 2
+=item $obj-E<gt>B<trusted>()
 
-=item file => FILEHANDLE|undef
-
-The file is already open, for instance because the data must be read
-from STDIN.
-
-=back
-
-=item $obj-E<gt>B<stop>()
-
-Stop the parser, which will include a close of the file.  The lock on the
-folder will not be removed (is not the responsibility of the parser).
+Trust the source of the data: do not run additional tests.
 
 =back
 
@@ -142,7 +144,7 @@ folder will not be removed (is not the responsibility of the parser).
 
 Try to read one message-body from the file, and immediately write
 it to the specified file-handle.  Optionally, the predicted number
-of CHARacterS and/or $lines to be read can be supplied.  These values may be
+of CHARacterS and/or C<$lines> to be read can be supplied.  These values may be
 C<undef> and may be wrong.
 
 The return is a list of three scalars: the location of the body (begin
@@ -151,7 +153,7 @@ and end) and the number of lines in the body.
 =item $obj-E<gt>B<bodyAsList>( [$chars, [$lines]] )
 
 Try to read one message-body from the file.  Optionally, the predicted number
-of CHARacterS and/or $lines to be read can be supplied.  These values may be
+of CHARacterS and/or C<$lines> to be read can be supplied.  These values may be
 C<undef> and may be wrong.
 
 The return is a list of scalars, each containing one line (including
@@ -161,28 +163,22 @@ in the file where this body started and ended.
 =item $obj-E<gt>B<bodyAsString>( [$chars, [$lines]] )
 
 Try to read one message-body from the file.  Optionally, the predicted number
-of CHARacterS and/or $lines to be read can be supplied.  These values may be
+of CHARacterS and/or C<$lines> to be read can be supplied.  These values may be
 C<undef> and may be wrong.
 
-The return is a list of three scalars, the location in the file
+Returned is a list of three scalars: the location in the file
 where the body starts, where the body ends, and the string containing the
 whole body.
 
 =item $obj-E<gt>B<bodyDelayed>( [$chars, [$lines]] )
 
 Try to read one message-body from the file, but the data is skipped.
-Optionally, the predicted number of CHARacterS and/or $lines to be skipped
+Optionally, the predicted number of CHARacterS and/or C<$lines> to be skipped
 can be supplied.  These values may be C<undef> and may be wrong.
 
 The return is a list of four scalars: the location of the body (begin and
 end), the size of the body, and the number of lines in the body.  The
 number of lines may be C<undef>.
-
-=item $obj-E<gt>B<filePosition>( [$position] )
-
-Returns the location of the next byte to be used in the file which is
-parsed.  When a $position is specified, the location in the file is
-moved to the indicated spot first.
 
 =item $obj-E<gt>B<lineSeparator>()
 
@@ -190,6 +186,36 @@ Returns the character or characters which are used to separate lines
 in the folder file.  This is based on the first line of the file.
 UNIX systems use a single LF to separate lines.  Windows uses a CR and
 a LF.  Mac uses CR.
+
+=item $obj-E<gt>B<readHeader>()
+
+Read the whole message-header and return it as list of field-value
+pairs.  Mind that some fields will appear more than once.
+
+The first element will represent the position in the file where the
+header starts.  The follows the list of header field names and bodies.
+
+» example: 
+
+  my ($where, @header) = $parser->readHeader;
+
+=item $obj-E<gt>B<stop>()
+
+Stop the parser.
+
+=back
+
+=head3 Administering separators
+
+The various "separators" methods are used by L<Mail::Message::Body::Multipart|Mail::Message::Body::Multipart>
+to detect parts, and for the file based mailboxes to flag where the new message
+starts.
+
+=over 4
+
+=item $obj-E<gt>B<activeSeparator>()
+
+Z<>
 
 =item $obj-E<gt>B<popSeparator>()
 
@@ -203,20 +229,8 @@ A famous separator is the C<From>-line, which is used in Mbox-like
 folders to separate messages.  But also parts (I<attachments>) is a
 message are divided by separators.
 
-The specified STRING describes the start of the separator-line.  The
+The specified C<STRING> describes the start of the separator-line.  The
 Regexp can specify a more complicated format.
-
-=item $obj-E<gt>B<readHeader>()
-
-Read the whole message-header and return it as list of field-value
-pairs.  Mind that some fields will appear more than once.
-
-The first element will represent the position in the file where the
-header starts.  The follows the list of header field names and bodies.
-
-example: 
-
- my ($where, @header) = $parser->readHeader;
 
 =item $obj-E<gt>B<readSeparator>(%options)
 
@@ -226,58 +240,26 @@ are ignored.
 
 The return are two scalars, where the first gives the location of the
 separator in the file, and the second the line which is found as
-separator.  A new separator is activated using L<pushSeparator()|Mail::Box::Parser/"Parsing">.
+separator.  A new separator is activated using L<pushSeparator()|Mail::Box::Parser/"Administering separators">.
 
-=back
+=item $obj-E<gt>B<resetSeparators>()
 
-=head2 Internals
+Z<>
 
-=over 4
+=item $obj-E<gt>B<separators>()
 
-=item $obj-E<gt>B<closeFile>()
+Z<>
 
-Close the file which was being parsed.
+=item $obj-E<gt>B<stripGt>()
 
-=item $obj-E<gt>B<defaultParserType>( [$class] )
-
-=item Mail::Box::Parser-E<gt>B<defaultParserType>( [$class] )
-
-Returns the parser to be used to parse all subsequent
-messages, possibly first setting the parser using the optional argument.
-Usually, the parser is autodetected; the C<C>-based parser will be used
-when it can be, and the Perl-based parser will be used otherwise.
-
-The $class argument allows you to specify a package name to force a
-particular parser to be used (such as your own custom parser). You have
-to C<use> or C<require> the package yourself before calling this method
-with an argument. The parser must be a sub-class of C<Mail::Box::Parser>.
-
-=item $obj-E<gt>B<openFile>($args)
-
-Open the file to be parsed.  $args is a ref-hash of options.
-
- -Option  --Default
-  filename  <required>
-  mode      <required>
-
-=over 2
-
-=item filename => FILENAME
-
-=item mode => STRING
-
-=back
-
-=item $obj-E<gt>B<takeFileInfo>()
-
-Capture some data about the file being parsed, to be compared later.
+Z<>
 
 =back
 
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -288,9 +270,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Parser-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -298,19 +278,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Parser-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Parser-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -339,7 +311,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -352,23 +324,12 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Warning: File $filename changed during access.
-
-When a message parser starts working, it takes size and modification time
-of the file at hand.  If the folder is written, it checks whether there
-were changes in the file made by external programs.
-
-Calling L<Mail::Box::update()|Mail::Box/"The folder"> on a folder before it being closed
-will read these new messages.  But the real source of this problem is
-locking: some external program (for instance the mail transfer agent,
-like sendmail) uses a different locking mechanism as you do and therefore
-violates your rights.
-
 =item Error: Filename or handle required to create a parser.
 
 A message parser needs to know the source of the message at creation.  These
-sources can be a filename (string), file handle object or GLOB.
+sources can be a filename (string), file handle object, or GLOB.
 See new(filename) and new(file).
+Cast by C<new()>
 
 =item Error: Package $package does not implement $method.
 
@@ -377,19 +338,35 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
+
+=item Warning: Unexpected end of header in $source: $line
+
+While parsing a message from the specified source (usually a file name),
+the parser found a syntax error.  According to the MIME specification in the
+RFCs, each header line must either contain a colon, or start with a blank
+to indicate a folded field.  Apparently, this header contains a line which
+starts on the first position, but not with a field name.
+
+By default, parsing of the header will be stopped.  If there are more header
+lines after the erroneous line, they will be added to the body of the message.
+In case of L<new(fix_header_errors)|Mail::Box::Parser/"METHODS"> set, the parsing of the header will be continued.
+The erroneous line will be added to the preceding field.
+Cast by C<readHeader()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

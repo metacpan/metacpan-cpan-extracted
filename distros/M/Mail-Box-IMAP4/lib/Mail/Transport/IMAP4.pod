@@ -13,21 +13,21 @@ Mail::Transport::IMAP4 - proxy to Mail::IMAPClient
 
 =head1 SYNOPSIS
 
- my $imap = Mail::Transport::IMAP4->new(...);
- my $message = $imap->receive($id);
- $imap->send($message);
+  my $imap = Mail::Transport::IMAP4->new(...);
+  my $message = $imap->receive($id);
+  $imap->send($message);
 
- my Mail::Box::Manager $mgr = Mail::Box::Manager->new;
- $mgr->open(
-     # Generic folder options
-     folder => 'imaps://...',
-     access => 'rw',
-     extract => 'ALWAYS',
+  my Mail::Box::Manager $mgr = Mail::Box::Manager->new;
+  $mgr->open(
+      # Generic folder options
+      folder => 'imaps://...',
+      access => 'rw',
+      extract => 'ALWAYS',
 
-     # Mail::IMAPClient options start with [A-Z]
-     IgnoreSizeErrors => 1,
-     Ssl => 1,
- );
+      # Mail::IMAPClient options start with [A-Z]
+      IgnoreSizeErrors => 1,
+      Ssl => 1,
+  );
 
 =head1 DESCRIPTION
 
@@ -46,22 +46,22 @@ connection.
 The Mail::IMAPClient module is the best IMAP4 implementation for
 Perl5, but is not maintained.  There are many known problems with the
 module, and solving those is outside the scope of MailBox.  See
-F<http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient>
 for all the reported bugs.
 
 Extends L<"DESCRIPTION" in Mail::Transport::Receive|Mail::Transport::Receive/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Transport::Receive|Mail::Transport::Receive/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Transport::Receive|Mail::Transport::Receive/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Transport::IMAP4-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create the IMAP connection to the server.  IMAP servers can handle
 multiple folders for a single user, which means that connections
@@ -70,7 +70,7 @@ may get shared.  This is sharing is hidden for the user.
 When an C<imap_client> is specified, then the options C<hostname>,
 C<port>, C<username>, and C<password> are extracted from it.
 
-All %options which start with a capital are passed as initiation
+All C<%options> which start with a capital are passed as initiation
 to Mail::IMAPClient.  See that manual about the huge pile of
 parameters.  When talking to Microsoft Exchange, you probabaly need the
 C<IgnoreSizeErros>.  Probably, you need C<Ssl> or C<StartTLS> as well.
@@ -79,6 +79,7 @@ only accepts an ARRAY.
 
 For backwards compatibility, C<ssl> is an alternative for C<Ssl>,
 and C<starttls> for C<StartTLS>.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option      --Defined in     --Default
   authenticate                   'AUTO'
@@ -91,7 +92,7 @@ and C<starttls> for C<StartTLS>.
   password      Mail::Transport  undef
   port          Mail::Transport  143
   proxy         Mail::Transport  undef
-  retry         Mail::Transport  <false>
+  retry         Mail::Transport  <unlimited>
   timeout       Mail::Transport  120
   trace         Mail::Reporter   'WARNINGS'
   username      Mail::Transport  undef
@@ -109,9 +110,9 @@ the available types.  You may provide an ARRAY of types.
 
 Used for NTLM authentication.
 
-=item executable => FILENAME
+=item executable => $file
 
-=item hostname => HOSTNAME|ARRAY
+=item hostname => $host|\@hosts
 
 =item imap_client => OBJECT|CLASS
 
@@ -124,34 +125,88 @@ When a CLASS is given, an object of that type is created for you.  The created
 object can be retrieved via L<imapClient()|Mail::Transport::IMAP4/"Protocol [internals]">, and than configured as
 defined by L<Mail::IMAPClient|Mail::IMAPClient>.
 
-=item interval => SECONDS
+=item interval => $span
 
 =item log => LEVEL
 
-=item password => STRING
+=item password => $password
 
-=item port => INTEGER
+=item port => $port
 
-=item proxy => PATH
+=item proxy => $path
 
-=item retry => NUMBER|undef
+=item retry => $count|undef
 
-=item timeout => SECONDS
+=item timeout => $span
 
 =item trace => LEVEL
 
-=item username => STRING
+=item username => $username
 
-=item via => CLASS|NAME
+=item via => CLASS|$name
 
 =back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Transport::Receive|Mail::Transport::Receive/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<authentication>( ['AUTO'|$type|$types] )
+
+Returns a LIST of ARRAYS, each describing one possible way to contact
+the server. Each pair contains a mechanism name and a challenge callback
+(which may be C<undef>).
+
+The settings are used by L<login()|Mail::Transport::IMAP4/"Protocol [internals]"> to get server access.  The initial
+value origins from L<new(authenticate)|Mail::Transport::IMAP4/"METHODS">, but may be changed later.
+
+Available basic C<$types> are C<CRAM-MD5>, C<NTLM>, and C<PLAIN>.  With
+C<AUTO>, all available types will be tried.  When the Authen::NTLM
+is not installed, the C<NTLM> option will silently be skipped.  Be warned
+that, because of C<PLAIN>, erroneous username/password combinations will
+be passed readible as last attempt!
+
+The C<NTLM> authentication requires Authen::NTLM to be installed.  Other
+methods may be added later.  Besides, you may also specify a CODE
+reference which implements some authentication.
+
+An ARRAY as C<$type> can be used to specify both mechanism as callback.  When
+no array is used, callback of the pair is set to C<undef>.  See
+L<Mail::IMAPClient/authenticate> for the gory details.
+
+» example: 
+
+  $transporter->authentication('CRAM-MD5', [MY_AUTH => \&c], 'PLAIN');
+
+  foreach my $pair ($transporter->authentication)
+  {   my ($mechanism, $challenge) = @$pair;
+      ...
+  }
+
+=item $obj-E<gt>B<domain>( [$domain] )
+
+Used in NTLM authentication to define the Windows domain which is
+accessed.  Initially set by L<new(domain)|Mail::Transport::IMAP4/"METHODS"> and defaults to the
+server's name.
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<usesSSL>()
+
+Returns a boolean.
 
 =back
 
 =head2 Receiving mail
 
 Extends L<"Receiving mail" in Mail::Transport::Receive|Mail::Transport::Receive/"Receiving mail">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<receive>( [$unique_message_id] )
@@ -163,7 +218,7 @@ Inherited, see L<Mail::Transport::Receive/"Receiving mail">
 =head2 Server connection
 
 Extends L<"Server connection" in Mail::Transport::Receive|Mail::Transport::Receive/"Server connection">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<findBinary>( $name, [@directories] )
@@ -177,54 +232,6 @@ Inherited, see L<Mail::Transport/"Server connection">
 =item $obj-E<gt>B<retry>()
 
 Inherited, see L<Mail::Transport/"Server connection">
-
-=back
-
-=head2 Attributes
-
-=over 4
-
-=item $obj-E<gt>B<authentication>( ['AUTO'|$type|$types] )
-
-Returns a LIST of ARRAYS, each describing one possible way to contact
-the server. Each pair contains a mechanism name and a challenge callback
-(which may be C<undef>).
-
-The settings are used by L<login()|Mail::Transport::IMAP4/"Protocol [internals]"> to get server access.  The initial
-value origins from L<new(authenticate)|Mail::Transport::IMAP4/"METHODS">, but may be changed later.
-
-Available basic $types are C<CRAM-MD5>, C<NTLM>, and C<PLAIN>.  With
-C<AUTO>, all available types will be tried.  When the Authen::NTLM
-is not installed, the C<NTLM> option will silently be skipped.  Be warned
-that, because of C<PLAIN>, erroneous username/password combinations will
-be passed readible as last attempt!
-
-The C<NTLM> authentication requires Authen::NTLM to be installed.  Other
-methods may be added later.  Besides, you may also specify a CODE
-reference which implements some authentication.
-
-An ARRAY as $type can be used to specify both mechanism as callback.  When
-no array is used, callback of the pair is set to C<undef>.  See
-L<Mail::IMAPClient/authenticate> for the gory details.
-
-example: 
-
- $transporter->authentication('CRAM-MD5', [MY_AUTH => \&c], 'PLAIN');
-
- foreach my $pair ($transporter->authentication)
- {   my ($mechanism, $challenge) = @$pair;
-     ...
- }
-
-=item $obj-E<gt>B<domain>( [$domain] )
-
-Used in NTLM authentication to define the Windows domain which is
-accessed.  Initially set by L<new(domain)|Mail::Transport::IMAP4/"METHODS"> and defaults to the
-server's name.
-
-=item $obj-E<gt>B<usesSSL>()
-
-Returns a boolean.
 
 =back
 
@@ -248,9 +255,9 @@ Add a folder.
 
 =item $obj-E<gt>B<createImapClient>($class, %options)
 
-Create an object of $class, which extends L<Mail::IMAPClient>.
+Create an object of C<$class>, which extends L<Mail::IMAPClient>.
 
-All %options will be passed to the constructor (new) of $class.
+All C<%options> will be passed to the constructor (new) of C<$class>.
 
 =item $obj-E<gt>B<currentFolder>( [$foldername] )
 
@@ -258,7 +265,7 @@ Be sure that the specific FOLDER is the current one selected.  If the
 folder is already selected, no IMAP traffic will be produced.
 
 The boolean return value indicates whether the folder is selectable. It
-will return undef if it does not exist.
+will return C<undef> if it does not exist.
 
 =item $obj-E<gt>B<deleteFolder>($name)
 
@@ -269,12 +276,12 @@ Remove one folder.
 Command the server to delete for real all messages which are flagged to
 be deleted.
 
-=item $obj-E<gt>B<fetch>(ARRAY-$of-$messages, $info)
+=item $obj-E<gt>B<fetch>(\@messages, $info)
 
-Get some $info about the $messages from the server.  The specified messages
+Get some C<$info> about the C<@messages> from the server.  The specified messages
 shall extend L<Mail::Box::Net::Message|Mail::Box::Net::Message>, Returned is a list
 of hashes, each info about one result.  The contents of the hash
-differs per $info, but at least a C<message> field will be present, to
+differs per C<$info>, but at least a C<message> field will be present, to
 relate to the message in question.
 
 The right folder should be selected before this method is called. When
@@ -283,14 +290,12 @@ messages, and empty array is returned.  The retrieval is done by
 L<Mail::IMAPClient|Mail::IMAPClient> method C<fetch()>, which is then
 parsed.
 
-=item $obj-E<gt>B<flagsToLabels>($what, @flags)
-
-=item Mail::Transport::IMAP4-E<gt>B<flagsToLabels>($what, @flags)
+=item $any-E<gt>B<flagsToLabels>($what, @flags)
 
 In SCALAR context, a hash with labels is returned.  In LIST context, pairs
 are returned.
 
-The $what parameter can be C<'SET'>, C<'CLEAR'>, or C<'REPLACE'>.  With
+The C<$what> parameter can be C<'SET'>, C<'CLEAR'>, or C<'REPLACE'>.  With
 the latter, all standard imap flags which do not appear in the list will
 be ignored: their value may either by set or cleared.  See L<getFlags()|Mail::Transport::IMAP4/"Protocol [internals]">
 
@@ -299,15 +304,15 @@ lower-cased.  For instance, '\SomeWeirdFlag' will become
 `someweirdflag =E<gt> 1'.  It will be set to '1' for C<SET>, and '0'
 in case of C<CLEAR>.
 
-example: translating IMAP4 flags into MailBox flags
+» example: translating IMAP4 flags into MailBox flags
 
- my @flags  = ('\Seen', '\Flagged');
- my $labels = Mail::Transport::IMAP4->flags2labels(SET => @flags);
+  my @flags  = ('\Seen', '\Flagged');
+  my $labels = Mail::Transport::IMAP4->flags2labels(SET => @flags);
 
 =item $obj-E<gt>B<folders>( [$foldername] )
 
 Returns a list of folder names which are sub-folders of the specified
-$foldername.  Without $foldername, the top-level foldernames are returned.
+C<$foldername>.  Without C<$foldername>, the top-level foldernames are returned.
 
 =item $obj-E<gt>B<getFields>( $uid, $name, [$name, ...] )
 
@@ -318,7 +323,7 @@ When the name is C<ALL>, the whole header is returned.
 =item $obj-E<gt>B<getFlags>($folder, $id)
 
 Returns the values of all flags which are related to the message with the
-specified $id.  These flags are translated into the names which are
+specified C<$id>.  These flags are translated into the names which are
 standard for the MailBox suite.
 
 A HASH is returned.  Names which do not appear will also provide
@@ -341,9 +346,7 @@ If the contact to the server was still present or could be established,
 an Mail::IMAPClient object is returned.  Else, C<undef> is returned and
 no further actions should be tried on the object.
 
-=item $obj-E<gt>B<labelsToFlags>(HASH|PAIRS)
-
-=item Mail::Transport::IMAP4-E<gt>B<labelsToFlags>(HASH|PAIRS)
+=item $any-E<gt>B<labelsToFlags>(HASH|PAIRS)
 
 Convert MailBox labels into IMAP flags.  Returned is a string.  Unsupported
 labels are ignored.
@@ -362,7 +365,7 @@ Change the flags on the message which are represented by the label.  The
 value which can be related to the label will be lost, because IMAP only
 defines a boolean value, where MailBox labels can contain strings.
 
-Returned is a list of $label=>$value pairs which could not be send to
+Returned is a list of (C<$label> => C<$value>) pairs which could not be send to
 the IMAP server.  These values may be cached in a different way.
 
 =back
@@ -370,7 +373,7 @@ the IMAP server.  These values may be cached in a different way.
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Transport::Receive|Mail::Transport::Receive/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -381,9 +384,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Transport::IMAP4-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -391,19 +392,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Transport::IMAP4-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Transport::IMAP4-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -432,13 +425,14 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Transport::Receive|Mail::Transport::Receive/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
 
 The connection is cleanly terminated when the program is
 terminated.
+Improves base, see L<Mail::Reporter/"Cleanup">
 
 =back
 
@@ -448,13 +442,23 @@ terminated.
 
 =item Error: Cannot connect to $host:$port for IMAP4: $!
 
+Cast by C<login()>
+
 =item Error: IMAP cannot connect to $host: $@
+
+Cast by C<login()>
 
 =item Notice: IMAP4 authenication $mechanism to $host:$port successful
 
+Cast by C<login()>
+
 =item Error: IMAP4 requires a username and password
 
+Cast by C<login()>
+
 =item Error: IMAP4 username $username requires a password
+
+Cast by C<login()>
 
 =item Error: Package $package does not implement $method.
 
@@ -463,19 +467,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.009,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 3.010,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

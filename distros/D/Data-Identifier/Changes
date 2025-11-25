@@ -1,3 +1,9 @@
+v0.26  2025-11-25Z
+    - Updated documentation
+    - Added experimental Data::Identifier::Wellknown->announce()
+    - Added experimental style => 'uriid' to $identifier->uri()
+    - Improved SIRTX identifier parsing
+
 v0.25  2025-11-19Z
     - Added new SID values
     - Added support for wd:TNNN parsing and rendering in Util

@@ -1,64 +1,67 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 
 use strict;
 use warnings;
 
+#--------------------
 
-our %locations =
-(
-  bounce             => 'Bounce'
+our %locations = (
+	bounce             => 'Bounce',
 
-, build              => 'Build'
-, buildFromBody      => 'Build'
+	build              => 'Build',
+	buildFromBody      => 'Build',
 
-, forward            => 'Forward'
-, forwardNo          => 'Forward'
-, forwardInline      => 'Forward'
-, forwardAttach      => 'Forward'
-, forwardEncapsulate => 'Forward'
-, forwardSubject     => 'Forward'
-, forwardPrelude     => 'Forward'
-, forwardPostlude    => 'Forward'
+	forward            => 'Forward',
+	forwardNo          => 'Forward',
+	forwardInline      => 'Forward',
+	forwardAttach      => 'Forward',
+	forwardEncapsulate => 'Forward',
+	forwardSubject     => 'Forward',
+	forwardPrelude     => 'Forward',
+	forwardPostlude    => 'Forward',
 
-, read               => 'Read'
+	read               => 'Read',
 
-, rebuild            => 'Rebuild'
+	rebuild            => 'Rebuild',
 
-, reply              => 'Reply'
-, replySubject       => 'Reply'
-, replyPrelude       => 'Reply'
+	reply              => 'Reply',
+	replySubject       => 'Reply',
+	replyPrelude       => 'Reply',
 
-, string             => 'Text'
-, lines              => 'Text'
-, file               => 'Text'
-, printStructure     => 'Text'
+	string             => 'Text',
+	lines              => 'Text',
+	file               => 'Text',
+	printStructure     => 'Text',
 );
 
 sub AUTOLOAD(@)
-{   my $self  = shift;
-    our $AUTOLOAD;
-    (my $call = $AUTOLOAD) =~ s/.*\:\://g;
+{	my $self  = shift;
+	our $AUTOLOAD;
+	my $call = $AUTOLOAD =~ s/.*\:\://gr;
 
-    if(my $mod = $locations{$call})
-    {   eval "require Mail::Message::Construct::$mod";
-        die $@ if $@;
-        return $self->$call(@_);
-    }
+	if(my $mod = $locations{$call})
+	{	eval "require Mail::Message::Construct::$mod";
+		die $@ if $@;
+		return $self->$call(@_);
+	}
 
-    our @ISA;                    # produce error via Mail::Reporter
-    $call = "${ISA[0]}::$call";
-    $self->$call(@_);
+	our @ISA;                    # produce error via Mail::Reporter
+	$call = "${ISA[0]}::$call";
+	$self->$call(@_);
 }
 
 1;

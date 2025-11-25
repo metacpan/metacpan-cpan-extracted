@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Ethereum Fee Market transaction abstraction (EIP-1559)
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use parent 'Blockchain::Ethereum::Transaction';
 
@@ -77,7 +77,7 @@ Blockchain::Ethereum::Transaction::EIP1559 - Ethereum Fee Market transaction abs
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -103,7 +103,7 @@ Transaction abstraction for EIP-1559 Fee Market transactions
         ]
     );
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );

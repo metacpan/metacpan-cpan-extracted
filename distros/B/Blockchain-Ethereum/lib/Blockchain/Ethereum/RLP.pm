@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Ethereum RLP encoding/decoding utility
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use Carp;
 
@@ -176,7 +176,7 @@ Blockchain::Ethereum::RLP - Ethereum RLP encoding/decoding utility
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

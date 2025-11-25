@@ -14,36 +14,36 @@ Mail::Box::IMAP4s - handle IMAP4 folders as client, with ssl connection
 
 =head1 SYNOPSIS
 
- my $url = 'imap4s://user:passwd@host:port/INBOX';
- my $url = 'imaps://user:passwd@host:port/INBOX';
+  my $url = 'imap4s://user:passwd@host:port/INBOX';
+  my $url = 'imaps://user:passwd@host:port/INBOX';
 
- use Mail::Box::IMAP4s;
- my $folder = Mail::Box::IMAP4s->new(folder => $url, ...);
+  use Mail::Box::IMAP4s;
+  my $folder = Mail::Box::IMAP4s->new(folder => $url, ...);
 
- my $mgr    = Mail::Box::Manager->new;
- my $folder = $msg->open($url, retry => 3, interval => 5);
+  my $mgr    = Mail::Box::Manager->new;
+  my $folder = $msg->open($url, retry => 3, interval => 5);
 
 =head1 DESCRIPTION
 
 See L<Mail::Box::IMAP4|Mail::Box::IMAP4>.
 
 Extends L<"DESCRIPTION" in Mail::Box::IMAP4|Mail::Box::IMAP4/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Box::IMAP4|Mail::Box::IMAP4/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<@{}>
+=item overload: B<@{}> use as ARRAY
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<cmp>
+=item overload: B<cmp> string comparison
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
@@ -52,14 +52,16 @@ Inherited, see L<Mail::Box/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::IMAP4|Mail::Box::IMAP4/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::IMAP4s-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Box::IMAP4/"METHODS">
 
  -Option           --Defined in      --Default
   access             Mail::Box         'r'
@@ -68,17 +70,17 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
   cache_body         Mail::Box::IMAP4  NO
   cache_head         Mail::Box::IMAP4  NO or DELAY
   cache_labels       Mail::Box::IMAP4  NO or DELAY
-  coerce_options     Mail::Box         []
-  create             Mail::Box         <false>
+  coerce_options     Mail::Box         +[]
+  create             Mail::Box         false
   extract            Mail::Box         10240
   field_type         Mail::Box         undef
-  fix_headers        Mail::Box         <false>
+  fix_headers        Mail::Box         false
   folder             Mail::Box         /
   folderdir          Mail::Box         <network location>
   head_delayed_type  Mail::Box         Mail::Message::Head::Delayed
   head_type          Mail::Box         Mail::Box::IMAP4::Head or Mail::Message::Head::Complete
   join_connection    Mail::Box::IMAP4  true
-  keep_dups          Mail::Box         <false>
+  keep_dups          Mail::Box         false
   lock_file          Mail::Box         undef
   lock_timeout       Mail::Box         1 hour
   lock_type          Mail::Box         'NONE'
@@ -90,7 +92,7 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
   multipart_type     Mail::Box         Mail::Message::Body::Multipart
   password           Mail::Box::Net    undef
   remove_when_empty  Mail::Box         <false>
-  save_on_exit       Mail::Box         <true>
+  save_on_exit       Mail::Box         true
   server_name        Mail::Box::Net    undef
   server_port        Mail::Box::Net    993
   ssl                                  { SSL_verify_mode => SSL_VERIFY_NONE }
@@ -102,7 +104,7 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
 
 =over 2
 
-=item access => MODE
+=item access => $mode
 
 =item body_delayed_type => CLASS
 
@@ -118,15 +120,15 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
 
 =item create => BOOLEAN
 
-=item extract => INTEGER | CODE | METHOD | 'LAZY'|'ALWAYS'
+=item extract => INTEGER | CODE | METHOD | 'LAZY'| 'ALWAYS'
 
 =item field_type => CLASS
 
 =item fix_headers => BOOLEAN
 
-=item folder => FOLDERNAME
+=item folder => $name
 
-=item folderdir => DIRECTORY
+=item folderdir => $directory
 
 =item head_delayed_type => CLASS
 
@@ -136,33 +138,33 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
 
 =item keep_dups => BOOLEAN
 
-=item lock_file => FILENAME
+=item lock_file => $file
 
-=item lock_timeout => SECONDS
+=item lock_timeout => $seconds
 
 =item lock_type => CLASS|STRING|ARRAY
 
-=item lock_wait => SECONDS
+=item lock_wait => $seconds
 
 =item locker => OBJECT
 
 =item log => LEVEL
 
-=item manager => MANAGER
+=item manager => $manager
 
 =item message_type => CLASS
 
 =item multipart_type => CLASS
 
-=item password => STRING
+=item password => $password
 
 =item remove_when_empty => BOOLEAN
 
 =item save_on_exit => BOOLEAN
 
-=item server_name => HOSTNAME
+=item server_name => $host
 
-=item server_port => INTEGER
+=item server_port => $number
 
 =item ssl => HASH|ARRAY
 
@@ -172,20 +174,56 @@ Parameters to initialize the SSL connection.
 
 =item trace => LEVEL
 
-=item transporter => OBJECT|CLASS
+=item transporter => $object|$class
 
 =item trusted => BOOLEAN
 
-=item username => STRING
+=item username => $username
 
 =back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<fixHeaders>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<folderdir>( [$directory] )
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<isTrusted>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<removeEmpty>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box/"Attributes">
 
 =back
 
 =head2 The folder
 
 Extends L<"The folder" in Mail::Box::IMAP4|Mail::Box::IMAP4/"The folder">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addMessage>($message, %options)
@@ -196,7 +234,7 @@ Inherited, see L<Mail::Box/"The folder">
 
 Inherited, see L<Mail::Box/"The folder">
 
-=item Mail::Box::IMAP4s-E<gt>B<appendMessages>(%options)
+=item $class-E<gt>B<appendMessages>(%options)
 
 Inherited, see L<Mail::Box/"The folder">
 
@@ -212,23 +250,11 @@ Inherited, see L<Mail::Box/"The folder">
 
 Inherited, see L<Mail::Box/"The folder">
 
-=item $obj-E<gt>B<folderdir>( [$directory] )
-
-Inherited, see L<Mail::Box/"The folder">
-
-=item $obj-E<gt>B<name>()
-
-Inherited, see L<Mail::Box/"The folder">
-
 =item $obj-E<gt>B<organization>()
 
 Inherited, see L<Mail::Box/"The folder">
 
 =item $obj-E<gt>B<size>()
-
-Inherited, see L<Mail::Box/"The folder">
-
-=item $obj-E<gt>B<type>()
 
 Inherited, see L<Mail::Box/"The folder">
 
@@ -245,7 +271,7 @@ Inherited, see L<Mail::Box/"The folder">
 =head2 Folder flags
 
 Extends L<"Folder flags" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Folder flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<access>()
@@ -269,7 +295,7 @@ Inherited, see L<Mail::Box/"Folder flags">
 =head2 The messages
 
 Extends L<"The messages" in Mail::Box::IMAP4|Mail::Box::IMAP4/"The messages">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<current>( [$number|$message|$message_id] )
@@ -280,7 +306,7 @@ Inherited, see L<Mail::Box/"The messages">
 
 Inherited, see L<Mail::Box/"The messages">
 
-=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [$msgs]] )
+=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [\@msgs]] )
 
 Inherited, see L<Mail::Box/"The messages">
 
@@ -313,18 +339,14 @@ Inherited, see L<Mail::Box/"The messages">
 =head2 Sub-folders
 
 Extends L<"Sub-folders" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Sub-folders">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<listSubFolders>(%options)
-
-=item Mail::Box::IMAP4s-E<gt>B<listSubFolders>(%options)
+=item $any-E<gt>B<listSubFolders>(%options)
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
-=item $obj-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
-
-=item Mail::Box::IMAP4s-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+=item $any-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
@@ -336,9 +358,7 @@ Inherited, see L<Mail::Box/"Sub-folders">
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
-=item $obj-E<gt>B<topFolderWithMessages>()
-
-=item Mail::Box::IMAP4s-E<gt>B<topFolderWithMessages>()
+=item $any-E<gt>B<topFolderWithMessages>()
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
@@ -347,7 +367,7 @@ Inherited, see L<Mail::Box/"Sub-folders">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>( [$body] )
@@ -358,9 +378,7 @@ Inherited, see L<Mail::Box::IMAP4/"Internals">
 
 Inherited, see L<Mail::Box/"Internals">
 
-=item $obj-E<gt>B<create>($folder, %options)
-
-=item Mail::Box::IMAP4s-E<gt>B<create>($folder, %options)
+=item $any-E<gt>B<create>($folder, %options)
 
 Inherited, see L<Mail::Box::Net/"METHODS">
 
@@ -376,7 +394,7 @@ Inherited, see L<Mail::Box/"Internals">
 
 Inherited, see L<Mail::Box::IMAP4/"Internals">
 
-=item Mail::Box::IMAP4s-E<gt>B<foundIn>( [$foldername], %options )
+=item $class-E<gt>B<foundIn>( [$foldername], %options )
 
 Inherited, see L<Mail::Box/"Internals">
 
@@ -437,12 +455,10 @@ Inherited, see L<Mail::Box::IMAP4/"Internals">
 =head2 Other methods
 
 Extends L<"Other methods" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Other methods">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<timespan2seconds>($time)
-
-=item Mail::Box::IMAP4s-E<gt>B<timespan2seconds>($time)
+=item $any-E<gt>B<timespan2seconds>($time)
 
 Inherited, see L<Mail::Box/"Other methods">
 
@@ -451,7 +467,7 @@ Inherited, see L<Mail::Box/"Other methods">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -462,9 +478,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::IMAP4s-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -472,19 +486,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::IMAP4s-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::IMAP4s-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -513,7 +519,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -525,7 +531,7 @@ Inherited, see L<Mail::Box/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::IMAP4|Mail::Box::IMAP4/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -534,31 +540,38 @@ Extends L<"DETAILS" in Mail::Box::IMAP4|Mail::Box::IMAP4/"DETAILS">.
 
 The header was read before, but now seems empty: the IMAP4 server does
 not produce the header lines anymore.
+Cast by C<getHeadAndBody()>
 
 =item Warning: Cannot read body for $uidl in $folder.
 
 The header of the message was retrieved from the IMAP4 server, but the
 body is not read, for an unknown reason.
+Cast by C<getHeadAndBody()>
 
 =item Error: Copying failed for one message.
 
 For some reason, for instance disc full, removed by external process, or
 read-protection, it is impossible to copy one of the messages.  Copying will
 proceed for the other messages.
+Cast by C<copyTo()>
 
 =item Error: Couldn't select IMAP4 folder $name
+
+Cast by C<transporter()>
 
 =item Error: Destination folder $name is not writable.
 
 The folder where the messages are copied to is not opened with write
 access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
 to the folder which is controlled by your operating system.
+Cast by C<copyTo()>
 
 =item Warning: Different messages with id $msgid
 
 The message id is discovered more than once within the same folder, but the
 content of the message seems to be different.  This should not be possible:
 each message must be unique.
+Cast by C<messageId()>
 
 =item Error: Folder $name not deleted: not writable.
 
@@ -566,27 +579,31 @@ The folder must be opened with write access via L<new(access)|Mail::Box/"Constru
 removing it will be refused.  So, you may have write-access according to
 the operating system, but that will not automatically mean that this
 C<delete> method permits you to.  The reverse remark is valid as well.
+Cast by C<delete()>
 
 =item Notice: Impossible to keep deleted messages in IMAP
 
 Some folder type have a 'deleted' flag which can be stored in the folder to
 be performed later.  The folder keeps that knowledge even when the folder
 is rewritten.  Well, IMAP4 cannot play that trick.
+Cast by C<write()>
 
 =item Error: Invalid timespan '$timespan' specified.
 
 The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
+Cast by C<timespan2seconds()>
+
+=item Warning: Message $uidl disappeared from $folder.
+
+Trying to get the specific message from the server, but it appears to be gone.
+Cast by C<getHead()>
 
 =item Warning: Message $uidl disappeared from $folder.
 
 Trying to get the specific message from the server, but it appears to be
 gone.
-
-=item Warning: Message $uidl disappeared from $folder.
-
-Trying to get the specific message from the server, but it appears to be
-gone.
+Cast by C<getHeadAndBody()>
 
 =item Warning: Message-id '$msgid' does not contain a domain.
 
@@ -594,8 +611,11 @@ According to the RFCs, message-ids need to contain a unique random part,
 then an C<@>, and then a domain name.  This is made to avoid the creation
 of two messages with the same id.  The warning emerges when the C<@> is
 missing from the string.
+Cast by C<messageId()>
 
 =item Error: No IMAP4 transporter configured
+
+Cast by C<transporter()>
 
 =item Error: Package $package does not implement $method.
 
@@ -604,24 +624,27 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unable to create subfolder $name of $folder.
 
 The copy includes the subfolders, but for some reason it was not possible
 to copy one of these.  Copying will proceed for all other sub-folders.
+Cast by C<copyTo()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.009,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 3.010,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

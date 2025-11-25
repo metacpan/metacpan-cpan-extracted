@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "recommends" : {
+            "Pod::Autopod" : "0",
+            "Pod::Usage" : "0",
             "Types::Standard" : "0",
             "Win32::GuiTest" : "0",
             "Win32API::Registry" : "0.21"
@@ -50,6 +52,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Basename" : "0",
             "Test::More" : "0"
          }
       }
@@ -65,6 +68,6 @@
          "web" : "https://github.com/brickpool/Win32API-Console"
       }
    },
-   "version" : "v0.1.6",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

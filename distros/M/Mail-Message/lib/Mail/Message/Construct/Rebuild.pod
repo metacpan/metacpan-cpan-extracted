@@ -6,7 +6,7 @@ Mail::Message::Construct::Rebuild - modify a Mail::Message
 
 =head1 SYNOPSIS
 
- my $cleanup = $msg->rebuild;
+  my $cleanup = $msg->rebuild;
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ handing these messages for you.
 
  -Option         --Default
   extra_rules      []
-  keep_message_id  <false>
+  keep_message_id  false
   rules            <see text>
 
 =over 2
@@ -82,17 +82,17 @@ safe transformations may be added to this list.
 
 =back
 
-example: 
+» example: 
 
- # remove all deleted parts
- my $cleaned = $msg->rebuild(keep_message_id => 1);
- $folder->addMessage($cleaned) if defined $cleaned;
+  # remove all deleted parts
+  my $cleaned = $msg->rebuild(keep_message_id => 1);
+  $folder->addMessage($cleaned) if defined $cleaned;
 
- # Replace deleted parts by a place-holder
- my $cleaned = $msg->rebuild
-   ( keep_message_id => 1
-   , extra_rules => [ 'removeEmpty', 'flattenMultiparts' ]
-   );
+  # Replace deleted parts by a place-holder
+  my $cleaned = $msg->rebuild(
+    keep_message_id => 1,
+    extra_rules => [ 'removeEmpty', 'flattenMultiparts' ],
+  );
 
 =back
 
@@ -101,6 +101,8 @@ example:
 =over 4
 
 =item $obj-E<gt>B<recursiveRebuildPart>($part, %options)
+
+Z<>
 
  -Option--Default
   rules   <required>
@@ -113,7 +115,7 @@ Rules are method names which can be called on messages and message parts
 objects.  The ARRAY can also list code references which can be called.
 In any case, each rule will be called the same way:
 
- $code->(MESSAGE, PART)
+  $code->(MESSAGE, PART)
 
 The return can be C<undef> or any complex construct based on a
 L<Mail::Message::Part|Mail::Message::Part> or coerceable into such a part.  For each part,
@@ -140,8 +142,8 @@ other.  If one or more of the rules apply, a new message will be returned.
 A simple numeric comparison tells whether the message has changed.  For
 example
 
- print "No change"
-    if $message == $message->rebuild;
+  print "No change"
+     if $message == $message->rebuild;
 
 Transformation is made with a set of rules.  Each rule performs only a
 small step, which makes is easily configurable.  The rules are ordered,
@@ -237,14 +239,14 @@ your system.
 
 When you are planning to create an automatic html to plain text
 filter for your email, then have a look at
-F<https://github.com/logological/mimestrip>
+L<https://github.com/logological/mimestrip>
 
-B<. Example: using parameter with C<textAlternativeForHtml>>
+=head4 » Example: using parameter with C<textAlternativeForHtml>
 
-  my $result = $msg->rebuild
-    ( extra_rules => [ 'textAlternativeForHtml' ]
-    , textAlternativeForHtml => { leftmargin => 0 }
-    );
+  my $result = $msg->rebuild(
+    extra_rules => [ 'textAlternativeForHtml' ],
+    textAlternativeForHtml => { leftmargin => 0 },
+  );
 
 =item * removeExtraAlternativeText
 
@@ -259,11 +261,11 @@ with the C<flattenMultiparts> rule.
 =head3 Adding your own rules
 
 If you have designed your own rule, please consider contributing this
-to Mail::Box; it may be useful for other people as well.
+to L<Mail::Box|Mail::Box>; it may be useful for other people as well.
 
 Each rule is called
 
- my $new = $code->($message, $part, %options)
+  my $new = $code->($message, $part, %options)
 
 where the C<%options> are defined by the C<rebuild()> method internals. At
 least the C<rules> option is passed, which is a full expansion of all
@@ -277,8 +279,9 @@ comparible routine.
 
 When you have your own routine, you simply call:
 
- my $rebuild_message = $message->rebuild
-  ( extra_rules => [ \&my_own_rule, 'other_rule' ] );
+  my $rebuild_message = $message->rebuild(
+    extra_rules => [ \&my_own_rule, 'other_rule' ],
+  );
 
 =head1 DIAGNOSTICS
 
@@ -286,18 +289,21 @@ When you have your own routine, you simply call:
 
 =item Error: No rebuild rule $name defined.
 
+Cast by C<rebuild()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

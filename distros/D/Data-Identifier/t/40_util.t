@@ -3,7 +3,7 @@
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 use_ok('Data::Identifier::Util');
 use_ok('Data::Identifier');
@@ -41,6 +41,7 @@ my %sirtx = (
     'raes:NOSYS'    => Data::Identifier->new('2bffc55d-7380-454e-bd53-c5acd525d692' => 6),
     'chat0w:5'      => Data::Identifier->new('2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a' => 5),
     'uuid:7f265548-81dc-4280-9550-1bd0aa4bf748' => '7f265548-81dc-4280-9550-1bd0aa4bf748',
+    '[[uuid:8be115d2-dc2f-4a98-91e1-a6e3075cbc31]:[8be115d2-dc2f-4a98-91e1-a6e3075cbc31]]' => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
 );
 
 foreach my $value (sort keys %sirtx) {

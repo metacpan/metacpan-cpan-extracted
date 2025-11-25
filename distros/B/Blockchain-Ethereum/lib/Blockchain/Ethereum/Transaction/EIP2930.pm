@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Ethereum Access List transaction abstraction (EIP-2930)
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use parent 'Blockchain::Ethereum::Transaction';
 
@@ -63,7 +63,7 @@ Blockchain::Ethereum::Transaction::EIP2930 - Ethereum Access List transaction ab
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ Transaction abstraction for EIP-2930 Access List transactions
         ]
     );
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );

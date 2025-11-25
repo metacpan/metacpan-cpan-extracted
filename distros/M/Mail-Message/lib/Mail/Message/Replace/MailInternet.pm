@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Replace::MailInternet;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Message';
@@ -15,227 +18,205 @@ use base 'Mail::Message';
 use strict;
 use warnings;
 
-use Mail::Box::FastScalar;
-use Mail::Box::Parser::Perl;
-use Mail::Message::Body::Lines;
+use Mail::Box::FastScalar        ();
+use Mail::Box::Parser::Perl      ();
+use Mail::Message::Body::Lines   ();
 
-use File::Spec;
+use IO::Handle       ();
+use File::Spec       ();
 
+use Scalar::Util     qw/blessed/;
+
+#--------------------
 
 sub new(@)
-{   my $class = shift;
-    my $data  = @_ % 2 ? shift : undef;
-    $class = __PACKAGE__ if $class eq 'Mail::Internet';
-    $class->SUPER::new(@_, raw_data => $data);
+{	my $class = shift;
+	my $data  = @_ % 2 ? shift : undef;
+	$class = __PACKAGE__ if $class eq 'Mail::Internet';
+	$class->SUPER::new(@_, raw_data => $data);
 }
 
 sub init($)
-{   my ($self, $args) = @_;
-    $args->{head_type} ||= 'Mail::Message::Replace::MailHeader';
-    $args->{head}      ||= $args->{Header};
-    $args->{body}      ||= $args->{Body};
+{	my ($self, $args) = @_;
+	$args->{head_type} ||= 'Mail::Message::Replace::MailHeader';
+	$args->{head}      ||= $args->{Header};
+	$args->{body}      ||= $args->{Body};
 
-    defined $self->SUPER::init($args) or return;
+	defined $self->SUPER::init($args) or return;
 
-    $self->{MI_wrap}      = $args->{FoldLength} || 79;
-    $self->{MI_mail_from} = $args->{MailFrom};
-    $self->{MI_modify}    = exists $args->{Modify} ? $args->{Modify} : 1;
+	$self->{MI_wrap}      = $args->{FoldLength} || 79;
+	$self->{MI_mail_from} = $args->{MailFrom};
+	$self->{MI_modify}    = exists $args->{Modify} ? $args->{Modify} : 1;
 
-    $self->processRawData($self->{raw_data}, !defined $args->{Header}
-       , !defined $args->{Body}) if defined $self->{raw_data};
+	$self->processRawData($self->{raw_data}, !defined $args->{Header},
+		!defined $args->{Body}) if defined $self->{raw_data};
 
-    $self;
+	$self;
 }
 
 sub processRawData($$$)
-{   my ($self, $data, $get_head, $get_body) = @_;
-    return $self unless $get_head || $get_body;
- 
-    my ($filename, $lines);
-    if(ref $data eq 'ARRAY')
-    {   $filename = 'array of lines';
-        $lines    = $data;
-    }
-    elsif(ref $data eq 'GLOB')
-    {   $filename = 'file (GLOB)';
-        $lines    = [ <$data> ];
-    }
-    elsif(ref $data && $data->isa('IO::Handle'))
-    {   $filename = 'file ('.ref($data).')';
-        $lines    = [ $data->getlines ];
-    }
-    else
-    {   $self->log(ERROR=> "Mail::Internet does not support this kind of data");
-        return undef;
-    }
+{	my ($self, $data, $get_head, $get_body) = @_;
+	$get_head || $get_body or return $self;
 
-    return unless @$lines;
+	my ($filename, $lines);
+	if(ref $data eq 'ARRAY')
+	{	$filename = 'array of lines';
+		$lines    = $data;
+	}
+	elsif(ref $data eq 'GLOB' || (blessed $data && $data->isa('IO::Handle')))
+	{	$filename = 'file (' . (ref $data) . ')';
+		$lines    = [ $data->getlines ];
+	}
+	else
+	{	$self->log(ERROR=> "Mail::Internet does not support this kind of data");
+		return undef;
+	}
 
-    my $buffer = join '', @$lines;
-    my $file   = Mail::Box::FastScalar->new(\$buffer);
+	@$lines or return;
 
-    my $parser = Mail::Box::Parser::Perl->new
-     ( filename  => $filename
-     , file      => $file
-     , trusted   => 1
-     );
+	my $buffer = join '', @$lines;
+	my $file   = Mail::Box::FastScalar->new(\$buffer);
+	my $parser = Mail::Box::Parser::Perl->new(filename => $filename, file => $file, trusted => 1);
 
-    my $head;
-    if($get_head)
-    {   my $from = substr($lines->[0], 0, 5) eq 'From ' ? shift @$lines : undef;
+	my $head;
+	if($get_head)
+	{	my $from = $lines->[0] =~ m/^From / ? shift @$lines : undef;
 
-        my $head = $self->{MM_head_type}->new
-          ( MailFrom   => $self->{MI_mail_from}
-          , Modify => $self->{MI_modify}
-          , FoldLength => $self->{MI_wrap}
-          );
-        $head->read($parser);
-        $head->mail_from($from) if defined $from;
-        $self->head($head);
-    }
-    else
-    {   $head = $self->head;
-    }
+		my $head = $self->{MM_head_type}->new(
+			MailFrom   => $self->{MI_mail_from},
+			Modify     => $self->{MI_modify},
+			FoldLength => $self->{MI_wrap}
+		);
+		$head->read($parser);
+		$head->mail_from($from) if defined $from;
+		$self->head($head);
+	}
+	else
+	{	$head = $self->head;
+	}
 
-    $self->storeBody($self->readBody($parser, $head)) if $get_body;
-    $self->addReport($parser);
-    $parser->stop;
-    $self;
+	$self->storeBody($self->readBody($parser, $head)) if $get_body;
+	$self->addReport($parser);
+	$parser->stop;
+	$self;
 }
 
 
 sub dup()
-{   my $self = shift;
-    ref($self)->coerce($self->clone);
+{	my $self = shift;
+	(ref $self)->coerce($self->clone);
 }
 
 
-sub empty() { shift->DESTROY }
+sub empty() { $_[0]->DESTROY }
 
-#--------------------------
-
+#--------------------
 
 sub MailFrom(;$)
-{   my $self = shift;
-    @_ ? ($self->{MI_mail_from} = shift) : $self->{MU_mail_from};
+{	my $self = shift;
+	@_ ? ($self->{MI_mail_from} = shift) : $self->{MU_mail_from};
 }
 
-#--------------------------
-
+#--------------------
 
 sub read($@)
-{   my $thing = shift;
+{	my $thing = shift;
 
-    return $thing->SUPER::read(@_)   # Mail::Message behavior
-        unless ref $thing;
+	blessed $thing
+		or return $thing->SUPER::read(@_);  # Mail::Message behavior
 
-    # Mail::Header emulation
-    my $data = shift;
-    $thing->processRawData($data, 1, 1);
+	# Mail::Header emulation
+	my $data = shift;
+	$thing->processRawData($data, 1, 1);
 }
 
 
 sub read_body($)
-{   my ($self, $data) = @_;
-    $self->processRawData($data, 0, 1);
+{	my ($self, $data) = @_;
+	$self->processRawData($data, 0, 1);
 }
 
 
 sub read_header($)
-{   my ($self, $data) = @_;
-    $self->processRawData($data, 1, 0);
+{	my ($self, $data) = @_;
+	$self->processRawData($data, 1, 0);
 }
 
 
 sub extract($)
-{   my ($self, $data) = @_;
-    $self->processRawData($data, 1, 1);
+{	my ($self, $data) = @_;
+	$self->processRawData($data, 1, 1);
 }
 
 
 sub reply(@)
-{   my ($self, %args) = @_;
+{	my ($self, %args) = @_;
 
-    my $reply_head = $self->{MM_head_type}->new;
-    my $home       = $ENV{HOME} || File::Spec->curdir;
-    my $headtemp   = File::Spec->catfile($home, '.mailhdr');
+	my $reply_head = $self->{MM_head_type}->new;
+	my $home       = $ENV{HOME} || File::Spec->curdir;
+	my $headtemp   = File::Spec->catfile($home, '.mailhdr');
 
-    if(open HEAD, '<:raw', $headtemp)
-    {    my $parser = Mail::Box::Parser::Perl->new
-           ( filename  => $headtemp
-           , file      => \*HEAD
-           , trusted   => 1
-           );
-         $reply_head->read($parser);
-         $parser->close;
-    }
+	if(open my $head, '<:raw', $headtemp)
+	{	my $parser = Mail::Box::Parser::Perl->new(filename => $headtemp, file => $head, trusted => 1);
+		$reply_head->read($parser);
+		$parser->close;
+	}
 
-    $args{quote}       ||= delete $args{Inline}   || '>';
-    $args{group_reply} ||= delete $args{ReplyAll} || 0;
-    my $keep             = delete $args{Keep}     || [];
-    my $exclude          = delete $args{Exclude}  || [];
+	$args{quote}       ||= delete $args{Inline}   || '>';
+	$args{group_reply} ||= delete $args{ReplyAll} || 0;
+	my $keep             = delete $args{Keep}     || [];
+	my $exclude          = delete $args{Exclude}  || [];
 
-    my $reply = $self->SUPER::reply(%args);
+	my $reply = $self->SUPER::reply(%args);
+	my $head  = $self->head;
 
-    my $head  = $self->head;
+	$reply_head->add($_->clone) for map $head->get($_), @$keep;
+	$reply_head->reset($_)      for @$exclude;
 
-    $reply_head->add($_->clone)
-        foreach map { $head->get($_) } @$keep;
-
-    $reply_head->reset($_) foreach @$exclude;
-
-    ref($self)->coerce($reply);
+	(ref $self)->coerce($reply);
 }
 
 
 sub add_signature(;$)
-{   my $self     = shift;
-    my $filename = shift
-       || File::Spec->catfile($ENV{HOME} || File::Spec->curdir, '.signature');
-    $self->sign(File => $filename);
+{	my $self = shift;
+	my $fn   = shift // File::Spec->catfile($ENV{HOME} || File::Spec->curdir, '.signature');
+	$self->sign(File => $fn);
 }
 
 
 sub sign(@)
-{   my ($self, $args) = @_;
-    my $sig;
+{	my ($self, $args) = @_;
+	my $sig;
 
-    if(my $filename = delete $self->{File})
-    {   $sig = Mail::Message::Body->new(file => $filename);
-    }
-    elsif(my $sig   = delete $self->{Signature})
-    {   $sig = Mail::Message::Body->new(data => $sig);
-    }
+	if(my $filename = delete $self->{File})
+	{	$sig = Mail::Message::Body->new(file => $filename);
+	}
+	elsif(my $sign  = delete $self->{Signature})
+	{	$sig = Mail::Message::Body->new(data => $sign);
+	}
 
-    return unless defined $sig;
- 
-    my $body = $self->decoded->stripSignature;
-    my $set  = $body->concatenate($body, "-- \n", $sig);
-    $self->body($set) if defined $set;
-    $set;
+	defined $sig or return;
+
+	my $body = $self->decoded->stripSignature;
+	my $set  = $body->concatenate($body, "-- \n", $sig);
+	$self->body($set) if defined $set;
+	$set;
 }
 
+#--------------------
 
 sub send($@)
-{   my ($self, $type, %args) = @_;
-    $self->send(via => $type);
+{	my ($self, $type, %args) = @_;
+	$self->send(via => $type);
 }
 
 
-sub nntppost(@)
-{   my ($self, %args) = @_;
-    $args{port}       ||= delete $args{Port};
-    $args{nntp_debug} ||= delete $args{Debug};
-
-    $self->send(via => 'nntp', %args);
-}
-
-
+#--------------------
 
 sub head(;$)
-{  my $self = shift;
-   return $self->SUPER::head(@_) if @_;
-   $self->SUPER::head || $self->{MM_head_type}->new(message => $self);
+{	my $self = shift;
+	return $self->SUPER::head(@_) if @_;
+	$self->SUPER::head || $self->{MM_head_type}->new(message => $self);
 }
 
 
@@ -254,7 +235,7 @@ sub combine($;$) { shift->head->combine(@_) }
 sub print_header(@) { shift->head->print(@_) }
 
 
-sub clean_header() { shift->header }
+sub clean_header() { $_[0]->header }
 
 
 sub tidy_headers() { }
@@ -270,26 +251,25 @@ sub get(@) { shift->head->get(@_) }
 
 
 sub delete(@)
-{   my $self = shift;
-    @_ ?  $self->head->delete(@_) : $self->SUPER::delete;
+{	my $self = shift;
+	@_ ? $self->head->delete(@_) : $self->SUPER::delete;
 }
 
-#------------
-
+#--------------------
 
 sub body(@)
-{   my $self = shift;
+{	my $self = shift;
 
-    unless(@_)
-    {   my $body = $self->body;
-        return defined $body ? scalar($body->lines) : [];
-    }
+	unless(@_)
+	{	my $body = $self->body;
+		return defined $body ? scalar($body->lines) : [];
+	}
 
-    my $data = ref $_[0] eq 'ARRAY' ? shift : \@_;
-    my $body  = Mail::Message::Body::Lines->new(data => $data);
-    $self->body($body);
+	my $data = ref $_[0] eq 'ARRAY' ? shift : \@_;
+	my $body = Mail::Message::Body::Lines->new(data => $data);
+	$self->body($body);
 
-    $body;
+	$body;
 }
 
 
@@ -300,82 +280,76 @@ sub bodyObject(;$) { shift->SUPER::body(@_) }
 
 
 sub remove_sig(;$)
-{   my $self  = shift;
-    my $lines = shift || 10;
-    my $stripped = $self->decoded->stripSignature(max_lines => $lines);
-    $self->body($stripped) if defined $stripped;
-    $stripped;
+{	my $self  = shift;
+	my $lines = shift || 10;
+	my $stripped = $self->decoded->stripSignature(max_lines => $lines);
+	$self->body($stripped) if defined $stripped;
+	$stripped;
 }
 
 
 sub tidy_body(;$)
-{   my $self  = shift;
+{	my $self  = shift;
 
-    my $body  = $self->body or return;
-    my @body  = $body->lines;
+	my $body  = $self->body or return;
+	my @body  = $body->lines;
 
-    shift @body while @body &&  $body[0] =~ m/^\s*$/;
-    pop   @body while @body && $body[-1] =~ m/^\s*$/;
+	shift @body while @body && $body[ 0] =~ m/^\s*$/;
+	pop   @body while @body && $body[-1] =~ m/^\s*$/;
 
-    return $body if $body->nrLines == @body;
-    my $new = Mail::Message::Body::Lines->new(based_on => $body, data=>\@body);
-    $self->body($new);
+	return $body if $body->nrLines == @body;
+	my $new = Mail::Message::Body::Lines->new(based_on => $body, data=>\@body);
+	$self->body($new);
 }
 
 
 sub smtpsend(@)
-{   my ($self, %args) = @_;
-    my $from = $args{MailFrom} || $ENV{MAILADDRESS} || $ENV{USER} || 'unknown';
-    $args{helo}       ||= delete $args{Hello};
-    $args{port}       ||= delete $args{Port};
-    $args{smtp_debug} ||= delete $args{Debug};
+{	my ($self, %args) = @_;
+	my $from = $args{MailFrom} || $ENV{MAILADDRESS} || $ENV{USER} || 'unknown';
+	$args{helo}       ||= delete $args{Hello};
+	$args{port}       ||= delete $args{Port};
+	$args{smtp_debug} ||= delete $args{Debug};
 
-    my $host  = $args{Host};
-    unless(defined $host)
-    {   my $hosts = $ENV{SMTPHOSTS};
-        $host = (split /\:/, $hosts)[0] if defined $hosts;
-    }
-    $args{host} = $host;
+	my $host  = $args{Host};
+	unless(defined $host)
+	{	my $hosts = $ENV{SMTPHOSTS};
+		$host = (split /\:/, $hosts)[0] if defined $hosts;
+	}
+	$args{host} = $host;
 
-    $self->send(via => 'smtp', %args);
+	$self->send(via => 'smtp', %args);
 }
 
-#------------
-
+#--------------------
 
 sub as_mbox_string()
-{   my $self    = shift;
-    my $mboxmsg = Mail::Box::Mbox->coerce($self);
+{	my $self    = shift;
+	my $mboxmsg = Mail::Box::Mbox->coerce($self);
 
-    my $buffer  = '';
-    my $file    = Mail::Box::FastScalar->new(\$buffer);
-    $mboxmsg->print($file);
-    $buffer;
+	my $buffer  = '';
+	my $file    = Mail::Box::FastScalar->new(\$buffer);
+	$mboxmsg->print($file);
+	$buffer;
 }
 
-#------------
-
+#--------------------
 
 BEGIN {
- no warnings;
- *Mail::Internet::new = sub (@)
-   { my $class = shift;
-     Mail::Message::Replace::MailInternet->new(@_);
-   };
+	no warnings;
+	*Mail::Internet::new = sub (@) {
+		my $class = shift;
+		Mail::Message::Replace::MailInternet->new(@_);
+	};
 }
 
 
 sub isa($)
-{   my ($thing, $class) = @_;
-    return 1 if $class eq 'Mail::Internet';
-    $thing->SUPER::isa($class);
+{	my ($thing, $class) = @_;
+	$class eq 'Mail::Internet' ? 1 : $thing->SUPER::isa($class);
 }
 
-#------------
-
+#--------------------
 
 sub coerce() { confess }
 
-
 1;
-

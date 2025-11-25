@@ -829,26 +829,26 @@ T* unaligned_upper_bound(T* first, size_t size, T val);
 template<class T, class P>
 inline T unaligned_load(const P* ptr) {
   T value;
-  memcpy(&value, ptr, sizeof(T));
+  memcpy(&value, (const void*)ptr, sizeof(T));
   return value;
 }
 
 template<class T, class P>
 inline T unaligned_load_inc(const P*& ptr) {
   T value;
-  memcpy(&value, ptr, sizeof(T));
+  memcpy(&value, (const void*)ptr, sizeof(T));
   ((const char*&)ptr) += sizeof(T);
   return value;
 }
 
 template<class T, class P>
 inline void unaligned_store(P* ptr, T value) {
-  memcpy(ptr, &value, sizeof(T));
+  memcpy((void*)ptr, &value, sizeof(T));
 }
 
 template<class T, class P>
 inline void unaligned_store_inc(P*& ptr, T value) {
-  memcpy(ptr, &value, sizeof(T));
+  memcpy((void*)ptr, &value, sizeof(T));
   ((char*&)ptr) += sizeof(T);
 }
 
@@ -954,7 +954,7 @@ struct persistent_unordered_map::fnv_hash {
     uint32_t size = data.next_4B();
     mask = size - 2;
     hash.resize(size);
-    memcpy(hash.data(), data.next<uint32_t>(size), size * sizeof(uint32_t));
+    memcpy(hash.data(), (const void*)data.next<uint32_t>(size), size * sizeof(uint32_t));
 
     size = data.next_4B();
     this->data.resize(size);
@@ -11786,7 +11786,7 @@ class version {
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 version version::current() {
-  return {1, 11, 2, ""};
+  return {1, 11, 3, ""};
 }
 
 // Returns multi-line formated version and copyright string.

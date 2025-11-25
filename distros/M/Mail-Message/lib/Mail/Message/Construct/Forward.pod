@@ -6,8 +6,8 @@ Mail::Message::Construct::Forward - forwarding a Mail::Message
 
 =head1 SYNOPSIS
 
- my Mail::Message $forward = $message->forward(To => 'you');
- $forward->send;
+  my Mail::Message $forward = $message->forward(To => 'you');
+  $forward->send;
 
 =head1 DESCRIPTION
 
@@ -106,7 +106,7 @@ Their default behavior is usually C<INLINE>.
 
 It is only possible to inline textual messages, therefore binary or
 multi-part messages will always be enclosed as attachment.
-Read the details in section L</Creating a forward>..
+Read the details in section L</Creating a forward>.
 
 =item preamble => STRING|BODY
 
@@ -227,7 +227,7 @@ Construct a forward, where the whole body of the message is already
 constructed.  That complex body is usually produced in L<forwardInline()|Mail::Message::Construct::Forward/"Constructing a message">,
 L<forwardAttach()|Mail::Message::Construct::Forward/"Constructing a message">, or L<forwardEncapsulate()|Mail::Message::Construct::Forward/"Constructing a message">.
 
-The %options are the same as for C<forward()> except that C<body> is
+The C<%options> are the same as for C<forward()> except that C<body> is
 required.  Some other options, like C<preamble>, are ignored.
 
  -Option--Default
@@ -243,23 +243,23 @@ required.  Some other options, like C<preamble>, are ignored.
 
 Added after the forwarded message.
 
-example: 
+» example: 
 
- ---- END forwarded message
+  ---- END forwarded message
 
 =item $obj-E<gt>B<forwardPrelude>()
 
 Create a few lines to be included before the forwarded message
 content.  The return is an array of lines.
 
-example: 
+» example: 
 
- ---- BEGIN forwarded message
- From: him@somewhere.else.nl (Original Sender)
- To: me@example.com (Me the receiver)
- Cc: the.rest@world.net
- Date: Wed, 9 Feb 2000 15:44:05 -0500
- <blank line>
+  ---- BEGIN forwarded message
+  From: him@somewhere.else.nl (Original Sender)
+  To: me@example.com (Me the receiver)
+  Cc: the.rest@world.net
+  Date: Wed, 9 Feb 2000 15:44:05 -0500
+  <blank line>
 
 =item $obj-E<gt>B<forwardSubject>(STRING)
 
@@ -267,12 +267,12 @@ Create a subject for a message which is a forward from this one.  This routine
 tries to count the level of reply in subject field, and transform it into
 a standard form.  Please contribute improvements.
 
-example: 
+» example: 
 
- subject                 --> Forw: subject
- Re: subject             --> Forw: Re: subject
- Re[X]: subject          --> Forw: Re[X]: subject
- <blank>                 --> Forwarded
+  subject                 --> Forw: subject
+  Re: subject             --> Forw: Re: subject
+  Re[X]: subject          --> Forw: Re[X]: subject
+  <blank>                 --> Forwarded
 
 =back
 
@@ -336,18 +336,18 @@ not be stored with that part.
 
 As example of the structural transformation:
 
- # code: $original->printStructure;
- multipart/alternative: The source message
-   text/plain: content in raw text
-   text/html: content as html
+  # code: $original->printStructure;
+  multipart/alternative: The source message
+    text/plain: content in raw text
+    text/html: content as html
 
- # code: $fwd = $original->forward(include => 'ATTACH');
- # code: $fwd->printStructure
- multipart/mixed: The source message
-   text/plain: prelude/postlude/signature
-   multipart/alternative
-     text/plain: content in raw text
-     text/html: content as html
+  # code: $fwd = $original->forward(include => 'ATTACH');
+  # code: $fwd->printStructure
+  multipart/mixed: The source message
+    text/plain: prelude/postlude/signature
+    multipart/alternative
+      text/plain: content in raw text
+      text/html: content as html
 
 =head3 forward, encapsulate the original
 
@@ -359,19 +359,19 @@ enclosed in the part header.
 The encapsulation is implemented using a nested message, content type
 C<message/rfc822>.  As example of the structural transformation:
 
- # code: $original->printStructure;
- multipart/alternative: The source message
-   text/plain: content in raw text
-   text/html: content as html
+  # code: $original->printStructure;
+  multipart/alternative: The source message
+    text/plain: content in raw text
+    text/html: content as html
 
- # code: $fwd = $original->forward(include => 'ENCAPSULATE');
- # code: $fwd->printStructure
- multipart/mixed: The source message
-   text/plain: prelude/postlude/signature
-   message/rfc822
-      multipart/alternative: The source message
-         text/plain: content in raw text
-         text/html: content as html
+  # code: $fwd = $original->forward(include => 'ENCAPSULATE');
+  # code: $fwd->printStructure
+  multipart/mixed: The source message
+    text/plain: prelude/postlude/signature
+    message/rfc822
+       multipart/alternative: The source message
+          text/plain: content in raw text
+          text/html: content as html
 
 The message structure is much more complex, but no information is lost.
 This is probably the reason why many MUAs use this when the forward
@@ -385,27 +385,34 @@ an original message as attachment.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

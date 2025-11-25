@@ -3,7 +3,6 @@ ChangeLog
 MANIFEST
 META.yml
 Makefile.PL
-README
 README.md
 lib/Mail/Box/Parser/C.pm
 lib/Mail/Box/Parser/C.pod

@@ -12,13 +12,13 @@ Mail::Message::Head::SpamGroup - spam fighting related header fields
 
 =head1 SYNOPSIS
 
- my $sg = Mail::Message::Head::SpamGroup->new(head => $head, ...);
- $head->addSpamGroup($sg);
+  my $sg = Mail::Message::Head::SpamGroup->new(head => $head, ...);
+  $head->addSpamGroup($sg);
 
- my $sg = $head->addSpamGroup( <options> );
- $sg->delete;
- 
- my @sgs = $head->spamGroups;
+  my $sg = $head->addSpamGroup( <options> );
+  $sg->delete;
+
+  my @sgs = $head->spamGroups;
 
 =head1 DESCRIPTION
 
@@ -27,28 +27,29 @@ and spam fighting software.  This class knows various details about
 that software.
 
 Extends L<"DESCRIPTION" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>()
 
 Inherited, see L<Mail::Message::Head::FieldGroup/"Constructors">
 
-=item $obj-E<gt>B<fighter>( $name, [$settings] )
+=item $any-E<gt>B<fighter>($name, %options)
 
-=item Mail::Message::Head::SpamGroup-E<gt>B<fighter>( $name, [$settings] )
-
-Get the $settings of a certain spam-fighter, optionally after setting them.
+Get the settings of a certain spam-fighter, optionally after setting them.
 The L<knownFighters()> method returns the defined names.  The names
 are case-sensitive.
+
+The C<%options> are all passed as settings to the spamfilter, except the
+few which are listed here specifically.
 
  -Option --Default
   fields   <required>
@@ -64,7 +65,7 @@ added by the spam fighter software.
 
 =item isspam => CODE
 
-The CODE must return true or false, to indicate whether the spam fighter
+The CODE must return C<true> or C<false>, to indicate whether the spam fighter
 thinks that the message contains spam.  The CODE ref is called with
 the spamgroup object (under construction) and the header which is inspected.
 
@@ -76,17 +77,18 @@ the spamgroup object (under construction) and the header which is inspected.
 
 =back
 
-example: adding your own spam-fighter definitions
+» example: adding your own spam-fighter definitions
 
- Mail::Message::Head::SpamGroup->fighter( 'MY-OWN',
-    fields => qw/^x-MY-SPAM-DETECTOR-/,
-    isspam => sub { my ($sg, $head) = @_; $head->fields > 100 }
-   );
+  Mail::Message::Head::SpamGroup->fighter( 'MY-OWN',
+     fields => qw/^x-MY-SPAM-DETECTOR-/,
+     isspam => sub { my ($sg, $head) = @_; $head->fields > 100 },
+  );
 
 =item $obj-E<gt>B<from>($head|$message, %options)
 
 Returns a list of C<Mail::Message::Head::SpamGroup> objects, based on the
-specified $message or message $head.
+specified C<$message> or message C<$head>.
+Improves base, see L<Mail::Message::Head::FieldGroup/"Constructors">
 
  -Option--Default
   types   undef
@@ -100,50 +102,45 @@ list is returned.  Without this option, all sets are returned.
 
 =back
 
-=item $obj-E<gt>B<habeasSweFieldsCorrect>( [$message|$head] )
+=item $any-E<gt>B<habeasSweFieldsCorrect>( [$message|$head] )
 
-=item Mail::Message::Head::SpamGroup-E<gt>B<habeasSweFieldsCorrect>( [$message|$head] )
-
-Returns a true value if the $message or $head contains C<Habeas-SWE> fields
+Returns a C<true> value if the C<$message> or C<$head> contains C<Habeas-SWE> fields
 which are correct.  Without argument, this is used as instance method on
 an existing Spam-Group.
 
-example: checking Habeas-SWE fields
+» example: checking Habeas-SWE fields
 
- if(Mail::Message::Head::SpamGroup->habeasSweFieldsCorrect($message))
- {   $message->label(spam => 0);
- }
+  if(Mail::Message::Head::SpamGroup->habeasSweFieldsCorrect($message))
+  {   $message->label(spam => 0);
+  }
 
- my $sg = $message->head->spamGroups('Habeas-SWE');
- if($sg->habeasSweFieldsCorrect) { ... };
+  my $sg = $message->head->spamGroups('Habeas-SWE');
+  if($sg->habeasSweFieldsCorrect) { ... };
 
- use List::Util 'first';
- if(first {$_->habeasSweFieldsCorrect} $head->spamGroups)
- {   ...
- }
+  use List::Util 'first';
+  if(first {$_->habeasSweFieldsCorrect} $head->spamGroups)
+  {   ...
+  }
 
-=item $obj-E<gt>B<implementedTypes>()
-
-=item Mail::Message::Head::SpamGroup-E<gt>B<implementedTypes>()
+=item $any-E<gt>B<implementedTypes>()
 
 Inherited, see L<Mail::Message::Head::FieldGroup/"Constructors">
 
-=item $obj-E<gt>B<isSpamGroupFieldName>($name)
+=item $any-E<gt>B<isSpamGroupFieldName>($name)
 
-=item Mail::Message::Head::SpamGroup-E<gt>B<isSpamGroupFieldName>($name)
+Z<>
 
-=item $obj-E<gt>B<knownFighters>()
-
-=item Mail::Message::Head::SpamGroup-E<gt>B<knownFighters>()
+=item $any-E<gt>B<knownFighters>()
 
 Returns an unsorted list of all names representing pre-defined spam-fighter
 software.  You can ask details about them, and register more fighters with
 the L<fighter()|Mail::Message::Head::SpamGroup/"Constructors"> method.
 
-=item Mail::Message::Head::SpamGroup-E<gt>B<new>($fields, %options)
+=item $class-E<gt>B<new>($fields, %options)
 
 Construct an object which maintains one set of fields which were added
 by spam fighting software.
+Improves base, see L<Mail::Message::Head::FieldGroup/"Constructors">
 
  -Option  --Defined in                     --Default
   head      Mail::Message::Head::FieldGroup  undef
@@ -155,7 +152,7 @@ by spam fighting software.
 
 =over 2
 
-=item head => HEAD
+=item head => $head
 
 =item log => LEVEL
 
@@ -174,7 +171,7 @@ by spam fighting software.
 Returns (after setting) whether this group of spam headers thinks that
 this is spam.  See L<Mail::Message::Head::Complete::spamDetected()|Mail::Message::Head::Complete/"Access to the header">.
 
-example: 
+» example: 
 
   die if $head->spamDetected;
 
@@ -184,10 +181,22 @@ example:
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 The header
 
 Extends L<"The header" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"The header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>( <$field, $value> | $object )
@@ -223,7 +232,7 @@ Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
 =head2 Access to the header
 
 Extends L<"Access to the header" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Access to the header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<software>()
@@ -243,7 +252,7 @@ Inherited, see L<Mail::Message::Head::FieldGroup/"Access to the header">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<collectFields>( [$name] )
@@ -259,7 +268,7 @@ Inherited, see L<Mail::Message::Head::FieldGroup/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -270,9 +279,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Head::SpamGroup-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -284,19 +291,11 @@ Inherited, see L<Mail::Message::Head::FieldGroup/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Head::SpamGroup-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Head::SpamGroup-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -329,49 +328,12 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
 
 Inherited, see L<Mail::Reporter/"Cleanup">
-
-=back
-
-=head1 DETAILS
-
-=head2 Spam fighting fields
-
-=head3 Detected spam fighting software
-
-The L<Mail::Message::Head::SpamGroup|Mail::Message::Head::SpamGroup> class can be used to detect
-fields which were produced by different spam fighting software.
-
-=over 4
-
-=item * SpamAssassin
-
-These fields are added by L<Mail::SpamAssassin>, which is the central
-implementation of the spam-assassin package.  The homepage of this
-GPL'ed project can be found at L<http://spamassassin.org>.
-
-=item * Habeas-SWE
-
-Habeas tries to fight spam via the standard copyright protection
-mechanism: Sender Warranted E-mail (SWE). Only when you have a contract
-with Habeas, you are permitted to add a few copyrighted lines to your
-e-mail. Spam senders will be refused a contract.  Mail clients which
-see these nine lines are (quite) sure that the message is sincere.
-
-See L<http://www.habeas.com> for all the details on this commercial
-product.
-
-=item * MailScanner
-
-The MailScanner filter is developed and maintained by
-transtec Computers.  The software is available for free download from
-L<http://www.sng.ecs.soton.ac.uk/mailscanner/>.  Commercial support
-is provided via L<http://www.mailscanner.biz>.
 
 =back
 
@@ -386,19 +348,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

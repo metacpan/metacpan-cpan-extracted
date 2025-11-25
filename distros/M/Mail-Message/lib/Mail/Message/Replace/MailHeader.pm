@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Replace::MailHeader;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Message::Head::Complete';
@@ -15,139 +18,135 @@ use base 'Mail::Message::Head::Complete';
 use strict;
 use warnings;
 
+#--------------------
 
 sub new(@)
-{   my $class = shift;
-    unshift @_, 'raw_data' if @_ % 2;
-    $class->SUPER::new(@_);
+{	my $class = shift;
+	unshift @_, 'raw_data' if @_ % 2;
+	$class->SUPER::new(@_);
 }
 
 sub init($)
-{   my ($self, $args) = @_;
-    defined $self->SUPER::init($args) or return;
+{	my ($self, $args) = @_;
+	defined $self->SUPER::init($args) or return;
 
-    $self->modify     ($args->{Modify}     || $args->{Reformat} || 0);
-    $self->fold_length($args->{FoldLength} || 79);
-    $self->mail_from  ($args->{MailFrom}   || 'KEEP');
-    $self;
+	$self->modify($args->{Modify} || $args->{Reformat} || 0);
+	$self->fold_length($args->{FoldLength} || 79);
+	$self->mail_from($args->{MailFrom} || 'KEEP');
+	$self;
 }
 
+#--------------------
 
 sub delete($;$)
-{   my ($self, $tag) = (shift, shift);
-    return $self->delete($tag) unless @_;
+{	my ($self, $tag) = (shift, shift);
+	@_ or return $self->delete($tag);
 
-    my $index   = shift;
-    my @fields  = $self->get($tag);
-    my ($field) = splice @fields, $index, 1;
-    $self->reset($tag, @fields);
-    $field;
+	my $index   = shift;
+	my @fields  = $self->get($tag);
+	my ($field) = splice @fields, $index, 1;
+	$self->reset($tag, @fields);
+	$field;
 }
 
 
 sub add($$)
-{   my $self  = shift;
-    my $field = $self->add(shift);
-    $field->unfoldedBody;
+{	my $self  = shift;
+	my $field = $self->add(shift);
+	$field->unfoldedBody;
 }
 
 
 sub replace($$;$)
-{   my ($self, $tag, $line, $index) = @_;
-    $line =~ s/^([^:]+)\:\s*// && ($tag = $1) unless defined $tag;
+{	my ($self, $tag, $line, $index) = @_;
+	$tag //= $line =~ s/^([^:]+)\:\s*// ? $1 : 'MISSING';
 
-    my $field  = Mail::Message::Field::Fast->new($tag, $line);
-    my @fields = $self->get($tag);
-    $fields[ $index||0 ] = $field;
-    $self->reset($tag, @fields);
+	my $field  = Mail::Message::Field::Fast->new($tag, $line);
+	my @fields = $self->get($tag);
+	$fields[ $index||0 ] = $field;
+	$self->reset($tag, @fields);
 
-    $field;
+	$field;
 }
 
+#--------------------
 
 sub get($;$)
-{   my $head = shift->head;
-    my @ret  = map { $head->get(@_) } @_;
+{	my $head = shift->head;
+	my @ret  = map $head->get(@_), @_;
 
-    if(wantarray) { return @ret ? map({$_->unfoldedBody} @ret) : () }
-    else          { return @ret ? $ret[0]->unfoldedBody : undef }
+	  wantarray ? (map $_->unfoldedBody, @ret)
+	: @ret      ? $ret[0]->unfoldedBody
+	:    undef;
 }
 
+#--------------------
 
 sub modify(;$)
-{   my $self = shift;
-    @_ ? ($self->{MH_refold} = shift) : $self->{MH_refold};
+{	my $self = shift;
+	@_ ? ($self->{MH_refold} = shift) : $self->{MH_refold};
 }
 
 
 sub mail_from(;$)
-{   my $self = shift;
-    return $self->{MH_mail_from} unless @_;
+{	my $self = shift;
+	@_ or return $self->{MH_mail_from};
 
-    my $choice = uc(shift);
-    die "bad Mail-From choice: '$choice'"
-        unless $choice =~ /^(IGNORE|ERROR|COERCE|KEEP)$/;
+	my $choice = uc(shift);
+	$choice =~ /^(IGNORE|ERROR|COERCE|KEEP)$/
+		or die "bad Mail-From choice: '$choice'";
 
-    $self->{MH_mail_from} = $choice;
+	$self->{MH_mail_from} = $choice;
 }
 
 
 sub fold(;$)
-{   my $self = shift;
-    my $wrap = @_ ? shift : $self->fold_length;
-    $_->setWrapLength($wrap) foreach $self->orderedFields;
-    $self;
+{	my $self = shift;
+	my $wrap = @_ ? shift : $self->fold_length;
+	$_->setWrapLength($wrap) for $self->orderedFields;
+	$self;
 }
 
 
 sub unfold(;$)
-{   my $self = shift;
-    my @fields = @_ ? $self->get(shift) : $self->orderedFields;
-    $_->setWrapLength(100_000) foreach @fields;  # blunt approach
-    $self;
+{	my $self = shift;
+	my @fields = @_ ? $self->get(shift) : $self->orderedFields;
+	$_->setWrapLength(100_000) for @fields;  # blunt approach
+	$self;
 }
 
 
 sub extract($)
-{   my ($self, $lines) = @_;
+{	my ($self, $lines) = @_;
 
-    my $parser = Mail::Box::Parser::Perl->new
-       ( filename  => 'extract from array'
-       , data      => $lines
-       , trusted   => 1
-       );
+	my $parser = Mail::Box::Parser::Perl->new(filename => 'extract from array', data => $lines, trusted => 1);
+	$self->read($parser);
+	$parser->close;
 
-    $self->read($parser);
-    $parser->close;
-
-    # Remove header from array
-    shift @$lines while @$lines && $lines->[0] != m/^[\r\n]+/;
-    shift @$lines if @$lines;
-    $self;
+	# Remove header from array
+	shift @$lines while @$lines && $lines->[0] != m/^[\r\n]+/;
+	shift @$lines if @$lines;
+	$self;
 }
 
 
 sub read($)
-{   my ($self, $file) = @_;
-    my $parser = Mail::Box::Parser::Perl->new
-       ( filename  => ('from file-handle '.ref $file)
-       , file      => $file
-       , trusted   => 1
-       );
-    $self->read($parser);
-    $parser->close;
-    $self;
+{	my ($self, $file) = @_;
+	my $parser = Mail::Box::Parser::Perl->new(filename => ('from file-handle '.ref $file), file => $file, trusted => 1);
+	$self->read($parser);
+	$parser->close;
+	$self;
 }
 
 
-sub empty() { shift->removeFields( m/^/ ) }
+sub empty() { $_[0]->removeFields( m/^/ ) }
 
 
 sub header(;$)
-{   my $self = shift;
-    $self->extract(shift) if @_;
-    $self->fold if $self->modify;
-    [ $self->orderedFields ];
+{	my $self = shift;
+	$self->extract(shift) if @_;
+	$self->fold if $self->modify;
+	[ $self->orderedFields ];
 }
 
 
@@ -157,49 +156,47 @@ sub header_hashref($) { die "Don't use header_hashref!!!" }
 sub combine($;$) { die "Don't use combine()!!!" }
 
 
-sub exists() { shift->count }
+sub exists() { $_[0]->count }
 
 
-sub as_string() { shift->string }
+sub as_string() { $_[0]->string }
 
 
 sub fold_length(;$$)
-{   my $self = shift;
-    return $self->{MH_wrap} unless @_;
+{	my $self = shift;
+	@_ or return $self->{MH_wrap};
 
-    my $old  = $self->{MH_wrap};
-    my $wrap = $self->{MH_wrap} = shift;
-    $self->fold($wrap) if $self->modify;
-    $old;
-}    
-
-
-sub tags() { shift->names }
+	my $old  = $self->{MH_wrap};
+	my $wrap = $self->{MH_wrap} = shift;
+	$self->fold($wrap) if $self->modify;
+	$old;
+}
 
 
-sub dup() { shift->clone }
+sub tags() { $_[0]->names }
 
 
-sub cleanup() { shift }
+sub dup() { $_[0]->clone }
 
+
+sub cleanup() { $_[0] }
+
+#--------------------
 
 BEGIN
-{   no warnings;
-    *Mail::Header::new =
-     sub { my $class = shift;
-           Mail::Message::Replace::MailHeader->new(@_);
-         }
+{	no warnings;
+	*Mail::Header::new = sub {
+		my $class = shift;
+		Mail::Message::Replace::MailHeader->new(@_);
+	};
 }
 
 
 
 sub isa($)
-{   my ($thing, $class) = @_;
-    return 1 if $class eq 'Mail::Mailer';
-    $thing->SUPER::isa($class);
+{	my ($thing, $class) = @_;
+	$class eq 'Mail::Mailer' ? 1 : $thing->SUPER::isa($class);
 }
 
 
 1;
-
-

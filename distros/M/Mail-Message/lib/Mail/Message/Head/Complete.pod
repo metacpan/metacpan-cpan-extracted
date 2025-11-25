@@ -20,8 +20,8 @@ Mail::Message::Head::Complete - the header of one message
 
 =head1 SYNOPSIS
 
- my $head = Mail::Message::Head::Complete->new;
- See Mail::Message::Head
+  my $head = Mail::Message::Head::Complete->new;
+  See Mail::Message::Head
 
 =head1 DESCRIPTION
 
@@ -30,18 +30,18 @@ fully read.  The class stores a message of which all header lines are
 known for sure.
 
 Extends L<"DESCRIPTION" in Mail::Message::Head|Mail::Message::Head/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Message::Head|Mail::Message::Head/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringifaction
 
 Inherited, see L<Mail::Message::Head/"OVERLOADED">
 
-=item overload: B<bool>
+=item overload: B<bool> true/false
 
 Inherited, see L<Mail::Message::Head/"OVERLOADED">
 
@@ -50,37 +50,50 @@ Inherited, see L<Mail::Message::Head/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Head|Mail::Message::Head/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Head|Mail::Message::Head/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Message::Head::Complete-E<gt>B<build>( [PAIR|$field], ... )
+=item $class-E<gt>B<build>( [PAIR|$field], ... )
 
 Undefined values are interpreted as empty field values, and therefore skipped.
+Improves base, see L<Mail::Message::Head/"Constructors">
 
 =item $obj-E<gt>B<clone>( [@names|ARRAY|Regexps] )
 
 Make a copy of the header, optionally limited only to the header lines
-specified by @names.  See L<grepNames()|Mail::Message::Head::Complete/"Access to the header"> on the way these fields can be
+specified by C<@names>.  See L<grepNames()|Mail::Message::Head::Complete/"Access to the header"> on the way these fields can be
 used.
 
-example: 
+» example: 
 
- my $newhead = $head->clone('Subject', 'Received');
+  my $newhead = $head->clone('Subject', 'Received');
 
-=item Mail::Message::Head::Complete-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Inherited, see L<Mail::Message::Head/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Head|Mail::Message::Head/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 The header
 
 Extends L<"The header" in Mail::Message::Head|Mail::Message::Head/"The header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<isDelayed>()
@@ -125,19 +138,19 @@ find the actual size in the file.
 
 =item $obj-E<gt>B<wrap>($integer)
 
-Re-fold all fields from the header to contain at most $integer number of
+Re-fold all fields from the header to contain at most C<$integer> number of
 characters per line.
 
-example: re-folding a header
+» example: re-folding a header
 
- $msg->head->wrap(78);
+  $msg->head->wrap(78);
 
 =back
 
 =head2 Access to the header
 
 Extends L<"Access to the header" in Mail::Message::Head|Mail::Message::Head/"Access to the header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>( $field | $line | <$name, $body, [$attrs]> )
@@ -145,12 +158,12 @@ Extends L<"Access to the header" in Mail::Message::Head|Mail::Message::Head/"Acc
 Add a field to the header.  If a field is added more than once, all values
 are stored in the header, in the order they are added.
 
-When a $field object is specified (some L<Mail::Message::Field|Mail::Message::Field> instance), that
-will be added.  Another possibility is to specify a raw header $line, or a
-header line nicely split-up in $name and $body, in which case the
+When a C<$field> object is specified (some L<Mail::Message::Field|Mail::Message::Field> instance), that
+will be added.  Another possibility is to specify a raw header C<$line>, or a
+header line nicely split-up in C<$name> and C<$body>, in which case the
 field constructor is called for you.
 
-$line or $body specifications which are terminated by a new-line are considered
+C<$line> or C<$body> specifications which are terminated by a new-line are considered
 to be correctly folded.  Lines which are not terminated by a new-line will
 be folded when needed: new-lines will be added where required.  It is strongly
 advised to let MailBox do the folding for you.
@@ -158,35 +171,35 @@ advised to let MailBox do the folding for you.
 The return value of this method is the L<Mail::Message::Field|Mail::Message::Field> object
 which is created (or was specified).
 
-example: 
+» example: 
 
- my $head  = Mail::Message::Head->new;
- $head->add('Subject: hi!');
- $head->add(From => 'me@home');
- my $field = Mail::Message::Field->new('To: you@there');
- $head->add($field);
- my Mail::Message::Field $s = $head->add(Sender => 'I');
+  my $head  = Mail::Message::Head->new;
+  $head->add('Subject: hi!');
+  $head->add(From => 'me@home');
+  my $field = Mail::Message::Field->new('To: you@there');
+  $head->add($field);
+  my Mail::Message::Field $s = $head->add(Sender => 'I');
 
 =item $obj-E<gt>B<addListGroup>($object)
 
 A I<list group> is a set of header fields which contain data about a
 mailing list which was used to transmit the message.  See
 L<Mail::Message::Head::ListGroup|Mail::Message::Head::ListGroup> for details about the implementation
-of the $object.
+of the C<$object>.
 
 When you have a list group prepared, you can add it later using this
 method.  You will get your private copy of the list group data in
 return, because the same group can be used for multiple messages.
 
-example: of adding a list group to a header
+» example: of adding a list group to a header
 
- my $lg = Mail::Message::Head::ListGroup->new(...);
- my $own_lg = $msg->head->addListGroup($lg);
+  my $lg = Mail::Message::Head::ListGroup->new(...);
+  my $own_lg = $msg->head->addListGroup($lg);
 
 =item $obj-E<gt>B<addResentGroup>($resent_group|$data)
 
-Add a $resent_group (a L<Mail::Message::Head::ResentGroup|Mail::Message::Head::ResentGroup> object) to
-the header.  If you specify $data, that is used to create such group
+Add a C<$resent_group> (a L<Mail::Message::Head::ResentGroup|Mail::Message::Head::ResentGroup> object) to
+the header.  If you specify C<$data>, that is used to create such group
 first.  If no C<Received> line is specified, it will be created
 for you.
 
@@ -194,31 +207,31 @@ These header lines have nothing to do with the user's sense
 of C<reply> or C<forward> actions: these lines trace the e-mail
 transport mechanism.
 
-example: 
+» example: 
 
- my $rg = Mail::Message::Head::ResentGroup->new(head => $head, ...);
- $head->addResentGroup($rg);
+  my $rg = Mail::Message::Head::ResentGroup->new(head => $head, ...);
+  $head->addResentGroup($rg);
 
- my $rg = $head->addResentGroup(From => 'me');
+  my $rg = $head->addResentGroup(From => 'me');
 
 =item $obj-E<gt>B<addSpamGroup>($object)
 
 A I<spam fighting group> is a set of header fields which contains data
 which is used to fight spam.  See L<Mail::Message::Head::SpamGroup|Mail::Message::Head::SpamGroup>
-for details about the implementation of the $object.
+for details about the implementation of the C<$object>.
 
 When you have a spam group prepared, you can add it later using this
 method.  You will get your private copy of the spam group data in
 return, because the same group can be used for multiple messages.
 
-example: of adding a spam group to a header
+» example: of adding a spam group to a header
 
- my $sg = Mail::Message::Head::SpamGroup->new(...);
- my $own_sg = $msg->head->addSpamGroup($sg);
+  my $sg = Mail::Message::Head::SpamGroup->new(...);
+  my $own_sg = $msg->head->addSpamGroup($sg);
 
 =item $obj-E<gt>B<count>($name)
 
-Count the number of fields with this $name.  Most fields will return 1:
+Count the number of fields with this C<$name>.  Most fields will return 1:
 only one occurrence in the header.  As example, the C<Received> fields
 are usually present more than once.
 
@@ -239,15 +252,15 @@ Filter from all header fields those with names which start will any of the
 specified list.  When no names are specified, all fields will be returned.
 The list is ordered as they where read from file, or added later.
 
-The @names are considered regular expressions, and will all be matched
+The C<@names> are considered regular expressions, and will all be matched
 case insensitive and attached to the front of the string only.  You may
 also specify one or more prepared regexes.
 
-example: 
+» example: 
 
- my @f  = $head->grepNames();       # same as $head->orderedFields
- my @f  = $head->grepNames('X-', 'Subject', ');
- my @to = $head->grepNames('To\b'); # will only select To
+  my @f  = $head->grepNames();       # same as $head->orderedFields
+  my @f  = $head->grepNames('X-', 'Subject', ');
+  my @to = $head->grepNames('To\b'); # will only select To
 
 =item $obj-E<gt>B<listGroup>()
 
@@ -255,14 +268,14 @@ Returns a I<list group> description: the set of headers which form
 the information about mailing list software used to transport the
 message.  See also L<addListGroup()|Mail::Message::Head::Complete/"Access to the header"> and L<removeListGroup()|Mail::Message::Head::Complete/"Access to the header">.
 
-example: use of listGroup()
+» example: use of listGroup()
 
- if(my $lg = $msg->head->listGroup)
- {  $lg->print(\*STDERR);
-    $lg->delete;
- }
+  if(my $lg = $msg->head->listGroup)
+  {  $lg->print(\*STDERR);
+     $lg->delete;
+  }
 
- $msg->head->removeListGroup;
+  $msg->head->removeListGroup;
 
 =item $obj-E<gt>B<names>()
 
@@ -272,33 +285,33 @@ listed here.
 
 =item $obj-E<gt>B<print>( [$fh] )
 
-Print all headers to the specified $fh, by default the selected
+Print all headers to the specified C<$fh>, by default the selected
 filehandle.  See L<printUndisclosed()|Mail::Message::Head::Complete/"Access to the header"> to limit the headers to include
 only the public headers.
 
-example: 
+» example: 
 
- $head->print(\*OUT);
- $head->print;
+  $head->print(\*OUT);
+  $head->print;         # to selected file
 
- my $fh = IO::File->new(...);
- $head->print($fh);
+  open my ($fh), '>:raw', $filename;
+  $head->print($fh);
 
 =item $obj-E<gt>B<printSelected>($fh, <STRING|Regexp>, ...)
 
 Like the usual L<print()|Mail::Message::Head::Complete/"Access to the header">, the header lines are printed to the specified
-$fh.  In this case, however, only the fields with names as specified by
-STRING (case insensative) or Regexp are printed.  They will stay the in-order
+C<$fh>.  In this case, however, only the fields with names as specified by
+C<STRING> (case insensative) or Regexp are printed.  They will stay the in-order
 of the source header.
 
-example: printing only a subset of the fields
+» example: printing only a subset of the fields
 
- $head->printSelected(STDOUT, qw/Subject From To/, qr/^x\-(spam|xyz)\-/i)
+  $head->printSelected(STDOUT, qw/Subject From To/, qr/^x\-(spam|xyz)\-/i)
 
 =item $obj-E<gt>B<printUndisclosed>( [$fh] )
 
 Like the usual L<print()|Mail::Message::Head::Complete/"Access to the header">, the header lines are printed to the specified
-$fh, by default the selected filehandle.  In this case, however,
+C<$fh>, by default the selected filehandle.  In this case, however,
 C<Bcc> and C<Resent-Bcc> lines are included.
 
 =item $obj-E<gt>B<removeContentInfo>()
@@ -308,7 +321,7 @@ partial.
 
 =item $obj-E<gt>B<removeField>($field)
 
-Remove the specified $field object from the header.  This is useful when
+Remove the specified C<$field> object from the header.  This is useful when
 there are possible more than one fields with the same name, and you
 need to remove exactly one of them.  Also have a look at L<delete()|Mail::Message::Head::Complete/"Access to the header">,
 L<reset()|Mail::Message::Head::Complete/"Access to the header">, and L<set()|Mail::Message::Head::Complete/"Access to the header">.
@@ -322,30 +335,30 @@ uses weak references (see L<Scalar::Util> method weaken()> to figure-out
 which fields have been removed.  A header is a hash of field for fast search
 and an array of weak references to remember the order of the fields, required
 for printing.  If the field is removed from the hash, the weak-ref is set to
-undef and the field not printed.
+C<undef> and the field not printed.
 
 However... it is easy to disturb this process.  Example:
- my $msg = ....;                 # subject ref-count = 1 + 0 = 1
- $msg->head->delete('Subject');  # subject ref-count =     0 = 0: clean-up
- $msg->print;                    # subject doesn't show: ok
+  my $msg = ....;                 # subject ref-count = 1 + 0 = 1
+  $msg->head->delete('Subject');  # subject ref-count =     0 = 0: clean-up
+  $msg->print;                    # subject doesn't show: ok
 
 But
- my $msg = ....;                 # subject ref-count = 1 + 0 = 1
- my $s = $msg->head->get('subject'); # ref-count = 1 + 1 + 0 = 2
- $msg->head->delete('Subject');  # subject ref-count = 1 + 0 = 1: no clean-up
- $msg->print;                    # subject DOES show: not ok
- undef $s;                       # ref-count becomes 0: clean-up
- $msg->print;                    # subject doesn't show: ok
+  my $msg = ....;                 # subject ref-count = 1 + 0 = 1
+  my $s = $msg->head->get('subject'); # ref-count = 1 + 1 + 0 = 2
+  $msg->head->delete('Subject');  # subject ref-count = 1 + 0 = 1: no clean-up
+  $msg->print;                    # subject DOES show: not ok
+  undef $s;                       # ref-count becomes 0: clean-up
+  $msg->print;                    # subject doesn't show: ok
 
 To avoid the latter situation, do not catch the field object, but only
 the field content.  SAVE are all methods which return the text:
- my $s = $msg->head->get('subject')->body;
- my $s = $msg->head->get('subject')->unfoldedBody;
- my $s = $msg->head->get('subject')->foldedBody;
- my $s = $msg->head->get('subject')->foldedBody;
- my $s = $msg->get('subject');
- my $s = $msg->subject;
- my $s = $msg->string;
+  my $s = $msg->head->get('subject')->body;
+  my $s = $msg->head->get('subject')->unfoldedBody;
+  my $s = $msg->head->get('subject')->foldedBody;
+  my $s = $msg->head->get('subject')->foldedBody;
+  my $s = $msg->get('subject');
+  my $s = $msg->subject;
+  my $s = $msg->string;
 
 =item $obj-E<gt>B<removeFields>( <STRING|Regexp>, ... )
 
@@ -393,8 +406,8 @@ C<Received> field.
 
 =item $obj-E<gt>B<reset>($name, @fields)
 
-Replace the values in the header fields named by $name with the values
-specified in the list of @fields. A single name can correspond to multiple
+Replace the values in the header fields named by C<$name> with the values
+specified in the list of C<@fields>. A single name can correspond to multiple
 repeated fields.  READ THE IMPORTANT WARNING IN L<removeField()|Mail::Message::Head::Complete/"Access to the header">
 
 Removing fields which are part of one of the predefined field groups is
@@ -405,21 +418,21 @@ to a list group.  You can delete a whole group with
 L<Mail::Message::Head::FieldGroup::delete()|Mail::Message::Head::FieldGroup/"The header">, or with methods which
 are provided by L<Mail::Message::Head::Partial|Mail::Message::Head::Partial>.
 
-If FIELDS is empty, the corresponding $name fields will
+If FIELDS is empty, the corresponding C<$name> fields will
 be removed. The location of removed fields in the header order will be
 remembered. Fields with the same name which are added later will appear at
 the remembered position.  This is equivalent to the L<delete()|Mail::Message::Head::Complete/"Access to the header"> method.
 
-example: 
+» example: 
 
- # reduce number of 'Keywords' lines to last 5)
- my @keywords = $head->get('Keywords');
- $head->reset('Keywords', @keywords[-5..-1]) if @keywords > 5;
+  # reduce number of 'Keywords' lines to last 5)
+  my @keywords = $head->get('Keywords');
+  $head->reset('Keywords', @keywords[-5..-1]) if @keywords > 5;
 
- # Reduce the number of Received lines to only the last added one.
- my @rgs = $head->resentGroups;
- shift @rgs;     # keep this one (later is added in front)
- $_->delete foreach @rgs;
+  # Reduce the number of Received lines to only the last added one.
+  my @rgs = $head->resentGroups;
+  shift @rgs;     # keep this one (later is added in front)
+  $_->delete foreach @rgs;
 
 =item $obj-E<gt>B<set>( $field | $line | <$name, $body, [$attrs]> )
 
@@ -433,31 +446,31 @@ Returns whether one of the spam groups defines a report about spam.  If there
 are not header fields in the message which relate to spam-detection
 software, C<undef> is returned.  The spamgroups which report spam are returned.
 
-example: 
+» example: 
 
- $message->delete if $message->spamDetected;
+  $message->delete if $message->spamDetected;
 
- call_spamassassin($message)
-    unless defined $message->spamDetected;
+  defined $message->spamDetected
+     or call_spamassassin($message);
 
 =item $obj-E<gt>B<spamGroups>( [$names] )
 
 Returns a list of L<Mail::Message::Head::SpamGroup|Mail::Message::Head::SpamGroup> objects, each collecting
-some lines which contain spam fighting information.  When any $names are
+some lines which contain spam fighting information.  When any C<$names> are
 given, then only these groups are returned.
 See also L<addSpamGroup()|Mail::Message::Head::Complete/"Access to the header"> and L<removeSpamGroups()|Mail::Message::Head::Complete/"Access to the header">.
 
 In scalar context, with exactly one NAME specified, that group will be
-returned.  With more $names or without $names, a list will be returned
+returned.  With more C<$names> or without C<$names>, a list will be returned
 (which defaults to the length of the list in scalar context).
 
-example: use of listGroup()
+» example: use of listGroup()
 
- my @sg = $msg->head->spamGroups;
- $sg[0]->print(\*STDERR);
- $sg[-1]->delete;
+  my @sg = $msg->head->spamGroups;
+  $sg[0]->print(\*STDERR);
+  $sg[-1]->delete;
 
- my $sg = $msg->head->spamGroups('SpamAssassin');
+  my $sg = $msg->head->spamGroups('SpamAssassin');
 
 =item $obj-E<gt>B<string>()
 
@@ -473,7 +486,7 @@ Inherited, see L<Mail::Message::Head/"Access to the header">
 =head2 About the body
 
 Extends L<"About the body" in Mail::Message::Head|Mail::Message::Head/"About the body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<guessBodySize>()
@@ -508,24 +521,24 @@ headers, if they are present, and C<undef> otherwise.
 The timestamp is encoded as C<time> is on your system (see perldoc -f
 time), and as such usable for the C<gmtime> and C<localtime> methods.
 
-example: of time-sorting folders with received messages
+» example: of time-sorting folders with received messages
 
- my $folder = $mgr->open('InBox');
- my @messages = sort {$a->recvstamp <=> $b->recvstamp}
-                   $folder->messages;
+  my $folder = $mgr->open('InBox');
+  my @messages = sort {$a->recvstamp <=> $b->recvstamp}
+                    $folder->messages;
 
-example: of time-sorting messages of mixed origin
+» example: of time-sorting messages of mixed origin
 
- my $folder = $mgr->open('MyFolder');
+  my $folder = $mgr->open('MyFolder');
 
- # Pre-calculate timestamps to be sorted (for speed)
- my @stamps = map { [ ($_->timestamp || 0), $_ ] }
-                     $folder->messages;
+  # Pre-calculate timestamps to be sorted (for speed)
+  my @stamps = map +[ ($_->timestamp || 0), $_ ],
+    $folder->messages;
 
- my @sorted
-   = map { $_->[1] }      # get the message for the stamp
-       sort {$a->[0] <=> $b->[0]}   # stamps are numerics
-          @stamps;
+  my @sorted =
+    map { $_->[1] }      # get the message for the stamp
+      sort {$a->[0] <=> $b->[0]}   # stamps are numerics
+         @stamps;
 
 =item $obj-E<gt>B<timestamp>()
 
@@ -543,7 +556,7 @@ and C<localtime> methods.
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message::Head|Mail::Message::Head/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addNoRealize>($field)
@@ -576,18 +589,16 @@ Inherited, see L<Mail::Message::Head/"Internals">
 
 Inherited, see L<Mail::Message::Head/"Internals">
 
-=item $obj-E<gt>B<messageIdPrefix>( [$prefix, [$hostname]|CODE] )
-
-=item Mail::Message::Head::Complete-E<gt>B<messageIdPrefix>( [$prefix, [$hostname]|CODE] )
+=item $any-E<gt>B<messageIdPrefix>( [$prefix, [$hostname]|CODE] )
 
 When options are provided, it sets a new way to create message-ids,
 as used by L<createMessageId()|Mail::Message::Head::Complete/"Internals">.  You have two choices: either by
-providing a $prefix and optionally a $hostname, or a CODE reference.
+providing a C<$prefix> and optionally a C<$hostname>, or a C<CODE> reference.
 
-The CODE reference will be called with the header as first argument.
+The C<CODE> reference will be called with the header as first argument.
 You must ensure yourself that the returned value is RFC compliant.
 
-The $prefix defaults to C<mailbox-$$>, the $hostname defaults to the
+The C<$prefix> defaults to C<mailbox-$$>, the C<$hostname> defaults to the
 return of L<Net::Domains>'s function C<hostfqdn()>, or when not installed,
 the L<Sys::Hostname>'s function C<hostname()>.  Inbetween the
 two, a nano-second time provided by L<Time::HiRes> is used.  If that
@@ -598,7 +609,7 @@ In any case, a subroutine will be created to be used.  A reference
 to that will be returned.  When the method is called without arguments,
 but no subroutine is defined yet, one will be created.
 
-example: setting a message prefix
+» example: setting a message prefix
 
   $head->messageIdPrefix('prefix');
   Mail::Message::Head::Complete->messageIdPrefix('prefix');
@@ -629,7 +640,7 @@ Inherited, see L<Mail::Message::Head/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Head|Mail::Message::Head/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -640,9 +651,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Head::Complete-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -650,19 +659,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Head::Complete-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Head::Complete-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -691,7 +692,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Head|Mail::Message::Head/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -703,7 +704,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message::Head|Mail::Message::Head/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -713,8 +714,11 @@ Extends L<"DETAILS" in Mail::Message::Head|Mail::Message::Head/"DETAILS">.
 You ask to remove a field which is not known in the header.  Using
 L<delete()|Mail::Message::Head::Complete/"Access to the header">, L<reset()|Mail::Message::Head::Complete/"Access to the header">, or L<set()|Mail::Message::Head::Complete/"Access to the header"> to do the job will not result
 in warnings: those methods check the existence of the field first.
+Cast by C<removeField()>
 
 =item Warning: Field objects have an implied name ($name)
+
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -723,19 +727,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

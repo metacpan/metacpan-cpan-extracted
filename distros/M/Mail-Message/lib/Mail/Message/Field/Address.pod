@@ -12,17 +12,17 @@ Mail::Message::Field::Address - One e-mail address
 
 =head1 SYNOPSIS
 
- my $addr = Mail::Message::Field::Address->new(...);
+  my $addr = Mail::Message::Field::Address->new(...);
 
- my $ui   = User::Identity->new(...);
- my $addr = Mail::Message::Field::Address->coerce($ui);
+  my $ui   = User::Identity->new(...);
+  my $addr = Mail::Message::Field::Address->coerce($ui);
 
- my $mi   = Mail::Identity->new(...);
- my $addr = Mail::Message::Field::Address->coerce($mi);
+  my $mi   = Mail::Identity->new(...);
+  my $addr = Mail::Message::Field::Address->coerce($mi);
 
- print $addr->address;
- print $addr->fullName;   # possibly unicode!
- print $addr->domain;
+  print $addr->address;
+  print $addr->fullName;   # possibly unicode!
+  print $addr->domain;
 
 =head1 DESCRIPTION
 
@@ -31,52 +31,51 @@ can be represented by an object of this class.  These objects will
 handle interpretation and character set encoding and decoding for you.
 
 Extends L<"DESCRIPTION" in Mail::Identity|Mail::Identity/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 =over 4
 
-=item overload: B<boolean>
-
-The object used as boolean will always return C<true>
-
-=item overload: B<string $comparison>
-
-Two address objects are the same when their email addresses are the
-same.
-
-=item overload: B<stringification>
+=item overload: B<""> stringification
 
 When the object is used in string context, it will return the encoded
 representation of the e-mail address, just like L<string()|Mail::Message::Field::Address/"Access to the content"> does.
+
+=item overload: B<boolean> true/falase
+
+The object used as boolean will always return C<true>
+
+=item overload: B<cmp> string comparison
+
+Two address objects are the same when their email addresses are the same.
 
 =back
 
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Identity|Mail::Identity/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Identity|Mail::Identity/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<coerce>( <STRING|$object>, %options )
 
-Try to coerce the $object into a C<Mail::Message::Field::Address>.
-In case of a STRING, it is interpreted as an email address.
+Try to coerce the C<$object> into a C<Mail::Message::Field::Address>.
+In case of a C<STRING>, it is interpreted as an email address.
 
-The %options are passed to the object creation, and overrule the values
-found in the $object.  The result may be C<undef> or a newly created
-object.  If the $object is already of the correct type, it is returned
+The C<%options> are passed to the object creation, and overrule the values
+found in the C<$object>.  The result may be C<undef> or a newly created
+object.  If the C<$object> is already of the correct type, it is returned
 unmodified.
 
-The $object may currently be a L<Mail::Address|Mail::Address>, a L<Mail::Identity|Mail::Identity>, or
+The C<$object> may currently be a L<Mail::Address|Mail::Address>, a L<Mail::Identity|Mail::Identity>, or
 a L<User::Identity|User::Identity>.  In case of the latter, one of the user's addresses
 is chosen at random.
 
-=item Mail::Message::Field::Address-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
 
 Inherited, see L<Mail::Identity/"Constructors">
 
@@ -84,7 +83,7 @@ Inherited, see L<Mail::Identity/"Constructors">
 
 Parse the string for an address.  You never know whether one or more
 addresses are specified on a line (often applications are wrong), therefore,
-the STRING is first parsed for as many addresses as possible and then the
+the C<STRING> is first parsed for as many addresses as possible and then the
 one is taken at random.
 
 =back
@@ -92,7 +91,7 @@ one is taken at random.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Identity|Mail::Identity/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<address>()
@@ -144,7 +143,7 @@ Inherited, see L<Mail::Identity/"Attributes">
 =head2 Collections
 
 Extends L<"Collections" in Mail::Identity|Mail::Identity/"Collections">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($collection, $role)
@@ -167,9 +166,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<type>()
-
-=item Mail::Message::Field::Address-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -182,7 +179,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 =head2 Searching
 
 Extends L<"Searching" in Mail::Identity|Mail::Identity/"Searching">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<find>($collection, $role)
@@ -212,10 +209,10 @@ Returns an RFC compliant e-mail address, which will have character
 set encoding if needed.  The objects are also overloaded to call
 this method in string context.
 
-example: 
+» example: 
 
- print $address->string;
- print $address;          # via overloading
+  print $address->string;
+  print $address;          # via overloading
 
 =back
 
@@ -223,52 +220,44 @@ example:
 
 =over 4
 
-=item Error: $object is not a collection.
-
-The first argument is an object, but not of a class which extends
-L<User::Identity::Collection|User::Identity::Collection>.
-
 =item Error: Cannot coerce a $type into a Mail::Message::Field::Address
 
 When addresses are specified to be included in header fields, they may
 be coerced into L<Mail::Message::Field::Address|Mail::Message::Field::Address> objects first.  What
 you specify is not accepted as address specification.  This may be an
 internal error.
+Cast by C<coerce()>
 
-=item Error: Cannot load collection module for $type ($class).
+=item Error: cannot load collection module for $type ($class): $err
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by C<addCollection()>
 
-=item Error: Creation of a collection via $class failed.
+=item Error: nvalid collection $name.
 
-The $class did compile, but it was not possible to create an object
-of that class using the options you specified.
+The collection with C<$name> does not exist and can not be created.
+Cast by C<add()>
 
-=item Error: Don't know what type of collection you want to add.
+=item Error: this $object is not a collection.
 
-If you add a collection, it must either by a collection object or a
-list of options which can be used to create a collection object.  In
-the latter case, the type of collection must be specified.
-
-=item Warning: No collection $name
-
-The collection with $name does not exist and can not be created.
+Cast by C<addCollection()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

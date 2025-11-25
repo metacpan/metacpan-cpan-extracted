@@ -13,8 +13,8 @@ Mail::Transport::Exim - transmit messages using external Exim program
 
 =head1 SYNOPSIS
 
- my $sender = Mail::Transport::Exim->new(...);
- $sender->send($message);
+  my $sender = Mail::Transport::Exim->new(...);
+  $sender->send($message);
 
 =head1 DESCRIPTION
 
@@ -23,21 +23,22 @@ When instantiated, the mailer will look for the binary in specific system
 directories, and the first version found is taken.
 
 Extends L<"DESCRIPTION" in Mail::Transport::Send|Mail::Transport::Send/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Transport::Send|Mail::Transport::Send/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Transport::Send|Mail::Transport::Send/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Transport::Exim-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
-If you have Exim installed in a non-standard location, you will need to 
+If you have Exim installed in a non-standard location, you will need to
 specify the path, using L<new(proxy)|Mail::Transport/"METHODS">.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in     --Default
   executable  Mail::Transport  undef
@@ -47,7 +48,7 @@ specify the path, using L<new(proxy)|Mail::Transport/"METHODS">.
   password    Mail::Transport  undef
   port        Mail::Transport  undef
   proxy       Mail::Transport  undef
-  retry       Mail::Transport  <false>
+  retry       Mail::Transport  <unlimited>
   timeout     Mail::Transport  120
   trace       Mail::Reporter   'WARNINGS'
   username    Mail::Transport  undef
@@ -55,29 +56,29 @@ specify the path, using L<new(proxy)|Mail::Transport/"METHODS">.
 
 =over 2
 
-=item executable => FILENAME
+=item executable => $file
 
-=item hostname => HOSTNAME|ARRAY
+=item hostname => $host|\@hosts
 
-=item interval => SECONDS
+=item interval => $span
 
 =item log => LEVEL
 
-=item password => STRING
+=item password => $password
 
-=item port => INTEGER
+=item port => $port
 
-=item proxy => PATH
+=item proxy => $path
 
-=item retry => NUMBER|undef
+=item retry => $count|undef
 
-=item timeout => SECONDS
+=item timeout => $span
 
 =item trace => LEVEL
 
-=item username => STRING
+=item username => $username
 
-=item via => CLASS|NAME
+=item via => CLASS|$name
 
 =back
 
@@ -86,7 +87,7 @@ specify the path, using L<new(proxy)|Mail::Transport/"METHODS">.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Transport::Send|Mail::Transport::Send/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<logSettings>()
@@ -98,10 +99,10 @@ Inherited, see L<Mail::Reporter/"Attributes">
 =head2 Sending mail
 
 Extends L<"Sending mail" in Mail::Transport::Send|Mail::Transport::Send/"Sending mail">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<destinations>( $message, [$address|ARRAY] )
+=item $obj-E<gt>B<destinations>( $message, [$address|\@addresses] )
 
 Inherited, see L<Mail::Transport::Send/"Sending mail">
 
@@ -115,12 +116,14 @@ Inherited, see L<Mail::Transport::Send/"Sending mail">
 
 =item $obj-E<gt>B<trySend>($message, %options)
 
+Inherited, see L<Mail::Transport::Send/"Sending mail">
+
 =back
 
 =head2 Server connection
 
 Extends L<"Server connection" in Mail::Transport::Send|Mail::Transport::Send/"Server connection">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<findBinary>( $name, [@directories] )
@@ -140,7 +143,7 @@ Inherited, see L<Mail::Transport/"Server connection">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Transport::Send|Mail::Transport::Send/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -151,9 +154,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Transport::Exim-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -161,15 +162,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Transport::Exim-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Transport::Exim-E<gt>B<logPriority>($level)
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -198,7 +195,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Transport::Send|Mail::Transport::Send/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -207,10 +204,6 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =back
 
-=head2 Server connection
-
-Extends L<"Server connection" in Mail::Transport::Send|Mail::Transport::Send/"Server connection">.
- 
 =head1 DIAGNOSTICS
 
 =over 4
@@ -219,10 +212,12 @@ Extends L<"Server connection" in Mail::Transport::Send|Mail::Transport::Send/"Se
 
 The Exim mail transfer agent did start, but was not able to handle the message
 correctly.
+Cast by C<trySend()>
 
 =item Warning: Message has no destination
 
 It was not possible to figure-out where the message is intended to go to.
+Cast by C<destinations()>
 
 =item Error: Package $package does not implement $method.
 
@@ -231,6 +226,7 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Warning: Resent group does not specify a destination
 
@@ -246,19 +242,21 @@ C<Received> was found.  That seems to be the best explanation of the RFC.
 As alternative, you may also specify the C<to> option to some of the senders
 (for instance L<Mail::Transport::SMTP::send(to)|Mail::Transport::Send/"Sending mail"> to overrule any information
 found in the message itself about the destination.
+Cast by C<destinations()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.007,
-built on September 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport version 3.008,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -16,7 +16,8 @@ use t_SSUtils;
 use Spreadsheet::Edit qw(:all);
 
 ##??? WHAT ABOUT $a and $b ???
-for my $forbidden_varname (',', qw/^ $ " ' \\ \/ . _ 0 ( ) < > ; [ ]/, (map{ chr } 0..31), "ARGV") {
+#for my $forbidden_varname (',', qw/^ $ " \/ . _ 0 ( ) < > ; [ ] ' \\ /, (map{ chr } 0..31), "ARGV") {
+for my $forbidden_varname (',', qw'^ $ " / . _ 0 ( ) < > ; [ ] \' \\ ', (map{ chr } 0..31), "ARGV") {
   say dvis '$forbidden_varname' if $verbose;
   state $exp_cx = 0;
   new_sheet

@@ -30,7 +30,7 @@ use constant {
     DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
 };
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 
@@ -400,7 +400,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

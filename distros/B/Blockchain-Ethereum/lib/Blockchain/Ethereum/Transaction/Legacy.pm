@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Ethereum Legacy transaction abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use parent 'Blockchain::Ethereum::Transaction';
 
@@ -73,7 +73,7 @@ Blockchain::Ethereum::Transaction::Legacy - Ethereum Legacy transaction abstract
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ Transaction abstraction for Legacy transactions
         value     => '0xDE0B6B3A7640000',
         chain_id  => '0x1'
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );

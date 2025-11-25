@@ -4,6 +4,7 @@ author:
   - 'J. Schneider'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.56'
@@ -19,6 +20,8 @@ no_index:
     - t
     - inc
 recommends:
+  Pod::Autopod: '0'
+  Pod::Usage: '0'
   Types::Standard: '0'
   Win32::GuiTest: '0'
   Win32API::Registry: '0.21'
@@ -35,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/brickpool/Win32API-Console/issues
   repository: https://github.com/brickpool/Win32API-Console.git
-version: v0.1.6
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

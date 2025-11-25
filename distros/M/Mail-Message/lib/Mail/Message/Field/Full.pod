@@ -16,20 +16,20 @@ Mail::Message::Field::Full - construct one smart line in a message header
 
 =head1 SYNOPSIS
 
- # Getting to understand the complexity of a header field ...
+  # Getting to understand the complexity of a header field ...
 
- my $fast = $msg->head->get('subject');
- my $full = Mail::Message::Field::Full->from($fast);
+  my $fast = $msg->head->get('subject');
+  my $full = Mail::Message::Field::Full->from($fast);
 
- my $full = $msg->head->get('subject')->study;  # same
- my $full = $msg->head->study('subject');       # same
- my $full = $msg->study('subject');             # same
+  my $full = $msg->head->get('subject')->study;  # same
+  my $full = $msg->head->study('subject');       # same
+  my $full = $msg->study('subject');             # same
 
- # ... or build a complex header field yourself
+  # ... or build a complex header field yourself
 
- my $f = Mail::Message::Field::Full->new('To');
- my $f = Mail::Message::Field::Full->new('Subject: hi!');
- my $f = Mail::Message::Field::Full->new(Subject => 'hi!');
+  my $f = Mail::Message::Field::Full->new('To');
+  my $f = Mail::Message::Field::Full->new('Subject: hi!');
+  my $f = Mail::Message::Field::Full->new(Subject => 'hi!');
 
 =head1 DESCRIPTION
 
@@ -46,83 +46,80 @@ wrapping from RFC2231.  If you do not need the latter two, then the
 L<Mail::Message::Field::Fast|Mail::Message::Field::Fast> and L<Mail::Message::Field::Flex|Mail::Message::Field::Flex>
 are enough for your application.
 
-RFC5322 (F<https://www.rfc-editor.org/rfc/rfc5322.html>) describes a
+RFC5322 (L<https://www.rfc-editor.org/rfc/rfc5322.html>) describes a
 long list of obsolete syntax for structured header fields.  This mainly
 refers to disallowing white-spaces and folding on many inconvenient
 locations.  This matches MailBox's natural behavior.
 
 Extends L<"DESCRIPTION" in Mail::Message::Field|Mail::Message::Field/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Message::Field|Mail::Message::Field/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<0+>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<<=>>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<bool>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<cmp>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<stringification>
+=item overload: B<""> stringification
 
 In string context, the decoded body is returned, as if L<decodedBody()|Mail::Message::Field::Full/"Access to the body">
 would have been called.
+Improves base, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<0+> numification
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<<=>> numeric comparison
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<bool> boolean
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<cmp> string comparison
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
 =back
 
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Field|Mail::Message::Field/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Field|Mail::Message::Field/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>()
 
 Inherited, see L<Mail::Message::Field/"Constructors">
 
-=item Mail::Message::Field::Full-E<gt>B<from>($field, %options)
+=item $class-E<gt>B<from>($field, %options)
 
-Convert any $field (a L<Mail::Message::Field|Mail::Message::Field> object) into a new
+Convert any C<$field> (a L<Mail::Message::Field|Mail::Message::Field> object) into a new
 L<Mail::Message::Field::Full|Mail::Message::Field::Full> object.  This conversion is done the hard
 way: the string which is produced by the original object is parsed
 again.  Usually, the string which is parsed is exactly the line (or lines)
 as found in the original input source, which is a good thing because Full
 fields are much more careful with the actual content.
 
-%options are passed to the constructor (see L<new()|Mail::Message::Field::Full/"METHODS">).  In any case, some
+C<%options> are passed to the constructor (see L<new()|Mail::Message::Field::Full/"METHODS">).  In any case, some
 extensions of this Full field class is returned.  It depends on which
 field is created what kind of class we get.
 
-example: 
+» example: 
 
- my $fast = $msg->head->get('subject');
- my $full = Mail::Message::Field::Full->from($fast);
+  my $fast = $msg->head->get('subject');
+  my $full = Mail::Message::Field::Full->from($fast);
 
- my $full = $msg->head->get('subject')->study;  # same
- my $full = $msg->head->study('subject');       # same
- my $full = $msg->get('subject');               # same
+  my $full = $msg->head->get('subject')->study;  # same
+  my $full = $msg->head->study('subject');       # same
+  my $full = $msg->get('subject');               # same
 
-=item Mail::Message::Field::Full-E<gt>B<new>($data)
+=item $class-E<gt>B<new>(($line | $name, [$body], @attributes), %options)
 
 Creating a new field object the correct way is a lot of work, because
 there is so much freedom in the RFCs, but at the same time so many
@@ -135,23 +132,24 @@ parts:
 
 =over 4
 
-=item * B<new> LINE, OPTIONS
+=item * B<new>(C<$line>, C<%options>)
 
-Pass a LINE as it could be found in a file: a (possibly folded) line
+Pass a C<$line> as it could be found in a file: a (possibly folded) line
 which is terminated by a new-line.
 
-=item * B<new> NAME, [BODY], OPTIONS
+=item * B<new>(C<$name>, [C<$body>], C<@attributes>, C<%options>)
 
 A set of values which shape the line.
 
 =back
 
-The NAME is a wellformed header name (you may use wellformedName()) to
-be sure about the casing.  The BODY is a string, one object, or an
-ref-array of objects.  In case of objects, they must fit to the
+The C<$name> is a wellformed header name (you may use L<wellformedName()|Mail::Message::Field/"Access to the name">) to
+be sure about the casing.  The C<$body> is a string, one object, or an
+ARRAY of objects.  In case of objects, they must fit to the
 constructor of the field: the types which are accepted may differ.
 The optional ATTRIBUTE list contains L<Mail::Message::Field::Attribute|Mail::Message::Field::Attribute>
 objects.  Finally, there are some OPTIONS.
+Improves base, see L<Mail::Message::Field/"Constructors">
 
  -Option  --Defined in     --Default
   charset                    undef
@@ -163,10 +161,10 @@ objects.  Finally, there are some OPTIONS.
 
 =over 2
 
-=item charset => STRING
+=item charset => $charset
 
-The body is specified in utf8, and must become 7-bits ascii to be
-transmited.  Specify a charset to which the multi-byte utf8 is converted
+The body is specified in UTF-8, and must become 7-bits ascii to be
+transmited.  Specify a C<$charset> to which the multi-byte utf8 is converted
 before it gets encoded.  See L<encode()|Mail::Message::Field::Full/"Internals">, which does the job.
 
 =item encoding => 'q'|'Q'|'b'|'B'
@@ -179,9 +177,9 @@ Base64 ('b' or 'B') encoding.
 Enforce encoding in the specified charset, even when it is not needed
 because the body does not contain any non-ascii characters.
 
-=item language => STRING
+=item language => $language
 
-The language used can be specified, however is rarely used my mail clients.
+The C<$language> used can be specified, however is rarely used my mail clients.
 
 =item log => LEVEL
 
@@ -189,26 +187,36 @@ The language used can be specified, however is rarely used my mail clients.
 
 =back
 
-example: 
+» example: 
 
- my $s = Mail::Message::Field::Full->new('Subject: Hello World');
- my $s = Mail::Message::Field::Full->new('Subject', 'Hello World');
+  my $s = Mail::Message::Field::Full->new('Subject: Hello World');
+  my $s = Mail::Message::Field::Full->new('Subject', 'Hello World');
 
- my @attrs   = (Mail::Message::Field::Attribute->new(...), ...);
- my @options = (extra => 'the color blue');
- my $t = Mail::Message::Field::Full->new(To => \@addrs, @attrs, @options);
+  my @attrs   = (Mail::Message::Field::Attribute->new(...), ...);
+  my @options = (extra => 'the color blue');
+  my $t = Mail::Message::Field::Full->new(To => \@addrs, @attrs, @options);
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Field|Mail::Message::Field/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 The field
 
 Extends L<"The field" in Mail::Message::Field|Mail::Message::Field/"The field">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<isStructured>()
-
-=item Mail::Message::Field::Full-E<gt>B<isStructured>()
+=item $any-E<gt>B<isStructured>()
 
 Inherited, see L<Mail::Message::Field/"The field">
 
@@ -241,7 +249,7 @@ Inherited, see L<Mail::Message::Field/"The field">
 =head2 Access to the name
 
 Extends L<"Access to the name" in Mail::Message::Field|Mail::Message::Field/"Access to the name">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<Name>()
@@ -261,7 +269,7 @@ Inherited, see L<Mail::Message::Field/"Access to the name">
 =head2 Access to the body
 
 Extends L<"Access to the body" in Mail::Message::Field|Mail::Message::Field/"Access to the body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>()
@@ -271,13 +279,12 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 =item $obj-E<gt>B<decodedBody>(%options)
 
 Returns the unfolded body of the field, where encodings are resolved.  The
-returned line will still contain comments and such.  The %options are passed
+returned line will still contain comments and such.  The C<%options> are passed
 to the decoder, see L<decode()|Mail::Message::Field::Full/"Internals">.
 
 BE WARNED: if the field is a structured field, the content may change syntax,
 because of encapsulated special characters.  By default, the body is decoded
-as text, which results in a small difference within comments as well
-(read the RFC).
+as text, which results in a small difference within comments as well (read the RFC).
 
 =item $obj-E<gt>B<folded>()
 
@@ -287,9 +294,7 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 
 Inherited, see L<Mail::Message::Field/"Access to the body">
 
-=item $obj-E<gt>B<stripCFWS>( [STRING] )
-
-=item Mail::Message::Field::Full-E<gt>B<stripCFWS>( [STRING] )
+=item $any-E<gt>B<stripCFWS>( [STRING] )
 
 Inherited, see L<Mail::Message::Field/"Access to the body">
 
@@ -302,7 +307,7 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 =head2 Access to the content
 
 Extends L<"Access to the content" in Mail::Message::Field|Mail::Message::Field/"Access to the content">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addresses>()
@@ -328,38 +333,32 @@ and nice.  For unstructured bodies, this method doesn't do a thing.
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
-=item $obj-E<gt>B<createComment>(STRING, %options)
-
-=item Mail::Message::Field::Full-E<gt>B<createComment>(STRING, %options)
+=item $any-E<gt>B<createComment>(STRING, %options)
 
 Create a comment to become part in a field.  Comments are automatically
 included within parenthesis.  Matching pairs of parenthesis are
-permitted within the STRING.  When a non-matching parenthesis are used,
+permitted within the C<STRING>.  When a non-matching parenthesis are used,
 it is only permitted with an escape (a backslash) in front of them.
 These backslashes will be added automatically if needed (don't worry!).
 Backslashes will stay, except at the end, where it will be doubled.
 
-The %options are C<charset>, C<language>, and C<encoding> as always.
+The C<%options> are C<charset>, C<language>, and C<encoding> as always.
 The created comment is returned.
 
-=item $obj-E<gt>B<createPhrase>(STRING, %options)
-
-=item Mail::Message::Field::Full-E<gt>B<createPhrase>(STRING, %options)
+=item $any-E<gt>B<createPhrase>(STRING, %options)
 
 A phrase is a text which plays a well defined role.  This is the main
 difference with comments, which have do specified meaning.  Some special
 characters in the phrase will cause it to be surrounded with double
 quotes: do not specify them yourself.
 
-The %options are C<charset>, C<language>, and C<encoding>, as always.
+The C<%options> are C<charset>, C<language>, and C<encoding>, as always.
 
 =item $obj-E<gt>B<study>()
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
-=item $obj-E<gt>B<toDate>( [$time] )
-
-=item Mail::Message::Field::Full-E<gt>B<toDate>( [$time] )
+=item $any-E<gt>B<toDate>( [$time] )
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
@@ -372,12 +371,10 @@ Inherited, see L<Mail::Message::Field/"Access to the content">
 =head2 Other methods
 
 Extends L<"Other methods" in Mail::Message::Field|Mail::Message::Field/"Other methods">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<dateToTimestamp>(STRING)
-
-=item Mail::Message::Field::Full-E<gt>B<dateToTimestamp>(STRING)
+=item $any-E<gt>B<dateToTimestamp>(STRING)
 
 Inherited, see L<Mail::Message::Field/"Other methods">
 
@@ -386,20 +383,18 @@ Inherited, see L<Mail::Message::Field/"Other methods">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message::Field|Mail::Message::Field/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<consume>( $line | <$name,<$body|$objects>> )
 
 Inherited, see L<Mail::Message::Field/"Internals">
 
-=item $obj-E<gt>B<decode>(STRING, %options)
+=item $any-E<gt>B<decode>(STRING, %options)
 
-=item Mail::Message::Field::Full-E<gt>B<decode>(STRING, %options)
-
-Decode field encoded STRING to an utf8 string.  The input STRING is part of
+Decode field encoded C<STRING> to an utf8 string.  The input C<STRING> is part of
 a header field, and as such, may contain encoded words in C<=?...?.?...?=>
-format defined by RFC2047.  The STRING may contain multiple encoded parts,
+format defined by RFC2047.  The C<STRING> may contain multiple encoded parts,
 maybe using different character sets.
 
 Be warned:  you MUST first interpret the field into parts, like phrases and
@@ -413,7 +408,7 @@ otherwise croaked].  Unknown characters within an charset are replaced by
 a '?'.
 
  -Option --Default
-  is_text  1
+  is_text  true
 
 =over 2
 
@@ -426,10 +421,10 @@ an unencoded word.  Phrases and comments are texts.
 
 =back
 
-example: 
+» example: 
 
- print Mail::Message::Field::Full->decode('=?iso-8859-1?Q?J=F8rgen?=');
-    # prints   JE<0slash>rgen
+  print Mail::Message::Field::Full->decode('=?iso-8859-1?Q?J=F8rgen?=');
+     # prints   JE<0slash>rgen
 
 =item $obj-E<gt>B<defaultWrapLength>( [$length] )
 
@@ -437,13 +432,13 @@ Inherited, see L<Mail::Message::Field/"Internals">
 
 =item $obj-E<gt>B<encode>(STRING, %options)
 
-Encode the (possibly utf8 encoded) STRING to a string which is acceptable
+Encode the (possibly utf8 encoded) C<STRING> to a string which is acceptable
 to the RFC2047 definition of a header: only containing us-ascii characters.
 
  -Option  --Default
   charset   'us-ascii'
   encoding  'q'
-  force     <flase>
+  force     false
   language  undef
   name      undef
 
@@ -451,7 +446,7 @@ to the RFC2047 definition of a header: only containing us-ascii characters.
 
 =item charset => STRING
 
-STRING is an utf8 string which has to be translated into any byte-wise
+C<STRING> is an utf8 string which has to be translated into any byte-wise
 character set for transport, because MIME-headers can only contain ascii
 characters.
 
@@ -469,7 +464,7 @@ header fields.
 =item language => STRING
 
 RFC2231 defines how to specify language encodings in encoded words.  The
-STRING is a strandard iso language name.
+C<STRING> is a strandard iso language name.
 
 =item name => STRING
 
@@ -478,9 +473,7 @@ be shorter.
 
 =back
 
-=item $obj-E<gt>B<fold>( $name, $body, [$maxchars] )
-
-=item Mail::Message::Field::Full-E<gt>B<fold>( $name, $body, [$maxchars] )
+=item $any-E<gt>B<fold>( $name, $body, [$maxchars] )
 
 Inherited, see L<Mail::Message::Field/"Internals">
 
@@ -505,40 +498,36 @@ the standard constructors (L<new()|Mail::Message::Field::Full/"METHODS">) and it
 
 =over 4
 
-=item $obj-E<gt>B<consumeComment>(STRING)
+=item $any-E<gt>B<consumeComment>(STRING)
 
-=item Mail::Message::Field::Full-E<gt>B<consumeComment>(STRING)
-
-Try to read a comment from the STRING.  When successful, the comment
+Try to read a comment from the C<STRING>.  When successful, the comment
 without encapsulating parenthesis is returned, together with the rest
 of the string.
 
 =item $obj-E<gt>B<consumeDotAtom>(STRING)
 
 Returns three elemens: the atom-text, the rest string, and the
-concatenated comments.  Both atom and comments can be undef.
+concatenated comments.  Both atom and comments can be C<undef>.
 
-=item $obj-E<gt>B<consumePhrase>(STRING)
+=item $any-E<gt>B<consumePhrase>(STRING)
 
-=item Mail::Message::Field::Full-E<gt>B<consumePhrase>(STRING)
-
-Take the STRING, and try to strip-off a valid phrase.  In the obsolete
+Take the C<STRING>, and try to strip-off a valid phrase.  In the obsolete
 phrase syntax, any sequence of words is accepted as phrase (as long as
 certain special characters are not used).  RFC2822 is stricter: only
 one word or a quoted string is allowed.  As always, the obsolete
 syntax is accepted, and the new syntax is produced.
 
-This method returns two elements: the phrase (or undef) followed
+This method returns two elements: the phrase (or C<undef>) followed
 by the resulting string.  The phrase will be removed from the optional
 quotes.  Be warned that C<""> will return an empty, valid phrase.
 
-example: 
+» example: 
 
- my ($phrase, $rest) = $field->consumePhrase( q["hi!" <sales@example.com>] );
+  my ($phrase, $rest) = $field->consumePhrase( q["hi!" <sales@example.com>] );
 
 =item $obj-E<gt>B<parse>(STRING)
 
-Get the detailed information from the STRING, and store the data found
+Get the detailed information from the C<STRING>, and store the data found
 in the field object.  The accepted input is very field type dependent.
 Unstructured fields do no parsing whatsoever.
 
@@ -557,7 +546,7 @@ a call to this method when the field is needed later.
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Field|Mail::Message::Field/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -568,9 +557,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Field::Full-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -578,19 +565,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Field::Full-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Field::Full-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -619,7 +598,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Field|Mail::Message::Field/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -631,7 +610,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message::Field|Mail::Message::Field/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -641,34 +620,40 @@ Extends L<"DETAILS" in Mail::Message::Field|Mail::Message::Field/"DETAILS">.
 The numeric value of a field is requested (for instance the C<Lines> or
 C<Content-Length> fields should be numerical), however the data contains
 weird characters.
+Cast by C<toInt()>
 
 =item Error: Field name too long (max $length), in '$name'
 
 It is not specified in the RFCs how long a field name can be, but
 at least it should be a few characters shorter than the line wrap.
+Cast by C<fold()>
 
 =item Warning: Illegal character in charset '$charset'
 
 The field is created with an utf8 string which only contains data from the
 specified character set.  However, that character set can never be a valid
 name because it contains characters which are not permitted.
+Cast by C<encode()>
 
 =item Warning: Illegal character in field name $name
 
 A new field is being created which does contain characters not permitted
 by the RFCs.  Using this field in messages may break other e-mail clients
 or transfer agents, and therefore mutulate or extinguish your message.
+Cast by C<consume()>
 
 =item Warning: Illegal character in language '$lang'
 
 The field is created with data which is specified to be in a certain language,
 however, the name of the language cannot be valid: it contains characters
 which are not permitted by the RFCs.
+Cast by C<encode()>
 
 =item Warning: Illegal encoding '$encoding', used 'q'
 
 The RFCs only permit base64 (C<b > or C<B >) or quoted-printable
 (C<q> or C<Q>) encoding.  Other than these four options are illegal.
+Cast by C<encode()>
 
 =item Error: Package $package does not implement $method.
 
@@ -677,19 +662,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

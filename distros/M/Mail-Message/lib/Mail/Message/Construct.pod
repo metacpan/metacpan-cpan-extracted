@@ -6,7 +6,7 @@ Mail::Message::Construct - extends the functionality of a Mail::Message
 
 =head1 SYNOPSIS
 
- # See Mail::Message
+  # See Mail::Message
 
 =head1 DESCRIPTION
 
@@ -18,19 +18,19 @@ The following constructors are available:
 
 =over 4
 
-=item Mail::Message::Construct::Bounce
+=item L<Mail::Message::Construct::Bounce|Mail::Message::Construct::Bounce>
 
-=item Mail::Message::Construct::Build
+=item L<Mail::Message::Construct::Build|Mail::Message::Construct::Build>
 
-=item Mail::Message::Construct::Forward
+=item L<Mail::Message::Construct::Forward|Mail::Message::Construct::Forward>
 
-=item Mail::Message::Construct::Read
+=item L<Mail::Message::Construct::Read|Mail::Message::Construct::Read>
 
-=item Mail::Message::Construct::Rebuild
+=item L<Mail::Message::Construct::Rebuild|Mail::Message::Construct::Rebuild>
 
-=item Mail::Message::Construct::Reply
+=item L<Mail::Message::Construct::Reply|Mail::Message::Construct::Reply>
 
-=item Mail::Message::Construct::Text
+=item L<Mail::Message::Construct::Text|Mail::Message::Construct::Text>
 
 =back
 
@@ -45,19 +45,21 @@ not all code is compiled.  For performance reasons, most of the
 complex activities on messages are dynamically loaded from other
 packages.  An error will be produced when loading does not help resolving
 the requested method.
+Improves base, see L<Mail::Reporter/"Error handling">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

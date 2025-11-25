@@ -19,54 +19,56 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 use constant {
-    RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
-    RE_OID  => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
-    RE_URI  => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+:/,
-    RE_UINT => qr/^(?:0|[1-9][0-9]*)$/,
-    RE_QID  => qr/^[QPL][1-9][0-9]*$/,
-    RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
-    RE_GTIN => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
-    RE_UNICODE => qr/^U\+([0-9A-F]{4,7})$/,
-    RE_SIMPLE_TAG => qr/^[^\p{upper case}\s]+$/,
+    RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
+    RE_OID          => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
+    RE_URI          => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+:/,
+    RE_UINT         => qr/^(?:0|[1-9][0-9]*)$/,
+    RE_QID          => qr/^[QPL][1-9][0-9]*$/,
+    RE_DOI          => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
+    RE_GTIN         => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
+    RE_UNICODE      => qr/^U\+([0-9A-F]{4,7})$/,
+    RE_SIMPLE_TAG   => qr/^[^\p{upper case}\s]+$/,
 };
 
 use constant {
-    WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
-    WK_OID  => 'd08dc905-bbf6-4183-b219-67723c3c8374', # oid
-    WK_URI  => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439', # uri
-    WK_SID  => 'f87a38cb-fd13-4e15-866c-e49901adbec5', # small-identifier
-    WK_WD   => 'ce7aae1e-a210-4214-926a-0ebca56d77e3', # wikidata-identifier
-    WK_GTIN => '82d529be-0f00-4b4f-a43f-4a22de5f5312', # gtin
-    WK_IBAN => 'b1418262-6bc9-459c-b4b0-a054d77db0ea', # iban
-    WK_BIC  => 'c8a3a132-f160-473c-b5f3-26a748f37e62', # bic
-    WK_DOI  => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
-    WK_FC   => 'd576b9d1-47d4-43ae-b7ec-bbea1fe009ba', # factgrid-identifier
-    WK_UNICODE_CP => '5f167223-cc9c-4b2f-9928-9fe1b253b560', # unicode-code-point
-    WK_SNI  => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
-    WK_HDI  => 'f8eb04ef-3b8a-402c-ad7c-1e6814cb1998', # host-defined-identifier
-    WK_UDI  => '05af99f9-4578-4b79-aabe-946d8e6f5888', # user-defined-identifier
+    WK_NULL         => '00000000-0000-0000-0000-000000000000', # NULL, undef, ...
+    WK_UUID         => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
+    WK_OID          => 'd08dc905-bbf6-4183-b219-67723c3c8374', # oid
+    WK_URI          => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439', # uri
+    WK_SID          => 'f87a38cb-fd13-4e15-866c-e49901adbec5', # small-identifier
+    WK_WD           => 'ce7aae1e-a210-4214-926a-0ebca56d77e3', # wikidata-identifier
+    WK_GTIN         => '82d529be-0f00-4b4f-a43f-4a22de5f5312', # gtin
+    WK_IBAN         => 'b1418262-6bc9-459c-b4b0-a054d77db0ea', # iban
+    WK_BIC          => 'c8a3a132-f160-473c-b5f3-26a748f37e62', # bic
+    WK_DOI          => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
+    WK_FC           => 'd576b9d1-47d4-43ae-b7ec-bbea1fe009ba', # factgrid-identifier
+    WK_UNICODE_CP   => '5f167223-cc9c-4b2f-9928-9fe1b253b560', # unicode-code-point
+    WK_SNI          => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
+    WK_HDI          => 'f8eb04ef-3b8a-402c-ad7c-1e6814cb1998', # host-defined-identifier
+    WK_UDI          => '05af99f9-4578-4b79-aabe-946d8e6f5888', # user-defined-identifier
+    WK_CHAT0W       => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', # chat-0-word-identifier
 
-    NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
-    NS_FC   => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
-    NS_INT  => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
-    NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
-    NS_GTIN => 'd95d8b1f-5091-4642-a6b0-a585313915f1', # gtin-namespace
-    NS_UNICODE_CP => '132aa723-a373-48bf-a88d-69f1e00f00cf', # 'unicode-character-namespace'
+    NS_WD           => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
+    NS_FC           => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
+    NS_INT          => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
+    NS_DATE         => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
+    NS_GTIN         => 'd95d8b1f-5091-4642-a6b0-a585313915f1', # gtin-namespace
+    NS_UNICODE_CP   => '132aa723-a373-48bf-a88d-69f1e00f00cf', # 'unicode-character-namespace'
 };
 
 # Features:
 my $enabled_oid = 1;
 
 my %uuid_to_uriid_org = (
-    WK_UUID() => 'uuid',
-    WK_OID()  => 'oid',
-    WK_URI()  => 'uri',
-    WK_SID()  => 'sid',
-    WK_GTIN() => 'gtin',
-    WK_WD()   => 'wikidata-identifier',
+    WK_UUID()       => 'uuid',
+    WK_OID()        => 'oid',
+    WK_URI()        => 'uri',
+    WK_SID()        => 'sid',
+    WK_GTIN()       => 'gtin',
+    WK_WD()         => 'wikidata-identifier',
 );
 
 my %uuid_org_to_uuid = map {$uuid_to_uriid_org{$_} => $_} keys %uuid_to_uriid_org;
@@ -90,8 +92,9 @@ my %well_known = (
     # Also used by Data::Identifier::Util!
     unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, namespace => NS_UNICODE_CP, generate => 'id-based'),
 
-    hdi => __PACKAGE__->new($well_known_uuid => WK_HDI, validate => RE_UINT),
-    udi => __PACKAGE__->new($well_known_uuid => WK_UDI, validate => RE_UINT),
+    hdi  => __PACKAGE__->new($well_known_uuid => WK_HDI, validate => RE_UINT),
+    udi  => __PACKAGE__->new($well_known_uuid => WK_UDI, validate => RE_UINT),
+    null => __PACKAGE__->new($well_known_uuid => WK_NULL),
 );
 
 my %registered;
@@ -101,6 +104,7 @@ $_->register foreach values %well_known;
 # Refill with sids:
 {
     my %wk_sids = (
+        WK_NULL()                               =>   0, # NULL
         'ddd60c5c-2934-404f-8f2d-fcb4da88b633'  =>   1, # also-shares-identifier
         WK_UUID()                               =>   2,
         'bfae7574-3dae-425d-89b1-9c087c140c23'  =>   3, # tagname
@@ -137,7 +141,7 @@ $_->register foreach values %well_known;
         'bc598c52-642e-465b-b079-e9253cd6f190'  =>  35, # SEEK_CUR
         '06aff30f-70e8-48b4-8b20-9194d22fc460'  =>  36, # SEEK_END
         '59a5691a-6a19-4051-bc26-8db82c019df3'  =>  37, # inode
-        '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 112, # chat-0-word-identifier
+        WK_CHAT0W()                             => 112, # chat-0-word-identifier
         WK_SNI()                                => 113, # sirtx-numerical-identifier
         WK_GTIN()                               => 160,
     );
@@ -153,10 +157,11 @@ $_->register foreach values %well_known;
 # Refill with snis:
 {
     my %wk_snis = (
+        WK_NULL()                               =>   0, # NULL
         '039e0bb7-5dd3-40ee-a98c-596ff6cce405'  =>  10, # sirtx-numerical-identifier
         'f87a38cb-fd13-4e15-866c-e49901adbec5'  => 115, # small-identifier
         '2bffc55d-7380-454e-bd53-c5acd525d692'  => 116, # roaraudio-error-number
-        '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 118, # chat-0-word-identifier
+        WK_CHAT0W()                             => 118, # chat-0-word-identifier
         WK_UUID()                               => 119,
         WK_OID()                                => 120,
         WK_URI()                                => 121,
@@ -171,6 +176,16 @@ $_->register foreach values %well_known;
     }
 }
 
+# Update NULL:
+{
+    my $identifier = __PACKAGE__->new(uuid => WK_NULL);
+    $identifier->{id_cache} //= {};
+    foreach my $type (WK_HDI, WK_CHAT0W) {
+        $identifier->{id_cache}->{$type} //= 0;
+    }
+    $identifier->register;
+}
+
 # Some extra tags such as namespaces:
 foreach my $ise (NS_WD, NS_INT, NS_DATE) {
     my $identifier = __PACKAGE__->new(ise => $ise);
@@ -180,6 +195,7 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
 # Refill with displaynames
 {
     my %displaynames = (
+        WK_NULL()                               => 'null',
         WK_UUID()                               => 'uuid',
         WK_OID()                                => 'oid',
         WK_URI()                                => 'uri',
@@ -193,7 +209,8 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         WK_UNICODE_CP()                         => 'unicode-code-point',
         WK_SNI()                                => 'sirtx-numerical-identifier',
         WK_HDI()                                => 'host-defined-identifier',
-        WK_UDI(),                               => 'user-defined-identifier',
+        WK_UDI()                                => 'user-defined-identifier',
+        WK_CHAT0W()                             => 'chat-0-word-identifier',
         NS_WD()                                 => 'Wikidata-namespace',
         NS_FC()                                 => 'factgrid-namespace',
         NS_INT()                                => 'integer-namespace',
@@ -228,7 +245,6 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         'bc598c52-642e-465b-b079-e9253cd6f190'  => 'SEEK_CUR',
         '06aff30f-70e8-48b4-8b20-9194d22fc460'  => 'SEEK_END',
         '59a5691a-6a19-4051-bc26-8db82c019df3'  => 'inode',
-        '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 'chat-0-word-identifier',
         '53863a15-68d4-448d-bd69-a9b19289a191'  => 'unsigned-integer-generator',
         'e8aa9e01-8d37-4b4b-8899-42ca0a2a906f'  => 'signed-integer-generator',
         'd74f8c35-bcb8-465c-9a77-01010e8ed25c'  => 'unicode-character-generator',
@@ -539,20 +555,24 @@ sub uri {
     my ($self, %opts) = @_;
     my $type = $well_known{uri};
 
-    return $self->{id_cache}{WK_URI()} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{WK_URI()});
+    if (!$opts{no_defaults} && !defined($opts{style}) && defined($self->{id_cache}) && defined($self->{id_cache}{WK_URI()})) {
+        return $self->{id_cache}{WK_URI()};
+    }
 
     if ($self->{type} == $type) {
         return $self->{id};
     }
+
+    $opts{style} //= 'urn';
 
     unless ($opts{no_defaults}) {
         if ($self->{type} == $well_known{wd}) {
             return $self->{id_cache}{WK_URI()} = sprintf('http://www.wikidata.org/entity/%s', $self->{id});
         } elsif ($self->{type} == $well_known{doi}) {
             return $self->{id_cache}{WK_URI()} = sprintf('https://doi.org/%s', $self->{id});
-        } elsif (defined(my $uuid = $self->uuid(default => undef))) {
+        } elsif (defined(my $uuid = $self->uuid(default => undef)) && $opts{style} eq 'urn') {
             return $self->{id_cache}{WK_URI()} = sprintf('urn:uuid:%s', $uuid);
-        } elsif ($enabled_oid && defined(my $oid = $self->oid(default => undef))) {
+        } elsif ($enabled_oid && defined(my $oid = $self->oid(default => undef)) && $opts{style} eq 'urn') {
             return $self->{id_cache}{WK_URI()} = sprintf('urn:oid:%s', $oid);
         } else {
             my $u = URI->new("https://uriid.org/");
@@ -943,7 +963,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 
@@ -1243,6 +1263,13 @@ This can be set to C<undef> to change the method from C<die>ing in failture to r
 
 If set true do not try to generate a matching identifier.
 Note: This does not apply to C<sid()> as small-identifiers cannot be generated. For C<sid()> the option is ignored.
+
+=item C<style>
+
+(experimental since v0.26)
+
+Only in C<uri()>: Allows setting the style for mapping non-URI identifiers to URIs.
+Currently supported values are C<urn> (default), and C<uriid>.
 
 =back
 

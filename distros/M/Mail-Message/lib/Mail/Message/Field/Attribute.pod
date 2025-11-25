@@ -11,15 +11,15 @@ Mail::Message::Field::Attribute - one attribute of a full field
 
 =head1 SYNOPSIS
 
- my $field    = $msg->head->get('Content-Disposition') or return;
- my $full     = $field->study;   # full understanding in unicode
- my $filename = $full->attribute('filename')           or return;
+  my $field    = $msg->head->get('Content-Disposition') or return;
+  my $full     = $field->study;   # full understanding in unicode
+  my $filename = $full->attribute('filename')           or return;
 
- print ref $filename;     # this class name
- print $filename;         # the attributes content in utf-8
- print $filename->value;  # same
- print $filename->string; # print string as was found in the file
- $filename->print(\*OUT); # print as was found in the file
+  print ref $filename;     # this class name
+  print $filename;         # the attributes content in utf-8
+  print $filename->value;  # same
+  print $filename->string; # print string as was found in the file
+  $filename->print(\*OUT); # print as was found in the file
 
 =head1 DESCRIPTION
 
@@ -34,62 +34,63 @@ A C<Mail::Message::Field::Attribute> can be found in any structured
 L<Mail::Message::Field::Full|Mail::Message::Field::Full> header field.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 =over 4
 
-=item overload: B<comparison>
+=item overload: B<""> stringification
+
+Returns the decoded content of the attribute.
+
+=item overload: B<cmp> string comparison
 
 When the second argument is a field, then both attribute name (case-sensitive)
 and the decoded value must be the same.  Otherwise, the value is compared.
-
-=item overload: B<stringification>
-
-Returns the decoded content of the attribute.
 
 =back
 
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Message::Field::Attribute-E<gt>B<new>( <$name, [$value] | STRING>, %options )
+=item $class-E<gt>B<new>( <$name, [$value] | STRING>, %options )
 
-Create a new attribute $name with the optional $value.  If no $value is specified,
+Create a new attribute C<$name> with the optional C<$value>.  If no C<$value> is specified,
 the first argument of this method is inspected for an equals sign C<'='>.
-If that character is present, the argument is taken as STRING, containing
+If that character is present, the argument is taken as C<STRING>, containing
 a preformatted attribute which is processed.  Otherwise, the argument is
-taken as name without $value: set the value later with value().
+taken as name without C<$value>: set the value later with value().
 
-Whether encoding takes place depends on the %options and the existence
-of non-ascii characters in the $value.  The $name can only contain ascii
+Whether encoding takes place depends on the C<%options> and the existence
+of non-ascii characters in the C<$value>.  The C<$name> can only contain ascii
 characters, hence is never encoded.
 
 To speed things up, attributes are not derived from the L<Mail::Reporter|Mail::Reporter>
 base-class.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option           --Defined in     --Default
   charset                             'us-ascii'
   language                            undef
   log                Mail::Reporter   'WARNINGS'
   trace              Mail::Reporter   'WARNINGS'
-  use_continuations                   <true>
+  use_continuations                   <C<true>>
 
 =over 2
 
 =item charset => STRING
 
-The $value is translated from utf-8 (Perl internal) to this character set,
+The C<$value> is translated from utf-8 (Perl internal) to this character set,
 and the resulting string is encoded if required.  C<us-ascii> is the normal
-encoding for e-mail.  Valid character sets can be found with 
-Encode::encodings(':all').
+encoding for e-mail.  Valid character sets can be found with
+C<Encode::encodings(':all')>.
 
 =item language => STRING
 
@@ -110,26 +111,37 @@ but not supported by some Mail User Agents.
 
 =back
 
-example: 
+» example: 
 
- my $fn    = Mail::Message::Field::Attribute
-                ->new(filename => 'xyz');
+  my $fn    = Mail::Message::Field::Attribute->new(filename => 'xyz');
 
- my $fattr = 'Mail::Message::Field::Attribute';  # abbrev
- my $fn    = $fattr->new
-   ( filename => "Re\xC7u"
-   , charset  => 'iso-8859-15'
-   , language => 'nl-BE'
-   );
- print $fn;
-   # -->  filename*=iso-8859-15'nl-BE'Re%C7u
+  my $fattr = 'Mail::Message::Field::Attribute';  # abbrev
+  my $fn    = $fattr->new(
+    filename => "Re\xC7u",
+    charset  => 'iso-8859-15',
+    language => 'nl-BE'
+  );
+  print $fn;
+    # -->  filename*=iso-8859-15'nl-BE'Re%C7u
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -140,9 +152,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Field::Attribute-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -150,19 +160,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Field::Attribute-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Field::Attribute-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -191,7 +193,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -212,10 +214,10 @@ attribute are found when a field is being parsed.  The RFCs are
 very strict on valid characters, but we cannot be: you have to accept
 what is coming in if you can.
 
-example: 
+» example: 
 
- my $param = Mail::Message::Field::Attribute->new;
- $param->addComponent("filename*=iso10646'nl-BE'%Re\47u");
+  my $param = Mail::Message::Field::Attribute->new;
+  $param->addComponent("filename*=iso10646'nl-BE'%Re\47u");
 
 =item $obj-E<gt>B<charset>()
 
@@ -234,9 +236,9 @@ Returns the name of this attribute.
 
 =item $obj-E<gt>B<string>()
 
-Returns the parameter as reference to an array of lines.  When only one line
-is returned, it may be short enough to fit on the same line with other
-components of the header field.
+When called in LIST context, the lines are returned to be post-processed
+one after the other.  In SCALAR context, this returns the formatted
+attribute list.
 
 =item $obj-E<gt>B<value>( [STRING] )
 
@@ -254,6 +256,8 @@ Translate all known continuations into a value.  The produced value is
 returned and may be utf-8 encoded or a plain string.
 
 =item $obj-E<gt>B<encode>()
+
+Z<>
 
 =back
 
@@ -278,6 +282,7 @@ Merging is required by the field parsing.
 The specified parameter name contains characters which are not permitted by
 the RFCs.  You can better change the name into something which is accepted,
 or risk applications to corrupt or ignore the message.
+Cast by C<new()>
 
 =item Error: Package $package does not implement $method.
 
@@ -286,21 +291,25 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Too late to merge: value already changed.
+
+Cast by C<mergeComponent()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

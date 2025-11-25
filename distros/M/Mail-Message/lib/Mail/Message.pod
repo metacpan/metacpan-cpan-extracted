@@ -27,28 +27,28 @@ Mail::Message - general message object
 
 =head1 SYNOPSIS
 
- use Mail::Box::Manager;
- my $mgr    = Mail::Box::Manager->new;
- my $folder = $mgr->open(folder => 'InBox');
- my $msg    = $folder->message(2);    # $msg is a Mail::Message now
+  use Mail::Box::Manager;
+  my $mgr    = Mail::Box::Manager->new;
+  my $folder = $mgr->open(folder => 'InBox');
+  my $msg    = $folder->message(2);    # $msg is a Mail::Message now
 
- my $subject = $msg->subject;         # The message's subject
- my @cc      = $msg->cc;              # List of Mail::Address'es
+  my $subject = $msg->subject;         # The message's subject
+  my @cc      = $msg->cc;              # List of Mail::Address'es
 
- my Mail::Message::Head $head = $msg->head;
- my Mail::Message::Body $body = $msg->decoded;
- $msg->decoded->print($outfile);
+  my Mail::Message::Head $head = $msg->head;
+  my Mail::Message::Body $body = $msg->decoded;
+  $msg->decoded->print($outfile);
 
- # Send a simple email
- Mail::Message->build
-   ( To             => 'you@example.com'
-   , From           => 'me@example.com'
-   , Subject        => "My subject"
-   , data           => "Some plain text content"
-   )->send(via => 'postfix');
+  # Send a simple email
+  Mail::Message->build(
+    To             => 'you@example.com',
+    From           => 'me@example.com',
+    Subject        => "My subject",
+    data           => "Some plain text content"
+  )->send(via => 'postfix');
 
- my $reply_msg = Mail::Message->reply(...);
- my $frwd_msg  = Mail::Message->forward(...);
+  my $reply_msg = Mail::Message->reply(...);
+  my $frwd_msg  = Mail::Message->forward(...);
 
 =head1 DESCRIPTION
 
@@ -57,6 +57,10 @@ as defined by RFC2822.  Everything what is not specificaly related to storing
 the messages in mailboxes (folders) is implemented in this class.  Methods
 which are related to folders is implemented in the L<Mail::Box::Message|Mail::Box::Message>
 extension.
+
+B<This is a maintenance release for the old interface>.  Read
+F<https://github.com/markov2/perl5-Mail-Box/wiki/> how
+to move towards version 4.
 
 The main methods are L<get()|Mail::Message/"The header">, to get information from a message header
 field, and L<decoded()|Mail::Message/"The body"> to get the intended content of a message.
@@ -68,15 +72,15 @@ This means you can simply use these methods as if they are part of this class.
 Those package add functionality to all kinds of message objects.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>(%options)
@@ -84,7 +88,7 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 Create a copy of this message.  Returned is a C<Mail::Message> object.
 The head and body, the log and trace levels are taken.  Labels are
 copied with the message, but the delete and modified flags are not.
- 
+
 BE WARNED: the clone of any kind of message (or a message part)
 will B<always> be a C<Mail::Message> object.  For example, a
 L<Mail::Box::Message|Mail::Box::Message>'s clone is detached from the folder of its original.
@@ -95,9 +99,9 @@ to be added.
 See also L<Mail::Box::Message::copyTo()|Mail::Box::Message/"The message"> and L<Mail::Box::Message::moveTo()|Mail::Box::Message/"The message">.
 
  -Option      --Default
-  shallow       <false>
-  shallow_body  <false>
-  shallow_head  <false>
+  shallow       false
+  shallow_body  false
+  shallow_head  false
 
 =over 2
 
@@ -125,35 +129,37 @@ because the header fields can be updated, for instance when labels change.
 
 =back
 
-example: 
+» example: 
 
- $copy = $msg->clone;
+  $copy = $msg->clone;
 
-=item Mail::Message-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in     --Default
   body                         undef
   body_type                    Mail::Message::Body::Lines
-  deleted                      <false>
+  deleted                      false
   field_type                   undef
   head                         undef
   head_type                    Mail::Message::Head::Complete
-  labels                       {}
+  labels                       +{}
   log         Mail::Reporter   'WARNINGS'
   messageId                    undef
-  modified                     <false>
+  modified                     false
   trace       Mail::Reporter   'WARNINGS'
-  trusted                      <false>
+  trusted                      false
 
 =over 2
 
-=item body => OBJECT
+=item body => $object
 
 Instantiate the message with a body which has been created somewhere
-before the message is constructed.  The OBJECT must be a sub-class
-of Mail::Message::Body.  See also L<body()|Mail::Message/"The body"> and L<storeBody()|Mail::Message/"Internals">.
+before the message is constructed.  The C<$object> must be a sub-class
+of L<Mail::Message::Body|Mail::Message::Body>.  See also L<body()|Mail::Message/"The body"> and L<storeBody()|Mail::Message/"Internals">.
 
-=item body_type => CLASS
+=item body_type => $class
 
 Default type of body to be created for L<readBody()|Mail::Message/"Internals">.
 
@@ -161,15 +167,15 @@ Default type of body to be created for L<readBody()|Mail::Message/"Internals">.
 
 Is the file deleted from the start?
 
-=item field_type => CLASS
+=item field_type => $class
 
-=item head => OBJECT
+=item head => $object
 
 Instantiate the message with a head which has been created somewhere
-before the message is constructed.  The OBJECT must be a (sub-)class
+before the message is constructed.  The C<$object> must be a (sub-)class
 of L<Mail::Message::Head|Mail::Message::Head>. See also L<head()|Mail::Message/"The header">.
 
-=item head_type => CLASS
+=item head_type => $class
 
 Default type of head to be created for L<readHead()|Mail::Message/"Internals">.
 
@@ -182,11 +188,12 @@ will take care of the folder specifics once the message is added to one.
 
 =item log => LEVEL
 
-=item messageId => STRING
+=item messageId => $id
 
-The id on which this message can be recognized.  If none specified and
-not defined in the header --but one is needed-- there will be one assigned
-to the message to be able to pass unique message-ids between objects.
+The C<$id> string on which this message can be recognized.  If none specified
+and not defined in the header --but one is needed-- there will be one
+assigned to the message to be able to pass unique message-ids between
+objects.
 
 =item modified => BOOLEAN
 
@@ -206,6 +213,18 @@ body data is decoded or used for transmission.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 Constructing a message
 
 =over 4
@@ -214,11 +233,11 @@ body data is decoded or used for transmission.
 
 Inherited, see L<Mail::Message::Construct::Bounce/"Constructing a message">
 
-=item Mail::Message-E<gt>B<build>( [$message|$part|$body], $content )
+=item $class-E<gt>B<build>( [$message|$part|$body], @fields, %options )
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-=item Mail::Message-E<gt>B<buildFromBody>($body, [$head], $headers)
+=item $class-E<gt>B<buildFromBody>($body, [$head], $headers)
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
@@ -254,7 +273,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item Mail::Message-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -270,9 +289,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replySubject>(STRING)
-
-=item Mail::Message-E<gt>B<replySubject>(STRING)
+=item $any-E<gt>B<replySubject>(STRING)
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -287,21 +304,27 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 If the message is a part of another message, C<container> returns the
 reference to the containing body.
 
-example: 
+» example: 
 
- my Mail::Message $msg = ...
- return unless $msg->body->isMultipart;
- my $part   = $msg->body->part(2);
+  my Mail::Message $msg = ...
+  unless $msg->body->isMultipart or return;
+  my $part   = $msg->body->part(2);
 
- return unless $part->body->isMultipart;
- my $nested = $part->body->part(3);
+  $part->body->isMultipart or return;
+  my $nested = $part->body->part(3);
 
- $nested->container;  # returns $msg->body
- $nested->toplevel;   # returns $msg
- $msg->container;     # returns undef
- $msg->toplevel;      # returns $msg
- $msg->isPart;        # returns false
- $part->isPart;       # returns true
+  $nested->container;  # returns $msg->body
+  $nested->toplevel;   # returns $msg
+  $msg->container;     # returns undef
+  $msg->toplevel;      # returns $msg
+  $msg->isPart;        # returns false
+  $part->isPart;       # returns true
+
+=item $obj-E<gt>B<endsOnNewline>()
+
+[3.018] Return C<true> when the printed message has a trailing "\n".  In
+rare cases, that's not the case.  For instance, when the body is read
+from a file which was generated without trailing new-line.
 
 =item $obj-E<gt>B<isDummy>()
 
@@ -314,7 +337,7 @@ this will return C<false>.
 
 =item $obj-E<gt>B<isPart>()
 
-Returns true if the message is a part of another message.  This is
+Returns C<true> if the message is a part of another message.  This is
 the case for L<Mail::Message::Part|Mail::Message::Part> extensions of C<Mail::Message>.
 
 =item $obj-E<gt>B<messageId>()
@@ -325,7 +348,7 @@ is used mainly for recognizing discussion threads.
 =item $obj-E<gt>B<partNumber>()
 
 Returns a string representing the location of this part.  In case the
-top message is a single message, 'undef' is returned.  When it is a
+top message is a single message, 'C<undef>' is returned.  When it is a
 multipart, '1' up to the number of multiparts is returned.  A multi-level
 nested part may for instance return '2.5.1'.
 
@@ -336,46 +359,42 @@ see RFC2060 section 6.4.5.
 
 Print the message to the FILE-HANDLE, which defaults to the selected
 filehandle, without the encapsulation sometimes required by a folder
-type, like L<write()|Mail::Message/"The message"> does.
+  $message->print(\*STDERR);  # to the error output
+  $message->print;            # to the selected file
 
-example: 
-
- $message->print(\*STDERR);  # to the error output
- $message->print;            # to the selected file
-
- my $out = IO::File->new('out', 'w');
- $message->print($out);      # no encapsulation: no folder
- $message->write($out);      # with encapsulation: is folder.
+  my $out = IO::File->new('out', 'w');
+  $message->print($out);      # no encapsulation: no folder
+  $message->write($out);      # with encapsulation: is folder.
 
 =item $obj-E<gt>B<send>( [$mailer], %options )
 
 Transmit the message to anything outside this Perl program.  Returns
-false when sending failed even after retries.
+C<false> when sending failed even after retries.
 
-The optional $mailer is a L<Mail::Transport::Send|Mail::Transport::Send> object.  When the
-$mailer is not specified, one will be created and kept as default for
+The optional C<$mailer> is a L<Mail::Transport::Send|Mail::Transport::Send> object.  When the
+C<$mailer> is not specified, one will be created and kept as default for
 the next messages as well.
 
-The %options are mailer specific, and a mixture of what is usable for
+The C<%options> are mailer specific, and a mixture of what is usable for
 the creation of the mailer object and the sending itself.  Therefore, see
 for possible options L<Mail::Transport::Send::new()|Mail::Transport::Send/"METHODS"> and
 L<Mail::Transport::Send::send()|Mail::Transport::Send/"Sending mail">.  That object also provides a C<trySend()>
 method which gives more low-level control.
 
-example: 
+» example: 
 
- $message->send;
+  $message->send;
 
 is short (but little less flexibile) for
 
- my $mailer = Mail::Transport::SMTP->new(@smtpopts);
- $mailer->send($message, @sendopts);
+  my $mailer = Mail::Transport::SMTP->new(@smtpopts);
+  $mailer->send($message, @sendopts);
 
 See examples/send.pl in the distribution of L<Mail::Box|Mail::Box>.
 
-example: 
+» example: 
 
- $message->send(via => 'sendmail')
+  $message->send(via => 'sendmail')
 
 =item $obj-E<gt>B<size>()
 
@@ -400,7 +419,7 @@ message if the message is not part of another message.
 =item $obj-E<gt>B<write>( [$fh] )
 
 Write the message to the FILE-HANDLE, which defaults to the selected
-$fh, with all surrounding information which is needed to put
+C<$fh>, with all surrounding information which is needed to put
 it correctly in a folder file.
 
 In most cases, the result of C<write> will be the same as with L<print()|Mail::Message/"The message">.
@@ -451,14 +470,14 @@ If you need only one address from a sender, for instance to create a
 "original message by" line in constructed forwarded message body, then use
 L<sender()|Mail::Message/"The header">.
 
-example: using from() to get all sender addresses
+» example: using from() to get all sender addresses
 
- my @from = $message->from;
+  my @from = $message->from;
 
 =item $obj-E<gt>B<get>($fieldname)
 
 Returns the value which is stored in the header field with the specified
-name.  The $fieldname is case insensitive.  The I<unfolded body> of the
+name.  The C<$fieldname> is case insensitive.  The I<unfolded body> of the
 field is returned, stripped from any attributes.
 See L<Mail::Message::Field::body()|Mail::Message::Field/"Access to the body">.
 
@@ -467,13 +486,13 @@ instance is returned.  If you need more complex handing of fields, then
 call L<Mail::Message::Head::get()|Mail::Message::Head/"Access to the header"> yourself.  See L<study()|Mail::Message/"The header"> when you
 want to be smart, doing the better (but slower) job.
 
-example: the get() short-cut for header fields
+» example: the get() short-cut for header fields
 
- print $msg->get('Content-Type'), "\n";
+  print $msg->get('Content-Type'), "\n";
 
 Is equivalent to:
 
- print $msg->head->get('Content-Type')->body, "\n";
+  print $msg->head->get('Content-Type')->body, "\n";
 
 =item $obj-E<gt>B<guessTimestamp>()
 
@@ -486,23 +505,23 @@ This method may return C<undef> if the header is not parsed or only
 partially known.  If you require a time, then use the L<timestamp()|Mail::Message/"The header">
 method, described below.
 
-example: using guessTimestamp() to get a transmission date
+» example: using guessTimestamp() to get a transmission date
 
- print "Receipt ", ($message->timestamp || 'unknown'), "\n";
+  print "Receipt ", ($message->timestamp || 'unknown'), "\n";
 
 =item $obj-E<gt>B<head>( [$head] )
 
-Return (optionally after setting) the $head of this message.
+Return (optionally after setting) the C<$head> of this message.
 The head must be an (sub-)class of L<Mail::Message::Head|Mail::Message::Head>.
 When the head is added, status information is taken from it
 and transformed into labels.  More labels can be added by the
 LABELS hash.  They are added later.
 
-example: 
+» example: 
 
- my $header = Mail::Message::Head->new;
- $msg->head($header);    # set
- my $head = $msg->head;  # get
+  my $header = Mail::Message::Head->new;
+  $msg->head($header);    # set
+  my $head = $msg->head;  # get
 
 =item $obj-E<gt>B<nrLines>()
 
@@ -516,10 +535,10 @@ field, unless that field does not exists, in which case the first
 address from the C<From> field is taken.  If none of both provide
 an address, C<undef> is returned.
 
-example: using sender() to get exactly one sender address
+» example: using sender() to get exactly one sender address
 
- my $sender = $message->sender;
- print "Reply to: ", $sender->format, "\n" if defined $sender;
+  my $sender = $message->sender;
+  print "Reply to: ", $sender->format, "\n" if defined $sender;
 
 =item $obj-E<gt>B<study>($fieldname)
 
@@ -529,28 +548,28 @@ stringify to an utf8 decoded representation of the data contained in
 the field, where L<get()|Mail::Message/"The header"> does not decode.  When the field does not exist,
 then C<undef> is returned.  See L<Mail::Message::Field::study()|Mail::Message::Field/"Access to the content">.
 
-example: the study() short-cut for header fields
+» example: the study() short-cut for header fields
 
- print $msg->study('to'), "\n";
+  print $msg->study('to'), "\n";
 
 Is equivalent to:
 
- print $msg->head->study('to'), "\n";       # and
- print $msg->head->get('to')->study, "\n";
+  print $msg->head->study('to'), "\n";       # and
+  print $msg->head->get('to')->study, "\n";
 
 or better:
- if(my $to = $msg->study('to')) { print "$to\n" }
- if(my $to = $msg->get('to')) { print $to->study, "\n" }
+  if(my $to = $msg->study('to')) { print "$to\n" }
+  if(my $to = $msg->get('to')) { print $to->study, "\n" }
 
 =item $obj-E<gt>B<subject>()
 
 Returns the message's subject, or the empty string.  The subject may
 have encoded characters in it; use L<study()|Mail::Message/"The header"> to get rit of that.
 
-example: using subject() to get the message's subject
+» example: using subject() to get the message's subject
 
- print $msg->subject;
- print $msg->study('subject');
+  print $msg->subject;
+  print $msg->study('subject');
 
 =item $obj-E<gt>B<timestamp>()
 
@@ -574,9 +593,9 @@ A list of L<Mail::Address|Mail::Address> objects is returned.  The people addres
 here are the targets of the content, and should read it contents
 carefully.
 
-example: using to() to get all primar destination addresses
+» example: using to() to get all primar destination addresses
 
- my @to = $message->to;
+  my @to = $message->to;
 
 =back
 
@@ -590,32 +609,32 @@ Return the body of this message.  BE WARNED that this returns
 you an object which may be encoded: use decoded() to get a body
 with usable data.
 
-With options, a new $body is set for this message.  This is B<not>
+With options, a new C<$body> is set for this message.  This is B<not>
 for normal use unless you understand the consequences: you change
 the message content without changing the message-ID.  The right
 way to go is via
 
- $message = Mail::Message->buildFromBody($body);  # or
- $message = Mail::Message->build($body);          # or
- $message = $origmsg->forward(body => $body);
+  $message = Mail::Message->buildFromBody($body);  # or
+  $message = Mail::Message->build($body);          # or
+  $message = $origmsg->forward(body => $body);
 
-The $body must be an (sub-)class of L<Mail::Message::Body|Mail::Message::Body>.  In this case,
+The C<$body> must be an (sub-)class of L<Mail::Message::Body|Mail::Message::Body>.  In this case,
 information from the specified body will be copied into the header.  The
 body object will be encoded if needed, because messages written to file
 or transmitted shall not contain binary data.  The converted body
 is returned.
 
-When $body is C<undef>, the current message body will be dissected from
+When C<$body> is C<undef>, the current message body will be dissected from
 the message.  All relation will be cut.  The body is returned, and
 can be connected to a different message.
 
-example: 
+» example: 
 
- my $body      = $msg->body;
- my @encoded   = $msg->body->lines;
+  my $body      = $msg->body;
+  my @encoded   = $msg->body->lines;
 
- my $new       = Mail::Message::Body->new(mime_type => 'text/html');
- my $converted = $msg->body($new);
+  my $new       = Mail::Message::Body->new(mime_type => 'text/html');
+  my $converted = $msg->body($new);
 
 =item $obj-E<gt>B<contentType>()
 
@@ -625,14 +644,14 @@ defined.  The parameters will be stripped off.
 =item $obj-E<gt>B<decoded>(%options)
 
 Decodes the body of this message, and returns it as a body object.
-Short for C<< $msg->body->decoded >>  All %options are passed-on.
+Short for C<< $msg->body->decoded >>  All C<%options> are passed-on.
 
 =item $obj-E<gt>B<encode>(%options)
 
 Encode the message to a certain format.  Read the details in the
-dedicated manual page L<Mail::Message::Body::Encode|Mail::Message::Body::Encode>.  The %options which
+dedicated manual page L<Mail::Message::Body::Encode|Mail::Message::Body::Encode>.  The C<%options> which
 can be specified here are those of the L<Mail::Message::Body::encode()|Mail::Message::Body::Encode/"Constructing a body">
-method.  
+method.
 
 =item $obj-E<gt>B<isMultipart>()
 
@@ -656,25 +675,25 @@ which are stored within this message B<except> the multipart and
 message/rfc822 wrappers.  Objects returned are C<Mail::Message>'s and
 L<Mail::Message::Part|Mail::Message::Part>'s.
 
-The option default to 'ALL', which will return the message itself for
+The option default to 'C<ALL>', which will return the message itself for
 single-parts, the nested content of a message/rfc822 object, respectively
-the parts of a multipart without recursion.  In case of 'RECURSE', the
+the parts of a multipart without recursion.  In case of 'C<RECURSE>', the
 parts of multiparts will be collected recursively.  This option cannot
 be combined with the other options, which you may want: it that case
 you have to test yourself.
 
-'ACTIVE' and 'DELETED' check for the deleted flag on messages and
-message parts.  The $filter is a code reference, which is called for
+'C<ACTIVE>' and 'C<DELETED>' check for the deleted flag on messages and
+message parts.  The C<$filter> is a code reference, which is called for
 each part of the message; each part as C<RECURSE> would return.
 
-example: 
+» example: 
 
- my @parts = $msg->parts;           # $msg not multipart: returns ($msg)
- my $parts = $msg->parts('ACTIVE'); # returns ($msg)
+  my @parts = $msg->parts;           # $msg not multipart: returns ($msg)
+  my $parts = $msg->parts('ACTIVE'); # returns ($msg)
 
- $msg->delete;
- my @parts = $msg->parts;           # returns ($msg)
- my $parts = $msg->parts('ACTIVE'); # returns ()
+  $msg->delete;
+  my @parts = $msg->parts;           # returns ($msg)
+  my $parts = $msg->parts('ACTIVE'); # returns ()
 
 =back
 
@@ -685,7 +704,7 @@ example:
 =item $obj-E<gt>B<delete>()
 
 Flag the message to be deleted, which is a shortcut for
- $msg->label(deleted => time);
+  $msg->label(deleted => time);
 The real deletion only takes place on a synchronization of the folder.
 See L<deleted()|Mail::Message/"Flags"> as well.
 
@@ -694,44 +713,44 @@ is not always preserved in the folder (depends on the implementation).
 When the same message is deleted more than once, the first time stamp
 will stay.
 
-example: 
+» example: 
 
- $message->delete;
- $message->deleted(1);  # exactly the same
- $message->label(deleted => 1);
- delete $message;
+  $message->delete;
+  $message->deleted(1);  # exactly the same
+  $message->label(deleted => 1);
+  delete $message;
 
 =item $obj-E<gt>B<deleted>( [BOOLEAN] )
 
 Set the delete flag for this message.  Without argument, the method
-returns the same as L<isDeleted()|Mail::Message/"Flags">, which is preferred.  When a true
+returns the same as L<isDeleted()|Mail::Message/"Flags">, which is preferred.  When a C<true>
 value is given, L<delete()|Mail::Message/"Flags"> is called.
 
-example: 
+» example: 
 
- $message->deleted(1);          # delete
- $message->delete;              # delete (preferred)
+  $message->deleted(1);          # delete
+  $message->delete;              # delete (preferred)
 
- $message->deleted(0);          # undelete
+  $message->deleted(0);          # undelete
 
- if($message->deleted) {...}    # check
- if($message->isDeleted) {...}  # check (preferred)
+  if($message->deleted) {...}    # check
+  if($message->isDeleted) {...}  # check (preferred)
 
 =item $obj-E<gt>B<isDeleted>()
 
 Short-cut for
- $msg->label('deleted')
+  $msg->label('deleted')
 
 For some folder types, you will get the time of deletion in return.  This
 depends on the implementation.
 
-example: 
+» example: 
 
- next if $message->isDeleted;
+  next if $message->isDeleted;
 
- if(my $when = $message->isDeleted) {
-    print scalar localtime $when;
- }
+  if(my $when = $message->isDeleted) {
+     print scalar localtime $when;
+  }
 
 =item $obj-E<gt>B<isModified>()
 
@@ -741,8 +760,8 @@ are changes in header lines, when a new body is set to the message
 
 =item $obj-E<gt>B<label>($label|PAIRS)
 
-Return the value of the $label, optionally after setting some values.  In
-case of setting values, you specify key-value PAIRS.
+Return the value of the C<$label>, optionally after setting some values.  In
+case of setting values, you specify key-value C<PAIRS>.
 
 Labels are used to store knowledge about handling of the message within
 the folder.  Flags about whether a message was read, replied to, or
@@ -753,13 +772,13 @@ Folder types like MH define a separate label file, and Maildir adds
 letters to the message filename.  But the MailBox labels are always the
 same.
 
-example: 
+» example: 
 
- print $message->label('seen');
- if($message->label('seen')) {...};
- $message->label(seen => 1);
+  print $message->label('seen');
+  if($message->label('seen')) {...};
+  $message->label(seen => 1);
 
- $message->label(deleted => 1);  # same as $message->delete
+  $message->label(deleted => 1);  # same as $message->delete
 
 =item $obj-E<gt>B<labels>()
 
@@ -769,7 +788,7 @@ you shall *not* change that data directly: call C<label> for
 changes!
 
 In LIST context, you get a list of names which are defined.  Be warned
-that they will not all evaluate to true, although most of them will.
+that they will not all evaluate to C<true>, although most of them will.
 
 =item $obj-E<gt>B<labelsToStatus>()
 
@@ -820,23 +839,23 @@ Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
 
 =item $obj-E<gt>B<clonedFrom>()
 
-Returns the $message which is the source of this message, which was
-created by a L<clone()|Mail::Message/"Constructors"> operation.
+Returns the message which is the original of this message, when this
+was created by a L<clone()|Mail::Message/"Constructors"> operation.
 
-=item Mail::Message-E<gt>B<coerce>($message, %options)
+=item $class-E<gt>B<coerce>($message, %options)
 
-Coerce a $message into a Mail::Message.  In some occasions, for instance
+Coerce a C<$message> into a L<Mail::Message|Mail::Message>.  In some occasions, for instance
 where you add a message to a folder, this coercion is automatically
 called to ensure that the correct message type is stored.
 
 The coerced message is returned on success, otherwise C<undef>.  The
 coerced message may be a reblessed version of the original message
 or a new object.  In case the message has to be specialized, for
-instance from a general Mail::Message into a L<Mail::Box::Mbox::Message|Mail::Box::Mbox::Message>,
+instance from a general L<Mail::Message|Mail::Message> into a L<Mail::Box::Mbox::Message|Mail::Box::Mbox::Message>,
 no copy is needed.  However, to coerce a L<Mail::Internet|Mail::Internet> object into
-a Mail::Message, a lot of copying and converting will take place.
+a L<Mail::Message|Mail::Message>, a lot of copying and converting will take place.
 
-Valid MESSAGEs which can be coerced into Mail::Message objects
+Valid MESSAGEs which can be coerced into L<Mail::Message|Mail::Message> objects
 are of type
 
 =over 4
@@ -856,50 +875,50 @@ are of type
 L<Mail::Message::Part|Mail::Message::Part>'s, which are extensions of C<Mail::Message>'s,
 can also be coerced directly from a L<Mail::Message::Body|Mail::Message::Body>.
 
-example: 
+» example: 
 
- my $folder  = Mail::Box::Mbox->new;
- my $message = Mail::Message->build(...);
+  my $folder  = Mail::Box::Mbox->new;
+  my $message = Mail::Message->build(...);
 
- my $coerced = Mail::Box::Mbox::Message->coerce($message);
- $folder->addMessage($coerced);
+  my $coerced = Mail::Box::Mbox::Message->coerce($message);
+  $folder->addMessage($coerced);
 
 Simpler replacement for the previous two lines:
 
- my $coerced = $folder->addMessage($message);
+  my $coerced = $folder->addMessage($message);
 
 =item $obj-E<gt>B<isDelayed>()
 
 Check whether the message is delayed (not yet read from file).  Returns
-true or false, dependent on the body type.
+C<true> or C<false>, dependent on the body type.
 
 =item $obj-E<gt>B<readBody>( $parser, $head, [$bodytype] )
 
-Read a body of a message.  The $parser is the access to the folder's
-file, and the $head is already read.  Information from the $head is used
+Read a body of a message.  The C<$parser> is the access to the folder's
+file, and the C<$head> is already read.  Information from the C<$head> is used
 to create expectations about the message's length, but also to determine
 the mime-type and encodings of the body data.
 
-The $bodytype determines which kind of body will be made and defaults to
+The C<$bodytype> determines which kind of body will be made and defaults to
 the value specified by L<new(body_type)|Mail::Message/"Constructors">.
-$bodytype may be the name of a body class, or a reference
-to a routine which returns the body's class when passed the $head as only
+C<$bodytype> may be the name of a body class, or a reference
+to a routine which returns the body's class when passed the C<$head> as only
 argument.
 
 =item $obj-E<gt>B<readFromParser>( $parser, [$bodytype] )
 
-Read one message from file.  The $parser is opened on the file.  First
+Read one message from file.  The C<$parser> is opened on the file.  First
 L<readHead()|Mail::Message/"Internals"> is called, and the head is stored in the message.  Then
 L<readBody()|Mail::Message/"Internals"> is called, to produce a body.  Also the body is added to
 the message without decodings being done.
 
-The optional $bodytype may be a body class or a reference to a code
+The optional C<$bodytype> may be a body class or a reference to a code
 which returns a body-class based on the header.
 
 =item $obj-E<gt>B<readHead>( $parser, [$class] )
 
-Read a head into an object of the specified $class.  The $class defaults to
-L<new(head_type)|Mail::Message/"Constructors">.  The $parser is the access to the folder's file.
+Read a head into an object of the specified C<$class>.  The C<$class> defaults to
+L<new(head_type)|Mail::Message/"Constructors">.  The C<$parser> is the access to the folder's file.
 
 =item $obj-E<gt>B<recursiveRebuildPart>($part, %options)
 
@@ -913,18 +932,18 @@ to the message.  No conversions, no checking.
 
 =item $obj-E<gt>B<takeMessageId>( [STRING] )
 
-Take the message-id from the STRING, or create one when the C<undef>
-is specified.  If not STRING nor C<undef> is given, the current header
+Take the message-id from the C<STRING>, or create one when the C<undef>
+is specified.  If not C<STRING> nor C<undef> is given, the current header
 of the message is requested for the value of the C<'Message-ID'> field.
 
-Angles (if present) are removed from the id. 
+Angles (if present) are removed from the id.
 
 =back
 
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -935,9 +954,7 @@ Inherited, see L<Mail::Message::Construct/"METHODS">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -945,19 +962,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -973,13 +982,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<shortSize>( [$value] )
+=item $any-E<gt>B<shortSize>( [$value] )
 
-=item Mail::Message-E<gt>B<shortSize>( [$value] )
-
-Represent an integer $value representing the size of file or memory,
+Represent an integer C<$value> representing the size of file or memory,
 (which can be large) into a short string using M and K (Megabytes
-and Kilobytes).  Without $value, the size of the message head is used.
+and Kilobytes).  Without C<$value>, the size of the message head is used.
 
 =item $obj-E<gt>B<shortString>()
 
@@ -1000,7 +1007,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -1019,11 +1026,11 @@ This method is only provided to hide differences with messages which are
 located in folders: their L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup"> works quite
 differently.
 
-example: of Mail::Message destruct
+» example: of Mail::Message destruct
 
- my $msg = Mail::Message->read;
- $msg->destruct;
- $msg = undef;    # same
+  my $msg = Mail::Message->read;
+  $msg->destruct;
+  $msg = undef;    # same
 
 =back
 
@@ -1062,13 +1069,13 @@ transport and relations to other messages.
 
 The general idea about the structure of a message is
 
- Mail::Message
-  |  |
-  |  `-has-one--Mail::Message::Body
-  |
-  `----has-one--Mail::Message::Head
-                  |
-                  `-has-many--Mail::Message::Field
+  Mail::Message
+   |  |
+   |  `-has-one--Mail::Message::Body
+   |
+   `----has-one--Mail::Message::Head
+                   |
+                   `-has-many--Mail::Message::Field
 
 However: there are about 7 kinds of body objects, 3 kinds of headers and
 3 kinds of fields.  You will usually not see too much of these kinds,
@@ -1079,13 +1086,13 @@ A multipart body is either a L<Mail::Message::Body::Multipart|Mail::Message::Bod
 (mime type C<multipart/*>) or a L<Mail::Message::Body::Nested|Mail::Message::Body::Nested>
 (mime type C<message/rfc822>).  These bodies are more complex:
 
- Mail::Message::Body::Multipart
-  |
-  `-has-many--Mail::Message::Part
-               |  |
-               |  `-has-one--Mail::Message::Body
-               |
-               `----has-one--Mail::Message::Head
+  Mail::Message::Body::Multipart
+   |
+   `-has-many--Mail::Message::Part
+                |  |
+                |  `-has-one--Mail::Message::Body
+                |
+                `----has-one--Mail::Message::Head
 
 Before you try to reconstruct multiparts or nested messages yourself,
 you can better take a look at L<Mail::Message::Construct::Rebuild|Mail::Message::Construct::Rebuild>.
@@ -1103,26 +1110,26 @@ multipart body.
 
 The message types are:
 
- Mail::Box::Mbox::Message            Mail::Box::POP3::Message
- |  Mail::Box::Dbx::Message      Mail::Box::IMAP4::Message  |
- |  |                                                    |  |
- Mail::Box::File::Message             Mail::Box::Net::Message
-         |                                      |
-         |       Mail::Box::Maildir::Message    |
-         |       |   Mail::Box::MH::Message     |
-         |       |   |                          |
-         |       Mail::Box::Dir::Message        |
-         |                |                     |
-         `------------.   |   .-----------------'
-                      |   |   |
-                   Mail::Box::Message    Mail::Message::Part
-                          |                     |
-                          |       .-------------'
-                          |       |
-                      Mail::Message
-                          |
-                          |
-                    Mail::Reporter (general base class)
+  Mail::Box::Mbox::Message            Mail::Box::POP3::Message
+  |  Mail::Box::Dbx::Message      Mail::Box::IMAP4::Message  |
+  |  |                                                    |  |
+  Mail::Box::File::Message             Mail::Box::Net::Message
+          |                                      |
+          |       Mail::Box::Maildir::Message    |
+          |       |   Mail::Box::MH::Message     |
+          |       |   |                          |
+          |       Mail::Box::Dir::Message        |
+          |                |                     |
+          `------------.   |   .-----------------'
+                       |   |   |
+                    Mail::Box::Message    Mail::Message::Part
+                           |                     |
+                           |       .-------------'
+                           |       |
+                       Mail::Message
+                           |
+                           |
+                     Mail::Reporter (general base class)
 
 By far most folder features are implemented in L<Mail::Box|Mail::Box>, so
 available to all folder types.  Sometimes, features which appear
@@ -1219,15 +1226,27 @@ Mbox folders have no special means of storing information about messages
 adding fields to the message header when something special comes up.
 This feature is also enabled for POP3, although whether that works
 depends on the POP server.
+A mail user agent (MUA) will set this flag when the user has opened the
+message once.
+
+=back
+
+=head3 Status and X-Status fields
+
+Mbox folders have no special means of storing information about messages
+(except the message separator line), and therefore have to revert to
+adding fields to the message header when something special comes up.
+This feature is also enabled for POP3, although whether that works
+depends on the POP server.
 
 All applications which can handle mbox folders support the C<Status> and
 C<X-Status> field convensions.  The following encoding is used:
 
- Flag   Field       Label
- R      Status   => seen    (Read)
- O      Status   => old     (not recent)
- A      X-Status => replied (Answered)
- F      X-Status => flagged
+  Flag   Field       Label
+  R      Status   => seen    (Read)
+  O      Status   => old     (not recent)
+  A      X-Status => replied (Answered)
+  F      X-Status => flagged
 
 There is no special flag for C<deleted>, which most other folders support:
 messages flagged to be deleted will never be written to a folder file when
@@ -1239,15 +1258,19 @@ it is closed.
 
 =item Error: Cannot coerce a $class object into a $class object
 
+Cast by C<coerce()>
+
 =item Error: Cannot include forward source as $include.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Cannot include reply source as $include.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =item Error: Method bounce requires To, Cc, or Bcc
 
@@ -1256,22 +1279,31 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
 The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
 find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
+Cast by C<send()>
 
 =item Error: No rebuild rule $name defined.
+
+Cast by C<rebuild()>
 
 =item Error: Only build() Mail::Message's; they are not in a folder yet
 
@@ -1280,6 +1312,7 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -1288,21 +1321,25 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: coercion starts with some object
+
+Cast by C<coerce()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

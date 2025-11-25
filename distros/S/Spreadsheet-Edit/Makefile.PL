@@ -41,6 +41,7 @@ my %WriteMakefileArgs = (
     "Import::Into" => 0,
     "List::Util" => 0,
     "POSIX" => 0,
+    "Path::Iterator::Rule" => "1.15.0",
     "Path::Tiny" => "0.146",
     "Scalar::Util" => 0,
     "Symbol" => 0,
@@ -83,7 +84,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1000.028",
+  "VERSION" => "1000.029",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -125,6 +126,7 @@ my %FallbackPrereqs = (
   "List::AllUtils" => 0,
   "List::Util" => 0,
   "POSIX" => 0,
+  "Path::Iterator::Rule" => "1.15.0",
   "Path::Tiny" => "0.146",
   "Scalar::Util" => 0,
   "Symbol" => 0,

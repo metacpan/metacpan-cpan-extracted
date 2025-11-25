@@ -4,6 +4,8 @@ author:
   - 'Mark Overmeer'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -25,17 +27,38 @@ requires:
   IO::Socket: '0'
   IO::Socket::IP: '0'
   List::Util: '0'
-  Mail::Box::FastScalar: '3'
-  Mail::Box::Net: '3'
-  Mail::Box::Parser::Perl: '3'
-  Mail::Box::Test: '3'
-  Mail::Reporter: '3'
-  Mail::Transport::Receive: '3'
+  Mail::Box::FastScalar: '>= 3, < 4.0'
+  Mail::Box::Net: '>= 3, < 4.0'
+  Mail::Box::Parser::Perl: '>= 3, < 4.0'
+  Mail::Box::Test: '>= 3, < 4.0'
+  Mail::Reporter: '>= 3, < 4.0'
+  Mail::Transport::Receive: '>= 3, < 4.0'
   Socket: '0'
-  Test::More: '0'
 resources:
+  bugtracker: https://github.com/markov2/perl5-Mail-Box-POP3/issues
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Box-POP3.git
-version: '3.007'
+version: '3.008'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2001
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include:
+    - ../Mail-Box
+    - ../Mail-Message
+    - ../Mail-Transport
+  oodoc_version: 3.05
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/mail-box-pop3/raw
+  release:
+    publish: ../public_html/mail-box-pop3/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

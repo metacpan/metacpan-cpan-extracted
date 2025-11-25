@@ -1,14 +1,17 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Mail-Transport.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Transport version 3.008.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
 
-package Mail::Transport::Exim;
-use vars '$VERSION';
-$VERSION = '3.007';
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+
+package Mail::Transport::Exim;{
+our $VERSION = '3.008';
+}
 
 use base 'Mail::Transport::Send';
 
@@ -16,47 +19,49 @@ use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util  qw/blessed/;
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    $args->{via} = 'exim';
+{	my ($self, $args) = @_;
+	$args->{via} = 'exim';
 
-    $self->SUPER::init($args) or return;
+	$self->SUPER::init($args) or return;
 
-    $self->{MTS_program} = $args->{proxy}
-     || ( -x '/usr/sbin/exim4' ? '/usr/sbin/exim4' : undef)
-     || $self->findBinary('exim', '/usr/exim/bin')
-     || return;
+	$self->{MTS_program} = $args->{proxy}
+		|| ( -x '/usr/sbin/exim4' ? '/usr/sbin/exim4' : undef)
+		|| $self->findBinary('exim', '/usr/exim/bin')
+		or return;
 
-    $self;
+	$self;
 }
 
 
 sub trySend($@)
-{   my ($self, $message, %args) = @_;
+{	my ($self, $message, %args) = @_;
 
-    my $from = $args{from} || $message->sender;
-    $from    = $from->address if ref $from && $from->isa('Mail::Address');
-    my @to   = map $_->address, $self->destinations($message, $args{to});
+	my $from = $args{from} || $message->sender;
+	$from    = $from->address if blessed $from && $from->isa('Mail::Address');
+	my @to   = map $_->address, $self->destinations($message, $args{to});
 
-    my $program = $self->{MTS_program};
-    my $mailer;
-    if(open($mailer, '|-')==0)
-    {   { exec $program, '-i', '-f', $from, @to; }  # {} to avoid warning
-        $self->log(NOTICE => "Errors when opening pipe to $program: $!");
-        exit 1;
-    }
+	my $program = $self->{MTS_program};
+	my $mailer;
+	if(open($mailer, '|-')==0)
+	{	{ exec $program, '-i', '-f', $from, @to; }  # {} to avoid warning
+		$self->log(NOTICE => "Errors when opening pipe to $program: $!");
+		exit 1;
+	}
 
-    $self->putContent($message, $mailer, undisclosed => 1);
+	$self->putContent($message, $mailer, undisclosed => 1);
 
-    unless($mailer->close)
-    {   $self->log(ERROR => "Errors when closing Exim mailer $program: $!");
-        $? ||= $!;
-        return 0;
-    }
+	unless($mailer->close)
+	{	$self->log(ERROR => "Errors when closing Exim mailer $program: $!");
+		$? ||= $!;
+		return 0;
+	}
 
-    1;
+	1;
 }
 
 1;

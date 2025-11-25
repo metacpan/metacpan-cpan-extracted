@@ -13,10 +13,7 @@ use warnings;
 
 use Carp;
 use URI;
-use LWP::UserAgent;
 use Scalar::Util qw(blessed);
-use I18N::LangTags;
-use I18N::LangTags::Detect;
 
 use Data::Identifier;
 
@@ -25,7 +22,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.18;
+our $VERSION = v0.19;
 
 my %names = (
     service => {
@@ -166,9 +163,15 @@ my %service_lists = (
 my %ises;
 
 foreach my $class (keys %names) {
+    my $n = $names{$class};
+
     $ises{$class} = {
-        map {$names{$class}{$_} => $_} keys %{$names{$class}}
+        map {$n->{$_} => $_} keys %{$n}
     };
+
+    foreach my $key (keys %{$n}) {
+        Data::Identifier->new(uuid => $n->{$key}, displayname => $key)->register;
+    }
 }
 
 {
@@ -336,6 +339,8 @@ sub language_tags {
         $self->{language_tags} = \@new_value;
     }
 
+    require I18N::LangTags;
+    require I18N::LangTags::Detect;
     $self->{language_tags} //= [I18N::LangTags::implicate_supers(I18N::LangTags::Detect::detect())];
 
     return @{$self->{language_tags}};
@@ -347,6 +352,7 @@ sub _get_language_tags {
 
     if (defined(my $language_tags = $opts{language_tags})) {
         return @{$language_tags} if ref($language_tags) eq 'ARRAY';
+        require I18N::LangTags;
         return I18N::LangTags::implicate_supers(I18N::LangTags::extract_language_tags($language_tags));
     }
 
@@ -357,6 +363,8 @@ sub _get_language_tags {
 sub _ua {
     my ($self) = @_;
     return $self->{ua} //= do {
+        require LWP::UserAgent;
+
         my $ua = LWP::UserAgent->new(agent => $self->{agent});
         my $x = 1001; # we use 1001 and --$x here instead of 1000 and $x-- as that confuses parsers.
 
@@ -504,7 +512,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.18
+version v0.19
 
 =head1 SYNOPSIS
 

@@ -20,7 +20,7 @@ use version;
 
 # version '...'
 our $version = '0.10';
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.2.0';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -545,18 +545,10 @@ our %EXPORT_TAGS = (
     WriteConsoleOutputCharacterW
   )],
 
-  ALLOC_CONSOLE_ => [qw(
-    ALLOC_CONSOLE_MODE_DEFAULT
-    ALLOC_CONSOLE_MODE_NEW_WINDOW
-    ALLOC_CONSOLE_MODE_NO_WINDOW
-    ALLOC_CONSOLE_RESULT_NO_CONSOLE
-    ALLOC_CONSOLE_RESULT_NEW_CONSOLE
-    ALLOC_CONSOLE_RESULT_EXISTING_CONSOLE
-  )],
-
   Struct => [qw(
     CONSOLE_CURSOR_INFO
     CONSOLE_FONT_INFO
+    CONSOLE_FONT_INFOEX
     CONSOLE_READCONSOLE_CONTROL
     CONSOLE_SCREEN_BUFFER_INFO
     COORD
@@ -568,6 +560,15 @@ our %EXPORT_TAGS = (
     ATTACH_PARENT_PROCESS
     CONSOLE_TEXTMODE_BUFFER
     INVALID_HANDLE_VALUE
+  )],
+
+  ALLOC_CONSOLE_ => [qw(
+    ALLOC_CONSOLE_MODE_DEFAULT
+    ALLOC_CONSOLE_MODE_NEW_WINDOW
+    ALLOC_CONSOLE_MODE_NO_WINDOW
+    ALLOC_CONSOLE_RESULT_NO_CONSOLE
+    ALLOC_CONSOLE_RESULT_NEW_CONSOLE
+    ALLOC_CONSOLE_RESULT_EXISTING_CONSOLE
   )],
 
   CTRL_EVENT_ => [qw(
@@ -680,13 +681,17 @@ our %EXPORT_TAGS = (
 
 # Windows Error Codes
 use constant {
+  ERROR_SUCCESS              => 0x0,
+  ERROR_INVALID_FUNCTION     => 0x1,
   ERROR_INVALID_HANDLE       => 0x6,
-  ERROR_INVALID_DATA         => 0xd,
   ERROR_GEN_FAILURE          => 0x1f,
   ERROR_INVALID_PARAMETER    => 0x57,
   ERROR_CALL_NOT_IMPLEMENTED => 0x78,
   ERROR_PROC_NOT_FOUND       => 0x7f,
   ERROR_BAD_ARGUMENTS        => 0xa0,
+  ERROR_MR_MID_NOT_FOUND     => 0x13d,
+  ERROR_INVALID_VARIANT      => 0x25c,
+  ERROR_INVALID_USER_BUFFER  => 0x6f8,
 };
 
 # GetSystemMetrics
@@ -713,6 +718,8 @@ use constant {
 # AttachConsole/AllocConsoleWithOptions/AllocConsole
 use constant {
   ATTACH_PARENT_PROCESS => -1,
+  STATUS_SUCCESS        => 0,
+  FACILITY_WIN32        => 0x0007,
 };
 
 use constant {
@@ -941,16 +948,16 @@ sub AllocConsole {    # $|undef ()
 # It allocates a console with optional window display settings and returns the 
 # result code.
 #
-#  - $mode: console allocation mode (0 = default, 1 = new window, 2 = no window)
-#  - $show: optional showWindow flag (e.g. C<SW_SHOW>, C<SW_HIDE>)
-#  - \$result: result code (I<ALLOC_CONSOLE_RESULT>)
+#  - C<$mode>: console allocation mode (0 = default, 1 = new window, 2 = no win)
+#  - C<$show>: optional showWindow flag (e.g. C<SW_SHOW>, C<SW_HIDE>)
+#  - C<\$result>: result code (I<ALLOC_CONSOLE_RESULT>)
 #
 # B<Note>: We do not use the I<ALLOC_CONSOLE_OPTIONS> structure. Instead, we 
 # use positional parameters. If $show is defined, it is used as a parameter 
 # for displaying the console window. For more information, see C<ShowWindow>.
 #
 #  Returns: non-zero success, undef on failure
-#  Use C<GetLastError> to retrieve extended error information.
+#  Use GetLastError() to retrieve extended error information.
 #
 # B<Note>: We do not return C<HRESULT>, but instead set C<SetLastError> 
 # (extracting the Win32 error code if C<FACILITY_WIN32> flag is set).
@@ -966,27 +973,23 @@ sub AllocConsoleWithOptions {    # $|undef ($mode, $show|undef, \$result)
         : 0
         ;
   unless (defined $AllocConsoleWithOptions) {
-    $^E = ERROR_PROC_NOT_FOUND;
+    Win32::SetLastError(ERROR_PROC_NOT_FOUND);
     return undef;
   }
   my $use = 0;
   if   ( defined $show ) { $use  = 1 }
   else                   { $show = 0 }
   my $options = pack('LLL', $mode, $use, $show & 0xffff);
-  $$result = 0;
-  my $r = $AllocConsoleWithOptions->Call($options, $$result);
-  unless (defined $r) {
-    $^E = ERROR_GEN_FAILURE;
-    return undef;
-  }
-  if ($r != 0) {
-    my $err = ((($r >> 16) & 0x1fff) == 7)
-            ? ($r & 0xffff)
-            : ERROR_GEN_FAILURE;
-    $^E = $err;
-    return undef;
-  }
-  return 1;
+  my $r = $AllocConsoleWithOptions->Call($options, $$result = 0);
+  my $err = ERROR_GEN_FAILURE;
+  if (defined $r) {
+    return 1 
+      if $r == STATUS_SUCCESS;
+    $err = _HRESULT_CODE($r) 
+      if _HRESULT_FACILITY($r) == FACILITY_WIN32;
+  } 
+  Win32::SetLastError($err);
+  return undef;
 }
 
 ###
@@ -994,7 +997,7 @@ sub AllocConsoleWithOptions {    # $|undef ($mode, $show|undef, \$result)
 # process. Useful for redirecting output/input to an existing console window 
 # (e.g. from a GUI app).
 #
-#  - $pid:  process ID of the target console owner
+#  - C<$pid>: process ID of the target console owner
 #  
 # Use C<ATTACH_PARENT_PROCESS> (-1) to attach to the parent process's console.
 #
@@ -1018,7 +1021,7 @@ sub AttachConsole {    # $|undef ($pid)
 # C<CloseHandle> closes an open console handle (but not only consoles; other 
 # object handles such as files or processes can also be closed).
 #
-#  - $handle: handle to be closed
+#  - C<$handle>: handle to be closed
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1036,8 +1039,8 @@ sub CloseHandle {    # $|undef ($handle)
 # C<CreateConsoleScreenBuffer> creates a new console screen buffer.
 # Useful for off-screen rendering or switching between buffers.
 #
-#  - $access:     desired access (e.g. C<GENERIC_READ | GENERIC_WRITE>)
-#  - $shareMode:  sharing mode (e.g. C<FILE_SHARE_READ | FILE_SHARE_WRITE>)
+#  - C<$access>:    desired access (e.g. C<GENERIC_READ | GENERIC_WRITE>)
+#  - C<$shareMode>: sharing mode (e.g. C<FILE_SHARE_READ | FILE_SHARE_WRITE>)
 #
 #  Returns: handle to the new buffer on success, undef on failure.
 #  Use GetLastError() to retrieve extended error information.
@@ -1060,11 +1063,11 @@ sub CreateConsoleScreenBuffer {    # $|undef ($access, $shareMode)
 # C<FillConsoleOutputAttribute> sets character attributes (e.g. color) in the 
 # console buffer.
 #
-#  - $handle:   Console screen buffer handle
-#  - $attr:     Attribute value (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
-#  - $length:   Number of cells to fill
-#  - \%coord:   Starting coordinate (L</COORD> structure)
-#  - \$written: Number of attributes written
+#  - C<$handle>:   Console screen buffer handle
+#  - C<$attr>:     Attribute value (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
+#  - C<$length>:   Number of cells to fill
+#  - C<\%coord>:   Starting coordinate (L</COORD> structure)
+#  - C<\$written>: Number of attributes written
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1090,11 +1093,11 @@ sub FillConsoleOutputAttribute {    # $|undef ($handle, $attr, $length, \%coord,
 # C<FillConsoleOutputCharacter> writes a repeated character to the console 
 # buffer.
 #
-#  - $handle:   Console screen buffer handle
-#  - $char:     Character to write
-#  - $length:   Number of cells to write the character
-#  - \%coord:   Starting coordinate (L</COORD> structure)
-#  - \$written: Number of characters written
+#  - C<$handle>:   Console screen buffer handle
+#  - C<$char>:     Character to write
+#  - C<$length>:   Number of cells to write the character
+#  - C<\%coord>:   Starting coordinate (L</COORD> structure)
+#  - C<\$written>: Number of characters written
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1152,7 +1155,7 @@ sub FillConsoleOutputCharacterW {    # $|undef ($handle, $char, $length, \%coord
 # C<FlushConsoleInputBuffer> clears all pending input events from the console 
 # input buffer.
 #
-#  - $handle: handle to the console input buffer
+#  - C<$handle>: handle to the console input buffer
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1189,8 +1192,8 @@ sub FreeConsole {    # $|undef ()
 # C<GenerateConsoleCtrlEvent> sends a C<CTRL+C> or C<CTRL+BREAK> signal to a 
 # process group.
 #
-#  - $event:    C<CTRL_C_EVENT> or C<CTRL_BREAK_EVENT>
-#  - $groupId:  Process group ID to receive the signal
+#  - C<$event>:   C<CTRL_C_EVENT> or C<CTRL_BREAK_EVENT>
+#  - C<$groupId>: Process group ID to receive the signal
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1223,8 +1226,8 @@ sub GetConsoleCP {    # $codepage ()
 # C<GetConsoleCursorInfo> retrieves the size and visibility of the console 
 # cursor.
 #
-#  - $handle: Console screen buffer handle
-#  - \%info:  Hash reference to receive a L</CONSOLE_CURSOR_INFO> structure
+#  - C<$handle>: Console screen buffer handle
+#  - C<\%info>:  Hash reference to receive a L</CONSOLE_CURSOR_INFO> structure
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1258,13 +1261,14 @@ sub GetConsoleCursorInfo {    # $|undef ($handle, \%info)
 ###
 # C<GetConsoleDisplayMode> retrieves the display mode of the current console.
 #
-#  - \$flags: Reference to a scalar receiving the display mode
+#  - C<\$flags>: Reference to a scalar receiving the display mode
 #
 #  Returns: non-zero on success, undef on failure.
 #
 # B<Note>: Since ~ Windows 10, the function does not deliver correct results. 
-# If L<Win32::GuiTest> is available, we try to emulate the function by 
-# determining the mode based on the ratio of window size to screen size.
+# If L<Win32::GuiTest> is available (and C<EMULATE_DISPLAY_MODE> is true), we 
+# try to emulate the function by determining the mode based on the ratio of 
+# window size to screen size.
 #
 sub GetConsoleDisplayMode {    # $|undef (\$flags)
   my ($flags) = @_;
@@ -1321,8 +1325,8 @@ sub GetConsoleDisplayMode {    # $|undef (\$flags)
 ###
 # C<GetConsoleFontSize> retrieves the size of the font used by the console.
 #
-#  - $handle: Handle to the console output buffer
-#  - $index:  Index of the font (usually from L</GetCurrentConsoleFont>)
+#  - C<$handle>: Handle to the console output buffer
+#  - C<$index>:  Index of the font (usually from L</GetCurrentConsoleFont>)
 #
 #  Returns: COORD structure with width and height of the font, undef on failure.
 #  Use GetLastError() to retrieve extended error information.
@@ -1331,9 +1335,9 @@ sub GetConsoleDisplayMode {    # $|undef (\$flags)
 # Windows-Terminal. See: https://github.com/microsoft/terminal/issues/6395
 #
 # We therefore calculate the font size based on the pixels of the window 
-# client width and height of the console area using GetClientRect() and 
-# L</GetConsoleScreenBufferInfo>. Prerequisite that C<EMULATE_FONT_SIZE> is 
-# enabled.
+# client width and height of the console area using C<GetClientRect> and 
+# L</GetConsoleScreenBufferInfo> (prerequisite that C<EMULATE_FONT_SIZE> is 
+# enabled).
 #
 sub GetConsoleFontSize {    # \%coord|undef ($handle, $index)
   my ($handle, $index) = @_;
@@ -1392,8 +1396,8 @@ sub GetConsoleFontSize {    # \%coord|undef ($handle, $index)
 ###
 # C<GetConsoleOriginalTitle> retrieves the original title of the console window.
 #
-#  - \$buffer: Reference to a buffer receiving the title string
-#  - $size:    Size of the buffer in characters
+#  - C<\$buffer>: Reference to a buffer receiving the title string
+#  - C<$size>:    Size of the buffer in characters
 #
 #  Returns: number of characters copied, undef on failure.
 #  Use GetLastError() to retrieve extended error information.
@@ -1450,8 +1454,8 @@ sub GetConsoleOriginalTitleW {    # $num|undef ($handle, $index)
 # C<GetConsoleMode> retrieves the current input or output mode of a console 
 # handle.
 #
-#  - $handle: Handle to console input or output
-#  - \$mode:  Reference to a scalar receiving the mode flags
+#  - C<$handle>: Handle to console input or output
+#  - C<\$mode>:  Reference to a scalar receiving the mode flags
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1487,8 +1491,8 @@ sub GetConsoleOutputCP {    # $codepage ()
 # C<GetConsoleScreenBufferInfo> retrieves information about the console screen 
 # buffer.
 #
-#  - $handle:  Handle to the console screen buffer
-#  - \%info:   Reference to L</CONSOLE_SCREEN_BUFFER_INFO> structure
+#  - C<$handle>:  Handle to the console screen buffer
+#  - C<\%info>:   Reference to L</CONSOLE_SCREEN_BUFFER_INFO> structure
 #
 # L</CONSOLE_SCREEN_BUFFER_INFO> structure used by 
 # C<GetConsoleScreenBufferInfo> to receive the information about a console 
@@ -1505,7 +1509,7 @@ sub GetConsoleOutputCP {    # $codepage ()
 #  {dwMaximumWindowSize} Specifies the maximum size the console window can be, 
 #                        based on the current font and screen size (COORD).
 #
-# See L</CONSOLE_SCREEN_BUFFER_INFO> for more information.
+# B<Return>:
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1555,8 +1559,8 @@ sub GetConsoleScreenBufferInfo {    # $|undef ($handle, \%info)
 ###
 # C<GetConsoleTitle> retrieves the title of the current console window.
 #
-#  - \$buffer: Reference to a buffer receiving the title string
-#  - $size:    Size of the buffer in characters
+#  - C<\$buffer>: Reference to a buffer receiving the title string
+#  - C<$size>:    Size of the buffer in characters
 #
 #  Returns: number of characters copied, undef on failure.
 #  Use GetLastError() to retrieve extended error information.
@@ -1642,9 +1646,9 @@ sub GetConsoleWindow {    # $hwnd|undef ()
 ###
 # C<GetCurrentConsoleFont> retrieves information about the current console font.
 #
-#  - $handle: Handle to the console output buffer
-#  - $max:    TRUE to retrieve maximum font size, FALSE for current
-#  - \%info:  HashRef to receive the font information (CONSOLE_FONT_INFO struct)
+#  - C<$handle>: Handle to the console output buffer
+#  - C<$max>:    TRUE to retrieve maximum font size, FALSE for current
+#  - C<\%info>:  L</CONSOLE_FONT_INFO> HashRef to receive the font information
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1698,12 +1702,12 @@ sub GetCurrentConsoleFont {    # $|undef ($handle, $max, \%info)
 # C<GetCurrentConsoleFontEx> retrieves extended information about the current 
 # console font.
 #
-#  - $handle: Handle to the console output buffer
-#  - $max:    TRUE to retrieve maximum font size, FALSE for current
-#  - \%info:  HashRef to receive the information (CONSOLE_FONT_INFOEX struct)
+#  - C<$handle>: Handle to the console output buffer
+#  - C<$max>:    TRUE to retrieve maximum font size, FALSE for current
+#  - C<\%info>:  L</CONSOLE_FONT_INFOEX> HashRef to receive the information
 #
-# B<Note>: C<<$info->{cbSize}>> is set by this function and therefore does not 
-# need to be passed.
+# B<Note>: C<< $info->{cbSize} >> is set by this function and therefore does 
+# not need to be passed.
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -1787,7 +1791,7 @@ sub GetCurrentConsoleFontEx {    # $|undef ($handle, $max, \%info)
 # C<GetLargestConsoleWindowSize> returns the largest possible size for the 
 # console window.
 #
-#  - $handle: handle to the console screen buffer
+#  - C<$handle>: handle to the console screen buffer
 #
 #  Returns: COORD structure with maximum width and height, undef on failure.
 #  Use GetLastError() to retrieve extended error information.
@@ -1808,11 +1812,10 @@ sub GetLargestConsoleWindowSize {    # \%coord|undef ($handle)
 #  Returns: Number of console fonts on success, undef on failure.
 #  Use GetLastError() to retrieve extended error information.
 #
-# B<Note>: This function is not documented and may not work with current 
-# Windows versions.
-#
-# B<Note>: C<GetCurrentConsoleFont> returns the size C<(0,16)> in 
+# B<Notes>: C<GetCurrentConsoleFont> returns the size C<(0,16)> in 
 # Windows-Terminal. See: L</GetConsoleFontSize> for further information.
+# This function is not documented and may not work with current 
+# Windows versions.
 #
 sub GetNumberOfConsoleFonts {    # $num|undef ()
   croak(_usage("$^E", __FILE__, __FUNCTION__)) if 
@@ -1832,8 +1835,8 @@ sub GetNumberOfConsoleFonts {    # $num|undef ()
 # C<GetNumberOfConsoleInputEvents> retrieves the number of unread input events 
 # in the buffer.
 #
-#  - $handle: Handle to the console input buffer
-#  - \$count: Reference to variable receiving the count
+#  - C<$handle>: Handle to the console input buffer
+#  - C<\$count>: Reference to variable receiving the count
 #
 #  Returns: non-zero on success, undef on failure.
 # 
@@ -1855,7 +1858,7 @@ sub GetNumberOfConsoleInputEvents {    # $|undef ($handle, \$count)
 # I<GetStdHandle> retrieves a handle to the standard input, output, or error 
 # device.
 #
-#  - $id: identifier (C<STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE>)
+#  - C<$id>: identifier (e.g. C<STD_INPUT_HANDLE>, see L</":STD_HANDLE_">)
 #
 #  Returns: handle on success, INVALID_HANDLE_VALUE on failure.
 #  Use GetLastError() to retrieve extended error information.
@@ -1876,8 +1879,8 @@ sub GetStdHandle {    # $handle ($id)
 # C<PeekConsoleInput> reads input events from the console input buffer without 
 # removing them.
 #
-#  - $handle,   handle to the console input buffer
-#  - \%buffer,   pointer to INPUT_RECORD array
+#  - C<$handle>:  Handle to the console input buffer
+#  - C<\%buffer>: Reference to a I<INPUT_RECORD> structure
 #
 # I<INPUT_RECORD> structure used by C<PeekConsoleInput> and to represent a 
 # single input event. See L</ReadConsoleInput> for the complete description of 
@@ -2072,11 +2075,11 @@ sub PeekConsoleInputW {    # $|undef ($handle, \%buffer)
 ###
 # C<ReadConsole> reads characters from the console input buffer.
 #
-#  - $handle:   Handle to the console input buffer
-#  - \$buffer:  Reference to buffer receiving the input
-#  - $length:   Number of characters to read
-#  - \$read:    Reference to number of characters actually read
-#  - \%control: Optional hash reference (CONSOLE_READCONSOLE_CONTROL structure)
+#  - C<$handle>:   Handle to the console input buffer
+#  - C<\$buffer>:  Reference to buffer receiving the input
+#  - C<$length>:   Number of characters to read
+#  - C<\$read>:    Reference to number of characters actually read
+#  - C<\%control>: Optional HashRef (L</CONSOLE_READCONSOLE_CONTROL> structure)
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2148,8 +2151,8 @@ sub ReadConsoleW {    # $|undef ($handle, \$buffer, $length, \$read, |\%control|
 # etc.) from the console input buffer. It is useful for handling low-level 
 # console input events in real-time.
 #
-#  - $handle:  Handle to the console input buffer
-#  - \%buffer: Reference to a hash that receives a I<INPUT_RECORD> structure
+#  - C<$handle>:  Handle to the console input buffer
+#  - C<\%buffer>: HashRef that receives a I<INPUT_RECORD> structure
 #
 # I<INPUT_RECORD> structure used by C<ReadConsoleInput> to represent a single 
 # input event. The structure is a union of different event types, distinguished 
@@ -2181,8 +2184,8 @@ sub ReadConsoleW {    # $|undef ($handle, \$buffer, $length, \$read, |\%control|
 #   {dwControlKeyState} Bitmask indicating the state of control keys (SHIFT, 
 #                       CTRL, ALT, CAPSLOCK, etc.)
 #
-# I<MOUSE_EVENT_RECORD> structure used when <{EventType} == MOUSE_EVENT> 
-# (0x0002). Represents a mouse event in the console window.
+# I<MOUSE_EVENT_RECORD> structure used when C<{EventType} == MOUSE_EVENT> 
+# (C<0x0002>). Represents a mouse event in the console window.
 #
 #   {dwMousePosition}   X and Y coordinates of the mouse cursor in the console 
 #                       screen buffer.
@@ -2197,7 +2200,7 @@ sub ReadConsoleW {    # $|undef ($handle, \$buffer, $length, \$read, |\%control|
 #                         0x0008: MOUSE_HWHEELED
 #
 # I<WINDOW_BUFFER_SIZE_RECORD> structure used when 
-# C<{EventType} == WINDOW_BUFFER_SIZE_EVENT> (<0x0004>). Represents a change in 
+# C<{EventType} == WINDOW_BUFFER_SIZE_EVENT> (C<0x0004>). Represents a change in 
 # the size of the console screen buffer.
 #
 #  {dwSize}  New size of the screen buffer (width and height).
@@ -2211,10 +2214,12 @@ sub ReadConsoleW {    # $|undef ($handle, \$buffer, $length, \$read, |\%control|
 #                 menus.
 #
 # I<FOCUS_EVENT_RECORD> structure used when C<{EventType} == FOCUS_EVENT> 
-# (<0x0010>). Indicates a change in focus to or from the console window.
+# (C<0x0010>). Indicates a change in focus to or from the console window.
 #
 #  {bSetFocus}  TRUE if the console window has gained focus,
 #               FALSE if it has lost focus.
+#
+# B<Return>:
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2405,11 +2410,11 @@ sub ReadConsoleInputW {    # $|undef ($handle, \%buffer)
 # C<ReadConsoleOutput> reads character and attribute data from the console 
 # screen buffer.
 #
-#  - $handle:  Handle to the console screen buffer
-#  - \$buffer: Reference to a packed string (of I<CHAR_INFO>'s)
-#  - \%size:   Size of $buffer (L</COORD> hash as width and height)
-#  - \%coord:  Coordinates in $buffer to start reading from (L</COORD> hash)
-#  - \%region: L</SMALL_RECT> hash defining the screen region to read
+#  - C<$handle>:  Handle to the console screen buffer
+#  - C<\$buffer>: Reference to a packed string (of I<CHAR_INFO>'s)
+#  - C<\%size>:   Size of C<$buffer> (L</COORD> hash as width and height)
+#  - C<\%coord>:  Coordinates (L</COORD>) in C<$buffer> to start reading from
+#  - C<\%region>: L</SMALL_RECT> hash defining the screen region to read
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2486,11 +2491,11 @@ sub ReadConsoleOutputW {    # $|undef ($handle, \$buffer, \%size, \%coord, \%reg
 # C<ReadConsoleOutputAttribute> reads character attributes from the console 
 # screen buffer.
 #
-#  - $handle:  Handle to the console screen buffer
-#  - \$buffer: Reference to a packed string (C<S*>) receiving the attributes
-#  - $length:  Number of attributes to read
-#  - \%coord:  Coordinates to start reading from (L</COORD> hash)
-#  - \$read:   Reference to number of attributes read
+#  - C<$handle>:  Handle to the console screen buffer
+#  - C<\$buffer>: Reference to a packed string (C<S*>) receiving the attributes
+#  - C<$length>:  Number of attributes to read
+#  - C<\%coord>:  Coordinates to start reading from (L</COORD> hash)
+#  - C<\$read>:   Reference to number of attributes read
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2515,7 +2520,7 @@ sub ReadConsoleOutputAttribute {    # $|undef ($handle, \$buffer, $length, \%coo
         : 0
         ;
   if ($length > 80*999) {
-    $^E = ERROR_INVALID_DATA;
+    $^E = ERROR_INVALID_USER_BUFFER;
     return undef;
   }
   Win32::SetLastError(0);
@@ -2530,11 +2535,11 @@ sub ReadConsoleOutputAttribute {    # $|undef ($handle, \$buffer, $length, \%coo
 ###
 # C<ReadConsoleOutputCharacter> reads characters from the console screen buffer.
 #
-#  - $handle:  Handle to the console screen buffer
-#  - \$buffer: Reference to buffer receiving characters
-#  - $length:  Number of characters to read
-#  - \%coord:  Coordinates to start reading from (L</COORD> hash)
-#  - \$read:   Reference to number of attributes read
+#  - C<$handle>:  Handle to the console screen buffer
+#  - C<\$buffer>: Reference to buffer receiving characters
+#  - C<$length>:  Number of characters to read
+#  - C<\%coord>:  Coordinates to start reading from (L</COORD> hash)
+#  - C<\$read>:   Reference to number of attributes read
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2563,16 +2568,17 @@ sub ReadConsoleOutputCharacterA {    # $|undef ($handle, \$buffer, $length, \%co
   my $r = UNICODE
     ? $ReadConsoleOutputCharacterA->Call($handle, $$buffer, $length, 
         COORD::pack($coord), $$read = 0)
-    : Win32::Console::_ReadConsoleOutputCharacter($handle, $$buffer, 
+    : do { local $_;
+      $_ = Win32::Console::_ReadConsoleOutputCharacter($handle, $$buffer, 
         $length, COORD::list($coord));
+      $$read = length($$buffer);
+      $_;
+    };
   return undef unless $r;
 
   # Convert the Windows ANSI string to a Perl string (UTF-8)
-  $$buffer = Encode::ANSI::decode(
-    substr($$buffer, 0, UNICODE ? $$read : length($$buffer)), 
-    Win32::GetConsoleOutputCP()
-  );
-  $$read = length($$buffer);
+  $$buffer = Encode::ANSI::decode(substr($$buffer, 0, $$read), 
+    Win32::GetConsoleOutputCP());
   return $r;
 }
 
@@ -2609,11 +2615,11 @@ sub ReadConsoleOutputCharacterW {    # $|undef ($handle, \$buffer, $length, \%co
 ###
 # C<ScrollConsoleScreenBuffer> scrolls a region of the console screen buffer.
 #
-#  - $handle,      Handle to the console screen buffer
-#  - \%scrollRect: L</SMALL_RECT> structure defining the region to scroll
-#  - \%clipRect:   Optional clipping rectangle (SMALL_RECT struct, can be undef)
-#  - \%destCoord:  Destination coordinate (L</COORD> struct)
-#  - $fill:        Packed string of I<CHAR_INFO> used to fill emptied space
+#  - C<$handle>:      Handle to the console screen buffer
+#  - C<\%scrollRect>: L</SMALL_RECT> structure defining the region to scroll
+#  - C<\%clipRect>:   Optional clipping rectangle (L</SMALL_RECT> or C<undef>)
+#  - C<\%destCoord>:  Destination coordinate (L</COORD> struct)
+#  - C<$fill>:        Packed string of I<CHAR_INFO> used to fill emptied space
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2692,7 +2698,7 @@ sub ScrollConsoleScreenBufferW {    # $|undef ($handle, \%scrollRect, \%clipRect
 # C<SetConsoleActiveScreenBuffer> sets the specified screen buffer as the 
 # active one.
 #
-#  - $handle: Handle to the screen buffer to activate
+#  - C<$handle>: Handle to the screen buffer to activate
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2709,7 +2715,7 @@ sub SetConsoleActiveScreenBuffer {    # $|undef ($handle)
 ###
 # C<SetConsoleCP> sets the input code page used by the console.
 #
-#  - $codepage: Code page identifier (e.g. C<65001> for UTF-8)
+#  - C<$codepage>: Code page identifier (e.g. C<65001> for UTF-8)
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2729,8 +2735,8 @@ my (@sigint, @sigbreak);
 # C<SetConsoleCtrlHandler> adds or removes an user-defined I<handler> for 
 # console control events.
 #
-#  - \&handler: Code reference to a handler function (or undef when remove)
-#  - $add:      TRUE to add, FALSE to remove
+#  - C<\&handler>: Code reference to a handler function or C<undef> when remove
+#  - C<$add>:      TRUE to add, FALSE to remove
 #
 # A control signal is passed to the handler as a parameter. If the function 
 # handles the control signal, TRUE should be returned. If FALSE is returned, 
@@ -2788,8 +2794,8 @@ sub SetConsoleCtrlHandler {    # $|undef (\&handler|undef, $add)
 ###
 # C<SetConsoleCursorInfo> sets the size and visibility of the console cursor.
 #
-#  - $handle  Handle to the console screen buffer
-#  - \%info:  Reference to a hash (L</CONSOLE_CURSOR_INFO> structure)
+#  - C<$handle>: Handle to the console screen buffer
+#  - C<\%info>:  Reference to a hash (L</CONSOLE_CURSOR_INFO> structure)
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2809,8 +2815,8 @@ sub SetConsoleCursorInfo {    # $|undef ($handle, \%info)
 # C<SetConsoleCursorPosition> moves the cursor to a specified location in the 
 # console screen buffer.
 #
-#  - $handle: Handle to the console screen buffer
-#  - \%coord: L</COORD> structure specifying the new cursor position
+#  - C<$handle>: Handle to the console screen buffer
+#  - C<\%coord>: L</COORD> structure specifying the new cursor position
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2830,16 +2836,16 @@ sub SetConsoleCursorPosition {    # $|undef ($handle, \%coord)
 # C<SetConsoleDisplayMode> sets the display mode of the specified console 
 # screen buffer.
 #
-#  - $handle: Handle to the console screen buffer
-#  - $flags:  The display mode of the console
-#  - \%coord: COORD structure specifying the new dimensions of the screen buffer
+#  - C<$handle>: Handle to the console screen buffer
+#  - C<$flags>:  The display mode of the console
+#  - C<\%coord>: L</COORD> specifying the new dimensions of the screen buffer
 #
 #  Returns: non-zero on success, undef on failure.
 #
 # B<Note>: If the function is no longer supported by the operating system, 
 # C<GetLastError> returns C<120>. If L<Win32::GuiTest> is available, we 
 # attempt to emulate the behavior of the API function using the C<Alt+Enter> 
-# key combination. See: https://github.com/microsoft/terminal/issues/14885
+# key combination. See: L<https://github.com/microsoft/terminal/issues/14885>
 #
 sub SetConsoleDisplayMode {    # $|undef ($handle, $flags, \%coord)
   my ($handle, $flags, $coord) = @_;
@@ -2897,61 +2903,9 @@ sub SetConsoleDisplayMode {    # $|undef ($handle, $flags, \%coord)
 }
 
 ###
-# C<SetCurrentConsoleFontEx> sets the font used by the console.
-#
-#  - $handle: Handle to the console output buffer
-#  - $max:    TRUE to retrieve maximum font size, FALSE for current
-#  - \%info:  Hash reference to a L</CONSOLE_FONT_INFOEX> structure
-#
-# B<Note>: C<<$info->{cbSize}>> is set by this function and therefore does not 
-# need to be passed.
-#
-#  Returns: non-zero on success, undef on failure.
-#
-sub SetCurrentConsoleFontEx {    # $|undef ($handle, $max, \%info)
-  my ($handle, $max, $info) = @_;
-  croak(_usage("$^E", __FILE__, __FUNCTION__)) if 
-    $^E = @_ != 3 ? ERROR_BAD_ARGUMENTS
-        : !_is_Int($handle)           ? ERROR_INVALID_HANDLE
-        : !_is_Bool($max)             ? ERROR_INVALID_PARAMETER
-        : !CONSOLE_FONT_INFOEX($info) ? ERROR_INVALID_PARAMETER
-        : 0
-        ;
-  unless (defined $SetCurrentConsoleFontEx) {
-    $^E = ERROR_PROC_NOT_FOUND;
-    return undef;
-  }
-
-  # Encode FaceName to WCHAR
-  my $wide = do { local $_;
-    my $err = Win32::GetLastError();    # Encode may set $^E
-    $_ = Encode::encode('UTF-16LE', $info->{FaceName});
-    Win32::SetLastError($err);
-    $_;
-  };
-
-  # Pack the CONSOLE_FONT_INFOEX structure with all required fields:
-  # cbSize (DWORD), nFont (DWORD), dwFontSize.X (SHORT), dwFontSize.Y (SHORT),
-  # FontFamily (UINT), FontWeight (UINT), FaceName (WCHAR[LF_FACESIZE])
-  my $lpFontInfoEx = pack('LLSSLL' . 'a' . (2 * LF_FACESIZE),
-    CONSOLE_FONT_INFOEX_SIZE,                    # Byte size of the structure
-    $info->{nFont},                              # Font index
-    $info->{dwFontSize}{X},                      # Font width
-    $info->{dwFontSize}{Y},                      # Font height
-    $info->{FontFamily},                         # Font family flags
-    $info->{FontWeight},                         # Font weight (e.g. 400, 700)
-    bytes::substr($wide, 0, 2 * LF_FACESIZE),
-  );
-
-  # Call the Windows API SetCurrentConsoleFontEx to apply the font settings
-  my $r = $SetCurrentConsoleFontEx->Call($handle, $max ? 1 : 0, $lpFontInfoEx);
-  return $r ? $r : undef;
-}
-
-###
 # C<SetConsoleIcon> sets the icon for the console window.
 #
-#  - $iconFile: file name to an icon file
+#  - C<$iconFile>: file name to an icon file
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2970,8 +2924,8 @@ sub SetConsoleIcon {    # $|undef ($iconFile)
 ###
 # C<SetConsoleMode> sets the input or output mode of a console handle.
 #
-#  - $handle: Handle to console input or output
-#  - $mode:   Mode flags (e.g. C<ENABLE_ECHO_INPUT>, <ENABLE_PROCESSED_OUTPUT>)
+#  - C<$handle>: Handle to console input or output
+#  - C<$mode>:   Mode flags (e.g. C<ENABLE_ECHO_INPUT>, C<ENABLE_LINE_INPUT>)
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -2989,7 +2943,7 @@ sub SetConsoleMode {    # $|undef ($handle, $mode)
 ###
 # C<SetConsoleOutputCP> sets the output code page used by the console.
 #
-#  - $codepage: Code page identifier (e.g. C<65001> for UTF-8)
+#  - C<$codepage>: Code page identifier (e.g. C<65001> for UTF-8)
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3006,8 +2960,8 @@ sub SetConsoleOutputCP {    # $|undef ($codepage)
 ###
 # C<SetConsoleScreenBufferSize> sets the size of the console screen buffer.
 #
-#  - $handle: Handle to the console screen buffer
-#  - \%size:  L</COORD> structure specifying new width and height
+#  - C<$handle>: Handle to the console screen buffer
+#  - C<\%size>:  L</COORD> structure specifying new width and height
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3027,8 +2981,8 @@ sub SetConsoleScreenBufferSize {    # \%coord|undef ($handle, \%size)
 # C<SetConsoleTextAttribute> sets the text attributes (e.g. color) for 
 # characters written to the console.
 #
-#  - $handle:     Handle to the console screen buffer
-#  - $attributes: Attribute flags (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
+#  - C<$handle>:     Handle to the console screen buffer
+#  - C<$attributes>: Attribute flags (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3047,7 +3001,7 @@ sub SetConsoleTextAttribute {    # \%coord|undef ($handle, $attributes)
 ###
 # C<SetConsoleTitle> sets the title of the console window.
 #
-#  - $title: String to be displayed in the console window title bar
+#  - C<$title>: String to be displayed in the console window title bar
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3092,9 +3046,9 @@ sub SetConsoleTitleW {    # $|undef ($title)
 ###
 # C<SetConsoleWindowInfo> sets the size and position of the console window.
 #
-#  - $handle:   Handle to the console screen buffer
-#  - $absolute: TRUE for absolute coordinates, FALSE for relative
-#  - \%rect:    L</SMALL_RECT> structure defining the new window size
+#  - C<$handle>:   Handle to the console screen buffer
+#  - C<$absolute>: TRUE for absolute coordinates, FALSE for relative
+#  - C<\%rect>:    L</SMALL_RECT> structure defining the new window size
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3111,10 +3065,62 @@ sub SetConsoleWindowInfo {    # \%coord|undef ($handle, $absolute, \%rect)
 }
 
 ###
+# C<SetCurrentConsoleFontEx> sets the font used by the console.
+#
+#  - C<$handle>: Handle to the console output buffer
+#  - C<$max>:    TRUE to retrieve maximum font size, FALSE for current
+#  - C<\%info>:  Hash reference to a L</CONSOLE_FONT_INFOEX> structure
+#
+# B<Note>: C<< $info->{cbSize} >> is set by this function and therefore does 
+# not need to be passed.
+#
+#  Returns: non-zero on success, undef on failure.
+#
+sub SetCurrentConsoleFontEx {    # $|undef ($handle, $max, \%info)
+  my ($handle, $max, $info) = @_;
+  croak(_usage("$^E", __FILE__, __FUNCTION__)) if 
+    $^E = @_ != 3 ? ERROR_BAD_ARGUMENTS
+        : !_is_Int($handle)           ? ERROR_INVALID_HANDLE
+        : !_is_Bool($max)             ? ERROR_INVALID_PARAMETER
+        : !CONSOLE_FONT_INFOEX($info) ? ERROR_INVALID_PARAMETER
+        : 0
+        ;
+  unless (defined $SetCurrentConsoleFontEx) {
+    $^E = ERROR_PROC_NOT_FOUND;
+    return undef;
+  }
+
+  # Encode FaceName to WCHAR
+  my $wide = do { local $_;
+    my $err = Win32::GetLastError();    # Encode may set $^E
+    $_ = Encode::encode('UTF-16LE', $info->{FaceName});
+    Win32::SetLastError($err);
+    $_;
+  };
+
+  # Pack the CONSOLE_FONT_INFOEX structure with all required fields:
+  # cbSize (DWORD), nFont (DWORD), dwFontSize.X (SHORT), dwFontSize.Y (SHORT),
+  # FontFamily (UINT), FontWeight (UINT), FaceName (WCHAR[LF_FACESIZE])
+  my $lpFontInfoEx = pack('LLSSLL' . 'a' . (2 * LF_FACESIZE),
+    CONSOLE_FONT_INFOEX_SIZE,                    # Byte size of the structure
+    $info->{nFont},                              # Font index
+    $info->{dwFontSize}{X},                      # Font width
+    $info->{dwFontSize}{Y},                      # Font height
+    $info->{FontFamily},                         # Font family flags
+    $info->{FontWeight},                         # Font weight (e.g. 400, 700)
+    bytes::substr($wide, 0, 2 * LF_FACESIZE),
+  );
+
+  # Call the Windows API SetCurrentConsoleFontEx to apply the font settings
+  my $r = $SetCurrentConsoleFontEx->Call($handle, $max ? 1 : 0, $lpFontInfoEx);
+  return $r ? $r : undef;
+}
+
+###
 # C<SetStdHandle> sets the handle for standard input, output, or error.
 #
-#  - $id:      Identifier (e.g. C<STD_INPUT_HANDLE>, C<STD_OUTPUT_HANDLE>)
-#  - $handle:  New handle to assign
+#  - C<$id>:     Identifier (e.g. C<STD_INPUT_HANDLE>, C<STD_OUTPUT_HANDLE>)
+#  - C<$handle>: New handle to assign
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3132,9 +3138,9 @@ sub SetStdHandle {    # $handle|undef ($id, $handle)
 ###
 # C<WriteConsole> writes a string of characters to the console output buffer.
 #
-#  - $handle:   Handle to the console output buffer
-#  - $buffer:   String to write
-#  - \$written: Reference to number of characters actually written
+#  - C<$handle>:   Handle to the console output buffer
+#  - C<$buffer>:   String to write
+#  - C<\$written>: Reference to number of characters actually written
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3191,8 +3197,8 @@ sub WriteConsoleW {    # $|undef ($handle, $buffer, \$written)
 ###
 # C<WriteConsoleInput> writes input records to the console input buffer.
 #
-#  - $handle:  Handle to the console input buffer
-#  - \%record: Hash reference to a I<INPUT_RECORD> structure
+#  - C<$handle>:  Handle to the console input buffer
+#  - C<\%record>: Hash reference to a I<INPUT_RECORD> structure
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3264,7 +3270,7 @@ sub WriteConsoleInputA {    # $|undef ($handle, \%record)
       last;
     };
     DEFAULT: {
-      $^E = ERROR_INVALID_DATA;
+      $^E = ERROR_INVALID_VARIANT;
       return undef;
     }
   }
@@ -3331,7 +3337,7 @@ sub WriteConsoleInputW {    # $|undef ($handle, \%record)
       last;
     };
     DEFAULT: {
-      $^E = ERROR_INVALID_DATA;
+      $^E = ERROR_INVALID_VARIANT;
       return undef;
     }
   }
@@ -3346,11 +3352,11 @@ sub WriteConsoleInputW {    # $|undef ($handle, \%record)
 # to a specified rectangular region of a console screen buffer. It is useful 
 # for rendering formatted text directly to the console.
 #
-#  - $handle:  Handle to the console screen buffer
-#  - $buffer:  Packed string of CHAR_INFO's - characters (S) and attributes (S)
-#  - \%size:   Size of $buffer (COORD hash as width and height of CHAR_INFO's)
-#  - \%coord:  Coordinates in $buffer to start writing (L</COORD> hash)
-#  - \%region: SMALL_RECT hash defining the target region in the screen buffer
+#  - C<$handle>:  Handle to the console screen buffer
+#  - C<$buffer>:  Packed string of I<CHAR_INFO>'s - chars (S) and attributes (S)
+#  - C<\%size>:   Size of I<CHAR_INFO>'s' (L<COORD> as width and height)
+#  - C<\%coord>:  Coordinates in the buffer to start writing (L</COORD> hash)
+#  - C<\%region>: L</SMALL_RECT> defining the target region in the screen buffer
 # 
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3428,10 +3434,10 @@ sub WriteConsoleOutputW {   # $|undef ($handle, $buffer, \%size, \%coord, \%regi
 # C<WriteConsoleOutputAttribute> writes character attributes to the console 
 # screen buffer.
 #
-#  - $handle:   Handle to the console screen buffer
-#  - $buffer:   Packed string of attributes (C<S*>)
-#  - \%coord:   Starting coordinate (L</COORD> structure)
-#  - \$written: Reference to number of attributes written
+#  - C<$handle>:   Handle to the console screen buffer
+#  - C<$buffer>:   Packed string of attributes (C<S*>)
+#  - C<\%coord>:   Starting coordinate (L</COORD> structure)
+#  - C<\$written>: Reference to number of attributes written
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3452,7 +3458,7 @@ sub WriteConsoleOutputAttribute {    # $|undef ($handle, $buffer, \%coord, \$wri
         ;
   my $length = bytes::length($buffer);
   if ($length > 80*999) {
-    $^E = ERROR_INVALID_DATA;
+    $^E = ERROR_INVALID_USER_BUFFER;
     return undef;
   }
   Win32::SetLastError(0);
@@ -3465,10 +3471,10 @@ sub WriteConsoleOutputAttribute {    # $|undef ($handle, $buffer, \%coord, \$wri
 ###
 # C<WriteConsoleOutputCharacter> writes characters to the console screen buffer.
 #
-#  - $handle:   Handle to the console screen buffer
-#  - $buffer:   String of characters
-#  - \%coord:   Starting coordinate (L</COORD> structure)
-#  - \$written: Reference to number of attributes written
+#  - C<$handle>:   Handle to the console screen buffer
+#  - C<$buffer>:   String of characters
+#  - C<\%coord>:   Starting coordinate (L</COORD> structure)
+#  - C<\$written>: Reference to number of attributes written
 #
 #  Returns: non-zero on success, undef on failure.
 #
@@ -3836,6 +3842,30 @@ sub COORD::unpack ($) {    # @ ($)
   return unpack('SS', pack('L', $_[0]));
 }
 
+# Decode the ANSI string into a Perl string using the system code page or 
+# C<$codepage>, if specified. 
+#
+# B<Note>: If the code page is CP_UTF8, no conversion takes place, but the UTF8 
+# flag may be set.
+sub Encode::ANSI::decode {    # $str ($ansi, |$codepage)
+  my ($ansi, $cpi) = @_;
+  $cpi ||= CP_ACP;
+  if ($ansi =~ /[^\x00-\x7f]/) {
+    if ($cpi != CP_UTF8) {
+      my $wide = _MultiByteToWideChar($ansi, $cpi);
+      if (defined $wide) {
+        my $err = Win32::GetLastError();    # Encode may set $^E
+        my $str = Encode::decode('UTF-16LE', $wide);
+        Win32::SetLastError($err);
+        return $str;
+      }
+    }
+    _utf8_on($ansi);
+    Win32::SetLastError(0);
+  }
+  return $ansi;
+}
+
 # Use the default system code page if none is specified, and encode the 
 # character string only if the target C<$codepage> is not C<CP_UTF8>.
 #
@@ -3860,30 +3890,6 @@ sub Encode::ANSI::encode {    # $ansi ($str, |$codepage)
     Win32::SetLastError(0);
   }
   return $str;
-}
-
-# Decode the ANSI string into a Perl string using the system code page or 
-# C<$codepage>, if specified. 
-#
-# B<Note>: If the code page is CP_UTF8, no conversion takes place, but the UTF8 
-# flag may be set.
-sub Encode::ANSI::decode {    # $str ($ansi, |$codepage)
-  my ($ansi, $cpi) = @_;
-  $cpi ||= CP_ACP;
-  if ($ansi =~ /[^\x00-\x7f]/) {
-    if ($cpi != CP_UTF8) {
-      my $wide = _MultiByteToWideChar($ansi, $cpi);
-      if (defined $wide) {
-        my $err = Win32::GetLastError();    # Encode may set $^E
-        my $str = Encode::decode('UTF-16LE', $wide);
-        Win32::SetLastError($err);
-        return $str;
-      }
-    }
-    _utf8_on($ansi);
-    Win32::SetLastError(0);
-  }
-  return $ansi;
 }
 
 my $SMALL_RECT; BEGIN { $SMALL_RECT = { 
@@ -3959,48 +3965,21 @@ sub __FUNCTION__ () {    # $subname ()
   return $__func__;
 }
 
-# Get the product name from Windows Registry. Returns undef if an error occurs.
-sub _GetEditionName {    # $|undef ()
-  croak(_usage("$^E", __FILE__, __FUNCTION__)) if 
-    $^E = @_ ? ERROR_BAD_ARGUMENTS
-        : 0
-        ;
-  unless (defined $ProductName) {
-    TRY: eval {
-      require Win32API::Registry;
-      my $hkey;
-      my $path  = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion';
-      my $value = 'ProductName';
+sub _HRESULT_CODE ($) {    # $ ($hr)
+  no warnings;
+  $_[0] & 0xffff;
+}
 
-      # Open registry key
-      my $r = Win32API::Registry::RegOpenKeyEx(
-        Win32API::Registry::HKEY_LOCAL_MACHINE(), $path, 0, 
-          Win32API::Registry::KEY_READ(), $hkey);
-      $^E = Win32API::Registry::regLastError() unless $r;
-      die unless $r;
+sub _HRESULT_FACILITY ($) {    # $ ($hr)
+  no warnings;
+  ($_[0] >> 16) & 0x1fff;
+}
 
-      # Prepare buffer
-      my $data = "\0" x 256;
-      my $size = pack("L", 256);
-      my $type = pack("L", 0);
-
-      # Query value
-      $r = Win32API::Registry::RegQueryValueEx($hkey, $value, [], $type, 
-        $data, $size);
-      my $err = Win32API::Registry::regLastError() unless $r;    # save error code
-      Win32API::Registry::RegCloseKey($hkey);
-      $^E = $err if $err;    # restore old error code if necessary
-      die unless $r;
-
-      # Clean up and return string
-      $data =~ s/\0+$//;
-      $ProductName = $data;
-    };
-    CATCH: if ($@) {
-      $ProductName = '';
-    }
-  }
-  return $ProductName;
+# This sub converts a Win32 error code to an HRESULT
+sub __HRESULT_FROM_WIN32 ($) {
+  no warnings;
+  $_[0] <= 0 ? $_[0] : 
+    (($_[0] & 0x0000ffff) | (FACILITY_WIN32 << 16) | 0x80000000)
 }
 
 # Create a cache so that the search routine does not have to be performed again.
@@ -4059,6 +4038,49 @@ sub _is_Bool ($) {    # $bool ($)
   goto &_is_Bool;
 }
 
+# Get the product name from Windows Registry. Returns undef if an error occurs.
+sub _GetEditionName {    # $|undef ()
+  croak(_usage("$^E", __FILE__, __FUNCTION__)) if 
+    $^E = @_ ? ERROR_BAD_ARGUMENTS
+        : 0
+        ;
+  unless (defined $ProductName) {
+    TRY: eval {
+      require Win32API::Registry;
+      my $hkey;
+      my $path  = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion';
+      my $value = 'ProductName';
+
+      # Open registry key
+      my $r = Win32API::Registry::RegOpenKeyEx(
+        Win32API::Registry::HKEY_LOCAL_MACHINE(), $path, 0, 
+          Win32API::Registry::KEY_READ(), $hkey);
+      $^E = Win32API::Registry::regLastError() unless $r;
+      die unless $r;
+
+      # Prepare buffer
+      my $data = "\0" x 256;
+      my $size = pack("L", 256);
+      my $type = pack("L", 0);
+
+      # Query value
+      $r = Win32API::Registry::RegQueryValueEx($hkey, $value, [], $type, 
+        $data, $size);
+      my $err = Win32API::Registry::regLastError() unless $r;  # save error code
+      Win32API::Registry::RegCloseKey($hkey);
+      $^E = $err if $err;    # restore old error code if necessary
+      die unless $r;
+
+      # Clean up and return string
+      $data =~ s/\0+$//;
+      $ProductName = $data;
+    };
+    CATCH: if ($@) {
+      $ProductName = '';
+    }
+  }
+  return $ProductName;
+}
 
 # Check for code reference.
 # B<Note>: Returns FALSE on objects.
@@ -4107,6 +4129,23 @@ sub _is_Str ($) {    # $bool ($)
     return defined($_[0]) && !ref($_[0]);
   };
   goto &_is_Str;
+}
+
+# Converts a ANSI string in Unicode format (UTF-16).
+# See: L<https://metacpan.org/release/JDB/Win32-0.59/source/Win32.xs#L130>
+sub _MultiByteToWideChar {    # $wstr|undef ($str, |$cp)
+  my ($str, $cp) = @_;
+  return undef unless defined $str;
+  return '' unless $str;
+  $cp = CP_ACP unless defined $cp;
+  my $raw = bytes::substr($str, 0);
+  my $len = bytes::length($raw);
+  my $wlen = $MultiByteToWideChar->Call($cp, 0, $raw, $len, undef, 0) 
+    || return undef;
+  my $wide = "\0" x (2 * $wlen);
+  my $r = $MultiByteToWideChar->Call($cp, 0, $raw, $len, $wide, $wlen) 
+    || return undef;
+  return $wide;
 }
 
 # C<_lock_ref_keys_recure> locks an entire hash and any hashes it references 
@@ -4169,18 +4208,6 @@ sub _usage {    # $string ($message, $filename, $subroutine)
   return $usage;
 }
 
-# Turns the string's internal UTF8 flag on. See: L<Encode/_utf8_on>
-sub _utf8_on ($) {
-  no warnings;
-  # Fallback if the internal routine is no longer available
-  *_utf8_on = Encode->can('_utf8_on') || sub {
-    my $is_utf8 = Encode::is_utf8($_[0]);
-    $_[0] = Encode::decode('UTF-8', $_[0]) unless $is_utf8;
-    return $is_utf8;
-  };
-  goto &_utf8_on;
-}
-
 # Turns the string's internal UTF8 flag off. See: L<Encode/_utf8_off>
 sub _utf8_off ($) {
   no warnings;
@@ -4193,21 +4220,16 @@ sub _utf8_off ($) {
   goto &_utf8_off;
 }
 
-# Converts a ANSI string in Unicode format (UTF-16).
-# See: L<https://metacpan.org/release/JDB/Win32-0.59/source/Win32.xs#L130>
-sub _MultiByteToWideChar {    # $wstr|undef ($str, |$cp)
-  my ($str, $cp) = @_;
-  return undef unless defined $str;
-  return '' unless $str;
-  $cp = CP_ACP unless defined $cp;
-  my $raw = bytes::substr($str, 0);
-  my $len = bytes::length($raw);
-  my $wlen = $MultiByteToWideChar->Call($cp, 0, $raw, $len, undef, 0) 
-    || return undef;
-  my $wide = "\0" x (2 * $wlen);
-  my $r = $MultiByteToWideChar->Call($cp, 0, $raw, $len, $wide, $wlen) 
-    || return undef;
-  return $wide;
+# Turns the string's internal UTF8 flag on. See: L<Encode/_utf8_on>
+sub _utf8_on ($) {
+  no warnings;
+  # Fallback if the internal routine is no longer available
+  *_utf8_on = Encode->can('_utf8_on') || sub {
+    my $is_utf8 = Encode::is_utf8($_[0]);
+    $_[0] = Encode::decode('UTF-8', $_[0]) unless $is_utf8;
+    return $is_utf8;
+  };
+  goto &_utf8_on;
 }
 
 # Converts an Unicode string (UTF-16) to a ANSI string.

@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Body;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Reporter';
@@ -15,207 +18,166 @@ use base 'Mail::Reporter';
 use strict;
 use warnings;
 
-use Mail::Message::Field;
-use Mail::Message::Body::Lines;
-use Mail::Message::Body::File;
-
 use Carp;
 use Scalar::Util     qw/weaken refaddr blessed/;
 use File::Basename   qw/basename/;
 
-use MIME::Types;
+use Mail::Message::Field       ();
+use Mail::Message::Body::Lines ();
+use Mail::Message::Body::File  ();
+
+use MIME::Types      ();
 my $mime_types = MIME::Types->new;
 my $mime_plain = $mime_types->type('text/plain');
 
+#--------------------
 
 use overload
-    bool  => sub {1}   # $body->print if $body
-  , '""'  => 'string_unless_carp'
-  , '@{}' => 'lines'
-  , '=='  => sub {ref $_[1] && refaddr $_[0] == refaddr $_[1]}
-  , '!='  => sub {ref $_[1] && refaddr $_[0] != refaddr $_[1]};
+	bool  => sub {1},   # $body->print if $body
+	'""'  => 'string_unless_carp',
+	'@{}' => 'lines',
+	'=='  => sub {ref $_[1] && refaddr $_[0] == refaddr $_[1]},
+	'!='  => sub {ref $_[1] && refaddr $_[0] != refaddr $_[1]};
 
-#------------------------------------------
-
+#--------------------
 
 my $body_count = 0;  # to be able to compare bodies for equivalence.
 
 sub new(@)
-{   my $class = shift;
+{	my $class = shift;
 
-    return $class->SUPER::new(@_)
-         unless $class eq __PACKAGE__;
+	$class eq __PACKAGE__
+		or return $class->SUPER::new(@_);
 
-    my %args  = @_;
-
-      exists $args{file}
-    ? Mail::Message::Body::File->new(@_)
-    : Mail::Message::Body::Lines->new(@_);
+	my %args  = @_;
+	exists $args{file} ? Mail::Message::Body::File->new(@_) : Mail::Message::Body::Lines->new(@_);
 }
 
 # All body implementations shall implement all of the following!!
-
-sub _data_from_filename(@)   {shift->notImplemented}
-sub _data_from_filehandle(@) {shift->notImplemented}
-sub _data_from_glob(@)       {shift->notImplemented}
-sub _data_from_lines(@)      {shift->notImplemented}
+sub _data_from_filename(@)   { $_[0]->notImplemented }
+sub _data_from_filehandle(@) { $_[0]->notImplemented }
+sub _data_from_lines(@)      { $_[0]->notImplemented }
 
 sub init($)
-{   my ($self, $args) = @_;
+{	my ($self, $args) = @_;
 
-    $self->SUPER::init($args);
+	$self->SUPER::init($args);
 
-    $self->{MMB_modified} = $args->{modified} || 0;
+	$self->{MMB_modified} = $args->{modified} || 0;
 
-    my $filename = $args->{filename};
+	my $filename = $args->{filename};
 	my $mime     = $args->{mime_type};
 
-    if(defined(my $file = $args->{file}))
-    {
-        if(!ref $file)
-        {   $self->_data_from_filename($file) or return;
-            $filename ||= $file;
-            $mime ||= $mime_types->mimeTypeOf($filename)
-                  || (-T $file ? 'text/plain' : 'application/octet-stream');
-        }
-        elsif(ref $file eq 'GLOB')
-        {   $self->_data_from_glob($file) or return }
-        elsif($file->isa('IO::Handle'))
-        {   $self->_data_from_filehandle($file) or return }
-        else
-        {   croak "message body: illegal datatype `".ref($file)."' for file option" }
-    }
-    elsif(defined(my $data = $args->{data}))
-    {
-        if(!ref $data)
-        {   my @lines = split /^/, $data;
-            $self->_data_from_lines(\@lines)
-        }
-        elsif(ref $data eq 'ARRAY')
-        {   $self->_data_from_lines($data) or return;
-        }
-        else
-        {   croak "message body: illegal datatype `".ref($data)."' for data option" }
-    }
-    elsif(! $self->isMultipart && ! $self->isNested)
-    {   # Neither 'file' nor 'data', so empty body.
-        $self->_data_from_lines( [] ) or return;
-    }
+	if(defined(my $file = $args->{file}))
+	{
+		if(!ref $file)
+		{	$self->_data_from_filename($file) or return;
+			$filename ||= $file;
+			$mime ||= $mime_types->mimeTypeOf($filename) || (-T $file ? 'text/plain' : 'application/octet-stream');
+		}
+		elsif(ref $file eq 'GLOB' || (blessed $file && $file->isa('IO::Handle')))
+		{	$self->_data_from_filehandle($file) or return;
+		}
+		else
+		{	croak "message body: illegal datatype `".ref($file)."' for file option";
+		}
+	}
+	elsif(defined(my $data = $args->{data}))
+	{
+		if(!ref $data)
+		{	my @lines = split /^/, $data;
+			$self->_data_from_lines(\@lines)
+		}
+		elsif(ref $data eq 'ARRAY')
+		{	$self->_data_from_lines($data) or return;
+		}
+		else
+		{	croak "message body: illegal datatype `".ref($data)."' for data option";
+		}
+	}
+	elsif(! $self->isMultipart && ! $self->isNested)
+	{	# Neither 'file' nor 'data', so empty body.
+		$self->_data_from_lines( [] ) or return;
+	}
 
-    # Set the content info
+	# Set the content info
 
-    my ($transfer, $disp, $descr, $cid, $lang) = @$args{
-       qw/transfer_encoding disposition description content_id language/ };
+	my ($transfer, $disp, $descr, $cid, $lang) = @$args{
+		qw/transfer_encoding disposition description content_id language/ };
 
-    if(defined $filename)
-    {   $disp //= Mail::Message::Field->new
-          ( 'Content-Disposition' => (-T $filename ? 'inline' : 'attachment')
-          , filename => basename($filename)
-          );
-        $mime //= $mime_types->mimeTypeOf($filename);
-    }
+	if(defined $filename)
+	{	$disp //= Mail::Message::Field->new(
+			'Content-Disposition' => (-T $filename ? 'inline' : 'attachment'),
+			filename => basename($filename)
+		);
+		$mime //= $mime_types->mimeTypeOf($filename);
+	}
 
-    if(ref $mime && $mime->isa('MIME::Type'))
-    {   $mime     = $mime->type;
-    }
+	if(ref $mime && $mime->isa('MIME::Type'))
+	{	$mime     = $mime->type;
+	}
 
-    if(defined(my $based = $args->{based_on}))
-    {   $mime     //= $based->type;
-        $transfer //= $based->transferEncoding;
-        $disp     //= $based->disposition;
-        $descr    //= $based->description;
-        $lang     //= $based->language;
-        $cid      //= $based->contentId;
+	if(defined(my $based = $args->{based_on}))
+	{	$mime     //= $based->type;
+		$transfer //= $based->transferEncoding;
+		$disp     //= $based->disposition;
+		$descr    //= $based->description;
+		$lang     //= $based->language;
+		$cid      //= $based->contentId;
 
-        $self->{MMB_checked}
-          = defined $args->{checked} ? $args->{checked} : $based->checked;
-    }
-    else
-    {   $transfer = $args->{transfer_encoding};
-        $self->{MMB_checked} = $args->{checked} || 0;
-    }
+		$self->{MMB_checked} = exists $args->{checked} ? $args->{checked} : $based->checked;
+	}
+	else
+	{	$transfer = $args->{transfer_encoding};
+		$self->{MMB_checked} = $args->{checked} || 0;
+	}
 
-    $mime ||= 'text/plain';
-    $mime = $self->type($mime);
+	$mime ||= 'text/plain';
+	$mime   = $self->type($mime);
 
-    my $default_charset = exists $args->{charset} ? $args->{charset} : 'PERL';
-    $mime->attribute(charset => $default_charset)
-        if $default_charset
-        && $mime =~ m!^text/!i
-        && !$mime->attribute('charset');
+	my $default_charset = exists $args->{charset} ? $args->{charset} : 'PERL';
+	$mime->attribute(charset => $default_charset)
+		if $default_charset
+		&& $mime =~ m!^text/!i
+		&& !$mime->attribute('charset');
 
-    $self->transferEncoding($transfer) if defined $transfer;
-    $self->disposition($disp)          if defined $disp;
-    $self->description($descr)         if defined $descr;
-    $self->language($lang)             if defined $lang;
-    $self->contentId($cid)             if defined $cid;
-    $self->type($mime);
+	$self->transferEncoding($transfer) if defined $transfer;
+	$self->disposition($disp)          if defined $disp;
+	$self->description($descr)         if defined $descr;
+	$self->language($lang)             if defined $lang;
+	$self->contentId($cid)             if defined $cid;
+	$self->type($mime);
 
-    $self->{MMB_eol}   = $args->{eol} || 'NATIVE';
+	# Set message where the body belongs to.
 
-    # Set message where the body belongs to.
+	$self->message($args->{message})
+		if defined $args->{message};
 
-    $self->message($args->{message})
-        if defined $args->{message};
-
-    $self->{MMB_seqnr} = $body_count++;
-    $self;
+	$self->{MMB_seqnr} = $body_count++;
+	$self;
 }
 
 
 
-sub clone() {shift->notImplemented}
+sub clone() { $_[0]->notImplemented }
 
-#------------------------------------------
-
+#--------------------
 
 sub decoded(@)
-{   my $self = shift;
-    $self->encode(charset => 'PERL', transfer_encoding => 'none', @_);
+{	my $self = shift;
+	$self->encode(charset => 'PERL', transfer_encoding => 'none', @_);
 }
 
-
-sub eol(;$)
-{   my $self = shift;
-    return $self->{MMB_eol} unless @_;
-
-    my $eol  = shift;
-    if($eol eq 'NATIVE')
-    {   $eol = $^O =~ m/^win/i ? 'CRLF'
-             : $^O =~ m/^mac/i ? 'CR'
-             :                   'LF';
-    }
-
-    return $self if $eol eq $self->{MMB_eol} && $self->checked;
-    my $lines = $self->lines;
-    if(@$lines)
-    {   # sometimes texts lack \n on last line
-        $lines->[-1] .= "\n";
-
-
-           if($eol eq 'CR')   {s/[\015\012]+$/\015/     for @$lines}
-        elsif($eol eq 'LF')   {s/[\015\012]+$/\012/     for @$lines}
-        elsif($eol eq 'CRLF') {s/[\015\012]+$/\015\012/ for @$lines}
-        else
-        {   $self->log(WARNING => "Unknown line terminator $eol ignored");
-            return $self->eol('NATIVE');
-        }
-    }
-
-    (ref $self)->new(based_on => $self, eol => $eol, data => $lines);
-}
-
-#------------------------------------------
-
+#--------------------
 
 sub message(;$)
-{   my $self = shift;
-    if(@_)
-    {   if($self->{MMB_message} = shift)
-        {   weaken $self->{MMB_message};
-        }
-    }
-    $self->{MMB_message};
+{	my $self = shift;
+	if(@_)
+	{	if($self->{MMB_message} = shift)
+		{	weaken $self->{MMB_message};
+		}
+	}
+	$self->{MMB_message};
 }
 
 
@@ -229,71 +191,60 @@ sub isNested() {0}
 
 
 sub partNumberOf($)
-{   shift->log(ERROR => 'part number needs multi-part or nested');
-    'ERROR';
+{	shift->log(ERROR => 'part number needs multi-part or nested');
+	'ERROR';
 }
 
-#------------------------------------------
-
+#--------------------
 
 sub type(;$)
-{   my $self = shift;
-    return $self->{MMB_type} if !@_ && defined $self->{MMB_type};
+{	my $self = shift;
+	return $self->{MMB_type} if !@_ && defined $self->{MMB_type};
 
-    delete $self->{MMB_mime};
-    my $type =  shift // 'text/plain';
+	delete $self->{MMB_mime};
+	my $type = shift // 'text/plain';
 
-    $self->{MMB_type} = ref $type ? $type->clone
-      : Mail::Message::Field->new('Content-Type' => $type);
+	$self->{MMB_type} = ref $type ? $type->clone : Mail::Message::Field->new('Content-Type' => $type);
 }
 
 
 sub mimeType()
-{   my $self  = shift;
-    return $self->{MMB_mime} if exists $self->{MMB_mime};
+{	my $self  = shift;
+	return $self->{MMB_mime} if exists $self->{MMB_mime};
 
-    my $field = $self->{MMB_type};
-    my $body  = defined $field ? $field->body : '';
-
-    return $self->{MMB_mime} = $mime_plain
-       unless length $body;
-
-    $self->{MMB_mime}
-       = $mime_types->type($body) || MIME::Type->new(type => $body);
+	my $field = $self->{MMB_type};
+	my $body  = defined $field ? $field->body : '';
+	$self->{MMB_mime} = length $body ? ($mime_types->type($body) || MIME::Type->new(type => $body)) : $mime_plain;
 }
 
 
-sub charset() { shift->type->attribute('charset') }
+sub charset() { $_[0]->type->attribute('charset') }
 
 
 sub transferEncoding(;$)
-{   my $self = shift;
-    return $self->{MMB_transfer} if !@_ && defined $self->{MMB_transfer};
+{	my $self = shift;
+	return $self->{MMB_transfer} if !@_ && defined $self->{MMB_transfer};
 
-    my $set = defined $_[0] ? shift : 'none';
-    $self->{MMB_transfer} = ref $set ? $set->clone
-       : Mail::Message::Field->new('Content-Transfer-Encoding' => $set);
+	my $set = shift // 'none';
+	$self->{MMB_transfer} = blessed $set ? $set->clone : Mail::Message::Field->new('Content-Transfer-Encoding' => $set);
 }
 
 
 sub description(;$)
-{   my $self = shift;
-    return $self->{MMB_description} if !@_ && $self->{MMB_description};
+{	my $self = shift;
+	return $self->{MMB_description} if !@_ && $self->{MMB_description};
 
-    my $disp = defined $_[0] ? shift : 'none';
-    $self->{MMB_description} = ref $disp ? $disp->clone
-      : Mail::Message::Field->new('Content-Description' => $disp);
+	my $disp = shift // 'none';
+	$self->{MMB_description} = blessed $disp ? $disp->clone : Mail::Message::Field->new('Content-Description' => $disp);
 }
 
 
 sub disposition(;$)
-{   my $self = shift;
-    return $self->{MMB_disposition} if !@_ && $self->{MMB_disposition};
+{	my $self = shift;
+	return $self->{MMB_disposition} if !@_ && $self->{MMB_disposition};
 
-    my $disp = defined $_[0] ? shift : 'none';
-
-    $self->{MMB_disposition} = blessed $disp ? $disp->clone
-      : Mail::Message::Field->new('Content-Disposition' => $disp);
+	my $disp = shift // 'none';
+	$self->{MMB_disposition} = blessed $disp ? $disp->clone : Mail::Message::Field->new('Content-Disposition' => $disp);
 }
 
 
@@ -304,176 +255,172 @@ sub language(@)
 	my $langs
 	  = @_ > 1        ? (join ', ', @_)
 	  : blessed $_[0] ? $_[0]
-	  : ref $_[0] eq 'ARRAY' ? (join ', ', @{$_[0]}) : $_[0];
+	  : ref $_[0] eq 'ARRAY' ? (join ', ', @{$_[0]})
+	  :    $_[0];
 
-	$self->{MMB_lang} = ! defined $langs || ! length $langs ? undef
+	$self->{MMB_lang}
+	  = ! defined $langs || ! length $langs ? undef
 	  : blessed $langs ? $langs->clone
-	  : Mail::Message::Field->new('Content-Language' => $langs);
+	  :    Mail::Message::Field->new('Content-Language' => $langs);
 }
 
 
 sub contentId(;$)
-{   my $self = shift;
-    return $self->{MMB_id} if !@_ && $self->{MMB_id};
+{	my $self = shift;
+	return $self->{MMB_id} if !@_ && $self->{MMB_id};
 
-    my $cid = defined $_[0] ? shift : 'none';
-    $self->{MMB_id} = ref $cid ? $cid->clone
-      : Mail::Message::Field->new('Content-ID' => $cid);
+	my $cid = shift // 'none';
+	$self->{MMB_id} = blessed $cid ? $cid->clone : Mail::Message::Field->new('Content-ID' => $cid);
 }
 
 
 sub checked(;$)
-{   my $self = shift;
-    @_ ? ($self->{MMB_checked} = shift) : $self->{MMB_checked};
+{	my $self = shift;
+	@_ ? ($self->{MMB_checked} = shift) : $self->{MMB_checked};
 }
 
 
-sub nrLines(@)  {shift->notImplemented}
+sub nrLines(@)  { $_[0]->notImplemented }
 
 
-sub size(@)  {shift->notImplemented}
+sub size(@)  { $_[0]->notImplemented }
 
-#------------------------------------------
+#--------------------
 
-
-sub string() {shift->notImplemented}
+sub string() { $_[0]->notImplemented }
 
 sub string_unless_carp()
-{   my $self  = shift;
-    return $self->string unless (caller)[0] eq 'Carp';
+{	my $self  = shift;
+	(caller)[0] eq 'Carp' or return $self->string;
 
-    (my $class = ref $self) =~ s/^Mail::Message/MM/;
-    "$class object";
+	my $class = ref $self =~ s/^Mail::Message/MM/r;
+	"$class object";
 }
 
 
-sub lines() {shift->notImplemented}
+sub lines() { $_[0]->notImplemented }
 
 
-sub file(;$) {shift->notImplemented}
+sub file(;$) { $_[0]->notImplemented }
 
 
-sub print(;$) {shift->notImplemented}
+sub print(;$) { $_[0]->notImplemented }
 
 
-sub printEscapedFrom($) {shift->notImplemented}
+sub printEscapedFrom($) { $_[0]->notImplemented }
 
 
 sub write(@)
-{   my ($self, %args) = @_;
-    my $filename = $args{filename};
-    die "No filename for write() body" unless defined $filename;
+{	my ($self, %args) = @_;
+	my $filename = $args{filename}
+		or die "No filename for write() body";
 
-    open OUT, '>', $filename or return;
-    $self->print(\*OUT);
-    close OUT or return undef;
-    $self;
+	open my $out, '>', $filename or return;
+	$self->print($out);
+	$out->close or return undef;
+	$self;
 }
 
 
-sub endsOnNewline() {shift->notImplemented}
+sub endsOnNewline() { $_[0]->notImplemented }
 
 
-sub stripTrailingNewline() {shift->notImplemented}
+sub stripTrailingNewline() { $_[0]->notImplemented }
 
-#------------------------------------------
+#--------------------
 
-
-sub read(@) {shift->notImplemented}
+sub read(@) { $_[0]->notImplemented }
 
 
 sub contentInfoTo($)
-{   my ($self, $head) = @_;
-    return unless defined $head;
+{	my ($self, $head) = @_;
+	return unless defined $head;
 
-    my $lines  = $self->nrLines;
-    my $size   = $self->size;
-    $size     += $lines if $Mail::Message::crlf_platform;
+	my $lines  = $self->nrLines;
+	my $size   = $self->size;
+	$size     += $lines if $Mail::Message::crlf_platform;
 
-    $head->set($self->type);
-    $head->set($self->transferEncoding);
-    $head->set($self->disposition);
-    $head->set($self->description);
-    $head->set($self->language);
-    $head->set($self->contentId);
-    $self;
+	$head->set($self->type);
+	$head->set($self->transferEncoding);
+	$head->set($self->disposition);
+	$head->set($self->description);
+	$head->set($self->language);
+	$head->set($self->contentId);
+	$self;
 }
 
 
 sub contentInfoFrom($)
-{   my ($self, $head) = @_;
+{	my ($self, $head) = @_;
 
-    $self->type($head->get('Content-Type', 0));
+	$self->type($head->get('Content-Type', 0));
 
-    my ($te, $disp, $desc, $cid, $lang)
-      = map { my $x = $head->get("Content-$_") || '';
-              s/^\s+//,s/\s+$// for $x;
-              length $x ? $x : undef
-            } qw/Transfer-Encoding Disposition Description ID Language/;
+	my ($te, $disp, $desc, $cid, $lang) = map {
+		my $x = $head->get("Content-$_") || '';
+		s/^\s+//,s/\s+$// for $x;
+		length $x ? $x : undef;
+	} qw/Transfer-Encoding Disposition Description ID Language/;
 
-    $self->transferEncoding($te);
-    $self->disposition($disp);
-    $self->description($desc);
-    $self->language($lang);
-    $self->contentId($cid);
+	$self->transferEncoding($te);
+	$self->disposition($disp);
+	$self->description($desc);
+	$self->language($lang);
+	$self->contentId($cid);
 
-    delete $self->{MMB_mime};
-    $self;
+	delete $self->{MMB_mime};
+	$self;
 
 }
 
 
 sub modified(;$)
-{  my $self = shift;
-   return $self->isModified unless @_;  # compat 2.036
-   $self->{MMB_modified} = shift;
+{	my $self = shift;
+	@_ or return $self->isModified;  # compat 2.036
+	$self->{MMB_modified} = shift;
 }
 
 
-sub isModified() { shift->{MMB_modified} }
+sub isModified() { $_[0]->{MMB_modified} }
 
 
 sub fileLocation(;@)
-{   my $self = shift;
-    return @$self{ qw/MMB_begin MMB_end/ } unless @_;
-    @$self{ qw/MMB_begin MMB_end/ } = @_;
+{	my $self = shift;
+	@_ or return @$self{ qw/MMB_begin MMB_end/ };
+	@$self{ qw/MMB_begin MMB_end/ } = @_;
 }
 
 
 sub moveLocation($)
-{   my ($self, $dist) = @_;
-    $self->{MMB_begin} -= $dist;
-    $self->{MMB_end}   -= $dist;
-    $self;
+{	my ($self, $dist) = @_;
+	$self->{MMB_begin} -= $dist;
+	$self->{MMB_end}   -= $dist;
+	$self;
 }
 
 
-sub load() {shift}
+sub load() { $_[0] }
 
-#------------------------------------------
+#--------------------
 
-
-my @in_encode = qw/check encode encoded eol isBinary isText unify
-                   dispositionFilename/;
-my %in_module = map { ($_ => 'encode') } @in_encode;
+my @in_encode = qw/check encode encoded eol isBinary isText unify dispositionFilename/;
+my %in_module = map +($_ => 'encode'), @in_encode;
 
 sub AUTOLOAD(@)
-{   my $self  = shift;
-    our $AUTOLOAD;
-    (my $call = $AUTOLOAD) =~ s/.*\:\://g;
+{	my $self  = shift;
+	our $AUTOLOAD;
+	my $call = $AUTOLOAD =~ s/.*\:\://gr;
 
-    my $mod = $in_module{$call} || 'construct';
-    if($mod eq 'encode'){ require Mail::Message::Body::Encode    }
-    else                { require Mail::Message::Body::Construct }
+	my $mod = $in_module{$call} || 'construct';
+	if($mod eq 'encode') { require Mail::Message::Body::Encode    }
+	else                 { require Mail::Message::Body::Construct }
 
-    no strict 'refs';
-    return $self->$call(@_) if $self->can($call);  # now loaded
+	no strict 'refs';
+	return $self->$call(@_) if $self->can($call);  # now loaded
 
 	# AUTOLOAD inheritance is a pain
 	confess "Method $call() is not defined for a ", ref $self;
 }
 
-#------------------------------------------
-
+#--------------------
 
 1;

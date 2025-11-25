@@ -12,15 +12,15 @@ Mail::Message::Body::Multipart - body of a message with attachments
 
 =head1 SYNOPSIS
 
- See Mail::Message::Body
+  See Mail::Message::Body
 
- if($body->isMultipart) {
-    my @attachments = $body->parts;
-    my $attachment3 = $body->part(2);
-    my $before      = $body->preamble;
-    my $after       = $body->epilogue;
-    $body->part(1)->delete;
- }
+  if($body->isMultipart) {
+     my @attachments = $body->parts;
+     my $attachment3 = $body->part(2);
+     my $before      = $body->preamble;
+     my $after       = $body->epilogue;
+     $body->part(1)->delete;
+  }
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,7 @@ manual-page you find the description of extra functionality you have
 when a message contains attachments (parts).
 
 The number of multipart alternatives is growing.  A full list is maintained
-by IANA af F<http://www.iana.org/assignments/media-types/media-types.xhtml#multipart>
+by IANA af L<https://www.iana.org/assignments/media-types/media-types.xhtml#multipart>
 
 =over 4
 
@@ -50,26 +50,26 @@ by IANA af F<http://www.iana.org/assignments/media-types/media-types.xhtml#multi
 =back
 
 Extends L<"DESCRIPTION" in Mail::Message::Body|Mail::Message::Body/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Message::Body|Mail::Message::Body/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
 Inherited, see L<Mail::Message::Body/"OVERLOADED">
 
-=item overload: B<'==' and '!='>
+=item overload: B<'=='> numerical comparison
 
 Inherited, see L<Mail::Message::Body/"OVERLOADED">
 
-=item overload: B<@{}>
+=item overload: B<@{}> addressed as array
 
 Inherited, see L<Mail::Message::Body/"OVERLOADED">
 
-=item overload: B<bool>
+=item overload: B<bool> true/false
 
 Inherited, see L<Mail::Message::Body/"OVERLOADED">
 
@@ -78,24 +78,26 @@ Inherited, see L<Mail::Message::Body/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Body|Mail::Message::Body/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Body|Mail::Message::Body/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>()
 
 Inherited, see L<Mail::Message::Body/"Constructors">
 
-=item Mail::Message::Body::Multipart-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Message::Body/"Constructors">
 
  -Option           --Defined in         --Default
   based_on           Mail::Message::Body  undef
   boundary                                undef
   charset            Mail::Message::Body  'PERL'
-  checked            Mail::Message::Body  <false>
+  checked            Mail::Message::Body  false
   content_id         Mail::Message::Body  undef
   data               Mail::Message::Body  undef
   description        Mail::Message::Body  undef
@@ -108,7 +110,7 @@ Inherited, see L<Mail::Message::Body/"Constructors">
   log                Mail::Reporter       'WARNINGS'
   message            Mail::Message::Body  undef
   mime_type          Mail::Message::Body  'multipart/mixed'
-  modified           Mail::Message::Body  <false>
+  modified           Mail::Message::Body  <C<false>>
   parts                                   undef
   preamble                                undef
   trace              Mail::Reporter       'WARNINGS'
@@ -118,11 +120,12 @@ Inherited, see L<Mail::Message::Body/"Constructors">
 
 =item based_on => BODY
 
-=item boundary => STRING
+=item boundary => $separator
 
-Separator to be used between parts of the message.  This separator must
-be unique in case the message contains nested multiparts (which are not
-unusual).  If C<undef>, a nice unique boundary will be generated.
+The C<$separator> string to be used between parts of the message.
+This separator must be unique in case the message contains nested
+multiparts (which are not unusual).  If C<undef>, a nice unique boundary
+will be generated.
 
 =item charset => CHARSET|'PERL'|<undef>
 
@@ -138,13 +141,13 @@ unusual).  If C<undef>, a nice unique boundary will be generated.
 
 =item eol => 'CR'|'LF'|'CRLF'|'NATIVE'
 
-=item epilogue => BODY|STRING
+=item epilogue => $body|$text
 
 The text which is included in the main body after the final boundary.  This
 is usually empty, and has no meaning.
 
-Provide a BODY object or a STRING which will automatically translated
-into a C<text/plain> body.
+Provide a C<$body> object or plain C<$text> (which will automatically translated
+into a C<text/plain> body).
 
 =item file => FILENAME|FILEHANDLE|IOHANDLE
 
@@ -160,25 +163,25 @@ into a C<text/plain> body.
 
 =item modified => BOOLEAN
 
-=item parts => ARRAY-OF-(MESSAGES|BODIES)
+=item parts => [$message, $body, ...]
 
 Specifies an initial list of parts in this body.  These may be full
-MESSAGES, or BODIES which transformed into messages before use.  Each
-message is coerced into a L<Mail::Message::Part|Mail::Message::Part> object.
+C<$message> objects, or C<$body> objects which will be transformed into messages
+before use.  Each message is coerced into a L<Mail::Message::Part|Mail::Message::Part> object.
 
 MIME::Entity and L<Mail::Internet|Mail::Internet> objects are acceptable in the
 list, because they are coercible into L<Mail::Message::Part|Mail::Message::Part>'s.  Values
 of C<undef> will be skipped silently.
 
-=item preamble => BODY|STRING
+=item preamble => $body|$text
 
-The text which is included in the body before the first part.  It is
+The C<$text> which is included in the body before the first part.  It is
 common use to include a text to warn the user that the message is a
 multipart.  However, this was useful in earlier days: most mail
 agents are very capable in warning the user themselves.
 
-Provide a BODY object or a STRING which will automatically translated
-into a text/plain body.
+Provide a C<$body> object or plain C<$text> (which will automatically translated
+into a C<text/plain> body).
 
 =item trace => LEVEL
 
@@ -186,38 +189,51 @@ into a text/plain body.
 
 =back
 
-example: 
+» example: 
 
- my $intro = Mail::Message::Body->new(data => ['part one']);
- my $pgp   = Mail::Message::Body->new(data => ['part three']);
+  my $intro = Mail::Message::Body->new(data => ['part one']);
+  my $pgp   = Mail::Message::Body->new(data => ['part three']);
 
- my $body  = Mail::Message::Body::Multipart->new
-   ( boundary => time . '--it-s-mine'
-   , preamble => "This is a multi-part message in MIME format.\n\n"
-   , parts    => [ $intro, $folder->message(3)->decoded, $pgp ]
-   );
+  my $body  = Mail::Message::Body::Multipart->new(
+    boundary => time . '--it-s-mine',
+    preamble => "This is a multi-part message in MIME format.\n\n",
+    parts    => [ $intro, $folder->message(3)->decoded, $pgp ],
+  );
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Body|Mail::Message::Body/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
+
+Inherited, see L<Mail::Message::Body::Encode/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 Constructing a body
 
 Extends L<"Constructing a body" in Mail::Message::Body|Mail::Message::Body/"Constructing a body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<attach>($messages|$bodies)
 
-Attach a list of $messages to this multipart.  A new body is returned.
-When you specify $bodies, they will first be translated into
+Attach a list of C<$messages> to this multipart.  A new body is returned.
+When you specify C<$bodies>, they will first be translated into
 real messages.  MIME::Entity and L<Mail::Internet|Mail::Internet> objects may be
 specified too.  In any case, the parts will be coerced into
 L<Mail::Message::Part|Mail::Message::Part>'s.
+Improves base, see L<Mail::Message::Body::Construct/"Constructing a body">
 
 =item $obj-E<gt>B<charsetDetect>(%options)
-
-Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
-
-=item Mail::Message::Body::Multipart-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
@@ -225,7 +241,7 @@ Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
-=item $obj-E<gt>B<concatenate>($components)
+=item $obj-E<gt>B<concatenate>(@components)
 
 Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
 
@@ -243,37 +259,39 @@ Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
 =item $obj-E<gt>B<eol>( ['CR'|'LF'|'CRLF'|'NATIVE'] )
 
-Inherited, see L<Mail::Message::Body/"Constructing a body">
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
 =item $obj-E<gt>B<foreachComponent>(CODE)
 
-Execute the CODE for each component of the message: the preamble, the
+Execute the C<CODE> for each component of the message: the preamble, the
 epilogue, and each of the parts.
 
-Each component is a body and is passed as second argument to the CODE.
-The first argument is a reference to this multi-parted body.  The CODE
+Each component is a body and is passed as second argument to the C<CODE>.
+The first argument is a reference to this multi-parted body.  The C<CODE>
 returns a body object.  When any of the returned bodies differs from
 the body which was passed, then a new multi-part body will be returned.
 Reference to the not-changed bodies and the changed bodies will be
 included in that new multi-part.
 
-example: 
+» example: 
 
- my $checked = $multi->foreachComponent(sub {$_[1]->check});
+  my $checked = $multi->foreachComponent(sub {$_[1]->check});
 
 =item $obj-E<gt>B<foreachLine>((CODE))
 
 It is NOT possible to call some code for each line of a multipart,
 because that would not only inflict damage to the body of each
 message part, but also to the headers and the part separators.
+Improves base, see L<Mail::Message::Body::Construct/"Constructing a body">
 
 =item $obj-E<gt>B<stripSignature>(%options)
 
 Removes all parts which contains data usually defined as being signature.
 The L<MIME::Type|MIME::Type> module provides this knowledge.  A new multipart is
-returned, containing the remaining parts.  No %options are defined yet,
+returned, containing the remaining parts.  No C<%options> are defined yet,
 although some may be specified, because this method overrules the
 C<stripSignature> method for normal bodies.
+Improves base, see L<Mail::Message::Body::Construct/"Constructing a body">
 
  -Option     --Defined in                    --Default
   max_lines    Mail::Message::Body::Construct  10
@@ -299,7 +317,7 @@ Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 =head2 The body
 
 Extends L<"The body" in Mail::Message::Body|Mail::Message::Body/"The body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<isDelayed>()
@@ -327,7 +345,7 @@ Inherited, see L<Mail::Message::Body/"The body">
 =head2 About the payload
 
 Extends L<"About the payload" in Mail::Message::Body|Mail::Message::Body/"About the payload">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<charset>()
@@ -391,14 +409,14 @@ Inherited, see L<Mail::Message::Body/"About the payload">
 =head2 Access to the payload
 
 Extends L<"Access to the payload" in Mail::Message::Body|Mail::Message::Body/"Access to the payload">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<boundary>( [STRING] )
 
 Returns the boundary which is used to separate the parts in this
 body.  If none was read from file, then one will be assigned.  With
-STRING you explicitly set the boundary to be used.
+C<STRING> you explicitly set the boundary to be used.
 
 =item $obj-E<gt>B<endsOnNewline>()
 
@@ -421,33 +439,33 @@ Inherited, see L<Mail::Message::Body/"Access to the payload">
 
 =item $obj-E<gt>B<part>($index)
 
-Returns only the part with the specified $index.  You may use a negative
+Returns only the part with the specified C<$index>.  You may use a negative
 value here, which counts from the back in the list.  Parts which are
 flagged to be deleted are included in the count.
 
-example: 
+» example: 
 
- $message->body->part(2)->print;
- $body->part(1)->delete;
+  $message->body->part(2)->print;
+  $body->part(1)->delete;
 
 =item $obj-E<gt>B<parts>( [<'ALL'|'ACTIVE'|'DELETED'|'RECURSE'|$filter>] )
 
-Return all parts by default, or when ALL is specified.  C<ACTIVE> returns
+Return all parts by default, or when C<ALL> is specified.  C<ACTIVE> returns
 the parts which are not flagged for deletion, as opposite to C<DELETED>.
 C<RECURSE> descents into all nested multiparts to collect all parts.
 
 You may also specify a code reference which is called for each nested
 part.  The first argument will be the message part.  When the code
-returns true, the part is incorporated in the return list.
+returns C<true>, the part is incorporated in the return list.
 
-example: 
+» example: 
 
- print "Number of attachments: ",
+  print "Number of attachments: ",
      scalar $message->body->parts('ACTIVE');
 
- foreach my $part ($message->body->parts) {
+  foreach my $part ($message->body->parts) {
      print "Type: ", $part->get('Content-Type');
- }
+  }
 
 =item $obj-E<gt>B<preamble>()
 
@@ -481,12 +499,10 @@ Inherited, see L<Mail::Message::Body/"Access to the payload">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message::Body|Mail::Message::Body/"Internals">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
-
-=item Mail::Message::Body::Multipart-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+=item $any-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
 
 Inherited, see L<Mail::Message::Body::Encode/"Internals">
 
@@ -531,7 +547,7 @@ Inherited, see L<Mail::Message::Body/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Body|Mail::Message::Body/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -542,9 +558,7 @@ Inherited, see L<Mail::Message::Body/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Body::Multipart-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -552,19 +566,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Body::Multipart-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Body::Multipart-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -593,7 +599,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Body|Mail::Message::Body/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -605,7 +611,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message::Body|Mail::Message::Body/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -614,21 +620,29 @@ Extends L<"DETAILS" in Mail::Message::Body|Mail::Message::Body/"DETAILS">.
 
 The encoding or decoding of a message body encounters a character set which
 is not understood by Perl's Encode module.
+Cast by C<encode()>
+
+=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
+
+Cast by C<encode()>
 
 =item Error: Data not convertible to a message (type is $type)
 
 An object which is not coercable into a L<Mail::Message::Part|Mail::Message::Part> object was
 passed to the initiation.  The data is ignored.
+Cast by C<new()>
 
 =item Warning: No decoder defined for transfer encoding $name.
 
 The data (message body) is encoded in a way which is not currently understood,
 therefore no decoding (or recoding) can take place.
+Cast by C<encode()>
 
 =item Warning: No encoder defined for transfer encoding $name.
 
 The data (message body) has been decoded, but the required encoding is
 unknown.  The decoded data is returned.
+Cast by C<encode()>
 
 =item Error: Package $package does not implement $method.
 
@@ -637,32 +651,38 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unknown criterium $what to select parts.
 
-Valid choices fdr part selections are C<ALL>, C<ACTIVE>, C<DELETED>,
+Valid choices for part selections are C<ALL>, C<ACTIVE>, C<DELETED>,
 C<RECURSE> or a code reference.  However, some other argument was passed.
+Cast by C<parts()>
 
 =item Warning: Unknown line terminator $eol ignored
+
+Cast by C<eol()>
 
 =item Error: You cannot use foreachLine on a multipart
 
 L<foreachLine()|Mail::Message::Body::Multipart/"METHODS"> should be used on decoded message bodies only, because
 it would attempt to modify part-headers and separators as well, which is
 clearly not acceptable.
+Cast by C<foreachLine()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

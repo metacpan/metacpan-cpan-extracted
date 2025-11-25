@@ -12,17 +12,17 @@ Mail::Message::Part - a part of a message, but a message by itself
 
 =head1 SYNOPSIS
 
- my Mail::Message $message = ...;
- if($message->isMultipart) {
-    my Mail::Message::Part $part;
+  my Mail::Message $message = ...;
+  if($message->isMultipart) {
+     my Mail::Message::Part $part;
 
-    foreach $part ($message->body->parts) {
-       $part->print(\*OUT);
-       my $attached_head = $part->head;
-       my $attached_body = $part->body;      # encoded as read
-       my $attached_body = $part->decoded;   # transfer-encoding removed
-    }
- }
+     foreach $part ($message->body->parts) {
+        $part->print(\*OUT);
+        my $attached_head = $part->head;
+        my $attached_body = $part->body;      # encoded as read
+        my $attached_body = $part->decoded;   # transfer-encoding removed
+     }
+  }
 
 =head1 DESCRIPTION
 
@@ -34,45 +34,46 @@ reference to its parent message, and will usually not be sub-classed
 into mail folder specific variants.
 
 Extends L<"DESCRIPTION" in Mail::Message|Mail::Message/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message|Mail::Message/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message|Mail::Message/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>(%options)
 
 Inherited, see L<Mail::Message/"Constructors">
 
-=item Mail::Message::Part-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a message part.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in     --Default
   body        Mail::Message    undef
   body_type   Mail::Message    Mail::Message::Body::Lines
   container                    <required>
-  deleted     Mail::Message    <false>
+  deleted     Mail::Message    false
   field_type  Mail::Message    undef
   head        Mail::Message    <empty header>
   head_type   Mail::Message    Mail::Message::Head::Complete
-  labels      Mail::Message    {}
+  labels      Mail::Message    +{}
   log         Mail::Reporter   'WARNINGS'
   messageId   Mail::Message    undef
-  modified    Mail::Message    <false>
+  modified    Mail::Message    false
   trace       Mail::Reporter   'WARNINGS'
-  trusted     Mail::Message    <false>
+  trusted     Mail::Message    false
 
 =over 2
 
-=item body => OBJECT
+=item body => $object
 
-=item body_type => CLASS
+=item body_type => $class
 
 =item container => BODY
 
@@ -82,17 +83,17 @@ or a L<Mail::Message::Body::Nested|Mail::Message::Body::Nested>.
 
 =item deleted => BOOLEAN
 
-=item field_type => CLASS
+=item field_type => $class
 
-=item head => OBJECT
+=item head => $object
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item labels => ARRAY|HASH
 
 =item log => LEVEL
 
-=item messageId => STRING
+=item messageId => $id
 
 =item modified => BOOLEAN
 
@@ -104,31 +105,44 @@ or a L<Mail::Message::Body::Nested|Mail::Message::Body::Nested>.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message|Mail::Message/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 Constructing a message
 
 Extends L<"Constructing a message" in Mail::Message|Mail::Message/"Constructing a message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bounce>( [<$rg_object|%options>] )
 
 Inherited, see L<Mail::Message::Construct::Bounce/"Constructing a message">
 
-=item Mail::Message::Part-E<gt>B<build>( [$message|$part|$body], $content )
+=item $class-E<gt>B<build>( [$message|$part|$body], @fields, %options )
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-=item Mail::Message::Part-E<gt>B<buildFromBody>($body, $container, $headers)
+=item $class-E<gt>B<buildFromBody>($body, $container, $headers)
 
-Shape a message part around a $body.  Bodies have information about their
+Shape a message part around a C<$body>.  Bodies have information about their
 content in them, which is used to construct a header for the message.
-Next to that, more $headers can be specified.  No headers are obligatory.
+Next to that, more C<$headers> can be specified.  No headers are obligatory.
 No extra headers are fabricated automatically.
+Improves base, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-example: 
+» example: 
 
- my $multi = Mail::Message::Body::Multipart->new;
- my $part  = Mail::Message::Part->buildFromBody($body, $multi);
+  my $multi = Mail::Message::Body::Multipart->new;
+  my $part  = Mail::Message::Part->buildFromBody($body, $multi);
 
 =item $obj-E<gt>B<forward>(%options)
 
@@ -162,7 +176,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item Mail::Message::Part-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -178,9 +192,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replySubject>(STRING)
-
-=item Mail::Message::Part-E<gt>B<replySubject>(STRING)
+=item $any-E<gt>B<replySubject>(STRING)
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -189,10 +201,14 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 =head2 The message
 
 Extends L<"The message" in Mail::Message|Mail::Message/"The message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<endsOnNewline>()
 
 Inherited, see L<Mail::Message/"The message">
 
@@ -242,7 +258,7 @@ Inherited, see L<Mail::Message/"The message">
 =head2 The header
 
 Extends L<"The header" in Mail::Message|Mail::Message/"The header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bcc>()
@@ -306,7 +322,7 @@ Inherited, see L<Mail::Message/"The header">
 =head2 The body
 
 Extends L<"The body" in Mail::Message|Mail::Message/"The body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>( [$body] )
@@ -342,7 +358,7 @@ Inherited, see L<Mail::Message/"The body">
 =head2 Flags
 
 Extends L<"Flags" in Mail::Message|Mail::Message/"Flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<delete>()
@@ -386,7 +402,7 @@ Inherited, see L<Mail::Message/"Flags">
 =head2 The whole message as text
 
 Extends L<"The whole message as text" in Mail::Message|Mail::Message/"The whole message as text">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<file>()
@@ -410,22 +426,23 @@ Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message|Mail::Message/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clonedFrom>()
 
 Inherited, see L<Mail::Message/"Internals">
 
-=item Mail::Message::Part-E<gt>B<coerce>( <$body|$message>, $multipart, @headers )
+=item $class-E<gt>B<coerce>( <$body|$message>, $multipart, @headers )
 
-Transforms a $body or $message to a real message part.  The $multipart
+Transforms a C<$body> or C<$message> to a real message part.  The C<$multipart>
 refers to the parental body.
 
-When ta $body is specified, extra @headers can be supplied as well.
+When ta C<$body> is specified, extra C<@headers> can be supplied as well.
 Bodies are coerced into message parts by calling L<buildFromBody()|Mail::Message::Part/"METHODS">.
-If you specify a $message residing in a folder, this message will
+If you specify a C<$message> residing in a folder, this message will
 automatically be cloned.
+Improves base, see L<Mail::Message/"Internals">
 
 =item $obj-E<gt>B<isDelayed>()
 
@@ -460,7 +477,7 @@ Inherited, see L<Mail::Message/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message|Mail::Message/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -471,9 +488,7 @@ Inherited, see L<Mail::Message::Construct/"METHODS">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Part-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -481,19 +496,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Part-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Part-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -509,9 +516,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<shortSize>( [$value] )
-
-=item Mail::Message::Part-E<gt>B<shortSize>( [$value] )
+=item $any-E<gt>B<shortSize>( [$value] )
 
 Inherited, see L<Mail::Message/"Error handling">
 
@@ -532,7 +537,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message|Mail::Message/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -545,13 +550,14 @@ Message parts can not be destructed per part: only whole messages can
 be forcefully freed from memory.  Of course, you can L<delete()|Mail::Message/"Flags"> separate
 parts, which only sets a flag not to write a part again.  Furthermore,
 you may cosider L<rebuild()|Mail::Message::Construct::Rebuild/"Constructing a message"> to get rit of deleted parts.
+Improves base, see L<Mail::Message/"Cleanup">
 
 =back
 
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message|Mail::Message/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -560,11 +566,13 @@ Extends L<"DETAILS" in Mail::Message|Mail::Message/"DETAILS">.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Cannot include reply source as $include.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =item Error: Method bounce requires To, Cc, or Bcc
 
@@ -573,22 +581,31 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
 The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
 find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
+Cast by C<send()>
 
 =item Error: No rebuild rule $name defined.
+
+Cast by C<rebuild()>
 
 =item Error: Only build() Mail::Message's; they are not in a folder yet
 
@@ -597,6 +614,7 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message::Part/"METHODS">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -605,24 +623,27 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: You cannot destruct message parts, only whole messages
 
 Message parts can not be destructed per part: only whole messages can
 be forcefully freed from memory. Consider L<delete()|Mail::Message/"Flags"> or L<rebuild()|Mail::Message::Construct::Rebuild/"Constructing a message">.
+Cast by C<destruct()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -4,32 +4,38 @@
 
 Mail::Box::FastScalar - fast alternative to IO::Scalar
 
+=head1 SYNOPSIS
+
+  my $fh = Mail::Box::FastScalar->new;
+  $fh->open(\my $out);
+
+  my $fh = Mail::Box::FastScalar->new(\my $out);
+
 =head1 DESCRIPTION
 
-Contributed by "Todd Richmond" (richmond@proofpoint.com)  This package
-should be released as separate package, but till then is incorporated
-in the Mail::Box module.
+Extremely fast IO::Scalar replacement - over 20x improvement in
+C<getline()> and C<getlines()> methods.
 
-Extremely fast L<IO::Scalar> replacement - >20x improvement in
-getline(s)()
+Contributed by "Todd Richmond" (C<richmond@proofpoint.com>)
 
 =head2 Warnings
 
 You cannot modify the original reference between calls unless you
-C<$obj->seek(1, 0)> to reset the object - VERY rare usage case
+C<$obj->seek(1, 0)> to reset the object - VERY rare usage case.
 
-$/ must be undef or string - "" and \scalar unimplemented
+$/ must be C<undef> or string - "" and \scalar unimplemented
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -19,14 +19,14 @@ Mail::Transport::Send - send a message
 
 =head1 SYNOPSIS
 
- my $message = Mail::Message->new(...);
+  my $message = Mail::Message->new(...);
 
- # Some extensions implement sending:
- $message->send;
- $message->send(via => 'sendmail');
+  # Some extensions implement sending:
+  $message->send;
+  $message->send(via => 'sendmail');
 
- my $sender = Mail::Transport::SMTP->new(...);
- $sender->send($message);
+  my $sender = Mail::Transport::SMTP->new(...);
+  $sender->send($message);
 
 =head1 DESCRIPTION
 
@@ -71,18 +71,20 @@ known to have exploitable security breaches.
 =back
 
 Extends L<"DESCRIPTION" in Mail::Transport|Mail::Transport/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Transport|Mail::Transport/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Transport|Mail::Transport/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Transport::Send-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in     --Default
   executable  Mail::Transport  undef
@@ -92,7 +94,7 @@ Extends L<"Constructors" in Mail::Transport|Mail::Transport/"Constructors">.
   password    Mail::Transport  undef
   port        Mail::Transport  undef
   proxy       Mail::Transport  undef
-  retry       Mail::Transport  <false>
+  retry       Mail::Transport  <unlimited>
   timeout     Mail::Transport  120
   trace       Mail::Reporter   'WARNINGS'
   username    Mail::Transport  undef
@@ -100,29 +102,29 @@ Extends L<"Constructors" in Mail::Transport|Mail::Transport/"Constructors">.
 
 =over 2
 
-=item executable => FILENAME
+=item executable => $file
 
-=item hostname => HOSTNAME|ARRAY
+=item hostname => $host|\@hosts
 
-=item interval => SECONDS
+=item interval => $span
 
 =item log => LEVEL
 
-=item password => STRING
+=item password => $password
 
-=item port => INTEGER
+=item port => $port
 
-=item proxy => PATH
+=item proxy => $path
 
-=item retry => NUMBER|undef
+=item retry => $count|undef
 
-=item timeout => SECONDS
+=item timeout => $span
 
 =item trace => LEVEL
 
-=item username => STRING
+=item username => $username
 
-=item via => CLASS|NAME
+=item via => CLASS|$name
 
 =back
 
@@ -131,7 +133,7 @@ Extends L<"Constructors" in Mail::Transport|Mail::Transport/"Constructors">.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Transport|Mail::Transport/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<logSettings>()
@@ -144,26 +146,26 @@ Inherited, see L<Mail::Reporter/"Attributes">
 
 =over 4
 
-=item $obj-E<gt>B<destinations>( $message, [$address|ARRAY] )
+=item $obj-E<gt>B<destinations>( $message, [$address|\@addresses] )
 
-Determine the destination for this message.  If a valid $address is defined,
-this is used to overrule the addresses within the message.  If the $address
-is C<undef> it is ignored.  It may also be an ARRAY of addresses.
+Determine the destination for this message.  If a valid C<$address> is defined,
+this is used to overrule the addresses within the message.  If the C<$address>
+is C<undef> it is ignored.  It may also be an ARRAY of C<@addresses>.
 
-If no $address is specified, the message is scanned for resent groups
+If no C<$address> is specified, the message is scanned for resent groups
 (see L<Mail::Message::Head::Complete::resentGroups()|Mail::Message::Head::Complete/"Access to the header">).  The addresses
 found in the first (is latest added) group are used.  If no resent groups
 are found, the normal C<To>, C<Cc>, and C<Bcc> lines are taken.
 
 =item $obj-E<gt>B<putContent>($message, $fh, %options)
 
-Print the content of the $message to the $fh.
+Print the content of the C<$message> to the C<$fh>.
 
 The content might not end with new-line.  See L<Mail::Message::endsOnNewline()|Mail::Message/"The message">
 
  -Option     --Default
-  body_only    <false>
-  undisclosed  <false>
+  body_only    <C<false>>
+  undisclosed  <C<false>>
 
 =over 2
 
@@ -173,16 +175,16 @@ Print only the body of the message, not the whole.
 
 =item undisclosed => BOOLEAN
 
-Do not print the C<Bcc> and C<Resent-Bcc> lines.  Default false, which
+Do not print the C<Bcc> and C<Resent-Bcc> lines.  Default C<false>, which
 means that they are not printed.
 
 =back
 
 =item $obj-E<gt>B<send>($message, %options)
 
-Transmit the $message, which may be anything what can be coerced into a
-L<Mail::Message|Mail::Message>, so including Mail::Internet and MIME::Entity
-messages.  It returns true when the transmission was successfully completed.
+Transmit the C<$message>, which may be anything what can be coerced into a
+L<Mail::Message|Mail::Message>, so including L<Mail::Internet|Mail::Internet> and MIME::Entity
+messages.  It returns C<true> when the transmission was successfully completed.
 
  -Option  --Default
   interval  new(interval)
@@ -204,13 +206,15 @@ from the (Resent-)To, (Resent-)Cc, and (Resent-)Bcc.
 
 =item $obj-E<gt>B<trySend>($message, %options)
 
-Try to send the message. This will return true if successful, and
-false in case some problems where detected.  The C<$?> contains
+Try to send the message. This will return C<true> if successful, and
+C<false> in case some problems where detected.  The C<$?> contains
 the exit status of the command which was started.
 
 =back
 
 =head2 Server connection
+
+Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connection">.
 
 =over 4
 
@@ -231,7 +235,7 @@ Inherited, see L<Mail::Transport/"Server connection">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Transport|Mail::Transport/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -242,9 +246,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Transport::Send-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -252,15 +254,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Transport::Send-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Transport::Send-E<gt>B<logPriority>($level)
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -289,7 +287,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Transport|Mail::Transport/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -298,10 +296,6 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =back
 
-=head2 Server connection
-
-Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connection">.
- 
 =head1 DIAGNOSTICS
 
 =over 4
@@ -309,6 +303,7 @@ Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connect
 =item Warning: Message has no destination
 
 It was not possible to figure-out where the message is intended to go to.
+Cast by C<destinations()>
 
 =item Error: Package $package does not implement $method.
 
@@ -317,6 +312,7 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Warning: Resent group does not specify a destination
 
@@ -332,24 +328,27 @@ C<Received> was found.  That seems to be the best explanation of the RFC.
 As alternative, you may also specify the C<to> option to some of the senders
 (for instance L<Mail::Transport::SMTP::send(to)|Mail::Transport::Send/"Sending mail"> to overrule any information
 found in the message itself about the destination.
+Cast by C<destinations()>
 
 =item Error: Transporters of type $class cannot send.
 
 The L<Mail::Transport|Mail::Transport> object of the specified type can not send messages,
 but only receive message.
+Cast by C<trySend()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.007,
-built on September 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport version 3.008,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

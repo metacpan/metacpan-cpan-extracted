@@ -6,8 +6,8 @@ Mail::Message::Construct::Read - read a Mail::Message from a file handle
 
 =head1 SYNOPSIS
 
- my $msg1 = Mail::Message->read(\*STDIN);
- my $msg2 = Mail::Message->read(\@lines);
+  my $msg1 = Mail::Message->read(\*STDIN);
+  my $msg2 = Mail::Message->read(\@lines);
 
 =head1 DESCRIPTION
 
@@ -21,10 +21,10 @@ handle.
 
 =over 4
 
-=item Mail::Message-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
 
-Read a message from a $fh, STRING, SCALAR, or a reference to an
-ARRAY of lines.  Most %options are passed to the L<new()|Mail::Message/"Constructors"> of the message
+Read a message from a C<$fh>, C<STRING>, C<SCALAR>, or a reference to an
+C<ARRAY> of lines.  Most C<%options> are passed to the L<new()|Mail::Message/"Constructors"> of the message
 which is created, but a few extra are defined.
 
 Please have a look at L<build()|Mail::Message::Construct::Build/"Constructing a message"> and L<buildFromBody()|Mail::Message::Construct::Build/"Constructing a message"> before thinking about
@@ -45,7 +45,10 @@ with your internal administration, which may have security implications.
 
  -Option             --Default
   body_type            undef
-  strip_status_fields  <true>
+  parser_class         undef
+  seekable             false
+  strip_status_fields  <C<true>>
+  trusted              true
 
 =over 2
 
@@ -55,6 +58,17 @@ Force a body type (any specific implementation of a L<Mail::Message::Body|Mail::
 to be used to store the message content.  When the body is a multipart or
 nested, this will be overruled.
 
+=item parser_class => CLASS
+
+Enforce a certain parser type to be used, which must be an extension of
+the parser class otherwise taken.
+
+=item seekable => BOOLEAN
+
+Indicate that a seekable file-handle has been passed. In this case, we
+can use the L<Mail::Box::Parser::Perl|Mail::Box::Parser::Perl> parser which reads messages
+directly from the input stream.
+
 =item strip_status_fields => BOOLEAN
 
 Remove the C<Status> and C<X-Status> fields from the message after
@@ -63,39 +77,42 @@ sources interfere with your internal administration.  If you want
 fields not to be stripped (you would like to disable the stripping)
 you probably process folders yourself, which is a Bad Thing!
 
+=item trusted => BOOLEAN
+
 =back
 
-example: 
+» example: 
 
- my $msg1 = Mail::Message->read(\*STDIN);
- my $msg2 = Mail::Message->read(\@lines, log => 'PROGRESS');
- $folder->addMessages($msg1, $msg2);
+  my $msg1 = Mail::Message->read(\*STDIN);
+  my $msg2 = Mail::Message->read(\@lines, log => 'PROGRESS');
+  $folder->addMessages($msg1, $msg2);
 
- my $msg3 = Mail::Message->read(<<MSG);
- Subject: hello world
- To: you@example.com
-                      # warning: empty line required !!!
- Hi, greetings!
- MSG
+  my $msg3 = Mail::Message->read(<<MSG);
+  Subject: hello world
+  To: you@example.com
+                       # warning: empty line required !!!
+  Hi, greetings!
+  MSG
 
- # promail example
- my $fromline = <STDIN>;
- my $msg      = Mail::Message->read(\*STDIN);
- my $coerced  = $mboxfolder->addMessage($msg);
- $coerced->fromLine($fromline);
+  # promail example
+  my $fromline = <STDIN>;
+  my $msg      = Mail::Message->read(\*STDIN);
+  my $coerced  = $mboxfolder->addMessage($msg);
+  $coerced->fromLine($fromline);
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -25,7 +25,8 @@ WriteMakefile1(
   },
 
   TEST_REQUIRES => {
-    'Test::More' => 0,
+    'Test::More'     => 0,
+    'File::Basename' => 0,
   },
 
   META_MERGE => {
@@ -53,9 +54,11 @@ WriteMakefile1(
           'version'        => 0.77,
         },
         recommends => {
+          'Pod::Autopod'       => 0,
+          'Pod::Usage'         => 0,
+          'Types::Standard'    => 0,
           'Win32::GuiTest'     => 0,
           'Win32API::Registry' => 0.21,
-          'Types::Standard'    => 0,
         },
       },
       # test => {

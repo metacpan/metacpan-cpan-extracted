@@ -74,7 +74,7 @@ is("$body", $filedata,                              'overloaded stringification'
 @lines = @$body;
 ok(@lines,                                          'overloaded ref array');
 cmp_ok(@lines, "==", 5,                             'count of lines');
-foreach (0..4) { is($lines[$_], $filedata[$_],      "line $_") }
+foreach (0..4) { is $lines[$_], $filedata[$_],      "line $_" }
 
 # Test cleanup
 

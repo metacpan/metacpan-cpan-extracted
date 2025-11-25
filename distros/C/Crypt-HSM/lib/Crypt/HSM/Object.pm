@@ -1,5 +1,5 @@
 package Crypt::HSM::Object;
-$Crypt::HSM::Object::VERSION = '0.024';
+$Crypt::HSM::Object::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Object - A PKCS11 object
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ Only one attribute is present in all objects:
 
 =item * C<class>
 
-This enum value van be one of C<data>, C<certificate>, C<public-key>, C<private-key>, C<secret-key>, C<hw-feature>, C<domain-parameters>, C<mechanism>, C<profile>, or C<vendor-defined>
+This enum value van be one of C<data>, C<certificate>, C<public-key>, C<private-key>, C<secret-key>, C<hw-feature>, C<domain-parameters>, C<mechanism>, C<profile>, or C<vendor-defined>.
 
 =back
 
@@ -119,7 +119,7 @@ Of these attributes, only C<label> may be modified after the object is created.
 
 =head3 Certificates
 
-Several attributes are shared between all certificate types
+Several attributes are shared between all certificate types:
 
 =over 4
 
@@ -137,15 +137,15 @@ This can be any of C<unspecified>, C<token-user>, C<authority> or C<other-entity
 
 =item * C<check-value>
 
-The checksum of the certificate
+The checksum of the certificate.
 
 =item * C<start-date>
 
-Start date for the certificate
+Start date for the certificate.
 
 =item * C<end-date>
 
-End date for the certificate
+End date for the certificate.
 
 =item * C<public-key-info>
 
@@ -159,19 +159,19 @@ DER-encoding of the SubjectPublicKeyInfo for the public key contained in this ce
 
 =item * C<subject>
 
-DER-encoding of the certificate subject name
+DER-encoding of the certificate subject name.
 
 =item * C<id>
 
-Key identifier for public/private key pair
+Key identifier for public/private key pair.
 
 =item * C<issuer>
 
-DER-encoding of the certificate issuer name
+DER-encoding of the certificate issuer name.
 
 =item * C<serial-number>
 
-DER-encoding of the certificate serial number
+DER-encoding of the certificate serial number.
 
 =item * C<value>
 
@@ -191,7 +191,7 @@ Hash of the issues public key (default empty). Hash algorithm is defined by C<na
 
 =item * C<java-midp-security-domain>
 
-Java MIDP security domain. This must be one of C<unspecified>, C<manufactorer>, C<operator> or C<third-party>.
+Java MIDP security domain. This must be one of C<unspecified>, C<manufacturer>, C<operator> or C<third-party>.
 
 =item * C<name-hash-algorithm>
 
@@ -205,11 +205,11 @@ Defines the mechanism used to calculate C<hash-of-subject-public-key> and C<hash
 
 =item * C<subject>
 
-DER-encoding of the certificate subject name
+DER-encoding of the certificate subject name.
 
 =item * C<issuer>
 
-DER-encoding of the certificate issuer name
+DER-encoding of the certificate issuer name.
 
 =item * C<value>
 
@@ -247,11 +247,11 @@ DER-encoding of the attribute certificate's issuer field. This is distinct from 
 
 =item * C<serial-number>
 
-DER-encoding of the certificate serial number
+DER-encoding of the certificate serial number.
 
 =item * C<attr-types>
 
-BER-encoding of a sequence of object identifier values corresponding to the attribute types contained in the certificate. When present, this field offers an opportunity for applications to search for a particular attribute certificate without fetching and parsing the certificate itself. (default empty)
+BER-encoding of a sequence of object identifier values corresponding to the attribute types contained in the certificate. When present, this field offers an opportunity for applications to search for a particular attribute certificate without fetching and parsing the certificate itself. (default empty).
 
 =item * C<value>
 
@@ -261,7 +261,7 @@ BER-encoding of the certificate.
 
 =head3 Key objects
 
-All key types share the following attributes
+All key types share the following attributes:
 
 =over 4
 
@@ -275,15 +275,15 @@ Key identifier for key.
 
 =item * C<start-date>
 
-Start date for the key
+Start date for the key.
 
 =item * C<end-date>
 
-End date for the key
+End date for the key.
 
 =item * C<derive>
 
-True if key supports key derivation (i.e., if other keys can be derived from this one)
+True if key supports key derivation (i.e., if other keys can be derived from this one).
 
 =item * C<local>
 
@@ -353,27 +353,27 @@ DER-encoding of the SubjectPublicKeyInfo for the public key contained in this ce
 
 =item * C<subject>
 
-DER-encoding of certificate subject name
+DER-encoding of certificate subject name.
 
 =item * C<sensitive>
 
-True if key is sensitive
+True if key is sensitive.
 
 =item * C<decrypt>
 
-True if key supports decryption
+True if key supports C<decrypt>.
 
 =item * C<sign>
 
-True if key supports C<sign>
+True if key supports C<sign>.
 
 =item * C<sign-recover>
 
-True if key supports C<sign_recover>
+True if key supports C<sign_recover>.
 
 =item * C<unwrap>
 
-True if key supports unwrapping
+True if key supports C<unwrap>.
 
 =item * C<extractable>
 
@@ -381,11 +381,11 @@ True if key is extractable and can be wrapped.
 
 =item * C<always-sensitive>
 
-True if key has always had the C<sensitive> attribute set to true
+True if key has always had the C<sensitive> attribute set to true.
 
 =item * C<never-extractable>
 
-True if key has never had the C<extractable> attribute set to true
+True if key has never had the C<extractable> attribute set to true.
 
 =item * C<wrap-with-trusted>
 
@@ -419,31 +419,31 @@ Modulus n
 
 =item * C<public-exponent>
 
-Public exponent e
+Public exponent e.
 
 =item * C<private-exponent>
 
-Private exponent d
+Private exponent d.
 
 =item * C<prime-1>
 
-Prime p
+Prime p.
 
 =item * C<prime-2>
 
-Prime q
+Prime q.
 
 =item * C<exponent-1>
 
-Private exponent d modulo p-1
+Private exponent d modulo p-1.
 
 =item * C<exponent-2>
 
-Private exponent d modulo q-1
+Private exponent d modulo q-1.
 
 =item * C<coefficient>
 
-CRT coefficient q-1 mod p
+CRT coefficient q-1 mod p.
 
 =back
 
@@ -453,31 +453,31 @@ CRT coefficient q-1 mod p
 
 =item * C<sensitive>
 
-True if key is sensitive
+True if key is sensitive.
 
 =item * C<encrypt>
 
-True if key supports encryption
+True if key supports C<encrypt>.
 
 =item * C<decrypt>
 
-True if key supports decryption
+True if key supports C<decrypt>.
 
 =item * C<sign>
 
-True if key supports C<sign>
+True if key supports C<sign>.
 
 =item * C<verify>
 
-True if key supports verification (i.e., of authentication codes) where the signature is an appendix to the data.
+True if key supports C<verify> (i.e., of authentication codes) where the signature is an appendix to the data.
 
 =item * C<wrap>
 
-True if key supports wrapping (i.e., can be used to wrap other keys).
+True if key supports C<wrap> (i.e., can be used to wrap other keys).
 
 =item * C<unwrap>
 
-True if key supports unwrapping (i.e., can be used to unwrap other keys).
+True if key supports C<unwrap> (i.e., can be used to unwrap other keys).
 
 =item * C<extractable>
 
@@ -485,11 +485,11 @@ True if key is extractable and can be wrapped.
 
 =item * C<always-sensitive>
 
-True if key has always had the C<sensitive> attribute set to true
+True if key has always had the C<sensitive> attribute set to true.
 
 =item * C<never-extractable>
 
-True if key has never had the C<extractable> attribute set to true
+True if key has never had the C<extractable> attribute set to true.
 
 =item * C<check-value>
 
@@ -531,7 +531,7 @@ DER-encoding of the object identifier indicating the data object type.
 
 =item * C<value>
 
-Value of the object
+Value of the object.
 
 =back
 
@@ -563,7 +563,7 @@ True only if key was either:
 
 =item * C<mechanism-type>
 
-The L<mechanism|Crypt::HSM::Mechanism> object
+The L<mechanism|Crypt::HSM::Mechanism> object.
 
 =back
 
@@ -621,19 +621,19 @@ Current time as a character-string of length 16, represented in the format YYYYM
 
 =item * C<pixel-x>
 
-Screen resolution (in pixels) in X-axis (e.g. 1280)
+Screen resolution (in pixels) in X-axis (e.g. 1280).
 
 =item * C<pixel-y>
 
-Screen resolution (in pixels) in Y-axis (e.g. 1024)
+Screen resolution (in pixels) in Y-axis (e.g. 1024).
 
 =item * C<resolution>
 
-DPI, pixels per inch
+DPI, pixels per inch.
 
 =item * C<char-rows>
 
-For character-oriented displays; number of character rows (e.g. 24)
+For character-oriented displays; number of character rows (e.g. 24).
 
 =item * C<char-columns>
 
@@ -641,7 +641,7 @@ For character-oriented displays: number of character columns (e.g. 80). If displ
 
 =item * C<color>
 
-Color support
+Color support.
 
 =item * C<bits-per-pixel>
 

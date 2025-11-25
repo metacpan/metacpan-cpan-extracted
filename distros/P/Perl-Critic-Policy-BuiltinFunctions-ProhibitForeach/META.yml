@@ -1,0 +1,32 @@
+---
+abstract: 'Prohibit foreach keyword'
+author:
+  - 'Dean Hamstead <dean@fragfest.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-BuiltinFunctions-ProhibitForeach
+requires:
+  Perl::Critic: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+version: '0.01'
+x_generated_by_perl: v5.40.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

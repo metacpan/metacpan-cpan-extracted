@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Convert::TextAutoformat;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Message::Convert';
@@ -15,31 +18,25 @@ use base 'Mail::Message::Convert';
 use strict;
 use warnings;
 
-use Mail::Message::Body::String;
-use Text::Autoformat;
+use Text::Autoformat qw/autoformat/;
 
+use Mail::Message::Body::String ();
+
+#--------------------
 
 sub init($)
-{   my ($self, $args)  = @_;
+{	my ($self, $args)  = @_;
+	$self->SUPER::init($args);
 
-    $self->SUPER::init($args);
-
-    $self->{MMCA_options} = $args->{autoformat} || { all => 1 };
-    $self;
+	$self->{MMCA_options} = $args->{autoformat} || +{ all => 1 };
+	$self;
 }
 
-#------------------------------------------
-
+#--------------------
 
 sub autoformatBody($)
-{   my ($self, $body) = @_;
-
-    ref($body)->new
-       ( based_on => $body
-       , data     => autoformat($body->string, $self->{MMCA_options})
-       );
+{	my ($self, $body) = @_;
+	(ref $body)->new(based_on => $body, data => autoformat($body->string, $self->{MMCA_options}));
 }
-
-#------------------------------------------
 
 1;

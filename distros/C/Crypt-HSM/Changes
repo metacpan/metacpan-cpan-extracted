@@ -1,5 +1,8 @@
 Revision history for Crypt-HSM
 
+0.025     2025-11-24 23:29:47+01:00 Europe/Brussels
+          - Inflate/deflate big integers to Math::BigInt
+
 0.024     2025-11-24 11:48:42+01:00 Europe/Brussels
           - Add sign_recover and verify_recover methods
           - Allow empty attributes argument in various methods

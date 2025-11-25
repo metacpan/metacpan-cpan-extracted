@@ -1,10 +1,12 @@
 package Crypt::HSM;
-$Crypt::HSM::VERSION = '0.024';
+$Crypt::HSM::VERSION = '0.025';
 use strict;
 use warnings;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
+
+use Math::BigInt;
 
 # Pure-perl backwards compatibility methods
 use Crypt::HSM::Mechanism;
@@ -25,7 +27,7 @@ Crypt::HSM - A PKCS11 interface for Perl
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

@@ -1151,7 +1151,7 @@ typedef struct Attributes {
 
 static const Attributes empty = { 0, NULL };
 
-enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigintAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, ProfileIdAttr, MechanismAttr, OtpFormatAttr, OtpParamAttr, TokenFlagsAttr, SecurityDomainAttr, IntArrayAttr, MechanismArrayAttr, AttrAttr };
+enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigIntAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, ProfileIdAttr, MechanismAttr, OtpFormatAttr, OtpParamAttr, TokenFlagsAttr, SecurityDomainAttr, IntArrayAttr, MechanismArrayAttr, AttrAttr };
 
 typedef struct { const char* key; size_t length; CK_ULONG value; enum Attribute_type type; } attribute_entry;
 typedef attribute_entry attribute_map[];
@@ -1194,19 +1194,19 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("derive"), CKA_DERIVE, BoolAttr },
 	{ STR_WITH_LEN("start-date"), CKA_START_DATE, StrAttr },
 	{ STR_WITH_LEN("end-date"), CKA_END_DATE, StrAttr },
-	{ STR_WITH_LEN("modulus"), CKA_MODULUS, BigintAttr },
+	{ STR_WITH_LEN("modulus"), CKA_MODULUS, BigIntAttr },
 	{ STR_WITH_LEN("modulus-bits"), CKA_MODULUS_BITS, IntAttr },
-	{ STR_WITH_LEN("public-exponent"), CKA_PUBLIC_EXPONENT, BigintAttr },
-	{ STR_WITH_LEN("private-exponent"), CKA_PRIVATE_EXPONENT, BigintAttr },
-	{ STR_WITH_LEN("prime-1"), CKA_PRIME_1, BigintAttr },
-	{ STR_WITH_LEN("prime-2"), CKA_PRIME_2, BigintAttr },
-	{ STR_WITH_LEN("exponent-1"), CKA_EXPONENT_1, BigintAttr },
-	{ STR_WITH_LEN("exponent-2"), CKA_EXPONENT_2, BigintAttr },
-	{ STR_WITH_LEN("coefficient"), CKA_COEFFICIENT, BigintAttr },
+	{ STR_WITH_LEN("public-exponent"), CKA_PUBLIC_EXPONENT, BigIntAttr },
+	{ STR_WITH_LEN("private-exponent"), CKA_PRIVATE_EXPONENT, BigIntAttr },
+	{ STR_WITH_LEN("prime-1"), CKA_PRIME_1, BigIntAttr },
+	{ STR_WITH_LEN("prime-2"), CKA_PRIME_2, BigIntAttr },
+	{ STR_WITH_LEN("exponent-1"), CKA_EXPONENT_1, BigIntAttr },
+	{ STR_WITH_LEN("exponent-2"), CKA_EXPONENT_2, BigIntAttr },
+	{ STR_WITH_LEN("coefficient"), CKA_COEFFICIENT, BigIntAttr },
 	{ STR_WITH_LEN("public-key-info"), CKA_PUBLIC_KEY_INFO, ByteAttr },
-	{ STR_WITH_LEN("prime"), CKA_PRIME, BigintAttr },
-	{ STR_WITH_LEN("subprime"), CKA_SUBPRIME, BigintAttr },
-	{ STR_WITH_LEN("base"), CKA_BASE, BigintAttr },
+	{ STR_WITH_LEN("prime"), CKA_PRIME, BigIntAttr },
+	{ STR_WITH_LEN("subprime"), CKA_SUBPRIME, BigIntAttr },
+	{ STR_WITH_LEN("base"), CKA_BASE, BigIntAttr },
 	{ STR_WITH_LEN("prime-bits"), CKA_PRIME_BITS, IntAttr },
 	{ STR_WITH_LEN("subprime-bits"), CKA_SUBPRIME_BITS, IntAttr },
 	{ STR_WITH_LEN("sub-prime-bits"), CKA_SUB_PRIME_BITS, IntAttr },
@@ -1222,7 +1222,7 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("destroyable"), CKA_DESTROYABLE, BoolAttr },
 	{ STR_WITH_LEN("ecdsa-params"), CKA_ECDSA_PARAMS, ByteAttr },
 	{ STR_WITH_LEN("ec-params"), CKA_EC_PARAMS, ByteAttr },
-	{ STR_WITH_LEN("ec-point"), CKA_EC_POINT, BigintAttr },
+	{ STR_WITH_LEN("ec-point"), CKA_EC_POINT, BigIntAttr },
 	{ STR_WITH_LEN("secondary-auth"), CKA_SECONDARY_AUTH, BoolAttr },
 	{ STR_WITH_LEN("auth-pin-flags"), CKA_AUTH_PIN_FLAGS, TokenFlagsAttr },
 	{ STR_WITH_LEN("always-authenticate"), CKA_ALWAYS_AUTHENTICATE, BoolAttr },
@@ -1310,6 +1310,8 @@ static void S_set_intval(pTHX_ CK_ATTRIBUTE* current, CK_ULONG value) {
 }
 #define set_intval(current, value) S_set_intval(aTHX_ current, value)
 
+static const char integer_pattern[] = "J>";
+
 #define get_attributes(attributes) S_get_attributes(aTHX_ attributes)
 #define XS_unpack_Attributes get_attributes
 static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
@@ -1354,22 +1356,21 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					current->ulValueLen = len;
 					break;
 				}
-				case BigintAttr:
+				case BigIntAttr:
 					if (SvROK(value)) {
-						if (SvTYPE(SvRV(value)) != SVt_PVAV)
-							croak("Invalid Bigint attribute value");
-						AV* input = (AV*) SvRV(value);
-						char* array;
-						Newxz(array, av_count(input), char);
-						SAVEFREEPV(array);
-						size_t i;
-						for (i = 0; i < av_count(input); ++i)
-							array[i] = (char)SvUV(*av_fetch(input, i, FALSE));
-						current->pValue = array;
-						current->ulValueLen = av_count(input);
-						break;
+						dSP;
+						PUSHMARK(SP);
+						mXPUSHs(value);
+						PUTBACK;
+						call_method("to_bytes", G_SCALAR);
+						SPAGAIN;
+						current->pValue = get_buffer(POPs, &current->ulValueLen);
+					} else {
+						SV* temp = sv_2mortal(newSVpvn("", 0));
+						packlist(temp, integer_pattern, integer_pattern + 2, &value, &value+1);
+						current->pValue = get_buffer(temp, &current->ulValueLen);
 					}
-					// FALLTHROUGH
+					break;
 				case ByteAttr: {
 					current->pValue = get_buffer(value, &current->ulValueLen);
 					break;
@@ -1500,7 +1501,25 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 			sv_utf8_downgrade(result, TRUE);
 			return result;
 		}
-		case BigintAttr:
+		case BigIntAttr: {
+			dSP;
+			if (length > IVSIZE) {
+				PUSHMARK(SP);
+				mXPUSHpvs("Math::BigInt");
+				mXPUSHp(pointer, length);
+				PUTBACK;
+				call_method("from_bytes", G_SCALAR);
+			} else {
+				SV* temp = sv_2mortal(newSVpvn("\0\0\0\0\0\0\0\0", IVSIZE));
+				if (length)
+					sv_insert(temp, IVSIZE - length, length, pointer, length);
+				const char* buffer = SvPV_nolen(temp);
+				if (unpackstring(integer_pattern, integer_pattern + 2, buffer, buffer + IVSIZE, 0) != 1)
+					die("Could not decode integer");
+			}
+			SPAGAIN;
+			return SvREFCNT_inc(POPs);
+		}
 		case ByteAttr:
 			return newSVpvn(pointer, length);
 		case ClassAttr: {

@@ -15,7 +15,7 @@ use Carp;
 use Data::Identifier v0.08;
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -39,8 +39,6 @@ my %_is_utf8 = (
             '7e5d56d4-98e6-4205-89c0-763e1d729531', # utf-8-marker
         )),
 );
-
-$_->register foreach @wellknown;
 
 
 
@@ -87,7 +85,7 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

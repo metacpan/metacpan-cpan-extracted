@@ -1,6 +1,6 @@
 package OpenAPI::Linter;
 
-$OpenAPI::Linter::VERSION   = '0.12';
+$OpenAPI::Linter::VERSION   = '0.13';
 $OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ OpenAPI::Linter - Validate and lint OpenAPI specifications
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,7 @@ use JSON::Validator;
 use JSON qw(decode_json);
 use YAML::XS qw(LoadFile);
 use File::Slurp qw(read_file);
+use OpenAPI::Linter::Location;
 
 =head1 METHODS
 
@@ -78,19 +79,45 @@ sub new {
     my ($class, %args) = @_;
 
     my $spec;
+    my $locations = {};
+    my $file_path = $args{spec};
 
     if (ref $args{spec} eq 'HASH') {
-        # Already a hashref — use directly
+        # Already a hashref - use directly
         $spec = $args{spec};
+        # For hashref input, we can't provide line numbers
+        $locations = { base => OpenAPI::Linter::Location->new('input', 1, 1) };
+        $file_path = 'input';
     }
     elsif ($args{spec}) {
-        my $path = $args{spec};
-        die "ERROR: Spec file not found: $path\n" unless (-f $path);
+        $file_path = $args{spec};
+        die "ERROR: Spec file not found: $file_path\n" unless (-f $file_path);
 
-        if ($path =~ /\.ya?ml$/i) {
-            $spec = LoadFile($path);
+        if ($file_path =~ /\.ya?ml$/i) {
+            # Try to use YAML::PP for better location tracking
+            my $yaml_pp_available = eval {
+                require YAML::PP;
+                YAML::PP->import();
+                1;
+            };
+
+            if ($yaml_pp_available) {
+                my $yamlpp = YAML::PP->new( preserve => 1 );
+                $spec = $yamlpp->load_file($file_path);
+                $locations = _extract_yaml_locations($spec, $file_path);
+
+                # Ensure we always have a base location
+                $locations->{base} = OpenAPI::Linter::Location->new($file_path, 1, 1)
+                    unless exists $locations->{base};
+            } else {
+                # Fall back to YAML::XS
+                $spec = LoadFile($file_path);
+                $locations = { base => OpenAPI::Linter::Location->new($file_path, 1, 1) };
+            }
         } else {
-            $spec = decode_json(read_file($path));
+            $spec = decode_json(read_file($file_path));
+            # JSON doesn't easily give us line numbers, but we can approximate
+            $locations = { base => OpenAPI::Linter::Location->new($file_path, 1, 1) };
         }
     }
     else {
@@ -100,9 +127,11 @@ sub new {
     my $version = $args{version} || $spec->{openapi} || '3.0.3';
 
     return bless {
-        spec    => $spec,
-        issues  => [],
-        version => $version,
+        spec      => $spec,
+        issues    => [],
+        version   => $version,
+        locations => $locations,
+        file_path => $file_path,
     }, $class;
 }
 
@@ -142,36 +171,87 @@ Filter issues by message pattern (regular expression).
 sub find_issues {
     my ($self, %opts) = @_;
 
-    my $spec = $self->{spec} || {};
+    my $spec      = $self->{spec}      || {};
+    my $locations = $self->{locations} || {};
     my @issues;
+
+    # Helper to get location for a path
+    my $get_location = sub {
+        my $path = shift;
+
+        # Try the exact path first
+        return $locations->{$path} if exists $locations->{$path};
+
+        # Try to find a parent path
+        my @path_parts = split(/\./, $path);
+        while (@path_parts) {
+            pop @path_parts;
+            my $parent_path = join('.', @path_parts);
+            return $locations->{$parent_path}
+                if exists $locations->{$parent_path};
+        }
+
+        # Fall back to base location
+        return $locations->{base}
+            || OpenAPI::Linter::Location->new($self->{file_path}, 1, 1);
+    };
 
     # Check OpenAPI root keys
     foreach my $key (qw/openapi info paths/) {
-        push @issues, {
-            level   => 'ERROR',
-            message => "Missing $key"
-        } unless $spec->{$key};
+        unless ($spec->{$key}) {
+            my $location = $get_location->($key);
+            push @issues, {
+                level    => 'ERROR',
+                message  => "Missing $key",
+                location => $location->to_string,
+                path     => $key
+            };
+        }
     }
 
     # Info checks
     if ($spec->{info}) {
         my $info = $spec->{info};
-        push @issues, {
-            level   => 'ERROR',
-            message => 'Missing info.title'
-        } unless $info->{title};
-        push @issues, {
-            level   => 'ERROR',
-            message =>'Missing info.version'
-        } unless $info->{version};
-        push @issues, {
-            level   => 'WARN',
-            message => 'Missing info.description'
-        } unless $info->{description};
-        push @issues, {
-            level   => 'WARN',
-            message => 'Missing info.license'
-        } unless $info->{license};
+
+        unless ($info->{title}) {
+            my $location = $get_location->('info.title');
+            push @issues, {
+                level    => 'ERROR',
+                message  => 'Missing info.title',
+                location => $location->to_string,
+                path     => 'info.title'
+            };
+        }
+
+        unless ($info->{version}) {
+            my $location = $get_location->('info.version');
+            push @issues, {
+                level    => 'ERROR',
+                message  => 'Missing info.version',
+                location => $location->to_string,
+                path     => 'info.version'
+            };
+        }
+
+        unless ($info->{description}) {
+            my $location = $get_location->('info.description');
+            push @issues, {
+                level    => 'WARN',
+                message  => 'Missing info.description',
+                location => $location->to_string,
+                path     => 'info.description'
+            };
+        }
+
+        unless ($info->{license}) {
+            my $location = $get_location->('info.license');
+            push @issues, {
+                level    => 'WARN',
+                message  => 'Missing info.license',
+                location => $location->to_string,
+                path     => 'info.license'
+            };
+        }
     }
 
     # Paths / operations
@@ -179,10 +259,16 @@ sub find_issues {
         for my $path (sort keys %{$spec->{paths}}) {
             for my $method (sort keys %{$spec->{paths}{$path}}) {
                 my $op = $spec->{paths}{$path}{$method};
-                push @issues, {
-                    level   => 'WARN',
-                    message => "Missing description for $method $path"
-                } unless $op->{description};
+                unless ($op->{description}) {
+                    my $_path    = "paths.$path.$method.description";
+                    my $location = $get_location->($_path);
+                    push @issues, {
+                        level    => 'WARN',
+                        message  => "Missing description for $method $path",
+                        location => $location->to_string,
+                        path     => $_path,
+                    };
+                }
             }
         }
     }
@@ -191,17 +277,29 @@ sub find_issues {
     if ($spec->{components} && $spec->{components}{schemas}) {
         for my $name (sort keys %{$spec->{components}{schemas}}) {
             my $schema = $spec->{components}{schemas}{$name};
-            push @issues, {
-                level   => 'WARN',
-                message => "Schema $name missing type"
-            } unless $schema->{type};
+            unless ($schema->{type}) {
+                my $path     = "components.schemas.$name.type";
+                my $location = $get_location->($path);
+                push @issues, {
+                    level    => 'WARN',
+                    message  => "Schema $name missing type",
+                    location => $location->to_string,
+                    path     => $path,
+                };
+            }
 
             if ($schema->{properties}) {
                 for my $prop (sort keys %{$schema->{properties}}) {
-                    push @issues, {
-                        level   => 'WARN',
-                        message => "Schema $name.$prop missing description"
-                    } unless $schema->{properties}{$prop}{description};
+                    unless ($schema->{properties}{$prop}{description}) {
+                        my $path = "components.schemas.$name.properties.$prop.description";
+                        my $location = $get_location->($path);
+                        push @issues, {
+                            level    => 'WARN',
+                            message  => "Schema $name.$prop missing description",
+                            location => $location->to_string,
+                            path     => $path,
+                        };
+                    }
                 }
             }
         }
@@ -275,12 +373,13 @@ sub validate_schema {
 
     my @raw_errors = $validator->schema($schema_url)->validate($self->{spec});
 
-    # Convert to consistent hashref format matching find_issues
+    # Convert to consistent hashref format with location information
     my @issues = map {
         my $message;
+        my $path = '';
 
         if (ref $_) {
-            # Try different methods to extract the error message
+            # Extract message
             if ($_->can('to_string')) {
                 $message = $_->to_string;
             } elsif (exists $_->{message}) {
@@ -291,20 +390,33 @@ sub validate_schema {
                 $message = "$_";
             }
 
-            # Include path if available
+            # Extract path for location
             if ($_->can('path') && $_->path) {
-                $message = $_->path . ": $message";
+                $path = $_->path;
             } elsif (exists $_->{path} && $_->{path}) {
-                $message = $_->{path} . ": $message";
+                $path = $_->{path};
             }
         } else {
             $message = $_;
         }
 
+        # Convert JSON Pointer path to our location format
+        my $location_path = $path;
+        $location_path =~ s{^/}{};
+        $location_path =~ s{/}{.}g;
+        $location_path =~ s{~1}{/}g;
+        $location_path =~ s{~0}{~}g;
+
+        my $location = $self->{locations}{$location_path} ||
+                      $self->{locations}{base} ||
+                      OpenAPI::Linter::Location->new($self->{file_path}, 1, 1);
+
         {
-            level   => 'ERROR',
-            message => $message,
-            type    => 'schema_validation'
+            level    => 'ERROR',
+            message  => $message,
+            type     => 'schema_validation',
+            location => $location->to_string,
+            path     => $location_path
         }
     } @raw_errors;
 
@@ -355,6 +467,58 @@ sub _apply_json_validator_fix {
             return $orig_validate_format->(@_);
         };
     }
+}
+
+sub _extract_yaml_locations {
+    my ($data, $file_path) = @_;
+    my $locations = {};
+
+    # Always set a base location
+    $locations->{base} = OpenAPI::Linter::Location->new($file_path, 1, 1);
+
+    _walk_yaml_data($data, '', $locations, $file_path);
+    return $locations;
+}
+
+sub _walk_yaml_data {
+    my ($node, $path, $locations, $file_path) = @_;
+
+    return unless defined $node;
+
+    if (ref $node eq 'HASH') {
+        while (my ($key, $value) = each %$node) {
+            my $actual_key = ref $key eq 'YAML::PP::Node' ? $key->value : $key;
+            my $new_path = $path ? "$path.$actual_key" : $actual_key;
+
+            # Store location if available from YAML::PP
+            if (ref $key eq 'YAML::PP::Node') {
+                my $line = $key->line || 1;
+                my $column = $key->column || 1;
+                $locations->{$new_path} =
+                    OpenAPI::Linter::Location->new($file_path, $line, $column);
+            }
+
+            _walk_yaml_data($value, $new_path, $locations, $file_path);
+        }
+    }
+    elsif (ref $node eq 'ARRAY') {
+        for my $i (0 .. $#$node) {
+            my $new_path = "$path\[$i]";
+            my $item = $node->[$i];
+
+            # Store location for array items if available
+            if (ref $item eq 'YAML::PP::Node') {
+                my $line = $item->line || 1;
+                my $column = $item->column || 1;
+                $locations->{$new_path} =
+                    OpenAPI::Linter::Location->new($file_path, $line, $column);
+            }
+
+            _walk_yaml_data($item, $new_path, $locations, $file_path);
+        }
+    }
+    # For scalar values, we don't store separate locations as
+    # they're handled by their keys
 }
 
 =head1 APPLICATION

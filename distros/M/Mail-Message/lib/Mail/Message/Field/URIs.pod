@@ -14,15 +14,15 @@ Mail::Message::Field::URIs - message header field with uris
 
 =head1 SYNOPSIS
 
- my $f = Mail::Message::Field->new('List-Post' => 'http://x.org/');
+  my $f = Mail::Message::Field->new('List-Post' => 'http://x.org/');
 
- my $g = Mail::Message::Field->new('List-Post');
- $g->addURI('http://x.org');
+  my $g = Mail::Message::Field->new('List-Post');
+  $g->addURI('http://x.org');
 
- my $uri = URI->new(...);
- $g->addURI($uri);
+  my $uri = URI->new(...);
+  $g->addURI($uri);
 
- my @uris = $g->URIs;
+  my @uris = $g->URIs;
 
 =head1 DESCRIPTION
 
@@ -31,58 +31,56 @@ syntaxes.  Especially the mailing-list RFCs use these fields all the
 time.  This class can maintain these fields.
 
 Extends L<"DESCRIPTION" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<0+>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<<=>>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<bool>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<cmp>
-
-Inherited, see L<Mail::Message::Field/"OVERLOADED">
-
-=item overload: B<stringification>
+=item overload: B<""> stringification
 
 Inherited, see L<Mail::Message::Field::Full/"OVERLOADED">
+
+=item overload: B<0+> numification
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<<=>> numeric comparison
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<bool> boolean
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<cmp> string comparison
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
 =back
 
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>()
 
 Inherited, see L<Mail::Message::Field/"Constructors">
 
-=item Mail::Message::Field::URIs-E<gt>B<from>($field, %options)
+=item $class-E<gt>B<from>($field, %options)
 
 Inherited, see L<Mail::Message::Field::Full/"Constructors">
 
-=item Mail::Message::Field::URIs-E<gt>B<new>($data)
+=item $class-E<gt>B<new>($data)
+
+Inherited, see L<Mail::Message::Field::Structured/"METHODS">
 
  -Option    --Defined in                      --Default
   attributes  Mail::Message::Field::Structured  <ignored>
@@ -96,17 +94,17 @@ Inherited, see L<Mail::Message::Field::Full/"Constructors">
 
 =over 2
 
-=item attributes => ATTRS
+=item attributes => \@attributes|\%attributes
 
-=item charset => STRING
+=item charset => $charset
 
-=item datum => STRING
+=item datum => $date
 
 =item encoding => 'q'|'Q'|'b'|'B'
 
 =item force => BOOLEAN
 
-=item language => STRING
+=item language => $language
 
 =item log => LEVEL
 
@@ -114,25 +112,35 @@ Inherited, see L<Mail::Message::Field::Full/"Constructors">
 
 =back
 
-example: 
+» example: 
 
- my $mmfu = 'Mail::Message::Field::URIs;
- my $f = $mmfu->new('List-Post' => 'mailto:x@y.com');
- my $f = $mmfu->new('List-Post' => '<mailto:x@y.com>');
- my $f = $mmfu->new('List-Post: <mailto:x@y.com>');
- my $f = $mmfu->new('List-Post' => [ $uri, 'http://x.org' ]);
+  my $mmfu = 'Mail::Message::Field::URIs;
+  my $f = $mmfu->new('List-Post' => 'mailto:x@y.com');
+  my $f = $mmfu->new('List-Post' => '<mailto:x@y.com>');
+  my $f = $mmfu->new('List-Post: <mailto:x@y.com>');
+  my $f = $mmfu->new('List-Post' => [ $uri, 'http://x.org' ]);
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 The field
 
 Extends L<"The field" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"The field">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<isStructured>()
-
-=item Mail::Message::Field::URIs-E<gt>B<isStructured>()
+=item $any-E<gt>B<isStructured>()
 
 Inherited, see L<Mail::Message::Field/"The field">
 
@@ -165,7 +173,7 @@ Inherited, see L<Mail::Message::Field/"The field">
 =head2 Access to the name
 
 Extends L<"Access to the name" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Access to the name">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<Name>()
@@ -185,7 +193,7 @@ Inherited, see L<Mail::Message::Field/"Access to the name">
 =head2 Access to the body
 
 Extends L<"Access to the body" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Access to the body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>()
@@ -204,9 +212,7 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 
 Inherited, see L<Mail::Message::Field/"Access to the body">
 
-=item $obj-E<gt>B<stripCFWS>( [STRING] )
-
-=item Mail::Message::Field::URIs-E<gt>B<stripCFWS>( [STRING] )
+=item $any-E<gt>B<stripCFWS>( [STRING] )
 
 Inherited, see L<Mail::Message::Field/"Access to the body">
 
@@ -219,7 +225,7 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 =head2 Access to the content
 
 Extends L<"Access to the content" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Access to the content">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<URIs>()
@@ -227,9 +233,9 @@ Extends L<"Access to the content" in Mail::Message::Field::Structured|Mail::Mess
 Returns a list with all URIs defined by the field.  Mind the lower-case
 's' at the enc of the name.
 
-example: 
+» example: 
 
- my @uris = $field->URIs;
+  my @uris = $field->URIs;
 
 =item $obj-E<gt>B<addAttribute>(...)
 
@@ -237,19 +243,19 @@ Attributes are not supported for URI fields.
 
 =item $obj-E<gt>B<addURI>($uri)
 
-Add an $uri to the field.  The $uri can be specified as URI object
-or as string which will be turned into an $uri object.  The added
-$uri is returned.
+Add an C<$uri> to the field.  The C<$uri> can be specified as URI object
+or as string which will be turned into an C<$uri> object.  The added
+C<$uri> is returned.
 
-example: adding an URI to an URI field
+» example: adding an URI to an URI field
 
- my $f   = Mail::Message::Field::URI->new('List-Post');
+  my $f   = Mail::Message::Field::URI->new('List-Post');
 
- my $uri = URI->new("http://x.org");
- $f->addURI($uri);
+  my $uri = URI->new("http://x.org");
+  $f->addURI($uri);
 
- $f->addURI("http://y.org");  # simpler
- $f->addURI("//y.org", "http");
+  $f->addURI("http://y.org");  # simpler
+  $f->addURI("//y.org", "http");
 
 =item $obj-E<gt>B<addresses>()
 
@@ -275,15 +281,11 @@ Inherited, see L<Mail::Message::Field::Full/"Access to the content">
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
-=item $obj-E<gt>B<createComment>(STRING, %options)
-
-=item Mail::Message::Field::URIs-E<gt>B<createComment>(STRING, %options)
+=item $any-E<gt>B<createComment>(STRING, %options)
 
 Inherited, see L<Mail::Message::Field::Full/"Access to the content">
 
-=item $obj-E<gt>B<createPhrase>(STRING, %options)
-
-=item Mail::Message::Field::URIs-E<gt>B<createPhrase>(STRING, %options)
+=item $any-E<gt>B<createPhrase>(STRING, %options)
 
 Inherited, see L<Mail::Message::Field::Full/"Access to the content">
 
@@ -291,9 +293,7 @@ Inherited, see L<Mail::Message::Field::Full/"Access to the content">
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
-=item $obj-E<gt>B<toDate>( [$time] )
-
-=item Mail::Message::Field::URIs-E<gt>B<toDate>( [$time] )
+=item $any-E<gt>B<toDate>( [$time] )
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
@@ -306,12 +306,10 @@ Inherited, see L<Mail::Message::Field/"Access to the content">
 =head2 Other methods
 
 Extends L<"Other methods" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Other methods">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<dateToTimestamp>(STRING)
-
-=item Mail::Message::Field::URIs-E<gt>B<dateToTimestamp>(STRING)
+=item $any-E<gt>B<dateToTimestamp>(STRING)
 
 Inherited, see L<Mail::Message::Field/"Other methods">
 
@@ -320,16 +318,14 @@ Inherited, see L<Mail::Message::Field/"Other methods">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<consume>( $line | <$name,<$body|$objects>> )
 
 Inherited, see L<Mail::Message::Field/"Internals">
 
-=item $obj-E<gt>B<decode>(STRING, %options)
-
-=item Mail::Message::Field::URIs-E<gt>B<decode>(STRING, %options)
+=item $any-E<gt>B<decode>(STRING, %options)
 
 Inherited, see L<Mail::Message::Field::Full/"Internals">
 
@@ -341,9 +337,7 @@ Inherited, see L<Mail::Message::Field/"Internals">
 
 Inherited, see L<Mail::Message::Field::Full/"Internals">
 
-=item $obj-E<gt>B<fold>( $name, $body, [$maxchars] )
-
-=item Mail::Message::Field::URIs-E<gt>B<fold>( $name, $body, [$maxchars] )
+=item $any-E<gt>B<fold>( $name, $body, [$maxchars] )
 
 Inherited, see L<Mail::Message::Field/"Internals">
 
@@ -364,12 +358,10 @@ Inherited, see L<Mail::Message::Field/"Internals">
 =head2 Parsing
 
 Extends L<"Parsing" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Parsing">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<consumeComment>(STRING)
-
-=item Mail::Message::Field::URIs-E<gt>B<consumeComment>(STRING)
+=item $any-E<gt>B<consumeComment>(STRING)
 
 Inherited, see L<Mail::Message::Field::Full/"Parsing">
 
@@ -377,9 +369,7 @@ Inherited, see L<Mail::Message::Field::Full/"Parsing">
 
 Inherited, see L<Mail::Message::Field::Full/"Parsing">
 
-=item $obj-E<gt>B<consumePhrase>(STRING)
-
-=item Mail::Message::Field::URIs-E<gt>B<consumePhrase>(STRING)
+=item $any-E<gt>B<consumePhrase>(STRING)
 
 Inherited, see L<Mail::Message::Field::Full/"Parsing">
 
@@ -400,7 +390,7 @@ Inherited, see L<Mail::Message::Field::Full/"Parsing">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -411,9 +401,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Field::URIs-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -421,19 +409,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Field::URIs-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Field::URIs-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -462,7 +442,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -474,7 +454,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -484,39 +464,46 @@ Extends L<"DETAILS" in Mail::Message::Field::Structured|Mail::Message::Field::St
 The numeric value of a field is requested (for instance the C<Lines> or
 C<Content-Length> fields should be numerical), however the data contains
 weird characters.
+Cast by C<toInt()>
 
 =item Error: Field name too long (max $length), in '$name'
 
 It is not specified in the RFCs how long a field name can be, but
 at least it should be a few characters shorter than the line wrap.
+Cast by C<fold()>
 
 =item Warning: Illegal character in charset '$charset'
 
 The field is created with an utf8 string which only contains data from the
 specified character set.  However, that character set can never be a valid
 name because it contains characters which are not permitted.
+Cast by C<encode()>
 
 =item Warning: Illegal character in field name $name
 
 A new field is being created which does contain characters not permitted
 by the RFCs.  Using this field in messages may break other e-mail clients
 or transfer agents, and therefore mutulate or extinguish your message.
+Cast by C<consume()>
 
 =item Warning: Illegal character in language '$lang'
 
 The field is created with data which is specified to be in a certain language,
 however, the name of the language cannot be valid: it contains characters
 which are not permitted by the RFCs.
+Cast by C<encode()>
 
 =item Warning: Illegal encoding '$encoding', used 'q'
 
 The RFCs only permit base64 (C<b > or C<B >) or quoted-printable
 (C<q> or C<Q>) encoding.  Other than these four options are illegal.
+Cast by C<encode()>
 
 =item Error: No attributes for URI fields.
 
 Is is not possible to add attributes to URI fields: it is not permitted
 by the RFCs.
+Cast by C<addAttribute()>
 
 =item Error: Package $package does not implement $method.
 
@@ -525,19 +512,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -5,10 +5,12 @@ use warnings;
 
 package Tie::Hash::MultiValueOpts;
 
-$Tie::Hash::MultiValueOpts::VERSION = 'v1.0.3';
+$Tie::Hash::MultiValueOpts::VERSION = 'v1.0.4';
 
 use Tie::Hash ();
 use parent -norequire, 'Tie::StdHash';
+
+sub TIEHASH { my $class = shift; bless { @_ }, $class }
 
 sub STORE {
   my ( $self, $key, $value ) = @_;

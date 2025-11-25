@@ -12,34 +12,36 @@ Mail::Message::Convert::HtmlFormatText - Convert HTML into Text
 
 =head1 SYNOPSIS
 
- use Mail::Message::Convert::HtmlFormatText;
- my $af = Mail::Message::Convert::HtmlFormatText->new;
+  use Mail::Message::Convert::HtmlFormatText;
+  my $af = Mail::Message::Convert::HtmlFormatText->new;
 
- my $plain_body = $af->format($body);
+  my $plain_body = $af->format($body);
 
 =head1 DESCRIPTION
 
 Convert HTML/XHTML message body objects into plain text bodies using
 HTML::FormatText.  This package requires HTML::TreeBuilder and
 HTML::FormatText which are not installed by default together with
-Mail::Box.  See also L<Mail::Message::rebuild()|Mail::Message::Construct::Rebuild/"Constructing a message"> with rule
+L<Mail::Box|Mail::Box>.  See also L<Mail::Message::rebuild()|Mail::Message::Construct::Rebuild/"Constructing a message"> with rule
 C<text_alternative_for_html>.
 
 This module is a small wrapper around HTML::FormatText.
 
 Extends L<"DESCRIPTION" in Mail::Message::Convert|Mail::Message::Convert/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Convert|Mail::Message::Convert/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Convert|Mail::Message::Convert/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Message::Convert::HtmlFormatText-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option     --Defined in            --Default
   fields       Mail::Message::Convert  <see description>
@@ -68,10 +70,22 @@ The column of the right margin, passed to the formatter.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Convert|Mail::Message::Convert/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 Converting
 
 Extends L<"Converting" in Mail::Message::Convert|Mail::Message::Convert/"Converting">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<format>($body)
@@ -88,7 +102,7 @@ Inherited, see L<Mail::Message::Convert/"Converting">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Convert|Mail::Message::Convert/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -99,9 +113,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Convert::HtmlFormatText-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -109,19 +121,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Convert::HtmlFormatText-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Convert::HtmlFormatText-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -150,7 +154,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Convert|Mail::Message::Convert/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -170,19 +174,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

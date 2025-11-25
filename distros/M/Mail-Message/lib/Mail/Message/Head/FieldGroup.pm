@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Head::FieldGroup;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Reporter';
@@ -15,172 +18,138 @@ use base 'Mail::Reporter';
 use strict;
 use warnings;
 
+#--------------------
 
 sub new(@)
-{   my $class = shift;
+{	my $class = shift;
 
-    my @fields;
-    push @fields, shift while ref $_[0];
+	my @fields;
+	push @fields, shift while ref $_[0];
 
-    $class->SUPER::new(@_, fields => \@fields);
+	$class->SUPER::new(@_, fields => \@fields);
 }
 
 sub init($$)
-{   my ($self, $args) = @_;
-    $self->SUPER::init($args);
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args);
 
-    my $head = $self->{MMHF_head}
-      = $args->{head} || Mail::Message::Head::Partial->new;
+	my $head = $self->{MMHF_head} = $args->{head} || Mail::Message::Head::Partial->new;
 
-    $self->add($_)                            # add specified object fields
-        foreach @{$args->{fields}};
+	$self->add($_)                            # add specified object fields
+		for @{$args->{fields}};
 
-    $self->add($_, delete $args->{$_})        # add key-value paired fields
-        foreach grep m/^[A-Z]/, keys %$args;
+	$self->add($_, delete $args->{$_})        # add key-value paired fields
+		for grep m/^[A-Z]/, keys %$args;
 
-    $self->{MMHF_version}  = $args->{version}  if defined $args->{version};
-    $self->{MMHF_software} = $args->{software} if defined $args->{software};
-    $self->{MMHF_type}     = $args->{type}     if defined $args->{type};
-
-    $self->{MMHF_fns}      = [];
-    $self;
+	$self->{MMHF_version}  = $args->{version}  if defined $args->{version};
+	$self->{MMHF_software} = $args->{software} if defined $args->{software};
+	$self->{MMHF_type}     = $args->{type}     if defined $args->{type};
+	$self->{MMHF_fns}      = [];
+	$self;
 }
 
-#------------------------------------------
+
+sub implementedTypes() { $_[0]->notImplemented }
 
 
-sub implementedTypes() { shift->notImplemented }
-
-#------------------------------------------
-
-
-sub from($) { shift->notImplemented }
-
-#------------------------------------------
+sub from($) { $_[0]->notImplemented }
 
 
 sub clone()
-{   my $self = shift;
-    my $clone = bless %$self, ref $self;
-    $clone->{MMHF_fns} = [ $self->fieldNames ];
-    $clone;
+{	my $self = shift;
+	my $clone = bless %$self, ref $self;
+	$clone->{MMHF_fns} = [ $self->fieldNames ];
+	$clone;
 }
 
-#------------------------------------------
+#--------------------
 
-
-sub head() { shift->{MMHF_head} }
-
-#------------------------------------------
+sub head() { $_[0]->{MMHF_head} }
 
 
 sub attach($)
-{   my ($self, $head) = @_;
-    $head->add($_->clone) for $self->fields;
-    $self;
+{	my ($self, $head) = @_;
+	$head->add($_->clone) for $self->fields;
+	$self;
 }
-
-#------------------------------------------
 
 
 sub delete()
-{   my $self   = shift;
-    my $head   = $self->head;
-    $head->removeField($_) foreach $self->fields;
-    $self;
+{	my $self = shift;
+	my $head = $self->head;
+	$head->removeField($_) for $self->fields;
+	$self;
 }
-
-#------------------------------------------
 
 
 sub add(@)
-{   my $self = shift;
-    my $field = $self->head->add(@_) or return ();
-    push @{$self->{MMHF_fns}}, $field->name;
-    $self;
+{	my $self = shift;
+	my $field = $self->head->add(@_) or return ();
+	push @{$self->{MMHF_fns}}, $field->name;
+	$self;
 }
-
-#------------------------------------------
 
 
 sub fields()
-{   my $self = shift;
-    my $head = $self->head;
-    map { $head->get($_) } $self->fieldNames;
+{	my $self = shift;
+	my $head = $self->head;
+	map $head->get($_), $self->fieldNames;
 }
 
-#------------------------------------------
 
-
-sub fieldNames() { @{shift->{MMHF_fns}} }
-
-#------------------------------------------
+sub fieldNames() { @{ $_[0]->{MMHF_fns}} }
 
 
 sub addFields(@)
-{   my $self = shift;
-    my $head = $self->head;
+{	my $self = shift;
+	my $head = $self->head;
 
-    push @{$self->{MMHF_fns}}, @_;
-    @_;
+	push @{$self->{MMHF_fns}}, @_;
+	@_;
 }
 
-#------------------------------------------
+#--------------------
+
+sub version() { $_[0]->{MMHF_version} }
 
 
-sub version() { shift->{MMHF_version} }
-
-#------------------------------------------
+sub software() { $_[0]->{MMHF_software} }
 
 
-sub software() { shift->{MMHF_software} }
+sub type() { $_[0]->{MMHF_type} }
 
-#------------------------------------------
-
-
-sub type() { shift->{MMHF_type} }
-
-#------------------------------------------
-
+#--------------------
 
 sub detected($$$)
-{   my $self = shift;
-    @$self{ qw/MMHF_type MMHF_software MMHF_version/ } = @_;
+{	my $self = shift;
+	@$self{ qw/MMHF_type MMHF_software MMHF_version/ } = @_;
 }
 
-#------------------------------------------
 
+sub collectFields(;$) { $_[0]->notImplemented }
 
-sub collectFields(;$) { shift->notImplemented }
-
-#------------------------------------------
-
+#--------------------
 
 sub print(;$)
-{   my $self = shift;
-    my $out  = shift || select;
-    $_->print($out) foreach $self->fields;
+{	my $self = shift;
+	my $out  = shift || select;
+	$_->print($out) for $self->fields;
 }
-
-#------------------------------------------
 
 
 sub details()
-{   my $self     = shift;
-    my $type     = $self->type || 'Unknown';
+{	my $self     = shift;
+	my $type     = $self->type || 'Unknown';
 
-    my $software = $self->software;
-    undef $software if defined($software) && $type eq $software;
-    my $version  = $self->version;
-    my $release
-      = defined $software
-      ? (defined $version ? " ($software $version)" : " ($software)")
-      : (defined $version ? " ($version)"           : '');
+	my $software = $self->software;
+	undef $software if defined($software) && $type eq $software;
+	my $version  = $self->version;
+	my $release  = defined $software
+	  ? (defined $version ? " ($software $version)" : " ($software)")
+	  : (defined $version ? " ($version)"           : '');
 
-    my $fields   = scalar $self->fields;
-    "$type $release, $fields fields";
+	my $fields   = scalar $self->fields;
+	"$type $release, $fields fields";
 }
-
-#------------------------------------------
 
 1;

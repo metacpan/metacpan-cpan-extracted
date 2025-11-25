@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -236,6 +236,13 @@ sub parse_sirtx {
 
     $data =~ s/^\[(.+)\]$/$1/;
 
+    # Experimental:
+    if (my ($d, $v) = $data =~ /^(\[.+?\]):(.+)$/) {
+        $d = $self->parse_sirtx($d);
+        $v =~ s/^\[(.+)\]$/$1/;
+        return Data::Identifier->new($d => $v);
+    }
+
     if ($data =~ /^'([0-9]*)$/) {
         my $num = int($1 || '0');
         require Data::Identifier::Generate;
@@ -374,7 +381,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 

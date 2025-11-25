@@ -14,30 +14,30 @@ Mail::Box::POP3s - handle secure POP3 folders as client
 
 =head1 SYNOPSIS
 
- use Mail::Box::POP3s;
- my $folder = Mail::Box::POP3s->new(folder => $ENV{MAIL}, ...);
+  use Mail::Box::POP3s;
+  my $folder = Mail::Box::POP3s->new(folder => $ENV{MAIL}, ...);
 
 =head1 DESCRIPTION
 
 This module mainly extends L<Mail::Box::POP3|Mail::Box::POP3>.
 
 Extends L<"DESCRIPTION" in Mail::Box::POP3|Mail::Box::POP3/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Box::POP3|Mail::Box::POP3/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<@{}>
+=item overload: B<@{}> use as ARRAY
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<cmp>
+=item overload: B<cmp> string comparison
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
@@ -46,30 +46,32 @@ Inherited, see L<Mail::Box/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::POP3|Mail::Box::POP3/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::POP3s-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Box::POP3/"METHODS">
 
  -Option           --Defined in     --Default
   access             Mail::Box        'r'
   authenticate       Mail::Box::POP3  'AUTO'
   body_delayed_type  Mail::Box        Mail::Message::Body::Delayed
   body_type          Mail::Box        Mail::Message::Body::Lines
-  coerce_options     Mail::Box        []
+  coerce_options     Mail::Box        +[]
   create             Mail::Box        <not applicable>
   extract            Mail::Box        10240
   field_type         Mail::Box        undef
-  fix_headers        Mail::Box        <false>
+  fix_headers        Mail::Box        false
   folder             Mail::Box        <not applicable>
   folderdir          Mail::Box        <network location>
   head_delayed_type  Mail::Box        Mail::Message::Head::Delayed
   head_type          Mail::Box        Mail::Message::Head::Complete
-  keep_dups          Mail::Box        <false>
+  keep_dups          Mail::Box        false
   lock_file          Mail::Box        undef
   lock_timeout       Mail::Box        1 hour
   lock_type          Mail::Box        'NONE'
@@ -82,18 +84,18 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
   password           Mail::Box::Net   undef
   pop_client         Mail::Box::POP3  undef
   remove_when_empty  Mail::Box        <false>
-  save_on_exit       Mail::Box        <true>
+  save_on_exit       Mail::Box        true
   server_name        Mail::Box::Net   undef
   server_port        Mail::Box::Net   995
-  ssl_options        Mail::Box::POP3  <undef>
+  ssl_options        Mail::Box::POP3  <C<undef>>
   trace              Mail::Reporter   'WARNINGS'
   trusted            Mail::Box        <false>
-  use_ssl            Mail::Box::POP3  <false>
+  use_ssl            Mail::Box::POP3  <C<false>>
   username           Mail::Box::Net   undef
 
 =over 2
 
-=item access => MODE
+=item access => $mode
 
 =item authenticate => 'LOGIN'|'APOP'|'AUTO'|'OUATH2'|'OAUTH2_SEP'
 
@@ -105,15 +107,15 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
 
 =item create => BOOLEAN
 
-=item extract => INTEGER | CODE | METHOD | 'LAZY'|'ALWAYS'
+=item extract => INTEGER | CODE | METHOD | 'LAZY'| 'ALWAYS'
 
 =item field_type => CLASS
 
 =item fix_headers => BOOLEAN
 
-=item folder => FOLDERNAME
+=item folder => $name
 
-=item folderdir => DIRECTORY
+=item folderdir => $directory
 
 =item head_delayed_type => CLASS
 
@@ -121,25 +123,25 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
 
 =item keep_dups => BOOLEAN
 
-=item lock_file => FILENAME
+=item lock_file => $file
 
-=item lock_timeout => SECONDS
+=item lock_timeout => $seconds
 
 =item lock_type => CLASS|STRING|ARRAY
 
-=item lock_wait => SECONDS
+=item lock_wait => $seconds
 
 =item locker => OBJECT
 
 =item log => LEVEL
 
-=item manager => MANAGER
+=item manager => $manager
 
 =item message_type => CLASS
 
 =item multipart_type => CLASS
 
-=item password => STRING
+=item password => $password
 
 =item pop_client => OBJECT
 
@@ -147,9 +149,9 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
 
 =item save_on_exit => BOOLEAN
 
-=item server_name => HOSTNAME
+=item server_name => $host
 
-=item server_port => INTEGER
+=item server_port => $number
 
 =item ssl_options => HASH
 
@@ -159,16 +161,52 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
 
 =item use_ssl => BOOLEAN
 
-=item username => STRING
+=item username => $username
 
 =back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::POP3|Mail::Box::POP3/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<fixHeaders>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<folderdir>( [$directory] )
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<isTrusted>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<removeEmpty>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box/"Attributes">
 
 =back
 
 =head2 The folder
 
 Extends L<"The folder" in Mail::Box::POP3|Mail::Box::POP3/"The folder">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addMessage>($message)
@@ -179,7 +217,7 @@ Inherited, see L<Mail::Box::POP3/"METHODS">
 
 Inherited, see L<Mail::Box::POP3/"METHODS">
 
-=item Mail::Box::POP3s-E<gt>B<appendMessages>(%options)
+=item $class-E<gt>B<appendMessages>(%options)
 
 Inherited, see L<Mail::Box/"The folder">
 
@@ -195,23 +233,11 @@ Inherited, see L<Mail::Box/"The folder">
 
 Inherited, see L<Mail::Box::POP3/"METHODS">
 
-=item $obj-E<gt>B<folderdir>( [$directory] )
-
-Inherited, see L<Mail::Box/"The folder">
-
-=item $obj-E<gt>B<name>()
-
-Inherited, see L<Mail::Box/"The folder">
-
 =item $obj-E<gt>B<organization>()
 
 Inherited, see L<Mail::Box/"The folder">
 
 =item $obj-E<gt>B<size>()
-
-Inherited, see L<Mail::Box/"The folder">
-
-=item $obj-E<gt>B<type>()
 
 Inherited, see L<Mail::Box/"The folder">
 
@@ -228,7 +254,7 @@ Inherited, see L<Mail::Box/"The folder">
 =head2 Folder flags
 
 Extends L<"Folder flags" in Mail::Box::POP3|Mail::Box::POP3/"Folder flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<access>()
@@ -252,7 +278,7 @@ Inherited, see L<Mail::Box/"Folder flags">
 =head2 The messages
 
 Extends L<"The messages" in Mail::Box::POP3|Mail::Box::POP3/"The messages">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<current>( [$number|$message|$message_id] )
@@ -263,7 +289,7 @@ Inherited, see L<Mail::Box/"The messages">
 
 Inherited, see L<Mail::Box/"The messages">
 
-=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [$msgs]] )
+=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [\@msgs]] )
 
 Inherited, see L<Mail::Box/"The messages">
 
@@ -296,18 +322,14 @@ Inherited, see L<Mail::Box/"The messages">
 =head2 Sub-folders
 
 Extends L<"Sub-folders" in Mail::Box::POP3|Mail::Box::POP3/"Sub-folders">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<listSubFolders>(%options)
-
-=item Mail::Box::POP3s-E<gt>B<listSubFolders>(%options)
+=item $any-E<gt>B<listSubFolders>(%options)
 
 Inherited, see L<Mail::Box::POP3/"METHODS">
 
-=item $obj-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
-
-=item Mail::Box::POP3s-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+=item $any-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
@@ -319,9 +341,7 @@ Inherited, see L<Mail::Box/"Sub-folders">
 
 Inherited, see L<Mail::Box::POP3/"METHODS">
 
-=item $obj-E<gt>B<topFolderWithMessages>()
-
-=item Mail::Box::POP3s-E<gt>B<topFolderWithMessages>()
+=item $any-E<gt>B<topFolderWithMessages>()
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
@@ -330,16 +350,14 @@ Inherited, see L<Mail::Box/"Sub-folders">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Box::POP3|Mail::Box::POP3/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<coerce>($message, %options)
 
 Inherited, see L<Mail::Box/"Internals">
 
-=item $obj-E<gt>B<create>($folder, %options)
-
-=item Mail::Box::POP3s-E<gt>B<create>($folder, %options)
+=item $any-E<gt>B<create>($folder, %options)
 
 Inherited, see L<Mail::Box::POP3/"METHODS">
 
@@ -347,7 +365,7 @@ Inherited, see L<Mail::Box::POP3/"METHODS">
 
 Inherited, see L<Mail::Box/"Internals">
 
-=item Mail::Box::POP3s-E<gt>B<foundIn>( [$foldername], %options )
+=item $class-E<gt>B<foundIn>( [$foldername], %options )
 
 Inherited, see L<Mail::Box/"Internals">
 
@@ -408,12 +426,10 @@ Inherited, see L<Mail::Box::POP3/"Internals">
 =head2 Other methods
 
 Extends L<"Other methods" in Mail::Box::POP3|Mail::Box::POP3/"Other methods">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<timespan2seconds>($time)
-
-=item Mail::Box::POP3s-E<gt>B<timespan2seconds>($time)
+=item $any-E<gt>B<timespan2seconds>($time)
 
 Inherited, see L<Mail::Box/"Other methods">
 
@@ -422,7 +438,7 @@ Inherited, see L<Mail::Box/"Other methods">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::POP3|Mail::Box::POP3/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -433,9 +449,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::POP3s-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -443,19 +457,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::POP3s-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::POP3s-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -484,7 +490,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::POP3|Mail::Box::POP3/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -496,7 +502,7 @@ Inherited, see L<Mail::Box/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::POP3|Mail::Box::POP3/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -505,17 +511,20 @@ Extends L<"DETAILS" in Mail::Box::POP3|Mail::Box::POP3/"DETAILS">.
 
 The connection to the POP3 server cannot be established.  You may see
 more, related, error messages about the failure.
+Cast by C<popClient()>
 
 =item Error: Cannot find head back for $uidl on POP3 server $name.
 
 The server told to have this message, but when asked for its headers, no
 single line was returned.  Did the message get destroyed?
+Cast by C<getHeadAndBody()>
 
 =item Error: Cannot read body for $uidl on POP3 server $name.
 
 The message's headers are retrieved from the server, but the body seems
 to be lost.  Did the message get destroyed between reading the header
 and reading the body?
+Cast by C<getHeadAndBody()>
 
 =item Warning: Changes not written to read-only folder $self.
 
@@ -523,39 +532,46 @@ You have opened the folder read-only --which is the default set
 by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
 Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mode, or close
 the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
+Cast by C<close()>
 
 =item Error: Copying failed for one message.
 
 For some reason, for instance disc full, removed by external process, or
 read-protection, it is impossible to copy one of the messages.  Copying will
 proceed for the other messages.
+Cast by C<copyTo()>
 
 =item Error: Destination folder $name is not writable.
 
 The folder where the messages are copied to is not opened with write
 access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
 to the folder which is controlled by your operating system.
+Cast by C<copyTo()>
 
 =item Warning: Different messages with id $msgid
 
 The message id is discovered more than once within the same folder, but the
 content of the message seems to be different.  This should not be possible:
 each message must be unique.
+Cast by C<messageId()>
 
 =item Error: Folder $name is opened read-only
 
 You can not write to this folder unless you have opened the folder to
-write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set true.
+write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set C<true>.
+Cast by C<write()>
 
 =item Error: Invalid timespan '$timespan' specified.
 
 The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
+Cast by C<timespan2seconds()>
 
 =item Warning: Message $uidl on POP3 server $name disappeared.
 
 The server indicated the existence of this message before, however it
 has no information about the message anymore.
+Cast by C<getHeadAndBody()>
 
 =item Warning: Message-id '$msgid' does not contain a domain.
 
@@ -563,11 +579,13 @@ According to the RFCs, message-ids need to contain a unique random part,
 then an C<@>, and then a domain name.  This is made to avoid the creation
 of two messages with the same id.  The warning emerges when the C<@> is
 missing from the string.
+Cast by C<messageId()>
 
 =item Warning: POP3 folders cannot be deleted.
 
 Each user has only one POP3 folder on a server.  This folder is created and
 deleted by the server's administrator only.
+Cast by C<delete()>
 
 =item Error: Package $package does not implement $method.
 
@@ -576,41 +594,47 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unable to create subfolder $name of $folder.
 
 The copy includes the subfolders, but for some reason it was not possible
 to copy one of these.  Copying will proceed for all other sub-folders.
+Cast by C<copyTo()>
 
 =item Error: Update of $nr messages ignored for POP3 folder $name.
 
 The standard POP3 implementation does not support writing from client back
 to the server.  Therefore, modifications may be lost.
+Cast by C<writeMessages()>
 
 =item Error: Writing folder $name failed
 
 For some reason (you probably got more error messages about this problem)
 it is impossible to write the folder, although you should because there
 were changes made.
+Cast by C<write()>
 
 =item Error: You cannot write a message to a pop server (yet)
 
 Some extensions to the POP3 protocol do permit writing messages to the server,
 but the standard protocol only implements retreival.  Feel invited to extend our
 implementation with writing.
+Cast by C<addMessage()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 distribution version 3.007,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 version 3.008,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -6,14 +6,14 @@ Mail::Message::Body::Encode - organize general message encodings
 
 =head1 SYNOPSIS
 
- my Mail::Message $msg = ...;
- my $decoded = $msg->decoded;
- my $encoded = $msg->encode(mime_type => 'image/gif',
-     transfer_encoding => 'base64');
+  my Mail::Message $msg = ...;
+  my $decoded = $msg->decoded;
+  my $encoded = $msg->encode(mime_type => 'image/gif',
+      transfer_encoding => 'base64');
 
- my $body = $msg->body;
- my $decoded = $body->decoded;
- my $encoded = $body->encode(transfer_encoding => '7bit');
+  my $body = $msg->body;
+  my $decoded = $body->decoded;
+  my $encoded = $body->encode(transfer_encoding => '7bit');
 
 =head1 DESCRIPTION
 
@@ -52,6 +52,23 @@ NOT IMPLEMENTED YET
 
 =head1 METHODS
 
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
+
+[3.013] When a body object does not specify its character-set, but that
+detail is required, then it gets autodetected.  The default algorithm is
+implemented in L<charsetDetect()|Mail::Message::Body::Encode/"Constructing a body">.  You may change this default algorithm,
+or pass option C<charset_detect> for each call to L<encode()|Mail::Message::Body::Encode/"Constructing a body">.
+
+When you call this method with an explicit C<undef>, you reset the default.
+(Without parameter) the current algorithm (C<CODE> or method name) is
+returned.
+
+=back
+
 =head2 Constructing a body
 
 =over 4
@@ -64,7 +81,7 @@ are those octets or strings?
 Please read L<Mail::Message::Body/Autodetection of character-set>.
 
  -Option  --Default
-  external  <false>
+  external  <C<false>>
 
 =over 2
 
@@ -74,17 +91,6 @@ Do only consider externally valid character-sets, implicitly: C<PERL> is not
 an acceptable answer.
 
 =back
-
-=item Mail::Message::Body-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
-
-[3.013] When a body object does not specify its character-set, but that
-detail is required, then it gets autodetected.  The default algorithm is
-implemented in L<charsetDetect()|Mail::Message::Body::Encode/"Constructing a body">.  You may change this default algorithm,
-or pass option C<charset_detect> for each call to L<encode()|Mail::Message::Body::Encode/"Constructing a body">.
-
-When you call this method with an explicit C<undef>, you reset the default.
-(Without parameter) the current algorithm (CODE or method name) is
-returned.
 
 =item $obj-E<gt>B<check>()
 
@@ -126,14 +132,14 @@ This setting overrules the charset attribute in the mime_type FIELD.
 =item charset_detect => CODE
 
 [3.013] When the body does not contain an explicit charset specification,
-then the RFC says it is C<us-ascii>.  In reality, this is not true:
+then the RFC says it is C<us-ascii>.  In reality, this is not C<true>:
 it is just an unknown character set. This often happens when text files
 are included as attachment, for instance a footer attachment.
 
 When you want to be smarter than the default charset detector, you can
 provide your own function for this parameter.  The function will get
 the transfer-decoded version of this body.  You can change the default
-globally via L<charsetDetectAlgorithm()|Mail::Message::Body::Encode/"Constructing a body">.
+globally via L<charsetDetectAlgorithm()|Mail::Message::Body::Encode/"Attributes">.
 
 =item mime_type => STRING|FIELD
 
@@ -172,24 +178,35 @@ otherwise.  In either case, the body is checked.
 
 =item charset_detect => CODE
 
-See L<charsetDetectAlgorithm()|Mail::Message::Body::Encode/"Constructing a body">.
+See L<charsetDetectAlgorithm()|Mail::Message::Body::Encode/"Attributes">.
 
 =back
 
+=item $obj-E<gt>B<eol>( ['CR'|'LF'|'CRLF'|'NATIVE'] )
+
+Returns the character (or characters) which are used to separate lines
+within this body.  When a kind of separator is specified, the body is
+translated to contain the specified line endings.
+
+» example: 
+
+  my $body = $msg->decoded->eol('NATIVE');
+  my $char = $msg->decoded->eol;
+
 =item $obj-E<gt>B<unify>($body)
 
-Unify the type of the given $body objects with the type of the called
+Unify the type of the given C<$body> objects with the type of the called
 body.  C<undef> is returned when unification is impossible.  If the
-bodies have the same settings, the $body object is returned unchanged.
+bodies have the same settings, the C<$body> object is returned unchanged.
 
 Examples:
 
- my $bodytype = Mail::Message::Body::Lines;
- my $html  = $bodytype->new(mime_type=>'text/html', data => []);
- my $plain = $bodytype->new(mime_type=>'text/plain', ...);
+  my $bodytype = Mail::Message::Body::Lines;
+  my $html  = $bodytype->new(mime_type=>'text/html', data => []);
+  my $plain = $bodytype->new(mime_type=>'text/plain', ...);
 
- my $unified = $html->unify($plain);
- # $unified is the data of plain translated to html (if possible).
+  my $unified = $html->unify($plain);
+  # $unified is the data of plain translated to html (if possible).
 
 =back
 
@@ -200,9 +217,9 @@ Examples:
 =item $obj-E<gt>B<dispositionFilename>( [$directory] )
 
 Various fields are searched for C<filename> and C<name> attributes.  Without
-$directory, the name found will be returned unmodified.
+C<$directory>, the name found will be returned unmodified.
 
-When a $directory is given, a filename is composed.  For security reasons,
+When a C<$directory> is given, a filename is composed.  For security reasons,
 only the basename of the found name gets used and many potentially
 dangerous characters removed.  If no name was found, or when the found
 name is already in use, then an unique name is generated.
@@ -212,12 +229,12 @@ email application.
 
 =item $obj-E<gt>B<isBinary>()
 
-Returns true when the un-encoded message is binary data.  This information
+Returns C<true> when the un-encoded message is binary data.  This information
 is retrieved from knowledge provided by L<MIME::Types|MIME::Types>.
 
 =item $obj-E<gt>B<isText>()
 
-Returns true when the un-encoded message contains printable
+Returns C<true> when the un-encoded message contains printable
 text.
 
 =back
@@ -226,23 +243,21 @@ text.
 
 =over 4
 
-=item $obj-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
-
-=item Mail::Message::Body-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+=item $any-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
 
 Relate the NAMEd transfer encoding to an OBJECTs or object of the specified
-$class.  In the latter case, an object of that $class will be created on the
+C<$class>.  In the latter case, an object of that C<$class> will be created on the
 moment that one is needed to do encoding or decoding.
 
-The $class or $object must extend L<Mail::Message::TransferEnc|Mail::Message::TransferEnc>.  It will
-replace existing class and object for this $name.
+The C<$class> or C<$object> must extend L<Mail::Message::TransferEnc|Mail::Message::TransferEnc>.  It will
+replace existing class and object for this C<$name>.
 
 Why aren't you contributing this class to MailBox?
 
 =item $obj-E<gt>B<getTransferEncHandler>($type)
 
-Get the transfer encoder/decoder which is able to handle $type, or return
-undef if there is no such handler.
+Get the transfer encoder/decoder which is able to handle C<$type>, or return
+C<undef> if there is no such handler.
 
 =back
 
@@ -254,29 +269,41 @@ undef if there is no such handler.
 
 The encoding or decoding of a message body encounters a character set which
 is not understood by Perl's Encode module.
+Cast by C<encode()>
+
+=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
+
+Cast by C<encode()>
 
 =item Warning: No decoder defined for transfer encoding $name.
 
 The data (message body) is encoded in a way which is not currently understood,
 therefore no decoding (or recoding) can take place.
+Cast by C<encode()>
 
 =item Warning: No encoder defined for transfer encoding $name.
 
 The data (message body) has been decoded, but the required encoding is
 unknown.  The decoded data is returned.
+Cast by C<encode()>
+
+=item Warning: Unknown line terminator $eol ignored
+
+Cast by C<eol()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

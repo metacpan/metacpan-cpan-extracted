@@ -12,13 +12,13 @@ Mail::Message::Convert::Html - Format messages in HTML
 
 =head1 SYNOPSIS
 
- use Mail::Message::Convert::Html;
- my $Html = Mail::Message::Convert::Html->new;
+  use Mail::Message::Convert::Html;
+  my $Html = Mail::Message::Convert::Html->new;
 
- print $html->fieldToHtml($head);
- print $html->headToHtmlHead($head);
- print $html->headToHtmlTable($head);
- print $html->textToHtml($text);
+  print $html->fieldToHtml($head);
+  print $html->headToHtmlHead($head);
+  print $html->headToHtmlTable($head);
+  print $html->textToHtml($text);
 
 =head1 DESCRIPTION
 
@@ -27,22 +27,24 @@ without the help of external modules.  There are more HTML related modules,
 which do require extra packages to be installed.
 
 Extends L<"DESCRIPTION" in Mail::Message::Convert|Mail::Message::Convert/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Convert|Mail::Message::Convert/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Convert|Mail::Message::Convert/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Message::Convert::Html-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option     --Defined in            --Default
   fields       Mail::Message::Convert  <see description>
-  head_mailto                          <true>
+  head_mailto                          <C<true>>
   log          Mail::Reporter          'WARNINGS'
   produce                              HTML
   trace        Mail::Reporter          'WARNINGS'
@@ -68,22 +70,34 @@ html browsers will usually accept the XHTML data.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Convert|Mail::Message::Convert/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 Converting
 
 Extends L<"Converting" in Mail::Message::Convert|Mail::Message::Convert/"Converting">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<fieldContentsToHtml>( $field, [$subject] )
 
 Format one field from the header to HTML.  When the header line usually
 contains e-mail addresses, the line is scanned and valid addresses
-are linked with an C<mailto:> anchor.  The $subject can be specified to
+are linked with an C<mailto:> anchor.  The C<$subject> can be specified to
 be included in that link.
 
 =item $obj-E<gt>B<fieldToHtml>( $field, [$subject] )
 
-Reformat one header line field to HTML.  The $field's name
+Reformat one header line field to HTML.  The C<$field>'s name
 is printed in bold, followed by the formatted field content,
 which is produced by L<fieldContentsToHtml()|Mail::Message::Convert::Html/"Converting">.
 
@@ -103,26 +117,26 @@ the whole text is returned as one.
 If you need to add lines to the head (for instance, http-equiv lines), then
 splice them before the last element in the returned list.
 
-example: 
+» example: 
 
- my @head = $html->headToHtmlHead
-     ( $head
-     , description => 'This is a message'
-     , generator   => 'Mail::Box'
-     );
- splice @head, -1, 0, '<meta http-equiv=...>';
- print @head;
+  my @head = $html->headToHtmlHead(
+        $head,
+        description => 'This is a message',
+        generator   => 'Mail::Box',
+  );
+  splice @head, -1, 0, '<meta http-equiv=...>';
+  print @head;
 
 =item $obj-E<gt>B<headToHtmlTable>( $head, [$table_params] )
 
 Produce a display of the L<selectedFields()|Mail::Message::Convert/"Converting"> of the header in a
-table shape.  The optional $table_params are added as parameters to the
+table shape.  The optional C<$table_params> are added as parameters to the
 produced TABLE tag.  In list context, the separate lines are returned.
 In scalar context, everything is returned as one.
 
-example: 
+» example: 
 
- print $html->headToHtmlTable($head, 'width="50%"');
+  print $html->headToHtmlTable($head, 'width="50%"');
 
 =item $obj-E<gt>B<selectedFields>($head)
 
@@ -130,7 +144,7 @@ Inherited, see L<Mail::Message::Convert/"Converting">
 
 =item $obj-E<gt>B<textToHtml>($lines)
 
-Translate one or more $lines from text into HTML.  Each line is taken one
+Translate one or more C<$lines> from text into HTML.  Each line is taken one
 after the other, and only simple things are translated.  C<textToHtml>
 is able to convert large plain texts in a descent fashion.  In scalar
 context, the resulting lines are returned as one.
@@ -140,7 +154,7 @@ context, the resulting lines are returned as one.
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Convert|Mail::Message::Convert/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -151,9 +165,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Convert::Html-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -161,19 +173,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Convert::Html-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Convert::Html-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -202,7 +206,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Convert|Mail::Message::Convert/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -222,19 +226,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

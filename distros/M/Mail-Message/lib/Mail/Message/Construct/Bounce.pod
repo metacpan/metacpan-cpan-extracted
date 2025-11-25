@@ -6,7 +6,7 @@ Mail::Message::Construct::Bounce - bounce a Mail::Message
 
 =head1 SYNOPSIS
 
- $message->bounce(To => 'you')->send;
+  $message->bounce(To => 'you')->send;
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ in the message delivery process; it therefore leaves a resent group
 of header fields as trace.
 
 When a message is received, the Mail Transfer Agent (MTA) adds a
-C<Received> field to the header.  As %options, you may specify lines
+C<Received> field to the header.  As C<%options>, you may specify lines
 which are added to the resent group of that received field.  C<Resent-*>
 is prepended before the field-names automatically, unless already present.
 
@@ -48,16 +48,16 @@ messages have the same message-id as the original message, and therefore
 should have the same content (message-ids are universally unique).  If you
 still insist, use L<Mail::Message::body()|Mail::Message/"The body">.
 
-example: 
+» example: 
 
- my $bounce = $folder->message(3)->bounce(To => 'you', Bcc => 'everyone');
+  my $bounce = $folder->message(3)->bounce(To => 'you', Bcc => 'everyone');
 
- $bounce->send;
- $outbox->addMessage($bounce);
+  $bounce->send;
+  $outbox->addMessage($bounce);
 
- my $rg     = Mail::Message::Head::ResentGroup->new(To => 'you',
-    Received => 'from ... by ...');
- $msg->bounce($rg)->send;
+  my $rg     = Mail::Message::Head::ResentGroup->new(To => 'you',
+     Received => 'from ... by ...');
+  $msg->bounce($rg)->send;
 
 =back
 
@@ -72,19 +72,21 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

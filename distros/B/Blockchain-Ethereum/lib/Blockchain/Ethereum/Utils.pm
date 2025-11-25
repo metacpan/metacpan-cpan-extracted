@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Utility functions for Ethereum operations
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use Carp;
 use Math::BigInt;
@@ -79,7 +79,7 @@ Blockchain::Ethereum::Utils - Utility functions for Ethereum operations
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

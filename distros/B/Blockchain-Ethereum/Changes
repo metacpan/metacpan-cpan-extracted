@@ -1,3 +1,12 @@
+0.021     2025-11-25 00:06:01-03:00 America/Sao_Paulo
+    [Improvements]
+    - Removed Crypt::Perl dependency in favor of Bitcoin::Secp256k1
+    - Removed File::Slurp dependency in favor of core Perl functions
+    - Removed Net::SSH::Perl dependency in favor of CryptX
+    - [BREAKING] Blockchain::Ethereum::Keystore::Keyfile is now Blockchain::Ethereum::Keystore::File
+    - [BREAKING] (Key, Address, Seed) are now under Blockchain::Ethereum and not Blockchain::Ethereum::Keystore
+    - [BREAKING] Blockchain::Ethereum::Keystore::File instance must be created by using from_file or from_key
+    - Fixed MAC verification and key derivation vulnerabilities
 0.020     2025-10-30 23:35:49-03:00 America/Sao_Paulo
     [Improvements]
     - Added EIP-2930 transaction support

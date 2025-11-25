@@ -30,6 +30,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -37,23 +42,58 @@
             "File::Spec" : "0.7",
             "IO::Socket" : "0",
             "List::Util" : "0",
-            "Mail::Reporter" : "3",
+            "Mail::Reporter" : ">= 3, < 4.0",
             "Net::SMTP" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-Mail-Transport/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Mail-Transport.git",
          "web" : "https://github.com/markov2/perl5-Mail-Transport"
       }
    },
-   "version" : "3.007",
+   "version" : "3.008",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2001,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [
+         "../Mail-Box-IMAP4",
+         "../Mail-Box-POP3",
+         "../Mail-Message"
+      ],
+      "oodoc_version" : 3.05,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/mail-transport/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/mail-transport/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

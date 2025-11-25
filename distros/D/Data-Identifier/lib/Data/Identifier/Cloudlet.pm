@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 my %_valid_new_opts = (
     db          => 'Data::TagDB',
@@ -196,7 +196,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 

@@ -1,85 +1,85 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 
 use strict;
 use warnings;
 
-use IO::Lines;
+use IO::Lines  ();
 
+#--------------------
 
 sub string()
-{   my $self = shift;
-    $self->head->string . $self->body->string;
+{	my $self = shift;
+	$self->head->string . $self->body->string;
 }
-
-#------------------------------------------
 
 
 sub lines()
-{   my $self = shift;
-    my @lines;
-    my $file = IO::Lines->new(\@lines);
-    $self->print($file);
-    wantarray ? @lines : \@lines;
+{	my $self = shift;
+	my @lines;
+	my $file = IO::Lines->new(\@lines);
+	$self->print($file);
+	wantarray ? @lines : \@lines;
 }
-
-#------------------------------------------
 
 
 sub file()
-{   my $self = shift;
-    my @lines;
-    my $file = IO::Lines->new(\@lines);
-    $self->print($file);
-    $file->seek(0,0);
-    $file;
+{	my $self = shift;
+	my $file = IO::Lines->new;
+	$self->print($file);
+	$file->seek(0,0);
+	$file;
 }
 
 
 sub printStructure(;$$)
-{   my $self    = shift;
+{	my $self    = shift;
 
-    my $indent
-      = @_==2                       ? pop
-      : defined $_[0] && !ref $_[0] ? shift
-      :                               '';
+	my $indent
+	  = @_==2                       ? pop
+	  : defined $_[0] && !ref $_[0] ? shift
+	  :   '';
 
-    my $fh      = @_ ? shift : select;
+	my $fh      = @_ ? shift : select;
 
-    my $buffer;   # only filled if filehandle==undef
-    open $fh, '>:raw', \$buffer unless defined $fh;
+	my $buffer;   # only filled if filehandle==undef
+	open $fh, '>:raw', \$buffer unless defined $fh;
 
-    my $subject = $self->get('Subject') || '';
-    $subject    = ": $subject" if length $subject;
+	my $subject = $self->get('Subject') || '';
+	$subject    = ": $subject" if length $subject;
 
-    my $type    = $self->get('Content-Type', 0) || '';
-    my $size    = $self->size;
-    my $deleted = $self->label('deleted') ? ', deleted' : '';
+	my $type    = $self->get('Content-Type', 0) || '';
+	my $size    = $self->size;
+	my $deleted = $self->label('deleted') ? ', deleted' : '';
 
-    my $text    = "$indent$type$subject ($size bytes$deleted)\n";
-    ref $fh eq 'GLOB' ? (print $fh $text) : $fh->print($text);
+	my $text    = "$indent$type$subject ($size bytes$deleted)\n";
+	$fh->print($text);
 
-    my $body    = $self->body;
-    my @parts
-      = $body->isNested    ? ($body->nested)
-      : $body->isMultipart ? $body->parts
-      :                      ();
+	my $body    = $self->body;
+	my @parts
+	  = $body->isNested    ? ($body->nested)
+	  : $body->isMultipart ? $body->parts
+	  :    ();
 
-    $_->printStructure($fh, $indent.'   ')
-        for @parts;
+	$_->printStructure($fh, $indent.'   ')
+		for @parts;
 
-    $buffer;
+	$buffer;
 }
-    
+
+#--------------------
 
 1;

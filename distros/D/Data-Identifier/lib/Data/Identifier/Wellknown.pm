@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.25;
+our $VERSION = v0.26;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -209,6 +209,36 @@ sub classes_of {
     return keys %{$identifier->userdata(__PACKAGE__, 'classes') // {}};
 }
 
+
+sub announce {
+    my ($pkg, $type, $regs, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $type = Data::Identifier->new(from => $type); # Force to Data::Identifier
+    $type->register;                              # Ensure it is registered
+
+    if (ref($regs) eq 'HASH') {
+        $type = $type->uuid;                      # Convert to UUID for cache usage
+        foreach my $key (keys %{$regs}) {
+            my $identifier = Data::Identifier->new(from => $regs->{$key});
+            $identifier->{id_cache} //= {};
+            $identifier->{id_cache}->{$type} //= $key;
+            $identifier->register;
+        }
+    } elsif (ref($regs) eq 'ARRAY') {
+        foreach my $key (@{$regs}) {
+            if (ref $key) {
+                Data::Identifier->new(from => $key)->register;
+            } else {
+                Data::Identifier->new($type => $key)->register;
+            }
+        }
+    } else {
+        croak 'Unsupported data type';
+    }
+}
+
 # ---- Private helpers ----
 
 sub _add_classes {
@@ -229,11 +259,15 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.25
+version v0.26
 
 =head1 SYNOPSIS
 
     use Data::Identifier::Wellknown qw(classes...);
+    e.g.:
+    use Data::Identifier::Wellknown ':all';
+
+(experimental since v0.07)
 
 This package provides a simple list of well known identifiers.
 Classes are loaded on demand. However for speedy lookup classes can
@@ -247,7 +281,9 @@ This improves speed as it will reduce the read of the full list to a single pass
 In contrast if every use will only list a single class that is not yet loaded loading will be most in-efficient.
 
 B<Note:>
-This is an B<experimental> package. It may be changed, renamed, or removed without notice.
+This is an B<experimental> package.
+It's methods and classes are not stable.
+But the package itself and the class C<:all> is.
 
 This package implements L<Data::Identifier::Interface::Known>.
 
@@ -256,6 +292,8 @@ This package implements L<Data::Identifier::Interface::Known>.
 =head2 classes_of
 
     my @classes = Data::Identifier::Wellknown->classes_of($identifier);
+
+(experimental since v0.07)
 
 Returns the classes the identifier is known for.
 C<$identifier> is parsed as per C<from> of L<Data::Identifier/new>.
@@ -269,6 +307,29 @@ imported before.
 
 B<Note:>
 This is an B<experimental> method. It may be changed, renamed, or removed without notice.
+
+=head2 announce
+
+    Data::Identifier::Wellknown->announce($type => $data);
+
+(experimental since v0.26)
+
+This method can be used to announce additional well known identifiers.
+It is mostly used by other modules to register identifiers for a given type related to those modules
+and alias them to UUIDs.
+This is mostly useful if those identifiers are mapped to UUIDs via a register (in contrast to a generator).
+
+The type is passed as C<$type> which is parsed as per C<from> of L<Data::Identifier/new>.
+It must resolve to an identifier with a defined UUID.
+This module might make restrictions on the type identifiers can be registered for.
+
+If C<$data> is a hashref the keys are understood as the identifiers of the type given via C<$type>
+and the values are the corresponding identifiers (parsed as per C<from> of L<Data::Identifier/new>) to map to.
+
+If C<$data> is an arrayref the values are understood as the identifiers.
+L<Data::Identifier> objects are created as needed and registered.
+
+C<$type> and all identifiers updated by this method will be registered as per L<Data::Identifier/register>.
 
 =head1 AUTHOR
 

@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Server::IMAP4::Search;{
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 }
 
 use base 'Mail::Box::Search';
@@ -15,12 +18,11 @@ use base 'Mail::Box::Search';
 use strict;
 use warnings;
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    $self->notImplemented;
+{	my ($self, $args) = @_;
+	$self->notImplemented;
 }
-
-#-------------------------------------------
 
 1;

@@ -45,22 +45,21 @@ my %public_key_template = (
 	verify => 1,
 	wrap => 1,
 	'modulus-bits' => 2096,
-	'public-exponent' => [ 1, 0, 1 ],
-	label => 'test_pub',
-	id => [ 1, 2, 3 ],
+	'public-exponent' => 65537,
+	label => 'test public key',
+	id => "\1\2\3",
 );
 
 my %private_key_template = (
 	class => 'private-key',
 	'key-type' => 'rsa',
 	token => 0,
-	private => 1,
 	sensitive => 1,
 	decrypt => 1,
 	sign => 1,
 	unwrap => 1,
-	label => 'test',
-	id => [ 4, 5, 6 ],
+	label => 'test private key',
+	id => "\1\2\3",
 );
 
 my ($public_key, $private_key) = $session->generate_keypair('rsa-pkcs-key-pair-gen', \%public_key_template, \%private_key_template);

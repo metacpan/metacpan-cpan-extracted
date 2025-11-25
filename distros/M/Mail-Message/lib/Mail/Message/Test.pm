@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Test;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Exporter';
@@ -15,21 +18,12 @@ use base 'Exporter';
 use strict;
 use warnings;
 
-use File::Copy 'copy';
-use List::Util 'first';
-use IO::File;            # to overrule open()
-use File::Spec;
-use Cwd qw(getcwd);
-use Sys::Hostname qw(hostname);
+use File::Copy    qw/copy/;
+use List::Util    qw/first/;
+use IO::File;                # to overrule open()
 use Test::More;
 
-
-our @EXPORT =
-  qw/compare_message_prints reproducable_text
-     $raw_html_data
-     $crlf_platform
-    /;
-
+our @EXPORT = qw/compare_message_prints reproducable_text $raw_html_data $crlf_platform/;
 our $crlf_platform = $^O =~ m/mswin32/i;
 
 #
@@ -38,14 +32,13 @@ our $crlf_platform = $^O =~ m/mswin32/i;
 #
 
 sub compare_message_prints($$$)
-{   my ($first, $second, $label) = @_;
+{	my ($first, $second, $label) = @_;
 
-    if($crlf_platform)
-    {   $first  =~ s/Content-Length: (\d+)/Content-Length: <removed>/g;
-        $second =~ s/Content-Length: (\d+)/Content-Length: <removed>/g;
-    }
+	if($crlf_platform)
+	{	s/Content-Length: (\d+)/Content-Length: <removed>/g for $first, $second;
+	}
 
-    is($first, $second, $label);
+	is($first, $second, $label);
 }
 
 #
@@ -54,13 +47,13 @@ sub compare_message_prints($$$)
 #
 
 sub reproducable_text($)
-{   my $text  = shift;
-    my @lines = split /^/m, $text;
-    foreach (@lines)
-    {   s/((?:references|message-id|date|content-length)\: ).*/$1<removed>/i;
-        s/boundary-\d+/boundary-<removed>/g;
-    }
-    join '', @lines;
+{	my $text  = shift;
+	my @lines = split /^/m, $text;
+	foreach (@lines)
+	{	s/((?:references|message-id|date|content-length)\: ).*/$1<removed>/i;
+		s/boundary-\d+/boundary-<removed>/g;
+	}
+	join '', @lines;
 }
 
 #

@@ -23,5 +23,6 @@ t/15-output.t
 t/16-title.t
 t/17-buffer.t
 t/18-misc.t
+t/lib/TestConsole.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

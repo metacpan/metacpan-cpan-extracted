@@ -6,8 +6,8 @@ Mail::Message::Construct::Reply - reply to a Mail::Message
 
 =head1 SYNOPSIS
 
- my Mail::Message $reply = $message->reply;
- my $quoted  = $message->replyPrelude($head->get('From'));
+  my Mail::Message $reply = $message->reply;
+  my $quoted  = $message->replyPrelude($head->get('From'));
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ or you may do that later with C<set> on the header.
 ADDRESSES may be specified as string, or
 a L<Mail::Address|Mail::Address> object, or as array of L<Mail::Address|Mail::Address> objects.
 
-All %options which are not listed below AND start with a capital, will
+All C<%options> which are not listed below AND start with a capital, will
 be added as additional headers to the reply message.
 
  -Option         --Default
@@ -46,7 +46,7 @@ be added as additional headers to the reply message.
   Subject          replySubject()
   To               <sender in current>
   body             undef
-  group_reply      <true>
+  group_reply      true
   include          'INLINE'
   max_signature    10
   message_type     Mail::Message
@@ -124,7 +124,7 @@ effective for single-part messages.
 =item message_type => CLASS
 
 Create a message with the requested type.  By default, it will be a
-Mail::Message.  This is correct, because it will be coerced into
+L<Mail::Message|Mail::Message>.  This is correct, because it will be coerced into
 the correct folder message type when it is added to that folder.
 
 =item postlude => BODY|LINES
@@ -171,46 +171,44 @@ matter, as long as it is present.  See L<Mail::Message::Body::Multipart|Mail::Me
 
 =back
 
-example: 
+» example: 
 
-  my $reply = $msg->reply
-   ( prelude         => "No spam, please!\n\n"
-   , postlude        => "\nGreetings\n"
-   , strip_signature => 1
-   , signature       => $my_pgp_key
-   , group_reply     => 1
-   , 'X-Extra'       => 'additional header'
-   );
+  my $reply = $msg->reply(
+    prelude         => "No spam, please!\n\n",
+    postlude        => "\nGreetings\n",
+    strip_signature => 1,
+    signature       => $my_pgp_key,
+    group_reply     => 1,
+    'X-Extra'       => 'additional header',
+  );
 
 =item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|ARRAY-$of-$things] )
 
 Produces a list of lines (usually only one), which will preceded the
-quoted body of the message.  STRING must comply to the RFC822 email
+quoted body of the message.  C<STRING> must comply to the RFC822 email
 address specification, and is usually the content of a C<To> or C<From>
-header line.  If a $field is specified, the field's body must be
+header line.  If a C<$field> is specified, the field's body must be
 compliant.  Without argument -or when the argument is C<undef>- a
 slightly different line is produced.
 
 An characteristic example of the output is
 
- On Thu Oct 13 04:54:34 1995, him@example.com wrote:
+  On Thu Oct 13 04:54:34 1995, him@example.com wrote:
 
-=item $obj-E<gt>B<replySubject>(STRING)
-
-=item Mail::Message-E<gt>B<replySubject>(STRING)
+=item $any-E<gt>B<replySubject>(STRING)
 
 Create a subject for a message which is a reply for this one.  This routine
 tries to count the level of reply in subject field, and transform it into
 a standard form.  Please contribute improvements.
 
-example: 
+» example: 
 
- subject                 --> Re: subject
- Re: subject             --> Re[2]: subject
- Re[X]: subject          --> Re[X+1]: subject
- subject (Re)            --> Re[2]: subject
- subject (Forw)          --> Re[2]: subject
- <blank>                 --> Re: your mail
+  subject                 --> Re: subject
+  Re: subject             --> Re[2]: subject
+  Re[X]: subject          --> Re[X+1]: subject
+  subject (Re)            --> Re[2]: subject
+  subject (Forw)          --> Re[2]: subject
+  <blank>                 --> Re: your mail
 
 =back
 
@@ -222,19 +220,21 @@ example:
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

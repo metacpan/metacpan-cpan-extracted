@@ -1,99 +1,117 @@
 use ExtUtils::MakeMaker;
 
-require 5.010;
+require 5.016;
 
-use IO::Handle;
+use warnings;
+use strict;
 
-my $VERSION = '3.009';
+# Use command 'oodist' to produce your whole software release.
+my $version  = '3.010';
+my $git      = "https://github.com/markov2/perl5-Mail-Box-IMAP4";
+my $publish  = "../public_html/mail-box-imap4";
+my $homepage = "http://perl.overmeer.net/CPAN/";
 
-my %prereq =
-  ( Date::Parse      => 0
-  , Digest::HMAC_MD5 => 0
-  , Digest::MD5      => 0
-  , File::Compare    => 0
-  , File::Copy       => 0
-  , File::Spec       => 0
-  , File::Temp       => 0.19
-  , IO::Socket::IP   => 0
-  , List::Util       => 0
-  , Mail::IMAPClient => 3.42
-  , Scalar::Util     => 0
-  , Test::More       => 0
+my %oodist   = (
+	oodoc_version => 3.05,
+	first_year    => 2001,
+	email         => "perl\@overmeer.net",
 
-  , Mail::Box                     => 3.007
-  , Mail::Box::Manage::User       => 3
-  , Mail::Box::Net                => 3
-  , Mail::Box::Search             => 3
-  , Mail::Box::Test               => 3
-  , Mail::Message                 => 3.013
-  , Mail::Message::Body::Lines    => 3
-  , Mail::Message::Head::Complete => 3
-  , Mail::Message::Head::Delayed  => 3
-  , Mail::Server                  => 3
-  , Mail::Transport::Receive      => 3.004
-  );
+	include  => [
+		'../Mail-Box',
+ 		'../Mail-Message',
+ 		'../Mail-Transport',
+	],
 
-foreach my $module (sort keys %prereq)
-{   my $reqversion = $prereq{$module};
-    eval "require $module";
+	use      => [
+	],
 
-    if($@ && $@ =~ m/^Can't locate /)
-    {   print "    $module is not yet installed\n" }
-    elsif($@)
-    {   print "    $module produced an error:\n$@";
-        push @errors, $module;
-    }
-    elsif($module->VERSION < $reqversion)
-    {   print "    $module version ",$module->VERSION
-            , " is outdated; requires $reqversion\n";
-    }
-    else
-    {   print "    $module version ",$module->VERSION
-            , " is ok (required is $reqversion)\n";
-    }
-}
+	parser   => {
+		syntax         => 'markov',
+		skip_links     => [
+		],
+		pmhead         => undef,
+	},
 
-if($errors)
-{   die <<'FIX';
-*** ERROR! You have to install @errors manually,
-*** before you can retry to install MailBox.
-FIX
-    exit 1;
-}
+	tests    => {
+	},
+
+	release  => {
+		publish        => "$publish/source",
+	},
+
+	raw      => {
+		publish        => "$publish/raw",
+	},
+
+	generate => [ {
+		format         => 'pod3',
+		podtail        => undef,
+	  },
+ 	  # You may add HTML formatters here.
+ 		  # You may add exporter configurations here.
+	],
+);
+
+my %prereq = (
+	'Date::Parse'      => 0,
+	'Digest::HMAC_MD5' => 0,
+	'Digest::MD5'      => 0,
+	'File::Compare'    => 0,
+	'File::Copy'       => 0,
+	'File::Spec'       => 0,
+	'File::Temp'       => 0.19,
+	'IO::Socket::IP'   => 0,
+	'List::Util'       => 0,
+	'Mail::IMAPClient' => 3.42,
+	'Scalar::Util'     => 0,
+	'Test::More'       => 0,
+
+	'Mail::Box'                    => '3.007, <4.0',
+	'Mail::Box::Manage::User'      => '3, <4.0',
+	'Mail::Box::Net'               => '3, <4.0',
+	'Mail::Box::Search'            => '3, <4.0',
+	'Mail::Box::Test'              => '3, <4.0',
+	'Mail::Message'                => '3.013, <4.0',
+	'Mail::Message::Body::Lines'   => '3, <4.0',
+	'Mail::Message::Head::Complete'=> '3, <4.0',
+	'Mail::Message::Head::Delayed' => '3, <4.0',
+	'Mail::Server'                 => '3, <4.0',
+	'Mail::Transport::Receive'     => '3.004, <4.0',
+);
 
 WriteMakefile
- ( NAME       => 'Mail::Box::IMAP4'
- , VERSION    => $VERSION
- , AUTHOR     => 'Mark Overmeer'
- , ABSTRACT   => 'Mail::Box connector via IMAP4'
- , PREREQ_PM  => \%prereq
- , LICENSE    => 'perl_5'
+	NAME       => 'Mail::Box::IMAP4',
+	VERSION    => $version,
+	AUTHOR     => 'Mark Overmeer',
+	ABSTRACT   => 'Mail::Box connector via IMAP4',
+	PREREQ_PM  => \%prereq,
+	LICENSE    => 'perl_5',
 
- , META_MERGE =>
-      { 'meta-spec' => { version => 2 }
-      , resources  =>
-          { repository =>
-              { type => 'git'
-              , url  => 'https://github.com/markov2/perl5-Mail-Box-IMAP4.git'
-              , web  => 'https://github.com/markov2/perl5-Mail-Box-IMAP4'
-              }
-          , homepage => 'http://perl.overmeer.net/CPAN/'
-          , license  => [ 'http://dev.perl.org/licenses/' ]
-          }
-      }
- );
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => "$git.git",
+				web  => $git,
+			},
+			homepage => $homepage,
+			license  => [ 'http//dev.perl.org/licenses/' ],
+		},
+		prereqs => {
+			develop => {
+				requires => {
+					'OODoc' => '3.00',
+				}
+			},
+			test => {
+				requires => {
+					'Test::More' => 1.00,
+					'Test::Pod'  => 1.00,
+				}
+			},
+		},
 
-### used by oodist during production of distribution
-sub MY::postamble { <<'__POSTAMBLE' }
-
-# for DIST
-RAWDIR          = ../public_html/mail-box-imap4/raw
-DISTDIR         = ../public_html/mail-box-imap4/source
-EXTENDS         = ../Mail-Message:../Mail-Transport:../Mail-Box
-
-# for POD
-FIRST_YEAR      = 2001
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/CPAN/
-
-__POSTAMBLE
+		# You may use multiple set-ups, see "oodist --make"
+		x_oodist => \%oodist,
+	};

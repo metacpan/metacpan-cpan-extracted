@@ -24,6 +24,7 @@ documentation from Microsoft can be used in most cases.
 
  my $scalar | undef = AllocConsole();
 
+
 C<AllocConsole> creates a new console for the calling process.
 Useful when running GUI applications that need to output to a console window.
 
@@ -33,9 +34,12 @@ B<Note>: After calling C<AllocConsole>, standard handles (C<STDIN>,
 C<STDOUT>, C<STDERR>) can be redirected to the new console using
 L</SetStdHandle>.
 
+
+
 =head2 AllocConsoleWithOptions
 
  my $scalar | undef = AllocConsoleWithOptions($mode, $show | undef, \$result);
+
 
 C<AllocConsoleWithOptions> wraps the Windows API function.
 It allocates a console with optional window display settings and returns the
@@ -44,13 +48,15 @@ result code.
 =over
 
 =item *
-$mode: console allocation mode (0 = default, 1 = new window, 2 = no window)
+C<$mode>: console allocation mode (0 = default, 1 = new window, 2 = no win)
+
 
 =item *
-$show: optional showWindow flag (e.g. C<SW_SHOW>, C<SW_HIDE>)
+C<$show>: optional showWindow flag (e.g. C<SW_SHOW>, C<SW_HIDE>)
+
 
 =item *
-\$result: result code (I<ALLOC_CONSOLE_RESULT>)
+C<\$result>: result code (I<ALLOC_CONSOLE_RESULT>)
 
 =back
 
@@ -59,14 +65,17 @@ use positional parameters. If $show is defined, it is used as a parameter
 for displaying the console window. For more information, see C<ShowWindow>.
 
  Returns: non-zero success, undef on failure
- Use C<GetLastError> to retrieve extended error information.
+ Use GetLastError() to retrieve extended error information.
 
 B<Note>: We do not return C<HRESULT>, but instead set C<SetLastError>
 (extracting the Win32 error code if C<FACILITY_WIN32> flag is set).
 
+
+
 =head2 AttachConsole
 
  my $scalar | undef = AttachConsole($pid);
+
 
 C<AttachConsole> attaches the calling process to the console of another
 process. Useful for redirecting output/input to an existing console window
@@ -75,7 +84,7 @@ process. Useful for redirecting output/input to an existing console window
 =over
 
 =item *
-$pid:  process ID of the target console owner
+C<$pid>: process ID of the target console owner
 
 =back
 
@@ -90,21 +99,25 @@ can be used to interact with the attached console.
 
  my $scalar | undef = CloseHandle($handle);
 
+
 C<CloseHandle> closes an open console handle (but not only consoles; other
 object handles such as files or processes can also be closed).
 
 =over
 
 =item *
-$handle: handle to be closed
+C<$handle>: handle to be closed
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 CreateConsoleScreenBuffer
 
  my $scalar | undef = CreateConsoleScreenBuffer($access, $shareMode);
+
 
 C<CreateConsoleScreenBuffer> creates a new console screen buffer.
 Useful for off-screen rendering or switching between buffers.
@@ -112,10 +125,11 @@ Useful for off-screen rendering or switching between buffers.
 =over
 
 =item *
-$access:     desired access (e.g. C<GENERIC_READ | GENERIC_WRITE>)
+C<$access>:    desired access (e.g. C<GENERIC_READ | GENERIC_WRITE>)
+
 
 =item *
-$shareMode:  sharing mode (e.g. C<FILE_SHARE_READ | FILE_SHARE_WRITE>)
+C<$shareMode>: sharing mode (e.g. C<FILE_SHARE_READ | FILE_SHARE_WRITE>)
 
 =back
 
@@ -126,29 +140,36 @@ $shareMode:  sharing mode (e.g. C<FILE_SHARE_READ | FILE_SHARE_WRITE>)
 
  my $scalar | undef = FillConsoleOutputAttribute($handle, $attr, $length, \%coord, \$written);
 
+
 C<FillConsoleOutputAttribute> sets character attributes (e.g. color) in the
 console buffer.
 
 =over
 
 =item *
-$handle:   Console screen buffer handle
+C<$handle>:   Console screen buffer handle
+
 
 =item *
-$attr:     Attribute value (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
+C<$attr>:     Attribute value (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
+
 
 =item *
-$length:   Number of cells to fill
+C<$length>:   Number of cells to fill
+
 
 =item *
-\%coord:   Starting coordinate (L</COORD> structure)
+C<\%coord>:   Starting coordinate (L</COORD> structure)
+
 
 =item *
-\$written: Number of attributes written
+C<\$written>: Number of attributes written
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 FillConsoleOutputCharacter
 
@@ -161,23 +182,29 @@ buffer.
 =over
 
 =item *
-$handle:   Console screen buffer handle
+C<$handle>:   Console screen buffer handle
+
 
 =item *
-$char:     Character to write
+C<$char>:     Character to write
+
 
 =item *
-$length:   Number of cells to write the character
+C<$length>:   Number of cells to write the character
+
 
 =item *
-\%coord:   Starting coordinate (L</COORD> structure)
+C<\%coord>:   Starting coordinate (L</COORD> structure)
+
 
 =item *
-\$written: Number of characters written
+C<\$written>: Number of characters written
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 FillConsoleOutputCharacterA
 
@@ -198,15 +225,18 @@ input buffer.
 =over
 
 =item *
-$handle: handle to the console input buffer
+C<$handle>: handle to the console input buffer
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 FreeConsole
 
  my $scalar | undef = FreeConsole();
+
 
 C<FreeConsole> detaches the calling process from its current console.
 Useful when a process no longer needs console I/O or wants to release the
@@ -218,9 +248,12 @@ B<Note>: After calling C<FreeConsole>, C<STDIN>, C<STDOUT>, and C<STDERR> are
 no longer valid unless a new console is allocated (via L</AllocConsole>) or
 attached (via L</AttachConsole>).
 
+
+
 =head2 GenerateConsoleCtrlEvent
 
  my $scalar | undef = GenerateConsoleCtrlEvent($event, $groupId);
+
 
 C<GenerateConsoleCtrlEvent> sends a C<CTRL+C> or C<CTRL+BREAK> signal to a
 process group.
@@ -228,27 +261,34 @@ process group.
 =over
 
 =item *
-$event:    C<CTRL_C_EVENT> or C<CTRL_BREAK_EVENT>
+C<$event>:   C<CTRL_C_EVENT> or C<CTRL_BREAK_EVENT>
+
 
 =item *
-$groupId:  Process group ID to receive the signal
+C<$groupId>: Process group ID to receive the signal
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 GetConsoleCP
 
  my $codepage = GetConsoleCP();
+
 
 C<GetConsoleCP> retrieves the input code page used by the console.
 
  Returns: code page identifier (e.g. 65001 for UTF-8).
  Use GetLastError() to retrieve extended error information.
 
+
+
 =head2 GetConsoleCursorInfo
 
  my $scalar | undef = GetConsoleCursorInfo($handle, \%info);
+
 
 C<GetConsoleCursorInfo> retrieves the size and visibility of the console
 cursor.
@@ -256,47 +296,56 @@ cursor.
 =over
 
 =item *
-$handle: Console screen buffer handle
+C<$handle>: Console screen buffer handle
+
 
 =item *
-\%info:  Hash reference to receive a L</CONSOLE_CURSOR_INFO> structure
+C<\%info>:  Hash reference to receive a L</CONSOLE_CURSOR_INFO> structure
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 GetConsoleDisplayMode
 
  my $scalar | undef = GetConsoleDisplayMode(\$flags);
+
 
 C<GetConsoleDisplayMode> retrieves the display mode of the current console.
 
 =over
 
 =item *
-\$flags: Reference to a scalar receiving the display mode
+C<\$flags>: Reference to a scalar receiving the display mode
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
 B<Note>: Since ~ Windows 10, the function does not deliver correct results.
-If L<Win32::GuiTest> is available, we try to emulate the function by
-determining the mode based on the ratio of window size to screen size.
+If L<Win32::GuiTest> is available (and C<EMULATE_DISPLAY_MODE> is true), we
+try to emulate the function by determining the mode based on the ratio of
+window size to screen size.
+
+
 
 =head2 GetConsoleFontSize
 
  my \%coord | undef = GetConsoleFontSize($handle, $index);
+
 
 C<GetConsoleFontSize> retrieves the size of the font used by the console.
 
 =over
 
 =item *
-$handle: Handle to the console output buffer
+C<$handle>: Handle to the console output buffer
+
 
 =item *
-$index:  Index of the font (usually from L</GetCurrentConsoleFont>)
+C<$index>:  Index of the font (usually from L</GetCurrentConsoleFont>)
 
 =back
 
@@ -307,13 +356,16 @@ B<Note>: C<GetConsoleFontSize()> returns the size C<(0,16)> in
 Windows-Terminal. See: https://github.com/microsoft/terminal/issues/6395
 
 We therefore calculate the font size based on the pixels of the window
-client width and height of the console area using GetClientRect() and
-L</GetConsoleScreenBufferInfo>. Prerequisite that C<EMULATE_FONT_SIZE> is
-enabled.
+client width and height of the console area using C<GetClientRect> and
+L</GetConsoleScreenBufferInfo> (prerequisite that C<EMULATE_FONT_SIZE> is
+enabled).
+
+
 
 =head2 GetConsoleMode
 
  my $scalar | undef = GetConsoleMode($handle, \$mode);
+
 
 C<GetConsoleMode> retrieves the current input or output mode of a console
 handle.
@@ -321,33 +373,40 @@ handle.
 =over
 
 =item *
-$handle: Handle to console input or output
+C<$handle>: Handle to console input or output
+
 
 =item *
-\$mode:  Reference to a scalar receiving the mode flags
+C<\$mode>:  Reference to a scalar receiving the mode flags
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 GetConsoleOriginalTitle
 
  my $num | undef = GetConsoleOriginalTitle(\$buffer, $size);
+
 
 C<GetConsoleOriginalTitle> retrieves the original title of the console window.
 
 =over
 
 =item *
-\$buffer: Reference to a buffer receiving the title string
+C<\$buffer>: Reference to a buffer receiving the title string
+
 
 =item *
-$size:    Size of the buffer in characters
+C<$size>:    Size of the buffer in characters
 
 =back
 
  Returns: number of characters copied, undef on failure.
  Use GetLastError() to retrieve extended error information.
+
+
 
 =head2 GetConsoleOriginalTitleA
 
@@ -361,14 +420,18 @@ $size:    Size of the buffer in characters
 
  my $codepage = GetConsoleOutputCP();
 
+
 C<GetConsoleOutputCP> retrieves the output code page used by the console.
 
  Returns: code page identifier (e.g. 65001 for UTF-8).
  Use GetLastError() to retrieve extended error information.
 
+
+
 =head2 GetConsoleScreenBufferInfo
 
  my $scalar | undef = GetConsoleScreenBufferInfo($handle, \%info);
+
 
 C<GetConsoleScreenBufferInfo> retrieves information about the console screen
 buffer.
@@ -376,10 +439,11 @@ buffer.
 =over
 
 =item *
-$handle:  Handle to the console screen buffer
+C<$handle>:  Handle to the console screen buffer
+
 
 =item *
-\%info:   Reference to L</CONSOLE_SCREEN_BUFFER_INFO> structure
+C<\%info>:   Reference to L</CONSOLE_SCREEN_BUFFER_INFO> structure
 
 =back
 
@@ -398,23 +462,27 @@ screen buffer:
  {dwMaximumWindowSize} Specifies the maximum size the console window can be,
                        based on the current font and screen size (COORD).
 
-See L</CONSOLE_SCREEN_BUFFER_INFO> for more information.
+B<Return>:
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 GetConsoleTitle
 
  my $num | undef = GetConsoleTitle(\$buffer, $size);
+
 
 C<GetConsoleTitle> retrieves the title of the current console window.
 
 =over
 
 =item *
-\$buffer: Reference to a buffer receiving the title string
+C<\$buffer>: Reference to a buffer receiving the title string
+
 
 =item *
-$size:    Size of the buffer in characters
+C<$size>:    Size of the buffer in characters
 
 =back
 
@@ -424,6 +492,8 @@ $size:    Size of the buffer in characters
 B<Note>: The buffer for the ANSI version contains an empty string if the
 specified length is greater than C<1024>, due to the limitation of the
 underlying XS function of L<Win32::Console>.
+
+
 
 =head2 GetConsoleTitleA
 
@@ -437,36 +507,45 @@ underlying XS function of L<Win32::Console>.
 
  my $hwnd | undef = GetConsoleWindow();
 
+
 C<GetConsoleWindow> retrieves the window handle used by the console
 associated with the calling process.
 
  Returns: handle to the window used by the console associated with
  the calling process or undef if there is no such associated console.
 
+
+
 =head2 GetCurrentConsoleFont
 
  my $scalar | undef = GetCurrentConsoleFont($handle, $max, \%info);
+
 
 C<GetCurrentConsoleFont> retrieves information about the current console font.
 
 =over
 
 =item *
-$handle: Handle to the console output buffer
+C<$handle>: Handle to the console output buffer
+
 
 =item *
-$max:    TRUE to retrieve maximum font size, FALSE for current
+C<$max>:    TRUE to retrieve maximum font size, FALSE for current
+
 
 =item *
-\%info:  HashRef to receive the font information (CONSOLE_FONT_INFO struct)
+C<\%info>:  L</CONSOLE_FONT_INFO> HashRef to receive the font information
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 GetCurrentConsoleFontEx
 
  my $scalar | undef = GetCurrentConsoleFontEx($handle, $max, \%info);
+
 
 C<GetCurrentConsoleFontEx> retrieves extended information about the current
 console font.
@@ -474,27 +553,32 @@ console font.
 =over
 
 =item *
-$handle: Handle to the console output buffer
+C<$handle>: Handle to the console output buffer
+
 
 =item *
-$max:    TRUE to retrieve maximum font size, FALSE for current
+C<$max>:    TRUE to retrieve maximum font size, FALSE for current
+
 
 =item *
-\%info:  HashRef to receive the information (CONSOLE_FONT_INFOEX struct)
+C<\%info>:  L</CONSOLE_FONT_INFOEX> HashRef to receive the information
 
 =back
 
-B<Note>: C<<$info->{cbSize}>> is set by this function and therefore does not
-need to be passed.
+B<Note>: C<< $info->{cbSize} >> is set by this function and therefore does
+not need to be passed.
 
  Returns: non-zero on success, undef on failure.
 
 B<Note>: C<GetCurrentConsoleFontEx> returns the size C<(0,16)> in
 Windows-Terminal. See: L</GetConsoleFontSize> for further information.
 
+
+
 =head2 GetLargestConsoleWindowSize
 
  my \%coord | undef = GetLargestConsoleWindowSize($handle);
+
 
 C<GetLargestConsoleWindowSize> returns the largest possible size for the
 console window.
@@ -502,12 +586,14 @@ console window.
 =over
 
 =item *
-$handle: handle to the console screen buffer
+C<$handle>: handle to the console screen buffer
 
 =back
 
  Returns: COORD structure with maximum width and height, undef on failure.
  Use GetLastError() to retrieve extended error information.
+
+
 
 =head2 GetNumberOfConsoleFonts
 
@@ -519,15 +605,17 @@ To identify the index of a font, call the C<GetCurrentConsoleFont> function.
  Returns: Number of console fonts on success, undef on failure.
  Use GetLastError() to retrieve extended error information.
 
-B<Note>: This function is not documented and may not work with current
+B<Notes>: C<GetCurrentConsoleFont> returns the size C<(0,16)> in
+Windows-Terminal. See: L</GetConsoleFontSize> for further information.
+This function is not documented and may not work with current
 Windows versions.
 
-B<Note>: C<GetCurrentConsoleFont> returns the size C<(0,16)> in
-Windows-Terminal. See: L</GetConsoleFontSize> for further information.
+
 
 =head2 GetNumberOfConsoleInputEvents
 
  my $scalar | undef = GetNumberOfConsoleInputEvents($handle, \$count);
+
 
 C<GetNumberOfConsoleInputEvents> retrieves the number of unread input events
 in the buffer.
@@ -535,15 +623,17 @@ in the buffer.
 =over
 
 =item *
-$handle: Handle to the console input buffer
+C<$handle>: Handle to the console input buffer
 
 
 =item *
-\$count: Reference to variable receiving the count
+C<\$count>: Reference to variable receiving the count
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 GetOSVersion
 
@@ -568,9 +658,12 @@ system. This Version should also work for Version > 6.2.
 
 In a scalar context, it returns only the Platform ID C<[4]>.
 
+
+
 =head2 GetStdHandle
 
  my $handle = GetStdHandle($id);
+
 
 I<GetStdHandle> retrieves a handle to the standard input, output, or error
 device.
@@ -578,16 +671,19 @@ device.
 =over
 
 =item *
-$id: identifier (C<STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE>)
+C<$id>: identifier (e.g. C<STD_INPUT_HANDLE>, see L</":STD_HANDLE_">)
 
 =back
 
  Returns: handle on success, INVALID_HANDLE_VALUE on failure.
  Use GetLastError() to retrieve extended error information.
 
+
+
 =head2 PeekConsoleInput
 
  my $scalar | undef = PeekConsoleInput($handle, \%buffer);
+
 
 C<PeekConsoleInput> reads input events from the console input buffer without
 removing them.
@@ -595,10 +691,11 @@ removing them.
 =over
 
 =item *
-$handle,   handle to the console input buffer
+C<$handle>:  Handle to the console input buffer
+
 
 =item *
-\%buffer,   pointer to INPUT_RECORD array
+C<\%buffer>: Reference to a I<INPUT_RECORD> structure
 
 =back
 
@@ -607,6 +704,8 @@ single input event. See L</ReadConsoleInput> for the complete description of
 I<INPUT_RECORD>.
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 PeekConsoleInputA
 
@@ -620,40 +719,44 @@ I<INPUT_RECORD>.
 
  my $scalar | undef = ReadConsole($handle, \$buffer, $length, \$read,  | \%control | undef);
 
+
 C<ReadConsole> reads characters from the console input buffer.
 
 =over
 
 =item *
-$handle:   Handle to the console input buffer
+C<$handle>:   Handle to the console input buffer
+
 
 =item *
-\$buffer:  Reference to buffer receiving the input
+C<\$buffer>:  Reference to buffer receiving the input
+
 
 =item *
-$length:   Number of characters to read
+C<$length>:   Number of characters to read
+
 
 =item *
-\$read:    Reference to number of characters actually read
+C<\$read>:    Reference to number of characters actually read
+
 
 =item *
-\%control: Optional hash reference (L</CONSOLE_READCONSOLE_CONTROL> structure)
+C<\%control>: Optional HashRef (L</CONSOLE_READCONSOLE_CONTROL> structure)
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 ReadConsoleA
 
  my $scalar | undef = ReadConsoleA($handle, \$buffer, $length, \$read,  | undef);
 
-=head2 ReadConsoleW
-
- my $scalar | undef = ReadConsoleW($handle, \$buffer, $length, \$read,  | \%control | undef);
-
 =head2 ReadConsoleInput
 
  my $scalar | undef = ReadConsoleInput($handle, \%buffer);
+
 
 C<ReadConsoleInput> reads input records (keyboard, mouse, buffer-resize,
 etc.) from the console input buffer. It is useful for handling low-level
@@ -662,10 +765,11 @@ console input events in real-time.
 =over
 
 =item *
-$handle:  Handle to the console input buffer
+C<$handle>:  Handle to the console input buffer
+
 
 =item *
-\%buffer: Reference to a hash that receives a I<INPUT_RECORD> structure
+C<\%buffer>: HashRef that receives a I<INPUT_RECORD> structure
 
 =back
 
@@ -699,8 +803,8 @@ I<KEY_EVENT_RECORD> structure used when C<{EventType} == KEY_EVENT>
   {dwControlKeyState} Bitmask indicating the state of control keys (SHIFT,
                       CTRL, ALT, CAPSLOCK, etc.)
 
-I<MOUSE_EVENT_RECORD> structure used when <{EventType} == MOUSE_EVENT>
-(0x0002). Represents a mouse event in the console window.
+I<MOUSE_EVENT_RECORD> structure used when C<{EventType} == MOUSE_EVENT>
+(C<0x0002>). Represents a mouse event in the console window.
 
   {dwMousePosition}   X and Y coordinates of the mouse cursor in the console
                       screen buffer.
@@ -715,7 +819,7 @@ I<MOUSE_EVENT_RECORD> structure used when <{EventType} == MOUSE_EVENT>
                         0x0008: MOUSE_HWHEELED
 
 I<WINDOW_BUFFER_SIZE_RECORD> structure used when
-C<{EventType} == WINDOW_BUFFER_SIZE_EVENT> (<0x0004>). Represents a change in
+C<{EventType} == WINDOW_BUFFER_SIZE_EVENT> (C<0x0004>). Represents a change in
 the size of the console screen buffer.
 
  {dwSize}  New size of the screen buffer (width and height).
@@ -729,52 +833,16 @@ applications).
                 menus.
 
 I<FOCUS_EVENT_RECORD> structure used when C<{EventType} == FOCUS_EVENT>
-(<0x0010>). Indicates a change in focus to or from the console window.
+(C<0x0010>). Indicates a change in focus to or from the console window.
 
  {bSetFocus}  TRUE if the console window has gained focus,
               FALSE if it has lost focus.
 
- Returns: non-zero on success, undef on failure.
-
-=head2 ReadConsoleOutput
-
- my $scalar | undef = ReadConsoleOutput($handle, \$buffer, \%size, \%coord, \%region);
-
-C<ReadConsoleOutput> reads character and attribute data from the console
-screen buffer.
-
-=over
-
-=item *
-$handle:  Handle to the console screen buffer
-
-=item *
-\$buffer: Reference to a packed string (of I<CHAR_INFO>'s)
-
-=item *
-\%size:   Size of $buffer (L</COORD> hash as width and height)
-
-=item *
-\%coord:  Coordinates in $buffer to start reading from (L</COORD> hash)
-
-=item *
-\%region: L</SMALL_RECT> hash defining the screen region to read
-
-=back
+B<Return>:
 
  Returns: non-zero on success, undef on failure.
 
-B<Note>: If successful, C<$buffer> returns a packed string containing
-I<CHAR_INFO>'s - characters (C<S>) and attributes (C<S>) - and C<%region>
-returns the rectangle actually used.
 
-=head2 ReadConsoleOutputA
-
- my $scalar | undef = ReadConsoleOutputA($handle, \$buffer, \%size, \%coord, \%region);
-
-=head2 ReadConsoleOutputW
-
- my $scalar | undef = ReadConsoleOutputW($handle, \$buffer, \%size, \%coord, \%region);
 
 =head2 ReadConsoleInputA
 
@@ -784,9 +852,57 @@ returns the rectangle actually used.
 
  my $scalar | undef = ReadConsoleInputW($handle, \%buffer);
 
+=head2 ReadConsoleOutput
+
+ my $scalar | undef = ReadConsoleOutput($handle, \$buffer, \%size, \%coord, \%region);
+
+
+C<ReadConsoleOutput> reads character and attribute data from the console
+screen buffer.
+
+=over
+
+=item *
+C<$handle>:  Handle to the console screen buffer
+
+
+=item *
+C<\$buffer>: Reference to a packed string (of I<CHAR_INFO>'s)
+
+
+=item *
+C<\%size>:   Size of C<$buffer> (L</COORD> hash as width and height)
+
+
+=item *
+C<\%coord>:  Coordinates (L</COORD>) in C<$buffer> to start reading from
+
+
+=item *
+C<\%region>: L</SMALL_RECT> hash defining the screen region to read
+
+=back
+
+ Returns: non-zero on success, undef on failure.
+
+B<Note>: If successful, C<$buffer> returns a packed string containing
+I<CHAR_INFO>'s - characters (C<S>) and attributes (C<S>) - and C<%region>
+returns the rectangle actually used.
+
+
+
+=head2 ReadConsoleOutputA
+
+ my $scalar | undef = ReadConsoleOutputA($handle, \$buffer, \%size, \%coord, \%region);
+
+=head2 ReadConsoleOutputW
+
+ my $scalar | undef = ReadConsoleOutputW($handle, \$buffer, \%size, \%coord, \%region);
+
 =head2 ReadConsoleOutputAttribute
 
  my $scalar | undef = ReadConsoleOutputAttribute($handle, \$buffer, $length, \%coord, \$read);
+
 
 C<ReadConsoleOutputAttribute> reads character attributes from the console
 screen buffer.
@@ -794,19 +910,23 @@ screen buffer.
 =over
 
 =item *
-$handle:  Handle to the console screen buffer
+C<$handle>:  Handle to the console screen buffer
+
 
 =item *
-\$buffer: Reference to a packed string (C<S*>) receiving the attributes
+C<\$buffer>: Reference to a packed string (C<S*>) receiving the attributes
+
 
 =item *
-$length:  Number of attributes to read
+C<$length>:  Number of attributes to read
+
 
 =item *
-\%coord:  Coordinates to start reading from (L</COORD> hash)
+C<\%coord>:  Coordinates to start reading from (L</COORD> hash)
+
 
 =item *
-\$read:   Reference to number of attributes read
+C<\$read>:   Reference to number of attributes read
 
 =back
 
@@ -819,32 +939,41 @@ The L<Win32::Console> XS function has some limitations: the maximum supported
 data length is C<80*999>. In addition, the return value only reflects the
 color attributes (no C<DCBS> support).
 
+
+
 =head2 ReadConsoleOutputCharacter
 
  my $scalar | undef = ReadConsoleOutputCharacter($handle, \$buffer, $length, \%coord, \$read);
+
 
 C<ReadConsoleOutputCharacter> reads characters from the console screen buffer.
 
 =over
 
 =item *
-$handle:  Handle to the console screen buffer
+C<$handle>:  Handle to the console screen buffer
+
 
 =item *
-\$buffer: Reference to buffer receiving characters
+C<\$buffer>: Reference to buffer receiving characters
+
 
 =item *
-$length:  Number of characters to read
+C<$length>:  Number of characters to read
+
 
 =item *
-\%coord:  Coordinates to start reading from (L</COORD> hash)
+C<\%coord>:  Coordinates to start reading from (L</COORD> hash)
+
 
 =item *
-\$read:   Reference to number of attributes read
+C<\$read>:   Reference to number of attributes read
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 ReadConsoleOutputCharacterA
 
@@ -858,28 +987,35 @@ $length:  Number of characters to read
 
  my $scalar | undef = ScrollConsoleScreenBuffer($handle, \%scrollRect, \%clipRect | undef, \%destCoord, $fill);
 
+
 C<ScrollConsoleScreenBuffer> scrolls a region of the console screen buffer.
 
 =over
 
 =item *
-$handle,      Handle to the console screen buffer
+C<$handle>:      Handle to the console screen buffer
+
 
 =item *
-\%scrollRect: L</SMALL_RECT> structure defining the region to scroll
+C<\%scrollRect>: L</SMALL_RECT> structure defining the region to scroll
+
 
 =item *
-\%clipRect:   Optional clipping rectangle (SMALL_RECT struct, can be undef)
+C<\%clipRect>:   Optional clipping rectangle (L</SMALL_RECT> or C<undef>)
+
 
 =item *
-\%destCoord:  Destination coordinate (L</COORD> struct)
+C<\%destCoord>:  Destination coordinate (L</COORD> struct)
+
 
 =item *
-$fill:        Packed string of I<CHAR_INFO> used to fill emptied space
+C<$fill>:        Packed string of I<CHAR_INFO> used to fill emptied space
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 ScrollConsoleScreenBufferA
 
@@ -893,36 +1029,43 @@ $fill:        Packed string of I<CHAR_INFO> used to fill emptied space
 
  my $scalar | undef = SetConsoleActiveScreenBuffer($handle);
 
+
 C<SetConsoleActiveScreenBuffer> sets the specified screen buffer as the
 active one.
 
 =over
 
 =item *
-$handle: Handle to the screen buffer to activate
+C<$handle>: Handle to the screen buffer to activate
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleCP
 
  my $scalar | undef = SetConsoleCP($codepage);
+
 
 C<SetConsoleCP> sets the input code page used by the console.
 
 =over
 
 =item *
-$codepage: Code page identifier (e.g. C<65001> for UTF-8)
+C<$codepage>: Code page identifier (e.g. C<65001> for UTF-8)
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleCtrlHandler
 
  my $scalar | undef = SetConsoleCtrlHandler(\&handler | undef, $add);
+
 
 C<SetConsoleCtrlHandler> adds or removes an user-defined I<handler> for
 console control events.
@@ -930,10 +1073,11 @@ console control events.
 =over
 
 =item *
-\&handler: Code reference to a handler function (or undef when remove)
+C<\&handler>: Code reference to a handler function or C<undef> when remove
+
 
 =item *
-$add:      TRUE to add, FALSE to remove
+C<$add>:      TRUE to add, FALSE to remove
 
 =back
 
@@ -947,27 +1091,34 @@ B<Note:> We emulate this function using C<SIGINT> and C<SIGBREAK>, since Perl
 itself has installed a handler. Currently, only the C<CTRL_C_EVENT> and
 C<CTRL_BREAK_EVENT> control signals are supported.
 
+
+
 =head2 SetConsoleCursorInfo
 
  my $scalar | undef = SetConsoleCursorInfo($handle, \%info);
+
 
 C<SetConsoleCursorInfo> sets the size and visibility of the console cursor.
 
 =over
 
 =item *
-$handle  Handle to the console screen buffer
+C<$handle>: Handle to the console screen buffer
+
 
 =item *
-\%info:  Reference to a hash (L</CONSOLE_CURSOR_INFO> structure)
+C<\%info>:  Reference to a hash (L</CONSOLE_CURSOR_INFO> structure)
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleCursorPosition
 
  my $scalar | undef = SetConsoleCursorPosition($handle, \%coord);
+
 
 C<SetConsoleCursorPosition> moves the cursor to a specified location in the
 console screen buffer.
@@ -975,18 +1126,22 @@ console screen buffer.
 =over
 
 =item *
-$handle: Handle to the console screen buffer
+C<$handle>: Handle to the console screen buffer
+
 
 =item *
-\%coord: L</COORD> structure specifying the new cursor position
+C<\%coord>: L</COORD> structure specifying the new cursor position
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleDisplayMode
 
  my $scalar | undef = SetConsoleDisplayMode($handle, $flags, \%coord);
+
 
 C<SetConsoleDisplayMode> sets the display mode of the specified console
 screen buffer.
@@ -994,13 +1149,15 @@ screen buffer.
 =over
 
 =item *
-$handle: Handle to the console screen buffer
+C<$handle>: Handle to the console screen buffer
+
 
 =item *
-$flags:  The display mode of the console
+C<$flags>:  The display mode of the console
+
 
 =item *
-\%coord: COORD structure specifying the new dimensions of the screen buffer
+C<\%coord>: L</COORD> specifying the new dimensions of the screen buffer
 
 =back
 
@@ -1009,18 +1166,21 @@ $flags:  The display mode of the console
 B<Note>: If the function is no longer supported by the operating system,
 C<GetLastError> returns C<120>. If L<Win32::GuiTest> is available, we
 attempt to emulate the behavior of the API function using the C<Alt+Enter>
-key combination. See: https://github.com/microsoft/terminal/issues/14885
+key combination. See: L<https://github.com/microsoft/terminal/issues/14885>
+
+
 
 =head2 SetConsoleIcon
 
  my $scalar | undef = SetConsoleIcon($iconFile);
+
 
 C<SetConsoleIcon> sets the icon for the console window.
 
 =over
 
 =item *
-$iconFile: file name to an icon file
+C<$iconFile>: file name to an icon file
 
 =back
 
@@ -1028,60 +1188,74 @@ $iconFile: file name to an icon file
 
 B<Note>: Not available in all Windows versions.
 
+
+
 =head2 SetConsoleMode
 
  my $scalar | undef = SetConsoleMode($handle, $mode);
+
 
 C<SetConsoleMode> sets the input or output mode of a console handle.
 
 =over
 
 =item *
-$handle: Handle to console input or output
+C<$handle>: Handle to console input or output
+
 
 =item *
-$mode:   Mode flags (e.g. C<ENABLE_ECHO_INPUT>, <ENABLE_PROCESSED_OUTPUT>)
+C<$mode>:   Mode flags (e.g. C<ENABLE_ECHO_INPUT>, C<ENABLE_LINE_INPUT>)
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleOutputCP
 
  my $scalar | undef = SetConsoleOutputCP($codepage);
+
 
 C<SetConsoleOutputCP> sets the output code page used by the console.
 
 =over
 
 =item *
-$codepage: Code page identifier (e.g. C<65001> for UTF-8)
+C<$codepage>: Code page identifier (e.g. C<65001> for UTF-8)
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleScreenBufferSize
 
  my \%coord | undef = SetConsoleScreenBufferSize($handle, \%size);
+
 
 C<SetConsoleScreenBufferSize> sets the size of the console screen buffer.
 
 =over
 
 =item *
-$handle: Handle to the console screen buffer
+C<$handle>: Handle to the console screen buffer
+
 
 =item *
-\%size:  L</COORD> structure specifying new width and height
+C<\%size>:  L</COORD> structure specifying new width and height
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleTextAttribute
 
  my \%coord | undef = SetConsoleTextAttribute($handle, $attributes);
+
 
 C<SetConsoleTextAttribute> sets the text attributes (e.g. color) for
 characters written to the console.
@@ -1089,29 +1263,34 @@ characters written to the console.
 =over
 
 =item *
-$handle:     Handle to the console screen buffer
+C<$handle>:     Handle to the console screen buffer
+
 
 =item *
-$attributes: Attribute flags (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
+C<$attributes>: Attribute flags (e.g. C<FOREGROUND_RED | BACKGROUND_BLUE>)
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetConsoleTitle
 
  my $scalar | undef = SetConsoleTitle($title);
+
 
 C<SetConsoleTitle> sets the title of the console window.
 
 =over
 
 =item *
-$title: String to be displayed in the console window title bar
+C<$title>: String to be displayed in the console window title bar
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
 
 
 =head2 SetConsoleTitleA
@@ -1126,85 +1305,104 @@ $title: String to be displayed in the console window title bar
 
  my \%coord | undef = SetConsoleWindowInfo($handle, $absolute, \%rect);
 
+
 C<SetConsoleWindowInfo> sets the size and position of the console window.
 
 =over
 
 =item *
-$handle:   Handle to the console screen buffer
+C<$handle>:   Handle to the console screen buffer
+
 
 =item *
-$absolute: TRUE for absolute coordinates, FALSE for relative
+C<$absolute>: TRUE for absolute coordinates, FALSE for relative
+
 
 =item *
-\%rect:    L</SMALL_RECT> structure defining the new window size
+C<\%rect>:    L</SMALL_RECT> structure defining the new window size
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 SetCurrentConsoleFontEx
 
  my $scalar | undef = SetCurrentConsoleFontEx($handle, $max, \%info);
+
 
 C<SetCurrentConsoleFontEx> sets the font used by the console.
 
 =over
 
 =item *
-$handle: Handle to the console output buffer
+C<$handle>: Handle to the console output buffer
+
 
 =item *
-$max:    TRUE to retrieve maximum font size, FALSE for current
+C<$max>:    TRUE to retrieve maximum font size, FALSE for current
+
 
 =item *
-\%info:  Hash reference to a L</CONSOLE_FONT_INFOEX> structure
+C<\%info>:  Hash reference to a L</CONSOLE_FONT_INFOEX> structure
 
 =back
 
-B<Note>: C<<$info->{cbSize}>> is set by this function and therefore does not
-need to be passed.
+B<Note>: C<< $info->{cbSize} >> is set by this function and therefore does
+not need to be passed.
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 SetStdHandle
 
  my $handle | undef = SetStdHandle($id, $handle);
+
 
 C<SetStdHandle> sets the handle for standard input, output, or error.
 
 =over
 
 =item *
-$id:      Identifier (e.g. C<STD_INPUT_HANDLE>, C<STD_OUTPUT_HANDLE>)
+C<$id>:     Identifier (e.g. C<STD_INPUT_HANDLE>, C<STD_OUTPUT_HANDLE>)
+
 
 =item *
-$handle:  New handle to assign
+C<$handle>: New handle to assign
 
 =back
 
  Returns: non-zero on success, undef on failure.
 
+
+
 =head2 WriteConsole
 
  my $scalar | undef = WriteConsole($handle, $buffer, \$written);
+
 
 C<WriteConsole> writes a string of characters to the console output buffer.
 
 =over
 
 =item *
-$handle:   Handle to the console output buffer
+C<$handle>:   Handle to the console output buffer
+
 
 =item *
-$buffer:   String to write
+C<$buffer>:   String to write
+
 
 =item *
-\$written: Reference to number of characters actually written
+C<\$written>: Reference to number of characters actually written
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 WriteConsoleA
 
@@ -1218,19 +1416,23 @@ $buffer:   String to write
 
  my $scalar | undef = WriteConsoleInput($handle, \%record);
 
+
 C<WriteConsoleInput> writes input records to the console input buffer.
 
 =over
 
 =item *
-$handle:  Handle to the console input buffer
+C<$handle>:  Handle to the console input buffer
+
 
 =item *
-\%record: Hash reference to a I<INPUT_RECORD> structure
+C<\%record>: Hash reference to a I<INPUT_RECORD> structure
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 WriteConsoleInputA
 
@@ -1244,6 +1446,7 @@ $handle:  Handle to the console input buffer
 
  my $scalar | undef = WriteConsoleOutput($handle, $buffer, \%size, \%coord, \%region);
 
+
 C<WriteConsoleOutput> function writes a block of character and attribute data
 to a specified rectangular region of a console screen buffer. It is useful
 for rendering formatted text directly to the console.
@@ -1251,20 +1454,23 @@ for rendering formatted text directly to the console.
 =over
 
 =item *
-$handle:  Handle to the console screen buffer
-
-=item *
-$buffer:  Packed string of CHAR_INFO's - characters (S) and attributes (S)
-
-=item *
-\%size:   Size of $buffer (COORD hash as width and height of CHAR_INFO's)
-
-=item *
-\%coord:  Coordinates in $buffer to start writing (L</COORD> hash)
+C<$handle>:  Handle to the console screen buffer
 
 
 =item *
-\%region: SMALL_RECT hash defining the target region in the screen buffer
+C<$buffer>:  Packed string of I<CHAR_INFO>'s - chars (S) and attributes (S)
+
+
+=item *
+C<\%size>:   Size of I<CHAR_INFO>'s' (L<COORD> as width and height)
+
+
+=item *
+C<\%coord>:  Coordinates in the buffer to start writing (L</COORD> hash)
+
+
+=item *
+C<\%region>: L</SMALL_RECT> defining the target region in the screen buffer
 
 =back
 
@@ -1272,6 +1478,8 @@ $buffer:  Packed string of CHAR_INFO's - characters (S) and attributes (S)
 
 B<Note>: If successful, C<%region> returns the actual rectangle that was
 used.
+
+
 
 =head2 WriteConsoleOutputA
 
@@ -1285,22 +1493,26 @@ used.
 
  my $scalar | undef = WriteConsoleOutputAttribute($handle, $buffer, \%coord, \$written);
 
+
 C<WriteConsoleOutputAttribute> writes character attributes to the console
 screen buffer.
 
 =over
 
 =item *
-$handle:   Handle to the console screen buffer
+C<$handle>:   Handle to the console screen buffer
+
 
 =item *
-$buffer:   Packed string of attributes (C<S*>)
+C<$buffer>:   Packed string of attributes (C<S*>)
+
 
 =item *
-\%coord:   Starting coordinate (L</COORD> structure)
+C<\%coord>:   Starting coordinate (L</COORD> structure)
+
 
 =item *
-\$written: Reference to number of attributes written
+C<\$written>: Reference to number of attributes written
 
 =back
 
@@ -1310,30 +1522,37 @@ B<Note>: The L<Win32::Console> XS function has some limitations: the maximum
 supported data length is C<80*999>. Furthermore, only the lower byte of the
 attribute (the color component) is processed (no C<DCBS> support).
 
+
+
 =head2 WriteConsoleOutputCharacter
 
  my $scalar | undef = WriteConsoleOutputCharacter($handle, $buffer, \%coord, \$written);
+
 
 C<WriteConsoleOutputCharacter> writes characters to the console screen buffer.
 
 =over
 
 =item *
-$handle:   Handle to the console screen buffer
-
-=item *
-$buffer:   String of characters
-
-=item *
-\%coord:   Starting coordinate (L</COORD> structure)
+C<$handle>:   Handle to the console screen buffer
 
 
 =item *
-\$written: Reference to number of attributes written
+C<$buffer>:   String of characters
+
+
+=item *
+C<\%coord>:   Starting coordinate (L</COORD> structure)
+
+
+=item *
+C<\$written>: Reference to number of attributes written
 
 =back
 
  Returns: non-zero on success, undef on failure.
+
+
 
 =head2 WriteConsoleOutputCharacterA
 
@@ -1461,11 +1680,214 @@ Usage:
    Bottom  => $bottom,
  }) // die;
 
+=head1 EXPORTS
+
+Nothing is exported by default. The following tags can be used to have large 
+sets of symbols exported.
+
+=head2 ":Func"
+
+The basic function names.
+
+=head2 ":FuncA"
+
+The ANSI-specific functions. Each of these is just the same as the version 
+without the trailing I<"A"> when C<Win32API::Console::UNICODE> is FALSE.
+
+  FillConsoleOutputCharacterA
+  GetConsoleOriginalTitleA
+  GetConsoleTitleA
+  PeekConsoleInputA
+  ReadConsoleA
+  ReadConsoleInputA
+  ReadConsoleOutputA
+  ReadConsoleOutputCharacterA
+  ScrollConsoleScreenBufferA
+  SetConsoleTitleA
+  WriteConsoleA
+  WriteConsoleInputA
+  WriteConsoleOutputA
+  WriteConsoleOutputCharacterA
+
+=head2 ":FuncW"
+
+The wide-character-specific (Unicode) functions. Each of these is just the same 
+as the version without the trailing I<"W"> when C<Win32API::Console::UNICODE> 
+is TRUE.
+
+  FillConsoleOutputCharacterW
+  GetConsoleOriginalTitleW
+  GetConsoleTitleW
+  PeekConsoleInputW
+  ReadConsoleW
+  ReadConsoleInputW
+  ReadConsoleOutputW
+  ReadConsoleOutputCharacterW
+  ScrollConsoleScreenBufferW
+  SetConsoleTitleW
+  WriteConsoleW
+  WriteConsoleInputW
+  WriteConsoleOutputW
+  WriteConsoleOutputCharacterW
+
+=head2 ":Misc"
+
+  GetOSVersion
+  ATTACH_PARENT_PROCESS
+  CONSOLE_TEXTMODE_BUFFER
+  INVALID_HANDLE_VALUE
+
+=head2 ":Struct"
+
+The following structures (L</STRUCTURES>) are used to access a console.
+
+  CONSOLE_CURSOR_INFO
+  CONSOLE_FONT_INFO
+  CONSOLE_FONT_INFOEX
+  CONSOLE_READCONSOLE_CONTROL
+  CONSOLE_SCREEN_BUFFER_INFO
+  COORD
+  SMALL_RECT
+
+=head2 ":ALLOC_CONSOLE_"
+
+Constants for L</AttachConsole>, L</AllocConsoleWithOptions> and 
+L</AllocConsole>.
+
+  ALLOC_CONSOLE_MODE_DEFAULT
+  ALLOC_CONSOLE_MODE_NEW_WINDOW
+  ALLOC_CONSOLE_MODE_NO_WINDOW
+  ALLOC_CONSOLE_RESULT_NO_CONSOLE
+  ALLOC_CONSOLE_RESULT_NEW_CONSOLE
+  ALLOC_CONSOLE_RESULT_EXISTING_CONSOLE
+
+=head2 ":BACKGROUND_"
+
+Constants for L</GetConsoleScreenBufferInfo>, L</SetConsoleTextAttribute>, 
+L</ReadConsoleOutput>, L</WriteConsoleOutput>, L</ReadConsoleOutputAttribute>,
+L</WriteConsoleOutputAttribute> and L</FillConsoleOutputAttribute>.
+
+  BACKGROUND_BLUE
+  BACKGROUND_GREEN
+  BACKGROUND_RED
+  BACKGROUND_INTENSITY
+
+=head2 ":COMMON_LVB_"
+
+Constants for L</GetConsoleScreenBufferInfo>, L</SetConsoleTextAttribute>, 
+L</ReadConsoleOutput>, L</WriteConsoleOutput>, L</ReadConsoleOutputAttribute>,
+L</WriteConsoleOutputAttribute> and L</FillConsoleOutputAttribute>.
+
+  COMMON_LVB_LEADING_BYTE
+  COMMON_LVB_TRAILING_BYTE
+  COMMON_LVB_GRID_HORIZONTAL
+  COMMON_LVB_GRID_LVERTICAL
+  COMMON_LVB_GRID_RVERTICAL
+  COMMON_LVB_REVERSE_VIDEO
+  COMMON_LVB_UNDERSCORE
+
+=head2 ":CONTROL_KEY_STATE_"
+
+Constants for L</PeekConsoleInput>, L</ReadConsoleInput> and 
+L</WriteConsoleInput>.
+
+  CAPSLOCK_ON
+  ENHANCED_KEY
+  LEFT_ALT_PRESSED
+  LEFT_CTRL_PRESSED
+  NUMLOCK_ON
+  RIGHT_ALT_PRESSED
+  RIGHT_CTRL_PRESSED
+  SCROLLLOCK_ON
+  SHIFT_PRESSED
+
+=head2 ":CTRL_EVENT_"
+
+Constants for L</GenerateConsoleCtrlEvent> and L</SetConsoleCtrlHandler>.
+
+  CTRL_BREAK_EVENT
+  CTRL_C_EVENT
+
+=head2 ":DISPLAY_MODE_"
+
+Constants for L</GetConsoleDisplayMode> and L</SetConsoleDisplayMode>.
+
+  CONSOLE_FULLSCREEN
+  CONSOLE_FULLSCREEN_HARDWARE
+  CONSOLE_FULLSCREEN_MODE
+  CONSOLE_WINDOWED_MODE
+
+=head2 ":EVENT_TYPE_"
+
+Constants for L</PeekConsoleInput>, L</ReadConsoleInput> and 
+L</WriteConsoleInput>.
+
+  KEY_EVENT
+  MOUSE_EVENT
+  WINDOW_BUFFER_SIZE_EVENT
+  MENU_EVENT
+  FOCUS_EVENT
+
+=head2 ":FOREGROUND_"
+
+Constants for L</GetConsoleScreenBufferInfo>, L</SetConsoleTextAttribute>, 
+L</ReadConsoleOutput>, L</WriteConsoleOutput>, L</ReadConsoleOutputAttribute>,
+L</WriteConsoleOutputAttribute> and L</FillConsoleOutputAttribute>.
+
+  FOREGROUND_BLUE
+  FOREGROUND_GREEN
+  FOREGROUND_RED
+  FOREGROUND_INTENSITY
+
+=head2 ":INPUT_MODE_"
+
+Constants for L</GetConsoleMode> and L</SetConsoleMode>.
+
+  ENABLE_INSERT_MODE
+  ENABLE_PROCESSED_INPUT
+  ENABLE_LINE_INPUT
+  ENABLE_ECHO_INPUT
+  ENABLE_WINDOW_INPUT
+  ENABLE_MOUSE_INPUT
+  ENABLE_QUICK_EDIT_MODE
+  ENABLE_EXTENDED_FLAGS
+  ENABLE_VIRTUAL_TERMINAL_INPUT
+
+=head2 ":MOUSE_"
+
+Constants for L</PeekConsoleInput>, L</ReadConsoleInput> and 
+L</WriteConsoleInput>.
+
+  MOUSE_MOVED
+  DOUBLE_CLICK
+  MOUSE_WHEELED
+  MOUSE_HWHEELED
+
+=head2 :OUTPUT_MODE_
+
+Constants for L</GetConsoleMode> and L</SetConsoleMode>.
+
+  ENABLE_PROCESSED_OUTPUT
+  ENABLE_WRAP_AT_EOL_OUTPUT
+  ENABLE_VIRTUAL_TERMINAL_PROCESSING
+  DISABLE_NEWLINE_AUTO_RETURN
+  ENABLE_LVB_GRID_WORLDWIDE
+
+=head2 ":STD_HANDLE_"
+
+Constants for L</GetStdHandle> and L</SetStdHandle>
+
+  STD_ERROR_HANDLE
+  STD_INPUT_HANDLE
+  STD_OUTPUT_HANDLE
+
+=head2 ":all"
+
+  All of the above.
+
 =head1 REQUIRES
 
 L<Exporter> 
-
-L<Win32API::Registry> 
 
 L<Win32API::File> 
 

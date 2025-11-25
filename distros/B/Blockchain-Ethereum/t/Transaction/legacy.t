@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use Blockchain::Ethereum::Transaction::Legacy;
-use Blockchain::Ethereum::Keystore::Key;
+use Blockchain::Ethereum::Key;
 use Blockchain::Ethereum::Utils;
 
 # These tests are based on the result of running the same transactions over ethers.js
@@ -20,7 +20,7 @@ subtest "eip-155 example" => sub {
         chain_id  => '0x1'
     );
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );

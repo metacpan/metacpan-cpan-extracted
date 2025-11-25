@@ -1,10 +1,26 @@
 
 === Revision history for distribution Mail-Box-Parser-C.
 
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.012:
+
+	Changes:
+	- MailBox mid-life  upgrade: require Perl minimal version 5.016.
+	- maintenance release with Mail::Box version 3 compatibility.
+
+	Improvements:
+	- add .gitignore
+	- convert install process to OODoc 3.05
+	- restyle code to OODoc v3
+	- depend on Mail::Message v3, not 4.
+
 version 3.011: Fri Sep 15 20:17:44 CEST 2023
 
 	3.010 Not indexed by CPAN, try to recover by uploading a new
-	release.
+	release. Spotted by [Todd Richmond]
 
 version 3.010: Sun Mar  4 17:19:54 CET 2018
 

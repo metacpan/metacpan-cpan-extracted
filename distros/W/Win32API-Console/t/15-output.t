@@ -4,8 +4,8 @@ use utf8;
 
 use Test::More tests => 9;
 require bytes;
-use FindBin;
-use lib "$FindBin::Bin/lib";
+use File::Basename;
+use lib dirname(__FILE__) . '\lib';
 
 BEGIN {
   use_ok 'TestConsole', qw( GetConsoleOutputHandle );

@@ -15,23 +15,27 @@ Mail::Transport - use Mail Transfer Agents (MTAs)
 
 =head1 SYNOPSIS
 
- my $message = Mail::Message->new(...);
+  my $message = Mail::Message->new(...);
 
- # Some extensions implement sending:
- $message->send;
- $message->send(via => 'sendmail');
+  # Some extensions implement sending:
+  $message->send;
+  $message->send(via => 'sendmail');
 
- my $sender = Mail::Transport::SMTP->new(...);
- $sender->send($message);
+  my $sender = Mail::Transport::SMTP->new(...);
+  $sender->send($message);
 
- # Some extensions implement receiving:
- my $receiver = Mail::Transport::POP3->new(...);
- $message = $receiver->receive;
+  # Some extensions implement receiving:
+  my $receiver = Mail::Transport::POP3->new(...);
+  $message = $receiver->receive;
 
 =head1 DESCRIPTION
 
 Objects which extend C<Mail::Transport> implement sending and/or
 receiving of messages, using various protocols.
+
+B<This is a maintenance release for the old interface>.  Read
+F<https://github.com/markov2/perl5-Mail-Box/wiki/> how
+to move towards version 4.
 
 L<Mail::Transport::Send|Mail::Transport::Send> extends this class, and offers general
 functionality for send protocols, like SMTP.  L<Mail::Transport::Receive|Mail::Transport::Receive>
@@ -39,18 +43,20 @@ also extends this class, and offers receive method.  Some transport
 protocols will implement both sending and receiving.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Transport-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in     --Default
   executable                   undef
@@ -60,7 +66,7 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
   password                     undef
   port                         undef
   proxy                        undef
-  retry                        <false>
+  retry                        <unlimited>
   timeout                      120
   trace       Mail::Reporter   'WARNINGS'
   username                     undef
@@ -68,7 +74,7 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 
 =over 2
 
-=item executable => FILENAME
+=item executable => $file
 
 If you specify an executable, the module does not need to search the
 system directories to figure-out where the client lives.  Using this
@@ -76,52 +82,53 @@ decreases the flexible usage of your program: moving your program
 to other systems may involve changing the path to the executable,
 which otherwise would work auto-detect and unmodified.
 
-=item hostname => HOSTNAME|ARRAY
+=item hostname => $host|\@hosts
 
-The host on which the server runs.  Some protocols accept an ARRAY
+The C<$host> on which the server runs.  Some protocols accept an ARRAY
 of alternatives for this option.
 
-=item interval => SECONDS
+=item interval => $span
 
-The time between tries to contact the remote server for sending or
-receiving a message in SECONDS.  This number must be larger than 0.
+The time C<$span> between tries to contact the remote server for sending or
+receiving a message in seconds.  This number must be larger than 0.
 
 =item log => LEVEL
 
-=item password => STRING
+=item password => $password
 
-Some protocols require a password to be given, usually in combination
+Some protocols require a C<$password> to be given, usually in combination
 with a password.
 
-=item port => INTEGER
+=item port => $port
 
-The port number behind which the service is hiding on the remote server.
+The C<$port> number behind which the service is hiding on the remote server.
 
-=item proxy => PATH
+=item proxy => $path
 
 The name of the proxy software (the protocol handler).  This must be
-the name (preferable the absolute path) of your mail delivery
+the name (preferable the absolute C<$path>) of your mail delivery
 software.
 
-=item retry => NUMBER|undef
+=item retry => $count|undef
 
 The number of retries before the sending will fail.  If C<undef>, the
 number of retries is unlimited.
 
-=item timeout => SECONDS
+=item timeout => $span
 
-SECONDS till time-out while establishing the connection to a remote server.
+The maximim seconds to wait for establishing the connection to a remote
+server.
 
 =item trace => LEVEL
 
-=item username => STRING
+=item username => $username
 
 Some protocols require a user to login.
 
-=item via => CLASS|NAME
+=item via => CLASS|$name
 
 Which CLASS (extending C<Mail::Transport>) will transport the data.
-Some predefined NAMEs avoid long class names: C<mail> and C<mailx>
+Some predefined names avoid long class names: C<mail> and C<mailx>
 are handled by the L<Mail::Transport::Mailx|Mail::Transport::Mailx> module, C<sendmail>
 and C<postfix> belong to L<Mail::Transport::Sendmail|Mail::Transport::Sendmail>, and C<smtp>
 is implemented in L<Mail::Transport::SMTP|Mail::Transport::SMTP>.
@@ -137,7 +144,7 @@ L<Mail::Transport::IMAP4|Mail::Transport::IMAP4>.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<logSettings>()
@@ -146,10 +153,34 @@ Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
+=head2 Server connection
+
+=over 4
+
+=item $obj-E<gt>B<findBinary>( $name, [@directories] )
+
+Look for a binary with the specified C<$name> in the directories which
+are defined to be safe.  The list of standard directories is followed
+by the optional C<@directories>.  The full pathname is returned.
+
+You may specify L<new(proxy)|Mail::Transport/"METHODS">, which specifies the absolute name
+of the binary to be used.
+
+=item $obj-E<gt>B<remoteHost>()
+
+Returns the hostname, port number, username and password to be used to
+establish the connection to the server for sending or receiving mail.
+
+=item $obj-E<gt>B<retry>()
+
+Returns the retry interval, retry count, and timeout for the connection.
+
+=back
+
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -160,9 +191,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Transport-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -170,15 +199,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Transport-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Transport-E<gt>B<logPriority>($level)
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -207,36 +232,12 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
 
 Inherited, see L<Mail::Reporter/"Cleanup">
-
-=back
-
-=head2 Server connection
-
-=over 4
-
-=item $obj-E<gt>B<findBinary>( $name, [@directories] )
-
-Look for a binary with the specified $name in the directories which
-are defined to be safe.  The list of standard directories is followed
-by the optional @directories.  The full pathname is returned.
-
-You may specify L<new(proxy)|Mail::Transport/"METHODS">, which specifies the absolute name
-of the binary to be used.
-
-=item $obj-E<gt>B<remoteHost>()
-
-Returns the hostname, port number, username and password to be used to
-establish the connection to the server for sending or receiving mail.
-
-=item $obj-E<gt>B<retry>()
-
-Returns the retry interval, retry count, and timeout for the connection.
 
 =back
 
@@ -249,11 +250,13 @@ Returns the retry interval, retry count, and timeout for the connection.
 Specifying explicit locations for executables of email transfer agents
 should only be done with absolute file names, to avoid various pontential
 security problems.
+Cast by C<new()>
 
 =item Warning: Executable $exec does not exist.
 
 The explicitly indicated mail transfer agent does not exists. The normal
 settings are used to find the correct location.
+Cast by C<new()>
 
 =item Error: Package $package does not implement $method.
 
@@ -262,19 +265,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.007,
-built on September 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport version 3.008,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -1,3 +1,7 @@
+v0.09   2025-11-24Z
+    - Code cleanups
+    - Added style option 'comment_column' in File::ValueFile::Simple::Writer
+
 v0.08   2025-10-19Z
     - Automatically add a comment to tag-generator-hint if available
     - Added experimental style option 'tag_relation' in File::ValueFile::Simple::Writer

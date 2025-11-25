@@ -16,8 +16,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.028'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-10-30'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.029'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-11-24'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -300,7 +300,7 @@ sub title2ident($) {
   s/^\s+//;  s/\s+$//;
   s/\W/_/g;
   s/^(?=\d)/_/;
-  # Prepend underscore to Perl's reserved identifiers.
+  # Prepend underscore to reserved identifiers.
   $_ = "_".$_ if __is_unindexed_title($_, 0);
   $_
 }
@@ -482,11 +482,17 @@ sub _fmt_colx(;$$) {
 sub __is_unindexed_title($$) {
   my ($title, $num_cols) = @_;
   oops unless defined $title;
+  ### FIXME BUG(?): I think colx only needs to exclude titles ^ and $
+  ###  (which are reserved by Spreadsheet::Edit to mean 1st & last col)
+  ###  and numbers which exceed maxcx; all other titles should be
+  ###  unambiguous as %colx keys, however...
+  ###  --> Perl's reserved names must still be excluded as tied variable
+  ###      names; this would need a separate check for _all_valid_idents()
 my $r =
   $title eq ""
   || $title =~ /^\W$/    # ^ or $ or any single punctuation or control-char
   || $title =~ /\^\w+$/  # ^Var to not confuse w Perl "control-character" names
-  || $title =~ /^(?:ARGV|ARGVOUT|_|REGERROR|REGMARK|AUTOLOAD)$/
+  || $title =~ /^(?:ARGV|ARGVOUT|_|REGERROR|REGMARK|AUTOLOAD|a|b)$/
   || $title =~ /::/                    # package::qualified::name
   || $title =~ /^[0-9]$/               # $0 and regex $1 $2 .. $9
                                        # (regardless of max cx)
@@ -1392,7 +1398,8 @@ sub _call_usercode($$$) {
   }
   if ($@) {
     local $_ = $@;
-    unless ($$self->{debug}) {
+    unless ($$self->{debug} #or "TEMP DEBUG"
+           ) {
       # Simplify a backtrace to omit our internal frames between the user's
       # call to apply* (or join_cols) and the call to the user's callback.
       # A typical Carp::confess traceback looks like this:
@@ -1400,19 +1407,30 @@ sub _call_usercode($$$) {
       #   ...user frame(s) inside the apply callback
       #   users_callback_function called at lib/Spreadsheet/Edit.pm line nnn
       #
-      #   ### this part is replaced by '[apply internals]'
-      #   eval {...} called at lib/Spreadsheet/Edit.pm line xxx [the above eval]
-      #   Spreadsheet::Edit::_call_usercode(...) called at filename line nnn
-      #   ...internal frame(s)...
+      #   <user_subname() or pkg::__ANON__() called from ...Spreadsheet/Edit.pm
+      #
+      #   ### BEGIN portion replaced by '[apply internals]'
+      #
+      #   eval {...} called at ...Spreadsheet/Edit.pm line... [the above eval]
+      #   Spreadsheet::Edit::_call_usercode(...) called at .../Spreadsheet/Edit.pm line...
+      #   Spreadsheet::Edit::_apply_to_rows(...) called at .../Spreadsheet/Edit.pm line...
+      #   ...possible other internal frame(s)...
+      #
+      #   ### END portion replaced by '[apply internals]'
       #
       #   Spreadsheet::Edit::public_method(...) called at userfilename line nnn
+      #      [where public_method is apply*, join_cols, etc.]
       #   outer user frame(s)...
       #
       # The last internal frame will be the eval{...} above.
       state $__FILE__ = __FILE__;
       state $__PACKAGE__ = __PACKAGE__;
       #warn "### MMM before: $_\n--{end}--\n";
-      s/^(\h*)eval \{.*?\} called at $__FILE__ line .*?\R(\h*${__PACKAGE__}::[a-z])/${1}[apply internals]\n$2/msg
+
+      #s/^(\h*)eval \{.*?\} called at $__FILE__ line .*?\R(\h*${__PACKAGE__}::[a-z])/${1}[apply internals]\n$2/msg
+
+      s/^(?<prespace>\h*)(?<usercallback>\w[\w:]*\([^()]*\)) called at $__FILE__ line .*?\R\h*eval \{.*?\} called at $__FILE__ line (?:.|\R)*?\R(?<outermethod>\h*${__PACKAGE__}::[a-z])/$+{prespace}$+{usercallback} called from [apply internals]\n$+{outermethod}/msg;
+
       #  or warn "!!!\n","(*_call_usercode REGEX DID NOT MATCH*)\n(__FILE__=$__FILE__)\n(__PACKAGE__=$__PACKAGE__)\n$@\n----------\n"
       ;
       #warn "### MM2 after : $_\n--{end}--\n";

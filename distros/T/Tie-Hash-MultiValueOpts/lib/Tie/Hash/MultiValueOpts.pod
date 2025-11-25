@@ -9,6 +9,11 @@ Tie::Hash::MultiValueOpts - Store multiple values per option
   use Getopt::Std               qw( getopts );
   use Tie::Hash::MultiValueOpts ();
 
+  tie my %opts, 'Tie::Hash::MultiValueOpts', l => [];
+  getopts( 'a:bl:', \%opts );
+
+  # is equivalent to
+
   tie my %opts, 'Tie::Hash::MultiValueOpts';
   $opts{ l } = [];
   getopts( 'a:bl:', \%opts );
@@ -23,11 +28,10 @@ value refers to the option-argument (or C<1> if it is a flag).
 
 If an option that requires an option-argument is provided multiple times,
 the last argument wins (implicit overwrite). Sometimes we want to treat an
-option (C<l> for example) as a multi-value option. In this case we have to
-bind the C<%opts> variable to the C<Tie::Hash::MultiValueOpts> class and we
-have to set its initial value to an empty ARRAY reference. If the multi-value
-option is now provided multiple times, their values are stored in order in
-C<@{ $opts{ l } }>.
+option (C<l> for example) as a multi-value option. In this case we can bind
+the C<%opts> variable to this class and initialize the multi-value option to
+an empty array reference. If the multi-value option is now provided multiple
+times, their values are stored in order in C<@{ $opts{ l } }>.
 
 =head1 SEE ALSO
 

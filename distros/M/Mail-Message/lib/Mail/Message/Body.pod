@@ -25,18 +25,18 @@ Mail::Message::Body - the data of a body in a message
 
 =head1 SYNOPSIS
 
- my Mail::Message $msg = ...;
- my $body  = $msg->body;
- my @text  = $body->lines;
- my $text  = $body->string;
- my $file  = $body->file;  # IO::File
- $body->print(\*FILE);
+  my Mail::Message $msg = ...;
+  my $body  = $msg->body;
+  my @text  = $body->lines;
+  my $text  = $body->string;
+  my $file  = $body->file;  # IO::File
+  $body->print(\*FILE);
 
- my $content_type = $body->type;
- my $transfer_encoding = $body->transferEncoding;
- my $encoded = $body->encode(mime_type => 'text/html',
-    charset => 'us-ascii', transfer_encoding => 'none');\n";
- my $decoded = $body->decoded;
+  my $content_type = $body->type;
+  my $transfer_encoding = $body->transferEncoding;
+  my $encoded = $body->encode(mime_type => 'text/html',
+     charset => 'us-ascii', transfer_encoding => 'none');\n";
+  my $decoded = $body->decoded;
 
 =head1 DESCRIPTION
 
@@ -52,54 +52,52 @@ are performance differences.  Each body type has its own documentation
 with details about its implementation.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
-(stringification) Returns the body as string --which will trigger
-completion-- unless called to produce a string for C<Carp>.  The latter
-to avoid deep recursions.
+Returns the body as string --which will trigger completion-- unless called
+to produce a string for C<Carp>.  The latter to avoid deep recursions.
 
-example: stringification of body
+» example: stringification of body
 
- print $msg->body;   # implicit by print
+  print $msg->body;   # implicit by print
 
- my $body = $msg->body;
- my $x    = "$body"; # explicit by interpolation
+  my $body = $msg->body;
+  my $x    = "$body"; # explicit by interpolation
 
-=item overload: B<'==' and '!='>
+=item overload: B<'=='> numerical comparison
 
-(numeric comparison) compares if two references point to the
-same message.  This only produces correct results is both arguments
-are message references B<within the same folder>.
+compares if two references point to the same message.  This only produces
+correct results is both arguments are message references B<within the same folder>.
 
-example: use of numeric comparison on a body
+» example: use of numeric comparison on a body
 
- my $skip = $folder->message(3);
- foreach my $msg (@$folder)
- {   next if $msg == $skip;
-     $msg->send;
- }
+  my $skip = $folder->message(3);
+  foreach my $msg (@$folder)
+  {   next if $msg == $skip;
+      $msg->send;
+  }
 
-=item overload: B<@{}>
+=item overload: B<@{}> addressed as array
 
 When a body object is used as being an array reference, the lines of
 the body are returned.  This is the same as using L<lines()|Mail::Message::Body/"Access to the payload">.
 
-example: using a body as array
+» example: using a body as array
 
- print $body->lines->[1];  # second line
- print $body->[1];         # same
+  print $body->lines->[1];  # second line
+  print $body->[1];         # same
 
- my @lines = $body->lines;
- my @lines = @$body;       # same
+  my @lines = $body->lines;
+  my @lines = @$body;       # same
 
-=item overload: B<bool>
+=item overload: B<bool> true/false
 
-Always returns a true value, which is needed to have overloaded
+Always returns a C<true> value, which is needed to have overloaded
 objects to be used as in C<if($body)>.  Otherwise, C<if(defined $body)>
 would be needed to avoid a runtime error.
 
@@ -108,11 +106,11 @@ would be needed to avoid a runtime error.
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>()
@@ -120,17 +118,18 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 Return a copy of this body, usually to be included in a cloned
 message. Use L<Mail::Message::clone()|Mail::Message/"Constructors"> for a whole message.
 
-=item Mail::Message::Body-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 BE WARNED that, what you specify here are encodings and such which are
 already in place.  The options will not trigger conversions.  When you
 need conversions, first create a body with options which tell what you've
 got, and then call L<encode()|Mail::Message::Body::Encode/"Constructing a body"> for what you need.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option           --Defined in     --Default
   based_on                            undef
   charset                             'PERL'
-  checked                             <false>
+  checked                             false
   content_id                          undef
   data                                undef
   description                         undef
@@ -142,7 +141,7 @@ got, and then call L<encode()|Mail::Message::Body::Encode/"Constructing a body">
   log                Mail::Reporter   'WARNINGS'
   message                             undef
   mime_type                           'text/plain'
-  modified                            <false>
+  modified                            <C<false>>
   trace              Mail::Reporter   'WARNINGS'
   transfer_encoding                   'none'
 
@@ -178,7 +177,7 @@ allow access to the related content via a C<< cid:<...> >> descriptor
 of an inline disposition.
 
 A C<Content-ID> is supposed to be globally unique.  As such, it
-is common to append C<@computer.domain'> to the end of some unique
+is common to append C<@computer.domain> to the end of some unique
 string.  As other content in the C<multipart/related> container also
 needs to know what this C<Content-ID> is, this should be left to
 the imagination of the person making the content (for now).
@@ -285,20 +284,36 @@ to the C<Content-Transfer-Encoding> field in the header.
 
 =back
 
-example: 
+» example: 
 
- my $body = Mail::Message::Body::String->new(file => \*IN,
-    mime_type => 'text/html; charset="ISO-8859-1"');
+  my $body = Mail::Message::Body::String->new(file => \*IN,
+     mime_type => 'text/html; charset="ISO-8859-1"');
 
- my $body = Mail::Message::Body::Lines->new(data => ['first', $second],
-    charset => 'ISO-10646', transfer_encoding => 'none');
+  my $body = Mail::Message::Body::Lines->new(data => ["first\n", $second],
+     charset => 'ISO-10646', transfer_encoding => 'none');
 
- my $body = Mail::Message::Body::Lines->new(data => \@lines,
-    transfer_encoding => 'base64');
+  my $body = Mail::Message::Body::Lines->new(data => \@lines,
+     transfer_encoding => 'base64');
 
- my $body = Mail::Message::Body::Lines->new(file => 'picture.gif',
-    mime_type => 'image/gif', content_id => '<12345@example.com>',
-    disposition => 'inline');
+  my $body = Mail::Message::Body::Lines->new(file => 'picture.gif',
+     mime_type => 'image/gif', content_id => '<12345@example.com>',
+     disposition => 'inline');
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
+
+Inherited, see L<Mail::Message::Body::Encode/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
@@ -306,7 +321,7 @@ example:
 
 =over 4
 
-=item $obj-E<gt>B<attach>($messages, %options)
+=item $obj-E<gt>B<attach>(@messages, %options)
 
 Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
 
@@ -314,15 +329,11 @@ Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
-=item Mail::Message::Body-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
-
-Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
-
 =item $obj-E<gt>B<check>()
 
 Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
-=item $obj-E<gt>B<concatenate>($components)
+=item $obj-E<gt>B<concatenate>(@components)
 
 Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
 
@@ -333,15 +344,15 @@ which contains a simplified representation of textual data.  The returned
 object may be the object where this is called on, but may also be a new
 body of any type.
 
- my $dec = $body->decoded;
+  my $dec = $body->decoded;
 
 is equivalent with
 
- my $dec = $body->encode
-   ( mime_type         => 'text/plain'
-   , transfer_encoding => 'none'
-   , charset           => 'PERL'
-   );
+  my $dec = $body->encode(
+    mime_type         => 'text/plain',
+    transfer_encoding => 'none',
+    charset           => 'PERL',
+  );
 
 The C<$dec> which is returned is a body.  Ask with the L<mimeType()|Mail::Message::Body/"About the payload"> method
 what is produced.  This C<$dec> body is B<not related to a header>.
@@ -365,14 +376,7 @@ Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
 =item $obj-E<gt>B<eol>( ['CR'|'LF'|'CRLF'|'NATIVE'] )
 
-Returns the character (or characters) which are used to separate lines
-within this body.  When a kind of separator is specified, the body is
-translated to contain the specified line endings.
-
-example: 
-
- my $body = $msg->decoded->eol('NATIVE');
- my $char = $msg->decoded->eol;
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
 =item $obj-E<gt>B<foreachLine>(CODE)
 
@@ -394,8 +398,8 @@ Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
 
 =item $obj-E<gt>B<isDelayed>()
 
-Returns a true or false value, depending on whether the body of this
-message has been read from file.  This can only false for a
+Returns a C<true> or C<false> value, depending on whether the body of this
+message has been read from file.  This can only C<false> for a
 L<Mail::Message::Body::Delayed|Mail::Message::Body::Delayed>.
 
 =item $obj-E<gt>B<isMultipart>()
@@ -405,13 +409,13 @@ by themselves.
 
 =item $obj-E<gt>B<isNested>()
 
-Only true for a message body which contains exactly one sub-message:
+Only C<true> for a message body which contains exactly one sub-message:
 the C<Mail::Message::Body::Nested> body type.
 
 =item $obj-E<gt>B<message>( [$message] )
 
 Returns the message (or message part) where this body belongs to,
-optionally setting it to a new $message first.  If C<undef> is passed,
+optionally setting it to a new C<$message> first.  If C<undef> is passed,
 the body will be disconnected from the message.
 
 =item $obj-E<gt>B<partNumberOf>($part)
@@ -443,8 +447,8 @@ A L<Mail::Message::Field|Mail::Message::Field> object is returned (which stringi
 the field content).  The field content will be C<none> if no disposition
 was specified.
 
-The argument can be a STRING (which is converted into a field), or a
-fully prepared header $field.
+The argument can be a C<STRING> (which is converted into a field), or a
+fully prepared header C<$field>.
 
 =item $obj-E<gt>B<description>( [STRING|$field] )
 
@@ -454,7 +458,7 @@ A L<Mail::Message::Field|Mail::Message::Field> object is returned (which stringi
 the field content).  The field content will be C<none> if no disposition
 was specified.
 
-The argument can be a STRING (which is converted into a field), or a
+The argument can be a C<STRING> (which is converted into a field), or a
 fully prepared header field.
 
 =item $obj-E<gt>B<disposition>( [STRING|$field] )
@@ -465,7 +469,7 @@ A L<Mail::Message::Field|Mail::Message::Field> object is returned (which stringi
 the field content).  The field content will be C<none> if no disposition
 was specified.
 
-The argument can be a STRING (which is converted into a field), or a
+The argument can be a C<STRING> (which is converted into a field), or a
 fully prepared header field.
 
 [3.017] RFC9078 adds type C<reaction>.  This part content is restricted
@@ -494,10 +498,10 @@ languages as body.
 Returns a L<MIME::Type|MIME::Type> object which is related to this body's type.  This
 differs from the C<type> method, which results in a L<Mail::Message::Field|Mail::Message::Field>.
 
-example: 
+» example: 
 
- if($body->mimeType eq 'text/html') {...}
- print $body->mimeType->simplified;
+  if($body->mimeType eq 'text/html') {...}
+  print $body->mimeType->simplified;
 
 =item $obj-E<gt>B<nrLines>()
 
@@ -518,16 +522,16 @@ L<Mail::Message::Field|Mail::Message::Field> (which stringifies to its content).
 needs to be changed, call the L<encode()|Mail::Message::Body::Encode/"Constructing a body"> or L<encoded()|Mail::Message::Body::Encode/"Constructing a body"> method.
 When no encoding is present, the field contains the text C<none>.
 
-The optional STRING or $field enforces a new encoding to be set, without the
+The optional C<STRING> or C<$field> enforces a new encoding to be set, without the
 actual required translations.
 
-example: 
+» example: 
 
- my $transfer = $msg->decoded->transferEncoding;
- $transfer->print;   # --> Content-Encoding: base64
- print $transfer;    # --> base64
+  my $transfer = $msg->decoded->transferEncoding;
+  $transfer->print;   # --> Content-Encoding: base64
+  print $transfer;    # --> base64
 
- if($msg->body->transferEncoding eq 'none') {...}
+  if($msg->body->transferEncoding eq 'none') {...}
 
 =item $obj-E<gt>B<type>( [STRING|$field] )
 
@@ -539,23 +543,23 @@ then you will get a default field containing C<text/plain>.
 You usually can better use L<mimeType()|Mail::Message::Body/"About the payload">, because that will return a
 clever object with type information.
 
-example: 
+» example: 
 
- my $msg     = $folder->message(6);
- $msg->get('Content-Type')->print;
-    # --> Content-Type: text/plain; charset="us-ascii"
+  my $msg     = $folder->message(6);
+  $msg->get('Content-Type')->print;
+     # --> Content-Type: text/plain; charset="us-ascii"
 
- my $content = $msg->decoded;
- my $type    = $content->type;
+  my $content = $msg->decoded;
+  my $type    = $content->type;
 
- print "This is a $type message\n";
-    # --> This is a text/plain; charset="us-ascii" message
+  print "This is a $type message\n";
+     # --> This is a text/plain; charset="us-ascii" message
 
- print "This is a ", $type->body, "message\n";
-    # --> This is a text/plain message
+  print "This is a ", $type->body, "message\n";
+     # --> This is a text/plain message
 
- print "Comment: ", $type->comment, "\n";
-    # --> Comment: charset="us-ascii"
+  print "Comment: ", $type->comment, "\n";
+     # --> Comment: charset="us-ascii"
 
 =back
 
@@ -566,7 +570,7 @@ example:
 =item $obj-E<gt>B<endsOnNewline>()
 
 Returns whether the last line of the body is terminated by a new-line
-(in transport it will become a CRLF).  An empty body will return true
+(in transport it will become a CRLF).  An empty body will return C<true>
 as well: the newline comes from the line before it.
 
 =item $obj-E<gt>B<file>()
@@ -594,27 +598,27 @@ original data. You must not change the referenced data! If you do, some of
 the essential internal variables of the L<Mail::Message::Body|Mail::Message::Body> may not be
 updated.
 
-example: 
+» example: 
 
- my @lines    = $body->lines;     # copies lines
- my $line3    = ($body->lines)[3] # only one copy
- print $lines[0];
+  my @lines    = $body->lines;     # copies lines
+  my $line3    = ($body->lines)[3] # only one copy
+  print $lines[0];
 
- my $linesref = $body->lines;     # reference to originals
- my $line3    = $body->lines->[3] # only one copy (faster)
- print $linesref->[0];
+  my $linesref = $body->lines;     # reference to originals
+  my $line3    = $body->lines->[3] # only one copy (faster)
+  print $linesref->[0];
 
- print $body->[0];                # by overloading
+  print $body->[0];                # by overloading
 
 =item $obj-E<gt>B<print>( [$fh] )
 
-Print the body to the specified $fh (defaults to the selected handle).
-The handle may be a GLOB, an IO::File object, or... any object with a
-C<print()> method will do.  Nothing useful is returned.
+Print the body to the specified C<$fh> (defaults to the selected handle).
+an IO::File object or... any object with a C<print()> method will do.
+Nothing useful is returned.
 
 =item $obj-E<gt>B<printEscapedFrom>($fh)
 
-Print the body to the specified $fh but all lines which start
+Print the body to the specified C<$fh> but all lines which start
 with 'From ' (optionally already preceded by E<gt>'s) will habe an E<gt>
 added in front.  Nothing useful is returned.
 
@@ -623,10 +627,10 @@ added in front.  Nothing useful is returned.
 Return the content of the body as a scalar (a single string).  This is
 a copy of the internally kept information.
 
-example: 
+» example: 
 
- my $text = $body->string;
- print "Body: $body\n";     # by overloading
+  my $text = $body->string;
+  print "Body: $body\n";     # by overloading
 
 =item $obj-E<gt>B<stripTrailingNewline>()
 
@@ -647,20 +651,20 @@ decode the body before writing it!
 
 =back
 
-example: write the data to a file
+» example: write the data to a file
 
- use File::Temp;
- my $fn = tempfile;
- $message->decoded->write(filename => $fn)
-    or die "Couldn't write to $fn: $!\n";
+  use File::Temp;
+  my $fn = tempfile;
+  $message->decoded->write(filename => $fn)
+     or die "Couldn't write to $fn: $!\n";
 
-example: using the content-disposition information to write
+» example: using the content-disposition information to write
 
- use File::Temp;
- my $dir = tempdir; mkdir $dir or die;
- my $fn  = $message->body->dispositionFilename($dir);
- $message->decoded->write(filename => $fn)
-    or die "Couldn't write to $fn: $!\n";
+  use File::Temp;
+  my $dir = tempdir; mkdir $dir or die;
+  my $fn  = $message->body->dispositionFilename($dir);
+  $message->decoded->write(filename => $fn)
+     or die "Couldn't write to $fn: $!\n";
 
 =back
 
@@ -668,9 +672,7 @@ example: using the content-disposition information to write
 
 =over 4
 
-=item $obj-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
-
-=item Mail::Message::Body-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+=item $any-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
 
 Inherited, see L<Mail::Message::Body::Encode/"Internals">
 
@@ -681,7 +683,7 @@ Transfer the body related info from the header into this body.
 =item $obj-E<gt>B<contentInfoTo>($head)
 
 Copy the content information (the C<Content-*> fields) into the specified
-$head.  The body was created from raw data without the required information,
+C<$head>.  The body was created from raw data without the required information,
 which must be added.  See also L<contentInfoFrom()|Mail::Message::Body/"Internals">.
 
 =item $obj-E<gt>B<fileLocation>( [$begin, $end] )
@@ -716,23 +718,23 @@ L<isModified()|Mail::Message::Body/"Internals">.
 
 =item $obj-E<gt>B<moveLocation>( [$distance] )
 
-Move the registration of the message to a new location over $distance.  This
+Move the registration of the message to a new location over C<$distance>.  This
 is called when the message is written to a new version of the same
 folder-file.
 
 =item $obj-E<gt>B<read>( $parser, $head, $bodytype, [$chars, [$lines]] )
 
-Read the body with the $parser from file. The implementation of this method
-will differ between types of bodies.  The $bodytype argument is a class name
+Read the body with the C<$parser> from file. The implementation of this method
+will differ between types of bodies.  The C<$bodytype> argument is a class name
 or a code reference of a routine which can produce a class name, and is
 used in multipart bodies to determine the type of the body for each part.
 
-The $chars argument is the estimated number of bytes in the body, or
+The C<$chars> argument is the estimated number of bytes in the body, or
 C<undef> when this is not known.  This data can sometimes be derived from
 the header (the C<Content-Length> line) or file-size.
 
-The second argument is the estimated number of $lines of the body.  It is less
-useful than the $chars but may be of help determining whether the message
+The second argument is the estimated number of C<$lines> of the body.  It is less
+useful than the C<$chars> but may be of help determining whether the message
 separator is trustworthy.  This value may be found in the C<Lines> field
 of the header.
 
@@ -741,7 +743,7 @@ of the header.
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -751,14 +753,13 @@ not be problematic.  For performance reasons, some methods are
 implemented in separate files, and only demand-loaded.  If this
 delayed compilation of additional modules does not help, an error
 will be produced.
+Improves base, see L<Mail::Reporter/"Error handling">
 
 =item $obj-E<gt>B<addReport>($object)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Body-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -766,19 +767,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Body-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Body-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -807,7 +800,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -827,13 +820,13 @@ body can be encoded and decoded, returning a new body object.  However,
 bodies which are part of a message will always be in a shape that they can
 be written to a file or send to somewhere: they will be encoded if needed.
 
-B<. Example>
+=head4 » Example
 
- my $body    = Mail::Message::Body::String->new(mime_type => 'image/gif');
- $body->print(\*OUT);    # this is binary image data...
+  my $body    = Mail::Message::Body::String->new(mime_type => 'image/gif');
+  $body->print(\*OUT);    # this is binary image data...
 
- my $encoded = $message->body($body);
- $encoded->print(\*OUT); # ascii data, encoded image
+  my $encoded = $message->body($body);
+  $encoded->print(\*OUT); # ascii data, encoded image
 
 Now encoded refers to the body of the C<$message> which is the content of
 C<$body> in a shape that it can be transmitted.  Usually C<base64> encoding
@@ -869,13 +862,13 @@ The message body is stored in an external temporary file.  This type of
 storage is especially useful when the body is large, the total folder is
 large, or memory is limited.
 
-=item * Mail::Message::Body::InFolder
+=item * C<Mail::Message::Body::InFolder>
 
 NOT IMPLEMENTED YET.
 The message is kept in the folder, and is only taken out when the
 content is changed.
 
-=item * Mail::Message::Body::External
+=item * C<Mail::Message::Body::External>
 
 NOT IMPLEMENTED YET.
 The message is kept in a separate file, usually because the message body
@@ -922,8 +915,8 @@ cp1252 (extended latin1) or utf8 (not real UTF-8, but something alike,
 see the perlunicode manual page)  So, before you start using the data
 from an incoming message, do
 
-    my $body  = $msg->decoded;
-    my @lines = $body->lines;
+  my $body  = $msg->decoded;
+  my @lines = $body->lines;
 
 Now, the body has character-set 'PERL' (when it is text)
 
@@ -931,14 +924,14 @@ When you create a new body which contains text content (the default),
 it will be created with character-set 'PERL' unless you specify a
 character-set explicitly.
 
-   my $body = Mail::Box::Body::Lines->new(data => \@lines);
-   # now mime=text/plain, charset=PERL
+  my $body = Mail::Box::Body::Lines->new(data => \@lines);
+  # now mime=text/plain, charset=PERL
 
-   my $msg  = Mail::Message->buildFromBody($body);
-   $msg->body($body);
-   $msg->attach($body);   # etc
-   # these all will convert the charset=PERL into real utf-8,
-   # cp1252 or us-ascii, which depends on the characters found.
+  my $msg  = Mail::Message->buildFromBody($body);
+  $msg->body($body);
+  $msg->attach($body);   # etc
+  # these all will convert the charset=PERL into real utf-8,
+  # cp1252 or us-ascii, which depends on the characters found.
 
 =head3 Autodetection of character-set
 
@@ -1000,16 +993,23 @@ In all other cases, the character-set is known so "easy".
 
 The encoding or decoding of a message body encounters a character set which
 is not understood by Perl's Encode module.
+Cast by C<encode()>
+
+=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
+
+Cast by C<encode()>
 
 =item Warning: No decoder defined for transfer encoding $name.
 
 The data (message body) is encoded in a way which is not currently understood,
 therefore no decoding (or recoding) can take place.
+Cast by C<encode()>
 
 =item Warning: No encoder defined for transfer encoding $name.
 
 The data (message body) has been decoded, but the required encoding is
 unknown.  The decoded data is returned.
+Cast by C<encode()>
 
 =item Error: Package $package does not implement $method.
 
@@ -1018,21 +1018,25 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Warning: Unknown line terminator $eol ignored
+
+Cast by C<eol()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Message::Field::Flex;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Message::Field';
@@ -17,94 +20,75 @@ use warnings;
 
 use Carp;
 
+#--------------------
 
 sub new($;$$@)
-{   my $class  = shift;
-    my $args   = @_ <= 2 || ! ref $_[-1] ? {}
-                : ref $_[-1] eq 'ARRAY'  ? { @{pop @_} }
-                :                          pop @_;
+{	my $class  = shift;
+	my $args
+	  = @_ <= 2 || ! ref $_[-1] ? {}
+	  : ref $_[-1] eq 'ARRAY'  ? { @{pop @_} }
+  	  :    pop @_;
 
-    my ($name, $body) = $class->consume(@_==1 ? (shift) : (shift, shift));
-    return () unless defined $body;
+	my ($name, $body) = $class->consume(@_==1 ? (shift) : (shift, shift));
+	defined $body or return ();
 
-    # Attributes preferably stored in array to protect order.
-    my $attr   = $args->{attributes};
-    $attr      = [ %$attr ] if defined $attr && ref $attr eq 'HASH';
-    push @$attr, @_;
+	# Attributes preferably stored in array to protect order.
+	my $attr   = $args->{attributes};
+	$attr      = [ %$attr ] if defined $attr && ref $attr eq 'HASH';
+	push @$attr, @_;
 
-    $class->SUPER::new(%$args, name => $name, body => $body,
-         attributes => $attr);
+	$class->SUPER::new(%$args, name => $name, body => $body, attributes => $attr);
 }
 
 sub init($)
-{   my ($self, $args) = @_;
+{	my ($self, $args) = @_;
 
-    @$self{ qw/MMFF_name MMFF_body/ } = @$args{ qw/name body/ };
+	@$self{ qw/MMFF_name MMFF_body/ } = @$args{ qw/name body/ };
+	$self->comment($args->{comment}) if exists $args->{comment};
 
-    $self->comment($args->{comment})
-        if exists $args->{comment};
+	my $attr = $args->{attributes};
+	$self->attribute(shift @$attr, shift @$attr) while @$attr;
 
-    my $attr = $args->{attributes};
-    $self->attribute(shift @$attr, shift @$attr)
-        while @$attr;
-
-    $self;
+	$self;
 }
-
-#------------------------------------------
 
 sub clone()
-{   my $self = shift;
-    (ref $self)->new($self->Name, $self->body);
+{	my $self = shift;
+	(ref $self)->new($self->Name, $self->body);
 }
-
-#------------------------------------------
 
 sub length()
-{   my $self = shift;
-    length($self->{MMFF_name}) + 1 + length($self->{MMFF_body});
+{	my $self = shift;
+	length($self->{MMFF_name}) + 1 + length($self->{MMFF_body});
 }
 
-#------------------------------------------
+sub name() { lc($_[0]->{MMFF_name}) }
 
-sub name() { lc shift->{MMFF_name}}
-
-#------------------------------------------
-
-sub Name() { shift->{MMFF_name}}
-
-#------------------------------------------
+sub Name() { $_[0]->{MMFF_name} }
 
 sub folded(;$)
-{   my $self = shift;
-    return $self->{MMFF_name}.':'.$self->{MMFF_body}
-        unless wantarray;
+{	my $self = shift;
 
-    my @lines = $self->foldedBody;
-    my $first = $self->{MMFF_name}. ':'. shift @lines;
-    ($first, @lines);
+	wantarray
+		or return $self->{MMFF_name}.':'.$self->{MMFF_body};
+
+	my @lines = $self->foldedBody;
+	my $first = $self->{MMFF_name}. ':'. shift @lines;
+	($first, @lines);
 }
-
-#------------------------------------------
 
 sub unfoldedBody($;@)
-{   my $self = shift;
-    $self->{MMFF_body} = $self->fold($self->{MMFF_name}, @_)
-       if @_;
-
-    $self->unfold($self->{MMFF_body});
+{	my $self = shift;
+	$self->{MMFF_body} = $self->fold($self->{MMFF_name}, @_) if @_;
+	$self->unfold($self->{MMFF_body});
 }
-
-#------------------------------------------
 
 sub foldedBody($)
-{   my ($self, $body) = @_;
-    if(@_==2) { $self->{MMFF_body} = $body }
-    else      { $body = $self->{MMFF_body} }
+{	my ($self, $body) = @_;
+	if(@_==2) { $self->{MMFF_body} = $body }
+	else      { $body = $self->{MMFF_body} }
 
-    wantarray ? (split /^/, $body) : $body;
+	wantarray ? (split /^/, $body) : $body;
 }
-
-#------------------------------------------
 
 1;

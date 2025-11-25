@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Server::IMAP4::User;{
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 }
 
 use base 'Mail::Box::Manage::User';
@@ -15,128 +18,118 @@ use base 'Mail::Box::Manage::User';
 use strict;
 use warnings;
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    
-    $self->SUPER::init($args) or return ();
-
-    my $fn = $args->{indexfile};
-    $self->{MSNU_indexfile}
-        = defined $fn ? $fn : ($self->folderdir . '/index');
-
-    $self;
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args) or return ();
+	$self->{MSNU_indexfile} = $args->{indexfile} // ($self->folderdir . '/index');
+	$self;
 }
 
-#-------------------------------------------
+#--------------------
 
+sub indexFilename() { $_[0]->{MSNU_indexfile} };
 
-sub indexFilename() { shift->{MSNU_indexfile} };
-
-#-------------------------------------------
-
+#--------------------
 
 sub folderInfo($)
-{   my $index = shift->index or return ();
-    $index->folder(shift);
+{	my $index = $_[0]->index or return ();
+	$index->folder(shift);
 }
-
-#-------------------------------------------
 
 
 sub delete($)
-{   my ($self, $name) = @_;
-    my $index = $self->index->startModify or return 0;
+{	my ($self, $name) = @_;
+	my $index = $self->index->startModify or return 0;
 
-    unless($self->_delete($index, $name))
-    {   $self->cancelModification($index);
-        return 0;
-    }
+	unless($self->_delete($index, $name))
+	{	$self->cancelModification($index);
+		return 0;
+	}
 
-    $index->write;
+	$index->write;
 }
 
 sub _delete($$)
-{   my ($self, $index, $name) = @_;
+{	my ($self, $index, $name) = @_;
 
-    # First clean all subfolders recursively
-    foreach my $subf ($index->subfolders($name))
-    {   $self->_delete($index, $subf) or return 0;
-    }
+	# First clean all subfolders recursively
+	foreach my $subf ($index->subfolders($name))
+	{	$self->_delete($index, $subf) or return 0;
+	}
 
-    # Already disappeared?  Shouldn't happen, but ok
-    my $info  = $index->folder($name)
-        or return 1;
+	# Already disappeared?  Shouldn't happen, but ok
+	my $info  = $index->folder($name)
+		or return 1;
 
-    # Bluntly clean-out the directory
-    if(my $dir = $info->{Directory})
-    {   # Bluntly try to remove, but error is not set
-        if(remove(\1, $dir) != 0 && -d $dir)
-        {   $self->log(error => "Unable to remove folder $dir");
-            return 0;
-        }
-    }
+	# Bluntly clean-out the directory
+	if(my $dir = $info->{Directory})
+	{	# Bluntly try to remove, but error is not set
+		if(remove(\1, $dir) != 0 && -d $dir)
+		{	$self->log(error => "Unable to remove folder $dir");
+			return 0;
+		}
+	}
 
-    # Remove (sub)folder from index
-    $index->folder($name, undef);
-    1;
+	# Remove (sub)folder from index
+	$index->folder($name, undef);
+	1;
 }
-
-#-------------------------------------------
 
 
 sub create($@)
-{   my ($self, $name) = (shift, shift);
-    my $index   = $self->index->startModify or return undef;
+{	my ($self, $name) = (shift, shift);
+	my $index   = $self->index->startModify or return undef;
 
-    if(my $info = $index->folder($name))
-    {   $self->log(WARNING => "Folder $name already exists, creation skipped");
-        return $info;
-    }
+	if(my $info = $index->folder($name))
+	{	$self->log(WARNING => "Folder $name already exists, creation skipped");
+		return $info;
+	}
 
-    my $uniq    = $index->createUnique;
+	my $uniq    = $index->createUnique;
 
-    # Create the directory
-    # Also in this case, we bluntly try to create it, and when it doesn't
-    # work, we check whether we did too much. This may safe an NFS stat.
+	# Create the directory
+	# Also in this case, we bluntly try to create it, and when it doesn't
+	# work, we check whether we did too much. This may safe an NFS stat.
 
-    my $dir     = $self->home . '/F' . $uniq;
-    unless(mkdir $dir, 0750)
-    {   my $rc = "$!";
-        unless(-d $dir)   # replaces $!
-        {   $self->log(ERROR => "Cannot create folder directory $dir: $rc");
-            return undef;
-        }
-    }
+	my $dir     = $self->home . '/F' . $uniq;
+	unless(mkdir $dir, 0750)
+	{	my $rc = "$!";
+		unless(-d $dir)   # replaces $!
+		{	$self->log(ERROR => "Cannot create folder directory $dir: $rc");
+			return undef;
+		}
+	}
 
-    # Write folder name in directory, for recovery purposes.
-    my $namefile = "$dir/name";
-    unless(open NAME, '>:encoding(utf-8)', $namefile)
-    {   $self->log(ERROR => "Cannot write name for folder in $namefile: $!");
-        return undef;
-    }
+	# Write folder name in directory, for recovery purposes.
+	my $namefile = "$dir/name";
+	my $namefh;
+	unless(open $namefh, '>:encoding(utf-8)', $namefile)
+	{	$self->log(ERROR => "Cannot write name for folder in $namefile: $!");
+		return undef;
+	}
 
-    print NAME "$name\n";
+	$namefh->print("$name\n");
 
-    unless(close NAME)
-    {   $self->log(ERROR => "Failed writing folder name to $namefile: $!");
-        return undef;
-    }
+	unless($namefh->close)
+	{	$self->log(ERROR => "Failed writing folder name to $namefile: $!");
+		return undef;
+	}
 
-    # Add folder to the index
+	# Add folder to the index
 
-    my $facts = $self->folder
-     ( $name
-     , Folder    => $name
-     , Directory => $dir
-     , Messages  => 0
-     , Size      => 0
-     );
+	my $facts = $self->folder(
+		$name,
+		Folder    => $name,
+		Directory => $dir,
+		Messages  => 0,
+		Size      => 0,
+	);
 
-   $self->write && $facts;
+	$self->write && $facts;
 }
 
-#-------------------------------------------
-
+#--------------------
 
 1;

@@ -1,5 +1,11 @@
 Revision history for Win32API::Console
 
+0.2.0  2025-11-20
+    - Add "macros" (subs) for HRESULT
+    - Fixes "\0" buffer in XS of ReadConsoleOutputCharacterA
+    - Fix added TestConsole.pm to MANIFEST for disttest
+    - Fix bugs in POD
+
 0.1.6  2025-11-19
     - Further adjustment to ANSI handling
     - UTF-8 flag should be deleted for ANSI

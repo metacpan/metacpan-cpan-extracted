@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,24 +30,60 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0.47"
+            "Mail::Message" : "4.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-Mail-Box-Parser-C/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Mail-Box-Parser-C.git",
          "web" : "https://github.com/markov2/perl5-Mail-Box-Parser-C"
       }
    },
-   "version" : "3.011",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "3.012",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2002,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [],
+      "oodoc_version" : 3.05,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/mail-box-parser-c/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/mail-box-parser-c/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

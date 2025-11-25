@@ -1,23 +1,27 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Mail-Transport.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Transport version 3.008.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
 
-package Mail::Transport::Receive;
-use vars '$VERSION';
-$VERSION = '3.007';
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+
+package Mail::Transport::Receive;{
+our $VERSION = '3.008';
+}
 
 use base 'Mail::Transport';
 
 use strict;
 use warnings;
 
+#--------------------
 
-sub receive(@) {shift->notImplemented}
+sub receive(@) { $_[0]->notImplemented }
 
-#------------------------------------------
+#--------------------
 
 1;

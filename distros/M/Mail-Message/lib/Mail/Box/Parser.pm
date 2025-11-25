@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Message.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Message version 3.019.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Parser;{
-our $VERSION = '3.017';
+our $VERSION = '3.019';
 }
 
 use base 'Mail::Reporter';
@@ -17,170 +20,113 @@ use warnings;
 
 use Carp;
 
+#--------------------
 
 sub new(@)
-{   my $class = shift;
+{	my $class = shift;
 
-    $class eq __PACKAGE__
-    ? $class->defaultParserType->new(@_)   # bootstrap right parser
-    : $class->SUPER::new(@_);
+	  $class eq __PACKAGE__
+	? $class->defaultParserType->new(@_)   # bootstrap right parser
+	: $class->SUPER::new(@_);
 }
 
 sub init(@)
-{   my ($self, $args) = @_;
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args);
 
-#warn "PARSER type=".ref $self,$self->VERSION;
-    $self->SUPER::init($args);
-
-    $self->{MBP_mode} = $args->{mode} || 'r';
-
-    unless($self->{MBP_filename} = $args->{filename} || ref $args->{file})
-    {    $self->log(ERROR => "Filename or handle required to create a parser.");
-         return;
-    }
-
-    $self->start(file => $args->{file});
+	$self->{MBP_trusted}  = $args->{trusted};
+	$self->{MBP_fix}      = $args->{fix_header_errors};
+	$self->{MBP_seps}     = [];
+	$self;
 }
 
-#------------------------------------------
+#--------------------
 
-
-sub start(@)
-{   my $self = shift;
-    my %args = (@_, filename => $self->filename, mode => $self->{MBP_mode});
-
-    $self->openFile(\%args)
-        or return;
-
-    $self->takeFileInfo;
-
-    $self->log(PROGRESS => "Opened folder $args{filename} to be parsed");
-    $self;
-}
-
-#------------------------------------------
-
-
-sub stop()
-{   my $self     = shift;
-
-    my $filename = $self->filename;
-
-#   $self->log(WARNING => "File $filename changed during access.")
-#      if $self->fileChanged;
-
-    $self->log(NOTICE  => "Close parser for file $filename");
-    $self->closeFile;
+sub fixHeaderErrors(;$)
+{	my $self = shift;
+	@_ ? ($self->{MBP_fix} = shift) : $self->{MBPL_fix};
 }
 
 
-sub restart()
-{   my $self     = shift;
-    my $filename = $self->filename;
-
-    $self->closeFile;
-    $self->openFile( {filename => $filename, mode => $self->{MBP_mode}} )
-        or return;
-
-    $self->takeFileInfo;
-    $self->log(NOTICE  => "Restarted parser for file $filename");
-    $self;
-}
-
-
-sub fileChanged()
-{   my $self = shift;
-    my ($size, $mtime) = (stat $self->filename)[7,9];
-    return 0 if !defined $size || !defined $mtime;
-    $size != $self->{MBP_size} || $mtime != $self->{MBP_mtime};
-}
-    
-
-sub filename() {shift->{MBP_filename}}
-
-#------------------------------------------
-
-
-sub filePosition(;$) {shift->NotImplemented}
-
-
-sub pushSeparator($) {shift->notImplemented}
-
-
-sub popSeparator($) {shift->notImplemented}
-
-
-sub readSeparator($) {shift->notImplemented}
-
-
-sub readHeader()    {shift->notImplemented}
-
-
-sub bodyAsString() {shift->notImplemented}
-
-
-sub bodyAsList() {shift->notImplemented}
-
-
-sub bodyAsFile() {shift->notImplemented}
-
-
-sub bodyDelayed() {shift->notImplemented}
-
-
-sub lineSeparator() {shift->{MBP_linesep}}
-
-#------------------------------------------
-
-
-sub openFile(@) {shift->notImplemented}
-
-
-sub closeFile(@) {shift->notImplemented}
-
-
-sub takeFileInfo()
-{   my $self     = shift;
-    @$self{ qw/MBP_size MBP_mtime/ } = (stat $self->filename)[7,9];
-}
+sub trusted() { $_[0]->{MBP_trusted} }
 
 
 my $parser_type;
 
 sub defaultParserType(;$)
-{   my $class = shift;
+{	my $class = shift;
 
-    # Select the parser manually?
-    if(@_)
-    {   $parser_type = shift;
-        return $parser_type if $parser_type->isa( __PACKAGE__ );
+	# Select the parser manually?
+	if(@_)
+	{	$parser_type = shift;
+		return $parser_type if $parser_type->isa( __PACKAGE__ );
+		confess "Parser $parser_type does not extend " . __PACKAGE__ . "\n";
+	}
 
-        confess "Parser $parser_type does not extend "
-              . __PACKAGE__ . "\n";
-    }
+	# Already determined which parser we want?
+	$parser_type
+		and return $parser_type;
 
-    # Already determined which parser we want?
-    return $parser_type if $parser_type;
+	# Try to use C-based parser.
+	eval 'require Mail::Box::Parser::C';
+	$@ or return $parser_type = 'Mail::Box::Parser::C';
 
-    # Try to use C-based parser.
-    eval 'require Mail::Box::Parser::C';
-#warn "C-PARSER errors $@\n" if $@;
-
-    return $parser_type = 'Mail::Box::Parser::C'
-        unless $@;
-
-    # Fall-back on Perl-based parser.
-    require Mail::Box::Parser::Perl;
-    $parser_type = 'Mail::Box::Parser::Perl';
+	# Fall-back on Perl-based parser.
+	require Mail::Box::Parser::Perl;
+	$parser_type = 'Mail::Box::Parser::Perl';
 }
 
-#------------------------------------------
+#--------------------
+
+sub readHeader()    { $_[0]->notImplemented }
 
 
-sub DESTROY
-{   my $self = shift;
-    $self->stop;
-    $self->SUPER::DESTROY;
+sub bodyAsString() { $_[0]->notImplemented }
+
+
+sub bodyAsList() { $_[0]->notImplemented }
+
+
+sub bodyAsFile() { $_[0]->notImplemented }
+
+
+sub bodyDelayed() { $_[0]->notImplemented }
+
+
+sub lineSeparator() { $_[0]->{MBP_linesep} }
+
+
+sub stop() { }
+sub filePosition() { undef }
+
+#--------------------
+
+sub readSeparator() { $_[0]->notImplemented }
+
+
+sub pushSeparator($)
+{	my ($self, $sep) = @_;
+	unshift @{$self->{MBP_seps}}, $sep;
+	$self->{MBP_strip_gt}++ if $sep eq 'From ';
+	$self;
 }
+
+
+sub popSeparator()
+{	my $self = shift;
+	my $sep  = shift @{$self->{MBP_seps}};
+	$self->{MBP_strip_gt}-- if $sep eq 'From ';
+	$sep;
+}
+
+
+sub separators()      { $_[0]->{MBP_seps} }
+sub activeSeparator() { $_[0]->separators->[0] }
+sub resetSeparators() { $_[0]->{MBP_seps} = []; $_[0]->{MBP_strip_gt} = 0 }
+sub stripGt           { $_[0]->{MBP_strip_gt} }
+
+#--------------------
+
+#--------------------
 
 1;

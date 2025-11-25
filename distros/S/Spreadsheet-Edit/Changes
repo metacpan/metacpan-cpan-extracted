@@ -1,5 +1,9 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.029 : Avoid showing any internal frames in tracebacks involving apply* etc.
+           Disallow "a" and "b" as tied variable names (to avoid clashing with Perl)
+           Fix bugs finding libreoffice executable when following symlinks
+           or if some filesystems are unreadable.
 1000.028 : Colorize btw and oops messages (import :nocolor to disable)
 1000.027 : Add OPTION subname_override to log_call and friends.
            Initial support for csv -> txt (fixed-width-fields); not fully working yet.
@@ -15,7 +19,7 @@ Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::L
            Fix BOM-related test issues on Windows.
 1000.018 : Support reading csv files with a BOM
 1000.016 : Avoid warnings about !$foo ne $bar with perl v5.41.5
-1000.016 : Allow {data_soruce} as option to read_spreadsheet()
+1000.016 : Allow {data_source} as option to read_spreadsheet()
 1000.015 : Add sort_indicies() method.   Remove unused t/LpodhTestUtils.pm
            Add btwN, btwbt added to Spreadsheet::Edit::Log
 1000.014 : Revised algo used to search for an OO/LL installation

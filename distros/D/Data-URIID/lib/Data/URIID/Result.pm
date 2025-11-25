@@ -35,7 +35,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.18;
+our $VERSION = v0.19;
 
 use parent 'Data::URIID::Base';
 
@@ -1830,7 +1830,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.18
+version v0.19
 
 =head1 SYNOPSIS
 

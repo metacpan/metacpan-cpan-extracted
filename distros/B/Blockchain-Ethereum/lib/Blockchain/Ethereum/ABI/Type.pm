@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Type interface
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use Carp;
 use Module::Load;
@@ -230,7 +230,7 @@ Blockchain::Ethereum::ABI::Type - Type interface
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

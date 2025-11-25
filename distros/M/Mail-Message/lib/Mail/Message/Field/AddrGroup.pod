@@ -13,13 +13,13 @@ Mail::Message::Field::AddrGroup - A group of Mail::Message::Field::Address objec
 
 =head1 SYNOPSIS
 
- my $g = Mail::Message::Field::AddrGroup->new(name => 'name');
+  my $g = Mail::Message::Field::AddrGroup->new(name => 'name');
 
- my $a = Mail::Message::Field::Address->new(...);
- $g->addAddress($a);
- 
- my $f = Mail::Message::Field::Addresses->new;
- $f->addGroup($g);
+  my $a = Mail::Message::Field::Address->new(...);
+  $g->addAddress($a);
+
+  my $f = Mail::Message::Field::Addresses->new;
+  $f->addGroup($g);
 
 =head1 DESCRIPTION
 
@@ -27,22 +27,19 @@ An address group collects a set of e-mail addresses (in this case they
 are L<Mail::Message::Field::Address|Mail::Message::Field::Address> objects).
 
 Extends L<"DESCRIPTION" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<@{}>
-
-Inherited, see L<User::Identity::Collection/"OVERLOADED">
-
-=item overload: B<stringification>
+=item overload: B<""> stringification
 
 Returns the L<string()|Mail::Message::Field::AddrGroup/"METHODS"> value.
+Improves base, see L<User::Identity::Collection/"OVERLOADED">
 
-=item overload: B<stringification >
+=item overload: B<@{}> array dereference
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
@@ -51,7 +48,7 @@ Inherited, see L<User::Identity::Collection/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"METHODS">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<string>()
@@ -66,16 +63,16 @@ where included and there is no name, then C<undef> is returned.
 =head2 Constructors
 
 Extends L<"Constructors" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<coerce>($object)
 
-Coerce an $object into a L<Mail::Message::Field::AddrGroup|Mail::Message::Field::AddrGroup>.  Currently,
+Coerce an C<$object> into a L<Mail::Message::Field::AddrGroup|Mail::Message::Field::AddrGroup>.  Currently,
 you can only coerce L<User::Identity::Collection::Emails|User::Identity::Collection::Emails> (which is
 the base class for this one) into this one.
 
-=item Mail::Message::Field::AddrGroup-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
 
 Inherited, see L<User::Identity::Collection::Emails/"Constructors">
 
@@ -84,7 +81,7 @@ Inherited, see L<User::Identity::Collection::Emails/"Constructors">
 =head2 Attributes
 
 Extends L<"Attributes" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<description>()
@@ -108,7 +105,7 @@ Inherited, see L<User::Identity::Collection/"Attributes">
 =head2 Collections
 
 Extends L<"Collections" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"Collections">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($collection, $role)
@@ -131,9 +128,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<type>()
-
-=item Mail::Message::Field::AddrGroup-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -146,10 +141,10 @@ Inherited, see L<User::Identity::Item/"Collections">
 =head2 Maintaining roles
 
 Extends L<"Maintaining roles" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"Maintaining roles">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addRole>($role| <[$name],%options> | ARRAY)
+=item $obj-E<gt>B<addRole>($role|([$name], %options))
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
@@ -170,7 +165,7 @@ Inherited, see L<User::Identity::Collection/"Maintaining roles">
 =head2 Searching
 
 Extends L<"Searching" in User::Identity::Collection::Emails|User::Identity::Collection::Emails/"Searching">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<find>($name|CODE|undef)
@@ -187,20 +182,20 @@ Inherited, see L<User::Identity::Collection/"Searching">
 
 Add one e-mail address to the list which is maintained in the group. This
 is a wrapper around L<addRole()|User::Identity::Collection/"Maintaining roles"> adding flexibility on how addresses
-are specified.  An $address can be anything which is acceptable for
+are specified.  An C<$address> can be anything which is acceptable for
 L<Mail::Message::Field::Address::coerce()|Mail::Message::Field::Address/"Constructors"> or a list of options which
 will create such an object.
 
-example: of adding an address to an address group
+» example: of adding an address to an address group
 
- my @data = (full_name => "Myself", address => 'me@tux.org');
- $group->addAddress(@data);
+  my @data = (full_name => "Myself", address => 'me@tux.org');
+  $group->addAddress(@data);
 
- my $addr = Mail::Message::Field::Address->new(@data);
- $group->addAddress(@data);
+  my $addr = Mail::Message::Field::Address->new(@data);
+  $group->addAddress(@data);
 
- my $ma = Mail::Address->new(...);
- $group->addAddress($ma);
+  my $ma = Mail::Address->new(...);
+  $group->addAddress($ma);
 
 =item $obj-E<gt>B<addresses>()
 
@@ -208,10 +203,10 @@ Returns all addresses defined in this group.  The addresses will be
 ordered alphabetically to make automated testing possible: roles are
 stored in a hash, so have an unpredictable order by default.
 
-example: getting all addresses from a group
+» example: getting all addresses from a group
 
- my @addrs = $group->addresses;
- my @addrs = map { $_->address } $self->roles; #same
+  my @addrs = $group->addresses;
+  my @addrs = map $_->address, $self->roles; #same
 
 =back
 
@@ -221,61 +216,60 @@ example: getting all addresses from a group
 
 =over 4
 
-=item Error: $object is not a collection.
-
-The first argument is an object, but not of a class which extends
-L<User::Identity::Collection|User::Identity::Collection>.
-
 =item Error: Cannot coerce a $type into a Mail::Message::Field::AddrGroup
 
-=item Error: Cannot create a $type to add this to my collection.
+Cast by C<coerce()>
 
-Some options are specified to create a $type object, which is native to
+=item Error: cannot create a $type to add this to my collection.
+
+Some options are specified to create a C<$type> object, which is native to
 this collection.  However, for some reason this failed.
+Cast by C<addRole()>
 
-=item Error: Cannot load collection module for $type ($class).
+=item Error: cannot load collection module for $type ($class): $err
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by C<addCollection()>
 
-=item Error: Cannot rename $name into $newname: already exists
+=item Error: cannot rename $from into $to: already exists.
 
-=item Error: Cannot rename $name into $newname: doesn't exist
+Cast by C<renameRole()>
 
-=item Error: Creation of a collection via $class failed.
+=item Error: cannot rename $from into $to: doesn't exist.
 
-The $class did compile, but it was not possible to create an object
-of that class using the options you specified.
+Cast by C<renameRole()>
 
-=item Error: Don't know what type of collection you want to add.
+=item Error: nvalid collection $name.
 
-If you add a collection, it must either by a collection object or a
-list of options which can be used to create a collection object.  In
-the latter case, the type of collection must be specified.
+The collection with C<$name> does not exist and can not be created.
+Cast by C<add()>
 
-=item Warning: No collection $name
+=item Error: this $object is not a collection.
 
-The collection with $name does not exist and can not be created.
+Cast by C<addCollection()>
 
-=item Error: Wrong type of role for $collection: requires a $expect but got a $type
+=item Error: wrong type of role for $collection: requires a $expect but got a $type.
 
-Each $collection groups sets of roles of one specific type ($expect).  You
-cannot add objects of a different $type.
+Each C<$collection> groups sets of roles of one specific type (C<$expect>).  You
+cannot add objects of a different C<$type>.
+Cast by C<addRole()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

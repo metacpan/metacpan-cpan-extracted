@@ -1,32 +1,36 @@
-# Copyrights 2002-2023 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box-Parser-C.  Meta-POD processed
-# with OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box-Parser-C version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
 
-package Mail::Box::Parser::C;
-use vars '$VERSION';
-$VERSION = '3.011';
+# This software is copyright (c) 2002-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+
+package Mail::Box::Parser::C;{
+our $VERSION = '3.012';
+}
 
 use base qw/Mail::Box::Parser Exporter DynaLoader/;
 
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 
 use strict;
 use warnings;
 
 use Carp;
 
+#--------------------
 
-use Mail::Message::Field;
+use Mail::Message::Field ();
 
-our %EXPORT_TAGS =
- ( field => [ qw( ) ]
- , head  => [ qw( ) ]
- , body  => [ qw( ) ]
- );
+our %EXPORT_TAGS = (
+	field => [ qw( ) ],
+	head  => [ qw( ) ],
+	body  => [ qw( ) ],
+);
 
 
 our @EXPORT_OK = @{$EXPORT_TAGS{field}};
@@ -55,17 +59,18 @@ sub body_delayed($$$);
 #fold_header_line(char *original, int wrap)
 #in_dosmode(int boxnr)
 
+#--------------------
 
 sub pushSeparator($)
-{   my ($self, $sep) = @_;
-    push_separator $self->{MBPC_boxnr}, $sep;
+{	my ($self, $sep) = @_;
+	push_separator $self->{MBPC_boxnr}, $sep;
 }
 
 sub popSeparator() { pop_separator shift->{MBPC_boxnr} }
-    
+
 sub filePosition(;$)
-{   my $boxnr = shift->{MBPC_boxnr};
-    @_ ? set_position($boxnr, shift) : get_position($boxnr);
+{	my $boxnr = shift->{MBPC_boxnr};
+	@_ ? set_position($boxnr, shift) : get_position($boxnr);
 }
 
 sub readHeader() { read_header shift->{MBPC_boxnr} }
@@ -73,58 +78,47 @@ sub readHeader() { read_header shift->{MBPC_boxnr} }
 sub readSeparator() { read_separator shift->{MBPC_boxnr} }
 
 sub bodyAsString(;$$)
-{   my ($self, $exp_chars, $exp_lines) = @_;
-    $exp_chars = -1 unless defined $exp_chars;
-    $exp_lines = -1 unless defined $exp_lines;
-    body_as_string $self->{MBPC_boxnr}, $exp_chars, $exp_lines;
+{	my ($self, $exp_chars, $exp_lines) = @_;
+	body_as_string $self->{MBPC_boxnr}, $exp_chars // -1, $exp_lines // -1;
 }
 
 sub bodyAsList(;$$)
-{   my ($self, $exp_chars, $exp_lines) = @_;
-    $exp_chars = -1 unless defined $exp_chars;
-    $exp_lines = -1 unless defined $exp_lines;
-    body_as_list $self->{MBPC_boxnr}, $exp_chars, $exp_lines;
+{	my ($self, $exp_chars, $exp_lines) = @_;
+	body_as_list $self->{MBPC_boxnr}, $exp_chars // -1, $exp_lines // -1;
 }
 
 sub bodyAsFile($;$$)
-{   my ($self, $file, $exp_chars, $exp_lines) = @_;
-    $exp_chars = -1 unless defined $exp_chars;
-    $exp_lines = -1 unless defined $exp_lines;
-    body_as_file $self->{MBPC_boxnr}, $file, $exp_chars, $exp_lines;
+{	my ($self, $file, $exp_chars, $exp_lines) = @_;
+	body_as_file $self->{MBPC_boxnr}, $file, $exp_chars // -1, $exp_lines // -1;
 }
 
-#------------------------------------------
-
+#--------------------
 
 sub bodyDelayed(;$$)
-{   my ($self, $exp_chars, $exp_lines) = @_;
-    $exp_chars = -1 unless defined $exp_chars;
-    $exp_lines = -1 unless defined $exp_lines;
-    body_delayed $self->{MBPC_boxnr}, $exp_chars, $exp_lines;
+{	my ($self, $exp_chars, $exp_lines) = @_;
+	body_delayed $self->{MBPC_boxnr}, $exp_chars // -1, $exp_lines // -1;
 }
 
 sub openFile($)
-{   my ($self, $args) = @_;
-    my $boxnr;
-    my %log = $self->logSettings;
+{	my ($self, $args) = @_;
+	my %log = $self->logSettings;
 
-    if(my $file = $args->{file})
-    {   my $name = $args->{filename} || "$file";
-        $boxnr   = open_filehandle($file, $name, $log{trace});
-    }
-    else
-    {   $boxnr   = open_filename($args->{filename}, $args->{mode}, $log{trace});
-    }
+	my $boxnr;
+	if(my $file = $args->{file})
+	{	my $name = $args->{filename} || "$file";
+		$boxnr   = open_filehandle($file, $name, $log{trace});
+	}
+	else
+	{	$boxnr   = open_filename($args->{filename}, $args->{mode}, $log{trace});
+	}
 
-    $self->{MBPC_boxnr} = $boxnr;
-    defined $boxnr ? $self : undef;
+	$self->{MBPC_boxnr} = $boxnr;
+	defined $boxnr ? $self : undef;
 }
 
 sub closeFile() {
-   my $boxnr = delete shift->{MBPC_boxnr};
-   return unless defined $boxnr;
-   close_file $boxnr;
+	my $boxnr = delete $_[0]->{MBPC_boxnr};
+	defined $boxnr ? close_file $boxnr : ();
 }
 
 1;
-

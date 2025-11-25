@@ -20,101 +20,100 @@ L<Mail::Box::Parser::C|Mail::Box::Parser::C>, but will also work on platforms wh
 compiler is available.
 
 Extends L<"DESCRIPTION" in Mail::Box::Parser|Mail::Box::Parser/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::Parser|Mail::Box::Parser/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::Parser|Mail::Box::Parser/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Parser::Perl-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Box::Parser/"METHODS">
 
  -Option           --Defined in       --Default
-  file               Mail::Box::Parser  undef
-  filename           Mail::Box::Parser  <required>
-  fix_header_errors                     <false>
+  file                                  undef
+  filename                              <required>
+  fix_header_errors  Mail::Box::Parser  false
   log                Mail::Reporter     'WARNINGS'
-  mode               Mail::Box::Parser  'r'
+  mode                                  'r'
   trace              Mail::Reporter     'WARNINGS'
-  trusted                               <false>
+  trusted            Mail::Box::Parser  false
 
 =over 2
 
-=item file => FILE-HANDLE
+=item file => $filehandle
+
+Any IO::File or C<GLOB> C<$filehandle> which can be used to read
+the data from.  In case this option is specified, the C<filename> is
+informational only.
 
 =item filename => FILENAME
 
-=item fix_header_errors => BOOLEAN
+The name of the file to be read.
 
-When header errors are detected, the parsing of the header will
-be stopped.  Other header lines will become part of the body of
-the message.  Set this flag to have the erroneous line added to
-the previous header line.
+=item fix_header_errors => BOOLEAN
 
 =item log => LEVEL
 
-=item mode => OPENMODE
+=item mode => $mode
+
+File open C<$mode>, which defaults to C<'r'>, which means `read-only'.
+See C<perldoc -f open> for possible modes.  Only applicable
+when no C<file> is specified.
 
 =item trace => LEVEL
 
 =item trusted => BOOLEAN
 
-Is the input from the file to be trusted, or does it require extra
-tests.  Related to L<Mail::Box::new(trusted)|Mail::Box/"Constructors">.
-
 =back
 
 =back
 
-=head2 The parser
+=head2 Attributes
 
-Extends L<"The parser" in Mail::Box::Parser|Mail::Box::Parser/"The parser">.
- 
+Extends L<"Attributes" in Mail::Box::Parser|Mail::Box::Parser/"Attributes">.
+
 =over 4
 
-=item $obj-E<gt>B<fileChanged>()
+=item $any-E<gt>B<defaultParserType>( [$class] )
 
-Inherited, see L<Mail::Box::Parser/"The parser">
+Inherited, see L<Mail::Box::Parser/"Attributes">
+
+=item $obj-E<gt>B<file>()
+
+Z<>
 
 =item $obj-E<gt>B<filename>()
 
-Inherited, see L<Mail::Box::Parser/"The parser">
+Returns the name of the file this parser is working on.
 
 =item $obj-E<gt>B<fixHeaderErrors>( [BOOLEAN] )
 
-If set to C<true>, parsing of a header will not stop on an error, but
-attempt to add the erroneous this line to previous field.  Without BOOLEAN,
-the current setting is returned.
+Inherited, see L<Mail::Box::Parser/"Attributes">
 
-example: 
+=item $obj-E<gt>B<logSettings>()
 
- $folder->parser->fixHeaderErrors(1);
- my $folder = $mgr->open('folder', fix_header_errors => 1);
+Inherited, see L<Mail::Reporter/"Attributes">
 
-=encoding utf8
+=item $obj-E<gt>B<openMode>()
 
-=item $obj-E<gt>B<restart>()
+Z<>
 
-Inherited, see L<Mail::Box::Parser/"The parser">
+=item $obj-E<gt>B<trusted>()
 
-=item $obj-E<gt>B<start>(%options)
-
-Inherited, see L<Mail::Box::Parser/"The parser">
-
-=item $obj-E<gt>B<stop>()
-
-Inherited, see L<Mail::Box::Parser/"The parser">
+Inherited, see L<Mail::Box::Parser/"Attributes">
 
 =back
 
 =head2 Parsing
 
 Extends L<"Parsing" in Mail::Box::Parser|Mail::Box::Parser/"Parsing">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bodyAsFile>( $fh [$chars, [$lines]] )
@@ -133,60 +132,70 @@ Inherited, see L<Mail::Box::Parser/"Parsing">
 
 Inherited, see L<Mail::Box::Parser/"Parsing">
 
+=item $obj-E<gt>B<closeFile>()
+
+Close the file which was being parsed.
+
+=item $obj-E<gt>B<fileChanged>()
+
+Returns whether the file which is parsed has changed after the last
+time takeFileInfo() was called.
+
 =item $obj-E<gt>B<filePosition>( [$position] )
 
-Inherited, see L<Mail::Box::Parser/"Parsing">
+Returns the location of the next byte to be used in the file which is
+parsed.  When a C<$position> is specified, the location in the file is
+moved to the indicated spot first.
 
 =item $obj-E<gt>B<lineSeparator>()
 
 Inherited, see L<Mail::Box::Parser/"Parsing">
 
-=item $obj-E<gt>B<popSeparator>()
+=item $obj-E<gt>B<openFile>(%options)
 
-Inherited, see L<Mail::Box::Parser/"Parsing">
-
-=item $obj-E<gt>B<pushSeparator>(STRING|Regexp)
-
-Inherited, see L<Mail::Box::Parser/"Parsing">
+[3.012] Open the file to be parsed.
 
 =item $obj-E<gt>B<readHeader>()
 
-=item $obj-E<gt>B<readSeparator>(%options)
-
 Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<restart>(%options)
+
+Restart the parser on a certain file, usually because the content has
+changed.  The C<%options> are passed to L<openFile()|Mail::Box::Parser::Perl/"Parsing">.
+
+=item $obj-E<gt>B<start>(%options)
+
+Start the parser by opening a file.
+
+ -Option--Default
+  file    undef
+
+=over 2
+
+=item file => FILEHANDLE|undef
+
+The file is already open, for instance because the data must be read
+from STDIN.
 
 =back
 
-=head2 Internals
+=item $obj-E<gt>B<stop>()
 
-Extends L<"Internals" in Mail::Box::Parser|Mail::Box::Parser/"Internals">.
- 
-=over 4
-
-=item $obj-E<gt>B<closeFile>()
-
-Inherited, see L<Mail::Box::Parser/"Internals">
-
-=item $obj-E<gt>B<defaultParserType>( [$class] )
-
-=item Mail::Box::Parser::Perl-E<gt>B<defaultParserType>( [$class] )
-
-Inherited, see L<Mail::Box::Parser/"Internals">
-
-=item $obj-E<gt>B<openFile>($args)
-
-Inherited, see L<Mail::Box::Parser/"Internals">
+Stop the parser, which will include a close of the file.  The lock on the
+folder will not be removed (is not the responsibility of the parser).
+Improves base, see L<Mail::Box::Parser/"Parsing">
 
 =item $obj-E<gt>B<takeFileInfo>()
 
-Inherited, see L<Mail::Box::Parser/"Internals">
+Capture some data about the file being parsed, to be compared later.
 
 =back
 
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::Parser|Mail::Box::Parser/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -197,9 +206,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Parser::Perl-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -207,19 +214,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Parser::Perl-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Parser::Perl-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -248,7 +247,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::Parser|Mail::Box::Parser/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -261,7 +260,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Warning: File $filename changed during access.
+=item Warning: File $file changed during access.
 
 When a message parser starts working, it takes size and modification time
 of the file at hand.  If the folder is written, it checks whether there
@@ -272,6 +271,7 @@ will read these new messages.  But the real source of this problem is
 locking: some external program (for instance the mail transfer agent,
 like sendmail) uses a different locking mechanism as you do and therefore
 violates your rights.
+Cast by C<stop()>
 
 =item Error: Package $package does not implement $method.
 
@@ -280,6 +280,7 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Warning: Unexpected end of header in $source: $line
 
@@ -291,21 +292,23 @@ starts on the first position, but not with a field name.
 
 By default, parsing of the header will be stopped.  If there are more header
 lines after the erroneous line, they will be added to the body of the message.
-In case of new(fix_headers) set, the parsing of the header will be continued.
+In case of L<new(fix_header_errors)|Mail::Box::Parser/"METHODS"> set, the parsing of the header will be continued.
 The erroneous line will be added to the preceding field.
+Cast by C<readHeader()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

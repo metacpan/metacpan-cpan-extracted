@@ -10,8 +10,9 @@ use Spreadsheet::Edit;
 use Spreadsheet::Edit::IO qw/let2cx cx2let convert_spreadsheet
                              filepath_from_spec sheetname_from_spec/;
 
-# On Solars and maybe others File::Find warns "Use of uninitialized..."
-# while openlibreoffice_path searches for an installation.
+# November 2025: The code to find libreoffice has been rewritten and no
+# longer uses File::Find (which has internal problems on some platforms).
+#
 # Enable debug tracing but only show it if there is a problem
 my $path;
 { my @warnings;
@@ -23,7 +24,7 @@ my $path;
   my $caught = $@;
   if ($caught || any { /se of uninitialized/} @warnings) {
     diag @warnings;
-    diag $caught if $caught;
+    diag "EXCEPTION: $caught" if $caught;
     fail("File::Find trouble") unless $debug && !$caught;
   }
 }

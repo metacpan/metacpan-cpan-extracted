@@ -18,17 +18,14 @@ use URI::Escape;
 use Encode;
 use Scalar::Util qw(weaken);
 use List::Util qw(all);
-use DateTime::Format::ISO8601;
-use Data::Identifier::Generate;
+use Data::Identifier::Generate v0.25;
 
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.18;
+our $VERSION = v0.19;
 
 use parent 'Data::URIID::Base';
-
-my $HAVE_HTML_TreeBuilder_XPath = eval {require HTML::TreeBuilder::XPath; 1;};
 
 my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 
@@ -828,7 +825,7 @@ sub _get_html {
         return undef;
     }
 
-    if ($HAVE_HTML_TreeBuilder_XPath) {
+    if (eval {require HTML::TreeBuilder::XPath; 1;}) {
         my Data::URIID $extractor = $self->extractor;
 
         if (defined(my $query = $opts{query})) {
@@ -1161,6 +1158,8 @@ sub _online_lookup__wikibase__from_service__datetime {
     #die Dumper $value;
 
     if ($precision >= 9) {
+        require DateTime::Format::ISO8601;
+
         my $dt = DateTime::Format::ISO8601->parse_datetime($value->{time} =~ s/^\+//r =~ s/-00-00T/-01-01T/r =~ s/-00T/-01T/r);
         my $val;
 
@@ -1442,9 +1441,7 @@ sub _online_lookup__danbooru2chanjp {
 
         foreach my $tag (split /\s+/, $tags) {
             next unless length $tag;
-            eval { # eval required for Data::Identifier < v0.11
-                push(@list, [Data::Identifier->new('c5632c60-5da2-41af-8b60-75810b622756' => $tag)]);
-            };
+            push(@list, [Data::Identifier->new('c5632c60-5da2-41af-8b60-75810b622756' => $tag)]);
         }
     }
 
@@ -1571,7 +1568,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.18
+version v0.19
 
 =head1 SYNOPSIS
 

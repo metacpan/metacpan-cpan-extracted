@@ -1,40 +1,91 @@
 use ExtUtils::MakeMaker;
 
+require 5.016;
+
+#!!! Change VERSION in lib/Mail/Box/Parser/C.pm
+
+my $git      = "https://github.com/markov2/perl5-Mail-Box-Parser-C";
+my $publish  = "../public_html/mail-box-parser-c";
+my $homepage = "http://perl.overmeer.net/CPAN/";
+
+my %oodist   = (
+	oodoc_version => 3.05,
+	first_year => 2002,
+	email    => "markov\@cpan.org",
+
+	include  => [
+	],
+
+	use      => [
+	],
+
+	parser   => {
+		syntax         => 'markov',
+		skip_links     => [
+		],
+		pmhead         => undef,
+	},
+
+	tests    => {
+	},
+
+	release  => {
+		publish        => "$publish/source",
+	},
+
+	raw      => {
+		publish        => "$publish/raw",
+	},
+
+	generate => [
+	  {	format         => 'pod3',
+		podtail        => undef,
+	  },
+	],
+);
+
+my %requires = (
+	'Mail::Message' => '4.0',
+);
+
 WriteMakefile
- ( NAME          => 'Mail::Box::Parser::C'
- , VERSION_FROM  => 'lib/Mail/Box/Parser/C.pm'
- , PREREQ_PM     =>
-     { Test::More => 0.47
-     }
- , ABSTRACT      => 'Parse mbox files with XS'
- , AUTHOR        => 'Mark Overmeer'
- , LICENSE       => 'perl_5'
+	NAME          => 'Mail::Box::Parser::C',
+	VERSION_FROM  => 'lib/Mail/Box/Parser/C.pm',
+	ABSTRACT      => 'Parse mbox files with XS',
+	AUTHOR        => 'Mark Overmeer',
+	LICENSE       => 'perl_5',
 
- , META_MERGE =>
-      { 'meta-spec' => { version => 2 }
-      , resources  =>
-          { repository =>
-              { type => 'git'
-              , url  => 'https://github.com/markov2/perl5-Mail-Box-Parser-C.git'
-              , web  => 'https://github.com/markov2/perl5-Mail-Box-Parser-C'
-              }
-          , homepage => 'http://perl.overmeer.net/CPAN/'
-          , license  => [ 'http://dev.perl.org/licenses/' ]
-          }
-      }
- );
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => "$git.git",
+				web  => $git,
+			},
+			bugtracker => {
+				web  => "$git/issues",
+			},
+			homepage => $homepage,
+			license  => [ 'http//dev.perl.org/licenses/' ],
+		},
+		prereqs => {
+			runtime => {
+				requires => \%requires,
+			},
+			develop => {
+				requires => {
+					'OODoc' => '3.00',
+				},
+			},
+			test => {
+				requires => {
+					'Test::More' => 1.00,
+					'Test::Pod'  => 1.00,
+				},
+			},
+		},
 
-### used by oodist during production of distribution
-sub MY::postamble { <<'__POSTAMBLE' }
-
-# for DIST
-RAWDIR          = ../public_html/mail-box-parser-c/raw
-DISTDIR         = ../public_html/mail-box-parser-c/source
-
-# for POD
-FIRST_YEAR      = 2002
-EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/CPAN/
-
-__POSTAMBLE
-
+		# You may use multiple set-ups, see "oodist --make"
+		x_oodist => \%oodist,
+	};

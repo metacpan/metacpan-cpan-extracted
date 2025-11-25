@@ -1,12 +1,13 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 lib/Mail/Box/FastScalar.pm
 lib/Mail/Box/FastScalar.pod
 lib/Mail/Box/Parser.pm
 lib/Mail/Box/Parser.pod
+lib/Mail/Box/Parser/Lines.pm
+lib/Mail/Box/Parser/Lines.pod
 lib/Mail/Box/Parser/Perl.pm
 lib/Mail/Box/Parser/Perl.pod
 lib/Mail/Message.pm
@@ -160,6 +161,7 @@ t/313encode-seven.t
 t/314encode-charset.t
 t/315encode-body.t
 t/316encode-charset.t
+t/317encode-eol.t
 t/320bodyconv-textaf.t
 t/321bodyconv-html.t
 t/322bodyconv-htmlps.t

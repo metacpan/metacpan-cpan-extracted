@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use Blockchain::Ethereum::Transaction::EIP1559;
-use Blockchain::Ethereum::Keystore::Key;
+use Blockchain::Ethereum::Key;
 use Blockchain::Ethereum::Utils;
 
 # These tests are based on the result of running the same transactions over ethers.js
@@ -25,7 +25,7 @@ subtest "contract deployment => remix storage contract" => sub {
         chain_id                 => '0x539'
     );
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );
@@ -57,7 +57,7 @@ subtest "eth transfer" => sub {
         chain_id                 => '0x539'
     );
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );
@@ -101,7 +101,7 @@ subtest 'with access list' => sub {
         ],
     );
 
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
+    my $key = Blockchain::Ethereum::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
     );

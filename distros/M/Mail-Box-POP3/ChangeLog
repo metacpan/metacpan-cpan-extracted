@@ -1,6 +1,21 @@
 
 ===== history of distribution Mail-Box-POP3
 
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.008: Mon 24 Nov 12:45:07 CET 2025
+
+	Changes:
+	- MailBox mid-life upgrade: require Perl minimal version 5.16.
+	- this branch goes into maintenance.
+
+	Improvements:
+	- add .gitignore
+	- converted to OODoc 3.04
+	- explicitly depend on Mail::Message v3, not 4
+
 version 3.007: Fri Apr 18 08:59:39 PM CEST 2025
 
 	Changes:
@@ -9,14 +24,14 @@ version 3.007: Fri Apr 18 08:59:39 PM CEST 2025
 
 version 3.006: Mon 28 Aug 13:35:25 CEST 2023
 
+	Changes:
+	- Default SSL options disable verification.
+
 	Improvements:
 	- Mail::Box::POP3 and Mail::Transport::POP3 can set SSL during
 	  construction.
 	  rt.cpan.org#140896 [Yanyan Yang]
 	- Add OUATH2 verification [Medha Prasad]
-
-	Changes:
-	- Default SSL options disable verification.
 
 version 3.005: Fri  3 May 09:41:53 CEST 2019
 

@@ -30,6 +30,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -39,29 +44,63 @@
             "IO::Socket" : "0",
             "IO::Socket::IP" : "0",
             "List::Util" : "0",
-            "Mail::Box::FastScalar" : "3",
-            "Mail::Box::Net" : "3",
-            "Mail::Box::Parser::Perl" : "3",
-            "Mail::Box::Test" : "3",
-            "Mail::Reporter" : "3",
-            "Mail::Transport::Receive" : "3",
-            "Socket" : "0",
-            "Test::More" : "0"
+            "Mail::Box::FastScalar" : ">= 3, < 4.0",
+            "Mail::Box::Net" : ">= 3, < 4.0",
+            "Mail::Box::Parser::Perl" : ">= 3, < 4.0",
+            "Mail::Box::Test" : ">= 3, < 4.0",
+            "Mail::Reporter" : ">= 3, < 4.0",
+            "Mail::Transport::Receive" : ">= 3, < 4.0",
+            "Socket" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-Mail-Box-POP3/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Mail-Box-POP3.git",
          "web" : "https://github.com/markov2/perl5-Mail-Box-POP3"
       }
    },
-   "version" : "3.007",
+   "version" : "3.008",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2001,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [
+         "../Mail-Box",
+         "../Mail-Message",
+         "../Mail-Transport"
+      ],
+      "oodoc_version" : 3.05,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/mail-box-pop3/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/mail-box-pop3/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

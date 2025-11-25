@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: A Ethereum toolkit in Perl
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 1;
 
@@ -22,39 +22,43 @@ Blockchain::Ethereum - A Ethereum toolkit in Perl
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 
 A Ethereum toolkit written in Perl, combining core utilities for working with Ethereum's internal data structures.
 
-This distribution merges the functionality of previously separate modules into a single toolkit, including:
-
 =over 4
 
 =item *
 
-ABI encoding and decoding
+L<Blockchain::Ethereum::ABI> ABI (En/De)coding
 
 =item *
 
-RLP serialization
+L<Blockchain::Ethereum::RLP> RLP (De)Serialization
 
 =item *
 
-Transaction creation and signing
+L<Blockchain::Ethereum::Transaction> Ethereum Transaction Abstraction
 
-=item *
+=over 4
 
-Keystore encryption and decryption
+=item * L<Blockchain::Ethereum::Transaction::Legacy>  - Legacy Transaction
+
+=item * L<Blockchain::Ethereum::Transaction::EIP1559> - Fee Market Transaction
+
+=item * L<Blockchain::Ethereum::Transaction::EIP2930> - Optional Access Lists Transaction
+
+=item * L<Blockchain::Ethereum::Transaction::EIP4844> - Blob Transaction
 
 =back
 
-These modules are now bundled together in a single distribution to simplify usage, packaging, and long-term maintenance.
+=item *
 
-=head1 NAME
+L<Blockchain::Ethereum::Keystore> Keystore File Abstraction (v3)
 
-Blockchain::Ethereum::Toolkit - A Ethereum toolkit in Perl
+=back
 
 =head1 INSTALLATION
 

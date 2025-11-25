@@ -1,0 +1,9 @@
+force = 1
+only = 1
+severity = 1
+verbose = 5
+color-severity-highest = bold red underline
+color-severity-high = bold magenta
+color-severity-medium = bold yellow
+include = BuiltinFunctions::ProhibitShiftRef CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireTidyCode ErrorHandling::RequireCarping Modules::ProhibitMultiplePackages Subroutines::ProtectPrivateSubs TestingAndDebugging::ProhibitNoStrict TestingAndDebugging::ProhibitNoWarnings TestingAndDebugging::RequireUseStrict TestingAndDebugging::RequireUseWarnings ValuesAndExpressions::ProhibitMixedBooleanOperators
+exclude = Subroutines::ProhibitExplicitReturnUndef Subroutines::ProtectPrivateSubs

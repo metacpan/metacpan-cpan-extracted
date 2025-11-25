@@ -6,14 +6,14 @@ Mail::Server::IMAP4::List - folder related IMAP4 answers
 
 =head1 SYNOPSIS
 
- my $imap = Mail::Server::IMAP4::List->new
-   ( folders   => $folders   # Mail::Box::Identity
-   , inbox     => $inbox     # Mail::Box
-   , delimiter => '#'
-   );
+  my $imap = Mail::Server::IMAP4::List->new(
+    folders   => $folders,   # Mail::Box::Identity
+    inbox     => $inbox,     # Mail::Box
+    delimiter => '#'
+  );
 
- my $imap = Mail::Server::IMAP4::List->new(user => $user);
- print $imap->list(...);        # for LIST command
+  my $imap = Mail::Server::IMAP4::List->new(user => $user);
+  print $imap->list(...);        # for LIST command
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ Mail::Server::IMAP4::List - folder related IMAP4 answers
 
 =over 4
 
-=item Mail::Server::IMAP4::List-E<gt>B<new>($user)
+=item $class-E<gt>B<new>(%options)
 
 Create a (temporary) object to handle the LIST requests for
 a certain user, based upon a set of folders.  The data is kept by
@@ -34,7 +34,7 @@ mean that the folders will not be opened to answer these questions.
   delimiter  '/'
   folders    <from user>
   inbox      <from user>
-  user       <undef>
+  user       undef
 
 =over 2
 
@@ -54,7 +54,7 @@ user. Some L<Mail::Box::Identity|Mail::Box::Identity> OBJECT is needed.
 
 For now, only used to see whether there is an inbox, so a truth value will
 do.  This may change in the future.  By default, the flag is set if
-C<$user->inbox> is defined.
+C<user> inbox is defined.
 
 =item user => OBJECT
 
@@ -74,22 +74,22 @@ must get reported.
 Returns the delimiter string.  The foldername is only required when a
 CODE reference was specified at initiation.
 
-example: setting-up an IMAP4 delimiter
+» example: setting-up an IMAP4 delimiter
 
- sub delim($)
- {   my $path = shift;
-     my ($delim, $root)
-       = $path =~ m/^(#news\.)/ ? ('.', $1)
-       = $path =~ m!^/!         ? ('/', '/')
-       :                          ('/', '');
+  sub delim($)
+  {   my $path = shift;
+      my ($delim, $root)
+        = $path =~ m/^(#news\.)/ ? ('.', $1)
+        : $path =~ m!^/!         ? ('/', '/')
+        :                          ('/', '');
 
-     wantarray ? ($delim, $root) : $delim;
- }
+      wantarray ? ($delim, $root) : $delim;
+  }
 
- my $list = Mail::Server::IMAP4::List->new(delimiter => \&delim, ...);
- print $list->delimiter('abc/xyz');      # returns a / (slash) and ''
- print $list->delimiter('#news.feed');   # returns a . (dot)   and $news.
- print $list->delimiter('');             # returns default delimiter
+  my $list = Mail::Server::IMAP4::List->new(delimiter => \&delim, ...);
+  print $list->delimiter('abc/xyz');      # returns a / (slash) and ''
+  print $list->delimiter('#news.feed');   # returns a . (dot)   and $news.
+  print $list->delimiter('');             # returns default delimiter
 
 =item $obj-E<gt>B<folders>()
 
@@ -114,19 +114,19 @@ Returns the L<Mail::Box::Manage::User|Mail::Box::Manage::User> object, if define
 IMAP's LIST command.  The request must be partially decoded, the answer
 will need to be encoded.
 
-example: using IMAP list
+» example: using IMAP list
 
- my $imap  = Mail::Server::IMAP4::List->new(delimiter => \&delim, ...);
- local $"  = ';';
+  my $imap  = Mail::Server::IMAP4::List->new(delimiter => \&delim, ...);
+  local $"  = ';';
 
- my @lines = $imap->list('', '');  # returns the default delimiter
- print ">@{$lines[0]}<";           #  >(\Noselect);/;<
+  my @lines = $imap->list('', '');  # returns the default delimiter
+  print ">@{$lines[0]}<";           #  >(\Noselect);/;<
 
- my @lines = $imap->list('#news',''); # specific delimiter
- print ">@{$lines[0]}<";           #  >(\Noselect);.;<
+  my @lines = $imap->list('#news',''); # specific delimiter
+  print ">@{$lines[0]}<";           #  >(\Noselect);.;<
 
- my @lines = $imap->list('top/x/', '%');
- print ">@$_<," foreach @lines;    #  >();/;/tmp/x/y<,>(\Marked);/;/tmp/x/z<
+  my @lines = $imap->list('top/x/', '%');
+  print ">@$_<," foreach @lines;    #  >();/;/tmp/x/y<,>(\Marked);/;/tmp/x/z<
 
 =back
 
@@ -144,14 +144,15 @@ sections 6.3.8 (LIST question) and 7.2.2 (LIST answer)
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.009,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 3.010,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

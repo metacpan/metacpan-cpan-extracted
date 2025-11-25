@@ -1,3 +1,8 @@
+v0.19  2025-11-24Z
+    - Improved loading time of the modules
+    - Updated required version of Data::Identifier to v0.25
+    - Register more identifiers with Data::Identifier
+
 v0.18  2025-10-19Z
     - Added support for tag: and acct:-URIs
     - Updated list of well known identifiers

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 52;
+use Test::More;
 
 # The versions of the following packages are reported to help understanding
 # the environment in which the tests are run.  This is certainly not a
@@ -11,7 +11,7 @@ use Test::More tests => 52;
 my @show_versions =
  qw/Mail::Box
     Mail::Box::Manager
-    Mail::Transfer
+    Mail::Transport
    /;
 
 foreach my $package (@show_versions)
@@ -29,6 +29,7 @@ foreach my $package (@show_versions)
 require_ok('Mail::Box::FastScalar');
 require_ok('Mail::Box::Parser');
 require_ok('Mail::Box::Parser::Perl');
+require_ok('Mail::Box::Parser::Lines');
 require_ok('Mail::Message::Body::Construct');
 require_ok('Mail::Message::Body::Encode');
 require_ok('Mail::Message::Body::File');
@@ -87,3 +88,5 @@ require_ok('Mail::Reporter');
 #require_ok('Mail::Message::Convert::MailInternet');
 #require_ok('Mail::Message::Convert::MimeEntity');
 #require_ok('Mail::Message::Convert::TextAutoformat');
+
+done_testing;

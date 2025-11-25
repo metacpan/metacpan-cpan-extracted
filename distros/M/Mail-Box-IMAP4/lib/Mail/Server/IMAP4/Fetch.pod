@@ -6,11 +6,11 @@ Mail::Server::IMAP4::Fetch - message info for IMAP protocol speed-up
 
 =head1 SYNOPSIS
 
- my $imap = Mail::Server::IMAP4::Fetch->new($msg);
- print $imap->fetchBody(1);   # for FETCH BODYSTRUCTURE
- print $imap->fetchBody;      # for FETCH BODY
- print $imap->fetchEnvelope;  # for FETCH ENVELOPE
- print $imap->fetchSize;
+  my $imap = Mail::Server::IMAP4::Fetch->new($msg);
+  print $imap->fetchBody(1);   # for FETCH BODYSTRUCTURE
+  print $imap->fetchBody;      # for FETCH BODY
+  print $imap->fetchEnvelope;  # for FETCH ENVELOPE
+  print $imap->fetchSize;
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,9 @@ Therefore, this object can be frozen by L<Storable> if you want to.
 
 =over 4
 
-=item Mail::Server::IMAP4::Fetch-E<gt>B<new>( <$message|$part>, %options )
+=item $class-E<gt>B<new>( <$message|$part>, %options )
+
+Z<>
 
  -Option      --Default
   md5checksums  0
@@ -48,9 +50,15 @@ Therefore, this object can be frozen by L<Storable> if you want to.
 
 =item $obj-E<gt>B<bodyLocation>()
 
+Z<>
+
 =item $obj-E<gt>B<headLocation>()
 
+Z<>
+
 =item $obj-E<gt>B<partLocation>()
+
+Z<>
 
 =back
 
@@ -62,7 +70,7 @@ Therefore, this object can be frozen by L<Storable> if you want to.
 
 Returns one string, representing the message's structure as defined by
 the IMAP protocol.  The boolean argument indicates whether you like to
-have the $extended information, as the imap command 'FETCH BODYSTRUCTURE'
+have the C<$extended> information, as the imap command 'FETCH BODYSTRUCTURE'
 defines or the limited information of 'FETCH BODY'.
 
 =item $obj-E<gt>B<fetchEnvelope>()
@@ -79,24 +87,24 @@ The partnummer is a list of dot-separated positive integers, numbering
 (nested) parts in multi-part message bodies.  By default, the info of
 the main message is returned.
 
-example: 
+» example: 
 
- my $partinfo = $msg->info->part('1.2.1');
- print $msg->info->part('3.3')->fetchBody;
+  my $partinfo = $msg->info->part('1.2.1');
+  print $msg->info->part('3.3')->fetchBody;
 
 =item $obj-E<gt>B<printStructure>( [<$fh|undef>, [$number]] )
 
-Print the structure of the fetch data to the specified $fh or the
+Print the structure of the fetch data to the specified C<$fh> or the
 selected filehandle.  When explicitly C<undef> is specified as handle,
-then the output will be returned as string.  
+then the output will be returned as string.
 Only a limited set of the information is displayed.
 
-example: 
+» example: 
 
- my $imap = ...;
- $imap->printStructure(\*OUTPUT);
- $imap->printStructure;
- my $struct = $imap->printStructure(undef);
+  my $imap = ...;
+  $imap->printStructure(\*OUTPUT);
+  $imap->printStructure;
+  my $struct = $imap->printStructure(undef);
 
 =back
 
@@ -116,14 +124,15 @@ See
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.009,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 3.010,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

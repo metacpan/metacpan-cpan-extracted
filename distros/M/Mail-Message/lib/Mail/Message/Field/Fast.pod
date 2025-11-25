@@ -12,7 +12,7 @@ Mail::Message::Field::Fast - one line of a message header
 
 =head1 SYNOPSIS
 
- See Mail::Message::Field
+  See Mail::Message::Field
 
 =head1 DESCRIPTION
 
@@ -22,30 +22,30 @@ things up.  Be gentle with me, and consider that each message contains
 many of these lines, so speed is very important here.
 
 Extends L<"DESCRIPTION" in Mail::Message::Field|Mail::Message::Field/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Message::Field|Mail::Message::Field/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
 Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
-=item overload: B<0+>
+=item overload: B<0+> numification
 
 Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
-=item overload: B<<=>>
+=item overload: B<<=>> numeric comparison
 
 Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
-=item overload: B<bool>
+=item overload: B<bool> boolean
 
 Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
-=item overload: B<cmp>
+=item overload: B<cmp> string comparison
 
 Inherited, see L<Mail::Message::Field/"OVERLOADED">
 
@@ -54,21 +54,21 @@ Inherited, see L<Mail::Message::Field/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::Field|Mail::Message::Field/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::Field|Mail::Message::Field/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>()
 
 Inherited, see L<Mail::Message::Field/"Constructors">
 
-=item Mail::Message::Field::Fast-E<gt>B<new>($data)
+=item $class-E<gt>B<new>(($line | $name, $body, [$attributes]), %options)
 
 The constructor of this object does not follow the usual practise within
-the Mail::Box suite: it does not use the constructor
+the L<Mail::Box|Mail::Box> suite: it does not use the constructor
 L<Mail::Reporter::new()|Mail::Reporter/"Constructors">.
 Therefor it has no logging or tracing facilities.
 
@@ -76,33 +76,34 @@ The method can be used in one of the following ways:
 
 =over 4
 
-=item * B<new> LINE
+=item * B<new>(C<$line>, C<%options>)
 
-Pass a LINE as it could be found in a file: a (possibly folded) line
+Pass a C<$line> as it could be found in a file: a (possibly folded) line
 which is terminated by a new-line.
 
-=item * B<new> NAME, (BODY|OBJECTS), [ATTRIBUTES]
+=item * B<new>(C<$name>, C<$body>, [C<$attributes>], C<%options>)
 
 A set of values which shape the line.
 
 =back
 
-Create a new header field object.  Specify the whole LINE at once, and
-it will be split-up for you.  I case you already have the parts of the
-header line, you may specify them separately as NAME and BODY.
+Create a new header field object.  Specify the whole C<$line> (encoded
+octets) at once, and it will be split-up for you.  I case you already
+have the parts of the header line, you may specify them separately as
+C<$name> and field C<$body>.
 
-In case you specify a single OBJECT, or a reference to an array of
-OBJECTS, these objects are processed to become suitable to fill a
-field, usually by simple strification.  When you specify one or more
-L<Mail::Address|Mail::Address> objects, these are transformed into a string using
-their C<format> method.  You may also add one L<Mail::Message::Field|Mail::Message::Field>,
-whose body is taken.  In case of an array, the elements are joined into
-one string with a comma.
+In case you specify a single C<$body> object, or an ARRAY of objects,
+these are processed to become suitable to fill a field, usually by simple
+strification.  When you specify one or more L<Mail::Address|Mail::Address> objects, these
+are transformed into a string using their C<format> method.  You may also
+add one L<Mail::Message::Field|Mail::Message::Field>, whose body is taken.  In case of an array,
+the elements are joined into one string with a comma.
 
-ATTRIBUTES can be exactly one string which may contain multiple attributes
+The C<$attributes> can be exactly one string which may contain multiple attributes
 at once, quoted and formatted as required in RFC2822.  As alternative,
 list of key-value pairs can be used.  In this case, the values will get
 quoted if needed and everything formatted as the protocol demands.
+Improves base, see L<Mail::Message::Field/"Constructors">
 
  -Option--Defined in     --Default
   log     Mail::Reporter   <disabled>
@@ -116,33 +117,32 @@ quoted if needed and everything formatted as the protocol demands.
 
 =back
 
-example: 
+» example: 
 
- my $mime = Mail::Message::Field->new(
-  'Content-Type: text/plain; charset=US-ASCII');
+  my $mime = Mail::Message::Field->new(
+    'Content-Type: text/plain; charset=US-ASCII');
 
- my $mime = Mail::Message::Field->new(
-  'Content-Type' => 'text/plain; charset=US-ASCII');
+  my $mime = Mail::Message::Field->new(
+    'Content-Type' => 'text/plain; charset=US-ASCII');
 
- my $mime = Mail::Message::Field->new(
-  'Content-Type' => 'text/plain', 'charset=US-ASCII');
+  my $mime = Mail::Message::Field->new(
+    'Content-Type' => 'text/plain', 'charset=US-ASCII');
 
- my $mime = Mail::Message::Field->new(
-  'Content-Type' => 'text/plain', charset => 'Latin1');
+  my $mime = Mail::Message::Field->new(
+    'Content-Type' => 'text/plain', charset => 'Latin1');
 
- my $mime = Mail::Message::Field->new(
-  To => Mail::Address->new('My', 'me@example.com');
+  my $mime = Mail::Message::Field->new(
+    To => Mail::Address->new('My', 'me@example.com');
 
- my $mime = Mail::Message::Field->new(
-  Cc => [ Mail::Address->new('You', 'you@example.com')
-        , Mail::Address->new('His', 'he@example.com')
-        ]);
+  my $mime = Mail::Message::Field->new( Cc => [
+    Mail::Address->new('You', 'you@example.com'),
+    Mail::Address->new('His', 'he@example.com')
+  ]);
 
 But in practice, you can simply call
 
- my $head = Mail::Message::Head->new;
- $head->add( 'Content-Type' => 'text/plain'
-           , charset => 'utf8');
+  my $head = Mail::Message::Head->new;
+  $head->add( 'Content-Type' => 'text/plain', charset => 'utf8');
 
 which implicitly calls this constructor (when needed).  You can specify
 the same things for L<Mail::Message::Head::Complete::add()|Mail::Message::Head::Complete/"Access to the header"> as this
@@ -150,15 +150,25 @@ C<new> accepts.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::Field|Mail::Message::Field/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 The field
 
 Extends L<"The field" in Mail::Message::Field|Mail::Message::Field/"The field">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<isStructured>()
-
-=item Mail::Message::Field::Fast-E<gt>B<isStructured>()
+=item $any-E<gt>B<isStructured>()
 
 Inherited, see L<Mail::Message::Field/"The field">
 
@@ -191,7 +201,7 @@ Inherited, see L<Mail::Message::Field/"The field">
 =head2 Access to the name
 
 Extends L<"Access to the name" in Mail::Message::Field|Mail::Message::Field/"Access to the name">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<Name>()
@@ -211,7 +221,7 @@ Inherited, see L<Mail::Message::Field/"Access to the name">
 =head2 Access to the body
 
 Extends L<"Access to the body" in Mail::Message::Field|Mail::Message::Field/"Access to the body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>()
@@ -226,9 +236,7 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 
 Inherited, see L<Mail::Message::Field/"Access to the body">
 
-=item $obj-E<gt>B<stripCFWS>( [STRING] )
-
-=item Mail::Message::Field::Fast-E<gt>B<stripCFWS>( [STRING] )
+=item $any-E<gt>B<stripCFWS>( [STRING] )
 
 Inherited, see L<Mail::Message::Field/"Access to the body">
 
@@ -241,7 +249,7 @@ Inherited, see L<Mail::Message::Field/"Access to the body">
 =head2 Access to the content
 
 Extends L<"Access to the content" in Mail::Message::Field|Mail::Message::Field/"Access to the content">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addresses>()
@@ -264,9 +272,7 @@ Inherited, see L<Mail::Message::Field/"Access to the content">
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
-=item $obj-E<gt>B<toDate>( [$time] )
-
-=item Mail::Message::Field::Fast-E<gt>B<toDate>( [$time] )
+=item $any-E<gt>B<toDate>( [$time] )
 
 Inherited, see L<Mail::Message::Field/"Access to the content">
 
@@ -279,12 +285,10 @@ Inherited, see L<Mail::Message::Field/"Access to the content">
 =head2 Other methods
 
 Extends L<"Other methods" in Mail::Message::Field|Mail::Message::Field/"Other methods">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<dateToTimestamp>(STRING)
-
-=item Mail::Message::Field::Fast-E<gt>B<dateToTimestamp>(STRING)
+=item $any-E<gt>B<dateToTimestamp>(STRING)
 
 Inherited, see L<Mail::Message::Field/"Other methods">
 
@@ -293,7 +297,7 @@ Inherited, see L<Mail::Message::Field/"Other methods">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message::Field|Mail::Message::Field/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<consume>( $line | <$name,<$body|$objects>> )
@@ -304,9 +308,7 @@ Inherited, see L<Mail::Message::Field/"Internals">
 
 Inherited, see L<Mail::Message::Field/"Internals">
 
-=item $obj-E<gt>B<fold>( $name, $body, [$maxchars] )
-
-=item Mail::Message::Field::Fast-E<gt>B<fold>( $name, $body, [$maxchars] )
+=item $any-E<gt>B<fold>( $name, $body, [$maxchars] )
 
 Inherited, see L<Mail::Message::Field/"Internals">
 
@@ -327,7 +329,7 @@ Inherited, see L<Mail::Message::Field/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::Field|Mail::Message::Field/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -338,9 +340,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Field::Fast-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -348,19 +348,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Field::Fast-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Field::Fast-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -389,7 +381,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::Field|Mail::Message::Field/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -401,7 +393,7 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message::Field|Mail::Message::Field/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -411,17 +403,20 @@ Extends L<"DETAILS" in Mail::Message::Field|Mail::Message::Field/"DETAILS">.
 The numeric value of a field is requested (for instance the C<Lines> or
 C<Content-Length> fields should be numerical), however the data contains
 weird characters.
+Cast by C<toInt()>
 
 =item Error: Field name too long (max $length), in '$name'
 
 It is not specified in the RFCs how long a field name can be, but
 at least it should be a few characters shorter than the line wrap.
+Cast by C<fold()>
 
 =item Warning: Illegal character in field name $name
 
 A new field is being created which does contain characters not permitted
 by the RFCs.  Using this field in messages may break other e-mail clients
 or transfer agents, and therefore mutulate or extinguish your message.
+Cast by C<consume()>
 
 =item Error: Package $package does not implement $method.
 
@@ -430,19 +425,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

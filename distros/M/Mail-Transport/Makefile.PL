@@ -4,82 +4,99 @@ require 5.016;
 
 use IO::Handle;
 
-my $VERSION = '3.007';
+# Use command 'oodist' to produce your whole software release.
+my $VERSION = '3.008';
+my $git      = "https://github.com/markov2/perl5-Mail-Transport";
+my $publish  = "../public_html/mail-transport";
+my $homepage = "http://perl.overmeer.net/CPAN/";
 
-my %prereq =
- ( Carp           => 0
- , List::Util     => 0
- , IO::Socket     => 0
- , File::Spec     => 0.7
- , Errno          => 0
- , Net::SMTP      => 0
+my %oodist   = (
+	oodoc_version => 3.05,
+	first_year => 2001,
+	email    => "markov\@cpan.org",
 
- , Mail::Reporter => 3
- );
+	include  => [
+		'../Mail-Box-IMAP4',
+ 		'../Mail-Box-POP3',
+ 		'../Mail-Message',
+	],
 
-foreach my $module (sort keys %prereq)
-{   my $reqversion = $prereq{$module};
-    eval "require $module";
+	use      => [
+	],
 
-    if($@ && $@ =~ m/^Can't locate /)
-    {   print "    $module is not yet installed\n" }
-    elsif($@)
-    {   print "    $module produced an error:\n$@";
-        push @errors, $module;
-    }
-    elsif($module->VERSION < $reqversion)
-    {   print "    $module version ",$module->VERSION
-            , " is outdated; requires $reqversion\n";
-    }
-    else
-    {   print "    $module version ",$module->VERSION
-            , " is ok (required is $reqversion)\n";
-    }
-}
+	parser   => {
+		syntax         => 'markov',
+		skip_links     => [
+		],
+		pmhead         => undef,
+	},
 
-if($errors)
-{   die <<'FIX';
-*** ERROR! You have to install @errors manually,
-*** before you can retry to install MailBox.
-FIX
-    exit 1;
-}
+	tests    => {
+	},
+
+	release  => {
+		publish        => "$publish/source",
+	},
+
+	raw      => {
+		publish        => "$publish/raw",
+	},
+
+	generate => [ {
+		format         => 'pod3',
+		podtail        => undef,
+	}, ],
+);
+
+my %requires = (
+	'Carp'           => 0,
+	'List::Util'     => 0,
+	'IO::Socket'     => 0,
+	'File::Spec'     => 0.7,
+	'Errno'          => 0,
+	'Net::SMTP'      => 0,
+
+	'Mail::Reporter' => '3, <4.0',
+);
 
 WriteMakefile
- ( NAME       => 'Mail::Transport'
- , VERSION    => $VERSION
- , AUTHOR     => 'Mark Overmeer'
- , ABSTRACT   => 'Email message exchange'
- , PREREQ_PM  => \%prereq
- , LICENSE    => 'perl_5'
+	NAME       => 'Mail::Transport',
+	VERSION    => $VERSION,
+	AUTHOR     => 'Mark Overmeer',
+	ABSTRACT   => 'Email message exchange',
+	LICENSE    => 'perl_5',
 
- , META_MERGE =>
-      { 'meta-spec' => { version => 2 }
-      , resources  =>
-          { repository =>
-              { type => 'git'
-              , url  => 'https://github.com/markov2/perl5-Mail-Transport.git'
-              , web  => 'https://github.com/markov2/perl5-Mail-Transport'
-              }
-          , homepage => 'http://perl.overmeer.net/CPAN/'
-          , license  => [ 'http://dev.perl.org/licenses/' ]
-          }
-      }
- );
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => "$git.git",
+				web  => $git,
+			},
+			bugtracker => {
+				web  => "$git/issues",
+			},
+			homepage => $homepage,
+			license  => [ 'http//dev.perl.org/licenses/' ],
+		},
+		prereqs => {
+			runtime => {
+				requires => \%requires,
+			},
+			develop => {
+				requires => {
+					'OODoc' => '3.00',
+				},
+			},
+			test => {
+				requires => {
+					'Test::More' => 1.00,
+					'Test::Pod'  => 1.00,
+				},
+			},
+		},
 
-### used by oodist during production of distribution
-sub MY::postamble { <<'__POSTAMBLE' }
-
-# for DIST
-RAWDIR          = ../public_html/mail-transport/raw
-DISTDIR         = ../public_html/mail-transport/source
-
-LICENSE         = perl
-EXTENDS			= ../Mail-Message:../Mail-Box-POP3:../Mail-Box-IMAP4
-
-# for POD
-FIRST_YEAR      = 2001
-EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/CPAN/
-
-__POSTAMBLE
+		# You may use multiple set-ups, see "oodist --make"
+		x_oodist => \%oodist,
+	};

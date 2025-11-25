@@ -53,7 +53,7 @@
    "provides" : {
       "Tie::Hash::MultiValueOpts" : {
          "file" : "lib/Tie/Hash/MultiValueOpts.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -67,5 +67,5 @@
          "web" : "https://github.com/XSven/Tie-Hash-MultiValueOpts"
       }
    },
-   "version" : "v1.0.3"
+   "version" : "v1.0.4"
 }

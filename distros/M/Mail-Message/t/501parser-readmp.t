@@ -9,9 +9,8 @@ use warnings;
 use Mail::Message;
 use Mail::Message::Test;
 
-use Test::More tests => 66;
+use Test::More;
 use IO::File;
-
 
 #
 # From scalar
@@ -41,7 +40,7 @@ ok($msg1->get('message-id'));
 
 my $scalar = "Subject: hello world\n\nbody1\nbody2\n";
 my $msg2 = Mail::Message->read(\$scalar);
-ok(defined $msg2);
+ok(defined $msg2, 'Scalar');
 is(ref $msg2, 'Mail::Message');
 ok(defined $msg2->head);
 isa_ok($msg2->head, 'Mail::Message::Head');
@@ -64,7 +63,7 @@ ok($msg2->get('message-id'));
 
 my $array = [ "Subject: hello world\n", "\n", "body1\n", "body2\n" ];
 my $msg3 = Mail::Message->read($array);
-ok(defined $msg3);
+ok(defined $msg3, 'ARRAY of lines');
 is(ref $msg3, 'Mail::Message');
 ok(defined $msg3->head);
 isa_ok($msg3->head, 'Mail::Message::Head');
@@ -85,15 +84,15 @@ ok($msg3->get('message-id'));
 # From file glob
 #
 
-open OUT, '>', 'tmp' or die $!;
-print OUT $scalar;
-close OUT;
+open my $out, '>', 'tmp' or die $!;
+print $out $scalar;
+close $out;
 
-open IN, '<', 'tmp' or die $!;
-my $msg4 = Mail::Message->read(\*IN);
-close IN;
+open my $in, '<', 'tmp' or die $!;
+my $msg4 = Mail::Message->read($in);
+close $in;
 
-ok(defined $msg4);
+ok(defined $msg4, 'GLOB');
 is(ref $msg4, 'Mail::Message');
 ok(defined $msg4->head);
 isa_ok($msg4->head, 'Mail::Message::Head');
@@ -110,7 +109,6 @@ is($msg4->subject, 'hello world');
 ok($msg4->messageId);
 ok($msg4->get('message-id'));
 
-
 #
 # From file handle
 #
@@ -119,10 +117,10 @@ open OUT, '>', 'tmp' or die $!;
 print OUT $scalar;
 close OUT;
 
-my $in = IO::File->new('tmp', 'r');
-ok(defined $in);
-my $msg5 = Mail::Message->read($in);
-$in->close;
+my $in2 = IO::File->new('tmp', 'r');
+ok(defined $in2, 'IO::File');
+my $msg5 = Mail::Message->read($in2);
+$in2->close;
 
 ok(defined $msg5);
 is(ref $msg5, 'Mail::Message');
@@ -142,3 +140,5 @@ ok($msg5->messageId);
 ok($msg5->get('message-id'));
 
 unlink 'tmp';
+
+done_testing;

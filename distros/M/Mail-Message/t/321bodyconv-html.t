@@ -72,7 +72,7 @@ HTML_HEAD_DUMP
 my $html_head = $html->headToHtmlHead($head);
 is($html_head, $html_head_dump);
 
-(my $xhtml_head_dump = $html_head_dump) =~ s!"\>!" />!g;
+my $xhtml_head_dump = $html_head_dump =~ s!"\>!" />!gr;
 my $xhtml_head = $xhtml->headToHtmlHead($head);
 is($xhtml_head, $xhtml_head_dump);
 

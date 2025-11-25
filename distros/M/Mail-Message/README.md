@@ -1,15 +1,57 @@
 # distribution Mail-Message
 
+This distribution knows everything about email messages: the headers,
+body, encodings, and processing.
+
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Mail-Message>
+  * Sponsor me: <https://markov.solutions/sponsor/index-en.html>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
   * Indexed from CPAN: <https://metacpan.org/release/Mail-Message>
 
 Until release 3.0, this module was an integral part of the Mail-Box
 distribution.  Now it can be used stand-alone.
 
-This distribution knows everything about email messages: the headers,
-body, encodings, and processing.
+## Installing
+
+On github, you can find the processed version for each release.  But the
+better source is CPAN; to get it installed simply run:
+
+```sh
+   cpan -i Mail::Message
+```
+
+Including all the options described below:
+
+```sh
+   cpan -i MIME::Entity HTML::TreeBuilder HTML::FormatText Net::Domain Mail::Message
+```
+
+### optional Mail::Internet
+
+Many existing e-mail applications use Mail::Internet objects.  If
+you want automatic conversions for compatibility, you need this.
+
+### optional MIME::Entity
+
+MIME::Entity extends Mail::Internet messages with multipart handling
+and composition.  Install this when you want compatibility with
+distrs which are based on this kind of messages.
+
+### optional HTML::TreeBuilder
+
+The tree builder is used by the HTML::Format* packages.  Not needed
+unless you want to convert HTML attachments into something else.
+
+### optional HTML::FormatText
+
+Plug-in which converts HTML to Postscript or plain text.  Only
+when you do this kind of processing.
+
+### optional Net::Domain
+
+Better (slower, thorow) detection of full hostname, when you do not
+explictly pass domain-names in some cases.
 
 ## Development &rarr; Release
 
@@ -24,13 +66,6 @@ existed, sorry for the confusion)
 
 Clone from github for the "raw" version.  For instance, when you want
 to contribute a new feature.
-
-On github, you can find the processed version for each release.  But the
-better source is CPAN; to get it installed simply run:
-
-```sh
-   cpan -i Mail::Message
-```
 
 ## Contributing
 

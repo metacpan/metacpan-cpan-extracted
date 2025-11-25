@@ -6,11 +6,12 @@ use warnings;
 
 # ABSTRACT: Ethereum transaction abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.020';          # VERSION
+our $VERSION   = '0.021';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256);
 use Scalar::Util             qw(blessed looks_like_number);
+use Math::BigInt;
 
 use Blockchain::Ethereum::RLP;
 
@@ -101,11 +102,12 @@ sub _normalize_params {
     return [
         map {
             !defined $_
-                ? $_                                                                        # undefined
-                : blessed $_ && $_->isa('Math::BigInt')  ? $_->as_hex                       # BigInt
-                : /^0x/i                                 ? $_                               # hex string
-                : looks_like_number($_) && $_ == int($_) ? Math::BigInt->new($_)->as_hex    # integer/numeric string
-                : $_                                                                        # anything else
+                ? $_                                                                                                   # undefined
+                : blessed $_ && $_->isa('Math::BigInt') ? $_->as_hex                                                   # BigInt
+                : /^0x/i                                ? $_                                                           # hex string
+                : looks_like_number($_) && $_ == int($_)                            ? Math::BigInt->new($_)->as_hex    # integer/numeric string
+                : blessed $_            && $_->isa('Blockchain::Ethereum::Address') ? $_->to_string                    # Ethereum Address object
+                : $_                                                                                                   # anything else
         } @$params
     ];
 }
@@ -153,43 +155,23 @@ Blockchain::Ethereum::Transaction - Ethereum transaction abstraction
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Ethereum transaction abstraction for signing and generating raw transactions
-    # parameters can be hexadecimal strings or Math::BigInt instances
-    my $transaction = Blockchain::Ethereum::Transaction::EIP1559->new(
-        nonce                    => '0x0',
-        max_fee_per_gas          => '0x9',
-        max_priority_fee_per_gas => '0x0',
-        gas_limit                => '0x1DE2B9',
-        to                       => '0x3535353535353535353535353535353535353535'
-        value                    => parse_unit('1', ETH),
-        data                     => '0x',
-        chain_id                 => '0x539'
-    );
-
-    my $key = Blockchain::Ethereum::Keystore::Key->new(
-        private_key => pack "H*",
-        '4646464646464646464646464646464646464646464646464646464646464646'
-    );
-
-    $key->sign_transaction($transaction);
-
-    my $raw_transaction = $transaction->serialize;
-
-    print unpack("H*", $raw_transaction);
+Ethereum transaction abstraction for generating raw transactions
 
 Supported transaction types:
 
 =over 4
 
-=item * B<Legacy>
+=item * L<Blockchain::Ethereum::Transaction::Legacy>  - Legacy Transaction
 
-=item * B<EIP2930 Access List>
+=item * L<Blockchain::Ethereum::Transaction::EIP1559> - Fee Market Transaction
 
-=item * B<EIP1559 Fee Market>
+=item * L<Blockchain::Ethereum::Transaction::EIP2930> - Optional Access Lists Transaction
+
+=item * L<Blockchain::Ethereum::Transaction::EIP4844> - Blob Transaction
 
 =back
 
@@ -214,16 +196,6 @@ SHA3 Hash the serialized transaction object
 =back
 
 Returns the SHA3 transaction hash bytes
-
-=head2 _encode_access_list
-
-Internal method to encode the access list for RLP serialization
-
-=over 4
-
-=back
-
-Returns the properly formatted access list for RLP encoding
 
 =head2 generate_v
 

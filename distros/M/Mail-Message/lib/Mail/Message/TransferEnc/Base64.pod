@@ -12,9 +12,9 @@ Mail::Message::TransferEnc::Base64 - encode/decode base64 message bodies
 
 =head1 SYNOPSIS
 
- my Mail::Message $msg = ...;
- my $decoded = $msg->decoded;
- my $encoded = $msg->encode(transfer => 'base64');
+  my Mail::Message $msg = ...;
+  my $decoded = $msg->decoded;
+  my $encoded = $msg->encode(transfer => 'base64');
 
 =head1 DESCRIPTION
 
@@ -31,30 +31,42 @@ The encoded data will be trailed by C<'='> characters to align on
 four bytes.
 
 Extends L<"DESCRIPTION" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Message::TransferEnc::Base64-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Inherited, see L<Mail::Reporter/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 The Encoder
 
 Extends L<"The Encoder" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"The Encoder">.
- 
+
 =over 4
 
-=item Mail::Message::TransferEnc::Base64-E<gt>B<addTransferEncoder>($type, $class)
+=item $class-E<gt>B<addTransferEncoder>($type, $class)
 
 Inherited, see L<Mail::Message::TransferEnc/"The Encoder">
 
@@ -71,7 +83,7 @@ Inherited, see L<Mail::Message::TransferEnc/"The Encoder">
 =head2 Encoding
 
 Extends L<"Encoding" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"Encoding">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<check>($body, %options)
@@ -79,6 +91,8 @@ Extends L<"Encoding" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"E
 Inherited, see L<Mail::Message::TransferEnc/"Encoding">
 
 =item $obj-E<gt>B<decode>($body, %options)
+
+Inherited, see L<Mail::Message::TransferEnc/"Encoding">
 
  -Option     --Defined in                --Default
   result_type  Mail::Message::TransferEnc  <type of source body>
@@ -98,7 +112,7 @@ Inherited, see L<Mail::Message::TransferEnc/"Encoding">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -109,9 +123,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::TransferEnc::Base64-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -119,19 +131,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::TransferEnc::Base64-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::TransferEnc::Base64-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -160,7 +164,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -178,15 +182,18 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 While decoding base64 the data in a message body, a string was found which
 was not padded into a multiple of four bytes.  This is illegal, and therefore
 this data is ignored.
+Cast by C<decode()>
 
 =item Error: Decoder for transfer encoding $type does not work: $@
 
 Compiling the required transfer encoding resulted in errors, which means
 that the decoder can not be used.
+Cast by C<create()>
 
 =item Warning: No decoder for transfer encoding $type.
 
 A decoder for the specified type of transfer encoding is not implemented.
+Cast by C<create()>
 
 =item Error: Package $package does not implement $method.
 
@@ -195,19 +202,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

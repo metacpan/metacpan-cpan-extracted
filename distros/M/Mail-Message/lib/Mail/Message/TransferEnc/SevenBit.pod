@@ -12,9 +12,9 @@ Mail::Message::TransferEnc::SevenBit - encode/decode 7bit message bodies
 
 =head1 SYNOPSIS
 
- my Mail::Message $msg = ...;
- my $decoded = $msg->decoded;
- my $encoded = $msg->encode(transfer => '7bit');
+  my Mail::Message $msg = ...;
+  my $decoded = $msg->decoded;
+  my $encoded = $msg->encode(transfer => '7bit');
 
 =head1 DESCRIPTION
 
@@ -34,11 +34,11 @@ As you can safely conclude: decoding of these bodies is no work
 at all.
 
 Extends L<"DESCRIPTION" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"METHODS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -47,10 +47,12 @@ Extends L<"METHODS" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"ME
 
 Compiling the required transfer encoding resulted in errors, which means
 that the decoder can not be used.
+Cast by C<create()>
 
 =item Warning: No decoder for transfer encoding $type.
 
 A decoder for the specified type of transfer encoding is not implemented.
+Cast by C<create()>
 
 =item Error: Package $package does not implement $method.
 
@@ -59,19 +61,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

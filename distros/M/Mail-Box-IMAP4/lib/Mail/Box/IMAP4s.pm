@@ -1,39 +1,42 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::IMAP4s;{
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 }
 
-use base 'Mail::Box::IMAP4';
+use parent 'Mail::Box::IMAP4';
 
 use strict;
 use warnings;
 
 use IO::Socket::IP;
-use IO::Socket::SSL qw(SSL_VERIFY_NONE);
+use IO::Socket::SSL qw/SSL_VERIFY_NONE/;
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    $args->{server_port} = 993;
+{	my ($self, $args) = @_;
+	$args->{server_port} = 993;
 	$args->{starttls}    = 0;
-    $self->SUPER::init($args);
+	$self->SUPER::init($args);
 }
 
 sub type() {'imap4s'}
 
-
 sub createTransporter($@)
-{   my ($self, $class, %args) = @_;
-    $args{starttls} = 0;
-    $args{ssl} ||= { SSL_verify_mode => SSL_VERIFY_NONE };
-    $self->SUPER::createTransporter($class, %args);
+{	my ($self, $class, %args) = @_;
+	$args{starttls} = 0;
+	$args{ssl} ||= +{ SSL_verify_mode => SSL_VERIFY_NONE };
+	$self->SUPER::createTransporter($class, %args);
 }
 
 1;

@@ -1,5 +1,8 @@
 Revision history for OpenAPI::Linter
 
+0.13  2025-11-25
+      - Error now have line and column number. (issue #4)
+
 0.12  2025-11-02
       - Tidied up script: openapi-linter
 

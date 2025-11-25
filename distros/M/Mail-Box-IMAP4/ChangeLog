@@ -1,6 +1,22 @@
 
 ===== history of Mail-Box-IMAP4
 
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.010: Mon 24 Nov 13:45:47 CET 2025
+
+	Changes:
+	- MailBox mid-life upgrade: require Perl minimal version 5.016
+	- maintenance release with Mail::Box version 3 compatibility.
+
+	Improvements:
+	- remove explicit use of GLOB.
+	- remove use of bareword filehandle.
+	- use defined-or
+	- oorestyle and convert to OODoc 3.04
+
 version 3.009: Fri Apr 18 08:41:26 PM CEST 2025
 
 	Fixes:

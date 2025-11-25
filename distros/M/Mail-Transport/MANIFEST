@@ -1,7 +1,6 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 lib/Mail/Transport.pm
 lib/Mail/Transport.pod

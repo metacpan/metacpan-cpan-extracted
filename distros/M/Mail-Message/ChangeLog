@@ -8,6 +8,48 @@ Limitations to be fixed:
 	- when lines are over 997 chars, then the transfer-encoding should
 	 automatically change from 'none' into 'quoted-printable' or 'base64'
 
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.019: Mon 24 Nov 19:46:56 CET 2025
+
+	Changes:
+	- remove questions for optional dependencies during install.
+	- maintenance release with Mail::Box version 3 compatibility.
+
+	Fixes:
+	- nested bodies which specify a Content-Transfer-Encoding [Andy Beverly]
+	- build(data) with only 3-bytes utf8 encoding not detected [Andy Beverly]
+	- ::TransferEncoding::Binary::encode() was broken
+	  github issue #24 [Jacob Balazer]
+
+	Improvements:
+	- add $msg->endsOnNewline()
+	- restyle code according to OODoc 3.05
+	- convert Makefile.PL to OODoc 3.05
+	- remove ::Replace::MailInternet::nntppost() because it never worked.
+	- explicitly depend on Mail::Message v3, not 4
+
+version 3.018_001: Thu 21 Aug 10:15:05 CEST 2025
+
+	Fixes:
+	- at message construction, do not detect charset for binaries.
+	  Big performance improvement GitHub#21
+	- charset detection upto 45% faster.  GitHub#22
+	- setting eol() on a body was not lazy enough, and mutulated caller.
+	  GitHub#23
+	- protect two isa calls with blessed.
+	- ::Field::Full q-encoding must encode the '=' as well [Andy Beverley]
+
+	Improvements:
+	- do not use bareword file-handles anywhere in the code.
+	- use s///r
+	- cleanup syntax of Mail::Box::FastScalar
+	- use defined-or
+	- add Attributes section to documentation
+	- implement Mail::Box::Parser::Lines, 49% faster for in-memory emails
+
 version 3.017: Fri 18 Apr 18:29:10 CEST 2025
 
 	Improvements:
@@ -91,7 +133,7 @@ version 3.012: Fri 11 Feb 11:34:31 CET 2022
 
 	Fixes:
 	- ::Field::Attributes should be stored case intensively
-	 rt.cpan.org#140894 [Yanyan Yang]
+	  rt.cpan.org#140894 [Yanyan Yang]
 	- ::Field::Full phrase with encoding qp parsing failed when
 	  the qp contains non-atext characters. Github#2 [Andy Beverley]
 	- ::Field::Full QP encoding must be more strict for use in

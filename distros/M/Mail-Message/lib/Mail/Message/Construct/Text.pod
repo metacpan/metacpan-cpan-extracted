@@ -6,16 +6,16 @@ Mail::Message::Construct::Text - capture a Mail::Message as text
 
 =head1 SYNOPSIS
 
- my $text = $msg->string;
- my $text = "$msg";   # via overload
+  my $text = $msg->string;
+  my $text = "$msg";   # via overload
 
- my @text = $msg->lines;
- my @text = @$lines;  # via overload
+  my @text = $msg->lines;
+  my @text = @$lines;  # via overload
 
- my $fh   = $msg->file;
- my $line = <$fh>;
+  my $fh   = $msg->file;
+  my $line = <$fh>;
 
- $msg->printStructure;
+  $msg->printStructure;
 
 =head1 DESCRIPTION
 
@@ -41,32 +41,32 @@ is returned.
 
 =item $obj-E<gt>B<printStructure>( [$fh|undef],[$indent] )
 
-Print the structure of a message to the specified $fh or the
+Print the structure of a message to the specified C<$fh> or the
 selected filehandle.  When explicitly C<undef> is specified as handle,
 then the output will be returned as string.
 
 The message's subject and the types of all composing parts are
 displayed.
 
-$indent specifies the initial indentation string: it is added in front
-of each line. The $indent must contain at least one white-space.
+C<$indent> specifies the initial indentation string: it is added in front
+of each line. The C<$indent> must contain at least one white-space.
 
-example: 
+» example: 
 
- my $msg = ...;
- $msg->printStructure(\*OUTPUT);
+  my $msg = ...;
+  $msg->printStructure(\*OUTPUT);
 
- $msg->printStructure;
+  $msg->printStructure;
 
- my $struct = $msg->printStructure(undef);
+  my $struct = $msg->printStructure(undef);
 
- # Possible output for one message:
- multipart/mixed: forwarded message from Pietje Puk (1550 bytes)
-    text/plain (164 bytes)
-    message/rfc822 (1043 bytes)
-       multipart/alternative: A multipart alternative (942 bytes)
-          text/plain (148 bytes, deleted)
-          text/html (358 bytes)
+  # Possible output for one message:
+  multipart/mixed: forwarded message from Pietje Puk (1550 bytes)
+     text/plain (164 bytes)
+     message/rfc822 (1043 bytes)
+        multipart/alternative: A multipart alternative (942 bytes)
+           text/plain (148 bytes, deleted)
+           text/html (358 bytes)
 
 =item $obj-E<gt>B<string>()
 
@@ -78,14 +78,15 @@ Returns the whole message as string.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.017,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.019,
+built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

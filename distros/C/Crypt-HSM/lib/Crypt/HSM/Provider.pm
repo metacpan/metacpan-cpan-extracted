@@ -1,5 +1,5 @@
 package Crypt::HSM::Provider;
-$Crypt::HSM::Provider::VERSION = '0.024';
+$Crypt::HSM::Provider::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Crypt::HSM::Provider - A PKCS11 provider
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
