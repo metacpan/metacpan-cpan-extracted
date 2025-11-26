@@ -19,4 +19,5 @@ getopts('d');
 
 my $opts = { ( $opt_d ? ( logLevel => 'debug' ) : () ), };
 
-exit 1 unless Lemonldap::NG::Common::Session::Purge->new($opts)->localPurge();
+Lemonldap::NG::Common::Session::Purge->new($opts)->localPurge();
+exit 0;

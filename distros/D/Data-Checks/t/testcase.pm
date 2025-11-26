@@ -31,6 +31,7 @@ sub unimport
 # Some test classes
 package BaseClass {
    sub new { bless [], shift }
+   sub basem {}
 }
 package DifferentClass {
    sub new { bless [], shift }

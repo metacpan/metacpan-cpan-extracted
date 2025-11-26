@@ -1,5 +1,56 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.6.0 2025-11-25T19:17:41+0900
+    [New Features]
+    - Added compile_js() to generate a standalone JavaScript validator from the
+      current schema. The generated code exposes a single global function:
+          validate(inst) -> [ { path, keyword, message, schema_pointer }, ... ]
+      using the same error structure as the Perl engine.
+    - compile_js() supports an 'ecma' option:
+          ecma => "auto"    # default; cautious feature detection
+          ecma => 2018      # assume ES2018+ (Unicode property escapes, /u, etc.)
+      allowing callers to tune how aggressively Unicode regexp features are used
+      in the generated JavaScript.
+
+    [JavaScript Codegen]
+    - Implemented a conservative Perl-regexp to JavaScript converter for
+      'pattern' keywords:
+          * \x{...}  -> \uHHHH / \u{HHHHH}
+          * \p{Katakana}, \p{Hiragana}, \p{Han}, etc. -> \p{scx=...}
+        with proper escaping for use inside new RegExp("...","u").
+      Patterns that cannot be compiled by the browser are safely skipped on the
+      client and remain enforced by the Perl validator.
+    - JavaScript validator now covers:
+          type, const (primitive), enum,
+          minLength / maxLength / pattern,
+          minimum / maximum / exclusiveMinimum / exclusiveMaximum,
+          minItems / maxItems / items (single-schema form),
+          contains / minContains / maxContains,
+          properties / required,
+          allOf / anyOf / oneOf / not,
+          if / then / else,
+          and the non-core 'uniqueKeys' applicator when enabled in Perl.
+      Negative "not + required" patterns are deliberately skipped client-side and
+      enforced server-side only, to avoid surprising UX.
+
+    [Behaviour Changes]
+    - For generated JavaScript only: when numeric bound keywords are present
+      (minimum/maximum/exclusiveMinimum/exclusiveMaximum), numeric-looking
+      strings such as "10" or "3.14" are coerced to numbers before applying
+      the bounds. Non-numeric values:
+          * raise a 'type' error ("expected number but found ...") when no
+            explicit 'type' is declared, or
+          * are checked by the schema's 'type' keyword when present.
+      This provides friendlier form validation in browsers while the Perl
+      engine remains strictly JSON-typed.
+    - Ensured error locations and schema pointers reported by the generated
+      JavaScript match the Perl engine, so server-side and client-side logs
+      can be correlated easily.
+
+    [Documentation & Tests]
+    - Expanded POD to document compile_js(), its 'ecma' option, the JavaScript
+      error format, and typical integration in web forms.
+
 v0.5.1 2025-11-20T16:07:53+0900
     - Fixed _k_combinator to avoid leaking errors from anyOf/oneOf branches
       into the main validation context; only the selected branch now contributes

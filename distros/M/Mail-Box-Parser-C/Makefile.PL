@@ -14,6 +14,7 @@ my %oodist   = (
 	email    => "markov\@cpan.org",
 
 	include  => [
+		'../Mail-Message',   # for Mail::Box::Parser
 	],
 
 	use      => [
@@ -45,7 +46,7 @@ my %oodist   = (
 );
 
 my %requires = (
-	'Mail::Message' => '4.0',
+	'Mail::Message' => '3.0, <4.0',
 );
 
 WriteMakefile

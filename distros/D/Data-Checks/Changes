@@ -1,5 +1,12 @@
 Revision history for Data-Checks
 
+0.11    2025-11-26
+        [CHANGES]
+         * Added `Can()` constraint
+         * Use Sublike::Extended v0.29 in SYNOPSIS and unit tests to simplify
+           the examples
+         * Fixed some L<> links to internal functions (thanks ilmari)
+
 0.10    2024-08-19
         [CHANGES]
          * Optional flags arguments to `make_assertop`

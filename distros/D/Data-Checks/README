@@ -7,12 +7,12 @@ SYNOPSIS
     With Signature::Attribute::Checked:
 
        use v5.26;
-       use Sublike::Extended;
+       use Sublike::Extended 0.29 'sub';
        use Signature::Attribute::Checked;
     
        use Data::Checks qw( Str );
     
-       extended sub greet ( $message :Checked(Str) ) {
+       sub greet ( $message :Checked(Str) ) {
           say "Hello, $message";
        }
     
@@ -107,7 +107,7 @@ CONSTRAINTS
 
     Since version 0.05.
 
-    Accepts any value that passes the Str check, and additionally is
+    Accepts any value that passes the "Str" check, and additionally is
     exactly equal to any of the given strings.
 
  StrMatch
@@ -116,7 +116,7 @@ CONSTRAINTS
 
     Since version 0.08.
 
-    Accepts any value that passes the Str check, and additionally matches
+    Accepts any value that passes the "Str" check, and additionally matches
     the given regexp pattern.
 
     Remember that the pattern must be supplied as a qr/.../ expression, not
@@ -149,9 +149,9 @@ CONSTRAINTS
 
     Since version 0.05.
 
-    Accepts any value that passes the Num check, and additionally is within
-    the bound given. NumGT and NumLT exclude the bound value itself, NumGE
-    and NumLE include it.
+    Accepts any value that passes the "Num" check, and additionally is
+    within the bound given. NumGT and NumLT exclude the bound value itself,
+    NumGE and NumLE include it.
 
  NumRange
 
@@ -159,7 +159,7 @@ CONSTRAINTS
 
     Since version 0.05.
 
-    Accepts any value that passes the Num check, and additionally is
+    Accepts any value that passes the "Num" check, and additionally is
     between the two bounds given. The lower bound is inclusive, and the
     upper bound is exclusive.
 
@@ -184,7 +184,7 @@ CONSTRAINTS
 
     Since version 0.05.
 
-    Accepts any value that passes the Num check, and additionally is
+    Accepts any value that passes the "Num" check, and additionally is
     exactly equal to any of the given numbers.
 
  Isa
@@ -196,6 +196,22 @@ CONSTRAINTS
     Accepts any blessed object reference to an instance of the given class
     name, or a subclass derived from it (i.e. anything accepted by the isa
     operator).
+
+ Can
+
+       Can($methodname)
+       Can($methodname1, $methodname2, ...)
+
+    Since version 0.11.
+
+    Accepts any blessed object reference to an instance in a class, or a
+    class name directly, that has the all of the given method names (i.e.
+    anything that passes a ->can test on every name).
+
+    To accept only object references and not package names, combine this
+    check with Object by using the All combination:
+
+       All(Object, Can($methodname, ...))
 
  ArrayRef
 
@@ -410,6 +426,11 @@ TODO
 
       * Look into making const-folding work with the MIN .. MAX flip-flop
       operator
+
+      * Performance enhancements for lists of many values in StrEq, NumEq,
+      etc
+
+      * Performance enhancement of Can by caching per package name
 
 AUTHOR
 

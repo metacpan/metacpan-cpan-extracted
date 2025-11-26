@@ -58,6 +58,11 @@
   RenderPassDescriptorMaxDrawCount => {
     maxDrawCount => 50000000,
   },
+  RenderPassColorAttachment => {
+
+    # -1 gives UINT32_MAX which translate to WGPU_DEPTH_SLICE_UNDEFINED
+    depthSlice => -1,
+  },
   RequestAdapterOptions => {
     forceFallbackAdapter => 0,
   },
@@ -139,7 +144,6 @@
   # XS Function and function documentation of defaults
   Adapter => {
     requestDevice => {
-      descriptor => 'undef',
       callback   => 'undef',
       userdata   => '{}',
     },
@@ -195,7 +199,6 @@
 
   Instance => {
     requestAdapter => {
-      options  => 'undef',
       callback => 'undef',
       userdata => '{}',
     },

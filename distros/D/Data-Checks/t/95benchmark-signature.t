@@ -28,16 +28,16 @@ sub measure(&)
    return tv_interval $start;
 }
 
-use Sublike::Extended;
+use Sublike::Extended 0.29 'sub';
 use Signature::Attribute::Checked;
 use Data::Checks;
 use Types::Standard;
 
 use experimental qw( signatures );
 
-extended sub func_DC ( $x :Checked(Data::Checks::Defined) ) { return $x; }
+sub func_DC ( $x :Checked(Data::Checks::Defined) ) { return $x; }
 
-extended sub func_TS ( $x :Checked(Types::Standard::Defined) ) { return $x; }
+sub func_TS ( $x :Checked(Types::Standard::Defined) ) { return $x; }
 
 sub func_manual ( $x ) {
    defined $x or die "Require defined value for \$x";

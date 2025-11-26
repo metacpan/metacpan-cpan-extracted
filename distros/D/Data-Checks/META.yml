@@ -4,6 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
+  Sublike::Extended: '0.29'
   Test2::V0: '0.000148'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,7 +18,7 @@ name: Data-Checks
 provides:
   Data::Checks:
     file: lib/Data/Checks.pm
-    version: '0.10'
+    version: '0.11'
   Data::Checks::Builder:
     file: lib/Data/Checks/Builder.pm
     version: '0.44'
@@ -26,5 +27,5 @@ requires:
   perl: '5.022'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

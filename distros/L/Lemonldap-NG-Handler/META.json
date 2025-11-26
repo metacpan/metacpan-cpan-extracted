@@ -45,7 +45,7 @@
          },
          "requires" : {
             "LWP::UserAgent" : "0",
-            "Lemonldap::NG::Common" : "v2.22.0",
+            "Lemonldap::NG::Common" : "v2.22.1",
             "Mouse" : "0",
             "URI" : "0"
          }
@@ -63,6 +63,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.22.0",
+   "version" : "v2.22.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

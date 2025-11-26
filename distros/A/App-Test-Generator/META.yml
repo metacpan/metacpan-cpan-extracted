@@ -40,8 +40,10 @@ requires:
   File::Spec: '0'
   Getopt::Long: '0'
   Module::Load::Conditional: '0'
+  PPI: '0'
   Params::Get: '0.13'
   Params::Validate::Strict: '0.23'
+  Pod::Simple: '0'
   Pod::Usage: '0'
   Return::Set: '0.03'
   Template: '0'
@@ -52,5 +54,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.16'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

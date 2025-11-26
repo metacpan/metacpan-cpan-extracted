@@ -17,11 +17,13 @@
 
 =over
 
+=item * undefined
+
+=item * clampToEdge
+
 =item * repeat
 
 =item * mirrorRepeat
-
-=item * clampToEdge
 
 =back
 
@@ -53,6 +55,8 @@
 
 =over
 
+=item * undefined
+
 =item * zero
 
 =item * one
@@ -79,11 +83,21 @@
 
 =item * oneMinusConstant
 
+=item * src1
+
+=item * oneMinusSrc1
+
+=item * src1Alpha
+
+=item * oneMinusSrc1Alpha
+
 =back
 
 =head1 WebGPU::Direct::BlendOperation
 
 =over
+
+=item * undefined
 
 =item * add
 
@@ -101,6 +115,8 @@
 
 =over
 
+=item * bindingNotUsed
+
 =item * undefined
 
 =item * uniform
@@ -108,30 +124,6 @@
 =item * storage
 
 =item * readOnlyStorage
-
-=back
-
-=head1 WebGPU::Direct::BufferMapAsyncStatus
-
-=over
-
-=item * success
-
-=item * validationError
-
-=item * unknown
-
-=item * deviceLost
-
-=item * destroyedBeforeCallback
-
-=item * unmappedBeforeCallback
-
-=item * mappingAlreadyPending
-
-=item * offsetOutOfRange
-
-=item * sizeOutOfRange
 
 =back
 
@@ -175,6 +167,18 @@
 
 =back
 
+=head1 WebGPU::Direct::CallbackMode
+
+=over
+
+=item * waitAnyOnly
+
+=item * allowProcessEvents
+
+=item * allowSpontaneous
+
+=back
+
 =head1 WebGPU::Direct::ColorWriteMask
 
 =over
@@ -203,15 +207,15 @@
 
 =item * less
 
+=item * equal
+
 =item * lessEqual
 
 =item * greater
 
-=item * greaterEqual
-
-=item * equal
-
 =item * notEqual
+
+=item * greaterEqual
 
 =item * always
 
@@ -223,9 +227,9 @@
 
 =item * success
 
-=item * error
+=item * instanceDropped
 
-=item * deviceLost
+=item * error
 
 =item * unknown
 
@@ -265,13 +269,11 @@
 
 =item * success
 
+=item * instanceDropped
+
 =item * validationError
 
 =item * internalError
-
-=item * deviceLost
-
-=item * deviceDestroyed
 
 =item * unknown
 
@@ -280,6 +282,8 @@
 =head1 WebGPU::Direct::CullMode
 
 =over
+
+=item * undefined
 
 =item * none
 
@@ -293,9 +297,13 @@
 
 =over
 
-=item * undefined
+=item * unknown
 
 =item * destroyed
+
+=item * instanceDropped
+
+=item * failedCreation
 
 =back
 
@@ -325,7 +333,15 @@
 
 =item * unknown
 
-=item * deviceLost
+=back
+
+=head1 WebGPU::Direct::FeatureLevel
+
+=over
+
+=item * compatibility
+
+=item * core
 
 =back
 
@@ -343,9 +359,13 @@
 
 =item * textureCompressionBC
 
+=item * textureCompressionBCSliced3D
+
 =item * textureCompressionETC2
 
 =item * textureCompressionASTC
+
+=item * textureCompressionASTCSliced3D
 
 =item * indirectFirstInstance
 
@@ -357,11 +377,19 @@
 
 =item * float32Filterable
 
+=item * float32Blendable
+
+=item * clipDistances
+
+=item * dualSourceBlending
+
 =back
 
 =head1 WebGPU::Direct::FilterMode
 
 =over
+
+=item * undefined
 
 =item * nearest
 
@@ -372,6 +400,8 @@
 =head1 WebGPU::Direct::FrontFace
 
 =over
+
+=item * undefined
 
 =item * CCW
 
@@ -397,9 +427,25 @@
 
 =item * undefined
 
+=item * load
+
 =item * clear
 
-=item * load
+=back
+
+=head1 WebGPU::Direct::MapAsyncStatus
+
+=over
+
+=item * success
+
+=item * instanceDropped
+
+=item * error
+
+=item * aborted
+
+=item * unknown
 
 =back
 
@@ -419,9 +465,35 @@
 
 =over
 
+=item * undefined
+
 =item * nearest
 
 =item * linear
+
+=back
+
+=head1 WebGPU::Direct::OptionalBool
+
+=over
+
+=item * false
+
+=item * true
+
+=item * undefined
+
+=back
+
+=head1 WebGPU::Direct::PopErrorScopeStatus
+
+=over
+
+=item * success
+
+=item * instanceDropped
+
+=item * emptyStack
 
 =back
 
@@ -441,6 +513,8 @@
 
 =over
 
+=item * undefined
+
 =item * fifo
 
 =item * fifoRelaxed
@@ -454,6 +528,8 @@
 =head1 WebGPU::Direct::PrimitiveTopology
 
 =over
+
+=item * undefined
 
 =item * pointList
 
@@ -483,11 +559,11 @@
 
 =item * success
 
+=item * instanceDropped
+
 =item * error
 
 =item * unknown
-
-=item * deviceLost
 
 =back
 
@@ -496,6 +572,8 @@
 =over
 
 =item * success
+
+=item * instanceDropped
 
 =item * unavailable
 
@@ -511,6 +589,8 @@
 
 =item * success
 
+=item * instanceDropped
+
 =item * error
 
 =item * unknown
@@ -521,35 +601,31 @@
 
 =over
 
-=item * invalid
+=item * shaderSourceSPIRV
 
-=item * surfaceDescriptorFromMetalLayer
+=item * shaderSourceWGSL
 
-=item * surfaceDescriptorFromWindowsHWND
+=item * renderPassMaxDrawCount
 
-=item * surfaceDescriptorFromXlibWindow
+=item * surfaceSourceMetalLayer
 
-=item * surfaceDescriptorFromCanvasHTMLSelector
+=item * surfaceSourceWindowsHWND
 
-=item * shaderModuleSPIRVDescriptor
+=item * surfaceSourceXlibWindow
 
-=item * shaderModuleWGSLDescriptor
+=item * surfaceSourceWaylandSurface
 
-=item * primitiveDepthClipControl
+=item * surfaceSourceAndroidNativeWindow
 
-=item * surfaceDescriptorFromWaylandSurface
-
-=item * surfaceDescriptorFromAndroidNativeWindow
-
-=item * surfaceDescriptorFromXcbWindow
-
-=item * renderPassDescriptorMaxDrawCount
+=item * surfaceSourceXCBWindow
 
 =back
 
 =head1 WebGPU::Direct::SamplerBindingType
 
 =over
+
+=item * bindingNotUsed
 
 =item * undefined
 
@@ -575,9 +651,21 @@
 
 =back
 
+=head1 WebGPU::Direct::Status
+
+=over
+
+=item * success
+
+=item * error
+
+=back
+
 =head1 WebGPU::Direct::StencilOperation
 
 =over
+
+=item * undefined
 
 =item * keep
 
@@ -600,6 +688,8 @@
 =head1 WebGPU::Direct::StorageTextureAccess
 
 =over
+
+=item * bindingNotUsed
 
 =item * undefined
 
@@ -627,7 +717,9 @@
 
 =over
 
-=item * success
+=item * successOptimal
+
+=item * successSuboptimal
 
 =item * timeout
 
@@ -639,11 +731,15 @@
 
 =item * deviceLost
 
+=item * error
+
 =back
 
 =head1 WebGPU::Direct::TextureAspect
 
 =over
+
+=item * undefined
 
 =item * all
 
@@ -656,6 +752,8 @@
 =head1 WebGPU::Direct::TextureDimension
 
 =over
+
+=item * undefined
 
 =item * _1D
 
@@ -867,6 +965,8 @@
 
 =over
 
+=item * bindingNotUsed
+
 =item * undefined
 
 =item * float
@@ -923,39 +1023,55 @@
 
 =over
 
-=item * undefined
+=item * uint8
 
 =item * uint8x2
 
 =item * uint8x4
 
+=item * sint8
+
 =item * sint8x2
 
 =item * sint8x4
+
+=item * unorm8
 
 =item * unorm8x2
 
 =item * unorm8x4
 
+=item * snorm8
+
 =item * snorm8x2
 
 =item * snorm8x4
+
+=item * uint16
 
 =item * uint16x2
 
 =item * uint16x4
 
+=item * sint16
+
 =item * sint16x2
 
 =item * sint16x4
+
+=item * unorm16
 
 =item * unorm16x2
 
 =item * unorm16x4
 
+=item * snorm16
+
 =item * snorm16x2
 
 =item * snorm16x4
+
+=item * float16
 
 =item * float16x2
 
@@ -985,16 +1101,52 @@
 
 =item * sint32x4
 
+=item * unorm10_10_10_2
+
+=item * unorm8x4BGRA
+
 =back
 
 =head1 WebGPU::Direct::VertexStepMode
 
 =over
 
+=item * vertexBufferNotUsed
+
+=item * undefined
+
 =item * vertex
 
 =item * instance
 
-=item * vertexBufferNotUsed
+=back
+
+=head1 WebGPU::Direct::WGSLLanguageFeatureName
+
+=over
+
+=item * readonlyAndReadwriteStorageTextures
+
+=item * packed4x8IntegerDotProduct
+
+=item * unrestrictedPointerParameters
+
+=item * pointerCompositeAccess
+
+=back
+
+=head1 WebGPU::Direct::WaitStatus
+
+=over
+
+=item * success
+
+=item * timedOut
+
+=item * unsupportedTimeout
+
+=item * unsupportedCount
+
+=item * unsupportedMixedSources
 
 =back

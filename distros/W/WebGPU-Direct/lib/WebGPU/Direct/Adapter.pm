@@ -7,7 +7,7 @@ package WebGPU::Direct::Adapter
 
   use WebGPU::Direct::Error qw/webgpu_die/;
 
-  sub requestDevice (
+  sub createDevice (
     $self,
     $descriptor = undef,
     $callback   = undef,
@@ -33,32 +33,85 @@ package WebGPU::Direct::Adapter
 
     if ( !defined $descriptor )
     {
-      my $supported_limits = WebGPU::Direct->SupportedLimits->new;
+      my $limits = WebGPU::Direct->Limits->new;
 
-      $self->getLimits($supported_limits);
-      my $limits = $supported_limits->limits;
+      $self->getLimits($limits);
 
-      my $req_limits
-          = WebGPU::Direct->RequiredLimits->new( { limits => $limits } );
-      $descriptor
-          = WebGPU::Direct->DeviceDescriptor->new( requiredLimits => $req_limits );
-    }
-
-    $self->_requestDevice( $descriptor, $callback, $userdata );
-
-    if ($device)
-    {
       my $croak = sub
       {
+        my $device   = shift;
         my $type     = shift;
         my $message  = shift;
         my $userdata = shift;
         webgpu_die( $type, $message );
       };
-      $device->setUncapturedErrorCallback( $croak, {} );
+
+      my $error_callback = {
+        callback => $croak,
+      };
+
+      my $req_limits = WebGPU::Direct->Limits->new( { limits => $limits } );
+      $descriptor = WebGPU::Direct->DeviceDescriptor->new(
+        requiredLimits              => $limits,
+        uncapturedErrorCallbackInfo => $error_callback,
+      );
+    }
+
+    my $future = $self->requestDevice( $descriptor, { callback => $callback, userdata1 => $userdata } );
+
+    while ( !defined $descriptor )
+    {
+      my $status = $self->waitAny( [$future], 500 );
+      die $status
+          if $status->error;
     }
 
     return $device;
+  }
+
+  sub getLimits (
+    $self,
+    $limits = undef,
+      )
+  {
+    if ( !defined $limits )
+    {
+      $limits = WebGPU::Direct::Limits->new;
+    }
+
+    $self->_getLimits($limits);
+
+    return $limits;
+  }
+
+  sub getFeatures (
+    $self,
+    $features = undef,
+      )
+  {
+    if ( !defined $features )
+    {
+      $features = WebGPU::Direct::SupportedFeatures->new;
+    }
+
+    $self->_getFeatures($features);
+
+    return $features;
+  }
+
+  sub getInfo (
+    $self,
+    $info = undef,
+      )
+  {
+    if ( !defined $info )
+    {
+      $info = WebGPU::Direct::AdapterInfo->new;
+    }
+
+    $self->_getInfo($info);
+
+    return $info;
   }
 };
 
@@ -74,7 +127,21 @@ WebGPU::Direct::Adapter
 
 =head2 Methods
 
-=head3 enumerateFeatures
+=head3 getFeatures
+
+=over
+
+=item * Arguments
+
+=over
+
+=item * features (L<WebGPU::Direct::SupportedFeatures|WebGPU::Direct::Types/WebGPU::Direct::SupportedFeatures>)
+
+=back
+
+=back
+
+=head3 getInfo
 
 =over
 
@@ -82,7 +149,7 @@ WebGPU::Direct::Adapter
 
 =over
 
-=item * Integer (size_t)
+=item * L<WebGPU::Direct::Status|WebGPU::Direct::Constants/WebGPU::Direct::Status>
 
 =back
 
@@ -90,7 +157,7 @@ WebGPU::Direct::Adapter
 
 =over
 
-=item * features (L<WebGPU::Direct::FeatureName|WebGPU::Direct::Constants/WebGPU::Direct::FeatureName>)
+=item * info (L<WebGPU::Direct::AdapterInfo|WebGPU::Direct::Types/WebGPU::Direct::AdapterInfo>)
 
 =back
 
@@ -104,7 +171,7 @@ WebGPU::Direct::Adapter
 
 =over
 
-=item * Boolean (WGPUBool)
+=item * L<WebGPU::Direct::Status|WebGPU::Direct::Constants/WebGPU::Direct::Status>
 
 =back
 
@@ -112,21 +179,7 @@ WebGPU::Direct::Adapter
 
 =over
 
-=item * limits (L<WebGPU::Direct::SupportedLimits|WebGPU::Direct::Types/WebGPU::Direct::SupportedLimits>)
-
-=back
-
-=back
-
-=head3 getProperties
-
-=over
-
-=item * Arguments
-
-=over
-
-=item * properties (L<WebGPU::Direct::AdapterProperties|WebGPU::Direct::Types/WebGPU::Direct::AdapterProperties>)
+=item * limits (L<WebGPU::Direct::Limits|WebGPU::Direct::Types/WebGPU::Direct::Limits>)
 
 =back
 
@@ -158,21 +211,27 @@ WebGPU::Direct::Adapter
 
 =over
 
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Future|WebGPU::Direct::Types/WebGPU::Direct::Future>
+
+=back
+
 =item * Arguments
 
 =over
 
-=item * descriptor (L<WebGPU::Direct::DeviceDescriptor|WebGPU::Direct::Types/WebGPU::Direct::DeviceDescriptor>) Default: undef
+=item * descriptor (L<WebGPU::Direct::DeviceDescriptor|WebGPU::Direct::Types/WebGPU::Direct::DeviceDescriptor>)
 
-=item * callback (WebGPU::Direct::RequestDeviceCallback (Code reference)) Default: undef
-
-=item * userdata (Scalar (void *)) Default: {}
+=item * callbackInfo (L<WebGPU::Direct::RequestDeviceCallbackInfo|WebGPU::Direct::Types/WebGPU::Direct::RequestDeviceCallbackInfo>)
 
 =back
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

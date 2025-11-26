@@ -47,6 +47,18 @@ A lean CLI powered by [JSON::Schema::Validate](https://metacpan.org/pod/JSON%3A%
 
 ## Behavior
 
+- **--allow-file-refs**
+
+    Enabled by default.
+
+    When enabled, perform resolution of relative or file:// references.
+
+- **--allow-http**
+
+    Disabled by default.
+
+    This is an alias for **--remote-refs**
+
 - **--compile** / **--no-compile**
 
     Enable compiled fast-path for repeated validation.
@@ -55,9 +67,38 @@ A lean CLI powered by [JSON::Schema::Validate](https://metacpan.org/pod/JSON%3A%
 
     Enable `contentEncoding`, `contentMediaType`, `contentSchema`. Registers a basic `application/json` validator/decoder.
 
+- **--extensions**
+
+    Enables non-standard extensions. Right now this includes `uniqueKeys`
+
+- **--ignore-unknown-required-vocab**
+
+    Ignore unknown vocabularies listed in schema `` `'$vocabulary'` `` _required_.
+
 - **--register-formats**
 
     Register built-in `format` validators (date, email, hostname, ip, uri, uuid, JSON Pointer, regex, etc.).
+
+- **--max-errors N**
+
+    Maximum recorded errors per validation (default 200).
+
+- **--normalize** / **--no-normalize**
+
+    Round-trip instances through [JSON](https://metacpan.org/pod/JSON) to enforce strict JSON typing (default on).
+
+- **--remote-refs**
+
+    Allow fetching of http:// and https:// $ref URIs.
+
+    By default this is OFF — fictional $id values like
+    "https://schemas.example.com/..." will NOT be fetched.
+
+    This is the modern, safe default (prevents SSRF, accidental traffic).
+
+- **--schema-base DIR**
+
+    A base directory to resolve relative file `$ref` (defaults to the directory of the first `--schema`).
 
 - **--trace**
 
@@ -71,21 +112,9 @@ A lean CLI powered by [JSON::Schema::Validate](https://metacpan.org/pod/JSON%3A%
 
     Sampling percentage for trace events.
 
-- **--max-errors N**
+- **--unique-keys** / **--no-unique-keys**
 
-    Maximum recorded errors per validation (default 200).
-
-- **--normalize** / **--no-normalize**
-
-    Round-trip instances through [JSON](https://metacpan.org/pod/JSON) to enforce strict JSON typing (default on).
-
-- **--ignore-unknown-required-vocab**
-
-    Ignore unknown vocabularies listed in schema `` `'$vocabulary'` `` _required_.
-
-- **--schema-base DIR**
-
-    A base directory to resolve relative file `$ref` (defaults to the directory of the first `--schema`).
+    Enables the non-standard extension `uniqueKeys`
 
 # EXIT CODES
 

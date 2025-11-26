@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use App::Test::Generator::SchemaExtractor;
+
+=head1 NAME
+
+extract-schemas - Extract test schemas from Perl modules
+
+=head1 SYNOPSIS
+
+    extract-schemas [options] <module.pm>
+
+    Options:
+      --output-dir DIR    Output directory for schema files (default: schemas/)
+      --verbose           Show detailed analysis
+      --help              Show this help message
+      --man               Show full documentation
+
+    Examples:
+      extract-schemas lib/MyModule.pm
+      extract-schemas --output-dir my_schemas --verbose lib/MyModule.pm
+      extract-schemas --help
+
+=head1 DESCRIPTION
+
+This tool analyzes a Perl module and generates YAML schema files for each
+method, suitable for use with App::Test::Generator.
+
+The extractor uses three sources of information:
+
+=over 4
+
+=item 1. POD Documentation
+
+Parses parameter descriptions from POD to extract types and constraints.
+
+=item 2. Code Analysis
+
+Analyzes validation patterns in the code (ref checks, length checks, etc.)
+
+=item 3. Method Signatures
+
+Extracts parameter names from method signatures.
+
+=back
+
+The tool assigns a confidence level (high/medium/low) to each schema based
+on how much information it could infer.
+
+=cut
+
+# Parse command line options
+my %opts = (
+    output_dir => 'schemas',
+    verbose    => 0,
+    help       => 0,
+    man        => 0,
+);
+
+GetOptions(
+    'output-dir|o=s' => \$opts{output_dir},
+    'verbose|v'      => \$opts{verbose},
+    'help|h'         => \$opts{help},
+    'man|m'          => \$opts{man},
+) or pod2usage(2);
+
+pod2usage(1) if $opts{help};
+pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
+
+# Get input file
+my $input_file = shift @ARGV or pod2usage("Error: No input file specified");
+
+die "Error: File not found: $input_file\n" unless -f $input_file;
+
+# Run the extractor
+print "Extracting schemas from: $input_file\n";
+print "Output directory: $opts{output_dir}\n";
+print "\n";
+
+my $extractor = App::Test::Generator::SchemaExtractor->new(
+	input_file => $input_file,
+	output_dir => $opts{output_dir},
+	verbose    => $opts{verbose},
+);
+
+my $schemas = $extractor->extract_all();
+
+# Summary report
+print "\n", '=' x 70, "\n";
+print "EXTRACTION SUMMARY\n";
+print '=' x 70, "\n\n";
+
+my %iconfidence_counts = (high => 0, medium => 0, low => 0);
+my %oconfidence_counts = (high => 0, medium => 0, low => 0);
+
+foreach my $method (sort keys %$schemas) {
+    my $schema = $schemas->{$method};
+    my $iconf = $schema->{_confidence}{input};
+    $iconfidence_counts{$iconf}++;
+    my $oconf = $schema->{_confidence}{output};
+    $oconfidence_counts{$oconf}++;
+
+    my $param_count = scalar keys %{$schema->{input}};
+
+    printf "%-30s %d params  [%s input confidence] [%s output confidence]\n",
+        $method, $param_count, uc($iconf), uc($oconf);
+}
+
+print "\n";
+print 'Total methods: ', (scalar keys %$schemas), "\n";
+print "  Input:\n";
+print "    High confidence:   $iconfidence_counts{high}\n";
+print "    Medium confidence: $iconfidence_counts{medium}\n";
+print "    Low confidence:    $iconfidence_counts{low}\n";
+print "  Outut:\n";
+print "    High confidence:   $oconfidence_counts{high}\n";
+print "    Medium confidence: $oconfidence_counts{medium}\n";
+print "    Low confidence:    $oconfidence_counts{low}\n";
+print "\n";
+
+if ($iconfidence_counts{low} > 0 || $iconfidence_counts{medium} > 0) {
+    print "RECOMMENDATION:\n";
+    print "Review the generated schemas in $opts{output_dir}/\n";
+    print "Focus on methods with medium/low confidence ratings.\n";
+    print "\n";
+}
+
+print "Schema files written to: $opts{output_dir}/\n";
+
+__END__
+
+=head1 SCHEMA FORMAT
+
+The generated YAML files have the following structure:
+
+    method: method_name
+    confidence: high|medium|low
+    notes:
+      - Any warnings or suggestions
+    input:
+      param_name:
+        type: string|integer|number|boolean|arrayref|hashref
+        min: 5
+        max: 100
+        optional: 0
+        matches: /pattern/
+
+=head1 CONFIDENCE LEVELS
+
+=over 4
+
+=item B<high>
+
+Strong evidence from POD and code analysis. Schema should be accurate.
+
+=item B<medium>
+
+Partial information available. Review recommended.
+
+=item B<low>
+
+Limited information. Manual review required.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Basic Usage
+
+    extract-schemas lib/MyModule.pm
+
+Extracts schemas to ./schemas/ directory.
+
+=head2 Custom Output Directory
+
+    extract-schemas --output-dir test_schemas lib/MyModule.pm
+
+=head2 Verbose Mode
+
+    extract-schemas --verbose lib/MyModule.pm
+
+Shows detailed analysis of each method.
+
+=head1 NEXT STEPS
+
+After extracting schemas:
+
+1. Review the generated YAML files, especially those marked low confidence
+2. Edit the schemas to add missing information or correct errors
+3. Use the schemas with App::Test::Generator:
+
+    test-generator --schema schemas/my_method.yaml
+
+=head1 SEE ALSO
+
+L<App::Test::Generator>, L<PPI>, L<Pod::Simple>
+
+=head1 AUTHOR
+
+Nigel Horne
+
+=cut

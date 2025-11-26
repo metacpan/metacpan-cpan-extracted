@@ -6,7 +6,7 @@ use warnings;
 use version;
 use Carp qw(carp);
 
-our $VERSION = version->declare("v2.19.11");
+our $VERSION = version->declare("v2.19.12");
 
 use Exporter   qw( );
 use List::Util qw( uniq );
@@ -55,7 +55,7 @@ Dev::Util - Utilities useful in the development of perl programs
 
 =head1 VERSION
 
-Version v2.19.11
+Version v2.19.12
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,7 @@ This is equivalent to:
 
 B<Note: C<use Dev::Util::Syntax> automatically adds C<use strict> and C<use warnings> to the program.>
 
+L<Dev::Util::Syntax>
 
 =head2 Dev::Util::Const
 
@@ -141,6 +142,7 @@ Defines named constants as Readonly, based on best practices.
     $DOUBLE_QUOTE = q{"};
     $COMMA = q{,};
 
+L<Dev::Util::Const>
 
 =head2 Dev::Util::OS
 
@@ -153,6 +155,7 @@ OS discovery and functions to execute and collect data from external programs.
     my $system_is_linux = is_linux();
     my @seq = ipc_run_c( { cmd => 'seq 1 10', } );
 
+L<Dev::Util::OS>
 
 =head2 Dev::Util::File
 
@@ -168,6 +171,7 @@ Provides functions to assist working with files and dirs, menus and prompts.
     my $slash_added_dir = dir_suffix_slash('/dir/path/no/slash');
     my $td = mk_temp_dir();
 
+L<Dev::Util::File>
 
 =head2 Dev::Util::Query
 
@@ -177,6 +181,7 @@ Provides functions to ask the user for input.
     display_menu( $msg, \@items );
     my $action = yes_no_prompt( { text    => "Rename Files?", default => 1, });
 
+L<Dev::Util::Query>
 
 =head2 Dev::Util::Backup
 
@@ -186,6 +191,7 @@ appended. Directories are backed up by tar and gz.
     my $backup_file = backup('myfile');
     my $backup_dir  = backup('mydir/');
 
+L<Dev::Util::Backup>
 
 =head2 Dev::Util::Sem
 
@@ -197,10 +203,11 @@ Module to do Semaphore locking
     ...
     $sem->unlock;
 
+L<Dev::Util::Sem>
 
 =head1 EXAMPLES
 
-Example programs demonstrate how the C<Dev::Util> modules can be used are in the C<examples> dir.
+Example programs that demonstrate how the C<Dev::Util> modules can be used are in the C<examples> dir.
 
 
 =head1 SEE ALSO

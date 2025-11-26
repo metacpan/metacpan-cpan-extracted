@@ -1,6 +1,5 @@
 use v5.30;
 use Test::More;
-use Scalar::Util qw/refaddr/;
 
 use WebGPU::Direct;
 

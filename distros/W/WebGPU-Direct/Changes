@@ -1,5 +1,18 @@
 Revision history for WebGPU-Direct
 
+0.16  2025-11-26 00:19:00 EST
+        - Upgrade webgpu.h handling
+        - Updated handling of webgpu strings
+        - Updated handling of callbacks
+        - Update to latest webgpu.h
+        - Add perlish "createAdapter" that hides the C-like details of
+          requestAdapter
+        - Makefile.PL now offers to download wgpu-native for you
+        - Add win32 support for new_window
+        - Add support for passing in some exteranl window classes
+          - This includes X11::Xlib and X11::Xcb. Wayland and win32 support
+            are not available at this time
+
 0.15  2024-08-07 23:41:34 EDT
         - Add array constructor for Color and Extent3D
         - Add rotating cube example

@@ -1,0 +1,12 @@
+AI-Anthropic-0.01.tar.gz
+Changes
+examples/basic.pl
+lib/AI/Anthropic.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/01-basic.t
+tree_structure.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

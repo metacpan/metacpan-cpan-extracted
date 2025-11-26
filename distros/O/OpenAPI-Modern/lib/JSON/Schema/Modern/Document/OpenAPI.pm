@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 
 use 5.020;
 use utf8;
@@ -579,7 +579,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 SYNOPSIS
 

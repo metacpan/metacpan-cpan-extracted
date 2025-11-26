@@ -4,7 +4,7 @@ Dev::Util::Syntax - Provide consistent feature setup.
 
 # VERSION
 
-Version v2.19.11
+Version v2.19.12
 
 # SYNOPSIS
 

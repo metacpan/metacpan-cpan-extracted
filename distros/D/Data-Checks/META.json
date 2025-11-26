@@ -32,6 +32,7 @@
       },
       "test" : {
          "requires" : {
+            "Sublike::Extended" : "0.29",
             "Test2::V0" : "0.000148"
          }
       }
@@ -39,7 +40,7 @@
    "provides" : {
       "Data::Checks" : {
          "file" : "lib/Data/Checks.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Data::Checks::Builder" : {
          "file" : "lib/Data/Checks/Builder.pm",
@@ -52,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,4 +1,14 @@
+0.005   2025-11-26  Released-By: PERLANCAR; Urgency: medium
+
+        [script find-duplicate-filenames]
+
+        - Add options: --eval (-e), --regex (-r), --exclude-filename-regex
+          (-x).
+
+
 0.004   2025-10-31  Released-By: PERLANCAR; Urgency: low
+
+        [script find-duplicate-filenames]
 
         - Enable logging & add examples.
 

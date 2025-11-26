@@ -1,5 +1,20 @@
 Revision history for App-Test-Generator
 
+0.18	Tue Nov 25 11:58:12 EST 2025
+	Removed one place sending '' if test_empty was disabled
+	Don't send long strings if matches is set
+	Fixed handling of position code with more than argument
+	Renamed the sample module
+
+0.17	Tue Nov 25 10:24:36 EST 2025
+	Improved TEST_VERBOSE output for Corpus tests
+	Make the strings more random
+	Added test_non_ascii (default 1) to the configuration matrix
+	Removed all legacy conf code
+	Re-ordered the POD
+	Don't give 42 if max < 42
+	Added App::Test::Generator::SchemaExtractor
+
 0.16	Thu Nov 20 08:38:17 EST 2025
 	Use Data::Random::String to generate the string
 	Use Data::Random::Structure to generate references to hashes and arrays

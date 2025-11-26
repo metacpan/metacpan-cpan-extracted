@@ -154,7 +154,7 @@ WebGPU::Direct::RenderBundleEncoder
 
 =over
 
-=item * markerLabel (String (char *))
+=item * markerLabel (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -170,7 +170,7 @@ WebGPU::Direct::RenderBundleEncoder
 
 =over
 
-=item * groupLabel (String (char *))
+=item * groupLabel (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -224,7 +224,7 @@ WebGPU::Direct::RenderBundleEncoder
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -264,7 +264,7 @@ WebGPU::Direct::RenderBundleEncoder
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

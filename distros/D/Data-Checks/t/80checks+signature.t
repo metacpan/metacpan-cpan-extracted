@@ -22,10 +22,10 @@ BEGIN {
 
 # We know this must be available since Signature::Attribute::Checked would
 # depend on it
-use Sublike::Extended;
+use Sublike::Extended 0.29 'sub';
 use experimental qw( signatures );
 
-extended sub func ( $x :Checked(Defined) ) { return $x }
+sub func ( $x :Checked(Defined) ) { return $x }
 
 is( func(123), 123, 'func() accepts defined argument' );
 ok( dies { func(undef) }, 'rejects undefined argument' );

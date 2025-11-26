@@ -139,9 +139,9 @@ WebGPU::Direct::CommandEncoder
 
 =over
 
-=item * source (L<WebGPU::Direct::ImageCopyBuffer|WebGPU::Direct::Types/WebGPU::Direct::ImageCopyBuffer>)
+=item * source (L<WebGPU::Direct::TexelCopyBufferInfo|WebGPU::Direct::Types/WebGPU::Direct::TexelCopyBufferInfo>)
 
-=item * destination (L<WebGPU::Direct::ImageCopyTexture|WebGPU::Direct::Types/WebGPU::Direct::ImageCopyTexture>)
+=item * destination (L<WebGPU::Direct::TexelCopyTextureInfo|WebGPU::Direct::Types/WebGPU::Direct::TexelCopyTextureInfo>)
 
 =item * copySize (L<WebGPU::Direct::Extent3D|WebGPU::Direct::Types/WebGPU::Direct::Extent3D>)
 
@@ -157,9 +157,9 @@ WebGPU::Direct::CommandEncoder
 
 =over
 
-=item * source (L<WebGPU::Direct::ImageCopyTexture|WebGPU::Direct::Types/WebGPU::Direct::ImageCopyTexture>)
+=item * source (L<WebGPU::Direct::TexelCopyTextureInfo|WebGPU::Direct::Types/WebGPU::Direct::TexelCopyTextureInfo>)
 
-=item * destination (L<WebGPU::Direct::ImageCopyBuffer|WebGPU::Direct::Types/WebGPU::Direct::ImageCopyBuffer>)
+=item * destination (L<WebGPU::Direct::TexelCopyBufferInfo|WebGPU::Direct::Types/WebGPU::Direct::TexelCopyBufferInfo>)
 
 =item * copySize (L<WebGPU::Direct::Extent3D|WebGPU::Direct::Types/WebGPU::Direct::Extent3D>)
 
@@ -175,9 +175,9 @@ WebGPU::Direct::CommandEncoder
 
 =over
 
-=item * source (L<WebGPU::Direct::ImageCopyTexture|WebGPU::Direct::Types/WebGPU::Direct::ImageCopyTexture>)
+=item * source (L<WebGPU::Direct::TexelCopyTextureInfo|WebGPU::Direct::Types/WebGPU::Direct::TexelCopyTextureInfo>)
 
-=item * destination (L<WebGPU::Direct::ImageCopyTexture|WebGPU::Direct::Types/WebGPU::Direct::ImageCopyTexture>)
+=item * destination (L<WebGPU::Direct::TexelCopyTextureInfo|WebGPU::Direct::Types/WebGPU::Direct::TexelCopyTextureInfo>)
 
 =item * copySize (L<WebGPU::Direct::Extent3D|WebGPU::Direct::Types/WebGPU::Direct::Extent3D>)
 
@@ -215,7 +215,7 @@ WebGPU::Direct::CommandEncoder
 
 =over
 
-=item * markerLabel (String (char *))
+=item * markerLabel (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -231,7 +231,7 @@ WebGPU::Direct::CommandEncoder
 
 =over
 
-=item * groupLabel (String (char *))
+=item * groupLabel (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -267,7 +267,7 @@ WebGPU::Direct::CommandEncoder
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -289,7 +289,7 @@ WebGPU::Direct::CommandEncoder
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

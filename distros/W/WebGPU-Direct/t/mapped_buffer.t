@@ -5,8 +5,8 @@ use WebGPU::Direct;
 
 my $wgpu = WebGPU::Direct->new;
 
-my $adapter = $wgpu->requestAdapter( { compatibleSurface => undef } );
-my $device  = $adapter->requestDevice;
+my $adapter = $wgpu->createAdapter( { compatibleSurface => undef } );
+my $device  = $adapter->createDevice;
 
 my @cubeVertexArray = (
   #<<<

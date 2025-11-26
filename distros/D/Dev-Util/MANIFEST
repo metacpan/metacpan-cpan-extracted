@@ -44,7 +44,6 @@ t/07-sem.t
 t/perlcritic.t
 t/perlcriticrc
 t/perltidy.t
-test.pl
 VERSION
 xt/00-report-prereqs.t
 xt/boilerplate.t

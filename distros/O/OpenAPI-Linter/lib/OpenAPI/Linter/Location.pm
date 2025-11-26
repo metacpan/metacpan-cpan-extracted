@@ -1,6 +1,6 @@
 package OpenAPI::Linter::Location;
 
-$OpenAPI::Linter::VERSION   = '0.13';
+$OpenAPI::Linter::VERSION   = '0.14';
 $OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,11 +9,11 @@ OpenAPI::Linter::Location - Represents file location information for OpenAPI spe
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 

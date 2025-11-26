@@ -4,7 +4,7 @@ Dev::Util - Utilities useful in the development of perl programs
 
 # VERSION
 
-Version v2.19.11
+Version v2.19.12
 
 # SYNOPSIS
 
@@ -67,6 +67,8 @@ This is equivalent to:
 
 **Note: `use Dev::Util::Syntax` automatically adds `use strict` and `use warnings` to the program.**
 
+[Dev::Util::Syntax](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3ASyntax)
+
 ## Dev::Util::Const
 
 Defines named constants as Readonly, based on best practices.
@@ -76,6 +78,8 @@ Defines named constants as Readonly, based on best practices.
     $SINGLE_QUOTE = q{'};
     $DOUBLE_QUOTE = q{"};
     $COMMA = q{,};
+
+[Dev::Util::Const](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3AConst)
 
 ## Dev::Util::OS
 
@@ -87,6 +91,8 @@ OS discovery and functions to execute and collect data from external programs.
     my $hostname = get_hostname();
     my $system_is_linux = is_linux();
     my @seq = ipc_run_c( { cmd => 'seq 1 10', } );
+
+[Dev::Util::OS](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3AOS)
 
 ## Dev::Util::File
 
@@ -102,6 +108,8 @@ Provides functions to assist working with files and dirs, menus and prompts.
     my $slash_added_dir = dir_suffix_slash('/dir/path/no/slash');
     my $td = mk_temp_dir();
 
+[Dev::Util::File](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3AFile)
+
 ## Dev::Util::Query
 
 Provides functions to ask the user for input.
@@ -110,6 +118,8 @@ Provides functions to ask the user for input.
     display_menu( $msg, \@items );
     my $action = yes_no_prompt( { text    => "Rename Files?", default => 1, });
 
+[Dev::Util::Query](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3AQuery)
+
 ## Dev::Util::Backup
 
 The backup function will make a copy of a file or dir with the date of the file
@@ -117,6 +127,8 @@ appended. Directories are backed up by tar and gz.
 
     my $backup_file = backup('myfile');
     my $backup_dir  = backup('mydir/');
+
+[Dev::Util::Backup](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3ABackup)
 
 ## Dev::Util::Sem
 
@@ -128,9 +140,11 @@ Module to do Semaphore locking
     ...
     $sem->unlock;
 
+[Dev::Util::Sem](https://metacpan.org/pod/Dev%3A%3AUtil%3A%3ASem)
+
 # EXAMPLES
 
-Example programs demonstrate how the `Dev::Util` modules can be used are in the `examples` dir.
+Example programs that demonstrate how the `Dev::Util` modules can be used are in the `examples` dir.
 
 # SEE ALSO
 

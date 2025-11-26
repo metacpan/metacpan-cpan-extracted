@@ -228,7 +228,7 @@ sub run {
         # Log access granted
         $class->logger->debug( "User "
               . $session->{ $class->tsv->{whatToTrace} }
-              . " was granted to access to $uri" );
+              . " was granted access to $uri" );
 
         #  Catch POST rules
         $class->postOutputFilter( $req, $session, $uri );
@@ -365,7 +365,7 @@ sub getLevel {
 # Grant or refuse client using compiled regexp and functions
 # @param $uri URI
 # @param $cond optional Function granting access
-# @return True if the user is granted to access to the current URL
+# @return True if the user is granted access to the current URL
 sub grant {
     my ( $class, $req, $session, $uri, $cond, $vhost ) = @_;
 
@@ -445,7 +445,7 @@ sub forbidden {
         message => (
                 "User "
               . $session->{ $class->tsv->{whatToTrace} }
-              . " was forbidden to access to $vhost$uri"
+              . " was forbidden access to $vhost$uri"
         ),
         code => "ACCESS_REFUSED",
         user => $session->{ $class->tsv->{whatToTrace} },

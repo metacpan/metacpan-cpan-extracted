@@ -1,0 +1,15 @@
+AI-Anthropic/
+├── lib/
+│   └── AI/
+│       ├── Anthropic.pm              # Главный модуль
+│       └── Anthropic/
+│           ├── Client.pm             # HTTP-клиент
+│           ├── Message.pm            # Класс сообщения
+│           ├── Response.pm           # Класс ответа
+│           ├── Stream.pm             # Streaming поддержка
+│           └── Error.pm              # Обработка ошибок
+├── t/                                # Тесты
+├── examples/                         # Примеры
+├── Makefile.PL
+├── README.md
+└── Changes

@@ -15,6 +15,7 @@ my $build = Module::Build::with::XSTests->new(
       ) : (),
    },
    test_requires => {
+      'Sublike::Extended' => '0.29',
       'Test2::V0' => '0.000148',
    },
    configure_requires => {

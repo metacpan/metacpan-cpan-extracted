@@ -8,7 +8,7 @@ use Test2::V0;
 use lib "t";
 use testcase "t::test", qw( test_constraint );
 
-use Data::Checks qw( Defined Object Str Isa ArrayRef HashRef Callable );
+use Data::Checks qw( Defined Object Str Isa Can ArrayRef HashRef Callable );
 
 # Defined
 {
@@ -66,6 +66,25 @@ test_constraint Isa => Isa("BaseClass"),
       'other instance' => DifferentClass->new,
    ];
 
+# Can
+test_constraint Can => Can("basem"),
+   [
+      'object'       => BaseClass->new,
+      'subclass'     => DerivedClass->new,
+      'package name' => "BaseClass",
+   ],
+   [
+      'other instance' => DifferentClass->new,
+   ];
+
+# Can (multi)
+test_constraint Can => Can("basem", "new", "can"),
+   [
+      'object'       => BaseClass->new,
+      'subclass'     => DerivedClass->new,
+      'package name' => "BaseClass",
+   ];
+
 # ArrayRef
 test_constraint ArrayRef => ArrayRef,
    [
@@ -95,6 +114,8 @@ is( Data::Checks::Debug::stringify_constraint( Object ), "Object",
    'debug stringify Object' );
 is( Data::Checks::Debug::stringify_constraint( Isa("Base::Class") ), "Isa(\"Base::Class\")",
    'debug stringify Isa("Base::Class")' );
+is( Data::Checks::Debug::stringify_constraint( Can("red", "blue") ), "Can(\"red\", \"blue\")",
+   'debug stringify Can("red", "blue")' );
 is( Data::Checks::Debug::stringify_constraint( ArrayRef ), "ArrayRef",
    'debug stringify ArrayRef' );
 is( Data::Checks::Debug::stringify_constraint( HashRef ), "HashRef",

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-10-31'; # DATE
+our $DATE = '2025-11-26'; # DATE
 our $DIST = 'App-FindUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FindUtils/find_duplicate_filenames",
@@ -40,7 +40,7 @@ find-duplicate-filenames - Search directories recursively and find files/dirs wi
 
 =head1 VERSION
 
-This document describes version 0.004 of find-duplicate-filenames (from Perl distribution App-FindUtils), released on 2025-10-31.
+This document describes version 0.005 of find-duplicate-filenames (from Perl distribution App-FindUtils), released on 2025-11-26.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<find-duplicate-filenames> B<L<--help|/"--help">>
 
 B<find-duplicate-filenames> B<L<--version|/"--version">>
 
-B<find-duplicate-filenames> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--dir|/"--dirs-json=s">>=I<L<dirname|Sah::Schema::dirname>>)+|B<L<--dirs-json|/"--dirs-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<dir|/"--dirs-json=s">>] ...
+B<find-duplicate-filenames> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [(B<L<--dir|/"--dirs-json=s">>=I<L<dirname|Sah::Schema::dirname>>)+|B<L<--dirs-json|/"--dirs-json=s">>=I<json>] [B<L<--eval|/"--eval=s, -e">>=I<str>|B<L<-e|/"--eval=s, -e">>=I<str>] [B<L<--exclude-filename-regex|/"--exclude-filename-regex=s, -x">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-x|/"--exclude-filename-regex=s, -x">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--regex|/"--regex=s, -r">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-r|/"--regex=s, -r">>=I<L<re_from_str|Sah::Schema::re_from_str>>] -- [I<L<dir|/"--dirs-json=s">>] ...
 
 
 
@@ -81,6 +81,26 @@ Can be specified multiple times.
 See C<--dir>.
 
 Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--eval>=I<s>, B<-e>
+
+Process filename through this code. Code will receive filename in C<$_> and is
+expected to change and return a new "name" that will be compared for duplicate
+instead of the original name. You can use this e.g. to find duplicate in some
+part of the filename. As an alternative, see the C<--regex> option.
+
+
+=item B<--exclude-filename-regex>=I<s>, B<-x>
+
+Filename regex to exclude.
+
+=item B<--regex>=I<s>, B<-r>
+
+Specify a regex with a capture to get part of the filename. The first capture
+C<$1> will be used to compare for duplicate instead of the original name. You can
+use this to find duplicate in some part of the filename. As an alternative, see
+the C<--eval> option.
+
 
 =back
 
@@ -236,6 +256,10 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Find duplicate filenames under the current directory
 
  % find-duplicate-filenames
+
+=head2 Find duplicate receipts by order ID (filenames are named receipt-order=12345.pdf), exclude backup files
+
+ % find-duplicate-filenames -x '/\.bak$/' -r '/order=(\d+)/' --debug
 
 =head1 HOMEPAGE
 

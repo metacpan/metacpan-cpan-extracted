@@ -169,7 +169,7 @@ WebGPU::Direct::RenderPassEncoder
 
 =over
 
-=item * markerLabel (String (char *))
+=item * markerLabel (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -185,7 +185,7 @@ WebGPU::Direct::RenderPassEncoder
 
 =over
 
-=item * groupLabel (String (char *))
+=item * groupLabel (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -253,7 +253,7 @@ WebGPU::Direct::RenderPassEncoder
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
@@ -351,7 +351,7 @@ WebGPU::Direct::RenderPassEncoder
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

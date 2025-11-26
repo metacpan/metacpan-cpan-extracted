@@ -27,16 +27,95 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
         ->prune_unknown
         ->register_builtin_formats
         ->trace
-        ->trace_limit(200); # 0 means unlimited
+        ->trace_limit(200) # 0 means unlimited
+        ->unique_keys; # enable uniqueKeys
 
-    my $ok = $js->validate({ name => 'head', next=>{ name => 'tail' } })
+You could also do:
+
+    my $js = JSON::Schema::Validate->new( $schema,
+        compile          => 1,
+        content_checks   => 1,
+        ignore_req_vocab => 1,
+        prune_unknown    => 1,
+        trace_on         => 1,
+        trace_on         => 200,
+        trace_on         => 1,
+    )->register_builtin_formats;
+
+    my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
         or die( $js->error );
 
     print "ok\n";
 
+Generating a browser-side validator with ["compile\_js"](#compile_js):
+
+    use JSON::Schema::Validate;
+    use JSON ();
+
+    my $schema = JSON->new->decode( do {
+        local $/;
+        <DATA>;
+    } );
+
+    my $js = JSON::Schema::Validate->new( $schema )
+        ->compile;
+    my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
+        or die( $js->error );
+
+    # Generate a standalone JavaScript validator for use in a web page.
+    # ecma => 2018 enables Unicode regex features when available.
+    my $js_code = $validator->compile_js( ecma => 2018 );
+
+    open my $fh, '>:encoding(UTF-8)', 'htdocs/js/schema-validator.js'
+        or die( "Unable to write schema-validator.js: $!" );
+    print {$fh} $js_code;
+    close $fh;
+
+In your HTML:
+
+    <script src="/js/schema-validator.js"></script>
+    <script>
+    function validateForm()
+    {
+        var src = document.getElementById('payload').value;
+        var out = document.getElementById('errors');
+        var inst;
+
+        try
+        {
+            inst = JSON.parse( src );
+        }
+        catch( e )
+        {
+            out.textContent = "Invalid JSON: " + e;
+            return;
+        }
+
+        // The generated file defines a global function `validate(inst)`
+        // that returns an array of error objects.
+        var errors = validate( inst );
+
+        if( !errors || !errors.length )
+        {
+            out.textContent = "OK – no client-side schema errors.";
+            return;
+        }
+
+        var lines = [];
+        for( var i = 0; i < errors.length; i++ )
+        {
+            var e = errors[i];
+            lines.push(
+                e.path + " [" + e.keyword + "]: " + e.message
+            );
+        }
+        out.textContent = lines.join("\n");
+    }
+    </script>
+
 # VERSION
 
-v0.5.1
+v0.6.0
 
 # DESCRIPTION
 
@@ -46,6 +125,7 @@ v0.5.1
 - Draft 2020-12 evaluation semantics, including `unevaluatedItems` and `unevaluatedProperties` with annotation tracking.
 - A practical Perl API (constructor takes the schema; call `validate` with your data; inspect `error` / `errors` on failure).
 - Builtin validators for common `format`s (date, time, email, hostname, ip, uri, uuid, JSON Pointer, etc.), with the option to register or override custom format handlers.
+- Optional code generation via ["compile\_js"](#compile_js) to run a subset of the schema client-side in JavaScript, using the same error structure as the Perl validator.
 
 This module is intentionally minimal compared to large reference implementations, but it implements the parts most people rely on in production.
 
@@ -69,8 +149,7 @@ This module is intentionally minimal compared to large reference implementations
 
 - Arrays
 
-    `prefixItems`, `items`, `contains`, `minContains`, `maxContains`,
-    `uniqueItems`, `unevaluatedItems`.
+    `prefixItems`, `items`, `contains`, `minContains`, `maxContains`, `uniqueItems`, `unevaluatedItems`.
 
 - Objects
 
@@ -87,6 +166,8 @@ This module is intentionally minimal compared to large reference implementations
 - Referencing
 
     `$id`, `$anchor`, `$ref`, `$dynamicAnchor`, `$dynamicRef`.
+
+The Perl engine supports the full list above. The generated JavaScript currently implements a pragmatic subset; see ["compile\_js"](#compile_js) for details.
 
 ## Formats
 
@@ -249,7 +330,7 @@ Options (all optional):
 
     `uniqueKeys` is a non-standard extension (proposed for future drafts) that enforces uniqueness of one or more properties across all objects in an array.
 
-        "uniqueKeys": [ ["id"] ]                    # 'id' must be unique
+        "uniqueKeys": [ ["id"] ]                   # 'id' must be unique
         "uniqueKeys": [ ["id"], ["email"] ]        # id AND email must each be unique
         "uniqueKeys": [ ["category", "code"] ]     # the pair (category,code) must be unique
 
@@ -280,6 +361,174 @@ Enable or disable the compiled-validator fast path.
 When enabled and the root hasn’t been compiled yet, this triggers an initial compilation.
 
 Returns the current object to enable chaining.
+
+## compile\_js
+
+    my $js_source = $js->compile_js;
+    my $js_source = $js->compile_js( ecma => 2018 );
+
+Generate a standalone JavaScript validator for the current schema and return it as a UTF-8 string.
+
+You are responsible for writing this string to a `.js` file and serving it to the browser (or embedding it in a page).
+
+The generated code:
+
+- Wraps everything in a simple IIFE (Immediately Invoked Function Expression) `(function(global){ ... })(this)`.
+- Defines a single public function:
+
+        function validate(inst) { ... }
+
+    exported on the global object (`window.validate` in a browser).
+
+- Implements the same error reporting format as the Perl engine, but using plain JavaScript objects:
+
+        {
+            path:           "#/path/in/instance",
+            keyword:        "minimum",
+            message:        "number is less than minimum 2",
+            schema_pointer: "#/definitions/.../minimum"
+        }
+
+- Returns an `Array` of such error objects. If validation succeeds, the array is empty.
+
+Supported JavaScript options:
+
+- `ecma => "auto" | YEAR`
+
+    Controls which JavaScript regexp features the generated code will try to use.
+
+        ecma => "auto"      # default
+        ecma => 2018        # assume ES2018+ (Unicode property escapes, etc.)
+
+    When `ecma` is a number `>= 2018`, patterns that use Unicode property escapes (e.g. `\p{scx=Katakana}`) are compiled with the `/u` flag and will take advantage of Script / Script\_Extensions support when the browser has it.
+
+    In `"auto"` mode the generator emits cautious compatibility shims: “advanced” patterns are wrapped in `try/catch`; if the browser cannot compile them, those checks are silently skipped on the client (and are still enforced server-side by Perl).
+
+### JavaScript keyword coverage
+
+The generated JS implements a pragmatic subset of the Perl engine:
+
+- Types
+
+    `type` (including unions).
+
+- Constants / enumerations
+
+    `const` (primitive values only) and `enum`.
+
+    Complex object/array `const` values are currently ignored client-side and enforced server-side only.
+
+- Numbers
+
+    `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`.
+
+    For better UX, numeric-looking strings such as `"10"` or `"3.14"` are coerced to numbers before applying bounds. Non-numeric values:
+
+    - trigger a `type` error (`"expected number but found string"`) when numeric keywords are present and no explicit `type` is declared;
+    - or are handled by the normal `type` keyword if you explicitly declared `type => 'number'` in the schema.
+
+- Strings
+
+    `minLength`, `maxLength`, `pattern`.
+
+    Patterns are converted from Perl syntax to JavaScript using a conservative converter (e.g. `\x{FF70}` to `\uFF70`, `\p{Katakana}` to `\p{scx=Katakana}`). When the browser does not support the necessary Unicode features, such patterns are skipped client-side.
+
+- Arrays
+
+    `items` (single-schema form), `minItems`, `maxItems`, `contains`, `minContains`, `maxContains`.
+
+- Objects
+
+    `properties`, `required`.
+
+- Combinators
+
+    `allOf`, `anyOf`, `oneOf`, `not`.
+
+    “Negative required” patterns of the form `{ "not": { "required": [...] } }` are intentionally skipped on the client and enforced server-side only.
+
+- Conditionals
+
+    `if`, `then`, `else`, with the same semantics as the Perl engine: `if` is evaluated in a “shadow” context and never produces errors directly; only `then`/`else` do.
+
+- Non-core extension
+
+    `uniqueKeys` when you enabled it via `unique_keys => 1` or `->unique_keys`.
+
+The following are intentionally **not** implemented in JavaScript (but are fully supported in Perl):
+
+- `format` (client-side format checks are skipped).
+- `prefixItems`, `patternProperties`, `unevaluatedItems`, `unevaluatedProperties`, `contentEncoding`, `contentMediaType`, `contentSchema`, external `$ref` and `$dynamicRef` targets.
+
+In other words: the JS validator is a fast, user-friendly _pre-flight_ check for web forms; the Perl validator remains the source of truth.
+
+### Example: integrating the generated JS in a form
+
+Perl side:
+
+    my $schema = ...; # your decoded schema
+
+    my $validajstor = JSON::Schema::Validate->new( $schema )
+        ->compile;
+
+    my $js_source = $validator->compile_js( ecma => 2018 );
+
+    open my $fh, '>:encoding(UTF-8)', 'htdocs/js/validator.js'
+        or die( "Cannot write JS: $!" );
+    print {$fh} $js_source;
+    close $fh;
+
+HTML / JavaScript:
+
+    <textarea id="company-data" rows="8" cols="80">
+    { "name_ja": "株式会社テスト", "capital": 1 }
+    </textarea>
+
+    <button type="button" onclick="runValidation()">Validate</button>
+
+    <pre id="validation-errors"></pre>
+
+    <script src="/js/validator.js"></script>
+    <script>
+    function runValidation()
+    {
+        var src = document.getElementById('company-data').value;
+        var out = document.getElementById('validation-errors');
+        var inst;
+
+        try
+        {
+            inst = JSON.parse( src );
+        }
+        catch( e )
+        {
+            out.textContent = "Invalid JSON: " + e;
+            return;
+        }
+
+        var errors = validate( inst ); // defined by validator.js
+
+        if( !errors || !errors.length )
+        {
+            out.textContent = "OK – no client-side schema errors.";
+            return;
+        }
+
+        var lines = [];
+        for( var i = 0; i < errors.length; i++ )
+        {
+            var e = errors[i];
+            lines.push(
+                "- " + e.path +
+                " [" + e.keyword + "]: " +
+                e.message
+            );
+        }
+        out.textContent = lines.join("\n");
+    }
+    </script>
+
+You can then map each error back to specific fields, translate `message` via your own localisation layer, or forward the `errors` array to your logging pipeline.
 
 ## content\_checks
 
@@ -431,8 +680,7 @@ Register a content **decoder** for `contentEncoding`. The callback receives a si
 
 - a decoded scalar (success);
 - `undef` (failure);
-- or the triplet `( $ok, $msg, $out )` where `$ok` is truthy on success,
-`$msg` is an optional error string, and `$out` is the decoded value.
+- or the triplet `( $ok, $msg, $out )` where `$ok` is truthy on success, `$msg` is an optional error string, and `$out` is the decoded value.
 
 The `$name` is lower-cased internally. Returns the current object.
 
@@ -591,7 +839,7 @@ On failure, inspect `$js->error` to retrieve the [error object](https://metacpan
 
     This matches the JSON Schema 2020-12 intent: only `then`/`else` affect validity, `if` itself never does.
 
-- Unevaluated\*
+- `unevaluatedItems` / `unevaluatedProperties`
 
     Both `unevaluatedItems` and `unevaluatedProperties` are enforced using annotation produced by earlier keyword evaluations within the same schema object, matching draft 2020-12 semantics.
 

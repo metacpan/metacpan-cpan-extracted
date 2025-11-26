@@ -711,13 +711,15 @@ $(window).on('load', function() {
   $(`.category[name=\"${datas['floatingCategory']}\"]`).appendTo('#floating-menu').find("i").remove();
   $(`.category[name=\"${datas['floatingCategory']}\"]`).draggable();
   const parent = document.getElementById('floating-menu');
-  const divs = parent.querySelectorAll('.col-md-4');
-  divs.forEach(
-    (div, index) => {
-      div.classList.remove("col-md-4");
-      div.classList.add("col-md-12");
-    }
-  );
+  if (parent) {
+    const divs = parent.querySelectorAll('.col-md-4');
+    divs.forEach(
+      (div, index) => {
+        div.classList.remove("col-md-4");
+        div.classList.add("col-md-12");
+      }
+    );
+  }
   $(document).trigger("portalLoaded");
   return true;
 });

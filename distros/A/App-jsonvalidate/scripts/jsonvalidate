@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/App/jsonvalidate.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/10
-## Modified 2025/11/10
+## Modified 2025/11/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,7 +27,7 @@ use JSON::Schema::Validate;
 use Module::Generic::File qw( file );
 use Pod::Usage;
 use Term::ANSIColor::Simple;
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 our $LOG_LEVEL = 0;
 our $DEBUG = 0;
@@ -51,9 +51,13 @@ our $err = stderr( binmode => 'utf-8', autoflush => 1 );
 # $opts->{content_checks} having a true value
 my $dict =
 {
+    allow_file_refs         => { type => 'boolean', default => 1 },
     compile                 => { type => 'boolean', default => 0 },
     content_checks          => { type => 'boolean', default => 0 },
+    ecma                    => { type => 'string',  default => 'auto' },
+    emit_js                 => { type => 'boolean', default => 0 },
     errors_only             => { type => 'boolean', default => 0 },
+    extensions              => { type => 'boolean', default => 0 },
     ignore_vocab            => { type => 'boolean', alias => [qw( ignore_unknown_required_vocab )], default => 0 },
     # Array object (Module::Generic::Array) of file objects (Module::Generic::File)
     instance                => { type => 'file-array', alias => [qw(i)] },
@@ -63,6 +67,7 @@ my $dict =
     max_errors              => { type => 'integer', default => 200 },
     normalize               => { type => 'boolean', alias => [qw( normalise )], default => 1 },
     register_formats        => { type => 'boolean', default => 0 },
+    remote_refs             => { type => 'boolean', alias => [qw( allow_http )], default => 0 },
     # Array object (Module::Generic::Array) of file objects (Module::Generic::File)
     schema                  => { type => 'file-array', alias => [qw(s)], required => 1 },
     # base directory for file refs; this make this option value a Module::Generic::File object
@@ -70,6 +75,7 @@ my $dict =
     trace                   => { type => 'boolean', default => 0 },
     trace_limit             => { type => 'integer', default => 0 },
     trace_sample            => { type => 'integer', default => 0 },
+    unique_keys             => { type => 'boolean', default => 0 },
 
     # Generic options
     debug                   => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
@@ -214,18 +220,26 @@ sub validate
         _message( 5, "<green>schema_base</> is now set to <green>$opts->{schema_base}</>" );
     }
 
+     if( $opts->{extensions} )
+     {
+        $opts->{unique_keys} = $opts->{extensions};
+     }   
+
     # Build the validator from the FIRST schema (root)
     my %ctor =
     (
         compile                         => $opts->{compile} ? 1 : 0,
         content_assert                  => $opts->{content_checks} ? 1 : 0,
+        extensions                      => $opts->{extensions} ? 1 : 0,
         ignore_unknown_required_vocab   => $opts->{ignore_vocab} ? 1 : 0,
         max_errors                      => $opts->{max_errors},
         normalize_instance              => $opts->{normalize} ? 1 : 0,
         trace                           => $opts->{trace} ? 1 : 0,
         trace_limit                     => $opts->{trace_limit},
         trace_sample                    => $opts->{trace_sample},
+        unique_keys                     => $opts->{unique_keys} ? 1 : 0,
     );
+    local $JSON::Schema::Validate::DEBUG = $opts->{debug};
     my $js = JSON::Schema::Validate->new( $schemas[0], %ctor );
     # Register built-in formats if desired
     if( $opts->{register_formats} )
@@ -257,47 +271,92 @@ sub validate
     $js->set_resolver(sub
     {
         my( $abs_uri ) = @_;
+        my $orig_uri = $abs_uri;
 
-        # exact $id match among provided schemas
-        if( exists( $by_id{ $abs_uri } ) )
+        # Strip fragment for all decisions below
+        my( $doc_uri, $fragment ) = ( $abs_uri =~ /^([^#]+)(#.*)?$/ );
+        $doc_uri //= $abs_uri;
+        my $has_fragment = defined( $fragment ) && length( $fragment );
+
+        # First: exact $id match from any schema we were given on the command line
+        if( exists( $by_id{ $abs_uri } ) || exists( $by_id{ $doc_uri } ) )
         {
-            return( $by_id{ $abs_uri } );
+            my $schema = $by_id{ $abs_uri } // $by_id{ $doc_uri };
+            _message( 6, "Resolver: found pre-loaded schema for ", $by_id{ $abs_uri } ? $abs_uri : $doc_uri );
+            return( $schema );
         }
 
-        # file: URIs
-        if( $abs_uri =~ m{\Afile:(//)?(.+)\z} )
+        # Optional: allow relative/local file refs (very common and safe)
+        if( $opts->{allow_file_refs} && defined( $opts->{schema_base} ) )
         {
-            # Transform this into a Module::Generic::File
-            my $path = file( $2 );
-            return( $path->load_json );
-        }
-
-        # Bare relative paths occasionally appear if upstream forms wrong absolute;
-        # resolve against schema_base if set
-        if( defined( $opts->{schema_base} ) && $abs_uri !~ m{^[a-z][a-z0-9+.-]*:}i )
-        {
-            my $try = file( $abs_uri, base_dir => $opts->{schema_base} );
-            if( $try->exists )
+            # If it's not a proper scheme, treat as relative path
+            if( $doc_uri !~ /^[a-zA-Z][a-zA-Z0-9+.-]*:/ )
             {
-                return( $try->load_json );
+                my $path = file( $doc_uri, base_dir => $opts->{schema_base} );
+                if( $path->exists )
+                {
+                    _message( 6, "Resolver: loading local file $path for $doc_uri" );
+                    return( $path->load_json );
+                }
+            }
+            # Also support explicit file:// URIs
+            elsif( $doc_uri =~ m{^file://}i )
+            {
+                my $path = file( $doc_uri );
+                if( $path->exists )
+                {
+                    _message( 6, "Resolver: loading file:// URI $path" );
+                    return( $path->load_json );
+                }
             }
         }
 
-        # Optional HTTP(S)
-        if( $abs_uri =~ m{\Ahttps?://}i )
+        # Only if user explicitly asked for remote fetching
+        #    Can also be called as --allow_http. It is aliased to --remote_refs
+        if( $doc_uri =~ m{^https?://}i )
         {
-            my $doc = _fetch_http_json( $abs_uri, $json );
-            return( $doc ) if( defined( $doc ) );
+            # The specs say that, if there is a fragment, we should always fetch the remote document.
+            my $should_fetch = $has_fragment || $opts->{remote_refs};
+            if( $should_fetch )
+            {
+                _message( 5, "Resolver: fetching remote document $doc_uri (fragment=$has_fragment, remote-refs=", ( $opts->{remote_refs} // 0 ), ")" );
+                my $doc = _fetch_http_json( $doc_uri, $json );
+                return( $doc ) if( defined( $doc ) );
+            }
+            else
+            {
+                _message( 4, "Resolver: refusing to fetch remote $doc_uri (no fragment and --remote-refs not used)" );
+                return;
+            }
         }
 
-        $abs_uri = file( $abs_uri );
-        # Last resort: try as local path
-        if( $abs_uri->exists )
+        my $path = file( $doc_uri );
+        # 4. Last resort: maybe it's a bare filename without base?
+        if( $path->exists && $path->is_file )
         {
-            return( $abs_uri->load_json );
+            _message( 6, "Resolver: fallback loading bare path $path" );
+            return( $path->load_json );
         }
 
-        bailout( "Unable to resolve \$ref: $abs_uri" );
+        # Fail loudly with helpful message
+        bailout( <<EOF );
+    Cannot resolve \$ref "$orig_uri"
+
+    Document URI: $doc_uri
+    Fragment    : $fragment
+
+    This is probably a fictional/internal \$id (very common and correct!).
+
+    The validator will NOT auto-fetch such URIs by default (security + correctness).
+
+    This looks like a reference to a remote document with a JSON Pointer fragment.
+    Such references MUST be retrieved (per JSON Schema spec).
+
+    Solutions:
+      • Pass --remote-refs to allow HTTP(S) fetching
+      • Provide the referenced schema via additional --schema arguments
+      • Rewrite the schema to use relative references + --schema-base
+EOF
     });
 
     # Optional: capture $comment into trace (no-op handler by default)
@@ -369,8 +428,29 @@ sub validate
         }
     }
 
+    if( $opts->{emit_js} )
+    {
+        my $js_code = $js->compile_js( $opts->{ecma} ? ( ecma => $opts->{ecma} ) : () );
+        my $source = join( ', ', map{ $_->basename } @{$opts->{schema}} );
+        require DateTime;
+        my $now    = DateTime->now->iso8601;
+        $out->print( <<HEADER );
+// =============================================================================
+// JSON Schema Validator — Client-Side (Compiled from Perl)
+// =============================================================================
+// Schema   : $source
+// Generated: $now
+// Validator: JSON::Schema::Validate $JSON::Schema::Validate::VERSION (Perl)
+// Module   : $INC{'JSON/Schema/Validate.pm'}
+// Compiler : jsonvalidate --emit-js
+// =============================================================================
+
+HEADER
+        $out->print( $js_code );
+        return( $total_fail ? 0 : 1 );
+    }
     # Summary & exit code
-    if( !$opts->{quiet} && !$opts->{json} )
+    elsif( !$opts->{quiet} && !$opts->{json} )
     {
         $out->print( "Summary: OK=$total_ok  FAIL=$total_fail\n" );
     }
@@ -549,24 +629,29 @@ sub _run_one
     {
         if( $ok )
         {
-            if( !$opts->{quiet} && !$opts->{errors_only} )
+            if( !$opts->{quiet} && !$opts->{errors_only} && !$opts->{emit_js} )
             {
-                $out->print( "Record #$idx OK\n" );
+                $err->print( "Record #$idx OK\n" );
             }
         }
         else
         {
             $$fail_ref++;
-            my $err = $js->error;
+            my $errs = $js->errors;
             if( !$opts->{quiet} )
             {
-                $out->print( "Record #$idx FAILED\n" );
-                $out->printf( "  %s: %s\n", $err->path, $err->message );
+                $err->print( "Record #$idx FAILED\n" );
+                # $out->printf( "  %s: %s\n", $err->path, $err->message );
                 # Maybe, we should display the full list?
                 # for my $e ( @{$js->errors || []} )
                 # {
                 #     $out->printf( "  - %s: %s\n", $e->path, $e->message );
                 # }
+                for my $error ( @$errs )
+                {
+                    # If $err is a JSON::Schema::Validate::Error object, this calls as_string()
+                    $err->print( "  $error\n" );
+                }
             }
         }
     }
@@ -655,6 +740,18 @@ Emit JSON objects (one per instance) with C<{ index, ok, errors[] }>.
 
 =over 4
 
+=item B<--allow-file-refs>
+
+Enabled by default.
+
+When enabled, perform resolution of relative or file:// references.
+
+=item B<--allow-http>
+
+Disabled by default.
+
+This is an alias for B<--remote-refs>
+
 =item B<--compile> / B<--no-compile>
 
 Enable compiled fast-path for repeated validation.
@@ -663,9 +760,38 @@ Enable compiled fast-path for repeated validation.
 
 Enable C<contentEncoding>, C<contentMediaType>, C<contentSchema>. Registers a basic C<application/json> validator/decoder.
 
+=item B<--extensions>
+
+Enables non-standard extensions. Right now this includes C<uniqueKeys>
+
+=item B<--ignore-unknown-required-vocab>
+
+Ignore unknown vocabularies listed in schema C<C<'$vocabulary'>> I<required>.
+
 =item B<--register-formats>
 
 Register built-in C<format> validators (date, email, hostname, ip, uri, uuid, JSON Pointer, regex, etc.).
+
+=item B<--max-errors N>
+
+Maximum recorded errors per validation (default 200).
+
+=item B<--normalize> / B<--no-normalize>
+
+Round-trip instances through L<JSON> to enforce strict JSON typing (default on).
+
+=item B<--remote-refs>
+
+Allow fetching of http:// and https:// $ref URIs.
+
+By default this is OFF — fictional $id values like
+"https://schemas.example.com/..." will NOT be fetched.
+
+This is the modern, safe default (prevents SSRF, accidental traffic).
+
+=item B<--schema-base DIR>
+
+A base directory to resolve relative file C<$ref> (defaults to the directory of the first C<--schema>).
 
 =item B<--trace>
 
@@ -679,21 +805,9 @@ Max number of trace entries per validation (0 = unlimited).
 
 Sampling percentage for trace events.
 
-=item B<--max-errors N>
+=item B<--unique-keys> / B<--no-unique-keys>
 
-Maximum recorded errors per validation (default 200).
-
-=item B<--normalize> / B<--no-normalize>
-
-Round-trip instances through L<JSON> to enforce strict JSON typing (default on).
-
-=item B<--ignore-unknown-required-vocab>
-
-Ignore unknown vocabularies listed in schema C<C<'$vocabulary'>> I<required>.
-
-=item B<--schema-base DIR>
-
-A base directory to resolve relative file C<$ref> (defaults to the directory of the first C<--schema>).
+Enables the non-standard extension C<uniqueKeys>
 
 =back
 

@@ -22,13 +22,19 @@ WebGPU::Direct::ShaderModule
 
 =over
 
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Future|WebGPU::Direct::Types/WebGPU::Direct::Future>
+
+=back
+
 =item * Arguments
 
 =over
 
-=item * callback (WebGPU::Direct::CompilationInfoCallback (Code reference))
-
-=item * userdata (Scalar (void *))
+=item * callbackInfo (L<WebGPU::Direct::CompilationInfoCallbackInfo|WebGPU::Direct::Types/WebGPU::Direct::CompilationInfoCallbackInfo>)
 
 =back
 
@@ -42,13 +48,13 @@ WebGPU::Direct::ShaderModule
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

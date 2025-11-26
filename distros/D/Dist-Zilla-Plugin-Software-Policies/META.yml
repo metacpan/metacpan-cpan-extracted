@@ -1,0 +1,60 @@
+---
+abstract: 'Manage project policy files: CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md, etc.'
+author:
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
+build_requires:
+  File::Find: '0'
+  File::Spec: '0'
+  FindBin: '1.51'
+  Test2::V0: '0'
+  Test::Script: '1.26'
+  lib: '0'
+  perl: '5.013002'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.013002'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - dist
+  - zilla
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Software-Policies
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Data::Section: '0.004'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Pragmas: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  English: '0'
+  List::Util: '0'
+  Module::Load: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Tiny: '0'
+  Software::Policies: '0'
+  Sub::Exporter::ForMethods: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: '5.013002'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Software-Policies
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Software-Policies
+  repository: git://github.com/mikkoi/dist-zilla-plugin-software-policies.git
+version: '0.001'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

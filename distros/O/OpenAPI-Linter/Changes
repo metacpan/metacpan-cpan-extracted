@@ -1,5 +1,10 @@
 Revision history for OpenAPI::Linter
 
+0.14  2025-11-26
+      - Proposed patch for issue #2, #3:
+        path not recognized as a valid value for in.
+        true not recognized as a valid value for required.
+
 0.13  2025-11-25
       - Error now have line and column number. (issue #4)
 

@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/App/jsonvalidate.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/10
-## Modified 2025/11/10
+## Modified 2025/11/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -14,7 +15,7 @@ package App::jsonvalidate;
 use strict;
 use warnings;
 use vars qw( $VERSION );
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 sub init
 {
@@ -40,7 +41,7 @@ Run C<jsonvalidate -h> or C<perldoc jsonvalidate> for more options.
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

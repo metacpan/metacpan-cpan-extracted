@@ -27,9 +27,9 @@ package WebGPU::Direct::Device
         $descriptor = WebGPU::Direct->ShaderModuleDescriptor->new(
           {
             label       => $label,
-            nextInChain => WebGPU::Direct->ShaderModuleWGSLDescriptor->new(
+            nextInChain => WebGPU::Direct->ShaderSourceWGSL->new(
               {
-                sType => $stype->shaderModuleWGSLDescriptor,
+                sType => $stype->shaderSourceWGSL,
                 code  => $code,
               }
             ),
@@ -187,15 +187,21 @@ WebGPU::Direct::Device
 
 =over
 
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Future|WebGPU::Direct::Types/WebGPU::Direct::Future>
+
+=back
+
 =item * Arguments
 
 =over
 
 =item * descriptor (L<WebGPU::Direct::ComputePipelineDescriptor|WebGPU::Direct::Types/WebGPU::Direct::ComputePipelineDescriptor>)
 
-=item * callback (WebGPU::Direct::CreateComputePipelineAsyncCallback (Code reference))
-
-=item * userdata (Scalar (void *))
+=item * callbackInfo (L<WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo|WebGPU::Direct::Types/WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo>)
 
 =back
 
@@ -293,15 +299,21 @@ WebGPU::Direct::Device
 
 =over
 
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Future|WebGPU::Direct::Types/WebGPU::Direct::Future>
+
+=back
+
 =item * Arguments
 
 =over
 
 =item * descriptor (L<WebGPU::Direct::RenderPipelineDescriptor|WebGPU::Direct::Types/WebGPU::Direct::RenderPipelineDescriptor>)
 
-=item * callback (WebGPU::Direct::CreateRenderPipelineAsyncCallback (Code reference))
-
-=item * userdata (Scalar (void *))
+=item * callbackInfo (L<WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo|WebGPU::Direct::Types/WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo>)
 
 =back
 
@@ -375,7 +387,7 @@ WebGPU::Direct::Device
 
 =head3 destroy
 
-=head3 enumerateFeatures
+=head3 getAdapterInfo
 
 =over
 
@@ -383,15 +395,21 @@ WebGPU::Direct::Device
 
 =over
 
-=item * Integer (size_t)
+=item * L<WebGPU::Direct::AdapterInfo|WebGPU::Direct::Types/WebGPU::Direct::AdapterInfo>
 
 =back
+
+=back
+
+=head3 getFeatures
+
+=over
 
 =item * Arguments
 
 =over
 
-=item * features (L<WebGPU::Direct::FeatureName|WebGPU::Direct::Constants/WebGPU::Direct::FeatureName>)
+=item * features (L<WebGPU::Direct::SupportedFeatures|WebGPU::Direct::Types/WebGPU::Direct::SupportedFeatures>)
 
 =back
 
@@ -405,7 +423,7 @@ WebGPU::Direct::Device
 
 =over
 
-=item * Boolean (WGPUBool)
+=item * L<WebGPU::Direct::Status|WebGPU::Direct::Constants/WebGPU::Direct::Status>
 
 =back
 
@@ -413,7 +431,21 @@ WebGPU::Direct::Device
 
 =over
 
-=item * limits (L<WebGPU::Direct::SupportedLimits|WebGPU::Direct::Types/WebGPU::Direct::SupportedLimits>)
+=item * limits (L<WebGPU::Direct::Limits|WebGPU::Direct::Types/WebGPU::Direct::Limits>)
+
+=back
+
+=back
+
+=head3 getLostFuture
+
+=over
+
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Future|WebGPU::Direct::Types/WebGPU::Direct::Future>
 
 =back
 
@@ -459,13 +491,19 @@ WebGPU::Direct::Device
 
 =over
 
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Future|WebGPU::Direct::Types/WebGPU::Direct::Future>
+
+=back
+
 =item * Arguments
 
 =over
 
-=item * callback (WebGPU::Direct::ErrorCallback (Code reference))
-
-=item * userdata (Scalar (void *))
+=item * callbackInfo (L<WebGPU::Direct::PopErrorScopeCallbackInfo|WebGPU::Direct::Types/WebGPU::Direct::PopErrorScopeCallbackInfo>)
 
 =back
 
@@ -493,29 +531,13 @@ WebGPU::Direct::Device
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
 =back
 
-=head3 setUncapturedErrorCallback
-
-=over
-
-=item * Arguments
-
-=over
-
-=item * callback (WebGPU::Direct::ErrorCallback (Code reference))
-
-=item * userdata (Scalar (void *))
-
-=back
-
-=back
-
-=head3 reference
+=head3 addRef
 
 =head3 release
 

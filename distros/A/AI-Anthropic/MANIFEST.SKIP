@@ -1,0 +1,30 @@
+# Git
+\.git/
+\.gitignore
+
+# Build artifacts
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^blib/
+^pm_to_blib$
+\.o$
+\.bs$
+
+# Editor files
+~$
+\.swp$
+\.bak$
+\.orig$
+
+# OS files
+\.DS_Store$
+Thumbs\.db$
+
+# IDE
+\.vscode/
+\.idea/
+
+# Test/dev files
+^\.prove$
+^cover_db/

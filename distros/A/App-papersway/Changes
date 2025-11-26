@@ -1,5 +1,12 @@
 Revision history for App::papersway
 
+2.003     2025-11-25 11:08:01+00:00 Europe/London
+    - New 'bury-column' command.
+    - Fix 'workspace back_and_forth' after burying.
+    - Fix some cases in which we can lose track of a workspace.
+      These occurred when leaving the workspace empty after moving away its
+      only visible, but non-wide column.
+
 2.002     2025-08-10 11:49:26+01:00 Europe/London
     - Visually distinguish wide and non-wide windows in the status display.
     - When resizing after floating, use pixel widths.

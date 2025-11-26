@@ -1,9 +1,11 @@
+<script type="text/javascript"><!--
+jQuery(function() {
+%   my $request_path = $HTML::Mason::Commands::r->path_info;
+%   my $ajax_url  = $request_path !~ /SelfService\/Display\.html/ ? '/Helpers/GetCustomFieldValues' : '/SelfService/GetCustomFieldValues';
 %   my $condition = $CustomField->ConditionedBy;
 %   if ($condition) {
 %       my $condition_val = $condition->{vals} || '';
 %       my @condition_vals = ref($condition_val) eq 'ARRAY' ? @$condition_val : ($condition_val);
-<script type="text/javascript">
-jQuery(function() {
 %       my $condition_cf = $Object->LoadCustomFieldByIdentifier($condition->{CF});
 %       if ($condition_cf->id) {
 %           if ($ParentSelector eq 'id') {
@@ -13,16 +15,20 @@ jQuery(function() {
     var condition_selector = '<% '.record-field.CustomField__' . $condition_cf->Name . '_' |n%>';
     var cf_selector = '<% '.record-field.CustomField__' . $CustomField->Name . '_' |n%>';
 %           }
-%           my $cf_condition_vals_str = $Object->CustomFieldValuesAsString($condition_cf->id);
-%           my @cf_condition_vals = split(/\n/, $cf_condition_vals_str);
-%           if ($condition_cf->Type eq 'DateTime') {
-%               @cf_condition_vals = map { my $DateObj = RT::Date->new($session{'CurrentUser'}); $DateObj->Set(Format => 'ISO', Value => $_); $DateObj->ISO(Time => 1, Timezone => 'user'); } @cf_condition_vals;
-%           } elsif ($condition_cf->Type eq 'IPAddress') {
-%               @cf_condition_vals = map { RT::ObjectCustomFieldValue->ParseIP($_) } @cf_condition_vals;
-%           }
     cf_selector = cf_selector.replace(/:/g,'\\:');
     var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
-    var cf_condition_vals = ["<% join('", "', @cf_condition_vals) |n%>"];
+    var cf_condition_vals;
+    jQuery.ajax({
+        dataType: "json",
+        url: '<% $ajax_url %>',
+        async: false,
+        data:  {ObjectType: '<% ref($Object) %>', ObjectId: <% $Object->id %>, CustomFieldId: <% $condition_cf->id %>},
+        success: function(res) {
+            if (res) {
+                cf_condition_vals = res.split("\n");
+            }
+        }
+    });
     var condition_met = false;
 %           if (scalar(grep {$_ eq $condition_cf->id} map {$_->id} @{$Object->CustomFields->ItemsArrayRef})) {
     if (jQuery(condition_selector).is(':visible')) {
@@ -38,12 +44,84 @@ jQuery(function() {
     else {
         jQuery(cf_selector).hide();
     }
+
+    var condition_event = '<% 'customField-' . $condition_cf->id . 'Changed' |n%>';
+%           if ((ref($Object) eq 'RT::Ticket' && $request_path !~ /SelfService\/Display\.html/) || ref($Object) eq 'RT::Asset') {
+
+    document.body.addEventListener('htmx:load', function(evt) {
+        var cf_container = jQuery(evt.detail.elt).parent('div.show-custom-fields-container');
+        if (cf_container.length) {
+            var condition_event_re = new RegExp(condition_event);
+            if (condition_event_re.test(cf_container.attr('hx-trigger'))) {
+                if (condition_met) {
+                    jQuery(cf_selector).show();
+                }
+                else {
+                    jQuery(cf_selector).hide();
+                }
+            }
+        }
+    }, { once: true });
+
+    jQuery(body).on(condition_event, function(e, show = true) {
+        var cf_condition_vals;
+        jQuery.ajax({
+            dataType: "json",
+            url: '<% $ajax_url %>',
+            async: false,
+            data:  {ObjectId: <% $Object->id %>, CustomFieldId: <% $condition_cf->id %>},
+            success: function(res) {
+                if (res) {
+                    cf_condition_vals = res.split("\n");
+                }
+            }
+        });
+        var condition_met = false;
+%               if (scalar(grep {$_ eq $condition_cf->id} map {$_->id} @{$Object->CustomFields->ItemsArrayRef})) {
+        if (show) {
+            condition_met = condition_is_met(condition_vals, cf_condition_vals, "<% $condition->{op} |n%>", '<% $session{CurrentUser}->LanguageHandle->language_tag %>');
+        }
+%               } else {
+        condition_met = true;
+%               }
+
+        if (condition_met) {
+            jQuery(cf_selector).show();
+        }
+        else {
+            jQuery(cf_selector).hide();
+        }
+        var cf_event = '<% 'customField-' . $CustomField->id . 'Changed' |n%>';
+        jQuery(body).triggerHandler(cf_event, condition_met);
+    });
+%           } elsif ((ref($Object) eq 'RT::Ticket' && $request_path =~ /SelfService\/Display\.html/) || ref($Object) eq 'RT::Article') {
+    var main_container_event = 'mainContainerChanged';
+
+    document.body.addEventListener('htmx:load', function(evt) {
+        var main_container = jQuery(evt.detail.elt).children('div').first();
+        if (main_container.length) {
+            var main_container_event_re = new RegExp(main_container_event);
+            if (main_container_event_re.test(main_container.attr('hx-trigger'))) {
+            if (!jQuery(condition_selector).is(':visible')) {
+                condition_met = false;
+            }
+                if (condition_met) {
+                    jQuery(cf_selector).show();
+                }
+                else {
+                    jQuery(cf_selector).hide();
+                }
+            }
+        }
+    }, { once: true });
+%           }
 %       }
-});
-</script>
 %   }
+});
+--></script>
 <%ARGS>
 $CustomField
 $Object
+$Grouping => undef
 $ParentSelector => 'id'
 </%ARGS>

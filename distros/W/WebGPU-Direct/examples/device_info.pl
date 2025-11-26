@@ -16,17 +16,18 @@ my $gpuContext = $wgpu->createSurface(
   }
 );
 
-my $adapter = $wgpu->requestAdapter({ compatibleSurface => $gpuContext });
+my $adapter = $wgpu->createAdapter( { compatibleSurface => $gpuContext } );
 
-my $limits = $wgpu->SupportedLimits->new;
-if ( $adapter->getLimits($limits) )
+local $Data::Dumper::Sortkeys = 1;
+
+warn Data::Dumper::Dumper( $adapter->getFeatures );
+
+if ( my $limits = $adapter->getLimits )
 {
   warn Data::Dumper::Dumper($limits);
 }
 
-my $features = $adapter->enumerateFeatures;
-warn Data::Dumper::Dumper($features);
-
-my $properties = WebGPU::Direct::AdapterProperties->new;
-$adapter->getProperties($properties);
-warn Data::Dumper::Dumper($properties);
+if ( my $info = $adapter->getInfo )
+{
+  warn Data::Dumper::Dumper($info);
+}

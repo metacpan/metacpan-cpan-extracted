@@ -16,18 +16,33 @@ WriteMakefile(
     AUTHOR       => 'Nigel Horne <njh@nigelhorne.com>',
     LICENSE      => 'GPL',
 	EXE_FILES => [ 'bin/date-age' ],
-    PREREQ_PM    => {
+    PREREQ_PM => {
 	'Time::Local' => 0
 	}, TEST_REQUIRES => {
+		'IPC::Run3' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Date-Age-*' },
-	META_MERGE => {
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+		'meta-spec' => { version => 2 },
 		resources => {
-			repository => 'https://github.com/nigelhorne/Date-Age',
-			bugtracker => 'https://github.com/nigelhorne/Date-Age/issues',
+			homepage => 'https://metacpan.org/pod/Date::Age',
+			repository => {
+				repository => 'https://github.com/nigelhorne/Date-Age',
+				type => 'git',
+				url => 'git://github.com/nigelhorne/Date-Age.git',
+				web => 'https://github.com/nigelhorne/Date-Age',
+				# license => 'http://dev.perl.org/licenses/',
+			}, bugtracker => {
+				mailto => 'bug-Date-Age@rt.cpan.org',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Age',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Age',
+				# url => 'https://github.com/nigelhorne/Date-Age/issues',
+				# web => 'https://github.com/nigelhorne/Date-Age/issues'
+			}
 		},
-	}
+	},
+	MIN_PERL_VERSION	=> '5.010'
 );

@@ -1,0 +1,9 @@
+Revision history for Perl extension AI::Anthropic
+
+0.01  2025-11-25
+    - Initial release
+    - Messages API support
+    - Streaming support
+    - Vision (image) support
+    - Tool use (function calling) support
+    - Support for all Claude models

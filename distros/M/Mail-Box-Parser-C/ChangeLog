@@ -5,7 +5,20 @@
 #!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
 #!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
 
-version 3.012:
+version 3.013: Wed 26 Nov 09:47:06 CET 2025
+
+	Fixes:
+	- dependency on Mail::Message 3, not 4.
+	  github issue #1 [Slaven Rezić] cpantesters
+	- doesn't export anything
+	- missing methods after Mail::Message 3.018
+	  github Mail::Message issue #25 [Slaven Rezić] cpantesters
+	  github issue #2
+
+	Improvements:
+	- introduce attribute boxnr
+
+version 3.012: Mon 24 Nov 19:15:06 CET 2025
 
 	Changes:
 	- MailBox mid-life  upgrade: require Perl minimal version 5.016.

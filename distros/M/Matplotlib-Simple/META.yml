@@ -17,6 +17,7 @@ requires:
   Data::Printer: '0'
   Devel::Confess: '0'
   Devel::Size: '0'
+  File::Path: '0'
   Term::ANSIColor: '0'
   Test::More: '0'
   perl: '5.010'
@@ -24,7 +25,7 @@ resources:
   bugtracker: https://github.com/hhg7/MatPlotLib-Simple/issues
   homepage: https://metacpan.org/dist/Matplotlib-Simple
   repository: git://github.com/hhg7/MatPlotLib-Simple
-version: '0.09'
+version: '0.11'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

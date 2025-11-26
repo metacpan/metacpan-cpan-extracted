@@ -1,5 +1,11 @@
 Revision history for Perl module App::jsonvalidate
 
+v0.2.0 2025-11-25T21:16:53+0900
+    - Improvement in behaviour for remote references
+    - Added support for non-standard extension 'uniqueKeys'
+    - Added option --emit-js to product compiled js code suitable to be used in an HTML
+      page for pre-flight check
+    - Added support for the --ecma option to output ECMA 5/6 or automatic output
+
 v0.1.0 2025-11-10T16:17:45+0900
 	- Initial version
-

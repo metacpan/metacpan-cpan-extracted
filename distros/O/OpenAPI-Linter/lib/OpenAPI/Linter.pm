@@ -1,6 +1,6 @@
 package OpenAPI::Linter;
 
-$OpenAPI::Linter::VERSION   = '0.13';
+$OpenAPI::Linter::VERSION   = '0.14';
 $OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ OpenAPI::Linter - Validate and lint OpenAPI specifications
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =head1 SYNOPSIS
 
@@ -102,19 +102,26 @@ sub new {
             };
 
             if ($yaml_pp_available) {
-                my $yamlpp = YAML::PP->new( preserve => 1 );
-                $spec = $yamlpp->load_file($file_path);
-                $locations = _extract_yaml_locations($spec, $file_path);
+                # First: Load with preserve mode ONLY for location tracking
+                my $yamlpp_preserve = YAML::PP->new( preserve => 1 );
+                my $spec_preserved = $yamlpp_preserve->load_file($file_path);
+                $locations = _extract_yaml_locations($spec_preserved, $file_path);
+
+                # Second: Load again WITHOUT preserve mode for clean validation data
+                my $yamlpp_clean = YAML::PP->new();
+                $spec = $yamlpp_clean->load_file($file_path);
 
                 # Ensure we always have a base location
                 $locations->{base} = OpenAPI::Linter::Location->new($file_path, 1, 1)
                     unless exists $locations->{base};
-            } else {
+            }
+            else {
                 # Fall back to YAML::XS
                 $spec = LoadFile($file_path);
                 $locations = { base => OpenAPI::Linter::Location->new($file_path, 1, 1) };
             }
-        } else {
+        }
+        else {
             $spec = decode_json(read_file($file_path));
             # JSON doesn't easily give us line numbers, but we can approximate
             $locations = { base => OpenAPI::Linter::Location->new($file_path, 1, 1) };
@@ -371,7 +378,50 @@ sub validate_schema {
     # Apply the fix before validation
     _apply_json_validator_fix();
 
+    # Only coerce booleans to handle true/false properly
+    # Do NOT coerce numbers or strings as that would hide legitimate type errors
+    $validator->coerce('booleans');
+
     my @raw_errors = $validator->schema($schema_url)->validate($self->{spec});
+
+    # JSON::Validator returns 0 (a plain scalar) for success
+    # Error objects are blessed references
+    # Only filter out if we have a single non-reference item
+    if (@raw_errors == 1 && !ref($raw_errors[0])) {
+        # It's a scalar success indicator, not an error object
+        @raw_errors = ();
+    }
+
+    @raw_errors = grep {
+        my $keep = 1;  # Default to keeping the error
+        my $error_str;
+        eval {
+            $error_str = ref $_ ? ($_->can('to_string') ? $_->to_string : "$_") : "$_";
+        };
+        if ($@) {
+            $keep = 1;  # Keep errors we can't stringify
+        }
+        else {
+            # Skip errors about 'path' not being in enum for parameter 'in' field
+            # as 'path' is a valid value per OpenAPI 3.0 spec
+            # These errors appear as "/in: ... Not in enum list: query/header/cookie"
+            # when the actual value is 'path' which is missing from the enum
+            if ($error_str =~ m{/in:.*Not in enum list}i) {
+                $keep = 0;
+            }
+            # Skip errors about boolean true not being in enum for 'required' field
+            # as true is a valid boolean value per OpenAPI 3.0 spec
+            elsif ($error_str =~ m{/required:.*Not in enum list}i && $error_str =~ m{true}i) {
+                $keep = 0;
+            }
+            # Skip errors about missing $ref when the object is properly defined
+            elsif ($error_str =~ m{/parameters/.*\$ref:.*Missing property}i) {
+                $keep = 0;
+            }
+        }
+
+        $keep;  # Return the decision
+    } @raw_errors;
 
     # Convert to consistent hashref format with location information
     my @issues = map {

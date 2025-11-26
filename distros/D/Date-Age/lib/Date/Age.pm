@@ -1,7 +1,11 @@
 package Date::Age;
 
+use 5.010;
+
 use strict;
 use warnings;
+
+use Carp qw(carp croak);
 use Exporter 'import';
 use Time::Local qw(timelocal);
 
@@ -13,17 +17,17 @@ Date::Age - Return an age or age range from date(s)
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
   use Date::Age qw(describe details);
 
-  say describe('1943', '2016-01-01');    # '72-73'
+  print describe('1943', '2016-01-01'), "\n";    # '72-73'
 
   my $data = details('1943-05-01', '2016-01-01');
   # { min_age => 72, max_age => 72, range => '72', precise => 72 }
@@ -37,12 +41,24 @@ It works even with partial dates.
 =cut
 
 sub describe {
+	if($_[0] eq __PACKAGE__) {
+		shift;
+	}
+
+	croak('Usage: ', __PACKAGE__, '::describe($dob, $ref)') if(scalar(@_) == 0);
+
 	my ($dob, $ref) = @_;
 	my $info = details($dob, $ref);
 	return $info->{range};
 }
 
 sub details {
+	if($_[0] eq __PACKAGE__) {
+		shift;
+	}
+
+	croak('Usage: ', __PACKAGE__, '::details($dob, $ref)') if(scalar(@_) == 0);
+
 	my ($dob, $ref) = @_;
 
 	my ($dob_early, $dob_late) = _parse_date_range($dob);
@@ -63,7 +79,8 @@ sub details {
 }
 
 sub _now_string {
-	return localtime->ymd();
+	my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime();
+	return sprintf('%04d-%02d-%02d', $year + 1900, $mon + 1, $mday);
 }
 
 sub _calc_age_localtime {
@@ -146,6 +163,14 @@ sub _is_leap {
 1;
 
 __END__
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/Date-Age/coverage/>
+
+=back
 
 =head1 REPOSITORY
 

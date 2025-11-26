@@ -32,11 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Time::Local" : "0"
+            "Time::Local" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "IPC::Run3" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0"
@@ -46,12 +48,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/nigelhorne/Date-Age/issues"
+         "mailto" : "bug-Date-Age@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Age",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Age"
       },
+      "homepage" : "https://metacpan.org/pod/Date::Age",
       "repository" : {
-         "url" : "https://github.com/nigelhorne/Date-Age"
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Date-Age.git",
+         "web" : "https://github.com/nigelhorne/Date-Age",
+         "x_repository" : "https://github.com/nigelhorne/Date-Age"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -223,7 +223,7 @@ WebGPU::Direct::Texture
 
 =over
 
-=item * L<WGPUTextureUsageFlags|WebGPU::Direct::Constants/WebGPU::Direct::TextureUsage>
+=item * L<WebGPU::Direct::TextureUsage|WebGPU::Direct::Constants/WebGPU::Direct::TextureUsage>
 
 =back
 
@@ -251,13 +251,13 @@ WebGPU::Direct::Texture
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

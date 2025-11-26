@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-Parser-C version 3.012.
+# This code is part of Perl distribution Mail-Box-Parser-C version 3.013.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -9,31 +9,22 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 
+#XXX WARNING: large overlap with Mail::Box::Parser:Perl; you may need to change both!
+
 package Mail::Box::Parser::C;{
-our $VERSION = '3.012';
+our $VERSION = '3.013';
 }
 
-use base qw/Mail::Box::Parser Exporter DynaLoader/;
+use base qw/Mail::Box::Parser DynaLoader/;
 
-our $VERSION = '3.012';
+our $VERSION = '3.013';
 
 use strict;
 use warnings;
 
-use Carp;
-
-#--------------------
-
 use Mail::Message::Field ();
 
-our %EXPORT_TAGS = (
-	field => [ qw( ) ],
-	head  => [ qw( ) ],
-	body  => [ qw( ) ],
-);
-
-
-our @EXPORT_OK = @{$EXPORT_TAGS{field}};
+#--------------------
 
 bootstrap Mail::Box::Parser::C $VERSION;
 
@@ -61,55 +52,121 @@ sub body_delayed($$$);
 
 #--------------------
 
-sub pushSeparator($)
-{	my ($self, $sep) = @_;
-	push_separator $self->{MBPC_boxnr}, $sep;
-}
+sub init(@)
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args) or return;
 
-sub popSeparator() { pop_separator shift->{MBPC_boxnr} }
+	$self->{MBPC_mode}     = $args->{mode} || 'r';
+	$self->{MBPC_filename} = $args->{filename} || ref $args->{file}
+		or $self->log(ERROR => "Filename or handle required to create a parser."), return;
 
-sub filePosition(;$)
-{	my $boxnr = shift->{MBPC_boxnr};
-	@_ ? set_position($boxnr, shift) : get_position($boxnr);
-}
-
-sub readHeader() { read_header shift->{MBPC_boxnr} }
-
-sub readSeparator() { read_separator shift->{MBPC_boxnr} }
-
-sub bodyAsString(;$$)
-{	my ($self, $exp_chars, $exp_lines) = @_;
-	body_as_string $self->{MBPC_boxnr}, $exp_chars // -1, $exp_lines // -1;
-}
-
-sub bodyAsList(;$$)
-{	my ($self, $exp_chars, $exp_lines) = @_;
-	body_as_list $self->{MBPC_boxnr}, $exp_chars // -1, $exp_lines // -1;
-}
-
-sub bodyAsFile($;$$)
-{	my ($self, $file, $exp_chars, $exp_lines) = @_;
-	body_as_file $self->{MBPC_boxnr}, $file, $exp_chars // -1, $exp_lines // -1;
+	$self->start(file => $args->{file});
+	$self;
 }
 
 #--------------------
 
-sub bodyDelayed(;$$)
-{	my ($self, $exp_chars, $exp_lines) = @_;
-	body_delayed $self->{MBPC_boxnr}, $exp_chars // -1, $exp_lines // -1;
+sub boxnr() { $_[0]->{MBPC_boxnr} }
+
+
+sub filename() { $_[0]->{MBPC_filename} }
+sub openMode() { $_[0]->{MBPC_mode} }
+sub file()     { $_[0]->{MBPC_file} }
+
+#--------------------
+
+sub start(@)
+{	my ($self, %args) = @_;
+	$self->openFile(%args) or return;
+	$self->takeFileInfo;
+
+	$self->log(PROGRESS => "Opened folder ".$self->filename." to be parsed");
+	$self;
 }
 
-sub openFile($)
-{	my ($self, $args) = @_;
+
+sub stop()
+{	my $self = shift;
+	$self->log(NOTICE => "Close parser for file ".$self->filename);
+	$self->closeFile;
+}
+
+
+sub restart()
+{	my $self     = shift;
+	$self->closeFile;
+	$self->openFile(@_) or return;
+	$self->takeFileInfo;
+	$self->log(NOTICE => "Restarted parser for file ".$self->filename);
+	$self;
+}
+
+
+sub fileChanged()
+{	my $self = shift;
+	my ($size, $mtime) = (stat $self->filename)[7,9];
+	return 0 if !defined $size || !defined $mtime;
+	$size != $self->{MBPC_size} || $mtime != $self->{MBPC_mtime};
+}
+
+
+sub filePosition(;$)
+{	my $boxnr = shift->boxnr;
+	@_ ? set_position($boxnr, shift) : get_position($boxnr);
+}
+
+
+sub takeFileInfo()
+{	my $self = shift;
+	@$self{ qw/MBPC_size MBPC_mtime/ } = (stat $self->filename)[7,9];
+}
+
+
+sub pushSeparator($)
+{	my ($self, $sep) = @_;
+	push_separator $self->boxnr, $sep;
+}
+
+sub popSeparator()  { pop_separator $_[0]->boxnr }
+
+sub readHeader()    { read_header $_[0]->boxnr }
+
+sub readSeparator() { read_separator $_[0]->boxnr }
+
+sub bodyAsString(;$$)
+{	my ($self, $exp_chars, $exp_lines) = @_;
+	body_as_string $self->boxnr, $exp_chars // -1, $exp_lines // -1;
+}
+
+sub bodyAsList(;$$)
+{	my ($self, $exp_chars, $exp_lines) = @_;
+	body_as_list $self->boxnr, $exp_chars // -1, $exp_lines // -1;
+}
+
+sub bodyAsFile($;$$)
+{	my ($self, $file, $exp_chars, $exp_lines) = @_;
+	body_as_file $self->boxnr, $file, $exp_chars // -1, $exp_lines // -1;
+}
+
+sub bodyDelayed(;$$)
+{	my ($self, $exp_chars, $exp_lines) = @_;
+	body_delayed $self->boxnr, $exp_chars // -1, $exp_lines // -1;
+}
+
+
+sub openFile(%)
+{	my ($self, %args) = @_;
 	my %log = $self->logSettings;
 
 	my $boxnr;
-	if(my $file = $args->{file})
-	{	my $name = $args->{filename} || "$file";
-		$boxnr   = open_filehandle($file, $name, $log{trace});
+	my $name = $args{filename} || $self->filename;
+
+	if(my $file = $args{file})
+	{	$boxnr   = open_filehandle($file, $name // "$file", $log{trace});
 	}
 	else
-	{	$boxnr   = open_filename($args->{filename}, $args->{mode}, $log{trace});
+	{	my $mode = $args{mode} || $self->openMode || 'r';
+		$boxnr   = open_filename($name, $mode, $log{trace});
 	}
 
 	$self->{MBPC_boxnr} = $boxnr;

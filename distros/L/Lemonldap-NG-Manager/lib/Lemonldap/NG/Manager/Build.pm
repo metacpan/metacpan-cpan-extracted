@@ -287,7 +287,7 @@ $defaultAttr}
         $ra->add($_);
     }
     foreach ( qw(
-        exportedHeaders locationRules post vhostOptions
+        exportedHeaders locationRules post vhostOptions keys
         samlIDPMetaDataXML samlIDPMetaDataExportedAttributes
         samlIDPMetaDataURL samlSPMetaDataURL
         samlIDPMetaDataOptions samlSPMetaDataXML

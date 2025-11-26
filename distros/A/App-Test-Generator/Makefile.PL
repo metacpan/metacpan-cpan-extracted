@@ -17,7 +17,7 @@ WriteMakefile(
 	ABSTRACT_FROM => 'lib/App/Test/Generator.pm',
 	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
 	LICENSE => 'GPL',
-	EXE_FILES => ['bin/fuzz-harness-generator'],
+	EXE_FILES => ['bin/fuzz-harness-generator', 'bin/extract-schemas'],
 	MIN_PERL_VERSION => '5.014',
 	PREREQ_PM => {
 		'autodie' => 0,
@@ -30,6 +30,8 @@ WriteMakefile(
 		'Module::Load::Conditional' => 0,
 		'Params::Get' => 0.13,
 		'Params::Validate::Strict' => 0.23,
+		'PPI' => 0,
+		'Pod::Simple' => 0,
 		'Pod::Usage' => 0,
 		'Return::Set' => 0.03,
 		'Template' => 0,

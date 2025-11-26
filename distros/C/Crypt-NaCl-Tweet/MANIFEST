@@ -1,0 +1,23 @@
+Changes
+CONTRIBUTING.md
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+SECURITY.md
+Tweet.xs
+Makefile.PL
+lib/Crypt/NaCl/Tweet.pm
+ppport.h
+t/box.t
+t/hash.t
+t/onetimeauth.t
+t/scalarmult.t
+t/secretbox.t
+t/sign.t
+t/stream.t
+t/verify.t
+tweetnacl.c
+tweetnacl.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

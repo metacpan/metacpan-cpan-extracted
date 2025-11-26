@@ -14,7 +14,7 @@ ok($rv, "Inserted test data from $initialdata: $msg");
 my $attributes = RT::Attributes->new(RT->SystemUser);
 $attributes->Limit(FIELD => 'Name', VALUE => 'ConditionedBy');
 is($attributes->Count, 3, 'All attributes created');
-my $first_attribute_id = RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0 ? 7 : RT::Handle::cmp_version($RT::VERSION, '5.0.2') < 0 ? 8 : 11;
+my $first_attribute_id = 7;
 while (my $attribute = $attributes->Next) {
     if ($attribute->id == $first_attribute_id) {
         is($attribute->Content->{CF}, 3, 'First ConditionedBy CF');

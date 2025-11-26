@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.108     2025-11-25 18:03:38Z
+          - fixed error in type detection in parameter schemas (thanks, Robin
+            Murray!)
+
 0.107     2025-11-23 18:56:54Z
           - efficiency improvements in validate_response() when provided with
             an operationId for lookup

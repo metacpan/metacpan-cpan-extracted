@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2024-2025 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.10;
+package Data::Checks 0.11;
 
 use v5.22;
 use warnings;
@@ -41,12 +41,12 @@ With L<Signature::Attribute::Checked>:
 =for highlighter perl
 
    use v5.26;
-   use Sublike::Extended;
+   use Sublike::Extended 0.29 'sub';
    use Signature::Attribute::Checked;
 
    use Data::Checks qw( Str );
 
-   extended sub greet ( $message :Checked(Str) ) {
+   sub greet ( $message :Checked(Str) ) {
       say "Hello, $message";
    }
 
@@ -141,7 +141,7 @@ or references to objects in classes that do not overload stringification.
 
 I<Since version 0.05.>
 
-Accepts any value that passes the L<Str> check, and additionally is exactly
+Accepts any value that passes the L</Str> check, and additionally is exactly
 equal to I<any of> the given strings.
 
 =head2 StrMatch
@@ -150,7 +150,7 @@ equal to I<any of> the given strings.
 
 I<Since version 0.08.>
 
-Accepts any value that passes the L<Str> check, and additionally matches the
+Accepts any value that passes the L</Str> check, and additionally matches the
 given regexp pattern.
 
 Remember that the pattern must be supplied as a C<qr/.../> expression, not
@@ -183,7 +183,7 @@ classes that do not overload numification.
 
 I<Since version 0.05.>
 
-Accepts any value that passes the L<Num> check, and additionally is within
+Accepts any value that passes the L</Num> check, and additionally is within
 the bound given. C<NumGT> and C<NumLT> exclude the bound value itself,
 C<NumGE> and C<NumLE> include it.
 
@@ -193,7 +193,7 @@ C<NumGE> and C<NumLE> include it.
 
 I<Since version 0.05.>
 
-Accepts any value that passes the L<Num> check, and additionally is between
+Accepts any value that passes the L</Num> check, and additionally is between
 the two bounds given. The lower bound is inclusive, and the upper bound is
 exclusive.
 
@@ -218,7 +218,7 @@ C<NumRange()> constraint.
 
 I<Since version 0.05.>
 
-Accepts any value that passes the L<Num> check, and additionally is exactly
+Accepts any value that passes the L</Num> check, and additionally is exactly
 equal to I<any of> the given numbers.
 
 =head2 Isa
@@ -229,6 +229,22 @@ I<Since version 0.04.>
 
 Accepts any blessed object reference to an instance of the given class name,
 or a subclass derived from it (i.e. anything accepted by the C<isa> operator).
+
+=head2 Can
+
+   Can($methodname)
+   Can($methodname1, $methodname2, ...)
+
+I<Since version 0.11.>
+
+Accepts any blessed object reference to an instance in a class, or a class
+name directly, that has the all of the given method names (i.e. anything that
+passes a C<< ->can >> test on every name).
+
+To accept only object references and not package names, combine this check
+with C<Object> by using the C<All> combination:
+
+   All(Object, Can($methodname, ...))
 
 =head2 ArrayRef
 
@@ -484,6 +500,14 @@ Think about a convenient name for inclusive-bounded numerical constraints.
 =item *
 
 Look into making const-folding work with the C<MIN .. MAX> flip-flop operator
+
+=item *
+
+Performance enhancements for lists of many values in C<StrEq>, C<NumEq>, etc
+
+=item *
+
+Performance enhancement of C<Can> by caching per package name
 
 =back
 

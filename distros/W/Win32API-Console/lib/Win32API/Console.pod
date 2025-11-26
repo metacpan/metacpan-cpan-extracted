@@ -20,6 +20,65 @@ documentation from Microsoft can be used in most cases.
 
 =head1 METHODS
 
+Many Windows API functions exist in multiple variants that differ by the 
+character encoding they expect. The naming convention typically uses suffixes:
+
+=over 4
+
+=item * C<FunctionNameA>
+
+This variant expects C<ANSI> strings encoded in the console's current local 
+code page.
+
+Example:
+
+  # Text must be an ANSI string encoded in the local code page
+  FunctionNameA("Text");
+
+The parameter is passed as a C<ANSI> string.
+
+B<Note>: C<A>-Version uses C<ANSI> and is not recommended for international 
+applications.
+
+=item * C<FunctionNameW>
+
+This variant expects wide strings encoded as C<UTF-16LE>.
+
+Example:
+
+  # Text must be a sequence of bytes encoded as UTF-16LE
+  FunctionNameW("T\0e\0x\0t\0");
+
+The parameter is passed as a C<WCHAR> string.
+
+B<Note>: C<W>-Version uses C<UTF-16LE> and is the quasi standard for Windows 
+applications.
+
+=item * C<FunctionName>
+
+This wrapper decides internally based on the compiler setting and automatically 
+encodes/decodes the Perl string (UTF-8) to/from C<ANSI> or C<UTF-16LE> using 
+L<Encode> in a call to the C<A> or C<W> variant.
+
+=over 4
+
+=item * If C<UNICODE> is enabled, the C<W> version is used.
+
+=item * If C<UNICODE> is disabled, the C<A> version is used.
+
+=back
+
+Example:
+
+  # Text must be a Perl string encoded as UTF-8.
+  use utf8;
+  FunctionName("Text");
+
+B<Note>: The wrapper provides a compatibility layer, but depends on the 
+internal XS compilation settings of L<Win32::Console>.
+
+=back
+
 =head2 AllocConsole
 
  my $scalar | undef = AllocConsole();
@@ -671,7 +730,7 @@ device.
 =over
 
 =item *
-C<$id>: identifier (e.g. C<STD_INPUT_HANDLE>, see L</":STD_HANDLE_">)
+C<$id>: identifier (e.g. C<STD_INPUT_HANDLE>, see L</:STD_HANDLE_>)
 
 =back
 
@@ -1685,11 +1744,11 @@ Usage:
 Nothing is exported by default. The following tags can be used to have large 
 sets of symbols exported.
 
-=head2 ":Func"
+=head2 :Func
 
 The basic function names.
 
-=head2 ":FuncA"
+=head2 :FuncA
 
 The ANSI-specific functions. Each of these is just the same as the version 
 without the trailing I<"A"> when C<Win32API::Console::UNICODE> is FALSE.
@@ -1709,7 +1768,7 @@ without the trailing I<"A"> when C<Win32API::Console::UNICODE> is FALSE.
   WriteConsoleOutputA
   WriteConsoleOutputCharacterA
 
-=head2 ":FuncW"
+=head2 :FuncW
 
 The wide-character-specific (Unicode) functions. Each of these is just the same 
 as the version without the trailing I<"W"> when C<Win32API::Console::UNICODE> 
@@ -1730,14 +1789,14 @@ is TRUE.
   WriteConsoleOutputW
   WriteConsoleOutputCharacterW
 
-=head2 ":Misc"
+=head2 :Misc
 
   GetOSVersion
   ATTACH_PARENT_PROCESS
   CONSOLE_TEXTMODE_BUFFER
   INVALID_HANDLE_VALUE
 
-=head2 ":Struct"
+=head2 :Struct
 
 The following structures (L</STRUCTURES>) are used to access a console.
 
@@ -1749,7 +1808,7 @@ The following structures (L</STRUCTURES>) are used to access a console.
   COORD
   SMALL_RECT
 
-=head2 ":ALLOC_CONSOLE_"
+=head2 :ALLOC_CONSOLE_
 
 Constants for L</AttachConsole>, L</AllocConsoleWithOptions> and 
 L</AllocConsole>.
@@ -1761,7 +1820,7 @@ L</AllocConsole>.
   ALLOC_CONSOLE_RESULT_NEW_CONSOLE
   ALLOC_CONSOLE_RESULT_EXISTING_CONSOLE
 
-=head2 ":BACKGROUND_"
+=head2 :BACKGROUND_
 
 Constants for L</GetConsoleScreenBufferInfo>, L</SetConsoleTextAttribute>, 
 L</ReadConsoleOutput>, L</WriteConsoleOutput>, L</ReadConsoleOutputAttribute>,
@@ -1772,7 +1831,7 @@ L</WriteConsoleOutputAttribute> and L</FillConsoleOutputAttribute>.
   BACKGROUND_RED
   BACKGROUND_INTENSITY
 
-=head2 ":COMMON_LVB_"
+=head2 :COMMON_LVB_
 
 Constants for L</GetConsoleScreenBufferInfo>, L</SetConsoleTextAttribute>, 
 L</ReadConsoleOutput>, L</WriteConsoleOutput>, L</ReadConsoleOutputAttribute>,
@@ -1786,7 +1845,7 @@ L</WriteConsoleOutputAttribute> and L</FillConsoleOutputAttribute>.
   COMMON_LVB_REVERSE_VIDEO
   COMMON_LVB_UNDERSCORE
 
-=head2 ":CONTROL_KEY_STATE_"
+=head2 :CONTROL_KEY_STATE_
 
 Constants for L</PeekConsoleInput>, L</ReadConsoleInput> and 
 L</WriteConsoleInput>.
@@ -1801,14 +1860,14 @@ L</WriteConsoleInput>.
   SCROLLLOCK_ON
   SHIFT_PRESSED
 
-=head2 ":CTRL_EVENT_"
+=head2 :CTRL_EVENT_
 
 Constants for L</GenerateConsoleCtrlEvent> and L</SetConsoleCtrlHandler>.
 
   CTRL_BREAK_EVENT
   CTRL_C_EVENT
 
-=head2 ":DISPLAY_MODE_"
+=head2 :DISPLAY_MODE_
 
 Constants for L</GetConsoleDisplayMode> and L</SetConsoleDisplayMode>.
 
@@ -1817,7 +1876,7 @@ Constants for L</GetConsoleDisplayMode> and L</SetConsoleDisplayMode>.
   CONSOLE_FULLSCREEN_MODE
   CONSOLE_WINDOWED_MODE
 
-=head2 ":EVENT_TYPE_"
+=head2 :EVENT_TYPE_
 
 Constants for L</PeekConsoleInput>, L</ReadConsoleInput> and 
 L</WriteConsoleInput>.
@@ -1828,7 +1887,7 @@ L</WriteConsoleInput>.
   MENU_EVENT
   FOCUS_EVENT
 
-=head2 ":FOREGROUND_"
+=head2 :FOREGROUND_
 
 Constants for L</GetConsoleScreenBufferInfo>, L</SetConsoleTextAttribute>, 
 L</ReadConsoleOutput>, L</WriteConsoleOutput>, L</ReadConsoleOutputAttribute>,
@@ -1839,7 +1898,7 @@ L</WriteConsoleOutputAttribute> and L</FillConsoleOutputAttribute>.
   FOREGROUND_RED
   FOREGROUND_INTENSITY
 
-=head2 ":INPUT_MODE_"
+=head2 :INPUT_MODE_
 
 Constants for L</GetConsoleMode> and L</SetConsoleMode>.
 
@@ -1853,7 +1912,7 @@ Constants for L</GetConsoleMode> and L</SetConsoleMode>.
   ENABLE_EXTENDED_FLAGS
   ENABLE_VIRTUAL_TERMINAL_INPUT
 
-=head2 ":MOUSE_"
+=head2 :MOUSE_
 
 Constants for L</PeekConsoleInput>, L</ReadConsoleInput> and 
 L</WriteConsoleInput>.
@@ -1873,7 +1932,7 @@ Constants for L</GetConsoleMode> and L</SetConsoleMode>.
   DISABLE_NEWLINE_AUTO_RETURN
   ENABLE_LVB_GRID_WORLDWIDE
 
-=head2 ":STD_HANDLE_"
+=head2 :STD_HANDLE_
 
 Constants for L</GetStdHandle> and L</SetStdHandle>
 
@@ -1881,7 +1940,7 @@ Constants for L</GetStdHandle> and L</SetStdHandle>
   STD_INPUT_HANDLE
   STD_OUTPUT_HANDLE
 
-=head2 ":all"
+=head2 :all
 
   All of the above.
 

@@ -22,8 +22,8 @@ my $context = $wgpu->createSurface(
   }
 );
 
-my $adapter = $wgpu->requestAdapter( { compatibleSurface => $context } );
-my $device  = $adapter->requestDevice;
+my $adapter = $wgpu->createAdapter( { compatibleSurface => $context } );
+my $device  = $adapter->createDevice;
 
 my $presentationFormat = $context->getPreferredFormat($adapter);
 
@@ -250,6 +250,8 @@ sub resetGameData
   $loopTimes = 0;
   $render    = sub
   {
+    $wgpu->processEvents;
+
     my $currentTexture = $context->getCurrentTexture;
     my $view           = $currentTexture->texture->createView();
     my $renderPass     = {

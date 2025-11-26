@@ -1,0 +1,16 @@
+0.03   2025-11-11
+
+- implement working keypair functions
+
+- minor cleanups
+
+0.02   2025-11-11
+
+- allocation fixups
+- pod cleanup
+- makefile cleanup
+- a few more tests
+
+0.01   2025-11-10
+
+- released onto an unsuspecting world

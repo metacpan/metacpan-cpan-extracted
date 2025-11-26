@@ -1,14 +1,19 @@
 Revision history for Win32API::Console
 
-0.2.0  2025-11-20
-    - Add "macros" (subs) for HRESULT
-    - Fixes "\0" buffer in XS of ReadConsoleOutputCharacterA
-    - Fix added TestConsole.pm to MANIFEST for disttest
+0.2.1  2025-11-25
+    - Add script that performs an inventory before the tests begin
+    - Change: encoding/decoding is only performed for wrapper functions
     - Fix bugs in POD
 
+0.2.0  2025-11-24
+    - Add "macros" (subs) for HRESULT
+    - Change documentation in POD
+    - Fixes "\0" buffer in XS of ReadConsoleOutputCharacterA
+    - Fix added TestConsole.pm to MANIFEST for disttest
+
 0.1.6  2025-11-19
-    - Further adjustment to ANSI handling
-    - UTF-8 flag should be deleted for ANSI
+    - Change: Further adjustment to ANSI handling
+    - Fix UTF-8 flag, should be deleted for ANSI
 
 0.1.5  2025-11-19
     - Change regarding the use of Encode::Unicode

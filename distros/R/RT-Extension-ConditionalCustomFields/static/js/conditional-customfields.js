@@ -143,11 +143,11 @@ function parseIP(ip) {
     return ip;
 }
 
-function get_selector(name, type, render_type, rt_v5) {
+function get_selector(name, type, render_type) {
     var selector;
     if (type == 'Text' || type == 'Wikitext' || type == 'HTML') {
         selector = 'textarea[name="' + name + '"]';
-    } else if ((type == 'Select' && render_type == 'List') || type == 'Image' || type == 'Binary' || (rt_v5 >= 0 && (type == 'Combobox' || type == 'Date' || type == 'DateTime'))) {
+    } else if ((type == 'Select' && render_type == 'List') || type == 'Image' || type == 'Binary' || type == 'Combobox' || type == 'Date' || type == 'DateTime') {
         selector = 'input[name="' + name + '"]';
     } else {
         selector = '#' + name;
@@ -205,7 +205,7 @@ function condition_is_met(condition_vals, cf_condition_vals, condition_op, lang)
         condition_met = true;
     }
 
-    if (cf_condition_vals.length) {
+    if (cf_condition_vals && cf_condition_vals.length) {
         for (var i=0; i<cf_condition_vals.length; i++) {
             for (var j=0; j<condition_vals.length; j++) {
                 if (condition_op == "is" || condition_op == "isn't") {

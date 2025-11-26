@@ -7,7 +7,7 @@ use JSON;
 use strict;
 require 't/test-lib.pm';
 
-my $tests = 22;
+my $tests = 23;
 
 use_ok('Lemonldap::NG::Common::Cli');
 use_ok('Lemonldap::NG::Manager::Cli');
@@ -38,6 +38,11 @@ ok( $res =~ /^notification\s+=\s+1$/, '"get notification" OK' )
 
 # Test 'addKey' command
 @cmd = qw(-yes 1 addKey locationRules/test1.example.com ^/reject deny);
+combined_like( sub { llclient->run(@cmd) }, qr/Saved under/, '"addKey" OK' );
+
+# Test 'addKey' command with negative number, to make sure the option parser
+# does not interfere (#3495)
+@cmd = qw(-yes 1 addKey vhostOptions/test1.example.com vhostServiceTokenTTL -1);
 combined_like( sub { llclient->run(@cmd) }, qr/Saved under/, '"addKey" OK' );
 
 # Test 'delKey' command

@@ -21,10 +21,11 @@ my %WriteMakefileArgs = (
     "Data::Printer" => 0,
     "Devel::Confess" => 0,
     "Devel::Size" => 0,
+    "File::Path" => 0,
     "Term::ANSIColor" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +37,7 @@ my %FallbackPrereqs = (
   "Data::Printer" => 0,
   "Devel::Confess" => 0,
   "Devel::Size" => 0,
+  "File::Path" => 0,
   "Term::ANSIColor" => 0,
   "Test::More" => 0
 );

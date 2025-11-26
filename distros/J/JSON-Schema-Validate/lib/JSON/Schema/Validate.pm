@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.5.1
+## Version v0.6.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/11/20
+## Modified 2025/11/21
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,7 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.5.1';
+    our $VERSION = 'v0.6.0';
 };
 
 use v5.16.0;
@@ -152,6 +152,110 @@ sub compile
         $self->{compiled} = _compile_root( $self->{schema} );
     }
     return( $self );
+}
+
+sub compile_js
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+
+    my $schema = $self->{schema}
+        or die( "No schema loaded; cannot compile to JavaScript" );
+
+    # Public JS API name, e.g. "validateIncorporation"
+    my $name = exists( $opts->{name} ) && defined( $opts->{name} ) && length( $opts->{name} )
+        ? $opts->{name}
+        : 'validate';
+
+    # Max errors to collect on the client side
+    my $max_errors = exists( $opts->{max_errors} ) ? int( $opts->{max_errors} ) : 200;
+    $max_errors = 0 if( $max_errors < 0 );
+
+    my %seen;          # schema_pointer -> function name
+    my $counter = 0;   # for generating unique function names
+    my @funcs;         # accumulated JS validator functions
+
+    my $root_ptr = '#';
+
+    # Pass $opts down so we can see ecma => ... inside the compiler.
+    my $root_fn  = $self->_compile_js_node( $schema, $root_ptr, \%seen, \@funcs, \$counter, $schema, $opts );
+
+    my $js = '';
+
+    $js .= <<'JS_RUNTIME';
+(function(global)
+{
+    "use strict";
+
+    function _jsv_err(ctx, path, keyword, message, schemaPtr)
+    {
+        if(ctx.maxErrors && ctx.errors.length >= ctx.maxErrors)
+        {
+            return;
+        }
+        ctx.errors.push({
+            path: path,
+            keyword: keyword,
+            message: message,
+            schema_pointer: schemaPtr
+        });
+    }
+
+    function _jsv_typeOf(x)
+    {
+        if(x === null)
+        {
+            return "null";
+        }
+        if(Array.isArray ? Array.isArray(x) : Object.prototype.toString.call(x) === "[object Array]")
+        {
+            return "array";
+        }
+        var t = typeof x;
+        if(t === "number" && isFinite(x) && Math.floor(x) === x)
+        {
+            // distinguish "integer" for convenience
+            return "integer";
+        }
+        return t;
+    }
+
+    function _jsv_hasOwn(obj, prop)
+    {
+        return Object.prototype.hasOwnProperty.call(obj, prop);
+    }
+
+JS_RUNTIME
+
+    # Public entry point
+    $js .= <<"JS_RUNTIME";
+    function $name(instance)
+    {
+        var ctx = { errors: [], maxErrors: $max_errors };
+        $root_fn(instance, "#", ctx);
+        return ctx.errors;
+    }
+
+JS_RUNTIME
+
+    # Attach to global (browser: window) in a conservative way
+    $js .= <<"JS_RUNTIME";
+    if(typeof global === 'object' && global)
+    {
+        global.$name = $name;
+    }
+
+JS_RUNTIME
+
+    # Emit all compiled validator functions, indented one level
+    $js .= join( "\n\n", map{ '    ' . join( "\n    ", split( /\n/, $_ ) ) } @funcs );
+
+    $js .= <<'JS_RUNTIME';
+
+})(this);
+JS_RUNTIME
+
+    return( $js );
 }
 
 # $js->content_checks -> enables it
@@ -899,6 +1003,933 @@ sub _clone
     return( $json->decode( $json->encode( $v ) ) );
 }
 
+sub _compile_js_node
+{
+    my $self = shift( @_ );
+    my( $S, $sp, $seen, $funcs, $counter_ref, $root, $opts ) = @_;
+
+    $opts ||= {};
+    my $ecma  = exists( $opts->{ecma} ) ? $opts->{ecma} : 'auto';
+    my $force_unicode =
+        defined( $ecma ) &&
+        $ecma =~ /^\d+$/ &&
+        $ecma >= 2018;
+
+    # Re-use same JS function for the same schema pointer
+    if( exists( $seen->{ $sp } ) )
+    {
+        return( $seen->{ $sp } );
+    }
+
+    # NOTE: $ref
+    # 0) $ref handling (internal refs only)
+    if( ref( $S ) eq 'HASH' &&
+        exists( $S->{'$ref'} ) )
+    {
+        my $ref = $S->{'$ref'};
+
+        # Only support internal refs ("#/...") in JS
+        if( defined( $ref ) && $ref =~ /^#/ )
+        {
+            my $target_ptr = $ref;
+
+            # If we already compiled that pointer, just alias and return it
+            if( exists( $seen->{ $target_ptr } ) )
+            {
+                $seen->{ $sp } = $seen->{ $target_ptr };
+                return( $seen->{ $target_ptr } );
+            }
+
+            # Otherwise, resolve pointer against the root schema
+            my $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
+
+
+            unless( defined( $target_schema ) )
+            {
+                # Pointer could not be resolved. As a safety fallback,
+                # make this node a no-op on the client (server will still enforce).
+                my $id = $$counter_ref++;
+                my $fn = "jsv_node_${id}";
+                $seen->{ $sp } = $fn;
+                push( @$funcs, <<JS_RUNTIME );
+// $sp
+function $fn(inst, path, ctx)
+{
+}
+
+JS_RUNTIME
+                return( $fn );
+            }
+
+            # Compile the target, then merge sibling keywords
+            my $base_fn = $self->_compile_js_node( $target_schema, $target_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+
+            # Create a wrapper that runs both the referenced schema AND local keywords
+            my $id = $$counter_ref++;
+            my $wrapper_fn = "jsv_node_$id";
+            $seen->{ $sp } = $wrapper_fn;
+
+            my @wrapper_body;
+            push( @wrapper_body, <<JS_RUNTIME );
+// $sp (\$ref + siblings)
+function $wrapper_fn(inst, path, ctx)
+{
+    $base_fn(inst, path, ctx);
+    if(ctx.errors.length >= ctx.maxErrors) return;
+JS_RUNTIME
+
+            # Now compile the current node again, but skip the $ref
+            my $local_S = { %$S };  # shallow copy
+            delete( $local_S->{'$ref'} );
+            my $local_fn = $self->_compile_js_node( $local_S, $sp, $seen, $funcs, $counter_ref, $root, $opts );
+
+            if( $local_fn ne $wrapper_fn )
+            {
+                push( @wrapper_body, <<JS_RUNTIME );
+    $local_fn(inst, path, ctx);
+JS_RUNTIME
+            }
+
+            push( @wrapper_body, <<JS_RUNTIME );
+}
+JS_RUNTIME
+            push( @$funcs, join( '', @wrapper_body ) );
+            return( $wrapper_fn );
+        }
+
+        # External refs (URLs, etc.) are not resolved on the client.
+        # Full resolution is done server-side.
+    }
+
+    my $id = $$counter_ref++;
+    my $fn = "jsv_node_$id";
+    $seen->{ $sp } = $fn;
+
+    my @body;
+
+    push( @body, <<JS_RUNTIME );
+// $sp
+function $fn(inst, path, ctx)
+{
+JS_RUNTIME
+
+    # NOTE: combinator (allOf / anyOf / oneOf / not / if-then-else)
+    if( ref( $S ) eq 'HASH' )
+    {
+        # allOf – AND of subschemas
+        if( exists( $S->{allOf} ) &&
+            ref( $S->{allOf} ) eq 'ARRAY' &&
+            @{$S->{allOf}} )
+        {
+            for my $i ( 0 .. $#{$S->{allOf}} )
+            {
+                my $sub_sp = _join_ptr( $sp, 'allOf', $i );
+                my $sub_fn = $self->_compile_js_node( $S->{allOf}->[ $i ], $sub_sp, $seen, $funcs, $counter_ref, $root, $opts );
+
+                push( @body, <<JS_RUNTIME );
+    // $sub_sp
+    $sub_fn(inst, path + '/allOf/$i', ctx);
+    if(ctx.maxErrors && ctx.errors.length >= ctx.maxErrors) return;
+JS_RUNTIME
+            }
+
+            # IMPORTANT: we do *not* return here.
+            # Other local keywords (type, properties, contains, ...) must still run.
+        }
+
+        # anyOf – at least one must validate (we only emit a single anyOf error)
+        if( exists( $S->{anyOf} ) &&
+            ref( $S->{anyOf} ) eq 'ARRAY' &&
+            @{$S->{anyOf}} )
+        {
+            push( @body, <<JS_RUNTIME );
+    (function()
+    {
+        var baseErrors = ctx.errors;
+        var matched = false;
+
+JS_RUNTIME
+
+            for my $i ( 0 .. $#{$S->{anyOf}} )
+            {
+                my $sub_sp = _join_ptr( $sp, 'anyOf', $i );
+                my $sub_fn = $self->_compile_js_node( $S->{anyOf}->[ $i ], $sub_sp, $seen, $funcs, $counter_ref, $root, $opts );
+
+                push( @body, <<JS_RUNTIME );
+        if(matched) return;
+        ctx.errors = [];
+        // $sub_sp
+        $sub_fn(inst, path + '/anyOf/$i', ctx);
+        if(ctx.errors.length === 0)
+        {
+            matched = true;
+            ctx.errors = baseErrors;
+            return;
+        }
+JS_RUNTIME
+            }
+
+            my $sp_qp = _js_quote( $sp );
+            push( @body, <<JS_RUNTIME );
+        ctx.errors = baseErrors;
+        if(!matched)
+        {
+            _jsv_err(ctx, path, 'anyOf', 'no subschema matched', $sp_qp);
+        }
+    })();
+    // return;
+JS_RUNTIME
+        }
+
+        # oneOf – exactly one must validate
+        if( exists( $S->{oneOf} ) &&
+            ref( $S->{oneOf} ) eq 'ARRAY' &&
+            @{$S->{oneOf}} )
+        {
+            push( @body, <<JS_RUNTIME );
+    (function()
+    {
+        var baseErrors = ctx.errors;
+        var hits = 0;
+
+JS_RUNTIME
+
+            for my $i ( 0 .. $#{$S->{oneOf}} )
+            {
+                my $sub_sp = _join_ptr( $sp, 'oneOf', $i );
+                my $sub_fn = $self->_compile_js_node( $S->{oneOf}->[ $i ], $sub_sp, $seen, $funcs, $counter_ref, $root, $opts );
+
+                push( @body, <<JS_RUNTIME );
+        ctx.errors = [];
+        // $sub_sp
+        $sub_fn(inst, path + '/oneOf/$i', ctx);
+        if(ctx.errors.length === 0)
+        {
+            hits++;
+        }
+JS_RUNTIME
+            }
+
+            my $sp_qp = _js_quote( $sp );
+            push( @body, <<JS_RUNTIME );
+        ctx.errors = baseErrors;
+        if(hits !== 1)
+        {
+            _jsv_err(ctx, path, 'oneOf', 'exactly one subschema must match, but ' + hits + ' did', $sp_qp);
+        }
+    })();
+    // return;
+JS_RUNTIME
+        }
+
+        # not – but we SKIP "negative required" patterns on the client
+        if( exists( $S->{not} ) )
+        {
+            my $skip_not = 0;
+
+            if( ref( $S->{not} ) eq 'HASH' )
+            {
+                my $N = $S->{not};
+
+                # Direct: { "not": { "required": [...] } }
+                if( exists( $N->{required} ) &&
+                    ref( $N->{required} ) eq 'ARRAY' )
+                {
+                    $skip_not = 1;
+                }
+                # Or: { "not": { "anyOf": [ {required:...}, ... ] } }
+                elsif( exists( $N->{anyOf} ) &&
+                       ref( $N->{anyOf} ) eq 'ARRAY' )
+                {
+                    my $all_req = 1;
+                    for my $elt ( @{$N->{anyOf}} )
+                    {
+                        if( !( ref( $elt ) eq 'HASH' &&
+                               exists( $elt->{required} ) &&
+                               ref( $elt->{required} ) eq 'ARRAY' ) )
+                        {
+                            $all_req = 0;
+                            last;
+                        }
+                    }
+                    $skip_not = 1 if( $all_req );
+                }
+            }
+
+            if( !$skip_not )
+            {
+                my $sub_sp = _join_ptr( $sp, 'not' );
+                my $sub_fn = $self->_compile_js_node( $S->{not}, $sub_sp, $seen, $funcs, $counter_ref, $root, $opts );
+                my $sp_qp  = _js_quote( $sp );
+                push( @body, <<JS_RUNTIME );
+    (function()
+    {
+        var baseErrors = ctx.errors;
+        ctx.errors = [];
+        // $sub_sp
+        $sub_fn(inst, path + '/not', ctx);
+        var failed = (ctx.errors.length > 0);
+        ctx.errors = baseErrors;
+        if(!failed)
+        {
+            _jsv_err(ctx, path, 'not', 'instance matched forbidden schema', $sp_qp);
+        }
+    })();
+    // return;
+JS_RUNTIME
+            }
+            else
+            {
+                # Skip "not + required" style rules on the client;
+                # they are enforced server-side only.
+                push( @body, <<JS_RUNTIME );
+    // NOTE: 'not' at $sp is a negative-required pattern; skipped client-side.
+JS_RUNTIME
+            }
+        }
+
+        # if / then / else  (branch errors are enforced, "if" errors are not)
+        if( exists( $S->{if} ) )
+        {
+            my $if_sp = _join_ptr( $sp, 'if' );
+            my $if_fn = $self->_compile_js_node( $S->{if}, $if_sp, $seen, $funcs, $counter_ref, $root, $opts );
+
+            push( @body, <<JS_RUNTIME );
+    (function()
+    {
+        var baseErrors = ctx.errors;
+        var tmp = [];
+        ctx.errors = tmp;
+        // $if_sp
+        $if_fn(inst, path + '/if', ctx);
+        var failed = (tmp.length > 0);
+        ctx.errors = baseErrors;
+JS_RUNTIME
+
+            if( $S->{then} )
+            {
+                my $then_sp = _join_ptr( $sp, 'then' );
+                my $then_fn = $self->_compile_js_node( $S->{then}, $then_sp, $seen, $funcs, $counter_ref, $root, $opts );
+                push( @body, <<JS_RUNTIME );
+        if(!failed)
+        {
+            $then_fn(inst, path + '/then', ctx);
+        }
+JS_RUNTIME
+            }
+            if( $S->{else} )
+            {
+                my $else_sp = _join_ptr( $sp, 'else' );
+                my $else_fn = $self->_compile_js_node( $S->{else}, $else_sp, $seen, $funcs, $counter_ref, $root, $opts );
+                push( @body, <<JS_RUNTIME );
+        else
+        {
+            $else_fn(inst, path + '/else', ctx);
+        }
+JS_RUNTIME
+            }
+
+            push( @body, <<JS_RUNTIME );
+    })();
+JS_RUNTIME
+            # Do NOT return here; this node can also have local constraints
+        }
+
+        # uniqueKeys extension when enabled
+        if( $self->{unique_keys} &&
+            exists( $S->{uniqueKeys} ) &&
+            ref( $S->{uniqueKeys} ) eq 'ARRAY' )
+        {
+            for my $keyset_ref ( @{$S->{uniqueKeys}} )
+            {
+                next unless( ref( $keyset_ref ) eq 'ARRAY' && @$keyset_ref );
+
+                my @keys = map{ _js_quote( $_ ) } @$keyset_ref;
+                my $qsp  = _js_quote( $sp );
+
+                push( @body, <<JS_RUNTIME );
+    if(Array.isArray(inst))
+    {
+        var seen = {};
+        for(var i = 0; i < inst.length; i++)
+        {
+            var item = inst[i];
+            var key = '';
+            try
+            {
+                key = [ @keys ].map(function(k){ return item[k]; }).join('\x1E'); // RS separator
+            }
+            catch(e) {}
+            if(seen.hasOwnProperty(key))
+            {
+                _jsv_err(ctx, path, 'uniqueKeys', 'duplicate items with keys [@$keyset_ref]', $qsp);
+                break;
+            }
+            seen[key] = true;
+        }
+    }
+JS_RUNTIME
+            }
+        }
+    }
+
+    my $has_type_keyword = ( ref( $S ) eq 'HASH' && exists( $S->{type} ) ) ? 1 : 0;
+
+    # NOTE: type
+    # 1) type
+    if( exists( $S->{type} ) )
+    {
+        my @types = ref( $S->{type} ) eq 'ARRAY' ? @{$S->{type}} : ( $S->{type} );
+
+        # Special-case "number" vs "integer": _jsv_typeOf returns "integer" for ints
+        my @checks;
+        for my $t ( @types )
+        {
+            if( $t eq 'number' )
+            {
+                # accept "number" or "integer" from _jsv_typeOf
+                push( @checks, q{tt === 'number' || tt === 'integer'} );
+            }
+            else
+            {
+                my $qt = _js_quote( $t );
+                push( @checks, "tt === $qt" );
+            }
+        }
+
+        my $cond = join( ' || ', @checks );
+        my $msg  = 'expected type ' .
+                   ( @types == 1 ? $types[0] : '[' . join( ',', @types ) . ']' ) .
+                   ' but found ';
+        my $qmsg = _js_quote( $msg );
+        my $qsp  = _js_quote( $sp );
+
+        push( @body, <<JS_RUNTIME );
+    var tt = _jsv_typeOf(inst);
+    if(!( $cond ))
+    {
+        _jsv_err(ctx, path, 'type', $qmsg + tt, $qsp);
+        return;
+    }
+JS_RUNTIME
+    }
+
+    # NOTE: enum
+    # 2) enum
+    if( exists( $S->{enum} ) &&
+        ref( $S->{enum} ) eq 'ARRAY' &&
+        @{$S->{enum}} )
+    {
+        my @vals  = @{$S->{enum}};
+        my @vs_js = map{ _js_quote( $_ ) } @vals;
+        my $qsp   = _js_quote( $sp );
+
+        local $" = ', ';
+        push( @body, <<JS_RUNTIME );
+    (function()
+    {
+        var ok = false;
+        var v = inst;
+        var list = [ @vs_js ];
+        for(var i = 0; i < list.length; i++)
+        {
+            if(v === list[i])
+            {
+                ok = true;
+                break;
+            }
+        }
+        if(!ok)
+        {
+            _jsv_err(ctx, path, 'enum', 'value is not in enum list', $qsp);
+        }
+    })();
+JS_RUNTIME
+    }
+
+    # NOTE: const
+    # 3) const (primitive only)
+    if( exists( $S->{const} ) )
+    {
+        # For simplicity on the JS side, only support primitive const reliably.
+        # (Object/array equality is non-trivial; we keep it minimal for now.)
+        my $c   = $S->{const};
+        my $qsp = _js_quote( $sp );
+
+        if( !ref( $c ) )
+        {
+            my $cv = _js_quote( $c );
+            push( @body, <<JS_RUNTIME );
+    if(inst !== $cv)
+    {
+        _jsv_err(ctx, path, 'const', 'value does not match const', $qsp);
+    }
+JS_RUNTIME
+        }
+        else
+        {
+            # Complex const -> skip in JS (server will still enforce)
+            push( @body, <<JS_RUNTIME );
+    // NOTE: const at $sp is non-primitive; not enforced client-side.
+
+JS_RUNTIME
+        }
+    }
+
+    # NOTE: required
+    # 4) required (objects)
+    if( exists( $S->{required} ) &&
+        ref( $S->{required} ) eq 'ARRAY' &&
+        @{$S->{required}} )
+    {
+        push( @body, <<JS_RUNTIME );
+    if(_jsv_typeOf(inst) === 'object')
+    {
+JS_RUNTIME
+
+        for my $p ( @{$S->{required}} )
+        {
+            my $qp   = _js_quote( $p );
+            my $sp2  = _join_ptr( $sp, 'properties', $p );
+            my $qsp2 = _js_quote( $sp2 );
+
+            my $msg  = "required property '$p' is missing";
+            my $qmsg = _js_quote( $msg );
+
+            push( @body, <<JS_RUNTIME );
+        if(!_jsv_hasOwn(inst, $qp))
+        {
+            _jsv_err(ctx, path, 'required', $qmsg, $qsp2);
+        }
+JS_RUNTIME
+        }
+
+        push( @body, <<JS_RUNTIME );
+    }
+JS_RUNTIME
+    }
+
+    # NOTE: string && pattern
+    # 5) string length & pattern
+    my $has_string_constraints =
+        exists( $S->{minLength} ) ||
+        exists( $S->{maxLength} ) ||
+        exists( $S->{pattern} );
+
+    if( $has_string_constraints )
+    {
+        my $qsp = _js_quote( $sp );
+
+        push( @body, <<JS_RUNTIME );
+    if(_jsv_typeOf(inst) === 'string')
+    {
+JS_RUNTIME
+
+        if( exists( $S->{minLength} ) )
+        {
+            my $min = int( $S->{minLength} );
+            push( @body, <<JS_RUNTIME );
+        if(inst.length < $min)
+        {
+            _jsv_err(ctx, path, 'minLength', 'string shorter than minLength $min', $qsp);
+        }
+JS_RUNTIME
+        }
+
+        if( exists( $S->{maxLength} ) )
+        {
+            my $max = int( $S->{maxLength} );
+            push( @body, <<JS_RUNTIME );
+        if(inst.length > $max)
+        {
+            _jsv_err(ctx, path, 'maxLength', 'string longer than maxLength $max', $qsp);
+        }
+JS_RUNTIME
+        }
+
+        if( exists( $S->{pattern} ) &&
+            defined( $S->{pattern} ) &&
+            length( $S->{pattern} ) )
+        {
+            my $pat  = $S->{pattern};
+            # my $qpat = _js_quote( $pat );
+            # from \x{FF70} to \uFF70
+            # from \p{Katakana} to \p{sc=Katakana}
+            my $qpat = _re_to_js( $pat );
+
+            if( $force_unicode )
+            {
+                # ecma >= 2018: always try with "u" flag (Unicode mode)
+                push( @body, <<JS_RUNTIME );
+        try
+        {
+            var re = new RegExp("$qpat", "u");
+            if(!re.test(inst))
+            {
+                _jsv_err(ctx, path, 'pattern', 'string does not match pattern', $qsp);
+            }
+        }
+        catch(e)
+        {
+            // Browser does not support Unicode property escapes or this pattern.
+        }
+JS_RUNTIME
+            }
+            else
+            {
+                # auto / ES5 mode: detect "advanced" patterns
+                if( $pat =~ /\\p\{|\\P\{|\\X|\\R|\(\?[A-Za-z]/ )
+                {
+                    # Attempt Unicode mode with "u" flag, but gracefully fall back
+                    push( @body, <<JS_RUNTIME );
+        (function()
+        {
+            var re = null;
+            try
+            {
+                re = new RegExp("$qpat", "u");
+            }
+            catch(e)
+            {
+                // Older browser; skip Unicode-property-based pattern on client.
+            }
+            if(re && !re.test(inst))
+            {
+                _jsv_err(ctx, path, 'pattern', 'string does not match pattern', $qsp);
+            }
+        })();
+JS_RUNTIME
+                }
+                else
+                {
+                    # Simple ECMA 5-compatible pattern
+                    push( @body, <<JS_RUNTIME );
+        try
+        {
+            var re = new RegExp("$qpat");
+            if(!re.test(inst))
+            {
+                _jsv_err(ctx, path, 'pattern', 'string does not match pattern', $qsp);
+            }
+        }
+        catch(e)
+        {
+            // If pattern is not JS-compatible, we silently skip on the client.
+        }
+JS_RUNTIME
+                }
+            }
+        }
+
+        push( @body, <<JS_RUNTIME );
+    }
+JS_RUNTIME
+    }
+
+    # NOTE: minimum, maximum, etc
+    # 6) numeric bounds (minimum/maximum/exclusive*)
+    my $has_num_constraints =
+        exists( $S->{minimum} ) ||
+        exists( $S->{maximum} ) ||
+        exists( $S->{exclusiveMinimum} ) ||
+        exists( $S->{exclusiveMaximum} );
+
+    if( $has_num_constraints )
+    {
+        # For consistency with string/pattern/etc, we report the
+        # schema pointer of the *owning schema* ($sp), not the
+        # child keyword location (.../minimum).
+        my $qsp_num = _js_quote( $sp );
+        my $qmsg_expected_num = _js_quote( 'expected number but found ' );
+
+        push( @body, <<'JS_RUNTIME' );
+    var t = _jsv_typeOf(inst);
+
+    // Coerce numeric-looking strings to numbers, for friendlier UX
+    if(t === 'string' && /^[+-]?(?:\d+|\d*\.\d+)$/.test(inst))
+    {
+        inst = +inst;
+        t = _jsv_typeOf(inst);
+    }
+
+    if(t === 'number' || t === 'integer')
+    {
+JS_RUNTIME
+
+        if( exists( $S->{minimum} ) )
+        {
+            my $min = 0 + $S->{minimum};
+            push( @body, <<JS_RUNTIME );
+        if(inst < $min)
+        {
+            _jsv_err(ctx, path, 'minimum', 'number is less than minimum $min', $qsp_num);
+        }
+JS_RUNTIME
+        }
+
+        if( exists( $S->{maximum} ) )
+        {
+            my $max = 0 + $S->{maximum};
+            push( @body, <<JS_RUNTIME );
+        if(inst > $max)
+        {
+            _jsv_err(ctx, path, 'maximum', 'number is greater than maximum $max', $qsp_num);
+        }
+JS_RUNTIME
+        }
+
+        if( exists( $S->{exclusiveMinimum} ) )
+        {
+            my $emin = 0 + $S->{exclusiveMinimum};
+            push( @body, <<JS_RUNTIME );
+        if(inst <= $emin)
+        {
+            _jsv_err(ctx, path, 'exclusiveMinimum',
+                     'number is <= exclusiveMinimum $emin', $qsp_num);
+        }
+JS_RUNTIME
+        }
+
+        if( exists( $S->{exclusiveMaximum} ) )
+        {
+            my $emax = 0 + $S->{exclusiveMaximum};
+            push( @body, <<JS_RUNTIME );
+        if(inst >= $emax)
+        {
+            _jsv_err(ctx, path, 'exclusiveMaximum',
+                     'number is >= exclusiveMaximum $emax', $qsp_num);
+        }
+JS_RUNTIME
+        }
+
+        # Close the "if(t === 'number' || t === 'integer')" and, if needed,
+        # add a fallback type error when no explicit "type" keyword exists.
+        if( $has_type_keyword )
+        {
+            push( @body, <<'JS_RUNTIME' );
+    }
+JS_RUNTIME
+        }
+        else
+        {
+            push( @body, <<JS_RUNTIME );
+    }
+    else
+    {
+        _jsv_err(ctx, path, 'type', $qmsg_expected_num + t, $qsp_num);
+    }
+JS_RUNTIME
+        }
+    }
+
+    # NOTE: items / minItems / maxItems
+    # 7) array items & minItems/maxItems
+    my $has_array_len =
+        exists( $S->{minItems} ) ||
+        exists( $S->{maxItems} );
+
+    if( exists( $S->{items} ) || $has_array_len )
+    {
+        my $qsp = _js_quote( $sp );
+
+        # Precompile single-schema "items"
+        my $items_fn;
+        if( exists( $S->{items} ) && ref( $S->{items} ) eq 'HASH' )
+        {
+            my $items_ptr = _join_ptr( $sp, 'items' );
+            $items_fn     = $self->_compile_js_node( $S->{items}, $items_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+        }
+
+        my $min_items = exists( $S->{minItems} ) ? int( $S->{minItems} ) : undef;
+        my $max_items = exists( $S->{maxItems} ) ? int( $S->{maxItems} ) : undef;
+
+        my( $qmsg_min, $qmsg_max );
+        if( defined( $min_items ) )
+        {
+            my $msg_min = "array has fewer than $min_items items";
+            $qmsg_min   = _js_quote( $msg_min );
+        }
+        if( defined( $max_items ) )
+        {
+            my $msg_max = "array has more than $max_items items";
+            $qmsg_max   = _js_quote( $msg_max );
+        }
+
+        push( @body, <<JS_RUNTIME );
+    if(_jsv_typeOf(inst) === 'array')
+    {
+JS_RUNTIME
+
+        if( defined( $min_items ) )
+        {
+            push( @body, <<JS_RUNTIME );
+        if(inst.length < $min_items)
+        {
+            _jsv_err(ctx, path, 'minItems', $qmsg_min, $qsp);
+        }
+JS_RUNTIME
+        }
+
+        if( defined( $max_items ) )
+        {
+            push( @body, <<JS_RUNTIME );
+        if(inst.length > $max_items)
+        {
+            _jsv_err(ctx, path, 'maxItems', $qmsg_max, $qsp);
+        }
+JS_RUNTIME
+        }
+
+        if( $items_fn )
+        {
+            push( @body, <<JS_RUNTIME );
+        for(var i = 0; i < inst.length; i++)
+        {
+            $items_fn(inst[i], path + '/' + i, ctx);
+            if(ctx.maxErrors && ctx.errors && ctx.errors.length >= ctx.maxErrors)
+            {
+                return;
+            }
+        }
+JS_RUNTIME
+        }
+
+        push( @body, <<JS_RUNTIME );
+    }
+JS_RUNTIME
+    }
+
+    # NOTE: properties
+    # 8) properties (objects) – recurse into children
+    if( exists( $S->{properties} ) &&
+        ref( $S->{properties} ) eq 'HASH' )
+    {
+        push( @body, <<JS_RUNTIME );
+    if(_jsv_typeOf(inst) === 'object')
+    {
+JS_RUNTIME
+
+        for my $p ( sort( keys( %{$S->{properties}} ) ) )
+        {
+            my $child     = $S->{properties}->{ $p };
+            my $child_ptr = _join_ptr( $sp, 'properties', $p );
+            my $child_fn  = $self->_compile_js_node( $child, $child_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+
+            my $qp            = _js_quote( $p );
+            my $path_suffix   = '/' . $p;
+            my $path_suffix_q = _js_quote( $path_suffix );
+
+            push( @body, <<JS_RUNTIME );
+        if(_jsv_hasOwn(inst, $qp))
+        {
+            // $child_ptr
+            $child_fn(inst[$qp], path + $path_suffix_q, ctx);
+        }
+JS_RUNTIME
+        }
+
+        push( @body, <<JS_RUNTIME );
+    }
+JS_RUNTIME
+    }
+
+    # NOTE: definitions – recurse into named schemas
+    if( exists( $S->{definitions} ) &&
+        ref( $S->{definitions} ) eq 'HASH' )
+    {
+        for my $name ( sort keys %{ $S->{definitions} } )
+        {
+            my $child     = $S->{definitions}->{ $name };
+            my $child_ptr = _join_ptr( $sp, 'definitions', $name );
+            my $child_fn  = $self->_compile_js_node( $child, $child_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+
+            # No runtime call needed here — definitions don't validate by themselves.
+            # We just need them compiled so pointer-based lookup can see them.
+        }
+    }
+
+    # NOTE: contains
+    # 9) contains / minContains / maxContains (arrays)
+    if( exists( $S->{contains} ) )
+    {
+        my $contains_schema = $S->{contains};
+        my $contains_ptr    = _join_ptr( $sp, 'contains' );
+        my $contains_fn     = $self->_compile_js_node( $contains_schema, $contains_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+        my $qsp_contains    = _js_quote( $contains_ptr );
+
+        my $have_min = exists( $S->{minContains} );
+        my $have_max = exists( $S->{maxContains} );
+        my $min      = $have_min ? int( $S->{minContains} ) : 0;
+        my $max      = $have_max ? int( $S->{maxContains} ) : 0;
+
+        my $msg_min  = "array has fewer than $min items matching contains subschema";
+        my $qmsg_min = _js_quote( $msg_min );
+        my $msg_max  = "array has more than $max items matching contains subschema";
+        my $qmsg_max = _js_quote( $msg_max );
+        my $msg_cont = "array does not contain any item matching contains subschema";
+        my $qmsg_cont= _js_quote( $msg_cont );
+
+        push( @body, <<JS_RUNTIME );
+    if(_jsv_typeOf(inst) === 'array')
+    {
+        var matchCount = 0;
+        for(var i = 0; i < inst.length; i++)
+        {
+            var tmpCtx = { errors: [], maxErrors: ctx.maxErrors };
+            // $contains_ptr
+            $contains_fn(inst[i], path + '/' + i, tmpCtx);
+            if(tmpCtx.errors.length === 0)
+            {
+                matchCount++;
+            }
+        }
+JS_RUNTIME
+
+        if( $have_min )
+        {
+            push( @body, <<JS_RUNTIME );
+        if(matchCount < $min)
+        {
+            _jsv_err(ctx, path, 'minContains', $qmsg_min, $qsp_contains);
+        }
+JS_RUNTIME
+        }
+
+        if( $have_max )
+        {
+            push( @body, <<JS_RUNTIME );
+        if(matchCount > $max)
+        {
+            _jsv_err(ctx, path, 'maxContains', $qmsg_max, $qsp_contains);
+        }
+JS_RUNTIME
+        }
+
+        # Plain "contains" only if no min/max are present
+        if( !$have_min && !$have_max )
+        {
+            push( @body, <<JS_RUNTIME );
+        if(matchCount === 0)
+        {
+            _jsv_err(ctx, path, 'contains', $qmsg_cont, $qsp_contains);
+        }
+JS_RUNTIME
+        }
+
+        push( @body, <<JS_RUNTIME );
+    }
+JS_RUNTIME
+    }
+
+    push( @body, <<JS_RUNTIME );
+}
+JS_RUNTIME
+
+    push( @$funcs, join( '', @body ) );
+
+    return( $fn );
+}
+
 sub _compile_node
 {
     my( $root, $ptr, $S ) = @_;
@@ -1585,17 +2616,113 @@ sub _is_true { my $v = shift( @_ ); return( ref( $v ) eq 'HASH' ? 0 : $v ? 1 : 0
 
 sub _join_ptr
 {
-    my( $base, $token ) = @_;
-    # Proper JSON Pointer escaping
-    $token =~ s/~/~0/g;
-    $token =~ s/\//~1/g;
-    return( $base eq '#' ? "#/$token" : "$base/$token" );
+    my( $base, @tokens ) = @_;
+
+    # Default base to '#' if not provided
+    $base = '#' unless( defined( $base ) && length( $base ) );
+
+    my $ptr = $base;
+
+    for my $token ( @tokens )
+    {
+        next unless( defined( $token ) );
+
+        # Proper JSON Pointer escaping
+        $token =~ s/~/~0/g;
+        $token =~ s/\//~1/g;
+
+        if( $ptr eq '#' )
+        {
+            $ptr = "#/$token";
+        }
+        else
+        {
+            $ptr .= "/$token";
+        }
+    }
+
+    return( $ptr );
+}
+
+sub _js_quote
+{
+    my $s = shift( @_ );
+    $s = '' unless( defined( $s ) );
+    $s =~ s/\\/\\\\/g;
+    $s =~ s/'/\\'/g;
+    $s =~ s/\r\n/\n/g;
+    $s =~ s/\r/\n/g;
+    $s =~ s/\n/\\n/g;
+    return( "'$s'" );
 }
 
 sub _json_equal
 {
     my( $a, $b ) = @_;
     return( _canon( $a ) eq _canon( $b ) );
+}
+
+# Very small JSON Pointer resolver for internal refs ("#/...") for JS compile
+# Very small JSON Pointer resolver for internal refs ("#/...") for JS compile
+sub _jsv_resolve_internal_ref
+{
+    my( $root, $ptr ) = @_;
+
+    return( $root ) if( !defined( $ptr ) || $ptr eq '' || $ptr eq '#' );
+
+    # Expect something like "#/definitions/address"
+    $ptr =~ s/^#//;
+
+    my @tokens = split( /\//, $ptr );
+    shift( @tokens ) if( @tokens && $tokens[0] eq '' );
+
+    my $node = $root;
+
+    TOKEN:
+    for my $tok ( @tokens )
+    {
+        # JSON Pointer unescaping
+        $tok =~ s/~1/\//g;
+        $tok =~ s/~0/~/g;
+
+        if( ref( $node ) eq 'HASH' )
+        {
+            # Draft 2020-12 alias: allow "definitions" to hit "$defs" if needed
+            if( $tok eq 'definitions' &&
+                !exists( $node->{definitions} ) &&
+                exists( $node->{'$defs'} ) )
+            {
+                $tok = '$defs';
+            }
+
+            unless( exists( $node->{$tok} ) )
+            {
+                # Optional: help debug resolution problems
+                warn( "_jsv_resolve_internal_ref: token '$tok' not found in current hash for pointer '$ptr'\n" )
+                    if( $JSON::Schema::Validate::DEBUG );
+                return;
+            }
+            $node = $node->{ $tok };
+        }
+        elsif( ref( $node ) eq 'ARRAY' )
+        {
+            unless( $tok =~ /^\d+$/ && $tok < @$node )
+            {
+                warn( "_jsv_resolve_internal_ref: array index '$tok' out of range for pointer '$ptr'\n" )
+                    if( $JSON::Schema::Validate::DEBUG );
+                return;
+            }
+            $node = $node->[ $tok ];
+        }
+        else
+        {
+            warn( "_jsv_resolve_internal_ref: reached non-container node while resolving '$ptr'\n" )
+                if( $JSON::Schema::Validate::DEBUG );
+            return;
+        }
+    }
+
+    return( $node );
 }
 
 # Keyword groups
@@ -2448,6 +3575,87 @@ sub _ptr_of_node
     return( '#' );
 }
 
+my %SCRIPT_LIKE = map{ $_ => 1 } qw(
+    Hiragana Katakana Han Hangul Latin Cyrillic Greek
+    Hebrew Thai Armenian Georgian
+    Arabic Devanagari Bengali Gurmukhi Gujarati Oriya
+    Tamil Telugu Kannada Malayalam Sinhala
+    Lao Tibetan Myanmar Khmer
+);
+sub _re_to_js
+{
+    my $re = shift( @_ );
+    my %opt = @_;
+
+    # style: 'literal'  => for use in /.../u
+    #        'string'   => for use in new RegExp("...", "u")
+    my $style = $opt{style} || 'string';
+
+    return if( !defined( $re ) || !length( $re ) );
+
+    #
+    # 1) Convert \x{...} (Perl) to \u.... or \u{....} (JS)
+    #    - 1–4 hex digits  -> \uHHHH
+    #    - 5–6 hex digits  -> \u{HHHHH}  (requires /u in JS)
+    #
+    $re =~ s{
+        \\x\{([0-9A-Fa-f]{1,6})\}
+    }{
+        my $hex = uc( $1 );
+        if( length( $hex ) <= 4 )
+        {
+            "\\u$hex";
+        }
+        else
+        {
+            "\\u\{$hex\}";
+        }
+    }egx;
+
+    # Script eXtended
+    # 
+    # 2) Convert \p{Katakana} / \P{Katakana}
+    #    to \p{scx=Katakana} / \P{scx=Katakana}
+    #    (Script_Extensions so it covers half-width too)
+    #
+    $re =~ s[
+        \\([pP])\{([^}]+)\}
+    ][
+        my( $p, $name ) = ( $1, $2 );
+
+        my $norm = $name;
+        $norm =~ s/^\s+|\s+$//g;
+        $norm = ucfirst( lc( $norm ) );
+
+        if( exists( $SCRIPT_LIKE{ $norm } ) )
+        {
+            "\\$p\{scx=$norm\}";
+        }
+        else
+        {
+            # Pass other properties through unchanged:
+            # \p{L}, \p{Letter}, \p{Nd}, etc.
+            "\\$p\{$name\}";
+        }
+    ]egx;
+
+    #
+    # 3) Optionally escape backslashes for JS string literal
+    #
+    if( $style eq 'string' )
+    {
+        $re =~ s{\\}{\\\\}g;   # existing
+        $re =~ s{"}{\\"}g;     # escape "
+        $re =~ s{\n}{\\n}g;
+        $re =~ s{\r}{\\r}g;
+        $re =~ s{/}{\/}g;
+    }
+
+    # For 'literal', we leave backslashes as-is, for use in /.../u
+
+    return( $re );
+}
+
 sub _register_builtin_media_validators
 {
     my( $self ) = @_;
@@ -2981,16 +4189,95 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
         ->prune_unknown
         ->register_builtin_formats
         ->trace
-        ->trace_limit(200); # 0 means unlimited
+        ->trace_limit(200) # 0 means unlimited
+        ->unique_keys; # enable uniqueKeys
 
-    my $ok = $js->validate({ name => 'head', next=>{ name => 'tail' } })
+You could also do:
+
+    my $js = JSON::Schema::Validate->new( $schema,
+        compile          => 1,
+        content_checks   => 1,
+        ignore_req_vocab => 1,
+        prune_unknown    => 1,
+        trace_on         => 1,
+        trace_on         => 200,
+        trace_on         => 1,
+    )->register_builtin_formats;
+
+    my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
         or die( $js->error );
 
     print "ok\n";
 
+Generating a browser-side validator with L</compile_js>:
+
+    use JSON::Schema::Validate;
+    use JSON ();
+
+    my $schema = JSON->new->decode( do {
+        local $/;
+        <DATA>;
+    } );
+
+    my $js = JSON::Schema::Validate->new( $schema )
+        ->compile;
+    my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
+        or die( $js->error );
+
+    # Generate a standalone JavaScript validator for use in a web page.
+    # ecma => 2018 enables Unicode regex features when available.
+    my $js_code = $validator->compile_js( ecma => 2018 );
+
+    open my $fh, '>:encoding(UTF-8)', 'htdocs/js/schema-validator.js'
+        or die( "Unable to write schema-validator.js: $!" );
+    print {$fh} $js_code;
+    close $fh;
+
+In your HTML:
+
+    <script src="/js/schema-validator.js"></script>
+    <script>
+    function validateForm()
+    {
+        var src = document.getElementById('payload').value;
+        var out = document.getElementById('errors');
+        var inst;
+
+        try
+        {
+            inst = JSON.parse( src );
+        }
+        catch( e )
+        {
+            out.textContent = "Invalid JSON: " + e;
+            return;
+        }
+
+        // The generated file defines a global function `validate(inst)`
+        // that returns an array of error objects.
+        var errors = validate( inst );
+
+        if( !errors || !errors.length )
+        {
+            out.textContent = "OK – no client-side schema errors.";
+            return;
+        }
+
+        var lines = [];
+        for( var i = 0; i < errors.length; i++ )
+        {
+            var e = errors[i];
+            lines.push(
+                e.path + " [" + e.keyword + "]: " + e.message
+            );
+        }
+        out.textContent = lines.join("\n");
+    }
+    </script>
+
 =head1 VERSION
 
-v0.5.1
+v0.6.0
 
 =head1 DESCRIPTION
 
@@ -3013,6 +4300,10 @@ A practical Perl API (constructor takes the schema; call C<validate> with your d
 =item *
 
 Builtin validators for common C<format>s (date, time, email, hostname, ip, uri, uuid, JSON Pointer, etc.), with the option to register or override custom format handlers.
+
+=item *
+
+Optional code generation via L</compile_js> to run a subset of the schema client-side in JavaScript, using the same error structure as the Perl validator.
 
 =back
 
@@ -3040,8 +4331,7 @@ C<minLength>, C<maxLength>, C<pattern>, C<format>.
 
 =item * Arrays
 
-C<prefixItems>, C<items>, C<contains>, C<minContains>, C<maxContains>,
-C<uniqueItems>, C<unevaluatedItems>.
+C<prefixItems>, C<items>, C<contains>, C<minContains>, C<maxContains>, C<uniqueItems>, C<unevaluatedItems>.
 
 =item * Objects
 
@@ -3060,6 +4350,8 @@ C<if>, C<then>, C<else>.
 C<$id>, C<$anchor>, C<$ref>, C<$dynamicAnchor>, C<$dynamicRef>.
 
 =back
+
+The Perl engine supports the full list above. The generated JavaScript currently implements a pragmatic subset; see L</compile_js> for details.
 
 =head2 Formats
 
@@ -3255,7 +4547,7 @@ Explicitly enable or disable the C<uniqueKeys> applicator.
 
 C<uniqueKeys> is a non-standard extension (proposed for future drafts) that enforces uniqueness of one or more properties across all objects in an array.
 
-    "uniqueKeys": [ ["id"] ]                    # 'id' must be unique
+    "uniqueKeys": [ ["id"] ]                   # 'id' must be unique
     "uniqueKeys": [ ["id"], ["email"] ]        # id AND email must each be unique
     "uniqueKeys": [ ["category", "code"] ]     # the pair (category,code) must be unique
 
@@ -3288,6 +4580,213 @@ Enable or disable the compiled-validator fast path.
 When enabled and the root hasn’t been compiled yet, this triggers an initial compilation.
 
 Returns the current object to enable chaining.
+
+=head2 compile_js
+
+    my $js_source = $js->compile_js;
+    my $js_source = $js->compile_js( ecma => 2018 );
+
+Generate a standalone JavaScript validator for the current schema and return it as a UTF-8 string.
+
+You are responsible for writing this string to a C<.js> file and serving it to the browser (or embedding it in a page).
+
+The generated code:
+
+=over 4
+
+=item *
+
+Wraps everything in a simple IIFE (Immediately Invoked Function Expression) C<(function(global){ ... })(this)>.
+
+=item *
+
+Defines a single public function:
+
+    function validate(inst) { ... }
+
+exported on the global object (C<window.validate> in a browser).
+
+=item *
+
+Implements the same error reporting format as the Perl engine, but using plain JavaScript objects:
+
+    {
+        path:           "#/path/in/instance",
+        keyword:        "minimum",
+        message:        "number is less than minimum 2",
+        schema_pointer: "#/definitions/.../minimum"
+    }
+
+=item *
+
+Returns an C<Array> of such error objects. If validation succeeds, the array is empty.
+
+=back
+
+Supported JavaScript options:
+
+=over 4
+
+=item C<ecma =E<gt> "auto" | YEAR>
+
+Controls which JavaScript regexp features the generated code will try to use.
+
+    ecma => "auto"      # default
+    ecma => 2018        # assume ES2018+ (Unicode property escapes, etc.)
+
+When C<ecma> is a number C<E<gt>= 2018>, patterns that use Unicode property escapes (e.g. C<\p{scx=Katakana}>) are compiled with the C</u> flag and will take advantage of Script / Script_Extensions support when the browser has it.
+
+In C<"auto"> mode the generator emits cautious compatibility shims: “advanced” patterns are wrapped in C<try/catch>; if the browser cannot compile them, those checks are silently skipped on the client (and are still enforced server-side by Perl).
+
+=back
+
+=head3 JavaScript keyword coverage
+
+The generated JS implements a pragmatic subset of the Perl engine:
+
+=over 4
+
+=item * Types
+
+C<type> (including unions).
+
+=item * Constants / enumerations
+
+C<const> (primitive values only) and C<enum>.
+
+Complex object/array C<const> values are currently ignored client-side and enforced server-side only.
+
+=item * Numbers
+
+C<minimum>, C<maximum>, C<exclusiveMinimum>, C<exclusiveMaximum>.
+
+For better UX, numeric-looking strings such as C<"10"> or C<"3.14"> are coerced to numbers before applying bounds. Non-numeric values:
+
+=over 4
+
+=item *
+
+trigger a C<type> error (C<"expected number but found string">) when numeric keywords are present and no explicit C<type> is declared;
+
+=item *
+
+or are handled by the normal C<type> keyword if you explicitly declared C<< type => 'number' >> in the schema.
+
+=back
+
+=item * Strings
+
+C<minLength>, C<maxLength>, C<pattern>.
+
+Patterns are converted from Perl syntax to JavaScript using a conservative converter (e.g. C<\x{FF70}> to C<\uFF70>, C<\p{Katakana}> to C<\p{scx=Katakana}>). When the browser does not support the necessary Unicode features, such patterns are skipped client-side.
+
+=item * Arrays
+
+C<items> (single-schema form), C<minItems>, C<maxItems>, C<contains>, C<minContains>, C<maxContains>.
+
+=item * Objects
+
+C<properties>, C<required>.
+
+=item * Combinators
+
+C<allOf>, C<anyOf>, C<oneOf>, C<not>.
+
+“Negative required” patterns of the form C<< { "not": { "required": [...] } } >> are intentionally skipped on the client and enforced server-side only.
+
+=item * Conditionals
+
+C<if>, C<then>, C<else>, with the same semantics as the Perl engine: C<if> is evaluated in a “shadow” context and never produces errors directly; only C<then>/C<else> do.
+
+=item * Non-core extension
+
+C<uniqueKeys> when you enabled it via C<< unique_keys => 1 >> or C<< ->unique_keys >>.
+
+=back
+
+The following are intentionally B<not> implemented in JavaScript (but are fully supported in Perl):
+
+=over 4
+
+=item *
+
+C<format> (client-side format checks are skipped).
+
+=item *
+
+C<prefixItems>, C<patternProperties>, C<unevaluatedItems>, C<unevaluatedProperties>, C<contentEncoding>, C<contentMediaType>, C<contentSchema>, external C<$ref> and C<$dynamicRef> targets.
+
+=back
+
+In other words: the JS validator is a fast, user-friendly I<pre-flight> check for web forms; the Perl validator remains the source of truth.
+
+=head3 Example: integrating the generated JS in a form
+
+Perl side:
+
+    my $schema = ...; # your decoded schema
+
+    my $validajstor = JSON::Schema::Validate->new( $schema )
+        ->compile;
+
+    my $js_source = $validator->compile_js( ecma => 2018 );
+
+    open my $fh, '>:encoding(UTF-8)', 'htdocs/js/validator.js'
+        or die( "Cannot write JS: $!" );
+    print {$fh} $js_source;
+    close $fh;
+
+HTML / JavaScript:
+
+    <textarea id="company-data" rows="8" cols="80">
+    { "name_ja": "株式会社テスト", "capital": 1 }
+    </textarea>
+
+    <button type="button" onclick="runValidation()">Validate</button>
+
+    <pre id="validation-errors"></pre>
+
+    <script src="/js/validator.js"></script>
+    <script>
+    function runValidation()
+    {
+        var src = document.getElementById('company-data').value;
+        var out = document.getElementById('validation-errors');
+        var inst;
+
+        try
+        {
+            inst = JSON.parse( src );
+        }
+        catch( e )
+        {
+            out.textContent = "Invalid JSON: " + e;
+            return;
+        }
+
+        var errors = validate( inst ); // defined by validator.js
+
+        if( !errors || !errors.length )
+        {
+            out.textContent = "OK – no client-side schema errors.";
+            return;
+        }
+
+        var lines = [];
+        for( var i = 0; i < errors.length; i++ )
+        {
+            var e = errors[i];
+            lines.push(
+                "- " + e.path +
+                " [" + e.keyword + "]: " +
+                e.message
+            );
+        }
+        out.textContent = lines.join("\n");
+    }
+    </script>
+
+You can then map each error back to specific fields, translate C<message> via your own localisation layer, or forward the C<errors> array to your logging pipeline.
 
 =head2 content_checks
 
@@ -3461,8 +4960,7 @@ Register a content B<decoder> for C<contentEncoding>. The callback receives a si
 
 =item * C<undef> (failure);
 
-=item * or the triplet C<( $ok, $msg, $out )> where C<$ok> is truthy on success,
-C<$msg> is an optional error string, and C<$out> is the decoded value.
+=item * or the triplet C<( $ok, $msg, $out )> where C<$ok> is truthy on success, C<$msg> is an optional error string, and C<$out> is the decoded value.
 
 =back
 
@@ -3648,7 +5146,7 @@ If C<if> fails and C<else> is present, C<else> is evaluated against the real con
 
 This matches the JSON Schema 2020-12 intent: only C<then>/C<else> affect validity, C<if> itself never does.
 
-=item * Unevaluated*
+=item * C<unevaluatedItems> / C<unevaluatedProperties>
 
 Both C<unevaluatedItems> and C<unevaluatedProperties> are enforced using annotation produced by earlier keyword evaluations within the same schema object, matching draft 2020-12 semantics.
 

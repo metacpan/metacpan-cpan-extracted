@@ -5,8 +5,8 @@ RTx 'RT-Extension-ConditionalCustomFields';
 license 'gpl_3';
 repository 'https://github.com/gibus/RT-Extension-ConditionalCustomFields';
 
-requires_rt('4.2.0');
-rt_too_new('5.1.0');
+requires_rt('6.0.0');
+rt_too_new('6.1.0');
 
 readme_from 'lib/RT/Extension/ConditionalCustomFields.pm', 0, 'md', 'README.md';
 

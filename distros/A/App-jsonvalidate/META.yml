@@ -23,7 +23,7 @@ no_index:
 requires:
   Getopt::Class: v1.1.4
   JSON: '4.10'
-  JSON::Schema::Validate: v0.3.0
+  JSON::Schema::Validate: v0.6.0
   Module::Generic: v1.1.3
   Pod::Usage: '2.01'
   Term::ANSIColor::Simple: '0.10'
@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/App-jsonvalidate/issues
   repository: https://gitlab.com/jackdeguest/App-jsonvalidate
-version: v0.1.0
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

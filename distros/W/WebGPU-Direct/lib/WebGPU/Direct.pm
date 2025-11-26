@@ -4,7 +4,7 @@ use v5.30;
 no warnings qw(experimental::signatures);
 use feature 'signatures';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Carp;
 use WebGPU::Direct::XS;
@@ -51,6 +51,13 @@ sub new_window (
   {
     local $@;
     my $result = eval { $class->new_window_wayland( $xw, $yh ); };
+    return $result
+        if $result;
+  }
+  if (WebGPU::Direct::XS::HAS_WIN32)
+  {
+    local $@;
+    my $result = eval { $class->new_window_win32( $xw, $yh ); };
     return $result
         if $result;
   }
@@ -117,7 +124,7 @@ Create a new WebGPU::Direct instance. This inherits from L<WebGPU::Direct::Insta
 
 =head2 new_window
 
-    $wgpu->CreateSurface( { nextInChain => WebGPU::Direct->new_window( $width, $height ) } );
+    $wgpu->createSurface( WebGPU::Direct->new_window( $width, $height ) );
 
 =over
 
@@ -133,7 +140,7 @@ Create a new WebGPU::Direct instance. This inherits from L<WebGPU::Direct::Insta
 
 =back
 
-Constructs a C<WebGPU::Direct::SurfaceDescriptorFrom*> object, usable for passing to L<CreateSurface|WebGPU::Direct::Instance/CreateSurface>. These are crude and simplistic windows suitable for testing WebGPU with, but there are no options and doesn't come with any way to interact or configure the window.
+Constructs a C<WebGPU::Direct::SurfaceDescriptorFrom*> object, usable for passing to L<createSurface|WebGPU::Direct::Instance/createSurface>. These are crude and simplistic windows suitable for testing WebGPU with, but there are no options and doesn't come with any way to interact or configure the window.
 
 Currently the supported windowing systems are:
 
@@ -143,6 +150,8 @@ Currently the supported windowing systems are:
 
 =item * Wayland
 
+=item * Microsoft Windows (win32)
+
 =back
 
 =head2 WebGPU::Direct::XS::HAS_<FOO>
@@ -150,6 +159,76 @@ Currently the supported windowing systems are:
 Constant indicating if C<FOO> support is compiled in. This only indicates that C<WebGPU::Direct> detected and compiled C<FOO> was available when installed, making L</new_window> available. C<FOO> windows can still be used if you manually construct the C<WebGPU::Direct::SurfaceDescriptorFrom*> object.
 
 =head1 METHODS
+
+=head2 createAdapter
+
+=over
+
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Adapter>
+
+=back
+
+=item * Arguments
+
+=over
+
+=item * options (L<WebGPU::Direct::RequestAdapterOptions|WebGPU::Direct::Types/WebGPU::Direct::RequestAdapterOptions>) Default: undef
+
+=item * callback (WebGPU::Direct::RequestAdapterCallback (Code reference)) Default: undef
+
+=item * userdata (Scalar (void *)) Default: {}
+
+=back
+
+Alternative to requestAdapter that does all of the waiting and processing
+required to get an adapter. If no callback is provided, then a default one
+will be used that can produce a usable adapter.
+
+It is B<highly> encouraged to pass in a compatibleSurface. Failure to pass
+one in will likely not return an adapter that can be used with any surface.
+
+=back
+
+=head2 createSurface
+
+=over
+
+=item * Return Type
+
+=over
+
+=item * L<WebGPU::Direct::Surface>
+
+=back
+
+=item * Arguments
+
+=over
+
+=item * descriptor (L<WebGPU::Direct::SurfaceDescriptor|WebGPU::Direct::Types/WebGPU::Direct::SurfaceDescriptor> or compatible window object)
+
+=back
+
+Creates a surface for displaying onto. The SurfaceDescriptor is very exact
+requirements and needs to follow the layout of L<WebGPU::Direct::SurfaceDescriptor|WebGPU::Direct::Types/WebGPU::Direct::SurfaceDescriptor>
+exactly, including the requirement of what value goes into C<nextInChain>.
+It is also possible to pass in the results of L<new_window|/new_window>
+directly in. You can also pass in a window object from several other modules
+available on CPAN. Currently supported modules are:
+
+=over
+
+=item * L<X11::Xlib::Window|X11::Xlib::Window>
+
+=item * L<X11::XCB::Window|X11::XCB::Window>
+
+=back
+
+=back
 
 =head1 TYPES
 
@@ -255,11 +334,11 @@ There appears to be an issue with L<ColorAttachment|WebGPU::Direct::ColorAttachm
 
 =head3 Error reflecting bind group 0: Validation Error / Invalid group index 0
 
-When a L<RenderPipeline|WebGPU::Direct::RenderPipeline> is being ran with an C<auto> layout, that C<layout> is not defined in the L<RenderPipelineDescriptor|WebGPU::Direct::RenderPipelineDescriptor> passed to C<$device-E<gt>CreateRenderPipeline>, WebGPU will auto analyze the C<WGSL> to determine the group bindings. If a group binding is not used, the layout for it will not be included in the layout. You will need to either use the group binding in the shaders, or manually create and use a layout definition.
+When a L<RenderPipeline|WebGPU::Direct::RenderPipeline> is being ran with an C<auto> layout, that C<layout> is not defined in the L<RenderPipelineDescriptor|WebGPU::Direct::RenderPipelineDescriptor> passed to C<$device-E<gt>createRenderPipeline>, WebGPU will auto analyze the C<WGSL> to determine the group bindings. If a group binding is not used, the layout for it will not be included in the layout. You will need to either use the group binding in the shaders, or manually create and use a layout definition.
 
 =head3 Surface image is already acquired
 
-The WebGPU JavaScript API and the WebGPU Native API differ slightly in how you interact with the hardware. In JavaScript, the L<GPUCanvasContext|https://developer.mozilla.org/en-US/docs/Web/API/GPUCanvasContext> is used, and with the native it is a L<Surface|WebGPU::Direct::Surface>. The core functions are in both, but the Native API has several extra that the JavaScript API does not have, most notably L<Present|WebGPU::Direct::Surface/Present>, which informs the system that rendering is complete. Because of this, this you cannot acquire a L<TextureView|WebGPU::Direct::TextureView> twice in a single frame via the L<CreateView|WebGPU::Direct::TextureView/CreateView> function before calls to L<Present|WebGPU::Direct::Surface/Present>. Tryig to get it a second time will will throw this error.
+The WebGPU JavaScript API and the WebGPU Native API differ slightly in how you interact with the hardware. In JavaScript, the L<GPUCanvasContext|https://developer.mozilla.org/en-US/docs/Web/API/GPUCanvasContext> is used, and with the native it is a L<Surface|WebGPU::Direct::Surface>. The core functions are in both, but the Native API has several extra that the JavaScript API does not have, most notably L<Present|WebGPU::Direct::Surface/Present>, which informs the system that rendering is complete. Because of this, this you cannot acquire a L<TextureView|WebGPU::Direct::TextureView> twice in a single frame via the L<createView|WebGPU::Direct::TextureView/createView> function before calls to L<Present|WebGPU::Direct::Surface/Present>. Tryig to get it a second time will will throw this error.
 
 Because the JavaScript WebGPU API does not have a L<Present|WebGPU::Direct::Surface/Present> function, examples will not include it; it happens implictly after each frame function. That means you must remember to call it at the end of each frame loop when the render is ready to go.
 

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.106-6-g819d02fa
+package OpenAPI::Modern; # git description: v0.107-3-g8d88c679
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 
 use 5.020;
 use utf8;
@@ -1071,7 +1071,7 @@ sub _type_in_schema ($self, $schema, $state) {
 
   my @types;
 
-  push @types, is_plain_arrayref($schema->{type}) ? ($schema->{types}->@*) : ($schema->{type})
+  push @types, is_plain_arrayref($schema->{type}) ? ($schema->{type}->@*) : ($schema->{type})
     if exists $schema->{type};
 
   push @types, map $self->_type_in_schema($schema->{allOf}[$_],
@@ -1236,7 +1236,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,7 @@ function: set
 config:
   test_undef: off
   test_empty: off
+  test_nuls: no
 
 new: ''
 
@@ -16,3 +17,10 @@ input:
     min: 1
 output:
   type: object
+
+cases:
+  undef_warns:
+    input:
+      text:
+        undef
+    _STATUS: DIES

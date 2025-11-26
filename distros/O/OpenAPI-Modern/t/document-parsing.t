@@ -166,6 +166,10 @@ subtest '/paths correctness' => sub {
         '/{foo}{bar}' => {},      # valid, but inadvised
         '/{foo}-{bar}' => {},     # valid
         '/{foo}%20{bar}' => {},   # valid
+        '/f/?/g' => {},           # invalid
+        '/h/#/i' => {},           # invalid
+        '/j/{foo?bar}' => {},     # valid, but weird
+        '/k/{foo#bar}' => {},     # valid, but weird
       },
     },
   );
@@ -203,12 +207,12 @@ subtest '/paths correctness' => sub {
         absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
         error => 'duplicate path template variable "e"',
       },
-      {
+      (map +{
         instanceLocation => '',
-        keywordLocation => '/paths/~1e~1{e{}',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1e~1{e{}')),
-        error => 'invalid path template "/e/{e{}"',
-      },
+        keywordLocation => jsonp('/paths', $_),
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#'.jsonp('/paths', $_))),
+        error => 'invalid path template "'.$_.'"',
+      }, '/e/{e{}', '/f/?/g', '/h/#/i'),
     ],
     'duplicate paths or template variables are not permitted',
   );
@@ -220,6 +224,8 @@ subtest '/paths correctness' => sub {
 '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}': duplicate path template variable "c"
 '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}': duplicate path template variable "e"
 '/paths/~1e~1{e{}': invalid path template "/e/{e{}"
+'/paths/~1f~1?~1g': invalid path template "/f/?/g"
+'/paths/~1h~1#~1i': invalid path template "/h/#/i"
 ERRORS
 };
 

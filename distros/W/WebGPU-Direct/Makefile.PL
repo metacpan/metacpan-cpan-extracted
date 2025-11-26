@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,20 +44,25 @@ my %FallbackPrereqs = (
 
 my $addl_search = $ENV{ADDL_SEARCH} // '';
 my $addl_L      = '';
+my $wgpu;
 
-if ( !$addl_search && -e 'webgpu/webgpu.h' )
+foreach my $path ( qw[webgpu webgpu/include/webgpu include/webgpu] )
 {
-  $addl_search = 'webgpu';
-}
+  if ( !$addl_search && -e "$path/webgpu.h" )
+  {
+    $addl_search = $path;
+    last;
+  }
 
-if ( $addl_search && -e "$addl_search/webgpu/webgpu.h" )
-{
-  $addl_search = "$addl_search/webgpu/";
+  if ( $addl_search && -e "$addl_search/$path/webgpu.h" )
+  {
+    $addl_search = "$addl_search/$path/";
+  }
 }
 
 if ($addl_search)
 {
-  $addl_L = "-L$addl_search";
+  $addl_L = "-L$addl_search -L$addl_search/../../lib";
 }
 
 my ($EXTRALIBS) = do
@@ -70,20 +75,49 @@ sub is_lib
 {
   my $lib = shift;
 
+  if ( $^O eq 'MSWin32' )
+  {
+    my $lib_dll = "$lib.dll";
+    my ($extra) = ExtUtils::Liblist->ext("$addl_L -l$lib_dll");
+    $extra =~ s/\Q$EXTRALIBS//;
+
+    return $lib_dll
+      if $extra;
+  }
+
   my ($extra) = ExtUtils::Liblist->ext("$addl_L -l$lib");
   $extra =~ s/\Q$EXTRALIBS//;
 
-  return !!$extra;
+  return $lib
+    if $extra;
+
+  return;
 }
 
-my $wgpu;
 my @tests = qw/wgpu_native dawn_native/;
 for my $wgpu_test (@tests)
 {
-  if ( is_lib($wgpu_test) )
+  if ( my $lib = is_lib($wgpu_test) )
   {
-    $wgpu = $wgpu_test;
+    $wgpu = $lib;
     last;
+  }
+}
+
+if ( !$wgpu )
+{
+  ( $wgpu, $addl_search ) = do './Makefile.download.pl';
+  die $@
+      if $@;
+
+  if ($wgpu)
+  {
+    $addl_L = "-L$addl_search -L$addl_search/../../lib";
+    $wgpu = is_lib($wgpu);
+    if ( !$wgpu )
+    {
+      die "Could not download and use $wgpu successfully";
+    }
   }
 }
 
@@ -118,10 +152,30 @@ if ( is_lib('wayland-client') && qx/pkg-config --version 2>&1/ )
   }
 }
 
+if ( $^O eq 'MSWin32' )
+{
+  push @defines, '-DHAS_WIN32';
+
+  *MY::postamble = sub
+  {
+    my $dll_cp = File::Spec->catdir( $addl_search,          '..', '..', 'lib', $wgpu );
+    my $dll_to = File::Spec->catdir( '$(INST_ARCHAUTODIR)', $wgpu );
+    return join(
+      "\n",
+      "dynamic :: $dll_cp",
+      "\t\$(CP_NONEMPTY) $dll_cp $dll_to \$(PERM_RWX)"
+
+          #cp myexternal_lib.so $(INSTALLSITELIB)/auto/Your/Module/
+    );
+  }
+}
+
 $WriteMakefileArgs{LIBS}   = "$addl_L -l$wgpu @libs";
 $WriteMakefileArgs{DEFINE} = "@defines";
 $WriteMakefileArgs{INC}    = "-I$addl_search/.."
     if $addl_search;
+
+# vim: syntax=perl
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

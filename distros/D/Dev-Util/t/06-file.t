@@ -130,9 +130,9 @@ is( file_is_setuid($tff), 0,
     'file_is_setuid - non-setuid file returns false' );
 
 $mode = oct(4444);
-my $chmod_result = chmod $mode, $tff;
+my $chmod_suid_result = chmod $mode, $tff;
 SKIP: {
-    skip "Could not set setuid bit on test file", 1 unless ($chmod_result);
+    skip "Could not set setuid bit on test file", 1 unless ($chmod_suid_result);
     is( file_is_setuid($tff), 1, 'file_is_setuid - setuid file returns true' );
 }
 
@@ -144,9 +144,9 @@ is( file_is_setgid($tff), 0,
     'file_is_setgid - non-setgid file returns false' );
 
 $mode = oct(2444);
-$chmod_result = chmod $mode, $tff;
+my $chmod_guid_result = chmod $mode, $tff;
 SKIP: {
-    skip "Could not set setgid bit on test file", 1 unless ($chmod_result);
+    skip "Could not set setgid bit on test file", 1 unless ($chmod_guid_result);
     is( file_is_setgid($tff), 1, 'file_is_setgid - setgid file returns true' );
 }
 
@@ -158,9 +158,9 @@ is( file_is_sticky($tff), 0,
     'file_is_sticky - non-sticky file returns false' );
 
 $mode = oct(1444);
-$chmod_result = chmod $mode, $tff;
+my $chmod_sticky_result = chmod $mode, $tff;
 SKIP: {
-    skip "Could not set sticky bit on test file", 1 unless ($chmod_result);
+    skip "Could not set sticky bit on test file", 1 unless ($chmod_sticky_result);
     is( file_is_sticky($tff), 1, 'file_is_sticky - sticky file returns true' );
 }
 
@@ -347,8 +347,8 @@ is( $file_date, $expected_date, "stat_date - dir_format monthly case" );
 #              status_for              #
 #======================================#
 
-my $file_mtime = status_for($tf)->{ mtime };
-is( $file_mtime, '1708449443', 'status_for - mtime of file' );
+my $file_size = status_for($tf)->{ size };
+is( $file_size, '0', 'status_for - size of file' );
 
 #======================================#
 #              read_list               #

@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v2.19.12] - 2025-11-25
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🧪 Testing
+
+- *(file)* Change status_for test to avoid timezone issues
+- *(file)* Refactor to give each suid,guid,sticky test its own variable
+
+### 📚 Documentation
+
+- *(pod)* Provide links to sub-modules
+- *(pod)* Add links to sub-modules. Pod clean-up
+
+### 🚧 Build
+
+- *(manifest)* Skip test.pl so installers wont need yath or prove
+
+## [release/2025/11/20/1858] - 2025-11-20
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v2.19.11] - 2025-11-20
 
 ### 🐛 Bug Fixes

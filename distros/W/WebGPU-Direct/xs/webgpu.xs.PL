@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.20;
+use v5.30;
 use warnings;
 
 use FindBin qw/$Bin $Script/;
@@ -12,9 +12,11 @@ use autodie;
 
 my $add_trace = $ENV{WGPU_PL_TRACE} // 0;
 
-open my $h,  '<', "$Bin/../webgpu/webgpu.h";
+my $h_file = find_header();
+
+open my $h,  '<', $h_file;
 open my $xs, '>', "$Bin/webgpu.xs";
-open my $c,  '>', "$Bin/webgpu.c";
+open my $c,  '>', "$Bin/webgpu_wrap.c";
 open my $tm, '>', "$Bin/../typemap";
 open my $pm, '>', "$Bin/../lib/WebGPU/Direct/XS.pm";
 
@@ -50,9 +52,11 @@ my @typemap = (
   q{T_VOID},
   q{    $arg = _void__wrap($var);},
   q{T_FETCH},
-  q{    $arg = ${$type=~tr/:/_/, \$type}__wrap($var);},
+  q{    ${$type=~tr/:/_/, \$type}* ptr_$var; Newx(ptr_$var, 1, $type);},
+  q{    Copy(&$var, ptr_$var, 1, $type);},
+  q{    $arg = ${\$type}__wrap(ptr_$var); /* T_FETCH */},
   q{T_FETCHPTR},
-  q{    $arg = ${$type=~tr/:/_/, \$type}__wrap($var);},
+  q{    $arg = ${$type=~tr/:/_/, \$type}__wrap($var); /* T_FETCHPTR */},
 );
 
 my $arrcnt_re = qr/^(\w+)Count$/xms;
@@ -82,11 +86,12 @@ say $tm $edit_warning;
 say $pm $edit_warning;
 say $pm q{use v5.30;};
 say $pm q{use warnings;};
+say $pm q{use Carp;};
 say $pm q{};
 say $pm q[package # Hide from PAUSE];
 say $pm q[    WebGPU::Direct::XS];
 say $pm q[{];
-say $pm q[  our $VERSION = '0.14';];
+say $pm q[  our $VERSION = '0.15';];
 say $pm q[  require XSLoader;];
 say $pm q[  XSLoader::load('WebGPU::Direct', $VERSION);];
 say $pm q[}];
@@ -127,6 +132,7 @@ sub trace_c
   return \qq{printf("$name: $stage L%d\\n", __LINE__);};
 }
 
+# Parse the header file
 while (<$h>)
 {
   chomp;
@@ -140,6 +146,21 @@ while (<$h>)
     next;
   }
 
+  # Ignore multi-line comments
+  if (m[(.*?) /[*] .*?]xms .. m[.*? [*]/ (.*)]xms )
+  {
+    next
+      if !defined $1;
+    $_ = $1;
+  }
+
+  # Ignore multi-line definitions
+  if (m/^ [#] .* \\ $/xms .. m[ [^\\] $ ]xms )
+  {
+    next;
+  }
+
+  # Ignore CPP macros, blank lines, and extern statements
   if (m/^ [#] | ^ \s* $ | ^ extern \s* "C" \s* { | ^ } \s* $ /xms)
   {
     next;
@@ -151,6 +172,7 @@ while (<$h>)
     next;
   }
 
+  # Enum typedef blocks
   if ( m[^ typedef \s+ (enum) \s+ (\w+) \s+ { $]xms .. m[ ^ } \s+ (\w+) ; $]xms )
   {
     state $type;
@@ -171,11 +193,12 @@ while (<$h>)
       }
     }
 
+    # Pull out constants, including named ones
     if (
       m[^ \s*
               (\w+) \s*
               = \s*
-              (\w+) \s*
+              ([^,]+) \s*
               ,? \s* $]xms
         )
     {
@@ -196,8 +219,52 @@ while (<$h>)
         $short = lcfirst $short;
       }
 
+      # If it is a definition of previous constants, keep the idea in tact
+      # and let perl do that work of its value
+      if ( $value !~ m/^[0-9a-fx]+$/ixms )
+      {
+        $value =~ s/$type [_] (\w+)/\l$1()/xmsg;
+      }
+
       $enums{$type}->{$value} = "__PACKAGE__->_add_enum('$short' => ($value, '$const'));";
     }
+
+    next;
+  }
+
+  # Bit flag typedef definitions
+  if (m[^ typedef \s+ (WGPUFlags) \s+ (\w+); $]xms)
+  {
+    die "Duplicate typedef: $2"
+        if exists $typedefs{$2};
+    my $type = $2;
+    $enums{$type}    = {};
+    $typedefs{$type} = 'flag';
+    next;
+  }
+
+  # Bit flag definitions
+  if (m[^ static \s+ const \s+ (\w+) \s+ (\w+) \s* = \s* ( (?:0x)? [0-9a-fx]+ ) \s* ;]ixms)
+  {
+    my $type  = $1;
+    my $const = $2;
+    my $value = $3;
+    my $short = $const;
+    $short =~ s/$type\_//;
+    if ( $short =~ m/^\d/ )
+    {
+      $short = "_$short";
+    }
+
+    next
+        if $short eq 'Force32';
+
+    if ( $short !~ m/^[[:upper:]][\d[:upper:]]+/ )
+    {
+      $short = lcfirst $short;
+    }
+
+    $enums{$type}->{$value} = "__PACKAGE__->_add_enum('$short' => ($value, '$const'));";
 
     next;
   }
@@ -320,7 +387,7 @@ while (<$h>)
     my @args = ( $definition =~ m[ \s* ([^,]*) \s+ (\w+) \s* (?: , | $ ) ]xmsg );
 
     # If the last arg is a user-data slot, create a callback situation
-    if ( $return eq 'void' && $args[-2] && $args[-2] =~ m/^void\s+[*]$/ )
+    if ( $return eq 'void' && $args[-2] && $args[-2] =~ m/^void\s*[*]$/ )
     {
       $callbackdefs{$class} = {
         type  => $type,
@@ -426,6 +493,7 @@ while (<$h>)
 say $xs qq{MODULE = WebGPU::Direct\t\tPACKAGE = WebGPU::Direct::XS\t\tPREFIX = wgpu};
 say $pm qq[package\n\tWebGPU::Direct {];
 
+# Map all the shortcuts to their proper calsses
 foreach (@fns)
 {
   my %def = %$_;
@@ -450,8 +518,6 @@ foreach my $enum ( sort keys %enums )
         if $classdefs{$pkg}->{fn_type};
     next
         if $classdefs{$pkg}->{opaque};
-    next
-        if $pkg =~ m/Callback$/;
 
     my $fn = $pkg;
     $fn =~ s/^WebGPU::Direct:://;
@@ -462,6 +528,7 @@ foreach my $enum ( sort keys %enums )
   say $pm join( "\n", @new );
 }
 
+# Write out all the constant definitions
 foreach my $const ( sort keys %$constants )
 {
   my $val = $constants->{$const};
@@ -471,28 +538,25 @@ foreach my $const ( sort keys %$constants )
 say $pm qq[};];
 say $pm qq[];
 
-# Chosen by fair dice roll
-say $c "#define CB_GUARD 0x25b3eea3";
-say $c "typedef struct cb_data {
-    I32 guard1;
-    CV *perlsub;
-    SV *data;
-    I32 guard2;
-} cb_data;
-";
-
 open my $const_pod, '>', "$Bin/../lib/WebGPU/Direct/Constants.pod";
 open my $types_pod, '>', "$Bin/../lib/WebGPU/Direct/Types.pod";
 
+my %enum_base = (
+  enum => 'WebGPU::Direct::Enum',
+  flag => 'WebGPU::Direct::Flag',
+);
+
+# Write out all the enum definitions
 foreach my $enum ( sort keys %enums )
 {
   my $pkg = "WebGPU::Direct::$enum";
   $pkg =~ s/::WGPU/::/;
 
+  my $base = $enum_base{ $typedefs{$enum} };
   $const_pod->say(qq[\n=head1 $pkg]);
   $const_pod->say(qq[\n=over]);
   say $pm qq[package\n\t$pkg {];
-  say $pm qq{  use base "WebGPU::Direct::Enum";};
+  say $pm qq{  use base "$base";};
 
   my %consts = %{ $enums{$enum} };
 
@@ -509,6 +573,44 @@ foreach my $enum ( sort keys %enums )
   say $pm qq[];
 }
 
+# Forward define the callback refs
+foreach my $cb_name ( sort keys %callbackdefs )
+{
+  my $callback = $callbackdefs{$cb_name};
+  my $type     = $callback->{type};
+  my $class    = $callback->{class};
+  my @args     = $callback->{args}->@*;
+  my $c_prefix = "${class}";
+
+  $c_prefix =~ s/::/__/g;
+
+  my @argdefs;
+  my @keys;
+  my @vals;
+  my @pushs;
+
+  my $argoff = -1;
+  foreach my $pair ( pairs @args )
+  {
+    my ( $key, $value ) = @$pair;
+
+    my ($type) = $key =~ m/^(?:struct\s+)?(\w+)/;
+    my $pkg = pkg_name($type);
+
+    warn "Unknown type: $type"
+        if !exists $typedefs{$pkg} && !exists $typedefs{$type};
+
+    push @argdefs, "$key $value";
+  }
+
+  {
+    local $" = ', ';
+    say $c "void ${c_prefix}__callback( @argdefs );";
+  }
+}
+say $c '';
+
+# Produce all the class definitions
 foreach my $class (@classes)
 {
   my %def = $classdefs{$class}->%*;
@@ -537,7 +639,11 @@ foreach my $class (@classes)
 
   if (@defs)
   {
-    if ( $defs[0]->{inline_obj} && 1 == scalar( grep { $_->{inline_obj} } @defs ) )
+    # Tehcnically this gets more than it should, because anyone with a first
+    # element that is non-pointer struct can be used in place of that first
+    # element type. Used to require that the first one be the only inlinable
+    # object, but that now removes some that are legit ISA's. TODO
+    if ( $defs[0]->{inline_obj} )
     {
       my $c_prefix = $defs[0]->{return} . '::';
       $c_prefix =~ s/::/__/g;
@@ -600,6 +706,56 @@ foreach my $class (@classes)
 
       undef $maybe_array;
     }
+
+    # Check for callback-type elements
+    if ( $#defs >= 3 )
+    {
+      my %has_x;
+      foreach my $i ( 0 .. $#defs )
+      {
+        my %def = $defs[$i]->%*;
+
+        foreach my $x (qw/callback userdata1 userdata2/)
+        {
+          if ( $def{key} eq $x )
+          {
+            die "Saw $x twice in the same struct: $class"
+                if $has_x{$x};
+
+            $has_x{$x} = $i || '0 but true';
+            last;
+          }
+        }
+      }
+
+      if ( $has_x{callback} && $has_x{userdata1} && $has_x{userdata2} )
+      {
+        $defs[ $has_x{callback} ]->{struct_key} = 'userdata1';
+
+        $defs[ $has_x{userdata1} ]->{is_ro} = 1;
+        $defs[ $has_x{userdata1} ]->{key}   = '';
+        $defs[ $has_x{userdata1} ]->{klen}  = 0;
+
+        $defs[ $has_x{userdata2} ]->{typedef}    = 'SV';
+        $defs[ $has_x{userdata2} ]->{key}        = 'userdata';
+        $defs[ $has_x{userdata2} ]->{klen}       = 8;
+        $defs[ $has_x{userdata2} ]->{struct_key} = 'userdata2';
+
+        my $cb_type = pkg_name( $defs[ $has_x{callback} ]->{ctype} );
+        $cb_type =~ s/::/__/g;
+        $cb_type .= '__callback';
+
+        $packs .= "  n->callback = &${cb_type};\n";
+      }
+    }
+
+    # Check for a pascal-like string type, aka StringView
+    if ( $#defs == 1 && $defs[0]->{key} eq 'data' && $defs[1]->{key} eq 'length' )
+    {
+      $defs[0]->{str} = 1;
+      $defs[1]->{ro}  = 1;
+    }
+
   }
   else
   {
@@ -658,13 +814,26 @@ foreach my $class (@classes)
   say $xs qq{MODULE = WebGPU::Direct\tPACKAGE = $class\tPREFIX = $prefix};
   say $xs '';
 
+  my @destroys;
   if ( grep { $_->{name} eq 'release' } @fns )
+  {
+    push @destroys, '$_[0]->release;';
+  }
+  if ( grep { $_->{name} eq 'freeMembers' } @fns )
+  {
+    push @destroys, '$_[0]->freeMembers;';
+  }
+
+  if (@destroys)
   {
     $destroy = <<~"EOF"; my $n = qq{
 
         sub DESTROY
         {
-          \$_[0]->release;
+          if ( \${^GLOBAL_PHASE} ne 'DESTRUCT' )
+          {
+            @destroys
+          }
         }
     EOF
     };
@@ -682,6 +851,10 @@ foreach my $class (@classes)
   {
     my %def   = %$_;
     my %calls = calls_for( %$_, c_prefix => $c_prefix );
+
+    next
+      if $def{key} eq '';
+
     $packs   .= $calls{pack};
     $unpacks .= $calls{unpack};
 
@@ -720,6 +893,12 @@ foreach my $class (@classes)
       $coerce      = "ref( \$_[0] ) eq ref [] ? ($constr) : " . $coerce;
     }
 
+    # StringView is special since it represents a string
+    if ( $short_class eq 'StringView' )
+    {
+      $coerce = "(scalar \@_ == 1 && ref( \$_[0] ) eq '') ? (data => \$_[0]) : " . $coerce;
+    }
+
     local $Data::Dumper::Trailingcomma = 1;
     local $Data::Dumper::Sortkeys      = 1;
     my $default = Data::Dumper->Dump( [ $default_raw // {} ], [qw/default/] );
@@ -732,6 +911,7 @@ foreach my $class (@classes)
           $preamble
           my $default
           sub new {
+              local \$SIG{__DIE__} = \\&Carp::confess;
               my \$class = shift;
               die "\$class does not inherit from $class\\n"
                 if !\$class->isa("$class");
@@ -771,12 +951,18 @@ foreach my $class (@classes)
               SV *THIS
           PROTOTYPE: \$
           CODE:
-              $type *n = ($type *) _get_struct_ptr(aTHX, THIS, NULL);
+              $type *n = ($type *) _get_struct_ptr(aTHX_ THIS, NULL);
               RETVAL = newSVpvn((const char *const) n, sizeof($type) );
           OUTPUT:
               RETVAL
       EOF
       };
+
+    my $init_struct = "Newxz(n, 1, $type)";
+    if ( $short_class eq 'StringView' )
+    {
+      $init_struct .= "; _init_strview(aTHX_ h, n)";
+    }
 
     say $c <<~"EOF"; $n = qq{
     void ${c_prefix}__pack( SV *THIS )
@@ -790,10 +976,10 @@ foreach my $class (@classes)
       }
 
       HV *h = (HV *)SvRV(THIS);
-      $type *n = ($type *) _get_struct_ptr(aTHX, THIS, NULL);
+      $type *n = ($type *) _get_struct_ptr(aTHX_ THIS, NULL);
       if ( !n )
       {
-        Newxz(n, 1, $type);
+        $init_struct;
         sv_magicext((SV *)h, NULL, PERL_MAGIC_ext, NULL, (const char *)n, 0);
       }
     $packs
@@ -813,7 +999,7 @@ foreach my $class (@classes)
       }
 
       HV *h = (HV *)SvRV(THIS);
-      $type *n = ($type *) _get_struct_ptr(aTHX, THIS, NULL);
+      $type *n = ($type *) _get_struct_ptr(aTHX_ THIS, NULL);
       if ( !n )
       {
         Newxz(n, 1, $type);
@@ -844,6 +1030,7 @@ foreach my $class (@classes)
         package\n\t$class {
             $preamble
             sub new {
+                local \$SIG{__DIE__} = \\&Carp::croak;
                 my \$class = __PACKAGE__;
                 die "Cannot call new on abstract class \$class";
             }$destroy
@@ -938,7 +1125,7 @@ foreach my $class (@classes)
   }
 
   my $typemap = $typedefs{$class} eq 'obj' ? 'T_SV' : '';
-  if ( $def{ptr_type} && $def{ptr_type} )
+  if ( $def{ptr_type} )
   {
     say $tm sprintf( "%-64s%s", $type,                  'T_FETCHPTR' );
   }
@@ -955,6 +1142,7 @@ foreach my $class (@classes)
   say $c "typedef SV* $c_prefix;";
 }
 
+# Output all of the typemaps
 foreach my $typedef ( sort keys %typedefs )
 {
   next
@@ -970,6 +1158,7 @@ say $tm join( "\n", @typemap );
 
 $tm->flush;
 
+# Load and merge the typemaps into our typemap
 my $tmx = ExtUtils::Typemaps->new;
 foreach my $tm_file ( standard_typemap_locations( \@INC ) )
 {
@@ -982,6 +1171,7 @@ foreach my $tm_file ( standard_typemap_locations( \@INC ) )
   $tmx->merge( file => $tm_file, replace => 1 );
 }
 
+# Write out all the static callback functions
 foreach my $cb_name ( sort keys %callbackdefs )
 {
   my $callback = $callbackdefs{$cb_name};
@@ -1012,14 +1202,30 @@ foreach my $cb_name ( sort keys %callbackdefs )
     push @keys,    $key;
     push @vals,    $value;
 
-    if ( $value eq 'userdata' )
+    # userdata1 is the callback, which we don't need to supply
+    if ( $value eq 'userdata1' )
     {
-      push @pushs, "\n    XPUSHs(cb->data);";
+      next;
+    }
+
+    # userdata2 is the userdata, which we handle special
+    if ( $value eq 'userdata2' )
+    {
+      push @pushs, "\n    XPUSHs(user_sv);";
       next;
     }
 
     my $outputmap = $tmx->get_outputmap( ctype => $key );
     $argoff++;
+
+    # If we're passed a const-pointer to a normal type, we can take extra
+    # steps to pass it along
+    my $const_ptr;
+    if ( !defined $outputmap && $key =~ m/^(\w+) \s+ const \s* [*]/xms )
+    {
+      $outputmap = $tmx->get_outputmap( ctype => $1 );
+      $const_ptr = 1;
+    }
 
     die "Can't find for ctype $key"
         if !defined $outputmap;
@@ -1030,6 +1236,11 @@ foreach my $cb_name ( sort keys %callbackdefs )
       my $type = $type;
 
       $type =~ tr/:/_/;
+
+      if ($const_ptr)
+      {
+        $var = "*$var";
+      }
 
       my $expr = $outputmap->cleaned_code;
 
@@ -1049,19 +1260,40 @@ foreach my $cb_name ( sort keys %callbackdefs )
     say $c "void ${c_prefix}__callback( @argdefs )";
   }
 
+  # userdata1 is the CODE/CV. userdata2 is the userdata
+
   say $c <<~"EOF"; my $n = qq{
       {
-        cb_data *cb = (cb_data *)userdata;
-        if ( cb->guard1 != CB_GUARD || cb->guard2 != cb->guard1 )
+        if ( userdata1 == NULL || !SvOK((SV *)userdata1) )
         {
-          croak("Got a callback with improper guards: 0x%X, 0x%X", cb->guard1, cb->guard2);
+          warn("Callback ${c_prefix} failed: callback function was NULL");
+          return;
+        }
+
+        SV* callback = (SV *) userdata1;
+        SV* user_sv  = (SV *) userdata2;
+
+        if ( userdata2 == NULL || !SvOK(user_sv) )
+        {
+          user_sv = &PL_sv_undef;
+        }
+
+        if ( !SvROK(callback) )
+        {
+          warn("Callback ${c_prefix} failed: callback function was not a ref: %s", SvPV_nolen(callback));
+          return;
+        }
+        if ( SvTYPE(SvRV(callback)) != SVt_PVCV )
+        {
+          warn("Callback ${c_prefix} failed: callback function was not a coderef: %s", SvPV_nolen(callback));
+          return;
         }
 
         dSP;
         dTARGET;
         PUSHMARK(SP);@pushs
         PUTBACK;
-        call_sv((SV *)cb->perlsub, G_VOID);
+        call_sv((SV *)callback, G_VOID);
       }
     EOF
     };
@@ -1180,17 +1412,18 @@ sub calls_for
   my $typedef = $def{typedef};
   my $return  = $def{return};
 
-  if ( $typedef eq 'enum' )
+  if ( $typedef eq 'enum' || $typedef eq 'flag' )
   {
     $return = "WebGPU::Direct::$return";
     $return =~ s/::WGPU/::/;
   }
 
-  my $is_obj_opaque = $def{typedef} eq 'obj' || $def{typedef} eq 'opaque';
+  my $is_obj_opaque = $def{typedef} eq 'obj' || $def{typedef} eq 'opaque' || $def{typedef} eq 'SV';
   my $base
       = ( $typedef eq 'obj' )    ? qq{newSVpvs("$return")}
       : ( $typedef eq 'opaque' ) ? qq{newSVpvs("$return")}
       : ( $typedef eq 'enum' )   ? qq{newSVpvs("$return")}
+      : ( $typedef eq 'flag' )   ? qq{newSVpvs("$return")}
       :                                 "NULL";
 
   if ( $def{is_ptr} )
@@ -1219,6 +1452,12 @@ sub calls_for
     $cast = '(void **)';
   }
 
+  if ( $def{str} )
+  {
+    $typedef = 'strview';
+    $set_addl = qq{, &n->length$set_addl};
+  }
+
   my %result = (
     pack    => '',
     unpack  => '',
@@ -1238,14 +1477,16 @@ sub calls_for
     $result{set}    .= $warning;
 
     $typedef = 'void';
+    $cast    = '(void **)';
   }
 
   my $c_prefix = $def{c_prefix} // '';
-  $result{pack}   .= ${ trace_c( "${c_prefix}__pack",   "pack $def{key}" ) };
-  $result{unpack} .= ${ trace_c( "${c_prefix}__unpack", "unpack $def{key}" ) };
+  my $struct_key = $def{struct_key} // $def{key};
+  $result{pack}   .= ${ trace_c( "${c_prefix}__pack",   "pack $struct_key" ) };
+  $result{unpack} .= ${ trace_c( "${c_prefix}__unpack", "unpack $struct_key" ) };
 
-  my $call     = qq{aTHX_ h, "$def{key}", $def{klen}, $cast &n->$def{key}$set_addl, $base};
-  my $set_call = qq{aTHX_ value,/**/ (void *) &n->$def{key}$set_addl, $base};
+  my $call     = qq{aTHX_ h, "$def{key}", $def{klen}, $cast &n->${struct_key}$set_addl, $base};
+  my $set_call = qq{aTHX_ value,/**/ (void *) &n->${struct_key}$set_addl, $base};
 
   $result{pack}   .= qq{  _pack_$typedef($call);\n};
   $result{unpack} .= qq{  _unpack_$typedef($call);\n};
@@ -1313,7 +1554,7 @@ sub say_set_fn
         PROTOTYPE: \$;\$
         CODE:
             HV *h = (HV *)SvRV(THIS);
-            $type *n = ($type *) _get_struct_ptr(aTHX, THIS, NULL);
+            $type *n = ($type *) _get_struct_ptr(aTHX_ THIS, NULL);
             RETVAL = $calls{find}
             $mut
 
@@ -1332,27 +1573,9 @@ sub say_call_fn
   # 0b010: has size
   # 0b100: is a MappedBuffer return
   my $has_mb = 0;
-  my $is_cb;
-  my $ret_array;
 
-  # Handle callbacks in a perl-ish way
+  # Handle certain aspects in a perl-ish way
   my @defargs = $def{args}->@*;
-  if ( @defargs >= 4
-    && $defargs[-1] eq 'userdata'
-    && $defargs[-3] eq 'callback' )
-  {
-    $is_cb = 1;
-  }
-
-  if ( @defargs == 4
-    && $def{return} =~ m/^size_t\s*$/xms
-    && $defargs[2] =~ m/\s*[*]$/xms )
-  {
-    $def{return} = 'SV *';
-    $ret_array = $defargs[2];
-    delete $defargs[2];
-    delete $defargs[3];
-  }
 
   my %arrays;
   my $array_can;
@@ -1418,16 +1641,6 @@ sub say_call_fn
 
     warn "Unknown type: $type"
         if !exists $typedefs{$pkg} && !exists $typedefs{$type};
-
-    # Handle the callback cases
-    if ( $is_cb && $value eq 'callback' )
-    {
-      $key = 'CV *';
-    }
-    if ( $is_cb && $value eq 'userdata' )
-    {
-      $key = 'SV *';
-    }
 
     # Handle the array cases
     if ( $value =~ $arrcnt_re && exists $arrays{$1} )
@@ -1500,39 +1713,23 @@ sub say_call_fn
 
   say $xs "    CODE:";
 
-  if ( $is_cb || keys %arrays || keys %buffers )
+  if ( keys %arrays || keys %buffers )
   {
-    if ($is_cb)
-    {
-      my $cb_type = $defargs[-4];
-      my $cb_pkg  = pkg_name($cb_type);
-
-      $cb_pkg =~ tr/:/_/;
-      @calls[ -2, -1 ] = qw/c c_userdata/;
-
-      say $xs <<~"EOF"; my $n = qq{
-              $cb_type c = &${cb_pkg}__callback;
-              cb_data *c_userdata;
-              Newx(c_userdata, 1, cb_data);
-              *c_userdata = (cb_data) {
-                .guard1 = CB_GUARD,
-                .guard2 = CB_GUARD,
-                .perlsub = callback,
-                .data = userdata,
-              };
-              SvREFCNT_inc(callback);
-              SvREFCNT_inc(userdata);
-        EOF
-        };
-    }
-
     foreach my $array ( sort keys %arrays )
     {
       my $type = $arrays{$array};
+      die $type if $type !~ m/[*]$/;
       $type =~ s/[*]$//;
       $type =~ s/const//;
 
-      my $fetch = "($type) _get_struct_ptr(aTHX_ *item, NULL)";
+      my $cast = "($type)";
+      my $class = $classdefs{pkg_name($type)};
+      if ( $class && !$class->{ptr_type} )
+      {
+        $cast = "*($type *)";
+      }
+
+      my $fetch = "$cast _get_struct_ptr(aTHX_ *item, NULL)";
       if ( $type =~ m/^\s*uint\d+_t\s*$/xms )
       {
         $fetch = "SvIV(*item)";
@@ -1550,9 +1747,13 @@ sub say_call_fn
                   $array\[i] = n;
                 }
               }
-              $array\[${array}Count+1] = ($type) 0;
         EOF
         };
+
+      if ( $class && $class->{ptr_type} )
+      {
+        say $xs "      $array\[${array}Count+1] = ($type) 0;";
+      }
 
       @calls = map { $_ eq "${array}s" ? ( "${array}Count", $array ) : $_ } @calls;
     }
@@ -1589,22 +1790,6 @@ sub say_call_fn
     say $xs "      RETVAL =  WebGPU__Direct__MappedBuffer__wrap(aTHX_ n, size-offset);";
     $def_arg->{return} = 'MappedBuffer';
   }
-  elsif ($ret_array)
-  {
-    my $ptr_type = $ret_array;
-    my $type     = $ptr_type;
-    $type =~ s/\s*[*]$//xms;
-
-    say $xs "      $ptr_type result = NULL;";
-    say $xs "      size_t count = $def{c_name}($call, result);";
-    say $xs "      Newxz(result, count, $type);";
-    say $xs "      count = $def{c_name}($call, result);";
-    say $xs '      SV *STRICT_ENUM = get_sv("WebGPU::Direct::Enum::STRICT_NEW", GV_ADDWARN | GV_ADDMULTI);';
-    say $xs "      save_item(STRICT_ENUM);";
-    say $xs "      sv_setsv(STRICT_ENUM, &PL_sv_undef);";
-    say $xs "      RETVAL = _array_new(newSVpvs(\"WebGPU::Direct::FeatureName\"), result, sizeof($type), count);";
-    say $xs "      Safefree(result);";
-  }
   else
   {
     say $xs "      $retval$def{c_name}($call);";
@@ -1629,5 +1814,30 @@ sub say_call_fn
 say $pm q{1;};
 
 warn Data::Dumper::Dumper( \%typedefs );
+
+sub find_header
+{
+  use File::Find qw//;
+
+  my $result;
+  my $find = sub
+  {
+    if (m/^webgpu[.]h$/xms)
+    {
+      die "Found more than one webgpu.h"
+        if $result;
+      $result = $File::Find::name;
+    }
+
+    if ( m/git-tag/xms )
+    {
+      open my $gittag_fh, '<', $_;
+      open my $versio_fh, '>', "$Bin/../webgpu-version";
+      $versio_fh->print( <$gittag_fh> );
+    }
+  };
+  File::Find::find( $find, "$Bin/../webgpu/" );
+  return $result;
+}
 
 1;

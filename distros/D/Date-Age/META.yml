@@ -4,6 +4,7 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  IPC::Run3: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
@@ -22,8 +23,10 @@ no_index:
     - inc
 requires:
   Time::Local: '0'
+  perl: '5.010'
 resources:
-  bugtracker: https://github.com/nigelhorne/Date-Age/issues
-  repository: https://github.com/nigelhorne/Date-Age
-version: '0.04'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Age
+  homepage: https://metacpan.org/pod/Date::Age
+  repository: git://github.com/nigelhorne/Date-Age.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

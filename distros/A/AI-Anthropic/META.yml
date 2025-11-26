@@ -1,0 +1,40 @@
+---
+abstract: 'Perl interface to Anthropic Claude API'
+author:
+  - 'Your Name <your@email.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - anthropic
+  - claude
+  - ai
+  - llm
+  - api
+  - chatbot
+  - gpt
+  - language-model
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AI-Anthropic
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  HTTP::Tiny: '0.070'
+  JSON::PP: '2.0'
+  MIME::Base64: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/yourusername/AI-Anthropic/issues
+  repository: https://github.com/yourusername/AI-Anthropic.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

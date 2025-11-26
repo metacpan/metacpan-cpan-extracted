@@ -6,6 +6,7 @@ use Mouse;
 use Data::Dumper;
 use JSON;
 use Hash::Merge::Simple;
+use Getopt::Long qw(GetOptionsFromArray);
 use Lemonldap::NG::Common::Conf::ReConstants;
 
 use constant booleanOptions => qr/^(?:json)$/;
@@ -42,8 +43,6 @@ has jsonConverter => (
     is      => 'rw',
     default => sub { JSON->new->allow_nonref->canonical->pretty },
 );
-has keep_last   => ( is => 'rw' );
-has keep_recent => ( is => 'rw' );
 
 sub get {
     my ( $self, @keys ) = @_;
@@ -499,31 +498,35 @@ sub rollback {
 }
 
 sub purge {
-    my ($self) = @_;
-    unless ( $self->keep_last xor $self->keep_recent ) {
+    my ( $self, @args ) = @_;
+
+    my %opts;
+    GetOptionsFromArray( \@args, \%opts, "keep-last=i", "keep-recent=i" );
+
+    unless ( $opts{'keep-last'} xor $opts{'keep-recent'} ) {
         die
 'usage: purge --keep-last <value> | --keep-recent <number of seconds to keep>';
     }
     my @configs  = $self->mgr->confAcc->available();
     my $n_config = scalar @configs;
 
-    if ( $self->keep_last ) {
-        if ( $n_config < $self->keep_last ) {
+    if ( $opts{'keep-last'} ) {
+        if ( $n_config < $opts{'keep-last'} ) {
             $self->logger->warn(
-"The number of configs to keep ($self->{keep_last}) is more than the number of available configs ($n_config)"
+"The number of configs to keep ($opts{'keep-last'}) is more than the number of available configs ($n_config)"
             );
         }
 
-        my @to_delete = @configs[ 0 .. $#configs - $self->keep_last ];
+        my @to_delete = @configs[ 0 .. $#configs - $opts{'keep-last'} ];
         if ( scalar @to_delete == $n_config ) {
             die 'This would delete all configs';
         }
         _config_delete( $self, @to_delete );
     }
-    if ( $self->keep_recent ) {
+    if ( $opts{'keep-recent'} ) {
 
 # The keep-recent argument is a relative number of seconds to keep. Compute an absolute offset to keep
-        my $absoluteOffset = time() - $self->keep_recent;
+        my $absoluteOffset = time() - $opts{'keep-recent'};
         my @to_delete      = grep {
             my $r = $self->mgr->confAcc->getConf( { cfgNum => $_ } );
             $r && ref $r && $r->{cfgDate} < $absoluteOffset
@@ -685,29 +688,19 @@ sub run {
 
     # Options simply call corresponding accessor
     my $args = {};
-    my @REST;
-    for ( my $i = 0 ; $i < @_ ; $i++ ) {
-        if ( $_[$i] =~ s/^--?(\w)/$1/ ) {
-            $_[$i] =~ s/-/_/g;
-            my $k    = $_[$i];
-            my $bool = ( $k =~ booleanOptions );
-            my $v    = $bool ? 1 : $_[ $i + 1 ];
-            $i++ unless $bool;
-            if ( ref $self ) {
-                eval { $self->$k($v) };
-                if ($@) {
-                    die "Unknown option -$k or bad value ($@)";
-                }
-            }
-            else {
-                $args->{$k} = $v;
+    while ( $_[0] =~ s/^--?// ) {
+        my $k = shift;
+        my $v = $k =~ $self->booleanOptions ? 1 : shift;
+        if ( ref $self ) {
+            eval { $self->$k($v) };
+            if ($@) {
+                die "Unknown option -$k or bad value ($@)";
             }
         }
         else {
-            push @REST, $_[$i];
+            $args->{$k} = $v;
         }
     }
-    @_ = @REST;
     unless ( ref $self ) {
         $self = $self->new($args);
     }

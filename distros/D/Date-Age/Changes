@@ -1,5 +1,15 @@
 Revision history for Date-Range
 
+0.06	Tue Nov 25 21:52:23 EST 2025
+	Added test dashboard
+	Added Appveyor integration
+	Added sanity test
+
+0.05	Tue Nov 25 19:33:25 EST 2025
+	Fixed ymd code (WillWills - https://github.com/nigelhorne/Date-Age/pull/1)
+	Added fuzz testing
+	Bump minimum version
+
 0.04	Mon Nov 17 21:33:22 EST 2025
 	Added bin/date-age
 	Fixed is_leap logic

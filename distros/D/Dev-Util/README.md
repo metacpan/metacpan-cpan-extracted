@@ -2,7 +2,7 @@
 Dev::Util - Utilities useful in the development of perl programs
 
 # VERSION
-Version v2.19.11
+Version v2.19.12
 
 # SYNOPSIS
 

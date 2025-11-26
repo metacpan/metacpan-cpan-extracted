@@ -1,8 +1,13 @@
+bin/demo_extractor.pl
+bin/extract-schemas
 bin/fuzz-harness-generator
 Changes
 doc/getting-started-blog.md
+doc/SchemaExtractor.pm
 lib/App/Test/Generator.pm
+lib/App/Test/Generator/SchemaExtractor.pm
 lib/App/Test/Generator/Template.pm
+lib/App/Test/Generator/Sample/Module.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -20,7 +25,6 @@ t/conf/abs_custom.yml
 t/conf/app_generator.yml
 t/conf/class_simple.conf
 t/conf/data_text_append.conf
-t/conf/data_text_set.conf
 t/conf/data_text_set.yml
 t/conf/email_rfc822.yml
 t/conf/html_genealogy_map.conf
@@ -37,6 +41,7 @@ t/pod-coverage.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/test_extractor.t
 t/unused.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

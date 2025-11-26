@@ -56,13 +56,13 @@ WebGPU::Direct::QuerySet
 
 =over
 
-=item * label (String (char *))
+=item * label (L<WebGPU::Direct::StringView|WebGPU::Direct::Types/WebGPU::Direct::StringView>)
 
 =back
 
 =back
 
-=head3 reference
+=head3 addRef
 
 =head3 release
 

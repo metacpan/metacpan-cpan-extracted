@@ -5,6 +5,7 @@ package WebGPU::Direct::Error
   no warnings qw(experimental::signatures);
   use feature 'signatures';
 
+  use Scalar::Util qw/blessed/;
   use Exporter 'import';
   use Carp qw/croak/;
 
@@ -31,6 +32,11 @@ package WebGPU::Direct::Error
     my $prev_excp = $@;
     my $class     = shift;
     my $ref       = { ref( $_[0] ) eq ref {} ? %{ $_[0] } : @_ };
+
+    if ( blessed $ref->{message} && $ref->{message}->isa('WebGPU::Direct::StringView') )
+    {
+      $ref->{message} = $ref->{message}->as_string;
+    }
 
     my $result = {
       $ref->%{qw/type message/},

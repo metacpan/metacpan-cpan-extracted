@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2024-2025 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -19,6 +19,12 @@
 #include "sv_numcmp.c.inc"
 
 #include "ckcall_constfold.c.inc"
+
+#if HAVE_PERL_VERSION(5, 28, 0)
+   /* perl 5.28.0 onward can do gv_fetchmeth superclass lookups without caching
+    */
+#  define HAVE_FETCHMETH_SUPER_NOCACHE
+#endif
 
 #define newSVsv_num(osv)  S_newSVsv_num(aTHX_ osv)
 static SV *S_newSVsv_num(pTHX_ SV *osv)
@@ -401,6 +407,63 @@ static SV *mk_constraint_Isa(pTHX_ SV *arg0)
   c->args[0] = newSVsv(arg0);
 
   return sv_2mortal(ret);
+}
+
+static bool constraint_Can(pTHX_ struct Constraint *c, SV *value)
+{
+  HV *stash;
+  if(SvROK(value) && SvOBJECT(SvRV(value)))
+    stash = SvSTASH(SvRV(value));
+  else if(SvOK(value)) {
+    stash = gv_stashsv(value, GV_NOADD_NOINIT);
+    if(!stash)
+      return false;
+  }
+  else
+    return false;
+
+  /* TODO: we could cache which classes do or don't satisfy the constraints
+   * and store it somewhere, maybe in an HV in ->args[1] or somesuch */
+
+  SV *methods = c->args[0];
+  size_t nmethods = SvTYPE(methods) == SVt_PVAV ? av_count((AV *)methods) : 1;
+  for(size_t idx = 0; idx < nmethods; idx++) {
+    SV *method = SvTYPE(methods) == SVt_PVAV ? AvARRAY((AV *)methods)[idx] : methods;
+    if(!gv_fetchmeth_sv(stash, method,
+#ifdef HAVE_FETCHMETH_SUPER_NOCACHE
+          -1,
+#else
+          0,
+#endif
+          0))
+      return false;
+  }
+
+  return true;
+}
+
+static SV *mk_constraint_Can(pTHX_ size_t nargs, SV **args)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_Can, 1);
+  sv_2mortal(ret);
+
+  if(!nargs)
+    croak("Require at least one method name for Can()");
+
+  if(nargs == 1)
+    /* We can just store a single string directly */
+    c->args[0] = newSVsv_str(args[0]);
+  else {
+    AV *strs = newAV_alloc_x(nargs);
+    for(size_t i = 0; i < nargs; i++)
+      av_store(strs, i, newSVsv_str(args[i]));
+
+    c->args[0] = (SV *)strs;
+  }
+
+  return ret;
 }
 
 static bool constraint_ArrayRef(pTHX_ struct Constraint *c, SV *value)
@@ -808,6 +871,18 @@ static void S_sv_catsv_quoted(pTHX_ SV *buf, SV *sv, char quote)
   sv_catpvn(buf, &quote, 1);
 }
 
+#define sv_catsv_quoted_list(buf, av, quote, sep)  S_sv_catsv_quoted_list(aTHX_ buf, av, quote, sep)
+static void S_sv_catsv_quoted_list(pTHX_ SV *buf, AV *av, char quote, char sep)
+{
+  U32 n = av_count(av);
+  SV **vals = AvARRAY(av);
+  for(U32 i = 0; i < n; i++) {
+    if(i > 0)
+      sv_catpvn(buf, &sep, 1), sv_catpvs(buf, " ");
+    sv_catsv_quoted(buf, vals[i], quote);
+  }
+}
+
 SV *DataChecks_stringify_constraint(pTHX_ struct Constraint *c)
 {
   const char *name = NULL;
@@ -888,17 +963,17 @@ SV *DataChecks_stringify_constraint(pTHX_ struct Constraint *c)
   }
   else if(c->func == &constraint_StrEq) {
     name = "StrEq";
-    if(SvTYPE(c->args[0]) != SVt_PVAV)
+    if(SvTYPE(c->args[0]) == SVt_PVAV)
+      sv_catsv_quoted_list(args, (AV *)c->args[0], '"', ',');
+    else
       sv_catsv_quoted(args, c->args[0], '"');
-    else {
-      U32 n = av_count((AV *)c->args[0]);
-      SV **vals = AvARRAY(c->args[0]);
-      for(U32 i = 0; i < n; i++) {
-        if(i > 0)
-          sv_catpvs(args, ", ");
-        sv_catsv_quoted(args, vals[i], '"');
-      }
-    }
+  }
+  else if(c->func == &constraint_Can) {
+    name = "Can";
+    if(SvTYPE(c->args[0]) == SVt_PVAV)
+      sv_catsv_quoted_list(args, (AV *)c->args[0], '"', ',');
+    else
+      sv_catsv_quoted(args, c->args[0], '"');
   }
   else if(c->func == &constraint_Any || c->func == &constraint_All) {
     name = (c->func == &constraint_Any) ? "Any" : "All";
@@ -941,6 +1016,7 @@ void boot_Data_Checks__constraints(pTHX)
   MAKE_nARG_CONSTRAINT(NumEq);
 
   MAKE_1ARG_CONSTRAINT(Isa);
+  MAKE_nARG_CONSTRAINT(Can);
   MAKE_0ARG_CONSTRAINT(ArrayRef);
   MAKE_0ARG_CONSTRAINT(HashRef);
   MAKE_0ARG_CONSTRAINT(Callable);

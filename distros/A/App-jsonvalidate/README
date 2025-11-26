@@ -41,6 +41,16 @@ OPTIONS
         Emit JSON objects (one per instance) with "{ index, ok, errors[] }".
 
   Behavior
+    --allow-file-refs
+        Enabled by default.
+
+        When enabled, perform resolution of relative or file:// references.
+
+    --allow-http
+        Disabled by default.
+
+        This is an alias for --remote-refs
+
     --compile / --no-compile
         Enable compiled fast-path for repeated validation.
 
@@ -48,9 +58,37 @@ OPTIONS
         Enable "contentEncoding", "contentMediaType", "contentSchema".
         Registers a basic "application/json" validator/decoder.
 
+    --extensions
+        Enables non-standard extensions. Right now this includes
+        "uniqueKeys"
+
+    --ignore-unknown-required-vocab
+        Ignore unknown vocabularies listed in schema '$vocabulary'
+        *required*.
+
     --register-formats
         Register built-in "format" validators (date, email, hostname, ip,
         uri, uuid, JSON Pointer, regex, etc.).
+
+    --max-errors N
+        Maximum recorded errors per validation (default 200).
+
+    --normalize / --no-normalize
+        Round-trip instances through JSON to enforce strict JSON typing
+        (default on).
+
+    --remote-refs
+        Allow fetching of http:// and https:// $ref URIs.
+
+        By default this is OFF — fictional $id values like
+        "https://schemas.example.com/..." will NOT be fetched.
+
+        This is the modern, safe default (prevents SSRF, accidental
+        traffic).
+
+    --schema-base DIR
+        A base directory to resolve relative file $ref (defaults to the
+        directory of the first "--schema").
 
     --trace
         Record lightweight trace; cap with "--trace-limit"; sample with
@@ -62,20 +100,8 @@ OPTIONS
     --trace-sample P
         Sampling percentage for trace events.
 
-    --max-errors N
-        Maximum recorded errors per validation (default 200).
-
-    --normalize / --no-normalize
-        Round-trip instances through JSON to enforce strict JSON typing
-        (default on).
-
-    --ignore-unknown-required-vocab
-        Ignore unknown vocabularies listed in schema '$vocabulary'
-        *required*.
-
-    --schema-base DIR
-        A base directory to resolve relative file $ref (defaults to the
-        directory of the first "--schema").
+    --unique-keys / --no-unique-keys
+        Enables the non-standard extension "uniqueKeys"
 
 EXIT CODES
     *   All instances validated.

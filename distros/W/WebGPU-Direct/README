@@ -61,7 +61,7 @@ FUNCTIONS
 
  new_window
 
-        $wgpu->CreateSurface( { nextInChain => WebGPU::Direct->new_window( $width, $height ) } );
+        $wgpu->createSurface( WebGPU::Direct->new_window( $width, $height ) );
 
     Arguments
 
@@ -70,7 +70,7 @@ FUNCTIONS
 	* yh - Height of window
 
     Constructs a WebGPU::Direct::SurfaceDescriptorFrom* object, usable for
-    passing to CreateSurface. These are crude and simplistic windows
+    passing to createSurface. These are crude and simplistic windows
     suitable for testing WebGPU with, but there are no options and doesn't
     come with any way to interact or configure the window.
 
@@ -79,6 +79,8 @@ FUNCTIONS
       * X11
 
       * Wayland
+
+      * Microsoft Windows (win32)
 
  WebGPU::Direct::XS::HAS_<FOO>
 
@@ -89,6 +91,52 @@ FUNCTIONS
     object.
 
 METHODS
+
+ createAdapter
+
+      * Return Type
+
+	* WebGPU::Direct::Adapter
+
+      * Arguments
+
+	* options (WebGPU::Direct::RequestAdapterOptions) Default: undef
+
+	* callback (WebGPU::Direct::RequestAdapterCallback (Code
+	reference)) Default: undef
+
+	* userdata (Scalar (void *)) Default: {}
+
+      Alternative to requestAdapter that does all of the waiting and
+      processing required to get an adapter. If no callback is provided,
+      then a default one will be used that can produce a usable adapter.
+
+      It is highly encouraged to pass in a compatibleSurface. Failure to
+      pass one in will likely not return an adapter that can be used with
+      any surface.
+
+ createSurface
+
+      * Return Type
+
+	* WebGPU::Direct::Surface
+
+      * Arguments
+
+	* descriptor (WebGPU::Direct::SurfaceDescriptor or compatible
+	window object)
+
+      Creates a surface for displaying onto. The SurfaceDescriptor is very
+      exact requirements and needs to follow the layout of
+      WebGPU::Direct::SurfaceDescriptor exactly, including the requirement
+      of what value goes into nextInChain. It is also possible to pass in
+      the results of new_window directly in. You can also pass in a window
+      object from several other modules available on CPAN. Currently
+      supported modules are:
+
+	* X11::Xlib::Window
+
+	* X11::XCB::Window
 
 TYPES
 
@@ -260,7 +308,7 @@ ADDITIONAL WEBGPU INFORMATION
 
     When a RenderPipeline is being ran with an auto layout, that layout is
     not defined in the RenderPipelineDescriptor passed to
-    $device->CreateRenderPipeline, WebGPU will auto analyze the WGSL to
+    $device->createRenderPipeline, WebGPU will auto analyze the WGSL to
     determine the group bindings. If a group binding is not used, the
     layout for it will not be included in the layout. You will need to
     either use the group binding in the shaders, or manually create and use
@@ -275,7 +323,7 @@ ADDITIONAL WEBGPU INFORMATION
     both, but the Native API has several extra that the JavaScript API does
     not have, most notably Present, which informs the system that rendering
     is complete. Because of this, this you cannot acquire a TextureView
-    twice in a single frame via the CreateView function before calls to
+    twice in a single frame via the createView function before calls to
     Present. Tryig to get it a second time will will throw this error.
 
     Because the JavaScript WebGPU API does not have a Present function,

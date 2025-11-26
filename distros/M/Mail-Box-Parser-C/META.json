@@ -37,7 +37,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mail::Message" : "4.0"
+            "Mail::Message" : ">= 3.0, < 4.0"
          }
       },
       "test" : {
@@ -59,7 +59,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-Parser-C"
       }
    },
-   "version" : "3.012",
+   "version" : "3.013",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2002,
@@ -69,7 +69,9 @@
             "podtail" : null
          }
       ],
-      "include" : [],
+      "include" : [
+         "../Mail-Message"
+      ],
       "oodoc_version" : 3.05,
       "parser" : {
          "pmhead" : null,

@@ -19,8 +19,8 @@ my $gpuContext = $wgpu->createSurface(
   }
 );
 
-my $adapter = $wgpu->requestAdapter({ compatibleSurface => $gpuContext });
-my $device  = $adapter->requestDevice;
+my $adapter = $wgpu->createAdapter({ compatibleSurface => $gpuContext });
+my $device  = $adapter->createDevice;
 
 #*** Vertex Buffer Setup ***
 
@@ -103,6 +103,8 @@ my $start  = time;
 my $frames = 1000;
 for ( 1 .. 1000 )
 {
+  $wgpu->processEvents;
+
   # GPURenderPassDescriptor
   my $renderPassDescriptor = { colorAttachments => [$colorAttachmentDescriptor] };
 

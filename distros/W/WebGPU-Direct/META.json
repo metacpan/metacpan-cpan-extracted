@@ -61,7 +61,7 @@
          "web" : "https://github.com/atrodo/WebGPU-Direct"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_contributors" : [
       "Jon Gentle <atrodo@atrodo.org>"
    ],

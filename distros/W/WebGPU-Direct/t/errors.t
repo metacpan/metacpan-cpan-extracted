@@ -5,8 +5,8 @@ use WebGPU::Direct;
 
 my $wgpu = WebGPU::Direct->new;
 
-my $adapter = $wgpu->requestAdapter( { compatibleSurface => undef } );
-my $device  = $adapter->requestDevice;
+my $adapter = $wgpu->createAdapter( { compatibleSurface => undef } );
+my $device  = $adapter->createDevice;
 
 my $cube = {};
 
@@ -30,7 +30,6 @@ my $cube = {};
   is( ref $error, 'WebGPU::Direct::Error', 'Error produced is an Error object' );
   like( $error, qr/buffer/i, 'The error was about buffer' );
   like( $error, qr/usage/i,  'The error was about the usage field' );
-  diag(explain $error);
 }
 
 done_testing;

@@ -1,0 +1,47 @@
+---
+abstract: 'Framework to create policy files, e.g. CODE_OF_CONDUCT.md, CONTRIBUTING.md, FUNDING.md, GOVERNANCE.md, SECURITY.md, SUPPORT.md, etc.'
+author:
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
+build_requires:
+  Cwd: '0'
+  English: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FileHandle: '0'
+  FindBin: '1.51'
+  Test2::V0: '0'
+  lib: '0'
+  perl: '5.014'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - perl5
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Software-Policies
+requires:
+  Carp: '0'
+  Data::Section: '0'
+  Module::Load: '0'
+  Module::Loader: '0'
+  Software::Policy::CodeOfConduct: '0'
+  Software::Security::Policy::Individual: '0.11'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Policies
+  homepage: https://metacpan.org/release/Software-Policies
+  repository: git://github.com/mikkoi/software-policies.git
+version: '0.001'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

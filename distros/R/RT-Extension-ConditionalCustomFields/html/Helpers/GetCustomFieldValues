@@ -1,0 +1,24 @@
+<%args>
+$ObjectType => 'RT::Ticket'
+$ObjectId
+$CustomFieldId
+</%args>
+<%init>
+my $result = undef;
+my $object = $ObjectType->new(RT->SystemUser);
+$object->Load($ObjectId);
+if ($object->id) {
+    my $cf_condition_vals_str = $object->CustomFieldValuesAsString($CustomFieldId);
+    my @cf_condition_vals = split(/\n/, $cf_condition_vals_str);
+    my $condition_cf = RT::CustomField->new(RT->SystemUser);
+    $condition_cf->Load($CustomFieldId);
+    if ($condition_cf->Type eq 'DateTime') {
+        @cf_condition_vals = map { my $DateObj = RT::Date->new($session{'CurrentUser'}); $DateObj->Set(Format => 'ISO', Value => $_); $DateObj->ISO(Time => 1, Timezone => 'user'); } @cf_condition_vals;
+    } elsif ($condition_cf->Type eq 'IPAddress') {
+        @cf_condition_vals = map { RT::ObjectCustomFieldValue->ParseIP($_) } @cf_condition_vals;
+    }
+    $result = join("\n", @cf_condition_vals);
+}
+$m->out(JSON($result));
+$m->abort;
+</%init>

@@ -4,11 +4,12 @@
 
 use v5.30;
 use warnings;
+use Carp;
 
 package # Hide from PAUSE
     WebGPU::Direct::XS
 {
-  our $VERSION = '0.15';
+  our $VERSION = '0.16';
   require XSLoader;
   XSLoader::load('WebGPU::Direct', $VERSION);
 }
@@ -23,6 +24,7 @@ require WebGPU::Direct::Error;
 package
 	WebGPU::Direct {
   sub createInstance { my $class = shift; WebGPU::Direct::XS::createInstance(@_); }
+  sub getInstanceCapabilities { my $class = shift; WebGPU::Direct::XS::getInstanceCapabilities(@_); }
   sub getProcAddress { my $class = shift; WebGPU::Direct::XS::getProcAddress(@_); }
   our @export_all;
   sub AdapterType () { 'WebGPU::Direct::AdapterType' }; push @export_all, 'AdapterType';
@@ -31,9 +33,9 @@ package
   sub BlendFactor () { 'WebGPU::Direct::BlendFactor' }; push @export_all, 'BlendFactor';
   sub BlendOperation () { 'WebGPU::Direct::BlendOperation' }; push @export_all, 'BlendOperation';
   sub BufferBindingType () { 'WebGPU::Direct::BufferBindingType' }; push @export_all, 'BufferBindingType';
-  sub BufferMapAsyncStatus () { 'WebGPU::Direct::BufferMapAsyncStatus' }; push @export_all, 'BufferMapAsyncStatus';
   sub BufferMapState () { 'WebGPU::Direct::BufferMapState' }; push @export_all, 'BufferMapState';
   sub BufferUsage () { 'WebGPU::Direct::BufferUsage' }; push @export_all, 'BufferUsage';
+  sub CallbackMode () { 'WebGPU::Direct::CallbackMode' }; push @export_all, 'CallbackMode';
   sub ColorWriteMask () { 'WebGPU::Direct::ColorWriteMask' }; push @export_all, 'ColorWriteMask';
   sub CompareFunction () { 'WebGPU::Direct::CompareFunction' }; push @export_all, 'CompareFunction';
   sub CompilationInfoRequestStatus () { 'WebGPU::Direct::CompilationInfoRequestStatus' }; push @export_all, 'CompilationInfoRequestStatus';
@@ -44,13 +46,17 @@ package
   sub DeviceLostReason () { 'WebGPU::Direct::DeviceLostReason' }; push @export_all, 'DeviceLostReason';
   sub ErrorFilter () { 'WebGPU::Direct::ErrorFilter' }; push @export_all, 'ErrorFilter';
   sub ErrorType () { 'WebGPU::Direct::ErrorType' }; push @export_all, 'ErrorType';
+  sub FeatureLevel () { 'WebGPU::Direct::FeatureLevel' }; push @export_all, 'FeatureLevel';
   sub FeatureName () { 'WebGPU::Direct::FeatureName' }; push @export_all, 'FeatureName';
   sub FilterMode () { 'WebGPU::Direct::FilterMode' }; push @export_all, 'FilterMode';
   sub FrontFace () { 'WebGPU::Direct::FrontFace' }; push @export_all, 'FrontFace';
   sub IndexFormat () { 'WebGPU::Direct::IndexFormat' }; push @export_all, 'IndexFormat';
   sub LoadOp () { 'WebGPU::Direct::LoadOp' }; push @export_all, 'LoadOp';
+  sub MapAsyncStatus () { 'WebGPU::Direct::MapAsyncStatus' }; push @export_all, 'MapAsyncStatus';
   sub MapMode () { 'WebGPU::Direct::MapMode' }; push @export_all, 'MapMode';
   sub MipmapFilterMode () { 'WebGPU::Direct::MipmapFilterMode' }; push @export_all, 'MipmapFilterMode';
+  sub OptionalBool () { 'WebGPU::Direct::OptionalBool' }; push @export_all, 'OptionalBool';
+  sub PopErrorScopeStatus () { 'WebGPU::Direct::PopErrorScopeStatus' }; push @export_all, 'PopErrorScopeStatus';
   sub PowerPreference () { 'WebGPU::Direct::PowerPreference' }; push @export_all, 'PowerPreference';
   sub PresentMode () { 'WebGPU::Direct::PresentMode' }; push @export_all, 'PresentMode';
   sub PrimitiveTopology () { 'WebGPU::Direct::PrimitiveTopology' }; push @export_all, 'PrimitiveTopology';
@@ -61,6 +67,7 @@ package
   sub SType () { 'WebGPU::Direct::SType' }; push @export_all, 'SType';
   sub SamplerBindingType () { 'WebGPU::Direct::SamplerBindingType' }; push @export_all, 'SamplerBindingType';
   sub ShaderStage () { 'WebGPU::Direct::ShaderStage' }; push @export_all, 'ShaderStage';
+  sub Status () { 'WebGPU::Direct::Status' }; push @export_all, 'Status';
   sub StencilOperation () { 'WebGPU::Direct::StencilOperation' }; push @export_all, 'StencilOperation';
   sub StorageTextureAccess () { 'WebGPU::Direct::StorageTextureAccess' }; push @export_all, 'StorageTextureAccess';
   sub StoreOp () { 'WebGPU::Direct::StoreOp' }; push @export_all, 'StoreOp';
@@ -73,7 +80,9 @@ package
   sub TextureViewDimension () { 'WebGPU::Direct::TextureViewDimension' }; push @export_all, 'TextureViewDimension';
   sub VertexFormat () { 'WebGPU::Direct::VertexFormat' }; push @export_all, 'VertexFormat';
   sub VertexStepMode () { 'WebGPU::Direct::VertexStepMode' }; push @export_all, 'VertexStepMode';
-  sub AdapterProperties () { Carp::croak if @_>1; 'WebGPU::Direct::AdapterProperties' }
+  sub WGSLLanguageFeatureName () { 'WebGPU::Direct::WGSLLanguageFeatureName' }; push @export_all, 'WGSLLanguageFeatureName';
+  sub WaitStatus () { 'WebGPU::Direct::WaitStatus' }; push @export_all, 'WaitStatus';
+  sub AdapterInfo () { Carp::croak if @_>1; 'WebGPU::Direct::AdapterInfo' }
   sub BindGroupDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::BindGroupDescriptor' }
   sub BindGroupEntry () { Carp::croak if @_>1; 'WebGPU::Direct::BindGroupEntry' }
   sub BindGroupLayoutDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::BindGroupLayoutDescriptor' }
@@ -82,6 +91,7 @@ package
   sub BlendState () { Carp::croak if @_>1; 'WebGPU::Direct::BlendState' }
   sub BufferBindingLayout () { Carp::croak if @_>1; 'WebGPU::Direct::BufferBindingLayout' }
   sub BufferDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::BufferDescriptor' }
+  sub BufferMapCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::BufferMapCallbackInfo' }
   sub ChainedStruct () { Carp::croak if @_>1; 'WebGPU::Direct::ChainedStruct' }
   sub ChainedStructOut () { Carp::croak if @_>1; 'WebGPU::Direct::ChainedStructOut' }
   sub Color () { Carp::croak if @_>1; 'WebGPU::Direct::Color' }
@@ -89,65 +99,75 @@ package
   sub CommandBufferDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::CommandBufferDescriptor' }
   sub CommandEncoderDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::CommandEncoderDescriptor' }
   sub CompilationInfo () { Carp::croak if @_>1; 'WebGPU::Direct::CompilationInfo' }
+  sub CompilationInfoCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::CompilationInfoCallbackInfo' }
   sub CompilationMessage () { Carp::croak if @_>1; 'WebGPU::Direct::CompilationMessage' }
   sub ComputePassDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::ComputePassDescriptor' }
   sub ComputePassTimestampWrites () { Carp::croak if @_>1; 'WebGPU::Direct::ComputePassTimestampWrites' }
   sub ComputePipelineDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::ComputePipelineDescriptor' }
   sub ConstantEntry () { Carp::croak if @_>1; 'WebGPU::Direct::ConstantEntry' }
+  sub CreateComputePipelineAsyncCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo' }
+  sub CreateRenderPipelineAsyncCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo' }
   sub DepthStencilState () { Carp::croak if @_>1; 'WebGPU::Direct::DepthStencilState' }
   sub DeviceDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::DeviceDescriptor' }
+  sub DeviceLostCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::DeviceLostCallbackInfo' }
   sub Extent3D () { Carp::croak if @_>1; 'WebGPU::Direct::Extent3D' }
   sub FragmentState () { Carp::croak if @_>1; 'WebGPU::Direct::FragmentState' }
-  sub ImageCopyBuffer () { Carp::croak if @_>1; 'WebGPU::Direct::ImageCopyBuffer' }
-  sub ImageCopyTexture () { Carp::croak if @_>1; 'WebGPU::Direct::ImageCopyTexture' }
+  sub Future () { Carp::croak if @_>1; 'WebGPU::Direct::Future' }
+  sub FutureWaitInfo () { Carp::croak if @_>1; 'WebGPU::Direct::FutureWaitInfo' }
+  sub InstanceCapabilities () { Carp::croak if @_>1; 'WebGPU::Direct::InstanceCapabilities' }
   sub InstanceDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::InstanceDescriptor' }
   sub Limits () { Carp::croak if @_>1; 'WebGPU::Direct::Limits' }
   sub MultisampleState () { Carp::croak if @_>1; 'WebGPU::Direct::MultisampleState' }
   sub Origin3D () { Carp::croak if @_>1; 'WebGPU::Direct::Origin3D' }
   sub PipelineLayoutDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::PipelineLayoutDescriptor' }
-  sub PrimitiveDepthClipControl () { Carp::croak if @_>1; 'WebGPU::Direct::PrimitiveDepthClipControl' }
+  sub PopErrorScopeCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::PopErrorScopeCallbackInfo' }
   sub PrimitiveState () { Carp::croak if @_>1; 'WebGPU::Direct::PrimitiveState' }
   sub ProgrammableStageDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::ProgrammableStageDescriptor' }
   sub QuerySetDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::QuerySetDescriptor' }
   sub QueueDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::QueueDescriptor' }
+  sub QueueWorkDoneCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::QueueWorkDoneCallbackInfo' }
   sub RenderBundleDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::RenderBundleDescriptor' }
   sub RenderBundleEncoderDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::RenderBundleEncoderDescriptor' }
   sub RenderPassColorAttachment () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPassColorAttachment' }
   sub RenderPassDepthStencilAttachment () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPassDepthStencilAttachment' }
   sub RenderPassDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPassDescriptor' }
-  sub RenderPassDescriptorMaxDrawCount () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPassDescriptorMaxDrawCount' }
+  sub RenderPassMaxDrawCount () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPassMaxDrawCount' }
   sub RenderPassTimestampWrites () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPassTimestampWrites' }
   sub RenderPipelineDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::RenderPipelineDescriptor' }
+  sub RequestAdapterCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::RequestAdapterCallbackInfo' }
   sub RequestAdapterOptions () { Carp::croak if @_>1; 'WebGPU::Direct::RequestAdapterOptions' }
-  sub RequiredLimits () { Carp::croak if @_>1; 'WebGPU::Direct::RequiredLimits' }
+  sub RequestDeviceCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::RequestDeviceCallbackInfo' }
   sub SamplerBindingLayout () { Carp::croak if @_>1; 'WebGPU::Direct::SamplerBindingLayout' }
   sub SamplerDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::SamplerDescriptor' }
-  sub ShaderModuleCompilationHint () { Carp::croak if @_>1; 'WebGPU::Direct::ShaderModuleCompilationHint' }
   sub ShaderModuleDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::ShaderModuleDescriptor' }
-  sub ShaderModuleSPIRVDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::ShaderModuleSPIRVDescriptor' }
-  sub ShaderModuleWGSLDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::ShaderModuleWGSLDescriptor' }
+  sub ShaderSourceSPIRV () { Carp::croak if @_>1; 'WebGPU::Direct::ShaderSourceSPIRV' }
+  sub ShaderSourceWGSL () { Carp::croak if @_>1; 'WebGPU::Direct::ShaderSourceWGSL' }
   sub StencilFaceState () { Carp::croak if @_>1; 'WebGPU::Direct::StencilFaceState' }
   sub StorageTextureBindingLayout () { Carp::croak if @_>1; 'WebGPU::Direct::StorageTextureBindingLayout' }
-  sub SupportedLimits () { Carp::croak if @_>1; 'WebGPU::Direct::SupportedLimits' }
+  sub StringView () { Carp::croak if @_>1; 'WebGPU::Direct::StringView' }
+  sub SupportedFeatures () { Carp::croak if @_>1; 'WebGPU::Direct::SupportedFeatures' }
+  sub SupportedWGSLLanguageFeatures () { Carp::croak if @_>1; 'WebGPU::Direct::SupportedWGSLLanguageFeatures' }
   sub SurfaceCapabilities () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceCapabilities' }
   sub SurfaceConfiguration () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceConfiguration' }
   sub SurfaceDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptor' }
-  sub SurfaceDescriptorFromAndroidNativeWindow () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromAndroidNativeWindow' }
-  sub SurfaceDescriptorFromCanvasHTMLSelector () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromCanvasHTMLSelector' }
-  sub SurfaceDescriptorFromMetalLayer () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromMetalLayer' }
-  sub SurfaceDescriptorFromWaylandSurface () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromWaylandSurface' }
-  sub SurfaceDescriptorFromWindowsHWND () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromWindowsHWND' }
-  sub SurfaceDescriptorFromXcbWindow () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromXcbWindow' }
-  sub SurfaceDescriptorFromXlibWindow () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceDescriptorFromXlibWindow' }
+  sub SurfaceSourceAndroidNativeWindow () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceSourceAndroidNativeWindow' }
+  sub SurfaceSourceMetalLayer () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceSourceMetalLayer' }
+  sub SurfaceSourceWaylandSurface () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceSourceWaylandSurface' }
+  sub SurfaceSourceWindowsHWND () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceSourceWindowsHWND' }
+  sub SurfaceSourceXCBWindow () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceSourceXCBWindow' }
+  sub SurfaceSourceXlibWindow () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceSourceXlibWindow' }
   sub SurfaceTexture () { Carp::croak if @_>1; 'WebGPU::Direct::SurfaceTexture' }
+  sub TexelCopyBufferInfo () { Carp::croak if @_>1; 'WebGPU::Direct::TexelCopyBufferInfo' }
+  sub TexelCopyBufferLayout () { Carp::croak if @_>1; 'WebGPU::Direct::TexelCopyBufferLayout' }
+  sub TexelCopyTextureInfo () { Carp::croak if @_>1; 'WebGPU::Direct::TexelCopyTextureInfo' }
   sub TextureBindingLayout () { Carp::croak if @_>1; 'WebGPU::Direct::TextureBindingLayout' }
-  sub TextureDataLayout () { Carp::croak if @_>1; 'WebGPU::Direct::TextureDataLayout' }
   sub TextureDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::TextureDescriptor' }
   sub TextureViewDescriptor () { Carp::croak if @_>1; 'WebGPU::Direct::TextureViewDescriptor' }
+  sub UncapturedErrorCallbackInfo () { Carp::croak if @_>1; 'WebGPU::Direct::UncapturedErrorCallbackInfo' }
   sub VertexAttribute () { Carp::croak if @_>1; 'WebGPU::Direct::VertexAttribute' }
   sub VertexBufferLayout () { Carp::croak if @_>1; 'WebGPU::Direct::VertexBufferLayout' }
   sub VertexState () { Carp::croak if @_>1; 'WebGPU::Direct::VertexState' }
-  sub newAdapterProperties { my $class = shift; return WebGPU::Direct::AdapterProperties->new(@_); }
+  sub newAdapterInfo { my $class = shift; return WebGPU::Direct::AdapterInfo->new(@_); }
   sub newBindGroupDescriptor { my $class = shift; return WebGPU::Direct::BindGroupDescriptor->new(@_); }
   sub newBindGroupEntry { my $class = shift; return WebGPU::Direct::BindGroupEntry->new(@_); }
   sub newBindGroupLayoutDescriptor { my $class = shift; return WebGPU::Direct::BindGroupLayoutDescriptor->new(@_); }
@@ -156,6 +176,7 @@ package
   sub newBlendState { my $class = shift; return WebGPU::Direct::BlendState->new(@_); }
   sub newBufferBindingLayout { my $class = shift; return WebGPU::Direct::BufferBindingLayout->new(@_); }
   sub newBufferDescriptor { my $class = shift; return WebGPU::Direct::BufferDescriptor->new(@_); }
+  sub newBufferMapCallbackInfo { my $class = shift; return WebGPU::Direct::BufferMapCallbackInfo->new(@_); }
   sub newChainedStruct { my $class = shift; return WebGPU::Direct::ChainedStruct->new(@_); }
   sub newChainedStructOut { my $class = shift; return WebGPU::Direct::ChainedStructOut->new(@_); }
   sub newColor { my $class = shift; return WebGPU::Direct::Color->new(@_); }
@@ -163,61 +184,71 @@ package
   sub newCommandBufferDescriptor { my $class = shift; return WebGPU::Direct::CommandBufferDescriptor->new(@_); }
   sub newCommandEncoderDescriptor { my $class = shift; return WebGPU::Direct::CommandEncoderDescriptor->new(@_); }
   sub newCompilationInfo { my $class = shift; return WebGPU::Direct::CompilationInfo->new(@_); }
+  sub newCompilationInfoCallbackInfo { my $class = shift; return WebGPU::Direct::CompilationInfoCallbackInfo->new(@_); }
   sub newCompilationMessage { my $class = shift; return WebGPU::Direct::CompilationMessage->new(@_); }
   sub newComputePassDescriptor { my $class = shift; return WebGPU::Direct::ComputePassDescriptor->new(@_); }
   sub newComputePassTimestampWrites { my $class = shift; return WebGPU::Direct::ComputePassTimestampWrites->new(@_); }
   sub newComputePipelineDescriptor { my $class = shift; return WebGPU::Direct::ComputePipelineDescriptor->new(@_); }
   sub newConstantEntry { my $class = shift; return WebGPU::Direct::ConstantEntry->new(@_); }
+  sub newCreateComputePipelineAsyncCallbackInfo { my $class = shift; return WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo->new(@_); }
+  sub newCreateRenderPipelineAsyncCallbackInfo { my $class = shift; return WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo->new(@_); }
   sub newDepthStencilState { my $class = shift; return WebGPU::Direct::DepthStencilState->new(@_); }
   sub newDeviceDescriptor { my $class = shift; return WebGPU::Direct::DeviceDescriptor->new(@_); }
+  sub newDeviceLostCallbackInfo { my $class = shift; return WebGPU::Direct::DeviceLostCallbackInfo->new(@_); }
   sub newExtent3D { my $class = shift; return WebGPU::Direct::Extent3D->new(@_); }
   sub newFragmentState { my $class = shift; return WebGPU::Direct::FragmentState->new(@_); }
-  sub newImageCopyBuffer { my $class = shift; return WebGPU::Direct::ImageCopyBuffer->new(@_); }
-  sub newImageCopyTexture { my $class = shift; return WebGPU::Direct::ImageCopyTexture->new(@_); }
+  sub newFuture { my $class = shift; return WebGPU::Direct::Future->new(@_); }
+  sub newFutureWaitInfo { my $class = shift; return WebGPU::Direct::FutureWaitInfo->new(@_); }
+  sub newInstanceCapabilities { my $class = shift; return WebGPU::Direct::InstanceCapabilities->new(@_); }
   sub newInstanceDescriptor { my $class = shift; return WebGPU::Direct::InstanceDescriptor->new(@_); }
   sub newLimits { my $class = shift; return WebGPU::Direct::Limits->new(@_); }
   sub newMultisampleState { my $class = shift; return WebGPU::Direct::MultisampleState->new(@_); }
   sub newOrigin3D { my $class = shift; return WebGPU::Direct::Origin3D->new(@_); }
   sub newPipelineLayoutDescriptor { my $class = shift; return WebGPU::Direct::PipelineLayoutDescriptor->new(@_); }
-  sub newPrimitiveDepthClipControl { my $class = shift; return WebGPU::Direct::PrimitiveDepthClipControl->new(@_); }
+  sub newPopErrorScopeCallbackInfo { my $class = shift; return WebGPU::Direct::PopErrorScopeCallbackInfo->new(@_); }
   sub newPrimitiveState { my $class = shift; return WebGPU::Direct::PrimitiveState->new(@_); }
   sub newProgrammableStageDescriptor { my $class = shift; return WebGPU::Direct::ProgrammableStageDescriptor->new(@_); }
   sub newQuerySetDescriptor { my $class = shift; return WebGPU::Direct::QuerySetDescriptor->new(@_); }
   sub newQueueDescriptor { my $class = shift; return WebGPU::Direct::QueueDescriptor->new(@_); }
+  sub newQueueWorkDoneCallbackInfo { my $class = shift; return WebGPU::Direct::QueueWorkDoneCallbackInfo->new(@_); }
   sub newRenderBundleDescriptor { my $class = shift; return WebGPU::Direct::RenderBundleDescriptor->new(@_); }
   sub newRenderBundleEncoderDescriptor { my $class = shift; return WebGPU::Direct::RenderBundleEncoderDescriptor->new(@_); }
   sub newRenderPassColorAttachment { my $class = shift; return WebGPU::Direct::RenderPassColorAttachment->new(@_); }
   sub newRenderPassDepthStencilAttachment { my $class = shift; return WebGPU::Direct::RenderPassDepthStencilAttachment->new(@_); }
   sub newRenderPassDescriptor { my $class = shift; return WebGPU::Direct::RenderPassDescriptor->new(@_); }
-  sub newRenderPassDescriptorMaxDrawCount { my $class = shift; return WebGPU::Direct::RenderPassDescriptorMaxDrawCount->new(@_); }
+  sub newRenderPassMaxDrawCount { my $class = shift; return WebGPU::Direct::RenderPassMaxDrawCount->new(@_); }
   sub newRenderPassTimestampWrites { my $class = shift; return WebGPU::Direct::RenderPassTimestampWrites->new(@_); }
   sub newRenderPipelineDescriptor { my $class = shift; return WebGPU::Direct::RenderPipelineDescriptor->new(@_); }
+  sub newRequestAdapterCallbackInfo { my $class = shift; return WebGPU::Direct::RequestAdapterCallbackInfo->new(@_); }
   sub newRequestAdapterOptions { my $class = shift; return WebGPU::Direct::RequestAdapterOptions->new(@_); }
-  sub newRequiredLimits { my $class = shift; return WebGPU::Direct::RequiredLimits->new(@_); }
+  sub newRequestDeviceCallbackInfo { my $class = shift; return WebGPU::Direct::RequestDeviceCallbackInfo->new(@_); }
   sub newSamplerBindingLayout { my $class = shift; return WebGPU::Direct::SamplerBindingLayout->new(@_); }
   sub newSamplerDescriptor { my $class = shift; return WebGPU::Direct::SamplerDescriptor->new(@_); }
-  sub newShaderModuleCompilationHint { my $class = shift; return WebGPU::Direct::ShaderModuleCompilationHint->new(@_); }
   sub newShaderModuleDescriptor { my $class = shift; return WebGPU::Direct::ShaderModuleDescriptor->new(@_); }
-  sub newShaderModuleSPIRVDescriptor { my $class = shift; return WebGPU::Direct::ShaderModuleSPIRVDescriptor->new(@_); }
-  sub newShaderModuleWGSLDescriptor { my $class = shift; return WebGPU::Direct::ShaderModuleWGSLDescriptor->new(@_); }
+  sub newShaderSourceSPIRV { my $class = shift; return WebGPU::Direct::ShaderSourceSPIRV->new(@_); }
+  sub newShaderSourceWGSL { my $class = shift; return WebGPU::Direct::ShaderSourceWGSL->new(@_); }
   sub newStencilFaceState { my $class = shift; return WebGPU::Direct::StencilFaceState->new(@_); }
   sub newStorageTextureBindingLayout { my $class = shift; return WebGPU::Direct::StorageTextureBindingLayout->new(@_); }
-  sub newSupportedLimits { my $class = shift; return WebGPU::Direct::SupportedLimits->new(@_); }
+  sub newStringView { my $class = shift; return WebGPU::Direct::StringView->new(@_); }
+  sub newSupportedFeatures { my $class = shift; return WebGPU::Direct::SupportedFeatures->new(@_); }
+  sub newSupportedWGSLLanguageFeatures { my $class = shift; return WebGPU::Direct::SupportedWGSLLanguageFeatures->new(@_); }
   sub newSurfaceCapabilities { my $class = shift; return WebGPU::Direct::SurfaceCapabilities->new(@_); }
   sub newSurfaceConfiguration { my $class = shift; return WebGPU::Direct::SurfaceConfiguration->new(@_); }
   sub newSurfaceDescriptor { my $class = shift; return WebGPU::Direct::SurfaceDescriptor->new(@_); }
-  sub newSurfaceDescriptorFromAndroidNativeWindow { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromAndroidNativeWindow->new(@_); }
-  sub newSurfaceDescriptorFromCanvasHTMLSelector { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromCanvasHTMLSelector->new(@_); }
-  sub newSurfaceDescriptorFromMetalLayer { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromMetalLayer->new(@_); }
-  sub newSurfaceDescriptorFromWaylandSurface { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromWaylandSurface->new(@_); }
-  sub newSurfaceDescriptorFromWindowsHWND { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromWindowsHWND->new(@_); }
-  sub newSurfaceDescriptorFromXcbWindow { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromXcbWindow->new(@_); }
-  sub newSurfaceDescriptorFromXlibWindow { my $class = shift; return WebGPU::Direct::SurfaceDescriptorFromXlibWindow->new(@_); }
+  sub newSurfaceSourceAndroidNativeWindow { my $class = shift; return WebGPU::Direct::SurfaceSourceAndroidNativeWindow->new(@_); }
+  sub newSurfaceSourceMetalLayer { my $class = shift; return WebGPU::Direct::SurfaceSourceMetalLayer->new(@_); }
+  sub newSurfaceSourceWaylandSurface { my $class = shift; return WebGPU::Direct::SurfaceSourceWaylandSurface->new(@_); }
+  sub newSurfaceSourceWindowsHWND { my $class = shift; return WebGPU::Direct::SurfaceSourceWindowsHWND->new(@_); }
+  sub newSurfaceSourceXCBWindow { my $class = shift; return WebGPU::Direct::SurfaceSourceXCBWindow->new(@_); }
+  sub newSurfaceSourceXlibWindow { my $class = shift; return WebGPU::Direct::SurfaceSourceXlibWindow->new(@_); }
   sub newSurfaceTexture { my $class = shift; return WebGPU::Direct::SurfaceTexture->new(@_); }
+  sub newTexelCopyBufferInfo { my $class = shift; return WebGPU::Direct::TexelCopyBufferInfo->new(@_); }
+  sub newTexelCopyBufferLayout { my $class = shift; return WebGPU::Direct::TexelCopyBufferLayout->new(@_); }
+  sub newTexelCopyTextureInfo { my $class = shift; return WebGPU::Direct::TexelCopyTextureInfo->new(@_); }
   sub newTextureBindingLayout { my $class = shift; return WebGPU::Direct::TextureBindingLayout->new(@_); }
-  sub newTextureDataLayout { my $class = shift; return WebGPU::Direct::TextureDataLayout->new(@_); }
   sub newTextureDescriptor { my $class = shift; return WebGPU::Direct::TextureDescriptor->new(@_); }
   sub newTextureViewDescriptor { my $class = shift; return WebGPU::Direct::TextureViewDescriptor->new(@_); }
+  sub newUncapturedErrorCallbackInfo { my $class = shift; return WebGPU::Direct::UncapturedErrorCallbackInfo->new(@_); }
   sub newVertexAttribute { my $class = shift; return WebGPU::Direct::VertexAttribute->new(@_); }
   sub newVertexBufferLayout { my $class = shift; return WebGPU::Direct::VertexBufferLayout->new(@_); }
   sub newVertexState { my $class = shift; return WebGPU::Direct::VertexState->new(@_); }
@@ -234,19 +265,20 @@ package
 package
 	WebGPU::Direct::AdapterType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('discreteGPU' => (0x00000000, 'WGPUAdapterType_DiscreteGPU'));
-  __PACKAGE__->_add_enum('integratedGPU' => (0x00000001, 'WGPUAdapterType_IntegratedGPU'));
-  __PACKAGE__->_add_enum('CPU' => (0x00000002, 'WGPUAdapterType_CPU'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000003, 'WGPUAdapterType_Unknown'));
+  __PACKAGE__->_add_enum('discreteGPU' => (0x00000001, 'WGPUAdapterType_DiscreteGPU'));
+  __PACKAGE__->_add_enum('integratedGPU' => (0x00000002, 'WGPUAdapterType_IntegratedGPU'));
+  __PACKAGE__->_add_enum('CPU' => (0x00000003, 'WGPUAdapterType_CPU'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000004, 'WGPUAdapterType_Unknown'));
   WebGPU::Direct::AdapterType->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::AddressMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('repeat' => (0x00000000, 'WGPUAddressMode_Repeat'));
-  __PACKAGE__->_add_enum('mirrorRepeat' => (0x00000001, 'WGPUAddressMode_MirrorRepeat'));
-  __PACKAGE__->_add_enum('clampToEdge' => (0x00000002, 'WGPUAddressMode_ClampToEdge'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUAddressMode_Undefined'));
+  __PACKAGE__->_add_enum('clampToEdge' => (0x00000001, 'WGPUAddressMode_ClampToEdge'));
+  __PACKAGE__->_add_enum('repeat' => (0x00000002, 'WGPUAddressMode_Repeat'));
+  __PACKAGE__->_add_enum('mirrorRepeat' => (0x00000003, 'WGPUAddressMode_MirrorRepeat'));
   WebGPU::Direct::AddressMode->_build_const_lut;
 };
 
@@ -268,93 +300,94 @@ package
 package
 	WebGPU::Direct::BlendFactor {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('zero' => (0x00000000, 'WGPUBlendFactor_Zero'));
-  __PACKAGE__->_add_enum('one' => (0x00000001, 'WGPUBlendFactor_One'));
-  __PACKAGE__->_add_enum('src' => (0x00000002, 'WGPUBlendFactor_Src'));
-  __PACKAGE__->_add_enum('oneMinusSrc' => (0x00000003, 'WGPUBlendFactor_OneMinusSrc'));
-  __PACKAGE__->_add_enum('srcAlpha' => (0x00000004, 'WGPUBlendFactor_SrcAlpha'));
-  __PACKAGE__->_add_enum('oneMinusSrcAlpha' => (0x00000005, 'WGPUBlendFactor_OneMinusSrcAlpha'));
-  __PACKAGE__->_add_enum('dst' => (0x00000006, 'WGPUBlendFactor_Dst'));
-  __PACKAGE__->_add_enum('oneMinusDst' => (0x00000007, 'WGPUBlendFactor_OneMinusDst'));
-  __PACKAGE__->_add_enum('dstAlpha' => (0x00000008, 'WGPUBlendFactor_DstAlpha'));
-  __PACKAGE__->_add_enum('oneMinusDstAlpha' => (0x00000009, 'WGPUBlendFactor_OneMinusDstAlpha'));
-  __PACKAGE__->_add_enum('srcAlphaSaturated' => (0x0000000A, 'WGPUBlendFactor_SrcAlphaSaturated'));
-  __PACKAGE__->_add_enum('constant' => (0x0000000B, 'WGPUBlendFactor_Constant'));
-  __PACKAGE__->_add_enum('oneMinusConstant' => (0x0000000C, 'WGPUBlendFactor_OneMinusConstant'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUBlendFactor_Undefined'));
+  __PACKAGE__->_add_enum('zero' => (0x00000001, 'WGPUBlendFactor_Zero'));
+  __PACKAGE__->_add_enum('one' => (0x00000002, 'WGPUBlendFactor_One'));
+  __PACKAGE__->_add_enum('src' => (0x00000003, 'WGPUBlendFactor_Src'));
+  __PACKAGE__->_add_enum('oneMinusSrc' => (0x00000004, 'WGPUBlendFactor_OneMinusSrc'));
+  __PACKAGE__->_add_enum('srcAlpha' => (0x00000005, 'WGPUBlendFactor_SrcAlpha'));
+  __PACKAGE__->_add_enum('oneMinusSrcAlpha' => (0x00000006, 'WGPUBlendFactor_OneMinusSrcAlpha'));
+  __PACKAGE__->_add_enum('dst' => (0x00000007, 'WGPUBlendFactor_Dst'));
+  __PACKAGE__->_add_enum('oneMinusDst' => (0x00000008, 'WGPUBlendFactor_OneMinusDst'));
+  __PACKAGE__->_add_enum('dstAlpha' => (0x00000009, 'WGPUBlendFactor_DstAlpha'));
+  __PACKAGE__->_add_enum('oneMinusDstAlpha' => (0x0000000A, 'WGPUBlendFactor_OneMinusDstAlpha'));
+  __PACKAGE__->_add_enum('srcAlphaSaturated' => (0x0000000B, 'WGPUBlendFactor_SrcAlphaSaturated'));
+  __PACKAGE__->_add_enum('constant' => (0x0000000C, 'WGPUBlendFactor_Constant'));
+  __PACKAGE__->_add_enum('oneMinusConstant' => (0x0000000D, 'WGPUBlendFactor_OneMinusConstant'));
+  __PACKAGE__->_add_enum('src1' => (0x0000000E, 'WGPUBlendFactor_Src1'));
+  __PACKAGE__->_add_enum('oneMinusSrc1' => (0x0000000F, 'WGPUBlendFactor_OneMinusSrc1'));
+  __PACKAGE__->_add_enum('src1Alpha' => (0x00000010, 'WGPUBlendFactor_Src1Alpha'));
+  __PACKAGE__->_add_enum('oneMinusSrc1Alpha' => (0x00000011, 'WGPUBlendFactor_OneMinusSrc1Alpha'));
   WebGPU::Direct::BlendFactor->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::BlendOperation {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('add' => (0x00000000, 'WGPUBlendOperation_Add'));
-  __PACKAGE__->_add_enum('subtract' => (0x00000001, 'WGPUBlendOperation_Subtract'));
-  __PACKAGE__->_add_enum('reverseSubtract' => (0x00000002, 'WGPUBlendOperation_ReverseSubtract'));
-  __PACKAGE__->_add_enum('min' => (0x00000003, 'WGPUBlendOperation_Min'));
-  __PACKAGE__->_add_enum('max' => (0x00000004, 'WGPUBlendOperation_Max'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUBlendOperation_Undefined'));
+  __PACKAGE__->_add_enum('add' => (0x00000001, 'WGPUBlendOperation_Add'));
+  __PACKAGE__->_add_enum('subtract' => (0x00000002, 'WGPUBlendOperation_Subtract'));
+  __PACKAGE__->_add_enum('reverseSubtract' => (0x00000003, 'WGPUBlendOperation_ReverseSubtract'));
+  __PACKAGE__->_add_enum('min' => (0x00000004, 'WGPUBlendOperation_Min'));
+  __PACKAGE__->_add_enum('max' => (0x00000005, 'WGPUBlendOperation_Max'));
   WebGPU::Direct::BlendOperation->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::BufferBindingType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUBufferBindingType_Undefined'));
-  __PACKAGE__->_add_enum('uniform' => (0x00000001, 'WGPUBufferBindingType_Uniform'));
-  __PACKAGE__->_add_enum('storage' => (0x00000002, 'WGPUBufferBindingType_Storage'));
-  __PACKAGE__->_add_enum('readOnlyStorage' => (0x00000003, 'WGPUBufferBindingType_ReadOnlyStorage'));
+  __PACKAGE__->_add_enum('bindingNotUsed' => (0x00000000, 'WGPUBufferBindingType_BindingNotUsed'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000001, 'WGPUBufferBindingType_Undefined'));
+  __PACKAGE__->_add_enum('uniform' => (0x00000002, 'WGPUBufferBindingType_Uniform'));
+  __PACKAGE__->_add_enum('storage' => (0x00000003, 'WGPUBufferBindingType_Storage'));
+  __PACKAGE__->_add_enum('readOnlyStorage' => (0x00000004, 'WGPUBufferBindingType_ReadOnlyStorage'));
   WebGPU::Direct::BufferBindingType->_build_const_lut;
-};
-
-package
-	WebGPU::Direct::BufferMapAsyncStatus {
-  use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPUBufferMapAsyncStatus_Success'));
-  __PACKAGE__->_add_enum('validationError' => (0x00000001, 'WGPUBufferMapAsyncStatus_ValidationError'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000002, 'WGPUBufferMapAsyncStatus_Unknown'));
-  __PACKAGE__->_add_enum('deviceLost' => (0x00000003, 'WGPUBufferMapAsyncStatus_DeviceLost'));
-  __PACKAGE__->_add_enum('destroyedBeforeCallback' => (0x00000004, 'WGPUBufferMapAsyncStatus_DestroyedBeforeCallback'));
-  __PACKAGE__->_add_enum('unmappedBeforeCallback' => (0x00000005, 'WGPUBufferMapAsyncStatus_UnmappedBeforeCallback'));
-  __PACKAGE__->_add_enum('mappingAlreadyPending' => (0x00000006, 'WGPUBufferMapAsyncStatus_MappingAlreadyPending'));
-  __PACKAGE__->_add_enum('offsetOutOfRange' => (0x00000007, 'WGPUBufferMapAsyncStatus_OffsetOutOfRange'));
-  __PACKAGE__->_add_enum('sizeOutOfRange' => (0x00000008, 'WGPUBufferMapAsyncStatus_SizeOutOfRange'));
-  WebGPU::Direct::BufferMapAsyncStatus->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::BufferMapState {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('unmapped' => (0x00000000, 'WGPUBufferMapState_Unmapped'));
-  __PACKAGE__->_add_enum('pending' => (0x00000001, 'WGPUBufferMapState_Pending'));
-  __PACKAGE__->_add_enum('mapped' => (0x00000002, 'WGPUBufferMapState_Mapped'));
+  __PACKAGE__->_add_enum('unmapped' => (0x00000001, 'WGPUBufferMapState_Unmapped'));
+  __PACKAGE__->_add_enum('pending' => (0x00000002, 'WGPUBufferMapState_Pending'));
+  __PACKAGE__->_add_enum('mapped' => (0x00000003, 'WGPUBufferMapState_Mapped'));
   WebGPU::Direct::BufferMapState->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::BufferUsage {
-  use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('none' => (0x00000000, 'WGPUBufferUsage_None'));
-  __PACKAGE__->_add_enum('mapRead' => (0x00000001, 'WGPUBufferUsage_MapRead'));
-  __PACKAGE__->_add_enum('mapWrite' => (0x00000002, 'WGPUBufferUsage_MapWrite'));
-  __PACKAGE__->_add_enum('copySrc' => (0x00000004, 'WGPUBufferUsage_CopySrc'));
-  __PACKAGE__->_add_enum('copyDst' => (0x00000008, 'WGPUBufferUsage_CopyDst'));
-  __PACKAGE__->_add_enum('index' => (0x00000010, 'WGPUBufferUsage_Index'));
-  __PACKAGE__->_add_enum('vertex' => (0x00000020, 'WGPUBufferUsage_Vertex'));
-  __PACKAGE__->_add_enum('uniform' => (0x00000040, 'WGPUBufferUsage_Uniform'));
-  __PACKAGE__->_add_enum('storage' => (0x00000080, 'WGPUBufferUsage_Storage'));
-  __PACKAGE__->_add_enum('indirect' => (0x00000100, 'WGPUBufferUsage_Indirect'));
-  __PACKAGE__->_add_enum('queryResolve' => (0x00000200, 'WGPUBufferUsage_QueryResolve'));
+  use base "WebGPU::Direct::Flag";
+  __PACKAGE__->_add_enum('none' => (0x0000000000000000, 'WGPUBufferUsage_None'));
+  __PACKAGE__->_add_enum('mapRead' => (0x0000000000000001, 'WGPUBufferUsage_MapRead'));
+  __PACKAGE__->_add_enum('mapWrite' => (0x0000000000000002, 'WGPUBufferUsage_MapWrite'));
+  __PACKAGE__->_add_enum('copySrc' => (0x0000000000000004, 'WGPUBufferUsage_CopySrc'));
+  __PACKAGE__->_add_enum('copyDst' => (0x0000000000000008, 'WGPUBufferUsage_CopyDst'));
+  __PACKAGE__->_add_enum('index' => (0x0000000000000010, 'WGPUBufferUsage_Index'));
+  __PACKAGE__->_add_enum('vertex' => (0x0000000000000020, 'WGPUBufferUsage_Vertex'));
+  __PACKAGE__->_add_enum('uniform' => (0x0000000000000040, 'WGPUBufferUsage_Uniform'));
+  __PACKAGE__->_add_enum('storage' => (0x0000000000000080, 'WGPUBufferUsage_Storage'));
+  __PACKAGE__->_add_enum('indirect' => (0x0000000000000100, 'WGPUBufferUsage_Indirect'));
+  __PACKAGE__->_add_enum('queryResolve' => (0x0000000000000200, 'WGPUBufferUsage_QueryResolve'));
   WebGPU::Direct::BufferUsage->_build_const_lut;
 };
 
 package
-	WebGPU::Direct::ColorWriteMask {
+	WebGPU::Direct::CallbackMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('none' => (0x00000000, 'WGPUColorWriteMask_None'));
-  __PACKAGE__->_add_enum('red' => (0x00000001, 'WGPUColorWriteMask_Red'));
-  __PACKAGE__->_add_enum('green' => (0x00000002, 'WGPUColorWriteMask_Green'));
-  __PACKAGE__->_add_enum('blue' => (0x00000004, 'WGPUColorWriteMask_Blue'));
-  __PACKAGE__->_add_enum('alpha' => (0x00000008, 'WGPUColorWriteMask_Alpha'));
-  __PACKAGE__->_add_enum('all' => (0x0000000F, 'WGPUColorWriteMask_All'));
+  __PACKAGE__->_add_enum('waitAnyOnly' => (0x00000001, 'WGPUCallbackMode_WaitAnyOnly'));
+  __PACKAGE__->_add_enum('allowProcessEvents' => (0x00000002, 'WGPUCallbackMode_AllowProcessEvents'));
+  __PACKAGE__->_add_enum('allowSpontaneous' => (0x00000003, 'WGPUCallbackMode_AllowSpontaneous'));
+  WebGPU::Direct::CallbackMode->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::ColorWriteMask {
+  use base "WebGPU::Direct::Flag";
+  __PACKAGE__->_add_enum('none' => (0x0000000000000000, 'WGPUColorWriteMask_None'));
+  __PACKAGE__->_add_enum('red' => (0x0000000000000001, 'WGPUColorWriteMask_Red'));
+  __PACKAGE__->_add_enum('green' => (0x0000000000000002, 'WGPUColorWriteMask_Green'));
+  __PACKAGE__->_add_enum('blue' => (0x0000000000000004, 'WGPUColorWriteMask_Blue'));
+  __PACKAGE__->_add_enum('alpha' => (0x0000000000000008, 'WGPUColorWriteMask_Alpha'));
+  __PACKAGE__->_add_enum('all' => (0x000000000000000F, 'WGPUColorWriteMask_All'));
   WebGPU::Direct::ColorWriteMask->_build_const_lut;
 };
 
@@ -364,11 +397,11 @@ package
   __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUCompareFunction_Undefined'));
   __PACKAGE__->_add_enum('never' => (0x00000001, 'WGPUCompareFunction_Never'));
   __PACKAGE__->_add_enum('less' => (0x00000002, 'WGPUCompareFunction_Less'));
-  __PACKAGE__->_add_enum('lessEqual' => (0x00000003, 'WGPUCompareFunction_LessEqual'));
-  __PACKAGE__->_add_enum('greater' => (0x00000004, 'WGPUCompareFunction_Greater'));
-  __PACKAGE__->_add_enum('greaterEqual' => (0x00000005, 'WGPUCompareFunction_GreaterEqual'));
-  __PACKAGE__->_add_enum('equal' => (0x00000006, 'WGPUCompareFunction_Equal'));
-  __PACKAGE__->_add_enum('notEqual' => (0x00000007, 'WGPUCompareFunction_NotEqual'));
+  __PACKAGE__->_add_enum('equal' => (0x00000003, 'WGPUCompareFunction_Equal'));
+  __PACKAGE__->_add_enum('lessEqual' => (0x00000004, 'WGPUCompareFunction_LessEqual'));
+  __PACKAGE__->_add_enum('greater' => (0x00000005, 'WGPUCompareFunction_Greater'));
+  __PACKAGE__->_add_enum('notEqual' => (0x00000006, 'WGPUCompareFunction_NotEqual'));
+  __PACKAGE__->_add_enum('greaterEqual' => (0x00000007, 'WGPUCompareFunction_GreaterEqual'));
   __PACKAGE__->_add_enum('always' => (0x00000008, 'WGPUCompareFunction_Always'));
   WebGPU::Direct::CompareFunction->_build_const_lut;
 };
@@ -376,19 +409,19 @@ package
 package
 	WebGPU::Direct::CompilationInfoRequestStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPUCompilationInfoRequestStatus_Success'));
-  __PACKAGE__->_add_enum('error' => (0x00000001, 'WGPUCompilationInfoRequestStatus_Error'));
-  __PACKAGE__->_add_enum('deviceLost' => (0x00000002, 'WGPUCompilationInfoRequestStatus_DeviceLost'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000003, 'WGPUCompilationInfoRequestStatus_Unknown'));
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUCompilationInfoRequestStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPUCompilationInfoRequestStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('error' => (0x00000003, 'WGPUCompilationInfoRequestStatus_Error'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000004, 'WGPUCompilationInfoRequestStatus_Unknown'));
   WebGPU::Direct::CompilationInfoRequestStatus->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::CompilationMessageType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('error' => (0x00000000, 'WGPUCompilationMessageType_Error'));
-  __PACKAGE__->_add_enum('warning' => (0x00000001, 'WGPUCompilationMessageType_Warning'));
-  __PACKAGE__->_add_enum('info' => (0x00000002, 'WGPUCompilationMessageType_Info'));
+  __PACKAGE__->_add_enum('error' => (0x00000001, 'WGPUCompilationMessageType_Error'));
+  __PACKAGE__->_add_enum('warning' => (0x00000002, 'WGPUCompilationMessageType_Warning'));
+  __PACKAGE__->_add_enum('info' => (0x00000003, 'WGPUCompilationMessageType_Info'));
   WebGPU::Direct::CompilationMessageType->_build_const_lut;
 };
 
@@ -406,11 +439,10 @@ package
 package
 	WebGPU::Direct::CreatePipelineAsyncStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPUCreatePipelineAsyncStatus_Success'));
-  __PACKAGE__->_add_enum('validationError' => (0x00000001, 'WGPUCreatePipelineAsyncStatus_ValidationError'));
-  __PACKAGE__->_add_enum('internalError' => (0x00000002, 'WGPUCreatePipelineAsyncStatus_InternalError'));
-  __PACKAGE__->_add_enum('deviceLost' => (0x00000003, 'WGPUCreatePipelineAsyncStatus_DeviceLost'));
-  __PACKAGE__->_add_enum('deviceDestroyed' => (0x00000004, 'WGPUCreatePipelineAsyncStatus_DeviceDestroyed'));
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUCreatePipelineAsyncStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPUCreatePipelineAsyncStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('validationError' => (0x00000003, 'WGPUCreatePipelineAsyncStatus_ValidationError'));
+  __PACKAGE__->_add_enum('internalError' => (0x00000004, 'WGPUCreatePipelineAsyncStatus_InternalError'));
   __PACKAGE__->_add_enum('unknown' => (0x00000005, 'WGPUCreatePipelineAsyncStatus_Unknown'));
   WebGPU::Direct::CreatePipelineAsyncStatus->_build_const_lut;
 };
@@ -418,39 +450,49 @@ package
 package
 	WebGPU::Direct::CullMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('none' => (0x00000000, 'WGPUCullMode_None'));
-  __PACKAGE__->_add_enum('front' => (0x00000001, 'WGPUCullMode_Front'));
-  __PACKAGE__->_add_enum('back' => (0x00000002, 'WGPUCullMode_Back'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUCullMode_Undefined'));
+  __PACKAGE__->_add_enum('none' => (0x00000001, 'WGPUCullMode_None'));
+  __PACKAGE__->_add_enum('front' => (0x00000002, 'WGPUCullMode_Front'));
+  __PACKAGE__->_add_enum('back' => (0x00000003, 'WGPUCullMode_Back'));
   WebGPU::Direct::CullMode->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::DeviceLostReason {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUDeviceLostReason_Undefined'));
-  __PACKAGE__->_add_enum('destroyed' => (0x00000001, 'WGPUDeviceLostReason_Destroyed'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000001, 'WGPUDeviceLostReason_Unknown'));
+  __PACKAGE__->_add_enum('destroyed' => (0x00000002, 'WGPUDeviceLostReason_Destroyed'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000003, 'WGPUDeviceLostReason_InstanceDropped'));
+  __PACKAGE__->_add_enum('failedCreation' => (0x00000004, 'WGPUDeviceLostReason_FailedCreation'));
   WebGPU::Direct::DeviceLostReason->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::ErrorFilter {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('validation' => (0x00000000, 'WGPUErrorFilter_Validation'));
-  __PACKAGE__->_add_enum('outOfMemory' => (0x00000001, 'WGPUErrorFilter_OutOfMemory'));
-  __PACKAGE__->_add_enum('internal' => (0x00000002, 'WGPUErrorFilter_Internal'));
+  __PACKAGE__->_add_enum('validation' => (0x00000001, 'WGPUErrorFilter_Validation'));
+  __PACKAGE__->_add_enum('outOfMemory' => (0x00000002, 'WGPUErrorFilter_OutOfMemory'));
+  __PACKAGE__->_add_enum('internal' => (0x00000003, 'WGPUErrorFilter_Internal'));
   WebGPU::Direct::ErrorFilter->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::ErrorType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('noError' => (0x00000000, 'WGPUErrorType_NoError'));
-  __PACKAGE__->_add_enum('validation' => (0x00000001, 'WGPUErrorType_Validation'));
-  __PACKAGE__->_add_enum('outOfMemory' => (0x00000002, 'WGPUErrorType_OutOfMemory'));
-  __PACKAGE__->_add_enum('internal' => (0x00000003, 'WGPUErrorType_Internal'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000004, 'WGPUErrorType_Unknown'));
-  __PACKAGE__->_add_enum('deviceLost' => (0x00000005, 'WGPUErrorType_DeviceLost'));
+  __PACKAGE__->_add_enum('noError' => (0x00000001, 'WGPUErrorType_NoError'));
+  __PACKAGE__->_add_enum('validation' => (0x00000002, 'WGPUErrorType_Validation'));
+  __PACKAGE__->_add_enum('outOfMemory' => (0x00000003, 'WGPUErrorType_OutOfMemory'));
+  __PACKAGE__->_add_enum('internal' => (0x00000004, 'WGPUErrorType_Internal'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000005, 'WGPUErrorType_Unknown'));
   WebGPU::Direct::ErrorType->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::FeatureLevel {
+  use base "WebGPU::Direct::Enum";
+  __PACKAGE__->_add_enum('compatibility' => (0x00000001, 'WGPUFeatureLevel_Compatibility'));
+  __PACKAGE__->_add_enum('core' => (0x00000002, 'WGPUFeatureLevel_Core'));
+  WebGPU::Direct::FeatureLevel->_build_const_lut;
 };
 
 package
@@ -461,29 +503,36 @@ package
   __PACKAGE__->_add_enum('depth32FloatStencil8' => (0x00000002, 'WGPUFeatureName_Depth32FloatStencil8'));
   __PACKAGE__->_add_enum('timestampQuery' => (0x00000003, 'WGPUFeatureName_TimestampQuery'));
   __PACKAGE__->_add_enum('textureCompressionBC' => (0x00000004, 'WGPUFeatureName_TextureCompressionBC'));
-  __PACKAGE__->_add_enum('textureCompressionETC2' => (0x00000005, 'WGPUFeatureName_TextureCompressionETC2'));
-  __PACKAGE__->_add_enum('textureCompressionASTC' => (0x00000006, 'WGPUFeatureName_TextureCompressionASTC'));
-  __PACKAGE__->_add_enum('indirectFirstInstance' => (0x00000007, 'WGPUFeatureName_IndirectFirstInstance'));
-  __PACKAGE__->_add_enum('shaderF16' => (0x00000008, 'WGPUFeatureName_ShaderF16'));
-  __PACKAGE__->_add_enum('RG11B10UfloatRenderable' => (0x00000009, 'WGPUFeatureName_RG11B10UfloatRenderable'));
-  __PACKAGE__->_add_enum('BGRA8UnormStorage' => (0x0000000A, 'WGPUFeatureName_BGRA8UnormStorage'));
-  __PACKAGE__->_add_enum('float32Filterable' => (0x0000000B, 'WGPUFeatureName_Float32Filterable'));
+  __PACKAGE__->_add_enum('textureCompressionBCSliced3D' => (0x00000005, 'WGPUFeatureName_TextureCompressionBCSliced3D'));
+  __PACKAGE__->_add_enum('textureCompressionETC2' => (0x00000006, 'WGPUFeatureName_TextureCompressionETC2'));
+  __PACKAGE__->_add_enum('textureCompressionASTC' => (0x00000007, 'WGPUFeatureName_TextureCompressionASTC'));
+  __PACKAGE__->_add_enum('textureCompressionASTCSliced3D' => (0x00000008, 'WGPUFeatureName_TextureCompressionASTCSliced3D'));
+  __PACKAGE__->_add_enum('indirectFirstInstance' => (0x00000009, 'WGPUFeatureName_IndirectFirstInstance'));
+  __PACKAGE__->_add_enum('shaderF16' => (0x0000000A, 'WGPUFeatureName_ShaderF16'));
+  __PACKAGE__->_add_enum('RG11B10UfloatRenderable' => (0x0000000B, 'WGPUFeatureName_RG11B10UfloatRenderable'));
+  __PACKAGE__->_add_enum('BGRA8UnormStorage' => (0x0000000C, 'WGPUFeatureName_BGRA8UnormStorage'));
+  __PACKAGE__->_add_enum('float32Filterable' => (0x0000000D, 'WGPUFeatureName_Float32Filterable'));
+  __PACKAGE__->_add_enum('float32Blendable' => (0x0000000E, 'WGPUFeatureName_Float32Blendable'));
+  __PACKAGE__->_add_enum('clipDistances' => (0x0000000F, 'WGPUFeatureName_ClipDistances'));
+  __PACKAGE__->_add_enum('dualSourceBlending' => (0x00000010, 'WGPUFeatureName_DualSourceBlending'));
   WebGPU::Direct::FeatureName->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::FilterMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('nearest' => (0x00000000, 'WGPUFilterMode_Nearest'));
-  __PACKAGE__->_add_enum('linear' => (0x00000001, 'WGPUFilterMode_Linear'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUFilterMode_Undefined'));
+  __PACKAGE__->_add_enum('nearest' => (0x00000001, 'WGPUFilterMode_Nearest'));
+  __PACKAGE__->_add_enum('linear' => (0x00000002, 'WGPUFilterMode_Linear'));
   WebGPU::Direct::FilterMode->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::FrontFace {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('CCW' => (0x00000000, 'WGPUFrontFace_CCW'));
-  __PACKAGE__->_add_enum('CW' => (0x00000001, 'WGPUFrontFace_CW'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUFrontFace_Undefined'));
+  __PACKAGE__->_add_enum('CCW' => (0x00000001, 'WGPUFrontFace_CCW'));
+  __PACKAGE__->_add_enum('CW' => (0x00000002, 'WGPUFrontFace_CW'));
   WebGPU::Direct::FrontFace->_build_const_lut;
 };
 
@@ -500,26 +549,56 @@ package
 	WebGPU::Direct::LoadOp {
   use base "WebGPU::Direct::Enum";
   __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPULoadOp_Undefined'));
-  __PACKAGE__->_add_enum('clear' => (0x00000001, 'WGPULoadOp_Clear'));
-  __PACKAGE__->_add_enum('load' => (0x00000002, 'WGPULoadOp_Load'));
+  __PACKAGE__->_add_enum('load' => (0x00000001, 'WGPULoadOp_Load'));
+  __PACKAGE__->_add_enum('clear' => (0x00000002, 'WGPULoadOp_Clear'));
   WebGPU::Direct::LoadOp->_build_const_lut;
 };
 
 package
-	WebGPU::Direct::MapMode {
+	WebGPU::Direct::MapAsyncStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('none' => (0x00000000, 'WGPUMapMode_None'));
-  __PACKAGE__->_add_enum('read' => (0x00000001, 'WGPUMapMode_Read'));
-  __PACKAGE__->_add_enum('write' => (0x00000002, 'WGPUMapMode_Write'));
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUMapAsyncStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPUMapAsyncStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('error' => (0x00000003, 'WGPUMapAsyncStatus_Error'));
+  __PACKAGE__->_add_enum('aborted' => (0x00000004, 'WGPUMapAsyncStatus_Aborted'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000005, 'WGPUMapAsyncStatus_Unknown'));
+  WebGPU::Direct::MapAsyncStatus->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::MapMode {
+  use base "WebGPU::Direct::Flag";
+  __PACKAGE__->_add_enum('none' => (0x0000000000000000, 'WGPUMapMode_None'));
+  __PACKAGE__->_add_enum('read' => (0x0000000000000001, 'WGPUMapMode_Read'));
+  __PACKAGE__->_add_enum('write' => (0x0000000000000002, 'WGPUMapMode_Write'));
   WebGPU::Direct::MapMode->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::MipmapFilterMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('nearest' => (0x00000000, 'WGPUMipmapFilterMode_Nearest'));
-  __PACKAGE__->_add_enum('linear' => (0x00000001, 'WGPUMipmapFilterMode_Linear'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUMipmapFilterMode_Undefined'));
+  __PACKAGE__->_add_enum('nearest' => (0x00000001, 'WGPUMipmapFilterMode_Nearest'));
+  __PACKAGE__->_add_enum('linear' => (0x00000002, 'WGPUMipmapFilterMode_Linear'));
   WebGPU::Direct::MipmapFilterMode->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::OptionalBool {
+  use base "WebGPU::Direct::Enum";
+  __PACKAGE__->_add_enum('false' => (0x00000000, 'WGPUOptionalBool_False'));
+  __PACKAGE__->_add_enum('true' => (0x00000001, 'WGPUOptionalBool_True'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000002, 'WGPUOptionalBool_Undefined'));
+  WebGPU::Direct::OptionalBool->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::PopErrorScopeStatus {
+  use base "WebGPU::Direct::Enum";
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUPopErrorScopeStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPUPopErrorScopeStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('emptyStack' => (0x00000003, 'WGPUPopErrorScopeStatus_EmptyStack'));
+  WebGPU::Direct::PopErrorScopeStatus->_build_const_lut;
 };
 
 package
@@ -534,120 +613,132 @@ package
 package
 	WebGPU::Direct::PresentMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('fifo' => (0x00000000, 'WGPUPresentMode_Fifo'));
-  __PACKAGE__->_add_enum('fifoRelaxed' => (0x00000001, 'WGPUPresentMode_FifoRelaxed'));
-  __PACKAGE__->_add_enum('immediate' => (0x00000002, 'WGPUPresentMode_Immediate'));
-  __PACKAGE__->_add_enum('mailbox' => (0x00000003, 'WGPUPresentMode_Mailbox'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUPresentMode_Undefined'));
+  __PACKAGE__->_add_enum('fifo' => (0x00000001, 'WGPUPresentMode_Fifo'));
+  __PACKAGE__->_add_enum('fifoRelaxed' => (0x00000002, 'WGPUPresentMode_FifoRelaxed'));
+  __PACKAGE__->_add_enum('immediate' => (0x00000003, 'WGPUPresentMode_Immediate'));
+  __PACKAGE__->_add_enum('mailbox' => (0x00000004, 'WGPUPresentMode_Mailbox'));
   WebGPU::Direct::PresentMode->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::PrimitiveTopology {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('pointList' => (0x00000000, 'WGPUPrimitiveTopology_PointList'));
-  __PACKAGE__->_add_enum('lineList' => (0x00000001, 'WGPUPrimitiveTopology_LineList'));
-  __PACKAGE__->_add_enum('lineStrip' => (0x00000002, 'WGPUPrimitiveTopology_LineStrip'));
-  __PACKAGE__->_add_enum('triangleList' => (0x00000003, 'WGPUPrimitiveTopology_TriangleList'));
-  __PACKAGE__->_add_enum('triangleStrip' => (0x00000004, 'WGPUPrimitiveTopology_TriangleStrip'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUPrimitiveTopology_Undefined'));
+  __PACKAGE__->_add_enum('pointList' => (0x00000001, 'WGPUPrimitiveTopology_PointList'));
+  __PACKAGE__->_add_enum('lineList' => (0x00000002, 'WGPUPrimitiveTopology_LineList'));
+  __PACKAGE__->_add_enum('lineStrip' => (0x00000003, 'WGPUPrimitiveTopology_LineStrip'));
+  __PACKAGE__->_add_enum('triangleList' => (0x00000004, 'WGPUPrimitiveTopology_TriangleList'));
+  __PACKAGE__->_add_enum('triangleStrip' => (0x00000005, 'WGPUPrimitiveTopology_TriangleStrip'));
   WebGPU::Direct::PrimitiveTopology->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::QueryType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('occlusion' => (0x00000000, 'WGPUQueryType_Occlusion'));
-  __PACKAGE__->_add_enum('timestamp' => (0x00000001, 'WGPUQueryType_Timestamp'));
+  __PACKAGE__->_add_enum('occlusion' => (0x00000001, 'WGPUQueryType_Occlusion'));
+  __PACKAGE__->_add_enum('timestamp' => (0x00000002, 'WGPUQueryType_Timestamp'));
   WebGPU::Direct::QueryType->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::QueueWorkDoneStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPUQueueWorkDoneStatus_Success'));
-  __PACKAGE__->_add_enum('error' => (0x00000001, 'WGPUQueueWorkDoneStatus_Error'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000002, 'WGPUQueueWorkDoneStatus_Unknown'));
-  __PACKAGE__->_add_enum('deviceLost' => (0x00000003, 'WGPUQueueWorkDoneStatus_DeviceLost'));
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUQueueWorkDoneStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPUQueueWorkDoneStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('error' => (0x00000003, 'WGPUQueueWorkDoneStatus_Error'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000004, 'WGPUQueueWorkDoneStatus_Unknown'));
   WebGPU::Direct::QueueWorkDoneStatus->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::RequestAdapterStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPURequestAdapterStatus_Success'));
-  __PACKAGE__->_add_enum('unavailable' => (0x00000001, 'WGPURequestAdapterStatus_Unavailable'));
-  __PACKAGE__->_add_enum('error' => (0x00000002, 'WGPURequestAdapterStatus_Error'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000003, 'WGPURequestAdapterStatus_Unknown'));
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPURequestAdapterStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPURequestAdapterStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('unavailable' => (0x00000003, 'WGPURequestAdapterStatus_Unavailable'));
+  __PACKAGE__->_add_enum('error' => (0x00000004, 'WGPURequestAdapterStatus_Error'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000005, 'WGPURequestAdapterStatus_Unknown'));
   WebGPU::Direct::RequestAdapterStatus->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::RequestDeviceStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPURequestDeviceStatus_Success'));
-  __PACKAGE__->_add_enum('error' => (0x00000001, 'WGPURequestDeviceStatus_Error'));
-  __PACKAGE__->_add_enum('unknown' => (0x00000002, 'WGPURequestDeviceStatus_Unknown'));
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPURequestDeviceStatus_Success'));
+  __PACKAGE__->_add_enum('instanceDropped' => (0x00000002, 'WGPURequestDeviceStatus_InstanceDropped'));
+  __PACKAGE__->_add_enum('error' => (0x00000003, 'WGPURequestDeviceStatus_Error'));
+  __PACKAGE__->_add_enum('unknown' => (0x00000004, 'WGPURequestDeviceStatus_Unknown'));
   WebGPU::Direct::RequestDeviceStatus->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::SType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('invalid' => (0x00000000, 'WGPUSType_Invalid'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromMetalLayer' => (0x00000001, 'WGPUSType_SurfaceDescriptorFromMetalLayer'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromWindowsHWND' => (0x00000002, 'WGPUSType_SurfaceDescriptorFromWindowsHWND'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromXlibWindow' => (0x00000003, 'WGPUSType_SurfaceDescriptorFromXlibWindow'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromCanvasHTMLSelector' => (0x00000004, 'WGPUSType_SurfaceDescriptorFromCanvasHTMLSelector'));
-  __PACKAGE__->_add_enum('shaderModuleSPIRVDescriptor' => (0x00000005, 'WGPUSType_ShaderModuleSPIRVDescriptor'));
-  __PACKAGE__->_add_enum('shaderModuleWGSLDescriptor' => (0x00000006, 'WGPUSType_ShaderModuleWGSLDescriptor'));
-  __PACKAGE__->_add_enum('primitiveDepthClipControl' => (0x00000007, 'WGPUSType_PrimitiveDepthClipControl'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromWaylandSurface' => (0x00000008, 'WGPUSType_SurfaceDescriptorFromWaylandSurface'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromAndroidNativeWindow' => (0x00000009, 'WGPUSType_SurfaceDescriptorFromAndroidNativeWindow'));
-  __PACKAGE__->_add_enum('surfaceDescriptorFromXcbWindow' => (0x0000000A, 'WGPUSType_SurfaceDescriptorFromXcbWindow'));
-  __PACKAGE__->_add_enum('renderPassDescriptorMaxDrawCount' => (0x0000000F, 'WGPUSType_RenderPassDescriptorMaxDrawCount'));
+  __PACKAGE__->_add_enum('shaderSourceSPIRV' => (0x00000001, 'WGPUSType_ShaderSourceSPIRV'));
+  __PACKAGE__->_add_enum('shaderSourceWGSL' => (0x00000002, 'WGPUSType_ShaderSourceWGSL'));
+  __PACKAGE__->_add_enum('renderPassMaxDrawCount' => (0x00000003, 'WGPUSType_RenderPassMaxDrawCount'));
+  __PACKAGE__->_add_enum('surfaceSourceMetalLayer' => (0x00000004, 'WGPUSType_SurfaceSourceMetalLayer'));
+  __PACKAGE__->_add_enum('surfaceSourceWindowsHWND' => (0x00000005, 'WGPUSType_SurfaceSourceWindowsHWND'));
+  __PACKAGE__->_add_enum('surfaceSourceXlibWindow' => (0x00000006, 'WGPUSType_SurfaceSourceXlibWindow'));
+  __PACKAGE__->_add_enum('surfaceSourceWaylandSurface' => (0x00000007, 'WGPUSType_SurfaceSourceWaylandSurface'));
+  __PACKAGE__->_add_enum('surfaceSourceAndroidNativeWindow' => (0x00000008, 'WGPUSType_SurfaceSourceAndroidNativeWindow'));
+  __PACKAGE__->_add_enum('surfaceSourceXCBWindow' => (0x00000009, 'WGPUSType_SurfaceSourceXCBWindow'));
   WebGPU::Direct::SType->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::SamplerBindingType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUSamplerBindingType_Undefined'));
-  __PACKAGE__->_add_enum('filtering' => (0x00000001, 'WGPUSamplerBindingType_Filtering'));
-  __PACKAGE__->_add_enum('nonFiltering' => (0x00000002, 'WGPUSamplerBindingType_NonFiltering'));
-  __PACKAGE__->_add_enum('comparison' => (0x00000003, 'WGPUSamplerBindingType_Comparison'));
+  __PACKAGE__->_add_enum('bindingNotUsed' => (0x00000000, 'WGPUSamplerBindingType_BindingNotUsed'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000001, 'WGPUSamplerBindingType_Undefined'));
+  __PACKAGE__->_add_enum('filtering' => (0x00000002, 'WGPUSamplerBindingType_Filtering'));
+  __PACKAGE__->_add_enum('nonFiltering' => (0x00000003, 'WGPUSamplerBindingType_NonFiltering'));
+  __PACKAGE__->_add_enum('comparison' => (0x00000004, 'WGPUSamplerBindingType_Comparison'));
   WebGPU::Direct::SamplerBindingType->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::ShaderStage {
-  use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('none' => (0x00000000, 'WGPUShaderStage_None'));
-  __PACKAGE__->_add_enum('vertex' => (0x00000001, 'WGPUShaderStage_Vertex'));
-  __PACKAGE__->_add_enum('fragment' => (0x00000002, 'WGPUShaderStage_Fragment'));
-  __PACKAGE__->_add_enum('compute' => (0x00000004, 'WGPUShaderStage_Compute'));
+  use base "WebGPU::Direct::Flag";
+  __PACKAGE__->_add_enum('none' => (0x0000000000000000, 'WGPUShaderStage_None'));
+  __PACKAGE__->_add_enum('vertex' => (0x0000000000000001, 'WGPUShaderStage_Vertex'));
+  __PACKAGE__->_add_enum('fragment' => (0x0000000000000002, 'WGPUShaderStage_Fragment'));
+  __PACKAGE__->_add_enum('compute' => (0x0000000000000004, 'WGPUShaderStage_Compute'));
   WebGPU::Direct::ShaderStage->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::Status {
+  use base "WebGPU::Direct::Enum";
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUStatus_Success'));
+  __PACKAGE__->_add_enum('error' => (0x00000002, 'WGPUStatus_Error'));
+  WebGPU::Direct::Status->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::StencilOperation {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('keep' => (0x00000000, 'WGPUStencilOperation_Keep'));
-  __PACKAGE__->_add_enum('zero' => (0x00000001, 'WGPUStencilOperation_Zero'));
-  __PACKAGE__->_add_enum('replace' => (0x00000002, 'WGPUStencilOperation_Replace'));
-  __PACKAGE__->_add_enum('invert' => (0x00000003, 'WGPUStencilOperation_Invert'));
-  __PACKAGE__->_add_enum('incrementClamp' => (0x00000004, 'WGPUStencilOperation_IncrementClamp'));
-  __PACKAGE__->_add_enum('decrementClamp' => (0x00000005, 'WGPUStencilOperation_DecrementClamp'));
-  __PACKAGE__->_add_enum('incrementWrap' => (0x00000006, 'WGPUStencilOperation_IncrementWrap'));
-  __PACKAGE__->_add_enum('decrementWrap' => (0x00000007, 'WGPUStencilOperation_DecrementWrap'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUStencilOperation_Undefined'));
+  __PACKAGE__->_add_enum('keep' => (0x00000001, 'WGPUStencilOperation_Keep'));
+  __PACKAGE__->_add_enum('zero' => (0x00000002, 'WGPUStencilOperation_Zero'));
+  __PACKAGE__->_add_enum('replace' => (0x00000003, 'WGPUStencilOperation_Replace'));
+  __PACKAGE__->_add_enum('invert' => (0x00000004, 'WGPUStencilOperation_Invert'));
+  __PACKAGE__->_add_enum('incrementClamp' => (0x00000005, 'WGPUStencilOperation_IncrementClamp'));
+  __PACKAGE__->_add_enum('decrementClamp' => (0x00000006, 'WGPUStencilOperation_DecrementClamp'));
+  __PACKAGE__->_add_enum('incrementWrap' => (0x00000007, 'WGPUStencilOperation_IncrementWrap'));
+  __PACKAGE__->_add_enum('decrementWrap' => (0x00000008, 'WGPUStencilOperation_DecrementWrap'));
   WebGPU::Direct::StencilOperation->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::StorageTextureAccess {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUStorageTextureAccess_Undefined'));
-  __PACKAGE__->_add_enum('writeOnly' => (0x00000001, 'WGPUStorageTextureAccess_WriteOnly'));
-  __PACKAGE__->_add_enum('readOnly' => (0x00000002, 'WGPUStorageTextureAccess_ReadOnly'));
-  __PACKAGE__->_add_enum('readWrite' => (0x00000003, 'WGPUStorageTextureAccess_ReadWrite'));
+  __PACKAGE__->_add_enum('bindingNotUsed' => (0x00000000, 'WGPUStorageTextureAccess_BindingNotUsed'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000001, 'WGPUStorageTextureAccess_Undefined'));
+  __PACKAGE__->_add_enum('writeOnly' => (0x00000002, 'WGPUStorageTextureAccess_WriteOnly'));
+  __PACKAGE__->_add_enum('readOnly' => (0x00000003, 'WGPUStorageTextureAccess_ReadOnly'));
+  __PACKAGE__->_add_enum('readWrite' => (0x00000004, 'WGPUStorageTextureAccess_ReadWrite'));
   WebGPU::Direct::StorageTextureAccess->_build_const_lut;
 };
 
@@ -663,30 +754,34 @@ package
 package
 	WebGPU::Direct::SurfaceGetCurrentTextureStatus {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('success' => (0x00000000, 'WGPUSurfaceGetCurrentTextureStatus_Success'));
-  __PACKAGE__->_add_enum('timeout' => (0x00000001, 'WGPUSurfaceGetCurrentTextureStatus_Timeout'));
-  __PACKAGE__->_add_enum('outdated' => (0x00000002, 'WGPUSurfaceGetCurrentTextureStatus_Outdated'));
-  __PACKAGE__->_add_enum('lost' => (0x00000003, 'WGPUSurfaceGetCurrentTextureStatus_Lost'));
-  __PACKAGE__->_add_enum('outOfMemory' => (0x00000004, 'WGPUSurfaceGetCurrentTextureStatus_OutOfMemory'));
-  __PACKAGE__->_add_enum('deviceLost' => (0x00000005, 'WGPUSurfaceGetCurrentTextureStatus_DeviceLost'));
+  __PACKAGE__->_add_enum('successOptimal' => (0x00000001, 'WGPUSurfaceGetCurrentTextureStatus_SuccessOptimal'));
+  __PACKAGE__->_add_enum('successSuboptimal' => (0x00000002, 'WGPUSurfaceGetCurrentTextureStatus_SuccessSuboptimal'));
+  __PACKAGE__->_add_enum('timeout' => (0x00000003, 'WGPUSurfaceGetCurrentTextureStatus_Timeout'));
+  __PACKAGE__->_add_enum('outdated' => (0x00000004, 'WGPUSurfaceGetCurrentTextureStatus_Outdated'));
+  __PACKAGE__->_add_enum('lost' => (0x00000005, 'WGPUSurfaceGetCurrentTextureStatus_Lost'));
+  __PACKAGE__->_add_enum('outOfMemory' => (0x00000006, 'WGPUSurfaceGetCurrentTextureStatus_OutOfMemory'));
+  __PACKAGE__->_add_enum('deviceLost' => (0x00000007, 'WGPUSurfaceGetCurrentTextureStatus_DeviceLost'));
+  __PACKAGE__->_add_enum('error' => (0x00000008, 'WGPUSurfaceGetCurrentTextureStatus_Error'));
   WebGPU::Direct::SurfaceGetCurrentTextureStatus->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::TextureAspect {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('all' => (0x00000000, 'WGPUTextureAspect_All'));
-  __PACKAGE__->_add_enum('stencilOnly' => (0x00000001, 'WGPUTextureAspect_StencilOnly'));
-  __PACKAGE__->_add_enum('depthOnly' => (0x00000002, 'WGPUTextureAspect_DepthOnly'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUTextureAspect_Undefined'));
+  __PACKAGE__->_add_enum('all' => (0x00000001, 'WGPUTextureAspect_All'));
+  __PACKAGE__->_add_enum('stencilOnly' => (0x00000002, 'WGPUTextureAspect_StencilOnly'));
+  __PACKAGE__->_add_enum('depthOnly' => (0x00000003, 'WGPUTextureAspect_DepthOnly'));
   WebGPU::Direct::TextureAspect->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::TextureDimension {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('_1D' => (0x00000000, 'WGPUTextureDimension_1D'));
-  __PACKAGE__->_add_enum('_2D' => (0x00000001, 'WGPUTextureDimension_2D'));
-  __PACKAGE__->_add_enum('_3D' => (0x00000002, 'WGPUTextureDimension_3D'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUTextureDimension_Undefined'));
+  __PACKAGE__->_add_enum('_1D' => (0x00000001, 'WGPUTextureDimension_1D'));
+  __PACKAGE__->_add_enum('_2D' => (0x00000002, 'WGPUTextureDimension_2D'));
+  __PACKAGE__->_add_enum('_3D' => (0x00000003, 'WGPUTextureDimension_3D'));
   WebGPU::Direct::TextureDimension->_build_const_lut;
 };
 
@@ -795,24 +890,25 @@ package
 package
 	WebGPU::Direct::TextureSampleType {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUTextureSampleType_Undefined'));
-  __PACKAGE__->_add_enum('float' => (0x00000001, 'WGPUTextureSampleType_Float'));
-  __PACKAGE__->_add_enum('unfilterableFloat' => (0x00000002, 'WGPUTextureSampleType_UnfilterableFloat'));
-  __PACKAGE__->_add_enum('depth' => (0x00000003, 'WGPUTextureSampleType_Depth'));
-  __PACKAGE__->_add_enum('sint' => (0x00000004, 'WGPUTextureSampleType_Sint'));
-  __PACKAGE__->_add_enum('uint' => (0x00000005, 'WGPUTextureSampleType_Uint'));
+  __PACKAGE__->_add_enum('bindingNotUsed' => (0x00000000, 'WGPUTextureSampleType_BindingNotUsed'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000001, 'WGPUTextureSampleType_Undefined'));
+  __PACKAGE__->_add_enum('float' => (0x00000002, 'WGPUTextureSampleType_Float'));
+  __PACKAGE__->_add_enum('unfilterableFloat' => (0x00000003, 'WGPUTextureSampleType_UnfilterableFloat'));
+  __PACKAGE__->_add_enum('depth' => (0x00000004, 'WGPUTextureSampleType_Depth'));
+  __PACKAGE__->_add_enum('sint' => (0x00000005, 'WGPUTextureSampleType_Sint'));
+  __PACKAGE__->_add_enum('uint' => (0x00000006, 'WGPUTextureSampleType_Uint'));
   WebGPU::Direct::TextureSampleType->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::TextureUsage {
-  use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('none' => (0x00000000, 'WGPUTextureUsage_None'));
-  __PACKAGE__->_add_enum('copySrc' => (0x00000001, 'WGPUTextureUsage_CopySrc'));
-  __PACKAGE__->_add_enum('copyDst' => (0x00000002, 'WGPUTextureUsage_CopyDst'));
-  __PACKAGE__->_add_enum('textureBinding' => (0x00000004, 'WGPUTextureUsage_TextureBinding'));
-  __PACKAGE__->_add_enum('storageBinding' => (0x00000008, 'WGPUTextureUsage_StorageBinding'));
-  __PACKAGE__->_add_enum('renderAttachment' => (0x00000010, 'WGPUTextureUsage_RenderAttachment'));
+  use base "WebGPU::Direct::Flag";
+  __PACKAGE__->_add_enum('none' => (0x0000000000000000, 'WGPUTextureUsage_None'));
+  __PACKAGE__->_add_enum('copySrc' => (0x0000000000000001, 'WGPUTextureUsage_CopySrc'));
+  __PACKAGE__->_add_enum('copyDst' => (0x0000000000000002, 'WGPUTextureUsage_CopyDst'));
+  __PACKAGE__->_add_enum('textureBinding' => (0x0000000000000004, 'WGPUTextureUsage_TextureBinding'));
+  __PACKAGE__->_add_enum('storageBinding' => (0x0000000000000008, 'WGPUTextureUsage_StorageBinding'));
+  __PACKAGE__->_add_enum('renderAttachment' => (0x0000000000000010, 'WGPUTextureUsage_RenderAttachment'));
   WebGPU::Direct::TextureUsage->_build_const_lut;
 };
 
@@ -832,60 +928,119 @@ package
 package
 	WebGPU::Direct::VertexFormat {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('undefined' => (0x00000000, 'WGPUVertexFormat_Undefined'));
-  __PACKAGE__->_add_enum('uint8x2' => (0x00000001, 'WGPUVertexFormat_Uint8x2'));
-  __PACKAGE__->_add_enum('uint8x4' => (0x00000002, 'WGPUVertexFormat_Uint8x4'));
-  __PACKAGE__->_add_enum('sint8x2' => (0x00000003, 'WGPUVertexFormat_Sint8x2'));
-  __PACKAGE__->_add_enum('sint8x4' => (0x00000004, 'WGPUVertexFormat_Sint8x4'));
-  __PACKAGE__->_add_enum('unorm8x2' => (0x00000005, 'WGPUVertexFormat_Unorm8x2'));
-  __PACKAGE__->_add_enum('unorm8x4' => (0x00000006, 'WGPUVertexFormat_Unorm8x4'));
-  __PACKAGE__->_add_enum('snorm8x2' => (0x00000007, 'WGPUVertexFormat_Snorm8x2'));
-  __PACKAGE__->_add_enum('snorm8x4' => (0x00000008, 'WGPUVertexFormat_Snorm8x4'));
-  __PACKAGE__->_add_enum('uint16x2' => (0x00000009, 'WGPUVertexFormat_Uint16x2'));
-  __PACKAGE__->_add_enum('uint16x4' => (0x0000000A, 'WGPUVertexFormat_Uint16x4'));
-  __PACKAGE__->_add_enum('sint16x2' => (0x0000000B, 'WGPUVertexFormat_Sint16x2'));
-  __PACKAGE__->_add_enum('sint16x4' => (0x0000000C, 'WGPUVertexFormat_Sint16x4'));
-  __PACKAGE__->_add_enum('unorm16x2' => (0x0000000D, 'WGPUVertexFormat_Unorm16x2'));
-  __PACKAGE__->_add_enum('unorm16x4' => (0x0000000E, 'WGPUVertexFormat_Unorm16x4'));
-  __PACKAGE__->_add_enum('snorm16x2' => (0x0000000F, 'WGPUVertexFormat_Snorm16x2'));
-  __PACKAGE__->_add_enum('snorm16x4' => (0x00000010, 'WGPUVertexFormat_Snorm16x4'));
-  __PACKAGE__->_add_enum('float16x2' => (0x00000011, 'WGPUVertexFormat_Float16x2'));
-  __PACKAGE__->_add_enum('float16x4' => (0x00000012, 'WGPUVertexFormat_Float16x4'));
-  __PACKAGE__->_add_enum('float32' => (0x00000013, 'WGPUVertexFormat_Float32'));
-  __PACKAGE__->_add_enum('float32x2' => (0x00000014, 'WGPUVertexFormat_Float32x2'));
-  __PACKAGE__->_add_enum('float32x3' => (0x00000015, 'WGPUVertexFormat_Float32x3'));
-  __PACKAGE__->_add_enum('float32x4' => (0x00000016, 'WGPUVertexFormat_Float32x4'));
-  __PACKAGE__->_add_enum('uint32' => (0x00000017, 'WGPUVertexFormat_Uint32'));
-  __PACKAGE__->_add_enum('uint32x2' => (0x00000018, 'WGPUVertexFormat_Uint32x2'));
-  __PACKAGE__->_add_enum('uint32x3' => (0x00000019, 'WGPUVertexFormat_Uint32x3'));
-  __PACKAGE__->_add_enum('uint32x4' => (0x0000001A, 'WGPUVertexFormat_Uint32x4'));
-  __PACKAGE__->_add_enum('sint32' => (0x0000001B, 'WGPUVertexFormat_Sint32'));
-  __PACKAGE__->_add_enum('sint32x2' => (0x0000001C, 'WGPUVertexFormat_Sint32x2'));
-  __PACKAGE__->_add_enum('sint32x3' => (0x0000001D, 'WGPUVertexFormat_Sint32x3'));
-  __PACKAGE__->_add_enum('sint32x4' => (0x0000001E, 'WGPUVertexFormat_Sint32x4'));
+  __PACKAGE__->_add_enum('uint8' => (0x00000001, 'WGPUVertexFormat_Uint8'));
+  __PACKAGE__->_add_enum('uint8x2' => (0x00000002, 'WGPUVertexFormat_Uint8x2'));
+  __PACKAGE__->_add_enum('uint8x4' => (0x00000003, 'WGPUVertexFormat_Uint8x4'));
+  __PACKAGE__->_add_enum('sint8' => (0x00000004, 'WGPUVertexFormat_Sint8'));
+  __PACKAGE__->_add_enum('sint8x2' => (0x00000005, 'WGPUVertexFormat_Sint8x2'));
+  __PACKAGE__->_add_enum('sint8x4' => (0x00000006, 'WGPUVertexFormat_Sint8x4'));
+  __PACKAGE__->_add_enum('unorm8' => (0x00000007, 'WGPUVertexFormat_Unorm8'));
+  __PACKAGE__->_add_enum('unorm8x2' => (0x00000008, 'WGPUVertexFormat_Unorm8x2'));
+  __PACKAGE__->_add_enum('unorm8x4' => (0x00000009, 'WGPUVertexFormat_Unorm8x4'));
+  __PACKAGE__->_add_enum('snorm8' => (0x0000000A, 'WGPUVertexFormat_Snorm8'));
+  __PACKAGE__->_add_enum('snorm8x2' => (0x0000000B, 'WGPUVertexFormat_Snorm8x2'));
+  __PACKAGE__->_add_enum('snorm8x4' => (0x0000000C, 'WGPUVertexFormat_Snorm8x4'));
+  __PACKAGE__->_add_enum('uint16' => (0x0000000D, 'WGPUVertexFormat_Uint16'));
+  __PACKAGE__->_add_enum('uint16x2' => (0x0000000E, 'WGPUVertexFormat_Uint16x2'));
+  __PACKAGE__->_add_enum('uint16x4' => (0x0000000F, 'WGPUVertexFormat_Uint16x4'));
+  __PACKAGE__->_add_enum('sint16' => (0x00000010, 'WGPUVertexFormat_Sint16'));
+  __PACKAGE__->_add_enum('sint16x2' => (0x00000011, 'WGPUVertexFormat_Sint16x2'));
+  __PACKAGE__->_add_enum('sint16x4' => (0x00000012, 'WGPUVertexFormat_Sint16x4'));
+  __PACKAGE__->_add_enum('unorm16' => (0x00000013, 'WGPUVertexFormat_Unorm16'));
+  __PACKAGE__->_add_enum('unorm16x2' => (0x00000014, 'WGPUVertexFormat_Unorm16x2'));
+  __PACKAGE__->_add_enum('unorm16x4' => (0x00000015, 'WGPUVertexFormat_Unorm16x4'));
+  __PACKAGE__->_add_enum('snorm16' => (0x00000016, 'WGPUVertexFormat_Snorm16'));
+  __PACKAGE__->_add_enum('snorm16x2' => (0x00000017, 'WGPUVertexFormat_Snorm16x2'));
+  __PACKAGE__->_add_enum('snorm16x4' => (0x00000018, 'WGPUVertexFormat_Snorm16x4'));
+  __PACKAGE__->_add_enum('float16' => (0x00000019, 'WGPUVertexFormat_Float16'));
+  __PACKAGE__->_add_enum('float16x2' => (0x0000001A, 'WGPUVertexFormat_Float16x2'));
+  __PACKAGE__->_add_enum('float16x4' => (0x0000001B, 'WGPUVertexFormat_Float16x4'));
+  __PACKAGE__->_add_enum('float32' => (0x0000001C, 'WGPUVertexFormat_Float32'));
+  __PACKAGE__->_add_enum('float32x2' => (0x0000001D, 'WGPUVertexFormat_Float32x2'));
+  __PACKAGE__->_add_enum('float32x3' => (0x0000001E, 'WGPUVertexFormat_Float32x3'));
+  __PACKAGE__->_add_enum('float32x4' => (0x0000001F, 'WGPUVertexFormat_Float32x4'));
+  __PACKAGE__->_add_enum('uint32' => (0x00000020, 'WGPUVertexFormat_Uint32'));
+  __PACKAGE__->_add_enum('uint32x2' => (0x00000021, 'WGPUVertexFormat_Uint32x2'));
+  __PACKAGE__->_add_enum('uint32x3' => (0x00000022, 'WGPUVertexFormat_Uint32x3'));
+  __PACKAGE__->_add_enum('uint32x4' => (0x00000023, 'WGPUVertexFormat_Uint32x4'));
+  __PACKAGE__->_add_enum('sint32' => (0x00000024, 'WGPUVertexFormat_Sint32'));
+  __PACKAGE__->_add_enum('sint32x2' => (0x00000025, 'WGPUVertexFormat_Sint32x2'));
+  __PACKAGE__->_add_enum('sint32x3' => (0x00000026, 'WGPUVertexFormat_Sint32x3'));
+  __PACKAGE__->_add_enum('sint32x4' => (0x00000027, 'WGPUVertexFormat_Sint32x4'));
+  __PACKAGE__->_add_enum('unorm10_10_10_2' => (0x00000028, 'WGPUVertexFormat_Unorm10_10_10_2'));
+  __PACKAGE__->_add_enum('unorm8x4BGRA' => (0x00000029, 'WGPUVertexFormat_Unorm8x4BGRA'));
   WebGPU::Direct::VertexFormat->_build_const_lut;
 };
 
 package
 	WebGPU::Direct::VertexStepMode {
   use base "WebGPU::Direct::Enum";
-  __PACKAGE__->_add_enum('vertex' => (0x00000000, 'WGPUVertexStepMode_Vertex'));
-  __PACKAGE__->_add_enum('instance' => (0x00000001, 'WGPUVertexStepMode_Instance'));
-  __PACKAGE__->_add_enum('vertexBufferNotUsed' => (0x00000002, 'WGPUVertexStepMode_VertexBufferNotUsed'));
+  __PACKAGE__->_add_enum('vertexBufferNotUsed' => (0x00000000, 'WGPUVertexStepMode_VertexBufferNotUsed'));
+  __PACKAGE__->_add_enum('undefined' => (0x00000001, 'WGPUVertexStepMode_Undefined'));
+  __PACKAGE__->_add_enum('vertex' => (0x00000002, 'WGPUVertexStepMode_Vertex'));
+  __PACKAGE__->_add_enum('instance' => (0x00000003, 'WGPUVertexStepMode_Instance'));
   WebGPU::Direct::VertexStepMode->_build_const_lut;
 };
+
+package
+	WebGPU::Direct::WGSLLanguageFeatureName {
+  use base "WebGPU::Direct::Enum";
+  __PACKAGE__->_add_enum('readonlyAndReadwriteStorageTextures' => (0x00000001, 'WGPUWGSLLanguageFeatureName_ReadonlyAndReadwriteStorageTextures'));
+  __PACKAGE__->_add_enum('packed4x8IntegerDotProduct' => (0x00000002, 'WGPUWGSLLanguageFeatureName_Packed4x8IntegerDotProduct'));
+  __PACKAGE__->_add_enum('unrestrictedPointerParameters' => (0x00000003, 'WGPUWGSLLanguageFeatureName_UnrestrictedPointerParameters'));
+  __PACKAGE__->_add_enum('pointerCompositeAccess' => (0x00000004, 'WGPUWGSLLanguageFeatureName_PointerCompositeAccess'));
+  WebGPU::Direct::WGSLLanguageFeatureName->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::WaitStatus {
+  use base "WebGPU::Direct::Enum";
+  __PACKAGE__->_add_enum('success' => (0x00000001, 'WGPUWaitStatus_Success'));
+  __PACKAGE__->_add_enum('timedOut' => (0x00000002, 'WGPUWaitStatus_TimedOut'));
+  __PACKAGE__->_add_enum('unsupportedTimeout' => (0x00000003, 'WGPUWaitStatus_UnsupportedTimeout'));
+  __PACKAGE__->_add_enum('unsupportedCount' => (0x00000004, 'WGPUWaitStatus_UnsupportedCount'));
+  __PACKAGE__->_add_enum('unsupportedMixedSources' => (0x00000005, 'WGPUWaitStatus_UnsupportedMixedSources'));
+  WebGPU::Direct::WaitStatus->_build_const_lut;
+};
+
+package
+	WebGPU::Direct::StringView {
+    
+    require WebGPU::Direct::StringView;
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::StringView\n"
+          if !$class->isa("WebGPU::Direct::StringView");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = (scalar @_ == 1 && ref( $_[0] ) eq '') ? (data => $_[0]) : ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
 
 package
 	WebGPU::Direct::Adapter {
     push @WebGPU::Direct::Adapter::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Adapter;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -895,12 +1050,16 @@ package
     push @WebGPU::Direct::BindGroup::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::BindGroup;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -910,12 +1069,16 @@ package
     push @WebGPU::Direct::BindGroupLayout::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::BindGroupLayout;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -925,12 +1088,16 @@ package
     push @WebGPU::Direct::Buffer::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Buffer;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -940,12 +1107,16 @@ package
     push @WebGPU::Direct::CommandBuffer::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::CommandBuffer;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -955,12 +1126,16 @@ package
     push @WebGPU::Direct::CommandEncoder::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::CommandEncoder;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -970,12 +1145,16 @@ package
     push @WebGPU::Direct::ComputePassEncoder::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::ComputePassEncoder;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -985,12 +1164,16 @@ package
     push @WebGPU::Direct::ComputePipeline::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::ComputePipeline;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1000,12 +1183,16 @@ package
     push @WebGPU::Direct::Device::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Device;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1015,12 +1202,16 @@ package
     push @WebGPU::Direct::Instance::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Instance;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1030,12 +1221,16 @@ package
     push @WebGPU::Direct::PipelineLayout::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::PipelineLayout;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1045,12 +1240,16 @@ package
     push @WebGPU::Direct::QuerySet::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::QuerySet;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1060,12 +1259,16 @@ package
     push @WebGPU::Direct::Queue::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Queue;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1075,12 +1278,16 @@ package
     push @WebGPU::Direct::RenderBundle::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::RenderBundle;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1090,12 +1297,16 @@ package
     push @WebGPU::Direct::RenderBundleEncoder::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::RenderBundleEncoder;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1105,12 +1316,16 @@ package
     push @WebGPU::Direct::RenderPassEncoder::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::RenderPassEncoder;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1120,12 +1335,16 @@ package
     push @WebGPU::Direct::RenderPipeline::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::RenderPipeline;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1135,12 +1354,16 @@ package
     push @WebGPU::Direct::Sampler::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Sampler;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1150,12 +1373,16 @@ package
     push @WebGPU::Direct::ShaderModule::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::ShaderModule;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1165,12 +1392,16 @@ package
     push @WebGPU::Direct::Surface::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Surface;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1180,12 +1411,16 @@ package
     push @WebGPU::Direct::Texture::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::Texture;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1195,12 +1430,16 @@ package
     push @WebGPU::Direct::TextureView::ISA, "WebGPU::Direct::Opaque";
     require WebGPU::Direct::TextureView;
     sub new {
+        local $SIG{__DIE__} = \&Carp::croak;
         my $class = __PACKAGE__;
         die "Cannot call new on abstract class $class";
     }
     sub DESTROY
     {
-      $_[0]->release;
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->release;
+      }
     }
 
 }
@@ -1211,6 +1450,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ChainedStruct\n"
           if !$class->isa("WebGPU::Direct::ChainedStruct");
@@ -1232,6 +1472,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ChainedStructOut\n"
           if !$class->isa("WebGPU::Direct::ChainedStructOut");
@@ -1248,14 +1489,15 @@ package
 }
 
 package
-	WebGPU::Direct::AdapterProperties {
+	WebGPU::Direct::BufferMapCallbackInfo {
     
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::AdapterProperties\n"
-          if !$class->isa("WebGPU::Direct::AdapterProperties");
+        die "$class does not inherit from WebGPU::Direct::BufferMapCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::BufferMapCallbackInfo");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1269,12 +1511,242 @@ package
 }
 
 package
+	WebGPU::Direct::CompilationInfoCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::CompilationInfoCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::CompilationInfoCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::CreateComputePipelineAsyncCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::CreateRenderPipelineAsyncCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::DeviceLostCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::DeviceLostCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::DeviceLostCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::PopErrorScopeCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::PopErrorScopeCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::PopErrorScopeCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::QueueWorkDoneCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::QueueWorkDoneCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::QueueWorkDoneCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::RequestAdapterCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::RequestAdapterCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::RequestAdapterCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::RequestDeviceCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::RequestDeviceCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::RequestDeviceCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::UncapturedErrorCallbackInfo {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::UncapturedErrorCallbackInfo\n"
+          if !$class->isa("WebGPU::Direct::UncapturedErrorCallbackInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::AdapterInfo {
+    
+    require WebGPU::Direct::AdapterInfo;
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::AdapterInfo\n"
+          if !$class->isa("WebGPU::Direct::AdapterInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+    sub DESTROY
+    {
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->freeMembers;
+      }
+    }
+
+}
+
+package
 	WebGPU::Direct::BindGroupEntry {
     
     require WebGPU::Direct::BindGroupEntry;
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BindGroupEntry\n"
           if !$class->isa("WebGPU::Direct::BindGroupEntry");
@@ -1300,6 +1772,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BlendComponent\n"
           if !$class->isa("WebGPU::Direct::BlendComponent");
@@ -1325,6 +1798,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BufferBindingLayout\n"
           if !$class->isa("WebGPU::Direct::BufferBindingLayout");
@@ -1348,6 +1822,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BufferDescriptor\n"
           if !$class->isa("WebGPU::Direct::BufferDescriptor");
@@ -1369,6 +1844,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::Color\n"
           if !$class->isa("WebGPU::Direct::Color");
@@ -1390,6 +1866,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::CommandBufferDescriptor\n"
           if !$class->isa("WebGPU::Direct::CommandBufferDescriptor");
@@ -1411,6 +1888,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::CommandEncoderDescriptor\n"
           if !$class->isa("WebGPU::Direct::CommandEncoderDescriptor");
@@ -1432,6 +1910,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::CompilationMessage\n"
           if !$class->isa("WebGPU::Direct::CompilationMessage");
@@ -1453,6 +1932,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ComputePassTimestampWrites\n"
           if !$class->isa("WebGPU::Direct::ComputePassTimestampWrites");
@@ -1474,6 +1954,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ConstantEntry\n"
           if !$class->isa("WebGPU::Direct::ConstantEntry");
@@ -1498,6 +1979,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::Extent3D\n"
           if !$class->isa("WebGPU::Direct::Extent3D");
@@ -1514,14 +1996,37 @@ package
 }
 
 package
-	WebGPU::Direct::InstanceDescriptor {
+	WebGPU::Direct::Future {
     
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::InstanceDescriptor\n"
-          if !$class->isa("WebGPU::Direct::InstanceDescriptor");
+        die "$class does not inherit from WebGPU::Direct::Future\n"
+          if !$class->isa("WebGPU::Direct::Future");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::InstanceCapabilities {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::InstanceCapabilities\n"
+          if !$class->isa("WebGPU::Direct::InstanceCapabilities");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1540,6 +2045,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::Limits\n"
           if !$class->isa("WebGPU::Direct::Limits");
@@ -1565,6 +2071,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::MultisampleState\n"
           if !$class->isa("WebGPU::Direct::MultisampleState");
@@ -1590,6 +2097,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::Origin3D\n"
           if !$class->isa("WebGPU::Direct::Origin3D");
@@ -1611,30 +2119,10 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::PipelineLayoutDescriptor\n"
           if !$class->isa("WebGPU::Direct::PipelineLayoutDescriptor");
-        $class = ref($class) ? ref($class) : $class;
-        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
-        my $result = { %$default, %params };
-        $result = $class->BUILDARGS($result)
-          if $class->can('BUILDARGS');
-        $result = bless( $result, $class );
-        $result->pack;
-        return $result;
-    }
-    
-}
-
-package
-	WebGPU::Direct::PrimitiveDepthClipControl {
-    push @WebGPU::Direct::PrimitiveDepthClipControl::ISA, "WebGPU::Direct::ChainedStruct";
-    my $default = {};
-
-    sub new {
-        my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::PrimitiveDepthClipControl\n"
-          if !$class->isa("WebGPU::Direct::PrimitiveDepthClipControl");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1657,6 +2145,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::PrimitiveState\n"
           if !$class->isa("WebGPU::Direct::PrimitiveState");
@@ -1678,6 +2167,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::QuerySetDescriptor\n"
           if !$class->isa("WebGPU::Direct::QuerySetDescriptor");
@@ -1699,6 +2189,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::QueueDescriptor\n"
           if !$class->isa("WebGPU::Direct::QueueDescriptor");
@@ -1720,6 +2211,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderBundleDescriptor\n"
           if !$class->isa("WebGPU::Direct::RenderBundleDescriptor");
@@ -1745,6 +2237,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderBundleEncoderDescriptor\n"
           if !$class->isa("WebGPU::Direct::RenderBundleEncoderDescriptor");
@@ -1766,6 +2259,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderPassDepthStencilAttachment\n"
           if !$class->isa("WebGPU::Direct::RenderPassDepthStencilAttachment");
@@ -1782,16 +2276,15 @@ package
 }
 
 package
-	WebGPU::Direct::RenderPassDescriptorMaxDrawCount {
-    push @WebGPU::Direct::RenderPassDescriptorMaxDrawCount::ISA, "WebGPU::Direct::ChainedStruct";
-    my $default = {
-             'maxDrawCount' => 50000000,
-           };
+	WebGPU::Direct::RenderPassMaxDrawCount {
+    push @WebGPU::Direct::RenderPassMaxDrawCount::ISA, "WebGPU::Direct::ChainedStruct";
+    my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::RenderPassDescriptorMaxDrawCount\n"
-          if !$class->isa("WebGPU::Direct::RenderPassDescriptorMaxDrawCount");
+        die "$class does not inherit from WebGPU::Direct::RenderPassMaxDrawCount\n"
+          if !$class->isa("WebGPU::Direct::RenderPassMaxDrawCount");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1810,6 +2303,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderPassTimestampWrites\n"
           if !$class->isa("WebGPU::Direct::RenderPassTimestampWrites");
@@ -1833,6 +2327,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RequestAdapterOptions\n"
           if !$class->isa("WebGPU::Direct::RequestAdapterOptions");
@@ -1854,6 +2349,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::SamplerBindingLayout\n"
           if !$class->isa("WebGPU::Direct::SamplerBindingLayout");
@@ -1885,6 +2381,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::SamplerDescriptor\n"
           if !$class->isa("WebGPU::Direct::SamplerDescriptor");
@@ -1901,14 +2398,15 @@ package
 }
 
 package
-	WebGPU::Direct::ShaderModuleCompilationHint {
+	WebGPU::Direct::ShaderModuleDescriptor {
     
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::ShaderModuleCompilationHint\n"
-          if !$class->isa("WebGPU::Direct::ShaderModuleCompilationHint");
+        die "$class does not inherit from WebGPU::Direct::ShaderModuleDescriptor\n"
+          if !$class->isa("WebGPU::Direct::ShaderModuleDescriptor");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1922,14 +2420,15 @@ package
 }
 
 package
-	WebGPU::Direct::ShaderModuleSPIRVDescriptor {
-    push @WebGPU::Direct::ShaderModuleSPIRVDescriptor::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::ShaderSourceSPIRV {
+    push @WebGPU::Direct::ShaderSourceSPIRV::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::ShaderModuleSPIRVDescriptor\n"
-          if !$class->isa("WebGPU::Direct::ShaderModuleSPIRVDescriptor");
+        die "$class does not inherit from WebGPU::Direct::ShaderSourceSPIRV\n"
+          if !$class->isa("WebGPU::Direct::ShaderSourceSPIRV");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1943,14 +2442,15 @@ package
 }
 
 package
-	WebGPU::Direct::ShaderModuleWGSLDescriptor {
-    push @WebGPU::Direct::ShaderModuleWGSLDescriptor::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::ShaderSourceWGSL {
+    push @WebGPU::Direct::ShaderSourceWGSL::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::ShaderModuleWGSLDescriptor\n"
-          if !$class->isa("WebGPU::Direct::ShaderModuleWGSLDescriptor");
+        die "$class does not inherit from WebGPU::Direct::ShaderSourceWGSL\n"
+          if !$class->isa("WebGPU::Direct::ShaderSourceWGSL");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -1974,6 +2474,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::StencilFaceState\n"
           if !$class->isa("WebGPU::Direct::StencilFaceState");
@@ -1995,6 +2496,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::StorageTextureBindingLayout\n"
           if !$class->isa("WebGPU::Direct::StorageTextureBindingLayout");
@@ -2011,12 +2513,75 @@ package
 }
 
 package
+	WebGPU::Direct::SupportedFeatures {
+    
+    require WebGPU::Direct::SupportedFeatures;
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::SupportedFeatures\n"
+          if !$class->isa("WebGPU::Direct::SupportedFeatures");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+    sub DESTROY
+    {
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->freeMembers;
+      }
+    }
+
+}
+
+package
+	WebGPU::Direct::SupportedWGSLLanguageFeatures {
+    
+    require WebGPU::Direct::SupportedWGSLLanguageFeatures;
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::SupportedWGSLLanguageFeatures\n"
+          if !$class->isa("WebGPU::Direct::SupportedWGSLLanguageFeatures");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+    sub DESTROY
+    {
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->freeMembers;
+      }
+    }
+
+}
+
+package
 	WebGPU::Direct::SurfaceCapabilities {
     
     require WebGPU::Direct::SurfaceCapabilities;
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::SurfaceCapabilities\n"
           if !$class->isa("WebGPU::Direct::SurfaceCapabilities");
@@ -2030,6 +2595,14 @@ package
         return $result;
     }
     
+    sub DESTROY
+    {
+      if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+      {
+        $_[0]->freeMembers;
+      }
+    }
+
 }
 
 package
@@ -2041,6 +2614,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::SurfaceConfiguration\n"
           if !$class->isa("WebGPU::Direct::SurfaceConfiguration");
@@ -2062,6 +2636,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::SurfaceDescriptor\n"
           if !$class->isa("WebGPU::Direct::SurfaceDescriptor");
@@ -2078,14 +2653,15 @@ package
 }
 
 package
-	WebGPU::Direct::SurfaceDescriptorFromAndroidNativeWindow {
-    push @WebGPU::Direct::SurfaceDescriptorFromAndroidNativeWindow::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::SurfaceSourceAndroidNativeWindow {
+    push @WebGPU::Direct::SurfaceSourceAndroidNativeWindow::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromAndroidNativeWindow\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromAndroidNativeWindow");
+        die "$class does not inherit from WebGPU::Direct::SurfaceSourceAndroidNativeWindow\n"
+          if !$class->isa("WebGPU::Direct::SurfaceSourceAndroidNativeWindow");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2099,14 +2675,15 @@ package
 }
 
 package
-	WebGPU::Direct::SurfaceDescriptorFromCanvasHTMLSelector {
-    push @WebGPU::Direct::SurfaceDescriptorFromCanvasHTMLSelector::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::SurfaceSourceMetalLayer {
+    push @WebGPU::Direct::SurfaceSourceMetalLayer::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromCanvasHTMLSelector\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromCanvasHTMLSelector");
+        die "$class does not inherit from WebGPU::Direct::SurfaceSourceMetalLayer\n"
+          if !$class->isa("WebGPU::Direct::SurfaceSourceMetalLayer");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2120,14 +2697,15 @@ package
 }
 
 package
-	WebGPU::Direct::SurfaceDescriptorFromMetalLayer {
-    push @WebGPU::Direct::SurfaceDescriptorFromMetalLayer::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::SurfaceSourceWaylandSurface {
+    push @WebGPU::Direct::SurfaceSourceWaylandSurface::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromMetalLayer\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromMetalLayer");
+        die "$class does not inherit from WebGPU::Direct::SurfaceSourceWaylandSurface\n"
+          if !$class->isa("WebGPU::Direct::SurfaceSourceWaylandSurface");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2141,14 +2719,15 @@ package
 }
 
 package
-	WebGPU::Direct::SurfaceDescriptorFromWaylandSurface {
-    push @WebGPU::Direct::SurfaceDescriptorFromWaylandSurface::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::SurfaceSourceWindowsHWND {
+    push @WebGPU::Direct::SurfaceSourceWindowsHWND::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromWaylandSurface\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromWaylandSurface");
+        die "$class does not inherit from WebGPU::Direct::SurfaceSourceWindowsHWND\n"
+          if !$class->isa("WebGPU::Direct::SurfaceSourceWindowsHWND");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2162,14 +2741,15 @@ package
 }
 
 package
-	WebGPU::Direct::SurfaceDescriptorFromWindowsHWND {
-    push @WebGPU::Direct::SurfaceDescriptorFromWindowsHWND::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::SurfaceSourceXCBWindow {
+    push @WebGPU::Direct::SurfaceSourceXCBWindow::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromWindowsHWND\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromWindowsHWND");
+        die "$class does not inherit from WebGPU::Direct::SurfaceSourceXCBWindow\n"
+          if !$class->isa("WebGPU::Direct::SurfaceSourceXCBWindow");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2183,35 +2763,15 @@ package
 }
 
 package
-	WebGPU::Direct::SurfaceDescriptorFromXcbWindow {
-    push @WebGPU::Direct::SurfaceDescriptorFromXcbWindow::ISA, "WebGPU::Direct::ChainedStruct";
+	WebGPU::Direct::SurfaceSourceXlibWindow {
+    push @WebGPU::Direct::SurfaceSourceXlibWindow::ISA, "WebGPU::Direct::ChainedStruct";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromXcbWindow\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromXcbWindow");
-        $class = ref($class) ? ref($class) : $class;
-        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
-        my $result = { %$default, %params };
-        $result = $class->BUILDARGS($result)
-          if $class->can('BUILDARGS');
-        $result = bless( $result, $class );
-        $result->pack;
-        return $result;
-    }
-    
-}
-
-package
-	WebGPU::Direct::SurfaceDescriptorFromXlibWindow {
-    push @WebGPU::Direct::SurfaceDescriptorFromXlibWindow::ISA, "WebGPU::Direct::ChainedStruct";
-    my $default = {};
-
-    sub new {
-        my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SurfaceDescriptorFromXlibWindow\n"
-          if !$class->isa("WebGPU::Direct::SurfaceDescriptorFromXlibWindow");
+        die "$class does not inherit from WebGPU::Direct::SurfaceSourceXlibWindow\n"
+          if !$class->isa("WebGPU::Direct::SurfaceSourceXlibWindow");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2230,9 +2790,32 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::SurfaceTexture\n"
           if !$class->isa("WebGPU::Direct::SurfaceTexture");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::TexelCopyBufferLayout {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::TexelCopyBufferLayout\n"
+          if !$class->isa("WebGPU::Direct::TexelCopyBufferLayout");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2251,30 +2834,10 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::TextureBindingLayout\n"
           if !$class->isa("WebGPU::Direct::TextureBindingLayout");
-        $class = ref($class) ? ref($class) : $class;
-        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
-        my $result = { %$default, %params };
-        $result = $class->BUILDARGS($result)
-          if $class->can('BUILDARGS');
-        $result = bless( $result, $class );
-        $result->pack;
-        return $result;
-    }
-    
-}
-
-package
-	WebGPU::Direct::TextureDataLayout {
-    
-    my $default = {};
-
-    sub new {
-        my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::TextureDataLayout\n"
-          if !$class->isa("WebGPU::Direct::TextureDataLayout");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2297,6 +2860,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::TextureViewDescriptor\n"
           if !$class->isa("WebGPU::Direct::TextureViewDescriptor");
@@ -2318,6 +2882,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::VertexAttribute\n"
           if !$class->isa("WebGPU::Direct::VertexAttribute");
@@ -2339,6 +2904,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BindGroupDescriptor\n"
           if !$class->isa("WebGPU::Direct::BindGroupDescriptor");
@@ -2360,6 +2926,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BindGroupLayoutEntry\n"
           if !$class->isa("WebGPU::Direct::BindGroupLayoutEntry");
@@ -2377,10 +2944,11 @@ package
 
 package
 	WebGPU::Direct::BlendState {
-    
+    push @WebGPU::Direct::BlendState::ISA, "WebGPU::Direct::BlendComponent";
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BlendState\n"
           if !$class->isa("WebGPU::Direct::BlendState");
@@ -2402,6 +2970,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::CompilationInfo\n"
           if !$class->isa("WebGPU::Direct::CompilationInfo");
@@ -2423,6 +2992,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ComputePassDescriptor\n"
           if !$class->isa("WebGPU::Direct::ComputePassDescriptor");
@@ -2450,6 +3020,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::DepthStencilState\n"
           if !$class->isa("WebGPU::Direct::DepthStencilState");
@@ -2466,16 +3037,15 @@ package
 }
 
 package
-	WebGPU::Direct::ImageCopyBuffer {
+	WebGPU::Direct::DeviceDescriptor {
     
-    my $default = {
-             'offset' => 0,
-           };
+    my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::ImageCopyBuffer\n"
-          if !$class->isa("WebGPU::Direct::ImageCopyBuffer");
+        die "$class does not inherit from WebGPU::Direct::DeviceDescriptor\n"
+          if !$class->isa("WebGPU::Direct::DeviceDescriptor");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2489,17 +3059,37 @@ package
 }
 
 package
-	WebGPU::Direct::ImageCopyTexture {
-    
-    my $default = {
-             'aspect' => WebGPU::Direct::TextureAspect->all,
-             'mipLevel' => 0,
-           };
+	WebGPU::Direct::FutureWaitInfo {
+    push @WebGPU::Direct::FutureWaitInfo::ISA, "WebGPU::Direct::Future";
+    my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::ImageCopyTexture\n"
-          if !$class->isa("WebGPU::Direct::ImageCopyTexture");
+        die "$class does not inherit from WebGPU::Direct::FutureWaitInfo\n"
+          if !$class->isa("WebGPU::Direct::FutureWaitInfo");
+        $class = ref($class) ? ref($class) : $class;
+        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
+        my $result = { %$default, %params };
+        $result = $class->BUILDARGS($result)
+          if $class->can('BUILDARGS');
+        $result = bless( $result, $class );
+        $result->pack;
+        return $result;
+    }
+    
+}
+
+package
+	WebGPU::Direct::InstanceDescriptor {
+    
+    my $default = {};
+
+    sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
+        my $class = shift;
+        die "$class does not inherit from WebGPU::Direct::InstanceDescriptor\n"
+          if !$class->isa("WebGPU::Direct::InstanceDescriptor");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2518,6 +3108,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ProgrammableStageDescriptor\n"
           if !$class->isa("WebGPU::Direct::ProgrammableStageDescriptor");
@@ -2536,9 +3127,12 @@ package
 package
 	WebGPU::Direct::RenderPassColorAttachment {
     
-    my $default = {};
+    my $default = {
+             'depthSlice' => -1,
+           };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderPassColorAttachment\n"
           if !$class->isa("WebGPU::Direct::RenderPassColorAttachment");
@@ -2555,46 +3149,15 @@ package
 }
 
 package
-	WebGPU::Direct::RequiredLimits {
-    
-    my $default = {
-             'maxBindGroups' => 4,
-             'maxBindingsPerBindGroup' => 640,
-             'maxBufferSize' => 268435456,
-             'maxColorAttachmentBytesPerSample' => 32,
-             'maxColorAttachments' => 8,
-             'maxComputeInvocationsPerWorkgroup' => 256,
-             'maxComputeWorkgroupSizeX' => 256,
-             'maxComputeWorkgroupSizeY' => 256,
-             'maxComputeWorkgroupSizeZ' => 64,
-             'maxComputeWorkgroupStorageSize' => 16384,
-             'maxComputeWorkgroupsPerDimension' => 65535,
-             'maxDynamicStorageBuffersPerPipelineLayout' => 4,
-             'maxDynamicUniformBuffersPerPipelineLayout' => 8,
-             'maxInterStageShaderComponents' => 60,
-             'maxInterStageShaderVariables' => 16,
-             'maxSampledTexturesPerShaderStage' => 16,
-             'maxSamplersPerShaderStage' => 16,
-             'maxStorageBufferBindingSize' => 134217728,
-             'maxStorageBuffersPerShaderStage' => 8,
-             'maxStorageTexturesPerShaderStage' => 4,
-             'maxTextureArrayLayers' => 256,
-             'maxTextureDimension1D' => 8192,
-             'maxTextureDimension2D' => 8192,
-             'maxTextureDimension3D' => 2048,
-             'maxUniformBufferBindingSize' => 65536,
-             'maxUniformBuffersPerShaderStage' => 12,
-             'maxVertexAttributes' => 16,
-             'maxVertexBufferArrayStride' => 2048,
-             'maxVertexBuffers' => 8,
-             'minStorageBufferOffsetAlignment' => 256,
-             'minUniformBufferOffsetAlignment' => 256,
-           };
+	WebGPU::Direct::TexelCopyBufferInfo {
+    push @WebGPU::Direct::TexelCopyBufferInfo::ISA, "WebGPU::Direct::TexelCopyBufferLayout";
+    my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::RequiredLimits\n"
-          if !$class->isa("WebGPU::Direct::RequiredLimits");
+        die "$class does not inherit from WebGPU::Direct::TexelCopyBufferInfo\n"
+          if !$class->isa("WebGPU::Direct::TexelCopyBufferInfo");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2608,35 +3171,15 @@ package
 }
 
 package
-	WebGPU::Direct::ShaderModuleDescriptor {
+	WebGPU::Direct::TexelCopyTextureInfo {
     
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::ShaderModuleDescriptor\n"
-          if !$class->isa("WebGPU::Direct::ShaderModuleDescriptor");
-        $class = ref($class) ? ref($class) : $class;
-        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
-        my $result = { %$default, %params };
-        $result = $class->BUILDARGS($result)
-          if $class->can('BUILDARGS');
-        $result = bless( $result, $class );
-        $result->pack;
-        return $result;
-    }
-    
-}
-
-package
-	WebGPU::Direct::SupportedLimits {
-    
-    my $default = {};
-
-    sub new {
-        my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::SupportedLimits\n"
-          if !$class->isa("WebGPU::Direct::SupportedLimits");
+        die "$class does not inherit from WebGPU::Direct::TexelCopyTextureInfo\n"
+          if !$class->isa("WebGPU::Direct::TexelCopyTextureInfo");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2663,6 +3206,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::TextureDescriptor\n"
           if !$class->isa("WebGPU::Direct::TextureDescriptor");
@@ -2686,6 +3230,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::VertexBufferLayout\n"
           if !$class->isa("WebGPU::Direct::VertexBufferLayout");
@@ -2707,6 +3252,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::BindGroupLayoutDescriptor\n"
           if !$class->isa("WebGPU::Direct::BindGroupLayoutDescriptor");
@@ -2731,6 +3277,7 @@ package
            };
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ColorTargetState\n"
           if !$class->isa("WebGPU::Direct::ColorTargetState");
@@ -2752,30 +3299,10 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::ComputePipelineDescriptor\n"
           if !$class->isa("WebGPU::Direct::ComputePipelineDescriptor");
-        $class = ref($class) ? ref($class) : $class;
-        my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
-        my $result = { %$default, %params };
-        $result = $class->BUILDARGS($result)
-          if $class->can('BUILDARGS');
-        $result = bless( $result, $class );
-        $result->pack;
-        return $result;
-    }
-    
-}
-
-package
-	WebGPU::Direct::DeviceDescriptor {
-    
-    my $default = {};
-
-    sub new {
-        my $class = shift;
-        die "$class does not inherit from WebGPU::Direct::DeviceDescriptor\n"
-          if !$class->isa("WebGPU::Direct::DeviceDescriptor");
         $class = ref($class) ? ref($class) : $class;
         my %params = ref( $_[0] ) eq ref {} ? %{$_[0]} : @_;
         my $result = { %$default, %params };
@@ -2794,6 +3321,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderPassDescriptor\n"
           if !$class->isa("WebGPU::Direct::RenderPassDescriptor");
@@ -2815,6 +3343,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::VertexState\n"
           if !$class->isa("WebGPU::Direct::VertexState");
@@ -2836,6 +3365,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::FragmentState\n"
           if !$class->isa("WebGPU::Direct::FragmentState");
@@ -2857,6 +3387,7 @@ package
     my $default = {};
 
     sub new {
+        local $SIG{__DIE__} = \&Carp::confess;
         my $class = shift;
         die "$class does not inherit from WebGPU::Direct::RenderPipelineDescriptor\n"
           if !$class->isa("WebGPU::Direct::RenderPipelineDescriptor");

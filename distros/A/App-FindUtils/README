@@ -2,8 +2,8 @@ NAME
     App::FindUtils - Utilities related to finding files
 
 VERSION
-    This document describes version 0.004 of App::FindUtils (from Perl
-    distribution App-FindUtils), released on 2025-10-31.
+    This document describes version 0.005 of App::FindUtils (from Perl
+    distribution App-FindUtils), released on 2025-11-26.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -30,6 +30,25 @@ FUNCTIONS
     *   dirs => *array[dirname]* (default: ["."])
 
         (No description)
+
+    *   eval => *str*
+
+        Process filename through this code. Code will receive filename in $_
+        and is expected to change and return a new "name" that will be
+        compared for duplicate instead of the original name. You can use
+        this e.g. to find duplicate in some part of the filename. As an
+        alternative, see the "--regex" option.
+
+    *   exclude_filename_regex => *re_from_str*
+
+        Filename regex to exclude.
+
+    *   regex => *re_from_str*
+
+        Specify a regex with a capture to get part of the filename. The
+        first capture $1 will be used to compare for duplicate instead of
+        the original name. You can use this to find duplicate in some part
+        of the filename. As an alternative, see the "--eval" option.
 
     Returns an enveloped result (an array).
 

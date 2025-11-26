@@ -1,5 +1,6 @@
-<& /Elements/ShowConditionalCustomFields, CustomField => $CustomField, Object => $Object, ParentSelector => 'id' &>
+<& /Elements/ShowConditionalCustomFields, CustomField => $CustomField, Object => $Object, Grouping => $Grouping, ParentSelector => 'id' &>
 <%ARGS>
 $CustomField
 $Object
+$Grouping => undef
 </%ARGS>

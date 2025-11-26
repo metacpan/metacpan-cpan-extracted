@@ -8,6 +8,7 @@ README.md
 README.pod
 dist.ini
 lib/Matplotlib/Simple.pm
+make.subs.pl
 md2pod.pl
 mpl.examples.pl
 output.images/add.single.png
@@ -20,7 +21,9 @@ output.images/imshow.multiple.png
 output.images/imshow.single.png
 output.images/pie.png
 output.images/plot.png
+output.images/plot.single.arr.png
 output.images/plot.single.png
+output.images/plots.png
 output.images/scatterplots.png
 output.images/single.array.png
 output.images/single.barplot.png
@@ -31,6 +34,8 @@ output.images/single.hist2d.png
 output.images/single.pie.png
 output.images/single.violinplot.png
 output.images/single.wide.png
+output.images/trig.subplots.png
 output.images/violin.png
 output.images/wide.subplots.png
 t/01.python.t
+t/02.make.files.t

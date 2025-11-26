@@ -160,6 +160,7 @@ my $start  = time;
 my $frames = 1000;
 for ( 1 .. 1000 )
 {
+  $wgpu->processEvents;
   $surface->getCurrentTexture($surface_texture);
 
   for ( $surface_texture->status )

@@ -58,9 +58,9 @@ static const struct xdg_toplevel_listener xdg_tl_listener = {
   .close = noop,
 };
 
-bool wayland_window(WGPUSurfaceDescriptorFromWaylandSurface *result, int xw, int yh)
+bool wayland_window(WGPUSurfaceSourceWaylandSurface *result, int xw, int yh)
 {
-  Zero((void*)result, 1, WGPUSurfaceDescriptorFromWaylandSurface);
+  Zero((void*)result, 1, WGPUSurfaceSourceWaylandSurface);
   xw = xw ? xw : 640;
   yh = yh ? yh : 360;
 
@@ -113,7 +113,7 @@ bool wayland_window(WGPUSurfaceDescriptorFromWaylandSurface *result, int xw, int
   wl_display_roundtrip(display);
   wl_surface_commit(items->surface);
 
-  result->chain.sType = WGPUSType_SurfaceDescriptorFromWaylandSurface;
+  result->chain.sType = WGPUSType_SurfaceSourceWaylandSurface;
   result->display = display;
   result->surface = items->surface;
 

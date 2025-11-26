@@ -29,7 +29,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
@@ -42,13 +42,15 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.16
+Version 0.18
 
 =head1 SYNOPSIS
 
 From the command line:
 
-  fuzz-harness-generator t/conf/add.yml > t/add_fuzz.t
+  fuzz-harness-generator -r t/conf/add.yml
+
+  extract-schemas bin/extract-schemas lib/Sample/Module.pm; fuzz-harness-generator -r schemas/greet.yaml
 
 From Perl:
 
@@ -90,12 +92,13 @@ handling, and regressions without manually writing every case.
 
 This module implements the logic behind L<fuzz-harness-generator>.
 It parses configuration files (fuzz and/or corpus YAML), and
-produces a ready-to-run F<.t> test script using L<Test::Most>.
+produces a ready-to-run F<.t> test script to run through C<prove>.
 
-It reads configuration files in any format
-(including Perl C<.conf> with C<our> variables, though this format will be deprecated in a future release)
-and optional YAML corpus files,
-and generates a L<Test::Most>-based fuzzing harness combining:
+It reads configuration files in any format,
+and optional YAML corpus files.
+All of the examples in this documenation are in C<YAML> format,
+other formats may not work as they aren't so heavily tested.
+It then generates a L<Test::Most>-based fuzzing harness combining:
 
 =over 4
 
@@ -111,19 +114,15 @@ and generates a L<Test::Most>-based fuzzing harness combining:
 
 =head1 CONFIGURATION
 
-The configuration file is either a file that can be read by L<Config::Abstraction> or a B<trusted input> Perl file that should set variables with C<our>.
-
-The documentation here covers the old trusted input style input, but that will go away so you are recommended to use
-L<Config::Abstraction> files.
-Example: the generator expects your config to use C<our %input>, C<our $function>, etc.
+The configuration file,
+for each set of tests to be produced,
+is a file containng a schema that can be read by L<Config::Abstraction>.
 
 =head2 SCHEMA
 
-Recognized items:
+The schema is split into several sections.
 
-=over 4
-
-=item * C<%input> - input params with keys => type/optional specs:
+=head3 C<%input> - input params with keys => type/optional specs
 
 When using named parameters
 
@@ -135,19 +134,34 @@ When using named parameters
       type: integer
       optional: true
 
-Supported basic types used by the fuzzer: C<string>, C<integer>, C<number>, C<boolean>, C<arrayref>, C<hashref>.
-(You can add more types; they will default to C<undef> unless extended.)
+Supported basic types used by the fuzzer: C<string>, C<integer>, C<float>, C<number>, C<boolean>, C<arrayref>, C<hashref>.
+See also L<Params::Validate::Strict>.
+You can add more custom types using properties.
 
 For routines with one unnamed parameter
 
   input:
     type: string
 
-Currently, routines with more than one unnamed parameter are not supported.
+For routines with more than one named parameter, use the C<position> keyword.
+
+  module: Math::Simple::MinMax
+  fuction: max
+
+  input:
+    left:
+      type: number
+      position: 0
+    right:
+      type: number
+      position: 1
+
+  output:
+    type: number
 
 The keyword C<undef> is used to indicate that the C<function> takes no arguments.
 
-=item * C<%output> - output param types for Return::Set checking:
+=head3 C<%output> - output param types for L<Return::Set> checking
 
   output:
     type: string
@@ -163,18 +177,59 @@ The output can be set to the string 'undef' if the routine should return the und
   function: blessed
 
   input:
-    arg1: string
+    type: string
 
   output: undef
 
 The keyword C<undef> is used to indicate that the C<function> returns nothing.
 
-=item * C<%transforms> - list of transformations from input sets to output sets
+=head3 C<%config> - optional hash of configuration.
 
+The current supported variables are
+
+=over 4
+
+=item * C<test_nuls>, inject NUL bytes into strings (default: 1)
+
+=item * C<test_undef>, test with undefined value (default: 1)
+
+=item * C<test_empty>, test with empty strings (default: 1)
+
+=item * C<test_non_ascii>, test with strings that contain non ascii characaters (default: 1)
+
+=item * C<dedup>, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
+
+=item * C<properties>, enable L<Test::LectroTest> Property tests (default: 0)
+
+=back
+
+=head3 C<%transforms> - list of transformations from input sets to output sets
+
+Transforms allow you to define how input data should be transformed into output data.
+This is useful for testing functions that convert between formats, normalize data,
+or apply business logic transformations on a set of data to different set of data.
 It takes a list of subsets of the input and output definitions,
 and verifies that data from each input subset is correctly transformed into data from the matching output subset.
 
-This is a draft definition of the schema.
+=head4 Transform Validation Rules
+
+For each transform:
+
+=over 4
+
+=item 1. Generate test cases using the transform's input schema
+
+=item 2. Call the function with those inputs
+
+=item 3. Validate the output matches the transform's output schema
+
+=item 4. If output has a specific 'value', check exact match
+
+=item 5. If output has constraints (min/max), validate within bounds
+
+=back
+
+=head4 Example 1
 
   ---
   module: builtin
@@ -184,14 +239,17 @@ This is a draft definition of the schema.
     test_undef: no
     test_empty: no
     test_nuls: no
+    test_non_ascii: no
 
   input:
     number:
       type: number
       position: 0
+
   output:
     type: number
     min: 0
+
   transforms:
     positive:
       input:
@@ -219,21 +277,72 @@ This is a draft definition of the schema.
 
 If the output hash contains the key _STATUS, and if that key is set to DIES,
 the routine should die with the given arguments; otherwise, it should live.
-If it's set to WARNS,
-the routine should warn with the given arguments.
+If it's set to WARNS, the routine should warn with the given arguments.
 
 The keyword C<undef> is used to indicate that the C<function> returns nothing.
 
-=item * C<$module> - module name (optional).
+=head4 Example 2
+
+  ---
+  module: Math::Utils
+  function: normalize_number
+
+  input:
+    value:
+      type: number
+      position: 0
+
+  output:
+    type: number
+
+  transforms:
+    positive_stays_positive:
+      input:
+        value:
+          type: number
+          min: 0
+          max: 1000
+      output:
+        type: number
+        min: 0
+        max: 1
+
+    negative_becomes_zero:
+      input:
+        value:
+          type: number
+          max: 0
+      output:
+        type: number
+        value: 0
+
+    preserves_zero:
+      input:
+        value:
+          type: number
+          value: 0
+      output:
+        type: number
+        value: 0
+
+=head3 C<$module>
+
+The name of the module (optional).
 
 Using the reserved word C<builtin> means you're testing a Perl builtin function.
 
 If omitted, the generator will guess from the config filename:
 C<My-Widget.conf> -> C<My::Widget>.
 
-=item * C<$function> - function/method to test (defaults to C<run>).
+=head3 C<$function>
 
-=item * C<$new> - optional hashref of args to pass to the module's constructor (object mode):
+The function/method to test.
+
+This defaults to C<run>.
+
+=head3 C<%new>
+
+An optional hashref of args to pass to the module's constructor.
 
   new:
     api_key: ABC123
@@ -246,7 +355,9 @@ To ensure C<new()> is called with no arguments, you still need to define new, th
 
   new:
 
-=item * C<%cases> - optional Perl static corpus, when the output is a simple string (expected => [ args... ]):
+=head3 C<%cases>
+
+An optional Perl static corpus, when the output is a simple string (expected => [ args... ]).
 
 Maps the expected output string to the input and _STATUS
 
@@ -258,38 +369,44 @@ Maps the expected output string to the input and _STATUS
       input: ""
       _STATUS: DIES
 
-=item * C<$yaml_cases> - optional path to a YAML file with the same shape as C<%cases>.
+=head3 C<$yaml_cases> - optional path to a YAML file with the same shape as C<%cases>.
 
-=item * C<$seed> - optional integer. When provided, the generated C<t/fuzz.t> will call C<srand($seed)> so fuzz runs are reproducible.
+=head3 C<$seed>
 
-=item * C<$iterations> - optional integer controlling how many fuzz iterations to perform (default 50).
+An optional integer.
+When provided, the generated C<t/fuzz.t> will call C<srand($seed)> so fuzz runs are reproducible.
 
-=item * C<%edge_cases> - optional hash mapping of extra values to inject:
+=head3 C<$iterations>
+
+An optional integer controlling how many fuzz iterations to perform (default 50).
+
+=head3 C<%edge_cases>
+
+An optional hash mapping of extra values to inject.
 
 	# Two named parameters
-	our %edge_cases = (
-		name => [ '', 'a' x 1024, \"\x{263A}" ],
-		age => [ -1, 0, 99999999 ],
-	);
+	edge_cases:
+		name: [ '', 'a' x 1024, \"\x{263A}" ]
+		age: [ -1, 0, 99999999 ]
 
 	# Takes a string input
-	our %edge_cases (
-		'foo', 'bar'
-	);
+	edge_cases: [ 'foo', 'bar' ]
 
-(Values can be strings or numbers; strings will be properly quoted.)
+Values can be strings or numbers; strings will be properly quoted.
 Note that this only works with routines that take named parameters.
 
-=item * C<%type_edge_cases> - optional hash mapping types to arrayrefs of extra values to try for any field of that type:
+=head3 C<%type_edge_cases>
 
-	our %type_edge_cases = (
-		string => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
-		number => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
-		integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
-	);
+An optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
-=item * C<%edge_case_array> - specify edge case values for routines that accept a single unnamed parameter
+	type_edge_cases:
+		string: [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ]
+		number: [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ]
+		integer: [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ]
 
+=head3 C<%edge_case_array>
+
+Specify edge case values for routines that accept a single unnamed parameter.
 This is specifically designed for simple functions that take one argument without a parameter name.
 These edge cases supplement the normal random string generation, ensuring specific problematic values are always tested.
 During fuzzing iterations, there's a 40% probability that a test case will use a value from edge_case_array instead of randomly generated data.
@@ -314,27 +431,11 @@ During fuzzing iterations, there's a 40% probability that a test case will use a
   seed: 42
   iterations: 50
 
-=item * C<%config> - optional hash of configuration.
-
-The current supported variables are
-
-=over 4
-
-=item * C<test_nuls>, inject NUL bytes into strings (default: 1)
-
-=item * C<test_undef>, test with undefined value (default: 1)
-
-=item * C<test_empty>, test with empty strings (default: 1)
-
-=item * C<dedup>, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
-
-=back
-
-=back
-
 =head3 Semantic Data Generators
 
-For property-based testing, you can use semantic generators to create realistic test data:
+For property-based testing with L<Test::LectroTest>,
+you can use semantic generators to create realistic test data.
+Fuzz testing support for C<semantic> entries is being developed.
 
   input:
     email:
@@ -391,69 +492,6 @@ For property-based testing, you can use semantic generators to create realistic 
 
 =back
 
-=head2 TRANSFORMS
-
-=head3 Overview
-
-Transforms allow you to define how input data should be transformed into output data.
-This is useful for testing functions that convert between formats, normalize data,
-or apply business logic transformations on a set of data to different set of data.
-
-Transform schema also have the keyword C<value>, when a specific value is required
-
-=head3 Configuration Example
-
-  ---
-  module: Math::Utils
-  function: normalize_number
-
-  input:
-    value:
-      type: number
-      position: 0
-
-  output:
-    type: number
-
-  transforms:
-    positive_stays_positive:
-      input:
-        value:
-          type: number
-          min: 0
-          max: 1000
-      output:
-        type: number
-        min: 0
-        max: 1
-
-    negative_becomes_zero:
-      input:
-        value:
-          type: number
-          max: 0
-      output:
-        type: number
-        value: 0
-
-    preserves_zero:
-      input:
-        value:
-          type: number
-          value: 0
-      output:
-        type: number
-        value: 0
-
-=head3 Transform Validation Rules
-
-For each transform:
-1. Generate test cases using the transform's input schema
-2. Call the function with those inputs
-3. Validate the output matches the transform's output schema
-4. If output has a specific 'value', check exact match
-5. If output has constraints (min/max), validate within bounds
-
 =head2 EDGE CASE GENERATION
 
 In addition to purely random fuzz cases, the harness generates
@@ -482,7 +520,7 @@ Supported constraint types:
 
 =over 4
 
-=item * C<number>, C<integer>
+=item * C<number>, C<integer>, C<float>
 
 Uses numeric values one below, equal to, and one above the boundary.
 
@@ -685,6 +723,9 @@ Then create this file as <t/fuzz.t>:
 				}
 			} else {
 				diag("$filepath: STDOUT:\n$stdout");
+				diag($stderr) if(length($stderr));
+				diag("$filepath Failed");
+				last;
 			}
 			diag($stderr) if(length($stderr));
 		}
@@ -1106,7 +1147,7 @@ your custom properties:
         - name: no_iframes
           code: $result !~ /<iframe/i
 
-=head2 OUTPUT
+=head2 GENERATED OUTPUT
 
 The generated test:
 
@@ -1123,6 +1164,8 @@ The generated test:
 =item * Validates outputs with L<Return::Set>
 
 =item * Runs static C<is(... )> corpus tests from Perl and/or YAML corpus
+
+=item * Runs L<Test::LectroTest> tests
 
 =back
 
@@ -1181,7 +1224,7 @@ sub generate
 	}
 
 	# dedup: fuzzing can easily generate repeats, default is to remove duplicates
-	foreach my $field ('test_nuls', 'test_undef', 'test_empty', 'dedup') {
+	foreach my $field ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup') {
 		if(exists($config{$field})) {
 			if(($config{$field} eq 'false') || ($config{$field} eq 'off') || ($config{$field} eq 'no')) {
 				$config{$field} = 0;
@@ -1259,18 +1302,24 @@ sub generate
 		if(ref($config{$key}) eq 'HASH') {
 			next;
 		}
-		$config_code .= "'$key' => $config{$key},\n";
+		if((!defined($config{$key})) || !$config{$key}) {
+			# YAML will strip the word 'false'
+			# e.g. in 'test_undef: false'
+			$config_code .= "'$key' => 0,\n";
+		} else {
+			$config_code .= "'$key' => $config{$key},\n";
+		}
 	}
 
 	# Render input/output
 	my $input_code = '';
 	if(((scalar keys %input) == 1) && exists($input{'type'}) && !ref($input{'type'})) {
-		# our %input = ( type => 'string' );
+		# %input = ( type => 'string' );
 		foreach my $key (sort keys %input) {
 			$input_code .= "'$key' => '$input{$key}',\n";
 		}
 	} else {
-		# our %input = ( str => { type => 'string' } );
+		# %input = ( str => { type => 'string' } );
 		$input_code = render_hash(\%input);
 	}
 	if(defined(my $re = $output{'matches'})) {
@@ -1320,7 +1369,8 @@ sub generate
 
 	# Setup / call code (always load module)
 	my $setup_code = ($module) ? "BEGIN { use_ok('$module') }" : '';
-	my $call_code;
+	my $call_code;	# Code to call the function being test when used with named arguments
+	my $position_code;	# Code to call the function being test when used with position arguments
 	if(defined($new)) {
 		# keep use_ok regardless (user found earlier issue)
 		if($new_code eq '') {
@@ -1329,16 +1379,21 @@ sub generate
 			$setup_code .= "\nmy \$obj = new_ok('$module' => [ { $new_code } ] );";
 		}
 		$call_code = "\$result = \$obj->$function(\$input);";
+		$position_code = "\$result = \$obj->$function(\@alist);";
 	} elsif(defined($module)) {
 		$call_code = "\$result = $module\->$function(\$input);";
+		$position_code = "\$result = $module\->$function(\@alist);";
 	} else {
 		$call_code = "\$result = $function(\$input);";
+		$position_code = "\$result = $function(\@alist);";
 	}
 
 	# Build static corpus code
 	my $corpus_code = '';
 	if (%all_cases) {
-		$corpus_code = "\n# --- Static Corpus Tests ---\n";
+		$corpus_code = "\n# --- Static Corpus Tests ---\n" .
+			"diag('Running " . scalar(keys %all_cases) . " corpus tests');\n";
+
 		for my $expected (sort keys %all_cases) {
 			my $inputs = $all_cases{$expected};
 			next unless($inputs);
@@ -1385,16 +1440,16 @@ sub generate
 			} else {
 				if($status eq 'DIES') {
 					$corpus_code .= "dies_ok { $module\::$function($input_str) } " .
-						"'$function(" . ref(($inputs eq 'ARRAY') ? join(', ', map { $_ // '' } @{$inputs}) : $inputs) . ") dies';\n";
+						"'Corpus $expected dies';\n";
 				} elsif($status eq 'WARNS') {
 					$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr/./, " .
-						"'$function(" . ((ref $inputs eq 'ARRAY') ? join(', ', map { $_ // '' } @{$inputs}) : $inputs) . ") warns';\n";
+						"'Corpus $expected warns';\n";
 				} else {
 					my $desc = sprintf("$function(%s) returns %s",
 						perl_quote((ref $inputs eq 'ARRAY') ? (join(', ', map { $_ // '' } @{$inputs})) : $inputs),
 						$expected_str
 					);
-					$corpus_code .= "is($module\::$function($input_str), $expected_str, " . q_wrap($desc) . ");\n";
+					$corpus_code .= "is($module\::$function($input_str), $expected_str, 'Corpus $expected works');\n";
 				}
 			}
 		}
@@ -1426,6 +1481,7 @@ sub generate
 		transforms_code => $transforms_code,
 		corpus_code => $corpus_code,
 		call_code => $call_code,
+		position_code => $position_code,
 		function => $function,
 		iterations_code => int($iterations),
 		use_properties => $use_properties,
@@ -1469,12 +1525,7 @@ sub _load_schema {
 	if(my $config = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
 		$config = $config->all();
 		if(defined($config->{'$module'}) || defined($config->{'our $module'}) || !defined($config->{'module'})) {
-			# Legacy file format. This will go away.
-			# TODO: remove this code
-			# $config = _load_conf(File::Spec->rel2abs($schema_file));
-			# if($config) {
-				croak("$schema_file: Loading perl files as configs is no longer supported");
-			# }
+			croak("$schema_file: Loading perl files as configs is no longer supported");
 		}
 		return $config;
 	}
@@ -1497,43 +1548,6 @@ sub _load_schema_section
 		}
 	}
 	return {};
-}
-
-sub _load_conf {
-	croak('Loading perl files as configs is no longer supported');
-
-	my $file = $_[0];
-
-	my $pkg = 'ConfigLoader';
-
-	# eval in a separate package
-	{
-		package ConfigLoader;
-		no strict 'refs';
-		do $file or die "Error loading $file: ", ($@ || $!);
-	}
-
-	# Now pull variables from ConfigLoader
-	my @vars = qw(
-		module new edge_cases function input output cases yaml_cases
-		seed iterations edge_case_array type_edge_cases config
-	);
-
-	my %conf;
-	no strict 'refs';	# allow symbolic references here
-	for my $v (@vars) {
-		if(my $full = "${pkg}::$v") {
-			if (defined ${$full}) {	# scalar
-				$conf{$v} = ${$full};
-			} elsif (@{$full}) {	# array
-				$conf{$v} = [ @{$full} ];
-			} elsif (%{$full}) {	# hash
-				$conf{$v} = { %{$full} };
-			}
-		}
-	}
-
-	return \%conf;
 }
 
 # Input validation for configuration
@@ -2674,7 +2688,7 @@ sub _render_properties {
 			$code .= "    \$died;\n";
 		} else {
 			$code .= "    my \$error = \$\@;\n";
-			# $code .= "    ::diag(\"\$$prop->{name} -> \$error; \") if(\$ENV{'TEST_VERBOSE'});\n";
+			# $code .= "    diag(\"\$$prop->{name} -> \$error; \") if(\$ENV{'TEST_VERBOSE'});\n";
 			$code .= "    \n";
 			$code .= "    !\$error && (\n";
 			$code .= "        $prop->{property_checks}\n";
@@ -2693,17 +2707,17 @@ sub _render_properties {
 
 =head1 NOTES
 
-=over 4
-
-=item * The legacy format conf file must use C<our> declarations so variables are visible to the generator via C<require>.
-
-=back
+C<seed> and C<iterations> really should be within C<config>.
 
 =head1 SEE ALSO
 
 =over 4
 
 =item * L<https://nigelhorne.github.io/App-Test-Generator/coverage/>: Test Coverage Report
+
+=item * L<App::Test::Generator::Template> - Template of the file of tests created by C<App::Test::Generator>
+
+=item * L<App::Test::Generator::SchemaExtractor> - Project to create schemas from Perl programs
 
 =item * L<Params::Validate::Strict>: Schema Definition
 
@@ -2724,8 +2738,7 @@ sub _render_properties {
 Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 Portions of this module's initial design and documentation were created with the
-assistance of L<ChatGPT|https://openai.com/> (GPT-5), with final curation
-and authorship by Nigel Horne.
+assistance of AI.
 
 =cut
 

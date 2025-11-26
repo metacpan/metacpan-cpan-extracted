@@ -81,6 +81,6 @@
          "web" : "https://github.com/mattmartini/Dev-Util"
       }
    },
-   "version" : "v2.19.11",
+   "version" : "v2.19.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
