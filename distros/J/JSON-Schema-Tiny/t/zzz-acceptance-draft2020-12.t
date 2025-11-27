@@ -10,7 +10,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More;
 use List::Util 1.50 'head';
 use Config;
 use lib 't/lib';
@@ -69,6 +68,7 @@ acceptance_tests(
           '$id must be resolved against nearest parent, not just immediate parent',
           'order of evaluation: $id and $ref',
           'order of evaluation: $id and $anchor and $ref',
+          'order of evaluation: $id and $ref on nested schema',
           'URN base URI with URN and anchor ref',
           'URN ref with nested pointer ref',
           'ref to if',
@@ -110,7 +110,7 @@ Attention CPANTesters: you do not need to file a ticket when this test fails. I 
 
 ###############################
 DIAG
-  if not Test::Builder->new->is_passing;
+  if not is_passing;
 }
 
 done_testing;

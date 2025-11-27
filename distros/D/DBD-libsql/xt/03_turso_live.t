@@ -10,7 +10,15 @@ my $turso_url = $ENV{TURSO_DATABASE_URL};
 my $turso_token = $ENV{TURSO_DATABASE_TOKEN};
 
 if (!$turso_url || !$turso_token) {
-    plan skip_all => "TURSO_DATABASE_URL and TURSO_DATABASE_TOKEN environment variables not set";
+    plan skip_all => 
+        "Turso Cloud live tests require environment variables to be set:\n" .
+        "  TURSO_DATABASE_URL - The libsql database URL (e.g., libsql://your-db.turso.io)\n" .
+        "  TURSO_DATABASE_TOKEN - Your authentication token from Turso dashboard\n" .
+        "\n" .
+        "To run these tests, export the variables and run:\n" .
+        "  export TURSO_DATABASE_URL='libsql://...'\n" .
+        "  export TURSO_DATABASE_TOKEN='...'\n" .
+        "  prove -Ilib xt/03_turso_live.t\n";
 }
 
 # Extract hostname from Turso URL
@@ -19,7 +27,10 @@ my $hostname;
 if ($turso_url =~ m|^libsql://([^/]+)|) {
     $hostname = $1;
 } else {
-    plan skip_all => "Invalid TURSO_DATABASE_URL format: $turso_url";
+    plan skip_all => 
+        "Invalid TURSO_DATABASE_URL format: '$turso_url'\n" .
+        "Expected format: libsql://database-name-author.region.turso.io\n" .
+        "Get the correct URL from your Turso dashboard at https://app.turso.io\n";
 }
 
 plan tests => 8;

@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+# convert a gcode file to postscript, using Graphics::Penplotter::GcodeXY
+# use: gcodetoeps filename [papersize]
+# output goes to filename.eps
+
+use strict;
+use warnings;
+use Graphics::Penplotter::GcodeXY;
+
+# file name
+my $f = shift or die "no input file provided";
+my $s = shift || "A3";
+#open the file
+open (my $inf , '<', $f) or die "cannot open input file $f";
+
+# create a gcode object
+my $g = Graphics::Penplotter::GcodeXY->new(papersize => $s, units => "pt");
+
+# read the file, add to the output queue
+while (<$inf>) {
+    $g->addtopage($_);
+}
+
+# create the postscript
+$g->exporteps("$f.eps");
+

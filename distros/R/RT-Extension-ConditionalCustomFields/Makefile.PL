@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install;
 use utf8;
 
@@ -31,7 +32,7 @@ substitute(
            {
         sufix => '.in'
     },
-           qw(lib/RT/Extension/ConditionalCustomFields/Test.pm xt/external_customfield_values.t),
+           qw(lib/RT/Extension/ConditionalCustomFields/Test.pm),
 );
 
 auto_install;

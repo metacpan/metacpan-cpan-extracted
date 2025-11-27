@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.2.0";
+our $VERSION = "0.2.2";
 
 use Exporter qw/import/;
 use Scalar::Util   qw//;
@@ -694,6 +694,31 @@ sub to_pkg(;$) {
 	$path
 }
 
+# Из пакета в файловый путь из @INC, пакет не подгружается
+sub from_inc(;$) {
+	my ($pkg) = @_ == 0? $_: @_;
+
+	$pkg = from_pkg $pkg;
+
+	for my $dir (@INC) {
+		my $path = "$dir/$pkg";
+		return $path if -f $path;
+	}
+
+	return;
+}
+
+# Из файлового пути в @INC в пакет
+sub to_inc(;$) {
+	my ($path) = @_ == 0? $_: @_;
+	
+	my $inc = join "|", map quotemeta, @INC;
+	
+	return to_pkg $' if $path =~ m!^(?:$inc)/!;
+
+	return;
+}
+
 # Подключает модуль, если он ещё не подключён, и возвращает его
 sub include(;$) {
 	my ($pkg) = @_ == 0? $_: @_;
@@ -716,7 +741,7 @@ Aion::Fs - utilities for the file system: reading, writing, searching, replacing
 
 =head1 VERSION
 
-0.2.0
+0.2.2
 
 =head1 SYNOPSIS
 
@@ -1598,6 +1623,24 @@ Translates the path from the FS to the package. Without a parameter, uses C<$_>.
 
 	to_pkg "Aion/Fs.pm"  # => Aion::Fs
 	[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]
+
+=head2 from_inc (;$pkg)
+
+Translates the packet to the FS path in C<@INC>. The package file must exist in one of the C<@INC> paths. Without a parameter, uses C<$_>.
+
+	from_inc "Aion::Fs" # -> $INC{'Aion/Fs.pm'}
+	[map from_inc, "A::B::C", "Aion::Fs"]  # --> [$INC{'Aion/Fs.pm'}]
+	
+	from_inc "A::B::C" # -> undef
+
+=head2 to_inc (;$path)
+
+Translates the path from FS to C<@INC> into a package. Without a parameter, uses C<$_>.
+
+	to_inc $INC{'Aion/Fs.pm'} # => Aion::Fs
+	[map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]  # --> ["Aion::Fs"]
+	
+	to_inc 'Aion/Fs.pm' # -> undef
 
 =head1 AUTHOR
 

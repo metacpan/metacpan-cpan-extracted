@@ -481,10 +481,9 @@ SV * sign(SV *msg, SV *sk)
   msg_buf = SvPVbyte(msg, msg_len);
 
   xNEWX(sm_buf, msg_len + crypto_sign_BYTES + 1, unsigned char);
-  if (sm_buf == NULL)
-    croak("Out of memory");
 
   crypto_sign(sm_buf, &sm_len, msg_buf, msg_len, sk_buf);
+  sm_buf[sm_len] = '\0';
 
   RETVAL = newSV(0);
   sv_usepvn_flags(RETVAL, (char *)sm_buf, (STRLEN)sm_len, SV_HAS_TRAILING_NUL);

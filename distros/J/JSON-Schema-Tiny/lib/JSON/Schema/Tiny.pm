@@ -1,11 +1,11 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.029-2-gf5663ad
+package JSON::Schema::Tiny; # git description: v0.030-3-g571c24a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
@@ -1366,7 +1366,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -1656,6 +1656,14 @@ L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: 
 =back
 
 =for stopwords OpenAPI
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Tiny>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Tiny>.
 
 =head1 SUPPORT
 

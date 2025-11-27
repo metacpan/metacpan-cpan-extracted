@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::Meta;
-$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.006';
+$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.007';
 use Moose;
 use namespace::autoclean;
 
@@ -23,7 +23,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::Meta - Add dynamic prereqs to the metadata
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -35,17 +35,21 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This plugin is adds dynamic prereqs to the metadata. Note that for most uses it's recommended to use the various plugins for your install tool, that will enable support for dynamic prereqs metadata for that tool. So far the following have been implemented.
+This plugin is adds L<dynamic prerequisites|CPAN::Requirements::Dynamic> to the metadata. Note that for most uses it's recommended to use the various plugins for your install tool, that will enable support for dynamic prereqs metadata for that tool. So far the following have been implemented.
 
 =over 4
 
-=item * L<Dist::Zilla::Plugin::ModuleBuildTiny::DynamicPrereqs>
+=item * L<Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuildTiny>
 
 This will add all the necessary prereqs to enable dynamic prerequisites in L<Module::Build::Tiny>.
 
-=item * L<Dist::Zilla::Plugin::DistBuild::DynamicPrereqs>
+=item * L<Dist::Zilla::Plugin::DynamicPrereqs::DistBuild>
 
 This will add everything needed to enable dynamic prerequisites in L<Dist::Build>.
+
+=item * L<Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuild>
+
+This will add everything needed to enable dynamic prerequisites in L<Module::Build>.
 
 =back
 
@@ -59,7 +63,7 @@ One or more conditions, as defined by L<CPAN::Requirements::Dynamic>.
 
 =head2 joiner
 
-The operator that is used when more than one condition is given. This must be either C<and> or C<or>.
+The operator that is used when more than one condition is given. This must be either C<and> (the default) or C<or>.
 
 =head2 prereqs
 

@@ -2,16 +2,26 @@
 
 use strict;
 
-use Graphics::Framebuffer;
+# use Graphics::Framebuffer;
+use Term::ANSIColor;
 use Test::More tests => 2;
 
 # For debugging only
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '2.00';
+    our $VERSION = '2.01';
 	use_ok('Graphics::Framebuffer');
 }
+
+diag("\n" . colored(['cyan on_black'], q{ _______        _   _              }));
+diag(colored(['cyan on_black'], q{|__   __|      | | (_)             }));
+diag(colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }));
+diag(colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }));
+diag(colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }));
+diag(colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }));
+diag(colored(['cyan on_black'], q{                             __/ | }));
+diag(colored(['cyan on_black'], q{                            |___/  }));
 
 our $F = Graphics::Framebuffer->new('RESET' => 0);
 $F->graphics_mode();

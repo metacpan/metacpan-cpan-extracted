@@ -6,7 +6,7 @@ BEGIN{ # before t_* libraries mess with settings
   @VARNAMES = qw/Debug MaxStringwidth Truncsuffix Trunctailwidth Objects Refaddr Foldwidth Foldwidth1 Useqq Quotekeys Sortkeys Maxdepth Maxrecurse Deparse Deepcopy/;
   () = vis(""); # set Foldwidth
   %defaults = (
-    map{ no strict 'refs'; ($_ => ${"Data::Dumper::Interp::$_"}) } @VARNAMES
+    map{ do{ no strict 'refs'; ($_ => ${"Data::Dumper::Interp::$_"}) } } @VARNAMES
   );
   #warn dvis '##INIT %defaults\n';
 }

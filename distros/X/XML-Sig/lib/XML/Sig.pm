@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -273,6 +273,7 @@ sub verify {
     my $numsigs = $signature_nodeset->size();
     print ("NodeSet Size: $numsigs\n") if $DEBUG;
 
+    die 'XML::Sig - XML does not include any signatures' if $numsigs <= 0;
     # Loop through each Signature in the document checking each
     my $i;
     while (my $signature_node = $signature_nodeset->shift()) {
@@ -442,7 +443,7 @@ sub verify {
         return 0 unless ($refdigest eq _trim(encode_base64($digest, '')));
 
         print ( "Signature $i Valid\n") if $DEBUG;
-        }
+    }
 
     return 1;
 }
@@ -1683,7 +1684,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SYNOPSIS
 

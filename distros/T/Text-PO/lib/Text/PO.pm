@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.8.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.8.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
 ## Modified 2025/10/08
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.8.0';
+    our $VERSION = 'v0.8.1';
 };
 
 use strict;
@@ -433,7 +433,7 @@ sub meta
             {
                 my $k2 = $k;
                 $k2 =~ tr/-/_/;
-                $self->{meta}->{ $k2 } = CORE::delete( $self->{meta}->{ $k } );
+                $self->{meta}->{ lc( $k2 ) } = CORE::delete( $self->{meta}->{ $k } );
             }
         }
     }
@@ -1367,7 +1367,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v0.8.0
+    v0.8.1
 
 =head1 DESCRIPTION
 

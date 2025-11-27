@@ -27,8 +27,8 @@ my $schema = {
     type => 'object',
     properties =>
     {
-        name => { '$ref' => '#$defs/Name' },              # via $anchor combined to absolute id
-        age  => { '$ref' => '#/defsAge' },                # pointer
+        name => { '$ref' => '#Name' },      # via $anchor combined to absolute id
+        age  => { '$ref' => '#/defsAge' },  # pointer
     },
     required => [ 'name', 'age' ],
     additionalProperties => JSON::false,

@@ -45,4 +45,3 @@ xt/api.t
 xt/data/firstcf
 xt/data/initialdata
 xt/initialdata.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

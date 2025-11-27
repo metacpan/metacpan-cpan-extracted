@@ -11,7 +11,7 @@ use HTTP::Request;
 use JSON;
 use Data::Dumper;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $drh;
 
 # Global hash to store HTTP clients keyed by database handle reference
@@ -703,6 +703,34 @@ sub fetchrow_array {
     my $row = $sth->fetchrow_arrayref();
     return undef unless $row;
     return @$row;
+}
+
+sub fetchall_arrayref {
+    my ($sth, $slice, $max_rows) = @_;
+    
+    my @rows;
+    
+    if (ref $slice eq 'HASH') {
+        # Return array of hash references
+        while (my $row = $sth->fetchrow_hashref()) {
+            push @rows, $row;
+            last if defined $max_rows && @rows >= $max_rows;
+        }
+    } elsif (ref $slice eq 'ARRAY') {
+        # Return array of array references with specific columns
+        while (my $row = $sth->fetchrow_arrayref()) {
+            push @rows, [@{$row}[@$slice]];
+            last if defined $max_rows && @rows >= $max_rows;
+        }
+    } else {
+        # Default: return array of array references
+        while (my $row = $sth->fetchrow_arrayref()) {
+            push @rows, [@$row];
+            last if defined $max_rows && @rows >= $max_rows;
+        }
+    }
+    
+    return \@rows;
 }
 
 sub finish {

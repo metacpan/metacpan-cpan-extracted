@@ -10,13 +10,12 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More;
-use Test::Warnings 'warnings', ':no_end_test';
-use Test::Deep;
 use lib 't/lib';
+use Helper;
 use Acceptance;
 use Path::Tiny;
 use Mojo::JSON 'decode_json';
+use Test2::Warnings qw(warnings :no_end_test had_no_warnings);
 
 my $version = 'draft2020-12';
 
@@ -45,7 +44,7 @@ my @warnings = warnings {
 
 my $test_sub = $ENV{AUTHOR_TESTING} ? sub { bag(@_) } : sub { superbagof(@_) };
 
-cmp_deeply(
+cmp_result(
   \@warnings,
   $test_sub->(
     # these are all in unknownKeyword.json

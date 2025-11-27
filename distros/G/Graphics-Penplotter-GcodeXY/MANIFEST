@@ -18,6 +18,8 @@ examples/triangles.pl
 lib/Graphics/Penplotter/GcodeXY.pm
 minil.toml
 script/gcode-simulator.pl
+script/gcodebb
+script/gcodetoeps
 script/manifest-gen.sh
 script/svgtogcode
 script/template.pl

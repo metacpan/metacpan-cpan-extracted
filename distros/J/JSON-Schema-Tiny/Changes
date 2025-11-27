@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Tiny
 
+0.031     2025-11-26 18:07:48Z
+          - update test results and exemptions for TJSA 1.034
+          - modernize usage of test libraries
+
 0.030     2025-04-22 16:44:19Z
           - skip a test of "multipleOf" that fails on ivsize < 8
 

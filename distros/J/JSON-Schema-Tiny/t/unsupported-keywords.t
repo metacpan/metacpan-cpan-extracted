@@ -10,17 +10,15 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use Test::Warnings qw(warnings had_no_warnings :no_end_test);
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
 use Helper;
+use Test2::Warnings qw(warnings had_no_warnings :no_end_test);
 
 foreach my $keyword (
   qw(unevaluatedItems unevaluatedProperties),
 ) {
-  cmp_deeply(
+  cmp_result(
     evaluate(true, { $keyword => {} }),
     {
       valid => false,
@@ -59,7 +57,7 @@ foreach my $index (0 .. $#warnings) {
   note "\n", $spec_version;
   my $js = JSON::Schema::Tiny->new(specification_version => $spec_version);
   foreach my $keyword (@$removed_keywords) {
-    cmp_deeply(
+    cmp_result(
       [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates in '.$spec_version) } ],
       [ re($strings{$keyword}), ],
       'warned for "'.$keyword.'" in '.$spec_version,
@@ -70,7 +68,7 @@ foreach my $index (0 .. $#warnings) {
   my ($next_spec_version, $removed_next_keywords) = $warnings[$index+1]->@*;
   foreach my $keyword (@$removed_next_keywords) {
     next if grep $keyword eq $_, @$removed_keywords;
-    cmp_deeply(
+    cmp_result(
       [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates') } ],
       [],
       'did not warn for "'.$keyword.'" in '.$spec_version,

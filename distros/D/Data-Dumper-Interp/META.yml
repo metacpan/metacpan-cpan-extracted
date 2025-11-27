@@ -46,7 +46,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -55,7 +55,7 @@ name: Data-Dumper-Interp
 provides:
   Data::Dumper::Interp:
     file: lib/Data/Dumper/Interp.pm
-    version: '7.020'
+    version: '7.021'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/jimav/Data-Dumper-Interp/issues
   homepage: https://github.com/jimav/Data-Dumper-Interp
   repository: https://github.com/jimav/Data-Dumper-Interp.git
-version: '7.020'
-x_generated_by_perl: v5.38.2
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '7.021'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: CC0-1.0

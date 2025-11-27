@@ -1,5 +1,12 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+2.02 2025-11-26
+ - Remove obsolete test file from Makefile
+ - Add export $RTHOME in install doc
+ - Perl 5.26 and newer remove '.' from @inc by default. Re-add to Makefile.PL to enable installation on newer Perl releases. Thanks to PinkFreud
+ - Upgrade Module::Install:RTx for RT 6
+ - Redirect to AJAX Helper from SelfService instead of duplicating code
+
 2.01 2025-11-26
  - Update test for RT 6 Attributes
  - Make it works for SelfService tickets

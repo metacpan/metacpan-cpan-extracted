@@ -10,15 +10,12 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
 use Helper;
 
 subtest 'multiple types' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(true, { type => ['string','number'] }),
     {
       valid => false,
@@ -35,7 +32,7 @@ subtest 'multiple types' => sub {
 };
 
 subtest 'multipleOf' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(3, { multipleOf => 2 }),
     {
       valid => false,
@@ -52,7 +49,7 @@ subtest 'multipleOf' => sub {
 };
 
 subtest 'uniqueItems' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate([qw(a b c d c)], { uniqueItems => true }),
     {
       valid => false,
@@ -69,7 +66,7 @@ subtest 'uniqueItems' => sub {
 };
 
 subtest 'allOf, not, and false schema' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       my $data = 1,
       my $schema = { allOf => [ true, false, { not => { not => false } } ] },
@@ -98,7 +95,7 @@ subtest 'allOf, not, and false schema' => sub {
   );
 
   local $JSON::Schema::Tiny::SHORT_CIRCUIT = 1;
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     {
       valid => false,
@@ -120,7 +117,7 @@ subtest 'allOf, not, and false schema' => sub {
 };
 
 subtest 'anyOf keeps all errors for false paths when invalid, discards errors for false paths when valid' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       my $data = 1,
       my $schema = { anyOf => [ false, false ] },
@@ -148,7 +145,7 @@ subtest 'anyOf keeps all errors for false paths when invalid, discards errors fo
     'correct errors with locations; did not collect errors inside "not"',
   );
 
-  cmp_deeply(
+  cmp_result(
     do {
       local $JSON::Schema::Tiny::SHORT_CIRCUIT = 1;
       evaluate($data, $schema)
@@ -157,7 +154,7 @@ subtest 'anyOf keeps all errors for false paths when invalid, discards errors fo
     'short-circuited results contain the same errors (short-circuiting not possible)',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(1, { anyOf => [ false, true ], not => true }),
     {
       valid => false,
@@ -172,7 +169,7 @@ subtest 'anyOf keeps all errors for false paths when invalid, discards errors fo
     'did not collect errors from failure paths from successful anyOf',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(1, { anyOf => [ false, true ] }),
     { valid => true },
     'no errors collected for true validation',
@@ -227,7 +224,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
 #   /items FAILS (across all instances)
 # entire schema FAILS
 
-  cmp_deeply(
+  cmp_result(
     $result,
     {
       valid => false,
@@ -284,7 +281,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
   );
 
   local $JSON::Schema::Tiny::SHORT_CIRCUIT = 1;
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     {
       valid => false,
@@ -355,7 +352,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
 #   /contains has at least 1 match; it PASSES
 # entire schema FAILS
 
-  cmp_deeply(
+  cmp_result(
     $result,
     {
       valid => false,
@@ -381,7 +378,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
     'collected all errors from subschemas for failing branches only (passing branches discard errors)',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     {
       valid => false,
@@ -428,7 +425,7 @@ subtest 'errors with $refs' => sub {
   # /items/properties/x/$ref (mydef) /minimum
   # /items/properties/x/maximum
 
-  cmp_deeply(
+  cmp_result(
     $result,
     {
       valid => false,
@@ -501,7 +498,7 @@ subtest 'errors with $refs' => sub {
 };
 
 subtest 'const and enum' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { foo => { a => { b => { c => { d => 1 } } } } },
       {
@@ -545,7 +542,7 @@ subtest 'const and enum' => sub {
 };
 
 subtest 'exceptions' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { x => 'hello' },
       {
@@ -568,7 +565,7 @@ subtest 'exceptions' => sub {
     'a subschema of an invalid type returns an error at the right position, and evaluation aborts',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -593,7 +590,7 @@ subtest 'exceptions' => sub {
 };
 
 subtest 'unresolvable $ref to a local resource' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -622,7 +619,7 @@ subtest 'unresolvable $ref to a local resource' => sub {
 };
 
 subtest 'abort due to a schema error' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -648,7 +645,7 @@ subtest 'abort due to a schema error' => sub {
 };
 
 subtest 'sorted property names' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { foo => 1, bar => 1, baz => 1, hello => 1 },
       {
@@ -699,7 +696,7 @@ subtest 'sorted property names' => sub {
 };
 
 subtest 'bad regex in schema' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       {
         my_pattern => 'foo',
@@ -736,7 +733,7 @@ subtest 'bad regex in schema' => sub {
     'bad "pattern" regex is properly noted in error',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       {
         my_patternProperties => { foo => 1 },
@@ -757,7 +754,7 @@ subtest 'bad regex in schema' => sub {
     'bad "patternProperties" regex is properly noted in error',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { my_runtime_pattern => 'foo' },
       $schema,
@@ -780,7 +777,7 @@ subtest 'bad regex in schema' => sub {
   no warnings 'once';
   *IsFoo = sub { "0066\n006F\n" }; # accepts 'f', 'o'
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { my_runtime_pattern => 'foo' },
       $schema,
@@ -793,7 +790,7 @@ subtest 'bad regex in schema' => sub {
 };
 
 subtest 'JSON pointer escaping' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       my $schema = {
@@ -873,7 +870,7 @@ subtest 'JSON pointer escaping' => sub {
     'JSON pointers are properly escaped; URIs doubly so',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       $schema->{'$defs'}{mydef},
@@ -891,7 +888,7 @@ subtest 'JSON pointer escaping' => sub {
     'absoluteKeywordLocation is omitted when paths are the same, not counting uri encoding',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { '{}' => { 'my~tilde/slash-property' => 1 } },
       {
@@ -926,7 +923,7 @@ subtest 'JSON pointer escaping' => sub {
 };
 
 subtest 'invalid $schema' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -951,7 +948,7 @@ subtest 'invalid $schema' => sub {
 };
 
 subtest 'absoluteKeywordLocation' => sub {
-  cmp_deeply(
+  cmp_result(
     do {
       local $JSON::Schema::Tiny::MAX_TRAVERSAL_DEPTH = 1;
       evaluate(
@@ -973,7 +970,7 @@ subtest 'absoluteKeywordLocation' => sub {
     'absoluteKeywordLocation is included when different from instanceLocation, even when empty',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(1, { '$ref' => '#/does_not_exist' }),
     {
       valid => false,
@@ -988,7 +985,7 @@ subtest 'absoluteKeywordLocation' => sub {
     'absoluteKeywordLocation is not included when the path equals keywordLocation, even if a $ref is present',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       my $schema = {
@@ -1051,7 +1048,7 @@ subtest 'absoluteKeywordLocation' => sub {
 
   $schema->{'$id'} = '#my_anchor';
   $schema->{allOf}[2]{'$id'} = '#my_anchor2';
-  cmp_deeply(
+  cmp_result(
     JSON::Schema::Tiny->new(specification_version => 'draft7')->evaluate(1, $schema),
     {
       valid => false,
@@ -1091,7 +1088,7 @@ subtest 'absoluteKeywordLocation' => sub {
 };
 
 subtest dependentRequired => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(1, { dependentRequired => { foo => [ 1 ] } }),
     {
       valid => false,
@@ -1108,7 +1105,7 @@ subtest dependentRequired => sub {
 };
 
 subtest 'numbers in output' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       5,
       {
@@ -1149,7 +1146,7 @@ subtest 'numbers in output' => sub {
         },
       ],
     },
-    error => 'numbers in errors do not lose any digits of precision',
+    'numbers in errors do not lose any digits of precision',
   );
 };
 

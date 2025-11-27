@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-fs/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-fs/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Fs.svg)](https://metacpan.org/release/Aion-Fs) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-fs/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Fs+0.2.0)
+[![Actions Status](https://github.com/darviarush/perl-aion-fs/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-fs/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Fs.svg)](https://metacpan.org/release/Aion-Fs) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-fs/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Fs+0.2.2)
 # NAME
 
 Aion::Fs - утилиты для файловой системы: чтение, запись, поиск, замена файлов и т.д.
 
 # VERSION
 
-0.2.0
+0.2.2
 
 # SYNOPSIS
 
@@ -758,6 +758,28 @@ from_pkg "Aion::Fs"  # => Aion/Fs.pm
 ```perl
 to_pkg "Aion/Fs.pm"  # => Aion::Fs
 [map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]
+```
+
+## from_inc (;$pkg)
+
+Переводит пакет в путь ФС в `@INC`. Файл с пакетом должен существовать в одном из путей `@INC`. Без параметра использует `$_`.
+
+```perl
+from_inc "Aion::Fs" # -> $INC{'Aion/Fs.pm'}
+[map from_inc, "A::B::C", "Aion::Fs"]  # --> [$INC{'Aion/Fs.pm'}]
+
+from_inc "A::B::C" # -> undef
+```
+
+## to_inc (;$path)
+
+Переводит путь из ФС в `@INC` в пакет. Без параметра использует `$_`.
+
+```perl
+to_inc $INC{'Aion/Fs.pm'} # => Aion::Fs
+[map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]  # --> ["Aion::Fs"]
+
+to_inc 'Aion/Fs.pm' # -> undef
 ```
 
 # AUTHOR

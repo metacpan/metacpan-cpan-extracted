@@ -5,7 +5,7 @@
       "Cucumber Ltd"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -38,31 +38,31 @@
    "provides" : {
       "Cucumber::TagExpressions" : {
          "file" : "lib/Cucumber/TagExpressions.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       },
       "Cucumber::TagExpressions::AndNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       },
       "Cucumber::TagExpressions::ExpressionNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       },
       "Cucumber::TagExpressions::LiteralNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       },
       "Cucumber::TagExpressions::Node" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       },
       "Cucumber::TagExpressions::NotNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       },
       "Cucumber::TagExpressions::OrNode" : {
          "file" : "lib/Cucumber/TagExpressions/Node.pm",
-         "version" : "v8.0.0"
+         "version" : "v8.1.0"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/cucumber/tag-expressions"
       }
    },
-   "version" : "8.0.0",
+   "version" : "8.1.0",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "MIT"

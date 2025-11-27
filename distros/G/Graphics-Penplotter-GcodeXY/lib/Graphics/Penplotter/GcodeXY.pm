@@ -1,21 +1,21 @@
-package Graphics::Penplotter::GcodeXY v0.5.17;
+package Graphics::Penplotter::GcodeXY v0.5.22;
 
 use v5.38.2;  # required by List::Util and Term::ANSIcolor (perl testers matrix)
 use strict;
 use warnings;
 use vars qw($VERSION @ISA @EXPORT);
 use Exporter;
-use Math::Trig qw/deg2rad tan acos/;
-use Math::Bezier;
-use POSIX qw/ceil/;
-use Image::SVG::Transform;
-use Image::SVG::Path 'extract_path_info';
-use Font::FreeType;
-use List::Util qw(min max);
-use Readonly;
-use Carp;
-use Term::ANSIColor qw/:constants/;
-use File::Temp qw/ tempfile /;
+use Math::Trig qw( acos tan );
+use Math::Bezier ();
+use POSIX qw( ceil );
+use Image::SVG::Transform ();
+use Image::SVG::Path qw( extract_path_info );
+use Font::FreeType qw( FT_LOAD_NO_HINTING );
+use List::Util qw( max );
+use Readonly qw( Readonly );
+use Carp qw( croak );
+use Term::ANSIColor qw( RED RESET YELLOW );
+use File::Temp qw( tempfile );
 use parent qw(Exporter);
 
 our @EXPORT_OK = qw(translate translateC stroketextfill stroketext strokefill stroke split
@@ -206,7 +206,7 @@ sub init {
 
     # Paper size
     if ( defined $self->{papersize} ) {
-        $self->{papersize} = ucfirst lc $self->{papersize};
+        $self->{papersize} = uc $self->{papersize};
     }
     # warn and/or check
     if ( defined $self->{papersize} && defined $pspaper{ $self->{papersize} } )
@@ -230,7 +230,7 @@ sub init {
     $self->{currentpage} = [];    # list of generated gcode statements
     $self->{psegments}   = [];    # path segments (needing stroking)
     $self->{hsegments}   = [];    # list of segments needing hatching
-    $self->{csegments}   = [];    # list of clipping segments
+    #$self->{csegments}   = [];    # list of clipping segments
     $self->{gstate}      = [];    # graphics state
     $self->{CTM} = [ [ 1, 0, 0 ], [ 0, 1, 0 ], [ 0, 0, 1 ] ]; # current transformation matrix
     # add header to page
@@ -2616,7 +2616,7 @@ sub _svgconvert {
 # import the svg
 sub importsvg {
     my ( $self, $file ) = @_;
-    use XML::Parser;
+    use XML::Parser ();
     my $p = XML::Parser->new(
         Handlers => {
             Start => sub { $self->_starttag(@_) },
@@ -3154,7 +3154,7 @@ sub exporteps {
     my $miny  = 100.0;
     my $linecount = 0;
     my ( $x, $y, $line );
-    $self->_flushPsegments();
+    $self->stroke();
     my $limit     = scalar @{ $self->{currentpage} };
     open( my $out, '>', $gcout ) or croak "cannot open output file $gcout";
     # process the header
@@ -3167,56 +3167,56 @@ sub exporteps {
     }
     # start the output
     # should really add a trailer here, but that's not ideal
-    print {$out} "%!PS-Adobe-3.0 EPSF-3.0$EOL";
-    print {$out} "%%BoundingBox: (atend)$EOL";
+    print {$out} "%!PS-Adobe-3.0 EPSF-3.0 $EOL";
+    print {$out} "%%BoundingBox: (atend) $EOL";
     if ($self->{papersize} eq "4A0") {
         print {$out} "%%Orientation: Portrait$EOL";
-        print {$out} "%%DocumentMedia: 4a0 4768 6741 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
+        print {$out} "%%DocumentMedia: 4a0 4768 6741 80 () () $EOL";
+        print {$out} "%%BeginSetup $EOL";
         print {$out} "<< /PageSize [4768 6741] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     elsif ($self->{papersize} eq "2A0") {
-        print {$out} "%%Orientation: Portrait$EOL";
+        print {$out} "%%Orientation: Portrait $EOL";
         print {$out} "%%DocumentMedia: 2a0 3370  4768 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
+        print {$out} "%%BeginSetup $EOL";
         print {$out} "<< /PageSize [3370 4768] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     elsif ($self->{papersize} eq "A0") {
-        print {$out} "%%Orientation: Portrait$EOL";
-        print {$out} "%%DocumentMedia: a0 2384 3370 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
-        print {$out} "<< /PageSize [2384 3370] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%Orientation: Portrait $EOL";
+        print {$out} "%%DocumentMedia: a0 2384 3370 80 () () $EOL";
+        print {$out} "%%BeginSetup $EOL";
+        print {$out} "<< /PageSize [2384 3370] /Orientation 0 >> setpagedevice $EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     elsif ($self->{papersize} eq "A1") {
-        print {$out} "%%Orientation: Portrait$EOL";
-        print {$out} "%%DocumentMedia: a1 1684 2384 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
-        print {$out} "<< /PageSize [1684 2384] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%Orientation: Portrait $EOL";
+        print {$out} "%%DocumentMedia: a1 1684 2384 80 () () $EOL";
+        print {$out} "%%BeginSetup $EOL";
+        print {$out} "<< /PageSize [1684 2384] /Orientation 0 >> setpagedevice $EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     elsif ($self->{papersize} eq "A2") {
-        print {$out} "%%Orientation: Portrait$EOL";
-        print {$out} "%%DocumentMedia: a2 1191 1684 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
-        print {$out} "<< /PageSize [1191 1684] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%Orientation: Portrait $EOL";
+        print {$out} "%%DocumentMedia: a2 1191 1684 80 () () $EOL";
+        print {$out} "%%BeginSetup $EOL";
+        print {$out} "<< /PageSize [1191 1684] /Orientation 0 >> setpagedevice $EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     elsif ($self->{papersize} eq "A3") {
-        print {$out} "%%Orientation: Portrait$EOL";
-        print {$out} "%%DocumentMedia: a3 842 1191 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
-        print {$out} "<< /PageSize [842 1191] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%Orientation: Portrait $EOL";
+        print {$out} "%%DocumentMedia: a3 842 1191 80 () () $EOL";
+        print {$out} "%%BeginSetup $EOL";
+        print {$out} "<< /PageSize [842 1191] /Orientation 0 >> setpagedevice $EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     elsif ($self->{papersize} eq "A4") {
-        print {$out} "%%Orientation: Portrait$EOL";
-        print {$out} "%%DocumentMedia: a4 595 842 80 () ()$EOL";
-        print {$out} "%%BeginSetup$EOL";
-        print {$out} "<< /PageSize [595 842] /Orientation 0 >> setpagedevice$EOL";
-        print {$out} "%%EndSetup$EOL";
+        print {$out} "%%Orientation: Portrait $EOL";
+        print {$out} "%%DocumentMedia: a4 595 842 80 () () $EOL";
+        print {$out} "%%BeginSetup $EOL";
+        print {$out} "<< /PageSize [595 842] /Orientation 0 >> setpagedevice $EOL";
+        print {$out} "%%EndSetup $EOL";
     }
     while ( $linecount < $limit ) {
         $linecount++;
@@ -4119,6 +4119,7 @@ sub split {
         $self->_croak("split: paper sizes are the same. Finished.");
         return 1;
     }
+    $self->stroke();  # flush the queue
     $self->_corners( $dest );
     # loop through the subpages and use Liang-Barsky to assign (partial) segments
     # we distinguish between the actual pen (which is kept over the sheet)

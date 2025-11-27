@@ -10,10 +10,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Fatal;
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
 use Helper;
@@ -32,10 +28,10 @@ BOOLEAN_TESTS:
 note '$SCALARREF_BOOLEANS = '.(0+!!$JSON::Schema::Tiny::SCALARREF_BOOLEANS);
 foreach my $test (@tests) {
   my $data = 'hello';
-  is(
-    exception {
+  ok(
+    lives {
       my $result = evaluate($data, $test->{schema});
-      cmp_deeply(
+      cmp_result(
         $result,
         {
           valid => $test->{valid},
@@ -48,7 +44,6 @@ foreach my $test (@tests) {
       my $bool_result = evaluate($data, $test->{schema});
       ok(!($bool_result xor $test->{valid}), json_sprintf('schema: %s evaluates to: %s', $test->{schema}, $test->{valid}));
     },
-    undef,
     'no exceptions in evaluate',
   );
 }
@@ -59,7 +54,7 @@ if (not $JSON::Schema::Tiny::SCALARREF_BOOLEANS) {
   goto BOOLEAN_TESTS;
 }
 
-cmp_deeply(
+cmp_result(
   evaluate('hello', []),
   {
     valid => false,
@@ -74,7 +69,7 @@ cmp_deeply(
   'invalid schema type results in error',
 );
 
-cmp_deeply(
+cmp_result(
   evaluate('hello', \0),
   {
     valid => false,

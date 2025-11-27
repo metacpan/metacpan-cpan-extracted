@@ -10,25 +10,22 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use Test::Warnings qw(warnings :no_end_test had_no_warnings);
-use Test::Fatal;
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
 use Helper;
+use Test2::Warnings qw(warnings :no_end_test had_no_warnings);
 
 {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'ohhai';
-  like(
-    exception { ()= evaluate(true, true) },
+  like (
+    dies { ()= evaluate(true, true) },
     qr/^\$SPECIFICATION_VERSION value is invalid/,
     'unrecognized $SPECIFICATION_VERSION',
   );
 }
 
-+subtest '$schema' => sub {
-  cmp_deeply(
+subtest '$schema' => sub {
+  cmp_result(
     evaluate(
       true,
       { '$schema' => 'http://wrong/url' },
@@ -47,7 +44,7 @@ use Helper;
   );
 
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft2020-12';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       true,
       {
@@ -95,7 +92,7 @@ subtest 'specification aliases' => sub {
 };
 
 subtest '$ref and older specification versions' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       true,
       {
@@ -119,7 +116,7 @@ subtest '$ref and older specification versions' => sub {
 
 subtest '<= draft7: $ref in combination with any other keyword causes the other keywords to be ignored' => sub {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft7';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -140,9 +137,9 @@ subtest '<= draft7: $ref in combination with any other keyword causes the other 
 };
 
 subtest '$ref adjacent to a path used in a $ref' => sub {
+  todo 'fixing this requires traversing the schema to mark which locations are unusable' => sub {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft7';
-  local $TODO = 'fixing this requires traversing the schema to mark which locations are unusable';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       true,
       {
@@ -171,11 +168,11 @@ subtest '$ref adjacent to a path used in a $ref' => sub {
     },
     'the presence of $ref also kills the use of other $refs to adjacent locations',
   );
-};
+}};
 
 subtest '$defs support' => sub {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft7';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       my $schema = {
@@ -197,7 +194,7 @@ subtest '$defs support' => sub {
   );
 
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft2019-09';
-  cmp_deeply(
+  cmp_result(
     evaluate(1, $schema),
     {
       valid => false,
@@ -215,7 +212,7 @@ subtest '$defs support' => sub {
 
 subtest 'definitions support' => sub {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft2019-09';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       my $schema = {
@@ -237,7 +234,7 @@ subtest 'definitions support' => sub {
   );
 
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft7';
-  cmp_deeply(
+  cmp_result(
     evaluate(1, $schema),
     {
       valid => false,
@@ -257,7 +254,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft2019-09';
   my $dependencies_schema;
   my @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       evaluate(
         { alpha => 1, beta => 2 },
         $dependencies_schema = {
@@ -271,13 +268,13 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
       'dependencies is not recognized in >= draft2019-09',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "dependencies" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { alpha => 1, beta => 2 },
       my $dependentRequired_schema = {
@@ -304,7 +301,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
     'dependentRequired is supported in >= draft2019-09',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { alpha => 1, beta => 2 },
       my $dependentSchemas_schema = {
@@ -332,7 +329,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
   );
 
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft7';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { alpha => 1, beta => 2 },
       $dependencies_schema,
@@ -360,7 +357,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
     'dependencies is supported in <= draft7',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { alpha => 1, beta => 2 },
       $dependentRequired_schema,
@@ -369,7 +366,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
     'dependentRequired is not recognized in <= draft7',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { alpha => 1, beta => 2 },
       $dependentSchemas_schema,
@@ -381,7 +378,7 @@ subtest 'dependencies, dependentRequired, dependentSchemas' => sub {
 
 subtest 'prefixItems, items and additionalItems' => sub {
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft2020-12';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1, 2 ],
       {
@@ -417,7 +414,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'prefixItems+items works when $SPECIFICATION_VERSION is set to draft2020-12',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1 ],
       {
@@ -438,7 +435,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
   );
 
   my @warnings = warnings {
-    cmp_deeply(
+    cmp_result(
       evaluate(
         [ 1 ],
         { additionalItems => false },
@@ -447,14 +444,14 @@ subtest 'prefixItems, items and additionalItems' => sub {
       'additionalItems not recognized when $SPECIFICATION_VERSION specifies draft2020-12',
     );
   };
-  cmp_deeply(
+  cmp_result(
     \@warnings,
     [ re(qr/^no-longer-supported "additionalItems" keyword present/) ],
     'warned when using no-longer-supported keyword',
   );
 
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION = 'draft2019-09';
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1 ],
       { prefixItems => [ { maximum => 0 } ] }
@@ -464,7 +461,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
   );
 
   local $JSON::Schema::Tiny::SPECIFICATION_VERSION;
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1, 2, 3 ],
       {
@@ -490,7 +487,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'prefixItems + array-based items',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1, 2, 3 ],
       {
@@ -531,7 +528,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'prefixItems + additionalItems',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1, 2, 3 ],
       {
@@ -572,7 +569,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'prefixItems + schema-based items',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1, 2, 3 ],
       {
@@ -598,7 +595,7 @@ subtest 'prefixItems, items and additionalItems' => sub {
     'schema-based items + additionalItems, failure case',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 1, 2, 3 ],
       {
@@ -615,7 +612,7 @@ subtest '$id' => sub {
   my $schema = { '$id' => '#/foo/bar/baz' };
   foreach my $version (qw(draft2020-12 draft2019-09 draft7)) {
     local $JSON::Schema::Tiny::SPECIFICATION_VERSION = $version;
-    cmp_deeply(
+    cmp_result(
       evaluate(1, $schema),
       {
         valid => false,

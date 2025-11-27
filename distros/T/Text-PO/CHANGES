@@ -1,5 +1,9 @@
 Revision history for Perl module Text::PO
 
+v0.8.1 2025-11-27T11:01:10+0900
+    - Correcting msgctxt format in Text::PO::Element
+    - Correcting setLocale in the companion JavaScript library gettext.js
+
 v0.8.0 2025-10-08T09:00:25+0900
     - Improved the documentation for Text::PO and Text::PO::Element
 

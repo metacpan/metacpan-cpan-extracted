@@ -430,6 +430,12 @@ msgstr "Transfers the packet to the FS path. Without a parameter, uses `$_`."
 msgid "Переводит путь из ФС в пакет. Без параметра использует `$_`."
 msgstr "Translates the path from the FS to the package. Without a parameter, uses `$_`."
 
+msgid "Переводит пакет в путь ФС в `@INC`. Файл с пакетом должен существовать в одном из путей `@INC`. Без параметра использует `$_`."
+msgstr "Translates the packet to the FS path in `@INC`. The package file must exist in one of the `@INC` paths. Without a parameter, uses `$_`."
+
+msgid "Переводит путь из ФС в `@INC` в пакет. Без параметра использует `$_`."
+msgstr "Translates the path from FS to `@INC` into a package. Without a parameter, uses `$_`."
+
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 

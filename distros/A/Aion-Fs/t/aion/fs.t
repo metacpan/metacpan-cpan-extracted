@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 0.1.2
+# 0.2.1
 # 
 # # SYNOPSIS
 # 
@@ -758,6 +758,28 @@ goto_editor "mypath", 10;
 ::done_testing; }; subtest 'to_pkg (;$path)' => sub { 
 ::is scalar do {to_pkg "Aion/Fs.pm"}, "Aion::Fs", 'to_pkg "Aion/Fs.pm"  # => Aion::Fs';
 ::is_deeply scalar do {[map to_pkg, "Aion/Fs.md", "A/B/C.md"]}, scalar do {["Aion::Fs", "A::B::C"]}, '[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]';
+
+# 
+# ## from_inc (;$pkg)
+# 
+# Переводит пакет в путь ФС в `@INC`. Файл с пакетом должен существовать в одном из путей `@INC`. Без параметра использует `$_`.
+# 
+::done_testing; }; subtest 'from_inc (;$pkg)' => sub { 
+::is scalar do {from_inc "Aion::Fs"}, scalar do{$INC{'Aion/Fs.pm'}}, 'from_inc "Aion::Fs" # -> $INC{\'Aion/Fs.pm\'}';
+::is_deeply scalar do {[map from_inc, "A::B::C", "Aion::Fs"]}, scalar do {[$INC{'Aion/Fs.pm'}]}, '[map from_inc, "A::B::C", "Aion::Fs"]  # --> [$INC{\'Aion/Fs.pm\'}]';
+
+::is scalar do {from_inc "A::B::C"}, scalar do{undef}, 'from_inc "A::B::C" # -> undef';
+
+# 
+# ## to_inc (;$path)
+# 
+# Переводит путь из ФС в `@INC` в пакет. Без параметра использует `$_`.
+# 
+::done_testing; }; subtest 'to_inc (;$path)' => sub { 
+::is scalar do {to_inc $INC{'Aion/Fs.pm'}}, "Aion::Fs", 'to_inc $INC{\'Aion/Fs.pm\'} # => Aion::Fs';
+::is_deeply scalar do {[map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]}, scalar do {["Aion::Fs"]}, '[map to_inc,"A/B/C.pm", $INC{\'Aion/Fs.pm\'}]  # --> ["Aion::Fs"]';
+
+::is scalar do {to_inc 'Aion/Fs.pm'}, scalar do{undef}, 'to_inc \'Aion/Fs.pm\' # -> undef';
 
 # 
 # # AUTHOR

@@ -139,7 +139,7 @@ sub dngettext
                 $index = 0;
             }
             # return( join( '', @{$dict->{msgstr}->[ $index ]} ) || $default );
-            my $locale_str = join( '', @{$dict->{msgstr}->[ $index ]} );
+            my $locale_str = ref( $dict->{msgstr}->[ $index ] ) eq 'ARRAY' ? join( '', @{$dict->{msgstr}->[ $index ]} ) : $dict->{msgstr}->[ $index ];
             return( Text::PO::String->new( $locale_str => $opts->{locale} ) ) if( length( "$locale_str" ) );
             return( Text::PO::String->new( $default ) );
         }

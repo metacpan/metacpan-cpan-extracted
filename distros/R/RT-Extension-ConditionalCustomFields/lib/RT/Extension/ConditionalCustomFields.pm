@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 =encoding utf8
 
@@ -74,6 +74,10 @@ Works with RT 6 (use v1.x versions of this module for previous version of RT)
 =head1 INSTALLATION
 
 =over
+
+=item export C<$RTHOME=/home/of/your/RT/installation/lib>
+
+This is needed if your C<RT> installation directory is not C</opt/rt6/>, as documented in L<https://docs.bestpractical.com/rt/6.0.2/extensions.html>.
 
 =item C<perl Makefile.PL>
 

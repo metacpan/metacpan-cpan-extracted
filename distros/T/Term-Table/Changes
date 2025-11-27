@@ -1,6 +1,10 @@
-0.027     2025-11-14 10:04:51-08:00 America/Los_Angeles
+0.028     2025-11-26 14:25:55-08:00 America/Los_Angeles
 
-    - No changes from trial
+    - Replace '//' with '||' for 5.8 support
+
+0.027     2025-11-12 20:02:15-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - No Changes from trial
 
 0.026     2025-11-12 20:02:15-08:00 America/Los_Angeles (TRIAL RELEASE)
 

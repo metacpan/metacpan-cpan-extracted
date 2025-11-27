@@ -2,7 +2,7 @@ package Crypt::NaCl::Tweet;
 use strict;
 use warnings;
 BEGIN {
-  our $VERSION = '0.03';
+  our $VERSION = '0.04';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -70,6 +70,7 @@ our %EXPORT_TAGS = (
     onetimeauth_KEYBYTES
     onetimeauth_PRIMITIVE
     onetimeauth
+    onetimeauth_keygen
     onetimeauth_verify
   ]],
   random => [qw[ random_bytes ]],
@@ -103,6 +104,7 @@ our %EXPORT_TAGS = (
     stream_NONCEBYTES
     stream_PRIMITIVE
     stream
+    stream_keygen
     stream_xor
   ]],
   verify => [qw[
@@ -156,6 +158,10 @@ sub box_keypair {
   my $pk = scalarmult_base($sk);
   return ($pk, $sk);
 }
+
+sub onetimeauth_keygen { random_bytes(onetimeauth_KEYBYTES) }
+
+sub stream_keygen { random_bytes(stream_KEYBYTES) }
 
 1;
 
@@ -271,6 +277,10 @@ primitives.
 =item onetimeauth
 
   my $authenticator = onetimeauth($msg, $key);
+
+=item onetimeauth_keygen
+
+  my $auth_key = onetimeauth_keygen();
 
 =item onetimeauth_verify
 
@@ -399,6 +409,10 @@ returns undef if signature is not valid.
 =item stream
 
   my $stream_bytes = stream($nbytes, $nonce, $key);
+
+=item stream_keygen
+
+  my $stream_key = stream_keygen();
 
 =item stream_xor
 

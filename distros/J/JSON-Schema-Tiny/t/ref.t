@@ -10,23 +10,19 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Fatal;
-use Test::Deep;
 use Storable 'dclone';
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
 use Helper;
 
 subtest 'local JSON pointer' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(true, { '$defs' => { true => true }, '$ref' => '#/$defs/true' }),
     { valid => true },
     'can follow local $ref to a true schema',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(true, { '$defs' => { false => false }, '$ref' => '#/$defs/false' }),
     {
       valid => false,
@@ -42,8 +38,8 @@ subtest 'local JSON pointer' => sub {
     'can follow local $ref to a false schema',
   );
 
-  is(
-    exception {
+  ok(
+    lives {
       my $result = evaluate(true, { '$ref' => '#/$defs/nowhere' });
       like(
         $result->{errors}[0]{error},
@@ -51,13 +47,12 @@ subtest 'local JSON pointer' => sub {
         'got error for unresolvable ref',
       );
     },
-    undef,
     'no exception',
   );
 };
 
 subtest 'fragment with URI-escaped and JSON Pointer-escaped characters' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -71,12 +66,13 @@ subtest 'fragment with URI-escaped and JSON Pointer-escaped characters' => sub {
 };
 
 subtest 'local anchor' => sub {
-  local $TODO = '$anchor is not yet supported';
-  fail;
+  todo '$anchor is not yet supported' => sub {
+    fail;
+  };
 };
 
 subtest '$ref using the local $id' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -89,7 +85,7 @@ subtest '$ref using the local $id' => sub {
     'can follow $ref using a base URI that matches our document',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ 'foo', [ 'bar' ] ],
       {

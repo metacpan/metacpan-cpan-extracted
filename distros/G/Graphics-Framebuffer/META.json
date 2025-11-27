@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "List::Util" : "1.20",
+            "Term::ANSIColor" : "0",
             "Test::More" : "1.00"
          }
       },
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "6.75",
+   "version" : "6.77",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

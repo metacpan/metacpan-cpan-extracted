@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuild;
-$Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuild::VERSION = '0.006';
+$Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuild::VERSION = '0.007';
 use 5.020;
 use Moose;
 
@@ -122,7 +122,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::ModuleBuild - Add dynamic prereqs to the me
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -145,7 +145,7 @@ One or more conditions, as defined by L<CPAN::Requirements::Dynamic>.
 
 =head2 joiner
 
-The operator that is used when more than one condition is given. This must be either C<and> or C<or>.
+The operator that is used when more than one condition is given. This must be either C<and> (the default) or C<or>.
 
 =head2 prereqs
 

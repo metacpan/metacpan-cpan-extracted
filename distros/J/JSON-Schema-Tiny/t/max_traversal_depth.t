@@ -10,9 +10,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 
 use lib 't/lib';
@@ -26,7 +23,7 @@ for my $obj (0,1) {
     JSON::Schema::Tiny->new(max_traversal_depth => 6)->evaluate(@_)
   } if $obj;
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [ [ [ [ [ 1 ] ] ] ] ],
       {
@@ -47,7 +44,7 @@ for my $obj (0,1) {
     'evaluation is halted when traversal gets too deep',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       1,
       {
@@ -76,7 +73,7 @@ for my $obj (0,1) {
     'evaluation is halted when an instance location is evaluated against the same schema location a second time',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { foo => 1 },
       {

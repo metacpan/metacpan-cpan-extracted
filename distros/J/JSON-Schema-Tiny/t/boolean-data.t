@@ -10,10 +10,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Fatal;
-use Test::Deep;
 use Data::Dumper;
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
@@ -24,7 +20,7 @@ sub serialize { Data::Dumper->new([ $_[0] ])->Indent(0)->Terse(1)->Sortkeys(1)->
 my ($test_schema, $failure_result);
 
 subtest 'strict booleans (default)' => sub {
-  cmp_deeply(
+  cmp_result(
     evaluate($_, { type => 'boolean' }),
     { valid => true },
     'in data, '.serialize($_).' is a boolean',
@@ -34,7 +30,7 @@ subtest 'strict booleans (default)' => sub {
     true,
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate($_->[1], { type => 'boolean' }),
     {
       valid => false,
@@ -60,7 +56,7 @@ subtest 'strict booleans (default)' => sub {
     [ 'reference to SCALAR' => \1 ],
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       $_->[1],
       $test_schema = {
@@ -126,7 +122,7 @@ subtest 'strict booleans (default)' => sub {
 
 subtest '$SCALARREF_BOOLEANS = 1' => sub {
   local $JSON::Schema::Tiny::SCALARREF_BOOLEANS = 1;
-  cmp_deeply(
+  cmp_result(
     evaluate($_, $test_schema),
     { valid => true },
     'in data, '.serialize($_).' is a boolean',
@@ -138,7 +134,7 @@ subtest '$SCALARREF_BOOLEANS = 1' => sub {
     \1,
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate($_->[1], $test_schema),
     {
       valid => false,
@@ -164,7 +160,7 @@ subtest '$SCALARREF_BOOLEANS = 1' => sub {
     [ string => 'true' ],
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       [
         undef,
@@ -183,7 +179,7 @@ subtest '$SCALARREF_BOOLEANS = 1' => sub {
     'items are all considered unique when types differ, even when perl treats them similarly',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate($_, { uniqueItems => true }),
     {
       valid => false,

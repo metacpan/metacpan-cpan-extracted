@@ -6,14 +6,14 @@ build_requires:
   CPAN::Meta::Check: '0.011'
   CPAN::Meta::Requirements: '0'
   Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Math::BigInt: '1.999701'
-  Module::Metadata: '0'
   Term::ANSIColor: '0'
   Test2::API: '0'
   Test2::Tools::Exception: '0'
   Test2::V0: '0'
-  Test2::Warnings: '0'
+  Test2::Warnings: '0.038'
   Test::Deep: '0'
   Test::Deep::UnorderedPairs: '0'
   Test::File::ShareDir: '0'
@@ -26,9 +26,11 @@ build_requires:
   perl: v5.20.0
   utf8: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  Text::ParseWords: '0'
   perl: '5.020'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 keywords:
   - JSON
@@ -52,66 +54,65 @@ no_index:
 provides:
   JSON::Schema::Modern:
     file: lib/JSON/Schema/Modern.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Annotation:
     file: lib/JSON/Schema/Modern/Annotation.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Document:
     file: lib/JSON/Schema/Modern/Document.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Error:
     file: lib/JSON/Schema/Modern/Error.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Result:
     file: lib/JSON/Schema/Modern/Result.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::ResultNode:
     file: lib/JSON/Schema/Modern/ResultNode.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Utilities:
     file: lib/JSON/Schema/Modern/Utilities.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary:
     file: lib/JSON/Schema/Modern/Vocabulary.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::Applicator:
     file: lib/JSON/Schema/Modern/Vocabulary/Applicator.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::Content:
     file: lib/JSON/Schema/Modern/Vocabulary/Content.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::Core:
     file: lib/JSON/Schema/Modern/Vocabulary/Core.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::FormatAnnotation:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::FormatAssertion:
     file: lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::MetaData:
     file: lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::Unevaluated:
     file: lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
-    version: '0.623'
+    version: '0.624'
   JSON::Schema::Modern::Vocabulary::Validation:
     file: lib/JSON/Schema/Modern/Vocabulary/Validation.pm
-    version: '0.623'
+    version: '0.624'
 requires:
   B: '0'
   Carp: '0'
-  Cpanel::JSON::XS: '4.38'
   Digest::MD5: '0'
   Exporter: '0'
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
   Getopt::Long::Descriptive: '0'
-  JSON::PP: '4.11'
   List::Util: '1.55'
   MIME::Base64: '0'
   Math::BigFloat: '0'
   Math::BigInt: '1.999701'
+  Mojo::File: '0'
   Mojo::JSON: '0'
   Mojo::JSON::Pointer: '0'
   Mojo::Message::Response: '0'
@@ -120,7 +121,6 @@ requires:
   Moo: '0'
   Moo::Role: '0'
   MooX::TypeTiny: '0.002002'
-  Path::Tiny: '0'
   Ref::Util: '0.100'
   Safe::Isa: '1.000008'
   Scalar::Util: '0'
@@ -147,10 +147,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern
   repository: https://github.com/karenetheridge/JSON-Schema-Modern.git
-version: '0.623'
+version: '0.624'
 x_Dist_Zilla:
   perl:
-    version: '5.043004'
+    version: '5.043005'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -590,12 +590,12 @@ x_Dist_Zilla:
       name: '@Author::ETHER/MinimumPerl'
       version: '1.006'
     -
-      class: Dist::Zilla::Plugin::ModuleBuildTiny
+      class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
-      name: '@Author::ETHER/ModuleBuildTiny'
-      version: '0.020'
+      name: '@Author::ETHER/MakeMaker'
+      version: '6.036'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -667,7 +667,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20251022'
+          Module::CoreList: '5.20251120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -831,7 +831,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.623
+          tag: v0.624
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -976,10 +976,20 @@ x_Dist_Zilla:
             - Email::Address::XS
             - Net::IDN::Encode
             - Sereal
+            - JSON::PP
+            - Cpanel::JSON::XS
           modules_from_features: ~
           to_relationship: suggests
       name: Prereqs::Soften
       version: '0.006003'
+    -
+      class: Dist::Zilla::Plugin::DynamicPrereqs
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000038'
+          version: '0.006'
+      name: DynamicPrereqs
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::Breaks
       name: Breaks
@@ -1051,7 +1061,7 @@ x_breaks:
   Mojolicious::Plugin::OpenAPI::Modern: '< 0.014'
   OpenAPI::Modern: '< 0.077'
   Test::Mojo::Role::OpenAPI::Modern: '< 0.007'
-x_generated_by_perl: v5.43.4
+x_generated_by_perl: v5.43.5
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

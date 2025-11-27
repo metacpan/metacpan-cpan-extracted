@@ -1,5 +1,5 @@
 package Dist::Zilla::Role::DynamicPrereqs::Meta;
-$Dist::Zilla::Role::DynamicPrereqs::Meta::VERSION = '0.006';
+$Dist::Zilla::Role::DynamicPrereqs::Meta::VERSION = '0.007';
 use 5.020;
 use Moose::Role;
 use experimental qw/signatures postderef/;
@@ -10,6 +10,7 @@ use Carp 'croak';
 use Cpanel::JSON::XS;
 use Dist::Zilla::File::InMemory;
 use MooseX::Types::Moose qw/ArrayRef Str/;
+use MooseX::Enumeration;
 use Text::ParseWords 'shellwords';
 
 my $coder = Cpanel::JSON::XS->new->pretty;
@@ -29,8 +30,9 @@ around 'mvp_aliases', sub($orig, $self) {
 
 has joiner => (
 	is      => 'ro',
-	isa     => Str,
+	traits  => ['Enumeration'],
 	default => 'and',
+	enum    => [qw/and or/],
 );
 
 has input_conditions => (
@@ -118,7 +120,7 @@ Dist::Zilla::Role::DynamicPrereqs::Meta - A role to add dynamic prereqs to to th
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

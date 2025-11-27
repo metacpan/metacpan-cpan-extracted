@@ -40,6 +40,7 @@
             "List::Util" : "1.20",
             "Term::ANSIColor" : "0",
             "Term::ANSIScreen" : "0",
+            "Term::Drawille" : "0.01",
             "Text::Wrap::Smart" : "0",
             "Time::HiRes" : "0",
             "charnames" : "0",
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.46",
+   "version" : "1.48",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

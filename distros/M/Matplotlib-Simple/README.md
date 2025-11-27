@@ -18,7 +18,7 @@ Simplest use case:
 	   }
     });
 
-where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `input.file` are all specific to `MatPlotLib::Simple`.
+where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `fh` are all specific to `MatPlotLib::Simple`.
 
 As of version 0.11, all plot types are available as their own subroutines for making **single** plots.
 For example, the above code is equivalent to the shorter version:
@@ -149,14 +149,14 @@ an example of multiple plots, showing many options:
 	    title		=> 'Customer Calls by Days'
     });
 
-where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `input.file` are all specific to `MatPlotLib::Simple`.
+where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `fh` are all specific to `MatPlotLib::Simple`.
 <img width="651" height="491" alt="single barplot" src="https://github.com/user-attachments/assets/eae009a8-5571-4608-abdb-1016e3cff5fd" />
 
 ### multiple plots
 
     plt({
-	    'input.file'		=> $tmp_filename,
-	    execute				=> 0,
+	    fh                  => $fh,
+	    execute				   => 0,
 	    'output.file'	=> 'output.images/barplots.png',
 	    plots					=> [
 		{ # simple plot
@@ -178,9 +178,9 @@ where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `
 			    'plot.type'	=> 'bar',
 			    data	=> {
 				    1941 => {
-		    		   UK      => 6.6,
-	    			   US      => 6.2,
-    				   USSR    => 17.8,
+		    		   UK       => 6.6,
+	    			   US       => 6.2,
+    				   USSR     => 17.8,
 				       Germany => 26.6
 			    	},
 		    		1942 => {
@@ -190,7 +190,7 @@ where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `
 				      Germany => 29.7
 	     			},
     				1943 => {
-    			   	  UK      => 7.9,
+    			   	 UK      => 7.9,
 				      US      => 61.4,
 		    		  USSR    => 22.5,
 	    			  Germany => 34.9
@@ -361,7 +361,7 @@ single plots are simple
     	},
     	title        => 'Single Box Plot: Specified Colors',
     	colors       => { E => 'yellow', B => 'purple' },
-    	'input.file' => $tmp_filename,
+    	fh           => $fh,
     	execute      => 0,
     });
 
@@ -374,7 +374,7 @@ which makes the following image:
     plt({
     	'output.file' => 'output.images/boxplot.png',
     	execute           => 0,
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	plots             => [
     		{
     		    data => {
@@ -536,7 +536,7 @@ which makes the following plot:
 ### multiple plots
 
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 0,
     	'output.file' => 'output.images/hexbin.png',
     	plots             => [
@@ -682,7 +682,7 @@ Plot a hash of arrays as a series of histograms
     my @a = generate_normal_dist( 105, 15, 3 * 200 );
 
     hist({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 0,
     	'output.file' => 'output.images/single.hist.png',
     	data              => {
@@ -699,7 +699,7 @@ which makes the following simple plot:
 ### multiple plots
 
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 0,
     	'output.file' => 'output.images/histogram.png',
        set_figwidth => 15,
@@ -820,7 +820,7 @@ Make a 2-D histogram from a hash of arrays
     	'plot.type'  => 'hist2d',
     	title        => 'title',
     	execute      => 0,
-    	'input.file' => $tmp_filename,
+    	fh => $fh,
     });
 makes the following image:
 
@@ -835,8 +835,8 @@ the range for the density min and max is reported to stdout
 |`cb_logscale`| make the colorbar log-scale | `cb_logscale => 1` |
 |`cmap`| color map for coloring # "gist_rainbow" by default |  |
 |'cmax', `cmin`| All bins that has count < *cmin* or > *cmax* will not be displayed|
-|  'density',      # density : bool, default: False
-|  'key.order'|    # define the keys in an order (an array reference)
+|  'density'|  density : bool, default: False|
+|  'key.order'|  define the keys in an order (an array reference)
 | 'logscale' |    # logscale, an array of axes that will get log scale
 |'show.colorbar'| self-evident, 0 or 1 | `show.colorbar` => 1|
 |'vmax'| When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover |
@@ -848,7 +848,7 @@ the range for the density min and max is reported to stdout
 
 ### multiple plots
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 1,
     	ncols             => 3,
     	nrows             => 3,
@@ -974,7 +974,7 @@ Plot 2D array of numbers as an image
     plt({
     	data              => \@imshow_data,
     	execute           => 0,
-       'input.file'      => $tmp_filename,
+       fh => $fh,
     	'output.file' => 'output.images/imshow.single.png',
     	'plot.type'       => 'imshow',
     	set_xlim          => '0, ' . scalar @imshow_data,
@@ -1042,7 +1042,7 @@ which makes the following image:
     		},
     	],
     	execute         => 0,
-       'input.file'    => $tmp_filename,
+      fh              => $fh,
     	'output.file'   => 'output.images/imshow.multiple.png',
     	ncols           => 2,
     	nrows           => 2,
@@ -1073,7 +1073,7 @@ which makes the following image:
     	},
     	'plot.type'  => 'pie',
     	title        => 'Single Simple Pie',
-    	'input.file' => $tmp_filename,
+    	fh           => $fh,
     	execute      => 0,
     });
 
@@ -1138,7 +1138,7 @@ which makes the image:
     		    labeldistance => 0.6,
     		}
     	],
-    	'input.file' => $tmp_filename,
+    	fh => $fh,
     	execute      => 0,
        set_figwidth  => 12,
     	ncols        => 3,
@@ -1155,7 +1155,7 @@ plot either a hash of arrays or an array of arrays
 data can be given as a hash, where the hash key is the label:
 
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 0,
     	'output.file' => 'output.images/plot.single.png',
     	data              => {
@@ -1182,7 +1182,7 @@ data can be given as a hash, where the hash key is the label:
 or as an array of arrays:
 
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 0,
     	'output.file' => 'output.images/plot.single.arr.png',
     	data              => [
@@ -1264,7 +1264,7 @@ which makes
     		. '], [r\'$-2\pi$\', r\'$-3\pi/2$\', r\'$-\pi$\', r\'$-\pi/2$\', r\'$0$\', r\'$\pi/2$\', r\'$\pi$\', r\'$3\pi/2$\', r\'$2\pi$\']';
     my ($min, $max) = (-9,9);
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	execute           => 0,
     	'output.file' => 'output.images/plots.png',
     	plots         => [
@@ -1383,14 +1383,29 @@ which makes
 
 ## scatter
 
+### single, simple plot
+    scatter({
+    	fh            => $fh,
+    	data          => {
+    		X => [@x],
+    		Y => [map {sin($_)} @x]
+    	},
+    	execute       => 0,
+    	'output.file' => 'output.images/single.scatter.png',
+    });
+
+makes the following image:
+
+<img width="651" height="491" alt="single scatter" src="https://github.com/user-attachments/assets/c45d9922-23e0-4f85-8306-aa7fca400328" />
+
 ### options
 
-### single, simple plot
+
 
 ### multiple plots
 
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh => $fh,
     	'output.file' => 'output.images/scatterplots.png',
     	execute           => 0,
     	nrows             => 2,
@@ -1461,8 +1476,17 @@ which makes the following figure:
 
 ## violin
 
+plot a hash of array refs as violins
+
 ### options
 
+| Option | Description | Example |
+| -------- | ------- | -------
+|`color`| # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
+|`colors`| match sets | `colors       => { E => 'yellow', B => 'purple', A => 'green' }`|
+|`key.order`| determine key order display on x-axis|
+|`log`|    # if set to > 1, the y-axis will be logarithmic
+|`orientation`|'vertical', 'horizontal'}, default: 'vertical'|
 
 ### single, simple plot
 
@@ -1476,7 +1500,7 @@ which makes the following figure:
     	'plot.type'  => 'violinplot',
     	title        => 'Single Violin Plot: Specified Colors',
     	colors       => { E => 'yellow', B => 'purple', A => 'green' },
-    	'input.file' => $tmp_filename,
+    	fh => $fh,
     	execute      => 0,
     });
 
@@ -1487,9 +1511,9 @@ which makes:
 ### multiple plots
 
     plt({
-    	'input.file'      => $tmp_filename,
+    	fh                => $fh,
     	execute           => 0,
-    	'output.file' => 'output.images/violin.png',
+    	'output.file'     => 'output.images/violin.png',
     	plots             => [
     		{
     		    data => {
@@ -1570,11 +1594,10 @@ all files that can have notes with them, give notes about how the file was writt
 ## Speed
 To improve speed, all data can be written into a single temp python3 file thus:
 
-    use File::Temp 'tempfile';
-    my ( $fh, $tmp_filename ) =  tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
-    close $fh;
+    use File::Temp;
+    my $fh = File::Temp->new( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
 	
-all files will be written to $tmp_filename; be sure to put `execute => 0`
+all files will be written to `$fh->filename`; be sure to put `execute => 0` unless you want the file to be run, which is the last step.
 
     plt({
         data => {
@@ -1602,7 +1625,7 @@ all files will be written to $tmp_filename; be sure to put `execute => 0`
             HGI      => 'green'
         },
         title        => 'Visualization of similar lines plotted together',
-        'input.file' => $tmp_filename,
+        fh => $fh,
         execute      => 0,
     });
     # the last plot should have `execute => 1`
@@ -1619,6 +1642,6 @@ all files will be written to $tmp_filename; be sure to put `execute => 0`
         'plot.type'       => 'wide',
         color             => 'red',
         title             => 'Visualization of similar lines plotted together',
-        'input.file'      => $tmp_filename,
+        fh                => $fh,
         execute           => 1,
     });

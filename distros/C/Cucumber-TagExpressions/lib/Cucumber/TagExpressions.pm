@@ -1,6 +1,6 @@
 
 package Cucumber::TagExpressions;
-$Cucumber::TagExpressions::VERSION = '8.0.0';
+$Cucumber::TagExpressions::VERSION = '8.1.0';
 =head1 NAME
 
 Cucumber::TagExpressions - Tag expression parser
@@ -104,7 +104,7 @@ sub _term_expr {
 
     my $token = _get_token( $state );
 
-    die 'Unexpected end of input parsing tag expression'
+    die qq{Tag expression "$state->{text}" could not be parsed because of syntax error: Expected operand.}
         if not defined $token;
 
     if ( $token eq '(' ) {

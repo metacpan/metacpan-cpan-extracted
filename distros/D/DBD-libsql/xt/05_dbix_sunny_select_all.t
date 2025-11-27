@@ -68,7 +68,7 @@ if ($@ || !$dbh) {
 }
 
 # Check if select_all method exists
-unless ($dbh->can('select_all')) {
+unless (UNIVERSAL::can($dbh, 'select_all')) {
     plan skip_all => 'DBIx::Sunny does not have select_all method';
 }
 

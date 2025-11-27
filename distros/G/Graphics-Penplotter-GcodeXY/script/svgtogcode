@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # convert an svg file to gcode, using Graphics::Penplotter::GcodeXY
-# use: svgimport filename
+# use: svgimport filename [scalefactor]
 # output goes to filename.gcode
 
 use strict;
@@ -20,6 +20,9 @@ my $g = Graphics::Penplotter::GcodeXY->new(
 
 # file name
 my $f = shift or die "no input file provided";
+my $scale = shift || 1.0;
+
+$g->scale($scale, $scale);
 # import it
 $g->importsvg($f);
 # create the gcode

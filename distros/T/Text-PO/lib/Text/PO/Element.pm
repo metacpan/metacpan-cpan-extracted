@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.4.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
 ## Modified 2025/10/08
@@ -25,7 +25,7 @@ BEGIN
         fallback => 1,
     );
     use Text::Wrap ();
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
     use open ':std' => ':utf8';
 };
 
@@ -120,7 +120,7 @@ sub dump
     {
         push( @res, sprintf( '#, %s', join( ", ", @$flags ) ) );
     }
-    push( @res, sprintf( 'msgctxt: "%s"', $self->po->quote( $self->{context} ) ) ) if( length( $self->{context} ) );
+    push( @res, sprintf( 'msgctxt "%s"', $self->po->quote( $self->{context} ) ) ) if( length( $self->{context} ) );
     foreach my $k ( qw( msgid msgid_plural ) )
     {
         if( $self->can( "${k}_as_string" ) )
@@ -482,7 +482,7 @@ Text::PO::Element - PO Element
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 

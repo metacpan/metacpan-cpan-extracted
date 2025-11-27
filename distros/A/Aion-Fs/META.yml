@@ -35,7 +35,7 @@ no_index:
 provides:
   Aion::Fs:
     file: lib/Aion/Fs.pm
-    version: v0.2.0
+    version: v0.2.2
   Aion::Fs::Find:
     file: lib/Aion/Fs/Find.pm
 requires:
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-fs/issues
   homepage: https://github.com/darviarush/perl-aion-fs
   repository: https://github.com/darviarush/perl-aion-fs.git
-version: 0.2.0
+version: 0.2.2
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

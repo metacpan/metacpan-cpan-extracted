@@ -9,44 +9,7 @@ use Matplotlib::Simple;
 use File::Path 'rmtree';
 use Test::More;
 
-sub linspace { # mostly written by Grok
-	my ( $start, $stop, $num, $endpoint ) = @_;   # endpoint means include $stop
-	$num      = defined $num      ? int($num) : 50;    # Default to 50 points
-	$endpoint = defined $endpoint ? $endpoint : 1; # Default to include endpoint
-	return ()       if $num < 0;     # Return empty array for invalid num
-	return ($start) if $num == 1;    # Return single value if num is 1
-	my ( @result, $step );
-	if ($endpoint) {
-		$step = ( $stop - $start ) / ( $num - 1 ) if $num > 1;
-		for my $i ( 0 .. $num - 1 ) {
-			$result[$i] = $start + $i * $step;
-		}
-	} else {
-		$step = ( $stop - $start ) / $num;
-		for my $i ( 0 .. $num - 1 ) {
-			$result[$i] = $start + $i * $step;
-		}
-	}
-	return @result;
-}
-
-sub generate_normal_dist {
-	my ( $mean, $std_dev, $size ) = @_;
-	$size = defined $size ? int $size : 100;    # default to 100 points
-	my @numbers;
-	for ( 1 .. int( $size / 2 ) + 1 ) {         # Box-Muller transform
-		my $u1 = rand();
-		my $u2 = rand();
-		my $z0 = sqrt( -2.0 * log($u1) ) * cos( 2.0 * 3.141592653589793 * $u2 );
-		my $z1 = sqrt( -2.0 * log($u1) ) * sin( 2.0 * 3.141592653589793 * $u2 )
-		 ;    # Scale and shift to match mean and std_dev
-		push @numbers, ( $z0 * $std_dev + $mean, $z1 * $std_dev + $mean );
-	} # Trim to exact size if needed
-	@numbers = @numbers[ 0 .. $size - 1 ] if @numbers > $size;
-	@numbers = map { sprintf '%.1f', $_ } @numbers;
-	return \@numbers;
-}
-
+mkdir 'output.images' unless -d 'output.images';
 sub is_valid_svg { # mostly written by Gemini
 	my ($filepath) = @_;
 	my $expected_namespace = 'http://www.w3.org/2000/svg';
@@ -82,6 +45,45 @@ sub is_valid_svg { # mostly written by Gemini
 	return 1;
 }
 
+# Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς
+sub linspace {    # mostly written by Grok
+	my ( $start, $stop, $num, $endpoint ) = @_;   # endpoint means include $stop
+	$num      = defined $num      ? int($num) : 50;    # Default to 50 points
+	$endpoint = defined $endpoint ? $endpoint : 1; # Default to include endpoint
+	return ()       if $num < 0;     # Return empty array for invalid num
+	return ($start) if $num == 1;    # Return single value if num is 1
+	my ( @result, $step );
+	if ($endpoint) {
+		$step = ( $stop - $start ) / ( $num - 1 ) if $num > 1;
+		for my $i ( 0 .. $num - 1 ) {
+			$result[$i] = $start + $i * $step;
+		}
+	} else {
+	  $step = ( $stop - $start ) / $num;
+	  for my $i ( 0 .. $num - 1 ) {
+		   $result[$i] = $start + $i * $step;
+	  }
+	}
+	return @result;
+}
+
+sub generate_normal_dist {
+	my ( $mean, $std_dev, $size ) = @_;
+	$size = defined $size ? int $size : 100;    # default to 100 points
+	my @numbers;
+	for ( 1 .. int( $size / 2 ) + 1 ) {         # Box-Muller transform
+	  my $u1 = rand();
+	  my $u2 = rand();
+	  my $z0 = sqrt( -2.0 * log($u1) ) * cos( 2.0 * 3.141592653589793 * $u2 );
+	  my $z1 = sqrt( -2.0 * log($u1) ) * sin( 2.0 * 3.141592653589793 * $u2 )
+		 ;    # Scale and shift to match mean and std_dev
+	  push @numbers, ( $z0 * $std_dev + $mean, $z1 * $std_dev + $mean );
+	}    # Trim to exact size if needed
+	@numbers = @numbers[ 0 .. $size - 1 ] if @numbers > $size;
+	@numbers = map { sprintf '%.1f', $_ } @numbers;
+	return \@numbers;
+}
+
 sub rand_between {
 	my ( $min, $max ) = @_;
 	return $min + rand( $max - $min );
@@ -95,9 +97,7 @@ my $x = generate_normal_dist( 100, 15, 3 * 10 );
 my $y = generate_normal_dist( 85,  15, 3 * 10 );
 my $z = generate_normal_dist( 106, 15, 3 * 10 );
 my @x  = linspace( -2 * $pi, 2 * $pi, 100, 1 );
-my ( $fh, $tmp_filename ) = tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 1 );
-close $fh;
-mkdir 'output.images' unless -d 'output.images';
+my $fh = File::Temp->new( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
 plt({
 	'output.file' => 'output.images/add.single.svg',
 	'plot.type'       => 'plot',
@@ -137,7 +137,7 @@ plt({
 			}
 		},
 	],
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 plt({
@@ -166,7 +166,7 @@ plt({
 		HGI      => 'green'
 	},
 	title        => 'Visualization of similar lines plotted together',
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 plt({
@@ -182,7 +182,7 @@ plt({
 	'plot.type'       => 'wide',
 	color             => 'red',
 	title             => 'Visualization of similar lines plotted together',
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 });
 plt({
@@ -203,7 +203,7 @@ plt({
 	],
 	'output.file' => 'output.images/wide.subplots.svg',
 	suptitle          => 'SubPlots',
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 });
 pie({
@@ -218,7 +218,7 @@ pie({
 		Wed => 77
 	},
 	title        => 'Single Simple Pie',
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 plt({
@@ -276,7 +276,7 @@ plt({
 		    labeldistance => 0.6,
 		}
 	],
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
    set_figwidth  => 12,
 	ncols        => 3,
@@ -294,13 +294,13 @@ plt({
         'plot.type'  => 'boxplot',
         title        => 'Single Box Plot: Specified Colors',
         colors       => { E => 'yellow', B => 'purple' },
-        'input.file' => $tmp_filename,
+        fh => $fh,
         execute      => 0,
 });
 plt({
 	'output.file' => 'output.images/boxplot.svg',
 	execute           => 0,
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	plots             => [
 		{
 			data => {
@@ -428,14 +428,14 @@ plt({
 	'plot.type'  => 'violinplot',
 	title        => 'Single Violin Plot: Specified Colors',
 	colors       => { E => 'yellow', B => 'purple', A => 'green' },
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 my @e = generate_normal_dist( 100, 15, 3 * 200 );
 my @b = generate_normal_dist( 85,  15, 3 * 200 );
 my @a = generate_normal_dist( 105, 15, 3 * 200 );
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/violin.svg',
 	plots             => [
@@ -517,7 +517,7 @@ plt({
 	ylabel       => 'Count',
 	title        => 'Customer Calls by Days',
 	execute      => 0,
-	'input.file' => $tmp_filename,
+	fh => $fh,
 });
 plt({
 	data => {
@@ -525,7 +525,7 @@ plt({
 		B => @b,
 	},
 	execute           => 0,
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	'output.file' => 'output.images/single.hexbin.svg',
 	'plot.type'       => 'hexbin',
 	set_figwidth      => 12,
@@ -540,10 +540,10 @@ plt({
 	'plot.type'  => 'hist2d',
 	title        => 'title',
 	execute      => 0,
-	'input.file' => $tmp_filename,
+	fh => $fh,
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/hexbin.svg',
 	plots             => [
@@ -706,11 +706,12 @@ foreach my $interval (
 	@{ $d{tan}{$i}[1] } = map { sin($_)/cos($_) } @th;
 	$i++;
 }
+mkdir 'output.images' unless -d 'output.images';
 my $xticks = "[-2 * $pi, -3 * $pi / 2, -$pi, -$pi / 2, 0, $pi / 2, $pi, 3 * $pi / 2, 2 * $pi"
 		. '], [r\'$-2\pi$\', r\'$-3\pi/2$\', r\'$-\pi$\', r\'$-\pi/2$\', r\'$0$\', r\'$\pi/2$\', r\'$\pi$\', r\'$3\pi/2$\', r\'$2\pi$\']';
 my ($min, $max) = (-9,9);
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/plots.svg',
 	plots         => [
@@ -825,7 +826,7 @@ plt({
 	suptitle     => 'Basic Trigonometric Functions'
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/plot.single.svg',
 	data              => {
@@ -849,7 +850,7 @@ plt({
 	}
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/plot.single.arr.svg',
 	data              => [
@@ -873,7 +874,7 @@ plt({
 	],
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/barplots.svg',
 	plots             => [
@@ -1057,7 +1058,7 @@ plt({
 	nrows => 4
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/single.hist.svg',
 	data              => {
@@ -1068,7 +1069,7 @@ plt({
 	'plot.type'       => 'hist'
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/histogram.svg',
    set_figwidth => 15,
@@ -1159,7 +1160,7 @@ plt({
 		    'plot.type' => 'hist',
 		    alpha       => 0.75,
 		    color       => {
-		        B => 'Black',
+		        B  => 'Black',
 		        E => 'Orange',
 		        A => 'Yellow',
 		    },
@@ -1172,9 +1173,18 @@ plt({
 	ncols => 3,
 	nrows => 2,
 });
+scatter({
+	fh            => $fh,
+	data          => {
+		X => [@x],
+		Y => [map {sin($_)} @x]
+	},
+	execute       => 0,
+	'output.file' => 'output.images/single.scatter.svg',
+});
 plt({
-	'input.file'      => $tmp_filename,
-	'output.file' => 'output.images/scatterplots.svg',
+	fh                => $fh,
+	'output.file'     => 'output.images/scatterplots.svg',
 	execute           => 0,
 	nrows             => 2,
 	ncols             => 3,
@@ -1234,6 +1244,24 @@ plt({
 				Y => 'marker = "d"'     # diamond
 			},
 			color_key => 'Z',
+		},
+		{ # multiple-set scatter, labels are "X" and "Y"
+			data => {    # 8th plot,
+				X => {    # 1st data set; label is "X"
+					A => @e,    # x-axis
+					B => @b,    # y-axis
+				},
+				Y => {    # 2nd data set; label is "Y"
+					A => generate_normal_dist( 100, 15, 210 ),    # x-axis
+					B => generate_normal_dist( 100, 15, 210 ),    # y-axis
+				},
+			},
+			'plot.type'   => 'scatter',
+			title         => 'Multiple Set Scatter w/ colorbar',
+			'set.options' => {    # arguments to ax.scatter, for each set in data
+				X => 'marker = "."',
+				Y => 'marker = "d"'     # diamond
+			},
 		}
 	]
 });
@@ -1246,7 +1274,7 @@ foreach my $i (0..360) {
 plt({
 	data              => \@imshow_data,
 	execute           => 0,
-   'input.file'      => $tmp_filename,
+   fh => $fh,
 	'output.file' => 'output.images/imshow.single.svg',
 	'plot.type'       => 'imshow',
 	set_xlim          => '0, ' . scalar @imshow_data,
@@ -1307,7 +1335,7 @@ plt({
 		},
 	],
 	execute         => 0,
-   'input.file'    => $tmp_filename,
+   fh              => $fh,
 	'output.file'   => 'output.images/imshow.multiple.svg',
 	ncols           => 2,
 	nrows           => 2,
@@ -1315,7 +1343,7 @@ plt({
 	set_figwidth    => 6*4 # 6.4
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh                => $fh,
 	execute           => 1,
 	ncols             => 3,
 	nrows             => 3,
@@ -1411,16 +1439,11 @@ plt({
 	],
 	'output.file' => 'output.images/hist2d.svg',
 });
-my @output_files = qw(add.single.svg  imshow.multiple.svg plots.svg single.hist2d.svg violin.svg
-barplots.svg imshow.single.svg scatterplots.svg single.hist.svg wide.subplots.svg
-boxplot.svg pie.svg single.array.svg single.pie.svg
-hexbin.svg single.barplot.svg single.violinplot.svg
-hist2d.svg plot.single.arr.svg single.boxplot.svg  single.wide.svg
-histogram.svg plot.single.svg single.hexbin.svg);
+# σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
+my @output_files = ('output.images/add.single.svg','output.images/single.wide.svg','output.images/single.array.svg','output.images/wide.subplots.svg','output.images/single.pie.svg','output.images/pie.svg','output.images/single.boxplot.svg','output.images/boxplot.svg','output.images/single.violinplot.svg','output.images/violin.svg','output.images/single.barplot.svg','output.images/single.hexbin.svg','output.images/single.hist2d.svg','output.images/hexbin.svg','output.images/plots.svg','output.images/plot.single.svg','output.images/plot.single.arr.svg','output.images/barplots.svg','output.images/single.hist.svg','output.images/histogram.svg','output.images/single.scatter.svg','output.images/scatterplots.svg','output.images/imshow.single.svg','output.images/imshow.multiple.svg','output.images/hist2d.svg');
 foreach my $file (@output_files) {
-	my $test_file = "output.images/$file";
-	ok(-f $test_file, "Output file ($test_file) was created.");
-	ok(is_valid_svg($test_file), "$test_file is likely a valid SVG file");
+	ok(-f $file, "Output file ($file) was created.");
+	ok(is_valid_svg($file), "$file is likely a valid SVG file");
 }
 done_testing();
 say 'Now removing test files and directory to save space.';

@@ -79,7 +79,7 @@
    "provides" : {
       "Aion::Fs" : {
          "file" : "lib/Aion/Fs.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.2"
       },
       "Aion::Fs::Find" : {
          "file" : "lib/Aion/Fs/Find.pm"
@@ -97,7 +97,7 @@
          "web" : "https://github.com/darviarush/perl-aion-fs"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.2",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

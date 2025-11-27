@@ -58,6 +58,10 @@ Works with RT 6 (use v1.x versions of this module for previous version of RT)
 
 # INSTALLATION
 
+- export `$RTHOME=/home/of/your/RT/installation/lib`
+
+    This is needed if your `RT` installation directory is not `/opt/rt6/`, as documented in [https://docs.bestpractical.com/rt/6.0.2/extensions.html](https://docs.bestpractical.com/rt/6.0.2/extensions.html).
+
 - `perl Makefile.PL`
 - `make`
 - `make install`

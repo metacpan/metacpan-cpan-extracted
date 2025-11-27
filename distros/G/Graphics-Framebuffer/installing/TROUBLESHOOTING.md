@@ -2,110 +2,116 @@
 
 ## TROUBLESHOOTING
 
-  Ok, you've installed the module, but can't seem to get it to work properly.  Here  are some things you can try:
+Ok, you've installed the module, but can't seem to get it to work properly.  Here  are some things you can try:
 
-  * make sure you turn on the "SHOW_ERRORS" parameter when calling "new" to create the object.  This helps with troubleshooting.
+* make sure you turn on the "SHOW_ERRORS" parameter when calling "new" to create the object.  This helps with troubleshooting.
 
-  You Have To Run From The Console
+You Have To Run From The Console
 
-   A console window doesn't count as "the console".  You cannot use this module from within X-Windows/Wayland.  It won't work, and likely will only go into emulation mode if you do, or maybe crash, or even corrupt your X-Windows screen.
+A console window doesn't count as "the console".  You cannot use this module from within X-Windows/Wayland.  It won't work, and likely will only go into emulation mode if you do, or maybe crash, or even corrupt your X-Windows screen.
 
-   If you want to run your program within X-Windows, then you have the wrong module.  Use SDL, QT, or GTK or something similar.
+If you want to run your program within X-Windows, then you have the wrong module.  Use SDL, QT, or GTK or something similar.
 
-   You MUST have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
+You MUST have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
 
-   If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it automatically.
+If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it automatically.
 
-   * It may be possible to get a framebuffer device with a proprietary driver by forcing Grub to go into a VESA VGA mode for the console (worked for me with NVidia's proprietary drivers).
+* It may be possible to get a framebuffer device with a proprietary driver by forcing Grub to go into a VESA VGA mode for the console (worked for me with NVidia's proprietary drivers).
 
 ### It's Crashing
 
-   Ok, segfaults suck.  Believe me, I had plenty in the early days of writing this module.  There is hope for you.
+Ok, segfaults suck.  Believe me, I had plenty in the early days of writing this module.  There is hope for you.
 
-   This is almost always caused by the module incorrectly calculating the framebuffer memory size, and it's guessing too large or small a memory footprint, and the system doesn't like it.
+This is almost always caused by the module incorrectly calculating the framebuffer memory size, and it's guessing too large or small a memory footprint, and the system doesn't like it.
 
-   Try running the "primitives.pl" in the "examples" directory in the following way (assuming your screen is larger than 640x480):
+Try running the "primitives.pl" in the "examples" directory in the following way (assuming your screen is larger than 640x480):
 
-       perl examples/primitives.pl --x=640 --y=480
+```
+perl examples/primitives.pl --x=640 --y=480
+```
 
-   This forces the module to pretend it is rendering for a smaller resolution (by placing this screen in the middle of the actual one).  If it works fine, then try changing the "x" value back to your screen's actual width, but still make the "y" value slightly smaller.  Keep decreasing this "y" value until it works.
+This forces the module to pretend it is rendering for a smaller resolution (by placing this screen in the middle of the actual one).  If it works fine, then try changing the "x" value back to your screen's actual width, but still make the "y" value slightly smaller.  Keep decreasing this "y" value until it works.
 
-   If you get this behavior, then it is a bug, and the author needs to be notified, although as of version 6.06 this should no longer be an issue.
+If you get this behavior, then it is a bug, and the author needs to be notified, although as of version 6.06 this should no longer be an issue.
 
 ### It Only Partially Renders
 
-   Yeah this can look weird.  This is likely because there's some buffering going on.  The module attempts to turn it off, but if, for some reason, it is buffering anyway, try adding the following to points in your code where displaying a full render is necessary:
+Yeah this can look weird.  This is likely because there's some buffering going on.  The module attempts to turn it off, but if, for some reason, it is buffering anyway, try adding the following to points in your code where displaying a full render is necessary:
 
 ```
-      $fb->_flush_screen();
+$fb->_flush_screen();
 ```
 
-   This should force a full screen flush, but only use this if you really need it.
+This should force a full screen flush, but only use this if you really need it.
 
 ### Where are the fonts?
   
-   The default chosen font is "FreeSans" and this is included in the "fonts-freetype-ttf" package.  If this package is not installed, then either install it (recommended) or pick a different font.  The "fonts.pl" example script uses FreeSans.
+The default chosen font is "FreeSans" and this is included in the "fonts-freetype-ttf" package.  If this package is not installed, then either install it (recommended) or pick a different font.  The "fonts.pl" example script uses FreeSans.
 
 ### It Just Plain Isn't Working
 
-   Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous items).
+Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous items).
 
-   First, make sure your system has a framebuffer by seeing if "/dev/fb0" (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev" (or "/dev/fb/"), then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with ```modprobe -a drivername``` (replacing "drivername" with the actual driver name).
+First, make sure your system has a framebuffer by seeing if "/dev/fb0" (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev" (or "/dev/fb/"), then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with ```modprobe -a drivername``` (replacing "drivername" with the actual driver name).
 
-   Second, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "video" group.  Let's say the account is called "username", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "username" (your account name) to the "video" group:
+Second, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "video" group.  Let's say the account is called "username", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "username" (your account name) to the "video" group:
 
-      sudo usermod -a -G video username
+```
+sudo usermod -a -G video username
+```
 
-   Once that is run (changing "username" to whatever your username is), log out, then log back in, and it should work.
+Once that is run (changing "username" to whatever your username is), log out, then log back in, and it should work.
 
 ### The Text Cursor Is Messing Things Up
 
-   It is?  Well then turn it off.  Use the ```$fb->cls('OFF')``` method to do it.  Use ```$fb->cls('ON')``` to turn it back on.
+It is?  Well then turn it off.  Use the ```$fb->cls('OFF')``` method to do it.  Use ```$fb->cls('ON')``` to turn it back on.
 
-   If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command "reset" (and make sure you turn it back on before your code exits, so it doesn't do that).
+If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command "reset" (and make sure you turn it back on before your code exits, so it doesn't do that).
 
-   * UPDATE:  The new default behavior is to do this for you via the "RESET" parameter when creating the object.  See the "new" method documentation for more information.
+* UPDATE:  The new default behavior is to do this for you via the "RESET" parameter when creating the object.  See the "new" method documentation for more information.
 
 ### TrueType Printing isn't working
 
-   This is likely caused by the *Imager* library either being unable to locate the font file, or when it was compiled, it couldn't find the FreeType development libraries, and was thus compiled without TrueType text support.
+This is likely caused by the *Imager* library either being unable to locate the font file, or when it was compiled, it couldn't find the FreeType development libraries, and was thus compiled without TrueType text support.
 
-   See the INSTALLATION instructions on getting *Imager* properly compiled.  If you have a package based Perl installation, then installing the *Imager* (usually "libimager-perl" or "perl-libimager") package will always work.  If you already installed *Imager* via CPAN, then you should uninstall it via CPAN, then go install the package version, in that order.  You may also install ```libfreetype6-dev``` and then re-install *Imager* via CPAN with a forced install.  If you don't want the package version but still want the CPAN version, then still uninstall what is there, then go and make sure the TrueType and FreeType development libraries are installed on your system, along with PNG, JPEG, and GIF development libraries.  Now you can go to CPAN and install *Imager*.
+See the INSTALLATION instructions on getting *Imager* properly compiled.  If you have a package based Perl installation, then installing the *Imager* (usually "libimager-perl" or "perl-libimager") package will always work.  If you already installed *Imager* via CPAN, then you should uninstall it via CPAN, then go install the package version, in that order.  You may also install ```libfreetype6-dev``` and then re-install *Imager* via CPAN with a forced install.  If you don't want the package version but still want the CPAN version, then still uninstall what is there, then go and make sure the TrueType and FreeType development libraries are installed on your system, along with PNG, JPEG, and GIF development libraries.  Now you can go to CPAN and install *Imager*.
 
 ### It's Too Slow
 
-   Ok, it does say a *PERL graphics library* in the description, if I am not mistaken.  This means Perl is doing most of the work.  This also means it is only as fast as your system and its CPU, as it does not use your GPU at all.
+Ok, it does say a *PERL graphics library* in the description, if I am not mistaken.  This means Perl is doing most of the work.  This also means it is only as fast as your system and its CPU, as it does not use your GPU at all.
 
-   First, check to make sure the C acceleration routines are compiling properly.  Call the "acceleration" method without parameters.  It SHOULD return 1 and not 0 if C is properly compiling.  If it's not, then you need to make sure *Inline::C* is properly installed in your Perl environment.  **THIS WILL BE THE BIGGEST HELP TO YOU, IF YOU GET THIS SOLVED FIRST**.
+First, check to make sure the C acceleration routines are compiling properly.  Call the "acceleration" method without parameters.  It SHOULD return 1 and not 0 if C is properly compiling.  If it's not, then you need to make sure *Inline::C* is properly installed in your Perl environment.  **THIS WILL BE THE BIGGEST HELP TO YOU, IF YOU GET THIS SOLVED FIRST**.
 
-   Second, (and this is very advanced) you could try recompiling Perl with optimizations specific to your hardware.  That can help, but this is very advanced and you should know what you are doing before attempting this.  Keep in mind that if you do this, then ALL of the modules installed via your distribution packager won't work, and will have to be reinstalled via CPAN for the new perl.
+Second, (and this is very advanced) you could try recompiling Perl with optimizations specific to your hardware.  That can help, but this is very advanced and you should know what you are doing before attempting this.  Keep in mind that if you do this, then ALL of the modules installed via your distribution packager won't work, and will have to be reinstalled via CPAN for the new perl.
 
-   You can also try simplifying your drawing to exploit the speed of horizontal lines.  Horizonal line drawing is incredibly fast, even for very slow systems.
+You can also try simplifying your drawing to exploit the speed of horizontal lines.  Horizonal line drawing is incredibly fast, even for very slow systems.
 
-   Only use pixel sizes of 1.  Anything larger requires a box to be drawn at the pixel size you asked for.  Pixel sizes of 1 only use plot to draw, (so no boxes) so it is much faster.
+Only use pixel sizes of 1.  Anything larger requires a box to be drawn at the pixel size you asked for.  Pixel sizes of 1 only use plot to draw, (so no boxes) so it is much faster.
 
-   Try using 'polygon' to draw complex shapes instead of a series of plot or line commands.
+Try using 'polygon' to draw complex shapes instead of a series of plot or line commands.
 
-   Does your device have more than one core?  Well, how about using threads (or MCE)?  Just make sure you do it according to the examples in the "examples" directory.  Yes, I know this can be too advanced for the average coder, but the option is there.
+Does your device have more than one core?  Well, how about using threads (or MCE)?  Just make sure you do it according to the examples in the "examples" directory.  Yes, I know this can be too advanced for the average coder, but the option is there.
 
-   Plain and simple, your device just may be too slow for some CPU intensive operations, specifically anything involving animated images and heavy blitting.  If you must use images, then make sure they are already the right size for your needs.  Don't force the module to resize them when loading, as this takes CPU time.
+Plain and simple, your device just may be too slow for some CPU intensive operations, specifically anything involving animated images and heavy blitting.  If you must use images, then make sure they are already the right size for your needs.  Don't force the module to resize them when loading, as this takes CPU time.
 
 ### Ask For Help
 
-   If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the "dump.pl" script inside the "examples" directory inside this module's package:
+If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the "dump.pl" script inside the "examples" directory inside this module's package:
 
-       perl dump.pl
+```
+perl dump.pl
+```
 
-   Please include the dump file it creates (dump.log) as an attachment to your email.  Please do NOT include it inline as part of the message text.
+Please include the dump file it creates (dump.log) as an attachment to your email.  Please do NOT include it inline as part of the message text.
 
-   Also, please include a copy of your code (or at least the portion of it where you initialize this module and are having issues), AND explain to me your hardware and OS it is running under.
+Also, please include a copy of your code (or at least the portion of it where you initialize this module and are having issues), AND explain to me your hardware and OS it is running under.
 
-   Screen shots and photos are also helpful.
+Screen shots and photos are also helpful.
 
 ### KNOW THIS:
 
-   I want to get it working on your system, and I will do everything I can to help you get it working, but there may be some conditions where that may not be possible.  It's very rare (and I haven't seen it yet), but possible.
+I want to get it working on your system, and I will do everything I can to help you get it working, but there may be some conditions where that may not be possible.  It's very rare (and I haven't seen it yet), but possible.
 
-   I am not one of those arrogant ogres that spout "RTFM" every time someone asks for help (although it helps if you do read the manual).  I actually will help you.  Please be patient, as I do have other responsibilities that may delay a response, but a response will come.
+I am not one of those arrogant ogres that spout "RTFM" every time someone asks for help (although it helps if you do read the manual).  I actually will help you.  Please be patient, as I do have other responsibilities that may delay a response, but a response will come.
 
-   ** Making the subject of your email "PERL GFB HELP" is most helpful for me, and likely will get your email seen sooner.
+* Making the subject of your email "PERL GFB HELP" is most helpful for me, and likely will get your email seen sooner.

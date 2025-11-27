@@ -1,5 +1,13 @@
 Revision history for Data-Section-Writer
 
+0.05      2025-11-26 10:01:48 -0700
+  - The update_file method will replace the content in an existing file
+    rather than creating a new one.  A backup of the original file is
+    made while the new content is being written, in the unlikely event
+    of an error during content replacement.  The backup will be removed
+    if the replacement succeeds.  A new file will be created if one does
+    not exist, as before.  (gh#6)
+
 0.04      2024-12-15 20:35:06 -0700
   - I somehow forgot how to write POD and had to fix some (gh#5)
 

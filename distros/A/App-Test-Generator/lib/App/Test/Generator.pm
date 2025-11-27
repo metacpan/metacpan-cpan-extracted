@@ -4,6 +4,8 @@ package App::Test::Generator;
 # TODO: $seed should be passed to Data::Random::String::Matches
 # TODO: positional args - when config_undef is set, see what happens when not all args are given
 
+use 5.014;
+
 use strict;
 use warnings;
 use autodie qw(:all);
@@ -29,7 +31,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
@@ -42,7 +44,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =head1 SYNOPSIS
 

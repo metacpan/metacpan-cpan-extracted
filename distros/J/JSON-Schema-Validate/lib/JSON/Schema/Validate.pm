@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.6.0
+## Version v0.6.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/11/21
+## Modified 2025/11/26
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,7 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.6.0';
+    our $VERSION = 'v0.6.1';
 };
 
 use v5.16.0;
@@ -888,6 +888,7 @@ sub _apply_ref
     # Local fragment
     if( $ref =~ /^\#/ )
     {
+        # 1) Try anchors (e.g. "#foo" / "#MyAnchor")
         if( my $n = $ctx->{root}->{anchors}->{ $ref } )
         {
             return( _v( $ctx, $ref, $n, $inst ) );
@@ -901,15 +902,26 @@ sub _apply_ref
                 return( _v( $ctx, $sp, $node, $inst ) );
             }
         }
-        if( $ref =~ /^\#\$defs\/([A-Za-z0-9._-]+)\z/ )
+        # 2) If it’s a JSON Pointer ( "#/..." ), use _jsv_resolve_internal_ref
+        if( $ref =~ m{\A\#/(?:[^~/]|~[01])} )
         {
-            my $cand = $base . '#' . $1;
-            if( my $node = $ctx->{root}->{id_index}->{ $cand } )
+            # or pulled from id_index; same one used in compile_js
+            my $root_schema = $ctx->{root}->{schema} or return( _err_res( $ctx, $schema_ptr, "missing schema", '$ref' ) );
+    
+            my $node = _jsv_resolve_internal_ref( $root_schema, $ref );
+            if( $node )
             {
-                my $sp = _ptr_of_node( $ctx->{root}, $node );
-                return( _v( $ctx, $sp, $node, $inst ) );
+                return( _v( $ctx, $ref, $node, $inst ) );
             }
+    
+            return _err_res(
+                $ctx,
+                $schema_ptr,
+                "unresolved JSON Pointer fragment in \$ref: $abs",
+                '$ref'
+            );
         }
+        # 3) If not a JSON Pointer and not an anchor, fall through to external resolver / error
     }
 
     # External resolver hook
@@ -2663,7 +2675,6 @@ sub _json_equal
 }
 
 # Very small JSON Pointer resolver for internal refs ("#/...") for JS compile
-# Very small JSON Pointer resolver for internal refs ("#/...") for JS compile
 sub _jsv_resolve_internal_ref
 {
     my( $root, $ptr ) = @_;
@@ -2695,7 +2706,7 @@ sub _jsv_resolve_internal_ref
                 $tok = '$defs';
             }
 
-            unless( exists( $node->{$tok} ) )
+            unless( exists( $node->{ $tok } ) )
             {
                 # Optional: help debug resolution problems
                 warn( "_jsv_resolve_internal_ref: token '$tok' not found in current hash for pointer '$ptr'\n" )
@@ -4200,8 +4211,8 @@ You could also do:
         ignore_req_vocab => 1,
         prune_unknown    => 1,
         trace_on         => 1,
-        trace_on         => 200,
-        trace_on         => 1,
+        trace_limit      => 200,
+        trace_sample     => 1,
     )->register_builtin_formats;
 
     my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
@@ -4277,7 +4288,7 @@ In your HTML:
 
 =head1 VERSION
 
-v0.6.0
+v0.6.1
 
 =head1 DESCRIPTION
 
@@ -4800,7 +4811,7 @@ When enabling, built-in media validators are registered (e.g. C<application/json
 
 Returns the current object to enable chaining.
 
-=head2 POD::Coverage enable_content_checks
+=for Pod::Coverage enable_content_checks
 
 =head2 error
 

@@ -1,5 +1,9 @@
 Revision history for App-Test-Generator
 
+0.19	Wed Nov 26 07:50:22 EST 2025
+	Fixed the loop iterating over mandatory args
+	Ensure mandatory_args honours matches
+
 0.18	Tue Nov 25 11:58:12 EST 2025
 	Removed one place sending '' if test_empty was disabled
 	Don't send long strings if matches is set

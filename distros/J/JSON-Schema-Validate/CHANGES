@@ -1,5 +1,44 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.6.1 2025-11-26T19:04:00+0900
+    [Fixes: $ref Resolution]
+    - Corrected handling of internal JSON Pointer fragments in $ref during interpreted
+      (Perl) validation. The engine now resolves fragments such as
+      "#/definitions/address" and "#/$defs/address" using the same resolution logic as
+      the JavaScript compiler (via _jsv_resolve_internal_ref), ensuring consistent
+      behaviour across interpreted and compiled modes.
+    - Fixed aliasing rules between "definitions" and "$defs" in accordance with the 
+      2020-12 specification: both locations are now recognised bidirectionally when
+      resolving $ref.
+    - Improved error reporting for unresolved internal references:
+          * keyword     => '$ref'
+          * schema_pointer => pointer to the schema node containing
+                             the failing $ref
+          * message     => "unresolved JSON Pointer fragment in $ref …"
+      ensuring correct failure location and fully deterministic errors.
+
+    [Interpreted Validator Improvements]
+    - $ref resolution now attempts anchor lookup, id_index lookup, JSON Pointer lookup,
+      and definitions/$defs alias mapping before falling back to the external resolver
+      hook.
+    - Behaviour now matches compile_js(): valid internal references resolve immediately;
+      unresolved references produce a clean '$ref' error rather than misrouting to a
+      parent keyword.
+
+    [Tests]
+    - Added comprehensive regression tests under t/083_defs_refs.t:
+          * Resolution of "#/definitions/…" and "#/$defs/…" under both interpreted and
+            compiled modes.
+          * Aliasing behaviour where "#/definitions/…" resolves to entries stored under
+            "$defs", and vice-versa.
+          * Correct handling of missing references: detection of unresolved fragments,
+            correct keyword ('$ref'), correct error message, and correct schema_pointer.
+      These tests cover both success and failure paths exhaustively.
+
+    [Internal]
+    - Refactored _apply_ref() to unify logic between interpreted and compiled validators
+      and eliminate discrepancies present in earlier releases.
+
 v0.6.0 2025-11-25T19:17:41+0900
     [New Features]
     - Added compile_js() to generate a standalone JavaScript validator from the

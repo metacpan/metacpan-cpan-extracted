@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-DynamicPrereqs-Meta
 
+0.007     2025-11-26 18:48:46+01:00 Europe/Brussels
+          - Fix broken links to DynamicPrereqs modules
+          - Restrict valid values of joiner to and/or
+
 0.006     2025-04-11 23:28:06+02:00 Europe/Brussels
           - Add [DynamicPrereqs::ModuleBuild] plugin
           - Allow empty conditions

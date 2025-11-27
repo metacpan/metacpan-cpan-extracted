@@ -38,8 +38,8 @@ You could also do:
         ignore_req_vocab => 1,
         prune_unknown    => 1,
         trace_on         => 1,
-        trace_on         => 200,
-        trace_on         => 1,
+        trace_limit      => 200,
+        trace_sample     => 1,
     )->register_builtin_formats;
 
     my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
@@ -115,7 +115,7 @@ In your HTML:
 
 # VERSION
 
-v0.6.0
+v0.6.1
 
 # DESCRIPTION
 
@@ -541,8 +541,6 @@ Turn on/off content assertions for the `contentEncoding`, `contentMediaType` and
 When enabling, built-in media validators are registered (e.g. `application/json`).
 
 Returns the current object to enable chaining.
-
-## POD::Coverage enable\_content\_checks
 
 ## error
 

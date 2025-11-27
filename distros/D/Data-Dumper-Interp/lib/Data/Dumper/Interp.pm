@@ -4,6 +4,7 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 
 ##FIXME: Refaddr(1) has no effect inside Blessed structures
+#
 
 use strict; use warnings FATAL => 'all'; use utf8;
 #use 5.010; # say, state
@@ -13,8 +14,6 @@ use 5.018;  # lexical_subs
 use feature qw(say state lexical_subs current_sub);
 use feature 'lexical_subs';
 use feature 'unicode_strings';
-
-
 
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
@@ -27,8 +26,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.020'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-08-07'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-11-26'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -76,6 +75,7 @@ our @EXPORT    = qw( visnew
                    );
 
 our @EXPORT_OK = qw(addrvis_digits
+                    RefArgFormatter
 
                     $Debug $MaxStringwidth $Trunctailwidth $Truncsuffix
                     $Objects $Foldwidth $Useqq $Quotekeys $Sortkeys
@@ -636,6 +636,22 @@ sub _generate_sub($;$) {
 
 
 sub visnew()  { __PACKAGE__->new() }  # shorthand
+
+# $Carp::RefArgFormatter may be set to this to format traceback args
+# The optional options are for use when currying, e.g.
+#   $Carp::RefArgFormatter = sub($) { Data::Dumper::Interp::CarpArgFormatter($_[0], Maxdepth=9, ...) }
+sub RefArgFormatter {
+  my ($item, %opts) = @_;
+  $opts{Maxdepth} //= 3;
+  $opts{MaxStringwidth} //= 1000;
+  $opts{Refaddr} //= 1;
+  $opts{Objects} //= {objects => 1, overloads => "tagged"};
+  my $obj = Data::Dumper::Interp::visnew;
+  for my $optname (keys %opts) {
+    $obj->$optname($opts{$optname});
+  }
+  return $obj->vis($item)
+}
 
 
 ############# only internals follow ############
@@ -2118,7 +2134,8 @@ sub import {
     elsif (/^:all/) {
       # Generate all modifier combinations as suffixes in alphabetical order.
       my %already = map{$_ => 1} @args;
-      push @args, ":DEFAULT" unless $already{':DEFAULT'};
+      #WRONG: push @args, ":DEFAULT" unless $already{':DEFAULT'};
+      foreach (@EXPORT) { push @args, $_ unless $already{$_}++; }
       for my $v1 (qw/avis hvis vis ivis dvis/) { # avisl hvisl ?
         for my $v2 ('1', '2', "") {
           for my $v3 ('l', "") {
@@ -2127,8 +2144,7 @@ sub import {
               for my $v5 ('q', "") {
                 for my $v6 ('r', "") {
                   my $subname = $v1.$v2.$v3.$v4.$v5.$v6;
-                  next if $already{$subname}++;
-                  push @args, $subname;
+                  push @args, $subname unless $already{$subname}++;
                 }
               }
             }
@@ -2365,6 +2381,13 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say Data::Dumper::Interp->new()
             ->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
 
+  #-------- CARP TRACEBACK FORMATTING --------
+
+  use Carp;
+  $Carp::RefArgFormatter = \&Data::Dumper::Interp::RefArgFormatter;
+
+  # Now cluck and confess will format references with 'vis'
+
   #-------- UTILITY FUNCTIONS --------
   say u($might_be_undef);  # $_[0] // "undef"
   say quotekey($string);   # quote if not a valid bareword
@@ -2534,14 +2557,14 @@ By default the following are imported:
  addrvis addrvisl
  u quotekey qsh qshlist qshpath
 
-Special import tags may be specified (e.g. in C<use Data::Dumper::Interp ... ;>):
+The following special import tags are available:
 
-  :all - Imports function variations with all combinations of modifier letters
-         appended to the basic name in alphabetical order
+  :all - Imports all function variations, spelled with modifier
+         letters appended to the basic name in alphabetical order
 
   :debug - Show functions/methods as they are generated
 
-  :OPTIONNAME=VALUE - Set global variable '$OPTIONNAME' to eval(VALUE).
+  :Optionname=VALUE - Set global variable '$Optionname' to eval(VALUE).
 
 =for HIDE =head2 The :all import tag
 =for HIDE Z<> Z<>
@@ -2569,6 +2592,12 @@ Special import tags may be specified (e.g. in C<use Data::Dumper::Interp ... ;>)
 =for HIDE
 =for HIDE You could have used alternate names for the same function such as C<avis2ql>,
 =for HIDE C<q2avisl>, C<q_2_avis_l> etc. if called as methods or explicitly imported.
+
+
+=head2 RefArgFormatter
+
+Carp::RefArgFormatter may be set to a ref to this sub (or a wrapper)
+to format arguments using 'vis' in tracebacks (see L<Carp>).
 
 =head1 Showing Abbreviated Addresses
 

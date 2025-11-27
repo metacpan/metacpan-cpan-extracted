@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.008006	2025-11-26
+
+ - Minor optimization for non-XS type check code for Enum types: if there
+   are only a small number of valid strings (five or under), check using
+   `eq` and `or` operators instead of compiling a regexp to check against
+   them all at once. This can be controlled by passing the `use_eq`
+   attribute to the Type::Tiny::Enum constructor, but is otherwise
+   automatic.
+
 2.008005	2025-11-20
 
  - Minor optimization for Type::Params: sometimes it would construct an

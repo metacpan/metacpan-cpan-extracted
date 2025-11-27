@@ -1,5 +1,13 @@
 Revision history for XML-Sig
 
+0.68 -- Wed Nov 26 18:27:44 AST 2025
+
+  [Notable Changes since 0.67]
+  - Fixed (CVE-2025-40934) issue where unsigned xml verified as true (thanks @gttds)
+
+  [Change Log]
+  - 74ea948 Fixes #63: An unsigned XML should fail verification
+
 0.67 -- Fri Nov 07 18:25:52 AST 2025
 
   [Notable Changes since 0.65]
@@ -179,6 +187,7 @@ Revision history for XML-Sig
 0.51 - 2021-07-03
 
   [Change Log]
+  - e307b69 Fixes #63: An unsigned XML should fail verification
 
   - e852d07 Update Changes and Increment version
   - 3ad26aa Renew RSA certificate for 10 years

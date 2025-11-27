@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+# extract the boundary box of a gcode file
+# use: gcodebb filename
+
+use strict;
+use warnings;
+use Readonly qw( Readonly );
+
+Readonly my $G00  => 3;                # G00 line opcode
+Readonly my $G01  => 4;                # G01 line opcode
+Readonly my $NOOP => 5;                # "ignore this line" opcode
+         my $maxx = 0.0;
+         my $maxy = 0.0;
+         my $minx = 100.0;
+         my $miny = 100.0;
+my ($op, $xn, $yn, $x, $y);
+
+# file name
+my $f = shift or die "no input file provided";
+
+#open the file
+open (my $inf , '<', $f) or die "cannot open input file $f";
+
+# read the file
+while (<$inf>) {
+    ( $op, $xn, $yn ) = parse($_);
+    if ( $op eq $G00 || $op eq $G01 ) {
+        $x = 0.0 + $xn;
+        $y = 0.0 + $yn;
+        if ( $x > $maxx )             { $maxx = $x }
+        if ( $y > $maxy )             { $maxy = $y }
+        if ( $x < $minx && $x > 0.0 ) { $minx = $x }
+        if ( $y < $miny && $y > 0.0 ) { $miny = $y }
+    }
+}
+
+print "x: ($minx,$maxx) y: ($miny,$maxy)\n";
+
+###################################################################################################
+
+# parsing of instruction
+sub parse {
+    my $ss = shift;
+    my ( $opp, $x, $xcoord, $y, $ycoord, $rest );
+    # some lines can be ignored
+    if ( $ss =~ m{\A\s*\z} ) { return ( $NOOP, 0, 0 ) }    # ignore empty line
+    if ( $ss =~ m{\A\s*\N{LEFT PARENTHESIS}} ) {
+        return ( $NOOP, 0, 0 );
+    }                                                      # ignore comment line
+    # do some standardization, different tools have different gcode formats
+    $ss =~ s{X}{X\N{SPACE}};     # in case there is no space after X or Y or Z
+    $ss =~ s{Y}{Y\N{SPACE}};
+    $ss =~ s{Z0}{Z\N{SPACE}0};
+    $ss =~ s{G0\N{SPACE}}{G00\N{SPACE}};    # G0 equivalent to G00
+    $ss =~ s{G1\N{SPACE}}{G01\N{SPACE}};    # G1 equivalent to G01
+    $ss =~ s{\N{SPACE}\N{FULL STOP}000}{\N{SPACE}0\N{FULL STOP}000}g;  # turns .0 into 0.0
+    ( $opp, $x, $xcoord, $y, $ycoord, $rest ) = split( / +/, $ss );    # split on multiple spaces
+    if ( $ss =~ m{G00\N{SPACE}Z\N{SPACE}} || $ss =~ m{G01\N{SPACE}Z\N{SPACE}} )
+    {
+        return ( $NOOP, '0', '0' );
+    }
+    if ( $opp eq 'G00' ) {
+        return ( $G00, $xcoord, $ycoord );
+    }
+    if ( $opp eq 'G01' ) {
+        return ( $G01, $xcoord, $ycoord );
+    }
+    return ( $NOOP, 0, 0 );
+}

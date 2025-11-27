@@ -9,12 +9,12 @@ use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Term::ANSIColor;
 use Cwd 'getcwd';
-use File::Temp 'tempfile';
+use File::Temp;
 use DDP { output => 'STDOUT', array_max => 10, show_memsize => 1 };
 use Devel::Confess 'color';
 use FindBin '$RealScript';
@@ -180,7 +180,7 @@ my @plt_methods = (
 	#	'yticks'
 );
 
-my @arg = ('cmap', 'data', 'execute', 'input.file','ncols', 'plot.type',
+my @arg = ('cmap', 'data', 'execute', 'fh','ncols', 'plot.type',
  'plots', 'plot', 'output.file','nrows');
 my @cb_arg = (
 'cbdrawedges', # for colarbar: Whether to draw lines at color boundaries
@@ -365,8 +365,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 	  my $ref = ref $plot->{$c};
 	  if ( $ref eq '' ) {    # single color
 		   $options .= ", $c = '$plot->{$c}'";
-	  }
-	  elsif ( $ref eq 'ARRAY' ) {
+	  } elsif ( $ref eq 'ARRAY' ) {
 		   $options .= ", $c = [\"" . join( '","', @{ $plot->{$c} } ) . '"]';
 	  }
 	}    # args that can be either arrays or strings below; NUMERIC:
@@ -382,28 +381,27 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 		}
 	}
 	foreach my $err ( grep { defined $plot->{$_} } ( 'xerr', 'yerr' ) ) {
-	  my $ref = ref $plot->{$err};
-	  if ( $ref eq '' ) {
-		   $options .= ", $err = $plot->{$err}";
-	  } elsif ( $ref eq 'HASH' ) {    # I assume that it's all defined
-		   my ( @low, @high );
-		   foreach my $i (@key_order) {
-		       if ( scalar @{ $plot->{$err}{$i} } != 2 ) {
-		           p $plot->{$err}{$i};
-		           die
-	"$err/$i should have exactly 2 items: low and high error bars";
-		       }
-		       push @low,  $plot->{$err}{$i}[0];
-		       push @high, $plot->{$err}{$i}[1];
-		   }
-		   $options .=
-		       ", $err = [["
-		     . join( ',', @low ) . '],['
-		     . join( ',', @high ) . ']]';
-	  } else {
-		   p $args;
-		   die "$ref for $err isn't acceptable";
-	  }
+		my $ref = ref $plot->{$err};
+		if ( $ref eq '' ) {
+			$options .= ", $err = $plot->{$err}";
+		} elsif ( $ref eq 'HASH' ) {    # I assume that it's all defined
+			my ( @low, @high );
+			foreach my $i (@key_order) {
+				if ( scalar @{ $plot->{$err}{$i} } != 2 ) {
+				  p $plot->{$err}{$i};
+				  die	"$err/$i should have exactly 2 items: low and high error bars";
+				}
+				push @low,  $plot->{$err}{$i}[0];
+				push @high, $plot->{$err}{$i}[1];
+			}
+			$options .=
+				 ", $err = [["
+			  . join( ',', @low ) . '],['
+			  . join( ',', @high ) . ']]';
+		} else {
+			p $args;
+			die "$ref for $err isn't acceptable";
+		}
 	}
 	if ( $plot_type eq 'simple' ) {    # a simple hash -> simple bar plot
 	  say { $args->{fh} } 'labels = ["' . join( '","', @key_order ) . '"]';
@@ -720,8 +718,8 @@ sub hist_helper {
 	);
 	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
 	if ( scalar @undef_args > 0 ) {
-	  p @undef_args;
-	  die 'the above args are necessary, but were not defined.';
+		p @undef_args;
+		die 'the above args are necessary, but were not defined.';
 	}
 	my @opt = (
 	  @ax_methods, @plt_methods, @fig_methods, @arg,
@@ -732,7 +730,7 @@ sub hist_helper {
 	  , # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
 	  'log',            # if set to > 1, the y-axis will be logarithmic
 	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
-	  'plots', 'ncols', 'nrows', 'output.file', 'input.file',
+	  'plots', 'ncols', 'nrows', 'output.file', 'fh',
 	  'execute'         # these will be ignored
 	);
 	@opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
@@ -1238,18 +1236,21 @@ sub scatter_helper {
 	}
 	my ( %ref_counts, $plot_type );
 	foreach my $set ( keys %{ $plot->{data} } ) {
-	  $ref_counts{ ref $plot->{data}{$set} }++;
+		$ref_counts{ ref $plot->{data}{$set} }++;
 	}
 	my $ax = $args->{ax};
 	if ( scalar %ref_counts > 1 ) {
-	  p $plot->{data};
-	  die
-	"different kinds of data were entered to plot $ax; it should be simple hash or hash of arrays.";
+		p $plot->{data};
+		die "different kinds of data were entered to plot $ax; should be simple hash or hash of arrays.";
 	}
 	if ( defined $ref_counts{ARRAY} ) {
 		$plot_type = 'single';
 	} elsif ( defined $ref_counts{HASH} ) {
 		$plot_type = 'multiple';
+	} else {
+		p $plot->{data};
+		p %ref_counts;
+		die 'Could not determine scatter type for the above data.';
 	}
 	$plot->{cmap} = $plot->{cmap} // 'gist_rainbow';
 	my $options = '';
@@ -1292,7 +1293,7 @@ sub scatter_helper {
 			  . join( ',', @{ $plot->{data}{$color_key} } ) . ']';
 			say { $args->{fh} }
 			  "im = ax$ax.scatter(x, y, c = z, cmap = 'gist_rainbow' $options)";
-			say { $args->{fh} } "plt.colorbar(im, label = '$color_key')";
+			say { $args->{fh} } "fig.colorbar(im, label = '$color_key')";
 		} else {
 			say { $args->{fh} } "ax$ax.scatter(x, y, $options)";
 		}
@@ -1301,55 +1302,54 @@ sub scatter_helper {
 	} elsif ( $plot_type eq 'multiple' ) { # multiple sets
 		my @undefined_opts;
 		foreach my $set ( sort keys %{ $plot->{'set.options'} } ) {
-		next if grep { $set eq $_ } keys %{ $plot->{data} };
-		push @undefined_opts, $set;
+			next if grep { $set eq $_ } keys %{ $plot->{data} };
+			push @undefined_opts, $set;
 		}
 		if ( scalar @undefined_opts > 0 ) {
-		p $plot->{data};
-		p $plot;
-		say
-		'The data and options are above, but the following sets have options without data:';
-		p @undefined_opts;
-		die 'no data was defined for the above options';
+			p $plot->{data};
+			p $plot;
+			say 'The data and options are above, but the following sets have options without data:';
+			p @undefined_opts;
+			die 'no data was defined for the above options';
 		}
 		my $color_key;
 		foreach my $set ( sort keys %{ $plot->{data} } ) {
-		my @keys;
-		if ( defined $plot->{'keys'} ) {
-			 @keys = @{ $plot->{'keys'} };
-		} else { # automatically take the key from the first; further sets should have the same labels
-			 @keys = sort { lc $a cmp lc $b } keys %{ $plot->{data}{$set} };
-		}
-		my $n_keys = scalar keys %{ $plot->{data}{$set} };
-		if ( ( $n_keys != 2 ) && ( $n_keys != 3 ) ) {
-			 p $plot->{data}{$set};
-			 die
-		"scatterplots can only take 2 or 3 keys as data, but $current_sub received $n_keys";
-		}
-		if ( ( not defined $color_key ) && ( $n_keys == 3 ) ) {
-			 $color_key = pop @keys;
-		}
-		if ( defined $plot->{'set.options'}{$set} ) {
-			 $options = ", $plot->{'set.options'}{$set}";
-		}
-		say { $args->{fh} } 'x = ['
-		  . join( ',', @{ $plot->{data}{$set}{ $keys[0] } } ) . ']';
-		say { $args->{fh} } 'y = ['
-		  . join( ',', @{ $plot->{data}{$set}{ $keys[1] } } ) . ']';
-		if ( defined $color_key ) {
-			 say { $args->{fh} } 'z = ['
-				. join( ',', @{ $plot->{data}{$set}{$color_key} } ) . ']';
-			 unless ( $options =~ m/label\s*=/ ) {
-				  $options .= ", label = '$set'";
-			 }
-			 say { $args->{fh} }
-		"im = ax$ax.scatter(x, y, c = z, cmap = '$plot->{cmap}' $options)";
-		} else {
-			 say { $args->{fh} }
-				"ax$ax.scatter(x, y, label = '$set' $options)";
-		}
-		$plot->{xlabel} = $plot->{xlabel} // $keys[0];
-		$plot->{ylabel} = $plot->{ylabel} // $keys[1];
+			my @keys;
+			if ( defined $plot->{'keys'} ) {
+				 @keys = @{ $plot->{'keys'} };
+			} else { # automatically take the key from the first; further sets should have the same labels
+				 @keys = sort { lc $a cmp lc $b } keys %{ $plot->{data}{$set} };
+			}
+			my $n_keys = scalar keys %{ $plot->{data}{$set} };
+			if ( ( $n_keys != 2 ) && ( $n_keys != 3 ) ) {
+				 p $plot->{data}{$set};
+				 die
+			"scatterplots can only take 2 or 3 keys as data, but $current_sub received $n_keys";
+			}
+			if ( ( not defined $color_key ) && ( $n_keys == 3 ) ) {
+				 $color_key = pop @keys;
+			}
+			if ( defined $plot->{'set.options'}{$set} ) {
+				 $options = ", $plot->{'set.options'}{$set}";
+			}
+			say { $args->{fh} } 'x = ['
+			  . join( ',', @{ $plot->{data}{$set}{ $keys[0] } } ) . ']';
+			say { $args->{fh} } 'y = ['
+			  . join( ',', @{ $plot->{data}{$set}{ $keys[1] } } ) . ']';
+			if ( defined $color_key ) {
+				 say { $args->{fh} } 'z = ['
+					. join( ',', @{ $plot->{data}{$set}{$color_key} } ) . ']';
+				 unless ( $options =~ m/label\s*=/ ) {
+					  $options .= ", label = '$set'";
+				 }
+				 say { $args->{fh} }
+			"im = ax$ax.scatter(x, y, c = z, cmap = '$plot->{cmap}' $options)";
+			} else {
+				 say { $args->{fh} }
+					"ax$ax.scatter(x, y, label = '$set' $options)";
+			}
+			$plot->{xlabel} = $plot->{xlabel} // $keys[0];
+			$plot->{ylabel} = $plot->{ylabel} // $keys[1];
 	  }
 	  say { $args->{fh} } "plt.colorbar(im, label = '$color_key')"  if defined $color_key;
 	}
@@ -1373,10 +1373,7 @@ sub violin_helper {
 	}
 	my @opt = (
 	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'alpha',    # default 0.5; same for all sets
 	  'ax',       # used for multiple plots
-	  'bins'
-	  , # nt or sequence or str, default: :rc:`hist.bins`If *bins* is an integer, it defines the number of equal-width bins in the range. If *bins* is a sequence, it defines the bin edges, including the left edge of the first bin and the right edge of the last bin; in this case, bins may be unequally spaced.  All but the last  (righthand-most) bin is half-open
 	  'color'
 	  , # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
 	  'colors',
@@ -1384,7 +1381,7 @@ sub violin_helper {
 	  'log',            # if set to > 1, the y-axis will be logarithmic
 	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
 	  'whiskers',
-	  'plots', 'ncols', 'nrows', 'output.file', 'input.file',
+	  'plots', 'ncols', 'nrows', 'output.file', 'fh',
 	  'execute'         # these will be ignored
 	);
 	my $plot      = $args->{plot};
@@ -1695,9 +1692,9 @@ sub plt {
 	  not grep { $_ eq $key } @defined_args
 	} keys %{$args};
 	if ( scalar @bad_args > 0 ) {
-	  p @bad_args, array_max => scalar @bad_args;
-	  say 'the above arguments are not recognized.';
 	  p @defined_args, array_max => scalar @defined_args;
+	  p @bad_args, array_max => scalar @bad_args;
+	  say STDERR 'the 2nd group of arguments are not recognized, while the 1st is the defined list';
 	  die "The above args are accepted by \"$current_sub\"";
 	}
 	my $single_plot = 0; # false
@@ -1753,14 +1750,14 @@ sub plt {
 	foreach my $y (@y) {
 	  push @py, '(' . join( ',', @{$y} ) . ')';
 	}
-	my $unlink = 0;
-	if ( defined $args->{'input.file'} ) {
-	  $temp_py = $args->{'input.file'};
-	  open $fh, '>>', $args->{'input.file'};
+#	my $unlink = 0;
+	if ( defined $args->{fh} ) {
+		$fh = $args->{fh};
+#	  open $fh, '>>', $args->{fh};
 	} else {
-	 ( $fh, $temp_py ) = tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => $unlink );
+		$fh = File::Temp->new( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
 	}
-	say "temp file is $temp_py" if $unlink == 0;
+	say 'temp file is ' . $fh->filename;# if $unlink == 0;
 	say $fh 'import matplotlib.pyplot as plt';
 	if ( $single_plot == 0 ) {
 		$args->{sharex} = $args->{sharex} // 'False';
@@ -2052,8 +2049,7 @@ sub plt {
 				ax   => $ax,
 				plot => $plot
 			});
-		}
-		elsif ( $plot->{'plot.type'} eq 'hexbin' ) {
+		} elsif ( $plot->{'plot.type'} eq 'hexbin' ) {
 			hexbin_helper({
 				fh   => $fh,
 				ax   => $ax,
@@ -2182,7 +2178,7 @@ sub plt {
 	  say $fh 'plt.close()';
 	}
 	if ( $args->{execute} > 0 ) {
-		my $r = execute( "python3 $temp_py", 'all' );
+		my $r = execute( 'python3 ' . $fh->filename, 'all' );
 		say 'wrote '		
 		 . colored( ['cyan on_bright_yellow'], "$args->{'output.file'}" );
 		p $r;
@@ -2381,7 +2377,7 @@ Simplest use case:
     }
  });
 
-where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<input.file> are all specific to C<MatPlotLib::Simple>.
+where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<fh> are all specific to C<MatPlotLib::Simple>.
 
 As of version 0.11, all plot types are available as their own subroutines for making B<single> plots.
 For example, the above code is equivalent to the shorter version:
@@ -2528,7 +2524,7 @@ an example of multiple plots, showing many options:
      title       => 'Customer Calls by Days'
  });
 
-where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<input.file> are all specific to C<MatPlotLib::Simple>.
+where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<fh> are all specific to C<MatPlotLib::Simple>.
 
 =for html
 <p>
@@ -2539,8 +2535,8 @@ where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself
 =head3 multiple plots
 
  plt({
-     'input.file'        => $tmp_filename,
-     execute             => 0,
+     fh                  => $fh,
+     execute                => 0,
      'output.file'   => 'output.images/barplots.png',
      plots                   => [
      { # simple plot
@@ -2562,9 +2558,9 @@ where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself
              'plot.type' => 'bar',
              data    => {
                  1941 => {
-                    UK      => 6.6,
-                    US      => 6.2,
-                    USSR    => 17.8,
+                    UK       => 6.6,
+                    US       => 6.2,
+                    USSR     => 17.8,
                     Germany => 26.6
                  },
                  1942 => {
@@ -2574,7 +2570,7 @@ where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself
                    Germany => 29.7
                  },
                  1943 => {
-                   UK      => 7.9,
+                  UK      => 7.9,
                    US      => 61.4,
                    USSR    => 22.5,
                    Germany => 34.9
@@ -2755,7 +2751,7 @@ single plots are simple
      },
      title        => 'Single Box Plot: Specified Colors',
      colors       => { E => 'yellow', B => 'purple' },
-     'input.file' => $tmp_filename,
+     fh           => $fh,
      execute      => 0,
  });
 
@@ -2773,7 +2769,7 @@ which makes the following image:
  plt({
      'output.file' => 'output.images/boxplot.png',
      execute           => 0,
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      plots             => [
          {
              data => {
@@ -2950,7 +2946,7 @@ which makes the following plot:
 =head3 multiple plots
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 0,
      'output.file' => 'output.images/hexbin.png',
      plots             => [
@@ -3105,7 +3101,7 @@ Plot a hash of arrays as a series of histograms
  my @a = generate_normal_dist( 105, 15, 3 * 200 );
  
  hist({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 0,
      'output.file' => 'output.images/single.hist.png',
      data              => {
@@ -3127,7 +3123,7 @@ which makes the following simple plot:
 =head3 multiple plots
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 0,
      'output.file' => 'output.images/histogram.png',
     set_figwidth => 15,
@@ -3254,7 +3250,7 @@ Make a 2-D histogram from a hash of arrays
      'plot.type'  => 'hist2d',
      title        => 'title',
      execute      => 0,
-     'input.file' => $tmp_filename,
+     fh => $fh,
  });
 
 makes the following image:
@@ -3278,15 +3274,8 @@ the range for the density min and max is reported to stdout
 <tr><td><code>cb_logscale</code></td><td>make the colorbar log-scale</td><td><code>cb_logscale => 1</code></td></tr>
 <tr><td><code>cmap</code></td><td>color map for coloring # "gist_rainbow" by default</td><td></td></tr>
 <tr><td>'cmax', <code>cmin</code></td><td>All bins that has count < *cmin* or > *cmax* will not be displayed</td><td></td></tr>
-</tbody>
-</table>
-
-|  'density',      # density : bool, default: False
-
-=for html
-<table>
-<tbody>
-<tr><td>'key.order'</td><td># define the keys in an order (an array reference)</td><td></td></tr>
+<tr><td>'density'</td><td>density : bool, default: False</td><td></td></tr>
+<tr><td>'key.order'</td><td>define the keys in an order (an array reference)</td><td></td></tr>
 <tr><td>'logscale'</td><td># logscale, an array of axes that will get log scale</td><td></td></tr>
 <tr><td>'show.colorbar'</td><td>self-evident, 0 or 1</td><td><code>show.colorbar</code> => 1</td></tr>
 <tr><td>'vmax'</td><td>When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover</td><td></td></tr>
@@ -3301,7 +3290,7 @@ the range for the density min and max is reported to stdout
 =head3 multiple plots
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 1,
      ncols             => 3,
      nrows             => 3,
@@ -3439,7 +3428,7 @@ Plot 2D array of numbers as an image
  plt({
      data              => \@imshow_data,
      execute           => 0,
-    'input.file'      => $tmp_filename,
+    fh => $fh,
      'output.file' => 'output.images/imshow.single.png',
      'plot.type'       => 'imshow',
      set_xlim          => '0, ' . scalar @imshow_data,
@@ -3512,7 +3501,7 @@ which makes the following image:
          },
      ],
      execute         => 0,
-    'input.file'    => $tmp_filename,
+   fh              => $fh,
      'output.file'   => 'output.images/imshow.multiple.png',
      ncols           => 2,
      nrows           => 2,
@@ -3548,7 +3537,7 @@ which makes the following image:
      },
      'plot.type'  => 'pie',
      title        => 'Single Simple Pie',
-     'input.file' => $tmp_filename,
+     fh           => $fh,
      execute      => 0,
  });
 
@@ -3618,7 +3607,7 @@ which makes the image:
              labeldistance => 0.6,
          }
      ],
-     'input.file' => $tmp_filename,
+     fh => $fh,
      execute      => 0,
     set_figwidth  => 12,
      ncols        => 3,
@@ -3640,7 +3629,7 @@ plot either a hash of arrays or an array of arrays
 data can be given as a hash, where the hash key is the label:
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 0,
      'output.file' => 'output.images/plot.single.png',
      data              => {
@@ -3667,7 +3656,7 @@ data can be given as a hash, where the hash key is the label:
 or as an array of arrays:
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 0,
      'output.file' => 'output.images/plot.single.arr.png',
      data              => [
@@ -3754,7 +3743,7 @@ which makes
          . '], [r\'$-2\pi$\', r\'$-3\pi/2$\', r\'$-\pi$\', r\'$-\pi/2$\', r\'$0$\', r\'$\pi/2$\', r\'$\pi$\', r\'$3\pi/2$\', r\'$2\pi$\']';
  my ($min, $max) = (-9,9);
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      execute           => 0,
      'output.file' => 'output.images/plots.png',
      plots         => [
@@ -3878,14 +3867,33 @@ which makes
 
 =head2 scatter
 
-=head3 options
-
 =head3 single, simple plot
+
+ scatter({
+     fh            => $fh,
+     data          => {
+         X => [@x],
+         Y => [map {sin($_)} @x]
+     },
+     execute       => 0,
+     'output.file' => 'output.images/single.scatter.png',
+ });
+
+makes the following image:
+
+
+=for html
+<p>
+<img width="651" height="491" alt="single scatter" src="https://github.com/user-attachments/assets/c45d9922-23e0-4f85-8306-aa7fca400328" />
+<p>
+
+
+=head3 options
 
 =head3 multiple plots
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh => $fh,
      'output.file' => 'output.images/scatterplots.png',
      execute           => 0,
      nrows             => 2,
@@ -3961,7 +3969,22 @@ which makes the following figure:
 
 =head2 violin
 
+plot a hash of array refs as violins
+
 =head3 options
+
+=for html
+<table>
+<tbody>
+<tr><td>Option</td><td>Description</td><td>Example</td></tr>
+<tr><td>--------</td><td>-------</td><td>-------</td></tr>
+<tr><td><code>color</code></td><td># a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'</td><td></td></tr>
+<tr><td><code>colors</code></td><td>match sets</td><td><code>colors       => { E => 'yellow', B => 'purple', A => 'green' }</code></td></tr>
+<tr><td><code>key.order</code></td><td>determine key order display on x-axis</td><td></td></tr>
+<tr><td><code>log</code></td><td># if set to > 1, the y-axis will be logarithmic</td><td></td></tr>
+<tr><td><code>orientation</code></td><td>'vertical', 'horizontal'}, default: 'vertical'</td><td></td></tr>
+</tbody>
+</table>
 
 =head3 single, simple plot
 
@@ -3975,7 +3998,7 @@ which makes the following figure:
      'plot.type'  => 'violinplot',
      title        => 'Single Violin Plot: Specified Colors',
      colors       => { E => 'yellow', B => 'purple', A => 'green' },
-     'input.file' => $tmp_filename,
+     fh => $fh,
      execute      => 0,
  });
 
@@ -3991,9 +4014,9 @@ which makes:
 =head3 multiple plots
 
  plt({
-     'input.file'      => $tmp_filename,
+     fh                => $fh,
      execute           => 0,
-     'output.file' => 'output.images/violin.png',
+     'output.file'     => 'output.images/violin.png',
      plots             => [
          {
              data => {
@@ -4085,11 +4108,10 @@ all files that can have notes with them, give notes about how the file was writt
 
 To improve speed, all data can be written into a single temp python3 file thus:
 
- use File::Temp 'tempfile';
- my ( $fh, $tmp_filename ) =  tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
- close $fh;
+ use File::Temp;
+ my $fh = File::Temp->new( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
 
-all files will be written to $tmp_filename; be sure to put C<< execute =E<gt> 0 >>
+all files will be written to C<< $fh-E<gt>filename >>; be sure to put C<< execute =E<gt> 0 >> unless you want the file to be run, which is the last step.
 
  plt({
      data => {
@@ -4117,7 +4139,7 @@ all files will be written to $tmp_filename; be sure to put C<< execute =E<gt> 0 
          HGI      => 'green'
      },
      title        => 'Visualization of similar lines plotted together',
-     'input.file' => $tmp_filename,
+     fh => $fh,
      execute      => 0,
  });
  # the last plot should have C<< execute =E<gt> 1 >>
@@ -4134,6 +4156,6 @@ all files will be written to $tmp_filename; be sure to put C<< execute =E<gt> 0 
      'plot.type'       => 'wide',
      color             => 'red',
      title             => 'Visualization of similar lines plotted together',
-     'input.file'      => $tmp_filename,
+     fh                => $fh,
      execute           => 1,
  });

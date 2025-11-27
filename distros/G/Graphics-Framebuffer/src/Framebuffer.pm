@@ -293,6 +293,8 @@ Acceleration method constants
 use constant {
     TRUE  => 1,
     FALSE => 0,
+	ON    => 1,
+	OFF   => 0,
 
     NORMAL_MODE   => 0,    #   Constants for DRAW_MODE
     XOR_MODE      => 1,
@@ -354,7 +356,6 @@ use constant {
     KD_TEXT             => 0,
 
     # FLAGS
-	# I have never found a driver that actually uses these, else I would have used them
     FBINFO_HWACCEL_NONE      => 0x0000,    # These come from "fb.h" in the kernel source
     FBINFO_HWACCEL_COPYAREA  => 0x0100,
     FBINFO_HWACCEL_FILLRECT  => 0x0200,
@@ -363,6 +364,7 @@ use constant {
     FBINFO_HWACCEL_XPAN      => 0x1000,
     FBINFO_HWACCEL_YPAN      => 0x2000,
     FBINFO_HWACCEL_YWRAP     => 0x4000,
+	FBINFO_MISC_TILEBLITTING => 0x20000,
 
     pi => (4 * atan2(1,1)), # This gets rid of Math::Trig
 };
@@ -7684,7 +7686,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+L<https://perlfoundation.org/artistic-license-20.html>
 
 Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.
 

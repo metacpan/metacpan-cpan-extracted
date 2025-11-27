@@ -74,3 +74,30 @@ splice @lib, 1-(scalar @lib - $line);
 push @lib, @pod; # add properly formatted POD text
 open $fh, '>', 'lib/Matplotlib/Simple.pm';
 say $fh join ("\n", @lib);
+close $fh;
+# now get 02.make.files.t ready
+my $txt = file2string('mpl.examples.pl');
+my @mpl_examples = split /\n/, $txt;
+my $start_str = '# Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς';
+my $end_str   = '# σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ';
+my $i1 = first_index {$_ eq $start_str} @mpl_examples;
+splice @mpl_examples, 0, $i1+1;
+my @output_files;
+foreach my $line (grep {/output\.file'\h+=\>\h*.+\.png',?\s*/} @mpl_examples) {
+	$line =~ s/\.png'(,?)/.svg'$1/;
+	if ($line =~ m/output.file\'\h*=\>\h+'(.*)\.svg/) {
+		push @output_files, "$1.svg";
+	} else {
+		die "$line failed regex.";
+	}
+}
+p @output_files;
+$txt = file2string('t/02.make.files.t');
+my @test = split /\n/, $txt;
+$i1 = first_index {$_ eq $start_str}  @test;
+my $i2 = first_index {$_ eq $end_str} @test;
+splice @test, $i1+1, $i2-$i1-1; # remove old code
+splice @test, $i1+1, 0, @mpl_examples; # insert
+$test[$i2+1] = 'my @output_files = (\'' . join ("','", @output_files) . '\');';
+open $fh, '>', 't/02.make.files.t';
+say $fh join ("\n", @test);

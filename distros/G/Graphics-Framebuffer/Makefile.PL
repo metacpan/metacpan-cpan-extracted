@@ -32,7 +32,7 @@ if (-e 'Makefile') { # We need a clean slate;
 	exec('make veryclean;reset;perl Makefile.PL');
 }
 
-my $blink = chr(27) . '[5m';
+my $blink = "\e[5m";
 
 # Graphics::Framebuffer banner
 my $banner = '';
@@ -200,7 +200,7 @@ unless (defined($ENV{'DISPLAY'})) {
 	print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'               make')," veryclean\n";
 }
 print colored(['black on_blue'],'-' x $COLS),"\n";
-# print $blink,colored(['black on_bright_white'],sprintf('%-67s',' PLEASE PAY ATTENTION TO THE MESSAGE BELOW FOR ANY MISSING MODULES ')),"\n";
+print $blink, colored(['yellow on_blue'],sprintf('%-67s',' PLEASE PAY ATTENTION TO THE MESSAGE BELOW FOR ANY MISSING MODULES BEFORE CONTINUING ')), "\n";
 
 my $mm = WriteMakefile(
     NAME               => 'Graphics::Framebuffer',
@@ -216,8 +216,9 @@ my $mm = WriteMakefile(
         'Term::ReadKey'       => '0',
     },
     BUILD_REQUIRES => {
-        'Test::More' => '1.00',
-        'List::Util' => '1.20',
+        'Test::More'      => '1.00',
+        'List::Util'      => '1.20',
+		'Term::ANSIColor' => '0',
     },
     PREREQ_PRINT   => TRUE,
     PREREQ_FATAL   => FALSE,
@@ -235,7 +236,7 @@ my $mm = WriteMakefile(
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *.inl *log *bak *old'},
 );
-# print $blink,colored(['black on_bright_white'],sprintf('%-67s',' PLEASE PAY ATTENTION TO THE MESSAGE ABOVE FOR ANY MISSING MODULES ')),"\n";
+print $blink, colored(['yellow on_blue'],sprintf('%-67s',' PLEASE PAY ATTENTION TO THE MESSAGE ABOVE FOR ANY MISSING MODULES BEFORE CONTINUING ')), "\n";
 
 exit(0);
 

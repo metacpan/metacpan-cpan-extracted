@@ -1,5 +1,35 @@
 Revision history for Perl extension DBD-libsql
 
+0.06 2025-11-26T11:42:23Z
+    - feat: Implement fetchall_arrayref() method for DBD::libsql::st (issue #19)
+      * Supports multiple slice parameter styles: {}, [], and default
+      * Returns array of hash references when slice is {}
+      * Returns array of array references by default
+      * Supports array slice [col1, col2] for specific columns
+      * Supports max_rows parameter for limiting results
+      * Fixes DBIx::Sunny compatibility issues with select_all()
+    - fix: Improve UNIVERSAL::can() method detection for DBIx::Sunny::db objects
+      * Fixed xt/05_dbix_sunny_select_all.t to use UNIVERSAL::can() instead of $dbh->can()
+    - fix: Enhance test skip messages with setup instructions
+      * xt/03_turso_live.t now provides clear instructions for required environment variables
+      * Users can now easily configure TURSO_DATABASE_URL and TURSO_DATABASE_TOKEN
+    - test: Add comprehensive unit tests for fetchall_arrayref (35 test cases)
+      * t/04_fetchall_arrayref.t covers all parameter styles and edge cases
+    - test: Add integration test for fetchall_arrayref with real database (15 test cases)
+      * xt/07_sth_fetchall_arrayref.t validates against turso dev server
+    - test: Add Issue #1 comment reproduction test (8 test cases)
+      * xt/90_issue1_reproduction.t reproduces exact bug report from kfly8
+      * Tests both $dbh->selectall_arrayref and $sth->fetchall_arrayref
+    - test: Add integration test for selectrow_hashref (15 test cases)
+      * xt/08_selectrow_hashref_integration.t validates hash structure with real database
+    - test: Add integration test for selectall_arrayref Slice option (15 test cases)
+      * xt/09_selectall_arrayref_slice.t validates { Slice => {} } with real database
+    - docs: Add detailed status comments to all child issues (#13-#19)
+      * Each issue includes implementation details, test coverage, and verification steps
+    - chore: Remove duplicate STREAM_EXPIRED test
+      * xt/10_stream_expired_integration.t was identical to t/06_stream_expired_handling.t
+      * Kept xt/06 approach with unit tests for better CI/CD compatibility
+
 0.05 2025-11-13T03:52:51Z
     - feat: Implement last_insert_id method (issue #8)
     - fix: Implement { Slice => {} } option for selectall_arrayref (issue #10)

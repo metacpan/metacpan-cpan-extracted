@@ -5,10 +5,8 @@ use warnings FATAL => 'all';
 use autodie ':all';
 use feature 'say';
 use File::Temp 'tempfile';
-use DDP { output => 'STDOUT', array_max => 10, show_memsize => 1 };
-use Devel::Confess 'color';
 use Matplotlib::Simple;
-
+# Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς
 sub linspace {    # mostly written by Grok
 	my ( $start, $stop, $num, $endpoint ) = @_;   # endpoint means include $stop
 	$num      = defined $num      ? int($num) : 50;    # Default to 50 points
@@ -60,8 +58,7 @@ my $x = generate_normal_dist( 100, 15, 3 * 10 );
 my $y = generate_normal_dist( 85,  15, 3 * 10 );
 my $z = generate_normal_dist( 106, 15, 3 * 10 );
 my @x  = linspace( -2 * $pi, 2 * $pi, 100, 1 );
-my ( $fh, $tmp_filename ) = tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
-close $fh;
+my $fh = File::Temp->new( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
 plt({
 	'output.file' => 'output.images/add.single.png',
 	'plot.type'       => 'plot',
@@ -101,7 +98,7 @@ plt({
 			}
 		},
 	],
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 plt({
@@ -130,7 +127,7 @@ plt({
 		HGI      => 'green'
 	},
 	title        => 'Visualization of similar lines plotted together',
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 plt({
@@ -146,7 +143,7 @@ plt({
 	'plot.type'       => 'wide',
 	color             => 'red',
 	title             => 'Visualization of similar lines plotted together',
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 });
 plt({
@@ -167,7 +164,7 @@ plt({
 	],
 	'output.file' => 'output.images/wide.subplots.png',
 	suptitle          => 'SubPlots',
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 });
 pie({
@@ -182,7 +179,7 @@ pie({
 		Wed => 77
 	},
 	title        => 'Single Simple Pie',
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 plt({
@@ -240,7 +237,7 @@ plt({
 		    labeldistance => 0.6,
 		}
 	],
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
    set_figwidth  => 12,
 	ncols        => 3,
@@ -258,13 +255,13 @@ plt({
         'plot.type'  => 'boxplot',
         title        => 'Single Box Plot: Specified Colors',
         colors       => { E => 'yellow', B => 'purple' },
-        'input.file' => $tmp_filename,
+        fh => $fh,
         execute      => 0,
 });
 plt({
 	'output.file' => 'output.images/boxplot.png',
 	execute           => 0,
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	plots             => [
 		{
 			data => {
@@ -392,14 +389,14 @@ plt({
 	'plot.type'  => 'violinplot',
 	title        => 'Single Violin Plot: Specified Colors',
 	colors       => { E => 'yellow', B => 'purple', A => 'green' },
-	'input.file' => $tmp_filename,
+	fh => $fh,
 	execute      => 0,
 });
 my @e = generate_normal_dist( 100, 15, 3 * 200 );
 my @b = generate_normal_dist( 85,  15, 3 * 200 );
 my @a = generate_normal_dist( 105, 15, 3 * 200 );
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/violin.png',
 	plots             => [
@@ -481,7 +478,7 @@ plt({
 	ylabel       => 'Count',
 	title        => 'Customer Calls by Days',
 	execute      => 0,
-	'input.file' => $tmp_filename,
+	fh => $fh,
 });
 plt({
 	data => {
@@ -489,7 +486,7 @@ plt({
 		B => @b,
 	},
 	execute           => 0,
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	'output.file' => 'output.images/single.hexbin.png',
 	'plot.type'       => 'hexbin',
 	set_figwidth      => 12,
@@ -504,10 +501,10 @@ plt({
 	'plot.type'  => 'hist2d',
 	title        => 'title',
 	execute      => 0,
-	'input.file' => $tmp_filename,
+	fh => $fh,
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/hexbin.png',
 	plots             => [
@@ -670,12 +667,12 @@ foreach my $interval (
 	@{ $d{tan}{$i}[1] } = map { sin($_)/cos($_) } @th;
 	$i++;
 }
-mkdir 'svg' unless -d 'svg';
+mkdir 'output.images' unless -d 'output.images';
 my $xticks = "[-2 * $pi, -3 * $pi / 2, -$pi, -$pi / 2, 0, $pi / 2, $pi, 3 * $pi / 2, 2 * $pi"
 		. '], [r\'$-2\pi$\', r\'$-3\pi/2$\', r\'$-\pi$\', r\'$-\pi/2$\', r\'$0$\', r\'$\pi/2$\', r\'$\pi$\', r\'$3\pi/2$\', r\'$2\pi$\']';
 my ($min, $max) = (-9,9);
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/plots.png',
 	plots         => [
@@ -790,7 +787,7 @@ plt({
 	suptitle     => 'Basic Trigonometric Functions'
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/plot.single.png',
 	data              => {
@@ -814,7 +811,7 @@ plt({
 	}
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/plot.single.arr.png',
 	data              => [
@@ -838,7 +835,7 @@ plt({
 	],
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/barplots.png',
 	plots             => [
@@ -1022,7 +1019,7 @@ plt({
 	nrows => 4
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/single.hist.png',
 	data              => {
@@ -1033,7 +1030,7 @@ plt({
 	'plot.type'       => 'hist'
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh => $fh,
 	execute           => 0,
 	'output.file' => 'output.images/histogram.png',
    set_figwidth => 15,
@@ -1124,7 +1121,7 @@ plt({
 		    'plot.type' => 'hist',
 		    alpha       => 0.75,
 		    color       => {
-		        B => 'Black',
+		        B  => 'Black',
 		        E => 'Orange',
 		        A => 'Yellow',
 		    },
@@ -1137,9 +1134,18 @@ plt({
 	ncols => 3,
 	nrows => 2,
 });
+scatter({
+	fh            => $fh,
+	data          => {
+		X => [@x],
+		Y => [map {sin($_)} @x]
+	},
+	execute       => 0,
+	'output.file' => 'output.images/single.scatter.png',
+});
 plt({
-	'input.file'      => $tmp_filename,
-	'output.file' => 'output.images/scatterplots.png',
+	fh                => $fh,
+	'output.file'     => 'output.images/scatterplots.png',
 	execute           => 0,
 	nrows             => 2,
 	ncols             => 3,
@@ -1199,6 +1205,24 @@ plt({
 				Y => 'marker = "d"'     # diamond
 			},
 			color_key => 'Z',
+		},
+		{ # multiple-set scatter, labels are "X" and "Y"
+			data => {    # 8th plot,
+				X => {    # 1st data set; label is "X"
+					A => @e,    # x-axis
+					B => @b,    # y-axis
+				},
+				Y => {    # 2nd data set; label is "Y"
+					A => generate_normal_dist( 100, 15, 210 ),    # x-axis
+					B => generate_normal_dist( 100, 15, 210 ),    # y-axis
+				},
+			},
+			'plot.type'   => 'scatter',
+			title         => 'Multiple Set Scatter w/ colorbar',
+			'set.options' => {    # arguments to ax.scatter, for each set in data
+				X => 'marker = "."',
+				Y => 'marker = "d"'     # diamond
+			},
 		}
 	]
 });
@@ -1211,7 +1235,7 @@ foreach my $i (0..360) {
 plt({
 	data              => \@imshow_data,
 	execute           => 0,
-   'input.file'      => $tmp_filename,
+   fh => $fh,
 	'output.file' => 'output.images/imshow.single.png',
 	'plot.type'       => 'imshow',
 	set_xlim          => '0, ' . scalar @imshow_data,
@@ -1272,7 +1296,7 @@ plt({
 		},
 	],
 	execute         => 0,
-   'input.file'    => $tmp_filename,
+   fh              => $fh,
 	'output.file'   => 'output.images/imshow.multiple.png',
 	ncols           => 2,
 	nrows           => 2,
@@ -1280,7 +1304,7 @@ plt({
 	set_figwidth    => 6*4 # 6.4
 });
 plt({
-	'input.file'      => $tmp_filename,
+	fh                => $fh,
 	execute           => 1,
 	ncols             => 3,
 	nrows             => 3,

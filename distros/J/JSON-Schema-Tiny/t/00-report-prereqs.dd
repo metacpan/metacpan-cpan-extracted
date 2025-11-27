@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.166',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.170',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -16,6 +16,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Pod::Wordlist' => '0',
+                                      'Test2::Warnings' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
                                       'Test::CleanNamespaces' => '0.15',
@@ -29,7 +30,6 @@ do { my $x = {
                                       'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
-                                      'Test::Warnings' => '0',
                                       'strict' => '0'
                                     }
                     },
@@ -76,11 +76,12 @@ do { my $x = {
                                    'Math::BigInt' => '0',
                                    'Module::Metadata' => '0',
                                    'Path::Tiny' => '0',
+                                   'Test2::API' => '0',
+                                   'Test2::V0' => '0',
+                                   'Test2::Warnings' => '0',
                                    'Test::Deep' => '0',
-                                   'Test::Fatal' => '0',
                                    'Test::JSON::Schema::Acceptance' => '1.026',
-                                   'Test::More' => '0.96',
-                                   'Test::Warnings' => '0',
+                                   'Test::More' => '0',
                                    'lib' => '0',
                                    'open' => '0',
                                    'perl' => '5.020',

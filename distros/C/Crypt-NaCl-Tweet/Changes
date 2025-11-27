@@ -1,16 +1,24 @@
-0.03   2025-11-11
+0.04   2025-11-26
+
+- fix an assert on debug builds
+
+- add a couple keygen functions
+
+- fix the dates in Changes
+
+0.03   2025-11-26
 
 - implement working keypair functions
 
 - minor cleanups
 
-0.02   2025-11-11
+0.02   2025-11-26
 
 - allocation fixups
 - pod cleanup
 - makefile cleanup
 - a few more tests
 
-0.01   2025-11-10
+0.01   2025-11-25
 
 - released onto an unsuspecting world

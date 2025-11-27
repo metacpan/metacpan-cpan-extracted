@@ -228,6 +228,7 @@ t/20-modules/Type-Tiny-Enum/exporter.t
 t/20-modules/Type-Tiny-Enum/exporter_lexical.t
 t/20-modules/Type-Tiny-Enum/sorter.t
 t/20-modules/Type-Tiny-Enum/union_intersection.t
+t/20-modules/Type-Tiny-Enum/use_eq.t
 t/20-modules/Type-Tiny-Intersection/basic.t
 t/20-modules/Type-Tiny-Intersection/cmp.t
 t/20-modules/Type-Tiny-Intersection/constrainedobject.t

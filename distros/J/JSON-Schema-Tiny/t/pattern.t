@@ -11,16 +11,13 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 
 use lib 't/lib';
 use Helper;
 
 my $tests = sub ($char, $test_substr) {
-  cmp_deeply(
+  cmp_result(
     evaluate($char, { pattern => '[a-z]' }),
     {
       valid => false,
@@ -35,7 +32,7 @@ my $tests = sub ($char, $test_substr) {
     $test_substr.' LATIN SMALL LETTER E WITH ACUTE does not match the ascii range [a-z]',
   );
 
-  cmp_deeply(
+  cmp_result(
     evaluate($char, { pattern => '\w' }),
     {
       valid => true,
@@ -57,7 +54,7 @@ subtest 'empty pattern' => sub {
   # create a "last successful match" in a containing scope
   my $str = "furble" =~ s/fur/meow/r;
 
-  cmp_deeply(
+  cmp_result(
     evaluate('hello', { pattern => '' }),
     { valid => true },
     'empty pattern in "pattern" will correctly match',
@@ -66,7 +63,7 @@ subtest 'empty pattern' => sub {
   # create a new "last successful match"
   $str = "furble" =~ s/fur/meow/r;
 
-  cmp_deeply(
+  cmp_result(
     evaluate(
       { alpha => 'hello' },
       {

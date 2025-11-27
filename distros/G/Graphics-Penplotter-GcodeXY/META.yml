@@ -27,7 +27,7 @@ no_index:
 provides:
   Graphics::Penplotter::GcodeXY:
     file: lib/Graphics/Penplotter/GcodeXY.pm
-    version: v0.5.17
+    version: v0.5.22
 requires:
   File::Temp: '0'
   Font::FreeType: '0'
@@ -44,7 +44,7 @@ requires:
 resources:
   homepage: https://github.com/gamk67/Graphics-Penplotter-GcodeXY
   repository: https://github.com/gamk67/Graphics-Penplotter-GcodeXY.git
-version: v0.5.17
+version: v0.5.22
 x_contributors:
   - 'gamk67 <31990368+gamk67@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

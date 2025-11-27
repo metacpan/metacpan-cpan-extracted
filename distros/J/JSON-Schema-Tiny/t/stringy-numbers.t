@@ -10,9 +10,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use JSON::Schema::Tiny 'evaluate';
 use lib 't/lib';
 use Helper;
@@ -21,7 +18,7 @@ foreach my $config (0, 1) {
   $JSON::Schema::Tiny::STRINGY_NUMBERS = $config;
   note '$STRINGY_NUMBERS = '.$config;
 
-  cmp_deeply(
+  cmp_result(
     evaluate(1, { $_ => '1' }),
     {
       valid => false,
@@ -46,7 +43,7 @@ foreach my $config (0, 1) {
     ],
   };
 
-  cmp_deeply(
+  cmp_result(
     evaluate('1.1', $schema),
     {
       valid => false,
@@ -81,7 +78,7 @@ foreach my $config (0, 1) {
     'by default "type": "string" does not accept numbers',
   ) if not $config;
 
-  cmp_deeply(
+  cmp_result(
     evaluate('1.1', $schema),
     {
       valid => false,
@@ -158,7 +155,7 @@ foreach my $config (0, 1) {
 
   my $data = 11e0;
 
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     {
       valid => false,
@@ -169,13 +166,13 @@ foreach my $config (0, 1) {
 
   $data = '11e0';
 
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     { valid => true },
     'by default, stringy numbers are not evaluated by numeric keywords',
   ) if $config == 0;
 
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     {
       valid => false,
@@ -192,7 +189,7 @@ foreach my $config (0, 1) {
     const => 11,
   };
 
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     {
       valid => false,
@@ -212,7 +209,7 @@ foreach my $config (0, 1) {
     'by default, stringy numbers are not the same as numbers using comparison keywords',
   ) if $config == 0;
 
-  cmp_deeply(
+  cmp_result(
     evaluate($data, $schema),
     { valid => true },
     'with the config enabled, stringy numbers are the same as numbers using comparison keywords',

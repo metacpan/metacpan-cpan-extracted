@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.622-7-gee615857
+package JSON::Schema::Modern; # git description: v0.623-10-g10919909
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.623';
+our $VERSION = '0.624';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -28,7 +28,7 @@ use Ref::Util 0.100 qw(is_ref is_plain_hashref);
 use builtin::compat qw(refaddr load_module);
 use Mojo::URL;
 use Safe::Isa;
-use Path::Tiny;
+use Mojo::File 'path';
 use Storable 'dclone';
 use File::ShareDir 'dist_dir';
 use MooX::TypeTiny 0.002002;
@@ -812,9 +812,13 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
     # tick off properties that were recognized by this subschema
     $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 1 foreach @evaluated_properties;
+
+    # weird! the draft4 metaschema doesn't know about '$ref' at all!
+    $state->{seen_data_properties}{$state->{data_path}.'/$ref'} |= 1
+      if exists $data->{'$ref'} and $state->{specification_version} eq 'draft4';
   }
 
-  if ($valid and $state->{collect_annotations} and $state->{specification_version} !~ /^draft(?:7|2019-09)$/) {
+  if ($valid and $state->{collect_annotations} and $state->{specification_version} !~ /^draft(?:[467]|2019-09)$/) {
     annotate_self(+{ %$state, keyword => $_, _unknown => 1 }, $schema)
       foreach sort keys %unknown_keywords;
   }
@@ -1057,7 +1061,7 @@ sub _get_or_load_resource ($self, $uri) {
     my $document;
     if (not $document = $metaschema_cache->{$local_filename}) {
       my $file = path(dist_dir('JSON-Schema-Modern'), $local_filename);
-      my $schema = $self->_json_decoder->decode($file->slurp_raw);
+      my $schema = $self->_json_decoder->decode($file->slurp);
       my $_document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $self);
 
       # this should be caught by the try/catch in evaluate()
@@ -1170,7 +1174,10 @@ sub _prefix_match_length ($x, $y) {
 # and also checks if Cpanel::JSON::XS is installed.
 # Mojo::JSON falls back to its own pure-perl encoder/decoder but does not support all the options
 # that we require here.
-use constant _JSON_BACKEND => Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP';
+use constant _JSON_BACKEND =>
+    Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION('4.38'); 1 } ? 'Cpanel::JSON::XS'
+  : eval { JSON::PP->VERSION('4.11'); 1 } ? 'JSON::PP'
+  : die 'Cpanel::JSON::XS 4.38 or JSON::PP 4.11 is required';
 
 # used for internal encoding as well (when caching serialized schemas)
 has _json_decoder => (
@@ -1290,7 +1297,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.623
+version 0.624
 
 =head1 SYNOPSIS
 
@@ -1901,8 +1908,8 @@ L<encodings|/add_encoding> are not serialized, as they are represented by subrou
 will need to be manually added after thawing.
 
   sub get_evaluator (...) {
-    my $serialized_file = Path::Tiny::path($filename);
-    my $schema_file = Path::Tiny::path($schema_filename);
+    my $serialized_file = path($filename);
+    my $schema_file = path($schema_filename);
     my $js;
     if ($serialized_file->stat->mtime < $schema_file->stat->mtime)) {
       $js = JSON::Schema::Modern->new;

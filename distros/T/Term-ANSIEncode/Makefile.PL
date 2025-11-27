@@ -50,6 +50,7 @@ WriteMakefile(
         'Time::HiRes'       => '0',
         'Getopt::Long'      => '0',
         'Text::Wrap::Smart' => '0',
+		'Term::Drawille'    => '0.01',
     },
     EXE_FILES => ['bin/ansi-encode'],
     dist      => {

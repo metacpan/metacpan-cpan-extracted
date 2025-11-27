@@ -1,3 +1,4 @@
+AUTHOR.md
 Changes
 examples/dump.pl
 examples/fonts.pl
@@ -23,10 +24,10 @@ examples/screensaver.pl
 examples/slideshow.pl
 examples/template.pl
 examples/text_mode.pl
-examples/vector-usa.gfb
 examples/vector.pl
+examples/vector-usa.gfb
 examples/viewpic.pl
-examples/banner.vt
+GFB.png
 ignore.txt
 installing/detect.sh
 installing/FAQ.md
@@ -40,15 +41,14 @@ lib/Graphics/Framebuffer.pm
 lib/Graphics/Framebuffer/Mouse.pm
 lib/Graphics/Framebuffer/Splash.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST          This list of files
 README.md
-AUTHOR.md
-GFB.png
-Win-No.png
 src/Framebuffer.c
 src/Framebuffer.pm
-src/README.md
 src/metadata.txt
+src/README.md
 t/01-primitives.t
+Win-No.png
+LICENSE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

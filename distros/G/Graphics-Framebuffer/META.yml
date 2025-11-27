@@ -4,6 +4,7 @@ author:
   - 'Richard Kelsch <rich@rk-internet.com>'
 build_requires:
   List::Util: '1.20'
+  Term::ANSIColor: '0'
   Test::More: '1.00'
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
@@ -32,5 +33,5 @@ requires:
   Pod::Usage: '0'
   Term::ReadKey: '0'
   perl: '5.020'
-version: '6.75'
+version: '6.77'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

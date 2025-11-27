@@ -40,6 +40,7 @@ my @files = (
     't/024-sign-wide-char.t',
     't/025_verify-xml-with-id.t',
     't/026_do-not-move-namespace-to-parent.t',
+    't/027_no_signatures_should_fail.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
