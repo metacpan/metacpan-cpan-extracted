@@ -14,27 +14,27 @@ Mail::Box::Manager - manage a set of folders
 
 =head1 SYNOPSIS
 
- use Mail::Box::Manager;
- my $mgr     = new Mail::Box::Manager;
+  use Mail::Box::Manager;
+  my $mgr     = new Mail::Box::Manager;
 
- # Create folder objects.
- my $folder   = $mgr->open(folder => $ENV{MAIL});
- my $message1 = $folder->message(0);
- $mgr->copyMessage('Draft', $message);
+  # Create folder objects.
+  my $folder   = $mgr->open(folder => $ENV{MAIL});
+  my $message1 = $folder->message(0);
+  $mgr->copyMessage('Draft', $message);
 
- my @messages = $folder->message(0,3);
- $mgr->moveMessage('Outbox', @messages, create => 1 );
- $mgr->close($folder);
+  my @messages = $folder->message(0,3);
+  $mgr->moveMessage('Outbox', @messages, create => 1 );
+  $mgr->close($folder);
 
- # Create thread-detectors (see Mail::Box::Thread::Manager)
- my $t       = $mgr->threads($inbox, $outbox);
+  # Create thread-detectors (see Mail::Box::Thread::Manager)
+  my $t       = $mgr->discoverThreads($inbox, $outbox);
 
- my $threads = $mgr->threads(folder => $folder);
- foreach my $thread ($threads->all)
- {   $thread->print;
- }
+  my $threads = $mgr->discoverThreads(folder => $folder);
+  foreach my $thread ($threads->all)
+  {   $thread->print;
+  }
 
- $mgr->registerType(mbox => 'Mail::Box::MyType');
+  $mgr->registerType(mbox => 'Mail::Box::MyType');
 
 =head1 DESCRIPTION
 
@@ -44,18 +44,20 @@ directly create a L<Mail::Box::Mbox|Mail::Box::Mbox> if you prefer), but you wil
 more portable and safer code if you do use it.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Manager-E<gt>B<new>($args)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option             --Defined in     --Default
   autodetect                            undef
@@ -68,27 +70,27 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 
 =over 2
 
-=item autodetect => TYPE|ARRAY-OF-TYPES
+=item autodetect => $type|\@types
 
-Select only a subset of the folder types which are implemented by MailBox
+Select only a subset of the folder C<@types> which are implemented by MailBox
 to be detected automatically.  This may improve the auto-detection of
 folder types.  Normally, all folder types will be tried when a folder's
 name is incorrect, but this option limits the types which are checked
 and therefore may respond faster.
 
-=item default_folder_type => NAME|CLASS
+=item default_folder_type => $type|CLASS
 
-Specifies the default folder type for newly created folders.  If this
+Specifies the default folder C<$type> for newly created folders.  If this
 option is not specified, the most recently registered type is used (see
 L<registerType()|Mail::Box::Manager/"Attributes"> and the L<new(folder_types)|Mail::Box::Manager/"METHODS"> option.
 
-=item folder_types => NEW-TYPE | ARRAY-OF-NEW-TYPES
+=item folder_types => $typedef|\@typedefs
 
-Add one or more new folder types to the list of known types.  The order is
-important: when you open a file without specifying its type, the
-manager will start trying the last added list of types, in order.
+Add one or more new folder C<@typedefs> to the list of known types.
+The order is important: when you open a file without specifying its type,
+the manager will start trying the last added list of types, in order.
 
-Each TYPE is specified as an array which contains name, class, and
+Each C<$typedef> is specified as an array which contains name, class, and
 defaults for options which overrule the usual defaults.  You may specify
 folder-specific defaults as OPTIONS.  They override the settings of
 the manager.
@@ -113,38 +115,53 @@ a loss of information depending on the folder types.
 
 =head2 Attributes
 
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
 =over 4
 
 =item $obj-E<gt>B<defaultFolderType>()
 
 Returns the default folder type, some class name.
 
+=item $obj-E<gt>B<folderTypeDefs>()
+
+Z<>
+
 =item $obj-E<gt>B<folderTypes>()
 
 Returns the list of currently defined folder types.
 
-example: 
+» example: 
 
- print join("\n", $manager->folderTypes), "\n";
+  print join("\n", $manager->folderTypes), "\n";
 
 =item $obj-E<gt>B<folderdir>()
 
 In list context, this returns all folderdirs specified.  In SCALAR
 context only the first.
 
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
 =item $obj-E<gt>B<registerType>($type, $class, %options)
 
-With C<registerType> you can register one $type of folders.  The $class
+With C<registerType> you can register one C<$type> of folders.  The C<$class>
 is compiled automatically, so you do not need to C<use> them in your own
-modules.  The $type is just an arbitrary name.
+modules.  The C<$type> is just an arbitrary name.
 
 The added types are prepended to the list of known types, so they are
 checked first when a folder is opened in autodetect mode.
 
-example: 
+» example: 
 
- $manager->registerType(mbox => 'Mail::Box::Mbox',
-     save_on_exit => 0, folderdir => '/tmp');
+  $manager->registerType(mbox => 'Mail::Box::Mbox',
+      save_on_exit => 0, folderdir => '/tmp');
+
+=item $obj-E<gt>B<threads>( [@params] )
+
+[3.012] return the descovered threads (cached value).  When any C<@params> are passed, then
+L<discoverThreads()|Mail::Box::Manager/"Manage message threads"> will be called for backwards compatibility.
 
 =back
 
@@ -154,9 +171,9 @@ example:
 
 =item $obj-E<gt>B<close>($folder, %options)
 
-C<close> removes the specified folder from the list of open folders.
+Remove the specified C<$folder> from the index of open folders.
 Indirectly it will update the files on disk if needed (depends on
-the L<Mail::Box::new(save_on_exit)|Mail::Box/"Constructors"> flag for each folder). %options are
+the L<Mail::Box::new(save_on_exit)|Mail::Box/"Constructors"> flag for each folder). C<%options> are
 passed to L<Mail::Box::close()|Mail::Box/"The folder"> of the folder.
 
 The folder's messages will also be withdrawn from the known message threads.
@@ -164,7 +181,7 @@ You may also close the folder directly. The manager will be informed
 about this event and take appropriate actions.
 
  -Option       --Default
-  close_by_self  <false>
+  close_by_self  <C<false>>
 
 =over 2
 
@@ -175,13 +192,13 @@ not change this.
 
 =back
 
-example: 
+» example: 
 
- my $inbox = $mgr->open('inbox');
- $mgr->close($inbox);
- $inbox->close;        # alternative
+  my $inbox = $mgr->open('inbox');
+  $mgr->close($inbox);
+  $inbox->close;        # alternative
 
-=item $obj-E<gt>B<closeAllFolders>(, %options)
+=item $obj-E<gt>B<closeAllFolders>(%options)
 
 C<closeAllFolders> calls close() for each folder managed by
 this object.  It is called just before the program stops (before global
@@ -189,11 +206,11 @@ cleanup).
 
 =item $obj-E<gt>B<isOpenFolder>($folder)
 
-Returns true if the $folder is currently open.
+Returns C<true> if the C<$folder> is currently open.
 
-example: 
+» example: 
 
- print "Yes\n" if $mgr->isOpenFolder('Inbox');
+  print "Yes\n" if $mgr->isOpenFolder('Inbox');
 
 =item $obj-E<gt>B<open>( [$foldername], %options )
 
@@ -208,16 +225,16 @@ L<Mail::Box::new()|Mail::Box/"Constructors"> for each type of mail box.
 
  -Option      --Default
   authenticate  'AUTO'
-  create        <false>
+  create        false
   folder        $ENV{MAIL}
   folderdir     '.'
-  type          <first, usually C<mbox>>
+  type          <first, usually 'mbox'>
 
 =over 2
 
-=item authenticate => TYPE|ARRAY-OF-TYPES|'AUTO'
+=item authenticate => $type|\@types|'AUTO'
 
-The TYPE of authentication to be used, or a list of TYPES which the
+The C<$type> of authentication to be used, or an ARRAY of C<@types> which the
 client prefers.  The server may provide preferences as well, and that
 order will be kept.  This option is only supported by a small subset of
 folder types, especially by POP and IMAP.
@@ -227,12 +244,12 @@ folder types, especially by POP and IMAP.
 Create the folder if it does not exist. By default, this is not done.
 The C<type> option specifies which type of folder is created.
 
-=item folder => NAME|URL
+=item folder => $name|$url
 
-Which folder to open, specified by NAME or special URL.
+Which folder to open, specified by C<$name> or special C<$url>.
 The URL format is composed as
 
- type://username:password@hostname:port/foldername
+  type://username:password@hostname:port/foldername
 
 Like real URLs, all fields are optional and have smart defaults, as long
 as the string starts with a known folder type.  Far
@@ -247,7 +264,7 @@ passed directly to the C<new> method of the folder which is opened.
 
 The directory where the folders are usually stored.
 
-=item type => FOLDERTYPENAME|FOLDERTYPE
+=item type => $foldertypename|$foldertype
 
 Specify the type of the folder.  If you do not specify this option while
 opening a folder for reading, the manager checks all registered folder
@@ -262,23 +279,22 @@ and C<imaps>.
 
 =back
 
-example: opening folders via the manager
+» example: opening folders via the manager
 
- my $jack  = $manager->open(folder => '=jack',
-    type => 'mbox');
+  my $jack  = $manager->open(folder => '=jack', type => 'mbox');
 
- my $rcvd  = $manager->open('myMail',
-    type => 'Mail::Box::Mbox', access => 'rw');
+  my $rcvd  = $manager->open('myMail',
+     type => 'Mail::Box::Mbox', access => 'rw');
 
- my $inbox = $manager->open('Inbox')
-    or die "Cannot open Inbox.\n";
+  my $inbox = $manager->open('Inbox')
+     or die "Cannot open Inbox.\n";
 
- my $pop   = 'pop3://myself:secret@pop3.server.com:120/x';
- my $send  = $manager->open($url);
+  my $pop   = 'pop3://myself:secret@pop3.server.com:120/x';
+  my $send  = $manager->open($url);
 
- my $send  = $manager->open(folder => '/x',
-   type => 'pop3', username => 'myself', password => 'secret'
-   server_name => 'pop3.server.com', server_port => '120');
+  my $send  = $manager->open(folder => '/x',
+    type => 'pop3', username => 'myself', password => 'secret'
+    server_name => 'pop3.server.com', server_port => '120');
 
 =item $obj-E<gt>B<openFolders>()
 
@@ -292,7 +308,7 @@ Returns a list of all open folders.
 
 =item $obj-E<gt>B<delete>($foldername, %options)
 
-Remove the named folder.  The %options are the same as those for L<open()|Mail::Box::Manager/"Manage open folders">.
+Remove the named folder.  The C<%options> are the same as those for L<open()|Mail::Box::Manager/"Manage open folders">.
 
 The deletion of a folder can take some time.  Dependent on the type of
 folder, the folder must be read first.  For some folder-types this will
@@ -318,7 +334,7 @@ Some folder can only be recursively deleted, other have more flexibility.
 =item $obj-E<gt>B<appendMessage>( [$folder|$foldername], $messages, %options )
 
 Append one or more messages to a folder (therefore, an C<appendMessages()>
-is defined as well). You may specify a $foldername or an opened folder
+is defined as well). You may specify a C<$foldername> or an opened folder
 as the first argument. When the name is that of an open folder, it is
 treated as if the folder-object was specified, and not directly access
 the folder-files.  You may also specify the foldername as part of the
@@ -335,21 +351,20 @@ type does not have to match the folder type--the folder will try to
 resolve the differences with minimal loss of information.  The coerced
 messages (how the were actually written) are returned as list.
 
-The %options is a list of key/values, which are added to (overriding)
+The C<%options> is a list of key/values, which are added to (overriding)
 the default options for the detected folder type.
 
-example: 
+» example: 
 
- $mgr->appendMessage('=send', $message, folderdir => '/');
- $mgr->appendMessage($received, $inbox->messages);
+  $mgr->appendMessage('=send', $message, folderdir => '/');
+  $mgr->appendMessage($received, $inbox->messages);
 
- my @appended = $mgr->appendMessages($inbox->messages,
-    folder => 'Drafts');
- $_->label(seen => 1) foreach @appended;
+  my @appended = $mgr->appendMessages($inbox->messages, folder => 'Drafts');
+  $_->label(seen => 1) for @appended;
 
-=item $obj-E<gt>B<copyMessage>( [$folder|$foldername], $messages, %options )
+=item $obj-E<gt>B<copyMessage>( [$folder|$foldername], @messages, %options )
 
-Copy a message from one folder into another folder.  If the destination
+Copy C<@messages> from one folder into another folder.  If the destination
 folder is already opened, L<Mail::Box::copyTo()|Mail::Box/"The folder"> is used.  Otherwise,
 L<Mail::Box::appendMessages()|Mail::Box/"The folder"> is called.
 
@@ -358,7 +373,7 @@ argument, or in the options list.  The options are the same as those
 which can be specified when opening a folder.
 
  -Option--Default
-  share   <false>
+  share   false
 
 =over 2
 
@@ -370,23 +385,22 @@ message is copied to.  Silently ignored when not possible to share.
 
 =back
 
-example: 
+» example: 
 
- my $drafts = $mgr->open(folder => 'Drafts');
- my $outbox = $mgr->open(folder => 'Outbox');
- $mgr->copyMessage($outbox, $drafts->message(0));
+  my $drafts = $mgr->open(folder => 'Drafts');
+  my $outbox = $mgr->open(folder => 'Outbox');
+  $mgr->copyMessage($outbox, $drafts->message(0));
 
- my @messages = $drafts->message(1,2);
- $mgr->copyMessage('=Trash', @messages,
-    folderdir => '/tmp', create => 1);
+  my @messages = $drafts->message(1,2);
+  $mgr->copyMessage('=Trash', @messages,
+     folderdir => '/tmp', create => 1);
 
- $mgr->copyMessage($drafts->message(1),
-    folder => '=Drafts' folderdir => '/tmp',
-    create => 1);
+  $mgr->copyMessage($drafts->message(1), create => 1,
+     folder => '=Drafts' folderdir => '/tmp');
 
-=item $obj-E<gt>B<moveMessage>( [$folder|$foldername], $messages, %options )
+=item $obj-E<gt>B<moveMessage>( [$folder|$foldername], @messages, %options )
 
-Move a message from one folder to another.
+Move @message from one C<$folder> to another.
 
 BE WARNED that removals from a folder only take place when the folder
 is closed, so the message is only flagged to be deleted in the opened
@@ -396,15 +410,15 @@ BE WARNED that message labels may get lost when a message is moved from
 one folder type to an other.  An attempt is made to translate labels,
 but there are many differences in interpretation by applications.
 
- $mgr->moveMessage($received, $inbox->message(1))
+  $mgr->moveMessage($received, $inbox->message(1))
 
 is equivalent to
 
- $mgr->copyMessage($received, $inbox->message(1), share => 1);
- $inbox->message(1)->delete;
+  $mgr->copyMessage($received, $inbox->message(1), share => 1);
+  $inbox->message(1)->delete;
 
  -Option--Default
-  share   <true>
+  share   true
 
 =over 2
 
@@ -418,18 +432,30 @@ is equivalent to
 
 =over 4
 
-=item $obj-E<gt>B<threads>( [$folders], %options )
+=item $obj-E<gt>B<discoverThreads>( [@folders], %options )
 
-Create a new object which keeps track of message threads.  You can
-read about the possible options in L<Mail::Box::Thread::Manager|Mail::Box::Thread::Manager>.
-As %options specify one folder or an array of $folders.
-It is also permitted to specify folders before the options.
+[3.012] Create a new L<Mail::Box::Thread::Manager|Mail::Box::Thread::Manager> object which collects
+the message threads found in the combined specified C<@folders>.
 
-example: 
+All other C<%options> are passed to L<Mail::Box::Thread::Manager::new()|Mail::Box::Thread::Manager/"METHODS">.
 
- my $t1 = $mgr->threads(folders => [ $inbox, $send ]);
- my $t2 = $mgr->threads($inbox);
- my $t3 = $mgr->threads($inbox, $send);
+ -Option --Default
+  folders  <positional folder arguments>
+
+=over 2
+
+=item folders => \@folders
+
+As alternative for positional parameters to select the C<@folders>, you can also
+pass them via this named parameter.
+
+=back
+
+» example: 
+
+  my $t2 = $mgr->discoverThreads($inbox);
+  my $t3 = $mgr->discoverThreads($inbox, $send);
+  my $t1 = $mgr->discoverThreads(folders => [ $inbox, $send ]);
 
 =back
 
@@ -439,9 +465,9 @@ example:
 
 =item $obj-E<gt>B<decodeFolderURL>($url)
 
-Try to decompose a folder name which is specified as $url (see open())
+Try to decompose a folder name which is specified as C<$url> (see open())
 into separate options.  Special characters like @-sign, colon, and slash
-used in the user or password parts must be passed $url-encoded.
+used in the user or password parts must be passed C<$url>-encoded.
 
 =item $obj-E<gt>B<toBeThreaded>($folder, $messages)
 
@@ -460,7 +486,7 @@ or going out.
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -471,9 +497,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Manager-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -481,19 +505,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Manager-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Manager-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -522,7 +538,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -605,12 +621,14 @@ older releases (before MailBox 2.049), this was permitted, but then
 behaviour changed, because many nasty side-effects are to be expected.
 For instance, an L<Mail::Box::update()|Mail::Box/"The folder"> on one folder handle would
 influence the second, probably unexpectedly.
+Cast by C<open()>
 
 =item Error: Folder $name is not a Mail::Box; cannot add a message.
 
 The folder where the message should be appended to is an object which is
 not a folder type which extends L<Mail::Box|Mail::Box>.  Probably, it is not a folder
 at all.
+Cast by C<appendMessage()>
 
 =item Warning: Folder does not exist, failed opening $type folder $name.
 
@@ -624,6 +642,7 @@ to explicitly state the type of your folder with the C<type> option.
 There will probably be another warning or error message which is related
 to this report and provides more details about its cause.  You may also
 have a look at L<new(autodetect)|Mail::Box::Manager/"METHODS"> and L<new(folder_types)|Mail::Box::Manager/"METHODS">.
+Cast by C<open()>
 
 =item Warning: Folder type $type is unknown, using autodetect.
 
@@ -632,19 +651,22 @@ the folder name when specified as url) is not known to the manager.
 This may mean that you forgot to require the L<Mail::Box|Mail::Box> extension
 which implements this folder type, but probably it is a typo.  Usually,
 the manager is able to figure-out which type to use by itself.
+Cast by C<open()>
 
 =item Error: Illegal folder URL '$url'.
 
 The folder name was specified as URL, but not according to the syntax.
 See L<decodeFolderURL()|Mail::Box::Manager/"Internals"> for an description of the syntax.
+Cast by C<open()>
 
 =item Error: No foldername specified to open.
 
-C<open()> needs a folder name as first argument (before the list of options),
+L<open()|Mail::Box::Manager/"Manage open folders"> needs a folder name as first argument (before the list of options),
 or with the C<folder> option within the list.  If no name was found, the
 MAIL environment variable is checked.  When even that does not result in
 a usable folder, then this error is produced.  The error may be caused by
 an accidental odd-length option list.
+Cast by C<open()>
 
 =item Error: Package $package does not implement $method.
 
@@ -653,36 +675,41 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Use appendMessage() to add messages which are not in a folder.
 
 You do not need to copy this message into the folder, because you do
 not share the message between folders.
+Cast by C<copyMessage()>
 
 =item Warning: Use moveMessage() or copyMessage() to move between open folders.
 
 The message is already part of a folder, and now it should be appended
 to a different folder.  You need to decide between copy or move, which
 both will clone the message (not the body, because they are immutable).
+Cast by C<appendMessage()>
 
 =item Warning: Will never create a folder $name without having write access.
 
 You have set L<open(create)|Mail::Box::Manager/"Manage open folders">, but only want to read the folder.  Create is
 only useful for folders which have write or append access modes
 (see L<Mail::Box::new(access)|Mail::Box/"Constructors">).
+Cast by C<open()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

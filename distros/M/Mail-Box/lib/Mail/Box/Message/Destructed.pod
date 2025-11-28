@@ -13,7 +13,7 @@ Mail::Box::Message::Destructed - a destructed message
 
 =head1 SYNOPSIS
 
- $folder->message(3)->destruct;
+  $folder->message(3)->destruct;
 
 =head1 DESCRIPTION
 
@@ -30,67 +30,68 @@ for read-only, the message will stay in that folder, but otherwise it may
 be deleted.
 
 Extends L<"DESCRIPTION" in Mail::Box::Message|Mail::Box::Message/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::Message|Mail::Box::Message/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::Message|Mail::Box::Message/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>(%options)
 
 Inherited, see L<Mail::Message/"Constructors">
 
-=item Mail::Box::Message::Destructed-E<gt>B<new>($message_id, %options)
+=item $class-E<gt>B<new>($msgid, %options)
 
 You cannot instantiate a destructed message object.  Destruction is
 done by calling L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup">.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in        --Default
   body        Mail::Message       undef
   body_type   Mail::Box::Message  <from folder>
-  deleted     Mail::Message       <false>
+  deleted     Mail::Message       false
   field_type  Mail::Message       undef
   folder      Mail::Box::Message  <required>
   head        Mail::Message       undef
   head_type   Mail::Message       Mail::Message::Head::Complete
-  labels      Mail::Message       {}
+  labels      Mail::Message       +{}
   log         Mail::Reporter      'WARNINGS'
   messageId   Mail::Message       undef
-  modified    Mail::Message       <false>
+  modified    Mail::Message       false
   size        Mail::Box::Message  undef
   trace       Mail::Reporter      'WARNINGS'
-  trusted     Mail::Message       <false>
+  trusted     Mail::Message       false
 
 =over 2
 
-=item body => OBJECT
+=item body => $object
 
-=item body_type => CODE|CLASS
+=item body_type => CODE|$class
 
 =item deleted => BOOLEAN
 
-=item field_type => CLASS
+=item field_type => $class
 
-=item folder => FOLDER
+=item folder => $folder
 
-=item head => OBJECT
+=item head => $object
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item labels => ARRAY|HASH
 
 =item log => LEVEL
 
-=item messageId => STRING
+=item messageId => $id
 
 =item modified => BOOLEAN
 
-=item size => INTEGER
+=item size => $bytes
 
 =item trace => LEVEL
 
@@ -100,21 +101,41 @@ done by calling L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup">.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::Message|Mail::Box::Message/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<folder>( [$folder] )
+
+Inherited, see L<Mail::Box::Message/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<seqnr>( [$integer] )
+
+Inherited, see L<Mail::Box::Message/"Attributes">
+
+=back
+
 =head2 Constructing a message
 
 Extends L<"Constructing a message" in Mail::Box::Message|Mail::Box::Message/"Constructing a message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bounce>( [<$rg_object|%options>] )
 
 Inherited, see L<Mail::Message::Construct::Bounce/"Constructing a message">
 
-=item Mail::Box::Message::Destructed-E<gt>B<build>( [$message|$part|$body], $content )
+=item $class-E<gt>B<build>( [$message|$part|$body], @fields, %options )
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-=item Mail::Box::Message::Destructed-E<gt>B<buildFromBody>($body, [$head], $headers)
+=item $class-E<gt>B<buildFromBody>($body, [$head], $headers)
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
@@ -150,7 +171,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item Mail::Box::Message::Destructed-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -166,9 +187,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replySubject>(STRING)
-
-=item Mail::Box::Message::Destructed-E<gt>B<replySubject>(STRING)
+=item $any-E<gt>B<replySubject>(STRING)
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -177,7 +196,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 =head2 The message
 
 Extends L<"The message" in Mail::Box::Message|Mail::Box::Message/"The message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>()
@@ -188,9 +207,9 @@ Inherited, see L<Mail::Message/"The message">
 
 Inherited, see L<Mail::Box::Message/"The message">
 
-=item $obj-E<gt>B<folder>( [$folder] )
+=item $obj-E<gt>B<endsOnNewline>()
 
-Inherited, see L<Mail::Box::Message/"The message">
+Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<isDummy>()
 
@@ -220,10 +239,6 @@ Inherited, see L<Mail::Message/"The message">
 
 Inherited, see L<Mail::Message/"The message">
 
-=item $obj-E<gt>B<seqnr>( [$integer] )
-
-Inherited, see L<Mail::Box::Message/"The message">
-
 =item $obj-E<gt>B<size>()
 
 Inherited, see L<Mail::Message/"The message">
@@ -241,7 +256,7 @@ Inherited, see L<Mail::Message/"The message">
 =head2 The header
 
 Extends L<"The header" in Mail::Box::Message|Mail::Box::Message/"The header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bcc>()
@@ -274,9 +289,10 @@ Inherited, see L<Mail::Message/"The header">
 
 =item $obj-E<gt>B<head>( [$head] )
 
-When C<undef> is specified for $head, no change has to take place and
+When C<undef> is specified for C<$head>, no change has to take place and
 the method returns silently.  In all other cases, this method will
 complain that the header has been removed.
+Improves base, see L<Mail::Message/"The header">
 
 =item $obj-E<gt>B<nrLines>()
 
@@ -307,14 +323,15 @@ Inherited, see L<Mail::Message/"The header">
 =head2 The body
 
 Extends L<"The body" in Mail::Box::Message|Mail::Box::Message/"The body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>( [$body] )
 
-When C<undef> is specified for $body, no change has to take place and
+When C<undef> is specified for C<$body>, no change has to take place and
 the method returns silently.  In all other cases, this method will
 complain that the body data has been removed.
+Improves base, see L<Mail::Message/"The body">
 
 =item $obj-E<gt>B<contentType>()
 
@@ -345,7 +362,7 @@ Inherited, see L<Mail::Message/"The body">
 =head2 Flags
 
 Extends L<"Flags" in Mail::Box::Message|Mail::Box::Message/"Flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<delete>()
@@ -367,6 +384,7 @@ Inherited, see L<Mail::Message/"Flags">
 =item $obj-E<gt>B<label>($label|PAIRS)
 
 It is possible to delete a destructed message, but not to undelete it.
+Improves base, see L<Mail::Message/"Flags">
 
 =item $obj-E<gt>B<labels>()
 
@@ -389,7 +407,7 @@ Inherited, see L<Mail::Message/"Flags">
 =head2 The whole message as text
 
 Extends L<"The whole message as text" in Mail::Box::Message|Mail::Box::Message/"The whole message as text">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<file>()
@@ -413,25 +431,26 @@ Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Box::Message|Mail::Box::Message/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clonedFrom>()
 
 Inherited, see L<Mail::Message/"Internals">
 
-=item Mail::Box::Message::Destructed-E<gt>B<coerce>($message)
+=item $class-E<gt>B<coerce>($message)
 
 Coerce a L<Mail::Box::Message|Mail::Box::Message> into destruction.
+Improves base, see L<Mail::Message/"Internals">
 
-example: of coercion to death
+» example: of coercion to death
 
- Mail::Box::Message::Destructed->coerce($folder->message(1));
- $folder->message(1)->destruct;  # same
+  Mail::Box::Message::Destructed->coerce($folder->message(1));
+  $folder->message(1)->destruct;  # same
 
- my $msg = $folder->message(1);
- Mail::Box::Message::Destructed->coerce($msg);
- $msg->destruct;                 # same
+  my $msg = $folder->message(1);
+  Mail::Box::Message::Destructed->coerce($msg);
+  $msg->destruct;                 # same
 
 =item $obj-E<gt>B<diskDelete>()
 
@@ -470,7 +489,7 @@ Inherited, see L<Mail::Message/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::Message|Mail::Box::Message/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -481,9 +500,7 @@ Inherited, see L<Mail::Message::Construct/"METHODS">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Message::Destructed-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -491,19 +508,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Message::Destructed-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Message::Destructed-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -519,9 +528,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<shortSize>( [$value] )
-
-=item Mail::Box::Message::Destructed-E<gt>B<shortSize>( [$value] )
+=item $any-E<gt>B<shortSize>( [$value] )
 
 Inherited, see L<Mail::Message/"Error handling">
 
@@ -542,7 +549,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::Message|Mail::Box::Message/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -558,7 +565,7 @@ Inherited, see L<Mail::Box::Message/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::Message|Mail::Box::Message/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -568,24 +575,30 @@ Extends L<"DETAILS" in Mail::Box::Message|Mail::Box::Message/"DETAILS">.
 Only real L<Mail::Box::Message|Mail::Box::Message> objects can get destructed into
 L<Mail::Box::Message::Destructed|Mail::Box::Message::Destructed> objects.  L<Mail::Message|Mail::Message> free
 their memory immediately when the last reference is lost.
+Cast by C<coerce()>
 
 =item Error: Cannot include forward source as $include.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Cannot include reply source as $include.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =item Error: Destructed message has no labels except 'deleted'
+
+Cast by C<label()>
 
 =item Error: Destructed messages can not be undeleted
 
 Once a message is destructed, it can not be revived.  Destruction is an
 optimization in memory usage: if you need an undelete functionality, then
 you can not use L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup">.
+Cast by C<label()>
 
 =item Error: Method bounce requires To, Cc, or Bcc
 
@@ -594,22 +607,31 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
 The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
 find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
+Cast by C<send()>
 
 =item Error: No rebuild rule $name defined.
+
+Cast by C<rebuild()>
 
 =item Error: Only build() Mail::Message's; they are not in a folder yet
 
@@ -618,6 +640,7 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Box::Message::Destructed/"METHODS">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -626,12 +649,14 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: You cannot instantiate a destructed message
 
 You cannot instantiate a destructed message object directly.  Destruction
 is done by calling L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup"> on any existing
 folder message.
+Cast by C<new()>
 
 =item Error: You cannot take the head/body of a destructed message
 
@@ -639,19 +664,21 @@ The message originated from a folder, but its memory has been freed-up
 forcefully by means of L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup">.  Apparently,
 your program still tries to get to the header or body data after this
 destruction, which is not possible.
+Cast by C<head()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

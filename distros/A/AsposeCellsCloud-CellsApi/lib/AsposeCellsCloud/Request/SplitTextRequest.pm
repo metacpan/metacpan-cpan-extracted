@@ -61,11 +61,11 @@ sub new {
 
 # Run Operation Request
 # SplitTextRequest.Spreadsheet : Upload spreadsheet file.  ,
-# SplitTextRequest.splitDelimitersType : Indicates split delimiters type.  ,
-# SplitTextRequest.customDelimiter : Indicates the custom delimiter.  ,
+# SplitTextRequest.delimiters : Indicates the custom delimiter.  ,
 # SplitTextRequest.keepDelimitersInResultingCells : Indicates keep delimiters in resulting cells.  ,
 # SplitTextRequest.keepDelimitersPosition : Indicates keep delimiters position.  ,
 # SplitTextRequest.HowToSplit : Indicates  ,
+# SplitTextRequest.outPositionRange : Indicates split delimiters type.  ,
 # SplitTextRequest.worksheet : Specify the worksheet of spreadsheet.  ,
 # SplitTextRequest.range : Specify the worksheet range of spreadsheet.  ,
 # SplitTextRequest.outPath : (Optional) The folder path where the workbook is stored. The default is null.  ,
@@ -108,12 +108,8 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('multipart/form-data');
  
-    if(defined $self->split_delimiters_type){
-        $query_params->{'splitDelimitersType'} = $client->to_query_value($self->split_delimiters_type);      
-    }
-
-    if(defined $self->custom_delimiter){
-        $query_params->{'customDelimiter'} = $client->to_query_value($self->custom_delimiter);      
+    if(defined $self->delimiters){
+        $query_params->{'delimiters'} = $client->to_query_value($self->delimiters);      
     }
 
     if(defined $self->keep_delimiters_in_resulting_cells){
@@ -126,6 +122,10 @@ sub run_http_request {
 
     if(defined $self->how_to_split){
         $query_params->{'HowToSplit'} = $client->to_query_value($self->how_to_split);      
+    }
+
+    if(defined $self->out_position_range){
+        $query_params->{'outPositionRange'} = $client->to_query_value($self->out_position_range);      
     }
 
     if(defined $self->worksheet){
@@ -176,16 +176,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'split_delimiters_type' => {
+     'delimiters' => {
      	datatype => 'string',
-     	base_name => 'splitDelimitersType',
-     	description => 'Indicates split delimiters type.',
-     	format => '',
-     	read_only => '',
-     		},
-     'custom_delimiter' => {
-     	datatype => 'string',
-     	base_name => 'customDelimiter',
+     	base_name => 'delimiters',
      	description => 'Indicates the custom delimiter.',
      	format => '',
      	read_only => '',
@@ -208,6 +201,13 @@ __PACKAGE__->method_documentation({
      	datatype => 'string',
      	base_name => 'HowToSplit',
      	description => 'Indicates',
+     	format => '',
+     	read_only => '',
+     		},
+     'out_position_range' => {
+     	datatype => 'string',
+     	base_name => 'outPositionRange',
+     	description => 'Indicates split delimiters type.',
      	format => '',
      	read_only => '',
      		},
@@ -258,11 +258,11 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'spreadsheet' => 'Spreadsheet',
-    'split_delimiters_type' => 'splitDelimitersType',
-    'custom_delimiter' => 'customDelimiter',
+    'delimiters' => 'delimiters',
     'keep_delimiters_in_resulting_cells' => 'keepDelimitersInResultingCells',
     'keep_delimiters_position' => 'keepDelimitersPosition',
     'how_to_split' => 'HowToSplit',
+    'out_position_range' => 'outPositionRange',
     'worksheet' => 'worksheet',
     'range' => 'range',
     'out_path' => 'outPath',

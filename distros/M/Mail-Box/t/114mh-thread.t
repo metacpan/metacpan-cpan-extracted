@@ -143,9 +143,9 @@ my $dump;
 # Restore the line endings and whitespace at the end
 # because my editor sometimes eats them:
 if( $Mail::Message::crlf_platform ) {
-    ($dump = $dump_crlf) =~ s!<\r?\n!\n!g
+    $dump = $dump_crlf =~ s!<\r?\n!\n!gr
 } else {
-    ($dump = $dump_lf) =~ s!<\r?\n!\n!g
+    $dump = $dump_lf =~ s!<\r?\n!\n!gr
 };
 
 $dump = join '', sort split /^/, $dump;

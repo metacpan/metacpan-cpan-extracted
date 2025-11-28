@@ -4,26 +4,25 @@
 
 Mail::Box::Tie - access an existing message-folder as an array or hash
 
+=head1 INHERITANCE
+
+ Mail::Box::Tie is extended by
+   Mail::Box::Tie::ARRAY
+   Mail::Box::Tie::HASH
+
 =head1 SYNOPSIS
 
 As an array:
 
- use Mail::Box::Tie;
- tie my(@inbox), Mail::Box::Tie::ARRAY => $folder;
- tie my(@inbox), Mail::Box::Tie => $folder;    # deprecated
- print $inbox[3];
+  tie my(@inbox), Mail::Box::Tie::ARRAY => $folder;
+  print $inbox[3];
 
 or as hash:
 
- tie my(%inbox), Mail::Box::Tie::HASH => $folder;
- tie my(%inbox), Mail::Box::Tie => $folder;    # deprecated
- print $inbox{'<12379.124879@example.com>'};
+  tie my(%inbox), Mail::Box::Tie::HASH => $folder;
+  print $inbox{'<12379.124879@example.com>'};
 
 =head1 DESCRIPTION
-
-The use of C<Mail::Box::Tie> is B<deprecated>, because it is succeeded by two
-separate modules: L<Mail::Box::Tie::ARRAY|Mail::Box::Tie::ARRAY> and L<Mail::Box::Tie::HASH|Mail::Box::Tie::HASH>.
-However, this module still works.
 
 Folders certainly look like an array of messages, so why not just
 access them as one?  Or, the order is not important, but the
@@ -33,16 +32,41 @@ look simpler than programs using the more traditional method calls.
 
 =head1 METHODS
 
+=head2 Constructors
+
+=over 4
+
+=item $class-E<gt>B<new>($folder, $type)
+
+Do not call this method directly, but via the tie interface.
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<folder>()
+
+Z<>
+
+=item $obj-E<gt>B<type>()
+
+Z<>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

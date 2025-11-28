@@ -12,6 +12,7 @@ do { my $x = {
                                       'Minion' => '9',
                                       'Module::Runtime' => '0',
                                       'Mojolicious' => '7',
+                                      'YAML::PP' => '0',
                                       'perl' => '5.010'
                                     }
                     },

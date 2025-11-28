@@ -1,0 +1,28 @@
+#---*- Makefile -*-------------------------------------------------------
+
+# Targets related to handling the AUTHORS file
+
+.PHONY: test_authors
+
+test_authors: tests/generated/AUTHORS.sorted
+	diff -u AUTHORS tests/generated/AUTHORS.sorted || true
+
+AUTHORS_TAG=Contributors to the development of the OPTIMADE specification and implementation in alphabetical order:
+
+tests/generated/AUTHORS.sorted: AUTHORS
+	awk '{print} /${AUTHORS_TAG}/ {exit}' $< > $@
+	cat $< \
+	| awk 'NAMES {print} /${AUTHORS_TAG}/ {NAMES=1}' \
+	| sed 's/Di /Di_/' \
+	| awk '{printf("%s:%s\n",$$NF,$$0)}' \
+	| sort \
+	| awk -F: '{print $$2}' \
+	| sed 's/Di_/Di /' \
+	>> $@
+
+.PHONY: clean clean_authors
+
+clean: clean_authors
+
+clean_authors:
+	rm -f tests/generated/AUTHORS.sorted

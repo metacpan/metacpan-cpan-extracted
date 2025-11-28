@@ -87,6 +87,7 @@ subtest 'constructor failure' => sub {
 };
 
 subtest 'BEAM_MINION must be set' => sub {
+    local @Beam::Minion::Util::INIT_ARGS = ();
     local $ENV{BEAM_MINION} = '';
     like
         exception {

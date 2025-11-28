@@ -1,10 +1,37 @@
 
 ===== ChangeLog of distribution Mail-Box version 3.*
 
+TODO: Mail::Box::Message::new(body_type) not used?
+
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.012: Thu 27 Nov 14:16:04 CET 2025
+
+	Changes:
+	- maintenance release with Mail::Box version 3 compatibility.
+	- mid-life upgrade project: require minimal Perl version 5.16
+	- remove deprecated use of Mail::Box::Tie, use ::ARRAY or ::HASH
+	- rename ::Manager::threads() into ::discoverThreads().  Old name
+	  still supported.
+
+	Improvements:
+	- remove all internal use of bareword file-handles.
+	- remove all internal use of bareword directory-handles.
+	- use s///r
+	- use defined-or
+	- syntax of tie docs
+	- remove use of filetest.pm: plays bad with method access()
+	- replace IO::File by open(my $fh)
+
 version 3.011: Fri 18 Apr 18:33:17 CEST 2025
 
 	Fixes:
 	- url use for folder requires % decoding. [Gabrielle Schmidt]
+
+	Improvements:
+	- document some structures in Overview.
 
 version 3.010: Tue 18 Jul 09:24:24 CEST 2023
 

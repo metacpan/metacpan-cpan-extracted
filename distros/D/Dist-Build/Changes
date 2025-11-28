@@ -1,5 +1,11 @@
 Revision history for Dist-Build
 
+0.022     2025-11-27 23:07:13+01:00 Europe/Brussels
+          - Move Dist::Build::DynamicPrereqs to a separate dist
+          - Embed File::ShareDir::Tiny into Dist::Build::Util
+          - Adapt to split_like_shell now being in ExtUtils::Builder::Util
+          - Add external argument alias to Alien
+
 0.021     2025-11-14 04:02:43+01:00 Europe/Brussels
           - Don't generate manpages on systems not supporting man paths
 

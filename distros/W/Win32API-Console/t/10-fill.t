@@ -10,6 +10,7 @@ use lib dirname(__FILE__) . '\lib';
 BEGIN {
   use_ok 'TestConsole', qw( GetConsoleOutputHandle );
   use_ok 'Win32API::Console', qw(
+    GetConsoleOutputCP
     FillConsoleOutputCharacterW
     FillConsoleOutputCharacterA
   );
@@ -43,7 +44,7 @@ SKIP: {
   ok($ok, 'FillConsoleOutputCharacterW call succeeded');
   is($written, $length, 'Correct number of characters written');
 
-  $char = 'ö';
+  $char = Encode::ANSI::encode('ö', GetConsoleOutputCP());
   $coord{X} = $written;
 
   $ok = FillConsoleOutputCharacterA(

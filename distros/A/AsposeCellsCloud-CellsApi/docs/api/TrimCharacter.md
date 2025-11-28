@@ -7,6 +7,8 @@ The TrimSpreadsheetContent API is designed to process and trim content within a 
 
 - **Base URL**: `http://api.aspose.cloud/v4.0`
 - **Authentication Method**: `JWT (OAuth2, application)`  **Token URL**: `https://api.aspose.cloud/connect/token`
+- **Example** 
+
 ## **Interface Details**
 
 ### **Endpoint** 

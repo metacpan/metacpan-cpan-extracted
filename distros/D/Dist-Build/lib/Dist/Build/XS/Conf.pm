@@ -1,5 +1,5 @@
 package Dist::Build::XS::Conf;
-$Dist::Build::XS::Conf::VERSION = '0.021';
+$Dist::Build::XS::Conf::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -42,11 +42,12 @@ Dist::Build::XS::Conf - Configure-time utilities for Dist::Build for using C hea
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
  load_extension("Dist::Build::XS");
+ load_extension("Dist::Build::XS::Conf");
  
  find_libs_for(source => <<'EOF', libs => [ ['socket'], ['moonlaser'] ]);
  #include <stdio.h>

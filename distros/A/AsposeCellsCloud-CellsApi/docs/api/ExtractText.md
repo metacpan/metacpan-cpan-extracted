@@ -25,11 +25,11 @@ Extracts substrings, numbers, or fixed-length prefixes/suffixes from the selecte
 | :- | :- | :- |:- | 
 |Spreadsheet|File|FormData|Upload spreadsheet file.|
 |extractTextType|String|Query|Indicates extract text type.|
+|outPositionRange|String|Query|Indicates the output location for the extracted text.|
 |beforeText|String|Query|Indicates extracting the text before the specified characters or substrings.|
 |afterText|String|Query|Indicates extracting the text after the specified characters or substrings.|
 |beforePosition|Integer|Query|Indicates retrieving the first character or a specified number of characters from the left side of the selected cell.|
 |afterPosition|Integer|Query|Indicates retrieving the first character or a specified number of characters from the right side of the selected cell.|
-|outPositionRange|String|Query|Indicates the output location for the extracted text.|
 |worksheet|String|Query|Specify the worksheet of spreadsheet.|
 |range|String|Query|Specify the worksheet range of spreadsheet.|
 |outPath|String|Query|(Optional) The folder path where the workbook is stored. The default is null.|

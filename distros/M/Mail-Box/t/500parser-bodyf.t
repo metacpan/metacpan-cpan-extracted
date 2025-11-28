@@ -6,13 +6,12 @@
 use strict;
 use warnings;
 
+use Test::More;
 use Mail::Box::Test;
-use Mail::Box::Parser::Perl;
-use Mail::Message::Body::File;
-use Mail::Message::Head;
 
-use Test::More tests => 945;
-
+use Mail::Box::Parser::Perl   ();
+use Mail::Message::Body::File ();
+use Mail::Message::Head       ();
 
 # MO: I do not know whether there is an other way to get this to work
 # on Windows without error messages.
@@ -29,22 +28,18 @@ $parser->pushSeparator('From ');
 my ($where, $sep) = $parser->readSeparator;
 cmp_ok($where, "==", 0,            "begin at file-start");
 ok(defined $sep,                   "reading first separator");
-
-like($sep, qr/^From /,             "correctness first separator")
-    if defined $sep;
+like($sep, qr/^From /,             "correctness first separator") if defined $sep;
 
 my $head = Mail::Message::Head->new;
 ok(defined $head);
 
 $head->read($parser);
-ok(defined $head);
-ok($head,                          "overloaded boolean");
+ok defined $head,                  "read a head";
+ok $head,                          "overloaded boolean";
 
 my $hard_coded_lines_msg0  = 33;
 my $hard_coded_length_msg0 = 1280;
-
-my $binary_size = $hard_coded_length_msg0
-      + ($crlf_platform ? $hard_coded_lines_msg0 : 0);
+my $binary_size = $hard_coded_length_msg0 + ($crlf_platform ? $hard_coded_lines_msg0 : 0);
 
 my $length = int $head->get('Content-Length');
 cmp_ok($length, "==", $binary_size, "first message size");
@@ -67,23 +62,25 @@ cmp_ok(@lines, "==", $lines,         "lines of body");
 
 my @msgs;
 
-push @msgs,  # first message already read.
- +{ fields => scalar $head->names
-  , lines  => $hard_coded_lines_msg0
-  , size   => $hard_coded_length_msg0
-  , sep    => $sep
-  , subject=> $head->get('subject')
-  };
+push @msgs, +{  # first message already read.
+	fields => scalar $head->names,
+	lines  => $hard_coded_lines_msg0,
+	size   => $hard_coded_length_msg0,
+	sep    => $sep,
+	subject=> $head->get('subject'),
+};
 
 while(1)
 {   my ($where, $sep) = $parser->readSeparator;
-    last unless $sep;
+    $sep or last;
+
+	ok defined $sep, "read seperator ". ($sep =~ s/\n*$//r);
 
     my $count = @msgs;
-    like($sep, qr/^From /,                     "1 from $count");
+    like $sep, qr/^From /,      "1 from $count";
 
     $head = Mail::Message::Head->new;
-    ok(defined $head,                          "1 head count");
+    ok defined $head,           "1 head count";
 
     $head->read($parser);
 
@@ -91,32 +88,29 @@ while(1)
     my $li    = int $head->get('Lines');
     my $su    = $head->get('Subject');
 
-    $body = Mail::Message::Body::File->new
-        ->read($parser, $head, undef, $cl, $li);
+    $body = Mail::Message::Body::File->new->read($parser, $head, undef, $cl, $li);
     ok(defined $body,                          "1 body $count");
 
     my $size  = $body->size;
     my $lines = $body->nrLines;
 
-    cmp_ok($li , "==",  $lines,                "1 lines $count")
-        if defined $li;
+    cmp_ok $lines, "==", $li,   "1 lines $count" if defined $li;
 
     $cl -= $li if $crlf_platform;
-    cmp_ok($cl , "==",  $size,                 "1 size $count")
-        if defined $cl;
+    cmp_ok $size, "==", $cl,    "1 size $count"  if defined $cl;
 
-    my $msg = 
-     { size   => $size
-     , lines  => $lines
-     , fields => scalar $head->names
-     , sep    => $sep
-     , subject=> $su
-     };
+    my $msg = +{
+		size   => $size,
+		lines  => $lines,
+		fields => scalar $head->names,
+		sep    => $sep,
+		subject=> $su,
+	};
 
     push @msgs, $msg;
 }
 
-cmp_ok(@msgs, "==", 45);
+cmp_ok @msgs, "==", 45, '1 Found all messages';
 $parser->stop;
 
 ###
@@ -192,12 +186,8 @@ while(1)
     # two messages contain one trailing blank, which is removed because
     # of the wrong number of lines.  The will have an extra OK.
     my $wrong = $count==14 || $count==18;
-
-    cmp_ok($size, '==', $msg->{size},            "3 size $count")
-        unless $wrong;
-
-    cmp_ok($lines, '==', $msg->{lines},          "3 lines $count")
-        unless $wrong;
+    cmp_ok($size, '==', $msg->{size},            "3 size $count")  unless $wrong;
+    cmp_ok($lines, '==', $msg->{lines},          "3 lines $count") unless $wrong;
 
     is($su, $msg->{subject}, "3 subject $count")
         if defined $su && defined $msg->{subject};
@@ -208,3 +198,4 @@ while(1)
     $count++;
 }
 
+done_testing;

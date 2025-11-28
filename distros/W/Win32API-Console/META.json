@@ -53,7 +53,7 @@
       "test" : {
          "requires" : {
             "File::Basename" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -68,6 +68,6 @@
          "web" : "https://github.com/brickpool/Win32API-Console"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.3",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

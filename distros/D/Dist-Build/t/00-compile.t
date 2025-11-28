@@ -11,9 +11,9 @@ plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 my @module_files = (
     'Dist/Build.pm',
     'Dist/Build/Core.pm',
-    'Dist/Build/DynamicPrereqs.pm',
     'Dist/Build/Serializer.pm',
     'Dist/Build/ShareDir.pm',
+    'Dist/Build/Util.pm',
     'Dist/Build/XS.pm',
     'Dist/Build/XS/Alien.pm',
     'Dist/Build/XS/Conf.pm',

@@ -23,20 +23,20 @@ collection is used by the L<Mail::Box::Manage::User|Mail::Box::Manage::User> obj
 the folders of a single user, even if those folders are closed.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 Extends L<"DESCRIPTION" in User::Identity::Collection|User::Identity::Collection/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in User::Identity::Collection|User::Identity::Collection/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<@{}>
+=item overload: B<""> stringification
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
-=item overload: B<stringification >
+=item overload: B<@{}> array dereference
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
@@ -45,18 +45,20 @@ Inherited, see L<User::Identity::Collection/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 Extends L<"METHODS" in User::Identity::Collection|User::Identity::Collection/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 Extends L<"Constructors" in User::Identity::Collection|User::Identity::Collection/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Collection-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option     --Defined in                --Default
   description  User::Identity::Item        undef
@@ -73,21 +75,21 @@ Extends L<"Constructors" in User::Identity::Collection|User::Identity::Collectio
 
 =item description => STRING
 
-=item folder_type => CLASS
+=item folder_type => $class
 
 =item item_type => CLASS
 
 =item log => LEVEL
 
-=item manager => OBJECT
+=item manager => $object
 
-An L<Mail::Box::Manager|Mail::Box::Manager> OBJECT (could be a L<Mail::Box::Manage::User|Mail::Box::Manage::User>).
+A pre-prepared L<Mail::Box::Manager|Mail::Box::Manager> C<$object> (could be a L<Mail::Box::Manage::User|Mail::Box::Manage::User>).
 
 =item name => STRING
 
 =item parent => OBJECT
 
-=item roles => ROLE|ARRAY
+=item roles => $role|\@roles
 
 =item trace => LEVEL
 
@@ -95,10 +97,122 @@ An L<Mail::Box::Manager|Mail::Box::Manager> OBJECT (could be a L<Mail::Box::Mana
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
+Extends L<"Attributes" in User::Identity::Collection|User::Identity::Collection/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<description>()
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<folderType>( [$folderclass] )
+
+Returns the type of folder (on this location).  When specified, then
+C<$folderclass> must be a L<Mail::Box|Mail::Box> extension.
+
+=item $obj-E<gt>B<itemType>()
+
+Inherited, see L<User::Identity::Collection/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<manager>()
+
+The L<Mail::Box::Manager|Mail::Box::Manager> (usually a L<Mail::Box::Manage::User|Mail::Box::Manage::User> object),
+which is handling the opening of folders.
+
+=item $obj-E<gt>B<name>( [$newname] )
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<roles>()
+
+Inherited, see L<User::Identity::Collection/"Attributes">
+
+=back
+
+=head2 Collections
+
+Extends L<"Collections" in User::Identity::Collection|User::Identity::Collection/"Collections">.
+
+=over 4
+
+=item $obj-E<gt>B<add>($collection, $role)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<collection>($name)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<parent>( [$parent] )
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<removeCollection>($object|$name)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $any-E<gt>B<type>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<user>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=back
+
+=head2 Maintaining roles
+
+Extends L<"Maintaining roles" in User::Identity::Collection|User::Identity::Collection/"Maintaining roles">.
+
+=over 4
+
+=item $obj-E<gt>B<addRole>($role|([$name], %options))
+
+Inherited, see L<User::Identity::Collection/"Maintaining roles">
+
+=item $obj-E<gt>B<removeRole>($role|$name)
+
+Inherited, see L<User::Identity::Collection/"Maintaining roles">
+
+=item $obj-E<gt>B<renameRole>( <$role|$oldname>, $newname )
+
+Inherited, see L<User::Identity::Collection/"Maintaining roles">
+
+=item $obj-E<gt>B<sorted>()
+
+Inherited, see L<User::Identity::Collection/"Maintaining roles">
+
+=back
+
+=head2 Searching
+
+Extends L<"Searching" in User::Identity::Collection|User::Identity::Collection/"Searching">.
+
+=over 4
+
+=item $obj-E<gt>B<find>($name|CODE|undef)
+
+Inherited, see L<User::Identity::Collection/"Searching">
+
+=back
+
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -109,9 +223,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Collection-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -119,19 +231,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Collection-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Collection-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -160,7 +264,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -169,153 +273,9 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =back
 
-=head2 Attributes
-
-Extends L<"Attributes" in User::Identity::Collection|User::Identity::Collection/"Attributes">.
- 
-=over 4
-
-=item $obj-E<gt>B<description>()
-
-Inherited, see L<User::Identity::Item/"Attributes">
-
-=item $obj-E<gt>B<folderType>( [$folderclass] )
-
-Returns the type of folder (on this location).  When specified, then
-$folderclass must be a L<Mail::Box|Mail::Box> extension.
-
-=item $obj-E<gt>B<itemType>()
-
-Inherited, see L<User::Identity::Collection/"Attributes">
-
-=item $obj-E<gt>B<manager>()
-
-The L<Mail::Box::Manager|Mail::Box::Manager> (usually a L<Mail::Box::Manage::User|Mail::Box::Manage::User> object),
-which is handling the opening of folders.
-
-=item $obj-E<gt>B<name>( [$newname] )
-
-Inherited, see L<User::Identity::Item/"Attributes">
-
-=item $obj-E<gt>B<roles>()
-
-Inherited, see L<User::Identity::Collection/"Attributes">
-
-=back
-
-=head2 Collections
-
-Extends L<"Collections" in User::Identity::Collection|User::Identity::Collection/"Collections">.
- 
-=over 4
-
-=item $obj-E<gt>B<add>($collection, $role)
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=item $obj-E<gt>B<collection>($name)
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=item $obj-E<gt>B<parent>( [$parent] )
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=item $obj-E<gt>B<removeCollection>($object|$name)
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=item $obj-E<gt>B<type>()
-
-=item Mail::Box::Collection-E<gt>B<type>()
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=item $obj-E<gt>B<user>()
-
-Inherited, see L<User::Identity::Item/"Collections">
-
-=back
-
-=head2 Maintaining roles
-
-Extends L<"Maintaining roles" in User::Identity::Collection|User::Identity::Collection/"Maintaining roles">.
- 
-=over 4
-
-=item $obj-E<gt>B<addRole>($role| <[$name],%options> | ARRAY)
-
-Inherited, see L<User::Identity::Collection/"Maintaining roles">
-
-=item $obj-E<gt>B<removeRole>($role|$name)
-
-Inherited, see L<User::Identity::Collection/"Maintaining roles">
-
-=item $obj-E<gt>B<renameRole>( <$role|$oldname>, $newname )
-
-Inherited, see L<User::Identity::Collection/"Maintaining roles">
-
-=item $obj-E<gt>B<sorted>()
-
-Inherited, see L<User::Identity::Collection/"Maintaining roles">
-
-=back
-
-=head2 Searching
-
-Extends L<"Searching" in User::Identity::Collection|User::Identity::Collection/"Searching">.
- 
-=over 4
-
-=item $obj-E<gt>B<find>($name|CODE|undef)
-
-Inherited, see L<User::Identity::Collection/"Searching">
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
-
-=item Error: $object is not a collection.
-
-The first argument is an object, but not of a class which extends
-L<User::Identity::Collection|User::Identity::Collection>.
-
-=item Error: Cannot create a $type to add this to my collection.
-
-Some options are specified to create a $type object, which is native to
-this collection.  However, for some reason this failed.
-
-=item Error: Cannot load collection module for $type ($class).
-
-Either the specified $type does not exist, or that module named $class returns
-compilation errors.  If the type as specified in the warning is not
-the name of a package, you specified a nickname which was not defined.
-Maybe you forgot the 'require' the package which defines the nickname.
-
-=item Error: Cannot rename $name into $newname: already exists
-
-=item Error: Cannot rename $name into $newname: doesn't exist
-
-=item Error: Creation of a collection via $class failed.
-
-The $class did compile, but it was not possible to create an object
-of that class using the options you specified.
-
-=item Error: Don't know what type of collection you want to add.
-
-If you add a collection, it must either by a collection object or a
-list of options which can be used to create a collection object.  In
-the latter case, the type of collection must be specified.
-
-=item Warning: No collection $name
-
-The collection with $name does not exist and can not be created.
 
 =item Error: Package $package does not implement $method.
 
@@ -324,24 +284,58 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
-=item Error: Wrong type of role for $collection: requires a $expect but got a $type
+=item Error: cannot create a $type to add this to my collection.
 
-Each $collection groups sets of roles of one specific type ($expect).  You
-cannot add objects of a different $type.
+Some options are specified to create a C<$type> object, which is native to
+this collection.  However, for some reason this failed.
+Cast by C<addRole()>
+
+=item Error: cannot load collection module for $type ($class): $err
+
+Either the specified C<$type> does not exist, or that module named C<$class> returns
+compilation errors.  If the type as specified in the warning is not
+the name of a package, you specified a nickname which was not defined.
+Maybe you forgot the 'require' the package which defines the nickname.
+Cast by C<addCollection()>
+
+=item Error: cannot rename $from into $to: already exists.
+
+Cast by C<renameRole()>
+
+=item Error: cannot rename $from into $to: doesn't exist.
+
+Cast by C<renameRole()>
+
+=item Error: nvalid collection $name.
+
+The collection with C<$name> does not exist and can not be created.
+Cast by C<add()>
+
+=item Error: this $object is not a collection.
+
+Cast by C<addCollection()>
+
+=item Error: wrong type of role for $collection: requires a $expect but got a $type.
+
+Each C<$collection> groups sets of roles of one specific type (C<$expect>).  You
+cannot add objects of a different C<$type>.
+Cast by C<addRole()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

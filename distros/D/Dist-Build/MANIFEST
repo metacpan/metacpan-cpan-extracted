@@ -11,9 +11,9 @@ dist.ini
 examples/mbt-compat.pl
 lib/Dist/Build.pm
 lib/Dist/Build/Core.pm
-lib/Dist/Build/DynamicPrereqs.pm
 lib/Dist/Build/Serializer.pm
 lib/Dist/Build/ShareDir.pm
+lib/Dist/Build/Util.pm
 lib/Dist/Build/XS.pm
 lib/Dist/Build/XS/Alien.pm
 lib/Dist/Build/XS/Conf.pm

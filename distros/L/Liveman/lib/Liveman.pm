@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "3.5";
+our $VERSION = "3.7";
 
 use File::Basename qw/dirname/;
 use File::Find::Wanted qw/find_wanted/;
@@ -85,17 +85,17 @@ sub transforms {
 }
 
 # Эскейпинг для qr!!
-sub _qr_esc {
+sub _qr_esc($) {
 	$_[0] =~ s/!/\\!/gr
 }
 
 # Эскейпинг для строки в двойных кавычках
-sub _qq_esc {
+sub _qq_esc($) {
 	$_[0] =~ s!"!\\"!gr
 }
 
 # Эскейпинг для строки в одинарных кавычках
-sub _q_esc {
+sub _q_esc($) {
 	$_[0] =~ s!'!\\'!gr
 }
 
@@ -108,23 +108,27 @@ sub _to_testing {
 	my $expected = $x{expected};
 	my $q = _q_esc($line =~ s!\s*$!!r);
 	my $code = trim($x{code});
+	# clear делается, чтобы освободить ресурсы
+	my $clear = 'undef $::_g0; undef $::_e0;';
+	
+	# local делается для того, чтобы в AnyEvent, Coro или Thread переменные не пересекались
 
-	if(exists $x{is_deeply}) { "::is_deeply scalar do {$code}, scalar do {$expected}, '$q';\n" }
-	elsif(exists $x{is})   { "::is scalar do {$code}, scalar do{$expected}, '$q';\n" }
-	elsif(exists $x{qqis}) { my $ex = _qq_esc($expected); "::is scalar do {$code}, \"$ex\", '$q';\n" }
-	elsif(exists $x{qis})  { my $ex = _q_esc($expected); "::is scalar do {$code}, '$ex', '$q';\n" }
-	elsif(exists $x{like})  { my $ex = _qr_esc($expected); "::like scalar do {$code}, qr{$ex}, '$q';\n" }
-	elsif(exists $x{unlike})  { my $ex = _qr_esc($expected); "::unlike scalar do {$code}, qr{$ex}, '$q';\n" }
-	elsif(exists $x{qqbegins})  { my $ex = _qq_esc($expected); "::cmp_ok scalar do {$code}, '=~', '^' . quotemeta \"$ex\", '$q';\n" }
-	elsif(exists $x{qqends})  { my $ex = _qq_esc($expected); "::cmp_ok scalar do {$code}, '=~', quotemeta(\"$ex\") . '\$', '$q';\n" }
-	elsif(exists $x{qqinners})  { my $ex = _qq_esc($expected); "::cmp_ok scalar do {$code}, '=~', quotemeta \"$ex\", '$q';\n" }
-	elsif(exists $x{begins})  { my $ex = _q_esc($expected); "::cmp_ok scalar do {$code}, '=~', '^' . quotemeta '$ex', '$q';\n" }
-	elsif(exists $x{ends})  { my $ex = _q_esc($expected); "::cmp_ok scalar do {$code}, '=~', quotemeta('$ex') . '\$', '$q';\n" }
-	elsif(exists $x{inners})  { my $ex = _q_esc($expected); "::cmp_ok scalar do {$code}, '=~', quotemeta '$ex', '$q';\n" }
-	elsif(exists $x{error})  { my $ex = _q_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::cmp_ok \$\@, '=~', '^' . quotemeta '$ex', '$q';\n" }
-	elsif(exists $x{qqerror})  { my $ex = _qq_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::cmp_ok \$\@, '=~', '^' . quotemeta \"$ex\", '$q';\n" }
-	elsif(exists $x{qrerror})  { my $ex = _qr_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::like scalar \$\@, qr{$ex}, '$q';\n" }
-	elsif(exists $x{unqrerror})  { my $ex = _qr_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::unlike scalar \$\@, qr{$ex}, '$q';\n" }
+	if(exists $x{is_deeply}) { "local (\$::_g0 = do {$code}, \$::_e0 = do {$expected}); ::is_deeply \$::_g0, \$::_e0, '$q' or ::diag ::_struct_diff(\$::_g0, \$::_e0); $clear\n" }
+	elsif(exists $x{is}) { "local (\$::_g0 = do {$code}, \$::_e0 = do {$expected}); ::ok defined(\$::_g0) == defined(\$::_e0) && ref \$::_g0 eq ref \$::_e0 && \$::_g0 eq \$::_e0, '$q' or ::diag ::_struct_diff(\$::_g0, \$::_e0); $clear\n" }
+	elsif(exists $x{qqis}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 eq \$::_e0, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0); $clear\n" }
+	elsif(exists $x{qis}) { "local (\$::_g0 = do {$code}, \$::_e0 = '${\_q_esc $expected}'); ::ok \$::_g0 eq \$::_e0, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0); $clear\n" }
+	elsif(exists $x{like}) { "::like scalar do {$code}, qr{${\_qr_esc $expected}}, '$q'; $clear\n" }
+	elsif(exists $x{unlike}) { "::unlike scalar do {$code}, qr{${\_qr_esc $expected}}, '$q'; $clear\n" }
+	elsif(exists $x{qqbegins}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 =~ /^\${\\quotemeta \$::_e0}/, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 1); $clear\n" }
+	elsif(exists $x{qqends}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 =~ /\${\\quotemeta \$::_e0}\$/, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 1); $clear\n" }
+	elsif(exists $x{qqinners}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 =~ quotemeta \$::_e0, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 0); $clear\n" }
+	elsif(exists $x{begins}) { "local (\$::_g0 = do {$code}, \$::_e0 = '${\_q_esc $expected}'); ::ok \$::_g0 =~ /^\${\\quotemeta \$::_e0}/, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 1); $clear\n" }
+	elsif(exists $x{ends}) { "local (\$::_g0 = do {$code}, \$::_e0 = '${\_q_esc $expected}'); ::ok \$::_g0 =~ /\${\\quotemeta \$::_e0}\$/, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, -1); $clear\n" }
+	elsif(exists $x{inners}) { "local (\$::_g0 = do {$code}, \$::_e0 = '${\_q_esc $expected}'); ::ok \$::_g0 =~ quotemeta \$::_e0, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 0); $clear\n" }
+	elsif(exists $x{error}) { "eval {$code}; local (\$::_g0 = \$\@, \$::_e0 = '${\_q_esc $expected}'); ok defined(\$::_g0) && \$::_g0 =~ /^\${\\quotemeta \$::_e0}/, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 1); $clear\n" }
+	elsif(exists $x{qqerror}) { "eval {$code}; local (\$::_g0 = \$\@, \$::_e0 = \"${\_qq_esc $expected}\"); ok defined(\$::_g0) && \$::_g0 =~ /^\${\\quotemeta \$::_e0}/, '$q' or ::diag ::string_diff(\$::_g0, \$::_e0, 1); $clear\n" }
+	elsif(exists $x{qrerror}) { "eval {$code}; local (\$::_g0 = \$\@, \$::_e0 = qr{${\_qr_esc $expected}}); ok defined(\$::_g0) && \$::_g0 =~ \$::_e0, '$q' or ::diag defined(\$::_g0)? \"Got:\$::_g0\": 'Got is undef'; $clear\n" }
+	elsif(exists $x{unqrerror}) { "eval {$code}; local (\$::_g0 = \$\@, \$::_e0 = qr{${\_qr_esc $expected}}); ok defined(\$::_g0) && \$::_g0 !~ \$::_e0, '$q' or ::diag defined(\$::_g0)? \"Got:\$::_g0\": 'Got is undef'; $clear\n" }
 	else { # Что-то ужасное вырвалось на волю!
 		"???"
 	}
@@ -270,6 +274,10 @@ use Scalar::Util qw//;
 
 use Test::More 0.98;
 
+use String::Diff qw//;
+use Data::Dumper qw//;
+use Term::ANSIColor qw//;
+
 BEGIN {
 	$SIG{__DIE__} = sub {
 		my ($msg) = @_;
@@ -309,6 +317,34 @@ BEGIN {
 		File::Slurper::write_text($file, $code);
 	}
 }
+
+my $white = Term::ANSIColor::color('BRIGHT_WHITE');
+my $red = Term::ANSIColor::color('BRIGHT_RED');
+my $green = Term::ANSIColor::color('BRIGHT_GREEN');
+my $reset = Term::ANSIColor::color('RESET');
+my @diff = (
+	remove_open => "$white\[$red",
+	remove_close => "$white]$reset",
+	append_open => "$white\{$green",
+	append_close => "$white}$reset",
+);
+
+sub _string_diff {
+	my ($got, $expected, $chunk) = @_;
+	$got = substr($got, 0, length $expected) if $chunk == 1;
+	$got = substr($got, -length $expected) if $chunk == -1;
+	String::Diff::diff_merge($got, $expected, @diff)
+}
+
+sub _struct_diff {
+	my ($got, $expected) = @_;
+	String::Diff::diff_merge(
+		Data::Dumper->new([$got], ['diff'])->Indent(0)->Useqq(1)->Dump,
+		Data::Dumper->new([$expected], ['diff'])->Indent(0)->Useqq(1)->Dump,
+		@diff
+	)
+}
+
 END
 
 # Трансформирует md-файл в тест и документацию
@@ -506,7 +542,7 @@ Liveman - compiler from Markdown to tests and documentation
 
 =head1 VERSION
 
-3.5
+3.7
 
 =head1 SYNOPSIS
 

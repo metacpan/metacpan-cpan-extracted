@@ -23,7 +23,7 @@ L<Mail::Box::Mbox|Mail::Box::Mbox> class, or the user program can bypass the man
 create L<Mail::Box::Mbox|Mail::Box::Mbox> objects directly. Similarly, if the user program
 is only manipulating a single message, a L<Mail::Message|Mail::Message>.
 
-The Mail::Box package has special features to help MUA's access folder
+The L<Mail::Box|Mail::Box> package has special features to help MUA's access folder
 data quickly in random order.  You will not really benefit (neither
 slower) if you need the full folder sequentially.
 
@@ -38,17 +38,17 @@ attempt to reduce the dependencies:
 
 =over 4
 
-=item * Mail::Message
+=item * L<Mail::Message|Mail::Message>
 
-=item * Mail::Transfer
+=item * L<Mail::Transport|Mail::Transport>
 
-=item * Mail::Box
+=item * L<Mail::Box|Mail::Box>
 
-=item * Mail::Box::IMAP4
+=item * L<Mail::Box::IMAP4|Mail::Box::IMAP4>
 
-=item * Mail::Box::POP3
+=item * L<Mail::Box::POP3|Mail::Box::POP3>
 
-=item * Mail::Box::Parser::C
+=item * L<Mail::Box::Parser|Mail::Box::Parser>::C
 
 =back
 
@@ -78,11 +78,11 @@ be used for MBOX, MH, Maildir, and POP3 folders with no change at all (as
 long as you stick to the rules).
 
  Mail::Box::Mbox  <-----------* Mail::Box::Mbox::Message
-        ^             <has-a>            ^
+        |             <has-a>            |
         | <isa>                          | <isa>
         |                                |
     Mail::Box     ............. Mail::Box::Message
-                                         ^
+                                         |
                                          | <isa>
                                          |
                                    Mail::Message
@@ -96,22 +96,51 @@ The situation for MH and Maildir folders is a little more complicated,
 because they have an extra intermediate level of abstraction: L<Mail::Box::Dir|Mail::Box::Dir>.
 The POP3 folder has an intermediate L<Mail::Box::Net|Mail::Box::Net>.
 
-In the future, when more Mbox-like folder types get implemented, there
-may be a L<Mail::Box::File|Mail::Box::File> level too.  The following is also true
-for the mail boxes
+MailBox actively use inheritance.  For folders, the structure is just like
+this depicted for Message class relations:
 
- MB::MH::Message                 MB::POP3::Message
-       \  MB::Maildir::Message            /
-        \         /                      /
-         \       /   MB::Mbox::Message  /
-          \     /         |            /
+    MB::MH::Message              MB::POP3::Message
+    MB::Maildir::Message         MB::IMAP4::Message
+          \                              /
+           \      MB::Mbox::Message     /
+            \             |            /
+             \    MB::File::Message   /
+              \           |          /
         MB::Dir::Message  |   MB::Net::Message
+                    \     |     /
                      \    |    /
-                      \   |   /
-                      MB::Message
-                          |
+                  Mail::Box::Message
                           |
                      Mail::Message
+
+Any Message has the structure of the L<Mail::Message|Mail::Message>
+
+                                 MM::Head::Complete
+                                         |
+   Mail::Message                        isa
+         |                               |
+         `---has a---> Mail::Message::Head::Partial
+         |             `-- has many --> MM::Field::Fast
+         |             `-- has many --> MM::Field::Full
+         |
+         `---has a---> Mail::Message::Body
+                       | one of:
+                       `--- MMB::Lines
+                       `--- MMB::String
+                       `--- MMB::File  
+                       `--- MMB::Nested
+                       |     `--- one ---> MM:Message
+                       `--- MMB::Multipart  
+                             `--- many --> MM:Part
+                                      isa Mail::Message
+
+The header is not always totally known, for instance via IMAP or when
+the message is located in a file.  Basically, only used Fields are cached
+until the whole header is needed for additions, deletes, or changes.
+
+The "Full" Fields have a very detailed, perfect handling of the RFCs.
+You will get them via C<study()> methods.  The default Fast field is
+sloppy: just text strings.
 
 =head2 The Manager
 
@@ -317,7 +346,7 @@ via POP3.
 A debugging and logging class which is inherited by most of the Mail::
 modules.  For each object, you can say what log and error reports must be
 kept or directly presented to the user.  This way you can decide to have
-Mail::Box report about problems, or do it all yourself.
+L<Mail::Box|Mail::Box> report about problems, or do it all yourself.
 
 =back
 
@@ -325,14 +354,15 @@ All classes are written to be extensible.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

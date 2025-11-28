@@ -1,17 +1,18 @@
 package Beam::Minion;
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 # ABSTRACT: A distributed task runner for Beam::Wire containers
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     # Command-line interface
-#pod     export BEAM_MINION=sqlite://test.db
+#pod     export BEAM_MINION=sqlite://test.db            # Configure a DSN directly
+#pod     export BEAM_MINION=file:///etc/beam/minion.yml # Configuration file
 #pod     beam minion worker
 #pod     beam minion run <container> <service> [<args>...]
 #pod     beam minion help
 #pod
 #pod     # Perl interface
-#pod     local $ENV{BEAM_MINION} = 'sqlite://test.db';
+#pod     Beam::Minion->init(%config)
 #pod     Beam::Minion->enqueue( $container, $service, \@args, \%opt );
 #pod
 #pod =head1 DESCRIPTION
@@ -53,14 +54,25 @@ our $VERSION = '0.016';
 #pod
 #pod =back
 #pod
-#pod Once you've picked a database backend, configure the C<BEAM_MINION>
-#pod environment variable with the URL. Minion will automatically deploy the
+#pod Minion will automatically deploy the
 #pod database tables it needs, so be sure to allow the right permissions (if
 #pod the database has such things).
 #pod
 #pod In order to communicate with Minion workers on other machines, it will
 #pod be necessary to use a database accessible from the network (so, not
 #pod SQLite).
+#pod
+#pod =head3 Environment variable
+#pod
+#pod Once you've picked a database backend, configure the C<BEAM_MINION>
+#pod environment variable with the URL. This could leave the password in the environment variable 
+#pod which could leak out.
+#pod
+#pod =head3 Configuration File
+#pod
+#pod To read configuration from a file, set the C<BEAM_MINION> environment variable
+#pod to a URL starting with C<file://> and then a path to a YAML file containing a
+#pod hash of the configuration passed to L<Beam::Minion/init>.
 #pod
 #pod =head2 Start a Worker
 #pod
@@ -89,7 +101,23 @@ our $VERSION = '0.016';
 
 use strict;
 use warnings;
-use Beam::Minion::Util qw( minion );
+use Mojo::Base -strict, -signatures;
+use Beam::Minion::Util qw( minion minion_init_args );
+
+#pod =sub init
+#pod
+#pod   Beam::Minion->init(%config)
+#pod
+#pod Set the configuration for Beam::Minion. This overrides the C<BEAM_MINION> environment
+#pod variable to allow setting configuration from any kind of source. The configuration should
+#pod be a hash with a single key for the L<Minion> backend to use, and a value to be 
+#pod passed to that backend's constructor (same as the arguments to L<Minion/new>).
+#pod
+#pod =cut
+
+sub init ($class, %config) {
+  minion_init_args(%config);
+}
 
 #pod =sub enqueue
 #pod
@@ -139,18 +167,19 @@ Beam::Minion - A distributed task runner for Beam::Wire containers
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
     # Command-line interface
-    export BEAM_MINION=sqlite://test.db
+    export BEAM_MINION=sqlite://test.db            # Configure a DSN directly
+    export BEAM_MINION=file:///etc/beam/minion.yml # Configuration file
     beam minion worker
     beam minion run <container> <service> [<args>...]
     beam minion help
 
     # Perl interface
-    local $ENV{BEAM_MINION} = 'sqlite://test.db';
+    Beam::Minion->init(%config)
     Beam::Minion->enqueue( $container, $service, \@args, \%opt );
 
 =head1 DESCRIPTION
@@ -161,6 +190,15 @@ Tasks are configured as L<Beam::Runnable> objects by L<Beam::Wire>
 container files.
 
 =head1 SUBROUTINES
+
+=head2 init
+
+  Beam::Minion->init(%config)
+
+Set the configuration for Beam::Minion. This overrides the C<BEAM_MINION> environment
+variable to allow setting configuration from any kind of source. The configuration should
+be a hash with a single key for the L<Minion> backend to use, and a value to be 
+passed to that backend's constructor (same as the arguments to L<Minion/new>).
 
 =head2 enqueue
 
@@ -222,14 +260,25 @@ L<Minion::Backend::MongoDB> - C<< mongodb://<host>:<port> >>
 
 =back
 
-Once you've picked a database backend, configure the C<BEAM_MINION>
-environment variable with the URL. Minion will automatically deploy the
+Minion will automatically deploy the
 database tables it needs, so be sure to allow the right permissions (if
 the database has such things).
 
 In order to communicate with Minion workers on other machines, it will
 be necessary to use a database accessible from the network (so, not
 SQLite).
+
+=head3 Environment variable
+
+Once you've picked a database backend, configure the C<BEAM_MINION>
+environment variable with the URL. This could leave the password in the environment variable 
+which could leak out.
+
+=head3 Configuration File
+
+To read configuration from a file, set the C<BEAM_MINION> environment variable
+to a URL starting with C<file://> and then a path to a YAML file containing a
+hash of the configuration passed to L<Beam::Minion/init>.
 
 =head2 Start a Worker
 

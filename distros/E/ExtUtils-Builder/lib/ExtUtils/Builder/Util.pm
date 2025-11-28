@@ -1,14 +1,15 @@
 package ExtUtils::Builder::Util;
-$ExtUtils::Builder::Util::VERSION = '0.017';
+$ExtUtils::Builder::Util::VERSION = '0.018';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl require_module unix_to_native_path native_to_unix_path command code function/;
+our @EXPORT_OK = qw/get_perl require_module unix_to_native_path native_to_unix_path command code function split_like_shell/;
 
 use Carp 'croak';
 use Config;
 use ExtUtils::Config;
+use ExtUtils::Helpers 0.027 'split_like_shell';
 use File::Spec;
 use File::Spec::Unix;
 use Scalar::Util 'tainted';
@@ -145,7 +146,7 @@ ExtUtils::Builder::Util - Utility functions for ExtUtils::Builder
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 DESCRIPTION
 
@@ -192,6 +193,10 @@ An L<ExtUtils::Config|ExtUtils::Config> (compatible) object.
 =head2 require_module($module)
 
 Dynamically require a module.
+
+=head2 split_like_shell($string)
+
+This function splits a string the same way as the local platform does.
 
 =head1 AUTHOR
 

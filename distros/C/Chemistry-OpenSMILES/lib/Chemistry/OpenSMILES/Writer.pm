@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Writer;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.12.2'; # VERSION
+our $VERSION = '0.12.3'; # VERSION
 
 =head1 NAME
 
@@ -138,6 +138,19 @@ Other order-dependent markers have to be adjusted to preorder as well.
 =cut
 
     $order_sub = $options->{order_sub} if $options->{order_sub};
+
+=item C<write_atom_sub>
+
+Subroutine reference used to depict an atom in the output SMILES.
+Takes three parameters: atom hash, molecular graph and option hash.
+Must return string.
+Caveat: interface might change.
+
+=cut
+
+    my $write_atom_sub = $options->{write_atom_sub}
+                            ? $options->{write_atom_sub}
+                            : \&_depict_atom;
     my $raw = $options->{raw};
 
 =back
@@ -145,7 +158,7 @@ Other order-dependent markers have to be adjusted to preorder as well.
 =cut
 
     # Subroutine will also accept and properly represent a single atom:
-    return _depict_atom( $what, undef, $options ) if ref $what eq 'HASH';
+    return $write_atom_sub->( $what, undef, $options ) if ref $what eq 'HASH';
 
     my @moieties = ref $what eq 'ARRAY' ? @$what : ( $what );
     my @components;
@@ -335,14 +348,14 @@ Other order-dependent markers have to be adjusted to preorder as well.
             }
             if( $chirality{$vertex} ) {
                 $component .=
-                    _depict_atom( $vertex,
-                                  $graph,
-                                  { %$options, chirality => $chirality{$vertex}, raw => 1 } );
+                    $write_atom_sub->( $vertex,
+                                       $graph,
+                                       { %$options, chirality => $chirality{$vertex}, raw => 1 } );
             } else {
                 $component .=
-                    _depict_atom( $vertex,
-                                  $graph,
-                                  { %$options, chirality => undef } );
+                    $write_atom_sub->( $vertex,
+                                       $graph,
+                                       { %$options, chirality => undef } );
             }
             if( $rings->{$i} ) {
                 my @rings_closed;

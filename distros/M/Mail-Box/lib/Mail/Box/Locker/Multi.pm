@@ -1,123 +1,118 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Locker::Multi;{
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 }
 
-use base 'Mail::Box::Locker';
+use parent 'Mail::Box::Locker';
 
 use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util   qw/blessed/;
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    $self->SUPER::init($args);
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args);
 
-    my @use
-     = exists $args->{use} ? @{delete $args->{use}}
-     : $^O eq 'MSWin32'    ? qw/Flock/
-     :                       qw/NFS FcntlLock Flock/;
+	my @use
+	  = exists $args->{use} ? @{delete $args->{use}}
+	  : $^O eq 'MSWin32'    ? qw/Flock/
+	  :   qw/NFS FcntlLock Flock/;
 
-    my (@lockers, @used);
+	my (@lockers, @used);
 
-    foreach my $method (@use)
-    {   if(UNIVERSAL::isa($method, 'Mail::Box::Locker'))
-        {   push @lockers, $method;
-            (my $used = ref $method) =~ s/.*\:\://;
-            push @used, $used;
-            next;
-        }
+	foreach my $method (@use)
+	{	if(blessed $method && $method->isa('Mail::Box::Locker'))
+		{	push @lockers, $method;
+			push @used, ref $method =~ s/.*\:\://r;
+			next;
+		}
 
-        my $locker = eval
-        {   Mail::Box::Locker->new
-              ( %$args
-              , method  => $method
-              , timeout => 1
-              )
-        };
-        next unless defined $locker;
+		my $locker = eval {	Mail::Box::Locker->new(%$args, method => $method, timeout => 1) };
+		defined $locker or next;
 
-        push @lockers, $locker;
-        push @used, $method;
-    }
+		push @lockers, $locker;
+		push @used, $method;
+	}
 
-    $self->{MBLM_lockers} = \@lockers;
-    $self->log(PROGRESS => "Multi-locking via @used.");
-    $self;
+	$self->{MBLM_lockers} = \@lockers;
+	$self->log(PROGRESS => "Multi-locking via @used.");
+	$self;
 }
 
-#-------------------------------------------
+#--------------------
+
+sub lockers() { @{ $_[0]->{MBLM_lockers}} }
 
 sub name() {'MULTI'}
 
-sub _try_lock($)
-{   my $self     = shift;
-    my @successes;
+sub _try_lock()
+{	my $self     = shift;
+	my @successes;
 
-    foreach my $locker ($self->lockers)
-    {
-        unless($locker->lock)
-        {   $_->unlock foreach @successes;
-            return 0;
-        }
-        push @successes, $locker;
-    }
+	foreach my $locker ($self->lockers)
+	{
+		unless($locker->lock)
+		{	$_->unlock for @successes;
+			return 0;
+		}
+		push @successes, $locker;
+	}
 
-    1;
+	1;
 }
 
+#--------------------
+
 sub unlock()
-{   my $self = shift;
-    $self->hasLock
-		or return $self;
-
-    $_->unlock foreach $self->lockers;
-    $self->SUPER::unlock;
-
-    $self;
+{	my $self = shift;
+	$self->hasLock or return $self;
+	$_->unlock for $self->lockers;
+	$self->SUPER::unlock;
+	$self;
 }
 
 sub lock()
-{   my $self  = shift;
-    return 1 if $self->hasLock;
+{	my $self  = shift;
+	return 1 if $self->hasLock;
 
-    my $timeout = $self->timeout;
-    my $end     = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
+	my $timeout = $self->timeout;
+	my $end     = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
 
-    while(1)
-    {   return $self->SUPER::lock
-            if $self->_try_lock;
+	while(1)
+	{	return $self->SUPER::lock
+			if $self->_try_lock;
 
-        last unless --$end;
-        sleep 1;
-    }
+		last unless --$end;
+		sleep 1;
+	}
 
-    return 0;
+	return 0;
 }
 
 sub isLocked()
-{   my $self     = shift;
+{	my $self     = shift;
 
-    # Try get a lock
-    $self->_try_lock($self->filename) or return 0;
+	# Try get a lock
+	$self->_try_lock or return 0;
 
-    # and release it immediately
-    $self->unlock;
-    1;
+	# and release it immediately
+	$self->unlock;
+	1;
 }
 
-#-------------------------------------------
-
-
-sub lockers() { @{shift->{MBLM_lockers}} }
 
 1;

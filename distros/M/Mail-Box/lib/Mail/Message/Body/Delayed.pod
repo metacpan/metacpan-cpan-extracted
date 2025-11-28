@@ -13,7 +13,7 @@ Mail::Message::Body::Delayed - body of a Mail::Message but not read yet.
 
 =head1 SYNOPSIS
 
- See Mail::Message::Body
+  See Mail::Message::Body
 
 =head1 DESCRIPTION
 
@@ -22,32 +22,31 @@ access the content.  In this documentation you will find the description of
 how a message body gets delay loaded.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
-(stringification) Returns the body as string --which will trigger
-completion-- unless called to produce a string for C<Carp>.  The latter
-to avoid deep recursions.
+Returns the body as string --which will trigger completion-- unless called
+to produce a string for C<Carp>.  The latter to avoid deep recursions.
 
-example: stringification of delayed body
+» example: stringification of delayed body
 
- print $msg->body;   # implicit by print
+  print $msg->body;   # implicit by print
 
- my $body = $msg->body;
- my $x    = "$body"; # explicit by interpolation
+  my $body = $msg->body;
+  my $x    = "$body"; # explicit by interpolation
 
-=item overload: B<@{}>
+=item overload: B<@{}> access as ARRAY
 
 When a body object is used as being an array reference, the lines of
 the body are returned.  This is the same as using the C<lines> method.
 
-=item overload: B<bool>
+=item overload: B<bool> existence
 
-Always returns a true value, which is needed to have overloaded
+Always returns a C<true> value, which is needed to have overloaded
 objects to be used as in C<if($body)>.  Otherwise, C<if(defined $body)>
 would be needed to avoid a runtime error.
 
@@ -56,14 +55,16 @@ would be needed to avoid a runtime error.
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Message::Body::Delayed-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option --Defined in     --Default
   log      Mail::Reporter   'WARNINGS'
@@ -84,52 +85,22 @@ The MESSAGE object which contains this delayed body.
 
 =back
 
-=head2 The body
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
 =over 4
 
-=item $obj-E<gt>B<message>()
+=item $obj-E<gt>B<logSettings>()
 
-=back
-
-=head2 About to the payload
-
-=over 4
-
-=item $obj-E<gt>B<guessSize>()
-
-=item $obj-E<gt>B<isDelayed>()
-
-=item $obj-E<gt>B<isModified>()
-
-=item $obj-E<gt>B<isMultipart>()
-
-=item $obj-E<gt>B<modified>()
-
-=item $obj-E<gt>B<nrLines>()
-
-=back
-
-=head2 Internals
-
-=over 4
-
-=item $obj-E<gt>B<fileLocation>( [$begin, $end] )
-
-=item $obj-E<gt>B<load>()
-
-Returns the loaded version of this body.
-
-=item $obj-E<gt>B<moveLocation>($distance)
-
-=item $obj-E<gt>B<read>($parser, $head, $bodytype)
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -140,9 +111,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Message::Body::Delayed-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -150,19 +119,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Message::Body::Delayed-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Message::Body::Delayed-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -191,12 +152,74 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
 
 Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head2 The body
+
+=over 4
+
+=item $obj-E<gt>B<message>()
+
+Z<>
+
+=back
+
+=head2 About to the payload
+
+=over 4
+
+=item $obj-E<gt>B<guessSize>()
+
+Z<>
+
+=item $obj-E<gt>B<isDelayed>()
+
+Z<>
+
+=item $obj-E<gt>B<isModified>()
+
+Z<>
+
+=item $obj-E<gt>B<isMultipart>()
+
+Z<>
+
+=item $obj-E<gt>B<modified>()
+
+Z<>
+
+=item $obj-E<gt>B<nrLines>()
+
+Z<>
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<fileLocation>( [$begin, $end] )
+
+Z<>
+
+=item $obj-E<gt>B<load>()
+
+Returns the loaded version of this body.
+
+=item $obj-E<gt>B<moveLocation>($distance)
+
+Z<>
+
+=item $obj-E<gt>B<read>($parser, $head, $bodytype)
+
+Z<>
 
 =back
 
@@ -211,19 +234,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

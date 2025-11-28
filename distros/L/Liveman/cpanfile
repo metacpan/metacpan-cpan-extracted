@@ -16,12 +16,15 @@ on 'test' => sub {
     requires 'Carp';
     requires 'Cwd';
     requires 'common::sense';
+    requires 'Data::Dumper';
     requires 'File::Basename';
     requires 'File::Find';
     requires 'File::Path';
     requires 'File::Slurper';
     requires 'File::Spec';
     requires 'Scalar::Util';
+    requires 'String::Diff';
+    requires 'Term::ANSIColor';
 };
 
 requires 'App::Yath' unless $^O eq 'MSWin32';

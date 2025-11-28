@@ -24,11 +24,11 @@ PUT http://api.aspose.cloud/v4.0/cells/content/split/text
 | Parameter Name | Type | Path/Query String/HTTPBody | Description | 
 | :- | :- | :- |:- | 
 |Spreadsheet|File|FormData|Upload spreadsheet file.|
-|splitDelimitersType|String|Query|Indicates split delimiters type.|
-|customDelimiter|String|Query|Indicates the custom delimiter.|
+|delimiters|String|Query|Indicates the custom delimiter.|
 |keepDelimitersInResultingCells|Boolean|Query|Indicates keep delimiters in resulting cells.|
 |keepDelimitersPosition|String|Query|Indicates keep delimiters position.|
 |HowToSplit|String|Query|Indicates|
+|outPositionRange|String|Query|Indicates split delimiters type.|
 |worksheet|String|Query|Specify the worksheet of spreadsheet.|
 |range|String|Query|Specify the worksheet range of spreadsheet.|
 |outPath|String|Query|(Optional) The folder path where the workbook is stored. The default is null.|

@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "25.10"
+         "version" : "25.11"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -1418,6 +1418,12 @@
       "AsposeCellsCloud::Object::WorksheetDataStatistics" : {
          "file" : "lib/AsposeCellsCloud/Object/WorksheetDataStatistics.pm"
       },
+      "AsposeCellsCloud::Request::TranslationSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/TranslationSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::TranslateTextFileRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/TranslateTextFileRequest.pm"
+      },
       "AsposeCellsCloud::Request::AggregateCellsByColorRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/AggregateCellsByColorRequest.pm"
       },
@@ -1453,6 +1459,9 @@
       },
       "AsposeCellsCloud::Request::ConvertSpreadsheetToPdfRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ConvertSpreadsheetToPdfRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertSpreadsheetToJsonRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertSpreadsheetToJsonRequest.pm"
       },
       "AsposeCellsCloud::Request::ConvertSpreadsheetToCsvRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ConvertSpreadsheetToCsvRequest.pm"
@@ -1603,6 +1612,12 @@
       },
       "AsposeCellsCloud::Request::RemoveCharactersRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/RemoveCharactersRequest.pm"
+      },
+      "AsposeCellsCloud::Request::RemoveCharactersByPositionRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/RemoveCharactersByPositionRequest.pm"
+      },
+      "AsposeCellsCloud::Request::RemoveDuplicateSubstringsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/RemoveDuplicateSubstringsRequest.pm"
       },
       "AsposeCellsCloud::Request::AddTextRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/AddTextRequest.pm"
@@ -2701,6 +2716,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "25.10",
+   "version" : "25.11",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

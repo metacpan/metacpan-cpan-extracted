@@ -8,10 +8,9 @@ Liveman::Cpanfile - анализатор зависимостей Perl прое�
 ```perl
 use Liveman::Cpanfile;
 
-chmod 0755, $_ for qw!scripts/test_script bin/tool!;
+chmod 0755, $_ for qw!script/test_script bin/tool!;
 
 $::cpanfile = Liveman::Cpanfile->new;
-
 $::cpanfile->cpanfile # -> << 'END'
 requires 'perl', '5.22.0';
 
@@ -30,12 +29,15 @@ on 'test' => sub {
 	requires 'Car::Auto';
 	requires 'Carp';
 	requires 'Cwd';
+	requires 'Data::Dumper';
 	requires 'File::Basename';
 	requires 'File::Find';
 	requires 'File::Path';
 	requires 'File::Slurper';
 	requires 'File::Spec';
 	requires 'Scalar::Util';
+	requires 'String::Diff';
+	requires 'Term::ANSIColor';
 	requires 'Test::More';
 	requires 'Turbin';
 	requires 'open';
@@ -70,9 +72,9 @@ Liveman::Cpanfile::pkg_from_path('lib/My/App.pm')    # => My::App
 
 ## sc ()
 
-Возвращает список исполняемых скриптов в директориях `scripts/` и `bin/`.
+Возвращает список исполняемых скриптов в директориях `script/` и `bin/`.
 
-Файл scripts/test_script:
+Файл script/test_script:
 ```perl
 #!/usr/bin/env perl
 require Data::Printer;
@@ -85,7 +87,7 @@ use List::Util;
 ```
 
 ```perl
-[$::cpanfile->sc] # --> [qw!bin/tool scripts/test_script!]
+[$::cpanfile->sc] # --> [qw!bin/tool script/test_script!]
 ```
 
 ## pm ()
@@ -167,7 +169,7 @@ use Car::Auto;
 3. Внедрённых в `*.md` пакетов.
 
 ```perl
-[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util Test::More Turbin open!]
+[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util String::Diff Term::ANSIColor Test::More Turbin open!]
 ```
 
 ## cpanfile ()

@@ -59,17 +59,18 @@ SKIP: {
   subtest 'ScrollConsoleScreenBuffer' => sub {
     my %rect = ( Left => 0, Top => 0, Right => 10, Bottom => 10 );
     my %coord = ( X => 0, Y => -1 );    # scroll up
-    my $fill = unpack('L', pack('CxS', ord('*'), 0x07));
+    my %fill = ( Char => ord('*'), Attributes => 0x07 );
 
     select(undef, undef, undef, 0.5);
-    my $r = ScrollConsoleScreenBufferA($hConsole, \%rect, undef, \%coord, $fill);
+    my $r = ScrollConsoleScreenBufferA($hConsole, \%rect, undef, \%coord, 
+      \%fill);
     diag "$^E" if $^E;
     ok($r, 'ScrollConsoleScreenBufferA ok region');
 
-    $fill = unpack('L', pack('SS', ord("ö"), 0x07));
+    $fill{Char} = ord("ö");
 
     select(undef, undef, undef, 0.5);
-    $r = ScrollConsoleScreenBufferW($hConsole, \%rect, undef, \%coord, $fill);
+    $r = ScrollConsoleScreenBufferW($hConsole, \%rect, undef, \%coord, \%fill);
     diag "$^E" if $^E;
     ok($r, 'ScrollConsoleScreenBufferW ok region');
   };

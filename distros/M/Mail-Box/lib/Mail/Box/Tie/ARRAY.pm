@@ -1,77 +1,78 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Tie::ARRAY;{
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 }
 
+use parent 'Mail::Box::Tie';
 
 use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util   qw/blessed/;
 
+#--------------------
 
 sub TIEARRAY(@)
-{   my ($class, $folder) = @_;
-    croak "No folder specified to tie to."
-        unless ref $folder && $folder->isa('Mail::Box');
-
-    bless { MBT_folder => $folder }, $class;
+{	my ($class, $folder) = @_;
+	$class->new($folder, 'ARRAY');
 }
 
-#-------------------------------------------
+#--------------------
 
+#--------------------
 
 sub FETCH($)
-{   my ($self, $index) = @_;
-    my $msg = $self->{MBT_folder}->message($index);
-    $msg->isDeleted ? undef : $msg;
+{	my ($self, $index) = @_;
+	my $msg = $self->folder->message($index);
+	$msg->isDeleted ? undef : $msg;
 }
-
-#-------------------------------------------
 
 
 sub STORE($$)
-{   my ($self, $index, $msg) = @_;
-    my $folder = $self->{MBT_folder};
+{	my ($self, $index, $msg) = @_;
+	my $folder = $self->folder;
 
-    croak "Cannot simply replace messages in a folder: use delete old, then push new."
-        unless $index == $folder->messages;
+	$index == $folder->messages
+		or croak "Cannot simply replace messages in a folder: use delete old, then push new.";
 
-    $folder->addMessages($msg);
-    $msg;
+	$folder->addMessages($msg);
+	$msg;
 }
 
 
-sub FETCHSIZE()  { scalar shift->{MBT_folder}->messages }
+sub FETCHSIZE()  { scalar $_[0]->folder->messages }
 
 
 sub PUSH(@)
-{   my $folder = shift->{MBT_folder};
-    $folder->addMessages(@_);
-    scalar $folder->messages;
+{	my $folder = shift->folder;
+	$folder->addMessages(@_);
+	scalar $folder->messages;
 }
- 
 
-sub DELETE($) { shift->{MBT_folder}->message(shift)->delete }
+
+sub DELETE($) { $_[0]->folder->message($_[1])->delete }
 
 
 sub STORESIZE($)
-{   my $folder = shift->{MBT_folder};
-    my $length = shift;
-    $folder->message($_) foreach $length..$folder->messages;
-    $length;
+{	my $folder = $_[0]->folder;
+	my $length = $_[1];
+	$folder->message($_) for $length..$folder->messages;
+	$length;
 }
 
 # DESTROY is implemented in Mail::Box
 
-#-------------------------------------------
-
+#--------------------
 
 1;

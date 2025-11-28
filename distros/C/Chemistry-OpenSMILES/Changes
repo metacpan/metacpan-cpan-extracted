@@ -1,3 +1,7 @@
+0.12.3 2025-11-28
+
+    - Introduce 'write_atom_sub' option to write_SMILES().
+
 0.12.2 2025-11-19
 
     - Introduce 'report_unnecessary_dot_usage' parser option.

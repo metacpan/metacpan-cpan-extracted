@@ -14,38 +14,42 @@ Mail::Box::Mbox::Message - one message in a Mbox folder
 
 =head1 SYNOPSIS
 
- my $folder  = new Mail::Box::Mbox folder => $ENV{MAIL}, ...;
- my $message = $folder->message(0);
+  my $folder  = Mail::Box::Mbox->new(folder => $ENV{MAIL}, ...);
+  my $message = $folder->message(0);
 
 =head1 DESCRIPTION
 
 Maintain one message in an L<Mail::Box::Mbox|Mail::Box::Mbox> folder.
 
 Extends L<"DESCRIPTION" in Mail::Box::File::Message|Mail::Box::File::Message/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::File::Message|Mail::Box::File::Message/"METHODS">.
- 
+
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::File::Message|Mail::Box::File::Message/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
 
 =item Error: Cannot coerce a $class object into a $class object
 
+Cast by C<coerce()>
+
 =item Error: Cannot include forward source as $include.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Cannot include reply source as $include.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =item Error: Method bounce requires To, Cc, or Bcc
 
@@ -54,22 +58,31 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
 The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
 find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
+Cast by C<send()>
 
 =item Error: No rebuild rule $name defined.
+
+Cast by C<rebuild()>
 
 =item Error: Only build() Mail::Message's; they are not in a folder yet
 
@@ -78,6 +91,7 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -86,23 +100,29 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unable to read delayed body.
 
+Cast by C<loadBody()>
+
 =item Error: coercion starts with some object
+
+Cast by C<coerce()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

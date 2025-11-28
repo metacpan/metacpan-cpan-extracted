@@ -10,7 +10,7 @@ use warnings;
 use Mail::Box::Test;
 use Mail::Box::Mbox;
 
-use Test::More tests => 5;
+use Test::More;
 use File::Compare;
 use File::Copy;
 
@@ -23,24 +23,21 @@ unlink $cpy;
 copy $src, $cpy
     or die "Cannot create test folder $cpy: $!\n";
 
-my $folder = new Mail::Box::Mbox
-  ( folder       => "=$cpyfn"
-  , folderdir    => $workdir
-  , lock_type    => 'NONE'
-  , extract      => 'ALWAYS'
-  , access       => 'rw'
-  );
-
-die "Couldn't read $cpy: $!\n"
-     unless $folder;
+my $folder = Mail::Box::Mbox->new(
+	folder       => "=$cpyfn",
+	folderdir    => $workdir,
+	lock_type    => 'NONE',
+	extract      => 'ALWAYS',
+	access       => 'rw',
+) or die "Couldn't read $cpy: $!\n";
 
 #
 # None of the messages should be modified.
 #
 
 my $modified = 0;
-$modified ||= $_->modified foreach $folder->messages;
-ok(!$modified);
+$modified ||= $_->modified for $folder->messages;
+ok !$modified, 'opened, not modified';
 
 #
 # Write unmodified folder to different file.
@@ -49,19 +46,19 @@ ok(!$modified);
 #
 
 $folder->modified(1);  # force write
-ok($folder->write(policy => 'REPLACE'));
+ok $folder->write(policy => 'REPLACE');
 
 # Try to read it back
 
-my $copy = new Mail::Box::Mbox
-  ( folder    => "=$cpyfn"
-  , folderdir => $workdir
-  , lock_type => 'NONE'
-  , extract   => 'ALWAYS'
-  );
+my $copy = Mail::Box::Mbox->new(
+	folder    => "=$cpyfn",
+	folderdir => $workdir,
+	lock_type => 'NONE',
+	extract   => 'ALWAYS',
+);
 
-ok($copy);
-cmp_ok($folder->messages, "==", $copy->messages);
+ok $copy, 'Opened copy again';
+cmp_ok $folder->messages, "==", $copy->messages, 'same nr messages after write';
 
 # Check also if the subjects are the same.
 
@@ -71,4 +68,6 @@ my @copy_subjects   = sort map {$_->head->get('subject')||''} $copy->messages;
 while(@folder_subjects)
 {   last unless shift(@folder_subjects) eq shift(@copy_subjects);
 }
-ok(!@folder_subjects);
+ok !@folder_subjects;
+
+done_testing;

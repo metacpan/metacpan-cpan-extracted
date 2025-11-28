@@ -25,7 +25,7 @@ WriteMakefile1(
   },
 
   TEST_REQUIRES => {
-    'Test::More'     => 0,
+    'Test::More'     => 0.88,
     'File::Basename' => 0,
   },
 

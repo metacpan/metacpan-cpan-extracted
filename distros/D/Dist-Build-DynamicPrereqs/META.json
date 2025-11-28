@@ -1,0 +1,85 @@
+{
+   "abstract" : "Support dynamic prerequisites in Dist::Build",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Build-DynamicPrereqs",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Dist::Build" : "0.001",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Requirements::Dynamic" : "0.002",
+            "ExtUtils::Builder::Planner::Extension" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "5.57",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open2" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "XSLoader" : "0",
+            "lib" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Build::DynamicPrereqs" : {
+         "file" : "lib/Dist/Build/DynamicPrereqs.pm",
+         "version" : "0.022"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Leont/dist-build-dynamicprereqs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/dist-build-dynamicprereqs.git",
+         "web" : "https://github.com/Leont/dist-build-dynamicprereqs"
+      }
+   },
+   "version" : "0.022",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

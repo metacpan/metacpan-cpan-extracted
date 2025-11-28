@@ -14,7 +14,7 @@ Search broken links in the range of remoted spreadsheet.
 ### **Endpoint** 
 
 ```
-PUT http://api.aspose.cloud/v4.0/cells/{name}/worksheets/{worksheet}/ranges/{cellArea}search/broken-links
+PUT http://api.aspose.cloud/v4.0/cells/{name}/worksheets/{worksheet}/ranges/{cellArea}/search/broken-links
 ```
 ### **Function Description**
 This method searches for broken links within a range of spreadsheet file stored in remote cloud storage. It scans all sheets and cells to identify hyperlinks that no longer point to valid destinations, such as dead URLs or missing external references. The operation is performed remotely within the cloud environment, without requiring the file to be downloaded to the local machine. Ensure that you have valid cloud storage credentials and proper access permissions to the target file. If the source file cannot be accessed, if it contains unsupported formats, or if an error occurs during the scanning process, an appropriate exception will be thrown. Depending on the implementation, the method may return a list of broken links with details such as sheet name, cell coordinates, and the invalid URL. Users should carefully review the results to update or remove outdated links in the spreadsheet.## **Error Handling**- **400 Bad Request**: Invalid url.- **401 Unauthorized**:  Authentication has failed, or no credentials were provided.- **404 Not Found**: Source file not accessible.- **500 Server Error** The spreadsheet has encountered an anomaly in obtaining data.## **Key Features and Benefits**- **Remote Scanning**: Searches for broken links within a specified range in a spreadsheet stored in cloud storage.- **Comprehensive Coverage**: Scans all sheets and cells within the defined range to identify invalid hyperlinks.

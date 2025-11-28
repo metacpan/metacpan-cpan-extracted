@@ -59,6 +59,82 @@ sub new {
 }
 
 #
+# TranslationSpreadsheetRequest
+#
+# Translates the entire spreadsheet to the specified target language.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @targetLanguage  string (required)  The target language code for translation (e.g., "es", "fr", "de").  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'TranslationSpreadsheetRequest',
+            description => 'TranslationSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'translation_spreadsheet' } = { 
+    	summary => 'Translates the entire spreadsheet to the specified target language.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub translation_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# TranslateTextFileRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @targetLanguage  string (required)  The target language code for translation (e.g., "es", "fr", "de").  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'TranslateTextFileRequest',
+            description => 'TranslateTextFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'translate_text_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub translate_text_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
 # AggregateCellsByColorRequest
 #
 # The Aggregate by Color API provides a convenient way to perform calculations on cells that share the same fill or font color. This API supports a range of aggregate operations, including count, sum, maximum value, minimum value, and average value, enabling you to analyze and summarize data based on color distinctions.
@@ -538,6 +614,46 @@ sub convert_spreadsheet{
 # @return string
 #
 sub convert_spreadsheet_to_pdf{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertSpreadsheetToJsonRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertSpreadsheetToJsonRequest',
+            description => 'ConvertSpreadsheetToJson Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_spreadsheet_to_json' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_spreadsheet_to_json{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -2586,18 +2702,15 @@ sub update_word_case{
 #
 # RemoveCharactersRequest
 #
-# Perform operations or delete any custom characters, character sets, and substrings within a selected range for a specific position.
+# Deletes user-defined characters, predefined symbol sets, or any substring from every cell in the chosen range while preserving formulas, formatting and data-validation.
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @theFirstNCharacters  int (required)  Specify removing the first n characters from selected cells.  
-# @theLastNCharacters  int (required)  Specify removing the last n characters from selected cells.  
-# @allCharactersBeforeText  string (required)  Specify using targeted removal options to delete text that is located before certain characters.  
-# @allCharactersAfterText  string (required)  Specify using targeted removal options to delete text that is located after certain characters.  
-# @removeTextMethod  string (required)  Specify the removal of text method type.  
-# @characterSets  string (required)  Specify the character sets.  
-# @removeCustomValue  string (required)  Specify the remove custom value.  
-# @worksheet  string (required)  Specify the worksheet of spreadsheet.  
-# @range  string (required)  Specify the worksheet range of spreadsheet.  
+# @removeTextMethod  string   Specify the removal of text method type.  
+# @characterSets  string   Specify the character sets.  
+# @removeCustomValue  string   Specify the remove custom value.  
+# @caseSensitive  boolean     
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
 # @outStorageName  string   Output file Storage Name.  
 # @region  string   The spreadsheet region setting.  
@@ -2612,7 +2725,7 @@ sub update_word_case{
        }
     };
     __PACKAGE__->method_documentation->{ 'remove_characters' } = { 
-    	summary => 'Perform operations or delete any custom characters, character sets, and substrings within a selected range for a specific position.',
+    	summary => 'Deletes user-defined characters, predefined symbol sets, or any substring from every cell in the chosen range while preserving formulas, formatting and data-validation.',
         params => $params,
         returns => 'string',
     };
@@ -2632,6 +2745,96 @@ sub remove_characters{
 }
 
 #
+# RemoveCharactersByPositionRequest
+#
+# Deletes characters from every cell in the target range by position (first/last N, before/after a substring, or between two delimiters) while preserving formulas, formatting and data-validation.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @theFirstNCharacters  int   Specify removing the first n characters from selected cells.  
+# @theLastNCharacters  int   Specify removing the last n characters from selected cells.  
+# @allCharactersBeforeText  string   Specify using targeted removal options to delete text that is located before certain characters.  
+# @allCharactersAfterText  string   Specify using targeted removal options to delete text that is located after certain characters.  
+# @caseSensitive  boolean     
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveCharactersByPositionRequest',
+            description => 'RemoveCharactersByPosition Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_characters_by_position' } = { 
+    	summary => 'Deletes characters from every cell in the target range by position (first/last N, before/after a substring, or between two delimiters) while preserving formulas, formatting and data-validation.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub remove_characters_by_position{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# RemoveDuplicateSubstringsRequest
+#
+# Finds and removes repeated substrings inside every cell of the chosen range, using user-defined or preset delimiters, while preserving formulas, formatting and data-validation.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @delimiters  string (required)    
+# @treatConsecutiveDelimitersAsOne  boolean     
+# @caseSensitive  boolean     
+# @worksheet  string     
+# @range  string     
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveDuplicateSubstringsRequest',
+            description => 'RemoveDuplicateSubstrings Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_duplicate_substrings' } = { 
+    	summary => 'Finds and removes repeated substrings inside every cell of the chosen range, using user-defined or preset delimiters, while preserving formulas, formatting and data-validation.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub remove_duplicate_substrings{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
 # AddTextRequest
 #
 # Specify appending text to multiple cells at once, allowing you to add prefixes, suffixes, labels, or any specific characters. You can choose the exact position of the text—in the beginning, at the end, or before or after certain characters in the cell.
@@ -2639,7 +2842,7 @@ sub remove_characters{
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
 # @text  string (required)  Specify the added text content.  
 # @position  string (required)  Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.    
-# @selectText  string (required)  Indicates selecting the specific position to add text based on the content of the text.  
+# @selectText  string   Indicates selecting the specific position to add text based on the content of the text.  
 # @skipEmptyCells  boolean   Indicates skip empty cells.  
 # @worksheet  string   Specify the worksheet of spreadsheet.  
 # @range  string   Specify the worksheet range of spreadsheet.  
@@ -2683,8 +2886,8 @@ sub add_text{
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
 # @convertTextType  string (required)  Indicates the conversion of text type.  
-# @sourceCharacters  string (required)  Indicates the source characters.  
-# @targetCharacters  string (required)  Indicates the target characters.  
+# @sourceCharacters  string   Indicates the source characters.  
+# @targetCharacters  string   Indicates the target characters.  
 # @worksheet  string   Specify the worksheet of spreadsheet.  
 # @range  string   Specify the worksheet range of spreadsheet.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
@@ -2727,11 +2930,11 @@ sub convert_text{
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
 # @extractTextType  string (required)  Indicates extract text type.  
-# @beforeText  string (required)  Indicates extracting the text before the specified characters or substrings.  
-# @afterText  string (required)  Indicates extracting the text after the specified characters or substrings.  
-# @beforePosition  int (required)  Indicates retrieving the first character or a specified number of characters from the left side of the selected cell.  
-# @afterPosition  int (required)  Indicates retrieving the first character or a specified number of characters from the right side of the selected cell.  
 # @outPositionRange  string (required)  Indicates the output location for the extracted text.  
+# @beforeText  string   Indicates extracting the text before the specified characters or substrings.  
+# @afterText  string   Indicates extracting the text after the specified characters or substrings.  
+# @beforePosition  int   Indicates retrieving the first character or a specified number of characters from the left side of the selected cell.  
+# @afterPosition  int   Indicates retrieving the first character or a specified number of characters from the right side of the selected cell.  
 # @worksheet  string   Specify the worksheet of spreadsheet.  
 # @range  string   Specify the worksheet range of spreadsheet.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
@@ -2773,11 +2976,11 @@ sub extract_text{
 # Indicates performing text segmentation on the specified area according to the segmentation method, and outputting to the designated interval.
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @splitDelimitersType  string (required)  Indicates split delimiters type.  
-# @customDelimiter  string (required)  Indicates the custom delimiter.  
-# @keepDelimitersInResultingCells  boolean (required)  Indicates keep delimiters in resulting cells.  
-# @keepDelimitersPosition  string (required)  Indicates keep delimiters position.  
-# @HowToSplit  string (required)  Indicates  
+# @delimiters  string (required)  Indicates the custom delimiter.  
+# @keepDelimitersInResultingCells  boolean   Indicates keep delimiters in resulting cells.  
+# @keepDelimitersPosition  string   Indicates keep delimiters position.  
+# @HowToSplit  string   Indicates  
+# @outPositionRange  string   Indicates split delimiters type.  
 # @worksheet  string   Specify the worksheet of spreadsheet.  
 # @range  string   Specify the worksheet range of spreadsheet.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  

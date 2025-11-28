@@ -26,17 +26,17 @@ my $lockfile  = File::Spec->catfile($workdir, 'lockfiletest');
 unlink $lockfile;
 
 if($windows)
-{   open my $OUT, '>', $lockfile or die;
-    close $OUT;
+{   open my $out, '>', $lockfile or die;
+    $out->close;
 }
 
 my $locker = Mail::Box::Locker->new
- ( method  => 'MULTI'
- , timeout => 1
- , wait    => 1
- , file    => $lockfile
- , folder  => $fakefolder
- );
+  ( method  => 'MULTI'
+  , timeout => 1
+  , wait    => 1
+  , file    => $lockfile
+  , folder  => $fakefolder
+  );
 
 ok($locker);
 is($locker->name, 'MULTI');

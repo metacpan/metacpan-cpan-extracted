@@ -12,7 +12,7 @@ Mail::Box::Locker::DotLock - lock a folder with a separate file
 
 =head1 SYNOPSIS
 
- See Mail::Box::Locker
+  See Mail::Box::Locker
 
 =head1 DESCRIPTION
 
@@ -20,27 +20,28 @@ The C<::DotLock> object lock the folder by creating a file with the
 same name as the folder, extended by C<.lock>.
 
 Extends L<"DESCRIPTION" in Mail::Box::Locker|Mail::Box::Locker/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::Locker|Mail::Box::Locker/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::Locker|Mail::Box::Locker/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Locker::DotLock-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Name of the file to lock.  By default, the folder's name is extended
 with C<.lock>.
+Improves base, see L<Mail::Box::Locker/"METHODS">
 
  -Option      --Defined in       --Default
-  dotlock_file                     <undef>
+  dotlock_file                     undef
   expires       Mail::Box::Locker  1 hour
   file          Mail::Box::Locker  <folderfile>.lock
-  folder        Mail::Box::Locker  <undef>
+  folder        Mail::Box::Locker  <C<undef>>
   log           Mail::Reporter     'WARNINGS'
   method        Mail::Box::Locker  'DOTLOCK'
   timeout       Mail::Box::Locker  10
@@ -48,22 +49,22 @@ with C<.lock>.
 
 =over 2
 
-=item dotlock_file => FILENAME
+=item dotlock_file => $file
 
 Alternative name for C<file>, especially useful to confusion when
 the multi locker is used.
 
-=item expires => SECONDS
+=item expires => $seconds
 
-=item file => FILENAME
+=item file => $file
 
-=item folder => FOLDER
+=item folder => $folder
 
 =item log => LEVEL
 
-=item method => STRING|CLASS|ARRAY
+=item method => $name|CLASS|\@names
 
-=item timeout => SECONDS|'NOTIMEOUT'
+=item timeout => $seconds|'NOTIMEOUT'
 
 =item trace => LEVEL
 
@@ -74,10 +75,26 @@ the multi locker is used.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Box::Locker|Mail::Box::Locker/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<expires>( [SECONDS] )
+
+Inherited, see L<Mail::Box::Locker/"Attributes">
+
+=item $obj-E<gt>B<filename>( [$filename] )
+
+Inherited, see L<Mail::Box::Locker/"Attributes">
+
+=item $obj-E<gt>B<folder>( [$folder] )
+
+Inherited, see L<Mail::Box::Locker/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<name>()
 
 Inherited, see L<Mail::Box::Locker/"Attributes">
 
@@ -87,30 +104,10 @@ Inherited, see L<Mail::Box::Locker/"Attributes">
 
 =back
 
-=head2 The Locker
-
-Extends L<"The Locker" in Mail::Box::Locker|Mail::Box::Locker/"The Locker">.
- 
-=over 4
-
-=item $obj-E<gt>B<filename>( [$filename] )
-
-Inherited, see L<Mail::Box::Locker/"The Locker">
-
-=item $obj-E<gt>B<folder>( [$folder] )
-
-Inherited, see L<Mail::Box::Locker/"The Locker">
-
-=item $obj-E<gt>B<name>()
-
-Inherited, see L<Mail::Box::Locker/"The Locker">
-
-=back
-
 =head2 Locking
 
 Extends L<"Locking" in Mail::Box::Locker|Mail::Box::Locker/"Locking">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<hasLock>()
@@ -123,14 +120,18 @@ Inherited, see L<Mail::Box::Locker/"Locking">
 
 =item $obj-E<gt>B<lock>()
 
+Inherited, see L<Mail::Box::Locker/"Locking">
+
 =item $obj-E<gt>B<unlock>()
+
+Inherited, see L<Mail::Box::Locker/"Locking">
 
 =back
 
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::Locker|Mail::Box::Locker/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -141,9 +142,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Locker::DotLock-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -151,19 +150,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Locker::DotLock-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Locker::DotLock-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -192,7 +183,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::Locker|Mail::Box::Locker/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -207,9 +198,15 @@ Inherited, see L<Mail::Box::Locker/"Cleanup">
 
 =item Warning: Couldn't remove lockfile $lock: $!
 
+Cast by C<unlock()>
+
 =item Error: Failed to remove expired lockfile $lockfile: $!
 
+Cast by C<lock()>
+
 =item Warning: Folder already locked with file $lockfile
+
+Cast by C<lock()>
 
 =item Error: Package $package does not implement $method.
 
@@ -218,21 +215,25 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Warning: Removed expired lockfile $lockfile
+
+Cast by C<lock()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

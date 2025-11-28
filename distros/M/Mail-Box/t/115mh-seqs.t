@@ -19,15 +19,15 @@ my $seq   = File::Spec->catfile($mhsrc, '.mh_sequences');
 unpack_mbox2mh($src, $mhsrc);
 
 # Create a sequences file.
-open SEQ, ">$seq" or die "Cannot write to $seq: $!\n";
+open my $sh, ">$seq" or die "Cannot write to $seq: $!\n";
 
 # Be warned that message number 13 has been skipped from the MH-box.
-print SEQ <<'MH_SEQUENCES';
+$sh->print(<<'MH_SEQUENCES');
 unseen: 12-15 3 34 36 16
 cur: 5
 MH_SEQUENCES
 
-close SEQ;
+$sh->close;
 
 my $mgr = Mail::Box::Manager->new;
 
@@ -58,9 +58,9 @@ ok($folder->message(1)->label('current'));
 $folder->modified(1);
 $folder->close(write => 'ALWAYS');
 
-open SEQ, $seq or die "Cannot read from $seq: $!\n";
-my @seq = <SEQ>;
-close SEQ;
+open $sh, $seq or die "Cannot read from $seq: $!\n";
+my @seq = <$sh>;
+$sh->close;
 
 my ($cur)    = grep /^cur\: /, @seq;
 is($cur, "cur: 2\n");

@@ -1,5 +1,17 @@
 Revision history for Win32API::Console
 
+0.2.3  2025-11-27
+    - Fix the switch of the wrapper functions
+    - Fixed related ANSI and WCHAR tests
+    - Fix buffer overflow in WriteConsoleOutputCharacterA
+
+0.2.2  2025-11-26
+    - Add author only tests
+    - Add samples to the distribution
+    - Add CHAR_INFO structure for ScrollConsoleScreenBuffer
+    - Fix the type of the parameter $fill from ScrollConsoleScreenBuffer
+    - Fixed bug regarding the return value of SetConsoleCtrlHandler
+
 0.2.1  2025-11-25
     - Add script that performs an inventory before the tests begin
     - Change: encoding/decoding is only performed for wrapper functions
@@ -34,16 +46,16 @@ Revision history for Win32API::Console
 
 0.1.2  2025-11-16
     - Add a TestConsole Module for automated tests
-    - Fixed no WC_NO_BEST_FIT_CHARS when CP_UTF8
     - Change regarding the use of Encode::Unicode
     - Change emulation use for SetConsoleDisplayMode()
     - Change of osname detection for GetOSVersion()
+    - Fixed no WC_NO_BEST_FIT_CHARS when CP_UTF8
     - Remove dependency on the Win32API::Registry module
 
 0.1.1  2025-11-14
-    - Fix bugs in POD
     - Change tests for GitHub Actions
     - Change parameter check for SetConsoleCtrlHandler()
+    - Fix bugs in POD
 
 0.1.0  2025-11-14
     - First published version

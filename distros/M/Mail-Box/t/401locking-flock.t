@@ -27,15 +27,15 @@ my $fakefolder = bless {MB_foldername=> 'this'}, 'Mail::Box';
 my $lockfile   = File::Spec->catfile($workdir, 'lockfiletest');
 
 unlink $lockfile;
-open OUT, '>', $lockfile;
+open my $out, '>', $lockfile;   # create lockfile
 
 my $locker = Mail::Box::Locker->new
- ( method  => 'FLOCK'
- , timeout => 1
- , wait    => 1
- , file    => $lockfile
- , folder  => $fakefolder
- );
+  ( method  => 'FLOCK'
+  , timeout => 1
+  , wait    => 1
+  , file    => $lockfile
+  , folder  => $fakefolder
+  );
 
 ok($locker,                                       'create locker');
 is($locker->name, 'FLOCK',                        'lock name');
@@ -54,5 +54,5 @@ ok($warn =~ m/already flocked/,                   'relock no problem');
 $locker->unlock;
 ok(! $locker->hasLock,                            'unlocked');
 
-close OUT;
+$out->close;
 unlink $lockfile;

@@ -1,0 +1,15 @@
+#---*- Makefile -*-------------------------------------------------------
+
+# Targets related to spellchecking the specification
+
+.PHONY: fix_spelling
+
+# Interactively fix spelling errors and add to .words.lst
+fix_spelling:
+	aspell check -x -p ./.words.lst -l en_US ${RST_FILES}
+
+.PHONY: spell
+
+# Output all spelling errors to stdout with their line numbers
+spell:
+	./tests/scripts/check_spelling.sh

@@ -1,13 +1,12 @@
 package Dist::Build::XS::Alien;
-$Dist::Build::XS::Alien::VERSION = '0.021';
+$Dist::Build::XS::Alien::VERSION = '0.022';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Carp 'croak';
-use ExtUtils::Builder::Util 'require_module';
-use ExtUtils::Helpers 'split_like_shell';
+use ExtUtils::Builder::Util 0.018 qw/require_module split_like_shell/;
 
 sub add_methods {
 	my ($self, $planner, %args) = @_;
@@ -17,7 +16,7 @@ sub add_methods {
 	$planner->add_delegate('add_xs', sub {
 		my ($planner, %args) = @_;
 
-		if (my $alien = delete $args{alien}) {
+		if (my $alien = delete $args{alien} // delete $args{external}) {
 			my @aliens = ref $alien ? @{ $alien } : $alien;
 
 			for my $alien (@aliens) {
@@ -71,7 +70,7 @@ Dist::Build::XS::Alien - Dist::Build extension to use Alien modules.
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -85,7 +84,7 @@ version 0.021
 
 =head1 DESCRIPTION
 
-This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an additional argument to the C<add_xs> function: C<alien>. It will add the appropriate arguments for that alien module to the build. It can be either a string or a list of strings. If the strings don't contain C<::> they're prepended with C<'Alien::'> before the module is loaded.
+This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an additional argument to the C<add_xs> function: C<alien> (or alternatively C<external>). It will add the appropriate arguments for that alien module to the build. It can be either a string or a list of strings. If the strings don't contain C<::> they're prepended with C<'Alien::'> before the module is loaded.
 
 =head1 AUTHOR
 

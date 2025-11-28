@@ -13,31 +13,31 @@ Mail::Box::Mbox - handle folders in Mbox format
 
 =head1 SYNOPSIS
 
- use Mail::Box::Mbox;
- my $folder = Mail::Box::Mbox->new(folder => $ENV{MAIL}, ...);
+  use Mail::Box::Mbox;
+  my $folder = Mail::Box::Mbox->new(folder => $ENV{MAIL}, ...);
 
 =head1 DESCRIPTION
 
 This documentation describes how Mbox mailboxes work, and also describes
-what you can do with the Mbox folder object Mail::Box::Mbox.
+what you can do with the Mbox folder object L<Mail::Box::Mbox|Mail::Box::Mbox>.
 
 Extends L<"DESCRIPTION" in Mail::Box::File|Mail::Box::File/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in Mail::Box::File|Mail::Box::File/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<"">
+=item overload: B<""> stringification
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<@{}>
+=item overload: B<@{}> use as ARRAY
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<cmp>
+=item overload: B<cmp> string comparison
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
@@ -46,29 +46,31 @@ Inherited, see L<Mail::Box/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::File|Mail::Box::File/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::File|Mail::Box::File/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Mbox-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Box/"Constructors">
 
  -Option             --Defined in     --Default
   access               Mail::Box        'r'
   body_delayed_type    Mail::Box        Mail::Message::Body::Delayed
   body_type            Mail::Box::File  <see description>
-  coerce_options       Mail::Box        []
-  create               Mail::Box        <false>
+  coerce_options       Mail::Box        +[]
+  create               Mail::Box        false
   extract              Mail::Box        10240
   field_type           Mail::Box        undef
-  fix_headers          Mail::Box        <false>
+  fix_headers          Mail::Box        false
   folder               Mail::Box        $ENV{MAIL}
   folderdir            Mail::Box        $ENV{HOME}.'/Mail'
   head_delayed_type    Mail::Box        Mail::Message::Head::Delayed
   head_type            Mail::Box        Mail::Message::Head::Complete
-  keep_dups            Mail::Box        <false>
+  keep_dups            Mail::Box        false
   lock_extension       Mail::Box::File  '.lock'
   lock_file            Mail::Box        <foldername><lock-extension>
   lock_timeout         Mail::Box        1 hour
@@ -79,8 +81,8 @@ Extends L<"Constructors" in Mail::Box::File|Mail::Box::File/"Constructors">.
   manager              Mail::Box        undef
   message_type         Mail::Box        Mail::Box::Mbox::Message
   multipart_type       Mail::Box        Mail::Message::Body::Multipart
-  remove_when_empty    Mail::Box        <true>
-  save_on_exit         Mail::Box        <true>
+  remove_when_empty    Mail::Box        true
+  save_on_exit         Mail::Box        true
   subfolder_extension                   '.d'
   trace                Mail::Reporter   'WARNINGS'
   trusted              Mail::Box        <depends on folder location>
@@ -88,7 +90,7 @@ Extends L<"Constructors" in Mail::Box::File|Mail::Box::File/"Constructors">.
 
 =over 2
 
-=item access => MODE
+=item access => $mode
 
 =item body_delayed_type => CLASS
 
@@ -98,7 +100,7 @@ Extends L<"Constructors" in Mail::Box::File|Mail::Box::File/"Constructors">.
 
 =item create => BOOLEAN
 
-=item extract => INTEGER | CODE | METHOD | 'LAZY'|'ALWAYS'
+=item extract => INTEGER | CODE | METHOD | 'LAZY'| 'ALWAYS'
 
 =item field_type => CLASS
 
@@ -106,7 +108,7 @@ Extends L<"Constructors" in Mail::Box::File|Mail::Box::File/"Constructors">.
 
 =item folder => FOLDERNAME
 
-=item folderdir => DIRECTORY
+=item folderdir => $directory
 
 =item head_delayed_type => CLASS
 
@@ -114,21 +116,21 @@ Extends L<"Constructors" in Mail::Box::File|Mail::Box::File/"Constructors">.
 
 =item keep_dups => BOOLEAN
 
-=item lock_extension => FILENAME|STRING
+=item lock_extension => $file|STRING
 
-=item lock_file => FILENAME
+=item lock_file => $file
 
-=item lock_timeout => SECONDS
+=item lock_timeout => $seconds
 
 =item lock_type => CLASS|STRING|ARRAY
 
-=item lock_wait => SECONDS
+=item lock_wait => $seconds
 
 =item locker => OBJECT
 
 =item log => LEVEL
 
-=item manager => MANAGER
+=item manager => $manager
 
 =item message_type => CLASS
 
@@ -155,10 +157,105 @@ to contain them.  This extension C<.d> can be changed using this option.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::File|Mail::Box::File/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<filename>()
+
+Inherited, see L<Mail::Box::File/"Attributes">
+
+=item $obj-E<gt>B<fixHeaders>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<folderdir>( [$directory] )
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $class-E<gt>B<foundIn>( [$foldername], %options )
+
+If no C<$foldername> is specified, then the value of the C<folder> option
+is taken.  A mbox folder is a file which starts with a separator
+line: a line with C<'From '> as first characters.  Blank lines which
+start the file are ignored, which is not for all MUA's acceptable.
+Improves base, see L<Mail::Box/"Internals">
+
+ -Option             --Defined in     --Default
+  folder                                undef
+  folderdir            Mail::Box        undef
+  subfolder_extension                   <from object>
+
+=over 2
+
+=item folder => $name
+
+=item folderdir => $directory
+
+=item subfolder_extension => STRING
+
+=back
+
+=item $obj-E<gt>B<isTrusted>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $any-E<gt>B<listSubFolders>(%options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+ -Option             --Defined in     --Default
+  check                Mail::Box        <C<false>>
+  folder               Mail::Box        <from calling object>
+  folderdir            Mail::Box        <from folder>
+  skip_empty           Mail::Box        <C<false>>
+  subfolder_extension                   <from object>
+
+=over 2
+
+=item check => BOOLEAN
+
+=item folder => FOLDERNAME
+
+=item folderdir => DIRECTORY
+
+=item skip_empty => BOOL
+
+=item subfolder_extension => STRING
+
+When the method is called on an open folder, the extension defined by it is
+used to detect sub-folders by default.  Otherwise, C<'.d'> is taken.
+
+=back
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<removeEmpty>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=item $obj-E<gt>B<subfolderExtension>()
+
+Z<>
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box/"Attributes">
+
+=back
+
 =head2 The folder
 
 Extends L<"The folder" in Mail::Box::File|Mail::Box::File/"The folder">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addMessage>($message, %options)
@@ -169,9 +266,9 @@ Inherited, see L<Mail::Box/"The folder">
 
 Inherited, see L<Mail::Box/"The folder">
 
-=item Mail::Box::Mbox-E<gt>B<appendMessages>(%options)
+=item $class-E<gt>B<appendMessages>(%options)
 
-Inherited, see L<Mail::Box::File/"METHODS">
+Inherited, see L<Mail::Box::File/"The folder">
 
 =item $obj-E<gt>B<close>(%options)
 
@@ -185,27 +282,11 @@ Inherited, see L<Mail::Box/"The folder">
 
 Inherited, see L<Mail::Box/"The folder">
 
-=item $obj-E<gt>B<filename>()
-
-Inherited, see L<Mail::Box::File/"The folder">
-
-=item $obj-E<gt>B<folderdir>( [$directory] )
-
-Inherited, see L<Mail::Box/"The folder">
-
-=item $obj-E<gt>B<name>()
-
-Inherited, see L<Mail::Box/"The folder">
-
 =item $obj-E<gt>B<organization>()
 
 Inherited, see L<Mail::Box/"The folder">
 
 =item $obj-E<gt>B<size>()
-
-Inherited, see L<Mail::Box/"The folder">
-
-=item $obj-E<gt>B<type>()
 
 Inherited, see L<Mail::Box/"The folder">
 
@@ -222,7 +303,7 @@ Inherited, see L<Mail::Box/"The folder">
 =head2 Folder flags
 
 Extends L<"Folder flags" in Mail::Box::File|Mail::Box::File/"Folder flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<access>()
@@ -246,7 +327,7 @@ Inherited, see L<Mail::Box/"Folder flags">
 =head2 The messages
 
 Extends L<"The messages" in Mail::Box::File|Mail::Box::File/"The messages">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<current>( [$number|$message|$message_id] )
@@ -290,40 +371,10 @@ Inherited, see L<Mail::Box/"The messages">
 =head2 Sub-folders
 
 Extends L<"Sub-folders" in Mail::Box::File|Mail::Box::File/"Sub-folders">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<listSubFolders>(%options)
-
-=item Mail::Box::Mbox-E<gt>B<listSubFolders>(%options)
-
- -Option             --Defined in     --Default
-  check                Mail::Box        <false>
-  folder               Mail::Box        <from calling object>
-  folderdir            Mail::Box        <from folder>
-  skip_empty           Mail::Box        <false>
-  subfolder_extension                   <from object>
-
-=over 2
-
-=item check => BOOLEAN
-
-=item folder => FOLDERNAME
-
-=item folderdir => DIRECTORY
-
-=item skip_empty => BOOL
-
-=item subfolder_extension => STRING
-
-When the method is called on an open folder, the extension defined by it is
-used to detect sub-folders by default.  Otherwise, C<'.d'> is taken.
-
-=back
-
-=item $obj-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
-
-=item Mail::Box::Mbox-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+=item $any-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
@@ -335,9 +386,7 @@ Inherited, see L<Mail::Box/"Sub-folders">
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
-=item $obj-E<gt>B<topFolderWithMessages>()
-
-=item Mail::Box::Mbox-E<gt>B<topFolderWithMessages>()
+=item $any-E<gt>B<topFolderWithMessages>()
 
 Inherited, see L<Mail::Box/"Sub-folders">
 
@@ -346,16 +395,16 @@ Inherited, see L<Mail::Box/"Sub-folders">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Box::File|Mail::Box::File/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<coerce>($message, %options)
 
 Inherited, see L<Mail::Box/"Internals">
 
-=item $obj-E<gt>B<create>($foldername, %options)
+=item $any-E<gt>B<create>($foldername, %options)
 
-=item Mail::Box::Mbox-E<gt>B<create>($foldername, %options)
+Inherited, see L<Mail::Box/"Internals">
 
  -Option             --Defined in     --Default
   folderdir            Mail::Box        undef
@@ -363,7 +412,7 @@ Inherited, see L<Mail::Box/"Internals">
 
 =over 2
 
-=item folderdir => DIRECTORY
+=item folderdir => $directory
 
 =item subfolder_extension => STRING
 
@@ -378,36 +427,13 @@ is passed to L<folderToFilename()|Mail::Box::Mbox/"Internals">.
 
 Inherited, see L<Mail::Box/"Internals">
 
-=item $obj-E<gt>B<folderToFilename>( $foldername, $folderdir, [$extension] )
-
-=item Mail::Box::Mbox-E<gt>B<folderToFilename>( $foldername, $folderdir, [$extension] )
+=item $any-E<gt>B<folderToFilename>( $foldername, $folderdir, [$extension] )
 
 Translate a folder name into a filename, using the
-$folderdir value to replace a leading C<=>.  If no $extension is specified and
+C<$folderdir> value to replace a leading C<=>.  If no C<$extension> is specified and
 this method is called as instance method, new(subfolder_extension) is used.
 Otherwise, the extension default to C<'.d'>.
-
-=item Mail::Box::Mbox-E<gt>B<foundIn>( [$foldername], %options )
-
-If no $foldername is specified, then the value of the C<folder> option
-is taken.  A mbox folder is a file which starts with a separator
-line: a line with C<'From '> as first characters.  Blank lines which
-start the file are ignored, which is not for all MUA's acceptable.
-
- -Option             --Defined in     --Default
-  folder                                undef
-  folderdir            Mail::Box        undef
-  subfolder_extension                   <from object>
-
-=over 2
-
-=item folder => FOLDERNAME
-
-=item folderdir => DIRECTORY
-
-=item subfolder_extension => STRING
-
-=back
+Improves base, see L<Mail::Box::File/"Internals">
 
 =item $obj-E<gt>B<lineSeparator>( [<STRING|'CR'|'LF'|'CRLF'>] )
 
@@ -466,12 +492,10 @@ Inherited, see L<Mail::Box/"Internals">
 =head2 Other methods
 
 Extends L<"Other methods" in Mail::Box::File|Mail::Box::File/"Other methods">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<timespan2seconds>($time)
-
-=item Mail::Box::Mbox-E<gt>B<timespan2seconds>($time)
+=item $any-E<gt>B<timespan2seconds>($time)
 
 Inherited, see L<Mail::Box/"Other methods">
 
@@ -480,7 +504,7 @@ Inherited, see L<Mail::Box/"Other methods">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::File|Mail::Box::File/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -491,9 +515,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Mbox-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -501,19 +523,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Mbox-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Mbox-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -542,7 +556,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::File|Mail::Box::File/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -554,23 +568,23 @@ Inherited, see L<Mail::Box/"Cleanup">
 =head2 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::File|Mail::Box::File/"DETAILS">.
- 
+
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::File|Mail::Box::File/"DETAILS">.
- 
+
 =head2 Different kinds of folders
 
 Extends L<"Different kinds of folders" in Mail::Box::File|Mail::Box::File/"Different kinds of folders">.
- 
+
 =head2 Available folder types
 
 Extends L<"Available folder types" in Mail::Box::File|Mail::Box::File/"Available folder types">.
- 
+
 =head2 Folder class implementation
 
 Extends L<"Folder class implementation" in Mail::Box::File|Mail::Box::File/"Folder class implementation">.
- 
+
 =head2 How MBOX folders work
 
 MBOX folders store many messages in one file.  Each message begins with a
@@ -589,13 +603,13 @@ MBOX folders do not have a sub-folder concept as directory based folders
 do, but this MBOX module tries to simulate them.  In this implementation
 a directory like
 
- Mail/subject1/
+  Mail/subject1/
 
 is taken as an empty folder C<Mail/subject1>, with the folders in that
 directory as sub-folders for it.  You may also use
 
- Mail/subject1
- Mail/subject1.d/
+  Mail/subject1
+  Mail/subject1.d/
 
 where C<Mail/subject1> is the folder, and the folders in the
 C<Mail/subject1.d> directory are used as sub-folders.  If your situation
@@ -611,26 +625,32 @@ that the second situation is reached.
 
 Appending messages to a not-opened file-organized folder may fail when the
 operating system does not allow write access to the file at hand.
+Cast by C<appendMessages()>
 
 =item Error: Cannot move away sub-folder $dir
 
-=item Warning: Cannot remove folder $name file $filename: $!
-
-Writing an empty folder will usually cause that folder to be removed,
-which fails for the indicated reason.  L<new(remove_when_empty)|Mail::Box/"Constructors">
+Cast by C<moveAwaySubFolder()>
 
 =item Warning: Cannot remove folder $name file $filename: $!
 
 Writing an empty folder will usually cause that folder to be removed,
 which fails for the indicated reason.  L<new(remove_when_empty)|Mail::Box/"Constructors">
-controls whether the empty folder will removed; setting it to false
+Cast by C<write()>
+
+=item Warning: Cannot remove folder $name file $filename: $!
+
+Writing an empty folder will usually cause that folder to be removed,
+which fails for the indicated reason.  L<new(remove_when_empty)|Mail::Box/"Constructors">
+controls whether the empty folder will removed; setting it to C<false>
 (C<0>) may be needed to avoid this message.
+Cast by C<write()>
 
 =item Error: Cannot replace $filename by $tempname, to update folder $name: $!
 
 The replace policy wrote a new folder file to update the existing, but
 was unable to give the final touch: replacing the old version of the
 folder file for the indicated reason.
+Cast by C<write()>
 
 =item Warning: Changes not written to read-only folder $self.
 
@@ -638,28 +658,32 @@ You have opened the folder read-only --which is the default set
 by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
 Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mode, or close
 the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
+Cast by C<close()>
 
 =item Error: Copying failed for one message.
 
 For some reason, for instance disc full, removed by external process, or
 read-protection, it is impossible to copy one of the messages.  Copying will
 proceed for the other messages.
+Cast by C<copyTo()>
 
 =item Error: Destination folder $name is not writable.
 
 The folder where the messages are copied to is not opened with write
 access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
 to the folder which is controlled by your operating system.
+Cast by C<copyTo()>
 
 =item Warning: Different messages with id $msgid
 
 The message id is discovered more than once within the same folder, but the
 content of the message seems to be different.  This should not be possible:
 each message must be unique.
+Cast by C<messageId()>
 
 =item Error: File too short to get write message $nr ($size, $need)
 
-Mail::Box is lazy: it tries to leave messages in the folders until they
+L<Mail::Box|Mail::Box> is lazy: it tries to leave messages in the folders until they
 are used, which saves time and memory usage.  When this message appears,
 something is terribly wrong: some lazy message are needed for updating the
 folder, but they cannot be retrieved from the original file anymore.  In
@@ -669,6 +693,7 @@ This message does appear regularly on Windows systems when using the
 'replace' write policy.  Please help to find the cause, probably something
 to do with Windows incorrectly handling multiple filehandles open in the
 same file.
+Cast by C<write()>
 
 =item Error: Folder $name not deleted: not writable.
 
@@ -676,11 +701,13 @@ The folder must be opened with write access via L<new(access)|Mail::Box/"Constru
 removing it will be refused.  So, you may have write-access according to
 the operating system, but that will not automatically mean that this
 C<delete> method permits you to.  The reverse remark is valid as well.
+Cast by C<delete()>
 
 =item Error: Invalid timespan '$timespan' specified.
 
 The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
+Cast by C<timespan2seconds()>
 
 =item Warning: Message-id '$msgid' does not contain a domain.
 
@@ -688,6 +715,7 @@ According to the RFCs, message-ids need to contain a unique random part,
 then an C<@>, and then a domain name.  This is made to avoid the creation
 of two messages with the same id.  The warning emerges when the C<@> is
 missing from the string.
+Cast by C<messageId()>
 
 =item Error: Package $package does not implement $method.
 
@@ -696,30 +724,34 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unable to create subfolder $name of $folder.
 
 The copy includes the subfolders, but for some reason it was not possible
 to copy one of these.  Copying will proceed for all other sub-folders.
+Cast by C<copyTo()>
 
 =item Error: Unable to update folder $self.
 
 When a folder is to be written, both replace and inplace write policies are
 tried,  If both fail, the whole update fails.  You may see other, related,
 error messages to indicate the real problem.
+Cast by C<write()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

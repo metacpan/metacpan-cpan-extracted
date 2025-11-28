@@ -16,6 +16,9 @@ create_subst(
 	},
 );
 
+load_extension('Dist::Build::Core');
+script_dir('script');
+
 load_extension('Dist::Build::ShareDir');
 dist_sharedir('share') if -d 'share';
 if (-d 'module-share') {

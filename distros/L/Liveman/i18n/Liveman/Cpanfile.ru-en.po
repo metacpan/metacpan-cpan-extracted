@@ -10,11 +10,11 @@ msgstr "Constructor."
 msgid "Преобразует путь к файлу в имя пакета Perl."
 msgstr "Converts a file path to a Perl package name."
 
-msgid "Возвращает список исполняемых скриптов в директориях `scripts/` и `bin/`."
-msgstr "Returns a list of executable scripts in the `scripts/` and `bin/` directories."
+msgid "Возвращает список исполняемых скриптов в директориях `script/` и `bin/`."
+msgstr "Returns a list of executable scripts in the `script/` and `bin/` directories."
 
-msgid "Файл scripts/test_script:"
-msgstr "Scripts/test_script file:"
+msgid "Файл script/test_script:"
+msgstr "Script/test_script file:"
 
 msgid "Файл bin/tool:"
 msgstr "bin/tool file:"

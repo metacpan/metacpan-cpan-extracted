@@ -14,8 +14,8 @@ Mail::Server - Base class for email servers in MailBox
 
 =head1 SYNOPSIS
 
- my $server = Mail::Server::IMAP4->new($msg);
- my $server = Mail::Server::POP3->new($msg);
+  my $server = Mail::Server::IMAP4->new($msg);
+  my $server = Mail::Server::POP3->new($msg);
 
 =head1 DESCRIPTION
 
@@ -34,11 +34,11 @@ Partial IMAP4 implementation.
 =back
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head1 DETAILS
 
 =head1 DIAGNOSTICS
@@ -52,19 +52,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

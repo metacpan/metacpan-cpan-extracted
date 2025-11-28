@@ -17,8 +17,8 @@ Mail::Box::Dir::Message - one message in a directory organized folder
 
 =head1 SYNOPSIS
 
- my $folder = new Mail::Box::MH ...
- my $message = $folder->message(10);
+  my $folder = new Mail::Box::MH ...
+  my $message = $folder->message(10);
 
 =head1 DESCRIPTION
 
@@ -51,76 +51,77 @@ code is not GPLed (yet).
 =back
 
 Extends L<"DESCRIPTION" in Mail::Box::Message|Mail::Box::Message/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::Message|Mail::Box::Message/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::Message|Mail::Box::Message/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>(%options)
 
 Inherited, see L<Mail::Message/"Constructors">
 
-=item Mail::Box::Dir::Message-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a messages in a directory organized folder.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in        --Default
   body        Mail::Message       undef
   body_type   Mail::Box::Message  <from folder>
-  deleted     Mail::Message       <false>
+  deleted     Mail::Message       false
   field_type  Mail::Message       undef
   filename                        undef
   fix_header                      false
   folder      Mail::Box::Message  <required>
   head        Mail::Message       undef
   head_type   Mail::Message       Mail::Message::Head::Complete
-  labels      Mail::Message       {}
+  labels      Mail::Message       +{}
   log         Mail::Reporter      'WARNINGS'
   messageId   Mail::Message       undef
-  modified    Mail::Message       <false>
+  modified    Mail::Message       false
   size        Mail::Box::Message  undef
   trace       Mail::Reporter      'WARNINGS'
-  trusted     Mail::Message       <false>
+  trusted     Mail::Message       false
 
 =over 2
 
-=item body => OBJECT
+=item body => $object
 
-=item body_type => CODE|CLASS
+=item body_type => CODE|$class
 
 =item deleted => BOOLEAN
 
-=item field_type => CLASS
+=item field_type => $class
 
-=item filename => FILENAME
+=item filename => $file
 
-The file where the message is stored in.
+The C<$file> where the message is stored in.
 
 =item fix_header => BOOLEAN
 
 See L<Mail::Box::new(fix_headers)|Mail::Box/"Constructors">.
 
-=item folder => FOLDER
+=item folder => $folder
 
-=item head => OBJECT
+=item head => $object
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item labels => ARRAY|HASH
 
 =item log => LEVEL
 
-=item messageId => STRING
+=item messageId => $id
 
 =item modified => BOOLEAN
 
-=item size => INTEGER
+=item size => $bytes
 
 =item trace => LEVEL
 
@@ -130,21 +131,50 @@ See L<Mail::Box::new(fix_headers)|Mail::Box/"Constructors">.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::Message|Mail::Box::Message/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<filename>( [$filename] )
+
+Returns the name of the file in which this message is actually stored.  This
+will return C<undef> when the message is not stored in a file.
+
+=item $obj-E<gt>B<fixHeader>()
+
+Returns C<true> when the folder is in fixing mode.
+
+=item $obj-E<gt>B<folder>( [$folder] )
+
+Inherited, see L<Mail::Box::Message/"Attributes">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<seqnr>( [$integer] )
+
+Inherited, see L<Mail::Box::Message/"Attributes">
+
+=back
+
 =head2 Constructing a message
 
 Extends L<"Constructing a message" in Mail::Box::Message|Mail::Box::Message/"Constructing a message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bounce>( [<$rg_object|%options>] )
 
 Inherited, see L<Mail::Message::Construct::Bounce/"Constructing a message">
 
-=item Mail::Box::Dir::Message-E<gt>B<build>( [$message|$part|$body], $content )
+=item $class-E<gt>B<build>( [$message|$part|$body], @fields, %options )
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-=item Mail::Box::Dir::Message-E<gt>B<buildFromBody>($body, [$head], $headers)
+=item $class-E<gt>B<buildFromBody>($body, [$head], $headers)
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
@@ -180,7 +210,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item Mail::Box::Dir::Message-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -196,9 +226,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replySubject>(STRING)
-
-=item Mail::Box::Dir::Message-E<gt>B<replySubject>(STRING)
+=item $any-E<gt>B<replySubject>(STRING)
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -207,7 +235,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 =head2 The message
 
 Extends L<"The message" in Mail::Box::Message|Mail::Box::Message/"The message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>()
@@ -218,14 +246,9 @@ Inherited, see L<Mail::Message/"The message">
 
 Inherited, see L<Mail::Box::Message/"The message">
 
-=item $obj-E<gt>B<filename>( [$filename] )
+=item $obj-E<gt>B<endsOnNewline>()
 
-Returns the name of the file in which this message is actually stored.  This
-will return C<undef> when the message is not stored in a file.
-
-=item $obj-E<gt>B<folder>( [$folder] )
-
-Inherited, see L<Mail::Box::Message/"The message">
+Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<isDummy>()
 
@@ -255,10 +278,6 @@ Inherited, see L<Mail::Message/"The message">
 
 Inherited, see L<Mail::Message/"The message">
 
-=item $obj-E<gt>B<seqnr>( [$integer] )
-
-Inherited, see L<Mail::Box::Message/"The message">
-
 =item $obj-E<gt>B<size>()
 
 Inherited, see L<Mail::Message/"The message">
@@ -276,7 +295,7 @@ Inherited, see L<Mail::Message/"The message">
 =head2 The header
 
 Extends L<"The header" in Mail::Box::Message|Mail::Box::Message/"The header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bcc>()
@@ -340,7 +359,7 @@ Inherited, see L<Mail::Message/"The header">
 =head2 The body
 
 Extends L<"The body" in Mail::Box::Message|Mail::Box::Message/"The body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>( [$body] )
@@ -376,7 +395,7 @@ Inherited, see L<Mail::Message/"The body">
 =head2 Flags
 
 Extends L<"Flags" in Mail::Box::Message|Mail::Box::Message/"Flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<delete>()
@@ -420,7 +439,7 @@ Inherited, see L<Mail::Message/"Flags">
 =head2 The whole message as text
 
 Extends L<"The whole message as text" in Mail::Box::Message|Mail::Box::Message/"The whole message as text">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<file>()
@@ -444,14 +463,14 @@ Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Box::Message|Mail::Box::Message/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clonedFrom>()
 
 Inherited, see L<Mail::Message/"Internals">
 
-=item Mail::Box::Dir::Message-E<gt>B<coerce>($message, %options)
+=item $class-E<gt>B<coerce>($message, %options)
 
 Inherited, see L<Mail::Message/"Internals">
 
@@ -459,8 +478,8 @@ Inherited, see L<Mail::Message/"Internals">
 
 Create the message in the specified file.  If the message already has
 a filename and is not modified, then a move is tried.  Otherwise the
-message is printed to the file.  If the $filename already exists for
-this message, nothing is done.  In any case, the new $filename is set
+message is printed to the file.  If the C<$filename> already exists for
+this message, nothing is done.  In any case, the new C<$filename> is set
 as well.
 
 =item $obj-E<gt>B<diskDelete>()
@@ -514,7 +533,7 @@ Inherited, see L<Mail::Message/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::Message|Mail::Box::Message/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -525,9 +544,7 @@ Inherited, see L<Mail::Message::Construct/"METHODS">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Dir::Message-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -535,19 +552,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Dir::Message-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Dir::Message-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -563,9 +572,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<shortSize>( [$value] )
-
-=item Mail::Box::Dir::Message-E<gt>B<shortSize>( [$value] )
+=item $any-E<gt>B<shortSize>( [$value] )
 
 Inherited, see L<Mail::Message/"Error handling">
 
@@ -586,7 +593,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::Message|Mail::Box::Message/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -602,39 +609,46 @@ Inherited, see L<Mail::Box::Message/"Cleanup">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::Message|Mail::Box::Message/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
 
 =item Error: Cannot coerce a $class object into a $class object
 
+Cast by C<coerce()>
+
 =item Error: Cannot create parser for $filename.
 
 For some reason (the previous message have told you already) it was not possible
 to create a message parser for the specified filename.
+Cast by C<parser()>
 
 =item Error: Cannot include forward source as $include.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Cannot include reply source as $include.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =item Error: Cannot write message to $filename: $!
 
 When a modified or new message is written to disk, it is first written
 to a temporary file in the folder directory.  For some reason, it is
 impossible to create this file.
+Cast by C<create()>
 
 =item Error: Failed to move $new to $filename: $!
 
 When a modified or new message is written to disk, it is first written
 to a temporary file in the folder directory.  Then, the new file is
 moved to replace the existing file.  Apparently, the latter fails.
+Cast by C<create()>
 
 =item Error: Method bounce requires To, Cc, or Bcc
 
@@ -643,22 +657,31 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
 The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
 find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
+Cast by C<send()>
 
 =item Error: No rebuild rule $name defined.
+
+Cast by C<rebuild()>
 
 =item Error: Only build() Mail::Message's; they are not in a folder yet
 
@@ -667,6 +690,7 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -675,35 +699,41 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unable to read delayed body.
 
 For some reason, the header of the message could be read, but the body
 cannot.  Probably the file has disappeared or the permissions were
 changed during the progress of the program.
+Cast by C<loadBody()>
 
 =item Error: Unable to read delayed head.
 
-Mail::Box tries to be I<lazy> with respect to parsing messages.  When a
+L<Mail::Box|Mail::Box> tries to be I<lazy> with respect to parsing messages.  When a
 directory organized folder is opened, only the filenames of messages are
 collected.  At first use, the messages are read from their file.  Apperently,
 a message is used for the first time here, but has disappeared or is
 unreadible for some other reason.
+Cast by C<loadBody()>
 
 =item Error: coercion starts with some object
+
+Cast by C<coerce()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

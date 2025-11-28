@@ -116,10 +116,10 @@ undef $grep2;
 
 my @hits;
 my $grep3  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/
- , in      => 'MESSAGE'
- , deliver => \@hits
- );
+  ( match   => qr/ImageMagick/
+  , in      => 'MESSAGE'
+  , deliver => \@hits
+  );
 
 my @m3 = $grep3->search($folder);
 #warn $_.": ".$_->subject, "\n" for @m3;
@@ -135,7 +135,7 @@ foreach (@m3)   # in order?
 }
 cmp_ok(keys %m3, "==", 24,                      'returned message unique');
 
-my %h3 = map { ($_->{message}->seqnr => 1) } @hits;
+my %h3 = map +($_->{message}->seqnr => 1), @hits;
 cmp_ok(keys %h3, "==", 24,                      'returned hits in the messages');
 
 undef $grep3;
@@ -146,10 +146,10 @@ undef $grep3;
 
 @hits = ();
 my $grep4  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/i
- , in      => 'MESSAGE'
- , deliver => \@hits
- );
+  ( match   => qr/ImageMagick/i
+  , in      => 'MESSAGE'
+  , deliver => \@hits
+  );
 
 my @m4 = $grep4->search($folder);
 cmp_ok(@m4, "==", 28,                           'messages with /ImageMagick/i');
@@ -165,10 +165,10 @@ undef $grep4;
 $folder->message($_)->delete(1) for 3, 6, 8, 9, 11, 13, 23, 33;
 
 my $grep5  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/i
- , in      => 'MESSAGE'
- , deliver => \@hits
- );
+  ( match   => qr/ImageMagick/i
+  , in      => 'MESSAGE'
+  , deliver => \@hits
+  );
 
 my @m5 = $grep5->search($folder);
 cmp_ok(@m5, "==", 22,                           'msgs, search excludes deleted');
@@ -180,11 +180,11 @@ undef $grep5;
 
 @hits = ();
 my $grep6  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/i
- , in      => 'MESSAGE'
- , deleted => 1
- , deliver => \@hits
- );
+  ( match   => qr/ImageMagick/i
+  , in      => 'MESSAGE'
+  , deleted => 1
+  , deliver => \@hits
+  );
 
 my @m6 = $grep6->search($folder);
 cmp_ok(@m6, "==", 28,                           'msgs, search includes deleted');
@@ -196,10 +196,10 @@ undef $grep6;
 
 @hits = ();
 my $grep7  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/i
- , in      => 'HEAD'
- , deliver => \@hits
- );
+  ( match   => qr/ImageMagick/i
+  , in      => 'HEAD'
+  , deliver => \@hits
+  );
 
 my @m7 = $grep7->search($folder);
 cmp_ok(@m7, "==", 11,                            'msgs, /ImageMagick/i in head');
@@ -211,10 +211,10 @@ undef $grep7;
 
 @hits = ();
 my $grep8  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/i
- , in      => 'BODY'
- , deliver => \@hits
- );
+  ( match   => qr/ImageMagick/i
+  , in      => 'BODY'
+  , deliver => \@hits
+  );
 
 my @m8 = $grep8->search($folder);
 cmp_ok(@m8, "==", 20,                            'msgs, /ImageMagick/i in body');
@@ -227,9 +227,9 @@ undef $grep8;
 # only test for match: stops at first hit
 
 my $grep9  = Mail::Box::Search::Grep->new
- ( match   => qr/ImageMagick/i
- , in      => 'BODY'
- );
+  ( match   => qr/ImageMagick/i
+  , in      => 'BODY'
+  );
 
 cmp_ok($grep9->search($folder), "==", 1,         'no deliver, then only find one');
 
@@ -244,10 +244,10 @@ $fh   = IO::Scalar->new(\$output) or die $!;
 select $fh;
 
 my $grep10  = Mail::Box::Search::Grep->new
- ( match   => 'ImageMagick'
- , in      => 'BODY'
- , deliver => 'PRINT'
- );
+  ( match   => 'ImageMagick'
+  , in      => 'BODY'
+  , deliver => 'PRINT'
+  );
 
 my $t     = $mgr->threads($folder);
 my $start = $t->threadStart($folder->message(25));  #isa multipart
@@ -283,11 +283,11 @@ $fh   = IO::Scalar->new(\$output) or die $!;
 select $fh;
 
 my $grep11  = Mail::Box::Search::Grep->new
- ( match      => 'ImageMagick'
- , in         => 'BODY'
- , deliver    => 'PRINT'
- , multiparts => 0
- );
+  ( match      => 'ImageMagick'
+  , in         => 'BODY'
+  , deliver    => 'PRINT'
+  , multiparts => 0
+  );
 
 my @m11 = $grep11->search($start);
 cmp_ok(@m11, "==", 1,                            'do not search multiparts');
@@ -317,11 +317,11 @@ $fh   = IO::Scalar->new(\$output) or die $!;
 select $fh;
 
 my $grep12  = Mail::Box::Search::Grep->new
- ( match      => 'pointsize'
- , in         => 'MESSAGE'
- , binaries   => 1
- , deliver    => 'PRINT'
- );
+  ( match      => 'pointsize'
+  , in         => 'MESSAGE'
+  , binaries   => 1
+  , deliver    => 'PRINT'
+  );
 
 my @m12 = $grep12->search($msg);
 cmp_ok(@m12, "==", 1,                            'search binaries');

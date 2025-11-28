@@ -62,11 +62,11 @@ sub new {
 # Run Operation Request
 # ExtractTextRequest.Spreadsheet : Upload spreadsheet file.  ,
 # ExtractTextRequest.extractTextType : Indicates extract text type.  ,
+# ExtractTextRequest.outPositionRange : Indicates the output location for the extracted text.  ,
 # ExtractTextRequest.beforeText : Indicates extracting the text before the specified characters or substrings.  ,
 # ExtractTextRequest.afterText : Indicates extracting the text after the specified characters or substrings.  ,
 # ExtractTextRequest.beforePosition : Indicates retrieving the first character or a specified number of characters from the left side of the selected cell.  ,
 # ExtractTextRequest.afterPosition : Indicates retrieving the first character or a specified number of characters from the right side of the selected cell.  ,
-# ExtractTextRequest.outPositionRange : Indicates the output location for the extracted text.  ,
 # ExtractTextRequest.worksheet : Specify the worksheet of spreadsheet.  ,
 # ExtractTextRequest.range : Specify the worksheet range of spreadsheet.  ,
 # ExtractTextRequest.outPath : (Optional) The folder path where the workbook is stored. The default is null.  ,
@@ -113,6 +113,10 @@ sub run_http_request {
         $query_params->{'extractTextType'} = $client->to_query_value($self->extract_text_type);      
     }
 
+    if(defined $self->out_position_range){
+        $query_params->{'outPositionRange'} = $client->to_query_value($self->out_position_range);      
+    }
+
     if(defined $self->before_text){
         $query_params->{'beforeText'} = $client->to_query_value($self->before_text);      
     }
@@ -127,10 +131,6 @@ sub run_http_request {
 
     if(defined $self->after_position){
         $query_params->{'afterPosition'} = $client->to_query_value($self->after_position);      
-    }
-
-    if(defined $self->out_position_range){
-        $query_params->{'outPositionRange'} = $client->to_query_value($self->out_position_range);      
     }
 
     if(defined $self->worksheet){
@@ -188,6 +188,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'out_position_range' => {
+     	datatype => 'string',
+     	base_name => 'outPositionRange',
+     	description => 'Indicates the output location for the extracted text.',
+     	format => '',
+     	read_only => '',
+     		},
      'before_text' => {
      	datatype => 'string',
      	base_name => 'beforeText',
@@ -213,13 +220,6 @@ __PACKAGE__->method_documentation({
      	datatype => 'int',
      	base_name => 'afterPosition',
      	description => 'Indicates retrieving the first character or a specified number of characters from the right side of the selected cell.',
-     	format => '',
-     	read_only => '',
-     		},
-     'out_position_range' => {
-     	datatype => 'string',
-     	base_name => 'outPositionRange',
-     	description => 'Indicates the output location for the extracted text.',
      	format => '',
      	read_only => '',
      		},
@@ -271,11 +271,11 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->attribute_map( {
     'spreadsheet' => 'Spreadsheet',
     'extract_text_type' => 'extractTextType',
+    'out_position_range' => 'outPositionRange',
     'before_text' => 'beforeText',
     'after_text' => 'afterText',
     'before_position' => 'beforePosition',
     'after_position' => 'afterPosition',
-    'out_position_range' => 'outPositionRange',
     'worksheet' => 'worksheet',
     'range' => 'range',
     'out_path' => 'outPath',

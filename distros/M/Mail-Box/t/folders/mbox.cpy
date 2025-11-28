@@ -1784,8 +1784,8 @@ To: markov@ATComputing.nl
 Content-Type: multipart/mixed; boundary="-"
 Status: RO
 X-Status: A
-Content-Length: 1042
-Lines: 21
+Content-Length: 1056
+Lines: 36
 
 This is a MIME encoded message.  Decode it with "munpack"
 or any other MIME reading software.  Mpack/munpack is available
@@ -1806,6 +1806,20 @@ ODg1OS0xJwogICAgICAsIHBvaW50c2l6ZSA9PiAkcG9pbnNpemUKICAgICAgLCBncmF2aXR5
 ICAgPT4gJ1NvdXRoRWFzdCcKICAgICAgLCAneCcgICAgICAgPT4gNQogICAgICAsICd5JyAg
 ICAgICA9PiAkcG9pbnNpemUrNQogICAgICApOwogICAkaW1nLT5Xcml0ZShmaWxlbmFtZSAg
 PT4gInRlc3QuZ2lmIik7Cgo=
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -----
 
@@ -1979,8 +1993,8 @@ Content-Type: multipart/mixed; boundary="5vNYLRcllDrimb99"
 X-Mailer: Mutt 1.0pre4i
 In-Reply-To: <200006141634.e5EGYfI19547@mystic.es.dupont.com>; from cristy@mystic.es.dupont.com on Wed, Jun 14, 2000 at 12:34:41PM -0400
 Status: RO
-Content-Length: 4505
-Lines: 82
+Content-Length: 4533
+Lines: 111
 
 --5vNYLRcllDrimb99
 Content-Type: text/plain; charset=us-ascii
@@ -2016,6 +2030,20 @@ Sorry, no more time to investigate for me today: have to go...
 drs Mark A.C.J. Overmeer                           markov@ATComputing.nl
 AT Computing, UNIX Training and Consultancy    http://www.ATComputing.nl
 http://www.dhp.nl/~markov/                         http://satfoto.dhp.nl
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 --5vNYLRcllDrimb99
 Content-Type: image/gif
@@ -2062,6 +2090,20 @@ tvHlDWxJ08PUfre5831oH7ijHfnmrIwck858zRJFA6tlwDQp8HIObNvocpbAnUntg4944QrT
 C3nIRC6ykY+M5CQreclMbrKTnwzlKEt5ylSuspWvjOUsa3nLXO6yl78M5jCLecxkLrOZz4zm
 NKt5zWxus5vfDOc4y3nOdK6zne+M5zzrec987rOf/wwg6EALetCELrShD43oRCt60YxutKMf
 DelIS3rSlF50AQAAOw==
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 --5vNYLRcllDrimb99--
 
@@ -2129,8 +2171,8 @@ Mime-Version: 1.0
 To: markov@ATComputing.nl
 Content-Type: multipart/mixed; boundary="-"
 Status: RO
-Content-Length: 2009
-Lines: 34
+Content-Length: 2023
+Lines: 49
 
 This is a MIME encoded message.  Decode it with "munpack"
 or any other MIME reading software.  Mpack/munpack is available
@@ -2164,6 +2206,20 @@ LSIsZ3Jhdml0eT0+IlNvdXRoV2VzdCIseD0+JHgseT0+JHkpOwokcGljLT5Bbm5vdGF0ZShw
 b2ludHNpemU9PjI0LGZvbnQ9PidUaW1lcycsdGV4dD0+Ii1XLSIsZ3Jhdml0eT0+Ildlc3Qi
 LHg9PiR4LHk9PiR5KTsKCiRwaWMtPldyaXRlKGZpbGVuYW1lPT4idGVzdC5naWYiKTsKc3lz
 dGVtKCJkaXNwbGF5IHRlc3QuZ2lmIik7Cg==
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -----
 

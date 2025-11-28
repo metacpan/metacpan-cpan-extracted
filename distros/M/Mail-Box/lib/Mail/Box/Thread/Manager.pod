@@ -11,19 +11,19 @@ Mail::Box::Thread::Manager - maintain threads within a set of folders
 
 =head1 SYNOPSIS
 
- my $mgr     = Mail::Box::Manager->new;
- my $folder  = $mgr->open(folder => '/tmp/inbox');
+  my $mgr     = Mail::Box::Manager->new;
+  my $folder  = $mgr->open(folder => '/tmp/inbox');
 
- my $threads = $mgr->threads();
- $threads->includeFolder($folder);
+  my $threads = $mgr->threads();
+  $threads->includeFolder($folder);
 
- my $threads = $msg->threads(folder => $folder);
+  my $threads = $msg->threads(folder => $folder);
 
- foreach my $thread ($threads->all) {
-     $thread->print;
- }
+  foreach my $thread ($threads->all) {
+      $thread->print;
+  }
 
- $threads->removeFolder($folder);
+  $threads->removeFolder($folder);
 
 =head1 DESCRIPTION
 
@@ -39,30 +39,31 @@ opened folders.  Both facilities are rare for mail-agents.  The manager
 creates flexible trees with L<Mail::Box::Thread::Node|Mail::Box::Thread::Node> objects.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Thread::Manager-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
-A C<Mail::Box::Thread::Manager> object is usually created by a
-L<Mail::Box::Manager|Mail::Box::Manager>.  One manager can produce more than one of these
-objects.  One thread manager can combine messages from a set of folders,
-which may be partially overlapping with other objects of the same type.
+A thread manager object is usually created by a L<Mail::Box::Manager|Mail::Box::Manager>.
+One manager can produce more than one of these objects.  One thread
+manager can combine messages from a set of folders, which may be partially
+overlapping with other objects of the same type.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option     --Defined in     --Default
   dummy_type                    Mail::Message::Dummy
   folder                        [ ]
   folders                       [ ]
   log          Mail::Reporter   'WARNINGS'
-  thread_body                   <false>
+  thread_body                   false
   thread_type                   Mail::Box::Thread::Node
   timespan                      '3 days'
   trace        Mail::Reporter   'WARNINGS'
@@ -74,16 +75,16 @@ which may be partially overlapping with other objects of the same type.
 
 The type of dummy messages.  Dummy messages are used to fill holes in
 detected threads: referred to by messages found in the folder, but itself
-not in the folder. 
+not in the folder.
 
-=item folder => FOLDER | REF-ARRAY-FOLDERS
+=item folder => $folder|\@folders
 
-Specifies which folders are to be covered by the threads.  You can
+Specifies which C<@folders> are to be covered by the threads.  You can
 specify one or more open folders.  When you close a folder, the
 manager will automatically remove the messages of that folder from
 your threads.
 
-=item folders => FOLDER | REF-ARRAY-FOLDERS
+=item folders => $folder|\@folders
 
 Equivalent to the C<folder> option.
 
@@ -106,7 +107,7 @@ Specify how fast threads usually work: the amount of time between an
 answer and a reply.  This is used in combination with the C<window>
 option to determine when to give-up filling the holes in threads.
 
-See Mail::Box::timespan2seconds() for the possibilities for TIME.
+See L<Mail::Box|Mail::Box>::timespan2seconds() for the possibilities for TIME.
 With 'EVER', the search for messages in a thread
 will only be limited by the window-size.
 
@@ -124,18 +125,50 @@ is reached.  Gives the best quality results, but may perform bad.
 
 =back
 
-example: 
+» example: 
 
- use Mail::Box::Manager;
- my $mgr     = Mail::Box::Manager->new;
- my $inbox   = $mgr->open(folder => $ENV{MAIL});
- my $read    = $mgr->open(folder => 'Mail/read');
- my $threads = $mgr->threads(folders => [$inbox, $read]);
+  use Mail::Box::Manager;
+  my $mgr     = Mail::Box::Manager->new;
+  my $inbox   = $mgr->open(folder => $ENV{MAIL});
+  my $read    = $mgr->open(folder => 'Mail/read');
+  my $threads = $mgr->threads(folders => [$inbox, $read]);
 
- # longer alternative for last line:
- my $threads = $mgr->threads;
- $threads->includeFolder($inbox);
- $threads->includeFolder($read);
+  # longer alternative for last line:
+  my $threads = $mgr->threads;
+  $threads->includeFolder($inbox);
+  $threads->includeFolder($read);
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<byId>()
+
+Returns a reference to the index which maps message ids to messages.
+
+=item $obj-E<gt>B<folder>($name)
+
+Z<>
+
+=item $obj-E<gt>B<folderIndex>()
+
+Z<>
+
+=item $obj-E<gt>B<folders>()
+
+Returns the folders as managed by this threader.
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<msgById>( $id, [$node] )
+
+Returns the message which the specified C<$id>.
 
 =back
 
@@ -143,13 +176,9 @@ example:
 
 =over 4
 
-=item $obj-E<gt>B<folders>()
+=item $obj-E<gt>B<includeFolder>(@folders)
 
-Returns the folders as managed by this threader.
-
-=item $obj-E<gt>B<includeFolder>($folders)
-
-Add one or more folders to the list of folders whose messages are
+Add one or more C<@folders> to the LIST of folders whose messages are
 organized in the threads maintained by this object.  Duplicated
 inclusions will not cause any problems.
 
@@ -158,18 +187,18 @@ From the folders, the messages which have their header lines parsed
 Messages of which the header is known only later will have to report this
 (see L<toBeThreaded()|Mail::Box::Thread::Manager/"Internals">).
 
-example: 
+» example: 
 
- $threads->includeFolder($inbox, $draft);
+  $threads->includeFolder($inbox, $draft);
 
-=item $obj-E<gt>B<removeFolder>($folders)
+=item $obj-E<gt>B<removeFolder>(@folders)
 
-Remove one or more folders from the list of folders whose messages are
+Remove one or more C<@folders> from the LIST of folders whose messages are
 organized in the threads maintained by this object.
 
-example: 
+» example: 
 
- $threads->removeFolder($draft);
+  $threads->removeFolder($draft);
 
 =back
 
@@ -207,27 +236,27 @@ Returns L<all()|Mail::Box::Thread::Manager/"The Threads"> the threads by default
 =item $obj-E<gt>B<sortedKnown>( [$prepare, [$compare]] )
 
 Returns all L<known()|Mail::Box::Thread::Manager/"The Threads"> threads, in sorted order.  By default, the threads
-will be sorted on timestamp, But a different $compare method can be
+will be sorted on timestamp, But a different C<$compare> method can be
 specified.
 
 =item $obj-E<gt>B<thread>($message)
 
-Returns the thread where this $message is the start of.  However, there
+Returns the thread where this C<$message> is the start of.  However, there
 is a possibility that this message is a reply itself.
 
 Usually, all messages which are in reply of this message are dated later
 than the specified one.  All headers of messages later than this one are
 getting parsed first, for each folder in this threads-object.
 
-example: 
+» example: 
 
- my $threads = $mgr->threads(folder => $inbox);
- my $thread  = $threads->thread($inbox->message(3));
- print $thread->string;
+  my $threads = $mgr->threads(folder => $inbox);
+  my $thread  = $threads->thread($inbox->message(3));
+  print $thread->string;
 
 =item $obj-E<gt>B<threadStart>($message)
 
-Based on a message, and facts from previously detected threads, try
+Based on a C<$message>, and facts from previously detected threads, try
 to build solid knowledge about the thread where this message is in.
 
 =back
@@ -262,7 +291,7 @@ this object, if this folder is maintained by this thread-manager.
 
 =item $obj-E<gt>B<toBeUnthreaded>($folder, @messages)
 
-Remove the specified @messages in/from the threads managed by
+Remove the specified C<@messages> in/from the threads managed by
 this object, if this folder is maintained by this thread-manager.
 
 =back
@@ -270,7 +299,7 @@ this object, if this folder is maintained by this thread-manager.
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -281,9 +310,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Thread::Manager-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -291,19 +318,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Thread::Manager-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Thread::Manager-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -332,7 +351,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -352,7 +371,7 @@ may be a serious performance hit (depends on the type of folder used).
 =head2 Maintaining threads
 
 A C<Mail::Box::Thread::Manager> object is created by the
-L<Mail::Box::Manager|Mail::Box::Manager>, using L<Mail::Box::Manager::threads()|Mail::Box::Manager/"Manage message threads">.
+L<Mail::Box::Manager|Mail::Box::Manager>, using L<Mail::Box::Manager::threads()|Mail::Box::Manager/"Attributes">.
 Each object can monitor the thread-relations between messages in one
 or more folders.  When more than one folder is specified, the messages
 are merged while reading the threads, although nothing changes in the
@@ -364,22 +383,22 @@ L<Mail::Box::Manager|Mail::Box::Manager> has two open folders, and a thread-buil
 monitors them both.  The combined folders have two threads, the second
 is two long (msg3 is a reply on msg2).  Msg2 is in two folders at once.
 
-       manager
-        |    \
-        |     `----------- threads
-        |                  |     |
-        |                thread thread---thread
-        |                  |    /|        /
-        |                  |   //        /
-        +---- folder1      |  //        /
-        |       |         /  //        /
-        |       `-----msg1  //        /
-        |       `-----msg2-'/        /
-        |                  /        /
-        `-----folder2     /        /
-                |        /        /
-                `-----msg2       /
-                `-----msg3------'
+  manager
+   |    \
+   |     `----------- threads
+   |                  |     |
+   |                thread thread---thread
+   |                  |    /|        /
+   |                  |   //        /
+   +---- folder1      |  //        /
+   |       |         /  //        /
+   |       `-----msg1  //        /
+   |       `-----msg2-'/        /
+   |                  /        /
+   `-----folder2     /        /
+           |        /        /
+           `-----msg2       /
+           `-----msg3------'
 
 =head2 Delayed thread detection
 
@@ -405,7 +424,7 @@ by default only the message headers are used.
 The following reports the L<Mail::Box::Thread::Node|Mail::Box::Thread::Node> which is
 related to a message:
 
- my $thread = $message->thread;
+  my $thread = $message->thread;
 
 When the message was not put in a thread yet, it is done now.  But, more
 work is done to return the best thread.  Based on various parameters,
@@ -437,19 +456,21 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -11,17 +11,17 @@ Mail::Message::Wrapper::SpamAssassin - Connect a Mail::Message with Mail::SpamAs
 
 =head1 SYNOPSIS
 
- # WARNING: requires OLD SpamAssassion 2.x, not the new 3.x
- # See Mail::Box::Search::SpamAssassin for the preferred interface
- # However, it is possible to do:
+  # WARNING: requires OLD SpamAssassion 2.x, not the new 3.x
+  # See Mail::Box::Search::SpamAssassin for the preferred interface
+  # However, it is possible to do:
 
- my $msg    = ...;   # some Mail::Message object
- my $sa     = Mail::Message::Wrapper::SpamAssassin->new($msg);
- my $spam   = Mail::SpamAssassin->new;
- my $status = $spam->check($sa);
+  my $msg    = ...;   # some Mail::Message object
+  my $sa     = Mail::Message::Wrapper::SpamAssassin->new($msg);
+  my $spam   = Mail::SpamAssassin->new;
+  my $status = $spam->check($sa);
 
- $msg->label(spam => 1) if $status->is_spam;
- $status->rewrite_mail;  # Adds spam lines to header
+  $msg->label(spam => 1) if $status->is_spam;
+  $status->rewrite_mail;  # Adds spam lines to header
 
 =head1 DESCRIPTION
 
@@ -37,9 +37,9 @@ is an interface to the spam checking software of Mail::SpamAssassin.
 
 =over 4
 
-=item Mail::Message::Wrapper::SpamAssassin-E<gt>B<new>($message, %options)
+=item $class-E<gt>B<new>($message, %options)
 
-Creates a wrapper around the $message.  The already present fields
+Creates a wrapper around the C<$message>.  The already present fields
 from a previous run of Spam::Assassin (or probably fake lines) are
 removed first.
 
@@ -47,14 +47,15 @@ removed first.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

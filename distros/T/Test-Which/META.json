@@ -1,0 +1,91 @@
+{
+   "abstract" : "Skip tests if external programs are missing from PATH (with version checks)",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Which",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Abstraction" : "0.36",
+            "Data::Dumper" : "0",
+            "Data::Section::Simple" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Module::Load::Conditional" : "0",
+            "PPI" : "0",
+            "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.23",
+            "Pod::Simple" : "0",
+            "Pod::Usage" : "0",
+            "Return::Set" : "0.03",
+            "Template" : "0",
+            "YAML::XS" : "0",
+            "autodie" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Random" : "0",
+            "Data::Random::String" : "0",
+            "Data::Random::String::Matches" : "0.02",
+            "Data::Random::Structure" : "0",
+            "Encode" : "0",
+            "File::Temp" : "0",
+            "IPC::Run3" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON::MaybeXS" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::LectroTest" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "Test::Returns" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Test-Which@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Which",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Which"
+      },
+      "homepage" : "https://metacpan.org/pod/Test::Which",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Test-Which.git",
+         "web" : "https://github.com/nigelhorne/Test-Which",
+         "x_repository" : "https://github.com/nigelhorne/Test-Which"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

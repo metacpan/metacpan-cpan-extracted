@@ -9,7 +9,7 @@ use lib 't/lib';
 use DistGen qw/undent/;
 use XSLoader;
 use ExtUtils::HasCompiler 0.024 'can_compile_loadable_object';
-use File::ShareDir::Tiny ':ALL';
+use Dist::Build::Util ':sharedir';
 
 local $ENV{PERL_INSTALL_QUIET};
 local $ENV{PERL_MB_OPT};
@@ -35,10 +35,6 @@ $dist->add_file('planner/shared.pl', undent(<<'	---'));
 	load_extension("Dist::Build::ShareDir");
 	dist_sharedir('share', 'Foo-Bar');
 	module_sharedir('module-share/Foo-Bar', 'Foo::Bar');
-	---
-$dist->add_file('planner/dynamic.pl', undent(<<'	---'));
-	load_extension("Dist::Build::DynamicPrereqs");
-	evaluate_dynamic_prereqs();
 	---
 
 my $has_compiler = can_compile_loadable_object(quiet => 1);
@@ -176,9 +172,9 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
   require blib;
   blib->import;
   ok( -d dist_dir('Foo-Bar'), 'sharedir has been made');
-  ok( -f dist_file('Foo-Bar', 'file.txt'), 'sharedir file has been made');
+  ok( -f catfile(dist_dir('Foo-Bar'), 'file.txt'), 'sharedir file has been made');
   ok( -d module_dir('Foo::Bar'), 'sharedir has been made');
-  ok( -f module_file('Foo::Bar', 'file.txt'), 'sharedir file has been made');
+  ok( -f catfile(module_dir('Foo::Bar'), 'file.txt'), 'sharedir file has been made');
   ok( -d catdir(qw/blib lib auto share dist Foo-Bar/), 'dist sharedir has been made');
   ok( -f catfile(qw/blib lib auto share dist Foo-Bar file.txt/), 'dist sharedir file has been made');
   ok( -d catdir(qw/blib lib auto share module Foo-Bar/), 'moduole sharedir has been made');
@@ -192,16 +188,9 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
         my $libref = pop @DynaLoader::dl_librefs;
         DynaLoader::dl_unload_file($libref);
     }
-    ok( -f module_file('Foo::Bar', 'include/foo.h'), 'header file has been exported');
-    ok( -f module_file('Foo::Bar', 'compile.json'), 'compilation flag file has been exported');
+    ok( -f catfile(module_dir('Foo::Bar'), 'include/foo.h'), 'header file has been exported');
+    ok( -f catfile(module_dir('Foo::Bar'), 'compile.json'), 'compilation flag file has been exported');
   }
-
-  require CPAN::Meta;
-  my $meta = CPAN::Meta->load_file("MYMETA.json");
-  my $req = $meta->effective_prereqs->requirements_for('runtime', 'requires');
-  my $dynamic_dependency = join ',', sort $req->required_modules;
-
-  is($dynamic_dependency, 'Bar,perl', 'Dependency on Foo has been inserted');
 
   SKIP: {
     require ExtUtils::InstallPaths;

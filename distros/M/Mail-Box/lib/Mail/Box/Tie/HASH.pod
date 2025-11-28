@@ -4,16 +4,21 @@
 
 Mail::Box::Tie::HASH - access an existing message folder as a hash
 
+=head1 INHERITANCE
+
+ Mail::Box::Tie::HASH
+   is a Mail::Box::Tie
+
 =head1 SYNOPSIS
 
- tie my(%inbox), 'Mail::Box::Tie::HASH', $folder;
+  tie my(%inbox), 'Mail::Box::Tie::HASH', $folder;
 
- foreach my $msgid (keys %inbox)
- {   print $inbox{$msgid};
-     delete $inbox{$msgid};
- }
+  foreach my $msgid (keys %inbox)
+  {   print $inbox{$msgid};
+      delete $inbox{$msgid};
+  }
 
- $inbox{$msg->messageId} = $msg;
+  $inbox{$msg->messageId} = $msg;
 
 =head1 DESCRIPTION
 
@@ -27,21 +32,47 @@ folder, one will be flagged for deletion and the other will be returned.
 This implementation uses basic folder access routines which are related
 to the message-id.
 
+Extends L<"DESCRIPTION" in Mail::Box::Tie|Mail::Box::Tie/"DESCRIPTION">.
+
 =head1 METHODS
+
+Extends L<"METHODS" in Mail::Box::Tie|Mail::Box::Tie/"METHODS">.
 
 =head2 Constructors
 
+Extends L<"Constructors" in Mail::Box::Tie|Mail::Box::Tie/"Constructors">.
+
 =over 4
 
-=item B<TIEHASH>('Mail::Box::Tie::HASH', FOLDER)
+=item tie B<%hash>, 'Mail::Box::Tie::HASH', FOLDER
 
 Connects the FOLDER object to a HASH.
 
-example: 
+» example: 
 
- my $mgr    = Mail::Box::Manager->new;
- my $folder = $mgr->open(access => 'rw');
- tie my(%inbox), 'Mail::Box::Tie::HASH', $folder;
+  my $mgr    = Mail::Box::Manager->new;
+  my $folder = $mgr->open(access => 'rw');
+  tie my(%inbox), 'Mail::Box::Tie::HASH', $folder;
+
+=item $class-E<gt>B<new>($folder, $type)
+
+Inherited, see L<Mail::Box::Tie/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::Tie|Mail::Box::Tie/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<folder>()
+
+Inherited, see L<Mail::Box::Tie/"Attributes">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box::Tie/"Attributes">
 
 =back
 
@@ -54,26 +85,26 @@ example:
 Remove the contents of the hash.  This is not really possible, but all
 the messages will be flagged for deletion.
 
-example: 
+» example: 
 
- %inbox = ();
- %inbox = ($msg->messageId, $msg); #before adding msg
+  %inbox = ();
+  %inbox = ($msg->messageId, $msg); #before adding msg
 
 =item $obj-E<gt>B<DELETE>($message_id)
 
-Remove the message with the specified $message_id.
+Remove the message with the specified C<$message_id>.
 
-example: 
+» example: 
 
- delete $inbox{$msgid};
+  delete $inbox{$msgid};
 
 =item $obj-E<gt>B<EXISTS>($message_id)
 
-Check whether a message with a certain $message_id exists.
+Check whether a message with a certain C<$message_id> exists.
 
-example: 
+» example: 
 
- if(exists $inbox{$msgid}) ...
+  if(exists $inbox{$msgid}) ...
 
 =item $obj-E<gt>B<FETCH>($message_id)
 
@@ -81,10 +112,10 @@ Get the message with the specified id.  The returned message may be
 a dummy if message thread detection is used.  Returns C<undef> when
 there is no message with the specified id.
 
-example: 
+» example: 
 
- my $msg = $inbox{$msgid};
- if($inbox{$msgid}->isDummy)  ...
+  my $msg = $inbox{$msgid};
+  if($inbox{$msgid}->isDummy)  ...
 
 =item $obj-E<gt>B<FIRSTKEY>()
 
@@ -100,14 +131,14 @@ Messages flagged for deletion will B<not> be returned. See the
 L<Mail::Box::messages()|Mail::Box/"The messages"> method of the folder type for more information
 about the folder message order.
 
-example: 
+» example: 
 
- foreach my $msgid (keys %inbox) ...
- foreach my $msg (values %inbox) ...
+  foreach my $msgid (keys %inbox) ...
+  foreach my $msg (values %inbox) ...
 
- while(my ($msgid, $msg) = each %inbox) {
-    $msg->print unless $msg->isDeleted;
- }
+  while(my ($msgid, $msg) = each %inbox) {
+     $msg->print unless $msg->isDeleted;
+  }
 
 =item $obj-E<gt>B<STORE>(undef, $message)
 
@@ -119,23 +150,24 @@ C<undef>, therefore the string C<"undef"> is accepted as well.
 The message may be converted into something which can be stored in the
 folder type which is at stake.  The added instance is returned.
 
-example: 
+» example: 
 
- $inbox{ (undef) } = $msg;
- $inbox{undef} = $msg;
+  $inbox{ (undef) } = $msg;
+  $inbox{undef} = $msg;
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

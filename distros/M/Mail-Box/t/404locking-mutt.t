@@ -15,35 +15,31 @@ use Mail::Box::Locker::Mutt;
 use Test::More;
 
 BEGIN {
-  eval qq{use POSIX 'sys_wait_h';
-          close STDERR;
-          system('mutt_dotlock', '-u', '$0');
-          die "OK!" if WIFEXITED(\$?);
-         };
+	eval qq{
+		use POSIX 'sys_wait_h';
+		close STDERR;    ### remove this to debug this test
+		system('mutt_dotlock', '-u', '$0');
+		die "OK!" if WIFEXITED(\$?);
+	};
 
-  if($@ =~ m/OK!/)
-  {    plan tests => 7;
-  }
-  else
-  {    plan skip_all => "mutt_dotlock cannot be used";
-       exit 0;
-  }
+	$@ =~ m/OK!/
+		or plan skip_all => "mutt_dotlock cannot be used";
 }
 
 my $foldername = $0;
+my $fakefolder = bless +{ MB_foldername => $foldername }, 'Mail::Box::Mbox';
 
-my $fakefolder = bless {MB_foldername=> $foldername}, 'Mail::Box::Mbox';
-my $lockfile = "$foldername.lock";
+my $lockfile   = "$foldername.lock";
 unlink $lockfile;
 
-my $locker = Mail::Box::Locker->new
- ( method  => 'MUTT'
- , timeout => 1
- , wait    => 1
- , folder  => $fakefolder
- );
+my $locker = Mail::Box::Locker->new(
+	method  => 'MUTT',
+	timeout => 1,
+	wait    => 1,
+	folder  => $fakefolder,
+);
 
-ok($locker);
+ok($locker, 'Created locker');
 is($locker->name, 'MUTT', 'locker name');
 
 ok($locker->lock,    'can lock');
@@ -59,3 +55,5 @@ ok($warn =~ m/already mutt-locked/, 'second attempt');
 
 $locker->unlock;
 ok(! $locker->hasLock, 'released lock');
+
+done_testing;

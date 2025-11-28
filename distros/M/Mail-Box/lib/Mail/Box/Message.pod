@@ -18,13 +18,13 @@ Mail::Box::Message - manage one message within a mail-folder
 
 =head1 SYNOPSIS
 
- # Usually these message objects are created indirectly
- use Mail::Box::Manager;
- my $manager = Mail::Box::Manager->new;
- my $folder  = $manager->open(folder => 'Mail/Drafts');
- my $msg     = $folder->message(1);
- $msg->delete;
- $msg->size;   # and much more
+  # Usually these message objects are created indirectly
+  use Mail::Box::Manager;
+  my $manager = Mail::Box::Manager->new;
+  my $folder  = $manager->open(folder => 'Mail/Drafts');
+  my $msg     = $folder->message(1);
+  $msg->delete;
+  $msg->size;   # and much more
 
 =head1 DESCRIPTION
 
@@ -36,44 +36,46 @@ stages were introduced to reduce the access-time to the folder.  Changing
 from stage, the message's body and head objects may change.
 
 Extends L<"DESCRIPTION" in Mail::Message|Mail::Message/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Message|Mail::Message/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Message|Mail::Message/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clone>(%options)
 
 Inherited, see L<Mail::Message/"Constructors">
 
-=item Mail::Box::Message-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Reporter/"Constructors">
 
  -Option    --Defined in     --Default
   body        Mail::Message    undef
   body_type                    <from folder>
-  deleted     Mail::Message    <false>
+  deleted     Mail::Message    false
   field_type  Mail::Message    undef
   folder                       <required>
   head        Mail::Message    undef
   head_type   Mail::Message    Mail::Message::Head::Complete
-  labels      Mail::Message    {}
+  labels      Mail::Message    +{}
   log         Mail::Reporter   'WARNINGS'
   messageId   Mail::Message    undef
-  modified    Mail::Message    <false>
+  modified    Mail::Message    false
   size                         undef
   trace       Mail::Reporter   'WARNINGS'
-  trusted     Mail::Message    <false>
+  trusted     Mail::Message    false
 
 =over 2
 
-=item body => OBJECT
+=item body => $object
 
-=item body_type => CODE|CLASS
+=item body_type => CODE|$class
 
 If the body of a message is used delay-loaded, the message must what type
 of message to become when it finally gets parsed.  The folder which is
@@ -81,26 +83,26 @@ delaying the load must specify the algorithm to determine that type.
 
 =item deleted => BOOLEAN
 
-=item field_type => CLASS
+=item field_type => $class
 
-=item folder => FOLDER
+=item folder => $folder
 
-The folder where this message appeared in.  The argument is
+The C<$folder> where this message appeared in.  The argument is
 an instance of (a sub-class of) a L<Mail::Box|Mail::Box>.
 
-=item head => OBJECT
+=item head => $object
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item labels => ARRAY|HASH
 
 =item log => LEVEL
 
-=item messageId => STRING
+=item messageId => $id
 
 =item modified => BOOLEAN
 
-=item size => INTEGER
+=item size => $bytes
 
 The size of the message, which includes head and body, but without the
 message separators which may be used by the folder type.
@@ -113,21 +115,43 @@ message separators which may be used by the folder type.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Message|Mail::Message/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<folder>( [$folder] )
+
+In which folder did we detect this message/dummy?  This is a reference
+to the folder-object.
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=item $obj-E<gt>B<seqnr>( [$integer] )
+
+Get the number of this message is the current folder.  It starts counting
+from zero.  Do not change the number.
+
+=back
+
 =head2 Constructing a message
 
 Extends L<"Constructing a message" in Mail::Message|Mail::Message/"Constructing a message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bounce>( [<$rg_object|%options>] )
 
 Inherited, see L<Mail::Message::Construct::Bounce/"Constructing a message">
 
-=item Mail::Box::Message-E<gt>B<build>( [$message|$part|$body], $content )
+=item $class-E<gt>B<build>( [$message|$part|$body], @fields, %options )
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-=item Mail::Box::Message-E<gt>B<buildFromBody>($body, [$head], $headers)
+=item $class-E<gt>B<buildFromBody>($body, [$head], $headers)
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
@@ -163,7 +187,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item Mail::Box::Message-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -179,9 +203,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replySubject>(STRING)
-
-=item Mail::Box::Message-E<gt>B<replySubject>(STRING)
+=item $any-E<gt>B<replySubject>(STRING)
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -190,7 +212,7 @@ Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 =head2 The message
 
 Extends L<"The message" in Mail::Message|Mail::Message/"The message">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>()
@@ -199,15 +221,15 @@ Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<copyTo>($folder, %options)
 
-Copy the message to the indicated opened $folder, without deleting the
+Copy the message to the indicated opened C<$folder>, without deleting the
 original.  The coerced message (the clone in the destination folder)
 is returned.
 
  -Option      --Default
-  shallow       <false>
-  shallow_body  <false>
-  shallow_head  <false>
-  share         <false>
+  shallow       false
+  shallow_body  false
+  shallow_head  false
+  share         false
 
 =over 2
 
@@ -231,15 +253,14 @@ options will be silently ignored.
 
 =back
 
-example: 
+» example: 
 
- my $draft = $mgr->open(folder => 'Draft');
- $message->copyTo($draft, share => 1);
+  my $draft = $mgr->open(folder => 'Draft');
+  $message->copyTo($draft, share => 1);
 
-=item $obj-E<gt>B<folder>( [$folder] )
+=item $obj-E<gt>B<endsOnNewline>()
 
-In with folder did we detect this message/dummy?  This is a reference
-to the folder-object.
+Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<isDummy>()
 
@@ -255,16 +276,16 @@ Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<moveTo>($folder, %options)
 
-Move the message from this folder to the $folder specified.  This will
+Move the message from this folder to the C<$folder> specified.  This will
 create a copy using L<clone()|Mail::Message/"Constructors"> first.  Then, this original message is
 flagged to get deleted.  So until the source folder is closed, two copies
 of the message may stay in memory.
 
 The newly created message clone (part of the destination folder)
-is returned.  All %options are passed to L<copyTo()|Mail::Box::Message/"The message">
+is returned.  All C<%options> are passed to L<copyTo()|Mail::Box::Message/"The message">
 
  -Option      --Default
-  shallow_body  <undef>
+  shallow_body  undef
   share         <true unless shallow_body exists>
 
 =over 2
@@ -278,20 +299,20 @@ explicitly stated.
 =item share => BOOLEAN
 
 When there is a chance that the original message can be undeleted, then
-this must be set to false.  Otherwise a shallow clone will be made, which
+this must be set to C<false>.  Otherwise a shallow clone will be made, which
 will share the header which can be modified in the undeleted message.
 
 =back
 
-example: of moving a message
+» example: of moving a message
 
- my $trash = Mail::Box::Mbox->new(folder => 'trash');
- my $t = $msg->moveTo($trash);
+  my $trash = Mail::Box::Mbox->new(folder => 'trash');
+  my $t = $msg->moveTo($trash);
 
 is equivalent to
 
- my $t = $msg->copyTo($trash, share => 1);
- $msg->delete;
+  my $t = $msg->copyTo($trash, share => 1);
+  $msg->delete;
 
 =item $obj-E<gt>B<partNumber>()
 
@@ -304,11 +325,6 @@ Inherited, see L<Mail::Message/"The message">
 =item $obj-E<gt>B<send>( [$mailer], %options )
 
 Inherited, see L<Mail::Message/"The message">
-
-=item $obj-E<gt>B<seqnr>( [$integer] )
-
-Get the number of this message is the current folder.  It starts counting
-from zero.  Do not change the number.
 
 =item $obj-E<gt>B<size>()
 
@@ -327,7 +343,7 @@ Inherited, see L<Mail::Message/"The message">
 =head2 The header
 
 Extends L<"The header" in Mail::Message|Mail::Message/"The header">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<bcc>()
@@ -391,7 +407,7 @@ Inherited, see L<Mail::Message/"The header">
 =head2 The body
 
 Extends L<"The body" in Mail::Message|Mail::Message/"The body">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<body>( [$body] )
@@ -427,7 +443,7 @@ Inherited, see L<Mail::Message/"The body">
 =head2 Flags
 
 Extends L<"Flags" in Mail::Message|Mail::Message/"Flags">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<delete>()
@@ -471,7 +487,7 @@ Inherited, see L<Mail::Message/"Flags">
 =head2 The whole message as text
 
 Extends L<"The whole message as text" in Mail::Message|Mail::Message/"The whole message as text">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<file>()
@@ -495,14 +511,14 @@ Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Message|Mail::Message/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<clonedFrom>()
 
 Inherited, see L<Mail::Message/"Internals">
 
-=item Mail::Box::Message-E<gt>B<coerce>($message, %options)
+=item $class-E<gt>B<coerce>($message, %options)
 
 Inherited, see L<Mail::Message/"Internals">
 
@@ -518,14 +534,15 @@ Inherited, see L<Mail::Message/"Internals">
 
 =item $obj-E<gt>B<readBody>( $parser, $head, [$bodytype] )
 
-Read the body of one message.  The $parser gives access to the folder file.
-The $head has been read with L<readHead()|Mail::Message/"Internals">.  The optional $bodytype supplies
+Read the body of one message.  The C<$parser> gives access to the folder file.
+The C<$head> has been read with L<readHead()|Mail::Message/"Internals">.  The optional C<$bodytype> supplies
 the class name of the body to be created, or a code reference to a
 routine which can produce a body type based on the head (passed as
 first argument).
 
-By default, the $bodytype will call L<Mail::Box::determineBodyType()|Mail::Box/"Internals">
+By default, the C<$bodytype> will call L<Mail::Box::determineBodyType()|Mail::Box/"Internals">
 where the message will be added to.
+Improves base, see L<Mail::Message/"Internals">
 
 =item $obj-E<gt>B<readFromParser>( $parser, [$bodytype] )
 
@@ -552,7 +569,7 @@ Inherited, see L<Mail::Message/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Message|Mail::Message/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -563,9 +580,7 @@ Inherited, see L<Mail::Message::Construct/"METHODS">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Message-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -573,19 +588,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Message-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Message-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -601,9 +608,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<shortSize>( [$value] )
-
-=item Mail::Box::Message-E<gt>B<shortSize>( [$value] )
+=item $any-E<gt>B<shortSize>( [$value] )
 
 Inherited, see L<Mail::Message/"Error handling">
 
@@ -624,7 +629,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Message|Mail::Message/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -637,28 +642,33 @@ Removes most of the memory occupied by the message by detaching the header
 and body.  Then, the object changes into a L<Mail::Box::Message::Destructed|Mail::Box::Message::Destructed>
 which will catch all attempts to access the header and body.  Be careful
 with the usage of this method.
+Improves base, see L<Mail::Message/"Cleanup">
 
 =back
 
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Message|Mail::Message/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
 
 =item Error: Cannot coerce a $class object into a $class object
 
+Cast by C<coerce()>
+
 =item Error: Cannot include forward source as $include.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+Cast by C<forward()>
 
 =item Error: Cannot include reply source as $include.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
 
 =item Error: Method bounce requires To, Cc, or Bcc
 
@@ -667,22 +677,31 @@ else without modification; you must specified it's new destination.
 If you have the urge not to specify any destination, you probably
 are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
 L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
 
 =item Error: Method forwardAttach requires a preamble
 
+Cast by C<forwardAttach()>
+
 =item Error: Method forwardEncapsulate requires a preamble
+
+Cast by C<forwardEncapsulate()>
 
 =item Error: No address to create forwarded to.
 
 If a forward message is created, a destination address must be specified.
+Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
 The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
 find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
+Cast by C<send()>
 
 =item Error: No rebuild rule $name defined.
+
+Cast by C<rebuild()>
 
 =item Error: Only build() Mail::Message's; they are not in a folder yet
 
@@ -691,6 +710,7 @@ of folder, but you need to do that in two steps.  First, create a
 normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
 L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
 into the right message type, adding storage information and the like.
+Cast by C<build()>
 
 =item Error: Package $package does not implement $method.
 
@@ -699,21 +719,25 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: coercion starts with some object
+
+Cast by C<coerce()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

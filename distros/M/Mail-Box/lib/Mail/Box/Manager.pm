@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Manager;{
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 }
 
 use base 'Mail::Reporter';
@@ -17,560 +20,546 @@ use warnings;
 
 use Mail::Box;
 
-use List::Util   'first';
-use Scalar::Util 'weaken';
+use List::Util   qw/first/;
+use Scalar::Util qw/weaken blessed/;
 
 # failed compilation will not complain a second time
 # so we need to keep track.
 my %require_failed;
 
+#--------------------
 
-my @basic_folder_types =
-  ( [ mbox    => 'Mail::Box::Mbox'    ]
-  , [ mh      => 'Mail::Box::MH'      ]
-  , [ maildir => 'Mail::Box::Maildir' ]
-  , [ pop     => 'Mail::Box::POP3'    ]
-  , [ pop3    => 'Mail::Box::POP3'    ]
-  , [ pops    => 'Mail::Box::POP3s'   ]
-  , [ pop3s   => 'Mail::Box::POP3s'   ]
-  , [ imap    => 'Mail::Box::IMAP4'   ]
-  , [ imap4   => 'Mail::Box::IMAP4'   ]
-  , [ imaps   => 'Mail::Box::IMAP4s'  ]
-  , [ imap4s  => 'Mail::Box::IMAP4s'  ]
-  );
+my @basic_folder_types = (
+	[ mbox    => 'Mail::Box::Mbox'    ],
+	[ mh      => 'Mail::Box::MH'      ],
+	[ maildir => 'Mail::Box::Maildir' ],
+	[ pop     => 'Mail::Box::POP3'    ],
+	[ pop3    => 'Mail::Box::POP3'    ],
+	[ pops    => 'Mail::Box::POP3s'   ],
+	[ pop3s   => 'Mail::Box::POP3s'   ],
+	[ imap    => 'Mail::Box::IMAP4'   ],
+	[ imap4   => 'Mail::Box::IMAP4'   ],
+	[ imaps   => 'Mail::Box::IMAP4s'  ],
+	[ imap4s  => 'Mail::Box::IMAP4s'  ],
+);
 
 my @managers;  # usually only one, but there may be more around :(
 
 sub init($)
-{   my ($self, $args) = @_;
-    $self->SUPER::init($args);
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args);
 
-    # Register all folder-types.  There may be some added later.
+	# Register all folder-types.  There may be some added later.
 
-    my @new_types;
-    if(exists $args->{folder_types})
-    {   @new_types = ref $args->{folder_types}[0]
-                   ? @{$args->{folder_types}}
-                   : $args->{folder_types};
-    }
+	my @new_types;
+	if(my $ft = $args->{folder_types})
+	{	@new_types = ref($ft->[0]) eq 'ARRAY' ? @$ft : $ft;
+	}
 
-    my @basic_types = reverse @basic_folder_types;
-    if(my $basic = $args->{autodetect})
-    {   my %types = map +($_ => 1), ref $basic ? @$basic : $basic;
-        @basic_types = grep $types{$_->[0]}, @basic_types;
-    }
+	my @basic_types = reverse @basic_folder_types;
+	if(my $basic = $args->{autodetect})
+	{	my %types = map +($_ => 1), ref $basic ? @$basic : $basic;
+		@basic_types = grep $types{$_->[0]}, @basic_types;
+	}
 
-    $self->{MBM_folder_types} = [];
-    $self->registerType(@$_) for @new_types, @basic_types;
+	$self->{MBM_folder_types} = [];
+	$self->registerType(@$_) for @new_types, @basic_types;
 
-    $self->{MBM_default_type} = $args->{default_folder_type} || 'mbox';
+	$self->{MBM_default_type} = $args->{default_folder_type} || 'mbox';
 
-    # Inventory on existing folder-directories.
-    my $fd = $self->{MBM_folderdirs} = [ ];
-    if(exists $args->{folderdir})
-    {   my @dirs = $args->{folderdir};
-        @dirs = @{$dirs[0]} if ref $dirs[0] eq 'ARRAY';
-        push @$fd, @dirs;
-    }
+	# Inventory on existing folder-directories.
+	my $fd = $self->{MBM_folderdirs} = [ ];
+	if(exists $args->{folderdir})
+	{	my @dirs = $args->{folderdir};
+		@dirs = @{$dirs[0]} if ref $dirs[0] eq 'ARRAY';
+		push @$fd, @dirs;
+	}
 
-    if(exists $args->{folderdirs})
-    {   my @dirs = $args->{folderdirs};
-        @dirs = @{$dirs[0]} if ref $dirs[0];
-        push @$fd, @dirs;
-    }
-    push @$fd, '.';
+	if(exists $args->{folderdirs})
+	{	my @dirs = $args->{folderdirs};
+		@dirs = @{$dirs[0]} if ref $dirs[0];
+		push @$fd, @dirs;
+	}
+	push @$fd, '.';
 
-    $self->{MBM_folders} = [];
-    $self->{MBM_threads} = [];
+	$self->{MBM_folders} = [];
+	$self->{MBM_threads} = [];
 
-    push @managers, $self;
-    weaken $managers[-1];
+	push @managers, $self;
+	weaken $managers[-1];
 
-    $self;
+	$self;
 }
 
-#-------------------------------------------
+#--------------------
 
 sub registerType($$@)
-{   my ($self, $name, $class, @options) = @_;
-    unshift @{$self->{MBM_folder_types}}, [$name, $class, @options];
-    $self;
+{	my ($self, $name, $class, @options) = @_;
+	unshift @{$self->{MBM_folder_types}}, [$name, $class, @options];
+	$self;
 }
 
 
 sub folderdir()
-{   my $dirs = shift->{MBM_folderdirs} or return ();
-    wantarray ? @$dirs : $dirs->[0];
+{	my $dirs = shift->{MBM_folderdirs} or return ();
+	wantarray ? @$dirs : $dirs->[0];
 }
 
 
 sub folderTypes()
-{   my $self = shift;
-    my %uniq;
-    $uniq{$_->[0]}++ foreach @{$self->{MBM_folder_types}};
-    sort keys %uniq;
+{	my $self = shift;
+	my %uniq;
+	$uniq{$_->[0]}++ for $self->folderTypeDefs;
+	sort keys %uniq;
 }
 
 
 sub defaultFolderType()
-{   my $self = shift;
-    my $name = $self->{MBM_default_type};
-    return $name if $name =~ m/\:\:/;  # obviously a class name
+{	my $self = shift;
+	my $name = $self->{MBM_default_type};
+	return $name if $name =~ m/\:\:/;  # obviously a class name
 
-    foreach my $def (@{$self->{MBM_folder_types}})
-    {   return $def->[1] if $def->[0] eq $name || $def->[1] eq $name;
-    }
+	foreach my $def ($self->folderTypeDefs)
+	{	return $def->[1] if $def->[0] eq $name || $def->[1] eq $name;
+	}
 
-    undef;
+	undef;
 }
 
-#-------------------------------------------
 
+sub threads(@) { my $self = shift; @_ ? $self->discoverThreads(@_) : @{$self->{MBM_threads}} }
+
+
+sub folderTypeDefs() { @{$_[0]->{MBM_folder_types}} }
+
+#--------------------
 
 sub open(@)
-{   my $self = shift;
-    my $name = @_ % 2 ? shift : undef;
-    my %args = @_;
-    $args{authentication} ||= 'AUTO';
+{	my $self = shift;
+	my $name = @_ % 2 ? shift : undef;
+	my %args = @_;
 
-    $name    = defined $args{folder} ? $args{folder} : ($ENV{MAIL} || '')
-        unless defined $name;
+	$args{authentication} ||= 'AUTO';
+	$name  //= defined $args{folder} ? $args{folder} : ($ENV{MAIL} || '');
 
-    if($name =~ m/^(\w+)\:/ && grep $_ eq $1, $self->folderTypes)
-    {   # Complicated folder URL
-        my %decoded = $self->decodeFolderURL($name);
-        if(keys %decoded)
-        {   # accept decoded info
-            @args{keys %decoded} = values %decoded;
-        }
-        else
-        {   $self->log(ERROR => "Illegal folder URL '$name'.");
-            return;
-        }
-    }
-    else
-    {   # Simple folder name
-        $args{folder} = $name;
-    }
+	if($name =~ m/^(\w+)\:/ && grep $_ eq $1, $self->folderTypes)
+	{	# Complicated folder URL
+		my %decoded = $self->decodeFolderURL($name);
+		keys %decoded
+			or $self->log(ERROR => "Illegal folder URL '$name'."), return;
 
-    # Do not show password in folder name
-    my $type = $args{type};
-    if(!defined $type) { ; }
-    elsif($type eq 'pop3' || $type eq 'pop')
-    {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
-        my $srv  = $args{server_name} ||= 'localhost';
-        my $port = $args{server_port} ||= 110;
-        $args{folderdir} = $name = "pop3://$un\@$srv:$port";
-    }
-    elsif($type eq 'pop3s' || $type eq 'pops')
-    {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
-        my $srv  = $args{server_name} ||= 'localhost';
-        my $port = $args{server_port} ||= 995;
-        $args{folderdir} = $name = "pop3s://$un\@$srv:$port";
-    }
-    elsif($type eq 'imap4' || $type eq 'imap')
-    {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
-        my $srv  = $args{server_name} ||= 'localhost';
-        my $port = $args{server_port} ||= 143;
-        $args{folderdir} = $name = "imap4://$un\@$srv:$port";
-    }
-    elsif($type eq 'imap4s' || $type eq 'imaps')
-    {   my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
-        my $srv  = $args{server_name} ||= 'localhost';
-        my $port = $args{server_port} ||= 993;
-        $args{folderdir} = $name = "imap4s://$un\@$srv:$port";
-    }
+		# accept decoded info
+		@args{keys %decoded} = values %decoded;
+	}
+	else
+	{	# Simple folder name
+		$args{folder} = $name;
+	}
 
-    unless(defined $name && length $name)
-    {   $self->log(ERROR => "No foldername specified to open.");
-        return undef;
-    }
-        
-    $args{folderdir} ||= $self->{MBM_folderdirs}->[0]
-        if $self->{MBM_folderdirs};
+	# Do not show password in folder name
+	my $type = $args{type};
+	   if(!defined $type) { ; }
+	elsif($type eq 'pop3' || $type eq 'pop')
+	{	my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
+		my $srv  = $args{server_name} ||= 'localhost';
+		my $port = $args{server_port} ||= 110;
+		$args{folderdir} = $name = "pop3://$un\@$srv:$port";
+	}
+	elsif($type eq 'pop3s' || $type eq 'pops')
+	{	my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
+		my $srv  = $args{server_name} ||= 'localhost';
+		my $port = $args{server_port} ||= 995;
+		$args{folderdir} = $name = "pop3s://$un\@$srv:$port";
+	}
+	elsif($type eq 'imap4' || $type eq 'imap')
+	{	my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
+		my $srv  = $args{server_name} ||= 'localhost';
+		my $port = $args{server_port} ||= 143;
+		$args{folderdir} = $name = "imap4://$un\@$srv:$port";
+	}
+	elsif($type eq 'imap4s' || $type eq 'imaps')
+	{	my $un   = $args{username}    ||= $ENV{USER} || $ENV{LOGIN};
+		my $srv  = $args{server_name} ||= 'localhost';
+		my $port = $args{server_port} ||= 993;
+		$args{folderdir} = $name = "imap4s://$un\@$srv:$port";
+	}
 
-    $args{access} ||= 'r';
+	unless(defined $name && length $name)
+	{	$self->log(ERROR => "No foldername specified to open.");
+		return undef;
+	}
 
-    if($args{create} && $args{access} !~ m/w|a/)
-    {   $self->log(WARNING
-           => "Will never create a folder $name without having write access.");
-        undef $args{create};
-    }
+	$args{folderdir} ||= $self->{MBM_folderdirs}->[0]
+		if $self->{MBM_folderdirs};
 
-    # Do not open twice.
-    if(my $folder = $self->isOpenFolder($name))
-    {   $self->log(ERROR => "Folder $name is already open.");
-        return undef;
-    }
+	$args{access} ||= 'r';
 
-    #
-    # Which folder type do we need?
-    #
+	if($args{create} && $args{access} !~ m/w|a/)
+	{	$self->log(WARNING => "Will never create a folder $name without having write access.");
+		undef $args{create};
+	}
 
-    my ($folder_type, $class, @defaults);
-    if($type)
-    {   # User-specified foldertype prevails.
-        foreach (@{$self->{MBM_folder_types}})
-        {   (my $abbrev, $class, @defaults) = @$_;
+	# Do not open twice.
+	my $folder = $self->isOpenFolder($name)
+		and $self->log(ERROR => "Folder $name is already open."), return undef;
 
-            if($type eq $abbrev || $type eq $class)
-            {   $folder_type = $abbrev;
-                last;
-            }
-        }
+	#
+	# Which folder type do we need?
+	#
 
-        $self->log(ERROR => "Folder type $type is unknown, using autodetect.")
-            unless $folder_type;
-    }
+	my ($folder_type, $class, @defaults);
+	my @typedefs = $self->folderTypeDefs;
+	if($type)
+	{	# User-specified foldertype prevails.
+		foreach (@typedefs)
+		{	(my $abbrev, $class, @defaults) = @$_;
 
-    unless($folder_type)
-    {   # Try to autodetect foldertype.
-        foreach (@{$self->{MBM_folder_types}})
-        {   next unless $_;
-            (my $abbrev, $class, @defaults) = @$_;
-            next if $require_failed{$class};
+			if($type eq $abbrev || $type eq $class)
+			{	$folder_type = $abbrev;
+				last;
+			}
+		}
 
-            eval "require $class";
-            if($@)
-            {   $require_failed{$class}++;
-                next;
-            }
+		$folder_type
+			or $self->log(ERROR => "Folder type $type is unknown, using autodetect.");
+	}
 
-            if($class->foundIn($name, @defaults, %args))
-            {   $folder_type = $abbrev;
-                last;
-            }
-        }
-     }
+	unless($folder_type)
+	{	# Try to autodetect foldertype.
+		foreach (@typedefs)
+		{	(my $abbrev, $class, @defaults) = @$_;
+			next if $require_failed{$class};
 
-    unless($folder_type)
-    {   # Use specified default
-        if(my $type = $self->{MBM_default_type})
-        {   foreach (@{$self->{MBM_folder_types}})
-            {   (my $abbrev, $class, @defaults) = @$_;
-                if($type eq $abbrev || $type eq $class)
-                {   $folder_type = $abbrev;
-                    last;
-                }
-            }
-        }
-    }
+			eval "require $class";
+			if($@)
+			{	$require_failed{$class}++;
+				next;
+			}
 
-    unless($folder_type)
-    {   # use first type (last defined)
-        ($folder_type, $class, @defaults) = @{$self->{MBM_folder_types}[0]};
-    }
-    
-    #
-    # Try to open the folder
-    #
+			if($class->foundIn($name, @defaults, %args))
+			{	$folder_type = $abbrev;
+				last;
+			}
+		}
+	}
 
-    return if $require_failed{$class};
-    eval "require $class";
-    if($@)
-    {   $self->log(ERROR => "Failed for folder default $class: $@");
-        $require_failed{$class}++;
-        return ();
-    }
+	unless($folder_type)
+	{	# Use specified default
+		if(my $type = $self->{MBM_default_type})
+		{	foreach (@typedefs)
+			{	(my $abbrev, $class, @defaults) = @$_;
+				if($type eq $abbrev || $type eq $class)
+				{	$folder_type = $abbrev;
+					last;
+				}
+			}
+		}
+	}
 
-    push @defaults, manager => $self;
-    my $folder = $class->new(@defaults, %args);
-    unless(defined $folder)
-    {   $self->log(WARNING =>
-           "Folder does not exist, failed opening $folder_type folder $name.")
-           unless $args{access} eq 'd';
-        return;
-    }
+	unless($folder_type)
+	{	# use first type (last defined)
+		($folder_type, $class, @defaults) = @{$typedefs[0]};
+	}
 
-    $self->log(PROGRESS => "Opened folder $name ($folder_type).");
-    push @{$self->{MBM_folders}}, $folder;
-    $folder;
+	#
+	# Try to open the folder
+	#
+
+	return if $require_failed{$class};
+	eval "require $class";
+	if($@)
+	{	$self->log(ERROR => "Failed for folder default $class: $@");
+		$require_failed{$class}++;
+		return ();
+	}
+
+	push @defaults, manager => $self;
+	$folder = $class->new(@defaults, %args);
+	unless(defined $folder)
+	{	$args{access} eq 'd'
+			or $self->log(WARNING => "Folder does not exist, failed opening $folder_type folder $name.");
+		return;
+	}
+
+	$self->log(PROGRESS => "Opened folder $name ($folder_type).");
+	push @{$self->{MBM_folders}}, $folder;
+	$folder;
 }
 
 
-sub openFolders() { @{shift->{MBM_folders}} }
+sub openFolders() { @{ $_[0]->{MBM_folders}} }
 
 
 sub isOpenFolder($)
-{   my ($self, $name) = @_;
-    first {$name eq $_->name} $self->openFolders;
+{	my ($self, $name) = @_;
+	first { $name eq $_->name } $self->openFolders;
 }
-
-#-------------------------------------------
 
 
 sub close($@)
-{   my ($self, $folder, %options) = @_;
-    return unless $folder;
+{	my ($self, $folder, %options) = @_;
+	return unless $folder;
 
-    my $name      = $folder->name;
-    my @remaining = grep {$name ne $_->name} @{$self->{MBM_folders}};
+	my $name      = $folder->name;
+	my @folders   = $self->openFolders;
+	my @remaining = grep $name ne $_->name, @folders;
 
-    # folder opening failed:
-    return if @{$self->{MBM_folders}} == @remaining;
+	# folder opening failed:
+	return if @folders == @remaining;
 
-    $self->{MBM_folders} = [ @remaining ];
-    $_->removeFolder($folder) foreach @{$self->{MBM_threads}};
+	$self->{MBM_folders} = [ @remaining ];
+	$_->removeFolder($folder) for $self->threads;
 
-    $folder->close(close_by_manager => 1, %options)
-       unless $options{close_by_self};
+	$options{close_by_self}
+		or $folder->close(close_by_manager => 1, %options);
 
-    $self;
+	$self;
 }
-
-#-------------------------------------------
 
 
 sub closeAllFolders(@)
-{   my ($self, @options) = @_;
-    $_->close(@options) for $self->openFolders;
-    $self;
+{	my ($self, @options) = @_;
+	$_->close(@options) for $self->openFolders;
+	$self;
 }
 
 END { map defined $_ && $_->closeAllFolders, @managers }
 
-#-------------------------------------------
+#--------------------
 
 sub delete($@)
-{   my ($self, $name, %args) = @_;
-    my $recurse = delete $args{recursive};
+{	my ($self, $name, %args) = @_;
+	my $recurse = delete $args{recursive};
 
-    my $folder = $self->open(folder => $name, access => 'd', %args)
-        or return $self;  # still successful
+	my $folder = $self->open(folder => $name, access => 'd', %args)
+		or return $self;  # still successful
 
-    $folder->delete(recursive => $recurse);
+	$folder->delete(recursive => $recurse);
 }
 
-#-------------------------------------------
+#--------------------
 
 sub appendMessage(@)
-{   my $self     = shift;
-    my @appended = $self->appendMessages(@_);
-    wantarray ? @appended : $appended[0];
+{	my $self     = shift;
+	my @appended = $self->appendMessages(@_);
+	wantarray ? @appended : $appended[0];
 }
 
 sub appendMessages(@)
-{   my $self = shift;
-    my $folder;
-    $folder  = shift if !ref $_[0] || $_[0]->isa('Mail::Box');
+{	my $self = shift;
+	my $folder;
+	$folder  = shift if ! blessed $_[0] || $_[0]->isa('Mail::Box');
 
-    my @messages;
-    push @messages, shift while @_ && ref $_[0];
+	my @messages;
+	push @messages, shift while @_ && blessed $_[0];
 
-    my %options = @_;
-    $folder ||= $options{folder};
+	my %options = @_;
+	$folder ||= $options{folder};
 
-    # Try to resolve filenames into opened-files.
-    $folder = $self->isOpenFolder($folder) || $folder
-        unless ref $folder;
+	# Try to resolve filenames into opened-files.
+	$folder = $self->isOpenFolder($folder) || $folder
+		unless blessed $folder;
 
-    if(ref $folder)
-    {   # An open file.
-        unless($folder->isa('Mail::Box'))
-        {   $self->log(ERROR =>
-                "Folder $folder is not a Mail::Box; cannot add a message.\n");
-            return ();
-        }
+	if(blessed $folder)
+	{	# An open file.
+		$folder->isa('Mail::Box')
+			or $self->log(ERROR => "Folder $folder is not a Mail::Box; cannot add a message.\n"), return ();
 
-        foreach (@messages)
-        {   next unless $_->isa('Mail::Box::Message') && $_->folder;
-            $self->log(WARNING =>
-               "Use moveMessage() or copyMessage() to move between open folders.");
-        }
+		foreach my $msg (@messages)
+		{	$msg->isa('Mail::Box::Message') && $msg->folder or next;
+			$self->log(WARNING => "Use moveMessage() or copyMessage() to move between open folders.");
+		}
 
-        return $folder->addMessages(@messages);
-    }
+		return $folder->addMessages(@messages);
+	}
 
-    # Not an open file.
-    # Try to autodetect the folder-type and then add the message.
+	# Not an open file.
+	# Try to autodetect the folder-type and then add the message.
 
-    my ($name, $class, @gen_options, $found);
+	my ($name, $class, @gen_options, $found);
+	my @typedefs = $self->folderTypeDefs;
 
-    foreach (@{$self->{MBM_folder_types}})
-    {   ($name, $class, @gen_options) = @$_;
-        next if $require_failed{$class};
-        eval "require $class";
-        if($@)
-        {   $require_failed{$class}++;
-            next;
-        }
+	foreach (@typedefs)
+	{	($name, $class, @gen_options) = @$_;
+		next if $require_failed{$class};
+		eval "require $class";
+		if($@)
+		{	$require_failed{$class}++;
+			next;
+		}
 
-        if($class->foundIn($folder, @gen_options, access => 'a'))
-        {   $found++;
-            last;
-        }
-    }
- 
-    # The folder was not found at all, so we take the default folder-type.
-    my $type = $self->{MBM_default_type};
-    if(!$found && $type)
-    {   foreach (@{$self->{MBM_folder_types}})
-        {   ($name, $class, @gen_options) = @$_;
-            if($type eq $name || $type eq $class)
-            {   $found++;
-                last;
-            }
-        }
-    }
+		if($class->foundIn($folder, @gen_options, access => 'a'))
+		{	$found++;
+			last;
+		}
+	}
 
-    # Even the default foldertype was not found (or nor defined).
-    ($name, $class, @gen_options) = @{$self->{MBM_folder_types}[0]}
-        unless $found;
+	# The folder was not found at all, so we take the default folder-type.
+	my $type = $self->{MBM_default_type};
+	if(!$found && $type)
+	{	foreach (@typedefs)
+		{	($name, $class, @gen_options) = @$_;
+			if($type eq $name || $type eq $class)
+			{	$found++;
+				last;
+			}
+		}
+	}
 
-    $class->appendMessages
-      ( type     => $name
-      , messages => \@messages
-      , @gen_options
-      , %options
-      , folder   => $folder
-      );
+	# Even the default foldertype was not found (or nor defined).
+	($name, $class, @gen_options) = @{$typedefs[0]}
+		unless $found;
+
+	$class->appendMessages(
+		type     => $name,
+		messages => \@messages,
+		@gen_options,
+		%options,
+		folder   => $folder,
+	);
 }
 
 
 
 sub copyMessage(@)
-{   my $self   = shift;
-    my $folder;
-    $folder    = shift if !ref $_[0] || $_[0]->isa('Mail::Box');
+{	my $self   = shift;
+	my $folder;
+	$folder    = shift if ! blessed $_[0] || $_[0]->isa('Mail::Box');
 
-    my @messages;
-    while(@_ && ref $_[0])
-    {   my $message = shift;
-        $self->log(ERROR =>
-            "Use appendMessage() to add messages which are not in a folder.")
-                unless $message->isa('Mail::Box::Message');
-        push @messages, $message;
-    }
+	my @messages;
+	while(@_ && blessed $_[0])
+	{	my $message = shift;
+		$message->isa('Mail::Box::Message')
+			or $self->log(ERROR => "Use appendMessage() to add messages which are not in a folder.");
+		push @messages, $message;
+	}
 
-    my %args = @_;
-    $folder ||= $args{folder};
-    my $share   = exists $args{share} ? $args{share} : $args{_delete};
+	my %args  = @_;
 
-    # Try to resolve filenames into opened-files.
-    $folder = $self->isOpenFolder($folder) || $folder
-        unless ref $folder;
+	$folder ||= $args{folder};
+	my $share = exists $args{share} ? $args{share} : $args{_delete};
 
-    unless(ref $folder)
-    {   my @c = $self->appendMessages(@messages, %args, folder => $folder);
-        if($args{_delete})
-        {   $_->label(deleted => 1) for @messages;
-        }
-        return @c;
-    }
+	# Try to resolve filenames into opened-files.
+	$folder   = $self->isOpenFolder($folder) || $folder
+		unless ref $folder;
 
-    my @coerced;
-    foreach my $msg (@messages)
-    {   if($msg->folder eq $folder)  # ignore move to same folder
-        {   push @coerced, $msg;
-            next;
-        }
-        push @coerced, $msg->copyTo($folder, share => $args{share});
-        $msg->label(deleted => 1) if $args{_delete};
-    }
-    @coerced;
+	unless(ref $folder)
+	{	my @c = $self->appendMessages(@messages, %args, folder => $folder);
+		if($args{_delete})
+		{	$_->label(deleted => 1) for @messages;
+		}
+		return @c;
+	}
+
+	my @coerced;
+	foreach my $msg (@messages)
+	{	if($msg->folder eq $folder)  # ignore move to same folder
+		{	push @coerced, $msg;
+			next;
+		}
+		push @coerced, $msg->copyTo($folder, share => $args{share});
+		$msg->label(deleted => 1) if $args{_delete};
+	}
+	@coerced;
 }
 
 
 
 sub moveMessage(@)
-{   my $self = shift;
-    $self->copyMessage(@_, _delete => 1);
+{	my $self = shift;
+	$self->copyMessage(@_, _delete => 1);
 }
 
-#-------------------------------------------
+#--------------------
 
-sub threads(@)
-{   my $self    = shift;
-    my @folders;
-    push @folders, shift
-       while @_ && ref $_[0] && $_[0]->isa('Mail::Box');
-    my %args    = @_;
+sub discoverThreads(@)
+{	my $self    = shift;
+	my @folders;
+	push @folders, shift while @_ && ref $_[0] && $_[0]->isa('Mail::Box');
+	my %args    = @_;
 
-    my $base    = 'Mail::Box::Thread::Manager';
-    my $type    = $args{threader_type} || $base;
+	my $base    = 'Mail::Box::Thread::Manager';
+	my $type    = $args{threader_type} || $base;
 
-    my $folders = delete $args{folder} || delete $args{folders};
-    push @folders
-     , ( !$folders               ? ()
-       : ref $folders eq 'ARRAY' ? @$folders
-       :                           $folders
-       );
+	my $folders = delete $args{folder} || delete $args{folders};
+	push @folders, ( !$folders ? () : ref $folders eq 'ARRAY' ? @$folders : $folders );
 
-    $self->log(INTERNAL => "No folders specified.")
-       unless @folders;
+	@folders
+		or $self->log(INTERNAL => "No folders specified.");
 
-    my $threads;
-    if(ref $type)
-    {   # Already prepared object.
-        $self->log(INTERNAL => "You need to pass a $base derived")
-            unless $type->isa($base);
-        $threads = $type;
-    }
-    else
-    {   # Create an object.  The code is compiled, which safes us the
-        # need to compile Mail::Box::Thread::Manager when no threads are needed.
-        eval "require $type";
-        $self->log(INTERNAL => "Unusable threader $type: $@") if $@;
+	my $threads;
+	if(ref $type)
+	{	# Already prepared object.
+		$type->isa($base)
+			or $self->log(INTERNAL => "You need to pass a $base derived");
+		$threads = $type;
+	}
+	else
+	{	# Create an object.  The code is compiled, which safes us the
+		# need to compile Mail::Box::Thread::Manager when no threads are needed.
+		eval "require $type";
+		$self->log(INTERNAL => "Unusable threader $type: $@") if $@;
 
-        $self->log(INTERNAL => "You need to pass a $base derived")
-            unless $type->isa($base);
+		$type->isa($base)
+			or $self->log(INTERNAL => "You need to pass a $base derived");
 
-        $threads = $type->new(manager => $self, %args);
-    }
+		$threads = $type->new(manager => $self, %args);
+	}
 
-    $threads->includeFolder($_) foreach @folders;
-    push @{$self->{MBM_threads}}, $threads;
-    $threads;
+	$threads->includeFolder($_) for @folders;
+	push @{$self->{MBM_threads}}, $threads;
+	$threads;
 }
 
-#-------------------------------------------
+#--------------------
 
 sub toBeThreaded($@)
-{   my $self = shift;
-    $_->toBeThreaded(@_) foreach @{$self->{MBM_threads}};
+{	my $self = shift;
+	$_->toBeThreaded(@_) for $self->threads;
 }
 
 
 sub toBeUnthreaded($@)
-{   my $self = shift;
-    $_->toBeUnthreaded(@_) foreach @{$self->{MBM_threads}};
+{	my $self = shift;
+	$_->toBeUnthreaded(@_) for $self->threads;
 }
 
 
 sub decodeFolderURL($)
-{   my ($self, $name) = @_;
+{	my ($self, $name) = @_;
 
-    return unless
-       my ($type, $username, $password, $hostname, $port, $path)
-          = $name =~ m!^(\w+)\:             # protocol
-                       (?://
-                          (?:([^:@/]*)      # username
-                            (?:\:([^@/]*))? # password
-                           \@)?
-                           ([\w.-]+)?       # hostname
-                           (?:\:(\d+))?     # port number
-                        )?
-                        (.*)                # foldername
-                      !x;
+	return unless
+		my ($type, $username, $password, $hostname, $port, $path)
+		= $name =~ m!^
+			(\w+) \:                   # protocol
+			(?: \/\/
+				(?: ([^:@/]* )         # username
+					(?: \: ([^@/]*) )? # password
+					\@
+				)?
+				([\w.-]+)?             # hostname
+				(?: \: (\d+) )?        # port number
+			)?
+			(.*)                       # foldername
+		!x;
 
-    $username ||= $ENV{USER} || $ENV{LOGNAME};
-    $password ||= '';
+	$username ||= $ENV{USER} || $ENV{LOGNAME};
+	$password ||= '';
 
-    for($username, $password)
-    {   s/\+/ /g;
-        s/\%([A-Fa-f0-9]{2})/chr hex $1/ge;
-    }
+	for($username, $password)
+	{	s/\+/ /g;
+		s/\%([A-Fa-f0-9]{2})/chr hex $1/ge;
+	}
 
-    $hostname ||= 'localhost';
+	$hostname ||= 'localhost';
+	$path     ||= '=';
 
-    $path     ||= '=';
-
-    ( type        => $type,     folder      => $path
-    , username    => $username, password    => $password
-    , server_name => $hostname, server_port => $port
-    );
+	( type        => $type,     folder      => $path,
+	  username    => $username, password    => $password,
+	  server_name => $hostname, server_port => $port
+	);
 }
 
-#-------------------------------------------
+#--------------------
 
 1;

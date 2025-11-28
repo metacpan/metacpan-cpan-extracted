@@ -7,10 +7,13 @@ use Chemistry::OpenSMILES::Writer qw(write_SMILES);
 use Test::More;
 
 my @cases = (
-    [ '[CH:4](=[CH:3]/[C:2][O:1])\[C:5][O:6]', '[C:4](=[C:3](/[C:2][O:1])[H])(\[C:5][O:6])[H]', '[H][C:3](/[C:2][O:1])=[C:4]([H])\[C:5][O:6]', '[O:1][C:2]\[C:3](=[C:4](\[C:5][O:6])[H])[H]' ],
+    [ '[CH:4](=[CH:3]/[C:2][O:1])\[C:5][O:6]', '[C:4](=[C:3](/[C:2][O:1])[H])(\[C:5][O:6])[H]', '[H][C:3](/[C:2][O:1])=[C:4]([H])\[C:5][O:6]', '[O:1][C:2]\[C:3](=[C:4](\[C:5][O:6])[H])[H]', '[C:4](=[C:3]/[C:2][O:1])\[C:5][O:6]' ],
 );
 
-plan tests => 3 * scalar @cases;
+eval 'use Term::ExtendedColor qw(fg)';
+my $has_Term_ExtendedColor = $@ ? 0 : 1;
+
+plan tests => (3 + $has_Term_ExtendedColor) * scalar @cases;
 
 for my $case (@cases) {
     my $parser;
@@ -30,6 +33,12 @@ for my $case (@cases) {
     $result = write_SMILES( \@moieties, { unsprout_hydrogens => '',
                                           order_sub => \&class_order } );
     is $result, $case->[3];
+
+    next unless $has_Term_ExtendedColor;
+    my $colored_case = $case->[4];
+    $colored_case =~ s/\[([A-Z]):(\d+)\]/"" . fg( $2, '[' . $1 . ']' )/ge;
+    $result = write_SMILES( \@moieties, { write_atom_sub => \&depict_colored } );
+    is $result, $colored_case;
 }
 
 sub reverse_order
@@ -48,4 +57,14 @@ sub class_order
     my @sorted = ( (sort {  $vertices->{$a}{class}  <=> $vertices->{$b}{class}  } @classed),
                    (sort {  $vertices->{$a}{number} <=> $vertices->{$b}{number} } @classless) );
     return $vertices->{shift @sorted};
+}
+
+sub depict_colored
+{
+    my $atom = shift;
+    if( exists $atom->{class} ) {
+        return fg( $atom->{class}, Chemistry::OpenSMILES::Writer::_depict_atom( { %$atom, class => 0 }, @_ ) );
+    } else {
+        return Chemistry::OpenSMILES::Writer::_depict_atom( $atom, @_ );
+    }
 }

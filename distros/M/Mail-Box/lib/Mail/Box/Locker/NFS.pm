@@ -1,28 +1,32 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Locker::NFS;{
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 }
 
-use base 'Mail::Box::Locker';
+use parent 'Mail::Box::Locker';
 
 use strict;
 use warnings;
 
 use Sys::Hostname;
-use IO::File;
 use Carp;
+use Fcntl  qw/O_CREAT O_WRONLY/;
 
+#--------------------
 
-sub name() {'NFS'}
+sub name() { 'NFS' }
 
-#-------------------------------------------
+#--------------------
 
 # METHOD nfs
 # This hack is copied from the Mail::Folder packages, as written
@@ -38,107 +42,96 @@ sub name() {'NFS'}
 my $hostname = hostname;
 
 sub _tmpfilename()
-{   my $self = shift;
-    $self->{MBLN_tmp} ||= $self->filename . $$;
+{	my $self = shift;
+	$self->{MBLN_tmp} ||= $self->filename . $$;
 }
 
 sub _construct_tmpfile()
-{   my $self    = shift;
-    my $tmpfile = $self->_tmpfilename;
+{	my $self    = shift;
+	my $tmpfile = $self->_tmpfilename;
 
-    my $fh      = IO::File->new($tmpfile, O_CREAT|O_WRONLY, 0600)
-        or return undef;
+	sysopen my $fh, $tmpfile, O_CREAT|O_WRONLY, 0600
+		or return undef;
 
-    $fh->close;
-    $tmpfile;
+	$fh->close;
+	$tmpfile;
 }
 
 sub _try_lock($$)
-{   my ($self, $tmpfile, $lockfile) = @_;
+{	my ($self, $tmpfile, $lockfile) = @_;
 
-    return undef
-        unless link $tmpfile, $lockfile;
+	link $tmpfile, $lockfile
+		or return undef;
 
-    my $linkcount = (stat $tmpfile)[3];
+	my $linkcount = (stat $tmpfile)[3];
 
-    unlink $tmpfile;
-    $linkcount == 2;
+	unlink $tmpfile;
+	$linkcount == 2;
 }
 
 sub _unlock($$)
-{   my ($self, $tmpfile, $lockfile) = @_;
+{	my ($self, $tmpfile, $lockfile) = @_;
 
-    unlink $lockfile
-        or warn "Couldn't remove lockfile $lockfile: $!\n";
+	unlink $lockfile
+		or warn "Couldn't remove lockfile $lockfile: $!\n";
 
-    unlink $tmpfile;
-
-    $self;
+	unlink $tmpfile;
+	$self;
 }
-
-#-------------------------------------------
 
 
 sub lock()
-{   my $self     = shift;
-    my $folder   = $self->folder;
+{	my $self     = shift;
+	my $folder   = $self->folder;
 
-    if($self->hasLock)
-    {   $self->log(WARNING => "Folder $folder already locked over nfs");
-        return 1;
-    }
+	$self->hasLock
+		and $self->log(WARNING => "Folder $folder already locked over nfs"), return 1;
 
-    my $lockfile = $self->filename;
-    my $tmpfile  = $self->_construct_tmpfile or return;
-    my $timeout  = $self->timeout;
-    my $end      = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
-    my $expires  = $self->expires / 86400;  # in days for -A
+	my $lockfile = $self->filename;
+	my $tmpfile  = $self->_construct_tmpfile or return;
+	my $timeout  = $self->timeout;
+	my $end      = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
+	my $expires  = $self->expires / 86400;  # in days for -A
 
-    if(-e $lockfile && -A $lockfile > $expires)
-    {   if(unlink $lockfile)
-             { $self->log(WARNING => "Removed expired lockfile $lockfile.") }
-        else { $self->log(ERROR =>
-                        "Unable to remove expired lockfile $lockfile: $!") }
-    }
+	if(-e $lockfile && -A $lockfile > $expires)
+	{	unlink $lockfile
+			or $self->log(ERROR => "Unable to remove expired lockfile $lockfile: $!"), return 0;
 
-    while(1)
-    {   return $self->SUPER::lock
+		$self->log(WARNING => "Removed expired lockfile $lockfile.");
+	}
+
+	while(1)
+	{	return $self->SUPER::lock
 			if $self->_try_lock($tmpfile, $lockfile);
 
-        last unless --$end;
-        sleep 1;
-    }
+		--$end or last;
+		sleep 1;
+	}
 
-    return 0;
+	return 0;
 }
-
-#-------------------------------------------
 
 sub isLocked()
-{   my $self     = shift;
-    my $tmpfile  = $self->_construct_tmpfile or return 0;
-    my $lockfile = $self->filename;
+{	my $self     = shift;
+	my $tmpfile  = $self->_construct_tmpfile or return 0;
+	my $lockfile = $self->filename;
 
-    my $fh = $self->_try_lock($tmpfile, $lockfile) or return 0;
+	my $fh = $self->_try_lock($tmpfile, $lockfile) or return 0;
+	close $fh;
 
-    close $fh;
-    $self->_unlock($tmpfile, $lockfile);
-    $self->SUPER::unlock;
+	$self->_unlock($tmpfile, $lockfile);
+	$self->SUPER::unlock;
 
-    1;
+	1;
 }
-
-#-------------------------------------------
 
 sub unlock($)
-{   my $self   = shift;
-    return $self unless $self->hasLock;
+{	my $self   = shift;
+	$self->hasLock or return $self;
 
-    $self->_unlock($self->_tmpfilename, $self->filename);
-    $self->SUPER::unlock;
-    $self;
+	$self->_unlock($self->_tmpfilename, $self->filename);
+	$self->SUPER::unlock;
+	$self;
 }
-
-#-------------------------------------------
 
 1;

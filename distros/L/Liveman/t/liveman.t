@@ -1,11 +1,11 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  use String::Diff qw//; use Data::Dumper qw//; use Term::ANSIColor qw//;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} }  my $white = Term::ANSIColor::color('BRIGHT_WHITE'); my $red = Term::ANSIColor::color('BRIGHT_RED'); my $green = Term::ANSIColor::color('BRIGHT_GREEN'); my $reset = Term::ANSIColor::color('RESET'); my @diff = ( 	remove_open => "$white\[$red", 	remove_close => "$white]$reset", 	append_open => "$white\{$green", 	append_close => "$white}$reset", );  sub _string_diff { 	my ($got, $expected, $chunk) = @_; 	$got = substr($got, 0, length $expected) if $chunk == 1; 	$got = substr($got, -length $expected) if $chunk == -1; 	String::Diff::diff_merge($got, $expected, @diff) }  sub _struct_diff { 	my ($got, $expected) = @_; 	String::Diff::diff_merge( 		Data::Dumper->new([$got], ['diff'])->Indent(0)->Useqq(1)->Dump, 		Data::Dumper->new([$expected], ['diff'])->Indent(0)->Useqq(1)->Dump, 		@diff 	) }  # 
 # # NAME
 # 
 # Liveman - компиллятор из markdown в тесты и документацию
 # 
 # # VERSION
 # 
-# 3.4
+# 3.7
 # 
 # # SYNOPSIS
 # 
@@ -25,19 +25,19 @@ my $liveman = Liveman->new(prove => 1);
 
 $liveman->transform("lib/Example.md");
 
-::is scalar do {$liveman->{count}}, scalar do{1}, '$liveman->{count}    # -> 1';
-::is scalar do {-f "t/example.t"}, scalar do{1}, '-f "t/example.t"     # -> 1';
-::is scalar do {-f "lib/Example.pod"}, scalar do{1}, '-f "lib/Example.pod" # -> 1';
+local ($::_g0 = do {$liveman->{count}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$liveman->{count}    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-f "t/example.t"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '-f "t/example.t"     # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-f "lib/Example.pod"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '-f "lib/Example.pod" # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 $liveman->transforms;
-::is scalar do {$liveman->{count}}, scalar do{0}, '$liveman->{count}   # -> 0';
+local ($::_g0 = do {$liveman->{count}}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$liveman->{count}   # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {Liveman->new(compile_force => 1)->transforms->{count}}, scalar do{1}, 'Liveman->new(compile_force => 1)->transforms->{count} # -> 1';
+local ($::_g0 = do {Liveman->new(compile_force => 1)->transforms->{count}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, 'Liveman->new(compile_force => 1)->transforms->{count} # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 my $prove_return_code = $liveman->tests->{exit_code};
 
-::is scalar do {$prove_return_code}, scalar do{0}, '$prove_return_code          # -> 0';
-::is scalar do {-f "cover_db/coverage.html"}, scalar do{1}, '-f "cover_db/coverage.html" # -> 1';
+local ($::_g0 = do {$prove_return_code}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$prove_return_code          # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-f "cover_db/coverage.html"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '-f "cover_db/coverage.html" # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPION
@@ -101,8 +101,8 @@ my $prove_return_code = $liveman->tests->{exit_code};
 # Сравнить два эквивалентных выражения:
 # 
 ::done_testing; }; subtest '`is`' => sub { 
-::is scalar do {"hi!"}, scalar do{"hi" . "!"}, '"hi!" # -> "hi" . "!"';
-::is scalar do {"hi!"}, scalar do{"hi" . "!"}, '"hi!" # → "hi" . "!"';
+local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '"hi!" # -> "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '"hi!" # → "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `is_deeply`
@@ -110,8 +110,8 @@ my $prove_return_code = $liveman->tests->{exit_code};
 # Сравнить два выражения для структур:
 # 
 ::done_testing; }; subtest '`is_deeply`' => sub { 
-::is_deeply scalar do {["hi!"]}, scalar do {["hi" . "!"]}, '["hi!"] # --> ["hi" . "!"]';
-::is_deeply scalar do {"hi!"}, scalar do {"hi" . "!"}, '"hi!" # ⟶ "hi" . "!"';
+local ($::_g0 = do {["hi!"]}, $::_e0 = do {["hi" . "!"]}); ::is_deeply $::_g0, $::_e0, '["hi!"] # --> ["hi" . "!"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::is_deeply $::_g0, $::_e0, '"hi!" # ⟶ "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `is` with extrapolate-string
@@ -120,8 +120,8 @@ my $prove_return_code = $liveman->tests->{exit_code};
 # 
 ::done_testing; }; subtest '`is` with extrapolate-string' => sub { 
 my $exclamation = "!";
-::is scalar do {"hi!2"}, "hi${exclamation}2", '"hi!2" # => hi${exclamation}2';
-::is scalar do {"hi!2"}, "hi${exclamation}2", '"hi!2" # ⇒ hi${exclamation}2';
+local ($::_g0 = do {"hi!2"}, $::_e0 = "hi${exclamation}2"); ::ok $::_g0 eq $::_e0, '"hi!2" # => hi${exclamation}2' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"hi!2"}, $::_e0 = "hi${exclamation}2"); ::ok $::_g0 eq $::_e0, '"hi!2" # ⇒ hi${exclamation}2' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `is` with nonextrapolate-string
@@ -129,8 +129,8 @@ my $exclamation = "!";
 # Сравнить выражение с неэкстраполированной строкой:
 # 
 ::done_testing; }; subtest '`is` with nonextrapolate-string' => sub { 
-::is scalar do {'hi${exclamation}3'}, 'hi${exclamation}3', '\'hi${exclamation}3\' # \> hi${exclamation}3';
-::is scalar do {'hi${exclamation}3'}, 'hi${exclamation}3', '\'hi${exclamation}3\' # ↦ hi${exclamation}3';
+local ($::_g0 = do {'hi${exclamation}3'}, $::_e0 = 'hi${exclamation}3'); ::ok $::_g0 eq $::_e0, '\'hi${exclamation}3\' # \> hi${exclamation}3' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'hi${exclamation}3'}, $::_e0 = 'hi${exclamation}3'); ::ok $::_g0 eq $::_e0, '\'hi${exclamation}3\' # ↦ hi${exclamation}3' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like`
@@ -138,8 +138,8 @@ my $exclamation = "!";
 # Скаляр должен быть сопостовим с регулярным выражением:
 # 
 ::done_testing; }; subtest '`like`' => sub { 
-::like scalar do {'abbc'}, qr{b+}, '\'abbc\' # ~> b+';
-::like scalar do {'abc'}, qr{b+}, '\'abc\'  # ↬ b+';
+::like scalar do {'abbc'}, qr{b+}, '\'abbc\' # ~> b+'; undef $::_g0; undef $::_e0;
+::like scalar do {'abc'}, qr{b+}, '\'abc\'  # ↬ b+'; undef $::_g0; undef $::_e0;
 
 # 
 # ### `unlike`
@@ -147,8 +147,8 @@ my $exclamation = "!";
 # В скаляре не должно быть совпадения с регулярным выражением:
 # 
 ::done_testing; }; subtest '`unlike`' => sub { 
-::unlike scalar do {'ac'}, qr{b+}, '\'ac\' # <~ b+';
-::unlike scalar do {'ac'}, qr{b+}, '\'ac\' # ↫ b+';
+::unlike scalar do {'ac'}, qr{b+}, '\'ac\' # <~ b+'; undef $::_g0; undef $::_e0;
+::unlike scalar do {'ac'}, qr{b+}, '\'ac\' # ↫ b+'; undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` begins with extrapolate-string
@@ -158,8 +158,8 @@ my $exclamation = "!";
 ::done_testing; }; subtest '`like` begins with extrapolate-string' => sub { 
 my $var = 'b';
 
-::cmp_ok scalar do {'abbc'}, '=~', '^' . quotemeta "a$var", '\'abbc\' # ^=> a$var';
-::cmp_ok scalar do {'abc'}, '=~', '^' . quotemeta "a$var", '\'abc\'  # ⤇ a$var';
+local ($::_g0 = do {'abbc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abbc\' # ^=> a$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abc\'  # ⤇ a$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` ends with extrapolate-string
@@ -169,8 +169,8 @@ my $var = 'b';
 ::done_testing; }; subtest '`like` ends with extrapolate-string' => sub { 
 my $var = 'c';
 
-::cmp_ok scalar do {'abbc'}, '=~', quotemeta("b$var") . '$', '\'abbc\' # $=> b$var';
-::cmp_ok scalar do {'abc'}, '=~', quotemeta("b$var") . '$', '\'abc\'  # ➾ b$var';
+local ($::_g0 = do {'abbc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abbc\' # $=> b$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abc\'  # ➾ b$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` inners with extrapolate-string
@@ -180,8 +180,8 @@ my $var = 'c';
 ::done_testing; }; subtest '`like` inners with extrapolate-string' => sub { 
 my $var = 'x';
 
-::cmp_ok scalar do {'abxc'}, '=~', quotemeta "b$var", '\'abxc\'  # *=> b$var';
-::cmp_ok scalar do {'abxs'}, '=~', quotemeta "b$var", '\'abxs\'  # ⥴ b$var';
+local ($::_g0 = do {'abxc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0, '\'abxc\'  # *=> b$var' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abxs'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0, '\'abxs\'  # ⥴ b$var' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` begins with nonextrapolate-string
@@ -189,8 +189,8 @@ my $var = 'x';
 # Скаляр должен начинаться неэкстраполированой срокой:
 # 
 ::done_testing; }; subtest '`like` begins with nonextrapolate-string' => sub { 
-::cmp_ok scalar do {'abbc'}, '=~', '^' . quotemeta 'ab', '\'abbc\' # ^-> ab';
-::cmp_ok scalar do {'abc'}, '=~', '^' . quotemeta 'ab', '\'abc\'  # ↣ ab';
+local ($::_g0 = do {'abbc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abbc\' # ^-> ab' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abc\'  # ↣ ab' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` ends with nonextrapolate-string
@@ -198,8 +198,8 @@ my $var = 'x';
 # Скаляр должен заканчиваться неэкстраполированой срокой:
 # 
 ::done_testing; }; subtest '`like` ends with nonextrapolate-string' => sub { 
-::cmp_ok scalar do {'abbc'}, '=~', quotemeta('bc') . '$', '\'abbc\' # $-> bc';
-::cmp_ok scalar do {'abc'}, '=~', quotemeta('bc') . '$', '\'abc\'  # ⇥ bc';
+local ($::_g0 = do {'abbc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abbc\' # $-> bc' or ::diag ::string_diff($::_g0, $::_e0, -1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abc\'  # ⇥ bc' or ::diag ::string_diff($::_g0, $::_e0, -1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` inners with nonextrapolate-string
@@ -207,8 +207,8 @@ my $var = 'x';
 # Скаляр должен содержать неэкстраполированую сроку:
 # 
 ::done_testing; }; subtest '`like` inners with nonextrapolate-string' => sub { 
-::cmp_ok scalar do {'abbc'}, '=~', quotemeta 'bb', '\'abbc\' # *-> bb';
-::cmp_ok scalar do {'abc'}, '=~', quotemeta 'b', '\'abc\'  # ⥵ b';
+local ($::_g0 = do {'abbc'}, $::_e0 = 'bb'); ::ok $::_g0 =~ quotemeta $::_e0, '\'abbc\' # *-> bb' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = 'b'); ::ok $::_g0 =~ quotemeta $::_e0, '\'abc\'  # ⥵ b' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` throw begins with nonextrapolate-string
@@ -216,8 +216,8 @@ my $var = 'x';
 # Исключение должно начинаться с неэкстраполированой сроки:
 # 
 ::done_testing; }; subtest '`like` throw begins with nonextrapolate-string' => sub { 
-eval {1/0}; ok defined($@), '1/0 # @-> Illegal division by zero'; ::cmp_ok $@, '=~', '^' . quotemeta 'Illegal division by zero', '1/0 # @-> Illegal division by zero';
-eval {1/0}; ok defined($@), '1/0 # ↯ Illegal division by zero'; ::cmp_ok $@, '=~', '^' . quotemeta 'Illegal division by zero', '1/0 # ↯ Illegal division by zero';
+eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # @-> Illegal division by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # ↯ Illegal division by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` throw begins with extrapolate-string
@@ -227,8 +227,8 @@ eval {1/0}; ok defined($@), '1/0 # ↯ Illegal division by zero'; ::cmp_ok $@, '
 ::done_testing; }; subtest '`like` throw begins with extrapolate-string' => sub { 
 my $by = 'by';
 
-eval {1/0}; ok defined($@), '1/0 # @=> Illegal division $by zero'; ::cmp_ok $@, '=~', '^' . quotemeta "Illegal division $by zero", '1/0 # @=> Illegal division $by zero';
-eval {1/0}; ok defined($@), '1/0 # ⤯ Illegal division $by zero'; ::cmp_ok $@, '=~', '^' . quotemeta "Illegal division $by zero", '1/0 # ⤯ Illegal division $by zero';
+eval {1/0}; local ($::_g0 = $@, $::_e0 = "Illegal division $by zero"); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # @=> Illegal division $by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = "Illegal division $by zero"); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # ⤯ Illegal division $by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` throw
@@ -236,8 +236,8 @@ eval {1/0}; ok defined($@), '1/0 # ⤯ Illegal division $by zero'; ::cmp_ok $@, 
 # Исключение должно быть сопостовимо с регулярным выражением:
 # 
 ::done_testing; }; subtest '`like` throw' => sub { 
-eval {1/0}; ok defined($@), '1/0 # @~> division\s*by\s*zero'; ::like scalar $@, qr{division\s*by\s*zero}, '1/0 # @~> division\s*by\s*zero';
-eval {1/0}; ok defined($@), '1/0 # ⇝ division\s*by\s*zero'; ::like scalar $@, qr{division\s*by\s*zero}, '1/0 # ⇝ division\s*by\s*zero';
+eval {1/0}; local ($::_g0 = $@, $::_e0 = qr{division\s*by\s*zero}); ok defined($::_g0) && $::_g0 =~ $::_e0, '1/0 # @~> division\s*by\s*zero' or ::diag defined($::_g0)? "Got:$::_g0": 'Got is undef'; undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = qr{division\s*by\s*zero}); ok defined($::_g0) && $::_g0 =~ $::_e0, '1/0 # ⇝ division\s*by\s*zero' or ::diag defined($::_g0)? "Got:$::_g0": 'Got is undef'; undef $::_g0; undef $::_e0;
 
 # 
 # ### `unlike` throw
@@ -245,8 +245,8 @@ eval {1/0}; ok defined($@), '1/0 # ⇝ division\s*by\s*zero'; ::like scalar $@, 
 # Исключение не должно быть сопостовимо с регулярным выражением (но оно должно иметь место):
 # 
 ::done_testing; }; subtest '`unlike` throw' => sub { 
-eval {1/0}; ok defined($@), '1/0 # <~@ auto'; ::unlike scalar $@, qr{auto}, '1/0 # <~@ auto';
-eval {1/0}; ok defined($@), '1/0 # ⇜ auto'; ::unlike scalar $@, qr{auto}, '1/0 # ⇜ auto';
+eval {1/0}; local ($::_g0 = $@, $::_e0 = qr{auto}); ok defined($::_g0) && $::_g0 !~ $::_e0, '1/0 # <~@ auto' or ::diag defined($::_g0)? "Got:$::_g0": 'Got is undef'; undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = qr{auto}); ok defined($::_g0) && $::_g0 !~ $::_e0, '1/0 # ⇜ auto' or ::diag defined($::_g0)? "Got:$::_g0": 'Got is undef'; undef $::_g0; undef $::_e0;
 
 # 
 # ## EMBEDDING FILES
@@ -290,7 +290,7 @@ eval {1/0}; ok defined($@), '1/0 # ⇜ auto'; ::unlike scalar $@, qr{auto}, '1/0
 # Получить путь к `t/**.t`-файлу из пути к `lib/**.md`-файлу:
 # 
 ::done_testing; }; subtest 'test_path ($md_path)' => sub { 
-::is scalar do {Liveman->new->test_path("lib/PathFix/RestFix.md")}, "t/path-fix/rest-fix.t", 'Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t';
+local ($::_g0 = do {Liveman->new->test_path("lib/PathFix/RestFix.md")}, $::_e0 = "t/path-fix/rest-fix.t"); ::ok $::_g0 eq $::_e0, 'Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## transform ($md_path, [$test_path])

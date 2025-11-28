@@ -4,12 +4,14 @@ use utf8;
 
 use Test::More tests => 9;
 require bytes;
+use Encode qw( encode );
 use File::Basename;
 use lib dirname(__FILE__) . '\lib';
 
 BEGIN {
   use_ok 'TestConsole', qw( GetConsoleOutputHandle );
   use_ok 'Win32API::Console', qw(
+    GetConsoleOutputCP
     SetConsoleCursorPosition
     WriteConsoleOutputAttribute
     ReadConsoleOutputAttribute
@@ -61,7 +63,7 @@ SKIP: {
   };
 
   subtest 'WriteConsoleOutputCharacterA / ReadConsoleOutputCharacterA' => sub {
-    my $text  = "Gruß";
+    my $text  = Encode::ANSI::encode("Gruß", GetConsoleOutputCP());
     my $coord = COORD(0,0);
     my $written;
 
@@ -86,7 +88,8 @@ SKIP: {
   };
 
   subtest 'WriteConsoleOutputCharacterW / ReadConsoleOutputCharacterW' => sub {
-    my $text  = "Olá";
+    my $text = encode('UTF-16LE', "Olá");
+    my $length = bytes::length($text) >> 1;
     my $coord = COORD(0,1);
     my $written;
 
@@ -95,13 +98,13 @@ SKIP: {
     ok($r, 'WriteConsoleOutputCharacterW call succeeded');
     is(
       $written, 
-      length($text), 
+      $length, 
       'WriteConsoleOutputCharacterW wrote correct number of characters'
     );
 
     my ($chars, $read);
-    $r = ReadConsoleOutputCharacterW($hConsole, \$chars, length($text), 
-      $coord, \$read);
+    $r = ReadConsoleOutputCharacterW($hConsole, \$chars, $length, $coord, 
+      \$read);
     diag "$^E" if $^E;
     ok($r, 'ReadConsoleOutputCharacterW call succeeded');
     is($chars, $text, 'ReadConsoleOutputCharacterW returned expected text');

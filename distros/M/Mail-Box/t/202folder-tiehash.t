@@ -7,24 +7,24 @@
 use strict;
 use warnings;
 
-use Mail::Box::Test;
-use Mail::Box::Mbox;
-use Mail::Box::Tie::HASH;
-use Mail::Message::Construct;
+use Mail::Box::Mbox           ();
+use Mail::Box::Tie::HASH      ();
+use Mail::Message::Construct  ();
 
-use Test::More tests => 101;
+use Mail::Box::Test;
+use Test::More;
 
 #
 # The folder is read.
 #
 
-my $folder = Mail::Box::Mbox->new
-  ( folder    => $src
-  , folderdir => 't'
-  , lock_type => 'NONE'
-  , extract   => 'ALWAYS'
-  , access    => 'rw'
-  );
+my $folder = Mail::Box::Mbox->new(
+	folder    => $src,
+	folderdir => 't',
+	lock_type => 'NONE',
+	extract   => 'ALWAYS',
+	access    => 'r',
+);
 
 ok(defined $folder);
 
@@ -64,4 +64,5 @@ cmp_ok($folder->messages , "==",  46);
 cmp_ok(keys %folder , "==",  45);
 
 $folder->close(write => 'NEVER');
-exit 0;
+
+done_testing;

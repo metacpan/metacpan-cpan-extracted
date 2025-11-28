@@ -7,6 +7,8 @@ Delete all blank rows that do not contain any data or other objects.
 
 - **Base URL**: `http://api.aspose.cloud/v4.0`
 - **Authentication Method**: `JWT (OAuth2, application)`  **Token URL**: `https://api.aspose.cloud/connect/token`
+- **Example** 
+
 ## **Interface Details**
 
 ### **Endpoint** 

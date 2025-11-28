@@ -4,6 +4,8 @@ author:
   - 'Mark Overmeer'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -31,16 +33,52 @@ requires:
   File::Spec: '0.7'
   File::Temp: '0'
   IO::Scalar: '0'
-  Mail::Message: '3.013'
-  Mail::Transport: '3.003'
-  Object::Realize::Later: '0.19'
+  Mail::Message: '>= 3.013, < 4.0'
+  Mail::Transport: '>= 3.003, < 4.0'
+  Object::Realize::Later: '>= 0.19, < 4.0'
   POSIX: '0'
   Scalar::Util: '1.13'
   Sys::Hostname: '0'
-  Test::More: '0.47'
 resources:
+  bugtracker: https://github.com/markov2/perl5-Mail-Box/issues
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Box.git
-version: '3.011'
+version: '3.012'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2001
+  generate:
+    -
+      format: pod3
+      podtail: ~
+    -
+      docroot: /mailbox/html
+      format: html
+      publish: ../public_html/mail-box/htmlpkg
+      stylesheet: /oodoc.css
+      templates: html
+      webpages: ../public_html/mailbox/html
+  include:
+    - ../HTML-FromMail
+    - ../MIME-Types
+    - ../Mail-Box-IMAP4
+    - ../Mail-Box-POP3
+    - ../Mail-Box-Parser-C
+    - ../Mail-Message
+    - ../Mail-Transport
+    - ../MailTools
+    - ../Object-Realize-Later
+    - ../User-Identity
+    - /p/MailDbx
+  oodoc_version: 3.05
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/mail-box/raw
+  release:
+    publish: ../public_html/mail-box/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

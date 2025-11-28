@@ -46,10 +46,8 @@ folder $top, "f1", $0;
 folder $top, "f2";
 
 {   # Create an empty file.
-    my $f = IO::File->new(File::Spec->catfile($top,'f3'), 'w')
-        or die "Empty? $top/f3: $!";
-
-    $f->close;
+    open my $fh, '>:raw', File::Spec->catfile($top,'f3') or die "Empty? $top/f3: $!";
+    $fh->close;
 }
 
 my $dir = dir $top, "sub1";
@@ -65,9 +63,9 @@ folder $dir, "f4f1";
 folder $dir, "f4f2";
 folder $dir, "f4f3";
 
-my $success =
-   compare_lists [ sort Mail::Box::Mbox->listSubFolders(folderdir => $top) ]
-          , [ qw/f1 f2 f3 f4 sub1 sub2/ ];
+my $success = compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folderdir => $top) ],
+	[ qw/f1 f2 f3 f4 sub1 sub2/ ];
 
 ok($success,                            'Initial tree creation');
 unless($success)
@@ -78,42 +76,29 @@ unless($success)
     exit 1;
 }
 
-ok(compare_lists [ sort Mail::Box::Mbox->listSubFolders(folderdir => $top) ]
-          , [ qw/f1 f2 f3 f4 sub1 sub2/ ]
-  );
+ok compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folderdir => $top) ],
+	[ qw/f1 f2 f3 f4 sub1 sub2/ ];
 
-ok(compare_lists [ sort Mail::Box::Mbox->listSubFolders
-                     ( folderdir  => $top
-                     , skip_empty => 1
-                     ) ]
-          , [ qw/f1 f2 f4 sub1/ ]
-  );
+ok compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folderdir => $top, skip_empty => 1) ],
+	[ qw/f1 f2 f4 sub1/ ];
 
-ok(compare_lists [ sort Mail::Box::Mbox->listSubFolders
-                     ( folderdir  => $top
-                     , check      => 1
-                     ) ]
-          , [ qw/f2 f3 f4 sub1 sub2/ ]
-  );
+ok compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folderdir => $top, check => 1) ],
+	[ qw/f2 f3 f4 sub1 sub2/ ];
 
-ok(compare_lists [ sort Mail::Box::Mbox->listSubFolders
-                     ( folderdir  => File::Spec->catfile($top, "f4.d")
-                     ) ]
-          , [ qw/f4f1 f4f2 f4f3/ ]
-  );
+ok compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folderdir => File::Spec->catfile($top, "f4.d")) ],
+	[ qw/f4f1 f4f2 f4f3/ ];
 
-ok(compare_lists [ sort Mail::Box::Mbox->listSubFolders
-                     ( folderdir  => $top
-                     , folder     => "=f4.d"
-                     )
-            ]
-          , [ qw/f4f1 f4f2 f4f3/ ]
-  );
+ok compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folderdir => $top, folder => "=f4.d") ],
+	[ qw/f4f1 f4f2 f4f3/ ];
 
-ok(compare_lists [ sort Mail::Box::Mbox->listSubFolders
-                     ( folder => File::Spec->catfile($top, "f4")) ]
-          , [ qw/f4f1 f4f2 f4f3/ ]
-  );
+ok compare_lists
+	[ sort Mail::Box::Mbox->listSubFolders(folder => File::Spec->catfile($top, "f4")) ],
+	[ qw/f4f1 f4f2 f4f3/ ];
 
 #
 # Open a folder in a sub-dir which uses the extention.

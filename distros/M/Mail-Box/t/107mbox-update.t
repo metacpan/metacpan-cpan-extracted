@@ -34,29 +34,26 @@ my $folder = $mgr->open
   ( folder    => "=$cpyfn"
   , folderdir => $workdir
   , @fopts
-  );
+  ) or die "Couldn't read $cpy: $!\n";
 
-die "Couldn't read $cpy: $!\n"
-    unless $folder;
-
-cmp_ok($folder->messages, "==", 45);
+cmp_ok $folder->messages, "==", 45;
 
 my $msg = Mail::Message->build
- ( From => 'me', To => 'you', Subject => 'Hello!'
- , data => [ "one line\n" ]
- );
-ok(defined $msg);
+  ( From => 'me', To => 'you', Subject => 'Hello!'
+  , data => [ "one line\n" ]
+  );
+ok defined $msg;
 
 my $filename = $folder->filename;
-die "Cannot open $filename: $!"
-   unless open OUT, '>>', $filename;
+open my $out, '>>', $filename
+    or die "Cannot open $filename: $!";
 
-print OUT $msg->head->createFromLine;
-$msg->print(\*OUT);
-close OUT;
+$out->print($msg->head->createFromLine);
+$msg->print($out);
+$out->close;
 
-cmp_ok($folder->messages, "==", 45);
+cmp_ok $folder->messages, "==", 45;
 $folder->update;
-cmp_ok($folder->messages, "==", 46);
+cmp_ok $folder->messages, "==", 46;
 
 $folder->close;

@@ -61,13 +61,10 @@ sub new {
 
 # Run Operation Request
 # RemoveCharactersRequest.Spreadsheet : Upload spreadsheet file.  ,
-# RemoveCharactersRequest.theFirstNCharacters : Specify removing the first n characters from selected cells.  ,
-# RemoveCharactersRequest.theLastNCharacters : Specify removing the last n characters from selected cells.  ,
-# RemoveCharactersRequest.allCharactersBeforeText : Specify using targeted removal options to delete text that is located before certain characters.  ,
-# RemoveCharactersRequest.allCharactersAfterText : Specify using targeted removal options to delete text that is located after certain characters.  ,
 # RemoveCharactersRequest.removeTextMethod : Specify the removal of text method type.  ,
 # RemoveCharactersRequest.characterSets : Specify the character sets.  ,
 # RemoveCharactersRequest.removeCustomValue : Specify the remove custom value.  ,
+# RemoveCharactersRequest.caseSensitive :   ,
 # RemoveCharactersRequest.worksheet : Specify the worksheet of spreadsheet.  ,
 # RemoveCharactersRequest.range : Specify the worksheet range of spreadsheet.  ,
 # RemoveCharactersRequest.outPath : (Optional) The folder path where the workbook is stored. The default is null.  ,
@@ -84,7 +81,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'remove_characters' } = { 
-    	summary => 'Perform operations or delete any custom characters, character sets, and substrings within a selected range for a specific position.',
+    	summary => 'Deletes user-defined characters, predefined symbol sets, or any substring from every cell in the chosen range while preserving formulas, formatting and data-validation.',
         params => $params,
         returns => 'string',
     };
@@ -110,22 +107,6 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('multipart/form-data');
  
-    if(defined $self->the_first_n_characters){
-        $query_params->{'theFirstNCharacters'} = $client->to_query_value($self->the_first_n_characters);      
-    }
-
-    if(defined $self->the_last_n_characters){
-        $query_params->{'theLastNCharacters'} = $client->to_query_value($self->the_last_n_characters);      
-    }
-
-    if(defined $self->all_characters_before_text){
-        $query_params->{'allCharactersBeforeText'} = $client->to_query_value($self->all_characters_before_text);      
-    }
-
-    if(defined $self->all_characters_after_text){
-        $query_params->{'allCharactersAfterText'} = $client->to_query_value($self->all_characters_after_text);      
-    }
-
     if(defined $self->remove_text_method){
         $query_params->{'removeTextMethod'} = $client->to_query_value($self->remove_text_method);      
     }
@@ -136,6 +117,10 @@ sub run_http_request {
 
     if(defined $self->remove_custom_value){
         $query_params->{'removeCustomValue'} = $client->to_query_value($self->remove_custom_value);      
+    }
+
+    if(defined $self->case_sensitive){
+        $query_params->{'caseSensitive'} = $client->to_query_value($self->case_sensitive);      
     }
 
     if(defined $self->worksheet){
@@ -186,34 +171,6 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'the_first_n_characters' => {
-     	datatype => 'int',
-     	base_name => 'theFirstNCharacters',
-     	description => 'Specify removing the first n characters from selected cells.',
-     	format => '',
-     	read_only => '',
-     		},
-     'the_last_n_characters' => {
-     	datatype => 'int',
-     	base_name => 'theLastNCharacters',
-     	description => 'Specify removing the last n characters from selected cells.',
-     	format => '',
-     	read_only => '',
-     		},
-     'all_characters_before_text' => {
-     	datatype => 'string',
-     	base_name => 'allCharactersBeforeText',
-     	description => 'Specify using targeted removal options to delete text that is located before certain characters.',
-     	format => '',
-     	read_only => '',
-     		},
-     'all_characters_after_text' => {
-     	datatype => 'string',
-     	base_name => 'allCharactersAfterText',
-     	description => 'Specify using targeted removal options to delete text that is located after certain characters.',
-     	format => '',
-     	read_only => '',
-     		},
      'remove_text_method' => {
      	datatype => 'string',
      	base_name => 'removeTextMethod',
@@ -232,6 +189,13 @@ __PACKAGE__->method_documentation({
      	datatype => 'string',
      	base_name => 'removeCustomValue',
      	description => 'Specify the remove custom value.',
+     	format => '',
+     	read_only => '',
+     		},
+     'case_sensitive' => {
+     	datatype => 'string',
+     	base_name => 'caseSensitive',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -282,13 +246,10 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'spreadsheet' => 'Spreadsheet',
-    'the_first_n_characters' => 'theFirstNCharacters',
-    'the_last_n_characters' => 'theLastNCharacters',
-    'all_characters_before_text' => 'allCharactersBeforeText',
-    'all_characters_after_text' => 'allCharactersAfterText',
     'remove_text_method' => 'removeTextMethod',
     'character_sets' => 'characterSets',
     'remove_custom_value' => 'removeCustomValue',
+    'case_sensitive' => 'caseSensitive',
     'worksheet' => 'worksheet',
     'range' => 'range',
     'out_path' => 'outPath',

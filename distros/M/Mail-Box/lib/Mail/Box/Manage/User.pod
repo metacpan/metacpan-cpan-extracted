@@ -15,18 +15,18 @@ Mail::Box::Manage::User - manage the folders of a user
 
 =head1 SYNOPSIS
 
- use Mail::Box::Manage::User;
- use User::Identity;
+  use Mail::Box::Manage::User;
+  use User::Identity;
 
- my $id      = User::Identity->new(...);
- my $user    = Mail::Box::Manage::User->new
-   ( identity  => $id
-   , folderdir => "$ENV{HOME}/Mail"
-   , inbox     => $ENV{MAIL}
-   );
+  my $id      = User::Identity->new(...);
+  my $user    = Mail::Box::Manage::User->new(
+    identity  => $id,
+    folderdir => "$ENV{HOME}/Mail",
+    inbox     => $ENV{MAIL},
+  );
 
- my $inbox   = $user->open($user->inbox);
- my $top     = $user->topfolder;
+  my $inbox   = $user->open($user->inbox);
+  my $top     = $user->topfolder;
 
 =head1 DESCRIPTION
 
@@ -36,21 +36,22 @@ same time, it will try to cache some information about that person's
 folder files.
 
 Extends L<"DESCRIPTION" in Mail::Box::Manager|Mail::Box::Manager/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Mail::Box::Manager|Mail::Box::Manager/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Mail::Box::Manager|Mail::Box::Manager/"Constructors">.
- 
+
 =over 4
 
-=item Mail::Box::Manage::User-E<gt>B<new>($args)
+=item $class-E<gt>B<new>(%options)
 
 Use L<new(default_folder_type)|Mail::Box::Manager/"METHODS"> to explicitly state which kind of folders
 you use.
+Improves base, see L<Mail::Reporter/"Constructors">
 
  -Option             --Defined in        --Default
   autodetect           Mail::Box::Manager  undef
@@ -69,13 +70,13 @@ you use.
 
 =over 2
 
-=item autodetect => TYPE|ARRAY-OF-TYPES
+=item autodetect => $type|\@types
 
-=item collection_type => CLASS
+=item collection_type => $class
 
 Subfolders grouped together.
 
-=item default_folder_type => NAME|CLASS
+=item default_folder_type => $type|CLASS
 
 =item delimiter => STRING
 
@@ -84,7 +85,7 @@ same as your directory system is using.
 
 =item folder_id_type => CLASS|OBJECT
 
-=item folder_types => NEW-TYPE | ARRAY-OF-NEW-TYPES
+=item folder_types => $typedef|\@typedefs
 
 =item folderdir => DIRECTORY
 
@@ -96,16 +97,15 @@ The main difference between the L<Mail::Box::Manager|Mail::Box::Manager> and thi
 the concept of some person (or virtual person) who's files are being
 administered by this object.  The OBJECT is an L<User::Identity|User::Identity>.
 
-The smallest identity that will do:
-C<< my $id = User::Identity->new('myname') >>
+The smallest identity that will do: C<< my $id = User::Identity->new('myname') >>
 
-=item inbox => NAME
+=item inbox => $name
 
-The name of the user's inbox.
+The C<$name> of the user's inbox.
 
 =item log => LEVEL
 
-=item topfolder_name => STRING
+=item topfolder_name => $name
 
 =item trace => LEVEL
 
@@ -116,10 +116,18 @@ The name of the user's inbox.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Box::Manager|Mail::Box::Manager/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<defaultFolderType>()
+
+Inherited, see L<Mail::Box::Manager/"Attributes">
+
+=item $obj-E<gt>B<delimiter>()
+
+Folder path delimiter
+
+=item $obj-E<gt>B<folderTypeDefs>()
 
 Inherited, see L<Mail::Box::Manager/"Attributes">
 
@@ -137,27 +145,39 @@ Returns a L<User::Identity|User::Identity> object.
 
 =item $obj-E<gt>B<inbox>( [$name] )
 
-(Set and) get the $name of the mailbox which is considered the folder
+(Set and) get the C<$name> of the mailbox which is considered the folder
 for incoming mail.  In many protocols, this folder is handled separately.
 For instance in IMAP this is the only case-insensitive folder name.
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<registerType>($type, $class, %options)
 
 Inherited, see L<Mail::Box::Manager/"Attributes">
+
+=item $obj-E<gt>B<threads>( [@params] )
+
+Inherited, see L<Mail::Box::Manager/"Attributes">
+
+=item $obj-E<gt>B<topfolder>()
+
+Returns the top folder of the user's mailbox storage.
 
 =back
 
 =head2 Manage open folders
 
 Extends L<"Manage open folders" in Mail::Box::Manager|Mail::Box::Manager/"Manage open folders">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<close>($folder, %options)
 
 Inherited, see L<Mail::Box::Manager/"Manage open folders">
 
-=item $obj-E<gt>B<closeAllFolders>(, %options)
+=item $obj-E<gt>B<closeAllFolders>(%options)
 
 Inherited, see L<Mail::Box::Manager/"Manage open folders">
 
@@ -178,123 +198,22 @@ Inherited, see L<Mail::Box::Manager/"Manage open folders">
 =head2 Manage existing folders
 
 Extends L<"Manage existing folders" in Mail::Box::Manager|Mail::Box::Manager/"Manage existing folders">.
- 
-=head2 Manage folders
-
-=over 4
-
-=item $obj-E<gt>B<create>($name, %options)
-
-Creates a new folder with the specified name.  An folder's administrative
-structure (L<Mail::Box::Identity|Mail::Box::Identity>) is returned, but the folder is not
-opened.
-
-In the accidental case that the folder already
-exists, a warning will be issued, and an empty list/undef returned.
-
-The %options are passed to L<Mail::Box::create()|Mail::Box/"Internals"> of your default folder
-type, except for the options intended for this method itself.
-
- -Option       --Default
-  create_real    <true>
-  create_supers  <false>
-  deleted        <false>
-  id_options     []
-
-=over 2
-
-=item create_real => BOOLEAN
-
-When this option is false, the pysical folder will not be created, but
-only the administration is updated.
-
-=item create_supers => BOOLEAN
-
-When you create a folder where upper hierarchy level are missing, they
-will be created as well.
-
-=item deleted => BOOLEAN
-
-The folder starts as deleted.
-
-=item id_options => ARRAY
-
-Values passed to the instantiated L<Mail::Box::Identity|Mail::Box::Identity>.  That object
-is very picky about the initiation values it accepts.
-
-=back
-
-=item $obj-E<gt>B<delete>($name)
-
-Remove all signs from the folder on the file-system.  Messages still in
-the folder will be removed.  This method returns a true value when the
-folder has been removed or not found, so "false" means failure.
-
-It is also possible to delete a folder using C<< $folder->delete >>,
-which will call this method here.  OPTIONS, which are used for some
-other folder types, will be ignored here: the user's index contains the
-required details.
-
- -Option   --Defined in        --Default
-  recursive  Mail::Box::Manager  <folder's default>
-
-=over 2
-
-=item recursive => BOOLEAN
-
-=back
-
-example: how to delete a folder
-
- print "no xyz (anymore)\n" if $user->delete('xyz');
-
-=item $obj-E<gt>B<folder>($name)
-
-Returns the folder description, a L<Mail::Box::Identity|Mail::Box::Identity>.
-
-=item $obj-E<gt>B<folderCollection>($name)
-
-Returns a pair: the folder collection (L<Mail::Box::Collection|Mail::Box::Collection>) and
-the base name of $name.
-
-=item $obj-E<gt>B<rename>($oldname, $newname, %options)
-
-Rename the folder with name $oldname to $newname.  Both names are full
-pathnames.
-
- -Option       --Default
-  create_supers  <false>
-
-=over 2
-
-=item create_supers => BOOLEAN
-
-When you rename a folder to a place where upper hierarchy levels are
-missing, they will get be defined, but with the deleted flag set.
-
-=back
-
-=item $obj-E<gt>B<topfolder>()
-
-Returns the top folder of the user's mailbox storage.
-
-=back
 
 =head2 Move messages to folders
 
 Extends L<"Move messages to folders" in Mail::Box::Manager|Mail::Box::Manager/"Move messages to folders">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<appendMessage>( [$folder|$foldername], $messages, %options )
 
 Inherited, see L<Mail::Box::Manager/"Move messages to folders">
 
-=item $obj-E<gt>B<copyMessage>( [$folder|$foldername], $messages, %options )
+=item $obj-E<gt>B<copyMessage>( [$folder|$foldername], @messages, %options )
 
 Inherited, see L<Mail::Box::Manager/"Move messages to folders">
 
-=item $obj-E<gt>B<moveMessage>( [$folder|$foldername], $messages, %options )
+=item $obj-E<gt>B<moveMessage>( [$folder|$foldername], @messages, %options )
 
 Inherited, see L<Mail::Box::Manager/"Move messages to folders">
 
@@ -303,10 +222,10 @@ Inherited, see L<Mail::Box::Manager/"Move messages to folders">
 =head2 Manage message threads
 
 Extends L<"Manage message threads" in Mail::Box::Manager|Mail::Box::Manager/"Manage message threads">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<threads>( [$folders], %options )
+=item $obj-E<gt>B<discoverThreads>( [@folders], %options )
 
 Inherited, see L<Mail::Box::Manager/"Manage message threads">
 
@@ -315,7 +234,7 @@ Inherited, see L<Mail::Box::Manager/"Manage message threads">
 =head2 Internals
 
 Extends L<"Internals" in Mail::Box::Manager|Mail::Box::Manager/"Internals">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<decodeFolderURL>($url)
@@ -335,7 +254,7 @@ Inherited, see L<Mail::Box::Manager/"Internals">
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Box::Manager|Mail::Box::Manager/"Error handling">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -346,9 +265,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-=item Mail::Box::Manage::User-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -356,19 +273,11 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<log>( [$level, [$strings]] )
-
-=item Mail::Box::Manage::User-E<gt>B<log>( [$level, [$strings]] )
+=item $any-E<gt>B<log>( [$level, [$strings]] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logPriority>($level)
-
-=item Mail::Box::Manage::User-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<logSettings>()
+=item $any-E<gt>B<logPriority>($level)
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -397,7 +306,7 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =head2 Cleanup
 
 Extends L<"Cleanup" in Mail::Box::Manager|Mail::Box::Manager/"Cleanup">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<DESTROY>()
@@ -406,10 +315,108 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =back
 
+=head2 Manage folders
+
+=over 4
+
+=item $obj-E<gt>B<create>($name, %options)
+
+Creates a new folder with the specified name.  An folder's administrative
+structure (L<Mail::Box::Identity|Mail::Box::Identity>) is returned, but the folder is not
+opened.
+
+In the accidental case that the folder already
+exists, a warning will be issued, and an empty list/C<undef> returned.
+
+The C<%options> are passed to L<Mail::Box::create()|Mail::Box/"Internals"> of your default folder
+type, except for the options intended for this method itself.
+
+ -Option       --Default
+  create_real    true
+  create_supers  false
+  deleted        false
+  id_options     []
+
+=over 2
+
+=item create_real => BOOLEAN
+
+When this option is C<false>, the pysical folder will not be created, but
+only the administration is updated.
+
+=item create_supers => BOOLEAN
+
+When you create a folder where upper hierarchy level are missing, they
+will be created as well.
+
+=item deleted => BOOLEAN
+
+The folder starts as deleted.
+
+=item id_options => ARRAY
+
+Values passed to the instantiated L<Mail::Box::Identity|Mail::Box::Identity>.  That object
+is very picky about the initiation values it accepts.
+
+=back
+
+=item $obj-E<gt>B<delete>($name)
+
+Remove all signs from the folder on the file-system.  Messages still in
+the folder will be removed.  This method returns a C<true> value when the
+folder has been removed or not found, so "C<false>" means failure.
+
+It is also possible to delete a folder using C<< $folder->delete >>,
+which will call this method here.  OPTIONS, which are used for some
+other folder types, will be ignored here: the user's index contains the
+required details.
+Improves base, see L<Mail::Box::Manager/"Manage existing folders">
+
+ -Option   --Defined in        --Default
+  recursive  Mail::Box::Manager  <folder's default>
+
+=over 2
+
+=item recursive => BOOLEAN
+
+=back
+
+» example: how to delete a folder
+
+  print "no xyz (anymore)\n" if $user->delete('xyz');
+
+=item $obj-E<gt>B<folder>($name)
+
+Returns the folder description, a L<Mail::Box::Identity|Mail::Box::Identity>.
+
+=item $obj-E<gt>B<folderCollection>($name)
+
+Returns a pair: the folder collection (L<Mail::Box::Collection|Mail::Box::Collection>) and
+the base name of C<$name>.
+
+=item $obj-E<gt>B<rename>($oldname, $newname, %options)
+
+Rename the folder with name C<$oldname> to C<$newname>.  Both names are full
+pathnames.
+
+ -Option       --Default
+  create_supers  false
+
+=over 2
+
+=item create_supers => BOOLEAN
+
+When you rename a folder to a place where upper hierarchy levels are
+missing, they will get be defined, but with the deleted flag set.
+
+=back
+
+=back
+
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::Manager|Mail::Box::Manager/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -418,11 +425,13 @@ Extends L<"DETAILS" in Mail::Box::Manager|Mail::Box::Manager/"DETAILS">.
 
 Unless you set L<create(create_supers)|Mail::Box::Manage::User/"Manage folders">, all higher level folders must
 exist before this new one can be created.
+Cast by C<create()>
 
 =item Error: Cannot rename $name to $new: higher levels missing
 
 Unless you set L<create(create_supers)|Mail::Box::Manage::User/"Manage folders">, all higher level folders must
 exist before this new one can be created.
+Cast by C<rename()>
 
 =item Error: Folder $name is already open.
 
@@ -431,12 +440,14 @@ older releases (before MailBox 2.049), this was permitted, but then
 behaviour changed, because many nasty side-effects are to be expected.
 For instance, an L<Mail::Box::update()|Mail::Box/"The folder"> on one folder handle would
 influence the second, probably unexpectedly.
+Cast by C<open()>
 
 =item Error: Folder $name is not a Mail::Box; cannot add a message.
 
 The folder where the message should be appended to is an object which is
 not a folder type which extends L<Mail::Box|Mail::Box>.  Probably, it is not a folder
 at all.
+Cast by C<appendMessage()>
 
 =item Warning: Folder does not exist, failed opening $type folder $name.
 
@@ -450,6 +461,7 @@ to explicitly state the type of your folder with the C<type> option.
 There will probably be another warning or error message which is related
 to this report and provides more details about its cause.  You may also
 have a look at L<new(autodetect)|Mail::Box::Manager/"METHODS"> and L<new(folder_types)|Mail::Box::Manager/"METHODS">.
+Cast by C<open()>
 
 =item Warning: Folder type $type is unknown, using autodetect.
 
@@ -458,19 +470,22 @@ the folder name when specified as url) is not known to the manager.
 This may mean that you forgot to require the L<Mail::Box|Mail::Box> extension
 which implements this folder type, but probably it is a typo.  Usually,
 the manager is able to figure-out which type to use by itself.
+Cast by C<open()>
 
 =item Error: Illegal folder URL '$url'.
 
 The folder name was specified as URL, but not according to the syntax.
 See L<decodeFolderURL()|Mail::Box::Manager/"Internals"> for an description of the syntax.
+Cast by C<open()>
 
 =item Error: No foldername specified to open.
 
-C<open()> needs a folder name as first argument (before the list of options),
+L<open()|Mail::Box::Manager/"Manage open folders"> needs a folder name as first argument (before the list of options),
 or with the C<folder> option within the list.  If no name was found, the
 MAIL environment variable is checked.  When even that does not result in
 a usable folder, then this error is produced.  The error may be caused by
 an accidental odd-length option list.
+Cast by C<open()>
 
 =item Error: Package $package does not implement $method.
 
@@ -479,38 +494,45 @@ implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
+Cast by C<notImplemented()>
 
 =item Error: Unable to remove folder $dir
+
+Cast by C<delete()>
 
 =item Error: Use appendMessage() to add messages which are not in a folder.
 
 You do not need to copy this message into the folder, because you do
 not share the message between folders.
+Cast by C<copyMessage()>
 
 =item Warning: Use moveMessage() or copyMessage() to move between open folders.
 
 The message is already part of a folder, and now it should be appended
 to a different folder.  You need to decide between copy or move, which
 both will clone the message (not the body, because they are immutable).
+Cast by C<appendMessage()>
 
 =item Warning: Will never create a folder $name without having write access.
 
 You have set L<open(create)|Mail::Box::Manager/"Manage open folders">, but only want to read the folder.  Create is
 only useful for folders which have write or append access modes
 (see L<Mail::Box::new(access)|Mail::Box/"Constructors">).
+Cast by C<open()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

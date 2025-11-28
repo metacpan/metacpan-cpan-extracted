@@ -27,7 +27,7 @@ diag "$^E" if $^E;
 
 SKIP: {
   skip "SKIP: No console input handle available" => 8
-    unless $hInput && GetConsoleMode($hInput, \my $mode);
+    unless $hInput > 0 && GetConsoleMode($hInput, \my $mode);
 
   subtest 'FlushConsoleInputBuffer' => sub {
     my $r = FlushConsoleInputBuffer($hInput);

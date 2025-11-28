@@ -26,8 +26,9 @@ my $fakefolder = bless {MB_foldername=> 'this'}, 'Mail::Box';
 
 my $lockfile  = File::Spec->catfile($workdir, 'lockfiletest');
 unlink $lockfile;
-open OUT, '>', $lockfile;
-close OUT;
+
+open my $out, '>', $lockfile;
+$out->close;
 
 my $locker = Mail::Box::Locker->new
  ( method  => 'POSIX'
@@ -54,5 +55,4 @@ ok($warn =~ m/already lockf/,                   'relock no problem');
 $locker->unlock;
 ok(not $locker->hasLock);
 
-close OUT;
 unlink $lockfile;

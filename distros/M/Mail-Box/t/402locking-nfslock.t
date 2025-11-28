@@ -20,20 +20,18 @@ BEGIN {
    {   plan skip_all => "not available on MicroSoft Windows.";
        exit 0;
    }
-
-   plan tests => 7;
 }
 
 my $lockfile  = File::Spec->catfile($workdir, 'lockfiletest');
 unlink $lockfile;
 
-my $locker = Mail::Box::Locker->new
- ( method  => 'nfs'
- , timeout => 1
- , wait    => 1
- , file    => $lockfile
- , folder  => $fakefolder
- );
+my $locker = Mail::Box::Locker->new(
+	method  => 'nfs',
+	timeout => 1,
+	wait    => 1,
+	file    => $lockfile,
+	folder  => $fakefolder,
+);
 
 ok($locker);
 is($locker->name, 'NFS');
@@ -51,3 +49,5 @@ ok($warn =~ m/already locked over nfs/i, 'relock no problem');
 
 $locker->unlock;
 ok(not $locker->hasLock);
+
+done_testing;

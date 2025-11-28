@@ -7,6 +7,7 @@ cpanfile
 lib/Daje/Workflow.pm
 lib/Daje/Workflow/Activities.pm
 lib/Daje/Workflow/Activities/Closed.pm
+lib/Daje/Workflow/Activities/Document/Builder.pm
 lib/Daje/Workflow/Activities/Save.pm
 lib/Daje/Workflow/Checks.pm
 lib/Daje/Workflow/Checks/Mandatory.pm

@@ -89,7 +89,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = 'v4.0/cells/{name}/worksheets/{worksheet}/ranges/{cellArea}search/broken-links';
+    my $_resource_path = 'v4.0/cells/{name}/worksheets/{worksheet}/ranges/{cellArea}/search/broken-links';
 
     my $_method = 'PUT';
     my $query_params = {};

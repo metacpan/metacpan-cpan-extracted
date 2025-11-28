@@ -34,12 +34,14 @@ use v5.40;
 #
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 
+use Data::Dumper;
+
 has 'db';
 
 sub load($self, $data) {
 
     my $result = $self->db->select(
-        'workflow_connections', ['*'],
+        'workflow_connections', undef,
         {
             connector      => $data->{connector},
             connector_fkey => $data->{connector_pkey},
@@ -47,7 +49,7 @@ sub load($self, $data) {
     );
 
     my $hash;
-    $hash = $data->hash if $result->rows > 0;
+    $hash = $result->hash if $result->rows > 0;
 
     return $hash;
 }

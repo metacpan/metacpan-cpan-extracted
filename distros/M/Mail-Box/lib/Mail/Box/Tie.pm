@@ -1,13 +1,16 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Tie;{
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 }
 
 
@@ -15,28 +18,22 @@ use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util   qw/blessed/;
 
+#--------------------
 
-#-------------------------------------------
+sub new($$)
+{	my ($class, $folder, $type) = @_;
 
-sub TIEHASH(@)
-{   my $class = (shift) . "::HASH";
-    eval "require $class";   # bootstrap
+	blessed $folder && $folder->isa('Mail::Box')
+        or croak "No folder specified to tie to.";
 
-    confess $@ if $@;
-    $class->TIEHASH(@_);
+	bless +{ MBT_folder => $folder, MBT_type => $type }, $class;
 }
 
-#-------------------------------------------
+#--------------------
 
-sub TIEARRAY(@)
-{   my $class = (shift) . "::ARRAY";
-    eval "require $class";   # bootstrap
-
-    confess $@ if $@;
-    $class->TIEARRAY(@_);
-}
-
-#-------------------------------------------
+sub folder() { $_[0]->{MBT_folder} }
+sub type()   { $_[0]->{MBT_type} }
 
 1;

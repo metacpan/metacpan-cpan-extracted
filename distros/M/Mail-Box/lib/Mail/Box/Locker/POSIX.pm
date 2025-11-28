@@ -1,22 +1,24 @@
-# Copyrights 2001-2025 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Mail-Box.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Mail-Box version 3.012.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
 
 package Mail::Box::Locker::POSIX;{
-our $VERSION = '3.011';
+our $VERSION = '3.012';
 }
 
-use base 'Mail::Box::Locker';
+use parent 'Mail::Box::Locker';
 
 use strict;
 use warnings;
 
-use Fcntl;
-use IO::File;
+use Fcntl   qw/F_WRLCK F_UNLCK F_SETLK/;
 use Errno   qw/EAGAIN/;
 
 # fcntl() should not be used without XS: the below is sensitive
@@ -25,100 +27,95 @@ use Errno   qw/EAGAIN/;
 
 my $pack_pattern = $^O =~ /bsd|darwin/i ? '@20 s @256' : 's @256';
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    $args->{file} = $args->{posix_file} if $args->{posix_file};
-    $self->SUPER::init($args);
+{	my ($self, $args) = @_;
+	$args->{file} = $args->{posix_file} if $args->{posix_file};
+	$self->SUPER::init($args);
 }
 
-sub name() {'POSIX'}
+sub name() { 'POSIX' }
+
+#--------------------
 
 sub _try_lock($)
-{   my ($self, $file) = @_;
-    my $p = pack $pack_pattern, F_WRLCK;
-    $? = fcntl($file, F_SETLK, $p) || ($!+0);
-    $?==0;
+{	my ($self, $file) = @_;
+	my $p = pack $pack_pattern, F_WRLCK;
+	$? = fcntl($file, F_SETLK, $p) || ($!+0);
+	$?==0;
 }
 
 sub _unlock($)
-{   my ($self, $file) = @_;
-    my $p = pack $pack_pattern, F_UNLCK;
-    fcntl $file, F_SETLK, $p;
-    $self;
+{	my ($self, $file) = @_;
+	my $p = pack $pack_pattern, F_UNLCK;
+	fcntl $file, F_SETLK, $p;
+	$self;
 }
 
 
-
 sub lock()
-{   my $self   = shift;
+{	my $self   = shift;
 
-    if($self->hasLock)
-    {   my $folder = $self->folder;
-        $self->log(WARNING => "Folder $folder already lockf'd");
-        return 1;
-    }
+	if($self->hasLock)
+	{	my $folder = $self->folder;
+		$self->log(WARNING => "Folder $folder already lockf'd");
+		return 1;
+	}
 
-    my $filename = $self->filename;
-    my $folder   = $self->folder;
+	my $file     = $self->filename;
+	my $folder   = $self->folder;
 
-    my $file     = IO::File->new($filename, 'r+');
-    unless(defined $file)
-    {   $self->log(ERROR =>
-           "Unable to open POSIX lock file $filename for $folder: $!");
-        return 0;
-    }
+	open my $fh, '+<:raw', $file
+		or $self->log(ERROR => "Unable to open POSIX lock file $file for $folder: $!"), return 0;
 
-    my $timeout  = $self->timeout;
-    my $end      = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
+	my $timeout  = $self->timeout;
+	my $end      = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
 
-    while(1)
-    {   if($self->_try_lock($file))
-        {   $self->{MBLF_filehandle} = $file;
-            return $self->SUPER::lock;
-        }
+	while(1)
+	{	if($self->_try_lock($fh))
+		{	$self->{MBLF_filehandle} = $fh;
+			return $self->SUPER::lock;
+		}
 
-        unless($!==EAGAIN)
-        {   $self->log(ERROR =>
-               "Will never get a POSIX lock on $filename for $folder: $!");
-            last;
-        }
+		$!==EAGAIN
+			or $self->log(ERROR => "Will never get a POSIX lock on $file for $folder: $!"), return 0;
 
-        last unless --$end;
-        sleep 1;
-    }
+		--$end or last;
+		sleep 1;
+	}
 
-    return 0;
+	return 0;
 }
 
 
 sub isLocked()
-{   my $self     = shift;
-    my $filename = $self->filename;
+{	my $self = shift;
+	my $file = $self->filename;
 
-    my $file     = IO::File->new($filename, "r");
-    unless($file)
-    {   my $folder = $self->folder;
-        $self->log(ERROR => "Unable to check lock file $filename for $folder: $!");
-        return 0;
-    }
+	open my $fh, '<:raw', $file;
+	unless($fh)
+	{	my $folder = $self->folder;
+		$self->log(ERROR => "Unable to check lock file $file for $folder: $!");
+		return 0;
+	}
 
-    $self->_try_lock($file)==0 or return 0;
-    $self->_unlock($file);
-    $file->close;
+	$self->_try_lock($fh)==0 or return 0;
+	$self->_unlock($fh);
+	$fh->close;
 
-    $self->SUPER::unlock;
-    1;
+	$self->SUPER::unlock;
+	1;
 }
 
 sub unlock()
-{   my $self = shift;
+{	my $self = shift;
 
-    $self->_unlock(delete $self->{MBLF_filehandle})
-       if $self->hasLock;
+	$self->_unlock(delete $self->{MBLF_filehandle})
+		if $self->hasLock;
 
-    $self->SUPER::unlock;
-    $self;
+	$self->SUPER::unlock;
+	$self;
 }
 
 1;

@@ -1,0 +1,15 @@
+#---*- Makefile -*-------------------------------------------------------
+
+# Configure where the grammar source files reside:
+
+RST_FILE_DIR = .
+
+RST_FILES = $(wildcard ${RST_FILE_DIR}/*.rst)
+
+GRAMMAR_START_STRING = \(\* BEGIN EBNF GRAMMAR
+GRAMMAR_END_STRING   = \(\* END EBNF GRAMMAR
+
+GRAMMARS = $(shell awk '/^ *${GRAMMAR_START_STRING}/{print $$5}' ${RST_FILES})
+GRAMMAR_DIR   = tests/generated
+EBNF_FILES    = ${GRAMMARS:%=${GRAMMAR_DIR}/%.ebnf}
+GRAMMAR_FILES = ${EBNF_FILES:%.ebnf=%.g}

@@ -1,5 +1,12 @@
 Changelog for Beam-Minion
 
+0.017     2025-11-27 10:22:06-06:00 America/Chicago
+
+  [Added]
+
+  - Added Beam::Minion->init() to initialize via code
+  - Added "file:" schema to BEAM_MINION var to load configuration from a YAML file
+
 0.016     2019-03-07 21:05:08-06:00 America/Chicago
 
     [Fixed]

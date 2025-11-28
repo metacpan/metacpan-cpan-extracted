@@ -81,12 +81,15 @@
          "requires" : {
             "Carp" : "0",
             "Cwd" : "0",
+            "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Find" : "0",
             "File::Path" : "0",
             "File::Slurper" : "0",
             "File::Spec" : "0",
             "Scalar::Util" : "0",
+            "String::Diff" : "0",
+            "Term::ANSIColor" : "0",
             "Test::More" : "0.98",
             "common::sense" : "0"
          }
@@ -95,7 +98,7 @@
    "provides" : {
       "Liveman" : {
          "file" : "lib/Liveman.pm",
-         "version" : "3.5"
+         "version" : "3.7"
       },
       "Liveman::App::liveman" : {
          "file" : "lib/Liveman/App/liveman.pm"
@@ -128,7 +131,7 @@
          "web" : "https://github.com/darviarush/perl-liveman"
       }
    },
-   "version" : "3.5",
+   "version" : "3.7",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

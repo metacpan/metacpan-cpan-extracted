@@ -10,7 +10,7 @@ use warnings;
 use Mail::Box::Test;
 use Mail::Box::Manager;
 
-use Test::More tests => 23;
+use Test::More;
 use File::Copy;
 
 #
@@ -22,40 +22,44 @@ copy $src, $cpy
     or die "Cannot create test folder $cpy: $!\n";
 
 my $mgr = Mail::Box::Manager->new;
-ok($mgr);
+ok $mgr, 'Start manager';
 
-my $folder = $mgr->open
-  ( folder       => "=$cpyfn"
-  , folderdir    => $folderdir
-  , lock_type    => 'NONE'
-  , extract      => 'LAZY'
-  , access       => 'rw'
-  , save_on_exit => 0
-# , thread_timespan => 'EVER'
-  );
-ok($folder);
+my $folder = $mgr->open(
+	folder       => "=$cpyfn",
+	folderdir    => $folderdir,
+	lock_type    => 'NONE',
+	extract      => 'LAZY',
+	access       => 'rw',
+	save_on_exit => 0,
+#	thread_timespan => 'EVER'
+);
+ok $folder, 'open folder';
+
+cmp_ok $folder->nrMessages, '==', 45, '... expected msgs found';
 
 my $threads = $mgr->threads(folder => $folder);
+ok $threads, 'detect threads';
 
 # First try message which is single.
-my $single = $folder->messageID(
-   '<200010041822.e94IMZr19712@mystic.es.dupont.com>');
-ok($single);
-my $single2 = $folder->messageID(
-   '200010041822.e94IMZr19712@mystic.es.dupont.com');
-ok($single2);
-is($single2, $single);
-my $single3 = $folder->messageID(
-   'garbage <200010041822.e94IMZr19712@mystic.es.dupont.com> trash');
-ok($single3);
-is($single3, $single);
+my $single = $folder->messageID('<200010041822.e94IMZr19712@mystic.es.dupont.com>');
+ok $single, 'single message';
+
+my $single2 = $folder->messageID('200010041822.e94IMZr19712@mystic.es.dupont.com');
+ok $single2, '... get it again';
+is $single2, $single, '... ... same';
+
+my $single3 = $folder->messageID('garbage <200010041822.e94IMZr19712@mystic.es.dupont.com> trash');
+ok $single3, '... strip msgid to <>';
+is $single3, $single, '... ... same';
 
 my $start = $threads->threadStart($single);
-ok($start);
-is($single->messageID, $start->message->messageID);
+ok $start, 'thread start at single message';
+defined $start or exit 1;
+
+is $single->messageID, $start->message->messageID;
 
 my $message = $folder->messageID('NDBBJJFDMKFOAIFBEPPJIELLCBAA.cknoos@atg.com');
-ok($message);
+ok $message;
 
 my $this = $threads->thread($message);
 ok($this);
@@ -153,3 +157,5 @@ DUMP
 
 $dump = join '', sort split /^/, $out;
 compare_thread_dumps($out, $dump , 'sorted full dump');
+
+done_testing;

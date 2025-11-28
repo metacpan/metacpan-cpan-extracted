@@ -4,31 +4,36 @@
 
 Mail::Box::Tie::ARRAY - access an existing message folder as array
 
+=head1 INHERITANCE
+
+ Mail::Box::Tie::ARRAY
+   is a Mail::Box::Tie
+
 =head1 SYNOPSIS
 
- use Mail::Box::Manager;
- my $mgr    = Mail::Box::Manager->new;
- my $folder = $mgr->open(folder => 'inbox');
+  use Mail::Box::Manager;
+  my $mgr    = Mail::Box::Manager->new;
+  my $folder = $mgr->open(folder => 'inbox');
 
- use Mail::Box::Tie::ARRAY;
- tie my(@inbox), 'Mail::Box::Tie::ARRAY', $folder;
+  use Mail::Box::Tie::ARRAY;
+  tie my(@inbox), 'Mail::Box::Tie::ARRAY', $folder;
 
- # deprecated, but works too
- use Mail::Box::Tie;
- tie my(@inbox), 'Mail::Box::Tie', $folder;
+  # deprecated, but works too
+  use Mail::Box::Tie;
+  tie my(@inbox), 'Mail::Box::Tie', $folder;
 
- foreach (@inbox) {print $_->short}
- print $_->print foreach @inbox;
- my $emails = @inbox;
+  foreach (@inbox) {print $_->short}
+  print $_->print foreach @inbox;
+  my $emails = @inbox;
 
- print $inbox[3];
- print scalar @inbox;
- push @inbox, Mail::Box::Message->new(...);
- delete $inbox[6];
- print $inbox[0]->head->get('status');
+  print $inbox[3];
+  print scalar @inbox;
+  push @inbox, Mail::Box::Message->new(...);
+  delete $inbox[6];
+  print $inbox[0]->head->get('status');
 
- my $folder = tied @inbox;
- untie @inbox;
+  my $folder = tied @inbox;
+  untie @inbox;
 
 =head1 DESCRIPTION
 
@@ -41,23 +46,49 @@ deletion.
 
 Examples what you I<cannot> do:
 
- shift/unshift/pop/splice @inbox;
+  shift/unshift/pop/splice @inbox;
+
+Extends L<"DESCRIPTION" in Mail::Box::Tie|Mail::Box::Tie/"DESCRIPTION">.
 
 =head1 METHODS
 
+Extends L<"METHODS" in Mail::Box::Tie|Mail::Box::Tie/"METHODS">.
+
 =head2 Constructors
+
+Extends L<"Constructors" in Mail::Box::Tie|Mail::Box::Tie/"Constructors">.
 
 =over 4
 
-=item B<TIEARRAY>('Mail::Box::Tie::ARRAY', FOLDER)
+=item tie B<@array>, 'Mail::Box::Tie::ARRAY', FOLDER
 
 Create the tie on an existing folder.
 
-example: tie an array to a folder
+» example: tie an array to a folder
 
- my $mgr   = Mail::Box::Manager->new;
- my $inbox = $mgr->new(folder => $ENV{MAIL});
- tie my(@inbox), 'Mail::Box::Tie::Array', ref $inbox, $inbox;
+  my $mgr   = Mail::Box::Manager->new;
+  my $inbox = $mgr->new(folder => $ENV{MAIL});
+  tie my(@inbox), 'Mail::Box::Tie::Array', ref $inbox, $inbox;
+
+=item $class-E<gt>B<new>($folder, $type)
+
+Inherited, see L<Mail::Box::Tie/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Box::Tie|Mail::Box::Tie/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<folder>()
+
+Inherited, see L<Mail::Box::Tie/"Attributes">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box::Tie/"Attributes">
 
 =back
 
@@ -70,10 +101,10 @@ example: tie an array to a folder
 Flag a message to be removed.  Be warned that the message stays in
 the folder, and is not removed before the folder is written.
 
-example: 
+» example: 
 
- delete $inbox[5];
- $inbox[5]->delete;   #same
+  delete $inbox[5];
+  $inbox[5]->delete;   #same
 
 =item $obj-E<gt>B<FETCH>($index)
 
@@ -81,29 +112,29 @@ Get the message which is at the indicated location in the list of
 messages contained in this folder.  Deleted messages will be returned
 as C<undef>.
 
-example: 
+» example: 
 
- print $inbox[3];     # 4th message in the folder
- print @inbox[3,0];   # 4th and first of the folder
- print $inbox[-1];    # last message
+  print $inbox[3];     # 4th message in the folder
+  print @inbox[3,0];   # 4th and first of the folder
+  print $inbox[-1];    # last message
 
 =item $obj-E<gt>B<FETCHSIZE>()
 
 Return the total number of messages in a folder.  This is called when
 the folder-array is used in scalar context, for instance.
 
-example: 
+» example: 
 
- if(@inbox > 10)    # contains more than 10 messages?
- my $nrmsgs = @inbox;
+  if(@inbox > 10)    # contains more than 10 messages?
+  my $nrmsgs = @inbox;
 
 =item $obj-E<gt>B<PUSH>(@messages)
 
-Add @messages to the end of the folder.
+Add C<@messages> to the end of the folder.
 
-example: 
+» example: 
 
-    push @inbox, $newmsg;
+  push @inbox, $newmsg;
 
 =item $obj-E<gt>B<STORE>($index, $message)
 
@@ -112,15 +143,15 @@ etc.  An error occurs if you try to do this. The only thing which is allowed
 is to store a message at the first free index at the end of the folder (which
 is also achievable with L<PUSH()|Mail::Box::Tie::ARRAY/"Tied Interface">).
 
-example: 
+» example: 
 
- $inbox[8] = $add;
- $inbox[-1] = $add;
- push @inbox, $add;
+  $inbox[8]  = $add;
+  $inbox[-1] = $add;
+  push @inbox, $add;
 
 =item $obj-E<gt>B<STORESIZE>($length)
 
-Sets all messages behind from $length to the end of folder to be deleted.
+Sets all messages behind from C<$length> to the end of folder to be deleted.
 
 =back
 
@@ -139,14 +170,15 @@ is not permitted to shrink or be mutilated.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

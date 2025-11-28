@@ -133,7 +133,6 @@ sub save($self, $context) {
     $context->{context_pkey} = 0 unless exists $context->{context_pkey};
     $context->{context} = to_json($context->{context});
     my $context_pkey;
-    say "Daje::Workflow::Database::Model::Context::save " . Dumper($context);
 
     if ($context->{context_pkey} > 0) {
         try {

@@ -23,7 +23,7 @@ sub pkg_from_path(;$) {
 # Список файлов scripts/* и bin/*
 sub sc {
 	my ($self) = @_;
-	@{$self->{sc} //= [sort(find_wanted(sub { -f $_ and -x _ }, "scripts", "bin"))]}
+	@{$self->{sc} //= [sort(find_wanted(sub { -f $_ and do { open my $f, '<:utf8', $_; my $x = <$f> =~ /^#!.*\bperl\b/; close $f; $x } }, "script", "bin"))]}
 }
 
 # Список файлов lib/*.pm
@@ -63,12 +63,23 @@ sub md_mod {
 }
 
 # Список пакетов, используемых в скриптах и модулях
+my $qr_mod = qr/
+	  '(?<p> [\w:]+ )'
+	| "(?<p> [\w:]+ )"
+	| (?:q|qq|qw) [^\w\s] \s* (?<p> [\w:]+ (?: \s+ [\w:]+ )* ) \s* [^\w\s]
+/ax;
 sub _used_mod {
 	my ($s) = @_;
 	my @mod;
 	
-	push @mod, pkg_from_path $1 while $s =~ /\brequire\s*['"]([\w\/\.]+)['"]/g;
-	push @mod, $1 while $s =~ /\b(?:use|require)\s+([a-zA-Z_]\w*(?:::[a-zA-Z_]\w*)*)/g;
+	push @mod, pkg_from_path $1 while $s =~ /(?:^|[{};])[ \t]*require\s*['"]([\w\/\.]+)['"]/gma;
+	
+	push @mod, $1 while $s =~ /(?:^|[{};])[ \t]*(?:use|require)\s+([a-zA-Z_]\w*(?:::[a-zA-Z_]\w*)*)/gma;
+
+	push @mod, map { /$qr_mod/ && split /\s+/, $+{p} } split /\s*,\s*/, $1 while $s =~ /(?:^|[{};]) [\ \t]* (?:with|extends) \s* ((?:
+			(?: $qr_mod ) (?:\s*,\s*)*
+		)+) \s* ;
+	/agmx;
 	
 	@mod
 }
@@ -78,6 +89,7 @@ sub deps {
 	my ($self) = @_;
 	@{$self->{deps} //= [do {
 		my %mod;
+		
 		for my $pl ($self->pm, $self->sc) {
 			open my $f, '<', $pl or die "Can't open $pl: $!";
 			while(<$f>) {
@@ -161,10 +173,9 @@ Liveman::Cpanfile - Perl project dependency analyzer
 
 	use Liveman::Cpanfile;
 	
-	chmod 0755, $_ for qw!scripts/test_script bin/tool!;
+	chmod 0755, $_ for qw!script/test_script bin/tool!;
 	
 	$::cpanfile = Liveman::Cpanfile->new;
-	
 	$::cpanfile->cpanfile # -> << 'END'
 	requires 'perl', '5.22.0';
 	
@@ -183,12 +194,15 @@ Liveman::Cpanfile - Perl project dependency analyzer
 		requires 'Car::Auto';
 		requires 'Carp';
 		requires 'Cwd';
+		requires 'Data::Dumper';
 		requires 'File::Basename';
 		requires 'File::Find';
 		requires 'File::Path';
 		requires 'File::Slurper';
 		requires 'File::Spec';
 		requires 'Scalar::Util';
+		requires 'String::Diff';
+		requires 'Term::ANSIColor';
 		requires 'Test::More';
 		requires 'Turbin';
 		requires 'open';
@@ -220,9 +234,9 @@ Converts a file path to a Perl package name.
 
 =head2 sc ()
 
-Returns a list of executable scripts in the C<scripts/> and C<bin/> directories.
+Returns a list of executable scripts in the C<script/> and C<bin/> directories.
 
-Scripts/test_script file:
+Script/test_script file:
 
 	#!/usr/bin/env perl
 	require Data::Printer;
@@ -234,7 +248,7 @@ bin/tool file:
 
 
 
-	[$::cpanfile->sc] # --> [qw!bin/tool scripts/test_script!]
+	[$::cpanfile->sc] # --> [qw!bin/tool script/test_script!]
 
 =head2 pm ()
 
@@ -311,7 +325,7 @@ List of dependencies from tests except:
 
 =back
 
-	[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util Test::More Turbin open!]
+	[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util String::Diff Term::ANSIColor Test::More Turbin open!]
 
 =head2 cpanfile ()
 

@@ -1,5 +1,5 @@
 package Dist::Build::XS::Import;
-$Dist::Build::XS::Import::VERSION = '0.021';
+$Dist::Build::XS::Import::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Carp 'croak';
 use File::Spec::Functions qw/catfile catdir/;
-use File::ShareDir::Tiny 'module_dir';
+use Dist::Build::Util 'module_dir';
 use Parse::CPAN::Meta;
 
 my $json_backend = Parse::CPAN::Meta->json_backend;
@@ -69,7 +69,7 @@ Dist::Build::XS::Import - Dist::Build extension to import headers for other XS m
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

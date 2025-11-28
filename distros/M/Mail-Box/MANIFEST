@@ -1,9 +1,7 @@
 ChangeLog
 MANIFEST
 MANIFEST.extra
-META.yml
 Makefile.PL
-README
 README.md
 README.todo
 examples/build.pl
@@ -157,4 +155,5 @@ t/folders/mbox.src
 t/folders/mbox.win
 testrules.yml
 xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

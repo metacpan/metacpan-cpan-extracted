@@ -449,6 +449,8 @@ docs/DiscoverChart.md
 docs/DiscoverPivotTable.md
 docs/ExcelDataStatistics.md
 docs/WorksheetDataStatistics.md
+docs/TranslationSpreadsheetRequest.md
+docs/TranslateTextFileRequest.md
 docs/AggregateCellsByColorRequest.md
 docs/MathCalculateRequest.md
 docs/PostAccessTokenRequest.md
@@ -461,6 +463,7 @@ docs/ExportTableAsFormatRequest.md
 docs/ExportRangeAsFormatRequest.md
 docs/ConvertSpreadsheetRequest.md
 docs/ConvertSpreadsheetToPdfRequest.md
+docs/ConvertSpreadsheetToJsonRequest.md
 docs/ConvertSpreadsheetToCsvRequest.md
 docs/ConvertWorksheetToImageRequest.md
 docs/ConvertWorksheetToPdfRequest.md
@@ -511,6 +514,8 @@ docs/CodegenSpecRequest.md
 docs/TrimCharacterRequest.md
 docs/UpdateWordCaseRequest.md
 docs/RemoveCharactersRequest.md
+docs/RemoveCharactersByPositionRequest.md
+docs/RemoveDuplicateSubstringsRequest.md
 docs/AddTextRequest.md
 docs/ConvertTextRequest.md
 docs/ExtractTextRequest.md
@@ -1328,6 +1333,8 @@ lib/AsposeCellsCloud/Object/DiscoverChart.pm
 lib/AsposeCellsCloud/Object/DiscoverPivotTable.pm
 lib/AsposeCellsCloud/Object/ExcelDataStatistics.pm
 lib/AsposeCellsCloud/Object/WorksheetDataStatistics.pm
+lib/AsposeCellsCloud/Request/TranslationSpreadsheetRequest.pm
+lib/AsposeCellsCloud/Request/TranslateTextFileRequest.pm
 lib/AsposeCellsCloud/Request/AggregateCellsByColorRequest.pm
 lib/AsposeCellsCloud/Request/MathCalculateRequest.pm
 lib/AsposeCellsCloud/Request/PostAccessTokenRequest.pm
@@ -1340,6 +1347,7 @@ lib/AsposeCellsCloud/Request/ExportTableAsFormatRequest.pm
 lib/AsposeCellsCloud/Request/ExportRangeAsFormatRequest.pm
 lib/AsposeCellsCloud/Request/ConvertSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/ConvertSpreadsheetToPdfRequest.pm
+lib/AsposeCellsCloud/Request/ConvertSpreadsheetToJsonRequest.pm
 lib/AsposeCellsCloud/Request/ConvertSpreadsheetToCsvRequest.pm
 lib/AsposeCellsCloud/Request/ConvertWorksheetToImageRequest.pm
 lib/AsposeCellsCloud/Request/ConvertWorksheetToPdfRequest.pm
@@ -1390,6 +1398,8 @@ lib/AsposeCellsCloud/Request/CodegenSpecRequest.pm
 lib/AsposeCellsCloud/Request/TrimCharacterRequest.pm
 lib/AsposeCellsCloud/Request/UpdateWordCaseRequest.pm
 lib/AsposeCellsCloud/Request/RemoveCharactersRequest.pm
+lib/AsposeCellsCloud/Request/RemoveCharactersByPositionRequest.pm
+lib/AsposeCellsCloud/Request/RemoveDuplicateSubstringsRequest.pm
 lib/AsposeCellsCloud/Request/AddTextRequest.pm
 lib/AsposeCellsCloud/Request/ConvertTextRequest.pm
 lib/AsposeCellsCloud/Request/ExtractTextRequest.pm

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 5;
+use Encode qw( encode decode );
 
 BEGIN {
   use_ok 'Win32API::Console', qw(
@@ -29,7 +30,7 @@ subtest 'Set and Get Console Title (A)' => sub {
 };
 
 subtest 'Set and Get Console Title (W)' => sub {
-  my $new_title = "Perl Console Test #2";
+  my $new_title = encode('UTF-16LE', "Perl Console Test " . time);
   select(undef, undef, undef, 0.25);
   ok(SetConsoleTitleW($new_title), 'SetConsoleTitleW applied new title');
   diag "$^E" if $^E;
@@ -55,7 +56,11 @@ subtest 'Get Original Console Title' => sub {
   diag "$^E" if $^E;
   ok($ok, 'GetConsoleOriginalTitleW returned a value');
   ok(defined $original_titleW, 'Original title (W) is not empty');
-  is($original_titleA, $original_titleW, 'Both titles matches');
+  is(
+    $original_titleA, 
+    decode('UTF16-LE', $original_titleW), 
+    'Both titles matches'
+  );
 };
 
 subtest 'Wrapper for the Unicode and ANSI functions' => sub {

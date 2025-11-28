@@ -88,19 +88,16 @@ while(1)
     my $li    = int $head->get('Lines');
     my $su    = $head->get('Subject');
 
-    $body = Mail::Message::Body::Lines->new
-        ->read($parser, $head, undef, $cl, $li);
+    $body = Mail::Message::Body::Lines->new->read($parser, $head, undef, $cl, $li);
     ok(defined $body,                          "1 body $count");
 
     my $size  = $body->size;
     my $lines = $body->nrLines;
 
-    cmp_ok($li , "==",  $lines,                "1 lines $count")
-        if defined $li;
+    cmp_ok($lines, "==", $li,                "1 lines $count") if defined $li;
 
     $cl -= $li if $crlf_platform;
-    cmp_ok($cl , "==",  $size,                 "1 size $count")
-        if defined $cl;
+    cmp_ok($size, "==", $cl,                 "1 size $count")  if defined $cl;
 
     my $msg = 
      { size   => $size

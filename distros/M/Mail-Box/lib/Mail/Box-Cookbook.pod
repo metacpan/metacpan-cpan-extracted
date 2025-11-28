@@ -6,7 +6,7 @@ Mail::Box-Cookbook - Examples how to use Mail::Box
 
 =head1 DESCRIPTION
 
-The Mail::Box package is a suite of classes for accessing and managing
+The L<Mail::Box|Mail::Box> package is a suite of classes for accessing and managing
 email folders in a folder-independent manner.  This manual demonstrates
 a few simple applications.  Please contribute with examples and fixes.
 It may also help to have a look at the programs included in the
@@ -15,8 +15,8 @@ C<scripts/> and the C<examples/> directories of the distribution.
 =head2 The Manager
 
 For more details about all the packages which are involved in the
-Mail::Box suite you have to read L<Mail::Box-Overview|Mail::Box-Overview>.  But you
-do not need to know much if you want to use the Mail::Box suite.
+L<Mail::Box|Mail::Box> suite you have to read L<Mail::Box-Overview|Mail::Box-Overview>.  But you
+do not need to know much if you want to use the L<Mail::Box|Mail::Box> suite.
 
 Please use the manager to open your folders.  You will certainly
 benefit from it.  The manager takes care of detecting which folder
@@ -34,7 +34,7 @@ The C<examples/open.pl> script contains mainly
 
 which shows all the most important functions.  It will cause all
 subjects of the messages in the indicated folder to be listed.  So:
-although the number of packages included in the Mail::Box module
+although the number of packages included in the L<Mail::Box|Mail::Box> module
 is huge, only little is needed for normal programs.
 
 In stead of calling C<close> on the folder, you may also call
@@ -256,14 +256,15 @@ multi-part message is produced.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.011,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 3.012,
+built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
