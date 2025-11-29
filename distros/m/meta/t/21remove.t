@@ -22,7 +22,7 @@ my $metapkg = meta::package->get( "main" );
       '$metapkg no longer has old glob after remove' );
 
    like( dies { $metapkg->remove_symbol( '$SCALAR_VAR' ) },
-      qr/^Cannot remove non-existing symbol from package: "\$SCALAR_VAR" /,
+      qr/^Cannot remove non-existing symbol "\$SCALAR_VAR" from package /,
       '->remove_symbol on same name throws exception' );
 }
 
@@ -78,7 +78,7 @@ my $metapkg = meta::package->get( "main" );
       '$metapkg still has %SHARED after remove array' );
 
    like( dies { $metapkg->remove_symbol( '@SHARED' ) },
-      qr/^Cannot remove non-existing symbol from package: "\@SHARED" /,
+      qr/^Cannot remove non-existing symbol "\@SHARED" from package /,
       '->remove_symbol on same name throws exception' );
 }
 

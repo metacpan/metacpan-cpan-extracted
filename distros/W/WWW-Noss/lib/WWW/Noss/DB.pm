@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use List::Util qw(all any max none);
 
@@ -32,10 +32,10 @@ sub _initialize {
         {
             RaiseError => 1,
             AutoInactiveDestroy => 1,
-            AutoCommit => 0,
         }
     );
 
+    $self->{ DB }->do('PRAGMA journal_mode = WAL');
     $self->{ DB }->do('PRAGMA cache_size = 10000');
 
     $self->{ DB }->do(
@@ -189,7 +189,6 @@ sub new {
     $self->{ Path } = $file;
 
     $self->_initialize;
-    $self->commit;
 
     return $self;
 
@@ -966,20 +965,9 @@ sub vacuum {
 
     my ($self) = @_;
 
-    # Stops the 'cannot VACUUM from within a transaction' error
-    local $self->{ DB }{ AutoCommit } = 1;
-
     $self->{ DB }->do(q{ VACUUM; });
 
     return 1;
-
-}
-
-sub commit {
-
-    my ($self) = @_;
-
-    return $self->{ DB }->commit;
 
 }
 
@@ -1035,8 +1023,6 @@ Returns true if C<$db> has the feed C<$feed>.
 Loads the L<WWW::Noss::FeedConfig> object C<$feed_conf> into the database.
 Returns the number of new posts loaded if successful, dies on failure.
 
-To commit the loaded feed, you must also call the C<commit()> method.
-
 =item \%feed = $db->feed($feed, [ %param ])
 
 Returns a hash ref of information about the feed C<$feed>. C<$feed> can either
@@ -1083,8 +1069,6 @@ minus the C<posts> and C<unread> fields.
 =item $rt = $db->del_feeds(@feeds)
 
 Deletes the feeds C<@feeds> from the database. Returns C<1> on success.
-
-To commit the deleted feeds, you must also call the C<commit()> method.
 
 =item \%post = $db->post($feed, $post)
 
@@ -1197,8 +1181,6 @@ updated. C<$feed> can be either a feed name or L<WWW::Noss::FeedConfig> object.
 C<$mark> can either be C<'read'> or C<'unread'>. C<@post> is a list of post IDs
 to update. If C<@post> is empty, all posts in C<$feed> are updated.
 
-To commit the updated posts, you must also call the C<commit()> method.
-
 =item $bool = $db->skip($feed)
 
 Check whether you are supposed to skip updating C<$feed> right now. C<$feed>
@@ -1209,11 +1191,6 @@ returned if C<$feed> does not exist.
 
 Runs the C<VACUUM> L<sqlite3(1)> command on the database, which frees up any
 unused space within the database and reduces its total size.
-
-=item $db->commit()
-
-Commits database updates to the local database. Should be ran after running any
-method that modifies the database.
 
 =item $db->finish()
 

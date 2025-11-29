@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING.md
 lib/Cron/Toolkit.pm
 lib/Cron/Toolkit/Pattern.pm
 lib/Cron/Toolkit/Pattern/Last.pm
@@ -17,6 +18,7 @@ LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+SECURITY.md
 t/all.t
 t/data/cron_tests.json
 t/new_from_crontab.t

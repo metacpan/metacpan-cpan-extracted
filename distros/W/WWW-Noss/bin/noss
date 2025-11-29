@@ -32,6 +32,7 @@ Commands:
   feeds     List feeds
   groups    List feed groups
   clean     Clean up obsolete files and data
+  discover  Discover feed URLs associated with a web page
   export    Export feed list as OPML
   import    Import feed list from OPML
   help      View documentation for a noss command
@@ -670,6 +671,30 @@ Cleans up obsolete cache files and database data.
 
 This command has no unique options.
 
+=head2 discover
+
+  noss discover <url>
+
+Discover RSS/Atom feed URLs associated with the given web page URL, and print
+them out if found.
+
+This command has the following options, which are the same as the C<update>
+command's:
+
+=over 4
+
+=item B<--limit-rate>=I<speed>
+
+=item B<--user-agent>=I<agent>
+
+=item B<--timeout>=I<fractional second>
+
+=item B<--proxy>=[I<protocol>://]I<host>[:I<port>]
+
+=item B<--proxy-user>=I<user>:I<password>
+
+=back
+
 =head2 export
 
   noss export [opml]
@@ -1022,7 +1047,7 @@ The post's full month name according to the current locale.
 
 =item %n
 
-THe post's month as a decimal number (range 01 to 12).
+The post's month as a decimal number (range 01 to 12).
 
 =item %y
 

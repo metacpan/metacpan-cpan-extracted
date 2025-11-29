@@ -2,10 +2,12 @@ package WWW::Noss::FeedReader;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(read_feed);
+our @EXPORT_OK = qw(read_feed discover_feeds);
+
+use XML::LibXML;
 
 use WWW::Noss::FeedReader::Atom;
 use WWW::Noss::FeedReader::RSS;
@@ -25,9 +27,6 @@ use WWW::Noss::TextToHtml qw(strip_tags unescape_html);
 # title - Internal title used by noss for generating nossuids; should not
 #         change.
 # displaytitle - Title that will be shown to users; can be changed.
-
-# TODO: Add feed option to truncate display titles like we do when generating
-# titles from summaries?
 
 sub _title_from_desc {
 
@@ -50,8 +49,6 @@ sub _title_from_desc {
 sub read_feed {
 
     my ($feed) = @_;
-
-    require XML::LibXML;
 
     my $channel;
     my $entries;
@@ -129,6 +126,44 @@ sub read_feed {
     }
 
     return ($channel, $entries);
+
+}
+
+sub discover_feeds {
+
+    my ($html_file) = @_;
+
+    my $dom = XML::LibXML->load_html(
+        location => $html_file,
+        recover => 2,
+        suppress_errors => 1,
+    );
+
+    my ($head) = $dom->findnodes('/html/head');
+    if (not defined $head) {
+        return ();
+    }
+
+    my @discovered;
+    for my $c ($head->childNodes) {
+        next unless $c->isa('XML::LibXML::Element');
+        next unless $c->nodeName eq 'link';
+        my $rel = $c->getAttribute('rel') // '';
+        if ($rel ne 'alternate') {
+            next;
+        }
+        my $type = $c->getAttribute('type') // '';
+        if ($type ne 'application/atom+xml' and $type ne 'application/rss+xml') {
+            next;
+        }
+        my $href = $c->getAttribute('href');
+        if (not defined $href) {
+            next;
+        }
+        push @discovered, $href;
+    }
+
+    return @discovered;
 
 }
 

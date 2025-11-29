@@ -48,6 +48,8 @@ provides:
     file: lib/Daje/Controller/ToolsTreelist.pm
   Daje::Controller::ToolsVersions:
     file: lib/Daje/Controller/ToolsVersions.pm
+  Daje::Database::Helper::LoadParameters:
+    file: lib/Daje/Database/Helper/LoadParameters.pm
   Daje::Database::Helper::ParameterTreelist:
     file: lib/Daje/Database/Helper/ParameterTreelist.pm
   Daje::Database::Helper::TreeList:
@@ -104,6 +106,12 @@ provides:
     file: lib/Daje/Database/Model/ToolsVersion.pm
   Daje::Database::View::Super::VToolsObjects:
     file: lib/Daje/Database/View/Super/VToolsObjects.pm
+  Daje::Database::View::Super::VToolsObjectsTables:
+    file: lib/Daje/Database/View/Super/VToolsObjectsTables.pm
+  Daje::Database::View::Super::VToolsObjectsTypes:
+    file: lib/Daje/Database/View/Super/VToolsObjectsTypes.pm
+  Daje::Database::View::Super::VToolsParameterValues:
+    file: lib/Daje/Database/View/Super/VToolsParameterValues.pm
   Daje::Database::View::Super::VToolsProjects:
     file: lib/Daje/Database/View/Super/VToolsProjects.pm
   Daje::Database::View::Super::VToolsVersion:
@@ -112,27 +120,41 @@ provides:
     file: lib/Daje/Database/View/Super/VTreeList.pm
   Daje::Database::View::VToolsObjects:
     file: lib/Daje/Database/View/VToolsObjects.pm
+  Daje::Database::View::VToolsObjectsTables:
+    file: lib/Daje/Database/View/VToolsObjectsTables.pm
+  Daje::Database::View::VToolsObjectsTypes:
+    file: lib/Daje/Database/View/VToolsObjectsTypes.pm
+  Daje::Database::View::VToolsParameterValues:
+    file: lib/Daje/Database/View/VToolsParameterValues.pm
   Daje::Database::View::VToolsProjects:
     file: lib/Daje/Database/View/VToolsProjects.pm
   Daje::Database::View::VToolsVersion:
     file: lib/Daje/Database/View/VToolsVersion.pm
   Daje::Database::View::VTreeList:
     file: lib/Daje/Database/View/VTreeList.pm
+  Daje::Document::Templates::Tools::Generate::SQL:
+    file: lib/Daje/Document/Templates/Tools/Generate/SQL.pm
   Daje::Plugin::Tools:
     file: lib/Daje/Plugin/Tools.pm
-    version: '0.14'
+    version: '0.15'
+  Daje::Workflow::Activities::Tools::Generate::Base:
+    file: lib/Daje/Workflow/Activities/Tools/Generate/Base.pm
+  Daje::Workflow::Activities::Tools::Generate::SQL:
+    file: lib/Daje/Workflow/Activities/Tools/Generate/SQL.pm
   Daje::Workflow::Activity::Tools::Project:
-    file: lib/Daje/Workflow/Activity/Tools/Project.pm
+    file: lib/Daje/Workflow/Activities/Tools/Project.pm
 requires:
+  Daje::Document::Builder: '0.01'
   Future::AsyncAwait: '0.52'
   Mojo::Base: '0'
   Scalar::Util: '0'
+  Template: '3.102'
   perl: '5.042000'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Plugin-Tools/issues
   homepage: https://github.com/janeskil1525/Daje-Plugin-Tools
   repository: https://github.com/janeskil1525/Daje-Plugin-Tools.git
-version: '0.14'
+version: '0.15'
 x_contributors:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

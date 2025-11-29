@@ -11,7 +11,7 @@ use Liveman::Cpanfile;
 chmod 0755, $_ for qw!script/test_script bin/tool!;
 
 $::cpanfile = Liveman::Cpanfile->new;
-local ($::_g0 = do {$::cpanfile->cpanfile}, $::_e0 = do {<< 'END'}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$::cpanfile->cpanfile # -> << \'END\'' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$::cpanfile->cpanfile}, $::_e0 = do {<< 'END'}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$::cpanfile->cpanfile # -> << \'END\'' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 requires 'perl', '5.22.0';
 
 on 'develop' => sub {

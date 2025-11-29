@@ -20,8 +20,8 @@ my @files = (
     't/00-report-prereqs.t',
     't/author-no-tabs.t',
     't/author-pod-syntax.t',
-    't/melian_mock.t',
-    't/melian_server_live.t'
+    't/melian_live.t',
+    't/melian_mock.t'
 );
 
 notabs_ok($_) foreach @files;

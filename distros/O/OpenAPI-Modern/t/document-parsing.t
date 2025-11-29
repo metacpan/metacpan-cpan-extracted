@@ -13,9 +13,9 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Memory::Cycle;
-use JSON::Schema::Modern::Utilities 'jsonp';
 use lib 't/lib';
 use Helper;
+use JSON::Schema::Modern::Utilities 'jsonp';
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 

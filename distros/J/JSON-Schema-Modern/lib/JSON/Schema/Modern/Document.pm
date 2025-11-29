@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.624';
+our $VERSION = '0.625';
 
 use 5.020;
 use Moo;
@@ -21,7 +21,6 @@ no feature 'switch';
 use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
-use Ref::Util 0.100 'is_plain_hashref';
 use builtin::compat qw(refaddr blessed);
 use Safe::Isa 1.000008;
 use MooX::TypeTiny;
@@ -188,7 +187,7 @@ sub BUILD ($self, $args) {
 # a subclass's method will override this one
 sub traverse ($self, $evaluator, $config_override = {}) {
   die 'wrong class - use JSON::Schema::Modern::Document::OpenAPI instead'
-    if is_plain_hashref($self->schema) and exists $self->schema->{openapi};
+    if ref $self->schema eq 'HASH' and exists $self->schema->{openapi};
 
   my $original_uri = $self->original_uri;
 
@@ -240,8 +239,8 @@ sub THAW ($class, $serializer, $data) {
 
   my $self = bless($data, $class);
 
-  foreach my $attr (qw(schema _entities _checksum)) {
-    croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
+  foreach my $attr (qw(schema _entities)) {
+    croak "serialization missing attribute '$attr' on document for identifier '$self->{canonical_uri}': perhaps your serialized data was produced for an older version of $class?"
       if not exists $self->{$attr};
   }
   return $self;
@@ -263,7 +262,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.624
+version 0.625
 
 =head1 SYNOPSIS
 

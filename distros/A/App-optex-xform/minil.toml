@@ -13,3 +13,5 @@ os = [
 [FileGatherer]
 exclude_match = ['^images/.*']
 
+[release]
+branch = 'master'

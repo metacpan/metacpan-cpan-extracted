@@ -11,11 +11,10 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 
-use Test::Memory::Cycle;
-use Feature::Compat::Try;
-
 use lib 't/lib';
 use Helper;
+use Test::Memory::Cycle;
+use Feature::Compat::Try;
 
 my $minimal_schema = {
   openapi => OAD_VERSION,

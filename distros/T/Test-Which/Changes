@@ -1,4 +1,13 @@
 Revision history for Test-Which
 
+0.03	Fri Nov 28 16:30:02 EST 2025
+	Use hashref rather than putting entire hash on the stack
+	Use IPC::Run3
+	Refactor a fair chunk
+
+0.02	Fri Nov 28 13:32:43 EST 2025
+	Fix copy and paste Pre-reqs error
+	Added CI testing
+
 0.01	Thu Nov 27 21:24:03 EST 2025
         First draft

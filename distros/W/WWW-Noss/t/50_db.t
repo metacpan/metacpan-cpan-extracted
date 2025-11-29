@@ -231,9 +231,7 @@ subtest 'look ok' => sub {
 
 };
 
-ok($obj->commit, 'commit ok');
 ok($obj->vacuum, 'vacuum ok');
-$obj->commit;
 
 ok($obj->finish, 'finish ok');
 

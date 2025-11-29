@@ -19,6 +19,7 @@ META.yml
 README
 SIGNATURE
 t/data/cnb000000168-correct_field_020a_isbn_not_present.xml
+t/data/cnb000008190-duplicates_in_035a_fields.xml
 t/data/cnb000295209-incorrect_field_008_syntax_space.xml
 t/data/cnb000545093-cnb001214971-duplicite_035a.xml
 t/data/cnb001410157-incorrect_field_020a_isbn_with_extra_characters.xml

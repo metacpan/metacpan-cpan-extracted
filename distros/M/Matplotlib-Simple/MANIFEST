@@ -38,5 +38,4 @@ output.images/single.wide.png
 output.images/trig.subplots.png
 output.images/violin.png
 output.images/wide.subplots.png
-t/01.python.t
-t/02.make.files.t
+t/01.all.tests.t

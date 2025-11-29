@@ -14,21 +14,19 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Safe::Isa;
 use List::Util 'pairs';
-use Ref::Util 'is_hashref';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Test2::V0 qw(!bag !bool !warnings), -no_pragmas => 1;  # prefer Test::Deep and Test2::Warnings versions of these exports
 use Test2::API 'context_do';
-use Test2::Tools::Exception 'lives';
 use Test::Needs;
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
 use if $ENV{AUTHOR_TESTING}, 'Test2::Plugin::BailOnFail';
 use Test::Deep qw(!array !hash); # import symbols: ignore, re etc
+use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use JSON::Schema::Modern::Document::OpenAPI;
 use JSON::Schema::Modern::Utilities qw(true false);
 use OpenAPI::Modern;
 use OpenAPI::Modern::Utilities;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use YAML::PP 0.005;
 
 use constant OAS_VOCABULARIES => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
@@ -305,7 +303,7 @@ sub cmp_result ($got, $expected, $test_name) {
 
     # dirty hack to check we always set operation_uri on success
     $ctx->fail('missing operation_uri on successful call')
-      if is_hashref($expected) and $expected->{errors} and $expected->{method} and not $expected->{errors}->@*
+      if ref $expected eq 'HASH' and $expected->{errors} and $expected->{method} and not $expected->{errors}->@*
       and not exists $expected->{operation_uri};
 
     my ($equal, $stack) = Test::Deep::cmp_details($got, $expected);

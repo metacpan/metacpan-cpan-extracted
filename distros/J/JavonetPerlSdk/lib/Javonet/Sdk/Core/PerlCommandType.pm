@@ -54,7 +54,8 @@ my %command_type = (
     'AsKwargs'                    => 45,
     'GetResultType'               => 46,
     'GetGlobalField'              => 47,
-
+    'RegisterForUpdate'           => 48,
+    'ValueForUpdate'              => 49,
 );
 
 sub get_command_type {

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.624';
+our $VERSION = '0.625';
 
 use 5.020;
 use Moo;
@@ -22,7 +22,6 @@ use JSON::Schema::Modern::Utilities qw(get_type E A assert_keyword_type abort);
 use Feature::Compat::Try;
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use Ref::Util 0.100 'is_plain_arrayref';
 use Scalar::Util 'looks_like_number';
 use namespace::clean;
 
@@ -255,9 +254,9 @@ sub _eval_keyword_format ($class, $data, $schema, $state) {
   $type = 'number' if $type eq 'integer';
 
   return 1 if
-    not is_plain_arrayref($spec->{type}) ? any { $type eq $_ } $spec->{type}->@* : $type eq $spec->{type}
+    not ref $spec->{type} eq 'ARRAY' ? any { $type eq $_ } $spec->{type}->@* : $type eq $spec->{type}
     and not ($state->{stringy_numbers} and $type eq 'string'
-      and is_plain_arrayref($spec->{type}) ? any { $_ eq 'number' } $spec->{type}->@* : $spec->{type} eq 'number'
+      and ref $spec->{type} eq 'ARRAY' ? any { $_ eq 'number' } $spec->{type}->@* : $spec->{type} eq 'number'
       and looks_like_number($data));
 
   return E($state, 'not a valid %s', $schema->{format}) if not $spec->{sub}->($data);
@@ -278,7 +277,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.624
+version 0.625
 
 =head1 DESCRIPTION
 

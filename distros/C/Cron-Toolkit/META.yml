@@ -1,7 +1,7 @@
 ---
 abstract: 'Quartz-compatible cron parser with unique extensions and over 400 tests'
 author:
-  - 'Nathaniel Graham <nathaniel.graham@cpan.org>'
+  - 'Nathaniel Graham <ngraham@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   JSON::PP: '0'
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/nathanielgraham/cron-toolkit-perl/issues
   repository: https://github.com/nathanielgraham/cron-toolkit-perl.git
-version: 0.09
+version: 0.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

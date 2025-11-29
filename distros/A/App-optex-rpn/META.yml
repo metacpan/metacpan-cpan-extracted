@@ -1,5 +1,5 @@
 ---
-abstract: 'Reverse Polish Notation calculation'
+abstract: 'optex module for Reverse Polish Notation calculation'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +26,19 @@ no_index:
 provides:
   App::optex::rpn:
     file: lib/App/optex/rpn.pm
-    version: '1.01'
+    version: '1.02'
 requires:
-  App::optex: v0.5.2
+  App::optex: '1.02'
+  Getopt::EX::Config: '0'
   Math::RPN: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/optex-rpn/issues
   homepage: https://github.com/kaz-utashiro/optex-rpn
-  repository: git://github.com/kaz-utashiro/optex-rpn.git
-version: '1.01'
+  repository: https://github.com/kaz-utashiro/optex-rpn.git
+version: '1.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

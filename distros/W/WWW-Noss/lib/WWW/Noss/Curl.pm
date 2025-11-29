@@ -2,7 +2,7 @@ package WWW::Noss::Curl;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(curl curl_error http_status_string parse_http_header);
@@ -198,6 +198,7 @@ sub curl {
     my $fail         = $param{ fail         } // 0;
     my $proxy        = $param{ proxy        } // undef;
     my $proxy_user   = $param{ proxy_user   } // undef;
+    my $redirect     = $param{ redirect     } // 0;
 
     my $tmp = do {
         my ($h, $p) = tempfile(UNLINK => 1);
@@ -255,12 +256,29 @@ sub curl {
         push @cmd, '-U', $proxy_user;
     }
 
+    if (defined $redirect) {
+        push @cmd, '-L';
+    }
+
     push @cmd, $link;
 
     system @cmd;
 
     my $exit = $? == -1 ? $? : $? >> 8;
-    my ($resp, $head) = -s $tmp ? parse_http_header($tmp) : (undef, {});
+    my ($resp, $head) = (
+        -s $tmp
+        # If there are multiple headers, only parse the last one.
+        ? do {
+            open my $fh, '<', $tmp or die "Failed to open $tmp for reading: $!\n";
+            binmode $fh;
+            my $slurp = do { local $/; <$fh> };
+            close $fh;
+            $slurp =~ s/(?:\r\n)*$//;
+            my $headstr = (split /(?:\r\n){2,}/, $slurp)[-1];
+            parse_http_header($headstr);
+        }
+        : (undef, {})
+    );
 
     return ($exit, $resp, $head);
 
@@ -268,13 +286,9 @@ sub curl {
 
 sub parse_http_header {
 
-    my ($file) = @_;
+    my ($header) = @_;
 
-    open my $fh, '<', $file
-        or die "Failed to open $file for reading: $!\n";
-    binmode $fh;
-    my ($resp, @lines) = do { local $/ = "\r\n"; <$fh> };
-    close $fh;
+    my ($resp, @lines) = split /\r\n/, $header;
 
     $resp =~ s/\r\n$//;
     my @resp_parts = split /\s+/, $resp, 3;
@@ -414,15 +428,20 @@ to none.
 Username and password to use for proxy, separated by a colon (C<user:pwd>).
 Corresponds to L<curl(1)>'s C<--proxy-user> option. Defaults to none.
 
+=item redirect
+
+Boolean determining whether to following redirections. Corresponds to
+L<curl(1)>'s C<--location> option. Defaults to false.
+
 =back
 
 =item $desc = curl_error($rt)
 
 Returns the string description of the C<curl()> exit code C<$rt>.
 
-=item (\@response, \%head) = parse_http_header($file)
+=item (\@response, \%head) = parse_http_header($header)
 
-Parses the HTTP header in C<$file>. C<\@response> is an array ref containing
+Parses the HTTP header in C<$header>. C<\@response> is an array ref containing
 the reponses's information. The first element is the protocol information, the
 second is the HTTP status code, and the third is a string providing extra
 information about the reponse. C<\%head> is a hash of data provided by the

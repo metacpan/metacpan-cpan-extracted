@@ -9,7 +9,7 @@ use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Term::ANSIColor;
@@ -67,7 +67,7 @@ my @ax_methods = (
 	'autoscale_view', 'axison',   'bxp', 'callbacks', 'can_pan', 'can_zoom',
 	'child_axes', 'collections', 'containers', 'contains_point', 'dataLim',
 	'drag_pan',   'end_pan',     'fmt_xdata',  'fmt_ydata',      'format_coord',
-	'format_xdata', 'format_ydata',
+	'format_xdata', 'format_ydata','hexbin', 'hist', 'hist2d', 'hlines',
 	'ignore_existing_data_limits', 'in_axes',    'indicate_inset',
 	'indicate_inset_zoom',         'inset_axes', 'invert_xaxis', 'invert_yaxis',
 	'label_outer', 'legend_', 'name', 'pcolorfast', 'redraw_in_frame', 'relim',
@@ -138,7 +138,7 @@ my @plt_methods = (
 	'Text', 'TickHelper',   'Widget',    'acorr',  'angle_spectrum', 'annotate',
 	'annotations', 'arrow', 'autoscale', 'autumn', 'axes',           'axhline',
 	'axhspan',     'axis',  'axline', 'axvline', 'axvspan', 'backend_registry',
-	'bar',         'bar_label', 'barbs', 'barh', 'bone',    'box', 'boxplot',
+	'bar_label', 'barbs', 'bone',    'box', 'boxplot',
 	'broken_barh', 'cast',      'cbook', 'cla',  'clabel'
 	,    #'clf', # I don't think you'd ever do that, also redundant with fig
 	'clim',      'close',   'cm',      'cohere', 'color_sequences', 'colorbar',
@@ -149,8 +149,8 @@ my @plt_methods = (
 	'fill_between', 'fill_betweenx', 'findobj',     'flag', 'functools', 'gca',
 	'gcf', 'gci', 'get', 'get_backend', 'get_cmap', 'get_current_fig_manager',
 	'get_figlabels', 'get_fignums', 'get_plot_commands', 'get_scale_names',
-	'getp',    'ginput', 'gray', 'grid', 'hexbin', 'hist', 'hist2d', 'hlines',
-	'hot',     'hsv',    'importlib', 'imread', 'imsave', 'imshow', 'inferno',
+	'getp',    'ginput', 'gray', 'grid', 
+	'hot',     'hsv',    'importlib', 'imread', 'imsave', 'inferno',
 	'inspect', 'install_repl_displayhook', 'interactive', 'ioff', 'ion',
 	'isinteractive',  'jet', 'legend', 'locator_params', 'logging', 'loglog',
 	'magma',          'magnitude_spectrum', 'margins', 'matplotlib', 'matshow',
@@ -166,7 +166,7 @@ my @plt_methods = (
 	'subplot',    # nrows, ncols : int, default: 1
 	'subplot2grid',    'subplot_mosaic', 'subplot_tool', 'subplots',
 	'subplots_adjust', 'summer', 'suptitle', 'switch_backend', 'sys', 'table',
-	'text'
+#	'text'
 	, # text(x: 'float', y: 'float', s: 'str', fontdict: 'dict[str, Any] | None' = None, **kwargs) -> 'Text'
 	'thetagrids',   'threading', 'tick_params',
 	'tight_layout', 'time', 'title', 'tricontour', 'tricontourf', 'tripcolor',

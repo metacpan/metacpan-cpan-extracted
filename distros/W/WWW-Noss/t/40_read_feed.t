@@ -7,9 +7,10 @@ use Test::More;
 use File::Spec;
 
 use WWW::Noss::FeedConfig;
-use WWW::Noss::FeedReader qw(read_feed);
+use WWW::Noss::FeedReader qw(read_feed discover_feeds);
 
 my $ATOM = File::Spec->catfile(qw/t data atom.xml/);
+my $DISCOVER = File::Spec->catfile(qw/t data discover.html/);
 
 my %DEFAULT = (
     name => 'feed',
@@ -125,6 +126,12 @@ subtest 'limit ok' => sub {
     is(scalar @$entries, 2, 'limit ok');
 
 };
+
+is_deeply(
+    [ discover_feeds($DISCOVER) ],
+    [ '/rss.xml', '/atom.xml' ],
+    'discover_feeds ok'
+);
 
 done_testing;
 

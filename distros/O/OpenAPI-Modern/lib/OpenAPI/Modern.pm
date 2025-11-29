@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.107-3-g8d88c679
+package OpenAPI::Modern; # git description: v0.108-9-gf5fb4675
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.108';
+our $VERSION = '0.109';
 
 use 5.020;
 use utf8;
@@ -21,7 +21,6 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Carp 'croak';
 use Safe::Isa;
-use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
 use List::Util qw(first pairs);
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
@@ -1008,7 +1007,7 @@ sub _validate_media_type ($self, $state, $content_obj, $media_type, $media_type_
   if (not $media_type_decoder) {
     # don't fail if the schema would pass on any input
     my $schema = $content_obj->{$media_type}{schema};
-    return if not defined $schema or is_plain_hashref($schema) ? !keys %$schema : $schema;
+    return if not defined $schema or ref $schema eq 'HASH' ? !keys %$schema : $schema;
 
     abort({ %$state, keyword => 'content', _keyword_path_suffix => $media_type},
       'EXCEPTION: unsupported media type "%s": add support with $openapi->add_media_type(...)', $media_type);
@@ -1067,11 +1066,11 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
 # 0, 1, false, true will be interpreted as boolean when type = boolean
 # (number and integer are implicit via evaluation with "stringy_numbers" enabled)
 sub _type_in_schema ($self, $schema, $state) {
-  return [] if not is_plain_hashref($schema);
+  return [] if ref $schema ne 'HASH';
 
   my @types;
 
-  push @types, is_plain_arrayref($schema->{type}) ? ($schema->{type}->@*) : ($schema->{type})
+  push @types, ref $schema->{type} eq 'ARRAY' ? ($schema->{type}->@*) : ($schema->{type})
     if exists $schema->{type};
 
   push @types, map $self->_type_in_schema($schema->{allOf}[$_],
@@ -1089,7 +1088,7 @@ sub _type_in_schema ($self, $schema, $state) {
 # evaluates data against the subschema at the current state location
 sub _evaluate_subschema ($self, $dataref, $schema, $state) {
   # boolean schema
-  if (not is_plain_hashref($schema)) {
+  if (ref $schema ne 'HASH') {
     return 1 if $schema;
 
     my @location = unjsonp($state->{data_path});
@@ -1236,7 +1235,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 SYNOPSIS
 
@@ -1621,8 +1620,8 @@ documents at startup, and impact can be further reduced by saving objects to cac
 reloading them (perhaps by using a timestamp or checksum to determine if a fresh reload is needed).
 
   sub get_openapi (...) {
-    my $serialized_file = Path::Tiny::path($serialized_filename);
-    my $openapi_file = Path::Tiny::path($openapi_filename);
+    my $serialized_file = Mojo::File->new($serialized_filename);
+    my $openapi_file = Mojo::File->new($openapi_filename);
     my $openapi;
     if ($serialized_file->stat->mtime < $openapi_file->stat->mtime)) {
       $openapi = OpenAPI::Modern->new(
@@ -1667,6 +1666,11 @@ C<https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3
 which treats the `format` keyword as an assertion, and also prevents any unknown keywords from being
 used in JSON Schemas. This is useful to avoid
 spelling mistakes from going unnoticed and resulting in false positive results.
+
+The OpenAPI v3.0 schema document is also available, for use in validating v3.0.x OpenAPI
+descriptions, but parsing of the description (e.g. for use in request and response validation) is
+not supported. It can be used directly as a schema (e.g. by using its URI in a C<$schema> or C<$ref>
+keyword) after calling L<JSON::Schema::Modern::Utilities/load_cached_document>.
 
 =head1 ON THE USE OF JSON SCHEMAS
 

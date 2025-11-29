@@ -92,12 +92,12 @@ foreach my $line (grep {/output\.file'\h+=\>\h*.+\.png',?\s*/} @mpl_examples) {
 	}
 }
 p @output_files;
-$txt = file2string('t/02.make.files.t');
+$txt = file2string('t/01.all.tests.t');
 my @test = split /\n/, $txt;
 $i1 = first_index {$_ eq $start_str}  @test;
 my $i2 = first_index {$_ eq $end_str} @test;
 splice @test, $i1+1, $i2-$i1-1; # remove old code
 splice @test, $i1+1, 0, @mpl_examples; # insert
 $test[$i2+1] = 'my @output_files = (\'' . join ("','", @output_files) . '\');';
-open $fh, '>', 't/02.make.files.t';
+open $fh, '>', 't/01.all.tests.t';
 say $fh join ("\n", @test);

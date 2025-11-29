@@ -2,7 +2,7 @@ package WWW::Noss::Util;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(dir resolve_url);

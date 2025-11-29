@@ -1,10 +1,10 @@
 {
-   "abstract" : "Reverse Polish Notation calculation",
+   "abstract" : "optex module for Reverse Polish Notation calculation",
    "author" : [
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "App::optex" : "v0.5.2",
+            "App::optex" : "1.02",
+            "Getopt::EX::Config" : "0",
             "Math::RPN" : "0",
             "perl" : "v5.14.0"
          }
@@ -56,7 +57,7 @@
    "provides" : {
       "App::optex::rpn" : {
          "file" : "lib/App/optex/rpn.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -66,15 +67,16 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/optex-rpn",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/optex-rpn.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/optex-rpn.git",
          "web" : "https://github.com/kaz-utashiro/optex-rpn"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

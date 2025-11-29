@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Cron::Toolkit',
-    AUTHOR           => 'Nathaniel Graham <nathaniel.graham@cpan.org>',
+    AUTHOR           => 'Nathaniel Graham <ngraham@cpan.org>',
     VERSION_FROM     => 'lib/Cron/Toolkit.pm',
     ABSTRACT_FROM    => 'lib/Cron/Toolkit.pm',
     LICENSE          => 'artistic_2',

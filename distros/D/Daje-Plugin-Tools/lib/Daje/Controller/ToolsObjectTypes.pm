@@ -49,7 +49,7 @@ sub load_object_types ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_object_types->load_full_list_p()->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;

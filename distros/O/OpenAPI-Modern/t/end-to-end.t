@@ -13,12 +13,11 @@ no feature 'switch';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use lib 't/lib';
+use Helper;
 use JSON::Schema::Modern::Utilities 'jsonp';
 use Mojolicious;
 use Test::Mojo;
-
-use lib 't/lib';
-use Helper;
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 my $doc_uri_rel = Mojo::URL->new('/api');

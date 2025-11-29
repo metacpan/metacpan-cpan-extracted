@@ -50,7 +50,7 @@ sub load_table_object($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
 
     $self->tools_objects_tables->load_tools_objects_tables_pkey_p($tools_object_tables_pkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
         $self->render(json => { result => 0, data => $err });
     })->wait;

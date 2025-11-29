@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader::RSS;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use WWW::Noss::FeedReader::MediaRSS qw(parse_media_node);
 use WWW::Noss::Timestamp;

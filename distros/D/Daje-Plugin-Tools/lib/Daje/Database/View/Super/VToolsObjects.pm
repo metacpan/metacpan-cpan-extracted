@@ -47,7 +47,7 @@ async sub load_full_list_p($self) {
 
 sub load_tools_objects_fkey($self, $foreign_key_name, $foreign_key) {
 
-    say "$foreign_key_name = $foreign_key";
+    say "$foreign_key_name == $foreign_key";
     return $self->load_fkey(
         $self->view_name, $self->fields(), $foreign_key_name, $foreign_key
     );

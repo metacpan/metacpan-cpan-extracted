@@ -11,16 +11,16 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
-use Path::Tiny;
+use Mojo::File 'path';
 use Mojo::UserAgent;
 use Digest::MD5 'md5_hex';
-use JSON::Schema::Modern;
+use JSON::Schema::Modern 0.624;
 use lib 'lib';  # make sure we load the newly-patched version of our modules
-use OpenAPI::Modern::Utilities qw(BUNDLED_SCHEMAS OAS_SCHEMAS OAS_VERSIONS);
+use OpenAPI::Modern::Utilities qw(OAS_SCHEMAS OAS_VERSIONS);
 
 # { download URL -> filename (in share) }
 my %files = (
-  (map +(BUNDLED_SCHEMAS->{$_}->%{OAS_SCHEMAS->{$_}->@*}), OAS_VERSIONS->@*),
+  (OpenAPI::Modern::Utilities::_BUNDLED_SCHEMAS->%{ map @$_, values OAS_SCHEMAS->%* }),
   'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE' => 'oas/LICENSE',
 );
 
@@ -68,11 +68,11 @@ if (my @outdated_schemas = grep $new_schemas{$_}->@*, reverse sort keys %new_sch
 
   foreach my $file (split("\n", `git ls-files`) ) {
     next if $file =~ m{^share/oas/};  # skip references in the files we are replacing
-    path($file)->edit_raw(sub {
-        foreach my $outdated (@outdated_schemas) {
-          s/$outdated/$new_schemas{$outdated}/g;
-        }
-      });
+
+    $file = path($file);
+    my $content = $file->slurp;
+    $content =~ s/$_/$new_schemas{$_}/g foreach @outdated_schemas;
+    $file->spew($content);
   }
 
   # update the values of %files for all schemas that are outdated
@@ -95,9 +95,9 @@ foreach my $uri (sort keys %files) {
   die "Failed to fetch $uri", $res->code, " ", $res->message if $res->is_error;
 
   $target = path('share', $target);
-  $target->parent->mkpath;
-  my $exists = $target->exists;
-  $target->spew_raw(my $content = $res->body);
+  $target->dirname->make_path;
+  my $exists = -e $target;
+  $target->spew(my $content = $res->body);
   system('git add '.$target) if not $exists;
   $checksums{$target} = md5_hex($content);
 
@@ -112,11 +112,12 @@ foreach my $uri (sort keys %files) {
 }
 
 # compute checksums and record them in the test, preserving unaffected entries
-path('t/checksums.t')->edit_raw(sub {
-  m/^__DATA__$/mg;
-  %checksums = ((split /\s/, substr($_, pos()+1)), %checksums);
-  $_ = substr($_, 0, pos()+1).join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n";
-});
+my $checksums_file = path('t/checksums.t');
+my $checksums_content = $checksums_file->slurp;
+$checksums_content =~ m/^__DATA__$/mg;
+%checksums = ((split /\s/, substr($checksums_content, pos($checksums_content)+1)), %checksums);
+$checksums_file->spew(substr($checksums_content, 0, pos($checksums_content)+1)
+  .join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n");
 
 # only edit Changes file if there are updated files to be committed
 my @changed_versions = grep +(
@@ -127,15 +128,14 @@ if (@changed_versions) {
   my ($seen_next, $seen_blank);
   my $versions = (@changed_versions > 1 ? 's ' : ' ').join(', ', @changed_versions);
   say '# edited Changes file for OAS version'.$versions if $ENV{DEBUG};
-  path('Changes')->edit_lines_utf8(sub {
-    if ($seen_next ||= /^\{\{\$NEXT\}\}/ and not $seen_blank and /^$/) {
-      my $leader = ' 'x10;
-      my @string = ("updated bundled schemas for OAS version${versions} to their latest", 'published versions');
 
-      s/^$/$leader- $string[0]\n$leader  $string[1]/;
-      $seen_blank = 1;
-    }
-  });
+  my $changes_file = path('Changes');
+  my $changes_content = $changes_file->slurp('UTF-8');
+  $changes_content =~ m/^\{\{\$NEXT\}\}$/mg;
+  $changes_content =~ m/^$/mg;    # find first empty line after {{$NEXT}}, and insert before it.
+  my $leader = ' 'x10;
+  $changes_content =~ s/\G/$leader- updated bundled schemas for OAS version${versions} to their latest\n$leader  published versions\n/m;
+  $changes_file->spew($changes_content, 'UTF-8');
 
   exec 'git commit -m"update bundled schemas for OAS '.join(', ', @changed_versions).' to latest versions" Changes lib share t';
 }

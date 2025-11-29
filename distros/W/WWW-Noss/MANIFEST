@@ -2,6 +2,7 @@ bin/noss
 bin/nossui
 Changes
 doc/nossui.pod
+img/noss-list-screenshot.png
 img/noss-logo.png
 img/noss-the-mouse.png
 lib/WWW/Noss.pm
@@ -41,6 +42,7 @@ t/data/dir/.hidden.txt
 t/data/dir/a.txt
 t/data/dir/b.txt
 t/data/dir/c.txt
+t/data/discover.html
 t/data/lynx.html
 t/data/mail-dates
 t/data/mrss-atom.xml

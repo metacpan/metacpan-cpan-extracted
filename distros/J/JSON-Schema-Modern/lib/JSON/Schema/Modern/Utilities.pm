@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.624';
+our $VERSION = '0.625';
 
 use 5.020;
 use strictures 2;
@@ -19,7 +19,6 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use B;
 use Carp 'croak';
-use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use builtin::compat qw(blessed created_as_number);
 use Scalar::Util 'looks_like_number';
 use Storable 'dclone';
@@ -27,6 +26,7 @@ use Feature::Compat::Try;
 use Mojo::JSON ();
 use JSON::PP ();
 use Types::Standard qw(Str InstanceOf);
+use Mojo::File 'path';
 use namespace::clean;
 
 use Exporter 'import';
@@ -57,6 +57,8 @@ our @EXPORT_OK = qw(
   false
   json_pointer_type
   canonical_uri_type
+  register_schema
+  load_cached_document
 );
 
 use constant HAVE_BUILTIN => "$]" >= 5.035010;
@@ -84,10 +86,10 @@ sub is_type ($type, $value, $config = {}) {
     return is_bool($value);
   }
   if ($type eq 'object') {
-    return is_plain_hashref($value);
+    return ref $value eq 'HASH';
   }
   if ($type eq 'array') {
-    return is_plain_arrayref($value);
+    return ref $value eq 'ARRAY';
   }
 
   if ($type eq 'string' or $type eq 'number' or $type eq 'integer') {
@@ -101,7 +103,7 @@ sub is_type ($type, $value, $config = {}) {
 
     if ($type eq 'string') {
       # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
-      return !is_ref($value)
+      return !length ref($value)
         && !(HAVE_BUILTIN && builtin::is_bool($value))
         && $flags & B::SVf_POK
         && (!($flags & (B::SVf_IOK | B::SVf_NOK))
@@ -143,14 +145,14 @@ sub is_type ($type, $value, $config = {}) {
 # pass { legacy_ints => 1 } in $config to use draft4 integer behaviour
 # behaviour is consistent with is_type().
 sub get_type ($value, $config = {}) {
-  return 'object' if is_plain_hashref($value);
+  return 'object' if ref $value eq 'HASH';
   return 'boolean' if is_bool($value);
   return 'null' if not defined $value;
-  return 'array' if is_plain_arrayref($value);
+  return 'array' if ref $value eq 'ARRAY';
 
   # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
-  if (is_ref($value)) {
-    my $ref = ref($value);
+  if (length ref $value) {
+    my $ref = ref $value;
     return $ref eq 'Math::BigInt' ? 'integer'
       : $ref eq 'Math::BigFloat' ? (!$config->{legacy_ints} && $value->is_int ? 'integer' : 'number')
       : (defined blessed($value) ? '' : 'reference to ').$ref;
@@ -201,7 +203,7 @@ sub is_bool ($value) {
 }
 
 sub is_schema ($value) {
-  is_plain_hashref($value) || is_bool($value);
+  ref $value eq 'HASH' || is_bool($value);
 }
 
 sub is_bignum ($value) {
@@ -344,7 +346,7 @@ sub E ($state, $error_string, @args) {
 
   # sometimes the keyword shouldn't be at the very end of the schema path
   my $sps = delete $state->{_keyword_path_suffix};
-  my @keyword_path_suffix = defined $sps && is_plain_arrayref($sps) ? $sps->@* : $sps//();
+  my @keyword_path_suffix = defined $sps && ref $sps eq 'ARRAY' ? $sps->@* : $sps//();
 
   # we store the absolute uri in unresolved form until needed,
   # and perform the rest of the calculations later.
@@ -479,7 +481,7 @@ sub assert_uri ($state, $schema, $override = undef) {
 # produces an annotation whose value is the same as that of the current schema keyword
 # makes a copy as this is passed back to the user, who cannot be trusted to not mutate it
 sub annotate_self ($state, $schema) {
-  A($state, is_ref($schema->{$state->{keyword}}) ? dclone($schema->{$state->{keyword}})
+  A($state, ref $schema->{$state->{keyword}} ? dclone($schema->{$state->{keyword}})
     : $schema->{$state->{keyword}});
 }
 
@@ -496,6 +498,66 @@ sub canonical_uri_type () {
   (InstanceOf['Mojo::URL'])->where(q{!defined($_->fragment) || $_->fragment =~ m{^/} && $_->fragment !~ m{~(?![01])}});
 }
 
+# simple runtime-wide cache of $ids to filenames that are sourced from disk
+my $schema_filename_cache = {};
+
+# adds a mapping from a URI to an absolute filename in the global runtime
+# (available to all instances of the evaluator running in the same process).
+sub register_schema ($uri, $filename) {
+  $schema_filename_cache->{$uri} = $filename;
+}
+
+sub get_schema_filename ($uri) {
+  $schema_filename_cache->{$uri};
+}
+
+# simple runtime-wide cache of $ids to schema document objects that are sourced from disk
+my $document_cache = {};
+
+# Fetches a document from the cache (reading it from disk and creating the document if necessary),
+# and add it to the evaluator.
+# Normally this will just be a cache of schemas that are bundled with this distribution or a related
+# distribution (such as OpenAPI-Modern), as duplicate identifiers are not checked for, unlike for
+# normal schema additions.
+# Only JSON-encoded files are supported at this time.
+sub load_cached_document ($evaluator, $uri) {
+  $uri =~ s/#$//; # older draft $ids use an empty fragment
+
+  # see if it already exists as a document in the cache
+  my $document = $document_cache->{$uri};
+
+  # otherwise, load it from disk using our filename cache and create the document
+  if (not $document and my $filename = $schema_filename_cache->{$uri}) {
+    my $file = path($filename);
+    die "uri $uri maps to file $file which does not exist" if not -f $file;
+    my $schema = $evaluator->_json_decoder->decode($file->slurp);
+
+    # avoid calling add_schema, which checksums the file to look for duplicates
+    $document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $evaluator);
+
+    # avoid calling add_document, which checks for duplicate identifiers (and would result in an
+    # infinite loop)
+    die JSON::Schema::Modern::Result->new(
+      output_format => $evaluator->output_format,
+      valid => 0,
+      errors => [ $document->errors ],
+      exception => 1,
+    ) if $document->has_errors;
+
+    $document_cache->{$uri} = $document;
+  }
+
+  return if not $document;
+
+  # bypass the normal collision checks, to avoid an infinite loop: these documents are presumed safe
+  $evaluator->_add_resources_unsafe(
+    map +($_->[0] => +{ $_->[1]->%*, document => $document }),
+      $document->resource_pairs
+  );
+
+  return $document;
+}
+
 1;
 
 __END__
@@ -510,7 +572,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.624
+version 0.625
 
 =head1 SYNOPSIS
 
@@ -518,11 +580,28 @@ version 0.624
 
 =head1 DESCRIPTION
 
-This class contains internal utilities to be used by L<JSON::Schema::Modern>.
+This class contains internal utilities to be used by L<JSON::Schema::Modern>, and other useful helpers.
 
 =for Pod::Coverage is_type get_type is_bignum is_bool is_schema is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
 annotate_self sprintf_num HAVE_BUILTIN true false json_pointer_type canonical_uri_type
+register_schema get_schema_filename load_cached_document
+
+=head1 FUNCTIONS
+
+=for stopwords schemas metaschemas
+
+=head2 load_cached_document
+
+  my $evaluator = JSON::Schema::Modern->new;
+  my $uri = 'https://json-schema.org/draft-07/schema#';
+  my $document = load_cached_document($evaluator, $uri);
+
+  my $result = $evaluator->evaluate($data, $uri);
+
+Loads a document object from global cache, loading data from disk if needed. This should only be
+used for officially-published schemas and metaschemas that are bundled with this distribution or
+another related one.
 
 =head1 GIVING THANKS
 

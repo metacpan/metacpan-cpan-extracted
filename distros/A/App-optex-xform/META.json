@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "App::optex::xform" : {
          "file" : "lib/App/optex/xform.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -68,15 +68,16 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/optex-xform",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/optex-xform.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/optex-xform.git",
          "web" : "https://github.com/kaz-utashiro/optex-xform"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

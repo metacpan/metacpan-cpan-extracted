@@ -46,6 +46,7 @@
             "Daje::Workflow::Database" : "0",
             "Daje::Workflow::Database::Model::WorkflowConnection" : "0",
             "Daje::Workflow::Loader" : "0",
+            "Future::AsyncAwait" : "0.52",
             "Mojo::Base" : "0",
             "Mojolicious::Plugin" : "0",
             "perl" : "v5.40.0"
@@ -63,7 +64,7 @@
       },
       "Daje::Plugin::Workflow" : {
          "file" : "lib/Daje/Plugin/Workflow.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-Workflow"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

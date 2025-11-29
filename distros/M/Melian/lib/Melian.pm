@@ -1,7 +1,7 @@
 package Melian;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Perl client to the Melian cache
-$Melian::VERSION = '0.001';
+$Melian::VERSION = '0.002';
 use v5.34;
 use JSON::XS qw<decode_json>;
 use IO::Socket::INET;
@@ -89,7 +89,7 @@ sub fetch_raw {
     return $self->_send(ACTION_FETCH(), $table_id, $index_id, $key);
 }
 
-sub fetch_json {
+sub fetch_by_string {
     my ($self, $table_id, $index_id, $key) = @_;
     my $payload = $self->fetch_raw($table_id, $index_id, $key);
     return undef if $payload eq '';
@@ -106,9 +106,9 @@ sub fetch_json {
     return $decoded;
 }
 
-sub fetch_json_by_id {
+sub fetch_by_int {
     my ($self, $table_id, $index_id, $id) = @_;
-    return $self->fetch_json($table_id, $index_id, pack('V', $id));
+    return $self->fetch_by_string($table_id, $index_id, pack('V', $id));
 }
 
 sub _load_schema_from_describe {
@@ -244,7 +244,7 @@ Melian - Perl client to the Melian cache
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ version 0.001
         dsn => 'unix:///tmp/melian.sock',
     );
 
-    my $row = $client->fetch_json_by_id(0, 0, 5);
+    my $row = $client->fetch_by_int(0, 0, 5);
 
 =head1 DESCRIPTION
 
@@ -314,16 +314,16 @@ Closes the socket connection.
 Sends a C<FETCH> action and returns the raw payload as bytes for the specified
 table/index pair.
 
-=head2 fetch_json
+=head2 fetch_by_string
 
-    my $row = $client->fetch_json($table_id, $index_id, $key_bytes);
+    my $row = $client->fetch_by_string($table_id, $index_id, $key_bytes);
 
 Like C<fetch_raw> but decodes the JSON payload into a hashref, or returns
 C<undef> if the server responds with an empty payload.
 
-=head2 fetch_json_by_id
+=head2 fetch_by_int
 
-    my $row = $client->fetch_json_by_id($table_id, $index_id, $numeric_id);
+    my $row = $client->fetch_by_int($table_id, $index_id, $numeric_id);
 
 Helper for integer primary keys; packs the ID into little-endian bytes and
 returns the decoded row.

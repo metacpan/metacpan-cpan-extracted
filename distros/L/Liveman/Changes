@@ -1,5 +1,9 @@
 Revision history for Perl extension Liveman
 
+3.8 2025-11-28T11:36:53Z
+
+    - test -> check defined and eq (remove equal ref-s)
+
 3.7 2025-11-28T08:15:57Z
 
     - tests with local

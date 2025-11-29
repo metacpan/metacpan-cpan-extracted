@@ -48,7 +48,7 @@ sub load_table_object_datatypes($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
 
     $self->tools_objects_tables_datatypes->load_tools_objects_tables_datatypes_p()->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub($err) {
         $self->render(json => { result => 0, data => $err });
     })->wait;

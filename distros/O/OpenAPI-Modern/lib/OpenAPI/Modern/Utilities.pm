@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.108';
+our $VERSION = '0.109';
 
 use 5.020;
 use strictures 2;
@@ -17,7 +17,8 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use File::ShareDir 'dist_dir';
-use Path::Tiny;
+use Mojo::File 'path';
+use JSON::Schema::Modern::Utilities 0.625 qw(register_schema load_cached_document);
 use namespace::clean;
 
 use Exporter 'import';
@@ -34,10 +35,8 @@ our @EXPORT = qw(
 );
 
 our @EXPORT_OK = qw(
-  BUNDLED_SCHEMAS
   OAS_SCHEMAS
   add_vocab_and_default_schemas
-  load_bundled_document
 );
 
 our %EXPORT_TAGS = (
@@ -50,15 +49,18 @@ our %EXPORT_TAGS = (
 use constant SUPPORTED_OAD_VERSIONS => [ '3.1.2', '3.2.0' ];
 
 # in most things, e.g. schemas, we only use major.minor as the version number
-use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+$//r, SUPPORTED_OAD_VERSIONS->@* ];
+# we don't actually support OAS 3.0.x, but we will bundle its schema so it can be more easily used
+# for validating v3.0 OADs
+use constant OAS_VERSIONS => [ '3.0', map s/^\d+\.\d+\K\.\d+$//r, SUPPORTED_OAD_VERSIONS->@* ];
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
 # these are updated automatically at build time via 'update-schemas'
 
 # the main OpenAPI document schema, with permissive (unvalidated) JSON Schemas
 use constant DEFAULT_METASCHEMA => {
-  3.1 => 'https://spec.openapis.org/oas/3.1/schema/2025-09-15',
-  3.2 => 'https://spec.openapis.org/oas/3.2/schema/2025-09-17',
+  '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18',
+  '3.1' => 'https://spec.openapis.org/oas/3.1/schema/2025-09-15',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/schema/2025-09-17',
 };
 
 # metaschema for JSON Schemas contained within OpenAPI documents:
@@ -92,23 +94,27 @@ use constant STRICT_DIALECT => {
   3.2 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-dialect.json',
 };
 
-# identifier => local filename (under share/)
-use constant BUNDLED_SCHEMAS => {
-  map +($_ => +{
-    DEFAULT_METASCHEMA->{$_}      => 'oas/'.$_.'/schema.json',
-    DEFAULT_DIALECT->{$_}         => 'oas/'.$_.'/dialect.json',
-    DEFAULT_BASE_METASCHEMA->{$_} => 'oas/'.$_.'/schema-base.json',
-    OAS_VOCABULARY->{$_}          => 'oas/'.$_.'/vocabulary.json',
-    STRICT_METASCHEMA->{$_}       => $_.'/strict-schema.json',
-    STRICT_DIALECT->{$_}          => $_.'/strict-dialect.json',
-  }), OAS_VERSIONS->@*
+# <uri> => <local filename> (under share/) - for internal use only!
+use constant _BUNDLED_SCHEMAS => {
+  map +(
+    DEFAULT_METASCHEMA->{$_}        => 'oas/'.$_.'/schema.json',
+    $_ eq '3.0' ? () : (
+      DEFAULT_DIALECT->{$_}         => 'oas/'.$_.'/dialect.json',
+      DEFAULT_BASE_METASCHEMA->{$_} => 'oas/'.$_.'/schema-base.json',
+      OAS_VOCABULARY->{$_}          => 'oas/'.$_.'/vocabulary.json',
+      STRICT_METASCHEMA->{$_}       => $_.'/strict-schema.json',
+      STRICT_DIALECT->{$_}          => $_.'/strict-dialect.json',
+    )
+  ), OAS_VERSIONS->@*
 };
 
-# these are all pre-loaded, and also made available as s/<date>/latest/
+# these are all loadable on demand, via JSON::Schema::Modern::load_cached_document,
+# and also made available as s/<date>/latest/
+# { <oas version> => [ <uri>, <uri>, .. ]
 use constant OAS_SCHEMAS => {
   map {
     my $version = $_;
-    $version => [ grep m{/oas/$version/}, keys BUNDLED_SCHEMAS->{$version}->%* ]
+    $version => [ grep m{/oas/$version/}, keys _BUNDLED_SCHEMAS->%* ]
   } OAS_VERSIONS->@*
 };
 
@@ -143,24 +149,19 @@ sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
   $evaluator->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
 
   foreach my $uri (OAS_SCHEMAS->{$version}->@*) {
-    my $document = load_bundled_document($evaluator, $uri);
+    my $document = load_cached_document($evaluator, $uri);
+
+    # add "latest" alias for each of these documents, mapping to the same document object
     $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}$}{}r).'/latest', $document);
   }
 }
 
-# simple runtime-wide cache of $ids to metaschema document objects that are sourced from disk
-my $metaschema_cache = {};
-
-# load a schema that comes bundled with the distribution, and add it to the evaluator.
-sub load_bundled_document ($evaluator, $uri) {
-  if (my $document = $metaschema_cache->{$uri}) {
-    return $evaluator->add_document($document);
+{
+  # make all bundled schemas available via JSON::Schema::Modern::load_cached_document
+  my $share_dir = dist_dir('OpenAPI-Modern');
+  foreach my $uri (keys _BUNDLED_SCHEMAS->%*) {
+    register_schema($uri, $share_dir.'/'._BUNDLED_SCHEMAS->{$uri});
   }
-
-  my ($version) = $uri =~ m{/(\d+\.\d+)/};
-  my $file = path(dist_dir('OpenAPI-Modern'), BUNDLED_SCHEMAS->{$version}{$uri});
-  my $schema = $evaluator->_json_decoder->decode($file->slurp_raw);
-  return $metaschema_cache->{$uri} = $evaluator->add_schema($schema);
 }
 
 1;
@@ -177,7 +178,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 SYNOPSIS
 
@@ -187,8 +188,7 @@ version 0.108
 
 This class contains common definitions and internal utilities to be used by L<OpenAPI::Modern>.
 
-=for Pod::Coverage BUNDLED_SCHEMAS
-DEFAULT_BASE_METASCHEMA
+=for Pod::Coverage DEFAULT_BASE_METASCHEMA
 DEFAULT_DIALECT
 DEFAULT_METASCHEMA
 OAS_SCHEMAS
@@ -198,7 +198,6 @@ STRICT_DIALECT
 STRICT_METASCHEMA
 SUPPORTED_OAD_VERSIONS
 add_vocab_and_default_schemas
-load_bundled_document
 
 =head1 GIVING THANKS
 

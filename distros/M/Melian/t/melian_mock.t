@@ -53,13 +53,13 @@ test_tcp(
         my $table1 = $schema->{'tables'}[0];
         my $table2 = $schema->{'tables'}[1];
 
-        my $table1_row = $melian->fetch_json_by_id( $table1->{'id'}, $table1->{'indexes'}[0]{'id'}, 5 );
+        my $table1_row = $melian->fetch_by_int( $table1->{'id'}, $table1->{'indexes'}[0]{'id'}, 5 );
         is( $table1_row->{'name'}, 'item_5', 'table1 row fetched' );
 
-        my $table2_id_row = $melian->fetch_json_by_id( $table2->{'id'}, $table2->{'indexes'}[0]{'id'}, 2 );
+        my $table2_id_row = $melian->fetch_by_int( $table2->{'id'}, $table2->{'indexes'}[0]{'id'}, 2 );
         is( $table2_id_row->{'hostname'}, 'host-00002', 'table2 by id' );
 
-        my $table2_host_row = $melian->fetch_json( $table2->{'id'}, $table2->{'indexes'}[1]{'id'}, 'host-00002' );
+        my $table2_host_row = $melian->fetch_by_string( $table2->{'id'}, $table2->{'indexes'}[1]{'id'}, 'host-00002' );
         is( $table2_host_row->{'status'}, 'maintenance', 'table2 by hostname' );
     },
     server => sub {

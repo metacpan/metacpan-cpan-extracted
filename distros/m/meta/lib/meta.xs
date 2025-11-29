@@ -61,6 +61,10 @@
 #  define HAVE_OP_MULTIPARAM
 #endif
 
+#if HAVE_PERL_VERSION(5, 43, 5)
+#  define HAVE_OP_MULTIPARAM_NAMED
+#endif
+
 #ifndef av_count
 #  define av_count(av)  (AvFILL(av)+1)
 #endif
@@ -124,12 +128,31 @@ static SV *S_wrap_cv_signature(pTHX_ CV *cv, OP *op, U32 flags)
   return sv_setref_pvn(newSV(0), "meta::subsignature", (const char *)&ret, sizeof(ret));
 }
 
+#ifdef HAVE_OP_MULTIPARAM_NAMED
+
+# define newSVmultiparam_named(oaux)  S_newSVmultiparam_named(aTHX_ oaux)
+static SV *S_newSVmultiparam_named(pTHX_ struct op_multiparam_named_aux *oaux)
+{
+  struct op_multiparam_named_aux ret = *oaux;
+  ret.namepv = savepvn(ret.namepv, ret.namelen);
+  return sv_setref_pvn(newSV(0), "meta::subsignature::named_param", (const char *)&ret, sizeof(ret));
+}
+
+# define MULTIPARAM_NAMED_FROM_REFSV(refsv) \
+  (struct op_multiparam_named_aux *)SvPVX(SvRV(refsv))
+
+#endif /* HAVE_OP_MULTIPARAM_NAMED */
+
 #ifdef SVf_QUOTEDPREFIX
-#  define CROAK_QUOTED_PREFIX(msg, arg)  \
-    croak(msg "%" SVf_QUOTEDPREFIX, arg)
+#  define templateSVf_QUOTEDPREFIX  "%" SVf_QUOTEDPREFIX
 #else
-#  define CROAK_QUOTED_PREFIX(msg, arg)  \
-    croak(msg "\"%" SVf "\"", arg)
+#  define templateSVf_QUOTEDPREFIX  "\"%" SVf "\""
+#endif
+
+#ifdef PVf_QUOTEDPREFIX
+#  define templatePVf_QUOTEDPREFIX  "%" PVf_QUOTEDPREFIX
+#else
+#  define templatePVf_QUOTEDPREFIX  "\"%s\""
 #endif
 
 #define gv_is_empty(gv)  S_gv_is_empty(aTHX_ gv)
@@ -385,7 +408,8 @@ get_glob(SV *metapkg, SV *name)
     }
     else switch(ix) {
       case GET_OR_THROW:
-        CROAK_QUOTED_PREFIX("Package does not contain a glob called ", SVfARG(name));
+        croak("Package " templatePVf_QUOTEDPREFIX " does not contain a glob called " templateSVf_QUOTEDPREFIX,
+          HvNAME(stash), SVfARG(name));
       case GET_OR_UNDEF_WITH_WARNING:
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
@@ -491,7 +515,8 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
       croak("TODO: Not sure what to do with SvTYPE(sv)=%d\n", SvTYPE(sv));
 
     if(ix == ADD_OR_THROW && ret)
-      CROAK_QUOTED_PREFIX("Already have a symbol named ", SVfARG(name));
+      croak("Package " templatePVf_QUOTEDPREFIX " already contains a symbol named " templateSVf_QUOTEDPREFIX,
+        HvNAME(stash), SVfARG(name));
 
     if(!ret && create) {
       GV *gv = (GV *)sv;
@@ -529,7 +554,8 @@ get_symbol(SV *metapkg, SV *name, SV *value = NULL)
       RETVAL = (GIMME_V != G_VOID) ? wrap_sv_refsv(ret) : &PL_sv_undef;
     else switch(ix) {
       case GET_OR_THROW:
-        CROAK_QUOTED_PREFIX("Package has no symbol named ", SVfARG(name));
+        croak("Package " templatePVf_QUOTEDPREFIX " has no symbol named " templateSVf_QUOTEDPREFIX,
+          HvNAME(stash), SVfARG(name));
       case GET_OR_UNDEF_WITH_WARNING:
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
@@ -566,7 +592,8 @@ add_named_sub(SV *metapkg, SV *name, SV *value)
     }
 
     if(GvCVu(gv))
-      CROAK_QUOTED_PREFIX("Already have a symbol named &", SVfARG(name));
+      croak("Package " templatePVf_QUOTEDPREFIX " already contains symbol named &" templateSVf_QUOTEDPREFIX,
+        HvNAME(stash), SVfARG(name));
 
     /* Set these in the right order so the name GV works properly */
     GvCV_set(gv, CvREFCNT_inc(cv));
@@ -613,7 +640,8 @@ remove_symbol(SV *metapkg, SV *name)
 
       if(!sv)
         missing:
-        CROAK_QUOTED_PREFIX("Cannot remove non-existing symbol from package: ", SVfARG(name));
+        croak("Cannot remove non-existing symbol " templateSVf_QUOTEDPREFIX " from package " templatePVf_QUOTEDPREFIX,
+          SVfARG(name), HvNAME(stash));
 
       SvREFCNT_dec(sv);
 
@@ -825,7 +853,8 @@ get(SV *cls, SV *globname)
     }
     else switch(ix) {
       case GET_OR_THROW:
-        CROAK_QUOTED_PREFIX("Symbol table does not contain a glob called ", SVfARG(globname));
+        croak("Symbol table does not contain a glob called " templateSVf_QUOTEDPREFIX,
+          SVfARG(globname));
       case GET_OR_UNDEF:
         RETVAL = &PL_sv_undef;
         break;
@@ -1138,20 +1167,28 @@ mandatory_params(SV *metasig)
     mandatory_params = 0
     optional_params  = 1
     slurpy           = 2
-    min_args         = 0
-    max_args         = 3
+    min_args         = 3
+    max_args         = 4
   CODE:
   {
     int params, opt_params;
+    size_t n_named;
     char slurpy;
 #ifdef HAVE_SUB_SIGNATURES
     struct CVwithOP *cvop = (struct CVwithOP *)SvPVX(SvRV(metasig));
 #  if HAVE_PERL_VERSION(5, 31, 5)
 #    ifdef HAVE_OP_MULTIPARAM
+    struct op_multiparam_aux *aux = NULL;
     if(cvop->op->op_type == OP_MULTIPARAM) {
-      struct op_multiparam_aux *aux = (struct op_multiparam_aux *)cUNOP_AUXx(cvop->op)->op_aux;
+      aux = (struct op_multiparam_aux *)cUNOP_AUXx(cvop->op)->op_aux;
+
       params     = aux->n_positional;
       opt_params = params - aux->min_args;
+#      ifdef HAVE_OP_MULTIPARAM_NAMED
+      n_named    = aux->n_named;
+#      else
+      n_named    = 0;
+#      endif
       slurpy     = aux->slurpy;
     }
     else
@@ -1160,32 +1197,115 @@ mandatory_params(SV *metasig)
       struct op_argcheck_aux *aux = (struct op_argcheck_aux *)cUNOP_AUXx(cvop->op)->op_aux;
       params     = aux->params + ((cvop->flags & CVSIGNATURE_IS_METHOD) ? 1 : 0);
       opt_params = aux->opt_params;
+      n_named    = 0;
       slurpy     = aux->slurpy;
     }
 #  else
     UNOP_AUX_item *aux = cUNOP_AUXx(cvop->op)->op_aux;
     params     = aux[0].iv;
     opt_params = aux[1].iv;
+    n_named    = 0;
     slurpy     = aux[2].iv;
 #  endif
 
     switch(ix) {
-      case 0:
+      case 0: /* mandatory_params */
         RETVAL = newSViv(params - opt_params);
         break;
-      case 1:
+      case 1: /* optional_params */
         RETVAL = newSViv(opt_params);
         break;
-      case 2:
+      case 2: /* slurpy */
         RETVAL = slurpy ? newSVpvf("%c", slurpy) : &PL_sv_undef;
         break;
-      case 3:
-        RETVAL = slurpy ? &PL_sv_undef : newSViv(params);
+      case 3: /* min_args */
+#  ifdef HAVE_OP_MULTIPARAM_NAMED
+        if(n_named) {
+          int min_args = 0;
+          /* Each mandatory named parameter counts for 2 arguments
+           */
+          for(size_t namedix = 0; namedix < n_named; namedix++) {
+            struct op_multiparam_named_aux *named = &(aux->named[namedix]);
+            if(named->is_required)
+              min_args += 2;
+          }
+          /* If any named parameters are required then all of the optional
+           * positional ones must be passed, to allow for them */
+          if(min_args) {
+            RETVAL = newSViv(params + min_args);
+            break;
+          }
+        }
+        /* else fallthrough */
+#  endif
+        RETVAL = newSViv(params - opt_params);
+        break;
+      case 4: /* max_args */
+        RETVAL = (slurpy || n_named) ? &PL_sv_undef : newSViv(params);
         break;
 
       default:
         NOT_REACHED;
     }
+#endif
+  }
+  OUTPUT:
+    RETVAL
+
+void
+named_params(SV *metasig)
+  PPCODE:
+  {
+#ifdef HAVE_OP_MULTIPARAM_NAMED
+    struct CVwithOP *cvop = (struct CVwithOP *)SvPVX(SvRV(metasig));
+    if(cvop->op->op_type != OP_MULTIPARAM)
+      XSRETURN(0);
+
+    struct op_multiparam_aux *aux = (struct op_multiparam_aux *)cUNOP_AUXx(cvop->op)->op_aux;
+    size_t n_named = aux->n_named;
+    EXTEND(SP, 2 * n_named);
+    for(size_t namedix = 0; namedix < n_named; namedix++) {
+      struct op_multiparam_named_aux *named = &(aux->named[namedix]);
+      PUSHs(newSVpvn_flags(named->namepv, named->namelen, SVf_UTF8|SVs_TEMP));
+      mPUSHs(newSVmultiparam_named(named));
+    }
+    XSRETURN(2 * n_named);
+#else
+    XSRETURN(0);
+#endif
+  }
+
+MODULE = meta    PACKAGE = meta::subsignature::named_param
+
+void DESTROY(SV *metaparam)
+  CODE:
+  {
+#ifdef HAVE_OP_MULTIPARAM_NAMED
+    struct op_multiparam_named_aux *aux = MULTIPARAM_NAMED_FROM_REFSV(metaparam);
+#endif
+  }
+
+SV *name(SV *metaparam)
+  CODE:
+  {
+#ifdef HAVE_OP_MULTIPARAM_NAMED
+    struct op_multiparam_named_aux *aux = MULTIPARAM_NAMED_FROM_REFSV(metaparam);
+    RETVAL = newSVpvn_flags(aux->namepv, aux->namelen, SVf_UTF8);
+#else
+    RETVAL = &PL_sv_undef;
+#endif
+  }
+  OUTPUT:
+    RETVAL
+
+bool is_required(SV *metaparam)
+  CODE:
+  {
+#ifdef HAVE_OP_MULTIPARAM_NAMED
+    struct op_multiparam_named_aux *aux = MULTIPARAM_NAMED_FROM_REFSV(metaparam);
+    RETVAL = aux->is_required;
+#else
+    RETVAL = false;
 #endif
   }
   OUTPUT:

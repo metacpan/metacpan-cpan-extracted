@@ -17,10 +17,10 @@ name: meta
 provides:
   meta:
     file: lib/meta.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.014'
+version: '0.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

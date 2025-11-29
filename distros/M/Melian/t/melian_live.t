@@ -4,7 +4,7 @@ use Melian;
 use Test::More;
 use List::Util qw(first);
 
-plan( skip_all => 'Live Melian testing disabled' ) unless $ENV{'MELIAN_LIVE_TEST'};
+plan( skip_all => 'Live Melian testing disabled - set MELIAN_LIVE_TEST=1' ) unless $ENV{'MELIAN_LIVE_TEST'};
 
 my $melian = Melian->new(
     'dsn'     => 'unix:///tmp/melian.sock',
@@ -31,7 +31,7 @@ subtest 'table1 by id' => sub {
     );
 
     is_deeply(
-        $melian->fetch_json_by_id($table->{'id'}, $column->{'id'}, 5),
+        $melian->fetch_by_int($table->{'id'}, $column->{'id'}, 5),
         {
             'active'      => 1,
             'category'    => 'alpha',
@@ -42,7 +42,7 @@ subtest 'table1 by id' => sub {
             'updated_at'  => '2025-11-04 14:26:47',
             'value'       => 'VAL_0005',
         },
-        "[$table_name] fetch_json_by_id($table->{'id'}, $column->{'id'})",
+        "[$table_name] fetch_by_int($table->{'id'}, $column->{'id'})",
     );
 };
 
@@ -64,13 +64,13 @@ subtest 'Table2 by id and hostname' => sub {
      };
 
     is_deeply(
-        $melian->fetch_json_by_id($table->{'id'}, $id_column->{'id'}, $record_id),
+        $melian->fetch_by_int($table->{'id'}, $id_column->{'id'}, $record_id),
         $expected,
         "$table_name by id",
     );
 
     is_deeply(
-        $melian->fetch_json($table->{'id'}, $hostname_column->{'id'}, $record_hostname),
+        $melian->fetch_by_string($table->{'id'}, $hostname_column->{'id'}, $record_hostname),
         $expected,
         "$table_name by hostname",
     );

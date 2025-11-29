@@ -551,6 +551,7 @@ SV * sign_open(SV *sm, SV *pk)
     Safefree(msg_buf);
     XSRETURN_UNDEF;
   }
+  msg_buf[msg_len] = '\0';
 
   RETVAL = newSV(0);
   sv_usepvn_flags(RETVAL, (char *)msg_buf, (STRLEN)msg_len, SV_HAS_TRAILING_NUL);

@@ -39,12 +39,12 @@ use v5.40;
 
 sub load_treelist($self) {
 
-    $self->app->log->debug('Daje::Controller::ToolsTreelist::load_treelist');
+    $self->app->log->debug('Daje::Controller::ToolsParameterTreelist::load_treelist');
     $self->render_later;
 
 
     $self->tools_helper_parameter_treelist->load_treelist()->then(sub ($result){
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub ($err) {
         $self->render(json => { 'result' => 0, data => $err });
     });

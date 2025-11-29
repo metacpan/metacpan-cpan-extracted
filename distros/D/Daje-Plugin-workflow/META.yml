@@ -28,12 +28,13 @@ provides:
     file: lib/Daje/Controller/Workflow.pm
   Daje::Plugin::Workflow:
     file: lib/Daje/Plugin/Workflow.pm
-    version: '0.10'
+    version: '0.12'
 requires:
   Daje::Workflow: '0'
   Daje::Workflow::Database: '0'
   Daje::Workflow::Database::Model::WorkflowConnection: '0'
   Daje::Workflow::Loader: '0'
+  Future::AsyncAwait: '0.52'
   Mojo::Base: '0'
   Mojolicious::Plugin: '0'
   perl: v5.40.0
@@ -41,6 +42,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Plugin-Workflow/issues
   homepage: https://github.com/janeskil1525/Daje-Plugin-Workflow
   repository: https://github.com/janeskil1525/Daje-Plugin-Workflow.git
-version: '0.10'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

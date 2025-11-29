@@ -10,7 +10,7 @@ use Liveman::MinillaPod2Markdown;
 
 my $mark = Liveman::MinillaPod2Markdown->new;
 
-local ($::_g0 = do {$mark->isa("Pod::Markdown")}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$mark->isa("Pod::Markdown")  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$mark->isa("Pod::Markdown")}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$mark->isa("Pod::Markdown")  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 use File::Slurper qw/write_text/;
 write_text "X.md", "hi!";

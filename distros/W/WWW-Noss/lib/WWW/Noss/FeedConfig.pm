@@ -2,7 +2,7 @@ package WWW::Noss::FeedConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use parent 'WWW::Noss::BaseConfig';
 
@@ -29,6 +29,7 @@ sub initialize {
     $self->set_feed($param{ feed });
     $self->set_path($param{ path });
     $self->set_etag($param{ etag });
+    $self->set_retry_cache($param{ retry_cache });
 
     my $default = $param{ default };
 
@@ -247,6 +248,81 @@ sub set_etag {
 
 }
 
+sub retry_cache {
+
+    my ($self) = @_;
+
+    return $self->{ RetryCache };
+
+}
+
+sub set_retry_cache {
+
+    my ($self, $cache) = @_;
+
+    $self->{ RetryCache } = $cache;
+
+}
+
+sub retry {
+
+    my ($self) = @_;
+
+    if (not defined $self->{ RetryCache } or not -f $self->{ RetryCache }) {
+        return undef;
+    }
+
+    open my $fh, '<', $self->{ RetryCache }
+        or die "Failed to open $self->{ RetryCache } for reading: $!";
+    my $retry = do { local $/; (readline $fh)[0] };
+    close $fh;
+    chomp $retry;
+
+    if ($retry !~ /^\d+$/) {
+        die "$self->{ RetryCache }: corrupted retry cache";
+    }
+
+    return int $retry;
+
+}
+
+sub set_retry {
+
+    my ($self, $retry) = @_;
+
+    if ($retry !~ /^\d+$/) {
+        die 'retry time must be an integar';
+    }
+
+    if (not defined $self->{ RetryCache }) {
+        die 'retry_cache must be set before setting retry';
+    }
+
+    $retry = int $retry;
+
+    open my $fh, '>', $self->{ RetryCache }
+        or die "Failed to open $self->{ RetryCache } for writing: $!";
+    print { $fh } $retry, "\n";
+    close $fh;
+
+    return $retry;
+
+}
+
+sub can_we_retry {
+
+    my ($self, $time) = @_;
+    $time //= time;
+
+    my $retry = $self->retry;
+    if (not defined $retry) {
+        return 1;
+    }
+
+    return $time >= $retry;
+
+}
+
 1;
 
 =head1 NAME
@@ -377,6 +453,20 @@ Getter/setter for the feed's path attribute.
 =item $feed->set_etag($etag)
 
 Getter/setter for the feed's etag attribute.
+
+=item $file = $feed->retry_cache()
+
+=item $feed->set_retry_cache($file)
+
+Getter/setter for the feed's retry cache file.
+
+=item $retry = $feed->retry()
+
+=item $feed->set_retry($retry)
+
+=item $ok = $feed->can_we_retry([ $time ])
+
+Getter/setter for the feed's retry time.
 
 =back
 

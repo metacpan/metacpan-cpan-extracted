@@ -19,6 +19,7 @@ share/3.1/strict-dialect.json
 share/3.1/strict-schema.json
 share/3.2/strict-dialect.json
 share/3.2/strict-schema.json
+share/oas/3.0/schema.json
 share/oas/3.1/dialect.json
 share/oas/3.1/schema-base.json
 share/oas/3.1/schema.json

@@ -31,7 +31,7 @@ no warnings qw( meta::experimental );
       'try_get_glob yields undef on missing glob' );
 
    like( dies { $metapkg->get_glob( "not-a-glob" ) },
-      qr/^Package does not contain a glob called "not-a-glob" /,
+      qr/^Package "meta" does not contain a glob called "not-a-glob" /,
       'get_glob throws on missing glob' );
 }
 

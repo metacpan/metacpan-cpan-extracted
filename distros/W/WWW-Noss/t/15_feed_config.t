@@ -4,6 +4,8 @@ use strict;
 
 use Test::More;
 
+use File::Temp qw(tempfile);
+
 use WWW::Noss::BaseConfig;
 use WWW::Noss::FeedConfig;
 use WWW::Noss::GroupConfig;
@@ -166,6 +168,11 @@ subtest 'FeedConfig ok' => sub {
         autoread => 0,
         default_update => 1,
         hidden => 1,
+        retry_cache => do {
+            my ($h, $p) = tempfile(UNLINK => 1);
+            close $h;
+            $p;
+        },
     );
 
     isa_ok($o, 'WWW::Noss::FeedConfig');
@@ -221,6 +228,10 @@ subtest 'FeedConfig ok' => sub {
     ok($o->default_update, 'default_update ok');
 
     ok($o->hidden, 'hidden ok');
+
+    $o->set_retry(0);
+    is($o->retry, 0, 'retry ok');
+    ok($o->can_we_retry, 'can_we_retry ok');
 
 };
 

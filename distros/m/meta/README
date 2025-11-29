@@ -440,6 +440,24 @@ METHODS ON SUBROUTINE METASIGNATURES
     Returns the number of parameters that are optional (i.e. have a
     defaulting expression).
 
+ named_param
+
+       %params = $metasig->named_param;
+
+    Since version 0.015.
+
+    If the subroutine defines any named parameters (as provided by Perl
+    version 5.43.5 or later), returns a list of name/value pairs containing
+    them. This list is returned in no particular order. Each gives the name
+    of one parameter, and its value is a structure object responding to the
+    following methods:
+
+       $named_param->name;
+       $named_param->is_required;
+
+    On Perls older than when signature named parameters were added, this
+    method always simply returns an empty list.
+
  slurpy
 
        $slurpy = $metasig->slurpy;
@@ -456,10 +474,22 @@ METHODS ON SUBROUTINE METASIGNATURES
        $n = $metasig->max_args;
 
     Returns the minimum or maximum number of argument values that can be
-    passed to a call to this function. min_args is the same as
-    mandatory_params but is offered as an alias in case the data model ever
-    changes. max_args will be undef if the function uses a slurpy final
-    parameter.
+    passed to a call to this function. In many situations there is no upper
+    bound, so max_args may return undef. These are simply the boundaries of
+    argument count beyond which the function is guaranteed to complain. It
+    may of course raise an error during arugment processing for a variety
+    of other reaosns.
+
+    In the absence of named parameters, min_args is the same as
+    mandatory_params, and max_args is either undef if there is a slurpy
+    parameter, or the sum of mandatory_params and optional_params if not.
+
+    When named parameters (on Perl 5.43.5 or above) are being used,
+    min_args counts 1 for every mandatory positional parameter, and 2 for
+    every mandatory named parameter. max_args will always be undef when
+    named parameters are being used, because Perl always accepts multiple
+    duplicate values for any given name; the final one having the effective
+    value.
 
 TODO
 

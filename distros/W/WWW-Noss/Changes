@@ -1,5 +1,16 @@
 Revision history for noss (WWW::Noss)
 
+2.01  Nov 28 2025
+  - Add "discover" command: Discover feed URLs associated with a given web
+    page.
+  - update and reload commands now have colored error messages.
+  - update respects the "Retry-After" HTTP header.
+  - update now follows redirections.
+  - Multiple instances of noss can now access the same database at the same
+    time.
+  - Format strings now accept a plus ("+") sign prefix for justifying to the
+    right.
+
 2.00  Nov 11 2025
   - list, feeds, and post commands now have colored output. Output can be
     customized by using color codes in the commands' respective format

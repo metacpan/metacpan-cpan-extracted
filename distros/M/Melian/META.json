@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Melian",
    "prereqs" : {
@@ -53,7 +53,7 @@
    "provides" : {
       "Melian" : {
          "file" : "lib/Melian.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -64,10 +64,10 @@
          "web" : "https://github.com/xsawyerx/melian-perl"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:XSAWYERX",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "MIT"
 }
 

@@ -47,10 +47,11 @@ sub load_object ($self) {
     # );
     my $tools_objects_pkey = $self->param('tools_objects_pkey');
 
-    $self->app->log->debug($self->req->headers->header('X-Token-Check'));
+    # $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->tools_objects->load_tools_object_pkey_p($tools_objects_pkey)->then(sub($result) {
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->app->log->debug('Daje::Controller::ToolsObjects::load_object ' . Dumper($result->{data}));
+        $self->render(json =>  $result->{data});
     })->catch(sub($err) {
         $self->render(json => { 'result' => 0, data => $err });
     })->wait;

@@ -25,19 +25,19 @@ my $liveman = Liveman->new(prove => 1);
 
 $liveman->transform("lib/Example.md");
 
-local ($::_g0 = do {$liveman->{count}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$liveman->{count}    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-f "t/example.t"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '-f "t/example.t"     # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-f "lib/Example.pod"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '-f "lib/Example.pod" # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$liveman->{count}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$liveman->{count}    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-f "t/example.t"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-f "t/example.t"     # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-f "lib/Example.pod"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-f "lib/Example.pod" # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 $liveman->transforms;
-local ($::_g0 = do {$liveman->{count}}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$liveman->{count}   # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$liveman->{count}}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$liveman->{count}   # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-local ($::_g0 = do {Liveman->new(compile_force => 1)->transforms->{count}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, 'Liveman->new(compile_force => 1)->transforms->{count} # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Liveman->new(compile_force => 1)->transforms->{count}}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Liveman->new(compile_force => 1)->transforms->{count} # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 my $prove_return_code = $liveman->tests->{exit_code};
 
-local ($::_g0 = do {$prove_return_code}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '$prove_return_code          # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {-f "cover_db/coverage.html"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '-f "cover_db/coverage.html" # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$prove_return_code}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$prove_return_code          # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-f "cover_db/coverage.html"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-f "cover_db/coverage.html" # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPION
@@ -101,8 +101,8 @@ local ($::_g0 = do {-f "cover_db/coverage.html"}, $::_e0 = do {1}); ::ok defined
 # Сравнить два эквивалентных выражения:
 # 
 ::done_testing; }; subtest '`is`' => sub { 
-local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '"hi!" # -> "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::ok defined($::_g0) == defined($::_e0) && ref $::_g0 eq ref $::_e0 && $::_g0 eq $::_e0, '"hi!" # → "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"hi!" # -> "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"hi!"}, $::_e0 = do {"hi" . "!"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"hi!" # → "hi" . "!"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `is_deeply`

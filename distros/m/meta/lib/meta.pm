@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2025 -- leonerd@leonerd.org.uk
 
-package meta 0.014;
+package meta 0.015;
 
 use v5.14;
 use warnings;
@@ -490,6 +490,23 @@ included in this count. This count will always be at least 1 on such a method.
 Returns the number of parameters that are optional (i.e. have a defaulting
 expression).
 
+=head2 named_param
+
+   %params = $metasig->named_param;
+
+I<Since version 0.015.>
+
+If the subroutine defines any named parameters (as provided by Perl version
+5.43.5 or later), returns a list of name/value pairs containing them. This
+list is returned in no particular order. Each gives the name of one parameter,
+and its value is a structure object responding to the following methods:
+
+   $named_param->name;
+   $named_param->is_required;
+
+On Perls older than when signature named parameters were added, this method
+always simply returns an empty list.
+
 =head2 slurpy
 
    $slurpy = $metasig->slurpy;
@@ -506,9 +523,20 @@ exists (i.e. C<%> or C<@>), or C<undef> if no slurpy parameter is defined.
    $n = $metasig->max_args;
 
 Returns the minimum or maximum number of argument values that can be passed to
-a call to this function. C<min_args> is the same as C<mandatory_params> but is
-offered as an alias in case the data model ever changes. C<max_args> will be
-C<undef> if the function uses a slurpy final parameter.
+a call to this function. In many situations there is no upper bound, so
+C<max_args> may return C<undef>. These are simply the boundaries of argument
+count beyond which the function is I<guaranteed> to complain. It may of course
+raise an error during arugment processing for a variety of other reaosns.
+
+In the absence of named parameters, C<min_args> is the same as
+C<mandatory_params>, and C<max_args> is either C<undef> if there is a slurpy
+parameter, or the sum of C<mandatory_params> and C<optional_params> if not.
+
+When named parameters (on Perl 5.43.5 or above) are being used, C<min_args>
+counts 1 for every mandatory positional parameter, and 2 for every mandatory
+named parameter. C<max_args> will always be C<undef> when named parameters are
+being used, because Perl always accepts multiple duplicate values for any
+given name; the final one having the effective value.
 
 =cut
 

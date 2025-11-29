@@ -1,3 +1,7 @@
+0.05   2025-11-28
+
+- fix another DEBUGGING assert
+
 0.04   2025-11-26
 
 - fix an assert on debug builds

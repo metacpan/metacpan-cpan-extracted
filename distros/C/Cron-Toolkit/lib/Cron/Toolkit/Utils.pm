@@ -138,12 +138,13 @@ sub num_to_ordinal {
 sub format_time {
    my ( $sec, $min, $hour ) = @_;
    return "midnight" if $hour == 0 && $min == 0 && $sec == 0;
+   #return "noon" if $hour == 12 && $min == 0 && $sec == 0;
    my $ampm = $hour >= 12 ? 'PM' : 'AM';
    $hour = $hour % 12 || 12;
    return
-       $min && $sec ? sprintf( "%d:%02d:%02d %s", $hour, $min, $sec, $ampm )
+       $sec ? sprintf( "%d:%02d:%02d %s", $hour, $min, $sec, $ampm )
      : $min         ? sprintf( "%d:%02d %s", $hour, $min, $ampm )
-     :                "$hour $ampm";
+     : "$hour $ampm";
 
 }
 

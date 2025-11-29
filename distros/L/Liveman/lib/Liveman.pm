@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "3.7";
+our $VERSION = "3.8";
 
 use File::Basename qw/dirname/;
 use File::Find::Wanted qw/find_wanted/;
@@ -114,7 +114,7 @@ sub _to_testing {
 	# local делается для того, чтобы в AnyEvent, Coro или Thread переменные не пересекались
 
 	if(exists $x{is_deeply}) { "local (\$::_g0 = do {$code}, \$::_e0 = do {$expected}); ::is_deeply \$::_g0, \$::_e0, '$q' or ::diag ::_struct_diff(\$::_g0, \$::_e0); $clear\n" }
-	elsif(exists $x{is}) { "local (\$::_g0 = do {$code}, \$::_e0 = do {$expected}); ::ok defined(\$::_g0) == defined(\$::_e0) && ref \$::_g0 eq ref \$::_e0 && \$::_g0 eq \$::_e0, '$q' or ::diag ::_struct_diff(\$::_g0, \$::_e0); $clear\n" }
+	elsif(exists $x{is}) { "local (\$::_g0 = do {$code}, \$::_e0 = do {$expected}); ::ok defined(\$::_g0) == defined(\$::_e0) && \$::_g0 eq \$::_e0, '$q' or ::diag ::_struct_diff(\$::_g0, \$::_e0); $clear\n" }
 	elsif(exists $x{qqis}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 eq \$::_e0, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0); $clear\n" }
 	elsif(exists $x{qis}) { "local (\$::_g0 = do {$code}, \$::_e0 = '${\_q_esc $expected}'); ::ok \$::_g0 eq \$::_e0, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0); $clear\n" }
 	elsif(exists $x{like}) { "::like scalar do {$code}, qr{${\_qr_esc $expected}}, '$q'; $clear\n" }
@@ -542,7 +542,7 @@ Liveman - compiler from Markdown to tests and documentation
 
 =head1 VERSION
 
-3.7
+3.8
 
 =head1 SYNOPSIS
 

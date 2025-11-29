@@ -4,7 +4,7 @@ use warnings;
 use File::Object;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator::Plugin::Field035;
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Data dir.
@@ -56,4 +56,25 @@ is_deeply(
 		}],
 	},
 	'Get struct - checks (field 035 $a is duplicite to another record).',
+);
+
+# Test.
+$obj = MARC::Validator::Plugin::Field035->new(
+	'error_id_def' => '015a',
+);
+$obj->init;
+$marc = MARC::File::XML->in($data_dir->file('cnb000008190-duplicates_in_035a_fields.xml')->s);
+$obj->process($marc->next);
+$ret = $obj->struct;
+is_deeply(
+	$ret->{'checks'}->{'not_valid'},
+	{
+		'cnb000008190' => [{
+			'error' => 'Duplicate system control number in 035a field.',
+			'params' => {
+				'value' => '(OCoLC)39406753',
+			},
+		}],
+	},
+	'Get struct - checks (field 035 $a is duplicite in same record).',
 );

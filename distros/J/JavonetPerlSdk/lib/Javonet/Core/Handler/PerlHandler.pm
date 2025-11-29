@@ -3,6 +3,15 @@ use strict;
 use warnings FATAL => 'all';
 use lib 'lib';
 use Moose;
+
+use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'PerlCommandType', qw(get_command_type);
+use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
+use aliased 'Javonet::Core::Handler::ReferencesCache' => 'ReferencesCache';
+use aliased 'Javonet::Core::Handler::AbstractHandler' => 'AbstractHandler';
+use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib';
+use aliased 'Javonet::Core::Handler::HandlerDictionary' => 'HandlerDictionary';
+use aliased 'Javonet::Sdk::Core::TypesHandler' => 'TypesHandler';
+
 use aliased 'Javonet::Core::Handler::CommandHandler::ValueHandler' => 'ValueHandler';
 use aliased 'Javonet::Core::Handler::CommandHandler::LoadLibraryHandler' => 'LoadLibraryHandler';
 use aliased 'Javonet::Core::Handler::CommandHandler::GetStaticFieldHandler' => 'GetStaticFieldHandler';
@@ -23,15 +32,7 @@ use aliased 'Javonet::Core::Handler::CommandHandler::ArrayGetSizeHandler' => 'Ar
 use aliased 'Javonet::Core::Handler::CommandHandler::ArrayGetRankHandler' => 'ArrayGetRankHandler';
 use aliased 'Javonet::Core::Handler::CommandHandler::ArraySetItemHandler' => 'ArraySetItemHandler';
 use aliased 'Javonet::Core::Handler::CommandHandler::InvokeGlobalFunctionHandler' => 'InvokeGlobalFunctionHandler';
-
-
-use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'PerlCommandType', qw(get_command_type);
-use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
-use aliased 'Javonet::Core::Handler::ReferencesCache' => 'ReferencesCache';
-use aliased 'Javonet::Core::Handler::AbstractHandler' => 'AbstractHandler';
-use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib';
-use aliased 'Javonet::Core::Handler::HandlerDictionary' => 'HandlerDictionary';
-use aliased 'Javonet::Sdk::Core::TypesHandler' => 'TypesHandler';
+use aliased 'Javonet::Core::Handler::CommandHandler::RegisterForUpdateHandler' => 'RegisterForUpdateHandler';
 
 my $value_handler = ValueHandler->new();
 my $load_library_handler = LoadLibraryHandler->new();
@@ -51,6 +52,7 @@ my $array_get_size_handler = ArrayGetSizeHandler->new();
 my $array_get_rank_handler = ArrayGetRankHandler->new();
 my $array_set_item_handler = ArraySetItemHandler->new();
 my $invoke_global_function_handler = InvokeGlobalFunctionHandler->new();
+my $register_for_update_handler = RegisterForUpdateHandler->new();
 
 
 Javonet::Core::Handler::HandlerDictionary::add_handler_to_dict(
@@ -125,6 +127,11 @@ Javonet::Core::Handler::HandlerDictionary::add_handler_to_dict(
 Javonet::Core::Handler::HandlerDictionary::add_handler_to_dict(
     Javonet::Sdk::Core::PerlCommandType::get_command_type('InvokeGlobalFunction'),
     $invoke_global_function_handler
+);
+
+Javonet::Core::Handler::HandlerDictionary::add_handler_to_dict(
+    Javonet::Sdk::Core::PerlCommandType::get_command_type('RegisterForUpdate'),
+    $register_for_update_handler
 );
 
 sub handle_command {

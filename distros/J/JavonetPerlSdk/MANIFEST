@@ -18,6 +18,7 @@ lib/Javonet/Core/Handler/CommandHandler/InvokeGlobalFunctionHandler.pm
 lib/Javonet/Core/Handler/CommandHandler/InvokeInstanceMethodHandler.pm
 lib/Javonet/Core/Handler/CommandHandler/InvokeStaticMethodHandler.pm
 lib/Javonet/Core/Handler/CommandHandler/LoadLibraryHandler.pm
+lib/Javonet/Core/Handler/CommandHandler/RegisterForUpdateHandler.pm
 lib/Javonet/Core/Handler/CommandHandler/ResolveInstanceHandler.pm
 lib/Javonet/Core/Handler/CommandHandler/SetInstanceFieldHandler.pm
 lib/Javonet/Core/Handler/CommandHandler/SetStaticFieldHandler.pm

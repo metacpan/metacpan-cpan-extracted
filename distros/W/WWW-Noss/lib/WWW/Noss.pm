@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -10,7 +10,7 @@ use File::Basename;
 use File::Copy;
 use File::Spec;
 use File::Temp qw(tempfile);
-use List::Util qw(max);
+use List::Util qw(max uniq);
 use POSIX qw(strftime);
 use Pod::Usage;
 use Term::ANSIColor;
@@ -20,27 +20,19 @@ use JSON;
 use WWW::Noss::Curl qw(curl curl_error http_status_string);
 use WWW::Noss::DB;
 use WWW::Noss::FeedConfig;
+use WWW::Noss::FeedReader qw(discover_feeds);
 use WWW::Noss::GroupConfig;
 use WWW::Noss::Home qw(home);
 use WWW::Noss::Lynx qw(lynx_dump);
 use WWW::Noss::OPML;
 use WWW::Noss::TextToHtml qw(escape_html);
-use WWW::Noss::Util qw(dir);
+use WWW::Noss::Util qw(dir resolve_url);
 
 my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
 
-# TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
-# TODO: Command to determine RSS feed from HTML page?
-
-# TODO: Look into adding colored output to the following commands:
-# - update
-# - reload
-
-# TODO: Handle 301 Moved Permanently pages gracefully
-# TODO: Handle 429 Too Many Request pages gracefully
-
-# TODO: Add screenshot to README
+# TODO: Command aliases?
+# TODO: "open" feed setting? (command to use for opening post URLs)
 
 my %COMMANDS = (
     'update'   => \&update,
@@ -55,6 +47,7 @@ my %COMMANDS = (
     'feeds'    => \&feeds,
     'groups'   => \&groups,
     'clean'    => \&clean,
+    'discover' => \&discover,
     'export'   => \&export_opml,
     'import'   => \&import_opml,
     'help'     => \&help,
@@ -216,7 +209,7 @@ my $DEFAULT_FEED_FMT = <<'HERE';
 HERE
 
 my %DOESNT_NEED_FEED = map { $_ => 1 } qw(
-    import help
+    discover import help
 );
 
 my $COLOR_CODE_RX = qr/(?:1[0-6]|[0-9])/;
@@ -832,6 +825,7 @@ sub _read_feed_file {
             groups => \@groups,
             path => File::Spec->catfile($self->{ FeedDir }, "$k.feed"),
             etag => File::Spec->catfile($self->{ EtagDir }, "$k.etag"),
+            retry_cache => File::Spec->catfile($self->{ RetryDir }, "$k.retry"),
             %params
         );
 
@@ -857,7 +851,6 @@ sub _arg2rx {
 
 }
 
-# TODO: Accept '+'?
 sub _fmt {
 
     my ($fmt, $codes, $colors) = @_;
@@ -868,7 +861,7 @@ sub _fmt {
     my @subs;
     my $colored = 0;
 
-    $fmt =~ s{(?<Fmt>%(?:-?\d+)?.)|(?<Color><$COLOR_CODE_RX>)}{
+    $fmt =~ s{(?<Fmt>%(?:[+\-]?\d+)?.)|(?<Color><$COLOR_CODE_RX>)}{
         if (defined $+{ Fmt }) {
             my $code = substr $+{ Fmt }, 1;
             my $c = chop $code;
@@ -901,6 +894,20 @@ sub _rm_color_codes {
     my ($str) = @_;
 
     return $str =~ s/<$COLOR_CODE_RX>//gr;
+
+}
+
+sub err {
+
+    my ($self, @args) = @_;
+
+    my $err = join '', @args;
+
+    if ($self->{ UseColor } and -t STDERR) {
+        warn colored($err, 'bold red') . "\n";
+    } else {
+        warn "$err\n";
+    }
 
 }
 
@@ -980,7 +987,15 @@ sub _get_feed {
                 )
                 : ()
             ),
+            redirect => 1,
         );
+
+        if (defined $resp and $resp->[1] eq '429') {
+            my $retry = $head->{ 'retry-after' };
+            if (defined $retry and $retry =~ /^\d+$/) {
+                $feed->set_retry($retry + time);
+            }
+        }
 
         if ($rt != 0) {
             my $e;
@@ -1062,6 +1077,12 @@ sub update {
             last;
         }
 
+        if ($feed->respect_skip and !$self->{ Unconditional } and !$feed->can_we_retry) {
+            say "Skipping $name; performed too many requests";
+            $pm->finish;
+            last;
+        }
+
         my $changed = 0;
 
         my $oldmod = -f $feed->path ? (stat($feed->path))[9] : 0;
@@ -1071,7 +1092,7 @@ sub update {
         if ($@ ne '' or not -f $feed->path) {
             my $e = $@ || 'unknown error';
             chomp $e;
-            warn sprintf "Failed to fetch %s: %s\n", $feed->feed, $e;
+            $self->err(sprintf "Failed to fetch %s: %s", $feed->feed, $e);
         } else {
             printf "Fetched %s\n", $feed->feed;
             my $newmod = (stat($feed->path))[9];
@@ -1102,7 +1123,7 @@ sub update {
         if ($@ ne '') {
             my $e = $@;
             chomp $e;
-            warn "Error updating $c: $e, skipping\n";
+            $self->err("Error updating $c: $e, skipping");
             next;
         }
 
@@ -1118,8 +1139,6 @@ sub update {
     } else {
         say "No new posts";
     }
-
-    $self->{ DB }->commit;
 
     return 1;
 
@@ -1149,7 +1168,7 @@ sub reload {
             if (-f $self->{ Feeds }{ $f }->path) {
                 push @reloads, $f;
             } else {
-                warn "'$f' does not have a local feed file, skipping\n";
+                $self->err("'$f' does not have a local feed file, skipping");
             }
         }
 
@@ -1178,10 +1197,11 @@ sub reload {
         unless (defined $new) {
             my $e = $@;
             chomp $e;
-            warn
-                $e ne ''
-                ? "Failed to reload $r: $e, skipping\n"
-                : "Failed to relaod $r, skipping\n";
+            if ($e ne '') {
+                $self->err("Failed to reload $r: $e, skipping");
+            } else {
+                $self->err("Failed to reload $r, skipping");
+            }
             next;
         }
 
@@ -1197,8 +1217,6 @@ sub reload {
     } else {
         say "No new posts";
     }
-
-    $self->{ DB }->commit;
 
     return 1;
 
@@ -1289,7 +1307,6 @@ sub read_post {
     unless ($self->{ NoMark }) {
         $self->{ DB }->mark('read', $feed_name, $post->{ nossid })
             or die "Failed to mark '$feed_name:$post->{ nossid }' as read";
-        $self->{ DB }->commit;
     }
 
     return 1;
@@ -1348,7 +1365,6 @@ sub open_post {
     if (defined $id and not $self->{ NoMark }) {
         $self->{ DB }->mark('read', $feed_name, $post->{ nossid })
             or die "Failed to mark '$feed_name:$id' as read";
-        $self->{ DB }->commit;
     }
 
     return 1;
@@ -1515,8 +1531,6 @@ sub mark {
         my $n = $self->{ DB }->mark($status, $f, @posts);
         $num += $n;
     }
-
-    $self->{ DB }->commit;
 
     say "$num posts updated";
 
@@ -1698,10 +1712,54 @@ sub clean {
 
     if (@clean) {
         $self->{ DB }->del_feeds(@clean);
-        $self->{ DB }->commit;
     }
 
     $self->{ DB }->vacuum;
+
+    return 1;
+
+}
+
+sub discover {
+
+    my ($self) = @_;
+
+    my $url = shift @{ $self->{ Args } };
+    if (not defined $url) {
+        die "discover requires a URL as argument\n";
+    }
+
+    my $tmp = do {
+        my ($h, $p) = tempfile(UNLINK => 1);
+        close $h;
+        $p;
+    };
+
+    my ($rt, undef, undef) = curl(
+        $url, $tmp,
+        user_agent => $self->{ UserAgent },
+        limit_rate => $self->{ RateLimit },
+        timeout => $self->{ Timeout },
+        fail => 1,
+        proxy => $self->{ Proxy },
+        proxy_user => $self->{ ProxyUser },
+        redirect => 1,
+    );
+
+    if ($rt != 0) {
+        die sprintf "Failed to curl %s: %s\n", $url, curl_error($rt);
+    }
+
+    my @feeds = discover_feeds($tmp);
+    if (!@feeds) {
+        say "No feeds found in $url";
+        return 1;
+    }
+
+    @feeds = uniq sort map { resolve_url($_, $url) } @feeds;
+    for my $f (@feeds) {
+        say $f;
+    }
 
     return 1;
 
@@ -1867,6 +1925,7 @@ sub init {
         TimeFmt       => undef,
         UseColor      => undef,
         ColorMap      => { %COLOR_CODES },
+        RetryDir      => undef,
         # update
         NewOnly       => 0,
         NonDefaults   => 0,
@@ -2040,13 +2099,20 @@ sub init {
     }
 
     $self->{ EtagDir } = File::Spec->catfile(
-        $self->{ DataDir },
-        'etag'
+        $self->{ DataDir }, 'etag'
     );
-
     unless (-d $self->{ EtagDir }) {
         mkdir $self->{ EtagDir }
             or die "Failed to mkdir $self->{ EtagDir }: $!\n";
+    }
+
+    $self->{ RetryDir } = File::Spec->catfile(
+        $self->{ DataDir }, 'retry'
+    );
+    if (not -d $self->{ RetryDir }) {
+        unlink $self->{ RetryDir } if -f $self->{ RetryDir };
+        mkdir $self->{ RetryDir }
+            or die "Failed to mkdir $self->{ RetryDir }: $!\n";
     }
 
     unless (exists $DOESNT_NEED_FEED{ $self->{ Cmd } }) {
@@ -2136,6 +2202,17 @@ sub run {
         $self->clean;
     }
 
+    # Delete outdated retry caches
+    my $now = time;
+    for my $f (values %{ $self->{ Feeds } }) {
+        my $retry = $f->retry;
+        next if not defined $retry;
+        if ($now >= $retry) {
+            unlink $f->retry_cache
+                or warn sprintf "Failed to unlink %s: %s\n", $f->retry_cache, $!;
+        }
+    }
+
     return 1;
 
 }
@@ -2221,6 +2298,10 @@ Method implementing the C<groups> command.
 =item $noss->clean()
 
 Method implementing the C<clean> command.
+
+=item $noss->discover()
+
+Method implementing the C<discover> command.
 
 =item $noss->export_opml()
 

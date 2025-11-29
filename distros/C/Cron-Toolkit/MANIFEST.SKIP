@@ -6,6 +6,7 @@
 ^MYMETA\.
 ^cover_db
 share\.sh
+test_install\.sh
 grok_prompts
 Makefile
 MAKEFILE\.skip

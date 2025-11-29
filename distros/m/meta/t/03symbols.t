@@ -57,11 +57,11 @@ our @VAR;
       'try_get_symbol yields undef on missing HV' );
 
    like( dies { $metapkg->get_symbol( '%VAR' ) },
-      qr/^Package has no symbol named "%VAR" /,
+      qr/^Package "main" has no symbol named "%VAR" /,
       'get_symbol throws on missing HV' );
 
    like( dies { $metapkg->get_symbol( '%missing-name' ) },
-      qr/^Package has no symbol named "%missing-name" /,
+      qr/^Package "main" has no symbol named "%missing-name" /,
       'get_symbol throws on missing GV' );
 }
 

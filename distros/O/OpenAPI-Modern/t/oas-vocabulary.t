@@ -11,14 +11,13 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::JSON::Schema::Acceptance 1.014;
-use Path::Tiny;
-use Config;
-
 use lib 't/lib';
 use Helper;
+use Test::JSON::Schema::Acceptance 1.014;
+use Mojo::File 'path';
+use Config;
 
-foreach my $oas_version (map $_->basename, path('t/oas-vocabulary')->children) {
+foreach my $oas_version (map $_->basename, path('t/oas-vocabulary')->list({dir=>1})->each) {
   my $accepter = Test::JSON::Schema::Acceptance->new(
     verbose => 1,
     test_schemas => 0,  # some schemas are not valid, as we are testing error handling in traverse()
@@ -52,7 +51,7 @@ foreach my $oas_version (map $_->basename, path('t/oas-vocabulary')->children) {
     @ARGV ? (tests => { file => \@ARGV }) : (),
   );
 
-  path('t/results/oas-vocabulary-'.$oas_version.'.txt')->spew_utf8($accepter->results_text)
+  path('t/results/oas-vocabulary-'.$oas_version.'.txt')->spew($accepter->results_text, 'UTF-8')
     if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
 }
 

@@ -1,7 +1,7 @@
 package Cron::Toolkit;
 
 # VERSION
-$VERSION = 0.09;
+$VERSION = 0.12;
 
 use strict;
 use warnings;
@@ -105,7 +105,7 @@ Allows queries such as "next February 29 that falls on a Monday".
 
 =item * Wrapped day-of-week ranges
 
-C<6-2> Saturday, Sunday, Monday, Tuesday
+6-2 matches Saturday, Sunday, Monday, Tuesday
 
 =item * Internal day-of-week: 1–7 = Monday–Sunday
 
@@ -122,7 +122,7 @@ Matches L<Time::Moment> and L<DateTime>. C<as_quartz_string()> converts back to 
     Hour             0–23                   *,/,-,
     Day of month     1–31                   *,/,-,?,L,LW,W
     Month            1–12 or JAN–DEC        *,/,-                          
-    Day of week      1–7 or SUN–SAT         *,/,-,?,L,#
+    Day of week      1–7 or MON-SUN         *,/,-,?,L,#
     Year (optional)  1970–2099              *,/,-
 
     Legend:
@@ -320,17 +320,13 @@ sub new {
    # Convert month names to numerical equivalent
    while ( my ( $name, $num ) = each %MONTH_MAP ) { $fields[4] =~ s/\b\Q$name\E\b/$num/gi; }
 
-   # enforce dom/dow mutual exclusivity
+   # align dom and dow fields
    if ( $fields[3] ne '?' && $fields[5] eq '*' ) {
       $fields[5] = '?';
    }
    elsif ( $fields[3] eq '*' && $fields[5] ne '?' ) {
       $fields[3] = '?';
    }
-
-   #elsif ( $fields[3] ne '?' && $fields[5] ne '?' ) {
-   #   die "dow and dom cannot both be specified\n";
-   #}
    elsif ( $fields[3] eq '?' && $fields[5] eq '?' ) {
       die "dow and dom cannot both be unspecified\n";
    }
@@ -347,6 +343,8 @@ sub new {
       end_epoch   => time + ( 10 * 365 * 86400 ),    # ~10 years ahead
    }, $class;
 
+   $self->utc_offset( $args{utc_offset} ) if defined $args{utc_offset};
+   $self->time_zone( $args{time_zone} ) if defined $args{time_zone};
    $self->user( $args{user} )       if defined $args{user};
    $self->command( $args{command} ) if defined $args{command};
    $self->env( $args{env} )         if defined $args{env};
@@ -506,6 +504,7 @@ sub _build_node {
          $day //= $max;
          die "dow $day out of range [$min-$max]" unless $day >= $min && $day <= $max;
          $node->{dow} = $day;
+         $node->{value} = $day . 'L';
       }
    }
    elsif ( $value =~ qr/^L-(\d+)$/ ) {
@@ -558,8 +557,9 @@ sub _build_node {
          field_type => $field
       );
    }
-   elsif ( $value =~ /^(\d+)-(\d+)$/ ) {
+   elsif ( $value =~ /^(\*|\d+)-(\d+)$/ ) {
       my ( $start, $end ) = ( $1, $2 );
+      $start = $min if $start eq '*';
       die "$field start $start out of range [$min-$max]" unless $start >= $min && $start <= $max;
       die "$field end $end out of range [$min-$max]"     unless $end >= $min   && $end <= $max;
       die "$field range start $start must be <= end $end" if $start > $end && $field ne 'dow';
@@ -899,14 +899,9 @@ sub describe {
    # DMY
    if ( defined $nodes[3] && $nodes[3]->type ne 'unspecified' ) {
       if ( $nodes[3]->type eq 'single' ) {
-         $dmy = 'on ' . $nodes[3]->to_english;
+         $dmy .= 'on ';
       }
-      else {
-         $dmy = $nodes[3]->to_english;
-      }
-
-      #$dmy .= ' of ' . $self->{nodes}[4]->to_english unless $nodes[3]->type eq 'wildcard';
-      $dmy .= ' of ' . $self->{nodes}[4]->to_english;
+      $dmy .= $nodes[3]->to_english . ' of ' . $self->{nodes}[4]->to_english;
    }
 
    if ( defined $nodes[3] && $nodes[3]->type ne 'unspecified' && defined $nodes[5] && $nodes[5]->type ne 'unspecified' ) {
@@ -914,22 +909,17 @@ sub describe {
    }
 
    if ( defined $nodes[5] && $nodes[5]->type ne 'unspecified' ) {
-      if ( $nodes[5]->type =~ /^single|list$/ ) {
-         $dmy .= 'every ' . $nodes[5]->to_english;
-         $dmy .= ' in ' . $self->{nodes}[4]->to_english;
-      }
-      else {
-         $dmy .= $nodes[5]->to_english;
 
-         #$dmy .= ' of ' . $self->{nodes}[4]->to_english unless $nodes[5]->type eq 'wildcard';
-         $dmy .= ' of ' . $self->{nodes}[4]->to_english;
+      if ( $nodes[5]->type eq 'single' ) {
+         $dmy .= 'every ';
       }
+      $dmy .= $nodes[5]->to_english . ' of ' . $self->{nodes}[4]->to_english;
    }
 
    if ( defined $nodes[6] && $nodes[6]->type ne 'wildcard' ) {
       $dmy .= ' ' . $self->{nodes}[6]->to_english;
    }
-   return "$hms $dmy";
+   return join ' ', grep { $_ } ($hms, $dmy);
 }
 
 # matching

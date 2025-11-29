@@ -13,10 +13,9 @@ no feature 'switch';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use JSON::Schema::Modern::Utilities 'jsonp';
-
 use lib 't/lib';
 use Helper;
+use JSON::Schema::Modern::Utilities 'jsonp';
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));

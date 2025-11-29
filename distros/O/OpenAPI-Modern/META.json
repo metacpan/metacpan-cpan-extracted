@@ -80,17 +80,16 @@
             "File::ShareDir" : "0",
             "JSON::Schema::Modern" : "0.620",
             "JSON::Schema::Modern::Document" : "0.619",
-            "JSON::Schema::Modern::Utilities" : "0",
+            "JSON::Schema::Modern::Utilities" : "0.625",
             "JSON::Schema::Modern::Vocabulary" : "0",
             "List::Util" : "0",
             "Math::BigInt" : "1.999701",
+            "Mojo::File" : "0",
             "Mojo::Message::Request" : "0",
             "Mojo::Message::Response" : "0",
             "Mojo::Util" : "0",
             "Moo" : "0",
             "MooX::TypeTiny" : "0.002002",
-            "Path::Tiny" : "0",
-            "Ref::Util" : "0",
             "Safe::Isa" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
@@ -120,7 +119,6 @@
             "HTTP::Status" : "0",
             "Plack::Request" : "1.0043",
             "Plack::Response" : "0",
-            "Ref::Util::XS" : "0",
             "Type::Tiny" : "0.045_03",
             "Type::Tiny::XS" : "0",
             "URI" : "0"
@@ -138,7 +136,6 @@
             "Mojolicious" : "0",
             "Term::ANSIColor" : "0",
             "Test2::API" : "0",
-            "Test2::Tools::Exception" : "0",
             "Test2::V0" : "0",
             "Test2::Warnings" : "0.038",
             "Test::Deep" : "0",
@@ -239,19 +236,19 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.108"
+         "version" : "0.109"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.108"
+         "version" : "0.109"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.108"
+         "version" : "0.109"
       },
       "OpenAPI::Modern::Utilities" : {
          "file" : "lib/OpenAPI/Modern/Utilities.pm",
-         "version" : "0.108"
+         "version" : "0.109"
       }
    },
    "release_status" : "stable",
@@ -266,7 +263,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.108",
+   "version" : "0.109",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043005"
@@ -1161,7 +1158,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.108",
+                  "tag" : "v0.109",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

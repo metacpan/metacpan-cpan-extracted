@@ -1,6 +1,6 @@
 package Daje::Controller::ToolsTreelist;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
-use v5.40;
+use v5.42;
 
 
 # NAME
@@ -37,6 +37,8 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.com
 #
 
+use Data::Dumper;
+
 sub load_treelist($self) {
 
     $self->app->log->debug('Daje::Controller::ToolsTreelist::load_treelist');
@@ -44,8 +46,9 @@ sub load_treelist($self) {
     my $tools_projects_pkey = $self->param('tools_projects_pkey');
 
     $self->tools_helper_treelist->load_treelist($tools_projects_pkey)->then(sub ($result){
-        $self->render(json => { data => $result->{data}, result => => 1 });
+        $self->render(json => $result->{data});
     })->catch(sub ($err) {
+        $self->app->log->error('Daje::Controller::ToolsTreelist::load_treelist ' . $err);
         $self->render(json => { 'result' => 0, data => $err });
     });
 }

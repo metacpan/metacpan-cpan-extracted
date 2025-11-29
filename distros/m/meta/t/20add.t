@@ -23,7 +23,7 @@ my $metapkg = meta::package->get( "main" );
       '$metasym->reference for scalar' );
 
    like( dies { $metapkg->add_symbol( '$NEW_SCALAR', \my $tmp ) },
-      qr/^Already have a symbol named "\$NEW_SCALAR" /,
+      qr/^Package "main" already contains a symbol named "\$NEW_SCALAR" /,
       '->add_symbol on same name throws exception' );
 
    is( $metapkg->add_symbol( '$BLANK_SCALAR' )->reference, \undef,

@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-xform
 
+1.05 2025-11-29T05:45:59Z
+
+    - Add --xform-bin option for binary data transformation.
+    - Add --xform-visible option to customize Text::Conceal visible parameter.
+
 1.04 2022-07-04T03:40:03Z
 
     - Support nested encode and decode.

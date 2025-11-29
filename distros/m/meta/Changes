@@ -1,5 +1,12 @@
 Revision history for meta
 
+0.015   2025-11-27
+        [CHANGES]
+         * Attempt to support signature named parameters of Perl 5.43.5 in
+           signature metadata queries
+         * Include the package name in exception strings thrown by methods on
+           metapackage instances
+
 0.014   2025-09-03
         [BUGFIXES]
          * Account for `OP_MULTIPARAM` of signatured subs in latest bleadperl

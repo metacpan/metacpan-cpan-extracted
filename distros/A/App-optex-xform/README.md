@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/optex-xform/workflows/test/badge.svg)](https://github.com/kaz-utashiro/optex-xform/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-optex-xform.svg)](https://metacpan.org/release/App-optex-xform)
+[![Actions Status](https://github.com/kaz-utashiro/optex-xform/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kaz-utashiro/optex-xform/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-optex-xform.svg)](https://metacpan.org/release/App-optex-xform)
 # NAME
 
 xform - data transform filter module for optex
@@ -27,9 +27,39 @@ data.
     Transform multibyte Non-ASCII chracters into single-byte sequene, and
     recover.
 
+- **--xform-bin**
+
+    Transform non-printable binary characters into printable string, and
+    recover.
+
+- **--xform-visible**=_0|1|2_
+
+    Specify the character set used for transformation. This option overrides
+    the default `visible` parameter of `Text::Conceal`.
+
+    - **0**
+
+        Use both printable and non-printable characters.
+
+    - **1**
+
+        Use printable characters first, then non-printable characters if needed.
+
+    - **2**
+
+        Use only printable characters (default).
+
+    This option can be combined with any xform mode (ansi, utf8, bin, generic).
+
 # EXAMPLE
 
     $ jot 100 | egrep --color=always .+ | optex column -Mxform --xform-ansi -x
+
+Use `--xform-visible` to control character set used for transformation:
+
+    $ optex -Mxform --xform-visible=2 --xform-ansi cat colored.txt
+
+    $ optex -Mxform --xform-visible=1 --xform-utf8 command
 
 # SEE ALSO
 
@@ -46,7 +76,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020-2022 Kazumasa Utashiro.
+Copyright 2020-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

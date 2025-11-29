@@ -14,13 +14,13 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test2::V0 -no_pragmas => 1;
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
 use Digest::MD5 'md5_hex';
-use Path::Tiny;
+use Mojo::File 'path';
 
 foreach my $line (<DATA>) {
   chomp $line;
   my ($filename, $checksum) = split / /, $line, 2;
 
-  is(md5_hex(path($filename)->slurp_raw), $checksum, 'checksum for '.$filename.' is correct')
+  is(md5_hex(path($filename)->slurp), $checksum, 'checksum for '.$filename.' is correct')
     or diag $filename.' is not what was shipped in the distribution!';
 }
 
@@ -31,6 +31,7 @@ share/3.1/strict-dialect.json d13df15c1f7475a477cdff7c3dfa0bca
 share/3.1/strict-schema.json 94554b65920faa88f89d0e65d2e099c1
 share/3.2/strict-dialect.json 11c94716eb238cd21d84a4eea7c3e1ce
 share/3.2/strict-schema.json 3b89643225eced6ce7d3f1a923e91624
+share/oas/3.0/schema.json bd82d5fc176d386ce85d0e8d5836aa32
 share/oas/3.1/dialect.json 06cea984f8807c13e2916914251e22c3
 share/oas/3.1/schema-base.json c7384a02a8fa98ba83488c09d76a1df1
 share/oas/3.1/schema.json 724962b927e62a5a578604093e5ecc78

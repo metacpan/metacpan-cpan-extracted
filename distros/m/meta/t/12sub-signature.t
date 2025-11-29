@@ -32,6 +32,9 @@ my $mainpkg = meta::package->get( "main" );
    is( $metasig->optional_params,  1, 'signature has 1 optional param' );
    is( $metasig->slurpy, undef,       'signature has no slurpy param' );
 
+   # Should always be permitted even on older perls
+   is( [ $metasig->named_params ], [], 'signature has no named params' );
+
    is( $metasig->min_args, 2, 'signature requires at least 2 argument values' );
    is( $metasig->max_args, 3, 'signature supports at most 3 argument values' );
 
@@ -51,6 +54,33 @@ my $mainpkg = meta::package->get( "main" );
 
    is( $mainpkg->get_symbol( '&testfunc_with_hash' )->signature->slurpy, '%',
       'signature slurpy hash' );
+}
+
+if( $^V ge v5.43.5 ) {
+   # This perl has named parameters
+   my $sub_with_named = eval <<'EOF' or die $@;
+no warnings 'experimental::signature_named_parameters';
+sub ( $x, :$y, :$z = 123 ) { }
+EOF
+
+   my $metasig = meta::for_reference( $sub_with_named )->signature;
+
+   is( $metasig->mandatory_params, 1, 'signature has 1 mandatory positional params' );
+   is( $metasig->optional_params,  0, 'signature has 0 optional positional params' );
+   is( $metasig->slurpy, undef,       'signature has no slurpy param' );
+
+   my %named_params = $metasig->named_params;
+
+   is( scalar keys %named_params, 2, 'signature has 2 named parameters' );
+
+   is( $named_params{y}->name, "y",   'signature named param "y" has name' );
+   ok( $named_params{y}->is_required, 'signature named param "y" is required' );
+
+   is( $named_params{z}->name, "z",    'signature named param "z" has name' );
+   ok( !$named_params{z}->is_required, 'signature named param "z" is not required' );
+
+   is( $metasig->min_args, 3,     'signature requires at least 1+2 argument values' );
+   is( $metasig->max_args, undef, 'signature with named supports unbounded argument values' );
 }
 
 sub func_no_sig { }

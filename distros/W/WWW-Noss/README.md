@@ -2,6 +2,8 @@
 
 ![noss](img/noss-logo.png)
 
+![noss list](img/noss-list-screenshot.png)
+
 **noss** is a command-line RSS/Atom feed reader and aggregator written in
 Perl.
 
