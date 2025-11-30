@@ -2,7 +2,7 @@ package Aion::Carp;
 use 5.008001;
 use common::sense;
 
-our $VERSION = "1.5";
+our $VERSION = "1.6";
 
 use Carp qw//;
 use Scalar::Util qw//;
@@ -12,9 +12,9 @@ sub handler {
 
     if(!ref $x) {
         no utf8; use bytes;
-        if($x =~ s/\n[ \t]+\.\.\.propagated at .* line \d+\.\n\z/\n/a) {}
+        if($x =~ s/\n[ \t]+\.\.\.propagated at .* line \d+\.\n\z/\n/) {}
         else {
-            $x =~ s/ at .*? line \d+\.\n\z//a;
+            $x =~ s/ at .*? line \d+\.\n\z//;
             my $c = Carp::longmess('');
             $c =~ s/^( at .*? line \d+)\.\n/$x\n\tdie(...) called$1\n/;
             $x = $c;
@@ -41,11 +41,11 @@ __END__
 
 =head1 NAME
 
-Aion::Carp - added stacktrace to exceptions
+Aion::Carp - adds stack trace to exceptions
 
 =head1 VERSION
 
-1.5
+1.6
 
 =head1 SYNOPSIS
 
@@ -59,13 +59,13 @@ Aion::Carp - added stacktrace to exceptions
 	eval { D() };
 	
 	my $expected = "hi!
-	    die(...) called at t/aion/carp.t line 14
-	    main::A() called at t/aion/carp.t line 15
-	    main::B() called at t/aion/carp.t line 16
-	    eval {...} called at t/aion/carp.t line 16
-	    main::C() called at t/aion/carp.t line 17
-	    main::D() called at t/aion/carp.t line 19
-	    eval {...} called at t/aion/carp.t line 19
+	    die(...) called at t/aion/carp.t line 15
+	    main::A() called at t/aion/carp.t line 16
+	    main::B() called at t/aion/carp.t line 17
+	    eval {...} called at t/aion/carp.t line 17
+	    main::C() called at t/aion/carp.t line 18
+	    main::D() called at t/aion/carp.t line 20
+	    eval {...} called at t/aion/carp.t line 20
 	";
 	$expected =~ s/^ {4}/\t/gm;
 	
@@ -88,23 +88,23 @@ Aion::Carp - added stacktrace to exceptions
 
 =head1 DESCRIPTION
 
-This module replace C<$SIG{__DIE__}> to function, who added to exception stacktrace.
+This module replaces C<$SIG{__DIE__}> with a function that adds a stack trace to exceptions.
 
-If exeption is string, then stacktrace added to message. And if exeption is hash (C<{}>), or object on base hash (C<bless {}, "...">), then added to it key C<STACKTRACE> with stacktrace.
+If the exception is a string, a stack trace is added to the message. And if the exception is a hash (C<{}>) or a hash-based object (C<bless {}, "..."), then the>STACKTRACE` key with stacktrace is added to it.
 
-Where use propagation, stacktrace do'nt added.
+When the exception is thrown again, the stack trace is not added, but remains the same.
 
 =head1 SUBROUTINES
 
 =head2 handler ($message)
 
-It added to C<$message> stacktrace.
+Adds a stack trace to C<$message>.
 
 	eval { Aion::Carp::handler("hi!") }; $@  # ~> ^hi!\n\tdie
 
 =head2 import
 
-Replace C<$SIG{__DIE__}> to C<handler>.
+Replaces C<$SIG{__DIE__}> with C<handler>.
 
 	$SIG{__DIE__} = undef;
 	$SIG{__DIE__} # --> undef
@@ -112,21 +112,6 @@ Replace C<$SIG{__DIE__}> to C<handler>.
 	Aion::Carp->import;
 	
 	$SIG{__DIE__} # -> \&Aion::Carp::handler
-
-=head1 INSTALL
-
-Add to B<cpanfile> in your project:
-
-	on 'test' => sub {
-		requires 'Aion::Carp',
-			git => 'https://github.com/darviarush/perl-aion-carp.git',
-			ref => 'master',
-		;
-	};
-
-And run command:
-
-	$ sudo cpm install -gvv
 
 =head1 SEE ALSO
 
@@ -138,8 +123,12 @@ And run command:
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 
 ⚖ B<GPLv3>
+
+=head1 COPYRIGHT
+
+The Aion::Surf module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.

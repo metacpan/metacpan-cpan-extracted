@@ -1,0 +1,24 @@
+msgid "Aion::Format::Html - библиотека для форматирования HTML"
+msgstr "Aion::Format::Html - library for HTML formatting"
+
+msgid "Библиотека для форматирования HTML-документов."
+msgstr "Library for formatting HTML documents."
+
+msgid "Преобразует HTML в текст."
+msgstr "Converts HTML to text."
+
+msgid "Экранирует символы HTML."
+msgstr "Escapes HTML characters."
+
+msgid "Обрезает опасные и неизвестные теги HTML, а также неизвестные атрибуты из известных тегов."
+msgstr "Trims dangerous and unknown HTML tags, as well as unknown attributes from known tags."
+
+msgid "Разбивает текст на страницы с учетом html-тегов."
+msgstr "Breaks text into pages taking into account html tags."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Format::Html module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Format::Html module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

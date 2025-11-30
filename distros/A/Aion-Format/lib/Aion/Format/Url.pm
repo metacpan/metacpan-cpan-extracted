@@ -3,11 +3,12 @@ package Aion::Format::Url;
 use common::sense;
 
 use List::Util qw//;
+use Encode qw//;
 
 use Exporter qw/import/;
 our @EXPORT = our @EXPORT_OK = grep {
-    ref \$Aion::Format::Url::{$_} eq "GLOB"
-        && *{$Aion::Format::Url::{$_}}{CODE} && !/^(_|(NaN|import)\z)/n
+	ref \$Aion::Format::Url::{$_} eq "GLOB"
+		&& *{$Aion::Format::Url::{$_}}{CODE} && !/^(_|(NaN|import)\z)/n
 } keys %Aion::Format::Url::;
 
 
@@ -15,44 +16,129 @@ our @EXPORT = our @EXPORT_OK = grep {
 
 use constant UNSAFE_RFC3986 => qr/[^A-Za-z0-9\-\._~]/;
 
+# Эскейпит значение
 sub to_url_param(;$) {
 	my ($param) = @_ == 0? $_: @_;
-	$param =~ s/${\ UNSAFE_RFC3986}/$& eq " "? "+": sprintf "%%%02X", ord $&/age;
+	use bytes;
+	$param =~ s/${\ UNSAFE_RFC3986}/$& eq " "? "+": sprintf "%%%02X", ord $&/ge;
 	$param
 }
 
-sub _escape_url_params {
-	my ($key, $param) = @_;
-
-	!defined($param)? ():
-	$param eq 1? $key:
-	ref $param eq "HASH"? do {
-		join "&", map _escape_url_params("${key}[$_]", $param->{$_}), sort keys %$param
-	}:
-	ref $param eq "ARRAY"? do {
-		join "&", map _escape_url_params("${key}[]", $_), @$param
-	}:
-	join "", $key, "=", to_url_param $param
-}
-
+# Преобразует в формат url-параметров
 sub to_url_params(;$) {
 	my ($param) = @_ == 0? $_: @_;
 
-	if(ref $param eq "HASH") {
-		join "&", map _escape_url_params($_, $param->{$_}), sort keys %$param
+	my @R;
+	my @S = [$param];
+	while(@S) {
+		my $u = pop @S;
+		my ($x, $key) = @$u;
+		
+		if(ref $x eq "HASH") {
+			push @S, defined($key)
+				? (map [$x->{$_}, "$key\[${\to_url_param}]"], sort keys %$x)
+				: (map [$x->{$_}, to_url_param], sort keys %$x)
+			;
+		}
+		elsif(ref $x eq "ARRAY") {
+			my $i = '';
+			push @S, map [$_, "$key\[${\($i++)}]"], @$x;
+		}
+		elsif(!defined $x) {}
+		elsif($x eq 1) { unshift @R, $key }
+		else {
+			unshift @R, join "=", $key, to_url_param $x;
+		}
 	}
-	else {
-		join "&", List::Util::pairmap { _escape_url_params($a, $b) } @$param
-	}
+	
+	join "&", @R
 }
 
-# #@see https://habr.com/ru/articles/63432/
-# # В multipart/form-data
-# sub to_multipart(;$) {
-# 	my ($param) = @_ == 0? $_: @_;
-# 	$param =~ s/[&=?#+\s]/$& eq " "? "+": sprintf "%%%02X", ord $&/ge;
-# 	$param
-# }
+# Определяет кодировку. В koi8-r и в cp1251 большие и малые буквы как бы поменялись местами, поэтому у правильной кодировки вес будет больше
+sub _bohemy {
+	my ($s) = @_;
+	my $c = 0;
+	while($s =~ /[а-яё]+/gi) {
+		my $x = $&;
+		if($x =~ /^[А-ЯЁа-яё][а-яё]*$/) { $c += length $x } else { $c -= length $x }
+	}
+	$c
+}
+
+sub from_url_param(;$) {
+	my ($param) = @_ == 0? $_: @_;
+
+	utf8::encode($param) if utf8::is_utf8($param);
+
+	{
+		no utf8;
+		use bytes;
+		$param =~ tr!\+! !;
+		$param =~ s!%([\da-f]{2})! chr hex $1 !iage;
+	}
+
+	eval { $param = Encode::decode_utf8($param, Encode::FB_CROAK) };
+
+	if($@) { # видимо тут кодировка cp1251 или koi8-r
+		my $cp  = Encode::decode('cp1251', $param);
+		my $koi = Encode::decode('koi8-r', $param);
+		# выбираем перекодировку в которой меньше больших букв внутри слова
+		$param = _bohemy($koi) > _bohemy($cp)? $koi: $cp;
+	}
+
+	$param
+}
+
+sub _set_url_param(@) {
+	my ($x, $val) = @_;
+	if(ref $$x eq "ARRAY") { push @$$x, $val }
+	elsif(ref $$x eq "HASH") { $$x = [$$x, $val] }
+	else { $$x = $val }
+}
+
+sub from_url_params(;$) {
+	my ($params) = @_ == 0? $_: @_;
+
+	my %param;
+	my $x;
+	my $was_val;
+
+	while($params =~ /\G (?: 
+		(?:^|&) (?<key1> [^&=\[\]]* )
+		| \[ (?<key> [^\[\]]* ) \]
+		| (?: = (?<val> [^&]*) )
+		| .
+	) /gsx) {
+
+		if(exists $+{key1}) {
+			_set_url_param $x, 1 unless $was_val;
+			$was_val = 0;
+			$x = \$param{from_url_param $+{key1}};
+		}
+		elsif(exists $+{key}) {
+			# Добрасываем в массив
+			if($+{key} eq '' || int $+{key} eq $+{key}) {
+				$$x = [$$x] if ref $$x ne 'ARRAY' && defined $$x;
+				$x = \$$x->[$+{key}];
+			}
+			else {
+				# Добавляем в хеш
+				my $key = from_url_param $+{key};
+				$$x = {$key => $$x} if ref $$x ne 'HASH' && defined $$x;
+				$x = \$$x->{$key};
+			}
+		}
+		elsif(exists $+{val}) {
+			_set_url_param $x, from_url_param $+{val};
+			$was_val = 1;
+		}
+		
+	}
+	
+	_set_url_param $x, 1 unless $was_val;
+
+	\%param
+}
 
 #@category parse url
 
@@ -63,7 +149,7 @@ sub _parse_url ($) {
 		( //
 			( (?<user> [^:/?\#\@]* ) :
 		  	  (?<pass> [^/?\#\@]*  ) \@  )?
-			(?<domain> [^/?\#]* )             )?
+			(?<domain> [^/?\#]* )  )?
 		(  / (?<path>  [^?\#]* ) )?
 		(?<part> [^?\#]+ )?
 		( \? (?<query> [^\#]*  ) )?
@@ -162,62 +248,76 @@ __END__
 
 =head1 NAME
 
-Aion::Format::Url - the utitlities for encode and decode the urls
+Aion::Format::Url - utilities for encoding and decoding URLs
 
 =head1 SYNOPSIS
 
 	use Aion::Format::Url;
 	
-	to_url_params {a => 1, b => [[1,2],3,{x=>10}]} # => a&b[][]&b[][]=2&b[]=3&b[][x]=10
+	to_url_params {a => 1, b => [[1,2],3,{x=>10}]} # => a&b[][]&b[][1]=2&b[1]=3&b[2][x]=10
 	
 	normalize_url "?x", "http://load.er/fix/mix?y=6"  # => http://load.er/fix/mix?x
 
 =head1 DESCRIPTION
 
-The utitlities for encode and decode the urls.
+Utilities for encoding and decoding URLs.
 
 =head1 SUBROUTINES
 
 =head2 to_url_param (;$scalar)
 
-Escape scalar to part of url search.
+Escapes C<$scalar> for the search part of the URL.
 
 	to_url_param "a b" # => a+b
 	
-	[map to_url_param, "a b", "🦁"] # --> [qw/a+b %1F981/]
+	[map to_url_param, "a b", "🦁"] # --> [qw/a+b %F0%9F%A6%81/]
 
 =head2 to_url_params (;$hash_ref)
 
-Generates the search part of the url.
+Generates the search portion of the URL.
 
 	local $_ = {a => 1, b => [[1,2],3,{x=>10}]};
-	to_url_params  # => a&b[][]&b[][]=2&b[]=3&b[][x]=10
+	to_url_params  # => a&b[][]&b[][1]=2&b[1]=3&b[2][x]=10
 
 =over
 
-=item 1. Keys with undef values not stringify.
+=item 1. Keys with C<undef> values are discarded.
 
-=item 2. Empty value is empty.
+=item 2. The value C<1> is used for a key without a value.
 
-=item 3. C<1> value stringify key only.
-
-=item 4. Keys stringify in alfabet order.
+=item 3. Keys are converted in alphabetical order.
 
 =back
 
 	to_url_params {k => "", n => undef, f => 1}  # => f&k=
 
+=head2 from_url_params (;$scalar)
+
+Parses the search part of the URL.
+
+	local $_ = 'a&b[][]&b[][1]=2&b[1]=3&b[2][x]=10';
+	from_url_params  # --> {a => 1, b => [[1,2],3,{x=>10}]}
+
+=head2 from_url_param (;$scalar)
+
+Used to parse keys and values in a URL parameter.
+
+Reverse to C<to_url_param>.
+
+	local $_ = to_url_param '↬';
+	from_url_param  # => ↬
+
 =head2 parse_url ($url, $onpage, $dir)
 
-Parses and normalizes url.
+Parses and normalizes URLs.
 
 =over
 
-=item * C<$url> — url, or it part for parsing.
+=item * C<$url> - URL or part of it to be parsed.
 
-=item * C<$onpage> — url page with C<$url>. If C<$url> not complete, then extended it. Optional. By default use config ONPAGE = "off://off".
+=item * C<$onpage> is the URL of the page with C<$url>. If C<$url> is not complete, then it is completed from here. Optional. By default it uses the C<$onpage = 'off://off'> configuration.
 
-=item * C<$dir> (bool): 1 — normalize url path with "/" on end, if it is catalog. 0 — without "/".
+=item * C<$dir> (bool): 1 - normalize the URL path with a "/" at the end if it is a directory. 0 - without "/".
 
 =back
 
@@ -230,7 +330,7 @@ Parses and normalizes url.
 	    onpage => "off://off",
 	};
 	
-	parse_url ""    # --> $res
+	parse_url "" # --> $res
 	
 	$res = {
 	    proto  => "https",
@@ -261,13 +361,11 @@ Parses and normalizes url.
 	};
 	parse_url 'https://user:pass@www.x.test/path?x=10&y=20#hash'  # --> $res
 
-See also C<URL::XS>.
-
 =head2 normalize_url ($url, $onpage, $dir)
 
-Normalizes url.
+Normalizes the URL.
 
-It use C<parse_url>, and it returns link.
+Uses C<parse_url> and returns a link.
 
 	normalize_url ""   # => off://off
 	normalize_url "www.fix.com"  # => off://off/www.fix.com
@@ -286,13 +384,25 @@ It use C<parse_url>, and it returns link.
 
 =over
 
-=item * C<URI::URL>.
+=item * L<Badger::URL>.
+
+=item * L<Mojo::URL>.
+
+=item * L<Plack::Request>.
+
+=item * L<URI>.
+
+=item * L<URI::URL>.
+
+=item * L<URL::Encode>.
+
+=item * L<URL::XS>.
 
 =back
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+Yaroslav O. Kosmina L<mailto:darviarush@mail.ru>
 
 =head1 LICENSE
 

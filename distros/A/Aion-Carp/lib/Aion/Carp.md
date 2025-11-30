@@ -1,10 +1,11 @@
+!ru:en,badges
 # NAME
 
-Aion::Carp - added stacktrace to exceptions
+Aion::Carp - добавляет трассировку стека в исключения
 
 # VERSION
 
-1.5
+1.6
 
 # SYNOPSIS
 
@@ -19,13 +20,13 @@ sub D { C() }
 eval { D() };
 
 my $expected = "hi!
-    die(...) called at t/aion/carp.t line 14
-    main::A() called at t/aion/carp.t line 15
-    main::B() called at t/aion/carp.t line 16
-    eval {...} called at t/aion/carp.t line 16
-    main::C() called at t/aion/carp.t line 17
-    main::D() called at t/aion/carp.t line 19
-    eval {...} called at t/aion/carp.t line 19
+    die(...) called at t/aion/carp.t line 15
+    main::A() called at t/aion/carp.t line 16
+    main::B() called at t/aion/carp.t line 17
+    eval {...} called at t/aion/carp.t line 17
+    main::C() called at t/aion/carp.t line 18
+    main::D() called at t/aion/carp.t line 20
+    eval {...} called at t/aion/carp.t line 20
 ";
 $expected =~ s/^ {4}/\t/gm;
 
@@ -49,17 +50,17 @@ $@ # --> []
 
 # DESCRIPTION
 
-This module replace `$SIG{__DIE__}` to function, who added to exception stacktrace.
+Этот модуль заменяет `$SIG{__DIE__}` на функцию, добавляющую в исключения трассировку стека.
 
-If exeption is string, then stacktrace added to message. And if exeption is hash (`{}`), or object on base hash (`bless {}, "..."`), then added to it key `STACKTRACE` with stacktrace.
+Если исключением является строка, к сообщению добавляется трассировка стека. А если исключением является хэш (`{}`) или объект на базе хеша (`bless {}, "..."`), то к нему добавляется ключ `STACKTRACE` со stacktrace.
 
-Where use propagation, stacktrace do'nt added.
+При повторном выбрасывании исключения трассировка стека не добавляется, а остаётся прежней.
 
 # SUBROUTINES
 
 ## handler ($message)
 
-It added to `$message` stacktrace.
+Добавляет трассировку стека в `$message`.
 
 ```perl
 eval { Aion::Carp::handler("hi!") }; $@  # ~> ^hi!\n\tdie
@@ -67,7 +68,7 @@ eval { Aion::Carp::handler("hi!") }; $@  # ~> ^hi!\n\tdie
 
 ## import
 
-Replace `$SIG{__DIE__}` to `handler`.
+Заменяет `$SIG{__DIE__}` на `handler`.
 
 ```perl
 $SIG{__DIE__} = undef;
@@ -78,33 +79,18 @@ Aion::Carp->import;
 $SIG{__DIE__} # -> \&Aion::Carp::handler
 ```
 
-# INSTALL
-
-Add to **cpanfile** in your project:
-
-```cpanfile
-on 'test' => sub {
-	requires 'Aion::Carp',
-		git => 'https://github.com/darviarush/perl-aion-carp.git',
-		ref => 'master',
-	;
-};
-```
-
-And run command:
-
-```sh
-$ sudo cpm install -gvv
-```
-
 # SEE ALSO
 
 * `Carp::Always`
 
 # AUTHOR
 
-Yaroslav O. Kosmina [dart@cpan.org](mailto:dart@cpan.org)
+Yaroslav O. Kosmina <dart@cpan.org>
 
 # LICENSE
 
 ⚖ **GPLv3**
+
+# COPYRIGHT
+
+The Aion::Surf module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.

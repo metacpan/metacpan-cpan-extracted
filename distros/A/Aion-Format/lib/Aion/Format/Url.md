@@ -1,58 +1,78 @@
+!ru:en
 # NAME
 
-Aion::Format::Url - the utitlities for encode and decode the urls
+Aion::Format::Url - утилиты для кодирования и декодирования URL-адресов
 
 # SYNOPSIS
 
 ```perl
 use Aion::Format::Url;
 
-to_url_params {a => 1, b => [[1,2],3,{x=>10}]} # => a&b[][]&b[][]=2&b[]=3&b[][x]=10
+to_url_params {a => 1, b => [[1,2],3,{x=>10}]} # => a&b[][]&b[][1]=2&b[1]=3&b[2][x]=10
 
 normalize_url "?x", "http://load.er/fix/mix?y=6"  # => http://load.er/fix/mix?x
 ```
 
 # DESCRIPTION
 
-The utitlities for encode and decode the urls.
+Утилиты для кодирования и декодирования URL-адресов.
 
 # SUBROUTINES
 
 ## to_url_param (;$scalar)
 
-Escape scalar to part of url search.
+Экранирует `$scalar` для части поиска URL.
 
 ```perl
 to_url_param "a b" # => a+b
 
-[map to_url_param, "a b", "🦁"] # --> [qw/a+b %1F981/]
+[map to_url_param, "a b", "🦁"] # --> [qw/a+b %F0%9F%A6%81/]
 ```
 
 ## to_url_params (;$hash_ref)
 
-Generates the search part of the url.
+Генерирует поисковую часть URL-адреса.
 
 ```perl
 local $_ = {a => 1, b => [[1,2],3,{x=>10}]};
-to_url_params  # => a&b[][]&b[][]=2&b[]=3&b[][x]=10
+to_url_params  # => a&b[][]&b[][1]=2&b[1]=3&b[2][x]=10
 ```
 
-1. Keys with undef values not stringify.
-1. Empty value is empty.
-1. `1` value stringify key only.
-1. Keys stringify in alfabet order.
+1. Ключи со значениями `undef` отбрасываются.
+1. Значение `1` используется для ключа без значения.
+1. Ключи преобразуются в алфавитном порядке.
 
 ```perl
 to_url_params {k => "", n => undef, f => 1}  # => f&k=
 ```
 
+## from_url_params (;$scalar)
+
+Парсит поисковую часть URL-адреса.
+
+```perl
+local $_ = 'a&b[][]&b[][1]=2&b[1]=3&b[2][x]=10';
+from_url_params  # --> {a => 1, b => [[1,2],3,{x=>10}]}
+```
+
+## from_url_param (;$scalar)
+
+Используется для парсинга ключей и значений в параметре URL.
+
+Обратный к `to_url_param`.
+
+```perl
+local $_ = to_url_param '↬';
+from_url_param  # => ↬
+```
+
 ## parse_url ($url, $onpage, $dir)
 
-Parses and normalizes url.
+Парсит и нормализует URL.
 
-* `$url` — url, or it part for parsing.
-* `$onpage` — url page with `$url`. If `$url` not complete, then extended it. Optional. By default use config ONPAGE = "off://off".
-* `$dir` (bool): 1 — normalize url path with "/" on end, if it is catalog. 0 — without "/".
+* `$url` — URL-адрес или его часть для парсинга.
+* `$onpage` — URL-адрес страницы с `$url`. Если `$url` не завершен, то он дополняется отсюда. Необязательный. По умолчанию использует конфигурацию `$onpage = 'off://off'`.
+* `$dir` (bool): 1 — нормализовать URL-путь с "/" на конце, если это каталог. 0 — без «/».
 
 ```perl
 my $res = {
@@ -64,7 +84,7 @@ my $res = {
     onpage => "off://off",
 };
 
-parse_url ""    # --> $res
+parse_url "" # --> $res
 
 $res = {
     proto  => "https",
@@ -96,13 +116,11 @@ $res = {
 parse_url 'https://user:pass@www.x.test/path?x=10&y=20#hash'  # --> $res
 ```
 
-See also `URL::XS`.
-
 ## normalize_url ($url, $onpage, $dir)
 
-Normalizes url.
+Нормализует URL.
 
-It use `parse_url`, and it returns link.
+Использует `parse_url` и возвращает ссылку.
 
 ```perl
 normalize_url ""   # => off://off
@@ -121,11 +139,17 @@ normalize_url "?x", "http://load.er/fix/mix?y=6"  # => http://load.er/fix/mix?x
 
 # SEE ALSO
 
-* `URI::URL`.
+* [Badger::URL](https://metacpan.org/pod/Badger::URL).
+* [Mojo::URL](https://metacpan.org/pod/Mojo::URL).
+* [Plack::Request](https://metacpan.org/pod/Plack::Request).
+* [URI](https://metacpan.org/pod/URI).
+* [URI::URL](https://metacpan.org/pod/URI::URL).
+* [URL::Encode](https://metacpan.org/pod/URL::Encode).
+* [URL::XS](https://metacpan.org/pod/URL::XS).
 
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+Yaroslav O. Kosmina <darviarush@mail.ru>
 
 # LICENSE
 

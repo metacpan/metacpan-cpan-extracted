@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use Test::More;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
+#use FindBin;
+#use lib "$FindBin::Bin/../lib";
 
 BEGIN {
     use_ok('OpenAPI::Linter');

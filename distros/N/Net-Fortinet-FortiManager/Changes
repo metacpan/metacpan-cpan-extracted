@@ -1,5 +1,11 @@
 Revision history for Net-Fortinet-FortiManager
 
+0.004001  2025-11-29 17:09:00+01:00 Europe/Vienna
+    - fix running tests against FortiManager with invalid certificate
+      mainly self-signed
+    - add has_firewall_service_udp_lite_support method
+    - fix tests when running against FortiManager >= 7.6
+
 0.004000  2023-12-04 18:16:30+01:00 Europe/Vienna
     - add wildcard FQDN object support
 

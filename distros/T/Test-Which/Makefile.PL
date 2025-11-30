@@ -20,7 +20,6 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.008',
 	PREREQ_PM => {
 		'File::Which' => 0,
-		'IPC::Run3' => 0,
 	},
 	TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,

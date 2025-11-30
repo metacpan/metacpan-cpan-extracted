@@ -1,0 +1,24 @@
+msgid "Aion::Carp - добавляет трассировку стека в исключения"
+msgstr "Aion::Carp - adds stack trace to exceptions"
+
+msgid "Этот модуль заменяет `$SIG{__DIE__}` на функцию, добавляющую в исключения трассировку стека."
+msgstr "This module replaces `$SIG{__DIE__}` with a function that adds a stack trace to exceptions."
+
+msgid "Если исключением является строка, к сообщению добавляется трассировка стека. А если исключением является хэш (`{}`) или объект на базе хеша (`bless {}, \"...\"`), то к нему добавляется ключ `STACKTRACE` со stacktrace."
+msgstr "If the exception is a string, a stack trace is added to the message. And if the exception is a hash (`{}`) or a hash-based object (`bless {}, \"...\"), then the `STACKTRACE` key with stacktrace is added to it."
+
+msgid "При повторном выбрасывании исключения трассировка стека не добавляется, а остаётся прежней."
+msgstr "When the exception is thrown again, the stack trace is not added, but remains the same."
+
+msgid "Добавляет трассировку стека в `$message`."
+msgstr "Adds a stack trace to `$message`."
+
+msgid "Заменяет `$SIG{__DIE__}` на `handler`."
+msgstr "Replaces `$SIG{__DIE__}` with `handler`."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Surf module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Surf module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

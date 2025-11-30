@@ -1,4 +1,4 @@
-package EAI::FTP 1.919;
+package EAI::FTP 1.920;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Net::SFTP::Foreign (); use Net::SFTP::Foreign::Constants qw( SFTP_ERR_LOCAL_UTIME_FAILED ); use Net::FTP (); use Text::Glob qw(match_glob);
@@ -237,7 +237,7 @@ sub fetchFiles ($$) {
 					}
 				};
 				$logger->info("fetched file $remoteFile to $localFile");
-				if ($mod_time && !$FTP->{dontDoUtime}) {
+				if ($mod_time and !$FTP->{dontDoUtime}) {
 					 utime($mod_time,$mod_time,$localFile) or $logger->warn("couldn't set time for $localFile: $!");
 				}
 			}
@@ -581,7 +581,7 @@ sub setHandle ($;$) {
 	my ($handle,$rhost) = @_;
 	my $logger = get_logger();
 	eval {
-		confess "neither Net::SFTP::Foreign nor Net::FTP handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed $handle && ($handle->isa('Net::SFTP::Foreign') or $handle->isa('Net::FTP')) ;
+		confess "neither Net::SFTP::Foreign nor Net::FTP handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle and blessed $handle and ($handle->isa('Net::SFTP::Foreign') or $handle->isa('Net::FTP')) ;
 		$ftp = $handle;
 		$RemoteHost = $rhost;
 	};

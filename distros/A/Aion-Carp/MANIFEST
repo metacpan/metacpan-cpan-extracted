@@ -4,6 +4,8 @@ LICENSE
 META.json
 README.md
 cpanfile
+doc/badges/total.svg
+i18n/Aion/Carp.ru-en.po
 lib/Aion/Carp.md
 lib/Aion/Carp.pm
 minil.toml

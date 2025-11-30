@@ -1,7 +1,7 @@
-package EAI::DB 1.919;
+package EAI::DB 1.920;
 
-use strict; use feature 'unicode_strings'; use warnings;
-use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Carp qw(confess longmess);
+use strict; use warnings; use feature 'unicode_strings'; use Encode qw(encode);
+use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Carp qw(confess longmess); use Scalar::Util 'blessed';
 
 our @EXPORT = qw(newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn);
 
@@ -95,19 +95,22 @@ sub readFromDB ($$) {
 }
 
 # read data into hash using columns $DB->{keyfields} as the unique key for the hash (used for lookups), returned in $data
-sub readFromDBHash ($$) {
-	my ($DB, $data) = @_;
+sub readFromDBHash ($$;$) {
+	my ($DB, $data, $encode_keys_utf8) = @_;
 	my $logger = get_logger();
 	my $statement = $DB->{query};
 	my @keyfields = @{$DB->{keyfields}} if $DB->{keyfields} and ref($DB->{keyfields}) eq "ARRAY";
+	# work around bug in for fetchall_hashref (DBD::ODBC?) that double encodes returned fields from query. This encoding here makes the fields comparable again
+	@keyfields = map { encode('utf8',$_) } @keyfields if $encode_keys_utf8;
 	eval {
 		confess "no ref to hash argument param given ({query=>'',keyfields=>[]})" if ref($DB) ne "HASH";
 		confess "no ref to hash argument data (for returning data) given" if ref($data) ne "HASH";
 		confess "no valid dbh connection available" if !defined($dbh);
 		confess "no statement (hashkey query) given" if (!$statement);
 		confess "no key fields list (hashkey keyfields) given" if (!@keyfields);
-		$logger->debug("statement: ".$statement.", keyfields: @keyfields");
+		$logger->debug("statement: $statement, keyfields: @keyfields");
 		$dbh->{RaiseError} = 1; # to enable following try/catch (eval)
+		#DBI->trace(15);
 		eval {
 			my $sth = $dbh->prepare($statement);
 			$sth->execute();
@@ -225,7 +228,7 @@ sub storeInDB ($$;$) {
 		}
 		# is the given field (header) in table? warn, if not
 		for my $dataheader (keys %{$data->[0]}) {
-			$logger->warn("field '".$dataheader."' not contained in table $schemaName.$tableName") if !$coldefs->{$dataheader} && !$DB->{dontWarnOnNotExistingFields};
+			$logger->warn("field '".$dataheader."' not contained in table $schemaName.$tableName") if !$coldefs->{$dataheader} and !$DB->{dontWarnOnNotExistingFields};
 		}
 		$dbh->{PrintError} = 0; $dbh->{RaiseError} = 0;
 		my $lines = scalar(@{$data});
@@ -303,7 +306,7 @@ sub storeInDB ($$;$) {
 							$dataArray[$tgtCol] = undef;
 							$severity = 1 if !$severity;
 						}
-						if ($dataArray[$tgtCol] && $dataArray[$tgtCol] !~ /^\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}$/ && $dataArray[$tgtCol] !~ /^\d{4}\-\d{2}\-\d{2}$/) {
+						if ($dataArray[$tgtCol] and $dataArray[$tgtCol] !~ /^\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}$/ and $dataArray[$tgtCol] !~ /^\d{4}\-\d{2}\-\d{2}$/) {
 							$errorIndicator .= '| correct dateformat (\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2} or \d{4}\-\d{2}\-\d{2}) couldn\'t be created for: '.$dataArray[$tgtCol].", field: ".$columns[$dbCol];
 							$dataArray[$tgtCol] = undef;
 							$severity = 1 if !$severity;
@@ -325,7 +328,7 @@ sub storeInDB ($$;$) {
 					my $colVal = $dataArray[$tgtCol];
 					$logger->trace("$colName: $colVal") if $logger->is_trace;
 					# skip field building for incrementalStore and no content was found
-					unless ($incrementalStore && !defined($data->[$i]{$columns[$dbCol]})) {
+					unless ($incrementalStore and !defined($data->[$i]{$columns[$dbCol]})) {
 						# explicit NULL for empty values
 						$colVal = "NULL" if !defined($dataArray[$tgtCol]) or $dataArray[$tgtCol] eq "";
 						# fill primary key values with data from current row for update (in case insert fails)
@@ -343,7 +346,7 @@ sub storeInDB ($$;$) {
 				confess $errorIndicator.", at [".$debugKey."]" if $errorIndicator and $severity>=1;
 				$logger->warn($errorIndicator.", at [".$debugKey."]") if $errorIndicator and $severity==0;
 				# delete relevant data before insert. only done once for first row that fulfills $deleteBeforeInsertSelector
-				if ($deleteBeforeInsertSelector && !$beforeInsert{$deleteBeforeInsertSelector}) {
+				if ($deleteBeforeInsertSelector and !$beforeInsert{$deleteBeforeInsertSelector}) {
 					$logger->info("deleting data from $schemaName.$tableName, criteria: $deleteBeforeInsertSelector");
 					my $dostring = "delete from $schemaName.$tableName WHERE $deleteBeforeInsertSelector";
 					my $affectedRows = $dbh->do($dostring) or confess $DBI::errstr." with $dostring ".$debugKeyIndicator;
@@ -359,7 +362,7 @@ sub storeInDB ($$;$) {
 				}
 				substr($inscols, -1) = ""; substr($inscolVals, -1) = ""; substr($updcols, -1) = ""; # remove last comma
 				# only update before insert, if no deleteBeforeInsertSelector given (may not have a primkey then)
-				if ($doUpdateBeforeInsert && !$deleteBeforeInsertSelector) {
+				if ($doUpdateBeforeInsert and !$deleteBeforeInsertSelector) {
 					# insert data:  first try UPDATE
 					my $dostring = "UPDATE $schemaName.$tableName SET $updcols WHERE $updselector";
 					my $affectedRows = $dbh->do($dostring);
@@ -534,10 +537,10 @@ sub updateInDB ($$) {
 
 # set handle with externally created DBI::db connection (if EAI::DB::newDBH capabilities are not sufficient)
 sub setConn ($;$) {
-	my ($handle,$setDSN) = shift;
+	my ($handle,$setDSN) = @_;
 	my $logger = get_logger();
 	eval {
-		confess "no DBI::db handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed $handle && $handle->isa('DBI::db') ;
+		confess "no DBI::db handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed($handle) && $handle->isa('DBI::db') ;
 		$dbh = $handle;
 		$DSN = $setDSN;
 	};
@@ -631,6 +634,7 @@ read data into hash using column $DB->{keyfield} as the unique key for the hash 
  $DB->{columnnames} .. optionally return fieldnames of the query here
  $DB->{keyfield} .. field contained in the query string that should be used as the hashkey for the hash values of $data.
  $data .. ref to hash of hash values (as returned by selectall_hashref: $return->{hashkey}->{"<fieldname>"}) for return values of query.
+ $encode_keys_utf8 .. optional flag to encode UTF8 keyfield name to match the name from database (workaround for odbc driver bug)
 
 returns 0 on error, 1 if OK
 

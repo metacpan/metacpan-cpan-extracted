@@ -1,6 +1,6 @@
 package App::optex::rpn;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 =encoding utf-8
 
@@ -21,39 +21,93 @@ them with their calculated results.
 By default, all arguments are processed automatically when the module
 is loaded.
 
-=head1 OPTIONS
+=head1 MODULE OPTIONS
 
-Options can be set via C<-Mrpn::config(...)> or C<--option> before
-C<-->.
+Module options can be set via C<-Mrpn::config(...)> or C<--option>
+before C<-->.
 
 =over 4
 
-=item B<--all>, B<--no-all>
+=item B<--auto>, B<--no-auto>
 
 Enable or disable automatic processing of all arguments.  Default is
-enabled.  Use C<--no-all> to disable and process only arguments
+enabled.  Use C<--no-auto> to disable and process only arguments
 specified by C<--rpn>.
+
+=item B<-p> I<name_or_regex>, B<--pattern> I<name_or_regex>
+
+Specify a pattern to match RPN expressions.  The value can be either a
+preset name (word characters only, prefix match supported) or a
+custom regex pattern.
+
+When C<--pattern> is specified, C<--auto> is ignored.
+
+B<Preset patterns:>
+
+=over 4
+
+=item C<rpn>
+
+Matches C<rpn(...)> and extracts the content inside parentheses.
+
+=item C<equal>
+
+Matches C<...=> at the end and extracts the expression before C<=>.
+
+=back
+
+B<Custom patterns:>
+
+When the value contains non-word characters, it is treated as a
+regex pattern.  The pattern must contain a capture group C<(...)> that
+captures the RPN expression.  The entire matched portion is replaced
+with the calculated result.
+
+Examples:
+
+    # Use preset pattern 'rpn' (or -pr for short)
+    optex -Mrpn -pr -- echo '3600*5' '=' rpn(3600,5*)
+    # outputs: 3600*5 = 18000
+
+    # Use preset pattern 'equal' (or -pe for short)
+    optex -Mrpn -pe -- echo '3600*5' '=' 3600,5*=
+    # outputs: 3600*5 = 18000
+
+    # Use custom regex pattern
+    optex -Mrpn --pattern 'calc\[(.*)\]' -- echo calc[3600,5*]
+    # outputs: 18000
+
+=item B<--quiet>, B<--no-quiet>
+
+Suppress Math::RPN warning messages.  Default is enabled.  Use
+C<--no-quiet> to see warnings for invalid expressions.
 
 =item B<--verbose>
 
 Print diagnostic messages.
 
+=back
+
+=head1 COMMAND OPTIONS
+
+These options are available after C<-->.
+
+=over 4
+
 =item B<--rpn> I<expression>
 
-Convert a single RPN expression.  Use colon (C<:>) instead of comma
-as the term separator because comma is used as a parameter delimiter
-in the module call syntax.
+Convert a single RPN expression.
 
-    optex -Mrpn --no-all -- echo --rpn 3600:5* hello
-    # outputs: 18000 hello
+    optex -Mrpn --no-auto -- printf '%s = %d\n' 3600,5* --rpn 3600,5*
+    # outputs: 3600,5* = 18000
 
 =back
 
 =head1 EXPRESSIONS
 
-An RPN expression requires at least two terms separated by commas (or
-colons when using C<--rpn>).  A single term like C<RAND> will not be
-converted, but C<RAND,0+> will produce a random number.
+An RPN expression requires at least two terms separated by commas or
+colons.  A single term like C<RAND> will not be converted, but
+C<RAND,0+> will produce a random number.
 
 =head2 OPERATORS
 
@@ -159,19 +213,24 @@ use Carp;
 use utf8;
 use open IO => 'utf8', ':std';
 use Data::Dumper;
-
 use Getopt::EX::Config;
 my $config = Getopt::EX::Config->new(
-    all     => 1,
+    auto    => 1,
     verbose => 0,
+    quiet   => 1,
+    pattern => undef,
 );
 
 my($mod, $argv);
 sub initialize { ($mod, $argv) = @_ }
 
 sub finalize {
-    $config->deal_with($argv, 'all!', 'verbose!');
-    rpn() if $config->{all};
+    $config->deal_with($argv, 'auto!', 'verbose!', 'quiet!', 'pattern|p=s');
+    if (defined $config->{pattern}) {
+	rpn_pattern($config->{pattern});
+    } elsif ($config->{auto}) {
+	rpn();
+    }
 }
 
 sub argv (&) {
@@ -197,10 +256,19 @@ my $operator_re = join '|', map "\Q$_", @operator;
 my $term_re     = qr/(?:\d*\.)?\d+|$operator_re/i;
 my $rpn_re      = qr/(?: $term_re [,:]* ){2,}/xi;
 
+my %preset_pattern = (
+    rpn   => qr/^rpn\((.+)\)$/,
+    equal => qr/^(.+)=$/,
+);
+
 sub rpn_calc {
     use Math::RPN ();
     my @terms = map { /$term_re/g } @_;
-    my @ans = do { local $_; Math::RPN::rpn @terms };
+    my @ans = do {
+	local $_;
+	local $SIG{__WARN__} = $config->{quiet} ? sub {} : undef;
+	Math::RPN::rpn @terms;
+    };
     if (@ans == 1 && defined $ans[0] && $ans[0] !~ /[^\.\d]/) {
 	$ans[0];
     } else {
@@ -222,8 +290,35 @@ sub rpn {
     warn "rpn: converted $count expression(s)\n" if $config->{verbose} && $count;
 }
 
+sub rpn_pattern {
+    my $pattern = shift;
+    my $re;
+    if ($pattern =~ /^\w+$/) {
+	my @matches = grep { /^\Q$pattern/ } keys %preset_pattern;
+	@matches == 1 or die @matches == 0
+	    ? "rpn: unknown preset pattern '$pattern'\n"
+	    : "rpn: ambiguous preset pattern '$pattern' (matches: @matches)\n";
+	$re = $preset_pattern{$matches[0]};
+    } else {
+	$re = qr/$pattern/;
+    }
+    my $count = 0;
+    for (@$argv) {
+	/$re/ or next;
+	my $expr = $1 // next;
+	length $expr or next;
+	my $calc = rpn_calc($expr) // next;
+	if ($calc ne $expr) {
+	    $count++;
+	    s/$re/$calc/;
+	}
+    }
+    warn "rpn: converted $count expression(s)\n" if $config->{verbose} && $count;
+}
+
 sub convert {
-    my $target = shift;
+    my %arg = @_;
+    my $target = $arg{rpn} // die "rpn: missing expression\n";
     if ($target =~ /^$rpn_re$/) {
 	my $calc = rpn_calc($target);
 	if (defined $calc && $calc ne $target) {
@@ -237,6 +332,6 @@ sub convert {
 
 __DATA__
 
-option --rpn -M__PACKAGE__::convert($<shift>)
+option --rpn -M__PACKAGE__::convert(rpn~$<shift>)
 
 #  LocalWords:  rpn optex macOS

@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "File::Which" : "0",
-            "IPC::Run3" : "0",
             "perl" : "5.008"
          }
       },
@@ -60,6 +59,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Which"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

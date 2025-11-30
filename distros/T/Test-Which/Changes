@@ -1,5 +1,13 @@
 Revision history for Test-Which
 
+0.04	Sat Nov 29 13:26:52 EST 2025
+	"checked" was not being set up
+	Print version found if TEST_VERBOSE is set
+	Added support for extractor
+	Added version_flag
+	Don't look in path if absolute name given
+	Cache calls
+
 0.03	Fri Nov 28 16:30:02 EST 2025
 	Use hashref rather than putting entire hash on the stack
 	Use IPC::Run3

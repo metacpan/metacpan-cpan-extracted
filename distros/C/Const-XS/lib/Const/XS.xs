@@ -91,6 +91,25 @@ int _is_readonly (SV * val) {
 	return SvREADONLY(val) ? 1 : 0;
 }
 
+void export (CV * cb, char * pkg, int pkg_len, char * method, int method_len) {
+	dTHX;
+	int name_len = pkg_len + method_len + 3;
+	char *name = (char *)malloc(name_len);
+	snprintf(name, name_len, "%s::%s", pkg, method);
+	newXS(name, cb, __FILE__); 
+	free(name);
+}
+
+void export_proto (CV * cb, char * pkg, int pkg_len, char * method, int method_len, char * proto) {
+	dTHX;
+	int name_len = pkg_len + method_len + 3;
+	char *name = (char *)malloc(name_len);
+	snprintf(name, name_len, "%s::%s", pkg, method);
+	newXSproto(name, cb, __FILE__, proto);
+	free(name);
+}
+
+
 MODULE = Const::XS  PACKAGE = Const::XS
 PROTOTYPES: ENABLE
 
@@ -166,4 +185,35 @@ is_readonly(...)
 	CODE:
 		ST(0) = newSViv(_is_readonly(SvRV(ST(0))));
 		XSRETURN(1);
+
+
+void
+import(...)
+    CODE:
+		char *pkg = HvNAME((HV*)CopSTASH(PL_curcop));
+		int pkg_len = strlen(pkg);
+		STRLEN retlen;
+		int i = 1;
+		for (i = 1; i < items; i++) {
+			char * ex = SvPV(ST(i), retlen);
+			if (strcmp(ex, "all") == 0) {
+				export_proto(XS_Const__XS_const, pkg, pkg_len, "const", 5, "\\[$@%]@");
+				export_proto(XS_Const__XS_make_readonly, pkg, pkg_len, "make_readonly", 13, "\\[$@%]@");
+				export(XS_Const__XS_make_readonly_ref, pkg, pkg_len, "make_readonly_ref", 17);
+				export_proto(XS_Const__XS_unmake_readonly, pkg, pkg_len, "unmake_readonly", 15, "\\[$@%]@");
+				export_proto(XS_Const__XS_is_readonly, pkg, pkg_len, "is_readonly", 11, "\\[$@%]@");
+			} else if (strcmp(ex, "const") == 0) {
+				export_proto(XS_Const__XS_const, pkg, pkg_len, "const", 5, "\\[$@%]@");
+			} else if (strcmp(ex, "make_readonly") == 0) {
+				export_proto(XS_Const__XS_make_readonly, pkg, pkg_len, "make_readonly", 13, "\\[$@%]@");
+			} else if (strcmp(ex, "make_readonly_ref") == 0) {
+				export(XS_Const__XS_make_readonly_ref, pkg, pkg_len, "make_readonly_ref", 17);
+			} else if (strcmp(ex, "unmake_readonly") == 0) {
+				export_proto(XS_Const__XS_unmake_readonly, pkg, pkg_len, "unmake_readonly", 15, "\\[$@%]@");
+			} else if (strcmp(ex, "is_readonly") == 0) {
+				export_proto(XS_Const__XS_is_readonly, pkg, pkg_len, "is_readonly", 11, "\\[$@%]@");
+			} else {
+				croak("Unknown import: %s", ex);
+			}
+		}
 

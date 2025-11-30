@@ -1,4 +1,4 @@
-package EAI::File 1.919;
+package EAI::File 1.920;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use Text::CSV(); use Data::XLSX::Parser(); use Spreadsheet::ParseExcel(); use Spreadsheet::WriteExcel(); use Excel::Writer::XLSX(); use XML::LibXML(); use XML::LibXML::Debugging();
@@ -199,7 +199,7 @@ sub cell_handler {
 	my $logger = get_logger();
 	return unless $sheet_index eq $worksheet; # only parse desired worksheet
 	if ($headerColumn{$col}) {
-		if (($stopOnEmptyValueColumn eq $col && !$cell) || $stoppedOnEmptyValue) {
+		if (($stopOnEmptyValueColumn eq $col and !$cell) or $stoppedOnEmptyValue) {
 			$logger->warn("empty cell in row $row / column $col and stopOnEmptyValueColumn is set to $col, skipping from here now".longmess()) if !$stoppedOnEmptyValue; # pass warning only once
 			$stoppedOnEmptyValue = 1;
 		} else {
@@ -233,7 +233,7 @@ sub row_handlerXLSX {
 		my $col = $cellDetail->{"c"};
 		my $value = $cellDetail->{"v"};
 		if ($headerColumn{$col}) {
-			if (($stopOnEmptyValueColumn eq $col && !$value) || $stoppedOnEmptyValue) {
+			if (($stopOnEmptyValueColumn eq $col and !$value) or $stoppedOnEmptyValue) {
 				$logger->warn("empty cell in row $row / column $col and stopOnEmptyValueColumn is set to $col, skipping from here now".longmess()) if !$stoppedOnEmptyValue; # pass warning only once
 				$stoppedOnEmptyValue = 1;
 			} else {
@@ -527,7 +527,7 @@ sub readRow ($$$$$$$$$$) {
 		}
 		# field specific processing set, augments processing for a single specific field specified by targetheader...
 		if ($fieldProcessing->{$targetheader[$i]}) {
-			$logger->trace('specific fieldProcessing: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
+			$logger->trace('specific fieldProcessing: $targetheader['.$i.'],$line{'.$targetheader[$i].'}:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
 			if (ref($fieldProcessing->{$targetheader[$i]}) eq "CODE") {
 				eval {$fieldProcessing->{$targetheader[$i]}->()};
 			} else {
@@ -535,7 +535,7 @@ sub readRow ($$$$$$$$$$) {
 			}
 			$logger->error("eval of ".(ref($fieldProcessing->{$targetheader[$i]}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{$targetheader[$i]}."'")." returned error:$@".longmess()) if ($@);
 		} elsif ($fieldProcessing->{""}) { # special case: if empty key is defined with processing code, do for all fields
-			$logger->trace('general fieldProcessing: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
+			$logger->trace('general fieldProcessing: $targetheader['.$i.'],$line{'.$targetheader[$i].'}:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
 			if (ref($fieldProcessing->{""}) eq "CODE") {
 				eval {$fieldProcessing->{""}->()};
 			} else {
@@ -565,7 +565,9 @@ sub writeText ($$;$) {
 	my $logger = get_logger();
 	my $filename = $File->{filename};
 	my $writemode = ($File->{append} ? ">>" : ">");
-	$logger->debug("sepHead: ".Data::Dumper::qquote($File->{format_sepHead}).", sep: ".Data::Dumper::qquote($File->{format_sep}));
+	my $format_sepHead = ($File->{format_sepHead} ? $File->{format_sepHead} : "");
+	my $format_sep = ($File->{format_sep} ? $File->{format_sep} : "");
+	$logger->debug("sepHead: ".Data::Dumper::qquote($format_sepHead).", sep: ".Data::Dumper::qquote($format_sep));
 	if (ref($data) ne 'ARRAY') {
 		$logger->error("passed data in \$data is not a ref to array (you have to initialize it as an array):".Dumper($data).longmess());
 		return 0;
@@ -610,7 +612,7 @@ sub writeText ($$;$) {
 				push @$headerRow, $colname;
 			} else {
 				# first column has no separator before. if there is a special separator for heading, then use it, else the standard one
-				$headerRow = $headerRow.($firstcol ? "" : ($File->{format_sepHead} ? $File->{format_sepHead} : $File->{format_sep})).$colname if (!$File->{format_fix});
+				$headerRow = $headerRow.($firstcol ? "" : ($format_sepHead ? $format_sepHead : $format_sep)).$colname if (!$File->{format_fix});
 				$headerRow = $headerRow.sprintf("%-*s%s", $paddings[$col],$colname) if ($File->{format_fix});
 				$firstcol = 0;
 			}

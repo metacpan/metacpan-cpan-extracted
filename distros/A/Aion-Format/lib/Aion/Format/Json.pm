@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Aion::Format::Json - Perl extension for formatting JSON
+Aion::Format::Json - Perl extension for JSON formatting
 
 =head1 SYNOPSIS
 
@@ -42,15 +42,15 @@ Aion::Format::Json - Perl extension for formatting JSON
 
 =head1 DESCRIPTION
 
-C<Aion::Format::Json> based on C<JSON::XS>. And includethe following settings:
+C<Aion::Format::Json> uses C<JSON::XS> as a base. And includes the following settings:
 
 =over
 
-=item * allow_nonref - coding and decoding scalars.
+=item * allow_nonref - encoding and decoding scalars.
 
-=item * indent - enable multiline with indent on begin lines.
+=item * indent – enable multiline text with indentation at the beginning of the line.
 
-=item * space_after - C<\n> after json.
+=item * space_after — C<\n> after json.
 
 =item * canonical - sorting keys in hashes.
 
@@ -60,7 +60,7 @@ C<Aion::Format::Json> based on C<JSON::XS>. And includethe following settings:
 
 =head2 to_json (;$data)
 
-Translate data to json format.
+Converts data to json format.
 
 	my $data = {
 	    a => 10,
@@ -78,7 +78,7 @@ Translate data to json format.
 
 =head2 from_json (;$string)
 
-Parse string in json format to perl structure.
+Parses a JSON string into a Perl structure.
 
 	from_json '{"a": 10}' # --> {a => 10}
 	
@@ -86,7 +86,7 @@ Parse string in json format to perl structure.
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+Yaroslav O. Kosmina L<mailto:darviarush@mail.ru>
 
 =head1 LICENSE
 

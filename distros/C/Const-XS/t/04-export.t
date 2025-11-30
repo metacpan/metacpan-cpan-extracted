@@ -1,6 +1,13 @@
 use lib 't/lib';
 use Test::More;
-use Two;
+
+eval {
+	require Two;
+	Two->new();
+	1;
+} or do {
+	plan skip_all => "Import::Export is not available";
+};
 
 my $package = Two->new();
 

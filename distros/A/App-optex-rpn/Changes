@@ -1,6 +1,12 @@
 Revision history for Perl extension App-optex-rpn
 
-1.02 2025-11-29T09:34:42Z
+1.03 2025-11-30T01:14:27Z
+
+1.03 2025-11-30T01:13:38Z
+
+    - Fix --rpn option using Getopt::EX ~ notation
+    - Rename --all to --auto and separate OPTIONS into MODULE/COMMAND sections
+    - Add --pattern option for custom RPN expression matching
 
 1.02 2025-11-29T09:33:32Z
 

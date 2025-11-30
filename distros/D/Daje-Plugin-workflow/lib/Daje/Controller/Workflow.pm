@@ -1,6 +1,6 @@
 package Daje::Controller::Workflow;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
-use v5.40;
+use v5.42;
 
 # NAME
 # ====
@@ -97,6 +97,7 @@ sub execute($self) {
         if($self->workflow->error->has_error() == 0) {
             $self->render(json => {result => 1, data => 'OK'});
         } else {
+            $self->app->log->error('Daje::Controller::Workflow::execute ' . $self->workflow->error->error());
             $self->render(json =>
                 {result => 0, data => $self->workflow->error->error()}
             );

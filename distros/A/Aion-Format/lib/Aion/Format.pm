@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.10";
+our $VERSION = "0.1.0";
 
 require POSIX;
 require Term::ANSIColor;
@@ -16,23 +16,44 @@ our @EXPORT = our @EXPORT_OK = grep {
 
 #@category Вывод структур
 
-use DDP {
-	colored => 1,
-	class => {
-		expand => "all",
-		inherited => "all",
-		show_reftype => 1,
-	},
-	deparse => 1,
-	show_unicode => 1,
-	show_readonly => 1,
-	print_escapes => 1,
-	#show_refcount => 1,
-	#show_memsize => 1,
-	caller_info => 1,
-	output => 'stdout',
-	#unicode_charnames => 1,
-};
+use DDP qw//;
+
+sub _extends_ddp_properties {
+	my ($properties) = @_;
+	+{
+		colored => 1,
+		deparse => 1,
+		show_unicode => 1,
+		show_readonly => 1,
+		print_escapes => 1,
+		show_refcount => 1,
+		show_memsize => 1,
+		caller_info => 1,
+		#output => 'stdout',
+		unicode_charnames => 1,
+		%$properties,
+		class => {
+			expand => "all",
+			inherited => "all",
+			show_reftype => 1,
+			%{$properties->{class}},
+		},
+	}
+}
+
+# p с предустановленными опциями
+sub p($;%) {
+	my ($arg, %properties) = @_;
+	%properties = %{_extends_ddp_properties(\%properties)};
+	DDP::p $arg, %properties
+}
+
+# np с предустановленными опциями
+sub np($;%) {
+	my ($arg, %properties) = @_;
+	%properties = %{_extends_ddp_properties(\%properties)};
+	DDP::np $arg, %properties
+}
 
 #@category Ловушки
 
@@ -43,6 +64,7 @@ sub trapperr(&) {
 	open STDERR, '>:utf8', \my $f;
 	$sub->();
 	close STDERR;
+	utf8::decode($f) unless utf8::is_utf8($f);
 	$f
 }
 
@@ -53,6 +75,7 @@ sub trappout(&) {
 	open STDOUT, '>:utf8', \my $f;
 	$sub->();
 	close STDOUT;
+	utf8::decode($f) unless utf8::is_utf8($f);
 	$f
 }
 
@@ -94,9 +117,10 @@ sub errorlog(@) {
 
 # Проводит соответствия
 #
-# matches "...", qr/.../ => sub {...}, ...
+# replace "...", qr/.../ => sub {...}, ...
 #
-sub matches($@) {
+sub matches($@) { goto &replace }
+sub replace($@) {
 	my $s = shift;
 	my $i = 0;
 	my $re = join "\n| ", map { $i++ % 2 == 0? "(?<I$i> $_ )": () } @_;
@@ -163,7 +187,7 @@ sub from_str(;$) {
 sub nous($) {
 	my ($templates) = @_;
 	my $x = join "|", map {
-		matches $_,
+		replace $_,
 		# Срезаем все пробелы с конца:
 		qr!\s*$! => sub {},
 		# Срезаем все начальные строки:
@@ -349,16 +373,16 @@ sub GiB() { 2**30 }
 sub TiB() { 2**40 }
 
 # Максимум в данных TinyText Марии
-sub xxS { 255 }
+sub xxS() { 255 }
 
 # Максимум в данных Text Марии
-sub xxR { 64*KiB-1 }
+sub xxR() { 64*KiB-1 }
 
 # Максимум в данных MediumText Марии
-sub xxM { 16*MiB-1 }
+sub xxM() { 16*MiB-1 }
 
 # Максимум в данных LongText Марии
-sub xxL { 4*GiB-1 }
+sub xxL() { 4*GiB-1 }
 
 #@category Конверторы
 
@@ -390,11 +414,11 @@ __END__
 
 =head1 NAME
 
-Aion::Format - Perl extension for formatting numbers, colorizing output and so on
+Aion::Format - a Perl extension for formatting numbers, coloring output, etc.
 
 =head1 VERSION
 
-0.0.10
+0.1.0
 
 =head1 SYNOPSIS
 
@@ -402,46 +426,66 @@ Aion::Format - Perl extension for formatting numbers, colorizing output and so o
 	
 	trappout { print "123\n" } # => 123\n
 	
-	coloring "#red ~> #r\n" # => \e[31m ~> \e[0m\n
-	trappout { printcolor "#red ~> #r\n" } # => \e[31m ~> \e[0m\n
+	coloring "#red ↬ #r\n" # => \e[31m ↬ \e[0m\n
+	trappout { printcolor "#red ↬ #r\n" } # => \e[31m ↬ \e[0m\n
 
 =head1 DESCRIPTION
 
-A utilities for formatting numbers, colorizing output and so on.
+Utilities for formatting numbers, coloring output, etc.
 
 =head1 SUBROUTINES
 
 =head2 coloring ($format, @params)
 
-Colorizes the text with escape sequences, and then replaces the format with sprintf. Color names using from module C<Term::ANSIColor>. For C<RESET> use C<#r> or C<#R>.
+Colorizes text using escape sequences and then replaces the format with C<sprintf>. The color names are used from the C<Term::ANSIColor> module. For B<RESET> use C<#r> or C<#R>.
 
 	coloring "#{BOLD RED}###r %i", 6 # => \e[1;31m##\e[0m 6
 
 =head2 printcolor ($format, @params)
 
-As C<coloring>, but it print formatted string.
+Like C<coloring>, but prints the formatted string to standard output.
 
 =head2 warncolor ($format, @params)
 
-As C<coloring>, but print formatted string to C<STDERR>.
+Like C<coloring>, but prints the formatted string to C<STDERR>.
 
 	trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }  # => \e[32mACCESS\e[0m 6\n
 
 =head2 accesslog ($format, @params)
 
-It write in STDOUT C<coloring> returns with prefix datetime.
+Writes to STDOUT using the C<coloring> function for formatting and adds a date-time prefix.
 
 	trappout { accesslog "#{green}ACCESS#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[32mACCESS\e\[0m 6\n
 
 =head2 errorlog ($format, @params)
 
-It write in STDERR C<coloring> returns with prefix datetime.
+Writes to B<STDERR> using the C<coloring> function for formatting and adds a date-time prefix.
 
 	trapperr { errorlog "#{red}ERROR#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[31mERROR\e\[0m 6\n
 
+=head2 p ($target; %properties)
+
+C<p> from Data::Printer with preset settings.
+
+Instead of the inconvenient first parameter, a simple scalar is used.
+
+The optional C<%properties> parameter allows you to override settings.
+
+	trapperr { p +{cat => 123} } # ~> cat.+123
+
+=head2 np ($target; %properties)
+
+C<np> from Data::Printer with preset settings.
+
+Instead of the inconvenient first parameter, a simple scalar is used.
+
+The optional C<%properties> parameter allows you to override settings.
+
+	np +{cat => 123} # ~> cat.+123
+
 =head2 flesch_index_human ($flesch_index)
 
-Convert flesch index to russian label with step 10.
+Converts the Flesch index to a Russian label using step 10.
 
 	flesch_index_human -10   # => несвязный русский текст
 	flesch_index_human -3    # => для академиков
@@ -454,9 +498,9 @@ Convert flesch index to russian label with step 10.
 
 =head2 from_radix ($string, $radix)
 
-Parses a natural number in the specified number system. 64-number system used by default.
+Parses a natural number in the specified number system. The default is the 64-digit system.
 
-For digits using symbols 0-9, A-Z, a-z, _ and -. This symbols using before and for 64 NS. For digits after 64 using symbols from CP1251 encoding.
+The symbols used for numbers are 0–9, A–Z, a–z, _, and –. These characters are used before and for the 64 character system. For numbers after the 64-digit system, B<CP1251> encoding characters are used.
 
 	from_radix "A-C" # -> 45004
 	from_radix "A-C", 64 # -> 45004
@@ -465,7 +509,7 @@ For digits using symbols 0-9, A-Z, a-z, _ and -. This symbols using before and f
 
 =head2 to_radix ($number, $radix)
 
-Converts a natural number to a given number system. 64-number system used by default.
+Converts a natural number to a given number system. The default is the 64-digit system.
 
 	to_radix 10_000 				# => 2SG
 	to_radix 10_000, 64 			# => 2SG
@@ -474,7 +518,7 @@ Converts a natural number to a given number system. 64-number system used by def
 
 =head2 kb_size ($number)
 
-Adds number digits and adds a unit of measurement.
+Adds numeric digits and adds a unit of measurement.
 
 	kb_size 102             # => 102b
 	kb_size 1024            # => 1k
@@ -482,9 +526,21 @@ Adds number digits and adds a unit of measurement.
 	kb_size 1024*1024       # => 1M
 	kb_size 1000_002_000_001_000    # => 931\x{a0}324G
 
-=head2 matches ($subject, @rules)
+=head2 replace ($subject, @rules)
 
 Multiple text transformations in one pass.
+
+	my $s = replace "33*pi",
+	    qr/(?<num> \d+)/x   => sub { "($+{num})" },
+	    qr/\b pi \b/x       => sub { 3.14 },
+	    qr/(?<op> \*)/x     => sub { " $& " },
+	;
+	
+	$s # => (33) * 3.14
+
+=head2 matches ($subject, @rules)
+
+Synonym for C<replace>. B<DEPRECATED>.
 
 	my $s = matches "33*pi",
 	    qr/(?<num> \d+)/x   => sub { "($+{num})" },
@@ -496,23 +552,27 @@ Multiple text transformations in one pass.
 
 =head2 nous ($templates)
 
-A simplified regex language for text recognition in HTML documents.
+A simplified regular expression language for text recognition in HTML documents.
 
 =over
 
-=item 1. All spaces from the beginning and end are removed. 
+=item 1. Removes all spaces at the beginning and end.
 
-=item 2. From the beginning of each line, 4 spaces or 0-3 spaces and a tab are removed. 
+=item 2. From the beginning of each line, 4 spaces or 0-3 spaces and a tab are removed.
 
-=item 3. Spaces at the end of the line and whitespace lines are replaced with C<\s*>. 4. All variables in C<{{ var }}> are replaced with C<.*?>. Those. recognize everything. 
+=item 3. Spaces at the end of a line and strings of spaces are replaced with C<\s*>.
 
-=item 4. All variables in C<< {{E<gt> var }} >> are replaced with C<< [^E<lt>E<gt>]*? >>. Those. do not recognize html tags. 
+=item 4. All variables in C<{{ var }}> are replaced with C<.*?>. Those. everything is recognized.
 
-=item 5. All variables in C<{{: var }}> are replaced with C<[^\n]*>. Those. must be on the same line. 
+=item 5. All variables in C<< {{E<gt> var }} >> are replaced with C<< [^E<lt>E<gt>]*? >>. Those. HTML tags are not recognized.
 
-=item 6. Expressions in double square brackets (C<[[ ... ]]>) may not exist. 
+=item 6. All variables in C<{{: var }}> are replaced with C<[^\n]*>. Those. must be on one line.
 
-=item 7. Double parentheses (C<(( ... ))>) are used as parentheses. 5. C<||> - or.
+=item 7. Expressions in double square brackets (C<[[ ... ]]>) may not exist.
+
+=item 8. Double brackets (C<(( ... ))> are used as parentheses.
+
+=item 9. C<||> - or.
 
 =back
 
@@ -566,7 +626,7 @@ Adds separators between digits of a number.
 	num +0         # => 0
 	num -1000.3    # => -1 000.3
 
-Separator by default is no-break space. Set separator and decimal point same as:
+The default separator is a non-breaking space. Set the separator and decimal point the same way:
 
 	num [1000, "#"]         		# => 1#000
 	num [-1000.3003003, "_", ","]   # => -1_000,3003003
@@ -575,7 +635,7 @@ See also C<Number::Format>.
 
 =head2 rim ($number)
 
-Translate positive integers to B<roman numerals>.
+Converts positive integers to B<Roman numerals>.
 
 	rim 0       # => N
 	rim 4       # => IV
@@ -584,7 +644,7 @@ Translate positive integers to B<roman numerals>.
 	rim 49      # => XLIX
 	rim 505     # => DV
 
-B<roman numerals> after 1000:
+B<Roman numerals> after 1000:
 
 	rim 49_000      # => XLIX M
 	rim 49_000_000  # => XLIX M M
@@ -594,23 +654,23 @@ See also:
 
 =over
 
-=item * C<Roman> is simple converter.
+=item * L<Roman> is a simple converter.
 
-=item * C<Math::Roman> is another converter.
+=item * L<Math::Roman> is another converter.
 
-=item * C<Convert::Number::Roman> is OOP interface.
+=item * L<Convert::Number::Roman> has an OOP interface.
 
-=item * C<Number::Convert::Roman> is another OOP interface.
+=item * L<Number::Convert::Roman> – another OOP interface.
 
-=item * C<Text::Roman> convert standart and milhar roman numbers.
+=item * L<Text::Roman> converts standard and milharic Roman numerals.
 
-=item * C<Roman::Unicode> use digits ↁ (5 000), ↂ (1000), and so on.
+=item * L<Roman::Unicode> uses the numbers ↁ (5000), ↂ (1000) and so on.
 
-=item * C<Acme::Roman> added support roman numerals in perl code (C<< I + II -E<gt> III >>), but use C<+>, C<-> and C<*> operations only.
+=item * L<Acme::Roman> adds support for Roman numerals in Perl code (C<< I + II -E<gt> III >>), but only uses the C<+>, C<-> and C<*> operators.
 
-=item * C<Date::Roman> is Perl OO extension for handling roman style dates, but with arabic numbers (id 3 702).
+=item * L<Date::Roman> is an object-oriented Perl extension for handling Roman-style dates but with Arabic numerals (id 3,702).
 
-=item * C<DateTime::Format::Roman> is roman date formatter, but with arabic numbers (5 Kal Jun 2003).
+=item * L<DateTime::Format::Roman> - Roman date formatter, but with Arabic numerals (5 Kal Jun 2003).
 
 =back
 
@@ -623,9 +683,9 @@ Rounds a number to the specified decimal place.
 
 =head2 sinterval ($interval)
 
-Generates human-readable spacing.
+Creates human-readable spacing.
 
-Width of result is 12 symbols.
+The width of the result is 12 characters.
 
 	sinterval  6666.6666 	# => 01:51:06.667
 	sinterval  6.6666 		# => 00:00:06.667
@@ -635,106 +695,108 @@ Width of result is 12 symbols.
 
 =head2 sround ($number, $digits)
 
-Leaves C<$digits> (0 does not count) wherever they are relative to the point.
+Leaves C<$digits> digits after the last zero (the 0 itself is ignored).
 
-Default C<$digits> is 2.
+By default C<$digits> is 2.
 
 	sround 10.11        # -> 10
+	sround 12.11        # -> 12
 	sround 100.11       # -> 100
+	sround 133.11       # -> 133
 	sround 0.00012      # -> 0.00012
 	sround 1.2345       # -> 1.2
 	sround 1.2345, 3    # -> 1.23
 
 =head2 trans ($s)
 
-Transliterates the russian text, leaving only Latin letters and dashes.
+Transliterates Russian text, leaving only Latin letters and dashes.
 
 	trans "Мир во всём Мире!"  # => mir-vo-vsjom-mire
 
 =head2 transliterate ($s)
 
-Transliterates the russian text.
+Transliterates Russian text.
 
 	transliterate "Мир во всём Мире!"  # => Mir vo vsjom Mire!
 
 =head2 trapperr (&block)
 
-Trap for STDERR.
+Trap for B<STDERR>.
 
-	trapperr { print STDERR 123 }  # => 123
+	trapperr { print STDERR "Stars: ✨" }  # => Stars: ✨
 
 See also C<IO::Capture::Stderr>.
 
 =head2 trappout (&block)
 
-Trap for STDOUT.
+Trap for B<STDOUT>.
 
-	trappout { print 123 }  # => 123
+	trappout { print "Stars: ✨" }  # => Stars: ✨
 
 See also C<IO::Capture::Stdout>.
 
 =head2 TiB ()
 
-The constant is one tebibyte.
+The constant is equal to one tebibyte.
 
 	TiB  # -> 2**40
 
 =head2 GiB ()
 
-The constant is one gibibyte.
+The constant is equal to one gibibyte.
 
 	GiB  # -> 2**30
 
 =head2 MiB ()
 
-The constant is one mebibyte.
+The constant is equal to one mebibyte.
 
 	MiB  # -> 2**20
 
 =head2 KiB ()
 
-The constant is one kibibyte.
+The constant is equal to one kibibyte.
 
 	KiB  # -> 2**10
 
 =head2 xxL ()
 
-Maximum length in data LongText mysql and mariadb.
+Maximum length of LongText mysql and mariadb data.
 L - large.
 
 	xxL  # -> 4*GiB-1
 
 =head2 xxM ()
 
-Maximum length in data MediumText mysql and mariadb.
+Maximum length of MediumText mysql and mariadb data.
 M - medium.
 
 	xxM  # -> 16*MiB-1
 
 =head2 xxR ()
 
-Maximum length in data Text mysql and mariadb.
+Maximum text length of mysql and mariadb data.
 R - regularity.
 
 	xxR  # -> 64*KiB-1
 
 =head2 xxS ()
 
-Maximum length in data TinyText mysql and mariadb.
+Maximum length of TinyText mysql and mariadb data.
 S - small.
 
 	xxS  # -> 255
 
 =head2 to_str (;$scalar)
 
-Converts to string perl without interpolation.
+Convert to Perl string without interpolation.
 
 	to_str "a'\n" # => 'a\\'\n'
 	[map to_str, "a'\n"] # --> ["'a\\'\n'"]
 
 =head2 from_str (;$one_quote_str)
 
-Converts from string perl without interpolation.
+Conversion from Perl string without interpolation.
 
 	from_str "'a\\'\n'"  # => a'\n
 	[map from_str, "'a\\'\n'"]  # --> ["a'\n"]

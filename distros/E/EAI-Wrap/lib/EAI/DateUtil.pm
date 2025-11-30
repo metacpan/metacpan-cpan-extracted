@@ -1,4 +1,4 @@
-package EAI::DateUtil 1.919;
+package EAI::DateUtil 1.920;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime); use Carp qw(cluck);
@@ -333,7 +333,7 @@ sub first_week ($$$$;$) {
 	my ($d,$m,$y,$day,$month) = @_;
 	return undef if !$y or !$m or !$d or !defined($day);
 	$month = $m if !$month;
-	unless ((0 <= $day) && ( $day <= 6)) {
+	unless ((0 <= $day) and ( $day <= 6)) {
 		cluck("day <$day> is out of range 0 - 6  (sunday==0)");
 		return 0;
 	}
@@ -358,7 +358,7 @@ sub last_week ($$$$;$) {
 	my ($d,$m,$y,$day,$month) = @_;
 	return undef if !$y or !$m or !$d or !defined($day);
 	$month = $m if !$month;
-	unless ((0 <= $day) && ( $day <= 6)) {
+	unless ((0 <= $day) and ( $day <= 6)) {
 		cluck("day <$day> is out of range 0 - 6  (sunday==0)");
 		return 0;
 	}
@@ -527,7 +527,7 @@ sub get_dateseries ($$;$) {
 		my $date = localtime($_);
 		my $datestr = sprintf("%04d%02d%02d",$date->year()+1900,$date->mon()+1,$date->mday());
 		if ($cal) {
-			push @dateseries, $datestr if $date->wday() != 0 && $date->wday() != 6 && !is_holiday($cal,$datestr);
+			push @dateseries, $datestr if $date->wday() != 0 and $date->wday() != 6 and !is_holiday($cal,$datestr);
 		} else {
 			push @dateseries, $datestr;
 		}
@@ -540,7 +540,7 @@ sub parseFromDDMMYYYY ($) {
 	return undef if !$dateStr;
 	my ($df,$mf,$yf) = $dateStr =~ /(..*)\.(..*)\.(.{4})/;
 	return undef if !$yf or !$mf or !$df;
-	return undef if !($yf >= 1900) or !($mf >= 1 && $mf <= 12) or !($df >= 1 && $df <= 31);
+	return undef if !($yf >= 1900) or !($mf >= 1 and $mf <= 12) or !($df >= 1 and $df <= 31);
 	return timelocal_modern(0,0,0,$df,$mf-1,$yf);
 }
 
@@ -549,7 +549,7 @@ sub parseFromYYYYMMDD ($) {
 	return undef if !$dateStr;
 	my ($yf,$mf,$df) = $dateStr =~ /(.{4})(..)(..)/;
 	return undef if !$yf or !$mf or !$df;
-	return undef if !$dateStr or !($yf >= 1900) or !($mf >= 1 && $mf <= 12) or !($df >= 1 && $df <= 31);
+	return undef if !$dateStr or !($yf >= 1900) or !($mf >= 1 and $mf <= 12) or !($df >= 1 and $df <= 31);
 	return timelocal_modern(0,0,0,$df,$mf-1,$yf);
 }
 

@@ -1,4 +1,4 @@
-package EAI::Common 1.919;
+package EAI::Common 1.920;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); 
@@ -240,7 +240,16 @@ my %alternateType = (
 	taskskipHolidays => 1, # can be calendar string or true (1)
 	taskskipForFirstBusinessDate => 1, # can be calendar string or true (1)
 );
-
+# passed options containing numerical strings are converted to numbers if their hash check (definition) looks like a number and their leading zero shouldn't be preserved
+# currently below two parameters are to be treated as strings.
+my %allow_leading_zeros = (
+	task => {
+		plannedUntil => 1,
+	},
+	DB => {
+		cutoffYr2000 => 1,
+	}
+);
 our %common;our %config;our @loads;our %execute;our @optload;our %opt;
 our $EAI_WRAP_CONFIG_PATH; our $EAI_WRAP_SENS_CONFIG_PATH;
 my @coreConfig = ("DB","File","FTP","process");
@@ -250,7 +259,7 @@ our $logConfig;
 
 # read given config file (eval perl code)
 sub readConfigFile ($) {
-	my $configfilename = shift;
+	my ($configfilename) = @_;
 	my $siteCONFIGFILE;
 	open (CONFIGFILE, "<$configfilename") or confess("couldn't open $configfilename: $@ $!, caller ".(caller(1))[3].", line ".(caller(1))[2]." in ".(caller(1))[1]);
 	{
@@ -292,7 +301,7 @@ sub setupConfigMerge {
 				for my $defkey (keys %{$common{$hashName}}) {
 					if (!defined($loads[$check]{$hashName."_"}{$defkey})) {
 						$loads[$check]{$hashName}{$defkey} = undef;
-						$logger->debug("creating empty $hashName\{$defkey\} in load $check instead of inheriting as ${hashName}_ is given here");
+						$logger->debug("creating empty $hashName\{$defkey\} in load $check instead of inheriting, because ${hashName}_ is given here");
 					}
 				}
 				delete $loads[$check]{$hashName."_"}; # need to remove, otherwise checkHash further below throws an error for these...
@@ -366,7 +375,8 @@ sub getOptions {
 			unless (exists($hashCheck{$hashName}{$defkey}) or ($hashName eq "process" and $defkey =~ /interactive.*/)) {
 				$errStr.="option not allowed: --$hashName $defkey=<value>\n";
 			} else {
-				$opt{$hashName}{$defkey} = 0+$opt{$hashName}{$defkey} if looks_like_number($hashCheck{$hashName}{$defkey});
+				# convert passed numerical strings to numbers if their hash check (definition) looks like a number and their leading zero shouldn't be preserved (currently for two parameters)
+				$opt{$hashName}{$defkey} = 0+$opt{$hashName}{$defkey} if looks_like_number($hashCheck{$hashName}{$defkey}) and !$allow_leading_zeros{$hashName}{$defkey};
 			}
 		}
 		for my $i (0..$#loads) {
@@ -376,7 +386,7 @@ sub getOptions {
 				unless (exists($hashCheck{$hashName}{$defkey}) or ($hashName eq "process" and $defkey =~ /interactive.*/)) {
 					$errStr.="option not allowed: --load$i$hashName $defkey=<value>\n";
 				} else {
-					$optload[$i]{$hashName}{$defkey} = 0+$optload[$i]{$hashName}{$defkey} if looks_like_number($hashCheck{$hashName}{$defkey});
+					$optload[$i]{$hashName}{$defkey} = 0+$optload[$i]{$hashName}{$defkey} if looks_like_number($hashCheck{$hashName}{$defkey}) and !$allow_leading_zeros{$hashName}{$defkey};
 				}
 			}
 		}
@@ -418,7 +428,7 @@ sub checkHash ($$) {
 		for my $defkey (keys %{$hash}) {
 			unless ($hashName eq "process" and $defkey =~ /interactive.*/) {
 				if (!exists($hashCheck{$hashName}{$defkey})) {
-					confess "key name not allowed: \$".$hashName."{".$defkey."},";
+					confess "key name not allowed: \$".$hashName."{".$defkey."}, following is possible:\n".Dumper($hashCheck{$hashName});
 				} else {
 					# check type for existing keys, if explicitly not defined then ignore...
 					if (defined($hash->{$defkey})) {
@@ -487,7 +497,7 @@ sub MailFilter {
 
 # sets the error subject for the subsequent error mails from logger->error()
 sub setErrSubject ($) {
-	my $context = shift;
+	my ($context) = @_;
 	Log::Log4perl->appenders()->{"MAIL"}->{"appender"}->{"subject"} = [($execute{envraw} ? $execute{envraw}.": " : "").$execute{errmailsubject}.": $context"];
 }
 
@@ -528,7 +538,7 @@ sub setupLogging {
 	my $logFolder = $execute{logRootPath};
 	# if logFolder doesn't exist, warn and log to $execute{homedir}.
 	if (! -e $logFolder) {
-		print "can't log to logfolder $logFolder (set specially for script with \$config{logRootPath}{$extendedScriptname} or default with \$config{logRootPath}{\"\"}), folder doesn't exist. Setting to $execute{homedir}";
+		print "can't log to logfolder '".$logFolder."' (set specially for script with \$config{logRootPath}{$extendedScriptname} or default with \$config{logRootPath}{\"\"}), folder doesn't exist. Setting to $execute{homedir}\n";
 		$logFolder = $execute{homedir};
 	}
 	$LogFPath = $logFolder."/".$extendedScriptname.".log";
@@ -618,9 +628,7 @@ sub setupEAIWrap {
 
 # returned Data::Dumpered datastructure given in $arg flattened, sorted (if $sortDump given) and compressed (if $compressDump given)
 sub dumpFlat ($;$$) {
-	my $arg = shift;
-	my $sortDump = shift;
-	my $compressDump = shift;
+	my ($arg, $sortDump, $compressDump) = @_;
 	$Data::Dumper::Indent = 0; # temporarily flatten dumper output for single line
 	$Data::Dumper::Sortkeys = 1 if $sortDump; # sort keys to get outputs easier to read
 	$Data::Dumper::Deepcopy = 1;
@@ -636,7 +644,7 @@ sub dumpFlat ($;$$) {
 
 # check starting conditions and return 1 if met
 sub checkStartingCond ($) {
-	my $arg = shift;
+	my ($arg) = @_;
 	my $logger = get_logger();
 	my ($task) = extractConfigs("checking starting conditions",$arg,"task");
 	my $curdate = get_curdate();
@@ -672,7 +680,7 @@ sub checkStartingCond ($) {
 		}
 	}
 	# if notest file exists, then exit here if not set to ignore that...
-	if (!$task->{ignoreNoTest} && -e "notest") {
+	if (!$task->{ignoreNoTest} and -e "notest") {
 		$logger->info("skip processing, because notest set (file exists).");
 		return 1;
 	}
@@ -720,11 +728,21 @@ sub sendGeneralMail ($$$$$$;$$$$$) {
 			);
 		}
 	} elsif ($AttachFile and $AttachType) {
-		$msg->attach(
-			Type => $AttachType,
-			Id   => $AttachFile,
-			Path => $AttachFile
-		);
+		if (ref($AttachFile) ne 'ARRAY') {
+			$msg->attach(
+				Type => $AttachType,
+				Id   => $AttachFile,
+				Path => $AttachFile
+			);
+		} else {
+			for (@$AttachFile) {
+				$msg->attach(
+					Type     => $AttachType,
+					Path     => $_,
+					Id       => $_,
+				);
+			}
+		}
 	}
 	if ($AttachFile and !$AttachType) {
 		$logger->error("no AttachType given for attachment $AttachFile".longmess());
@@ -744,10 +762,9 @@ use Log::Dispatch::Email;
 use base qw( Log::Dispatch::Email );
 
 sub send_email {
-	my $self = shift;
-	my %p    = @_;
+	my ($self, %p) = @_;
 	# catch wide non utf8 characters to avoid die in MIME::Lite
-	eval {decode('UTF-8',$p{message},$Encode::FB_confess )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
+	#eval {decode('UTF-8',$p{message},$Encode::FB_confess )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
 	my $msg = MIME::Lite->new(
 			From    => $self->{from},
 			To      => ( join ',', @{ $self->{to} } ),
@@ -901,7 +918,7 @@ arguments are
  In the above example a mail body ($Data) is being set as the first attachment and its type is text/html. The rest of the attachments from $AttachFile are encoded using base64 and all have mime type AttachType (see below).
  $Encoding .. encoding for mail body, optional (eg quoted-printable)
  $AttachType .. mime type for attachment(s) (eg text/csv or image/png), optional
- $AttachFile .. file name/path(s) for attachment(s), optional (hat to be ref to array, if $Type = 'multipart/related')
+ $AttachFile .. file name/path(s) for attachment(s), optional (has to be ref to array, if $Type = 'multipart/related' or if multiple files are provided)
  $enforceToAddressInTest .. usually $To is set to $config{testerrmailaddress} in a test environment ($execute{envraw} non-empty). This flag prevents this and sets the passed $To instead.
 
 send general mail, either simple text or html mails, mails with an attachment or multipart mails for "in-body" attachments (eg pictures). 

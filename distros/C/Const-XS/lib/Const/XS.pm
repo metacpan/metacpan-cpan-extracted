@@ -5,20 +5,10 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require XSLoader;
 XSLoader::load("Const::XS", $VERSION);
-
-use base qw/Import::Export/;
-
-our %EX = (
-        const => [qw/all/],
-	make_readonly => [qw/all/],
-	make_readonly_ref => [qw/all/],
-	unmake_readonly => [qw/all/],
-	is_readonly => [qw/all/],
-);
 
 1;
 
@@ -30,7 +20,7 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 

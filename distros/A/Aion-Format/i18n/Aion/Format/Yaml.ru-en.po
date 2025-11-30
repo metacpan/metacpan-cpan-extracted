@@ -1,0 +1,21 @@
+msgid "Aion::Format::Yaml - конвертер из/в yaml"
+msgstr "Aion::Format::Yaml - converter from/to yaml"
+
+msgid "Конвертирует из/в yaml. Под капотом использует `YAML::Syck`, настроенную в соответствии с требованиями Aion."
+msgstr "Converts from/to yaml. Under the hood it uses `YAML::Syck`, customized to Aion's requirements."
+
+msgid "В yaml."
+msgstr "In yaml."
+
+msgid "Из yaml."
+msgstr "From yaml."
+
+msgid "Булевы значения:"
+msgstr "Boolean values:"
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Format::Yaml module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Format::Yaml module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

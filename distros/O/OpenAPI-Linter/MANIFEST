@@ -18,6 +18,7 @@ t/07_edge_cases.t
 t/08_validate_schema.t
 t/09_error_line_col.t
 t/10_path_parameter_fix.t
+t/11_in_parameter.t
 t/data/minimal.yaml
 t/data/missing_descriptions.yaml
 t/data/missing_info.yaml

@@ -1,6 +1,7 @@
+!ru:en
 # NAME
 
-Aion::Format::Json - Perl extension for formatting JSON
+Aion::Format::Json - расширение Perl для форматирования JSON
 
 # SYNOPSIS
 
@@ -13,18 +14,18 @@ from_json '[1, "5"]' # --> [1, "5"]
 
 # DESCRIPTION
 
-`Aion::Format::Json` based on `JSON::XS`. And includethe following settings:
+`Aion::Format::Json` использует в качестве основы `JSON::XS`. И включает следующие настройки:
 
-* allow_nonref - coding and decoding scalars.
-* indent - enable multiline with indent on begin lines.
-* space_after - `\n` after json.
-* canonical - sorting keys in hashes.
+* allow_nonref — скаляры кодирования и декодирования.
+* indent – включить многострочный текст с отступом в начале строки.
+* space_after — `\n` после json.
+* canonical — сортировка ключей в хешах.
 
 # SUBROUTINES
 
 ## to_json (;$data)
 
-Translate data to json format.
+Переводит данные в формат json.
 
 ```perl
 my $data = {
@@ -44,7 +45,7 @@ to_json # -> $result
 
 ## from_json (;$string)
 
-Parse string in json format to perl structure.
+Разбирает строку в формате JSON в структуру Perl.
 
 ```perl
 from_json '{"a": 10}' # --> {a => 10}
@@ -54,7 +55,7 @@ from_json '{"a": 10}' # --> {a => 10}
 
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](darviarush@mail.ru)
+Yaroslav O. Kosmina <darviarush@mail.ru>
 
 # LICENSE
 

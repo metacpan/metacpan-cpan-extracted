@@ -4,6 +4,12 @@ LICENSE
 META.json
 README.md
 cpanfile
+doc/badges/total.svg
+i18n/Aion/Format.ru-en.po
+i18n/Aion/Format/Html.ru-en.po
+i18n/Aion/Format/Json.ru-en.po
+i18n/Aion/Format/Url.ru-en.po
+i18n/Aion/Format/Yaml.ru-en.po
 lib/Aion/Format.md
 lib/Aion/Format.pm
 lib/Aion/Format/Html.md
@@ -12,10 +18,14 @@ lib/Aion/Format/Json.md
 lib/Aion/Format/Json.pm
 lib/Aion/Format/Url.md
 lib/Aion/Format/Url.pm
+lib/Aion/Format/Yaml.md
+lib/Aion/Format/Yaml.pm
 minil.toml
 t/aion/format.t
 t/aion/format/html.t
 t/aion/format/json.t
+t/aion/format/url.pm
 t/aion/format/url.t
+t/aion/format/yaml.t
 META.yml
 MANIFEST

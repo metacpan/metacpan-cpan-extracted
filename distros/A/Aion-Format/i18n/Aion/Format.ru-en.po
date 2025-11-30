@@ -1,0 +1,194 @@
+msgid "Aion::Format - расширение Perl для форматирования чисел, раскрашивания вывода и т.п."
+msgstr "Aion::Format - a Perl extension for formatting numbers, coloring output, etc."
+
+msgid "Утилиты для форматирования чисел, раскрашивания вывода и т.п."
+msgstr "Utilities for formatting numbers, coloring output, etc."
+
+msgid "Раскрашивает текст с помощью escape-последовательностей, а затем заменяет формат на `sprintf`. Названия цветов используются из модуля `Term::ANSIColor`. Для **RESET** используйте `#r` или `#R`."
+msgstr "Colorizes text using escape sequences and then replaces the format with `sprintf`. The color names are used from the `Term::ANSIColor` module. For **RESET** use `#r` or `#R`."
+
+msgid "Как `coloring`, но печатает отформатированную строку на стандартный вывод."
+msgstr "Like `coloring`, but prints the formatted string to standard output."
+
+msgid "Как `coloring`, но печатает отформатированную строку в `STDERR`."
+msgstr "Like `coloring`, but prints the formatted string to `STDERR`."
+
+msgid "Пишет в STDOUT используя для форматирования функцию `coloring` и добавляет префикс с датой-временем."
+msgstr "Writes to STDOUT using the `coloring` function for formatting and adds a date-time prefix."
+
+msgid "Пишет в **STDERR** используя для форматирования функцию `coloring` и добавляет префикс с датой-временем."
+msgstr "Writes to **STDERR** using the `coloring` function for formatting and adds a date-time prefix."
+
+msgid "`p` из Data::Printer с предустановленными настройками."
+msgstr "`p` from Data::Printer with preset settings."
+
+msgid "`np` из Data::Printer с предустановленными настройками."
+msgstr "`np` from Data::Printer with preset settings."
+
+msgid "Вместо неудобного первого параметра используется просто скаляр."
+msgstr "Instead of the inconvenient first parameter, a simple scalar is used."
+
+msgid "Необязательный параметр `%properties` позволяет перекрывать настройки."
+msgstr "The optional `%properties` parameter allows you to override settings."
+
+msgid "Преобразует индекс Флеша в русскоязычную метку с помощью шага 10."
+msgstr "Converts the Flesch index to a Russian label using step 10."
+
+msgid "Анализирует натуральное число в указанной системе счисления. По умолчанию используется 64-значная система."
+msgstr "Parses a natural number in the specified number system. The default is the 64-digit system."
+
+msgid "Для цифр используются символы 0–9, A–Z, a–z, _ и –. Эти символы используются до и для 64 значной системы. Для цифр после 64 значной системы используются символы кодировки **CP1251**."
+msgstr "The symbols used for numbers are 0–9, A–Z, a–z, _, and –. These characters are used before and for the 64 character system. For numbers after the 64-digit system, **CP1251** encoding characters are used."
+
+msgid "Преобразует натуральное число в заданную систему счисления. По умолчанию используется 64-значная система."
+msgstr "Converts a natural number to a given number system. The default is the 64-digit system."
+
+msgid "Добавляет числовые цифры и добавляет единицу измерения."
+msgstr "Adds numeric digits and adds a unit of measurement."
+
+msgid "Несколько преобразований текста за один проход."
+msgstr "Multiple text transformations in one pass."
+
+msgid "Синоним `replace`. **DEPRECATED**."
+msgstr "Synonym for `replace`. **DEPRECATED**."
+
+msgid "Упрощенный язык регулярных выражений для распознавания текста в документах HTML."
+msgstr "A simplified regular expression language for text recognition in HTML documents."
+
+msgid ""
+"1. Убирает все пробелы в начале и конце.\n"
+"2. С начала каждой строки удаляются 4 пробела или 0-3 пробела и табуляция.\n"
+"3. Пробелы в конце строки и строки пробелов заменяются на `\\s*`. \n"
+"4. Все переменные в `{{ var }}` заменяются на `.*?`. Т.е. распознаётся всё.\n"
+"4. Все переменные в `{{> var }}` заменяются на `[^<>]*?`. Т.е. не распознаются html-теги.\n"
+"4. Все переменные в `{{: var }}` заменяются на `[^\\n]*`. Т.е. должно быть на одной строке.\n"
+"5. Выражения в двойных квадратных скобках (`[[ ... ]]`) могут не существовать.\n"
+"5. В качестве круглых скобок используются двойные скобки (`(( ... ))`).\n"
+"5. `||` - или."
+msgstr ""
+"1. Removes all spaces at the beginning and end.\n"
+"2. From the beginning of each line, 4 spaces or 0-3 spaces and a tab are removed.\n"
+"3. Spaces at the end of a line and strings of spaces are replaced with `\\s*`.\n"
+"4. All variables in `{{ var }}` are replaced with `.*?`. Those. everything is recognized.\n"
+"4. All variables in `{{> var }}` are replaced with `[^<>]*?`. Those. HTML tags are not recognized.\n"
+"4. All variables in `{{: var }}` are replaced with `[^\\n]*`. Those. must be on one line.\n"
+"5. Expressions in double square brackets (`[[ ... ]]`) may not exist.\n"
+"5. Double brackets (`(( ... ))` are used as parentheses.\n"
+"5. `||` - or."
+
+msgid "Добавляет разделители между цифрами числа."
+msgstr "Adds separators between digits of a number."
+
+msgid "Разделителем по умолчанию является неразрывный пробел. Установите разделитель и десятичную точку так же, как:"
+msgstr "The default separator is a non-breaking space. Set the separator and decimal point the same way:"
+
+msgid "См. также `Number::Format`."
+msgstr "See also `Number::Format`."
+
+msgid "Переводит положительные целые числа в **римские цифры**."
+msgstr "Converts positive integers to **Roman numerals**."
+
+msgid "**Римские цифры** после 1000:"
+msgstr "**Roman numerals** after 1000:"
+
+msgid "См. также:"
+msgstr "See also:"
+
+msgid ""
+"* [Roman](https://metacpan.org/pod/Roman) это простой конвертер.\n"
+"* [Math::Roman](https://metacpan.org/pod/Math::Roman) это еще один конвертер.\n"
+"* [Convert::Number::Roman](https://metacpan.org/pod/Convert::Number::Roman) имеет ООП-интерфейс.\n"
+"* [Number::Convert::Roman](https://metacpan.org/pod/Number::Convert::Roman) – еще один интерфейс ООП.\n"
+"* [Text::Roman](https://metacpan.org/pod/Text::Roman) конвертирует стандартные и милхарные римские числа.\n"
+"* [Roman::Unicode](https://metacpan.org/pod/Roman::Unicode) использует цифры ↁ (5 000), ↂ (1000) и так далее.\n"
+"* [Acme::Roman](https://metacpan.org/pod/Acme::Roman) добавляет поддержку римских цифр в коде Perl (`I + II -> III`), но использует только операции `+`, `-` и `*`.\n"
+"* [Date::Roman](https://metacpan.org/pod/Date::Roman) — это объектно-ориентированное расширение Perl для обработки дат в римском стиле, но с арабскими цифрами (id 3 702).\n"
+"* [DateTime::Format::Roman](https://metacpan.org/pod/DateTime::Format::Roman) – средство форматирования римских дат, но с арабскими цифрами (5 Kal Jun 2003)."
+msgstr ""
+"* [Roman](https://metacpan.org/pod/Roman) is a simple converter.\n"
+"* [Math::Roman](https://metacpan.org/pod/Math::Roman) is another converter.\n"
+"* [Convert::Number::Roman](https://metacpan.org/pod/Convert::Number::Roman) has an OOP interface.\n"
+"* [Number::Convert::Roman](https://metacpan.org/pod/Number::Convert::Roman) – another OOP interface.\n"
+"* [Text::Roman](https://metacpan.org/pod/Text::Roman) converts standard and milharic Roman numerals.\n"
+"* [Roman::Unicode](https://metacpan.org/pod/Roman::Unicode) uses the numbers ↁ (5000), ↂ (1000) and so on.\n"
+"* [Acme::Roman](https://metacpan.org/pod/Acme::Roman) adds support for Roman numerals in Perl code (`I + II -> III`), but only uses the `+`, `-` and `*` operators.\n"
+"* [Date::Roman](https://metacpan.org/pod/Date::Roman) is an object-oriented Perl extension for handling Roman-style dates but with Arabic numerals (id 3,702).\n"
+"* [DateTime::Format::Roman](https://metacpan.org/pod/DateTime::Format::Roman) - Roman date formatter, but with Arabic numerals (5 Kal Jun 2003)."
+
+msgid "Округляет число до указанного десятичного знака."
+msgstr "Rounds a number to the specified decimal place."
+
+msgid "Создает человекочитаемый интервал."
+msgstr "Creates human-readable spacing."
+
+msgid "Ширина результата — 12 символов."
+msgstr "The width of the result is 12 characters."
+
+msgid "Оставляет `$digits` цифр после последнего нуля (сам 0 не учитывается)."
+msgstr "Leaves `$digits` digits after the last zero (the 0 itself is ignored)."
+
+msgid "По умолчанию `$digits` равен 2."
+msgstr "By default `$digits` is 2."
+
+msgid "Транслитерирует русский текст, оставляя только латинские буквы и тире."
+msgstr "Transliterates Russian text, leaving only Latin letters and dashes."
+
+msgid "Транслитерирует русский текст."
+msgstr "Transliterates Russian text."
+
+msgid "Ловушка для **STDERR**."
+msgstr "Trap for **STDERR**."
+
+msgid "См. также `IO::Capture::Stderr`."
+msgstr "See also `IO::Capture::Stderr`."
+
+msgid "Ловушка для **STDOUT**."
+msgstr "Trap for **STDOUT**."
+
+msgid "См. также `IO::Capture::Stdout`."
+msgstr "See also `IO::Capture::Stdout`."
+
+msgid "Константа равна одному тебибайту."
+msgstr "The constant is equal to one tebibyte."
+
+msgid "Константа равна одному гибибайту."
+msgstr "The constant is equal to one gibibyte."
+
+msgid "Константа равна одному мебибайту."
+msgstr "The constant is equal to one mebibyte."
+
+msgid "Константа равна одному кибибайту."
+msgstr "The constant is equal to one kibibyte."
+
+msgid "Максимальная длина данных LongText mysql и mariadb.\n"
+"L - large."
+msgstr "Maximum length of LongText mysql and mariadb data.\n"
+"L - large."
+
+msgid "Максимальная длина данных MediumText mysql и mariadb.\n"
+"M - medium."
+msgstr "Maximum length of MediumText mysql and mariadb data.\n"
+"M - medium."
+
+msgid "Максимальная длина текста данных mysql и mariadb.\n"
+"R - regularity."
+msgstr "Maximum text length of mysql and mariadb data.\n"
+"R - regularity."
+
+msgid "Максимальная длина данных TinyText mysql и mariadb.\n"
+"S - small."
+msgstr "Maximum length of TinyText mysql and mariadb data.\n"
+"S - small."
+
+msgid "Преобразование в строку Perl без интерполяции."
+msgstr "Convert to Perl string without interpolation."
+
+msgid "Преобразование из строки Perl без интерполяции."
+msgstr "Conversion from Perl string without interpolation."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "Aion::Format is copyright © 2023 by Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "Aion::Format is copyright © 2023 by Yaroslav O. Kosmina. Rusland. All rights reserved."
+

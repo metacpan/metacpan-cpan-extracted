@@ -144,7 +144,7 @@ close TESTFILE;
 );
 setupEAIWrap();
 standardLoop();
-is_deeply($loads[0]{process},{'data' => [{'col1' => 'val1','col2' => 'val2'}],'filenames' => ['test.csv'],'filesProcessed' => {'test.csv' => 1},'retrievedFiles' => ['test.csv'],'successfullyDone' => 'getLocalFilesreadFileData'},"test.csv read succesfully with standardLoop via \@loads");
+is_deeply($loads[0]{process},{'data' => [{'col1' => 'val1','col2' => 'val2'}],'filenames' => ['test.csv'],'retrievedFiles' => ['test.csv'],'filesProcessed' => {'test.csv' => 1},'successfullyDone' => 'getLocalFilesreadFileData'},"test.csv read succesfully with standardLoop via \@loads");
 undef(@loads);
 
 %common = (
@@ -160,7 +160,7 @@ undef(@loads);
 );
 setupEAIWrap();
 standardLoop();
-is_deeply($common{process},{'data' => [{'col1' => 'val1','col2' => 'val2'}],'filenames' => ['test.csv'],'filesProcessed' => {'test.csv' => 1},'retrievedFiles' => ['test.csv'],'successfullyDone' => 'getLocalFilesreadFileData'},"test.csv read succesfully with standardLoop via \%common");
+is_deeply($common{process},{'data' => [{'col1' => 'val1','col2' => 'val2'}],'filenames' => ['test.csv'],'retrievedFiles' => ['test.csv'],'filesProcessed' => {'test.csv' => 1},'successfullyDone' => 'getLocalFilesreadFileData'},"test.csv read succesfully with standardLoop via \%common");
 
 # cleanup
 unlink glob "redo/test*.csv";

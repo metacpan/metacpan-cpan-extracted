@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 use Module::Generate;
 use Switch::Again qw/switch/;
 use Hades::Myths { as_keywords => 1 };
@@ -1323,11 +1323,13 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
 =head1 SYNOPSIS
+
+For how the other modules in the distribution are generated see the .hades files in the root directory.
 
 	use Hades;
 
@@ -2067,7 +2069,7 @@ Used in conjunction with Dict and Tuple to specify slots that are optional and m
 
 =head2 Macros
 
-Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.24/macro-fh.hades> for an example of how to extend via macros.
+Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.25/macro-fh.hades> for an example of how to extend via macros.
 
 	macro {
 		FH [ macro => [qw/read_file write_file/], alias => { read_file => [qw/rf/], write_file => [qw/wf/] } ]

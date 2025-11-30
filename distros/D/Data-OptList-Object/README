@@ -1,0 +1,331 @@
+NAME
+    Data::OptList::Object - Data::OptList, but object-oriented
+
+SYNOPSIS
+    Data::OptList provides a compact list format for lists of options, where
+    each option has a key/name which is a string and a value which must be
+    either undef or a reference.
+
+        my $options = Data::OptList::mkopt([
+            qw(key1 key2 key3 key4),
+            key5 => { ... },
+            key6 => [ ... ],
+            key7 => sub { ... },
+            key8 => { ... },
+            key8 => [ ... ],
+        ]);
+
+    Is a shorthand for:
+
+        my $options = [
+            [ key1 => undef,        ],
+            [ key2 => undef,        ],
+            [ key3 => undef,        ],
+            [ key4 => undef,        ],
+            [ key5 => { ... },      ],
+            [ key6 => [ ... ],      ],
+            [ key7 => sub { ... },  ],
+            [ key8 => { ... },      ],
+            [ key8 => [ ... ],      ],
+        ];
+
+    The resulting structure may be looped through easily:
+
+        for my $pair ( @$options ) {
+            printf "%s=%s\n", $pair->[0], ref($pair->[1]) || 'undef';
+        }
+
+    Data::OptList::Object encapsulates the result in a blessed object,
+    allowing convenient methods to be called on it.
+
+        my $options = Data::OptList::Object->new(
+            qw(key1 key2 key3 key4),
+            key5 => { ... },
+            key6 => [ ... ],
+            key7 => sub { ... },
+            key8 => { ... },
+            key8 => [ ... ],
+        );
+    
+        for my $pair ( @$options ) {
+            printf "%s=%s\n", $pair->key, $pair->kind;
+        }
+    
+        if ( $options->key7 ) {
+            my $coderef = $options->key7->value;
+            $coderef->();
+        }
+
+DESCRIPTION
+  Constructor
+    The constructor can be used to create a new OptList object. It may be
+    called in any of these fashions:
+
+    new( @OPTLIST )
+    new( \@OPTLIST )
+    new( \%OPTHASH )
+    new( $OBJECT )
+
+    Where `\@OPTLIST` is a reference to any array conforming to the optlist
+    format, `\%OPTHASH` is any hashref where the values are either undef or
+    references, and $OBJECT is any blessed object where
+    `$OBJECT->DOES('Data::OptList::Object')` returns True and provides a
+    `TO_LIST` method.
+
+  Methods
+    All built-in methods are uppercase.
+
+    ALL()
+        Calling ALL() returns a list of pair objects.
+
+            for my $pair ( $options->ALL ) {
+                printf "%s=%s\n", $pair->key, ref($pair->value) || 'undef';
+            }
+
+        The returned list is like the *output* of mkopt() from Data::OptList
+        (except as a list instead of an arrayref).
+
+        In scalar context, it returns the length of that list.
+
+    COUNT()
+        Count is like ALL(), but forces scalar context, so always returns the
+        number of pairs.
+
+        Data::OptList::Object overloads the `0+` operator to call this.
+
+            my $how_many_options = 0 + $options;
+
+    KEYS()
+        Calling KEYS() returns a list of just the keys.
+
+            for my $key ( $options->KEYS ) {
+                printf "Found key: %s\n", $key;
+            }
+
+        This method's behaviour in scalar context is undefined.
+
+    VALUES()
+        Calling VALUES() returns a list of just the values.
+
+            for my $value ( $options->VALUES ) {
+                printf "Found value of type %s\n", ref $value;
+            }
+
+        This method's behaviour in scalar context is undefined.
+
+    TO_LIST()
+        Returns the options in their original optlist format. This may not
+        exactly match the format passed to the constructor as it will have
+        been canonicalized.
+
+        The returned list is like the *input* to mkopt() from Data::OptList
+        (except as a list instead of an arrayref).
+
+        This method's behaviour in scalar context is undefined.
+
+    TO_ARRAYREF()
+        Returns the same list as ALL(), but as an arrayref.
+
+            for my $pair ( @{ $options->TO_ARRAYREF } ) {
+                printf "%s=%s\n", $pair->key, ref($pair->value) || 'undef';
+            }
+
+        Data::OptList::Object overloads the `@{}` operator to call this.
+
+            for my $pair ( @$options ) {
+                printf "%s=%s\n", $pair->key, ref($pair->value) || 'undef';
+            }
+
+        The returned list is like the *output* of mkopt() from Data::OptList.
+
+    TO_JSON()
+        Returns the same list as TO_LIST(), but as an arrayref. This allows
+        Data::OptList::Object to play nice with JSON serialization, assuming
+        the values in your optlist are values that can be represented in JSON.
+
+            my $j = JSON->new->convert_blessed( 1 );
+            print $j->encode( $options );
+
+    TO_HASHREF()
+        Provides a simple key-value hashref for the optlist. This is
+        appropriate if you do not expect your keys to appear more than once.
+
+        The hashref is read-only. A quirk of read-only hashes in Perl is that
+        trying to read from a key that does not exist will cause an error.
+
+            my $hashref = $options->TO_HASHREF;
+            if ( $hashref->{key7} ) {  # might die
+                my $coderef = $hashref->{key7};
+                $coderef->();
+            }
+
+        Make sure to use the `exists` keyword when checking if an option was
+        given.
+
+            my $hashref = $options->TO_HASHREF;
+            if ( exists $hashref->{key7} ) {
+                my $coderef = $hashref->{key7};
+                $coderef->();
+            }
+
+        As options default to having the value `undef`, it is sensible to use
+        `exists` to check for their presence anyway.
+
+        Data::OptList::Object overloads the `%{}` operator to call this.
+
+            if ( exists $options->{key7} ) {
+                my $coderef = $options->{key7};
+                $coderef->();
+            }
+
+    TO_REGEXP()
+        Returns a regular expression which matches all the keys in the
+        optlist.
+
+            my $re = $options->TO_REGEXP;
+            if ( 'key7' =~ $re ) {
+                my $coderef = $options->{key7};
+                $coderef->();
+            }
+
+        Data::OptList::Object overloads the `qr` operator to call this.
+
+            if ( 'key7' =~ $options ) {
+                my $coderef = $options->{key7};
+                $coderef->();
+            }
+
+    GET( $key )
+        In list context, returns a list of pairs where the key is $key.
+
+            my @eights = $options->GET( 'key8' );
+            for my $pair ( @eights ) {
+                printf "%s=%s\n", $pair->key, ref($pair->value) || 'undef';
+            }
+
+        You can alternatively provide a regexp or coderef for $key.
+
+            my @eights = $options->GET( qr/^key8$/i );
+            my @eights = $options->GET( sub { $_->key eq 'key8' } );
+
+        In scalar context, will return the first such pair if there are any.
+
+            my $first_key8_value = $options->GET( 'key8' )->value;
+
+        If called in scalar context and there are no pairs with the given key,
+        `GET` will return a special object which overloads boolification to be
+        false, but provides `key` and `value` methods.
+
+            if ( $options->GET( 'does_not_exist' ) ) {
+                # The above condition is false, so this block will
+                # not execute.
+            }
+    
+            # Yet this doesn't die.
+            my $value = $options->GET( 'does_not_exist' )->value;
+
+    HAS( $key )
+        Like GET( $key ) but returns a simple true or false to indicate if the
+        key was found.
+
+        Also accepts a regexp or coderef.
+
+    MATCH( $key )
+        An alias for HAS( $key ). This alias exists to play nicely with
+        match::simple.
+
+            use match::simple 'match';
+    
+            if ( match 'key7', $options ) {
+                ...;
+            }
+
+        It also works with Syntax::Keyword::Matches:
+
+            use Syntax::Keyword::Matches;
+    
+            if ( 'key7' matches $options ) {
+                my $coderef = $options->key7->value;
+                $coderef->();
+            }
+
+  AUTOLOAD
+    The `AUTOLOAD` method will call GET($key).
+
+        my $first_key8_value = $options->key8->value;
+
+    This is useful for when your option keys are all valid unqualified
+    bareword identifiers. This is the reason Data::OptList::Object avoids
+    having any method names with lowercase characters. (Except `new`.)
+
+  Overloading
+    The following operators are overloaded:
+
+    `bool`
+        Data::OptList::Options objects are always True.
+
+    ""  Data::OptList::Options have a cute stringification which shows their
+        keys (but not values).
+
+    `0+`
+        Calls `COUNT`.
+
+    `%{}`
+        Calls `TO_HASHREF`.
+
+    `@{}`
+        Calls `TO_ARRAYREF`.
+
+    `qr`
+        Calls `TO_REGEXP`.
+
+  Pair Objects
+    A number of methods return pair objects, representing a key-value pair.
+    Pair objects are read-only and have the following methods:
+
+    key()
+        Returns the key as a string.
+
+    value()
+        Returns the value, which will normally be either undef or a reference.
+
+    kind()
+        The kind of value this pair has. Either the string returned by Perl's
+        builtin ref() function, or the string "undef" if the value is undef.
+
+    exists()
+        Returns True to indicate that the pair exists. Data::OptList::Object's
+        GET() method in scalar context will return a special pair object where
+        exists() returns False to indicate that no pair has been found.
+
+    TO_JSON()
+        Returns a two item arrayref consisting of the key followed by the
+        value.
+
+    Pair objects are blessed arrayrefs, and you may access the key using
+    `$pair->[0]` or the value using `$pair->[1]`.
+
+    Pair objects overload "" to return the key, and override `bool` to return
+    the result of exists().
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-data-optlist-object/issues>.
+
+SEE ALSO
+    Data::OptList.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,142 +1,183 @@
-use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { my ($p) = @_; length($`) && !-e $`? mkdir($`, 0755) || die "mkdir $`: $!": () while $p =~ m!/!g; $p } BEGIN { use Scalar::Util qw//; use Carp qw//; $SIG{__DIE__} = sub { my ($s) = @_; if(ref $s) { $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s; die $s } else {die Carp::longmess defined($s)? $s: "undef" }}; my $t = `pwd`; chop $t; $t .= '/' . __FILE__; my $s = '/tmp/.liveman/perl-aion-format!aion!format/'; `rm -fr '$s'` if -e $s; chdir _mkpath_($s) or die "chdir $s: $!"; open my $__f__, "<:utf8", $t or die "Read $t: $!"; read $__f__, $s, -s $__f__; close $__f__; while($s =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { my ($file, $code) = ($1, $2); $code =~ s/^#>> //mg; open my $__f__, ">:utf8", _mkpath_($file) or die "Write $file: $!"; print $__f__ $code; close $__f__; } } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  use String::Diff qw//; use Data::Dumper qw//; use Term::ANSIColor qw//;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} }  my $white = Term::ANSIColor::color('BRIGHT_WHITE'); my $red = Term::ANSIColor::color('BRIGHT_RED'); my $green = Term::ANSIColor::color('BRIGHT_GREEN'); my $reset = Term::ANSIColor::color('RESET'); my @diff = ( 	remove_open => "$white\[$red", 	remove_close => "$white]$reset", 	append_open => "$white\{$green", 	append_close => "$white}$reset", );  sub _string_diff { 	my ($got, $expected, $chunk) = @_; 	$got = substr($got, 0, length $expected) if $chunk == 1; 	$got = substr($got, -length $expected) if $chunk == -1; 	String::Diff::diff_merge($got, $expected, @diff) }  sub _struct_diff { 	my ($got, $expected) = @_; 	String::Diff::diff_merge( 		Data::Dumper->new([$got], ['diff'])->Indent(0)->Useqq(1)->Dump, 		Data::Dumper->new([$expected], ['diff'])->Indent(0)->Useqq(1)->Dump, 		@diff 	) }  # 
+# # NAME
 # 
-# Aion::Format - Perl extension for formatting numbers, colorizing output and so on
+# Aion::Format - расширение Perl для форматирования чисел, раскрашивания вывода и т.п.
 # 
 # # VERSION
 # 
-# 0.0.9
+# 0.0.10
 # 
 # # SYNOPSIS
 # 
 subtest 'SYNOPSIS' => sub { 
 use Aion::Format;
 
-::is scalar do {trappout { print "123\n" }}, "123\n", 'trappout { print "123\n" } # => 123\n';
+local ($::_g0 = do {trappout { print "123\n" }}, $::_e0 = "123\n"); ::ok $::_g0 eq $::_e0, 'trappout { print "123\n" } # => 123\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {coloring "#red ~> #r\n"}, "\e[31m ~> \e[0m\n", 'coloring "#red ~> #r\n" # => \e[31m ~> \e[0m\n';
-::is scalar do {trappout { printcolor "#red ~> #r\n" }}, "\e[31m ~> \e[0m\n", 'trappout { printcolor "#red ~> #r\n" } # => \e[31m ~> \e[0m\n';
+local ($::_g0 = do {coloring "#red ↬ #r\n"}, $::_e0 = "\e[31m ↬ \e[0m\n"); ::ok $::_g0 eq $::_e0, 'coloring "#red ↬ #r\n" # => \e[31m ↬ \e[0m\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {trappout { printcolor "#red ↬ #r\n" }}, $::_e0 = "\e[31m ↬ \e[0m\n"); ::ok $::_g0 eq $::_e0, 'trappout { printcolor "#red ↬ #r\n" } # => \e[31m ↬ \e[0m\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION
 # 
-# A utilities for formatting numbers, colorizing output and so on.
+# Утилиты для форматирования чисел, раскрашивания вывода и т.п.
 # 
 # # SUBROUTINES
 # 
 # ## coloring ($format, @params)
 # 
-# Colorizes the text with escape sequences, and then replaces the format with sprintf. Color names using from module `Term::ANSIColor`. For `RESET` use `#r` or `#R`.
+# Раскрашивает текст с помощью escape-последовательностей, а затем заменяет формат на `sprintf`. Названия цветов используются из модуля `Term::ANSIColor`. Для **RESET** используйте `#r` или `#R`.
 # 
-done_testing; }; subtest 'coloring ($format, @params)' => sub { 
-::is scalar do {coloring "#{BOLD RED}###r %i", 6}, "\e[1;31m##\e[0m 6", 'coloring "#{BOLD RED}###r %i", 6 # => \e[1;31m##\e[0m 6';
+::done_testing; }; subtest 'coloring ($format, @params)' => sub { 
+local ($::_g0 = do {coloring "#{BOLD RED}###r %i", 6}, $::_e0 = "\e[1;31m##\e[0m 6"); ::ok $::_g0 eq $::_e0, 'coloring "#{BOLD RED}###r %i", 6 # => \e[1;31m##\e[0m 6' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## printcolor ($format, @params)
 # 
-# As `coloring`, but it print formatted string.
+# Как `coloring`, но печатает отформатированную строку на стандартный вывод.
 # 
 # ## warncolor ($format, @params)
 # 
-# As `coloring`, but print formatted string to `STDERR`.
+# Как `coloring`, но печатает отформатированную строку в `STDERR`.
 # 
-done_testing; }; subtest 'warncolor ($format, @params)' => sub { 
-::is scalar do {trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }}, "\e[32mACCESS\e[0m 6\n", 'trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }  # => \e[32mACCESS\e[0m 6\n';
+::done_testing; }; subtest 'warncolor ($format, @params)' => sub { 
+local ($::_g0 = do {trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }}, $::_e0 = "\e[32mACCESS\e[0m 6\n"); ::ok $::_g0 eq $::_e0, 'trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }  # => \e[32mACCESS\e[0m 6\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## accesslog ($format, @params)
 # 
-# It write in STDOUT `coloring` returns with prefix datetime.
+# Пишет в STDOUT используя для форматирования функцию `coloring` и добавляет префикс с датой-временем.
 # 
-done_testing; }; subtest 'accesslog ($format, @params)' => sub { 
-::like scalar do {trappout { accesslog "#{green}ACCESS#r %i\n", 6 }}, qr!\[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[32mACCESS\e\[0m 6\n!, 'trappout { accesslog "#{green}ACCESS#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[32mACCESS\e\[0m 6\n';
+::done_testing; }; subtest 'accesslog ($format, @params)' => sub { 
+::like scalar do {trappout { accesslog "#{green}ACCESS#r %i\n", 6 }}, qr{\[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[32mACCESS\e\[0m 6\n}, 'trappout { accesslog "#{green}ACCESS#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[32mACCESS\e\[0m 6\n'; undef $::_g0; undef $::_e0;
 
 # 
 # ## errorlog ($format, @params)
 # 
-# It write in STDERR `coloring` returns with prefix datetime.
+# Пишет в **STDERR** используя для форматирования функцию `coloring` и добавляет префикс с датой-временем.
 # 
-done_testing; }; subtest 'errorlog ($format, @params)' => sub { 
-::like scalar do {trapperr { errorlog "#{red}ERROR#r %i\n", 6 }}, qr!\[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[31mERROR\e\[0m 6\n!, 'trapperr { errorlog "#{red}ERROR#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[31mERROR\e\[0m 6\n';
+::done_testing; }; subtest 'errorlog ($format, @params)' => sub { 
+::like scalar do {trapperr { errorlog "#{red}ERROR#r %i\n", 6 }}, qr{\[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[31mERROR\e\[0m 6\n}, 'trapperr { errorlog "#{red}ERROR#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[31mERROR\e\[0m 6\n'; undef $::_g0; undef $::_e0;
+
+# 
+# ## p ($target; %properties)
+# 
+# `p` из Data::Printer с предустановленными настройками.
+# 
+# Вместо неудобного первого параметра используется просто скаляр.
+# 
+# Необязательный параметр `%properties` позволяет перекрывать настройки. 
+# 
+::done_testing; }; subtest 'p ($target; %properties)' => sub { 
+::like scalar do {trapperr { p +{cat => 123} }}, qr{cat.+123}, 'trapperr { p +{cat => 123} } # ~> cat.+123'; undef $::_g0; undef $::_e0;
+
+# 
+# ## np ($target; %properties)
+# 
+# `np` из Data::Printer с предустановленными настройками.
+# 
+# Вместо неудобного первого параметра используется просто скаляр.
+# 
+# Необязательный параметр `%properties` позволяет перекрывать настройки. 
+# 
+::done_testing; }; subtest 'np ($target; %properties)' => sub { 
+::like scalar do {np +{cat => 123}}, qr{cat.+123}, 'np +{cat => 123} # ~> cat.+123'; undef $::_g0; undef $::_e0;
 
 # 
 # ## flesch_index_human ($flesch_index)
 # 
-# Convert flesch index to russian label with step 10.
+# Преобразует индекс Флеша в русскоязычную метку с помощью шага 10.
 # 
-done_testing; }; subtest 'flesch_index_human ($flesch_index)' => sub { 
-::is scalar do {flesch_index_human -10}, "несвязный русский текст", 'flesch_index_human -10   # => несвязный русский текст';
-::is scalar do {flesch_index_human -3}, "для академиков", 'flesch_index_human -3    # => для академиков';
-::is scalar do {flesch_index_human 0}, "для академиков", 'flesch_index_human 0     # => для академиков';
-::is scalar do {flesch_index_human 1}, "для академиков", 'flesch_index_human 1     # => для академиков';
-::is scalar do {flesch_index_human 15}, "для профессионалов", 'flesch_index_human 15    # => для профессионалов';
-::is scalar do {flesch_index_human 99}, "для 11 лет (уровень 5-го класса)", 'flesch_index_human 99    # => для 11 лет (уровень 5-го класса)';
-::is scalar do {flesch_index_human 100}, "для младшеклассников", 'flesch_index_human 100   # => для младшеклассников';
-::is scalar do {flesch_index_human 110}, "несвязный русский текст", 'flesch_index_human 110   # => несвязный русский текст';
+::done_testing; }; subtest 'flesch_index_human ($flesch_index)' => sub { 
+local ($::_g0 = do {flesch_index_human -10}, $::_e0 = "несвязный русский текст"); ::ok $::_g0 eq $::_e0, 'flesch_index_human -10   # => несвязный русский текст' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human -3}, $::_e0 = "для академиков"); ::ok $::_g0 eq $::_e0, 'flesch_index_human -3    # => для академиков' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human 0}, $::_e0 = "для академиков"); ::ok $::_g0 eq $::_e0, 'flesch_index_human 0     # => для академиков' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human 1}, $::_e0 = "для академиков"); ::ok $::_g0 eq $::_e0, 'flesch_index_human 1     # => для академиков' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human 15}, $::_e0 = "для профессионалов"); ::ok $::_g0 eq $::_e0, 'flesch_index_human 15    # => для профессионалов' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human 99}, $::_e0 = "для 11 лет (уровень 5-го класса)"); ::ok $::_g0 eq $::_e0, 'flesch_index_human 99    # => для 11 лет (уровень 5-го класса)' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human 100}, $::_e0 = "для младшеклассников"); ::ok $::_g0 eq $::_e0, 'flesch_index_human 100   # => для младшеклассников' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {flesch_index_human 110}, $::_e0 = "несвязный русский текст"); ::ok $::_g0 eq $::_e0, 'flesch_index_human 110   # => несвязный русский текст' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## from_radix ($string, $radix)
 # 
-# Parses a natural number in the specified number system. 64-number system used by default.
+# Анализирует натуральное число в указанной системе счисления. По умолчанию используется 64-значная система.
 # 
-# For digits using symbols 0-9, A-Z, a-z, _ and -. This symbols using before and for 64 NS. For digits after 64 using symbols from CP1251 encoding.
+# Для цифр используются символы 0–9, A–Z, a–z, _ и –. Эти символы используются до и для 64 значной системы. Для цифр после 64 значной системы используются символы кодировки **CP1251**.
 # 
-done_testing; }; subtest 'from_radix ($string, $radix)' => sub { 
-::is scalar do {from_radix "A-C"}, scalar do{45004}, 'from_radix "A-C" # -> 45004';
-::is scalar do {from_radix "A-C", 64}, scalar do{45004}, 'from_radix "A-C", 64 # -> 45004';
-::is scalar do {from_radix "A-C", 255}, scalar do{666327}, 'from_radix "A-C", 255 # -> 666327';
-::like scalar do {eval { from_radix "A-C", 256 }; $@}, qr!The number system 256 is too large. Use NS before 256!, 'eval { from_radix "A-C", 256 }; $@ 	# ~> The number system 256 is too large. Use NS before 256';
+::done_testing; }; subtest 'from_radix ($string, $radix)' => sub { 
+local ($::_g0 = do {from_radix "A-C"}, $::_e0 = do {45004}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'from_radix "A-C" # -> 45004' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {from_radix "A-C", 64}, $::_e0 = do {45004}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'from_radix "A-C", 64 # -> 45004' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {from_radix "A-C", 255}, $::_e0 = do {666327}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'from_radix "A-C", 255 # -> 666327' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+::like scalar do {eval { from_radix "A-C", 256 }; $@}, qr{The number system 256 is too large. Use NS before 256}, 'eval { from_radix "A-C", 256 }; $@ 	# ~> The number system 256 is too large. Use NS before 256'; undef $::_g0; undef $::_e0;
 
 # 
 # ## to_radix ($number, $radix)
 # 
-# Converts a natural number to a given number system. 64-number system used by default.
+# Преобразует натуральное число в заданную систему счисления. По умолчанию используется 64-значная система.
 # 
-done_testing; }; subtest 'to_radix ($number, $radix)' => sub { 
-::is scalar do {to_radix 10_000}, "2SG", 'to_radix 10_000 				# => 2SG';
-::is scalar do {to_radix 10_000, 64}, "2SG", 'to_radix 10_000, 64 			# => 2SG';
-::is scalar do {to_radix 10_000, 255}, "dt", 'to_radix 10_000, 255 			# => dt';
-::like scalar do {eval { to_radix 0, 256 }; $@}, qr!The number system 256 is too large. Use NS before 256!, 'eval { to_radix 0, 256 }; $@ 	# ~> The number system 256 is too large. Use NS before 256';
+::done_testing; }; subtest 'to_radix ($number, $radix)' => sub { 
+local ($::_g0 = do {to_radix 10_000}, $::_e0 = "2SG"); ::ok $::_g0 eq $::_e0, 'to_radix 10_000 				# => 2SG' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {to_radix 10_000, 64}, $::_e0 = "2SG"); ::ok $::_g0 eq $::_e0, 'to_radix 10_000, 64 			# => 2SG' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {to_radix 10_000, 255}, $::_e0 = "dt"); ::ok $::_g0 eq $::_e0, 'to_radix 10_000, 255 			# => dt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+::like scalar do {eval { to_radix 0, 256 }; $@}, qr{The number system 256 is too large. Use NS before 256}, 'eval { to_radix 0, 256 }; $@ 	# ~> The number system 256 is too large. Use NS before 256'; undef $::_g0; undef $::_e0;
 
 # 
 # ## kb_size ($number)
 # 
-# Adds number digits and adds a unit of measurement.
+# Добавляет числовые цифры и добавляет единицу измерения.
 # 
-done_testing; }; subtest 'kb_size ($number)' => sub { 
-::is scalar do {kb_size 102}, "102b", 'kb_size 102             # => 102b';
-::is scalar do {kb_size 1024}, "1k", 'kb_size 1024            # => 1k';
-::is scalar do {kb_size 1023}, "1\x{a0}023b", 'kb_size 1023            # => 1\x{a0}023b';
-::is scalar do {kb_size 1024*1024}, "1M", 'kb_size 1024*1024       # => 1M';
-::is scalar do {kb_size 1000_002_000_001_000}, "931\x{a0}324G", 'kb_size 1000_002_000_001_000    # => 931\x{a0}324G';
+::done_testing; }; subtest 'kb_size ($number)' => sub { 
+local ($::_g0 = do {kb_size 102}, $::_e0 = "102b"); ::ok $::_g0 eq $::_e0, 'kb_size 102             # => 102b' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {kb_size 1024}, $::_e0 = "1k"); ::ok $::_g0 eq $::_e0, 'kb_size 1024            # => 1k' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {kb_size 1023}, $::_e0 = "1\x{a0}023b"); ::ok $::_g0 eq $::_e0, 'kb_size 1023            # => 1\x{a0}023b' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {kb_size 1024*1024}, $::_e0 = "1M"); ::ok $::_g0 eq $::_e0, 'kb_size 1024*1024       # => 1M' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {kb_size 1000_002_000_001_000}, $::_e0 = "931\x{a0}324G"); ::ok $::_g0 eq $::_e0, 'kb_size 1000_002_000_001_000    # => 931\x{a0}324G' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## replace ($subject, @rules)
+# 
+# Несколько преобразований текста за один проход.
+# 
+::done_testing; }; subtest 'replace ($subject, @rules)' => sub { 
+my $s = replace "33*pi",
+    qr/(?<num> \d+)/x   => sub { "($+{num})" },
+    qr/\b pi \b/x       => sub { 3.14 },
+    qr/(?<op> \*)/x     => sub { " $& " },
+;
+
+local ($::_g0 = do {$s}, $::_e0 = "(33) * 3.14"); ::ok $::_g0 eq $::_e0, '$s # => (33) * 3.14' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## matches ($subject, @rules)
 # 
-# Multiple text transformations in one pass.
+# Синоним `replace`. **DEPRECATED**.
 # 
-done_testing; }; subtest 'matches ($subject, @rules)' => sub { 
+::done_testing; }; subtest 'matches ($subject, @rules)' => sub { 
 my $s = matches "33*pi",
     qr/(?<num> \d+)/x   => sub { "($+{num})" },
     qr/\b pi \b/x       => sub { 3.14 },
     qr/(?<op> \*)/x     => sub { " $& " },
 ;
 
-::is scalar do {$s}, "(33) * 3.14", '$s # => (33) * 3.14';
+local ($::_g0 = do {$s}, $::_e0 = "(33) * 3.14"); ::ok $::_g0 eq $::_e0, '$s # => (33) * 3.14' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## nous ($templates)
 # 
-# A simplified regex language for text recognition in HTML documents.
+# Упрощенный язык регулярных выражений для распознавания текста в документах HTML.
 # 
-# 1. All spaces from the beginning and end are removed. 
-# 2. From the beginning of each line, 4 spaces or 0-3 spaces and a tab are removed. 
-# 3. Spaces at the end of the line and whitespace lines are replaced with `\s*`. 4. All variables in `{{ var }}` are replaced with `.*?`. Those. recognize everything. 
-# 4. All variables in `{{> var }}` are replaced with `[^<>]*?`. Those. do not recognize html tags. 
-# 4. All variables in `{{: var }}` are replaced with `[^\n]*`. Those. must be on the same line. 
-# 5. Expressions in double square brackets (`[[ ... ]]`) may not exist. 
-# 5. Double parentheses (`(( ... ))`) are used as parentheses. 5. `||` - or.
+# 1. Убирает все пробелы в начале и конце.
+# 2. С начала каждой строки удаляются 4 пробела или 0-3 пробела и табуляция.
+# 3. Пробелы в конце строки и строки пробелов заменяются на `\s*`. 
+# 4. Все переменные в `{{ var }}` заменяются на `.*?`. Т.е. распознаётся всё.
+# 4. Все переменные в `{{> var }}` заменяются на `[^<>]*?`. Т.е. не распознаются html-теги.
+# 4. Все переменные в `{{: var }}` заменяются на `[^\n]*`. Т.е. должно быть на одной строке.
+# 5. Выражения в двойных квадратных скобках (`[[ ... ]]`) могут не существовать.
+# 5. В качестве круглых скобок используются двойные скобки (`(( ... ))`).
+# 5. `||` - или.
 # 
-done_testing; }; subtest 'nous ($templates)' => sub { 
+::done_testing; }; subtest 'nous ($templates)' => sub { 
 my $re = nous [
 q{
 	<body>
@@ -178,217 +219,219 @@ This book text!
 
 $s =~ $re;
 my $result = {%+};
-::is_deeply scalar do {$result}, scalar do {{author_link => "/to/book/link", author_name => "A. Alis", title => "Grivus campf"}}, '$result # --> {author_link => "/to/book/link", author_name => "A. Alis", title => "Grivus campf"}';
+local ($::_g0 = do {$result}, $::_e0 = do {{author_link => "/to/book/link", author_name => "A. Alis", title => "Grivus campf"}}); ::is_deeply $::_g0, $::_e0, '$result # --> {author_link => "/to/book/link", author_name => "A. Alis", title => "Grivus campf"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## num ($number)
 # 
-# Adds separators between digits of a number.
+# Добавляет разделители между цифрами числа.
 # 
-done_testing; }; subtest 'num ($number)' => sub { 
-::is scalar do {num +0}, "0", 'num +0         # => 0';
-::is scalar do {num -1000.3}, "-1 000.3", 'num -1000.3    # => -1 000.3';
+::done_testing; }; subtest 'num ($number)' => sub { 
+local ($::_g0 = do {num +0}, $::_e0 = "0"); ::ok $::_g0 eq $::_e0, 'num +0         # => 0' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {num -1000.3}, $::_e0 = "-1 000.3"); ::ok $::_g0 eq $::_e0, 'num -1000.3    # => -1 000.3' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# Separator by default is no-break space. Set separator and decimal point same as:
+# Разделителем по умолчанию является неразрывный пробел. Установите разделитель и десятичную точку так же, как:
 # 
 
-::is scalar do {num [1000, "#"]}, "1#000", 'num [1000, "#"]         		# => 1#000';
-::is scalar do {num [-1000.3003003, "_", ","]}, "-1_000,3003003", 'num [-1000.3003003, "_", ","]   # => -1_000,3003003';
+local ($::_g0 = do {num [1000, "#"]}, $::_e0 = "1#000"); ::ok $::_g0 eq $::_e0, 'num [1000, "#"]         		# => 1#000' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {num [-1000.3003003, "_", ","]}, $::_e0 = "-1_000,3003003"); ::ok $::_g0 eq $::_e0, 'num [-1000.3003003, "_", ","]   # => -1_000,3003003' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# See also `Number::Format`.
+# См. также `Number::Format`.
 # 
 # ## rim ($number)
 # 
-# Translate positive integers to **roman numerals**.
+# Переводит положительные целые числа в **римские цифры**.
 # 
-done_testing; }; subtest 'rim ($number)' => sub { 
-::is scalar do {rim 0}, "N", 'rim 0       # => N';
-::is scalar do {rim 4}, "IV", 'rim 4       # => IV';
-::is scalar do {rim 6}, "VI", 'rim 6       # => VI';
-::is scalar do {rim 50}, "L", 'rim 50      # => L';
-::is scalar do {rim 49}, "XLIX", 'rim 49      # => XLIX';
-::is scalar do {rim 505}, "DV", 'rim 505     # => DV';
+::done_testing; }; subtest 'rim ($number)' => sub { 
+local ($::_g0 = do {rim 0}, $::_e0 = "N"); ::ok $::_g0 eq $::_e0, 'rim 0       # => N' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 4}, $::_e0 = "IV"); ::ok $::_g0 eq $::_e0, 'rim 4       # => IV' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 6}, $::_e0 = "VI"); ::ok $::_g0 eq $::_e0, 'rim 6       # => VI' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 50}, $::_e0 = "L"); ::ok $::_g0 eq $::_e0, 'rim 50      # => L' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 49}, $::_e0 = "XLIX"); ::ok $::_g0 eq $::_e0, 'rim 49      # => XLIX' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 505}, $::_e0 = "DV"); ::ok $::_g0 eq $::_e0, 'rim 505     # => DV' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# **roman numerals** after 1000:
+# **Римские цифры** после 1000:
 # 
 
-::is scalar do {rim 49_000}, "XLIX M", 'rim 49_000      # => XLIX M';
-::is scalar do {rim 49_000_000}, "XLIX M M", 'rim 49_000_000  # => XLIX M M';
-::is scalar do {rim 49_009_555}, "XLIX IX DLV", 'rim 49_009_555  # => XLIX IX DLV';
+local ($::_g0 = do {rim 49_000}, $::_e0 = "XLIX M"); ::ok $::_g0 eq $::_e0, 'rim 49_000      # => XLIX M' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 49_000_000}, $::_e0 = "XLIX M M"); ::ok $::_g0 eq $::_e0, 'rim 49_000_000  # => XLIX M M' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {rim 49_009_555}, $::_e0 = "XLIX IX DLV"); ::ok $::_g0 eq $::_e0, 'rim 49_009_555  # => XLIX IX DLV' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# See also:
+# См. также:
 # 
-# * `Roman` is simple converter.
-# * `Math::Roman` is another converter.
-# * `Convert::Number::Roman` is OOP interface.
-# * `Number::Convert::Roman` is another OOP interface.
-# * `Text::Roman` convert standart and milhar roman numbers.
-# * `Roman::Unicode` use digits ↁ (5 000), ↂ (1000), and so on.
-# * `Acme::Roman` added support roman numerals in perl code (`I + II -> III`), but use `+`, `-` and `*` operations only.
-# * `Date::Roman` is Perl OO extension for handling roman style dates, but with arabic numbers (id 3 702).
-# * `DateTime::Format::Roman` is roman date formatter, but with arabic numbers (5 Kal Jun 2003).
+# * [Roman](https://metacpan.org/pod/Roman) это простой конвертер.
+# * [Math::Roman](https://metacpan.org/pod/Math::Roman) это еще один конвертер.
+# * [Convert::Number::Roman](https://metacpan.org/pod/Convert::Number::Roman) имеет ООП-интерфейс.
+# * [Number::Convert::Roman](https://metacpan.org/pod/Number::Convert::Roman) – еще один интерфейс ООП.
+# * [Text::Roman](https://metacpan.org/pod/Text::Roman) конвертирует стандартные и милхарные римские числа.
+# * [Roman::Unicode](https://metacpan.org/pod/Roman::Unicode) использует цифры ↁ (5 000), ↂ (1000) и так далее.
+# * [Acme::Roman](https://metacpan.org/pod/Acme::Roman) добавляет поддержку римских цифр в коде Perl (`I + II -> III`), но использует только операции `+`, `-` и `*`.
+# * [Date::Roman](https://metacpan.org/pod/Date::Roman) — это объектно-ориентированное расширение Perl для обработки дат в римском стиле, но с арабскими цифрами (id 3 702).
+# * [DateTime::Format::Roman](https://metacpan.org/pod/DateTime::Format::Roman) – средство форматирования римских дат, но с арабскими цифрами (5 Kal Jun 2003).
 # 
 # ## round ($number, $decimal)
 # 
-# Rounds a number to the specified decimal place.
+# Округляет число до указанного десятичного знака.
 # 
-done_testing; }; subtest 'round ($number, $decimal)' => sub { 
-::is scalar do {round 1.234567, 2}, scalar do{1.23}, 'round 1.234567, 2  # -> 1.23';
-::is scalar do {round 1.235567, 2}, scalar do{1.24}, 'round 1.235567, 2  # -> 1.24';
+::done_testing; }; subtest 'round ($number, $decimal)' => sub { 
+local ($::_g0 = do {round 1.234567, 2}, $::_e0 = do {1.23}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'round 1.234567, 2  # -> 1.23' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {round 1.235567, 2}, $::_e0 = do {1.24}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'round 1.235567, 2  # -> 1.24' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## sinterval ($interval)
 # 
-# Generates human-readable spacing.
+# Создает человекочитаемый интервал.
 # 
-# Width of result is 12 symbols.
+# Ширина результата — 12 символов.
 # 
-done_testing; }; subtest 'sinterval ($interval)' => sub { 
-::is scalar do {sinterval  6666.6666}, "01:51:06.667", 'sinterval  6666.6666 	# => 01:51:06.667';
-::is scalar do {sinterval  6.6666}, "00:00:06.667", 'sinterval  6.6666 		# => 00:00:06.667';
-::is scalar do {sinterval  .333}, "0.33300000 s", 'sinterval  .333 		# => 0.33300000 s';
-::is scalar do {sinterval  .000_33}, "0.3300000 ms", 'sinterval  .000_33 		# => 0.3300000 ms';
-::is scalar do {sinterval  .000_000_33}, "0.330000 mks", 'sinterval  .000_000_33 	# => 0.330000 mks';
+::done_testing; }; subtest 'sinterval ($interval)' => sub { 
+local ($::_g0 = do {sinterval  6666.6666}, $::_e0 = "01:51:06.667"); ::ok $::_g0 eq $::_e0, 'sinterval  6666.6666 	# => 01:51:06.667' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sinterval  6.6666}, $::_e0 = "00:00:06.667"); ::ok $::_g0 eq $::_e0, 'sinterval  6.6666 		# => 00:00:06.667' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sinterval  .333}, $::_e0 = "0.33300000 s"); ::ok $::_g0 eq $::_e0, 'sinterval  .333 		# => 0.33300000 s' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sinterval  .000_33}, $::_e0 = "0.3300000 ms"); ::ok $::_g0 eq $::_e0, 'sinterval  .000_33 		# => 0.3300000 ms' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sinterval  .000_000_33}, $::_e0 = "0.330000 mks"); ::ok $::_g0 eq $::_e0, 'sinterval  .000_000_33 	# => 0.330000 mks' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## sround ($number, $digits)
 # 
-# Leaves `$digits` (0 does not count) wherever they are relative to the point.
+# Оставляет `$digits` цифр после последнего нуля (сам 0 не учитывается).
 # 
-# Default `$digits` is 2.
+# По умолчанию `$digits` равен 2.
 # 
-done_testing; }; subtest 'sround ($number, $digits)' => sub { 
-::is scalar do {sround 10.11}, scalar do{10}, 'sround 10.11        # -> 10';
-::is scalar do {sround 100.11}, scalar do{100}, 'sround 100.11       # -> 100';
-::is scalar do {sround 0.00012}, scalar do{0.00012}, 'sround 0.00012      # -> 0.00012';
-::is scalar do {sround 1.2345}, scalar do{1.2}, 'sround 1.2345       # -> 1.2';
-::is scalar do {sround 1.2345, 3}, scalar do{1.23}, 'sround 1.2345, 3    # -> 1.23';
+::done_testing; }; subtest 'sround ($number, $digits)' => sub { 
+local ($::_g0 = do {sround 10.11}, $::_e0 = do {10}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 10.11        # -> 10' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sround 12.11}, $::_e0 = do {12}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 12.11        # -> 12' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sround 100.11}, $::_e0 = do {100}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 100.11       # -> 100' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sround 133.11}, $::_e0 = do {133}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 133.11       # -> 133' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sround 0.00012}, $::_e0 = do {0.00012}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 0.00012      # -> 0.00012' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sround 1.2345}, $::_e0 = do {1.2}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 1.2345       # -> 1.2' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {sround 1.2345, 3}, $::_e0 = do {1.23}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'sround 1.2345, 3    # -> 1.23' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## trans ($s)
 # 
-# Transliterates the russian text, leaving only Latin letters and dashes.
+# Транслитерирует русский текст, оставляя только латинские буквы и тире.
 # 
-done_testing; }; subtest 'trans ($s)' => sub { 
-::is scalar do {trans "Мир во всём Мире!"}, "mir-vo-vsjom-mire", 'trans "Мир во всём Мире!"  # => mir-vo-vsjom-mire';
+::done_testing; }; subtest 'trans ($s)' => sub { 
+local ($::_g0 = do {trans "Мир во всём Мире!"}, $::_e0 = "mir-vo-vsjom-mire"); ::ok $::_g0 eq $::_e0, 'trans "Мир во всём Мире!"  # => mir-vo-vsjom-mire' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## transliterate ($s)
 # 
-# Transliterates the russian text.
+# Транслитерирует русский текст.
 # 
-done_testing; }; subtest 'transliterate ($s)' => sub { 
-::is scalar do {transliterate "Мир во всём Мире!"}, "Mir vo vsjom Mire!", 'transliterate "Мир во всём Мире!"  # => Mir vo vsjom Mire!';
+::done_testing; }; subtest 'transliterate ($s)' => sub { 
+local ($::_g0 = do {transliterate "Мир во всём Мире!"}, $::_e0 = "Mir vo vsjom Mire!"); ::ok $::_g0 eq $::_e0, 'transliterate "Мир во всём Мире!"  # => Mir vo vsjom Mire!' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## trapperr (&block)
 # 
-# Trap for STDERR.
+# Ловушка для **STDERR**.
 # 
-done_testing; }; subtest 'trapperr (&block)' => sub { 
-::is scalar do {trapperr { print STDERR 123 }}, "123", 'trapperr { print STDERR 123 }  # => 123';
+::done_testing; }; subtest 'trapperr (&block)' => sub { 
+local ($::_g0 = do {trapperr { print STDERR "Stars: ✨" }}, $::_e0 = "Stars: ✨"); ::ok $::_g0 eq $::_e0, 'trapperr { print STDERR "Stars: ✨" }  # => Stars: ✨' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# See also `IO::Capture::Stderr`.
+# См. также `IO::Capture::Stderr`.
 # 
 # ## trappout (&block)
 # 
-# Trap for STDOUT.
+# Ловушка для **STDOUT**.
 # 
-done_testing; }; subtest 'trappout (&block)' => sub { 
-::is scalar do {trappout { print 123 }}, "123", 'trappout { print 123 }  # => 123';
+::done_testing; }; subtest 'trappout (&block)' => sub { 
+local ($::_g0 = do {trappout { print "Stars: ✨" }}, $::_e0 = "Stars: ✨"); ::ok $::_g0 eq $::_e0, 'trappout { print "Stars: ✨" }  # => Stars: ✨' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# See also `IO::Capture::Stdout`.
+# См. также `IO::Capture::Stdout`.
 # 
 # ## TiB ()
 # 
-# The constant is one tebibyte.
+# Константа равна одному тебибайту.
 # 
-done_testing; }; subtest 'TiB ()' => sub { 
-::is scalar do {TiB}, scalar do{2**40}, 'TiB  # -> 2**40';
+::done_testing; }; subtest 'TiB ()' => sub { 
+local ($::_g0 = do {TiB}, $::_e0 = do {2**40}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'TiB  # -> 2**40' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## GiB ()
 # 
-# The constant is one gibibyte.
+# Константа равна одному гибибайту.
 # 
-done_testing; }; subtest 'GiB ()' => sub { 
-::is scalar do {GiB}, scalar do{2**30}, 'GiB  # -> 2**30';
+::done_testing; }; subtest 'GiB ()' => sub { 
+local ($::_g0 = do {GiB}, $::_e0 = do {2**30}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'GiB  # -> 2**30' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## MiB ()
 # 
-# The constant is one mebibyte.
+# Константа равна одному мебибайту.
 # 
-done_testing; }; subtest 'MiB ()' => sub { 
-::is scalar do {MiB}, scalar do{2**20}, 'MiB  # -> 2**20';
+::done_testing; }; subtest 'MiB ()' => sub { 
+local ($::_g0 = do {MiB}, $::_e0 = do {2**20}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'MiB  # -> 2**20' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## KiB ()
 # 
-# The constant is one kibibyte.
+# Константа равна одному кибибайту.
 # 
-done_testing; }; subtest 'KiB ()' => sub { 
-::is scalar do {KiB}, scalar do{2**10}, 'KiB  # -> 2**10';
+::done_testing; }; subtest 'KiB ()' => sub { 
+local ($::_g0 = do {KiB}, $::_e0 = do {2**10}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'KiB  # -> 2**10' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## xxL ()
 # 
-# Maximum length in data LongText mysql and mariadb.
+# Максимальная длина данных LongText mysql и mariadb.
 # L - large.
 # 
-done_testing; }; subtest 'xxL ()' => sub { 
-::is scalar do {xxL}, scalar do{4*GiB-1}, 'xxL  # -> 4*GiB-1';
+::done_testing; }; subtest 'xxL ()' => sub { 
+local ($::_g0 = do {xxL}, $::_e0 = do {4*GiB-1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'xxL  # -> 4*GiB-1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## xxM ()
 # 
-# Maximum length in data MediumText mysql and mariadb.
+# Максимальная длина данных MediumText mysql и mariadb.
 # M - medium.
 # 
-done_testing; }; subtest 'xxM ()' => sub { 
-::is scalar do {xxM}, scalar do{16*MiB-1}, 'xxM  # -> 16*MiB-1';
+::done_testing; }; subtest 'xxM ()' => sub { 
+local ($::_g0 = do {xxM}, $::_e0 = do {16*MiB-1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'xxM  # -> 16*MiB-1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## xxR ()
 # 
-# Maximum length in data Text mysql and mariadb.
+# Максимальная длина текста данных mysql и mariadb.
 # R - regularity.
 # 
-done_testing; }; subtest 'xxR ()' => sub { 
-::is scalar do {xxR}, scalar do{64*KiB-1}, 'xxR  # -> 64*KiB-1';
+::done_testing; }; subtest 'xxR ()' => sub { 
+local ($::_g0 = do {xxR}, $::_e0 = do {64*KiB-1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'xxR  # -> 64*KiB-1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## xxS ()
 # 
-# Maximum length in data TinyText mysql and mariadb.
+# Максимальная длина данных TinyText mysql и mariadb.
 # S - small.
 # 
-done_testing; }; subtest 'xxS ()' => sub { 
-::is scalar do {xxS}, scalar do{255}, 'xxS  # -> 255';
+::done_testing; }; subtest 'xxS ()' => sub { 
+local ($::_g0 = do {xxS}, $::_e0 = do {255}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'xxS  # -> 255' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## to_str (;$scalar)
 # 
-# Converts to string perl without interpolation.
+# Преобразование в строку Perl без интерполяции.
 # 
-done_testing; }; subtest 'to_str (;$scalar)' => sub { 
-::is scalar do {to_str "a'\n"}, "'a\\'\n'", 'to_str "a\'\n" # => \'a\\\'\n\'';
-::is_deeply scalar do {[map to_str, "a'\n"]}, scalar do {["'a\\'\n'"]}, '[map to_str, "a\'\n"] # --> ["\'a\\\'\n\'"]';
+::done_testing; }; subtest 'to_str (;$scalar)' => sub { 
+local ($::_g0 = do {to_str "a'\n"}, $::_e0 = "'a\\'\n'"); ::ok $::_g0 eq $::_e0, 'to_str "a\'\n" # => \'a\\\'\n\'' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map to_str, "a'\n"]}, $::_e0 = do {["'a\\'\n'"]}); ::is_deeply $::_g0, $::_e0, '[map to_str, "a\'\n"] # --> ["\'a\\\'\n\'"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## from_str (;$one_quote_str)
 # 
-# Converts from string perl without interpolation.
+# Преобразование из строки Perl без интерполяции.
 # 
-done_testing; }; subtest 'from_str (;$one_quote_str)' => sub { 
-::is scalar do {from_str "'a\\'\n'"}, "a'\n", 'from_str "\'a\\\'\n\'"  # => a\'\n';
-::is_deeply scalar do {[map from_str, "'a\\'\n'"]}, scalar do {["a'\n"]}, '[map from_str, "\'a\\\'\n\'"]  # --> ["a\'\n"]';
+::done_testing; }; subtest 'from_str (;$one_quote_str)' => sub { 
+local ($::_g0 = do {from_str "'a\\'\n'"}, $::_e0 = "a'\n"); ::ok $::_g0 eq $::_e0, 'from_str "\'a\\\'\n\'"  # => a\'\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map from_str, "'a\\'\n'"]}, $::_e0 = do {["a'\n"]}); ::is_deeply $::_g0, $::_e0, '[map from_str, "\'a\\\'\n\'"]  # --> ["a\'\n"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # SUBROUTINES/METHODS
@@ -405,7 +448,7 @@ done_testing; }; subtest 'from_str (;$one_quote_str)' => sub {
 # 
 # Aion::Format is copyright © 2023 by Yaroslav O. Kosmina. Rusland. All rights reserved.
 
-	done_testing;
+	::done_testing;
 };
 
-done_testing;
+::done_testing;

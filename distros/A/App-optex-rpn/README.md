@@ -15,35 +15,81 @@ them with their calculated results.
 By default, all arguments are processed automatically when the module
 is loaded.
 
-# OPTIONS
+# MODULE OPTIONS
 
-Options can be set via `-Mrpn::config(...)` or `--option` before
-`--`.
+Module options can be set via `-Mrpn::config(...)` or `--option`
+before `--`.
 
-- **--all**, **--no-all**
+- **--auto**, **--no-auto**
 
     Enable or disable automatic processing of all arguments.  Default is
-    enabled.  Use `--no-all` to disable and process only arguments
+    enabled.  Use `--no-auto` to disable and process only arguments
     specified by `--rpn`.
+
+- **-p** _name\_or\_regex_, **--pattern** _name\_or\_regex_
+
+    Specify a pattern to match RPN expressions.  The value can be either a
+    preset name (word characters only, prefix match supported) or a
+    custom regex pattern.
+
+    When `--pattern` is specified, `--auto` is ignored.
+
+    **Preset patterns:**
+
+    - `rpn`
+
+        Matches `rpn(...)` and extracts the content inside parentheses.
+
+    - `equal`
+
+        Matches `...=` at the end and extracts the expression before `=`.
+
+    **Custom patterns:**
+
+    When the value contains non-word characters, it is treated as a
+    regex pattern.  The pattern must contain a capture group `(...)` that
+    captures the RPN expression.  The entire matched portion is replaced
+    with the calculated result.
+
+    Examples:
+
+        # Use preset pattern 'rpn' (or -pr for short)
+        optex -Mrpn -pr -- echo '3600*5' '=' rpn(3600,5*)
+        # outputs: 3600*5 = 18000
+
+        # Use preset pattern 'equal' (or -pe for short)
+        optex -Mrpn -pe -- echo '3600*5' '=' 3600,5*=
+        # outputs: 3600*5 = 18000
+
+        # Use custom regex pattern
+        optex -Mrpn --pattern 'calc\[(.*)\]' -- echo calc[3600,5*]
+        # outputs: 18000
+
+- **--quiet**, **--no-quiet**
+
+    Suppress Math::RPN warning messages.  Default is enabled.  Use
+    `--no-quiet` to see warnings for invalid expressions.
 
 - **--verbose**
 
     Print diagnostic messages.
 
+# COMMAND OPTIONS
+
+These options are available after `--`.
+
 - **--rpn** _expression_
 
-    Convert a single RPN expression.  Use colon (`:`) instead of comma
-    as the term separator because comma is used as a parameter delimiter
-    in the module call syntax.
+    Convert a single RPN expression.
 
-        optex -Mrpn --no-all -- echo --rpn 3600:5* hello
-        # outputs: 18000 hello
+        optex -Mrpn --no-auto -- printf '%s = %d\n' 3600,5* --rpn 3600,5*
+        # outputs: 3600,5* = 18000
 
 # EXPRESSIONS
 
-An RPN expression requires at least two terms separated by commas (or
-colons when using `--rpn`).  A single term like `RAND` will not be
-converted, but `RAND,0+` will produce a random number.
+An RPN expression requires at least two terms separated by commas or
+colons.  A single term like `RAND` will not be converted, but
+`RAND,0+` will produce a random number.
 
 ## OPERATORS
 

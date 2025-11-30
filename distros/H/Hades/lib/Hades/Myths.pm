@@ -2,7 +2,7 @@ package Hades::Myths;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 our ($STASH);
 
 sub new {
@@ -81,7 +81,7 @@ Hades::Myths - error handling for hades.
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 

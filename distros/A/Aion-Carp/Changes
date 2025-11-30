@@ -1,5 +1,11 @@
 Revision history for Perl extension Aion-Carp
 
+1.6 2025-11-29T21:47:59Z
+
+    - new liveman tests
+    - upgrade dependencies
+    - change workflow
+
 1.5 2023-09-08T19:12:17Z
 
     - fix tests on metacpan!

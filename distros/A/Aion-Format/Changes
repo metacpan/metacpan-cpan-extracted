@@ -1,5 +1,13 @@
 Revision history for Perl extension Aion::Str::Util
 
+0.1.0 2025-11-29T19:06:17Z
+
+    - p and np added with simple options
+    - translate into russian *.md
+    - rename matches to replace
+    - added from_url_params
+    - ecosystem package use new liveman
+
 0.0.10 2024-01-12T08:34:38Z
 
     - rename die message in out_tag

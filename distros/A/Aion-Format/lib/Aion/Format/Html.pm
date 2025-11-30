@@ -8,11 +8,11 @@ our @EXPORT = our @EXPORT_OK = grep {
 } keys %Aion::Format::Html::;
 
 # Экранирует символы html
-my %HTML_SIM = qw/< &lt; > &gt; & &amp; \' &#39; " &quot;/;
-sub to_html (@) {
-	local $_ = join "", @_;
-	s/[<>&\'\"]/$HTML_SIM{$&}/ge;
-	$_
+my %HTML_SIM = (qw/< &lt; > &gt; & &amp; \' &apos; " &quot;/, "\n" => '<br>', "\t" => '&emsp;');
+sub to_html (;$) {
+	my ($s) = @_? @_: $_;
+	$s =~ s/[<>&\'\"]/$HTML_SIM{$&}/ge;
+	$s
 }
 
 our %ENTITIES = (
@@ -1245,8 +1245,8 @@ our %WITH_CLOSE_TAG2SPACE = (
 
 
 # переводит html в text
-sub from_html {
-	local ($_) = @_;
+sub from_html (;$) {
+	local ($_) = @_? @_: $_;
 
 	# 1. Убираем энтитиес:
 	my $ent = sub {
@@ -1501,34 +1501,34 @@ __END__
 
 =head1 NAME
 
-Aion::Format::Html - Perl extension for formatting HTML
+Aion::Format::Html - library for HTML formatting
 
 =head1 SYNOPSIS
 
 	use Aion::Format::Html;
 	
-	from_html "<b>&excl;</b>"  # => !
-	to_html "<a>"       # => &lt;a&gt;
+	from_html "<b>&excl;</b>" # => !
+	to_html "<a>"             # => &lt;a&gt;
 
 =head1 DESCRIPION
 
-Perl extension for formatting HTML-documents.
+Library for formatting HTML documents.
 
 =head1 SUBROUTINES
 
 =head2 from_html ($html)
 
-Converts html to text.
+Converts HTML to text.
 
 	from_html "Basic is <b>superlanguage</b>!<br>"  # => Basic is superlanguage!\n
 
 =head2 to_html ($html)
 
-Escapes html characters.
+Escapes HTML characters.
 
 =head2 safe_html ($html)
 
-Cuts off dangerous and unknown tags from html, and unknown attributes from known tags.
+Trims dangerous and unknown HTML tags, as well as unknown attributes from known tags.
 
 	safe_html "-<em>-</em><br>-" # => -<em>-</em><br>-
 	safe_html "-<em onclick='  '>-</em><br onmouseout=1>-" # => -<em>-</em><br>-
@@ -1543,7 +1543,7 @@ Breaks text into pages taking into account html tags.
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:darviarush@mail.ru>
+Yaroslav O. Kosmina L<mailto:darviarush@mail.ru>
 
 =head1 LICENSE
 

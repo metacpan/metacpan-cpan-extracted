@@ -1,5 +1,5 @@
 package Net::Fortinet::FortiManager;
-$Net::Fortinet::FortiManager::VERSION = '0.004000';
+$Net::Fortinet::FortiManager::VERSION = '0.004001';
 # ABSTRACT: Fortinet FortiManager REST API client library
 
 use 5.024;
@@ -208,6 +208,23 @@ sub logout ($self) {
 
 sub get_sys_status ($self) {
     return $self->exec_method('get', '/sys/status');
+}
+
+
+sub has_firewall_service_udp_lite_support ($self) {
+    state $rv;
+    return $rv
+        if defined $rv;
+
+    my $sys_status = $self->get_sys_status;
+
+    my $major_version = $sys_status->{Major};
+    my $minor_version = $sys_status->{Minor};
+
+    $rv = ($major_version == 7 && $minor_version >= 6)
+        || $major_version > 7;
+
+    return $rv;
 }
 
 
@@ -690,7 +707,7 @@ Net::Fortinet::FortiManager - Fortinet FortiManager REST API client library
 
 =head1 VERSION
 
-version 0.004000
+version 0.004001
 
 =head1 SYNOPSIS
 
@@ -770,6 +787,11 @@ Logs out of the Fortinet FortiManager.
 =head2 get_sys_status
 
 Returns /sys/status.
+
+=head2 has_firewall_service_udp_lite_support
+
+Returns true if the version supports UDP-Lite.
+This was introduced in version 7.6.0.
 
 =head2 list_adoms
 

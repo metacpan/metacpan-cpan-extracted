@@ -1,5 +1,8 @@
 Revision history for OpenAPI::Linter
 
+0.15  2025-11-30
+      - Updated pod, be honest about false positives.
+
 0.14  2025-11-26
       - Proposed patch for issue #2, #3:
         path not recognized as a valid value for in.

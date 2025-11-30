@@ -1,6 +1,6 @@
 requires 'perl', '5.014';
 requires 'App::optex', '1.02';
-requires 'Getopt::EX::Config';
+requires 'Getopt::EX', '3.01';
 requires 'Math::RPN';
 
 on 'test' => sub {

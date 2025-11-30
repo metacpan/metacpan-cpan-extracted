@@ -1,0 +1,28 @@
+Data-OptList-Object
+===================
+
+Created:      2025-11-28
+Home page:    <https://metacpan.org/release/Data-OptList-Object>
+Bug tracker:  <https://github.com/tobyink/p5-data-optlist-object/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001003	2025-11-29
+
+ [ Packaging ]
+ - Require newer List::Util.
+
+0.001002	2025-11-29	Oops, I did it again
+
+ [ Packaging ]
+ - Fixed changelog.
+
+0.001001	2025-11-29	Oops
+
+ [ Packaging ]
+ - Fixed changelog dates.
+ - Remembered to list dependencies in metadata.
+
+ [ Other ]
+ - Give the helper packages $VERSION, etc.
+
+0.001000	2025-11-29	Initial release

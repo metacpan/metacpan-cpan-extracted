@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-format/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-format/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Format.svg)](https://metacpan.org/release/Aion-Format)
+[![Actions Status](https://github.com/darviarush/perl-aion-format/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-format/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Format.svg)](https://metacpan.org/release/Aion-Format) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-format/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Format+0.1.0)
 # NAME
 
-Aion::Format - Perl extension for formatting numbers, colorizing output and so on
+Aion::Format - расширение Perl для форматирования чисел, раскрашивания вывода и т.п.
 
 # VERSION
 
-0.0.10
+0.1.0
 
 # SYNOPSIS
 
@@ -14,19 +14,19 @@ use Aion::Format;
 
 trappout { print "123\n" } # => 123\n
 
-coloring "#red ~> #r\n" # => \e[31m ~> \e[0m\n
-trappout { printcolor "#red ~> #r\n" } # => \e[31m ~> \e[0m\n
+coloring "#red ↬ #r\n" # => \e[31m ↬ \e[0m\n
+trappout { printcolor "#red ↬ #r\n" } # => \e[31m ↬ \e[0m\n
 ```
 
 # DESCRIPTION
 
-A utilities for formatting numbers, colorizing output and so on.
+Утилиты для форматирования чисел, раскрашивания вывода и т.п.
 
 # SUBROUTINES
 
 ## coloring ($format, @params)
 
-Colorizes the text with escape sequences, and then replaces the format with sprintf. Color names using from module `Term::ANSIColor`. For `RESET` use `#r` or `#R`.
+Раскрашивает текст с помощью escape-последовательностей, а затем заменяет формат на `sprintf`. Названия цветов используются из модуля `Term::ANSIColor`. Для **RESET** используйте `#r` или `#R`.
 
 ```perl
 coloring "#{BOLD RED}###r %i", 6 # => \e[1;31m##\e[0m 6
@@ -34,11 +34,11 @@ coloring "#{BOLD RED}###r %i", 6 # => \e[1;31m##\e[0m 6
 
 ## printcolor ($format, @params)
 
-As `coloring`, but it print formatted string.
+Как `coloring`, но печатает отформатированную строку на стандартный вывод.
 
 ## warncolor ($format, @params)
 
-As `coloring`, but print formatted string to `STDERR`.
+Как `coloring`, но печатает отформатированную строку в `STDERR`.
 
 ```perl
 trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }  # => \e[32mACCESS\e[0m 6\n
@@ -46,7 +46,7 @@ trapperr { warncolor "#{green}ACCESS#r %i\n", 6 }  # => \e[32mACCESS\e[0m 6\n
 
 ## accesslog ($format, @params)
 
-It write in STDOUT `coloring` returns with prefix datetime.
+Пишет в STDOUT используя для форматирования функцию `coloring` и добавляет префикс с датой-временем.
 
 ```perl
 trappout { accesslog "#{green}ACCESS#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[32mACCESS\e\[0m 6\n
@@ -54,15 +54,39 @@ trappout { accesslog "#{green}ACCESS#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d
 
 ## errorlog ($format, @params)
 
-It write in STDERR `coloring` returns with prefix datetime.
+Пишет в **STDERR** используя для форматирования функцию `coloring` и добавляет префикс с датой-временем.
 
 ```perl
 trapperr { errorlog "#{red}ERROR#r %i\n", 6 }  # ~> \[\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\] \e\[31mERROR\e\[0m 6\n
 ```
 
+## p ($target; %properties)
+
+`p` из Data::Printer с предустановленными настройками.
+
+Вместо неудобного первого параметра используется просто скаляр.
+
+Необязательный параметр `%properties` позволяет перекрывать настройки. 
+
+```perl
+trapperr { p +{cat => 123} } # ~> cat.+123
+```
+
+## np ($target; %properties)
+
+`np` из Data::Printer с предустановленными настройками.
+
+Вместо неудобного первого параметра используется просто скаляр.
+
+Необязательный параметр `%properties` позволяет перекрывать настройки. 
+
+```perl
+np +{cat => 123} # ~> cat.+123
+```
+
 ## flesch_index_human ($flesch_index)
 
-Convert flesch index to russian label with step 10.
+Преобразует индекс Флеша в русскоязычную метку с помощью шага 10.
 
 ```perl
 flesch_index_human -10   # => несвязный русский текст
@@ -77,9 +101,9 @@ flesch_index_human 110   # => несвязный русский текст
 
 ## from_radix ($string, $radix)
 
-Parses a natural number in the specified number system. 64-number system used by default.
+Анализирует натуральное число в указанной системе счисления. По умолчанию используется 64-значная система.
 
-For digits using symbols 0-9, A-Z, a-z, _ and -. This symbols using before and for 64 NS. For digits after 64 using symbols from CP1251 encoding.
+Для цифр используются символы 0–9, A–Z, a–z, _ и –. Эти символы используются до и для 64 значной системы. Для цифр после 64 значной системы используются символы кодировки **CP1251**.
 
 ```perl
 from_radix "A-C" # -> 45004
@@ -90,7 +114,7 @@ eval { from_radix "A-C", 256 }; $@ 	# ~> The number system 256 is too large. Use
 
 ## to_radix ($number, $radix)
 
-Converts a natural number to a given number system. 64-number system used by default.
+Преобразует натуральное число в заданную систему счисления. По умолчанию используется 64-значная система.
 
 ```perl
 to_radix 10_000 				# => 2SG
@@ -101,7 +125,7 @@ eval { to_radix 0, 256 }; $@ 	# ~> The number system 256 is too large. Use NS be
 
 ## kb_size ($number)
 
-Adds number digits and adds a unit of measurement.
+Добавляет числовые цифры и добавляет единицу измерения.
 
 ```perl
 kb_size 102             # => 102b
@@ -111,9 +135,23 @@ kb_size 1024*1024       # => 1M
 kb_size 1000_002_000_001_000    # => 931\x{a0}324G
 ```
 
+## replace ($subject, @rules)
+
+Несколько преобразований текста за один проход.
+
+```perl
+my $s = replace "33*pi",
+    qr/(?<num> \d+)/x   => sub { "($+{num})" },
+    qr/\b pi \b/x       => sub { 3.14 },
+    qr/(?<op> \*)/x     => sub { " $& " },
+;
+
+$s # => (33) * 3.14
+```
+
 ## matches ($subject, @rules)
 
-Multiple text transformations in one pass.
+Синоним `replace`. **DEPRECATED**.
 
 ```perl
 my $s = matches "33*pi",
@@ -127,15 +165,17 @@ $s # => (33) * 3.14
 
 ## nous ($templates)
 
-A simplified regex language for text recognition in HTML documents.
+Упрощенный язык регулярных выражений для распознавания текста в документах HTML.
 
-1. All spaces from the beginning and end are removed. 
-2. From the beginning of each line, 4 spaces or 0-3 spaces and a tab are removed. 
-3. Spaces at the end of the line and whitespace lines are replaced with `\s*`. 4. All variables in `{{ var }}` are replaced with `.*?`. Those. recognize everything. 
-4. All variables in `{{> var }}` are replaced with `[^<>]*?`. Those. do not recognize html tags. 
-4. All variables in `{{: var }}` are replaced with `[^\n]*`. Those. must be on the same line. 
-5. Expressions in double square brackets (`[[ ... ]]`) may not exist. 
-5. Double parentheses (`(( ... ))`) are used as parentheses. 5. `||` - or.
+1. Убирает все пробелы в начале и конце.
+2. С начала каждой строки удаляются 4 пробела или 0-3 пробела и табуляция.
+3. Пробелы в конце строки и строки пробелов заменяются на `\s*`. 
+4. Все переменные в `{{ var }}` заменяются на `.*?`. Т.е. распознаётся всё.
+4. Все переменные в `{{> var }}` заменяются на `[^<>]*?`. Т.е. не распознаются html-теги.
+4. Все переменные в `{{: var }}` заменяются на `[^\n]*`. Т.е. должно быть на одной строке.
+5. Выражения в двойных квадратных скобках (`[[ ... ]]`) могут не существовать.
+5. В качестве круглых скобок используются двойные скобки (`(( ... ))`).
+5. `||` - или.
 
 ```perl
 my $re = nous [
@@ -184,25 +224,25 @@ $result # --> {author_link => "/to/book/link", author_name => "A. Alis", title =
 
 ## num ($number)
 
-Adds separators between digits of a number.
+Добавляет разделители между цифрами числа.
 
 ```perl
 num +0         # => 0
 num -1000.3    # => -1 000.3
 ```
 
-Separator by default is no-break space. Set separator and decimal point same as:
+Разделителем по умолчанию является неразрывный пробел. Установите разделитель и десятичную точку так же, как:
 
 ```perl
 num [1000, "#"]         		# => 1#000
 num [-1000.3003003, "_", ","]   # => -1_000,3003003
 ```
 
-See also `Number::Format`.
+См. также `Number::Format`.
 
 ## rim ($number)
 
-Translate positive integers to **roman numerals**.
+Переводит положительные целые числа в **римские цифры**.
 
 ```perl
 rim 0       # => N
@@ -213,7 +253,7 @@ rim 49      # => XLIX
 rim 505     # => DV
 ```
 
-**roman numerals** after 1000:
+**Римские цифры** после 1000:
 
 ```perl
 rim 49_000      # => XLIX M
@@ -221,21 +261,21 @@ rim 49_000_000  # => XLIX M M
 rim 49_009_555  # => XLIX IX DLV
 ```
 
-See also:
+См. также:
 
-* `Roman` is simple converter.
-* `Math::Roman` is another converter.
-* `Convert::Number::Roman` is OOP interface.
-* `Number::Convert::Roman` is another OOP interface.
-* `Text::Roman` convert standart and milhar roman numbers.
-* `Roman::Unicode` use digits ↁ (5 000), ↂ (1000), and so on.
-* `Acme::Roman` added support roman numerals in perl code (`I + II -> III`), but use `+`, `-` and `*` operations only.
-* `Date::Roman` is Perl OO extension for handling roman style dates, but with arabic numbers (id 3 702).
-* `DateTime::Format::Roman` is roman date formatter, but with arabic numbers (5 Kal Jun 2003).
+* [Roman](https://metacpan.org/pod/Roman) это простой конвертер.
+* [Math::Roman](https://metacpan.org/pod/Math::Roman) это еще один конвертер.
+* [Convert::Number::Roman](https://metacpan.org/pod/Convert::Number::Roman) имеет ООП-интерфейс.
+* [Number::Convert::Roman](https://metacpan.org/pod/Number::Convert::Roman) – еще один интерфейс ООП.
+* [Text::Roman](https://metacpan.org/pod/Text::Roman) конвертирует стандартные и милхарные римские числа.
+* [Roman::Unicode](https://metacpan.org/pod/Roman::Unicode) использует цифры ↁ (5 000), ↂ (1000) и так далее.
+* [Acme::Roman](https://metacpan.org/pod/Acme::Roman) добавляет поддержку римских цифр в коде Perl (`I + II -> III`), но использует только операции `+`, `-` и `*`.
+* [Date::Roman](https://metacpan.org/pod/Date::Roman) — это объектно-ориентированное расширение Perl для обработки дат в римском стиле, но с арабскими цифрами (id 3 702).
+* [DateTime::Format::Roman](https://metacpan.org/pod/DateTime::Format::Roman) – средство форматирования римских дат, но с арабскими цифрами (5 Kal Jun 2003).
 
 ## round ($number, $decimal)
 
-Rounds a number to the specified decimal place.
+Округляет число до указанного десятичного знака.
 
 ```perl
 round 1.234567, 2  # -> 1.23
@@ -244,9 +284,9 @@ round 1.235567, 2  # -> 1.24
 
 ## sinterval ($interval)
 
-Generates human-readable spacing.
+Создает человекочитаемый интервал.
 
-Width of result is 12 symbols.
+Ширина результата — 12 символов.
 
 ```perl
 sinterval  6666.6666 	# => 01:51:06.667
@@ -258,13 +298,15 @@ sinterval  .000_000_33 	# => 0.330000 mks
 
 ## sround ($number, $digits)
 
-Leaves `$digits` (0 does not count) wherever they are relative to the point.
+Оставляет `$digits` цифр после последнего нуля (сам 0 не учитывается).
 
-Default `$digits` is 2.
+По умолчанию `$digits` равен 2.
 
 ```perl
 sround 10.11        # -> 10
+sround 12.11        # -> 12
 sround 100.11       # -> 100
+sround 133.11       # -> 133
 sround 0.00012      # -> 0.00012
 sround 1.2345       # -> 1.2
 sround 1.2345, 3    # -> 1.23
@@ -272,7 +314,7 @@ sround 1.2345, 3    # -> 1.23
 
 ## trans ($s)
 
-Transliterates the russian text, leaving only Latin letters and dashes.
+Транслитерирует русский текст, оставляя только латинские буквы и тире.
 
 ```perl
 trans "Мир во всём Мире!"  # => mir-vo-vsjom-mire
@@ -280,7 +322,7 @@ trans "Мир во всём Мире!"  # => mir-vo-vsjom-mire
 
 ## transliterate ($s)
 
-Transliterates the russian text.
+Транслитерирует русский текст.
 
 ```perl
 transliterate "Мир во всём Мире!"  # => Mir vo vsjom Mire!
@@ -288,27 +330,27 @@ transliterate "Мир во всём Мире!"  # => Mir vo vsjom Mire!
 
 ## trapperr (&block)
 
-Trap for STDERR.
+Ловушка для **STDERR**.
 
 ```perl
-trapperr { print STDERR 123 }  # => 123
+trapperr { print STDERR "Stars: ✨" }  # => Stars: ✨
 ```
 
-See also `IO::Capture::Stderr`.
+См. также `IO::Capture::Stderr`.
 
 ## trappout (&block)
 
-Trap for STDOUT.
+Ловушка для **STDOUT**.
 
 ```perl
-trappout { print 123 }  # => 123
+trappout { print "Stars: ✨" }  # => Stars: ✨
 ```
 
-See also `IO::Capture::Stdout`.
+См. также `IO::Capture::Stdout`.
 
 ## TiB ()
 
-The constant is one tebibyte.
+Константа равна одному тебибайту.
 
 ```perl
 TiB  # -> 2**40
@@ -316,7 +358,7 @@ TiB  # -> 2**40
 
 ## GiB ()
 
-The constant is one gibibyte.
+Константа равна одному гибибайту.
 
 ```perl
 GiB  # -> 2**30
@@ -324,7 +366,7 @@ GiB  # -> 2**30
 
 ## MiB ()
 
-The constant is one mebibyte.
+Константа равна одному мебибайту.
 
 ```perl
 MiB  # -> 2**20
@@ -332,7 +374,7 @@ MiB  # -> 2**20
 
 ## KiB ()
 
-The constant is one kibibyte.
+Константа равна одному кибибайту.
 
 ```perl
 KiB  # -> 2**10
@@ -340,7 +382,7 @@ KiB  # -> 2**10
 
 ## xxL ()
 
-Maximum length in data LongText mysql and mariadb.
+Максимальная длина данных LongText mysql и mariadb.
 L - large.
 
 ```perl
@@ -349,7 +391,7 @@ xxL  # -> 4*GiB-1
 
 ## xxM ()
 
-Maximum length in data MediumText mysql and mariadb.
+Максимальная длина данных MediumText mysql и mariadb.
 M - medium.
 
 ```perl
@@ -358,7 +400,7 @@ xxM  # -> 16*MiB-1
 
 ## xxR ()
 
-Maximum length in data Text mysql and mariadb.
+Максимальная длина текста данных mysql и mariadb.
 R - regularity.
 
 ```perl
@@ -367,7 +409,7 @@ xxR  # -> 64*KiB-1
 
 ## xxS ()
 
-Maximum length in data TinyText mysql and mariadb.
+Максимальная длина данных TinyText mysql и mariadb.
 S - small.
 
 ```perl
@@ -376,7 +418,7 @@ xxS  # -> 255
 
 ## to_str (;$scalar)
 
-Converts to string perl without interpolation.
+Преобразование в строку Perl без интерполяции.
 
 ```perl
 to_str "a'\n" # => 'a\\'\n'
@@ -385,7 +427,7 @@ to_str "a'\n" # => 'a\\'\n'
 
 ## from_str (;$one_quote_str)
 
-Converts from string perl without interpolation.
+Преобразование из строки Perl без интерполяции.
 
 ```perl
 from_str "'a\\'\n'"  # => a'\n

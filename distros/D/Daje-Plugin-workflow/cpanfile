@@ -1,4 +1,4 @@
-requires 'perl', '5.040000';
+requires 'perl', '5.042000';
 requires 'Daje::Workflow::Database', '0';
 requires 'Daje::Workflow::Loader', '0';
 requires 'Mojo::Base', '0';

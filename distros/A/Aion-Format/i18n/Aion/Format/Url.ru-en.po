@@ -1,0 +1,54 @@
+msgid "Aion::Format::Url - утилиты для кодирования и декодирования URL-адресов"
+msgstr "Aion::Format::Url - utilities for encoding and decoding URLs"
+
+msgid "Утилиты для кодирования и декодирования URL-адресов."
+msgstr "Utilities for encoding and decoding URLs."
+
+msgid "Экранирует `$scalar` для части поиска URL."
+msgstr "Escapes `$scalar` for the search part of the URL."
+
+msgid "Генерирует поисковую часть URL-адреса."
+msgstr "Generates the search portion of the URL."
+
+msgid ""
+"1. Ключи со значениями `undef` отбрасываются.\n"
+"1. Значение `1` используется для ключа без значения.\n"
+"1. Ключи преобразуются в алфавитном порядке."
+msgstr ""
+"1. Keys with `undef` values are discarded.\n"
+"1. The value `1` is used for a key without a value.\n"
+"1. Keys are converted in alphabetical order."
+
+msgid "Парсит поисковую часть URL-адреса."
+msgstr "Parses the search part of the URL."
+
+msgid "Используется для парсинга ключей и значений в параметре URL."
+msgstr "Used to parse keys and values in a URL parameter."
+
+msgid "Обратный к `to_url_param`."
+msgstr "Reverse to `to_url_param`."
+
+msgid "Парсит и нормализует URL."
+msgstr "Parses and normalizes URLs."
+
+msgid ""
+"* `$url` — URL-адрес или его часть для парсинга.\n"
+"* `$onpage` — URL-адрес страницы с `$url`. Если `$url` не завершен, то он дополняется отсюда. Необязательный. По умолчанию использует конфигурацию `$onpage = 'off://off'`.\n"
+"* `$dir` (bool): 1 — нормализовать URL-путь с \"/\" на конце, если это каталог. 0 — без «/»."
+msgstr ""
+"* `$url` - URL or part of it to be parsed.\n"
+"* `$onpage` is the URL of the page with `$url`. If `$url` is not complete, then it is completed from here. Optional. By default it uses the `$onpage = 'off://off'` configuration.\n"
+"* `$dir` (bool): 1 - normalize the URL path with a \"/\" at the end if it is a directory. 0 - without \"/\"."
+
+msgid "Нормализует URL."
+msgstr "Normalizes the URL."
+
+msgid "Использует `parse_url` и возвращает ссылку."
+msgstr "Uses `parse_url` and returns a link."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Format::Url module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Format::Url module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

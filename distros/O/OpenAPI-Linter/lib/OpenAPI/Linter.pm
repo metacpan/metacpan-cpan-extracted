@@ -1,6 +1,6 @@
 package OpenAPI::Linter;
 
-$OpenAPI::Linter::VERSION   = '0.14';
+$OpenAPI::Linter::VERSION   = '0.15';
 $OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ OpenAPI::Linter - Validate and lint OpenAPI specifications
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 
@@ -331,7 +331,99 @@ Validates the C<OpenAPI> specification against the official C<JSON> Schema for t
 C<OpenAPI> version. Returns a list of validation errors in list context or an array
 reference in scalar context.
 
-This method uses L<JSON::Validator> to perform schema validation.
+This method uses L<JSON::Validator> to perform schema validation. It applies filtering
+to address validation discrepancies where valid OpenAPI specifications (per the OpenAPI
+Specification text) are incorrectly flagged as invalid.
+
+=head3 Validation Discrepancies
+
+When validating against the published schemas, L<JSON::Validator> produces errors for
+constructs that are explicitly valid according to the OpenAPI Specification v3.0.3.
+
+B<Example:> This valid parameter definition:
+
+    parameters:
+      - name: id
+        in: path        # Valid per OpenAPI Spec
+        required: true  # Valid boolean per OpenAPI Spec
+        schema:
+          type: string
+
+Produces these validation errors:
+
+    /in: Not in enum list: query, header, cookie
+    /required: Not in enum list: true
+    /$ref: Missing property
+
+B<The OpenAPI Specification states:>
+
+"C<in> (string, REQUIRED): The location of the parameter. Possible values are
+C<query>, C<header>, C<path> or C<cookie>."
+
+Reference: L<https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#parameter-object>
+
+Despite C<path> being explicitly listed as valid, validation fails.
+
+=head3 Filtering Approach
+
+To ensure valid OpenAPI specifications validate correctly, this method filters errors by:
+
+=over 4
+
+=item 1. Identifying error patterns matching known discrepancies
+
+=item 2. Extracting the actual value from the specification
+
+=item 3. Checking if the value is valid per the OpenAPI Specification text
+
+=item 4. Removing the error only if the value is explicitly documented as valid
+
+=back
+
+B<Important:> Invalid values still generate errors. For example, C<in: invalid_location>
+will correctly produce a validation error.
+
+=head3 Filtered Patterns
+
+=over 4
+
+=item * B<Parameter 'in' field>
+
+Error pattern: C</in: Not in enum list>
+
+Filtered when: actual value is C<'path'> (valid per L<https://spec.openapis.org/oas/v3.0.3.html#fixed-fields-9>)
+
+=item * B<Parameter 'required' field>
+
+Error pattern: C</required: Not in enum list>
+
+Filtered when: actual value is a boolean (true, false, 1, 0)
+
+=item * B<Inline parameter definitions>
+
+Error pattern: C</$ref: Missing property>
+
+Filtered when: parameter has both C<name> and C<in> fields (valid inline definition)
+
+=back
+
+=head3 Root Cause
+
+The exact cause of these discrepancies is unclear and could involve:
+
+=over 4
+
+=item * Issues in the published JSON Schema files
+
+=item * L<JSON::Validator>'s interpretation of those schemas
+
+=item * Interactions between validator and schema
+
+=back
+
+This method takes a pragmatic approach: it defers to the authoritative OpenAPI
+Specification text when determining validity, ensuring users get accurate validation
+results for their specifications.
 
 =cut
 
@@ -375,53 +467,43 @@ sub validate_schema {
         }
     }
 
-    # Apply the fix before validation
+    # Apply the JSON::Validator format fix
     _apply_json_validator_fix();
 
+    # Set user agent timeout for schema download (default is 20s, increase to 30s)
+    eval {
+        if ($validator->can('ua')) {
+            $validator->ua->connect_timeout(30);
+            $validator->ua->request_timeout(30);
+        }
+    };
+
     # Only coerce booleans to handle true/false properly
-    # Do NOT coerce numbers or strings as that would hide legitimate type errors
     $validator->coerce('booleans');
 
-    my @raw_errors = $validator->schema($schema_url)->validate($self->{spec});
+    my @raw_errors;
+    eval {
+        @raw_errors = $validator->schema($schema_url)->validate($self->{spec});
+    };
+
+    if ($@) {
+        # If schema download fails, provide a helpful error message
+        if ($@ =~ /timeout|connect/i) {
+            die "ERROR: Failed to download OpenAPI schema from $schema_url\n" .
+                "This usually indicates a network connectivity issue.\n" .
+                "The schema will be cached after the first successful download.\n" .
+                "Error: $@";
+        }
+        die $@;  # Re-throw other errors
+    }
 
     # JSON::Validator returns 0 (a plain scalar) for success
-    # Error objects are blessed references
-    # Only filter out if we have a single non-reference item
     if (@raw_errors == 1 && !ref($raw_errors[0])) {
-        # It's a scalar success indicator, not an error object
         @raw_errors = ();
     }
 
-    @raw_errors = grep {
-        my $keep = 1;  # Default to keeping the error
-        my $error_str;
-        eval {
-            $error_str = ref $_ ? ($_->can('to_string') ? $_->to_string : "$_") : "$_";
-        };
-        if ($@) {
-            $keep = 1;  # Keep errors we can't stringify
-        }
-        else {
-            # Skip errors about 'path' not being in enum for parameter 'in' field
-            # as 'path' is a valid value per OpenAPI 3.0 spec
-            # These errors appear as "/in: ... Not in enum list: query/header/cookie"
-            # when the actual value is 'path' which is missing from the enum
-            if ($error_str =~ m{/in:.*Not in enum list}i) {
-                $keep = 0;
-            }
-            # Skip errors about boolean true not being in enum for 'required' field
-            # as true is a valid boolean value per OpenAPI 3.0 spec
-            elsif ($error_str =~ m{/required:.*Not in enum list}i && $error_str =~ m{true}i) {
-                $keep = 0;
-            }
-            # Skip errors about missing $ref when the object is properly defined
-            elsif ($error_str =~ m{/parameters/.*\$ref:.*Missing property}i) {
-                $keep = 0;
-            }
-        }
-
-        $keep;  # Return the decision
-    } @raw_errors;
+    # Filter known false positives
+    @raw_errors = $self->_filter_known_false_positives(@raw_errors);
 
     # Convert to consistent hashref format with location information
     my @issues = map {
@@ -429,7 +511,6 @@ sub validate_schema {
         my $path = '';
 
         if (ref $_) {
-            # Extract message
             if ($_->can('to_string')) {
                 $message = $_->to_string;
             } elsif (exists $_->{message}) {
@@ -440,7 +521,6 @@ sub validate_schema {
                 $message = "$_";
             }
 
-            # Extract path for location
             if ($_->can('path') && $_->path) {
                 $path = $_->path;
             } elsif (exists $_->{path} && $_->{path}) {
@@ -471,6 +551,202 @@ sub validate_schema {
     } @raw_errors;
 
     return wantarray ? @issues : \@issues;
+}
+
+=head2 _filter_known_false_positives
+
+    @filtered = $self->_filter_known_false_positives(@errors);
+
+Internal method that filters out false positive errors. This method validates that
+errors are truly false positives by checking the actual spec values before filtering.
+
+This is a targeted approach that only removes errors when the actual value in the
+spec is valid per the OpenAPI specification
+
+All other errors, including similar-looking errors with invalid values, are preserved.
+
+The key insight is that JSON::Validator reports the path to the FIELD with the error
+(e.g., /paths/~1test/get/parameters/0/in), so we need to navigate to the parent object
+and check the actual value of that field.
+
+=cut
+
+sub _filter_known_false_positives {
+    my ($self, @errors) = @_;
+    my $spec = $self->{spec};
+
+    my @filtered;
+
+    foreach my $error (@errors) {
+        my $keep = 1;
+        my $error_str = '';
+        my $error_path = '';
+
+        # Extract error details safely
+        eval {
+            if (ref $error) {
+                $error_str = $error->can('to_string') ? $error->to_string : "$error";
+                $error_path = $error->can('path') ? $error->path : '';
+            } else {
+                $error_str = "$error";
+            }
+        };
+
+        if ($@) {
+            # If we can't parse the error, keep it to be safe
+            push @filtered, $error;
+            next;
+        }
+
+        # Bug 1: Missing 'path' in parameter 'in' enum
+        # The schema's enum for 'in' is missing 'path', but 'path' is valid per OpenAPI spec
+        # Error path points to the 'in' field: /paths/~1{id}/parameters/0/in
+        # We need to get the parent parameter object and check if 'in' == 'path'
+        if ($error_str =~ m{/in:.*Not in enum list}i) {
+            # Get the parent path (parameter object) by removing '/in' suffix
+            my $param_path = $error_path;
+            $param_path =~ s{/in$}{};
+
+            # Extract the parameter object
+            my $param = $self->_extract_value_from_path($param_path, undef);
+            my $actual_value = ref($param) eq 'HASH' ? $param->{in} : undef;
+
+            # Only filter if the value is actually 'path' (valid but missing from schema enum)
+            # Keep the error for truly invalid values like 'invalid_location'
+            if (defined $actual_value && $actual_value eq 'path') {
+                $keep = 0;
+            }
+        }
+        # Bug 2: Boolean 'required' incorrectly validated as enum
+        # The 'required' field should be boolean, but schema sometimes treats it as enum
+        # Error path points to the 'required' field: /paths/~1test/get/parameters/0/required
+        elsif ($error_str =~ m{/required:.*Not in enum list}i) {
+            # Get the parent path (parameter object) by removing '/required' suffix
+            my $param_path = $error_path;
+            $param_path =~ s{/required$}{};
+
+            # Extract the parameter object
+            my $param = $self->_extract_value_from_path($param_path, undef);
+            my $actual_value = ref($param) eq 'HASH' ? $param->{required} : undef;
+
+            # Check if it's a valid boolean value (true, false, 1, 0, JSON::PP::Boolean)
+            if (defined $actual_value && $self->_is_valid_boolean($actual_value)) {
+                $keep = 0;
+            }
+        }
+        # Bug 3: Missing $ref for inline parameters
+        # Schema incorrectly requires $ref even for fully-defined inline parameters
+        # Only filter if parameter has both 'name' and 'in' (making $ref unnecessary)
+        elsif ($error_str =~ m{/parameters/.*\$ref:.*Missing property}i) {
+            my $param = $self->_extract_parameter_from_path($error_path);
+            # Only filter if parameter is properly defined inline (has name and in)
+            if ($param && $param->{name} && $param->{in}) {
+                $keep = 0;
+            }
+        }
+
+        push @filtered, $error if $keep;
+    }
+
+    return @filtered;
+}
+
+=head2 _extract_value_from_path
+
+Internal helper to extract actual value from spec using JSON pointer path.
+
+This method handles JSON Pointer syntax (RFC 6901) with proper decoding of escape sequences.
+It also handles a quirk where JSON::Validator sometimes produces ~001 instead of ~1 in
+error paths (observed with $ref-related errors).
+
+=cut
+
+sub _extract_value_from_path {
+    my ($self, $json_pointer, $field) = @_;
+
+    return unless $json_pointer;
+
+    # Convert JSON pointer to data structure path
+    my @parts = split m{/}, $json_pointer;
+    shift @parts if @parts && $parts[0] eq '';  # Remove leading empty part
+
+    my $current = $self->{spec};
+
+    # Navigate to the location
+    foreach my $part (@parts) {
+        # Decode JSON pointer escapes
+        # CRITICAL: Handle ~001 quirk from JSON::Validator before standard decoding
+        $part =~ s/~001/~1/g;  # Normalize ~001 to ~1
+        $part =~ s/~1/\//g;    # Decode ~1 to /
+        $part =~ s/~0/~/g;     # Decode ~0 to ~
+
+        if (ref $current eq 'HASH') {
+            $current = $current->{$part};
+        } elsif (ref $current eq 'ARRAY') {
+            $current = $current->[$part] if $part =~ /^\d+$/;
+        } else {
+            return undef;
+        }
+
+        return undef unless defined $current;
+    }
+
+    # Extract the specific field if we're at an object
+    if (defined $field) {
+        if (ref $current eq 'HASH') {
+            return $current->{$field};
+        }
+        return undef;
+    }
+
+    return $current;
+}
+
+=head2 _extract_parameter_from_path
+
+Internal helper to extract parameter object from spec using JSON pointer path.
+
+=cut
+
+sub _extract_parameter_from_path {
+    my ($self, $json_pointer) = @_;
+
+    return unless $json_pointer;
+
+    # Get the parent path (remove the $ref part)
+    my $param_path = $json_pointer;
+    $param_path =~ s{/\$ref$}{};
+
+    return $self->_extract_value_from_path($param_path, undef);
+}
+
+=head2 _is_valid_boolean
+
+Internal helper to check if a value is a valid boolean.
+
+=cut
+
+sub _is_valid_boolean {
+    my ($self, $value) = @_;
+
+    return 0 unless defined $value;
+
+    # Check for JSON::PP::Boolean objects (after coercion)
+    if (ref $value) {
+        return 1 if ref($value) =~ /Boolean/i;
+    }
+
+    # Check for numeric 0 or 1 (common after coercion)
+    if (!ref($value) && $value =~ /^[01]$/) {
+        return 1;
+    }
+
+    # Check for string 'true' or 'false'
+    if (!ref($value) && $value =~ /^(true|false)$/i) {
+        return 1;
+    }
+
+    return 0;
 }
 
 sub format_schema_error {

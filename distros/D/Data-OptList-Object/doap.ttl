@@ -1,0 +1,107 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
+		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Plugin::BailOnFail"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <https://github.com/tobyink/p5-data-optlist-object/issues>;
+	doap:created         "2025-11-28"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Data-OptList-Object>;
+	doap:homepage        <https://metacpan.org/release/Data-OptList-Object>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Data-OptList-Object";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-data-optlist-object>;
+	];
+	doap:shortdesc       "Data::OptList, but object-oriented".
+
+<http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001000>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Data-OptList-Object-0.001000"^^xsd:string;
+	dc:issued            "2025-11-29"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-OptList-Object-0.001000.tar.gz>;
+	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001001>
+	a                    doap:Version;
+	rdfs:label           "Oops";
+	dc:identifier        "Data-OptList-Object-0.001001"^^xsd:string;
+	dc:issued            "2025-11-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Remembered to list dependencies in metadata.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fixed changelog dates.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Give the helper packages $VERSION, etc.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-OptList-Object-0.001001.tar.gz>;
+	doap:revision        "0.001001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001002>
+	a                    doap:Version;
+	rdfs:label           "Oops, I did it again";
+	dc:identifier        "Data-OptList-Object-0.001002"^^xsd:string;
+	dc:issued            "2025-11-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fixed changelog.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-OptList-Object-0.001002.tar.gz>;
+	doap:revision        "0.001002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-OptList-Object/v_0-001003>
+	a                    doap:Version;
+	dc:identifier        "Data-OptList-Object-0.001003"^^xsd:string;
+	dc:issued            "2025-11-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require newer List::Util.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-OptList-Object-0.001003.tar.gz>;
+	doap:revision        "0.001003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

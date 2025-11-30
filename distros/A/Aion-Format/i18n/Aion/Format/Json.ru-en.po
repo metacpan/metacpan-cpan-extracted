@@ -1,0 +1,29 @@
+msgid "Aion::Format::Json - расширение Perl для форматирования JSON"
+msgstr "Aion::Format::Json - Perl extension for JSON formatting"
+
+msgid "`Aion::Format::Json` использует в качестве основы `JSON::XS`. И включает следующие настройки:"
+msgstr "`Aion::Format::Json` uses `JSON::XS` as a base. And includes the following settings:"
+
+msgid ""
+"* allow_nonref — скаляры кодирования и декодирования.\n"
+"* indent – включить многострочный текст с отступом в начале строки.\n"
+"* space_after — `\\n` после json.\n"
+"* canonical — сортировка ключей в хешах."
+msgstr ""
+"* allow_nonref - encoding and decoding scalars.\n"
+"* indent – enable multiline text with indentation at the beginning of the line.\n"
+"* space_after — `\\n` after json.\n"
+"* canonical - sorting keys in hashes."
+
+msgid "Переводит данные в формат json."
+msgstr "Converts data to json format."
+
+msgid "Разбирает строку в формате JSON в структуру Perl."
+msgstr "Parses a JSON string into a Perl structure."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Format::Json module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Format::Json module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

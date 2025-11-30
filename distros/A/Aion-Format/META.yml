@@ -1,13 +1,24 @@
 ---
-abstract: 'Perl extension for formatting numbers, colorizing output and so on'
+abstract: 'a Perl extension for formatting numbers, coloring output, etc.'
 author:
   - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
 build_requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  String::Diff: '0'
   Test::More: '0.98'
+  open: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,30 +37,39 @@ no_index:
 provides:
   Aion::Format:
     file: lib/Aion/Format.pm
-    version: v0.0.10
+    version: v0.1.0
   Aion::Format::Html:
     file: lib/Aion/Format/Html.pm
   Aion::Format::Json:
     file: lib/Aion/Format/Json.pm
   Aion::Format::Url:
     file: lib/Aion/Format/Url.pm
+  Aion::Format::Yaml:
+    file: lib/Aion/Format/Yaml.pm
 requires:
-  Data::Printer: '0'
-  JSON::XS: '4.03'
+  DDP: '0'
+  Devel::Size: '0'
+  Encode: '0'
+  Exporter: '0'
+  JSON::XS: '0'
   List::Util: '0'
   POSIX: '0'
   Term::ANSIColor: '0'
+  YAML::Syck: '0'
+  bigint: '0'
+  bytes: '0'
   common::sense: '0'
-  config: '1.3'
+  config: '0'
+  constant: '0'
   perl: v5.22.0
 resources:
   bugtracker: https://github.com/darviarush/perl-aion-format/issues
   homepage: https://github.com/darviarush/perl-aion-format
   repository: https://github.com/darviarush/perl-aion-format.git
-version: 0.0.10
+version: 0.1.0
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'
   - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 0

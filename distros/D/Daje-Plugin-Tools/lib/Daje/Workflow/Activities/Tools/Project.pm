@@ -1,4 +1,4 @@
-package Daje::Workflow::Activity::Tools::Project;
+package Daje::Workflow::Activities::Tools::Project;
 use Mojo::Base 'Daje::Workflow::Common::Activity::Base', -base, -signatures;
 use v5.42;
 
@@ -48,7 +48,7 @@ sub new_project ($self) {
             db => $self->db
         )->insert($data);
 
-        my $connection->{connector} = $self->context->{context}->{workflow}->{connector};
+        my $connection->{connector} = $self->context->{context}->{workflow}->{connector_data}->{connector};
         $connection->{workflow_fkey} = $self->model->workflow_pkey();
         $connection->{connector_fkey} = $tools_projects_pkey->{data}->{tools_projects_pkey};
         $self->model->insert_connector($connection);

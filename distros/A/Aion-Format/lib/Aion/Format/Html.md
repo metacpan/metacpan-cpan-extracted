@@ -1,25 +1,26 @@
+!ru:en
 # NAME
 
-Aion::Format::Html - Perl extension for formatting HTML
+Aion::Format::Html - библиотека для форматирования HTML
 
 # SYNOPSIS
 
 ```perl
 use Aion::Format::Html;
 
-from_html "<b>&excl;</b>"  # => !
-to_html "<a>"       # => &lt;a&gt;
+from_html "<b>&excl;</b>" # => !
+to_html "<a>"             # => &lt;a&gt;
 ```
 
 # DESCRIPION
 
-Perl extension for formatting HTML-documents.
+Библиотека для форматирования HTML-документов.
 
 # SUBROUTINES
 
 ## from_html ($html)
 
-Converts html to text.
+Преобразует HTML в текст.
 
 ```perl
 from_html "Basic is <b>superlanguage</b>!<br>"  # => Basic is superlanguage!\n
@@ -27,11 +28,11 @@ from_html "Basic is <b>superlanguage</b>!<br>"  # => Basic is superlanguage!\n
 
 ## to_html ($html)
 
-Escapes html characters.
+Экранирует символы HTML.
 
 ## safe_html ($html)
 
-Cuts off dangerous and unknown tags from html, and unknown attributes from known tags.
+Обрезает опасные и неизвестные теги HTML, а также неизвестные атрибуты из известных тегов.
 
 ```perl
 safe_html "-<em>-</em><br>-" # => -<em>-</em><br>-
@@ -42,7 +43,7 @@ safe_html "-< applet >-</ applet >" # => -< applet >-
 
 ## split_on_pages ($html, $symbols_on_page, $by)
 
-Breaks text into pages taking into account html tags.
+Разбивает текст на страницы с учетом html-тегов.
 
 ```perl
 [split_on_pages "Alice in wonderland. This is book", 17]  # --> ["Alice in wonderland. ", "This is book"]
@@ -50,7 +51,7 @@ Breaks text into pages taking into account html tags.
 
 # AUTHOR
 
-Yaroslav O. Kosmina [darviarush@mail.ru](mailto:darviarush@mail.ru)
+Yaroslav O. Kosmina <darviarush@mail.ru>
 
 # LICENSE
 

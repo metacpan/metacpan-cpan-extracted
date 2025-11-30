@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 184fd2cb5b493298bdafb98c7eecfaa61ffd4951762eb71d4bf0efdce783fd0a COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 a2a849d9679e9da53f1875f974b063bf3ce834600d21f5cafba7fe733fb85d32 Changes
+SHA256 bb006bf8b977903f1080b5418d3bce5f1d835b2e62b8baa9ef82aa5151746b18 INSTALL
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
+SHA256 d21dc48ff5eee4427175e557b319a931c044b72d88e86fda86d657e2d3d8bc59 MANIFEST
+SHA256 e6c9c2eb0efba88571fbecde1632c380ccea8f4bdda4335c66631c8f27e48d9d META.json
+SHA256 bc3b07ceedbd09d168f7556939028cefe1e304aa1b28e013356fee9feed7b26a META.yml
+SHA256 4917da6330a7529026dc352fd2b5b2fc63083c029008c03ba176f2cbf3da537d Makefile.PL
+SHA256 a77b30271eea4609cd4656aa76c04e9a403ab4feba5d4be6ac0bf01dde04d101 README
+SHA256 f2e08cc673e66189b0f6966f5492614e193bb97787cce2193a9814aa29a8cb97 dist.ini
+SHA256 9d49f7bc4836685cfe1963b45891dee46e6684a7a46c2966d66f7054d60da786 doap.ttl
+SHA256 80d3ec234ca4e3f420f5ec97c457a609707e5efe7f7faec5017f61b8558c91ad lib/Data/OptList/Object.pm
+SHA256 701f089a26374eeb414842abb01ac33f903e103b9daa5eb2327cf7208c1e5231 t/00start.t
+SHA256 299954c5b7896a5769f708418a3b9d25dad83f3841bdab6fe39bf368064d819d t/01basic.t
+SHA256 d14c9e4a9228401d73b1c3b0a2d32d67418e4254e1b6dfea87ef34481fd0acbb t/integration/simple.t
+SHA256 7433a2247f3d85dcdf5d068d3f797ffd2f395ab5a268d9d79c41a779c5bf36a7 t/unit/Data/OptList/Object.t
+SHA256 df6b5c73f2c6446fadf67464043483b6bc133e53007025a1825e7eb3014915c1 t/unit/Data/OptList/Object/_NoValue.t
+SHA256 c152a0e1c8cc9adcc0c349afb22e3bfa67f5da97081c868940732cfe86ef5d2c t/unit/Data/OptList/Object/_Pair.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaStj/wAKCRDOv4Eoaip9
+OdwYAJ9ATXSRynozaZe+Kfr0mYtA4FiRRQCgsNaVDSUtZoo08TK0OmetKU7zW9c=
+=hdBJ
+-----END PGP SIGNATURE-----

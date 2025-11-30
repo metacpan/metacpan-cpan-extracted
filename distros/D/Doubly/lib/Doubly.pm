@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Doubly', $VERSION);
@@ -19,7 +19,7 @@ Doubly - Doubly linked lists
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 

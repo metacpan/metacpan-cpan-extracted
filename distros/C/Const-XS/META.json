@@ -4,13 +4,13 @@
       "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Const-XS",
    "no_index" : {
@@ -32,18 +32,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Import::Export" : "1.00",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Import::Export" : "1.00",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
