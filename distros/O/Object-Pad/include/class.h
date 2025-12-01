@@ -22,6 +22,7 @@ struct ClassMeta {
   unsigned int composed_adjust : 1; /* all ADJUST blocks are true blocks, composed into initfields */
   unsigned int has_superclass : 1;
   unsigned int has_buildargs : 1;
+  unsigned int lexical_new : 1;
 
   FIELDOFFSET start_fieldix; /* first field index of this partial within its instance */
   FIELDOFFSET next_fieldix;  /* 1 + final field index of this partial within its instance; includes fields in roles */
@@ -33,6 +34,7 @@ struct ClassMeta {
 
   SV *name;
   HV *stash;
+  CV *constructor;     /* CV that implements &new constructor */
   AV *isa;             /* cached pointer to the @ISA array for the stash */
   AV *pending_submeta; /* NULL, or AV containing raw ClassMeta pointers to subclasses pending seal */
   AV *hooks;           /* NULL, or AV of raw pointers directly to ClassHook structs */

@@ -69,6 +69,7 @@ t/32threads.t
 t/33class-anon.t
 t/34class-abstract.t
 t/35my-class.t
+t/36lexical-new.t
 t/40role.t
 t/41role-repr.t
 t/42role-BUILD.t

@@ -5,26 +5,27 @@ class Mojolicious::Renderer {
   version_from Mojolicious;
   
   use Mojo::File;
-  use JSON;
   use Mojo::Util;
-  use Mojo::Loader;
   use Mojo::Template;
+  use Mojolicious::Renderer::Callback;
+  
+  use Sys;
+  use JSON;
   
   # Fields
-  has compress : rw byte;
+  has paths : rw string[];
   
-  has default_format : rw string;
+  has handlers : rw Hash of Mojolicious::Renderer::Callback;
   
   has default_handler : rw string;
   
-  has handlers : rw Hash of Mojo::Callback;
+  has default_format : rw string;
+  
+  has data_templates : rw string;
+  
+  has compress : rw byte;
   
   has min_compress_size : rw int;
-  
-  has paths : rw string[];
-  
-  # Undocumented Fields
-  has templates : Hash of string[];
   
   # Class Methods
   static method new : Mojolicious::Renderer () {
@@ -43,7 +44,10 @@ class Mojolicious::Renderer {
     
     $self->{paths} = new string[0];
     
-    $self->{templates} = Hash->new;
+    $self->add_handler("ep" => method : void ($renderer : Mojolicious::Renderer, $c : Mojolicious::Controller, $output_ref : string[]) {
+      
+      $renderer->_render_ep($c, $output_ref);
+    });
     
     return $self;
   }
@@ -83,191 +87,246 @@ class Mojolicious::Renderer {
     $self->{handlers}->set($name, $cb);
   }
   
-  method get_data_template : string ($options : object[], $data : string = undef) {
+  private method get_data_template : string ($options : object[]) {
     
-    my $template = $self->template_name($options);
+    my $template_name = $self->template_name($options);
     
-    unless ($template) {
+    unless ($template_name) {
       return undef;
     }
     
-    return Mojo::Util->get_data_template($data, $template);
+    # Split files
+    my $files = StringList->new(Re->split(["^@@\s*(.+?)\s*\r?\n", "m"], $self->data_templates));
+    if (@$files) {
+      $files->shift;
+    }
+    
+    # Find data
+    my $template = (string)undef;
+    while (1) {
+      
+      unless (@$files) {
+        last;
+      }
+     
+      my $_ = $files->splice(0, 2);
+      my $name = $_->[0];
+      my $data = $_->[1];
+      
+      if (Re->s((mutable string)$name, "\s*\(\s*base64\s*\)$", "")) {
+        $data = Mojo::Util->b64_decode($data);
+      }
+      
+      if ($name eq $template_name) {
+        $template = $data;
+        last;
+      }
+    }
+    
+    return $template;
   }
   
   method template_name : string ($options : Hash|object[]) {
     
-    my $options_h = Fn->to_hash($options);
+    my $options = Fn->to_hash($options);
     
-    my $template = $options_h->{"template"}->(string);
+    my $template = $options->{"template"}->(string);
     unless ($template) {
       return undef;
     }
     
-    my $format = $options_h->{"format"}->(string);
+    my $format = $options->{"format"}->(string);
     unless ($format) {
       return undef;
     }
     
     $template .= ".$format";
     
-    # Variants
-    my $handler = $options_h->{"handler"}->(string);
+    my $handler = $options->{"handler"}->(string);
     
     return $handler ? "$template.$handler" : $template;
   }
   
-  method render : string[] ($c : Mojolicious::Controller) {
+  method render : string[] ($c : Mojolicious::Controller, $options : Hash|object[] = undef) {
     
-    my $stash   = $c->stash;
-    my $options_h = Hash->new({
-      handler  => $stash->{"handler"}->(string),
-      template => (string)$stash->delete("template"),
+    my $options = Fn->to_hash($options);
+    
+    # Localize stash
+    my $stash = $c->stash_h;
+    my $stash_save = $stash->clone;
+    Fn->defer([$c : Mojolicious::Controller, $stash_save : Hash] method : void () {
+      $c->set_stash_h($stash_save);
     });
     
-    my $inline = (string)$stash->delete("inline");
-    $options_h->set(inline => $inline);
-    
-    if ($inline) {
-      if ($options_h->get("handler")) {
-        $options_h->set("handler", $self->default_handler);
-      }
+    # All other arguments just become part of the stash
+    for my $name (@{$options->keys}) {
+      $stash->{$name} = $options->{$name};
     }
     
-    $options_h->set(format => $stash->{"format"}->(string) // $self->default_format);
+    my $format = $stash->{"format"}->(string) // $self->default_format;
+    $stash->{"format"} = $format;
     
     # Data
-    if ($stash->get("data")) {
-      return [(string)$stash->delete("data"), $options_h->{"format"}->(string)];
+    if ($stash->{"data"}) {
+      return [$stash->{"data"}->(string), $format];
     }
     
     # Text
-    if ($stash->get("text")) {
-      return [(string)$stash->delete("text"), $options_h->{"format"}->(string)];
+    elsif ($stash->{"text"}) {
+      return [$stash->{"text"}->(string), $format];
     }
     
     # JSON
-    if ($stash->get("json")) {
-      return [JSON->new->encode($stash->get("json")), "json"];
+    elsif ($stash->{"json"}) {
+      return [JSON->new->encode($stash->{"json"}), "json"];
     }
     
-    my $output = (string)undef;
-    my $success = $self->_render_template($c, my $_ = [$output], $options_h);
-    unless ($success) {
-      return undef;
-    }
-    $output = $_->[0];
-    
-=pod TODO
-
-    # Inheritance
-    my $content = $stash->{'mojo.content'} //= {};
-    local $content->{content} = $output =~ /\S/ ? $output : undef if $stash->{extends} || $stash->{layout};
-    while ((my $next = _next($stash)) && !defined $inline) {
-      @$options_h{qw(handler template)} = ($stash->{handler}, $next);
-      $options_h->{format} = $stash->{format} || $self->default_format;
-      if ($self->_render_template($c, \my $tmp, $options_h)) { $output = $tmp }
-      $content->{content} //= $output if $output =~ /\S/;
-    }
-
-=cut
-    
-    if ($stash->{"mojo.string"}->(int)) {
-      return [$output, undef];
-    }
-    
-    return [$output, $options_h->{"format"}->(string)];
-    
-  }
-
-  private method _render_template : int ($c : Mojolicious::Controller, $output_ref : string[], $options_h : Hash) {
-    
-    my $handler = $self->template_handler($options_h);
-    
-    unless ($options_h->get("handler")) {
-      $options_h->set("handler", $handler);
-    }
-    
-    unless ($handler) {
-      return 0;
-    }
+    # Template
+    my $template = $stash->{"template"}->(string);
+    my $handler = $stash->{"handler"}->(string) // $self->default_handler;
+    $stash->{"handler"} = $handler;
     
     my $renderer = $self->handlers->get($handler);
     
     unless ($renderer) {
-      $c->log->error("No handler for '$handler' found.");
-      return 0;
+      die "No handler for '$handler' found.";
     }
     
-    my $output = (string)undef;
-    $renderer->($self, $c, my $_ = [$output], $options_h);
-    $output = $_->[0];
+    $renderer->($self, $c, my $_ = [(string)undef]);
+    my $output = $_->[0];
     
-    if ($output) {
-      return 1;
+    unless ($output) {
+      return [$output, undef];
     }
-    else {
-      return 0;
+    
+    # Layout
+    my $layout = $stash->{"layout"}->(string);
+    if ($layout) {
+      my $layout_template = "layouts/$layout";
+      my $layout_stash = $stash->{"mojo.layout"}->(Hash) // Hash->new;
+      my $layout_handler = $layout_stash->{"handler"}->(string) // $self->default_handler;
+      my $layout_format = $layout_stash->{"format"}->(string) // $self->default_format;
+      
+      $stash->{"handler"} = $layout_handler;
+      $stash->{"format"} = $layout_format;
+      $stash->{"template"} = $layout_template;
+      $stash->{"mojo.content"} // Hash->new;
+      $stash->{"mojo.content"}->(Hash)->{"content"} = $output;
+      
+      my $layout_renderer = $self->handlers->get($layout_handler);
+      
+      unless ($layout_renderer) {
+        die "No handler for '$handler' found.";
+      }
+      
+      $renderer->($self, $c, my $_ = [(string)undef]);
+      $output = $_->[0];
     }
+    
+    return [$output, $format];
   }
   
-  method template_handler : string ($options : Hash|object[] = undef) {
+  method respond : void ($c : Mojolicious::Controller, $output : string, $format : string, $status : int) {
     
-    my $options_h = Fn->to_hash($options);
+    if ($c->stash_h->{"mojo.respond"}->(int)) {
+      die "A response has already been rendered.";
+    }
+    $c->stash_h->{"mojo.respond"} = 1;
     
-    my $file = $self->template_name($options_h);
-    unless ($file) {
+    # Gzip compression
+    my $res = $c->res;
+    if ($self->compress && length($output) >= $self->min_compress_size) {
+      my $headers = $res->headers;
+      $headers->append(Vary => "Accept-Encoding");
+      my $gzip = Re->m($c->req->headers->accept_encoding // "", ["gzip". "i"]);
+      if ($gzip && !length $headers->content_encoding) {
+        $headers->set_content_encoding("gzip");
+        $output = Mojo::Util->gzip($output);
+      }
+    }
+    
+    $res->set_body($output);
+    $c->app->types->content_type($c, {ext => $format});
+    
+    $c->rendered($status);
+  }
+  
+  method template_path : string ($options : Hash|object[] = undef) {
+    
+    my $options = Fn->to_hash($options);
+    
+    my $name = $self->template_name($options);
+    
+    unless ($name) {
       return undef;
     }
     
-    my $templates = $self->{templates};
+    my $parts = Fn->split("/", $name);
     
-    my $handlers = $templates->get($file);
-    
-    unless ($handlers) {
-      return $self->default_handler;
+    for my $path (@{$self->paths}) {
+      
+      my $abs_path = Mojo::File->path(Array->merge_string([$path], $parts));
+      
+      if (Sys->r($abs_path->to_string)) {
+        return $path;
+      }
+      
     }
     
-    return $handlers->[0];
+    return undef;
   }
-
-}
-
-__END__
-
-sub respond {
-  my ($self, $c, $output, $format, $status) = @_;
-
-  croak 'A response has already been rendered' if $c->stash->{'mojo.respond'}++;
-
-  # Gzip compression
-  my $res = $c->res;
-  if ($self->compress && length($output) >= $self->min_compress_size) {
-    my $headers = $res->headers;
-    $headers->append(Vary => 'Accept-Encoding');
-    my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
-    if ($gzip && !$headers->content_encoding) {
-      $headers->content_encoding('gzip');
-      $output = gzip $output;
+  
+  private method _render_ep : void ($c : Mojolicious::Controller, $output_ref : string[]) {
+    
+    my $inline = $c->stash("inline")->(string);
+    
+    my $options = {
+      template => $c->stash("template")->(string),
+      format => $c->stash("format")->(string),
+      handler => $c->stash("handler")->(string),
+    };
+    
+    my $name = $inline ? Mojo::Util->md5_sum($inline) : $self->template_name($options);
+    
+    unless ($name) {
+      die "Template name is not resolved.";
     }
+    
+    my $mt = Mojo::Template->new;
+    $mt->set_auto_escape(1);
+    
+    # Inline
+    my $output = (string)undef;
+    if ($inline) {
+      $c->log->trace("Rendering inline template \"$name\"");
+      $mt->set_name("inline template $name");
+      $output = $mt->render($inline, undef, $c);
+    }
+    
+    # File
+    else {
+      # Try template
+      if (my $path = $self->template_path($options)) {
+        $c->log->trace("Rendering template \"$name\"");
+        my $file = "$path/$name";
+        $mt->set_name($name);
+        $output = $mt->render_file($file, undef, $c);
+      }
+      
+      # Try DATA section
+      elsif (my $d = $self->get_data_template($options)) {
+        $c->log->trace("Rendering template \"$name\" from DATA section");
+        $mt->set_name("template $name from data templates");
+        $output = $mt->render($d, undef, $c);
+      }
+      
+      # No template
+      else {
+        $c->log->trace("Template \"$name\" not found");
+      }
+    }
+    
+    $output_ref->[0] = $output;
   }
-
-  $res->body($output);
-  $c->app->types->content_type($c, {ext => $format});
-  return !!$c->rendered($status);
+  
 }
-
-sub template_path {
-  my ($self, $options) = @_;
-  return undef unless my $name = $self->template_name($options);
-  my @parts = split /\//, $name;
-  -r and return $_ for map { path($_, @parts)->to_string } @{$self->paths}, $TEMPLATES;
-  return undef;
-}
-
-sub _next {
-  my $stash = shift;
-  return delete $stash->{extends} if $stash->{extends};
-  return undef unless my $layout = delete $stash->{layout};
-  return join '/', 'layouts', $layout;
-}
-

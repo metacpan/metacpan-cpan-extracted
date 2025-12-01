@@ -8,10 +8,12 @@ class Mojo::Util {
   use Hash;
   use MIME::Base64;
   use StringList;
+  use Digest::MD5;
   use Digest::SHA;
   use Format;
   use Getopt::Long;
   use Mojo::ByteStream;
+  use Compress::Raw::Zlib;
   
   our $QUOTED_VALUE_RE : string;
   INIT {
@@ -41,6 +43,26 @@ class Mojo::Util {
   
   static method b64_decode : string ($string : string) {
     return MIME::Base64->decode_base64($string);
+  }
+  
+  static method md5_bytes : string ($data : string) {
+    
+    return Digest::MD5->md5($data);
+  }
+  
+  static method md5_sum : string ($data : string) {
+    
+    return Digest::MD5->md5_hex($data);
+  }
+  
+  static method hmac_sha1_sum : string ($data : string, $key : string) {
+    
+    return Digest::SHA->hmac_sha1_hex($data, $key);
+  }
+  
+  static method sha1_bytes : string ($data : string) {
+    
+    return Digest::SHA->sha1($data);
   }
   
   static method sha1_sum : string ($string : string) {
@@ -379,51 +401,31 @@ class Mojo::Util {
     return [(object)$params, Fn->substr($value, $offset)];
   }
   
-  static method _options : object[] ($args : object...)  {
-    
-    # The arguments are three pattern.
-    # 1. a value
-    # 2. a value and options
-    # 3. options
-    
-    unless (@$args <= 2) {
-      die "Too many arguments.";
-    }
-    
-    my $arg = (object)undef;
-    my $options = (object[])undef;
-    
-    if (@$args == 0) {
-      # Do nothing
-    }
-    elsif (@$args == 1) {
-      if ($args->[0] isa object[]) {
-        $options = (object[])$args->[0];
-      }
-      else {
-        $arg = $args->[0];
-      }
-    }
-    elsif (@$args == 2) {
-      $arg = $args->[0];
-      if ($args->[1] isa object[]) {
-        $options = (object[])$args->[1];
-      }
-      else {
-        die "The type of the second argument must be object[].";
-      }
-    }
-    
-    return [$arg, $options];
-  }
-  
   static method getopt : void ($comand_args_ref : string[][], $values_h : Hash, $spec_strings : string[]) {
     
     Getopt::Long->GetOptionsFromArray($comand_args_ref, $values_h, $spec_strings);
   }
   
-  static method get_data_template : string ($data_section : string, $name : string) {
+  static method gzip : string ($uncompressed : string) {
     
+    Compress::Raw::Zlib->gzip($uncompressed, my $_ = [(string)undef]);
+    my $compressed = $_->[0];
+    
+    return $compressed;
+  }
+  
+  static method secure_compare : int ($one : string, $two : string) {
+    my $r = length $one != length $two;
+    
+    if ($r) {
+      $two = $one;
+    }
+    
+    for (my $i = 0; $i < length $one; $i++) {
+      $r |= Fn->ord(Fn->substr($one, $i)) ^ Fn->ord(Fn->substr($two, $i));
+    }
+    
+    return $r == 0;
   }
   
 }

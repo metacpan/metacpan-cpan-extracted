@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Schedule::Activity::Attribute;
 
-our $VERSION='0.2.2';
+our $VERSION='0.2.3';
 
 sub new {
 	my ($ref,%opt)=@_;

@@ -1,6 +1,6 @@
 package App::optex::rpn;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 =encoding utf-8
 
@@ -332,6 +332,6 @@ sub convert {
 
 __DATA__
 
-option --rpn -M__PACKAGE__::convert(rpn~$<shift>)
+option --rpn -M__PACKAGE__::convert(rpn*=$<shift>)
 
 #  LocalWords:  rpn optex macOS

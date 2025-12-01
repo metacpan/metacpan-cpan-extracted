@@ -23,7 +23,7 @@ use constant {
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -57,23 +57,23 @@ my %_for_version = (
         parent => v0.01,
         identifier => {
             '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
-                '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c' => 0x1F30D,
-                '7b177183-083c-4387-abd3-8793eb647373' => 0x21E5,
-                '4dc9fd07-7ef3-4215-8874-31d78ed55c22' => 0x21A3,
-                '3877b2ef-6c77-423f-b15f-76508fbd48ed' => 0x21A6,
-                'bccdaf71-0c82-422e-af44-bb8396bf90ed' => 0x1F331,
-                '0a24c834-90bd-4abd-ad97-4bd3ca7e784a' => 0x1F332,
-                '85061c8c-be7a-4171-a008-f2035a4b8b61' => 0x1F333,
-                'eba923c3-a425-425d-80ab-0064258d108a' => 0x1F334,
-                '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1' => 0x1F981,
-                '3694d8ca-c969-5705-beca-01f17b1487e8' => 0x2642,
-                'ae1072ef-0865-5104-b257-0d45441fa5e5' => 0x2642,
-                'd642eff3-bee6-5d09-aea9-7c47b181dd83' => 0x2642,
-                '25dfeb8e-ef9a-52a1-b5f1-073387734988' => 0x2640,
-                '3c4b6cdf-f5a8-50d6-8a3a-b0c0975f7e69' => 0x2640,
-                'db9b0db1-a451-59e8-aa3b-9994e683ded3' => 0x2640,
-                '310f2b49-73a8-5f27-aeaf-5f34bc8e583f' => 0x26A5,
-                '036c0fe8-5189-5134-99ec-0b1b05c7bbf4' => 0x26A5,
+                '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c' => 0x1F30D,  # sid:60    Earth
+                '7b177183-083c-4387-abd3-8793eb647373' => 0x21E5,   #           write-mode@none
+                '4dc9fd07-7ef3-4215-8874-31d78ed55c22' => 0x21A3,   #           write-mode@append only
+                '3877b2ef-6c77-423f-b15f-76508fbd48ed' => 0x21A6,   #           write-mode@random access
+                'bccdaf71-0c82-422e-af44-bb8396bf90ed' => 0x1F331,  # sid:92    plant
+                '0a24c834-90bd-4abd-ad97-4bd3ca7e784a' => 0x1F332,  #           conifer
+                '85061c8c-be7a-4171-a008-f2035a4b8b61' => 0x1F333,  #           broadleaf
+                'eba923c3-a425-425d-80ab-0064258d108a' => 0x1F334,  #           palm
+                '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1' => 0x1F981,  # sid:82    lion
+                '3694d8ca-c969-5705-beca-01f17b1487e8' => 0x2642,   #           gender@male
+                'ae1072ef-0865-5104-b257-0d45441fa5e5' => 0x2642,   #           sex@male
+                'd642eff3-bee6-5d09-aea9-7c47b181dd83' => 0x2642,   # sid:75    gender-or-sex@male
+                '25dfeb8e-ef9a-52a1-b5f1-073387734988' => 0x2640,   #           gender@female
+                '3c4b6cdf-f5a8-50d6-8a3a-b0c0975f7e69' => 0x2640,   #           sex@female
+                'db9b0db1-a451-59e8-aa3b-9994e683ded3' => 0x2640,   # sid:76    gender-or-sex@female
+                '310f2b49-73a8-5f27-aeaf-5f34bc8e583f' => 0x26A5,   #           gender@herm
+                '036c0fe8-5189-5134-99ec-0b1b05c7bbf4' => 0x26A5,   #           sex@herm
             },
         },
     },
@@ -371,6 +371,36 @@ my %_for_version = (
             },
         }
     },
+    v0.04 => {
+        parent => v0.03,
+        identifier => {
+            '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
+                '6ad2c921-7a3e-4859-ae02-98e42522e2f8' => 0x23F5,   # sid:44    forwards
+                '4e855294-4b4f-443e-b67b-8cb9d733a889' => 0x23F4,   # sid:43    backwards
+                'dd708015-0fdd-4543-9751-7da42d19bc6a' => 0x1F31E,  # sid:64    Sun
+                '23026974-b92f-4820-80f6-c12f4dd22fca' => 0x1F31C,  # sid:65    Luna
+                '838eede5-3f93-46a9-8e10-75165d10caa1' => 0x1F431,  # sid:80    cat
+                '252314f9-1467-48bf-80fd-f8b74036189f' => 0x1F436,  # sid:81    dog
+                '36297a27-0673-44ad-b2d8-0e4e97a9022d' => 0x1F42F,  # sid:83    tiger
+                '5d006ca0-c27b-4529-b051-ac39c784d5ee' => 0x1F98A,  # sid:84    fox
+                '914b3a09-4e01-4afc-a065-513c199b6c24' => 0x1F43F,  # sid:85    squirrel
+                '95f1b56e-c576-4f32-ac9b-bfdd397c36a6' => 0x1F43A,  # sid:86    wolf
+                'dcf8f4f0-c15e-44bd-ad76-0d483079db16' => 0x1F468,  # sid:87    human
+                'a0b8122e-d11b-4b78-a266-0bb90d1c1cbe' => 0x1F344,  # sid:93    fungus
+                'a7872dea-8912-5c23-b243-567c60e8bd1a' => 0x2124,   # sid:47    -1
+                'dd8e13d3-4b0f-5698-9afa-acf037584b20' => 0x2124,   # sid:48    zero
+                'bd27669b-201e-51ed-9eb8-774ba7fef7ad' => 0x2115,   # sid:49    one
+                '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7' => 0x2115,   # sid:50    two
+                'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23' => 0x2115,   # sid:144   three
+                '79422b2c-b6f6-547f-949f-0cba44fa69b7' => 0x2115,   # sid:145   four
+                '5cbdbe1c-e8b6-4cac-b274-b066a7f86b28' => 0x2190,   # sid:192   left
+                '3b1858a9-996b-4831-b600-eb55ab7bb0d1' => 0x2192,   # sid:193   right
+                'f158e457-9a75-42ac-b864-914b34e813c7' => 0x2191,   # sid:194   up
+                '4c834505-8e77-4da6-b725-e11b6572d979' => 0x2193,   # sid:195   down
+                '2ec4a6b0-e6bf-40cd-96a2-490cbc8d6c4b' => 0x2205,   # sid:134   empty-set
+            },
+        }
+    },
 );
 
 while (1) {
@@ -455,34 +485,38 @@ sub new {
                 $for = Data::Identifier->new(from => $for);
             }
 
-            if (defined(my $table = $for_version_info->{identifier}{$for->type->uuid})) {
-                $self->{unicode} //= $table->{$for->id};
-            }
+            {
+                my $for_id = $for->Data::Identifier::as('Data::Identifier');
 
-            if (!defined($self->{unicode}) && $for->type->eq(WK_FREEDESKTOP_ICON_NAME)) {
-                if ($for->id =~ /^flag-([a-z]{2})$/) {
-                    $opts{flag} //= $1;
+                if (defined(my $table = $for_version_info->{identifier}{$for_id->type->uuid})) {
+                    $self->{unicode} //= $table->{$for_id->id};
                 }
-            }
 
-            unless (defined $self->{unicode}) {
-                state $sid_forceloaded;
-
-                if (!$sid_forceloaded && defined(my $sid = $for->sid(default => undef))) {
-                    unless (defined($for->uuid(default => undef))) {
-                        require Data::Identifier::Wellknown;
-                        Data::Identifier::Wellknown->import(':all');
-                        $for = Data::Identifier->new($for->type => $for->id);
-                        $sid_forceloaded = 1;
+                if (!defined($self->{unicode}) && $for_id->type->eq(WK_FREEDESKTOP_ICON_NAME)) {
+                    if ($for_id->id =~ /^flag-([a-z]{2})$/) {
+                        $opts{flag} //= $1;
                     }
                 }
 
-                foreach my $type (keys %_idtype_to_uuid) {
-                    my $v = $for->as($type, default => undef) // next;
-                    if (defined(my $table = $for_version_info->{identifier}{$_idtype_to_uuid{$type}})) {
-                        $self->{unicode} //= $table->{$v};
+                unless (defined $self->{unicode}) {
+                    state $sid_forceloaded;
+
+                    if (!$sid_forceloaded && defined(my $sid = $for_id->sid(default => undef))) {
+                        unless (defined($for_id->uuid(default => undef))) {
+                            require Data::Identifier::Wellknown;
+                            Data::Identifier::Wellknown->import(':all');
+                            $for_id = Data::Identifier->new($for_id->type => $for_id->id);
+                            $sid_forceloaded = 1;
+                        }
                     }
-                    last if defined $self->{unicode};
+
+                    foreach my $type (keys %_idtype_to_uuid) {
+                        my $v = $for_id->as($type, default => undef) // next;
+                        if (defined(my $table = $for_version_info->{identifier}{$_idtype_to_uuid{$type}})) {
+                            $self->{unicode} //= $table->{$v};
+                        }
+                        last if defined $self->{unicode};
+                    }
                 }
             }
 
@@ -733,7 +767,7 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

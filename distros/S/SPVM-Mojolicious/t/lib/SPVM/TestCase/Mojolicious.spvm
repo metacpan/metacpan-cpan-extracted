@@ -33,13 +33,13 @@ class TestCase::Mojolicious {
       return 0;
     }
     
-    my $inline_templates = <<'EOS';
+    my $data_templates = <<'EOS';
 @@ a/b.html.ep
 
 Hello
 EOS
     
-    $app->set_inline_templates($inline_templates);
+    $app->set_data_templates($data_templates);
     
     return 1;
   }

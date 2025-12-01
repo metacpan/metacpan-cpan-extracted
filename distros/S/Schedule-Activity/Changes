@@ -1,5 +1,10 @@
 Revision history for Schedule::Activity
 
+0.2.3 - 2025-11-30
+	- Documentation, significant restructuring
+	- Sample, test runner
+	- Validation improvements
+
 0.2.2 - 2025-11-21
 	- Annotation attributes during merge
 	- Support attribute reporting from general activity lists

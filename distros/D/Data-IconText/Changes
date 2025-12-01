@@ -1,3 +1,9 @@
+v0.04  2025-11-30Z
+    - Added more code comments
+    - Fixed bug with new(for => $X) not being an Data::Identifier
+    - Added more well known tags
+    - Updated required version of Data::Identifier to v0.26 to ensure consistent lists
+
 v0.03  2025-06-01Z
     - Support for flags
     - Support no_defaults in constructor

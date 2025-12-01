@@ -30,7 +30,7 @@ use Data::Dumper::Simple;
 use Data::Printer;
 
 Readonly my $PROGRAM => 'smart_show.pl';
-Readonly my $VERSION => version->declare("v3.3.8");
+Readonly my $VERSION => version->declare("v3.3.12");
 
 ########################################
 #      Define Global Variables         #

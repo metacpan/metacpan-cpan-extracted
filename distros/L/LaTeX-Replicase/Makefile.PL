@@ -15,10 +15,10 @@ WriteMakefile(
 		'Test::More'         => '0.98',
 		'Test::More::UTF8'   => '0.05',
 		'Test::Pod'          => '1.22',
+		'Test::Exception'    => '0.43',
 		'File::Basename'     => '2.86',
 		'File::Path'         => '2.18',
 		'File::Compare'      => '1.00',
-		'Digest::MD5'        => '2.59',
 		'Carp'               => '0',
     },
     dist => {

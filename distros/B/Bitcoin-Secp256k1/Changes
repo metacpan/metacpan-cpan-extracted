@@ -1,5 +1,10 @@
 Revision history for Bitcoin-Secp256k1
 
+0.011 - 2025-11-30
+	- Added argument checking, all functions now croak their usage on missing or undef arguments
+	- Fixed a bug where passing undef to some functions caused them to use previous data
+	- Removed a non-portable XS comment
+
 0.010 - 2025-11-17
 	[New interface]
 	- Added recoverable signature support

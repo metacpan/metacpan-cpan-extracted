@@ -591,6 +591,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(is_block) {
     I32 save_ix = block_start(TRUE);
     compclassmeta_set(meta);
+    mop_class_prepare_parse(meta);
 
     OP *body = parse_stmtseq(0);
     body = block_end(save_ix, body);
@@ -620,6 +621,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
     SAVEHINTS();
     compclassmeta_set(meta);
+    mop_class_prepare_parse(meta);
 
     *out = newSVOP(OP_CONST, 0, &PL_sv_yes);
     return KEYWORD_PLUGIN_STMT;

@@ -20,6 +20,7 @@ no_index:
 requires:
   SPVM: '0.990107'
   SPVM::Compress::Raw::Zlib: '0.003'
+  SPVM::Digest::MD5: '1.003'
   SPVM::Digest::SHA: '0.065'
   SPVM::File::Basename: '0.044'
   SPVM::File::Copy: '0.022'
@@ -41,5 +42,5 @@ requires:
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.033'
+version: '0.034'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

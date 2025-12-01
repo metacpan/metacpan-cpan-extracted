@@ -1,32 +1,74 @@
 =pod
 
+=head1 Overview
+
+=head2 Before 0.3.0
+
+The following are planned as part of the 0.3.0 release.
+
+=over
+
+=item Script incremental builds (done)
+
+=item Script attribute reporting (done)
+
+=item Documentation rewrite (done)
+
+=item Goal scheduling
+
+=item Attribute average values
+
+=item Node filtering for average values
+
+=back
+
 =head1 Features
 
 =head2 Goals
 
-Scheduling goals are planned for 0.2.3, specifically of the form C<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=>'gt|lt',value=>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based goals seeking is planned for 0.2.3.
+Scheduling goals are planned of the form C<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=E<gt>'max|min'},name=E<gt>{op=E<gt>'eq|ne',value=E<gt>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based goals seeking is planned at this time.
 
 =head2 Documentation
 
-Has sadly grown quite complex.  A rewrite is likely, but no ETA.
-
-=head2 Annotations
-
-Annotation filtering.  Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.
-
-=head2 Scheduling
-
-Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation is supported for materialized annotations starting with 0.2.2.  Ideally a finalized savefile could also store annotations.
+Rewrite in progress starting with 0.2.3.  The documentation in L<Schedule::Activity> is very thorough and complete, though some historical information is outdated.  Introductory and overview documentation is somewhat lacking.  That and better organization is the goal of the rewrite, as well as consistent terminology.
 
 =head2 Attributes
 
-Attribute recomputation is supported starting with 0.2.2, primarily for merged annotation support.  Attributes as "goals" is planned for 0.2.3.
+Attribute recomputation is supported starting with 0.2.2, primarily for merged annotation support.  Attributes as "goals" is planned for 0.2.3--5.
 
 Rudimentary attribute reporting from the commandline is supported starting with 0.2.2.
 
+There is a subtle intricacy raised by the behavior of node filtering on average values:  A configuration may fix/quiesce attributes via the increase-by-zero trick in every node, permitting some control over updates to the rolling average values.  Would it be expected that the value is constant, hence the average updating "second by second", until such time as it is explicitly changed?  The current model is that the average updates via the trapezoid rule when the next value update occurs.  This works for any granularity (including non-integer valued times), but it is, in a sense, retroactive.  This gives two alternate views of reality, where the attribute average suddenly flips during values assignment:  In one view, the average is steadily approaching the current value as time increases; but in the other, that average is replaced when the next value is set.
+
+Ideally there would be no such discrepancy (speaking mathematically), meaning that attribute values are fixed for the purpose of computing the rolling average, thru the current time minus epsilon.  When a value change occurs, that would only affect the future value of the average and would not change the historical value.  This is obviously different than the current interpretation.  The module author currently has no scenarios that rely on this granularity for the average, and because node filtering does not currently support average value selection, this non-backwards-compatible change would likely have minimal impacts.  It would still appear above with a version-specific, future update... once a decision is made.
+
 =head2 Node filtering
 
-Average value filtering should work but is not well tested.
+Average value filtering needs to be defined.  Value filtering is straightforward because the last recorded value is the current value for the attribute.  Average value filtering, however, has three different interpretations of value that are being considered:
+
+The currently stored "average" is the rolling average as computed with the most recent attribute update.  That update could have occurred recently or far in the past, but the recorded y-value and average represent a consistent pair at that time.
+
+If, however, the most recent value is also interpreted as the "current value" for the attribute, then the rolling average can be updated for the current time.  That average can be different than the previously recorded average.  For example, suppose an attribute is zero for times zero through ten, then the attribute becomes one.  At time twenty, the stored average is one-half and the stored value is one; however, if the value is also "increased by zero" at time twenty, then the updated average would be three-quarters.  For the sake of filtering, then, should the "average" be one-half, or is it steadily increasing toward one as time advances?  It seems more realistic that it would be the latter interpretation, since this means that node filtering permits "eventual activation" as the average crosses a threshold.
+
+But consider the very next step of the process.  Suppose that the node, when the filter passes, is also going to decrease the attribute in the above example by one.  This will occur precisely at time twenty, meaning that the average will be one-half.  So, is it more realistic to say that the average "would be three quarters at time twenty if the attribute value is still one", or that the average "would be one-half at time twenty if the attribute is updated per the instructions in the node".  Because the latter interpretation raises a logical paradox (if it passes the filter it wouldn't have passed the filter, but if it fails the filter it would have passed the filter)... it is likely that we'll choose the middle interpretation.
+
+That is, the attribute value is fixed up to the current time minus epsilon, and thus the speculative average at that time can be computed and represents the rolling average as updated to the current time.  If the chosen node adjusts the value, and thus the rolling average, that would only affect selection of future nodes.
+
+=head2 Annotations
+
+Annotation filtering.  Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.  No timeline has been established.
+
+Annotations may also benefit from a schedule-wide closeness configuration, but no timeline has been established.
+
+=head2 Scheduling
+
+Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation is supported for materialized annotations starting with 0.2.2.  Ideally a finalized savefile could also store materialized annotations, but no timeline has been established.
+
+=head2 Tension configuration
+
+Rebuilt in 0.1.9 to provide better control over slack and buffer tensions separately.  Behavior is established based on mathematical distribution, which is uniform stepwise leading to a skewed distribution for overall schedules.  Tension settings affect path selection, but the scheduler will fail for the full path if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely additional tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.  See the distribution in C<samples/tension.png> and documentation in L<Schedule::Activity>.
+
+Tension should also be configurable in the outer scheduling step.  This would permit incrementally relaxing the scheduler in case of retries.  No timeline has been established.
 
 =head2 Tutorial
 
@@ -35,10 +77,6 @@ A basic tutorial and sample configuration is provided starting with 0.2.0.  It m
 =head2 Action limits
 
 The case C<limit=1> is not the primary/initial use case of this scheduler, but some events will likely never be repeated.  This can already be achieved by setting the attribute to zero initially, incrementing as appropriate, and then filtering.  Because there's a difference between limit-per-activity and limit-per-schedule, it's not clear that a special mechanism will be created.
-
-=head2 Tension configuration
-
-Rebuilt in 0.1.9 to provide better control over slack and buffer tensions separately.  Behavior is established based on mathematical distribution, which is uniform stepwise leading to a skewed distribution for overall schedules.  Tension settings affect path selection, but the scheduler will fail for the full path if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely additional tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.  See the distribution in C<samples/tension.png> and documentation in L<Schedule::Activity>.
 
 =head2 Slack/buffer defaults
 

@@ -18,9 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Displaycolour",
   "PREREQ_PM" => {
     "Carp" => "1.35",
-    "Data::Identifier::Interface::Known" => "0.16.0",
-    "Data::Identifier::Interface::Subobjects" => "0.16.0",
-    "Data::Identifier::Interface::Userdata" => "0.16.0",
+    "Data::Identifier" => "0.26.0",
     "Data::URIID" => "0.18.0",
     "Data::URIID::Colour" => "0.18.0",
     "Digest" => "1.20"
@@ -28,7 +26,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.3"
   },
-  "VERSION" => "v0.03",
+  "VERSION" => "v0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,9 +35,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
-  "Data::Identifier::Interface::Known" => "0.16.0",
-  "Data::Identifier::Interface::Subobjects" => "0.16.0",
-  "Data::Identifier::Interface::Userdata" => "0.16.0",
+  "Data::Identifier" => "0.26.0",
   "Data::URIID" => "0.18.0",
   "Data::URIID::Colour" => "0.18.0",
   "Digest" => "1.20",

@@ -107,7 +107,11 @@ subtest 'should multiply' => sub {
 	is $secp->multiply_private_key($t{privkey}, $tweak), $multiplied_privkey, 'multiplied privkey ok';
 };
 
-subtest 'should combine' => sub {
+subtest 'should combine one pubkey into itself' => sub {
+	is $secp->combine_public_keys($t{pubkey}), $t{pubkey}, 'combined pubkey ok';
+};
+
+subtest 'should combine multiple pubkeys' => sub {
 	my @to_combine = (
 		pack('H*', '0311ab47c9252066f0ca5946d70c3aaac1486d65969b90cd57207476963c9f9af3'),
 		pack('H*', '0260213f6d967636c54d8845c23098e0f63d906b7903d23692efa155a155eda169'),

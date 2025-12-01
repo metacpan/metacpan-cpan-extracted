@@ -11,12 +11,12 @@ use Disk::SmartTools qw(:all);
 #======================================#
 #          get_physical_disks          #
 #======================================#
-if ( is_mac() ) {
+
+SKIP: {
+    skip "The get_physical_disks command is MacOS only.", 1 unless ( is_mac() );
     my @physical_disks = get_physical_disks();
-    is( $physical_disks[0], D(), "Must have at least one phsical disk" );
-}
-else {
-    pass("Not a macos system");
+    is( $physical_disks[0], D(),
+        "get_physical_disks - Must have at least one phsical disk" );
 }
 
 done_testing;

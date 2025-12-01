@@ -369,9 +369,7 @@ class Mojo::Template {
     return $new_tree->to_array;
   }
   
-  method process : string ($options : Hash|object[] = undef, $c : Mojolicious::Controller = undef) {
-    
-    my $options = Fn->to_hash($options);
+  method process : string ($args : Hash|object[] = undef, $c : Mojolicious::Controller = undef) {
     
     # Use a local stack trace for compile exceptions
     my $compiled = $self->compiled;
@@ -384,13 +382,13 @@ class Mojo::Template {
       eval { $compiled = Native->use_anon_class($code); }
       if ($@) {
         my $name = $self->name;
-        die "$@\n[Template:$name]\n" . $self->unparsed;
+        die "$@\n[Template:$name]\n" . $self->unparsed . "\n[Code]\n$code";
       }
       
       $self->set_compiled($compiled);
     }
     
-    my $output = (string)Native::MethodCall->call_class_method($compiled, "code", [(object)$options, $c]);
+    my $output = (string)Native::MethodCall->call_class_method($compiled, "code", [(object)$args, $c]);
     
     return $output;
   }
@@ -409,7 +407,7 @@ class Mojo::Template {
     $code->push("  use Mojo::Util;\n");
     $code->push("  use Mojo::ByteStream;\n");
     $code->push("  use Mojolicious::Controller;\n");
-    $code->push("static method code : string (\$options : Hash = undef, \$c : Mojolicious::Controller = undef) {\n");
+    $code->push("static method code : string (\$args : Hash = undef, \$c : Mojolicious::Controller = undef) {\n");
     $code->push("my \$_O = \"\";\n");
     
     my $i = 0;
@@ -478,23 +476,23 @@ class Mojo::Template {
     $self->set_code($code->get_string);
   }
   
-  method render : string ($template : string, $args : object[] = undef) {
+  method render : string ($template : string, $args : Hash|object[] = undef, $c : Mojolicious::Controller = undef) {
     
     $self->parse($template);
     
-    my $output = $self->process($args);
+    my $output = $self->process($args, $c);
     
     return $output;
   }
   
-  method render_file : string ($path : string, $args : object[] = undef) {
+  method render_file : string ($path : string, $args : Hash|object[] = undef, $c : Mojolicious::Controller = undef) {
     
     unless ($self->{name}) {
       $self->set_name($path) ;
     }
     my $template = Mojo::File->path($path)->slurp;
     
-    return $self->render($template, $args);
+    return $self->render($template, $args, $c);
   }
   
 }

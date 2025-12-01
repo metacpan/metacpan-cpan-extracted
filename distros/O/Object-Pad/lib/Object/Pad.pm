@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.821;
+package Object::Pad 0.822;
 
 use v5.18;
 use warnings;
@@ -314,6 +314,30 @@ This provides a way in which a generic type of class can be created, that is
 intended for multiple different specialisations to further define different
 kinds of behaviour by providing bodies for those named methods. Being abstract
 means that instances cannot be created of this as-yet-incomplete class type.
+
+=head3 :lexical_new
+
+   :lexical_new
+
+I<Since version 0.822.>
+
+Causes the constructor for this class to be made available to the class body
+lexically, and I<not> installed as a symbol in the package's symbol table. The
+effect of this is that code inside the class can nake use of it as a lexical
+function, but it is not available to callers outside the class. In this way,
+a wrapper method in the class itself is fully in control of how, and when,
+instances of the class are constructed.
+
+For example, a singleton class could be created by providing a wrapper 
+class method:
+
+   class A::Singleton :lexical_new {
+      my $instance;
+
+      sub instance { $instance //= new(shift); }
+
+      ...
+   }
 
 =head3 :repr(TYPE)
 

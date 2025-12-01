@@ -334,12 +334,15 @@ Node-specific support is maintained in a [separate repository](https://github.co
 ### Scala
 
 * [json-schema-validation-comparison](https://www.creekservice.org/json-schema-validation-comparison/functional) (Comparison site for JVM-based validator implementations)
-* [typed-json](https://github.com/frawa/typed-json)
 
 ### Swift
 
 * [JSONSchema](https://github.com/kylef/JSONSchema.swift)
 * [swift-json-schema](https://github.com/ajevans99/swift-json-schema)
+
+### Unison
+
+* [typed-json](https://share.unison-lang.org/@frawa/typed-json)
 
 If you use it as well, please fork and send a pull request adding yourself to
 the list :).

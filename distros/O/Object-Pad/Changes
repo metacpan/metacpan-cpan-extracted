@@ -1,5 +1,10 @@
 Revision history for Object-Pad
 
+0.822   2025-11-30
+        [CHANGES]
+         * Added `:lexical_new` class attribute to assist in various design
+           patterns and API shapes
+
 0.821   2025-07-12
         [CHANGES]
          * Don't apply implied pragmata on `class` or `role` keywords if the

@@ -281,6 +281,9 @@ _pubkey(self, ...)
 			secp256k1_pubkey *new_pubkey = pubkey_from_sv(ctx, pubkey_data);
 			secp256k1_perl_replace_pubkey(ctx, new_pubkey);
 		}
+		else if (items > 1) {
+			secp256k1_perl_replace_pubkey(ctx, NULL);
+		}
 
 		unsigned int compression = SECP256K1_EC_COMPRESSED;
 
@@ -317,6 +320,9 @@ _xonly_pubkey(self, ...)
 			SV *pubkey_data = ST(1);
 			secp256k1_xonly_pubkey *new_pubkey = xonly_pubkey_from_sv(ctx, pubkey_data);
 			secp256k1_perl_replace_xonly_pubkey(ctx, new_pubkey);
+		}
+		else if (items > 1) {
+			secp256k1_perl_replace_xonly_pubkey(ctx, NULL);
 		}
 
 		if (ctx->xonly_pubkey != NULL) {
@@ -365,6 +371,9 @@ _signature(self, ...)
 
 			secp256k1_perl_replace_signature(ctx, result_signature);
 		}
+		else if (items > 1) {
+			secp256k1_perl_replace_signature(ctx, NULL);
+		}
 
 		if (ctx->signature != NULL) {
 			unsigned char signature_output[72];
@@ -403,6 +412,9 @@ _signature_schnorr(self, ...)
 
 			secp256k1_perl_replace_schnorr_signature(ctx, result_signature);
 		}
+		else if (items > 1) {
+			secp256k1_perl_replace_schnorr_signature(ctx, NULL);
+		}
 
 		if (ctx->schnorr_signature != NULL) {
 			RETVAL = newSVpv((char*) ctx->schnorr_signature, SCHNORR_SIGNATURE_SIZE);
@@ -426,7 +438,7 @@ _signature_recoverable(self, ...)
 				croak("recoverable signature must be defined");
 			}
 
-			// Expect hash ref with signature and recovery_id
+			/* Expect hash ref with signature and recovery_id */
 			if (!SvROK(new_signature) || SvTYPE(SvRV(new_signature)) != SVt_PVHV) {
 				croak("recoverable signature must be a hash reference with 'signature' and 'recovery_id' keys");
 			}
@@ -461,6 +473,9 @@ _signature_recoverable(self, ...)
 			}
 
 			secp256k1_perl_replace_recoverable_signature(ctx, parsed_signature);
+		}
+		else if (items > 1) {
+			secp256k1_perl_replace_recoverable_signature(ctx, NULL);
 		}
 
 		if (ctx->recoverable_signature != NULL) {

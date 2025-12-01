@@ -31,7 +31,7 @@ class TestCase::Mojolicious::Routes {
         
         $results->{"success"} = 1;
         
-        $c->set_rendered(1);
+        $c->stash_h->{"mojo.rendered"} = 1;
       });
       
       my $c = Mojolicious::Controller->new;
@@ -79,9 +79,9 @@ class TestCase::Mojolicious::Routes {
           
           $results->{"path"} = $c->req->url->path->to_string;
           
-          $results->{"captures"} = $c->captures;
+          $results->{"captures"} = $c->stash_h->{"mojo.captures"};
           
-          $c->set_rendered(1);
+          $c->stash_h->{"mojo.rendered"} = 1;
         });
       }
       
@@ -127,7 +127,7 @@ class TestCase::Mojolicious::Routes {
         
         $results->{"under1"} = 1;
         
-        $c->set_rendered(1);
+        $c->stash_h->{"mojo.rendered"} = 1;
         
         return 0;
       });
@@ -144,9 +144,9 @@ class TestCase::Mojolicious::Routes {
           
           $results->{"path"} = $c->req->url->path->to_string;
           
-          $results->{"captures"} = $c->captures;
+          $results->{"captures"} = $c->stash_h->{"mojo.captures"};
           
-          $c->set_rendered(1);
+          $c->stash_h->{"mojo.rendered"} = 1;
         });
       }
       

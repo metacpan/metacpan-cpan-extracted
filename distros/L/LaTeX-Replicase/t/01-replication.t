@@ -12,10 +12,10 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 25;
+use Test::More tests => 41;
 use Test::More::UTF8;
 # use Test::NoWarnings;
-use Digest::MD5;
+use Test::Exception;
 use File::Path;
 
 use Data::Dumper;
@@ -57,24 +57,29 @@ my $msg = replication( $file, $info, ofile => $ofile, def => 1, ignore => 1 ) //
 
 is( @$msg, 0, "Test #2: '$file' without errors");
 
+sub read_file {
+	my $file = shift;
+
+	open FILE, $file or die "Can't open '$file': $!\n";
+
+	my @msg;
+	while(<FILE>) {
+		s/\s+$//;
+		push @msg, $_;
+	}
+	close FILE;
+
+	return \@msg;
+}
+
 ###Test 3
-open OFILE, $ofile or die "Can't open '$ofile': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+lives_ok { $msg = read_file( $ofile ) } "Test #3.1: $ofile read";
 
-open TFILE, 't/template_test.tex' or die "Can't open 't/template_test.tex': $!";
+my $tfile = 't/template_test.tex';
 my $msg_ref3 = [];
-while(<TFILE>) {
-	s/\s+$//;
-	push @$msg_ref3, $_;
-}
-close TFILE;
+lives_ok { $msg_ref3 = read_file( $tfile ) } "Test #3.2: $tfile read";
 
-is_deeply( $msg, $msg_ref3, "Test #3: Check body of '$ofile' vs 't/template_test.tex'");
+is_deeply( $msg, $msg_ref3, "Test #3.3: Check body of '$ofile' vs '$tfile'");
 
 unlink $ofile;
 
@@ -87,15 +92,10 @@ is( @$msg, 0, "Test #6: OUTDIR");
 
 
 ###Test 7
-open OFILE, "$outdir/template_good.tex" or die "Can't open '$outdir/template_good.tex': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+my $gfile = "$outdir/template_good.tex";
+lives_ok { $msg = read_file( $gfile ) } "Test #7.1: $gfile read";
 
-is_deeply( $msg, $msg_ref3, "Test #7: Check OUTDIR of '$outdir/template_good.tex' body");
+is_deeply( $msg, $msg_ref3, "Test #7.2: Check OUTDIR of '$gfile' body");
 
 unlink $ofile;
 
@@ -103,11 +103,174 @@ unlink $ofile;
 ###Test 8
 $msg = replication( $file, $info, ofile => $ofile, def => 1, debug => 1 ) // [];
 
-my $md5 = Digest::MD5->new;
-for( @$msg ) {
-	$md5->add($_);
-}
-is( $md5->hexdigest, 'f7298abe6cf73f063eb680728b7d78cc', "Test #8: DEBUG");
+my $msg_ref8 = [
+          '--> Check \'t/template_good.tex\' file',
+          '--> Using \'t/ready_good.tex\' file as output',
+          '--> Open \'t/template_good.tex\'',
+          '--> Open \'t/ready_good.tex\'',
+          '--> l.14>12 Insert %%%V[AR]:myTitle= ChiTaRS-${}_{3.1}$-the enhanced chimeric transcripts and RNA-seq database matched with protein-protein interactions',
+          '--> l.17 Found %%%VAR:Authors',
+          '--> l.19>15 Insert %%%V[AR]:Authors= Alessandro Gorohovski, Somnath Tagore, etc...',
+          '--> l.26 Found %%%VAR:myAbstract',
+          '--> l.28>22 Insert %%%V[AR]:myAbstract= Discovery of chimeric RNAs, which are produced by chromosomal translocations as well as 
+the joining of exons from different genes by trans-splicing, has added a new level of complexity to our study and 
+understanding of the transcriptome. The enhanced ChiTaRS-${}_{3.1}$ database (\\url{http://chitars.md.biu.ac.il}) is designed 
+to make widely accessible a wealth of mined data on chimeric RNAs, with easy-to-use analytical tools built-in.',
+          '--> l.34 Found %%%VAR:myCaption',
+          '--> l.36>31 Insert %%%V[AR]:myCaption= The major improvements and data additions in ChiTaRS-${}_{3.1}$ in comparison to ChiTaRS-${}_{2.1}$.',
+          '--> l.42 Found %%%VAR:myTable_array',
+          '--> Table row = 0',
+          '-->	l.61>37 Insert head: \\rule{0mm}{1.5em}
+',
+          '--> l.61>38 Insert %%%V[AR]:0= 00',
+          '-->	l.61>39 Insert head:  &
+',
+          '--> l.61>40 Insert %%%V[AR]:1= 01',
+          '-->	l.61>41 Insert head:  &
+',
+          '--> l.61>42 Insert %%%V[AR]:2= 02',
+          '-->	l.61>43 Insert head:  &
+',
+          '--> l.61>44 Insert %%%V[AR]:3= 03',
+          '-->	l.61>45 Insert head:  &
+',
+          '--> l.61>46 Insert %%%V[AR]:4= 04',
+          '-->	l.61>47 Insert head: ~
+',
+          '~~> l.61 NOT defined %%%V[AR]:',
+          '--> Table row = 1',
+          '-->	l.61>48 Insert head: \\\\
+',
+          '-->	l.61>49 Insert head: \\hline
+',
+          '-->	l.61>50 Insert head: \\rule{0mm}{1.5em}
+',
+          '--> l.61>51 Insert %%%V[AR]:0= 10',
+          '-->	l.61>52 Insert head:  &
+',
+          '--> l.61>53 Insert %%%V[AR]:1= 11',
+          '-->	l.61>54 Insert head:  &
+',
+          '--> l.61>55 Insert %%%V[AR]:2= 12',
+          '-->	l.61>56 Insert head:  &
+',
+          '--> l.61>57 Insert %%%V[AR]:3= 13',
+          '-->	l.61>58 Insert head:  &
+',
+          '--> l.61>59 Insert %%%V[AR]:4= 14',
+          '-->	l.61>60 Insert head: ~
+',
+          '~~> l.61 NOT defined %%%V[AR]:',
+          '--> Table row = 2',
+          '-->	l.61>61 Insert head: \\\\
+',
+          '-->	l.61>62 Insert head: \\hline
+',
+          '-->	l.61>63 Insert head: \\rule{0mm}{1.5em}
+',
+          '--> l.61>64 Insert %%%V[AR]:0= 20',
+          '-->	l.61>65 Insert head:  &
+',
+          '--> l.61>66 Insert %%%V[AR]:1= 21',
+          '-->	l.61>67 Insert head:  &
+',
+          '--> l.61>68 Insert %%%V[AR]:2= 22',
+          '-->	l.61 NOT defined %%%V:3',
+          '-->	l.61>69 Insert head:  &
+',
+          '--> l.61>70 Insert %%%V[AR]:4= 24',
+          '-->	l.61>71 Insert head: ~
+',
+          '~~> l.61 NOT defined %%%V[AR]:',
+          '--> Table row = 3',
+          '-->	l.61>72 Insert head: \\\\
+',
+          '-->	l.61>73 Insert head: \\hline
+',
+          '-->	l.61>74 Insert head: \\rule{0mm}{1.5em}
+',
+          '--> l.61>75 Insert %%%V[AR]:0= 30',
+          '-->	l.61>76 Insert head:  &
+',
+          '--> l.61>77 Insert %%%V[AR]:1= 31',
+          '-->	l.61>78 Insert head:  &
+',
+          '--> l.61>79 Insert %%%V[AR]:2= 32',
+          '-->	l.61>80 Insert head:  &
+',
+          '--> l.61>81 Insert %%%V[AR]:3= 33',
+          '-->	l.61>82 Insert head:  &
+',
+          '--> l.61>83 Insert %%%V[AR]:4= 34',
+          '~~> l.61 NOT defined %%%V[AR]:',
+          '--> l.70 Found %%%VAR:myTable_hash',
+          '--> Table row = 0',
+          '--> l.81>91 Insert %%%V[AR]:A= 00',
+          '-->	l.81>92 Insert head:  \\=
+',
+          '--> l.81>93 Insert %%%V[AR]:B= 01',
+          '-->	l.81>94 Insert head:  \\=
+',
+          '--> l.81>95 Insert %%%V[AR]:C= 02',
+          '-->	l.81>96 Insert head:  \\=
+',
+          '--> l.81>97 Insert %%%V[AR]:D= 03',
+          '-->	l.81>98 Insert head:  \\=
+',
+          '--> l.81>99 Insert %%%V[AR]:E= 04',
+          '--> Table row = 1',
+          '-->	l.81>100 Insert head: \\\\
+',
+          '--> l.81>101 Insert %%%V[AR]:A= 10',
+          '-->	l.81>102 Insert head:  \\=
+',
+          '--> l.81>103 Insert %%%V[AR]:B= 11',
+          '-->	l.81>104 Insert head:  \\=
+',
+          '--> l.81>105 Insert %%%V[AR]:C= 12',
+          '-->	l.81>106 Insert head:  \\=
+',
+          '--> l.81>107 Insert %%%V[AR]:D= 13',
+          '-->	l.81>108 Insert head:  \\=
+',
+          '--> l.81>109 Insert %%%V[AR]:E= 14',
+          '--> Table row = 2',
+          '-->	l.81>110 Insert head: \\\\
+',
+          '--> l.81>111 Insert %%%V[AR]:A= 20',
+          '-->	l.81>112 Insert head:  \\=
+',
+          '--> l.81>113 Insert %%%V[AR]:B= 21',
+          '-->	l.81>114 Insert head:  \\=
+',
+          '--> l.81>115 Insert %%%V[AR]:C= 22',
+          '-->	l.81>116 Insert head:  \\=
+',
+          '--> l.81>117 Insert %%%V[AR]:D= 23',
+          '-->	l.81>118 Insert head:  \\=
+',
+          '--> l.81>119 Insert %%%V[AR]:E= 24',
+          '--> Table row = 3',
+          '-->	l.81>120 Insert head: \\\\
+',
+          '--> l.81>121 Insert %%%V[AR]:A= 30',
+          '-->	l.81>122 Insert head:  \\=
+',
+          '--> l.81>123 Insert %%%V[AR]:B= 31',
+          '-->	l.81>124 Insert head:  \\=
+',
+          '--> l.81>125 Insert %%%V[AR]:C= 32',
+          '-->	l.81>126 Insert head:  \\=
+',
+          '--> l.81>127 Insert %%%V[AR]:D= 33',
+          '-->	l.81>128 Insert head:  \\=
+',
+          '--> l.81>129 Insert %%%V[AR]:E= 34',
+          '~~> l.86 WARNING#3: unknown sub-key \'NoNameI\' in %%%V:NoNameI',
+          '~~> l.89 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key \'NoNameII\' in %%%VAR:NoNameII'
+];
+
+is_deeply( $msg, $msg_ref8, "Test #8: DEBUG");
 
 
 ###Test 4
@@ -190,13 +353,21 @@ my $msg_ref2 = [
 is_deeply( $msg, $msg_ref2, "Test #11: unknown %%%VARs with DEBUG");
 
 
+sub copy_file {
+	my( $file, $newfile ) = @_;
+
+	open IFILE, $file or die "Can't open '$file': $!\n";
+	open OFILE, ">$newfile" or die "Can't open '$newfile': $!\n";
+
+	print OFILE <IFILE>;
+	close OFILE;
+	close IFILE;
+}
+
 ###Test 9
 my $newfile = "t/$$.tex";
-open IFILE, $file or die $!;
-open OFILE, ">$newfile" or die $!;
-print OFILE <IFILE>;
-close OFILE;
-close IFILE;
+
+lives_ok { copy_file( $file, $newfile ) } "Test #9.1: copy $file to $newfile";
 
 $msg = replication( $newfile, $info, ofile => $newfile, silent =>1, debug => 0 ) // [];
 
@@ -212,7 +383,7 @@ is_deeply( $msg, $msg_ref9, "Test #9: INFILE == OUTFILE");
 ###Test 10
 $msg = replication( $file, {}, ofile => $newfile, silent =>1, debug => 0 ) // [];
 
-is( $msg->[0], "!!! ERROR#2: EMPTY data!", "Test #10: EMPTY data");
+is( $msg->[0], "!!! ERROR#2: EMPTY or WRONG data!", "Test #10: EMPTY or WRONG data");
 
 unlink $newfile;
 
@@ -247,7 +418,7 @@ is_deeply( $msg, $msg_ref12, "Test #12: wrong ARRAY");
 unlink $ofile;
 
 
-###Test 13-14
+###Test 13
 my $file_s = 't/tmp/template_simple.tex';
 my $ofile_s = 't/tmp/ready_simple.tex';
 
@@ -277,7 +448,7 @@ my $tex = q|
 \begin{tabbing}
 %%%VAR: myArray
 %%%ADDX: \=
-   'A' %%%V: 2,1,3-4,0
+   'A' %%%V: 2,1,3-4,-,0
  \=
    'B'
  \=
@@ -297,9 +468,18 @@ my $tex = q|
 \end{tabbing}
 |;
 
-open F, ">$file_s" or die "Can't open '$file_s': $!";
-print F $tex;
-close F;
+
+sub save_file {
+	my( $file, $tex ) = @_;
+
+	open FILE, ">$file" or die "Can't open '$file': $!\n";
+	print FILE $$tex;
+	close FILE;
+
+}
+
+
+lives_ok { &save_file( $file_s, \$tex ) } "Test #13.1: $file_s save";
 
 my @ell = (11, 22, 33);
 $info = {
@@ -309,15 +489,11 @@ $info = {
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( @$msg, 0, "Test #13: '$file_s' without errors");
+is( @$msg, 0, "Test #13.2: '$file_s' without errors");
 
-open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+
+###Test 14
+lives_ok { $msg = read_file( $ofile_s ) } "Test #14.1: $ofile_s read";
 
 my $msg_ref_s = [
 '',
@@ -370,12 +546,12 @@ my $msg_ref_s = [
 '\end{tabbing}',
 ];
 
-is_deeply( $msg, $msg_ref_s, "Test #14: ordinary ARRAY");
+is_deeply( $msg, $msg_ref_s, "Test #14.2: ordinary ARRAY");
 
 unlink $file_s, $ofile_s;
 
 
-###Test 21-22
+###Test 21
 $tex = q|
 \begin{tabbing}
 %%%VAR: myArray
@@ -403,9 +579,7 @@ $tex = q|
 %%%END:
 |;
 
-open F, ">$file_s" or die "Can't open '$file_s': $!";
-print F $tex;
-close F;
+lives_ok { &save_file( $file_s, \$tex ) } "Test #21.1: $file_s save";
 
 $info = {
 		myArray => [0,1,2],
@@ -416,16 +590,11 @@ $info = {
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( @$msg, 0, "Test #21: '$file_s' without errors");
+is( @$msg, 0, "Test #21.2: '$file_s' without errors");
 
 
-open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+###Test 22
+lives_ok { $msg = read_file( $ofile_s ) } "Test #22.1: $ofile_s read";
 
 $msg_ref_s = [
 '',
@@ -447,12 +616,12 @@ $msg_ref_s = [
 '23456789,',
 ];
 
-is_deeply( $msg, $msg_ref_s, "Test #22: ARRAY");
+is_deeply( $msg, $msg_ref_s, "Test #22.2: ARRAY");
 
 unlink $file_s, $ofile_s;
 
 
-###Test 15-16
+###Test 15
 $tex = q|
 %%%V: /// 	   
 %%%V: /		
@@ -486,9 +655,7 @@ $tex = q|
 \end{tabular}
 |;
 
-open F, ">$file_s" or die "Can't open '$file_s': $!";
-print F $tex;
-close F;
+lives_ok { &save_file( $file_s, \$tex ) } "Test #15.1: $file_s save";
 
 my $r = 1;
 $info = {
@@ -499,18 +666,12 @@ $info = {
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
-# $msg = replication( $file_s, $info, ofile => $ofile_s, def=>1, debug => 1 ) // [];
 
-is( @$msg, 0, "Test #15: '$file_s' without errors");
+is( @$msg, 0, "Test #15.2: '$file_s' without errors");
 
 
-open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+###Test 16
+lives_ok { $msg = read_file( $ofile_s ) } "Test #16.1: $ofile_s read";
 
 $msg_ref_s = [
 '',
@@ -537,12 +698,12 @@ $msg_ref_s = [
 '\end{tabular}',
 ];
 
-is_deeply( $msg, $msg_ref_s, "Test #16: ordinary HASH");
+is_deeply( $msg, $msg_ref_s, "Test #16.2: ordinary HASH");
 
 unlink $ofile_s;
 
 
-###Test 17-18
+###Test 17
 $info = {
 		myHash => {
 			A=>1, B=>[2,6..8], C=>3, D=>4, E=>5,
@@ -554,13 +715,9 @@ $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) 
 
 is( @$msg, 0, "Test #17: '$file_s'");
 
-open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+
+###Test 18
+lives_ok { $msg = read_file( $ofile_s ) } "Test #18.1: $ofile_s read";
 
 $msg_ref_s = [
 '',
@@ -587,19 +744,21 @@ $msg_ref_s = [
 '\end{tabular}',
 ];
 
-is_deeply( $msg, $msg_ref_s, "Test #18: mixed HASH");
+is_deeply( $msg, $msg_ref_s, "Test #18.2: mixed HASH");
 
 unlink $file_s, $ofile_s;
 
 
-###Test 19-20
+###Test 19
 $tex = q|
 \mbox{
+ParamI:
 %%%VAR: ParamI%
 SPECIFY VALUE ParamI !
 ~
 ~
 ~
+ParamII:
 %%%VAR: ParamII
 SPECIFY VALUE ParamII !
 ~
@@ -608,21 +767,45 @@ SPECIFY VALUE ParamII !
 ~
 %%%V: RefSub
 ~
+myArray 1st:
 %%%VAR: myArray
+%%%ADD:%
 ~ %%%ADD:%
 SPECIFY VALUE %%%V:-25-15
 %%%END:
 ~
+myArray 2nd:
 %%%VAR: myArray
 ~ %%%ADD:%
 SPECIFY VALUE %%%V:-5-1,-3
 %%%END:
 ~
+ArrRefs:
 %%%VAR: ArrRefs
+( %%%ADD:%
+SPECIFY VALUE %%%V:1%
+) %%%ADDE:
 ~ %%%ADD:%
 SPECIFY VALUE %%%V:@
 %%%END:
 ~
+Arr_in_Hash:
+%%%VAR: Arr_in_Hash
+A %%%ADD:%
+SPECIFY VALUE %%%V:A%
+~ %%%ADDE:
+B %%%ADD:%
+SPECIFY VALUE %%%V:B%
+~ %%%ADDE:
+C %%%ADD:%
+SPECIFY VALUE %%%V:C%
+~ %%%ADDE:
+D %%%ADD:%
+SPECIFY VALUE %%%V:D%
+~ %%%ADDE:
+E %%%ADD:%
+SPECIFY VALUE %%%V:E%
+~ %%%ADDE:
 %%%VAR: Mixed
 ~ %%%ADD:%
 SPECIFY VALUE %%%V:@
@@ -630,9 +813,7 @@ SPECIFY VALUE %%%V:@
 }
 |;
 
-open F, ">$file_s" or die "Can't open '$file_s': $!";
-print F $tex;
-close F;
+lives_ok { &save_file( $file_s, \$tex ) } "Test #19.1: $file_s save";
 
 $info = {
 		ParamI => 12345,
@@ -650,29 +831,31 @@ $info = {
 				[5..9],
 			],
 		myArray => [0..9],
+		Arr_in_Hash => [
+			{A=>1, B=>[2,6..8], C=>3, D=>4, E=>5,},
+		],
 	};
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // []; # debug => 0
 
-is( $msg->[0], "~~> l.14 WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of 'RefSub' in %%%V:RefSub", "Test #19: '$file_s'");
+is( $msg->[0], "~~> l.16 WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of 'RefSub' in %%%V:RefSub", "Test #19.2: '$file_s'");
 
-open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+
+###Test 20
+lives_ok { $msg = read_file( $ofile_s ) } "Test #20.1: $ofile_s read";
 
 $msg_ref_s = [
 '',
 '\mbox{',
+'ParamI:',
 1234567890,
 '~',
 '%%%V: RefSub',
 '~',
+'myArray 1st:',
 '~0',
 '~',
+'myArray 2nd:',
 '~9',
 '~8',
 '~7',
@@ -680,20 +863,50 @@ $msg_ref_s = [
 '~5',
 '~7',
 '~',
-'~~~~',
+'ArrRefs:',
+'(11)',
+'~33',
+'~11',
+'~22',
+'~',
+'Arr_in_Hash:',
+'A1~',
+'B2~',
+'B6~',
+'B7~',
+'B8~',
+'C3~',
+'D4~',
+'E5~',
 '%%%VAR: Mixed',
 '~ %%%ADD:%',
 'SPECIFY VALUE %%%V:@',
 '}',
 ];
 
-is_deeply( $msg, $msg_ref_s, "Test #20: '%%%VAR:' nested within another '%%%VAR:'");
+is_deeply( $msg, $msg_ref_s, "Test #20.2: '%%%VAR:' nested within another '%%%VAR:'");
+
+# open F, ">test.log";
+# print F Dumper($msg);
+# close F;
+# exit;
+
 
 unlink $file_s, $ofile_s;
 
 
-###Test 23-24
+###Test 23
 $tex = q|
+SPECIFY Y ELEMENT ! %%%V: /1/Y \$
+~
+%%%VAR: 1
+~ %%%ADDA:% is wrong tag!
+SPECIFY X ELEMENT of HASH ! %%%V: X
+%%%END:
+%%%VAR: subParam
+SPECIFY ELEMENT %%%V: key
+%%%END:
+~
 \mbox{
 %%%VAR: /0/7
 SPECIFY ELEMENT of ARRAY !
@@ -702,40 +915,50 @@ SPECIFY ELEMENT of ARRAY !
 }
 |;
 
-open F, ">$file_s" or die "Can't open '$file_s': $!";
-print F $tex;
-close F;
+lives_ok { &save_file( $file_s, \$tex ) } "Test #23.1: $file_s save";
 
-$info = [ [0..9], ];
+$info = [ [0..9], {Y=>'~10', X=>11, S=>sub{ $_ = 1234567890 }, }, ];
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0, esc=>'~' ) // [];
 
-is( @$msg, 0, "Test #23: '$file_s'");
+my $msg_ref_23_2 = [
+	'~~> l.8 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key \'subParam\' in %%%VAR:subParam',
+	'~~> l.9 WARNING#3: unknown sub-key \'key\' in %%%V:key',
+];
 
-open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
-$msg = [];
-while(<OFILE>) {
-	s/\s+$//;
-	push @$msg, $_;
-}
-close OFILE;
+is_deeply( $msg, $msg_ref_23_2, "Test #23.2: wrong input info as subroutine");
+
+
+###Test 24
+lives_ok { $msg = read_file( $ofile_s ) } "Test #24.1: $ofile_s read";
 
 $msg_ref_s = [
 '',
+'\\texttt{\\~{}}10\$',
+'~',
+11,
+'%%%VAR: subParam',
+'SPECIFY ELEMENT %%%V: key',
+'~',
 '\mbox{',
 7,
 '}',
 ];
 
-is_deeply( $msg, $msg_ref_s, "Test #24: ARAAY.ARRAY %%%VAR:");
+is_deeply( $msg, $msg_ref_s, 'Test #24.2: ARAAY.ARRAY %%%VAR:');
+
+unlink $ofile_s;
+
+$msg = replication( $file_s, sub{ $_ = 1234567890 }, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+
+is( $msg->[0], '!!! ERROR#2: EMPTY or WRONG data!', 'Test #24.3: SUB %%%VAR:');
 
 unlink $file_s, $ofile_s;
-
 
 ###Test 25
 $msg = replication( undef, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( $msg->[0], "!!! ERROR#0: undefined input file!", "Test #25: undefined input name of TeX file");
+is( $msg->[0], '!!! ERROR#0: undefined input file!', 'Test #25: undefined input name of TeX file');
 
 unlink $ofile_s;
 

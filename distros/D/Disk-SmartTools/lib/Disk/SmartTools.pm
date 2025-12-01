@@ -9,7 +9,7 @@ use Exporter qw(import);
 use IPC::Cmd qw[can_run run];
 use YAML::PP;
 
-our $VERSION = version->declare("v3.3.8");
+our $VERSION = version->declare("v3.3.12");
 
 our @EXPORT_OK = qw(
     get_disk_prefix
@@ -46,11 +46,11 @@ sub get_disk_prefix {
 sub os_disks {
     my $disk_prefix = get_disk_prefix();
     my @disks;
-    if (is_linux) {
+    if ( is_linux() ) {
         @disks = qw(a b c d e f g h i j k l m n o p q r s t u v w x y z);
         return map { $disk_prefix . $_ } @disks;
     }
-    elsif (is_mac) {
+    elsif ( is_mac() ) {
         @disks = qw(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15);
         return map { $disk_prefix . $_ } @disks;
     }
@@ -165,7 +165,13 @@ sub get_smart_disks {
 
 sub is_drive_smart {
     my ($disk) = @_;
-    Readonly my $IS_AVAILABLE => qr{SMART support is: Available}i;
+
+    return 0 unless ( defined $disk );
+
+    Readonly my $IS_AVAILABLE_re     => qr{SMART support is: Available}i;
+    Readonly my $START_OF_INFO_re    => qr{START OF INFORMATION SECTION}i;
+    Readonly my $OP_NOT_SUPPORTED_re => qr{Operation not supported by device}i;
+
     my $smart_cmd = get_smart_cmd();
     $smart_cmd .= ' --info ' . $disk;
     if ($smart_cmd) {
@@ -180,8 +186,13 @@ sub is_drive_smart {
            )
         {
             foreach my $line ( split( /\n/, $buf ) ) {
-                if ( $line =~ $IS_AVAILABLE ) {
+                if (     ( $line =~ $IS_AVAILABLE_re )
+                      || ( $line =~ $START_OF_INFO_re ) )
+                {
                     return 1;
+                }
+                if ( $line =~ $OP_NOT_SUPPORTED_re ) {
+                    return 0;
                 }
             }    #foreach
         }    #if run
@@ -245,7 +256,7 @@ sub load_local_config {
     my $filename         = dir_suffix_slash( $ENV{ HOME } ) . '.smarttoolsrc.yml';
     my $local_config_ref = {};
 
-    if ( !file_readable($filename) ) { return undef; }
+    if ( !file_readable($filename) ) { return; }
 
     my $ypp              = YAML::PP->new;
     my $host_configs_ref = $ypp->load_file($filename);
@@ -270,7 +281,7 @@ Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 =head1 VERSION
 
-Version v3.3.8
+Version v3.3.12
 
 =head1 SYNOPSIS
 
@@ -307,6 +318,8 @@ Returns the proper disk prefix depending on the OS: C</dev/sd> for linux, C</dev
 =head2 B<os_disks()>
 
 Returns a list of possible disks based on OS, prefixed by get_disk_prefix().
+
+I<Should parse diskutil on macs and lsblk on linux for more accuracy.>
 
     my @disks = os_disks();
 
@@ -394,10 +407,74 @@ Load host local disk configuration from F<$HOME/.smarttools.yml> if it exists.
 This allows for manual configuration in the case where the automatic detection
 of disks is not precise.
 
-C<HOSTNAME> host name specified in configuration file. 
+C<HOSTNAME> host name specified in configuration file.
 Allows a single configuration file to be deployed with multiple host's configurations.
 
     my $local_config_ref = load_local_config($hostname);
+
+=head1 EXAMPLES
+
+Two example programs demonstrate how the `Disk::SmartTools` modules can be used.
+
+=head2 smart_show.pl
+
+Display SMART information on disks.
+
+    $ smart_show.pl
+
+Asks for the type of SMART information to display then reports for each
+physical disk in the system.
+
+    Display SMART information
+    --------------------------
+    Choose attribute to display:
+         a. All SMART Info
+         b. Info
+         c. Overall-Health
+         d. SelfTest History
+         e. Error Log
+         f. Temperature Graph
+         g. Power_On_Hours
+         h. Power_Cycle_Count
+         i. Temperature_Celsius
+         j. Reallocated_Sector_Ct
+         k. Offline_Uncorrectable
+         l. Raw_Read_Error_Rate
+         m. Seek_Error_Rate
+         n. Reported_Uncorrect
+         o. Command_Timeout
+         p. Current_Pending_Sector
+
+B<Must be run as root.>
+
+=head2 smart_run_tests.pl
+
+Runs a SMART test on all disks.  Typically run as a crontab.
+
+    $ smart_run_tests.pl <args>
+
+    --test_type : Length of SMART test, short (default) or long
+    --dry_run : Don't actually perform SMART test
+    --debug : Turn debugging on
+    --verbose : Generate debugging info on stderr
+    --silent : Do not print report on stdout
+    --help : This helpful information.
+
+B<Must be run as root.>
+
+=head3 Crontabs
+
+Usually run as a crontab
+
+=over 4
+
+=item 30 5 * * *       : S.M.A.R.T. disk checks - short ; /var/root/bin/smart_run_tests.pl
+
+Z<>
+
+=item 4  6 * * *       : S.M.A.R.T. disk checks - long  ; /var/root/bin/smart_run_tests.pl --test_type=long
+
+=back
 
 =head1 AUTHOR
 

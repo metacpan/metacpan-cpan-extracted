@@ -136,7 +136,7 @@ provides:
     file: lib/Daje/Document/Templates/Tools/Generate/SQL.pm
   Daje::Plugin::Tools:
     file: lib/Daje/Plugin/Tools.pm
-    version: '0.17'
+    version: '0.18'
   Daje::Workflow::Activities::Tools::Generate::Base:
     file: lib/Daje/Workflow/Activities/Tools/Generate/Base.pm
   Daje::Workflow::Activities::Tools::Generate::SQL:
@@ -154,7 +154,7 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Plugin-Tools/issues
   homepage: https://github.com/janeskil1525/Daje-Plugin-Tools
   repository: https://github.com/janeskil1525/Daje-Plugin-Tools.git
-version: '0.17'
+version: '0.18'
 x_contributors:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "App::optex" : "1.02",
-            "Getopt::EX" : "3.01",
+            "Getopt::EX" : "3.02",
+            "Getopt::EX::Config" : "0",
             "Math::RPN" : "0",
             "perl" : "v5.14.0"
          }
@@ -57,7 +58,7 @@
    "provides" : {
       "App::optex::rpn" : {
          "file" : "lib/App/optex/rpn.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-rpn"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

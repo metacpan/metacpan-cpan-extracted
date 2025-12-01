@@ -18,24 +18,40 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_extra_data = (
-    red      => [qw(fire feuer america amerika fox vixen fuchs), "f\N{U+00FC}chsin"],
-    green    => [qw(australia australien)],
-    blue     => [qw(water wasser sky himmel ice europe europa male man men mann herr), "m\N{U+00E4}nnlich", "m\N{U+00E4}nnchen"],
-    yellow   => [qw(lemon zitrone asia asien)],
-    magenta  => [qw(female woman women frau dame weiblich weib weibschen)],
-    grey     => [qw(gray mouse mice maus rat ratte ratten), "m\N{U+00E4}use"],
-    black    => [qw(africa afrika)],
-    savannah => [qw(savannah savanne lion leo), "l\N{U+00F6}we", "l\N{U+00F6}win"],
+    en => {
+        red      => [qw(fire america fox vixen squirrel blush error)],
+        green    => [qw(australia plant)],
+        blue     => [qw(water sky ice europe male man men daddy dad father son brother boy)],
+        yellow   => [qw(lemon asia warning)],
+        magenta  => [qw(female woman women dame mother mom daughter sister girl pink)],
+        grey     => [qw(gray mouse mice rat wolf)],
+        black    => [qw(africa)],
+        savannah => [qw(savannah lion leo)],
+        nocolour => [qw(proto group generator recommend coloured colored json)],
+    },
+    de => {
+        red      => [qw(feuer amerika fuchs fehler), "f\N{U+00FC}chsin", "eichh\N{U+00F6}rnschen"],
+        green    => [qw(australien pflanze)],
+        blue     => [qw(wasser himmel eis europa mann herr papa vater paps sohn bruder junge), "m\N{U+00E4}nnlich", "m\N{U+00E4}nnchen"],
+        yellow   => [qw(zitrone asien warnung)],
+        magenta  => [qw(frau dame weiblich weib weibschen mutter mama tochter schwester pink), "m\N{U+00E4}dschen"],
+        grey     => [qw(maus rat ratte ratten wolf), "m\N{U+00E4}use"],
+        black    => [qw(afrika)],
+        savannah => [qw(savanne), "l\N{U+00F6}we", "l\N{U+00F6}win"],
+    },
 );
 our %_extra;
 
-foreach my $key (keys %_extra_data) {
-    $_extra{$_} = $key foreach @{$_extra_data{$key}};
+foreach my $lang (keys %_extra_data) {
+    $_extra{$lang} = {};
+    foreach my $key (keys %{$_extra_data{$lang}}) {
+        $_extra{$lang}{$_} = $key foreach @{$_extra_data{$lang}{$key}};
+        $_extra{$lang}{__order__} = [sort {length($b) <=> length($a) || $b cmp $a} grep {$_ ne '__order__'} keys %{$_extra{$lang}}];
+    }
 }
-our @_extra_keys = sort {length($b) <=> length($a) || $b cmp $a} keys %_extra;
 our %_names = (
     en => {
         'black' => 'black',
@@ -530,7 +546,8 @@ our %_names = (
         __order__ => ["\N{U+6A59}\N{U+9EC3}\N{U+8272}","\N{U+6A58}\N{U+9EC3}\N{U+8272}","\N{U+5496}\N{U+5561}\N{U+8272}","\N{U+9752}\N{U+8272}","\N{U+8910}\N{U+8272}","\N{U+70CF}\N{U+8272}","\N{U+7070}\N{U+8272}","\N{U+6A59}\N{U+8272}","\N{U+6A58}\N{U+8272}","\N{U+68D5}\N{U+8272}","\N{U+54C1}\N{U+7D05}","\N{U+9ED1}","\N{U+9EC3}","\N{U+85CD}","\N{U+7DA0}","\N{U+7D05}","\N{U+767D}"],
     },
 );
-our @_langs = qw(en de nl ca da eo es eu fi fo fr ga gl gr is it ja ko la lu no oc pt ro ru sv vi zh);
+our %_langs = ('zh' => 0, 'vi' => 1, 'sv' => 2, 'ru' => 3, 'ro' => 4, 'pt' => 5, 'oc' => 6, 'no' => 7, 'lu' => 8, 'la' => 9, 'ko' => 10, 'ja' => 11, 'it' => 12, 'is' => 13, 'gr' => 14, 'gl' => 15, 'ga' => 16, 'fr' => 17, 'fo' => 18, 'fi' => 19, 'eu' => 20, 'es' => 21, 'eo' => 22, 'da' => 23, 'ca' => 24, 'nl' => 25, 'de' => 26, 'en' => 27);
+our $_lang_value = 28;
 1;
 
 __END__
@@ -545,7 +562,7 @@ Data::Displaycolour::Data - Work with display colours (internal data)
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Ref::Util qw/is_arrayref is_hashref is_ref/;
 
-our $VERSION='0.2.2';
+our $VERSION='0.2.3';
 
 my %property=map {$_=>undef} qw/message attributes names note/;
 
@@ -90,29 +90,53 @@ Schedule::Activity::Message - Container for individual or multiple messages
 
 =head1 SYNOPSIS
 
-	my $message=Schedule::Activity::Message->new(
-		message   =>'key name',
-		message   =>'string message',
-		message   =>['array', 'of', 'alternates'],
-		message   =>{name=>key},
-		message   =>{
-			alternates=>[
-				{message=>'string', attributes=>{...}},
-				{name=>key},
-				...
-			],
-		},
-		names=>{
-			key=>{
-				message=>'string message',
-				attributes=>{...}          # optional
-			},
-		},
-		attributes=>{...} # optional
-		note      =>...   # optional
-	);
+  my $message=Schedule::Activity::Message->new(
+    message   =>'key name',
+    message   =>'string message', attributes=>{...},
+    message   =>['array', 'of', 'alternates'],
+    message   =>{name=>key},
+    message   =>{
+      alternates=>[
+        {message=>'string', attributes=>{...}},
+        {name=>key},
+        ...
+      ],
+    },
+    names=>{
+      key=>{string, array, or hash configuration},
+    },
+    note      =>...   # optional
+  );
+
+=head1 DESCRIPTION
+
+A message object permits storage and generation of one or more associated string messages.  A simple string always returns the string as the message, but arrays of alternates permit random selection of messages.  Messages may also be referenced by a common structure of I<named messages>, shared across message objects.
+
+Both hash-alternate and named messages permit association of attributes, possibly different for each alternate.
+
+=head1 CONFIGURATION
+
+  message=>'A message string'
+  message=>'named message key'
+  message=>['An array','of alternates','chosen randomly']
+  message=>{name=>'named message key'}
+  message=>{
+    alternates=>[
+      {message=>'A hash containing an array', attributes=>{...}}
+      {message=>'of alternates',              attributes=>{...}}
+      {message=>'with optional attributes',   attributes=>{...}}
+      {message=>'named message key'}
+      {name=>'named message key'}
+    ]
+  }
+
+Message selection is randomized for arrays and a hash of alternates.  Named messages must exist.  If a simple message string matches a named message key, the name takes precedence.
+
+Named messages may only create string, array, or hash messages.  They cannot reference another name.
 
 =head1 FUNCTIONS
+
+A C<Message> object provides the following functions.
 
 =head2 random
 
@@ -122,11 +146,7 @@ Retrieve a pair of C<(message,object)>, which is either an individual string mes
 
 Given a plain (unknown) message configuration, find any embedded attributes.  This function is primarily useful during schedule configuration validation, prior to full action nodes being built, to identify all attributes within a nested configuration.  It does not need to handle named attributes because those are separately declared.
 
-=head1 NAMED MESSAGES
-
-Named messages permit sharing of common messages across configured instances.  This is particularly useful when there are a large number of common alternate messages where copy/pasting through the scheduling configuration would be egregious.
-
-A reference may be provided to C<names>, each defined with a lookup C<key> and containing a plain message string and, optionally, attributes.  During message selection, any string message or configured C<name> will return the message configuration for C<key=name>, if it exists, or will return the string message.  This applies to all messages configurations (flat strings, array of strings, hash containing a C<message>, and hash containing a C<name>).  If a configured message matches a referenced name, the name takes precedence.
+=head1 BUGS
 
 As of version 0.1.2, there is very little validation of the C<names> contents.
 

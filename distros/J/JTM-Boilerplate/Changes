@@ -1,3 +1,7 @@
+2.253341  2025-11-30 21:09:33+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * Remove EV & Anyevent for Perl 5.42 support
+
 2.241690  2024-06-16 20:33:38-06:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * Ensure JCM:: and JTM:: have same code

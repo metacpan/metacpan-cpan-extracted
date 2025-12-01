@@ -1,0 +1,102 @@
+=pod
+
+=head1 NAME
+
+Getopt::Guided - getopts implementation that follows POSIX utility guidelines
+
+=head1 SYNOPSIS
+
+  use Getopt::Guided qw( getopts );
+
+  local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
+  getopts 'a:bcd,v', my %opts;
+
+  # %opts == ( a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
+  # @ARGV == ( 'v1', 'v2' )
+
+=head1 DESCRIPTION
+
+This module reimplements the C<getopts()> function of the L<Getopts::Std>
+core module.  The new implementation supports only the two-parameter form
+of C<getopts()>.  The first parameter is a string that contains the option
+characters (the options specification).  The second parameter is an empty
+hash (passed by reference) that stores the processing result. Each hash
+key refers to a provided option character and the corresponding hash value
+refers to the option-argument (or C<1> if it is a flag). This module exports
+the C<getopts()> function on request.
+
+The new implementation follows the L<POSIX utility syntax
+guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
+4 to 10, inclusive. C<getopts()> warns and returns false if a processing error
+occurs; otherwise the function returns true. The processing error types are:
+
+=over 2
+
+=item 1. illegal option
+
+=item 2. option requires an argument
+
+=item 3. option with argument isn't last one in group
+
+=back
+
+The second processing error occurs if either no argument or the C<undef>
+value is provided for an option that requires an option-argument.
+
+If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
+before it warns and returns false.
+
+=head1 OPTION TYPES
+
+An option that requires no option-argument is called a flag. If a flag
+is provided, its hash value is C<1>, which in perl boolean context means
+true. If the same flag is provided multiple times, the implementation could
+keep the hash value. But for perl each positive integer is true in boolean
+context. Therefore each occurrence of the flag increments its hash value
+by one.  For example, this is useful for incrementing a verbosity level
+represented by the C<-v> flag.
+
+An option that requires an option-argument has either a colon (C<:>) or a
+comma (C<,>) option-argument indicator. The indicator follows the option
+character in the options specification (C<getopts()>'s first parameter).
+
+If a C<:> option is repeated, the option-arguments overwrite each other and
+the last argument wins that means it is assigned as a value to the option
+character key in C<%opts>.
+
+If a C<,> option is repeated, the option-arguments are pushed to an array.
+A reference to that array is assigned as a value to the option character
+key in C<%opts>.
+
+=head1 CAVEAT
+
+Even if you are currently using the two-parameter form of the C<getopts()>
+function of C<Getopts::Std>, the new implementation isn't a drop in
+replacement.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799/utilities/getopts.html>
+
+=item *
+
+L<Tacit list of POSIX short options|https://stackoverflow.com/questions/56131811/is-there-a-tacit-list-of-reserved-names-for-posix-short-options>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

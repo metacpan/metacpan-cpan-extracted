@@ -37,6 +37,23 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.com
 #
 
+sub load_current_version($self) {
+    $self->app->log->debug('Daje::Controller::ToolsVersions::load_current_version');
+    $self->render_later;
+    # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
+    #     $self->req->headers->header('X-Token-Check')
+    # );
+    my $tools_projects_pkey = $self->param('tools_projects_pkey');
+    $self->app->log->debug($self->req->headers->header('X-Token-Check'));
+    # my $setting = $self->param('setting');
+    $self->tools_versions->load_current_version_p($tools_projects_pkey)->then(sub($result) {
+        $self->render(json => $result->{data});
+    })->catch(sub($err) {
+        $self->app->log->error('Daje::Controller::ToolsVersions::load_current_version ' . $err);
+        $self->render(json => { result => 0, data => $err });
+    })->wait;
+}
+
 sub load_versions_list ($self) {
 
     $self->app->log->debug('Daje::Controller::ToolsVersions::load_versions_list');

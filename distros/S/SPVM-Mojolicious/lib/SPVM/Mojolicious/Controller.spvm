@@ -14,6 +14,7 @@ class Mojolicious::Controller {
   use Mojo::Message::Request;
   use Mojo::Message::Response;
   use Mojo::Log;
+  use Mojo::Callback;
   
   our $ABSOLUTE : string;
   INIT {
@@ -48,11 +49,22 @@ class Mojolicious::Controller {
     }
   ;
   
-  has stash : rw Hash;
+  has stash_h : rw Hash;
   
-  has active_session : rw int;
-  
-  has session : rw Hash;
+  has session_h : virtual ro Hash
+    get {
+      my $stash = $self->stash_h;
+      unless ($stash->{"mojo.active_session"}->(int)) {
+        $self->app->sessions->load($self);
+      }
+      
+      unless ($self->stash_h->exists("mojo.session")) {
+        $self->stash_h->{"mojo.session"} = Hash->new;
+      }
+      
+      return $self->stash_h->{"mojo.session"}->(Hash);
+    }
+  ;
   
   # Fields that is originally stash mojo.xxx
   has log : rw Mojo::Log
@@ -65,13 +77,11 @@ class Mojolicious::Controller {
     }
   ;
   
-  has captures : rw Hash;
-  
-  has rendered : rw byte;
-  
   static method new : Mojolicious::Controller () {
     
     my $self = new Mojolicious::Controller;
+    
+    $self->{stash_h} = Hash->new;
     
     return $self;
   }
@@ -141,7 +151,9 @@ class Mojolicious::Controller {
   method every_param : string[] ($name : string) {
     
     # Captured unreserved values
-    my $captures = $self->{captures} //= Hash->new;
+    $self->stash_h->{"mojo.captures"} //= Hash->new;
+    
+    my $captures = $self->stash_h->{"mojo.captures"}->(Hash);
     
     if ($captures->exists($name) && !$self->app->routes->is_reserved($name)) {
       my $value = $captures->get("$name");
@@ -163,294 +175,392 @@ class Mojolicious::Controller {
   }
 
   method signed_cookie : string ($name : string) {
-
-=pod
-
+    
     # Request cookie
-    return $self->every_signed_cookie($name)->[-1] unless defined $value;
-
-    # Response cookie
-    my $sum = Digest::SHA::hmac_sha256_hex("$name=$value", $self->app->secrets->[0]);
-    return $self->cookie($name, "$value--$sum", $options);
-
-=cut
-
+    return $self->every_signed_cookie($name)->[-1] ;
   }
   
-  method render : string ($template : string, $options : object[] = undef) {
-
-=pod
-
-    # Template may be first argument
-    my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
-    $args->{template} = $template if $template;
-    my $app     = $self->app;
-    my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
-
-    # Localize "extends" and "layout" to allow argument overrides
-    my ($maybe, $ts) = @{$args}{"mojo.maybe", "mojo.string"};
-    my $stash = $self->stash;
-    local $stash->{layout}  = $stash->{layout}  if exists $stash->{layout};
-    local $stash->{extends} = $stash->{extends} if exists $stash->{extends};
-
-    # Rendering to string
-    local @{$stash}{keys %$args}         if $ts || $maybe;
-    delete @{$stash}{qw(layout extends)} if $ts;
-
-    # All other arguments just become part of the stash
-    @$stash{keys %$args} = values %$args;
-    my $renderer = $app->renderer;
-    my ($output, $format) = $renderer->render($self);
-
-    # Maybe no 404
-    return defined $output ? Mojo::ByteStream->new($output) : undef if $ts;
-    return $maybe          ? undef : Carp::croak("Could not render a response") unless defined $output;
-
-    $plugins->emit_hook(after_render => $self, \$output, $format);
-    return $renderer->respond($self, $output, $format, $stash->{status});
-
-=cut
-
+  method set_signed_cookie : string ($name : string, $value : string = undef, $options : object[] = undef) {
+    
+    # Response cookie
+    my $sum = Digest::SHA->hmac_sha256_hex("$name=$value", $self->app->secrets->[0]);
+    
+    $self->set_cookie($name, "$value--$sum", $options);
   }
-
-=pod
-
-  method every_signed_cookie {
-    my ($self, $name) = @_;
+  
+  method every_signed_cookie : string[] ($name : string) {
 
     my $secrets = $self->app->secrets;
-    my @results;
+    my $results = StringList->new;
     for my $value (@{$self->every_cookie($name)}) {
 
       # Check signature with rotating secrets
-      if ($value =~ s/--([^\-]+)$//) {
-        my $signature = $1;
-
-        my $valid;
+      if (my $rep = Re->s((mutable string)$value, "--([^\-]+)$", "")) {
+        my $signature = $rep->match->cap1;
+        
+        my $valid = 0;
         for my $secret (@$secrets) {
-          my $check = Digest::SHA::hmac_sha256_hex("$name=$value", $secret);
-          ++$valid and last if Mojo::Util::secure_compare($signature, $check);
+          my $check = Digest::SHA->hmac_sha256_hex("$name=$value", $secret);
+          if (Mojo::Util->secure_compare($signature, $check)) {
+            $valid = 1;
+            last;
+          }
         }
-        if ($valid) { push @results, $value }
-
-        else { $self->log->trace(qq{Cookie "$name" has bad signature}) }
+        if ($valid) {
+          $results->push($value);
+        }
+        else {
+          $self->log->trace("Cookie \"$name\" has bad signature.");
+        }
       }
-
-      else { $self->log->trace(qq{Cookie "$name" is not signed}) }
+      
+      else {
+        $self->log->trace("Cookie \"$name\" is not signed.");
+      }
     }
-
-    return \@results;
+    
+    return $results->get_array;
   }
 
-  method finish {
-    my $self = shift;
-
+  method finish : void ($code : int = 0, $reason : string = undef) {
+    
+    my $tx = $self->tx;
+    unless ($tx) {
+      die "Transaction already destroyed";
+    }
+    
     # WebSocket
-    my $tx = $self->tx || Carp::croak "Transaction already destroyed";
-    $tx->finish(@_) and return $tx->established ? $self : $self->rendered(101) if $tx->is_websocket;
-
+    if ($tx->is_websocket) {
+      $tx->(Mojo::Transaction::WebSocket)->finish($code, $reason);
+      unless ($tx->(Mojo::Transaction::WebSocket)->established) {
+        $self->rendered(101);
+      }
+    }
+    else {
+      die "finish method is only for WebSocket. Use finish_stream method for long polling stream.";
+    }
+  }
+  
+  method finish_stream : void ($chunk : string = undef) {
+    
+    my $tx = $self->tx;
+    unless ($tx) {
+      die "Transaction already destroyed.";
+    }
+    
     # Chunked stream
-    return @_ ? $self->write_chunk(@_)->write_chunk("") : $self->write_chunk("") if $tx->res->content->is_chunked;
-
+    if ($tx->res->content->is_chunked) {
+      if ($chunk) {
+        $self->write_chunk($chunk);
+      }
+      $self->write_chunk("");
+    }
     # Normal stream
-    return @_ ? $self->write(@_)->write("") : $self->write("");
+    else {
+      if ($chunk) {
+        $self->write($chunk);
+      }
+      $self->write("");
+    }
+  }
+  
+  method on : void ($name : string, $cb : Mojo::Callback) {
+  
+    my $tx = $self->tx;
+    unless ($tx) {
+      die "Transaction already destroyed.";
+    }
+    
+    if ($tx->is_websocket && !$tx->(Mojo::Transaction::WebSocket)->established) {
+      $self->rendered(101);
+    }
+    
+    my $cb_with_instance = (Mojo::Callback)undef;
+    if ($cb) {
+      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+        $cb->($self, $arg1, $arg2, $arg3);
+      };
+    }
+    
+    $tx->on($name => $cb_with_instance);
   }
 
-  method helpers { $_[0]->app->renderer->get_helper("")->($_[0]) }
-
-  method on {
-    my ($self, $name, $cb) = @_;
-    my $tx = $self->tx || Carp::croak "Transaction already destroyed";
-    $self->rendered(101) if $tx->is_websocket && !$tx->established;
-    return $tx->on($name => method { shift; $self->$cb(@_) });
+  method param : string ($name : string) {
+    
+    my $value = $self->every_param($name)->[-1];
+    
+    return $value;
   }
-
-  method param {
-    my ($self, $name) = (shift, shift);
-    return $self->every_param($name)->[-1] unless @_;
-    $self->stash->{"mojo.captures"}{$name} = @_ > 1 ? [@_] : $_[0];
-    return $self;
+  
+  method set_param : void ($name : string, $value : string|string[]) {
+    
+    my $value_ = (string|string[])undef;
+    if ($value) {
+      if ($value isa string) {
+        $value_ = (string)$value;
+      }
+      elsif ($value isa string[]) {
+        $value_ = (string[])$value;
+      }
+      else {
+        die "The type of the value \$value must be string or string[]";
+      }
+    }
+    
+    $self->stash_h->{"mojo.captures"}->(Hash)->{$name} = $value_;
   }
-
-  method render_later { shift->stash("mojo.rendered" => 1) }
-
-  method render_to_string { shift->render(@_, "mojo.string" => 1) }
-
-  method rendered {
-    my ($self, $status) = @_;
-
+  
+  method render : Mojo::ByteStream ($template : string|Hash|object[] = undef, $options : Hash|object[] = undef) {
+    
+    my $template_ = (string)undef;
+    if ($template isa string) {
+      $template_ = $template->(string);
+    }
+    else {
+      $options = $template;
+      $template = undef;
+    }
+    
+    my $options = Fn->to_hash($options);
+    
+    if ($template_) {
+      $options->{"template"} = $template_;
+    }
+    
+    my $app = $self->app;
+    my $plugins = $app->plugins;
+    my $render_to_string = $options->{"mojo.string"}->(int);
+    
+    unless ($render_to_string) {
+      $plugins->emit_hook(before_render => $self, $options);
+    }
+    
+    my $renderer = $app->renderer;
+    my $_ = $renderer->render($self, $options);
+    my $output = $_->[0];
+    my $format = $_->[1];
+    
+    if ($render_to_string) {
+      return $output ? Mojo::ByteStream->new($output) : undef;
+    }
+    
+    $plugins->emit_hook(after_render => $self, my $_ = [$output], $format);
+    $output = $_->[0];
+    
+    unless ($output) {
+      return undef;
+    }
+    
+    $renderer->respond($self, $output, $format, $options->{"status"});
+  }
+  
+  method render_to_string : Mojo::ByteStream ($options : Hash|object[] = undef) {
+    
+    my $options = Fn->to_hash($options);
+    $options->merge_options({"mojo.string" => 1});
+    my $string = $self->render($options);
+    
+    return $string;
+  }
+  
+  method render_later : void () {
+    $self->stash_h->{"mojo.rendered"} = 1;
+  }
+  
+  method rendered : void ($status : int = 0) {
+    
     # Make sure we have a status
-    $self->res->code($status) if $status;
-
+    if ($status) {
+      $self->res->set_code($status);
+    }
+    
     # Finish transaction
-    my $stash = $self->stash;
-    if (!$stash->{"mojo.finished"} && ++$stash->{"mojo.finished"}) {
+    my $stash = $self->stash_h;
+    if (!$stash->{"mojo.finished"}->(int)) {
+      $stash->{"mojo.finished"} = 1;
+      
       my $res = $self->res;
-      $res->code(200) if !$status && !$res->code;
-
+      if (!$status && !$res->code) {
+        $res->set_code(200) ;
+      }
+      
       # Disable auto rendering and stop timer
-      my $app = $self->render_later->app;
-      $self->log->trace(method {
-        my $timing  = $self->helpers->timing;
-        my $elapsed = $timing->elapsed("mojo.timer") // 0;
-        my $rps     = $timing->rps($elapsed)         // "??";
-        my $code    = $res->code;
-        my $msg     = $res->message || $res->default_message($code);
-        return "$code $msg (${elapsed}s, $rps/s)";
-      }) unless $stash->{"mojo.static"};
-
+      $self->render_later;
+      
+      my $app = $self->app;
       $app->plugins->emit_hook_reverse(after_dispatch => $self);
       $app->sessions->store($self);
     }
-    $self->tx->resume;
-    return $self;
+    $self->tx->(Mojo::Transaction::HTTP)->resume;
   }
-
-  method req { (shift->tx || Carp::croak "Transaction already destroyed")->req }
-  method res { (shift->tx || Carp::croak "Transaction already destroyed")->res }
-
-  method send {
-    my ($self, $msg, $cb) = @_;
-    my $tx = $self->tx || Carp::croak "Transaction already destroyed";
-    Carp::croak "No WebSocket connection to send message to" unless $tx->is_websocket;
-    $tx->send($msg, $cb ? method { shift; $self->$cb(@_) } : ());
-    return $tx->established ? $self : $self->rendered(101);
+  
+  method send : void ($msg : string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {
+    my $tx = $self->tx;
+    
+    unless ($tx) {
+      die "Transaction already destroyed.";
+    }
+    
+    unless ($tx->is_websocket) {
+      die "No WebSocket connection to send message to.";
+    }
+    
+    my $cb_with_instance = (Mojo::Callback)undef;
+    if ($cb) {
+      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+        $cb->($self, $arg1, $arg2, $arg3);
+      };
+    }
+    
+    $tx->(Mojo::Transaction::WebSocket)->send($msg, $cb_with_instance);
+    
+    unless ($tx->(Mojo::Transaction::WebSocket)->established) {
+      $self->rendered(101);
+    }
   }
-
-  method session {
-    my $self = shift;
-
-    my $stash = $self->stash;
-    $self->app->sessions->load($self) unless exists $stash->{"mojo.active_session"};
-
-    # Hash
-    my $session = $stash->{"mojo.session"} //= {};
-    return $session unless @_;
-
-    # Get
-    return $session->{$_[0]} unless @_ > 1 || ref $_[0];
-
-    # Set
-    my $values = ref $_[0] ? $_[0] : {@_};
-    @$session{keys %$values} = values %$values;
-
-    return $self;
+  
+  method session : object ($name : string) {
+    
+    return $self->session_h->{$name};
   }
-
-  method stash { Mojo::Util::_stash(stash => @_) }
-
-  method url_for {
-    my ($self, $target) = (shift, shift // "");
-
+  
+  method set_session : void ($name : string, $value : string) {
+    
+    $self->session_h->{$name} = $value;
+  }
+  
+  method stash : object ($name : string) {
+    return $self->{stash_h}{$name};
+  }
+  
+  method set_stash : void ($name : string, $value : string) {
+    $self->{stash_h}{$name} = $value;
+  }
+  
+  method url_for : Mojo::URL ($target : string|Mojo::URL)  {
+    
     # Absolute URL
-    return $target                 if Scalar::Util::blessed $target && $target->isa("Mojo::URL");
-    return Mojo::URL->new($target) if $target =~ $ABSOLUTE;
-
+    if ($target isa Mojo::URL) {
+      return $target->(Mojo::URL);
+    }
+    
+    my $target = (string)$target;
+    
+    if (Re->m($target, $ABSOLUTE)) {
+      return Mojo::URL->new($target);
+    }
+    
     # Base
     my $url  = Mojo::URL->new;
     my $req  = $self->req;
-    my $base = $url->base($req->url->base->clone)->base->userinfo(undef);
-
+    $url->set_base($req->url->base->clone);
+    my $base = $url->base;
+    $base->set_userinfo(undef);
+    
     # Relative URL
     my $path = $url->path;
-    if ($target =~ m!^/!) {
-      if (defined(my $prefix = $self->stash->{path})) {
+    if (Re->m($target, "^/")) {
+      if (my $prefix = $self->stash_h->{"path"}->(string)) {
         my $real = $req->url->path->to_route;
-        $real =~ s!/?\Q$prefix\E$!$target!;
+        Re->s((mutable string)$real, "/?\Q$prefix\E$", "$target");
         $target = $real;
       }
       $url->parse($target);
     }
-
-    # Route
-    else {
-      my $generated = $self->match->path_for($target, @_);
-      $path->parse($generated->{path})                         if $generated->{path};
-      $base->scheme($base->protocol eq "https" ? "wss" : "ws") if $generated->{websocket};
-    }
-
+    
     # Make path absolute
     my $base_path = $base->path;
-    unshift @{$path->parts}, @{$base_path->parts};
-    $base_path->parts([])->trailing_slash(0);
-
+    StringList->new_ref($path->parts)->unshift_($base_path->parts);
+    $base_path->set_parts(new string[0]);
+    $base_path->set_trailing_slash(0);
+    
     return $url;
   }
-
-  method url_for_asset {
-    my ($self, $asset) = @_;
-    return $self->url_for($asset =~ $ABSOLUTE ? $asset : $self->app->static->asset_path($asset));
-  }
-
-  method url_for_file {
-    my ($self, $file) = @_;
-    return $self->url_for($file =~ $ABSOLUTE ? $file : $self->app->static->file_path($file));
-  }
-
-  method write {
-    my ($self, $chunk, $cb) = @_;
-    $self->res->content->write($chunk, $cb ? method { shift; $self->$cb(@_) } : ());
-    return $self->rendered;
-  }
-
-  method write_chunk {
-    my ($self, $chunk, $cb) = @_;
-    $self->res->content->write_chunk($chunk, $cb ? method { shift; $self->$cb(@_) } : ());
-    return $self->rendered;
-  }
-
-  method write_sse {
-    my ($self, $event, $cb) = @_;
-    $self->res->content->write_sse($event, $cb ? method { shift; $self->$cb(@_) } : ());
-    return $self->rendered;
-  }
-
-
-=cut
-
-=pod TODO
-
-  method encrypted_cookie {
-    my ($self, $name, $value, $options) = @_;
-
-    # Request cookie
-    return $self->every_encrypted_cookie($name)->[-1] unless defined $value;
-
-    # Response cookie
-    my $app     = $self->app;
-    my $secret  = $app->secrets->[0];
-    my $moniker = $app->moniker;
-    return $self->cookie($name, Mojo::Util::encrypt_cookie($value, $secret, $moniker), $options);
-  }
-
-  method every_encrypted_cookie {
-    my ($self, $name) = @_;
-
-    my $app     = $self->app;
-    my $secrets = $app->secrets;
-    my $moniker = $app->moniker;
-    my @results;
-    for my $value (@{$self->every_cookie($name)}) {
-      my $decrypted;
-      for my $secret (@$secrets) {
-        last if defined($decrypted = Mojo::Util::decrypt_cookie($value, $secret, $moniker));
-      }
-      if (defined $decrypted) { push @results, $decrypted }
-
-      else { $self->log->trace(qq{Cookie "$name" is not encrypted}) }
+  
+  method url_for_asset : Mojo::URL ($target : string) {
+    
+    unless (Re->m($target, $ABSOLUTE)) {
+      $target = $self->app->static->asset_path($target);
     }
-
-    return \@results;
+    
+    return $self->url_for($target);
   }
 
-=cut
+  method url_for_file : Mojo::URL ($target : string) {
+    
+    unless (Re->m($target, $ABSOLUTE)) {
+      $target = $self->app->static->file_path($target);
+    }
+    
+    return $self->url_for($target);
+  }
 
+  method write : void ($chunk : string, $cb : Mojo::Callback = undef) {
+    
+    my $cb_with_instance = (Mojo::Callback)undef;
+    if ($cb) {
+      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+        $cb->($self, $arg1, $arg2, $arg3);
+      };
+    }
+    
+    $self->res->content->write($chunk, $cb_with_instance);
+    
+    $self->rendered;
+  }
+
+  method write_chunk : void ($chunk : string, $cb : Mojo::Callback = undef) {
+    
+    my $cb_with_instance = (Mojo::Callback)undef;
+    if ($cb) {
+      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+        $cb->($self, $arg1, $arg2, $arg3);
+      };
+    }
+    
+    $self->res->content->write_chunk($chunk, $cb_with_instance);
+    
+    $self->rendered;
+  }
+  
+  method write_sse : void ($event : Mojo::SSE::Event, $cb : Mojo::Callback = undef) {
+    
+    my $cb_with_instance = (Mojo::Callback)undef;
+    if ($cb) {
+      $cb_with_instance = [$self : Mojolicious::Controller, $cb : Mojo::Callback] method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+        $cb->($self, $arg1, $arg2, $arg3);
+      };
+    }
+    
+    $self->res->content->write_sse($event, $cb_with_instance);
+   
+   $self->rendered;
+  }
+  
   method reply : Mojolicious::Helper::Reply () {
     
     my $reply = Mojolicious::Helper::Reply->new;
     $reply->set_controller($self);
     
     return $reply;
+  }
+  
+  method include : Mojo::ByteStream ($options : Hash|object[] = undef) {
+    
+    return $self->render_to_string($options);
+  }
+  
+  method content : Mojo::ByteStream ($name : string = undef) {
+    
+    unless ($name) {
+      $name = "content";
+    }
+    
+    my $hash = $self->stash_h->{"mojo.content"}->(Hash) // Hash->new;
+    
+    my $content = $hash->{$name}->(string);
+    
+    return Mojo::ByteStream->new($content // "");
   }
   
 }

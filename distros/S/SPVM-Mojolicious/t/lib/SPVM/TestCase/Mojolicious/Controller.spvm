@@ -1,0 +1,113 @@
+class TestCase::Mojolicious::Controller {
+  
+  use Mojolicious::Controller;
+  use Mojolicious::Lite;
+  use Mojo::Transaction::HTTP;
+  use Re;
+  use FindBin;
+  
+  static method render_to_string : int () {
+    
+    my $template_path = FindBin->Bin . "/templates";
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      
+      my $bs = $c->render_to_string({inline => "abc<%= 123 %>"});
+      
+      unless (Re->m($bs->to_string, "abc123")) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      $c->set_stash(x => 123);
+      
+      my $bs = $c->render_to_string({inline => q'abc<%= $c->stash("x") %>'});
+      
+      unless (Re->m($bs->to_string, "abc123")) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      $c->set_stash(x => 123);
+      
+      my $bs = $c->render_to_string({inline => q'abc<%= $c->stash("x") %>'});
+      
+      unless (Re->m($bs->to_string, "abc123")) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      $c->set_stash(x => 123);
+      
+      $app->renderer->set_paths(["$template_path"]);
+      my $bs = $c->render_to_string({template => "minimal"});
+      
+      unless (Re->m($bs->to_string, "abc123")) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      $c->set_stash(x => 123);
+      
+      my $templates = <<'EOS';
+@@minimal.html.ep
+abc<%= $c->stash("x") %>
+
+@@other.html.ep
+other
+EOS
+      
+      $app->renderer->set_data_templates($templates);
+      my $bs = $c->render_to_string({template => "minimal"});
+      
+      unless (Re->m($bs->to_string, "abc123")) {
+        return 0;
+      }
+      
+      if (Re->m($bs->to_string, "other")) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+}

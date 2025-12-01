@@ -91,5 +91,26 @@ subtest 'should generate the same signatures as BIP340 test cases' => sub {
 	ok $secp->verify_digest_schnorr($pub, $sig, $message), 'digest verified ok';
 };
 
+subtest 'should fail on undefined value input' => sub {
+
+	# validate first time to populate internal structures
+	$secp->verify_message($t{pubkey}, $t{sig}, $t{preimage});
+
+	# check if internal structure value will get emptied with undef
+	like dies { $secp->verify_message($t{pubkey}, undef, $t{preimage}) },
+		qr{usage: \$secp256k1->verify_message\(\$public_key, \$signature, \$message\)};
+	like dies { $secp->verify_message(undef, $t{sig}, $t{preimage}) },
+		qr{usage: \$secp256k1->verify_message\(\$public_key, \$signature, \$message\)};
+	like dies { $secp->verify_message($t{pubkey}, $t{sig}) },
+		qr{usage: \$secp256k1->verify_message\(\$public_key, \$signature, \$message\)};
+};
+
+subtest 'should fail on no pubkeys to combine' => sub {
+	like dies { $secp->combine_public_keys() },
+		qr{usage: \$secp256k1->combine_public_keys\(\$public_key, \[\@more_public_keys\]\)};
+	like dies { $secp->combine_public_keys($t{pubkey}, undef) },
+		qr{usage: \$secp256k1->combine_public_keys\(\$public_key, \[\@more_public_keys\]\)};
+};
+
 done_testing;
 

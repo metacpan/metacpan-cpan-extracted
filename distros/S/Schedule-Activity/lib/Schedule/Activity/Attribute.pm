@@ -3,7 +3,7 @@ package Schedule::Activity::Attribute;
 use strict;
 use warnings;
 
-our $VERSION='0.2.2';
+our $VERSION='0.2.3';
 
 my %types=(
 	int=>{
@@ -212,11 +212,72 @@ Schedule::Activity::Attribute - Updating, tracking, and reporting numeric values
 
 =head1 DESCRIPTION
 
-This module is responsible for individual attributes.  It tracks values for the attribute, facilitates updates, and handles reporting.
+This module is responsible for individual attributes.  It tracks values for the attribute, facilitates changes, and handles reporting.
 
 Attributes are intended to be I<typed>, so cross-type requests may produce failures.
 
-=head1 Functions
+=head1 CONFIGURATION
+
+=head2 Declaration
+
+Named attributes in scheduling configurations may provide the following:
+
+  type =>'bool' or 'int'
+  value=>numeric
+  note =>'any comment'
+
+Attributes are integers initialized to zero by default.  An initialization may include a C<note> for convenience, but this value is not stored nor reported.
+
+=head2 Changes
+
+Attribute changes within scheduling configurations may include the following:
+
+  set =>value
+  incr=>value (only for int)
+  decr=>value (only for int)
+  note=>'any comment'
+
+A change may include a C<note> for convenience, but this value is not stored nor reported.
+
+=head1 TYPES
+
+The two types of attributes are C<bool> or C<int>, which is the default.  A boolean attribute is primarily used as a state flag.  An integer attribute can be used both as a counter or gauge, either to track the number of occurrences of an activity or event, or to log varying numeric values.
+
+=head2 Integer attributes
+
+The C<int> type is the default.  The default initial value is zero.
+
+Integer attributes may change with any of:  C<set>, C<incr>, C<decr>.  There is no actual restriction on numeric type so any Perl L<number> is valid, integers or real numbers, positive or negative.
+
+The reported C<avg> is the overall time-weighted average of the values, computed via a trapezoid rule.  That is, if C<tm=0, value=2> and C<tm=10, value=12>, the average is 7 with a weight of 10.  See L</Logging> for more details.
+
+=head2 Boolean attributes
+
+The C<bool> type must be declared.  The default initial value is zero/false.
+
+Boolean attributes may change with any of:  C<set>.  Currently there is no restriction on values, but the behavior is only defined for values 0/1.
+
+The reported C<avg> is the percentage of time in the schedule for which the flag was true.  That is, if C<tm=0, value=0>, and C<tm=7, value=1>, and C<tm=10, value=1> is the complete schedule, then the reported average for the boolean will be C<0.3>.
+
+=head1 RESPONSE
+
+Each named attribute in a scheduling configuration uses the C<report> function, described below, to build an attribute report that includes:
+
+  y  =>(final value)
+  xy =>[[tm,value],...]
+  avg=>(average, depends on type)
+
+The C<y> value is the last recorded value.  The C<xy> contains an array of all values and the times at which they changed.  The C<avg> is roughly the time-weighted average of the value, but this depends on the attribute type.
+
+=head2 Logging
+
+The reported C<xy> is an array of values of the form C<(tm, value)>, with each timestamped entry indicating that a scheduling activity, action, or message, included an attribute change configuration.  Each attribute has an initial entry of C<(0, value)>, either the default or the value specified in the declaration.
+
+Any attribute may be "fixed" in the log at its current value by passing the change as C<{}>, which is equivalent to C<incr=0> for integers.  (Internally this may also be invoked with C<_log=1>, but this is subject to change.)
+
+=head1 FUNCTIONS
+
+The C<Attribute> object provides the following functions.
 
 =head2 change
 

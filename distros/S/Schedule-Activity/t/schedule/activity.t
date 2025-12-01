@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>18;
+use Test::More tests=>19;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -813,3 +813,32 @@ subtest 'Incremental build'=>sub {
 	is_deeply(\%res,\%fullres,'Two activities');
 };
 
+# Goals aren't yet available in Schedule::Activity, but the prototype is working.
+# When that code provides automated searching against this optimization function,
+# then this test can be updated.  Prior to that, however, score maximization should
+# still be possible, and this test establishes the mechanism of testing and the
+# associated probabilities.
+# 
+subtest 'Goal seeking'=>sub {
+	plan tests=>1;
+	my ($scheduler,%schedule);
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
+		finish=>{tmavg=>0},
+		A=>{attributes=>{bee=>{incr=>-1}},tmavg=>1,next=>[qw/A B finish/]},
+		B=>{attributes=>{bee=>{incr=>+1}},tmavg=>1,next=>[qw/A B finish/]},
+	}});
+	#
+	# Probability of bee=10 is 1/2^10.
+	# Probability of failure in N trials is (1023/1024)^N
+	# If you want to make this succeed faster, run only 5-step schedules, 1/2^5, and maxouter=436.
+	#
+	my ($pass,$steps,$maxouter)=(0,0,14141); # pfail<=1e-6
+	for(my $outer=0;$outer<=$maxouter;$outer++) {
+		$steps++;
+		%schedule=$scheduler->schedule(activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=12) { next }
+		if($schedule{attributes}{bee}{y}>=10) { $pass=1; $outer=$maxouter }
+	}
+	ok($pass,"Goal scheduling maximized attribute ($steps steps)");
+};

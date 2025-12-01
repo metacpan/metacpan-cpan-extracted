@@ -23,7 +23,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.300';
+our $VERSION = '0.350';
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our @logs;
 our $nlo = 1; # Number Line Output, start of 1
@@ -78,7 +78,7 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 	unless( $info 
 		and (( ref( $info ) eq 'HASH' and %$info ) or (ref( $info ) eq 'ARRAY' and @$info ))
 	) {
-		$_= "!!! ERROR#2: EMPTY data!";
+		$_= "!!! ERROR#2: EMPTY or WRONG data!";
 		$op{silent} or carp $_;
 
 		push @logs, $_;
@@ -96,7 +96,7 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 			s/^\s+//;
 			s/\s+.*//s;
 
-			$ofile = (glob)[0] if $^O =~/(?:linux|bsd|darwin|solaris|sunos)/;
+			$ofile = ( $^O =~/(?:linux|bsd|darwin|solaris|sunos)/ ) ? (glob)[0] : $_;
 		}
 	}
 	else {
@@ -212,13 +212,16 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 				}
 
 			}
-			elsif( ref($vardata) eq 'HASH' and ( ref( $vardata->{ $key } ) eq 'HASH' or ref( $vardata->{ $key } ) eq 'ARRAY')) {
-
+			elsif( (ref($vardata) eq 'HASH' and ( ref( $vardata->{ $key } ) eq 'HASH' or ref( $vardata->{ $key } ) eq 'ARRAY'))
+				or (ref($vardata) eq 'ARRAY' and ( ref( $vardata->[ $key ] ) eq 'HASH' or ref( $vardata->[ $key ] ) eq 'ARRAY'))
+			) {
 				# Index of column in target table
 				my $j = (@columns && exists( $columns[-1]{ki} )) ?
 							@columns :
 							($#columns // 0);
 				$j = 0 if $j < 0; # JIC
+
+				my $vk = ref $vardata eq 'HASH' ? $vardata->{ $key } : $vardata->[ $key ];
 
 				if(/%%%V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
 				# this V-variable is nested in a VAR-structure
@@ -232,26 +235,25 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 						}
 					}
 					elsif( $chkVAR == 0b0010) { # V-variable is in ARRAY.HASH of VAR-structure
-						for my $d ( @{$vardata->{ $key }} ) {
+
+						for my $d ( @$vk ) {
 							if( exists $d->{$ki} ) {
 								$columns[$j]{ki} = $ki; # save variable name in j-th column
 								last;
 							}
 						}
 					}
-					elsif( $chkVAR == 0b0100) { # V-variable is SCALAR in regular ARRAY of VAR-structure
-
-						my $nd = @{ $vardata->{ $key } };
+					elsif( $chkVAR == 0b0100 or $chkVAR == 0b01000 ) { # V-variable is SCALAR (or REF->SCALAR) in regular ARRAY of VAR-structure
 
 						if( $ki eq '@') {
 							$ki = '0-'; # ALL elements
 							$columns[$j]{ki} = $ki; # starting index (unnamed meaning)
 						}
-						elsif( $ki =~/^\-*(\d+)$/ && ($1 < $nd or ($ki < 0 && $1 == $nd)) ) {
+						elsif( $ki =~/^\-*(\d+)$/ && ($1 < @$vk or ($ki < 0 && $1 == @$vk)) ) {
 							# specific indices, e.g.: 0 or 3 or -1
 							$columns[$j]{ki} = $ki;
 						}
-						elsif( $ki =~/^\-*[\d,\-]+$/) {
+						elsif( $ki =~/^[\d,\-]+$/) {
 						# mixed indexes, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
 							for( $ki ) {
 								s/\-+/-/g;
@@ -261,28 +263,33 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 						}
 
 					}
-					elsif( ref( $vardata->{ $key } ) eq 'HASH'
-						and ( (ref( \$vardata->{ $key }{$ki} ) eq 'SCALAR' and defined( $vardata->{ $key }{$ki} ) )
-							or (ref( \$vardata->{ $key }{$ki} ) eq 'REF'
-								and ref($vardata->{ $key }{$ki}) eq 'SCALAR'
-								and defined( ${ $vardata->{ $key }{$ki} } )
+					elsif( ref( $vk ) eq 'HASH'
+							and ( (ref( \$vk->{$ki} ) eq 'SCALAR' and defined( $vk->{$ki} ) )
+								or (ref( \$vk->{$ki} ) eq 'REF'
+									and ref($vk->{$ki}) eq 'SCALAR'
+									and defined( ${ $vk->{$ki} } )
+								)
+								or ( $ki eq '@'
+									and exists($vk->{$ki})
+									and ref($vk->{$ki}) eq 'ARRAY'
+								)
 							)
-							or ( $ki eq '@'
-								and exists($vardata->{ $key }{$ki})
-								and ref($vardata->{ $key }{$ki}) eq 'ARRAY'
-							)
-						)
 					) {
 
 						$columns[$j]{ki} = $ki; # save variable key in j-th element
 					}
 
 					&_set_column( $Np, $paste, $columns[$j] ) if exists $columns[$j]{ki};
-
 				}
-				elsif( /(?<s>.+?)\s?%%%+ADD(?<t>[EX]?):(?<p>%?)/ or /^\s*%%%+ADD(?<t>[EX]?):(?<p>%?)\s?(?<s>.+?)[\r\n]*$/s ) {
+				elsif( /(?<s>.+?)\s?%%%+ADD(?<t>[EX]?):(?<p>%?)/ or /^\s*%%%+ADD(?<t>[EX]?):(?<p>%?)\s?(?<s>.*?)[\r\n]*$/ ) {
 					my $s = $+{s};
-					$s .= "\n" unless $+{p};
+
+					if( $+{p} ) {
+						length($s) or next;
+					}
+					else {
+						$s .= "\n";
+					}
 
 					if( $+{t} eq 'E') { # %%%ADDE:
 						if( @columns && exists( $columns[-1]{ki} ) && ! $columns[$j] ) {
@@ -300,6 +307,7 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 
 				next;
 			}
+
 			else {
 				next;
 			}
@@ -376,19 +384,21 @@ push @logs, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR o
 			# key or sub-...sub-key is found
 push @logs, "--> l.$. Found %%%VAR:". $k if $DEBUG;
 
-			if( ref($vardata) eq 'HASH') {
-				next if &_chk_var( $fh, $k, $vardata->{$k}, $Np, \$paste, \$before, \$chkVAR, \@columns, \$z, \%op );
+			my $vk = ref $vardata eq 'HASH' ? $vardata->{$k} :
+				(ref $vardata eq 'ARRAY' ? $vardata->[$k] : undef);
 
-# push @logs, "--> l.$. Remember HASH key = '$k' (chkVAR=$chkVAR)" if $DEBUG;
-				$key = $k; # save key name
+			unless( $vk ) {
+push @logs, "--> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op{def};
+				next;
 			}
-			elsif( ref($vardata) eq 'ARRAY') {
-				next if &_chk_var( $fh, $k, $vardata->[$k], $Np, \$paste, \$before, \$chkVAR, \@columns, \$z, \%op );
 
-# push @logs, "--> l.$. Remember ARRAY key = '$k' (chkVAR=$chkVAR)" if $DEBUG;
-				$key = $k; # save key name
-			}
+			next if &_chk_var( $fh, $k, $vk, $Np, \$paste, \$before, \$chkVAR, \@columns, \$z, \%op );
+
+# push @logs, "--> l.$. Remember key = '$k' (chkVAR=$chkVAR), type: ".ref($vk) if $DEBUG; ###AG
+
+			$key = $k; # save key name
 			next;
+
 		}
 		elsif(/%%%V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
 			my $k = $+{k};
@@ -513,11 +523,8 @@ sub _chk_var {
 	our @logs;
 	our $nlo;
 
-	if( ! defined( $vk ) && $op->{def} ) {
-push @logs, "--> l.$. NOT defined key in %%%VAR:". $k if $DEBUG;
-	}
-	elsif( ref( $vk ) eq 'ARRAY') {
-	# Check ARRAY.{ARRAY|HASH|SCALAR}
+	if( ref( $vk ) eq 'ARRAY') {
+	# Check ARRAY.{ARRAY|HASH|SCALAR[.REF]}
 		for my $d ( @{ $vk } ) {
 			if(ref($d) eq 'ARRAY'){
 				$$chkVAR |= 0b00001;
@@ -573,6 +580,8 @@ push @logs, "--> l.$.>$nlo".' Insert %%%V[AR]:'. $k .'= '. $v if $DEBUG;
 		print { $fh } $v;
 		print { $fh } $el->{p} if exists $el->{p};
 
+		++$nlo while $v =~/\n/g;
+
 		return if $el->{'%'};
 
 		print { $fh } "\n"; # NO:YES \par
@@ -627,10 +636,10 @@ sub _hvt_print {
 sub _mixed_indices {
 	my( $fh, $type, $ki, $nd, $values, $el, $op, $border ) = @_;
 
-	for my $ii ( split ',', $ki ) { # e.g. 1-3,6-7-9,-,4,-5,0,7-
+	for my $ii ( split ',', $ki ) { # e.g. -1-,1-3,6-7-9,-,4,-5,0,7-
 		next if $ii eq '-';
 
-		if( $ii =~/^(\-[1-9]\d*)\-(\d*)$/) { # -1- i.e. reverse: -1,-2,..arr_start
+		if( $ii =~/^(\-[1-9]\d*)\-(\d*)$/) { # -1- i.e. reverse: -1,-2,..-@arr (i.e. arr_start)
 			my $s = $1;
 			my $e = -1*($2 || $nd);
 			$s = -1*$nd if abs($s) > $nd;
@@ -718,29 +727,27 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 				if( defined $ki ) {
 					if( ref(\$d) eq 'SCALAR') { # ARRAY.SCALAR in regular vector
 
-						if( $ki =~/^\-*[\d,\-]+$/) {
+						if( $ki =~/^[\d,\-]+$/) {
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
 							last _var_output_M0 if $row;
 
 							&_mixed_indices( $fh, 'SCALAR', $ki, $nd, $values, $el, $op, $border );
 							next;
 						}
-						elsif( defined $values->[$ki] ) {
-							last _var_output_M0 if $row;
-							$val = $values->[$ki];
+						else {
+							next;
 						}
 					}
 					elsif( ref(\$d) eq 'REF' and ref($d) eq 'SCALAR') { # ARRAY.REF->SCALAR in regular array
-						if( $ki =~/^\-*[\d,\-]+$/) {
+						if( $ki =~/^[\d,\-]+$/) {
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
 							last _var_output_M0 if $row;
 
 							&_mixed_indices( $fh, 'REF', $ki, $nd, $values, $el, $op, $border );
 							next;
 						}
-						elsif( defined ${ $values->[$ki] } ) {
-							last _var_output_M0 if $row;
-							$val = ${ $values->[$ki] };
+						else {
+							next;
 						}
 					}
 					elsif( ref($d) eq 'HASH' and defined( $d->{$ki} ) ) { # ARRAY.HASH
@@ -756,7 +763,6 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 							}
 							next;
 						}
-
 						elsif( ref(\$val) ne 'SCALAR') { # TODO for REF
 							next;
 						}
@@ -1164,8 +1170,8 @@ Set the C<$DEBUG> package variable to enable debugging messages (global debug mo
 
 =head1 LIMITATIONS
 
-This module have reason only for C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>,
-C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY> data with perl 5.10 and higher.
+This module have reason only for C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>, C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY> 
+data with perl 5.10 and higher.
 
 File and directory names and paths to them must not contain space characters.
 
@@ -1177,7 +1183,8 @@ Currently, symbols: C<%>, C<@>, C<:>, and C</> have a special purpose.
 
 =head1 ABSTRACT
 
-Replicase is minimalistic (aesthetic) interpreter (uses only 3-4 basic control tags)
+Replicase is minimalistic (ascetic) interpreter (uses only 3-4 basic control tags,
+like the system of 4 bases (nucleotides) and 3 codons, it is an optimal balance between diversity and stability)
 that can be used to process (fill) real TeX-LaTeX files that act as templates.
 
 
@@ -1219,7 +1226,7 @@ in the finished PDF or PostScript document.
 If a C<variable_name> ends in C<%> (i.e. C<variable_name%>), a newline is suppressed.
 By default, a newline always occurs after value substitution and 'After blah, \ldots blah.' if it exists.
 
-In С<variable_name> you can use the special character "C</>", which denotes the "path" 
+In C<variable_name> you can use the special character "C</>", which denotes the "path" 
 to the variable(s) in the passed dataset (C<$info>) structure, e.g.
 C<%%%V: key/myParam>, C<%%%V: key/index/myParam>, etc.
 
@@ -1227,9 +1234,9 @@ If this "path" to C<variable_name> begins with "C</>", then it is I<absolute> an
 from the root (initial) C<$info> structure. Otherwise, the "path" is determined I<relative> to 
 the current I<global environment>, previously established in the same way.
 
-For example, using this trick, C<%%%V:/key/subkey>, you can move (shift) the I<global environment> of all
-subsequent (further down) C<%%%V:> and C<%%%VAR:> variables into the C<$info->{key}{subkey} area (scope).
-To return to the root (initial) C<$info> I<global environment> of all variables, call C<%%%V: />.
+For example, using this trick, C<< %%%V:/key/subkey >>, you can move (shift) the I<global environment> of all
+subsequent (further down) C<%%%V:> and C<%%%VAR:> variables into the C<< $info->{key}{subkey} >> area (scope).
+To return to the root (initial) C<$info> I<global environment> of all variables, call C<< %%%V: / >>.
 
 If this "path" ends with a regular (scalar) variable or a reference to one, 
 then the I<global environment> is not redefined, 
@@ -1245,7 +1252,7 @@ CONCLUSION: standalone C<%%%V:> tag (outside C<%%%VAR:> scope) can be used to se
 C<%%%V:> can be nested in an ARRAY or HASH C<%%%VAR:> tag,
 but in SCALAR or REF C<%%%VAR:> it will not work and will be discarded.
 
-There's a special С<variable_name> - C<@>, which means to "B<use all elements of an ARRAY>".
+There's a special C<variable_name> - C<@>, which means to "B<use all elements of an ARRAY>".
 Therefore, this only makes sense for ARRAY variables (see example above).
 
 Using C<@> for HASH variables is also acceptable.
@@ -1287,17 +1294,20 @@ BTW: if this tag is omitted and there are no further C<%%%ENDT:>, C<%%%ENDZ:>, C
 all text to the end of document will be replaced by C<variable_name> specified in C<%%%VAR:> tag.
 
 =item 2.
-B< C<%%%ENDZ:> > is used to mark the end of the C<%%%TDZ:> tag, 
-which marks B<The Dead Zone> in the template free from any tag searches.
-It can also be used to disable tags.
+B< C<%%%ENDZ:> > is used to mark the end of the C<%%%TDZ:> tag.
+
+C<%%%TDZ:> marks B<The Dead Zone> in the template free from any tag searches.
+It can also be used to disable (deactivate) tags.
 
 =item 3.
 B< C<%%%ENDT:> > is used to mark the end of a template.
+
 It is typically applied to the bottom of a document to terminate tag searches and speed up processing.
+It can also be used to disable (deactivate) tags.
 
 =back
 
-Text (and newline) located in line with any C<%%%END:>, C<%%%ENDZ:>, and C<%%%ENDT:> tags will be discarded.
+B<ATTENTION!> Text (and newline) located in line with any C<%%%END:>, C<%%%ENDZ:>, and C<%%%ENDT:> tags will be discarded.
 
 =item *
 B< C<%%%TDZ:> > marks the start of B<The Dead Zone> in the template free from any tag searches.
@@ -1319,14 +1329,13 @@ Here C<keys> or C<indexes> are columns (or positions) of the table (filled area)
 
 C<index> can also be specified as a comma-separated list of numbers (array indices, e.g., 1, -7, 3, 5, -9),
 or as a closed (0-7, 4-10), left-open (-3-), or right-open (0-) range of array indices.
-In this case, spaces are not allowed.
+In this case, spaces are also not allowed.
 
 Negative values and left-open range indicate the reverse order of the array indices,
 i.e., counting from the end. For example, -1- means from -1,-2,-3,... to the initial element of the array (vector).
 
-There's C<@> -- a special name of C<index> which means "B<to use all elements of an ARRAY>".
-It's actually short for right-open range: C< 0- >
-
+There's C<@> - a special name of C<index> which means "B<to use all elements of an ARRAY>".
+It's actually short for right-open range: C<< 0- >>.
 Therefore, this only makes sense for ARRAY variables.
 
 Using C<@> for HASH variables is also acceptable.
@@ -1345,6 +1354,7 @@ There are three options for B< C<%%%ADDx> > tags:
 
 =item 1.
 B< C<%%%ADD:> > adds text B<before> variable specified in C<%%%V:> tag.
+
 The added text is taken from the beginning of the line to the beginning of C<%%%ADD:>
 (i.e. text located on the left), e.g.
 
@@ -1360,10 +1370,10 @@ Or, if C<%%%ADD:> is located at the very beginning of line, then after it to the
 this text will be added here: C<Tail blah, blah, \ldots>.
 
 If the following C<%%%V:> tag is not present, then the text is output B<at the end of all> C<keys> or C<indexes> (columns)
-each table row.
+each table (filled area) row.
 
 BTW: 
-By combining auxiliary parameters and the C<def> parameter (see below), which specifies discarding (ignoring) 
+By combining auxiliary parameters and the C<def> facultative option (see below), which specifies discarding (ignoring) 
 C<undefined> values and their associated C<%%%ADD:> structures, you can create a logic scheme for disabling C<%%%ADD:> tags.
 For example:
 
@@ -1563,6 +1573,17 @@ and L<Carp>.
 Perl modules that offer similar functionality:
 
 L<Template::Latex>, L<LaTeX::Easy::Templates>
+
+
+=head1 SUPPORT AND BUGS
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc LaTeX::Replicase
+
+Please bug reports, comments or feature requests to: L<https://github.com/AlessandroGorohovski/LaTeX-Replicase>
+
+The original bug tracker can be found at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=LaTeX-Replicase>
 
 
 =head1 AUTHOR

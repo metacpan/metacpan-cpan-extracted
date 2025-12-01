@@ -1,5 +1,5 @@
-LaTeX-Replicase version 0.300
-=============================
+LaTeX-Replicase
+===============
 
 The module provides a minimalistic engine
 for filling real TeX-LaTeX files that act as templates.
@@ -26,10 +26,10 @@ This module requires these other modules and libraries:
 Test::More
 Test::More::UTF8
 Test::Pod
+Test::Exception
 File::Basename
 File::Path
 File::Compare
-Digest::MD5
 Carp
 
 COPYRIGHT AND LICENCE

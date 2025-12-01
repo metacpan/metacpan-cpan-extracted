@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 # The dequeue system has a couple limitations:
 # 1. There is no way to directly notify a sleeping worker of an incoming
@@ -30,21 +30,75 @@ our $VERSION = '1.006';
 # subscribers reads the message from the table and continues.
 #
 # The second is solved by checking how many rows are `UPDATE`d when
-# claiming the job. If none, we try again to dequeue immediately. This
-# happens $DEQUEUE_RACE_ATTEMPTS times before giving up.
+# claiming the job. Since we prefetch a few jobs, we can try to claim
+# a couple before needing to go to the database again.
 #
-# When it gives up, there may still be jobs available to be dequeued. In
+# If it gives up, there may still be jobs available to be dequeued. In
 # most cases, this is okay: The worker will start sleeping for an
 # incoming job and when one comes in, it will wake up and start
 # dequeuing again (even if the new job itself isn't ready to run).
 my $DEQUEUE_RACE_ATTEMPTS = 10;
 
+our $PREFETCH = 20;
+our $PREFETCH_EXPIRY = 30; # seconds
+
+sub _claim_job {
+  my ( $self, $db, $worker_id, $job ) = @_;
+  # Try to claim the job for this worker. There is a race condition
+  # between selecting the job and claiming it, so we need to make sure
+  # we were the one to claim it.
+  my $claimed = $db->query(
+    qq{ UPDATE minion_jobs SET started = NOW(), state = 'active', worker = ? WHERE id = ? AND state = 'inactive' },
+    $worker_id, $job->{id},
+  )->affected_rows;
+
+  if ($claimed) {
+    # Won the race, so do the job
+    $job->{args} = $job->{args} ? decode_json($job->{args}) : undef;
+    return $job;
+  }
+  return undef;
+}
+
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
+  state @cached_jobs = ();
+  state $last_fetch = 0;
+  my $has_fetched = 0;
+  my $db = $self->mysql->db;
 
-  if ((my $job = $self->_try($worker_id, $options))) { return $job }
-  return undef if Mojo::IOLoop->is_running;
+  my $tasks = [keys %{$self->minion->tasks}];
+  return unless @$tasks;
 
+  # If we're trying to dequeue a specific job ID, just do it
+  if ($options->{id}) {
+    my ($job) = $self->_fetch_jobs($worker_id, $options)->each;
+    $has_fetched = 1;
+    $job = $self->_claim_job( $db, $worker_id, $job );
+    return $job if $job;
+  }
+  else {
+    # Decide if we need some jobs
+    if (!@cached_jobs || $last_fetch + $PREFETCH_EXPIRY < time) {
+      @cached_jobs = $self->_fetch_jobs($worker_id, $options)->each;
+      $last_fetch = time;
+      $has_fetched = 1;
+    }
+
+    # Now, go through the jobs we have and try to claim one
+    while (@cached_jobs) {
+      my $job = $self->_claim_job( $db, $worker_id, shift @cached_jobs );
+      return $job if $job;
+    }
+  }
+
+  # If we haven't made one trip to the database, we should just in case
+  return $self->dequeue($worker_id, $wait, $options) if !$has_fetched;
+
+  return undef if Mojo::IOLoop->is_running || !$wait;
+
+  # Otherwise, wait for up to $wait for a job to come in. We know when a job comes
+  # in because enqueue will kill all the `sleep` jobs that the "pubsub" creates.
   my $cb = $self->mysql->pubsub->listen("minion.job" => sub {
     Mojo::IOLoop->stop;
   });
@@ -54,7 +108,7 @@ sub dequeue {
 
   $self->mysql->pubsub->unlisten("minion.job" => $cb) and Mojo::IOLoop->remove($timer);
 
-  return $self->_try($worker_id, $options);
+  return $self->dequeue($worker_id, 0, $options);
 }
 
 sub history {
@@ -606,13 +660,12 @@ sub unregister_worker {
   shift->mysql->db->query('delete from minion_workers where id = ?', shift);
 }
 
-sub _try {
+sub _fetch_jobs {
   my ($self, $worker_id, $options) = @_;
 
+  # The tasks this worker can perform
   my $tasks = [keys %{$self->minion->tasks}];
-
-  return unless @$tasks;
-
+  # The queues this worker is watching
   my $queues = $options->{queues} // ['default'];
 
   my $qq = join ", ", map({ "?" } @$queues);
@@ -655,37 +708,12 @@ sub _try {
         OR ( depends.pending = depends.failed AND job.lax )
       )
     ORDER BY job.priority DESC, job.created
-    LIMIT 1
+    LIMIT $PREFETCH
   };
 
   warn "Dequeuing SQL: $sql" if DEBUG;
   my $db = $self->mysql->db;
-  my $i = $DEQUEUE_RACE_ATTEMPTS;
-  my $job;
-  while ( $i-- > 0 ) {
-    # Find a candidate job to run
-    my $res = $db->query( $sql, @bind_vars )->hash;
-    return unless $res; # No jobs ready to work on
-
-    # Try to claim the job for this worker. There is a race condition
-    # between selecting the job and claiming it, so we need to make sure
-    # we were the one to claim it.
-    my $claimed = $db->query(
-      qq{ UPDATE minion_jobs SET started = NOW(), state = 'active', worker = ? WHERE id = ? AND state = 'inactive' },
-      $worker_id, $res->{id},
-    )->affected_rows;
-
-    # Try again if we lose the race
-    next if !$claimed;
-
-    # Won the race, so do the job
-    $job = $res;
-    last;
-  }
-
-  return undef unless $job;
-  $job->{args} = $job->{args} ? decode_json($job->{args}) : undef;
-  return $job;
+  return $db->query($sql, @bind_vars)->hashes;
 }
 
 sub _update {
@@ -1159,6 +1187,27 @@ sub receive {
 #pod
 #pod =back
 #pod
+#pod =head1 PREFETCH AND JOB VOLUME
+#pod
+#pod Currently, the query to look for the next job to run is slower than it
+#pod could be. Between all the features like dependencies, priorities, retries,
+#pod and expiration, the query is complicated and requires some expensive data
+#pod manipulation. It still generally runs in less than one second even for
+#pod hundreds of thousands of jobs, but if jobs take less than one second
+#pod to process, a worker will end up spending most of its time looking up
+#pod new jobs to run, and wasting all the effort it took to get those pending
+#pod jobs in the right order.
+#pod
+#pod With v1.007, this backend prefetches a number of jobs in one query. These
+#pod jobs are then fed to worker processes as they ask. If a job is already claimed,
+#pod the worker tries again to claim the next job.
+#pod
+#pod If you are not seeing the throughput you expect, and your jobs are shorter
+#pod than one second, you can change the C<$Minion::Backend::mysql::PREFETCH> value
+#pod to be higher. A good goal is for a worker to perform work for a few seconds before
+#pod going back to the database. The prefetch cache expires after 30 seconds (which
+#pod can be adjusted with C<$Minion::Backend::mysql::PREFETCH_EXPIRY>).
+#pod
 #pod =head1 ERRORS
 #pod
 #pod =head2 DBD::mysql::st execute failed: Table '*.minion_workers' doesn't exist
@@ -1192,7 +1241,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -1605,6 +1654,27 @@ Time worker was started.
 
 =back
 
+=head1 PREFETCH AND JOB VOLUME
+
+Currently, the query to look for the next job to run is slower than it
+could be. Between all the features like dependencies, priorities, retries,
+and expiration, the query is complicated and requires some expensive data
+manipulation. It still generally runs in less than one second even for
+hundreds of thousands of jobs, but if jobs take less than one second
+to process, a worker will end up spending most of its time looking up
+new jobs to run, and wasting all the effort it took to get those pending
+jobs in the right order.
+
+With v1.007, this backend prefetches a number of jobs in one query. These
+jobs are then fed to worker processes as they ask. If a job is already claimed,
+the worker tries again to claim the next job.
+
+If you are not seeing the throughput you expect, and your jobs are shorter
+than one second, you can change the C<$Minion::Backend::mysql::PREFETCH> value
+to be higher. A good goal is for a worker to perform work for a few seconds before
+going back to the database. The prefetch cache expires after 30 seconds (which
+can be adjusted with C<$Minion::Backend::mysql::PREFETCH_EXPIRY>).
+
 =head1 ERRORS
 
 =head2 DBD::mysql::st execute failed: Table '*.minion_workers' doesn't exist
@@ -1669,10 +1739,6 @@ Jason A. Crome <jcrome@empoweredbenefits.com>
 =item *
 
 Larry Leszczynski <larryl@cpan.org>
-
-=item *
-
-Larry Leszczynski <larryl@emailplus.org>
 
 =item *
 

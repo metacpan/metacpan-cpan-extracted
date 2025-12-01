@@ -41,7 +41,8 @@
             "IPC::Run3" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "Test::Which" : "0"
          }
       }
    },
@@ -60,6 +61,6 @@
          "x_repository" : "https://github.com/nigelhorne/Date-Age"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -106,7 +106,7 @@ sub _add_tools_object_tables($self, $node, $tools_objects_fkey) {
             my $res->{id} = @{$objects_tables->{data}}[$i]->{tools_object_tables_pkey} . "-tools_object_tables";
             $res->{label} = @{$objects_tables->{data}}[$i]->{fieldname};
             $res->{data} = @{$objects_tables->{data}}[$i];
-            $res->{icon} = 'pi pi-fw pi-folder';
+            $res->{icon} = 'pi pi-fw pi-sliders-h';
             $res->{children} = [];
             push(@{$node->{children}}, $res);
         }
@@ -154,7 +154,9 @@ sub _add_objects($self, $data, $type ) {
     my $res->{id} = $data->{tools_objects_pkey} . "-" . $type;
     $res->{label} = $data->{name} ;
     $res->{data} = $data ;
-    $res->{icon} = 'pi pi-fw pi-folder';
+    if($data->{tools_object_types_fkey} == 1) {
+        $res->{icon} = 'pi pi-fw pi-envelope';
+    }
     $res->{children} = [];
 
 

@@ -9,13 +9,15 @@ README.md
 scripts/generate_index.pl
 t/30-basics.t
 t/age.t
+t/conf/describe.yml
+t/conf/details.yml
 t/eof.t
 t/eol.t
 t/fuzz.t
 t/invalid.t
 t/pod-cm.t
+t/pod-coverage.t
 t/pod-synopsis.t
 t/pod.t
-t/conf/describe.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

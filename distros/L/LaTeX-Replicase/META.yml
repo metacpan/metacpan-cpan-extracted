@@ -19,13 +19,13 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Digest::MD5: '2.59'
   File::Basename: '2.86'
   File::Compare: '1.00'
   File::Path: '2.18'
+  Test::Exception: '0.43'
   Test::More: '0.98'
   Test::More::UTF8: '0.05'
   Test::Pod: '1.22'
   perl: '5.010000'
-version: '0.300'
+version: '0.350'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

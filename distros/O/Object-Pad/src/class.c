@@ -2575,16 +2575,14 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
   meta->initfields_lines = NULL;
 
   {
-    /* Inject the constructor */
-    CV *newcv;
-    if(type == METATYPE_CLASS) {
-      newcv = newXS_flags("new", injected_constructor, __FILE__, NULL, 0);
-    }
-    else {
-      newcv = newXS_flags("new", injected_constructor_role, __FILE__, NULL, 0);
-    }
+    /* Create the constructor CV but don't add it to symbol table yet */
+    XSUBADDR_t constructor_func =
+      (type == METATYPE_CLASS) ? injected_constructor
+                               : injected_constructor_role;
 
-    CvXSUBANY(newcv).any_ptr = meta;
+    CV *cv = meta->constructor = newXS(NULL, constructor_func, __FILE__);
+    CvANON_off(cv);
+    CvXSUBANY(cv).any_ptr = meta;
   }
 
   {
@@ -2794,11 +2792,48 @@ void ObjectPad_mop_class_inherit_from_superclass(pTHX_ ClassMeta *meta, SV **arg
   }
 }
 
+void ObjectPad_mop_class_prepare_parse(pTHX_ ClassMeta *meta)
+{
+  if(meta->lexical_new) {
+    CV *cv = meta->constructor;
+
+#ifdef CVf_LEXICAL
+    CvLEXICAL_on(cv);
+#endif
+
+    PADOFFSET padix = pad_add_name_pvs("&new", padadd_STATE, NULL, NULL);
+
+    SV **padslot = &(PadARRAY(PL_comppad))[padix];
+
+    SvREFCNT_dec(*padslot);
+    *padslot = (SV *)cv;
+
+    GV *namegv = (GV *)newSV(0);
+    gv_init_pvn(namegv, meta->stash, "new", 3, 0);
+    CvGV_set(cv, namegv);
+
+    SvREFCNT_dec(namegv);
+
+    intro_my();
+  }
+}
+
 void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta)
 {
   if(meta->begun)
     /* idempotent */
     return;
+
+  /* Inject the constructor in the symbol table if it isn't lexical */
+  if(!meta->lexical_new) {
+    HV *stash = meta->stash;
+    GV **gvp = (GV **)hv_fetchs(stash, "new", GV_ADD);
+    GV *gv = *gvp;
+    gv_init_pvn(gv, stash, "new", 3, 0);
+    GvMULTI_on(gv);
+
+    GvCV_set(gv, meta->constructor);
+  }
 
   if(meta->type == METATYPE_CLASS && !meta->cls.supermeta) {
     av_push(meta->isa, newSVpvs("Object::Pad::UNIVERSAL"));
@@ -3008,14 +3043,30 @@ static const struct ClassHookFuncs classhooks_strict = {
   .apply = &classhook_strict_apply,
 };
 
+/* :lexical_new */
+
+static bool classhook_lexicalnew_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
+{
+  classmeta->lexical_new = TRUE;
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_lexicalnew = {
+  .ver   = OBJECTPAD_ABIVERSION,
+  .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
+  .apply = &classhook_lexicalnew_apply,
+};
+
 void ObjectPad__boot_classes(pTHX)
 {
-  register_class_attribute("isa",      &classhooks_isa,      NULL);
-  register_class_attribute("does",     &classhooks_does,     NULL);
-  register_class_attribute("abstract", &classhooks_abstract, NULL);
-  register_class_attribute("repr",     &classhooks_repr,     NULL);
-  register_class_attribute("compat",   &classhooks_compat,   NULL);
-  register_class_attribute("strict",   &classhooks_strict,   NULL);
+  register_class_attribute("isa",         &classhooks_isa,        NULL);
+  register_class_attribute("does",        &classhooks_does,       NULL);
+  register_class_attribute("abstract",    &classhooks_abstract,   NULL);
+  register_class_attribute("repr",        &classhooks_repr,       NULL);
+  register_class_attribute("compat",      &classhooks_compat,     NULL);
+  register_class_attribute("strict",      &classhooks_strict,     NULL);
+  register_class_attribute("lexical_new", &classhooks_lexicalnew, NULL);
 
 #ifdef HAVE_DMD_HELPER
   DMD_ADD_ROOT((SV *)&vtbl_backingav, "the Object::Pad backing AV VTBL");

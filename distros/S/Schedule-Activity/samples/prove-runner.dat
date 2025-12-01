@@ -1,0 +1,437 @@
+$VAR1 = {
+          'node' => {
+                       't/schedule/activity/attribute.t::Change:  Boolean' => {
+                                                                                'next' => [
+                                                                                            'done testing',
+                                                                                            'test cycling'
+                                                                                          ],
+                                                                                'message' => 't/schedule/activity/attribute.t::Change:  Boolean',
+                                                                                'tmavg' => '56'
+                                                                              },
+                       't/schedule/activity/nodefilter.t::Values' => {
+                                                                       'next' => [
+                                                                                   'done testing',
+                                                                                   'test cycling'
+                                                                                 ],
+                                                                       'message' => 't/schedule/activity/nodefilter.t::Values',
+                                                                       'tmavg' => '53'
+                                                                     },
+                       't/schedule/activity.t::cycles' => {
+                                                            'message' => 't/schedule/activity.t::cycles',
+                                                            'next' => [
+                                                                        'done testing',
+                                                                        'test cycling'
+                                                                      ],
+                                                            'tmavg' => '69'
+                                                          },
+                       't/schedule/activity/annotation.t::validation' => {
+                                                                           'message' => 't/schedule/activity/annotation.t::validation',
+                                                                           'next' => [
+                                                                                       'done testing',
+                                                                                       'test cycling'
+                                                                                     ],
+                                                                           'tmavg' => '54'
+                                                                         },
+                       'test cycling' => {
+                                           'finish' => 'done testing',
+                                           'tmavg' => 0,
+                                           'next' => [
+                                                       't/schedule/activity.t::Simple scheduling',
+                                                       't/schedule/activity/nodefilter.t::Boolean and',
+                                                       't/schedule/activity.t::Incremental build',
+                                                       't/schedule/activity/message.t::Random selection',
+                                                       't/schedule/activity.t::Attribute recomputation',
+                                                       't/schedule/activity.t::Message randomization',
+                                                       't/schedule/activity/node.t::has next',
+                                                       't/schedule/activity.t::Failures',
+                                                       't/schedule/activity.t::Annotations',
+                                                       't/schedule/activity.t::Named messages',
+                                                       't/schedule/activity/node.t::defaulting',
+                                                       't/schedule/activity/message.t::Primary messages',
+                                                       't/schedule/activity/attributes.t::Registration',
+                                                       't/schedule/activity/attribute.t::Dump/Restore',
+                                                       't/schedule/activity.t::validation',
+                                                       't/schedule/activity.t::Markdown loading',
+                                                       't/schedule/activity/attribute.t::Change:  Log behavior',
+                                                       't/schedule/activity/attribute.t::init',
+                                                       't/schedule/activity/nodefilter.t::Boolean nand',
+                                                       't/schedule/activity/annotation.t::schedule annotation',
+                                                       't/schedule/activity/attribute.t::Validation of options',
+                                                       't/schedule/activity/message.t::Named messages',
+                                                       't/schedule/activity.t::Reachability',
+                                                       't/schedule/activity/message.t::Attributes',
+                                                       't/schedule/activity/nodefilter.t::Boolean or',
+                                                       't/schedule/activity.t::Attributes',
+                                                       't/schedule/activity.t::Sanity checks',
+                                                       't/schedule/activity/attribute.t::Change:  Integers',
+                                                       't/schedule/activity/attribute.t::Log/avg:  Integer',
+                                                       't/schedule/activity/nodefilter.t::Values',
+                                                       't/schedule/activity/attribute.t::Change:  Boolean',
+                                                       't/schedule/activity.t::cycles',
+                                                       't/schedule/activity/annotation.t::validation',
+                                                       't/schedule/activity.t::edge cases',
+                                                       't/schedule/activity/annotation.t::Attributes are reflected',
+                                                       't/schedule/activity.t::tension control',
+                                                       't/schedule/activity/node.t::validation',
+                                                       't/schedule/activity.t::Node filtering',
+                                                       't/schedule/activity/node.t::next random',
+                                                       't/schedule/activity/message.t::Validation',
+                                                       't/schedule/activity.t::Node+Message attributes',
+                                                       't/schedule/activity/nodefilter.t::Elapsed time',
+                                                       't/schedule/activity/attribute.t::Log/avg:  Boolean',
+                                                       't/schedule/activity.t::Message attributes',
+                                                       't/schedule/activity/node.t::slack/buffer',
+                                                       't/schedule/activity/message.t::init',
+                                                       't/schedule/activity/attributes.t::Push/Pop'
+                                                     ]
+                                         },
+                       't/schedule/activity/annotation.t::Attributes are reflected' => {
+                                                                                         'tmavg' => '54',
+                                                                                         'message' => 't/schedule/activity/annotation.t::Attributes are reflected',
+                                                                                         'next' => [
+                                                                                                     'done testing',
+                                                                                                     'test cycling'
+                                                                                                   ]
+                                                                                       },
+                       't/schedule/activity.t::edge cases' => {
+                                                                'tmavg' => '73',
+                                                                'next' => [
+                                                                            'done testing',
+                                                                            'test cycling'
+                                                                          ],
+                                                                'message' => 't/schedule/activity.t::edge cases'
+                                                              },
+                       't/schedule/activity.t::tension control' => {
+                                                                     'tmavg' => '209',
+                                                                     'message' => 't/schedule/activity.t::tension control',
+                                                                     'next' => [
+                                                                                 'done testing',
+                                                                                 'test cycling'
+                                                                               ]
+                                                                   },
+                       't/schedule/activity/node.t::validation' => {
+                                                                     'tmavg' => '52',
+                                                                     'next' => [
+                                                                                 'done testing',
+                                                                                 'test cycling'
+                                                                               ],
+                                                                     'message' => 't/schedule/activity/node.t::validation'
+                                                                   },
+                       't/schedule/activity.t::Node filtering' => {
+                                                                    'tmavg' => '145',
+                                                                    'message' => 't/schedule/activity.t::Node filtering',
+                                                                    'next' => [
+                                                                                'done testing',
+                                                                                'test cycling'
+                                                                              ]
+                                                                  },
+                       't/schedule/activity/message.t::Validation' => {
+                                                                        'tmavg' => '58',
+                                                                        'message' => 't/schedule/activity/message.t::Validation',
+                                                                        'next' => [
+                                                                                    'done testing',
+                                                                                    'test cycling'
+                                                                                  ]
+                                                                      },
+                       't/schedule/activity/node.t::next random' => {
+                                                                      'next' => [
+                                                                                  'done testing',
+                                                                                  'test cycling'
+                                                                                ],
+                                                                      'message' => 't/schedule/activity/node.t::next random',
+                                                                      'tmavg' => '55'
+                                                                    },
+                       't/schedule/activity.t::Node+Message attributes' => {
+                                                                             'message' => 't/schedule/activity.t::Node+Message attributes',
+                                                                             'next' => [
+                                                                                         'done testing',
+                                                                                         'test cycling'
+                                                                                       ],
+                                                                             'tmavg' => '70'
+                                                                           },
+                       't/schedule/activity/nodefilter.t::Elapsed time' => {
+                                                                             'tmavg' => '52',
+                                                                             'next' => [
+                                                                                         'done testing',
+                                                                                         'test cycling'
+                                                                                       ],
+                                                                             'message' => 't/schedule/activity/nodefilter.t::Elapsed time'
+                                                                           },
+                       't/schedule/activity/attribute.t::Log/avg:  Boolean' => {
+                                                                                 'tmavg' => '53',
+                                                                                 'next' => [
+                                                                                             'done testing',
+                                                                                             'test cycling'
+                                                                                           ],
+                                                                                 'message' => 't/schedule/activity/attribute.t::Log/avg:  Boolean'
+                                                                               },
+                       't/schedule/activity/node.t::slack/buffer' => {
+                                                                       'message' => 't/schedule/activity/node.t::slack/buffer',
+                                                                       'next' => [
+                                                                                   'done testing',
+                                                                                   'test cycling'
+                                                                                 ],
+                                                                       'tmavg' => '55'
+                                                                     },
+                       't/schedule/activity.t::Message attributes' => {
+                                                                        'tmavg' => '75',
+                                                                        'message' => 't/schedule/activity.t::Message attributes',
+                                                                        'next' => [
+                                                                                    'done testing',
+                                                                                    'test cycling'
+                                                                                  ]
+                                                                      },
+                       't/schedule/activity/attributes.t::Push/Pop' => {
+                                                                         'next' => [
+                                                                                     'done testing',
+                                                                                     'test cycling'
+                                                                                   ],
+                                                                         'message' => 't/schedule/activity/attributes.t::Push/Pop',
+                                                                         'tmavg' => '51'
+                                                                       },
+                       't/schedule/activity/message.t::init' => {
+                                                                  'tmavg' => '58',
+                                                                  'message' => 't/schedule/activity/message.t::init',
+                                                                  'next' => [
+                                                                              'done testing',
+                                                                              'test cycling'
+                                                                            ]
+                                                                },
+                       't/schedule/activity.t::validation' => {
+                                                                'message' => 't/schedule/activity.t::validation',
+                                                                'next' => [
+                                                                            'done testing',
+                                                                            'test cycling'
+                                                                          ],
+                                                                'tmavg' => '71'
+                                                              },
+                       't/schedule/activity.t::Markdown loading' => {
+                                                                      'message' => 't/schedule/activity.t::Markdown loading',
+                                                                      'next' => [
+                                                                                  'done testing',
+                                                                                  'test cycling'
+                                                                                ],
+                                                                      'tmavg' => '75'
+                                                                    },
+                       't/schedule/activity/attribute.t::Change:  Log behavior' => {
+                                                                                     'next' => [
+                                                                                                 'done testing',
+                                                                                                 'test cycling'
+                                                                                               ],
+                                                                                     'message' => 't/schedule/activity/attribute.t::Change:  Log behavior',
+                                                                                     'tmavg' => '54'
+                                                                                   },
+                       't/schedule/activity/annotation.t::schedule annotation' => {
+                                                                                    'next' => [
+                                                                                                'done testing',
+                                                                                                'test cycling'
+                                                                                              ],
+                                                                                    'message' => 't/schedule/activity/annotation.t::schedule annotation',
+                                                                                    'tmavg' => '52'
+                                                                                  },
+                       't/schedule/activity/nodefilter.t::Boolean nand' => {
+                                                                             'next' => [
+                                                                                         'done testing',
+                                                                                         'test cycling'
+                                                                                       ],
+                                                                             'message' => 't/schedule/activity/nodefilter.t::Boolean nand',
+                                                                             'tmavg' => '52'
+                                                                           },
+                       't/schedule/activity/attribute.t::init' => {
+                                                                    'next' => [
+                                                                                'done testing',
+                                                                                'test cycling'
+                                                                              ],
+                                                                    'message' => 't/schedule/activity/attribute.t::init',
+                                                                    'tmavg' => '54'
+                                                                  },
+                       't/schedule/activity/attribute.t::Validation of options' => {
+                                                                                     'tmavg' => '53',
+                                                                                     'next' => [
+                                                                                                 'done testing',
+                                                                                                 'test cycling'
+                                                                                               ],
+                                                                                     'message' => 't/schedule/activity/attribute.t::Validation of options'
+                                                                                   },
+                       't/schedule/activity/message.t::Attributes' => {
+                                                                        'tmavg' => '54',
+                                                                        'message' => 't/schedule/activity/message.t::Attributes',
+                                                                        'next' => [
+                                                                                    'done testing',
+                                                                                    'test cycling'
+                                                                                  ]
+                                                                      },
+                       't/schedule/activity/message.t::Named messages' => {
+                                                                            'tmavg' => '54',
+                                                                            'message' => 't/schedule/activity/message.t::Named messages',
+                                                                            'next' => [
+                                                                                        'done testing',
+                                                                                        'test cycling'
+                                                                                      ]
+                                                                          },
+                       't/schedule/activity.t::Reachability' => {
+                                                                  'message' => 't/schedule/activity.t::Reachability',
+                                                                  'next' => [
+                                                                              'done testing',
+                                                                              'test cycling'
+                                                                            ],
+                                                                  'tmavg' => '68'
+                                                                },
+                       't/schedule/activity/nodefilter.t::Boolean or' => {
+                                                                           'message' => 't/schedule/activity/nodefilter.t::Boolean or',
+                                                                           'next' => [
+                                                                                       'done testing',
+                                                                                       'test cycling'
+                                                                                     ],
+                                                                           'tmavg' => '57'
+                                                                         },
+                       't/schedule/activity.t::Attributes' => {
+                                                                'message' => 't/schedule/activity.t::Attributes',
+                                                                'next' => [
+                                                                            'done testing',
+                                                                            'test cycling'
+                                                                          ],
+                                                                'tmavg' => '73'
+                                                              },
+                       't/schedule/activity.t::Sanity checks' => {
+                                                                   'message' => 't/schedule/activity.t::Sanity checks',
+                                                                   'next' => [
+                                                                               'done testing',
+                                                                               'test cycling'
+                                                                             ],
+                                                                   'tmavg' => '70'
+                                                                 },
+                       't/schedule/activity/attribute.t::Change:  Integers' => {
+                                                                                 'tmavg' => '53',
+                                                                                 'message' => 't/schedule/activity/attribute.t::Change:  Integers',
+                                                                                 'next' => [
+                                                                                             'done testing',
+                                                                                             'test cycling'
+                                                                                           ]
+                                                                               },
+                       't/schedule/activity/attribute.t::Log/avg:  Integer' => {
+                                                                                 'next' => [
+                                                                                             'done testing',
+                                                                                             'test cycling'
+                                                                                           ],
+                                                                                 'message' => 't/schedule/activity/attribute.t::Log/avg:  Integer',
+                                                                                 'tmavg' => '53'
+                                                                               },
+                       't/schedule/activity.t::Attribute recomputation' => {
+                                                                             'message' => 't/schedule/activity.t::Attribute recomputation',
+                                                                             'next' => [
+                                                                                         'done testing',
+                                                                                         'test cycling'
+                                                                                       ],
+                                                                             'tmavg' => '74'
+                                                                           },
+                       't/schedule/activity.t::Message randomization' => {
+                                                                           'message' => 't/schedule/activity.t::Message randomization',
+                                                                           'next' => [
+                                                                                       'done testing',
+                                                                                       'test cycling'
+                                                                                     ],
+                                                                           'tmavg' => '73'
+                                                                         },
+                       't/schedule/activity/node.t::has next' => {
+                                                                   'tmavg' => '52',
+                                                                   'message' => 't/schedule/activity/node.t::has next',
+                                                                   'next' => [
+                                                                               'done testing',
+                                                                               'test cycling'
+                                                                             ]
+                                                                 },
+                       't/schedule/activity.t::Failures' => {
+                                                              'tmavg' => '73',
+                                                              'next' => [
+                                                                          'done testing',
+                                                                          'test cycling'
+                                                                        ],
+                                                              'message' => 't/schedule/activity.t::Failures'
+                                                            },
+                       't/schedule/activity.t::Annotations' => {
+                                                                 'next' => [
+                                                                             'done testing',
+                                                                             'test cycling'
+                                                                           ],
+                                                                 'message' => 't/schedule/activity.t::Annotations',
+                                                                 'tmavg' => '69'
+                                                               },
+                       't/schedule/activity.t::Named messages' => {
+                                                                    'next' => [
+                                                                                'done testing',
+                                                                                'test cycling'
+                                                                              ],
+                                                                    'message' => 't/schedule/activity.t::Named messages',
+                                                                    'tmavg' => '73'
+                                                                  },
+                       't/schedule/activity/node.t::defaulting' => {
+                                                                     'next' => [
+                                                                                 'done testing',
+                                                                                 'test cycling'
+                                                                               ],
+                                                                     'message' => 't/schedule/activity/node.t::defaulting',
+                                                                     'tmavg' => '52'
+                                                                   },
+                       't/schedule/activity/message.t::Primary messages' => {
+                                                                              'tmavg' => '57',
+                                                                              'next' => [
+                                                                                          'done testing',
+                                                                                          'test cycling'
+                                                                                        ],
+                                                                              'message' => 't/schedule/activity/message.t::Primary messages'
+                                                                            },
+                       't/schedule/activity/attribute.t::Dump/Restore' => {
+                                                                            'tmavg' => '57',
+                                                                            'message' => 't/schedule/activity/attribute.t::Dump/Restore',
+                                                                            'next' => [
+                                                                                        'done testing',
+                                                                                        'test cycling'
+                                                                                      ]
+                                                                          },
+                       't/schedule/activity/attributes.t::Registration' => {
+                                                                             'next' => [
+                                                                                         'done testing',
+                                                                                         'test cycling'
+                                                                                       ],
+                                                                             'message' => 't/schedule/activity/attributes.t::Registration',
+                                                                             'tmavg' => '51'
+                                                                           },
+                       't/schedule/activity.t::Simple scheduling' => {
+                                                                       'tmavg' => '70',
+                                                                       'message' => 't/schedule/activity.t::Simple scheduling',
+                                                                       'next' => [
+                                                                                   'done testing',
+                                                                                   'test cycling'
+                                                                                 ]
+                                                                     },
+                       't/schedule/activity/nodefilter.t::Boolean and' => {
+                                                                            'tmavg' => '56',
+                                                                            'message' => 't/schedule/activity/nodefilter.t::Boolean and',
+                                                                            'next' => [
+                                                                                        'done testing',
+                                                                                        'test cycling'
+                                                                                      ]
+                                                                          },
+                       't/schedule/activity.t::Incremental build' => {
+                                                                       'tmavg' => '84',
+                                                                       'message' => 't/schedule/activity.t::Incremental build',
+                                                                       'next' => [
+                                                                                   'done testing',
+                                                                                   'test cycling'
+                                                                                 ]
+                                                                     },
+                       't/schedule/activity/message.t::Random selection' => {
+                                                                              'tmavg' => '54',
+                                                                              'message' => 't/schedule/activity/message.t::Random selection',
+                                                                              'next' => [
+                                                                                          'done testing',
+                                                                                          'test cycling'
+                                                                                        ]
+                                                                            },
+                       'done testing' => {
+                                           'tmavg' => 0,
+                                           'message' => 'Testing concluded'
+                                         }
+                     }
+        };

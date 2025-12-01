@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.033";
+  version "0.034";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -65,7 +65,14 @@ class Mojolicious {
   
   has defaults : rw Hash;
   
-  has inline_templates : rw string;
+  has data_templates : virtual rw string
+    get {
+      return $self->renderer->data_templates;
+    }
+    set {
+      $self->renderer->set_data_templates($_);
+    }
+  ;
   
   # Class Methods
   static method new : Mojolicious () {
@@ -133,14 +140,14 @@ class Mojolicious {
     my $c = Mojolicious::Controller->new;
     $c->set_app($self);
     $c->set_tx($tx);
-    $c->set_stash($stash);
+    $c->set_stash_h($stash);
     
     return $c;
   }
   
   method dispatch : void ($c : Mojolicious::Controller) {
     
-    my $stash = $c->stash;
+    my $stash = $c->stash_h;
     if ($stash->{"mojo.rendered"}->(int)) {
       return;
     }

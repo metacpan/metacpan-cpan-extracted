@@ -19,7 +19,7 @@ use Data::URIID::Colour;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_abstract_names_to_ise = (
     black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284',
@@ -282,37 +282,70 @@ sub new {
     }
 
     foreach my $key (keys %_text_types) {
-        if (defined(my $for = $opts{'for_'.$key})) {
-            unless (defined $opts{from}) {
+        if (defined(my $for_text = $opts{'for_'.$key})) {
+            foreach my $for (split(/[\s\x20-\x2F\x5B-\x60\x7B-\x7F]+/, $for_text)) {
                 require Data::Displaycolour::Data;
-                my $done;
+
+                my %langs = %Data::Displaycolour::Data::_langs;
+                my @langs;
+                my %found;
+
+                if (defined(my $list = delete $opts{language})) {
+                    my $n = 0;
+                    %langs = ();
+                    $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
+                    $langs{$_} = $n++ foreach reverse @{$list};
+                }
+
+                if (defined(my $list = delete $opts{preferred_language})) {
+                    my $n = $Data::Displaycolour::Data::_lang_value;
+                    $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
+                    $langs{$_} = $n++ foreach reverse @{$list};
+                }
+
+                if (defined(my $list = delete $opts{blacklist_language})) {
+                    $list = [split/\s*,\s*|\s+/, $list] unless ref $list;
+                    delete $langs{$_} foreach @{$list};
+                }
+
+                @langs = sort {$langs{$b} <=> $langs{$a}} keys %langs;
 
                 outer:
-                foreach my $name (@Data::Displaycolour::Data::_extra_keys) {
-                    if (index($for, $name) >= 0) {
-                        $opts{from} //= $_abstract_names_to_ise{$Data::Displaycolour::Data::_extra{$name}};
-                        $done = 1;
-                        last outer;
+                foreach my $lang (@langs) {
+                    my $l = $Data::Displaycolour::Data::_extra{$lang};
+                    foreach my $name (@{$l->{__order__}}) {
+                        my $v = _match_with_quality($for, $name);
+                        $found{$l->{$name}} += $v if $v;
+                    }
+
+                    $l = $Data::Displaycolour::Data::_names{$lang};
+                    foreach my $name (@{$l->{__order__}}) {
+                        my $v = _match_with_quality($for, $name);
+                        $found{$l->{$name}} += $v if $v;
                     }
                 }
 
-                unless ($done) {
-                    outer:
-                    foreach my $lang (@Data::Displaycolour::Data::_langs) {
-                        my $l = $Data::Displaycolour::Data::_names{$lang};
-                        foreach my $name (@{$l->{__order__}}) {
-                            if (index($for, $name) >= 0) {
-                                $opts{from} //= $_abstract_names_to_ise{$l->{$name}} // next;
-                                last outer;
-                            }
+                {
+                    my $best_v = 0;
+                    my $best;
+
+                    foreach my $key (keys %found) {
+                        my $v = $found{$key};
+                        if ($v > $best_v) {
+                            $best = $key;
+                            $best_v = $v;
                         }
                     }
+
+                    $opts{from} //= $_abstract_names_to_ise{$best} if defined $best;
                 }
             }
         }
+
+        next if defined $opts{from};
     }
 
-    unless (defined $opts{from}) {
+    unless (delete($opts{no_defaults}) || defined $opts{from}) {
         foreach my $key (keys %_text_types) {
             if (defined(my $for = $opts{'for_'.$key})) {
                 unless (defined $self->{origin}) {
@@ -462,6 +495,15 @@ sub extractor {
 
 # ---- Private loaders ----
 
+sub _match_with_quality {
+    my ($haystack, $needle) = @_;
+    my ($pre, $post) = $haystack =~ /^(.*)\Q$needle\E(.*)\z/;
+
+    return 0 unless defined($pre) && defined($post);
+    return 1 - (length($pre) ? 0.4 : 0) - (length($post) ? 0.4 : 0);
+    return 0;
+}
+
 sub _load_abstract {
     my ($self) = @_;
     my $rgb = $self->rgb(default => undef);
@@ -503,10 +545,25 @@ sub _known_provider {
 
     if ($class eq 'abstract-colours') {
         return ([keys %_abstract_ise_to_name], rawtype => 'ise');
+    } elsif ($class eq 'specific-colours') {
+        my %rgb;
+
+        foreach my $palette (values %_palette) {
+            foreach my $value (values %{$palette}) {
+                if (ref $value) {
+                    $rgb{$_} = undef foreach @{$value};
+                } else {
+                    $rgb{$value} = undef;
+                }
+            }
+        }
+
+        return ([map {Data::URIID::Colour->new(rgb => $_)} keys %rgb], rawtype => 'Data::URIID::Colour');
     } elsif ($class eq 'palettes') {
         return ([keys %_palette], not_identifiers => 1);
     } elsif ($class eq ':all') {
         return ([
+                @{(__SUB__->($pkg, 'specific-colours', %opts))[0]},
                 keys(%_palette),
                 (map {Data::Identifier->new(ise => $_)} keys %_abstract_ise_to_name),
             ], not_identifiers => 1);
@@ -529,7 +586,7 @@ Data::Displaycolour - Work with display colours
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -601,6 +658,41 @@ In this case the colours are matched to the abstract colours if possible,
 with the default values used what what cannot be matched.
 Other types of values might be supported.
 Newer versions of this module might support more palette types.
+
+=item C<language>
+
+A language or list (arrayref or comma/space separated list) of languages as language tags (in order of preference) to use for lookups.
+
+Lookups will only performed with the listed languages.
+
+Defaults to a build in list.
+
+=item C<preferred_language>
+
+A list of langauges that are preferred. This will however not remove any languages from the list.
+
+The format is the same as for L</language>.
+
+Defaults to an empty list.
+
+B<Note:>
+It is not defined what happens if both this and L</language> is given.
+
+=item C<blacklist_language>
+
+A list of languages that are never tried for lookups.
+
+The format is the same as for L</language>.
+
+Defaults to an empty list.
+
+B<Note:>
+It is safe to combine with option with any other option.
+If a language is specifically asked for and blacklisted, the blacklist wins.
+
+=item C<no_defaults>
+
+Do not try to use calculate fallback colours if no colour could be detected.
 
 =item C<subobjects>
 
@@ -681,6 +773,13 @@ The following classes are supported:
 =item C<abstract-colours>
 
 The list of abstract colours known by this module.
+
+=item C<specific-colours>
+
+The list of specific colours known by this module for all palettes.
+
+See also:
+L</list_colours>.
 
 =item C<palettes>
 

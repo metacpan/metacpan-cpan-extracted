@@ -97,13 +97,13 @@ class Mojolicious::Sessions {
     
     my $session_keys_length = @$session_keys;
     
-    $c->set_active_session($session_keys_length);
+    $c->stash_h->{"mojo.active_session"} = $session_keys_length;
     
     unless ($session_keys_length) {
       return;
     }
     
-    $c->set_session($session);
+    $c->stash_h->{"mojo.session"} = $session;
     
     if ($session->get("new_flash")) {
       $session->set(flash => $session->delete("new_flash"));
@@ -112,14 +112,16 @@ class Mojolicious::Sessions {
   
 
   method store : void ($c : Mojolicious::Controller) {
-
+    
+    my $stash = $c->stash_h;
+    
     # Make sure session was active
-    my $session = $c->session;
+    my $session = $c->session_h;
     unless ($session) {
       return;
     }
     
-    unless (@$session->keys || $c->active_session) {
+    unless (@$session->keys || $stash->{"mojo.active_session"}->(int)) {
       return;
     }
     

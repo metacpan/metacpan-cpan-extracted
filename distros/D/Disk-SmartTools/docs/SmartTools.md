@@ -4,7 +4,7 @@ Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 # VERSION
 
-Version v3.3.8
+Version v3.3.12
 
 # SYNOPSIS
 
@@ -41,6 +41,8 @@ Returns the proper disk prefix depending on the OS: `/dev/sd` for linux, `/dev/d
 ## **os\_disks()**
 
 Returns a list of possible disks based on OS, prefixed by get\_disk\_prefix().
+
+_Should parse diskutil on macs and lsblk on linux for more accuracy._
 
     my @disks = os_disks();
 
@@ -128,10 +130,70 @@ Load host local disk configuration from `$HOME/.smarttools.yml` if it exists.
 This allows for manual configuration in the case where the automatic detection
 of disks is not precise.
 
-`HOSTNAME` host name specified in configuration file. 
+`HOSTNAME` host name specified in configuration file.
 Allows a single configuration file to be deployed with multiple host's configurations.
 
     my $local_config_ref = load_local_config($hostname);
+
+# EXAMPLES
+
+Two example programs demonstrate how the \`Disk::SmartTools\` modules can be used.
+
+## smart\_show.pl
+
+Display SMART information on disks.
+
+    $ smart_show.pl
+
+Asks for the type of SMART information to display then reports for each
+physical disk in the system.
+
+    Display SMART information
+    --------------------------
+    Choose attribute to display:
+         a. All SMART Info
+         b. Info
+         c. Overall-Health
+         d. SelfTest History
+         e. Error Log
+         f. Temperature Graph
+         g. Power_On_Hours
+         h. Power_Cycle_Count
+         i. Temperature_Celsius
+         j. Reallocated_Sector_Ct
+         k. Offline_Uncorrectable
+         l. Raw_Read_Error_Rate
+         m. Seek_Error_Rate
+         n. Reported_Uncorrect
+         o. Command_Timeout
+         p. Current_Pending_Sector
+
+**Must be run as root.**
+
+## smart\_run\_tests.pl
+
+Runs a SMART test on all disks.  Typically run as a crontab.
+
+    $ smart_run_tests.pl <args>
+
+    --test_type : Length of SMART test, short (default) or long
+    --dry_run : Don't actually perform SMART test
+    --debug : Turn debugging on
+    --verbose : Generate debugging info on stderr
+    --silent : Do not print report on stdout
+    --help : This helpful information.
+
+**Must be run as root.**
+
+### Crontabs
+
+Usually run as a crontab
+
+- 30 5 \* \* \*       : S.M.A.R.T. disk checks - short ; /var/root/bin/smart\_run\_tests.pl
+
+
+
+- 4  6 \* \* \*       : S.M.A.R.T. disk checks - long  ; /var/root/bin/smart\_run\_tests.pl --test\_type=long
 
 # AUTHOR
 

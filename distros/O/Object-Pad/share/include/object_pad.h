@@ -189,6 +189,9 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *class, SV *superclassna
 #define mop_class_inherit_from_superclass(class, args, nargs)  ObjectPad_mop_class_inherit_from_superclass(aTHX_ class, args, nargs)
 void ObjectPad_mop_class_inherit_from_superclass(pTHX_ ClassMeta *class, SV **args, size_t nargs);
 
+#define mop_class_prepare_parse(class)  ObjectPad_mop_class_prepare_parse(aTHX_ class)
+void ObjectPad_mop_class_prepare_parse(pTHX_ ClassMeta *meta);
+
 #define mop_class_begin(meta)  ObjectPad_mop_class_begin(aTHX_ meta)
 void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta);
 

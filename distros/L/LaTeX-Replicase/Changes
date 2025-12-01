@@ -32,3 +32,16 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Now the incoming $info structure can be either a HASH or an ARRAY.
 	- The manual has been corrected and expanded.
 	- Fixed tests.
+
+0.350 Mon Dec 01 01:01:01 2025
+	- Minor refactoring has been done.
+	- Improved control tag parser.
+	- Improved handling of lines with line breaks.
+	- Expanded control of input values for filling out TeX-template.
+	- Fixed bugs and tests for MSWIN32.
+	- Fixed bugs for REF, REF.SCALAR, and its derivatives.
+	- Significantly improved error messages when debugging.
+	- Increased diversity of code test coverage.
+	- Fixed tests.
+	- Removed Digest::MD5
+

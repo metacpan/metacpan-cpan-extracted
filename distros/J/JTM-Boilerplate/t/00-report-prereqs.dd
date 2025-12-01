@@ -18,9 +18,6 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'AnyEvent::Delay' => '0.001',
-                                      'AnyEvent::Handle::UDP' => '0.043',
-                                      'AnyEvent::Ping' => '0.011',
                                       'Bytes::Random::Secure' => '0.29',
                                       'CHI' => '0.6',
                                       'CLDR::Number' => '0.19',
@@ -43,7 +40,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::OSPrereqs' => '0.007',
                                       'Dist::Zilla::Plugin::PodWeaver' => '4.006',
                                       'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.161170',
-                                      'EV' => '4.22',
                                       'Email::Valid' => '1.198',
                                       'English' => '1.09',
                                       'Feature::Compat::Class' => '0.06',

@@ -155,6 +155,8 @@ lib/SPVM/Mojolicious/Plugins.pm
 lib/SPVM/Mojolicious/Plugins.spvm
 lib/SPVM/Mojolicious/Renderer.pm
 lib/SPVM/Mojolicious/Renderer.spvm
+lib/SPVM/Mojolicious/Renderer/Callback.pm
+lib/SPVM/Mojolicious/Renderer/Callback.spvm
 lib/SPVM/Mojolicious/Routes.pm
 lib/SPVM/Mojolicious/Routes.spvm
 lib/SPVM/Mojolicious/Routes/Match.pm
@@ -183,11 +185,14 @@ README.md
 t/basic.t
 t/lib/SPVM/TestCase/Mojo/Template.spvm
 t/lib/SPVM/TestCase/Mojolicious.spvm
+t/lib/SPVM/TestCase/Mojolicious/Controller.spvm
 t/lib/SPVM/TestCase/Mojolicious/Routes.spvm
 t/lib/SPVM/TestCase/Online.spvm
 t/Mojo-Template.t
+t/Mojolicious-Controller.t
 t/Mojolicious-Routes.t
 t/online.t
+t/templates/minimal.html.ep
 t/webapp/basic.pl
 TODO.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.010';
+$Bitcoin::Secp256k1::VERSION = '0.011';
 use v5.10;
 use strict;
 use warnings;
@@ -51,9 +51,23 @@ XSLoader::load('Bitcoin::Secp256k1', $Bitcoin::Secp256k1::VERSION);
 # These methods are implemented in Perl and deliver more convenient API to
 # interact with. They are stable and public.
 
+sub _croak_usage
+{
+	my $args_str = join ', ', @_;
+
+	my ($package) = caller;
+	my ($calling_sub) = (caller 1)[3];
+	$calling_sub =~ s/^${package}:://;
+
+	croak "bad or undefined arguments, usage: \$secp256k1->$calling_sub($args_str)";
+}
+
 sub verify_private_key
 {
 	my ($self, $private_key) = @_;
+
+	(defined $private_key)
+		or _croak_usage(qw($private_key));
 
 	return $self->_verify_privkey($private_key);
 }
@@ -61,19 +75,29 @@ sub verify_private_key
 sub verify_public_key
 {
 	my ($self, $public_key) = @_;
-	local $@;
 
-	my $success = eval {
-		$self->_pubkey($public_key);
-		1;
-	};
+	(defined $public_key)
+		or _croak_usage(qw($public_key));
 
-	return !!$success;
+	# scope for local $@
+	{
+		local $@;
+
+		my $success = eval {
+			$self->_pubkey($public_key);
+			1;
+		};
+
+		return !!$success;
+	}
 }
 
 sub create_public_key
 {
 	my ($self, $private_key) = @_;
+
+	(defined $private_key)
+		or _croak_usage(qw($private_key));
 
 	$self->_create_pubkey($private_key);
 	return $self->_pubkey;
@@ -82,6 +106,9 @@ sub create_public_key
 sub normalize_signature
 {
 	my ($self, $signature) = @_;
+
+	(defined $signature)
+		or _croak_usage(qw($signature));
 
 	$self->_signature($signature);
 	$self->_normalize;
@@ -94,12 +121,18 @@ sub compress_public_key
 	my ($self, $public_key, $compressed) = @_;
 	$compressed //= !!1;
 
+	(defined $public_key)
+		or _croak_usage(qw($public_key [$compressed]));
+
 	return $self->_pubkey($public_key, $compressed);
 }
 
 sub sign_message
 {
 	my ($self, $private_key, $message) = @_;
+
+	(defined $private_key and defined $message)
+		or _croak_usage(qw($private_key $message));
 
 	return $self->sign_digest($private_key, sha256(sha256($message)));
 }
@@ -108,6 +141,9 @@ sub sign_message_schnorr
 {
 	my ($self, $private_key, $message) = @_;
 
+	(defined $private_key and defined $message)
+		or _croak_usage(qw($private_key $message));
+
 	return $self->sign_digest_schnorr($private_key, sha256($message));
 }
 
@@ -115,12 +151,18 @@ sub sign_message_recoverable
 {
 	my ($self, $private_key, $message) = @_;
 
+	(defined $private_key and defined $message)
+		or _croak_usage(qw($private_key $message));
+
 	return $self->sign_digest_recoverable($private_key, sha256(sha256($message)));
 }
 
 sub sign_digest
 {
 	my ($self, $private_key, $digest) = @_;
+
+	(defined $private_key and defined $digest)
+		or _croak_usage(qw($private_key $digest));
 
 	$self->_sign($private_key, $digest);
 	return $self->_signature;
@@ -130,6 +172,9 @@ sub sign_digest_schnorr
 {
 	my ($self, $private_key, $digest) = @_;
 
+	(defined $private_key and defined $digest)
+		or _croak_usage(qw($private_key $digest));
+
 	$self->_sign_schnorr($private_key, $digest);
 	return $self->_signature_schnorr;
 }
@@ -138,29 +183,41 @@ sub sign_digest_recoverable
 {
 	my ($self, $private_key, $digest) = @_;
 
+	(defined $private_key and defined $digest)
+		or _croak_usage(qw($private_key $digest));
+
 	$self->_sign_recoverable($private_key, $digest);
 	return $self->_signature_recoverable;
-}
-
-sub recover_public_key_digest
-{
-	my ($self, $recoverable_signature, $digest) = @_;
-
-	$self->_signature_recoverable($recoverable_signature);
-	$self->_recover_pubkey_recoverable($digest);
-	return $self->_pubkey;
 }
 
 sub recover_public_key_message
 {
 	my ($self, $recoverable_signature, $message) = @_;
 
+	(defined $recoverable_signature and defined $message)
+		or _croak_usage(qw($signature $message));
+
 	return $self->recover_public_key_digest($recoverable_signature, sha256(sha256($message)));
+}
+
+sub recover_public_key_digest
+{
+	my ($self, $recoverable_signature, $digest) = @_;
+
+	(defined $recoverable_signature and defined $digest)
+		or _croak_usage(qw($signature $digest));
+
+	$self->_signature_recoverable($recoverable_signature);
+	$self->_recover_pubkey_recoverable($digest);
+	return $self->_pubkey;
 }
 
 sub verify_message
 {
 	my ($self, $public_key, $signature, $message) = @_;
+
+	(defined $public_key and defined $signature and defined $message)
+		or _croak_usage(qw($public_key $signature $message));
 
 	return $self->verify_digest($public_key, $signature, sha256(sha256($message)));
 }
@@ -169,6 +226,9 @@ sub verify_message_schnorr
 {
 	my ($self, $public_key, $signature, $message) = @_;
 
+	(defined $public_key and defined $signature and defined $message)
+		or _croak_usage(qw($public_key $signature $message));
+
 	return $self->verify_digest_schnorr($public_key, $signature, sha256($message));
 }
 
@@ -176,12 +236,18 @@ sub verify_message_recoverable
 {
 	my ($self, $public_key, $signature, $message) = @_;
 
+	(defined $public_key and defined $signature and defined $message)
+		or _croak_usage(qw($public_key $signature $message));
+
 	return $self->verify_digest_recoverable($public_key, $signature, sha256(sha256($message)));
 }
 
 sub verify_digest
 {
 	my ($self, $public_key, $signature, $digest) = @_;
+
+	(defined $public_key and defined $signature and defined $digest)
+		or _croak_usage(qw($public_key $signature $digest));
 
 	$self->_pubkey($public_key);
 	$self->_signature($signature);
@@ -194,6 +260,9 @@ sub verify_digest_schnorr
 {
 	my ($self, $public_key, $signature, $digest) = @_;
 
+	(defined $public_key and defined $signature and defined $digest)
+		or _croak_usage(qw($public_key $signature $digest));
+
 	$self->_xonly_pubkey($public_key);
 	$self->_signature_schnorr($signature);
 
@@ -203,6 +272,9 @@ sub verify_digest_schnorr
 sub verify_digest_recoverable
 {
 	my ($self, $public_key, $signature, $digest) = @_;
+
+	(defined $public_key and defined $signature and defined $digest)
+		or _croak_usage(qw($public_key $signature $digest));
 
 	$self->_signature_recoverable($signature);
 	$self->_recover_pubkey_recoverable($digest);
@@ -215,6 +287,9 @@ sub negate_public_key
 {
 	my ($self, $public_key) = @_;
 
+	(defined $public_key)
+		or _croak_usage(qw($public_key));
+
 	$self->_pubkey($public_key);
 	$self->_pubkey_negate;
 
@@ -225,12 +300,18 @@ sub negate_private_key
 {
 	my ($self, $private_key) = @_;
 
+	(defined $private_key)
+		or _croak_usage(qw($private_key));
+
 	return $self->_privkey_negate($private_key);
 }
 
 sub xonly_public_key
 {
 	my ($self, $public_key) = @_;
+
+	(defined $public_key)
+		or _croak_usage(qw($public_key));
 
 	$self->_pubkey($public_key);
 	$self->_convert_pubkey_xonly;
@@ -242,6 +323,9 @@ sub add_public_key
 {
 	my ($self, $public_key, $tweak) = @_;
 
+	(defined $public_key and defined $tweak)
+		or _croak_usage(qw($public_key $tweak));
+
 	$self->_pubkey($public_key);
 	$self->_pubkey_add($tweak);
 
@@ -252,12 +336,18 @@ sub add_private_key
 {
 	my ($self, $private_key, $tweak) = @_;
 
+	(defined $private_key and defined $tweak)
+		or _croak_usage(qw($private_key $tweak));
+
 	return $self->_privkey_add($private_key, $tweak);
 }
 
 sub multiply_public_key
 {
 	my ($self, $public_key, $tweak) = @_;
+
+	(defined $public_key and defined $tweak)
+		or _croak_usage(qw($public_key $tweak));
 
 	$self->_pubkey($public_key);
 	$self->_pubkey_mul($tweak);
@@ -269,6 +359,9 @@ sub multiply_private_key
 {
 	my ($self, $private_key, $tweak) = @_;
 
+	(defined $private_key and defined $tweak)
+		or _croak_usage(qw($private_key $tweak));
+
 	return $self->_privkey_mul($private_key, $tweak);
 }
 
@@ -276,8 +369,15 @@ sub combine_public_keys
 {
 	my ($self, @public_keys) = @_;
 
+	(@public_keys > 0)
+		or _croak_usage(qw($public_key [@more_public_keys]));
+
 	$self->_clear;
 	foreach my $pub (@public_keys) {
+
+		(defined $pub)
+			or _croak_usage(qw($public_key [@more_public_keys]));
+
 		$self->_pubkey($pub);
 		$self->_push_pubkey;
 	}
@@ -326,6 +426,15 @@ the system, and will try to detect and install it automatically using
 L<Alien::libsecp256k1>.
 
 =head1 INTERFACE
+
+Please note that the module does not treat corrupted data (too short or too
+long, badly encoded) as valid arguments and will throw an exception if it gets
+them in place of public keys, private keys or signatures. Same is true for
+undefined values, which will cause the module to print the help message with
+function usage. For some functions like L</verify_digest> this means that the
+function can fail either by returning false or by throwing an exception. This
+can be used to distinguish corrupted data (exception is raised) from invalid
+data (false is returned).
 
 =head2 Attributes
 

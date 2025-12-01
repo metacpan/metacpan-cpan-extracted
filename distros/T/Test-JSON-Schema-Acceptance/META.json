@@ -66,7 +66,7 @@
             "Feature::Compat::Try" : "0",
             "File::ShareDir" : "0",
             "Git::Wrapper" : "0",
-            "JSON::PP" : "4.16",
+            "JSON::PP" : "4.11",
             "List::Util" : "1.33",
             "Mojo::JSON" : "0",
             "Mojolicious" : "7.87",
@@ -105,7 +105,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "JSON::PP" : "4.16",
+            "JSON::PP" : "4.11",
             "Scalar::Util" : "0",
             "Test2::Suite" : "0.000131",
             "Test2::Tools::Exception" : "0",
@@ -207,7 +207,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "1.034"
+         "version" : "1.035"
       }
    },
    "release_status" : "stable",
@@ -222,10 +222,10 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "1.034",
+   "version" : "1.035",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.043004"
+         "version" : "5.043005"
       },
       "plugins" : [
          {
@@ -943,7 +943,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20251022"
+                  "Module::CoreList" : "5.20251120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1161,7 +1161,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.034",
+                  "tag" : "v1.035",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1433,7 +1433,7 @@
       "Karen Etheridge <ether@cpan.org>",
       "Daniel Perrett <dp13@sanger.ac.uk>"
    ],
-   "x_generated_by_perl" : "v5.43.4",
+   "x_generated_by_perl" : "v5.43.5",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "MIT",
    "x_static_install" : 0,

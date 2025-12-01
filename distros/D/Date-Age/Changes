@@ -1,5 +1,9 @@
 Revision history for Date-Range
 
+0.07	Sun Nov 30 19:44:01 EST 2025
+	Use Test::Which
+	Properly document the public methods
+
 0.06	Tue Nov 25 21:52:23 EST 2025
 	Added test dashboard
 	Added Appveyor integration

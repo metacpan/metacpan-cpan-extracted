@@ -1,5 +1,9 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.035     2025-11-30 18:21:46Z
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/8da0a7bcb23f3516590e70bc5c3e396400c27741...d69537acea93fd7481ad80ff3015d88ab0b13d5a
+
 1.034     2025-11-12 18:32:38Z
         - increased some prereq requirements to resolve failures on older
           perls; now using more Test2-specific modules

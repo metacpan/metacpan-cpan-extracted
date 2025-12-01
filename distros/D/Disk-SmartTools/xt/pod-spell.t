@@ -21,6 +21,7 @@ MegaRAID
 SelfTest
 crontab
 diskutil
+lsblk
 lspci
 macos
 readonly

@@ -1,0 +1,12 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Renderer::Callback : interface_t {
+  version_from Mojolicious;
+  
+  use Mojolicious::Renderer;
+  use Mojolicious::Controller;
+  
+  required method : void ($renderer : Mojolicious::Renderer, $c : Mojolicious::Controller, $output_ref : string[]);
+  
+}

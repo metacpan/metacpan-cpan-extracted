@@ -78,7 +78,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     my $stack_data = $stack->[$position];
     my $captures = $stack_data->captures;
     
-    $c->set_captures($captures);
+    $c->stash_h->{"mojo.captures"} = $captures;
     
     my $r = $stack_data->route;
     
@@ -95,7 +95,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
       my $output = $c->render($template, $r->pattern->defaults->to_options);
       
       if ($output) {
-        $c->set_rendered(1);
+        $c->stash_h->{"mojo.rendered"} = 1;
       }
       
       $continue = 0;
@@ -112,7 +112,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
       return $self->continue($c);
     }
     else {
-      unless ($c->rendered) {
+      unless ($c->stash_h->{"mojo.rendered"}->(int)) {
         die "Not rendered.";
       }
     }

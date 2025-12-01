@@ -302,14 +302,13 @@ class Mojo::File {
     my $buffer = new_string_len($buffer_length);
     
     while (1) {
-      
       my $length = $fh->read($buffer);
       
       if ($length == 0) {
         last;
       }
       
-      $content_buffer->push($buffer, $length);
+      $content_buffer->push($buffer, 0, $length);
     }
     
     return $content_buffer->to_string;
