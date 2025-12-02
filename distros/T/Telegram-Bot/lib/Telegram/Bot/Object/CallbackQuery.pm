@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::CallbackQuery;
-$Telegram::Bot::Object::CallbackQuery::VERSION = '0.028';
+$Telegram::Bot::Object::CallbackQuery::VERSION = '0.029';
 # ABSTRACT: The base class for the Telegram type "CallbackQuery".
 
 
@@ -65,7 +65,7 @@ Telegram::Bot::Object::CallbackQuery - The base class for the Telegram type "Cal
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

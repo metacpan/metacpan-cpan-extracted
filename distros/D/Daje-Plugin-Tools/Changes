@@ -1,6 +1,8 @@
 Revision history for Perl extension Daje-Plugin-Tools
 
-0.18 2025-11-30T12:44:23Z
+0.21 2025-12-02T04:40:11Z
+
+    - 2025-12-02 Moved migrations to Daje::Database::Tools
     - 2025-11-30 Table and field bugs fixed
     - 2025-11-04 Dependencies and test corrected
     - 2025-11-02 Beta 1

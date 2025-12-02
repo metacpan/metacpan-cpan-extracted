@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::PollOption;
-$Telegram::Bot::Object::PollOption::VERSION = '0.028';
+$Telegram::Bot::Object::PollOption::VERSION = '0.029';
 # ABSTRACT: The base class for Telegram 'PollOption' type objects
 
 
@@ -27,7 +27,7 @@ Telegram::Bot::Object::PollOption - The base class for Telegram 'PollOption' typ
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::CallbackGame;
-$Telegram::Bot::Object::CallbackGame::VERSION = '0.028';
+$Telegram::Bot::Object::CallbackGame::VERSION = '0.029';
 # ABSTRACT: The base class for Telegram message 'CallbackGame' type.
 
 
@@ -26,7 +26,7 @@ Telegram::Bot::Object::CallbackGame - The base class for Telegram message 'Callb
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

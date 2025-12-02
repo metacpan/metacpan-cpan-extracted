@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.625';
+our $VERSION = '0.626';
 
 use 5.020;
 use strictures 2;
@@ -494,6 +494,7 @@ sub sprintf_num ($value) {
 # TODO: move this off into its own distribution, see JSON::Schema::Types
 sub json_pointer_type () { Str->where('!length || m{^/} && !m{~(?![01])}'); }
 
+# a URI without a fragment, or with a json pointer fragment
 sub canonical_uri_type () {
   (InstanceOf['Mojo::URL'])->where(q{!defined($_->fragment) || $_->fragment =~ m{^/} && $_->fragment !~ m{~(?![01])}});
 }
@@ -572,7 +573,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.625
+version 0.626
 
 =head1 SYNOPSIS
 

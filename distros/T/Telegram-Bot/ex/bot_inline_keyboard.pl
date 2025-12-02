@@ -27,11 +27,11 @@ sub kb_dictionary {
   my $update = shift;
 
   if (ref ($update) eq 'Telegram::Bot::Object::Message') {
-    if ($update->text =~ /dictionary/) {
+    if ($update->text =~ /\d+/) {
       # start the search thing
       my $mkup = Telegram::Bot::Object::ReplyKeyboardMarkup->new();
-      my $btn1 = Telegram::Bot::Object::KeyboardButton->new(text => 'abc');
-      my $btn2 = Telegram::Bot::Object::KeyboardButton->new(text => 'def');
+      my $btn1 = Telegram::Bot::Object::KeyboardButton->new(text => $update->text );
+      my $btn2 = Telegram::Bot::Object::KeyboardButton->new(text => 'bar text 2');
 
       $mkup->keyboard([ [ $btn1 ], [ $btn2 ] ]);
 

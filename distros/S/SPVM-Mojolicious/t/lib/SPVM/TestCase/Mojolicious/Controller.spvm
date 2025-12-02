@@ -107,6 +107,54 @@ EOS
       
     }
     
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      
+      my $bs = $c->render_to_string({json => Hash->new({"foo" => 1})});
+      
+      unless ($bs->to_string eq "{\"foo\":1}") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      
+      my $bs = $c->render_to_string({text => "foo"});
+      
+      unless ($bs->to_string eq "foo") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_app($app);
+      $c->set_tx($tx);
+      
+      my $bs = $c->render_to_string({data => "foo"});
+      
+      unless ($bs->to_string eq "foo") {
+        return 0;
+      }
+      
+    }
+    
     return 1;
   }
   

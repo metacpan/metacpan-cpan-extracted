@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::KeyboardButton;
-$Telegram::Bot::Object::KeyboardButton::VERSION = '0.028';
+$Telegram::Bot::Object::KeyboardButton::VERSION = '0.029';
 # ABSTRACT: The base class for Telegram 'KeyboardButton' type objects
 
 
@@ -28,7 +28,7 @@ Telegram::Bot::Object::KeyboardButton - The base class for Telegram 'KeyboardBut
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

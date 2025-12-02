@@ -1,6 +1,6 @@
 Revision history for Perl extension Daje-Workflow
 
-0.21 2025-11-27T11:52:02Z
+0.22 2025-12-01T13:43:07Z
     - 2025-11-02 Beta 1
     - 2025-10-24 Activity pre and post checks added
     - 2025-10-21 Daje::Workflow::Loader and Daje::Workflow::Config merged.

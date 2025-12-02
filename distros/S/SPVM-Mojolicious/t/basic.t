@@ -16,7 +16,9 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
-ok(SPVM::TestCase::Mojolicious->test);
+ok(SPVM::TestCase::Mojolicious->extra_test);
+
+ok(SPVM::TestCase::Mojolicious->dispatch);
 
 # Version check
 {

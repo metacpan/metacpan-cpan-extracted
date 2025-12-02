@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ChatMember;
-$Telegram::Bot::Object::ChatMember::VERSION = '0.028';
+$Telegram::Bot::Object::ChatMember::VERSION = '0.029';
 # ABSTRACT: The base class for the Telegram type "ChatMember".
 
 
@@ -76,7 +76,7 @@ Telegram::Bot::Object::ChatMember - The base class for the Telegram type "ChatMe
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::SuccessfulPayment;
-$Telegram::Bot::Object::SuccessfulPayment::VERSION = '0.028';
+$Telegram::Bot::Object::SuccessfulPayment::VERSION = '0.029';
 # ABSTRACT: The base class for Telegram 'SuccessfulPayment' type objects
 
 
@@ -36,7 +36,7 @@ Telegram::Bot::Object::SuccessfulPayment - The base class for Telegram 'Successf
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

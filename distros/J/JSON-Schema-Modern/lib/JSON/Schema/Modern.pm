@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.624-9-g11d40e29
+package JSON::Schema::Modern; # git description: v0.625-7-g636676a5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.625';
+our $VERSION = '0.626';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -585,7 +585,9 @@ sub _traverse_subschema ($self, $schema, $state) {
   push $state->{subschemas}->@*, $state->{traversed_keyword_path}.$state->{keyword_path};
 
   my $schema_type = get_type($schema);
-  return 1 if $schema_type eq 'boolean';
+  return 1 if $schema_type eq 'boolean'
+    and ($state->{specification_version} ne 'draft4'
+      or $state->{keyword_path} =~ m{/(?:additional(?:Items|Properties)|uniqueItems)$});
 
   return E($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
@@ -717,8 +719,9 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   # bit if we see a local unevaluated* keyword, and clear it again as we move on to a new data path.
   # We also set it when _strict_schema_data is set, but only for object data instances.
   $state->{collect_annotations} |=
-    0+(exists $schema->{unevaluatedItems} || exists $schema->{unevaluatedProperties}
-      || !!$state->{seen_data_properties} && (my $is_object_data = ref $data eq 'HASH'));
+    0+((ref $data eq 'ARRAY' && exists $schema->{unevaluatedItems})
+      || ((my $is_object_data = ref $data eq 'HASH')
+        && (exists $schema->{unevaluatedProperties} || !!$state->{seen_data_properties})));
 
   # in order to collect annotations for unevaluated* keywords, we sometimes need to ignore the
   # suggestion to short_circuit evaluation at this scope (but lower scopes are still fine)
@@ -1289,7 +1292,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.625
+version 0.626
 
 =head1 SYNOPSIS
 

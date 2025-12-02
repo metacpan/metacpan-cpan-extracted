@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ChatInviteLink;
-$Telegram::Bot::Object::ChatInviteLink::VERSION = '0.028';
+$Telegram::Bot::Object::ChatInviteLink::VERSION = '0.029';
 # ABSTRACT: The base class for the Telegram type "ChatInviteLink".
 
 
@@ -46,7 +46,7 @@ Telegram::Bot::Object::ChatInviteLink - The base class for the Telegram type "Ch
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

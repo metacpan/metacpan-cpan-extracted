@@ -88,15 +88,11 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
       
       $continue = $cb->($c);
     }
-    elsif (my $template = $r->pattern->defaults->{"template"}->(string)) {
+    elsif (my $template_name = $r->pattern->defaults->{"template"}->(string)) {
       
-      # $c->log->trace("Routing to the template $template.$format.$handler");
+      $c->log->trace("Routing to the template $template_name");
       
-      my $output = $c->render($template, $r->pattern->defaults->to_options);
-      
-      if ($output) {
-        $c->stash_h->{"mojo.rendered"} = 1;
-      }
+      $c->render($template_name, $r->pattern->defaults->to_options);
       
       $continue = 0;
     }
@@ -110,11 +106,6 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     
     if ($continue) {
       return $self->continue($c);
-    }
-    else {
-      unless ($c->stash_h->{"mojo.rendered"}->(int)) {
-        die "Not rendered.";
-      }
     }
   }
   

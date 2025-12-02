@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.028';
+$Telegram::Bot::Brain::VERSION = '0.029';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-use Mojo::JSON qw/encode_json/;
+use Mojo::JSON qw/to_json/;
 use Carp qw/croak/;
 use Log::Any;
 use Data::Dumper;
@@ -107,11 +107,11 @@ sub sendMessage {
   $send_args->{parse_mode} = $args->{parse_mode} if exists $args->{parse_mode};
   $send_args->{disable_web_page_preview} = $args->{disable_web_page_preview} if exists $args->{disable_web_page_preview};
   $send_args->{disable_notification} = $args->{disable_notification} if exists $args->{disable_notification};
-  $send_args->{reply_parameters}     = encode_json($args->{reply_parameters}->as_hashref)
+  $send_args->{reply_parameters}     = to_json($args->{reply_parameters}->as_hashref)
       if exists $args->{reply_parameters};
   # deprecated reply_to_message_id
   if (exists $args->{reply_to_message_id}) {
-      $send_args->{reply_parameters} = encode_json({message_id => $args->{reply_to_message_id}});
+      $send_args->{reply_parameters} = to_json({message_id => $args->{reply_to_message_id}});
   }
   # $send_args->{reply_to_message_id}  = $args->{reply_to_message_id}  if exists $args->{reply_to_message_id};
 
@@ -123,7 +123,7 @@ sub sendMessage {
            ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardMarkup'  &&
            ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardRemove'  &&
            ref($reply_markup) ne 'Telegram::Bot::Object::ForceReply' );
-    $send_args->{reply_markup} = encode_json($reply_markup->as_hashref);
+    $send_args->{reply_markup} = to_json($reply_markup->as_hashref);
   }
 
   my $token = $self->token || croak "no token?";
@@ -193,7 +193,7 @@ sub editMessageText {
            ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardMarkup'  &&
            ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardRemove'  &&
            ref($reply_markup) ne 'Telegram::Bot::Object::ForceReply' );
-    $send_args->{reply_markup} = encode_json($reply_markup->as_hashref);
+    $send_args->{reply_markup} = to_json($reply_markup->as_hashref);
   }
   my $token = $self->token || croak "no token?";
   my $url = "https://api.telegram.org/bot${token}/editMessageText";
@@ -285,7 +285,7 @@ sub setMyCommands {
   
   my $send_args = {};
   croak "no commands supplied" unless $args->{commands};
-  $send_args->{commands} = encode_json $args->{commands};
+  $send_args->{commands} = to_json $args->{commands};
   $send_args->{language_code} = $args->{language_code} if ($args->{language_code}//'') ne '';
   my $token = $self->token || croak "no token?";
   my $url = "https://api.telegram.org/bot${token}/setMyCommands";
@@ -505,7 +505,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

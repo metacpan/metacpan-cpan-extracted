@@ -47,7 +47,7 @@
             "Future::AsyncAwait" : "0.52",
             "Mojo::Loader" : "0",
             "Mojo::Pg" : "0",
-            "perl" : "5.042000"
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
@@ -59,7 +59,7 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
@@ -143,7 +143,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

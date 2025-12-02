@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ForceReplyMarkup;
-$Telegram::Bot::Object::ForceReplyMarkup::VERSION = '0.028';
+$Telegram::Bot::Object::ForceReplyMarkup::VERSION = '0.029';
 # ABSTRACT: The base class for Telegram 'ForceReplyMarkup' type objects
 
 
@@ -28,7 +28,7 @@ Telegram::Bot::Object::ForceReplyMarkup - The base class for Telegram 'ForceRepl
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

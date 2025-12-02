@@ -42,12 +42,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Daje::Database::Model" : "0.09",
             "Daje::Document::Builder" : "0.01",
             "Future::AsyncAwait" : "0.52",
             "Mojo::Base" : "0",
             "Scalar::Util" : "0",
             "Template" : "3.102",
-            "perl" : "5.042000"
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
@@ -177,6 +178,10 @@
       "Daje::Database::Model::ToolsVersion" : {
          "file" : "lib/Daje/Database/Model/ToolsVersion.pm"
       },
+      "Daje::Database::Tools" : {
+         "file" : "lib/Daje/Database/Tools.pm",
+         "version" : "1"
+      },
       "Daje::Database::View::Super::VToolsObjects" : {
          "file" : "lib/Daje/Database/View/Super/VToolsObjects.pm"
       },
@@ -224,7 +229,7 @@
       },
       "Daje::Plugin::Tools" : {
          "file" : "lib/Daje/Plugin/Tools.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       },
       "Daje::Workflow::Activities::Tools::Generate::Base" : {
          "file" : "lib/Daje/Workflow/Activities/Tools/Generate/Base.pm"
@@ -248,7 +253,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-Tools"
       }
    },
-   "version" : "0.18",
+   "version" : "0.21",
    "x_contributors" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],

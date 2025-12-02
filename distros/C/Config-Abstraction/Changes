@@ -1,5 +1,9 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.37	Mon Dec  1 07:43:07 EST 2025
+	Only use Data::Reuse if it's installed - its installation often fails
+	Added the --version option to config-dump
+
 0.36	Wed Oct 15 08:12:49 EDT 2025
 	Ignore files that don't parse
 	Added the exists() method

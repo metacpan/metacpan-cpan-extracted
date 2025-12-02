@@ -7,49 +7,6 @@ use Config::Abstraction;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 
-my $config_dirs;
-my $file;
-my $env_prefix = 'APP_';
-my $help;
-my $format = 'dumper';	# dumper | json | yaml
-
-GetOptions(
-	'file=s' => \$file,
-	'dirs=s' => \$config_dirs,
-	'env_prefix=s' => \$env_prefix,
-	'format=s' => \$format,
-	'help|?' => \$help,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-
-my $args;
-$args->{'env_prefix'} = $env_prefix if($env_prefix);
-$args->{'file'} = $file if($file);
-$args->{'config_dirs'} = split(/,/, $config_dirs) if($config_dirs);
-
-if(my $cfg = Config::Abstraction->new($args)) {
-	my $data = $cfg->all();
-
-	if($format eq 'json') {
-		require JSON;
-		print JSON::encode_json($data), "\n";
-	} elsif($format eq 'yaml') {
-		require YAML;
-		print YAML::Dump($data);
-	} else {
-		require Data::Dumper;
-		Data::Dumper->import();
-		no warnings 'once';	# Silence Sortkeys message
-
-		local $Data::Dumper::Terse = 1;
-		local $Data::Dumper::Sortkeys = 1;
-		print Dumper($data);
-	}
-}
-
-__END__
-
 =head1 NAME
 
 config-dump - Display merged configuration from Config::Abstraction
@@ -86,4 +43,58 @@ Output format: C<dumper>, C<json>, or C<yaml>. Default: C<dumper>.
 
 Show this help message.
 
+=item V<--version>
+
+Prints the version of L<Config::Abstraction>
+
 =back
+
+my $config_dirs;
+my $file;
+my $env_prefix = 'APP_';
+my $help;
+my $version;
+my $format = 'dumper';	# dumper | json | yaml
+
+GetOptions(
+	'file=s' => \$file,
+	'dirs=s' => \$config_dirs,
+	'env_prefix=s' => \$env_prefix,
+	'format=s' => \$format,
+	'version|V' => \$version,
+	'help|?' => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+if($version) {
+	print $Config::Abstraction::VERSION, "\n";
+	exit 0;
+}
+
+my $args;
+$args->{'env_prefix'} = $env_prefix if($env_prefix);
+$args->{'file'} = $file if($file);
+$args->{'config_dirs'} = split(/,/, $config_dirs) if($config_dirs);
+
+if(my $cfg = Config::Abstraction->new($args)) {
+	my $data = $cfg->all();
+
+	if($format eq 'json') {
+		require JSON;
+		print JSON::encode_json($data), "\n";
+	} elsif($format eq 'yaml') {
+		require YAML;
+		print YAML::Dump($data);
+	} else {
+		require Data::Dumper;
+		Data::Dumper->import();
+		no warnings 'once';	# Silence Sortkeys message
+
+		local $Data::Dumper::Terse = 1;
+		local $Data::Dumper::Sortkeys = 1;
+		print Dumper($data);
+	}
+}
+
+__END__

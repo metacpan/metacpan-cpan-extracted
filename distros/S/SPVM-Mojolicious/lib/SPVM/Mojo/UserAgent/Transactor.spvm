@@ -150,7 +150,7 @@ class Mojo::UserAgent::Transactor {
       }
     }
     else {
-      $req->set_body((string)$args1);
+      $req->set_body((string)$args1 // "");
     }
     
     return $tx;

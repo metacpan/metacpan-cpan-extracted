@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::InlineQuery;
-$Telegram::Bot::Object::InlineQuery::VERSION = '0.028';
+$Telegram::Bot::Object::InlineQuery::VERSION = '0.029';
 # ABSTRACT: The base class for Telegram 'Invoice' type objects
 
 
@@ -32,7 +32,7 @@ sub reply {
     return $self->_brain->answerInlineQuery(
         {
             inline_query_id => $self->id,
-            results         => Mojo::JSON::encode_json($results),
+            results         => Mojo::JSON::to_json($results),
             %$args
         }
     );
@@ -52,7 +52,7 @@ Telegram::Bot::Object::InlineQuery - The base class for Telegram 'Invoice' type 
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 

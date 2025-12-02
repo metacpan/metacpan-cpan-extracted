@@ -1,5 +1,9 @@
 Revision history for IO-Uring
 
+0.007     2025-12-02 00:40:44+01:00 Europe/Brussels
+          - Fix off-by-one in probe
+          - Add latest OPs for probing
+
 0.006     2025-06-04 20:53:05+02:00 Europe/Brussels
           - Made sure P_PIDFD is defined on older linuxes
           - Remove accidental arguments to nop operation

@@ -15,7 +15,7 @@ class TestCase::Mojolicious {
   use Mojo::Message::Request;
   use Mojo::Template;
   
-  static method test : int () {
+  static method extra_test : int () {
     
     my $app = Mojolicious::Lite->new;
     
@@ -44,236 +44,140 @@ EOS
     return 1;
   }
   
-  static method template : int () {
+  static method dispatch : int () {
     
     {
-      my $mt = Mojo::Template->new;
+      my $app = Mojolicious::Lite->new;
       
-      my $code = "";
+      $app->get("/" => {x => 123} => "index");
       
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^\s*$")) {
-        return 0;
-      }
-    }
-    
-    {
-      my $mt = Mojo::Template->new;
-      
-      my $code = <<'EOS';
+      my $data_templates = <<'EOS';
+@@ index.html.ep
+abc<%= $c->stash("x") %>
 EOS
       
-      my $output = $mt->render($code);
+      $app->set_data_templates($data_templates);
       
-      unless (Re->m($output, "^\s*$")) {
+      my $path = "/";
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($c->res->code == 200) {
         return 0;
       }
-    }
-    
-    {
-      my $mt = Mojo::Template->new;
       
-      my $code = <<'EOS';
-a
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^a\s*$")) {
+      unless (Re->m($c->res->body, "abc123")) {
         return 0;
       }
-    }
-    
-    {
-      my $mt = Mojo::Template->new;
       
-      my $code = <<'EOS';
-\"'
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^\\\\\"'\s*$")) {
+      unless ($c->res->headers->content_type eq "text/html;charset=UTF-8") {
         return 0;
       }
+      
     }
     
     {
-      my $mt = Mojo::Template->new;
+      my $app = Mojolicious::Lite->new;
       
-      my $code = <<'EOS';
-a
-<%
-  my $num = 1;
-%>
-b
-EOS
+      $app->get("/" => {text => "abc"} => "index");
       
-      my $output = $mt->render($code);
+      my $path = "/";
       
-      unless (Re->m($output, "^\s*a\s+b\s*$")) {
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($c->res->code == 200) {
         return 0;
       }
+      
+      unless (Re->m($c->res->body, "abc")) {
+        return 0;
+      }
+      
+      unless ($c->res->headers->content_type eq "text/plain;charset=UTF-8") {
+        return 0;
+      }
+      
     }
     
     {
-      my $mt = Mojo::Template->new;
+      my $app = Mojolicious::Lite->new;
       
-      my $code = <<'EOS';
-<%= 123 %>
-EOS
+      $app->get("/" => {data => "abc", status => 201} => "index");
       
-      my $output = $mt->render($code);
+      my $path = "/";
       
-      unless (Re->m($output, "^\s*123\s*$")) {
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($c->res->code == 201) {
         return 0;
       }
+      
+      unless (Re->m($c->res->body, "abc")) {
+        return 0;
+      }
+      
+      unless ($c->res->headers->content_type eq "application/octet-stream") {
+        return 0;
+      }
+      
     }
     
     {
-      my $mt = Mojo::Template->new;
-      $mt->set_auto_escape(1);
+      my $app = Mojolicious::Lite->new;
       
-      my $code = <<'EOS';
-<%= "&<>\"'" %>
-EOS
+      $app->get("/" => {json => Hash->new({x => 1})} => "index");
       
-      my $output = $mt->render($code);
+      my $path = "/";
       
-      unless (Re->m($output, "^\s*&amp;&lt;&gt;&quot;&#39;\s*$")) {
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($c->res->code == 200) {
         return 0;
       }
+      
+      unless ($c->res->body eq "{\"x\":1}") {
+        return 0;
+      }
+      
+      unless ($c->res->headers->content_type eq "application/json;charset=UTF-8") {
+        return 0;
+      }
+      
     }
     
-    {
-      my $mt = Mojo::Template->new;
-      $mt->set_auto_escape(1);
-      
-      my $code = <<'EOS';
-<%== "&<>" %>
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^\s*&<>\s*$")) {
-        return 0;
-      }
-    }
-
-    {
-      my $mt = Mojo::Template->new;
-      $mt->set_auto_escape(1);
-      
-      my $code = <<'EOS';
-<%= Mojo::ByteStream->new("&<>") %>
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^\s*&<>\s*$")) {
-        return 0;
-      }
-    }
-
-    {
-      my $mt = Mojo::Template->new;
-      
-      my $code = <<'EOS';
-a
-% my $num = 1;
-b
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^\s*a\s+b\s*$")) {
-        return 0;
-      }
-    }
-    
-    {
-      my $mt = Mojo::Template->new;
-      
-      my $code = <<'EOS';
-a
-%= 123
-b
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "a\s*123\s*b")) {
-        return 0;
-      }
-    }
-    
-    {
-      my $mt = Mojo::Template->new;
-      
-      my $code = <<'EOS';
-a<%= 123 %>b
-EOS
-      
-      my $output = $mt->render($code);
-      
-      unless (Re->m($output, "^\s*a123b\s*$")) {
-        return 0;
-      }
-    }
-    
-    # Comment
-    {
-      {
-        my $mt = Mojo::Template->new;
-        
-      my $code = <<'EOS';
-% my $num = 123;
-%= $num
-EOS
-        
-        my $output = $mt->render($code);
-        
-        unless (Re->m($output, "123")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $mt = Mojo::Template->new;
-        
-      my $code = <<'EOS';
-% my $num = 123;
-%# my $num = 456;
-%= $num
-EOS
-        
-        my $output = $mt->render($code);
-        
-        unless (Re->m($output, "123")) {
-          return 0;
-        }
-      }
-      
-      {
-        my $mt = Mojo::Template->new;
-        
-      my $code = <<'EOS';
-<% my $num = 123; %>
-<%# my $num = 456; %>
-%= $num
-EOS
-        
-        my $output = $mt->render($code);
-        
-        unless (Re->m($output, "123")) {
-          return 0;
-        }
-      }
-      
-    }
     
     return 1;
   }
-  
 }

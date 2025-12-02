@@ -1,6 +1,8 @@
 package Daje::Workflow;
 use Mojo::Base -base, -signatures;
-use v5.40;
+use v5.42;
+
+use Data::Dumper;
 
 use Daje::Workflow::Loader;
 use Daje::Workflow::Database;
@@ -85,7 +87,7 @@ use Daje::Workflow::Errors::Error;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.21";
+our $VERSION = "0.22";
 
 has 'workflow_name';    #
 has 'workflow_pkey';    #

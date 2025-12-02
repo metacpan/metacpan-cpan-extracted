@@ -348,7 +348,7 @@ class Mojolicious::Controller {
     $output = $_->[0];
     
     unless ($output) {
-      return undef;
+      die "Rendering output must be define.";
     }
     
     $renderer->respond($self, $output, $format, $options->{"status"});
@@ -389,7 +389,9 @@ class Mojolicious::Controller {
       
       my $app = $self->app;
       $app->plugins->emit_hook_reverse(after_dispatch => $self);
-      $app->sessions->store($self);
+      
+      # TODO:session
+      # $app->sessions->store($self);
     }
     $self->tx->(Mojo::Transaction::HTTP)->resume;
   }

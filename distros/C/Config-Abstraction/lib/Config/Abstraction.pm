@@ -8,7 +8,6 @@ use strict;
 use warnings;
 
 use Carp;
-use Data::Reuse;
 use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
@@ -23,11 +22,11 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 SYNOPSIS
 
@@ -437,7 +436,7 @@ sub _load_config
 			}
 
 			my $data;
-			# TODO: only load config modules when they are needed
+			# Only load config modules when they are needed
 			if ($file =~ /\.ya?ml$/) {
 				$self->_load_driver('YAML::XS', ['LoadFile']);
 				$data = eval { LoadFile($path) };
@@ -732,10 +731,22 @@ sub get
 		$ref = $ref->{$part};
 	}
 	if((defined($ref) && !$self->{'no_fixate'})) {
-		if(ref($ref) eq 'HASH') {
-			Data::Reuse::fixate(%{$ref});
-		} elsif(ref($ref) eq 'ARRAY') {
-			Data::Reuse::fixate(@{$ref});
+		if(!$self->{reuse_loaded}) {
+			eval {
+				require Data::Reuse;
+				Data::Reuse->import();
+			};
+			unless($@) {
+				$self->{reuse_loaded} = 1;
+			}
+		}
+		if($self->{reuse_loaded}) {
+			if(ref($ref) eq 'HASH') {
+				Data::Reuse::fixate(%{$ref});
+			} elsif(ref($ref) eq 'ARRAY') {
+				# RT#171980
+				# Data::Reuse::fixate(@{$ref});
+			}
 		}
 	}
 	return $ref;
@@ -968,6 +979,10 @@ It should be possible to escape the separator character either with backslashes 
 Due to the case-insensitive nature of environment variables on Windows,
 it may be challenging to override values using environment variables on that platform.
 
+=head1 REPOSITORY
+
+L<https://github.com/nigelhorne/Config-Abstraction>
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
@@ -989,6 +1004,10 @@ You can find documentation for this module with the perldoc command.
 =item * L<Config::Any>
 
 =item * L<Config::Auto>
+
+=item * L<Data::Reuse>
+
+Used to C<fixate()> elements when installed, unless C<no-fixate> is given
 
 =item * L<Hash::Merge>
 

@@ -108,6 +108,11 @@ static op_entry methods[] = {
 	{ STR_WITH_LEN("ftruncate") },
 	{ STR_WITH_LEN("bind") },
 	{ STR_WITH_LEN("listen") },
+	{ STR_WITH_LEN("recv_zc") },
+	{ STR_WITH_LEN("epoll_wait") },
+	{ STR_WITH_LEN("readv_fixed") },
+	{ STR_WITH_LEN("writev_fixed") },
+	{ STR_WITH_LEN("pipe") },
 };
 
 struct callback {
@@ -133,7 +138,32 @@ void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 
 MODULE = IO::Uring				PACKAGE = IO::Uring
 
-PROTOTYPES: DISABLED
+PROTOTYPES: DISABLE
+
+TYPEMAP: <<END
+	IO::Uring	T_MAGICEXT
+	Signal::Info	T_OPAQUEOBJ
+	Time::Spec	T_OPAQUEOBJ
+	FileDescriptor	T_FILE_DESCRIPTOR
+	DirDescriptor T_DIR_DESCRIPTOR
+	const struct sockaddr* T_PV
+
+INPUT
+T_FILE_DESCRIPTOR
+	{
+		PerlIO* ${var}_io = IoIFP(sv_2io($arg));
+		$var = ${var}_io ? PerlIO_fileno(${var}_io) : -1;
+	}
+T_DIR_DESCRIPTOR
+	if (SvOK($arg)) {
+		IO* ${var}_io = sv_2io($arg);
+		if (IoDIRP(${var}_io)) {
+			$var = dirfd(IoDIRP(${var}_io));
+		} else
+			$var = -1;
+	} else
+		$var = AT_FDCWD;
+END
 
 BOOT:
 	HV* stash = get_hv("IO::Uring::", FALSE);
@@ -234,7 +264,7 @@ CODE:
 	HV* operations = newHV();
     for (int i = 0; i < probe->ops_len; ++i) {
 		int op = probe->ops[i].op;
-		if (op > sizeof methods / sizeof *methods)
+		if (op >= sizeof methods / sizeof *methods)
 			continue;
 		SV* value = probe->ops[i].flags & IO_URING_OP_SUPPORTED ? &PL_sv_yes : &PL_sv_no;
 		hv_store(operations, methods[i].value, methods[i].length, value, 0);

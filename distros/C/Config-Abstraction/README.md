@@ -4,7 +4,7 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 # VERSION
 
-Version 0.36
+Version 0.37
 
 # SYNOPSIS
 
@@ -371,6 +371,10 @@ It should be possible to escape the separator character either with backslashes 
 Due to the case-insensitive nature of environment variables on Windows,
 it may be challenging to override values using environment variables on that platform.
 
+# REPOSITORY
+
+[https://github.com/nigelhorne/Config-Abstraction](https://github.com/nigelhorne/Config-Abstraction)
+
 # SUPPORT
 
 This module is provided as-is without any warranty.
@@ -389,6 +393,10 @@ You can find documentation for this module with the perldoc command.
 
 - [Config::Any](https://metacpan.org/pod/Config%3A%3AAny)
 - [Config::Auto](https://metacpan.org/pod/Config%3A%3AAuto)
+- [Data::Reuse](https://metacpan.org/pod/Data%3A%3AReuse)
+
+    Used to `fixate()` elements when installed, unless `no-fixate` is given
+
 - [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge)
 - [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction)
 - Test Dashboard [https://nigelhorne.github.io/Config-Abstraction/coverage/](https://nigelhorne.github.io/Config-Abstraction/coverage/)

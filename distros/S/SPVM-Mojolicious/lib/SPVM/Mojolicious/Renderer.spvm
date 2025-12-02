@@ -168,17 +168,19 @@ class Mojolicious::Renderer {
     
     # Data
     if ($stash->{"data"}) {
-      return [$stash->{"data"}->(string), $format];
+      return [$stash->{"data"}->(string), "bin"];
     }
     
     # Text
     elsif ($stash->{"text"}) {
-      return [$stash->{"text"}->(string), $format];
+      return [$stash->{"text"}->(string), "txt"];
     }
     
     # JSON
     elsif ($stash->{"json"}) {
-      return [JSON->new->encode($stash->{"json"}), "json"];
+      my $data = $stash->{"json"};
+      my $json = JSON->new->encode($data);
+      return [$json, "json"];
     }
     
     # Template
@@ -246,6 +248,7 @@ class Mojolicious::Renderer {
     }
     
     $res->set_body($output);
+    
     $c->app->types->content_type($c, {ext => $format});
     
     $c->rendered($status);

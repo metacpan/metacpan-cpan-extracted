@@ -44,6 +44,7 @@ lib/Daje/Database/Model/ToolsParameterValues.pm
 lib/Daje/Database/Model/ToolsParameters.pm
 lib/Daje/Database/Model/ToolsProjects.pm
 lib/Daje/Database/Model/ToolsVersion.pm
+lib/Daje/Database/Tools.pm
 lib/Daje/Database/View/Super/VToolsObjects.pm
 lib/Daje/Database/View/Super/VToolsObjectsTables.pm
 lib/Daje/Database/View/Super/VToolsObjectsTypes.pm

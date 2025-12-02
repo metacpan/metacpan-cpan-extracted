@@ -4,7 +4,11 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::stat: '0'
   IPC::System::Simple: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
@@ -27,16 +31,17 @@ requires:
   Carp: '0'
   Config::Auto: '0'
   Config::IniFiles: '0'
-  Data::Reuse: '0'
   File::Basename: '0'
   File::Slurp: '0'
   File::Spec: '0'
+  Getopt::Long: '0'
   Hash::Flatten: '0'
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
   JSON::Parse: '0'
   Params::Get: '0.13'
   Params::Validate::Strict: '0.11'
+  Pod::Usage: '0'
   Scalar::Util: '0'
   XML::PP: '0.06'
   YAML::XS: '0'
@@ -45,5 +50,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.36'
+version: '0.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

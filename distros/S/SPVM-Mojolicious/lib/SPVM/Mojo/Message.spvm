@@ -77,12 +77,13 @@ class Mojo::Message extends Mojo::EventEmitter {
     
     my $content = $self->content;
     if ($content->is_multipart) {
-      my $content = Mojo::Content::Single->new;
+      $content = Mojo::Content::Single->new;
       $self->{content} = $content;
-      my $asset = Mojo::Asset::Memory->new;
-      $asset->add_chunk($body);
-      $content->set_asset($asset);
     }
+    
+    my $asset = Mojo::Asset::Memory->new;
+    $asset->add_chunk($body);
+    $content->(Mojo::Content::Single)->set_asset($asset);
   }
   
   method body_params : Mojo::Parameters () {

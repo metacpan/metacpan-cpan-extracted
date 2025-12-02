@@ -1,45 +1,27 @@
 TYPEMAP
-IO::Uring	T_MAGICEXT
-Signal::Info	T_OPAQUEOBJ
-Time::Spec	T_OPAQUEOBJ
-FileDescriptor	T_FILE_DESCRIPTOR
-DirDescriptor	T_DIR_DESCRIPTOR
-const struct sockaddr*	T_PV
 sigset_t*	T_SIGSET
 signo_t	T_SIGNO
 struct timespec	T_TIMESPEC
 
 INPUT
-T_FILE_DESCRIPTOR
-	{
-		PerlIO* ${var}_io = IoIFP(sv_2io($arg));
-		$var = ${var}_io ? PerlIO_fileno(${var}_io) : -1;
-	}
-T_DIR_DESCRIPTOR
-	if (SvOK($arg)) {
-		IO* ${var}_io = sv_2io($arg);
-		if (IoDIRP(${var}_io)) {
-			$var = dirfd(IoDIRP(${var}_io));
-		} else
-			$var = -1;
-	} else
-		$var = AT_FDCWD;
 T_MAGICEXT
 	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 
 T_MAGICEXT_BASE
 	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_find(SvRV(arg), PERL_MAGIC_ext) : NULL;
 	if (magic && magic->mg_virtual)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 
 T_SIGSET

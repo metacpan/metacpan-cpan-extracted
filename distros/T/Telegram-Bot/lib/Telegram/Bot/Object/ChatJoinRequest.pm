@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ChatJoinRequest;
-$Telegram::Bot::Object::ChatJoinRequest::VERSION = '0.028';
+$Telegram::Bot::Object::ChatJoinRequest::VERSION = '0.029';
 # ABSTRACT: The base class for the Telegram type "ChatJoinRequest".
 
 
@@ -61,7 +61,7 @@ Telegram::Bot::Object::ChatJoinRequest - The base class for the Telegram type "C
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 
