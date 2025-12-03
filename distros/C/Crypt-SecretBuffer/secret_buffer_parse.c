@@ -23,16 +23,16 @@ static bool parse_encoding(SV *sv, int *out) {
       STRLEN len;
       const char *str= SvPV(sv, len);
       switch (len) {
-      case  3: if (0 == strcmp(str, "HEX"))       enc= SECRET_BUFFER_ENCODING_HEX;     break;
-      case  4: if (0 == strcmp(str, "UTF8"))      enc= SECRET_BUFFER_ENCODING_UTF8;    break;
-      case  5: if (0 == strcmp(str, "ASCII"))     enc= SECRET_BUFFER_ENCODING_ASCII;   else
-               if (0 == strcmp(str, "UTF-8"))     enc= SECRET_BUFFER_ENCODING_UTF8;    break;
-      case  7: if (0 == strcmp(str, "UTF16LE"))   enc= SECRET_BUFFER_ENCODING_UTF16LE; else
-               if (0 == strcmp(str, "UTF16BE"))   enc= SECRET_BUFFER_ENCODING_UTF16BE; break;
-      case  8: if (0 == strcmp(str, "UTF-16LE"))  enc= SECRET_BUFFER_ENCODING_UTF16LE; else
-               if (0 == strcmp(str, "UTF-16BE"))  enc= SECRET_BUFFER_ENCODING_UTF16BE; break;
-      case  9: if (0 == strcmp(str, "ISO8859_1")) enc= SECRET_BUFFER_ENCODING_ISO8859_1; break;
-      case 10: if (0 == strcmp(str, "ISO-8859-1"))enc= SECRET_BUFFER_ENCODING_ISO8859_1; break;
+      case  3: if (0 == strcmp(str, "HEX"))        { enc= SECRET_BUFFER_ENCODING_HEX;       break; }
+      case  4: if (0 == strcmp(str, "UTF8"))       { enc= SECRET_BUFFER_ENCODING_UTF8;      break; }
+      case  5: if (0 == strcmp(str, "ASCII"))      { enc= SECRET_BUFFER_ENCODING_ASCII;     break; }
+               if (0 == strcmp(str, "UTF-8"))      { enc= SECRET_BUFFER_ENCODING_UTF8;      break; }
+      case  7: if (0 == strcmp(str, "UTF16LE"))    { enc= SECRET_BUFFER_ENCODING_UTF16LE;   break; }
+               if (0 == strcmp(str, "UTF16BE"))    { enc= SECRET_BUFFER_ENCODING_UTF16BE;   break; }
+      case  8: if (0 == strcmp(str, "UTF-16LE"))   { enc= SECRET_BUFFER_ENCODING_UTF16LE;   break; }
+               if (0 == strcmp(str, "UTF-16BE"))   { enc= SECRET_BUFFER_ENCODING_UTF16BE;   break; }
+      case  9: if (0 == strcmp(str, "ISO8859_1"))  { enc= SECRET_BUFFER_ENCODING_ISO8859_1; break; }
+      case 10: if (0 == strcmp(str, "ISO-8859-1")) { enc= SECRET_BUFFER_ENCODING_ISO8859_1; break; }
       default:
          return false;
       }
@@ -90,7 +90,7 @@ bool secret_buffer_match_charset(secret_buffer_parse *parse, secret_buffer_chars
  * by parse_state->encoding.
  */
 bool secret_buffer_match_bytestr(secret_buffer_parse *parse, char *data, size_t datalen, int flags) {
-   return sb_parse_match_bytestr(parse, data, datalen, flags);
+   return sb_parse_match_bytestr(parse, (U8*) data, datalen, flags);
 }
 
 /* Count number of bytes required to transcode the source.

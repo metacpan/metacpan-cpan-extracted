@@ -1,4 +1,9 @@
 Release history for Getopt-Guided
 
+1.1.0    Wed Dec  3 07:33:31 AM CET 2025
+         - Fix test script and documentation
+         - Improve utility integration test script
+         - Introduce new getopts3() function
+
 1.0.0    Mon Dec  1 07:25:09 AM CET 2025
          - Initial release

@@ -8,7 +8,8 @@ use Test2::V0;
 
 	package MyTestRole;
 
-	use v5.14;
+	use v5.10;
+	use strict;
 	use warnings;
 
 	use Mooish::Base -role;
@@ -24,7 +25,8 @@ use Test2::V0;
 
 	package MyTest;
 
-	use v5.14;
+	use v5.10;
+	use strict;
 	use warnings;
 
 	use Mooish::Base;

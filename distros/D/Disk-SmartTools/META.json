@@ -71,6 +71,6 @@
          "web" : "https://github.com/mattmartini/Disk-SmartTools"
       }
    },
-   "version" : "v3.3.12",
+   "version" : "v3.3.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

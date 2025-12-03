@@ -1,6 +1,6 @@
 {
   "name" : "Mojo-Util-Collection",
-  "version" : "0.0.17",
+  "version" : "0.0.19",
   "abstract" : "A set of utilities for working with collections of data.",
   "description" : "This is package that is going to provide a set of utilities for working with collections of data.",
   "author" : [
@@ -39,19 +39,19 @@
   "provides" : {
     "Mojo::Util::Collection::Comparator" : {
       "file" : "lib/Mojo/Util/Collection/Comparator.pm",
-      "version" : "0.0.17"
+      "version" : "0.0.19"
     },
     "Mojo::Util::Collection::Formatter" : {
       "file" : "lib/Mojo/Util/Collection/Formatter.pm",
-      "version" : "0.0.17"
+      "version" : "0.0.19"
     },
     "Mojo::Util::Collection" : {
       "file" : "lib/Mojo/Util/Collection.pm",
-      "version" : "0.0.17"
+      "version" : "0.0.19"
     },
     "Mojo::Util::Model" : {
       "file" : "lib/Mojo/Util/Model.pm",
-      "version" : "0.0.17"
+      "version" : "0.0.19"
     }
   },
   "keywords" : ["mojo util collection", "mojo util model"],

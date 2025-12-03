@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue Sep  2 11:08:53 EDT 2025
+#    Generated on: Tue Dec  2 16:06:17 EST 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.85';
+$VERSION='3.86';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -312,6 +312,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'code'} = {
    q(A1) => q(Unknown),
    q(A3) => q(Entity 6),
    q(AX) => q(Aland Islands),
+   q(EH) => q(Western Sahara),
    q(PS) => q(Palestine, State of),
    q(SJ) => q(Svalbard and Jan Mayen),
    q(UM) => q(United States Minor Outlying Islands),
@@ -322,6 +323,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'code'} = {
    q(ALA) => q(Aland Islands),
    q(AX1) => q(Unknown),
    q(AX3) => q(Entity 6),
+   q(ESH) => q(Western Sahara),
    q(PSE) => q(Palestine, State of),
    q(SJM) => q(Svalbard and Jan Mayen),
    q(UMI) => q(United States Minor Outlying Islands),
@@ -331,6 +333,7 @@ $Locale::Codes::Retired{'country'}{'genc-numeric'}{'code'} = {
    q(248) => q(Aland Islands),
    q(275) => q(Palestine, State of),
    q(581) => q(United States Minor Outlying Islands),
+   q(732) => q(Western Sahara),
    q(744) => q(Svalbard and Jan Mayen),
    q(914) => q(Entity 6),
    q(932) => q(Unknown),
@@ -563,6 +566,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
    q(swaziland) => [ q(SZ), q(SWAZILAND) ],
    q(united states minor outlying islands) => [ q(UM), q(United States Minor Outlying Islands) ],
    q(unknown) => [ q(A1), q(Unknown) ],
+   q(western sahara) => [ q(EH), q(Western Sahara) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
@@ -578,6 +582,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
    q(swaziland) => [ q(SWZ), q(SWAZILAND) ],
    q(united states minor outlying islands) => [ q(UMI), q(United States Minor Outlying Islands) ],
    q(unknown) => [ q(AX1), q(Unknown) ],
+   q(western sahara) => [ q(ESH), q(Western Sahara) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
@@ -593,6 +598,7 @@ $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
    q(swaziland) => [ q(748), q(SWAZILAND) ],
    q(united states minor outlying islands) => [ q(581), q(United States Minor Outlying Islands) ],
    q(unknown) => [ q(932), q(Unknown) ],
+   q(western sahara) => [ q(732), q(Western Sahara) ],
 };
 
 $Locale::Codes::Retired{'country'}{'numeric'}{'name'} = {

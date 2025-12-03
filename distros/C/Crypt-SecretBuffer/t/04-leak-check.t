@@ -11,7 +11,7 @@ sub count_copies_in_mem {
    my $map_spec= do { local $/; open my $fh, '</proc/self/maps'; <$fh> };
    my $n= 0;
    # Scan the memory maps looking for read/writeable ranges
-   while ($map_spec =~ /^([0-9a-f]+)-([0-9a-f]+) rw/mg) {
+   while ($map_spec =~ /^([0-9a-f]+)-([0-9a-f]+) rw/img) {
       no warnings 'portable';
       $n += $buf->_count_matches_in_mem(hex $1, hex $2);
    }

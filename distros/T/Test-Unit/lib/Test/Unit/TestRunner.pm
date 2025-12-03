@@ -1,7 +1,7 @@
 package Test::Unit::TestRunner;
 use strict;
 
-use base qw(Test::Unit::Runner); 
+use base qw(Test::Unit::Runner);
 
 use Test::Unit; # for copyright & version number
 use Test::Unit::TestSuite;
@@ -34,7 +34,7 @@ sub add_error {
     my ($test, $exception) = @_;
     $self->_print("E");
 }
-	
+
 sub add_failure {
     my $self = shift;
     my ($test, $exception) = @_;
@@ -53,9 +53,9 @@ sub do_run {
     my $start_time = new Benchmark();
     $suite->run($result, $self);
     my $end_time = new Benchmark();
-    
+
     $self->print_result($result, $start_time, $end_time);
-    
+
     if ($wait) {
         print "<RETURN> to continue"; # go to STDIN any case
         <STDIN>;
@@ -120,7 +120,7 @@ sub print_failures {
               ":\n";
     $self->_print($msg);
 
-    my $i = 0; 
+    my $i = 0;
     for my $f (@{$result->failures()}) {
         chomp(my $f_to_str = $f);
         $self->_print("\n") if $i++;
@@ -138,7 +138,7 @@ sub print_header {
     } else {
         $self->_print("\n", "!!!FAILURES!!!", "\n",
                       "Test Results:\n",
-                      "Run: ", $result->run_count(), 
+                      "Run: ", $result->run_count(),
                       ", Failures: ", $result->failure_count(),
                       ", Errors: ", $result->error_count(),
                       "\n");
@@ -151,7 +151,7 @@ sub run {
     my $a_test_runner = Test::Unit::TestRunner->new();
     $a_test_runner->do_run(Test::Unit::TestSuite->new($class), 0);
 }
-	
+
 sub run_and_wait {
     my $self = shift;
     my ($test) = @_;
@@ -170,7 +170,7 @@ sub start {
         if ($args[$i] eq "-wait") {
             $wait = 1;
         } elsif ($args[$i] eq "-v") {
-	    print Test::Unit::COPYRIGHT_SHORT;
+            print Test::Unit::COPYRIGHT_SHORT;
         } else {
             $test = $args[$i];
         }
@@ -178,7 +178,7 @@ sub start {
     if ($test eq "") {
         die "Usage: TestRunner.pl [-wait] name, where name is the name of the Test class\n";
     }
-    
+
     my $suite = Test::Unit::Loader::load($test);
     $self->do_run($suite, $wait);
 }

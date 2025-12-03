@@ -7,7 +7,7 @@ package Locale::Currency;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Tue Sep  2 11:07:25 EDT 2025
+#    Generated on: Tue Dec  2 16:02:50 EST 2025
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.85';
+$VERSION   = '3.86';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

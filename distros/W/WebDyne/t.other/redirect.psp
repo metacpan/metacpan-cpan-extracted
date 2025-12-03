@@ -1,0 +1,6 @@
+<start_html>
+<perl handler>
+__PERL__
+sub handler {
+    return shift()->redirect( location=>'http://example.com' );
+}

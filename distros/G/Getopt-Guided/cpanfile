@@ -18,6 +18,7 @@ on runtime => sub {
 };
 
 on test => sub {
+  requires 'File::Basename'        => '0';
   requires 'File::Spec::Functions' => '0';
   requires 'Test::Fatal'           => '0';
   requires 'Test::More'            => '1.001005';        # Subtests accept args

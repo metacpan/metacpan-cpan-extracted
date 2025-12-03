@@ -24,6 +24,7 @@ terms as the Perl 5 programming language system itself.
 use 5.014;
 use warnings;
 
+use Win32;
 use Test::More;
 
 sub UNICODE () {
@@ -103,10 +104,11 @@ sub banner {
   diag( ' ' );
   diag( '# ' x 36 );
   diag( ' ' );
-  diag( "  OS:            $^O" );
-  diag( "  PERL:          $]" );
-  diag( "  UNICODE:       ", UNICODE      ? "detected" : "not detected" );
-  diag( "  MANUAL_TESTS:  ", MANUAL_TESTS ? "enabled"  : "not enabled"  );
+  diag( "  OS:           $^O" );
+  diag( "  PERL:         $]" );
+  diag( "  CP:           ", Win32::GetConsoleOutputCP() );
+  diag( "  UNICODE:      ", UNICODE      ? "detected" : "not detected" );
+  diag( "  MANUAL_TESTS: ", MANUAL_TESTS ? "enabled"  : "not enabled"  );
   diag( ' ' );
   diag( '# ' x 36 );
 }

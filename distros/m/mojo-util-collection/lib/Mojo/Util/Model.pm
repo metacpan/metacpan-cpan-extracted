@@ -1,7 +1,7 @@
 package Mojo::Util::Model;
 use Mojo::Base -base;
 
-our $VERSION = '0.0.17';
+our $VERSION = '0.0.19';
 
 use Mojo::JSON qw(encode_json);
 

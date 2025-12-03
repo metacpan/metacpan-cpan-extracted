@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::Span;
 # VERSION
 # ABSTRACT: Reference a span of bytes within a SecretBuffer
-$Crypt::SecretBuffer::Span::VERSION = '0.010';
+$Crypt::SecretBuffer::Span::VERSION = '0.011';
 use strict;
 use warnings;
 use Crypt::SecretBuffer; # loads XS methods into this package
@@ -228,7 +228,7 @@ specify UTF-8 here, you will instead receive bytes of UTF-8 rather than perl wid
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHOR
 

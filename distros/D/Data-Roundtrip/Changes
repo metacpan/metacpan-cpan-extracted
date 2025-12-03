@@ -171,3 +171,11 @@ Revision history for Data-Roundtrip
         provided the object implements a TO_JSON() method.
         Switched to Test::TempDir::Tiny in test files.
         And removed taint mode from test '12-from-file.t'
+
+0.31    2025-12-03 01:00
+        Experimentally adding one more dependency: Devel::StackTrace
+        in order to get a stack trace when subs fail.
+	Now json2* subs take optional parameters in the form of
+	a hashref. At the moment it accepts 'boolean_values' parameter
+	as an ARRAY ref, of 2 items, to be passed on to JSON (it allows the mapping
+	of boolean values to the specified ARRAY instead of the idiotic object.

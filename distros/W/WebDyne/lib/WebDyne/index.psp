@@ -17,6 +17,7 @@
     include_script="@{qw(index.js)}" 
 >
 
+
 <perl handler="index">
 <header>
   <h1>Index of <span id="current-path">${path_dn}</span></h1>

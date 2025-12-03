@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use common::sense;
+use open qw/:std :utf8/;
+
+use Aion::Carp;
+use Aion::Run::Runner;
+
+if($ARGV[0] ~~ ['--help', '-h']) {
+    print << "END";
+Usage:
+	
+	act <run> [arguments]
+	
+	act [GET|QUERY|POST|PUT|DELETE|PATCH|OPTIONS|HEAD] /<path> [query_params] [body]
+	
+	act [options]
+
+Options:
+    -h, --help      Display this help message
+    -v, --version   Display the version of act
+END
+    exit 0;
+}
+
+if($ARGV[0] ~~ ['-v', '--version']) {
+	require Aion::Run;
+    print "act version ", Aion::Run->VERSION, "\n";
+    exit 0;
+}
+
+if($ARGV[0] ~~ ['GET', 'QUERY', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'] && $ARGV[1] =~ m{^/} || $ARGV[0] =~ m{^/}) {
+    unshift @ARGV, 'act';
+}
+
+Aion::Run::Runner->run(@ARGV);

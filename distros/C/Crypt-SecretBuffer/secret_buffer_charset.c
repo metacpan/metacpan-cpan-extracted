@@ -80,8 +80,8 @@ static bool sbc_test_codepoint(pTHX_ const secret_buffer_charset *cset, uint32_t
       /* Must test with regex engine */
       if (!cset->rx) return false;
       SV *test_sv= sv_2mortal(newSV(8));
-      U8 *utf8_buf= SvPVX(test_sv);
-      U8 *end = uvchr_to_utf8(utf8_buf, cp);
+      char *utf8_buf= SvPVX(test_sv);
+      char *end = uvchr_to_utf8(utf8_buf, cp);
       *end= '\0';
       SvPOK_on(test_sv);
       SvCUR_set(test_sv, (end - utf8_buf));
@@ -284,12 +284,12 @@ static bool regex_is_single_charclass(REGEXP *rx) {
    /* Get the pattern string */
    STRLEN pat_len = RX_PRELEN(rx);
    const char *pattern = RX_PRECOMP(rx);
-   struct regexp *re=
-#ifndef SVt_REGEXP
-      (struct regexp*) rx;          // before 5.12 REGEXP was struct regexp
-#else
-      (struct regexp*) SvANY(rx);   // after 5.12 REGEXP is a type of SV
-#endif
+//   struct regexp *re=
+//#ifndef SVt_REGEXP
+//      (struct regexp*) rx;          // before 5.12 REGEXP was struct regexp
+//#else
+//      (struct regexp*) SvANY(rx);   // after 5.12 REGEXP is a type of SV
+//#endif
    /* Try to validate that this regex is a single char class, with optional '+' */
    //warn("pattern = '%.*s' re->nparens = %d re->minlen = %d", pat_len, pattern, re->nparens, re->minlen);
    return pat_len >= 3 && pattern[0] == '[' && (

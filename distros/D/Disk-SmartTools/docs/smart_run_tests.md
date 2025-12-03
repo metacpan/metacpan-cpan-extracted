@@ -21,7 +21,9 @@ Can run either short or long SMART test on each disk.
 
 ## Crontabs
 
-Usually run as a crontab
+Usually run as a crontab.  Note the `--long` option is safe to run everyday, it
+will only run the long test on (up to) one disk a day.  By hashing the day of
+the month with the disk index it will run once a month for each disk.
 
 - 30 5 \* \* \*       : S.M.A.R.T. disk checks - short ; /var/root/bin/smart\_run\_tests.pl
 

@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  Debug load
@@ -89,16 +89,16 @@ sub new {
     debug("$class, opt: %s", Dumper(\%opt));
 
 
-    #  Get appropriate cgi_or
-    #
-    my $html_tag_or=WebDyne::HTML::Tiny->new(mode => 'html') ||
-        return err('unable to get new WebDyne::HTML::Tiny object');
-
-
     #  Init WebDyne module
     #
     require WebDyne::Request::Fake;
     my $r=WebDyne::Request::Fake->new( filename=> ( $opt{'filename'} || $opt{'srce'} ) );
+
+
+    #  Get appropriate cgi_or
+    #
+    my $html_tag_or=WebDyne::HTML::Tiny->new(mode => $WEBDYNE_HTML_TINY_MODE, r=>$r ) ||
+        return err('unable to get new WebDyne::HTML::Tiny object');
 
 
     #  New self ref
@@ -179,8 +179,9 @@ sub compile {
     #
     my $tree_or=WebDyne::HTML::TreeBuilder->new(
 
-        api_version => 3,
-        webdyne	    => $self
+        api_version 	=> 3,
+        html_tiny_or   	=> $self->html_tiny(),
+        r		=> $r
 
     ) || return err('unable to create HTML::TreeBuilder object');
 
@@ -226,7 +227,6 @@ sub compile {
 
     #  Muck around with strictness of P tags
     #
-    #$tree_or->implicit_tags(0);
     $tree_or->p_strict(
         exists($param_hr->{'p_strict'}) 
             ? $param_hr->{'p_strict'} 
@@ -243,7 +243,7 @@ sub compile {
     #  man page.
     #
     $tree_or->parse($parse_cr);
-
+    
 
     #  Close handler if anything goes wrong below
     #
@@ -569,7 +569,7 @@ sub optimise_one {
 
     #  Get CGI object and disable shortcut tags (e.g. start_html);
     #
-    my $html_tiny_or=$self->{'_html_tiny_or'} ||= $self->html_tiny() ||
+    my $html_tiny_or=$self->{'_html_tiny_or'} || $self->html_tiny() ||
         return err("unable to get CGI object from self ref");
     debug("CGI $html_tiny_or");
     $html_tiny_or->shortcut_disable();
@@ -786,6 +786,11 @@ sub optimise_one {
     #  No error, pop error hint
     #
     pop @{$self->{'_data_ar_err'}};
+    
+    
+    #  Re-enable shortcuts
+    #
+    $html_tiny_or->shortcut_enable();
 
 
     #  If scalar ref returned it is all HTML - return as plain scalar
@@ -817,7 +822,7 @@ sub optimise_two {
 
     #  Get CGI object and turn off shortcuts like start_html
     #
-    my $html_tiny_or=$self->{'_html_tiny_or'} ||= $self->html_tiny() ||
+    my $html_tiny_or=$self->{'_html_tiny_or'} || $self->html_tiny() ||
         return err("unable to get CGI object from self ref");
     $html_tiny_or->shortcut_disable();
 
@@ -1139,7 +1144,12 @@ sub optimise_two {
     #
     pop @{$self->{'_data_ar_err'}};
     
+
+    #  Re-enable shortcuts
+    #
+    $html_tiny_or->shortcut_enable();
     
+
     #  And return
     #
     return $ret;
@@ -1269,11 +1279,3 @@ sub parse {
 }
 
 
-sub html_tiny {
-
-    my $self=shift();
-    debug("$self html_tiny instantiate, mode:$WEBDYNE_HTML_TINY_MODE, existing: %s", $self->{'_html_tiny_or'});
-    return (shift()->{'_html_tiny_or'} ||= WebDyne::HTML::Tiny->new(mode => $WEBDYNE_HTML_TINY_MODE)) ||
-        err('unable to instantiate new WebDybe::HTML::Tiny object');
-
-}

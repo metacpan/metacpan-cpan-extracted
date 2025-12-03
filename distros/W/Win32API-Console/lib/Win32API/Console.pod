@@ -14,11 +14,11 @@ this module was created, which uses most of the XS functions of
 L<Win32::Console>, but also provides additional ones (e.g., for wide char 
 support). 
 
-Further details can be found in the included PM or directly at MSDN. The API 
+Further details can be found in the source code or directly at MSDN. The API 
 interface was modeled on the classic Windows API, so that the original 
 documentation from Microsoft can be used in most cases. 
 
-=head1 METHODS
+=head1 SUBROUTINES
 
 Many Windows API functions exist in multiple variants that differ by the 
 character encoding they expect. The naming convention typically uses suffixes:
@@ -75,8 +75,11 @@ Example:
   use utf8;
   FunctionName("Text");
 
-B<Note>: The wrapper provides a compatibility layer, but depends on the 
-internal XS compilation settings of L<Win32::Console>.
+B<Note>: The wrapper provides a compatibility layer, but its behavior depends 
+on the internal XS build configuration of L<Win32::Console>.
+
+Please also refer to the Windows-specific L</CAVEATS> section for important 
+details when using these wrapper functions.
 
 =back
 
@@ -528,6 +531,32 @@ B<Return>:
 
 
 
+=head2 GetConsoleScreenBufferInfoEx
+
+ my $scalar | undef = GetConsoleScreenBufferInfoEx($handle, \%infoEx);
+
+
+C<GetConsoleScreenBufferInfoEx> retrieves extended information about a
+console screen buffer.
+
+=over
+
+=item *
+C<$handle>:  Handle to the console output buffer
+
+
+=item *
+C<\%infoEx>: L</CONSOLE_SCREEN_BUFFER_INFOEX> to receive the information
+
+=back
+
+B<Note>: C<< $infoEx->{cbSize} >> is set by this function and therefore does
+not need to be passed.
+
+ Returns: non-zero on success, undef on failure.
+
+
+
 =head2 GetConsoleTitle
 
  my $num | undef = GetConsoleTitle(\$buffer, $size);
@@ -695,31 +724,6 @@ C<\$count>: Reference to variable receiving the count
 
 
 
-=head2 GetOSVersion
-
- my $scalar | @array = GetOSVersion();
-
-C<GetOSVersion> retrieves information about the current Windows operating
-system. This Version should also work for Version > 6.2.
-
- Returns a list containing:
-  [0] OS description string (e.g. "Microsoft Windows 10")
-  [1] Major version number (e.g. 10)
-  [2] Minor version number (e.g. 0)
-  [3] Build number (e.g. 19041)
-  [4] Platform ID (e.g. 2 for Win32_NT)
-
- On Windows NT 4 SP6 and later this function returns the following additional
- values:
-  [5] Service Pack Major version number
-  [6] Service Pack Minor version number
-  [7] Suite Mask
-  [8] Product Type
-
-In a scalar context, it returns only the Platform ID C<[4]>.
-
-
-
 =head2 GetStdHandle
 
  my $handle = GetStdHandle($id);
@@ -763,7 +767,10 @@ I<INPUT_RECORD> structure used by C<PeekConsoleInput> and to represent a
 single input event. See L</ReadConsoleInput> for the complete description of
 I<INPUT_RECORD>.
 
- Returns: non-zero on success, undef on failure.
+ Returns: nonzero or "0 but true" on success, undef on failure.
+
+B<Note>: C<PeekConsoleInput> returns C<0 but true> if the input buffer is 
+empty.
 
 
 
@@ -1290,6 +1297,31 @@ C<$codepage>: Code page identifier (e.g. C<65001> for UTF-8)
 
 
 
+=head2 SetConsoleScreenBufferInfoEx
+
+ my $scalar | undef = SetConsoleScreenBufferInfoEx($handle, \%infoEx);
+
+
+C<SetConsoleScreenBufferInfoEx> retrieves extended information about a
+console screen buffer.
+
+=over
+
+=item *
+C<$handle>:  Handle to the console output buffer
+
+
+=item *
+C<\%infoEx>: L</CONSOLE_SCREEN_BUFFER_INFOEX> for setting the information
+
+=back
+
+B<Note>: C<< $infoEx->{cbSize} >> is set by this function and can be 0.
+
+ Returns: non-zero on success, undef on failure.
+
+
+
 =head2 SetConsoleScreenBufferSize
 
  my \%coord | undef = SetConsoleScreenBufferSize($handle, \%size);
@@ -1409,8 +1441,7 @@ C<\%info>:  Hash reference to a L</CONSOLE_FONT_INFOEX> structure
 
 =back
 
-B<Note>: C<< $info->{cbSize} >> is set by this function and therefore does
-not need to be passed.
+B<Note>: C<< $info->{cbSize} >> is set by this function and can be 0.
 
  Returns: non-zero on success, undef on failure.
 
@@ -1637,6 +1668,18 @@ Usage:
    Attributes => $attributes,
  }) // die;
 
+=head2 CHAR_INFO::list
+
+ my @array = CHAR_INFO::list(\%hashref);
+
+=head2 CHAR_INFO::pack
+
+ my $scalar = CHAR_INFO::pack(\%hashref);
+
+=head2 CHAR_INFO::unpack
+
+ my @array = CHAR_INFO::unpack($scalar);
+
 =head2 CONSOLE_CURSOR_INFO
 
  my $hashref | undef = CONSOLE_CURSOR_INFO( | @array | \%hashref);
@@ -1672,7 +1715,14 @@ Usage:
 
  my \%hashref = CONSOLE_FONT_INFOEX();
  my @fontSize = ($fontSizeX, $fontSizeY);
- my \%hashref = CONSOLE_FONT_INFOEX($index, @fontSize) // die;
+ my \%hashref = CONSOLE_FONT_INFOEX(
+   CONSOLE_FONT_INFOEX_SIZE,
+   $index,
+   @fontSize,
+   $pitch,
+   $weight,
+   $string,
+ ) // die;
  my \%hashref = CONSOLE_FONT_INFOEX({
    cbSize     => CONSOLE_FONT_INFOEX_SIZE,
    nFont      => $index,
@@ -1723,6 +1773,41 @@ Usage:
    dwMaximumWindowSize => COORD(@max_size)
  }) // die;
 
+=head2 CONSOLE_SCREEN_BUFFER_INFOEX
+
+ my $hashref | undef = CONSOLE_SCREEN_BUFFER_INFOEX( | @array | \%hashref);
+
+Usage:
+
+ my \%hashref = CONSOLE_SCREEN_BUFFER_INFOEX();
+ my @size     = ($sizeX, $sizeY);
+ my @cursor   = ($cursorX, $cursorY);
+ my @win_rect = ($left, $top, $right, $bottom);
+ my @max_size = ($maxX, $maxY);
+ my @palette  = (0..15);
+ my \%hashref = CONSOLE_SCREEN_BUFFER_INFOEX(
+   CONSOLE_SCREEN_BUFFER_INFOEX_SIZE,
+   @size,
+   @cursor,
+   $attr,
+   @win_rect,
+   @max_size,
+   $pop_attr,
+   $fullscreen,
+   @palette,
+ ) // die;
+ my \%hashref = CONSOLE_SCREEN_BUFFER_INFOEX({
+   cbSize               => CONSOLE_SCREEN_BUFFER_INFOEX_SIZE,
+   dwSize               => COORD(@size),
+   dwCursorPosition     => COORD(@cursor),
+   wAttributes          => $attr,
+   srWindow             => SMALL_RECT(@win_rect),
+   dwMaximumWindowSize  => COORD(@max_size)
+   wPopupAttributes     => $pop_attr,
+   bFullscreenSupported => $fullscreen,
+   ColorTable           => [ @palette ],
+ }) // die;
+
 =head2 COORD
 
  my $hashref | undef = COORD( | @array | \%hashref);
@@ -1732,6 +1817,18 @@ Usage:
  my \%hashref = COORD();
  my \%hashref = COORD($x, $y) // die;
  my \%hashref = COORD({X => $x, Y = $y}) // die;
+
+=head2 COORD::list
+
+ my @array = COORD::list(\%hashref);
+
+=head2 COORD::pack
+
+ my $scalar = COORD::pack(\%hashref);
+
+=head2 COORD::unpack
+
+ my @array = COORD::unpack($scalar);
 
 =head2 SMALL_RECT
 
@@ -1752,6 +1849,67 @@ Usage:
    Right   => $right,
    Bottom  => $bottom,
  }) // die;
+
+=head2 SMALL_RECT::list
+
+ my @array = SMALL_RECT::list(\%hashref);
+
+=head2 SMALL_RECT::pack
+
+ my $scalar = SMALL_RECT::pack(\%hashref);
+
+=head2 SMALL_RECT::unpack
+
+ my @array = SMALL_RECT::unpack($scalar);
+
+=head1 HELPER
+
+=head2 Encode::ANSI::decode
+
+ my $str = Encode::ANSI::decode($ansi,  | $codepage);
+
+Decode the ANSI string into a Perl string using the system code page or
+C<$codepage>, if specified.
+
+B<Note>: If the code page is CP_UTF8, no conversion takes place, but the UTF8
+flag may be set.
+
+=head2 Encode::ANSI::encode
+
+ my $ansi = Encode::ANSI::encode($str,  | $codepage);
+
+Use the default system code page if none is specified, and encode the
+character string only if the target C<$codepage> is not C<CP_UTF8>.
+
+First convert the UTF-8 string to a UTF-16LE wide string, then convert the
+UTF-16LE wide string to a multibyte string using the target C<$codepage> and
+return the encoded multibyte (ANSI) version.
+
+B<Note>: Only converts if C<$str> has UTF-8 characters, otherwise it is
+already ANSI compatible. The returned string does not have the UTF8 flag set.
+
+=head2 GetOSVersion
+
+ my $scalar | @array = GetOSVersion();
+
+C<GetOSVersion> retrieves information about the current Windows operating
+system. This Version should also work for Version > 6.2.
+
+ Returns a list containing:
+  [0] OS description string (e.g. "Microsoft Windows 10")
+  [1] Major version number (e.g. 10)
+  [2] Minor version number (e.g. 0)
+  [3] Build number (e.g. 19041)
+  [4] Platform ID (e.g. 2 for Win32_NT)
+
+ On Windows NT 4 SP6 and later this function returns the following additional
+ values:
+  [5] Service Pack Major version number
+  [6] Service Pack Minor version number
+  [7] Suite Mask
+  [8] Product Type
+
+In a scalar context, it returns only the Platform ID C<[4]>.
 
 =head1 EXPORTS
 
@@ -1820,6 +1978,7 @@ The following structures (L</STRUCTURES>) are used to access a console.
   CONSOLE_FONT_INFOEX
   CONSOLE_READCONSOLE_CONTROL
   CONSOLE_SCREEN_BUFFER_INFO
+  CONSOLE_SCREEN_BUFFER_INFOEX
   COORD
   SMALL_RECT
 
@@ -1983,6 +2142,33 @@ Constants for L</GetStdHandle> and L</SetStdHandle>
 =head2 :all
 
   All of the above.
+
+=head1 CAVEATS
+
+Not all functions listed here are supported on every version of Windows. 
+Where possible, the platform support is detected, and if there are limitations, 
+a Windows error code (C<$^E>) is set accordingly. In some cases, a workaround 
+is available to circumvent these limitations. Please refer to the official 
+MSDN documentation to verify whether a specific function is supported on your 
+Windows version.
+
+=head2 Known limitations
+
+On Windows 7 and 8, C<WideCharToMultiByte> with C<CP_UTF8> sometimes returns 
+incorrect results when the system locale is not UTF-8. This is a platform 
+limitation, not an issue in the Perl code. Typical symptoms include corrupted 
+characters (e.g., double-encoded UTF-8 sequences).
+
+L<MSDN - WideCharToMultiByte function|https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte>:
+
+  UTF-8 (CP_UTF8) is supported starting with Windows XP, but full support for 
+  UTF-8 as a system locale was added in later versions of Windows 10
+
+L<MSDN - Unicode in the Windows API|https://learn.microsoft.com/en-us/windows/win32/intl/unicode-in-the-windows-api>:
+
+  Prior to Windows 10 version 1903, UTF-8 was not available as a system code 
+  page. Applications using CP_UTF8 may experience inconsistent behavior if the 
+  system locale is not UTF-8.
 
 =head1 REQUIRES
 

@@ -12,9 +12,9 @@ L<Perl Testing in 2023|https://toby.ink/blog/2023/01/24/perl-testing-in-2023/>
 
 L<TOBYINK/Type-Tiny/t/00-begin.t|https://metacpan.org/release/TOBYINK/Type-Tiny-2.004000/source/t/00-begin.t>
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT AND LICENSE
 
-This script is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
+The original script is copyright (c) 2013-2014, 2017-2023 by Toby Inkster.
 
 This is a free script; you can redistribute it and/or modify it under the same 
 terms as the Perl 5 programming language system itself.
@@ -26,6 +26,7 @@ use warnings;
 
 use Test::More;
 use Devel::StrictMode;
+use Win32;
 
 sub diag_version {
   my ($module, $version, $return) = @_;
@@ -73,11 +74,12 @@ sub banner {
   diag( ' ' );
   diag( '# ' x 36 );
   diag( ' ' );
-  diag( "  OS:            $^O" );
-  diag( "  PERL:          $]" );
-  diag( "  STRICT:        ", STRICT       ? "enabled" : "not enabled" );
-  diag( "  MANUAL_TESTS:  ", MANUAL_TESTS ? "enabled" : "not enabled" );
-  diag( "  DEBUG:         ", _DEBUG       ? "enabled" : "not enabled" );
+  diag( "  OS:           $^O" );
+  diag( "  PERL:         $]" );
+  diag( "  CP:           ", Win32::GetConsoleOutputCP );
+  diag( "  STRICT:       ", STRICT       ? "enabled" : "not enabled" );
+  diag( "  MANUAL_TESTS: ", MANUAL_TESTS ? "enabled" : "not enabled" );
+  diag( "  DEBUG:        ", _DEBUG       ? "enabled" : "not enabled" );
   diag( ' ' );
   diag( '# ' x 36 );
 }
@@ -136,3 +138,4 @@ $RELEASE_TESTING
 $NDEBUG
 $PERL_NDEBUG
 $MANUAL_TESTS
+$PERL_PLATFORM_OVERRIDE

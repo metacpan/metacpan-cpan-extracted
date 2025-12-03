@@ -28,8 +28,8 @@ my %suites = ();
 sub add_to_suites {
     my $suite_holder = shift;
     if (not exists $suites{$suite_holder}) {
-	my $test_suite = Test::Unit::TestSuite->empty_new($suite_holder);
-	$suites{$suite_holder} = $test_suite;
+        my $test_suite = Test::Unit::TestSuite->empty_new($suite_holder);
+        $suites{$suite_holder} = $test_suite;
     }
 }
 
@@ -79,8 +79,8 @@ sub create_suite {
                          $method_name => $subref,
                         },
              args    => [$method_name],);
-	    $suites{$test_package_name}->add_test($test_case);
-	}
+        $suites{$test_package_name}->add_test($test_case);
+    }
 }
 
 sub run_suite {
@@ -116,7 +116,7 @@ Test::Unit::Procedural - Procedural style unit testing interface
 
     # define tests
 
-    sub test_foo { assert(foo() == 23, "Your message here"); }	
+    sub test_foo { assert(foo() == 23, "Your message here"); }
     sub test_bar { assert(bar() == 42, "I will be printed if this fails"); }
 
     # set_up and tear_down are used to

@@ -1,0 +1,27 @@
+msgid "Aion::Run - роль для консольных команд"
+msgstr "Aion::Run - role for console commands"
+
+msgid "Файл lib/Scripts/MyScript.pm:"
+msgstr "File lib/Scripts/MyScript.pm:"
+
+msgid "Роль `Aion::Run` реализует аспект `arg` для установки фич из параметров командной строки."
+msgstr "The `Aion::Run` role implements the `arg` aspect for installing features from command line parameters."
+
+msgid ""
+"* `arg => \"-X\"` — именованный параметр. Можно использовать как шорткут **\\-X**, так и название фичи с **\\--**.\n"
+"* `arg => natural` — порядковый параметр. `1+`.\n"
+"* `arg => 0` — все неименованные параметры. Используется с `isa => ArrayRef`."
+msgstr ""
+"* `arg => \"-X\"` is a named parameter. You can use either the shortcut **\\-X** or the feature name with **\\--**.\n"
+"* `arg => natural` is an ordinal parameter. `1+`.\n"
+"* `arg => 0` - all unnamed parameters. Used with `isa => ArrayRef`."
+
+msgid "Конструктор. Он создает объект сценария с параметрами командной строки."
+msgstr "Constructor. It creates a script object with command line options."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Run module is copyright (с) 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Run module is copyright (c) 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

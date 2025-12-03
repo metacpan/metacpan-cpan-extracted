@@ -1,5 +1,13 @@
 -----
 
+0.1.10   2025-12-02
+   [Changed]
+       * Updated libvirt to v11.10.0 (from v11.9.0)
+   [Added]
+       * Constants STATS_BLOCK_SUFFIX_LIMITS_*,
+         STATS_BLOCK_SUFFIX_TIMED_GROUP_*, EVENT_SUSPENDED_GUEST_SHUTDOWN,
+         BACKUP_BEGIN_PRESERVE_SHUTDOWN_DOMAIN
+
 0.1.9    2025-11-23
    [Fixed]
        * SSH URL query parameter handling ignores 'keyfile',

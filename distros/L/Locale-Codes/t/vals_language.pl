@@ -34,7 +34,7 @@ rename zu NewName alpha-2 => 1
 
 2code French => fr
 
-2code Greek => el
+2code 'Modern Greek (1453-)' => el
 
 2code Japanese => ja
 

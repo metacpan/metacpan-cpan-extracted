@@ -38,7 +38,6 @@ use WebDyne::Util;
 #  Setup environment for this test if not already present
 #
 $ENV{'WEBDYNE_TEST_FILE_PREFIX'} ||= '02';
-#die Dumper(\%INC, \@INC);
 
 
 #  Run

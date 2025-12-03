@@ -28,6 +28,7 @@ use File::Spec::Unix;
 use HTTP::Status qw(status_message RC_OK RC_NOT_FOUND RC_FOUND);
 use URI;
 use Data::Dumper;
+use Plack::Request;
 $Data::Dumper::Indent=1;
 
 
@@ -41,12 +42,12 @@ use WebDyne::Constant;
 #  Inheritance
 #
 use WebDyne::Request::Fake;
-@ISA=qw(WebDyne::Request::Fake);
+@ISA=qw(Plack::Request WebDyne::Request::Fake);
 
 
 #  Version information
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  Debug load
@@ -72,11 +73,125 @@ my %Dir_config_env=%{$WEBDYNE_PSGI_ENV_SET}, (map { $_=>$ENV{$_} } (
 #==================================================================================================
 
 
+sub new {
+
+
+    #  New PSGI request
+    #
+    my ($class, %r)=@_;
+    debug("$class, r: %s, calller:%s", Dumper(\%r, [caller(0)]));
+    
+    
+    #  Try to figure out filename user wants
+    #
+    unless ($r{'filename'}) {
+    
+    
+        #  Not supplied - need to work out
+        #
+        debug('filename not supplied, determining from request');
+
+    
+        #  Env ?
+        #
+        my $env_hr=$r{'env'} ||= \%ENV;
+        debug("env_hr: %s", Dumper($env_hr));
+    
+
+        #  Iterate through options. If *not* supplied by SCRIPT_FILENAME keep going.
+        #
+        my $fn;
+        unless (($fn=$env_hr->{'SCRIPT_FILENAME'}) && !$r{'uri'}) {
+        
+        
+            #  Need to calc from document root in PSGI environment
+            #
+            debug('not supplied in SCRIPT_FILENAME or r{uri}. calculating');
+            if (my $dn=($r{'document_root'} || $env_hr->{'DOCUMENT_ROOT'} || $Dir_config_env{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT)) {
+            
+                #  Get from URI and location
+                #
+                my $uri=$r{'uri'} || $env_hr->{'PATH_INFO'} || $env_hr->{'SCRIPT_NAME'};
+                debug("uri: $uri");
+                $fn=File::Spec->catfile($dn, split m{/+}, $uri); #/
+                debug("fn: $fn from dn: $dn, uri: $uri");
+                
+            }
+            
+            
+            #  IIS/FastCGI, not tested recently unsure if works
+            #
+            elsif ($fn=$env_hr->{'PATH_TRANSLATED'}) {
+
+                #  Feel free to let me know a better way under IIS/FastCGI ..
+                my $script_fn=(File::Spec::Unix->splitpath($env_hr->{'SCRIPT_NAME'}))[2];
+                $fn=~s/\Q$script_fn\E.*/$script_fn/;
+                debug("fn: $fn derived from PATH_TRANSLATED script_fn: $script_fn");
+            }
+            
+            
+            #  Need to add default psp file ?
+            #
+            #unless ($fn=~/\.psp$/) { # fastest
+            unless ($fn=~WEBDYNE_PSP_EXT_RE) { # fastest
+
+                #  Is it a directory that exists ? Only append default document if that is the case, else let the api code
+                #  handle it
+                #
+                if  ((-d $fn) || !$fn) {
+                    
+            
+                    #  Append default doc to path, which appears at moment to be a directory ?
+                    #
+                    my $document_default=$r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
+                    debug("appending document default $document_default to fn:$fn");
+                    
+                    #  If absolute path just use it
+                    #
+                    if (File::Spec->file_name_is_absolute($document_default)) {
+                    
+                        #  Yep - absolute path
+                        #
+                        $fn=$document_default
+                    }
+                    else {
+                    
+                        #  Otherwise append to existing path
+                        #
+                        $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
+                    }
+                }
+                else {
+                    
+                    #  Not .psp file, do not want
+                    #
+                    $fn=undef;
+                }
+            }
+        }
+
+
+        #  Final sanity check
+        #
+        debug("final fn: $fn");
+        $r{'filename'}=$fn; 
+        
+    }
+    
+    
+    #  Finished, pass back
+    #
+    return bless \%r, $class;
+
+}
+
+
+
 sub content_type {
 
     my $r=shift();
     my $hr=$r->headers_out();
-    @_ ? $hr->{'Content-Type'}=shift() : $hr->{'Content-Type'};
+    @_ ? $r->headers_out()->{'Content-Type'}=shift() : $r->SUPER::content_type();
 
 }
 
@@ -101,28 +216,23 @@ sub filename {
 
 sub header_only {
 
-    ($ENV{'REQUEST_METHOD'} eq 'HEAD') ? 1 : 0;
+    (shift()->method() eq 'HEAD') ? 1 : 0 
 
 }
 
 
 sub headers_in {
-
-    my ($r, $header)=@_;
-    my $hr=$r->{'headers_in'} ||= do {
-        my @http_header=grep {/^HTTP_/} keys %ENV;
-        my %http_header=map  {$_ => $ENV{$_}} @http_header;
-        foreach my $k (keys %http_header) {
-            my $v=delete $http_header{$k};
-            $k=~s/^HTTP_//;
-            $k=~s/_/-/g;
-            $http_header{lc($k)}=$v;
-        }
-        \%http_header;
-    };
-    $header ? $hr->{lc($header)} : $hr;
-
+    my $r=shift();
+    return $r->headers();
 }
+
+
+sub headers_out {
+
+    my $r=shift();
+    return WebDyne::Request::Fake::headers($r, 'headers_out', @_);
+
+}    
 
 
 sub location {
@@ -178,7 +288,8 @@ sub location {
 
 sub log_error {
 
-    shift(); warn(@_) if $WEBDYNE_PSGI_WARN_ON_ERROR;
+    my $r=shift();
+    warn(@_) if $WEBDYNE_PSGI_WARN_ON_ERROR;
 
 }
 
@@ -187,7 +298,6 @@ sub lookup_file {
 
     my ($r, $fn)=@_;
     my $r_child;
-    #if ($fn!~/\.psp$/) { # fastest
     if ($fn!~WEBDYNE_PSP_EXT_RE) { # fastest
 
 
@@ -222,135 +332,12 @@ sub lookup_uri {
 }
 
 
-sub new {
-
-
-    #  New PSGI request
-    #
-    my ($class, %r)=@_;
-    debug("$class, r: %s, calller:%s", Dumper(\%r, [caller(0)]));
-    
-    
-    #  Try to figure out filename user wants
-    #
-    unless ($r{'filename'}) {
-    
-    
-        #  Not supplied - need to work out
-        #
-        debug('filename not supplied, determining from request');
-
-
-        #  Iterate through options. If *not* supplied by SCRIPT_FILENAME keep going.
-        #
-        my $fn;
-        unless (($fn=$ENV{'SCRIPT_FILENAME'}) && !$r{'uri'}) {
-        
-        
-            #  Need to calc from document root in PSGI environment
-            #
-            debug('not supplied in SCRIPT_FILENAME or r{uri}. calculating');
-            if (my $dn=($r{'document_root'} || $Dir_config_env{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT)) {
-            
-                #  Get from URI and location
-                #
-                ##my $uri=$r{'uri'} || $ENV{'REQUEST_URI'};
-                my $uri=$r{'uri'} || $ENV{'PATH_INFO'};
-                debug("uri: $uri");
-                #  Not sure why I did this ? Why strip location ?
-                #if (my $location=$class->location()) {
-                #    debug("location: $location");
-                #    $uri=~s/^\Q$location\E//;
-                #    debug("uri now: $uri");
-                #}
-                ##my $uri_or=URI->new($uri);
-                #$fn=File::Spec->catfile($dn, $uri_or->path());
-                ##$fn=File::Spec->catfile($dn, split m{/+}, $uri_or->path());
-                $fn=File::Spec->catfile($dn, split m{/+}, $uri); #/
-                debug("fn: $fn from dn: $dn, uri: $uri");
-                
-                #  If PSP file spec'd on command line get rid of trailing /
-                #$fn=~s/\.psp\/$/.psp/;
-            }
-            
-            
-            #  IIS/FastCGI, not tested recently unsure if works
-            #
-            elsif ($fn=$ENV{'PATH_TRANSLATED'}) {
-
-                #  Feel free to let me know a better way under IIS/FastCGI ..
-                my $script_fn=(File::Spec::Unix->splitpath($ENV{'SCRIPT_NAME'}))[2];
-                $fn=~s/\Q$script_fn\E.*/$script_fn/;
-                debug("fn: $fn derived from PATH_TRANSLATED script_fn: $script_fn");
-            }
-            
-            
-            #  Need to add default psp file ?
-            #
-            #unless ($fn=~/\.psp$/) { # fastest
-            unless ($fn=~WEBDYNE_PSP_EXT_RE) { # fastest
-
-                #  Is it a directory that exists ? Only append default document if that is the case, else let the api code
-                #  handle it
-                #
-                if  ((-d $fn) || !$fn) {
-                    
-            
-                    #  Append default doc to path, which appears at moment to be a directory ?
-                    #
-                    my $document_default=$r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
-                    debug("appending document default $document_default to fn:$fn");
-                    
-                    #  If absolute path just use it
-                    #
-                    if (File::Spec->file_name_is_absolute($document_default)) {
-                    
-                        #  Yep - absolute path
-                        #
-                        $fn=$document_default
-                    }
-                    else {
-                    
-                        #  Otherwise append to existing path
-                        #
-                        $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
-                    }
-                }
-                else {
-                    
-                    #  Not .psp file, do not want
-                    #
-                    $fn=undef;
-                }
-            }
-        }
-
-
-        #  Final sanity check
-        #
-        debug("final fn: $fn");
-        $r{'filename'}=$fn; # || do {
-            #my $env=join("\n", map {"$_=$ENV{$_}"} keys %ENV);
-            #return err("unable to determine filename for request from environment:%s, Dir_config_env: %s", Dumper(\%ENV, \%Dir_config_env))
-        #};
-        
-    }
-    
-    
-    #  Finished, pass back
-    #
-    bless \%r, $class;
-
-}
-
-
 sub redirect {
 
     my ($r, $location)=@_;
-    CORE::print sprintf("Status: %s\r\n", RC_FOUND);
-    CORE::print "Location: $location\r\n";
-    $r->send_http_header;
-    return RC_FOUND;
+    $r->status(HTTP_FOUND);
+    $r->headers_out('Location' => $location);
+    return HTTP_FOUND;
 
 }
 
@@ -366,15 +353,8 @@ sub run {
         debug("file not found !");
         $r->status(RC_NOT_FOUND);
         $r->send_error_message;
-        RC_NOT_FOUND;
+        return HTTP_NOT_FOUND;
     }
-
-}
-
-
-sub set_handlers {
-
-    #  No-op
 
 }
 
@@ -383,16 +363,11 @@ sub send_error_response {
 
     my $r=shift();
     my $status=$r->status();
-    
-    CORE::print "Status: $status\r\n";
-    $r->send_http_header;
     debug("in send error response, status $status");
-    #if (my $message_ar=$r->custom_response($status)) {
     if (my $message=$r->custom_response($status)) {
 
         #  We have a custom response - send it
         #
-        #$r->print(@{$message_ar});
         $r->print($message);
 
     }
@@ -415,7 +390,7 @@ sub err_html {
     #
     my ($r, $status, $message)=@_;
     require WebDyne::HTML::Tiny;
-    my $html_or=WebDyne::HTML::Tiny->new() ||
+    my $html_or=WebDyne::HTML::Tiny->new( mode=>$WEBDYNE_HTML_TINY_MODE, r=>$r ) ||
         return err();
     my $error;
     my @message=(
@@ -435,35 +410,7 @@ sub err_html {
 
 sub send_http_header {
 
-    my $r=shift();
-    return unless $r->{'header'};
-    while (my ($h, $v)=each %{$r->headers_out()}) {
-        CORE::print "$h: $v\r\n";
-    }
-    CORE::print "\r\n";
-
+    #  Stub
+    
 }
 
-
-sub uri {
-
-    my $r=shift();
-    @_ ? $r->{'uri'}=shift() : $r->{'uri'} || $ENV{'REQUEST_URI'}
-
-}
-
-
-sub protocol {
-
-    $ENV{'SERVER_PROTOCOL'}
-}
-
-
-sub env {
-
-    return \%Dir_config_env;
-
-}
-
-1;
-__END__

@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.9.0
+#                   and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::Local v0.1.9;
+class Sys::Async::Virt::Connection::Local v0.1.10;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
@@ -77,7 +77,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.1.9
+v0.1.10
 
 =head1 SYNOPSIS
 

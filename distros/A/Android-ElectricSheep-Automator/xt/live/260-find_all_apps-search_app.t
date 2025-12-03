@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Test::More;
 use Test::More::UTF8;
@@ -72,11 +72,12 @@ for my $appname (sort keys %$apps){
 	 declaredPermissions requestedPermissions
 	 installPermissions runtimePermissions enabledComponents
 	 usesLibraryFiles usesOptionalLibraries
-	 activities MainActivities MainActivity
+	 activities MainActivities MainActivity apkPaths codePath
 		/){
 			diag "$k:".perl2dump($apps->{$appname}->get($k));
 		}
 	}
+	
 }
 ok($instantiated_apps==1 || $instantiated_apps==2, 'find_installed_apps()'." : called with regex '$aregex' and result contains one or two items with AppProperties.") or BAIL_OUT("no it contains ${instantiated_apps} items: ".join(', ', @instantiated_apps));
 my $num_apps_total = scalar keys %{ $mother->apps };
@@ -125,7 +126,7 @@ for my $appname (sort keys %$apps){
 	 declaredPermissions requestedPermissions
 	 installPermissions runtimePermissions enabledComponents
 	 usesLibraryFiles usesOptionalLibraries
-	 activities MainActivities MainActivity
+	 activities MainActivities MainActivity apkPaths codePath
 		/){
 			diag "$k:".perl2dump($apps->{$appname}->get($k));
 		}
@@ -178,7 +179,7 @@ for my $appname (sort keys %$apps){
 	 declaredPermissions requestedPermissions
 	 installPermissions runtimePermissions enabledComponents
 	 usesLibraryFiles usesOptionalLibraries
-	 activities MainActivities MainActivity
+	 activities MainActivities MainActivity apkPaths codePath
 		/){
 			diag "$k:".perl2dump($apps->{$appname}->get($k));
 		}
@@ -203,7 +204,7 @@ is(scalar keys %{ $mother->apps }, $num_apps_total, "after these operations the 
 # Now, add one more app, e.g. clock
 # find one app by regex name 'clock' this yields 1 match
 # we expect to have lots of apps but only 1 to be instantiated
-#   com.google.android.deskclock
+#   com.google.android.deskclock or com.google.android.gallery2
 $aregex = qr/^com\.google\.android\.deskclock$/i;
 $params = {
 	'packages' => $aregex, # this will instantiate all matched apps AppProperties
@@ -228,7 +229,7 @@ for my $appname (sort keys %$apps){
 	 declaredPermissions requestedPermissions
 	 installPermissions runtimePermissions enabledComponents
 	 usesLibraryFiles usesOptionalLibraries
-	 activities MainActivities MainActivity
+	 activities MainActivities MainActivity apkPaths codePath
 		/){
 			diag "$k:".perl2dump($apps->{$appname}->get($k));
 		}
@@ -280,7 +281,7 @@ for my $appname (sort keys %$apps){
 	 declaredPermissions requestedPermissions
 	 installPermissions runtimePermissions enabledComponents
 	 usesLibraryFiles usesOptionalLibraries
-	 activities MainActivities MainActivity
+	 activities MainActivities MainActivity apkPaths codePath
 		/){
 			diag "$k:".perl2dump($apps->{$appname}->get($k));
 		}
@@ -335,7 +336,7 @@ for my $appname (sort keys %$apps){
 	 declaredPermissions requestedPermissions
 	 installPermissions runtimePermissions enabledComponents
 	 usesLibraryFiles usesOptionalLibraries
-	 activities MainActivities MainActivity
+	 activities MainActivities MainActivity apkPaths codePath
 		/){
 			diag "$k:".perl2dump($apps->{$appname}->get($k));
 		}

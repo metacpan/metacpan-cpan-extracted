@@ -32,21 +32,21 @@ sub test_assert_equals {
 sub test_numericness {
     my $self = shift;
     my %tests =
-      ( 1	=> 't',
-	0	=> 't',
+      ( 1 => 't',
+        0 => 't',
 
-	'15e7'	=> 't',
-	'15E7'	=> 't',
-	"not 0"	=> 'f',
-	"not 4"	=> 'f',
-	"  \n 5E2"	=> 't',
-	"  \t 0E0  "	=> 't',
+        '15e7' => 't',
+        '15E7' => 't',
+        "not 0" => 'f',
+        "not 4" => 'f',
+        "  \n 5E2" => 't',
+        "  \t 0E0  " => 't',
       );
     foreach my $str (keys %tests) {
-	my $expect = $tests{$str};
-	my $actual = Test::Unit::Assert::is_numeric($str) ? 't' : 'f';
-	$self->fail("For string '$str', expect $expect but got $actual")
-	  unless $expect eq $actual;
+      my $expect = $tests{$str};
+      my $actual = Test::Unit::Assert::is_numeric($str) ? 't' : 'f';
+      $self->fail("For string '$str', expect $expect but got $actual")
+        unless $expect eq $actual;
     }
 
     if ($] gt '5.029001' && $] lt '5.031004') {
@@ -112,7 +112,7 @@ sub test_assert_str_equals {
           [ __LINE__, sub { shift->assert_str_equals(undef, 'foo') } ],
         "expected '', got undef" =>
           [ __LINE__, sub { shift->assert_str_equals('', undef)    } ],
-        "expected 'foo', got undef" => 
+        "expected 'foo', got undef" =>
           [ __LINE__, sub { shift->assert_str_equals('foo', undef) } ],
         "expected '', got '0'" =>
           [ __LINE__, sub { shift->assert_str_equals('', 0)        } ],
@@ -128,7 +128,7 @@ sub test_assert_str_equals {
           [ __LINE__, sub { shift->assert_str_equals('-0', 0)      } ],
         "expected 'foo', got 'bar'" =>
           [ __LINE__, sub { shift->assert_str_equals('foo', 'bar') } ],
-        
+
     );
 }
 
@@ -167,7 +167,7 @@ sub test_assert_matches {
             => [ __LINE__, sub { shift->assert_matches(1, 2) } ]
     );
 }
-    
+
 sub test_assert_does_not_match {
     my $self = shift;
     $self->assert_does_not_match(qr/ob/, 'fooBar');
@@ -176,7 +176,7 @@ sub test_assert_does_not_match {
             => [ __LINE__, sub { shift->assert_does_not_match(1, 2) } ]
     );
 }
-    
+
 sub test_assert_equals_null {
     my $self = shift;
     $self->assert_equals(undef, undef);
@@ -219,7 +219,7 @@ sub test_assert_raises {
               sub { shift->assert_raises('AssertTest::Exception', sub {}, 'zxc') }
              ],
     );
-}    
+}
 
 sub test_ok_boolean {
     my $self = shift;
@@ -243,11 +243,11 @@ sub test_ok_bad_args {
 
 sub test_ok_equals {
     my $self = shift;
-    foreach my $args ([0, 0], [2, 2], [1.34, 1.34], 
-		      ['foo', 'foo'], ['', ''], [undef, undef],
-		      [sub {2+2}, 4], ['fixed', qr/x/]) {
-	$self->ok(@$args);
-	$self->ok(@$args, 'comment');
+    foreach my $args ([0, 0], [2, 2], [1.34, 1.34],
+                      ['foo', 'foo'], ['', ''], [undef, undef],
+                      [sub {2+2}, 4], ['fixed', qr/x/]) {
+        $self->ok(@$args);
+        $self->ok(@$args, 'comment');
     }
 }
 
@@ -273,8 +273,8 @@ sub test_ok_not_equals {
     while (@checks) {
         my $expected = shift @checks;
         my $args     = shift @checks;
-	push @tests, $expected => [ __LINE__, sub { shift->ok(@$args) } ];
-	push @tests, 'failure comment'
+        push @tests, $expected => [ __LINE__, sub { shift->ok(@$args) } ];
+        push @tests, 'failure comment'
           => [ __LINE__, sub { shift->ok(@$args, 'failure comment') } ];
     }
     $self->check_failures(@tests);
@@ -313,8 +313,8 @@ sub test_success_assert_not_equals {
     $self->assert_not_equals('string', 1);
     $self->assert_not_equals(1, 'string');
     $self->assert_not_equals('string', 0);
-    # $self->assert_not_equals(0,'string'); # Numeric comparison done here.. 
-    # $self->assert_not_equals(0, '');      # Numeric comparison done here.. 
+    # $self->assert_not_equals(0,'string'); # Numeric comparison done here..
+    # $self->assert_not_equals(0, '');      # Numeric comparison done here..
     $self->assert_not_equals('', 0);
     $self->assert_not_equals(undef, 0);
     $self->assert_not_equals(0, undef);
@@ -361,8 +361,8 @@ sub test_fail_assert_not_null {
           => [ __LINE__, sub { shift->assert_not_null(undef) } ],
         '<undef> unexpected'
           => [ __LINE__, sub { shift->assert_not_null() } ],
-	  # nb. $self->assert_not_null(@emptylist, "message") is not
-	  # going to do what you expected!
+          # nb. $self->assert_not_null(@emptylist, "message") is not
+          # going to do what you expected!
         'Weirdness'
           => [ __LINE__, sub { shift->assert_not_null(undef, 'Weirdness') } ]
     );
@@ -424,39 +424,43 @@ sub test_assert_deep_equals {
 
     my %families; # key=test-purpose, value=assorted circular structures
     foreach my $key (qw(orig copy bad_copy)) {
-	my %family = ( john => { name => 'John Doe',
-				 spouse => undef,
-				 children => [],
-			       },
-		       jane => { name   => 'Jane Doe',
-				 spouse => undef,
-				 children => [],
-			       },
-		       baby => { name => 'Baby Doll',
-#				 spouse => undef,
-				 children => [],
-			       },
-		     );
-	$family{john}{spouse} = $family{jane};
-	$family{jane}{spouse} = $family{john};
-	push @{$family{john}{children}}, $family{baby};
-	push @{$family{jane}{children}}, $family{baby};
-	$families{$key} = \%family;
+        my %family = (
+          john => {
+            name     => 'John Doe',
+            spouse   => undef,
+            children => [],
+          },
+          jane => {
+            name     => 'Jane Doe',
+            spouse   => undef,
+            children => [],
+          },
+          baby => {
+            name => 'Baby Doll',
+            # spouse => undef,
+            children => [],
+          },
+        );
+        $family{john}{spouse} = $family{jane};
+        $family{jane}{spouse} = $family{john};
+        push @{$family{john}{children}}, $family{baby};
+        push @{$family{jane}{children}}, $family{baby};
+        $families{$key} = \%family;
     }
     $families{bad_copy}->{jane}{spouse} = $families{bad_copy}->{baby}; # was ->{john}
 
     # Breakage under test is infinite recursion, to memory exhaustion!
     # Jump through hoops to avoid killing people's boxes
     {
-	my $old_isa = \&UNIVERSAL::isa;
-	# Pick on isa() because it'll be called from any deep-ing code
-	local $^W = 0;
-	local *UNIVERSAL::isa = sub {
-	    die "Giving up on deep recursion for assert_deep_equals"
-	      if defined caller(500);
-	    return $old_isa->(@_);
-	};
-	$self->assert_deep_equals($families{orig}, $families{copy});
+        my $old_isa = \&UNIVERSAL::isa;
+        # Pick on isa() because it'll be called from any deep-ing code
+        local $^W = 0;
+        local *UNIVERSAL::isa = sub {
+            die "Giving up on deep recursion for assert_deep_equals"
+                if defined caller(500);
+            return $old_isa->(@_);
+        };
+        $self->assert_deep_equals($families{orig}, $families{copy});
     }
 
     my ($H, $H2, $G) = qw(hello hello goodbye);
@@ -469,13 +473,11 @@ sub test_assert_deep_equals {
         'Both arguments were not references' => [ '', 0    ],
          $differ->(qw/'ARRAY 'HASH/)     => [ [],      {}      ],
          $differ->(qw/'ARRAY 'HASH/)     => [ [1,2],   {1,2}   ],
-	 $differ->( "'ARRAY", " undef" ) => [ { 'test' => []},
-					      { 'test' => undef } ],
-	 $differ->( "'ARRAY", 'not exist' ) => [ { 'test' => []}, {} ],
-	 $differ->( 'undef', "'ARRAY" ) => [ { 'test' => undef },
-					     { 'test' => []} ],
-	 $differ->( "''", " undef" ) => [ [ '' ], [ undef ] ],
-	 $differ->( "'undef'", " undef" ) => [ [ 'undef' ], [ undef ] ],
+         $differ->( "'ARRAY", " undef" ) => [ { 'test' => []}, { 'test' => undef } ],
+         $differ->( "'ARRAY", 'not exist' ) => [ { 'test' => []}, {} ],
+         $differ->( 'undef', "'ARRAY" ) => [ { 'test' => undef }, { 'test' => []} ],
+         $differ->( "''", " undef" ) => [ [ '' ], [ undef ] ],
+         $differ->( "'undef'", " undef" ) => [ [ 'undef' ], [ undef ] ],
          $differ->('not exist', "'3'") => [ [1,2],   [1,2,3] ],
          $differ->("'3'", "not exist") => [ [1,2,3], [1,2]   ],
          $differ->("'wahhhhh'", "'wahhhh'") => [
@@ -493,10 +495,10 @@ sub test_assert_deep_equals {
                  },
              }
          ],
-	 $differ->( 'HASH', 'not exist') => [$families{orig}, $families{bad_copy}], # test may be fragile due to recursion ordering?
-	 $differ->("'3'", "'5'") => [ [ \$H, 3 ], [ \$H2, 5 ] ],
-	 $differ->("'hello'", "'goodbye'") => [ { world => \$H }, { world => \$G } ],
-	 $differ->("'hello'", "'goodbye'") => [ [ \$H, "world" ], [ \$G, "world" ] ],
+         $differ->( 'HASH', 'not exist') => [$families{orig}, $families{bad_copy}], # test may be fragile due to recursion ordering?
+         $differ->("'3'", "'5'") => [ [ \$H, 3 ], [ \$H2, 5 ] ],
+         $differ->("'hello'", "'goodbye'") => [ { world => \$H }, { world => \$G } ],
+         $differ->("'hello'", "'goodbye'") => [ [ \$H, "world" ], [ \$G, "world" ] ],
     );
 
     my @tests = ();
@@ -542,7 +544,7 @@ my %test_hash = (
             { args => ['foo', undef], name => "'foo' ne undef" },
             { args => [undef, 'foo'], name => "undef ne 'foo'" },
             # { args => [0, ''],        name => "0 ne ''"        }, # numeric compare
-            
+
         ],
     },
 );
@@ -574,7 +576,7 @@ sub make_tests_from_matrix {
                      $self->$method_name(@{$spec->{args}});
                  }, $spec->{name});
         }
-        
+
         foreach my $outcome (grep {$_ ne 'success'} keys %{$matrix->{$method_name}}) {
             foreach my $spec (@{$matrix->{$method_name}{$outcome}}) {
                 push @tests, $self->make_test_from_coderef

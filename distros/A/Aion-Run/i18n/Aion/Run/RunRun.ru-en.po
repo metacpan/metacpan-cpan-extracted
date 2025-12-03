@@ -1,0 +1,18 @@
+msgid "Aion::Run::RunRun - выполняет Perl-код и распечатывает результат на STDOUT"
+msgstr "Aion::Run::RunRun - executes Perl code and prints the result to STDOUT"
+
+msgid "Этот класс выполняет код perl `$ run [code](https://metacpan.org/pod/code)` и распечатывает результат на STDOUT."
+msgstr "This class executes the perl code `$ run [code](https://metacpan.org/pod/code)` and prints the result to STDOUT."
+
+msgid "Код для выполнения."
+msgstr "Code to execute."
+
+msgid "Выполняет код perl в контексте текущего проекта."
+msgstr "Executes perl code in the context of the current project."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Run::RunRun module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Run::RunRun module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

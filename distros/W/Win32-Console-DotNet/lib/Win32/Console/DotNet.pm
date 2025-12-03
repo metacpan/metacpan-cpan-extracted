@@ -57,7 +57,7 @@ use warnings;
 
 # version '...'
 our $version = 'v4.6.0';
-our $VERSION = '0.005006';
+our $VERSION = 'v0.5.7';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -500,7 +500,7 @@ I<Throws>: I<IllegalArgumentException> if the check fails.
     confess(sprintf("IllegalArgumentException: %s\n", 
       'Int'->get_message($_[0])))
         if STRICT 
-        and !(defined($_[0]) && $_[0] ne '' && $_[0] =~ /^[+-]?\d+\z/);
+        and !(defined($_[0]) && !ref($_[0]) && $_[0] =~ /\A[+-]?\d+\z/);
     return $_[0];
   }
 
@@ -1702,8 +1702,10 @@ Gets a value indicating whether a key press is available in the input stream.
       while (TRUE) {
         my $r = do {
           @ir = Win32::Console::_PeekConsoleInput(ConsoleInputHandle());
-          $numEventsRead = 0 + (@ir > 1);
-          @ir != 1;
+          my $r = @ir != 1;
+          $numEventsRead = @ir > 1 ? 1 : 0;
+          @ir = (0) x 6 unless $ir[0];
+          $r;
         };
         if ( !$r ) {
           my $errorCode = Win32::GetLastError();
@@ -1725,9 +1727,10 @@ Gets a value indicating whether a key press is available in the input stream.
 
           $r = do {
             @ir = Win32::Console::_ReadConsoleInput(ConsoleInputHandle());
-            $numEventsRead = 0 + (@ir != 1);
+            my $r = @ir > 1;
+            $numEventsRead = @ir > 1 ? 1 : 0;
             @ir = (0) x 6 unless $ir[0];
-            !!$numEventsRead;
+            $r;
           };
 
           if ( !$r ) {
@@ -2315,9 +2318,11 @@ I<Throws>: I<IOException> if an I/O error occurred.
 
     my $numCellsWritten = 0;
     $success = do {
+      Win32::SetLastError(0);
       $numCellsWritten = Win32::Console::_FillConsoleOutputCharacter($hConsole,
-        ' ', $conSize, $coordScreen->{X}, $coordScreen->{Y});
-      $numCellsWritten > 0;
+        ' ', $conSize, $coordScreen->{X}, $coordScreen->{Y}
+      ) || 0;
+      Win32::GetLastError() == 0;
     };
     if ( !$success ) {
       confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
@@ -2327,9 +2332,11 @@ I<Throws>: I<IOException> if an I/O error occurred.
 
     $numCellsWritten = 0;
     $success = do {
+      Win32::SetLastError(0);
       $numCellsWritten = Win32::Console::_FillConsoleOutputAttribute($hConsole,
-        $csbi->{wAttributes}, $conSize, $coordScreen->{X}, $coordScreen->{Y});
-      $numCellsWritten > 0;
+        $csbi->{wAttributes}, $conSize, $coordScreen->{X}, $coordScreen->{Y}
+      ) || 0;
+      Win32::GetLastError() == 0;
     };
     if ( !$success ) {
       confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
@@ -2534,13 +2541,16 @@ C<$sourceHeight> is zero.
     $readRegion->{Bottom} = $sourceTop + $sourceHeight - 1;
 
     my $r;
-    $r = defined Win32::Console::_ReadConsoleOutput(ConsoleOutputHandle(), 
-      $data,
-      $bufferSize->{X}, $bufferSize->{Y}, 
-      $bufferCoord->{X}, $bufferCoord->{Y}, 
-      $readRegion->{Left}, $readRegion->{Top}, 
-      $readRegion->{Right}, $readRegion->{Bottom}
-    );
+    $r = do {
+      my @rect = Win32::Console::_ReadConsoleOutput(ConsoleOutputHandle(), 
+        $data,
+        $bufferSize->{X}, $bufferSize->{Y}, 
+        $bufferCoord->{X}, $bufferCoord->{Y}, 
+        $readRegion->{Left}, $readRegion->{Top}, 
+        $readRegion->{Right}, $readRegion->{Bottom}
+      );
+      @rect > 1;
+    };
     if ( !$r ) {
       confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
     }
@@ -2589,13 +2599,16 @@ C<$sourceHeight> is zero.
     $writeRegion->{Top} = $targetTop;
     $writeRegion->{Bottom} = $targetTop + $sourceHeight;
 
-    $r = Win32::Console::_WriteConsoleOutput(
-      ConsoleOutputHandle(), $data, 
-      $bufferSize->{X}, $bufferSize->{Y}, 
-      $bufferCoord->{X}, $bufferCoord->{Y}, 
-      $writeRegion->{Left}, $writeRegion->{Top}, 
-      $writeRegion->{Right}, $writeRegion->{Bottom}
-    );
+    $r = do {
+      my @rect = Win32::Console::_WriteConsoleOutput(
+        ConsoleOutputHandle(), $data, 
+        $bufferSize->{X}, $bufferSize->{Y}, 
+        $bufferCoord->{X}, $bufferCoord->{Y}, 
+        $writeRegion->{Left}, $writeRegion->{Top}, 
+        $writeRegion->{Right}, $writeRegion->{Bottom}
+      );
+      @rect > 1;
+    };
     return;
   }
 
@@ -2758,9 +2771,10 @@ simultaneously with the console key.
         while (TRUE) {
           $r = do {
             @ir = Win32::Console::_ReadConsoleInput(ConsoleInputHandle());
-            $numEventsRead = 0 + (@ir != 1);
+            my $r = @ir > 1;
+            $numEventsRead = @ir > 1 ? 1 : 0;
             @ir = (0) x 6 unless $ir[0];
-            !!$numEventsRead;
+            $r;
           };
           if ( !$r || $numEventsRead == 0 ) {
             # This will fail when stdin is redirected from a file or pipe.
@@ -4210,7 +4224,7 @@ IO::DebugOutputTextWriter {
     $self->open(@_);
     return $self;
   }
-  *nem_from_fd = *fdopen = \&new;
+  *new_from_fd = *fdopen = \&new;
 
   sub open { # $handle ($handle, | $consoleType)
     my $self = shift;

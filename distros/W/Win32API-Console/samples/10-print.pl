@@ -23,8 +23,9 @@ END { warn "$^E\n" if $^E }
 
 sub main {
   # Get a STDOUT console handle
-  my $hConsole = GetStdHandle(STD_OUTPUT_HANDLE)
-    or return Win32::GetLastError();
+  my $hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+  return Win32::GetLastError()
+    if $hConsole == INVALID_HANDLE_VALUE;
 
   # Intro message
   my $written = 0;

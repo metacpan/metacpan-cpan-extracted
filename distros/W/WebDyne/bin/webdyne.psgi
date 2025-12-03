@@ -41,7 +41,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  API file name cache
@@ -270,7 +270,7 @@ sub handler {
     #
     my $html;
     my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, @param) ||
+    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, env=>$env_hr, @param) ||
         return err('unable to create new WebDyne::Request::PSGI object: %s', 
 			$@ || errclr() || 'unknown error');
     debug("r: $r");

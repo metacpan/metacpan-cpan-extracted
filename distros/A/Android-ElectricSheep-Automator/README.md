@@ -4,7 +4,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 # VERSION
 
-Version 0.06
+Version 0.08
 
 # WARNING
 
@@ -41,7 +41,8 @@ See ["WILL ANYTHING BE INSTALLED ON THE DEVICE?"](#will-anything-be-installed-on
     my @devices = $mother->adb->devices;
     $mother->connect_device({'serial' => $devices->[0]->serial})
         or die;
-    # no device needs to be specified if just one:
+    # no device identification is required for the method call
+    # if there is only one connected device:
     $mother->connect_device() if scalar(@devices)==0;
 
     # Go Home
@@ -81,7 +82,7 @@ See ["WILL ANYTHING BE INSTALLED ON THE DEVICE?"](#will-anything-be-installed-on
 
 # CONSTRUCTOR
 
-## new($params)
+## **`new($params)`**
 
 Creates a new `Android::ElectricSheep::Automator` object. `$params`
 is a hash reference used to pass initialization options which may
@@ -91,8 +92,8 @@ or should include the following:
 
     the configuration
     file holds
-    configuration parameters and its format is "enhanced" JSON
-    (see ["use Config::JSON::Enhanced"](#use-config-json-enhanced)) which is basically JSON
+    configuration parameters. Its format is "enhanced" JSON
+    (see [Config::JSON::Enhanced](https://metacpan.org/pod/Config%3A%3AJSON%3A%3AEnhanced)) which is basically JSON
     which allows comments between ` </* ` and ` */> `.
 
     Here is an example configuration file to get you started:
@@ -177,8 +178,8 @@ or should include the following:
 
     optionally specify a logger object
     to be used (instead of creating a fresh one). This object
-    must implement `info()`, `warn()`, `error()`. For
-    example [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog).
+    must implement these methods: `info()`, `warn()`, `error()`.
+    [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog) fits perfectly.
 
 - **`logfile`**
 
@@ -207,741 +208,836 @@ Note:
 - In this module parameters to functions are passed as a HASH\_REF.
 Functions return back objects, ARRAY\_REF or HASH\_REF.
 
-- devices()
+## **`devices()`**
 
-    Lists all Android devices connected to your
-    desktop and returns these as an ARRAY\_REF which can be empty.
+Lists all Android devices connected to your
+desktop and returns these as an ARRAY\_REF which can be empty.
 
-    It returns `undef` on failure.
+It returns `undef` on failure.
 
-- connect\_device($params)
+## **`connect_device($params)`**
 
-    Specifies the current Android device to control. Its use is
-    required only if you have more than one devices connected.
-    `$params` is a HASH\_REF which should contain exactly
-    one of the following:
+Specifies the current Android device to control. Its use is
+required only if you have more than one devices connected.
+`$params` is a HASH\_REF which should contain exactly
+one of the following:
 
-    - **`serial`** should contain
-    the serial (string) of the connected device as returned
-    by ["devices()"](#devices).
-    - **`device-object`** should be
-    an already existing [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
-    object.
+- **`serial`** should contain
+the serial (string) of the connected device as returned
+by ["devices()"](#devices).
+- **`device-object`** should be
+an already existing [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
+object.
 
-    It returns `0` on success, `1` on failure.
+It returns `0` on success, `1` on failure.
 
-- dump\_current\_screen\_ui($params)
+## **`dump_current_screen_ui($params)`**
 
-    It dumps the current screen as XML and returns that as
-    a string, optionally saving it to the specified file.
+It dumps the current screen as XML and returns that as
+a string, optionally saving it to the specified file.
 
-    `$params` is a HASH\_REF which may or should contain:
+`$params` is a HASH\_REF which may or should contain:
 
-    - **`filename`**
+- **`filename`**
 
-        optionally save the returned XML string to the specified file.
+    optionally save the returned XML string to the specified file.
 
-    It returns `undef` on failure or the UI XML dump, as a string, on success.
+It returns `undef` on failure or the UI XML dump, as a string, on success.
 
-- dump\_current\_screen\_shot($params)
+## **`dump_current_screen_shot($params)`**
 
-    It dumps the current screen as a PNG image and returns that as
-    a [Image::PNG](https://metacpan.org/pod/Image%3A%3APNG) object, optionally saving it to the specified file.
+It dumps the current screen as a PNG image and returns that as
+a [Image::PNG](https://metacpan.org/pod/Image%3A%3APNG) object, optionally saving it to the specified file.
 
-    `$params` is a HASH\_REF which may or should contain:
+`$params` is a HASH\_REF which may or should contain:
 
-    - **`filename`**
+- **`filename`**
 
-        optionally save the returned XML string to the specified file.
+    optionally save the returned XML string to the specified file.
 
-    It returns `undef` on failure or a [Image::PNG](https://metacpan.org/pod/Image%3A%3APNG) image, on success.
+It returns `undef` on failure or a [Image::PNG](https://metacpan.org/pod/Image%3A%3APNG) image, on success.
 
-- dump\_current\_screen\_video($params)
+## **`dump_current_screen_video($params)`**
 
-    It dumps the current screen as MP4 video and saves that
-    in specified file.
+It dumps the current screen as MP4 video and saves that
+in specified file.
 
-    `$params` is a HASH\_REF which may or should contain:
+`$params` is a HASH\_REF which may or should contain:
 
-    - **`filename`**
+- **`filename`**
 
-        save the recorded video to the specified file in MP4 format. This
-        is required.
+    save the recorded video to the specified file in MP4 format. This
+    is required.
 
-    - **`time-limit`**
+- **`time-limit`**
 
-        optionally specify the duration of the recorded video, in seconds. Default is 10 seconds.
+    optionally specify the duration of the recorded video, in seconds. Default is 10 seconds.
 
-    - **`bit-rate`**
+- **`bit-rate`**
 
-        optionally specify the bit rate of the recorded video in bits per second. Default is 20Mbps.
+    optionally specify the bit rate of the recorded video in bits per second. Default is 20Mbps.
 
-        \# Optionally specify %size = ('width' => ..., 'height' => ...)
+- **`size`**
 
-    - **`size`**
+    optionally specify the size (geometry) of the recorded video as a
+    HASH\_REF with keys `width` and `height`, in pixels. Default is "_the
+    device's main display resolution_".
 
-        optionally specify the size (geometry) of the recorded video as a
-        HASH\_REF with keys `width` and `height`, in pixels. Default is "_the
-        device's main display resolution_".
+- **`bugreport`**
 
-    - **`bugreport`**
+    optionally set this flag to 1 to have Android overlay debug information
+    on the recorded video, e.g. timestamp.
 
-        optionally set this flag to 1 to have Android overlay debug information
-        on the recorded video, e.g. timestamp.
+- **`display-id`**
 
-        \# Optionally specify 'display-id'.
-        &#x3d;item **`display-id`**
+    for a device set up with multiple physical displays, optionally
+    specify which one to record -- if not the main display -- by providing the
+    display id. You can find display ids with ["list\_physical\_displays()"](#list_physical_displays)
+    or, from the CLI, by `adb shell dumpsys SurfaceFlinger --display-id`
 
-        for a device set up with multiple physical displays, optionally
-        specify which one to record -- if not the main display -- by providing the
-        display id. You can find display ids with ["list\_physical\_displays()"](#list_physical_displays)
-        or, from the CLI, by `adb shell dumpsys SurfaceFlinger --display-id`
+`adb shell screenrecord --help` contains some more documentation.
 
-    `adb shell screenrecord --help` contains some more documentation.
+## **`list_physical_displays()`**
 
-- list\_running\_processes($params)
+It lists the IDs of all the physical displays connected to the
+device, including the main one and returns these back as a HASH\_REF
+keyed on display ID. It needs that connect\_device() to have been called prior to this call
 
-    It finds the running processes on device (using a \`ps\`),
-    optionally can save the (parsed) \`ps\`
-    results as JSON to the specified 'filename'.
-    It returns `undef` on failure or the results as a hash of hashes on success.
+It returns `undef` on failure or the results as a HASH\_REF keyed on display ID.
 
-    `$params` is a HASH\_REF which may or should contain:
+## **`list_running_processes($params)`**
 
-    - **`extra-fields`**
+It finds the running processes on device (using a \`ps\`),
+optionally can save the (parsed) \`ps\`
+results as JSON to the specified 'filename'.
+It returns `undef` on failure or the results as a hash of hashes on success.
 
-        optionally add more fields (columns) to the report by `ps`, as an ARRAY\_REF.
-        For example, `['TTY','TIME']`.
+`$params` is a HASH\_REF which may or should contain:
 
-    It needs that connect\_device() to have been called prior to this call
+- **`extra-fields`**
 
-    It returns `undef` on failure or a hash with these keys on success:
+    optionally add more fields (columns) to the report by `ps`, as an ARRAY\_REF.
+    For example, `['TTY','TIME']`.
 
-    - **`raw`** : contains the raw \`ps\` output as a string.
-    - **`perl`** : contains the parsed raw output as a Perl hash with
-    each item corresponding to one process, keyed on process command and arguments
-    (as reported by \`ps\`, verbatim), as a hash keyed on each field (column)
-    of the \`ps\` output.
-    - **`json`** : the above data converted into a JSON string.
+It needs that connect\_device() to have been called prior to this call
 
-- pidof($params)
+It returns `undef` on failure or a hash with these keys on success:
 
-    It returns the PID of the specified command name.
-    The specified command name must match the app or command
-    name exactly. **Use `pgrep()` if you want to match command
-    names with a regular expression**.
+- **`raw`** : contains the raw \`ps\` output as a string.
+- **`perl`** : contains the parsed raw output as a Perl hash with
+each item corresponding to one process, keyed on process command and arguments
+(as reported by `ps`, verbatim), as a hash keyed on each field (column)
+of the `ps` output.
+- **`json`** : the above data converted into a JSON string.
 
-    `$params` is a HASH\_REF which should contain:
+## **`pidof($params)`**
 
-    - **`name`**
+It returns the PID of the specified command name.
+The specified command name must match the app or command
+name exactly. **Use L/pgrep()** if you want to match command
+names with a regular expression>.
 
-        the name of the process. It can be a command name,
-        e.g. `audioserver` or an app name e.g. `android.hardware.vibrator-service.example`.
+`$params` is a HASH\_REF which should contain:
 
-    It returns `undef` on failure or the PID of the matched command on success.
+- **`name`**
 
-- pgrep($params)
+    the name of the process. It can be a command name,
+    e.g. `audioserver` or an app name e.g. `android.hardware.vibrator-service.example`.
 
-    It returns the PIDs matching the specified command or app
-    name (which can be an extended regular expression that `pgrep`
-    understands). The returned array will contain zero, one or more
-    hashes with keys `pid` and `command`. The former key is the pid of the command
-    whose full name (as per the process table) will be under the latter key.
-    Unless parameter `dont-show-command-name` was set to `1`.
+It returns `undef` on failure or the PID of the matched command on success.
 
-    `$params` is a HASH\_REF which should contain:
+## **`pgrep($params)`**
 
-    - **`name`**
+It returns the PIDs matching the specified command or app
+name (which can be an extended regular expression that `pgrep`
+understands). The returned array will contain zero, one or more
+hashes with keys `pid` and `command`. The former key is the pid of the command
+whose full name (as per the process table) will be under the latter key.
+Unless parameter `dont-show-command-name` was set to `1`.
 
-        the name of the process. It can be a command name,
-        e.g. `audioserver` or an app name e.g. `android.hardware.vibrator-service.example`
-        or part of these e.g. `audio` or `hardware` or an extended
-        regular expression that Android's `pgrep` understands, e.g.
-        `^com.+google.+mess`.
+`$params` is a HASH\_REF which should contain:
 
-    It returns `undef` on failure or an ARRAY\_REF containing
-    a HASH\_REF of data for each command matched (under keys `pid` and `command`).
-    The returned ARRAY\_REF can contain 0, 1 or more items depending
-    on what was matched.
+- **`name`**
 
-- geofix($params)
+    the name of the process. It can be a command name,
+    e.g. `audioserver` or an app name e.g. `android.hardware.vibrator-service.example`
+    or part of these e.g. `audio` or `hardware` or an extended
+    regular expression that Android's `pgrep` understands, e.g.
+    `^com.+google.+mess`.
 
-    It fixes the geolocation of the device to the specified coordinates.
-    After this, app API calls to get current geolocation will result to this
-    position (unless they use their own, roundabout way).
+It returns `undef` on failure or an ARRAY\_REF containing
+a HASH\_REF of data for each command matched (under keys `pid` and `command`).
+The returned ARRAY\_REF can contain 0, 1 or more items depending
+on what was matched.
 
-    `$params` is a HASH\_REF which should contain:
+## **`geofix($params)`**
 
-    - **`latitude`**
+It fixes the geolocation of the device to the specified coordinates.
+After this, app API calls to get current geolocation will result to this
+position (unless they use their own, roundabout way).
 
-        the latitude of the position as a floating point number.
+`$params` is a HASH\_REF which should contain:
 
-    - **`longitude`**
+- **`latitude`**
 
-        the longitude of the position as a floating point number.
+    the latitude of the position as a floating point number.
 
-    It returns `1` on failure or a `0` on success.
+- **`longitude`**
 
-- dump\_current\_location()
+    the longitude of the position as a floating point number.
 
-    It finds the current GPS location of the device
-    according to ALL the GPS providers available.
+It returns `1` on failure or a `0` on success.
 
-    It needs that connect\_device() to have been called prior to this call
+## **`dump_current_location()`**
 
-    It takes no parameters.
+It finds the current GPS location of the device
+according to ALL the GPS providers available.
 
-    On failure, it returns `undef`.
+It needs that connect\_device() to have been called prior to this call
 
-    On success, it returns a HASH\_REF of results.
-    Each item will be keyed on provider name (e.g. '`network provider`')
-    and will contain the parsed output of
-    what each GPS provider returned as a HASH\_REF with
-    the following keys:
+It takes no parameters.
 
-    - **`provider`** : the provider name. This is also the key of the item
-    in the parent hash.
-    - **`latitude`** : the latitude as a floating point number (can be negative too)
-    or ` <na> ` if the provider failed to return valid output.
-    - **`longitude`** : the longitude as a floating point number (can be negative too)
-    or ` <na > ` if the provider failed to return valid output.
-    - **`last-location-string`** : the last location string, or
-    ` <na > ` if the provider failed to return valid output.
+On failure, it returns `undef`.
 
-- is\_app\_running($params)
+On success, it returns a HASH\_REF of results.
+Each item will be keyed on provider name (e.g. '`network provider`')
+and will contain the parsed output of
+what each GPS provider returned as a HASH\_REF with
+the following keys:
 
-    It checks if the specified app is running on the device.
-    The name of the app must be exact.
-    Note that you can search for running apps / commands
-    with extended regular expressions using `pgrep()`
+- **`provider`** : the provider name. This is also the key of the item
+in the parent hash.
+- **`latitude`** : the latitude as a floating point number (can be negative too)
+or ` <na> ` if the provider failed to return valid output.
+- **`longitude`** : the longitude as a floating point number (can be negative too)
+or ` <na > ` if the provider failed to return valid output.
+- **`last-location-string`** : the last location string, or
+` <na > ` if the provider failed to return valid output.
 
-    `$params` is a HASH\_REF which should contain:
+## **`pull_app_apk_from_device($params)`**
 
-    - **`appname`**
+It pulls the APK file (bytecode) for the
+app(s) matched by the specified package
+specification,
+from the device and writes them
+into the specified output directory, locally.
 
-        the name of the app to check if it is running.
-        It must be its exact name. Basically it checks the
-        output of `pidof()`.
+`$params` is a HASH\_REF which should contain:
 
-    It returns `undef` on failure,
-    `1` if the app is running or `0` if the app is not running.
+- **`package`**
 
-- find\_current\_device\_properties($params)
+    the package name of the app to pull from the device.
+    `package` can be a string containing the fully qualified package name
+    or a `Regexp` object.
+    The former should be a fully qualified package name, for example '`com.android.gallery2`'.
+    The latter is a regular expression matching the package name and
+    can be created via the `qr//modifiers` construct,
+    for example: `qr/gallery\d$/i`. The regular expression does not
+    need to match exactly one app. Any apps matched they will be extracted.
 
-    It enquires the device currently connected,
-    and specified with ["connect\_device($params)"](#connect_device-params), if needed,
-    and returns back an [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
-    object containing this information, for example screen size,
-    resolution, serial number, etc.
+- **`output-dir`**
 
-    It returns [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
-    object on success or `undef` on failure.
+    the output directory to write the APK(s) matched into.
+    It will be created if it does not exist.
 
-- connect\_device()
+- **`lazy`**
 
-    It signals to our object that there is now
-    a device connected to the desktop and its
-    enquiry and subsequent control can commence.
-    If this is not called and neither `device-is-connected => 1`
-    is specified as a parameter to the constructor, then
-    the functionality will be limited and access
-    to functions like `swipe()`, `open_app()`, etc.
-    will be blocked until the caller signals that
-    a device is now connected to the desktop.
+    Optional with sane defaults, refer to ["search\_app($params)"](#search_app-params) for what this does.
 
-    Using ["connect\_device($params)"](#connect_device-params) to specify which device
-    to target in the case of multiple devices
-    connected to the desktop will also call this
-    method.
+- **`force-reload-apps-list`**
 
-    This method will try to enquire the connected device
-    about some of its properties, like screen size,
-    resolution, orientation, serial number etc.
-    This information will subsequently be available
-    via `$self->`device\_properties()>.
+    Optional with sane defaults, refer to ["search\_app($params)"](#search_app-params) for what this does.
 
-    It returns `0` on success, `1` on failure.
+It returns `undef` on failure.
+On success it returns a HASH\_REF with as
+many items as the packages matched which
+had APK files available on the device.
+Each entry is keyed on the fully qualified
+package name and its value is a ARRAY\_REF
+with as many APK files pulled from the device
+and saved locally. Each item in this array
+is a HASH\_REF with keys `device-path`
+containing the path of the APK in the device's storage
+and `local-path` pointing to the location where
+the APK was saved, locally.
 
-- disconnect\_device()
+Note that there is a script available
+which utilises this method, see [electric-sheep-pull-app-apk.pl](https://metacpan.org/pod/electric-sheep-pull-app-apk.pl).
 
-    Signals to our object that it should consider
-    that there is currently no device connected to
-    the desktop (irrespective of that is true or not)
-    which will block access to ["swipe()"](#swipe), ["open\_app()"](#open_app), etc.
+## **`install_app($params)`**
 
-- device\_properties()
+It installs the app from its specified
+APK (bytecode archive and more) file.
 
-    It returns the currently connected device properties
-    as a [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
-    object or `undef` if there is no connected device.
-    The returned object is constructed during a call
-    to ["find\_current\_device\_properties()"](#find_current_device_properties)
-    which is called via ["connect\_device($params)"](#connect_device-params) and will persist
-    for the duration of the connection.
-    However, after a call to ["disconnect\_device()"](#disconnect_device)
-    this object will be discarded and `undef` will be
-    returned.
+`$params` is a HASH\_REF which should contain:
 
-- swipe($params)
+- **`apk-filename`**
 
-    Emulates a "swipe" in four directions.
-    Sets the current Android device to control. It is only
-    required if you have more than one device connected.
-    `$params` is a HASH\_REF which may or should contain:
+    The APK filename to install onto the device. It must
+    exist locally, obviously.
 
-    - **`direction`**
+- **`install-parameters`**
 
-        should be one of
+    Optional parameters to be passed on to the `adb install`
+    command. Nothing is expected here. Refer to the
+    [adb documentation](https://developer.android.com/tools/adb)
+    for what parameters are supported. For example, `-r` is for
+    re-installation (although is not necessary even for re-installation).
 
-        - up
-        - down
-        - left
-        - right
+It returns `1` on failure.
+It returns `0` on success.
 
-    - **`dt`**
+Note that there is a script available
+which utilises this method, see [electric-sheep-install-app.pl](https://metacpan.org/pod/electric-sheep-install-app.pl).
 
-        denotes the time taken for the swipe
-        in milliseconds. The smaller its value the faster
-        the swipe. A value of `100` is fast enough to swipe to
-        the next screen.
+## **`is_app_running($params)`**
 
-    It returns `0` on success, `1` on failure.
+It checks if the specified app is running on the device.
+The name of the app must be exact.
+Note that you can search for running apps / commands
+with extended regular expressions using L/pgrep()>
 
-- tap($params)
+`$params` is a HASH\_REF which should contain:
 
-    Emulates a "tap" at the specified location.
-    `$params` is a HASH\_REF which must contain one
-    of the following items:
+- **`appname`**
 
-    - **`position`**
+    the name of the app to check if it is running.
+    It must be its exact name. Basically it checks the
+    output of [pidof()](https://metacpan.org/pod/pidof%28%29).
 
-        should be an ARRAY\_REF
-        as the `X,Y` coordinates of the point to "tap".
+It returns `undef` on failure,
+`1` if the app is running or `0` if the app is not running.
 
-    - **`bounds`**
+## **`find_current_device_properties($params)`**
 
-        should be an ARRAY\_REF of a bounding rectangle
-        of the widget to tap. Which contains two ARRAY\_REFs
-        for the top-left and bottom-right coordinates, e.g.
-        ` [ [tlX,tlY], [brX,brY] ] `. This is convenient
-        when the widget is extracted from an XML dump of
-        the UI (see ["dump\_current\_screen\_ui()"](#dump_current_screen_ui)) which
-        contains exactly this bounding rectangle.
+It enquires the device currently connected,
+and specified with ["connect\_device($params)"](#connect_device-params), if needed,
+and returns back an [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
+object containing this information, for example screen size,
+resolution, serial number, etc.
 
-    It returns `0` on success, `1` on failure.
+It returns [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
+object on success or `undef` on failure.
 
-- input\_text($params)
+## **`connect_device()`**
 
-    It "`types`" the specified text into the specified position,
-    where a text-input widget is expected to exist.
-    At first it taps at the widget's
-    location in order to get the focus. And then it enters
-    the text. You need to find the position of the desired
-    text-input widget by first getting the current screen UI
-    (using [dump\_current\_screen\_ui](https://metacpan.org/pod/dump_current_screen_ui)) and then using an XPath
-    selector to identify the desired widget by name/id/attributes.
-    See the source code of method `send_message()` in file
-    `lib/Android/ElectricSheep/Automator/Plugins/Apps/Viber.pm`
-    for how this is done for the message-sending text-input widget
-    of the Viber app.
+It signals to our object that there is now
+a device connected to the desktop and its
+enquiry and subsequent control can commence.
+If this is not called and neither `device-is-connected => 1`
+is specified as a parameter to the constructor, then
+the functionality will be limited and access
+to functions like ["swipe($params)"](#swipe-params), ["open\_app($params)"](#open_app-params), etc.
+will be blocked until the caller signals that
+a device is now connected to the desktop.
 
-    `$params` is a HASH\_REF which must contain `text`
-    and one of the two position (of the text-edit widget)
-    specifiers `position` or `bounds`:
+Using ["connect\_device($params)"](#connect_device-params) to specify which device
+to target in the case of multiple devices
+connected to the desktop will also call this
+method.
 
-    - **`text`**
+This method will try to enquire the connected device
+about some of its properties, like screen size,
+resolution, orientation, serial number etc.
+This information will subsequently be available
+via `$self->`device\_properties()>.
 
-        the text to write on the text edit widget. At the
-        moment, this must be plain ASCII string, not unicode.
-        No spaces are accepted.
-        Each space character must be replaced with `%s`.
+It returns `0` on success, `1` on failure.
 
-    - **`position`**
+## **`disconnect_device()`**
 
-        should be an ARRAY\_REF
-        as the `X,Y` coordinates of the point to "tap" in order
-        to get the focus of the text edit widget, preceding the
-        text input.
+Signals to our object that it should consider
+that there is currently no device connected to
+the desktop (irrespective of that is true or not)
+which will block access to ["swipe($params)"](#swipe-params), ["open\_app($params)"](#open_app-params), etc.
 
-    - **`bounds`**
+## **`device_properties()`**
 
-        should be an ARRAY\_REF of a bounding rectangle
-        of the widget to tap, in order to get the focus, preceding
-        the text input. Which contains two ARRAY\_REFs
-        for the top-left and bottom-right coordinates, e.g.
-        ` [ [tlX,tlY], [brX,brY] ] `. This is convenient
-        when the widget is extracted from an XML dump of
-        the UI (see ["dump\_current\_screen\_ui()"](#dump_current_screen_ui)) which
-        contains exactly this bounding rectangle.
+It returns the currently connected device properties
+as a [Android::ElectricSheep::Automator::DeviceProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3ADeviceProperties)
+object or `undef` if there is no connected device.
+The returned object is constructed during a call
+to ["find\_current\_device\_properties($params)"](#find_current_device_properties-params)
+which is called via ["connect\_device($params)"](#connect_device-params) and will persist
+for the duration of the connection.
+However, after a call to ["disconnect\_device()"](#disconnect_device)
+this object will be discarded and `undef` will be
+returned.
 
-    It returns `0` on success, `1` on failure.
+## **`swipe($params)`**
 
-- clear\_input\_field($params)
+Emulates a "swipe" in four directions.
+Sets the current Android device to control. It is only
+required if you have more than one device connected.
+`$params` is a HASH\_REF which may or should contain:
 
-    It clears the contents of a text-input widget
-    at specified location.
+- **`direction`**
 
-    There are several ways to do this. The simplest way
-    (with `keycombination`) does not work in some
-    devices, in which case a failsafe way is employed
-    which deletes characters one after the other for
-    250 times. 
+    should be one of
 
-    `$params` is a HASH\_REF which must contain
-    one of the two position (of the text-edit widget)
-    specifiers `position` or `bounds`:
+    - up
+    - down
+    - left
+    - right
 
-    - **`position`**
+- **`dt`**
 
-        should be an ARRAY\_REF
-        as the `X,Y` coordinates of the point to "tap" in order
-        to get the focus of the text edit widget, preceding the
-        text input.
+    denotes the time taken for the swipe
+    in milliseconds. The smaller its value the faster
+    the swipe. A value of `100` is fast enough to swipe to
+    the next screen.
 
-    - **`bounds`**
+It returns `0` on success, `1` on failure.
 
-        should be an ARRAY\_REF of a bounding rectangle
-        of the widget to tap, in order to get the focus, preceding
-        the text input. Which contains two ARRAY\_REFs
-        for the top-left and bottom-right coordinates, e.g.
-        ` [ [tlX,tlY], [brX,brY] ] `. This is convenient
-        when the widget is extracted from an XML dump of
-        the UI (see ["dump\_current\_screen\_ui()"](#dump_current_screen_ui)) which
-        contains exactly this bounding rectangle.
+## **`tap($params)`**
 
-    - **`num-characters`**
+Emulates a "tap" at the specified location.
+`$params` is a HASH\_REF which must contain one
+of the following items:
 
-        how many times to press the backspace? Default is 250!
-        But if you know the length of the text currently at
-        the text-edit widget then enter this here.
+- **`position`**
 
-    It returns `0` on success, `1` on failure.
+    should be an ARRAY\_REF
+    as the `X,Y` coordinates of the point to "tap".
 
-- home\_screen()
+- **`bounds`**
 
-    Go to the "home" screen.
+    should be an ARRAY\_REF of a bounding rectangle
+    of the widget to tap. Which contains two ARRAY\_REFs
+    for the top-left and bottom-right coordinates, e.g.
+    ` [ [tlX,tlY], [brX,brY] ] `. This is convenient
+    when the widget is extracted from an XML dump of
+    the UI (see ["dump\_current\_screen\_ui($params)"](#dump_current_screen_ui-params)) which
+    contains exactly this bounding rectangle.
 
-    It returns `0` on success, `1` on failure.
+It returns `0` on success, `1` on failure.
 
-- wake\_up()
+## **`input_text($params)`**
 
-    "Wake" up the device.
+It "`types`" the specified text into the specified position,
+where a text-input widget is expected to exist.
+At first it taps at the widget's
+location in order to get the focus. And then it enters
+the text. You need to find the position of the desired
+text-input widget by first getting the current screen UI
+(using ["dump\_current\_screen\_ui($params)"](#dump_current_screen_ui-params)) and then using an XPath
+selector to identify the desired widget by name/id/attributes.
+See the source code of method ["send\_message()"](#send_message) in file
+`lib/Android/ElectricSheep/Automator/Plugins/Apps/Viber.pm`
+for how this is done for the message-sending text-input widget
+of the Viber app.
 
-    It returns `0` on success, `1` on failure.
+`$params` is a HASH\_REF which must contain `text`
+and one of the two position (of the text-edit widget)
+specifiers `position` or `bounds`:
 
-- next\_screen()
+- **`text`**
 
-    Swipe to the next screen (on the right).
+    the text to write on the text edit widget. At the
+    moment, this must be plain ASCII string, not unicode.
+    No spaces are accepted.
+    Each space character must be replaced with `%s`.
 
-    It returns `0` on success, `1` on failure.
+- **`position`**
 
-- previous\_screen()
+    should be an ARRAY\_REF
+    as the `X,Y` coordinates of the point to "tap" in order
+    to get the focus of the text edit widget, preceding the
+    text input.
 
-    Swipe to the previous screen (on the left).
+- **`bounds`**
 
-    It returns `0` on success, `1` on failure.
+    should be an ARRAY\_REF of a bounding rectangle
+    of the widget to tap, in order to get the focus, preceding
+    the text input. Which contains two ARRAY\_REFs
+    for the top-left and bottom-right coordinates, e.g.
+    ` [ [tlX,tlY], [brX,brY] ] `. This is convenient
+    when the widget is extracted from an XML dump of
+    the UI (see ["dump\_current\_screen\_ui($params)"](#dump_current_screen_ui-params)) which
+    contains exactly this bounding rectangle.
 
-- navigation\_menu\_back\_button()
+It returns `0` on success, `1` on failure.
 
-    Press the "back" button which is the triangular
-    button at the left of the navigation menu at the bottom.
+## **`clear_input_field($params)`**
 
-    It returns `0` on success, `1` on failure.
+It clears the contents of a text-input widget
+at specified location.
 
-- navigation\_menu\_home\_button()
+There are several ways to do this. The simplest way
+(with `keycombination`) does not work in some
+devices, in which case a failsafe way is employed
+which deletes characters one after the other for
+250 times. 
 
-    Press the "home" button which is the circular
-    button in the middle of the navigation menu at the bottom.
+`$params` is a HASH\_REF which must contain
+one of the two position (of the text-edit widget)
+specifiers `position` or `bounds`:
 
-    It returns `0` on success, `1` on failure.
+- <**`position`**
 
-- navigation\_menu\_overview\_button()
+    should be an ARRAY\_REF
+    as the `X,Y` coordinates of the point to "tap" in order
+    to get the focus of the text edit widget, preceding the
+    text input.
 
-    Press the "overview" button which is the square
-    button at the right of the navigation menu at the bottom.
+- **`bounds`**
 
-    It returns `0` on success, `1` on failure.
+    should be an ARRAY\_REF of a bounding rectangle
+    of the widget to tap, in order to get the focus, preceding
+    the text input. Which contains two ARRAY\_REFs
+    for the top-left and bottom-right coordinates, e.g.
+    ` [ [tlX,tlY], [brX,brY] ] `. This is convenient
+    when the widget is extracted from an XML dump of
+    the UI (see ["dump\_current\_screen\_ui($params)"](#dump_current_screen_ui-params)) which
+    contains exactly this bounding rectangle.
 
-- apps()
+- **`num-characters`**
 
-    It returns a HASH\_REF containing all the
-    packages (apps) installed on the device
-    keyed on package name (which is like `com.android.settings`.
-    The list of installed apps is populated either
-    if `device-is-connected` is set to 1 during construction
-    or a call has been made to any of these
-    methods: `open_app()`, `close_app()`,
-    `search_app()`, `find_installed_apps()`.
+    how many times to press the backspace? Default is 250!
+    But if you know the length of the text currently at
+    the text-edit widget then enter this here.
 
-- find\_installed\_apps($params)
+It returns `0` on success, `1` on failure.
 
-    It enquires the device about all the installed
-    packages (apps) it has for the purpose of
-    opening and closing apps with `open_app()` and `close_app()`.
-    This list is available using `$self-`apps>.
+## **`home_screen()`**
 
-    Finding the package names is done in a single
-    operation and does
-    not take long. But enquiring with the connected device
-    about the main activity/ies
-    of each package takes some time as there should be
-    one enquiry for each package. By default,
-    `find_installed_apps()` will find all the package names
-    but will not enquire each package (fast).
-    This enquiry will be
-    done lazily if and when you need to open or close that
-    app.
+Go to the "home" screen.
 
-    `$params` is a HASH\_REF which may or should contain:
+It returns `0` on success, `1` on failure.
 
-    - **`packages`**
+## **`wake_up()`**
 
-        is a list of package names to enquire
-        about with the device. It can be a scalar string with the
-        exact package name, e.g. `com.android.settings`, or
-        a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
-        created by e.g. `qr/^\.com.+?\.settings$/i`, or
-        an ARRAY\_REF of package names. Or a HASH\_REF where
-        keys are package names. For each of the packages matched
-        witht this specification a full enquiry will be made
-        with the connected device. The information will
-        be saved in a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
-        object and will include the main activity/ies, permissions requested etc.
+"Wake" up the device.
 
-    - **`lazy`**
+It returns `0` on success, `1` on failure.
 
-        is a flag to denote whether to enquire
-        information about each package (app) at the time of this
-        call (set it to `1`) or lazily, on a if-and-when-needed basis
-        (set it to `0` which is the default). `lazy` affects
-        all packages except those specified in `packages`, if any.
-        Default is `1`.
+## **`next_screen()`**
 
-    - **`force-reload-apps-list'`**
+Swipe to the next screen (on the right).
 
-        can be set to 1 to
-        erase previous packages information and start fresh.
-        Default is `0`.
+It returns `0` on success, `1` on failure.
 
-    It returns a HASH\_REF of packages names (keys) along
-    with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
-    object) or `undef` if this information was not
-    obtained (e.g. when `lazy` is set to 1).
-    It also sets the exact same data to be available
-    via `$self-`apps>.
+## **`previous_screen()`**
 
-- search\_app($params)
+Swipe to the previous screen (on the left).
 
-    It searches the list of installed packages (apps)
-    on the current device and returns the match(es)
-    as a HASH\_REF keyed on package name which may
-    have as values [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
-    objects with packages information. If there are
-    no entries yet in the list of installed packages,
-    it calls the `find_installed_apps()` first to populate it.
+It returns `0` on success, `1` on failure.
 
-    `$params` is a HASH\_REF which may or should contain:
+## **`navigation_menu_back_button()`**
 
-    - **`package`**
+Press the "back" button which is the triangular
+button at the left of the navigation menu at the bottom.
 
-        is required. It can either be
-        a scalar string with the exact package name
-        or a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
-        created by e.g. `qr/^\.com.+?\.settings$/i`.
+It returns `0` on success, `1` on failure.
 
-    - **`lazy`**
+## **`navigation_menu_home_button()`**
 
-        is a flag to be passed on to ["find\_installed\_apps()"](#find_installed_apps),
-        if needed, to denote whether to enquire
-        information about each package (app) at the time of this
-        call (set it to `1`) or lazily, on a if-and-when-needed basis
-        (set it to `0` which is the default). `lazy` affects
-        all packages except those specified in `packages`, if any. Default is `1`.
+Press the "home" button which is the circular
+button in the middle of the navigation menu at the bottom.
 
-    - **`force-reload-apps-list'`**
+It returns `0` on success, `1` on failure.
 
-        is a flag to be passed on to ["find\_installed\_apps()"](#find_installed_apps),
-        if needed, and can be set to 1 to
-        erase previous packages information and start fresh. Default is `0`.
+## **`navigation_menu_overview_button()`**
 
-    It returns a HASH\_REF of matched packages names (keys) along
-    with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
-    object) or `undef` if this information was not
-    obtained (e.g. when `lazy` is set to 1).
+Press the "overview" button which is the square
+button at the right of the navigation menu at the bottom.
 
-- open\_app($params)
+It returns `0` on success, `1` on failure.
 
-    It opens the package specified in `$params`
-    on the current device. If there are
-    no entries yet in the list of installed packages,
-    it calls the `find_installed_apps()` first to populate it.
-    It will refuse to open multiple apps matched perhaps
-    by a regular expression in the package specification.
+## **`apps()`**
 
-    `$params` is a HASH\_REF which may or should contain:
+It returns a HASH\_REF containing all the
+packages (apps) installed on the device
+keyed on package name (which is like `com.android.settings`.
+The list of installed apps is populated either
+if `device-is-connected` is set to 1 during construction
+or a call has been made to any of these
+methods: ["open\_app($params)"](#open_app-params), ["close\_app($params)"](#close_app-params),
+["search\_app($params)"](#search_app-params), ["find\_installed\_apps($params)"](#find_installed_apps-params).
 
-    - **`package`**
+## **`find_installed_apps($params)`**
 
-        is required. It can either be
-        a scalar string with the exact package name
-        or a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
-        created by e.g. `qr/^\.com.+?\.settings$/i`. If a regular
-        expression, the call will fail if there is not
-        exactly one match.
+It enquires the device about all the installed
+packages (apps) it has for the purpose of
+opening and closing apps with ["open\_app($params)"](#open_app-params) and ["close\_app($params)"](#close_app-params).
+This list is available using `$self-`apps> (where `$self`
+is a [Android::ElectricSheep::Automator](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator) object.
 
-    - **`lazy`**
+Finding the package names is done in a single
+operation and does
+not take long. But enquiring with the connected device
+about the main activity/ies
+of each package takes some time as there should be
+one enquiry for each package. By default,
+["find\_installed\_apps($params)"](#find_installed_apps-params) will find all the package names
+but will not enquire each package (fast).
+This enquiry will be
+done lazily if and when you need to open or close that
+app.
 
-        is a flag to be passed on to ["find\_installed\_apps()"](#find_installed_apps),
-        if needed, to denote whether to enquire
-        information about each package (app) at the time of this
-        call (set it to `1`) or lazily, on a if-and-when-needed basis
-        (set it to `0` which is the default). `lazy` affects
-        all packages except those specified in `packages`, if any. Default is `1`.
+`$params` is a HASH\_REF which may or should contain:
 
-    - **`force-reload-apps-list'`**
+- **`packages`**
 
-        is a flag to be passed on to ["find\_installed\_apps()"](#find_installed_apps),
-        if needed, and can be set to 1 to
-        erase previous packages information and start fresh. Default is `0`.
+    is a list of package names to enquire
+    about with the device. It can be a scalar string with the
+    exact package name, e.g. `com.android.settings`, or
+    a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
+    created by e.g. `qr/^\.com.+?\.settings$/i`, or
+    an ARRAY\_REF of package names. Or a HASH\_REF where
+    keys are package names. For each of the packages matched
+    witht this specification a full enquiry will be made
+    with the connected device. The information will
+    be saved in a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
+    object and will include the main activity/ies, permissions requested etc.
 
-    It returns a HASH\_REF of matched packages names (keys) along
-    with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
-    object). At the moment, because `open_app()` allows opening only a single app,
-    this hash will contain only one entry unless we allow opening multiple
-    apps (e.g. via a regex which it is already supported) in the future.
+- **`lazy`**
 
-- close\_app($params)
+    is a flag to denote whether to enquire
+    information about each package (app) at the time of this
+    call (set it to `1`) or lazily, on a if-and-when-needed basis
+    (set it to `0` which is the default). `lazy` affects
+    all packages except those specified in `packages`, if any.
+    Default is `1`.
 
-    It closes the package specified in `$params`
-    on the current device. If there are
-    no entries yet in the list of installed packages,
-    it calls the `find_installed_apps()` first to populate it.
-    It will refuse to close multiple apps matched perhaps
-    by a regular expression in the package specification.
+- **`force-reload-apps-list`**
 
-    `$params` is a HASH\_REF which may or should contain:
+    can be set to 1 to
+    erase previous packages information and start fresh.
+    Default is `0`.
 
-    - **`package`**
+It returns a HASH\_REF of packages names (keys) along
+with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
+object) or `undef` if this information was not
+obtained (e.g. when `lazy` is set to 1).
+It also sets the exact same data to be available
+via `$self-`apps>.
 
-        is required. It can either be
-        a scalar string with the exact package name
-        or a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
-        created by e.g. `qr/^\.com.+?\.settings$/i`. If a regular
-        expression, the call will fail if there is not
-        exactly one match.
+## **`search_app($params)`**
 
-    - **`lazy`**
+It searches the list of installed packages (apps)
+on the current device and returns the match(es)
+as a HASH\_REF keyed on package name which may
+have as values [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
+objects with packages information. If there are
+no entries yet in the list of installed packages,
+it calls the ["find\_installed\_apps($params)"](#find_installed_apps-params) first to populate it.
 
-        is a flag to be passed on to ["find\_installed\_apps()"](#find_installed_apps),
-        if needed, to denote whether to enquire
-        information about each package (app) at the time of this
-        call (set it to `1`) or lazily, on a if-and-when-needed basis
-        (set it to `0` which is the default). `lazy` affects
-        all packages except those specified in `packages`, if any. Default is `1`.
+`$params` is a HASH\_REF which may or should contain:
 
-    - **`force-reload-apps-list'`**
+- **`package`**
 
-        is a flag to be passed on to ["find\_installed\_apps()"](#find_installed_apps),
-        if needed, and can be set to 1 to
-        erase previous packages information and start fresh. Default is `0`.
+    is required. It can either be
+    a scalar string with the exact package name
+    or a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
+    created by e.g. `qr/^\.com.+?\.settings$/i`.
 
-    It returns a HASH\_REF of matched packages names (keys) along
-    with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
-    object). At the moment, because `close_app()` allows closing only a single app,
-    this hash will contain only one entry unless we allow closing multiple
-    apps (e.g. via a regex which it is already supported) in the future.
+- **`lazy`**
+
+    is a flag to be passed on to ["find\_installed\_apps($params)"](#find_installed_apps-params),
+    if needed, to denote whether to enquire
+    information about each package (app) at the time of this
+    call (set it to `1`) or lazily, on a if-and-when-needed basis
+    (set it to `0` which is the default). `lazy` affects
+    all packages except those specified in `packages`, if any. Default is `1`.
+
+- **`force-reload-apps-list`**
+
+    is a flag to be passed on to ["find\_installed\_apps($params)"](#find_installed_apps-params),
+    if needed, and can be set to 1 to
+    erase previous packages information and start fresh. Default is `0`.
+
+It returns a HASH\_REF of matched packages names (keys) along
+with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
+object) or `undef` if this information was not
+obtained (e.g. when `lazy` is set to 1).
+
+## **`open_app($params)`**
+
+It opens the package specified in `$params`
+on the current device. If there are
+no entries yet in the list of installed packages,
+it calls the ["find\_installed\_apps($params)"](#find_installed_apps-params) first to populate it.
+It will refuse to open multiple apps matched perhaps
+by a regular expression in the package specification.
+
+`$params` is a HASH\_REF which may or should contain:
+
+- **`package`**
+
+    is required. It can either be
+    a scalar string with the exact package name
+    or a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
+    created by e.g. `qr/^\.com.+?\.settings$/i`. If a regular
+    expression, the call will fail if there is not
+    exactly one match.
+
+- **`lazy`**
+
+    is a flag to be passed on to ["find\_installed\_apps($params)"](#find_installed_apps-params),
+    if needed, to denote whether to enquire
+    information about each package (app) at the time of this
+    call (set it to `1`) or lazily, on a if-and-when-needed basis
+    (set it to `0` which is the default). `lazy` affects
+    all packages except those specified in `packages`, if any. Default is `1`.
+
+- **`force-reload-apps-list`**
+
+    is a flag to be passed on to ["find\_installed\_apps($params)"](#find_installed_apps-params),
+    if needed, and can be set to 1 to
+    erase previous packages information and start fresh. Default is `0`.
+
+It returns a HASH\_REF of matched packages names (keys) along
+with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
+object). At the moment, because ["open\_app($params)"](#open_app-params) allows opening only a single app,
+this hash will contain only one entry unless we allow opening multiple
+apps (e.g. via a regex which it is already supported) in the future.
+
+## **`close_app($params)`**
+
+It closes the package specified in `$params`
+on the current device. If there are
+no entries yet in the list of installed packages,
+it calls the ["find\_installed\_apps($params)"](#find_installed_apps-params) first to populate it.
+It will refuse to close multiple apps matched perhaps
+by a regular expression in the package specification.
+
+`$params` is a HASH\_REF which may or should contain:
+
+- **`package`**
+
+    is required. It can either be
+    a scalar string with the exact package name
+    or a [Regexp](https://metacpan.org/pod/Regexp) object which is a compiled regular expression
+    created by e.g. `qr/^\.com.+?\.settings$/i`. If a regular
+    expression, the call will fail if there is not
+    exactly one match.
+
+- **`lazy`**
+
+    is a flag to be passed on to ["find\_installed\_apps($params)"](#find_installed_apps-params),
+    if needed, to denote whether to enquire
+    information about each package (app) at the time of this
+    call (set it to `1`) or lazily, on a if-and-when-needed basis
+    (set it to `0` which is the default). `lazy` affects
+    all packages except those specified in `packages`, if any. Default is `1`.
+
+- **`force-reload-apps-list`**
+
+    is a flag to be passed on to ["find\_installed\_apps($params)"](#find_installed_apps-params),
+    if needed, and can be set to 1 to
+    erase previous packages information and start fresh. Default is `0`.
+
+It returns a HASH\_REF of matched packages names (keys) along
+with enquired information (as a [Android::ElectricSheep::Automator::AppProperties](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3AAppProperties)
+object). At the moment, because ["close\_app($params)"](#close_app-params) allows closing only a single app,
+this hash will contain only one entry unless we allow closing multiple
+apps (e.g. via a regex which it is already supported) in the future.
 
 # SCRIPTS
 
 For convenience, a few simple scripts are provided:
 
-- **`script/electric-sheep-find-installed-apps.pl`**
+## **`electric-sheep-find-installed-apps.pl`**
 
-    Find all install packages in the connected device. E.g.
+Find all install packages in the connected device. E.g.
 
-    `script/electric-sheep-find-installed-apps.pl --configfile config/myapp.conf --device Pixel_2_API_30_x86_ --output myapps.json`
+    electric-sheep-find-installed-apps.pl --configfile config/myapp.conf --device Pixel_2_API_30_x86_ --output myapps.json
 
-    `script/electric-sheep-find-installed-apps.pl --configfile config/myapp.conf --device Pixel_2_API_30_x86_ --output myapps.json --fast`
+    electric-sheep-find-installed-apps.pl --configfile config/myapp.conf --device Pixel_2_API_30_x86_ --output myapps.json --fast
 
-- **`script/electric-sheep-open-app.pl`**
+## **`electric-sheep-open-app.pl`**
 
-    Open an app by its exact name or a keyword matching it (uniquely):
+Open an app by its exact name or a keyword matching it (uniquely):
 
-    `script/electric-sheep-open-app.pl --configfile config/myapp.conf --name com.android.settings`
+    electric-sheep-open-app.pl --configfile config/myapp.conf --name com.android.settings
 
-    `script/electric-sheep-open-app.pl --configfile config/myapp.conf --keyword 'clock'`
+    electric-sheep-open-app.pl --configfile config/myapp.conf --keyword 'clock'
 
-    Note that it constructs a regular expression from escaped user input.
+Note that it constructs a regular expression from escaped user input.
 
-- **`script/electric-sheep-close-app.pl`**
+## **`electric-sheep-close-app.pl`**
 
-    Close an app by its exact name or a keyword matching it (uniquely):
+Close an app by its exact name or a keyword matching it (uniquely):
 
-    `script/electric-sheep-close-app.pl --configfile config/myapp.conf --name com.android.settings`
+    electric-sheep-close-app.pl --configfile config/myapp.conf --name com.android.settings
 
-    `script/electric-sheep-close-app.pl --configfile config/myapp.conf --keyword 'clock'`
+    electric-sheep-close-app.pl --configfile config/myapp.conf --keyword 'clock'
 
-    Note that it constructs a regular expression from escaped user input.
+Note that it constructs a regular expression from escaped user input.
 
-- **`script/electric-sheep-dump-ui.pl`**
+## **`electric-sheep-dump-ui.pl`**
 
-    Dump the current screen UI as XML to STDOUT or to a file:
+Dump the current screen UI as XML to STDOUT or to a file:
 
-    `script/electric-sheep-dump-ui.pl --configfile config/myapp.conf --output ui.xml`
+    electric-sheep-dump-ui.pl --configfile config/myapp.conf --output ui.xml
 
-    Note that it constructs a regular expression from escaped user input.
+Note that it constructs a regular expression from escaped user input.
 
-- **`script/electric-sheep-dump-current-location.pl`**
+## **`electric-sheep-dump-current-location.pl`**
 
-    Dump the GPS / geo-location position for the device from its various providers, if enabled.
+Dump the GPS / geo-location position for the device from its various providers, if enabled.
 
-    `script/electric-sheep-dump-current-location.pl --configfile config/myapp.conf --output geolocation.json`
+    electric-sheep-dump-current-location.pl --configfile config/myapp.conf --output geolocation.json
 
-- **`script/electric-sheep-emulator-geofix.pl`**
+## **`electric-sheep-emulator-geofix.pl`**
 
-    Set the GPS / geo-location position to the specified coordinates.
+Set the GPS / geo-location position to the specified coordinates.
 
-    `script/electric-sheep-dump-ui.pl --configfile config/myapp.conf --latitude 12.3 --longitude 45.6`
+    electric-sheep-dump-ui.pl --configfile config/myapp.conf --latitude 12.3 --longitude 45.6
 
-- **`script/electric-sheep-dump-screen-shot.pl`**
+## **`electric-sheep-dump-screen-shot.pl`**
 
-    Take a screenshot of the device (current screen) and save to a PNG file.
+Take a screenshot of the device (current screen) and save to a PNG file.
 
-    `script/electric-sheep-dump-screen-shot.pl --configfile config/myapp.conf --output screenshot.png`
+    electric-sheep-dump-screen-shot.pl --configfile config/myapp.conf --output screenshot.png
 
-- **`script/electric-sheep-dump-screen-video.pl`**
+## **`electric-sheep-dump-screen-video.pl`**
 
-    Record a video of the device's current screen and save to an MP4 file.
+Record a video of the device's current screen and save to an MP4 file.
 
-    `script/electric-sheep-dump-screen-video.pl --configfile config/myapp.conf --output video.mp4 --time-limit 30`
+    electric-sheep-dump-screen-video.pl --configfile config/myapp.conf --output video.mp4 --time-limit 30
 
-- **`script/electric-sheep-viber-send-message.pl`**
+## **`electric-sheep-pull-app-apk.pl`**
 
-    Send a message using the Viber app.
+Extract the APK file (java bytecode) for an app installed on the device and save locally, perhaps, for disassembly and/or modification and/or re-installation.
 
-    `script/electric-sheep-viber-send-message.pl --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_>>`
+    electric-sheep-pull-app-apk.pl --package calendar2 --wildcard --output anoutdir --configfile config/myapp.conf --device Pixel_2_API_30_x86_
 
-    This one saves a lot of debugging information to `debug` which can be used to
-    deal with special cases or different versions of Viber:
+## **`electric-sheep-install-app`**
 
-    `script/electric-sheep-viber-send-message.pl --outbase debug --verbosity 1 --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_>>`
+Install an APK file onto the device, passing extra installation
+parameters `-r` (for re-install) and `-g` (for granting permissions),
+
+    electric-sheep-install-app --apk-filename test.apk -p '-r' -p '-g' --configfile config/myapp.conf --device Pixel_2_API_30_x86_
+
+## **`electric-sheep-viber-send-message.pl`**
+
+Send a message using the Viber app.
+
+    electric-sheep-viber-send-message.pl --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_
+
+This one saves a lot of debugging information to `debug` which can be used to
+deal with special cases or different versions of Viber:
+
+    electric-sheep-viber-send-message.pl --outbase debug --verbosity 1 --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_
 
 # TESTING
 
-The normal tests under `t/`, initiated with `make test`,
+The normal tests under the `t/` directory, initiated with `make test` command,
 are quite limited in scope because they do not assume
 a connected device. That is, they do not check any
 functions which require interaction with a connected
 device.
 
-The _live tests_ under `xt/live`, initiated with
-`make livetest`, require
-an Android device connected to your desktop on which
-you installed this package and on which you are doing the testing.
-This suffices to be an emulator. It can also be a real Android
-phone but testing
+The _live tests_ under the `xt/live` directory, initiated with
+`make livetest` command, require
+an Android emulator or real device (the latter **is not recommended**)
+connected to your desktop computer on which you are doing the testing.
+Note that testing
 with your smartphone is not a good idea, please do not do this,
 unless it is some phone which you do not store important data.
+It is very easy to get an emulated Android device running on any OS.
 
 So, prior to `make livetest` make sure you have an android
 emulator up and running with, for example,
@@ -971,21 +1067,27 @@ the tests to fail.
 ## Android Studio
 
 This is not a prerequisite but it is
-highly recommended to install
+highly recommended to install it
 (from [https://developer.android.com/studio](https://developer.android.com/studio))
 on your desktop computer because it contains
 all the executables you will need,
 saved in a well documented file system hierarchy,
 which can then be accessed from the command line.
+You will not be using the IDE or anything, just
+the accompaniying binaries and libraries it comes with.
 
 Additionally, Android Studio offers possibly the
 easiest way to create Android Virtual Devices (AVD) which emulate
-an Android phone of various specifications.
+an Android phone of various specifications, phone models and sizes,
+API levels, etc.
 I mention this because one can install apps
 on an AVD and control them from your desktop
 as long as you are able to receive sms verification
-codes from a real phone. This is great for
-experimenting without pluggin in your real
+codes from a real phone. Perhaps you will need an Android
+emulator image which comes with Google Play Services,
+if you are installing apps from their store.
+This is great for
+experimenting without plugging in your real
 smartphone on your desktop.
 
 The bottom line is that by installing Android Studio,
@@ -1114,6 +1216,14 @@ Create virtual device: `avdmanager create avd -d "Nexus 6" -n myavd -k "system-i
 
 See [https://stackoverflow.com/a/77599934](https://stackoverflow.com/a/77599934)
 
+# NO ACCESS TO GOOGLE PLAY?
+
+See here if your Android Emulator has no access to Google's App Store:
+
+[https://stackoverflow.com/questions/71815181/how-can-i-get-google-play-to-work-on-android-emulator-in-android-studio-bumblebe](https://stackoverflow.com/questions/71815181/how-can-i-get-google-play-to-work-on-android-emulator-in-android-studio-bumblebe)
+
+Your mileage will lean on the low side.
+
 # USING YOUR REAL SMARTPHONE
 
 Using your real smartphone
@@ -1192,27 +1302,3 @@ This software is Copyright (c) 2025 by Andreas Hadjiprocopis.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 2362:
-
-    '=item' outside of any '=over'
-
-- Around line 2392:
-
-    '=item' outside of any '=over'
-
-- Around line 2471:
-
-    '=item' outside of any '=over'
-
-- Around line 3012:
-
-    Unterminated C< ... > sequence
-
-- Around line 3017:
-
-    Unterminated C< ... > sequence

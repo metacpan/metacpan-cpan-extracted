@@ -452,7 +452,6 @@ new(...)
             SV *key= ST(i), *val= ST(i+1);
             {
                dSP;
-               int count;
                ENTER;
                SAVETMPS;
                PUSHMARK(SP);
@@ -767,6 +766,8 @@ _count_matches_in_mem(buf, addr0, addr1)
       if (!buf->len)
          croak("Empty buffer");
       RETVAL= scan_mapped_memory_in_range(addr0, addr1, buf->data, buf->len);
+      if (RETVAL < 0)
+         croak("Unimplemented");
    OUTPUT:
       RETVAL
 
@@ -1009,8 +1010,8 @@ scan(self, pattern=NULL, flags= 0)
          if (matched) span->pos= parse.lim - (U8*) buf->data;
          if (op == 4) break;
          // reset the modified parse_state and run in reverse
-         parse.pos= buf->data + span->pos;
-         parse.lim= buf->data + span->lim;
+         parse.pos= (U8*) (buf->data + span->pos);
+         parse.lim= (U8*) (buf->data + span->lim);
          flags |= SECRET_BUFFER_MATCH_REVERSE;
          matched= secret_buffer_match(&parse, pattern, flags);
       case 5: // rtrim, and trim

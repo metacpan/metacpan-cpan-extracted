@@ -21,8 +21,14 @@ Revision history for Android-ADB-Automator
         Moved functionality for opening and closing an app into the Android::ElectricSheep::Automator::Plugins::Apps::Base (before they were in the Android::ElectricSheep::Automator::Plugins::Apps::Viber). Also moved appname() into the Base as well.
 	Added one more script script/electric-sheep-viber-send-message.pl
         Pod changes.
-
 0.06    2025/07/29
         Fixed script/*.pl not being installed.
         input_text() now replaces spaces with %s automatically.
         Pod changes.
+0.07    2025/12/03
+        Fixed (most) pod links and some pod errors.
+	Added two more methods pull_app_apk_from_device() and
+	install_app(). And two more scripts electric-sheep-pull-app-apk.pl
+	and electric-sheep-install-app.pl.
+0.08    2025/12/03
+        Removed the test APK files from the distribution, ough!

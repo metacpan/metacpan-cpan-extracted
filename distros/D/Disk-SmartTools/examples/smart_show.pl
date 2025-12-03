@@ -14,7 +14,6 @@
 #      Requirements and Packages       #
 ########################################
 
-use lib '../lib';
 use Dev::Util::Syntax;
 use Dev::Util::OS    qw(:all);
 use Dev::Util::Query qw(banner display_menu);
@@ -30,7 +29,7 @@ use Data::Dumper::Simple;
 use Data::Printer;
 
 Readonly my $PROGRAM => 'smart_show.pl';
-Readonly my $VERSION => version->declare("v3.3.12");
+Readonly my $VERSION => version->declare("v3.3.15");
 
 ########################################
 #      Define Global Variables         #

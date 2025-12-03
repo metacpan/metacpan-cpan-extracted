@@ -41,13 +41,13 @@ object, e.g.
     # more code here ...
 
     sub suite {
-	my $class = shift;
-
-	# Create an empty suite.
-	my $suite = Test::Unit::TestSuite->empty_new("A Test Suite");
-	# Add some tests to it via $suite->add_test() here
-
-	return $suite;
+        my $class = shift;
+        
+        # Create an empty suite.
+        my $suite = Test::Unit::TestSuite->empty_new("A Test Suite");
+        # Add some tests to it via $suite->add_test() here
+        
+        return $suite;
     }
 
 This is useful if you want your test suite to be contained in the module

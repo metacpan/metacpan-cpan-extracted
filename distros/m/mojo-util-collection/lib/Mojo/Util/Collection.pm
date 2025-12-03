@@ -8,7 +8,7 @@ our @EXPORT_OK = qw(
     collect
 );
 
-our $VERSION = '0.0.17';
+our $VERSION = '0.0.19';
 
 use List::Util;
 use Scalar::Util qw(blessed);
@@ -317,7 +317,8 @@ sub indexOf {
 
 =head2 intersect
 
-    Return a new collection containing only items that exist in both collections
+    Return a new collection containing only items that exist in both collections.
+    Uses $key to compare objects (defaults to primary_key).
 
     Returns:
     C<Collection> of C<Model> objects
@@ -325,10 +326,12 @@ sub indexOf {
 =cut
 
 sub intersect {
-    my ($self, $other_collection) = @_;
+    my ($self, $other_collection, $key) = @_;
+
+    $key ||= $self->model->primary_key;
 
     return $self->search({
-        $self->model->primary_key => $other_collection->lists($other_collection->model->primary_key),
+        $key => $other_collection->lists($key),
     });
 }
 
@@ -397,7 +400,8 @@ sub min {
 =head2 missing
 
     Return a new collection containing only items that exist in this collection
-    but not in the other collection
+    but not in the other collection.
+    Uses $key to compare objects (defaults to primary_key).
 
     Returns:
     C<Collection> of C<Model> objects
@@ -405,10 +409,12 @@ sub min {
 =cut
 
 sub missing {
-    my ($self, $other_collection) = @_;
+    my ($self, $other_collection, $key) = @_;
+
+    $key ||= $self->model->primary_key;
 
     return $self->exclude({
-        $self->model->primary_key => $other_collection->lists($other_collection->model->primary_key),
+        $key => $other_collection->lists($key),
     });
 }
 

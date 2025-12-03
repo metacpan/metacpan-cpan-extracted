@@ -46,6 +46,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Basename" : "0",
             "File::Spec::Functions" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "1.001005",
@@ -57,7 +58,7 @@
    "provides" : {
       "Getopt::Guided" : {
          "file" : "lib/Getopt/Guided.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -71,5 +72,5 @@
          "web" : "https://github.com/XSven/Getopt-Guided"
       }
    },
-   "version" : "v1.0.0"
+   "version" : "v1.1.0"
 }

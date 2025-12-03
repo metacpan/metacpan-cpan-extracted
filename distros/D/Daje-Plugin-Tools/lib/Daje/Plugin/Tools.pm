@@ -58,7 +58,7 @@ use v5.42;
 #
 
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Daje::Database::Model::ToolsProjects;
 use Daje::Database::Helper::TreeList;

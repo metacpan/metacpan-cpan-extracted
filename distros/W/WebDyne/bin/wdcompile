@@ -40,15 +40,15 @@ use Data::Dumper;
 use File::Spec;
 use FindBin qw($RealBin $Script);
 $Data::Dumper::Indent=1;
-$Data::Dumper::Terse=1;
+#$Data::Dumper::Terse=1;
 $Data::Dumper::Sortkeys=1;
-$Data::Dumper::Deepcopy=1;
-$Data::Dumper::Purity=1;
+#$Data::Dumper::Deepcopy=1;
+#$Data::Dumper::Purity=1;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  Run main
@@ -98,6 +98,7 @@ sub main {
             dest|dest_fn:s
             all
             timestamp!
+            repeat|r|num|n=s
             perl!
             filter!
             version
@@ -131,23 +132,30 @@ sub main {
     die Dumper(\%opt) if $opt{'opt'};
 
 
-    #  Create and run compile object
+    #  Loop if required as diagnostic for consistant compiles, i.e. making
+    #  sure we haven't deleted an attribute from save data tree etc.
     #
-    my $compile_or=WebDyne::Compile->new(\%opt);
-    my $data_ar=$compile_or->compile(\%opt) ||
-        return err();
+    for (1 .. ($opt{'repeat'} || 1)) {
+
+        #  Create and run compile object
+        #
+        my $compile_or=WebDyne::Compile->new(\%opt);
+        my $data_ar=$compile_or->compile(\%opt) ||
+            return err();
 
 
-    #  Dump it
-    #
-    if ($opt{'all'}) {
-        print Dumper($data_ar);
-    }
-    elsif ($opt{'meta'}) {
-        print Dumper($data_ar->[0])
-    }
-    else {
-        print Dumper($data_ar->[1])
+        #  Dump it
+        #
+        if ($opt{'all'}) {
+            print Dumper($data_ar);
+        }
+        elsif ($opt{'meta'}) {
+            print Dumper($data_ar->[0])
+        }
+        else {
+            print Dumper($data_ar->[1])
+        }
+
     }
 
     #print Data::Dumper::Dumper(grep {$_} $opt{'meta'} ? $data_ar->[0] : undef, $data_ar->[1]);
@@ -160,11 +168,9 @@ sub main {
 
 }
 
-__END__# https://github.com/aspeer/pl-markpod.git 
+__END__
 
-
-
-
+# https://github.com/aspeer/pl-markpod.git 
 
 =pod
 

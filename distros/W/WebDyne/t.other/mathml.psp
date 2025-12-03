@@ -1,0 +1,84 @@
+#  No webdyne tags here, just demonstrating mathml works 
+#
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathML Demo</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #0e0e0e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    math {
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 1rem 2rem;
+      margin: 1rem 0;
+      font-size: 1.6rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚡ MathML in Modern Browsers</h1>
+
+  <!-- Quadratic Formula -->
+  <math display="block">
+    <mi>x</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <mo>−</mo>
+        <mi>b</mi>
+        <mo>±</mo>
+        <msqrt>
+          <msup><mi>b</mi><mn>2</mn></msup>
+          <mo>−</mo>
+          <mn>!{! 3+3 !}</mn><mi>a</mi><mi>c</mi>
+        </msqrt>
+      </mrow>
+      <mrow>
+        <mn>2</mn><mi>a</mi>
+      </mrow>
+    </mfrac>
+  </math>
+
+  <!-- Summation Example -->
+  <math display="block">
+    <munderover>
+      <mo>∑</mo>
+      <mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow>
+      <mi>n</mi>
+    </munderover>
+    <msup><mi>i</mi><mn>2</mn></msup>
+    <mo>=</mo>
+    <mfrac>
+      <mrow><mi>n</mi><mo>(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo>)(</mo><mn>2</mn><mi>n</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow>
+      <mn>6</mn>
+    </mfrac>
+  </math>
+
+  <!-- Integral Example -->
+  <math display="block">
+    <msubsup>
+      <mo>∫</mo>
+      <mn>0</mn>
+      <mn>∞</mn>
+    </msubsup>
+    <msup><mi>e</mi><mrow><mo>−</mo><mi>x</mi></mrow></msup>
+    <mi>dx</mi>
+    <mo>=</mo>
+    <mn>1</mn>
+  </math>
+
+  <p>All rendered natively with MathML — no JavaScript required 🚀</p>
+</body>
+</html>

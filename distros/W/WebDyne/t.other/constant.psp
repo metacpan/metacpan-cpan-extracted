@@ -1,0 +1,6 @@
+<start_html>
+<pre>
+<? Dumper(\%WebDyne::Constant::Constant) ?>
+__PERL__
+use Data::Dumper;
+$Data::Dumper::Sortkeys=1

@@ -44,7 +44,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  Debug load
@@ -372,6 +372,7 @@ sub print {
 
     my $r=shift();
     my $fh=$r->{'select'} || \*STDOUT;
+    debug("print fh: $fh");
     CORE::print $fh ((ref($_[0]) eq 'SCALAR') ? ${$_[0]} : @_);
 
 }
@@ -532,7 +533,7 @@ sub AUTOLOAD {
     my ($r, $v)=@_;
     debug("$r AUTOLOAD: $AUTOLOAD, v: $v");
     my $k=($AUTOLOAD=~/([^:]+)$/) && $1;
-    warn(sprintf("Unhandled '%s' method, using AUTOLOAD", $k));
+    warn(sprintf("Unhandled '%s' method, using AUTOLOAD. Caller:%s", $k, Dumper([caller(0)])));
     $v ? $r->{$k}=$v : $r->{$k};
 
 

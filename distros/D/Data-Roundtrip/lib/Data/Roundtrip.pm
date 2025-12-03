@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -31,6 +31,12 @@ use YAML::PP qw/Load Dump/;
 use Data::Dumper qw/Dumper/;
 use Data::Dump qw/pp/;
 use Data::Dump::Filtered;
+
+# There are cases where a malformed json causes an error (not a die)
+# but I have no idea where it is so I thought, 
+# on the expense of adding one more dependency, 
+# to include this:
+use Devel::StackTrace;
 
 use Exporter;
 # the EXPORT_OK and EXPORT_TAGS is code by [kcott] @ Perlmongs.org, thanks!
@@ -240,27 +246,53 @@ sub	yamlfile2perl {
 	if( ! defined $pv ){ print STDERR "yamlfile2perl() : error, call to yaml2perl() has failed after reading yaml string from file '${yaml_file}'.\n"; return undef }
 	return $pv;
 }
+# Optional input parameter following the required $json_string
+# is a HASHREF:
+#   'boolean_values' => [X, Y] : this is an ARRAYREF of 2 items json-false is mapped to X
+#                                and json-true is mapped to Y, e.g. [0,1].
+#                                JSON's default is JSON::PP::Boolean objects. Yikes
 sub	json2perl {
 	my $json_string = $_[0];
-	#my $params = defined($_[1]) ? $_[1] : {};
+	my $params = defined($_[1]) ? $_[1] : {};
 	my $pv;
+
+	# NOTE: the JSON OO interface has encode() and decode()
+	# whereas the function has encode_json() and decode_json()
 	if( _has_utf8($json_string) ){
-		# intercepting a die by wrapping in an eval
-		$pv = eval { JSON::decode_json(Encode::encode_utf8($json_string)) };
-		if( ! defined($pv) ){ print STDERR "json2perl() :  error, call to json2perl() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception: $@:":".")."\n"; return undef }
+		if( exists($params->{'boolean_values'}) && defined($params->{'boolean_values'}) && ref($params->{'boolean_values'})eq'ARRAY' ){
+			# in OO it needs decode()
+			# boolean_values(x,y)
+			$pv = eval {
+			  JSON->new()
+			      ->boolean_values(@{ $params->{'boolean_values'} })
+			      ->utf8(0)->decode($json_string)
+			};
+		} else {
+			# intercepting a die by wrapping in an eval
+			$pv = eval { JSON::decode_json(Encode::encode_utf8($json_string)) };
+		}
+		if( ! defined($pv) ){ print STDERR Devel::StackTrace->new->as_string . "\njson2perl() :  error, call to json2perl() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception: $@:":".")."\n"; return undef }
 	} else {
-		# intercepting a die by wrapping in an eval
-		$pv = eval { JSON::decode_json($json_string) };
-		if( ! defined($pv) ){ print STDERR "json2perl() :  error, call to json2perl() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception: $@:":".")."\n"; return undef }
+		if( exists($params->{'boolean_values'}) && defined($params->{'boolean_values'}) && ref($params->{'boolean_values'})eq'ARRAY' ){
+			# boolean_values(x,y)
+			$pv = eval {
+			  JSON->new()
+			      ->boolean_values(@{ $params->{'boolean_values'} })
+			      ->decode($json_string)
+			};
+		} else {
+			# intercepting a damn die by wrapping it around an eval
+			$pv = eval { JSON::decode_json($json_string) };
+		}
+		if( ! defined($pv) ){ print STDERR Devel::StackTrace->new->as_string."\njson2perl() :  error, call to json2perl() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception: $@:":".")."\n"; return undef }
 	}
 	return $pv;
 }
 sub	jsonfile2perl {
 	my $json_file = $_[0];
-	#my $params = defined($_[1]) ? $_[1] : {};
 	my $contents = read_from_file($json_file);
 	if( ! defined $contents ){ print STDERR "jsonfile2perl() : error, failed to read from file '${json_file}'.\n"; return undef }
-	my $pv = json2perl($contents);
+	my $pv = json2perl($contents, $_[1]);
 	if( ! defined $pv ){ print STDERR "jsonfile2perl() : error, call to json2perl() has failed after reading json string from file '${json_file}'.\n"; return undef }
 	return $pv;
 }
@@ -655,7 +687,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =head1 SYNOPSIS
 
@@ -731,6 +763,13 @@ format (not spaces, indendation or line breaks).
     # have its unicode content escaped:
     my $json_with_unicode_escaped =
           json2json($jsonstr, {'escape-unicode'=>1});
+
+    # sometimes we want JSON's true and false values
+    # to be mapped to something other than JSON::PP::Boolean objects:
+    my $json_with_custom_boolean_mapping = json2perl($jsonstr,
+	{'boolean_values' => 'myfalse', 'mytrue'});
+    my $json_with_custom_boolean_mapping = json2perl($jsonstr,
+	{'boolean_values' => 0, 1});
 
     # With version 0.18 and up two more exported-on-demand
     # subs were added to read JSON or YAML directly from a file:
@@ -1254,13 +1293,21 @@ Anything really.
 
 =head2 C<json2perl>
 
-    my $ret = json2perl($jsonstring)
+    my $ret = json2perl($jsonstring, $optional_paramshashref)
 
 Arguments:
 
 =over 4
 
 =item * C<$jsonstring>
+
+=item * C<$optional_paramshashref> is an optional hashref as it is blindingly obvious from
+the name. At the moment only one parameter is understood: C<boolean_values>.
+It must be an ARRAYREF of 0 or 2 elements. If 0 elements, then it resets the boolean
+values mapping of the JSON converter to its default state (which is L<JSON::PP::Boolean> objects.
+If it contains 2 elements, then the JSON converter will map a JSON C<false> value to
+the first element of the ARRAYREF and a JSON C<true> value to
+the second element of the ARRAYREF.
 
 =back
 
@@ -1400,7 +1447,6 @@ Return value:
 
 =item * C<$ret>
 
-=back
 Given an input string C<$dumpstring>, which can
 have been produced by e.g. C<perl2dump()>
 and is identical to L<Data::Dumper>'s C<Dumper()> output,
@@ -1421,6 +1467,7 @@ For example:
 
 It returns the a dump string similar to 
 
+=back
 
 =head2 C<read_from_file>
 

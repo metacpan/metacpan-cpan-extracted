@@ -8,8 +8,8 @@ use Test;
 
 foreach (qw(Makefile.PL Makefile examples lib t)) {
     die("Please run 'make test' from the top-level source directory\n".
-	"(I can't see $_)\n")
-	unless -e $_;
+        "(I can't see $_)\n")
+        unless -e $_;
 }
 
 my %skip = map { ("examples/$_") => 1 }
@@ -62,8 +62,8 @@ plan(tests => scalar(@examples));
 
 foreach my $e (keys %guru_checked) {
     warn("Guru ".(defined $guru_checked{$e} ? 'answer' : 'excuse').
-	 " exists for '$e' but there is no test file\n")
-	unless grep { $_ eq $e } @examples;
+        " exists for '$e' but there is no test file\n")
+        unless grep { $_ eq $e } @examples;
 }
 
 
@@ -83,31 +83,31 @@ my $perl = $^X || "perl";
 
 foreach my $e (@examples) {
     if (defined $guru_checked{$e}) {
-	# get program output
+    # get program output
         my $runner = $e =~ /\.pm$/ ? './TestRunner.pl ' : '';
         my $cmd = "$perl -I examples $runner$e 2>&1";
 #        warn "cmd $cmd\n";
-	my $out = `$cmd`;
-	foreach ($out, $guru_checked{$e}) {
-	    # mess about with start & end newlines
-	    s/^\n+//;
-	    $_ .= "\n" unless /\n$/;
-	    # bin the naughty carriage returns
-	    s/\r//g;
-	    # we can't assume the order of tests will be the same
-	    s/^[.F]+\n?Suite teardown$/TEST-RUN-SUMMARY/sm;
-	    s/::Load[0-9_]+Anonymous[0-9_]+/::LOAD_ANONYMOUS_CLASSNAME/;
-	    # indent lines with '# ' so they're comments if the test fails
-	    s/\n/\n# /g;
-	    # hide things that look like CPU usage
-	    s{Time:\s+[\d\.]+\s+wallclock secs \([\d\s\.]+usr\s+\+[\d\s\.]+sys\s+=[\d\s\.]+CPU\)}
-	    {TIME-SUMMARY}g;
-	}
-	ok($out, $guru_checked{$e});
+        my $out = `$cmd`;
+        foreach ($out, $guru_checked{$e}) {
+            # mess about with start & end newlines
+            s/^\n+//;
+            $_ .= "\n" unless /\n$/;
+            # bin the naughty carriage returns
+            s/\r//g;
+            # we can't assume the order of tests will be the same
+            s/^[.F]+\n?Suite teardown$/TEST-RUN-SUMMARY/sm;
+            s/::Load[0-9_]+Anonymous[0-9_]+/::LOAD_ANONYMOUS_CLASSNAME/;
+            # indent lines with '# ' so they're comments if the test fails
+            s/\n/\n# /g;
+            # hide things that look like CPU usage
+            s{Time:\s+[\d\.]+\s+wallclock secs \([\d\s\.]+usr\s+\+[\d\s\.]+sys\s+=[\d\s\.]+CPU\)}
+            {TIME-SUMMARY}g;
+        }
+        ok($out, $guru_checked{$e});
     } else {
-	skip( (exists $guru_checked{$e}
-	       ? "Skip $e: not yet checked"
-	       : 0),
-	      "nothing", "data at \$guru_checked{$e}");
+        skip( (exists $guru_checked{$e}
+                    ? "Skip $e: not yet checked"
+                    : 0),
+                "nothing", "data at \$guru_checked{$e}");
     }
 }

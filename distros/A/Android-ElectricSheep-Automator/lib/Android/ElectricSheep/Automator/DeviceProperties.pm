@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -93,23 +93,37 @@ sub enquire {
 	# here we could also save to a file on device and then
 	# fetch it locally. We will do that if there are problems
 	# getting the dump from STDOUT
-	@cmd = qw/dumpsys window/;
+	@cmd = ('wm', 'size');
 	$res = $self->adb->shell(@cmd);
 	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return 1 }
 	if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nsSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return 1 }
 
-	if( $res->[1] =~ /PinnedStackController.+?mDisplayInfo=DisplayInfo\{.+?\breal\b\s*(\d+)\s*x\s*(\d+)/s ){
+	if( $res->[1] =~ /Physical size:\s*(\d+)\s*x\s*(\d+)/s ){
 		$self->set('w', $1);
 		$self->set('h', $2);
-	} else { $log->error("DUMPSYS:\n".$res->[1]."\nEND DUMPSYS\n${whoami} (via $parent), line ".__LINE__." : error, failed to find screen size in above dumpsys."); return 1 }
+	} else { $log->error($res->[1]."\n${whoami} (via $parent), line ".__LINE__." : error, failed to find screen size in above output of command: ".join(' ', @cmd)); return 1 }
 
-	if( $res->[1] =~ /PinnedStackController.+?mDisplayInfo=DisplayInfo\{.+?\bdensity\s+(\d+)\s+\((.+?)\s*x\s*(.+?)\)\s+dpi/s ){
+	@cmd = ('wm', 'density');
+	$res = $self->adb->shell(@cmd);
+	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return 1 }
+	if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nsSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return 1 }
+
+	if( $res->[1] =~ /Physical density:\s*(\d+)/s ){
 		$self->set('density', $1);
-		$self->set('density-x', $2);
-		$self->set('density-y', $3);
-	} else { $log->error("DUMPSYS:\n".$res->[1]."\nEND DUMPSYS\n${whoami} (via $parent), line ".__LINE__." : error, failed to find screen density in above dumpsys."); return 1 }
+		#$self->set('density-x', $2); # no obsolete
+		#$self->set('density-y', $3);
+	} else { $log->error($res->[1]."\n${whoami} (via $parent), line ".__LINE__." : error, failed to find screen size in above output of command: ".join(' ', @cmd)); return 1 }
 
-	if( $res->[1] =~ /DisplayFrames w=.+?r=(\d+)/ ){
+	# here we could also save to a file on device and then
+	# fetch it locally. We will do that if there are problems
+	# getting the dump from STDOUT
+	@cmd = qw/dumpsys window displays/;
+	$res = $self->adb->shell(@cmd);
+	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return 1 }
+	if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nsSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return 1 }
+
+	# this can fail as they keep changing all these...
+	if( $res->[1] =~ /DisplayRotation.+?mCurrentRotation=(ROTATION_\d+)/s ){
 		$self->set('orientation', $1);
 	} else { $log->error("DUMPSYS:\n".$res->[1]."\nEND DUMPSYS\n${whoami} (via $parent), line ".__LINE__." : error, failed to find orientation in above dumpsys."); return 1 }
 
@@ -156,7 +170,7 @@ Android::ElectricSheep::Automator - The great new Android::ElectricSheep::Automa
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 
 =head1 SYNOPSIS

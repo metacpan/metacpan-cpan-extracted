@@ -4,6 +4,7 @@ use utf8;
 
 use Test::More tests => 6;
 require bytes;
+use version;
 
 BEGIN {
   use_ok 'Win32';
@@ -14,6 +15,7 @@ BEGIN {
 
 BEGIN { subtest "Import private helper's" => sub {
   can_ok('Win32API::Console' =>
+    'CP_ACP', 
     'CP_UTF8', 
     'ERROR_SUCCESS',
     'ERROR_INVALID_HANDLE',
@@ -28,6 +30,7 @@ BEGIN { subtest "Import private helper's" => sub {
     '__HRESULT_FROM_WIN32',
   );
   no warnings;
+  *CP_ACP                 = Win32API::Console->can('CP_ACP');
   *CP_UTF8                = Win32API::Console->can('CP_UTF8');
   *ERROR_SUCCESS          = Win32API::Console->can('ERROR_SUCCESS');
   *ERROR_INVALID_HANDLE   = Win32API::Console->can('ERROR_INVALID_HANDLE');
@@ -42,6 +45,7 @@ BEGIN { subtest "Import private helper's" => sub {
   *__HRESULT_FROM_WIN32   = Win32API::Console->can('__HRESULT_FROM_WIN32');
 }}
 
+my $os;
 subtest 'GetOSVersion' => sub {
   my $id = GetOSVersion();
   diag "$^E" if $^E;
@@ -51,23 +55,34 @@ subtest 'GetOSVersion' => sub {
   diag "$^E" if $^E;
   cmp_ok(@ver, '>=', 5, 'GetOSVersion() array context');
   note join(", " => @ver);
+  $os = version->declare(sprintf('v%2$d.%3$d.%4$d', @ver));
 };
 
 subtest 'WideCharToMultiByte and back' => sub {
-  my $original = "Viele Grüße";
+  my ($cp, $original);
+  if ($os < v10.0.1903) {
+    # Before Windows 10, there was no native UTF-8 system locale.
+    $cp = CP_ACP;
+    $original = "Hello";
+  } 
+  else {
+    # Starting with Windows 10 (1903), there is beta support for UTF-8.
+    $cp = CP_UTF8;
+    $original = "Viele Grüße";
+  }
 
-  # Convert multibyte to wide string (UTF-8 codepage)
-  my $wide = MultiByteToWideChar($original, CP_UTF8);
+  # Convert multibyte to wide string
+  my $wide = MultiByteToWideChar($original, $cp);
   ok(defined $wide, 'MultiByteToWideChar returned a value');
   ok($wide, 'wide string is not empty');
 
   # Convert back to multibyte string
-  my $mb = WideCharToMultiByte($wide, CP_UTF8);
+  my $mb = WideCharToMultiByte($wide, $cp);
   ok(defined $mb, 'WideCharToMultiByte returned a value');
   ok($mb, 'Multibyte string is not empty');
   is(
-    bytes::substr($original, 0), 
-    bytes::substr($mb, 0), 
+    bytes::substr($mb, 0),
+    bytes::substr($original, 0),
     'Round-trip conversion preserved string'
   );
 };

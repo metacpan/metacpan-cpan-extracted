@@ -41,11 +41,16 @@ subtest save_file => sub {
    is( $text, "abcdefgh", "temp file now contains secret" );
 
    $buf->length(3); # truncate buffer
-   ok( $buf->save_file("$f", 'rename'), 'overwrite via rename' );
-   $f->seek(0,0);
-   $text= <$f>;
-   is( $text, "abcdefgh", "previous file content unchanged" );
-   $f->close;
+   if ($^O eq 'MSWin32') { # Win32 can't rename overtop an open file
+      $f->close;
+      ok( $buf->save_file("$f", 'rename'), 'overwrite via rename' );
+   } else {
+      ok( $buf->save_file("$f", 'rename'), 'overwrite via rename' );
+      $f->seek(0,0);
+      $text= <$f>;
+      is( $text, "abcdefgh", "previous file content unchanged" );
+      $f->close;
+   }
    open my $fh, '<', "$f" or die "$!";
    $text= <$fh>;
    is( $text, "abc", "new file contains only 3 bytes" );

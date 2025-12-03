@@ -11,6 +11,8 @@ sub MY::libscan {
     return if $file =~  /^experiments$/; # private folder
     return if $file =~  /^doc$/; # private folder
     return if $file =~  /^forums$/; # private folder
+    return if $file =~  /^apks$/; # private folder (which is used for xt/live tests)
+    return if $file =~ /.*\.apk$/; # SKIP test apk files
     return if $file =~ /\.lock.*$/; # SKIP editor files
     return $file;
 }
@@ -60,6 +62,11 @@ my %WriteMakefileArgs = (
 	'XML::XPath' => '0',
 	'Time::HiRes' => '0',
 	'Image::PNG' => '0',
+	'Getopt::Long' => '0',
+	'Encode' => '0',
+	'File::Basename' => '0',
+	'File::Path' => '0',
+	'File::Spec' => '0',
 
 	# by Android::ADB
 	'Carp' => '0',

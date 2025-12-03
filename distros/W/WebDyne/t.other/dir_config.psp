@@ -1,0 +1,8 @@
+<start_html>
+<pre>
+<? Dumper(shift()->r->dir_config()) ?>
+</pre>
+__PERL__
+use Data::Dumper;
+$Data::Dumper::Indent=1;
+$Data::Dumper::Sortkeys=1;

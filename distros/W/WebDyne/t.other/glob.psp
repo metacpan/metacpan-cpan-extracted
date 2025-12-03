@@ -1,0 +1,7 @@
+<start_html>
+<pre>
+<? glob('~') ?>
+<? Dumper(&WebDyne::Constant::local_constant_pn()) ?>
+<? $WebDyne::WEBDYNE_CONF ?>
+__PERL__
+use Data::Dumper;

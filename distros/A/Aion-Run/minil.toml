@@ -1,0 +1,18 @@
+name = "Aion-Run"
+
+authority="cpan:DART"
+license="gpl_3"
+
+markdown_maker = "Liveman::MinillaPod2Markdown"
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+[unsupported]
+os = [
+    "MSWin32",
+    "os2",
+    "VMS",
+    "NetWare",
+    "symbian",
+    "dos"
+]

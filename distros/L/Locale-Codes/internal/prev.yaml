@@ -14035,7 +14035,7 @@ language:
       clj: Laitu Chin
       clk: Idu-Mishmi
       cll: Chala
-      clm: Clallam
+      clm: Klallam
       clo: Lowland Oaxaca Chontal
       cls: Classical Sanskrit
       clt: Lautu Chin
@@ -16161,7 +16161,7 @@ language:
       kwh: Kowiai
       kwi: Awa-Cuaiquer
       kwj: Kwanga
-      kwk: Kwakiutl
+      kwk: Kwak'wala
       kwl: Kofyar
       kwm: Kwambi
       kwn: Kwangali
@@ -20656,7 +20656,7 @@ language:
       zmm: Marimanindji
       zmn: Mbangwe
       zmo: Molo
-      zmp: Mpuono
+      zmp: Mbuun
       zmq: Mituku
       zmr: Maranunggu
       zms: Mbesa
@@ -24940,9 +24940,6 @@ language:
       ciwogai: 
         - tgd
         - Ciwogai
-      clallam: 
-        - clm
-        - Clallam
       classical armenian: 
         - xcl
         - Classical Armenian
@@ -30517,6 +30514,9 @@ language:
       kla-dan: 
         - lda
         - Kla-Dan
+      klallam: 
+        - clm
+        - Klallam
       klamath-modoc: 
         - kla
         - Klamath-Modoc
@@ -31429,9 +31429,9 @@ language:
       kwaja: 
         - kdz
         - Kwaja
-      kwakiutl: 
+      kwak'wala: 
         - kwk
-        - Kwakiutl
+        - Kwak'wala
       kwakum: 
         - kwu
         - Kwakum
@@ -33892,6 +33892,9 @@ language:
       mburku: 
         - bbt
         - Mburku
+      mbuun: 
+        - zmp
+        - Mbuun
       mbwela: 
         - mfu
         - Mbwela
@@ -34735,9 +34738,6 @@ language:
       mpumpong: 
         - mgg
         - Mpumpong
-      mpuono: 
-        - zmp
-        - Mpuono
       mpur: 
         - akc
         - Mpur
@@ -46806,6 +46806,7 @@ langvar:
       1994: Standardized Resian orthography
       1996: German orthography of 1996
       abl1943: Orthographic formulation of 1943 - Official in Brazil (Formulario Ortografico de 1943 - Oficial no Brasil)
+      akhmimic: Akhmimic dialect of Coptic
       akuapem: Akuapem Twi
       alalc97: ALA-LC Romanization, 1997 edition
       aluku: Aluku dialect
@@ -46825,6 +46826,7 @@ langvar:
       biscayan: Biscayan dialect of Basque
       biske: The San Giorgio dialect of Resian
       blasl: Black American Sign Language dialect
+      bohairic: Bohairic dialect of Coptic
       bohoric: Slovene in Bohoric alphabet
       boont: Boontling
       bornholm: Bornholmsk
@@ -46836,6 +46838,7 @@ langvar:
       ekavsk: Serbian with Ekavian pronunciation
       emodeng: Early Modern English (1500-1700)
       fascia: Fascia standard of Ladin
+      fayyumic: Fayyumic dialect of Coptic
       fodom: Fodom standard of Ladin
       fonipa: International Phonetic Alphabet
       fonkirsh: Kirshenbaum Phonetic Alphabet
@@ -46869,8 +46872,10 @@ langvar:
       ltg1929: The Latgalian language orthography codified in 1929
       ltg2007: The Latgalian language orthography codified in the language law in 2007
       luna1918: Post-1917 Russian orthography
+      lycopol: Lycopolitan alias Subakhmimic dialect of Coptic
       mdcegyp: Ancient Egyptian hieroglyphs encoded in Manuel de Codage
       mdctrans: Ancient Egyptian transliteration encoded in Manuel de Codage
+      mesokem: Mesokemic alias Oxyrhynchite dialect of Coptic
       metelko: Slovene in Metelko alphabet
       monoton: Monotonic Greek
       ndyuka: Ndyuka dialect
@@ -46895,6 +46900,7 @@ langvar:
       rigik: Volapuk rigik
       rozaj: Resian
       rumgr: Rumantsch Grischun
+      sahidic: Sahidic dialect of Coptic
       saigon: The Sai Gon variant of Vietnamese
       scotland: Scottish Standard English
       scouse: Scouse
@@ -46918,6 +46924,7 @@ langvar:
       valencia: Valencian
       vallader: Vallader idiom of Romansh
       vecdruka: Latvian orthography used before 1920s ("veca druka")
+      viennese: The Viennese dialect of German
       vivaraup: Vivaro-Alpine
       wadegile: Wade-Giles romanization
       xsistemo: Standard X-system orthographic fallback for spelling Esperanto
@@ -46925,6 +46932,9 @@ langvar:
       "\"academic\" (\"governmental\") variant of belarusian as codified in 1959": 
         - 1959acad
         - "\"Academic\" (\"governmental\") variant of Belarusian as codified in 1959"
+      akhmimic dialect of coptic: 
+        - akhmimic
+        - Akhmimic dialect of Coptic
       akuapem twi: 
         - akuapem
         - Akuapem Twi
@@ -46976,6 +46986,9 @@ langvar:
       black american sign language dialect: 
         - blasl
         - Black American Sign Language dialect
+      bohairic dialect of coptic: 
+        - bohairic
+        - Bohairic dialect of Coptic
       boontling: 
         - boont
         - Boontling
@@ -47012,6 +47025,9 @@ langvar:
       fascia standard of ladin: 
         - fascia
         - Fascia standard of Ladin
+      fayyumic dialect of coptic: 
+        - fayyumic
+        - Fayyumic dialect of Coptic
       fodom standard of ladin: 
         - fodom
         - Fodom standard of Ladin
@@ -47066,6 +47082,12 @@ langvar:
       limousin: 
         - lemosin
         - Limousin
+      lycopolitan alias subakhmimic dialect of coptic: 
+        - lycopol
+        - Lycopolitan alias Subakhmimic dialect of Coptic
+      mesokemic alias oxyrhynchite dialect of coptic: 
+        - mesokem
+        - Mesokemic alias Oxyrhynchite dialect of Coptic
       mistralian or mistralian-inspired occitan orthography: 
         - grmistr
         - Mistralian or Mistralian-inspired Occitan orthography
@@ -47141,6 +47163,9 @@ langvar:
       rumantsch grischun: 
         - rumgr
         - Rumantsch Grischun
+      sahidic dialect of coptic: 
+        - sahidic
+        - Sahidic dialect of Coptic
       scottish standard english: 
         - scotland
         - Scottish Standard English
@@ -47237,6 +47262,9 @@ langvar:
       the stolvizza dialect of resian: 
         - solba
         - The Stolvizza dialect of Resian
+      the viennese dialect of german: 
+        - viennese
+        - The Viennese dialect of German
       tongyong pinyin romanization: 
         - tongyong
         - Tongyong Pinyin romanization

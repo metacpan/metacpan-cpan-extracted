@@ -1075,6 +1075,46 @@ examples/README.md
 lib/WebDyne/Filter.pm                    
 t/07-dir_config.t                        
 t/webdyne_dir-config.conf.pl             
+favicon.ico                              
+lib/WebDyne/CGI.pm                       
+lib/WebDyne/CGI/PSGI.pm                  
+lib/WebDyne/CGI/Simple.pm                
+t.error/error_custom_401.psp             
+t.other/cgi_param_expand.psp             
+t.other/constant.psp                     
+t.other/cwd.psp                          
+t.other/dir_config.psp                   
+t.other/dump.psp                         
+t.other/env.psp                          
+t.other/glob.psp                         
+t.other/location.psp                     
+t.other/mathml.psp                       
+t.other/r_dump.psp                       
+t.other/r_plack.pl                       
+t.other/redirect.psp                     
+t.other/svg.psp                          
+t.other/upload.psp                       
+t.other/version.psp                      
+t/08-cgi_param_expand.t                  
+t/cgi_param_expand.psp                   
+t/data/02-cgi_param_expand.dat.0         
+t/data/02-cgi_param_expand.dat.1         
+t/data/02-cgi_param_expand.dat.2         
+t/data/02-cgi_param_expand.dat.3         
+t/data/02-cgi_param_expand.dat.4         
+t/data/02-cgi_param_expand.dat.5         
+t/data/02-cgi_param_expand.dat.final     
+t/data/02-cgi_param_expand.html          
+t/data/02-cgi_param_expand.tree          
+t/data/08-cgi_param_expand.dat.0         
+t/data/08-cgi_param_expand.dat.1         
+t/data/08-cgi_param_expand.dat.2         
+t/data/08-cgi_param_expand.dat.3         
+t/data/08-cgi_param_expand.dat.4         
+t/data/08-cgi_param_expand.dat.5         
+t/data/08-cgi_param_expand.dat.final     
+t/data/08-cgi_param_expand.html          
+t/data/08-cgi_param_expand.tree          
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 ChangeLog                                Module ChangeLog (added by ExtUtils::Git)

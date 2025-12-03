@@ -1,5 +1,21 @@
 Revision history for Win32API::Console
 
+0.3.1  2025-12-02
+    - Add limitations to POD
+    - Change PeekConsoleInput returns "0 but true" if read is 0
+    - Fix tests with CP_UTF8, use alternative code page for old systems
+
+0.3.0  2025-12-01
+    - Add Get/SetConsoleScreenBufferInfoEx functions
+    - Fix use of 'S' instead of 's' for COORD and SMALL_RECT
+    - Fix is hash reference in CONSOLE_SCREEN_BUFFER_INFO
+    - Fix parameter in CONSOLE_FONT_INFO/EX
+
+0.2.4  2025-11-28
+    - Change the scope for the OS version information, now local
+    - Fix coding switches, should also work in the event of a fault
+    - Fix ANSI string param of Win32::API imports: UTF8 flag must be off
+
 0.2.3  2025-11-27
     - Fix the switch of the wrapper functions
     - Fixed related ANSI and WCHAR tests

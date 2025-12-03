@@ -30,8 +30,6 @@ SKIP: {
   my $got = GetConsoleScreenBufferInfo($hConsole, \%info);
   diag "$^E" if $^E;
   ok($got, 'GetConsoleScreenBufferInfo returned true');
-  plan skip_all => 'Cannot proceed if the dimension is unknown' 
-    unless $info{srWindow};
 
   # Save original window rectangle
   my %original_window = %{$info{srWindow}};

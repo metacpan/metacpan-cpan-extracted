@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Tue Sep  2 11:06:54 EDT 2025
+#    Generated on: Tue Dec  2 16:02:25 EST 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.85';
+$VERSION='3.86';
 
 $Locale::Codes::Data{'language'}{'id'} = '8035';
 
@@ -552,8 +552,6 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Ancient Greek (to 1453)),
       ],
    q(0165) => [
-      q(Greek, Modern (1453-)),
-      q(Greek),
       q(Modern Greek (1453-)),
       ],
    q(0166) => [
@@ -999,11 +997,9 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Navaho),
       ],
    q(0304) => [
-      q(Ndebele, South),
       q(South Ndebele),
       ],
    q(0305) => [
-      q(Ndebele, North),
       q(North Ndebele),
       ],
    q(0306) => [
@@ -1021,8 +1017,8 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(0309) => [
       q(Nepal Bhasa),
-      q(Newari),
       q(Newar),
+      q(Newari),
       ],
    q(0310) => [
       q(Nias),
@@ -1035,10 +1031,8 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(0313) => [
       q(Norwegian Nynorsk),
-      q(Nynorsk, Norwegian),
       ],
    q(0314) => [
-      q(Bokmal, Norwegian),
       q(Norwegian Bokmal),
       ],
    q(0315) => [
@@ -28467,10 +28461,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(7657),
       q(0),
       ],
-   q(bokmal, norwegian) => [
-      q(0314),
-      q(0),
-      ],
    q(boko (benin)) => [
       q(1393),
       q(0),
@@ -33951,10 +33941,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(0163),
       q(0),
       ],
-   q(greek) => [
-      q(0165),
-      q(1),
-      ],
    q(greek languages) => [
       q(0509),
       q(0),
@@ -33965,10 +33951,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(greek, ancient (to 1453)) => [
       q(0164),
-      q(0),
-      ],
-   q(greek, modern (1453-)) => [
-      q(0165),
       q(0),
       ],
    q(green gelao) => [
@@ -43789,7 +43771,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(modern greek (1453-)) => [
       q(0165),
-      q(2),
+      q(0),
       ],
    q(modole) => [
       q(4518),
@@ -45107,14 +45089,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(4805),
       q(0),
       ],
-   q(ndebele, north) => [
-      q(0305),
-      q(0),
-      ],
-   q(ndebele, south) => [
-      q(0304),
-      q(0),
-      ],
    q(ndemli) => [
       q(4991),
       q(0),
@@ -45345,11 +45319,11 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(newar) => [
       q(0309),
-      q(2),
+      q(1),
       ],
    q(newari) => [
       q(0309),
-      q(1),
+      q(2),
       ],
    q(neyo) => [
       q(4846),
@@ -46157,7 +46131,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(north ndebele) => [
       q(0305),
-      q(1),
+      q(0),
       ],
    q(north nuaulu) => [
       q(5014),
@@ -46565,7 +46539,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(norwegian bokmal) => [
       q(0314),
-      q(1),
+      q(0),
       ],
    q(norwegian nynorsk) => [
       q(0313),
@@ -46930,10 +46904,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(nyiyaparli) => [
       q(7489),
       q(0),
-      ],
-   q(nynorsk, norwegian) => [
-      q(0313),
-      q(1),
       ],
    q(nyokon) => [
       q(5150),
@@ -51945,7 +51915,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(south ndebele) => [
       q(0304),
-      q(1),
+      q(0),
       ],
    q(south nuaulu) => [
       q(5168),
@@ -58617,7 +58587,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(el) => [
          q(0165),
-         q(2),
+         q(0),
          ],
       q(en) => [
          q(0124),
@@ -58917,11 +58887,11 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(nb) => [
          q(0314),
-         q(1),
+         q(0),
          ],
       q(nd) => [
          q(0305),
-         q(1),
+         q(0),
          ],
       q(ne) => [
          q(0308),
@@ -58945,7 +58915,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(nr) => [
          q(0304),
-         q(1),
+         q(0),
          ],
       q(nv) => [
          q(0303),

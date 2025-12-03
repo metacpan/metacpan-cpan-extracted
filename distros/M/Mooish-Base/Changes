@@ -1,5 +1,10 @@
 Revision history for Mooish-Base
 
+1.000 - 2025-12-02
+	- Added -standard flag, which allows module authors to use the module
+	- Module now automatically loads known performance-improving modules based on flavour
+	- Module now requires perl 5.10 (down from 5.14)
+
 0.002 - 2025-03-02
 	- Moose class will automatically be made immutable with Hook::AfterRuntime installed
 

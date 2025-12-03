@@ -12,13 +12,12 @@ use Disk::SmartTools qw(:all);
 #             get_raid_cmd             #
 #======================================#
 
-if ( is_linux() ) {
-    my $raid_cmd = get_raid_cmd();
-    $raid_cmd =~ s| .*$||;
+my $raid_cmd = get_raid_cmd();
+SKIP: {
+    skip "RAID command not found", 1 unless ( defined $raid_cmd );
+    skip "Not a linux system",     1 unless ( is_linux() );
+    if ( defined $raid_cmd ) { $raid_cmd =~ s| .*$||; }
     ok( file_executable($raid_cmd), "get_raid_cmd - raid cmd is executable." );
-}
-else {
-    pass("Not a linux system");
 }
 
 done_testing;

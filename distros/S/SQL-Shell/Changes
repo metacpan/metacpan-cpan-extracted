@@ -1,5 +1,9 @@
 Revision history for Perl module SQL::Shell
 
+1.18 - 2025-12-02
+
+  * Added use of File::Temp for handling temporary files.
+
 1.17 - 2019-05-24
 
   * Added missing prerequisites to Makefile.PL

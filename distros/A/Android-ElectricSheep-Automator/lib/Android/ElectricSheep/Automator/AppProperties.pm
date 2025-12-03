@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -32,7 +32,11 @@ sub new {
 			# both are extracted from pkg=Package{3d33653 com.viber.voip}
 			'packageName' => '',
 			'packageId' => '',
+			# where apks are
 			'codePath' => '',
+			# path(s) to one or more apk files found under the codePath above,
+			# it can be empty []
+			'apkPaths' => [],
 			'resourcePath' => '',
 			'applicationInfo' => '',
 			'dataDir' => '',
@@ -69,6 +73,7 @@ sub new {
 	){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, input parameter 'mother' with our parent Android::ElectricSheep::Automator object was not specified.\n"; return undef }
 	$self->{'_private'}->{'mother'} = $params->{'mother'};
 	# we now have a mother
+	my $mother = $self->mother();
 
 	if( exists $params->{'logger-object'} ){
 		$self->{'_private'}->{'logger-object'} = $params->{'logger-object'}
@@ -98,6 +103,29 @@ sub new {
 		# we have a package name, we will enquire about it and we
 		# fill us up with its info
 		if( 1 == $self->enquire({'package' => $params->{'package'}}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to enquire package '".$params->{'package'}."' (call to ".'enquire()'." has failed)."); return undef }
+	}
+
+	# and now also find the package's apk dir (where its apks are)
+	# we already have 'codePath'
+
+	# adb shell pm path com.android.gallery2 will output:
+	#   package:/product/app/Gallery2/Gallery2.apk
+	# but there may be other apks there, so why not
+	# adb shell ls "codePath"/*.apk
+	#my @cmd = ('pm', 'path', $k);
+	my $cdd = $self->get('codePath');
+	if( ! defined($cdd) || ($cdd=~/^\s*$/) ){ $log->warn("${whoami} (via $parent), line ".__LINE__." : warning, did not find any 'codePath' for app '".$self->get('packageName')."', no problem."); }
+	else {
+		# we have a codePath, perhaps we will find apks in there
+		my @cmd = ('ls', '-al', File::Spec->catfile($cdd, '*.apk'));
+		my $res = $self->mother->adb->shell(@cmd);
+		if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
+		if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nsSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+		my @apks;
+		while( $res->[1] =~ m!\d+\:\d+ (.+?)$!g ){
+			push @apks, $1;
+		}
+		$self->set('apkPaths', \@apks);
 	}
 
 	return $self;
@@ -204,7 +232,7 @@ sub enquire_installed_apps_factory {
 		# if you want the package content:
 		#while( $content =~ /^(\s{2}Package\s+\[(.+?)\]\s+\(.+?\)\:[\r\n].+?)(?:[\r\n]\s{2}[^ ]|[\r\n]$|\z)/smg ){
 		#my $package_contents = $1; and name $2
-		my $package_name = $1;
+		my $package_name = $1; # full package name, e.g. com.google.android.calendar
 		# we will be lazy
 		my $is_this_lazy = $lazy;
 		if( $lazy == 1 ){
@@ -460,7 +488,7 @@ Android::ElectricSheep::Automator - The great new Android::ElectricSheep::Automa
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 
 =head1 SYNOPSIS

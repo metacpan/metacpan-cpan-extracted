@@ -1,0 +1,185 @@
+<start_html>
+
+<style>
+table.prelike {
+  //font-family: monospace;           /* Key: monospace text */
+  border-collapse: collapse;        /* No spacing between cells */
+  white-space: pre-wrap;                 /* Preserve spaces like <pre> */
+  table-layout: fixed;
+  width: max-content;                       /* Never exceed container width */
+  max-width: 100%;   
+  background: #f9f9f9;              /* Subtle "terminal" background */
+  word-wrap: break-word;             /* Handle long words */
+  overflow-wrap: break-word;         /* Modern equivalent */
+
+}
+
+table.prelike th {
+  font-weight: bold;
+  padding: 2px 8px;                 /* Compact spacing */
+  text-align: left;                 /* Natural alignment */
+}
+  
+table.prelike td {
+  padding: 2px 8px;                 /* Compact spacing */
+  text-align: left;                 /* Natural alignment */
+}
+</style>
+
+
+<perl handler>
+
+<!-- Table Start -->
+<table class=prelike>
+
+
+<!-- Table Header -->
+<tr>
+<block name="th">
+<th>${th}</th>
+</block>
+</tr>
+
+
+<!-- Table Body -->
+<block name="tr">
+<tr>
+<td>${method}</td>
+<td>${value}</td>
+</tr>
+</block>
+
+
+<! -- Table Finish -->
+</table>
+
+
+__PERL__
+
+
+use Apache2::RequestRec ();
+use Apache2::RequestIO ();
+use Apache2::RequestUtil ();
+use Apache2::Response ();
+use Apache2::Log ();
+use APR::Table ();
+
+
+use Data::Dumper;
+use HTML::Tiny;
+$Data::Dumper::Indent=1;
+$Data::Dumper::Sortkeys=1;
+
+
+sub handler {
+
+
+    # Self ref and request object
+    #
+    my $self=shift();
+    my $r=$self->r() ||
+        return err('unable to get request object');
+        
+        
+    #  HTML Tiny
+    #
+    my $html_or=HTML::Tiny->new() ||
+        return err('unable to get HTML::Tiny object');
+
+    
+    #  Methods we want
+    #
+    my @methods = qw(
+      method
+      method_number
+      protocol
+      proto_num
+      the_request
+      unparsed_uri
+      uri
+      args
+      path_info
+      hostname
+      user
+      filename
+      finfo
+      mtime
+      status
+      status_line
+      content_type
+      content_encoding
+      content_languages
+      main
+      prev
+      next
+      allowed
+      header_only
+    );
+    
+    
+    #  Table header
+    #
+    map { $self->render_block('th', th => $_ ) } qw(Method Value);
+    
+
+    #  Iterate
+    #
+    for my $method (@methods) {
+        my $value;
+        eval { $value = $r->$method() };
+        if ($@) {
+            $self->render_block('tr', method => $method, value=>'[method unavailable]');
+        }
+        elsif (defined $value) {
+            $self->render_block('tr', method => $method, value=>(ref $value ? $html_or->pre(Dumper($value)) : $value) );
+        }
+        else {
+            $self->render_block('tr', method => $method, value=>'[undef]' );
+        }
+    }
+
+
+    # Dump connection info
+    #
+    eval {
+        my $c = $r->connection;
+        $self->render_block('tr', method => 'connection', value=>Dumper($c));
+    };
+    $self->render_block('tr', method => 'connection', value=>'[method unavailable]') if $@;
+
+
+    # Dump various tables
+    #
+    for my $table (qw(headers_in headers_out subprocess_env dir_config notes)) {
+        eval {
+            my %table;
+            if (ref(my $table_or = $r->$table()) eq 'APR::Table') {
+              foreach my $key(keys %{$table_or}) {
+                  my @value=$table_or->get($key);
+                  $table{$key}=(@value > 1) ? \@value : $value[0];
+              }
+            }
+            else {
+              %table=%{$table_or}
+            }
+            $self->render_block('tr', method => $table, value=>$html_or->pre(Dumper(\%table)));
+        };
+        $self->render_block('tr', method => $table, value=>'[method unavailable]') if $@;
+        eval {} if @_;
+    }
+
+
+    # If as_string is available, dump that too
+    #
+    eval {
+        my $dump = $r->as_string;
+        $self->render_block('tr', method => 'as_string', value=>$html_or->pre($dump));
+    };
+    return $self->render();
+    
+    
+    #  All done
+    #
+    return \'';
+    
+}

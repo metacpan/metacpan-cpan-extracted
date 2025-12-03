@@ -1,0 +1,27 @@
+msgid "Aion::Run::Runner - запускает команду описанную аннотацией `#@run`"
+msgstr "Aion::Run::Runner - runs the command described by the `#@run` annotation"
+
+msgid "Файл etc/annotation/run.ann:"
+msgstr "File etc/annotation/run.ann:"
+
+msgid "`Aion::Run::Runner` считывает файл **etc/annotation/run.ann** со списком скриптов, а выполнить любой скрипт из списка можно через его метод `run`."
+msgstr "`Aion::Run::Runner` reads the file **etc/annotation/run.ann** with a list of scripts, and any script from the list can be executed through its `run` method."
+
+msgid "Путь к файлу cо скриптами можно поменять с помощью конфига `INI`."
+msgstr "The path to the file with scripts can be changed using the `INI` config."
+
+msgid "Используется в команде `act`."
+msgstr "Used in the `act` command."
+
+msgid "Хеш с командами. Подгружается по дефолту из файла `INI`."
+msgstr "Hash with commands. Loaded by default from the `INI` file."
+
+msgid "Запускает команду с именем `$name` и аргументами `@args` из списка **etc/annotation/run.ann**."
+msgstr "Runs a command with the name `$name` and the arguments `@args` from the list **etc/annotation/run.ann**."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Run::Runner module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Run::Runner module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

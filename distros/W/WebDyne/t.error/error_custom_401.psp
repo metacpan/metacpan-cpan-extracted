@@ -1,0 +1,4 @@
+<start_html>
+<? shift()->r->status(401); return err() ?>
+__PERL__
+use HTTP::Status qw(:constants);

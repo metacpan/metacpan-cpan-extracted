@@ -51,7 +51,7 @@ sub add_error {
     my $self = shift;
     $self->not_ok(@_);
 }
-	
+
 sub add_failure {
     my $self = shift;
     $self->not_ok(@_);
@@ -86,9 +86,9 @@ sub run {
     my ($class) = @_;
     my $a_test_runner = Test::Unit::TestRunner->new();
     if ($class->isa("Test::Unit::Test")) {
-	$a_test_runner->do_run($class, 0);
+        $a_test_runner->do_run($class, 0);
     } else {
-	$a_test_runner->do_run(Test::Unit::TestSuite->new($class), 0);
+        $a_test_runner->do_run(Test::Unit::TestSuite->new($class), 0);
     }
 }
 

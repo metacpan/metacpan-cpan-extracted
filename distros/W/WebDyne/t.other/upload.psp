@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple File Upload</title>
+  </head>
+  <body>
+    <h2>Upload File</h2>
+
+    <form method="POST" enctype="multipart/form-data" action="">
+      <input type="file" name="file" multiple required />
+      <p>
+      <button type="submit">Upload</button>
+    </form>
+
+    <p>
+<pre>
+<perl handler/>
+</pre>
+
+  </body>
+</html>
+
+__PERL__
+
+use Data::Dumper;
+sub handler {
+
+    my $self=shift();
+    my $cgi_or=$self->CGI();
+    my $uploads_hr=$cgi_or->uploads();
+    my %data;
+    foreach my $field (keys %{$uploads_hr}) {
+        my @or=$uploads_hr->get_all($field);
+        foreach my $or (@or) {
+            foreach my $field (qw(size path content_type filename basename)) {
+                $data{$or}{$field}=$or->$field();
+            }
+        }
+    }
+    return Dumper(\%data);
+    
+    return Dumper([$cgi_or->uploads()->flatten, $cgi_or]);
+    
+}

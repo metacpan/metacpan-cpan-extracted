@@ -1,0 +1,12 @@
+<start_html>
+<p>
+<form>
+<submit name="foo&bar=1&bar=2&car=3">
+<hidden name="bar" value="3">
+</form>
+<pre>
+<? Dumper([shift()->CGI->Vars()->multi()]) ?>
+__PERL__
+use Data::Dumper;
+$Data::Dumper::Sortkeys=1;
+$Data::Dumper::Indent=1;

@@ -226,15 +226,15 @@ effects among test runs. Here is an example:
 
       sub new {
           my $self = shift()->SUPER::new(@_);
-	      $self->{value_1} = 0;
-	      $self->{value_2} = 0;
-	      return $self;
+          $self->{value_1} = 0;
+          $self->{value_2} = 0;
+          return $self;
       }
 
       sub set_up {
-	      my $self = shift;
-	      $self->{value_1} = 2;
-	      $self->{value_2} = 3;
+          my $self = shift;
+          $self->{value_1} = 2;
+          $self->{value_2} = 3;
       }
 
 For each test implement a method which interacts with the fixture.
@@ -242,9 +242,9 @@ Verify the expected results with assertions specified by calling
 C<$self-E<gt>assert()> with a boolean value.
 
       sub test_add {
-	      my $self = shift;
-	      my $result = $self->{value_1} + $self->{value_2};
-	      $self->assert($result == 5);
+          my $self = shift;
+          my $result = $self->{value_1} + $self->{value_2};
+          $self->assert($result == 5);
       }
 
 Once the methods are defined you can run them. The normal way to do

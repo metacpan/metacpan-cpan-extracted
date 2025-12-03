@@ -1,0 +1,8 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <form> @0.1.0
+      "Hello"
+      <p> @0.1.0.1
+        <pre> @0.1.0.1.0
+          "CGI->Vars()->flatten]) ?>__PERL__use Data::Dumper;$Data::Dumper::..."

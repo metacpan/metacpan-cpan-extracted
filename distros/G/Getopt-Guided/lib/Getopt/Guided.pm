@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v1.0.0';
+$Getopt::Guided::VERSION = 'v1.1.0';
 
 use Carp           qw( croak );
 use Exporter       qw( import );
@@ -14,11 +14,11 @@ use File::Basename qw( basename );
 # Option-Argument Indicator Character Class
 sub OAICC () { '[,:]' }
 
-@Getopt::Guided::EXPORT_OK = qw( getopts );
+@Getopt::Guided::EXPORT_OK = qw( getopts getopts3 );
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
-sub getopts ( $\% ) {
-  my ( $spec, $opts ) = @_;
+sub getopts3 ( \@$\% ) {
+  my ( $argv, $spec, $opts ) = @_;
 
   croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
     unless $spec =~ m/\A (?: [[:alnum:]] ${ \( OAICC ) } ?)+ \z/x;
@@ -35,33 +35,33 @@ sub getopts ( $\% ) {
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
-  my @argv_backup = @ARGV;
+  my @argv_backup = @$argv;
   my @error;
   # Guideline 4, Guideline 9
-  while ( @ARGV and my ( $first, $rest ) = ( $ARGV[ 0 ] =~ m/\A-(.)(.*)/ ) ) {
+  while ( @$argv and my ( $first, $rest ) = ( $argv->[ 0 ] =~ m/\A-(.)(.*)/ ) ) {
     # Guideline 10
-    shift @ARGV, last if $ARGV[ 0 ] eq '--';
+    shift @$argv, last if $argv->[ 0 ] eq '--';
     my $pos = index( $spec, $first );
     if ( $pos >= 0 ) {
       # The option-argument indicator "," or ":" is the character that follows
       # an option character if the option requires an option-argument
       my $ind = $chars[ $pos + 1 ];
       if ( defined $ind and $ind =~ m/\A ${ \( OAICC ) } \z/x ) {
-        shift @ARGV;
+        shift @$argv;
         if ( $rest eq '' ) {
           # Guideline 7
           @error = ( 'option requires an argument', $first ), last
-            unless @ARGV;
+            unless @$argv;
           # Guideline 6, Guideline 8
           @error = ( 'option requires an argument', $first ), last
-            unless defined( my $argv = shift @ARGV );
+            unless defined( my $val = shift @$argv );
           if ( $ind eq ':' ) {
             # Option-argument overwrite situation!
-            $opts->{ $first } = $argv
+            $opts->{ $first } = $val
           } else {
             # Create and fill list of option-arguments
             $opts->{ $first } = [] unless exists $opts->{ $first };
-            push @{ $opts->{ $first } }, $argv
+            push @{ $opts->{ $first } }, $val
           }
         } else {
           # Guideline 5
@@ -71,10 +71,10 @@ sub getopts ( $\% ) {
       } else {
         ++$opts->{ $first };
         if ( $rest eq '' ) {
-          shift @ARGV
+          shift @$argv
         } else {
           # Guideline 5
-          $ARGV[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
+          $argv->[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
         }
       }
     } else {
@@ -84,7 +84,7 @@ sub getopts ( $\% ) {
 
   if ( @error ) {
     # Restore to avoid side effects
-    @ARGV = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
+    @$argv = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
@@ -92,6 +92,12 @@ sub getopts ( $\% ) {
   }
 
   @error == 0
+}
+
+sub getopts ( $\% ) {
+  my ( $spec, $opts ) = @_;
+
+  getopts3 @ARGV, $spec, %$opts
 }
 
 1

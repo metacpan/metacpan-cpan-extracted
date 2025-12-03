@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  Debug load
@@ -169,12 +169,23 @@ push @HTML::Tagset::p_closure_barriers, keys %CGI_TAG_WEBDYNE;
 
 sub new {
 
-    my $class=shift();
-    debug('in %s new(), class: %s', __PACKAGE__, ref($class) || $class);
-    my $self=$class->SUPER::new(@_) ||
+
+    #  Instantiate new WebDyne::HTML::TreeBuilder object
+    #
+    my ($class, %param)=@_;
+    debug('in %s new(), class: %s, param: %s', __PACKAGE__, (ref($class) || $class), Dumper(\%param));
+    my $self=$class->SUPER::new(%param) ||
         return err('unable to initialize from %s, using ISA: %s', ref($class) || $class, Dumper(\@ISA));
-    $self->{'_html_tiny_or'}=
-        WebDyne::HTML::Tiny->new(mode => 'html', @_);
+        
+        
+    #  We do need a HTML::Tiny object that has been ideally already been instantiated.
+    #
+    $self->{'_html_tiny_or'}=($param{'html_tiny_or'} ||
+        WebDyne::HTML::Tiny->new(mode => $WEBDYNE_HTML_TINY_MODE, r=>$param{'r'}));
+        
+        
+    #  Done
+    #
     return $self;
 
 }
@@ -186,6 +197,7 @@ sub line_no_debug {
     return sprintf("self $self, line_no: %s, line_no_start: %s, line_no_next: %s", @{$self}{qw(_line_no _line_no_start _line_no_next)});
     
 }
+
 
 sub parse_fh {
 
@@ -311,7 +323,7 @@ sub tag_parse {
     my ($tag, $attr_hr)=@_;
     
     
-    #  Get rid of attribute multi-line value if the start with subst cars
+    #  Get rid of attribute multi-line value if the start with subst chars
     #
     foreach my $attr (keys %{$attr_hr}) {
         my $attr_value=$attr_hr->{$attr};
@@ -368,8 +380,8 @@ sub tag_parse {
         $html_or=$self->$method(@_);
 
     }
-
-
+    
+    
     #  Special case where <perl/block/etc> wraps <head> or <body> tags. HTML::TreeBuilder assumes
     #  head is always under html - we have to hack.
     #
@@ -557,7 +569,7 @@ sub script {
 }
 
 
-sub json {
+sub json0 {
 
 
     #  No special handling needed, just log for debugging purposes

@@ -241,7 +241,7 @@ Android::ElectricSheep::Automator::Plugins::Apps::Viber - Control the Viber app 
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =head1 WARNING
 
@@ -276,6 +276,35 @@ interacts with the Viber app from the desktop.
         'message' => 'thank%syou'
     }) or die;
 
+=head1 MOTIVATION
+
+I wanted to send viber messages from my beloved Linux Desktop
+using the command line. I did not want to install Viber app on
+my smartphone. I do not use a smartphone except for
+reading the news.
+
+=head1 INSTALLING VIBER
+
+Firstly, I installed an Android emulator
+in my desktop computer, as described here
+L<https://metacpan.org/pod/Android::ElectricSheep::Automator#Android-Emulators>
+
+Note that some Android emulators do not allow access to
+Google App Store (whatever is called). You can only install apps
+via third party which is not very safe (even for your emulator).
+See this for how to enable the App Store:
+
+L<https://stackoverflow.com/questions/71815181/how-can-i-get-google-play-to-work-on-android-emulator-in-android-studio-bumblebe>
+
+Fortunately, Viber offers a version of its app from its website,
+calling it an "update". And you will not need to give any personal
+details to Google to download it.
+
+It is located here
+L<https://download.cdn.viber.com/android/android_32_64/viber-lst.apk>
+(via  L<https://www.viber.com/en/download-android-update>).
+
+
 =head1 CONSTRUCTOR
 
 =head2 new($params)
@@ -283,7 +312,8 @@ interacts with the Viber app from the desktop.
 Creates a new C<Android::ElectricSheep::Automator::Plugins::Apps::Viber> object. C<$params>
 is a hash reference used to pass initialization options. These options are
 passed onto the main constructor.
-Refer to the documentation of L<Android::ElectricSheep::Automator::new($params)> for
+Refer to the documentation of
+L<Android::ElectricSheep::Automator#new($params)> for
 
 A configuration file or hash is required.
 
@@ -318,9 +348,8 @@ yield in problems.
 
 =head1 METHODS
 
-=over 1
 
-=item send_message($params)
+=head2 send_message($params)
 
 It sends a message to one of your contacts.
 
@@ -353,11 +382,11 @@ dumps. For debugging purposes.
 
 =back
 
-It needs that connect_device() to have been called prior to this call.
+It needs that L<Android::ElectricSheep::Automator#connect_device($params)> to have been called prior to this call.
 
 It returns C<undef> on failure or an (empty) hash on success.
 
-=item navigate_to_viber_home_activity($params)
+=head2 navigate_to_viber_home_activity($params)
 
 It navigates to the viber app's home screen. E.g.
 if you are in your contacts screen, calling this method
@@ -383,7 +412,6 @@ It needs that connect_device() to have been called prior to this call.
 
 It returns C<1> on failure or C<0> on success.
 
-=back
 
 =head1 AUTHOR
 
@@ -393,7 +421,9 @@ Andreas Hadjiprocopis, C<< <bliako at cpan.org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-Android-ElectricSheep-Automator at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Android-ElectricSheep-Automator>.  I will be notified, and then you'll
+the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Android-ElectricSheep-Automator>.
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 

@@ -29,7 +29,7 @@ our @ISA=qw(HTML::Tiny);
 #  External Modules
 #
 use HTML::Tiny;
-use CGI::Simple;
+#use CGI::Simple;
 use Data::Dumper;
 use HTML::Element;
 
@@ -38,6 +38,7 @@ use HTML::Element;
 #
 use WebDyne::Constant;
 use WebDyne::Util;
+use WebDyne::CGI;
 
 
 #  Constants
@@ -57,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.034';
+$VERSION='2.035';
 
 
 #  Debug load
@@ -95,12 +96,6 @@ sub new {
     debug("$class new, %s", Dumper(\%param));
     
     
-    #  Were we supplied with a CGI::Simple and/or webdyne object ?
-    #
-    my $cgi_or=delete $param{'CGI'};
-    my $webdyne_or=delete $param{'webdyne'};
-    
-
     #  Shortcuts (start_html, start_form etc.) enabled by default.
     #
     &shortcut_enable() unless
@@ -109,15 +104,14 @@ sub new {
         
     #  Get HTML::Tiny ref
     #
-    my $self=$class->SUPER::new(%param);
+    my $self=$class->SUPER::new( mode=>(delete($param{'mode'}) || $WEBDYNE_HTML_TINY_MODE));
     
     
-    #  Save away CGI object and return
+    #  Save away other supplied params into self ref
     #
-    ($self->{'_CGI'} ||= $cgi_or) if $cgi_or;
-    ($self->{'_webdyne'} ||= $webdyne_or) if $webdyne_or;
+    $self->{'_r'}=$param{'r'};
     
-    
+
     #  Done
     #
     return $self;
@@ -143,7 +137,7 @@ sub CGI {
     #
     my $self=shift();
     debug("$self CGI");
-    return ($self->{'_CGI'} ||= CGI::Simple->new());
+    return ($self->{'_CGI'} ||= WebDyne::CGI->new($self->{'_r'}));
     
 }
 
@@ -188,7 +182,8 @@ sub _init {
             if (defined($attr_hr)) {
                 #  Copy attr so don't pollute ref
                 my %attr=%{$attr_hr};
-                my $param_hr=$self->Vars();
+                #my $param_hr=$self->Vars();
+                my $param_hr=$self->CGI->Vars();
                 if ($persist{$tag}) {
                     if ($attr{'name'} && (my $value=$param_hr->{$attr{'name'}}) && !$attr{'force'}) {
                         $attr{'value'}=$value;
@@ -1177,7 +1172,9 @@ sub textarea {
 
 
 sub AUTOLOAD {
+    debug("AUTOLOAD: $AUTOLOAD");
     if (my ($action, $tag)=($AUTOLOAD=~/\:\:(start|end|open|close)_([^:]+)$/)) {
+        debug("action: $action, tag: $tag");
         *{$AUTOLOAD}=sub {shift()->$action($tag, @_)};
         return &{$AUTOLOAD}(@_);
     }

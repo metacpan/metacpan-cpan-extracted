@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.30';
+our $VERSION='0.31';
 
 ######################################################
 # see also:

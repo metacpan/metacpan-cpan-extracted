@@ -50,8 +50,8 @@ my %WriteMakefileArgs = (
 	# Data::Random is not installed in their system.
 	# We have no direct dependency on Data::Random.
 	# I guess Data::Random::Structure must declare this dependency.
-	'Data::Random::Structure' => '0',
-	'Data::Random::Structure::UTF8' => '0.06',
+	'Data::Random::Structure' => '0.01',
+	'Data::Random::Structure::UTF8' => '0.01',
 	'Data::Dumper' => '0',
 	'Data::Dump' => '0',
 	'YAML' => '0',
@@ -67,6 +67,7 @@ my %WriteMakefileArgs = (
 	'Data::Dump' => '0',
 	'Data::Dump::Filtered' => '0',
 	'Getopt::Long' => '0',
+	'Devel::StackTrace' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Roundtrip-*' },

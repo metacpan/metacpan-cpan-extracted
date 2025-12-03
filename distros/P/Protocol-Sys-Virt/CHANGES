@@ -1,5 +1,11 @@
 -----
 
+11.10.0   2025-12-02
+    [Changed]
+       * Updated to libvirt tag v11.10.0 (from 11.9.0 - no actual changes)
+    [Fixed]
+       * POD section head formatting
+
 11.9.0    2025-11-07
     [Changed]
        * Updated to libvirt tag v11.9.0 (from 11.8.0 - no actual changes)

@@ -55,7 +55,7 @@ SKIP: {
   subtest 'PeekConsoleInputA' => sub {
     my %peeked;
     my $r = PeekConsoleInputA($hInput, \%peeked);
-    ok($r, 'PeekConsoleInputA returned events');
+    ok($r && 0+$r, 'PeekConsoleInputA returned events');
     is($peeked{EventType}, KEY_EVENT, 'Peeked event is KEY_EVENT');
     ok(exists $peeked{Event}, 'Field Event exists');
   };
@@ -93,7 +93,7 @@ SKIP: {
   subtest 'PeekConsoleInputW' => sub {
     my %peeked;
     my $r = PeekConsoleInputW($hInput, \%peeked);
-    ok($r, 'PeekConsoleInputW returned events');
+    ok($r && 0+$r, 'PeekConsoleInputW returned events');
     is($peeked{EventType}, KEY_EVENT, 'Peeked event is KEY_EVENT');
     ok(exists $peeked{Event}, 'Field Event exists');
   };

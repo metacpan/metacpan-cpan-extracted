@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # SYNOPSIS
 
@@ -80,6 +80,13 @@ format (not spaces, indendation or line breaks).
     # have its unicode content escaped:
     my $json_with_unicode_escaped =
           json2json($jsonstr, {'escape-unicode'=>1});
+
+    # sometimes we want JSON's true and false values
+    # to be mapped to something other than JSON::PP::Boolean objects:
+    my $json_with_custom_boolean_mapping = json2perl($jsonstr,
+        {'boolean_values' => 'myfalse', 'mytrue'});
+    my $json_with_custom_boolean_mapping = json2perl($jsonstr,
+        {'boolean_values' => 0, 1});
 
     # With version 0.18 and up two more exported-on-demand
     # subs were added to read JSON or YAML directly from a file:
@@ -500,11 +507,18 @@ Anything really.
 
 ## `json2perl`
 
-    my $ret = json2perl($jsonstring)
+    my $ret = json2perl($jsonstring, $optional_paramshashref)
 
 Arguments:
 
 - `$jsonstring`
+- `$optional_paramshashref` is an optional hashref as it is blindingly obvious from
+the name. At the moment only one parameter is understood: `boolean_values`.
+It must be an ARRAYREF of 0 or 2 elements. If 0 elements, then it resets the boolean
+values mapping of the JSON converter to its default state (which is [JSON::PP::Boolean](https://metacpan.org/pod/JSON%3A%3APP%3A%3ABoolean) objects.
+If it contains 2 elements, then the JSON converter will map a JSON `false` value to
+the first element of the ARRAYREF and a JSON `true` value to
+the second element of the ARRAYREF.
 
 Return value:
 
@@ -605,18 +619,24 @@ Return value:
 
 - `$ret`
 
-For example:
+    Given an input string `$dumpstring`, which can
+    have been produced by e.g. `perl2dump()`
+    and is identical to [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)'s `Dumper()` output,
+    it will roundtrip back to the same string,
+    possibly with altered format via the parameters in `$optional_paramshashref`.
 
-    my $dumpstr = '...';
-    my $newdumpstr = dump2dump(
-      $dumpstr,
-      {
-        'dont-bloody-escape-unicode' => 1,
-        'terse' => 0,
-      }
-    );
+    For example:
 
-It returns the a dump string similar to 
+        my $dumpstr = '...';
+        my $newdumpstr = dump2dump(
+          $dumpstr,
+          {
+            'dont-bloody-escape-unicode' => 1,
+            'terse' => 0,
+          }
+        );
+
+    It returns the a dump string similar to 
 
 ## `read_from_file`
 
@@ -835,11 +855,3 @@ is Copyright (c) 2020 by Andreas Hadjiprocopis.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 1403:
-
-    &#x3d;back doesn't take any parameters, but you said =back  Given an input string C&lt;$dumpstring>, which can have been produced by e.g. C&lt;perl2dump()> and is identical to L<Data::Dumper>'s C<Dumper()> output, it will roundtrip back to the same string, possibly with altered format via the parameters in C&lt;$optional\_paramshashref>.

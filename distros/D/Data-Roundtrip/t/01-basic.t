@@ -9,7 +9,7 @@ my $verbose = 0;
 #### nothing to change below
 use utf8;
 
-our $VERSION='0.30';
+our $VERSION='0.31';
 
 use Test::More;
 use Test2::Plugin::UTF8;

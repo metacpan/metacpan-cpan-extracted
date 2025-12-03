@@ -1,3 +1,8 @@
+Version 0.011 - 2025-12-02
+  - Fix bug in parsing strings of '$encoding' parameters that could return
+    an uninitialized value for an invalid encoding.
+  - Fix compatibility of tests for Win32 and Cygwin
+
 Version 0.010 - 2025-11-22
   - Fix bug where substr with replacement that shrinks the buffer would leave
     un-wiped bytes at the end of the string.

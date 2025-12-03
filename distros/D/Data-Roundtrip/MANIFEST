@@ -1,3 +1,7 @@
+.test-script-2QtWaKNH/__TEST_SCRIPT__.pm
+.test-script-9ipPH93d/__TEST_SCRIPT__.pm
+.test-script-VW5EzxhH/__TEST_SCRIPT__.pm
+a.html
 Changes
 lib/Data/Roundtrip.pm
 Makefile.PL
@@ -23,6 +27,7 @@ t/11-scripts-pod.t
 t/12-from-file.t
 t/13-yaml-tricky-cases.t
 t/14-yaml-tainted-input.t
+t/15-json2-boolean_values.t
 t/20-synopsis.t
 t/manifest.t
 t/pod-coverage.t

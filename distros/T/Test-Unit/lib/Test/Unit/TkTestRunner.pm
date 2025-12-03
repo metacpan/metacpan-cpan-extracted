@@ -17,7 +17,7 @@ use Test::Unit::Loader;
 sub new {
     my $self = bless {}, shift;
     return $self;
-}  
+}
 
 sub about {
     my $self = shift;
@@ -47,9 +47,9 @@ sub add_failure {
 
 sub append_failure {
     my ($self, $kind, $test, $exception)=@_;
-    my $message = $test->name();	#bad juju!!
+    my $message = $test->name(); #bad juju!!
     if ($message) {
-	$kind .= ":".substr($message, 0, 100);
+        $kind .= ":".substr($message, 0, 100);
     }
     $self->{failure_list}->insert("end", $message);
     push @{$self->{failed_tests}}, $test;
@@ -68,22 +68,22 @@ sub choose_file {
     my @types = ([ 'All Files', '*' ]);
     my $dir   = undef;
     if (defined $name) {
-	require File::Basename;
-	my $sfx;
-	($name, $dir, $sfx) = File::Basename::fileparse($name, '\..*');
-	if (defined($sfx) && length($sfx)) {
+        require File::Basename;
+        my $sfx;
+        ($name, $dir, $sfx) = File::Basename::fileparse($name, '\..*');
+        if (defined($sfx) && length($sfx)) {
             unshift(@types, [ 'Similar Files', [$sfx]]);
             $name .= $sfx;
-	}
+        }
     }
     my $file = $self->{frame}->getOpenFile(
         -title       => "Select test case",
-        -initialdir  => $dir, 
+        -initialdir  => $dir,
         -initialfile => $name,
         -filetypes   => \@types
     );
     if (defined $file) {
-	$file=~s/\/+/\//g;
+        $file=~s/\/+/\//g;
     }
     $self->{suite_name} = $file;
 }
@@ -141,7 +141,7 @@ sub create_ui {
             -justify      => $args[1],
             -relief       => 'flat',
             -state        => 'disabled'
-        ); 
+        );
     };
     $self->create_menus();
     $self->{suite_label} = $mw->Label(
@@ -158,7 +158,7 @@ sub create_ui {
         -state   => 'normal',
         -command => sub { $self->run_suite() }
     );
-  
+
     my $lab1 = $mw->Label(-text => "Runs:");
     my $lab2 = &{$mklabel}('number_of_runs', 'right', 0);
     my $lab3 = $mw->Label(-text => "Errors:");
@@ -177,7 +177,7 @@ sub create_ui {
     );
     $self->{failure_list} = $mw->Scrolled('Listbox', -scrollbars => 'e');
     $self->{failure_list}->insert("end", "", "", "", "", "", "");
-  
+
     $self->{quit_button} = $mw->Button(
         -text    => 'Quit',
         -command => sub { $mw->destroy() }
@@ -197,7 +197,7 @@ sub create_ui {
 
     $self->{status_line_box}= &{$mklabel}('status_line', 'left', 'Status line');
     $self->{status_line_box}->configure(-relief => 'sunken', -bg => 'grey');
-  
+
     # Bindings go here, so objects are already defined.
     $self->{failure_list}->bind('<Double-1>' => sub { $self->show_error_trace() });
 
@@ -217,7 +217,7 @@ sub create_ui {
         -right => [$self->{run}],
         -top   => [$self->{suite_label}], -fill => 'x'
     );
-  
+
     $lab1->form(-left => ['%0'],  -top => [$self->{suite_field}, 10]);
     $lab2->form(-left => [$lab1], -top => [$self->{suite_field}, 10], -fill => 'x');
     $lab3->form(-left => [$lab2], -top => [$self->{suite_field}, 10]);
@@ -254,7 +254,7 @@ sub create_ui {
 #         -right => [$self->{show_error_button}],
 #         -top   => [$self->{failure_list}]
 #     );
-  
+
     $self->{status_line_box}->form(
         -left   => [ '%0' ],
         -right  => [$self->{quit_button}],
@@ -331,7 +331,7 @@ sub run_suite {
     my $self = shift;
     my $suite;
     if (defined($self->{runner})) {
-	$self->{result}->stop();
+        $self->{result}->stop();
     }
     else {
         $self->add_to_history();
@@ -385,9 +385,9 @@ sub show_error_trace {
 
     my $e = $self->{exceptions}[$selected];
     if ($e->object->annotations()) {
-	foreach my $data ("\n\nAnnotations:\n", $e->object->annotations()) {
-	    $text->insert("end", $data); # third arg would be a tag
-	}
+        foreach my $data ("\n\nAnnotations:\n", $e->object->annotations()) {
+            $text->insert("end", $data); # third arg would be a tag
+        }
     }
 
     $dialog->Show();
@@ -410,7 +410,7 @@ sub start {
     my (@args)=@_;
     my $mw = $self->create_ui();
     if (@args) {
-	$self->{suite_name} = shift @args;
+        $self->{suite_name} = shift @args;
     }
     MainLoop;
 }
@@ -452,16 +452,16 @@ sub add_to_history {
     my $choices = $h->cget('-choices');
     my @choices = ();
     if (ref($choices)) {
-	@choices=@{$h->cget('-choices')};
+        @choices=@{$h->cget('-choices')};
     }
     elsif ($choices) {
-	# extraordinarily bad - choices is a scalar if theres
-	# only one, and undefined if there are none!
-	@choices = ($h->cget('-choices'));
+        # extraordinarily bad - choices is a scalar if theres
+        # only one, and undefined if there are none!
+        @choices = ($h->cget('-choices'));
     }
     @choices = ($new_item, grep {$_ ne $new_item} @choices);
     if (@choices>10) {
-	@choices=@choices[0..9];
+        @choices=@choices[0..9];
     }
     $h->configure(-choices => \@choices);
 }
@@ -484,15 +484,15 @@ Construct Tk::Widget 'ArrayBar';
 
 sub ClassInit {
   my ($class, $mw) = @_;
-  
+
   $class->SUPER::ClassInit($mw);
-  
+
   $mw->bind($class, '<Configure>', [ '_layoutRequest', 1 ]);
 }
 
 sub Populate {
     my($c, $args) = @_;
-  
+
     $c->ConfigSpecs(
         -width              => [ PASSIVE => undef, undef, 0           ],
         '-length'           => [ PASSIVE => undef, undef, 0           ],
@@ -511,7 +511,7 @@ sub Populate {
             PASSIVE => 'troughColor', 'Background', 'grey55'
         ],
     );
-  
+
     _layoutRequest($c, 1);
     $c->OnDestroy([ Destroyed => $c ]);
 }
@@ -520,14 +520,14 @@ sub anchor {
     my $c = shift;
     my $var = \$c->{Configure}{'-anchor'};
     my $old = $$var;
-  
+
     if (@_) {
-	my $new = shift;
-	croak "bad anchor position \"$new\": must be n, s, w or e"
-	  unless $new =~ /^[news]$/;
-	$$var = $new;
+        my $new = shift;
+        croak "bad anchor position \"$new\": must be n, s, w or e"
+            unless $new =~ /^[news]$/;
+        $$var = $new;
     }
-  
+
     $old;
 }
 
@@ -541,9 +541,9 @@ sub _layoutRequest {
 sub _arrange {
     my $c = shift;
     my $why = $c->{layout_pending};
-  
+
     $c->{layout_pending} = 0;
-  
+
     my $w     = $c->Width;
     my $h     = $c->Height;
     my $bw    = $c->cget('-borderwidth') + $c->cget('-highlightthickness');
@@ -552,76 +552,76 @@ sub _arrange {
     my $value = $c->cget('-variable');
     my $horz  = $c->{Configure}{'-anchor'} =~ /[ew]/i ? 1 : 0;
     my $dir   = $c->{Configure}{'-anchor'} =~ /[ne]/i ? -1 : 1;
-  
+
     if ($w == 1 && $h == 1) {
-	my $bw = $c->cget('-borderwidth');
-	$h = $c->pixels($c->cget('-length')) || 40;
-	$w = $c->pixels($c->cget('-width'))  || 20;
-	
-	($w, $h) = ($h, $w) if $horz;
-	$c->GeometryRequest($w, $h);
-	$c->parent->update;
-	$c->update;
-	
-	$w = $c->Width;
-	$h = $c->Height;
+        my $bw = $c->cget('-borderwidth');
+        $h = $c->pixels($c->cget('-length')) || 40;
+        $w = $c->pixels($c->cget('-width'))  || 20;
+
+        ($w, $h) = ($h, $w) if $horz;
+        $c->GeometryRequest($w, $h);
+        $c->parent->update;
+        $c->update;
+
+        $w = $c->Width;
+        $h = $c->Height;
     }
-  
+
     $w -= $x*2;
     $h -= $y*2;
-  
+
     my $length = $horz ? $w : $h;
     my $width  = $horz ? $h : $w;
     # at this point we have the length and width of the
     # bar independent of orientation and padding.
     # blocks and gaps are not used.
-  
+
     # unlike progressbar I need to redraw these each time.
     # actually resizing them might be better...
-    my $colors = $c->{Configure}{'-colors'} || [ 'green', 'red', 'grey55' ];	
-    $c->delete($c->find('all'));	
+    my $colors = $c->{Configure}{'-colors'} || [ 'green', 'red', 'grey55' ];
+    $c->delete($c->find('all'));
     $c->createRectangle(
-        0, 0, $w+$x*2, $h+$y*2,
-        -fill    => $c->{Configure}{'-troughcolor'},
-        -width   => 0,
-        -outline => undef
-    );
+            0, 0, $w+$x*2, $h+$y*2,
+            -fill    => $c->{Configure}{'-troughcolor'},
+            -width   => 0,
+            -outline => undef
+            );
     my $total;
     my $count_value = scalar(@$value)-1;
     foreach my $val (@$value) {
-	$total += $val > 0 ? $val : 0;
+        $total += $val > 0 ? $val : 0;
     }
     # prevent div by zero and give a nice initial appearance.
     $total = $total ? $total : 1;
     my $curx = $x;
     my $cury = $y;
     foreach my $index (0..$count_value) {
-	my $size = ($length*$value->[$index])/$total;
-	my $ud = $horz?$width:$size;
-	my $lr = $horz?$size:$width;
-	$c->{cover}->[$index] = $c->createRectangle(
-            $curx, $cury, $curx+$lr-1, $cury+$ud-1,
-            -fill    => $colors->[$index],
-            -width   => 1,
-            -outline => 'black'
-        );
-	$curx+=$horz?$lr:0;
-	$cury+=$horz?0:$ud;
+        my $size = ($length*$value->[$index])/$total;
+        my $ud = $horz?$width:$size;
+        my $lr = $horz?$size:$width;
+        $c->{cover}->[$index] = $c->createRectangle(
+                $curx, $cury, $curx+$lr-1, $cury+$ud-1,
+                -fill    => $colors->[$index],
+                -width   => 1,
+                -outline => 'black'
+                );
+        $curx+=$horz?$lr:0;
+        $cury+=$horz?0:$ud;
     }
 }
 
 sub value {
     my $c = shift;
     my $val = $c->cget('-variable');
-  
+
     if (@_) {
-	$c->configure(-variable => [@_]);
-	_layoutRequest($c, 2);
+        $c->configure(-variable => [@_]);
+        _layoutRequest($c, 2);
     }
 }
 
 sub Destroyed {
-    my $c = shift;   
+    my $c = shift;
     my $var = delete $c->{'-variable'};
     untie $$var if defined($var) && ref($var);
 }

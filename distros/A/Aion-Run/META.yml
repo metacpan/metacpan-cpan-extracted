@@ -1,0 +1,68 @@
+---
+abstract: 'role for console commands'
+author:
+  - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
+build_requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
+  String::Diff: '0'
+  Term::ANSIColor: '0'
+  Test::More: '0.98'
+  lib: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Aion-Run
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Aion::Run:
+    file: lib/Aion/Run.pm
+    version: v0.0.1
+  Aion::Run::RunRun:
+    file: lib/Aion/Run/RunRun.pm
+  Aion::Run::Runner:
+    file: lib/Aion/Run/Runner.pm
+  Aion::Run::RunsRun:
+    file: lib/Aion/Run/RunsRun.pm
+requires:
+  Aion: '1.2'
+  Aion::Carp: '1.6'
+  Aion::Format: v0.1.0
+  Aion::Fs: v0.2.2
+  List::Util: '0'
+  common::sense: '0'
+  config: '0'
+  open: '0'
+  perl: v5.22.0
+resources:
+  bugtracker: https://github.com/darviarush/perl-aion-run/issues
+  homepage: https://github.com/darviarush/perl-aion-run
+  repository: https://github.com/darviarush/perl-aion-run.git
+version: 0.0.1
+x_authority: cpan:DART
+x_contributors:
+  - 'Yaroslav O. Kosmina <dart@cpan.org>'
+  - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

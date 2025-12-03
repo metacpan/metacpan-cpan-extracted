@@ -26,7 +26,7 @@ sub tell_listeners {
     }
 }
 
-sub add_error { 
+sub add_error {
     my $self = shift;
     debug($self . "::add_error() called\n");
     my ($test, $exception) = @_;
@@ -78,7 +78,7 @@ sub errors {
     my $self = shift;
     return $self->{_Errors};
 }
- 
+
 sub failure_count {
     my $self = shift;
     return scalar @{$self->{_Failures}};
@@ -107,7 +107,7 @@ sub run {
     );
 
     $self->end_test($test);
-} 
+}
 
 sub run_protected {
     my $self = shift;
@@ -143,12 +143,12 @@ sub run_count_inc {
     ++$self->{_Run_tests};
     return $self->{_Run_tests};
 }
-    
+
 sub should_stop {
     my $self = shift;
     return $self->{_Stop};
 }
-    
+
 sub start_test {
     my $self = shift;
     my ($test) = @_;
@@ -182,7 +182,7 @@ Test::Unit::Result - unit testing framework helper class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 
@@ -203,21 +203,21 @@ This is the quintessential call tree of the communication needed to
 record the results of a given test:
 
     $aTestCase->run() {
-	# creates result
-	$aTestResult->run($aTestCase) { 
-	    # catches exception and records it
-	    $aTestCase->run_bare() {
-		# runs test method inside eval
-		$aTestCase->run_test() {
-		    # calls method $aTestCase->name() 
-		    # and propagates exception
-		    # method will call Assert::assert() 
-		    # to cause failure if test fails on 
-		    # test assertion
-		    # it finds this because $aTestCase is-a Assert
-		}
-	    }
-	}
+        # creates result
+        $aTestResult->run($aTestCase) {
+            # catches exception and records it
+            $aTestCase->run_bare() {
+                # runs test method inside eval
+                $aTestCase->run_test() {
+                    # calls method $aTestCase->name()
+                    # and propagates exception
+                    # method will call Assert::assert()
+                    # to cause failure if test fails on
+                    # test assertion
+                    # it finds this because $aTestCase is-a Assert
+                }
+            }
+        }
     }
 
 Note too that, in the presence of Test::Unit::TestSuites, this call

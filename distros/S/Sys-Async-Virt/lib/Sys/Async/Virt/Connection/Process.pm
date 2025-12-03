@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.9.0
+#                   and LibVirt version v11.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Connection::Process v0.1.9;
+class Sys::Async::Virt::Connection::Process v0.1.10;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
@@ -24,7 +24,7 @@ use Carp qw(croak);
 use IO::Async::Stream;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::URI v11.9.0; # imports parse_url
+use Protocol::Sys::Virt::URI v11.10.0; # imports parse_url
 
 field $_url :param :reader;
 field $_process = undef;
@@ -79,7 +79,7 @@ Sys::Async::Virt::Connection::Process - Connection to LibVirt server using
 
 =head1 VERSION
 
-v0.1.9
+v0.1.10
 
 =head1 SYNOPSIS
 

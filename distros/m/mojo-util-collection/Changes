@@ -28,3 +28,6 @@ Revision history for Mojo::Util::Collection
 
 0.0.17   2025-11-11
         Add missing and intersect methods
+
+0.0.19   2025-12-02
+        Missing an intersect method accepts a different key to compare on

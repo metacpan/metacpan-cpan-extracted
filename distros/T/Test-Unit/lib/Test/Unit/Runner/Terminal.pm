@@ -1,7 +1,7 @@
 package Test::Unit::Runner::Terminal;
 use strict;
 
-use base qw(Test::Unit::TestRunner); 
+use base qw(Test::Unit::TestRunner);
 
 sub start_suite {
     my $self = shift;
@@ -34,7 +34,7 @@ sub add_error {
     my ($test, $exception) = @_;
     $self->_update_status;
 }
-	
+
 sub add_failure {
     my $self = shift;
     my ($test, $exception) = @_;
@@ -56,7 +56,7 @@ sub _update_status {
     # \e[J clears below
     # \e7 saves cursor position
     # \e8 restores cursor position
-    my $template = <<STATUS; 
+    my $template = <<STATUS;
 
 
 

@@ -1,0 +1,10 @@
+<start_html>
+<form>
+Hello
+<p>
+<submit name="foo&bar=1">
+<pre>
+<? Dumper([shift()->CGI->Vars()->flatten]) ?>
+__PERL__
+use Data::Dumper;
+$Data::Dumper::Sortkeys=1

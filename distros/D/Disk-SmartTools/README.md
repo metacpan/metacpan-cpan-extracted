@@ -2,7 +2,7 @@
 Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 # VERSION
-Version v3.3.12
+Version v3.3.15
 
 # SYNOPSIS
 
@@ -56,6 +56,10 @@ physical disk in the system.
          o. Command_Timeout
          p. Current_Pending_Sector
 
+For more information:
+
+    perldoc smart_show.pl
+
 ## smart_run_tests.pl
 Runs a SMART test on all disks.  Typically run as a crontab.
 
@@ -67,6 +71,10 @@ Runs a SMART test on all disks.  Typically run as a crontab.
     --verbose : Generate debugging info on stderr
     --silent : Do not print report on stdout
     --help : This helpful information.
+    
+For more information:
+
+    perldoc smart_run_test.pl
 
 # INSTALLATION
 To install this module, follow the instructions in `INSTALL.md`

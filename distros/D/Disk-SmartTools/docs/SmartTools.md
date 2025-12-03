@@ -4,7 +4,7 @@ Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 # VERSION
 
-Version v3.3.12
+Version v3.3.15
 
 # SYNOPSIS
 
@@ -187,7 +187,9 @@ Runs a SMART test on all disks.  Typically run as a crontab.
 
 ### Crontabs
 
-Usually run as a crontab
+Usually run as a crontab.  Note the `--long` option is safe to run everyday, it
+will only run the long test on (up to) one disk a day.  By hashing the day of 
+the month with the disk index it will run once a month for each disk.  
 
 - 30 5 \* \* \*       : S.M.A.R.T. disk checks - short ; /var/root/bin/smart\_run\_tests.pl
 
@@ -210,6 +212,8 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Disk::SmartTools
+    perldoc smart_show.pl
+    perldoc smart_run_test.pl
 
 You can also look for information at:
 

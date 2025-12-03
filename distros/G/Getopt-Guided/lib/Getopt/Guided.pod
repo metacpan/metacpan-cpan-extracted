@@ -9,8 +9,14 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   use Getopt::Guided qw( getopts );
 
   local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
+
   getopts 'a:bcd,v', my %opts;
 
+  # or
+
+  getopts3 @ARGV, 'a:bcd,v', my %opts;
+
+  # result
   # %opts == ( a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
 
@@ -30,13 +36,19 @@ guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.h
 4 to 10, inclusive. C<getopts()> warns and returns false if a processing error
 occurs; otherwise the function returns true. The processing error types are:
 
-=over 2
+=over 3
 
-=item 1. illegal option
+=item 1.
 
-=item 2. option requires an argument
+illegal option
 
-=item 3. option with argument isn't last one in group
+=item 2.
+
+option requires an argument
+
+=item 3.
+
+option with argument isn't last one in group
 
 =back
 
@@ -45,6 +57,11 @@ value is provided for an option that requires an option-argument.
 
 If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
+
+As of version 1.1.0 this module provides the additional function C<getopts3()>.
+This function has a 3rd leading parameter. The parameter is an array of
+argument values. It replaces the implicit use of C<@ARGV>. This module
+exports the C<getopts3()> function on request too.
 
 =head1 OPTION TYPES
 

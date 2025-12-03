@@ -9,7 +9,7 @@ use Exporter qw(import);
 use IPC::Cmd qw[can_run run];
 use YAML::PP;
 
-our $VERSION = version->declare("v3.3.12");
+our $VERSION = version->declare("v3.3.15");
 
 our @EXPORT_OK = qw(
     get_disk_prefix
@@ -32,11 +32,17 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 sub get_disk_prefix {
-    if (is_linux) {
+    if ( is_linux() ) {
         return '/dev/sd';
     }
-    elsif (is_mac) {
+    elsif ( is_mac() ) {
         return '/dev/disk';
+    }
+    elsif ( is_freebsd() ) {
+        return '/dev/da';
+    }
+    elsif ( is_openbsd() ) {
+        return '/dev/sd';
     }
     else {
         croak "Operating System not supported.\n";
@@ -50,12 +56,12 @@ sub os_disks {
         @disks = qw(a b c d e f g h i j k l m n o p q r s t u v w x y z);
         return map { $disk_prefix . $_ } @disks;
     }
-    elsif ( is_mac() ) {
+    elsif ( is_mac() || is_freebsd() || is_openbsd() ) {
         @disks = qw(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15);
         return map { $disk_prefix . $_ } @disks;
     }
     else {
-        croak "Operating System not supported.\n";
+        carp "Operating System not supported.\n";
     }
 }
 
@@ -281,7 +287,7 @@ Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 =head1 VERSION
 
-Version v3.3.12
+Version v3.3.15
 
 =head1 SYNOPSIS
 
@@ -464,7 +470,9 @@ B<Must be run as root.>
 
 =head3 Crontabs
 
-Usually run as a crontab
+Usually run as a crontab.  Note the C<--long> option is safe to run everyday, it
+will only run the long test on (up to) one disk a day.  By hashing the day of 
+the month with the disk index it will run once a month for each disk.  
 
 =over 4
 
@@ -491,6 +499,8 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Disk::SmartTools
+    perldoc smart_show.pl
+    perldoc smart_run_test.pl
 
 You can also look for information at:
 

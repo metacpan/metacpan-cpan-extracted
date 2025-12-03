@@ -1,4 +1,4 @@
-SQL::Shell v1.17
+SQL::Shell v1.18
 
 SQL-Shell:  Interactive shell for DBI Databases
 Copyright (C) 2006  BBC
@@ -51,6 +51,12 @@ Run 'perldoc SQL::Shell' to read the full documentation.
 
 
 RECENT CHANGES
+
+v1.18
+
+Added use of File::Temp for handling temporary files, specifically to allow 
+running tests from a read-only location.
+
 
 v1.17
 

@@ -8,6 +8,7 @@ MANIFEST			This list of files
 README
 t/basic.t
 t/examples/broken
+t/examples/fine
 t/utility.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

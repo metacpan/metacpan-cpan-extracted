@@ -1,0 +1,27 @@
+msgid "Aion::Run::RunsRun - список скриптов с аннотацией `#@run`"
+msgstr "Aion::Run::RunsRun - list of scripts with the annotation `#@run`"
+
+msgid "Файл etc/annotation/run.ann:"
+msgstr "File etc/annotation/run.ann:"
+
+msgid "Печатает на стандартный вывод список сценариев из файла **etc/annotation/run.ann**."
+msgstr "Prints a list of scripts from the file **etc/annotation/run.ann** to standard output."
+
+msgid "Для этого загружает файлы, чтобы получить из них описание аргументов."
+msgstr "To do this, it loads files to obtain descriptions of the arguments from them."
+
+msgid "Поменять файл можно в конфиге `Aion::Run::Runner#INI`."
+msgstr "You can change the file in the `Aion::Run::Runner#INI` config."
+
+msgid "Маска для фильтра по скриптам."
+msgstr "Mask for filter by scripts."
+
+msgid "Выводит список сценариев на `STDOUT`."
+msgstr "Lists scripts on `STDOUT`."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Run::RunsRun module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Run::RunsRun module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

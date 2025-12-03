@@ -30,19 +30,19 @@ sub check_exceptions {
         my $expected        = shift @tests;
         my $test_components = shift @tests;
         my ($test_code_line, $test) = @$test_components;
-	my $exception;
-	try {
-	    $self->$test();
-	}
-	catch $exception_class with {
-	    $exception = shift;
-	}
-	catch Error::Simple with {
-	    $exception = shift;
-	}
-	otherwise {
-	    $exception = 0;
-	};
+        my $exception;
+        try {
+            $self->$test();
+        }
+        catch $exception_class with {
+            $exception = shift;
+        }
+        catch Error::Simple with {
+            $exception = shift;
+        }
+        otherwise {
+            $exception = 0;
+        };
 
         try {
             $self->check_exception($exception_class, $expected, $exception);

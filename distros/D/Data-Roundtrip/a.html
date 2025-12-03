@@ -1,0 +1,984 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Roundtrip - convert between Perl data structures, YAML and JSON with unicode support (I believe ...)</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:andreas@fedora.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#EFFICIENCY">EFFICIENCY</a></li>
+  <li><a href="#BENCHMARKS">BENCHMARKS</a></li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#perl2json">perl2json</a></li>
+      <li><a href="#json2perl">json2perl</a></li>
+      <li><a href="#perl2yaml">perl2yaml</a></li>
+      <li><a href="#yaml2perl">yaml2perl</a></li>
+      <li><a href="#yamlfile2perl">yamlfile2perl</a></li>
+      <li><a href="#perl2dump">perl2dump</a></li>
+      <li><a href="#perl2dump_filtered">perl2dump_filtered</a></li>
+      <li><a href="#perl2dump_homebrew">perl2dump_homebrew</a></li>
+      <li><a href="#dump_perl_var_recursively">dump_perl_var_recursively</a></li>
+      <li><a href="#dump2perl">dump2perl</a></li>
+      <li><a href="#json2perl1">json2perl</a></li>
+      <li><a href="#jsonfile2perl">jsonfile2perl</a></li>
+      <li><a href="#json2yaml">json2yaml</a></li>
+      <li><a href="#yaml2json">yaml2json</a></li>
+      <li><a href="#json2json-yaml2yaml">json2json yaml2yaml</a></li>
+      <li><a href="#json2dump-dump2json-yaml2dump-dump2yaml">json2dump dump2json yaml2dump dump2yaml</a></li>
+      <li><a href="#dump2dump">dump2dump</a></li>
+      <li><a href="#read_from_file">read_from_file</a></li>
+      <li><a href="#read_from_filehandle">read_from_filehandle</a></li>
+      <li><a href="#write_to_file">write_to_file</a></li>
+      <li><a href="#write_to_filehandle">write_to_filehandle</a></li>
+    </ul>
+  </li>
+  <li><a href="#SCRIPTS">SCRIPTS</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#DEDICATIONS">DEDICATIONS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Data::Roundtrip - convert between Perl data structures, YAML and JSON with unicode support (I believe ...)</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.31</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>This module contains a collection of utilities for converting between JSON, YAML, Perl variable and a Perl variable&#39;s string representation (aka dump). Hopefully, all unicode content will be handled correctly between the conversions and optionally escaped or un-escaped. Also JSON can be presented in a pretty format or in a condensed, machine-readable format (not spaces, indendation or line breaks).</p>
+
+<pre><code>use Data::Roundtrip qw/:all/;
+#use Data::Roundtrip qw/json2yaml/;
+#use Data::Roundtrip qw/:json/; # see EXPORT
+
+$jsonstr = &#39;{&quot;Songname&quot;: &quot;&Alpha;&pi;&#x3CC;&kappa;&lambda;&eta;&rho;&omicron;&sigmaf; &tau;&eta;&sigmaf; &kappa;&omicron;&iota;&nu;&omega;&nu;&#x3AF;&alpha;&sigmaf;&quot;,&#39;
+           .&#39;&quot;Artist&quot;: &quot;&Kappa;&alpha;&zeta;&alpha;&nu;&tau;&zeta;&#x3AF;&delta;&eta;&sigmaf; &Sigma;&tau;&#x3AD;&lambda;&iota;&omicron;&sigmaf;/&Beta;&#x3AF;&rho;&beta;&omicron;&sigmaf; &Kappa;&#x3CE;&sigma;&tau;&alpha;&sigmaf;&quot;}&#39;
+;
+$yamlstr = json2yaml($jsonstr);
+print $yamlstr;
+# NOTE: long strings have been broken into multilines
+# and/or truncated (replaced with ...)
+#---
+#Artist: &Kappa;&alpha;&zeta;&alpha;&nu;&tau;&zeta;&#x3AF;&delta;&eta;&sigmaf; &Sigma;&tau;&#x3AD;&lambda;&iota;&omicron;&sigmaf;/&Beta;&#x3AF;&rho;&beta;&omicron;&sigmaf; &Kappa;&#x3CE;&sigma;&tau;&alpha;&sigmaf;
+#Songname: &Alpha;&pi;&#x3CC;&kappa;&lambda;&eta;&rho;&omicron;&sigmaf; &tau;&eta;&sigmaf; &kappa;&omicron;&iota;&nu;&omega;&nu;&#x3AF;&alpha;&sigmaf;
+
+$yamlstr = json2yaml($jsonstr, {&#39;escape-unicode&#39;=&gt;1});
+print $yamlstr;
+#---
+#Artist: \u039a\u03b1\u03b6\u03b1 ...
+#Songname: \u0391\u03c0\u03cc\u03ba ...
+
+$backtojson = yaml2json($yamlstr);
+# $backtojson is a string representation
+# of following JSON structure:
+# {&quot;Artist&quot;:&quot;&Kappa;&alpha;&zeta;&alpha;&nu;&tau;&zeta;&#x3AF;&delta;&eta;&sigmaf; &Sigma;&tau;&#x3AD;&lambda;&iota;&omicron;&sigmaf;/&Beta;&#x3AF;&rho;&beta;&omicron;&sigmaf; &Kappa;&#x3CE;&sigma;&tau;&alpha;&sigmaf;&quot;,
+#  &quot;Songname&quot;:&quot;&Alpha;&pi;&#x3CC;&kappa;&lambda;&eta;&rho;&omicron;&sigmaf; &tau;&eta;&sigmaf; &kappa;&omicron;&iota;&nu;&omega;&nu;&#x3AF;&alpha;&sigmaf;&quot;}
+
+# This is useful when sending JSON via
+# a POST request and it needs unicode escaped:
+$backtojson = yaml2json($yamlstr, {&#39;escape-unicode&#39;=&gt;1});
+# $backtojson is a string representation
+# of following JSON structure:
+# but this time with unicode escaped
+# (pod content truncated for readbility)
+# {&quot;Artist&quot;:&quot;\u039a\u03b1\u03b6 ...&quot;,
+#  &quot;Songname&quot;:&quot;\u0391\u03c0\u03cc ...&quot;}
+# this is the usual Data::Dumper dump:
+print json2dump($jsonstr);
+#$VAR1 = {
+#  &#39;Songname&#39; =&gt; &quot;\x{391}\x{3c0}\x{3cc} ...&quot;,
+#  &#39;Artist&#39; =&gt; &quot;\x{39a}\x{3b1}\x{3b6} ...&quot;,
+#};
+
+# and this is a more human-readable version:
+print json2dump($jsonstr, {&#39;dont-bloody-escape-unicode&#39;=&gt;1});
+# $VAR1 = {
+#   &quot;Artist&quot; =&gt; &quot;&Kappa;&alpha;&zeta;&alpha;&nu;&tau;&zeta;&#x3AF;&delta;&eta;&sigmaf; &Sigma;&tau;&#x3AD;&lambda;&iota;&omicron;&sigmaf;/&Beta;&#x3AF;&rho;&beta;&omicron;&sigmaf; &Kappa;&#x3CE;&sigma;&tau;&alpha;&sigmaf;&quot;,
+#   &quot;Songname&quot; =&gt; &quot;&Alpha;&pi;&#x3CC;&kappa;&lambda;&eta;&rho;&omicron;&sigmaf; &tau;&eta;&sigmaf; &kappa;&omicron;&iota;&nu;&omega;&nu;&#x3AF;&alpha;&sigmaf;&quot;
+# };
+
+# pass some parameters to Data::Dumper
+# like: be terse (no $VAR1):
+print json2dump($jsonstr,
+  {&#39;dont-bloody-escape-unicode&#39;=&gt;0, &#39;terse&#39;=&gt;1}
+ #{&#39;dont-bloody-escape-unicode&#39;=&gt;0, &#39;terse&#39;=&gt;1, &#39;indent&#39;=&gt;0}
+);
+# {
+#  &quot;Artist&quot; =&gt; &quot;&Kappa;&alpha;&zeta;&alpha;&nu;&tau;&zeta;&#x3AF;&delta;&eta;&sigmaf; &Sigma;&tau;&#x3AD;&lambda;&iota;&omicron;&sigmaf;/&Beta;&#x3AF;&rho;&beta;&omicron;&sigmaf; &Kappa;&#x3CE;&sigma;&tau;&alpha;&sigmaf;&quot;,
+#  &quot;Songname&quot; =&gt; &quot;&Alpha;&pi;&#x3CC;&kappa;&lambda;&eta;&rho;&omicron;&sigmaf; &tau;&eta;&sigmaf; &kappa;&omicron;&iota;&nu;&omega;&nu;&#x3AF;&alpha;&sigmaf;&quot;
+# }
+
+# this is how to reformat a JSON string to
+# have its unicode content escaped:
+my $json_with_unicode_escaped =
+      json2json($jsonstr, {&#39;escape-unicode&#39;=&gt;1});
+
+# sometimes we want JSON&#39;s true and false values
+# to be mapped to something other than JSON::PP::Boolean objects:
+my $json_with_custom_boolean_mapping = json2perl($jsonstr,
+    {&#39;boolean_values&#39; =&gt; &#39;myfalse&#39;, &#39;mytrue&#39;});
+my $json_with_custom_boolean_mapping = json2perl($jsonstr,
+    {&#39;boolean_values&#39; =&gt; 0, 1});
+
+# With version 0.18 and up two more exported-on-demand
+# subs were added to read JSON or YAML directly from a file:
+# jsonfile2perl() and yamlfile2perl()
+my $perldata = jsonfile2perl(&quot;file.json&quot;);
+my $perldata = yamlfile2perl(&quot;file.yaml&quot;);
+die &quot;failed&quot; unless defined $perldata;
+
+# For some of the above functions there exist command-line scripts:
+perl2json.pl -i &quot;perl-data-structure.pl&quot; -o &quot;output.json&quot; --pretty
+json2json.pl -i &quot;with-unicode.json&quot; -o &quot;unicode-escaped.json&quot; --escape-unicode
+# etc.
+
+# only for *2dump: perl2dump, json2dump, yaml2dump
+# and if no escape-unicode is required (i.e.
+# setting &#39;dont-bloody-escape-unicode&#39; =&gt; 1 permanently)
+# and if efficiency is important,
+# meaning that perl2dump is run in a loop thousand of times,
+# then import the module like this:
+use Data::Roundtrip qw/:all no-unicode-escape-permanently/;
+# or like this
+use Data::Roundtrip qw/:all unicode-escape-permanently/;
+
+# then perl2dump() is more efficient but unicode characters
+# will be permanently not-escaped (1st case) or escaped (2nd case).</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<p>By default no symbols are exported. However, the following export tags are available (:all will export all of them):</p>
+
+<ul>
+
+<li><p><code>:json</code> : <code>perl2json()</code>, <code>json2perl()</code>, <code>json2dump()</code>, <code>json2yaml()</code>, <code>json2json()</code>, <code>jsonfile2perl()</code></p>
+
+</li>
+<li><p><code>:yaml</code> : <code>perl2yaml()</code>, <code>yaml2perl()</code>, <code>yaml2dump()</code>, <code>yaml2yaml()</code>, <code>yaml2json()</code>, <code>yamlfile2perl()</code></p>
+
+</li>
+<li><p><code>:dump</code> : <code>perl2dump()</code>, <code>perl2dump_filtered()</code>, <code>perl2dump_homebrew()</code></p>
+
+</li>
+<li><p><code>:io</code> : <code>read_from_file()</code>, <code>write_to_file()</code>, <code>read_from_filehandle()</code>, <code>write_to_filehandle()</code>,</p>
+
+</li>
+<li><p><code>:all</code> : everything above.</p>
+
+</li>
+<li><p>Additionally, these four subs: <code>dump2perl()</code>, <code>dump2json()</code>, <code>dump2yaml()</code>, <code>dump2dump()</code> do not belong to any export tag. However they can be imported explicitly by the caller in the usual way (e.g. <code>use Data::Roundtrip qw/dump2perl perl2json .../</code>). Section CAVEATS, under <a href="#dump2perl">&quot;dump2perl&quot;</a>, describes how these subs <code>eval()</code> a string possibly coming from user, possibly being unchecked.</p>
+
+</li>
+<li><p><code>no-unicode-escape-permanently</code> : this is not an export keyword/parameter but a parameter which affects all the <code>*2dump*</code> subs by setting unicode escaping permanently to false. See <a href="#EFFICIENCY">&quot;EFFICIENCY&quot;</a>.</p>
+
+</li>
+<li><p><code>unicode-escape-permanently</code> : this is not an export keyword/parameter but a parameter which affects all the <code>*2dump*</code> subs by setting unicode escaping permanently to true. See <a href="#EFFICIENCY">&quot;EFFICIENCY&quot;</a>.</p>
+
+</li>
+</ul>
+
+<h1 id="EFFICIENCY">EFFICIENCY</h1>
+
+<p>The export keyword/parameter <code>no-unicode-escape-permanently</code> affects all the <code>*2dump*</code> subs by setting unicode escaping permanently to false. This improves efficiency, although one will ever need to use this in extreme situations where a <code>*2dump*</code> sub is called repeatedly in a loop of a few hundreds or thousands of iterations or more.</p>
+
+<p>Each time a <code>*2dump*</code> is called, the <code>dont-bloody-escape-unicode</code> flag is checked and if it is set, then <a>Data::Dumper</a>&#39;s <code>qquote()</code> is overriden with <code>_qquote_redefinition_by_Corion()</code> just for that instance and will be restored as soon as the dump is finished. Similarly, a filter for not escaping unicode is added to <a>Data::Dump</a> just for that particular call and is removed immediately after. This has some computational cost and can be avoided completely by overriding the sub and adding the filter once, at loading (in <code>import()</code>).</p>
+
+<p>The price to pay for this added efficiency is that unicode in any dump will never be escaped (e.g. <code>\x{3b1})</code>, but will be rendered (e.g. <code>&alpha;</code>, a greek alpha). Always. The option <code>dont-bloody-escape-unicode</code> will permanently be set to true.</p>
+
+<p>Similarly, the export keyword/parameter <code>unicode-escape-permanently</code> affects all the <code>*2dump*</code> subs by setting unicode escaping permanently to true. This improves efficiency as well.</p>
+
+<p>See <a href="#BENCHMARKS">&quot;BENCHMARKS&quot;</a> on how to find the fastest <code>*2dump*</code> sub.</p>
+
+<h1 id="BENCHMARKS">BENCHMARKS</h1>
+
+<p>The special Makefile target <code>benchmarks</code> will time calls to each of the <code>*2dump*</code> subs under</p>
+
+<pre><code>use Data::Roundtrip;
+
+use Data::Roundtrip qw/no-unicode-escape-permanently/;
+
+use Data::Roundtrip qw/unicode-escape-permanently/;</code></pre>
+
+<p>and for <code>&#39;dont-bloody-escape-unicode&#39; =&gt; 0</code> and <code>&#39;dont-bloody-escape-unicode&#39; =&gt; 1</code>.</p>
+
+<p>In general, <a href="#perl2dump">&quot;perl2dump&quot;</a> is faster by 25% when one of the permanent import parameters is used (either of the last two cases above).</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<h2 id="perl2json"><code>perl2json</code></h2>
+
+<pre><code>my $ret = perl2json($perlvar, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$perlvar</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$perlvar</code> (which can be a simple scalar or a nested data structure, but not an object), it will return the equivalent JSON string. In <code>$optional_paramshashref</code> one can specify whether to escape unicode with <code>&#39;escape-unicode&#39; =&gt; 1</code> and/or prettify the returned result with <code>&#39;pretty&#39; =&gt; 1</code> and/or allow conversion of blessed objects with <code>&#39;convert_blessed&#39; =&gt; 1</code>.</p>
+
+<p>The latter is useful when the input (Perl) data structure contains Perl objects (blessed refs!). But in addition to setting it, each of the Perl objects (their class) must implement a <code>TO_JSON()</code> method which will simply convert the object into a Perl data structure. For example, if your object stores the important data in <code>$self-&gt;data</code> as a hash, then use this to return it</p>
+
+<pre><code>sub TO_JSON { shift-&gt;data }</code></pre>
+
+<p>the converter will replace what is returned with the blessed object which does not know what to do with it. See <a href="https://perldoc.perl.org/JSON::PP#2.-convert_blessed-is-enabled-and-the-object-has-a-TO_JSON-method.">https://perldoc.perl.org/JSON::PP#2.-convert_blessed-is-enabled-and-the-object-has-a-TO_JSON-method.</a> for more information.</p>
+
+<p>The output can be fed back to <a href="#json2perl">&quot;json2perl&quot;</a> for getting the Perl variable back.</p>
+
+<p>It returns the JSON string on success or <code>undef</code> on failure.</p>
+
+<h2 id="json2perl"><code>json2perl</code></h2>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$jsonstring</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$jsonstring</code> as a string, it will return the equivalent Perl data structure using <code>JSON::decode_json(Encode::encode_utf8($jsonstring))</code>.</p>
+
+<p>It returns the Perl data structure on success or <code>undef</code> on failure.</p>
+
+<h2 id="perl2yaml"><code>perl2yaml</code></h2>
+
+<pre><code>my $ret = perl2yaml($perlvar, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$perlvar</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$perlvar</code> (which can be a simple scalar or a nested data structure, but not an object), it will return the equivalent YAML string. In <code>$optional_paramshashref</code> one can specify whether to escape unicode with <code>&#39;escape-unicode&#39; =&gt; 1</code>. Prettify is not supported yet. The output can be fed to <a href="#yaml2perl">&quot;yaml2perl&quot;</a> for getting the Perl variable back.</p>
+
+<p>It returns the YAML string on success or <code>undef</code> on failure.</p>
+
+<h2 id="yaml2perl"><code>yaml2perl</code></h2>
+
+<pre><code>my $ret = yaml2perl($yamlstring);</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$yamlstring</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$yamlstring</code> as a string, it will return the equivalent Perl data structure using <code>YAML::PP::Load($yamlstring)</code></p>
+
+<p>It returns the Perl data structure on success or <code>undef</code> on failure.</p>
+
+<h2 id="yamlfile2perl"><code>yamlfile2perl</code></h2>
+
+<pre><code>my $ret = yamlfile2perl($filename)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$filename</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$filename</code> which points to a file containing YAML content, it will return the equivalent Perl data structure.</p>
+
+<p>It returns the Perl data structure on success or <code>undef</code> on failure.</p>
+
+<h2 id="perl2dump"><code>perl2dump</code></h2>
+
+<pre><code>my $ret = perl2dump($perlvar, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$perlvar</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$perlvar</code> (which can be a simple scalar or a nested data structure, but not an object), it will return the equivalent string (via <a>Data::Dumper</a>). In <code>$optional_paramshashref</code> one can specify whether to escape unicode with <code>&#39;dont-bloody-escape-unicode&#39; =&gt; 0</code>, (or <code>&#39;escape-unicode&#39; =&gt; 1</code>). The DEFAULT behaviour is to NOT ESCAPE unicode.</p>
+
+<p>Additionally, use terse output with <code>&#39;terse&#39; =&gt; 1</code> and remove all the incessant indentation with <code>&#39;indent&#39; =&gt; 1</code> which unfortunately goes to the other extreme of producing a space-less output, not fit for human consumption. The output can be fed to <a href="#dump2perl">&quot;dump2perl&quot;</a> for getting the Perl variable back.</p>
+
+<p>It returns the string representation of the input perl variable on success or <code>undef</code> on failure.</p>
+
+<p>The output can be fed back to <a href="#dump2perl">&quot;dump2perl&quot;</a>.</p>
+
+<p>CAVEAT: when not escaping unicode (which is the default behaviour), each call to this sub will override <a>Data::Dumper</a>&#39;s <code>qquote()</code> sub then call <a>Data::Dumper</a>&#39;s <code>Dumper()</code> and save its output to a temporary variable, restore <code>qquote()</code> sub to its original code ref and return the contents. This exercise is done every time this <code>perl2dump()</code> is called. It may be expensive. The alternative is to redefine <code>qquote()</code> once, when the module is loaded, with all the side-effects this may cause.</p>
+
+<p>Note that there are two other alternative subs which offer more-or-less the same functionality and their output can be fed back to all the <code>dump2*()</code> subs. These are <a href="#perl2dump_filtered">&quot;perl2dump_filtered&quot;</a> which uses <a>Data::Dump::Filtered</a> to add a filter to control unicode escaping but lacks in aesthetics and functionality and handling all the cases Dump and Dumper do quite well.</p>
+
+<p>There is also <code>perl2dump_homebrew()</code> which uses the same dump-recursively engine as <a href="#perl2dump_filtered">&quot;perl2dump_filtered&quot;</a> but does not involve Data::Dump at all.</p>
+
+<h2 id="perl2dump_filtered"><code>perl2dump_filtered</code></h2>
+
+<pre><code>my $ret = perl2dump_filtered($perlvar, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$perlvar</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>It does the same job as <a href="#perl2dump">&quot;perl2dump&quot;</a> which is to stringify a perl variable. And takes the same options.</p>
+
+<p>It returns the string representation of the input perl variable on success or <code>undef</code> on failure.</p>
+
+<p>It uses <a>Data::Dump::Filtered</a> to add a filter to <a>Data::Dump</a>.</p>
+
+<h2 id="perl2dump_homebrew"><code>perl2dump_homebrew</code></h2>
+
+<pre><code>my $ret = perl2dump_homebrew($perlvar, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$perlvar</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>It does the same job as <a href="#perl2dump">&quot;perl2dump&quot;</a> which is to stringify a perl variable. And takes the same options.</p>
+
+<p>It returns the string representation of the input perl variable on success or <code>undef</code> on failure.</p>
+
+<p>The output can be fed back to <a href="#dump2perl">&quot;dump2perl&quot;</a>.</p>
+
+<p>It uses its own basic dumper. Which is recursive. So, beware of extremely deep nested data structures. Deep not long! But it probably is as efficient as it can be but definetely lacks in aesthetics and functionality compared to Dump and Dumper.</p>
+
+<h2 id="dump_perl_var_recursively"><code>dump_perl_var_recursively</code></h2>
+
+<pre><code>my $ret = dump_perl_var_recursively($perl_var)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$perl_var</code>, a Perl variable like a scalar or an arbitrarily nested data structure. For the latter, it requires references, e.g. hash-ref or arrayref.</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code>, the stringified version of the input Perl variable.</p>
+
+</li>
+</ul>
+
+<p>This sub will take a Perl var (as a scalar or an arbitrarily nested data structure) and emulate a very very basic Dump/Dumper but with enforced rendering unicode (for keys or values or array items), and not escaping unicode - this is not an option, it returns a string representation of the input perl var</p>
+
+<p>There are 2 obvious limitations:</p>
+
+<dl>
+
+<dt id="indentation-is-very-basic">1. indentation is very basic,</dt>
+<dd>
+
+</dd>
+<dt id="it-supports-only-scalars-hashes-and-arrays-which-will-dive-into-them-no-problem-This-sub-can-be-used-in-conjuction-with-DataDumpFilterino-to-create-a-Data::Dump-filter-like">2. it supports only scalars, hashes and arrays, (which will dive into them no problem) This sub can be used in conjuction with DataDumpFilterino() to create a Data::Dump filter like,</dt>
+<dd>
+
+<pre><code>     Data::Dump::Filtered::add_dump_filter( \&amp; DataDumpFilterino );
+or
+     dumpf($perl_var, \&amp; DataDumpFilterino);</code></pre>
+
+<p>the input is a Perl variable as a reference, so no <code>%inp</code> but <code>$inp={}</code> and <code>$inp=[]</code>.</p>
+
+<p>This function is recursive. Beware of extremely deep nested data structures. Deep not long! But it probably is as efficient as it can be but definetely lacks in aesthetics and functionality compared to Dump and Dumper.</p>
+
+<p>The output is a, possibly multiline, string. Which it can then be fed back to <a href="#dump2perl">&quot;dump2perl&quot;</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="dump2perl"><code>dump2perl</code></h2>
+
+<pre><code># CAVEAT: it will eval($dumpstring) internally, so
+#         check $dumpstring for malicious code beforehand
+#         it is a security risk if you don&#39;t.
+#         Don&#39;t use it if $dumpstring comes from
+#         untrusted sources (user input for example).
+my $ret = dump2perl($dumpstring)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$dumpstring</code>, this comes from the output of <a>Data::Dump</a>, <a>Data::Dumper</a> or our own <a href="#perl2dump">&quot;perl2dump&quot;</a>, <a href="#perl2dump_filtered">&quot;perl2dump_filtered&quot;</a>, <a href="#perl2dump_homebrew">&quot;perl2dump_homebrew&quot;</a>. Escaped, or unescaped.</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code>, the Perl data structure on success or <code>undef</code> on failure.</p>
+
+</li>
+</ul>
+
+<p>CAVEAT: it <b>eval()</b>&#39;s the input <code>$dumpstring</code> in order to create the Perl data structure. <b>eval()</b>&#39;ing unknown or unchecked input is a security risk. Always check input to <b>eval()</b> which comes from untrusted sources, like user input, scraped documents, email content. Anything really.</p>
+
+<h2 id="json2perl1"><code>json2perl</code></h2>
+
+<pre><code>my $ret = json2perl($jsonstring, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$jsonstring</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code> is an optional hashref as it is blindingly obvious from the name. At the moment only one parameter is understood: <code>boolean_values</code>. It must be an ARRAYREF of 0 or 2 elements. If 0 elements, then it resets the boolean values mapping of the JSON converter to its default state (which is <a>JSON::PP::Boolean</a> objects. If it contains 2 elements, then the JSON converter will map a JSON <code>false</code> value to the first element of the ARRAYREF and a JSON <code>true</code> value to the second element of the ARRAYREF.</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$jsonstring</code> as a string, it will return the equivalent Perl data structure using <code>JSON::decode_json(Encode::encode_utf8($jsonstring))</code>.</p>
+
+<p>It returns the Perl data structure on success or <code>undef</code> on failure.</p>
+
+<h2 id="jsonfile2perl"><code>jsonfile2perl</code></h2>
+
+<pre><code>my $ret = jsonfile2perl($filename)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$filename</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input <code>$filename</code> which points to a file containing JSON content, it will return the equivalent Perl data structure.</p>
+
+<p>It returns the Perl data structure on success or <code>undef</code> on failure.</p>
+
+<h2 id="json2yaml"><code>json2yaml</code></h2>
+
+<pre><code>my $ret = json2yaml($jsonstring, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$jsonstring</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input JSON string <code>$jsonstring</code>, it will return the equivalent YAML string <a>YAML</a> by first converting JSON to a Perl variable and then converting that variable to YAML using <a href="#perl2yaml">&quot;perl2yaml&quot;</a>. All the parameters supported by <a href="#perl2yaml">&quot;perl2yaml&quot;</a> are accepted.</p>
+
+<p>It returns the YAML string on success or <code>undef</code> on failure.</p>
+
+<h2 id="yaml2json"><code>yaml2json</code></h2>
+
+<pre><code>my $ret = yaml2json($yamlstring, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$yamlstring</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+</li>
+</ul>
+
+<p>Given an input YAML string <code>$yamlstring</code>, it will return the equivalent YAML string <a>YAML</a> by first converting YAML to a Perl variable and then converting that variable to JSON using <a href="#perl2json">&quot;perl2json&quot;</a>. All the parameters supported by <a href="#perl2json">&quot;perl2json&quot;</a> are accepted.</p>
+
+<p>It returns the JSON string on success or <code>undef</code> on failure.</p>
+
+<h2 id="json2json-yaml2yaml"><code>json2json</code> <code>yaml2yaml</code></h2>
+
+<p>Transform a json or yaml string via pretty printing or via escaping unicode or via un-escaping unicode. Parameters like above will be accepted.</p>
+
+<h2 id="json2dump-dump2json-yaml2dump-dump2yaml"><code>json2dump</code> <code>dump2json</code> <code>yaml2dump</code> <code>dump2yaml</code></h2>
+
+<p>These subs offer similar functionality as their counterparts described above.</p>
+
+<p>Section CAVEATS, under <a href="#dump2perl">&quot;dump2perl&quot;</a>, describes how <code>dump2*()</code> subs <code>eval()</code> a string possibly coming from user, possibly being unchecked.</p>
+
+<h2 id="dump2dump"><code>dump2dump</code></h2>
+
+<pre><code>my $ret = dump2dump($dumpstring, $optional_paramshashref)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$dumpstring</code></p>
+
+</li>
+<li><p><code>$optional_paramshashref</code></p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$ret</code></p>
+
+<p>Given an input string <code>$dumpstring</code>, which can have been produced by e.g. <code>perl2dump()</code> and is identical to <a>Data::Dumper</a>&#39;s <code>Dumper()</code> output, it will roundtrip back to the same string, possibly with altered format via the parameters in <code>$optional_paramshashref</code>.</p>
+
+<p>For example:</p>
+
+<pre><code>my $dumpstr = &#39;...&#39;;
+my $newdumpstr = dump2dump(
+  $dumpstr,
+  {
+    &#39;dont-bloody-escape-unicode&#39; =&gt; 1,
+    &#39;terse&#39; =&gt; 0,
+  }
+);</code></pre>
+
+<p>It returns the a dump string similar to</p>
+
+</li>
+</ul>
+
+<h2 id="read_from_file"><code>read_from_file</code></h2>
+
+<pre><code>my $contents = read_from_file($filename)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$filename</code> : the input filename.</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$contents</code></p>
+
+</li>
+</ul>
+
+<p>Given a filename, it opens it using <code>:encoding(UTF-8)</code>, slurps its contents and closes it. It&#39;s a convenience sub which could have also been private. If you want to retain the filehandle, use <a href="#read_from_filehandle">&quot;read_from_filehandle&quot;</a>.</p>
+
+<p>It returns the file contents on success or <code>undef</code> on failure.</p>
+
+<h2 id="read_from_filehandle"><code>read_from_filehandle</code></h2>
+
+<pre><code>my $contents = read_from_filehandle($filehandle)</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$filehandle</code> : the handle to an already opened file.</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p><code>$contents</code> : the file contents slurped.</p>
+
+</li>
+</ul>
+
+<p>It slurps all content from the specified input file handle. Upon return the file handle is still open. It returns the file contents on success or <code>undef</code> on failure.</p>
+
+<h2 id="write_to_file"><code>write_to_file</code></h2>
+
+<pre><code>write_to_file($filename, $contents) or die</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$filename</code> : the output filename.</p>
+
+</li>
+<li><p><code>$contents</code> : any string to write it to file.</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p>1 on success, 0 on failure</p>
+
+</li>
+</ul>
+
+<p>Given a filename, it opens it using <code>:encoding(UTF-8)</code>, writes all specified content and closes the file. It&#39;s a convenience sub which could have also been private. If you want to retain the filehandle, use <a href="#write_to_filehandle">&quot;write_to_filehandle&quot;</a>.</p>
+
+<p>It returns 1 on success or 0 on failure.</p>
+
+<h2 id="write_to_filehandle"><code>write_to_filehandle</code></h2>
+
+<pre><code>write_to_filehandle($filehandle, $contents) or die</code></pre>
+
+<p>Arguments:</p>
+
+<ul>
+
+<li><p><code>$filehandle</code> : the handle to an already opened file (for writing).</p>
+
+</li>
+</ul>
+
+<p>Return value:</p>
+
+<ul>
+
+<li><p>1 on success or 0 on failure.</p>
+
+</li>
+</ul>
+
+<p>It writes content to the specified file handle. Upon return the file handle is still open.</p>
+
+<p>It returns 1 on success or 0 on failure.</p>
+
+<h1 id="SCRIPTS">SCRIPTS</h1>
+
+<p>A few scripts have been put together and offer the functionality of this module to the command line. They are part of this distribution and can be found in the <code>script</code> directory.</p>
+
+<p>These are: <code>json2json.pl</code>, <code>json2yaml.pl</code>, <code>yaml2json.pl</code>, <code>json2perl.pl</code>, <code>perl2json.pl</code>, <code>yaml2perl.pl</code></p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>I have to apologise here to the authors of <a>YAML::PP</a> for defaming them because I clumsily wrote <a>YAML::PP</a> when I wanted to write <a>YAML</a>.</p>
+
+<p>So, the reality is that <a>YAML::PP</a> does not have any problem in handling the edge-case below.</p>
+
+<p>A valid Perl variable may kill <a>YAML</a>&#39;s <code>Load()</code> because of escapes and quotes. For example this:</p>
+
+<pre><code>my $yamlstr = &lt;&lt;&#39;EOS&#39;;
+---
+- 682224
+- &quot;\&quot;w&quot;: 1
+EOS
+my $pv = eval { YAML::Load($yamlstr) };
+if( $@ ){ die &quot;failed(1): &quot;. $@ }
+# it&#39;s dead</code></pre>
+
+<p>Strangely, there is no problem for this:</p>
+
+<pre><code>my $yamlstr = &lt;&lt;&#39;EOS&#39;;
+---
+- 682224
+- &quot;\&quot;w&quot;
+EOS
+# this is OK also:
+# - \&quot;w: 1
+my $pv = eval { YAML::Load($yamlstr) };
+if( $@ ){ die &quot;failed(1): &quot;. $@ }
+# it&#39;s OK! still alive.</code></pre>
+
+<p>I have provided an author-only test (<code>make deficiencies</code>) which tests all three of them on the edge cases. Both <a>YAML::PP</a> and <a>YAML::XS</a> pass the tests.</p>
+
+<p>This <a href="https://github.com/ingydotnet/yaml-pm/issues/224">YAML issue</a> is relevant. Many thanks to CPAN authors <a href="https://metacpan.org/author/TINITA">TINITA</a> and <a href="https://metacpan.org/author/INGY">INGY</a> for their work on this, and on <code>YAML*</code> too.</p>
+
+<p>For now, the plan is to still use <a>YAML::PP</a> and avoid explicitly requiring <a>YAML::XS</a> until <a>YAML::Any</a> is ready.</p>
+
+<p>Be warned that sub <code>dump2perl()</code> <code>eval()</code>&#39;s its input. If this comes from the user and it is not checked then it is considered a security problem. Subs <code>dump2json()</code>, <code>dump2yaml()</code>, <code>dump2dump()</code> use <code>dump2perl()</code>. The four subs will issue a warning whenever you call them. Additionally, as from version 0.28, they need to be explicitly imported like:</p>
+
+<pre><code>use Data::Roundtrip qw/... dump2perl .../</code></pre>
+
+<p>They are no longer part of export tag <code>:dump</code> nor <code>:all</code>. If their input comes from the user please check the input not to contain malicious code which when <code>eval()</code>&#39;ed can create security concerns.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andreas Hadjiprocopis, <code>&lt;bliako at cpan.org&gt; / &lt;andreashad2 at gmail.com&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-data-roundtrip at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Roundtrip">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Roundtrip</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="Convert-JSON-to-Perl-and-back-with-unicode"><a href="https://perlmonks.org/?node_id=11115241">Convert JSON to Perl and back with unicode</a></dt>
+<dd>
+
+</dd>
+<dt id="RFC:-Perl-JSON-YAML-Dumper-:-roundtripping-and-possibly-with-unicode"><a href="https://perlmonks.org/?node_id=11115280">RFC: Perl&lt;-&gt;JSON&lt;-&gt;YAML&lt;-&gt;Dumper : roundtripping and possibly with unicode</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>perldoc Data::Roundtrip</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Roundtrip">https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Roundtrip</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/Data-Roundtrip">http://annocpan.org/dist/Data-Roundtrip</a></p>
+
+</li>
+<li><p>Review this module at PerlMonks</p>
+
+<p><a href="https://www.perlmonks.org/?node_id=21144">https://www.perlmonks.org/?node_id=21144</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/Data-Roundtrip">https://metacpan.org/release/Data-Roundtrip</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Several Monks at <a>PerlMonks.org </a> (in no particular order):</p>
+
+<dl>
+
+<dt id="haukex"><a href="https://perlmonks.org/?node_id=830549">haukex</a></dt>
+<dd>
+
+</dd>
+<dt id="Corion-the-_qquote_redefinition_by_Corion-which-harnesses-Data::Dumpers-incessant-unicode-escaping"><a href="https://perlmonks.org/?node_id=5348">Corion</a> (the <code>_qquote_redefinition_by_Corion()</code> which harnesses <a>Data::Dumper</a>&#39;s incessant unicode escaping)</dt>
+<dd>
+
+</dd>
+<dt id="kcott-The-EXPORT-section-among-other-suggestions"><a href="https://perlmonks.org/?node_id=861371">kcott</a> (The EXPORT section among other suggestions)</dt>
+<dd>
+
+</dd>
+<dt id="jwkrahn"><a href="https://perlmonks.org/?node_id=540414">jwkrahn</a></dt>
+<dd>
+
+</dd>
+<dt id="leszekdubiel"><a href="https://perlmonks.org/?node_id=1164259">leszekdubiel</a></dt>
+<dd>
+
+</dd>
+<dt id="marto"><a href="https://perlmonks.org/?node_id=324763">marto</a></dt>
+<dd>
+
+</dd>
+<dt id="Haarg"><a href="https://perlmonks.org/?node_id=306692">Haarg</a></dt>
+<dd>
+
+</dd>
+<dt id="and-an-anonymous-monk">and an anonymous monk</dt>
+<dd>
+
+</dd>
+<dt id="CPAN-author-Slaven-Rezi-SREZIC-for-testing-the-code-and-reporting-numerous-problems">CPAN author Slaven Rezi&#x107; (<a href="https://metacpan.org/author/SREZIC">SREZIC</a>) for testing the code and reporting numerous problems.</dt>
+<dd>
+
+</dd>
+<dt id="CPAN-authors-TINITA-and-INGY-for-working-on-an-issue-related-to-YAML">CPAN authors <a href="https://metacpan.org/author/TINITA">TINITA</a> and <a href="https://metacpan.org/author/INGY">INGY</a> for working on an issue related to <a>YAML</a>.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="DEDICATIONS">DEDICATIONS</h1>
+
+<p>Almaz!</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software, EXCEPT the portions created by [Corion] @ Perlmonks and [kcott] @ Perlmonks, is Copyright (c) 2020 by Andreas Hadjiprocopis.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

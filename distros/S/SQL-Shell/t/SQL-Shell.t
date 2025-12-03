@@ -19,6 +19,7 @@ BEGIN {
 use Test::Assertions::TestScript(tests => $tests);
 use SQL::Shell;
 use IO::CaptureOutput qw(capture);
+use File::Temp 0.14;
 
 #Pick up testing DSN from environment
 my $dsn  = $ENV{UNIT_TEST_DSN};
@@ -46,10 +47,10 @@ my $set_history = $sqlsh->get('SetHistory');
 execute($sqlsh, "clear history");
 ASSERT(EQUAL($get_history->(), ["clear history"]), "history clear/accessor");
 execute($sqlsh, "show drivers");
-execute($sqlsh, "save history to sqlsh-history.txt");
+my $temporary_file = File::Temp->new();
+execute($sqlsh, "save history to $temporary_file");
 $set_history->([qw(foo bar)]);
-execute($sqlsh, "load history from sqlsh-history.txt");
-unlink("sqlsh-history.txt");
+execute($sqlsh, "load history from $temporary_file");
 $output = execute($sqlsh, "show history");
 ASSERT(scalar $output =~ /show drivers/s, "load and save history");
 

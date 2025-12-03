@@ -1,3 +1,45 @@
+commit 9777cd2b800e9d5a6ba9ad76fb13b3ed64e646f1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 2 23:31:22 2025 +1030
+
+    VERSION increment: 2.035
+
+commit f60efd894f4bb6ac850c8fce7873c85d005825d1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 2 23:27:06 2025 +1030
+
+    Added new files to MANIFEST
+
+commit 9b67e705fdce04996327e3ac04098ed3ee28ded4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 2 23:25:00 2025 +1030
+
+    Update WebDyne html function to allow alternative  to be supplied, but example in t.other/r_plack.pl
+
+commit b28f5a0b4d0c30c3150feb3c7248d649cc2ead6c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 2 18:40:14 2025 +1030
+
+    More more to ensure file upload object work correctly
+
+commit 4787025ef035553751fdbde07cc5f8a0d686caa8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 2 14:18:25 2025 +1030
+
+    Fix CGI_expand_param to work with both Apache mod_perl and Plack request handlers
+
+commit f62ea2cf65957aff6e5a1a278e66207376e74388
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 2 00:01:53 2025 +1030
+
+    Interim commit
+
+commit 29f51b5be447e6590afb4d19d1f99345fe7e0d2e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 30 19:47:14 2025 +1030
+
+    Interim commit
+
 commit acc41d9deb2b0cf2e077e8e3792f266d7e18515e
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Sun Nov 23 21:54:19 2025 +1030

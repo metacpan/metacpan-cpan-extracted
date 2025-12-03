@@ -156,27 +156,27 @@ sub ok { # To make porting from Test easier
     my @args = @_;
     local $Error::Depth = $Error::Depth + 1;
     if (@args == 1) {
-	$self->assert($args[0]); # boolean assertion
+        $self->assert($args[0]); # boolean assertion
     }
     elsif (@args >= 2 && @args <= 3) {
-	if (ref($args[0]) eq 'CODE') {
-	    my $code     = shift @args;
+        if (ref($args[0]) eq 'CODE') {
+            my $code     = shift @args;
             my $expected = shift @args;
-	    $self->assert_equals($expected, $code->(), @args);
-	}
-	elsif (eval {$args[1]->isa('Regexp')}) {
-	    my $got = shift @args;
-	    my $re  = shift @args;
-	    $self->assert($re, $got, @args);
-	}
-	else {
-	    my $got 	 = shift @args;
-	    my $expected = shift @args;
+            $self->assert_equals($expected, $code->(), @args);
+        }
+        elsif (eval {$args[1]->isa('Regexp')}) {
+            my $got = shift @args;
+            my $re  = shift @args;
+            $self->assert($re, $got, @args);
+        }
+        else {
+            my $got = shift @args;
+            my $expected = shift @args;
             $self->assert_equals($expected, $got, @args);
-	}
+        }
     }
     else {
-	$self->error('ok() called with wrong number of args');
+        $self->error('ok() called with wrong number of args');
     }
 }
 
@@ -502,9 +502,9 @@ sub fail {
     my($asserter,$file,$line) = caller($Error::Depth);
     my $message = join '', @_;
     Test::Unit::Failure->throw(-text => $message,
-			       -object => $self,
-			       -file => $file,
-			       -line => $line);
+                               -object => $self,
+                               -file => $file,
+                               -line => $line);
 }
 
 sub error {

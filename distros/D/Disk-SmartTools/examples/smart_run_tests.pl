@@ -12,9 +12,9 @@
 #      Requirements and Packages       #
 ########################################
 
-use lib '../lib';
 use Dev::Util::Syntax;
-use Dev::Util::OS    qw(get_hostname is_mac is_linux);
+use Dev::Util::OS    qw(get_hostname get_os is_mac is_linux);
+use Dev::Util::File  qw(file_is_block);
 use Dev::Util::Query qw(banner);
 use Disk::SmartTools qw(:all);
 
@@ -25,7 +25,7 @@ use Term::ANSIColor;
 use Data::Printer;
 
 Readonly my $PROGRAM => 'smart_run_tests.pl';
-Readonly my $VERSION => version->declare("v3.3.12");
+Readonly my $VERSION => version->declare("v3.3.15");
 
 ########################################
 #      Define Global Variables         #
@@ -280,7 +280,9 @@ B<Must be run as root.>
 
 =head2 Crontabs
 
-Usually run as a crontab
+Usually run as a crontab.  Note the C<--long> option is safe to run everyday, it
+will only run the long test on (up to) one disk a day.  By hashing the day of
+the month with the disk index it will run once a month for each disk.
 
 =over 4
 

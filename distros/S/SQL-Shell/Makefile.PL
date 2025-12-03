@@ -11,6 +11,7 @@ WriteMakefile(
     EXE_FILES        => ['bin/sqlsh'],
     PREREQ_PM        => {
       DBI => 0,
+      File::Temp => 0.14,
       URI::Escape => 0,
       Log::Trace => 0,
       Test::Assertions => 0,
