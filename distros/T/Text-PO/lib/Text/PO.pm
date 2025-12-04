@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.8.1
+## Version v0.9.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2025/10/08
+## Modified 2025/11/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.8.1';
+    our $VERSION = 'v0.9.0';
 };
 
 use strict;
@@ -70,66 +70,160 @@ our $DEF_META =
 sub init
 {
     my $self = shift( @_ );
-    $self->{domain}     = undef;
-    $self->{header}     = [];
-    ## utf8
-    $self->{encoding}   = undef;
-    $self->{meta}       = {};
-    $self->{meta_keys}  = [];
-    ## Default to using po json file if it exists
-    $self->{use_json}   = 1;
-    $self->{remove_duplicates} = 1;
+    $self->{domain}             = undef;
+    $self->{header}             = [];
+    # utf8
+    $self->{encoding}           = undef;
+    # Should we allow inclusion ?
+    $self->{include}            = 1;
+    # Maximum recursion allowed for the include option
+    $self->{max_recurse}        = 32;
+    $self->{meta}               = {};
+    $self->{meta_keys}          = [];
+    # Default to using po json file if it exists
+    $self->{use_json}           = 1;
+    $self->{remove_duplicates}  = 1;
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{elements}   = [];
     $self->{added}      = [];
     $self->{removed}    = [];
     $self->{source}     = {};
+    $self->{_parsed}    = 0;
     return( $self );
 }
 
 sub add_element
 {
     my $self = shift( @_ );
-    my $id;
-    my $opt = {};
-    my $e;
+    my( $msgid, $e, $opts );
     if( $self->_is_a( $_[0] => 'Text::PO::Element' ) )
     {
         $e = shift( @_ );
-        $id = $e->msgid_as_text;
-    }
-    elsif( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
-    {
-        $opt = shift( @_ );
-        $id = $opt->{msgid} || return( $self->error( "No msgid was provided" ) );
-        $e = Text::PO::Element->new( %$opt );
-    }
-    elsif( !( @_ % 2 ) )
-    {
-        $opt = { @_ };
-        $id = $opt->{msgid} || return( $self->error( "No msgid was provided" ) );
-        $e = Text::PO::Element->new( %$opt );
+        $msgid = $e->msgid_as_text || return( $self->error( "No msgid was provided" ) );
+        $opts = $self->_get_args_as_hash( @_ );
     }
     else
     {
-        $id = shift( @_ );
-        $opt = { @_ } if( !( @_ % 2 ) );
-        $opt->{msgid} = $id;
-        $e = Text::PO::Element->new( %$opt );
+        $opts = $self->_get_args_as_hash( @_ );
+        $msgid = $opts->{msgid} || return( $self->error( "No msgid was provided" ) );
+        $e = $self->new_element( %$opts ) || return( $self->pass_error );
     }
-    return( $self->error( "No msgid was provided." ) ) if( !length( $id ) );
-    my $elem = $self->elements;
-    foreach my $e2 ( @$elem )
+    return( $self->error( "No msgid was provided." ) ) if( !length( $msgid ) );
+    my $elems = $self->elements;
+    foreach my $e2 ( @$elems )
     {
-        if( $e2->msgid_as_text eq $id )
+        next if( $e2->is_meta || $e2->is_include );
+        if( $e2->msgid_as_text eq $msgid )
         {
-            # return( $self->error( "There already is an id '$id' in the po file" ) );
+            # return( $self->error( "There already is an id '$msgid' in the po file" ) );
             return( $e2 );
         }
     }
     $e->po( $self );
-    push( @{$self->{elements}}, $e );
+    my $id = ( $opts->{before} || $opts->{after} );
+    if( $id )
+    {
+        my $found = 0;
+        for( my $i = 0; $i < scalar( @$elems ); $i++ )
+        {
+            my $elem = $elems->[$i];
+            next if( $elem->is_meta );
+            if( ( $elem->is_include && ( $elem->file // '' ) eq $id ) ||
+                ( !$elem->is_include && ( $elem->id // '' ) eq $id ) )
+            {
+                if( $opts->{after} )
+                {
+                    splice( @$elems, $i + 1, 0, $e );
+                }
+                elsif( $opts->{before} )
+                {
+                    splice( @$elems, $i, 0, $e );
+                }
+                $found++;
+                last;
+            }
+        }
+        if( !$found )
+        {
+            return( $self->error( "No msgid/include '$id', to add ", ( $opts->{before} ? 'before' : 'after' ), ", was found, and thus the msgid '${msgid}' could not be added." ) );
+        }
+    }
+    else
+    {
+        push( @{$self->{elements}}, $e );
+    }
+    return( $e );
+}
+
+sub add_include
+{
+    my $self = shift( @_ );
+    my $e;
+    my $opts;
+    if( $self->_is_a( $_[0] => 'Text::PO::Element' ) )
+    {
+        $e = shift( @_ );
+        if( !$e->file )
+        {
+            return( $self->error( "The Text::PO::Element object provided does not have any 'file' value set." ) );
+        }
+        $opts = $self->_get_args_as_hash( @_ );
+    }
+    else
+    {
+        $opts = $self->_get_args_as_hash( @_ );
+        if( !$opts->{file} )
+        {
+            return( $self->error( "No 'file' property found in the hash of options provided." ) );
+        }
+        $e = $self->new_element( %$opts ) || return( $self->pass_error );
+    }
+    $e->is_include(1);
+    my $file  = $e->file;
+    my $elems = $self->elements;
+    foreach my $elem ( @$elems )
+    {
+        next unless( $elem->is_include );
+        if( ( $elem->file // '' ) eq $file )
+        {
+            return( $elem );
+        }
+    }
+
+    $e->po( $self );
+    my $id = ( $opts->{before} || $opts->{after} );
+    if( $id )
+    {
+        my $found = 0;
+        for( my $i = 0; $i < scalar( @$elems ); $i++ )
+        {
+            my $elem = $elems->[$i];
+            next if( $elem->is_meta );
+            if( ( $elem->is_include && ( $elem->file // '' ) eq $id ) ||
+                ( !$elem->is_include && ( $elem->id // '' ) eq $id ) )
+            {
+                if( $opts->{after} )
+                {
+                    splice( @$elems, $i + 1, 0, $e );
+                }
+                elsif( $opts->{before} )
+                {
+                    splice( @$elems, $i, 0, $e );
+                }
+                $found++;
+                last;
+            }
+        }
+        if( !$found )
+        {
+            return( $self->error( "No msgid/include '$id', to add ", ( $opts->{before} ? 'before' : 'after' ), ", was found, and thus the include '${file}' could not be added." ) );
+        }
+    }
+    else
+    {
+        push( @{$self->{elements}}, $e );
+    }
     return( $e );
 }
 
@@ -176,7 +270,7 @@ sub as_json
         {
             $v = ref( $msgstr ) ? join( '', @$msgstr ) : $msgstr;
         }
-        
+
         my $ref =
         {
             msgid => $k,
@@ -219,6 +313,15 @@ sub as_json
         return( $self->error( "Unable to json encode the hash data created: $@" ) );
     }
     return( $json );
+}
+
+sub as_string
+{
+    my $self = shift( @_ );
+    my $s = $self->new_scalar( '' );
+    my $io = $s->open || return( $self->pass_error( $s->error ) );
+    $self->dump( $io );
+    return( "$s" );
 }
 
 sub charset
@@ -273,6 +376,7 @@ sub domain { return( shift->_set_get_scalar( 'domain', @_ ) ); }
 sub dump
 {
     my $self = shift( @_ );
+    require IO::File;
     my $fh = IO::File->new;
     if( @_ )
     {
@@ -288,18 +392,26 @@ sub dump
     $enc = 'utf8' if( lc( $enc ) eq 'utf-8' );
     $fh->binmode( ":${enc}" ) || return( $self->error( "Unable to set binmode on character encoding '$enc': $!" ) );
     $fh->autoflush(1);
+
+    # If this is a brain new instance whose data do not originate from parsing a file, and we do not have yet meta data, we set some default now
+    if( !$self->{_parsed} && !scalar( keys( %{$self->{meta}} ) ) )
+    {
+        $self->set_default_meta;
+    }
+
     my $elem = $self->{elements};
     if( my $header = $self->header )
     {
         $fh->print( join( "\n", @$header ) ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
     }
-    my $domain = $self->domain;
+    my $domain = '';
+    $domain = $self->domain if( $self->domain );
     if( length( $domain ) )
     {
         $fh->print( "\n#\n# domain \"${domain}\"" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
     }
     $fh->print( "\n\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
-    ## my $metaKeys = $self->meta_keys;
+    # my $metaKeys = $self->meta_keys;
     my $metaKeys = [@META];
     if( scalar( @$metaKeys ) )
     {
@@ -309,11 +421,13 @@ sub dump
         {
             my $k2 = lc( $k );
             $k2 =~ tr/-/_/;
-            if( !exists( $self->{meta}->{ $k2 } ) && 
-                length( $DEF_META->{ $k } ) )
-            {
-                $self->{meta}->{ $k2 } = $DEF_META->{ $k };
-            }
+            # No, we do not do this anymore. See set_default_meta()
+            # if( !exists( $self->{meta}->{ $k2 } ) && 
+            #     length( $DEF_META->{ $k } ) )
+            # {
+            #     $self->{meta}->{ $k2 } = $DEF_META->{ $k };
+            # }
+            next if( !exists( $self->{meta}->{ $k2 } ) );
             $fh->printf( "\"%s: %s\\n\"\n", $self->normalise_meta( $k ), $self->meta( $k ) ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         }
         $fh->print( "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
@@ -321,12 +435,19 @@ sub dump
     foreach my $e ( @$elem )
     {
         my $msgid  = $e->msgid;
-        next if( $e->is_meta || !CORE::length( $msgid ) || ( ref( $msgid // '' ) eq 'ARRAY' && !scalar( @$msgid ) ) );
-        if( $e->po ne $self )
+        if( $e->is_include )
         {
-            warn( "This element '", $e->msgid_as_text, "' does not belong to us. Its po object is different than our current object.\n" ) if( $self->_is_warnings_enabled );
+            $fh->print( $e->dump, "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         }
-        $fh->print( $e->dump, "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
+        else
+        {
+            next if( $e->is_meta || !CORE::length( $msgid ) || ( ref( $msgid // '' ) eq 'ARRAY' && !scalar( @$msgid ) ) );
+            if( $e->po ne $self )
+            {
+                warn( "This element '", $e->msgid_as_text, "' does not belong to us. Its po object is different than our current object.\n" ) if( $self->_is_warnings_enabled );
+            }
+            $fh->print( $e->dump, "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
+        }
         $fh->print( "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
     }
     return( $self );
@@ -345,11 +466,18 @@ sub exists
     $opts->{msgid_only} //= 0;
     my $elems = $self->{elements};
     # No need to go further if the object provided does not even have a msgid
-    return(0) if( !length( $elem->msgid_as_text ) );
+    return(0) if( !$elem->is_include && !length( $elem->msgid_as_text ) );
     foreach my $e ( @$elems )
     {
-        if( ( $opts->{msgid_only} && $e->msgid_as_text eq $elem->msgid_as_text ) ||
-            ( $e->msgid_as_text eq $elem->msgid_as_text && $e->msgstr_as_text eq $elem->msgstr_as_text ) )
+        if( $e->is_include )
+        {
+            if( ( $e->file // '' ) eq ( $elem->file // '' ) )
+            {
+                return(1);
+            }
+        }
+        elsif( ( $opts->{msgid_only} && ( $e->msgid_as_text // '' ) eq ( $elem->msgid_as_text // '' ) ) ||
+            ( ( $e->msgid_as_text // '' ) eq ( $elem->msgid_as_text // '' ) && ( $e->msgstr_as_text // '' ) eq ( $elem->msgstr_as_text // '' ) ) )
         {
             if( length( $elem->context ) )
             {
@@ -383,11 +511,18 @@ sub hash
 
 sub header { return( shift->_set_get_array_as_object( 'header', @_ ) ); }
 
+sub include { return( shift->_set_get_boolean( 'include', @_ ) ); }
+
 sub language { return( shift->_set_get_meta_value( 'Language', @_ ) ); }
 
 sub language_team { return( shift->_set_get_meta_value( 'Language-Team', @_ ) ); }
 
 sub last_translator { return( shift->_set_get_meta_value( 'Last-Translator', @_ ) ); }
+
+sub max_recurse { return( shift->_set_get_number({
+    field => 'max_recurse',
+    constraint => 'unsigned_int',
+}, @_ ) ); }
 
 sub merge
 {
@@ -426,7 +561,7 @@ sub meta
         {
             return( $self->error( "Unknown data provided: '", join( "', '", @_ ), "'." ) );
         }
-        
+
         foreach my $k ( keys( %{$self->{meta}} ) )
         {
             if( CORE::index( $k, '-' ) != -1 )
@@ -495,6 +630,7 @@ sub parse
 {
     my $self = shift( @_ );
     my $this = shift( @_ ) || return( $self->error( "No file or glob was provided to parse po file." ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $io;
     my $fh_was_open = 0;
     if( Scalar::Util::reftype( $this ) eq 'GLOB' )
@@ -504,11 +640,18 @@ sub parse
         $fh_was_open++;
         $self->source({ handle => $this });
     }
+    elsif( index( $this, "\n" ) != -1 )
+    {
+        return( $self->error( "Use parse_data() if you want to parse lines of data." ) );
+    }
     else
     {
-        $io = IO::File->new( "<$this" ) || return( $self->error( "Unable to open po file \"$this\" in read mode: $!" ) );
+        # Use the inherited method 'new_file' from Module::Generic to get a Module::Generic::File object
+        my $file = $self->new_file( $this ) ||
+            return( $self->pass_error );
+        $io = $file->open( '<' ) || return( $self->error( "Unable to open po file \"$this\" in read mode: $!" ) );
         # By default
-        $self->source({ file => $this });
+        $self->source({ file => $file });
     }
     $io->binmode( ':utf8' );
     my $elem = [];
@@ -516,6 +659,114 @@ sub parse
     my $header = '';
     my $ignoring_leading_blanks = 1;
     my $n = 0;
+
+    my $include     = exists( $opts->{include} ) ? $opts->{include} : $self->include;
+    # For include recursion
+    my $seen_inc    = $opts->{seen}  // {};
+    my $depth       = $opts->{depth} // 0;
+    my $max_recurse = exists( $opts->{max_recurse} ) ? $opts->{max_recurse} : $self->max_recurse;
+    my $lang;
+
+    my $e = Text::PO::Element->new( po => $self );
+    $e->debug( $self->debug );
+    # What was the last seen element?
+    # This is used for multi line buffer, so we know where to add it
+    my $lastSeen = '';
+    my $foundFirstLine = 0;
+    # To keep track of the msgid found so we can skip duplicates
+    my $seen = {};
+
+    my $include_file = sub
+    {
+        my $inc_name = shift( @_ ) || return( $self->error( "No file to include was provided." ) );
+        my $c = shift( @_ ); # The original line
+        my $inc_file;
+        # Resolve path relative to current source file, if any
+        my $source = $self->source;
+        if( $source && $source->file )
+        {
+            my $base_file = $self->new_file( $source->file ) ||
+                return( $self->pass_error );
+            $inc_file = $self->new_file( $inc_name, base_file => $base_file ) ||
+                return( $self->pass_error );
+        }
+        else
+        {
+            $inc_file = $self->new_file( $inc_name );
+        }
+
+        if( !$inc_file->exists )
+        {
+            # Add it as a comment so the user sees it
+            $e->add_comment( $c );
+            my $msg = "Include file $inc_name ($inc_file) does not exist at line $n";
+            warn( $msg ) if( $self->_is_warnings_enabled );
+            # Add a comment so translators see the problem:
+            $e->add_comment( "ERROR: $msg" );
+            return(1);
+        }
+
+        # Cycle detection: avoid infinite mutual includes
+        if( exists( $seen_inc->{ "$inc_file" } ) )
+        {
+            my $from = $seen_inc->{ "$inc_file" };
+            my $msg  = "Include file \"$inc_file\" has already been included in \"$from\".";
+            warn( $msg ) if( $self->_is_warnings_enabled );
+            # Optionally annotate:
+            $e->add_comment( "INFO: $msg" );
+            return(1);
+        }
+
+        # Mark as seen from this file
+        # $this might be a glob, but the point here is to mark this include as being already processed.
+        $seen_inc->{ "$inc_file" } = ( $source && $source->file ) ? $source->file : "$this";
+
+        if( ( $depth + 1 ) > $max_recurse )
+        {
+            warn( "Maximum include recursion depth ($max_recurse) exceeded (", ( $depth + 1 ), "). Not parsing $inc_file" ) if( $self->_is_warnings_enabled );
+            return(1);
+        }
+
+        # Parse include in a fresh Text::PO object
+        my $sub = $self->new;
+        $sub->debug( $self->debug );
+
+        my $me = $sub->parse(
+            $inc_file,
+            include     => $include,
+            seen        => $seen_inc,
+            depth       => ( $depth + 1 ),
+            max_recurse => $max_recurse,
+        );
+        if( !$me )
+        {
+            return( $self->pass_error( $sub->error ) );
+        }
+
+        # If the include file has some meta information that include language and we do too, we check, and warn if they do not match
+        my $sub_lang = $sub->language;
+        if( defined( $lang ) && defined( $sub_lang ) && lc( $lang ) ne lc( $sub_lang ) )
+        {
+            warn( "Warning only: the language ($sub_lang) of the include file ($inc_file) is different than ours ($lang)" ) if( $self->_is_warnings_enabled );
+        }
+
+        my $sub_elems = $sub->elements;
+        if( $sub_elems && @$sub_elems )
+        {
+            # Reuse the same %$seen as for top-level duplicates
+            foreach my $se ( @$sub_elems )
+            {
+                my $id = $se->id // '';
+                # Skip duplicate msgid/context combos
+                next if( ++$seen->{ $id } > 1 );
+                # Before we add it to our elements, we change ownership
+                $se->po( $self );
+                push( @$elem, $se );
+            }
+        }
+        return( $sub );
+    };
+
     # Ignore / remove possible leading blank lines
     while( defined( $_ = $io->getline ) )
     {
@@ -530,7 +781,16 @@ sub parse
         }
         #( 1 .. /^[^\#]+$/ ) or last;
         /^\#+/ || last;
-        if( /^\#+[[:blank:]\h]*domain[[:blank:]]+\"([^\"]+)\"/ )
+        if( /^\#+[[:blank:]]*(?:\.[[:blank:]]*)?\$include[[:blank:]]+(["'])(.+?)\1$/i )
+        {
+            my $inc_name = $2;
+            if( $include )
+            {
+                $include_file->( $inc_name, $_, $n ) || return( $self->pass_error );
+            }
+            # otherwise, we don't do anything, and discard the line
+        }
+        elsif( /^\#+[[:blank:]\h]*domain[[:blank:]]+\"([^\"]+)\"/ )
         {
             $self->domain( $1 );
         }
@@ -544,15 +804,8 @@ sub parse
     # Make sure to position ourself after the initial blank line if any, since blank lines are used as separators
     # Actually, no we don't care. Blocks are: maybe some comments, msgid then msgstr. That's how we delimit them
     # $_ = $io->getline while( /^[[:blank:]]*$/ && defined( $_ ) );
-    $self->header( [ split( /\n/, $header ) ] ) if( length( $header ) );
-    my $e = Text::PO::Element->new( po => $self );
-    $e->debug( $self->debug );
-    # What was the last seen element?
-    # This is used for multi line buffer, so we know where to add it
-    my $lastSeen = '';
-    my $foundFirstLine = 0;
-    # To keep track of the msgid found so we can skip duplicates
-    my $seen = {};
+    $self->header( [split( /\n/, $header )] ) if( length( $header ) );
+
     while( defined( $_ = $io->getline ) )
     {
         $n++;
@@ -574,26 +827,38 @@ sub parse
                 {
                     $elem->[-1]->merge( $e );
                 }
+                elsif( $e->is_include )
+                {
+                    push( @$elem, $e );
+                }
                 else
                 {
                     if( ++$seen->{ $e->id // '' } > 1 )
                     {
                         next;
                     }
-                    push( @$elem, $e );
+                    elsif( !$e->id && !length( $e->msgstr // '' ) )
+                    {
+                        # Skipping empty first element. Probably from a bad file...
+                    }
+                    else
+                    {
+                        push( @$elem, $e );
+                    }
                 }
                 $e = Text::PO::Element->new( po => $self );
                 $e->{_po_line} = $n;
                 $e->encoding( $self->encoding ) if( $self->encoding );
                 $e->debug( $self->debug );
             }
+
             # special treatment for first item that contains the meta information
             if( scalar( @$elem ) == 1 )
             {
                 my $this = $elem->[0];
-                my $def = $this->msgstr;
+                my $def = $this->msgstr || [];
                 $def = [split( /\n/, join( '', @$def ) )];
-                
+
                 my $meta = {};
                 foreach my $s ( @$def )
                 {
@@ -628,15 +893,17 @@ sub parse
                 }
                 if( scalar( keys( %$meta ) ) )
                 {
+                    $lang = $meta->{language} if( exists( $meta->{language} ) && defined( $meta->{language} ) && length( $meta->{language} // '' ) );
                     $self->meta( $meta );
-                    $this->is_meta( 1 );
+                    $this->is_meta(1);
                 }
             }
         }
         # #. TRANSLATORS: A test phrase with all letters of the English alphabet.
         # #. Replace it with a sample text in your language, such that it is
         # #. representative of language's writing system.
-        elsif( /^\#\.[[:blank:]]*(.*?)$/ )
+        # We make sure this is not confused with a non-standard include directive
+        elsif( /^\#\.[[:blank:]]*(?<text>(?!.*\$include[[:blank:]]+["'][^"']*["']).*?)$/i )
         {
             my $c = $1;
             $e->add_auto_comment( $c );
@@ -654,16 +921,55 @@ sub parse
             my $c = $1;
             $e->flags( [ split( /[[:blank:]]*,[[:blank:]]*/, $c ) ] ) if( $c );
         }
-        elsif( /^\#+[[:blank:]]*(.*?)$/ )
+        # Some other comments:
+        # - domain declaration
+        # - auto comment (extracted with xgettext from the code)
+        # - $include directives
+        elsif( /^\#+(.*?)$/ )
         {
             my $c = $1;
+
+            # NOTE: Include directive:
+            #   # $include "file.po"
+            #   #. $include "file.po"
+            #   #.$include "file.po"
+            # case insensitive, and single or double quote is ok.
+            if( $c =~ /^(?:(?:\.[[:blank:]]*)|[[:blank:]]+)\$include[[:blank:]]+(["'])(.+?)\1/i )
+            {
+                my $inc_name = $2;
+                if( $include )
+                {
+                    $include_file->( $inc_name, $c ) || return( $self->pass_error );
+
+                    # Since this line is an include directive, we do not treat it as a normal comment.
+                    next;
+                }
+                # We just record it
+                else
+                {
+                    $e->is_include(1);
+                    $e->file( $inc_name );
+                }
+            }
+
+            # Normal comment / domain handling as before
             if( !$self->meta->length && $c =~ /^domain[[:blank:]\h]+\"(.*?)\"/ )
             {
                 $self->domain( $1 );
             }
+            # It could be a blank auto comment, but we keep it to represent faithfully what we found.
+            elsif( $c =~ /^\.[[:blank:]]*(.*?)$/ )
+            {
+                my $auto_comment = $1;
+                # Trim leading and trailing spaces
+                $auto_comment =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
+                $e->add_auto_comment( $auto_comment );
+            }
             else
             {
-                $e->add_comment( $c);
+                # Trim leading and trailing spaces
+                $c =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
+                $e->add_comment( $c );
             }
         }
         elsif( /^msgid[[:blank:]]+"(.*?)"$/ )
@@ -744,6 +1050,12 @@ sub parse
         }
         shift( @$elem ) if( $elem->[0]->is_meta );
     }
+    elsif( $e->msgid // '' )
+    {
+        push( @$elem, $e );
+    }
+    # Mark this instance as having parsed data (vs an instance where we build data programmatically)
+    $self->{_parsed} = 1;
     return( $self );
 }
 
@@ -780,7 +1092,7 @@ sub parse_header_value
     }
     my $header_val = shift( @parts );
     my $obj = Text::PO::HeaderValue->new( $header_val );
-    
+
     my $param = {};
     foreach my $frag ( @parts )
     {
@@ -864,7 +1176,7 @@ sub parse2object
         {
             return( $self->error( "An error occurred while json decoding data from \"${file}\": $@" ) );
         }
-        
+
         $self->domain( $ref->{domain} ) if( length( $ref->{domain} ) && !length( $self->domain ) );
         my $meta_keys = [];
         if( $ref->{meta_keys} )
@@ -875,7 +1187,7 @@ sub parse2object
         {
             $meta_keys = [sort( keys( %{$ref->{meta}} ) )];
         }
-        
+
         if( $ref->{meta} )
         {
             $self->{meta} = {};
@@ -887,7 +1199,7 @@ sub parse2object
             }
         }
         $self->{meta_keys} = $meta_keys;
-        
+
         if( scalar( @$meta_keys ) )
         {
             my $e = Text::PO::Element->new( 'po' => $self );
@@ -899,7 +1211,7 @@ sub parse2object
             $e->is_meta(1);
             push( @{$self->{elements}}, $e );
         }
-        
+
         foreach my $def ( @{$ref->{elements}} )
         {
             my $e = Text::PO::Element->new( 'po' => $self );
@@ -1012,6 +1324,22 @@ sub remove_element
 
 sub removed { return( shift->_set_get_array_as_object( 'removed', @_ ) ); }
 
+sub set_default_meta
+{
+    my $self = shift( @_ );
+    foreach my $k ( @META )
+    {
+        my $k2 = lc( $k );
+        $k2 =~ tr/-/_/;
+        if( !exists( $self->{meta}->{ $k2 } ) && 
+            length( $DEF_META->{ $k } ) )
+        {
+            $self->{meta}->{ $k2 } = $DEF_META->{ $k };
+        }
+    }
+    return( $self );
+}
+
 sub source { return( shift->_set_get_hash_as_object( 'source', @_ ) ); }
 
 sub sync
@@ -1041,7 +1369,7 @@ sub sync
         $fh->close;
         return( $self );
     }
-    
+
     if( Scalar::Util::reftype( $this ) eq 'GLOB' )
     {
         return( $self->error( "Filehandle provided is not opened" ) ) if( !Scalar::Util::openhandle( $this ) );
@@ -1080,31 +1408,51 @@ sub sync_fh
     return( $self->error( "Filehandle provided $fh is not a valid file handle" ) ) if( !Scalar::Util::openhandle( $fh ) );
     my $opts = $self->_get_args_as_hash( @_ );
     # Parse file
-    my $po = $self->new;
+    my $po = $self->new( include => 0 );
     $po->debug( $self->debug );
+    # Load the target data file
     $po->parse( $fh );
     # Remove the ones that do not exist
     my $elems = $po->elements;
     my @removed = ();
+    # Check the target elements against ours
     for( my $i = 0; $i < scalar( @$elems ); $i++ )
     {
         my $e = $elems->[$i];
+        # Do we have the target element ? If not, it was removed
         if( !$self->exists( $e, { msgid_only => 1 } ) )
         {
             my $removedObj = splice( @$elems, $i, 1 );
             push( @removed, $removedObj ) if( $removedObj );
             $i--;
         }
+        else
+        {
+            # Ok, already exists
+        }
     }
     # Now check each one of ours against this parsed file and add our items if missing
     $elems = $self->elements;
     my @added = ();
+    # Check our source elements against the target ones
     foreach my $e ( @$elems )
     {
+        # Does the target file have our element ? If not, we add it.
         if( !$po->exists( $e, { msgid_only => 1 } ) )
         {
-            $po->add_element( $e );
+            if( $e->is_include )
+            {
+                $po->add_include( $e );
+            }
+            else
+            {
+                $po->add_element( $e );
+            }
             push( @added, $e );
+        }
+        else
+        {
+            # Ok, already exists
         }
     }
     # Now, rewind and rewrite the file
@@ -1222,10 +1570,10 @@ sub _set_get_meta_value
         our $TOKEN_REGEXP = qr/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
         our $TEXT_REGEXP  = qr/^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
     };
-    
+
     use strict;
     use warnings;
-    
+
     sub init
     {
         my $self = shift( @_ );
@@ -1237,7 +1585,7 @@ sub _set_get_meta_value
         $self->{params} = {};
         return( $self );
     }
-    
+
     sub as_string
     {
         my $self = shift( @_ );
@@ -1274,9 +1622,9 @@ sub _set_get_meta_value
         }
         return( $self->{original} );
     }
-    
+
     sub original { return( shift->_set_get_scalar_as_object( 'original', @_ ) ); }
-    
+
     sub param
     {
         my $self = shift( @_ );
@@ -1288,7 +1636,7 @@ sub _set_get_meta_value
         }
         return( $self->{params}->{ $name } );
     }
-    
+
     sub qstring
     {
         my $self = shift( @_ );
@@ -1304,17 +1652,19 @@ sub _set_get_meta_value
         {
             return( $self->error( 'Invalid parameter value' ) );
         }
-        
+
         $str =~ s/$QUOTE_REGEXP/\\$1/g;
         return( '"' . $str . '"' );
     }
-    
+
     sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 }
 
 1;
 # NOTE: POD
 __END__
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -1323,21 +1673,38 @@ Text::PO - Read and write PO files
 =head1 SYNOPSIS
 
     use Text::PO;
+    # Create a parser (include directives enabled by default)
     my $po = Text::PO->new;
-    $po->debug( 2 );
-    $po->parse( $poFile ) || die( $po->error, "\n" );
+    $po->debug(2);
+    $po->parse( $poFile ) || die( $po->error );
+
+    # Or disable include processing for this parsing
+    $po->parse( $poFile, include => 0 );
+
+    # Retrieve parsed elements
     my $hash = $po->as_hash;
     my $json = $po->as_json;
+
+    # Serialize back to PO text
+    my $str = $po->as_string;
+
     # Add data:
     my $e = $po->add_element(
-        msgid => 'Hello!',
+        msgid  => 'Hello!',
         msgstr => 'Salut !',
     );
+    my $e = $po->add_include(
+        file  => 'include/me.po',
+        after => 'Hello world!',
+    );
+
     $po->remove_element( $e );
+
+    # Iterate over elements
     $po->elements->foreach(sub
     {
         my $e = shift( @_ ); # $_ is also available
-        if( $e->msgid_as_text eq $other->msgid_as_text )
+        if( $e->msgid_as_text eq 'Hello!' )
         {
             # do something
         }
@@ -1358,16 +1725,18 @@ Or, maybe using the object overloading directly:
     $po->dump;
     # or to a file handle
     $po->dump( $io );
+
     # Synchronise data
     $po->sync( '/some/where/com.example.api.po' );
     $po->sync( $file_handle );
+
     # or merge
     $po->merge( '/some/where/com.example.api.po' );
     $po->merge( $file_handle );
 
 =head1 VERSION
 
-    v0.8.1
+    v0.9.0
 
 =head1 DESCRIPTION
 
@@ -1393,13 +1762,136 @@ One object should be created per po file, because it stores internally the po da
 
 Returns the object.
 
+The following options can be provided:
+
+=over 4
+
+=item * C<domain>
+
+The PO domain.
+
+=item * C<header>
+
+An array reference of PO file header string. Those are often lines of comments preceded by a pound sign (C<#>), possibly with some copyright information.
+
+=item * C<encoding>
+
+The content encoding of the file, such as C<utf-8>
+
+=item * C<include>
+
+Defaults to true.
+
+A boolean value (C<1> or C<0>) to indicate whether the parser should recognise include directives or not.
+
+=item * C<max_recurse>
+
+Defaults to 32
+
+An unsigned integer value representing the maximum recursion allowed when C<include> is enabled, and when the parser finds include directives.
+
+=item * C<meta>
+
+An hash reference of meta key-value pairs, with the keys in all lower case.
+
+=item * C<meta_keys>
+
+An array reference of meta keys found,
+
+=item * C<use_json>
+
+Defaults to true.
+
+A boolean value (C<1> or C<0>) to indicate whether to use JSON format.
+
+=back
+
 =head2 METHODS
 
 =head2 add_element
 
-Given either a L<Text::PO::Element> object, or an hash ref with keys like C<msgid> and C<msgstr>, or given a C<msgid> followed by an optional hash ref, L</add_element> will add this to the stack of elements.
+    my $elem = $po->add_element( $element_object,
+        after => 'Some other text',
+    );
+    my $elem = $po->add_element(
+        msgid   => 'Hello world!",
+        msgstr  => 'Salut tout le monde !',
+        comment => 'No comment',
+        before  => 'Some other text',        # Add this new element before this msgid/include directive
+    );
+
+This takes either of the following parameters, and adds the new element, if it does not already exist, to the list of elements:
+
+=over 4
+
+=item 1. L<Text::PO::Element> object + C<%options>
+
+A L<Text::PO::Element> object, possibly followed by an hash or hash reference of options.
+
+=item 2. C<%options>
+
+An hash or hash ref of options that will be passed to L<Text::PO::Element> to create a new object.
+
+=back
 
 It returns the newly created element if it did not already exist, or the existing one found. Thus if you try to add an element data that already exists, this will prevent it and return the existing element object found.
+
+If an error occurred, it will set an L<error object|Module::Generic::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+Supported options are:
+
+=over 4
+
+=item * all the ones used in L<Text::PO::Element>
+
+=item * C<before> / C<after>
+
+A C<msgid> or C<include> directive value to add this element before or after.
+
+=back
+
+=head2 add_include
+
+    my $elem = $po->add_include( $element_object,
+        after => 'Some other text',
+    );
+    my $elem = $po->add_include(
+        file    => 'include/me.po",
+        comment => 'No comment',
+        before  => 'Some other text',   # Add this new element before this msgid/include directive
+    );
+
+This takes either of the following parameters, and adds the new include directive, if it does not already exist, to the list of elements:
+
+=over 4
+
+=item 1. L<Text::PO::Element> object + C<%options>
+
+A L<Text::PO::Element> object, possibly followed by an hash or hash reference of options.
+
+=item 2. C<%options>
+
+An hash or hash ref of options that will be passed to L<Text::PO::Element> to create a new object.
+
+=back
+
+Note that the C<file> parameter must be set in the element passed, or provided among the options used to create a new element.
+
+It returns the newly created element if it did not already exist, or the existing one found. Thus if you try to add an include directive that already exists, this will prevent it and return the existing element object found.
+
+If an error occurred, it will set an L<error object|Module::Generic::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+Supported options are:
+
+=over 4
+
+=item * all the ones used in L<Text::PO::Element>
+
+=item * C<before> / C<after>
+
+A C<msgid> or C<include> directive value to add this element before or after.
+
+=back
 
 =head2 added
 
@@ -1439,9 +1931,13 @@ If true, L<JSON> will utf8 encode the data.
 
 Return the data parsed as an hash reference.
 
-=head2 as_json
+=head2 as_string
 
-Return the PO data parsed as json data.
+Serializes the current PO object into a single string containing valid GNU C<.po> syntax. This is equivalent to calling L</dump> into an in-memory scalar, but more convenient for tests or further processing.
+
+    my $string = $po->as_string;
+
+This always returns a plain Perl string (not a blessed scalar or IO object) to avoid issues with string overloading.
 
 =head2 charset
 
@@ -1509,6 +2005,26 @@ Returns the data of the po file as an hash reference with each key representing 
 
 Access the headers data for this po file. The data is an array reference.
 
+=head2 include
+
+    $po->include(1);   # enable include directives
+    $po->include(0);   # disable include directives
+    my $bool = $po->include;
+
+Controls whether C<$include "file.po"> directives are recognised during parsing.
+
+Include support is enabled by default.
+
+Include directives may appear in comments, using one of the following forms:
+
+    # $include "other.po"
+    #. $include 'relative/path.po'
+    #   $include "shared/common.po"
+
+When include processing is enabled, any referenced file is parsed recursively. Only valid PO entries (C<msgid>/C<msgstr>/C<msgid_plural>/C<msgctxt> blocks and special comments) from included files are merged into the caller’s namespace; header blocks and meta sections of include files are ignored.
+
+This feature allows modular PO files, shared error message bundles, and structured localisation domains without a separate preprocessing step.
+
 =head2 language
 
 Sets or gets the meta field value for C<Language>
@@ -1520,6 +2036,19 @@ Sets or gets the meta field value for C<Language-Team>
 =head2 last_translator
 
 Sets or gets the meta field value for C<Last-Translator>
+
+=head2 max_recurse
+
+    $po->max_recurse(20);
+    my $limit = $po->max_recurse;
+
+Sets or gets the maximum recursion depth allowed when processing include directives.
+
+The default is 32.
+
+If the recursion limit is exceeded (for example because of accidental self-inclusion or a circular include chain), parsing will abort and L</error> will contain a descriptive message including the file path and line number where recursion overflow occurred.
+
+This protects users from infinite loops and malicious PO input.
 
 =head2 merge
 
@@ -1555,13 +2084,62 @@ Given a meta field, this will return a normalised version of it, ie a field name
 
 =head2 parse
 
-Given a filepath to a po file or a file handle, this will parse the po file and return a new L<Text::PO> object.
+    $po->parse( $filepath );
+    $po->parse( $filepath, include => 0 );
+    $po->parse( $fh, max_recurse => 20 );
 
-For each new entry that L</parse> find, it creates a L<Text::PO::Element> object.
+Parses a GNU C<.po> file or a filehandle and loads its entries into the current object. Returns the current L<Text::PO> instance on success. Upon error, it sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context, and an empty list in list context.
 
-The list of all elements found can then be accessed using L</elements>
+=head3 Include processing
 
-It returns the current L<Text::PO> object
+If include processing is enabled (see L</include>), the parser recognises the following non-standard directives:
+
+    # $include "path.po"
+    #.$include "relative.po"
+
+Relative paths are resolved against the directory of the parent file.
+
+When an include directive is seen:
+
+=over 4
+
+=item 1.
+
+A new L<Text::PO> object is created for the included file.
+
+=item 2.
+
+The effective C<include> and C<max_recurse> settings are passed to the child parser.
+
+=item 3.
+
+Only PO elements (C<msgid>/C<msgstr>/C<msgctl>/C<msgid_plural> entries, and special comments) from the included file are merged into the parent’s C<elements> list. Header metadata from included files is ignored.
+
+=item 4.
+
+Circular references are detected. A descriptive error is attached to the directive line and parsing continues for the parent file.
+
+=item 5.
+
+If the included file has some header meta information containing the header C<Language> and if it does not match that of the parent, a warning is emitted if warnings are enabled.
+
+=back
+
+=head3 Options
+
+parse() accepts the following options:
+
+=over 4
+
+=item * C<include> (boolean)
+
+Override the parser’s include behaviour for this parse call.
+
+=item * C<max_recurse> (unsigned integer)
+
+Override the maximum include depth for this parse call.
+
+=back
 
 =head2 parse_date_to_object
 
@@ -1586,6 +2164,11 @@ Sets or gets the plurality definition for this domain and locale used in the cur
 If set, this will expect 2 parameters: 1) an integer representing the possible plurality for the given locale and 2) the expression that will be evaluated to assess which plural form to use.
 
 It returns an array reference representing those 2 values.
+
+If you want to find out the proper plural form for a given C<locale>, you should refer to the L<Unicode CLDR|https://cldr.unicode.org/> data, which can be accessed and queries via the module L<Locale::Unicode::Data>:
+
+    my $cldr = Locale::Unicode::Data->new;
+    say $cldr->plural_forms( 'fr' ); # nplurals=2; plural=(n > 1);
 
 =head2 plural_forms
 
@@ -1663,11 +2246,11 @@ It takes an hash or hash reference passed as argument, as optional parameters wi
 
 =over 4
 
-=item I<file>
+=item * C<file>
 
 File path
 
-=item I<handle>
+=item * C<handle>
 
 Opened file handle
 
@@ -1721,6 +2304,10 @@ If a value is provided, even a string, it will be converted to a L<DateTime> obj
 
 Takes a meta field name and sets or gets its value.
 
+=head1 THREAD-SAFETY
+
+This module is thread-safe. All state is stored on a per-object basis, and the underlying file operations and data structures do not share mutable global state.
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
@@ -1737,7 +2324,7 @@ L<GNU documentation on header format|https://www.gnu.org/software/gettext/manual
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2025 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

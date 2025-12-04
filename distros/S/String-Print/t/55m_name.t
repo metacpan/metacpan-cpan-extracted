@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Test the 'undef default' modifier
+# Test the 'name' modifier
 
 use warnings;
 use strict;

@@ -57,9 +57,9 @@ L</FUNCTIONS>. The tag C<:all> imports everything.
 
   my $bytes = sodium_base642bin($string);
 
-No real advantage over L<MIME::Base64>. Stops parsing at any invalid base64
-bytes. C<$bytes> will be empty if C<$string> could not be validly interpreted
-as base64 (i.e., if the output would not be a multiple of 8 bits).
+Identical to L<MIME::Base64/decode_base64url>. Stops parsing at any invalid
+base64 bytes. C<$bytes> will be empty if C<$string> could not be validly
+interpreted as base64 (i.e., if the output would not be a multiple of 8 bits).
 
 Returns the base64 decoded bytes.
 
@@ -70,6 +70,8 @@ Returns the base64 decoded bytes.
 
 C<$variant> is optional. See L</BASE64 CONSTANTS>. If not provided, the default
 is L</BASE64_VARIANT_URLSAFE_NO_PADDING>.
+
+Identical to L<MIME::Base64/encode_base64url>.
 
 Returns the base64 encoded string.
 

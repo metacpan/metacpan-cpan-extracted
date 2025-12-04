@@ -820,7 +820,7 @@ subtest 'Incremental build'=>sub {
 # associated probabilities.
 # 
 subtest 'Goal seeking'=>sub {
-	plan tests=>1;
+	plan tests=>6;
 	my ($scheduler,%schedule);
 	$scheduler=Schedule::Activity->new(configuration=>{node=>{
 		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
@@ -834,11 +834,101 @@ subtest 'Goal seeking'=>sub {
 	# If you want to make this succeed faster, run only 5-step schedules, 1/2^5, and maxouter=436.
 	#
 	my ($pass,$steps,$maxouter)=(0,0,14141); # pfail<=1e-6
-	for(my $outer=0;$outer<=$maxouter;$outer++) {
-		$steps++;
-		%schedule=$scheduler->schedule(activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1);
-		if(1+$#{$schedule{activities}}!=12) { next }
-		if($schedule{attributes}{bee}{y}>=10) { $pass=1; $outer=$maxouter }
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		%schedule=$scheduler->schedule(goal=>{cycles=>$cycles,attribute=>{bee=>{op=>'max'}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=12)   { next }
+		if($schedule{attributes}{bee}{y}>=10) { $pass=1; $maxouter=$steps }
 	}
 	ok($pass,"Goal scheduling maximized attribute ($steps steps)");
+	#
+	# Probability of bee=-10 is 1/2^10.
+	# Probability of failure in N trials is (1023/1024)^N
+	# If you want to make this succeed faster, run only 5-step schedules, 1/2^5, and maxouter=436.
+	#
+	($pass,$steps,$maxouter)=(0,0,14141); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		%schedule=$scheduler->schedule(goal=>{cycles=>$cycles,attribute=>{bee=>{op=>'min'}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=12)   { next }
+		if($schedule{attributes}{bee}{y}<=-10) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,"Goal scheduling minimized attribute ($steps steps)");
+	#
+	# To test for inequality (average zero), verify that both extremes are reached
+	# Must achieve sequence 1,2,3,...,10,10, so the average is (1/2+(2+3+...+9)+10/2+10)/10=5.95
+	my %seen;
+	($pass,$steps,$maxouter)=(0,0,2*14141); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		%schedule=$scheduler->schedule(goal=>{cycles=>$cycles,attribute=>{bee=>{op=>'ne',value=>0}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=12)   { next }
+		if($schedule{attributes}{bee}{avg}<=-5.95) { $seen{min}++ }
+		if($schedule{attributes}{bee}{avg}>=+5.95) { $seen{max}++ }
+		if($seen{min}&&$seen{max}) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,"Goal scheduling inequality attribute ($steps steps)");
+	#
+	# Target a sequence of events with final average zero.
+	# The final node creates a final timestamp that affects the average value computation.
+	# Ergo, in this test, the final node will increase the attribute by one.
+	# Any sequence that repeats 1,0,-1,0,...,1 will have final average zero as needed.
+	# Length is 4n.
+	#
+	# Probability of avg=0 is 1/2^(4n)
+	# Probability of failure in M trials is less than P when:
+	# n=1, M=215, P=1e-6
+	# n=2, M=3529, P=1e-6
+	# l(10^(-6))/(l(2^4-1)-l(2^4))
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
+		finish=>{tmavg=>0,attributes=>{bee=>{incr=>+1}}},
+		A=>{attributes=>{bee=>{incr=>-1}},tmavg=>1,next=>[qw/A B finish/]},
+		B=>{attributes=>{bee=>{incr=>+1}},tmavg=>1,next=>[qw/A B finish/]},
+	}});
+	($pass,$steps,$maxouter)=(0,0,3530); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(40));
+		$steps+=$cycles;
+		%schedule=$scheduler->schedule(goal=>{cycles=>$cycles,attribute=>{bee=>{op=>'eq',value=>0}}},activities=>[[8,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=10)   { next }
+		if($schedule{attributes}{bee}{avg}==0) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,"Goal scheduling equality attribute ($steps steps)");
+	#
+	# For an off-center equality check (since the {value} could well be ignored by the code), suppose the nodes only increase by 1, or by 0 (as opposed to decreasing), and suppose the last step increases by 0 (the final node).
+	# 49.5=(0/2+(1+2+3+4+5+6+7+8+9)+9/2), so the first must be +1, after that however there are quite a few combinations.
+	# It turns out there are only 3 out of 1024 that have an exact average of 5.
+	# Probability of avg=5 is 3/1024
+	# Probability of failure in M trials is less than P when:  M>=l(P)/l(1021/1024)
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
+		finish=>{tmavg=>0},
+		A=>{attributes=>{bee=>{incr=>+0}},tmavg=>1,next=>[qw/A B finish/]},
+		B=>{attributes=>{bee=>{incr=>+1}},tmavg=>1,next=>[qw/A B finish/]},
+	}});
+	($pass,$steps,$maxouter)=(0,0,4709); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(40));
+		$steps+=$cycles;
+		%schedule=$scheduler->schedule(goal=>{cycles=>$cycles,attribute=>{bee=>{op=>'eq',value=>5}}},activities=>[[10,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=12)   { next }
+		if($schedule{attributes}{bee}{avg}==5) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,"Goal scheduling equality (offcenter) attribute ($steps steps)");
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
+		finish=>{tmavg=>0},
+		A=>{attributes=>{bee=>{incr=>+0}},tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B finish/]},
+		B=>{attributes=>{bee=>{incr=>+1}},tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B finish/]},
+	}});
+	eval { %schedule=$scheduler->schedule(goal=>{cycles=>20,attribute=>{bee=>{op=>'max'}}},activities=>[[11,'start']],tensionbuffer=>1,tensionslack=>1) };
+	like($@,qr/Excess exceeds/,'Goal scheduling raises last error if no schedule found');
+	#
 };

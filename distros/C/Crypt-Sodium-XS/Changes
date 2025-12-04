@@ -1,3 +1,14 @@
+0.000040 Dec 4 2025
+
+- re-factoring of MemVault file/tty io functions
+
+- document MemVault new_from_tty constructor
+
+- don't use hardcoded class name in MemVault constructors, allow for
+  subclassing
+
+- minor code cleanup (sodium_bin2base64) and assorted doc updates
+
 0.000039 Aug 21 2025
 
 - fix new_from_fd and new_from_file. test added.

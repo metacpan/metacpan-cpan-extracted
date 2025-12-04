@@ -31,6 +31,7 @@ t/050-instantiate-config-logger.t
 t/100-ScreenLayout.t
 t/150-DeviceProperties.t
 t/200-Plugins_Apps-general.t
+t/900-Scripts-basic.t
 t/manifest.t
 t/MY/TestPlugin_Apps.pm
 t/pod-coverage.t
@@ -39,6 +40,8 @@ t/t-config/myapp.conf
 t/t-config/plugins/mytestplugin_apps.conf
 t/t-config/plugins/viber.conf
 t/t-data/example-screen-layout.xml
+xt/author/500-install_app.t
+xt/author/optional/600-plugin-viber.t
 xt/boilerplate.t
 xt/live/100-adb-devices.t
 xt/live/110-adb-connect-device.t
@@ -62,8 +65,7 @@ xt/live/420-adb-pidof.t
 xt/live/440-adb-pgrep.t
 xt/live/460-is_app_running.t
 xt/live/480-pull_app_apk_from_device.t
-xt/live/500-install_app.t
-xt/live/600-plugin-viber.t
+xt/live/920-Scripts-real-run.t
 xt/live/obsolete/200-find_all_apps_roundabout_way.t
 xt/live/obsolete/250-open_app_roundabout_way.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

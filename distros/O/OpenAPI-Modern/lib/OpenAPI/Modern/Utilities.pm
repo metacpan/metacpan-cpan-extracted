@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.109';
+our $VERSION = '0.111';
 
 use 5.020;
 use strictures 2;
@@ -46,7 +46,7 @@ our %EXPORT_TAGS = (
 # it is likely the case that we can support a version beyond what's stated here -- but we may not,
 # so we'll warn to that effect. Every effort will be made to upgrade this implementation to fully
 # support the latest point release as soon as possible.
-use constant SUPPORTED_OAD_VERSIONS => [ '3.1.2', '3.2.0' ];
+use constant SUPPORTED_OAD_VERSIONS => [ '3.0.4', '3.1.2', '3.2.0' ];
 
 # in most things, e.g. schemas, we only use major.minor as the version number
 # we don't actually support OAS 3.0.x, but we will bundle its schema so it can be more easily used
@@ -66,6 +66,7 @@ use constant DEFAULT_METASCHEMA => {
 # metaschema for JSON Schemas contained within OpenAPI documents:
 # standard JSON Schema (presently draft2020-12) + OpenAPI vocabulary
 use constant DEFAULT_DIALECT => {
+  '3.0' => DEFAULT_METASCHEMA->{'3.0'}.'#/definitions/Schema',
   3.1 => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10',
   3.2 => 'https://spec.openapis.org/oas/3.2/dialect/2025-09-17',
 };
@@ -73,6 +74,7 @@ use constant DEFAULT_DIALECT => {
 # OpenAPI document schema that forces the use of the JSON Schema dialect (no $schema overrides
 # permitted)
 use constant DEFAULT_BASE_METASCHEMA => {
+  '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18', # same as standard
   3.1 => 'https://spec.openapis.org/oas/3.1/schema-base/2025-09-15',
   3.2 => 'https://spec.openapis.org/oas/3.2/schema-base/2025-09-17',
 };
@@ -85,6 +87,7 @@ use constant OAS_VOCABULARY => {
 
 # an OpenAPI schema and JSON Schema dialect which prohibit unknown keywords
 use constant STRICT_METASCHEMA => {
+  '3.0' => '',
   3.1 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.1/strict-schema.json',
   3.2 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-schema.json',
 };
@@ -178,7 +181,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.109
+version 0.111
 
 =head1 SYNOPSIS
 

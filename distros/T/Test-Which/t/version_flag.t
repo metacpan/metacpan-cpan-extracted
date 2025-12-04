@@ -6,10 +6,20 @@ use File::Temp qw(tempdir);
 use File::Spec;
 use File::Which qw(which);
 
+BEGIN {
+	# FIXME
+	if ($^O eq 'MSWin32') {
+		plan skip_all => 'Shell script mock programs not compatible with Windows';
+	}
+}
+
 my $tempdir = tempdir(CLEANUP => 1);
 my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
 $ENV{PATH} = "$tempdir$path_sep$ENV{PATH}";
 
+# ------------------------------------------------------------------
+# Create a mock program that behaves the same on Windows and Unix
+# ------------------------------------------------------------------
 sub create_mock_program {
 	my ($name, $version, $flag) = @_;
 	$flag ||= '--version';
@@ -17,18 +27,25 @@ sub create_mock_program {
 	my $path;
 
 	if ($^O eq 'MSWin32') {
-		# Create Windows batch file
+		# Windows batch file
 		$path = File::Spec->catfile($tempdir, "$name.bat");
+
 		open my $fh, '>', $path or die "Cannot create $path: $!";
-		print $fh '@echo off' . "\r\n";
-		print $fh "if \"%1\"==\"$flag\" (\r\n";
-		print $fh "  echo $name version $version\r\n";
-		print $fh "  exit /b 0\r\n";
-		print $fh ")\r\n";
+
+		print $fh '@echo off', "\r\n";
+
+		# Accept either a single flag or multiple possible flags
+		print $fh "set FLAG=%~1\r\n";
+		print $fh "if \"%FLAG%\"==\"$flag\" goto showver\r\n";
 		print $fh "exit /b 1\r\n";
+
+		print $fh ":showver\r\n";
+		print $fh "echo $name version $version\r\n";
+		print $fh "exit /b 0\r\n";
+
 		close $fh;
 	} else {
-		# Create Unix shell script
+		# Unix shell script
 		$path = File::Spec->catfile($tempdir, $name);
 		open my $fh, '>', $path or die "Cannot create $path: $!";
 		print $fh "#!/bin/sh\n";
@@ -44,68 +61,68 @@ sub create_mock_program {
 	return $path;
 }
 
+# ------------------------------------------------------------------
+# Subtests
+# ------------------------------------------------------------------
+
 subtest 'verify basic functionality first' => sub {
-	create_mock_program('basicprog', '1.2.3', '--version');
+	create_mock_program('basicprog', '1.2.3');
 
 	use_ok('Test::Which', 'which_ok');
 
-	# Test basic string constraint
 	my $result = which_ok('basicprog' => '>=1.0');
-	ok($result, 'basic string constraint works') or diag("Result: $result");
+	ok($result, 'basic string constraint works');
 
-	# Test if program can be found
 	my $prog_name = $^O eq 'MSWin32' ? 'basicprog.bat' : 'basicprog';
 	my $path = which($prog_name);
-	ok($path, "basicprog found at: " . ($path // 'undef'));
+
+	ok($path, "basicprog located: " . ($path // 'undef'));
 
 	SKIP: {
 		skip 'Program not found', 2 unless $path;
 
-		# Manually test version detection
 		require Test::Which;
-		my $output = Test::Which::_capture_version_output($path);
-		ok(defined $output, "Got output: " . (defined $output ? $output : 'undef'));
+
+		my $output = Test::Which::_capture_version_output($path, '--version');
+		ok(defined $output, "Got version output");
 
 		my $version = Test::Which::_extract_version($output);
-		is($version, '1.2.3', "Extracted version correctly: " . (defined $version ? $version : 'undef'));
+		is($version, '1.2.3', "Extracted correct version");
 	}
 };
 
 subtest 'test hashref constraint support' => sub {
-	create_mock_program('hashprog', '2.5.1', '--version');
+	create_mock_program('hashprog', '2.5.1');
 
 	use_ok('Test::Which', 'which_ok');
 
-	# Test if hashref is accepted at all
 	my $result;
 	lives_ok {
 		$result = which_ok('hashprog', { version => '>=2.0' });
-	} 'hashref constraint does not die';
+	} 'hashref constraint accepted';
 
-	ok($result, 'hashref with string version works')
-		or diag('Hashref constraint failed - may not be implemented yet');
+	ok($result, 'hashref version >=2.0 works');
 };
 
 subtest 'custom version flag - string constraint only' => sub {
-	create_mock_program('customprog', '3.0.0', '-show-ver');	# Changed from '-v'
+	create_mock_program('customprog', '3.0.0', '-show-ver');
 
 	use_ok('Test::Which', 'which_ok');
 
-	# First verify it fails with default flags
+	# Should fail with default flags
 	my $result1 = which_ok('customprog' => '>=3.0');
-	ok(!$result1, 'fails with default flags (as expected)');
+	ok(!$result1, 'Fails with default flags');
 
-	# Now test with custom flag in hashref
+	# Should succeed with custom flag
 	my $result2;
 	lives_ok {
 		$result2 = which_ok('customprog', {
 			version => '>=3.0',
-			version_flag => '-show-ver'  # Changed from '-v'
+			version_flag => '-show-ver'
 		});
-	} 'custom version_flag does not die';
+	};
 
-	ok($result2, 'succeeds with custom version_flag')
-		or diag("Custom version_flag may not be implemented yet");
+	ok($result2, 'Succeeds using custom version_flag');
 };
 
 subtest 'test _capture_version_output with custom flag' => sub {
@@ -115,19 +132,18 @@ subtest 'test _capture_version_output with custom flag' => sub {
 
 	my $prog_name = $^O eq 'MSWin32' ? 'flagprog.bat' : 'flagprog';
 	my $path = which($prog_name);
-	ok($path, "flagprog found");
+
+	ok($path, 'flagprog found');
 
 	SKIP: {
-		skip 'Program not found', 2 unless $path;
+		skip 'Program missing', 2 unless $path;
 
-		# Test with custom flag
-		my $output2;
+		my $output;
 		lives_ok {
-			$output2 = Test::Which::_capture_version_output($path, '-show-ver');
-		} '_capture_version_output accepts second parameter';
+			$output = Test::Which::_capture_version_output($path, '-show-ver');
+		} '_capture_version_output runs';
 
-		like($output2 || '', qr/1\.5\.0/, 'custom flag returns version')
-			or diag("Output with custom flag: " . ($output2 // 'undef'));
+		like($output || '', qr/1\.5\.0/, 'Output contains version');
 	}
 };
 
@@ -142,14 +158,13 @@ subtest 'test array of version flags' => sub {
 			version => '>=2.0',
 			version_flag => ['--version', '-ver']
 		});
-	} 'array of version_flags does not die';
+	} 'array version_flag accepted';
 
-	ok($result, 'array of flags works')
-		or diag('Array version_flag may not be implemented yet');
+	ok($result, 'array of version flags works');
 };
 
 subtest 'test regex constraint' => sub {
-	create_mock_program('regexprog', '5.10.1', '--version');
+	create_mock_program('regexprog', '5.10.1');
 
 	use_ok('Test::Which', 'which_ok');
 
@@ -158,17 +173,15 @@ subtest 'test regex constraint' => sub {
 		$result = which_ok('regexprog', {
 			version => qr/^5\.\d+/
 		});
-	} 'regex constraint does not die';
+	} 'regex constraint accepted';
 
-	ok($result, 'regex constraint works')
-		or diag('Regex constraint may not be implemented yet');
+	ok($result, 'regex constraint works');
 };
 
 subtest 'test empty version flag' => sub {
 	SKIP: {
-		skip 'Empty flag test not supported on Windows', 3 if $^O eq 'MSWin32';
+		skip 'Empty flag not supported on Windows', 3 if $^O eq 'MSWin32';
 
-		# This requires more complex shell scripting
 		my $prog = File::Spec->catfile($tempdir, 'noflagprog');
 		open my $fh, '>', $prog or die $!;
 		print $fh "#!/bin/sh\n";
@@ -188,16 +201,10 @@ subtest 'test empty version flag' => sub {
 				version => '>=1.0',
 				version_flag => ''
 			});
-		} 'empty version_flag does not die';
+		};
 
-		ok($result, 'empty string flag works')
-			or diag('Empty version_flag may not be implemented yet');
+		ok($result, 'empty version flag accepted');
 	}
-};
-
-subtest 'summary of implementation status' => sub {
-	note('This test summarizes what features are working');
-	pass('Check earlier subtests for implementation status');
 };
 
 done_testing();

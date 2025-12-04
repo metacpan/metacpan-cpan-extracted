@@ -1,0 +1,7 @@
+<nav style="background: #34495e; padding: 10px 0; margin-bottom: 20px;">
+    <div class="container">
+        <a href="/" style="color: white; text-decoration: none; margin-right: 20px;">Home</a>
+        <a href="/users" style="color: white; text-decoration: none; margin-right: 20px;">Users</a>
+        <a href="/about" style="color: white; text-decoration: none;">About</a>
+    </div>
+</nav>

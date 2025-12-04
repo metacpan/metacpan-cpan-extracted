@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.8.0';
+our $VERSION = '1.2.0';
 
 use Digest::MD5 qw();
 use File::Basename qw(basename dirname);
@@ -36,7 +36,7 @@ sub main {
         'C'   => \my $opt_clone,
         'F=s' => \my $opt_configfile,
         'R=s' => \my $opt_reponame,
-        'S'   => \my $opt_sync,
+        'S'   => \my $opt_syncrepo,
         'T'   => \my $opt_noinitrepo
     );
     Getopt::Long::Configure('nopass_through');
@@ -57,12 +57,11 @@ sub main {
     set_repo_name_or_die($opt_reponame // $CONFIG{REPO_PRIMARY});
     # initialize the environment
     return if $opt_noinitrepo and !repo_is_cloned();
-    sbozyp_mkdir(repo_dir(), $CONFIG{TMPDIR});
     if ($opt_clone or !repo_is_cloned()) {
         i_am_root_or_die('need root to clone repo');
         clone_repo();
     }
-    if ($opt_sync) {
+    if ($opt_syncrepo) {
         i_am_root_or_die('need root to sync repo');
         sync_repo();
     }
@@ -81,14 +80,14 @@ sub main_install {
         'f'      => \my $opt_force,
         'i'      => \my $opt_noninteractive,
         'k'      => \my $opt_keeppackage,
-        'n'      => \my $opt_nodeps
+        'r'      => \my $opt_installdeps
     );
     if ($opt_help) { print command_help_msg('install'); return }
     @_ >= 1 or die command_usage('install');
     i_am_root_or_die('the install command requires root');
     my @pkgs = pkgs_uniq(map { $_ = pkg($_) } @_);
     my @queue; for my $pkg (@pkgs) {
-        my @pkg_queue = $opt_nodeps ? ($pkg) : pkg_queue($pkg);
+        my @pkg_queue = $opt_installdeps ? pkg_queue($pkg) : ($pkg);
         unless ($opt_force) {
             @pkg_queue = grep { !pkg_installed_and_up_to_date($_) } @pkg_queue;
         }
@@ -175,24 +174,25 @@ sub main_query {
     sbozyp_getopts(
         \@_,
         'h|help' => \my $opt_help,
-        'a'     => \my $opt_listinstalled,
-        'b'     => \my $opt_printpackagedir,
-        'd'     => \my $opt_slackdesc,
-        'i'     => \my $opt_info,
-        'm'     => \my $opt_pkgsnodependents,
-        'n'     => \my $opt_recdependents,
-        'o'     => \my $opt_directdependents,
-        'p'     => \my $opt_pkginstalled,
-        'q'     => \my $opt_printqueue,
-        'r'     => \my $opt_readme,
-        's'     => \my $opt_slackbuild,
-        'u'     => \my $opt_listneedupgrade
+        'a'      => \my $opt_listinstalled,
+        'b'      => \my $opt_printpackagedir,
+        'c'      => \my $opt_printrepodir,
+        'd'      => \my $opt_slackdesc,
+        'i'      => \my $opt_info,
+        'm'      => \my $opt_pkgsnodependents,
+        'n'      => \my $opt_recdependents,
+        'o'      => \my $opt_directdependents,
+        'p'      => \my $opt_pkginstalled,
+        'q'      => \my $opt_printqueue,
+        'r'      => \my $opt_readme,
+        's'      => \my $opt_slackbuild,
+        'u'      => \my $opt_listneedupgrade
     );
     if ($opt_help) { print command_help_msg('query'); return }
     if (@_ > 1) { die command_usage('query') }
-    my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade) { $num_opts_set++ if defined }
+    my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_printrepodir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade) { $num_opts_set++ if defined }
     if    ($num_opts_set != 1)  { sbozyp_die("must set exactly 1 query option but $num_opts_set were set") }
-    my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : die;
+    my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_printrepodir ? '-c' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : die;
     my $pkg; if ($opt_printpackagedir || $opt_slackdesc || $opt_info || $opt_recdependents || $opt_directdependents || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
         @_ == 1 or sbozyp_die("query option '$opt' requires single PKGNAME argument");
         $pkg = pkg($_[0]);
@@ -207,6 +207,8 @@ sub main_query {
         }
     } elsif ($opt_printpackagedir) {
         print $pkg->{PKGDIR}, '/', "\n";
+    } elsif ($opt_printrepodir) {
+        print repo_dir(), "\n";
     } elsif ($opt_slackdesc) {
         sbozyp_print_file("$pkg->{PKGDIR}/slack-desc");
     } elsif ($opt_info) {
@@ -233,7 +235,7 @@ sub main_query {
             my $installed_version = $installed_sbo_pkgs{$pkgname};
             my $available_version = pkg($pkgname)->{VERSION};
             if (version_gt($available_version, $installed_version)) {
-                print "$pkgname $installed_version -> $available_version\n"
+                print "$pkgname $installed_version -> $available_version\n";
             }
         }
     }
@@ -354,7 +356,7 @@ sub pkgs_confirm_with_user {
 
 sub pkg_installed {
     my ($pkg) = @_;
-    my %installed_sbo_pkgs = installed_sbo_pkgs(); # hash from PKGNAME to version
+    my %installed_sbo_pkgs = installed_sbo_pkgs();
     my $version = $installed_sbo_pkgs{$pkg->{PKGNAME}};
     return $version;
 }
@@ -519,7 +521,7 @@ sub pkgs_no_dependents {
 sub pkgs_removable_dependencies {
     my @pkgs = @_; # we assume all pkgs in @pkgs are actually installed
     my %pkgs; $pkgs{$_->{PKGNAME}} = $_ for @pkgs;
-    my %deps; for my $pkg (values %pkgs) {
+    my %deps; for my $pkg (@pkgs) {
         for my $dep (pkg_dependencies_direct($pkg)) {
             next if exists $pkgs{$dep->{PKGNAME}};
             if (defined pkg_installed($dep)) {
@@ -556,7 +558,7 @@ sub pkg_prepare_for_build {
     my ($pkg) = @_;
     my $arch = arch();
     if (my $arch_problem = $pkg->{ARCH_UNSUPPORTED}) {
-        sbozyp_die("$pkg->{PKGNAME} is $arch_problem on $arch")
+        sbozyp_die("$pkg->{PKGNAME} is $arch_problem on $arch");
     }
     my %url_md5;
     if ($arch eq 'x86_64' and my @urls = @{$pkg->{DOWNLOAD_x86_64}}) {
@@ -586,6 +588,7 @@ sub pkg_prepare_for_build {
 sub build_slackware_pkg {
     my ($pkg) = @_;
     local $ENV{OUTPUT} = $CONFIG{TMPDIR}; # all SlackBuilds use the $OUTPUT env var to determine output pkg location
+    sbozyp_mkdir($CONFIG{TMPDIR});
     my $staging_dir = pkg_prepare_for_build($pkg);
     my $slackbuild = $pkg->{PRGNAM} . '.SlackBuild';
     my $cmd = sbozyp_open('-|', "cd '$staging_dir' && chmod +x ./$slackbuild && ./$slackbuild");
@@ -683,6 +686,7 @@ sub repo_is_cloned {
 
 sub clone_repo {
     my $repo_dir = repo_dir();
+    sbozyp_mkdir($repo_dir);
     if (repo_is_cloned()) {
         sbozyp_rmdir_rec($repo_dir);
         sbozyp_mkdir($repo_dir);
@@ -936,8 +940,15 @@ sbozyp - A package manager for Slackware's SlackBuilds.org
 
 Sbozyp is a command-line package manager for the SlackBuilds.org package
 repository. SlackBuilds.org is a collection of third-party SlackBuild scripts
-used to build Slackware packages. Sbozyp assumes an understanding of SlackBuilds
-and the SlackBuilds.org repository.
+used to build Slackware packages.
+
+Sbozyp assumes its users have an understanding of SlackBuilds and the
+SlackBuilds.org repository. While sbozyp provides conveniences to make it easier
+to build, install, and remove packages, users should always understand every
+package they consider installing by reading its README file.
+
+Sbozyp does not handle optional dependencies or setting build-time options.
+Users must deal with these special cases manually.
 
 =head1 OVERVIEW
 
@@ -1026,7 +1037,7 @@ Defaults to C<TMPDIR=/tmp>.
 
 =head2 INSTALL
 
- Usage: sbozyp <install|in> [-h] [-f] [-i] [-k] [-n] <pkgname...>
+ Usage: sbozyp <install|in> [-h] [-f] [-i] [-k] [-r] <pkgname...>
 
 Install or upgrade packages.
 
@@ -1036,17 +1047,17 @@ Options are:
  -f            Force installation even if package is already up to date
  -i            No interactive prompt
  -k            Keep the built package (resides in TMPDIR)
- -n            Do not install package dependencies
+ -r            Install package dependencies recursively
 
 Examples:
 
  sbozyp install --help
  sbozyp in password-store
- sbozyp in xclip mu password-store
- sbozyp in -k system/password-store
- sbozyp in -f -i -n password-store
- sbozyp -S -R $REPO in -f password-store
- sbozyp in $(sbozyp -S qr -u | cut -d' ' -f1) ### upgrade all packages
+ sbozyp in -r xclip mu password-store
+ sbozyp in -k -r system/password-store
+ sbozyp in -f -i -r password-store
+ sbozyp -S -R $REPO in -f -r password-store
+ sbozyp in -r $(sbozyp -S qr -u | cut -d' ' -f1) ### upgrade all packages
 
 =head2 BUILD
 
@@ -1091,7 +1102,7 @@ Examples:
 
 =head2 QUERY
 
- Usage: sbozyp <query|qr> [-h] [-a] [-b] [-d] [-i] [-m] [-n] [-o] [-p] [-q] [-r] [-s] [-u] PKGNAME?
+ Usage: sbozyp <query|qr> [-h] [-a] [-b] [-c] [-d] [-i] [-m] [-n] [-o] [-p] [-q] [-r] [-s] [-u] PKGNAME?
 
 Query for package related information.
 
@@ -1102,6 +1113,7 @@ Options are:
  -h|--help     Print help message
  -a            Print all installed SBo packages
  -b            Print the path to PKGNAME's local package directory
+ -c            Print the path to the current repositories directory
  -d            Print PKGNAME's slack-desc file
  -i            Print PKGNAME's info file
  -m            Print all installed SBo packages with no dependents
@@ -1163,7 +1175,7 @@ Examples:
 
 =head1 AUTHOR
 
-Nicholas Hubbard (nicholashubbard@posteo.net)
+Nicholas B. Hubbard (nicholashubbard@posteo.net)
 
 =head1 CONTRIBUTORS
 

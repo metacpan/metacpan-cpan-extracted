@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -105,6 +105,8 @@ sub new {
 		if( 1 == $self->enquire({'package' => $params->{'package'}}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to enquire package '".$params->{'package'}."' (call to ".'enquire()'." has failed)."); return undef }
 	}
 
+	my $packagename = $self->get('packageName');
+	my $codepath = $self->get('codePath');
 	# and now also find the package's apk dir (where its apks are)
 	# we already have 'codePath'
 
@@ -113,16 +115,24 @@ sub new {
 	# but there may be other apks there, so why not
 	# adb shell ls "codePath"/*.apk
 	#my @cmd = ('pm', 'path', $k);
-	my $cdd = $self->get('codePath');
-	if( ! defined($cdd) || ($cdd=~/^\s*$/) ){ $log->warn("${whoami} (via $parent), line ".__LINE__." : warning, did not find any 'codePath' for app '".$self->get('packageName')."', no problem."); }
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : finding the APK files for app '$packagename' (code path: '$codepath' ...") }
+	if( ! defined($codepath) || ($codepath=~/^\s*$/) ){ $log->warn("${whoami} (via $parent), line ".__LINE__." : warning, did not find any 'codePath' for app '".$self->get('packageName')."', no problem."); }
 	else {
 		# we have a codePath, perhaps we will find apks in there
-		my @cmd = ('ls', '-al', File::Spec->catfile($cdd, '*.apk'));
+		# but is it really a dir? it can be an apk (ending in apk)
+		my $apkf = ($codepath =~ /\.apk$/i)
+			? $codepath
+			: File::Spec->catfile($codepath, '*.apk')
+		;
+		my @cmd = ('ls', '-al', $apkf);
+		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : sending command to adb: @cmd") }
 		my $res = $self->mother->adb->shell(@cmd);
 		if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
 		if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nsSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
 		my @apks;
-		while( $res->[1] =~ m!\d+\:\d+ (.+?)$!g ){
+		# sieving through the output of ls -al
+		# we have the mod time (e.g. 12:21) and then the filename
+		while( $res->[1] =~ m!\d+\:\d+\s+(.+?)\s*$!gsm ){
 			push @apks, $1;
 		}
 		$self->set('apkPaths', \@apks);
@@ -205,6 +215,7 @@ sub enquire_installed_apps_factory {
 		elsif( $rr eq 'HASH' ){ @packages_arr = ( map { $_ } grep { $packages->{$_} > 0 } keys %$packages ) }
 		else { $log->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'packages' must be a scalar string (for specifying just one package) or a regexp (Regexp type for compiled (".'qr//'.") regexes or an ARRAYref or a HASHref of package names and not '$rr'."); return undef }
 	}
+	my $N_packages = scalar(@packages_arr);
 	# by now we have packages as a HASHref or undef and they can contain regex or string package names.
 
 	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : called ...") }
@@ -257,7 +268,6 @@ sub enquire_installed_apps_factory {
 			if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : registered installed app '${package_name}' successfully (but not instantiated AppProperties).") }
 		}
 	}
-
 	# done
 	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : enquired ".scalar(keys %apps)." apps.") }
 	return \%apps;
@@ -488,7 +498,7 @@ Android::ElectricSheep::Automator - The great new Android::ElectricSheep::Automa
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 
 =head1 SYNOPSIS

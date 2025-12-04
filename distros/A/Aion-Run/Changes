@@ -1,5 +1,13 @@
 Revision history for Perl extension Aion::Run
 
+0.0.3 2025-12-03T11:55:52Z
+
+    - correct version
+
+0.0.2 2025-12-03T10:51:46Z
+
+    - format Aion::Annotation change
+
 0.0.1 2025-12-03T10:43:51Z
 
     - use annotation-files from Aion::Annotation

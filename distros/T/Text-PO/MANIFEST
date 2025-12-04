@@ -4,6 +4,7 @@ lib/Text/PO.pm
 lib/Text/PO/Element.pm
 lib/Text/PO/Gettext.pm
 lib/Text/PO/MO.pm
+lib/Text/PO/String.pod
 LICENSE
 Makefile.PL
 MANIFEST
@@ -22,6 +23,7 @@ t/001_load.t
 t/002_po.t
 t/003_mo.t
 t/004_gettext.t
+t/005_include.t
 t/090_pod.t
 t/091_pod_coverage.t
 t/099_kwalitee.t
@@ -29,6 +31,19 @@ t/en_GB/LC_MESSAGES/com.example.api.mo
 t/fr_FR/LC_MESSAGES/com.example.api.json
 t/fr_FR/LC_MESSAGES/com.example.api.mo
 t/fr_FR/LC_MESSAGES/com.example.api.po
+t/include/base.po
+t/include/cycle-a.po
+t/include/cycle-b.po
+t/include/dept-5.po
+t/include/depth-1.po
+t/include/depth-2.po
+t/include/depth-3.po
+t/include/depth-4.po
+t/include/depth-root.po
+t/include/inc1.po
+t/include/include-nonpo.po
+t/include/missing-include.po
+t/include/nonpo.txt
 t/ja_JP/LC_MESSAGES/com.example.api.json
 t/ru_RU.po
 META.yml                                 Module YAML meta-data (added by MakeMaker)

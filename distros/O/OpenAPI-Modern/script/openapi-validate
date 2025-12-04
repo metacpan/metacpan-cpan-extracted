@@ -1,0 +1,253 @@
+#!/usr/bin/perl
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
+# PODNAME: openapi-validate
+# ABSTRACT: A command-line interface to OpenAPI document validation
+use 5.020;  # for fc, unicode_strings features
+use strictures 2;
+use stable 0.031 'postderef';
+use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
+use if "$]" >= 5.022, experimental => 're_strict';
+no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
+
+use Getopt::Long::Descriptive;
+use Mojo::File 'path';
+use Safe::Isa;
+use Feature::Compat::Try;
+use List::Util 'max';
+use JSON::Schema::Modern;
+use JSON::Schema::Modern::Document::OpenAPI;
+
+my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
+  "$0 %o",
+  ['help|usage|?|h', 'print usage information and exit', { shortcircuit => 1 } ],
+  [],
+  ['strict', 'disallow unknown keywords in embedded JSON Schemas'],
+  ['dump-identifiers', 'print a list of all identifiers found in the schema'],
+  [],
+  ['document=s@', 'document filename (if not provided, STDIN is used); can be used more than once'],
+);
+
+print($usage->text), exit if $opt->help;
+
+my $js = JSON::Schema::Modern->new(%$opt);
+my $exit_val = 0;
+
+foreach my $document_filename (($opt->document//[''])->@*) {
+  my $encoded_document;
+
+  if (length $document_filename) {
+    $encoded_document = path($document_filename)->slurp('UTF-8');
+  }
+  else {
+    say 'enter document data, followed by ^D:';
+    local $/;
+    $encoded_document = <STDIN>;
+    STDIN->clearerr;
+  }
+
+  my $schema = parse_input($encoded_document);
+  my $result;
+
+  if (ref $schema ne 'HASH' or not exists $schema->{openapi}) {
+    # not an OpenAPI document? assume it's a vanilla JSON Schema
+    $result = $js->validate_schema($schema);
+    $js->add_schema($schema);
+  }
+  else {
+    my $document;
+    try {
+      $document = JSON::Schema::Modern::Document::OpenAPI->new(
+        $document_filename ? (canonical_uri => $document_filename) : (),
+        schema => $schema,
+        evaluator => $js,
+      );
+      $js->add_document($document) if $opt->dump_identifiers;
+    }
+    catch ($e) {
+      say $e->$_isa('JSON::Schema::Modern::Result') ? $e->dump: '"'.$e.'"';
+      exit 2;
+    }
+
+    $result = JSON::Schema::Modern::Result->new(errors => [ $document->errors ]);
+  }
+
+  $exit_val = max($exit_val, $result->valid ? 0 : $result->exception ? 2 : 1);
+
+  say encode(($opt->document//[])->@* > 1 ? { $document_filename => $result } : $result);
+}
+
+if ($opt->dump_identifiers) {
+  my %identifiers = map +(
+    $_->[0] => {
+      canonical_uri => $_->[1]{canonical_uri},
+      document_base => $_->[1]{document}->canonical_uri,
+      document_path => $_->[1]{path},
+    }
+  ),
+  grep $_->[0] !~ m{^(?:https://json-schema.org/|https://spec.openapis.org/oas/)},
+  $js->_resource_pairs;
+
+  say encode({identifiers => \%identifiers });
+}
+
+exit $exit_val;
+
+### END
+
+sub parse_input ($input) {
+  if ($input =~ /^(\{|\[\|["0-9]|true\b|false\b|null\b)/) {
+    # this looks like json
+    state $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->allow_nonref(1)->utf8(0);
+    return $json_decoder->decode($input);
+  }
+  else {
+    # well I suppose it must be yaml
+    require YAML::PP;
+    state $yaml_decoder = YAML::PP->new(boolean => 'JSON::PP');
+    return $yaml_decoder->load_string($input);
+  }
+}
+
+sub encode ($input) {
+  my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+    ->convert_blessed(1)
+    ->utf8(0)
+    ->canonical(1)
+    ->pretty(1);
+  $encoder->indent_length(2) if $encoder->can('indent_length');
+  $encoder->encode($input);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+openapi-validate - A command-line interface to OpenAPI document validation
+
+=head1 VERSION
+
+version 0.111
+
+=head1 SYNOPSIS
+
+  openapi-validate --help
+
+  openapi-validate \
+    [ --strict ] \
+    [ --dump-identifiers ] \
+    [ --document [ <filename> ] ... ]
+
+=head1 DESCRIPTION
+
+A command-line interface to verify the correctness of an OpenAPI document.
+
+F<openapi.yaml> contains:
+
+  openapi: 3.2.0
+  $self: https://example.com/openapi.yaml
+  info:
+    title: my title
+    version: 1.2.3
+  paths:
+    /foo:
+      get: {}
+    /bar/{bar}:
+      post: {}
+    /bar/{baz}:
+      delete: {}
+
+Run:
+
+  openapi-validate --document openapi.yaml
+
+produces output:
+
+  {
+    "errors" : [
+      {
+        "error" : "duplicate of templated path \"/bar/{bar}\"",
+        "instanceLocation" : "",
+        "keywordLocation" : "/paths/~1bar~1{baz}"
+      }
+    ],
+    "valid" : false
+  }
+
+Or run:
+
+  openapi-validate --document openapi.json
+
+produces output:
+
+  {
+    "valid": true
+  }
+
+The exit value (C<$?>) is 0 when the result is valid, 1 when it is invalid,
+and some other non-zero value if an exception occurred.
+
+=head1 OPTIONS
+
+The following options from L<JSON::Schema::Modern> are available:
+
+=for stopwords schema metaschema
+
+=over 4
+
+
+
+=back
+
+* L<JSON::Schema::Modern/strict>: disallow unknown keywords in embedded JSON Schemas
+* L<JSON::Schema::Modern/dump_identifiers>: print a list of all identifiers found in the schema
+
+Additionally, C<--document> is used to provide the filename containing a JSON- or YAML-encoded
+OpenAPI document. You can use the C<--document> option more than once to validate multiple documents
+at the same time, which is faster than using separate processes.
+
+If the file looks like a JSON Schema rather than an OpenAPI document, it will be validated as such,
+and loaded into the evaluator so it can be used as a metaschema by your main document.
+
+If C<--document> is not provided, STDIN is used as input.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/OpenAPI-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/OpenAPI-Modern>.
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/karenetheridge/OpenAPI-Modern/issues>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI
+Slack server|https://open-api.slack.com>, which are also great resources for finding help.
+
+=head1 AUTHOR
+
+Karen Etheridge <ether@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2021 by Karen Etheridge.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Some schema files have their own licence, in share/oas/LICENSE.
+
+=cut

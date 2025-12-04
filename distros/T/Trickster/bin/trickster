@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.14;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Trickster::CLI;
+
+Trickster::CLI->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+trickster - Command-line tool for Trickster framework
+
+=head1 SYNOPSIS
+
+    trickster new myapp
+    trickster generate controller User
+    trickster generate model Post
+    trickster server
+    trickster routes
+    trickster version
+
+=head1 DESCRIPTION
+
+The trickster command-line tool helps you create and manage
+Trickster web applications.
+
+=head1 COMMANDS
+
+=over 4
+
+=item new <name>
+
+Create a new Trickster application
+
+=item generate <type> <name>
+
+Generate a new component (controller, model, template)
+
+=item server [options]
+
+Start the development server
+
+=item routes
+
+Display all registered routes
+
+=item version
+
+Show Trickster version
+
+=back
+
+=cut

@@ -1,0 +1,40 @@
+<div class="card">
+    <h2>Users</h2>
+    
+    [% IF users.size > 0 %]
+    <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #ddd;">
+                <th style="padding: 10px; text-align: left;">ID</th>
+                <th style="padding: 10px; text-align: left;">Name</th>
+                <th style="padding: 10px; text-align: left;">Email</th>
+                <th style="padding: 10px; text-align: left;">Role</th>
+                <th style="padding: 10px; text-align: left;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            [% FOR user IN users %]
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px;">[% user.id %]</td>
+                <td style="padding: 10px;">[% user.name %]</td>
+                <td style="padding: 10px;">[% user.email %]</td>
+                <td style="padding: 10px;">
+                    <span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.9em;">
+                        [% user.role | upper %]
+                    </span>
+                </td>
+                <td style="padding: 10px;">
+                    <a href="/user/[% user.id %]" style="color: #3498db; text-decoration: none;">View</a>
+                </td>
+            </tr>
+            [% END %]
+        </tbody>
+    </table>
+    [% ELSE %]
+    <p style="margin-top: 20px; color: #666;">No users found.</p>
+    [% END %]
+</div>
+
+<div class="card">
+    <p><strong>Total Users:</strong> [% users.size %]</p>
+</div>

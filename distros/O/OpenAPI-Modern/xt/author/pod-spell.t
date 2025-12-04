@@ -22,3 +22,5 @@ Vocabulary
 ether
 irc
 lib
+openapi
+script

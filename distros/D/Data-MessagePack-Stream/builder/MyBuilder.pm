@@ -28,6 +28,16 @@ sub new {
     $self;
 }
 
+sub _cmake_version {
+    my $self = shift;
+    my $version = `cmake --version`;
+    if ($version =~ m/version\s+(\d+)\.(\d+)/) {
+        return (int $1, int $2);
+    }
+
+    (-1, -1);
+}
+
 sub _build_msgpack {
     my $self = shift;
 
@@ -37,6 +47,12 @@ sub _build_msgpack {
         -DMSGPACK_BUILD_EXAMPLES=OFF
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     );
+
+    my ($major_version, $minor_version) = $self->_cmake_version;
+    if ($major_version >= 4 || ($major_version >= 3 && $minor_version >= 5)) {
+        push @opt, "-DCMAKE_POLICY_VERSION_MINIMUM=3.5";
+    }
+
     chdir "msgpack-$MSGPACK_VERSION";
     my $ok = $self->do_system($self->_cmake, @opt, ".");
     $ok &&= $self->do_system($Config{make});

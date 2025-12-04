@@ -13,7 +13,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test::More::UTF8;
@@ -93,7 +93,7 @@ $params = {
   }
 };
 $sl = Android::ElectricSheep::Automator::DeviceProperties->new($params);
-ok(!defined($sl), 'Android::ElectricSheep::Automator::DeviceProperties->new()'." : called and got defined result.") or BAIL_OUT;
+ok(!defined($sl), 'Android::ElectricSheep::Automator::DeviceProperties->new()'." : called and got failed result as expected.") or BAIL_OUT;
 
 # plain again
 $params = {

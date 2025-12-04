@@ -3,6 +3,7 @@
 use utf8;
 use open qw/:std :utf8/;
 
+use Aion::Carp;
 use Aion::Annotation;
 
-Aion::Annotation->scan
+Aion::Annotation->new_from_args(\@ARGV)->scan

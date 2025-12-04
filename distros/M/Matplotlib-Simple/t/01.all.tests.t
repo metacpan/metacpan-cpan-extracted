@@ -1332,14 +1332,13 @@ foreach my $i (0..360) {
 		push @{ $imshow_data[$i] }, sin($i * $pi/180)*cos($j * $pi/180);
 	}
 }
-plt({
-	data              => \@imshow_data,
-	execute           => 0,
-   fh => $fh,
+imshow({
+	data          => \@imshow_data,
+	execute       => 0,
+   fh            => $fh,
 	'output.file' => 'output.images/imshow.single.svg',
-	'plot.type'       => 'imshow',
-	set_xlim          => '0, ' . scalar @imshow_data,
-	set_ylim          => '0, ' . scalar @imshow_data,
+	set_xlim      => '0, ' . scalar @imshow_data,
+	set_ylim      => '0, ' . scalar @imshow_data,
 });
 plt({
 	plots  => [
@@ -1402,6 +1401,91 @@ plt({
 	nrows           => 2,
 	set_figheight   => 6*3,# 4.8
 	set_figwidth    => 6*4 # 6.4
+});
+# https://labs.chem.ucsb.edu/zakarian/armen/11---bonddissociationenergy.pdf
+my %bond_dissociation = (
+	Br =>  {
+	  Br =>  193
+	},
+	C  =>  {
+		Br =>  276,	C  =>  347,	Cl =>  339,	F   => 485,	H  =>  413,	I  =>  240,
+		N  =>  305,	O  =>  358,	S  =>  259
+	},
+	Cl =>  {
+		Br =>  218,	Cl =>  239
+	},
+	F =>   {
+		I => 280, Br =>  237, Cl  => 253, F   => 154
+	},
+	H  =>  {
+		Br =>  363,	Cl =>  427,	F  =>  565,	H   => 432,	I   => 295
+	},
+	I  =>  {
+		Br  => 175,	Cl =>  208,	I  =>  149
+	},
+	N  =>  {
+		Br =>  243,	Cl  => 200,	F   => 272,	H  =>  391,	N  =>  160, O  =>  201
+	},
+	O =>   {
+		Cl =>  203, F  =>  190,	H  =>  467,	I  =>  234,	O  =>  146
+	},
+	S  =>  {
+		Br => 218,	Cl => 253,	F  => 327,	H  => 347,	S  => 266
+	},
+	Si => {
+		C  => 360, H  => 393, O  => 452,	Si => 340
+	}
+);
+colored_table({
+	'cblabel'     => 'kJ/mol',
+	'col.labels'  => ['H', 'F', 'Cl', 'Br', 'I'],
+	data          => \%bond_dissociation,
+	execute       => 0,
+	fh            => $fh,
+	mirror        => 1,
+	'output.file' => 'output.images/single.tab.svg',
+	'row.labels'  => ['H', 'F', 'Cl', 'Br', 'I'],
+	'show.numbers'=> 1,
+	set_title     => 'Bond Dissociation Energy'
+});
+plt({
+	'output.file' => 'output.images/tab.multiple.svg',
+	execute       => 0,
+	fh            => $fh,
+	plots         => [
+		{
+			data          => \%bond_dissociation,
+			'output.file' => '/tmp/single.bonds.svg',
+			'plot.type'   => 'colored_table',
+			set_title     => 'No other options'
+		},
+		{
+			data          => \%bond_dissociation,
+			cblabel       => 'Average Dissociation Energy (kJ/mol)',
+			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			mirror        => 1,
+			'output.file' => '/tmp/single.bonds.svg',
+			'plot.type'   => 'colored_table',
+			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			'show.numbers'=> 1,
+			set_title     => 'Showing numbers and mirror with defined order'
+		},
+		{
+			data          => \%bond_dissociation,
+			cblabel       => 'Average Dissociation Energy (kJ/mol)',
+			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			mirror        => 1,
+			'output.file' => '/tmp/single.bonds.svg',
+			'plot.type'   => 'colored_table',
+			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			'show.numbers'=> 1,
+			set_title     => 'Set undefined color to white',
+			'undef.color' => 'white'
+		}
+	],
+	ncols         => 3,
+	set_figwidth  => 14,
+	suptitle      => 'Colored Table options'
 });
 plt({
 	fh                => $fh,
@@ -1501,7 +1585,7 @@ plt({
 	'output.file' => 'output.images/hist2d.svg',
 });
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('output.images/add.single.svg','output.images/single.wide.svg','output.images/single.array.svg','output.images/wide.subplots.svg','output.images/single.pie.svg','output.images/pie.svg','output.images/single.boxplot.svg','output.images/boxplot.svg','output.images/single.violinplot.svg','output.images/violin.svg','output.images/single.barplot.svg','output.images/single.hexbin.svg','output.images/single.hist2d.svg','output.images/hexbin.svg','output.images/plots.svg','output.images/plot.single.svg','output.images/plot.single.arr.svg','output.images/barplots.svg','output.images/single.hist.svg','output.images/histogram.svg','output.images/single.scatter.svg','output.images/scatterplots.svg','output.images/imshow.single.svg','output.images/imshow.multiple.svg','output.images/hist2d.svg');
+my @output_files = ('output.images/add.single.svg','output.images/single.wide.svg','output.images/single.array.svg','output.images/wide.subplots.svg','output.images/single.pie.svg','output.images/pie.svg','output.images/single.boxplot.svg','output.images/boxplot.svg','output.images/single.violinplot.svg','output.images/violin.svg','output.images/single.barplot.svg','output.images/single.hexbin.svg','output.images/single.hist2d.svg','output.images/hexbin.svg','output.images/plots.svg','output.images/plot.single.svg','output.images/plot.single.arr.svg','output.images/barplots.svg','output.images/single.hist.svg','output.images/histogram.svg','output.images/single.scatter.svg','output.images/scatterplots.svg','output.images/imshow.single.svg','output.images/imshow.multiple.svg','output.images/single.tab.svg','output.images/tab.multiple.svg','output.images/hist2d.svg');
 foreach my $file (@output_files) {
 	ok(-f $file, "Output file ($file) was created.");
 	ok(is_valid_svg($file), "$file is likely a valid SVG file");

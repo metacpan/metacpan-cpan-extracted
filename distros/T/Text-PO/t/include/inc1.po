@@ -1,0 +1,10 @@
+# Included PO file
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Included One\n"
+"Language: en_GB\n"
+
+msgid "inc-one"
+msgstr "Included one"
+

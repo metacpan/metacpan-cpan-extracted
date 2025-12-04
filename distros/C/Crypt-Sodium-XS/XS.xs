@@ -130,16 +130,16 @@ g_protmem_default_flags_state = PROTMEM_FLAG_MPROTECT_NOACCESS
 
 static U32
 g_protmem_default_flags_memvault = PROTMEM_FLAG_MPROTECT_NOACCESS
-                              | PROTMEM_FLAG_MLOCK_STRICT
-                              | PROTMEM_FLAG_LOCK_LOCKED;
+                                 | PROTMEM_FLAG_MLOCK_STRICT
+                                 | PROTMEM_FLAG_LOCK_LOCKED;
 static U32
 g_protmem_default_flags_key = PROTMEM_FLAG_MPROTECT_NOACCESS
-                                  | PROTMEM_FLAG_MLOCK_STRICT
-                                  | PROTMEM_FLAG_LOCK_LOCKED;
+                            | PROTMEM_FLAG_MLOCK_STRICT
+                            | PROTMEM_FLAG_LOCK_LOCKED;
 static U32
 g_protmem_default_flags_decrypt = PROTMEM_FLAG_MPROTECT_NOACCESS
-                                      | PROTMEM_FLAG_MLOCK_STRICT
-                                      | PROTMEM_FLAG_LOCK_LOCKED;
+                                | PROTMEM_FLAG_MLOCK_STRICT
+                                | PROTMEM_FLAG_LOCK_LOCKED;
 
 static int has_aes256gcm;
 
@@ -467,8 +467,7 @@ void _define_constants()
   HV *stash = gv_stashpv("Crypt::Sodium::XS", 0);
 
   PPCODE:
-  newCONSTSUB(stash, "SODIUM_VERSION_STRING",
-              newSVpvs(SODIUM_VERSION_STRING));
+  newCONSTSUB(stash, "SODIUM_VERSION_STRING", newSVpvs(SODIUM_VERSION_STRING));
   newCONSTSUB(stash, "SODIUM_LIBRARY_VERSION_MAJOR",
               newSVuv(SODIUM_LIBRARY_VERSION_MAJOR));
   newCONSTSUB(stash, "SODIUM_LIBRARY_VERSION_MINOR",
@@ -477,14 +476,6 @@ void _define_constants()
 
 const char *
 sodium_version_string()
-
-=for notes
-
-another parsexs "bug"? includes get weirdly merged together and claimed to be
-recursively included by one another if there isn't an extra blank line in
-between.
-
-=cut
 
 INCLUDE: inc/base64.xs
 

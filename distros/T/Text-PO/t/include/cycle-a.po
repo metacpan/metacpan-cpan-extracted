@@ -1,0 +1,11 @@
+# First file in a recursive cycle
+#. $include "cycle-b.po"
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Cycle A\n"
+"Language: en_GB\n"
+
+msgid "cycle-a"
+msgstr "Cycle A"
+

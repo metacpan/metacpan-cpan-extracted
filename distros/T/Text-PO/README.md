@@ -1,0 +1,605 @@
+# NAME
+
+Text::PO - Read and write PO files
+
+# SYNOPSIS
+
+    use Text::PO;
+    # Create a parser (include directives enabled by default)
+    my $po = Text::PO->new;
+    $po->debug(2);
+    $po->parse( $poFile ) || die( $po->error );
+
+    # Or disable include processing for this parsing
+    $po->parse( $poFile, include => 0 );
+
+    # Retrieve parsed elements
+    my $hash = $po->as_hash;
+    my $json = $po->as_json;
+
+    # Serialize back to PO text
+    my $str = $po->as_string;
+
+    # Add data:
+    my $e = $po->add_element(
+        msgid  => 'Hello!',
+        msgstr => 'Salut !',
+    );
+    my $e = $po->add_include(
+        file  => 'include/me.po',
+        after => 'Hello world!',
+    );
+
+    $po->remove_element( $e );
+
+    # Iterate over elements
+    $po->elements->foreach(sub
+    {
+        my $e = shift( @_ ); # $_ is also available
+        if( $e->msgid_as_text eq 'Hello!' )
+        {
+            # do something
+        }
+    });
+
+Or, maybe using the object overloading directly:
+
+    $po->elements->foreach(sub
+    {
+        my $e = shift( @_ ); # $_ is also available
+        if( $e eq $other )
+        {
+            # do something
+        }
+    });
+
+    # Write in a PO format to STDOUT
+    $po->dump;
+    # or to a file handle
+    $po->dump( $io );
+
+    # Synchronise data
+    $po->sync( '/some/where/com.example.api.po' );
+    $po->sync( $file_handle );
+
+    # or merge
+    $po->merge( '/some/where/com.example.api.po' );
+    $po->merge( $file_handle );
+
+# VERSION
+
+    v0.9.0
+
+# DESCRIPTION
+
+This module parse GNU PO (portable object) and POT (portable object template) files, making it possible to edit the localised text and write it back to a po file.
+
+[Text::PO::MO](https://metacpan.org/pod/Text%3A%3APO%3A%3AMO) reads and writes `.mo` (machine object) binary files.
+
+Thus, with those modules, you do not need to install `msgfmt`, `msginit` of GNU. It is better if you have them though.
+
+Also, this distribution provides a way to export the `po` files in json format to be used from within JavaScript and a JavaScript class to load and use those files is also provided along with some command line scripts. See the `share` folder along with its own test units.
+
+Also, there is a script in `scripts` that can be used to transcode `.po` or `mo` files into json format and vice versa.
+
+For more information on the format of a PO element, check [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement)
+
+# CONSTRUCTOR
+
+## new
+
+Create a new Text::PO object acting as an accessor.
+
+One object should be created per po file, because it stores internally the po data for that file in the [Text::PO](https://metacpan.org/pod/Text%3A%3APO) object instantiated.
+
+Returns the object.
+
+The following options can be provided:
+
+- `domain`
+
+    The PO domain.
+
+- `header`
+
+    An array reference of PO file header string. Those are often lines of comments preceded by a pound sign (`#`), possibly with some copyright information.
+
+- `encoding`
+
+    The content encoding of the file, such as `utf-8`
+
+- `include`
+
+    Defaults to true.
+
+    A boolean value (`1` or `0`) to indicate whether the parser should recognise include directives or not.
+
+- `max_recurse`
+
+    Defaults to 32
+
+    An unsigned integer value representing the maximum recursion allowed when `include` is enabled, and when the parser finds include directives.
+
+- `meta`
+
+    An hash reference of meta key-value pairs, with the keys in all lower case.
+
+- `meta_keys`
+
+    An array reference of meta keys found,
+
+- `use_json`
+
+    Defaults to true.
+
+    A boolean value (`1` or `0`) to indicate whether to use JSON format.
+
+## METHODS
+
+## add\_element
+
+    my $elem = $po->add_element( $element_object,
+        after => 'Some other text',
+    );
+    my $elem = $po->add_element(
+        msgid   => 'Hello world!",
+        msgstr  => 'Salut tout le monde !',
+        comment => 'No comment',
+        before  => 'Some other text',        # Add this new element before this msgid/include directive
+    );
+
+This takes either of the following parameters, and adds the new element, if it does not already exist, to the list of elements:
+
+- 1. [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) object + `%options`
+
+    A [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) object, possibly followed by an hash or hash reference of options.
+
+- 2. `%options`
+
+    An hash or hash ref of options that will be passed to [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) to create a new object.
+
+It returns the newly created element if it did not already exist, or the existing one found. Thus if you try to add an element data that already exists, this will prevent it and return the existing element object found.
+
+If an error occurred, it will set an [error object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) and return `undef` in scalar context, or an empty list in list context.
+
+Supported options are:
+
+- all the ones used in [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement)
+- `before` / `after`
+
+    A `msgid` or `include` directive value to add this element before or after.
+
+## add\_include
+
+    my $elem = $po->add_include( $element_object,
+        after => 'Some other text',
+    );
+    my $elem = $po->add_include(
+        file    => 'include/me.po",
+        comment => 'No comment',
+        before  => 'Some other text',   # Add this new element before this msgid/include directive
+    );
+
+This takes either of the following parameters, and adds the new include directive, if it does not already exist, to the list of elements:
+
+- 1. [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) object + `%options`
+
+    A [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) object, possibly followed by an hash or hash reference of options.
+
+- 2. `%options`
+
+    An hash or hash ref of options that will be passed to [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) to create a new object.
+
+Note that the `file` parameter must be set in the element passed, or provided among the options used to create a new element.
+
+It returns the newly created element if it did not already exist, or the existing one found. Thus if you try to add an include directive that already exists, this will prevent it and return the existing element object found.
+
+If an error occurred, it will set an [error object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) and return `undef` in scalar context, or an empty list in list context.
+
+Supported options are:
+
+- all the ones used in [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement)
+- `before` / `after`
+
+    A `msgid` or `include` directive value to add this element before or after.
+
+## added
+
+Returns an array object ([Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray)) of [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) objects added during synchronisation.
+
+## as\_json
+
+This takes an optional hash reference of option parameters and return a json formatted string.
+
+All options take a boolean value. Possible options are:
+
+- `indent`
+
+    If true, [JSON](https://metacpan.org/pod/JSON) will indent the data.
+
+    Default to false.
+
+- `pretty`
+
+    If true, this will return a human-readable json data.
+
+- `sort`
+
+    If true, this will instruct [JSON](https://metacpan.org/pod/JSON) to sort the keys. This makes it slower to generate.
+
+    It defaults to false, which will use a pseudo random order set by perl.
+
+- `utf8`
+
+    If true, [JSON](https://metacpan.org/pod/JSON) will utf8 encode the data.
+
+## as\_hash
+
+Return the data parsed as an hash reference.
+
+## as\_string
+
+Serializes the current PO object into a single string containing valid GNU `.po` syntax. This is equivalent to calling ["dump"](#dump) into an in-memory scalar, but more convenient for tests or further processing.
+
+    my $string = $po->as_string;
+
+This always returns a plain Perl string (not a blessed scalar or IO object) to avoid issues with string overloading.
+
+## charset
+
+Sets or gets the character encoding for the po data. This will affect the `charset` parameter in `Content-Type` meta information.
+
+## content\_encoding
+
+Sets or gets the meta field value for `Content-Encoding`
+
+## content\_type
+
+Sets or gets the meta field value for `Content-Type`
+
+## current\_lang
+
+Returns the current language environment variable set, trying `LANGUAGE` and `LANG`
+
+## decode
+
+Given a string, this will decode it using the character set specified with ["encoding"](#encoding)
+
+## domain
+
+Sets or gets the domain (or namespace) for this PO. Something like `com.example.api`
+
+## dump
+
+Given an optional filehandle, or STDOUT by default, it will print to that filehandle in a format suitable to the po file.
+
+Thus, one could create a perl script, read a po file, then redirect the output of the dump back to another po file like
+
+    ./po_script.pl en_GB.po > new_en_GB.po
+
+It returns the [Text::PO](https://metacpan.org/pod/Text%3A%3APO) object used.
+
+## elements
+
+Returns the array reference of all the [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) objects
+
+## encoding
+
+Sets or gets the character set encoding for the GNU PO file. Typically this should be `utf-8`
+
+## exists
+
+Given a [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) object, it will check if this object exists in its current stack. To achieve this, it will check if both the `msgid` and the `msgstr` exists and match. If you only want to check if the `msgid` exists, use the `msgid_only` option as explained below.
+
+It takes an optional hash or hash reference of options as follows:
+
+- `msgid_only`
+
+    Boolean. If true, this will check only if the `msgid` already exists, and not the corresponding `msgstr`
+
+It returns true of false accordingly.
+
+## hash
+
+Returns the data of the po file as an hash reference with each key representing a string and its value the localised version.
+
+## header
+
+Access the headers data for this po file. The data is an array reference.
+
+## include
+
+    $po->include(1);   # enable include directives
+    $po->include(0);   # disable include directives
+    my $bool = $po->include;
+
+Controls whether `$include "file.po"` directives are recognised during parsing.
+
+Include support is enabled by default.
+
+Include directives may appear in comments, using one of the following forms:
+
+    # $include "other.po"
+    #. $include 'relative/path.po'
+    #   $include "shared/common.po"
+
+When include processing is enabled, any referenced file is parsed recursively. Only valid PO entries (`msgid`/`msgstr`/`msgid_plural`/`msgctxt` blocks and special comments) from included files are merged into the caller’s namespace; header blocks and meta sections of include files are ignored.
+
+This feature allows modular PO files, shared error message bundles, and structured localisation domains without a separate preprocessing step.
+
+## language
+
+Sets or gets the meta field value for `Language`
+
+## language\_team
+
+Sets or gets the meta field value for `Language-Team`
+
+## last\_translator
+
+Sets or gets the meta field value for `Last-Translator`
+
+## max\_recurse
+
+    $po->max_recurse(20);
+    my $limit = $po->max_recurse;
+
+Sets or gets the maximum recursion depth allowed when processing include directives.
+
+The default is 32.
+
+If the recursion limit is exceeded (for example because of accidental self-inclusion or a circular include chain), parsing will abort and ["error"](#error) will contain a descriptive message including the file path and line number where recursion overflow occurred.
+
+This protects users from infinite loops and malicious PO input.
+
+## merge
+
+This takes the same parameters as ["sync"](#sync) and will merge the current data with the target data and return the newly created [Text::PO](https://metacpan.org/pod/Text%3A%3APO) object
+
+## meta
+
+This sets or return the given meta information. The meta field name provided is case insensitive and you can replace dashes (`-`) with underscore (<\_>)
+
+    $po->meta( 'Project-Id-Version' => 'MyProject 1.0' );
+    # or this will also work
+    $po->meta( project_id_version => 'MyProject 1.0' );
+
+It can take a hash ref, a hash, or a single element. If a single element is provided, it return its corresponding value.
+
+This returns its internal hash of meta information.
+
+## meta\_keys
+
+This is an hash reference of meta information.
+
+## mime\_version
+
+Sets or gets the meta field value for `MIME-Version`
+
+## new\_element
+
+Provided with an hash or hash reference of property-value pairs, and this will pass those information to [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) and return the new object.
+
+## normalise\_meta
+
+Given a meta field, this will return a normalised version of it, ie a field name with the right case and dash instead of underscore characters.
+
+## parse
+
+    $po->parse( $filepath );
+    $po->parse( $filepath, include => 0 );
+    $po->parse( $fh, max_recurse => 20 );
+
+Parses a GNU `.po` file or a filehandle and loads its entries into the current object. Returns the current [Text::PO](https://metacpan.org/pod/Text%3A%3APO) instance on success. Upon error, it sets an [error object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) and returns `undef` in scalar context, and an empty list in list context.
+
+### Include processing
+
+If include processing is enabled (see ["include"](#include)), the parser recognises the following non-standard directives:
+
+    # $include "path.po"
+    #.$include "relative.po"
+
+Relative paths are resolved against the directory of the parent file.
+
+When an include directive is seen:
+
+1. A new [Text::PO](https://metacpan.org/pod/Text%3A%3APO) object is created for the included file.
+2. The effective `include` and `max_recurse` settings are passed to the child parser.
+3. Only PO elements (`msgid`/`msgstr`/`msgctl`/`msgid_plural` entries, and special comments) from the included file are merged into the parent’s `elements` list. Header metadata from included files is ignored.
+4. Circular references are detected. A descriptive error is attached to the directive line and parsing continues for the parent file.
+5. If the included file has some header meta information containing the header `Language` and if it does not match that of the parent, a warning is emitted if warnings are enabled.
+
+### Options
+
+parse() accepts the following options:
+
+- `include` (boolean)
+
+    Override the parser’s include behaviour for this parse call.
+
+- `max_recurse` (unsigned integer)
+
+    Override the maximum include depth for this parse call.
+
+## parse\_date\_to\_object
+
+Provided with a date string and this returns a [DateTime](https://metacpan.org/pod/DateTime) object
+
+## parse\_header\_value
+
+Takes a header value such as `text/plain; charset="utf-8"` and this returns a `Text::PO::HeaderValue` object
+
+## parse2hash
+
+Whether the pod file is stored as standard GNU po data or as json data, this method will read its data and return an hash reference of it.     
+
+## parse2object
+
+Takes a file path, parse the po file and loads its data onto the current object. It returns the current object.
+
+## plural
+
+Sets or gets the plurality definition for this domain and locale used in the current object.
+
+If set, this will expect 2 parameters: 1) an integer representing the possible plurality for the given locale and 2) the expression that will be evaluated to assess which plural form to use.
+
+It returns an array reference representing those 2 values.
+
+If you want to find out the proper plural form for a given `locale`, you should refer to the [Unicode CLDR](https://cldr.unicode.org/) data, which can be accessed and queries via the module [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData):
+
+    my $cldr = Locale::Unicode::Data->new;
+    say $cldr->plural_forms( 'fr' ); # nplurals=2; plural=(n > 1);
+
+## plural\_forms
+
+Sets or gets the meta field value for `Plural-Forms`
+
+## po\_revision\_date
+
+Sets or gets the meta field value for `PO-Revision-Date`
+
+## pot\_creation\_date
+
+Sets or gets the meta field value for `POT-Creation-Date`
+
+## project\_id\_version
+
+Sets or gets the meta field value for `Project-Id-Version`
+
+## quote
+
+Given a string, it will escape carriage return, double quote and return it,
+
+## remove\_duplicates
+
+Takes a boolean value to enable or disable the removal of duplicates in the po file.
+
+## remove\_element
+
+Given a [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) and this will remove it from the object elements list.
+
+If the value provided is not an [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) object it will return an error.
+
+It returns a true value representing the number of elements removed or 0 if none could be found.
+
+## removed
+
+Sets or gets this boolean value.
+
+## report\_bugs\_to
+
+Sets or gets the meta field value for `Report-Msgid-Bugs-To`
+
+## quote
+
+Takes a string and escape the characters that needs to be and returns it.
+
+## remove\_duplicates
+
+Takes a boolean value and if true, this will remove duplicate msgid.
+
+## removed
+
+Returns an array object ([Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray)) of [Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement) removed during synchronisation.
+
+## source
+
+Sets or gets an hash reference of parameters providing information about the source of the data.
+
+It could have an attribute `handle` with a glob as value or an attribute `file` with a filepath as value.
+
+## sync
+
+    $po->sync( '/some/where/com.example.api.po' );
+    # or
+    $po->sync({ file => '/some/where/com.example.api.po' });
+    # or
+    $po->sync({ handle => $file_handle });
+    # or, if source of data has been set previously by parse()
+    $po->parse( '/some/where/com.example.api.po' );
+    # Do some change to the data, then:
+    $po->sync;
+
+Given a file or a file handle, it will read the po file, and our current object will synchronise against it.
+
+It takes an hash or hash reference passed as argument, as optional parameters with the following properties:
+
+- `file`
+
+    File path
+
+- `handle`
+
+    Opened file handle
+
+This means that our object is the source and the file or filehandle representing the target po file is the recipient of the synchronisation.
+
+This method will return an error a file is provided, already exists, but is either a symbolic link or not a regular file (`-f` test), or a file handle is provided, but not currently opened.
+
+If a file path is provided, and the file does not yet exist, it will attempt to create it or return an error if it cannot. In this case, it will use ["dump"](#dump) to write all its data to file.
+
+If the target file was created, it will return the current object, otherwise it returns the newly created [Text::PO](https://metacpan.org/pod/Text%3A%3APO) representing the data synchronised.
+
+## sync\_fh
+
+Takes a file handle as its unique argument and synchronise the object data with the file handle. This means, the file handle provided must be opened in both read and write mode.
+
+What it does is that, after creating a new [Text::PO](https://metacpan.org/pod/Text%3A%3APO) object, it will first call ["parse"](#parse) on the file handle to load its data, and then add all of the current object data to the newly created object, and finally dump all back to the file handle using ["dump"](#dump)
+
+It will set two array of data: one for the elements that did not exist in the recipient data and thus were added and one for those elements in the target data that did not exist in the source object and thus were removed.
+
+If the option _append_ is specified, however, it will not remove those elements in the target that doe not exist in the source one. You can get the same result by calling the method ["merge"](#merge) instead of ["sync"](#sync)
+
+You can get the data of each of those 2 arrays by calling the methods ["added"](#added) and ["removed"](#removed) respectively.
+
+It returns the newly created [Text::PO](https://metacpan.org/pod/Text%3A%3APO) object containing the synchronised data.
+
+## unquote
+
+Takes a string, unescape it and returns it.
+
+## use\_json
+
+Takes a boolean value and if true, this will save the data as json instead of regular po format.
+
+Saving data as json makes it quicker to load, but also enable the data to be used by JavaScript.
+
+# PRIVATE METHODS
+
+## \_can\_write\_fh
+
+Given a filehandle, returns true if it can be written to it or false otherwise.
+
+## \_set\_get\_meta\_date
+
+Takes a meta field name for a date-type field and sets its value, if one is provided, or returns a [DateTime](https://metacpan.org/pod/DateTime) object.
+
+If a value is provided, even a string, it will be converted to a [DateTime](https://metacpan.org/pod/DateTime) object and a [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) will be attached to it as a formatter so the stringification of the object produces a date compliant with PO format.
+
+## \_set\_get\_meta\_value
+
+Takes a meta field name and sets or gets its value.
+
+# THREAD-SAFETY
+
+This module is thread-safe. All state is stored on a per-object basis, and the underlying file operations and data structures do not share mutable global state.
+
+# AUTHOR
+
+Jacques Deguest <`jack@deguest.jp`>
+
+# SEE ALSO
+
+[Text::PO::Element](https://metacpan.org/pod/Text%3A%3APO%3A%3AElement), [Text::PO::MO](https://metacpan.org/pod/Text%3A%3APO%3A%3AMO), [Text::PO::Gettext](https://metacpan.org/pod/Text%3A%3APO%3A%3AGettext)
+
+[https://www.gnu.org/software/gettext/manual/html\_node/PO-Files.html](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html),
+
+[https://en.wikipedia.org/wiki/Gettext](https://en.wikipedia.org/wiki/Gettext)
+
+[GNU documentation on header format](https://www.gnu.org/software/gettext/manual/html_node/Header-Entry.html)
+
+# COPYRIGHT & LICENSE
+
+Copyright (c) 2020-2025 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.

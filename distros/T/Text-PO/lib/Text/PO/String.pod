@@ -1,0 +1,95 @@
+=encoding utf-8
+
+=head1 NAME
+
+Text::PO::String - A GNU Gettext String Class
+
+=head1 SYNOPSIS
+
+    use Text::PO::Gettext;
+    my $str = Text::PO::String->new(
+        locale   => 'fr_FR',
+        value    => 'Salut tout le monde !',
+    }) || die( Text::PO::String->error );
+
+    say $str;
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This class is a simple representation of a localised string. It is an inline package living within L<Text::PO::Gettext>.
+
+The purpose is to associate a locale to a string when it is returned by L<Text::PO::Gettext>. This is useful when you return localised content to the user in an HTTP request, for example, and you want to set the HTTP header C<Content-Language>. When using L<Text::PO::Gettext>, every localised content is guaranteed to be an instance of this class.
+
+Objects from this class are overloaded with stringification capability.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+Takes the following options and returns a L<Text::PO::String> object.
+
+=over 4
+
+=item * C<locale>
+
+A C<locale>, such as C<en_US>, C<en>, C<ja_JP>, etc. See L<Locale::Unicode> for more information about C<locale>
+
+=item * C<value>
+
+The localised text.
+
+=back
+
+=head1 METHODS
+
+=head2 as_string
+
+Returns the L</value>, but as a simple string, B<not> a L<Module::Generic::Scalar> object.
+
+This is called automatically when the object is stringified, such as:
+
+    say "$str";
+
+=head2 locale
+
+    $str->locale( 'fr_FR' );
+    $str->locale; # fr_FR
+
+Sets or gets the C<locale> for this object.
+
+This returns the current value as a L<Module::Generic::Scalar> object.
+
+See L<Locale::Unicode> for more information about C<locale>
+
+=head2 value
+
+    $str->value( 'Salut tout le monde !' );
+    $str->value; # Salut tout le monde !
+
+Sets or gets the localised text.
+
+This returns the current value as a L<Module::Generic::Scalar> object.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<Text::PO::Gettext>, L<Text::PO>, L<Text::PO::Element>, L<Text::PO::MO>
+
+L<Module::Generic::Scalar>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2021-2025 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+
+=cut

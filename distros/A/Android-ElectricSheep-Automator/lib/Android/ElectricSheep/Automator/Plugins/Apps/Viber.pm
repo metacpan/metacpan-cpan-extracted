@@ -241,7 +241,7 @@ Android::ElectricSheep::Automator::Plugins::Apps::Viber - Control the Viber app 
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 WARNING
 

@@ -7,8 +7,8 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # Файл etc/annotation/run.ann:
 #@> etc/annotation/run.ann
-#>> Aion::Run::RunRun#run=run:run „Executes Perl code in the context of the current project”
-#>> Aion::Run::RunsRun#list=run:runs „List of scripts”
+#>> Aion::Run::RunRun#run,3=run:run „Executes Perl code in the context of the current project”
+#>> Aion::Run::RunsRun#list,5=run:runs „List of scripts”
 #@< EOF
 # 
 subtest 'SYNOPSIS' => sub { 

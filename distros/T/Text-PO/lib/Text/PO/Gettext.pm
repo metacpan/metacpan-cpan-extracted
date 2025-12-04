@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2023/10/31
+## Modified 2025/11/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,27 +15,86 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Text::PO' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $L10N $DOMAIN_RE $LOCALE_RE );
     use I18N::Langinfo qw( langinfo );
+    use Module::Generic::Global ':const';
     use POSIX ();
     use Text::PO;
     # l10n_id => lang => string => local string
-    our $L10N = {};
+    # our $L10N = {};
+    # Since version v0.3.2, we now use Module::Generic::Global for thread safety
     our $DOMAIN_RE = qr/^[a-z]+(\.[a-zA-Z0-9\_\-]+)*$/;
-    our $LOCALE_RE = qr/^
-        (?<locale>
-            (?<locale_lang>
-                [a-z]{2}
-            )
+    # Taken from Unicode BCP47 via Locale::Unicode
+    our $LOCALE_RE = qr/
+    (?<locale>
+        (?<locale_lang>
             (?:
-                [_-](?<locale_country>[A-Z]{2})
+                # "root" is treated as a special Unicode language subtag in the LDML and required in the valid pattern
+                (?<root>root)
+                |
+                (?<language>[a-z]{2})
+                |
+                (?<language3>[a-z]{3})
+            )
+            # "Up to three optional extended language subtags composed of three letters each, separated by hyphens"
+            # "There is currently no extended language subtag registered in the Language Subtag Registry without an equivalent and preferred primary language subtag"
+            (?:
+                [_-]
+                (?<extended>
+                    [a-z]{3}
+                    (?:\-[a-z]{3}){0,2}
+                )
             )?
-            (?:\.(?<locale_encoding>[\w-]+))?
         )
-    $/x;
-    our $VERSION = 'v0.3.1';
+        # ISO 15924 for scripts
+        (?:
+            [_-]
+            (?:
+                (?<script>[A-Z][a-z]{3})
+                |
+                (?<script>[a-z]{4})
+            )
+        )?
+        (?:
+            (?:
+                [_-]
+                (?<territory>
+                    (?<country_code>[A-Z]{2})
+                    |
+                    # BCP47, section 2.2.4.4: the UN Standard Country or Area Codes for Statistical Use
+                    # We are careful not to catch a following variant starting with a digit.
+                    (?<region>\d{3}(?!\d))
+                )
+            )?
+            # "Optional variant subtags, separated by hyphens, each composed of five to eight letters, or of four characters starting with a digit"
+            # ca-ES-valencia
+            # country code can be skipped if the variant is limited to a country
+            # be-tarask
+            (?:
+                [_-]
+                (?<variant>
+                    (?:
+                        (?:[[:alnum:]]{5,8})
+                        |
+                        (?:\d[[:alnum:]]{3})
+                    )
+                    (?:
+                        [_-]
+                        (?:
+                            (?:[[:alnum:]]{5,8})
+                            |
+                            (?:\d[[:alnum:]]{3})
+                        )
+                    )*
+                )
+            )?
+        )?
+        (?:\.(?<locale_encoding>[\w-]+))?
+    )
+    /xi;
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -130,9 +189,16 @@ sub dngettext
                 no warnings 'once';
                 my $n = $count;
                 my $expr = $plural->[1];
-                $expr =~ s/(?:^|\b)(?<!\$)(n)(?:\b|$)/\$$1/g;
+                $expr =~ s/(?:^|\b)(?<!\$)(n)(?:\b|$)/$n/g;
                 $index = eval( $expr );
-                $index = int( $index );
+                if( $@ )
+                {
+                    warn( "Warning only: problem evaluating expression '$expr' for locale ", $opts->{locale}, ": $@" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+                }
+                else
+                {
+                    $index = int( $index );
+                }
             }
             else
             {
@@ -247,11 +313,13 @@ sub getDomainHash
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{domain} //= $self->domain;
-    
-    my $hash = $L10N;
+    my $class = ref( $self ) || $self;
+
+    my $repo = Module::Generic::Global->new( 'l10n' => $class );
+    my $hash = $repo->get // {};
     if( !exists( $hash->{ $opts->{domain} } ) )
     {
-        retrn( $self->error( "No locale data for domain \"$opts->{domain}\"." ) );
+        return( $self->error( "No locale data for domain \"$opts->{domain}\"." ) );
     }
     my $l10n = $hash->{ $opts->{domain} };
     if( exists( $opts->{locale} ) && 
@@ -278,7 +346,7 @@ sub getLanguageDict
         return( $self->error( "Locale provided (${lang}) is in an unsupported format." ) );
     }
     $lang = $self->locale_unix( $lang );
-    
+
     if( !$self->isSupportedLanguage( $lang ) )
     {
         return( $self->error( "Language provided (${lang}), to get its dictionary, is unsupported." ) );
@@ -408,12 +476,15 @@ sub gettextf { return( shift->getTextf( @_ ) ); }
 
 sub isSupportedLanguage
 {
-    my $self = shift( @_ );
-    my $lang = shift( @_ ) || return(0);
+    my $self  = shift( @_ );
+    my $lang  = shift( @_ ) || return(0);
+    my $class = ref( $self ) || $self;
     $lang = $self->locale_unix( $lang );
     my $dom  = $self->domain;
-    return( $self->error( "No domain \"$dom\" set!" ) ) if( !CORE::exists( $L10N->{ $dom } ) );
-    my $dict = $L10N->{ $dom };
+    my $repo = Module::Generic::Global->new( 'l10n' => $class );
+    my $l10n = $repo->get // {};
+    return( $self->error( "No domain \"$dom\" set!" ) ) if( !CORE::exists( $l10n->{ $dom } ) );
+    my $dict = $l10n->{ $dom };
     if( CORE::exists( $dict->{ $lang } ) )
     {
         return(1);
@@ -444,8 +515,12 @@ sub locale
         }
         elsif( $v =~ /^$LOCALE_RE$/ )
         {
-            $v = join( '_', $+{locale_lang}, ( $+{locale_country} ? $+{locale_country} : () ) );
-            $v .= '.' . $+{locale_encoding} if( $+{locale_encoding} );
+            # The user is responsible for the locale value s/he provides. We only checks s/he provides a valid locale.
+            # We normalise it.
+            my( $loc, $enc ) = split( /\./, $v, 2 );
+            $loc =~ tr/-/_/;
+            $v = $loc;
+            $v .= '.' . $enc if( defined( $enc ) );
         }
         else
         {
@@ -468,8 +543,9 @@ sub locale_unix
     # Only once
     if( $loc =~ /^$LOCALE_RE$/ )
     {
-        $loc = join( '_', $+{locale_lang}, ( $+{locale_country} ? $+{locale_country} : () ) );
-        $loc .= '.' . $+{locale_encoding} if( $+{locale_encoding} );
+        ( $loc, my $enc ) = split( /\./, $loc, 2 );
+        $loc =~ tr/-/_/;
+        $loc .= '.' . $enc if( defined( $enc ) );
     }
     return( $loc );
 }
@@ -481,8 +557,9 @@ sub locale_web
     # Only once
     if( $loc =~ /^$LOCALE_RE$/ )
     {
-        $loc = join( '-', $+{locale_lang}, ( $+{locale_country} ? $+{locale_country} : () ) );
-        $loc .= '.' . $+{locale_encoding} if( $+{locale_encoding} );
+        ( $loc, my $enc ) = split( /\./, $loc, 2 );
+        $loc =~ tr/_/-/;
+        $loc .= '.' . $enc if( defined( $enc ) );
     }
     return( $loc );
 }
@@ -527,8 +604,9 @@ sub reportBugsTo { return( shift->_get_po->report_bugs_to ); }
 
 sub textdomain
 {
-    my $self = shift( @_ );
-    my $dom  = shift( @_ ) || return( $self->error( "No domain was provided." ) );
+    my $self  = shift( @_ );
+    my $dom   = shift( @_ ) || return( $self->error( "No domain was provided." ) );
+    my $class = ref( $self ) || $self;
     my $base = $self->path;
     my $lang = $self->locale_unix;
     my $path_po   = $base->join( $base, $lang, ( $self->category ? $self->category : () ), "${dom}.po" );
@@ -536,8 +614,7 @@ sub textdomain
     my $path_mo   = $base->join( $base, $lang, ( $self->category ? $self->category : () ), "${dom}.mo" );
     my $file;
     my $po;
-    
-    
+
     if( $self->use_json && $path_json->exists )
     {
         $file = $path_json;
@@ -566,14 +643,19 @@ sub textdomain
     {
         return( $self->error( "No data file could be found for \"$dom\" for either json, po, or mo file." ) );
     }
-    $L10N->{ $dom } = {} if( ref( $L10N->{ $dom } ) ne 'HASH' );
-    my $dict = $L10N->{ $dom }->{ $lang } = {} if( ref( $L10N->{ $dom }->{ $lang } ) ne 'HASH' );
+    my $repo = Module::Generic::Global->new( 'l10n' => $class );
+    $repo->lock;
+    my $l10n = $repo->get // {};
+    $l10n->{ $dom } = {} if( ref( $l10n->{ $dom } ) ne 'HASH' );
+    my $dict = $l10n->{ $dom }->{ $lang } = {} if( ref( $l10n->{ $dom }->{ $lang } ) ne 'HASH' );
     $dict->{_po} = $po;
     $po->elements->foreach(sub
     {
         my $ref = shift( @_ );
         $dict->{ $ref->{msgid} } = $ref;
     });
+    $repo->set( $l10n );
+    $repo->unlock;
     return( $self );
 }
 
@@ -683,10 +765,10 @@ sub _get_po
             fallback => 1,
         );
     };
-    
+
     use strict;
     use warnings;
-    
+
     sub init
     {
         my $self = shift( @_ );
@@ -697,13 +779,13 @@ sub _get_po
         $self->SUPER::init( @_ );
         return( $self );
     }
-    
+
     sub as_string { return( shift->value->scalar ); }
-    
+
     sub locale { return( shift->_set_get_scalar_as_object( 'locale', @_ ) ); }
 
     sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
-    
+
     sub TO_JSON { return( shift->as_string ); }
 }
 
@@ -715,28 +797,102 @@ __END__
 
 =head1 NAME
 
-Text::PO::Gettext - A GNU Gettext implementation
+Text::PO::Gettext - Object-oriented GNU Gettext-style implementation
 
 =head1 SYNOPSIS
 
     use Text::PO::Gettext;
-    my $po = Text::PO::Gettext->new || die( Text::PO::Gettext->error, "\n" );
-    my $po = Text::PO::Gettext->new({
-        category => 'LC_MESSAGES',
-        debug    => 3,
-        domain   => "com.example.api",
-        locale   => 'ja-JP',
-        path     => "/home/joe/locale",
+
+    # Basic usage: one domain, one locale
+    my $po = Text::PO::Gettext->new(
+        path       => '/home/joe/locale', # path to where the list of locales directories are
+        domain     => 'com.example.api',
+        locale     => 'fr_FR',            # optional, falls back to environment; _ or - does not matter
+        # use_json => 1,                  # if you use JSON exports from Text::PO
+        # category => 'LC_MESSAGES',      # optional, defaults to LC_MESSAGES
+    ) || die( Text::PO::Gettext->error );
+
+    # Simple lookup
+    my $hello = $po->gettext('Hello world');
+
+    # Text::PO::String objects stringify to the translated text
+    say $hello;          # "Bonjour le monde"
+    say $hello->value;   # same
+    say $hello->locale;  # "fr_FR"
+
+    # Plural form lookup
+    my $n = 3;
+    my $apples = $po->ngettext(
+        '%d apple',     # singular
+        '%d apples',    # plural
+        $n,
+    );
+    printf "$apples\n", $n;              # formatted with %d, still Text::PO::String
+
+    # Typical web service / PSGI pattern
+    my $msg = $po->gettext('Invalid parameter');
+
+    my $body = { error => "$msg" };      # stringification
+    my $res  = [
+        200,
+        [
+            'Content-Type'     => 'application/json; charset=utf-8',
+            'Content-Language' => $msg->locale,   # <- effective locale
+        ],
+        [ encode_json($body) ],
+    ];
+
+    # Plural forms
+    my $count = 3;
+    my $files = $po->ngettext('%d file', '%d files', $count);
+    printf "$files\n", $count;    # "3 fichiers"
+
+    # Per-object locale: two locales loaded simultaneously
+    my $fr = Text::PO::Gettext->new(
+        domain => 'com.example.api',
+        locale => 'fr_FR',
+        path   => '/some/where/locale',
+    );
+
+    my $en = Text::PO::Gettext->new(
+        domain => 'com.example.api',
+        locale => 'en_GB',
+        path   => '/some/where/locale',
+    );
+
+    my $msg_fr = $fr->gettext( 'Welcome' );
+    my $msg_en = $en->gettext( 'Welcome' );
+
+    say "FR: $msg_fr";                   # "FR: Bienvenue"
+    say "EN: $msg_en";                   # "EN: Welcome"
+
+    # Using Text::PO::String to set Content-Language in a web service
+    my $title = $po->gettext( 'Page title' );
+
+    $res->header( 'Content-Language' => $title->locale );
+    $res->body( $title->value );
+
+    # Switching locale on an existing object
+    $po->locale( 'fr_FR' );              # internally normalised
+    my $bye = $po->gettext( 'Goodbye' );
+
+    # JSON-based catalogues instead of PO/MO
+    my $json_po = Text::PO::Gettext->new(
+        domain   => 'com.example.api',
+        locale   => 'ja_JP',
+        path     => '/var/www/locale',
         use_json => 1,
-    }) || die( Text::PO::Gettext->error, "\n" );
+    );
+
+    my $label = $json_po->gettext( 'Log in' );
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 
-This module is used to access the data in either C<po>, C<mo> or C<json> file and provides various methods to access those data.
+This module provides an object-oriented interface to gettext-style localisation data stored as C<.po>, C<.mo>, or C<.json> files.
 
 The conventional way to use GNU gettext is to set the global environment variable C<LANGUAGE> (not C<LANG> by the way. GNU gettext only uses C<LANGUAGE>), then set the L<POSIX/setlocale> to the language such as:
 
@@ -766,7 +922,56 @@ This works fine, but has the inconvenience that it uses the global C<LANGUAGE> e
 
 Thus comes a more straightforward object-oriented interface offered by this module.
 
-You instantiate an object, passing the domain, the locale and the filesystem path where the locale data resides.
+So, L<Text::PO::Gettext> allows you to create multiple independent localisation objects, each with its own domain, locale, and data directory. This makes it straightforward to:
+
+=over 4
+
+=item *
+
+serve multiple users with different locales in the same process,
+
+=item *
+
+switch locale per request without touching global environment variables, and
+
+=item *
+
+work comfortably under threaded environments, mod_perl, daemons, etc.
+
+=back
+
+A typical directory layout might look like:
+
+    /some/where/locale/
+        en_GB/
+            LC_MESSAGES/
+                com.example.api.po
+                com.example.api.mo
+                com.example.api.json
+        ja_JP/
+            LC_MESSAGES/
+                com.example.api.po
+                com.example.api.json
+
+Based on the options you pass (C<domain>, C<locale>, C<path>, C<use_json>), the module will look for a suitable localisation file in the order:
+
+=over 4
+
+=item *
+
+JSON file (C<.json>) if C<use_json> is true and such a file exists,
+
+=item *
+
+PO file (C<.po>) if present,
+
+=item *
+
+MO file (C<.mo>) as a fallback.
+
+=back
+
+Thus, you instantiate an object, passing the domain, the locale and the filesystem path where the locale data resides.
 
     my $po = Text::PO::Gettext->new(
         domain => 'com.example.api',
@@ -789,15 +994,56 @@ Still, it is better to convert the original C<.po> files to json using the C<po.
 
 This api supports locale that use hyphens or underscore in them such as C<en-GB> or C<en_GB>. You can use either, it will be converted internally.
 
+All translated strings returned by this module are instances of L<Text::PO::String>. L<Text::PO::String> objects are tiny wrappers around the translated value. They:
+
+=over 4
+
+=item *
+
+Stringify transparently to the translated text.
+
+=item *
+
+Provide a C<locale> method returning the effective locale used for that lookup (for example C<en_GB> or C<fr_FR>).
+
+=item *
+
+Provide a C<value> method returning the translated text as a plain scalar.
+
+=back
+
+This is particularly handy for web services and APIs, where you may want to inspect the locale actually used for a given message and, for example, set the C<Content-Language> response header accordingly:
+
+    my $msg = $po->gettext( 'Error: invalid input' );
+
+    $res->header( 'Content-Language' => $msg->locale );
+    $res->body( $msg->value );
+
+You can safely treat C<Text::PO::String> objects as regular strings in most contexts; they are designed to be drop-in replacements for plain scalars from the caller’s point of view, while still carrying useful metadata.
+
 =head1 CONSTRUCTOR
 
 =head2 new
+
+    my $po = Text::PO::Gettext->new(
+        domain   => 'com.example.api',
+        locale   => 'ja_JP',
+        path     => '/some/where/locale',
+        category => 'LC_MESSAGES',   # optional
+        use_json => 1,               # optional
+        plural   => [ $n, $expr ],   # optional
+        debug    => 1,               # optional
+    );
+
+Creates a new C<Text::PO::Gettext> object.
 
 Takes the following options and returns a Gettext object.
 
 =over 4
 
 =item * C<category>
+
+This is optional.
 
 If I<category> is defined, such as C<LC_MESSAGES> (by default), it will be used when building the I<path>.
 
@@ -812,20 +1058,46 @@ ware.html> for more information on this.
 
 =item * C<domain>
 
+This is required.
+
 The portable object domain, such as C<com.example.api>
+
+This typically corresponds to the base filename of your PO/MO/JSON files.
 
 =item * C<locale>
 
-The locale, such as C<ja_JP>, or C<en>, or it could even contain a dash instead of an underscore, such as C<en-GB>. Internally, though, this will be converted to underscore.
+This is required.
+
+The locale, such as C<ja_JP>, or C<en>, or it could even contain a hyphen instead of an underscore, such as C<en-GB>. Internally, though, this will be converted to underscore.
 
 =item * C<path>
 
-The uri path where the gettext localised data are.
+This is required.
+
+Base filesystem path where the localisation files are stored.
 
 This is used to form a path along with the locale string. For example, with a locale of C<ja_JP> and a domain of C<com/example.api>, if the path were C</locale>, the data po json data would be fetched from C</locale/
 ja_JP/LC_MESSAGES/com.example.api.json>
 
+=item * C<plural>
+
+This is optional.
+
+An array reference C<[ $n, $expr ]> defining plural forms for the current domain and locale. This is normally derived from the PO metadata (C<Plural-Forms>) but can be overridden if needed.
+
+=item * C<use_json>
+
+Optional boolean value.
+
+If true, PO data will be loaded from JSON files produced by L<Text::PO> instead of regular PO/MO files.
+
+This is particularly useful when working with the JavaScript companion library provided by the L<Text::PO> distribution.
+
 =back
+
+The constructor does not immediately load the catalogue; data is pulled in when you first call L</textdomain> or any of the lookup methods, which internally ensure the domain has been loaded.
+
+Returns the newly created L<Text::PO::Gettext> object or upon error, it sets an L<error object|Module::Generic::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head1 METHODS
 
@@ -875,7 +1147,7 @@ and thus, this is different from the C<locale> set in the Gettext class object u
 
 =head2 dgettext
 
-Takes a domain and a message id and returns the equivalent localised string if any, otherwise the original message id.
+This is like L</gettext>, but takes a specific domain and a message ID and returns the equivalent localised string if any, otherwise the original message id.
 
     $po->dgettext( 'com.example.auth', 'Please enter your e-mail address' );
     # Assuming the locale currently set is ja_JP, this would return:
@@ -975,7 +1247,7 @@ This takes an optional hash of parameters and return the global hash dictionary 
     # Explicitly specify another domain
     my $data = $po->getDomainHash( domain => "net.example.api" );
     # Specify a domain and a locale
-    my $l10n = $po->getDomainHash( domain => "com.example.api", locale => "ja_JP" );
+    my $po = $po->getDomainHash( domain => "com.example.api", locale => "ja_JP" );
 
 Possible options are:
 
@@ -1193,28 +1465,40 @@ The separator between groups of digits before the decimal point, except for curr
 
 =head2 getPlural
 
+    my $str = $po->getPlural( $singular, $plural, $count, [ $domain ] );
+
 Calls L<Text::PO/plural> and returns an array object (L<Module::Generic::Array>) with 2 elements.
+
+Internal helper used by L</ngettext> and L</dngettext>. It applies the plural expression associated with the current (or given) domain/locale, selects the correct form, and returns a C<Text::PO::String>.
 
 See L<Text::PO/plural> for more details.
 
 =head2 getText
 
+    my $str = $po->getText( $msgid );
+
+Internal workhorse used by L</gettext> and domain-aware variants. 
+
 Provided with an original string, and this will return its localised equivalent if it exists, or by default, it will return the original string.
 
+Returns a C<Text::PO::String> as described elsewhere.
+
 =head2 getTextf
+
+    my $str = $po->getTextf( $msgid, @args );
 
 Provided with an original string, and this will get its localised equivalent that wil be used as a template for the sprintf function. The resulting formatted localised content will be returned.
 
 =head2 gettext
 
-Provided with a C<msgid> represented by a string, and this return a localised version of the string, if any is found and is translated, otherwise returns the C<msgid> that was provided.
+Provided with a C<msgid> represented by a string, and this return a localised version of the string, under the current domain and locale, if any is found and is translated, otherwise returns the C<msgid> that was provided.
 
     $po->gettext( "Hello" );
     # With locale of fr_FR, this would return "Bonjour"
 
 See the global function L</_> for more information.
 
-Note that as of version C<v0.5.0>, this returns a C<Text::PO::String>, which is lightweight and stringifies automatically. It provides the benefit of tagging the string with the locale attached to it.
+Note that as of version C<v0.5.0> of L<Text::PO>, this returns a C<Text::PO::String>, which is lightweight and stringifies automatically. It provides the benefit of tagging the string with the locale attached to it.
 
 Thus, in the example above, the resulting C<Text::PO::String> would have its method C<locale> value set to C<fr_FR>, and you could do:
 
@@ -1225,39 +1509,61 @@ If no locale string was found, C<locale> would be undefined.
 
 =head2 gettextf
 
+    my $str = $po->gettextf( $format, @args );
+
 This is an alias to L</getTextf>
 
+Like L</gettext>, but intended for printf-style formatting. It looks up C<$format> as the message id, then applies C<sprintf> to fill in C<@args>.
+
+The returned object is still a L<Text::PO::String>; formatting is performed on the underlying string.
+
 =head2 isSupportedLanguage
+
+    if( $po->isSupportedLanguage( 'ja_JP' ) )
+    {
+        # Do something
+    }
 
 Provided with a locale such as C<fr-FR> or C<ja_JP> no matter whether an underscore or a dash is used, and this will return true if the locale has already been loaded and thus is supported. False otherwise.
 
 =head2 language
 
-Returns a string containing the value of the header C<Language>.
+Returns a string containing the value of the GNU PO file header C<Language>.
 
     $po->language();
 
 =head2 languageTeam
 
-Returns a string containing the value of the header C<Language-Team>.
+Returns a string containing the value of the GNU PO file header C<Language-Team>.
 
     $po->languageTeam();
 
 =head2 lastTranslator
 
-Returns a string containing the value of the header C<Last-Translator>.
+Returns a string containing the value of the GNU PO file header C<Last-Translator>.
 
     $po->lastTranslator();
 
 =head2 locale
 
-Returns the locale set in the object. if sets, this will trigger the (re)load of po data by calling L</textdomain>
+    $po->locale( 'fr-FR' ); # or 'fr_FR' either is the same
+    my $locale = $po->locale;
+
+Returns the locale set in the object as a L<scalar object|Module::Generic::Scalar>. if sets, this will trigger the (re)load of po data by calling L</textdomain>
+
+Note that this does not modify global environment variables such as C<LANGUAGE> or any process-wide locale; the change is strictly per-object.
 
 =head2 locale_unix
+
+    my $unix_locale = $po->locale_unix; # en_GB
+    my $norm        = $po->locale_unix( 'en-gb' ); # becomes en_GB
 
 Provided with a locale, such as C<en-GB> and this will return its equivalent formatted for server-side such as C<en_GB>
 
 =head2 locale_web
+
+    my $unix_locale = $po->locale_web; # en-GB
+    my $norm        = $po->locale_web( 'en_gb' ); # becomes en-GB
 
 Provided with a locale, such as C<en_GB> and this will return its equivalent formatted for the web such as C<en-GB>
 
@@ -1269,11 +1575,21 @@ Returns a string containing the value of the header C<MIME-Version>.
 
 =head2 ngettext
 
-Takes an original string (a.k.a message id), the plural version of that string, and an integer representing the applicable count. For example:
+This perform plural-aware lookup.
+
+Takes an original string (a.k.a message id), the plural version of that string, and an unsigned integer representing the applicable count, and this selects the appropriate translation according to the plural rules for the current locale/domain. For example:
 
     $po->ngettext( '%d comment awaiting moderation', '%d comments awaiting moderation', 12 );
     # Assuming the locale is ru_RU, this would return:
     # %d комментариев ожидают проверки
+
+As with L</gettext>, the result is a C<Text::PO::String> which you can print directly or pass to C<sprintf>:
+
+    printf $po->ngettext(
+        '%d apple',
+        '%d apples',
+        $count,
+    ), $count;
 
 =head2 path
 
@@ -1283,7 +1599,10 @@ Sets or gets the filesystem path to the base directory containing the locale dat
 
 =head2 plural
 
-Sets or gets the definition for plural for the current domain and locale.
+    my $plural_def = $po->plural;
+    $po->plural( [ $n, $expr ] );
+
+Sets or gets the definition for plural for the current domain and locale. Usually you do not need to set this manually; it is derived from the PO metadata (C<Plural-Forms>).
 
 It takes and returns an array reference of 2 elements:
 
@@ -1337,9 +1656,18 @@ Returns a string containing the value of the header C<Report-Msgid-Bugs-To>.
 
 =head2 textdomain
 
-Given a string representing a domain, such as C<com.example.api> and this will load the C<.json> (if the L</use_json> option is enabled), C<.po> or C<.mo> file found in that order.
+    $po->textdomain( $domain );
+
+Given a string representing a domain, such as C<com.example.api> and this will load (or reload) the C<.json> (if the L</use_json> option is enabled), C<.po> or C<.mo> file found in that order.
+
+Normally you do not need to call this directly; lookups such as L</gettext> will ensure the relevant domain is available.
+
+Internally, domain data is cached in a per-class repository (using L<Module::Generic::Global>) so that repeated lookups for the same domain and locale are efficient and thread-safe.
 
 =head2 use_json
+
+    my $flag = $po->use_json; # 1
+    $po->use_json(1);
 
 Takes a boolean and if set, L<Text::PO::Gettext> will use a json po data if it exists, otherwise it will use a C<.po> file or a C<.mo> file in that order of preference.
 
@@ -1347,16 +1675,26 @@ Takes a boolean and if set, L<Text::PO::Gettext> will use a json po data if it e
 
 Returns the L<Text::PO> object used.
 
+=head1 JAVASCRIPT COMPANION
+
+This distribution provides a JavaScript companion library (see the C<share> directory in the L<Text::PO> distribution) that can read JSON-based PO data generated from your C<.po> or C<.mo> files. This makes it straightforward to share the same localisation data between Perl and browser-side code.
+
+=head1 THREAD & PROCESS SAFETY
+
+L<Text::PO::Gettext> is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It combines system-level file locking (C<flock>) with Perl-level synchronisation via L<Module::Generic::Global> to provide robust, system-wide thread-safe, and process-safe file operations.
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>
+L<Text::PO>, L<Text::PO::String>, L<Text::PO::Element>, L<Text::PO::MO>
+
+L<https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2025 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
 
 =cut

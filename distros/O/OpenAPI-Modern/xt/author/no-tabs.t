@@ -12,6 +12,7 @@ my @files = (
     'lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm',
     'lib/OpenAPI/Modern.pm',
     'lib/OpenAPI/Modern/Utilities.pm',
+    'script/openapi-validate',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/bundled-schemas.t',

@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw/Class::Accessor::Fast/;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 sub new {
 	my ($class, $serial, $state, @attrs) = @_;

@@ -15,11 +15,11 @@ has runs => (is => 'ro', isa => HashRef, default => sub {
 	open my $f, '<:utf8', INI or die "Can't open ${\INI}: $!";
 	while (<$f>) {
 		chomp;
-		warn("Annotation error. Use #\@run <rubric>:<name> <remark>\n$_\n  at ${\INI} line $."), next unless /^([\w:]+)#(\w+)?=(\S+?):(\S+)[ \t]+(.+)/am;
-		$run{$4} = {
-			rubric => $3,
-			name   => $4,
-			remark => $5,
+		warn("Annotation error. Use #\@run <rubric>:<name> <remark>\n$_\n  at ${\INI} line $."), next unless /^([\w:]+)#(\w*),(\d+)=(\S+?):(\S+)[ \t]+(.+)/am;
+		$run{$5} = {
+			rubric => $4,
+			name   => $5,
+			remark => $6,
 			pkg    => $1,
 			sub    => $2,
 		};
@@ -56,8 +56,8 @@ Aion::Run::Runner - runs the command described by the C<#@run> annotation
 
 File etc/annotation/run.ann:
 
-	Aion::Run::RunRun#run=run:run „Executes Perl code in the context of the current project”
-	Aion::Run::RunsRun#list=run:runs „List of scripts”
+	Aion::Run::RunRun#run,3=run:run „Executes Perl code in the context of the current project”
+	Aion::Run::RunsRun#list,5=run:runs „List of scripts”
 
 
 

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.108-9-gf5fb4675
+package OpenAPI::Modern; # git description: v0.110-4-g3881f1d0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.109';
+our $VERSION = '0.111';
 
 use 5.020;
 use utf8;
@@ -1235,7 +1235,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.109
+version 0.111
 
 =head1 SYNOPSIS
 
@@ -1647,9 +1647,11 @@ See also L<JSON::Schema::Modern/CACHING>.
 
 =head1 BUNDLED SCHEMA DOCUMENTS
 
-This distribution comes bundled with all the metaschema documents you need to build your application,
-or build custom schemas on top of. It aims to always use the latest versions of the documents; if
-you need earlier versions, you can find them at
+This distribution comes bundled with all the metaschema documents you need to build your
+application, or build custom schemas on top of. These can be referenced via constants in
+L<OpenAPI::Modern::Utilities> if you are building complex cross-referencing documents.
+We always use the latest versions of the documents that are published for each minor specification
+version; if you need earlier versions (but you should ask yourself why), you can find them at
 L<https://spec.openapis.org/#openapi-specification-schemas>.
 
 The default metaschema used by this tool does not permit the use of C<$schema> keywords

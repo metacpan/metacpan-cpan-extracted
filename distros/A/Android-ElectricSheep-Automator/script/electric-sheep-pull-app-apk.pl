@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use lib ('blib/lib');
 
@@ -56,16 +56,18 @@ my $sparams = {
 };
 my $res = $client->pull_app_apk_from_device($sparams);
 if( ! defined($res) ){ die perl2dump($sparams)."$0 : failed to pull APK of app specified using this name '$PACKAGE_NAME' and above parameters. Note that the error is not about not finding the app on the device, it is something else.\n"; }
+my $Npackages = scalar keys %$res;
+if( $Npackages == 0 ){ print STDERR "$0 : done, warning zero apps were pulled, nothing matched specified package name '$PACKAGE_NAME'.\n"; exit(0); }
 
-if( $VERBOSITY > 0 ){
-	my $N = scalar @$res;
-	my $i = 0;
-	for my $v (@$res){
-		$i++;
-		print STDOUT "$0 : saved apk $i/$N '".$v->{'device-path'}."' into '".$v->{'local-path'}."'.\n";
-	}
+my $Napks = 0;
+for my $pname (sort keys %$res){
+  my $arr = $res->{$pname};
+  for my $v (@$arr){
+	$Napks++;
+	if( $VERBOSITY > 0 ){ print STDOUT "$0 : package '$pname' : saved apk ${Napks} from '".$v->{'device-path'}."' into '".$v->{'local-path'}."'.\n" }
+  }
 }
-print STDOUT "$0 : done, success! Extracted APK(s) written to output dir '$OUTDIR'.\n";
+print STDOUT "$0 : done, success! Extracted ${Napks} APK(s) from ${Npackages} packages, written to output dir '$OUTDIR'.\n";
 
 sub usage {
 	return "Usage $0 --package NAME --output apkdir --configfile CONFIGFILE [--wildcard] [--device DEVICE] [--verbosity v]\n"

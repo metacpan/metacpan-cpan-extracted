@@ -59,6 +59,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Which"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,22 @@
+# -- Skip VCS
+\.git
+\.github
+\.idea
+
+# -- Skip temp & dev artifacts
+^blib/
+^pm_to_blib
+^Makefile$
+^Makefile.old$
+^MYMETA\.
+^META\.
+^.*\.tar\.gz$
+
+# -- Skip development-only dirs
+^test
+^venv/
+
+# -- Skip editor files
+\~
+\.swp$
+\.bak$

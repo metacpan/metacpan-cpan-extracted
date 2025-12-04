@@ -14,7 +14,7 @@ BEGIN {
 }
 
 my $tempdir = tempdir(CLEANUP => 1);
-$ENV{PATH} = "$tempdir:$ENV{PATH}";
+local $ENV{PATH} = "$tempdir:$ENV{PATH}";
 
 # Helper to create a mock executable
 sub create_mock_program {
@@ -88,7 +88,8 @@ EOF
 
 	ok(which_ok('weirdver', {
 		version => '>=2020.10',
-		version_flag => '-version'
+		version_flag => '-version',
+		timeout => 10,
 	}), 'handles year-based version formats');
 
 	# Test with regex

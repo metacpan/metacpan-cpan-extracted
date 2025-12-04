@@ -2,13 +2,13 @@ use strict;
 use warnings;
 package MetaCPAN::Client::DownloadURL;
 # ABSTRACT: A Download URL data object
-$MetaCPAN::Client::DownloadURL::VERSION = '2.033000';
+$MetaCPAN::Client::DownloadURL::VERSION = '2.034000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
 
 my %known_fields = (
-    scalar   => [qw< checksum_md5 checksum_sha256 date download_url status version >],
+    scalar   => [qw< checksum_md5 checksum_sha256 date distribution download_url status version >],
     arrayref => [],
     hashref  => [],
 );
@@ -43,7 +43,7 @@ MetaCPAN::Client::DownloadURL - A Download URL data object
 
 =head1 VERSION
 
-version 2.033000
+version 2.034000
 
 =head1 SYNOPSIS
 
@@ -66,6 +66,10 @@ The md5 hexdigest for the file.
 =head2 date
 
 Returns the date of the release that this URL refers to.
+
+=head2 distribution
+
+The name of the distribution.
 
 =head2 download_url
 

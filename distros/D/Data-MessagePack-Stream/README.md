@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/typester/Data-MessagePack-Stream.svg?branch=master)](https://travis-ci.org/typester/Data-MessagePack-Stream)
+[![Actions Status](https://github.com/typester/Data-MessagePack-Stream/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/typester/Data-MessagePack-Stream/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Data-MessagePack-Stream.svg)](https://metacpan.org/release/Data-MessagePack-Stream)
 # NAME
 
 Data::MessagePack::Stream - yet another messagepack streaming deserializer

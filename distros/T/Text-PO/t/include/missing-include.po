@@ -1,0 +1,12 @@
+# Testing non-existing include target
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Missing Include Test\n"
+"Language: en_GB\n"
+
+#. $include "no-such-file.po"
+
+msgid "missing-base"
+msgstr "Base when include target missing"
+

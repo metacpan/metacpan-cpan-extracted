@@ -295,6 +295,17 @@ YAML
 '/jsonSchemaDialect/$vocabulary/https:~1~1unknown': "https://unknown" is not a known vocabulary
 '/jsonSchemaDialect': "https://metaschema/with/wrong/spec" is not a valid metaschema
 ERRORS
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js,
+    schema => {
+      openapi => '3.0.4',
+      info => { title => '', version => '' },
+      paths => {},
+    },
+  );
+  cmp_result([ $doc->errors ], [], 'no errors when loading empty 3.0.4 document');
 };
 
 subtest 'openapi version checks' => sub {
@@ -342,7 +353,7 @@ YAML
     );
   }
 
-  foreach my $version (qw(3.0.3 3.3.5 4.0.0 4.1.0 4.1.1)) {
+  foreach my $version (qw(3.3.5 4.0.0 4.1.0 4.1.1)) {
     die_result(
       sub {
         JSON::Schema::Modern::Document::OpenAPI->new(

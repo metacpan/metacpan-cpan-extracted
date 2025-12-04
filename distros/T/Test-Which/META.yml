@@ -27,5 +27,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Which
   homepage: https://metacpan.org/pod/Test::Which
   repository: git://github.com/nigelhorne/Test-Which.git
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

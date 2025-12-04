@@ -1,7 +1,7 @@
 name = "Data-MessagePack-Stream"
 authority = "cpan:TYPESTER"
 module_maker = "ModuleBuild"
-badges = ['travis']
+badges = ['github-actions/test.yml', 'metacpan']
 
 [build]
 build_class = "builder::MyBuilder"

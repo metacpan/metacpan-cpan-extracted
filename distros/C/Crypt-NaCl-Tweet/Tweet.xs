@@ -177,6 +177,7 @@ SV * box_open(SV *ctext, SV *nonce, SV * pk, SV *sk)
   }
 
   RETVAL = newSVpvn(full_buf + crypto_box_ZEROBYTES, ctext_len - crypto_box_ZEROBYTES);
+  free(full_buf);
 
   OUTPUT:
   RETVAL
@@ -208,6 +209,7 @@ SV * box_open_afternm(SV *ctext, SV *nonce, SV *key)
   }
 
   RETVAL = newSVpvn(full_buf + crypto_box_ZEROBYTES, ctext_len - crypto_box_ZEROBYTES);
+  free(full_buf);
 
   OUTPUT:
   RETVAL
@@ -460,7 +462,6 @@ SV * secretbox_open(SV *ctext, SV *nonce, SV *key)
   }
 
   RETVAL = newSVpvn(full_buf + crypto_secretbox_ZEROBYTES, ctext_len - crypto_secretbox_ZEROBYTES);
-
   free(full_buf);
 
   OUTPUT:

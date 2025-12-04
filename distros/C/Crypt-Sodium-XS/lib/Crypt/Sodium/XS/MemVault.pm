@@ -5,6 +5,10 @@ use warnings;
 use Crypt::Sodium::XS;
 
 use Exporter 'import';
+use Fcntl qw(
+  F_GETFD F_SETFD
+  O_CREAT O_NOCTTY O_RDONLY O_RDWR O_TRUNC O_TTY_INIT O_WRONLY
+);
 
 our %EXPORT_TAGS = (
   constructors => [qw[
@@ -14,6 +18,7 @@ our %EXPORT_TAGS = (
     mv_from_fd
     mv_from_file
     mv_from_tty
+    mv_from_tty_file
     mv_from_ttyno
   ]],
 );
@@ -58,6 +63,32 @@ sub mv_from_fd { __PACKAGE__->new_from_fd(@_); }
 sub mv_from_file { __PACKAGE__->new_from_file(@_); }
 sub mv_from_tty { __PACKAGE__->new_from_tty(@_); }
 sub mv_from_ttyno { __PACKAGE__->new_from_ttyno(@_); }
+
+sub new_from_file {
+  my $invocant = shift;
+  my $path = shift // '';
+  sysopen(my $fh, $path, O_NOCTTY|O_RDONLY)
+    or die "$path: new_from_file:open: $!";
+  return $invocant->new_from_fd(fileno($fh), @_);
+}
+
+sub new_from_tty {
+  my $invocant = shift;
+  # undef intended to indicate 'controlling tty'
+  my $path = shift // '/dev/tty';
+  sysopen(my $fh, $path, O_NOCTTY|O_RDWR|O_TTY_INIT)
+    or die "$path: new_from_tty:open: $!";
+  return $invocant->new_from_ttyno(fileno($fh), @_);
+}
+
+sub to_file {
+  my $invocant = shift;
+  my $path = shift // '';
+  my $mode = shift // 0600;
+  sysopen(my $fh, $path, O_CREAT|O_NOCTTY|O_TRUNC|O_WRONLY, $mode)
+    or die "$path: to_file:open: $!";
+  return $invocant->to_fd(fileno($fh), @_);
+}
 
 1;
 
@@ -120,7 +151,8 @@ Memory protections are documented in L<Crypt::Sodium::XS::ProtMem>.
 
 C<$bytes> is an arbitrary string of bytes.
 
-C<$flags> is optional. If not provided, the default is
+C<$flags> is optional. It is the L<flags|Crypt::Sodium::XS::ProtMem/FLAGS> of
+the newly-created MemVault object. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the content of C<$bytes>.
@@ -150,7 +182,8 @@ C<$variant> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::Base64/BASE64_VARIANT_URLSAFE_NO_PADDING>. See
 L<Crypt::Sodium::XS::Base64/CONSTANTS>.
 
-C<$flags> is optional. If not provided, the default is
+C<$flags> is optional. It is the L<flags|Crypt::Sodium::XS::ProtMem/FLAGS> of
+the newly-created MemVault object. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the decoded content of C<$base64>.
@@ -164,7 +197,8 @@ C<$path> is a filesystem path.
 C<$size> is optional. It is the B<maximum> number of bytes to read from C<$fd>.
 If not provided or it numifies to 0, C<$fd> will be read until end-of-file.
 
-C<$flags> is optional. If not provided, the default is
+C<$flags> is optional. It is the L<flags|Crypt::Sodium::XS::ProtMem/FLAGS> of
+the newly-created MemVault object. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the bytes read from the file located
@@ -172,21 +206,26 @@ at C<$path>, B<up to> C<$size> bytes or until end-of-file if C<$size> is 0.
 
 Croaks on failure to open or read C<$path>.
 
-=head2 new_from_fd
+=head2 new_from_tty
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $size, $flags);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_tty($path, $prompt, $flags);
 
-C<$fd> is a file descriptor number. Note this is B<not> a perl file handle. You
-may need to use the C<fileno> function.
+C<$path> is optional. It is a filesystem path naming a TTY device. If not
+provided, the default is the controlling tty for the process.
 
-C<$size> is optional. It is the B<maximum> number of bytes to read from C<$fd>.
-If not provided or it numifies to 0, C<$fd> will be read until end-of-file.
+C<$prompt> is optional. It will be printed to the tty before reading input. If
+not provided, the default is C<Password: >.
 
-C<$flags> is optional. If not provided, the default is
+C<$flags> is optional. It is the L<flags|Crypt::Sodium::XS::ProtMem/FLAGS> of
+the newly-created MemVault object. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
-Returns a L<Crypt::Sodium::XS::MemVault>: the bytes from read C<$fd>, B<up to>
-C<$size> bytes or until end-of-file if C<$size> is 0.
+Returns a L<Crypt::Sodium::XS::MemVault>: one line of input read from the TTY
+device at C<$path>. The end-of-line character is not be included.
+
+Echo will be disabled during input, making this appropriate for password input.
+
+Croaks on failure.
 
 =head1 FUNCTIONS
 
@@ -214,6 +253,14 @@ Shortcut to L</new_from_fd>.
 =head2 mv_from_file
 
 Shortcut to L</new_from_file>.
+
+=head2 mv_from_tty
+
+Shortcut to L</new_from_tty>.
+
+=head2 mv_from_ttyno
+
+Shortcut to L</new_from_ttyno>.
 
 =head1 METHODS
 
@@ -425,16 +472,15 @@ channels for a given length & <block size mask> value.
 
 =back
 
-=head2 to_fd
-
-  $mv->to_fd(fileno($fh));
-  close($fh) or die "error: $!";
-
-Returns number of bytes written. Croaks on failure.
-
 =head2 to_file
 
-  $mv->to_file($path);
+  $mv->to_file($path, $mode);
+
+C<$path> is a filesystem path. It will be created if it does not exist.
+
+C<$mode> is optional. It is the mode of C<$path> if the file is created. If not
+provided, the default is C<0600>. The mode will be modified by the current
+umask.
 
 Returns number of bytes written. Croaks on failure.
 

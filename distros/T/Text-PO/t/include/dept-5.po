@@ -1,0 +1,10 @@
+# Past where we expect max_include_depth to cut off in tests
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Depth 5\n"
+"Language: en_GB\n"
+
+msgid "depth-5"
+msgstr "Depth 5"
+

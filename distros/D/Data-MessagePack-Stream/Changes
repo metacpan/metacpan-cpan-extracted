@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::MessagePack::Stream
 
+1.06 2025-12-04T10:19:15Z
+     - Fix for newer CMake(#18)
+
 1.05 2021-04-20T02:07:52Z
      - update message pack 3.3.0
 

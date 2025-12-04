@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test::More::UTF8;
@@ -44,7 +44,7 @@ my $mother = Android::ElectricSheep::Automator->new({
 ok(defined($mother), 'Android::ElectricSheep::Automator->new()'." : called and got defined result.") or BAIL_OUT;
 
 # open an app
-my $aregex = qr/^com\.google\.android\.calendar$/i;
+my $aregex = qr/^com\.google\.android\.apps\.messaging$/i;
 my $res = $mother->open_app({
 	'package' => $aregex
 });

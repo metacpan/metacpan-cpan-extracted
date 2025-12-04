@@ -4,12 +4,13 @@ BEGIN
     use strict;
     use warnings;
     use open ':std' => ':utf8';
+    use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     use_ok( 'Text::PO::Gettext' ) || BAIL_OUT( "Cannot load Text::PO::Gettext" );
     use Module::Generic::File qw( cwd file tempfile );
     use POSIX ();
     use I18N::Langinfo qw( langinfo );
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 use utf8;

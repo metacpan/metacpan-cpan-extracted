@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test::More::UTF8;
@@ -78,7 +78,7 @@ for my $ares (@$res){
 }
 
 # this is an exact match, it should return 1 pid
-$name = '^com.google.android.calendar$';
+$name = '^com.google.android.apps.messaging$';
 $res = $mother->pgrep({'name' => $name});
 ok(defined($res), 'Android::ElectricSheep::Automator->pgrep()'." : called and got good result.") or BAIL_OUT;
 is(ref($res), 'ARRAY', 'Android::ElectricSheep::Automator->pgrep()'." : called and got good result which is an ARRAY.") or BAIL_OUT("no it is '".ref($res)."'");

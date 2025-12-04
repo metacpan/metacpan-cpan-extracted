@@ -1,0 +1,12 @@
+^\.git/
+^\.gitignore
+^local/
+^\.carton/
+^MYMETA\.
+^Makefile$
+^blib/
+^pm_to_blib
+\.swp$
+\.bak$
+~$
+^\.DS_Store$

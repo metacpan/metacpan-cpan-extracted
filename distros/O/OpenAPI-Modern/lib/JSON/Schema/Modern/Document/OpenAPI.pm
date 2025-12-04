@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.109';
+our $VERSION = '0.111';
 
 use 5.020;
 use utf8;
@@ -194,24 +194,33 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # we used to always preload these, so we need to do it as needed for users who are using them
     load_cached_document($evaluator, STRICT_DIALECT->{$self->oas_version})
       if $self->_has_metaschema_uri and $self->metaschema_uri eq STRICT_METASCHEMA->{$self->oas_version}
-        or $json_schema_dialect eq STRICT_DIALECT->{$self->oas_version};
+        or $json_schema_dialect eq (STRICT_DIALECT->{$self->oas_version}//'');
 
-    # traverse an empty schema with this dialect uri to confirm it is valid, and add an entry in
-    # the evaluator's _metaschema_vocabulary_classes
-    my $check_metaschema_state = $evaluator->traverse({}, {
-      metaschema_uri => $json_schema_dialect,
-      initial_schema_uri => $self->canonical_uri->clone->fragment('/jsonSchemaDialect'),
-      traversed_keyword_path => '/jsonSchemaDialect',
-    });
-
-    # we cannot continue if the metaschema is invalid
-    if ($check_metaschema_state->{errors}->@*) {
-      push $state->{errors}->@*, $check_metaschema_state->{errors}->@*;
-      return $state;
+    if ($self->oas_version eq '3.0') {
+      # this is not going to actually work in this state, but we're never going to try to
+      # execute it anyway (potential TODO: define an OAS 3.0 dialect and vocabulary so we can)
+      $state->{specification_version} = 'draft4';
+      $state->{vocabularies} = [];
+      $state->{json_schema_dialect} = DEFAULT_METASCHEMA->{'3.0'}.'#/definitions/Schema';
     }
+    else {
+      # traverse an empty schema with this dialect uri to confirm it is valid, and add an entry in
+      # the evaluator's _metaschema_vocabulary_classes
+      my $check_metaschema_state = $evaluator->traverse({}, {
+        metaschema_uri => $json_schema_dialect,
+        initial_schema_uri => $self->canonical_uri->clone->fragment('/jsonSchemaDialect'),
+        traversed_keyword_path => '/jsonSchemaDialect',
+      });
 
-    $state->@{qw(specification_version vocabularies)} = $check_metaschema_state->@{qw(specification_version vocabularies)};
-    $state->{json_schema_dialect} = $json_schema_dialect; # subsequent '$schema' keywords can still override this
+      # we cannot continue if the metaschema is invalid
+      if ($check_metaschema_state->{errors}->@*) {
+        push $state->{errors}->@*, $check_metaschema_state->{errors}->@*;
+        return $state;
+      }
+
+      $state->@{qw(specification_version vocabularies)} = $check_metaschema_state->@{qw(specification_version vocabularies)};
+      $state->{json_schema_dialect} = $json_schema_dialect; # subsequent '$schema' keywords can still override this
+    }
 
     $self->_set_metaschema_uri(
           $json_schema_dialect eq DEFAULT_DIALECT->{$self->oas_version} ? DEFAULT_BASE_METASCHEMA->{$self->oas_version}
@@ -235,7 +244,6 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
-      short_circuit => 1,
       collect_annotations => 0,
       validate_formats => 1,
       callbacks => {
@@ -286,7 +294,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   if (not $result->valid) {
     foreach my $e ($result->errors) {
-      if ($e->keyword eq 'not'
+      if (($e->keyword//'') eq 'not'
           and $e->absolute_keyword_location->fragment eq '/$defs/parameters/not'
           and $e->absolute_keyword_location->clone->fragment(undef) eq DEFAULT_METASCHEMA->{$self->oas_version}
       ) {
@@ -578,7 +586,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.109
+version 0.111
 
 =head1 SYNOPSIS
 
@@ -587,24 +595,23 @@ version 0.109
   my $openapi_document = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'https://example.com/v1/api',
     schema => decode_json(<<JSON),
-{
-  "openapi": "3.2.0",
-  "info": {
-    "title": "my title",
-    "version": "1.2.3"
-  },
-  "components": {
-  },
-  "paths": {
-    "/foo": {
-      "get": {}
+  {
+    "openapi": "3.2.0",
+    "$self": "openapi.json",
+    "info": {
+      "title": "my title",
+      "version": "1.2.3"
     },
-    "/foo/{foo_id}": {
-      "post": {}
+    "paths": {
+      "/foo": {
+        "get": {}
+      },
+      "/foo/{foo_id}": {
+        "post": {}
+      }
     }
   }
-}
-JSON
+  JSON
     metaschema_uri => 'https://example.com/my_custom_metaschema',
   );
 

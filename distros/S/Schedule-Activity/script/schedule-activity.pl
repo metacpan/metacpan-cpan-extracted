@@ -108,6 +108,7 @@ my %opt=(
 	attribute =>'',
 	tslack    =>undef,
 	tbuffer   =>undef,
+	goal      =>undef,
 	after     =>undef,
 	save      =>undef,
 );
@@ -124,6 +125,7 @@ GetOptions(
 	'attribute=s' =>\$opt{attribute},
 	'tslack=f'    =>\$opt{tslack},
 	'tbuffer=f'   =>\$opt{tbuffer},
+	'goal=s'      =>\$opt{goal},
 	'after=s'     =>\$opt{after},
 	'save=s'      =>\$opt{save},
 	'help'        =>\$opt{help},
@@ -132,7 +134,7 @@ GetOptions(
 if($opt{man})  { pod2usage(-verbose=>2,-exitval=>2) }
 if($opt{help}) { pod2usage(-verbose=>1,-exitval=>2) }
 
-my (%configuration,%after);
+my (%configuration,%after,%goal);
 if($opt{after}) {
 	%after=loadafter($opt{after});
 	%configuration=%{$after{configuration}};
@@ -151,11 +153,16 @@ if($opt{check}) {
 	exit(0);
 }
 
+if($opt{goal}) {
+	eval "\%goal=($opt{goal});";
+	if($@) { die "Goal format failure:  $@" }
+}
+
 if($opt{activities}) { foreach my $pair (split(/;/,$opt{activities})) { push @{$opt{activity}},$pair } }
 if(!@{$opt{activity}}&&!$opt{after}) { die 'Activities are required' }
 for(my $i=0;$i<=$#{$opt{activity}};$i++) { $opt{activity}[$i]=[split(/,/,$opt{activity}[$i],2)] }
 
-my %schedule=$scheduler->schedule(%after,activities=>$opt{activity},tensionslack=>$opt{tslack},tensionbuffer=>$opt{tbuffer});
+my %schedule=$scheduler->schedule(goal=>\%goal,%after,activities=>$opt{activity},tensionslack=>$opt{tslack},tensionbuffer=>$opt{tbuffer});
 if($schedule{error}) { print STDERR join("\n",@{$schedule{error}}),"\n"; exit(1) }
 
 # Workaround.  Until other options are available, annotations canNOT be
@@ -223,6 +230,10 @@ Do not merge annotation messages into the final schedule.
 =head2 --attribute=grid
 
 Display all attributes, their values over time, and averages.  (No other output formats are supported at this time)
+
+=head2 --goal=(hash)
+
+Provide a Perl hash string of the form C<'cycles=E<gt>N,attribute=E<gt>{...}'> as described in L<Schedule::Activity/Goals> to enable attribute-based goal seeking.
 
 =head2 --unsafe
 

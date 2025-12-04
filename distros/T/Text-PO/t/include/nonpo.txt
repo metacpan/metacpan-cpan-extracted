@@ -1,0 +1,4 @@
+This is not a PO file.
+It has no msgid or msgstr.
+It should not produce any elements when parsed.
+

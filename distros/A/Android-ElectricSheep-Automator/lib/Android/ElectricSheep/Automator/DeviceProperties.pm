@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -170,7 +170,7 @@ Android::ElectricSheep::Automator - The great new Android::ElectricSheep::Automa
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 
 =head1 SYNOPSIS

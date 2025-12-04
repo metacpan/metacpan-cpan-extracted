@@ -6,7 +6,8 @@ use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
+use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
 use DDP {output => 'STDOUT', array_max => 10, show_memsize => 0};
@@ -20,9 +21,11 @@ our @EXPORT = qw(say2 task);
 sub say2 { # say to both command line and
 	my ($msg, $fh) = @_;
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1]; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
+	my @c = caller;
 	if (not openhandle($fh)) {
-		die "the filehandle given to $current_sub with \"$msg\" isn't actually a filehandle";
+		die "the filehandle given to $current_sub with \"$msg\" from $c[1] line $c[2] isn't actually a filehandle";
 	}
+	$msg = "\@ $c[1] line $c[2] " . $msg;
 	say $msg;
 	say $fh $msg;
 }
@@ -33,6 +36,7 @@ sub task {
 	unless (ref $args eq 'HASH') {
 		die "args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
 	}
+	my @c = caller;
 	my @reqd_args = (
 		'cmd', # the shell command
 	);
@@ -112,6 +116,8 @@ sub task {
 		cmd             => $args->{cmd},
 		'die'           => $args->{'die'},
 		dir				 => getcwd(),
+		'source.file'   => $c[1],
+		'source.line'   => $c[2],
 		overwrite       => $args->{overwrite},
 		'output.files' => [@output_files],
 	);
@@ -130,9 +136,12 @@ sub task {
 		p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
 		return \%r;
 	}
+	my $t0 = Time::HiRes::time();
 	($r{stdout}, $r{stderr}, $r{'exit'}) = capture {
 		system( $args->{cmd} );
 	};
+	my $t1 = Time::HiRes::time();
+	$r{duration} = $t1-$t0;
 	foreach my $std ('stderr', 'stdout') {
 		$r{$std} =~ s/\s+$//; # remove trailing whitespace/newline
 	}
@@ -158,7 +167,7 @@ sub task {
 	p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
 	if (($args->{'die'} eq 'true') && ($r{'exit'} != 0)) {
 		p %r;
-		die "$args->{cmd} failed"
+		die "$args->{cmd} failed from $c[1] line $c[2]"
 	}
 	return \%r;
 }

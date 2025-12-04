@@ -26,9 +26,10 @@ requires:
   Test::More: '0.86'
   Unicode::GCString: '0'
 resources:
+  bugtracker: https://github.com/markov2/perl5-String-Print/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-String-Print.git
-version: '0.96'
+version: '1.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2016

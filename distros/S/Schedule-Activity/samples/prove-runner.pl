@@ -62,7 +62,7 @@ sub getTests {
 
 sub singleTestCmd {
 	my ($fn,$subtest)=@_;
-	return qq|SUBTESTRE='\Q$subtest\E' prove --timer --exec='perl -Isamples -MSubtestSelect' $fn|;
+	return qq|SUBTESTRE='\Q$subtest\E' prove --timer --exec='perl -I. -MSubtestSelect' ../$fn|;
 }
 
 sub getRuntimes {
@@ -78,7 +78,11 @@ sub getRuntimes {
 	return %runtimes;
 }
 
-if(!-e 'samples/prove-runner.dat') {
+if(($ARGV[0]//'') ne '--runit') {
+	print STDERR "Please call as '$0 --runit'\n";
+	exit(0);
+}
+if(!-e 'prove-runner.dat') {
 	my @tests=getTests();
 	my %runtimes=getRuntimes(@tests);
 	my %configuration=(node=>{
@@ -90,15 +94,15 @@ if(!-e 'samples/prove-runner.dat') {
 			next=>['done testing','test cycling'],
 		})} keys(%runtimes)
 	});
-	open(my $fh,'>','samples/prove-runner.dat');
+	open(my $fh,'>','prove-runner.dat');
 	print $fh Dumper(\%configuration);
 	close($fh);
-	print STDERR "Saved into samples/prove-runner.dat\n";
+	print STDERR "Saved into ./prove-runner.dat\n";
 }
 else {
 	my $runtimeratio=0.45;
 	my %configuration;
-	open(my $fh,'<','samples/prove-runner.dat');
+	open(my $fh,'<','prove-runner.dat');
 	{local($/);my $t=<$fh>;my $VAR1;eval "$t";%configuration=%$VAR1};
 	close($fh);
 	my %counts=map {$_=>0} keys(%{$configuration{node}}); delete(@counts{'test cycling','done testing'});

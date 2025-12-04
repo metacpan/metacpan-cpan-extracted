@@ -25,7 +25,6 @@ my %WriteMakefile=(
     AUTHOR           => 'Andrew Speer <andrew.speer@isolutions.com.au>',
     MIN_PERL_VERSION => '5.006',
     PREREQ_PM        => {
-        'Test::Simple'      => 0.44,
         'CGI::Simple'       => 0,
         'HTML::Tiny'        => 0,
         'JSON'              => 0,
@@ -35,11 +34,14 @@ my %WriteMakefile=(
         'HTML::Tagset'      => 0,
         'HTML::TreeBuilder' => 0,
         'Storable'          => 0,
-        'Test::More'        => 0,
-        'Capture::Tiny'     => 0,
         'Tie::IxHash'       => 0,
         'Devel::Confess'    => 0,
         'Router::Simple'    => 0,
+        'Hash::MultiValue'  => 0,
+        
+        #  Plack recommended but not mandatory
+        #
+        #'Plack'             => 0,
 
         #  Needed for installer - can be ignored if not using installer
         'Text::Template' => 0,
@@ -47,7 +49,10 @@ my %WriteMakefile=(
 
     },
     BUILD_REQUIRES  => {
-        'Test::Deep'     => 0
+        'Test::Simple'      => 0.44,
+        'Test::More'        => 0,
+        'Capture::Tiny'     => 0,
+        'Test::Deep'        => 0
     },
     META_MERGE => {
         'meta-spec' => {

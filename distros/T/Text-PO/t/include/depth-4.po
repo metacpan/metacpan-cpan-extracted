@@ -1,0 +1,10 @@
+#. $include "depth-5.po"
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Depth 4\n"
+"Language: en_GB\n"
+
+msgid "depth-4"
+msgstr "Depth 4"
+

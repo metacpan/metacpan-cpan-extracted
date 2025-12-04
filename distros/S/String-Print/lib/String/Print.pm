@@ -1,4 +1,4 @@
-# This code is part of Perl distribution String-Print version 0.96.
+# This code is part of Perl distribution String-Print version 1.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,18 +8,15 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package String::Print;{
-our $VERSION = '0.96';
+our $VERSION = '1.00';
 }
 
 
 use warnings;
 use strict;
+use utf8;
 
 #use Log::Report::Optional 'log-report';
 
@@ -31,16 +28,25 @@ use POSIX             qw/strftime/;
 use Scalar::Util      qw/blessed reftype/;
 
 my @default_modifiers   = (
-	qr/\% ?\S+/     => \&_modif_format,
-	qr/BYTES\b/     => \&_modif_bytes,
-	qr/HTML\b/      => \&_modif_html,
-	qr/YEAR\b/      => \&_modif_year,
-	qr/DT\([^)]*\)/ => \&_modif_dt,
-	qr/DT\b/        => \&_modif_dt,
-	qr/DATE\b/      => \&_modif_date,
-	qr/TIME\b/      => \&_modif_time,
-	qr/\=/          => \&_modif_name,
-	qr!//(?:\"[^"]*\"|\'[^']*\'|\w+)! => \&_modif_undef,
+	qr/\% ?\S+/      => \&_modif_format,
+	qr/BYTES\b/      => \&_modif_bytes,
+	qr/HTML\b/       => \&_modif_html,
+	qr/YEAR\b/       => \&_modif_year,
+	qr/DT\([^)]*\)/  => \&_modif_dt,
+	qr/DT\b/         => \&_modif_dt,
+	qr/DATE\b/       => \&_modif_date,
+	qr/TIME\b/       => \&_modif_time,
+	qr/\=/           => \&_modif_name,
+	qr!CHOP\([0-9]+(?:\,?[^)]*)\)|CHOP\b! => \&_modif_chop,
+	qr!EL\([0-9]+(?:\,?[^)]*)\)|EL\b!     => \&_modif_ellipsis,
+	qr!//(?:\"[^"]*\"|\'[^']*\'|\w+)!     => \&_modif_undef,
+);
+
+my %defaults = (
+	CHOP   => +{ width => 20, head => '[', units => '', tail => ']' },
+	DT     => +{ standard => 'FT' },
+	EL     => +{ width => 20, replace => '⋯ '},
+	FORMAT => +{ thousands => '' },
 );
 
 my %default_serializers = (
@@ -60,7 +66,7 @@ my %predefined_encodings = (
 );
 
 
-sub new(@) { my $class = shift; (bless {}, $class)->init( {@_} ) }
+sub new(@) { my $class = shift; (bless {}, $class)->init( +{@_} ) }
 
 sub init($)
 {	my ($self, $args) = @_;
@@ -72,6 +78,9 @@ sub init($)
 
 	my $s    = $args->{serializers} || {};
 	my $seri = $self->{SP_seri} = +{ %default_serializers, (ref $s eq 'ARRAY' ? @$s : %$s) };
+
+	$self->{SP_defs} = +{ %defaults };  # the HASHes get copied when changed.
+	$self->setDefaults($args->{defaults}) if $args->{defaults};
 
 	$self->encodeFor($args->{encode_for});
 	$self->{SP_missing} = $args->{missing_key} || \&_reportMissingKey;
@@ -119,8 +128,7 @@ sub encodeFor($)
 	{	%def = %$type;
 	}
 	else
-	{	my $def = $predefined_encodings{$type}
-			or die "ERROR: unknown output encoding type $type\n";
+	{	my $def = $predefined_encodings{$type} or die "ERROR: unknown output encoding type $type\n";
 		%def = (%$def, @_);
 	}
 
@@ -133,10 +141,27 @@ sub encodeFor($)
 	$self->{SP_enc} = \%def;
 }
 
-#XXX
-# OODoc does not like it when we have methods and functions with the same name.
+
+sub setDefaults(@)
+{	my $self    = shift;
+	my $default = $self->{SP_defs};
+
+	my @set = @_==1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+	while(@set)
+	{	my ($modif, $defs) = (shift @set, shift @set);
+		my $was = $defaults{$modif} or die "No defaults available for $modif.";
+		$default->{$modif} = +{ %$was, %$defs };
+	}
+
+	$self;
+}
+
+
+sub defaults($) { $_[0]->{SP_defs}{$_[1]} }
 
 #--------------------
+#XXX OODoc does not like it when we have methods and functions with the same name.
+
 
 #--------------------
 
@@ -303,7 +328,7 @@ sub _modif_format_s($$$$$)
 sub _modif_format_d($$$$)
 {	my ($value, $padding, $max, $sep) = @_;
 	my $d = sprintf "%d", $value;   # what perl usually does with floats etc
-	my $v = reverse(reverse($d) =~ s/([0-9][0-9][0-9])/$1$sep/gr);
+	my $v = length $sep ? reverse(reverse($d) =~ s/([0-9][0-9][0-9])/$1$sep/gr) : $d;
 	$v =~ s/^\.//;
 
 	if($d !~ /^\-/)
@@ -316,6 +341,7 @@ sub _modif_format_d($$$$)
 
 	    $pad <= 0       ? $v 
 	  : $padding eq '-' ? $v . (' ' x $pad)
+	  : $padding eq '0' ? ('0' x $pad) . $v
 	  : $padding eq ''  ? (' ' x $pad) . $v
 	  :   $v;
 }
@@ -323,6 +349,8 @@ sub _modif_format_d($$$$)
 sub _modif_format($$$$)
 {	my ($self, $format, $value, $args) = @_;
 	defined $value && length $value or return undef;
+
+	my $defaults = $self->defaults('FORMAT');
 
 	use locale;
 	if(ref $value eq 'ARRAY')
@@ -335,7 +363,7 @@ sub _modif_format($$$$)
 	}
 
 	  $format =~ m/^\%(\-?)([0-9]*)(?:\.([0-9]*))?([sS])$/ ? _modif_format_s($value, $1, $2, $3, $4)
-	: $format =~ m/^\%([+\ \-]?)([0-9]*)([_,.])d$/ ? _modif_format_d($value, $1, $2, $3)
+	: $format =~ m/^\%([+\ \-0]?)([0-9]*)([_,.])?d$/ ? _modif_format_d($value, $1, $2, $3 // $defaults->{thousands})
 	:    return sprintf $format, $value;   # simple: standard perl sprintf()
 }
 
@@ -377,7 +405,12 @@ my %dt_format = (
 
 sub _modif_year($$$)
 {	my ($self, $format, $value, $args) = @_;
-	defined $value && length $value or return undef;
+	defined $value or return undef;
+
+	blessed $value && $value->isa('DateTime')
+		and return $value->year;
+
+	length $value or return undef;
 
 	return $1
 		if $value =~ /^\s*([0-9]{4})\s*$/ && $1 < 2200;
@@ -390,7 +423,12 @@ sub _modif_year($$$)
 
 sub _modif_date($$$)
 {	my ($self, $format, $value, $args) = @_;
-	defined $value && length $value or return undef;
+	defined $value or return undef;
+
+	blessed $value && $value->isa('DateTime')
+		and return $value->ymd;
+
+	length $value or return undef;
 
 	return sprintf("%4d-%02d-%02d", $1, $2, $3)
 		if $value =~ m!^\s*([0-9]{4})[:/.-]([0-9]?[0-9])[:/.-]([0-9]?[0-9])\s*$!
@@ -404,7 +442,12 @@ sub _modif_date($$$)
 
 sub _modif_time($$$)
 {	my ($self, $format, $value, $args) = @_;
-	defined $value && length $value or return undef;
+	defined $value or return undef;
+
+	blessed $value && $value->isa('DateTime')
+		and return $value->hms;
+
+	length $value or return undef;
 
 	return sprintf "%02d:%02d:%02d", $1, $2, $3||0
 		if $value =~ m!^\s*(0?[0-9]|1[0-9]|2[0-3])\:([0-5]?[0-9])(?:\:([0-5]?[0-9]))?\s*$!
@@ -418,10 +461,17 @@ sub _modif_time($$$)
 
 sub _modif_dt($$$)
 {	my ($self, $format, $value, $args) = @_;
-	defined $value && length $value or return undef;
+	defined $value or return undef;
 
-	my $kind    = ($format =~ m/DT\(([^)]*)\)/ ? $1 : undef) || 'FT';
-	my $pattern = $dt_format{$kind}
+	blessed $value && $value->isa('DateTime')
+		and $value = $value->epoch;
+
+	length $value or return undef;
+
+	my $defaults = $self->defaults('DT');
+	my $kind     = ($format =~ m/^DT\(([^)]*)\)/ ? $1 : undef) || $defaults->{standard};
+
+	my $pattern  = $dt_format{$kind}
 		or return "dt format $kind not known";
 
 	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
@@ -439,6 +489,72 @@ sub _modif_undef($$$)
 sub _modif_name($$$)
 {	my ($self, $format, $value, $args) = @_;
 	"$args->{varname}$format$value";
+}
+
+sub _modif_chop($$$)
+{	my ($self, $format, $value, $args) = @_;
+	defined $value && length $value or return undef;
+	$format =~ m/^ CHOP\( ([0-9]+) \,? ([^)]+)? \) | CHOP\b /x or die $format;
+
+	my $defaults = $self->defaults('CHOP');
+	my ($width, $units) = ($1 // $defaults->{width}, $2 // $defaults->{units});
+	$width != 0 or return $value;
+
+	# max width of a char is 2
+	return $value if 2 * length $value < $width;    # surely small enough?
+
+	my $v = Unicode::GCString->new(is_utf8($value) ? $value : decode(latin1 => $value));
+	return $value if $width >= $v->columns;          # small enough after counting
+
+	my $head = $defaults->{head};
+	my $tail = $defaults->{tail};
+
+	#XXX This is expensive for long texts, but the value could be filled with many zero-widths
+	my ($shortened, $append) = (0, $head . '+0' . $units . $tail);
+	while($v->columns > $width - length $append)
+	{	my $chopped = $v->substr(-1, 1, '');
+
+		unless($chopped->length)
+		{	# nothing left
+			$append = $head . $shortened . $units . $tail;
+			last;
+		}
+
+		$chopped->columns > 0 or next;
+		$shortened++;
+		$append     = $head . '+' . $shortened . $units . $tail;
+	}
+
+	# might be one column short
+	my $pad = $v->columns < $width - (length $append) ? ' ' : '';
+	$v->as_string . $pad . $append;
+}
+
+sub _modif_ellipsis($$$)
+{	my ($self, $format, $value, $args) = @_;
+	defined $value && length $value or return undef;
+	$format =~ m/^ EL\( ([0-9]+) \,? ([^)]+)? \) | EL\b /x or die $format;
+
+	my $defaults = $self->defaults('EL');
+	my ($width, $replace) = ($1 // $defaults->{width}, $2 // $defaults->{replace});
+	$width != 0 or return $value;
+
+	# max width of a char is 2
+	return $value if 2 * length($value) < $width;    # surely small enough?
+
+	my $v = Unicode::GCString->new(is_utf8($value) ? $value : decode(latin1 => $value));
+	return $value if $width >= $v->columns;          # small enough after counting
+
+	my $r = Unicode::GCString->new(is_utf8($replace) ? $replace : decode(latin1 => $replace));
+	$r->columns < $width or return $replace;
+
+	#XXX This is expensive for long texts, but the value could be filled with many zero-widths
+	my $take = $width - $r->columns;
+	$v->substr(-1, 1, '') while $v->columns > $take;
+
+	# might be one column short
+	my $pad = $v->columns + $r->columns < $width ? ' ' : '';
+	$v->as_string . $pad . $replace;
 }
 
 

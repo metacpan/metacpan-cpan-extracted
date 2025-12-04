@@ -3,7 +3,7 @@
 Take a data structure in Perl, and automatically write a Python3 script using matplotlib to generate an image.  The Python3 script is saved in `/tmp`, to be edited at the user's discretion.
 Requires python3 and matplotlib installations.
 
-## Single Plots
+# Single Plots
 Simplest use case:
 
     use Matplotlib::Simple 'plt';
@@ -36,7 +36,7 @@ For example, the above code is equivalent to the shorter version:
 
 <img width="651" height="491" alt="gospel word counts" src="https://github.com/user-attachments/assets/a008dece-2e34-47bf-af0f-8603709f7d52" />
 
-## Multiple Plots
+# Multiple Plots
 
 Having a `plots` argument as an array lets the module know to create subplots:
 
@@ -496,6 +496,114 @@ which makes the following image:
 which makes the following plot:
 
 <img width="1230" height="1211" alt="boxplot" src="https://github.com/user-attachments/assets/7e32e394-86fc-49e7-ad97-f48fd82fc8b0" />
+
+## Colored Table
+
+### options
+
+### Single, simple plot
+
+the bond dissociation energy table can be plotted:
+
+    # https://labs.chem.ucsb.edu/zakarian/armen/11---bonddissociationenergy.pdf and https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Chemical_Bonding/Fundamentals_of_Chemical_Bonding/Bond_Energies
+    my %bond_dissociation = (
+    	Br =>  {
+    	  Br =>  193
+    	},
+    	C  =>  {
+    		Br =>  276,	C  =>  347,	Cl =>  339,	F   => 485,	H  =>  413,	I  =>  240,
+    		N  =>  305,	O  =>  358,	S  =>  259
+    	},
+    	Cl =>  {
+    		Br =>  218,	Cl =>  239
+    	},
+    	F =>   {
+    		I => 280, Br =>  237, Cl  => 253, F   => 154
+    	},
+    	H  =>  {
+    		Br =>  363,	Cl =>  427,	F  =>  565,	H   => 432,	I   => 295
+    	},
+    	I  =>  {
+    		Br  => 175,	Cl =>  208,	I  =>  149
+    	},
+    	N  =>  {
+    		Br =>  243,	Cl  => 200,	F   => 272,	H  =>  391,	N  =>  160, O  =>  201
+    	},
+    	O =>   {
+    		Cl =>  203, F  =>  190,	H  =>  467,	I  =>  234,	O  =>  146
+    	},
+    	S  =>  {
+    		Br => 218,	Cl => 253,	F  => 327,	H  => 347,	S  => 266
+    	},
+    	Si => {
+    		C  => 360, H  => 393, O  => 452,	Si => 340
+    	}
+    );
+
+and the plot itself:
+
+    colored_table({
+    	'cblabel'     => 'kJ/mol',
+    	'col.labels'  => ['H', 'F', 'Cl', 'Br', 'I'],
+    	data          => \%bond_dissociation,
+    	execute       => 0,
+    	fh            => $fh,
+    	mirror        => 1,
+    	'output.file' => 'output.images/single.tab.png',
+    	'row.labels'  => ['H', 'F', 'Cl', 'Br', 'I'],
+    	'show.numbers'=> 1,
+    	set_title     => 'Bond Dissociation Energy'
+    });
+
+which makes the following image:
+
+<img width="584" height="491" alt="single tab" src="https://github.com/user-attachments/assets/d890830b-a502-4d51-b118-20aeae0473e8" />
+
+### Multiple Plots
+
+    plt({
+    	'output.file' => 'output.images/tab.multiple.png',
+    	execute       => 0,
+    	fh            => $fh,
+    	plots         => [
+    		{
+    			data          => \%bond_dissociation,
+    			'output.file' => '/tmp/single.bonds.svg',
+    			'plot.type'   => 'colored_table',
+    			set_title     => 'No other options'
+    		},
+    		{
+    			data          => \%bond_dissociation,
+    			cblabel       => 'Average Dissociation Energy (kJ/mol)',
+    			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+    			mirror        => 1,
+    			'output.file' => '/tmp/single.bonds.svg',
+    			'plot.type'   => 'colored_table',
+    			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+    			'show.numbers'=> 1,
+    			set_title     => 'Showing numbers and mirror with defined order'
+    		},
+    		{
+    			data          => \%bond_dissociation,
+    			cblabel       => 'Average Dissociation Energy (kJ/mol)',
+    			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+    			mirror        => 1,
+    			'output.file' => '/tmp/single.bonds.svg',
+    			'plot.type'   => 'colored_table',
+    			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+    			'show.numbers'=> 1,
+    			set_title     => 'Set undefined color to white',
+    			'undef.color' => 'white'
+    		}
+    	],
+    	ncols         => 3,
+    	set_figwidth  => 14,
+    	suptitle      => 'Colored Table options'
+    });
+
+which makes the following plot:
+
+<img width="1410" height="491" alt="tab multiple" src="https://github.com/user-attachments/assets/be836742-cc5b-4618-a0c8-a0ee57856eb1" />
 
 ## hexbin
 

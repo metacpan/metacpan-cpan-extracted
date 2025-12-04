@@ -41,7 +41,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.035';
+$VERSION='2.036';
 
 
 #  API file name cache
@@ -257,7 +257,7 @@ sub handler {
     #
     my ($env_hr, @param)=@_;
     local *ENV=$env_hr;
-    debug('in handler, env: %s, param:%s', Dumper(\%ENV, \@param));
+    debug('in handler, env: %s, param:%s', Dumper(\%ENV));
     
 
     #  Cache handler for a location
@@ -270,9 +270,9 @@ sub handler {
     #
     my $html;
     my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, env=>$env_hr, @param) ||
+    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, uri=>$ENV{'PATH_INFO'}, env=>$env_hr, @param) ||
         return err('unable to create new WebDyne::Request::PSGI object: %s', 
-			$@ || errclr() || 'unknown error');
+    			$@ || errclr() || 'unknown error');
     debug("r: $r");
 
 

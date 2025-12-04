@@ -1,13 +1,23 @@
 # distribution String-Print
 
-  * My extended documentation: <http://perl.overmeer.net/CPAN/>
-  * Development via GitHub: <https://github.com/markov2/perl5-String-Print>
-  * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <https://metacpan.org/release/String-Print>
-
 This module inserts values into (format) strings.  It provides printf()
 and sprintf() alternatives via both an object oriented and a functional
 interface.
+
+  * My extended documentation: <http://perl.overmeer.net/CPAN/>
+  * Development via GitHub: <https://github.com/markov2/perl5-String-Print>
+  * Sponsor me: <https://markov.solutions/sponsor/index-en.html>
+  * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
+  * Indexed from CPAN: <https://metacpan.org/release/String-Print>
+
+## Installing
+
+On github, you can find the processed version for each release.  But the
+better source is CPAN; to get it installed simply run:
+
+```sh
+   cpan -i String::Print
+```
 
 ## Development &rarr; Release
 
@@ -22,13 +32,6 @@ existed, sorry for the confusion)
 
 Clone from github for the "raw" version.  For instance, when you want
 to contribute a new feature.
-
-On github, you can find the processed version for each release.  But the
-better source is CPAN; to get it installed simply run:
-
-```sh
-   cpan -i String::Print
-```
 
 ## Contributing
 

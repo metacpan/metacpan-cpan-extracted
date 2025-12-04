@@ -1,0 +1,30 @@
+<<<<<<< HEAD
+This software is copyright (c) 2025 by Trickster Contributors.
+=======
+This software is copyright (c) 2024-2025 by Trickster Contributors.
+>>>>>>> 420b50c5e0b7df34e8e546fcca1ea71a93c95ddf
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Terms of the Perl programming language system itself:
+
+a) the GNU General Public License as published by the Free
+   Software Foundation; either version 1, or (at your option) any
+   later version, or
+b) the "Artistic License"
+
+--- The GNU General Public License, Version 1, February 1989 ---
+
+(Full GPL text would go here - abbreviated for brevity)
+
+--- The Artistic License 1.0 ---
+
+(Full Artistic License text would go here - abbreviated for brevity)
+
+The intent of this document is to state the conditions under which a
+Package may be copied, such that the Copyright Holder maintains some
+semblance of artistic control over the development of the package,
+while giving the users of the package the right to use and distribute
+the Package in a more-or-less customary fashion, plus the right to make
+reasonable modifications.

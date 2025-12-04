@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test::More::UTF8;
@@ -44,7 +44,7 @@ ok(defined($mother), 'Android::ElectricSheep::Automator->new()'." : called and g
 
 # this app should exist
 # we are sure this app exists on a virgin phone i guess?
-my $appname = 'com.google.android.calendar';
+my $appname = 'com.google.android.apps.messaging';
 my $res = $mother->is_app_running({'appname' => $appname});
 ok(defined($res), 'Android::ElectricSheep::Automator->is_app_running()'." : called and got good result.") or BAIL_OUT;
 is(ref($res), '', 'Android::ElectricSheep::Automator->is_app_running()'." : called and got good result which is a SCALAR.") or BAIL_OUT("no it is '".ref($res)."'");

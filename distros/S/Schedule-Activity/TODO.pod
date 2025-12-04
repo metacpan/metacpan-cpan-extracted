@@ -14,7 +14,7 @@ The following are planned as part of the 0.3.0 release.
 
 =item Documentation rewrite (done)
 
-=item Goal scheduling
+=item Goal scheduling (done)
 
 =item Attribute average values
 
@@ -26,7 +26,7 @@ The following are planned as part of the 0.3.0 release.
 
 =head2 Goals
 
-Scheduling goals are planned of the form C<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=E<gt>'max|min'},name=E<gt>{op=E<gt>'eq|ne',value=E<gt>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based goals seeking is planned at this time.
+Scheduling goals are available starting with 0.2.4.  Goals can specifyC<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=E<gt>'max|min'},name=E<gt>{op=E<gt>'eq|ne',value=E<gt>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based, average value goals seeking is planned at this time.
 
 =head2 Documentation
 

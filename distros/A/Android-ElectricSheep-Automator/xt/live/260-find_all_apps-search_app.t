@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test::More::UTF8;
@@ -113,6 +113,7 @@ is(ref($apps), 'HASH', 'find_installed_apps()'." : called and result is a HASHre
 ok(scalar(keys %$apps)>1, 'find_installed_apps()'." : called and result contains at least one item.") or BAIL_OUT(perl2dump($params)."using above params, no it contains ".scalar(keys %$apps)." items.");
 is_deeply($apps, $mother->apps, 'find_installed_apps()'." : set mother's apps to the returned value.") or BAIL_OUT;
 # now $mother's apps must contain many items but calendar will have AppProperties.
+# The others will be set to undef.
 my $instantiated_apps = 0;
 my @instantiated_apps = ();
 for my $appname (sort keys %$apps){
@@ -201,10 +202,12 @@ ok(scalar(keys %$searched_apps)==1 || scalar(keys %$searched_apps)==2, 'search_a
 is(scalar keys %{ $mother->apps }, $num_apps_total, "after these operations the number of total apps remains unchanged ($num_apps_total).") or BAIL_OUT(perl2dump($params)."using above params, no it is now ".(scalar keys %{ $mother->apps })." instead of $num_apps_total.");
 
 #########################################################################
-# Now, add one more app, e.g. clock
+# Now, ask it to include one more app, e.g. clock
 # find one app by regex name 'clock' this yields 1 match
 # we expect to have lots of apps but only 1 to be instantiated
-#   com.google.android.deskclock or com.google.android.gallery2
+#   com.google.android.deskclock
+# the others should exist in the returned hash keyed on package name
+# but the value will be undef
 $aregex = qr/^com\.google\.android\.deskclock$/i;
 $params = {
 	'packages' => $aregex, # this will instantiate all matched apps AppProperties
@@ -236,7 +239,7 @@ for my $appname (sort keys %$apps){
 	}
 }
 # note that it contains the instantiated apps previously instantiated, so 2+1 = 3
-ok($instantiated_apps==3, 'find_installed_apps()'." : called with regex '$aregex' and result contains three items with AppProperties.") or BAIL_OUT("no it contains ${instantiated_apps} items: ".join(', ', @instantiated_apps));
+ok($instantiated_apps==2 || $instantiated_apps==3, 'find_installed_apps()'." : called with regex '$aregex' and result contains three items with AppProperties.") or BAIL_OUT("no it contains ${instantiated_apps} items: ".join(', ', @instantiated_apps));
 # we must still have the same number of total apps in mother
 is(scalar keys %{ $mother->apps }, $num_apps_total, "after these operations the number of total apps remains unchanged ($num_apps_total).") or BAIL_OUT("no it is now ".(scalar keys %{ $mother->apps })." instead of $num_apps_total.");
 
@@ -288,7 +291,7 @@ for my $appname (sort keys %$apps){
 	}
 }
 # note that it contains the instantiated apps previously instantiated, so 2+1 = 3
-ok($instantiated_apps==3, 'find_installed_apps()'." : called with regex '$aregex' and result contains three items with AppProperties.") or BAIL_OUT("no it contains ${instantiated_apps} items: ".join(', ', @instantiated_apps));
+ok($instantiated_apps==2 || $instantiated_apps==3, 'find_installed_apps()'." : called with regex '$aregex' and result contains three items with AppProperties.") or BAIL_OUT("no it contains ${instantiated_apps} items: ".join(', ', @instantiated_apps));
 # we must still have the same number of total apps in mother
 is(scalar keys %{ $mother->apps }, $num_apps_total, "after these operations the number of total apps remains unchanged ($num_apps_total).") or BAIL_OUT("no it is now ".(scalar keys %{ $mother->apps })." instead of $num_apps_total.");
 

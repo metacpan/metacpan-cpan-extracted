@@ -25,16 +25,7 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
     EXE_FILES        => [
-	'script/electric-sheep-close-app.pl',
-	'script/electric-sheep-dump-current-location.pl',
-	'script/electric-sheep-dump-current-screen-ui.pl',
-	'script/electric-sheep-dump-screen-shot.pl',
-	'script/electric-sheep-dump-screen-video.pl',
-	'script/electric-sheep-emulator-geofix.pl',
-	'script/electric-sheep-find-installed-apps.pl',
-	'script/electric-sheep-find-running-processes.pl',
-	'script/electric-sheep-open-app.pl',
-	'script/electric-sheep-viber-send-message.pl',
+	glob('script/*.pl'),
     ],
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -75,9 +66,11 @@ my %WriteMakefileArgs = (
 	'IPC::Run' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Android-ElectricSheep-Automator-*' },
+    clean => { FILES => 'Android-ElectricSheep-Automator-* tmp .test*' },
     postamble => {
         LIVE_TEST_FILES => 'xt/live/*.t',
+        AUTHOR_TEST_FILES => 'xt/author/*.t',
+	OPTIONAL_TEST_FILES => 'xt/author/optional/*.t'
     },
     # see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
     META_MERGE => {
@@ -121,11 +114,21 @@ WriteMakefile(%WriteMakefileArgs);
 sub MY::postamble {
     my (undef,%h) = @_;
     # require Data::Dumper; print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
-    return "LIVE_TEST_FILES=$h{LIVE_TEST_FILES}\n"
+    return
+	  "LIVE_TEST_FILES=$h{LIVE_TEST_FILES}\n"
+	. "AUTHOR_TEST_FILES=$h{AUTHOR_TEST_FILES}\n"
+	. "OPTIONAL_TEST_FILES=$h{OPTIONAL_TEST_FILES}\n"
 	. <<'POSTAMBLE';
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
 livetest :: $(LIVE_TEST_FILES)
 	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+
+authortest :: $(AUTHOR_TEST_FILES)
+	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+
+optionaltest :: $(OPTIONAL_TEST_FILES)
+	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+
 POSTAMBLE
 }

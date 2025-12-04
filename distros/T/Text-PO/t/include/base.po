@@ -1,0 +1,13 @@
+# Main PO file for include testing
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Test Base\n"
+"Language: en_GB\n"
+
+# File to include
+#. $include "inc1.po"
+
+msgid "base-only"
+msgstr "Base only entry"
+

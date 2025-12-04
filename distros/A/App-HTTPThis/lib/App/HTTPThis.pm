@@ -1,5 +1,5 @@
 package App::HTTPThis;
-$App::HTTPThis::VERSION = '0.009';
+$App::HTTPThis::VERSION = '0.010';
 # ABSTRACT: Export the current directory over HTTP
 
 use strict;
@@ -18,7 +18,7 @@ sub new {
   my $default_config_file = '.http_thisrc';
 
   GetOptions(
-    $self, "help", "man", "config=s", "port=i", "name=s", "autoindex", "pretty"
+    $self, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex", "pretty"
   ) || pod2usage(2);
   pod2usage(1) if $self->{help};
   pod2usage(-verbose => 2) if $self->{man};
@@ -56,6 +56,7 @@ sub run {
 
   my $runner = Plack::Runner->new;
   $runner->parse_options(
+    ($self->{host} ? ('--host' => $self->{host}) : ()),
     '--port'         => $self->{port},
     '--env'          => 'production',
     '--server_ready' => sub { $self->_server_ready(@_) },
@@ -119,7 +120,7 @@ App::HTTPThis - Export the current directory over HTTP
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

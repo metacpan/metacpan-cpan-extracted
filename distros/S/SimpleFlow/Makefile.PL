@@ -25,9 +25,10 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Scalar::Util" => 0,
     "Term::ANSIColor" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Time::HiRes" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +44,8 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Scalar::Util" => 0,
   "Term::ANSIColor" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "Time::HiRes" => 0
 );
 
 

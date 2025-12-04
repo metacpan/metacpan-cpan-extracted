@@ -1,0 +1,4 @@
+Revision history for Mojo-Collection-XS
+
+0.01 2025-12-04
+  - Initial release of Mojo::Collection::XS with XS-backed while/map/grep helpers

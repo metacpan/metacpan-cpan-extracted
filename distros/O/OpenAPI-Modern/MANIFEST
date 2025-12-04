@@ -15,6 +15,7 @@ lib/JSON/Schema/Modern/Document/OpenAPI.pm
 lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
 lib/OpenAPI/Modern.pm
 lib/OpenAPI/Modern/Utilities.pm
+script/openapi-validate
 share/3.1/strict-dialect.json
 share/3.1/strict-schema.json
 share/3.2/strict-dialect.json

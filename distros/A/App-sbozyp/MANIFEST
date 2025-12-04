@@ -7,9 +7,7 @@ MANIFEST
 Makefile.PL
 cpanfile
 
-package/sbozyp.SlackBuild
-package/slack-desc
-package/sbozyp.conf.example
+configs/sbozyp.conf
 
 completions/sbozyp.bash
 completions/sbozyp.zsh

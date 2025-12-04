@@ -2,28 +2,9 @@ package Crypt::NaCl::Tweet;
 use strict;
 use warnings;
 BEGIN {
-  our $VERSION = '0.05';
+  our $VERSION = '0.06';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
-}
-BEGIN {
-  sub random_bytes;
-  if (eval { require Sys::GetRandom; 1; }) {
-    *random_bytes = sub { Sys::GetRandom::random_bytes($_[0]) };
-  }
-  elsif (eval { require Crypt::PRNG; 1; }) {
-    *random_bytes = sub { Crypt::PRNG::random_bytes($_[0]) };
-  }
-  elsif (eval { require Crypt::URandom; 1; }) {
-    *random_bytes = sub { Crypt::URandom::urandom($_[0]); };
-  }
-  # probably others...
-  else {
-    *random_bytes = sub {
-      die "no random_bytes implementation is available on this system. ",
-          "you could install Sys::GetRandom, Crypt::PRNG, or Crypt::URandom."
-    };
-  }
 }
 
 use Exporter 'import';
@@ -163,6 +144,24 @@ sub onetimeauth_keygen { random_bytes(onetimeauth_KEYBYTES) }
 
 sub stream_keygen { random_bytes(stream_KEYBYTES) }
 
+sub random_bytes;
+if (eval { require Sys::GetRandom; 1; }) {
+  *random_bytes = sub { Sys::GetRandom::random_bytes($_[0]) };
+}
+elsif (eval { require Crypt::PRNG; 1; }) {
+  *random_bytes = sub { Crypt::PRNG::random_bytes($_[0]) };
+}
+elsif (eval { require Crypt::URandom; 1; }) {
+  *random_bytes = sub { Crypt::URandom::urandom($_[0]); };
+}
+# probably others...
+else {
+  *random_bytes = sub {
+    die "no random_bytes implementation is available on this system. ",
+        "you could install Sys::GetRandom, Crypt::PRNG, or Crypt::URandom."
+  };
+}
+
 1;
 
 __END__
@@ -182,9 +181,10 @@ Crypt::NaCl::Tweet - XS bindings for TweetNaCl
 =head1 DESCRIPTION
 
 L<TweetNaCl|https://tweetnacl.cr.yp.to/index.html> is an implementation of
-L<NaCl|https://nacl.cr.yp.to/> which fits into 100 tweets. Cute trick, but it
-also makes for a more digestable/auditable self-contained library.
-L<Crypt::NaCl::Tweet> includes, and provides perl bindings to, that library.
+the L<NaCl|https://nacl.cr.yp.to/> cryptographic library which fits into 100
+tweets. Cute trick, but it also makes for a more digestable/auditable
+self-contained library.  L<Crypt::NaCl::Tweet> includes, and provides perl
+bindings to, that library.
 
 See the documentation available on the L<NaCl|https://nacl.cr.yp.to/> website
 for more information about the purpose and design of the available functions.

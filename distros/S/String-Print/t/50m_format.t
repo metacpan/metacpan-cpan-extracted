@@ -56,6 +56,9 @@ is $f->sprinti("g={z%.5s}x", z => "${short}yzz"), "g=${short}yzx", 'too large';
 is $f->sprinti("h={z%5.3s}x",z => "${short}yz"), "h=  ${short}x";
 is $f->sprinti("i={z%-5.3s}x",z=> "${short}yz"), "i=${short}  x";
 
+$f->setDefaults(FORMAT => { thousands => ',' });
+is $f->sprinti("x={v%d}", v => 1e9), 'x=1,000,000,000', 'default thousands';
+
 #XXX Now re-run the tests with wide display chars.
 
 done_testing;

@@ -15,6 +15,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 my %VERSION_CACHE;
 my $TEST = Test::Builder->new();
+our $TIMEOUT = 5;	# Seconds
 
 =head1 NAME
 
@@ -22,11 +23,11 @@ Test::Which - Skip tests if external programs are missing from PATH (with versio
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -123,7 +124,8 @@ Some programs use non-standard flags to display version information:
   # Program prints version without any flag
   which_ok 'sometool', {
       version => '>=1.0',
-      version_flag => ''
+      version_flag => '',
+      timeout => 10,	# seconds - the default is 5
   };
 
   # Windows-specific flag
@@ -166,7 +168,7 @@ Skip entire test files if requirements aren't met:
 
   use Test::Which 'ffmpeg' => '>=6.0', 'convert' => '>=7.1';
 
-  # Test file is skipped if either program is missing or version too old
+  # Test file is skipped if either program is missing or the version is too old
   # No tests below this line will run if requirements aren't met
 
 =head2 Runtime Checking in Subtests
@@ -358,77 +360,132 @@ sub which_ok {
 sub _capture_version_output {
 	my ($path, $custom_flags) = @_;
 
-	# Return undef immediately if path is not defined
 	return undef unless defined $path;
 
-	# Create cache key from path and flags
+	# Build cache key
 	my $cache_key = $path;
 	if (defined $custom_flags) {
-		if (ref($custom_flags) eq 'ARRAY') {
+		if (ref $custom_flags eq 'ARRAY') {
 			$cache_key .= '|' . join(',', @$custom_flags);
-		} elsif (!ref($custom_flags)) {
+		} elsif (!ref $custom_flags) {
 			$cache_key .= '|' . $custom_flags;
 		}
 	}
-
-	# Return cached result if available
 	return $VERSION_CACHE{$cache_key} if exists $VERSION_CACHE{$cache_key};
 
-	# Determine which flags to try
+	# Determine flags to try
 	my @flags;
-	if (defined $custom_flags) {
-		if (ref($custom_flags) eq 'ARRAY') {
-			@flags = @$custom_flags;
-		} elsif (!ref($custom_flags)) {
-			@flags = ($custom_flags);
-		} else {
-			warn 'Invalid version_flag type: ', ref($custom_flags);
-			$VERSION_CACHE{$cache_key} = undef;
-			return undef;
-		}
-	} else {
+	if (!defined $custom_flags) {
 		@flags = qw(--version -version -v -V);
-		# Add Windows-specific flags
 		push @flags, qw(/? -?) if $^O eq 'MSWin32';
 	}
+	elsif (ref($custom_flags) eq 'ARRAY') {
+		@flags = @$custom_flags;
+	}
+	elsif (!ref($custom_flags)) {
+		@flags = ($custom_flags);	# allow empty string ''
+	}
+	else {
+		warn "Invalid version_flag type: ", ref($custom_flags);
+		$VERSION_CACHE{$cache_key} = undef;
+		return undef;
+	}
 
+	# timeout (default to 5 seconds if not set)
+	my $timeout = defined $TIMEOUT ? $TIMEOUT : 5;
+
+	my $is_win = ($^O eq 'MSWin32') ? 1 : 0;
+	my $is_bat = ($path =~ /\.(bat|cmd)$/i) ? 1 : 0;
+
+	FLAG:
 	for my $flag (@flags) {
-		my $out = eval {
-			# Platform-specific command construction
-			my $cmd;
-			if ($flag eq '') {
-				if ($^O eq 'MSWin32') {
-					$cmd = qq{"$path" 2>&1};
+
+		# Build command / args
+		my @cmd;
+		if ($is_win && $is_bat) {
+			# For .bat/.cmd on Windows, call cmd.exe /c "prog [flag]"
+			# Build a single command string for cmd.exe /c; quote path if it contains spaces
+			my $path_part = ($path =~ /\s/) ? qq{"$path"} : $path;
+			my $cmdstr = $path_part;
+			$cmdstr .= " $flag" if defined $flag && length $flag;
+			@cmd = ('cmd.exe', '/c', $cmdstr);
+		} else {
+			# Normal argv-style call for binaries / scripts
+			@cmd = ($path);
+			push @cmd, $flag if defined $flag && length $flag;
+		}
+
+		my ($stdout, $stderr) = ('', '');
+		my $ok = 0;
+
+		# Try IPC::Run3 (preferred) in argv-mode
+		if (eval { require IPC::Run3; 1 }) {
+			eval {
+				local $SIG{ALRM} = sub { die 'TIMEOUT' };
+				alarm $timeout;
+				IPC::Run3::run3(\@cmd, \undef, \$stdout, \$stderr);
+				alarm 0;
+			};
+			if ($@) {
+				next FLAG if $@ =~ /TIMEOUT/;
+				next FLAG;
+			}
+			$ok = ($stdout ne '' || $stderr ne '');
+		}
+
+		# Fallback to shell qx{} if IPC::Run3 not available or produced no output
+		if (!$ok) {
+			my $shell_cmd;
+			if ($is_win && $is_bat) {
+				# Use cmd.exe /c "prog [flag]" and capture stderr
+				my $path_part = ($path =~ /\s/) ? qq{"$path"} : $path;
+				my $inner = $path_part;
+				$inner .= " $flag" if defined $flag && length $flag;
+				$shell_cmd = qq{cmd.exe /c "$inner" 2>&1};
+			}
+			elsif ($is_win) {
+				# Non-bat on Windows — quote path and append flag
+				my $flagpart = defined $flag && length $flag ? " $flag" : '';
+				$shell_cmd = qq{"$path"$flagpart 2>&1};
+			}
+			else {
+				# Unix: single-quote the path; if flag present pass it unquoted (shell will split)
+				my $escaped = $path;
+				$escaped =~ s/'/'\\''/g;
+				if (defined $flag && length $flag) {
+					# If flag contains spaces, shell will treat it as one word if quoted; use simple approach
+					my $f = $flag;
+					$f =~ s/'/'\\''/g;
+					$shell_cmd = qq{'$escaped' '$f' 2>&1};
 				} else {
-					# Escape the path for shell on Unix
-					my $escaped = $path;
-					$escaped =~ s/'/'\\''/g;
-					$cmd = qq{'$escaped' 2>&1};
-				}
-			} else {
-				if ($^O eq 'MSWin32') {
-					$cmd = qq{"$path" $flag 2>&1};
-				} else {
-					# Escape the path for shell on Unix
-					my $escaped = $path;
-					$escaped =~ s/'/'\\''/g;
-					$cmd = qq{'$escaped' $flag 2>&1};
+					$shell_cmd = qq{'$escaped' 2>&1};
 				}
 			}
 
-			my $output = qx{$cmd};
-			return $output;
-		};
+			eval {
+				local $SIG{ALRM} = sub { die 'TIMEOUT' };
+				alarm $timeout;
+				$stdout = qx{$shell_cmd};
+				alarm 0;
+			};
+			next FLAG if $@;
+			$ok = ($stdout ne '');
+		}
 
-		next unless defined $out;
-		next if $out eq '';
+		next FLAG unless $ok;
 
-		# Cache and return the result
-		$VERSION_CACHE{$cache_key} = $out;
-		return $out;
+		# Merge outputs (IPC::Run3 already gave us stderr separately)
+		my $output = $stdout . $stderr;
+
+		# Normalize newlines on Windows
+		$output =~ s/\r\n/\n/g if $is_win;
+
+		# Cache and return
+		$VERSION_CACHE{$cache_key} = $output;
+		return $output;
 	}
 
-	# Cache the failure (undef) so we don't keep retrying
+	# Nothing worked — cache failure
 	$VERSION_CACHE{$cache_key} = undef;
 	return undef;
 }
@@ -631,6 +688,10 @@ sub _check_requirements {
 				$r->{version_flag} = $version_flag;
 			}
 
+			if(exists($want->{'timeout'})) {
+				$TIMEOUT = $want->{'timeout'};
+			}
+
 			if (exists $want->{version}) {
 				my $version_spec = $want->{version};
 				my $found;
@@ -805,7 +866,9 @@ L<Test::Builder> - Used for test integration
 =over 4
 
 =item * Version detection is heuristic-based and may fail for programs with
-unusual output formats. Use custom C<version_flag> or C<extractor> for such cases.
+unusual output formats.
+Use custom C<version_flag> or C<extractor> for such cases,
+though even those may break.
 
 =item * No built-in timeout for program execution. Hanging programs will hang tests.
 

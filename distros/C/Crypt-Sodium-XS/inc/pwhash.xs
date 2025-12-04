@@ -338,7 +338,7 @@ SV * pwhash_str(SV * passphrase, STRLEN opslimit = 0, STRLEN memlimit = 0)
   unsigned char *pw_buf;
   unsigned char *out_buf;
   STRLEN pw_len;
-  int alg;
+  int alg = crypto_pwhash_ALG_DEFAULT;
   size_t out_len;
   size_t opslimit_def;
   size_t opslimit_min;
@@ -380,7 +380,6 @@ SV * pwhash_str(SV * passphrase, STRLEN opslimit = 0, STRLEN memlimit = 0)
       memlimit_max = crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_MAX;
       break;
     default:
-      alg = crypto_pwhash_ALG_DEFAULT;
       out_len = crypto_pwhash_STRBYTES;
       opslimit_def = crypto_pwhash_OPSLIMIT_INTERACTIVE;
       opslimit_min = crypto_pwhash_OPSLIMIT_MIN;

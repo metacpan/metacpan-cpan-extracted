@@ -16,18 +16,25 @@ on 'test' => sub {
 
 	requires 'Carp';
 	requires 'Cwd';
+	requires 'Data::Dumper';
 	requires 'File::Basename';
 	requires 'File::Find';
 	requires 'File::Path';
 	requires 'File::Slurper';
 	requires 'File::Spec';
 	requires 'Scalar::Util';
-	requires 'open';
+	requires 'String::Diff';
+	requires 'Term::ANSIColor';
+	requires 'Test::More';
 };
 
-requires 'Aion';
+requires 'Aion', '1.2';
+requires 'Aion::Carp', '1.6';
+requires 'Aion::Run', '0.0.3';
 requires 'Aion::Fs', '0.2.0';
 requires 'POSIX';
 requires 'Time::Local';
 requires 'common::sense';
 requires 'config';
+requires 'open';
+requires 'utf8';

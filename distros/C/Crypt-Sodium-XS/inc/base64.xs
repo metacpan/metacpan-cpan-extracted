@@ -39,12 +39,10 @@ SV * sodium_bin2base64(SV * bytes, int variant = sodium_base64_VARIANT_URLSAFE_N
   Newx(out_buf, out_len, char);
   if (out_buf == NULL)
     croak("Failed to allocate memory");
-  out_len -= 1; /* decrement space for null */
-  out_buf[out_len] = '\0';
-  sodium_bin2base64(out_buf, out_len + 1, (unsigned char *)bytes_buf,
-                    bytes_len, variant);
+  /* sodium_bin2base64 adds null */
+  sodium_bin2base64(out_buf, out_len, (unsigned char *)bytes_buf, bytes_len, variant);
   RETVAL = newSV(0);
-  sv_usepvn_flags(RETVAL, out_buf, out_len, SV_HAS_TRAILING_NUL);
+  sv_usepvn_flags(RETVAL, out_buf, out_len - 1, SV_HAS_TRAILING_NUL);
 
   OUTPUT:
   RETVAL

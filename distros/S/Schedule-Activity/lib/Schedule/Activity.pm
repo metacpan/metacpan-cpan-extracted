@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.2.3';
+our $VERSION='0.2.4';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -336,11 +336,73 @@ sub scheduler {
 	return @res;
 }
 
+sub goalScheduling {
+	my ($self,%opt)=@_;
+	my %goal=%{delete($opt{goal})};
+	my $cycles=$goal{cycles}//10;
+	my %schedule;
+	eval { %schedule=$self->schedule(%opt) };
+	my ($bestscore,%best);
+	my $notemerge=sub {
+		if(!defined($schedule{annotations})) { return }
+		my %seen;
+		my @activities=@{$schedule{activities}};
+		foreach my $group (sort {$a cmp $b} keys(%{$schedule{annotations}})) {
+			if($seen{$group}) { next }
+			if(!defined($schedule{annotations}{$group})) { next }
+			push @activities,@{$schedule{annotations}{$group}{events}};
+			$seen{$group}=1;
+		}
+		if(%seen) {
+			@activities=sort {$$a[0]<=>$$b[0]} @activities;
+			%{$schedule{attributes}}=$self->computeAttributes(@activities);
+		}
+	};
+	my $score=sub {
+		my $res=-1e6;
+		if(!defined($schedule{attributes})) { return $res }
+		$res=0;
+		foreach my $k (keys %{$goal{attribute}}) {
+			my %cmp=%{$goal{attribute}{$k}};
+			my %attr=%{$schedule{attributes}{$k}//{}};
+			my $avg=$attr{avg}//0;
+			if   ($cmp{op} eq 'max') { $res+=$avg }
+			elsif($cmp{op} eq 'min') { $res-=$avg }
+			elsif($cmp{op} eq 'eq')  { $res-=abs($avg-$cmp{value}) }
+			elsif($cmp{op} eq 'ne')  { $res+=abs($avg-$cmp{value}) }
+			elsif($cmp{op} eq 'XX')  {
+				my $xy=$attr{xy}//[];
+				foreach my $i (0..$#$xy-1) {
+					$res-=($$xy[1+$i][0]-$$xy[$i][0])*abs(0.5*$$xy[$i][1]+0.5*$$xy[1+$i][1]-$cmp{value})
+				}
+			}
+		}
+		return $res;
+	};
+	&$notemerge();
+	$bestscore=&$score(); %best=%schedule;
+	my $lasterr;
+	#
+	while(--$cycles) {
+		eval { %schedule=$self->schedule(%opt) };
+		if($@) { $lasterr=$@; next }
+		&$notemerge();
+		my $s=&$score();
+		if($s>$bestscore) {
+			$bestscore=$s;
+			%best=%schedule;
+		}
+	}
+	if(!%best&&$lasterr) { die $lasterr }
+	return %best;
+}
+
 sub schedule {
 	my ($self,%opt)=@_;
 	my %check=$self->compile(unsafe=>$opt{unsafe}//$$self{unsafe});
 	if($check{error})                  { return (error=>$check{error}) }
 	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
+	if($opt{goal}&&%{$opt{goal}}) { return $self->goalScheduling(%opt) }
 	my $tmoffset=$opt{tmoffset}//0;
 	my %res=(stat=>{slack=>0,buffer=>0});
 	if($opt{after}) {
@@ -459,7 +521,7 @@ Schedule::Activity - Generate activity schedules
 
 =head1 VERSION
 
-Version 0.2.3
+Version 0.2.4
 
 =head1 SYNOPSIS
 
@@ -784,6 +846,24 @@ The final result above does generate annotations, but it's also possible to pass
   my %res=$scheduler->schedule(after=>$earlierSchedule, activities=>[]);
 
 This functionality is experimental starting with Version 0.2.1.
+
+=head2 Goals
+
+Goal seeking retries schedule construction and finds the best, I<random> schedule meeting criteria for attribute average values:
+
+  %schedule=$scheduler->schedule(goal=>{
+    cycles=>N,
+    attribute=>{
+      'name'=>{op=>'max'},
+      'name'=>{op=>'min'},
+      'name'=>{op=>'eq', value=>x},
+      'name'=>{op=>'ne', value=>x},
+    }
+  },...)
+
+One or more attributes may be included in the goal, and each of the C<cycles> (default 10) schedules will be scored based on the configured conditions.  The C<max> and C<min> operators seek the largest/smallest attribute I<average value> for the schedule.  The C<eq> and C<ne> operators score near/far from the provided C<value>.  Note that generated schedules may have a different number of activities, so some attribute goals may be equivalent to finding the shortest/longest action counts.
+
+Goal scheduling is experimental starting with 0.2.4.  Attributes currently have equal weighting and scores are linear.  If no schedule can be generated, the most recent error will raise via C<die()>.  Goals can be different during different invocations of incremental construction.
 
 =head1 IMPORT MECHANISMS
 

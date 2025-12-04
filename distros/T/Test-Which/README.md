@@ -4,7 +4,7 @@ Test::Which - Skip tests if external programs are missing from PATH (with versio
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 
@@ -91,7 +91,8 @@ Some programs use non-standard flags to display version information:
     # Program prints version without any flag
     which_ok 'sometool', {
         version => '>=1.0',
-        version_flag => ''
+        version_flag => '',
+        timeout => 10,    # seconds - the default is 5
     };
 
     # Windows-specific flag
@@ -134,7 +135,7 @@ Skip entire test files if requirements aren't met:
 
     use Test::Which 'ffmpeg' => '>=6.0', 'convert' => '>=7.1';
 
-    # Test file is skipped if either program is missing or version too old
+    # Test file is skipped if either program is missing or the version is too old
     # No tests below this line will run if requirements aren't met
 
 ## Runtime Checking in Subtests
@@ -287,7 +288,9 @@ This module is provided as-is without any warranty.
 # LIMITATIONS
 
 - Version detection is heuristic-based and may fail for programs with
-unusual output formats. Use custom `version_flag` or `extractor` for such cases.
+unusual output formats.
+Use custom `version_flag` or `extractor` for such cases,
+though even those may break.
 - No built-in timeout for program execution. Hanging programs will hang tests.
 - Cache persists for process lifetime - updated programs won't be re-detected
 without restarting the test process.

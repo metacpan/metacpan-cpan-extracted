@@ -1,5 +1,19 @@
 Revision history for Perl module Text::PO
 
+v0.9.0 2025-12-03T20:42:17+0900
+    - Added support for non-standard PO include directives (# $include "file.po") with
+      recursive parsing, relative path handling, and duplicate suppression.
+    - Added max_recurse attribute with circular-include detection.
+    - Added include attribute (enabled by default).
+    - Added as_string() method to serialize PO data to a string.
+    - Updated parse() to support include and recursion limits.
+    - Updated documentation accordingly in Text::PO.
+    - Added a POD documentation for Text::PO::String
+    - Improved the documentation for all modules.
+    - Made Text::PO::Gettext thread-safe
+    - Improved the CLI too po.pl, and added options --pp, --include, --max-recurse, --add-include, --before, and --after
+    - Improved read and write method of Text::PO::MO
+
 v0.8.1 2025-11-27T11:01:10+0900
     - Correcting msgctxt format in Text::PO::Element
     - Correcting setLocale in the companion JavaScript library gettext.js

@@ -10,6 +10,7 @@ dist.ini
 lib/Matplotlib/Simple.pm
 make.subs.pl
 md2pod.pl
+methods.txt
 mpl.examples.pl
 output.images/add.single.png
 output.images/barplots.png
@@ -33,8 +34,10 @@ output.images/single.hist.png
 output.images/single.hist2d.png
 output.images/single.pie.png
 output.images/single.scatter.png
+output.images/single.tab.png
 output.images/single.violinplot.png
 output.images/single.wide.png
+output.images/tab.multiple.png
 output.images/trig.subplots.png
 output.images/violin.png
 output.images/wide.subplots.png

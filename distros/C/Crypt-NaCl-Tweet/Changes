@@ -1,3 +1,9 @@
+0.06   2025-11-28
+
+- fix two memory leaks
+
+- minor module cleanup
+
 0.05   2025-11-28
 
 - fix another DEBUGGING assert

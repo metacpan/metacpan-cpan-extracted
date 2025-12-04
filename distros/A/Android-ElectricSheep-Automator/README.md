@@ -4,7 +4,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # WARNING
 
@@ -79,6 +79,22 @@ See ["WILL ANYTHING BE INSTALLED ON THE DEVICE?"](#will-anything-be-installed-on
 
     # guess what!
     my $xmlstr = $mother->dump_current_screen_ui();
+
+    # Pull the apk(s) for an app from device and save locally
+    my $res = $mother->pull_app_apk_from_device({
+      package => 'com.google.android.calendar'
+        # or qr/calendar/i
+      'output-dir' => '/tmp/apks-of-calendar-app',
+    });
+    print $res->{'com.google.android.calendar'}->[0]->['local-path'};
+
+    # Install apk(s) for an app onto the device
+    $mother->install_app({
+      'apk-filename' => ['/tmp/apks/base.apk', '/tmp/apks/config.apk'],
+        # or just a string scalar '/tmp/apks/1.apk'
+      # optional params to the adb install command
+      'install-parameters' => ['-r', '-g']
+    });
 
 # CONSTRUCTOR
 
@@ -482,7 +498,8 @@ APK (bytecode archive and more) file.
     command. Nothing is expected here. Refer to the
     [adb documentation](https://developer.android.com/tools/adb)
     for what parameters are supported. For example, `-r` is for
-    re-installation (although is not necessary even for re-installation).
+    re-installation of an existing app and retaining its
+    previous data.
 
 It returns `1` on failure.
 It returns `0` on success.
@@ -1045,6 +1062,16 @@ emulator up and running with, for example,
 ["Android Emulators"](#android-emulators) for how to install, list and run them
 buggers.
 
+At least one of the _author tests_ under the `xt/author` directory,
+initiated with
+`make authortest` command, require an APK file (to be installed on the connected
+device) which is quite large and it is not included in the distribution
+bundle of this module. Anyway, it is not a good idea to install
+an unknown APK to your device. But if you want to make this test
+then pull an APK of an existing app on your connected device
+with [electric-sheep-pull-app-apk.pl](https://metacpan.org/pod/electric-sheep-pull-app-apk.pl) and point the test file
+to this APK.
+
 Testing will not send any messages via the device's apps.
 E.g. the plugin [Android::ElectricSheep::Automator::Plugins::Apps::Viber](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3APlugins%3A%3AApps%3A%3AViber)
 will not send a message via Viber but it will mock it.
@@ -1206,15 +1233,21 @@ Now you should have access to `avdmanager` executable
 (it should be located here: `/usr/local/android-sdk/cmdline-tools/latest/bin/avdmanager`)
 which you can use to create an emulator.
 
-List all available android virtual devices you can create: `avdmanager list target`
+List all available android virtual devices availabe to you **to create**: `avdmanager list target`
 
 List all available devices you can emulate: `avdmanager list device`
 
-List all available devices you have created already: `avdmanager list avd`
+List all available devices which have been created already and are available to boot right now: `avdmanager list avd`
 
 Create virtual device: `avdmanager create avd -d "Nexus 6" -n myavd -k "system-images;android-29;google_apis;x86"`
 
-See [https://stackoverflow.com/a/77599934](https://stackoverflow.com/a/77599934)
+(source: [https://stackoverflow.com/a/77599934](https://stackoverflow.com/a/77599934))
+
+In Linux, the Android emulator image files are stored
+at `~/.config/.android/avd` and/or at `~/.android/avd`
+Each image consists of an `.avd` file and a `.ini` file.
+As said before, you can boot a device with `emulator -avd 'Pixel_9'`
+(the images will be `Pixel_9.avd` and `Pixel_9.ini`)
 
 # NO ACCESS TO GOOGLE PLAY?
 

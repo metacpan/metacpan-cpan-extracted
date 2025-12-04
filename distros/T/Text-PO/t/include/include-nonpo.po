@@ -1,0 +1,11 @@
+# Including a non-PO file; it should not add any msgid
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Include Non-PO\n"
+"Language: en_GB\n"
+
+#. $include "nonpo.txt"
+
+msgid "nonpo-base"
+msgstr "Base around non-PO include"

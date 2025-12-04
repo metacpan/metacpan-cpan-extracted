@@ -1,0 +1,11 @@
+# Root of a deep include chain
+#. $include "depth-1.po"
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Depth Root\n"
+"Language: en_GB\n"
+
+msgid "depth-root"
+msgstr "Depth root"
+

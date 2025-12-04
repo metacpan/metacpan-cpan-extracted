@@ -30,6 +30,7 @@ $r = task({
 	overwrite      => 1
 });
 close $fh;
+p $r;
 my $log_write = 0;
 $log_write = 1 if ((-f $fname) && (-s $fname > 0));
 unless ($log_write == 1) {

@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -46,7 +46,7 @@ use Android::ElectricSheep::Automator::ScreenLayout;
 use Android::ElectricSheep::Automator::XMLParsers;
 
 my $_DEFAULT_CONFIG = <<'EODC';
-</* $VERSION = '0.08'; */>
+</* $VERSION = '0.09'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -314,7 +314,9 @@ sub devices {
 # documentation of adb https://developer.android.com/tools/adb
 # (search for 'install')
 # Inputs parameters:
-#   'apk-filename' => an existing APK (.apk) file to be installed on device
+#   'apk-filename' => this can be a string or an array of strings
+#        containing existing APK (.apk) file(s) to be installed on device.
+#        Sometimes an app consists of many apks, in this case use the ARRAY mode.
 #   'install-params' => an array of installation parameters in the fashion of when shelling out a @cmd
 #      each parameter and each of its attributes, if any, must be
 #      in a separate item in the array, e.g. ['-r', '-i', 'newpagename']
@@ -333,12 +335,18 @@ sub install_app {
 
 	my $apkfilename = exists($params->{'apk-filename'}) ? $params->{'apk-filename'} : undef;
 	if( ! defined $apkfilename ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'apk-filename' is missing."); return 1 }
-
 	my $installparams = exists($params->{'install-parameters'}) ? $params->{'install-parameters'} : [];
 
-	my @cmd = ('install');
+	my @cmd = ('later...');
 	for (@$installparams){ push @cmd, $_ }
-	push @cmd, $apkfilename;
+	if( ref($apkfilename) eq '' ){
+		# just one apk file
+		push @cmd, $apkfilename;
+		$cmd[0] = 'install';
+	} elsif( ref($apkfilename) eq 'ARRAY' ){
+		push @cmd, @$apkfilename;
+		$cmd[0] = 'install-multiple';
+	} else { $log->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'apk-filename' must either be a string scalar or an ARRAY of strings. Instead it is '".ref($apkfilename)."'."); return 1 }
 	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : sending command to adb: @cmd") }
 	my $res = $self->adb->run(@cmd);
 	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above adb command has failed, got undefined result, most likely adb command did not run at all, this should not be happening."); return 1 }
@@ -2100,7 +2108,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 WARNING
 
@@ -2175,6 +2183,22 @@ See L</WILL ANYTHING BE INSTALLED ON THE DEVICE?>.
 
     # guess what!
     my $xmlstr = $mother->dump_current_screen_ui();
+
+    # Pull the apk(s) for an app from device and save locally
+    my $res = $mother->pull_app_apk_from_device({
+      package => 'com.google.android.calendar'
+	# or qr/calendar/i
+      'output-dir' => '/tmp/apks-of-calendar-app',
+    });
+    print $res->{'com.google.android.calendar'}->[0]->['local-path'};
+
+    # Install apk(s) for an app onto the device
+    $mother->install_app({
+      'apk-filename' => ['/tmp/apks/base.apk', '/tmp/apks/config.apk'],
+        # or just a string scalar '/tmp/apks/1.apk'
+      # optional params to the adb install command
+      'install-parameters' => ['-r', '-g']
+    });
 
 =head1 CONSTRUCTOR
 
@@ -2643,7 +2667,8 @@ Optional parameters to be passed on to the C<adb install>
 command. Nothing is expected here. Refer to the
 L<adb documentation|https://developer.android.com/tools/adb>
 for what parameters are supported. For example, C<-r> is for
-re-installation (although is not necessary even for re-installation).
+re-installation of an existing app and retaining its
+previous data.
 
 =back
 
@@ -3260,6 +3285,16 @@ C<emulator -avd Pixel_2_API_30_x86_> . See section
 L<Android Emulators> for how to install, list and run them
 buggers.
 
+At least one of the I<author tests> under the C<xt/author> directory,
+initiated with
+C<make authortest> command, require an APK file (to be installed on the connected
+device) which is quite large and it is not included in the distribution
+bundle of this module. Anyway, it is not a good idea to install
+an unknown APK to your device. But if you want to make this test
+then pull an APK of an existing app on your connected device
+with L<electric-sheep-pull-app-apk.pl> and point the test file
+to this APK.
+
 Testing will not send any messages via the device's apps.
 E.g. the plugin L<Android::ElectricSheep::Automator::Plugins::Apps::Viber>
 will not send a message via Viber but it will mock it.
@@ -3426,15 +3461,21 @@ Now you should have access to C<avdmanager> executable
 (it should be located here: C</usr/local/android-sdk/cmdline-tools/latest/bin/avdmanager>)
 which you can use to create an emulator.
 
-List all available android virtual devices you can create: C<avdmanager list target>
+List all available android virtual devices availabe to you B<to create>: C<avdmanager list target>
 
 List all available devices you can emulate: C<avdmanager list device>
 
-List all available devices you have created already: C<avdmanager list avd>
+List all available devices which have been created already and are available to boot right now: C<avdmanager list avd>
 
 Create virtual device: C<avdmanager create avd -d "Nexus 6" -n myavd -k "system-images;android-29;google_apis;x86">
 
-See L<https://stackoverflow.com/a/77599934>
+(source: L<https://stackoverflow.com/a/77599934>)
+
+In Linux, the Android emulator image files are stored
+at C<~/.config/.android/avd> and/or at C<~/.android/avd>
+Each image consists of an C<.avd> file and a C<.ini> file.
+As said before, you can boot a device with C<emulator -avd 'Pixel_9'>
+(the images will be C<Pixel_9.avd> and C<Pixel_9.ini>)
 
 =head1 NO ACCESS TO GOOGLE PLAY?
 

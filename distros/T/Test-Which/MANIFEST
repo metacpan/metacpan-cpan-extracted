@@ -7,9 +7,11 @@ MANIFEST.SKIP
 README.md
 t/00-load.t
 t/basic.t
+t/conf/which_ok.yml
 t/custom.t
 t/eof.t
 t/eol.t
+t/fuzz.t
 t/missing.t
 t/pod-cm.t
 t/pod.t

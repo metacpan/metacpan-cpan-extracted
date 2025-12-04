@@ -1,6 +1,6 @@
 MODULE = Crypt::Sodium::XS PACKAGE = Crypt::Sodium::XS::MemVault
 
-SV * new(SV * class, SV * bytes, SV * flags = &PL_sv_undef)
+SV * new(const char * class, SV * bytes, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
@@ -9,8 +9,6 @@ SV * new(SV * class, SV * bytes, SV * flags = &PL_sv_undef)
   unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
-  PERL_UNUSED_VAR(class);
-
   SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV_nomg(flags);
@@ -27,12 +25,12 @@ SV * new(SV * class, SV * bytes, SV * flags = &PL_sv_undef)
     croak("new: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+  RETVAL = protmem_to_sv(aTHX_ new_pm, class);
 
   OUTPUT:
   RETVAL
 
-SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
+SV * new_from_hex(const char * class, SV * hex, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *hex_pm = NULL;
@@ -42,8 +40,6 @@ SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
   unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
-  PERL_UNUSED_VAR(class);
-
   if (sv_derived_from(hex, MEMVAULT_CLASS)) {
     hex_pm = protmem_get(aTHX_ hex, MEMVAULT_CLASS);
     hex_buf = hex_pm->pm_ptr;
@@ -82,13 +78,13 @@ SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
     croak("new_from_hex: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+  RETVAL = protmem_to_sv(aTHX_ new_pm, class);
 
   OUTPUT:
   RETVAL
 
 SV * new_from_base64( \
-  SV * class,  \
+  const char * class,  \
   SV * b64,  \
   int variant = sodium_base64_VARIANT_URLSAFE_NO_PADDING, \
   SV * flags = &PL_sv_undef \
@@ -103,8 +99,6 @@ SV * new_from_base64( \
   unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
-  PERL_UNUSED_VAR(class);
-
   if (sv_derived_from(b64, MEMVAULT_CLASS)) {
     b64_pm = protmem_get(aTHX_ b64, MEMVAULT_CLASS);
     b64_buf = (char *)b64_pm->pm_ptr;
@@ -159,7 +153,7 @@ SV * new_from_base64( \
     croak("new_from_base64: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+  RETVAL = protmem_to_sv(aTHX_ new_pm, class);
 
   OUTPUT:
   RETVAL
@@ -171,49 +165,26 @@ sizes.
 
 =cut
 
-SV * new_from_fd(SV * class, SV * file, STRLEN maxlen = 0, SV * flags = &PL_sv_undef)
-
-  ALIAS:
-  new_from_file = 1
+SV * new_from_fd(const char * class, int fd, STRLEN maxlen = 0, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm, *resize_pm;
-  char *path_buf = NULL;
   ssize_t bytes_read = 0;
   size_t bytes_total = 0, pmrem;
   STRLEN pmsize = MEMVAULT_READ_BUFSIZE;
   unsigned int new_flags = g_protmem_default_flags_memvault;
-  int fd;
 
   CODE:
-  PERL_UNUSED_VAR(class);
-
   SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV_nomg(flags);
-
-  switch(ix) {
-    case 1:
-      path_buf = SvPVbyte_nolen(file);
-      /* really need to be checking path_buf for nul termination, etc */
-
-      fd = open(path_buf, O_RDONLY|O_CLOEXEC|O_NOCTTY);
-      if (fd < 0)
-        croak("new_from_fd|file: %s: open failed", path_buf);
-      break;
-    default:
-      fd = SvIV(file);
-  }
 
   if (maxlen && maxlen < pmsize)
     pmsize = maxlen;
 
   new_pm = protmem_init(aTHX_ pmsize, new_flags);
-  if (new_pm == NULL) {
-    if (ix == 1)
-      close(fd);
-    croak("new_from_fd|file: Failed to allocate protmem");
-  }
+  if (new_pm == NULL)
+    croak("new_from_fd: Failed to allocate protmem");
 
   /* sub-optimal for perfomance, but "safer" */
   for (;;) {
@@ -223,11 +194,8 @@ SV * new_from_fd(SV * class, SV * file, STRLEN maxlen = 0, SV * flags = &PL_sv_u
         pmsize = maxlen;
       resize_pm = protmem_clone(aTHX_ new_pm, pmsize);
       protmem_free(aTHX_ new_pm);
-      if (resize_pm == NULL) {
-        if (ix == 1)
-          close(fd);
-        croak("new_from_fd|file: Failed to allocate resize protmem");
-      }
+      if (resize_pm == NULL)
+        croak("new_from_fd: Failed to allocate resize protmem");
       new_pm = resize_pm;
     }
 
@@ -236,10 +204,8 @@ SV * new_from_fd(SV * class, SV * file, STRLEN maxlen = 0, SV * flags = &PL_sv_u
     if (bytes_read < 0) {
       if (errno == EINTR)
         continue;
-      if (ix == 1)
-        close(fd);
       protmem_free(aTHX_ new_pm);
-      croak("new_from_fd|file: read error %d", errno);
+      croak("new_from_fd: read error %d", errno);
     }
     bytes_total += bytes_read;
     new_pm->size = bytes_total;
@@ -253,167 +219,46 @@ SV * new_from_fd(SV * class, SV * file, STRLEN maxlen = 0, SV * flags = &PL_sv_u
   if (pmsize - bytes_total > MEMVAULT_READ_BUFSIZE) {
     resize_pm = protmem_clone(aTHX_ new_pm, bytes_total);
     protmem_free(aTHX_ new_pm);
-    if (resize_pm == NULL) {
-      if (ix == 1)
-        close(fd);
-      croak("new_from_fd|file: Failed to allocate final resize protmem");
-    }
+    if (resize_pm == NULL)
+      croak("new_from_fd: Failed to allocate final resize protmem");
     new_pm = resize_pm;
   }
 
-  if (ix == 1)
-    if (close(fd) < 0) {
-      protmem_free(aTHX_ new_pm);
-      croak("new_from_file: %s: close error %d", path_buf, errno);
-    }
-
   if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
-    if (ix == 1)
-      close(fd);
     protmem_free(aTHX_ new_pm);
-    croak("new_from_fd|file: Failed to release protmem RW");
+    croak("new_from_fd: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+  RETVAL = protmem_to_sv(aTHX_ new_pm, class);
 
   OUTPUT:
   RETVAL
 
-SV * new_from_tty( \
-  SV * class, \
-  SV * prompt = &PL_sv_undef, \
-  SV * flags = &PL_sv_undef \
-)
+=for notes
 
-  PREINIT:
-  protmem *new_pm;
-  char *prompt_buf;
-  char *vbuf;
-  int fd;
-  unsigned int new_flags = g_protmem_default_flags_key;
-  STRLEN prompt_len;
-  struct termios tattr;
-  FILE *file;
+hardcoded buffer size here of 4096. should be large enough for a reasonable
+system without trying to deal with fpathconf
 
-  CODE:
-  PERL_UNUSED_VAR(class);
-
-  SvGETMAGIC(prompt);
-  if (SvOK(prompt))
-    /* prompt_len unused */
-    prompt_buf = SvPVbyte_nomg(prompt, prompt_len);
-  else
-    prompt_buf = "Password: ";
-
-  SvGETMAGIC(flags);
-  if (SvOK(flags))
-    new_flags = SvUV(flags);
-
-  new_pm = protmem_init(aTHX_ 1024, new_flags);
-  if (new_pm == NULL)
-    croak("new_from_tty: Failed to allocate protmem");
-
-  vbuf = sodium_malloc(1024);
-  if (vbuf == NULL)
-    croak("new_from_tty: Failed to allocate vbuf memory");
-
-  fd = open("/dev/tty", O_RDWR|O_CLOEXEC|O_NOCTTY);
-  if (fd < 0)
-    croak("new_from_tty: /dev/tty: open failed (%d)", errno);
-
-  if (fprintf(stderr, "%s", prompt_buf) == EOF) {
-    protmem_free(aTHX_ new_pm);
-    croak("new_from_tty: Failed to prompt");
-  }
-  if (fflush(stderr) == EOF) {
-    fprintf(stderr, "\n");
-    croak("new_from_tty: Failed fflush (stderr)");
-  }
-
-  if (!isatty(fd) || tcgetattr(fd, &tattr) != 0) {
-    fprintf(stderr, "\n");
-    croak("new_from_tty: Failed tcgetattr (not a tty?)");
-  }
-  tattr.c_lflag &= ~ECHO;
-  if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
-    fprintf(stderr, "\n");
-    croak("new_from_tty: Failed tcsetattr");
-  }
-
-  if ((file = fdopen(fd, "r")) == NULL) {
-    fprintf(stderr, "\n");
-    tattr.c_lflag |= ECHO;
-    tcsetattr(fd, TCSAFLUSH, &tattr);
-    croak("new_from_tty: Failed fdopen");
-  }
-
-  if (setvbuf(file, vbuf, _IOLBF, 1024) != 0) {
-    fprintf(stderr, "\n");
-    tattr.c_lflag |= ECHO;
-    tcsetattr(fd, TCSAFLUSH, &tattr);
-    croak("new_from_tty: Failed to setvbuf");
-  }
-
-  if (fgets((char *)new_pm->pm_ptr, 1024, file) == NULL)
-    RETVAL = &PL_sv_undef;
-  else {
-    char *input_buf = (char *)new_pm->pm_ptr;
-    char *nl_pos;
-
-    if ((nl_pos = strchr(input_buf, '\r')) != NULL)
-      *nl_pos = '\0';
-    if ((nl_pos = strchr(input_buf, '\n')) != NULL)
-      *nl_pos = '\0';
-    new_pm->size = strlen(input_buf);
-
-
-    if (new_pm->size == 0)
-      fprintf(stderr, "(WARNING: empty)\n");
-    else if (new_pm->size == 1023) {
-      /* warns even if input was exactly 1023. meh. */
-      fprintf(stderr, "(WARNING: truncated to 1023 characters)\n");
-    }
-
-    RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
-  }
-
-  fprintf(stderr, "\n");
-  fflush(stderr);
-  if (tcgetattr(fd, &tattr) != 0) {
-    protmem_free(aTHX_ new_pm);
-    croak("new_from_tty: tcgetattr failed");
-  }
-  tattr.c_lflag |= ECHO;
-  if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
-    protmem_free(aTHX_ new_pm);
-    croak("new_from_tty: tcsetattr failed");
-  }
-  fclose(file);
-  sodium_free(vbuf);
-
-  OUTPUT:
-  RETVAL
+=cut
 
 SV * new_from_ttyno( \
-  SV * class, \
+  const char * class, \
   SV * ttyno = &PL_sv_undef, \
   SV * prompt = &PL_sv_undef, \
   SV * flags = &PL_sv_undef \
 )
 
   PREINIT:
-  protmem *new_pm;
+  protmem *new_pm = NULL;
   char *prompt_buf;
-  char *vbuf;
   int fd;
   unsigned int new_flags = g_protmem_default_flags_key;
-  STRLEN prompt_len;
+  STRLEN prompt_len, total = 0;
+  ssize_t r, w;
   struct termios tattr;
-  FILE *file;
+  tcflag_t lflag_prev;
 
   CODE:
-  PERL_UNUSED_VAR(class);
-
   SvGETMAGIC(ttyno);
   if (SvOK(ttyno))
     fd = SvIV_nomg(ttyno);
@@ -422,94 +267,75 @@ SV * new_from_ttyno( \
 
   SvGETMAGIC(prompt);
   if (SvOK(prompt))
-    /* prompt_len unused */
     prompt_buf = SvPVbyte_nomg(prompt, prompt_len);
-  else
+  else {
     prompt_buf = "Password: ";
+    prompt_len = (sizeof "Password: ") - 1;
+  }
 
   SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV(flags);
 
-  new_pm = protmem_init(aTHX_ 1024, new_flags);
+  if (tcgetattr(fd, &tattr) != 0)
+    croak("new_from_ttyno: Failed tcgetattr (not a tty?)");
+  lflag_prev = tattr.c_lflag;
+
+  new_pm = protmem_init(aTHX_ 4096, new_flags);
   if (new_pm == NULL)
     croak("new_from_ttyno: Failed to allocate protmem");
 
-  vbuf = sodium_malloc(1024);
-  if (vbuf == NULL)
-    croak("new_from_ttyno: Failed to allocate vbuf memory");
-
-  if (fprintf(stderr, "%s", prompt_buf) == EOF) {
-    protmem_free(aTHX_ new_pm);
-    croak("new_from_ttyno: Failed to prompt");
-  }
-  if (fflush(stderr) == EOF) {
-    fprintf(stderr, "\n");
-    croak("new_from_ttyno: Failed fflush (stderr)");
+  while (total < prompt_len) {
+    w = write(fd, prompt_buf + total, prompt_len - total);
+    if (w == -1) {
+      if (errno == EINTR)
+        continue;
+      protmem_free(aTHX_ new_pm);
+      croak("new_from_ttyno: Failed to prompt");
+    }
+    total += w;
   }
 
-  if (!isatty(fd) || tcgetattr(fd, &tattr) != 0) {
-    fprintf(stderr, "\n");
-    croak("new_from_ttyno: Failed tcgetattr (not a tty?)");
-  }
-  tattr.c_lflag &= ~ECHO;
+  tattr.c_lflag = ICANON | ISIG;
   if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
-    fprintf(stderr, "\n");
+    write(fd, "\n", 1);
+    protmem_free(aTHX_ new_pm);
     croak("new_from_ttyno: Failed tcsetattr");
   }
+  tattr.c_lflag = lflag_prev; /* prepared for next tcsetattr to reset */
 
-  if ((file = fdopen(fd, "r")) == NULL) {
-    fprintf(stderr, "\n");
-    tattr.c_lflag |= ECHO;
-    tcsetattr(fd, TCSAFLUSH, &tattr);
-    croak("new_from_ttyno: Failed fdopen");
-  }
-
-  if (setvbuf(file, vbuf, _IOLBF, 1024) != 0) {
-    fprintf(stderr, "\n");
-    tattr.c_lflag |= ECHO;
-    tcsetattr(fd, TCSAFLUSH, &tattr);
-    croak("new_from_ttyno: Failed to setvbuf");
-  }
-
-  if (fgets((char *)new_pm->pm_ptr, 1024, file) == NULL)
-    RETVAL = &PL_sv_undef;
-  else {
-    char *input_buf = (char *)new_pm->pm_ptr;
-    char *nl_pos;
-
-    if ((nl_pos = strchr(input_buf, '\r')) != NULL)
-      *nl_pos = '\0';
-    if ((nl_pos = strchr(input_buf, '\n')) != NULL)
-      *nl_pos = '\0';
-    new_pm->size = strlen(input_buf);
-
-
-    if (new_pm->size == 0)
-      fprintf(stderr, "(WARNING: empty)\n");
-    else if (new_pm->size == 1023) {
-      /* warns even if input was exactly 1023. meh. */
-      fprintf(stderr, "(WARNING: truncated to 1023 characters)\n");
+  for (;;) {
+    r = read(fd, new_pm->pm_ptr, 4096);
+    if (r < 0) {
+      if (errno == EINTR)
+        continue;
+      write(fd, "\n", 1);
+      protmem_free(aTHX_ new_pm);
+      tcsetattr(fd, TCSAFLUSH, &tattr);
+      croak("new_from_ttyno: Failed read");
     }
-
-    RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+    else
+      break;
   }
+  if (r == 0)
+    write(fd, " (WARNING: empty)", (sizeof " (WARNING: empty)" - 1));
+  else if (*((unsigned char *)new_pm->pm_ptr + r - 1) == '\n')
+    r -= 1;
+  else if (*((unsigned char *)new_pm->pm_ptr + r - 1) == '\r')
+    r -= 1;
+  else if (r == 4096)
+    write(fd, " (WARNING: truncated to 4096 bytes)",
+          (sizeof " (WARNING: truncated to 4096 bytes)" - 1));
 
-  fflush(file);
-  setvbuf(file, NULL, _IOLBF, BUFSIZ); /* invalid */
-  sodium_free(vbuf);
+  new_pm->size = r;
 
-  fprintf(stderr, "\n");
-  fflush(stderr);
-  if (tcgetattr(fd, &tattr) != 0) {
-    protmem_free(aTHX_ new_pm);
-    croak("new_from_ttyno: tcgetattr failed");
-  }
-  tattr.c_lflag |= ECHO;
+  write(fd, "\n", 1);
   if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
     protmem_free(aTHX_ new_pm);
-    croak("new_from_ttyno: tcsetattr failed (stdin)");
+    croak("new_from_ttyno: tcsetattr failed");
   }
+
+  RETVAL = protmem_to_sv(aTHX_ new_pm, class);
 
   OUTPUT:
   RETVAL
@@ -614,7 +440,6 @@ void bitwise_and(SV * self, SV * other, ...)
   }
   else
     other_buf = (unsigned char *)SvPVbyte(other, other_len);
-    /* should probably zero afterwards */
   if (other_len != self_pm->size)
     /* lengths MUST be identical below */
     croak("Exclusive-or operands do not have equal length");
@@ -1451,50 +1276,18 @@ SV * to_hex(SV * self, SV * flags = &PL_sv_undef)
   OUTPUT:
   RETVAL
 
-SV * to_fd(SV * self, SV * file, int mode = 0600)
-
-  ALIAS:
-  to_file = 1
+SV * to_fd(SV * self, int fd)
 
   PREINIT:
   protmem *self_pm;
-  struct stat stat_buf;
-  char *path_buf = NULL;
   ssize_t w;
   size_t t = 0;
   size_t r = 0;
-  int fd;
 
   CODE:
-  switch (ix) {
-    case 1:
-      path_buf = SvPVbyte_nolen(file);
-      /* really need to be checking path_buf for nul termination, etc */
-
-      fd = open(path_buf, O_WRONLY|O_CLOEXEC|O_NOCTTY|O_CREAT|O_TRUNC, mode);
-      if (fd < 0)
-        croak("to_fd: %s: open failed", path_buf);
-      if (fstat(fd, &stat_buf) < 0) {
-        close(fd);
-        croak("to_fd: %s: fstat failed", path_buf);
-      }
-      if (((stat_buf.st_mode & ~S_IFMT) | mode) ^ mode) {
-        /* only caring if file has extra (most likely less-restrictive) modes.
-         * it would be invalid to assume that it's safe to fchmod here, as anything
-         * else could already have gotten a handle opened. */
-        croak("to_fd: %s: invalid modes on already-existing file", path_buf);
-      }
-      break;
-    default:
-      fd = SvIV(file);
-  }
-
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
-  if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) < 0) {
-    if (ix == 1)
-      close(fd);
+  if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) < 0)
     croak("to_fd: Failed to grant self protmem RO");
-  }
 
   /* w: current iteration written bytes */
   /* t: total bytes written */
@@ -1506,11 +1299,7 @@ SV * to_fd(SV * self, SV * file, int mode = 0600)
     if (w < 0) {
       if (errno == EINTR)
         continue;
-      if (ix == 1)
-        close(fd);
       protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
-      if (ix == 1)
-        croak("to_fd: %s: write error", path_buf);
       croak("to_fd: (%d): write error", fd);
     }
     t += w;
@@ -1518,12 +1307,6 @@ SV * to_fd(SV * self, SV * file, int mode = 0600)
     if (r == 0)
       break;
   }
-
-  if (ix == 1)
-    if (close(fd) < 0) {
-      protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
-      croak("to_fd: %s: close error", path_buf);
-    }
 
   if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) < 0)
     croak("to_fd: Failed to release self protmem RO");
@@ -1607,3 +1390,4 @@ void memzero(SV * self)
   overload.
 
 =cut
+

@@ -1,0 +1,20 @@
+<div class="card">
+    <h2>Welcome to Trickster!</h2>
+    <p>A modern, battle-tested micro-framework for Perl web applications.</p>
+</div>
+
+<div class="card">
+    <h3>Features</h3>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        [% FOR feature IN features %]
+        <li style="margin-bottom: 8px;">[% feature %]</li>
+        [% END %]
+    </ul>
+</div>
+
+<div class="card">
+    <h3>Quick Stats</h3>
+    <p><strong>Version:</strong> [% version %]</p>
+    <p><strong>Request Time:</strong> [% request_time %]</p>
+    <p><strong>Templates Loaded:</strong> [% template_count %]</p>
+</div>

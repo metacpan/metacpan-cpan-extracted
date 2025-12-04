@@ -54,6 +54,9 @@ sub init
     $self->{encoding}       = undef;
     # Parent po object
     $self->{po}             = undef;
+    # Whether this element is actually just an include directive
+    # If it is, the include file value is stored in the comment
+    $self->{is_include}     = 0;
     $self->{is_meta}        = 0;
     $self->{_po_line}       = 0;
     $self->{_init_strict_use_sub} = 1;
@@ -111,37 +114,45 @@ sub dump
 {
     my $self = shift( @_ );
     my @res = ();
-    push( @res, '# ' . join( "\n# ", @{$self->{comment}} ) ) if( scalar( @{$self->{comment}} ) );
-    push( @res, '#. ' . join( "\n#. ", @{$self->{auto_comment}} ) ) if( scalar( @{$self->{auto_comment}} ) );
-    my $ref = $self->reference;
-    push( @res, "#: $ref" ) if( length( $ref ) );
-    my $flags = $self->flags;
-    if( scalar( @$flags ) )
+    if( $self->is_include )
     {
-        push( @res, sprintf( '#, %s', join( ", ", @$flags ) ) );
+        push( @res, '# ' . join( "\n# ", @{$self->{comment}} ) ) if( scalar( @{$self->{comment}} ) );
+        push( @res, '#. $include "' . $self->{file} . '"' ) if( length( $self->{file} // '' ) );
     }
-    push( @res, sprintf( 'msgctxt "%s"', $self->po->quote( $self->{context} ) ) ) if( length( $self->{context} ) );
-    foreach my $k ( qw( msgid msgid_plural ) )
+    else
     {
-        if( $self->can( "${k}_as_string" ) )
+        push( @res, '# ' . join( "\n# ", @{$self->{comment}} ) ) if( scalar( @{$self->{comment}} ) );
+        push( @res, '#. ' . join( "\n#. ", @{$self->{auto_comment}} ) ) if( scalar( @{$self->{auto_comment}} ) );
+        my $ref = $self->reference;
+        push( @res, "#: $ref" ) if( length( $ref ) );
+        my $flags = $self->flags;
+        if( scalar( @$flags ) )
         {
-            my $sub = "${k}_as_string";
-            push( @res, $self->$sub() );
+            push( @res, sprintf( '#, %s', join( ", ", @$flags ) ) );
         }
-        else
+        push( @res, sprintf( 'msgctxt "%s"', $self->po->quote( $self->{context} ) ) ) if( length( $self->{context} ) );
+        foreach my $k ( qw( msgid msgid_plural ) )
         {
-            if( ref( $self->{ $k } ) && scalar( @{$self->{ $k }} ) )
+            if( $self->can( "${k}_as_string" ) )
             {
-                push( @res, sprintf( '%s ""', $k ) );
-                push( @res, map( sprintf( '"%s"', $self->po->quote( $_ ) ), @{$self->{ $k }} ) );
+                my $sub = "${k}_as_string";
+                push( @res, $self->$sub() );
             }
-            elsif( !ref( $self->{ $k } ) && length( $self->{ $k } ) )
+            else
             {
-                push( @res, sprintf( '%s "%s"', $k, $self->po->quote( $self->{ $k } ) ) );
+                if( ref( $self->{ $k } ) && scalar( @{$self->{ $k }} ) )
+                {
+                    push( @res, sprintf( '%s ""', $k ) );
+                    push( @res, map( sprintf( '"%s"', $self->po->quote( $_ ) ), @{$self->{ $k }} ) );
+                }
+                elsif( !ref( $self->{ $k } ) && length( $self->{ $k } ) )
+                {
+                    push( @res, sprintf( '%s "%s"', $k, $self->po->quote( $self->{ $k } ) ) );
+                }
             }
         }
+        push( @res, $self->msgstr_as_string );
     }
-    push( @res, $self->msgstr_as_string );
     return( join( "\n", @res ) );
 }
 
@@ -166,6 +177,8 @@ sub id
         return( $msgid );
     }
 }
+
+sub is_include { return( shift->_set_get_boolean( 'is_include', @_ ) ); }
 
 sub is_meta { return( shift->_set_get_boolean( 'is_meta', @_ ) ); }
 
@@ -935,6 +948,10 @@ Given a text, it returns an array reference of lines wrapped
 =head2 wrap_line
 
 Given a string, it returns an array reference of lines. This is called by L</wrap>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe. All state is stored on a per-object basis, and the underlying file operations and data structures do not share mutable global state.
 
 =head1 AUTHOR
 

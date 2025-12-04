@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-my $VERSION = '0.08';
+my $VERSION = '0.09';
 
 BEGIN {
     use_ok( 'Android::ElectricSheep::Automator::ADB::Device' ) || print "Bail out!\n";

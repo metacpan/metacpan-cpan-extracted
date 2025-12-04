@@ -10,22 +10,25 @@ String::Print - printf alternative
 
   use String::Print;           # simpelest way
   use String::Print qw/printi printp/, %config;
-  printi 'age {years}', years => 12;
+
+  printi 'age {years}', years => 12;   # to STDOUT
+  my $s = sprinti 'age {years}', years => 12;  # in variable
 
   # interpolation of arrays and hashes (serializers)
   printi 'price-list: {prices}', prices => \@p, _join => "+";
-  printi 'dump: {c}', c => \%config;
+  printi 'dump: {c}', c => \%data;
 
   # same with positional parameters
   printp 'age %d", 12;
   printp 'price-list: %.2f', \@prices;
   printp 'dump: %s', \%settings;
+  my $s = sprintp 'age %d", 12;
 
   # modifiers
   printi 'price: {price%.2f}', price => 3.14 * EURO;
 
   # [0.91] more complex interpolation names
-  printi 'filename: {c.filename}', c => \%config;
+  printi 'filename: {c.filename}', c => \%data;
   printi 'username: {user.name}', user => $user_object;
   printi 'price: {product.price €}', product => $db->product(3);
 
@@ -35,6 +38,8 @@ String::Print - printf alternative
   my $f = String::Print->new(%config);
   $f->printi('age {years}', years => 12);
   $f->printp('age %d', 12);
+  my $s = $f->sprinti('age {y}', y => 12);
+  my $s = $f->sprintp('age %d', 12);
 
   ### via Log::Report's __* functions (optional translation)
 
@@ -77,6 +82,10 @@ object has some benefits.
 
 =head2 Constructors
 
+When you use this package with functions, then you do not call the
+constructor explicitly.  In that case, these L<new()|String::Print/"Constructors"> parameters are
+added to the C<<use String::Print>> line.
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -84,6 +93,7 @@ object has some benefits.
 The C<%options> of the constructure configure processing options.
 
  -Option     --Default
+  defaults     see modifier docs
   encode_for   undef
   missing_key  <warning>
   modifiers    [ qr/^%\S+/ = \&format_printf]>
@@ -91,11 +101,17 @@ The C<%options> of the constructure configure processing options.
 
 =over 2
 
+=item defaults => \%defaults
+
+[1.00] change the defaults for some modifiers.  This is a map of
+modifier name to HASH with modifier specific settings.
+
 =item encode_for => HASH|'HTML'
 
 [0.91] The format string and the inserted values will get encoded according to
 some syntax rules.  Function C<encode_entities()> provided by HTML::Entities
-is used when you specify the predefined string C<HTML>.  See L<encodeFor()|String::Print/"Attributes">.
+is used when you specify the predefined string C<HTML>.  See L<encodeFor()|String::Print/"Attributes">
+and L</Output encoding>.
 
 =item missing_key => CODE
 
@@ -115,7 +131,7 @@ How to serialize data elements.
 
 =back
 
-example: 
+» example: 
 
   my $f = String::Print->new(
     modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ],
@@ -142,56 +158,105 @@ or L<printp()|String::Print/"FUNCTIONS">.
 
 See section L</"Interpolation: Modifiers"> about the details.
 
-=item $obj-E<gt>B<encodeFor>(HASH|undef|($predefined, %overrule))
+=item $obj-E<gt>B<defaults>($modifier)
 
-[0.91] Enable/define the output encoding.
+[1.00] Returns the current defaults for the C<$modifier>.
+
+» example: getting defaults for a modifier
+
+  my $def = $sp->defaults('EL');
+  say "Default max width is ", $def->{width};
+
+=item $obj-E<gt>B<encodeFor>(\%settings|undef|($predefined, %overrule))
+
+[0.91] Enable/define the output encoding.  The C<%settings> contain the C<encoding>
+CODE and the tag name patterns to C<exclude> from encoding.  Output for C<HTML>
+is C<$predefined>, but you may C<%overrule> its settings.
+
 Read section L</"Output encoding"> about the details.
+
+=item $obj-E<gt>B<setDefaults>(\%defaults|@defaults)
+
+[1.00] Set the defaults for modifiers, either with a HASH where the key modifier name
+maps to a HASH of settings, or a list of PAIRS.
+
+When using the methods in OO style , you can change the defaults at any time.  For
+functional style, the object is hidden.
+
+» example: setting defaults
+
+  $sp->setDefaults(EL => {width => 30}, CHOP => {width => 10});
+
+  my %defs = (EL => {width => 30}, CHOP => {width => 10});
+  $sp->setDefaults(\%defs);
 
 =back
 
 =head2 Printing
 
-The following are provided as method and as function.  You find their
-explanation further down on this page.
+The following are provided both as method and as function.  The function
+version is explained further down on this page, because it reads a bit
+easier, but the object version is most flexible.
 
-  $obj->printi([$fh], $format, %data|\%data);
-  $obj->printp([$fh], $format, @params, %options);
-  my $s = $obj->sprinti($format, %data|\%data);
-  my $s = $obj->sprintp($format, @params, %options);
+  my $sp = String::Print->new;
+  $sp->printi([$fh], $format, %data|\%data);        # see printi()
+  $sp->printp([$fh], $format, @params, %options);   # see printp()
+  my $s = $sp->sprinti($format, %data|\%data);      # see sprinti()
+  my $s = $sp->sprintp($format, @params, %options); # see sprintp()
+
+=head4 » Example
+
+  use String::Print 'oo';    # do not import the functions
+
+  my $sp = String::Print->new(
+    modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ],
+    serializers => [ UNDEF => sub {'-'} ],
+    defaults    => [ DT => { standard => 'ISO' } ],
+  );
+
+  $sp->printi("price: {p EUR}", p => 3.1415); # price: ␣␣3.14 e
+  $sp->printi("count: {c}", c => undef);      # count: -
+  my $s = $sp->sprinti("price: {p EUR}", p => 7); # output in $s
 
 =head1 FUNCTIONS
 
-The functional interface creates a hidden object.  You may import any of
-these functions explicitly, or all together by not specifying the names.
+The functional interface creates a hidden C<String::Print> object, which is
+reused in the whole active package.  Seperate packages will use different
+hidden objects.
 
-B<. Example>
+You may import any of these functions explicitly, or all together by
+not specifying the names.
+
+=head4 » Example
 
   use String::Print;           # all
   use String::Print 'sprinti'; # only sprinti
 
   use String::Print 'printi',   # only printi
     modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ],
-    serializers => [ UNDEF => sub {'-'} ];
+    serializers => [ UNDEF => sub {'-'} ],
+    defaults    => [ DT => { standard => 'ISO' } ];
 
   printi "price: {p EUR}", p => 3.1415; # price: ␣␣3.14 e
   printi "count: {c}", c => undef;      # count: -
+  my $s = sprinti "price: {p EUR}", p => 7;  # output in $s
 
 =over 4
 
 =item B<printi>( [$fh], $format, %data|\%data )
 
-Calls L<sprinti()|String::Print/"FUNCTIONS"> to fill the C<%data> into C<$format>, and
-then sends it to the C<$fh> (by default the selected file)
+Calls L<sprinti()|String::Print/"FUNCTIONS"> to fill the C<%data> into C<$format>, and then sends it to
+the C<$fh> (by default the selected file handle)
 
   open my $fh, '>:encoding(UTF-8)', $file;
   printi $fh, ...
 
   printi \*STDERR, ...
 
-=item B<printp>( [$fh], $format, @params, %options )
+=item B<printp>( [$fh], $format, @positionals, %options )
 
-Calls L<sprintp()|String::Print/"FUNCTIONS"> to fill the C<@params> in C<$format>, and
-then sends it to the C<$fh> (by default the selected file)
+Calls L<sprintp()|String::Print/"FUNCTIONS"> to fill the C<@positionals> in C<$format>, and
+then sends it to the C<$fh> (by default the selected file handle).
 
 =item B<sprinti>($format, %data|\%data|OBJECT, %options)
 
@@ -242,7 +307,7 @@ then fed into L<sprinti()|String::Print/"FUNCTIONS">.  B<Be careful> with the le
 superfluous parameter C<%options> are passed along to C<sprinti()>, and
 should only contain "specials": parameter names which start with '_'.
 
-example: of the rewrite
+» example: of the rewrite
 
   # positional parameters
   my $x = sprintp "dumpfiles: %s\n", \@dumpfiles, _join => ':';
@@ -558,7 +623,7 @@ specify its width, then there is no performance penalty for using 'S'.
   # name right aligned, commas on same position, always
   printp "name: {name%20S},\n", name => $some_chinese;
 
-=head4 POSIX modifier extensions '%[+ -]?[0-9]*[_,.]d'
+=head4 POSIX modifier extensions '%[+ -0]?[0-9]*[_,.]?d'
 
 [0.96] Only available when you print (big) decimals: add an underscore,
 comma, or dot on the thousands.
@@ -574,6 +639,19 @@ comma, or dot on the thousands.
   printi "'{v%+10,d}'", v =>  10000;   # '   +10,000';
   printi "'{v% ,d}'",   v =>  10000;   # ' 10,000';
   printi "'{v% ,d}'",   v => -10000;   # '-10,000';
+
+[1.00] You can set the default C<FORMAT> separator:
+
+  use String::Print
+      defaults => [ FORMAT => { thousands => ',' } ];
+
+  # or
+  my $sp = String::Print->new(
+     defaults => { FORMAT => { thousands => ',' }},
+  );
+
+  # or
+  $sp->setDefaults(FORMAT => { thousands => ',' });
 
 =head3 Modifier: BYTES
 
@@ -595,7 +673,7 @@ and " 27 MB".
 little flexible in values they accept, but do not expect miracles: when
 it get harder, you will need to process it yourself.
 
-The actual treatment of a time value depends on the value: three
+The actual treatment of a time value depends on the value.  Four
 different situations:
 
 =over 4
@@ -606,13 +684,24 @@ A pure numeric value is considered "seconds since epoch", unless it
 is smaller than 21000000, in which case it is taken as date without
 separators.
 
-=item 2. date format without time-zone
+=item 2. DateTime object
+
+[1.00] Use a DateTime object to provide the value.  This way, the
+format does not need to know whether the date is specified as object or
+as string.
+
+  my $now = DateTime->now;
+  printi "{t YEAR}", t => $now;  # works for DateTime, epoch and string
+  printi "{t.year YEAR}", t => $now;  # same effect, DateTime only
+  printi "{t.year}", t => $now;  # will also work, not as nice
+
+=item 3. date format without time-zone
 
 The same formats are understood as in the next option, but without
 time-zone information.  The date is processed as text as if in the
 local time zone, and the output in the local time-zone.
 
-=item 3. date format with time-zone
+=item 4. date format with time-zone
 
 By far not all possible date formats are supported, just a few common
 versions, like
@@ -625,7 +714,7 @@ versions, like
   2017-6-1                       # only for YEAR and DATE
   12:34                          # only for TIME
 
-The meaning of 05-04-2017 is unclear, so not supported.  Milliseconds
+The meaning of C<05-04-2017> is ambiguous, so not supported.  Milliseconds
 get ignored.
 
 When the provided value has a timezone indication, it will get
@@ -636,8 +725,7 @@ converted into the local timezone of the observer.
 The output of C<YEAR> is in format 'YYYY', for C<DATE> it will always be
 'YYYY-MM-DD', where C<TIME> produces 'HH:mm:ss'.
 
-The short form C<DT> is an alias for C<DT(FT)>.  The DT modifier can
-produce different formats:
+The DT modifier can produce different formats:
 
   DT(ASC)     : %a %b %e %T %Y       asctime output
   DT(FT)      : %F %T                YYYY-MM-DD HH:MM:SS
@@ -647,6 +735,10 @@ produce different formats:
   DT(RFC5322) : %a, %d %b %Y %T %z   email newest [0.96]
 
 You may suggest additional formats, or add your own modifier.
+
+The defaults are:
+
+  DT => { standard => 'FT' },
 
 =head3 Modifier: //word, //"string", //'string'
 
@@ -665,13 +757,56 @@ different kinds of output:
   "price: {price//5 EUR}"
   "price: {price EUR//unknown}"
 
-=head3 Modifier: '='
+=head3 Modifier: '=' (show name)
 
 [0.96] As (always trailing) modifier, this will show the interpolated
 name before the value.  It might simplify debugging statements.
 
-  printi "visitors: {count=}", count => 1;      # visitors: count=1
-  printi "v: {count %-8,d =}X", count => 10000; # v: count=10,000␣␣X
+  "visitors: {count=}", count => 1;      # visitors: count=1
+  "v: {count %-8,d =}X", count => 10000; # v: count=10,000␣␣X
+
+=head3 Modifier: EL, EL($width), or EL($width,$replace)
+
+[1.00] When the string is larger than C<$width> columns, then chop it
+short and add a 'mid-line ellipsis' character: C< ⋯  >.  You may also
+pick another replacement string.   The comma is optional
+
+Attention: "columns" not "characters": it is aware of wide fonts, like
+chinese characters (see C<%S> above).  The default ellipsis is also two
+columns wide.
+
+  "Intro: {text EL(10)}";     # Intro: 12345678⋯ 
+  "Intro: {text EL(10,⋮)}";   # Intro: 123456789⋮ 
+  "Intro: {text EL(10⋮)}";    # Intro: 123456789⋮ 
+  "Intro: {text EL(10,XY)}";  # Intro: 12345678XY 
+  "Intro: {text EL(10XY)}";   # Intro: 12345678XY 
+
+The defaults for EL are '20' and '⋯' (mid-dots).  You can changes these
+with L<setDefaults()|String::Print/"Attributes">:
+
+  $sp->setDefaults(EL => { width => 10, replace => '⋮' });
+  $sp->printi("Intro: {text EL}"); # Intro: 12345678⋯ 
+
+=head3 Modifier: CHOP, CHOP($width) or CHOP($width,$units)
+
+[1.00] When the string is larger than C<$width> columns (defaults to
+20), then chop it short and add C<< [+42] >>: the number of character
+chopped off.  The C<$width> is the size of the result string.
+The comma is optional.
+
+  "Intro: {text CHOP(10)}";        # Intro: 12345[+42]
+  "Intro: {text CHOP(19 chars)}";  # Intro: 1234578[+33 chars]
+  "Intro: {text CHOP(19, chars)}"; # Intro: 1234578[+33 chars]
+
+The same effect can be reached by setting the defaults
+
+  $sp->setDefaults(CHOP => +{width => 19, units => ' chars'});
+  $sp->printi("Intro: {text CHOP}", text => $t); # Intro: 1234578[+33 chars]
+
+Other defaults are C<head> (C<<[>>) and C<tail> (C<<]>>).
+
+  $sp->setDefaults(CHOP => +{head => '«', tail => '»'});
+  $sp->printi("Intro: {text CHOP}", text => $t); # Intro: 1234578«+12»
 
 =head3 Private modifiers
 
@@ -812,7 +947,7 @@ This may result in:
 Better not to have HTML in your program: leave it to the template.  But
 in some cases, you have no choice.
 
-=head2 Compared to other modules on CPAN
+=head2 String::Print Compared to other modules on CPAN
 
 There are a quite a number of modules on CPAN which extend the functionality
 of C<printf()>.  To name a few:
@@ -836,8 +971,8 @@ C<String::Print> is nicely integrated with Log::Report.
 
 =head1 SEE ALSO
 
-This module is part of String-Print version 0.96,
-built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of String-Print version 1.00,
+built on December 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

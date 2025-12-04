@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Test::More;
 use Test::More::UTF8;
@@ -44,7 +44,7 @@ ok(defined($mother), 'Android::ElectricSheep::Automator->new()'." : called and g
 
 # this app should exist
 # we are sure this app exists on a virgin phone i guess?
-my $name = 'com.google.android.calendar';
+my $name = 'com.google.android.apps.messaging';
 my $res = $mother->pidof({'name' => $name});
 ok(defined($res), 'Android::ElectricSheep::Automator->pidof()'." : called and got good result.") or BAIL_OUT;
 is(ref($res), '', 'Android::ElectricSheep::Automator->pidof()'." : called and got good result which is a SCALAR.") or BAIL_OUT("no it is '".ref($res)."'");

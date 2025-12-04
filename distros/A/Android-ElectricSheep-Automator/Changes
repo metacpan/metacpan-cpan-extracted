@@ -32,3 +32,8 @@ Revision history for Android-ADB-Automator
 	and electric-sheep-install-app.pl.
 0.08    2025/12/03
         Removed the test APK files from the distribution, ough!
+0.09    2025/12/03
+        Added feature for installing multiple APKs for a single app in install_app() and modified script electric-sheep-install-app.pl appropriately.
+        Fixed some bugs when pulling apks.
+        Pod additions.
+

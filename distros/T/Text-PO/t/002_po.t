@@ -4,19 +4,20 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     use JSON;
     use Module::Generic::File qw( cwd file tempfile );
     use Scalar::Util qw( reftype );
     use_ok( 'Text::PO' ) || BAIL_OUT( "Cannot load Test::PO" );
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 my $po = Text::PO->new( debug => $DEBUG );
 isa_ok( $po, 'Text::PO', 'Text::PO object instantiated' );
 my $cwd = cwd();
 my $f = $cwd->join( $cwd, qw( t fr_FR LC_MESSAGES com.example.api.po ) );
-diag( "Parsing file $f" );
+diag( "Parsing file $f" ) if( $DEBUG );
 $po->parse( $f ) || BAIL_OUT( $po->error );
 is( $po->elements->length, 8, 'number of elements' );
 is( $po->domain, 'com.example.api', 'domain' );
@@ -44,9 +45,9 @@ is( $po->content_type, 'text/plain; charset=utf-8', 'content_type' );
 is( $po->current_lang, ( ( defined( $ENV{LANGUAGE} ) || defined( $ENV{LANG} ) ) ? [split( /:/, ( $ENV{LANGUAGE} || $ENV{LANG} ) )]->[0] : '' ), 'current_lang' );
 is( $po->domain, 'com.example.api', 'domain' );
 is( $po->encoding, 'utf8', 'encoding' );
-my $temp = tempfile({ suffix => '.po', unlink => 0 });
+my $temp = tempfile({ suffix => '.po', unlink => 0, cleanup => 1 });
 my $fh = $temp->open( '>', { binmode => 'utf-8' } ) || BAIL_OUT( $temp->error );
-diag( "Dumping data to $temp" );
+diag( "Dumping data to $temp" ) if( $DEBUG );
 $po->dump( $fh );
 $fh->close;
 # Now let's read it and see if it worked

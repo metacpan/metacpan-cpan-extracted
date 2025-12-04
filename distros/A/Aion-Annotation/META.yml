@@ -5,14 +5,16 @@ author:
 build_requires:
   Carp: '0'
   Cwd: '0'
+  Data::Dumper: '0'
   File::Basename: '0'
   File::Find: '0'
   File::Path: '0'
   File::Slurper: '0'
   File::Spec: '0'
   Scalar::Util: '0'
-  Test::More: '0.98'
-  open: '0'
+  String::Diff: '0'
+  Term::ANSIColor: '0'
+  Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -35,20 +37,24 @@ no_index:
 provides:
   Aion::Annotation:
     file: lib/Aion/Annotation.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
-  Aion: '0'
+  Aion: '1.2'
+  Aion::Carp: '1.6'
   Aion::Fs: v0.2.0
+  Aion::Run: v0.0.3
   POSIX: '0'
   Time::Local: '0'
   common::sense: '0'
   config: '0'
+  open: '0'
   perl: v5.22.0
+  utf8: '0'
 resources:
   bugtracker: https://github.com/darviarush/perl-aion-annotation/issues
   homepage: https://github.com/darviarush/perl-aion-annotation
   repository: https://github.com/darviarush/perl-aion-annotation.git
-version: 0.0.2
+version: 0.0.3
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

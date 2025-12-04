@@ -7,8 +7,6 @@ use Exporter 'import';
 
 our @EXPORT_OK = (qw(
   sodium_add
-  sodium_base642bin
-  sodium_bin2base64
   sodium_bin2hex
   sodium_compare
   sodium_hex2bin

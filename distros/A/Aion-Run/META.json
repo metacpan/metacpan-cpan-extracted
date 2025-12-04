@@ -82,7 +82,7 @@
    "provides" : {
       "Aion::Run" : {
          "file" : "lib/Aion/Run.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.3"
       },
       "Aion::Run::RunRun" : {
          "file" : "lib/Aion/Run/RunRun.pm"
@@ -106,7 +106,7 @@
          "web" : "https://github.com/darviarush/perl-aion-run"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.3",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

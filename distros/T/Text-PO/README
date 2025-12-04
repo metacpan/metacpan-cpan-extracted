@@ -3,21 +3,38 @@ NAME
 
 SYNOPSIS
         use Text::PO;
+        # Create a parser (include directives enabled by default)
         my $po = Text::PO->new;
-        $po->debug( 2 );
-        $po->parse( $poFile ) || die( $po->error, "\n" );
+        $po->debug(2);
+        $po->parse( $poFile ) || die( $po->error );
+
+        # Or disable include processing for this parsing
+        $po->parse( $poFile, include => 0 );
+
+        # Retrieve parsed elements
         my $hash = $po->as_hash;
         my $json = $po->as_json;
+
+        # Serialize back to PO text
+        my $str = $po->as_string;
+
         # Add data:
         my $e = $po->add_element(
-            msgid => 'Hello!',
+            msgid  => 'Hello!',
             msgstr => 'Salut !',
         );
+        my $e = $po->add_include(
+            file  => 'include/me.po',
+            after => 'Hello world!',
+        );
+
         $po->remove_element( $e );
+
+        # Iterate over elements
         $po->elements->foreach(sub
         {
             my $e = shift( @_ ); # $_ is also available
-            if( $e->msgid_as_text eq $other->msgid_as_text )
+            if( $e->msgid_as_text eq 'Hello!' )
             {
                 # do something
             }
@@ -38,15 +55,17 @@ SYNOPSIS
         $po->dump;
         # or to a file handle
         $po->dump( $io );
+
         # Synchronise data
         $po->sync( '/some/where/com.example.api.po' );
         $po->sync( $file_handle );
+
         # or merge
         $po->merge( '/some/where/com.example.api.po' );
         $po->merge( $file_handle );
 
 VERSION
-        v0.7.2
+        v0.9.0
 
 DESCRIPTION
     This module parse GNU PO (portable object) and POT (portable object
@@ -66,6 +85,9 @@ DESCRIPTION
     Also, there is a script in "scripts" that can be used to transcode ".po"
     or "mo" files into json format and vice versa.
 
+    For more information on the format of a PO element, check
+    Text::PO::Element
+
 CONSTRUCTOR
   new
     Create a new Text::PO object acting as an accessor.
@@ -75,16 +97,132 @@ CONSTRUCTOR
 
     Returns the object.
 
+    The following options can be provided:
+
+    *   "domain"
+
+        The PO domain.
+
+    *   "header"
+
+        An array reference of PO file header string. Those are often lines
+        of comments preceded by a pound sign ("#"), possibly with some
+        copyright information.
+
+    *   "encoding"
+
+        The content encoding of the file, such as "utf-8"
+
+    *   "include"
+
+        Defaults to true.
+
+        A boolean value (1 or 0) to indicate whether the parser should
+        recognise include directives or not.
+
+    *   "max_recurse"
+
+        Defaults to 32
+
+        An unsigned integer value representing the maximum recursion allowed
+        when "include" is enabled, and when the parser finds include
+        directives.
+
+    *   "meta"
+
+        An hash reference of meta key-value pairs, with the keys in all
+        lower case.
+
+    *   "meta_keys"
+
+        An array reference of meta keys found,
+
+    *   "use_json"
+
+        Defaults to true.
+
+        A boolean value (1 or 0) to indicate whether to use JSON format.
+
   METHODS
   add_element
-    Given either a Text::PO::Element object, or an hash ref with keys like
-    "msgid" and "msgstr", or given a "msgid" followed by an optional hash
-    ref, "add_element" will add this to the stack of elements.
+        my $elem = $po->add_element( $element_object,
+            after => 'Some other text',
+        );
+        my $elem = $po->add_element(
+            msgid   => 'Hello world!",
+            msgstr  => 'Salut tout le monde !',
+            comment => 'No comment',
+            before  => 'Some other text',        # Add this new element before this msgid/include directive
+        );
+
+    This takes either of the following parameters, and adds the new element,
+    if it does not already exist, to the list of elements:
+
+    1. Text::PO::Element object + %options
+        A Text::PO::Element object, possibly followed by an hash or hash
+        reference of options.
+
+    2. %options
+        An hash or hash ref of options that will be passed to
+        Text::PO::Element to create a new object.
 
     It returns the newly created element if it did not already exist, or the
     existing one found. Thus if you try to add an element data that already
     exists, this will prevent it and return the existing element object
     found.
+
+    If an error occurred, it will set an error object and return "undef" in
+    scalar context, or an empty list in list context.
+
+    Supported options are:
+
+    *   all the ones used in Text::PO::Element
+
+    *   "before" / "after"
+
+        A "msgid" or "include" directive value to add this element before or
+        after.
+
+  add_include
+        my $elem = $po->add_include( $element_object,
+            after => 'Some other text',
+        );
+        my $elem = $po->add_include(
+            file    => 'include/me.po",
+            comment => 'No comment',
+            before  => 'Some other text',   # Add this new element before this msgid/include directive
+        );
+
+    This takes either of the following parameters, and adds the new include
+    directive, if it does not already exist, to the list of elements:
+
+    1. Text::PO::Element object + %options
+        A Text::PO::Element object, possibly followed by an hash or hash
+        reference of options.
+
+    2. %options
+        An hash or hash ref of options that will be passed to
+        Text::PO::Element to create a new object.
+
+    Note that the "file" parameter must be set in the element passed, or
+    provided among the options used to create a new element.
+
+    It returns the newly created element if it did not already exist, or the
+    existing one found. Thus if you try to add an include directive that
+    already exists, this will prevent it and return the existing element
+    object found.
+
+    If an error occurred, it will set an error object and return "undef" in
+    scalar context, or an empty list in list context.
+
+    Supported options are:
+
+    *   all the ones used in Text::PO::Element
+
+    *   "before" / "after"
+
+        A "msgid" or "include" directive value to add this element before or
+        after.
 
   added
     Returns an array object (Module::Generic::Array) of Text::PO::Element
@@ -121,8 +259,15 @@ CONSTRUCTOR
   as_hash
     Return the data parsed as an hash reference.
 
-  as_json
-    Return the PO data parsed as json data.
+  as_string
+    Serializes the current PO object into a single string containing valid
+    GNU ".po" syntax. This is equivalent to calling "dump" into an in-memory
+    scalar, but more convenient for tests or further processing.
+
+        my $string = $po->as_string;
+
+    This always returns a plain Perl string (not a blessed scalar or IO
+    object) to avoid issues with string overloading.
 
   charset
     Sets or gets the character encoding for the po data. This will affect
@@ -187,6 +332,32 @@ CONSTRUCTOR
     Access the headers data for this po file. The data is an array
     reference.
 
+  include
+        $po->include(1);   # enable include directives
+        $po->include(0);   # disable include directives
+        my $bool = $po->include;
+
+    Controls whether "$include "file.po"" directives are recognised during
+    parsing.
+
+    Include support is enabled by default.
+
+    Include directives may appear in comments, using one of the following
+    forms:
+
+        # $include "other.po"
+        #. $include 'relative/path.po'
+        #   $include "shared/common.po"
+
+    When include processing is enabled, any referenced file is parsed
+    recursively. Only valid PO entries
+    ("msgid"/"msgstr"/"msgid_plural"/"msgctxt" blocks and special comments)
+    from included files are merged into the caller’s namespace; header
+    blocks and meta sections of include files are ignored.
+
+    This feature allows modular PO files, shared error message bundles, and
+    structured localisation domains without a separate preprocessing step.
+
   language
     Sets or gets the meta field value for "Language"
 
@@ -195,6 +366,22 @@ CONSTRUCTOR
 
   last_translator
     Sets or gets the meta field value for "Last-Translator"
+
+  max_recurse
+        $po->max_recurse(20);
+        my $limit = $po->max_recurse;
+
+    Sets or gets the maximum recursion depth allowed when processing include
+    directives.
+
+    The default is 32.
+
+    If the recursion limit is exceeded (for example because of accidental
+    self-inclusion or a circular include chain), parsing will abort and
+    "error" will contain a descriptive message including the file path and
+    line number where recursion overflow occurred.
+
+    This protects users from infinite loops and malicious PO input.
 
   merge
     This takes the same parameters as "sync" and will merge the current data
@@ -231,15 +418,53 @@ CONSTRUCTOR
     characters.
 
   parse
-    Given a filepath to a po file or a file handle, this will parse the po
-    file and return a new Text::PO object.
+        $po->parse( $filepath );
+        $po->parse( $filepath, include => 0 );
+        $po->parse( $fh, max_recurse => 20 );
 
-    For each new entry that "parse" find, it creates a Text::PO::Element
-    object.
+    Parses a GNU ".po" file or a filehandle and loads its entries into the
+    current object. Returns the current Text::PO instance on success. Upon
+    error, it sets an error object and returns "undef" in scalar context,
+    and an empty list in list context.
 
-    The list of all elements found can then be accessed using "elements"
+   Include processing
+    If include processing is enabled (see "include"), the parser recognises
+    the following non-standard directives:
 
-    It returns the current Text::PO object
+        # $include "path.po"
+        #.$include "relative.po"
+
+    Relative paths are resolved against the directory of the parent file.
+
+    When an include directive is seen:
+
+    1.  A new Text::PO object is created for the included file.
+
+    2.  The effective "include" and "max_recurse" settings are passed to the
+        child parser.
+
+    3.  Only PO elements ("msgid"/"msgstr"/"msgctl"/"msgid_plural" entries,
+        and special comments) from the included file are merged into the
+        parent’s "elements" list. Header metadata from included files is
+        ignored.
+
+    4.  Circular references are detected. A descriptive error is attached to
+        the directive line and parsing continues for the parent file.
+
+    5.  If the included file has some header meta information containing the
+        header "Language" and if it does not match that of the parent, a
+        warning is emitted if warnings are enabled.
+
+   Options
+    parse() accepts the following options:
+
+    *   "include" (boolean)
+
+        Override the parser’s include behaviour for this parse call.
+
+    *   "max_recurse" (unsigned integer)
+
+        Override the maximum include depth for this parse call.
 
   parse_date_to_object
     Provided with a date string and this returns a DateTime object
@@ -265,6 +490,13 @@ CONSTRUCTOR
     be evaluated to assess which plural form to use.
 
     It returns an array reference representing those 2 values.
+
+    If you want to find out the proper plural form for a given "locale", you
+    should refer to the Unicode CLDR <https://cldr.unicode.org/> data, which
+    can be accessed and queries via the module Locale::Unicode::Data:
+
+        my $cldr = Locale::Unicode::Data->new;
+        say $cldr->plural_forms( 'fr' ); # nplurals=2; plural=(n > 1);
 
   plural_forms
     Sets or gets the meta field value for "Plural-Forms"
@@ -337,10 +569,12 @@ CONSTRUCTOR
     It takes an hash or hash reference passed as argument, as optional
     parameters with the following properties:
 
-    *file*
+    *   "file"
+
         File path
 
-    *handle*
+    *   "handle"
+
         Opened file handle
 
     This means that our object is the source and the file or filehandle
@@ -410,6 +644,11 @@ PRIVATE METHODS
   _set_get_meta_value
     Takes a meta field name and sets or gets its value.
 
+THREAD-SAFETY
+    This module is thread-safe. All state is stored on a per-object basis,
+    and the underlying file operations and data structures do not share
+    mutable global state.
+
 AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
@@ -425,7 +664,7 @@ SEE ALSO
     >
 
 COPYRIGHT & LICENSE
-    Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+    Copyright (c) 2020-2025 DEGUEST Pte. Ltd.
 
     You can use, copy, modify and redistribute this package and associated
     files under the same terms as Perl itself.

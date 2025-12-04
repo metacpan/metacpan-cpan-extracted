@@ -263,7 +263,7 @@ sub unpack_sk_data($sk_blob, $opts) {
   $sk_data->{sk} = $key_chunk->extract(8, $sk_len);
   print "deriving a key from the password and decrypting the secret key...\n";
   STDOUT->flush;
-  my $passwd = mv_from_tty("Passphrase: ");
+  my $passwd = mv_from_tty(undef, "Passphrase: ");
   $passwd = $passwd->concat("\n") if $ENV{PMINISIGN_COMPATIBLE_SECRETKEY};
   $passwd = $kdf_alg->{kdf_gen}->($passwd, $sk_data->{salt}, $sig_alg->{skbytes},
                                   @$sk_data{qw/opslimit memlimit/});
@@ -388,8 +388,8 @@ EODIE
   $sk_data->{chk} = chk_sk($sk_data);
   print "Please enter a passphrase to protect the secret key.\n";
   STDOUT->flush;
-  my $pw = mv_from_tty("Passphrase: ");
-  my $pw_chk = mv_from_tty("Passphrase (one more time): ");
+  my $pw = mv_from_tty(undef, "Passphrase: ");
+  my $pw_chk = mv_from_tty(undef, "Passphrase (one more time): ");
   unless ($pw->size == $pw_chk->size and $pw eq $pw_chk) {
     die "Passphrases don't match\n";
   }

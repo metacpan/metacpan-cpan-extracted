@@ -3,7 +3,10 @@ abstract: 'Dynamic Perl web application framework with template     compilation 
 author:
   - 'Andrew Speer <andrew.speer@isolutions.com.au>'
 build_requires:
+  Capture::Tiny: '0'
   Test::Deep: '0'
+  Test::More: '0'
+  Test::Simple: '0.44'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,7 +22,6 @@ no_index:
     - inc
 requires:
   CGI::Simple: '0'
-  Capture::Tiny: '0'
   Devel::Confess: '0'
   Digest::MD5: '0'
   Env::Path: '0'
@@ -27,12 +29,11 @@ requires:
   HTML::Tiny: '0'
   HTML::TreeBuilder: '0'
   HTTP::Status: '0'
+  Hash::MultiValue: '0'
   IO::String: '0'
   JSON: '0'
   Router::Simple: '0'
   Storable: '0'
-  Test::More: '0'
-  Test::Simple: '0.44'
   Text::Template: '0'
   Tie::IxHash: '0'
   perl: '5.006'
@@ -40,6 +41,6 @@ resources:
   homepage: https://github.com/aspeer/WebDyne
   license: http://dev.perl.org/licenses/
   repository: https://github.com/aspeer/WebDyne.git
-version: '2.035'
+version: '2.036'
 x_authority: cpan:ASPEER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

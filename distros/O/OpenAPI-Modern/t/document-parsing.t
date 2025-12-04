@@ -1067,4 +1067,43 @@ YAML
   cmp_result([$doc->operations_with_tag('yup')], [], 'operations_with_tag("yup")');
 };
 
+subtest '3.0 checks' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => {
+      openapi => '3.0.4',
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+        contact => { url => 'ಠ_ಠ' },
+      },
+      map +($_ => 'not an array'), qw(servers security tags),
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{'3.0'}.'#/required',
+        error => 'object is missing property: paths',
+      },
+      (map +{
+        instanceLocation => '/'.$_,
+        keywordLocation => '/properties/'.$_.'/type',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{'3.0'}.'#/properties/'.$_.'/type',
+        error => re(qr/^got string, not (object|array)$/),
+      }, qw(security servers tags)),
+      {
+        instanceLocation => '',
+        keywordLocation => "/properties",
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{'3.0'}.'#/properties',
+        error => 'not all properties are valid',
+      },
+    ],
+    'missing paths (etc), and bad types for top level fields',
+  );
+};
+
 done_testing;

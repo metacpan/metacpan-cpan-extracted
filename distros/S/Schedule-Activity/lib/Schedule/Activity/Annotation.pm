@@ -5,7 +5,7 @@ use warnings;
 use Ref::Util qw/is_hashref is_regexpref/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.2.3';
+our $VERSION='0.2.4';
 
 my %property=map {$_=>undef} qw/message nodes before between p limit attributes note/;
 

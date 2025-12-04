@@ -1,5 +1,12 @@
 Revision history for OpenAPI-Modern
 
+0.111     2025-12-04 01:23:20Z
+          - now also allowing validation of v3.0.x documents
+
+0.110     2025-12-03 23:53:53Z
+          - new command line script "openapi-validate", to validate OpenAPI
+            descriptions (one or more files)
+
 0.109     2025-11-29 00:46:37Z
           - the OpenAPI 3.0 schema is now available to be used via
           load_cached_document() in JSON::Schema::Modern::Utilities,

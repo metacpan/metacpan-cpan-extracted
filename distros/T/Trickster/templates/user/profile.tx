@@ -1,0 +1,26 @@
+<div class="card">
+    <h2>User Profile</h2>
+    
+    [% IF user %]
+    <div style="margin-top: 20px;">
+        <p><strong>ID:</strong> [% user.id %]</p>
+        <p><strong>Name:</strong> [% user.name %]</p>
+        <p><strong>Email:</strong> [% user.email %]</p>
+        <p><strong>Role:</strong> [% user.role | upper %]</p>
+    </div>
+    
+    [% IF user.bio %]
+    <div style="margin-top: 20px;">
+        <h3>Bio</h3>
+        <p>[% user.bio | html %]</p>
+    </div>
+    [% END %]
+    
+    [% ELSE %]
+    <p style="color: #e74c3c;">User not found.</p>
+    [% END %]
+</div>
+
+<div class="card">
+    <a href="/" style="color: #3498db; text-decoration: none;">&larr; Back to Home</a>
+</div>

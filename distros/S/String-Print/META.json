@@ -42,6 +42,9 @@
             "HTML::Entities" : "0",
             "Test::More" : "0.86",
             "Unicode::GCString" : "0"
+         },
+         "x_optional" : {
+            "DateTime" : 1
          }
       },
       "test" : {
@@ -53,6 +56,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-String-Print/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
       "repository" : {
          "type" : "git",
@@ -60,7 +66,7 @@
          "web" : "https://github.com/markov2/perl5-String-Print"
       }
    },
-   "version" : "0.96",
+   "version" : "1.00",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2016,

@@ -7,8 +7,8 @@ Aion::Run::Runner - запускает команду описанную анн�
 
 Файл etc/annotation/run.ann:
 ```
-Aion::Run::RunRun#run=run:run „Executes Perl code in the context of the current project”
-Aion::Run::RunsRun#list=run:runs „List of scripts”
+Aion::Run::RunRun#run,3=run:run „Executes Perl code in the context of the current project”
+Aion::Run::RunsRun#list,5=run:runs „List of scripts”
 ```
 
 ```perl

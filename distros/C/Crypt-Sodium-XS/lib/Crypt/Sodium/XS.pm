@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000039';
+  our $VERSION = '0.000040';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -223,7 +223,7 @@ promises. For example, with libsodium installed in /opt/sodium you may want
 something like:
 
   SODIUM_INC="-I/opt/sodium/include" \
-  SODIUM_LIBS="-L/opt/sodium/lib -Wl,-rpath -Wl,/opt/sodium/lib" \
+  SODIUM_LIBS="-L/opt/sodium/lib -Wl,-rpath -Wl,/opt/sodium/lib -lsodium" \
   cpanm Crypt::Sodium::XS
 
 =head1 PROCEDURAL vs. OO
@@ -233,17 +233,15 @@ perl modules. The OO interface is really just a convenience wrapper around the
 procedural one. If you are coming from L<Crypt::Sodium::NaCl>, the OO interface
 will be more familiar.
 
-The procedural interface gives a non-negligable performance improvement over
-OO, if micro-optimization is important to your use of the library. The OO
-interface can be more concise and easier to use, so it is recommended for most
-use.
+The procedural interface gives a small but not insignificant performance
+improvement over OO, if micro-optimization is important to your use of the
+library. The OO interface can be more concise and easier to use, so it is
+recommended for most use.
 
 It is acceptable to mix and match the use of procedural and OO interfaces.
 
 Procedural modules are in the C<Crypt::Sodium::XS::*> namespace, while object
 oriented modules are in the C<Crypt::Sodium::XS::OO::*> namespace.
-
-=head1 LIBSODIUM OPERATIONS
 
 To use a procedural interface, see C<Crypt::Sodium::XS::E<lt>operationE<gt>>
 (e.g., L<Crypt::Sodium::XS::box>).
@@ -261,6 +259,8 @@ equivalent:
 
   use Crypt::Sodium::XS;
   my $box = Crypt::Sodium::XS->box(%args);
+
+=head1 LIBSODIUM OPERATIONS
 
 The following libsodium operations are supported:
 
