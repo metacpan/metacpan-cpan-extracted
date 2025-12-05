@@ -21,7 +21,7 @@ Log::Report - report a problem, with exceptions and translation support
   # First step to translations, once you need it.
   print __x"my name is {name}", name => $n;  # print, so no exception
   print __"Hello World\n";      # no interpolation, optional translation
-  print __x'Hello World';       # SYNTAX ERROR!!  ' is alternative for ::
+  print __x'Hello World';       # SYNTAX ERROR: quote is alternative for ::
 
   # Functions replacing die/warn/carp, casting exceptions.
   error "oops";                 # exception like die(), no translation
@@ -155,7 +155,7 @@ context with only one name, the one object is returned.
   dispatcher Log::Dispatcher::File => mylog =>,
     accept   => 'MISTAKE-',    # for wrapper
     locale   => 'pt_BR',       # other language
-    filename => 'logfile';    # for back-end
+    filename => 'logfile';     # for back-end
 
   dispatcher close => 'mylog';  # cleanup
   my $obj = dispatcher find => 'mylog';
@@ -174,21 +174,23 @@ context with only one name, the one object is returned.
   dispatcher PERL => 'default', mode => 'DEBUG', accept => 'ALL'
      if $debug;
 
-=item B<report>( [%options], $reason, $message|<STRING,$params>, )
+=item B<report>( [\%options], $reason, $message|<$text,%params>, )
 
 The C<report> function is sending (for some C<$reason>) a C<$message> to be
 displayed or logged (by a `dispatcher').  This function is the core
 for L<error()|Log::Report/"Abbreviations for report()">, L<info()|Log::Report/"Abbreviations for report()"> etc functions, which are nicer names for this
 exception throwing: better use those short names.
 
-The C<$reason> is a string like 'ERROR' (for function C<error()>).
-The C<$message> is a L<Log::Report::Message|Log::Report::Message> object (which are created with
-the special translation syntax like L<__x()|Log::Report/"Messages (optionally translatable)">).  The C<$message> may also
-be a plain string, or an L<Log::Report::Exception|Log::Report::Exception> object. The optional
-first parameter is a HASH which can be used to influence the dispatchers.
-
 The optional C<%options> are listed below.  Quite differently from other
 functions and methods, they have to be passed in a HASH as first parameter.
+
+The C<$reason> is a string like 'ERROR' (for function C<error()>).
+The C<$message> is a L<Log::Report::Message|Log::Report::Message> object (which is created with
+the special translation syntax like L<__x()|Log::Report/"Messages (optionally translatable)">).
+
+The message may also be a plain piece of C<$text>, or a
+L<Log::Report::Exception|Log::Report::Exception> object. The C<%params> can be used to influence
+the dispatchers, like real message objects can.
 
 This function returns the LIST of dispatchers which accepted the C<$message>.
 When empty, no back-end has accepted it so the C<$message> was "lost".
@@ -225,13 +227,13 @@ program.
 
 Use this specific C<$locale>, in stead of the user's preference.
 
-=item location => STRING
+=item location => $location
 
 When defined, this location is used in the display.  Otherwise, it
 is determined automatically if needed.  An empty string will disable
 any attempt to display this line.
 
-=item stack => ARRAY
+=item stack => \@trace
 
 When defined, that data is used to display the call stack.  Otherwise,
 it is collected via C<caller()> if needed.
@@ -650,13 +652,13 @@ pollute your namespace with the useful abbrev functions.
 
 » example: of import
 
-  use Log::Report mode => 3;     # '3' or 'DEBUG'
+  use Log::Report mode => 3;      # '3' or 'DEBUG', no domain given
 
-  use Log::Report 'my-domain';   # in each package producing messages
+  use Log::Report 'my-domain';    # in each package producing messages
 
   use Log::Report 'my-domain',    # in one package, top of distr
     mode            => 'VERBOSE',
-    syntax          => 'REPORT', # report ERROR, not error()
+    syntax          => 'REPORT',  # report ERROR, not error()
     translator      => Log::Report::Translator::POT->new
       ( lexicon => '/home/mine/locale'  # translation tables
       ),
@@ -708,7 +710,7 @@ syntax.  The three tasks:
 
 =over 4
 
-=item *  produce some text on a certain condition,
+=item * produce some text on a certain condition,
 
 =item * translate it to the proper language, and
 
@@ -735,7 +737,19 @@ the graphical interface of the user may show the text in the language
 of the user --say Chinese in utf8--, but at the same time syslog may
 write the latin1 English version of the same message.
 
-=head2 Background ideas
+=head3 Lightweight Log::Report::Optional
+
+When you want to use L<Log::Report|Log::Report> features as cheap as possible, you
+may use L<Log::Report::Optional|Log::Report::Optional> in your module.  In this case, your
+module can use C<error()> and C<__x()> with very little cost: they
+will not build internal objects and support translations.  It's fast
+and few dependencies.
+
+The beauty is, then when the main program which uses module does
+initiate the full L<Log::Report|Log::Report> functionality, then your module will
+also switch to full support mode.
+
+=head3 Background ideas
 
 The following ideas are the base of this implementation:
 
@@ -918,7 +932,7 @@ of different reasons.  There is no need for C<confess> and C<croak>
 either, because the dispatcher can be configured to produce stack-trace
 information (for a limited sub-set of dispatchers)
 
-=head3 Report levels
+=head4 Report level comparison
 
 Various frameworks used with perl programs define different labels
 to indicate the reason for the message to be produced.
@@ -938,14 +952,14 @@ to indicate the reason for the message to be produced.
 
 =head3 Run modes
 
-The run-mode change which messages are passed to a dispatcher, but
-from a different angle than the dispatch filters; the mode changes
+The run-mode change which messages are passed to a dispatcher, the verbosity.
+It takes a different angle than the dispatch filters: the mode changes
 behavioral aspects of the messages, which are described in detail in
 L<Log::Report::Dispatcher/Processing the message>.  However, it should
 behave as you expect: the DEBUG mode shows more than the VERBOSE mode,
 and both show more than the NORMAL mode.
 
-=head4 Â» Example: extract run mode from Getopt::Long
+=head4 » Example: extract run mode from Getopt::Long
 
 The C<GetOptions()> function will count the number of C<v> options
 on the command-line when a C<+> is after the option name.
@@ -955,8 +969,8 @@ on the command-line when a C<+> is after the option name.
 
   my $mode;    # defaults to NORMAL
   GetOptions 'v+'        => \$mode,
-            'verbose=i' => \$mode,
-            'mode=s'    => \$mode
+             'verbose=i' => \$mode,
+             'mode=s'    => \$mode
       or exit 1;
 
   dispatcher 'PERL', 'default', mode => $mode;
@@ -965,11 +979,11 @@ Now, C<-vv> will set C<$mode> to C<2>, as will C<--verbose 2> and
 C<--verbose=2> and C<--mode=ASSERT>.  Of course, you do not need to
 provide all these options to the user: make a choice.
 
-=head4 Â» Example: the mode of a dispatcher
+=head4 » Example: the mode of a dispatcher
 
   my $mode = dispatcher(find => 'myname')->mode;
 
-=head4 Â» Example: run-time change mode of a dispatcher
+=head4 » Example: run-time change mode of a dispatcher
 
 To change the running mode of the dispatcher, you can do
 
@@ -1023,6 +1037,112 @@ untranslated, with all unprocessed parameters still at hand.
   }
 
 See L<Log::Report::Dispatcher::Try|Log::Report::Dispatcher::Try> and L<Log::Report::Exception|Log::Report::Exception>.
+
+=head2 Formats for interpolation and translation
+
+In above examples, you see C<__x()> everywhere.  When you use this,
+you get two benefits:
+
+=over 4
+
+=item 1. interpolation
+
+=item 2. optional translation
+
+=back
+
+Simple perl scripts will use C<print()> with variables in the string.
+However, when the content of the variable gets more unpredictable or
+needs some pre-processing, then it gets tricky.  When you do want to
+introduce translations (in the far future of your successful project)
+it gets impossible.  Let me give you some examples:
+
+  print "product: $name\n";    # simple perl
+
+  # Will not work because "$name" is interpolated too early
+  print translate("product: $name"), "\n";
+
+  # This is the gettext solution, with formats
+  printf translate("product: %s\n"), $name;
+
+  # With named in stead of positional parameters
+  print translate("product: {p}\n", p => $name);
+
+  # With Log::Report, the translate() is hidden in __x()
+  print __x"product: {p}\n", p => $name;
+
+Besides making translation possible, interpolation via format strings
+is much cleaner than in the simpelest perl way.  For instance, these
+cases:
+
+  # Safety measures while interpolation
+  my $name = undef;
+  print "product: $name\n";   # uninitialized warning
+  print __x"product: {p}\n", p => $name;  # --> product: undef
+
+  # Interpolation of more complex data
+  my @names = qw/a b c/;
+  print "products: ", join(', ', @names), "\n";
+  print __x"products: {p}\n", p => \@names;
+
+  # Padded values hard to do without format strings
+  print "padded counter: ", ' ' x (6-length $c), "$c\n";
+  printf "padded counter: %6d\n", $counter;
+  print __x"padded counter: {c%6d}\n", c => $counter;
+
+So: using formats has many advantages.  Advice: use simple perl only in
+trace and assert messages, maybe also with panics.  For serious output
+of your program, use formatted output.
+
+=head3 Format with String::Print
+
+This L<Log::Report|Log::Report> module uses L<String::Print|String::Print> to handle formatted strings.
+On object of that module is hidden in the logic of L<__x()|Log::Report/"Messages (optionally translatable)"> and friends.
+
+L<String::Print|String::Print> is a very capable format string processor, and you should
+really B<read its manual> page to see how it can help you.  It would be
+possible to support an other formatter (pretty simple even), but this is
+not (yet) supported.
+
+=head4 » Example: using format features
+
+  # This tries to display the $param as useful and safe as possible,
+  # where you have totally no idea what its contents is.
+  error __x"illegal parameter {p UNKNOWN}.", p => $param;
+  # ---> "illegal parameter 'accidentally passed text'."
+  # ---> "illegal parameter Unexpected::Object::Type."
+
+  # fault() adds ": $!", with $! translated when configured.
+  open my($fh), "<:encoding(utf-8)", $filename
+  	 or fault __x"cannot read {file}", file => $filename;
+
+  # Auto-abbreviation
+  trace __x"first lines: '{text EL}'\n", text => $t;
+  # ---> "first lines: 'This text is long, we sho⋯'.\n"
+
+  trace __x"first lines: {text CHOP}\n", text => $t;
+  # ---> "This text is long, we [+3712 chars]\n"
+
+  info __x"file {file} size {size BYTES}\n", file => $fn, size => -s $fn;
+  # --> "/etc/passwd size 23kB\n"
+
+There are more nice standard interpolation modifiers, and you can add
+your own.  Besides, you can add serializers which determine how
+objects are inlined.
+
+=head3 Translations
+
+Translating is optional.
+
+Distribution L<Log::Report::Lexicon|Log::Report::Lexicon> handles translations.  It will help
+you manage all L<__x()|Log::Report/"Messages (optionally translatable)"> (and friends) format strings in GNU's PO file
+format (F<https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html>)
+
+With L<Log::Report::Template|Log::Report::Template>, you can use L<Log::Report|Log::Report> with translations
+in various website template systems.
+
+Then, L<Dancer2::Plugin::LogReport|Dancer2::Plugin::LogReport> brings L<Log::Report|Log::Report> with exceptions
+and translations to the Dancer2 web framework.
 
 =head2 Compared to other solutions in Perl
 
@@ -1165,7 +1285,7 @@ into the translated text.
 
 =over 4
 
-=item Error: a message object is reported with more parameters
+=item Error: a message object is reported with more parameters.
 
 Cast by C<report()>
 
@@ -1181,15 +1301,15 @@ Cast by C<import()>
 
 Cast by C<import()>
 
-=item Error: odd length parameter list with '$msg'
+=item Error: odd length parameter list with '$msg'.
 
 Cast by C<report()>
 
-=item Error: odd length parameter list with object '$msg'
+=item Error: odd length parameter list with object '$msg'.
 
 Cast by C<report()>
 
-=item Error: only one dispatcher name accepted in SCALAR context
+=item Error: only one dispatcher name accepted in SCALAR context.
 
 In SCALAR context, only one dispatcher name accepted
 The L<dispatcher()|Log::Report/"Report production and configuration"> method returns the L<Log::Report::Dispatcher|Log::Report::Dispatcher>
@@ -1205,15 +1325,15 @@ Cast by C<import()>
 
 Cast by C<import()>
 
-=item Error: the 'filter' sub-command needs a CODE reference
+=item Error: the 'filter' sub-command needs a CODE reference.
 
 Cast by C<dispatcher()>
 
-=item Error: the 'needs' sub-command parameter '$need' is not a reason
+=item Error: the 'needs' sub-command parameter '$need' is not a reason.
 
 Cast by C<dispatcher()>
 
-=item Error: token '$token' not recognized as reason
+=item Error: token '$token' not recognized as reason.
 
 Cast by C<report()>
 
@@ -1225,8 +1345,8 @@ Cast by C<import()>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.42,
-built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.43,
+built on December 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

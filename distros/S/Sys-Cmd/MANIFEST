@@ -2,9 +2,11 @@ Changes
 cpanfile
 example/ex.pl
 lib/Sys/Cmd.pm
+lib/Sys/Cmd/Process.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+t/00-class-inlined.t
 t/info.pl
 t/sys-cmd.t
 TODO

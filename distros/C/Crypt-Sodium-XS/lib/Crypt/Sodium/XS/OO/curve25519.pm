@@ -84,7 +84,7 @@ __END__
 
 =head1 NAME
 
-Crypt::Sodium::XS::curve25519 - Low-level functions over Curve25519
+Crypt::Sodium::XS::OO::curve25519 - Low-level functions over Curve25519
 
 =head1 SYNOPSIS
 

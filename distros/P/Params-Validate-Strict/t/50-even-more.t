@@ -127,6 +127,24 @@ subtest 'invalid min/max' => sub {
 	like $@, qr/min must be <= max/, 'should die when min > max';
 };
 
+# Unicode length
+subtest 'checks number of characters not bytes' => sub {
+	my $schema = {
+		test => { type => 'string', min => 3, max => 4 },
+	};
+
+	my $input = { test => 'hello' };
+	eval { validate_strict(schema => $schema, input => $input, logger => $logger) };
+	like $@, qr/too long/, 'character too long is caught';
+
+	$input = { test => 'Allô' };
+	ok(validate_strict(schema => $schema, input => $input, logger => $logger));
+
+	$input = { test => 'où' };
+	eval { validate_strict(schema => $schema, input => $input, logger => $logger) };
+	like $@, qr/too short/, 'character count too short is caught';
+};
+
 # matches/nomatch with arrayrefs
 subtest 'regex with arrayrefs' => sub {
 	my $schema = {

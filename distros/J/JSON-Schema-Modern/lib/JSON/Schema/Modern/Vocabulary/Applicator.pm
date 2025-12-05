@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.626';
+our $VERSION = '0.627';
 
 use 5.020;
 use Moo;
@@ -21,7 +21,6 @@ no feature 'switch';
 use List::Util 1.45 'uniqstr';
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use Sub::Install;
 use JSON::Schema::Modern::Utilities qw(is_type jsonp E A assert_keyword_type assert_pattern true is_elements_unique);
 use JSON::Schema::Modern::Vocabulary::Unevaluated;
 use namespace::clean;
@@ -64,13 +63,11 @@ sub keywords ($class, $spec_version) {
 foreach my $phase (qw(traverse eval)) {
   foreach my $type (qw(Items Properties)) {
     my $method = '_'.$phase.'_keyword_unevaluated'.$type;
-    Sub::Install::install_sub({
-      as   => $method,
-      code => sub {
-        shift;
-        JSON::Schema::Modern::Vocabulary::Unevaluated->$method(@_);
-      }
-    }),
+    no strict 'refs';
+    *{__PACKAGE__.'::'.$method} = sub {
+      shift;
+      JSON::Schema::Modern::Vocabulary::Unevaluated->$method(@_);
+    };
   }
 }
 
@@ -103,7 +100,7 @@ sub _eval_keyword_anyOf ($class, $data, $schema, $state) {
     next if not $class->eval($data, $schema->{anyOf}[$idx],
       +{ %$state, errors => \@errors, keyword_path => $state->{keyword_path}.'/anyOf/'.$idx });
     ++$valid;
-    last if $state->{short_circuit};
+    last if $state->{short_circuit} and not $state->{collect_annotations};
   }
 
   return 1 if $valid;
@@ -140,7 +137,7 @@ sub _eval_keyword_not ($class, $data, $schema, $state) {
 
   return 1 if not $class->eval($data, $schema->{not},
     +{ %$state, keyword_path => $state->{keyword_path}.'/not',
-      short_circuit_suggested => 1, # errors do not propagate upward from this subschema
+      short_circuit => 1,           # errors do not propagate upward from this subschema
       collect_annotations => 0,     # nor do annotations
       errors => [] });
 
@@ -155,10 +152,7 @@ sub _eval_keyword_if ($class, $data, $schema, $state) {
   return 1 if not exists $schema->{then} and not exists $schema->{else}
     and not $state->{collect_annotations};
   my $keyword = $class->eval($data, $schema->{if},
-     +{ %$state, keyword_path => $state->{keyword_path}.'/if',
-        short_circuit_suggested => !$state->{collect_annotations},
-        errors => [],
-      })
+     +{ %$state, keyword_path => $state->{keyword_path}.'/if', short_circuit => 1, errors => [] })
     ? 'then' : 'else';
 
   return 1 if not exists $schema->{$keyword};
@@ -368,8 +362,14 @@ sub _eval_keyword_contains ($class, $data, $schema, $state) {
       push @valid, $idx;
 
       last if $state->{short_circuit}
-        and (not exists $schema->{maxContains} or $state->{_num_contains} > $schema->{maxContains})
-        and ($state->{_num_contains} >= ($schema->{minContains}//1));
+          # must continue until maxContains fails, but once it does we are guaranteed to be invalid,
+          # so can always stop evaluating immediately
+        and (exists $schema->{maxContains} and $state->{_num_contains} > $schema->{maxContains})
+          # once minContains succeeds, we can stop evaluating if no unevaluatedItems present
+          # (but only draft2020-12 collects annotations for "contains" evaluations)
+          or (not exists $schema->{maxContains}
+            and (not $state->{collect_annotations} or $state->{specification_version} ne 'draft2020-12')
+            and $state->{_num_contains} >= ($schema->{minContains}//1));
     }
   }
 
@@ -434,14 +434,10 @@ sub _eval_keyword_properties ($class, $data, $schema, $state) {
 }
 
 sub _traverse_keyword_patternProperties ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'object');
+  return if not $class->traverse_object_schemas($schema, $state);
 
-  my $valid = 1;
-  foreach my $property (sort keys $schema->{patternProperties}->%*) {
-    $valid = 0 if not assert_pattern({ %$state, _keyword_path_suffix => $property }, $property);
-    $valid = 0 if not $class->traverse_property_schema($schema, $state, $property);
-  }
-  return $valid;
+  0+!grep !assert_pattern({ %$state, _keyword_path_suffix => $_ }, $_),
+    sort keys $schema->{patternProperties}->%*;
 }
 
 sub _eval_keyword_patternProperties ($class, $data, $schema, $state) {
@@ -548,7 +544,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.626
+version 0.627
 
 =head1 DESCRIPTION
 

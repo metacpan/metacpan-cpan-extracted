@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.0",
             "File::Find" : "0",
             "File::Spec" : "0",
             "strict" : "0",
@@ -36,7 +36,7 @@
       "develop" : {
          "requires" : {
             "Imager" : "0",
-            "Pod::Markdown" : "3.005",
+            "Pod::Markdown::Githubert" : "0",
             "Pod::Text" : "4.09",
             "Test::Pod" : "1.22"
          }
@@ -61,12 +61,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Image-ThumbHash/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Image-ThumbHash",
-         "web" : "https://github.com/mauke/Image-ThumbHash"
+         "url" : "https://codeberg.org/mauke/Image-ThumbHash.git",
+         "web" : "https://codeberg.org/mauke/Image-ThumbHash"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

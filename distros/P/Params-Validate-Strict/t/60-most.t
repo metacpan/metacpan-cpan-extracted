@@ -50,6 +50,15 @@ subtest 'Transform functionality' => sub {
 	} 'dies with non-code transform';
 };
 
+subtest 'Catch meaningless min value for string' => sub {
+	dies_ok {
+		validate_strict(
+			schema => { test => { type => 'string', min => -2 } },
+			input => { test => 'Vickie' }
+		);
+	} 'dies min length for string < 0';
+};
+
 subtest 'Optional parameters with code references' => sub {
 	my $schema = {
 		optional_field => {

@@ -192,13 +192,14 @@ sub _encode_object_with_array {
                 if (@keys > 0) {
                     # First key with hyphen at current depth
                     my $first_key = $keys[0];
-                    my $first_val = $self->_encode_primitive($obj->{$first_key});
+                    local $self->{depth} = $self->{depth} + 1;
+                    my $first_val = $self->_encode_value($obj->{$first_key});
                     push @lines, $item_indent . "- $first_key: $first_val";
                     
                     # Remaining keys at depth+2 (one deeper)
                     for (my $i = 1; $i < @keys; $i++) {
                         my $k = $keys[$i];
-                        my $v = $self->_encode_primitive($obj->{$k});
+                        my $v = $self->_encode_value($obj->{$k});
                         push @lines, $field_indent . "$k: $v";
                     }
                 } else {

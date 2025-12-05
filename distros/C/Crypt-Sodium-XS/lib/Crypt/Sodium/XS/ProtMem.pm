@@ -62,6 +62,8 @@ __END__
 
 =encoding utf8
 
+=head1 NAME
+
 Crypt::Sodium::XS::ProtMem - Memory protection functions and constants
 
 =head1 SYNOPSIS

@@ -1,7 +1,7 @@
 ![](https://libsisimai.org/static/images/logo/sisimai-x01.png)
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-sisimai/blob/master/LICENSE)
 [![Perl](https://img.shields.io/badge/perl-v5.26--v5.42-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v5.4.1-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v5.5.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 [![codecov](https://codecov.io/github/sisimai/p5-sisimai/branch/5-stable/graph/badge.svg?token=8kvF4rWPM3)](https://codecov.io/github/sisimai/p5-sisimai)
 
 > [!IMPORTANT]
@@ -63,7 +63,7 @@ Sisimai(シシマイ)は複雑で多種多様なバウンスメールを解析�
 The key features of Sisimai
 ---------------------------------------------------------------------------------------------------
 * __バウンスメールを構造化したデータに変換__
-  * 以下26項目の情報を含むデータ構造[^2]
+  * 以下27項目の情報を含むデータ構造[^2]
     * __基本的情報__: `timestamp`, `origin`
     * __発信者情報__: `addresser`, `senderdomain`, 
     * __受信者情報__: `recipient`, `destination`, `alias`
@@ -80,7 +80,7 @@ The key features of Sisimai
   * `cpan`, `cpanm`, `cpm install`
   * `git clone & make`
 * __高い解析精度__
-  * [59種類のMTAs/MDAs/ESPs](https://libsisimai.org/en/engine/)に対応
+  * [60種類のMTAs/MDAs/ESPs](https://libsisimai.org/en/engine/)に対応
   * Feedback Loop(ARF)にも対応
   * [36種類のバウンス理由](https://libsisimai.org/en/reason/)を検出
 
@@ -109,7 +109,7 @@ Install
 ```shell
 $ cpanm --sudo Sisimai
 --> Working on Sisimai
-Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-5.2.1.tar.gz ... OK
+Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-5.5.0.tar.gz ... OK
 ...
 1 distribution installed
 $ perldoc -l Sisimai
@@ -136,14 +136,14 @@ $ cd ./p5-sisimai
 $ make install-from-local
 ./cpanm --sudo . || ( make cpm && ./cpm install --sudo -v . )
 --> Working on .
-Configuring Sisimai-v5.2.1 ... OK
-Building and testing Sisimai-v5.2.1 ... Password: <sudo password here>
+Configuring Sisimai-v5.5.0 ... OK
+Building and testing Sisimai-v5.5.0 ... Password: <sudo password here>
 OK
-Successfully installed Sisimai-v5.2.1
+Successfully installed Sisimai-v5.5.0
 1 distribution installed
 
 $ perl -MSisimai -lE 'print Sisimai->version'
-5.2.1
+5.5.0
 ```
 
 Usage
@@ -332,6 +332,7 @@ Output example
     "timezoneoffset": "+0900",
     "replycode": 550,
     "token": "84656774898baa90660be3e12fe0526e108d4473",
+    "toxic": false,
     "diagnostictype": "SMTP",
     "timestamp": 1650119685,
     "diagnosticcode": "host gmail-smtp-in.l.google.com[64.233.187.27] said: This mail has been blocked because the sender is unauthenticated. Gmail requires all senders to authenticate with either SPF or DKIM. Authentication results: DKIM = did not pass SPF [relay3.example.com] with ip: [192.0.2.22] = did not pass For instructions on setting up authentication, go to https://support.google.com/mail/answer/81126#authentication c2-202200202020202020222222cat.127 - gsmtp (in reply to end of DATA command)",
@@ -355,11 +356,11 @@ Sisimai 5.0.0から**Perl 5.26.0以上**が必要になります。
 |------------------------------------------------------|--------------------|---------------------|
 | 動作環境(Perl)                                       | 5.10 -             | **5.26** -          |
 | 元メールファイルを操作可能なコールバック機能         | なし               | あり[^3]            |
-| 解析エンジン(MTA/ESPモジュール)の数                  | 68                 | 59                  |
+| 解析エンジン(MTA/ESPモジュール)の数                  | 68                 | 60                  |
 | 検出可能なバウンス理由の数                           | 29                 | 36                  |
 | 依存もジュール数(Perlのコアモジュールを除く)         | 2 モジュール       | 2 モジュール        |
-| ソースコードの行数                                   | 10,800 行          | 9,900 行            |
-| テスト件数(t/とxt/ディレクトリ)                      | 270,000 件         | 320,000 件          |
+| ソースコードの行数                                   | 10,800 行          | 9,990 行            |
+| テスト件数(t/とxt/ディレクトリ)                      | 270,000 件         | 340,000 件          |
 | 1秒間に解析できるバウンスメール数[^4]                | 750 通             | 750 通              |
 | ライセンス                                           | 2条項BSD           | 2条項BSD            |
 | 開発会社による商用サポート                           | 提供中             | 提供中              |
@@ -399,7 +400,9 @@ Sisimai 5で3個のESPモジュール名(解析エンジン)が変更になり�
 | Google Workspace                                | `Rhost::GoogleApps`     | `Rhost::Google`     |
 | Tencent                                         | `Rhost::TencentQQ`      | `Rhost::Tencent`    |
 | Yahoo Mail (added at v5.1.0)                    | なし                    | `Rhost::YahooInc`   |
+| Zoho (added at v5.5.0)                          | なし                    | `Rhost::Zoho`       |
 | DragonFly Mail Agent (added at v5.1.0)          | なし                    | `Lhost::DragonFly`  |
+| Mimecast (added at v5.5.0)                      | なし                    | `Lhost::Mimecast`   |
 
 Bounce Reasons
 ---------------------------------------------------------------------------------------------------

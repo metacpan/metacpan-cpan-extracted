@@ -245,14 +245,19 @@ THX_sv_2moment(pTHX_ SV *sv, const char *name) {
 }
 
 static SV *
-THX_sv_2moment_coerce_sv(pTHX_ SV *sv) {
-    SV *res;
+THX_sv_2moment_coerce_sv(pTHX_ SV *sv, HV *stash) {
+    SV *res, *rv;
 
     if (THX_sv_isa_moment(aTHX_ sv))
         return sv;
     res = THX_sv_as_object(aTHX_ sv, "__as_Time_Moment");
     if(!res || !THX_sv_isa_moment(aTHX_ res))
         croak("Cannot coerce object of type %"SVf" to Time::Moment", THX_sv_2neat(aTHX_ sv));
+    rv = SvRV(res);
+    if (SvSTASH(rv) != stash) {
+        SvREFCNT_dec(SvSTASH(rv));
+        SvSTASH_set(rv, (HV*)SvREFCNT_inc(stash));
+    }
     return res;
 }
 
@@ -278,8 +283,8 @@ THX_sv_2moment_coerce_sv(pTHX_ SV *sv) {
 #define sv_2moment(sv, name) \
     THX_sv_2moment(aTHX_ sv, name)
 
-#define sv_2moment_coerce_sv(sv) \
-    THX_sv_2moment_coerce_sv(aTHX_ sv)
+#define sv_2moment_coerce_sv(sv, stash) \
+    THX_sv_2moment_coerce_sv(aTHX_ sv, stash)
 
 #define sv_isa_moment(sv) \
     THX_sv_isa_moment(aTHX_ sv)
@@ -356,7 +361,7 @@ THX_moment_now(pTHX_ bool utc) {
         if (tm == NULL)
             croak("localtime() failed: %s", Strerror(errno));
 
-        sec = ((1461 * (tm->tm_year - 1) >> 2) + tm->tm_yday - 25202) * 86400
+        sec = ((1461 * (tm->tm_year - 1) >> 2) + tm->tm_yday - 25202) * 86400LL
             + tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
         off = (sec - tv.tv_sec) / 60;
     }
@@ -573,12 +578,7 @@ from_object(klass, object)
   PREINIT:
     dSTASH_CONSTRUCTOR_MOMENT(klass);
   CODE:
-    /* PERL_UNUSED_VAR() fails on certain compilers because HV * const stash */ 
-    if (0) {
-        HV * dummy = stash;
-        PERL_UNUSED_VAR(dummy);
-    }
-    XSRETURN_SV(sv_2moment_coerce_sv(object));
+    XSRETURN_SV(sv_2moment_coerce_sv(object, stash));
 
 moment_t
 at_utc(self)

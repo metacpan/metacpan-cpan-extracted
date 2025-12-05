@@ -42,6 +42,7 @@ is $f->sprinti("Intro: {text EL(10XY)}", text => $text1),
 
 # Defaults
 
+$f->setDefaults(EL => { width => 20 });
 is $f->sprinti("Intro: {text EL}", text => $text1),
 	"Intro: 123456789012345678⋯ ", 'defaults';
 

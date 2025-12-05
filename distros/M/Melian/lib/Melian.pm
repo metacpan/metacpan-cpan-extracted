@@ -1,13 +1,14 @@
 package Melian;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Perl client to the Melian cache
-$Melian::VERSION = '0.002';
+$Melian::VERSION = '0.003';
 use v5.34;
-use JSON::XS qw<decode_json>;
+use Carp qw(croak);
 use IO::Socket::INET;
 use IO::Socket::UNIX;
+use JSON::XS qw(decode_json);
+use List::Util qw(first);
 use Socket qw(SOCK_STREAM);
-use Carp qw(croak);
 use constant {
     'MELIAN_HEADER_VERSION' => 0x11,
     'ACTION_FETCH'          => ord('F'),
@@ -29,6 +30,8 @@ sub new {
     my @schema_args = grep /^schema(?:_spec|_file)?$/, keys %args;
     @schema_args > 1
         and croak(q{Provide maximum one of: 'schema', 'schema_spec', 'schema_file'});
+
+    $self->connect();
 
     if (my $schema = $args{'schema'}) {
         $self->{'schema'} = $schema;
@@ -81,17 +84,40 @@ sub disconnect {
     return;
 }
 
+sub fetch_raw_from {
+    my ( $self, $table_name, $column_name, $key ) = @_;
+
+    # Get table ID
+    my $table = $self->_get_table($table_name);
+    my $table_id = $table->{'id'};
+
+    # Get column ID
+    my $column_id = $self->_get_column_id( $table, $column_name );
+    return $self->fetch_raw( $table_id, $column_id, $key );
+}
+
 sub fetch_raw {
-    my ($self, $table_id, $index_id, $key) = @_;
-    $self->connect();
+    my ( $self, $table_id, $column_id, $key ) = @_;
     defined $key
         or croak("You must provide a key to fetch");
-    return $self->_send(ACTION_FETCH(), $table_id, $index_id, $key);
+    return $self->_send(ACTION_FETCH(), $table_id, $column_id, $key);
+}
+
+sub fetch_by_string_from {
+    my ( $self, $table_name, $column_name, $key ) = @_;
+
+    # Get table ID
+    my $table = $self->_get_table($table_name);
+    my $table_id = $table->{'id'};
+
+    # Get column ID
+    my $column_id = $self->_get_column_id( $table, $column_name );
+    return $self->fetch_by_string( $table_id, $column_id, $key );
 }
 
 sub fetch_by_string {
-    my ($self, $table_id, $index_id, $key) = @_;
-    my $payload = $self->fetch_raw($table_id, $index_id, $key);
+    my ($self, $table_id, $column_id, $key) = @_;
+    my $payload = $self->fetch_raw($table_id, $column_id, $key);
     return undef if $payload eq '';
 
     my $decoded;
@@ -106,15 +132,27 @@ sub fetch_by_string {
     return $decoded;
 }
 
+sub fetch_by_int_from {
+    my ( $self, $table_name, $column_name, $id ) = @_;
+
+    # Get table ID
+    my $table = $self->_get_table($table_name);
+    my $table_id = $table->{'id'};
+
+    # Get column ID
+    my $column_id = $self->_get_column_id( $table, $column_name );
+
+    return $self->fetch_by_int( $table_id, $column_id, $id );
+}
+
 sub fetch_by_int {
-    my ($self, $table_id, $index_id, $id) = @_;
-    return $self->fetch_by_string($table_id, $index_id, pack('V', $id));
+    my ($self, $table_id, $column_id, $id) = @_;
+    return $self->fetch_by_string($table_id, $column_id, pack('V', $id));
 }
 
 sub _load_schema_from_describe {
     my $self = shift;
 
-    $self->connect();
     my $payload = $self->_send(ACTION_DESCRIBE(), 0, 0, '');
     defined $payload && length $payload
         or croak('Could not get schema data');
@@ -183,10 +221,9 @@ sub _load_schema_from_spec {
 }
 
 sub _send {
-    my ( $self, $action, $table_id, $index_id, $payload ) = @_;
+    my ( $self, $action, $table_id, $column_id, $payload ) = @_;
     $payload //= '';
-    $self->connect();
-    defined $table_id && defined $index_id
+    defined $table_id && defined $column_id
         or croak("Invalid table ID or index ID");
 
     my $header = pack(
@@ -194,7 +231,7 @@ sub _send {
         MELIAN_HEADER_VERSION(),
         $action,
         $table_id,
-        $index_id,
+        $column_id,
         length $payload,
     );
 
@@ -230,6 +267,30 @@ sub _read_exactly {
     return $buffer;
 }
 
+sub _get_table {
+    my ( $self, $name ) = @_;
+    my $table = List::Util::first(
+        sub { $_->{'name'} eq $name },
+        @{ $self->{'schema'}{'tables'} },
+    );
+
+    $table or croak("Cannot find table named '$name'");
+    return $table;
+}
+
+sub _get_column_id {
+    my ( $self, $table, $name ) = @_;
+
+    # Get column ID
+    my $column = List::Util::first(
+        sub { $_->{'column'} eq $name },
+        @{ $table->{'indexes'} },
+    );
+
+    $column or croak("Cannot find column named '$name'");
+    return $column->{'id'};
+}
+
 1;
 
 __END__
@@ -244,7 +305,7 @@ Melian - Perl client to the Melian cache
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -298,8 +359,8 @@ Logic for handling schema:
 
     $client->connect();
 
-Explicitly opens the underlying socket if it is not already connected. Usually
-called automatically by fetch routines.
+Explicitly opens the underlying socket if it is not already connected. Called
+automatically when create a new Melian instance.
 
 =head2 disconnect
 
@@ -309,24 +370,50 @@ Closes the socket connection.
 
 =head2 fetch_raw
 
-    my $payload = $client->fetch_raw($table_id, $index_id, $key_bytes);
+    my $payload = $client->fetch_raw($table_id, $column_id, $key_bytes);
 
 Sends a C<FETCH> action and returns the raw payload as bytes for the specified
 table/index pair.
 
 =head2 fetch_by_string
 
-    my $row = $client->fetch_by_string($table_id, $index_id, $key_bytes);
+    my $row = $client->fetch_by_string($table_id, $column_id, $string_key);
 
 Like C<fetch_raw> but decodes the JSON payload into a hashref, or returns
 C<undef> if the server responds with an empty payload.
 
+=head2 fetch_by_string_from
+
+    my $row = $client->fetch_by_string_from(
+        $table_name,
+        $column_name,
+        $string_key,
+    );
+
+Similar to C<fetch_by_string> but doesn't require IDs. Instead, it receives
+the table and column names and determines the IDs itself.
+
+C<fetch_by_string()> is faster.
+
 =head2 fetch_by_int
 
-    my $row = $client->fetch_by_int($table_id, $index_id, $numeric_id);
+    my $row = $client->fetch_by_int($table_id, $column_id, $numeric_key);
 
 Helper for integer primary keys; packs the ID into little-endian bytes and
 returns the decoded row.
+
+=head2 fetch_by_int_from
+
+    my $row = $client->fetch_by_int_from(
+        $table_name,
+        $column_name,
+        $numeric_key,
+    );
+
+Similar to C<fetch_by_int> but doesn't require IDs. Instead, it receives
+the table and column names and determines the IDs itself.
+
+C<fetch_by_int()> is faster.
 
 =head2 describe_schema
 

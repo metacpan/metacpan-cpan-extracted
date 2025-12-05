@@ -1,3 +1,6 @@
+0.03  2025-12-05
+    - Add convenience functions `imager_to_rgba`, `imager_to_thumb_hash`.
+
 0.02  2023-03-25
     - Fix test failure on `-Duselongdouble` builds.
 

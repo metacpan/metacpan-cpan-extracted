@@ -1,5 +1,14 @@
 Change log for Graphics::Framebuffer
 
+6.79   December 04, 2025
+
+       "pixel_size" removed.  Other optimizations.
+	   Added accelerated flood fill.  Works great.
+
+6.78   November 28, 2025
+
+       Added a manual index
+
 6.77   November 26, 2025
 
        Optimized much of Framebuffer.c

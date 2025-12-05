@@ -12,8 +12,8 @@ sudo apt install -y build-essential \
                     libjpeg-dev \
                     libpng-dev \
                     libtiff-dev \
-					ffmpeg \
-					fonts-freefont-ttf \
+                    ffmpeg \
+                    fonts-freefont-ttf \
                     fonts-wine
 
 # Only needed if you are using the OS installed (packaged) Perl

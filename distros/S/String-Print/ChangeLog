@@ -4,12 +4,18 @@
 All modifications where created by Mark Overmeer, unless explicitly
 stated differently.
 
+version 1.01: Thu  4 Dec 16:43:36 CET 2025
+
+	Improvements:
+	- add UNKNOWN modifier
+	- doc improvements
+
 version 1.00: Wed  3 Dec 13:21:40 CET 2025
 
 	Improvements:
 	- add bugtracker to meta
-	- add ellipsis modifier
-	- add chop modifier
+	- add ellipsis EL modifier
+	- add CHOP modifier
 	- add defaults configuration
 	- better document encodeFor()
 	- add DateTime support for time modifiers

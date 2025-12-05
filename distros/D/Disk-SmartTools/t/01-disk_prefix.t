@@ -4,7 +4,7 @@ use lib 'lib';
 use Test2::V0;
 
 use Dev::Util::Syntax;
-use Dev::Util::OS    qw(get_os is_linux is_mac);
+use Dev::Util::OS    qw(:all);
 use Dev::Util::File  qw(file_executable);
 use Disk::SmartTools qw(:all);
 

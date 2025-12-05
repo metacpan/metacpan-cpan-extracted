@@ -1,5 +1,5 @@
 package Mooish::Base;
-$Mooish::Base::VERSION = '1.000';
+$Mooish::Base::VERSION = '1.001';
 use v5.10;
 use strict;
 use warnings;
@@ -39,6 +39,12 @@ sub import
 		elsif ($arg eq -standard) {
 			$standard = !!1;
 		}
+	}
+
+	# Moo is the best choice for module development
+	if ($standard) {
+		$class_type = 'Moo';
+		$role_type = 'Moo::Role';
 	}
 
 	my $engine = $role ? $role_type : $class_type;
@@ -153,17 +159,24 @@ module is not installed and Moose flavour is used.
 
 If you wish to use Mooish::Base in your module, please use it with C<-standard>
 flag. This flag will prevent custom behavior from propagating into the module.
-Currently, it will only cause L<Mooish::AttributeBuilder> to be imported with
-C<-standard> flag. If some other custom behavior prove undesirable in the
-future, it may be included as well.
+The idea is to have a solid base OO for module development while making sure
+that it won't break when users add custom settings.
 
-Please be aware that having a variable OO engine may not be good for all
-modules. Obvious example of where it is bad is the case where your code mixes
-in roles which were not written using Mooish::Base. If this ever becomes a
-pressing problem, a way to force flavour (regardless of environmental flags)
-may be added in the future, and it may be included as a part of C<-standard>
-flag behavior. If you expect your code to be sensitive to changes in the
-flavour environmental flag, avoid depending on this module in your module.
+Currently, it will ensure that:
+
+=over
+
+=item
+
+L<Mooish::AttributeBuilder> will be imported with C<-standard> flag (no
+user-defined shortcuts). I<(in effect since version 1.000)>
+
+=item
+
+L<Moo> and L<Moo::Role> will be used regardless of the environment variables.
+I<(in effect since version 1.001)>
+
+=back
 
 =head1 SEE ALSO
 

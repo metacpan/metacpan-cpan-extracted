@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.625-7-g636676a5
+package JSON::Schema::Modern; # git description: v0.626-11-ga2961894
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.626';
+our $VERSION = '0.627';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -409,9 +409,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     abort($state, 'EXCEPTION: unable to find resource "%s"', $schema_reference)
       if not $schema_info;
 
-    abort($state, 'EXCEPTION: collect_annotations cannot be used with specification_version '.$schema_info->{specification_version})
-      if $config_override->{collect_annotations} and $schema_info->{specification_version} =~ /^draft[467]$/;
-
     abort($state, 'EXCEPTION: "%s" is not a schema', $schema_reference)
       if not $schema_info->{document}->get_entity_at_location($schema_info->{document_path});
 
@@ -458,9 +455,16 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
   if ($state->{seen_data_properties}) {
     my @unevaluated_properties = grep !$state->{seen_data_properties}{$_}, keys $state->{seen_data_properties}->%*;
+    my %unknown_keywords;
     foreach my $property (sort @unevaluated_properties) {
-      $valid = E({ %$state, data_path => $property }, 'unknown keyword found in schema: %s',
-        $property =~ m{/([^/]+)$});
+      my ($parent, $keyword) = ($property =~ m{^(.*)/([^/]*)$});
+      push(($unknown_keywords{$parent}//=[])->@*, $keyword);
+    }
+
+    foreach my $parent (sort keys %unknown_keywords) {
+      $valid = E({ %$state, data_path => $parent },
+        'unknown keyword%s seen in schema: %s', $unknown_keywords{$parent}->@* > 1 ? 's' : '',
+        join(', ', sort $unknown_keywords{$parent}->@*));
     }
   }
 
@@ -656,7 +660,7 @@ sub _traverse_subschema ($self, $schema, $state) {
   delete $state->{keyword};
 
   if ($self->strict and keys %unknown_keywords) {
-    $valid = E($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
+    $valid = E($state, 'unknown keyword%s seen in schema: %s', keys %unknown_keywords > 1 ? 's' : '',
       join(', ', sort keys %unknown_keywords));
   }
 
@@ -723,11 +727,6 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       || ((my $is_object_data = ref $data eq 'HASH')
         && (exists $schema->{unevaluatedProperties} || !!$state->{seen_data_properties})));
 
-  # in order to collect annotations for unevaluated* keywords, we sometimes need to ignore the
-  # suggestion to short_circuit evaluation at this scope (but lower scopes are still fine)
-  $state->{short_circuit} = ($state->{short_circuit} || delete($state->{short_circuit_suggested}))
-    && !exists($schema->{unevaluatedItems}) && !exists($schema->{unevaluatedProperties});
-
   # we use an index rather than iterating through the lists directly because the lists of
   # vocabularies and keywords can change after we have started. However, only the Core vocabulary
   # and $schema keyword can make this change, and they both come first, therefore a simple index
@@ -754,6 +753,8 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{specification_version} =~ /^draft[467]$/;
 
       delete $unknown_keywords{$keyword};
+      next if not $valid and $state->{short_circuit} and $state->{strict};
+
       $state->{keyword} = $keyword;
 
       if ($sub) {
@@ -766,7 +767,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
               if $error_count == $state->{errors}->@*;
             $valid = 0;
 
-            last ALL_KEYWORDS if $state->{short_circuit};
+            last ALL_KEYWORDS if $state->{short_circuit} and not $state->{strict};
             next;
           }
 
@@ -790,7 +791,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
             if $error_count == $state->{errors}->@*;
           $valid = 0;
 
-          last ALL_KEYWORDS if $state->{short_circuit};
+          last ALL_KEYWORDS if $state->{short_circuit} and not $state->{strict};
           next;
         }
         warn 'callback result is true but there are errors (keyword: '.$keyword.')'
@@ -802,7 +803,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   delete $state->{keyword};
 
   if ($state->{strict} and keys %unknown_keywords) {
-    abort($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
+    abort($state, 'unknown keyword%s seen in schema: %s', keys %unknown_keywords > 1 ? 's' : '',
       join(', ', sort keys %unknown_keywords));
   }
 
@@ -1292,7 +1293,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.626
+version 0.627
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,6 @@ BEGIN
     use open ':std' => ':utf8';
     use vars qw( $DEBUG );
     use Test::More qw( no_plan );
-    use Data::Pretty qw( dump ); # REMOVE ME
     use Module::Generic::File qw( cwd file tempfile );
     use POSIX ();
     use I18N::Langinfo qw( langinfo );
@@ -143,7 +142,6 @@ subtest 'Deep recursion' => sub
     ok( $po->parse( $file ), "parse(depth-root.po) with max_recurse => 2" );
 
     my @ids = sort( _msgids( $po ) );
-    diag( "\@ids are: ", dump( \@ids ) ) if( $DEBUG ); # REMOVE ME
 
     ok( grep( $_ eq 'depth-root', @ids ), "depth-root present" );
     ok( grep( $_ eq 'depth-1',    @ids ), "depth-1 present" );
@@ -160,7 +158,6 @@ subtest 'Deep recursion' => sub
         "higher levels beyond depth-4 are not included either"
     );
 
-    diag( "\@warnings contains: ", dump( \@warnings ) ) if( $DEBUG ); # REMOVE ME
     ok(
         join( '', @warnings ) =~ /Maximum include recursion depth/i,
         "A warning is emitted when maximum include depth is reached"

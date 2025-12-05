@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v3.3.16] - 2025-12-04
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🧪 Testing
+
+- *(use)* Update imported functions
+
+## [release/2025/12/02/1312] - 2025-12-02
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v3.3.15] - 2025-12-02
 
 ### 🚀 Features

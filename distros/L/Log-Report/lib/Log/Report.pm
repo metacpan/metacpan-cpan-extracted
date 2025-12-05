@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Log-Report version 1.42.
+# This code is part of Perl distribution Log-Report version 1.43.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package Log::Report;{
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 }
 
 use base 'Exporter';
@@ -87,7 +83,7 @@ sub report($@)
 	}
 
 	is_reason $reason
-		or error __x"token '{token}' not recognized as reason", token=>$reason;
+		or error __x"token '{token UNKNOWN}' not recognized as reason.", token => $reason;
 
 	# return when no-one needs it: skip unused trace() fast!
 	@disp || $stop
@@ -118,7 +114,7 @@ sub report($@)
 	my $exception;
 	if(!blessed $message)
 	{	# untranslated message into object
-		@_%2 and error __x"odd length parameter list with '{msg}'", msg => $message;
+		@_%2 and error __x"odd length parameter list with '{msg}'.", msg => $message;
 		$message   = $lrm->new(_prepend => $message, @_);
 	}
 	elsif($message->isa('Log::Report::Exception'))
@@ -126,13 +122,13 @@ sub report($@)
 		$message   = $exception->message;
 	}
 	elsif($message->isa('Log::Report::Message'))
-	{	@_==0 or error __x"a message object is reported with more parameters";
+	{	@_==0 or error __x"a message object is reported with more parameters.";
 	}
 	else
 	{	# foreign object
 		my $text = "$message";  # hope stringification is overloaded
 		$text	=~ s/\s*$//gs;
-		@_%2 and error __x"odd length parameter list with object '{msg}'", msg => $text;
+		@_%2 and error __x"odd length parameter list with object '{msg}'.", msg => $text;
 		$message = $lrm->new(_prepend => $text, @_);
 	}
 
@@ -192,7 +188,7 @@ sub dispatcher($@)
 		{	my $has = first {$_->name eq $name} @$disps;
 			if(defined $has && $has ne $default_dispatcher)
 			{	my $default = $name eq 'default' ? ' (refreshing configuration instead)' : '';
-				trace "not reopening $name$default";
+				trace "not reopening $name$default.";
 				return $has;
 			}
 		}
@@ -211,7 +207,7 @@ sub dispatcher($@)
 
 	my $command = shift;
 	if($command eq 'list')
-	{	@_ and mistake __"the 'list' sub-command doesn't expect additional parameters";
+	{	@_ and mistake __"the 'list' sub-command doesn't expect additional parameters.";
 		my @disp = @{$reporter->{dispatchers}};
 		push @disp, $nested_tries[-1] if @nested_tries;
 		return @disp;
@@ -219,14 +215,14 @@ sub dispatcher($@)
 	if($command eq 'needs')
 	{	my $reason = shift || 'undef';
 		is_reason $reason
-			or error __x"the 'needs' sub-command parameter '{need}' is not a reason", need => $reason;
+			or error __x"the 'needs' sub-command parameter '{need}' is not a reason.", need => $reason;
 		my $disp = $reporter->{needs}{$reason};
 		return $disp ? @$disp : ();
 	}
 	if($command eq 'filter')
 	{	my $code = shift;
 		ref $code eq 'CODE'
-			or error __"the 'filter' sub-command needs a CODE reference";
+			or error __"the 'filter' sub-command needs a CODE reference.";
 		my %names = map +($_ => 1), @_;
 		push @{$reporter->{filters}}, [ $code, \%names ];
 		return ();
@@ -251,8 +247,8 @@ sub dispatcher($@)
 		for my $n (@_) { push @disps, grep $_->name eq $n, @$disps }
 	}
 
-	error __"only one dispatcher name accepted in SCALAR context"
-		if @disps > 1 && !wantarray && defined wantarray;
+	wantarray || @disps < 2
+		or  error __"only one dispatcher name accepted in SCALAR context.";
 
 	if($command eq 'close')
 	{	my %kill = map +($_->name => 1), @disps;
@@ -292,7 +288,7 @@ sub try(&@)
 {	my $code = shift;
 
 	@_ % 2 and report +{ location => [caller 0] },
-		PANIC => __x"odd length parameter list for try(): forgot the terminating ';'?";
+		PANIC => __"odd length parameter list for try(): forgot the terminating ';'?";
 
 	unshift @_, mode => 'DEBUG'
 		if $reporter->{needs}{TRACE};

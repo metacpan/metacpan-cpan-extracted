@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,12 +24,13 @@ requires:
   Encode: '2.00'
   Log::Report::Optional: '1.07'
   Scalar::Util: '0'
-  String::Print: '0.91'
+  String::Print: '1.00'
   Sys::Syslog: '0.27'
 resources:
+  bugtracker: https://github.com/markov2/perl5-Log-Report/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Log-Report.git
-version: '1.42'
+version: '1.43'
 x_oodist:
   email: markov@cpan.org
   first_year: 2007
@@ -46,7 +47,6 @@ x_oodist:
       webpages: ../public_html/logreport/html
     -
       export: website
-      include_manuals: ~
       markup: html
       publish: ../public_html/log-report/doctree
       serializer: json

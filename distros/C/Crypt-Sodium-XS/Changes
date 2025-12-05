@@ -1,3 +1,9 @@
+0.000041 Dec 5 2025
+
+- add fallback for older Fcntl
+
+- fix termios flag setting
+
 0.000040 Dec 4 2025
 
 - re-factoring of MemVault file/tty io functions

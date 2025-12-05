@@ -12,7 +12,7 @@ Use a Virtual Machine like VirtualBox to use on Windows, with a Linux distributi
 
 ## PREREQUISITES
 
-This module was developed for Linux, but can work on any Unix-like OS *as long as it has a framebuffer*.  HOWEVER, for anything other than Linux, it's not likely to work out of the box.  It expects a framebuffer inside of "/dev".  It also requires a Linux-specific IOCTL call to be able to query the structure of the framebuffer.  This query requires a portion of the kernel source code to be used to understand the kernel structure returned from the IOCTL call.  The actual module code can work on something like FreeBSD, but considerable overhead modification needs to be done for the build process to make it actually work.  I suggest using Linux if you want to exploit the framebuffer, especially a UEFI install to make it the easiest.
+This module was developed for Linux and only Linux.
 
 This module REQUIRES access to the video framebuffer, usually "/dev/fb0".  You must be using a video device and driver that exposes this device to software.  Video cards with their proprietary drivers are not likely to work.  However, most open-sourced drivers, seem to work fine.  VirtualBox drivers work too.  You must also have the appropriate permissions to write to this device (usually membership with group "video").
 

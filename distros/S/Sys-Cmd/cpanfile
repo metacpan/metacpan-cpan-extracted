@@ -21,9 +21,11 @@ on develop => sub {
 };
 
 on test => sub {
-    requires 'Cwd'          => 0;
-    requires 'Data::Dumper' => 0;
-    requires 'File::Temp'   => 0;
-    requires 'File::Spec'   => 0;
-    requires 'Test2::V0'    => 0;
+    requires 'Cwd'                           => 0;
+    requires 'Data::Dumper'                  => 0;
+    requires 'File::Temp'                    => 0;
+    requires 'File::Spec'                    => 0;
+    requires 'Test2::V0'                     => 0;
+    requires 'Test2::Require::AuthorTesting' => 0;
+    requires 'Test2::Require::Module'        => 0;
 };

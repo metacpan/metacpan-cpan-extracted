@@ -18,5 +18,6 @@ t/05_security.t
 t/06_delimiters.t
 t/07_root_forms.t
 t/08_column_priority.t
+t/09_nested_hash_from_json.t
 META.yml
 MANIFEST

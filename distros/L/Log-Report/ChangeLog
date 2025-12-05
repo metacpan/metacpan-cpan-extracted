@@ -7,6 +7,13 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.43: Fri  5 Dec 11:32:36 CET 2025
+
+	Improvements:
+	- add bugtracker to meta
+	- add github Funding references
+	- explain formats better
+
 version 1.42: Tue  4 Nov 10:24:16 CET 2025
 
 	Changes:
@@ -1047,13 +1054,13 @@ version 0.05: Thu Jun  7 13:18:13 CEST 2007
 	  get interpreted (PPI does not do that automatically)
 	- ::Extract::PPI: only report the nessecary
 	- after a long discussion within Amsterdam.pm about concatenation
-          of translated fragments, it was decided to permit it but put
+	  of translated fragments, it was decided to permit it but put
 	  some extra warnings in the docs.
 	- also warn about __'xx'   meaning   __::xx '
 	- updated log-report/nl_NL.po translations
 	- configure native_language for a domain
 	- untranslated messages will still be formatted according to the
-          rules of the native_language
+	  rules of the native_language
 	- translator table setting per domain now integrated with
 	  other settings for the domain.
 	- ran ispell on the man-pages

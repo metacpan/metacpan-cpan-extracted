@@ -6,7 +6,7 @@ use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
@@ -17,6 +17,7 @@ use warnings FATAL => 'all';
 use Capture::Tiny 'capture';
 use Exporter 'import';
 our @EXPORT = qw(say2 task);
+our @EXPORT_OK = @EXPORT;
 
 sub say2 { # say to both command line and
 	my ($msg, $fh) = @_;
@@ -25,7 +26,7 @@ sub say2 { # say to both command line and
 	if (not openhandle($fh)) {
 		die "the filehandle given to $current_sub with \"$msg\" from $c[1] line $c[2] isn't actually a filehandle";
 	}
-	$msg = "\@ $c[1] line $c[2] " . $msg;
+	$msg = "\@ $c[1] line $c[2] $msg";
 	say $msg;
 	say $fh $msg;
 }
@@ -48,29 +49,24 @@ sub task {
 	my @defined_args = ( @reqd_args,
 		'die',			  # die if not successful; 0 or 1
 		'input.files',   # check for input files; SCALAR or ARRAY
-		'log.fh',        # print to filehandle
+		'log.fh',
 		'note',          # a note for the log
 		'overwrite',     # 
 		'output.files'	  # product files that need to be checked; can be scalar or array
 	);
-	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $args };
-	if (scalar @bad_args > 0) {
-		p @bad_args, array_max => scalar @bad_args;
-		say "the above arguments are not recognized by $current_sub";
-		p @defined_args, array_max => scalar @defined_args;
-		die "The above args are accepted by $current_sub";
-	}
+#	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $args };
+#	if (scalar @bad_args > 0) {
+#		p @bad_args, array_max => scalar @bad_args;
+#		say "the above arguments are not recognized by $current_sub";
+#		p @defined_args, array_max => scalar @defined_args;
+#		die "The above args are accepted by $current_sub";
+#	}
 	if (
-			(defined $args->{'log.fh'})
-			&&
+			(defined $args->{'log.fh'}) &&
 			(not openhandle($args->{'log.fh'}))
 		) {
 		p $args;
 		die "the filehandle given to $current_sub isn't actually a filehandle";
-	}
-	if (not defined $args->{'log.fh'}) {
-		p $args;
-		warn "$current_sub didn't receive a filehandle: no logging for the above task will be done.";
 	}
 	my (%input_file_size, @existing_files, @output_files);
 	if (defined $args->{'input.files'}) {
@@ -95,7 +91,9 @@ sub task {
 			die 'the above files are missing or are not readable';
 		}
 	}
-	say 'The command is ' . colored(['blue on_bright_red'], $args->{cmd});
+	my $msg = "At $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
+	say $msg;
+	say {$args->{'log.fh'}} $msg if defined $args->{'log.fh'};
 	if (defined $args->{'output.files'}) { # avoid "uninitialized value" warning
 		my $ref = ref $args->{'output.files'};
 		if ($ref eq 'ARRAY') {
@@ -111,7 +109,7 @@ sub task {
 		@existing_files = grep {-f $_} @output_files;
 	}
 	$args->{'die'}			= $args->{'die'}		// 'true';
-	$args->{overwrite}	= $args->{overwrite} // 'false';
+	$args->{overwrite}	= $args->{overwrite} // 0; # by default, false
 	my %r = (
 		cmd             => $args->{cmd},
 		'die'           => $args->{'die'},
@@ -129,11 +127,14 @@ sub task {
 		$r{'input.file.size'} = \%input_file_size;
 	}
 	my %output_file_size = map {$_ => -s $_} @output_files;
-	if (($args->{overwrite} eq 'false') && (scalar @existing_files > 0)) { # this has been done before
+	my $n_output_files = scalar @output_files;
+	if ((!$args->{overwrite}) && (scalar @output_files > 0) && (scalar @existing_files == $n_output_files)) { # this has been done before
+		p @existing_files;
 		say colored(['black on_green'], "\"$args->{cmd}\"\n") . ' has been done before';
 		$r{done} = 'before';
 		$r{'output.file.size'} = \%output_file_size;
 		p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
+		$r{duration} = 0;
 		return \%r;
 	}
 	my $t0 = Time::HiRes::time();

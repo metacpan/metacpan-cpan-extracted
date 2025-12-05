@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Log-Report version 1.42.
+# This code is part of Perl distribution Log-Report version 1.43.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Dispatcher::Callback;{
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 }
 
 use base 'Log::Report::Dispatcher';

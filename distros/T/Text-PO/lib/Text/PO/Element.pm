@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.4.1
+## Version v0.4.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
-## Modified 2025/10/08
+## Modified 2025/12/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,7 @@ BEGIN
         fallback => 1,
     );
     use Text::Wrap ();
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.4.2';
     use open ':std' => ':utf8';
 };
 
@@ -495,7 +495,7 @@ Text::PO::Element - PO Element
 
 =head1 VERSION
 
-    v0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -870,6 +870,10 @@ Set or  gets whether this element has the C<fuzzy> flag. Default to false.
 =head2 id
 
 Return the value of L<msgid> as a string
+
+=head2 is_include
+
+Sets or gets the boolean value whether this is a include directive or not. Defaults to false.
 
 =head2 is_meta
 

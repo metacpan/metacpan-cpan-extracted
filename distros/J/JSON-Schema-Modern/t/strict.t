@@ -22,10 +22,14 @@ my $schema = {
   '$id' => 'my_loose_schema',
   type => 'object',
   properties => {
-    foo => {
+    alpha => {
       title => 'bloop', # produces an annotation for 'title' with value 'bloop'
       bloop => 'hi',    # unknown keyword
       barf => 'no',     # unknown keyword
+    },
+    beta => {
+      zip => 1,         # unknown keyword
+      dah => 2,         # unknown keyword
     },
   },
 };
@@ -33,25 +37,26 @@ my $schema = {
 my $document = $js->add_schema($schema);
 
 cmp_result(
-  $js->evaluate({ foo => 1 }, 'my_loose_schema')->TO_JSON,
+  $js->evaluate({ alpha => 1, beta => 2 }, 'my_loose_schema')->TO_JSON,
   { valid => true },
   'by default, unknown keywords are allowed in evaluate()',
 );
 
 cmp_result(
-  $js->evaluate({ foo => 1 }, 'my_loose_schema', { strict => 1 })->TO_JSON,
+  $js->evaluate({ alpha => 1, beta => 2 }, 'my_loose_schema', { strict => 1 })->TO_JSON,
   {
     valid => false,
     errors => [
       {
-        instanceLocation => '/foo',
-        keywordLocation => '/properties/foo',
-        absoluteKeywordLocation => 'my_loose_schema#/properties/foo',
-        error => 'unknown keywords found: barf, bloop',
+        instanceLocation => '/alpha',
+        keywordLocation => '/properties/alpha',
+        absoluteKeywordLocation => 'my_loose_schema#/properties/alpha',
+        error => 'unknown keywords seen in schema: barf, bloop',
       },
+      # beta not examined -- we immediately abort
     ],
   },
-  'strict mode disallows unknown keywords during evaluation via a config override',
+  'strict mode abort immediately on unknown keywords during evaluation via a config override',
 );
 
 cmp_result(
@@ -66,41 +71,24 @@ cmp_result(
     valid => false,
     errors => [
       {
-        instanceLocation => '/properties/foo/barf',
+        instanceLocation => '/properties/alpha',
         keywordLocation => '',
         absoluteKeywordLocation => 'https://json-schema.org/draft/2020-12/schema',
-        error => 'unknown keyword found in schema: barf',
+        error => 'unknown keywords seen in schema: barf, bloop',
       },
       {
-        instanceLocation => '/properties/foo/bloop',
+        instanceLocation => '/properties/beta',
         keywordLocation => '',
         absoluteKeywordLocation => 'https://json-schema.org/draft/2020-12/schema',
-        error => 'unknown keyword found in schema: bloop',
+        error => 'unknown keywords seen in schema: dah, zip',
       },
     ],
   },
-  'strict mode disallows unknown keywords in validate_schema() via a config override',
+  'strict mode finds all unknown keywords in validate_schema() via a config override',
 );
 
 
 $js = JSON::Schema::Modern->new(strict => 1);
-$js->add_document($document);
-
-cmp_result(
-  $js->evaluate({ foo => 1 }, $document->canonical_uri)->TO_JSON,
-  {
-    valid => false,
-    errors => [
-      {
-        instanceLocation => '/foo',
-        keywordLocation => '/properties/foo',
-        absoluteKeywordLocation => 'my_loose_schema#/properties/foo',
-        error => 'unknown keywords found: barf, bloop',
-      },
-    ],
-  },
-  'strict mode disallows unknown keywords during evaluation, even if the document was already traversed',
-);
 
 cmp_result(
   $js->validate_schema($schema)->TO_JSON,
@@ -110,18 +98,23 @@ cmp_result(
 
 delete $schema->{'$id'};
 cmp_result(
-  $js->evaluate({ foo => 1 }, $schema)->TO_JSON,
+  $js->evaluate({ alpha => 1 }, $schema)->TO_JSON,
   {
     valid => false,
     errors => [
       {
         instanceLocation => '', # note no instance location - indicating evaluation has not started
-        keywordLocation => '/properties/foo',
-        error => 'unknown keywords found: barf, bloop',
+        keywordLocation => '/properties/alpha',
+        error => 'unknown keywords seen in schema: barf, bloop',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/properties/beta',
+        error => 'unknown keywords seen in schema: dah, zip',
       },
     ],
   },
-  'strict mode disallows unknown keywords during traverse',
+  'strict mode finds all unknown keywords during traverse',
 );
 
 my $lax_metaschema = {
@@ -143,14 +136,20 @@ cmp_result(
     valid => false,
     errors => [
       {
-        instanceLocation => '/properties/foo/barf',
+        instanceLocation => '/properties/alpha',
         keywordLocation => '',
         absoluteKeywordLocation => 'my_lax_metaschema',
-        error => 'unknown keyword found in schema: barf',
+        error => 'unknown keyword seen in schema: barf',
+      },
+      {
+        instanceLocation => '/properties/beta',
+        keywordLocation => '',
+        absoluteKeywordLocation => 'my_lax_metaschema',
+        error => 'unknown keywords seen in schema: dah, zip',
       },
     ],
   },
-  'strict mode only detected one property this time - bloop is evaluated',
+  'strict mode only detected one property in alpha this time - bloop is evaluated',
 );
 
 
@@ -162,20 +161,113 @@ cmp_result(
     valid => false,
     errors => [
       {
-        instanceLocation => '/properties/foo/barf',
+        instanceLocation => '/properties/alpha',
         keywordLocation => '',
         absoluteKeywordLocation => 'http://json-schema.org/draft-07/schema',
-        error => 'unknown keyword found in schema: barf',
+        error => 'unknown keywords seen in schema: barf, bloop',
       },
       {
-        instanceLocation => '/properties/foo/bloop',
+        instanceLocation => '/properties/beta',
         keywordLocation => '',
         absoluteKeywordLocation => 'http://json-schema.org/draft-07/schema',
-        error => 'unknown keyword found in schema: bloop',
+        error => 'unknown keywords seen in schema: dah, zip',
       },
     ],
   },
   'strict mode detects unknown keywords using draft7',
 );
+
+subtest 'strict and if/then/else' => sub {
+  cmp_result(
+    JSON::Schema::Modern->new(strict => 1)->evaluate(
+      $_,
+      {
+        if => { const => 0 },
+        then => true,
+        else => true,
+      },
+      { strict => 1 },
+    )->TO_JSON,
+
+    { valid => true },
+    'no unknown keywords are identified, even though "' . ($_?'else':'then').'" is never evaluated',
+  ) foreach (0..1);
+};
+
+subtest 'strict and short-circuit' => sub {
+  cmp_result(
+    JSON::Schema::Modern->new->evaluate(
+      { foo => 1, bar => 2 },
+      {
+        if => {
+          required => ['bar'],
+          properties => {
+            bar => { const => 1 },
+          },
+          additionalProperties => false,
+          bloop => 1,
+        },
+        then => false,
+        else => true,
+      },
+      { strict => 1 },
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/if',
+          error => 'unknown keyword seen in schema: bloop',
+        },
+        # no errors from additionalProperties, because we abort from within the 'if' subschema,
+        # and 'if' doesn't preserve its errors
+      ],
+    },
+    'strict mode will work properly even when some keywords short-circuit',
+  );
+
+  cmp_result(
+    JSON::Schema::Modern->new->evaluate(
+      { alpha => { beta => 2, gamma => 3 } },
+      # this is not a valid test, because we never preserve errors from 'if'.
+      # so we need something with a subschema that preserves errors, like properties.
+      my $schema = {
+        properties => {
+          alpha => {
+            required => ['beta'],
+            properties => {
+              beta => { const => 2 },
+            },
+            additionalProperties => false,
+            bloop => 1,
+          },
+        },
+      },
+      { strict => 1, short_circuit => 1 },
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+         instanceLocation => '/alpha/gamma',
+         keywordLocation => '/properties/alpha/additionalProperties',
+         error => 'additional property not permitted',
+        },
+        {
+         instanceLocation => '/alpha',
+         keywordLocation => '/properties/alpha/additionalProperties',
+         error => 'not all additional properties are valid',
+        },
+        {
+         instanceLocation => '/alpha',
+         keywordLocation => '/properties/alpha',
+         error => 'unknown keyword seen in schema: bloop',
+        },
+      ],
+    },
+    'strict mode will still work even when enabled together with short_circuit',
+  )
+};
 
 done_testing;

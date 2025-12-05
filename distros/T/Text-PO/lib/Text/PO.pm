@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.9.0
+## Version v0.9.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2025/11/30
+## Modified 2025/12/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.9.0';
+    our $VERSION = 'v0.9.1';
 };
 
 use strict;
@@ -1736,7 +1736,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v0.9.0
+    v0.9.1
 
 =head1 DESCRIPTION
 
@@ -2221,6 +2221,10 @@ Takes a boolean value and if true, this will remove duplicate msgid.
 =head2 removed
 
 Returns an array object (L<Module::Generic::Array>) of L<Text::PO::Element> removed during synchronisation.
+
+=head2 set_default_meta
+
+Applies a set of default meta information to the <.po> file, if missing.
 
 =head2 source
 

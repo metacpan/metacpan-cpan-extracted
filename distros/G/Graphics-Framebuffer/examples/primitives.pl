@@ -17,7 +17,7 @@ use Pod::Usage;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.08';
+    our $VERSION = '6.09';
 }
 
 our $F;
@@ -33,6 +33,7 @@ my $ignore_x = FALSE; # Ignore the check for X-Windows/Wayland
 my $small    = FALSE; # Force a small screen for debugging core dumps
 my $help     = FALSE; # Shows a brief help screen
 my $man      = FALSE; # Shows the full POD manual
+my $errors   = FALSE;
 my $show_func;
 
 GetOptions(
@@ -48,6 +49,7 @@ GetOptions(
     'func=s'           => \$show_func,
     'ignore-x-windows' => \$ignore_x,
     'small'            => \$small,
+	'errors'           => \$errors,
 );
 
 pod2usage(1) if ($help); # Show brief help
@@ -75,7 +77,7 @@ our $STAMP = sprintf('%.1', time);
 if (defined($new_x)) { # Ignore kernel structure and force a specific resolution
     $F = Graphics::Framebuffer->new(
 		'FB_DEVICE'        => "/dev/fb$dev",
-		'SHOW_ERRORS'      => 0,
+		'SHOW_ERRORS'      => $errors,
 		'SIMULATED_X'      => $new_x,
 		'SIMULATED_Y'      => $new_y,
 		'ACCELERATED'      => !$noaccel,
@@ -86,7 +88,7 @@ if (defined($new_x)) { # Ignore kernel structure and force a specific resolution
 } else { # Adhere to the kernel structuter for the screen layout (normal usage)
     $F = Graphics::Framebuffer->new(
 		'FB_DEVICE'        => "/dev/fb$dev",
-		'SHOW_ERRORS'      => 0,
+		'SHOW_ERRORS'      => $errors,
 		'ACCELERATED'      => !$noaccel,
 		'SPLASH'           => 0,
 		'RESET'            => TRUE,
@@ -341,12 +343,10 @@ foreach my $name (@order) {
 			$F->acceleration(PERL);
 			$func{$name}->($name . ' -> Pure-Perl');
 		}
-		unless ($name =~ /^(Anti)/) {
-			$F->cls();
-			$F->acceleration(SOFTWARE);
-			$func{$name}->($name . ' -> C Accelerated');
-			sleep $delay unless($name =~ /Plot|Lines|Poly|Boxes|Circles|Ellipses|Arcs|Beziers|Pies/);
-		}
+		$F->cls();
+		$F->acceleration(SOFTWARE);
+		$func{$name}->($name . ' -> C Accelerated');
+		sleep $delay unless($name =~ /Plot|Lines|Poly|Boxes|Circles|Ellipses|Arcs|Beziers|Pies/);
     }
 }
 
@@ -561,7 +561,7 @@ sub angle_lines {
 				'pixel_size'  => $psize,
 			}
 		);
-        $angle = ($F->acceleration()) ? $angle + .1 : $angle + 1;
+        $angle = ($F->acceleration()) ? $angle + .5 : $angle + 1;
         $angle -= 360 if ($angle >= 360);
     }
 }
@@ -1616,7 +1616,7 @@ sub flood_fill {
     $F->clip_reset();
 
     if ($XX > 255) {    # && !$rpi) {
-        my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+#        my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         $F->set_color(
 			{
 				'red'   => int(rand(256)),
@@ -1692,7 +1692,7 @@ sub flood_fill {
 			{
 				'x'       => int(700 * $xm),
 				'y'       => int(500 * $ym),
-				'texture' => $image,
+#				'texture' => $image,
 			}
 		);
 

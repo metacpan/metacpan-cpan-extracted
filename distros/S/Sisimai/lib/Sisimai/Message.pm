@@ -16,12 +16,15 @@ state $Fields5322 = Sisimai::RFC5322->FIELDINDEX;
 state $Fields5965 = Sisimai::RFC5965->FIELDINDEX;
 state $FieldTable = { map { lc $_ => $_ } ($Fields1894->@*, $Fields5322->@*, $Fields5965->@*) };
 state $Boundaries = ["Content-Type: message/rfc822", "Content-Type: text/rfc822-headers"];
-state $ReplacesAs = {
-    "Content-Type" => [
-        ["message/xdelivery-status",         "message/delivery-status"],
-        ["message/disposition-notification", "message/delivery-status"],
-    ],
-};
+state $MediaTypes = [
+    ["message/xdelivery-status",                "message/delivery-status"],
+    ["message/disposition-notification",        "message/delivery-status"],
+    ["message/global-delivery-status",          "message/delivery-status"],
+    ["message/global-disposition-notification", "message/delivery-status"],
+    ["message/global-delivery-status",          "message/delivery-status"],
+    ["message/global-headers",                  "text/rfc822-headers"],
+    ["message/global",                          "message/rfc822"],
+];
 
 my $TryOnFirst = [];
 
@@ -211,7 +214,7 @@ sub tidy {
         # Find and tidy up fields defined in RFC5322, RFC1894, and RFC5965
         # 1. Find a field label defined in RFC5322, RFC1894, or RFC5965 from this line
         my $p0 = index($e, ':');
-        my $cf = substr(lc $e, 0, $p0);
+        my $cf = substr(lc $e, 0, $p0); chop $cf if substr($cf, -1, 1) eq ' ';
         my $fn = $FieldTable->{ $cf } || '';
 
         # There is neither ":" character nor the field listed in $FieldTable
@@ -251,6 +254,7 @@ sub tidy {
                             substr($f, 0, $p2, $ps);
                         }
                         $f = lc $f if $ps ne 'boundary';
+                        $f = 'rfc822' if $f eq 'rfc/822';
                         last;
                     }
                     push @$ab, $f;
@@ -275,9 +279,9 @@ sub tidy {
         }
 
         # 3. Tidy up a value, and a parameter of Content-Type: field
-        if( exists $ReplacesAs->{ $fn } ) {
+        if( $fn eq "Content-Type" ) {
             # Replace the value of "Content-Type" field
-            for my $f ( $ReplacesAs->{ $fn }->@* ) {
+            for my $f ( @$MediaTypes ) {
                 # - Before: Content-Type: message/xdelivery-status; ...
                 # - After:  Content-Type: message/delivery-status; ...
                 $p1 = index($bf, $f->[0]); next if $p1 < 0;

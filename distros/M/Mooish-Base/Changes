@@ -1,5 +1,8 @@
 Revision history for Mooish-Base
 
+1.001 - 2025-12-04
+	- Changed -standard flag to always import Moo, regardless of the environment
+
 1.000 - 2025-12-02
 	- Added -standard flag, which allows module authors to use the module
 	- Module now automatically loads known performance-improving modules based on flavour

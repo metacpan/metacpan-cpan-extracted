@@ -1,0 +1,116 @@
+{
+   "abstract" : "A full-featured dig-like DNS query tool with JSON output, caching, and batch processing",
+   "author" : [
+      "Isaac Caldwell <solangiishaque49@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "dns",
+      "query",
+      "dig",
+      "network",
+      "resolver",
+      "dnssec",
+      "batch",
+      "json"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-dnsq",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "IO::Socket::INET" : "0",
+            "JSON" : "2.0",
+            "Net::DNS" : "1.0",
+            "POSIX" : "0",
+            "Storable" : "0",
+            "Term::ReadLine" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::dnsq" : {
+         "file" : "lib/App/dnsq.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Banner" : {
+         "file" : "lib/DNSQuery/Banner.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Batch" : {
+         "file" : "lib/DNSQuery/Batch.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Cache" : {
+         "file" : "lib/DNSQuery/Cache.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Constants" : {
+         "file" : "lib/DNSQuery/Constants.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Interactive" : {
+         "file" : "lib/DNSQuery/Interactive.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Output" : {
+         "file" : "lib/DNSQuery/Output.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Resolver" : {
+         "file" : "lib/DNSQuery/Resolver.pm",
+         "version" : "v1.1.0"
+      },
+      "DNSQuery::Validator" : {
+         "file" : "lib/DNSQuery/Validator.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bl4ckstack/dnsq/issues"
+      },
+      "homepage" : "https://github.com/bl4ckstack/dnsq",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bl4ckstack/dnsq.git",
+         "web" : "https://github.com/bl4ckstack/dnsq"
+      }
+   },
+   "version" : "v1.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

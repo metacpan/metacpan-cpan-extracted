@@ -1,5 +1,8 @@
 Revision history for Perl module Text::PO
 
+v0.9.1 2025-12-05T07:38:33+0900
+    - Fixed error in unit test with undeclared dependency.
+
 v0.9.0 2025-12-03T20:42:17+0900
     - Added support for non-standard PO include directives (# $include "file.po") with
       recursive parsing, relative path handling, and duplicate suppression.

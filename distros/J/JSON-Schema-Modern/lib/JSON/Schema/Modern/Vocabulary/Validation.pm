@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.626';
+our $VERSION = '0.627';
 
 use 5.020;
 use Moo;
@@ -113,15 +113,14 @@ sub _eval_keyword_multipleOf ($class, $data, $schema, $state) {
 
   my $remainder;
 
-  # if either value is a float, use the bignum library for the calculation for an accurate remainder
-  if (is_bignum($data) or is_bignum($schema->{multipleOf})
-      or get_type($data) eq 'number' or get_type($schema->{multipleOf}) eq 'number') {
+  if (get_type($data) eq 'integer' and get_type($schema->{multipleOf}) eq 'integer') {
+    $remainder = $data % $schema->{multipleOf};
+  }
+  else {
+    # if either value is a float, use the bignum library for the calculation for an accurate remainder
     my $dividend = is_bignum($data) ? $data->copy : Math::BigFloat->new($data);
     my $divisor = is_bignum($schema->{multipleOf}) ? $schema->{multipleOf} : Math::BigFloat->new($schema->{multipleOf});
     $remainder = $dividend->bmod($divisor);
-  }
-  else {
-    $remainder = $data % $schema->{multipleOf};
   }
 
   return 1 if $remainder == 0;
@@ -145,7 +144,7 @@ sub _eval_keyword_maximum ($class, $data, $schema, $state) {
 }
 
 sub _traverse_keyword_exclusiveMaximum ($class, $schema, $state) {
-  return _assert_number($class, $schema, $state) if $state->{specification_version} ne 'draft4';
+  return assert_keyword_type($state, $schema, 'number') if $state->{specification_version} ne 'draft4';
 
   return if not assert_keyword_type($state, $schema, 'boolean');
   return E($state, 'use of exclusiveMaximum requires the presence of maximum')
@@ -154,7 +153,7 @@ sub _traverse_keyword_exclusiveMaximum ($class, $schema, $state) {
 }
 
 sub _eval_keyword_exclusiveMaximum ($class, $data, $schema, $state) {
-  # we do the work in maximum for draft4 so we don't generate multiple errors
+  # we do the work in "maximum" for draft4 so we don't generate multiple errors
   return 1 if $state->{specification_version} eq 'draft4';
 
   return 1 if not is_type('number', $data)
@@ -181,7 +180,7 @@ sub _eval_keyword_minimum ($class, $data, $schema, $state) {
 }
 
 sub _traverse_keyword_exclusiveMinimum ($class, $schema, $state) {
-  return _assert_number($class, $schema, $state) if $state->{specification_version} ne 'draft4';
+  return assert_keyword_type($state, $schema, 'number') if $state->{specification_version} ne 'draft4';
 
   return if not assert_keyword_type($state, $schema, 'boolean');
   return E($state, 'use of exclusiveMinimum requires the presence of minimum')
@@ -190,7 +189,7 @@ sub _traverse_keyword_exclusiveMinimum ($class, $schema, $state) {
 }
 
 sub _eval_keyword_exclusiveMinimum ($class, $data, $schema, $state) {
-  # we do the work in minimum for draft4 so we don't generate multiple errors
+  # we do the work in "minimum" for draft4 so we don't generate multiple errors
   return 1 if $state->{specification_version} eq 'draft4';
 
   return 1 if not is_type('number', $data)
@@ -283,8 +282,13 @@ sub _eval_keyword_minProperties ($class, $data, $schema, $state) {
 sub _traverse_keyword_required ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'array');
   return E($state, '"required" array is empty') if $state->{specification_version} eq 'draft4' and not $schema->{required}->@*;
-  return E($state, '"required" element is not a string')
-    if any { !is_type('string', $_) } $schema->{required}->@*;
+
+  if (my @non_string = grep !is_type('string', $schema->{required}->[$_]), 0 .. $schema->{required}->$#*) {
+    ()= E({ %$state, _keyword_path_suffix => $_ }, '"required" element is not a string')
+      foreach @non_string;
+    return;
+  }
+
   return E($state, '"required" values are not unique') if not is_elements_unique($schema->{required});
   return 1;
 }
@@ -306,7 +310,7 @@ sub _traverse_keyword_dependentRequired ($class, $schema, $state) {
       if not is_type('array', $schema->{dependentRequired}{$property});
 
     foreach my $index (0..$schema->{dependentRequired}{$property}->$#*) {
-      $valid = E({ %$state, _keyword_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
+      $valid = E({ %$state, _keyword_path_suffix => [ $property, $index ] }, 'element is not a string')
         if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
     }
 
@@ -358,7 +362,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.626
+version 0.627
 
 =head1 DESCRIPTION
 

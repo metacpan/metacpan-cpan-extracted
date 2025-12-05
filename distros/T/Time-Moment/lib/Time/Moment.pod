@@ -156,15 +156,15 @@ Time::Moment - Represents a date and time of day with an offset from UTC
 
 =head1 DESCRIPTION
 
-C<Time::Moment> is an immutable object representing a date and time of day 
-with an offset from UTC in the ISO 8601 calendar system.
+C<Time::Moment> is an immutable object that represents a specific date and 
+time of day, along with an offset from UTC, within the ISO 8601 calendar 
+system. Time is measured in nanoseconds since C<0001-01-01T00Z>. Leap seconds 
+are not accounted for in C<Time::Moment>; each day is assumed to have exactly 
+C<86,400,000,000,000> nanoseconds.
 
-Time is measured in nanoseconds since C<0001-01-01T00Z>. In C<Time:Moment> 
-leap seconds are ignored. It is assumed that there are exactly 
-C<86,400,000,000,000> nanoseconds per day. C<Time::Moment> can represent 
-all epoch integers from C<-62,135,596,800> to C<253,402,300,799>; this 
-range suffices to measure times to nanosecond precision for any instant 
-that is within C<0001-01-01T00:00:00Z> to C<9999-12-31T23:59:59Z>.
+Time::Moment supports all epoch integers from C<-62,135,596,800> to 
+C<253,402,300,799>, allowing for nanosecond precision for any instant within 
+the range C<0001-01-01T00:00:00Z> to C<9999-12-31T23:59:59Z>.
 
 =head1 CONSTRUCTORS
 
@@ -831,7 +831,11 @@ Returns a copy of this instance with the given I<nanosecond> of the day
 
 Returns a copy of this instance with the given I<offset> from UTC in 
 minutes [-1080, 1080] (±18:00) altered. The resulting time is at the same 
-instant.
+instant. 
+
+This method ensures the exact UTC instant remains unchanged, but the local 
+date and time are recalculated based on the new offset.
+
 
     $tm = Time::Moment->from_string('2012-12-24T15-05')
                       ->with_offset_same_instant(0);
@@ -844,6 +848,10 @@ instant.
 Returns a copy of this instance with the given I<offset> from UTC in 
 minutes [-1080, 1080] (±18:00) altered. The resulting time has the same 
 local time.
+
+This method ensures the local date and time remain unchanged, but the 
+offset changes to reflect the new timezone. As a result, the UTC instant 
+represented by the instance also changes.
 
     $tm = Time::Moment->from_string('2012-12-24T15-05')
                       ->with_offset_same_local(0);
@@ -1011,39 +1019,39 @@ subtracted.
 
     $years = $tm->delta_years($other);
 
-Returns the difference between the local date of this moment and the I<other> 
-in terms of complete years. The result will be negative if the local date of 
+Returns the difference between the B<local date> of this moment and the I<other> 
+in terms of complete B<calendar years>. The result will be negative if the local date of 
 the I<other> moment is before this.
 
 =head2 delta_months
 
     $months = $tm->delta_months($other);
 
-Returns the difference between the local date of this moment and the I<other> 
-in terms of complete months. The result will be negative if the local date of 
+Returns the difference between the B<local date> of this moment and the I<other> 
+in terms of complete B<calendar months>. The result will be negative if the local date of 
 the I<other> moment is before this.
 
 =head2 delta_weeks
 
     $weeks = $tm->delta_weeks($other);
 
-Returns the difference between the local date of this moment and the I<other> 
-in terms of complete weeks. The result will be negative if the local date of 
+Returns the difference between the B<local date> of this moment and the I<other> 
+in terms of complete B<calendar weeks>. The result will be negative if the local date of 
 the I<other> moment is before this.
 
 =head2 delta_days
 
     $days = $tm->delta_days($other);
 
-Returns the difference between the local date of this moment and the I<other> 
-in terms of complete days. The result will be negative if the local date of 
+Returns the difference between the B<local date> of this moment and the I<other> 
+in terms of complete B<calendar days>. The result will be negative if the local date of 
 the I<other> moment is before this.
 
 =head2 delta_hours
 
     $hours = $tm->delta_hours($other);
 
-Returns the difference between the instant of this moment and the I<other> 
+Returns the difference between the B<instant> of this moment and the I<other> 
 in terms of complete hours. The result will be negative if the instant of 
 the I<other> moment is before this.
 
@@ -1051,7 +1059,7 @@ the I<other> moment is before this.
 
     $minutes = $tm->delta_minutes($other);
 
-Returns the difference between the instant of this moment and the I<other> 
+Returns the difference between the B<instant> of this moment and the I<other> 
 in terms of complete minutes. The result will be negative if the instant of 
 the I<other> moment is before this.
 
@@ -1059,7 +1067,7 @@ the I<other> moment is before this.
 
     $seconds = $tm->delta_seconds($other);
 
-Returns the difference between the instant of this moment and the I<other> in 
+Returns the difference between the B<instant> of this moment and the I<other> in 
 terms of complete seconds. The result will be negative if the instant of the 
 I<other> moment is before this.
 
@@ -1067,7 +1075,7 @@ I<other> moment is before this.
 
     $milliseconds = $tm->delta_milliseconds($other);
 
-Returns the difference between the instant of this moment and the I<other> in 
+Returns the difference between the B<instant> of this moment and the I<other> in 
 terms of complete milliseconds. The result will be negative if the instant of 
 the I<other> moment is before this.
 
@@ -1075,7 +1083,7 @@ the I<other> moment is before this.
 
     $microseconds = $tm->delta_microseconds($other);
 
-Returns the difference between the instant of this moment and the I<other> in 
+Returns the difference between the B<instant> of this moment and the I<other> in 
 terms of complete microseconds. The result will be negative if the instant of 
 the I<other> moment is before this.
 
@@ -1083,7 +1091,7 @@ the I<other> moment is before this.
 
     $nanoseconds = $tm->delta_nanoseconds($other);
 
-Returns the difference between the instant of this moment and the I<other> in 
+Returns the difference between the B<instant> of this moment and the I<other> in 
 terms of complete nanoseconds. The result will be negative if the instant of 
 the I<other> moment is before this.
 
@@ -1656,7 +1664,7 @@ Calendar date - 24 December 2012
 
     Basic format:               Example:
     %Y%m%d                      20121224
-    %y%m                        201212      (reduced accuracy)
+    %Y%m                        201212      (reduced accuracy)
 
     Extended format:            Example:
     %Y-%m-%d                    2012-12-24
@@ -1796,12 +1804,283 @@ L<RFC 5322 - 3.3. Date and Time Specification|http://tools.ietf.org/html/rfc5322
     %d %b %Y %H:%M:%S %z        24 Dec 2012 15:30:45 +0100
     %d %b %Y %H:%M %z           24 Dec 2012 15:30 +0100
 
+=head1 SUPPORTED CALENDARS
+
+Time::Moment primarily supports four distinct calendars through C<< ->from_string >> as well as accessor and adjustor (C<< ->with >>) methods.
+
+=head2 Calendar Date (ISO 8601)
+
+The calendar date format represents a traditional date system based on the year, month, and day. It is structured as C<YYYY-MM-DD> where C<YYYY> is the year, C<MM> is the two-digit month number (ranging from 01 for January to 12 for December), and C<DD> is the two-digit day of the month (ranging from 01 to 31, depending on the month).
+
+Examples in both basic and extended formats:
+
+=over
+
+=item * December 17, 2024
+
+=over
+
+=item * Extended format: C<2024-12-17>
+
+=item * Basic format: C<20241217>
+
+=back
+
+=item * July 1, 2024
+
+=over
+
+=item * Extended format: C<2024-07-01>  
+
+=item * Basic format: C<20240701>
+
+=back
+
+=back
+
+To construct a Time::Moment instance for July 1, 2024:
+
+    $tm = Time::Moment->new( year => 2024, month => 7, day => 1 ); 
+
+See L</Date> for example L</strftime> conversion specifications.
+
+=head2 Ordinal Date (ISO 8601)
+
+The ordinal date format represents a date using the year and the day of the year. It is structured as C<YYYY-DDD>, where C<YYYY> represents the year, and C<DDD> is the day of the year, a three-digit number ranging from C<001> to C<365> (or C<366> for leap years).
+
+Examples in both basic and extended formats:
+
+=over
+
+=item * First day of 2024
+
+=over
+
+=item * Extended format: C<2024-001> 
+
+=item * Basic format: C<2024001>
+
+=back
+
+=item * 366th day of 2024 (last day of the year, leap year)  
+
+=over
+
+=item * Extended format: C<2024-366>  
+
+=item * Basic format: C<2024366>
+
+=back
+
+=back
+
+To construct a Time::Moment instance for the 366th day of 2024:
+
+    $tm = Time::Moment->new( year => 2024 )
+                      ->with_day_of_year(366);
+
+See L</Date> for example L</strftime> conversion specifications.
+
+=head2 Week Date (ISO 8601)
+
+The week date format is a standardized way to represent dates based on the week of the year. It is structured as C<YYYY-Www-D>, where C<YYYY> represents the week-based year, which may differ from the calendar year in certain cases. C<Www> is the two-digit week number, ranging from C<01> to C<53>, indicating the specific week of the year. The final component, C<D>, represents the day of the week, with values from C<1> (Monday) to C<7> (Sunday).
+
+The system standardizes the structure of years by defining the first week (C<W01>) as the week that includes the first Thursday of the calendar year. Consequently, most years consist of 52 weeks, but some may have 53 weeks depending on how the weeks align with the calendar.
+
+The week year may differ from the calendar year at the beginning or end of the year, for example:
+
+=over
+
+=item * If January 1 falls on a Friday, Saturday, or Sunday, those days will belong to the last week of the previous week year.
+
+=item * Similarly, if December 31 falls on a Monday, Tuesday, or Wednesday, those days will belong to the first week of the next week year.
+
+=back
+
+This system ensures consistency for weeks but can cause overlaps or shifts between calendar and week years.
+
+Examples in both basic and extended formats:
+
+=over
+
+=item * Monday of the first week of 2024  
+
+=over
+
+=item * Extended format: C<2024-W01-1>
+
+=item * Basic format: C<2024W011>
+
+=back
+
+=item * Sunday of the 52nd week of 2023
+
+=over
+
+=item * Extended format: C<2023-W52-7>
+
+=item * Basic format: C<2023W527>
+
+=back
+
+=back
+
+Note: The standard defines week 01 as the week containing the first Thursday of the calendar year, which is equivalent to the week that includes January 4, due to the interdependent properties of the week.
+
+To construct a Time::Moment instance for Sunday of the 52nd week of 2023:
+
+    $tm = Time::Moment->new( year => 2023, day => 4 )
+                      ->with_week(52)
+                      ->with_day_of_week(7);
+
+See L</Date> for example L</strftime> conversion specifications.
+
+=head2 Quarter Date (Non-Standard)
+
+The quarter date format represents a date based on the year, the quarter of the year, and day within the quarter. It is structured as C<YYYY-Qq-dd>, where C<YYYY> is the year, C<Qq> indicates the quarter (C<Q1>, C<Q2>, C<Q3>, or C<Q4>), and C<dd> is the day of the quarter, ranging from C<01> to C<92> depending on the quarter. For example, C<Q1> refers to the first quarter, which includes January, February, and March; C<Q2> refers to the second quarter (April, May, and June), and so on.
+
+Examples in both basic and extended formats:
+
+=over
+
+=item * First day of the first quarter of 2024 
+
+=over
+
+=item * Extended format: C<2024-Q1-01>  
+
+=item *  Basic format: C<2024Q101>
+
+=back
+
+=item * 45th day of the second quarter of 2023 
+
+=over
+
+=item * Extended format: C<2023-Q2-45> 
+
+=item * Basic format: C<2023Q245>
+
+=back
+
+=back
+
+To construct a Time::Moment instance for 45th day of the second quarter of 2023:
+
+    $tm = Time::Moment->new( year => 2023 )
+                      ->with_quarter(2)
+                      ->with_day_of_quarter(45);
+
+=head1 TIME AND CALENDAR ARITHMETIC
+
+Time and Calendar Arithmetic refers to operations involving the addition, subtraction, or comparison of temporal values. These operations can involve either B<precise time units> (such as seconds, minutes, and hours) or B<calendar units> (like days, months, and years). These two types of arithmetic are fundamentally different due to their distinct characteristics.
+
+Mixing B<calendar units> and B<time units> can lead to confusion and inaccuracies because they adhere to different principles:
+
+=head2 1. Calendar Units Are Variable
+
+=over
+
+=item *
+
+B<Days, months, and years> do not have consistent lengths:
+
+=over
+
+=item *
+
+A day is generally 24 hours, but events like daylight saving time changes or leap seconds can alter this.
+
+=item *
+
+A month can vary between 28, 29, 30, or 31 days.
+
+=item *
+
+A year can be 365 or 366 days (leap years).
+
+=back
+
+=item *
+
+In contrast, time units such as seconds, minutes, and hours are fixed. For instance, there are always 60 seconds in a minute and 60 minutes in an hour.
+
+=back
+
+B<Example:>  
+Adding 1 calendar month to January 31 may result in February 28 (or 29 in a leap year) rather than February 31, which does not exist.
+
+=head2 2. Conceptual Differences Between Calendar and Time Units
+
+=over
+
+=item *
+
+B<Calendar units> are positional and relate to transitions within a calendar system. For example, moving from "December 31 to January 1" indicates crossing into a new day, even if only 1 second has passed.
+
+=item *
+
+B<Time units> measure exact durations, such as the total number of seconds, minutes, or hours between two timestamps.
+
+=back
+
+B<Example:>  
+The difference between C<2012-12-31T23:59:59Z> and C<2013-01-01T00:59:59Z>:
+
+=over
+
+=item *
+
+In B<calendar terms>, this spans 2 calendar days, as moving even 1 second into January 1 is considered a new day.
+
+=item *
+
+In B<time units>, the difference is precisely 1 hour or 60 minutes.
+
+=back
+
+=head2 3. Risks of Mixing Units
+
+=over
+
+=item *
+
+Mixing calendar and time units can lead to misleading interpretations:
+
+=over
+
+=item *
+
+Phrases like "1 day and 2 hours" might be ambiguous if not explicitly tied to a specific time context.
+
+=item *
+
+A span of "24 hours" does not always equate to "1 calendar day," particularly when factors like daylight saving time come into play.
+
+=back
+
+=back
+
+=head2 When to Use Each Type of Arithmetic
+
+=over
+
+=item *
+
+Use B<calendar units> when dealing with schedules, recurring events, or positional changes within a date system (e.g., adding months to calculate an anniversary).
+
+=item *
+
+Use B<time units> when working with precise durations, such as timers, interval measurements, or elapsed time calculations.
+
+=back
+
 =head1 TIME ZONES
 
-An instance of C<Time::Moment> represents an unambiguous point in time, 
-but it's not time zone aware. When performing arithmetic on the local 
-date/time or altering the components of the local date/time it may be 
-necessary to use a time zone to convert to the correct representation.
+A C<Time::Moment> instance represents a precise point in time but does 
+not account for time zones. When performing arithmetic or modifying 
+components of the local date/time, it may be necessary to apply a 
+time zone conversion to ensure accurate representation.
 
 C<Time::Moment> is API compatible with L<DateTime::TimeZone> and 
 L<DateTime::TimeZone::Tzfile>.

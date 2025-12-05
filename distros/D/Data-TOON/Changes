@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-TOON
 
+0.03 2025-12-05T09:43:32Z
+    - Fixed nested HASH references not being properly serialized in array elements
+      - Changed _encode_object_with_array() to use _encode_value() instead of _encode_primitive()
+      - Allows recursive expansion of nested structures from JSON::PP::decode_json()
+      - Added test: t/09_nested_hash_from_json.t
+
 0.02 2025-11-16T07:54:32Z
     - Improved error handling
     - Enhanced validation logic

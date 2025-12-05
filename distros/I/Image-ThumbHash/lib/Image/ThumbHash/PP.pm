@@ -12,7 +12,7 @@ use constant {
     PI => 4 * atan2(1, 1),
 };
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(
     rgba_to_thumb_hash
@@ -376,6 +376,7 @@ sub thumb_hash_to_data_url {
 
 1
 __END__
+
 =encoding utf8
 
 =head1 NAME

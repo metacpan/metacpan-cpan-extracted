@@ -1,5 +1,9 @@
 Revision history for Params-Validate-Strict
 
+0.25	Thu Dec  4 08:05:49 EST 2025
+	Now dies if the schema says that the minimum length of a string should be < 0
+	String length comparisons are now character counts, not bytes
+
 0.24	Mon Nov 17 08:19:19 EST 2025
 	error_message renamed error_msg (now consistent with Data::Processor)
 	added description field (inspired by Data::Processor)

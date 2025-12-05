@@ -2,7 +2,7 @@
 Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 # VERSION
-Version v3.3.15
+Version v3.3.16
 
 # SYNOPSIS
 

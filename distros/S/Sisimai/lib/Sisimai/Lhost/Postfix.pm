@@ -30,6 +30,7 @@ sub inquire {
 
     require Sisimai::RFC1123;
     require Sisimai::SMTP::Reply;
+    require Sisimai::SMTP::Status;
     require Sisimai::SMTP::Command;
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['Content-Type: message/rfc822', 'Content-Type: text/rfc822-headers'];
@@ -112,19 +113,23 @@ sub inquire {
                 if( $o->[3] eq 'addr' ) {
                     # Final-Recipient: rfc822; kijitora@example.jp
                     # X-Actual-Recipient: rfc822; kijitora@example.co.jp
-                    if( $o->[0] eq 'final-recipient' ) {
-                        # Final-Recipient: rfc822; kijitora@example.jp
-                        if( $v->{'recipient'} ) {
-                            # There are multiple recipient addresses in the message body.
-                            push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
-                            $v = $dscontents->[-1];
-                        }
-                        $v->{'recipient'} = $o->[2];
-                        $recipients++;
+                    if( Sisimai::Address->is_emailaddress($o->[2]) ) {
+                        # The email address is a valid email address, avoid an email address without a
+                        # valid domain part such as "neko@mailhost".
+                        if( $o->[0] eq 'final-recipient' ) {
+                            # Final-Recipient: rfc822; kijitora@example.jp
+                            if( $v->{'recipient'} ) {
+                                # There are multiple recipient addresses in the message body.
+                                push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
+                                $v = $dscontents->[-1];
+                            }
+                            $v->{'recipient'} = $o->[2];
+                            $recipients++;
 
-                    } else {
-                        # X-Actual-Recipient: rfc822; kijitora@example.co.jp
-                        $v->{'alias'} = $o->[2];
+                        } else {
+                            # X-Actual-Recipient: rfc822; kijitora@example.co.jp
+                            $v->{'alias'} = $o->[2];
+                        }
                     }
                 } elsif( $o->[3] eq 'code' ) {
                     # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
@@ -206,12 +211,15 @@ sub inquire {
 
     unless( $recipients ) {
         # Fallback: get a recipient address from error messages
-        if( defined $anotherset->{'recipient'} && $anotherset->{'recipient'} ) {
-            # Set a recipient address
-            $dscontents->[-1]->{'recipient'} = $anotherset->{'recipient'};
+        for my $e ( 'recipient', 'alias' ) {
+            # Set a valid recipient address picked from $anotherset
+            next unless Sisimai::Address->is_emailaddress($anotherset->{ $e });
+            $dscontents->[-1]->{'recipient'} = $anotherset->{ $e };
             $recipients++;
+            last;
+        }
 
-        } else {
+        if( $recipients == 0 ) {
             # Get a recipient address from message/rfc822 part if the delivery report was unavailable:
             # '--- Delivery report unavailable ---'
             my $p1 = index($emailparts->[1], "\nTo: ");
@@ -244,13 +252,10 @@ sub inquire {
                 my $as = ''; # status
                 my $ar = ''; # replycode
 
-                if( $e->{'status'} eq '' || substr($e->{'status'}, -4, 4) eq '.0.0' ) {
-                    # Check the value of D.S.N. in $anotherset
+                if( Sisimai::SMTP::Status->is_ambiguous($e->{'status'}) ) {
+                    # Check the value of D.S.N. in $anotherset is neither an empty nor *.0.0.
                     $as = Sisimai::SMTP::Status->find($anotherset->{'diagnosis'}) || '';
-                    if( length($as) > 0 && substr($as, -4, 4) ne '.0.0' ) {
-                        # The D.S.N. is neither an empty nor *.0.0
-                        $e->{'status'} = $as;
-                    }
+                    $e->{'status'} = $as unless Sisimai::SMTP::Status->is_ambiguous($as);
                 }
 
                 if( $e->{'replycode'} eq '' || substr($e->{'replycode'}, -2, 2) eq '00' ) {

@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.24
+Version 0.25
 
 # SYNOPSIS
 
@@ -310,11 +310,11 @@ The schema can define the following rules for each parameter:
 
 - `min`
 
-    The minimum length (for strings), value (for numbers) or number of keys (for hashrefs).
+    The minimum length (for strings in characters not bytes), value (for numbers) or number of keys (for hashrefs).
 
 - `max`
 
-    The maximum length (for strings), value (for numbers) or number of keys (for hashrefs).
+    The maximum length (for strings in characters not bytes), value (for numbers) or number of keys (for hashrefs).
 
 - `matches`
 

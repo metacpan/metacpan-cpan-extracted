@@ -1,6 +1,50 @@
-0.99.1 (2025-03-28)
+v0.986.0 (2025-12-04)
+
+    Improvements:
+        - *Really* Fix failing tests on non UTF-8 locales
+
+    Documentation
+        - Replaced old email address
+
+v0.985.3 (2025-12-02) TRIAL RELEASE
+
+    Enhancements:
+        - Minor documentation cleanups.
 
     Code Maintenance
+        - Inlined all class code.
+
+    Packaging:
+        - Fix failing tests on non UTF-8 locales
+
+v0.985.2 (2025-12-01) TRIAL RELEASE
+
+    Code Maintenance
+        - Extract Sys::Cmd::Process into its own file
+        - Restructure and expand documentation
+
+    Packaging:
+        - Fix *testing* of pre-existing wide characters in %ENV
+
+v0.985.1 (2025-04-03) TRIAL RELEASE
+
+    Packaging:
+        - Skip tests involving non-ascii characters under US-ASCII
+          locale.
+        - Ensure that the test info.pl script runs with the same perl
+          version as the calling test. Mismatch seen on cpantesters.
+
+0.985.0 (2025-03-31) (TRIAL RELEASE)
+
+    Packaging:
+        - Skip tests involving non-ascii characters under ascii
+          (ANSI_X3...) locales.
+        - Do not index Sys::Cmd::Process
+        - Version jump due to previous incorrect use of "X.Y_Z".
+
+0.99.1 (2025-03-28)
+
+    Packaging:
         - Correct broken info.pl test script
         - Add missing kitchen sink test for multiple features at a
           time.

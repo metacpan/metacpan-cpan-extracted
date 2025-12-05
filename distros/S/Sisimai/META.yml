@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.4.1
+    version: v5.5.0
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -79,16 +79,16 @@ provides:
     file: lib/Sisimai/Lhost/GoogleWorkspace.pm
   Sisimai::Lhost::IMailServer:
     file: lib/Sisimai/Lhost/IMailServer.pm
-  Sisimai::Lhost::InterScanMSS:
-    file: lib/Sisimai/Lhost/InterScanMSS.pm
   Sisimai::Lhost::KDDI:
     file: lib/Sisimai/Lhost/KDDI.pm
   Sisimai::Lhost::MailFoundry:
     file: lib/Sisimai/Lhost/MailFoundry.pm
-  Sisimai::Lhost::MailMarshalSMTP:
-    file: lib/Sisimai/Lhost/MailMarshalSMTP.pm
+  Sisimai::Lhost::MailMarshal:
+    file: lib/Sisimai/Lhost/MailMarshal.pm
   Sisimai::Lhost::MessagingServer:
     file: lib/Sisimai/Lhost/MessagingServer.pm
+  Sisimai::Lhost::Mimecast:
+    file: lib/Sisimai/Lhost/Mimecast.pm
   Sisimai::Lhost::Notes:
     file: lib/Sisimai/Lhost/Notes.pm
   Sisimai::Lhost::OpenSMTPD:
@@ -97,6 +97,8 @@ provides:
     file: lib/Sisimai/Lhost/Postfix.pm
   Sisimai::Lhost::Sendmail:
     file: lib/Sisimai/Lhost/Sendmail.pm
+  Sisimai::Lhost::TrendMicro:
+    file: lib/Sisimai/Lhost/TrendMicro.pm
   Sisimai::Lhost::V5sendmail:
     file: lib/Sisimai/Lhost/V5sendmail.pm
   Sisimai::Lhost::Verizon:
@@ -263,6 +265,8 @@ provides:
     file: lib/Sisimai/Rhost/Tencent.pm
   Sisimai::Rhost::YahooInc:
     file: lib/Sisimai/Rhost/YahooInc.pm
+  Sisimai::Rhost::Zoho:
+    file: lib/Sisimai/Rhost/Zoho.pm
   Sisimai::SMTP:
     file: lib/Sisimai/SMTP.pm
   Sisimai::SMTP::Command:
@@ -279,8 +283,6 @@ provides:
     file: lib/Sisimai/String.pm
   Sisimai::Time:
     file: lib/Sisimai/Time.pm
-  Sisimai::Xe:
-    file: lib/Sisimai/Xe.pm
 requires:
   Class::Accessor::Lite: '0.05'
   JSON: '2.90'
@@ -288,7 +290,7 @@ requires:
   Time::Local: '1.19'
   Time::Piece: '1.29'
   perl: v5.26.0
-version: v5.4.1
+version: v5.5.0
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'
@@ -298,11 +300,12 @@ x_contributors:
   - 'Mutsutoshi Yoshimoto <negachov@gmail.com>'
   - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
   - 'Valentin Henon <valentin.henon@gmail.com>'
+  - 'Valentin Henon <vhenon@mindbaz.com>'
   - 'Xavier <yadd@debian.org>'
   - 'Xavier Guimard <x.guimard@free.fr>'
-  - 'azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>'
   - 'azumakuniyuki <azumakuniyuki+github.com@gmail.com>'
   - 'azumakuniyuki <azumakuniyuki@gmail.com>'
+  - 'azumakuniyuki <azumakuniyuki@users.noreply.github.com>'
   - 'azumakuniyuki <perl.org@azumakuniyuki.org>'
   - 'batarian71 <36008612+batarian71@users.noreply.github.com>'
   - 'jcbf <underspell@gmail.com>'

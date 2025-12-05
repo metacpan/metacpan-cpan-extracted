@@ -242,7 +242,7 @@ my $moduletest = sub {
 
                 DIAGNOSTICTYPE: {
                     $cv = $rr->diagnostictype;
-                    $cr = qr/\A(?:LMTP|SMTP|UNKNOWN|X[.]?[45]00|X-[0-9A-Z-]+)/;
+                    $cr = qr/\A(?:DNS|LMTP|SMTP|UNKNOWN|X[.]?[45]00|X-[0-9A-Z-]+)/;
                     $ct = sprintf("[%s-%02d] ->diagnostictype =", $e, $errorindex);
 
                     if( $rr->reason eq 'feedback' || $rr->reason eq 'vacation' ) {
@@ -277,7 +277,7 @@ my $moduletest = sub {
                         # The value of "feedbacktype" is not empty
                         ok length $cv,                        sprintf("%s %s", $ct, $cv);
                         ok $cv =~ $cr,                        sprintf("%s %s", $ct, $cr);
-                        is $cv, $cx->[$errorindex - 1]->[4],  sprintf("%s %s", $ct, $cv);
+                        is $cv, $cx->[$errorindex - 1]->[5],  sprintf("%s %s", $ct, $cv);
 
                     } else {
                         # The value of "feedbacktype" is empty
@@ -362,7 +362,7 @@ my $moduletest = sub {
                     isa_ok $rr->recipient, 'Sisimai::Address';
 
                     $cv = $rr->recipient->address;
-                    $cr = qr/\A.+[@][0-9A-Za-z._-]+[A-Za-z]+?\z/;
+                    $cr = qr/\A.+[@][0-9A-Za-z._-]+[.][A-Za-z]+?\z/;
                     $ct = sprintf("[%s-%02d] ->recipient->", $e, $errorindex);
 
                     ok defined $rr->recipient->alias,   sprintf("%s%s = %s", $ct, 'alias', $rr->recipient->alias);
@@ -505,6 +505,16 @@ my $moduletest = sub {
 
                     is length($cv), 40, sprintf("%s %s", $ct, $cv);
                     ok $cv =~ $cr,      sprintf("%s %s", $ct, $cr);
+                }
+
+                TOXIC: {
+                    $cv = $rr->toxic;
+                    $cr = qr/\A[01]\z/;
+                    $ct = sprintf("[%s-%02d] ->toxic =", $e, $errorindex);
+
+                    ok defined $cv, sprintf("%s %d", $ct, $cv);
+                    ok $cv =~ $cr,  sprintf("%s %s", $ct, $cr);
+                    is $cv, $cx->[$errorindex - 1]->[4], sprintf("%s %d", $ct, $cv);
                 }
 
                 DAMN: {

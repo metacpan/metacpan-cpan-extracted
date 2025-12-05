@@ -1,0 +1,13 @@
+# Test batch file for DNS queries
+google.com A
+github.com A
+example.com A
+cloudflare.com A
+amazon.com A
+microsoft.com A
+apple.com A
+facebook.com A
+twitter.com A
+linkedin.com A
+netflix.com A
+reddit.com A

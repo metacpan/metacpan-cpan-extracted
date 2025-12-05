@@ -67,7 +67,6 @@ do { my $x = {
                                       'Safe::Isa' => '1.000008',
                                       'Scalar::Util' => '0',
                                       'Storable' => '0',
-                                      'Sub::Install' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '1.016003',
                                       'YAML::PP' => '0',

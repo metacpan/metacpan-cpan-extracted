@@ -183,7 +183,7 @@ Returns an ARRAY of ARRAYs with text, filename, line-number.
 =item $obj-E<gt>B<log>(\%options, $reason, $message, $domain)
 
 This method is called by L<Log::Report::report()|Log::Report/"Report production and configuration"> and should not be called
-directly.  Internally, it will call L<translate()|Log::Report::Dispatcher/"Logging">, which does most $of
+directly.  Internally, it will call L<translate()|Log::Report::Dispatcher/"Logging">, which does most of
 the work.
 
 =item $obj-E<gt>B<skipStack>()
@@ -369,7 +369,7 @@ object.  When the call to L<Log::Report::report()|Log::Report/"Report production
 comma-separated components, these will already have been joined together
 using concatenation (see L<Log::Report::Message::concat()|Log::Report::Message/"Processing">.
 
-=head4 Â» Example: a filter on syslog
+=head4 » Example: a filter on syslog
 
   dispatcher filter => \&myfilter, 'syslog';
 
@@ -381,7 +381,7 @@ using concatenation (see L<Log::Report::Message::concat()|Log::Report::Message/"
       ($reason, $message);
   }
 
-=head4 Â» Example: take all mistakes and warnings serious
+=head4 » Example: take all mistakes and warnings serious
 
   dispatch filter => \&take_warns_seriously;
   sub take_warns_seriously($$$$)
@@ -411,8 +411,8 @@ Cast by C<new()>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.42,
-built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.43,
+built on December 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

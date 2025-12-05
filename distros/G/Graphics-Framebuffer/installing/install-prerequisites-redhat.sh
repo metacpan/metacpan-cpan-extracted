@@ -15,7 +15,7 @@ sudo yum install gcc \
                  byacc \
                  flex \
                  patch \
-				 ffmpeg \
+                 ffmpeg \
                  giflib-devel \
                  libjpeg-turbo-devel \
                  libpng-devel \

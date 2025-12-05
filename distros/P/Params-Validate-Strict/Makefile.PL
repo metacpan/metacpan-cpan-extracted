@@ -41,6 +41,7 @@ WriteMakefile(
 		}
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'Encode' => 0,
 		'Exporter' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'List::Util' => 1.33,	# Minimum version for any()

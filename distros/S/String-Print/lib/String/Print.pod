@@ -101,15 +101,15 @@ The C<%options> of the constructure configure processing options.
 
 =over 2
 
-=item defaults => \%defaults
+=item defaults => \%map
 
-[1.00] change the defaults for some modifiers.  This is a map of
+[1.00] change the defaults for some modifiers.  This is a C<%map> of
 modifier name to HASH with modifier specific settings.
 
-=item encode_for => HASH|'HTML'
+=item encode_for => \%rules|'HTML'
 
 [0.91] The format string and the inserted values will get encoded according to
-some syntax rules.  Function C<encode_entities()> provided by HTML::Entities
+some C<%rules>.  Function C<encode_entities()> provided by HTML::Entities
 is used when you specify the predefined string C<HTML>.  See L<encodeFor()|String::Print/"Attributes">
 and L</Output encoding>.
 
@@ -623,10 +623,17 @@ specify its width, then there is no performance penalty for using 'S'.
   # name right aligned, commas on same position, always
   printp "name: {name%20S},\n", name => $some_chinese;
 
-=head4 POSIX modifier extensions '%[+ -0]?[0-9]*[_,.]?d'
+=head4 POSIX modifier extensions '%d'
 
-[0.96] Only available when you print (big) decimals: add an underscore,
-comma, or dot on the thousands.
+The full pattern is pretty complex: C<< %[+ -0]?[0-9]*[_,.]?d >>, POSIX
+format style with a few extra features.  The middle (optional) digits tell
+the minimal size of the integer to be displayed.  The optional character
+before it says: C<+> will add a '+' sign when positive, 'blank' adds one
+blank before the digits when positive, a C<0> pads left with zeros instead
+of blanks.  Finally, a C<-> means left-align padding blanks on the right.
+
+[0.96] The last pattern is only useful when you print (big) decimals:
+add an underscore, comma, or dot on the thousands.
 
   printi "{count%_d}\n", count => 1e9;   # 1_000_000_000
   printi "{count%,d}\n", count => 1e9;   # 1,000,000,000
@@ -808,6 +815,40 @@ Other defaults are C<head> (C<<[>>) and C<tail> (C<<]>>).
   $sp->setDefaults(CHOP => +{head => '«', tail => '»'});
   $sp->printi("Intro: {text CHOP}", text => $t); # Intro: 1234578«+12»
 
+=head3 Modifier: UNKNOWN or UNKNOWN($width)
+
+[1.01] When you need to interpolate a value which is unknown and potentially
+unsafe, then use this.  For instance, you produce an internal error message
+to report that a method is used incorrectly:
+
+  sub openFolder
+  {  my ($self, $folder) = @_;
+
+     blessed $folder && $folder->isa('Mail::Box')
+        or printi "ERROR: expected a Mail::Box, got a {t UNKNOWN}.",
+              t => $folder;
+  }
+
+Now, this C<$folder> parameter is clearly wrong.  But what is it?  Did we
+pass a wrong object type?  Did we pass a string?  An ARRAY maybe?
+
+The C<UNKNOWN> modifier distibuishes the following:
+
+=over 4
+
+=item * undefined values will be shown as the UNDEF serializer does;
+
+=item * objects will be represented by their type;
+
+=item * references will show the first part of their Data::Dumper dump; and
+
+=item * the leading parts of strings will be shown between double quotes.
+
+=back
+
+Care is taken that weird characters are escaped.  The shortening uses the
+C<trim> setting: either C<'EL'> (default) or C<'CHOP'>.
+
 =head3 Private modifiers
 
 You may pass your own modifiers.  A modifier consists of a selector and
@@ -862,10 +903,10 @@ formatter understands where one ends and the next begins.
 The modifiers are called in order:
 
   printi "price: {p€%9s}\n", p => $p; # price: ␣␣␣123.45
-  printi "!{t T%10s}!", t => $now;    # !␣␣12:59:17!
+  printi "!{t TIME%10s}!", t => $now; # !␣␣12:59:17!
 
   printp "price: %9{€}s\n", $p;       # price: ␣␣␣123.45
-  printp "!%10{T}s!", $now;           # !␣␣12:59:17!
+  printp "!%10{TIME}s!", $now;        # !␣␣12:59:17!
 
 =head2 Output encoding
 
@@ -947,7 +988,7 @@ This may result in:
 Better not to have HTML in your program: leave it to the template.  But
 in some cases, you have no choice.
 
-=head2 String::Print Compared to other modules on CPAN
+=head2 String::Print compared to other modules on CPAN
 
 There are a quite a number of modules on CPAN which extend the functionality
 of C<printf()>.  To name a few:
@@ -971,8 +1012,8 @@ C<String::Print> is nicely integrated with Log::Report.
 
 =head1 SEE ALSO
 
-This module is part of String-Print version 1.00,
-built on December 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of String-Print version 1.01,
+built on December 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.626';
+our $VERSION = '0.627';
 
 use 5.020;
 use strictures 2;
@@ -384,7 +384,11 @@ sub E ($state, $error_string, @args) {
 # - _unknown (boolean)
 # - depth
 sub A ($state, $annotation) {
-  return 1 if not $state->{collect_annotations};
+  # even if the user requested annotations, we only collect them for later drafts
+  # ..but we always collect them if the lowest bit is set, indicating the presence of unevaluated*
+  # keywords necessary for accurate validation
+  return 1 if not ($state->{collect_annotations}
+    & ($state->{specification_version} =~ /^draft[467]$/ ? ~(1<<8) : ~0));
 
   # we store the absolute uri in unresolved form until needed,
   # and perform the rest of the calculations later.
@@ -439,8 +443,8 @@ sub assert_pattern ($state, $pattern) {
 }
 
 # this is only suitable for checking URIs within schemas themselves
-# note that we cannot use $state->{specification_version} to more tightly constrain the plain-name fragment
-# syntax, as we could be checking a $ref to a schema using a different version
+# note that we cannot use $state->{specification_version} to more tightly constrain the plain-name
+# fragment syntax, as we could be checking a $ref to a schema using a different version
 sub assert_uri_reference ($state, $schema) {
   croak 'assert_uri_reference called in void context' if not defined wantarray;
 
@@ -573,7 +577,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.626
+version 0.627
 
 =head1 SYNOPSIS
 

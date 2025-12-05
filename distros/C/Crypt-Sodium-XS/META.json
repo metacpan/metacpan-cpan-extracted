@@ -46,6 +46,6 @@
    "resources" : {
       "x_IRC" : "irc://irc.perl.org/#sodium"
    },
-   "version" : "0.000040",
+   "version" : "0.000041",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

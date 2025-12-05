@@ -9,6 +9,7 @@ eg/cal.pl
 eg/cbor.pl
 eg/clocks.pl
 eg/excel.pl
+eg/isocal.pl
 eg/json.pl
 eg/se_bank_holidays.pl
 eg/sereal.pl

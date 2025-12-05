@@ -2,7 +2,7 @@ package Sisimai;
 use v5.26;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v5.4.1'); our $PATCHLV = 0;
+use version; our $VERSION = version->declare('v5.5.0'); our $PATCHLV = 0;
 sub version { return substr($VERSION->stringify, 1).($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub libname { 'Sisimai' }
 
@@ -34,7 +34,7 @@ sub rise {
         my $path = $mail->data->path;
         my $args = {
             'data' => $r, 'hook' => $c___->[0], 'origin' => $path,
-            'delivered' => $argv1->{'delivered'}, 'vaction' => $argv1->{'vacation'}
+            'delivered' => $argv1->{'delivered'}, 'vacation' => $argv1->{'vacation'}
         };
         my $fact = Sisimai::Fact->rise($args) || [];
 
@@ -70,10 +70,6 @@ sub dump {
         # Set UTF8 flag before converting to JSON string
         utf8::decode $e->{'subject'};
         utf8::decode $e->{'diagnosticcode'};
-
-        # Backward compatibility until v5.5.0
-        $e->{"smtpagent"} = $e->{"decodedby"};
-        $e->{"smtpcommand"} = $e->{"command"};
     }
 
     require Module::Load;

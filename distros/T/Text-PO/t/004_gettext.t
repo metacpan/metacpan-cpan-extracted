@@ -111,7 +111,7 @@ is( "$rv", '2019-10-03 19-44+0000', 'potCreationDate' );
 is( $po->projectIdVersion, 'MyProject 0.1', 'projectIdVersion' );
 is( $po->reportBugsTo, 'john.doe@example.com', 'reportBugsTo' );
 
-# XXX Added in v0.1.2 on 2021-07-30
+# NOTE Added in v0.1.2 on 2021-07-30
 my $old = POSIX::setlocale( &POSIX::LC_ALL );
 POSIX::setlocale( &POSIX::LC_ALL, $po->locale );
 $rv = $po->getMonthsLong();

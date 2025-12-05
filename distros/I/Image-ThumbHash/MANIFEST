@@ -3,13 +3,16 @@ lib/Image/ThumbHash.pm
 lib/Image/ThumbHash/PP.pm
 Makefile.PL
 Makefile_PL_settings.plx
+Makefile_PL_settings_maint.plx
 MANIFEST			This list of files
 MANIFEST.SKIP
 t/basic.t
+t/data/firefox.png
 t/data/pngified.txt
-xt/data/firefox.png
-xt/data/sunrise.jpg
-xt/imager.t
+t/data/somesulmic.jpg
+t/data/sunrise.jpg
+t/data/tolstoy.png
+t/imager.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

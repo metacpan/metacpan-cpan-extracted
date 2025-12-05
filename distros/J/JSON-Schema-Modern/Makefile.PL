@@ -55,7 +55,6 @@ my %WriteMakefileArgs = (
     "Safe::Isa" => "1.000008",
     "Scalar::Util" => 0,
     "Storable" => 0,
-    "Sub::Install" => 0,
     "Types::Common::Numeric" => 0,
     "Types::Standard" => "1.016003",
     "YAML::PP" => 0,
@@ -95,7 +94,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.626",
+  "VERSION" => "0.627",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -131,7 +130,6 @@ my %FallbackPrereqs = (
   "Safe::Isa" => "1.000008",
   "Scalar::Util" => 0,
   "Storable" => 0,
-  "Sub::Install" => 0,
   "Term::ANSIColor" => 0,
   "Test2::API" => 0,
   "Test2::V0" => 0,

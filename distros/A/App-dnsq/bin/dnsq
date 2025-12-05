@@ -1,0 +1,206 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use DNSQuery::Resolver;
+use DNSQuery::Output;
+use DNSQuery::Interactive;
+use DNSQuery::Batch;
+use DNSQuery::Validator qw(:all);
+use DNSQuery::Constants qw(:all);
+
+our $VERSION = '1.1.0';
+
+my %config = (
+    server      => undef,
+    port        => 53,
+    timeout     => 5,
+    retries     => 3,
+    protocol    => 'udp',
+    qtype       => 'A',
+    qclass      => 'IN',
+    json        => 0,
+    short       => 0,
+    trace       => 0,
+    batch       => undef,
+    interactive => 0,
+    recurse     => 1,
+    dnssec      => 0,
+    verbose     => 0,
+    quiet       => 0,
+);
+
+GetOptions(
+    'server|s=s'      => \$config{server},
+    'port|p=i'        => \$config{port},
+    'timeout|t=i'     => \$config{timeout},
+    'retries|r=i'     => \$config{retries},
+    'tcp|T'           => sub { $config{protocol} = 'tcp' },
+    'udp|U'           => sub { $config{protocol} = 'udp' },
+    'type|q=s'        => \$config{qtype},
+    'class|c=s'       => \$config{qclass},
+    'json|j'          => \$config{json},
+    'short|S'         => \$config{short},
+    'trace|+trace'    => \$config{trace},
+    'batch|b=s'       => \$config{batch},
+    'interactive|i'   => \$config{interactive},
+    'recurse!'        => \$config{recurse},
+    'dnssec|d'        => \$config{dnssec},
+    'verbose|v'       => \$config{verbose},
+    'quiet|Q'         => \$config{quiet},
+    'help|h'          => \&show_help,
+    'version|V'       => sub { print "dnsq version $VERSION\n"; exit 0; },
+) or die "Error parsing options. Use --help for usage.\n";
+
+# Validate configuration before creating objects
+my ($valid, $error);
+
+($valid, $error) = validate_port($config{port});
+die "Error: $error\n" unless $valid;
+
+($valid, $error) = validate_timeout($config{timeout});
+die "Error: $error\n" unless $valid;
+
+($valid, $error) = validate_retries($config{retries});
+die "Error: $error\n" unless $valid;
+
+my $resolver = eval { DNSQuery::Resolver->new(\%config) };
+if ($@) {
+    die "Error initializing resolver: $@";
+}
+
+my $output = DNSQuery::Output->new(\%config);
+
+# Show banner at startup (unless quiet, json, or short mode)
+unless ($config{quiet} || $config{json} || $config{short}) {
+    require DNSQuery::Banner;
+    DNSQuery::Banner::show($VERSION);
+}
+
+if ($config{interactive}) {
+    my $interactive = DNSQuery::Interactive->new(\%config, $resolver, $output);
+    $interactive->run();
+} elsif ($config{batch}) {
+    my $batch = DNSQuery::Batch->new(\%config, $resolver, $output);
+    $batch->process_file($config{batch});
+} elsif ($config{trace}) {
+    my $domain = shift @ARGV or die "Domain name required for trace mode\n";
+    my $trace_results = $resolver->trace($domain);
+    $output->print_trace($trace_results, $domain);
+    
+    print ";; Final query for $domain $config{qtype}\n";
+    my $result = $resolver->query($domain);
+    $output->print_result($result, $domain) if $result->{packet};
+} elsif (@ARGV) {
+    my $domain = shift @ARGV;
+    my $qtype = shift @ARGV || $config{qtype};
+    
+    # Trim whitespace
+    $domain =~ s/^\s+|\s+$//g if defined $domain;
+    
+    # Validate domain using Validator module
+    my ($valid, $error) = validate_domain($domain);
+    die "Error: $error\n" unless $valid;
+    
+    # Validate query type
+    $qtype = uc($qtype);
+    ($valid, $error) = validate_query_type($qtype);
+    die "Error: $error\n" unless $valid;
+    
+    $config{qtype} = $qtype;
+    
+    my $result = eval { $resolver->query($domain) };
+    
+    if ($@) {
+        my $error_msg = $@;
+        chomp $error_msg;
+        
+        if ($config{json}) {
+            require JSON;
+            print JSON::encode_json({
+                error => "Query exception: $error_msg",
+                domain => $domain,
+                type => $config{qtype},
+            }) . "\n";
+        } else {
+            print STDERR "Query exception: $error_msg\n";
+        }
+        exit 1;
+    }
+    
+    unless (defined $result && ref($result) eq 'HASH') {
+        if ($config{json}) {
+            require JSON;
+            print JSON::encode_json({
+                error => "Invalid query result",
+                domain => $domain,
+                type => $config{qtype},
+            }) . "\n";
+        } else {
+            print STDERR "Error: Invalid query result\n";
+        }
+        exit 1;
+    }
+    
+    if ($result->{error}) {
+        if ($config{json}) {
+            require JSON;
+            print JSON::encode_json({
+                error => $result->{error},
+                domain => $domain,
+                type => $config{qtype},
+            }) . "\n";
+        } else {
+            print STDERR "Query failed: $result->{error}\n";
+        }
+        exit 1;
+    }
+    
+    $output->print_result($result, $domain);
+} else {
+    show_help();
+}
+
+sub show_help {
+    print <<'HELP';
+dnsq - DNS Query Tool
+
+USAGE:
+    dnsq [OPTIONS] <domain> [type]
+    dnsq [OPTIONS] --batch <file>
+    dnsq [OPTIONS] --interactive
+    dnsq [OPTIONS] --trace <domain>
+
+OPTIONS:
+    -s, --server <ip>       DNS server to query
+    -p, --port <port>       DNS server port (default: 53)
+    -t, --timeout <sec>     Query timeout (default: 5)
+    -r, --retries <num>     Number of retries (default: 3)
+    -T, --tcp               Use TCP protocol
+    -U, --udp               Use UDP protocol (default)
+    -q, --type <type>       Query type (default: A)
+    -j, --json              JSON output
+    -S, --short             Short output (answers only)
+    --trace                 Trace DNS delegation
+    -b, --batch <file>      Batch mode
+    -i, --interactive       Interactive mode
+    -d, --dnssec            Request DNSSEC
+    -v, --verbose           Verbose output
+    -Q, --quiet             Quiet mode (no banners)
+    -h, --help              Show help
+    -V, --version           Show version
+
+EXAMPLES:
+    dnsq google.com
+    dnsq -s 8.8.8.8 example.com MX
+    dnsq --json --short google.com
+    dnsq --trace example.com
+    dnsq --batch queries.txt
+    dnsq --interactive
+
+HELP
+    exit 0;
+}

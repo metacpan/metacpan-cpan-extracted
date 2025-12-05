@@ -5,11 +5,11 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '1.42';
-my $webpages = "../public_html";
-my $git      = "https://github.com/markov2/perl5-Log-Report";
-my $publish  = "../public_html/log-report";
-my $homepage = "http://perl.overmeer.net/CPAN/";
+my $version  = '1.43';
+my $webpages = '../public_html';
+my $git      = 'https://github.com/markov2/perl5-Log-Report';
+my $publish  = '../public_html/log-report';
+my $homepage = 'http://perl.overmeer.net/CPAN/';
 
 my %oodist   = (
 	oodoc_version => 3.04,
@@ -50,9 +50,7 @@ my %oodist   = (
 	},
 
 	generate => [
-	  {
-		# Add real pod to the releases
-		format         => 'pod3',
+	  {	format         => 'pod3',
 		podtail        => undef,
 	  },
 	  {	format         => 'html',
@@ -66,28 +64,22 @@ my %oodist   = (
 		serializer   => 'json',
 		markup       => 'html',
 		publish      => "$publish/doctree",
-		include_manuals => undef,
 	  },
 	],
 );
 
-my %prereq  = (
+my %requires  = (
 	'Sys::Syslog'             => '0.27',
 	'Encode'                  => '2.00',
 	'Scalar::Util'            => 0,
 	'Devel::GlobalDestruction'=> '0.09',
 	'Log::Report::Optional'   => '1.07',
-	'String::Print'           => '0.91',
+	'String::Print'           => '1.00',
 );
 
-#use Data::Dumper;
-#warn Dumper \%prereq;
-
 WriteMakefile
-	NAME      => 'Log-Report',
+	NAME      => 'Log::Report',
 	VERSION   => $version,
-	PREREQ_PM => \%prereq,
-
 	AUTHOR    => 'Mark Overmeer <markov@cpan.org>',
 	ABSTRACT  => 'report a problem, pluggable handlers and language support',
 	LICENSE   => 'perl_5',
@@ -100,20 +92,26 @@ WriteMakefile
 				url  => "$git.git",
 				web  => $git,
 			},
+			bugtracker => {
+				web  => "$git/issues",
+			},
 			homepage => $homepage,
 			license  => [ 'http//dev.perl.org/licenses/' ],
 		},
 		prereqs => {
+			runtime => {
+				requires => \%requires,
+			},
 			develop => {
 				requires => {
 					'OODoc' => '3.04',
-				}
+				},
 			},
 			test => {
 				requires => {
 					'Test::More' => 1.00,
 					'Test::Pod'  => 1.00,
-				}
+				},
 			},
 		},
 

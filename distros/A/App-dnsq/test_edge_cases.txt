@@ -1,0 +1,26 @@
+# Test batch file with edge cases
+google.com A
+github.com AAAA
+
+# Empty line above and below
+
+# Invalid entries below
+..invalid.com
+-invalid.com
+invalid-.com
+
+# Valid entries
+amazon.com MX
+cloudflare.com A
+
+# Invalid type
+example.com BADTYPE
+
+# Very long domain (will be truncated in display)
+verylongdomainnamethatshouldstillbevalidbutmightcauseissuesifnothandledproperly.com
+
+# Trailing spaces  
+facebook.com   
+
+# Valid final entry
+microsoft.com A

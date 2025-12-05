@@ -25,6 +25,8 @@ __END__
 
 =encoding utf8
 
+=head1 NAME
+
 Crypt::Sodium::XS::Base64 - libsodium base64 functions and constants
 
 =head1 SYNOPSIS

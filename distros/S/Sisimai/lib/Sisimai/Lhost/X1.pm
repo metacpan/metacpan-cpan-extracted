@@ -16,11 +16,14 @@ sub inquire {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless index($mhead->{'subject'}, 'Returned Mail: ') == 0;
-    return undef unless index($mhead->{'from'}, '"Mail Deliver System" ') == 0;
+    my $proceedsto = 0;
+       $proceedsto = 1 if index($mhead->{'subject'}, 'Returned Mail: ') == 0;
+       $proceedsto = 1 if index($mhead->{'subject'}, 'Mail Delivery Failure') == 0;
+       $proceedsto = 1 if Sisimai::String->aligned(\$mhead->{'from'}, ['"Mail Deliver', 'System" ']);
+    return undef unless $proceedsto;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $boundaries = ['Received: from '];
+    state $boundaries = ['Content-Type: message/rfc822', 'Received: from '];
     state $markingsof = {'message' => ['The original message was received at ']};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;

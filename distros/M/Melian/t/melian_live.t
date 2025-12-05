@@ -31,7 +31,7 @@ subtest 'table1 by id' => sub {
     );
 
     is_deeply(
-        $melian->fetch_by_int($table->{'id'}, $column->{'id'}, 5),
+        $melian->fetch_by_int($table->{'id'}, $column->{'id'}, $record_id),
         {
             'active'      => 1,
             'category'    => 'alpha',
@@ -74,10 +74,6 @@ subtest 'Table2 by id and hostname' => sub {
         $expected,
         "$table_name by hostname",
     );
-};
-
-subtest 'Disconnect' => sub {
-    ok($melian->disconnect(), 'Closed connection');
 };
 
 subtest 'Schema functions' => sub {
@@ -141,6 +137,44 @@ subtest 'Schema functions' => sub {
         'Melian from spec produces the same as DESCRIBE action',
     );
 
+};
+
+subtest 'Fetch using names' => sub {
+    is(
+        $melian->fetch_raw_from( 'table1', 'id', pack( 'V', 5 ) ),
+        qq!{"id":5,"name":"item_5","category":"alpha","value":"VAL_0005","description":"Mock description for item 5","created_at":"2025-10-30 14:26:47","updated_at":"2025-11-04 14:26:47","active":1}!,
+        '->fetch_raw_from( "table1", "id", 5 )',
+    );
+
+    is_deeply(
+        $melian->fetch_by_int_from( 'table1', 'id', 5 ),
+        {
+            'active'      => 1,
+            'category'    => 'alpha',
+            'created_at'  => '2025-10-30 14:26:47',
+            'description' => 'Mock description for item 5',
+            'id'          => 5,
+            'name'        => 'item_5',
+            'updated_at'  => '2025-11-04 14:26:47',
+            'value'       => 'VAL_0005',
+        },
+        '->fetch_by_int_from( "table1", "id", 5 )',
+    );
+
+    is_deeply(
+        $melian->fetch_by_string_from( 'table2', 'hostname', 'host-00002' ),
+        {
+            'hostname' => 'host-00002',
+            'id'       => 2,
+            'ip'       => '10.0.2.0',
+            'status'   => 'maintenance',
+        },
+        '->fetch_by_string_from( "table2", "hostname", "host-00002" )',
+    );
+};
+
+subtest 'Disconnect' => sub {
+    ok($melian->disconnect(), 'Closed connection');
 };
 
 done_testing();

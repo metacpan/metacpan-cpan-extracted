@@ -1,4 +1,4 @@
-# This code is part of Perl distribution String-Print version 1.00.
+# This code is part of Perl distribution String-Print version 1.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package String::Print;{
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 }
 
 
@@ -21,6 +21,7 @@ use utf8;
 #use Log::Report::Optional 'log-report';
 
 use Unicode::GCString ();
+use Data::Dumper      ();
 use Date::Parse       qw/str2time/;
 use Encode            qw/is_utf8 decode/;
 use HTML::Entities    qw/encode_entities/;
@@ -37,16 +38,18 @@ my @default_modifiers   = (
 	qr/DATE\b/       => \&_modif_date,
 	qr/TIME\b/       => \&_modif_time,
 	qr/\=/           => \&_modif_name,
+	qr!UNKNOWN\([0-9]+\)|UNKNOWN\b!       => \&_modif_unknown,
 	qr!CHOP\([0-9]+(?:\,?[^)]*)\)|CHOP\b! => \&_modif_chop,
 	qr!EL\([0-9]+(?:\,?[^)]*)\)|EL\b!     => \&_modif_ellipsis,
 	qr!//(?:\"[^"]*\"|\'[^']*\'|\w+)!     => \&_modif_undef,
 );
 
 my %defaults = (
-	CHOP   => +{ width => 20, head => '[', units => '', tail => ']' },
-	DT     => +{ standard => 'FT' },
-	EL     => +{ width => 20, replace => '⋯ '},
-	FORMAT => +{ thousands => '' },
+	CHOP      => +{ width => 30, head => '[', units => '', tail => ']' },
+	DT        => +{ standard => 'FT' },
+	EL        => +{ width => 30, replace => '⋯ '},
+	FORMAT    => +{ thousands => '' },
+	UNKNOWN   => +{ width => 30, trim => 'EL' },
 );
 
 my %default_serializers = (
@@ -494,10 +497,11 @@ sub _modif_name($$$)
 sub _modif_chop($$$)
 {	my ($self, $format, $value, $args) = @_;
 	defined $value && length $value or return undef;
-	$format =~ m/^ CHOP\( ([0-9]+) \,? ([^)]+)? \) | CHOP\b /x or die $format;
 
 	my $defaults = $self->defaults('CHOP');
-	my ($width, $units) = ($1 // $defaults->{width}, $2 // $defaults->{units});
+	$format =~ m/^ CHOP\( ([0-9]+) \,? ([^)]+)? \) | CHOP\b /x or die $format;
+	my $width    = $1 // $args->{width} // $defaults->{width};
+	my $units    = $2 // $args->{units} // $defaults->{units};
 	$width != 0 or return $value;
 
 	# max width of a char is 2
@@ -533,10 +537,11 @@ sub _modif_chop($$$)
 sub _modif_ellipsis($$$)
 {	my ($self, $format, $value, $args) = @_;
 	defined $value && length $value or return undef;
-	$format =~ m/^ EL\( ([0-9]+) \,? ([^)]+)? \) | EL\b /x or die $format;
 
 	my $defaults = $self->defaults('EL');
-	my ($width, $replace) = ($1 // $defaults->{width}, $2 // $defaults->{replace});
+	$format =~ m/^ EL\( ([0-9]+) \,? ([^)]+)? \) | EL\b /x or die $format;
+	my $width    = $1 // $args->{width}   // $defaults->{width};
+	my $replace  = $2 // $args->{replace} // $defaults->{replace};
 	$width != 0 or return $value;
 
 	# max width of a char is 2
@@ -555,6 +560,29 @@ sub _modif_ellipsis($$$)
 	# might be one column short
 	my $pad = $v->columns + $r->columns < $width ? ' ' : '';
 	$v->as_string . $pad . $replace;
+}
+
+sub _modif_unknown($$$)
+{	my ($self, $format, $value, $args) = @_;
+	defined $value or return undef;
+
+	my $defaults = $self->defaults('UNKNOWN');
+	$format =~ m/^ UNKNOWN\( ([0-9]+) \) | UNKNOWN\b /x or die $format;
+	$args->{width} = $1 // $args->{width} // $defaults->{width};
+
+	return ref $value
+		if blessed $value;
+
+	my $trim    = $args->{trim} // $defaults->{trim};
+	my $trimmer = $trim eq 'EL' ? '_modif_ellipsis' : $trim eq 'CHOP' ? '_modif_chop' : die $trim;
+	my $shorten = sub { $self->$trimmer($trim, $_[0], $args) };
+
+	my $serial  = Data::Dumper->new([$value])->Quotekeys(0)->Terse(1)->Useqq(1)->Indent(0)->Sortkeys(1)->Dump;
+
+	  ! reftype $value          ?  '"' . $shorten->($serial =~ s/^\"//r =~ s/\"$//r) . '"'
+	: reftype $value eq 'ARRAY' ?  '[' . $shorten->($serial =~ s/^\[//r =~ s/\]$//r) . ']'
+	: reftype $value eq 'HASH'  ?  '{' . $shorten->($serial =~ s/^\{//r =~ s/\}$//r) . '}'
+	:     $shorten->($serial);
 }
 
 

@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Text-PO/issues
   repository: https://gitlab.com/jackdeguest/Text-PO
-version: v0.9.0
+version: v0.9.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

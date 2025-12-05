@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.2.3';
 
 use Digest::MD5 qw();
 use File::Basename qw(basename dirname);
@@ -947,8 +947,8 @@ SlackBuilds.org repository. While sbozyp provides conveniences to make it easier
 to build, install, and remove packages, users should always understand every
 package they consider installing by reading its README file.
 
-Sbozyp does not handle optional dependencies or setting build-time options.
-Users must deal with these special cases manually.
+Sbozyp does not handle optional dependencies or setting build-time options, so
+users must deal with these special cases manually.
 
 =head1 OVERVIEW
 
@@ -1189,7 +1189,7 @@ Nicholas B. Hubbard (nicholashubbard@posteo.net)
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023-2025 by Nicholas Hubbard (nicholashubbard@posteo.net)
+Copyright (c) 2023-2025 by Nicholas B. Hubbard (nicholashubbard@posteo.net)
 
 =head1 LICENSE
 

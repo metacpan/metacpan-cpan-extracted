@@ -27,17 +27,18 @@ sub list {
             Lhost/GoogleGroups.pm
             Lhost/GoogleWorkspace.pm
             Lhost/IMailServer.pm
-            Lhost/InterScanMSS.pm
             Lhost/KDDI.pm
             Lhost/MailFoundry.pm
-            Lhost/MailMarshalSMTP.pm
+            Lhost/MailMarshal.pm
             Lhost/MessagingServer.pm
+            Lhost/Mimecast.pm
             Lhost/mFILTER.pm
             Lhost/Notes.pm
             Lhost/OpenSMTPD.pm
             Lhost/Postfix.pm
             Lhost/qmail.pm
             Lhost/Sendmail.pm
+            Lhost/TrendMicro.pm
             Lhost/V5sendmail.pm
             Lhost/Verizon.pm
             Lhost/X1.pm
@@ -118,6 +119,7 @@ sub list {
             Rhost/Spectrum.pm
             Rhost/Tencent.pm
             Rhost/YahooInc.pm
+            Rhost/Zoho.pm
         SMTP.pm
             SMTP/Command.pm
             SMTP/Failure.pm

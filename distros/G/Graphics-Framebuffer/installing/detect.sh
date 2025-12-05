@@ -12,6 +12,13 @@ OS=`uname -s`
 REV=`uname -r`
 MACH=`uname -m`
 
+source /etc/lsb-release
+
+# echo $DISTRIB_ID
+# echo $DISTRIB_RELEASE
+# echo $DISTRIB_CODENAME
+# echo $DISTRIB_DESCRIPTION
+
 GetVersionFromFile()
 {
     VERSION=`cat $1 | tr "\n" ' ' | sed s/.*VERSION.*=\ // `
@@ -70,6 +77,7 @@ known_compatible_distros=(
                         "Cyborg"
                         "Ubuntu"
                         "Debian"
+                        "Mint"
                         "SuSE"
                         "CentOS"
                         "Gentoo"
@@ -77,6 +85,7 @@ known_compatible_distros=(
                         "Red Hat"
                         "Arch"
                         "OpenMandriva"
+                        "Zorin"
                     )
 
 known_arm_compatible_distros=(
@@ -84,7 +93,7 @@ known_arm_compatible_distros=(
                         "Parrot arm"
                         "Kali arm"
                         "Debian"
-						"Mint"
+                        "Mint"
                         "Ubuntu"
                     )
 
@@ -94,7 +103,7 @@ function detect_distro_phase1() {
     for i in "${known_compatible_distros[@]}"; do
         uname -a | grep "${i}" -i > /dev/null
         if [ "$?" = "0" ]; then
-            distro="${i^}"
+            distro="${DISTRIB_DESCRIPTION} (${i^} based)"
             break
         fi
     done
@@ -173,6 +182,7 @@ echo "  * LMDE         * PureOS              * SparkyLinux"
 echo "  * BackBox      * Bodhi Linux         * Cub Linux"
 echo "  * EasyPeasy    * elementary OS       * Mint"
 echo "  * Molinux      * Raspian             * Twister OS"
+echo "  * Mint         * Zorin OS"
 echo ""
 echo "RedHat Distributions"
 echo "  * RedHat           * Fedora             * CentOS"

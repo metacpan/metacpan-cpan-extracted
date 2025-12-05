@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -94,6 +94,7 @@ sub new($proto, %params) {
         language             => $params{language} // PEP_LANGUAGE_ENGLISH,
         ticket_width         => $params{ticket_width} // 40,
         ticket_printing_mode => $params{ticket_printing_mode} // 0,  # Default: POS prints (disables terminal printer)
+        tip_enabled          => $params{tip_enabled} // 0,         # Default: no tip dialog
 
         # Callback handling
         callback         => $params{callback},
@@ -327,6 +328,24 @@ sub doPayment($self, $amount, %options) {
 
     my $currency = $options{currency};
 
+    # Build additional options for the transaction
+    my $txnOptions = $options{options} // {};
+
+    # Tip support via Pepper API:
+    # - Transaction type 13 (GoodsPaymentWithTip): NOT supported by GlobalPayments ZVT (returns -1402)
+    # - iServiceByteValue bit 3 (tippable): Transaction completes but tip dialog depends on terminal config
+    # - The tip prompt/dialog must be enabled at the TERMINAL level by your payment processor
+    # - If you need tips, either:
+    #   1. Contact GlobalPayments to enable tip prompting on your terminal
+    #   2. Collect tip amount in your POS and pass it via doPayment(..., options => {iTipAmount => $tip})
+    if($self->{tip_enabled}) {
+        if(!exists $txnOptions->{iServiceByteValue}) {
+            $txnOptions->{iServiceByteValue} = 8;  # Bit 3 = tippable
+        } else {
+            $txnOptions->{iServiceByteValue} |= 8;
+        }
+    }
+
     # Execute transaction
     my $result;
     my $success = 0;
@@ -335,7 +354,7 @@ sub doPayment($self, $amount, %options) {
             amount           => $amount,
             transaction_type => $transactionType,
             (defined $currency ? (currency => $currency) : ()),
-            (exists $options{options} ? (options => $options{options}) : ()),
+            (keys %{$txnOptions} ? (options => $txnOptions) : ()),
         );
         $success = 1;
     };
@@ -862,6 +881,42 @@ B<Note>: The module automatically sets the C<config_byte> parameter to
 C<PEP_CONFIG_BYTE_DISABLE_PRINTER> (0x06) when mode 0 is used, which helps disable
 the terminal printer on many devices. This is handled internally and you don't need
 to set C<config_byte> manually.
+
+=item tip_enabled
+
+Controls whether the terminal displays a tip/gratuity dialog during payment transactions
+(default: 0 - tip dialog disabled).
+
+Values:
+
+=over 4
+
+=item * 0 - Tip dialog disabled (standard goods payment) - B<DEFAULT>
+
+=item * 1 - Tip dialog enabled (uses payment mode "Tippable")
+
+=back
+
+When C<tip_enabled =E<gt> 1> is set, C<doPayment()> will pass C<iPaymentModeValue =E<gt> 3>
+(C<PEP_PAYMENT_MODE_TIPPABLE>) to the transaction, causing the terminal to prompt for a
+tip amount during the payment flow.
+
+This is useful for restaurants, bars, taxis, and other businesses where tips are common.
+
+B<Note>: Tip support depends on the terminal and payment processor configuration.
+Not all terminals or card types support tipping.
+
+B<Example:>
+
+    my $pepper = Lib::Pepper::Simple->new(
+        terminal_type    => PEP_TERMINAL_TYPE_GLOBALPAYMENTS_ZVT,
+        terminal_address => '192.168.1.163:20008',
+        license_file     => '/etc/pepper/license.xml',
+        config_file      => '/etc/pepper/config.xml',
+        tip_enabled      => 1,  # Enable tip dialog
+    );
+
+    my $payment = $pepper->doPayment(5000);  # Terminal will show tip prompt
 
 =item callback
 

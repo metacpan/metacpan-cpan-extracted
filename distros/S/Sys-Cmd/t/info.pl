@@ -12,23 +12,17 @@ binmode STDIN,  ':encoding(locale)';
 binmode STDOUT, ':encoding(locale)';
 binmode STDERR, ':encoding(locale)';
 
-my %env;
-$env{ decode( locale => $_ ) } = decode( locale => $ENV{$_} ) for keys %ENV;
-
-my $err = $env{SYS_CMD_ERR} // undef;
-if ( length $err ) {
-    delete $env{SYS_CMD_ERR};
-    print STDERR $err, "\n";
-}
+print STDERR decode( locale => $ENV{SYS_CMD_ERR} ), "\n"
+  if exists $ENV{SYS_CMD_ERR};
 
 $Data::Dumper::Sortkeys++;
 print Data::Dumper->Dump(
     [
         {
             argv  => \@ARGV,
-            env   => \%env,
+            env   => \%ENV,
             cwd   => fc( cwd() ),
-            input => $env{SYS_CMD_INPUT} ? join( '', <STDIN> ) : '',
+            input => $ENV{SYS_CMD_INPUT} ? join( '', <STDIN> ) : '',
             pid   => $$,
         }
     ],

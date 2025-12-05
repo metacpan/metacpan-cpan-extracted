@@ -1,0 +1,27 @@
+bin/dnsq
+CHANGELOG.md
+cpanfile
+IMPROVEMENTS.md
+LICENSE
+Makefile
+Makefile.PL
+MANIFEST
+README.md
+USAGE_GUIDE.md
+lib/App/dnsq.pm
+lib/DNSQuery/Banner.pm
+lib/DNSQuery/Batch.pm
+lib/DNSQuery/Cache.pm
+lib/DNSQuery/Constants.pm
+lib/DNSQuery/Interactive.pm
+lib/DNSQuery/Output.pm
+lib/DNSQuery/Resolver.pm
+lib/DNSQuery/Validator.pm
+t/basic.t
+t/cache.t
+t/integration.t
+t/validator.t
+test_batch.txt
+test_edge_cases.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,15 +1,15 @@
 package Image::ThumbHash;
 use strict;
-use warnings;
+use warnings qw(all FATAL uninitialized);
 
+use Carp qw(croak);
 use Exporter 5.57 qw(import);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $_BACKEND = 'PP';
 
-use Image::ThumbHash::PP
-our @EXPORT_OK = qw(
+use Image::ThumbHash::PP our @EXPORT_OK = qw(
     rgba_to_thumb_hash
     rgba_to_png
     rgba_to_data_url
@@ -19,12 +19,36 @@ our @EXPORT_OK = qw(
     thumb_hash_to_data_url
 );
 
+push our @EXPORT_OK, qw(
+    imager_to_rgba
+    imager_to_thumb_hash
+);
+
+sub imager_to_rgba {
+    my ($img) = @_;
+    wantarray or croak "imager_to_rgba: must be called in list context";
+    $img = $img->to_rgb8;
+    $img = $img->scale(
+        xpixels => 100,
+        ypixels => 100,
+        type    => 'min',
+        qtype   => 'mixing',
+    ) or croak "imager_to_rgba: cannot scale: " . $img->errstr;
+    $img = $img->convert(preset => 'addalpha');
+    $img->write(type => 'raw', data => \my $data)
+        or croak "imager_to_rgba: cannot write: " . $img->errstr;
+    $img->getwidth, $img->getheight, $data
+}
+
+sub imager_to_thumb_hash {
+    my ($img) = @_;
+    rgba_to_thumb_hash imager_to_rgba $img
+}
+
 1
 __END__
 
 =encoding utf8
-
-=for github-markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/Image-ThumbHash/badge.svg?branch=main)](https://coveralls.io/github/mauke/Image-ThumbHash?branch=main)
 
 =head1 NAME
 
@@ -35,6 +59,8 @@ Image::ThumbHash - A very compact representation of an image placeholder
 =for highlighter language=perl
 
     use Image::ThumbHash qw(
+        imager_to_rgba
+        imager_to_thumb_hash
         rgba_to_thumb_hash
         rgba_to_png
         rgba_to_data_url
@@ -64,6 +90,23 @@ images can be loaded in asynchronously.
 =head1 FUNCTIONS
 
 This module exports the following functions on request.
+
+=head2 imager_to_rgba
+
+    my ($width, $height, $rgba) = imager_to_rgba($imager);
+
+Converts an image (an instance of L<Imager>) to RGBA (see below).
+
+The return value is a list containing the image width, height, and pixels as a
+byte string in RGBA format.
+
+=head2 imager_to_thumb_hash
+
+    my $thumbhash = imager_to_thumb_hash($imager);
+
+Encodes an image (an instance of L<Imager>) to a thumb hash.
+
+The return value is a byte string containing the thumb hash.
 
 =head2 rgba_to_thumb_hash
 
@@ -195,4 +238,6 @@ by the Free Software Foundation; or the Artistic License.
 
 See L<https://dev.perl.org/licenses/> for more information.
 
-=cut
+=head1 SEE ALSO
+
+L<Imager>

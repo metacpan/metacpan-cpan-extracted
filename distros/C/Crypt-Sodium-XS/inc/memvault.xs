@@ -296,7 +296,8 @@ SV * new_from_ttyno( \
     total += w;
   }
 
-  tattr.c_lflag = ICANON | ISIG;
+  tattr.c_lflag |= ICANON | ISIG;
+  tattr.c_lflag &= ~ECHO;
   if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
     write(fd, "\n", 1);
     protmem_free(aTHX_ new_pm);

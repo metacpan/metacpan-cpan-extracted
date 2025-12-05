@@ -26,5 +26,6 @@ return {
         'Imager'    => 0,
     },
 
-    REPOSITORY => [ github => 'mauke' ],
+    REPOSITORY => [ codeberg => 'mauke' ],
+    BUGTRACKER => 'https://codeberg.org/mauke/Image-ThumbHash/issues',
 };

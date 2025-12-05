@@ -7,7 +7,7 @@ use Crypt::Sodium::XS;
 use Exporter 'import';
 use Fcntl qw(
   F_GETFD F_SETFD
-  O_CREAT O_NOCTTY O_RDONLY O_RDWR O_TRUNC O_TTY_INIT O_WRONLY
+  O_CREAT O_NOCTTY O_RDONLY O_RDWR O_TRUNC O_WRONLY
 );
 
 our %EXPORT_TAGS = (
@@ -72,11 +72,13 @@ sub new_from_file {
   return $invocant->new_from_fd(fileno($fh), @_);
 }
 
+my $tty_init = eval 'Fcntl::O_TTY_INIT()';
+$tty_init = 0 if !defined($tty_init);
 sub new_from_tty {
   my $invocant = shift;
   # undef intended to indicate 'controlling tty'
   my $path = shift // '/dev/tty';
-  sysopen(my $fh, $path, O_NOCTTY|O_RDWR|O_TTY_INIT)
+  sysopen(my $fh, $path, O_NOCTTY|O_RDWR|$tty_init)
     or die "$path: new_from_tty:open: $!";
   return $invocant->new_from_ttyno(fileno($fh), @_);
 }

@@ -473,7 +473,7 @@ L<Log::Report::Dispatcher::Try::wasFatal()|Log::Report::Dispatcher::Try/"Status"
 
 =back
 
-=head4 Â» Example: using the _count
+=head4 » Example: using the _count
 
 With Locale::TextDomain, you have to do
 
@@ -564,8 +564,8 @@ In either case, the translation will be looked-up only once.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.42,
-built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.43,
+built on December 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
