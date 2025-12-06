@@ -1,5 +1,7 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.030 : Remove LO-search debug messages from t/00_compile.t
+           Test colorized btw* messages and expose colorize() function.
 1000.029 : Avoid showing any internal frames in tracebacks involving apply* etc.
            Disallow "a" and "b" as tied variable names (to avoid clashing with Perl)
            Fix bugs finding libreoffice executable when following symlinks

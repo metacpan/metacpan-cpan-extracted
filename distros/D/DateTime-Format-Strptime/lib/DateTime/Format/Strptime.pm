@@ -3,14 +3,14 @@ package DateTime::Format::Strptime;
 use strict;
 use warnings;
 
-our $VERSION = '1.79';
+our $VERSION = '1.80';
 
 use Carp qw( carp croak );
 use DateTime 1.00;
 use DateTime::Locale 1.30;
 use DateTime::Format::Strptime::Types;
 use DateTime::TimeZone 2.09;
-use Exporter ();
+use Exporter                   ();
 use Params::ValidationCompiler qw( validation_for );
 use Try::Tiny;
 
@@ -336,8 +336,9 @@ sub _build_parser {
     }
 
     return {
-        regex =>
-            ( $self->{strict} ? qr/(?:\A|\b)$regex(?:\b|\Z)/ : qr/$regex/ ),
+        regex => (
+            $self->{strict} ? qr/(?:\A|\b)$regex(?:\b|\Z)/ : qr/$regex/
+        ),
         fields => \@fields,
     };
 }
@@ -978,7 +979,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 =head1 VERSION
 
-version 1.79
+version 1.80
 
 =head1 SYNOPSIS
 
@@ -1112,7 +1113,8 @@ Given a string in the pattern specified in the constructor, this method will
 return a new C<DateTime> object.
 
 If given a string that doesn't match the pattern, the formatter will croak or
-return undef, depending on the setting of C<on_error> in the constructor.
+return an empty list or C<undef>, depending on the setting of C<on_error> in
+the constructor.
 
 =head2 $strptime->format_datetime($datetime)
 
@@ -1338,8 +1340,6 @@ This module was created by Rick Measham.
 
 C<datetime@perl.org> mailing list.
 
-http://datetime.perl.org/
-
 L<perl>, L<DateTime>, L<DateTime::TimeZone>, L<DateTime::Locale>
 
 =head1 BUGS
@@ -1353,8 +1353,6 @@ Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Format-Strp
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -1375,7 +1373,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<https://www.urth.org/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHORS
 
@@ -1421,7 +1419,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -25,11 +25,11 @@ WriteMakefile(
         provides    => {
             'OpenAPI::Linter' => {
                 file    => 'lib/OpenAPI/Linter.pm',
-                version => '0.15'
+                version => '0.16'
             },
             'OpenAPI::Linter::Location' => {
                 file    => 'lib/OpenAPI/Linter/Location.pm',
-                version => '0.15'
+                version => '0.16'
             },
         },
         resources => {

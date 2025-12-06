@@ -4,7 +4,7 @@ DateTime::Format::Strptime - Parse and format strp and strf time patterns
 
 # VERSION
 
-version 1.79
+version 1.80
 
 # SYNOPSIS
 
@@ -128,7 +128,8 @@ Given a string in the pattern specified in the constructor, this method will
 return a new `DateTime` object.
 
 If given a string that doesn't match the pattern, the formatter will croak or
-return undef, depending on the setting of `on_error` in the constructor.
+return an empty list or `undef`, depending on the setting of `on_error` in
+the constructor.
 
 ## $strptime->format\_datetime($datetime)
 
@@ -350,8 +351,6 @@ This module was created by Rick Measham.
 
 `datetime@perl.org` mailing list.
 
-http://datetime.perl.org/
-
 [perl](https://metacpan.org/pod/perl), [DateTime](https://metacpan.org/pod/DateTime), [DateTime::TimeZone](https://metacpan.org/pod/DateTime%3A%3ATimeZone), [DateTime::Locale](https://metacpan.org/pod/DateTime%3A%3ALocale)
 
 # BUGS
@@ -365,8 +364,6 @@ Bugs may be submitted at [https://github.com/houseabsolute/DateTime-Format-Strpt
 
 There is a mailing list available for users of this distribution,
 [mailto:datetime@perl.org](mailto:datetime@perl.org).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 
@@ -387,7 +384,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHORS
 
@@ -404,7 +401,7 @@ button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donati
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

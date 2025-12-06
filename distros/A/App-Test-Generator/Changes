@@ -1,5 +1,12 @@
 Revision history for App-Test-Generator
 
+0.20	Fri Dec  5 07:53:43 EST 2025
+	Added the --version flag to fuzz-harness-generator
+	Ensure the max value of string is honoured better
+	Fix array context detection to only match return statements
+	Improve chances of detecting a boolean output
+	Make the list context detection more specific
+
 0.19	Wed Nov 26 07:50:22 EST 2025
 	Fixed the loop iterating over mandatory args
 	Ensure mandatory_args honours matches

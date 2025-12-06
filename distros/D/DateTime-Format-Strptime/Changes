@@ -1,3 +1,10 @@
+1.80     2025-12-06
+
+* Fix the parse_datetime docs to state that it returns either an empty list of undef when it cannot
+  parse the given string, depending on the context. Previously, the docs said it always returned
+  undef, which is not true. Reported by @falsifian (James Cook). GH #33.
+
+
 1.79     2021-05-02
 
 * Fix too-strict type checking for time zones. This module now uses the same

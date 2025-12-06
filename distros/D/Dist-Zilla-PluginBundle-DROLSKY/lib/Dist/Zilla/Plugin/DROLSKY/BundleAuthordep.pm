@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use Path::Tiny qw( path );
 
@@ -60,7 +60,7 @@ Dist::Zilla::Plugin::DROLSKY::BundleAuthordep - Sets an authordep on this bundle
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =for Pod::Coverage .*
 

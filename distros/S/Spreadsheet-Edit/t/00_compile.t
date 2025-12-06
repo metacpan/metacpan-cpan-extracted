@@ -18,11 +18,11 @@ my $path;
 { my @warnings;
   eval{
     local $SIG{__WARN__} = $debug ? 'DEFAULT' : sub { push @warnings, @_; };
-    local $ENV{SPREADSHEET_EDIT_FINDDEBUG} = 1;
+    #local $ENV{SPREADSHEET_EDIT_FINDDEBUG} = 1;
     $path = Spreadsheet::Edit::IO::openlibreoffice_path();
   };
   my $caught = $@;
-  if ($caught || any { /se of uninitialized/} @warnings) {
+  if ($caught || any { /se of uninitialized/ } @warnings) {
     diag @warnings;
     diag "EXCEPTION: $caught" if $caught;
     fail("File::Find trouble") unless $debug && !$caught;

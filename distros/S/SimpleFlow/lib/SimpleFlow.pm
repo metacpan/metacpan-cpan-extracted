@@ -6,7 +6,7 @@ use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
@@ -48,19 +48,20 @@ sub task {
 	}
 	my @defined_args = ( @reqd_args,
 		'die',			  # die if not successful; 0 or 1
+		'dry.run',       # dry run or not
 		'input.files',   # check for input files; SCALAR or ARRAY
 		'log.fh',
 		'note',          # a note for the log
 		'overwrite',     # 
 		'output.files'	  # product files that need to be checked; can be scalar or array
 	);
-#	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $args };
-#	if (scalar @bad_args > 0) {
-#		p @bad_args, array_max => scalar @bad_args;
-#		say "the above arguments are not recognized by $current_sub";
-#		p @defined_args, array_max => scalar @defined_args;
-#		die "The above args are accepted by $current_sub";
-#	}
+	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $args };
+	if (scalar @bad_args > 0) {
+		p @bad_args, array_max => scalar @bad_args;
+		say "the above arguments are not recognized by $current_sub";
+		p @defined_args, array_max => scalar @defined_args;
+		die "The above args are accepted by $current_sub";
+	}
 	if (
 			(defined $args->{'log.fh'}) &&
 			(not openhandle($args->{'log.fh'}))
@@ -91,7 +92,7 @@ sub task {
 			die 'the above files are missing or are not readable';
 		}
 	}
-	my $msg = "At $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
+	my $msg = "\@ $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
 	say $msg;
 	say {$args->{'log.fh'}} $msg if defined $args->{'log.fh'};
 	if (defined $args->{'output.files'}) { # avoid "uninitialized value" warning
@@ -108,20 +109,19 @@ sub task {
 	if (scalar @output_files > 0) {
 		@existing_files = grep {-f $_} @output_files;
 	}
-	$args->{'die'}			= $args->{'die'}		// 'true';
-	$args->{overwrite}	= $args->{overwrite} // 0; # by default, false
 	my %r = (
-		cmd             => $args->{cmd},
-		'die'           => $args->{'die'},
-		dir				 => getcwd(),
-		'source.file'   => $c[1],
-		'source.line'   => $c[2],
-		overwrite       => $args->{overwrite},
+		cmd            => $args->{cmd},
+		dir				=> getcwd(),
+		'source.file'  => $c[1],
+		'source.line'  => $c[2],
 		'output.files' => [@output_files],
 	);
-	if (defined $args->{note}) {
-		$r{note} = $args->{note};
-	}
+	$r{'die'}     = $args->{'die'}     // 1; # by default, true
+	$r{'dry.run'} = $args->{'dry.run'} // 0; # by default, false
+	$r{note}      = $args->{note}      // '';# by default, false
+	$r{overwrite} = $args->{overwrite} // 0; # by default, false
+	$r{'will.do'} = 'yes';
+	$r{'will.do'} = 'no'  if $args->{'dry.run'};
 	if (defined $args->{'input.files'}) {
 		$r{'input.files'} = $args->{'input.files'};
 		$r{'input.file.size'} = \%input_file_size;
@@ -129,12 +129,27 @@ sub task {
 	my %output_file_size = map {$_ => -s $_} @output_files;
 	my $n_output_files = scalar @output_files;
 	if ((!$args->{overwrite}) && (scalar @output_files > 0) && (scalar @existing_files == $n_output_files)) { # this has been done before
+		$r{done} = 'before';
+		$r{'will.do'} = 'no';
+	} else {
+		$r{done} = 'not yet';
+	}
+	if ($r{'dry.run'}) {
+		say "\@ $c[1] line $c[2] the command was going to be:";
+		say colored(['red on_black'], "\"$args->{cmd}\"");
+		say 'But this is a dry run';
+		say '-------------';
+		$r{duration} = 0;
+		return \%r;
+	}
+	if ($r{done} eq 'before') { # this has been done before
 		p @existing_files;
 		say colored(['black on_green'], "\"$args->{cmd}\"\n") . ' has been done before';
 		$r{done} = 'before';
 		$r{'output.file.size'} = \%output_file_size;
 		p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
 		$r{duration} = 0;
+		p %r;
 		return \%r;
 	}
 	my $t0 = Time::HiRes::time();
@@ -147,16 +162,18 @@ sub task {
 		$r{$std} =~ s/\s+$//; # remove trailing whitespace/newline
 	}
 	$r{done} = 'now';
+	$r{'will.do'} = 'done';
 	my @missing_output_files = grep {not -f -r $_} @output_files;
 	if (scalar @missing_output_files > 0) {
 		say STDERR "this input to $current_sub:";
+		p $args;
 		say {$args->{'log.fh'}} "this input to $current_sub:" if defined $args->{'log.fh'};
 		p($args, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
-		say STDERR 'has these files missing:';
-		say {$args->{'log.fh'}} 'has these files missing:' if defined $args->{'log.fh'};
+		say STDERR 'has these output files missing:';
+		say {$args->{'log.fh'}} 'has these output files missing:' if defined $args->{'log.fh'};
 		p @missing_output_files;
 		p(@missing_output_files, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
-		die 'those above files should be made but are missing';
+		die 'those above files should have been made but are missing';
 	}
 	%output_file_size = map {$_ => -s $_} @output_files;
 #	p %output_file_size;
@@ -166,10 +183,11 @@ sub task {
 		warn 'the above output files have 0 size.';
 	}
 	p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
-	if (($args->{'die'} eq 'true') && ($r{'exit'} != 0)) {
+	if (($r{'die'}) && ($r{'exit'} != 0)) {
 		p %r;
-		die "$args->{cmd} failed from $c[1] line $c[2]"
+		die "\"$args->{cmd}\" failed from $c[1] line $c[2]"
 	}
+	p %r;
 	return \%r;
 }
 1;

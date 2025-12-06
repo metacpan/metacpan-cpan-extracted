@@ -31,7 +31,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
@@ -44,7 +44,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ produces a ready-to-run F<.t> test script to run through C<prove>.
 
 It reads configuration files in any format,
 and optional YAML corpus files.
-All of the examples in this documenation are in C<YAML> format,
+All of the examples in this documentation are in C<YAML> format,
 other formats may not work as they aren't so heavily tested.
 It then generates a L<Test::Most>-based fuzzing harness combining:
 
@@ -118,7 +118,7 @@ It then generates a L<Test::Most>-based fuzzing harness combining:
 
 The configuration file,
 for each set of tests to be produced,
-is a file containng a schema that can be read by L<Config::Abstraction>.
+is a file containing a schema that can be read by L<Config::Abstraction>.
 
 =head2 SCHEMA
 
@@ -197,7 +197,7 @@ The current supported variables are
 
 =item * C<test_empty>, test with empty strings (default: 1)
 
-=item * C<test_non_ascii>, test with strings that contain non ascii characaters (default: 1)
+=item * C<test_non_ascii>, test with strings that contain non ascii characters (default: 1)
 
 =item * C<dedup>, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 
@@ -1715,7 +1715,7 @@ sub _validate_module {
 
 		if (!$loaded) {
 			carp("Warning: Module '$module' found but failed to load: $Module::Load::Conditional::ERROR");
-			carp("  This might indicate a broken installation or missing dependencies.");
+			carp('  This might indicate a broken installation or missing dependencies.');
 			return 0;
 		}
 
@@ -1959,19 +1959,14 @@ sub _process_custom_properties {
 
 				# Build call code
 				my $call_code;
-				if ($module) {
-					$call_code = "$module\::$function";
-				} else {
-					$call_code = $function;
-				}
 				# Check if this is OO mode
 				if($module && defined($new)) {
 					$call_code = "my \$obj = new_ok('$module');";
-					$call_code .= "\$obj->$function";  # Method call
+					$call_code .= "\$obj->$function";	# Method call
 				} elsif($module && $module ne 'builtin') {
-					$call_code = "$module\::$function";  # Function call
+					$call_code = "$module\::$function";	# Function call
 				} else {
-					$call_code = $function;  # Builtin
+					$call_code = $function;	# Builtin
 				}
 
 				# Build args
@@ -2647,7 +2642,7 @@ sub _get_dominant_type {
 
 	return $spec->{type} if defined $spec->{type};
 
-	# For multi-field specs, return first type found
+	# For multi-field specs, return the first type found
 	for my $field (keys %$spec) {
 		next unless ref($spec->{$field}) eq 'HASH';
 		return $spec->{$field}{type} if defined $spec->{$field}{type};

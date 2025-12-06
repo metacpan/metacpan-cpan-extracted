@@ -20,7 +20,7 @@ name: Melian
 provides:
   Melian:
     file: lib/Melian.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   IO::Socket::INET: '0'
@@ -31,7 +31,7 @@ requires:
   perl: '5.034'
 resources:
   repository: git://github.com/xsawyerx/melian-perl.git
-version: '0.003'
+version: '0.004'
 x_authority: cpan:XSAWYERX
 x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use Path::Tiny qw( path );
 
@@ -22,11 +22,6 @@ sub before_build {
     my $self = shift;
 
     $self->_maybe_write_file(
-        'dev-bin/install-xt-tools.sh',
-        $self->_install_xt_tools_sh,
-        'is executable',
-    );
-    $self->_maybe_write_file(
         'git/setup.pl',
         $self->_git_setup_pl,
         'is executable',
@@ -39,30 +34,6 @@ sub before_build {
 
     return;
 }
-
-my $install_xt_tools_sh = <<'EOF';
-#!/bin/sh
-
-set -e
-
-TARGET="$HOME/bin"
-if [ $(id -u) -eq 0 ]; then
-    TARGET="/usr/local/bin"
-fi
-echo "Installing dev tools to $TARGET"
-
-mkdir -p $TARGET
-curl --silent --location \
-       https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh |
-       sh
-
-"$TARGET/ubi" --project houseabsolute/precious --in "$TARGET"
-"$TARGET/ubi" --project houseabsolute/omegasort --in "$TARGET"
-
-echo "Add $TARGET to your PATH in order to use precious for linting and tidying"
-EOF
-
-sub _install_xt_tools_sh {$install_xt_tools_sh}
 
 my $git_setup_pl = <<'EOF';
 #!/usr/bin/env perl
@@ -134,7 +105,7 @@ Dist::Zilla::Plugin::DROLSKY::DevTools - Creates scripts to install precious and
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =for Pod::Coverage .*
 

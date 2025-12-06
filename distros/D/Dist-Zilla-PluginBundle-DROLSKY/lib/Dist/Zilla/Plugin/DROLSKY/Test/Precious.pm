@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use Dist::Zilla::File::InMemory;
 
@@ -73,7 +73,7 @@ Dist::Zilla::Plugin::DROLSKY::Test::Precious - Creates a test that runs precious
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =for Pod::Coverage .*
 

@@ -165,8 +165,6 @@ DST transitions follow Quartz Scheduler rules exactly:
 
 # BUGS AND CONTRIBUTIONS
 
-This module is under active development and has not yet reached a 1.0 release.
-
 The test suite currently contains over 400 data-driven tests covering every supported token, DST transitions, leap years, all time zones, and many edge cases — but real-world cron expressions can be surprisingly creative.
 
 If you find:

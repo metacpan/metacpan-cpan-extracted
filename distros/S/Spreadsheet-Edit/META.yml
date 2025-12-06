@@ -17,7 +17,7 @@ build_requires:
   List::AllUtils: '0'
   Test2::Plugin::BailOnFail: '0'
   Test2::Tools::Subtest: '0'
-  Test2::V0: '0'
+  Test2::V0: '1.302214'
   Test::Deep::NoTest: '0'
   Time::HiRes: '0'
   autovivification: '0'
@@ -82,7 +82,7 @@ resources:
   bugtracker: https://github.com/jimav/Spreadsheet-Edit/issues
   homepage: https://github.com/jimav/Spreadsheet-Edit
   repository: https://github.com/jimav/Spreadsheet-Edit.git
-version: '1000.029'
+version: '1000.030'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: CC0-1.0

@@ -89,39 +89,28 @@ requests](https://help.github.com/articles/creating-a-pull-request)'; }
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
 can submit an issue report [via the web]({{ $dist->distmeta->{resources}{bugtracker}{web} // 'WARNING: bugtracker data not set!' }}){{ $dist->distmeta->{resources}{bugtracker}{mailto} ? ' or [via email](' . $dist->distmeta->{resources}{bugtracker}{mailto} . ')' : q{} }}.
-{{ if ( -e 'azure-pipelines.yml' ) {
-'
+
 ## Continuous Integration
 
 All pull requests for this distribution will be automatically tested using
-[Azure Pipelines](https://dev.azure.com/houseabsolute/houseabsolute/_build).
+GitHub Actions.
 
 All CI results will be visible in the pull request on GitHub. Follow the
 appropriate links for details when tests fail. PRs cannot be merged until tests
-pass.'
-} }}
-{{ if ( -e 'tidyall.ini' ) {
-'
-## TidyAll
+pass.
 
-This distribution uses
-[Code::TidyAll](https://metacpan.org/release/Code-TidyAll) to enforce a
-uniform coding style. This is tested as part of the author testing suite. You
-can install and run tidyall by running the following commands:
-
-    $> cpanm Code::TidyAll
-    $> tidyall -a
-
-Please run this before committing your changes and address any issues it
-brings up.'
-} elsif ( -e 'precious.toml') {
-'
 ## Precious
 
 This distribution uses [precious](https://github.com/houseabsolute/precious)
 to enforce a uniform coding style. This is tested as part of the author
-testing suite. You can install this and any other necessary non-Perl tools by
-running `./dev-bin/install-xt-tools.sh`.
+testing suite.
+
+You can install this and any other necessary non-Perl tools with
+[`mise`](https://mise.jdx.dev/). Once you have `mise` installed, you can install this project's dev
+tools by running the following commands:
+
+    $> mise trust
+    $> mise install
 
 Then you can use `precious` to tidy and lint your code:
 
@@ -132,8 +121,7 @@ Please run `precious tidy -a` and `precious lint -a` before committing your
 changes and address any issues that it reports.
 
 You can also set up a git pre-commit hook that checks all changed files for
-linting issues by running `./git/setup.pl`.'
-} }}
+linting issues by running `./git/setup.pl`.
 
 ## Contributor Names
 

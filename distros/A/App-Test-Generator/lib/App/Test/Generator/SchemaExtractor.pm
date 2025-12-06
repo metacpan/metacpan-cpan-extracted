@@ -12,7 +12,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Configure YAML::XS to not quote numeric strings
 $YAML::XS::QuoteNumericStrings = 0;
@@ -20,6 +20,10 @@ $YAML::XS::QuoteNumericStrings = 0;
 =head1 NAME
 
 App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
+
+=head1 VERSION
+
+Version 0.20
 
 =head1 SYNOPSIS
 
@@ -903,6 +907,25 @@ sub _analyze_output_from_code
 	my ($self, $output, $code) = @_;
 
 	if ($code) {
+
+		# Early boolean detection - check for consistent 1/0 returns
+		my @all_returns = $code =~ /return\s+([^;]+);/g;
+		if (@all_returns) {
+			my $boolean_count = 0;
+			my $total_count = scalar(@all_returns);
+
+			foreach my $ret (@all_returns) {
+				$ret =~ s/^\s+|\s+$//g;
+				$boolean_count++ if ($ret eq '0' || $ret eq '1');
+			}
+
+			# If most returns are 0 or 1, strongly suggest boolean
+			if ($boolean_count >= 2 && $boolean_count >= $total_count * 0.8) {
+				$output->{type} = 'boolean';
+				$self->_log("  OUTPUT: Early detection - $boolean_count/$total_count returns are 0/1, setting boolean");
+			}
+		}
+
 		my @return_statements;
 
 		if ($code =~ /return\s+bless\s*\{[^}]*\}\s*,\s*['"]?(\w+)['"]?/s) {
@@ -913,8 +936,8 @@ sub _analyze_output_from_code
 		} elsif ($code =~ /return\s+bless/s) {
 			$output->{type} = 'object';
 			$self->_log('  OUTPUT: Bless found, inferring type from code is object');
-		} elsif ($code =~ /return\s*\([^)]+,\s*[^)]+\)/) {
-			# Detect array context returns
+		} elsif ($code =~ /return\s*\(\s*[^)]+\s*,\s*[^)]+\s*\)\s*;/) {
+			# Detect array context returns - must end with semicolon to be actual return
 			$output->{type} = 'array';	# Not arrayref - actual array
 			$self->_log('  OUTPUT: Found array contect return');
 		} elsif ($code =~ /return\s+bless[^,]+,\s*__PACKAGE__/) {
@@ -924,7 +947,7 @@ sub _analyze_output_from_code
 			if ($self->{_document}) {
 				my $pkg = $self->{_document}->find_first('PPI::Statement::Package');
 				$output->{class} = $pkg ? $pkg->namespace : 'UNKNOWN';
-				$self->_log("  OUTPUT: Object blessed into __PACKAGE__: " . ($output->{class} || 'UNKNOWN'));
+				$self->_log('  OUTPUT: Object blessed into __PACKAGE__: ' . ($output->{class} || 'UNKNOWN'));
 			}
 		} elsif ($code =~ /return\s*\(([^)]+)\)/) {
 			my $content = $1;
@@ -938,7 +961,7 @@ sub _analyze_output_from_code
 			if ($self->{_document}) {
 				my $pkg = $self->{_document}->find_first('PPI::Statement::Package');
 				$output->{class} = $pkg ? $pkg->namespace : 'UNKNOWN';
-				$self->_log("  OUTPUT: Object chained into __PACKAGE__: " . ($output->{class} || 'UNKNOWN'));
+				$self->_log('  OUTPUT: Object chained into __PACKAGE__: ' . ($output->{class} || 'UNKNOWN'));
 			}
 		}
 
@@ -1021,49 +1044,73 @@ sub _analyze_output_from_code
 sub _enhance_boolean_detection {
 	my ($self, $output, $pod, $code, $method_name) = @_;
 
+	my $boolean_score = 0;	# Track evidence for boolean return
+
 	# Look for stronger boolean indicators
 	if ($pod && !$output->{type}) {
 		# Common boolean return patterns in POD
 		if ($pod =~ /returns?\s+(true|false|true|false|1|0)\s+(?:on|for|upon)\s+(success|failure|error|valid|invalid)/i) {
-			$output->{type} = 'boolean';
-			$self->_log("  OUTPUT: Strong boolean indicator in POD");
+			$boolean_score += 30;
+			$self->_log('  OUTPUT: Strong boolean indicator in POD (+30)');
 		}
 
 		# Check for method names that suggest boolean returns
 		if ($pod =~ /(?:method|sub)\s+(\w+)/) {
 			my $inferred_method_name = $1;
 			if ($inferred_method_name =~ /^(is_|has_|can_|should_|contains_|exists_)/) {
-				$output->{type} = 'boolean';
-				$self->_log("  OUTPUT: Inferred method name '$inferred_method_name' suggests boolean return");
+				$boolean_score += 20;
+				$self->_log("  OUTPUT: Inferred method name '$inferred_method_name' suggests boolean return (+20)");
 			}
 		}
 	}
 
 	# Analyze code for boolean patterns
-	if ($code && !$output->{type}) {
-		# Common boolean return idioms
-		if ($code =~ /return\s+(?:1|0)\s*;/) {
-			my $true_returns = () = $code =~ /return\s+1\s*;/g;
-			my $false_returns = () = $code =~ /return\s+0\s*;/g;
+	if ($code) {
+		# Count boolean return idioms
+		my $true_returns = () = $code =~ /return\s+1\s*;/g;
+		my $false_returns = () = $code =~ /return\s+0\s*;/g;
 
-			if ($true_returns + $false_returns >= 2) {
-				$output->{type} = 'boolean';
-				$self->_log('  OUTPUT: Multiple 1/0 returns suggest boolean');
-			}
+		if ($true_returns + $false_returns >= 2) {
+			$boolean_score += 40;
+			$self->_log('  OUTPUT: Multiple 1/0 returns suggest boolean (+40)');
+		} elsif ($true_returns + $false_returns == 1) {
+			$boolean_score += 10;
+			$self->_log('  OUTPUT: Single 1/0 return (+10)');
 		}
 
 		# Ternary operators that return booleans
 		if ($code =~ /return\s+(?:\w+\s*[!=]=\s*\w+|\w+\s*>\s*\w+|\w+\s*<\s*\w+)\s*\?\s*(?:1|0)\s*:\s*(?:1|0)/) {
-			$output->{type} = 'boolean';
-			$self->_log('  OUTPUT: Ternary with 1/0 suggests boolean');
+			$boolean_score += 25;
+			$self->_log('  OUTPUT: Ternary with 1/0 suggests boolean (+25)');
+		}
+
+		# Check for common boolean method patterns
+		if ($code =~ /return\s+[!\$\@\%]/) {
+			# Returns negation or existence check
+			$boolean_score += 15;
+			$self->_log('  OUTPUT: Returns negation/existence check (+15)');
 		}
 	}
 
 	# Check method name for boolean indicators
-	if (!$output->{type} && $method_name) {
-		if ($method_name =~ /^(is_|has_|can_|should_|contains_|exists_)/) {
+	if ($method_name) {
+		if ($method_name =~ /^(is_|has_|can_|should_|contains_|exists_|check_|verify_|validate_)/) {
+			$boolean_score += 25;
+			$self->_log("  OUTPUT: Method name '$method_name' suggests boolean return (+25)");
+		}
+		if ($method_name =~ /_ok$/) {
+			$boolean_score += 30;
+			$self->_log("  OUTPUT: Method name '$method_name' ends with '_ok' (+30)");
+		}
+	}
+
+	# Apply boolean type if we have strong evidence
+	# Override weak type assignments (like 'array' from false positive)
+	if ($boolean_score >= 30) {
+		if (!$output->{type} || $output->{type} eq 'scalar' || $output->{type} eq 'array' || $output->{type} eq 'undef') {
+			my $old_type = $output->{type} || 'none';
 			$output->{type} = 'boolean';
-			$self->_log("  OUTPUT: Method name '$method_name' suggests boolean return");
+			$self->_log("  OUTPUT: Boolean score $boolean_score >= 30, setting type to boolean (was: $old_type)");
 		}
 	}
 }
@@ -1076,7 +1123,7 @@ sub _detect_list_context {
 	# Check for wantarray usage
 	if ($code =~ /wantarray/) {
 		$output->{context_aware} = 1;
-		$self->_log("  OUTPUT: Method uses wantarray - context sensitive");
+		$self->_log('  OUTPUT: Method uses wantarray - context sensitive');
 
 		# Try to detect what's returned in list context
 		if ($code =~ /wantarray.*?\{\s*return\s+(?:\([^)]+\)|\@\w+)/) {
@@ -1085,11 +1132,15 @@ sub _detect_list_context {
 		}
 	}
 
-	# Check for array returns
-	if(($code =~ /return\s*\(\s*[^),]+\s*,\s*[^)]+\s*\)/) &&
-	   ($code !~ /return\s*\(\s*[^)]*\b(?:bless|new|constructor)\b/)) {
-		$output->{type} = 'array';
-		$self->_log("  OUTPUT: Multiple values in return suggest array");
+	# Check for array returns - must be a proper return statement
+	# This fixes the false positive from method calls like $TEST->ok(1, 'message')
+	if ($code =~ /return\s*\(\s*[^),]+\s*,\s*[^)]+\s*\)\s*;/ &&
+	    $code !~ /return\s*\(\s*[^)]*\b(?:bless|new|constructor)\b/) {
+		# Additional check: if we already detected boolean pattern, don't override
+		unless ($output->{type} && $output->{type} eq 'boolean') {
+			$output->{type} = 'array';
+			$self->_log('  OUTPUT: Multiple values in return suggest array');
+		}
 	}
 }
 
@@ -1779,8 +1830,8 @@ it is useful for creating a template which you can modify to create a working sc
 
 =item * L<App::Test::Generator> - Generate fuzz and corpus-driven test harnesses
 
-Output from this module serves as input into that module.
-So with well documented code, you can automatically create your tests.
+Output from this module serves as input to that module.
+So with well-documented code, you can automatically create your tests.
 
 =item * L<App::Test::Generator::Template> - Template of the file of tests created by C<App::Test::Generator>
 

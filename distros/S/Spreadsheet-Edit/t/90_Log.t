@@ -3,15 +3,15 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
 use t_TestCommon # Test2::V0 etc.
-  qw/t_like t_ok my_capture $silent $verbose $debug/;
+  qw/t_like t_ok my_capture my_capture_merged $silent $verbose $debug/;
+use File::Which qw/which/;
 
 package Inner;
 our @ISA = ('Outer');
 use Data::Dumper::Interp;
 use Spreadsheet::Edit::Log
   qw/fmt_call log_call nearest_call abbrev_call_fn_ln_subname/,
-  ':btw=$lno/$fname/$pkg/$package',
-  ':nocolor';
+  ':btw=$lno/$fname/$pkg/$package';
 
 sub new { my $class=shift; bless {color => $_[0]}, $class }
 sub get { my $self=shift; $self->{color} }
@@ -130,43 +130,67 @@ checklog { $obj_xx->meth_noretval; } qr/\.meth_noretval/;
 checklog { $obj2->meth_1retval; } qr/<\d{3,}:[\da-fA-F]{3,}>\.meth_1retval\(\) ==> 42/;
 
 #### Test btw and friends ####
-{ my $obj = Outer->new("btw"); # equivalent to btwN 0,...
-  my $explno = (__LINE__)+1;
-  checklog { $obj->doeval('btw "FOO"') }  qr{
-              # pfx is lno/fname/pkg/package
-              1/\(eval\ \d+\)/Inner/Inner:\ FOO
-           }sx, "btw test", "NOHEAD" ;
-}
-{ my $obj = Outer->new("btwN3");
-  my $explno = (__LINE__)+1;
-  checklog { $obj->doeval('btwN 3,"FOO"') }  qr{
-              # something like 141/90_Log.t/main/main««: FOO
-              ${explno}/$myFILE_basename/main/main[^\r\n\/]*:\ FOO
-           }sx, "btwN 3,...", "NOHEAD" ;
-}
-{ my $obj = Outer->new("btwNslash2");
-  my $explno = (__LINE__)+1;
-  checklog { $obj->doeval('btwN \2, "FOO"') }  qr{
-              1/\(eval\ \d+\)/Inner/Inner
-              .*? \d+/$myFILE_basename/Inner/Inner:\ FOO
-           }sx,
-           "btwN \\2,...",
-           "NOHEAD"
-            ;
-}
-{ my $obj = Outer->new("btwbt");
-  my $explno = (__LINE__)+1;
-  checklog { $obj->doeval('btwbt "FOO"') }  qr{
-              # pfx is lno/fname/pkg/package
-              1/\(eval\ \d+\)/Inner/Inner .*? \d+/$myFILE_basename/Inner/Inner
-              .*? \d+/$myFILE_basename/Outer/Outer
-              .*? \d+/$myFILE_basename/main/main
-              .* # Capture::Tiny stuff
-                $explno/$myFILE_basename/main/main:\ FOO
-           }sx,
-           "btwbt test",
-           "NOHEAD"
-            ;
+
+my $have_color_terminal = do{
+  my ($outerr, $exitstat) = $ENV{TERM} && my_capture_merged { system("tput", "sgr0") };
+  if (!$ENV{TERM} || $exitstat != 0 || $outerr !~ /^\033.*m$/) {
+    note "Terminal is unsuitable for tput color escapes\n",
+         dvis '$ENV{TERM} $exitstat $outerr\n';
+    0
+  } else {
+    1
+  }
+};
+
+foreach my $import_arg (":nocolor",":color") {
+  Spreadsheet::Edit::Log->import($import_arg);
+  my $color_re = "";
+  if ($import_arg eq ':color') {
+    $color_re = qr/\033.*?m/;
+    unless ($have_color_terminal) {
+      note "Skipping btw tests with :color\n";
+      next
+    }
+  }
+
+  { my $obj = Outer->new("btw"); # equivalent to btwN 0,...
+    my $explno = (__LINE__)+1;
+    checklog { $obj->doeval('btw "FOO"') }  qr{
+                # pfx is lno/fname/pkg/package
+                1/\(eval\ \d+\)/Inner/Inner:\ ${color_re}FOO${color_re}
+             }sx, "btw test (${import_arg})", "NOHEAD" ;
+  }
+  { my $obj = Outer->new("btwN3");
+    my $explno = (__LINE__)+1;
+    checklog { $obj->doeval('btwN 3,"FOO"') }  qr{
+                # something like 141/90_Log.t/main/main««: FOO
+                ${explno}/$myFILE_basename/main/main[^\r\n\/]*:\ ${color_re}FOO${color_re}
+             }sx, "btwN 3,... (${import_arg})", "NOHEAD" ;
+  }
+  { my $obj = Outer->new("btwNslash2");
+    my $explno = (__LINE__)+1;
+    checklog { $obj->doeval('btwN \2, "FOO"') }  qr{
+                1/\(eval\ \d+\)/Inner/Inner
+                .*? \d+/$myFILE_basename/Inner/Inner:\ ${color_re}FOO${color_re}
+             }sx,
+             "btwN \\2,... (${import_arg})",
+             "NOHEAD"
+              ;
+  }
+  { my $obj = Outer->new("btwbt");
+    my $explno = (__LINE__)+1;
+    checklog { $obj->doeval('btwbt "FOO"') }  qr{
+                # pfx is lno/fname/pkg/package
+                1/\(eval\ \d+\)/Inner/Inner .*? \d+/$myFILE_basename/Inner/Inner
+                .*? \d+/$myFILE_basename/Outer/Outer
+                .*? \d+/$myFILE_basename/main/main
+                .* # Capture::Tiny stuff
+                  $explno/$myFILE_basename/main/main:\ ${color_re}FOO${color_re}
+             }sx,
+             "btwbt test (${import_arg})",
+             "NOHEAD"
+              ;
+  }
 }
 
 done_testing();

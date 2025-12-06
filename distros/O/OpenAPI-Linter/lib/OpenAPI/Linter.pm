@@ -1,6 +1,6 @@
 package OpenAPI::Linter;
 
-$OpenAPI::Linter::VERSION   = '0.15';
+$OpenAPI::Linter::VERSION   = '0.16';
 $OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ OpenAPI::Linter - Validate and lint OpenAPI specifications
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -263,8 +263,14 @@ sub find_issues {
 
     # Paths / operations
     if ($spec->{paths}) {
+        my @http_methods = qw(get post put delete patch head options trace);
+        my %is_http_method = map { lc($_) => 1 } @http_methods;
+
         for my $path (sort keys %{$spec->{paths}}) {
             for my $method (sort keys %{$spec->{paths}{$path}}) {
+                # Check if it's an HTTP method (case-insensitive)
+                next unless $is_http_method{lc($method)};
+
                 my $op = $spec->{paths}{$path}{$method};
                 unless ($op->{description}) {
                     my $_path    = "paths.$path.$method.description";

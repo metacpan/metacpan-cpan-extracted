@@ -9,45 +9,6 @@ use File::Temp;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 
-my $infile;
-my $outfile;
-my $help;
-my $run;
-GetOptions(
-	'help|h' => \$help,
-	'input|i=s' => \$infile,
-	'output|o=s' => \$outfile,
-	'run|r' => \$run,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-
-$infile ||= shift @ARGV or pod2usage('No config file given');
-
-if($run && !$outfile) {
-	my $fh;
-	($fh, $outfile) = File::Temp::tempfile();
-
-	App::Test::Generator::generate($infile, $outfile);
-
-	system("prove -l $outfile");
-
-	exit $?;
-}
-
-App::Test::Generator::generate($infile, $outfile);
-
-if($outfile) {
-	chmod 0755, $outfile;
-	if($run) {
-		system("prove -l $outfile");
-	}
-}
-
-exit 0;
-
-__END__
-
 =head1 NAME
 
 fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses
@@ -84,6 +45,54 @@ Call C<prove> on the output file.
 
 C<fuzz-harness-generator -r t/conf/data_text_append.conf> will, therefore, dynamically create and run tests on the C<append> method of L<Data::Text>
 
+=item V<--version>
+
+Prints the version of L<App::Test::Generator>
+
 =back
 
 =cut
+
+my $infile;
+my $outfile;
+my $help;
+my $run;
+my $version;
+GetOptions(
+	'help|h' => \$help,
+	'input|i=s' => \$infile,
+	'output|o=s' => \$outfile,
+	'run|r' => \$run,
+	'version|V' => \$version,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+if($version) {
+	print $App::Test::Generator::VERSION, "\n";
+	exit 0;
+}
+
+$infile ||= shift @ARGV or pod2usage('No config file given');
+
+if($run && !$outfile) {
+	my $fh;
+	($fh, $outfile) = File::Temp::tempfile();
+
+	App::Test::Generator::generate($infile, $outfile);
+
+	system("prove -l $outfile");
+
+	exit $?;
+}
+
+App::Test::Generator::generate($infile, $outfile);
+
+if($outfile) {
+	chmod 0755, $outfile;
+	if($run) {
+		system("prove -l $outfile");
+	}
+}
+
+exit 0;

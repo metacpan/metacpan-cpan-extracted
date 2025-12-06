@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "List::AllUtils" => 0,
     "Test2::Plugin::BailOnFail" => 0,
     "Test2::Tools::Subtest" => 0,
-    "Test2::V0" => 0,
+    "Test2::V0" => "1.302214",
     "Test::Deep::NoTest" => 0,
     "Time::HiRes" => 0,
     "autovivification" => 0,
@@ -84,7 +84,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1000.029",
+  "VERSION" => "1000.030",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -132,7 +132,7 @@ my %FallbackPrereqs = (
   "Symbol" => 0,
   "Test2::Plugin::BailOnFail" => 0,
   "Test2::Tools::Subtest" => 0,
-  "Test2::V0" => 0,
+  "Test2::V0" => "1.302214",
   "Test::Deep::NoTest" => 0,
   "Text::CSV" => "1.90_01",
   "Tie::Array" => 0,

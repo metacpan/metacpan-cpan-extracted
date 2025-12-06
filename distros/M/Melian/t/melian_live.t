@@ -1,14 +1,17 @@
 use strict;
 use warnings;
-use Melian;
+use Melian qw<
+    fetch_raw_with
+    fetch_by_int_with
+    fetch_by_string_with
+>;
 use Test::More;
 use List::Util qw(first);
 
 plan( skip_all => 'Live Melian testing disabled - set MELIAN_LIVE_TEST=1' ) unless $ENV{'MELIAN_LIVE_TEST'};
 
 my $melian = Melian->new(
-    'dsn'     => 'unix:///tmp/melian.sock',
-    'timeout' => 1,
+    'dsn' => 'unix:///tmp/melian.sock',
 );
 
 subtest 'Connection' => sub {
@@ -171,6 +174,46 @@ subtest 'Fetch using names' => sub {
         },
         '->fetch_by_string_from( "table2", "hostname", "host-00002" )',
     );
+};
+
+subtest 'Functional interface' => sub {
+    my $new_conn = Melian->create_connection(
+        'dsn' => 'unix:///tmp/melian.sock',
+    );
+
+    for my $conn ( $new_conn, $melian->{'socket'} ) {
+        is(
+            fetch_raw_with( $conn, 0, 0, pack( 'V', 5 ) ),
+            qq!{"id":5,"name":"item_5","category":"alpha","value":"VAL_0005","description":"Mock description for item 5","created_at":"2025-10-30 14:26:47","updated_at":"2025-11-04 14:26:47","active":1}!,
+            '->fetch_raw_with( $conn, 0, 0, 5 )',
+        );
+
+        is_deeply(
+            fetch_by_int_with( $conn, 0, 0, 5 ),
+            {
+                'active'      => 1,
+                'category'    => 'alpha',
+                'created_at'  => '2025-10-30 14:26:47',
+                'description' => 'Mock description for item 5',
+                'id'          => 5,
+                'name'        => 'item_5',
+                'updated_at'  => '2025-11-04 14:26:47',
+                'value'       => 'VAL_0005',
+            },
+            '->fetch_by_int_with( $conn, 0, 0, 5 )',
+        );
+
+        is_deeply(
+            fetch_by_string_with( $conn, 1, 1, 'host-00002' ),
+            {
+                'hostname' => 'host-00002',
+                'id'       => 2,
+                'ip'       => '10.0.2.0',
+                'status'   => 'maintenance',
+            },
+            '->fetch_by_string_with( $conn, 1, 1, "host-00002" )',
+        );
+    }
 };
 
 subtest 'Disconnect' => sub {

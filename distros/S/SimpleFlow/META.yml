@@ -21,6 +21,7 @@ requires:
   File::Temp: '0'
   Scalar::Util: '0'
   Term::ANSIColor: '0'
+  Test::Exception: '0'
   Test::More: '0'
   Time::HiRes: '0'
   perl: '5.010'
@@ -28,7 +29,7 @@ resources:
   bugtracker: https://github.com/hhg7/SimpleFlow/issues
   homepage: https://metacpan.org/dist/SimpleFlow
   repository: git://github.com/hhg7/SimpleFlow
-version: '0.05'
+version: '0.06'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

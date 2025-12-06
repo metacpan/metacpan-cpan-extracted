@@ -1,3 +1,10 @@
+0.004     2025-12-05 15:00:41+01:00 Europe/Amsterdam
+
+    * Added functional interface which is much faster.
+    * Added helper functions.
+    * Rewritten documentation.
+    * Added tests.
+
 0.003     2025-12-04 22:54:17+01:00 Europe/Amsterdam
 
     * We now have fetch_by_int_from() and fetch_by_string_from()

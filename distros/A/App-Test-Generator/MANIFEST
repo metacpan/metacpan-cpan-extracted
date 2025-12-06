@@ -5,9 +5,9 @@ Changes
 doc/getting-started-blog.md
 doc/SchemaExtractor.pm
 lib/App/Test/Generator.pm
+lib/App/Test/Generator/Sample/Module.pm
 lib/App/Test/Generator/SchemaExtractor.pm
 lib/App/Test/Generator/Template.pm
-lib/App/Test/Generator/Sample/Module.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.029'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-11-24'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.030'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-12-05'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -24,7 +24,8 @@ use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
-our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest/;
+our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest
+                    colorize ERROR_COLOR WARN_COLOR BOLD_COLOR/;
 
 my %backup_defaults = (
   logdest         => \*STDERR,
@@ -45,32 +46,43 @@ our %opts = (
   color => 1,
 );
 
-use constant TYPE_ERROR => "error";
-use constant TYPE_WARN  => "warn";
-use constant TYPE_NORM  => "norm";
-sub _colorize($$) {
+use constant ERROR_COLOR => "error";
+use constant WARN_COLOR  => "warn";
+use constant BOLD_COLOR  => "norm";
+use constant SUCCESS_COLOR  => "succ";
+
+# Insert escapes to colorize text, provided the terminal supports ansi escapes
+sub colorize($$) {
   my ($str, $type) = @_;
-  state $initialized;
-  unless ($initialized) {
-    $opts{color} = 0 unless (
-      ($ENV{TERM}//"") =~ /xterm|screen|vt100|ansi/i
-        &&
-      (open(my $fh, ">/dev/tty") || open(my $fh2, "CON"))
-    );
-    $initialized = 1;
+  state $codes;
+  my sub _getcode($;$) {
+    my ($name, $tput_args) = @_;
+    unless (exists $codes->{$name}) {
+      $tput_args //= $name;
+      $codes->{$name} = `tput $tput_args 2>/dev/null`;
+      $codes->{$name} = undef if $? != 0;
+    }
+    return $codes->{$name} // die("terminal does not support $name");
   }
-  return $str unless $opts{color};
-  state $color_end = "\033[0m";
-  my $color_start;
-  if    ($type eq TYPE_NORM)  { }
-  elsif ($type eq TYPE_WARN ) { $color_start = "\033[93m" }   # yellow
-  elsif ($type eq TYPE_ERROR) { $color_start = "\033[1;31m" } # bold red
-  else { confess dvis '$type $str' }
-  if (defined $color_start) {
-    my @chunks = map{ $color_start.$_.$color_end } split /\R/, $str, -1;
-    $str = join "\n", @chunks;
+  my ($color_start, $color_end);
+  eval {
+    # The basic colors 0-7 => black,red,green,yellow,blue,magenta,cyan,white
+    # ("white" is often really light grey)
+    $color_start =
+      $type eq BOLD_COLOR    ? _getcode("bold") :
+      $type eq WARN_COLOR    ? _getcode("boldyellow", "setaf 3 bold") :
+      $type eq ERROR_COLOR   ? _getcode("boldred", "setaf 1 bold") :
+      $type eq SUCCESS_COLOR ? _getcode("boldgreen", "setaf 2 bold") :
+      croak "unknown message type '$type'"
+      ;
+    $color_end = _getcode("sgr0");
+  };
+  if ($@) {
+    return $str if $@ =~ /terminal/; # not impl for current terminal
+    die $@;
   }
-  $str;
+  my @chunks = map{ $color_start.$_.$color_end } split /\R/, $str, -1;
+  return join "\n", @chunks;
 }
 
 sub import {
@@ -153,7 +165,7 @@ sub _btwTN($$@) {
     foreach (2..$N) { $pfx .= "«" }
   }
   my $fh = _getoptions()->{logdest};
-$_ = _colorize($_, TYPE_WARN);
+  $_ = colorize($_, WARN_COLOR) if $opts{color};
   print $fh "${pfx}: $_\n";
 }#_btwTN
 
@@ -177,7 +189,7 @@ BEGIN {
 
 sub oops(@) {
   my @args = @_;
-  foreach (@args) { $_ = _colorize($_, TYPE_ERROR); }
+  foreach (@args) { $_ = colorize($_, ERROR_COLOR) if $opts{color}; }
   my $pkg = caller;
   my $pfx = "\nOOPS";
   #$pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
@@ -405,8 +417,9 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
 
     # Debug printing; shows location of call
     btw "By the way, the zort is $self->{zort}" if $self->{debug};
-    btwN 2, "message";  # With location of caller's caller'caller
+    btwN 2, "message";  # With location of caller's caller's caller
     btwbt "message";    # With 1-line mini traceback
+    print colorize("Red Alert!\n", ERROR_COLOR);
 
     # Wrapper for Carp::Confess
     oops "zort not set!" unless defined $self->{zort};
@@ -636,6 +649,14 @@ chains to Carp::confess for backtrace and death.
 Returns the handle or glob specified in
 C<$SpreadsheetEdit_Log_Options{logdest}> in your package, or if not set
 then the value from calling C<set_logdest()>, or the built-in default.
+
+=head1 COLORIZE TERMINAL TEXT
+
+=head2 $newstring = colorize($string, SUCCESS_COLOR | ERROR_COLOR | WARN_COLOR | BOLD_COLOR);
+
+Insert escape sequences to make the text display in an appropriate
+color, provided the process has a tty and $TERM is a terminal type
+which supports ansi color escapes.
 
 =head1 SEE ALSO
 

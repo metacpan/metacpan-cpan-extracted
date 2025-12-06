@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.029'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-11-24'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.030'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-12-05'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -505,7 +505,7 @@ sub openlibreoffice_path() {
         ||
         s/[a-z]+(\d.*)/0$1/; # 1.2.3.alpha2 => 1.2.3.02
       }
-      warn dvis '## $v1 $v2\n' if $debug;
+      #warn dvis '## $v1 $v2\n' if $debug;
       version->parse($v1) <=> version->parse($v2)
     } @candidates;
 

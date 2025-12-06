@@ -1,7 +1,7 @@
 package Cron::Toolkit;
 
 # VERSION
-$VERSION = 0.12;
+$VERSION = 1.00;
 
 use strict;
 use warnings;
@@ -216,8 +216,6 @@ DST transitions follow Quartz Scheduler rules exactly:
 =back
 
 =head1 BUGS AND CONTRIBUTIONS
-
-This module is under active development and has not yet reached a 1.0 release.
 
 The test suite currently contains over 400 data-driven tests covering every supported token, DST transitions, leap years, all time zones, and many edge cases — but real-world cron expressions can be surprisingly creative.
 
@@ -725,7 +723,7 @@ sub as_quartz_string {
     my $dow = $fields[5];
 
     $dow =~ s{
-       (?<![L#])        # not preceded by L or #
+       (?<![L#/])        # not preceded by L or #
        \b([1-7])\b      # standalone 1-7
     }{
        $1 == 7 ? 1 : $1 + 1
@@ -881,7 +879,8 @@ sub describe {
    # dedupe wildcards
    my $prev_type = '';
    for my $node ( @{ $self->{nodes} } ) {
-      push @nodes, $node->type eq 'wildcard' && $prev_type eq 'wildcard' ? undef : $node;
+      push @nodes, $node->type eq 'unspecified' || ($node->type eq 'wildcard' && $prev_type eq 'wildcard') ? undef : $node;
+       
       $prev_type = $node->type;
    }
 
@@ -897,23 +896,27 @@ sub describe {
    }
 
    # DMY
-   if ( defined $nodes[3] && $nodes[3]->type ne 'unspecified' ) {
+   if ( defined $nodes[3] ) {
       if ( $nodes[3]->type eq 'single' ) {
          $dmy .= 'on ';
       }
       $dmy .= $nodes[3]->to_english . ' of ' . $self->{nodes}[4]->to_english;
    }
 
-   if ( defined $nodes[3] && $nodes[3]->type ne 'unspecified' && defined $nodes[5] && $nodes[5]->type ne 'unspecified' ) {
+   if ( defined $nodes[3] && defined $nodes[5] ) {
       $dmy .= ' and ';
    }
 
-   if ( defined $nodes[5] && $nodes[5]->type ne 'unspecified' ) {
+   if ( defined $nodes[5] ) {
 
       if ( $nodes[5]->type eq 'single' ) {
          $dmy .= 'every ';
       }
       $dmy .= $nodes[5]->to_english . ' of ' . $self->{nodes}[4]->to_english;
+   }
+
+   if ( defined $nodes[4] && $nodes[4]->type ne 'wildcard' && !defined $nodes[3] && !defined $nodes[5] ) {
+      $dmy .= 'of ' . $self->{nodes}[4]->to_english;
    }
 
    if ( defined $nodes[6] && $nodes[6]->type ne 'wildcard' ) {

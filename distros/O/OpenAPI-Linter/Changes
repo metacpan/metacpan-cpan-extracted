@@ -1,5 +1,10 @@
 Revision history for OpenAPI::Linter
 
+0.16  2025-12-06
+      - Proposed path for issue #1:
+
+      Check that something is a hash ref before you use it as a hashref
+
 0.15  2025-11-30
       - Updated pod, be honest about false positives.
 

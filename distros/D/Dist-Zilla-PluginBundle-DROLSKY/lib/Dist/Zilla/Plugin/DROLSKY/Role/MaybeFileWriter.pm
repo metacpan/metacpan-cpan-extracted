@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use Carp::Always;
 use Path::Tiny qw( path );
@@ -49,7 +49,7 @@ Dist::Zilla::Plugin::DROLSKY::Role::MaybeFileWriter - Knows how to maybe write f
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =for Pod::Coverage .*
 

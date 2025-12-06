@@ -3,7 +3,7 @@ package DateTime::Format::Strptime::Types;
 use strict;
 use warnings;
 
-our $VERSION = '1.79';
+our $VERSION = '1.80';
 
 use parent 'Specio::Exporter';
 
@@ -80,7 +80,7 @@ DateTime::Format::Strptime::Types - Types used for parameter checking in DateTim
 
 =head1 VERSION
 
-version 1.79
+version 1.80
 
 =head1 DESCRIPTION
 
@@ -94,8 +94,6 @@ Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Format-Strp
 
 There is a mailing list available for users of this distribution,
 L<mailto:datetime@perl.org>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -117,7 +115,7 @@ Rick Measham <rickm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2015 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

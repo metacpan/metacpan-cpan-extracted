@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.19
+Version 0.20
 
 # SYNOPSIS
 
@@ -50,7 +50,7 @@ produces a ready-to-run `.t` test script to run through `prove`.
 
 It reads configuration files in any format,
 and optional YAML corpus files.
-All of the examples in this documenation are in `YAML` format,
+All of the examples in this documentation are in `YAML` format,
 other formats may not work as they aren't so heavily tested.
 It then generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based fuzzing harness combining:
 
@@ -63,7 +63,7 @@ It then generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based 
 
 The configuration file,
 for each set of tests to be produced,
-is a file containng a schema that can be read by [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction).
+is a file containing a schema that can be read by [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction).
 
 ## SCHEMA
 
@@ -137,7 +137,7 @@ The current supported variables are
 - `test_nuls`, inject NUL bytes into strings (default: 1)
 - `test_undef`, test with undefined value (default: 1)
 - `test_empty`, test with empty strings (default: 1)
-- `test_non_ascii`, test with strings that contain non ascii characaters (default: 1)
+- `test_non_ascii`, test with strings that contain non ascii characters (default: 1)
 - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 - `properties`, enable [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) Property tests (default: 0)
 
