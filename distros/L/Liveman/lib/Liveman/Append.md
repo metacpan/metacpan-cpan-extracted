@@ -91,7 +91,7 @@ Alt::The::Plan -
 \```perl
 use Alt::The::Plan;
 
-my $alt_the_plan = Alt::The::Plan->new;
+my $plan = Alt::The::Plan->new;
 \```
 
 # DESCRIPTION
@@ -105,8 +105,8 @@ my $alt_the_plan = Alt::The::Plan->new;
 .
 
 \```perl
-my $alt_the_plan = Alt::The::Plan->new;
-$alt_the_plan->planner  # -> .3
+my $plan = Alt::The::Plan->new;
+$plan->planner  # -> .3
 \```
 
 ## miting ($meet, $man, $woman)
@@ -114,8 +114,8 @@ $alt_the_plan->planner  # -> .3
 This is first!
 
 \```perl
-my $alt_the_plan = Alt::The::Plan->new;
-$alt_the_plan->miting($meet, $man, $woman)  # -> .3
+my $plan = Alt::The::Plan->new;
+$plan->miting($meet, $man, $woman)  # -> .3
 \```
 
 # INSTALL

@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.026';
+our $VERSION = '1.027';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -49,18 +49,17 @@ our $VERSION = '1.026';
 use strict;
 use warnings;
 
+use constant DEBUG => $ENV{BEAM_WIRE_DEBUG};
+
 use Scalar::Util qw( blessed );
 use Moo;
 use Config::Any;
 use Module::Runtime qw( use_module );
-use Data::DPath qw ( dpath );
 use Path::Tiny qw( path );
-use File::Basename qw( dirname );
 use Types::Standard qw( :all );
-use Data::Dumper;
+use if DEBUG, 'Data::Dumper' => qw( Dumper );
 use Beam::Wire::Event::ConfigService;
 use Beam::Wire::Event::BuildService;
-use constant DEBUG => $ENV{BEAM_WIRE_DEBUG};
 with 'Beam::Emitter';
 
 #pod =attr file
@@ -85,20 +84,31 @@ has file => (
 
 #pod =attr dir
 #pod
-#pod The directory path to use when searching for inner container files.
-#pod Defaults to the directory which contains the file specified by the
-#pod L<file attribute|/file>.
+#pod The directory path or paths to use when searching for inner container files.
+#pod Defaults to using the directory which contains the file specified by the
+#pod L<file attribute|/file> followed by the C<BEAM_PATH> environment variable
+#pod (separated by colons C<:>).
 #pod
 #pod =cut
 
 has dir => (
     is      => 'ro',
-    isa     => InstanceOf['Path::Tiny'],
+    isa     => ArrayRef[InstanceOf['Path::Tiny']],
     lazy    => 1,
-    default => sub { $_[0]->file->parent },
+    default => sub {
+      my $dir = [
+        ($_[0]->file ? ($_[0]->file->parent) : ()),
+        ($ENV{BEAM_PATH} ? (map { path($_) } grep !!$_, split /:/, $ENV{BEAM_PATH}) : ()),
+      ];
+      ; print 'Using default paths ', Dumper $dir if DEBUG;
+      return $dir;
+    },
     coerce => sub {
-        if ( !blessed $_[0] || !$_[0]->isa('Path::Tiny') ) {
-            return path( $_[0] );
+        if ( !ref $_[0] ) {
+            return [path( $_[0] )];
+        }
+        if ( ref $_[0] eq 'ARRAY' ) {
+          return [map { blessed( $_ ) && $_->isa('Path::Tiny') ? $_ : path($_) } @{$_[0]}];
         }
         return $_[0];
     },
@@ -258,7 +268,7 @@ sub get {
             );
         }
 
-        ; print STDERR "Got service config: " . Dumper $config_ref if DEBUG;
+        ; print STDERR "Got service config: " . Dumper( $config_ref ) if DEBUG;
 
         if ( ref $config_ref eq 'HASH' && $self->is_meta( $config_ref, 1 ) ) {
             my %config  = %{ $self->normalize_config( $config_ref ) };
@@ -272,7 +282,7 @@ sub get {
         }
     }
 
-    ; print STDERR "Returning service: " . Dumper $service if DEBUG;
+    ; print STDERR "Returning service: " . Dumper( $service ) if DEBUG;
 
     return $service;
 }
@@ -352,7 +362,7 @@ sub get_config {
 sub normalize_config {
     my ( $self, $conf ) = @_;
 
-    ; print STDERR "In conf: " . Dumper $conf if DEBUG;
+    ; print STDERR "In conf: " . Dumper( $conf ) if DEBUG;
 
     my %meta = reverse $self->get_meta_names;
 
@@ -369,7 +379,7 @@ sub normalize_config {
         }
     }
 
-    ; print STDERR "Out conf: " . Dumper \%out_conf if DEBUG;
+    ; print STDERR "Out conf: " . Dumper( \%out_conf ) if DEBUG;
 
     return \%out_conf;
 }
@@ -432,9 +442,18 @@ sub normalize_config {
 #pod
 #pod The path to a configuration file, relative to L<the dir attribute|/dir>.
 #pod The file will be read with L<Config::Any>, and the resulting data
-#pod structure returned.
+#pod structure returned. If the config file does not exist, will return the
+#pod data in the C<$default> attribute. If the C<$default> attribute does not
+#pod exist, will return C<undef>.
 #pod
-#pod C<value> can not be used with C<class> or C<extends>.
+#pod C<config> can not be used with C<class> or C<extends>.
+#pod
+#pod =item env
+#pod
+#pod Get the value from an environment variable. If the environment variable does not exist, will return the
+#pod data in the C<$default> attribute. If the C<$default> attribute does not exist, will return C<undef>.
+#pod
+#pod C<env> can not be used with C<class> or C<extends>.
 #pod
 #pod =item extends
 #pod
@@ -485,7 +504,7 @@ sub normalize_config {
 sub create_service {
     my ( $self, $name, %service_info ) = @_;
 
-    ; print STDERR "Creating service: " . Dumper \%service_info if DEBUG;
+    ; print STDERR "Creating service: " . Dumper( \%service_info ) if DEBUG;
 
     # Compose the parent ref into the copy, in case the parent changes
     %service_info = $self->merge_config( %service_info );
@@ -494,13 +513,13 @@ sub create_service {
     # must check after merge_config in case parent config has class/value
 
     my @classy = grep  { exists $service_info{$_} } qw( class extends );
-    my @other =  grep  { exists $service_info{$_} } qw( value ref config );
+    my @other =  grep  { exists $service_info{$_} } qw( value ref config env );
 
     if ( @other > 1 ) {
         Beam::Wire::Exception::InvalidConfig->throw(
             name => $name,
             file => $self->file,
-            error => 'use only one of "value", "ref", or "config"',
+            error => 'use only one of "value", "ref", "env", or "config"',
         );
     }
 
@@ -516,6 +535,10 @@ sub create_service {
         return $service_info{value};
     }
 
+    if ( exists $service_info{env} ) {
+        return exists $ENV{$service_info{env}} ? $ENV{$service_info{env}} : ($service_info{default} // undef);
+    }
+
     if ( exists $service_info{ref} ){
         # at this point the service info is normalized, so none of the
         # meta keys have a prefix.  this will cause resolve_ref some angst,
@@ -527,8 +550,11 @@ sub create_service {
 
     if ( $service_info{config} ) {
         my $conf_path = path( $service_info{config} );
-        if ( $self->file ) {
-            $conf_path = path( $self->file )->parent->child( $conf_path );
+        if ( !$conf_path->is_absolute ) {
+            $conf_path = $self->_resolve_relative_path($conf_path);
+        }
+        if ($service_info{default} && (!$conf_path || !$conf_path->is_file)) {
+            return $service_info{default};
         }
         return $self->_load_config( "$conf_path" );
     }
@@ -570,7 +596,7 @@ sub create_service {
         }
     }
     else {
-        my @args = $self->parse_args( $name, @service_info{"class","args"} );
+        my @args = $self->parse_args( $name, @service_info{"class","args","default"} );
         if ( $service_info{class}->can( 'DOES' ) && $service_info{class}->DOES( 'Beam::Service' ) ) {
             push @args, name => $name, container => $self;
         }
@@ -674,14 +700,25 @@ sub merge_config {
 #pod find_refs method|/find_refs>, and then a list of arguments will be
 #pod returned, ready to pass to the object's constructor.
 #pod
-#pod Nested containers are handled specially by this method: Their inner
-#pod references are not resolved by the parent container. This ensures that
-#pod references are always relative to the container they're in.
+#pod Nested containers are handled specially by this method:
+#pod
+#pod =over
+#pod
+#pod =item * Inner references are not resolved by the parent container.
+#pod This ensures that references are always relative to the container they're in.
+#pod
+#pod =item * If a file is specified but cannot be found, a C<default> can be provided
+#pod as a fallback.
+#pod
+#pod =back
 #pod
 #pod =cut
 
+# NOTE: Fallback only works on nested Beam::Wire containers right now.
+# I don't know what one could use to detect one should fall back for
+# any other kind of service...
 sub parse_args {
-    my ( $self, $for, $class, $args ) = @_;
+    my ( $self, $for, $class, $args, $fallback ) = @_;
     return if not $args;
     my @args;
     if ( ref $args eq 'ARRAY' ) {
@@ -693,10 +730,17 @@ sub parse_args {
         if ( $class->isa( 'Beam::Wire' ) ) {
             my %args = %{$args};
             my $config = delete $args{config};
-            # Relative subcontainer files should be from the current
-            # container's directory
+            # Subcontainer files should inherit the lookup paths of the
+            # current container, unless overridden.
+            $args{dir} //= $self->dir;
+            # Relative subcontainer files should be looked up from the list of dirs.
             if ( exists $args{file} && !path( $args{file} )->is_absolute ) {
-                $args{file} = $self->dir->child( $args{file} );
+                $args{file} = $self->_resolve_relative_path($args{file}, $args{dir});
+            }
+            # If the file doesn't exist, try to fall back to a default
+            if ( exists $args{file} && !($args{file} && path( $args{file} )->is_file) && $fallback ) {
+                delete $args{file};
+                %args = (%args, %$fallback);
             }
             @args = $self->find_refs( $for, %args );
             if ( $config ) {
@@ -744,7 +788,7 @@ sub parse_args {
 sub find_refs {
     my ( $self, $for, @args ) = @_;
 
-    ; printf STDERR qq{Searching for refs for "%s": %s}, $for, Dumper \@args if DEBUG;
+    ; printf STDERR qq{Searching for refs for "%s": %s}, $for, Dumper( \@args ) if DEBUG;
 
     my @out;
     my %meta = $self->get_meta_names;
@@ -755,7 +799,7 @@ sub find_refs {
                     push @out, $self->resolve_ref( $for, $arg );
                 }
                 else { # Try to treat it as a service to create
-                    ; print STDERR "Creating anonymous service: " . Dumper $arg if DEBUG;
+                    ; print STDERR "Creating anonymous service: " . Dumper( $arg ) if DEBUG;
 
                     my %service_info = %{ $self->normalize_config( $arg ) };
                     push @out, $self->create_service( '$anonymous', %service_info );
@@ -787,7 +831,7 @@ sub find_refs {
 #pod
 #pod A service hash reference must contain at least one key, and must either
 #pod contain a L<prefixed|/meta_prefix> key that could create or reference an
-#pod object (one of C<class>, C<extends>, C<config>, C<value>, or C<ref>) or,
+#pod object (one of C<class>, C<extends>, C<config>, C<value>, C<env>, or C<ref>) or,
 #pod if the C<$root> flag exists, be made completely of unprefixed meta keys
 #pod (as returned by L<the get_meta_names method|/get_meta_names>).
 #pod
@@ -817,7 +861,7 @@ sub is_meta {
     return 1
         if grep { exists $arg->{ $_ } }
             map { $meta{ $_ } }
-            qw( ref class extends config value );
+            qw( ref class extends config value env );
 
     # Must not be meta
     return;
@@ -849,6 +893,8 @@ sub get_meta_names {
         with        => "${prefix}with",
         value       => "${prefix}value",
         config      => "${prefix}config",
+        env         => "${prefix}env",
+        default     => "${prefix}default",
     );
     return wantarray ? %meta : \%meta;
 }
@@ -923,7 +969,7 @@ sub resolve_ref {
     # resolve service ref w/path
     if ( my $path = $arg->{ $meta{path} } ) {
         # locate foreign service data
-        my $conf = $self->get_config($name);
+        use_module( 'Data::DPath' )->import('dpath');
         @ref = dpath( $path )->match($service);
     }
     elsif ( my $call = $arg->{ $meta{call} } ) {
@@ -979,7 +1025,7 @@ sub fix_refs {
     for my $arg ( @args ) {
         if ( ref $arg eq 'HASH' ) {
             if ( $self->is_meta( $arg, 1 ) ) {
-                #; print STDERR 'Fixing refs for arg: ' . Dumper $arg;
+                #; print STDERR 'Fixing refs for arg: ' . Dumper( $arg );
                 my %new = %$arg;
                 for my $key ( keys %new ) {
                     if ( $key =~ /(?:ref|extends)$/ ) {
@@ -989,7 +1035,7 @@ sub fix_refs {
                         ( $new{ $key } ) = $self->fix_refs( $container_name, $new{ $key } );
                     }
                 }
-                #; print STDERR 'Fixed refs for arg: ' . Dumper \%new;
+                #; print STDERR 'Fixed refs for arg: ' . Dumper( \%new );
                 push @out, \%new;
             }
             else {
@@ -1066,6 +1112,18 @@ sub _load_config {
     }
 
    return "HASH" eq ref $loader ? (values(%{$loader}))[0] : {};
+}
+
+sub _resolve_relative_path {
+    my ( $self, $file, $dirs ) = @_;
+    $dirs //= $self->dir;
+    ; printf STDERR qq{Searching for path '%s' in %s}, $file, Dumper( $dirs ) if DEBUG;
+    for my $dir ( @{ $dirs } ) {
+        $dir = !(blessed $dir && $dir->isa('Path::Tiny')) ? path($dir) : $dir;
+        if ($dir->child($file)->exists) {
+            return $dir->child( $file );
+        }
+    }
 }
 
 # Check config file for known issues and report
@@ -1347,7 +1405,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 
@@ -1402,9 +1460,10 @@ configurations|Beam::Wire::Help::Config>.
 
 =head2 dir
 
-The directory path to use when searching for inner container files.
-Defaults to the directory which contains the file specified by the
-L<file attribute|/file>.
+The directory path or paths to use when searching for inner container files.
+Defaults to using the directory which contains the file specified by the
+L<file attribute|/file> followed by the C<BEAM_PATH> environment variable
+(separated by colons C<:>).
 
 =head2 config
 
@@ -1571,9 +1630,18 @@ A reference to another service.  This may be paired with C<call> or C<path>.
 
 The path to a configuration file, relative to L<the dir attribute|/dir>.
 The file will be read with L<Config::Any>, and the resulting data
-structure returned.
+structure returned. If the config file does not exist, will return the
+data in the C<$default> attribute. If the C<$default> attribute does not
+exist, will return C<undef>.
 
-C<value> can not be used with C<class> or C<extends>.
+C<config> can not be used with C<class> or C<extends>.
+
+=item env
+
+Get the value from an environment variable. If the environment variable does not exist, will return the
+data in the C<$default> attribute. If the C<$default> attribute does not exist, will return C<undef>.
+
+C<env> can not be used with C<class> or C<extends>.
 
 =item extends
 
@@ -1647,9 +1715,17 @@ scalar. The arguments will be searched for references using L<the
 find_refs method|/find_refs>, and then a list of arguments will be
 returned, ready to pass to the object's constructor.
 
-Nested containers are handled specially by this method: Their inner
-references are not resolved by the parent container. This ensures that
-references are always relative to the container they're in.
+Nested containers are handled specially by this method:
+
+=over
+
+=item * Inner references are not resolved by the parent container.
+This ensures that references are always relative to the container they're in.
+
+=item * If a file is specified but cannot be found, a C<default> can be provided
+as a fallback.
+
+=back
 
 =head2 find_refs
 
@@ -1677,7 +1753,7 @@ hashes inside of larger data structures.
 
 A service hash reference must contain at least one key, and must either
 contain a L<prefixed|/meta_prefix> key that could create or reference an
-object (one of C<class>, C<extends>, C<config>, C<value>, or C<ref>) or,
+object (one of C<class>, C<extends>, C<config>, C<value>, C<env>, or C<ref>) or,
 if the C<$root> flag exists, be made completely of unprefixed meta keys
 (as returned by L<the get_meta_names method|/get_meta_names>).
 
@@ -1835,6 +1911,11 @@ This event will bubble up from child containers.
 
 =over 4
 
+=item BEAM_PATH
+
+A colon-separated list of directories to look up inner container files. Use this
+to allow adding containers for (e.g.) Docker/Kubernetes deployments.
+
 =item BEAM_WIRE_DEBUG
 
 If set, print a bunch of internal debugging information to STDERR.
@@ -1895,7 +1976,7 @@ mohawk2 <mohawk2@users.noreply.github.com>
 
 =item *
 
-Sven Willenbuecher <sven.willenbuecher@gmx.de>
+Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>
 
 =back
 

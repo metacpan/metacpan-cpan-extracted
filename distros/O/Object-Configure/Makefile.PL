@@ -39,6 +39,7 @@ WriteMakefile(
 		'Scalar::Util' => 0,
 	}, TEST_REQUIRES => {
 		'autodie' => 0,
+		'Errno' => 0,
 		'File::Temp' => 0,
 		'File::Spec' => 0,
 		'File::stat' => 0,

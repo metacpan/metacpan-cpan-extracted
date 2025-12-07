@@ -501,6 +501,7 @@ Supported Functions:
   first / last     - Get first / last element of an array
   limit(N)         - Limit array to first N elements
   drop(N)          - Skip the first N elements of an array
+  rest             - Drop the first element of an array
   tail(N)          - Return the final N elements of an array
   chunks(N)        - Split array into subarrays each containing up to N items
   range(START; END[, STEP])

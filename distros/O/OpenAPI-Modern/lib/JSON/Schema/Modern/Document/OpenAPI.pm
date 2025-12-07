@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 use 5.020;
 use utf8;
@@ -19,7 +19,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use JSON::Schema::Modern::Utilities 0.625 qw(E canonical_uri jsonp is_equal json_pointer_type assert_keyword_type assert_uri_reference load_cached_document);
+use JSON::Schema::Modern::Utilities 0.625 qw(E canonical_uri jsonp is_equal json_pointer_type assert_keyword_type assert_uri_reference load_cached_document get_type);
 use OpenAPI::Modern::Utilities qw(:constants add_vocab_and_default_schemas);
 use Carp qw(croak carp);
 use Digest::MD5 'md5_hex';
@@ -193,7 +193,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
     # we used to always preload these, so we need to do it as needed for users who are using them
     load_cached_document($evaluator, STRICT_DIALECT->{$self->oas_version})
-      if $self->_has_metaschema_uri and $self->metaschema_uri eq STRICT_METASCHEMA->{$self->oas_version}
+      if $self->_has_metaschema_uri and $self->metaschema_uri eq (STRICT_METASCHEMA->{$self->oas_version}//'')
         or $json_schema_dialect eq (STRICT_DIALECT->{$self->oas_version}//'');
 
     if ($self->oas_version eq '3.0') {
@@ -222,13 +222,11 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       $state->{json_schema_dialect} = $json_schema_dialect; # subsequent '$schema' keywords can still override this
     }
 
-    $self->_set_metaschema_uri(
-          $json_schema_dialect eq DEFAULT_DIALECT->{$self->oas_version} ? DEFAULT_BASE_METASCHEMA->{$self->oas_version}
-        : $self->_dynamic_metaschema_uri($json_schema_dialect, $evaluator))
+    $self->_set_metaschema_uri(DEFAULT_METASCHEMA->{$self->oas_version})
       if not $self->_has_metaschema_uri;
 
     load_cached_document($evaluator, STRICT_METASCHEMA->{$self->oas_version})
-      if $self->_has_metaschema_uri and $self->metaschema_uri eq STRICT_METASCHEMA->{$self->oas_version};
+      if $self->_has_metaschema_uri and $self->metaschema_uri eq (STRICT_METASCHEMA->{$self->oas_version}//'');
   }
 
   $state->{identifiers}{$state->{initial_schema_uri}} = {
@@ -441,6 +439,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   # for each nested schema group. the schema paths appear longest first, with the parent schema
   # appearing last. Therefore we can whittle down to the parent schema for each group by iterating
   # through the full list in reverse, and checking if it is a child of the last path we chose to save.
+  # When the default metaschema is being used, there is no pruning to be done, as only the root of
+  # each embedded schema will be found via callbacks.
   my @real_json_schema_paths;
   for (my $idx = $#json_schema_paths; $idx >= 0; --$idx) {
     next if $idx != $#json_schema_paths
@@ -481,7 +481,11 @@ sub validate ($class, @args) {
 # identifiers
 sub _traverse_schema ($self, $state) {
   my $schema = $self->get($state->{keyword_path});
-  return if ref $schema ne 'HASH' or not keys %$schema;
+
+  if (get_type($schema) eq 'boolean' or not keys %$schema) {
+    push $state->{subschemas}->@*, $state->{keyword_path};
+    return;
+  }
 
   my $subschema_state = $state->{evaluator}->traverse($schema, {
     initial_schema_uri => canonical_uri($state),
@@ -586,7 +590,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 
@@ -667,7 +671,7 @@ may be other L<JSON::Schema::Modern::Document::OpenAPI> objects).
 
 This is the identifier that the document is known by, which is used to resolve any relative C<$ref>
 keywords in the document (unless overridden by a subsequent C<$id> in a schema).
-See L<Specification Reference: Relative References in API Description URIs/https://spec.openapis.org/oas/latest#relative-references-in-api-description-uris>.
+See L<Specification Reference: Relative References in API Description URIs|https://spec.openapis.org/oas/latest#relative-references-in-api-description-uris>.
 It is strongly recommended that this URI is absolute.
 
 In v3.2+ documents, it is used to resolve the C<$self> value in the document itself, which then
@@ -678,13 +682,15 @@ See also L</retrieval_uri>.
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-L<https://spec.openapis.org/oas/3.2/schema-base/2025-09-17> when the
-C<L<jsonSchemaDialect/https://spec.openapis.org/oas/latest#openapi-object>>
-is not changed from its default; otherwise defaults to a dynamically generated metaschema that uses
-the correct value of C<jsonSchemaDialect>, so you don't need to write one yourself.
+C<https://spec.openapis.org/oas/3.2/schema/2025-09-17> (or the equivalent for the
+L<OpenAPI version|https://spec.openapis.org/oas/latest#fixed-fields> you specify in the document),
+which permits the customization of
+L<C<jsonSchemaDialect|https://spec.openapis.org/oas/latest#openapi-object>>, which defines the
+JSON Schema dialect to use for embedded JSON Schemas (which itself defaults to
+C<https://spec.openapis.org/oas/3.2/dialect/2025-09-17> (or equivalent).
 
-Note that both the schemas described by C<metaschema_uri> and by the C<jsonSchemaDialect> keyword
-(if you are using custom schemas) should be loaded into the evaluator in advance with
+Note that if you are using custom schemas, both of these schemas described by C<metaschema_uri> and
+by the C<jsonSchemaDialect> keyword should be loaded into the evaluator in advance with
 L<JSON::Schema::Modern/add_schema>, and then this evaluator should be provided to the
 L<OpenAPI::Modern> constructor.
 

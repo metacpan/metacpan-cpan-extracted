@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.627';
+our $VERSION = '0.628';
 
 use 5.020;
 use Moo;
@@ -111,7 +111,7 @@ sub has_errors { scalar(($_[0]->{errors}//[])->@*) }
 # json pointer => entity name (indexed by integer)
 has _entities => (
   is => 'ro',
-  isa => HashRef[PositiveOrZeroInt],
+  isa => Map[json_pointer_type, PositiveOrZeroInt],
   lazy => 1,
   default => sub { {} },
 );
@@ -262,7 +262,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.627
+version 0.628
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+2.03 2025-12-06
+ - Fix support for Article and Transaction CFs
+ - Fix crash in CF admin. Thanks to PinkFreud
+
 2.02 2025-11-26
  - Remove obsolete test file from Makefile
  - Add export $RTHOME in install doc

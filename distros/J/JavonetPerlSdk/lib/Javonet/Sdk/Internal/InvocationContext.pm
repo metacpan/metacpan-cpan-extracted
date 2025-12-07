@@ -13,8 +13,6 @@ extends 'Javonet::Sdk::Internal::Abstract::AbstractInstanceContext',
     'Javonet::Sdk::Internal::Abstract::AbstractMethodInvocationContext',
     'Javonet::Sdk::Internal::Abstract::AbstractInvocationContext';
 
-my $perl_handler = Javonet::Core::Handler::PerlHandler->new();
-
 sub new {
     my $class = shift;
 

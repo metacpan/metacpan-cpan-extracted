@@ -5,7 +5,7 @@ use warnings;
 use Encode qw(decode_utf8);
 use Test2::API qw(context);
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 our $SEPARATOR = ' ';
 
@@ -15,7 +15,29 @@ sub import {
     my $class = shift;
     my ($caller, $file_path) = caller;
 
+    $file_path = _guess_file_path($file_path);
+
     $class->apply_plugin($caller, $file_path);
+}
+
+# If file_path is an eval (e.g., "(eval 19)"), find the real file
+# by checking caller stack. This happens when:
+#   - Import::Into: uses eval with #line directive, so caller(2) finds real file
+#   - String eval without #line: caller(1-3) are all "(eval N)", caller(4) finds real file
+# If real file not found within 4 levels, die with instructions to use apply_plugin().
+sub _guess_file_path {
+    my ($file_path) = @_;
+
+    return $file_path unless $file_path =~ /^\(eval \d+\)$/;
+
+    for my $level (1 .. 4) {
+        my @info = caller($level) or last;
+        return $info[1] if $info[1] !~ /^\(eval \d+\)$/;
+    }
+
+    die "Cannot determine file path from eval context. "
+      . "Please use apply_plugin() directly: "
+      . "Test2::Plugin::SubtestFilter->apply_plugin(__PACKAGE__, __FILE__)";
 }
 
 sub apply_plugin {

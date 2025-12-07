@@ -9,13 +9,8 @@ use aliased 'Javonet::Core::Protocol::CommandDeserializer' => 'CommandDeserializ
 use Exporter qw(import);
 our @EXPORT = qw(execute_ process);
 
-my $handler = PerlHandler->new();
-
 sub execute_ {
-    my $self = shift;
-    my $command = shift;
-    my $connection_type = shift;
-    my $tcp_address = shift;
+    my ($class, $command, $connection_type, $tcp_address) = @_;
     my @serialized_command = Javonet::Core::Protocol::CommandSerializer->serialize($command, $connection_type, $tcp_address, 0);
     my $response_byte_array_ref;
     if ($command->{runtime} eq Javonet::Sdk::Core::RuntimeLib::get_runtime('Perl')) {
@@ -26,18 +21,15 @@ sub execute_ {
         $response_byte_array_ref = Javonet::Core::Transmitter::PerlTransmitter->t_send_command(\@serialized_command);
     }
 
-    my $commandDeserializer = CommandDeserializer->new($response_byte_array_ref);
-    return $commandDeserializer->decode();
+    return CommandDeserializer->deserialize($response_byte_array_ref);
 }
 
 sub process {
-    my ($self, $message_byte_array_ref) = @_;
+    my ($class, $message_byte_array_ref) = @_;
     my @message_byte_array = @$message_byte_array_ref;
-    my $commandDeserializer = CommandDeserializer->new(\@message_byte_array);
-    my $command = $commandDeserializer->decode();
-    my $response = $handler->handle_command($command);
-    my $commandSerializer = CommandSerializer->new();
-    my @response_byte_array = $commandSerializer->serialize($response, 0, 0, 0);
+    my $command = CommandDeserializer->deserialize(\@message_byte_array);
+    my $response = PerlHandler->handle_command($command);
+    my @response_byte_array = CommandSerializer->serialize($response, 0, 0, 0);
     return @response_byte_array;
 }
 

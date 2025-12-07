@@ -44,6 +44,7 @@
       },
       "test" : {
          "requires" : {
+            "Errno" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "File::stat" : "0",
@@ -76,6 +77,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.16,
+   "version" : 0.17,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

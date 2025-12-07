@@ -26,10 +26,12 @@ my $schema = {
       title => 'bloop', # produces an annotation for 'title' with value 'bloop'
       bloop => 'hi',    # unknown keyword
       barf => 'no',     # unknown keyword
+      'x-alpha' => 1,   # ok
     },
     beta => {
       zip => 1,         # unknown keyword
       dah => 2,         # unknown keyword
+      'x-beta' => 3,    # ok
     },
   },
 };
@@ -56,7 +58,7 @@ cmp_result(
       # beta not examined -- we immediately abort
     ],
   },
-  'strict mode abort immediately on unknown keywords during evaluation via a config override',
+  'strict mode aborts immediately on unknown keywords during evaluation via a config override',
 );
 
 cmp_result(
@@ -103,12 +105,11 @@ cmp_result(
     valid => false,
     errors => [
       {
-        instanceLocation => '', # note no instance location - indicating evaluation has not started
+        # note no instance location - indicating evaluation has not started
         keywordLocation => '/properties/alpha',
         error => 'unknown keywords seen in schema: barf, bloop',
       },
       {
-        instanceLocation => '',
         keywordLocation => '/properties/beta',
         error => 'unknown keywords seen in schema: dah, zip',
       },

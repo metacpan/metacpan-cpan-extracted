@@ -24,7 +24,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test2::Plugin::BailOnFail';
 use Test::Deep qw(!array !hash); # import symbols: ignore, re etc
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use JSON::Schema::Modern::Document::OpenAPI;
-use JSON::Schema::Modern::Utilities qw(true false);
+use JSON::Schema::Modern::Utilities 0.628 qw(true false);
 use OpenAPI::Modern;
 use OpenAPI::Modern::Utilities;
 use YAML::PP 0.005;

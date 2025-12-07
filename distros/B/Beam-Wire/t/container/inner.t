@@ -6,9 +6,10 @@ use FindBin qw( $Bin );
 use Path::Tiny qw( path );
 use Scalar::Util qw( refaddr );
 
-my $SINGLE_FILE = path( $Bin, '..', 'share', 'file.yml' );
-my $DEEP_FILE   = path( $Bin, '..', 'share', 'inner_inline.yml' );
-my $INNER_FILE  = path( $Bin, '..', 'share', 'inner_file.yml' );
+my $SHARE_DIR   = path( $Bin, '..', 'share' );
+my $SINGLE_FILE = $SHARE_DIR->child( 'file.yml' );
+my $DEEP_FILE   = $SHARE_DIR->child( 'inner_inline.yml' );
+my $INNER_FILE  = $SHARE_DIR->child( 'inner_file.yml' );
 
 use Beam::Wire;
 
@@ -147,6 +148,80 @@ subtest 'inner container resolve extends of extends' => sub {
     ok !$@, 'service created successfully' or diag "$@";
     isa_ok $obj, 'My::ArgsTest', 'service gets class from inner/buzz';
     is_deeply $obj->got_args, [{ one => 'two' }], 'service gets args from inner/fizz';
+};
+
+subtest 'resolve from multiple directories' => sub {
+  subtest 'resolve from BEAM_PATH envvar' => sub {
+    local $ENV{BEAM_PATH} = $SHARE_DIR->child('beam_path');
+    my $wire = Beam::Wire->new( file => $INNER_FILE );
+    is_deeply $wire->dir, [$SHARE_DIR, $SHARE_DIR->child('beam_path')];
+  };
+
+  subtest 'resolve relative containers from list of dirs' => sub {
+    my $wire = Beam::Wire->new(
+        dir => [$SHARE_DIR->child('beam_path'), $SHARE_DIR],
+        config => {
+            container => {
+                class => 'Beam::Wire',
+                args => { file => $SINGLE_FILE->basename },
+            },
+            inner => {
+                class => 'Beam::Wire',
+                args => { file => $INNER_FILE->basename },
+            },
+        },
+    );
+
+    my $foo = $wire->get( 'container/foo' );
+    isa_ok $foo, 'My::Service', 'foo is overridden by BEAM_PATH';
+
+    my $inner = $wire->get('inner');
+    isa_ok $inner, 'Beam::Wire', 'inner_file found in original container parent dir';
+    is_deeply $inner->dir, $wire->dir, 'lookup dirs are the same';
+
+    isa_ok $inner->get('container/foo'), 'My::Service', 'inner container inherits lookup dirs from parent container';
+    isnt $inner->get('container/foo'), $foo, 'relative containers do not share caches';
+  };
+
+  subtest 'fallback default' => sub {
+    subtest 'fall back to default if file is missing' => sub {
+      my $wire = Beam::Wire->new(
+          dir => [],
+          config => {
+              container => {
+                  class => 'Beam::Wire',
+                  args => { file => $SINGLE_FILE->basename },
+                  default => {
+                      config => {
+                          'foo' => 'value',
+                      },
+                  },
+              },
+          },
+      );
+
+      my $foo = $wire->get( 'container/foo' );
+      is $foo, 'value', 'fallback default is used';
+    };
+
+    subtest 'default can specify fallback file' => sub {
+      my $wire = Beam::Wire->new(
+          dir => [],
+          config => {
+              container => {
+                  class => 'Beam::Wire',
+                  args => { file => $SINGLE_FILE->basename },
+                  default => {
+                      file => $DEEP_FILE->absolute,
+                  },
+              },
+          },
+      );
+
+      my $buzz = $wire->get( 'container/buzz' );
+      isa_ok $buzz, 'My::ArgsTest', 'fallback file is used';
+    };
+  };
 };
 
 done_testing;

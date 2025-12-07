@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Liveman.svg)](https://metacpan.org/release/Liveman) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-liveman/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Liveman+3.8)
+[![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Liveman.svg)](https://metacpan.org/release/Liveman) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-liveman/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Liveman+3.9)
 # NAME
 
 Liveman - компиллятор из markdown в тесты и документацию
 
 # VERSION
 
-3.8
+3.9
 
 # SYNOPSIS
 

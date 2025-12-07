@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/envassert',
     'lib/Env/Assert.pm',
     't/env-assert-private.t',
     't/env-assert-public-assert.t',

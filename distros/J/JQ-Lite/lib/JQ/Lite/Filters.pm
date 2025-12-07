@@ -576,6 +576,17 @@ sub apply {
             return 1;
         }
 
+        # support for rest
+        if ($part eq 'rest') {
+            @next_results = map {
+                ref $_ eq 'ARRAY'
+                ? (@$_ ? [ @$_[ 1 .. $#{$_} ] ] : [])
+                : $_
+            } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
         # support for reverse
         if ($part eq 'reverse') {
             @next_results = map {

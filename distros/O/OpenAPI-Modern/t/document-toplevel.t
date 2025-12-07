@@ -130,13 +130,13 @@ YAML
     [
       {
         instanceLocation => '/info',
-        keywordLocation => '/$ref/properties/info/$ref/required',
+        keywordLocation => '/properties/info/$ref/required',
         absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/$defs/info/required',
         error => 'object is missing properties: title, version',
       },
       {
         instanceLocation => '',
-        keywordLocation => '/$ref/properties',
+        keywordLocation => '/properties',
         absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/properties',
         error => 'not all properties are valid',
       },
@@ -164,7 +164,6 @@ ERRORS
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
         keywordLocation => '/jsonSchemaDialect',
         absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
         error => 'jsonSchemaDialect value is not a string',
@@ -189,7 +188,6 @@ ERRORS
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
         keywordLocation => '/$self',
         error => 'additional property not permitted',
       },
@@ -210,7 +208,6 @@ YAML
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
         keywordLocation => '/$self',
         error => re(qr/^\$self value is not a valid URI-reference$/i),
       },
@@ -227,7 +224,6 @@ YAML
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
         keywordLocation => '/$self',
         error => '$self cannot contain a fragment',
       },
@@ -246,7 +242,6 @@ YAML
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
         keywordLocation => '/jsonSchemaDialect',
         absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
         error => re(qr/^jsonSchemaDialect value is not a valid URI-reference$/i),
@@ -276,13 +271,11 @@ YAML
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '',
         keywordLocation => '/jsonSchemaDialect/$vocabulary/https:~1~1unknown',
         absoluteKeywordLocation => 'https://metaschema/with/wrong/spec#/$vocabulary/https:~1~1unknown',
         error => '"https://unknown" is not a known vocabulary',
       },
       {
-        instanceLocation => '',
         keywordLocation => '/jsonSchemaDialect',
         absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
         error => '"https://metaschema/with/wrong/spec" is not a valid metaschema',
@@ -372,17 +365,23 @@ YAML
   }
 };
 
-subtest 'custom dialects via jsonSchemaDialect' => sub {
+subtest 'parsing of jsonSchemaDialect to calculate dialect, metaschema_uri' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 # no jsonSchemaDialect
-paths: {}
+components:
+  schemas:
+    Foo:
+      properties:
+        foo:
+          $id: my_subschema
+          $schema: https://json-schema.org/draft/2019-09/schema
 YAML
 
   cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
-  is($doc->metaschema_uri, DEFAULT_BASE_METASCHEMA->{+OAS_VERSION}, 'default metaschema is saved for the document');
+  is($doc->metaschema_uri, DEFAULT_METASCHEMA->{+OAS_VERSION}, 'default metaschema is used for the document');
 
   $js->add_document($doc);
   cmp_result(
@@ -395,6 +394,13 @@ YAML
         specification_version => 'draft2020-12',
         document => shallow($doc),
         vocabularies => bag(OAS_VOCABULARIES->@*),
+      },
+      'http://localhost:1234/my_subschema' => {
+        canonical_uri => str('http://localhost:1234/my_subschema'),
+        path => '/components/schemas/Foo/properties/foo',
+        specification_version => 'draft2019-09',
+        document => shallow($doc),
+        vocabularies => bag(grep !/(Unevaluated|OpenAPI)$/, OAS_VOCABULARIES->@*),
       },
       # the oas vocabulary, and the dialect that uses it
       DEFAULT_DIALECT->{+OAS_VERSION} => {
@@ -431,23 +437,66 @@ YAML
     'dialect resources are properly stored on the evaluator',
   );
 
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js = JSON::Schema::Modern->new,
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+# no jsonSchemaDialect
+components:
+  schemas:
+    Foo:
+      properties:
+        foo: not_a_schema
+YAML
+
+  is(
+    ($doc->errors)[0],
+    '\'/components/schemas/Foo/properties/foo\': invalid schema type: string',
+    'found error when parsing document',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js = JSON::Schema::Modern->new,
+    schema => my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+# no jsonSchemaDialect
+components:
+  schemas:
+    Foo:
+      not-a-keyword: 1
+YAML
+
+  cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js = JSON::Schema::Modern->new(strict => 1),
+    schema => $schema,
+  );
+
+  is(
+    ($doc->errors)[0],
+    '\'/components/schemas/Foo\': unknown keyword seen in schema: not-a-keyword',
+    'found unknown keyword in embedded schema when parsing document in strict mode',
+  );
+
 
   $js = JSON::Schema::Modern->new;
-  my $mymetaschema_doc = $js->add_schema({
-    '$id' => 'https://mymetaschema',
+  my $my_custom_dialect_doc = $js->add_schema({
+    '$id' => 'https://my_custom_dialect',
     '$vocabulary' => {
       'https://json-schema.org/draft/2020-12/vocab/core' => true,
       'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
     },
   });
 
-
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION}, # '#meta' is now just {"type": ["object","boolean"]}
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-jsonSchemaDialect: https://mymetaschema
+jsonSchemaDialect: https://my_custom_dialect
 components:
   schemas:
     Foo:
@@ -469,70 +518,13 @@ YAML
         document => shallow($doc),
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
       },
-      'https://mymetaschema' => {
-        canonical_uri => str('https://mymetaschema'),
+      'https://my_custom_dialect' => {
+        canonical_uri => str('https://my_custom_dialect'),
         path => '',
         specification_version => 'draft2020-12',
-        document => shallow($mymetaschema_doc),
+        document => shallow($my_custom_dialect_doc),
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-      },
-    }),
-    'dialect resources are properly stored on the evaluator',
-  );
-
-
-  $js = JSON::Schema::Modern->new;
-  $js->add_document($mymetaschema_doc);
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
-    # metaschema_uri is not set, but autogenerated
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-jsonSchemaDialect: https://mymetaschema
-components:
-  schemas:
-    Foo:
-      maxLength: false,  # this is a bad schema, but our custom dialect does not detect that
-YAML
-
-  cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
-  like($doc->metaschema_uri, qr{^https://custom-dialect\.example\.com/[[:xdigit:]]{32}$}, 'dynamic metaschema is used');
-
-  $js->add_document($doc);
-  cmp_result(
-    $js->{_resource_index},
-    superhashof({
-      # our document itself is a resource, even if it isn't a json schema itself
-      'http://localhost:1234/api' => {
-        canonical_uri => str('http://localhost:1234/api'),
-        path => '',
-        specification_version => 'draft2020-12',
-        document => shallow($doc),
-        vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
-      },
-      'https://mymetaschema' => {
-        canonical_uri => str('https://mymetaschema'),
-        path => '',
-        specification_version => 'draft2020-12',
-        document => shallow($mymetaschema_doc),
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-      },
-      $doc->metaschema_uri => {
-        canonical_uri => str($doc->metaschema_uri),
-        path => '',
-        specification_version => 'draft2020-12',
-        document => ignore,
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-        anchors => {
-          meta => {
-            path => '/$defs/schema',
-            canonical_uri => str($doc->metaschema_uri.'#/$defs/schema'),
-            dynamic => 1,
-          },
-        },
       },
     }),
     'dialect resources are properly stored on the evaluator',
@@ -541,8 +533,8 @@ YAML
 
   # relative jsonSchemaDialect - resolve it against canonical_uri
   $js = JSON::Schema::Modern->new;
-  $mymetaschema_doc = $js->add_schema({
-    '$id' => 'https://example.com/mymetaschema',
+  $my_custom_dialect_doc = $js->add_schema({
+    '$id' => 'https://example.com/my_custom_dialect',
     '$vocabulary' => {
       'https://json-schema.org/draft/2020-12/vocab/core' => true,
       'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
@@ -555,7 +547,7 @@ YAML
     metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION},
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 $self: api
-jsonSchemaDialect: mymetaschema   # this is a relative uri
+jsonSchemaDialect: my_custom_dialect   # this is a relative uri
 components:
   schemas:
     Foo:
@@ -575,11 +567,11 @@ YAML
         document => shallow($doc),
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
       },
-      'https://example.com/mymetaschema' => {
-        canonical_uri => str('https://example.com/mymetaschema'),
+      'https://example.com/my_custom_dialect' => {
+        canonical_uri => str('https://example.com/my_custom_dialect'),
         path => '',
         specification_version => 'draft2020-12',
-        document => shallow($mymetaschema_doc),
+        document => shallow($my_custom_dialect_doc),
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
       },

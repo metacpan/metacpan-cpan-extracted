@@ -58,7 +58,7 @@ Functions are grouped by purpose for easier lookup.
 | `sort`, `sort_desc`, `sort_by(key)`              | Sort array               |
 | `reverse`, `first`, `last`                       | Basic reordering         |
 | `unique`, `unique_by(path)`                      | Deduplicate              |
-| `limit(n)`, `drop(n)`, `tail(n)`                 | Array slicing            |
+| `limit(n)`, `drop(n)`, `rest`, `tail(n)`         | Array slicing            |
 | `range(start; end[, step])`                      | Numeric sequence         |
 | `chunks(n)`                                      | Split into subarrays     |
 | `flatten()`, `flatten_all()`, `flatten_depth(n)` | Flatten nested arrays    |

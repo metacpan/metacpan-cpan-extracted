@@ -2682,7 +2682,7 @@ components:
 YAML
 
   $openapi->evaluator->add_schema({
-    '$id' => 'https://mymetaschema',
+    '$id' => 'https://my_custom_dialect',
     '$vocabulary' => {
       'https://json-schema.org/draft/2020-12/vocab/core' => true,
       'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
@@ -2697,7 +2697,7 @@ YAML
       evaluator => $openapi->evaluator,
       metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION}, # more lax, as we use multiple $schema values in schemas
       schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML')));
-jsonSchemaDialect: https://mymetaschema
+jsonSchemaDialect: https://my_custom_dialect
 components:
   pathItems:
     alpha_path:

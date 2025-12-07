@@ -5,7 +5,8 @@ use Test::Lib;
 use Scalar::Util qw( refaddr );
 use Beam::Wire;
 
-package TestClass {
+{
+    package TestClass;
     sub new { return bless {}, $_[0] }
     sub greeting { return 'Hello, World' }
 }

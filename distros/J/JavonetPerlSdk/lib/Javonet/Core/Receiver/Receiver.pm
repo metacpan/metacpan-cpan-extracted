@@ -30,13 +30,13 @@ use aliased 'Javonet::Core::Protocol::CommandSerializer' => 'CommandSerializer';
 
 
 sub heart_beat {
-    my ($self, $message_byte_array_ref) = @_;
+    my ($class, $message_byte_array_ref) = @_;
     my @response_byte_array = (49, 48);
     return \@response_byte_array;
 }
 
 sub send_command {
-    my ($self, $message_byte_array_ref) = @_;
+    my ($class, $message_byte_array_ref) = @_;
     my @message_byte_array = @$message_byte_array_ref;
     my @response_byte_array;
 #    try {
@@ -45,7 +45,7 @@ sub send_command {
 #    catch ( $e ) {
 #        my $exception = Exception->new($e);
 #        my $exception_command = Javonet::Core::Exception::ExceptionSerializer->serialize($exception);
-#        @response_byte_array = CommandSerializer->serialize($exception_command, 0);
+#        @response_byte_array = CommandSerializer->serialize($exception_command, 0, 0, 0);
 #    };
 
     return \@response_byte_array;
@@ -54,6 +54,7 @@ sub send_command {
 }
 
 sub get_runtime_info {
+    my ($class) = @_;
     return RuntimeLogger->rl_get_runtime_info();
 }
 

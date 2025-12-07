@@ -56,7 +56,7 @@
    "provides" : {
       "Test2::Plugin::SubtestFilter" : {
          "file" : "lib/Test2/Plugin/SubtestFilter.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/kfly8/Test2-Plugin-SubtestFilter"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

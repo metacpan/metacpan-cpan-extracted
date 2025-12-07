@@ -13,7 +13,7 @@ Beam::Wire::Help::Config - A brief introduction to dependency injection with Bea
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 DESCRIPTION
 
@@ -482,6 +482,35 @@ And you can set up relationships with C<$ref>:
             bounty:
                 $ref: bounty
 
+=head2 Environment Variables
+
+Like values, above, we can reference a environment variables using C<$env>.
+
+    # container.yml
+    bounty:
+        $env: CURRENT_BOUNTY
+
+These services can be used like any other. You can get the value with
+the C<get()> method:
+
+    my $bounty = $wire->get( 'bounty' );
+
+And you can set up relationships with C<$ref>:
+
+    # container.yml
+    serenity_crew:
+        class: Person
+        args:
+            bounty:
+                $ref: bounty
+
+If the environment variable is not set, you can fall back to a C<$default> value.
+
+    # container.yml
+    bounty:
+        $env: CURRENT_BOUNTY
+        $default: 100000
+
 =head2 Config Services
 
 A config service allows you to read a config file and use it as
@@ -534,6 +563,20 @@ object.
         args:
             cargo:
                 $config: manifest.yml
+
+Relative config files will be searched for in the same directories as L</nested
+containers>. If the file is not found, you can use C<$default> to fall back to
+a default.
+
+    # container.yml
+    serenity:
+        class: Ship
+        args:
+            cargo:
+                $config: manifest.yml
+                $default:
+                  hold: Nothing illegal, sir
+                  bribe: If you ask nicely
 
 =head2 Bare Services
 
@@ -610,8 +653,19 @@ multiple containers into one.
     my $actor = $wire->get( 'actors/malcolm' );
 
 Nested container file paths are relative to the current container file
-by default. If needed, you can set the L<dir attribute|Beam::Wire/dir>
-to change what directory to search in.
+by default, with directories in C<BEAM_PATH> environment variable appended.
+If needed, you can set the L<dir attribute|Beam::Wire/dir> to change what
+directories to search in. If the container file is not found, you can
+use C<$default> to choose a different file or specify services directly.
+
+    # container.yml
+    destination:
+        class: Beam::Wire
+        args:
+            file: current_flight_plan.yml
+        default:
+            config:
+                location: Right Here
 
 =head2 Event Handlers (on)
 

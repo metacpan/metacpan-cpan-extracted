@@ -9,7 +9,7 @@ use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 sub new {
     my ($class, %opts) = @_;
@@ -60,7 +60,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 1.43
+Version 1.44
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ C<length>, C<type>, C<keys>, C<keys_unsorted>, C<values>, C<paths>, C<leaf_paths
 
 =item * Selection and set operations
 
-C<select>, C<has>, C<contains>, C<any>, C<all>, C<unique>, C<unique_by>, C<group_by>, C<group_count>, C<pick>, C<merge_objects>, C<setpath>, C<getpath>, C<del>, C<delpaths>, C<compact>, C<drop>, C<tail>.
+C<select>, C<has>, C<contains>, C<any>, C<all>, C<unique>, C<unique_by>, C<group_by>, C<group_count>, C<pick>, C<merge_objects>, C<setpath>, C<getpath>, C<del>, C<delpaths>, C<compact>, C<drop>, C<rest>, C<tail>.
 
 =item * Transformation helpers
 
@@ -633,6 +633,17 @@ Examples:
 
   .users | slice(0, 2)        # => first two users
   .users | slice(-2)          # => last two users
+
+=item * rest
+
+Returns the current array without its first element. Empty arrays yield empty
+arrays. Non-array inputs pass through untouched so mixed pipelines remain
+compatible.
+
+Examples:
+
+  [1,2,3] | rest              # => [2,3]
+  []       | rest             # => []
 
 =item * tail(n)
 

@@ -14,7 +14,6 @@ do { my $x = {
                                       'Beam::Emitter' => '0',
                                       'Beam::Service' => '0',
                                       'Config::Any' => '0.23',
-                                      'Data::DPath' => '0.51',
                                       'Module::Runtime' => '0',
                                       'Moo' => '0',
                                       'Path::Tiny' => '0.055',
@@ -22,6 +21,9 @@ do { my $x = {
                                       'Types::Standard' => '0',
                                       'YAML' => '0',
                                       'perl' => '5.010'
+                                    },
+                      'suggests' => {
+                                      'Data::DPath' => '0.51'
                                     }
                     },
        'test' => {

@@ -9,42 +9,48 @@ use Text::Trim qw/trim/;
 
 # Конструктор
 sub new {
-    my $cls = shift;
-    my $self = bless {@_}, $cls;
-    delete $self->{files} if $self->{files} && !scalar @{$self->{files}};
-    $self
+	my $cls = shift;
+	my $self = bless {@_}, $cls;
+	delete $self->{files} if $self->{files} && !scalar @{$self->{files}};
+	$self
 }
 
 # Пакет из пути
 sub _pkg($) {
-    my ($pkg) = @_;
-    my @pkg = File::Spec->splitdir($pkg);
-    shift @pkg; # Удаляем lib/
-    $pkg[$#pkg] =~ s!\.\w+$!!; # Удаляем расширение
-    join "::", @pkg
+	my ($pkg) = @_;
+	my @pkg = File::Spec->splitdir($pkg);
+	shift @pkg; # Удаляем lib/
+	$pkg[$#pkg] =~ s!\.\w+$!!; # Удаляем расширение
+	join "::", @pkg
 }
 
 # Переменная из пакета
 sub _var($) {
-    '$' . lcfirst( shift =~ s!::(\w)?!_${\lc $1}!gr )
+	'$' . lcfirst( shift =~ /(::|^)(\w+)$/? $2: () )
+}
+
+# Добавляет точку в конец комментария
+sub _add_dot_in_remark($) {
+	$_[0] =~ s/\s*$//;
+	$_[0] =~ s/$/./ if $_[0] !~ /[.?!…]$/;
 }
 
 # Для метода для вставки
 sub _md_method(@) {
-    my ($pkg, $sub, $args, $remark) = @_;
-    my $sub_args = "$sub ($args)";
-    $args = "($args)" if $args;
+	my ($pkg, $sub, $args, $remark) = @_;
+	my $sub_args = "$sub ($args)";
+	$args = "($args)" if $args;
 
-    $remark = "." unless defined $remark;
-    my $var = _var $pkg;
-    << "END";
+	_add_dot_in_remark $remark;
+	my $var = _var $pkg;
+	<< "END";
 ## $sub_args
 
 $remark
 
 ```perl
 my $var = $pkg->new;
-${var}->$sub$args  # -> .3
+$var\->$sub$args  # -> .3
 ```
 
 END
@@ -52,11 +58,11 @@ END
 
 # Для фичи для вставки
 sub _md_feature(@) {
-    my ($pkg, $has, $remark) = @_;
+	my ($pkg, $has, $remark) = @_;
 
-    $remark = "." unless defined $remark;
-    my $var = _var $pkg;
-    << "END";
+	_add_dot_in_remark $remark;
+	my $var = _var $pkg;
+	<< "END";
 ## $has
 
 $remark
@@ -64,7 +70,7 @@ $remark
 ```perl
 my $var = $pkg->new;
 
-${var}->$has\t# -> .5
+${var}->$has # -> .5
 ```
 
 END
@@ -72,89 +78,88 @@ END
 
 # Добавить разделы функций в *.md из *.pm
 sub appends {
-    my ($self) = @_;
-    my $files = $self->{files} // [ find_wanted(sub { /\.pm$/ && -f }, "lib") ];
-    $self->append($_) for @$files;
-    $self
+	my ($self) = @_;
+	my $files = $self->{files} // [ find_wanted(sub { /\.pm$/ && -f }, "lib") ];
+	$self->append($_) for @$files;
+	$self
 }
 
 # Добавить разделы функций в *.md из *.pm
 sub append {
-    my ($self, $pm) = @_;
+	my ($self, $pm) = @_;
 
-    my $md = $pm =~ s!(\.\w+)?$!.md!r;
+	my $md = $pm =~ s!(\.\w+)?$!.md!r;
 
-    die "Not file $pm!" if !-f $pm;
-    $self->mkmd($md) if !-f $md;
+	die "Not file $pm!" if !-f $pm;
+	$self->mkmd($md) if !-f $md;
 
-    local $_ = read_text $pm;
-    my %sub; my %has;
-    while(m! (^\# [\ \t]* (?<remark> .*?) [\ \t]* )? \n (
-        sub \s+ (?<sub> (\w+|::)+ ) .* 
-            ( \s* my \s* \( \s* (\$self,? \s* )? (?<args>.*?) \s* \) \s* = \s* \@_; )?
-        | has \s+ (?<has> (\w+|'\w+'|"\w+"|\[ \s* ([^\[\]]*?) \s* \])+ )
-    ) !mgxn) {
-        for my $key (qw/has sub/) {
-            ($key eq "has"? \%has: \%sub)->{$+{$key}} = {%+,
-                pos => length $`}
-                    if exists $+{$key} and "_" ne substr $+{$key}, 0, 1;
-        }
-    }
+	local $_ = read_text $pm;
+	my %sub; my %has;
+	while(m! (^\# [\ \t]* (?<remark> .*?) [\ \t]* )? \n (
+		sub \s+ (?<sub> (\w+|::)+ ) .* 
+			( \s* my \s* \( \s* (\$self,? \s* )? (?<args>.*?) \s* \) \s* = \s* \@_; )?
+		| has \s+ (?<has> (\w+|'\w+'|"\w+"|\[ \s* ([^\[\]]*?) \s* \])+ )
+	) !mgxn) {
+		for my $key (qw/has sub/) {
+			($key eq "has"? \%has: \%sub)->{$+{$key}} = {%+, pos => length $`}
+				if exists $+{$key} and "_" ne substr $+{$key}, 0, 1;
+		}
+	}
 
-    return $self if !keys %sub && !keys %has;
+	return $self if !keys %sub && !keys %has;
 
-    $_ = read_text $md;
+	$_ = read_text $md;
 
-    my $pkg = _pkg $md;
+	my $pkg = _pkg $md;
 
-    my $added = 0;
+	my $added = 0;
 
-    my $add = sub {
-        $added += keys %sub;
-        join "", @_, map { _md_method $pkg, $_, $sub{$_}{args}, $sub{$_}{remark} } sort { $sub{$a}{pos} <=> $sub{$b}{pos} } keys %sub
-    };
+	my $add = sub {
+		$added += keys %sub;
+		join "", @_, map { _md_method $pkg, $_, $sub{$_}{args}, $sub{$_}{remark} } sort { $sub{$a}{pos} <=> $sub{$b}{pos} } keys %sub
+	};
 
-    s{^\#[\ \t]+ (METHODS|SUBROUTINES) (^```.*?^```|.)*? (?= ^\#\s) }{
-        my $x = $&;
-        while($x =~ /^\#\#[\ \t]+(\w+)/gm) {
-            delete $sub{$1};
-        }
-        $add->($x)
-    }emsx
-    or s{^\#[\ \t]+ DESCRIPTION (^```.*?^```|.)*? (?= ^\#\s) }{
-        $add->($&, "# SUBROUTINES/METHODS\n\n")
-    } or die "Нет секции DESCRIPTION!" if keys %sub;
+	s{^\#[\ \t]+ (METHODS|SUBROUTINES) (^```.*?^```|.)*? (?= ^\#\s) }{
+		my $x = $&;
+		while($x =~ /^##[ \t]+(\w+)/gm) {
+			delete $sub{$1};
+		}
+		$add->($x)
+	}emsx
+	or s{^#[\ \t]+ DESCRIPTION (^```.*?^```|.)*? (?= ^\#\s) }{
+		$add->($&, "# SUBROUTINES/METHODS\n\n")
+	} or die "Нет секции DESCRIPTION!" if keys %sub;
 
-    my $add = sub {
-        $added += keys %has;
-        join "", @_, map { _md_feature $pkg, $_, $sub{$_}{remark} } sort { $has{$a}{pos} <=> $has{$b}{pos} } keys %has
-    };
+	my $add = sub {
+		$added += keys %has;
+		join "", @_, map { _md_feature $pkg, $_, $has{$_}{remark} } sort { $has{$a}{pos} <=> $has{$b}{pos} } keys %has
+	};
 
-    s{^\#[\ \t]+ FEATURES (^```.*?^```|.)*? (?= ^\#\s) }{
-        my $x = $&;
-        while($x =~ /^\#\#[\ \t]+([^\n]+?)[\ \t]*/gm) {
-            delete $has{$1};
-        }
-        $add->($x)
-    }emsx
-    or s{^\#[\ \t]+ DESCRIPTION (^```.*?^```|.)*? (?= ^\#\s) }{
-        $add->($&, "# FEATURES\n\n")
-    }emsx or die "Нет секции DESCRIPTION!" if keys %has;
+	s{^\#[\ \t]+ FEATURES (^```.*?^```|.)*? (?= ^\#\s) }{
+		my $x = $&;
+		while($x =~ /^##[ \t]+(\w+)/gm) {
+			delete $has{$1};
+		}
+		$add->($x)
+	}emsx
+	or s{^\#[\ \t]+ DESCRIPTION (^```.*?^```|.)*? (?= ^\#\s) }{
+		$add->($&, "# FEATURES\n\n")
+	}emsx or die "Нет секции DESCRIPTION!" if keys %has;
 
 
-    if ($added) {
-        write_text $md, $_;
-        print "🔖 $pm ", colored("⊂", "BRIGHT_GREEN"), " $md ", "\n",
-            "  ", scalar keys %has? (colored("FEATURES ", "BRIGHT_WHITE"), join(colored(", ", "red"), sort keys %has), "\n"): (),
-            "  ", scalar keys %sub? (colored("SUBROUTINES ", "BRIGHT_WHITE"), join(colored(", ", "red"), sort keys %sub), "\n"): (),
-        ;
-    } else {
-        print "🔖 $pm\n";
-    }
+	if ($added) {
+		write_text $md, $_;
+		print "🔖 $pm ", colored("⊂", "BRIGHT_GREEN"), " $md ", "\n",
+			"  ", scalar keys %has? (colored("FEATURES ", "BRIGHT_WHITE"), join(colored(", ", "red"), sort keys %has), "\n"): (),
+			"  ", scalar keys %sub? (colored("SUBROUTINES ", "BRIGHT_WHITE"), join(colored(", ", "red"), sort keys %sub), "\n"): (),
+		;
+	} else {
+		print "🔖 $pm\n";
+	}
 
-    $self->{count}++;
-    $self->{added} = $added;
-    $self
+	$self->{count}++;
+	$self->{added} = $added;
+	$self
 }
 
 sub _git_user_name { shift->{_git_user_name} //= trim(`git config user.name`) }
@@ -165,17 +170,17 @@ sub _land { shift->{_land} //= `curl "https://ipapi.co/\$(curl https://2ip.ru --
 
 # Добавить разделы функций в *.md из *.pm
 sub mkmd {
-    my ($self, $md) = @_;
+	my ($self, $md) = @_;
 
-    my $pkg = _pkg $md;
+	my $pkg = _pkg $md;
 
-    my $author = $self->_git_user_name;
-    my $email = $self->_git_user_email;
-    my $year = $self->_year;
-    my $license = $self->_license;
-    my $land = $self->_land;
+	my $author = $self->_git_user_name;
+	my $email = $self->_git_user_email;
+	my $year = $self->_year;
+	my $license = $self->_license;
+	my $land = $self->_land;
 
-    write_text $md, << "END";
+	write_text $md, << "END";
 # NAME
 
 $pkg - 
@@ -316,7 +321,7 @@ File lib/Alt/The/Plan.md is:
 	\```perl
 	use Alt::The::Plan;
 	
-	my $alt_the_plan = Alt::The::Plan->new;
+	my $plan = Alt::The::Plan->new;
 	\```
 	
 	# DESCRIPTION
@@ -330,8 +335,8 @@ File lib/Alt/The/Plan.md is:
 	.
 	
 	\```perl
-	my $alt_the_plan = Alt::The::Plan->new;
-	$alt_the_plan->planner  # -> .3
+	my $plan = Alt::The::Plan->new;
+	$plan->planner  # -> .3
 	\```
 	
 	## miting ($meet, $man, $woman)
@@ -339,8 +344,8 @@ File lib/Alt/The/Plan.md is:
 	This is first!
 	
 	\```perl
-	my $alt_the_plan = Alt::The::Plan->new;
-	$alt_the_plan->miting($meet, $man, $woman)  # -> .3
+	my $plan = Alt::The::Plan->new;
+	$plan->miting($meet, $man, $woman)  # -> .3
 	\```
 	
 	# INSTALL

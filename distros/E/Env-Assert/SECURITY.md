@@ -1,11 +1,11 @@
-# Security Policy for the Env::Assert distribution.
+# Security Policy for the Env-Assert distribution.
 
 Report security issues by email to Mikko Koivunalho <mikkoi@cpan.org>.
 
-This is the Security Policy for Env::Assert.
+This is the Security Policy for Env-Assert.
 
 The latest version of the Security Policy can be found in the
-[git repository for Env::Assert](https://github.com/mikkoi/env-assert/blob/main/SECURITY.md).
+[git repository for Env-Assert](https://github.com/mikkoi/env-assert/blob/main/SECURITY.md).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
 a Security Policy to Perl Distributions (version 1.3.0)
@@ -13,7 +13,7 @@ https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability
 
-Security vulnerabilities can be reported to the current Env::Assert
+Security vulnerabilities can be reported to the current Env-Assert
 maintainers by email to Mikko Koivunalho <mikkoi@cpan.org>.
 
 Please include as many details as possible, including code samples
@@ -59,10 +59,10 @@ They may also forward this issue to CPANSec.
 
 # Which Software This Policy Applies To
 
-Any security vulnerabilities in Env::Assert are covered by this policy.
+Any security vulnerabilities in Env-Assert are covered by this policy.
 
 Security vulnerabilities in versions of any libraries that are
-included in Env::Assert are also covered by this policy.
+included in Env-Assert are also covered by this policy.
 
 Security vulnerabilities are considered anything that allows users
 to execute unauthorised code, access unauthorised resources, or to
@@ -70,27 +70,27 @@ have an adverse impact on accessibility or performance of a system.
 
 Security vulnerabilities in upstream software (prerequisite modules
 or system libraries, or in Perl), are not covered by this policy
-unless they affect Env::Assert, or Env::Assert can
+unless they affect Env-Assert, or Env-Assert can
 be used to exploit vulnerabilities in them.
 
 Security vulnerabilities in downstream software (any software that
-uses Env::Assert, or plugins to it that are not included with the
-Env::Assert distribution) are not covered by this policy.
+uses Env-Assert, or plugins to it that are not included with the
+Env-Assert distribution) are not covered by this policy.
 
-## Supported Versions of Env::Assert
+## Supported Versions of Env-Assert
 
 The maintainer(s) will only commit to releasing security fixes for
-the latest version of Env::Assert.
+the latest version of Env-Assert.
 
-Note that the Env::Assert project only supports major versions of Perl
-released in the past 10 years, even though Env::Assert will run on
+Note that the Env-Assert project only supports major versions of Perl
+released in the past 10 years, even though Env-Assert will run on
 older versions of Perl.  If a security fix requires us to increase
 the minimum version of Perl that is supported, then we may do so.
 
 # Installation and Usage Issues
 
 The distribution metadata specifies minimum versions of
-prerequisites that are required for Env::Assert to work.  However, some
+prerequisites that are required for Env-Assert to work.  However, some
 of these prerequisites may have security vulnerabilities, and you
 should ensure that you are using up-to-date versions of these
 prerequisites.
@@ -101,4 +101,3 @@ newer versions as recommended.
 ## Usage
 
 Please see the software documentation for further information.
-

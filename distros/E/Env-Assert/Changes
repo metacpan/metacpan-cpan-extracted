@@ -1,5 +1,10 @@
 Revision history for Env-Assert
 
+0.012     2025-12-06 15:55:13+01:00 Europe/Stockholm
+            * Rename dir script/ to bin/ to match with Dist::Zilla::Plugin::ExecDir defaults.
+            * Add badges for license, CPAN and kwalitee to Readme.
+            * Fix typos and add stopwords.
+
 0.011     2025-09-28 09:32:02+02:00 Europe/Stockholm
             * Bump version to 0.011 and remove underscore hack.
             * Change Security Policy to use CPANSec's template.

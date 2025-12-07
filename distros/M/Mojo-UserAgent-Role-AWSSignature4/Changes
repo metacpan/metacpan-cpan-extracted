@@ -1,0 +1,11 @@
+0.01 2025-12-06
+  - Add AWS Signature Version 4 signing to Mojo::UserAgent
+  - Support for AWS services (S3, DynamoDB, SQS, SNS, Lambda, etc.)
+  - Signed and unsigned payload options
+  - Session token support for temporary credentials
+  - Custom region and service endpoint configuration
+  - Debug mode for signature troubleshooting
+  - Configurable request expiration
+  - File-based payload support for large uploads
+  - Comprehensive test suite with near-100% coverage
+  - Full POD documentation

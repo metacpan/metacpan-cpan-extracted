@@ -1,3 +1,6 @@
+1.44  2025-11-10
+    - Promote release to version 1.44 including the jq-compatible rest filter.
+
 1.43  2025-11-09
     - Release jq-compatible @base64d formatter with documentation and tests.
 

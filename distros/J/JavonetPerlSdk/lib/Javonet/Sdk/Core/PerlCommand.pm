@@ -5,95 +5,207 @@ use lib 'lib';
 use Moose;
 use Scalar::Util;
 
+use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'PerlCommandType';
+
 has 'runtime' => (
-    is => 'rw',
+    is => 'ro',
     isa => 'Int',
     required => 1,
     reader => '_get_runtime'
 );
 
 has 'command_type' => (
-    is       => 'rw',
+    is       => 'ro',
     isa      => 'Int',
     required => 1,
     reader   => '_get_command_type'
 );
 
 has 'payload' => (
-    is      => 'rw',
+    is      => 'ro',
     isa     => 'ArrayRef',
     default => sub {[]},
-    writer  => '_set_payload',
     reader  => '_get_payload'
 );
 
-sub addArgumentToPayload{
-    my ($self, $payload_ref) = @_;
-    my @payload_array = @$payload_ref;
-    my $firstVar = $self->{payload}[0];
-    my @merged_payload;
-    if (!defined $firstVar){
-        @merged_payload = @payload_array;
+# Constructor with params object[] (list of objects)
+sub new {
+    my ($class, %args) = @_;
+    my $runtime = $args{runtime};
+    my $command_type = $args{command_type};
+    my $payload = $args{payload};
+    
+    # If payload is not provided or is undef, use empty array
+    if (!defined $payload) {
+        $payload = [];
     }
-    else{
-        my $current_payload_ref = $self->{payload};
-        my @cur_payload = @$current_payload_ref;
-        @merged_payload = (@cur_payload, @payload_array);
+    # If payload is already an array reference, use it directly
+    elsif (ref $payload eq 'ARRAY') {
+        # Reuse array reference directly - no conversion overhead
+        $payload = $payload;
     }
-    return Javonet::Sdk::Core::PerlCommand->new(runtime => $self->{runtime}, command_type => $self->{command_type}, payload => \@merged_payload);
+    # If payload is a list (not a reference), convert to array reference
+    else {
+        # This handles the case where payload might be passed as a list
+        # Convert to array reference
+        my @payload_array = ref $payload ? @$payload : ($payload);
+        $payload = \@payload_array;
+    }
+    
+    my $self = {
+        runtime => $runtime,
+        command_type => $command_type,
+        payload => $payload
+    };
+    
+    bless $self, $class;
+    return $self;
 }
 
-# sub size{
-#     my ($self) = @_;
-#     my $command_size = 0;
-#     my $current_payload_ref = $self->{payload};
-#     my @cur_payload = @$current_payload_ref;
-#     for (my $i = 0; $i < @cur_payload; $i++) {
-#         if ($cur_payload[$i]->isa("Javonet::Sdk::Core::PerlCommand")) {
-#             $command_size += $cur_payload[$i]->size();
-#         }
-#         if (Scalar::Util::looks_like_number($cur_payload[$i])){
-#             $command_size += 4
-#         }
-#         if ( ! defined $cur_payload[$i]){
-#             # undefined
-#             $command_size += 0;
-#         }
-#         elsif ( ref $cur_payload[$i] ) {
-#             # reference (return of ref will give the type)
-#             $command_size += 0;
-#         }
-#         else{
-#             $command_size += length($cur_payload[$i]);
-#         }
-#     }
-#     return $command_size;
-# }
+# Static factory method: CreateResponse
+sub CreateResponse {
+    my ($class, $response, $runtime_name) = @_;
+    return $class->new(
+        runtime => $runtime_name,
+        command_type => PerlCommandType->get_command_type('Value'),
+        payload => [$response]
+    );
+}
 
-sub drop_first_payload_argument {
+# Static factory method: CreateReference
+sub CreateReference {
+    my ($class, $guid, $runtime_name) = @_;
+    return $class->new(
+        runtime => $runtime_name,
+        command_type => PerlCommandType->get_command_type('Reference'),
+        payload => [$guid]
+    );
+}
+
+# Static factory method: CreateArrayResponse
+sub CreateArrayResponse {
+    my ($class, $array, $runtime_name) = @_;
+    # Convert array to array reference if needed
+    my $payload = ref $array eq 'ARRAY' ? $array : [$array];
+    return $class->new(
+        runtime => $runtime_name,
+        command_type => PerlCommandType->get_command_type('Array'),
+        payload => $payload
+    );
+}
+
+# DropFirstPayloadArg - matches C# DropFirstPayloadArg
+sub DropFirstPayloadArg {
     my ($self) = @_;
+    my $class = ref($self) || $self;
     my $current_payload_ref = $self->{payload};
     my @cur_payload = @$current_payload_ref;
     my $payload_length = @cur_payload;
-    if ($payload_length != 0){
-        shift(@cur_payload);
+    
+    if ($payload_length <= 1) {
+        return $class->new(
+            runtime => $self->{runtime},
+            command_type => $self->{command_type},
+            payload => []
+        );
     }
-    return Javonet::Sdk::Core::PerlCommand->new(runtime => $self->{runtime}, command_type => $self->{command_type}, payload => \@cur_payload);
-
+    
+    my $new_length = $payload_length - 1;
+    my @new_payload = @cur_payload[1 .. $#cur_payload];
+    
+    return $class->new(
+        runtime => $self->{runtime},
+        command_type => $self->{command_type},
+        payload => \@new_payload
+    );
 }
 
-sub prepend_arg_to_payload{
-    my ($self, $current_command) = @_;
+# AddArgToPayload - matches C# AddArgToPayload
+sub AddArgToPayload {
+    my ($self, $arg) = @_;
+    my $class = ref($self) || $self;
     my $current_payload_ref = $self->{payload};
     my @cur_payload = @$current_payload_ref;
-    my @merged_payload;
-    if(defined $current_command) {
-        @merged_payload = ($current_command, @cur_payload);
-    } else {
-        @merged_payload = @cur_payload;
-    }
+    my $old_length = @cur_payload;
+    my @new_payload = (@cur_payload, $arg);
+    
+    return $class->new(
+        runtime => $self->{runtime},
+        command_type => $self->{command_type},
+        payload => \@new_payload
+    );
+}
 
-    return Javonet::Sdk::Core::PerlCommand->new(runtime => $self->{runtime}, command_type => $self->{command_type}, payload => \@merged_payload);
+# PrependArgToPayload - matches C# PrependArgToPayload
+sub PrependArgToPayload {
+    my ($self, $arg_command) = @_;
+    
+    if (!defined $arg_command) {
+        return $self;
+    }
+    
+    my $class = ref($self) || $self;
+    my $current_payload_ref = $self->{payload};
+    my @cur_payload = @$current_payload_ref;
+    my $old_length = @cur_payload;
+    my @new_payload = ($arg_command, @cur_payload);
+    
+    return $class->new(
+        runtime => $self->{runtime},
+        command_type => $self->{command_type},
+        payload => \@new_payload
+    );
+}
+
+# Legacy method name for backward compatibility
+sub addArgumentToPayload {
+    my ($self, $payload_ref) = @_;
+    my @payload_array = ref $payload_ref eq 'ARRAY' ? @$payload_ref : ($payload_ref);
+    return $self->AddArgToPayload($payload_array[0]) if @payload_array == 1;
+    # For multiple items, add them one by one
+    my $result = $self;
+    for my $item (@payload_array) {
+        $result = $result->AddArgToPayload($item);
+    }
+    return $result;
+}
+
+# Legacy method name for backward compatibility
+sub drop_first_payload_argument {
+    return $_[0]->DropFirstPayloadArg();
+}
+
+# Legacy method name for backward compatibility
+sub prepend_arg_to_payload {
+    return $_[0]->PrependArgToPayload($_[1]);
+}
+
+# ToString method - matches C# ToString
+sub ToString {
+    my ($self) = @_;
+    eval {
+        my $result = "RuntimeName " . $self->{runtime} . " ";
+        $result .= "CommandType " . $self->{command_type} . " ";
+        $result .= "Payload ";
+        
+        my $payload_ref = $self->{payload};
+        my @payload = @$payload_ref;
+        my $len = @payload;
+        
+        for (my $i = 0; $i < $len; $i++) {
+            my $item = $payload[$i];
+            $result .= defined $item ? $item : "null";
+            
+            if ($i < $len - 1) {
+                $result .= " ";
+            }
+        }
+        
+        return $result;
+    };
+    if ($@) {
+        return "Error while converting command to string: " . $@;
+    }
 }
 
 no Moose;

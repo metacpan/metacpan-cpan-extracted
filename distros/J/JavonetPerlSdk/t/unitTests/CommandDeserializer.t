@@ -3,21 +3,17 @@ use warnings;
 use Test::More qw(no_plan);
 use lib 'lib';
 use aliased 'Javonet::Core::Protocol::CommandDeserializer' => 'CommandDeserializer';
-SKIP: {
-    skip "To evaluate", 1 eq 1;
-    cmp_ok(scalar test_command_deserialize(), '==', 0, 'Command deserialization success');
-}
 
 sub test_command_deserialize{
 
-    my @array_command = (5,0,0,0,0,0,0,0,5,0,0,0,12,5,7,0,8,5,9,1,0,8,100,97,116,101,116,105,109,101,1,0,4,100,97,116,101,1,0,5,116,111,100,97,121);
-    my $commandDeserializer = CommandDeserializer->new(\@array_command);
-
-    my $result = $commandDeserializer->decode();
-
-    return 0;
-
+    my @array_command = (4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 1, 1, 5, 0, 0, 0, 110, 117, 109, 112, 121);
+    return CommandDeserializer->deserialize(\@array_command);
 }
+
+my $deserialized_command = test_command_deserialize();
+is ($deserialized_command->{command_type}, 1, 'Command type is correct'); # LoadLibrary
+is ($deserialized_command->{runtime}, 4, 'Runtime is correct'); # Perl
+is ($deserialized_command->{payload}[0], 'numpy', 'Payload is correct'); # 'numpy'
 
 
 done_testing();

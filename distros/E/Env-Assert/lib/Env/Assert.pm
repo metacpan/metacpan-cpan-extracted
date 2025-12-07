@@ -18,7 +18,7 @@ use Carp;
 
 # ABSTRACT: Ensure that the environment variables match what you need, or abort.
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use constant {
     ENV_ASSERT_MISSING_FROM_ENVIRONMENT    => 1,
@@ -172,7 +172,7 @@ Env::Assert - Ensure that the environment variables match what you need, or abor
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

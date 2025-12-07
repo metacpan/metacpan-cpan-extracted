@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 3.18 - Sun Dec 07 2025
+
+    * Services: Fix VVS / update its API URL
+      (patch by amélie: <https://chaos.social/@aamy/115652192750332957>)
+
 Travel::Status::DE::VRR 3.17 - Wed Oct 15 2025
 
     * New dependency: URI::Escape

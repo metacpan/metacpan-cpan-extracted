@@ -134,7 +134,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 

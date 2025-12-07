@@ -1,4 +1,15 @@
 Revision history for Dist-Zilla-PluginBundle-MIKKOI
 
+0.003     2025-12-06 15:48:18+01:00 Europe/Stockholm
+
+0.002     2025-12-06 14:09:25+01:00 Europe/Stockholm
+            * Define directories for Test::PodSpelling.
+            * Add Signature and AuthorSignature Test.
+            * Change to not generate version number at release time.
+            * Add 'trailing_whitespace' check to Test::EOL.
+            * Add 'embed_critic_config' to Test::Perl::Critic.
+            * Switch Test::CheckManifest to Test::DistManifest.
+            * Clean whitespace.
+
 0.001     2023-12-31 22:57:40+01:00 Europe/Stockholm
             * Initial version

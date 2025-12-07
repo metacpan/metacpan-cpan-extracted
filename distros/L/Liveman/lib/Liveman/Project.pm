@@ -28,7 +28,6 @@ sub make {
 
     die "Not pkg!\n" if $pkg eq "";
     die "Pkg is one identifier or more via ::, but input `$pkg`!\n" if $pkg !~ /^[a-z]\w*(::[a-z]\w*)*\z/ai;
-    die "Not license $self->{license}!\n" if $self->{license} !~ /^(perl_5|gpl_3)$/;
 
     $self->{name} = my $name = $pkg =~ s/::/-/gr;
     $self->{path} = my $path = catfile("lib", split /::/, $pkg);
@@ -72,7 +71,6 @@ name = "$self->{name}"
 authority="cpan:$authority"
 license="$self->{license}"
 
-badges = ["github-actions/test.yml"]
 markdown_maker = "Liveman::MinillaPod2Markdown"
 module_maker="ModuleBuildTiny"
 static_install = "auto"
@@ -97,21 +95,30 @@ sub cpanfile {
 requires 'perl', '5.22.0';
 
 on 'develop' => sub {
-    requires 'Minilla', 'v3.1.19';
-    requires 'Data::Printer', '1.000004';
-    requires 'Liveman', '1.0';
+	requires 'App::cpm';
+	requires 'CPAN::Uploader';
+	requires 'Data::Printer', '1.000004';
+	requires 'Minilla', 'v3.1.19';
+	requires 'Software::License::GPL_3';
+	requires 'V';
+	requires 'Version::Next';
 };
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
 
     requires 'Carp';
+    requires 'Cwd';
     requires 'common::sense';
+    requires 'Data::Dumper';
     requires 'File::Basename';
+    requires 'File::Find';
     requires 'File::Path';
     requires 'File::Slurper';
     requires 'File::Spec';
     requires 'Scalar::Util';
+    requires 'String::Diff';
+    requires 'Term::ANSIColor';
 };
 
 requires 'common::sense', '3.75';
@@ -821,7 +828,7 @@ Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 END
     }
-    else { die "Not license `$l`!\n" }
+    else { warn "Not license `$l`!\n" }
     $self
 }
 

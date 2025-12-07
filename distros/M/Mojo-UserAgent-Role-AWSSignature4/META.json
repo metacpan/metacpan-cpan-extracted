@@ -1,0 +1,69 @@
+{
+   "abstract" : "Add AWS Signature Version 4 to Mojo::UserAgent requests",
+   "author" : [
+      "Stefan Adams <sadams@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-UserAgent-Role-AWSSignature4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Time::Piece" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "2.12",
+            "Digest::SHA" : "0",
+            "Mojolicious" : "9.00",
+            "Role::Tiny" : "2.00",
+            "Time::Piece" : "0",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::UserAgent::Role::AWSSignature4" : {
+         "file" : "lib/Mojo/UserAgent/Role/AWSSignature4.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stefanadams/Mojo-UserAgent-Role-AWSSignature4/issues"
+      },
+      "license" : [
+         "https://opensource.org/license/artistic-2-0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stefanadams/Mojo-UserAgent-Role-AWSSignature4.git",
+         "web" : "https://github.com/stefanadams/Mojo-UserAgent-Role-AWSSignature4"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

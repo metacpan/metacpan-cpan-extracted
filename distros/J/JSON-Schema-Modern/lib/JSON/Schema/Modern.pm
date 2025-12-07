@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.626-11-ga2961894
+package JSON::Schema::Modern; # git description: v0.627-4-g89fb55b8
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.627';
+our $VERSION = '0.628';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -277,9 +277,8 @@ sub evaluate_json_string ($self, $json_data, $schema, $config_override = {}) {
       errors => [
         JSON::Schema::Modern::Error->new(
           depth => 0,
-          mode => 'evaluate',
+          mode => 'traverse',
           keyword => undef,
-          instance_location => '',
           keyword_location => '',
           error => $e,
         )
@@ -454,9 +453,9 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
   }
 
   if ($state->{seen_data_properties}) {
-    my @unevaluated_properties = grep !$state->{seen_data_properties}{$_}, keys $state->{seen_data_properties}->%*;
     my %unknown_keywords;
-    foreach my $property (sort @unevaluated_properties) {
+    foreach my $property (sort grep !$state->{seen_data_properties}{$_},
+        keys $state->{seen_data_properties}->%*) {
       my ($parent, $keyword) = ($property =~ m{^(.*)/([^/]*)$});
       push(($unknown_keywords{$parent}//=[])->@*, $keyword);
     }
@@ -598,7 +597,7 @@ sub _traverse_subschema ($self, $schema, $state) {
   return 1 if not keys %$schema;
 
   my $valid = 1;
-  my %unknown_keywords = map +($_ => undef), keys %$schema;
+  my %unknown_keywords = map +($_ => undef), grep !/^x-/, keys %$schema;
 
   # we use an index rather than iterating through the lists directly because the lists of
   # vocabularies and keywords can change after we have started. However, only the Core vocabulary
@@ -713,7 +712,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   }
 
   my $valid = 1;
-  my %unknown_keywords = map +($_ => undef), keys %$schema;
+  my %unknown_keywords = map +($_ => undef), grep !/^x-/, keys %$schema;
 
   # set aside annotations collected so far; they are not used in the current scope's evaluation
   my $parent_annotations = $state->{annotations};
@@ -811,7 +810,8 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   # the traverse phase and replace with evaluate-against-metaschema.
   if ($state->{seen_data_properties} and $is_object_data) {
     # record the locations of all local properties
-    $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 0 foreach keys %$data;
+    $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 0
+      foreach grep !/^x-/, keys %$data;
 
     my @evaluated_properties = map {
       my $keyword = $_->{keyword};
@@ -1293,7 +1293,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.627
+version 0.628
 
 =head1 SYNOPSIS
 
@@ -1494,7 +1494,7 @@ Defaults to false.
 =head2 strict
 
 When true, unrecognized keywords are disallowed in schemas (they will cause an immediate abort
-in L</traverse> or L</evaluate>).
+in L</traverse> or L</evaluate>), with the exception of keywords starting with C<x->.
 
 Defaults to false.
 

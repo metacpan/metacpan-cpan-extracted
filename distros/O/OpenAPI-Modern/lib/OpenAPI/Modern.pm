@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.110-4-g3881f1d0
+package OpenAPI::Modern; # git description: v0.111-8-g635db82c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 use 5.020;
 use utf8;
@@ -1235,7 +1235,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 
@@ -1547,7 +1547,7 @@ C<operation_uri>: a URI indicating the document location of the operation object
 
     $openapi->document_get(Mojo::URL->new($openapi->openapi_uri)->fragment($path_to_operation);
 
-(See the L<documentation for an operation/https://learn.openapis.org/specification/paths.html#the-endpoints-list>
+(See the L<documentation for an operation|https://learn.openapis.org/specification/paths.html#the-endpoints-list>
 or in
 L<§4.10 of the specification|https://spec.openapis.org/oas/latest#operation-object>.)
 
@@ -1657,7 +1657,7 @@ L<https://spec.openapis.org/#openapi-specification-schemas>.
 The default metaschema used by this tool does not permit the use of C<$schema> keywords
 in subschemas (unless the value is equal to the default OAS dialect), but a more permissive
 dialect is also available (or you can define your own), which you declare by providing the
-C<L<jsonSchemaDialect/https://spec.openapis.org/oas/latest#openapi-object>> property in your OpenAPI
+L<C<jsonSchemaDialect|https://spec.openapis.org/oas/latest#openapi-object>> property in your OpenAPI
 Document.
 
 The schemas are also available under the URIs C<< s/<date>/latest/ >> so you don't have to change your
@@ -1681,7 +1681,7 @@ as per the spec, and implemented with L<JSON::Schema::Modern>. Unless overridden
 L<jsonSchemaDialect|https://spec.openapis.org/oas/latest#specifying-schema-dialects> keyword, their
 metaschema is the "dialect" schema listed at L<https://spec.openapis.org/oas/#schema-iterations>, which allows for use of the
 OpenAPI-specific keywords (C<discriminator>, C<xml>, C<externalDocs>, and C<example>), as defined in
-L<the specification/https://spec.openapis.org/oas/latest#schema-object>. Format validation is turned
+L<the specification|https://spec.openapis.org/oas/latest#schema-object>. Format validation is turned
 B<on>, and the use of content* keywords is off (see
 L<JSON::Schema::Modern/validate_content_schemas>).
 

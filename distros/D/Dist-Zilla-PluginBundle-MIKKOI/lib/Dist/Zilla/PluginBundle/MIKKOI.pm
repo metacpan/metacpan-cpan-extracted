@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::MIKKOI;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003';
 
 # ABSTRACT: BeLike::MIKKOI when you build your dists
 
@@ -12,20 +12,24 @@ with
     ;
 
 sub configure {
+    ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
     my $self = shift;
     my $target_perl = '5.014';
 
     $self->add_bundle('@Filter', {
             '-bundle' => '@Basic',
             '-remove' => [ 'License', 'ExtraTests', ],
-            '-version' => '5.031',
+            '-version' => '6.030',
         });
-    $self->add_plugins([ 'OurPkgVersion', ]);
-    $self->add_plugins([ 'Git::NextVersion', ]);
+    # $self->add_plugins([ 'Git::NextVersion', ]);
+    $self->add_plugins([ 'RewriteVersion', {
+            'allow_decimal_underscore' => 1,
+        }]);
 
     # NextRelease must be before [@Git](Git::Commit)
     $self->add_plugins([ 'NextRelease', ]);
     $self->add_bundle('@Git');
+    $self->add_plugins([ 'BumpVersionAfterRelease', ]);
 
     $self->add_plugins(
             'MetaJSON',
@@ -34,11 +38,12 @@ sub configure {
             'PruneFiles',
             'MinimumPerl',
             'AutoPrereqs',
-            [ 'CPANFile' => {
-                'filename' => 'dzil-generated-cpanfile',
+            ['Test::PodSpelling' => {
+                    'directories' => ['lib', 'bin', 'script', ],
+                    'stopword' => [ 'env', 'dotenv', 'envdot', ],
             }],
-            'Test::PodSpelling',
-            'Test::CheckManifest',
+            # 'Test::CheckManifest',
+            'Test::DistManifest', # By Karen Etheridge
             'MetaTests',
             'PodSyntaxTests',
             'PodCoverageTests',
@@ -47,10 +52,11 @@ sub configure {
             'Test::Kwalitee',
             'Test::CPAN::Changes',
             ['Test::Perl::Critic' => {
+                'embed_critic_config' => 1,
                 'critic_config' => '.perlcriticrc',
             }],
             ['Test::EOL' => {
-                'trailing_whitespace' => 1,
+                    'trailing_whitespace' => 1,
             }],
             'Test::UnusedVars',
             'Test::Synopsis',
@@ -60,10 +66,20 @@ sub configure {
             ['Test::MinimumVersion' => {
                     'max_target_perl' => $target_perl,
             }],
-            'CheckExtraTests',
+            # 'CheckExtraTests', We already run RunExtraTests
             'MojibakeTests',
             'Test::NoTabs',
+            'Signature',
+            'AuthorSignatureTest',
+            ['Test::Software::Policies' => {
+                    'include_policy' => [
+                        'Contributing',
+                        'CodeOfConduct',
+                        'License',
+                        'Security',
+                    ],
+            }],
         );
+    return;
 }
-
 1;

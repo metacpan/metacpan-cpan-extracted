@@ -3,6 +3,7 @@ abstract: 'Runtime Configuration for an Object'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Errno: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::Temp: '0'
@@ -44,5 +45,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure
   homepage: https://metacpan.org/pod/Object::Configure
   repository: git://github.com/nigelhorne/Object-Configure.git
-version: 0.16
+version: 0.17
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

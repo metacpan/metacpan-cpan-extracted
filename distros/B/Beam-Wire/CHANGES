@@ -1,5 +1,23 @@
 Changelog for Beam-Wire
 
+1.027     2025-12-06 11:32:40-06:00 America/Chicago
+
+  [Added]
+
+  - Added $env references to get values from environment variables. Thanks
+    @XSven for the idea! [Github #82]
+  - Added BEAM_PATH environment variable to add more directories to find
+    nested containers and relative config files.
+  - Added $default for a fallback to $env, $config, and nested containers.
+
+  [Changed]
+
+  - Data::DPath is now a "recommended" dependency and is not installed by default.
+    This greatly reduces the size of Beam::Wire's dependency chain. Thanks @XSven
+    for the patch! [Github #86]
+  - Fixed compatibility with Perl 5.10. Thanks @djerius for the patch!
+    [Github #84]
+
 1.026     2024-09-13 09:28:36-05:00 America/Chicago
 
   [Added]

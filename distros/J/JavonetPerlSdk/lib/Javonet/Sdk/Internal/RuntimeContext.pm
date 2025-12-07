@@ -13,7 +13,6 @@ use aliased 'Javonet::Sdk::Core::TypesHandler' => 'TypesHandler';
 extends 'Javonet::Sdk::Internal::Abstract::AbstractRuntimeContext',
     'Javonet::Sdk::Internal::Abstract::AbstractTypeContext';
 
-my $perl_handler = Javonet::Core::Handler::PerlHandler->new();
 our %memoryRuntimeContexts;
 our %networkRuntimeContexts;
 our %configRuntimeContexts;

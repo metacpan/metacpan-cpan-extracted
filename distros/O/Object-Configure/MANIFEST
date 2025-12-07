@@ -14,11 +14,13 @@ t/complex.t
 t/env.t
 t/eof.t
 t/eol.t
+t/inheritance.t
 t/instantiate.t
 t/manifest.t
 t/pod-cm.t
 t/pod-synopsis.t
 t/pod.t
+t/prereq.t
 t/reload.t
 t/simple.t
 t/strict.t

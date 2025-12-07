@@ -76,8 +76,8 @@ subtest 'missing arguments' => sub {
 
 
   my $js = JSON::Schema::Modern->new;
-  my $mymetaschema_doc = $js->add_schema({
-    '$id' => 'https://mymetaschema',
+  my $my_custom_dialect_doc = $js->add_schema({
+    '$id' => 'https://my_custom_dialect',
     '$vocabulary' => {
       'https://json-schema.org/draft/2020-12/vocab/core' => true,
       'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
@@ -88,11 +88,11 @@ subtest 'missing arguments' => sub {
     sub {
       OpenAPI::Modern->new(
         openapi_uri => 'http://example.com/openapi.yaml',
-        openapi_schema => { %$minimal_schema, jsonSchemaDialect => 'https://mymetaschema' },
+        openapi_schema => { %$minimal_schema, jsonSchemaDialect => 'https://my_custom_dialect' },
         # note: no evaluator!
       );
     },
-    qr!EXCEPTION: unable to find resource "https://mymetaschema"!,
+    qr!EXCEPTION: unable to find resource "https://my_custom_dialect"!,
     'cannot load an OpenAPI using a dialect not known to the default evaluator',
   );
 
@@ -101,7 +101,7 @@ subtest 'missing arguments' => sub {
     sub {
       $openapi = OpenAPI::Modern->new(
         openapi_uri => 'http://example.com/openapi.yaml',
-        openapi_schema => { %$minimal_schema, jsonSchemaDialect => 'https://mymetaschema' },
+        openapi_schema => { %$minimal_schema, jsonSchemaDialect => 'https://my_custom_dialect' },
         evaluator => $js,
       );
     },

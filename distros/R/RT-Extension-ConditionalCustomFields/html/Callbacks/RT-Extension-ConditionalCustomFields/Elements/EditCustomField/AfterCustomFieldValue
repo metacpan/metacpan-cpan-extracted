@@ -1,6 +1,10 @@
-<& /Elements/EditConditionalCustomFields, CustomField => $CustomField, Object => $Object, Grouping => $Grouping, ParentSelector => '.edit-custom-field' &>
+<& /Elements/EditConditionalCustomFields, CustomField => $CustomField, Object => $Object, Grouping => $Grouping, ParentSelector => $parent_selector &>
 <%ARGS>
 $CustomField
 $Object
 $Grouping => undef
 </%ARGS>
+<%INIT>
+return unless $Object;
+my $parent_selector = (ref($Object) eq 'RT::Article' || ref($Object) eq 'RT::Transaction') ? '.row' : '.edit-custom-field';
+</%INIT>

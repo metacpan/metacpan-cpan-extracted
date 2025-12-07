@@ -7,7 +7,7 @@ Object::Configure - Runtime Configuration for an Object
 
 # VERSION
 
-0.16
+0.17
 
 # SYNOPSIS
 
@@ -59,6 +59,42 @@ Throughout your class, add code such as:
         $self->{'logger'}->trace(ref($self), ': ', __LINE__, ' entering method');
     }
 
+### CONFIGURATION INHERITANCE
+
+`Object::Configure` supports configuration inheritance, allowing child classes to inherit and override configuration settings from their parent classes. When a class is configured, the module automatically traverses the inheritance hierarchy (using `@ISA`) and loads configuration files for each ancestor class in the chain.
+
+Configuration files are loaded in order from the most general (base class) to the most specific (child class), with later files overriding earlier ones. For example, if `My::Child::Class` inherits from `My::Parent::Class`, which inherits from `My::Base::Class`, the module will:
+
+- 1. Load `my-base-class.yml` (or .conf, .json, etc.) if it exists
+- 2. Load `my-parent-class.yml` if it exists, overriding base settings
+- 3. Load `my-child-class.yml`, overriding both parent and base settings
+
+The configuration files should be named using lowercase versions of the class name with `::` replaced by hyphens (`-`).
+For example, `My::Parent::Class` would use `my-parent-class.yml`.
+
+This allows you to define common settings in a base class configuration file and selectively override them in child class configurations, promoting DRY (Don't Repeat Yourself) principles and making it easier to manage configuration across class hierarchies.
+
+Example:
+
+    # File: config/my-base-class.yml
+    ---
+    My__Base__Class:
+      timeout: 30
+      retries: 3
+      log_level: info
+
+    # File: config/my-child-class.yml
+    ---
+    My__Child__Class:
+      timeout: 60
+      # Inherits retries: 3 and log_level: info from parent
+
+    # Result: Child class gets timeout=60, retries=3, log_level=info
+
+Parent configuration files are optional.
+If a parent class's configuration file doesn't exist, the module simply skips it and continues up the inheritance chain.
+All discovered configuration files are tracked in the `_config_files` array for hot reload support.
+
 ## CHANGING BEHAVIOUR AT RUN TIME
 
 ### USING A CONFIGURATION FILE
@@ -76,6 +112,7 @@ and initialize the logger accordingly.
 
 If the file is not readable and no config\_dirs are provided,
 the module will throw an error.
+To be clear, in this case, inheritance is not followed.
 
 This mechanism allows dynamic tuning of logging behavior (or other parameters you expose) without modifying code.
 

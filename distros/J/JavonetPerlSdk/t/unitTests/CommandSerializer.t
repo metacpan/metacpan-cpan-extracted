@@ -32,13 +32,10 @@ cmp_ok($deserialized_nested_command->{payload}[0]->{payload}[1], 'eq', $nested_c
 
 sub test_command_serialize_deserialize{
 
-    my $commandSerializer = CommandSerializer->new();
-
-    my @result = $commandSerializer->serialize($command);
+    my @result = CommandSerializer->serialize($command, 0, 0, 0);
 
 
-    my $commandDeserializer = CommandDeserializer->new(\@result);
-    my $deserializedResult = $commandDeserializer->decode();
+    my $deserializedResult = CommandDeserializer->deserialize(\@result);
 
     return $deserializedResult;
 
@@ -54,13 +51,10 @@ sub test_nested_command_serialize_deserialize{
             payload => ['../../testResources/perl-package','TestClass::TestClass','TestClass.pm']
         ), 'static_variable']);
 
-    my $commandSerializer = CommandSerializer->new();
-
-    my @result = $commandSerializer->serialize($get_static_method_nested_command, 0);
+    my @result = CommandSerializer->serialize($get_static_method_nested_command, 0, 0, 0);
 
 
-    my $commandDeserializer = CommandDeserializer->new(\@result);
-    my $deserializedResult = $commandDeserializer->decode();
+    my $deserializedResult = CommandDeserializer->deserialize(\@result);
 
     return $deserializedResult;
 

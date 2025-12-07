@@ -135,7 +135,7 @@ Javonet::Core::Handler::HandlerDictionary::add_handler_to_dict(
 );
 
 sub handle_command {
-    my ($self, $command) = @_;
+    my ($class, $command) = @_;
     my $response = Javonet::Core::Handler::HandlerDictionary::get_handler($command->{command_type})->handle_command($command);
 
     if (TypesHandler->is_primitive_or_none($response)) {

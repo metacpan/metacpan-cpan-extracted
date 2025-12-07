@@ -81,8 +81,7 @@ local ($::_g0 = do {$liveman_append->{added}}, $::_e0 = do {0}); ::ok defined($:
 
 # 
 # File lib/Alt/The/Plan.md is:
-
-{ my $s = 'lib/Alt/The/Plan.md'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $n = join '', <$__f__>; close $__f__; ::is $n, '# NAME
+{ my $s = 'lib/Alt/The/Plan.md'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = '# NAME
 
 Alt::The::Plan - 
 
@@ -91,7 +90,7 @@ Alt::The::Plan -
 ```perl
 use Alt::The::Plan;
 
-my $alt_the_plan = Alt::The::Plan->new;
+my $plan = Alt::The::Plan->new;
 ```
 
 # DESCRIPTION
@@ -105,8 +104,8 @@ my $alt_the_plan = Alt::The::Plan->new;
 .
 
 ```perl
-my $alt_the_plan = Alt::The::Plan->new;
-$alt_the_plan->planner  # -> .3
+my $plan = Alt::The::Plan->new;
+$plan->planner  # -> .3
 ```
 
 ## miting ($meet, $man, $woman)
@@ -114,8 +113,8 @@ $alt_the_plan->planner  # -> .3
 This is first!
 
 ```perl
-my $alt_the_plan = Alt::The::Plan->new;
-$alt_the_plan->miting($meet, $man, $woman)  # -> .3
+my $plan = Alt::The::Plan->new;
+$plan->miting($meet, $man, $woman)  # -> .3
 ```
 
 # INSTALL
@@ -137,7 +136,7 @@ Yaroslav O. Kosmina <dart@cpan.org>
 # COPYRIGHT
 
 The Alt::The::Plan module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
-', "File $s"; }
+'; ::ok $got eq $expected, 'File lib/Alt/The/Plan.md' or ::diag ::_string_diff($got, $expected) }
 # 
 # # AUTHOR
 # 

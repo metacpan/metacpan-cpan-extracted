@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.627';
+our $VERSION = '0.628';
 
 use 5.020;
 use strictures 2;
@@ -359,7 +359,7 @@ sub E ($state, $error_string, @args) {
   push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
     depth => $state->{depth} // 0,
     keyword => $state->{keyword},
-    instance_location => $state->{data_path},
+    $state->{traverse} ? () : (instance_location => $state->{data_path}),
     keyword_location => $keyword_location,
     # we calculate absolute_keyword_location when instantiating the Error object for Result
     _uri => $uri,
@@ -577,7 +577,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.627
+version 0.628
 
 =head1 SYNOPSIS
 

@@ -99,6 +99,7 @@ t/range.t
 t/recurse.t
 t/reduce.t
 t/replace.t
+t/rest.t
 t/reverse.t
 t/rindex.t
 t/round.t

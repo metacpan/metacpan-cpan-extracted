@@ -1,10 +1,10 @@
 {
-   "abstract" : "Ensure that the environment variables match what you need, or abort.",
+   "abstract" : "Ensure that the environment variables match what is requested, or abort. Module and executable.",
    "author" : [
       "Mikko Koivunalho <mikkoi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "environment",
       "variable",
@@ -27,8 +27,12 @@
       },
       "develop" : {
          "requires" : {
+            "Path::Tiny" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
+            "Software::Policies" : "0",
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::V0" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
@@ -45,10 +49,11 @@
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
             "Test::Signature" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::Synopsis" : "0",
             "Test::Vars" : "0",
-            "Test::Version" : "1"
+            "Test::Version" : "1",
+            "perl" : "5.010"
          }
       },
       "runtime" : {
@@ -56,7 +61,10 @@
             "Carp" : "0",
             "English" : "0",
             "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
             "constant" : "0",
+            "open" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -79,10 +87,10 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/mikkoi/env-assert.git",
-         "web" : "https://github.com/mikkoi/env-assert.git"
+         "web" : "https://github.com/mikkoi/env-assert"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_contributors" : [
       "Ivan Bessarabov <ivan@bessarabov.ru>",
       "gregor herrmann <gregoa@debian.org>",

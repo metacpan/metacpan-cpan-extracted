@@ -21,6 +21,12 @@ t/examples/edge_cases.t
 t/examples/emoji.t
 t/examples/japanese.t
 t/examples/syntax_variations.t
+t/integrations/Import-Into/TestSugar.pm
+t/integrations/Import-Into/basic.t
+t/integrations/Import-Into/example.pl
+t/integrations/StringEval/TestSugar.pm
+t/integrations/StringEval/basic.t
+t/integrations/StringEval/example.pl
 t/lib/TestHelper.pm
 META.yml
 MANIFEST
