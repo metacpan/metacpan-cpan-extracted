@@ -1,0 +1,16 @@
+Build.PL
+CLAUDE.md
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/optex/up.pm
+minil.toml
+t/00_compile.t
+t/01_options.t
+t/02_run.t
+t/Util.pm
+t/runner/Runner.pm
+META.yml
+MANIFEST

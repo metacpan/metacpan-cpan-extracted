@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001014';
+our $VERSION = '0.001015';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -313,7 +313,8 @@ sub parse_template {
   # Convert all lines starting with %= to start with <%= and then add %> to the end
   $template =~ s/^\s*${line_start}${expr_marker}(.*?)(?=\\?$)/${open_tag}${expr_marker}$1${close_tag}/mg;
   # Convert all lines starting with % to start with <% and then add %> to the end
-  $template =~ s/^\s*${line_start}(.*?)(?=\\?$)/${open_tag}$1${close_tag}/mg;
+  # Use negative lookahead (?!>\s*\\?$) to exclude %> closing tag from conversion
+  $template =~ s/^\s*${line_start}(?!>\s*\\?$)(.*?)(?=\\?$)/${open_tag}$1${close_tag}/mg;
 
   ## Escapes so you can actually have % and %= in the template
   # Convert all lines starting with \%= to start instead with %=

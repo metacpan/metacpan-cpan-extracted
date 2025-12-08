@@ -1,0 +1,84 @@
+{
+   "abstract" : "Config::Resolver",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Config-Resolver",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLI::Simple" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Config::INI::Tiny" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Module::Load" : "0",
+            "Query::Param" : "0",
+            "Readonly" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Scalar" : "0",
+            "IO::String" : "0",
+            "JSON" : "0",
+            "Test::Warn" : "0",
+            "YAML::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Resolver" : {
+         "file" : "lib/Config/Resolver.pm",
+         "version" : "v1.0.10"
+      },
+      "Config::Resolver::Utils" : {
+         "file" : "lib/Config/Resolver/Utils.pm",
+         "version" : "v1.0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "http://github.com/rlauer6/Config-Resolver/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/Config-Resolver.git",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/Config-Resolver.git",
+         "web" : "http://github.com/rlauer6/Config-Resolver"
+      }
+   },
+   "version" : "v1.0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

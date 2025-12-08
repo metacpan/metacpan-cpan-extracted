@@ -1,5 +1,15 @@
 Revision history for Perl extension Getopt-EX-Config
 
+1.00 2025-12-08T02:21:55Z
+
+    - Remove -C short option from --config to avoid conflicts with
+      module-specific options
+
+    - Update MCP server with advanced option analysis and staged migration
+      * Add option classification (module-specific, command-common, ambiguous)
+      * Add staged migration planning with risk levels
+      * Add optex module pattern detection (initialize/finalize)
+
 0.9905 2025-07-30T11:40:29Z
 
     - Add automatic underscore-to-dash conversion in Config.pm

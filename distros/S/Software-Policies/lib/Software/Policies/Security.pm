@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Security
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp;
 use Module::Load qw( load );
@@ -53,7 +53,7 @@ Software::Policies::Security - Create project policy file: Security
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =begin Pod::Coverage
 

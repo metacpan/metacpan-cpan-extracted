@@ -14,10 +14,14 @@ Analyzes Perl code and extracts information necessary for migration.
 
 **Detection Items:**
 - Use statement types (Getopt::Long, Getopt::EX, Getopt::EX::Config)
-- GetOptions call patterns
+- GetOptions call patterns with detailed option specification parsing
 - Existing set/setopt functions
 - %opt hash usage patterns
-- Option specification details
+- **Option classification:**
+  - Module-specific options (likely safe to migrate)
+  - Command-common options (help, version, etc. - may conflict)
+  - Ambiguous options (require manual review)
+- Variable mappings and option types
 - Migration complexity assessment
 
 **Example Output:**
@@ -27,7 +31,9 @@ Analyzes Perl code and extracts information necessary for migration.
 ✓ Using Getopt::Long
 ✓ Detected existing set/setopt functions
 ✓ Found GetOptions calls in 1 location
-✓ Detected options: debug, width, name
+🎯 Module-specific options: 2 (debug, width)
+⚠ Command-common options: 1 (help)
+❓ Ambiguous options: 1 (name)
 
 === Migration Steps ===
 1. Change use statement:
@@ -35,7 +41,9 @@ Analyzes Perl code and extracts information necessary for migration.
 
 2. Create configuration object:
    my $config = Getopt::EX::Config->new(
-       # Define default values here
+       # Module-specific options defaults
+       debug => 0,
+       width => 80,
    );
 ```
 
@@ -45,9 +53,11 @@ Automatically generates migration code examples to Getopt::EX::Config format bas
 
 **Generated Content:**
 - Appropriate use statements
-- Config object based on detected options
-- finalize function implementation examples
-- Type-based default value inference
+- Config object with intelligent defaults based on option types
+- finalize function implementation targeting module-specific options
+- Type-based default value inference (strings, integers, booleans, arrays, hashes)
+- **Conflict warnings for command-common options**
+- **Staged migration recommendations**
 
 **Generation Example:**
 ```perl
@@ -55,20 +65,21 @@ Automatically generates migration code examples to Getopt::EX::Config format bas
 use Getopt::EX::Config qw(config set);
 
 my $config = Getopt::EX::Config->new(
-    # Default values for detected options
+    # Module-specific options defaults
     debug => 0,
-    width => 0,
-    name => '',
+    width => 80,
 );
 
 sub finalize {
     our($mod, $argv) = @_;
     $config->deal_with($argv,
+        # Only module-specific options:
         "debug!",
         "width=i",
-        "name=s",
     );
 }
+
+# ⚠ Note: 'help' option excluded to avoid conflicts with command-level help
 ```
 
 ### 3. Migration Pattern Guide (`show_migration_patterns`)
@@ -81,6 +92,22 @@ Displays common migration patterns and best practices.
 - Boolean value handling
 - Success stories
 - Common pitfalls
+
+### 4. Staged Migration Planning (`generate_staged_migration_plan`)
+
+Generates step-by-step migration plans based on risk tolerance and code complexity.
+
+**Risk Levels:**
+- **Conservative**: Minimal risk approach with gradual migration
+- **Moderate**: Balanced approach (recommended)
+- **Aggressive**: Efficient complete replacement
+
+**Plan Features:**
+- Risk assessment based on option analysis
+- Step-by-step migration phases
+- Conflict resolution strategies
+- Testing checkpoints
+- Special handling for command-common options
 
 ## Usage
 
@@ -118,15 +145,18 @@ from mcp.types import Tool, TextContent
 
 ### Analysis Engine
 
-Uses regex-based pattern matching to detect the following Perl code elements:
+Uses advanced regex-based pattern matching to detect the following Perl code elements:
 
-- `use Getopt::Long`
-- `use Getopt::EX` 
+- `use Getopt::Long` (with qw() imports)
+- `use Getopt::EX` (with qw() imports)
 - `use Getopt::EX::Config`
-- `GetOptions()` / `GetOptionsFromArray()`
+- `GetOptions()` / `GetOptionsFromArray()` with detailed option parsing
+- Option specifications with type detection (string, integer, boolean, arrays, hashes)
+- Variable mappings (`"option" => \$variable`)
 - `sub set` / `sub setopt`
 - `$config->deal_with()`
 - `%opt` hash usage patterns
+- **Option classification patterns for conflict detection**
 
 ### Complexity Assessment
 
@@ -134,7 +164,13 @@ Evaluates migration complexity based on the following criteria:
 
 - 🟢 **Simple** (score ≤ 2): Basic GetOptions usage
 - 🟡 **Medium** (score ≤ 4): Has set functions or multiple options
-- 🔴 **Complex** (score ≥ 5): Many options or complex structure
+- 🔴 **Complex** (score ≥ 5): Many options, complex structure, or many module-specific options
+
+**Additional Factors:**
+- Number of module-specific options detected
+- Presence of command-common options (increases conflict risk)
+- Complex GetOptions calls spanning multiple lines
+- Multiple option specifications with various types
 
 ## Key Features
 

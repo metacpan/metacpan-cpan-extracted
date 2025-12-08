@@ -1,5 +1,10 @@
 Revision history for Schedule::Activity
 
+0.2.5 - 2025-12-07
+	- NodeFilter supports average values
+	- Attribute cleanup, averages always defined
+	- Attribute report includes averages
+
 0.2.4 - 2025-12-03
 	- Scheduling goals
 

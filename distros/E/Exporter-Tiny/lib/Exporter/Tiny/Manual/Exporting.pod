@@ -229,7 +229,7 @@ This method actually installs the exported sub into its new destination.
 Its return value is ignored.
 
 The default implementation handles sub renaming (i.e. the C<< -as >>,
-C<< -prefix >> and C<< -suffix >> functions. This method does a lot of
+C<< -prefix >> and C<< -suffix >> functions. This method does  lot of
 stuff; if you need to override it, it's probably a good idea to just
 pre-process the arguments and then call the super method rather than
 trying to handle all of it yourself.
@@ -255,7 +255,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

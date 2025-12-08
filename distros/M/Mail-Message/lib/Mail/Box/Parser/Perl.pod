@@ -52,9 +52,9 @@ Any IO::File or C<GLOB> C<$filehandle> which can be used to read
 the data from.  In case this option is specified, the C<filename> is
 informational only.
 
-=item filename => FILENAME
+=item filename => $name
 
-The name of the file to be read.
+The C<$name> of the file to be read.
 
 =item fix_header_errors => BOOLEAN
 
@@ -300,8 +300,8 @@ Cast by C<readHeader()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

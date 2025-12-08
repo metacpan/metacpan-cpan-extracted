@@ -3,7 +3,7 @@ package Schedule::Activity::Attribute;
 use strict;
 use warnings;
 
-our $VERSION='0.2.4';
+our $VERSION='0.2.5';
 
 my %types=(
 	int=>{
@@ -21,16 +21,17 @@ my %types=(
 sub new {
 	my ($ref,%opt)=@_;
 	my $class=ref($ref)||$ref;
+	my ($tm,$y)=($opt{tm}//0,$opt{value}//0);
 	my %self=(
 		type =>$opt{type}//'int',
-		value=>$opt{value}//0,
-		log  =>{},
-		tmmax=>$opt{tm}//0,
-		avg  =>undef,
-		tmsum=>undef,
+		value=>$y,
+		log  =>{$tm=>$y},
+		aog  =>{$tm=>$y},
+		tmmax=>$tm,
+		avg  =>$y,
+		tmsum=>0,
 	);
 	if(!defined($types{$self{type}})) { die "Attribute invalid type:  $self{type}" }
-	$self{log}{$opt{tm}//0}=$self{value};
 	return bless(\%self,$class);
 }
 
@@ -44,7 +45,7 @@ sub validateConfig {
 
 sub log {
 	my ($self,$tm)=@_;
-	if(defined($tm)&&($tm>=$$self{tmmax})) { $$self{log}{$tm}=$$self{value}; $$self{tmmax}=$tm }
+	if(defined($tm)&&($tm>=$$self{tmmax})) { $$self{log}{$tm}=$$self{value}; $$self{aog}{$tm}=$$self{avg}//$$self{value}; $$self{tmmax}=$tm }
 	# historic entry is not currently supported
 	return $self;
 }
@@ -65,7 +66,7 @@ sub report {
 	return (
 		y  =>$$self{value},
 		xy =>[$self->_xy()],
-		avg=>($self->average())[0],
+		avg=>$self->average(),
 	);
 }
 
@@ -85,9 +86,11 @@ sub average {
 sub reset {
 	my ($self)=@_;
 	foreach my $tm (sort {$a<=>$b} keys %{$$self{log}}) { $$self{tmmax}=$tm; $$self{value}=$$self{log}{$tm}; last }
-	%{$$self{log}}=();
-	$$self{avg}=undef;
-	$$self{tmsum}=undef;
+	my ($y,$tm)=@$self{qw/value tmmax/};
+	%{$$self{log}}=($tm=>$y);
+	%{$$self{aog}}=($tm=>$y);
+	$$self{avg}=$y;
+	$$self{tmsum}=0;
 	return $self;
 }
 
@@ -95,6 +98,7 @@ sub dump {
 	my ($self)=@_;
 	my %res=(
 		log=>{ %{$$self{log}} },
+		aog=>{ %{$$self{aog}} },
 		(map {$_=>$$self{$_}} qw/type value tmmax avg tmsum/),
 	);
 	return %res;
@@ -106,20 +110,22 @@ sub restore {
 		foreach my $k (keys %opt) { $$ref{$k}=$opt{$k} }
 		return $ref;
 	}
+	my $y=$opt{value}//0;
 	my %self=(
 		type =>$opt{type}//'int',
-		value=>$opt{value}//0,
+		value=>$y,
 		log  =>$opt{log}//{},
+		aog  =>$opt{aog}//{},
 		tmmax=>$opt{tmmax}//0,
-		avg  =>$opt{avg},
-		tmsum=>$opt{tmsum},
+		avg  =>$opt{avg}//$y,
+		tmsum=>$opt{tmsum}//0,
 	);
 	return bless(\%self,$ref);
 }
 
 sub _xy {
 	my ($self)=@_;
-	return map {[$_,$$self{log}{$_}]} sort {$a<=>$b} keys %{$$self{log}};
+	return map {[$_,$$self{log}{$_},$$self{aog}{$_}]} sort {$a<=>$b} keys %{$$self{log}};
 }
 
 # set=>value
@@ -166,14 +172,13 @@ sub _avgInt {
 	my ($log)=@_;
 	my ($avg,$weight,$lasttm,$lasty)=(0,0);
 	foreach my $tm (sort {$a<=>$b} keys(%$log)) {
-		if(!defined($lasttm)) { ($lasttm,$lasty)=($tm,$$log{$tm}); next }
+		if(!defined($lasttm)) { ($lasttm,$lasty,$avg,$weight)=($tm,$$log{$tm},$$log{$tm},0); next }
 		my $dt=$tm-$lasttm;
 		$avg=$weight/($weight+$dt)*$avg+0.5*$dt/($weight+$dt)*($lasty+$$log{$tm});
 		$weight+=$dt;
 		$lasttm=$tm;
 		$lasty=$$log{$tm};
 	}
-	if($weight==0) { return (undef,undef) }
 	return ($avg,$weight);
 }
 
@@ -181,14 +186,14 @@ sub _avgBool {
 	my ($log)=@_;
 	my ($sum,$weight,$lasttm,$lasty)=(0,0);
 	foreach my $tm (sort {$a<=>$b} keys(%$log)) {
-		if(!defined($lasttm)) { ($lasttm,$lasty)=($tm,$$log{$tm}); next }
+		if(!defined($lasttm)) { ($lasttm,$lasty,$sum,$weight)=($tm,$$log{$tm},$$log{$tm},0); next }
 		my $dt=$tm-$lasttm;
 		$sum+=$lasty*($tm-$lasttm);
 		$weight+=$dt;
 		$lasttm=$tm;
 		$lasty=$$log{$tm};
 	}
-	if($weight==0) { return (undef,undef) }
+	if($weight==0) { return ($sum,$weight) }
 	return ($sum/$weight,$weight);
 }
 
@@ -264,14 +269,14 @@ The reported C<avg> is the percentage of time in the schedule for which the flag
 Each named attribute in a scheduling configuration uses the C<report> function, described below, to build an attribute report that includes:
 
   y  =>(final value)
-  xy =>[[tm,value],...]
+  xy =>[[tm,value,average],...]
   avg=>(average, depends on type)
 
-The C<y> value is the last recorded value.  The C<xy> contains an array of all values and the times at which they changed.  The C<avg> is roughly the time-weighted average of the value, but this depends on the attribute type.
+The C<y> value is the last recorded value.  The C<xy> contains an array of all values, averages, and the times at which they changed.  The C<avg> is roughly the time-weighted average of the value, but this depends on the attribute type.
 
 =head2 Logging
 
-The reported C<xy> is an array of values of the form C<(tm, value)>, with each timestamped entry indicating that a scheduling activity, action, or message, included an attribute change configuration.  Each attribute has an initial entry of C<(0, value)>, either the default or the value specified in the declaration.
+The reported C<xy> is an array of values of the form C<(tm, value, average)>, with each timestamped entry indicating that a scheduling activity, action, or message, included an attribute change configuration.  Each attribute has an initial entry of C<(0, value)>, either the default or the value specified in the declaration.  Note that the starting time may be a value other than zero.
 
 Any attribute may be "fixed" in the log at its current value by passing the change as C<{}>, which is equivalent to C<incr=0> for integers.  (Internally this may also be invoked with C<_log=1>, but this is subject to change.)
 

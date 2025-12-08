@@ -1,0 +1,58 @@
+NAME
+    IO::Select::SSL - IO::Socket::SSL compatible IO::Select
+
+SYNOPSIS
+      use IO::Select::SSL;
+      my $sel = new IO::Select::SSL;
+
+DESCRIPTION
+    This module is intended to be a drop-in replacement for IO::Select.
+    However, the can_read method actually handles the very special
+    IO::Socket::SSL handles correctly by returning those handles that still
+    have at least some decrypted characters in the buffer. Without this
+    module, can_read will choke forever (or until timeout) waiting for the
+    socket to be ready to read even when there is still something just
+    sitting in the buffer ready to be immediately read. Actually, this
+    module will also correctly behave for any objects with any tied Handle
+    objects that implement the "pending" method to return true if something
+    is already in the buffer ready to read. And if the objects used are real
+    IO::Handle objects or real Perl blob file handles, then of course this
+    module will still work because it will fall back to behave exactly like
+    the normal IO::Select does.
+
+METHODS
+    All IO::Select methods will also be valid here since IO::Select::SSL isa
+    IO::Select. Plus the following methods have been overloaded:
+
+  can_read ( [ $timeout ] )
+    Same as IO::Select except immediately returns handles with pending INPUT
+    data.
+
+  select ( READ, WRITE, ERROR [, TIMEOUT ] )
+    Same as IO::Select except immediately returns handles with pending INPUT
+    data.
+
+  pending_handles
+    Returns a list of readable handles with pending INPUT data.
+
+INSTALLATION
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+DEPENDENCIES
+      Requires IO::Select to be installed.
+
+AUTHOR
+    Rob Brown <bbb@cpan.org>
+
+SEE ALSO
+    IO::Select. IO::Socket::SSL.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006-2025 by Rob Brown <bbb@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of The Artistic License 2.0.
+

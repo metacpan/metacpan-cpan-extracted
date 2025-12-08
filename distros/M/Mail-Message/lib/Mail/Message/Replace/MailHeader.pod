@@ -146,7 +146,7 @@ Inherited, see L<Mail::Message::Head/"The header">
 
 Inherited, see L<Mail::Message::Head/"The header">
 
-=item $obj-E<gt>B<modified>( [BOOLEAN] )
+=item $obj-E<gt>B<modified>( [$flage] )
 
 Inherited, see L<Mail::Message::Head/"The header">
 
@@ -529,6 +529,8 @@ Remove the folding for all instances of C<$tag>, or all fields at once.
 Of course, the C<isa()> class inheritance check should not see our
 nasty trick.
 
+=encoding utf8
+
 =back
 
 =head1 DETAILS
@@ -563,8 +565,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

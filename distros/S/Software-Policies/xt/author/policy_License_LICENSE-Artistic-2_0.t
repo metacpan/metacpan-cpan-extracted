@@ -31,12 +31,6 @@ do {
 done_testing;
 
 __DATA__
-This software is Copyright (c) 2025 by Mikko Koivunalho <mikkoi@cpan.org>.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
 		       The Artistic License 2.0
 
 	    Copyright (c) 2000-2006, The Perl Foundation.

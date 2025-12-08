@@ -1,0 +1,201 @@
+Sun Dec  7 11:11:24 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.10]:
+	* VERSION: bump
+	* bin/config-resolver.pl.in: return q{} when no input stream
+
+Sun Dec  7 07:29:05 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.9]:
+	* VERSION: bump
+	* README.md: updated
+	* bin/config-resolver.pl.in
+	(init)
+	- support -e option
+	(main): likewise
+	* lib/Config/Resolver.pm.in
+	- pod fix
+
+Tue Nov 11 14:45:00 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.8]:
+	* VERSION: bump
+	* bin/config-resolver.pl.in
+	(check_for_pipelining)
+	- check input parameters first
+
+Tue Nov 11 04:19:21 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.7]:
+	* bin/config-resolver.pl.in
+	- update pod, --format now accepts csv
+	(write_output)
+	- implement csv output
+	(main)
+	- --separator
+
+Fri Nov  7 08:05:31 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.6]:
+	* VERSION: bump
+	* README.md: generated
+	* bin/config-resolver.pl.in
+	- set default log level at 'info'
+	(process_manifest): add logging
+	(cmd_version): new
+	(init)
+	- --verbose, --debug should reset log level
+	- pass log_level down the chain
+	- set command to 'version' if --version
+	(main): --verbose, --version
+	* lib/Config/Resolver.pm.in
+	- +logger
+	(new): log message in debug mode
+	(init_plugins)
+	- preserve log level in case plugins boink it
+	- pass logger object down the chain
+	* t/25_plugin_contract.t
+	- add logger object
+
+Thu Nov  6 13:46:01 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.5]:
+	* VERSION: bump
+	* README.md: generated
+	* bin/config-resolver.pl.in
+	- update pod to explain plugin init feature
+	(fetch_parameter): default {}
+	(fetch_file): only read STDIN if !eof
+
+Thu Nov  6 07:10:18 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.4]:
+	* VERSION: bump
+	* README.md: generated
+	* requires
+	- +CLI::Simple, Config::INI::Tiny, Module::Load, YAML::Tiny,
+	- + Readonly, JSON, Query::Param
+	* t/03_cmd_dump.t
+	- move file creation to init()
+	* bin/config-resolver.pl.in
+	(build_manifest): new
+	(cmd_resolve)
+	- build a manifest if the template is a directory
+	(cmd_dump)
+	- set parameters_hash from parameter file
+	- refactoring
+	(to_object): croak if no content
+	(main)
+	- added option output_dir to support manifest
+
+Tue Nov  4 07:59:49 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.3]:
+	* VERSION: bump
+	* Makefile
+	- fix dependencies
+	- clean
+	* lib/Config/Resolver.pm.in
+	- localize die handler (Amazon::API needs to remove Carp::Always)
+	- update email address
+	* buildspec.yml: update email address
+
+Mon Nov  3 22:18:21 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* Makefile
+	- move verion.mk lower
+	- clean .pl, .pm files
+	* VERSION: bump
+	* bin/config-resolver.pl.in
+	(_build_plugin_config)
+	- use [plugin NAME] for section names
+	- add plugins defined in .config-resourcerc to the plugin list
+	* t/01_plugin_config.t: modify tests for new config format
+
+Mon Nov  3 20:08:58 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* README.md: generated
+	* VERSION: bump
+	* t/05-plugin.t: moved to Config-Resolver-Plugin-SSM
+	* lib/Config/Resolver/Plugin/SSM.pm.in: likewise
+	* .gitignore
+	- *.pl, \#*
+	* Makefile
+	- added config-resolver.pl.in
+	- remove Config::Resolver::Plugin::SSM
+	* buildspec.yml
+	(exe_files): config-resolver.pl
+	* lib/Config/Resolver.pm.in
+	- updates to support config-resolver.pl
+	- pod updates
+	(init_plugins)
+	- create env, file backends
+	- use PROTOCOL package variable for plugins
+	* lib/Config/Resolver/Utils.pm.in
+	* requires: +List::Util, -Amazon::Credentials, Amazon::API::SSM
+	* test-requires
+	- -Readonly, Test::More
+	- +IO::Scalar, IO::String, JSON, Test::Warn, YAML::Tiny
+	* bin/config-resolver.pl.in: new
+	* t/01_plugin_config.t: new
+	* t/02_process_manifest.t: new
+	* t/03_cmd_dump.t: new
+	* t/04_fetch_file.t: new
+	* t/05_resolve_stream.t: new
+	* t/06_fetch_parameters.t: new
+	* t/07_format_value.t: new
+	* t/08_fetch_query_param.t: new
+	* t/09_write_output.t: new
+	* t/10_from_ini_file.t: new
+	* t/11_to_object.t: new
+	* t/12_resolve.t: new
+	* t/20_resolver_engine.t: new
+	* t/21_get_parameter.t: new
+	* t/22_get_value.t: new
+	* t/23_eval_arg.t: new
+	* t/24_base_backends.t: new
+	* t/25_plugin_contract.t: new
+	* t/90_integration.t: new
+	* t/91_pipelining.t: new
+	* t/92_integration_dump.t: new
+	* t/93_integration_simple.t: new
+	* t/94_integration_failure.t: new
+	* t/95_integration_backends.t: new
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   ChangeLog
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	foo
+
+
+
+Fri Oct 31 16:40:21 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[BigBang]:
+	* .gitignore
+	* ChangeLog
+	* Makefile
+	* README.md
+	* VERSION
+	* buildspec.yml
+	* lib/Config/Resolver.pm.in
+	* lib/Config/Resolver/Plugin/SSM.pm.in
+	* lib/Config/Resolver/Utils.pm.in
+	* requires
+	* t/00-config.t
+	* t/01-config.t
+	* t/02-config.t
+	* t/03-config.t
+	* t/04-config.t
+	* t/05-plugin.t
+	* test-requires
+	* version.mk
+
+
+

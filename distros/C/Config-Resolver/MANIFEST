@@ -1,0 +1,37 @@
+bin/config-resolver.pl
+ChangeLog
+lib/Config/Resolver.pm
+lib/Config/Resolver/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-config.t
+t/01-config.t
+t/01_plugin_config.t
+t/02-config.t
+t/02_process_manifest.t
+t/03-config.t
+t/03_cmd_dump.t
+t/04-config.t
+t/04_fetch_file.t
+t/05_resolve_stream.t
+t/06_fetch_parameters.t
+t/07_format_value.t
+t/08_fetch_query_param.t
+t/09_write_output.t
+t/10_from_ini_file.t
+t/11_to_object.t
+t/12_resolve.t
+t/20_resolver_engine.t
+t/21_get_parameter.t
+t/22_get_value.t
+t/23_eval_arg.t
+t/24_base_backends.t
+t/25_plugin_contract.t
+t/90_integration.t
+t/91_pipelining.t
+t/92_integration_dump.t
+t/93_integration_simple.t
+t/94_integration_failure.t
+t/95_integration_backends.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

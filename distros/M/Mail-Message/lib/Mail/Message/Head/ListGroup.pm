@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.019.
+# This code is part of Perl distribution Mail-Message version 3.020.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -13,7 +13,7 @@
 #XXX Add Simplelists
 
 package Mail::Message::Head::ListGroup;{
-our $VERSION = '3.019';
+our $VERSION = '3.020';
 }
 
 use base 'Mail::Message::Head::FieldGroup';

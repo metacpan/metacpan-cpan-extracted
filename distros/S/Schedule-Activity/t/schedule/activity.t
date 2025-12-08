@@ -301,9 +301,10 @@ subtest 'Message attributes'=>sub {
 	);
 	my $scheduler=Schedule::Activity->new(configuration=>\%configuration);
 	my %schedule=$scheduler->schedule(activities=>[[30,'Activity']]);
-	is_deeply($schedule{attributes}{activity}{xy},[[0,1],[25,2],[30,2]],'Activities');
-	is_deeply($schedule{attributes}{action}{xy},  [[0,0],[5,1],[15,2],[30,2]],'Actions');
-	is_deeply($schedule{attributes}{messages}{xy},[[0,1],[5,2],[15,3],[25,4],[30,4]],'Messages');
+	foreach my $k (keys %{$schedule{attributes}}) { @{$schedule{attributes}{$k}{xy}}=map {[@$_[0,1],int($$_[2]*1e3)/1e3]} @{$schedule{attributes}{$k}{xy}} }
+	is_deeply($schedule{attributes}{activity}{xy},[[0,1,1],[25,2,1.5],[30,2,1.583]],'Activities');
+	is_deeply($schedule{attributes}{action}{xy},  [[0,0,0],[5,1,0.5],[15,2,1.166],[30,2,1.583]],'Actions');
+	is_deeply($schedule{attributes}{messages}{xy},[[0,1,1],[5,2,1.5],[15,3,2.166],[25,4,2.7],[30,4,2.916]],'Messages');
 	is($schedule{attributes}{attr2}{y},1,'Message-only attributes');
 };
 
@@ -355,19 +356,20 @@ subtest 'Node+Message attributes'=>sub {
 		},
 	});
 	my %schedule=$scheduler->schedule(activities=>[[20,'root']]);
+	foreach my $k (keys %{$schedule{attributes}}) { @{$schedule{attributes}{$k}{xy}}=map {[@$_[0,1],int($$_[2]*1e3)/1e3]} @{$schedule{attributes}{$k}{xy}} }
 	is_deeply($schedule{attributes}{boolA}{xy},
 		[
-			[ 0,0],
-			[ 5,1],
-			[10,1],
-			[15,0],
-			[20,0],
+			[ 0,0,0],
+			[ 5,1,0],
+			[10,1,0.5],
+			[15,0,0.666],
+			[20,0,0.5],
 		],'Boolean:  set/set operations');
-	is_deeply($schedule{attributes}{intA}{xy}[0],[ 0,8], 'Integer:  set/set');
-	is_deeply($schedule{attributes}{intA}{xy}[1],[ 5,10],'Integer:  set/incr');
-	is_deeply($schedule{attributes}{intA}{xy}[2],[10,7], 'Integer:  incr/set');
-	is_deeply($schedule{attributes}{intA}{xy}[3],[15,12],'Integer:  incr/incr');
-	is_deeply($schedule{attributes}{intA}{xy}[4],[20,12],'Integer:  end of activity');
+	is_deeply($schedule{attributes}{intA}{xy}[0],[ 0,8, 8   ],'Integer:  set/set');
+	is_deeply($schedule{attributes}{intA}{xy}[1],[ 5,10,9   ],'Integer:  set/incr');
+	is_deeply($schedule{attributes}{intA}{xy}[2],[10,7, 8.75],'Integer:  incr/set');
+	is_deeply($schedule{attributes}{intA}{xy}[3],[15,12,9   ],'Integer:  incr/incr');
+	is_deeply($schedule{attributes}{intA}{xy}[4],[20,12,9.75],'Integer:  end of activity');
 };
 
 subtest 'Attribute recomputation'=>sub {
@@ -504,7 +506,7 @@ subtest 'Named messages'=>sub {
 };
 
 subtest 'Node filtering'=>sub {
-	plan tests=>3;
+	plan tests=>4;
 	my (%schedule,$scheduler,%seen,$pass);
 	my %configuration=(
 		node=>{
@@ -572,6 +574,30 @@ subtest 'Node filtering'=>sub {
 	}
 	if($seen{'Begin action 2'}) { $pass=0 }
 	ok($pass,'Always blocked node never appears');
+	#
+	# The average should be (100*0.5+(tm-100)*1)/tm
+	# Ergo, tm>=50/(1-target)
+	my $target=0.73;
+	my $expect=50/(1-$target);
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		root    =>{attributes=>{averager=>{set=>0}},tmmin=>100,tmavg=>100,tmmax=>100,next=>['preloop'],finish=>'finish'},
+		finish  =>{tmavg=>0},
+		preloop =>{attributes=>{averager=>{set=>1}},tmavg=>0,next=>['looper']},
+		looper  =>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/looper postloop/]},
+		postloop=>{
+			require=>{attr=>'averager',f=>'avg',op=>'ge',value=>$target},
+			next=>['finish'],
+			tmavg=>0,
+		},
+	}});
+	%schedule=();
+	my $firsthit=0;
+	for(my $runtime=$expect-10;$runtime<=$expect+10;$runtime++) {
+		eval    { %schedule=$scheduler->schedule(activities=>[[$runtime,'root']]) };
+		if(!$@) { $firsthit=$schedule{_tmmax}; $runtime=200 }
+	}
+	ok(abs($firsthit-$expect)<=1,"Average value (growth) ($firsthit==$expect)");
+	#
 };
 
 subtest 'Reachability'=>sub {

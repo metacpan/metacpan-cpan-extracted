@@ -1,0 +1,9 @@
+Changes
+README
+Makefile.PL
+MANIFEST
+LICENSE
+lib/IO/Select/SSL.pm
+t/IO-Select-SSL.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

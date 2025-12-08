@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Contributing
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp;
 
@@ -56,7 +56,7 @@ Software::Policies::Contributing - Create project policy file: Contributing
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =begin Pod::Coverage
 

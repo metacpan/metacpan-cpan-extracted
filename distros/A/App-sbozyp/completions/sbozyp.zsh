@@ -54,7 +54,7 @@ _sbozyp_complete() {
     local cur=$words[$CURRENT]
     local prev=$words[$CURRENT-1]
 
-    local global_opts="-C -F -R -S --help --version"
+    local global_opts="--help --version -C -F -R -S -T"
 
     local commands="install build remove query search null"
 
@@ -71,7 +71,7 @@ _sbozyp_complete() {
 
     case $command in
         install|in)
-            local opts="--help -f -i -k -n"
+            local opts="--help -f -i -k -r"
             if [[ $cur == in ]]; then
                 compadd -U -- "install"
             elif [[ $cur == -* ]]; then
@@ -101,7 +101,7 @@ _sbozyp_complete() {
             fi
             ;;
         query|qr)
-            local opts="--help -a -d -i -p -q -r -s -u"
+            local opts="--help -a -b -c -d -i -m -n -o -p -q -r -s -u"
             if [[ $cur == qr ]]; then
                 compadd -U -- "query"
             elif [[ $cur == -* ]]; then
@@ -112,7 +112,7 @@ _sbozyp_complete() {
             fi
             ;;
         remove|rm)
-            local opts="--help -i"
+            local opts="--help -f -i -r"
             if [[ $cur == rm ]]; then
                 compadd -U -- "remove"
             elif [[ $cur == -* ]]; then

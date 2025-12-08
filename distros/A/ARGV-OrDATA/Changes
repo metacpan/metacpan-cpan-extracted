@@ -1,5 +1,8 @@
 Revision history for ARGV-OrDATA
 
+0.006   2025-12-08
+        Fix the documentation.
+
 0.005   2024-11-27
         New subroutines: is_using_data and is_using_argv.
 

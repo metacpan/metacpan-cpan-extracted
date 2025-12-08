@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use Ref::Util qw/is_plain_hashref/;
 
-our $VERSION='0.2.4';
+our $VERSION='0.2.5';
 
 my %property=map {$_=>undef} qw/f attr op value boolean filters/;
 my %matcher=(
 	boolean=>\&matchBoolean,
 	elapsed=>\&matchElapsed,
 	value  =>\&matchValue,
+	avg    =>\&matchValue,
 );
 
 sub new {
@@ -76,7 +77,8 @@ sub matchElapsed {
 sub matchValue {
 	my ($self,$tm,%attributes)=@_;
 	my $v=$attributes{$$self{attr}}//{};
-	if($$self{f} eq 'value') { $v=$$v{value} }
+	if   ($$self{f} eq 'value') { $v=$$v{value} }
+	elsif($$self{f} eq 'avg')   { $v=$$v{avg} }
 	else { die "Not yet available $$self{f}" }
 	if(defined($$self{value})) {
 		if(!defined($v)) { return 0 }
@@ -133,12 +135,14 @@ It is not necessary to pass C<f=value>, which is the default.  If the attribute 
 
 =head2 Attribute averages
 
-(not yet available) A filter that uses the current average value of an attribute as C<average op value> can be created with
+A filter that uses the current average value of an attribute as C<average op value> can be created with
 
   f    =>'avg',
   attr =>'name',
   op   =>'operator',
   value=>number,
+
+When used from L<Schedule::Activity>, the average will be provided by the attribute as if I<no change in value> occurred between the last recorded entry and the current time.  The meaning of the average depends on the type.
 
 =head2 Elapsed time
 

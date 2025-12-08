@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: License
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp;
 use Module::Load qw( load );
@@ -41,7 +41,7 @@ sub create {
             policy   => __PACKAGE__ =~ m/.*::([[:word:]]{1,})$/msx,
             class    => 'GPL',
             version  => 1,
-            text     => Software::License::GPL_3->new( \%attributes )->fulltext,
+            text     => Software::License::GPL_3->new( \%attributes )->license,
             filename => 'LICENSE-GPL-3',
             format   => 'text',
           },
@@ -49,7 +49,7 @@ sub create {
             policy   => __PACKAGE__ =~ m/.*::([[:word:]]{1,})$/msx,
             class    => 'Artistic',
             version  => '1.0',
-            text     => Software::License::Artistic_2_0->new( \%attributes )->fulltext,
+            text     => Software::License::Artistic_2_0->new( \%attributes )->license,
             filename => 'LICENSE-Artistic-2.0',
             format   => 'text',
           };
@@ -63,7 +63,7 @@ sub create {
         policy   => __PACKAGE__ =~ m/.*::([[:word:]]{1,})$/msx,
         class    => $class,
         version  => $version,
-        text     => $txt->fulltext,
+        text     => $txt->license,
         filename => _filename($format),
         format   => $format,
     };
@@ -102,7 +102,7 @@ Software::Policies::License - Create project policy file: License
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

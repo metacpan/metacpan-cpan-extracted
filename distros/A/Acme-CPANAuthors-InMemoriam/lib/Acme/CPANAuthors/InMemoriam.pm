@@ -4,32 +4,42 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.08";
+    $VERSION = "1.09";
 }
 
 use Acme::CPANAuthors::Register (
 
     # Our fallen heroes, may they never be forgotten
 
+    'ABELTJE'   => 'Abe Timmerman',
     'AMORETTE'  => 'Hojung Yoon',
     'ANDREWF'   => 'Andrew Ford',
     'AVENJ'     => 'Jon Portnoy',
     'CKARG'     => 'Christian Karg',
+    'DAVEHODG'  => 'Dave Hodgkinson',
+    'DHA'       => 'David Adler',
     'ENCRYPTIO' => 'Chris Kastorff',
     'GARY'      => 'Gary Howland',
     'GARYAJ'    => 'Gary Ashton-Jones',
     'GMCCAR'    => 'Greg McCarroll',
+    'GMCH'      => 'Chris Hall',
     'IVORW'     => 'Ivor Williams',
     'JAITKEN'   => 'James Aitken',
+    'JGOFF'     => 'Jeff Goff',
+    'KENTNL'    => 'Kent Fredric',
     'KHAMPTON'  => 'Kip Hampton',
+    'MSTROUT'   => 'Matt Trout',
     'NI-S'      => 'Nick Ing-Simmons',
     'NOBULL'    => 'Brian McCauley',
     'RKOBES'    => 'Randy Kobes',
+    'SAVA'      => 'Sava Chankov',
     'SCHOP'     => 'Ariel Brosh',
+    'SPIDB'     => 'Raun Boardman',
     'SPOON'     => 'Iain Truskett',
     'SUGMAK'    => 'Makoto Sugiyama',
     'TADMC'     => 'Tad McClellan',
-    'VSARKISS'  => 'Vahe Sarkissian'
+    'VSARKISS'  => 'Vahe Sarkissian',
+    'ZEFRAM'    => 'Andrew Main',
 
 );
 
@@ -64,25 +74,35 @@ celebrate their time with us.
 
 =head1 OUR HEROES
 
+  ABELTJE       Abe Timmerman       d.2024
   AMORETTE      Hojung Yoon         d.2013
   ANDREWF       Andrew Ford         d.2014
   AVENJ         Jon Portnoy         d.2016
   CKARG         Christian Karg      d.2013
+  DAVEHODG      Dave Hodgkinson     d.2023
+  DHA           David Adler         d.2021
   ENCRYPTIO     Chris Kastorff      d.2017
   GARY          Gary Howland        d.2002
   GARYAJ        Gary Ashton-Jones   d.2016
   GMCCAR        Greg McCarroll      d.2013
+  GMCH          Chris Hall          d.????
   IVORW         Ivor Williams       d.2009
   JAITKEN       James Aitken        d.2014
+  JGOFF         Jeff Goff           d.2020
   KHAMPTON      Kip Hampton         d.2017
+  KENTNL        Kent Fredric        d.2021
+  MSTROUT       Matt Trout          d.2025
   NI-S          Nick Ing-Simmons    d.2006
   NOBULL        Brian McCauley      d.2015
   RKOBES        Randy Kobes         d.2010
+  SAVA          Sava Chankov        d.????
   SCHOP         Ariel Brosh         d.2003
+  SPIDB         Raun Boardman       d.2021
   SPOON         Iain Truskett       d.2003
   SUGMAK        Makoto Sugiyama     d.2010
   TADMC         Tad McClellan       d.2012
   VSARKISS      Vahe Sarkissian     d.2008
+  ZEFRAM        Andrew Main         d.2025
 
 =head1 MAINTENANCE
 
@@ -131,7 +151,7 @@ Thanks to Kenichi Ishigaki for writing C<Acme::CPANAuthors>.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2013-2019 Barbie for Miss Barbell Productions.
+  Copyright 2013-2025 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

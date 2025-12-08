@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Code of Conduct
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp;
 use Module::Load qw( load );
@@ -68,7 +68,7 @@ Software::Policies::CodeOfConduct - Create project policy file: Code of Conduct
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =begin Pod::Coverage
 

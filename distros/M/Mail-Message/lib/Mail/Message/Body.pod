@@ -704,9 +704,9 @@ Returns whether the body has changed.
 
 Be sure that the body is loaded.  This returns the loaded body.
 
-=item $obj-E<gt>B<modified>( [BOOLEAN] )
+=item $obj-E<gt>B<modified>( [$flag] )
 
-Change the body modification flag.  This will force a re-write of the body
+Change the body modification C<$flag>.  This will force a re-write of the body
 to a folder file when it is closed.  It is quite dangerous to change the
 body: the same body may be shared between messages within your program.
 
@@ -1028,8 +1028,8 @@ Cast by C<eol()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

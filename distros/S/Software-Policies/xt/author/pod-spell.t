@@ -21,6 +21,8 @@ PerlDistZilla
 Policies
 Security
 Software
+dotenv
 env
+envdot
 lib
 mikkoi

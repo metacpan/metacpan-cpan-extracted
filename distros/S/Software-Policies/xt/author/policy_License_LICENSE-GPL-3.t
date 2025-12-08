@@ -31,12 +31,6 @@ do {
 done_testing;
 
 __DATA__
-This software is Copyright (c) 2025 by Mikko Koivunalho <mikkoi@cpan.org>.
-
-This is free software, licensed under:
-
-  The GNU General Public License, Version 3, June 2007
-
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 

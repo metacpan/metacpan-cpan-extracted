@@ -193,10 +193,10 @@ partial.  C<names()> will trigger completion, where C<knownNames()> does not.
 Get (after setting) the message where this header belongs to.
 This does not trigger completion.
 
-=item $obj-E<gt>B<modified>( [BOOLEAN] )
+=item $obj-E<gt>B<modified>( [$flage] )
 
-Sets the modified flag to C<BOOLEAN>.  Without value, the current setting is
-returned, but in that case you can better use L<isModified()|Mail::Message::Head/"The header">.
+Sets the modified $flag (a BOOLEAN).  Without value, the current setting
+is returned, but in that case you can better use L<isModified()|Mail::Message::Head/"The header">.
 Changing this flag will not trigger header completion.
 
 » example: 
@@ -483,8 +483,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

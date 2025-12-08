@@ -3,7 +3,7 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.9905';
+our $VERSION = '1.00';
 
 our $REPLACE_UNDERSCORE = 1;
 
@@ -65,7 +65,7 @@ sub getopt {
     GetOptionsFromArray(
 	$argv,
 	$obj,
-	"config|C=s" => sub {
+	"config=s" => sub {
 	    $obj->config(arg2kvlist($_[1]));
 	},
 	@_
@@ -148,7 +148,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 0.9905
+Version 1.00
 
 =head1 DESCRIPTION
 

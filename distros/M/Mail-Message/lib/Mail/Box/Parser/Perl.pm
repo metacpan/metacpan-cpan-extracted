@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.019.
+# This code is part of Perl distribution Mail-Message version 3.020.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -9,8 +9,10 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 
+#XXX WARNING: large overlap with Mail::Box::Parser:C; you may need to change both!
+
 package Mail::Box::Parser::Perl;{
-our $VERSION = '3.019';
+our $VERSION = '3.020';
 }
 
 use base 'Mail::Box::Parser';

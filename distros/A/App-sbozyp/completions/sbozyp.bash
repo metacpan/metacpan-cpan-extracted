@@ -52,7 +52,7 @@ _sbozyp_complete() {
     local cur prev words cword
     _init_completion || return
 
-    local global_opts="-C -F -R -S --help --version"
+    local global_opts="--help --version -C -F -R -S -T"
 
     local commands="install build remove query search null"
 
@@ -69,50 +69,50 @@ _sbozyp_complete() {
 
     case $command in
         install|in)
-            local opts="--help -f -i -k -n"
+            local opts="--help -f -i -k -r"
             if [[ $cur == in ]]; then
-                COMPREPLY=("install")
+                COMPREPLY=( "install" )
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             else
                 local all_prgnams=$(sbozyp $(_sbozyp_command_prefix) search -p '' 2>/dev/null)
-                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur"))
+                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur") )
             fi
             ;;
         build|bu)
             local opts="--help -f -i"
             if [[ $cur == bu ]]; then
-                COMPREPLY=("build")
+                COMPREPLY=( "build" )
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             else
                 local all_prgnams=$(sbozyp $(_sbozyp_command_prefix) search -p '' 2>/dev/null)
-                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur"))
+                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur") )
             fi
             ;;
         null|nu)
             local opts="--help"
             if [[ $cur == nu ]]; then
-                COMPREPLY=("null")
+                COMPREPLY=( "null" )
             else
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             fi
             ;;
         query|qr)
-            local opts="--help -a -d -i -p -q -r -s -u"
+            local opts="--help -a -b -c -d -i -m -n -o -p -q -r -s -u"
             if [[ $cur == qr ]]; then
-                COMPREPLY=("query")
+                COMPREPLY=( "query" )
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             else
                 local all_prgnams=$(sbozyp $(_sbozyp_command_prefix) search -p '' 2>/dev/null)
-                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur"))
+                COMPREPLY=( $(compgen -W "$all_prgnams" -- "$cur") )
             fi
             ;;
         remove|rm)
-            local opts="--help -i"
+            local opts="--help -f -i -r"
             if [[ $cur == rm ]]; then
-                COMPREPLY=("remove")
+                COMPREPLY=( "remove" )
             elif [[ $cur == -* ]]; then
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             else
@@ -123,7 +123,7 @@ _sbozyp_complete() {
         search|se)
             local opts="--help -c -n -p"
             if [[ $cur == se ]]; then
-                COMPREPLY=("search")
+                COMPREPLY=( "search" )
             else
                 COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
             fi

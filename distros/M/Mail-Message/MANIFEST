@@ -142,6 +142,8 @@ t/117fieldu-addr.t
 t/118fieldu-uri.t
 t/119fieldu-auth.t
 t/120fieldu-dkim.t
+t/121fieldu-comment.t
+t/122fieldu-date.t
 t/200head-create.t
 t/201head-partial.t
 t/202head-resentgroup.t

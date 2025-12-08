@@ -799,7 +799,7 @@ between these fields and the labels in the DETAILS chapter.
 The method will carefully only affect the result of L<modified()|Mail::Message/"Flags"> when
 there is a real change of flags, so not for each call to L<label()|Mail::Message/"Flags">.
 
-=item $obj-E<gt>B<modified>( [BOOLEAN] )
+=item $obj-E<gt>B<modified>( [$flag] )
 
 Returns (optionally after setting) whether this message is flagged as
 being modified.  See isModified().
@@ -1331,8 +1331,8 @@ Cast by C<coerce()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

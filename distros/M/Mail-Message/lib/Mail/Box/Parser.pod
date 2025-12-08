@@ -28,7 +28,7 @@ There are currently three implementations of this module:
 
 =over 4
 
-=item * L<Mail::Box::Parser::C|Mail::Box::Parser::C>
+=item * L<Mail::Box::Parser|Mail::Box::Parser>::C
 
 A fast parser written in C<C>.  This package is released as separate
 module on CPAN, because the module distribution via CPAN can not
@@ -358,8 +358,8 @@ Cast by C<readHeader()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

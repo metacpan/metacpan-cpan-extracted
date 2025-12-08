@@ -16,9 +16,15 @@ The following are planned as part of the 0.3.0 release.
 
 =item Goal scheduling (done)
 
-=item Attribute average values
+=item Attribute average values (done)
 
-=item Node filtering for average values
+=item Node filtering for average values (done)
+
+=item Attribute support modulus operator
+
+=item Script attribute grid for averages
+
+=item Script incremental build supports configuration overwrite (maybe)
 
 =back
 
@@ -34,25 +40,15 @@ Rewrite in progress starting with 0.2.3.  The documentation in L<Schedule::Activ
 
 =head2 Attributes
 
-Attribute recomputation is supported starting with 0.2.2, primarily for merged annotation support.  Attributes as "goals" is planned for 0.2.3--5.
+Attribute recomputation is supported starting with 0.2.2, primarily for merged annotation support.
+
+Attribute average values are available for goals starting with 0.2.5, which also cleaned up behavioral questions about initial average values, and averages during time overlaps.  See L<Schedule::Activity/Consistency>.
 
 Rudimentary attribute reporting from the commandline is supported starting with 0.2.2.
 
-There is a subtle intricacy raised by the behavior of node filtering on average values:  A configuration may fix/quiesce attributes via the increase-by-zero trick in every node, permitting some control over updates to the rolling average values.  Would it be expected that the value is constant, hence the average updating "second by second", until such time as it is explicitly changed?  The current model is that the average updates via the trapezoid rule when the next value update occurs.  This works for any granularity (including non-integer valued times), but it is, in a sense, retroactive.  This gives two alternate views of reality, where the attribute average suddenly flips during values assignment:  In one view, the average is steadily approaching the current value as time increases; but in the other, that average is replaced when the next value is set.
-
-Ideally there would be no such discrepancy (speaking mathematically), meaning that attribute values are fixed for the purpose of computing the rolling average, thru the current time minus epsilon.  When a value change occurs, that would only affect the future value of the average and would not change the historical value.  This is obviously different than the current interpretation.  The module author currently has no scenarios that rely on this granularity for the average, and because node filtering does not currently support average value selection, this non-backwards-compatible change would likely have minimal impacts.  It would still appear above with a version-specific, future update... once a decision is made.
-
 =head2 Node filtering
 
-Average value filtering needs to be defined.  Value filtering is straightforward because the last recorded value is the current value for the attribute.  Average value filtering, however, has three different interpretations of value that are being considered:
-
-The currently stored "average" is the rolling average as computed with the most recent attribute update.  That update could have occurred recently or far in the past, but the recorded y-value and average represent a consistent pair at that time.
-
-If, however, the most recent value is also interpreted as the "current value" for the attribute, then the rolling average can be updated for the current time.  That average can be different than the previously recorded average.  For example, suppose an attribute is zero for times zero through ten, then the attribute becomes one.  At time twenty, the stored average is one-half and the stored value is one; however, if the value is also "increased by zero" at time twenty, then the updated average would be three-quarters.  For the sake of filtering, then, should the "average" be one-half, or is it steadily increasing toward one as time advances?  It seems more realistic that it would be the latter interpretation, since this means that node filtering permits "eventual activation" as the average crosses a threshold.
-
-But consider the very next step of the process.  Suppose that the node, when the filter passes, is also going to decrease the attribute in the above example by one.  This will occur precisely at time twenty, meaning that the average will be one-half.  So, is it more realistic to say that the average "would be three quarters at time twenty if the attribute value is still one", or that the average "would be one-half at time twenty if the attribute is updated per the instructions in the node".  Because the latter interpretation raises a logical paradox (if it passes the filter it wouldn't have passed the filter, but if it fails the filter it would have passed the filter)... it is likely that we'll choose the middle interpretation.
-
-That is, the attribute value is fixed up to the current time minus epsilon, and thus the speculative average at that time can be computed and represents the rolling average as updated to the current time.  If the chosen node adjusts the value, and thus the rolling average, that would only affect selection of future nodes.
+Average value filtering is available starting with 0.2.5.  The most recent value is always used as the "current value" for the attribute, and the rolling average is updated to the "random current time" when evaluating any NodeFilter.  This permits node activation based on "eventual activation" without explicit checkpointing/materialization of attributes.  The user may still fix the attribute to affect the averages with more granularity as desired.
 
 =head2 Annotations
 

@@ -226,7 +226,7 @@ Some options are specified to create a C<$type> object, which is native to
 this collection.  However, for some reason this failed.
 Cast by C<addRole()>
 
-=item Error: cannot load collection module for $type ($class): $err
+=item Error: cannot load collection module for $type ($class): $@
 
 Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
@@ -261,8 +261,8 @@ Cast by C<addRole()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

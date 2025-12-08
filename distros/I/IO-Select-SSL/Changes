@@ -1,0 +1,14 @@
+Revision history for Perl extension IO::Select::SSL.
+
+0.03  Mon Dec  8 00:55:00 2025
+ - Update docs and distribution configuration
+ - No functional changes.
+
+0.02  Fri Nov  3 22:55:41 2023
+ - Handle ->select() method too
+
+0.01  Sat Dec 16 23:54:41 2006
+ - Initial version from Dec 16 2006
+
+0.00  Sun Dec  7 23:09:52 2025
+ - Initial creation by running: h2xs -b 5.6.0 -Afn IO::Select::SSL

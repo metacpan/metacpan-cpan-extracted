@@ -25,8 +25,8 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Exporter::Shiny" => { file => "lib/Exporter/Shiny.pm", version => 1.006002 },
-                        "Exporter::Tiny"  => { file => "lib/Exporter/Tiny.pm", version => 1.006002 },
+                        "Exporter::Shiny" => { file => "lib/Exporter/Shiny.pm", version => 1.006003 },
+                        "Exporter::Tiny"  => { file => "lib/Exporter/Tiny.pm", version => 1.006003 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -41,7 +41,8 @@ my $meta = {
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project",
                         x_IRC        => "irc://irc.perl.org/#moops",
                       },
-  "version"        => 1.006002,
+  "version"        => 1.006003,
+  "x_contributors" => ["Graham Knop (HAARG) <haarg\@cpan.org>"],
 };
 
 my %dynamic_config;
@@ -54,13 +55,13 @@ do {
 		$prereq_type = 'requires';
 	}
 
-	if ( $] ge 5.011002 and $] lt 5.037002 ) {
+	if ( "$]" >= 5.011002 and "$]" < 5.037002 ) {
 		$meta->{prereqs}{runtime}{$prereq_type}{'Lexical::Var'} = '0.010';
 	}
 
 	# idk, this should be automatic or summint? put it in explicitly.
 	$meta->{prereqs}{runtime}{requires}{'Test::More'} = '0.47'
-		if $] lt 5.006002;
+		if "$]" < 5.006002;
 
 };
 

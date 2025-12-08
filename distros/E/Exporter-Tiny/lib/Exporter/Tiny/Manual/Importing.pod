@@ -160,6 +160,17 @@ C<export_lexically> is included in a stable release of Perl.
 If you install L<Lexical::Var>, then lexical imports should work on versions
 of Perl as old as 5.12.
 
+=head2 Importing into a hash
+
+Another way of avoiding polluting your namespace with imports is to import
+into a hash.
+
+   my %U;
+   use MyUtils { into => \%U };
+   
+   ...
+   $U{frobnicate}->(...);
+
 =head2 Unimporting
 
 You can unimport the functions that MyUtils added to your namespace:
@@ -231,7 +242,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

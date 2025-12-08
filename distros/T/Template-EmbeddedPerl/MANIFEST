@@ -14,6 +14,7 @@ lib/Template/EmbeddedPerl/Compiled.pm
 lib/Template/EmbeddedPerl/SafeString.pm
 lib/Template/EmbeddedPerl/Utils.pm
 t/basic.t
+t/comparison_operators.t
 t/crazy.t
 t/ff.t
 t/if.t

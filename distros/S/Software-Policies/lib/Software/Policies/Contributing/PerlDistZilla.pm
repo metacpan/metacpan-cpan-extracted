@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Contributing / PerlDistZilla
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp;
 use Data::Section -setup;
@@ -71,7 +71,7 @@ Software::Policies::Contributing::PerlDistZilla - Create project policy file: Co
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for Pod::Coverage new create get_available_classes_and_versions
 

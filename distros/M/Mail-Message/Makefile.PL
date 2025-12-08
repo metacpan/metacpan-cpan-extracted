@@ -4,7 +4,7 @@ require 5.016;
 
 use IO::Handle;
 
-my $VERSION = '3.019';
+my $VERSION = '3.020';
 
 # This is an attempt to automatically convert you configuration parameters.
 # More docs: https://github.com/markov2/perl5-OODoc/wiki/oodist-config

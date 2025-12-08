@@ -15,6 +15,7 @@ Mail::Message::Field::Date - message header field with uris
 =head1 SYNOPSIS
 
   my $f = Mail::Message::Field->new(Date => time);
+  my $date = $f->date;  # cleaned-up and validated.
 
 =head1 DESCRIPTION
 
@@ -489,8 +490,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.019,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 3.020,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

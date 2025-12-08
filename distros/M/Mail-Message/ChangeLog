@@ -12,6 +12,15 @@ Limitations to be fixed:
 #!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
 #!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
 
+version 3.020: Mon  8 Dec 10:06:14 CET 2025
+
+	Fixes:
+	- ::Field::Date regex [Andy Beverley]
+
+	Improvements:
+	- added tests for parsing date field.
+	- added tests for parsing comment field to release.
+
 version 3.019: Mon 24 Nov 19:46:56 CET 2025
 
 	Changes:

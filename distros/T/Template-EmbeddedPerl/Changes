@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001015 07 December 2025
+          - fixed bug when > or < appeared in a multiline <% .. %> block
+
 0.001014 10 July 2025
           - When using auto_escape, check any objects for 'to_safe_string'
             method before stringifying for escape.   This allows an object

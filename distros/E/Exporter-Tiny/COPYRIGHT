@@ -21,7 +21,7 @@ Files: README
  lib/Exporter/Tiny/Manual/Exporting.pod
  lib/Exporter/Tiny/Manual/Importing.pod
  lib/Exporter/Tiny/Manual/QuickStart.pod
-Copyright: This software is copyright (c) 2013-2014, 2017, 2022-2023 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2017, 2022-2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/05shiny.t
@@ -41,11 +41,11 @@ Files: COPYRIGHT
 Copyright: Copyright 1970 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/01basic.t
- t/02renaming.t
- t/03generators.t
- t/04into.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/14lexical.t
@@ -55,11 +55,11 @@ Files: t/14lexical.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
-Copyright: Copyright 2023 Toby Inkster.
+Files: t/01basic.t
+ t/02renaming.t
+ t/03generators.t
+ t/04into.t
+Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/11noncode.t
@@ -78,10 +78,6 @@ Files: inc/archaic/Test/More.pm
 Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/archaic/Test/Builder.pm
-Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: inc/archaic/Test/Builder/IO/Scalar.pm
 Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
  Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
@@ -91,15 +87,19 @@ Files: SIGNATURE
 Copyright: None
 License: public-domain
 
+Files: inc/archaic/Test/Builder.pm
+Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  

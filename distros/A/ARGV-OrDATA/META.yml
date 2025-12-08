@@ -22,5 +22,5 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/choroba/argv-ordata
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,6 @@
+Revision history for Perl extension App-optex-up
+
+1.00 2025-12-08T05:49:34Z
+
+    - Initial release
+    - Provides multi-column output with ansicolumn and pager support
