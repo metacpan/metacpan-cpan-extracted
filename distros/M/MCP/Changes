@@ -1,8 +1,19 @@
 
+0.06  2025-12-05
+  - Protocol version is now 2025-11-25.
+  - Added support for resources.
+  - Added support for audio and resource results.
+  - Added support for sessions specific prompt, resource, and tool lists.
+  - Added MCP::Resource class.
+  - Added read_resource and list_resources methods to MCP::Client.
+  - Added resource method to MCP::Server.
+  - Added audio_result and resource_link_result methods to MCP::Tool.
+  - Added prompts, resources, and tools events to MCP::Server.
+
 0.05  2025-08-28
-  - Added supprot for prompts.
+  - Added support for prompts.
   - Added MCP::Prompt class.
-  - Added get_prompt and list_pronmpts methods to MCP::Client.
+  - Added get_prompt and list_prompts methods to MCP::Client.
   - Added prompt method to MCP::Server.
 
 0.04  2025-08-04

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.111-8-g635db82c
+package OpenAPI::Modern; # git description: v0.112-8-geee3c21e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
-# KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
+# ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
+# KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 use 5.020;
 use utf8;
@@ -1231,11 +1231,11 @@ __END__
 
 =head1 NAME
 
-OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
+OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 SYNOPSIS
 
@@ -1657,7 +1657,7 @@ L<https://spec.openapis.org/#openapi-specification-schemas>.
 The default metaschema used by this tool does not permit the use of C<$schema> keywords
 in subschemas (unless the value is equal to the default OAS dialect), but a more permissive
 dialect is also available (or you can define your own), which you declare by providing the
-L<C<jsonSchemaDialect|https://spec.openapis.org/oas/latest#openapi-object>> property in your OpenAPI
+L<C<jsonSchemaDialect>|https://spec.openapis.org/oas/latest#openapi-object> property in your OpenAPI
 Document.
 
 The schemas are also available under the URIs C<< s/<date>/latest/ >> so you don't have to change your
@@ -1773,6 +1773,10 @@ L<https://www.openapis.org/>
 =item *
 
 L<https://learn.openapis.org/>
+
+=item *
+
+L<https://spec.openapis.org/oas/v3.0>
 
 =item *
 

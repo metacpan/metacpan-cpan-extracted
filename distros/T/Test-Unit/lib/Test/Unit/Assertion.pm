@@ -1,6 +1,7 @@
 package Test::Unit::Assertion;
 
 use strict;
+use warnings;
 
 use Carp;
 use Test::Unit::Failure;
@@ -36,7 +37,7 @@ Test::Unit::Assertion - The abstract base class for assertions
 =head1 NAME
 
 Any assertion class that expects to plug into Test::Unit::Assert needs
-to implement this interface. 
+to implement this interface.
 
 =head2 Required methods
 

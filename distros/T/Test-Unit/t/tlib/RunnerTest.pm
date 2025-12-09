@@ -16,7 +16,7 @@ sub tear_down {
     my $self = shift;
     close(DEVNULL);
 }
-    
+
 sub test_reset_filtering {
     my $self = shift;
 

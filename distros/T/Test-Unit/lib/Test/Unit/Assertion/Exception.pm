@@ -1,6 +1,8 @@
 package Test::Unit::Assertion::Exception;
 
 use strict;
+use warnings;
+
 use base qw/Test::Unit::Assertion/;
 
 use Carp;

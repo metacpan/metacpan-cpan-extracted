@@ -7,8 +7,8 @@ SYNOPSIS
        use Feature::Compat::Class;
     
        class Point {
-          field $x :param :reader = 0;
-          field $y :param :reader = 0;
+          field $x :param :reader :writer = 0;
+          field $y :param :reader :writer = 0;
     
           method move_to ($new_x, $new_y) {
              $x = $new_x;
@@ -32,7 +32,8 @@ DESCRIPTION
        use feature 'class';
 
     This syntax was further expanded in 5.40, adding the __CLASS__ keyword
-    and :reader attribute on fields.
+    and :reader attribute on fields, and again in 5.42 to add the :writer
+    attribute.
 
     On that version of perl or later, this module simply enables the core
     feature equivalent of using it directly. On such perls, this module
@@ -203,7 +204,7 @@ KEYWORDS
        field $x :reader;
     
        # equivalent to
-       field $x;  method x { return $x }
+       field $x;  method x () { return $x }
 
     These are permitted on an field type, not just scalars. The reader
     method behaves identically to how a lexical variable would behave in
@@ -216,6 +217,29 @@ KEYWORDS
        foreach my $item ( $obj->items ) { ... }   # iterates the list of items
     
        my $count = $obj->items;                   # yields count of items
+
+  :writer, :writer(NAME)
+
+    Since version 0.08.
+
+    Generates a writer method to set a new value for the field. If no name
+    is given, the name of the field is used with a set_ prefix. If a name
+    is provided that will be used - you should remember to add a
+    distinguishing prefix if required to keep it distinct from the reader
+    method. A single prefix character _ will be removed if present.
+
+       field $x :writer;
+    
+       # equivalent to
+       field $x;  method set_x ($new_x) { $x = $new_x; return $self; }
+
+    When invoked, a :writer method will return the invocant object itself.
+    This is so that multiple fields can be modified in a convenient
+    chaining syntax; for example:
+
+       $obj->set_x( 10 )
+           ->set_y( 20 )
+           ->set_z( 30 );
 
  ADJUST
 

@@ -1,6 +1,10 @@
 #!/usr/bin/perl -w
-# $Id: distsync 27 2019-07-23 11:26:37Z abalama $
 use strict;
+use warnings;
+use utf8;
+use feature qw/say/;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -9,30 +13,70 @@ distsync - launcher of synchronization via App::DistSync
 =head1 SYNOPSIS
 
     distsync [options] [commands]
-
     distsync -D /var/www/dist init
-
+    distsync [-dv] -D /var/www/dist status
     distsync [-d] -D /var/www/dist [-T TIMEOUT] [sync]
+    distsync [-d] [-T TIMEOUT] sync /var/www/dist
+    distsync [-dv] -D /var/www/dist manifest|mkmani
+
+=head1 COMMANDS
+
+List of commands
+
+=over 4
+
+=item B<init>
+
+Initializing a new mirror in the specified directory
+
+=item B<manifest>, B<mkmani>
+
+MANIFEST file generation in the specified directory;
+no other resource files are modified, and the directory structure is preserved
+
+=item B<status>
+
+Show statistic information
+
+=item B<sync>
+
+Synchronization of the specified directory with remote resources (mirrors)
+
+=back
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-d, --debug>
-
-Enable debug mode
-
 =item B<-D /path/to/directory, --dir=/path/to/directory>
 
 Sets working directory
+
+=item B<-d, --debug>
+
+The I<debug> option switches operating mode to I<debug>.
+In I<debug> mode all debug messages will be written to I<STDERR> by default
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
 
 =item B<-h, --help>
 
 Show short help information and quit
 
-=item B<-H, --longhelp>
+=item B<-i secs, --delay=secs>
 
-Show long help information and quit
+Max amount of seconds between retries of reading lock file (0=disabled, default is 60)
+
+=item B<-k, --insecure>
+
+By default, every SSL/TLS connection client makes is verified to be secure.
+This option allows client to proceed and operate even for server connections
+otherwise considered insecure.
+
+The server connection is verified by making sure the server's certificate
+contains the right name and verifies successfully using the cert store.
 
 =item B<-T secs, --timeout=secs>
 
@@ -42,23 +86,15 @@ Set timeout for HTTP requests
 
 Print the version number of the program and quit
 
-=item B<-k secs, --keep=secs>
+=item B<-v, --verbose>
 
-Max amount of seconds before breaking lock (0 for never, default is 3600)
+Verbose mode. Show extended information on STDOUT
 
-=back
+=item B<-x PROXY_URL, --proxy=PROXY_URL>
 
-=head1 COMMANDS
+Sets proxy URL (http/socks4/socks5)
 
-=over 4
-
-=item B<init>
-
-Initializing the mirror in the specified directory
-
-=item B<sync>
-
-Synchronization of the specified directory with the remote resources (mirrors)
+For example: socks://user:pass@192.168.0.1:1080
 
 =back
 
@@ -66,15 +102,15 @@ Synchronization of the specified directory with the remote resources (mirrors)
 
 Launcher of synchronization via App::DistSync
 
-See L<App::DistSync> for details
+See C<README> file for details
 
 =head1 AUTHOR
 
-Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -88,112 +124,131 @@ See L<https://dev.perl.org/licenses/>
 use Getopt::Long;
 use Pod::Usage;
 
-use Cwd;
+use Cwd qw/getcwd/;
 use File::Spec;
 
 use App::DistSync;
-use App::DistSync::Lock;
+use App::DistSync::LockFile;
+use App::DistSync::Util;
+
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+
 
 use constant {
     PIDFILE     => 'distsync.pid',
     CMDDEFAULT  => 'sync',
-    COMMANDS    => [qw/ init sync /],
+    COMMANDS    => [qw/init status sync manifest mkmani/],
 };
 
-$SIG{INT} = sub { die "Aborted\n"; };
+$| = 1;  # Autoflush on
 
-$| = 1;  # autoflush
-
-our %OPT;
-
-BEGIN {
-    sub _say { return unless $OPT{debug} || -t; print STDOUT @_ ? @_ : '',"\n" }
-    sub _err { print STDERR @_ ? @_ : '',"\n" }
-    sub _tms { sprintf "[%s GMT]", scalar(gmtime(time())) }
-}
-
+my $options = {};
 Getopt::Long::Configure ("bundling");
-GetOptions(\%OPT,
+GetOptions($options,
+    # Information and debug
     "help|usage|h",         # Show help page
     "longhelp|H|?",         # Show long help page
-    "version|vers|ver|V",   # Print VERSION of the App::MBUtiny
-    "debug|d",              # Debug mode
+    "debug|devel|d",        # Debug mode
+    "verbose|v",            # Verbose mode
+    "version|ver|V",        # Print VERSION of the project
 
+    # Client options
+    "proxy|x=s",            # Proxy URL
+    "insecure|k",           # Insecure connection
+    "timeout|T=i",          # Timeoute value in seconds. Default - 60
+
+    # Project
     "directory|dir|D=s",    # Directory
-    "timeout|T=s",          # Timeout
-    "hold|keep|k=i",        # Hold value. 0 - off, 1-n - secs, default - 3600
+    "delay|i=i",            # Delay. 0 - off, 1-n - secs, default - 3600
 ) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
-pod2usage(-exitval => 0, -verbose => 1) if $OPT{help};
-pod2usage(-exitval => 0, -verbose => 2) if $OPT{longhelp};
-printf("Version: %s\n", App::DistSync->VERSION) && exit(0) if $OPT{version};
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+printf("DistSync v%s\n", App::DistSync->VERSION) && exit(0) if $options->{version};
 
-# VARS
-my %cmddata;
+# Get command
 my $command   = @ARGV ? shift @ARGV : CMDDEFAULT;
-my @argss = @ARGV ? @ARGV : ();
-my @commands  = @{(COMMANDS)};
 pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
-    if ( (grep {$_ eq $command} @commands) ? 0 : 1 );
+    unless scalar grep {$_ eq $command} @{(COMMANDS)};
 
-# Directory
-my $root_dir = $OPT{directory} || cwd();
-unless ($root_dir && (-e $root_dir) && (-d $root_dir or -l $root_dir)) {
-    _err(sprintf "Directory \"%s\" not exists", $root_dir || '.');
-    exit(1);
-}
+# Work directory
+my $dir = $options->{directory} || shift(@ARGV) || getcwd();
+die sprintf("Directory \"%s\" not exists", $dir) unless $dir && (-e $dir) && (-d $dir or -l $dir);
 
-# Debugging
-$App::DistSync::DEBUG = 1 if $OPT{debug};
+# Debugging on
+$App::DistSync::Util::DEBUG = $App::DistSync::DEBUG = 1 if $options->{debug};
 
-_say sprintf("App::DistSync/%s", App::DistSync->VERSION);
-_say;
-my $start_tms = _tms;
-START: debug("START ", _tms);
-#########################
-### START
-#########################
+# Start process
+my $started = time;
+debug("%s START", tms);
 
-# LOCK & PID
-my $lock = new App::DistSync::Lock(
-        file => File::Spec->catfile($root_dir, App::DistSync::MANILOCK()),
-        hold => $OPT{hold},
-        pid  => $$,
+# Lock file
+my $lock = App::DistSync::LockFile->new(
+        file => File::Spec->catfile($dir, App::DistSync::MANILOCK()),
+        $options->{delay} ? (delay => $options->{delay}) : (),
+        pid => $$,
     );
-if (!$lock->status || $lock->running) {
-    _err($lock->error);
+if ($lock->lock->error) {
+    warn $lock->error . "\n";
     goto FINISH;
 }
 
-# Main object
-my $ds = new App::DistSync(
-        dir => $root_dir,
-        pid => $$,
-        timeout => $OPT{timeout},
-    );
+# Create instance
+my $ds = App::DistSync->new(
+    dir     => $dir,
+    pid     => $$,
+    timeout => $options->{timeout},
+    verbose => $options->{verbose},
+    insecure=> $options->{insecure},
+    proxy   => $options->{proxy},
+);
 
+my $exitval = 1; # error
+
+# Init
 if ($command eq 'init') {
-    goto FINISH unless $ds->init;
-    _say sprintf "Initialization has been completed. Your files located in %s", $root_dir;
-} else {
-    my $status = $ds->sync;
-    if ($status) {
-        _say(sprintf("Sync completed successfully\n\tURI:\t\t%s\n\tDirectory:\t%s\n\tStarted at:\t%s\n\tFinished at:\t%s",
-            (defined($ds->{uri}) ? $ds->{uri} : 'none'),
-            $root_dir,
-            $start_tms,
-            _tms
-        ));
-    } else {
-        _say(sprintf("Sync completed with errors\n\tDirectory:\t%s", $root_dir));
+    $ds->init or goto FINISH;
+    say "The work directory has been successfully initialized";
+    printf "Your files are in \"%s\"\n", $ds->dir if $options->{verbose};
+    $exitval = 0; # Ok
+}
+
+# Status
+elsif ($command eq 'status') {
+    if ($ds->status) {
+        $ds->_show_summary;
+        $exitval = 0; # Ok
     }
 }
 
-#########################
-### FINISH
-#########################
-FINISH: debug("FINISH ", _tms);
-exit(0);
+# Sync
+elsif ($command eq 'sync') {
+    if ($ds->sync) {
+        say "Sync successfully completed";
+        goto FINISH unless $options->{verbose};
+        $ds->_show_summary;
+        $exitval = 0; # Ok
+    } else {
+        printf("Sync \"%s\" completed with errors\n", $ds->dir);
+    }
+}
+
+# Make manifest file
+elsif ($command eq 'manifest' or $command eq 'mkmani') {
+    if ($ds->mkmani) {
+        say sprintf "The MANIFEST file has been successfully generated in \"%s\"", $ds->dir;
+        $exitval = 0; # Ok
+    } else {
+        printf("Failed to generate MANIFEST file in \"%s\"\n", $ds->dir);
+    }
+}
+
+FINISH: debug("%s FINISH", tms);
+warn $lock->error . "\n" if $lock->unlock->error;
+exit $exitval;
 
 1;
 
 __END__
+
+

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -20,7 +20,7 @@ use Feature::Compat::Class;
    }
 
    my $obj = Test1->new;
-   isa_ok( $obj, "Test1", '$obj' );
+   isa_ok( $obj, [ "Test1" ], '$obj' );
 
    is( $obj->hello, "Hello, world!", '$obj->hello' );
 
@@ -44,7 +44,7 @@ use Feature::Compat::Class;
    }
 
    my $obj = Test3->new;
-   is_deeply( [ $obj->args( "a", "b" ) ], [ "a", "b" ],
+   is( [ $obj->args( "a", "b" ) ], [ "a", "b" ],
       '$self is shifted from @_' );
 }
 

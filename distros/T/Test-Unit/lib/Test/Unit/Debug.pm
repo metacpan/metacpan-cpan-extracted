@@ -16,11 +16,11 @@ Test::Unit::Debug - framework debugging control
 =cut
 
 use strict;
+use warnings;
 
 use base 'Exporter';
-use vars qw(@EXPORT_OK);
-@EXPORT_OK = qw(debug debug_to_file
-                debug_pkg no_debug_pkg debug_pkgs no_debug_pkgs debugged);
+our @EXPORT_OK = qw(debug debug_to_file
+                    debug_pkg no_debug_pkg debug_pkgs no_debug_pkgs debugged);
 
 my %DEBUG = ();
 my $out = \*STDERR;

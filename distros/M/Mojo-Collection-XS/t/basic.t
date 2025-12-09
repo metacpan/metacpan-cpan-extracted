@@ -1,9 +1,11 @@
 use Mojo::Base -strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../blib/lib", "$FindBin::Bin/../blib/arch";
 use Test::More;
 
 use Mojo::Collection::XS;
 
-subtest 'while_fast sets $_ and index' => sub {
+subtest 'while_fast aliases $_ and returns self' => sub {
   my $c = Mojo::Collection::XS->new(qw/a b c/);
   my (@seen, @idx);
 
@@ -20,17 +22,18 @@ subtest 'while_fast sets $_ and index' => sub {
   is_deeply([@$c],  [qw/a! b! c!/], '$_ aliased to elements');
 };
 
-subtest 'while_pure_fast keeps $_ untouched' => sub {
+subtest 'while_ultra keeps $_ untouched' => sub {
   my $c = Mojo::Collection::XS->new(qw/foo bar/);
   my @calls;
   local $_ = 'outer';
 
-  $c->while_pure_fast(sub {
+  my $ret = $c->while_ultra(sub {
     my ($e, $num) = @_;
     push @calls, [$e, $num, $_];
   });
 
-  is_deeply(\@calls, [['foo', 1, 'outer'], ['bar', 2, 'outer'],], '$_ not aliased, indexes preserved');
+  is($ret, $c, 'returns same object');
+  is_deeply(\@calls, [['foo', 1, 'outer'], ['bar', 2, 'outer']], 'uses @_ args only');
   is($_, 'outer', 'outer $_ unchanged');
 };
 
@@ -45,7 +48,7 @@ subtest 'each_fast aliases $_ and returns self' => sub {
   });
 
   is($ret, $c, 'returns same object');
-  is_deeply(\@pairs, [[1, 1, 1], [2, 2, 2],], 'saw element, $_ alias, index');
+  is_deeply(\@pairs, [[1, 1, 1], [2, 2, 2]], 'saw element, $_ alias, index');
   is_deeply([@$c], [2, 4], 'elements mutated through $_ alias');
 };
 
@@ -53,34 +56,37 @@ subtest 'map_fast returns new collection with list context values' => sub {
   my $c = Mojo::Collection::XS->new(1, 2);
 
   my $mapped = $c->map_fast(sub {
-    my ($e, $num) = @_;
-    return ($e * 2, $num);
+    my ($e) = @_;
+    return ($e * 2, $e + 1);
   });
 
   isa_ok($mapped, 'Mojo::Collection::XS', 'mapped class preserved');
   isnt($mapped, $c, 'returns new object');
-  is_deeply([@$mapped], [2, 1, 4, 2], 'list results flattened');
+  is_deeply([@$mapped], [2, 2, 4, 3], 'list results flattened');
 };
 
-subtest 'map_pure_fast returns new collection with scalar results' => sub {
+subtest 'map_ultra returns new collection with scalar results via @_ only' => sub {
   my $c = Mojo::Collection::XS->new(1, 2);
   local $_ = 'outer';
 
-  my $mapped = $c->map_pure_fast(sub {
-    my ($e, $num) = @_;
-    is($_, 'outer', '$_ untouched in scalar map');
-    return $e + $num;
+  my $mapped = $c->map_ultra(sub {
+    my ($e) = @_;
+    is($_, 'outer', '$_ untouched in ultra map');
+    return $e + 1;
   });
 
   isa_ok($mapped, 'Mojo::Collection::XS', 'mapped class preserved');
-  is_deeply([@$mapped], [2, 4], 'scalar results collected');
+  isnt($mapped, $c, 'returns new object');
+  is_deeply([@$mapped], [2, 3], 'scalar results collected');
 };
 
 subtest 'grep_fast filters with alias to $_' => sub {
   my $c = Mojo::Collection::XS->new(qw/a b c d/);
 
   my $filtered = $c->grep_fast(sub {
-    my ($e, $num) = @_;
+    my ($e) = @_;
+    state $i = 0;
+    my $num = ++$i;
     $_ .= $num;
     return $num % 2;
   });

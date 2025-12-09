@@ -52,17 +52,20 @@
             "Test::Spelling" : "0.17",
             "Test::Synopsis" : "0",
             "Test::Vars" : "0",
-            "Test::Version" : "1",
-            "perl" : "5.010"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
             "English" : "0",
             "Exporter" : "0",
+            "File::Spec" : "0",
             "Getopt::Long" : "0",
+            "IO::File" : "0",
             "Pod::Usage" : "0",
+            "Test::Perl::Critic" : "0",
             "constant" : "0",
             "open" : "0",
             "perl" : "5.010",
@@ -72,7 +75,12 @@
       },
       "test" : {
          "requires" : {
+            "FindBin" : "0",
+            "Test2::Require" : "0",
             "Test2::V0" : "0",
+            "Test::Script" : "1.28",
+            "base" : "0",
+            "lib" : "0",
             "perl" : "5.010"
          }
       }
@@ -90,7 +98,7 @@
          "web" : "https://github.com/mikkoi/env-assert"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_contributors" : [
       "Ivan Bessarabov <ivan@bessarabov.ru>",
       "gregor herrmann <gregoa@debian.org>",

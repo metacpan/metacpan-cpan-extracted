@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -13,6 +13,7 @@ use Feature::Compat::Class;
 
 {
    ok( !eval <<'EOPERL',
+      no warnings;
       field $field;
 EOPERL
       'field outside class fails' );
@@ -20,6 +21,7 @@ EOPERL
 
 {
    ok( !eval <<'EOPERL',
+      no warnings;
       class AClass { }
       field $field;
 EOPERL

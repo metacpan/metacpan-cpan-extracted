@@ -1,5 +1,22 @@
 Revision history for RT-Extension-Memo
 
+0.09 2025-12-08
+ - Upgrade doc to RT 6
+ - Add tests for merging with one ticket without Memo
+ - Upgrade tests to use RT::Test:Selenium with RT 6, no more phantomJS
+ - Fix merge with one ticket without Memo
+ - Pass RT > 6 to javascript
+ - Upgrade to htmx
+ - Upgrade to CKEditor 5
+ - Use Memo as widget for RT 6
+ - Use Callback only for RT < 6
+ - Upgrade Module::Install::RTx to RT 6
+ - Upgrade to RT 6
+ - Perl 5.26 and newer remove '.' from @inc by default. Re-add to Makefile.PL to enable installation on newer Perl releases.
+
+0.08  2022-12-14
+ - Update author's name
+
 0.07 2022-12-13
  - Upgrade to RT 5
 

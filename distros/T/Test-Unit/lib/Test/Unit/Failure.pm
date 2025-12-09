@@ -1,5 +1,7 @@
 package Test::Unit::Failure;
 use strict;
+use warnings;
+
 use base qw(Test::Unit::Exception);
 
 1;
@@ -12,7 +14,7 @@ Test::Unit::Failure - unit testing framework exception class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 

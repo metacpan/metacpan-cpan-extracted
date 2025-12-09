@@ -1,5 +1,12 @@
 Revision history for Feature-Compat-Class
 
+0.08    2025-12-08
+        [CHANGES]
+         * Updated for Perl v5.42 to support the `:writer` field attribute on
+           scalar fields
+         * Swapped unit tests from `Test::More` to `Test2::V0`
+         * Account for respelling of "unrecognized" in latest bleadperl
+
 0.07    2024-07-08
         [CHANGES]
          * Updated for Perl v5.40 to support the `:reader` field attribute and

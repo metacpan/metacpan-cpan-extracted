@@ -1,0 +1,5 @@
+# The env we need
+
+A_DIGIT=\d+
+A_MISSING_VAR=^[[:word:]]{1,}$
+ANOTHER_MISSING_VAR=^[[:word:]]{1,}$

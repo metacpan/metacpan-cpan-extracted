@@ -4,7 +4,7 @@
       "kobaken <kentafly88@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -56,7 +56,7 @@
    "provides" : {
       "Syntax::Keyword::Assert" : {
          "file" : "lib/Syntax/Keyword/Assert.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/kfly8/Syntax-Keyword-Assert"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_authority" : "cpan:KFLY",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0

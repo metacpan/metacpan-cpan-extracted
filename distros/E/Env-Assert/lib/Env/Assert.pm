@@ -1,161 +1,64 @@
-## no critic [ControlStructures::ProhibitPostfixControls]
-## no critic [ValuesAndExpressions::ProhibitConstantPragma]
-## no critic (ControlStructures::ProhibitCascadingIfElse)
+## no critic (ControlStructures::ProhibitPostfixControls)
+## no critic (ValuesAndExpressions::ProhibitConstantPragma)
 package Env::Assert;
 use strict;
 use warnings;
-
-use Exporter 'import';
-our @EXPORT_OK = qw(
-  assert
-  report_errors
-  file_to_desc
-);
-our %EXPORT_TAGS = ( 'all' => [qw( assert report_errors file_to_desc )], );
-
-use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
-use Carp;
+use 5.010;
 
 # ABSTRACT: Ensure that the environment variables match what you need, or abort.
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
-use constant {
-    ENV_ASSERT_MISSING_FROM_ENVIRONMENT    => 1,
-    ENV_ASSERT_INVALID_CONTENT_IN_VARIABLE => 2,
-    ENV_ASSERT_MISSING_FROM_DEFINITION     => 3,
-    DEFAULT_PARAMETER_BREAK_AT_FIRST_ERROR => 0,
-    INDENT                                 => q{    },
-};
+# We define our own import routine because
+# this is the point (when `use Env::Assert` is called)
+# when we do our magic.
 
-sub assert {
-    my ( $env, $want, $params ) = @_;
-    $params = {} if !$params;
-    croak 'Invalid options. Not a hash' if ( ref $env ne 'HASH' || ref $want ne 'HASH' );
+use Carp;
 
-    # Set default options
-    $params->{'break_at_first_error'} //= DEFAULT_PARAMETER_BREAK_AT_FIRST_ERROR;
+{
+    no warnings 'redefine';    ## no critic [TestingAndDebugging::ProhibitNoWarnings]
 
-    my $success = 1;
-    my %errors;
-    my $vars = $want->{'variables'};
-    my $opts = $want->{'options'};
-    foreach my $var_name ( keys %{$vars} ) {
-        my $var      = $vars->{$var_name};
-        my $required = $var->{'required'} // 1;
-        my $regexp   = $var->{'regexp'}   // q{.*};
-        if ( ( $opts->{'exact'} || $required ) && !defined $env->{$var_name} ) {
-            $success = 0;
-            $errors{'variables'}->{$var_name} = {
-                type    => ENV_ASSERT_MISSING_FROM_ENVIRONMENT,
-                message => "Variable $var_name is missing from environment",
-            };
-            goto EXIT if ( $params->{'break_at_first_error'} );
+    sub import {
+        my ( $class, $cmd, $args ) = @_;
+
+        if ( !assert_env( %{$args} ) ) {
+            croak 'Errors in environment detected.';
         }
-        elsif ( $env->{$var_name} !~ m/$regexp/msx ) {
-            $success = 0;
-            $errors{'variables'}->{$var_name} = {
-                type    => ENV_ASSERT_INVALID_CONTENT_IN_VARIABLE,
-                message => "Variable $var_name has invalid content",
-            };
-            goto EXIT if ( $params->{'break_at_first_error'} );
-        }
+        return;
     }
-    if ( $opts->{'exact'} ) {
-        foreach my $var_name ( keys %{$env} ) {
-            if ( !exists $vars->{$var_name} ) {
-                $success = 0;
-                $errors{'variables'}->{$var_name} = {
-                    type    => ENV_ASSERT_MISSING_FROM_DEFINITION,
-                    message => "Variable $var_name is missing from description",
-                };
-                goto EXIT if ( $params->{'break_at_first_error'} );
-            }
-        }
-    }
-
-  EXIT:
-    return { success => $success, errors => \%errors, };
 }
 
-sub report_errors {
-    my ($errors) = @_;
-    my $out = q{};
-    $out .= sprintf "Environment Assert: ERRORS:\n";
-    foreach my $error_area_name ( sort keys %{$errors} ) {
-        $out .= sprintf "%s%s:\n", INDENT, $error_area_name;
-        foreach my $error_key ( sort keys %{ $errors->{$error_area_name} } ) {
-            $out .= sprintf "%s%s: %s\n", INDENT . INDENT, $error_key, $errors->{$error_area_name}->{$error_key}->{'message'};
-        }
+use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
+use open ':std', IO => ':encoding(UTF-8)';
+
+use Env::Assert::Functions qw( :all );
+
+local $OUTPUT_AUTOFLUSH = 1;
+
+use constant { ENV_DESC_FILENAME => '.envdesc', };
+
+sub assert_env {
+    my (%args)               = @_;
+    my $env_desc_filename    = $args{'envdesc_file'}         // ENV_DESC_FILENAME;
+    my $break_at_first_error = $args{'break_at_first_error'} // 0;
+    my $exact                = $args{'exact'}                // 0;
+    open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
+    my @env_desc_rows = <$fh>;
+    close $fh or croak "Cannot close file '$env_desc_filename'";
+
+    my $desc = file_to_desc(@env_desc_rows);
+    my %parameters;
+    $parameters{'break_at_first_error'} = $break_at_first_error
+      if defined $break_at_first_error;
+    $desc->{'options'}->{'exact'} = $exact
+      if defined $exact;
+    my $r = assert( \%ENV, $desc, \%parameters );
+    if ( !$r->{'success'} ) {
+        print {*STDERR} report_errors( $r->{'errors'} )
+          or croak 'Cannot print errors to STDERR';
+        return 0;
     }
-    return $out;
-}
-
-sub file_to_desc {
-    my @rows = @_;
-    my %desc = ( 'options' => {}, 'variables' => {}, );
-    foreach (@rows) {
-
-        # This is envassert meta command
-        ## no critic (RegularExpressions::ProhibitComplexRegexes)
-        if (
-            m{
-            ^ [[:space:]]{0,} [#]{2}
-            [[:space:]]{1,} envassert [[:space:]]{1,}
-            [(] opts: [[:space:]]{0,} (?<opts> .*) [)]
-            [[:space:]]{0,} $
-            }msx
-          )
-        {
-            my $opts = _interpret_opts( $LAST_PAREN_MATCH{opts} );
-            foreach ( keys %{$opts} ) {
-                $desc{'options'}->{$_} = $opts->{$_};
-            }
-        }
-        elsif (
-            # This is comment row
-            m{
-                ^ [[:space:]]{0,} [#]{1} .* $
-            }msx
-          )
-        {
-            1;
-        }
-        elsif (
-            # This is empty row
-            m{
-                ^ [[:space:]]{0,} $
-            }msx
-          )
-        {
-            1;
-        }
-        elsif (
-            # This is env var description
-            m{
-                ^ (?<name> [^=]{1,}) = (?<value> .*) $
-            }msx
-          )
-        {
-            $desc{'variables'}->{ $LAST_PAREN_MATCH{name} } = { regexp => $LAST_PAREN_MATCH{value} };
-        }
-    }
-    return \%desc;
-}
-
-# Private subroutines
-
-sub _interpret_opts {
-    my ($opts_str) = @_;
-    my @opts = split qr{
-        [[:space:]]{0,} [,] [[:space:]]{0,}
-        }msx, $opts_str;
-    my %opts;
-    foreach (@opts) {
-        my ( $key, $val ) = split qr/=/msx;
-        $opts{$key} = $val;
-    }
-    return \%opts;
+    return 1;
 }
 
 1;
@@ -172,70 +75,47 @@ Env::Assert - Ensure that the environment variables match what you need, or abor
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
-    use Env::Assert qw( assert report_errors );
-
-    my %want = (
-        options => {
-            exact => 1,
-        },
-        variables => {
-            USER => { regexp => '^[[:word:]]{1}$', required => 1 },
-        },
-    );
-    my %parameters;
-    $parameters{'break_at_first_error'} = 1;
-    my $r = assert( \%ENV, \%want, \%parameters );
-    if( ! $r->{'success'} ) {
-        print report_errors( $r->{'errors'} );
-    }
-
-=for stopwords params env
+=for :stopwords env filepath filepaths
 
 =head1 STATUS
 
 Package Env::Assert is currently being developed so changes in the API are possible,
 though not likely.
 
+=for test_synopsis BEGIN { die 'SKIP: no .envdesc file here' }
+
+    use Env::Assert 'assert';
+    # or:
+    use Env::Assert assert => {
+        envdesc_file => 'another-envdesc',
+        break_at_first_error => 1,
+    };
+
+    # .envdesc file:
+    # MY_VAR=.+
+
+    # use any environment variable
+    say $ENV{MY_VAR};
+
 =head1 NOTES
+
+Functionality of L<Env::Assert> has been moved module L<Env::Assert::Functions> since version 0.013.
+L<Env::Assert> has a different API now.
+
+=head1 METHODS
+
+=head2 assert_env
+
+Read environment description, F<.envdesc> by default,
+and compare current environment.
 
 =head1 DEPENDENCIES
 
 No external dependencies outside Perl's standard distribution.
-
-=head1 FUNCTIONS
-
-No functions are automatically exported to the calling namespace.
-
-=head2 assert( \%env, \%want, \%params )
-
-Ensure your environment, parameter I<env> (hashref), matches with
-the environment description, parameter I<want> (hashref).
-Use parameter I<params> (hashref) to specify processing options.
-
-Supported params:
-
-=over 8
-
-=item break_at_first_error
-
-Verify environment only up until the first error.
-Then break and return with only that error.
-
-=back
-
-Return: hashref: { success => 1/0, errors => hashref, };
-
-=head2 report_errors( \%errors )
-
-Report errors in a nicely formatted way.
-
-=head2 file_to_desc( @rows )
-
-Extract an environment description from a F<.envdesc> file.
 
 =head1 SEE ALSO
 

@@ -73,7 +73,21 @@ STYLING
     defaults set in static/css/memo.cc.
 
 RT VERSION
-    Works with RT 4.2 or greater
+    Works with RT 4.2 or greater.
+
+  RT 6
+    In RT 6, Memo is available as a *widget*, that you can use on Display
+    Layouts for Tickets.
+
+    Also, in RT 6, a new Description field has been added to tickets, which
+    can play the same role as Memo. Still there are some differences between
+    these two widgets. Memo widget can be used only once in a page layout,
+    while Description can be used multiple times in the same page layout.
+    Memo widget is supposed to be used only on Display Layouts for tickets,
+    while Description can also be used in Create Layouts and Update Layouts.
+    Description widget is not available in SelfService while Memo is.
+    Description widget can only be edited with richtext editor (CKEditor)
+    while Memo can be configured to be edited in plain text.
 
 INSTALLATION
     perl Makefile.PL
@@ -81,7 +95,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::Memo');
@@ -93,9 +107,31 @@ INSTALLATION
         or add RT::Extension::Memo to your existing @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
+
+TEST SUITE
+    Memo comes with a fairly complete test suite. As for every RT extention
+    <https://docs.bestpractical.com/rt/6.0.2/writing_extensions.html#Tests>,
+    to run it, you will need a installed RT, set up in development mode
+    <https://docs.bestpractical.com/rt/6.0.2/hacking.html#Test-suite>. Since
+    Memo operates dynamically to show or edit information, some parts of its
+    processing rely on Javascript. Therefore, the test suite requires a
+    scriptable headless browser with Javascript capabilities. So, to work
+    with Selenium::Remote::Driver, you need to install Firefox and
+    geckodriver, or alternatively Chrome and chromedriver (see documentation
+    for Selenium Tests
+    <https://docs.bestpractical.com/rt/6.0.2/hacking.html#Test-suite>).
+
+    It should be noted that *Best Practical* is planing to implement
+    automated browser testing using Playwright, since Selenium tests in *RT
+    Core* have issues with false negatives, often because of htmx and issues
+    with implementing correct waiting behavior for pages. Memo tests
+    experience the same issues where a test can sometimes fail while the
+    same test pass most of the time. Memo tests will be rewritten with
+    Playwright to be more robust, when such tests will be available in *RT
+    Core*.
 
 AUTHOR
     Gérald Sédrati <gibus@easter-eggs.com>

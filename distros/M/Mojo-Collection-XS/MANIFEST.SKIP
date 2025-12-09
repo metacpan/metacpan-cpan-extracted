@@ -1,22 +1,33 @@
-# -- Skip VCS
-\.git
-\.github
-\.idea
+# Skip version control directories
+^\.git/
+^\.github/
 
-# -- Skip temp & dev artifacts
-^blib/
-^pm_to_blib
-^Makefile$
-^Makefile.old$
-^MYMETA\.
-^META\.
-^.*\.tar\.gz$
+# Skip JetBrains / IDE configs
+^\.idea/
 
-# -- Skip development-only dirs
-^test
-^venv/
+# Skip git config files
+^\.gitignore$
+^\.gitattributes$
 
-# -- Skip editor files
-\~
+# Skip editor & temporary files
+~$
 \.swp$
 \.bak$
+^MANIFEST\.bak$
+\.DS_Store$
+
+# Skip build artifacts
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^META\.(json|yml)$
+^.*\.tar\.gz$
+
+# Skip development-only directories
+^test/
+
+# Skip perltidy config
+^\.perltidyrc$
+

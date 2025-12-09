@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
@@ -21,7 +21,7 @@ class List {
 {
    my $l = List->new;
    $l->push(qw( a b c d ));
-   is_deeply( [ $l->nshift( 2 ) ],
+   is( [ $l->nshift( 2 ) ],
       [qw( a b )],
       '$l->nshift yields values' );
 }

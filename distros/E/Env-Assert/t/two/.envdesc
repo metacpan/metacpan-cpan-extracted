@@ -1,0 +1,10 @@
+# shellcheck disable=SC2034,SC2125
+
+# Simply assert the var exists
+ALERT_EMAIL=^.*$
+
+# Looks like a domain address
+SITE_URL=^https
+
+# POSIX regular expressions supported
+GITHUB_TOKEN=^[[:word:]]{1,}$

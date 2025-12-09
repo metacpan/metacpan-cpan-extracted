@@ -2,7 +2,9 @@
 # to be retrofitted as unit tests.
 package Test::Unit::UnitHarness;
 
-BEGIN {require 5.002;}
+use strict;
+use warnings;
+
 use base qw(Test::Unit::Runner Test::Unit::Test Exporter);
 
 use Config;
@@ -14,26 +16,22 @@ use Test::Unit::Debug qw(debug);
 use Test::Unit::TestCase;
 use Test::Unit::Exception;
 
-use strict;
+our $have_devel_corestack = 0;
 
-use vars qw($VERSION $verbose $switches $have_devel_corestack $curtest
-            @EXPORT @EXPORT_OK);
-$have_devel_corestack = 0;
+our $VERSION = "1.1502";
 
-$VERSION = "1.1502";
+our @EXPORT = qw(&runtests);
+our @EXPORT_OK = qw($verbose $switches);
 
-@EXPORT = qw(&runtests);
-@EXPORT_OK = qw($verbose $switches);
-
-$verbose = 0;
-$switches = "-w";
+our $verbose = 0;
+our $switches = "-w";
 
 # class and object methods
 
 sub new {
     my $class = shift;
     my ($name) = @_;
-    
+
     my @_Tests = ();
     my $self = {
         _Tests => \@_Tests,
@@ -42,7 +40,7 @@ sub new {
     };
     bless $self, $class;
     debug(ref($self) . "::new($name) called\n");
-    
+
     return $self;
 }
 
@@ -58,7 +56,7 @@ sub run {
     # pass -I flags to children
     my $old5lib = $ENV{PERL5LIB};
     local($ENV{'PERL5LIB'}) = join($Config{path_sep}, @INC);
-  
+
     if ($^O eq 'VMS') { $switches =~ s/-(\S*[A-Z]\S*)/"-$1"/g }
 
     $fh->open($test) or print "can't open $test. $!\n";
@@ -138,7 +136,7 @@ sub add_test {
 sub add_test_method {
   croak "This suite is not mutable.";
 }
- 
+
 sub count_test_cases {
   return 0;
 }
@@ -176,11 +174,11 @@ sub new {
     my $class = shift;
     my ($message) = @_;
     my $stacktrace = '';
-    
+
     $message = '' unless defined($message);
-    $stacktrace = $class . ": Output from external test\n" 
+    $stacktrace = $class . ": Output from external test\n"
                          . $message . "\n";
-    
+
     bless { stacktrace => $stacktrace }, $class;
 }
 
@@ -199,7 +197,7 @@ Test::Unit::UnitHarness - unit testing framework helper class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 

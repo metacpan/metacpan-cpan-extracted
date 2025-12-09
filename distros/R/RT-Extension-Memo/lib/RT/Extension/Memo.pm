@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::Memo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =encoding utf8
 
@@ -66,7 +66,13 @@ The CSS properties of the Memo widget can be styled by overwriting defaults set 
 
 =head1 RT VERSION
 
-Works with RT 4.2 or greater
+Works with RT 4.2 or greater.
+
+=head2 RT 6
+
+In RT 6, C<Memo> is available as a I<widget>, that you can use on C<Display Layouts> for Tickets.
+
+Also, in RT 6, a new C<Description> field has been added to tickets, which can play the same role as C<Memo>. Still there are some differences between these two widgets. C<Memo> widget can be used only once in a page layout, while C<Description> can be used multiple times in the same page layout. C<Memo> widget is supposed to be used only on C<Display Layouts> for tickets, while C<Description> can also be used in C<Create Layouts> and C<Update Layouts>. C<Description> widget is not available in C<SelfService> while C<Memo> is. C<Description> widget can only be edited with richtext editor (C<CKEditor>) while C<Memo> can be configured to be edited in plain text.
 
 =head1 INSTALLATION
 
@@ -80,7 +86,7 @@ Works with RT 4.2 or greater
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -94,11 +100,17 @@ or add C<RT::Extension::Memo> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
 =back
+
+=head1 TEST SUITE
+
+C<Memo> comes with a fairly complete test suite. As for every L<RT extention|https://docs.bestpractical.com/rt/6.0.2/writing_extensions.html#Tests>, to run it, you will need a installed C<RT>, set up in L<development mode|https://docs.bestpractical.com/rt/6.0.2/hacking.html#Test-suite>. Since C<Memo> operates dynamically to show or edit information, some parts of its processing rely on C<Javascript>. Therefore, the test suite requires a scriptable headless browser with C<Javascript> capabilities. So, to work with L<Selenium::Remote::Driver>, you need to install C<Firefox> and C<geckodriver>, or alternatively C<Chrome> and C<chromedriver> (see documentation for L<Selenium Tests|https://docs.bestpractical.com/rt/6.0.2/hacking.html#Test-suite>).
+
+It should be noted that I<Best Practical> is planing to implement automated browser testing using C<Playwright>, since C<Selenium> tests in I<RT Core> have issues with false negatives, often because of C<htmx> and issues with implementing correct waiting behavior for pages. C<Memo> tests experience the same issues where a test can sometimes fail while the same test pass most of the time. C<Memo> tests will be rewritten with C<Playwright> to be more robust, when such tests will be available in I<RT Core>.
 
 =cut
 
@@ -145,24 +157,29 @@ my $old_MergeInto = RT::Ticket->can("_MergeInto");
     my $self = shift;
     my $MergeInto = shift;
 
+    $self->ClearAttributes;
     my $attr = $self->FirstAttribute('Memo');
+    $MergeInto->ClearAttributes;
+    my $merged_attr = $MergeInto->FirstAttribute('Memo');
+
     my ($ok, $msg) = $old_MergeInto->($self, $MergeInto);
 
-    if ($attr && $attr->Content && $attr->Content !~ /^\s*$/) {
-        my $merged_memo = '';
-        my $merged_attr = $MergeInto->FirstAttribute('Memo');
-        if ($merged_attr && $merged_attr->Content && $merged_attr->Content !~ /^\s*$/) {
-            if (RT->Config->Get('MemoRichText', $self->CurrentUser)) {
-                $merged_memo = $merged_attr->Content . "<br />";
-            } else {
-                $merged_memo = $merged_attr->Content . "\n";
+    if ($ok) {
+        if ($attr && $attr->Content && $attr->Content !~ /^\s*$/) {
+            my $merged_memo = '';
+            if ($merged_attr && $merged_attr->Content && $merged_attr->Content !~ /^\s*$/) {
+                if (RT->Config->Get('MemoRichText', $self->CurrentUser)) {
+                    $merged_memo = $merged_attr->Content . "<br />";
+                } else {
+                    $merged_memo = $merged_attr->Content . "\n";
+                }
             }
-        }
-        $merged_memo .= $attr->Content;
-        my ($memo_ok, $memo_msg) = $MergeInto->SetAttribute(Name => 'Memo', Content => $merged_memo);
-        unless ($memo_ok) {
-            $RT::Handle->Rollback();
-            return (0, $self->loc("Merge failed. Couldn't merge Memo"));
+            $merged_memo .= $attr->Content;
+            my ($memo_ok, $memo_msg) = $MergeInto->SetAttribute(Name => 'Memo', Content => $merged_memo);
+            unless ($memo_ok) {
+                $RT::Handle->Rollback();
+                return (0, $self->loc("Merge failed. Couldn't merge Memo"));
+            }
         }
     }
 

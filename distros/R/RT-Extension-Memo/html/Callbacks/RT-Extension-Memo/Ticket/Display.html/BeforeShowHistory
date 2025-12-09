@@ -5,3 +5,8 @@
 <%ARGS>
 $Ticket
 </%ARGS>
+<%INIT>
+if (RT::Handle::cmp_version($RT::VERSION, '6.0.0') >= 0) {
+    return;
+}
+</%INIT>

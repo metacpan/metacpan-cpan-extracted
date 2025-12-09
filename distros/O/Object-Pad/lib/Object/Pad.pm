@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.822;
+package Object::Pad 0.823;
 
 use v5.18;
 use warnings;
@@ -323,21 +323,45 @@ I<Since version 0.822.>
 
 Causes the constructor for this class to be made available to the class body
 lexically, and I<not> installed as a symbol in the package's symbol table. The
-effect of this is that code inside the class can nake use of it as a lexical
+effect of this is that code inside the class can make use of it as a lexical
 function, but it is not available to callers outside the class. In this way,
 a wrapper method in the class itself is fully in control of how, and when,
 instances of the class are constructed.
 
-For example, a singleton class could be created by providing a wrapper 
-class method:
+For example, a singleton class could be created by providing a wrapper
+class method that lazily creates a single instance stored in a lexical
+variable in the class, ensuring every call returns the same instance.
 
    class A::Singleton :lexical_new {
       my $instance;
 
-      sub instance { $instance //= new(shift); }
+      method instance :common { $instance //= new(shift); }
 
       ...
    }
+
+Note also that since methods are I<not> considered when resolving bareword
+function call names, it is possible to provide a C<:common> class method
+called C<new>, which can wrap the default provided constructor. This can be
+useful for providing a constructor whose arguments are passed in some style
+other than the usual name/value pairs.
+
+For example, if a class only has one parameter it is sometimes common style
+to simply pass that one value as the only constructor parameter.
+
+   class Path :lexical_new {
+      field $filename :param :reader;
+
+      method new :common ($filename) {
+         return &new( $class, filename => $filename );
+      }
+   }
+
+   my $null = Path->new( "/dev/null" );
+
+Note carefully that to do this you must use C<method>. You cannot use C<sub>
+here as that will redefine the content of the I<lexical> sub C<new>, rather
+than creating a new package-named one.
 
 =head3 :repr(TYPE)
 

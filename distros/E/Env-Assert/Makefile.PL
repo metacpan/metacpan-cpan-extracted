@@ -21,33 +21,51 @@ my %WriteMakefileArgs = (
   "NAME" => "Env::Assert",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Cwd" => 0,
     "English" => 0,
     "Exporter" => 0,
+    "File::Spec" => 0,
     "Getopt::Long" => 0,
+    "IO::File" => 0,
     "Pod::Usage" => 0,
+    "Test::Perl::Critic" => 0,
     "constant" => 0,
     "open" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::V0" => 0
+    "FindBin" => 0,
+    "Test2::Require" => 0,
+    "Test2::V0" => 0,
+    "Test::Script" => "1.28",
+    "base" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/three/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Cwd" => 0,
   "English" => 0,
   "Exporter" => 0,
+  "File::Spec" => 0,
+  "FindBin" => 0,
   "Getopt::Long" => 0,
+  "IO::File" => 0,
   "Pod::Usage" => 0,
+  "Test2::Require" => 0,
   "Test2::V0" => 0,
+  "Test::Perl::Critic" => 0,
+  "Test::Script" => "1.28",
+  "base" => 0,
   "constant" => 0,
+  "lib" => 0,
   "open" => 0,
   "strict" => 0,
   "warnings" => 0

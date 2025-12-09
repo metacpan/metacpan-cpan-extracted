@@ -28,7 +28,7 @@ optional_features: {}
 provides:
   Class::XSConstructor:
     file: lib/Class/XSConstructor.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Exporter::Tiny: '1.000000'
   List::Util: '1.45'
@@ -40,5 +40,5 @@ resources:
   homepage: https://metacpan.org/release/Class-XSConstructor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-class-xsconstructor.git
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

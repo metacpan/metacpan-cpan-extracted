@@ -1,6 +1,7 @@
 package Test::Unit::Loader;
 
 use strict;
+use warnings;
 
 use FileHandle;
 use Test::Unit::Debug qw(debug);
@@ -24,7 +25,7 @@ sub compile {
     elsif ($target =~ /\.pm$/) {
         compile_file($target);
         # In this case I need to figure out what the class was I just loaded!
-        return get_package_name_from_file($target);        
+        return get_package_name_from_file($target);
     }
     else {
         return undef;
@@ -85,7 +86,7 @@ sub load_test_suite {
     if ($package->can("suite")) {
         debug("  $package has a suite() method\n");
         return $package->suite();
-    } 
+    }
 }
 
 sub load_test_case {
@@ -94,7 +95,7 @@ sub load_test_case {
     if ($package->isa("Test::Unit::TestCase")) {
         debug("  $package isa Test::Unit::TestCase\n");
         return Test::Unit::TestSuite->new($package);
-    } 
+    }
 }
 
 sub extract_testcases {

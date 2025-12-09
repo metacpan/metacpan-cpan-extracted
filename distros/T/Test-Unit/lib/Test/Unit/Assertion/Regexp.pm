@@ -1,6 +1,8 @@
 package Test::Unit::Assertion::Regexp;
 
 use strict;
+use warnings;
+
 use Test::Unit::Assertion;
 use base qw/Test::Unit::Assertion/;
 
@@ -43,7 +45,7 @@ Test::Unit::Assertion::Regexp - Assertion with regex matching
 This is rather more detail than the average user will need.
 Test::Unit::Assertion::Regexp objects are generated automagically by
 Test::Unit::Assert::assert when it is passed a regular expression as
-its first parameter. 
+its first parameter.
 
     sub test_foo {
       ...

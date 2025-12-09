@@ -1,14 +1,46 @@
 use strict;
 use warnings;
 
-use RT::Extension::Memo::Test tests => 11;
-RT->Config->Set('DevelMode', 1);
+use RT::Extension::Memo::Test tests => undef, selenium => 1;
 
-use WWW::Mechanize::PhantomJS;
+SKIP: {
+if (RT::Handle::cmp_version($RT::VERSION, '6.0.0') < 0) {
+    skip 'Selenium tests are only avalaible with RT 6';
+    fail('Selenium tests are only avalaible with RT 6');
+}
 
-# Create ticket
-my $ticket = RT::Ticket->new(RT->SystemUser);
-my ($ticket_id, $ticket_msg) = $ticket->Create(Queue => 'General', Subject => 'Test Ticket Memo');
+# Add Memo in Ticket Display page layout
+my $mapping = RT->Config->Get('PageLayoutMapping') || {};
+my $ticket_display_mapping = $mapping->{'RT::Ticket'}{Display};
+my $layout_name;
+for (my $i=0; $i < scalar(@$ticket_display_mapping); $i++) {
+    my $elt = $ticket_display_mapping->[$i];
+    if ($elt->{Type} eq 'Default') {
+        $layout_name = $elt->{Layout};
+        $elt->{Layout} = 'MemoLayout';
+        last;
+    }
+}
+
+my $page_layouts = RT->Config->Get('PageLayouts') || {};
+my $ticket_display_layout = $page_layouts->{'RT::Ticket'}{Display}{$layout_name};
+my @clone_layout = @$ticket_display_layout;
+
+for (my $i=0; $i < scalar(@clone_layout); $i++) {
+    my $elts = $clone_layout[$i]->{Elements};
+    for (my $j=0; $j < scalar(@$elts); $j++) {
+        if ($elts->[$j] eq 'History') {
+            splice @{$clone_layout[$i]->{Elements}}, $j, 0, 'Memo';
+            last;
+        }
+    }
+}
+$page_layouts->{'RT::Ticket'}{Display}{MemoLayout} = \@clone_layout;
+
+# Create queue and ticket
+my $queue_foo = RT::Extension::Memo::Test->load_or_create_queue( Name => 'Foo' );
+my $ticket = RT::Test->create_ticket( Queue => 'Foo', Subject => 'Test Ticket Memo', Requestor => 'root@localhost' );
+my $ticket_id = $ticket->id;
 
 # Create memo
 $ticket->SetAttribute(Name => 'Memo', Content => 'This is a <strong>memo</strong>');
@@ -18,29 +50,52 @@ my $user = RT::Test->load_or_create_user(Name => 'user', Password => 'password')
 ok(RT::Test->set_rights({Principal => $user, Right => [qw(ShowTicket SeeMemo ModifyMemo ModifySelf)]}), 'Set rights');
 
 # Login user
-my ($base, $m) = RT::Extension::Memo::Test->started_ok;
-my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->get($m->rt_base_url . '?user=user;pass=password');
+my ($url, $s) = RT::Extension::Memo::Test->started_ok;
+$s->login('user', 'password');
 
-# Unset Richtext preference
-$user->SetPreferences($RT::System, {'MemoRichText' => 0});
+diag "Testing editing plaintext Memo";
+{
+    # Unset Richtext preference
+    $user->SetPreferences($RT::System, {'MemoRichText' => 0});
 
-# Edit plaintext memo
-$mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
-my $action_button = $mjs->selector('#ActionMemo', single => 1);
-$mjs->click($action_button);
-my $textarea = $mjs->selector('#MemoContentEdit', single => 1);
-is($textarea->get_value, 'This is a <strong>memo</strong>', 'Edit memo in textarea');
-my ($no_cke, $no_type) = $mjs->eval('Object.keys(CKEDITOR.instances).length');
-is($no_cke, 0, 'No richtext instance created for editing memo');
+    # Display ticket
+    $s->goto_ticket($ticket_id);
+    $s->wait_for_htmx;
 
-# Set Richtext preference
-$user->SetPreferences($RT::System, {'MemoRichText' => 1});
+    # Click Add Memo
+    $s->click('#ActionMemo');
 
-$mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-$mjs->click($action_button);
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'No textarea');
-my ($cke_id, $type) = $mjs->eval('CKEDITOR.instances.MemoContentEdit.id');
-is($cke_id, 'cke_1', 'Richtext instance created for editing memo');
+    my $dom = $s->dom;
+
+    my $textarea = $dom->at('#MemoContentEdit');
+    is($textarea->val, 'This is a <strong>memo</strong>', 'Edit Memo in textarea without MemoRichText');
+
+    my $no_cke = $dom->at('#MemoContentEdit + div.ck-editor');
+    is($no_cke, undef, 'No richtext instance created for editing Memo without MemoRichText');
+}
+
+diag "Testing editing richtext Memo";
+{
+    # Set Richtext preference
+    $user->SetPreferences($RT::System, {'MemoRichText' => 1});
+
+    # Display ticket
+    $s->goto_ticket($ticket_id);
+    $s->wait_for_htmx;
+
+    # Click Add Memo
+    $s->click('#ActionMemo');
+
+    my $dom = $s->dom;
+
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'No textarea with MemoRichText');
+
+    my $no_cke = $dom->at('#MemoContentEdit + div.ck-editor');
+    ok($no_cke.length, 'Richtext instance created for editing Memo with MemoRichText');
+}
+
+$s->logout;
+}
+
+done_testing;

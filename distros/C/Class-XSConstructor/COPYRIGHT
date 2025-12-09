@@ -26,7 +26,7 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2019 Toby Inkster.
+Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -35,23 +35,27 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/03typenano.t
-Copyright: This software is copyright (c) 2019 by Toby Inkster.
+Files: t/05strictconstructor.t
+Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/03typenano.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  

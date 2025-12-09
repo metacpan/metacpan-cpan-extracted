@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -23,7 +23,7 @@ use Feature::Compat::Class;
    }
 
    Test1->new();
-   is_deeply( \@called, [qw( ADJUST-1 ADJUST-2 )], 'ADJUST blocks invoked in sequence' );
+   is( \@called, [qw( ADJUST-1 ADJUST-2 )], 'ADJUST blocks invoked in sequence' );
 
    is( $class_in_ADJUST, "Test1", '__CLASS__ during ADJUST block' );
 }

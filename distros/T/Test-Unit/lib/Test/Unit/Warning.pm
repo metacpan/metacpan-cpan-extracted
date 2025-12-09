@@ -1,6 +1,7 @@
 package Test::Unit::Warning;
-
 use strict;
+use warnings;
+
 use base 'Test::Unit::TestCase';
 
 =head1 NAME

@@ -4,7 +4,7 @@
       "Mark Overmeer <mark@overmeer.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,8 +40,7 @@
          "requires" : {
             "File::Basename" : "0",
             "File::Spec" : "0",
-            "List::Util" : "0",
-            "Test::More" : "0.47"
+            "List::Util" : "0"
          }
       },
       "test" : {
@@ -53,6 +52,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-MIME-Types/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
       "repository" : {
          "type" : "git",
@@ -60,7 +62,7 @@
          "web" : "https://github.com/markov2/perl5-MIME-Types"
       }
    },
-   "version" : "2.29",
+   "version" : "2.30",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 1999,

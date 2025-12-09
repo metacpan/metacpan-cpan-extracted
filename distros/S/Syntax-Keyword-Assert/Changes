@@ -1,5 +1,12 @@
 Revision history for Perl extension Syntax-Keyword-Assert
 
+0.18 2025-12-09T05:21:47Z
+    - Implement lazy evaluation for custom message expression #14
+
+0.17 2025-12-08T13:44:46Z
+    - Add custom error message support #11
+    - Fix test failures on Windows and older Perl #13
+
 0.16 2024-12-18T09:01:18Z
     - Fixed `isa` operator #9
 

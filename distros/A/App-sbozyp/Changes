@@ -1,3 +1,11 @@
+1.3.4  2025-12-08
+
+   - Renamed non-interactive flags from -i to -y
+   - More consistent exit status
+   - Added search -q option
+   - Renamed query -u flag to -v
+   - Added query -u flag to print upgradeable package names
+
 1.2.4  2025-12-07
 
    - Updated completion scripts for new sbozyp options

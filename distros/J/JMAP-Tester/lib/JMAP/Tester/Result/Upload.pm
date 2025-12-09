@@ -1,6 +1,6 @@
 use v5.14.0;
 
-package JMAP::Tester::Result::Upload 0.104;
+package JMAP::Tester::Result::Upload 0.105;
 # ABSTRACT: what you get when you upload a blob
 
 use Moo;
@@ -57,7 +57,7 @@ JMAP::Tester::Result::Upload - what you get when you upload a blob
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 OVERVIEW
 

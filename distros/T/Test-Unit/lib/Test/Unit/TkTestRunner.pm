@@ -1,8 +1,7 @@
-#!/usr/bin/perl -w
-
 package Test::Unit::TkTestRunner;
 
 use strict;
+use warnings;
 
 use base qw(Test::Unit::Runner);
 

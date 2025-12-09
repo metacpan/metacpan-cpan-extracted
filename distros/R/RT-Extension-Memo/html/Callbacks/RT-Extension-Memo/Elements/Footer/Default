@@ -1,0 +1,4 @@
+<script type="text/javascript">
+window.RT ||= {};
+RT.MemoRT6 = '<% RT::Handle::cmp_version($RT::VERSION, '6.0.0') >= 0 ? 1 : 0 |n%>';
+</script>

@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2025 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Class 0.07;
+package Feature::Compat::Class 0.08;
 
 use v5.14;
 use warnings;
 use feature ();
 
-use constant HAVE_FEATURE_CLASS => $^V ge v5.40;
+use constant HAVE_FEATURE_CLASS => $^V ge v5.42;
 
 =head1 NAME
 
@@ -20,8 +20,8 @@ C<Feature::Compat::Class> - make C<class> syntax available
    use Feature::Compat::Class;
 
    class Point {
-      field $x :param :reader = 0;
-      field $y :param :reader = 0;
+      field $x :param :reader :writer = 0;
+      field $y :param :reader :writer = 0;
 
       method move_to ($new_x, $new_y) {
          $x = $new_x;
@@ -45,7 +45,8 @@ Perl added such syntax at version 5.38.0, which is enabled by
    use feature 'class';
 
 This syntax was further expanded in 5.40, adding the C<__CLASS__> keyword and
-C<:reader> attribute on fields.
+C<:reader> attribute on fields, and again in 5.42 to add the C<:writer>
+attribute.
 
 On that version of perl or later, this module simply enables the core feature
 equivalent of using it directly. On such perls, this module will install with
@@ -73,12 +74,12 @@ sub import
    }
    else {
       require Object::Pad;
-      Object::Pad->VERSION( '0.806' );
+      Object::Pad->VERSION( '0.823' ); # :config(writer_only_scalar)
       Object::Pad->import(qw( class method field ADJUST ),
          ':experimental(init_expr)',
          ':config(' .
-            'always_strict only_class_attrs=isa only_field_attrs=param,reader ' .
-            'no_field_block no_adjust_attrs no_implicit_pragmata' .
+            'always_strict only_class_attrs=isa only_field_attrs=param,reader,writer ' .
+            'no_field_block no_adjust_attrs no_implicit_pragmata writer_only_scalar' .
          ')',
       );
    }
@@ -234,7 +235,7 @@ be removed if present.
    field $x :reader;
 
    # equivalent to
-   field $x;  method x { return $x }
+   field $x;  method x () { return $x }
 
 These are permitted on an field type, not just scalars. The reader method
 behaves identically to how a lexical variable would behave in the same
@@ -247,6 +248,29 @@ scalar context.
    foreach my $item ( $obj->items ) { ... }   # iterates the list of items
 
    my $count = $obj->items;                   # yields count of items
+
+=head3 :writer, :writer(NAME)
+
+I<Since version 0.08.>
+
+Generates a writer method to set a new value for the field. If no name is
+given, the name of the field is used with a C<set_> prefix. If a name is
+provided that will be used - you should remember to add a distinguishing
+prefix if required to keep it distinct from the reader method. A single
+prefix character C<_> will be removed if present.
+
+   field $x :writer;
+
+   # equivalent to
+   field $x;  method set_x ($new_x) { $x = $new_x; return $self; }
+
+When invoked, a C<:writer> method will return the invocant object itself.
+This is so that multiple fields can be modified in a convenient chaining
+syntax; for example:
+
+   $obj->set_x( 10 )
+       ->set_y( 20 )
+       ->set_z( 30 );
 
 =head2 ADJUST
 

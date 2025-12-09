@@ -16,6 +16,7 @@ JSON
 Karen
 Modern
 OpenAPI
+OpenAPI_3_0
 Schema
 Utilities
 Vocabulary

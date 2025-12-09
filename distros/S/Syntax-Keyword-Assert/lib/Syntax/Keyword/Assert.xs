@@ -9,6 +9,7 @@
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
 #include "newUNOP_CUSTOM.c.inc"
+#include "newBINOP_CUSTOM.c.inc"
 #include "sv_numeq.c.inc"
 #include "sv_numcmp.c.inc"
 #include "sv_streq.c.inc"
@@ -58,6 +59,15 @@ static OP *pp_assert(pTHX)
   croak_sv(msg);
 }
 
+/* Called after msgop is evaluated to croak with the message */
+static XOP xop_assert_croak;
+static OP *pp_assert_croak(pTHX)
+{
+  dSP;
+  SV *custom_msg = POPs;
+  croak_sv(custom_msg);
+}
+
 enum BinopType {
     BINOP_NONE,
     BINOP_NUM_EQ,
@@ -95,6 +105,49 @@ static enum BinopType classify_binop(int type)
   return BINOP_NONE;
 }
 
+/* Check if binary assertion passes. Returns true if assertion succeeds. */
+static bool S_assertbin_check(pTHX_ enum BinopType binoptype, SV *lhs, SV *rhs)
+{
+  switch(binoptype) {
+    case BINOP_NUM_EQ: return sv_numeq(lhs, rhs);
+    case BINOP_NUM_NE: return !sv_numeq(lhs, rhs);
+    case BINOP_NUM_LT: return sv_numcmp(lhs, rhs) == -1;
+    case BINOP_NUM_GT: return sv_numcmp(lhs, rhs) == 1;
+    case BINOP_NUM_LE: return sv_numcmp(lhs, rhs) != 1;
+    case BINOP_NUM_GE: return sv_numcmp(lhs, rhs) != -1;
+    case BINOP_STR_EQ: return sv_streq(lhs, rhs);
+    case BINOP_STR_NE: return !sv_streq(lhs, rhs);
+    case BINOP_STR_LT: return sv_cmp(lhs, rhs) == -1;
+    case BINOP_STR_GT: return sv_cmp(lhs, rhs) == 1;
+    case BINOP_STR_LE: return sv_cmp(lhs, rhs) != 1;
+    case BINOP_STR_GE: return sv_cmp(lhs, rhs) != -1;
+    case BINOP_ISA:    return sv_isa_sv(lhs, rhs);
+    default:           return FALSE; /* unreachable */
+  }
+}
+#define assertbin_check(binoptype, lhs, rhs) S_assertbin_check(aTHX_ binoptype, lhs, rhs)
+
+/* Get operator string for error message */
+static const char *binop_to_str(enum BinopType binoptype)
+{
+  switch(binoptype) {
+    case BINOP_NUM_EQ: return "==";
+    case BINOP_NUM_NE: return "!=";
+    case BINOP_NUM_LT: return "<";
+    case BINOP_NUM_GT: return ">";
+    case BINOP_NUM_LE: return "<=";
+    case BINOP_NUM_GE: return ">=";
+    case BINOP_STR_EQ: return "eq";
+    case BINOP_STR_NE: return "ne";
+    case BINOP_STR_LT: return "lt";
+    case BINOP_STR_GT: return "gt";
+    case BINOP_STR_LE: return "le";
+    case BINOP_STR_GE: return "ge";
+    case BINOP_ISA:    return "isa";
+    default:           return "??"; /* unreachable */
+  }
+}
+
 static XOP xop_assertbin;
 static OP *pp_assertbin(pTHX)
 {
@@ -103,134 +156,67 @@ static OP *pp_assertbin(pTHX)
   SV *lhs = POPs;
   enum BinopType binoptype = PL_op->op_private;
 
-  const char *op_str;
-
-  switch(binoptype) {
-    case BINOP_NUM_EQ:
-      if(sv_numeq(lhs, rhs))
-        goto ok;
-
-      op_str = "==";
-      break;
-
-    case BINOP_NUM_NE:
-      if(!sv_numeq(lhs, rhs))
-        goto ok;
-
-      op_str = "!=";
-      break;
-
-    case BINOP_NUM_LT:
-      if(sv_numcmp(lhs, rhs) == -1)
-        goto ok;
-
-      op_str = "<";
-      break;
-
-    case BINOP_NUM_GT:
-      if(sv_numcmp(lhs, rhs) == 1)
-        goto ok;
-
-      op_str = ">";
-      break;
-
-    case BINOP_NUM_LE:
-      if(sv_numcmp(lhs, rhs) != 1)
-        goto ok;
-
-      op_str = "<=";
-      break;
-
-    case BINOP_NUM_GE:
-      if(sv_numcmp(lhs, rhs) != -1)
-        goto ok;
-
-      op_str = ">=";
-      break;
-
-    case BINOP_STR_EQ:
-      if(sv_streq(lhs, rhs))
-        goto ok;
-
-      op_str = "eq";
-      break;
-
-    case BINOP_STR_NE:
-      if(!sv_streq(lhs, rhs))
-          goto ok;
-
-      op_str = "ne";
-      break;
-
-    case BINOP_STR_LT:
-      if(sv_cmp(lhs, rhs) == -1)
-        goto ok;
-
-      op_str = "lt";
-      break;
-
-    case BINOP_STR_GT:
-      if(sv_cmp(lhs, rhs) == 1)
-        goto ok;
-
-      op_str = "gt";
-      break;
-
-    case BINOP_STR_LE:
-      if(sv_cmp(lhs, rhs) != 1)
-        goto ok;
-
-      op_str = "le";
-      break;
-
-    case BINOP_STR_GE:
-      if(sv_cmp(lhs, rhs) != -1)
-        goto ok;
-
-      op_str = "ge";
-      break;
-
-    case BINOP_ISA:
-      if(sv_isa_sv(lhs, rhs))
-        goto ok;
-
-      op_str = "isa";
-      break;
-
-    default:
-      croak("ARGH unreachable");
-  }
+  if(assertbin_check(binoptype, lhs, rhs))
+    RETURN;
 
   SV *msg = sv_2mortal(newSVpvs("Assertion failed ("));
-
   sv_catsv_unqq(msg, lhs);
-  sv_catpvf(msg, " %s ", op_str);
+  sv_catpvf(msg, " %s ", binop_to_str(binoptype));
   sv_catsv_unqq(msg, rhs);
   sv_catpvs(msg, ")");
   croak_sv(msg);
-
-ok:
-  RETURN;
 }
 
-static int build_assert(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
+
+static int build_assert(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
-    OP *argop = arg0->op;
+    // assert(EXPR, EXPR)
+    //
+    //  assert($x == 1)
+    //  assert($x == 1, "x is not 1");
+    //
+    // first EXPR is the condition, second is the message.
+    // error message is optional.
+    // if the condition is false, the message is printed and the program dies.
+    OP *condop = args[0]->op;
+    OP *msgop  = args[2] ? args[2]->op : NULL;
+
     if (assert_enabled) {
-        enum BinopType binoptype = classify_binop(argop->op_type);
-        if (binoptype) {
-            argop->op_type = OP_CUSTOM;
-            argop->op_ppaddr = &pp_assertbin;
-            argop->op_private = binoptype;
-            *out = argop;
+        if (msgop) {
+            // With custom message: lazy evaluation using OP_OR
+            // assert(cond, msg) becomes: cond || do { croak(msg) }
+            //
+            // OP_OR: if condop is true, short-circuit; if false, evaluate other
+            // We use op_scope to isolate the other branch's op_next chain
+
+            OP *croakop     = newUNOP_CUSTOM(&pp_assert_croak, 0, msgop);
+            OP *scopedblock = op_scope(croakop);
+
+            *out = newLOGOP(OP_OR, 0, condop, scopedblock);
         }
         else {
-            *out = newUNOP_CUSTOM(&pp_assert, 0, argop);
+            // Without custom message: check if binary operator for better error
+            enum BinopType binoptype = classify_binop(condop->op_type);
+            if (binoptype) {
+                // Binary operator: use pp_assertbin for detailed error message
+                condop->op_type = OP_CUSTOM;
+                condop->op_ppaddr = &pp_assertbin;
+                condop->op_private = binoptype;
+
+                *out = condop;
+            }
+            else {
+                // Other expressions: use pp_assert
+                *out = newUNOP_CUSTOM(&pp_assert, 0, condop);
+            }
         }
     }
     else {
         // do nothing.
-        op_free(argop);
+        op_free(condop);
+        if (msgop) {
+            op_free(msgop);
+        }
         *out = newOP(OP_NULL, 0);
     }
 
@@ -239,8 +225,15 @@ static int build_assert(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdat
 
 static const struct XSParseKeywordHooks hooks_assert = {
   .permit_hintkey = "Syntax::Keyword::Assert/assert",
-  .piece1 = XPK_TERMEXPR_SCALARCTX,
-  .build1 = &build_assert,
+  .pieces = (const struct XSParseKeywordPieceType[]) {
+    XPK_ARGS(
+      XPK_TERMEXPR_SCALARCTX,
+      XPK_OPTIONAL(XPK_COMMA),
+      XPK_TERMEXPR_SCALARCTX_OPT
+    ),
+    {0}
+  },
+  .build = &build_assert,
 };
 
 MODULE = Syntax::Keyword::Assert    PACKAGE = Syntax::Keyword::Assert
@@ -258,6 +251,11 @@ BOOT:
   XopENTRY_set(&xop_assertbin, xop_class, OA_BINOP);
   Perl_custom_op_register(aTHX_ &pp_assertbin, &xop_assertbin);
 
+  XopENTRY_set(&xop_assert_croak, xop_name, "assert_croak");
+  XopENTRY_set(&xop_assert_croak, xop_desc, "assert croak with message");
+  XopENTRY_set(&xop_assert_croak, xop_class, OA_UNOP);
+  Perl_custom_op_register(aTHX_ &pp_assert_croak, &xop_assert_croak);
+
   register_xs_parse_keyword("assert", &hooks_assert, NULL);
 
   {
@@ -266,6 +264,7 @@ BOOT:
       SV *sv = newSVpvn(enabledstr, strlen(enabledstr));
       if(!SvTRUE(sv))
         assert_enabled = FALSE;
+      SvREFCNT_dec(sv);
     }
   }
 

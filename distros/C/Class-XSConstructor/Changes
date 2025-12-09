@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.010	2025-12-08
+
+ - Added: Allow MooseX::StrictConstructor-style constructors to be built;
+   which reject unknown parameters.
+ - Minor improvements to API.
+
 0.009	2019-01-07
 
  [ Test Suite ]
@@ -22,7 +28,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
  [ Packaging ]
  - Allow installation on Perl 5.8.1.
- - Devel::PPPort should be a configure recommentation, not a build
+ - Devel::PPPort should be a configure recommendation, not a build
    requirement.
 
  [ Other ]

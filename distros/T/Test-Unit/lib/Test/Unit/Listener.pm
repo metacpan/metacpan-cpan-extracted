@@ -1,7 +1,9 @@
 package Test::Unit::Listener;
+use strict;
+use warnings;
+
 use Test::Unit::Loader;
 use Carp;
-use strict;
 
 sub new {
     my $class = shift;
@@ -22,7 +24,7 @@ sub start_test {
     croak "call to abstract method ${class}::start_test";
 }
 
-sub add_error { 
+sub add_error {
     my $self = shift;
     my $class = ref($self);
     my ($test, $exception) = @_;
@@ -35,14 +37,14 @@ sub add_failure {
     my ($test, $exception) = @_;
     croak "call to abstract method ${class}::add_failure";
 }
- 
+
 sub end_test {
     my $self = shift;
     my $class = ref($self);
     my ($test) = @_;
     croak "call to abstract method ${class}::end_test";
 }
-    
+
 1;
 __END__
 
@@ -53,7 +55,7 @@ Test::Unit::Listener - unit testing framework abstract base class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 

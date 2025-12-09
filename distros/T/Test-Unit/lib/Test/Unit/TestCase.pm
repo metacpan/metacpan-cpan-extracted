@@ -1,11 +1,12 @@
 package Test::Unit::TestCase;
 use strict;
+use warnings;
 
 use base qw(Test::Unit::Test);
 
 use Test::Unit::Debug qw(debug);
-use Test::Unit::Failure; 
-use Test::Unit::Error; 
+use Test::Unit::Failure;
+use Test::Unit::Error;
 use Test::Unit::Result;
 
 use Devel::Symdump;
@@ -25,7 +26,7 @@ sub annotate {
     my $self = shift;
     $self->{__PACKAGE__ . '_annotations'} .= join '', @_;
 }
-  
+
 sub annotations { $_[0]->{__PACKAGE__ . '_annotations'} }
 
 sub count_test_cases {
@@ -67,7 +68,7 @@ sub run_bare {
 }
 
 sub run_test {
-    my $self = shift; 
+    my $self = shift;
     debug("    ", ref($self) . "::run_test() called on ", $self->name, "\n");
     my $method = $self->name();
     if ($self->can($method)) {
@@ -273,7 +274,7 @@ with exceptions, but will write tests that look something like:
         $self->assert(qr/some_pattern/, $resultB);
     }
 
-The assert methods throw appropriate exceptions when the assertions fail, 
+The assert methods throw appropriate exceptions when the assertions fail,
 which will generally stringify nicely to give you sensible error reports.
 
 L<Test::Unit::Assert> has more details on the various different
@@ -341,7 +342,7 @@ Here's a few things to remember when you're writing your test suite:
 
 Tests are run in 'random' order; the list of tests in your TestCase
 are generated automagically from its symbol table, which is a hash, so
-methods aren't sorted there. 
+methods aren't sorted there.
 
 If you need to specify the test order, you can do one of the
 following:

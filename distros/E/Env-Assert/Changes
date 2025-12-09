@@ -1,5 +1,9 @@
 Revision history for Env-Assert
 
+0.013     2025-12-09 00:10:04+01:00 Europe/Stockholm
+            * Move functionality from Env::Assert to Env::Assert::Functions.
+            * Make Env::Assert usable by only: "use Env::Assert 'assert';"
+
 0.012     2025-12-06 15:55:13+01:00 Europe/Stockholm
             * Rename dir script/ to bin/ to match with Dist::Zilla::Plugin::ExecDir defaults.
             * Add badges for license, CPAN and kwalitee to Readme.

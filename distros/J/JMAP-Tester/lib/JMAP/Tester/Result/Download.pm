@@ -1,6 +1,6 @@
 use v5.14.0;
 
-package JMAP::Tester::Result::Download 0.104;
+package JMAP::Tester::Result::Download 0.105;
 # ABSTRACT: what you get when you download a blob
 
 use Moo;
@@ -47,7 +47,7 @@ JMAP::Tester::Result::Download - what you get when you download a blob
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 OVERVIEW
 

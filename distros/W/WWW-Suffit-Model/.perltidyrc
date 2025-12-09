@@ -1,0 +1,38 @@
+# Base preset	
+-pbp        # Perl Best Practices as a starting point
+-w          # Show warnings
+-iob        # Ignore old breakpoints (#<<< #>>>)
+
+# Line length
+-l=120      # Max line width (120 characters per line)
+
+# Indentation
+-i=4        # 4 spaces indentation
+-ci=2       # Continuation indentation also 2
+-mbl=2      # Max 2 consecutive blank lines
+
+# Whitespace & structure
+-vt=0       # Relax vertical tightness a bit
+-pt=2       # Tight parentheses
+-bt=1       # Tight braces
+-sbt=1      # Tight square brackets
+-wn         # Weld nested containers
+
+# Comments
+-isbc       # Don't auto-indent inline comments without a space
+#-its=0      # Don’t touch POD indentation
+
+# Output behavior
+-nst        # Don't output to STDOUT (write .tdy or replace file)
+#-bao        # Backup original file only once (.bak) when rewriting
+
+# Code layout preferences
+--maximum-consecutive-blank-lines=2
+#--trim-trailing-space
+#--delete-old-breakpoints
+#--break-before-hash      # Allow nicer comment alignment when possible
+#--one-line-blocks        # Keep tiny {} blocks on one line when safe
+
+# Stability / reproducibility
+#--freeze-newlines        # Do not aggressively rewrite line breaks
+#--freeze-opt             # Avoid excessive reflow

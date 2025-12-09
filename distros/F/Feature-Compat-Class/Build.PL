@@ -8,11 +8,11 @@ my %REQUIRES_PERL = (
 );
 
 my %REQUIRES_OP = (
-   'Object::Pad' => '0.806',
+   'Object::Pad' => '0.823',
 );
 
-# We need the :reader attribute from 5.40
-my $HAVE_FEATURE_CLASS = $^V ge v5.40;
+# We need the :writer attribute from 5.42
+my $HAVE_FEATURE_CLASS = $^V ge v5.42;
 
 printf "Using %s\n",
    $HAVE_FEATURE_CLASS ? "core's feature 'class'" : "Object::Pad";
@@ -24,7 +24,7 @@ my $build = Module::Build->new(
       $HAVE_FEATURE_CLASS ? %REQUIRES_PERL : %REQUIRES_OP,
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

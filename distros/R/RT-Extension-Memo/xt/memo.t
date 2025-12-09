@@ -1,145 +1,239 @@
 use strict;
 use warnings;
+use Test::Deep;
 
-use RT::Extension::Memo::Test tests => 46;
-RT->Config->Set('DevelMode', 1);
+use RT::Extension::Memo::Test tests => undef, selenium => 1;
 
-use WWW::Mechanize::PhantomJS;
+SKIP: {
+if (RT::Handle::cmp_version($RT::VERSION, '6.0.0') < 0) {
+    skip 'Selenium test are only avalaible with RT 6';
+    fail('Selenium test are only avalaible with RT 6');
+}
 
-my $ticket = RT::Ticket->new(RT->SystemUser);
-my ($ticket_id, $ticket_msg) = $ticket->Create(Queue => 'General', Subject => 'Test Ticket Memo');
+# Add Memo in Ticket Display page layout
+my $mapping = RT->Config->Get('PageLayoutMapping') || {};
+my $ticket_display_mapping = $mapping->{'RT::Ticket'}{Display};
+my $layout_name;
+for (my $i=0; $i < scalar(@$ticket_display_mapping); $i++) {
+    my $elt = $ticket_display_mapping->[$i];
+    if ($elt->{Type} eq 'Default') {
+        $layout_name = $elt->{Layout};
+        $elt->{Layout} = 'MemoLayout';
+        last;
+    }
+}
 
-my ($base, $m) = RT::Extension::Memo::Test->started_ok;
-my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->get($m->rt_base_url . '?user=root;pass=password');
+my $page_layouts = RT->Config->Get('PageLayouts') || {};
+my $ticket_display_layout = $page_layouts->{'RT::Ticket'}{Display}{$layout_name};
+my @clone_layout = @$ticket_display_layout;
+
+for (my $i=0; $i < scalar(@clone_layout); $i++) {
+    my $elts = $clone_layout[$i]->{Elements};
+    for (my $j=0; $j < scalar(@$elts); $j++) {
+        if ($elts->[$j] eq 'History') {
+            splice @{$clone_layout[$i]->{Elements}}, $j, 0, 'Memo';
+            last;
+        }
+    }
+}
+$page_layouts->{'RT::Ticket'}{Display}{MemoLayout} = \@clone_layout;
+
+# Create queue and ticket
+my $queue_foo = RT::Extension::Memo::Test->load_or_create_queue(Name => 'Foo');
+my $ticket = RT::Test->create_ticket(Queue => 'Foo', Subject => 'Test Ticket Memo', Requestor => 'root@localhost');
+my $ticket_id = $ticket->id;
+
+my ($url, $s) = RT::Extension::Memo::Test->started_ok;
+$s->login();
 
 # Unset Richtext preference
-my $user = RT::Test->load_or_create_user(Name => 'root', Password => 'password');
+my $user = RT::Test->load_or_create_user(Name => 'root');
 $user->SetPreferences($RT::System, {'MemoRichText' => 0});
 
 # Display ticket
-$mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
+$s->goto_ticket($ticket_id);
+$s->wait_for_htmx;
 
-$ticket->ClearAttributes;
-my $attr = $ticket->FirstAttribute('Memo');
-is($attr, undef, 'No attribute on new ticket');
-my $div = $mjs->selector('#MemoContent', single => 1);
-ok($div->is_hidden, 'Memo hidden on new ticket');
-my $textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'Memo edition hidden on new ticket');
-my $action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Add', 'Action button is Add on new ticket');
-my $cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_hidden('data-action'), 'Cancel button hidden on new ticket');
+diag "Testing Memo area closed with no Memo";
+{
+    my $dom = $s->dom;
 
-# Click Add
-$mjs->click($action_button);
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr, undef, 'No attribute on new ticket');
 
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr, undef, 'No attribute on edit new ticket');
-$div = $mjs->selector('#MemoContent', single => 1);
-ok($div->is_hidden, 'Memo hidden on edit new ticket');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-is($textarea->get_value, '', 'Memo edition empty on edit new ticket');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Save', 'Action button is Save on edit new ticket');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_displayed, 'Cancel button displayed on edit new ticket');
+    my $div = $dom->at('#MemoContent');
+    like($div->attr('style'), qr(display: none), 'Memo hidden on new ticket');
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'Memo hidden on new ticket');
 
-# Fill textarea, click Cancel
-$mjs->field($textarea, 'This is a memo');
-$mjs->click($cancel_button);
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Add', 'Action button is Add on new ticket');
+    my $cancel_button = $dom->at('#CancelMemo');
+    like($cancel_button->attr('style'), qr(display: none), 'Cancel button hidden on new ticket');
+}
 
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr, undef, 'No attribute on canceled memo');
-$div = $mjs->selector('#MemoContent', single => 1);
-ok($div->is_hidden, 'Memo hidden on canceled memo');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'Memo edition hidden on canceled memo');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Add', 'Action button is Add on canceled memo');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_hidden('data-action'), 'Cancel button hidden on canceled memo');
+diag "Testing Memo area opened when adding a new Memo";
+{
+    $s->click('#ActionMemo');
 
-# Click Add, fill textarea, click Save
-$mjs->click($action_button);
-$mjs->field($textarea, 'This is a memo');
-$mjs->click($action_button);
+    my $dom = $s->dom;
 
-sleep 1; # wait for DB to sync
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, 'This is a memo', 'Attribute set on saved memo');
-$div = $mjs->selector('#MemoContent', single => 1);
-is($div->get_text, 'This is a memo', 'Memo set on saved memo');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'Memo edition hidden on saved memo');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Edit', 'Action button is Edit on saved memo');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_hidden('data-action'), 'Cancel button hidden on saved memo');
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr, undef, 'No attribute on editing new ticket');
 
-# Modify attribute
-$ticket->SetAttribute(Name => 'Memo', Content => "This is a modified memo");
+    my $div = $dom->at('#MemoContent');
+    like($div->attr('style'), qr(display: none), 'Memo hidden on editing new ticket');
+    my $textarea = $dom->at('#MemoContentEdit');
+    is($textarea->val, '', 'Memo edition empty on editing new ticket');
 
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, "This is a modified memo", 'Attribute set on modified attribute');
-$div = $mjs->selector('#MemoContent', single => 1);
-is($div->get_text, 'This is a memo', 'Memo set on modified attribute');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'Memo edition hidden on modified attribute');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Edit', 'Action button is Edit on modified attribute');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_hidden('data-action'), 'Cancel button hidden on modified attribute');
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Save', 'Action button is Save on editing new ticket');
+    my $cancel_button = $dom->at('#CancelMemo');
+    unlike($cancel_button->attr('style'), qr(display: none), 'Cancel button displayed on editing new ticket');
+}
 
-# Click Edit
-$mjs->click($action_button);
+diag "Testing Memo area closed when canceling Memo";
+{
+    $s->click('#CancelMemo');
 
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, "This is a modified memo", 'Attribute set on edit modified memo');
-$div = $mjs->selector('#MemoContent', single => 1);
-ok($div->is_hidden, 'Memo hidden on edit modified memo');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-is($textarea->get_value, "This is a modified memo", 'Memo edition set on edit modified memo');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Save', 'Action button is Save on edit modified memo');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_displayed, 'Cancel button displayed on edit memo attribute');
+    my $dom = $s->dom;
 
-# Reload ticket display
-$mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr, undef, 'No attribute on canceled Memo');
 
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, "This is a modified memo", 'Attribute set on reload modified memo');
-$div = $mjs->selector('#MemoContent', single => 1);
-is($div->get_text, "This is a modified memo", 'Memo set on reload modified attribute');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'Memo edition hidden on reload modified attribute');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Edit', 'Action button is Edit on reload modified memo');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_hidden, 'Cancel button hidden on reload memo attribute');
+    my $div = $dom->at('#MemoContent');
+    like($div->attr('style'), qr(display: none), 'Memo hidden on canceled Memo');
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'Memo edition hidden on canceled Memo');
 
-# Click edit, empty textarea, click Save
-$mjs->click($action_button);
-$mjs->field($textarea, '');
-$mjs->click($action_button);
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Add', 'Action button is Add on canceled Memo');
+    my $cancel_button = $dom->at('#CancelMemo');
+    like($cancel_button->attr('style'), qr(display: none), 'Cancel button hidden on canceled Memo');
+}
 
-sleep 1; # wait for DB to sync
-$ticket->ClearAttributes;
-$attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, '', 'Attribute empty on empty attribute');
-$div = $mjs->selector('#MemoContent', single => 1);
-ok($div->is_hidden, 'Memo hidden on empty attribute');
-$textarea = $mjs->selector('#MemoContentEdit', single => 1);
-ok($textarea->is_hidden, 'Memo edition hidden on empty attribute');
-$action_button = $mjs->selector('#ActionMemo', single => 1);
-is($action_button->get_attribute('data-action'), 'Add', 'Action button is Add on empty attribute');
-$cancel_button = $mjs->selector('#CancelMemo', single => 1);
-ok($cancel_button->is_hidden('data-action'), 'Cancel button hidden on empty attribute');
+diag "Testing adding Memo";
+{
+    $s->click('#ActionMemo');
+    my $textarea_s = $s->find_element_by_id('MemoContentEdit');
+    $textarea_s->send_keys('This is a memo');
+    $s->click('#ActionMemo');
+
+    my $dom = $s->dom;
+
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr->Content, 'This is a memo', 'Attribute set on saved Memo');
+
+    my $div = $dom->at('#MemoContent');
+    is($div->text, 'This is a memo', 'Memo set on saved Memo');
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'Memo edition hidden on saved Memo');
+
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Edit', 'Action button is Edit on saved Memo');
+    my $cancel_button = $dom->at('#CancelMemo');
+    like($cancel_button->attr('style'), qr(display: none), 'Cancel button hidden on saved Memo');
+}
+
+diag "Testing modifying attribute";
+{
+    $ticket->SetAttribute(Name => 'Memo', Content => "This is a modified memo");
+
+    my $dom = $s->dom;
+
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr->Content, 'This is a modified memo', 'Attribute set on modified attribute');
+
+    my $div = $dom->at('#MemoContent');
+    is($div->text, 'This is a memo', 'Memo set on modified attribute');
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'Memo edition hidden on modified attribute');
+
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Edit', 'Action button is Edit on modified attribute');
+    my $cancel_button = $dom->at('#CancelMemo');
+    like($cancel_button->attr('style'), qr(display: none), 'Cancel button hidden on modified attribute');
+}
+
+diag "Testing editing modified Memo";
+{
+    $s->click('#ActionMemo');
+
+    my $dom = $s->dom;
+
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr->Content, 'This is a modified memo', 'Attribute set on editing modified Memo');
+
+    my $div = $dom->at('#MemoContent');
+    like($div->attr('style'), qr(display: none), 'Memo hidden on editing modified Memo');
+    my $textarea_s = $s->find_element_by_id('MemoContentEdit');
+    is($textarea_s->get_attribute('value'), 'This is a modified memo', 'Memo edition set on editing modified Memo');
+
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Save', 'Action button is Save on editing modified Memo');
+    my $cancel_button = $dom->at('#CancelMemo');
+    unlike($cancel_button->attr('style'), qr(display: none), 'Cancel button displayed on editing modified Memo');
+}
+
+diag "Testing reloading ticket with modified Memo";
+{
+    $s->goto_ticket($ticket_id);
+    $s->wait_for_htmx;
+
+    my $dom = $s->dom;
+
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr->Content, 'This is a modified memo', 'Attribute set on reloading modified Memo');
+
+    my $div = $dom->at('#MemoContent');
+    is($div->text, 'This is a modified memo', 'Memo hidden on reloading modified Memo');
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'Memo edition hidden on reloading modified Memo');
+
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Edit', 'Action button is Edit on reloading modified Memo');
+    my $cancel_button = $dom->at('#CancelMemo');
+    like($cancel_button->attr('style'), qr(display: none), 'Cancel button hidden on reloading modified Memo');
+}
+
+diag "Testing modifying to empty Memo";
+{
+    $s->click('#ActionMemo');
+    my $textarea_s = $s->find_element_by_id('MemoContentEdit');
+    use Selenium::Remote::WDKeys;
+    my @keys = (KEYS->{'end'});
+    my $len = length('This is a modified memo');
+    for (my $i = 0; $i < $len; $i++) {
+        push @keys, KEYS->{'backspace'};
+    }
+    $textarea_s->send_keys(@keys);
+    $s->click('#ActionMemo');
+
+    my $dom = $s->dom;
+
+    $ticket->ClearAttributes;
+    my $attr = $ticket->FirstAttribute('Memo');
+    is($attr->Content, '', 'Attribute set on empty Memo');
+
+    my $div = $dom->at('#MemoContent');
+    like($div->attr('style'), qr(display: none), 'Memo content hidden on empty Memo');
+    my $textarea = $dom->at('#MemoContentEdit');
+    like($textarea->attr('style'), qr(display: none), 'Memo edition hidden on empty Memo');
+
+    my $action_button = $dom->at('#ActionMemo');
+    is($action_button->attr('data-action'), 'Add', 'Action button is Add on empty Memo');
+    my $cancel_button = $dom->at('#CancelMemo');
+    like($cancel_button->attr('style'), qr(display: none), 'Cancel button hidden on empty Memo');
+}
+
+$s->logout;
+}
+
+done_testing;

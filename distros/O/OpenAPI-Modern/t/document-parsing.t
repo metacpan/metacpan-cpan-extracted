@@ -1030,7 +1030,7 @@ YAML
   cmp_result([$doc->operations_with_tag('yup')], [], 'operations_with_tag("yup")');
 };
 
-subtest '3.0 checks' => sub {
+subtest '3.0 document' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
@@ -1066,6 +1066,186 @@ subtest '3.0 checks' => sub {
       },
     ],
     'missing paths (etc), and bad types for top level fields',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(<<'YAML'));
+openapi: 3.0.4
+info:
+  title: Test API
+  version: 1.2.3
+paths: {}
+components:
+  schemas:
+    OAS_3.0_schema:
+      type: array
+      # missing "items" here
+      anyOf:
+        - type: array
+          # no "items" here either
+YAML
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => '/components/schemas/OAS_3.0_schema/anyOf/0',
+        absoluteKeywordLocation => 'http://localhost:1234/api#/components/schemas/OAS_3.0_schema/anyOf/0',
+        error => '"items" must be present if type is "array"',
+      },
+      {
+        keywordLocation => '/components/schemas/OAS_3.0_schema',
+        absoluteKeywordLocation => 'http://localhost:1234/api#/components/schemas/OAS_3.0_schema',
+        error => '"items" must be present if type is "array"',
+      },
+    ],
+    'missing "items" keywords are identified',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'foo/api.json',
+    evaluator => my $js = JSON::Schema::Modern->new(strict => 1),
+    schema => $yamlpp->load_string(<<'YAML'));
+openapi: 3.0.4
+info:
+  title: Test API
+  version: 1.2.3
+paths: {}
+components:
+  schemas:
+    OAS_3.0_schema:
+      type: array
+      items:
+        type: string
+        nullable: 1
+YAML
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    superbagof(   # given the gratuitous use of oneOfs, the full error structure is hard to read
+      {
+        instanceLocation => '/components/schemas/OAS_3.0_schema/items/nullable',
+        keywordLocation => re(qr{/\$ref/properties/nullable/type$}),
+        absoluteKeywordLocation => DEFAULT_DIALECT->{'3.0'}.'/properties/nullable/type',
+        error => 'got integer, not boolean',
+      },
+      {
+        instanceLocation => '/components/schemas/OAS_3.0_schema/items',
+        keywordLocation => re(qr{/\$ref/properties$}),
+        absoluteKeywordLocation => DEFAULT_DIALECT->{'3.0'}.'/properties',
+        error => 'not all properties are valid',
+      },
+    ),
+    'errors in a subschema are found before evaluation',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'foo/api.json',
+    evaluator => $js = JSON::Schema::Modern->new(strict => 1),
+    schema => $yamlpp->load_string(<<'YAML'));
+openapi: 3.0.4
+info:
+  title: Test API
+  version: 1.2.3
+components:
+  schemas:
+    OAS_3.0_schema:
+      type: array
+      items:
+        type: string
+        nullable: true
+paths:
+  /foo/bar:
+    get:
+      operationId: foobar
+      parameters:
+        - name: foo
+          in: path
+          required: true
+          schema: {}
+      responses:
+        2XX:
+          description: ..
+          content:
+            application/json:
+              schema: {}
+YAML
+
+  cmp_result([ $doc->errors ], [], 'no errors in a 3.0 OAD');
+
+  cmp_result(
+    $doc->_entities,
+    {
+      '/components/schemas/OAS_3.0_schema' => 0,
+      '/components/schemas/OAS_3.0_schema/items' => 0,
+      '/paths/~1foo~1bar' => 9,
+      '/paths/~1foo~1bar/get/parameters/0' => 2,
+      '/paths/~1foo~1bar/get/parameters/0/schema' => 0,
+      '/paths/~1foo~1bar/get/responses/2XX' => 1,
+      '/paths/~1foo~1bar/get/responses/2XX/content/application~1json' => 10,
+      '/paths/~1foo~1bar/get/responses/2XX/content/application~1json/schema' => 0,
+    },
+    'all entities are identified in the document',
+  );
+
+  cmp_result(
+    $doc->_operationIds,
+    { foobar => '/paths/~1foo~1bar/get' },
+    'extracted the correct location of all operationIds',
+  );
+
+  cmp_result(
+    $doc->{resource_index},
+    {
+      'foo/api.json' => {
+        canonical_uri => str('foo/api.json'),
+        path => '',
+        specification_version => 'draft4',
+        vocabularies => [ 'JSON::Schema::Modern::Vocabulary::OpenAPI_3_0' ],
+      },
+    },
+    'document uses correct specification version and vocabulary',
+  );
+
+  cmp_result(
+    $js->{_metaschema_vocabulary_classes},
+    superhashof({
+      DEFAULT_DIALECT->{'3.0'} => [ 'draft4', [ 'JSON::Schema::Modern::Vocabulary::OpenAPI_3_0' ] ],
+    }),
+    'OpenAPI 3.0 dialect is registered with its own custom vocabulary',
+  );
+
+  $js->add_document($doc);
+  cmp_result(
+    $js->evaluate([ 1 ], 'foo/api.json#/components/schemas/OAS_3.0_schema')->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/0',
+          keywordLocation => '/items/type',
+          absoluteKeywordLocation => 'foo/api.json#/components/schemas/OAS_3.0_schema/items/type',
+          error => 'got integer, not string or null',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/items',
+          absoluteKeywordLocation => 'foo/api.json#/components/schemas/OAS_3.0_schema/items',
+          error => 'subschema is not valid against all items',
+        },
+      ],
+    },
+    'can evaluate an invalid schema in a 3.0 document',
+  );
+
+  cmp_result(
+    $js->evaluate([ undef ], 'foo/api.json#/components/schemas/OAS_3.0_schema')->TO_JSON,
+    { valid => true },
+    'can evaluate a valid schema in a 3.0 document',
   );
 };
 

@@ -1,5 +1,5 @@
 use v5.14.0;
-package JMAP::Tester::Response::Sentence::Set 0.104;
+package JMAP::Tester::Response::Sentence::Set 0.105;
 # ABSTRACT: the kind of sentence you get in reply to a setFoos call
 
 use Moo;
@@ -182,7 +182,7 @@ JMAP::Tester::Response::Sentence::Set - the kind of sentence you get in reply to
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 OVERVIEW
 

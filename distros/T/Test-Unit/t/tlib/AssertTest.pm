@@ -1,6 +1,7 @@
 package AssertTest;
 
 use strict;
+use warnings;
 
 use ExceptionChecker;
 use TestObject;
@@ -11,9 +12,7 @@ use Test::Unit::Error;
 use Error qw/:try/;
 use Class::Inner;
 
-use vars qw/@ISA/;
-@ISA = qw(Test::Unit::TestCase ExceptionChecker);
-
+our @ISA = qw(Test::Unit::TestCase ExceptionChecker);
 
 sub test_assert_equals {
     my $self = shift;

@@ -1,7 +1,7 @@
 use v5.14.0;
 use warnings;
 
-package JMAP::Tester::UA::Async 0.104;
+package JMAP::Tester::UA::Async 0.105;
 
 use Moo;
 with 'JMAP::Tester::Role::UA';
@@ -116,7 +116,7 @@ JMAP::Tester::UA::Async
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 PERL VERSION
 

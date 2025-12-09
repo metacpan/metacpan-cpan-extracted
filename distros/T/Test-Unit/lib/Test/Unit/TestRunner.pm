@@ -1,5 +1,6 @@
 package Test::Unit::TestRunner;
 use strict;
+use warnings;
 
 use base qw(Test::Unit::Runner);
 

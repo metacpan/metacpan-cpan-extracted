@@ -1,5 +1,12 @@
 Revision history for Object-Pad
 
+0.823   2025-12-08
+        [CHANGES]
+         * Added internals to support Feature::Compat::Class restricting the
+           `:writer` attribute to just scalars, to match perl 5.42
+         * Document and test that a class method can be called `new` and still
+           use the lexical constructor
+
 0.822   2025-11-30
         [CHANGES]
          * Added `:lexical_new` class attribute to assist in various design

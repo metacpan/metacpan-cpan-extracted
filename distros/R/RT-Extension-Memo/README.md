@@ -4,7 +4,7 @@ RT::Extension::Memo - Add a memo widget to tickets
 
 # DESCRIPTION
 
-This module adds a new widget to any [ticket](https://metacpan.org/pod/RT::Ticket) which allows to add, edit and display information directly on the ticket display page.
+This module adds a new widget to any [ticket](https://metacpan.org/pod/RT%3A%3ATicket) which allows to add, edit and display information directly on the ticket display page.
 
 In many cases, resolving a ticket involves to collect and store some information which helps the owner of the ticket to find some solution. Such information includes tips and tricks, _todo_ list, etc. The common way to handle such information in RT is to paste it into comments.
 
@@ -48,7 +48,13 @@ The CSS properties of the Memo widget can be styled by overwriting defaults set 
 
 # RT VERSION
 
-Works with RT 4.2 or greater
+Works with RT 4.2 or greater.
+
+## RT 6
+
+In RT 6, `Memo` is available as a _widget_, that you can use on `Display Layouts` for Tickets.
+
+Also, in RT 6, a new `Description` field has been added to tickets, which can play the same role as `Memo`. Still there are some differences between these two widgets. `Memo` widget can be used only once in a page layout, while `Description` can be used multiple times in the same page layout. `Memo` widget is supposed to be used only on `Display Layouts` for tickets, while `Description` can also be used in `Create Layouts` and `Update Layouts`. `Description` widget is not available in `SelfService` while `Memo` is. `Description` widget can only be edited with richtext editor (`CKEditor`) while `Memo` can be configured to be edited in plain text.
 
 # INSTALLATION
 
@@ -58,7 +64,7 @@ Works with RT 4.2 or greater
 
     May need root permissions
 
-- Edit your `/opt/rt5/etc/RT_SiteConfig.pm`
+- Edit your `/opt/rt6/etc/RT_SiteConfig.pm`
 
     If you are using RT 4.2 or greater, add this line:
 
@@ -72,9 +78,15 @@ Works with RT 4.2 or greater
 
 - Clear your mason cache
 
-        rm -rf /opt/rt5/var/mason_data/obj
+        rm -rf /opt/rt6/var/mason_data/obj
 
 - Restart your webserver
+
+# TEST SUITE
+
+`Memo` comes with a fairly complete test suite. As for every [RT extention](https://docs.bestpractical.com/rt/6.0.2/writing_extensions.html#Tests), to run it, you will need a installed `RT`, set up in [development mode](https://docs.bestpractical.com/rt/6.0.2/hacking.html#Test-suite). Since `Memo` operates dynamically to show or edit information, some parts of its processing rely on `Javascript`. Therefore, the test suite requires a scriptable headless browser with `Javascript` capabilities. So, to work with [Selenium::Remote::Driver](https://metacpan.org/pod/Selenium%3A%3ARemote%3A%3ADriver), you need to install `Firefox` and `geckodriver`, or alternatively `Chrome` and `chromedriver` (see documentation for [Selenium Tests](https://docs.bestpractical.com/rt/6.0.2/hacking.html#Test-suite)).
+
+It should be noted that _Best Practical_ is planing to implement automated browser testing using `Playwright`, since `Selenium` tests in _RT Core_ have issues with false negatives, often because of `htmx` and issues with implementing correct waiting behavior for pages. `Memo` tests experience the same issues where a test can sometimes fail while the same test pass most of the time. `Memo` tests will be rewritten with `Playwright` to be more robust, when such tests will be available in _RT Core_.
 
 # AUTHOR
 

@@ -1,14 +1,14 @@
 package Test::Unit::Procedural;
 
 use strict;
+use warnings;
 
 use Test::Unit::TestSuite;
 use Test::Unit::TestRunner;
 
 use base 'Exporter';
 
-use vars qw(@EXPORT);
-@EXPORT = qw(assert create_suite run_suite add_suite);
+our @EXPORT = qw(assert create_suite run_suite add_suite);
 
 # Helper classes
 use Devel::Symdump;
@@ -22,9 +22,8 @@ use Test::Unit::Failure;
 # private
 
 my $test_suite = Test::Unit::TestSuite->empty_new("Test::Unit");
-my %suites = ();
-%suites = ('Test::Unit' => $test_suite);
-    
+my %suites = ('Test::Unit' => $test_suite);
+
 sub add_to_suites {
     my $suite_holder = shift;
     if (not exists $suites{$suite_holder}) {
@@ -38,7 +37,7 @@ sub add_to_suites {
 sub assert ($;$) {
     my($condition, $message) = @_;
     my($asserter,$file,$line) = caller(1);
-    
+
     add_to_suites($asserter);
     try {
         $suites{$asserter}->assert($condition, $message);
@@ -56,7 +55,7 @@ sub create_suite {
     my ($test_package_name) = @_;
     $test_package_name = caller() unless defined($test_package_name);
     add_to_suites($test_package_name);
-    
+
     no strict 'refs';
 
     my $set_up_func    = sub {};

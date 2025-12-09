@@ -1,9 +1,10 @@
 package Test::Unit::HarnessUnit;
 # this is a test runner which outputs in the same
-# format that Test::Harness expects. 
+# format that Test::Harness expects.
 use strict;
+use warnings;
 
-use base qw(Test::Unit::Runner); 
+use base qw(Test::Unit::Runner);
 
 use Test::Unit::TestSuite;
 use Test::Unit::Loader;
@@ -120,7 +121,7 @@ Test::Unit::HarnessUnit - unit testing framework helper class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 

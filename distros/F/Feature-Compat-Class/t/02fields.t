@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -40,9 +40,9 @@ class Counter {
       field %hash   = ( 89 => 10 );
 
       method test {
-         Test::More::is(        $scalar, 123,         '$scalar field' );
-         Test::More::is_deeply( \@array, [ 45, 67 ],  '@array field' );
-         Test::More::is_deeply( \%hash, { 89 => 10 }, '%hash field' );
+         ::is( $scalar, 123,          '$scalar field' );
+         ::is( \@array, [ 45, 67 ],   '@array field' );
+         ::is( \%hash,  { 89 => 10 }, '%hash field' );
       }
    }
 

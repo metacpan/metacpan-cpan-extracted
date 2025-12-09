@@ -1,7 +1,7 @@
 package Test::Unit::Assert;
 
-
 use strict;
+use warnings;
 
 use Test::Unit::Debug qw(debug);
 use Test::Unit::Failure;
@@ -110,7 +110,7 @@ sub multi_assert {
 
 sub is_numeric {
     my $str = shift;
-    local $^W;
+    no warnings 'numeric';
     return defined $str && ! ($str == 0 && $str !~ /^\s*[+-]?0(e0)?\s*$/i);
 }
 
@@ -352,7 +352,7 @@ sub _format_stack {
     }
 
     my @vals = @{$Stack[-1]{vals}}[0,1];
-    
+
     my @vars = ();
     ($vars[0] = $var) =~ s/\$FOO/  \$a/;
     ($vars[1] = $var) =~ s/\$FOO/  \$b/;
@@ -360,7 +360,7 @@ sub _format_stack {
     my $out = "Structures begin differing at:\n";
     foreach my $idx (0..$#vals) {
         my $val = $vals[$idx];
-        $vals[$idx] = !defined $val ? 'undef' : 
+        $vals[$idx] = !defined $val ? 'undef' :
                       $val eq $DNE  ? "Does not exist"
                                     : "'$val'";
     }
@@ -421,7 +421,7 @@ sub _format_stack {
                   -text => @_ ? join('',@_) : "expected '$num1', got undef"
               );
             # silence `Argument "" isn't numeric in numeric eq (==)' warnings
-            local $^W; 
+            no warnings 'numeric';
             $num1 == $num2 or
               Test::Unit::Failure->throw(
                   -text => @_ ? join('', @_) : "expected $num1, got $num2"
@@ -441,7 +441,7 @@ sub _format_stack {
                     "expected a number != '$num1', got undef"
               );
             # silence `Argument "" isn't numeric in numeric ne (!=)' warnings
-            local $^W; 
+            no warnings 'numeric';
             $num1 != $num2 or
               Test::Unit::Failure->throw(
                   -text => @_ ? join('', @_) : "$num1 and $num2 should differ"
@@ -539,8 +539,8 @@ Test::Unit::Assert - unit testing framework assertion class
 
 =head1 SYNOPSIS
 
-    # this class is not intended to be used directly, 
-    # normally you get the functionality by subclassing from 
+    # this class is not intended to be used directly,
+    # normally you get the functionality by subclassing from
     # Test::Unit::TestCase
 
     use Test::Unit::TestCase;
@@ -556,7 +556,7 @@ Test::Unit::Assert - unit testing framework assertion class
     $self->assert(sub {
                       $_[0] == $_[1]
                         or $self->fail("Expected $_[0], got $_[1]");
-                  }, 1, 2); 
+                  }, 1, 2);
 
     # or, for old style regular expression comparisons
     # (strongly deprecated; see warning below)
@@ -584,7 +584,7 @@ This class contains the various standard assertions used within the
 framework. With the exception of the C<assert(CODEREF, @ARGS)>, all
 the assertion methods take an optional message after the mandatory
 fields. The message can either be a single string, or a list, which
-will get concatenated. 
+will get concatenated.
 
 Although you can specify a message, it is hoped that the default error
 messages generated when an assertion fails will be good enough for
@@ -601,7 +601,7 @@ most cases.
 The catch all assertions of (in)equality. We make a guess about
 whether to test for numeric or string (in)equality based on the first
 argument. If it looks like a number then we do a numeric test, if it
-looks like a string, we do a string test. 
+looks like a string, we do a string test.
 
 If the first argument is an object, we check to see if the C<'=='>
 operator has been overloaded and use that if it has, otherwise we do
@@ -640,7 +640,7 @@ quite sure what will happen with filehandles.
 
 Assert that ARG is defined or not defined.
 
-=item assert(BOOLEAN [, MESSAGE]) 
+=item assert(BOOLEAN [, MESSAGE])
 
 Checks if the BOOLEAN expression returns a true value that is neither
 a CODE ref nor a REGEXP.  Note that MESSAGE is almost non optional in

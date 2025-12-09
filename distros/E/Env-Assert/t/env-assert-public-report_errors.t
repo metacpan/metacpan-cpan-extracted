@@ -1,16 +1,9 @@
 #!perl
-## no critic [ValuesAndExpressions::ProhibitConstantPragma]
 use strict;
 use warnings;
 use Test2::V0;
 
-use Env::Assert qw( report_errors );
-
-use constant {
-    ENV_ASSERT_MISSING_FROM_ENVIRONMENT    => 1,
-    ENV_ASSERT_INVALID_CONTENT_IN_VARIABLE => 2,
-    ENV_ASSERT_MISSING_FROM_DEFINITION     => 3,
-};
+use Env::Assert::Functions qw( report_errors :constants );
 
 subtest 'Public Subroutine report_errors()' => sub {
 
@@ -23,7 +16,7 @@ subtest 'Public Subroutine report_errors()' => sub {
                 },
             },
         );
-        my $expected = <<END_OF_TEXT;
+        my $expected = <<'END_OF_TEXT';
 Environment Assert: ERRORS:
     variables:
         USER: Variable USER has invalid content
@@ -45,7 +38,7 @@ END_OF_TEXT
                 },
             },
         );
-        my $expected = <<END_OF_TEXT;
+        my $expected = <<'END_OF_TEXT';
 Environment Assert: ERRORS:
     variables:
         NEEDLESS_1: Variable NEEDLESS_1 is missing from definition
@@ -57,7 +50,7 @@ END_OF_TEXT
 
     {
         my %errors   = ();
-        my $expected = <<END_OF_TEXT;
+        my $expected = <<'END_OF_TEXT';
 Environment Assert: ERRORS:
 END_OF_TEXT
         my $out = report_errors( \%errors );

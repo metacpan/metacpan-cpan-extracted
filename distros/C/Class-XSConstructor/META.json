@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Class-XSConstructor",
    "no_index" : {
@@ -61,7 +61,7 @@
    "provides" : {
       "Class::XSConstructor" : {
          "file" : "lib/Class/XSConstructor.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -80,6 +80,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project"
    },
-   "version" : "0.009",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

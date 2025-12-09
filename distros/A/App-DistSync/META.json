@@ -1,16 +1,16 @@
 {
-   "abstract" : "Utility synchronization of the mirror distribution-sites",
+   "abstract" : "Utility for synchronizing distribution mirrors",
    "author" : [
       "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-DistSync",
    "no_index" : {
@@ -42,19 +42,22 @@
             "LWP" : "6.08",
             "URI" : "1.7",
             "YAML::Tiny" : "1",
-            "perl" : "5.012001"
+            "perl" : "5.020"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://app-distsync.sourceforge.net",
+      "homepage" : "https://sourceforge.net/projects/app-distsync/",
       "license" : [
          "https://dev.perl.org/licenses"
       ],
       "repository" : {
-         "url" : "https://svn.code.sf.net/p/app-distsync/code/trunk"
+         "type" : "git",
+         "url" : "https://abalama@git.code.sf.net/p/app-distsync/trunk",
+         "web" : "https://sourceforge.net/p/app-distsync/trunk/ci/master/tree/"
       }
    },
-   "version" : "1.06"
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

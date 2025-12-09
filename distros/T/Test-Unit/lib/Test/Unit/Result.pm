@@ -1,5 +1,6 @@
 package Test::Unit::Result;
 use strict;
+use warnings;
 
 use Test::Unit::Debug qw(debug);
 use Test::Unit::Error;
@@ -122,7 +123,7 @@ sub run_protected {
         $self->add_failure($test, shift);
     }
     catch Error with {
-        # *Any* exception which isn't a failure or
+        # *Any* Error.pm-based exception which isn't a failure or
         # Test::Unit::Exception should get rebuilt and added to the
         # result as a Test::Unit::Error, so that the stringify()
         # method can be called on it for nice reporting.
@@ -130,6 +131,17 @@ sub run_protected {
         $error = Test::Unit::Error->make_new_from_error($error)
           unless $error->isa('Test::Unit::Exception');
         $self->add_error($test, $error);
+    }
+    otherwise {
+        # We got an error that isn't an Error.pm-based exception!  Let's make a
+        # new Test::Unit::Error (Error.pm-based) that includes the original
+        # one, stringified.
+        my $error = shift;
+        my $new_error = Test::Unit::Error->make_new_from_error(
+            Error::Simple->new("exception while testing: $error")
+        );
+
+        $self->add_error($test, $new_error);
     };
 }
 

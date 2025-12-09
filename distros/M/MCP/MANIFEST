@@ -6,6 +6,7 @@ lib/MCP.pm
 lib/MCP/Client.pm
 lib/MCP/Constants.pm
 lib/MCP/Prompt.pm
+lib/MCP/Resource.pm
 lib/MCP/Server.pm
 lib/MCP/Server/Transport.pm
 lib/MCP/Server/Transport/HTTP.pm
@@ -15,6 +16,7 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/apps/empty.wav
 t/apps/lite_app.pl
 t/apps/mojolicious.png
 t/apps/stdio.pl
@@ -22,6 +24,7 @@ t/lib/MCPStdioTest.pm
 t/lite_app.t
 t/pod.t
 t/pod_coverage.t
+t/session_specific_app.t
 t/stdio.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

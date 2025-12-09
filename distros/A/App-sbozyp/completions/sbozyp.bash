@@ -69,7 +69,7 @@ _sbozyp_complete() {
 
     case $command in
         install|in)
-            local opts="--help -f -i -k -r"
+            local opts="--help -f -k -r -y"
             if [[ $cur == in ]]; then
                 COMPREPLY=( "install" )
             elif [[ $cur == -* ]]; then
@@ -80,7 +80,7 @@ _sbozyp_complete() {
             fi
             ;;
         build|bu)
-            local opts="--help -f -i"
+            local opts="--help -f -y"
             if [[ $cur == bu ]]; then
                 COMPREPLY=( "build" )
             elif [[ $cur == -* ]]; then
@@ -99,7 +99,7 @@ _sbozyp_complete() {
             fi
             ;;
         query|qr)
-            local opts="--help -a -b -c -d -i -m -n -o -p -q -r -s -u"
+            local opts="--help -a -b -c -d -i -m -n -o -p -q -r -s -u -v"
             if [[ $cur == qr ]]; then
                 COMPREPLY=( "query" )
             elif [[ $cur == -* ]]; then
@@ -110,7 +110,7 @@ _sbozyp_complete() {
             fi
             ;;
         remove|rm)
-            local opts="--help -f -i -r"
+            local opts="--help -f -r -y"
             if [[ $cur == rm ]]; then
                 COMPREPLY=( "remove" )
             elif [[ $cur == -* ]]; then
@@ -121,7 +121,7 @@ _sbozyp_complete() {
             fi
             ;;
         search|se)
-            local opts="--help -c -n -p"
+            local opts="--help -c -n -p -q"
             if [[ $cur == se ]]; then
                 COMPREPLY=( "search" )
             else

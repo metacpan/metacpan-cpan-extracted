@@ -1,6 +1,6 @@
 use Test2::V0;
+use Test2::Require::Perl 'v5.38'; # Syntax::Operator::Is requires Perl v5.38+ for custom infix operators
 use Test2::Require::Module 'Syntax::Operator::Is', '0.02';
-use Test2::Require::Module 'XS::Parse::Infix', '0.44';
 use Test2::Require::Module 'Data::Checks', '0.09';
 
 use Syntax::Keyword::Assert;

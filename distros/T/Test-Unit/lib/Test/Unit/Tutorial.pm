@@ -50,7 +50,7 @@ Martin Fowler. Addison-Wesley, 1999.
 
 =item *
 
-The JUnit (unit testing framework for Java) documentation. 
+The JUnit (unit testing framework for Java) documentation.
 
 =item *
 

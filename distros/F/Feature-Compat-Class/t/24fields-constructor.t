@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -16,7 +16,7 @@ class Point {
 
 {
    my $point = Point->new( x => 10 );
-   is_deeply( [ $point->pos ], [ 10, 0 ],
+   is( [ $point->pos ], [ 10, 0 ],
       'Point with default y' );
 }
 
@@ -44,7 +44,7 @@ my $QUOT = qr/["]?/;
    my $LINE = __LINE__+1;
    ok( !defined eval { Colour->new( yellow => 1 ); 1 },
       'constructor complains about unrecognised param name' );
-   like( $@, qr/^Unrecognised parameters for ${QUOT}Colour${QUOT} constructor: '?yellow'? at \S+ line $LINE\./,
+   like( $@, qr/^Unrecogni[sz]ed parameters for ${QUOT}Colour${QUOT} constructor: '?yellow'? at \S+ line $LINE\./,
       'exception message from unrecognised parameter' );
 }
 
@@ -58,19 +58,19 @@ my $QUOT = qr/["]?/;
       method values { return ( $exists, $defined, $true ); }
    }
 
-   is_deeply( [ AllTheOps->new(exists => "value", defined => "value", true => "value")->values ],
+   is( [ AllTheOps->new(exists => "value", defined => "value", true => "value")->values ],
       [ "value", "value", "value" ],
       'AllTheOps for true values' );
 
-   is_deeply( [ AllTheOps->new(exists => 0, defined => 0, true => 0)->values ],
+   is( [ AllTheOps->new(exists => 0, defined => 0, true => 0)->values ],
       [ 0, 0, "default" ],
       'AllTheOps for false values' );
 
-   is_deeply( [ AllTheOps->new(exists => undef, defined => undef, true => undef)->values ],
+   is( [ AllTheOps->new(exists => undef, defined => undef, true => undef)->values ],
       [ undef, "default", "default" ],
       'AllTheOps for undef values' );
 
-   is_deeply( [ AllTheOps->new()->values ],
+   is( [ AllTheOps->new()->values ],
       [ "default", "default", "default" ],
       'AllTheOps for missing values' );
 }

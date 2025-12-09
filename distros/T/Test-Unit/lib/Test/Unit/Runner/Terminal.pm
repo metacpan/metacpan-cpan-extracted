@@ -1,5 +1,6 @@
 package Test::Unit::Runner::Terminal;
 use strict;
+use warnings;
 
 use base qw(Test::Unit::TestRunner);
 

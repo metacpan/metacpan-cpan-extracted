@@ -1,5 +1,6 @@
 package Test::Unit::TestSuite;
 use strict;
+use warnings;
 
 =head1 NAME
 
@@ -22,7 +23,7 @@ use Test::Unit::Warning;
 
     use base qw(Test::Unit::TestSuite);
 
-    sub name { 'My very own test suite' } 
+    sub name { 'My very own test suite' }
     sub include_tests { qw(MySuite1 MySuite2 MyTestCase1 ...) }
 
 This is the easiest way of building suites; there are many more.  Read on ...
@@ -42,11 +43,11 @@ object, e.g.
 
     sub suite {
         my $class = shift;
-        
+
         # Create an empty suite.
         my $suite = Test::Unit::TestSuite->empty_new("A Test Suite");
         # Add some tests to it via $suite->add_test() here
-        
+
         return $suite;
     }
 
@@ -77,7 +78,7 @@ C<include_tests()> method as shorthand:
 
     use base qw(Test::Unit::TestSuite);
 
-    sub name { 'My very own test suite' } 
+    sub name { 'My very own test suite' }
     sub include_tests { qw(MySuite1 MySuite2 MyTestCase1 ...) }
 
 This is the easiest way of building suites.
@@ -96,13 +97,13 @@ sub empty_new {
     my $this = shift;
     my $classname = ref $this || $this;
     my $name = shift || '';
-    
+
     my $self = {
         _Tests => [],
         _Name => $name,
     };
     bless $self, $classname;
-    
+
     debug(ref($self), "::empty_new($name) called\n");
     return $self;
 }
@@ -231,7 +232,7 @@ Of course, there are many ways of getting the object too ...
     # $suite.
     use MySuite2;
     $suite->add_test(MySuite2->suite());
-    
+
     # Extract test case methods from MyModule::TestCase into a
     # new suite and add it to $suite.
     $suite->add_test(Test::Unit::TestSuite->new('MyModule::TestCase'));
@@ -273,7 +274,7 @@ sub run {
             next;
         }
         debug(sprintf "+ didn't skip '%s'\n", $t->name());
- 
+
         last if $result->should_stop();
         $t->run($result, $runner);
     }
@@ -282,7 +283,7 @@ sub run {
 
     return $result;
 }
-    
+
 sub filter_test {
     my $self = shift;
     my ($runner, $test) = @_;

@@ -1,6 +1,8 @@
 package Test::Unit::Assertion::CodeRef;
 
 use strict;
+use warnings;
+
 use base qw/Test::Unit::Assertion/;
 
 use Carp;
@@ -89,7 +91,7 @@ code like:
     $self->assert(sub {
                     $_[0] == $_[1]
                       or $self->fail("Expected $_[0], got $_[1]");
-                  }, 1, 2); 
+                  }, 1, 2);
 
 (Note that if Damian Conway's Perl6 RFC for currying ever comes to
 pass then we'll be able to do this as:
@@ -101,7 +103,7 @@ which will be nice...)
 If you have a working B::Deparse installed with your perl installation
 then, if an assertion fails, you'll see a listing of the decompiled
 coderef (which will be sadly devoid of comments, but should still be
-useful) 
+useful)
 
 =head1 AUTHOR
 

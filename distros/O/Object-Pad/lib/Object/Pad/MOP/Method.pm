@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Method 0.822;
+package Object::Pad::MOP::Method 0.823;
 
 use v5.18;
 use warnings;

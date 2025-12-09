@@ -1,4 +1,4 @@
-# This code is part of Perl distribution MIME-Types version 2.29.
+# This code is part of Perl distribution MIME-Types version 2.30.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package MIME::Types;{
-our $VERSION = '2.29';
+our $VERSION = '2.30';
 }
 
 
@@ -43,8 +39,8 @@ sub _read_db($)
 	my $only_complete   = $args->{only_complete};
 	my $only_iana       = $args->{only_iana};
 
-	my $db              = $ENV{PERL_MIME_TYPE_DB} || $args->{db_file}
-	  || File::Spec->catfile(dirname(__FILE__), 'types.db');
+	my $db              = $ENV{PERL_MIME_TYPE_DB} || $args->{db_file} ||
+		File::Spec->catfile(dirname(__FILE__), 'types.db');
 
 	open my $dbh, '<:encoding(utf8)', $db
 		or die "cannot open type database in $db: $!\n";
@@ -204,7 +200,7 @@ sub httpAcceptBest($@)
 	{	$acc   =~ s/\s*\;.*//;    # remove attributes
 		my $m = $acc !~ s#/\*$## ? first { $_->equals($acc) } @_
 		      : $acc eq '*'      ? $_[0]     # $acc eq */*
-		      :   first { $_->mediaType eq $acc } @_;
+		      :    first { $_->mediaType eq $acc } @_;
 		return $m if defined $m;
 	}
 

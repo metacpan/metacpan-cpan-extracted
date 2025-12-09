@@ -1,10 +1,12 @@
 Changes
 etc/Memo_Config.pm
+html/Callbacks/RT-Extension-Memo/Elements/Footer/Default
 html/Callbacks/RT-Extension-Memo/Elements/JavascriptConfig/Data
 html/Callbacks/RT-Extension-Memo/Ticket/Display.html/BeforeShowHistory
 html/Elements/Memo
 html/Helpers/GetMemo
 html/Helpers/SetMemo
+html/Ticket/Widgets/Display/Memo
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -22,6 +24,7 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/YAML/Tiny.pm
 lib/RT/Extension/Memo.pm
+lib/RT/Extension/Memo/Test.pm
 lib/RT/Extension/Memo/Test.pm.in
 LICENSE
 Makefile.PL
@@ -37,4 +40,3 @@ xt/memo.t
 xt/merge.t
 xt/richtext.t
 xt/rights.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

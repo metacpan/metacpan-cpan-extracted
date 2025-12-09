@@ -1,5 +1,5 @@
 ---
-abstract: 'Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document'
+abstract: 'Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
@@ -23,7 +23,6 @@ build_requires:
   YAML::PP: '0.005'
   lib: '0'
   perl: v5.20.0
-  strict: '0'
   warnings: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
@@ -36,6 +35,7 @@ keywords:
   - JSON
   - Schema
   - OpenAPI
+  - v3.0
   - v3.1
   - v3.2
   - Swagger
@@ -57,16 +57,19 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.112'
+    version: '0.113'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.112'
+    version: '0.113'
+  JSON::Schema::Modern::Vocabulary::OpenAPI_3_0:
+    file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm
+    version: '0.113'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.112'
+    version: '0.113'
   OpenAPI::Modern::Utilities:
     file: lib/OpenAPI/Modern/Utilities.pm
-    version: '0.112'
+    version: '0.113'
 requires:
   Carp: '0'
   Digest::MD5: '0'
@@ -102,13 +105,14 @@ requires:
   open: '0'
   perl: v5.20.0
   stable: '0.031'
+  strict: '0'
   strictures: '2'
   utf8: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.112'
+version: '0.113'
 x_Dist_Zilla:
   perl:
     version: '5.043005'
@@ -527,6 +531,7 @@ x_Dist_Zilla:
             - JSON
             - Schema
             - OpenAPI
+            - v3.0
             - v3.1
             - v3.2
             - Swagger
@@ -796,7 +801,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.112
+          tag: v0.113
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

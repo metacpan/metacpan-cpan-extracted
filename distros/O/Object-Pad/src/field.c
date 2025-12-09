@@ -837,6 +837,11 @@ static struct FieldHookFuncs fieldhooks_reader = {
 
 static bool fieldhook_writer_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
+  HV *hints = GvHV(PL_hintgv);
+  if(hv_fetchs(hints, "Object::Pad/configure(writer_only_scalar)", 0) &&
+      mop_field_get_sigil(fieldmeta) != '$')
+    croak("Can only apply a :writer attribute to scalar fields");
+
   *attrdata_ptr = make_accessor_mnamesv(aTHX_ fieldmeta, value, "set_%s");
   return TRUE;
 }

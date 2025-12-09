@@ -6,31 +6,42 @@ use XSLoader ();
 package Class::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.009';
+our $VERSION   = '0.010';
 
 use Exporter::Tiny 1.000000 qw( mkopt );
 use Ref::Util 0.100 qw( is_plain_arrayref is_plain_hashref is_blessed_ref is_coderef );
 use List::Util 1.45 qw( uniq );
 
 sub import {
-	my $class  = shift;
-	my $caller = our($SETUP_FOR) || caller;
+	my $class = shift;
+	my ( $package, $methodname );
+	if ( 'ARRAY' eq ref $_[0] ) {
+		( $package, $methodname ) = @{+shift};
+	}
+	$package    ||= our($SETUP_FOR) || caller;
+	$methodname ||= 'new';
 	
 	if (our $REDEFINE) {
 		no warnings 'redefine';
-		install_constructor("$caller\::new");
+		install_constructor("$package\::$methodname");
 	}
 	else {
-		install_constructor("$caller\::new");
+		install_constructor("$package\::$methodname");
 	}
-	inheritance_stuff($caller);
+	inheritance_stuff($package);
 	
-	my ($HAS, $REQUIRED, $ISA, $BUILDALL) = get_vars($caller);
+	my ($HAS, $REQUIRED, $ISA, $BUILDALL, $STRICT) = get_vars($package);
 	$$BUILDALL = undef;
+	$$STRICT = !!0;
 	
 	for my $pair (@{ mkopt \@_ }) {
 		my ($name, $thing) = @$pair;
 		my %spec;
+		
+		if ($name eq '!!') {
+			$$STRICT = !!1;
+			next;
+		}
 		
 		if (is_plain_arrayref($thing)) {
 			%spec = @$thing;
@@ -70,26 +81,27 @@ sub import {
 }
 
 sub get_vars {
-	my $caller = shift;
+	my $package = shift;
 	no strict 'refs';
 	(
-		\@{"$caller\::__XSCON_HAS"},
-		\@{"$caller\::__XSCON_REQUIRED"},
-		\%{"$caller\::__XSCON_ISA"},
-		\${"$caller\::__XSCON_BUILD"},
+		\@{"$package\::__XSCON_HAS"},
+		\@{"$package\::__XSCON_REQUIRED"},
+		\%{"$package\::__XSCON_ISA"},
+		\${"$package\::__XSCON_BUILD"},
+		\${"$package\::__XSCON_STRICT"},
 	);
 }
 
 sub inheritance_stuff {
-	my $caller = shift;
+	my $package = shift;
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	
-	my @isa = reverse @{ mro::get_linear_isa($caller) };
-	pop @isa;  # discard $caller itself
+	my @isa = reverse @{ mro::get_linear_isa($package) };
+	pop @isa;  # discard $package itself
 	return unless @isa;
 	
-	my ($HAS, $REQUIRED, $ISA) = get_vars($caller);
+	my ($HAS, $REQUIRED, $ISA) = get_vars($package);
 	foreach my $parent (@isa) {
 		my ($pHAS, $pREQUIRED, $pISA) = get_vars($parent);
 		@$HAS      = uniq(@$HAS, @$pHAS);
@@ -99,10 +111,10 @@ sub inheritance_stuff {
 }
 
 sub populate_build {
-	my $caller = ref($_[0]) || $_[0];
-	my (undef, undef, undef, $BUILDALL) = get_vars($caller);
+	my $package = ref($_[0]) || $_[0];
+	my (undef, undef, undef, $BUILDALL) = get_vars($package);
 	
-	if (!$caller->can('BUILD')) {
+	if (!$package->can('BUILD')) {
 		$$BUILDALL = 0;
 		return;
 	}
@@ -112,7 +124,7 @@ sub populate_build {
 	
 	$$BUILDALL  = [
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($caller) }
+		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($package) }
 	];
 	
 	return;
@@ -176,6 +188,11 @@ class.
 Supports required attributes using an exclamation mark. The name attribute
 in the synopsis is required.
 
+When multiple required attributes are missing, the constructor will only
+report the first one it encountered, based on the order the attributes were
+declared in. This is for compatibility with Moo and Moose error messages,
+which also only report the first missing required attribute.
+
 =item *
 
 Provides support for type constraints.
@@ -200,6 +217,11 @@ Type constraints can also be provided as coderefs returning a boolean:
 
 Type constraints are likely to siginificantly slow down your constructor.
 
+When multiple attributes fail their type check, the constructor will only
+report the first one it encountered, based on the order the attributes were
+declared in. This is for compatibility with Moo and Moose error messages,
+which also only report the first failed check.
+
 Note that Class::XSConstructor is only building your constructor for you.
 For read-write attributes, I<< checking the type constraint in the accessor
 is your responsibility >>.
@@ -209,6 +231,77 @@ is your responsibility >>.
 Supports Moose/Moo/Class::Tiny-style C<BUILD> methods.
 
 Including C<< __no_BUILD__ >>.
+
+=item *
+
+Optionally supports strict-style constructors a la L<MooX::StrictConstructor>
+and L<MooseX::StrictConstructor>. To opt in, pass "!!" as part of the import
+line. Although it doesn't really matter where in the list you include it,
+I recommend putting it at the end for readability.
+
+  use Class::XSConstructor qw( name! age email phone !! );
+
+Or:
+
+  use Class::XSConstructor (
+    "name!"    => Str,
+    "age"      => Int,
+    "email"    => sub { !ref($_[0]) and $_[0] =~ /\@/ },
+    "phone"    => Str,
+    "!!",
+  );
+
+Error messages when violating the strict constructor will list all the
+unexpected arguments, but the order in which they are listed will be
+unpredictable.
+
+The strict constructor check happens I<after> C<BUILD> methods have been
+called. Because C<BUILD> methods are passed a reference to the init args
+hashref, they can alter it, removing certain keys if they need to. For
+example:
+
+    use v5.36;
+    
+    package Person {
+        
+        use Class::XSConstructor qw( fullname !! );
+        use Class::XSAccessor { accessors => [ 'fullname' ] };
+        
+        sub BUILD ( $self, $args ) {
+            if ( exists $args->{given_name} and exists $args->{surname} ) {
+                $self->fullname(
+                    join q{ } => (
+                        delete $args->{given_name},
+                        delete $args->{surname},
+                    )
+                );
+            }
+        }
+    }
+    
+    my $bob = Person->new( given_name => 'Bob', surname => 'Dobalina' );
+    say $bob->fullname;
+
+=item *
+
+Constructor names other than C<< __PACKAGE__->new >>:
+
+  use Class::XSConstructor [ 'Person', 'create' ] => qw( name! age email phone );
+  
+  my $bob = Person->create( name => 'Bob Dobalina' );
+
+It is B<NOT> possible to create two different constructors for the same class
+with different attributes for each:
+
+  use Class::XSConstructor [ 'Person', 'new_by_phone' ] => qw( name! phone );
+  use Class::XSConstructor [ 'Person', 'new_by_email' ] => qw( name! email );
+
+However, you can create multiple contructors that all use the same defined
+list of attributes.
+
+  use Class::XSConstructor [ 'Person', 'new' ] => qw( name! phone email );
+  Class::XSConstructor::install_constructor( 'Person::new_by_phone' );
+  Class::XSConstructor::install_constructor( 'Person::new_by_email' );
 
 =back
 
@@ -228,10 +321,19 @@ None of the following functions are exported.
 =item C<< Class::XSConstructor->import(@optlist) >>
 
 Does all the setup for a class to install the constructor. Will determine which
-class to install the constructor into based on C<caller>. You can override this
+class to install the constructor into based on C<caller> and call the method
+C<new>. You can override this by passing an arrayref of the package name to
+do the setup for, followed by the method name for the constructor:
+
+  Class::XSConstructor->import( [ $packagename, $methodname ], @optlist );
+
+For historical reasons, it is also possible to override the package name
 using:
 
-  local $Class::XSConstructor::SETUP_FOR = "Some::Class::Name";
+  local $Class::XSConstructor::SETUP_FOR = 'Some::Package';
+  Class::XSConstructor->import( @optlist );
+
+... Though this does not allow you to provide a method name.
 
 Returns nothing.
 
@@ -256,7 +358,7 @@ you don't need to do this.
 
 Returns nothing.
 
-=item C<< ($ar_has, $ar_required, $hr_isa, $sr_build) = Class::XSConstructor::get_vars($classname) >>
+=item C<< ($ar_has, $ar_required, $hr_isa, $sr_build, $sr_strict) = Class::XSConstructor::get_vars($classname) >>
 
 Returns references to the variables where Class::XSConstructor stores its
 configuration for the class.
@@ -325,6 +427,15 @@ called.
 Any other value is invalid.
 
 C<import> will set this to undef.
+
+=item C<< $Foo::__XSCON_STRICT >>
+
+If set to true, indicates that XSConstructor should use a "strict"
+constructor, which complains about the presence of any unrecognized
+keys in the init args hashref.
+
+C<import> will set this to false by default, but set it to true if it
+sees "!!" in C<< @optlist >>.
 
 =back
 

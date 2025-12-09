@@ -1,0 +1,8 @@
+# The env we need
+
+## envassert (opts: exact=1)
+
+USER=^[[:word:]]{1,}$
+HOME=^[/]{1}[a-z0-9/_-]{1,}[a-z0-9]{1}
+A_DIGIT=\d+
+A_MISSING_VAR=^[[:word:]]{1,}$

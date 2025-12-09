@@ -1,4 +1,4 @@
-package Syntax::Keyword::Assert 0.16;
+package Syntax::Keyword::Assert 0.18;
 
 use v5.14;
 use warnings;
@@ -54,6 +54,9 @@ Syntax::Keyword::Assert - assert keyword for Perl with zero runtime cost
     assert($obj isa "Bar");
     # => Assertion failed (Foo=HASH(0x11e022818) isa "Bar")
 
+    assert($x > 0, "x must be positive");
+    # => x must be positive
+
 =head1 DESCRIPTION
 
 Syntax::Keyword::Assert provides a syntax extension for Perl that introduces a C<assert> keyword.
@@ -69,6 +72,7 @@ When assertions are disabled, the C<assert> are completely ignored at compile ph
 =head2 assert
 
     assert(EXPR)
+    assert(EXPR, MESSAGE)
 
 If EXPR is truthy in scalar context, then happens nothing. Otherwise, it dies with a user-friendly error message.
 
@@ -77,6 +81,21 @@ Here are some examples:
     assert("apple" eq "banana");  # => Assertion failed ("apple" eq "banana")
     assert(123 != 123);           # => Assertion failed (123 != 123)
     assert(1 > 10);               # => Assertion failed (1 > 10)
+
+You can provide a custom error message as the second argument:
+
+    assert($x > 0, "x must be positive");
+    # => x must be positive
+
+The message expression is lazily evaluated. It is only evaluated when the assertion fails.
+This is equivalent to:
+
+    $cond || do { die $msg }
+
+This means you can use expensive computations or side effects in the message without worrying about performance when the assertion passes:
+
+    assert($x > 0, expensive_debug_info());
+    # expensive_debug_info() is NOT called if $x > 0
 
 =head1 SEE ALSO
 
@@ -88,7 +107,7 @@ This module also uses keyword plugin, but it depends on L<Keyword::Simple>. And 
 
 =item L<Devel::Assert>
 
-This module provides a similar functionality, but it dose not use a keyword plugin.
+This module provides a similar functionality, but it does not use a keyword plugin.
 
 =back
 

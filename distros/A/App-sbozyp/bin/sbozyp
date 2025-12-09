@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '1.2.4';
+our $VERSION = '1.3.4';
 
 use Digest::MD5 qw();
 use File::Basename qw(basename dirname);
@@ -14,8 +14,6 @@ use File::Temp qw();
 use File::Path qw(make_path remove_tree);
 use Getopt::Long qw(GetOptionsFromArray :config no_ignore_case no_bundling);
 use Pod::Usage qw(pod2usage);
-
-$SIG{INT} = $SIG{TERM} = sub { die "\nsbozyp: got a signal to exit ... going down!\n" };
 
 our %CONFIG = (
     # defaults
@@ -78,9 +76,9 @@ sub main_install {
         \@_,
         'h|help' => \my $opt_help,
         'f'      => \my $opt_force,
-        'i'      => \my $opt_noninteractive,
         'k'      => \my $opt_keeppackage,
-        'r'      => \my $opt_installdeps
+        'r'      => \my $opt_installdeps,
+        'y'      => \my $opt_noninteractive
     );
     if ($opt_help) { print command_help_msg('install'); return }
     @_ >= 1 or die command_usage('install');
@@ -96,7 +94,7 @@ sub main_install {
     if (@queue) {
         if (not $opt_noninteractive) {
             sbozyp_print('are you sure you want to install these packages:', "\n");
-            return unless pkgs_confirm_with_user(@queue)
+            return unless pkgs_confirm_with_user(@queue);
         }
         for my $pkg (@queue) {
             my $slackware_pkg = built_slackware_pkg($pkg) // build_slackware_pkg($pkg);
@@ -104,7 +102,7 @@ sub main_install {
             sbozyp_unlink($slackware_pkg) unless $opt_keeppackage;
         }
     } else {
-        sbozyp_print("all packages (and their deps) requested for installation are up to date, invoke with -f option to force installation\n");
+        sbozyp_print('all packages requested for installation are up to date', "\n");
     }
 }
 
@@ -113,7 +111,7 @@ sub main_build {
         \@_,
         'h|help' => \my $opt_help,
         'f'      => \my $opt_force,
-        'i'      => \my $opt_noninteractive
+        'y'      => \my $opt_noninteractive
     );
     if ($opt_help) { print command_help_msg('build'); return }
     @_ >= 1 or die command_usage('build');
@@ -139,8 +137,8 @@ sub main_remove {
         \@_,
         'h|help' => \my $opt_help,
         'f'      => \my $opt_nodepsafetycheck,
-        'i'      => \my $opt_noninteractive,
-        'r'      => \my $opt_removedeps
+        'r'      => \my $opt_removedeps,
+        'y'      => \my $opt_noninteractive
     );
     if ($opt_help) { print command_help_msg('remove'); return }
     @_ >= 1 or die command_usage('remove');
@@ -186,13 +184,14 @@ sub main_query {
         'q'      => \my $opt_printqueue,
         'r'      => \my $opt_readme,
         's'      => \my $opt_slackbuild,
-        'u'      => \my $opt_listneedupgrade
+        'u'      => \my $opt_listneedupgrade,
+        'v'      => \my $opt_listneedupgradeversion
     );
     if ($opt_help) { print command_help_msg('query'); return }
     if (@_ > 1) { die command_usage('query') }
-    my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_printrepodir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade) { $num_opts_set++ if defined }
+    my $num_opts_set = 0; for ($opt_listinstalled,$opt_printpackagedir,$opt_printrepodir,$opt_slackdesc,$opt_info,$opt_pkgsnodependents,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade,$opt_listneedupgradeversion) { $num_opts_set++ if defined }
     if    ($num_opts_set != 1)  { sbozyp_die("must set exactly 1 query option but $num_opts_set were set") }
-    my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_printrepodir ? '-c' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : die;
+    my $opt = $opt_listinstalled ? '-a' : $opt_printpackagedir ? '-b' : $opt_printrepodir ? '-c' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkgsnodependents ? '-m' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : $opt_listneedupgradeversion ? '-v' : die;
     my $pkg; if ($opt_printpackagedir || $opt_slackdesc || $opt_info || $opt_recdependents || $opt_directdependents || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
         @_ == 1 or sbozyp_die("query option '$opt' requires single PKGNAME argument");
         $pkg = pkg($_[0]);
@@ -234,6 +233,13 @@ sub main_query {
         for my $pkgname (sort keys %installed_sbo_pkgs) {
             my $installed_version = $installed_sbo_pkgs{$pkgname};
             my $available_version = pkg($pkgname)->{VERSION};
+            print $pkgname, "\n" if version_gt($available_version, $installed_version);
+        }
+    } elsif ($opt_listneedupgradeversion) {
+        my %installed_sbo_pkgs = installed_sbo_pkgs();
+        for my $pkgname (sort keys %installed_sbo_pkgs) {
+            my $installed_version = $installed_sbo_pkgs{$pkgname};
+            my $available_version = pkg($pkgname)->{VERSION};
             if (version_gt($available_version, $installed_version)) {
                 print "$pkgname $installed_version -> $available_version\n";
             }
@@ -247,7 +253,8 @@ sub main_search {
         'h|help' => \my $opt_help,
         'c'      => \my $opt_casesensitive,
         'n'      => \my $opt_matchcategory,
-        'p'      => \my $opt_prgnam
+        'p'      => \my $opt_prgnam,
+        'q'      => \my $opt_quiet
     );
     if ($opt_help) { print command_help_msg('search'); return }
     @_ == 1 or die command_usage('search');
@@ -260,9 +267,9 @@ sub main_search {
         if ($opt_prgnam) {
             @matches = sort map { $_ = basename($_) } @matches;
         }
-        print $_, "\n" for @matches
-    } else {
-        sbozyp_die("no packages match the regex '$regex_arg'");
+        print $_, "\n" for @matches;
+    } elsif (not $opt_quiet) {
+        sbozyp_print('no matches found', "\n");
     }
 }
 
@@ -772,19 +779,23 @@ sub command_help_msg {
 
 sub sbozyp_system {
     my @cmd = @_;
-    my $exit_status = system(@cmd) >> 8;
-    unless (0 == $exit_status) {
-        sbozyp_die("the following system command exited with status $exit_status: @cmd");
+    my $result = system(@cmd); my $status = $result >> 8; my $signal = $result & 127;
+    if (0 != $status) {
+        sbozyp_die("the following system command exited with status $status: @cmd");
+    } elsif (0 != $signal) {
+        sbozyp_die("the following system command was killed by signal $signal: @cmd");
     }
-    return $exit_status;
+    return $status;
 }
 
 sub sbozyp_qx {
     my ($cmd) = @_;
     wantarray ? chomp(my @output = qx($cmd)) : chomp(my $output = qx($cmd));
-    unless (0 == $?) {
-        my $exit_status = $? >> 8;
-        sbozyp_die("the following system command exited with status $exit_status: $cmd");
+    my $result = $?; my $status = $result >> 8; my $signal = $result & 127;
+    if (0 != $status) {
+        sbozyp_die("the following system command exited with status $status: $cmd");
+    } elsif (0 != $signal) {
+        sbozyp_die("the following system command was killed by signal $signal: $cmd");
     }
     return wantarray ? @output : $output;
 }
@@ -911,6 +922,7 @@ sub sbozyp_error_prefix {
 }
 
 sub sbozyp_die {
+    $! = 1;
     die sbozyp_error_prefix(), @_, "\n";
 }
 
@@ -1037,7 +1049,7 @@ Defaults to C<TMPDIR=/tmp>.
 
 =head2 INSTALL
 
- Usage: sbozyp <install|in> [-h] [-f] [-i] [-k] [-r] <pkgname...>
+ Usage: sbozyp <install|in> [-h] [-f] [-k] [-r] [-y] <pkgname...>
 
 Install or upgrade packages.
 
@@ -1045,9 +1057,9 @@ Options are:
 
  -h|--help     Print help message
  -f            Force installation even if package is already up to date
- -i            No interactive prompt
  -k            Keep the built package (resides in TMPDIR)
  -r            Install package dependencies recursively
+ -y            No interactive prompt
 
 Examples:
 
@@ -1057,11 +1069,11 @@ Examples:
  sbozyp in -k -r system/password-store
  sbozyp in -f -i -r password-store
  sbozyp -S -R $REPO in -f -r password-store
- sbozyp in -r $(sbozyp -S qr -u | cut -d' ' -f1) ### upgrade all packages
+ sbozyp in -r $(sbozyp -S qr -u) ### upgrade all packages
 
 =head2 BUILD
 
- Usage: sbozyp <build|bu> [-h] [-f] [-i] <pkgname...>
+ Usage: sbozyp <build|bu> [-h] [-f] [-y] <pkgname...>
 
 Build but don't install packages.
 
@@ -1069,7 +1081,7 @@ Options are:
 
  -h|--help     Print help message
  -f            Force rebuilding the package even if it's already built
- -i            No confirmation prompt
+ -y            No confirmation prompt
 
 Examples:
 
@@ -1082,7 +1094,7 @@ Examples:
 
 =head2 REMOVE
 
- Usage: sbozyp <remove|rm> [-h] [-f] [-i] [-r] <pkgname...>
+ Usage: sbozyp <remove|rm> [-h] [-f] [-r] [-y] <pkgname...>
 
 Remove packages.
 
@@ -1090,8 +1102,8 @@ Options are:
 
  -h|--help     Print help message
  -f            Disable removal safety check (DANGEROUS)
- -i            No confirmation prompt
  -r            Recursively remove package dependencies that are safe to remove
+ -y            No confirmation prompt
 
 Examples:
 
@@ -1102,7 +1114,7 @@ Examples:
 
 =head2 QUERY
 
- Usage: sbozyp <query|qr> [-h] [-a] [-b] [-c] [-d] [-i] [-m] [-n] [-o] [-p] [-q] [-r] [-s] [-u] PKGNAME?
+ Usage: sbozyp <query|qr> [-h] [-a] [-b] [-c] [-d] [-i] [-m] [-n] [-o] [-p] [-q] [-r] [-s] [-u] [-v] PKGNAME?
 
 Query for package related information.
 
@@ -1111,7 +1123,7 @@ Exactly one option must be used in a single query command.
 Options are:
 
  -h|--help     Print help message
- -a            Print all installed SBo packages
+ -a            Print all installed packages
  -b            Print the path to PKGNAME's local package directory
  -c            Print the path to the current repositories directory
  -d            Print PKGNAME's slack-desc file
@@ -1124,6 +1136,7 @@ Options are:
  -r            Print PKGNAME's README file
  -s            Print PKGNAME's .SlackBuild file
  -u            Print all packages that have upgrades available
+ -v            Like -u, but also print the version information
 
 Examples:
 
@@ -1132,13 +1145,13 @@ Examples:
  sbozyp qr -m
  sbozyp -S qr -u
  cd $(sbozyp qr -b password-store)
- sbozyp -S -R $REPO qr password-store
+ sbozyp -S -R $REPO qr -r password-store
 
 =head2 SEARCH
 
- Usage: sbozyp <search|se> [-h] [-c] [-n] [-p] <regex>
+ Usage: sbozyp <search|se> [-h] [-c] [-n] [-p] [-q] <regex>
 
-Search for a package using a Perl regex.
+Search for packages using a Perl regex.
 
 Options are:
 
@@ -1146,12 +1159,13 @@ Options are:
  -c            Match case sensitive
  -n            Match against CATEGORY/PRGNAM instead of just PRGNAM
  -p            Print just the PRGNAM of matched packages
+ -q            Suppress output if no matches are found
 
 Examples:
 
  sbozyp search --help
  sbozyp se password-store
- sbozyp se -p password.+
+ sbozyp se -p -q password.+
  sbozyp se -c -n system/.+
  sbozyp -S -R $REPO se password-store
 

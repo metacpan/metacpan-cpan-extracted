@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 use 5.020;
 use strictures 2;
@@ -67,33 +67,33 @@ use constant DEFAULT_METASCHEMA => {
 # standard JSON Schema (presently draft2020-12) + OpenAPI vocabulary
 use constant DEFAULT_DIALECT => {
   '3.0' => DEFAULT_METASCHEMA->{'3.0'}.'#/definitions/Schema',
-  3.1 => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10',
-  3.2 => 'https://spec.openapis.org/oas/3.2/dialect/2025-09-17',
+  '3.1' => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/dialect/2025-09-17',
 };
 
 # OpenAPI document schema that forces the use of the JSON Schema dialect (no $schema overrides
 # permitted)
 use constant DEFAULT_BASE_METASCHEMA => {
   '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18', # same as standard
-  3.1 => 'https://spec.openapis.org/oas/3.1/schema-base/2025-09-15',
-  3.2 => 'https://spec.openapis.org/oas/3.2/schema-base/2025-09-17',
+  '3.1' => 'https://spec.openapis.org/oas/3.1/schema-base/2025-09-15',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/schema-base/2025-09-17',
 };
 
 # OpenAPI vocabulary definition
 use constant OAS_VOCABULARY => {
-  3.1 => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10',
-  3.2 => 'https://spec.openapis.org/oas/3.2/meta/2025-09-17',
+  '3.1' => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/meta/2025-09-17',
 };
 
 # an OpenAPI schema and JSON Schema dialect which prohibit unknown keywords
 use constant STRICT_METASCHEMA => {
-  3.1 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.1/strict-schema.json',
-  3.2 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-schema.json',
+  '3.1' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.1/strict-schema.json',
+  '3.2' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-schema.json',
 };
 
 use constant STRICT_DIALECT => {
-  3.1 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.1/strict-dialect.json',
-  3.2 => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-dialect.json',
+  '3.1' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.1/strict-dialect.json',
+  '3.2' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-dialect.json',
 };
 
 # <uri> => <local filename> (under share/) - for internal use only!
@@ -180,7 +180,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 SYNOPSIS
 
@@ -200,6 +200,8 @@ STRICT_DIALECT
 STRICT_METASCHEMA
 SUPPORTED_OAD_VERSIONS
 add_vocab_and_default_schemas
+
+The constant values are updated automatically by C<update-schemas>, in the root of this distribution.
 
 =head1 GIVING THANKS
 

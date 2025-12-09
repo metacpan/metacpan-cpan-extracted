@@ -1,5 +1,7 @@
 package Test::Unit::Error;
 use strict;
+use warnings;
+
 use base qw(Test::Unit::Exception);
 
 # This is a hack to effectively rebless an unknown user exception as a
@@ -21,7 +23,7 @@ Test::Unit::Error - unit testing framework exception class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 use v5.14.0;
 use warnings;
 
-package JMAP::Tester::UA::LWP 0.104;
+package JMAP::Tester::UA::LWP 0.105;
 
 use Moo;
 with 'JMAP::Tester::Role::UA';
@@ -16,7 +16,7 @@ has lwp => (
     my ($self) = @_;
 
     require LWP::UserAgent;
-    my $lwp = LWP::UserAgent->new;
+    my $lwp = LWP::UserAgent->new(keep_alive => 1);
     $lwp->cookie_jar({});
 
     $lwp->default_header('Content-Type' => 'application/json');
@@ -113,7 +113,7 @@ JMAP::Tester::UA::LWP
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 PERL VERSION
 

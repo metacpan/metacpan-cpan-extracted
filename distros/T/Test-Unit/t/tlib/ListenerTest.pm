@@ -1,5 +1,5 @@
 package ListenerTest;
-    
+
 # Test class used in SuiteTest
 
 use base qw(Test::Unit::TestCase Test::Unit::Listener);
@@ -21,13 +21,13 @@ sub add_error {
     my ($test, $t) = @_;
     $self->{_my_error_count}++;
 }
-    
+
 sub add_failure {
     my $self = shift;
     my ($test, $t) = @_;
     $self->{_my_failure_count}++;
 }
-    
+
 sub end_test {
     my $self = shift;
     my ($test) = @_;

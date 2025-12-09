@@ -28,7 +28,7 @@ requires:
 resources:
   bugtracker: https://github.com/Test-More/test-more/issues
   repository: https://github.com/Test-More/test-more/
-version: '1.302216'
+version: '1.302219'
 x_breaks:
   Log::Dispatch::Config::TestLog: '<= 0.02'
   Net::BitTorrent: '<= 0.052'

@@ -1,12 +1,19 @@
-.perltidyrc
+_Deparsed_XSubs.pm
 Changes
+CONTRIBUTING.md
 lib/Mojo/Collection/XS.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+SECURITY.md
 t/basic.t
+t/each.t
+t/grep.t
+t/map.t
+t/while.t
 XS.xs
+xt/benchmark.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

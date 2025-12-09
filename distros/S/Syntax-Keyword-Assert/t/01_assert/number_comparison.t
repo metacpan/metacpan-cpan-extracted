@@ -12,8 +12,10 @@ subtest 'NUM_EQ' => sub {
     is dies { assert($x + $y == 100) }, expected_assert_bin(3, '==', 100);
     is dies { assert($x == 100) },      expected_assert_bin(1, '==', 100);
 
-    is dies { assert(!!$x == 100) }, expected_assert_bin('true',  '==', 100);
-    is dies { assert(!$x == 100) },  expected_assert_bin('false', '==', 100);
+    my $true = !!1;
+    my $false = !1;
+    is dies { assert($true == 100) }, expected_assert_bin('true',  '==', 100);
+    is dies { assert($false == 100) },  expected_assert_bin('false', '==', 100);
 
     my $message = 'hello';
     my $undef   = undef;

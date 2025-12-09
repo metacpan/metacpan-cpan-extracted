@@ -2,6 +2,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef CVf_HAS_SIGNATURES
+#  define CVf_HAS_SIGNATURES 0
+#endif
+
 MODULE = Mojo::Collection::XS    PACKAGE = Mojo::Collection::XS
 
 SV *
@@ -11,36 +15,38 @@ while_fast(self, cb)
   CODE:
   {
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV)
-      croak("Mojo::Collection::XS->while_fast: self is not an arrayref");
+      croak("while_fast: self is not an arrayref");
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV)
-      croak("Mojo::Collection::XS->while_fast: callback must be a CODE ref");
+      croak("while_fast: callback must be a CODE ref");
 
-    AV *av     = (AV *)SvRV(self);
-    SSize_t max = AvFILL(av); /* -1 if empty */
+    AV     *av   = (AV *)SvRV(self);
+    SSize_t max  = AvFILL(av);
 
     if (max >= 0) {
       dSP;
 
-      ENTER;
-      SAVETMPS;
-      SAVE_DEFSV;
-
-      SV *num_sv = sv_2mortal(newSViv(0)); /* reusable index SV */
+      CV  *cv    = (CV *)SvRV(cb);   /* hoisted */
       SV **items = AvARRAY(av);
 
-      for (SSize_t idx = 0, num = 1; idx <= max; idx++, num++) {
-        SV *item = items[idx];
-        if (!item) continue;
+      ENTER;
+      SAVETMPS;
+      SAVE_DEFSV;                     /* alias $_ */
 
-        DEFSV = item;            /* alias to element */
-        sv_setiv(num_sv, num);
+      SV *idx_sv = sv_newmortal();
+
+      for (SSize_t i = 0, num = 1; i <= max; i++, num++) {
+        SV *e = items[i];
+        if (!e) continue;
+
+        DEFSV = e;                    /* $_ alias */
+        sv_setiv(idx_sv, num);
 
         PUSHMARK(SP);
-        XPUSHs(item);
-        XPUSHs(num_sv);
+        XPUSHs(e);
+        XPUSHs(idx_sv);
         PUTBACK;
 
-        call_sv(SvRV(cb), G_VOID | G_DISCARD);
+        call_sv((SV *)cv, G_VOID | G_DISCARD);
         SPAGAIN;
       }
 
@@ -50,44 +56,45 @@ while_fast(self, cb)
 
     RETVAL = SvREFCNT_inc(self);
   }
-  OUTPUT:
-    RETVAL
+  OUTPUT: RETVAL
 
 SV *
-while_pure_fast(self, cb)
+while_ultra(self, cb)
     SV *self
     SV *cb
   CODE:
   {
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV)
-      croak("Mojo::Collection::XS->while_pure_fast: self is not an arrayref");
+      croak("while_ultra: self is not an arrayref");
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV)
-      croak("Mojo::Collection::XS->while_pure_fast: callback must be a CODE ref");
+      croak("while_ultra: callback must be a CODE ref");
 
-    AV *av     = (AV *)SvRV(self);
-    SSize_t max = AvFILL(av);
+    AV     *av   = (AV *)SvRV(self);
+    SSize_t max  = AvFILL(av);
 
     if (max >= 0) {
       dSP;
 
+      CV  *cv    = (CV *)SvRV(cb);    /* hoist */
+      SV **items = AvARRAY(av);
+
       ENTER;
       SAVETMPS;
 
-      SV *num_sv = sv_2mortal(newSViv(0)); /* reusable index SV */
-      SV **items = AvARRAY(av);
+      SV *idx_sv = sv_newmortal();
 
-      for (SSize_t idx = 0, num = 1; idx <= max; idx++, num++) {
-        SV *item = items[idx];
-        if (!item) continue;
+      for (SSize_t i = 0, num = 1; i <= max; i++, num++) {
+        SV *e = items[i];
+        if (!e) continue;
 
-        sv_setiv(num_sv, num);
+        sv_setiv(idx_sv, num);
 
         PUSHMARK(SP);
-        XPUSHs(item);
-        XPUSHs(num_sv);
+        XPUSHs(e);
+        XPUSHs(idx_sv);
         PUTBACK;
 
-        call_sv(SvRV(cb), G_VOID | G_DISCARD);
+        call_sv((SV *)cv, G_VOID | G_DISCARD);
         SPAGAIN;
       }
 
@@ -97,8 +104,7 @@ while_pure_fast(self, cb)
 
     RETVAL = SvREFCNT_inc(self);
   }
-  OUTPUT:
-    RETVAL
+  OUTPUT: RETVAL
 
 SV *
 each_fast(self, cb)
@@ -111,18 +117,20 @@ each_fast(self, cb)
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV)
       croak("Mojo::Collection::XS->each_fast: callback must be a CODE ref");
 
-    AV *av     = (AV *)SvRV(self);
+    AV *av      = (AV *)SvRV(self);
     SSize_t max = AvFILL(av);
 
     if (max >= 0) {
       dSP;
+
+      CV  *cv    = (CV *)SvRV(cb);   /* hoist sekali */
+      SV **items = AvARRAY(av);
 
       ENTER;
       SAVETMPS;
       SAVE_DEFSV;
 
       SV *num_sv = sv_2mortal(newSViv(0)); /* reusable index SV */
-      SV **items = AvARRAY(av);
 
       for (SSize_t idx = 0, num = 1; idx <= max; idx++, num++) {
         SV *item = items[idx];
@@ -136,7 +144,7 @@ each_fast(self, cb)
         XPUSHs(num_sv);
         PUTBACK;
 
-        call_sv(SvRV(cb), G_VOID | G_DISCARD);
+        call_sv((SV *)cv, G_VOID | G_DISCARD);
         SPAGAIN;
       }
 
@@ -150,50 +158,50 @@ each_fast(self, cb)
     RETVAL
 
 SV *
-map_pure_fast(self, cb)
+map_ultra(self, cb)
     SV *self
     SV *cb
   CODE:
   {
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV)
-      croak("Mojo::Collection::XS->map_pure_fast: self is not an arrayref");
+      croak("map_ultra: self is not an arrayref");
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV)
-      croak("Mojo::Collection::XS->map_pure_fast: callback must be a CODE ref");
+      croak("map_ultra: callback must be a CODE ref");
 
-    AV *av     = (AV *)SvRV(self);
+    AV *av = (AV *)SvRV(self);
     SSize_t max = AvFILL(av);
 
-    AV *out_av = newAV();
-    SV *ret_rv = newRV_noinc((SV *)out_av);
-    sv_bless(ret_rv, SvSTASH(SvRV(self)));
+    AV *out    = newAV();
+    SV *out_rv = newRV_noinc((SV *)out);
+    sv_bless(out_rv, SvSTASH(SvRV(self)));
 
     if (max >= 0) {
       dSP;
 
-      ENTER;
-      SAVETMPS;
-
-      SV *num_sv = sv_2mortal(newSViv(0)); /* reusable index SV */
+      CV  *cv    = (CV *)SvRV(cb);
       SV **items = AvARRAY(av);
 
-      for (SSize_t idx = 0, num = 1; idx <= max; idx++, num++) {
-        SV *item = items[idx];
-        if (!item) continue;
+      ENTER;
+      SAVETMPS;
+      av_extend(out, max);
 
-        sv_setiv(num_sv, num);
+      for (SSize_t i = 0; i <= max; i++) {
+        SV *item = items[i];
+        if (!item) continue;
 
         PUSHMARK(SP);
         XPUSHs(item);
-        XPUSHs(num_sv);
         PUTBACK;
 
-        I32 count = call_sv(SvRV(cb), G_SCALAR);
+        I32 count = call_sv((SV *)cv, G_SCALAR);
         SPAGAIN;
 
         if (count > 0) {
           SV *ret = POPs;
-          if (ret)
-            av_push(out_av, newSVsv(ret));
+          if (ret && ret != &PL_sv_undef) {
+            av_push(out, SvTEMP(ret) ? newSVsv(ret) : SvREFCNT_inc(ret));
+          }
+          if (count > 1) SP -= (count - 1);
         }
       }
 
@@ -201,7 +209,7 @@ map_pure_fast(self, cb)
       LEAVE;
     }
 
-    RETVAL = ret_rv;
+    RETVAL = out_rv;
   }
   OUTPUT:
     RETVAL
@@ -217,7 +225,7 @@ map_fast(self, cb)
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV)
       croak("Mojo::Collection::XS->map_fast: callback must be a CODE ref");
 
-    AV *av     = (AV *)SvRV(self);
+    AV *av      = (AV *)SvRV(self);
     SSize_t max = AvFILL(av);
 
     AV *out_av = newAV();
@@ -227,26 +235,25 @@ map_fast(self, cb)
     if (max >= 0) {
       dSP;
 
+      CV  *cv    = (CV *)SvRV(cb);   /* hoist sekali */
+      SV **items = AvARRAY(av);
+
       ENTER;
       SAVETMPS;
       SAVE_DEFSV;
+      av_extend(out_av, max);
 
-      SV *num_sv = sv_2mortal(newSViv(0)); /* reusable index SV */
-      SV **items = AvARRAY(av);
-
-      for (SSize_t idx = 0, num = 1; idx <= max; idx++, num++) {
+      for (SSize_t idx = 0; idx <= max; idx++) {
         SV *item = items[idx];
         if (!item) continue;
 
         DEFSV = item;            /* alias to element */
-        sv_setiv(num_sv, num);
 
         PUSHMARK(SP);
         XPUSHs(item);
-        XPUSHs(num_sv);
         PUTBACK;
 
-        I32 count = call_sv(SvRV(cb), G_ARRAY);
+        I32 count = call_sv((SV *)cv, G_ARRAY);
         SPAGAIN;
 
         if (count > 0) {
@@ -278,7 +285,7 @@ grep_fast(self, cb)
     if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV)
       croak("Mojo::Collection::XS->grep_fast: callback must be a CODE ref");
 
-    AV *av     = (AV *)SvRV(self);
+    AV *av      = (AV *)SvRV(self);
     SSize_t max = AvFILL(av);
 
     AV *out_av = newAV();
@@ -288,31 +295,32 @@ grep_fast(self, cb)
     if (max >= 0) {
       dSP;
 
-      ENTER;
-      SAVETMPS;
-      SAVE_DEFSV;
-
-      SV *num_sv = sv_2mortal(newSViv(0)); /* reusable index SV */
+      CV  *cv    = (CV *)SvRV(cb);
       SV **items = AvARRAY(av);
 
-      for (SSize_t idx = 0, num = 1; idx <= max; idx++, num++) {
+      ENTER;
+      SAVETMPS;
+      SAVE_DEFSV;                      /* karena kita set $_ */
+
+      for (SSize_t idx = 0; idx <= max; idx++) {
         SV *item = items[idx];
         if (!item) continue;
 
-        DEFSV = item;            /* alias to element */
-        sv_setiv(num_sv, num);
+        DEFSV = item;                 /* $_ = item */
 
         PUSHMARK(SP);
         XPUSHs(item);
-        XPUSHs(num_sv);
         PUTBACK;
 
-        I32 count = call_sv(SvRV(cb), G_SCALAR);
+        I32 count = call_sv((SV *)cv, G_SCALAR);
         SPAGAIN;
 
-        SV *decision = (count > 0) ? POPs : NULL;
+        SV *decision = count > 0 ? POPs : &PL_sv_undef;
+        if (count > 1) SP -= (count - 1);
+
         if (decision && SvTRUE(decision)) {
-          av_push(out_av, newSVsv(item));
+          /* tidak clone: persis referensi aslinya */
+          av_push(out_av, SvREFCNT_inc(item));
         }
       }
 

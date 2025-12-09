@@ -36,6 +36,12 @@ DESCRIPTION
     *   Supports required attributes using an exclamation mark. The name
         attribute in the synopsis is required.
 
+        When multiple required attributes are missing, the constructor will
+        only report the first one it encountered, based on the order the
+        attributes were declared in. This is for compatibility with Moo and
+        Moose error messages, which also only report the first missing
+        required attribute.
+
     *   Provides support for type constraints.
 
           use Types::Standard qw(Str Int);
@@ -59,6 +65,11 @@ DESCRIPTION
         Type constraints are likely to siginificantly slow down your
         constructor.
 
+        When multiple attributes fail their type check, the constructor will
+        only report the first one it encountered, based on the order the
+        attributes were declared in. This is for compatibility with Moo and
+        Moose error messages, which also only report the first failed check.
+
         Note that Class::XSConstructor is only building your constructor for
         you. For read-write attributes, *checking the type constraint in the
         accessor is your responsibility*.
@@ -66,6 +77,74 @@ DESCRIPTION
     *   Supports Moose/Moo/Class::Tiny-style `BUILD` methods.
 
         Including `__no_BUILD__`.
+
+    *   Optionally supports strict-style constructors a la
+        MooX::StrictConstructor and MooseX::StrictConstructor. To opt in, pass
+        "!!" as part of the import line. Although it doesn't really matter
+        where in the list you include it, I recommend putting it at the end
+        for readability.
+
+          use Class::XSConstructor qw( name! age email phone !! );
+
+        Or:
+
+          use Class::XSConstructor (
+            "name!"    => Str,
+            "age"      => Int,
+            "email"    => sub { !ref($_[0]) and $_[0] =~ /\@/ },
+            "phone"    => Str,
+            "!!",
+          );
+
+        Error messages when violating the strict constructor will list all the
+        unexpected arguments, but the order in which they are listed will be
+        unpredictable.
+
+        The strict constructor check happens *after* `BUILD` methods have been
+        called. Because `BUILD` methods are passed a reference to the init
+        args hashref, they can alter it, removing certain keys if they need
+        to. For example:
+
+            use v5.36;
+    
+            package Person {
+        
+                use Class::XSConstructor qw( fullname !! );
+                use Class::XSAccessor { accessors => [ 'fullname' ] };
+        
+                sub BUILD ( $self, $args ) {
+                    if ( exists $args->{given_name} and exists $args->{surname} ) {
+                        $self->fullname(
+                            join q{ } => (
+                                delete $args->{given_name},
+                                delete $args->{surname},
+                            )
+                        );
+                    }
+                }
+            }
+    
+            my $bob = Person->new( given_name => 'Bob', surname => 'Dobalina' );
+            say $bob->fullname;
+
+    *   Constructor names other than `__PACKAGE__->new`:
+
+          use Class::XSConstructor [ 'Person', 'create' ] => qw( name! age email phone );
+  
+          my $bob = Person->create( name => 'Bob Dobalina' );
+
+        It is NOT possible to create two different constructors for the same
+        class with different attributes for each:
+
+          use Class::XSConstructor [ 'Person', 'new_by_phone' ] => qw( name! phone );
+          use Class::XSConstructor [ 'Person', 'new_by_email' ] => qw( name! email );
+
+        However, you can create multiple contructors that all use the same
+        defined list of attributes.
+
+          use Class::XSConstructor [ 'Person', 'new' ] => qw( name! phone email );
+          Class::XSConstructor::install_constructor( 'Person::new_by_phone' );
+          Class::XSConstructor::install_constructor( 'Person::new_by_email' );
 
 API
     This section documents the API of Class::XSConstructor for other modules
@@ -80,13 +159,23 @@ API
     `Class::XSConstructor->import(@optlist)`
         Does all the setup for a class to install the constructor. Will
         determine which class to install the constructor into based on
-        `caller`. You can override this using:
+        `caller` and call the method `new`. You can override this by passing
+        an arrayref of the package name to do the setup for, followed by the
+        method name for the constructor:
 
-          local $Class::XSConstructor::SETUP_FOR = "Some::Class::Name";
+          Class::XSConstructor->import( [ $packagename, $methodname ], @optlist );
+
+        For historical reasons, it is also possible to override the package
+        name using:
+
+          local $Class::XSConstructor::SETUP_FOR = 'Some::Package';
+          Class::XSConstructor->import( @optlist );
+
+        ... Though this does not allow you to provide a method name.
 
         Returns nothing.
 
-    `Class::XSConstructor::install_constructor($subname)`
+    Class::XSConstructor::install_constructor($subname)
         Just installs the XS constructor without doing some of the necessary
         setup. $subname is a fully qualified sub name, like "Foo::new".
 
@@ -95,7 +184,7 @@ API
 
         Returns nothing.
 
-    `Class::XSConstructor::inheritance_stuff($classname)`
+    Class::XSConstructor::inheritance_stuff($classname)
         Checks the @ISA variable in the class and makes Class::XSConstructor
         aware of any attributes declared by parent classes. (Though only if
         those parent classes use Class::XSConstructor.)
@@ -105,14 +194,14 @@ API
 
         Returns nothing.
 
-    `($ar_has, $ar_required, $hr_isa, $sr_build) =
+    `($ar_has, $ar_required, $hr_isa, $sr_build, $sr_strict) =
     Class::XSConstructor::get_vars($classname)`
         Returns references to the variables where Class::XSConstructor stores
         its configuration for the class.
 
         See "Use of Package Variables".
 
-    `Class::XSConstructor::populate_build($classname)`
+    Class::XSConstructor::populate_build($classname)
         This will need to be called if the list of `BUILD` methods that ought
         to be called when constructing an object of the given class changes at
         runtime. (Which would be pretty unusual.)
@@ -165,6 +254,14 @@ API
         Any other value is invalid.
 
         `import` will set this to undef.
+
+    $Foo::__XSCON_STRICT
+        If set to true, indicates that XSConstructor should use a "strict"
+        constructor, which complains about the presence of any unrecognized
+        keys in the init args hashref.
+
+        `import` will set this to false by default, but set it to true if it
+        sees "!!" in @optlist.
 
     If these package variables have not been declared, there is a very good
     chance that the constructor will segfault. `import` will automatically

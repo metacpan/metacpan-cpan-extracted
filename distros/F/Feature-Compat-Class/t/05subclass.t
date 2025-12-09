@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -18,8 +18,8 @@ use Feature::Compat::Class;
    }
 
    my $obj = Test1Derived->new;
-   isa_ok( $obj, "Test1Derived", '$obj' );
-   isa_ok( $obj, "Test1Base",    '$obj' );
+   isa_ok( $obj, [ "Test1Derived" ], '$obj' );
+   isa_ok( $obj, [ "Test1Base" ],    '$obj' );
    is( $obj->describe, "Value is 123", 'Object can invoke superclass methods' );
 }
 

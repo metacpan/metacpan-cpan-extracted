@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 7;
+plan tests => 8;
 
 my @module_files = (
     'JSON/Schema/Modern/Document/OpenAPI.pm',
     'JSON/Schema/Modern/Vocabulary/OpenAPI.pm',
+    'JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm',
     'OpenAPI/Modern.pm',
     'OpenAPI/Modern/Utilities.pm'
 );

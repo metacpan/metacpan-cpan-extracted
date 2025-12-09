@@ -1,7 +1,7 @@
 package BadSuite::SyntaxError;
 
 sub broken_method {
-    my $self = 
+    my $self =
 }
 
 1;

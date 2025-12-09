@@ -8,6 +8,7 @@ my $config = {};
 my $modules = [
   "JSON::Schema::Modern::Document::OpenAPI",
   "JSON::Schema::Modern::Vocabulary::OpenAPI",
+  "JSON::Schema::Modern::Vocabulary::OpenAPI_3_0",
   "OpenAPI::Modern",
   "OpenAPI::Modern::Utilities",
 ];

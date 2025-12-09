@@ -47,7 +47,7 @@ sub make_dummy_testcase {
     my $sub  = pop;
     my $method_name = shift || 'run_test';
     my $test_name = (caller(1))[3] . '_inner';
-    
+
     Class::Inner->new(parent  => 'Test::Unit::TestCase',
                       methods => { $method_name => $sub },
                       args    => [ $test_name ]);
@@ -108,7 +108,7 @@ sub test_run_and_tear_down_both_throw {
     my $self = shift;
     my $fails = Class::Inner->new(
         parent  => 'TornDown',
-        methods => { 
+        methods => {
             run_test => sub {
                 throw Test::Unit::Error -object => $_[0];
             },
@@ -128,7 +128,7 @@ sub test_run_and_tear_down_both_throw2 {
     my $self = shift;
     my $fails = Class::Inner->new(
         parent  => 'TornDown',
-        methods => { 
+        methods => {
             run_test => sub {
                 die "this run_test dies";
             },
@@ -272,7 +272,7 @@ sub test_assert_on_matching_regex {
 
 sub test_assert_on_failing_regex {
     my $self = shift;
-    
+
     my $matching_regex = $self->make_dummy_testcase
         (sub {
              my $self = shift;

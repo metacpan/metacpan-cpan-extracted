@@ -25,7 +25,7 @@ my $exefiles = [qw(
 
 WriteMakefile(
     'NAME'              => 'App::DistSync',
-    'MIN_PERL_VERSION'  => 5.012001,
+    'MIN_PERL_VERSION'  => 5.020001,
     'VERSION_FROM'      => 'lib/App/DistSync.pm',
     'ABSTRACT_FROM'     => 'lib/App/DistSync.pm',
     'BUILD_REQUIRES'    => $build_requires,
@@ -34,11 +34,20 @@ WriteMakefile(
     'AUTHOR'            => 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>',
     'LICENSE'           => 'perl',
     'META_MERGE'        => {
-        resources => {
-            homepage        => 'http://app-distsync.sourceforge.net',
-            repository      => 'https://svn.code.sf.net/p/app-distsync/code/trunk',
-            license         => 'https://dev.perl.org/licenses',
+        'meta-spec' => {version => 2},
+        prereqs     => {runtime => {requires => {perl => '5.020'}}},
+        resources   => {
+            homepage    => 'https://sourceforge.net/projects/app-distsync/',
+            license     => 'https://dev.perl.org/licenses',
+            repository      => {
+                type => 'git',
+                url  => 'https://abalama@git.code.sf.net/p/app-distsync/trunk',
+                web  => 'https://sourceforge.net/p/app-distsync/trunk/ci/master/tree/',
+            },
         },
+    },
+    clean => {
+        FILES => '*.tmp',
     },
 );
 

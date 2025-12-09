@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Feature::Compat::Class;
 
@@ -21,8 +21,8 @@ my $MATCH_ARGCOUNT =
 
    my $allthetypes = AllTheTypesReader->new;
    is( $allthetypes->sv, 123, ':reader on scalar field' );
-   is_deeply( [ $allthetypes->av ], [qw( one two three )],  ':reader on array field' );
-   is_deeply( { $allthetypes->hv }, { one => 1, two => 2 }, ':reader on hash field' );
+   is( [ $allthetypes->av ], [qw( one two three )],  ':reader on array field' );
+   is( { $allthetypes->hv }, { one => 1, two => 2 }, ':reader on hash field' );
 
    is( scalar $allthetypes->av, 3,   ':reader on array field in scalar context' );
 
@@ -37,6 +37,33 @@ my $MATCH_ARGCOUNT =
       'reader method complains if given any arguments' );
    like( $@, qr/^Too many arguments for subroutine 'AllTheTypesReader::sv'$MATCH_ARGCOUNT(?: at \S+ line $LINE\.)?$/,
       'exception message from too many arguments to reader' );
+}
+
+# writers
+{
+   class AllTheTypesWriter {
+      field $sv :reader :writer;
+      # only scalars support for now
+   }
+
+   my $allthetypes = AllTheTypesWriter->new;
+   $allthetypes->set_sv( 456 );
+   is( $allthetypes->sv, 456, ':writer set value of scalar field' );
+}
+
+# writers are not currently permitted on non-scalar fields
+{
+   ok( !defined eval <<'EOF',
+      class WriterOnArray { field @av :writer; }
+      1
+EOF
+      ':writer not permitted on array field' );
+
+   ok( !defined eval <<'EOF',
+      class WriterOnHash { field %hv :writer; }
+      1
+EOF
+      ':writer not permitted on hash field' );
 }
 
 done_testing;

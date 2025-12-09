@@ -19,6 +19,7 @@ intended to be used directly.  It provides functionality such as state
 =cut
 
 use strict;
+use warnings;
 
 use Test::Unit::Result;
 
@@ -35,7 +36,7 @@ sub start_suite {
     my $self = shift;
     my ($suite) = @_;
     push @{ $self->{_suites_running} }, $suite;
-} 
+}
 
 sub end_suite {
     my $self = shift;
@@ -77,7 +78,7 @@ Clears the current filter.
 
 sub reset_filter {
     my $self = shift;
-    $self->{_filter} = [];    
+    $self->{_filter} = [];
 }
 
 1;

@@ -50,7 +50,7 @@ sub result {
     my $self = shift;
     return $self->{_my_result};
 }
-    
+
 sub set_up {
     my $self = shift;
     $self->{_my_result} = Test::Unit::Result->new();
@@ -91,7 +91,7 @@ sub test_complex_inheritance {
             $self->assert($self->override_this_method );
         }
         sub override_this_method { 0 ; }
-        
+
         package _SubClass;
         use base qw(_SuperClass);
         sub override_this_method { 1 ; }
@@ -100,7 +100,7 @@ sub test_complex_inheritance {
     my $suite = Test::Unit::TestSuite->new("_SubClass");
     my $result = $self->result;
     $suite->run($result);
-    
+
     $self->assert($result->was_successful());
     $self->assert(1 == $self->result->run_count);
 }

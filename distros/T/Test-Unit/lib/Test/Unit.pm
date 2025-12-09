@@ -89,17 +89,11 @@ to do with it.
 package Test::Unit;
 
 use strict;
-use vars qw($VERSION);
-
-# NOTE: this version number has to be kept in sync with the
-# number in the distribution file name (the distribution file
-# is the tarball for CPAN release) because the CPAN module
-# decides to fetch the tarball by looking at the version of
-# this module if you say "install Test::Unit" in the CPAN
-# shell.  "make tardist" should do this automatically.
+use warnings;
+our $VERSION;
 
 BEGIN {
-    $VERSION = '0.28';
+    $VERSION = '0.29';
 }
 
 # Constants for notices displayed to the user:

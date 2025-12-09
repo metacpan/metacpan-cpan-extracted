@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 use 5.016;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '2.29';              #!!! scanned by bin/collect_types
+my $version  = '2.30';              #!!! scanned by bin/collect_types
 my $webpages = "../public_html";
 my $git      = "https://github.com/markov2/perl5-MIME-Types";
 my $publish  = "../public_html/mime-types";
@@ -47,15 +47,15 @@ my %oodist   = (
 	],
 );
 
+my %requires = (
+   	'File::Spec'     => 0,
+   	'File::Basename' => 0,
+   	'List::Util'     => 0,
+);
+
 WriteMakefile
 	NAME      => 'MIME::Types',
 	VERSION   => $version,
-	PREREQ_PM => {
-		'Test::More'     => 0.47,
-    	'File::Spec'     => 0,
-    	'File::Basename' => 0,
-    	'List::Util'     => 0,
-	},
 	AUTHOR    => 'Mark Overmeer <mark@overmeer.net>',
 	ABSTRACT  => 'Definition of MIME types',
 	LICENSE   => 'perl_5',
@@ -68,21 +68,27 @@ WriteMakefile
 				url  => "$git.git",
 				web  => $git,
 			},
+			bugtracker => {
+				web  => "$git/issues",
+			},
 			homepage => $homepage,
 			license  => [ 'http//dev.perl.org/licenses/' ],
 		},
 		prereqs => {
+			runtime => {
+				requires => \%requires,
+			},
 			develop => {
 				requires => {
 					'OODoc' => '3.00',
 					'File::Slurper' => 0,
-				}
+				},
 			},
 			test => {
 				requires => {
 					'Test::More' => 1.00,
 					'Test::Pod'  => 1.00,
-				}
+				},
 			},
 		},
 

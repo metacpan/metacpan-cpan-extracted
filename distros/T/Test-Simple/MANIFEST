@@ -106,6 +106,7 @@ lib/Test2/EventFacet/Render.pm
 lib/Test2/EventFacet/Trace.pm
 lib/Test2/Formatter.pm
 lib/Test2/Formatter/TAP.pm
+lib/Test2/Handle.pm
 lib/Test2/Hub.pm
 lib/Test2/Hub/Interceptor.pm
 lib/Test2/Hub/Interceptor/Terminator.pm
@@ -203,6 +204,9 @@ lib/Test2/Util/Term.pm
 lib/Test2/Util/Times.pm
 lib/Test2/Util/Trace.pm
 lib/Test2/V0.pm
+lib/Test2/V1.pm
+lib/Test2/V1/Base.pm
+lib/Test2/V1/Handle.pm
 lib/Test2/Workflow.pm
 lib/Test2/Workflow/BlockBase.pm
 lib/Test2/Workflow/Build.pm
@@ -510,6 +514,7 @@ t/modules/Compare/Set.t
 t/modules/Compare/String.t
 t/modules/Compare/Undef.t
 t/modules/Compare/Wildcard.t
+t/modules/Handle.t
 t/modules/Mock.t
 t/modules/Plugin.t
 t/modules/Plugin/BailOnFail.t
@@ -566,6 +571,9 @@ t/modules/Util/Table/Cell.t
 t/modules/Util/Table/LineBreak.t
 t/modules/Util/Times.t
 t/modules/V0.t
+t/modules/V1.t
+t/modules/V1/Base.t
+t/modules/V1/Handle.t
 t/modules/Workflow.t
 t/modules/Workflow/BlockBase.t
 t/modules/Workflow/Build.t

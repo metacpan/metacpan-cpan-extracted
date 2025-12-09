@@ -6,6 +6,7 @@ README.md
 bench/compare-no-assertion.pl
 builder/MyBuilder.pm
 cpanfile
+hax/newBINOP_CUSTOM.c.inc
 hax/newUNOP_CUSTOM.c.inc
 hax/sv_isa.c.inc
 hax/sv_numcmp.c.inc
@@ -16,6 +17,7 @@ lib/Syntax/Keyword/Assert.xs
 minil.toml
 t/00_compile.t
 t/01_assert.t
+t/01_assert/custom_message.t
 t/01_assert/isa.t
 t/01_assert/number_comparison.t
 t/01_assert/string_comparison.t

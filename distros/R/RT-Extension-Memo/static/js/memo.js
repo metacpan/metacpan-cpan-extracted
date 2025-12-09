@@ -7,7 +7,11 @@ function setDisplayMode(doUpdate) {
     // Replace ckeditor by textarea
     if (memoEditor) {
         if (doUpdate) {
-            memoEditor.updateElement();
+            if (RT.MemoRT6) {
+                memoEditor.updateSourceElement();
+            } else {
+                memoEditor.updateElement();
+            }
         }
         memoEditor.destroy();
     }
@@ -66,8 +70,81 @@ function setEditMode() {
         }
         // Set the type
         type.val("text/html");
-        memoEditor = CKEDITOR.replace(memoTextarea.name, {width: '100%', height: RT.Config.MemoRichTextHeight});
-        jQuery("#" + memoTextarea.name + "___Frame").addClass("richtext-editor");
+        if (RT.MemoRT6) {
+            var height = RT.Config.MemoRichTextHeight + 'px';
+
+            // Customize shouldNotGroupWhenFull based on textarea width
+            const initArgs = JSON.parse(JSON.stringify(RT.Config.MessageBoxRichTextInitArguments));
+            initArgs.toolbar.shouldNotGroupWhenFull = memoTextarea.offsetWidth >= 600 ? true : false;
+
+            // Load core CKEditor plugins
+            const corePlugins = [];
+            for (const plugin of initArgs.plugins || []) {
+                if (CKEDITOR?.[plugin]) {
+                    corePlugins.push(CKEDITOR[plugin]);
+                } else {
+                    console.error(`Core CKEditor plugin "${plugin}" not found.`);
+                }
+            }
+
+            // Load extra plugins
+            // The source JS must already be loaded by the extension.
+            const thirdPartyPlugins = [];
+            for (const plugin of initArgs.extraPlugins || []) {
+                if (window[plugin]?.[plugin]) {
+                    thirdPartyPlugins.push(window[plugin][plugin]);
+                } else {
+                    console.error(`Extra CKEditor plugin "${plugin}" not found.`);
+                }
+            }
+
+            // Combine core and third-party plugins
+            initArgs.plugins = [...corePlugins, ...thirdPartyPlugins];
+            initArgs.extraPlugins = []; // Clear extraPlugins as they're now included
+
+            initArgs.emoji.definitionsUrl = RT.Config.WebURL + initArgs.emoji.definitionsUrl;
+
+            CKEDITOR.ClassicEditor
+                .create( memoTextarea, initArgs )
+                .then(editor => {
+                    RT.CKEditor.instances[editor.sourceElement.name] = editor;
+                    memoEditor = editor;
+                    // the height of element(.ck-editor__editable_inline) is reset on focus,
+                    // here we set height of its parent(.ck-editor__main) instead.
+                    editor.ui.view.editable.element.parentNode.style.height = height;
+                    AddAttachmentWarning(editor);
+
+                    const parse_cf = /^Object-([\w:]+)-(\d*)-CustomField(?::\w+)?-(\d+)-(.*)$/;
+                    const parsed = parse_cf.exec(editor.sourceElement.name);
+                    if (parsed) {
+                        const name_filter_regex = new RegExp(
+                            "^Object-" + parsed[1] + "-" + parsed[2] +
+                            "-CustomField(?::\\w+)?-" + parsed[3] + "-" + parsed[4] + "$"
+                        );
+                        editor.model.document.on('change:data', () => {
+                            const value = editor.getData();
+                            jQuery('textarea.richtext').filter(function () {
+                                return RT.CKEditor.instances[this.name] && name_filter_regex.test(this.name);
+                            }).not(jQuery(editor.sourceElement)).each(function () {
+                                if ( RT.CKEditor.instances[this.name].getData() !== value ) {
+                                    RT.CKEditor.instances[this.name].setData(value);
+                                };
+                            });
+                        });
+                    }
+                    editor.on('destroy', () => {
+                        if (RT.CKEditor.instances[editor.sourceElement.name]) {
+                            delete RT.CKEditor.instances[editor.sourceElement.name];
+                        }
+                    });
+                })
+                .catch( error => {
+                    console.error( error );
+                } );
+        } else {
+            memoEditor = CKEDITOR.replace(memoTextarea.name, {width: '100%', height: RT.Config.MemoRichTextHeight});
+            jQuery("#" + memoTextarea.name + "___Frame").addClass("richtext-editor");
+        }
     }
 
     // Display Save and Cancel buttons
@@ -122,5 +199,13 @@ function memoInit() {
 }
 
 jQuery(document).ready(function() {
-    memoInit();
+    if (RT.MemoRT6) {
+        document.body.addEventListener('htmx:load', function(evt) {
+            if (jQuery(evt.detail.elt).hasClass('history') && jQuery(evt.detail.elt).hasClass('ticket')) {
+                memoInit();
+            }
+        });
+    } else {
+        memoInit();
+    }
 });

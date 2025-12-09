@@ -8,6 +8,22 @@
 
 #define XSCON_xc_stash(a)       ( (HV*)XSCON_av_at((a), XSCON_XC_STASH) )
 
+SV*
+join_with_commas(AV *av) {
+    SV *out = newSVpvs("");
+    I32 len = av_len(av) + 1;
+
+    for (I32 i = 0; i <= len; i++) {
+        SV **svp = av_fetch(av, i, 0);
+        if (!svp) continue;
+        if (i > 0)
+            sv_catpvs(out, ", ");
+        sv_catsv(out, *svp);
+    }
+
+    return out;
+}
+
 static HV*
 xscon_buildargs(const char* klass, I32 ax, I32 items) {
     dTHX;
@@ -140,7 +156,7 @@ xscon_initialize_object(const char* klass, SV* const object, HV* const args, boo
 static void
 xscon_buildall(SV* const object, SV* const args) {
     dTHX;
-    
+
     assert(object);
     assert(args);
 
@@ -212,6 +228,65 @@ xscon_buildall(SV* const object, SV* const args) {
     }
 }
 
+static void
+xscon_strictcon(SV* const object, SV* const args) {
+    dTHX;
+
+    assert(object);
+    assert(args);
+
+    const char* klass = sv_reftype(SvRV(object), 1);
+    HV* const stash = gv_stashpv(klass, 1);
+    assert(stash != NULL);
+
+    SV** const STRICT_globref = hv_fetch(stash, "__XSCON_STRICT", 14, 0);
+    SV* const STRICT_flag = GvSV(*STRICT_globref);
+
+    if (!SvTRUE(STRICT_flag)) {
+        return;
+    }
+
+    SV** const HAS_globref = hv_fetch(stash, "__XSCON_HAS", 11, 0);
+    AV* const HAS_attrs = GvAV(*HAS_globref);
+    I32 const HAS_len = av_len(HAS_attrs) + 1;
+
+    AV *badattrs = newAV();
+
+    HV* argshv = (HV*)SvRV(args);
+    HE* he;
+
+    hv_iterinit(argshv);
+    while ((he = hv_iternext(argshv))) {
+        SV* const k = hv_iterkeysv(he);
+        bool found = FALSE;
+
+        I32 i;
+        for (i = 0; i < HAS_len; i++) {
+            SV* const attr = *av_fetch(HAS_attrs, i, TRUE);
+            if (sv_eq(k, attr)) {
+                found = TRUE;
+                break;
+            }
+        }
+
+        if (!found) {
+            av_push(badattrs, k);
+        }
+    }
+
+    I32 const badattrs_len = av_len(badattrs) + 1;
+    if ( badattrs_len > 0 ) {
+        SV* const badattrs_commas = join_with_commas(badattrs);
+        if ( badattrs_len == 1 ) {
+            croak("Found unknown attribute passed to the constructor: %s", SvPV_nolen(badattrs_commas));
+        }
+        else {
+            croak("Found unknown attributes passed to the constructor: %s", SvPV_nolen(badattrs_commas));
+        }
+    }
+}
+
+
 MODULE = Class::XSConstructor  PACKAGE = Class::XSConstructor
 
 void
@@ -228,6 +303,7 @@ CODE:
     object = xscon_create_instance(klassname);
     xscon_initialize_object(klassname, object, (HV*)SvRV(args), FALSE);
     xscon_buildall(object, args);
+    xscon_strictcon(object, args);
     ST(0) = object; /* because object is mortal, we should return it as is */
     XSRETURN(1);
 }

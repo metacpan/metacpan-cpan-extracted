@@ -1,10 +1,10 @@
 use strictures 2;
 package JSON::Schema::Modern::Document::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: One OpenAPI v3.1 or v3.2 document
+# ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 use 5.020;
 use utf8;
@@ -186,7 +186,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # continue to support the old strict dialect and metaschema which didn't have "3.1" in the $id
     if ($json_schema_dialect eq (STRICT_DIALECT->{3.1} =~ s{/3.1/}{/}r)) {
       $json_schema_dialect =~ s{share/\K}{3.1/};
-      $schema->{jsonSchemaDialect} = $json_schema_dialect;
+      $schema->{jsonSchemaDialect} = $json_schema_dialect;  # allow the 'const' check to pass
     }
     $self->_set_metaschema_uri($self->metaschema_uri =~ s{share/\K}{3.1/}r)
       if $self->_has_metaschema_uri and $self->metaschema_uri eq (STRICT_METASCHEMA->{3.1} =~ s{/3.1/}{/}r);
@@ -196,12 +196,15 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       if $self->_has_metaschema_uri and $self->metaschema_uri eq (STRICT_METASCHEMA->{$self->oas_version}//'')
         or $json_schema_dialect eq (STRICT_DIALECT->{$self->oas_version}//'');
 
-    if ($self->oas_version eq '3.0') {
-      # this is not going to actually work in this state, but we're never going to try to
-      # execute it anyway (potential TODO: define an OAS 3.0 dialect and vocabulary so we can)
-      $state->{specification_version} = 'draft4';
-      $state->{vocabularies} = [];
-      $state->{json_schema_dialect} = DEFAULT_METASCHEMA->{'3.0'}.'#/definitions/Schema';
+    if ($json_schema_dialect eq DEFAULT_DIALECT->{'3.0'}
+        or $json_schema_dialect eq (DEFAULT_DIALECT->{'3.0'} =~ s/\b\d{4}-\d{2}-\d{2}\b/latest/r)) {
+      croak '3.0 dialect with a non-3.0 OAD is not currently supported' if $self->oas_version ne '3.0';
+
+      $evaluator->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI_3_0');
+      $evaluator->_set_metaschema_vocabulary_classes($json_schema_dialect => [
+        $state->@{qw(specification_version vocabularies)} =
+          ('draft4', ['JSON::Schema::Modern::Vocabulary::OpenAPI_3_0'])
+      ]);
     }
     else {
       # traverse an empty schema with this dialect uri to confirm it is valid, and add an entry in
@@ -219,8 +222,10 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       }
 
       $state->@{qw(specification_version vocabularies)} = $check_metaschema_state->@{qw(specification_version vocabularies)};
-      $state->{json_schema_dialect} = $json_schema_dialect; # subsequent '$schema' keywords can still override this
     }
+
+    # subsequent '$schema' keywords can still override this
+    $state->{json_schema_dialect} = $json_schema_dialect;
 
     $self->_set_metaschema_uri(DEFAULT_METASCHEMA->{$self->oas_version})
       if not $self->_has_metaschema_uri;
@@ -238,7 +243,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths, @bad_items_paths);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -256,13 +261,28 @@ sub traverse ($self, $evaluator, $config_override = {}) {
           return 1;
         },
         '$ref' => sub ($data, $schema, $state) {
-          # we only need to special-case path-item, because this is the only entity that is
-          # referenced in the schema without an -or-reference
-          my ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)$}),
-            ($schema->{'$ref'} =~ m{#/\$defs/(path-item)$}));
+          my $entity;
+
+          if ($self->oas_version eq '3.0') {
+            # strip '#/definitions/'; convert CamelCase to kebab-case
+            if ($entity = lc join('-', split /(?=[A-Z])/, substr($schema->{'$ref'}, 14))) {
+              push @bad_items_paths, $state->{data_path}
+                if $entity eq 'schema' and ($data->{type}//'') eq 'array' and not exists $data->{items};
+
+              undef $entity if not grep $entity eq $_, __entities;
+              # no need to push to @json_schema_paths, as all schema entities are already found
+            }
+          }
+          else {
+            # we only need to special-case path-item, because this is the only entity that is
+            # referenced in the schema without an -or-reference
+            ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)$}),
+                         ($schema->{'$ref'} =~ m{#/\$defs/(path-item)$}));
+          }
+
           $self->_add_entity_location($state->{data_path}, $entity) if $entity;
 
-          if ($schema->{'$ref'} eq '#/$defs/operation') {
+          if ($schema->{'$ref'} eq '#/$defs/operation' or $schema->{'$ref'} eq '#/definitions/Operation') {
             push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
               if defined $data->{operationId};
 
@@ -308,6 +328,9 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
     return $state;
   }
+
+  ()= E({ %$state, keyword_path => $_ }, '"items" must be present if type is "array"')
+    foreach @bad_items_paths;
 
   # v3.2.0 §4.8.1, "Patterned Fields": "When matching URLs, concrete (non-templated) paths would be
   # matched before their templated counterparts."
@@ -566,7 +589,7 @@ sub THAW ($class, $serializer, $data) {
   }
 
   my $self = bless($data, $class);
-  $self->{oas_version} = '3.1' if not exists $self->{oas_version};
+  $self->{oas_version} = OAS_VERSIONS->[-1] if not exists $self->{oas_version};
 
   foreach my $attr (qw(schema _entities)) {
     croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
@@ -586,11 +609,11 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
+JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 SYNOPSIS
 
@@ -685,7 +708,7 @@ The URI of the schema that describes the OpenAPI document itself. Defaults to
 C<https://spec.openapis.org/oas/3.2/schema/2025-09-17> (or the equivalent for the
 L<OpenAPI version|https://spec.openapis.org/oas/latest#fixed-fields> you specify in the document),
 which permits the customization of
-L<C<jsonSchemaDialect|https://spec.openapis.org/oas/latest#openapi-object>>, which defines the
+L<C<jsonSchemaDialect>|https://spec.openapis.org/oas/latest#openapi-object>, which defines the
 JSON Schema dialect to use for embedded JSON Schemas (which itself defaults to
 C<https://spec.openapis.org/oas/3.2/dialect/2025-09-17> (or equivalent).
 
@@ -704,7 +727,7 @@ Also available as L<JSON::Schema::Modern::Document/original_uri>, this is known 
 URI" in the OAS specification: the URL the document was originally sourced from, or the URI that
 was used to add the document to the L<OpenAPI::Modern> instance.
 
-In OpenAPI version 3.1.x (but not in 3.2+), this is the same as L</canonical_uri>.
+In OpenAPI versions before 3.2.0, this is the same as L</canonical_uri>.
 
 =head2 oas_version
 
@@ -773,7 +796,15 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/latest>
+L<https://spec.openapis.org/oas/v3.0>
+
+=item *
+
+L<https://spec.openapis.org/oas/v3.1>
+
+=item *
+
+L<https://spec.openapis.org/oas/v3.2>
 
 =item *
 

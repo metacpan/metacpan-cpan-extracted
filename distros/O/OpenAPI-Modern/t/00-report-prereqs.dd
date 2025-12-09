@@ -29,7 +29,6 @@ do { my $x = {
                                       'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
-                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -69,6 +68,7 @@ do { my $x = {
                                       'open' => '0',
                                       'perl' => 'v5.20.0',
                                       'stable' => '0.031',
+                                      'strict' => '0',
                                       'strictures' => '2',
                                       'utf8' => '0'
                                     },
@@ -115,7 +115,6 @@ do { my $x = {
                                    'YAML::PP' => '0.005',
                                    'lib' => '0',
                                    'perl' => 'v5.20.0',
-                                   'strict' => '0',
                                    'warnings' => '0'
                                  }
                  },

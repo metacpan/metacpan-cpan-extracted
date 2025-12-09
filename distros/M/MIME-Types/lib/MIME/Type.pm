@@ -1,4 +1,4 @@
-# This code is part of Perl distribution MIME-Types version 2.29.
+# This code is part of Perl distribution MIME-Types version 2.30.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package MIME::Type;{
-our $VERSION = '2.29';
+our $VERSION = '2.30';
 }
 
 
@@ -42,7 +38,6 @@ sub init($)
 		or croak "ERROR: Type parameter is obligatory.";
 
 	$self->{MT_simplified} = $args->{simplified} || $self->simplified($type);
-
 	$self->{MT_extensions} = $args->{extensions} || [];
 
 	$self->{MT_encoding}
@@ -62,13 +57,13 @@ sub type() { $_[0]->{MT_type} }
 
 sub simplified(;$)
 {	my $thing = shift;
-	return $thing->{MT_simplified} unless @_;
+	@_ or return $thing->{MT_simplified};
 
 	my $mime  = shift;
 
-	$mime =~ m!^\s*(?:x\-)?([\w.+-]+)/(?:x\-)?([\w.+-]+)\s*$!i ? lc "$1/$2"
-	  : $mime eq 'text' ? 'text/plain'          # some silly mailers...
-	  :   undef;
+	  $mime =~ m!^\s*(?:x\-)?([\w.+-]+)/(?:x\-)?([\w.+-]+)\s*$!i ? lc "$1/$2"
+	: $mime eq 'text' ? 'text/plain'         # some silly mailers...
+	:   $mime;                               # doesn't follow rules, f.i. one word
 }
 
 
@@ -81,24 +76,24 @@ sub charset()    { $_[0]->{MT_charset} }
 
 #--------------------
 
-sub mediaType()  { $_[0]->{MT_simplified} =~ m!^([\w.-]+)/! ? $1 : undef }
+sub mediaType()  { $_[0]->simplified =~ m!^([\w.-]+)/! ? $1 : undef }
 sub mainType()   { $_[0]->mediaType } # Backwards compatibility
 
 
-sub subType()    { $_[0]->{MT_simplified} =~ m!/([\w+.-]+)$! ? $1 : undef }
+sub subType()    { $_[0]->simplified =~ m!/([\w+.-]+)$! ? $1 : undef }
 
 
-sub isRegistered() { lc $_[0]->{MT_type} !~ m{^x\-|/x\-} }
+sub isRegistered() { lc($_[0]->type) !~ m{^x\-|/x\-} }
 
 
 # http://tools.ietf.org/html/rfc4288#section-3
-sub isVendor()       { $_[0]->{MT_simplified} =~ m!/vnd\.! }
-sub isPersonal()     { $_[0]->{MT_simplified} =~ m!/prs\.! }
-sub isExperimental() { $_[0]->{MT_simplified} =~ m!/x\.! }
+sub isVendor()       { $_[0]->simplified =~ m!/vnd\.! }
+sub isPersonal()     { $_[0]->simplified =~ m!/prs\.! }
+sub isExperimental() { $_[0]->simplified =~ m!/x\.! }
 
 
-sub isBinary() { $_[0]->{MT_encoding} eq 'base64' }
-sub isText()   { $_[0]->{MT_encoding} ne 'base64' }
+sub isBinary() { $_[0]->encoding eq 'base64' }
+sub isText()   { $_[0]->encoding ne 'base64' }
 *isAscii = \&isText;
 
 
@@ -108,7 +103,7 @@ qw(application/pgp-keys application/pgp application/pgp-signature
 	application/pkcs10 application/pkcs7-mime application/pkcs7-signature
 	text/vCard);
 
-sub isSignature() { $sigs{ $_[0]->{MT_simplified}} }
+sub isSignature() { $sigs{$_[0]->simplified} }
 
 
 sub cmp($)

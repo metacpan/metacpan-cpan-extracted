@@ -39,7 +39,7 @@ The stringification (use of the object in a place where a string
 is required) will result in the type name, the same as L<type()|MIME::Type/"Attributes">
 returns.
 
-example: use of stringification
+» example: use of stringification
 
   my $mime = MIME::Type->new('text/html');
   print "$mime\n";   # explicit stringification
@@ -146,7 +146,7 @@ carry an C<x-> preamble to indicate that.  Of course, after recognition,
 the C<x-> can disappear.  In many cases, we prefer the simplified version
 of the type.
 
-example: results of simplified()
+» example: results of simplified()
 
   my $mime = MIME::Type->new(type => 'x-appl/x-zip');
   print $mime->simplified;                     # 'appl/zip'
@@ -178,14 +178,14 @@ types may require a charset as well.
 It is hard to extract this information from the IANA registration files
 automagically, so is manually maintained.
 
-example: default charset use
+» example: default charset use
 
    $charset //= $type->defaultCharset // 'utf-8';
 
 =item $obj-E<gt>B<equals>($string|$mime)
 
-Compare this mime-type object with a STRING or other object.  In case of
-a STRING, simplification will take place.
+Compare this mime-type object with a type as C<$string> or other C<$mime>
+type object.  In case of a C<$string>, simplification will take place.
 
 =item $obj-E<gt>B<isAscii>()
 
@@ -249,14 +249,14 @@ For C<'text/plain'> it will return C<'plain'>.
 
 When a L<MIME::Type|MIME::Type> object is created, the type itself must be
 specified with the C<type> option flag.
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types version 2.29,
-built on September 15, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types version 2.30,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

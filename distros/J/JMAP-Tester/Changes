@@ -1,5 +1,11 @@
 Revision history for JMAP-Tester
 
+0.105     2025-12-09 11:44:18+11:00 Australia/Melbourne
+        - add a (temporary!) second arg to ->download to allow setting the
+          Accept header
+        - convert the LWP-based UA to use keepalive
+        - add get_client_session to get the session without reconfiguring
+
 0.104     2025-06-11 13:28:56-04:00 America/New_York
         - add a TO_JSON method to the Sentence class
         - include ->sentences, not ->items in default diagnostics (which allows

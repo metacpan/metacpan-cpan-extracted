@@ -137,7 +137,7 @@ In some cases, more than one type is known for a certain filename extension.
 In that case, the preferred one is taken (for an unclear definition of
 preference)
 
-example: use of mimeTypeOf()
+» example: use of mimeTypeOf()
 
   my $types = MIME::Types->new;
   my $mime = $types->mimeTypeOf('gif');
@@ -177,7 +177,7 @@ where the highest priority type is first.  The list may contain '*/*'
 Ill-formated typenames are ignored.  On equal qualities, the order is
 kept.  See RFC2616 section 14.1
 
-example: 
+» example: 
 
   my @types = $types->httpAccept('text/html, application/json;q=0.9');
 
@@ -192,7 +192,7 @@ Those need to be L<MIME::Type|MIME::Type> objects. The preferred type will get
 selected.  When none of these are accepted by the client, this will
 return C<undef>.  It should result in a 406 server response.
 
-example: 
+» example: 
 
   my $accept = $req->header('Accept');
   my @have   = map $mt->type($_), qw[text/plain text/html];
@@ -204,7 +204,7 @@ example:
 and filename, not just the type.  If C<$accept> is C<undef>, the first
 filename is returned.
 
-example: 
+» example: 
 
   use HTTP::Status ':constants';
   use File::Glob   'bsd_glob';    # understands blanks in filename
@@ -239,7 +239,7 @@ expression.
 Like C<mimeTypeOf>, but does not return an C<MIME::Type> object. If the file
 +type is unknown, both the returned media type and encoding are empty strings.
 
-example: use of function by_suffix()
+» example: use of function by_suffix()
 
   use MIME::Types 'by_suffix';
   my ($mediatype, $encoding) = by_suffix('image.gif');
@@ -259,8 +259,8 @@ missing, please contact the maintainer for inclusion.
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types version 2.29,
-built on September 15, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types version 2.30,
+built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

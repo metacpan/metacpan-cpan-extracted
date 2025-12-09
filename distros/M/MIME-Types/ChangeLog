@@ -6,6 +6,16 @@ Mark Overmeer.
 TODO:
 	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
+version 2.30: Mon  8 Dec 20:33:20 CET 2025
+
+	Fixes:
+	- no undef when simplifying illegal type
+	  github issue #15 [Todd Richmond]
+
+	Improvements:
+	- add bugtracker to meta
+	- better OO use of attributes.
+
 version 2.29: Mon 15 Sep 12:51:21 CEST 2025
 
 	Changes:

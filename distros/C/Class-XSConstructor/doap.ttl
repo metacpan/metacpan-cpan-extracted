@@ -30,7 +30,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Class-XSConstructor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-009>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-010>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-class-xsconstructor>;
@@ -135,7 +135,7 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Packaging;
-			rdfs:label "Devel::PPPort should be a configure recommentation, not a build requirement.";
+			rdfs:label "Devel::PPPort should be a configure recommendation, not a build requirement.";
 		], [
 			a doap-changeset:Addition;
 			rdfs:label "$Class::XSConstructor::REDEFINE to allow an existing `new` to be redefined without a warning.";
@@ -178,6 +178,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-XSConstructor-0.009.tar.gz>;
 	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Class-XSConstructor-0.010"^^xsd:string;
+	dc:issued            "2025-12-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Allow MooseX::StrictConstructor-style constructors to be built; which reject unknown parameters.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor improvements to API.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Class-XSConstructor-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -27,7 +27,7 @@ class Point :lexical_new
 
 {
    my $p = Point->create( 10, 20 );
-   ok( defined $p, 'Lexically constructed class Point can ->new' );
+   ok( defined $p, 'Lexically constructed class Point can ->create' );
    is( $p->x, 10, 'Lexically constructed class instances have methods' );
 
    ok( !defined &Point::new, '&Point::new is not in the symbol table' );
@@ -37,6 +37,24 @@ class Point :lexical_new
    if( HAVE_SUBNAME ) {
       is( subname( Point->get_constructor ), "Point::new", 'subname of lexical constructor' );
    }
+}
+
+class PointOverridingNew :lexical_new
+{
+   method new :common
+   {
+      my ( $x, $y ) = @_;
+      return &new( __PACKAGE__, x => $x, y => $y );
+   }
+
+   field $x :param :reader;
+   field $y :param :reader;
+}
+
+{
+   my $p = PointOverridingNew->new( 10, 20 );
+   ok( defined $p, 'Lexically constructed class Point can invoke overridden ->new' );
+   is( $p->x, 10, 'Lexically constructed class saw correct constructor args' );
 }
 
 done_testing;

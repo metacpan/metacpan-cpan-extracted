@@ -1,5 +1,6 @@
 package Test::Unit::Test;
 use strict;
+use warnings;
 
 use Carp;
 
@@ -54,7 +55,7 @@ my %filter = ();
 sub filter { \%filter }
 
 # use Attribute::Handlers;
-    
+
 # sub Filter : ATTR(CODE) {
 #     my ($pkg, $symbol, $referent, $attr, $data, $phase) = @_;
 #     print "attr $attr (data $data) on $pkg\::*{$symbol}{NAME}\n";
@@ -106,7 +107,7 @@ Test::Unit::Test - unit testing framework abstract base class
 
 =head1 SYNOPSIS
 
-This class is not intended to be used directly 
+This class is not intended to be used directly
 
 =head1 DESCRIPTION
 

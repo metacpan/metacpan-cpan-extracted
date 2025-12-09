@@ -1,0 +1,8 @@
+% if ($TicketObj && $TicketObj->id) {
+% $m->callback( %ARGS, CallbackName => 'BeforeWidget' );
+<& /Elements/Memo, Object => $TicketObj &>
+% $m->callback( %ARGS, CallbackName => 'AfterWidget' );
+% }
+<%ARGS>
+$TicketObj
+</%ARGS>
