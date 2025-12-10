@@ -6,7 +6,7 @@
 # closest interval to the interval under consideration will be used.
 #
 # For example, this checks the scala scale directory from
-# http://www.huygens-fokker.org/docs/scales.zip
+# https://www.huygens-fokker.org/docs/scales.zip
 # against a 53-note overtone-based scale for the worst fits:
 #
 #   perl fitness sparschuh_53in13lim.scl \

@@ -105,9 +105,9 @@ class Mojo::Asset::Memory extends Mojo::Asset {
       die "The start_range field must be less than or equal to Fn->INT_MAX.";
     }
     
-    my $end = $self->end_range;
+    my $end_range = $self->end_range;
     
-    unless ($end <= Fn->INT_MAX) {
+    unless ($end_range <= Fn->INT_MAX) {
       die "The end_range field must be less than or equal to Fn->INT_MAX.";
     }
     
@@ -117,13 +117,15 @@ class Mojo::Asset::Memory extends Mojo::Asset {
     
     $offset += $start;
     
-    if ($end >= 0) {
-      if (($offset + $max) > $end) {
-        $max = (int)$end + 1 - (int)$offset;
+    if ($end_range > 0) {
+      if (($offset + $max) > $end_range) {
+        $max = (int)$end_range + 1 - (int)$offset;
       }
     }
     
-    return $self->{content_buffer}->substr((int)$offset, $max);
+    my $chunk = $self->{content_buffer}->substr((int)$offset, $max);
+    
+    return $chunk;
   }
   
   method move_to : void ($file : string) {

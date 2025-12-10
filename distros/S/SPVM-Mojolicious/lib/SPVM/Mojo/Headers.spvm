@@ -349,14 +349,13 @@ class Mojo::Headers {
     my $offset = 0;
     while (1) {
       
-      my $_ = Re->s((mutable string)$buffer->get_string, "^(.*?)\x0d?\x0a", "");
+      my $rep = Re->s((mutable string)$buffer->get_string, "^(.*?)\x0d?\x0a", "");
       
-      unless ($_) {
+      unless ($rep) {
         last;
       }
       
-      my $line_buffer = StringBuffer->new;
-      $line_buffer->push($_->match->cap1);
+      my $line_buffer = $rep->match->cap1;
       
       # Check line size limit
       if ($offset > $size || @$headers >= $lines) {
@@ -366,19 +365,19 @@ class Mojo::Headers {
       }
       
       # New header
-      if (my $_ = Re->m($line_buffer->get_string, "^(\S[^:]*):\s*(.*)$")) {
+      if (my $m= Re->m($line_buffer, "^(\S[^:]*):\s*(.*)$")) {
         
-        my $name = $_->cap1;
-        my $value = $_->cap2;
+        my $name = $m->cap1;
+        my $value = $m->cap2;
         
         List->new_ref($headers)->push([$name, $value]);
       }
       
       # Multi-line
-      elsif ((my $_ = Re->s((mutable string)$line_buffer->get_string, "^\s+", "")) && @$headers) {
+      elsif ((Re->s((mutable string)$line_buffer, "^\s+", "")) && @$headers) {
         my $last_header = (string[])$headers->[-1];
         my $last_header_value = $last_header->[1];
-        $last_header->[1] = $last_header_value . " " . $line_buffer->to_string;
+        $last_header->[1] = $last_header_value . " " . $line_buffer;
       }
       
       # Empty line
@@ -395,7 +394,6 @@ class Mojo::Headers {
             }
             
             my $value = $items->[$item_index];
-            
             $self->add($name, $value);
           }
         }
@@ -455,18 +453,14 @@ class Mojo::Headers {
   method to_string : string () {
     
     my $names = $self->names;
-    
-    my $buffer = StringBuffer->new;
+    my $headers = StringList->new;
     for my $name (@$names) {
-      my $header_string = $self->header($name);
-      if ($header_string) {
-        $buffer->push("$name:");
-        $buffer->push($header_string);
-        $buffer->push("\r\n");
-      }
+      my $value = $self->header($name);
+      my $header = "$name: $value";
+      $headers->push($header);
     }
     
-    my $string = $buffer->to_string;
+    my $string = Fn->join("\x0d\x0a", $headers->get_array);
     
     return $string;
   }

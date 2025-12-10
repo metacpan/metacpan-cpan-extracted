@@ -1,0 +1,10 @@
+00,NATIONAL AUSTRALIA BANK,Direct Link,Direct Link - Direct Credit Disbursement Report,30012014,163707,SITDL,Automation,MultiSAmpleDC_pressinvalid.txt,30012014,10339867,DCtest,342180,,MultiSAmpleDC_pressinvalid.txt_10339867.dis
+53,DNN,DebitLodgementRef,1000,AUD,CR,Test NAB Account,084-737,576512164
+53,DNN,DebitLodgementRef,1000,AUD,CR,Test NAB Account,084-737,576512172
+54,UVD,2,2000
+57,DNN,CredtLodgementRef,3000,AUD,DR,Other ANZ Account,084-737,576510388
+58,UVD,1,3000
+61,UXD,DEN,DebitLodgementRef,1000,AUD,CR,Test NAB Account,084-737,123456789,,The Account Number 123456789 is Invalid.
+62,UXS,1,1000,1,Failed items will be returned as individual items to your trace account.
+99,0,3000,3000,4
+100,(c) 2012 National Australia Bank Limit ABN 12 004 044 937

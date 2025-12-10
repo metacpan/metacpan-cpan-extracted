@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.112-8-geee3c21e
+package OpenAPI::Modern; # git description: v0.113-2-g02f745dd
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 use 5.020;
 use utf8;
@@ -1140,6 +1140,7 @@ sub _convert_request ($request) {
     my $body = $request->content;
     $req->body($body) if length $body;
   }
+  # note: Dancer2::Core::Request inherits from Plack::Request
   elsif ($request->isa('Plack::Request') or $request->isa('Catalyst::Request')) {
     $req->parse($request->env);
 
@@ -1177,7 +1178,7 @@ sub _convert_response ($response) {
     my $body = $response->content;
     $res->body($body) if length $body;
   }
-  elsif ($response->isa('Plack::Response')) {
+  elsif ($response->isa('Plack::Response') or $response->isa('Dancer2::Core::Response')) {
     $res->code($response->status);
     $res->headers->add(@$_) foreach pairs $response->headers->psgi_flatten_without_sort->@*;
     my $body = $response->content;
@@ -1235,7 +1236,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.113
+version 0.114
 
 =head1 SYNOPSIS
 
@@ -1442,7 +1443,8 @@ L</recursive_get>.
     },
   );
 
-Validates an L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request> or L<Mojo::Message::Request>
+Validates an L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>,
+L<Dancer2::Core::Request> or L<Mojo::Message::Request>
 object against the corresponding OpenAPI document, returning a
 L<JSON::Schema::Modern::Result> object.
 
@@ -1465,7 +1467,8 @@ to improve performance.
     },
   );
 
-Validates an L<HTTP::Response>, L<Plack::Response>, L<Catalyst::Response> or L<Mojo::Message::Response>
+Validates an L<HTTP::Response>, L<Plack::Response>, L<Catalyst::Response>,
+L<Dancer2::Core::Response> or L<Mojo::Message::Response>
 object against the corresponding OpenAPI document, returning a
 L<JSON::Schema::Modern::Result> object.
 
@@ -1497,7 +1500,7 @@ of values can be provided; possible values are:
 
 =item *
 
-C<request>: the object representing the HTTP request. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Mojo::Message::Request>. Converted to a L<Mojo::Message::Request>.
+C<request>: the object representing the HTTP request. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Dancer2::Core::Request>, L<Mojo::Message::Request>. Converted to a L<Mojo::Message::Request>.
 
 =item *
 

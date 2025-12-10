@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "1.2";
+our $VERSION = "1.3";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -28,7 +28,6 @@ sub import {
 	my (undef, $attr) = @_;
 	my $pkg = caller;
 
-	*{"$pkg\::isa"} = \&isa if \&isa != $pkg->can('isa');
 	*{"$pkg\::DOES"} = \&does if \&does != $pkg->can('DOES');
 
 	if($attr ne '-role') {  # Класс
@@ -38,7 +37,7 @@ sub import {
 		export $pkg, qw/requires req/;
 	}
 
-	export $pkg, qw/with has aspect does/;
+	export $pkg, qw/with has aspect does exactly/;
 
 	# Метаинформация
 	$META{$pkg} = {
@@ -61,6 +60,7 @@ sub import {
 			predicate => \&predicate_aspect,
 			clearer   => \&clearer_aspect,
 			cleaner   => \&cleaner_aspect,
+			eon       => \&eon_aspect,
 		}
 	};
 
@@ -137,6 +137,25 @@ sub coerce_aspect {
 	die "coerce: isa not present!" unless $feature->{isa};
 
 	$feature->{construct}->add_preset("\$val = ${\$feature->meta}\{isa}->coerce(\$val);", 1) if ISA =~ /wo|rw/;
+}
+
+our $pleroma;
+
+# eon => $key
+sub eon_aspect {
+	my ($key, $feature) = @_;
+
+	die "eon is not compatible with default!" if $feature->{opt}{default};
+	
+	require Aion::Pleroma, $pleroma = Aion::Pleroma->new unless $pleroma;
+	
+	if($key eq 1) {
+		my $isa = $feature->{opt}{isa};
+		$key = $isa && $isa->{name} eq "Object" && $isa->{args}[0]
+			or die "use: has $feature->{name} => (isa => Object[...], eon => 1)";
+	}
+	
+	default_aspect(sub { $pleroma->resolve($key) }, $feature);
 }
 
 # lazy => 1|0
@@ -362,8 +381,8 @@ sub aspect($$) {
 	return;
 }
 
-# Переопределяет стандартную isa для того, чтобы не искать роли
-sub isa {
+# Ищет именно классы, а не роли
+sub exactly {
     my ($self, $class) = @_;
     return '' if Aion::Types::ClassName->exclude($class);
 	goto &UNIVERSAL::isa;
@@ -510,7 +529,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-1.2
+1.3
 
 =head1 SYNOPSIS
 
@@ -627,22 +646,24 @@ File lib/Class/All/Stringify.pm:
 	$s->keysify	 # => key1, key2
 	$s->valsify	 # => a, b
 
-=head2 isa ($package)
+=head2 exactly ($package)
 
 Checks that C<$package> is a super class for a given or this class itself.
+
+Aion does not change the implementation of the C<isa> method and it finds both superclasses and roles (since both are added to the C<@ISA> package).
 
 	package Ex::X { use Aion; }
 	package Ex::A { use Aion; extends q/Ex::X/; }
 	package Ex::B { use Aion; }
 	package Ex::C { use Aion; extends qw/Ex::A Ex::B/ }
 	
-	Ex::C->isa("Ex::A") # -> 1
-	Ex::C->isa("Ex::B") # -> 1
-	Ex::C->isa("Ex::X") # -> 1
-	Ex::C->isa("Ex::X1") # -> ""
-	Ex::A->isa("Ex::X") # -> 1
-	Ex::A->isa("Ex::A") # -> 1
-	Ex::X->isa("Ex::X") # -> 1
+	Ex::C->exactly("Ex::A") # -> 1
+	Ex::C->exactly("Ex::B") # -> 1
+	Ex::C->exactly("Ex::X") # -> 1
+	Ex::C->exactly("Ex::X1") # -> ""
+	Ex::A->exactly("Ex::X") # -> 1
+	Ex::A->exactly("Ex::A") # -> 1
+	Ex::X->exactly("Ex::X") # -> 1
 
 =head2 does ($package)
 
@@ -946,7 +967,7 @@ If C<$value> is a subroutine, then the subroutine is considered the feature's va
 
 =head2 lazy => (1|0)
 
-The C<lazy> attribute enables or disables lazy evaluation of the default value (C<default>).
+The C<lazy> aspect enables or disables lazy evaluation of the default value (C<default>).
 
 By default it is only enabled if the default is a subroutine.
 
@@ -966,10 +987,40 @@ By default it is only enabled if the default is a subroutine.
 	$ex1->has_x # -> ""
 	$ex1->x     # -> 6
 
+=head2 eon => (1|$key)
+
+The C<eon> aspect implements the B<Dependency Injection> pattern.
+
+It associates a property with a service from the C<$Aion::pleroma> container.
+
+The aspect value can be the service key or 1, then the key will be the package in C<< isa =E<gt> Object['Packet'] >>
+
+Example from 1st:
+
+	package CounterEon { use Aion;
+		has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
+	}
+	
+	package AccomulatorEon { use Aion;
+		has counter => (eon => 'ex.counter');
+	}
+	
+	{
+		local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
+			'ex.counter' => 'CounterEon#new',
+			AccomulatorEon => 'AccomulatorEon#new',
+		});
+		
+		my $counter = $Aion::pleroma->get('ex.counter');
+	
+		$counter->accomulator->counter # -> $counter
+	}
+
 =head2 trigger => $sub
 
-C<$sub> is called after installing the property in the constructor (C<new>) or through the setter.
-Etymology - let in.
+C<$sub> is called after setting the property in the constructor (C<new>) or via a setter.
+
+The etymology of C<trigger> is to let in.
 
 	package ExTrigger { use Aion;
 		has x => (trigger => sub {
@@ -987,8 +1038,9 @@ Etymology - let in.
 
 =head2 release => $sub
 
-C<$sub> is called before returning the property from the object through the gutter.
-Etymology - release.
+C<$sub> is called before returning a property from an object via a getter.
+
+The etymology of C<release> is to release.
 
 	package ExRelease { use Aion;
 		has x => (release => sub {

@@ -17,32 +17,37 @@ class Mojo::Asset::File extends Mojo::Asset {
   
   has handle : rw IO::File
     get {
-      my $handle = (IO::File)undef;
-      my $path = $self->path;
-      if ($path) {
-        if (Sys->e($path)) {
-          $handle = IO->open("<", $path);
+      unless (exists $self->{handle}) {
+        my $handle = (IO::File)undef;
+        my $path = $self->path;
+        if ($path) {
+          if (Sys->e($path)) {
+            $handle = IO->open("<", $path);
+          }
+          else {
+            $handle = IO->open("+>>", $path);
+          }
         }
         else {
-          $handle = IO->open("+>>", $path);
+          
+          unless (exists $self->{cleanup}) {
+            $self->{cleanup} = 1;
+          }
+          
+          my $tmpdir= $self->tmpdir;
+          
+          my $handle_ = File::Temp->new({DIR => $tmpdir, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
+          
+          # TODO: Fix IO::File#open for reopen
+          $handle_->close;
+          
+          $self->{path} = $handle_->filename;
+          $handle_->open($self->{path}, "+>>");
+          $handle = $handle_;
         }
+        
+        $self->{handle} = $handle;
       }
-      else {
-        
-        unless (exists $self->{cleanup}) {
-          $self->{cleanup} = 1;
-        }
-        
-        my $tmpdir= $self->tmpdir;
-        
-        my $handle = File::Temp->new({DIR => $tmpdir, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
-        
-        $self->{path} = $handle->filename;
-        
-        $handle->open($self->{path}, "+>>");
-      }
-      
-      $self->{handle} = $handle;
       
       return $self->{handle};
     }
@@ -70,7 +75,9 @@ class Mojo::Asset::File extends Mojo::Asset {
     
     my $handle = $self->handle;
     
+    # TODO: add IO::Handle#syswrite
     $handle->write($chunk);
+    $handle->flush;
     
     return $self;
   }
@@ -87,14 +94,7 @@ class Mojo::Asset::File extends Mojo::Asset {
     
     $handle->seek($start_range, IOC->SEEK_SET);
     
-    my $end = 0;
-    my $end_range = -1L;
-    if (exists $self->{end_range}) {
-      $end_range = $self->size;
-    }
-    else {
-      $end_range = $self->{end_range};
-    }
+    my $end_range = exists $self->{end_range} ? $self->{end_range} : $self->size;
     
     my $len  = length $string;
     my $size = 131072;
@@ -158,9 +158,9 @@ class Mojo::Asset::File extends Mojo::Asset {
     
     my $buffer = new_string_len $max;
     
-    my $end = $self->end_range;
-    
-    if ($end >= 0) {
+    if (exists $self->{end_range}) {
+      
+      my $end = $self->{end_range};
       
       my $chunk_size = (int)($end + 1 - $offset);
       

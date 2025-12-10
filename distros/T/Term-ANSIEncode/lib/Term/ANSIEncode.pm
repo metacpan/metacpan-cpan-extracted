@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.48;
+package Term::ANSIEncode 1.49;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -128,7 +128,19 @@ sub ansi_decode {
                               '[% RETURN %][% B_' . $color . ' %][% CLEAR LINE %][% RESET %]';
                           }/eigs;
 
-    # 24-bit RGB foreground/background
+	while($text =~ /\[\%\s+UNDERLINE COLOR RGB (\d+),(\d+),(\d+)\s+\%\]/) {
+		my ($red, $green, $blue) = ($1, $2, $3);
+		my $new = "\e[58;2;${red};${green};${blue}m";
+		$text =~ s/\[\%\s+UNDERLINE COLOR RGB $red,$green,$blue\s+\%\]/$new/gs;
+	}
+	while($text =~ /\[\%\s+UNDERLINE COLOR (.*?)\s+\%\]/) {
+		my $color = $1;
+		my $new;
+		$new = "\e[58;5;" . substr($self->{'ansi_meta'}->{'foreground'}->{$color}->{'out'},3);
+		$text =~ s/\[\%\s+UNDERLINE COLOR $color\s+\%\]/$new/gs;
+	}
+
+	# 24-bit RGB foreground/background
     $text =~ s/\[\%\s*RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\%\]/
               do { my ($r,$g,$b)=($1&255,$2&255,$3&255); $csi . "38:2:$r:$g:$b" . 'm' }/eigs;
     $text =~ s/\[\%\s*B_RGB\s+(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\%\]/

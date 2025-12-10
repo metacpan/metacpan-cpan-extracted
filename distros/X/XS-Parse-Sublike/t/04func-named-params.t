@@ -150,4 +150,7 @@ BEGIN { $^H{"t::func/nfunc"}++ }
       'result of invoking function with unnamed slurpy hash' );
 }
 
+# refalias named parameters are tested in a later test script, along with
+# other refalias
+
 done_testing;

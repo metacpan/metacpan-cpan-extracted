@@ -37,6 +37,7 @@ WriteMakefile(
         'Term::ReadKey'       => '0',
     },
     BUILD_REQUIRES => {
+		'Test2::Require::AuthorTesting' => '0',
         'Test::More' => '1.00',
         'List::Util' => '1.20',
     },
@@ -50,7 +51,6 @@ WriteMakefile(
         'Time::HiRes'       => '0',
         'Getopt::Long'      => '0',
         'Text::Wrap::Smart' => '0',
-		'Term::Drawille'    => '0.01',
     },
     EXE_FILES => ['bin/ansi-encode'],
     dist      => {

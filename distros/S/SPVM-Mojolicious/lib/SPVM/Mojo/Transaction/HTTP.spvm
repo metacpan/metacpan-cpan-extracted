@@ -13,8 +13,6 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   has previous : rw Mojo::Transaction::HTTP;
   
   # Undocumented Fields
-  has writing : byte;
-  
   has offset : int;
   
   has write : int;
@@ -70,7 +68,7 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     $self->client_read($leftovers);
   }
   
-  method client_write : string ($server : int) {
+  method client_write : string ($is_server : int) {
     
     $self->_write(0);
   }
@@ -81,8 +79,8 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   
   method keep_alive : int () {
     
-    my $req      = $self->req;
-    my $res      = $self->res;
+    my $req = $self->req;
+    my $res = $self->res;
     
     my $req_conn = $req->headers->connection;
     unless ($req_conn) {
@@ -114,21 +112,13 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   method redirects : Mojo::Transaction::HTTP[] () {
     my $previous = $self;
     
-    my $redirects_list = List->new(new Mojo::Transaction::HTTP[0]);
+    my $redirects = (List of Mojo::Transaction::HTTP)List->new(new Mojo::Transaction::HTTP[0]);
     
     while ($previous = $previous->previous) {
-      $redirects_list->unshift($previous);
+      $redirects->unshift($previous);
     }
     
-    return (Mojo::Transaction::HTTP[])$redirects_list->to_array;
-  }
-  
-  method resume : void () {
-    
-    $self->{writing} = 1;
-    
-    $self->emit("resume");
-    
+    return $redirects->to_array;
   }
   
   method server_read : void ($chunk : string) {
@@ -137,18 +127,26 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     $req->parse($chunk);
     
-    if ($req->is_finished && !$self->{handled}++) {
-      $self->emit("request");
+    if ($req->is_finished) {
+      unless ($self->{handled}++) {
+        $self->emit("request");
+      }
     }
     
   }
   
-  method server_write : string () { $self->_write(1); }
+  method server_write : string () {
+    
+    my $chunk = $self->_write(1);
+    
+    return $chunk;
+  }
   
   private method _start_line : string ($msg : Mojo::Message) {
     
-    my $buffer  = $msg->get_start_line_chunk($self->{offset});
-    my $written = length $buffer;
+    my $chunk = $msg->get_start_line_chunk($self->{offset});
+    
+    my $written = length $chunk;
     
     $self->{write}  -= $written;
     $self->{offset} += $written;
@@ -159,16 +157,16 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
       $self->{offset} = 0;
     }
     
-    return $buffer;
+    return $chunk;
   }
   
-  private method _headers : string ($msg : Mojo::Message, $head : int) {
+  private method _headers : string ($msg : Mojo::Message, $is_server : int) {
     
-    my $buffer  = $msg->get_header_chunk($self->{offset});
+    my $chunk = $msg->get_header_chunk($self->{offset});
     
     my $written = 0;
-    if ($buffer) {
-      $written = length $buffer;
+    if ($chunk) {
+      $written = length $chunk;
     }
     
     $self->{write}  -= $written;
@@ -178,57 +176,41 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
       $self->{http_state} = "body";
       $self->{offset} = 0;
       
-      if ($head && $self->is_empty) {
+      if ($is_server && $self->is_empty) {
         $self->completed;
         $self->{http_state} = "empty";
       }
     }
     
-    return $buffer;
+    return $chunk;
   }
   
-  private method _body : string ($msg : Mojo::Message, $finish : int) {
+  private method _body : string ($msg : Mojo::Message, $is_server : int) {
     
     # Prepare body chunk
-    my $buffer = $msg->get_body_chunk($self->{offset});
+    my $chunk = $msg->get_body_chunk($self->{offset});
     
-    if ($buffer) {
-      $self->{offset} += length $buffer;
+    if ($chunk) {
+      $self->{offset} += length $chunk;
     }
     
-    unless ($buffer) {
-      $self->{writing} = 0 ;
-    }
-    
-    if ($finish) {
-      if ($buffer && !length $buffer) {
+    if ($is_server) {
+      if ($chunk && !length $chunk) {
         $self->completed;
       }
-      else {
-        $self->{writing} = 0;
-      }
     }
     
-    unless ($buffer) {
-      $buffer = "";
+    unless ($chunk) {
+      $chunk = "";
     }
     
-    return $buffer;
+    return $chunk;
   }
   
-  private method _write : string ($server : int) {
-    
-    unless ($server) {
-      unless (exists $self->{writing}) {
-        $self->{writing} = 1;
-      }
-    }
-    unless ($self->{writing}) {
-      return "";
-    }
+  private method _write : string ($is_server : int) {
     
     my $msg = (Mojo::Message)undef;
-    if ($server) {
+    if ($is_server) {
       $msg = $self->res;
     }
     else {
@@ -241,22 +223,25 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     }
     
     # Start-line
-    my $chunk = "";
+    my $chunk = StringBuffer->new;
     if ($self->{http_state} eq "start_line") {
-      $chunk .= $self->_start_line($msg);
+      my $chunk_ = $self->_start_line($msg);
+      $chunk->push($chunk_);
     }
     
     # Headers
     if ($self->{http_state} eq "headers") {
-      $chunk .= $self->_headers($msg, $server);
+      my $chunk_ = $self->_headers($msg, $is_server);
+      $chunk->push($chunk_);
     }
     
     # Body
     if ($self->{http_state} eq "body") {
-      $chunk .= $self->_body($msg, $server);
+      my $chunk_ = $self->_body($msg, $is_server);
+      $chunk->push($chunk_);
     }
     
-    return $chunk;
+    return $chunk->get_string;
   }
   
 }

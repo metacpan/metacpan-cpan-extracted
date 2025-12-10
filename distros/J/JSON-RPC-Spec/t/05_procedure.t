@@ -19,7 +19,7 @@ is(
         $proc = JSON::RPC::Spec::Procedure->new(
             router        => $router,
             _callback_key => $callback_key
-          )
+        )
     },
     undef,
     'new'
@@ -34,7 +34,7 @@ subtest 'new hashref' => sub {
                     router        => $router,
                     _callback_key => $callback_key
                 }
-              )
+            )
         },
         undef,
         'new'
@@ -63,7 +63,7 @@ subtest 'parse' => sub {
 
 subtest 'trigger' => sub {
     my $params = 'Hello, trigger!';
-    my $res = $proc->_trigger('echo', $params);
+    my $res    = $proc->_trigger('echo', $params);
     is $res, $params, 'trigger' or diag explain $res;
 };
 

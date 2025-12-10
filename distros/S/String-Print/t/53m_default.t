@@ -14,21 +14,16 @@ isa_ok($f, 'String::Print');
 
 ### these are all examples from the manual page
 
-is $f->sprinti("visitors: {count //0}", count => 1), "visitors: 1", 'count';
+is $f->sprinti("visitors: {count //0}", count => 1),     "visitors: 1", 'count';
 is $f->sprinti("visitors: {count //0}", count => undef), "visitors: 0";
 is $f->sprinti("visitors: {count//0}",  count => undef), "visitors: 0";
 
-is $f->sprinti("published: {date DT//'not yet'}", date => undef),
-   "published: not yet", 'date';
-is $f->sprinti('published: {date DT//"not yet"}', date => undef),
-   "published: not yet";
-is $f->sprinti("published: {date DT//'not yet'}", date =>"2017-06-25 12:35:00"),
-   "published: 2017-06-25 12:35:00";
+is $f->sprinti("published: {date DT//'not yet'}", date => undef), "published: not yet", 'date';
+is $f->sprinti('published: {date DT//"not yet"}', date => undef), "published: not yet";
+is $f->sprinti("published: {date DT//'not yet'}", date => "2017-06-25 12:35:00"), "published: 2017-06-25 12:35:00";
 
-is $f->sprinti("copyright: {year//2017 YEAR}", year => " 2018 "),
-   'copyright: 2018', 'year';
-is $f->sprinti("copyright: {year//2017 YEAR}", year => undef),
-   'copyright: 2017';
+is $f->sprinti("copyright: {year//2017 YEAR}", year => " 2018 "), 'copyright: 2018', 'year';
+is $f->sprinti("copyright: {year//2017 YEAR}", year => undef),    'copyright: 2017';
 
 $f->addModifiers(qw/EUR\b/ => sub {
     my ($sp, $format, $value, $args) = @_;

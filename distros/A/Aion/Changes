@@ -1,5 +1,12 @@
 Revision history for Perl extension Aion
 
+1.3 2025-12-09T22:04:20Z
+
+    - added dependency injection: aspect eon
+    - isa finds classes and roles, does - roles and exactly - only classes
+    - added coercions Split[S] and Join[R]
+    - coerce container is common to all objects of the same type
+
 1.2 2025-11-20T12:35:01Z
 
     - add types Isa, BoolLike, ReachableCodeRef, UnreachableCodeRef, ScalarRefRef

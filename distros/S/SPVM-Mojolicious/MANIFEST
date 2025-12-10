@@ -184,11 +184,13 @@ MANIFEST.SKIP
 README.md
 t/basic.t
 t/lib/SPVM/TestCase/Mojo/Template.spvm
+t/lib/SPVM/TestCase/Mojo/Transaction.spvm
 t/lib/SPVM/TestCase/Mojolicious.spvm
 t/lib/SPVM/TestCase/Mojolicious/Controller.spvm
 t/lib/SPVM/TestCase/Mojolicious/Routes.spvm
 t/lib/SPVM/TestCase/Online.spvm
 t/Mojo-Template.t
+t/Mojo-Transaction.t
 t/Mojolicious-Controller.t
 t/Mojolicious-Routes.t
 t/online.t

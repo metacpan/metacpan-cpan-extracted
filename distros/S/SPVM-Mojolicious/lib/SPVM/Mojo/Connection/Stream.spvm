@@ -79,7 +79,7 @@ class Mojo::Connection::Stream extends Mojo::Connection {
     
     my $offset = 0;
     while (1) {
-      my $write_length = $handle->write($chunk, $offset);
+      my $write_length = $handle->syswrite($chunk, $offset);
       
       unless ($write_length) {
         last;
@@ -104,7 +104,7 @@ class Mojo::Connection::Stream extends Mojo::Connection {
     my $buffer = (mutable string)new_string_len 4096;
     
     while (1) {
-      my $read_length = $handle->read($buffer);
+      my $read_length = $handle->sysread($buffer);
       
       unless ($read_length) {
         return;

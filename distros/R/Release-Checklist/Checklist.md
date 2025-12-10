@@ -156,7 +156,13 @@ like [ExtUtils::MakeMaker](https://metacpan.org/pod/ExtUtils::MakeMaker),
     }
 ```
 
-# Legal issues
+# License
+
+Make a clear statement about your license. (or choose a default, but at least
+state it).
+
+Some target areas require a license in order to allow a CPAN module to be
+installed.
 
 Be very careful in choosing dependencies that have a different license than
 your own distribution. However useful a module might be, if it has a more
@@ -166,8 +172,30 @@ users. That would mean that your distribution cannot be used either.
 The reverse is also true: if your release has a more restrictive license than
 most releases on CPAN, it may lead to others avoiding depending on your code.
 
-The perl/perl_5 licence is a reasonable default if you do not have a preferred
+Does code (even part of the code from a patch, or a snippet that you have used)
+is based on other software, does that software have a compatible license?
+
+Does code (even part of the code from a patch or snippet that you have used) is
+AI-generated, then is it compatible with your license?
+(see e.g. [AI note in the Servo project](https://book.servo.org/contributing.html#ai-contributions))
+
+The perl/perl_5 license is a reasonable default if you do not have a preferred
 license.
+
+# Legal issues
+
+Do not release illegal code, not even in examples: do not release a webscraper
+for a site that strictly forbids that. (unless you have a written stement that
+your module is allowed to do so).
+
+Remember laws in the US are different than in the EU of Asian countries.
+Your module may be legal in Japan, but illegal in the EU, where
+[NIS2](https://digital-strategy.ec.europa.eu/en/policies/nis2-directive),
+[CSA](https://digital-strategy.ec.europa.eu/en/policies/cybersecurity-act), and
+[CRA](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act)
+might cause you to ensure that the code is easy to update/upgrade and that
+there is a full picture of the dependencies and any known issues in those
+dependencies.
 
 # Documentation
 
@@ -277,6 +305,8 @@ This gets really hard to set up if your release has different code for versions
 of perl and for versions of required modules, but it pays off eventually. Note
 that monitoring [CPANTESTERS](http://www.cpantesters.org) can be a huge help.
 
+TODO: CI integration. Travis is dead. Please add something about alternatives.
+Deprecated documentation:
 If your code resides on [GitHub](https://github.com/), you can set up hooks to
 [Travis CI](https://travis-ci.org/). Just compose a [.travis.yml](./.travis.yml)
 and enable the hook. This supports a variety of perl versions and an environment
@@ -418,7 +448,7 @@ of that to prevent unhappy users.
  $
 ```
 
-Other that doing all these tests *before* you upload to CPAN, there are some
+Other than doing all these tests *before* you upload to CPAN, there are some
 awesome metrics available on [cpants](https://cpants.cpanauthors.org/) that
 trigger *after* you have uploaded to CPAN.
 [This](https://cpants.cpanauthors.org/) also shows more metrics and has lots
@@ -490,6 +520,9 @@ style and layout. Again: consistency helps. A lot.
  - [.perltidy](./.perltidyrc)
  - [.perlcritic](./.perlcriticrc)
 
+This document should also describe what type of source is acceptable, e.g. if AI
+generated code can be used.
+
 # META
 
 Make sure your meta-data matches the expected requirements. That can be achieved
@@ -511,17 +544,17 @@ It is highly appreciated if you declare [resources](https://metacpan.org/pod/CPA
 like your public repository URL and the preferred way to communicate in your [META.json](./META.json):
 
 ```
-  "resources"      : {
-    "x_IRC"        : "irc://irc.perl.org/#toolchain",
-    "repository"   : {
-      "type"       : "git",
-      "url"        : "https://github.com/Tux/Release-Checklist",
-      "web"        : "https://github.com/Tux/Release-Checklist"
-      },
-    "bugtracker"   : {
-      "web"        : "https://github.com/Tux/Release-Checklist/issues"
-      }
-    }
+ "resources"      : {
+   "x_IRC"        : "irc://irc.perl.org/#toolchain",
+   "repository"   : {
+     "type"       : "git",
+     "url"        : "https://github.com/Tux/Release-Checklist",
+     "web"        : "https://github.com/Tux/Release-Checklist"
+     },
+   "bugtracker"   : {
+     "web"        : "https://github.com/Tux/Release-Checklist/issues"
+     }
+   }
 ```
 
 Those are recognized and shown in the top-left section on
@@ -539,6 +572,16 @@ Make sure it is a versioning system that increments
 
  - [Test::GreaterVersion](https://metacpan.org/pod/Test::GreaterVersion)
 
+# README / README.md
+
+Add a [file](./README.md) that states the purpose of your distribution.
+
+The README should state the purpose, the minimal envirenment to test, build,
+and run and possible license issue. If there is a need to amend or create
+configuration files or set up databases, that should be mentioned too.
+
+ - [Text::Markdown](https://metacpan.org/pod/Text::Markdown)
+
 # Changes
 
 Make sure your [Changes](./Changes) or ChangeLog file is up-to-date. Your
@@ -549,6 +592,8 @@ recent change(s).
 
  - [Date::Calc](https://metacpan.org/pod/Date::Calc)
  - [Test::CPAN::Changes](https://metacpan.org/pod/Test::CPAN::Changes)
+ - [CPAN::Changes::Spec](https://metacpan.org/pod/CPAN::Changes::Spec)
+
 
 # Performance
 
@@ -557,24 +602,6 @@ Check if your release matches previous performance (if appropriate)
  - between different versions of perl
  - between different versions of the module
  - between different versions of dependencies
-
-# License
-
-Make a clear statement about your license. (or choose a default, but at least
-state it).
-
-Some target areas require a license in order to allow a CPAN module to be
-installed.
-
-# README / README.md
-
-Add a [file](./README.md) that states the purpose of your distribution.
-
-The README should state the purpose, the minimal envirenment to test, build,
-and run and possible license issue. If there is a need to amend or create
-configuration files or set up databases, that should be mentioned too.
-
- - [Text::Markdown](https://metacpan.org/pod/Text::Markdown)
 
 # Tickets
 
@@ -597,11 +624,13 @@ as a (plain/simple) bug and deal with at with the appropriate actions.
 Whatever you choose, make it clear in your META information, so the link to
 issues on [metacpan](https://metacpan.org/) points to the correct location.
 
+```
  META.yml
  ---
  resources:
   bugtracker: https://github.com/Tux/Release-Checklist/issues
-
+```
+```
  META.json
  ---
  "resources" : {
@@ -609,14 +638,51 @@ issues on [metacpan](https://metacpan.org/) points to the correct location.
      "web" : "https://github.com/Tux/Release-Checklist/issues"
      }
    }
+```
+
+# CVE's
+
+The [Common Vulnerabilities and Exposures (CVE)](https://www.cve.org)
+Program's primary purpose is to uniquely identify vulnerabilities and to
+associate specific versions of code bases (e.g., software and shared
+libraries) to those vulnerabilities. The use of CVEs ensures that two or
+more parties can confidently refer to a CVE identifier (ID) when discussing
+or sharing information about a unique vulnerability. For detailed information
+regarding CVE please refer to [CNA](https://cve.mitre.org/)
+[CNA CVE Counting rules](https://cve.mitre.org/cve/cna/CNA_Rules_v1.1.pdf).
+
+In order to find a specific CVE that is known for your environment, you can
+visit the [NVD database](https://nvd.nist.gov/vuln) and
+[search for keywords](https://nvd.nist.gov/vuln/search).
+
+Modules might help you in finding (releated) CVE's and vulnerabilities:
+
+ - [CPAN::Audit](https://metacpan.org/pod/CPAN::Audit)
+ - [Test::CVE](https://metacpan.org/pod/Test::CVE)
+ - [App::CveClient](https://metacpan.org/pod/App::CveClient)
+
+[MetaCPAN](http://metacpan.org/) also provides CVE information per release
+in JSON but it is still work in progress, e.g.:
+
+ https://fastapi.metacpan.org/cve/Release-Checklist-0.18
+
+While you are at it, also consider adding F<SECURITY.md> where you declare
+how vulnerabilities in your own release are to be reported.
+
+ - [Software::Security::Policy::Individual](https://metacpan.org/pod/Software::Security::Policy::Individual)
 
 # Downriver
+
+Please read [The River of CPAN](https://neilb.org/2015/04/20/river-of-cpan.html)
+to understand the concept of upstream and downstream vs upriver and downriver.
 
 You have had reasons to make the changes leading up to a new distribution. If
 you really care about the users of your module, you should check if your new
 release would break any of the CPAN modules that (indirectly) depend on your
 module by testing with your previous release and your upcoming release and see
-if the new release would cause the other module(s) to break.
+if the new release would cause the other module(s) to break. Have good tests
+for your API (the stable parts) to prevent yourself from pushing unsuspected
+changes.
 
 [used_by.pl](./scripts/used-by.pl) will check the depending modules with the
 upcoming version.
@@ -626,7 +692,7 @@ Of course it is impossible to cover every possible situation here. The DarkPAN
 
 # LICENSE
 
-Copyright (C) 2015-2021 H.Merijn Brand.  All rights reserved.
+Copyright (C) 2015-2025 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

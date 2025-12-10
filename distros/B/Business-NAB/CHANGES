@@ -1,0 +1,368 @@
+==================================================
+Changes from 2024-11-25 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.01 at 2025-11-25 10:45:31 +0000
+-----------------------------------------
+
+  Change: 7f1ba085f5878a178a20d8c20af974ca02a44c6f
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-25 10:38:54 +0000
+
+    convert the dist to Dist::Zilla
+
+    as we're going to push out to our own DarkPAN first before we confirm
+    we will be releasing to CPAN 
+
+  Change: 6887139232ce1b17124594cdeebff0bf69be507b
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:16 +0000
+
+    up test coverage
+
+    Business::NAB::BPAY::Remittance::File::TrailerRecord::_brf_int gets
+    better coverage here as we specifically test for a negative amount.
+    the other stuff is trivial "oops i missed this" when writing the
+    original test coverage 
+
+  Change: 0a545b905ac5c97a69daff6b6feaf533190435cb
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:15 +0000
+
+    replace List::Util `sum` with`sum0`
+
+    so we don't need to `//= 0` after the fact. this requires List::Util
+    v1.26 min so update Makefile.PL to specify that
+
+    remove a couple of `use List::Util` imports as we're not... using
+    them 
+
+  Change: 65368135e878e56285f9a3cf6d325e8cc8a0c1b2
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:14 +0000
+
+    "inline" the decamelize method
+
+    rather than pulling in the entire Mojolicious distribution for this
+    one helper function, "inline" it instead into the
+    Business::NAB::Types module and make it available from it 
+
+  Change: a83e5bdd2dbd5120b9adc1b73ab4e1b25efedfbd
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:13 +0000
+
+    make dist ready for CPAN
+
+    various files for building and packaging:
+
+    perl Makefile.PL
+
+    make && make test && make dist 
+
+  Change: de3f41706a54c5ffd85e2d756dbad18b33074991
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:13 +0000
+
+    BPAY Remittance File parsing
+
+    based on Appendix D of the "NAB BPAY User Guide (April 2023)" this
+    follows the convention of the other file parsing/generating modules
+    created in the Business::NAB namespace
+
+    perldoc, test coverage, example files, etc
+
+    note the weird way of handling amounts in the trailer record, they
+    use the last character to represent: * the last digit * the sign
+
+    it's a little odd, but i guess they've historically had to squeeze
+    amounts into the 15 available spaces (which are minor units, so 13,
+    which still feels like a lot, but whatever). this is the *only* NAB
+    file type that does this, so it might actually be a BPAY thing
+
+    see also: NAB::Type::BRFInt in Business::NAB::Types which will coerce
+    NAB's value to an actual signed integer so we don't need to worry too
+    much about this in the class or the thing setting it / calling it 
+
+  Change: 2d5871956cd0ef88ba04aa4066bccfa5d9b03874
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:12 +0000
+
+    parse NAB acks and reports (unpaids, etc)
+
+    update the file_status table to keep track of which responses we get,
+    and when. this is done with the XML response files, we can't (or
+    shouldn't) do much else with these as the transaction level responses
+    are somewhat wishy-washy and free form text
+
+    the disbursement report is a bit more useful as it has a structured
+    format for returns/unpaids/failures so we don't need to faff about
+
+    add some test coverage around this, there's probably more to come but
+    this is a reasonable start 
+
+  Change: ccd52f5134c74b0451276054815cfc109c8bec10
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:11 +0000
+
+    change sprintf to string rather than dec
+
+    we're outputting strings here, don't potentially change the output
+    due to conversion - the test case added here covers this 
+
+  Change: 773540a86f63a7a3945e2f7902ea1ac73fac01e3
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:10 +0000
+
+    NAB BSB type constraint tweaks
+
+    the format of the BSB number is different depending on which batch
+    file we are dealing with:
+
+    * DirectEntry Payments: with a dash
+
+    * BPAY Payments: without a dash
+
+    this is a bit annoying, but we can handle via coercion to make either
+    format able to be passed into the constructor on the class but the
+    coercion then format it correctly for when the output is created
+
+    tweak test coverage to exercise this 
+
+  Change: 6babd0527837248ded98e6086f43d1ca0ed5b6e9
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:08 +0000
+
+    parse and link NAB response/ack
+
+    despite the response files using, you know, a markup language; we are
+    effectively having to handle free text as the schema is not using the
+    benefits of properly modeling the data. instead of getting something
+    easy to deal with like this:
+
+    <Issue>
+
+    <Type>181002</Type>
+
+    <ValiationStatus>Passed</Issue>
+
+    </Issue>
+
+    we get this:
+
+    <Issue type="181002">Payment has passed Account Validation.</Issue>
+
+    the usual case of "we're using XML!" no, you're using XML *poorly*
+
+    either way we don't do anything with the Issues because the
+    disbursement report from NAB will be more comprehensive and easier to
+    parse 
+
+  Change: 8a5c21b4d1587cb155ff5cbc99d6c52f75767906
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:08 +0000
+
+    move container attributes to a role
+
+    otherwise they are a property of the abstract class, and weird things
+    can happen when you use more than one of the classes that have these
+    attributes - as demonstrated by the test added here 
+
+  Change: 27025711702d92ad86e678c63a2fd437b90fe60a
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:07 +0000
+
+    NAB statement file (NAI/BAI2), tweaks
+
+    we have two conflicting spec docs here:
+
+    * NAB: "Account Information File (NAI/BAI2)" (2025)
+
+    * BAI: "Cash Management Balance Reporting Specifications Version 2"
+    (2005)
+
+    the former tries to describe *both* NAI and BAI2 and makes a bit of a
+    mess of this with ambiguity and conflicting examples, so we're having
+    to go by example files provided by NAB and the latter spec
+
+    thus here we need to add the version_number attribute to the File
+    class (absent in NAB's spec) and make some tweaks for the
+    physical_record_length and blocking_factor attributes to allow empty
+    values (defaulting them to zero to imply "not relevant") 
+
+  Change: 20c62cf7f78b32c9dd77c4446483bee71acd3032
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:06 +0000
+
+    NAB statement file (NAI/BAI2), tweaks
+
+    as per the TODO in Business::NAB::AccountInformation::File - it
+    indeed seems the continuation records can be continuation of not just
+    a record but also a field, so cope with that on the detail records
+    (type 16)
+
+    we may need to do this with other record types, although looking at
+    the spec that seems unlikely. the Transaction class was also wrong in
+    the number of fields and field names, correct those
+
+    tweak test coverage here 
+
+  Change: d62e7bb0ac567e48d06dead25673671d61494324
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:06 +0000
+
+    NAB statement file (NAI/BAI2), tweaks
+
+    having received example files and taking another look at the spec
+    there are some tweaks specific to records/fields that don't appear in
+    certain file types - the example(s) in the spec contradict these, so
+    we're going by the recently recently example files 
+
+  Change: 05bee58f865e06c021c34693ce4564b5ca65b037
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:05 +0000
+
+    NAB disbursement file tweaks
+
+    the "net total" in the file should be zero, at least in the case of
+    outgoing files, so the tweak wasn't wrong but rather the requirement
+    on the types of records wasn't quite right - if there are n debit
+    records, there must be a single credit record to explain where the
+    funds are credited to 
+
+  Change: c1a3d0fd775846f060609aa7aa7103b0ce498e29
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:05 +0000
+
+    constrain string types to BECS EBCDIC char set
+
+    as per the NAB docs - add a new type, NAB::Type::Str that checks that
+    and make all the Str attributes a subtype of it
+
+    note the error thrown here on constraint failure appears to be the
+    one defined on the chained subtype and not that of the parent, so
+    this means we have *another* check in the message 
+
+  Change: bcdeed796f67a6b56c4e15b6319bf3dbd24de1f5
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:05 +0000
+
+    disbursement file tweaks from testing
+
+    part 1 - the net total is, as expected, not all zeros (required in
+    the spec) but the absolute value of the credit total minus the debit
+    total
+
+    the trailing BSB number appears to be required to be 999-999 in
+    testing and not the assigned BSB number
+
+    add some test coverage for a payments disbursement rejection ack file 
+
+  Change: 8cdc3f541223623d4a2d370ca00008348c9a13a3
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:04 +0000
+
+    script to generate a test NAB disbursement file
+
+    fix a bug in Business::NAB::Australian::DirectEntry::Payments when
+    there are no credits in the file - default the vaules to zero (add
+    some tests to cover this) 
+
+  Change: 90736f509e0549c4afc3a3ea80b30418dea15fb5
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:04 +0000
+
+    NAB disbursement returns file parsing
+
+    mercifully this is just a minor derivative of the outgoing
+    disbursement file, rather than being yet another distinct file
+    format, so we can inherit from those classes and use some
+    polymorphism where necessary to handle the slight differences
+
+    test coverage here as well 
+
+  Change: 2c8dbb65b53ea8f181f96241b0793a56cc179edc
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:41:02 +0000
+
+    NAB disbursement report parsing
+
+    the "Disbursement Reports" file format found in the "Australian
+    Direct Entry Payments and Dishonour report" PDF - this is Yet Another
+    File Format, as NAB seem to have a different format for every single
+    type of file/report
+
+    test coverage to cover all of the code here, and some minor
+    refactoring to reuse some of the existing modules 
+
+  Change: 522925d5d563264f5ed02b597a607a8b9bfc88b8
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:40:59 +0000
+
+    top level namespace and docs
+
+    for Business::NAB 
+
+  Change: 474b1a077d0cb1f88fda187d4fcf63303de8133f
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:40:59 +0000
+
+    NAB Acknowledgement file parsing
+
+    a mish-mash of differing XML with no option of a schema or DTD...
+
+    the documentation around these acknowledgements is rather wishy-washy
+    so have done a minimal implementation and will tweak as we learn more
+    in testing 
+
+  Change: d01033ee7ae327999b211d30c7833aa9d09653fb
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:40:58 +0000
+
+    NAB BPAY Batch response parsing/creation
+
+    classes for parsing/creating the NAB "BPAY Batch" response file along
+    with the type constraint definitions. this is mostly an extension of
+    the request logic as the file is [effectively] echoed back with some
+    additional fields 
+
+  Change: e1e896a4fb65451a8d2df23a052814bc74f9f7e6
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:40:57 +0000
+
+    NAB BPAY Batch parsing/creation
+
+    classes for parsing/creating the NAB "BPAY Batch" file along with the
+    type constraint definitions. this may change as more classes are
+    created and as we learn more about the file structure, and may also
+    change as the reporting parsing logic is added 
+
+  Change: e395005f0829e1f070669368a41667a2fcc9a1e8
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:40:55 +0000
+
+    NAB statement file (NAI/BAI2), parsing logic
+
+    classes for parsing a NAB "Account Information File (NAI/BAI2)". the
+    format here is a rather baroque mashup of a CSV restricted to 80
+    chars (the lineage comes from punchcards) with continuation records,
+    so the parser makes available methods to simplify this
+
+    there's not too much other complexity here, although we shall see
+    once we start using this in anger. add test coverage around all of
+    the above 
+
+  Change: 1b80d5f7d287db557d1192fd9516dddb85f55a05
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-21 13:37:02 +0000
+
+    NAB disbursement file, and classes
+
+    classes for creating the "Australian Direct Entry Payments and
+    Dishonour report" along with the type constraint definitions. this
+    may change as more classes are created and as we learn more about the
+    file structure 
+
+================
+End of releases.
+================

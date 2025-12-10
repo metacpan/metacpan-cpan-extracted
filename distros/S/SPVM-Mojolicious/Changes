@@ -1,3 +1,18 @@
+0.037 2025-12-10
+  [Requirement Changes]
+    * Require SPVM::IO 0.243.
+    * Require SPVM::IO::Socket::SSL 0.014.
+0.036 2025-12-10
+  [Requirement Changes]
+    * Require SPVM 0.990109.
+  
+  [Changes]
+    * Use object... in arguments of methods of Mojo::UserAgent.
+  
+  [Bug Fix]
+    * Fix bugs of Mojo::Parameters.
+    * Fix bugs of Mojo::Transaction and etc.
+
 0.035 2025-12-02
   [Changes]
     * Improve routes, controller, renderer, template.

@@ -322,8 +322,12 @@ msgstr "Arrays or objects with an overloaded operator or `@{}`."
 msgid "Хэши или объекты с перегруженным оператором `%{}`."
 msgstr "Hashes or objects with the `%{}` operator overloaded."
 
+msgid "Сктроковый тип с преобразованием массивов в строку через разделитель."
+msgstr "String type with conversion of arrays to a string through a delimiter."
+
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 
 msgid "The Aion::Types module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
 msgstr "The Aion::Types module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

@@ -35,6 +35,8 @@
          "requires" : {
             "Acrux" : "0.07",
             "Acrux::DBI" : "0.03",
+            "DBD::SQLite" : "1",
+            "DBI" : "1.63",
             "perl" : "5.020"
          }
       }
@@ -51,6 +53,6 @@
          "web" : "https://sourceforge.net/p/www-suffit-model/code/ci/master/tree/"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

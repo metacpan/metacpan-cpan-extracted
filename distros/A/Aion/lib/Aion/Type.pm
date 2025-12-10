@@ -155,10 +155,12 @@ sub val_to_str {
 # Преобразовать значение в параметре и вернуть преобразованное
 sub coerce {
 	(my $self, local $_) = @_;
+	local $Aion::Type::SELF = $self;
+	
 	for my $coerce (@{$self->{coerce}}) {
-		return $coerce->[1]->() if $coerce->[0]->test;
+		return $coerce->[1]() if $coerce->[0]{test}();
 	}
-	return $_;
+	$_
 }
 
 # Определяет, что тип является подтипом другого типа
@@ -268,7 +270,7 @@ __END__
 
 =head1 NAME
 
-Aion::Type - validator class
+Aion::Type - class of validators
 
 =head1 SYNOPSIS
 

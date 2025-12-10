@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-String-Print/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-String-Print.git
-version: '1.01'
+version: '1.02'
 x_oodist:
   email: markov@cpan.org
   first_year: 2016

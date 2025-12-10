@@ -4,6 +4,7 @@ author:
   - 'Richard Kelsch <rich@rk-internet.com>'
 build_requires:
   List::Util: '1.20'
+  Test2::Require::AuthorTesting: '0'
   Test::More: '1.00'
 configure_requires:
   Config: '0'
@@ -26,10 +27,9 @@ requires:
   List::Util: '1.20'
   Term::ANSIColor: '0'
   Term::ANSIScreen: '0'
-  Term::Drawille: '0.01'
   Text::Wrap::Smart: '0'
   Time::HiRes: '0'
   charnames: '0'
   perl: '5.020'
-version: '1.48'
+version: '1.49'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

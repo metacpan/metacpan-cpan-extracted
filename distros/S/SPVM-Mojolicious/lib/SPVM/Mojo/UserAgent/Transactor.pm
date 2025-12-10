@@ -120,7 +120,7 @@ possible.
 
 =head2 tx
 
-C<method tx : Mojo::Transaction::HTTP ($method : string, $url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef);>
+C<method tx : Mojo::Transaction::HTTP ($method : string, $url : string|Mojo::URL, $args : object...);>
 
 Versatile general purpose L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> transaction builder for requests, with support for
 L</"Generators">.

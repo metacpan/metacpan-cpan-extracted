@@ -1,4 +1,4 @@
-# This code is part of Perl distribution String-Print version 1.01.
+# This code is part of Perl distribution String-Print version 1.02.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package String::Print;{
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 }
 
 
@@ -33,23 +33,38 @@ my @default_modifiers   = (
 	qr/BYTES\b/      => \&_modif_bytes,
 	qr/HTML\b/       => \&_modif_html,
 	qr/YEAR\b/       => \&_modif_year,
-	qr/DT\([^)]*\)/  => \&_modif_dt,
-	qr/DT\b/         => \&_modif_dt,
-	qr/DATE\b/       => \&_modif_date,
 	qr/TIME\b/       => \&_modif_time,
 	qr/\=/           => \&_modif_name,
+	qr/DATE\([^)]*\)|DATE\b/ => \&_modif_date,
+	qr/DT\([^)]*\)|DT\b/     => \&_modif_dt,
 	qr!UNKNOWN\([0-9]+\)|UNKNOWN\b!       => \&_modif_unknown,
 	qr!CHOP\([0-9]+(?:\,?[^)]*)\)|CHOP\b! => \&_modif_chop,
 	qr!EL\([0-9]+(?:\,?[^)]*)\)|EL\b!     => \&_modif_ellipsis,
 	qr!//(?:\"[^"]*\"|\'[^']*\'|\w+)!     => \&_modif_undef,
 );
 
+# Be warned: %F and %T (from C99) are not always supported on Windows
+my %dt_format = (
+	ASC     => '%a %b %e %H:%M:%S %Y',
+	ISO     => '%Y-%m-%dT%H:%M:%S%z',
+	RFC822  => '%a, %d %b %y %H:%M:%S %z',
+	RFC2822 => '%a, %d %b %Y %H:%M:%S %z',
+	RFC5322 => '%a, %d %b %Y %H:%M:%S %z',
+	FT      => '%Y-%m-%d %H:%M:%S',
+);
+
+my %date_format = (
+	'-'     => '%Y-%m-%d',
+	'/'     => '%Y/%m/%d',
+);
+
 my %defaults = (
 	CHOP      => +{ width => 30, head => '[', units => '', tail => ']' },
-	DT        => +{ standard => 'FT' },
-	EL        => +{ width => 30, replace => '⋯ '},
+	DATE      => +{ format => $date_format{'-'}, },
+	DT        => +{ format => $dt_format{FT}, },
+	EL        => +{ width  => 30, replace => '⋯ '},
 	FORMAT    => +{ thousands => '' },
-	UNKNOWN   => +{ width => 30, trim => 'EL' },
+	UNKNOWN   => +{ width  => 30, trim => 'EL' },
 );
 
 my %default_serializers = (
@@ -332,7 +347,7 @@ sub _modif_format_d($$$$)
 {	my ($value, $padding, $max, $sep) = @_;
 	my $d = sprintf "%d", $value;   # what perl usually does with floats etc
 	my $v = length $sep ? reverse(reverse($d) =~ s/([0-9][0-9][0-9])/$1$sep/gr) : $d;
-	$v =~ s/^\.//;
+	$v =~ s/^\Q$sep//;
 
 	if($d !~ /^\-/)
 	{	$v = "+$v" if $padding eq '+';
@@ -375,7 +390,7 @@ sub _modif_bytes($$$)
 {	my ($self, $format, $value, $args) = @_;
 	defined $value && length $value or return undef;
 
-	return sprintf("%3d  B", $value) if $value < 1000;
+	return sprintf("%3d B", $value) if $value < 1000;
 
 	my @scale = qw/kB MB GB TB PB EB ZB/;
 	$value /= 1024;
@@ -385,26 +400,16 @@ sub _modif_bytes($$$)
 		$value /= 1024;
 	}
 
-	return sprintf "%3d $scale[0]", $value + 0.5
+	return sprintf "%3d$scale[0]", $value + 0.5
 		if $value > 9.949;
 
-	sprintf "%3.1f $scale[0]", $value;
+	sprintf "%3.1f$scale[0]", $value;
 }
 
 sub _modif_html($$$)
 {	my ($self, $format, $value, $args) = @_;
 	defined $value ? (encode_entities $value) : undef;
 }
-
-# Be warned: %F and %T (from C99) are not supported on Windows
-my %dt_format = (
-	ASC     => '%a %b %e %T %Y',
-	ISO     => '%Y-%m-%dT%T%z',
-	RFC822  => '%a, %d %b %y %T %z',
-	RFC2822 => '%a, %d %b %Y %T %z',
-	RFC5322 => '%a, %d %b %Y %T %z',
-	FT      => '%Y-%m-%d %T',
-);
 
 sub _modif_year($$$)
 {	my ($self, $format, $value, $args) = @_;
@@ -428,19 +433,29 @@ sub _modif_date($$$)
 {	my ($self, $format, $value, $args) = @_;
 	defined $value or return undef;
 
-	blessed $value && $value->isa('DateTime')
-		and return $value->ymd;
+	my $defaults = $self->defaults('DATE');
+	my $kind     = ($format =~ m/^DATE\(([^)]*)\)/ ? $1 : undef) || $defaults->{format};
+	my $pattern  = $date_format{$kind} // $kind;
 
-	length $value or return undef;
+	my ($y, $m, $d);
+	if(blessed $value && $value->isa('DateTime'))
+	{	($y, $m, $d) = ($value->year, $value->month, $value->day);
+	}
+	elsif( $value =~ m!^\s*([0-9]{4})[:/.-]([0-9]?[0-9])[:/.-]([0-9]?[0-9])\s*$!
+		|| $value =~ m!^\s*([0-9]{4})([0-9][0-9])([0-9][0-9])\s*$!)
+	{	($y, $m, $d) = ($1, $2, $3);
+	}
+	else
+	{	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+		defined $stamp or return "date not found in '$value'";
+		($y, $m, $d) = (localtime $stamp)[5, 4, 3];
+		$y += 1900; $m++;
+	}
 
-	return sprintf("%4d-%02d-%02d", $1, $2, $3)
-		if $value =~ m!^\s*([0-9]{4})[:/.-]([0-9]?[0-9])[:/.-]([0-9]?[0-9])\s*$!
-		|| $value =~ m!^\s*([0-9]{4})([0-9][0-9])([0-9][0-9])\s*$!;
-
-	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
-	defined $stamp or return "date not found in '$value'";
-
-	strftime "%Y-%m-%d", localtime($stamp);
+	$pattern
+		=~ s/\%Y/$y/r
+		=~ s/\%m/sprintf "%02d", $m/re
+		=~ s/\%d/sprintf "%02d", $d/re;
 }
 
 sub _modif_time($$$)
@@ -472,10 +487,8 @@ sub _modif_dt($$$)
 	length $value or return undef;
 
 	my $defaults = $self->defaults('DT');
-	my $kind     = ($format =~ m/^DT\(([^)]*)\)/ ? $1 : undef) || $defaults->{standard};
-
-	my $pattern  = $dt_format{$kind}
-		or return "dt format $kind not known";
+	my $kind     = ($format =~ m/^DT\(([^)]*)\)/ ? $1 : undef) || $defaults->{format};
+	my $pattern  = $dt_format{$kind} // $kind;
 
 	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
 	defined $stamp or return "dt not found in '$value'";

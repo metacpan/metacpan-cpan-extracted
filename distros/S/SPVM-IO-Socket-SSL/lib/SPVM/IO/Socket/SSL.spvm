@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.013";
+  version "0.014";
   
   use IO::Socket::SSL::Callback::BeforeConnectSSL;
   use IO::Socket::SSL::Callback::BeforeAcceptSSL;
@@ -494,7 +494,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     return $accepted_socket;
   }
   
-  method read : int ($buffer : mutable string, $length : int = -1, $offset : int = 0) {
+  method sysread : int ($buffer : mutable string, $length : int = -1, $offset : int = 0) {
     
     my $ssl = $self->{ssl};
     
@@ -531,7 +531,14 @@ class IO::Socket::SSL extends IO::Socket::IP {
     return $read_length;
   }
   
-  method write : int ($buffer : string, $length : int = -1, $offset : int = 0) {
+  method read : int ($buffer : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    diag "IO::Socket::SSL#read method is depreacted. Use sysread method instead.";
+    
+    return $self->sysread($buffer, $length, $offset);
+  }
+  
+  method syswrite : int ($buffer : string, $length : int = -1, $offset : int = 0) {
     
     my $ssl = $self->{ssl};
     
@@ -567,6 +574,13 @@ class IO::Socket::SSL extends IO::Socket::IP {
     }
     
     return $write_length;
+  }
+  
+  method write : int ($buffer : string, $length : int = -1, $offset : int = 0) {
+    
+    diag "IO::Socket::SSL#write method is depreacted. Use syswrite method instead.";
+    
+    return $self->syswrite($buffer, $length, $offset);
   }
   
   method shutdown_SSL : int () {

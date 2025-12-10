@@ -55,6 +55,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

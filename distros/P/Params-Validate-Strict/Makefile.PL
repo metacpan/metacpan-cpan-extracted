@@ -47,6 +47,7 @@ WriteMakefile(
 		'List::Util' => 1.33,	# Minimum version for any()
 		'Params::Get' => 0.13,
 		'Scalar::Util' => 0,
+		'Unicode::GCString' => 0,
 		'strict' => 0,
 		'warnings' => 0
 	}, TEST_REQUIRES => {

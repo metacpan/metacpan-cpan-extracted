@@ -45,7 +45,7 @@ say $result;
 =cut
 
 my @extra_args = qw(fizz buzz);
-my $result2 = $app->jsonrpc->parse($json, @extra_args);
+my $result2    = $app->jsonrpc->parse($json, @extra_args);
 say $result2;
 
 =result2

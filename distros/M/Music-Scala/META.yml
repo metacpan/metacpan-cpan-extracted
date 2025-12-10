@@ -11,7 +11,7 @@ configure_requires:
   CPAN::Meta: '2.142060'
   Module::Build: '0.4004'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ name: Music-Scala
 provides:
   Music::Scala:
     file: lib/Music/Scala.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -31,6 +31,6 @@ requires:
   strict: '0'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: https://github.com/thrig/Music-Scala
-version: '1.07'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  repository: https://thrig.me/src/Music-Scala.git
+version: '1.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

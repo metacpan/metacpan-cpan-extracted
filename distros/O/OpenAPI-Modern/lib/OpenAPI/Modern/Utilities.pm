@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 use 5.020;
 use strictures 2;
@@ -180,7 +180,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.113
+version 0.114
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "nqounet <mail@nqou.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -57,6 +57,8 @@
       },
       "test" : {
          "requires" : {
+            "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.98"
          }
@@ -65,7 +67,7 @@
    "provides" : {
       "JSON::RPC::Spec" : {
          "file" : "lib/JSON/RPC/Spec.pm",
-         "version" : "v1.0.7"
+         "version" : "v1.1.2"
       },
       "JSON::RPC::Spec::Client" : {
          "file" : "lib/JSON/RPC/Spec/Client.pm"
@@ -84,14 +86,16 @@
       },
       "homepage" : "https://github.com/nqounet/p5-json-rpc-spec",
       "repository" : {
-         "url" : "git://github.com/nqounet/p5-json-rpc-spec.git",
+         "type" : "git",
+         "url" : "https://github.com/nqounet/p5-json-rpc-spec.git",
          "web" : "https://github.com/nqounet/p5-json-rpc-spec"
       }
    },
-   "version" : "v1.0.7",
+   "version" : "v1.1.2",
    "x_authority" : "cpan:NQOUNET",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
 }

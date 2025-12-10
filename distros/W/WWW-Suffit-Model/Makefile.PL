@@ -8,8 +8,10 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'Acrux'                 => 0.07,
-        'Acrux::DBI'            => 0.03,
+        'Acrux'                 => 0.07,    # Ubuntu = libacrux-perl                RHEL = perl-Acrux
+        'Acrux::DBI'            => 0.03,    # Ubuntu = libacrux-dbi-perl            RHEL = perl-Acrux-DBI
+        'DBI'                   => 1.63,    # Ubuntu = libdbi-perl                  RHEL = perl-DBI
+        'DBD::SQLite'           => 1.00,    # Ubuntu = libdbd-sqlite3-perl          RHEL = perl-DBD-SQLite
     };
 
 WriteMakefile(

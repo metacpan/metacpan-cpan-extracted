@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 use 5.016;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '1.01';
+my $version  = '1.02';
 my $git      = "https://github.com/markov2/perl5-String-Print";
 my $publish  = "../public_html/string-print";
 my $homepage = "http://perl.overmeer.net/CPAN/";

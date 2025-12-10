@@ -98,7 +98,7 @@
    "provides" : {
       "Liveman" : {
          "file" : "lib/Liveman.pm",
-         "version" : "3.9"
+         "version" : "4.0"
       },
       "Liveman::App::liveman" : {
          "file" : "lib/Liveman/App/liveman.pm"
@@ -131,7 +131,7 @@
          "web" : "https://github.com/darviarush/perl-liveman"
       }
    },
-   "version" : "3.9",
+   "version" : "4.0",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

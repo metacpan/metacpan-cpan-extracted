@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.41    2025-12-09
+        [CHANGES]
+         * Support optional refalias parameters with defaulting expressions
+         * Support named refalias parameters
+
 0.40    2025-11-14
         [CHANGES]
          * Experimentally support refalias syntax in extended signatures

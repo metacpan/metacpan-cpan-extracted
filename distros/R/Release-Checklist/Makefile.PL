@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-# Copyright (c) 2015-2023 H.Merijn Brand
+# Copyright (c) 2015-2025 H.Merijn Brand
 
 require 5.006;
 use strict;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 use ExtUtils::MakeMaker;
 
@@ -42,7 +42,7 @@ VERSION = $VERSION
 
 all::		Checklist.pm
 
-doc:		Checklist.html Checklist.pod
+doc:		Checklist.html Checklist.pod Checklist.pm
 
 Checklist.html:	Checklist.md
 	perl md2html.pl

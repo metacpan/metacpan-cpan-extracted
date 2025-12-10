@@ -11,6 +11,7 @@ use Encode qw(decode_utf8);
 use List::Util 1.33 qw(any);	# Required for memberof validation
 use Params::Get 0.13;
 use Scalar::Util;
+use Unicode::GCString;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(validate_strict);
@@ -21,11 +22,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 SYNOPSIS
 
@@ -1057,16 +1058,13 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
 						}
-						# Ensure string is decoded into Perl characters
-						my $bytes = decode_utf8($value) unless utf8::is_utf8($value);
-						my $len = length($bytes);
-						if(!defined($len)) {
+						if(defined(my $len = _number_of_characters($value))) {
+							if($len < $rule_value) {
+								_error($logger, $rules->{'error_msg'} || "$rule_description: String parameter '$key' too short, ($len characters), must be at least $rule_value characters");
+								$invalid_args{$key} = 1;
+							}
+						} else {
 							_error($logger, $rules->{'error_msg'} || "$rule_description: '$key' can't be decoded");
-							$invalid_args{$key} = 1;
-							$len = length($value);
-						}
-						if($len < $rule_value) {
-							_error($logger, $rules->{'error_msg'} || "$rule_description: String parameter '$key' too short, ($len characters), must be at least $rule_value characters");
 							$invalid_args{$key} = 1;
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
@@ -1138,16 +1136,13 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
 						}
-						# Ensure string is decoded into Perl characters
-						my $bytes = decode_utf8($value) unless utf8::is_utf8($value);
-						my $len = length($bytes);
-						if(!defined($len)) {
+						if(defined(my $len = _number_of_characters($value))) {
+							if($len > $rule_value) {
+								_error($logger, $rules->{'error_msg'} || "$rule_description: String parameter '$key' too long, ($len characters), must be no longer than $rule_value");
+								$invalid_args{$key} = 1;
+							}
+						} else {
 							_error($logger, $rules->{'error_msg'} || "$rule_description: '$key' can't be decoded");
-							$invalid_args{$key} = 1;
-							$len = length($value);
-						}
-						if($len > $rule_value) {
-							_error($logger, $rules->{'error_msg'} || "$rule_description: String parameter '$key' too long, ($len characters), must be no longer than $rule_value");
 							$invalid_args{$key} = 1;
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
@@ -1552,6 +1547,24 @@ sub validate_strict
 		return \@rc;
 	}
 	return \%validated_args;
+}
+
+# Return number of visible characters not number of bytes
+# Ensure string is decoded into Perl characters
+sub _number_of_characters
+{
+	my $value = $_[0];
+
+	return if(!defined($value));
+
+	if($value !~ /[^[:ascii:]]/) {
+		return length($value);
+	}
+	# Decode only if it's not already a Perl character string
+	$value = decode_utf8($value) unless utf8::is_utf8($value);
+
+	# Count grapheme clusters (visible characters)
+	return Unicode::GCString->new($value)->length();
 }
 
 # Helper to log error or croak

@@ -263,7 +263,9 @@ class Mojo::Message::Request extends Mojo::Message {
     }
     
     # Parse normal message
-    if (($self->{state} // "") ne "cgi") { $self->SUPER::parse($chunk); }
+    if (($self->{state} // "") ne "cgi") {
+      $self->SUPER::parse($chunk);
+    }
     
     # Parse CGI content
     else {

@@ -12,6 +12,7 @@ i18n/Aion/Meta/RequiresAnyFunction.ru-en.po
 i18n/Aion/Meta/RequiresFeature.ru-en.po
 i18n/Aion/Meta/Subroutine.ru-en.po
 i18n/Aion/Meta/Util.ru-en.po
+i18n/Aion/Pleroma.ru-en.po
 i18n/Aion/Type.ru-en.po
 i18n/Aion/Types.ru-en.po
 lib/Aion.md
@@ -28,6 +29,8 @@ lib/Aion/Meta/Subroutine.md
 lib/Aion/Meta/Subroutine.pm
 lib/Aion/Meta/Util.md
 lib/Aion/Meta/Util.pm
+lib/Aion/Pleroma.md
+lib/Aion/Pleroma.pm
 lib/Aion/Type.md
 lib/Aion/Type.pm
 lib/Aion/Types.md
@@ -42,6 +45,7 @@ t/aion/meta/requires-feature.pm
 t/aion/meta/requires-feature.t
 t/aion/meta/subroutine.t
 t/aion/meta/util.t
+t/aion/pleroma.t
 t/aion/type.t
 t/aion/types.t
 META.yml

@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 3.8
+# 3.9
 # 
 # # SYNOPSIS
 # 
@@ -158,8 +158,8 @@ local ($::_g0 = do {'hi${exclamation}3'}, $::_e0 = 'hi${exclamation}3'); ::ok $:
 ::done_testing; }; subtest '`like` begins with extrapolate-string' => sub { 
 my $var = 'b';
 
-local ($::_g0 = do {'abbc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abbc\' # ^=> a$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {'abc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abc\'  # ⤇ a$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abbc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abbc\' # ^=> a$var' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abc\'  # ⤇ a$var' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` ends with extrapolate-string
@@ -169,8 +169,8 @@ local ($::_g0 = do {'abc'}, $::_e0 = "a$var"); ::ok $::_g0 =~ /^${\quotemeta $::
 ::done_testing; }; subtest '`like` ends with extrapolate-string' => sub { 
 my $var = 'c';
 
-local ($::_g0 = do {'abbc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abbc\' # $=> b$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {'abc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abc\'  # ➾ b$var' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abbc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abbc\' # $=> b$var' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abc\'  # ➾ b$var' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` inners with extrapolate-string
@@ -180,8 +180,8 @@ local ($::_g0 = do {'abc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ /${\quotemeta $::_
 ::done_testing; }; subtest '`like` inners with extrapolate-string' => sub { 
 my $var = 'x';
 
-local ($::_g0 = do {'abxc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0, '\'abxc\'  # *=> b$var' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {'abxs'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0, '\'abxs\'  # ⥴ b$var' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abxc'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0, '\'abxc\'  # *=> b$var' or ::diag ::_string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abxs'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0, '\'abxs\'  # ⥴ b$var' or ::diag ::_string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` begins with nonextrapolate-string
@@ -189,8 +189,8 @@ local ($::_g0 = do {'abxs'}, $::_e0 = "b$var"); ::ok $::_g0 =~ quotemeta $::_e0,
 # Скаляр должен начинаться неэкстраполированой срокой:
 # 
 ::done_testing; }; subtest '`like` begins with nonextrapolate-string' => sub { 
-local ($::_g0 = do {'abbc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abbc\' # ^-> ab' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {'abc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abc\'  # ↣ ab' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abbc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abbc\' # ^-> ab' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '\'abc\'  # ↣ ab' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` ends with nonextrapolate-string
@@ -198,8 +198,8 @@ local ($::_g0 = do {'abc'}, $::_e0 = 'ab'); ::ok $::_g0 =~ /^${\quotemeta $::_e0
 # Скаляр должен заканчиваться неэкстраполированой срокой:
 # 
 ::done_testing; }; subtest '`like` ends with nonextrapolate-string' => sub { 
-local ($::_g0 = do {'abbc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abbc\' # $-> bc' or ::diag ::string_diff($::_g0, $::_e0, -1); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {'abc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abc\'  # ⇥ bc' or ::diag ::string_diff($::_g0, $::_e0, -1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abbc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abbc\' # $-> bc' or ::diag ::_string_diff($::_g0, $::_e0, -1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}$/, '\'abc\'  # ⇥ bc' or ::diag ::_string_diff($::_g0, $::_e0, -1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` inners with nonextrapolate-string
@@ -207,8 +207,8 @@ local ($::_g0 = do {'abc'}, $::_e0 = 'bc'); ::ok $::_g0 =~ /${\quotemeta $::_e0}
 # Скаляр должен содержать неэкстраполированую сроку:
 # 
 ::done_testing; }; subtest '`like` inners with nonextrapolate-string' => sub { 
-local ($::_g0 = do {'abbc'}, $::_e0 = 'bb'); ::ok $::_g0 =~ quotemeta $::_e0, '\'abbc\' # *-> bb' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {'abc'}, $::_e0 = 'b'); ::ok $::_g0 =~ quotemeta $::_e0, '\'abc\'  # ⥵ b' or ::diag ::string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abbc'}, $::_e0 = 'bb'); ::ok $::_g0 =~ quotemeta $::_e0, '\'abbc\' # *-> bb' or ::diag ::_string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {'abc'}, $::_e0 = 'b'); ::ok $::_g0 =~ quotemeta $::_e0, '\'abc\'  # ⥵ b' or ::diag ::_string_diff($::_g0, $::_e0, 0); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` throw begins with nonextrapolate-string
@@ -216,8 +216,8 @@ local ($::_g0 = do {'abc'}, $::_e0 = 'b'); ::ok $::_g0 =~ quotemeta $::_e0, '\'a
 # Исключение должно начинаться с неэкстраполированой сроки:
 # 
 ::done_testing; }; subtest '`like` throw begins with nonextrapolate-string' => sub { 
-eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # @-> Illegal division by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # ↯ Illegal division by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # @-> Illegal division by zero' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # ↯ Illegal division by zero' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` throw begins with extrapolate-string
@@ -227,8 +227,8 @@ eval {1/0}; local ($::_g0 = $@, $::_e0 = 'Illegal division by zero'); ok defined
 ::done_testing; }; subtest '`like` throw begins with extrapolate-string' => sub { 
 my $by = 'by';
 
-eval {1/0}; local ($::_g0 = $@, $::_e0 = "Illegal division $by zero"); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # @=> Illegal division $by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-eval {1/0}; local ($::_g0 = $@, $::_e0 = "Illegal division $by zero"); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # ⤯ Illegal division $by zero' or ::diag ::string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = "Illegal division $by zero"); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # @=> Illegal division $by zero' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+eval {1/0}; local ($::_g0 = $@, $::_e0 = "Illegal division $by zero"); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '1/0 # ⤯ Illegal division $by zero' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
 # 
 # ### `like` throw

@@ -197,3 +197,13 @@
 1.47    Nov 21, 2025
 
         Added many optimizations
+
+1.48    Nov 26, 2025
+
+        Fixed search bug
+        Improved testing
+
+1.49    Dec 09, 2025
+
+        Revamped the -t tokens table
+		Added "UNDERLINE COLOR" token for terminals that support it.

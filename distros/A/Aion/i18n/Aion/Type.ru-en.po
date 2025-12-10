@@ -120,3 +120,4 @@ msgstr "⚖ **GPLv3**"
 
 msgid "The Aion::Type module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
 msgstr "The Aion::Type module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

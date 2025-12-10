@@ -19,7 +19,6 @@ has router => (
 
 use namespace::clean;
 
-
 sub parse {
     my ($self, $obj, $extra_args) = @_;
     if (ref $obj ne 'HASH') {
@@ -35,13 +34,18 @@ sub parse {
     if ($method eq '' or $method =~ m!\A\.|\A[0-9]+\z!) {
         return $self->_rpc_invalid_request;
     }
+    my $jsonrpc_version = $self->_jsonrpc;
+    $obj->{jsonrpc} ne $jsonrpc_version
+      and return $self->_rpc_invalid_request(
+        qq{Invalid Request: jsonrpc must be '$jsonrpc_version'});
+
     my ($result, $err);
     try {
         $result = $self->_trigger($method, $obj->{params}, $extra_args);
     }
     catch {
         $err = $_;
-        warn qq{-- error : @{[$err]} } if DEBUG;
+        warn qq{-- error : @{[ $err ]} } if DEBUG;
     };
     if ($self->_is_notification) {
         return;
@@ -49,10 +53,14 @@ sub parse {
     if ($err) {
         my $error;
         if ($err =~ m!rpc_method_not_found!) {
-            $error = $self->_rpc_method_not_found;
+            $err =~ s!\sat\s.*?\n\z!!;
+            $err =~ s!rpc_method_not_found!Method not found!;
+            $error = $self->_rpc_method_not_found($err);
         }
         elsif ($err =~ m!rpc_invalid_params!) {
-            $error = $self->_rpc_invalid_params;
+            $err =~ s!\sat\s.*?\n\z!!;
+            $err =~ s!rpc_invalid_params!Invalid params!;
+            $error = $self->_rpc_invalid_params($err);
         }
         else {
             $error = $self->_rpc_internal_error(data => $err);
@@ -74,7 +82,7 @@ sub _trigger {
 
     # rpc call of non-existent method:
     unless ($matched) {
-        Carp::croak 'rpc_method_not_found on trigger';
+        Carp::croak 'rpc_method_not_found';
     }
     my $cb = delete $matched->{$self->_callback_key};
     return $cb->($params, $matched, @{$extra_args});

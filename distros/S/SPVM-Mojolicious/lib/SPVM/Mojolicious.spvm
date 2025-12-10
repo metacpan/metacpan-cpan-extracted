@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.035";
+  version "0.037";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -147,11 +147,6 @@ class Mojolicious {
   
   method dispatch : void ($c : Mojolicious::Controller) {
     
-    my $stash = $c->stash_h;
-    if ($stash->{"mojo.rendered"}->(int)) {
-      return;
-    }
-    
     # Try to find a static file
     my $tx = $c->tx;
     unless ($tx->res->code >= 0) {
@@ -208,8 +203,7 @@ class Mojolicious {
       $tx->req->set_max_message_size($max);
     }
     
-    # TODO
-    # $self->plugins->emit_hook(after_build_tx => $tx, $self);
+    $self->plugins->emit_hook(after_build_tx => $tx, $self);
     
     return $tx;
   }

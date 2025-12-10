@@ -1196,6 +1196,8 @@ paths:
               not: true
 YAML
 
+  if ($::TYPE eq 'dancer2') {
+  todo 'Dancer2 parses chunked content at construction time' => sub {
   $request = request('POST', 'http://example.com/foo',
     [ 'Content-Type' => 'text/plain', 'Content-Length' => 4, 'Transfer-Encoding' => 'chunked' ],
     "4\r\nabcd\r\n0\r\n\r\n");
@@ -1220,6 +1222,7 @@ YAML
     },
     'conflict between Content-Length + Transfer-Encoding headers (and body is still parseable)',
   );
+  }}
 
   # note: no content!
   $request = request('POST', 'http://example.com/foo');
@@ -2504,7 +2507,7 @@ YAML
 
 SKIP: {
   # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
-  skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
+  skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
   cmp_result(
     $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1 ]))->TO_JSON,
     {

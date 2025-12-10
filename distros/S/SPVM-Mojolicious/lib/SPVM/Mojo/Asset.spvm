@@ -10,6 +10,11 @@ class Mojo::Asset extends Mojo::EventEmitter {
   has start_range : rw long;
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->{start_range} = 0;
+  }
+  
   method add_chunk : Mojo::Asset ($chunk : string) { die "Not implemented."; }
   
   method contains : int ($string : string) { die "Not implemented."; }

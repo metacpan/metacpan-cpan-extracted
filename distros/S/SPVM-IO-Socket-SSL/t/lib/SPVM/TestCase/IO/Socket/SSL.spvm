@@ -56,14 +56,14 @@ class TestCase::IO::Socket::SSL {
     while (1) {
       
       my $data = (mutable string)new_string_len 1;
-      my $read_length = $accepted_socket->read($data);
+      my $read_length = $accepted_socket->sysread($data);
       
       if ($read_length > 0) {
         if ($data eq "\0") {
           last;
         }
         
-        $accepted_socket->write($data);
+        $accepted_socket->syswrite($data);
       }
       else {
         last;
@@ -96,14 +96,14 @@ class TestCase::IO::Socket::SSL {
       while (1) {
         
         my $data = (mutable string)new_string_len 1;
-        my $read_length = $accepted_socket->read($data);
+        my $read_length = $accepted_socket->sysread($data);
         
         if ($read_length > 0) {
           if ($data eq "\0") {
             last;
           }
           
-          $accepted_socket->write($data);
+          $accepted_socket->syswrite($data);
         }
         else {
           last;
@@ -290,9 +290,9 @@ class TestCase::IO::Socket::SSL {
         
         my $write_buffer = "abc";
           
-        $socket->write($write_buffer);
+        $socket->syswrite($write_buffer);
         
-        $socket->write("\0");
+        $socket->syswrite("\0");
         
         my $string_buffer = StringBuffer->new;
         
@@ -302,7 +302,7 @@ class TestCase::IO::Socket::SSL {
           
           my $recv_length = -1;
           
-          eval { $recv_length = $socket->read($recv_buffer); }
+          eval { $recv_length = $socket->sysread($recv_buffer); }
           
           if ($recv_length > 0) {
             $string_buffer->push($recv_buffer);
@@ -475,9 +475,9 @@ class TestCase::IO::Socket::SSL {
         
         my $write_buffer = "abc";
           
-        $socket->write($write_buffer);
+        $socket->syswrite($write_buffer);
         
-        $socket->write("\0");
+        $socket->syswrite("\0");
         
         my $string_buffer = StringBuffer->new;
         
@@ -487,7 +487,7 @@ class TestCase::IO::Socket::SSL {
           
           my $recv_length = -1;
           
-          eval { $recv_length = $socket->read($recv_buffer); }
+          eval { $recv_length = $socket->sysread($recv_buffer); }
           
           if ($recv_length > 0) {
             $string_buffer->push($recv_buffer);

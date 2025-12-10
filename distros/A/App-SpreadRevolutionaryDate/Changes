@@ -1,6 +1,9 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.52 2025-11-20T11:13:34
+0.53 2025-12-10T09:56:55
+ - Upgrade Gemini from gemini-2.0-flash to gemini-2.5-flash
+
+0.52 2025-11-20T11:13:34Z
  - Fix undefined options img_* for MsgPrompt
 
 0.51 2025-06-09T12:15:44Z

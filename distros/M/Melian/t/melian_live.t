@@ -80,7 +80,7 @@ subtest 'Table2 by id and hostname' => sub {
 };
 
 subtest 'Schema functions' => sub {
-    my $spec = 'table1#0|60|id:int,table2#1|60|id:int;hostname:string';
+    my $spec = 'table1#0|60|id#0:int,table2#1|60|id#0:int;hostname#1:string';
     my $struct = {
         "tables" => [
             {

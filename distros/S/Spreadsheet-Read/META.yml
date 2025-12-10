@@ -1,7 +1,7 @@
 --- 
 abstract: Meta-Wrapper for reading spreadsheet data
 author: 
-  - H.Merijn Brand <perl5@tux.freedom.nl>
+  - H.Merijn Brand <HMBRAND@cpan.org>
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -44,14 +44,14 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.93'
+    version: '0.94'
 recommends: 
   Data::Dumper: '2.183'
   Data::Peek: '0.53'
   Encode: '3.21'
-  File::Temp: '0.2311'
+  File::Temp: '0.2312'
   IO::Scalar: 0
-  Test::More: '1.302209'
+  Test::More: '1.302219'
 requires: 
   Carp: 0
   Data::Dumper: 0
@@ -68,4 +68,4 @@ resources:
   bugtracker: https://github.com/Tux/Spreadsheet-Read/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.93'
+version: '0.94'

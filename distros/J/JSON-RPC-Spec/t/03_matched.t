@@ -16,7 +16,7 @@ is(
         $rpc = JSON::RPC::Spec->new(
             coder  => $coder,
             router => $router
-          )
+        )
     },
     undef,
     'args in array'
@@ -27,7 +27,7 @@ $rpc->register(
     'test.{matched}' => sub {
         my ($params, $matched) = @_;
         is ref $matched, 'HASH', 'matched hash';
-        ok exists $matched->{matched}, 'exists matched key';
+        ok exists $matched->{matched},      'exists matched key';
         ok !exists $matched->{'.callback'}, 'delete internal used key';
         return $matched;
     }
@@ -45,7 +45,8 @@ $rpc->register(
 subtest 'placeholder' => sub {
     my $res
       = $rpc->parse('{"jsonrpc":"2.0","method":"test.ok","params":1,"id":1}');
-    like $res, qr/"result":\{"matched":"ok"\}/, 'return ok' or diag explain $res;
+    like $res, qr/"result":\{"matched":"ok"\}/, 'return ok'
+      or diag explain $res;
 
     $res = $rpc->parse(
         '{"jsonrpc":"2.0","method":"test.ok.ok","params":1,"id":1}');

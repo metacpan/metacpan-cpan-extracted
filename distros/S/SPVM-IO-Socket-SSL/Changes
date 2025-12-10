@@ -1,3 +1,8 @@
+0.014 2025-12-10
+  [Incompatible Changes]
+    * Rename IO::Socket::SSL#write method to syswrite.
+    * Rename IO::Socket::SSL#read method to sysread.
+    
 0.013 2025-10-14
   [Internal Changes]
     * Refactor options.

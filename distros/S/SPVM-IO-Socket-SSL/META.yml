@@ -28,5 +28,5 @@ requires:
   SPVM::Sys: '0.528'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL.git
-version: '0.013'
+version: '0.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,6 +14,8 @@ on configure => sub {
 };
 
 on test => sub {
+    requires 'Devel::Cover';
+    requires 'Devel::NYTProf';
     requires 'Test::Fatal';
     requires 'Test::More', '0.98';
 };

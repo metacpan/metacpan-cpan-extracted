@@ -28,6 +28,7 @@ t/Fake/Encode.pm
 t/Fake/JSON.pm
 t/Fake/Match.pm
 t/Fake/New.pm
+t/json-rpc-2.0-exercises.t
 t/json-rpc-spec-client.t
 t/json-rpc-spec.t
 t/proverc

@@ -26,7 +26,7 @@ is(
                 }
                 return $sum;
             }
-          )
+        )
     },
     undef,
     'register code refs'

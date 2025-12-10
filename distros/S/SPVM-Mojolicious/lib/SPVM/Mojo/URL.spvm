@@ -14,7 +14,15 @@ class Mojo::URL {
   interface Stringable;
   
   # Fields
-  has base : rw Mojo::URL;
+  has base : rw Mojo::URL
+    get {
+      unless (exists $self->{base}) {
+        $self->{base} = Mojo::URL->new;
+      }
+      
+      return $self->{base};
+    }
+  ;
   
   has fragment : rw string;
   

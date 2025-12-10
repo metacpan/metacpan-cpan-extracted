@@ -73,9 +73,9 @@ subtest 'extra args' => sub {
     $obj->register(
         echo => sub {
             is shift, 'Hello, World!', 'is params';
-            is_deeply shift, +{}, 'is_deeply matched';
+            is_deeply shift, +{},               'is_deeply matched';
             is_deeply shift, +{key => 'value'}, 'is_deeply extra_args';
-            is shift, 0, 'second args';
+            is shift,     0, 'second args';
             is scalar @_, 0, 'no more args';
             return;
         }

@@ -188,17 +188,32 @@ static OP *pp_namedargexists(pTHX)
   RETURN;
 }
 
-static XOP xop_namedargassign;
-static OP *pp_namedargassign(pTHX)
+#define check_refalias_arg(priv, sv)  S_check_refalias_arg(aTHX_ priv, sv)
+static bool S_check_refalias_arg(pTHX_ U8 priv, SV *sv)
 {
-  dSP;
-  dTARGET;
-  SV *value = POPs;
+  if(!sv || !SvROK(sv))
+    return false;
 
-  SvPADSTALE_off(TARG);
-  SvSetMagicSV(TARG, value);
+  SV *rv = SvRV(sv);
 
-  RETURN;
+  switch(priv & OPpARGELEM_MASK) {
+    case OPpARGELEM_SV:
+      if(SvTYPE(rv) > SVt_PVMG)
+        return false;
+      break;
+
+    case OPpARGELEM_AV:
+      if(SvTYPE(rv) != SVt_PVAV)
+        return false;
+      break;
+
+    case OPpARGELEM_HV:
+      if(SvTYPE(rv) != SVt_PVHV)
+        return false;
+      break;
+  }
+
+  return true;
 }
 
 struct ArgElemsNamedParam {
@@ -209,9 +224,63 @@ struct ArgElemsNamedParam {
   const char *namepv;
 };
 enum {
+  /* These flags are also stored in op_private of some ops so they have to
+   * fit in U8
+   */
   NAMEDPARAMf_REQUIRED = (1<<0),
   NAMEDPARAMf_UTF8     = (1<<1),
+  NAMEDPARAMf_REFALIAS = (1<<2),
+
+  NAMEDPARAMf_REFSCALAR = (1<<3),
+  NAMEDPARAMf_REFARRAY  = (2<<3),
+  NAMEDPARAMf_REFHASH   = (3<<3),
 };
+
+#define do_namedarg_assign(flags, padix, name, val)  S_do_namedarg_assign(aTHX_ flags, padix, name, val)
+static void S_do_namedarg_assign(pTHX_ U8 flags, PADOFFSET padix, SV *name, SV *val)
+{
+  SV **padentry = &PAD_SVl(padix);
+
+  /* This has to do all the work normally done by pp_argelem */
+  assert(TAINTING_get || !TAINT_get);
+  if(UNLIKELY(TAINT_get) && !SvTAINTED(val))
+    TAINT_NOT;
+
+  if(flags & NAMEDPARAMf_REFALIAS) {
+    const char *exp_reftype = NULL;
+    U8 priv = 0;
+    switch(flags & NAMEDPARAMf_REFHASH) {
+      case NAMEDPARAMf_REFSCALAR: priv = OPpARGELEM_SV; exp_reftype = "SCALAR"; break;
+      case NAMEDPARAMf_REFARRAY:  priv = OPpARGELEM_AV; exp_reftype = "ARRAY"; break;
+      case NAMEDPARAMf_REFHASH:   priv = OPpARGELEM_HV; exp_reftype = "HASH"; break;
+    }
+    if(!check_refalias_arg(priv, val)) {
+      if(!name)
+        // TODO: Look up the param name from the padix... somehow?
+        name = newSVpvs_flags("???", SVs_TEMP);
+      croak_from_caller("Expected named argument '%" SVf "' to %" SVf " to be a reference to %s",
+          SVfARG(name), SVfARG(S_find_runcv_name(aTHX)), exp_reftype);
+    }
+
+    SvREFCNT_dec(*padentry);
+    *padentry = SvREFCNT_inc(SvRV(val));
+  }
+  else
+    SvSetMagicSV(*padentry, val);
+
+  SvPADSTALE_off(*padentry);
+}
+
+static XOP xop_namedargassign;
+static OP *pp_namedargassign(pTHX)
+{
+  dSP;
+  SV *val = POPs;
+
+  do_namedarg_assign(PL_op->op_private, PL_op->op_targ, NULL, val);
+
+  RETURN;
+}
 
 static int cmp_argelemsnamedparam(const void *_a, const void *_b)
 {
@@ -303,8 +372,6 @@ static OP *pp_argelems_named(pTHX)
     U32 namehash;
     PERL_HASH(namehash, namepv, namelen);
 
-    PADOFFSET param_padix = 0;
-
     /* In theory we would get better performance at runtime by binary
      * searching for a good starting index. In practice only actually starts
      * saving measurable time once we start to get to literally hundreds of
@@ -313,36 +380,30 @@ static OP *pp_argelems_named(pTHX)
      * If your perl function wants to declare hundreds of different named
      * parameters you probably want to rethink your strategy. ;)
      */
+    struct ArgElemsNamedParam *param = NULL;
     for(parami = 0; parami < n_params; parami++) {
-      struct ArgElemsNamedParam *param = &aux->params[parami];
+      struct ArgElemsNamedParam *p = &aux->params[parami];
 
       /* Since the params are stored in hash key order, if we are already
        * past it then we know we are done
        */
-      if(param->namehash > namehash)
+      if(p->namehash > namehash)
         break;
-      if(param->namehash != namehash)
+      if(p->namehash != namehash)
         continue;
 
       /* TODO: This will be wrong for UTF-8 comparisons */
-      if(namelen != param->namelen)
+      if(namelen != p->namelen)
         continue;
-      if(!strnEQ(namepv, param->namepv, namelen))
+      if(!strnEQ(namepv, p->namepv, namelen))
         continue;
 
-      param_padix = param->padix;
+      param = p;
       break;
     }
 
-    if(param_padix) {
-      SV *targ = PAD_SVl(param_padix);
-
-      /* This has to do all the work normally done by pp_argelem */
-      assert(TAINTING_get || !TAINT_get);
-      if(UNLIKELY(TAINT_get) && !SvTAINTED(val))
-        TAINT_NOT;
-      SvPADSTALE_off(targ);
-      SvSetMagicSV(targ, val);
+    if(param) {
+      do_namedarg_assign(param->flags, param->padix, name, val);
     }
     else if(slurpy_hv) {
       hv_store_ent(slurpy_hv, name, newSVsv(val), 0);
@@ -426,6 +487,8 @@ static void opdump_argelems_named(pTHX_ const OP *o, struct Perl_OpDumpContext *
       opdump_printf(ctx, "%sUTF8", need_comma?",":""), need_comma = true;
     if(param->flags & NAMEDPARAMf_REQUIRED)
       opdump_printf(ctx, "%sREQUIRED", need_comma?",":""), need_comma = true;
+    if(param->flags & NAMEDPARAMf_REFALIAS)
+      opdump_printf(ctx, "%sREFALIAS", need_comma?",":""), need_comma = true;
 
     opdump_printf(ctx, ")}\n");
   }
@@ -435,42 +498,36 @@ static void opdump_argelems_named(pTHX_ const OP *o, struct Perl_OpDumpContext *
 static XOP xop_refargelem;
 static OP *pp_refargelem(pTHX)
 {
+  dSP;
   U8 priv = PL_op->op_private;
   IV argix = PTR2IV(cUNOP_AUX->op_aux);
 
-  SV **svp = av_fetch(GvAV(PL_defgv), argix, FALSE);
-  if(!svp || !SvROK(*svp))
-    croak_from_caller("Expected argument %" IVdf " to %" SVf " to be a reference",
-        argix + 1, SVfARG(S_find_runcv_name(aTHX)));
-
-  SV *rv = SvRV(*svp);
-
-  const char *exp_reftype = NULL;
-  switch(priv & OPpARGELEM_MASK) {
-    case OPpARGELEM_SV:
-      if(SvTYPE(rv) > SVt_PVMG)
-        exp_reftype = "SCALAR";
-      break;
-
-    case OPpARGELEM_AV:
-      if(SvTYPE(rv) != SVt_PVAV)
-        exp_reftype = "ARRAY";
-      break;
-
-    case OPpARGELEM_HV:
-      if(SvTYPE(rv) != SVt_PVHV)
-        exp_reftype = "HASH";
-      break;
+  SV *sv;
+  if(PL_op->op_flags & OPf_STACKED)
+    sv = POPs;
+  else {
+    SV **svp = av_fetch(GvAV(PL_defgv), argix, FALSE);
+    sv = svp ? *svp : NULL;
   }
-  if(exp_reftype)
+
+  PUTBACK;
+
+  if(!check_refalias_arg(priv, sv)) {
+    const char *exp_reftype = NULL;
+    switch(priv & OPpARGELEM_MASK) {
+      case OPpARGELEM_SV: exp_reftype = "SCALAR"; break;
+      case OPpARGELEM_AV: exp_reftype = "ARRAY"; break;
+      case OPpARGELEM_HV: exp_reftype = "HASH"; break;
+    }
     croak_from_caller("Expected argument %" IVdf " to %" SVf " to be a reference to %s",
         argix + 1, SVfARG(S_find_runcv_name(aTHX)), exp_reftype);
+  }
 
   /* Perform refaliasing into the pad */
   SV **padentry = &(PAD_SVl(PL_op->op_targ));
   save_clearsv(padentry);
   SvREFCNT_dec(*padentry);
-  *padentry = SvREFCNT_inc(rv);
+  *padentry = SvREFCNT_inc(SvRV(sv));
 
   return PL_op->op_next;
 }
@@ -530,7 +587,8 @@ static void pending_free(pTHX_ SV *sv)
 
 struct NamedParamDetails {
   PADOFFSET padix;
-  bool is_required;
+  U8 flags;
+  char sigil;
 };
 struct SignatureParsingContext {
   OP *positional_elems;  /* OP_LINESEQ of every positional element, in order */
@@ -566,8 +624,18 @@ static void S_sigctx_add_param(pTHX_ struct SignatureParsingContext *sigctx, str
       Newx(details, 1, struct NamedParamDetails);
       *details = (struct NamedParamDetails){
         .padix       = paramctx->padix,
-        .is_required = !paramctx->defop,
+        .flags       = (!paramctx->defop) ? NAMEDPARAMf_REQUIRED : 0,
+        .sigil       = paramctx->sigil,
       };
+
+      if(paramctx->is_refalias) {
+        details->flags |= NAMEDPARAMf_REFALIAS;
+        switch(paramctx->sigil) {
+          case '$': details->flags |= NAMEDPARAMf_REFSCALAR; break;
+          case '@': details->flags |= NAMEDPARAMf_REFARRAY;  break;
+          case '%': details->flags |= NAMEDPARAMf_REFHASH;   break;
+        }
+      }
 
       hv_store(sigctx->named_details, paramctx->namepv, paramctx->namelen, newSVpvx(details), 0);
     }
@@ -590,6 +658,8 @@ static void S_sigctx_add_param(pTHX_ struct SignatureParsingContext *sigctx, str
           newSTATEOP(0, NULL, paramctx->op));
 
     sigctx->n_elems++;
+    if(paramctx->defop)
+      sigctx->n_optelems++;
   }
   else if(paramctx->sigil == '$') {
     /* A positional scalar */
@@ -699,6 +769,10 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     c = lex_peek_unichar(0);
   }
 
+  /* Be slightly helpful to folks who write \:$foo */
+  if((flags & PARSE_SUBSIGNATURE_NAMED_PARAMS) && c == ':')
+    croak("Named refalias parameters should be written :\\VAR, not \\:VAR");
+
   paramctx.sigil = c;
   switch(paramctx.sigil) {
     case '$': private = OPpARGELEM_SV; break;
@@ -802,8 +876,6 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     if(lex_consume("=") ||
         (default_if_undef = lex_consume("//=")) ||
         (default_if_false = lex_consume("||="))) {
-      if(paramctx.is_refalias)
-        croak("Cannot supply a defaulting expression to a refalias parameter");
       OP *defexpr = parse_termexpr(PARSE_OPTIONAL);
       if(PL_parser->error_count)
         croak("Expected a defaulting expression for optional parameter");
@@ -817,6 +889,14 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
         OP *assignop = newUNOP(OP_CUSTOM, 0, defexpr);
         assignop->op_ppaddr = &pp_namedargassign;
         assignop->op_targ = paramctx.padix;
+        if(paramctx.is_refalias) {
+          assignop->op_private |= NAMEDPARAMf_REFALIAS;
+          switch(paramctx.sigil) {
+            case '$': assignop->op_private |= NAMEDPARAMf_REFSCALAR; break;
+            case '@': assignop->op_private |= NAMEDPARAMf_REFARRAY;  break;
+            case '%': assignop->op_private |= NAMEDPARAMf_REFHASH;   break;
+          }
+        }
 
         OP *existsop = (OP *)alloc_LOGOP(OP_CUSTOM, assignop, LINKLIST(assignop));
         existsop->op_ppaddr = &pp_namedargexists;
@@ -1003,9 +1083,8 @@ endofelems:
       struct NamedParamDetails *details = (struct NamedParamDetails *)SvPVX(HeVAL(iter));
 
       *param = (struct ArgElemsNamedParam){
-        .flags =
-          (HeUTF8(iter)         ? NAMEDPARAMf_UTF8     : 0) |
-          (details->is_required ? NAMEDPARAMf_REQUIRED : 0),
+        .flags = details->flags |
+          (HeUTF8(iter) ? NAMEDPARAMf_UTF8 : 0),
         .padix = details->padix,
         .namehash = HeHASH(iter),
         .namepv = savepvn(namepv, namelen),

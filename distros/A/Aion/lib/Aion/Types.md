@@ -1434,6 +1434,36 @@ $x ~~ HashLike[Int] # -> ""
 $x ~~ HashLike[Num] # -> 1
 ```
 
+# Coerces
+
+## Join\[R] as Str
+
+Сктроковый тип с преобразованием массивов в строку через разделитель.
+
+```perl
+Join([' '])->coerce([qw/a b c/]) # => a b c
+
+package JoinExample { use Aion;
+	has s => (isa => Join[', '], coerce => 1);
+}
+
+JoinExample->new(s => [qw/a b c/])->s # => a, b, c
+
+JoinExample->new(s => 'string')->s # => string
+```
+
+## Split\[S] as ArrayRef
+
+```perl
+Split([' '])->coerce('a b c') # --> [qw/a b c/]
+
+package SplitExample { use Aion;
+	has s => (isa => Split[qr/\s*,\s*/], coerce => 1);
+}
+
+SplitExample->new(s => 'a, b, c')->s # --> [qw/a b c/]
+```
+
 # AUTHOR
 
 Yaroslav O. Kosmina [dart@cpan.org](mailto:dart@cpan.org)

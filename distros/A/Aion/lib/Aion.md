@@ -5,7 +5,7 @@ Aion - постмодернистская объектная система дл
 
 # VERSION
 
-1.2
+1.3
 
 # SYNOPSIS
 
@@ -128,9 +128,11 @@ $s->keysify	 # => key1, key2
 $s->valsify	 # => a, b
 ```
 
-## isa ($package)
+## exactly ($package)
 
 Проверяет, что `$package` — это суперкласс для данного или сам этот класс.
+
+Реализацию метода `isa` Aion не меняет и она находит как суперклассы, так и роли (так как и те и другие добавляются в `@ISA` пакета).
 
 ```perl
 package Ex::X { use Aion; }
@@ -138,13 +140,13 @@ package Ex::A { use Aion; extends q/Ex::X/; }
 package Ex::B { use Aion; }
 package Ex::C { use Aion; extends qw/Ex::A Ex::B/ }
 
-Ex::C->isa("Ex::A") # -> 1
-Ex::C->isa("Ex::B") # -> 1
-Ex::C->isa("Ex::X") # -> 1
-Ex::C->isa("Ex::X1") # -> ""
-Ex::A->isa("Ex::X") # -> 1
-Ex::A->isa("Ex::A") # -> 1
-Ex::X->isa("Ex::X") # -> 1
+Ex::C->exactly("Ex::A") # -> 1
+Ex::C->exactly("Ex::B") # -> 1
+Ex::C->exactly("Ex::X") # -> 1
+Ex::C->exactly("Ex::X1") # -> ""
+Ex::A->exactly("Ex::X") # -> 1
+Ex::A->exactly("Ex::A") # -> 1
+Ex::X->exactly("Ex::X") # -> 1
 ```
 
 ## does ($package)
@@ -449,7 +451,7 @@ $count   # -> 11
 
 ## lazy => (1|0)
 
-Атрибут `lazy` включает или отключает ленивое вычисление значения по умолчанию (`default`).
+Аспект `lazy` включает или отключает ленивое вычисление значения по умолчанию (`default`).
 
 По умолчанию он включен только если значение по умолчанию является подпрограммой.
 
@@ -471,10 +473,42 @@ $ex1->has_x # -> ""
 $ex1->x     # -> 6
 ```
 
+## eon => (1|$key)
+
+С помощью аспекта `eon` реализуется паттерн **Dependency Injection**.
+
+Он связывает свойство с сервисом из контейнера `$Aion::pleroma`.
+
+Значением аспекта может быть ключ сервиса или 1, тогда ключём будет пакет в `isa => Object['Packet']`
+
+Пример с 1-й:
+
+```perl
+package CounterEon { use Aion;
+	has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
+}
+
+package AccomulatorEon { use Aion;
+	has counter => (eon => 'ex.counter');
+}
+
+{
+	local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
+		'ex.counter' => 'CounterEon#new',
+		AccomulatorEon => 'AccomulatorEon#new',
+	});
+	
+	my $counter = $Aion::pleroma->get('ex.counter');
+
+	$counter->accomulator->counter # -> $counter
+}
+```
+
 ## trigger => $sub
 
 `$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер.
-Этимология – впустить.
+
+Этимология `trigger` – впустить.
 
 ```perl
 package ExTrigger { use Aion;
@@ -495,7 +529,8 @@ $ex->y	  # -> 30
 ## release => $sub
 
 `$sub` вызывается перед возвратом свойства из объекта через геттер.
-Этимология – выпустить.
+
+Этимология `release` – выпустить.
 
 ```perl
 package ExRelease { use Aion;

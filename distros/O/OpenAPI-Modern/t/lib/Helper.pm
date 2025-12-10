@@ -52,7 +52,7 @@ YAML
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'plack': classes of type Plack::Request, Plack::Response
 # 'catalyst': classes of type Catalyst::Request, Catalyst::Response
-our @TYPES = qw(mojo lwp plack catalyst);
+our @TYPES = qw(mojo lwp plack catalyst dancer2);
 our $TYPE = 'mojo'; # safe default
 
 # Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
@@ -62,7 +62,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
     if length $body_content and $body_content =~ /[^\x00-\xff]/;
 
   my $req;
-  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
+  if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
     test_needs('HTTP::Request', 'URI');
 
     my $uri = URI->new($uri_string);
@@ -74,7 +74,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
         and not defined $req->headers->header('Transfer-Encoding');
     $req->protocol('HTTP/1.1'); # required, but not added by HTTP::Request constructor
 
-    if ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
+    if ($TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
       test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
       die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
 
@@ -95,6 +95,10 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
         uri => $uri,
         env => $req->env, # $req was Plack::Request
       );
+    }
+    elsif ($TYPE eq 'dancer2') {
+      test_needs('Dancer2::Core::Request');
+      $req = Dancer2::Core::Request->new(env => $req->env);
     }
   }
   elsif ($TYPE eq 'mojo') {
@@ -153,6 +157,19 @@ sub response ($code, $headers = [], $body_content = undef) {
       if defined $body_content and not defined $res->headers->header('Content-Length')
         and not defined $res->headers->header('Transfer-Encoding');
   }
+  elsif ($TYPE eq 'dancer2') {
+    test_needs('Dancer2::Core::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+    die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
+
+    $res = Dancer2::Core::Response->new(
+      status => $code,
+      headers => $headers,
+      defined $body_content ? (content => $body_content) : (),
+    );
+    $res->headers->header('Content-Length' => length $body_content)
+      if defined $body_content and not defined $res->headers->header('Content-Length')
+        and not defined $res->headers->header('Transfer-Encoding');
+  }
   else {
     die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
@@ -191,7 +208,7 @@ sub query_params ($request, $pairs) {
   elsif ($TYPE eq 'mojo') {
     $request->url->query->pairs($pairs);
   }
-  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
+  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
     # this is the encoded query string portion of the URI
     $request->env->{QUERY_STRING} = Mojo::Parameters->new->pairs($pairs)->to_string;
     $request->env->{REQUEST_URI} .= '?' . $request->env->{QUERY_STRING};
@@ -213,7 +230,7 @@ sub remove_header ($message, $header_name) {
   elsif ($TYPE eq 'mojo') {
     $message->headers->remove($header_name);
   }
-  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
+  elsif ($TYPE eq 'plack' or $TYPE eq 'catalyst' or $TYPE eq 'dancer2') {
     $message->headers->remove_header($header_name);
     delete $message->env->{uc $header_name =~ s/-/_/r} if $message->can('env');
   }

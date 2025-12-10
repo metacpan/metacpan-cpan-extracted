@@ -363,10 +363,6 @@ class Mojolicious::Controller {
     return $string;
   }
   
-  method render_later : void () {
-    $self->stash_h->{"mojo.rendered"} = 1;
-  }
-  
   method rendered : void ($status : int = 0) {
     
     # Make sure we have a status
@@ -384,16 +380,12 @@ class Mojolicious::Controller {
         $res->set_code(200) ;
       }
       
-      # Disable auto rendering and stop timer
-      $self->render_later;
-      
       my $app = $self->app;
       $app->plugins->emit_hook_reverse(after_dispatch => $self);
       
       # TODO:session
       # $app->sessions->store($self);
     }
-    $self->tx->(Mojo::Transaction::HTTP)->resume;
   }
   
   method send : void ($msg : string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {

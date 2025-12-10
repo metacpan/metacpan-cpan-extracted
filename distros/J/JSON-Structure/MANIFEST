@@ -1,0 +1,24 @@
+.perlcriticrc
+bin/pjstruct
+cpanfile
+lib/JSON/Structure.pm
+lib/JSON/Structure/ErrorCodes.pm
+lib/JSON/Structure/InstanceValidator.pm
+lib/JSON/Structure/JsonSourceLocator.pm
+lib/JSON/Structure/SchemaValidator.pm
+lib/JSON/Structure/Types.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+PUBLISHING.md
+README.md
+t/01_basic.t
+t/02_schema_validator.t
+t/03_instance_validator.t
+t/04_test_assets.t
+t/05_format_validation.t
+t/06_comprehensive.t
+t/07_cli.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -11,6 +11,8 @@ class Mojo::Content extends Mojo::EventEmitter {
   use Mojo::SSE::Event;
   use Format;
   
+  allow Mojo::Message;
+  
   # Class Variables
   our $BOUNDARY_RE : Regex;
   INIT {
@@ -38,8 +40,6 @@ class Mojo::Content extends Mojo::EventEmitter {
   has state : string;
   
   has dynamic : byte;
-  
-  has limit : byte;
   
   has buffer : StringBuffer;
   
@@ -123,10 +123,10 @@ class Mojo::Content extends Mojo::EventEmitter {
     }
     
     my $boundary = (string)undef;
-    if (my $_ = $BOUNDARY_RE->match($content_type)) {
-      $boundary = $_->cap1;
-      unless ($boundary) {
-        $boundary = $_->cap2;
+    if (my $m = $BOUNDARY_RE->match($content_type)) {
+      $boundary = $m->cap1;
+      unless (length $boundary) {
+        $boundary = $m->cap2;
       }
     }
     
@@ -234,11 +234,6 @@ class Mojo::Content extends Mojo::EventEmitter {
     return $state eq "finished";
   }
   
-  method is_limit_exceeded : int () {
-    
-    return !!$self->{limit};
-  }
-  
   method is_multipart : int () { return 0; }
   
   method is_parsing_body : int () {
@@ -264,7 +259,6 @@ class Mojo::Content extends Mojo::EventEmitter {
     if ($self->{state} eq "headers") {
       return $self;
     }
-    
     if ($self->is_chunked && $self->{state} ne "headers") {
       $self->_parse_chunked;
       
@@ -284,7 +278,6 @@ class Mojo::Content extends Mojo::EventEmitter {
         $self->{pre_buffer} = StringBuffer->new;
       }
     }
-    
     # No content
     if ($self->skip_body) {
       $self->{state} = "finished";
@@ -448,6 +441,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     # No compression
     unless ($self->auto_decompress && $self->is_compressed) {
       $self->emit(read => $chunk);
+      
       return;
     }
     
@@ -470,7 +464,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     # Check buffer size
     if ($self->{post_buffer}->length > $self->max_buffer_size) {
       $self->{state} = "finished";
-      $self->{limit} = 1;
+      die "Maximum buffer size exceeded";
     }
   }
   
@@ -558,7 +552,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     # Check buffer size
     if (($self->{pre_buffer} ? $self->{pre_buffer}->length : 0) > $self->max_buffer_size) {
       $self->{state} = "finished";
-      $self->{limit} = 1;
+      die "Maximum buffer size exceeded";
     }
   }
   

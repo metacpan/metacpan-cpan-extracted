@@ -43,5 +43,5 @@ Module::Build->new(
         },
     },
     meta_merge =>
-      { resources => { repository => 'https://github.com/thrig/Music-Scala' } },
+      { resources => { repository => 'https://thrig.me/src/Music-Scala.git' } },
 )->create_build_script;

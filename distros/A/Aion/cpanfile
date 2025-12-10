@@ -16,23 +16,26 @@ on 'test' => sub {
 
 	requires 'Carp';
 	requires 'Cwd';
+	requires 'Data::Dumper';
 	requires 'File::Basename';
 	requires 'File::Find';
 	requires 'File::Path';
 	requires 'File::Slurper';
 	requires 'File::Spec';
+	requires 'String::Diff';
+	requires 'Term::ANSIColor';
 	requires 'lib';
 	requires 'open';
 };
 
 requires 'B';
 requires 'Exporter';
-requires 'common::sense', '3.75';
-requires 'config', '1.3';
 requires 'List::Util', '1.68';
 requires 'Math::BigFloat', '0';
 requires 'Math::BigInt', '1.999837';
 requires 'Scalar::Util', '1.63';
 requires 'Sub::Util', '1.63';
+requires 'common::sense', '3.75';
+requires 'config', '1.3';
 requires 'constant';
 requires 'overload';

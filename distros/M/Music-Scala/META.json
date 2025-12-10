@@ -4,7 +4,7 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "Music::Scala" : {
          "file" : "lib/Music/Scala.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -52,9 +52,9 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
-         "url" : "https://github.com/thrig/Music-Scala"
+         "url" : "https://thrig.me/src/Music-Scala.git"
       }
    },
-   "version" : "1.07",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

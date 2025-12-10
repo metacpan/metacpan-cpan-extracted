@@ -227,85 +227,85 @@ EOS
     
   }
   
-  method get : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method get : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "GET";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method head : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method head : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "HEAD";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method delete : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method delete : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "DELETE";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method options : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method options : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "OPTIONS";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method patch : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method patch : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "PATCH";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method post : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method post : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "POST";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method put : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method put : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args : object...) {
     
     my $method = "PUT";
     
-    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    my $tx = $self->build_tx($method, $url, $args);
     
     $tx = $self->start($tx);
     
     return $tx;
   }
   
-  method build_tx : Mojo::Transaction::HTTP ($method : string, $url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
-    return $self->transactor->tx($method, $url, $args1, $args2);
+  method build_tx : Mojo::Transaction::HTTP ($method : string, $url : string|Mojo::URL, $args : object...) {
+    return $self->transactor->tx($method, $url, $args);
   }
   
   method start : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
@@ -493,13 +493,13 @@ EOS
     
     my $start_line = $req->build_start_line;
     
-    $handle->write($start_line);
+    $handle->syswrite($start_line);
     
     my $header_lines = $req->build_headers;
     
-    $handle->write($header_lines);
+    $handle->syswrite($header_lines);
     
-    $handle->write("\r\n");
+    $handle->syswrite("\r\n");
   }
   
   private method read_response : void ($tx : Mojo::Transaction::HTTP) {
@@ -510,7 +510,7 @@ EOS
     while (1) {
       my $chunk = (mutable string)new_string_len &READ_BUFFER_SIZE;
       
-      my $read_length = $handle->read($chunk);
+      my $read_length = $handle->sysread($chunk);
       
       if ($read_length == 0) {
         $res->finish;

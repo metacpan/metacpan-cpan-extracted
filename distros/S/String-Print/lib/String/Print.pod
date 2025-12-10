@@ -211,7 +211,7 @@ easier, but the object version is most flexible.
   my $sp = String::Print->new(
     modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ],
     serializers => [ UNDEF => sub {'-'} ],
-    defaults    => [ DT => { standard => 'ISO' } ],
+    defaults    => [ DT    => { standard => 'ISO' } ],
   );
 
   $sp->printi("price: {p EUR}", p => 3.1415); # price: ␣␣3.14 e
@@ -667,14 +667,14 @@ format.  The C<BYTES> modifier simplifies this a lot:
 
   printp "{size BYTES} {fn}\n", fn => $fn, size => -s $fn;
 
-The output will always be 6 characters.  Examples are "999  B", "1.2 kB",
-and " 27 MB".
+The output will always be 5 characters.  Examples are "999 B", "1.2kB",
+and " 27MB".
 
 =head3 Modifier: HTML
 
 [0.95] interpolate the parameter with HTML entity encoding.
 
-=head3 Modifiers: YEAR, DATE, TIME, DT, and DT()
+=head3 Modifiers: YEAR, DATE(), TIME, and DT()
 
 [0.91] A set of modifiers help displaying dates and times.  They are a
 little flexible in values they accept, but do not expect miracles: when
@@ -729,23 +729,37 @@ converted into the local timezone of the observer.
 
 =back
 
-The output of C<YEAR> is in format 'YYYY', for C<DATE> it will always be
-'YYYY-MM-DD', where C<TIME> produces 'HH:mm:ss'.
+The output of C<YEAR> is in format 'YYYY', where C<TIME> produces 'HH:mm:ss'.
+C<DT> and C<DATE> are configurable.
 
 The DT modifier can produce different formats:
 
-  DT(ASC)     : %a %b %e %T %Y       asctime output
-  DT(FT)      : %F %T                YYYY-MM-DD HH:MM:SS
+  DT(ASC)     : %a %b %e %T %Y       asctime output (not on Windows)
+  DT(FT)      : %F %T                YYYY-MM-DD HH:MM:SS (default)
   DT(ISO)     : %FT%T%z              iso8601
   DT(RFC822)  : %a, %d %b %y %T %z   email old
   DT(RFC2822) : %a, %d %b %Y %T %z   email newer
   DT(RFC5322) : %a, %d %b %Y %T %z   email newest [0.96]
+  DT(%F-%T)                          [1.02] any own format
 
-You may suggest additional formats, or add your own modifier.
+You may suggest additional formats, or add your own modifier.  For your own
+format: be warned that C<%F> and C<%T> are not supported on some Windows
+versions (but the difference is hidden by Perl >5.38).
+
+[1.02] Also, the DATE modifier can produce different formats:
+
+  DATE(-)     : %Y-%m-%d
+  DATE(/)     : %Y/%m/%d
+  DATE(%d-%m-%Y)         any own pattern
+  DATE(%m-%d-%Y)         better not use this broken order
+
+Other fields than C<%Y>, C<%m>, and C<%d> are not supported. Other characters
+are left untouched.
 
 The defaults are:
 
-  DT => { standard => 'FT' },
+  DATE => { format => '-' },
+  DT   => { format => 'FT' },
 
 =head3 Modifier: //word, //"string", //'string'
 
@@ -772,7 +786,7 @@ name before the value.  It might simplify debugging statements.
   "visitors: {count=}", count => 1;      # visitors: count=1
   "v: {count %-8,d =}X", count => 10000; # v: count=10,000␣␣X
 
-=head3 Modifier: EL, EL($width), or EL($width,$replace)
+=head3 Modifier: EL or EL($width, [$replace])
 
 [1.00] When the string is larger than C<$width> columns, then chop it
 short and add a 'mid-line ellipsis' character: C< ⋯  >.  You may also
@@ -794,7 +808,7 @@ with L<setDefaults()|String::Print/"Attributes">:
   $sp->setDefaults(EL => { width => 10, replace => '⋮' });
   $sp->printi("Intro: {text EL}"); # Intro: 12345678⋯ 
 
-=head3 Modifier: CHOP, CHOP($width) or CHOP($width,$units)
+=head3 Modifier: CHOP or CHOP($width, [$units])
 
 [1.00] When the string is larger than C<$width> columns (defaults to
 20), then chop it short and add C<< [+42] >>: the number of character
@@ -1012,8 +1026,8 @@ C<String::Print> is nicely integrated with Log::Report.
 
 =head1 SEE ALSO
 
-This module is part of String-Print version 1.01,
-built on December 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of String-Print version 1.02,
+built on December 09, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

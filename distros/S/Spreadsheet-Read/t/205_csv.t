@@ -5,7 +5,7 @@ use warnings;
 
 # OO version of 200_csv.t
 
-my     $tests = 271;
+my     $tests = 275;
 use     Test::More;
 require Test::NoWarnings;
 
@@ -71,11 +71,13 @@ is ($sheet->row     (255), undef, "No such row 255");
 is ($sheet->row     (-55), undef, "No such row -55");
 is ($sheet->row     (  0), undef, "No such row   0");
 
-is_deeply ([$sheet->cellcolumn (1)], ["A1","A2","A3","A4",""], "col 1");
+is_deeply ([$sheet->cellcolumn (  1)], ["A1","A2","A3","A4",""], "col 1");
+is_deeply ([$sheet->cellcolumn ("A")], ["A1","A2","A3","A4",""], "col 1");
 is ($sheet->cellcolumn (255), undef, "No such col 255");
 is ($sheet->cellcolumn (-55), undef, "No such col -55");
 is ($sheet->cellcolumn (  0), undef, "No such col   0");
-is_deeply ([$sheet->column     (1)], ["A1","A2","A3","A4",""], "col 1");
+is_deeply ([$sheet->column       (1)], ["A1","A2","A3","A4",""], "col 1");
+is_deeply ([$sheet->column     ("A")], ["A1","A2","A3","A4",""], "col 1");
 is ($sheet->column     (255), undef, "No such col 255");
 is ($sheet->column     (-55), undef, "No such col -55");
 is ($sheet->column     (  0), undef, "No such col   0");
@@ -95,10 +97,10 @@ foreach my $cell (qw( A1 A2 A3 A4 B1 B2 B4 C3 C4 D1 D3 )) {
 ok (1, "Undefined fields");
 foreach my $cell (qw( B3 C1 C2 D2 D4 )) {
     my ($c, $r) = $csv->cell2cr ($cell);
-    is ($sheet->{cell}[$c][$r],	"",   	"Unformatted cell $cell direct");
-    is ($sheet->{$cell},	"",   	"Formatted   cell $cell direct");
-    is ($sheet->cell ($c, $r),	"",   	"Unformatted cell $cell method");
-    is ($sheet->cell ($cell),	"",   	"Formatted   cell $cell method");
+    is ($sheet->{cell}[$c][$r],	"",	"Unformatted cell $cell direct");
+    is ($sheet->{$cell},	"",	"Formatted   cell $cell direct");
+    is ($sheet->cell ($c, $r),	"",	"Unformatted cell $cell method");
+    is ($sheet->cell ($cell),	"",	"Formatted   cell $cell method");
     }
 
 ok ($csv = Spreadsheet::Read->new ("files/test_m.csv"),	"Read/Parse M\$ csv file");
@@ -114,8 +116,8 @@ foreach my $cell (qw( A1 A2 A3 A4 B1 B2 B4 C3 C4 D1 D3 )) {
 ok (1, "Undefined fields");
 foreach my $cell (qw( B3 C1 C2 D2 D4 )) {
     my ($c, $r) = $sheet->cell2cr ($cell);
-    is ($csv->[1]{cell}[$c][$r],	"",   	"Unformatted cell $cell");
-    is ($csv->[1]{$cell},		"",   	"Formatted   cell $cell");
+    is ($csv->[1]{cell}[$c][$r],	"",	"Unformatted cell $cell");
+    is ($csv->[1]{$cell},		"",	"Formatted   cell $cell");
     }
 
 ok ($csv = Spreadsheet::Read->new ("files/test_x.csv", sep => "=", quote => "_"),
@@ -131,8 +133,8 @@ foreach my $cell (qw( A1 A2 A3 A4 B1 B2 B4 C3 C4 D1 D3 )) {
 ok (1, "Undefined fields");
 foreach my $cell (qw( B3 C1 C2 D2 D4 )) {
     my ($c, $r) = cell2cr ($cell);
-    is ($csv->[1]{cell}[$c][$r],	"",   	"Unformatted cell $cell");
-    is ($csv->[1]{$cell},		"",   	"Formatted   cell $cell");
+    is ($csv->[1]{cell}[$c][$r],	"",	"Unformatted cell $cell");
+    is ($csv->[1]{$cell},		"",	"Formatted   cell $cell");
     }
 
 {   # RT#74976 - Error Received when reading empty sheets
@@ -223,8 +225,10 @@ is_deeply ($sheet2, $sheet3, "Compare sheets");
 ok ($csv->add ("files/test.csv", label => "Test"), "Add with label");
 is_deeply ([ $csv->sheets ], [qw( files/test.csv files/test.csv[2] Test )], "Sheet names");
 
-is ($csv->col2label (4),             "D",  "col2label as book  method");
-is ($csv->sheet (1)->col2label (27), "AA", "col2label as sheet method");
+is ($csv->col2label (4),               "D",  "col2label as book  method");
+is ($csv->sheet (1)->col2label (27),   "AA", "col2label as sheet method");
+is ($csv->label2col ("D"),             4,    "label2col as book  method");
+is ($csv->sheet (1)->label2col ("AA"), 27,   "label2col as sheet method");
 
 is_deeply ($csv->sheet (1)->range ("A2:B3"), {
     A2 => "A2", A3 => "A3", B2 => "B2", B3 => "" }, "range (A2:B3)");

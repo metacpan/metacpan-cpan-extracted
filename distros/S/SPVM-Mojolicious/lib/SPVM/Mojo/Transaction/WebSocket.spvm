@@ -151,7 +151,6 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
       $self->parse_message($frame);
     }
     
-    $self->emit("resume");
   }
   
   method protocol : string () { return $self->res->headers->sec_websocket_protocol; }
@@ -160,10 +159,6 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   method remote_port : int () { return $self->handshake->remote_port; }
   method req : Mojo::Message::Request () { return $self->handshake->req; }
   method res : Mojo::Message::Response () { return $self->handshake->res; }
-  
-  method resume : void () {
-    $self->handshake->resume;
-  }
   
   method send : void ($msg : string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {
     
@@ -183,8 +178,6 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     
     $self->{write} //= "";
     $self->{write} .= Mojo::WebSocket->build_frame($frame);
-    
-    $self->emit("resume");
   }
   
   method parse_message : void ($frame : Mojo::WebSocket::Frame) {

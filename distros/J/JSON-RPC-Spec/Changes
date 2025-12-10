@@ -1,5 +1,13 @@
 Revision history for Perl extension JSON-RPC-Spec
 
+v1.1.2 2025-12-09T19:18:04Z
+
+    In case of an error, do not delete if ID is required
+
+v1.1.1 2025-12-09T18:35:40Z
+
+    Added the ability to add a message to an error
+
 v1.0.7 2017-05-15T04:39:40Z
 
     commit e0e901af4b2c2475e7f3719366df4c380b46f0f3

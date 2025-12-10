@@ -48,13 +48,17 @@ class Mojo::Content::MultiPart extends Mojo::Content {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
+  protected method init : void ($options : object[] = undef, $no_call_super : int = 0) {
     
-    $self->SUPER::init;
+    unless ($no_call_super) {
+      $self->SUPER::init;
+    }
     
     $self->on(read => method : void ($that : Mojo::Content::MultiPart, $chunk : string) {
       $that->_read($chunk);
     });
+    
+    $self->{parts} = new Mojo::Content[0];
   }
   
   method body_contains : int ($chunk : string) {
@@ -207,7 +211,6 @@ class Mojo::Content::MultiPart extends Mojo::Content {
   }
   
   private method _parse_multipart_body : int ($boundary : string) {
-    
     # Whole part in buffer
     my $pos = Fn->index($self->{multipart}, "\x0d\x0a--$boundary");
     if ($pos < 0) {
@@ -238,14 +241,19 @@ class Mojo::Content::MultiPart extends Mojo::Content {
   private method _parse_multipart_boundary : int ($boundary : string) {
     
     # Boundary begins
-    if (Fn->index($self->{multipart}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
+    my $found_index = Fn->index($self->{multipart}, "\x0d\x0a--$boundary\x0d\x0a");
+    
+    if ($found_index == 0) {
       Fn->substr($self->{multipart}, 0, length($boundary) + 6, "");
       
       # New part
       my $part = Mojo::Content::Single->new;
       $part->{relaxed} = 1;
       $self->emit(part => $part);
-      $self->{parts} = (Mojo::Content[])Array->merge_object($self->{parts}, [$part]);
+      
+      my $parts = (List of Mojo::Content)List->new_ref($self->{parts});
+      $parts->push($part);
+      $self->{parts} = $parts->get_array;
       $self->{multi_state} = "multipart_body";
       
       return 1;
@@ -279,6 +287,8 @@ class Mojo::Content::MultiPart extends Mojo::Content {
   }
   
   private method _read : void ($chunk : string) {
+    
+    $self->{multipart} //= "";
     
     $self->{multipart} .= $chunk;
     
@@ -314,7 +324,7 @@ class Mojo::Content::MultiPart extends Mojo::Content {
     # Check buffer size
     if (length($self->{multipart} // "") > $self->max_buffer_size) {
       $self->{state} = "finished";
-      $self->{limit} = 1;
+      die "Maximum buffer size exceeded";
     }
   }
   

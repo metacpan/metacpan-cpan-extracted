@@ -1,0 +1,696 @@
+class TestCase::Mojo::Transaction {
+  use Mojo::Transaction::HTTP;
+  use Re;
+  
+  static method basic : int () {
+    
+    # is_empty
+    {
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        $tx->req->set_method("HEAD");
+        
+        unless ($tx->is_empty) {
+          return 0;
+        }
+      }
+      
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        $tx->res->set_code(200);
+        if ($tx->is_empty) {
+          return 0;
+        }
+      }
+      
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        $tx->res->set_code(100);
+        unless ($tx->is_empty) {
+          return 0;
+        }
+      }
+    }
+    
+    # is_websocket
+    {
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        
+        if ($tx->is_websocket) {
+          return 0;
+        }
+      }
+      
+      {
+        my $tx = Mojo::Transaction::WebSocket->new;
+        
+        unless ($tx->is_websocket) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    # redirects
+    {
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        
+        $tx->set_previous(my $tx_pre = Mojo::Transaction::HTTP->new);
+        
+        $tx->previous->set_previous(my $tx_pre_pre = Mojo::Transaction::HTTP->new);
+        
+        my $redirects = $tx->redirects;
+        
+        unless (@$redirects == 2) {
+          return 0;
+        }
+        
+        unless ($redirects->[0] == $tx_pre_pre) {
+          return 0;
+        }
+        
+        unless ($redirects->[1] == $tx_pre) {
+          return 0;
+        }
+        
+      }
+      
+    }
+    return 1;
+  }
+  
+  static method keep_alive : int () {
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      unless ($tx->keep_alive) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      $tx->req->headers->set_connection("close");
+      
+      if ($tx->keep_alive) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      $tx->res->headers->set_connection("close");
+      
+      if ($tx->keep_alive) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      $tx->req->set_version("1.0");
+      
+      $tx->req->headers->set_connection("keep-alive");
+      
+      unless ($tx->keep_alive) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      $tx->res->set_version("1.0");
+      
+      $tx->res->headers->set_connection("keep-alive");
+      
+      unless ($tx->keep_alive) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method server_read : int () {
+    
+    {
+      my $input = <<'EOS';
+GET / HTTP/1.1
+Host: example.com
+
+EOS
+      
+      $input = &to_crlf($input);
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      while (1) {
+        if ($tx->req->is_finished) {
+          last;
+        }
+        
+        my $chunk = Fn->substr($input, 0, 10, "");
+        
+        $tx->server_read($chunk);
+      }
+      
+      unless ($tx->req->method eq "GET") {
+        return 0;
+      }
+      
+      unless ($tx->req->version eq "1.1") {
+        return 0;
+      }
+      
+      unless ($tx->req->url->path->to_string eq "/") {
+        return 0;
+      }
+      
+      unless ($tx->req->headers->host eq "example.com") {
+        return 0;
+      }
+    }
+    
+    {
+      my $input = <<'EOS';
+GET /foo/bar?p1=1&p2=2 HTTP/1.1
+Host: example.com
+
+EOS
+      
+      $input = &to_crlf($input);
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      while (1) {
+        if ($tx->req->is_finished) {
+          last;
+        }
+        
+        my $chunk = Fn->substr($input, 0, 10, "");
+        
+        $tx->server_read($chunk);
+      }
+      
+      unless ($tx->req->method eq "GET") {
+        return 0;
+      }
+      
+      unless ($tx->req->version eq "1.1") {
+        return 0;
+      }
+      
+      unless ($tx->req->url->path->to_string eq "/foo/bar") {
+        return 0;
+      }
+      
+      unless ($tx->req->url->query->param("p1") eq "1") {
+        return 0;
+      }
+      
+      unless ($tx->req->url->query->param("p2") eq "2") {
+        return 0;
+      }
+      
+      unless ($tx->req->headers->host eq "example.com") {
+        return 0;
+      }
+    }
+    
+    {
+      my $input = <<'EOS';
+POST / HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 34
+
+name=Taro&email=taro%40example.com
+EOS
+      
+      $input = Fn->chompr($input);
+      
+      $input = &to_crlf($input);
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      while (1) {
+        if ($tx->req->is_finished) {
+          last;
+        }
+        
+        my $chunk = Fn->substr($input, 0, 10, "");
+        
+        $tx->server_read($chunk);
+      }
+      
+      unless ($tx->req->method eq "POST") {
+        return 0;
+      }
+      
+      unless ($tx->req->version eq "1.1") {
+        return 0;
+      }
+      
+      unless ($tx->req->url->path->to_string eq "/") {
+        return 0;
+      }
+      
+      unless ($tx->req->headers->host eq "example.com") {
+        return 0;
+      }
+      
+      unless ($tx->req->headers->content_type eq "application/x-www-form-urlencoded") {
+        return 0;
+      }
+      
+      unless ($tx->req->headers->content_length eq "34") {
+        return 0;
+      }
+      
+      unless ($tx->req->body_params->param("name") eq "Taro") {
+        return 0;
+      }
+      
+      unless ($tx->req->body_params->param("email") eq "taro@example.com") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $input = <<'EOS';
+POST / HTTP/1.1
+Host: example.com
+Content-Type: multipart/form-data; boundary=AaBbCcDdEeFfGgHhIiJj
+Content-Length: 241
+
+--AaBbCcDdEeFfGgHhIiJj
+Content-Disposition: form-data; name="username"
+
+john_doe
+--AaBbCcDdEeFfGgHhIiJj
+Content-Disposition: form-data; name="upload"; filename="profile.txt"
+Content-Type: text/plain
+
+hello
+--AaBbCcDdEeFfGgHhIiJj--
+EOS
+      
+      $input = &to_crlf($input);
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      while (1) {
+        if ($tx->req->is_finished) {
+          last;
+        }
+        
+        my $chunk = Fn->substr($input, 0, 10, "");
+        
+        $tx->server_read($chunk);
+      }
+      
+      unless ($tx->req->method eq "POST") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->version eq "1.1") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->url->path->to_string eq "/") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->headers->host eq "example.com") {
+        diag $tx->req->headers->host;
+        return 0;
+      }
+      
+      unless ($tx->req->headers->content_type eq "multipart/form-data; boundary=AaBbCcDdEeFfGgHhIiJj") {
+        diag $tx->req->headers->content_type;
+        return 0;
+      }
+      
+      unless ($tx->req->headers->content_length eq "241") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->body_params->param("username") eq "john_doe") {
+        diag $tx->req->body_params->param("username");
+        return 0;
+      }
+      
+      unless (@{$tx->req->uploads} == 1) {
+        return 0;
+      }
+      
+      my $upload = $tx->req->upload("upload");
+      unless ($upload) {
+        return 0;
+      }
+      
+      unless ($upload->filename eq "profile.txt") {
+        return 0;
+      }
+      
+      unless ($upload->headers->content_type eq "text/plain") {
+        return 0;
+      }
+      
+      unless ($upload->name eq "upload") {
+        return 0;
+      }
+      
+      unless ($upload->slurp eq "hello") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $input = <<'EOS';
+POST / HTTP/1.1
+Host: example.com
+Transfer-Encoding: chunked
+
+5
+start
+a
+1234567890
+3
+end
+0
+
+EOS
+      
+      $input = &to_crlf($input);
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      while (1) {
+        if ($tx->req->is_finished) {
+          last;
+        }
+        
+        my $chunk = Fn->substr($input, 0, 10, "");
+        
+        $tx->server_read($chunk);
+      }
+      
+      unless ($tx->req->method eq "POST") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->version eq "1.1") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->url->path->to_string eq "/") {
+        diag;
+        return 0;
+      }
+      
+      unless ($tx->req->headers->host eq "example.com") {
+        diag $tx->req->headers->host;
+        return 0;
+      }
+      
+      unless ($tx->req->content->(Mojo::Content::Single)->asset->slurp eq "start1234567890end") {
+        return 0;
+      }
+      
+    }
+    
+    # leftovers
+    {
+      my $inputs = new string[2];
+      
+      $inputs->[0] = <<'EOS';
+POST / HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 9
+
+name=Taro
+EOS
+      
+      $inputs->[0] = Fn->chompr($inputs->[0]);
+      $inputs->[0] = &to_crlf($inputs->[0]);
+      
+      $inputs->[1] = <<'EOS';
+POST / HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 9
+
+name=Karo
+EOS
+      
+      $inputs->[1] = Fn->chompr($inputs->[1]);
+      $inputs->[1] = &to_crlf($inputs->[1]);
+      
+      my $input = $inputs->[0] . $inputs->[1];
+      
+      my $leftovers = (string)undef;
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        
+        while (1) {
+          if ($tx->req->is_finished) {
+            last;
+          }
+          
+          my $chunk = Fn->substr($input, 0, 10, "");
+          
+          $tx->server_read($chunk);
+        }
+        
+        unless ($tx->req->method eq "POST") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->version eq "1.1") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->url->path->to_string eq "/") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->body_params->param("name") eq "Taro") {
+          diag dump $tx->req->url->query;
+          return 0;
+        }
+        
+        unless ($tx->req->headers->host eq "example.com") {
+          diag;
+          return 0;
+        }
+        
+        $leftovers = $tx->req->content->leftovers;
+        
+        unless (length $leftovers) {
+          die "[Unexpected Error]";
+        }
+      }
+      
+      {
+        my $tx = Mojo::Transaction::HTTP->new;
+        
+        $tx->server_read($leftovers);
+        
+        while (1) {
+          if ($tx->req->is_finished) {
+            last;
+          }
+          
+          my $chunk = Fn->substr($input, 0, 10, "");
+          
+          $tx->server_read($chunk);
+        }
+        
+        unless ($tx->req->method eq "POST") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->version eq "1.1") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->url->path->to_string eq "/") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->body_params->param("name") eq "Karo") {
+          diag;
+          return 0;
+        }
+        
+        unless ($tx->req->headers->host eq "example.com") {
+          diag;
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method to_crlf : string ($input : string) {
+    
+    my $output = copy $input;
+    
+    Re->s((mutable string)$output, ["\xA", "g"], "\xD\xA");
+    
+    return $output;
+  }
+  
+  static method server_write : int () {
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $res = $tx->res;
+      
+      $res->set_code(200);
+      
+      my $output = "";
+      while (1) {
+        my $chunk = $tx->server_write;
+        
+        unless (length $chunk) {
+          last;
+        }
+        
+        $output .= $chunk;
+      }
+      
+      Re->s((mutable string)$output, "date:.+?\xD\xA", "");
+      
+      unless ($output eq "HTTP/1.1 200 OK\x{0D}\x{0A}content-length: 0\x{0D}\x{0A}\x{0D}\x{0A}") {
+        diag dump $output;
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $res = $tx->res;
+      
+      $res->set_code(200);
+      $res->headers->set_content_type("text/plain");
+      $res->content->(Mojo::Content::Single)->asset->add_chunk("Hello");
+      
+      my $output = "";
+      while (1) {
+        my $chunk = $tx->server_write;
+        
+        unless (length $chunk) {
+          last;
+        }
+        
+        $output .= $chunk;
+      }
+      
+      Re->s((mutable string)$output, "date:.+?\xD\xA", "");
+      
+      unless ($output eq "HTTP/1.1 200 OK\x{0D}\x{0A}content-length: 5\x{0D}\x{0A}content-type: text/plain\x{0D}\x{0A}\x{0D}\x{0A}Hello") {
+        diag dump $output;
+        return 0;
+      }
+      
+    }
+    
+    # HEAD
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      $tx->req->set_method("HEAD");
+      my $res = $tx->res;
+      $res->set_code(200);
+      $res->headers->set_content_type("text/plain");
+      $res->content->(Mojo::Content::Single)->asset->add_chunk("Hello");
+      
+      my $output = "";
+      while (1) {
+        my $chunk = $tx->server_write;
+        
+        unless (length $chunk) {
+          last;
+        }
+        
+        $output .= $chunk;
+      }
+      
+      Re->s((mutable string)$output, "date:.+?\xD\xA", "");
+      
+      unless ($output eq "HTTP/1.1 200 OK\x{0D}\x{0A}content-length: 5\x{0D}\x{0A}content-type: text/plain\x{0D}\x{0A}\x{0D}\x{0A}") {
+        diag dump $output;
+        return 0;
+      }
+      
+    }
+    
+    # Mojo::Asset::File
+    {
+      my $tx = Mojo::Transaction::HTTP->new;
+      
+      my $res = $tx->res;
+      $res->set_code(200);
+      $res->headers->set_content_type("text/plain");
+      $res->content->(Mojo::Content::Single)->asset->(Mojo::Asset::Memory)->set_max_memory_size(1);
+      
+      my $asset = $res->content->(Mojo::Content::Single)->asset;
+      $asset = $asset->add_chunk("Hello");
+      
+      unless ($asset is_type Mojo::Asset::File) {
+        return 0;
+      }
+      
+      $res->content->(Mojo::Content::Single)->set_asset($asset);
+      
+      my $output = "";
+      while (1) {
+        my $chunk = $tx->server_write;
+        
+        unless (length $chunk) {
+          last;
+        }
+        
+        $output .= $chunk;
+      }
+      
+      Re->s((mutable string)$output, "date:.+?\xD\xA", "");
+      
+      unless ($output eq "HTTP/1.1 200 OK\x{0D}\x{0A}content-length: 5\x{0D}\x{0A}content-type: text/plain\x{0D}\x{0A}\x{0D}\x{0A}Hello") {
+        diag dump $output;
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+}

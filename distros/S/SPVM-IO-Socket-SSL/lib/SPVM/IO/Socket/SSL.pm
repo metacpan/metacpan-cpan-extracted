@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.013";
+our $VERSION = "0.014";
 
 1;
 
@@ -22,11 +22,11 @@ IO::Socket::SSL class in L<SPVM> represents sockets for SSL communication.
   my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port});
   
   my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
-  $socket->write($write_buffer);
+  $socket->syswrite($write_buffer);
   
   my $read_buffer = (mutable string)new_string_len 100000;
   while (1) {
-    my $read_length = $socket->read($read_buffer);
+    my $read_length = $socket->sysread($read_buffer);
     
     if ($read_length < 0) {
       die "Read error";
@@ -287,9 +287,9 @@ And if the value of L</"SSL_startHandshake"> option is a true value, calls L</"a
 
 And returns the new object.
 
-=head2 read
+=head2 sysread
 
-C<method read : int ($buffer : mutable string, $length : int = -1, $offset : int = 0);>
+C<method sysread : int ($buffer : mutable string, $length : int = -1, $offset : int = 0);>
 
 Reads the buffer $buffer at offset $offset to the length $length from the socket by calling L<Net::SSLeay#read|SPVM::Net::SSLeay/"read"> method.
 
@@ -301,9 +301,9 @@ Exceptions thrown by L<Net::SSLeay#read|SPVM::Net::SSLeay/"read"> method could b
 
 If timeout occurs, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Go::Error::IOTimeout|SPVM::Go::Error::IOTimeout>.
 
-=head2 write
+=head2 syswrite
 
-C<method write : int ($buffer : string, $length : int = -1, $offset : int = 0);>
+C<method syswrite : int ($buffer : string, $length : int = -1, $offset : int = 0);>
 
 Writes the buffer $buffer at offset $offset to the length $length to the socket by calling L<Net::SSLeay#write|SPVM::Net::SSLeay/"write"> method.
 

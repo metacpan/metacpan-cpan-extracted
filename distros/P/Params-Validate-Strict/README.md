@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.25
+Version 0.26
 
 # SYNOPSIS
 

@@ -1,0 +1,39 @@
+---
+abstract: 'Suffit Library Bundle'
+author:
+  - 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.6'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Suffit
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Acrux: '0.07'
+  Acrux::DBI: '0.03'
+  Mojolicious: '7.94'
+  WWW::Suffit: '1.09'
+  WWW::Suffit::Client: '1.03'
+  WWW::Suffit::Model: '1.01'
+  WWW::Suffit::Plugin::BasicAuth: '1'
+  WWW::Suffit::Plugin::ConfigAuth: '1'
+  WWW::Suffit::Plugin::FileAuth: '1'
+  WWW::Suffit::Plugin::ServerInfo: '1.01'
+  WWW::Suffit::Server: '1.12'
+  perl: '5.020'
+resources:
+  homepage: https://sourceforge.net/projects/suffit/
+  license: https://dev.perl.org/licenses
+  repository: https://abalama@git.code.sf.net/p/suffit/code
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

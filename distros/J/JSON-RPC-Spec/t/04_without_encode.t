@@ -71,7 +71,7 @@ subtest 'parse error' => sub {
     is $res->{error}{message}, 'Invalid Request', '"[]" -> Invalid Request';
 
     $res = $rpc->parse_without_encode('[{}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
@@ -79,14 +79,14 @@ subtest 'parse error' => sub {
 
     $res
       = $rpc->parse_without_encode('[{"jsonrpc":"2.0","method":"","id":1}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
       'method empty -> Invalid Request';
 
     $res = $rpc->parse_without_encode('[{"jsonrpc":"2.0","method":""}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
@@ -94,7 +94,7 @@ subtest 'parse error' => sub {
 
     $res = $rpc->parse_without_encode(
         '[{"jsonrpc":"2.0","method":".anything","id":1}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
@@ -102,7 +102,7 @@ subtest 'parse error' => sub {
 
     $res
       = $rpc->parse_without_encode('[{"jsonrpc":"2.0","method":".anything"}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
@@ -110,7 +110,7 @@ subtest 'parse error' => sub {
 
     $res = $rpc->parse_without_encode(
         '[{"jsonrpc":"2.0","method":"123456789","id":1}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
@@ -118,7 +118,7 @@ subtest 'parse error' => sub {
 
     $res
       = $rpc->parse_without_encode('[{"jsonrpc":"2.0","method":"123456789"}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid Request',
@@ -126,7 +126,7 @@ subtest 'parse error' => sub {
 
     $res = $rpc->parse_without_encode(
         '[{"jsonrpc":"2.0","method":"404notfount","id":1}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Method not found', 'Method not found';
@@ -137,7 +137,7 @@ subtest 'parse error' => sub {
 
     $res = $rpc->parse_without_encode(
         '[{"jsonrpc":"2.0","method":"emit_error","id":1}]');
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Internal error', 'Internal error';
@@ -150,7 +150,7 @@ subtest 'parse error' => sub {
       = $rpc->parse_without_encode(
         '[{"jsonrpc":"2.0","method":"emit_error","params":"rpc_invalid_params","id":1}]'
       );
-    is ref $res, 'ARRAY';
+    is ref $res,      'ARRAY';
     is ref $res->[0], 'HASH';
     ok exists $res->[0]{error};
     is $res->[0]{error}{message}, 'Invalid params', 'Invalid params';

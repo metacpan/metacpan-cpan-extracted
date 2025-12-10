@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Sublike::Extended 0.40;
+package Sublike::Extended 0.41;
 
 use v5.14;
 use warnings;
@@ -154,14 +154,42 @@ variable within the body of the function, which aliases an array passed
 I<by reference> from the caller.
 
 Refaliased variables may be scalars, arrays, or hashes. For argument handling
-purposes each will act like a mandatory positional scalar which consumes a
-reference to a variable of the matching type. If the caller does not pass a
-reference, or a reference to a mismatched type of variable, an exception is
-thrown as part of argument handling in the signature.
+purposes each will act like a positional scalar which consumes a reference to
+a variable of the matching type. If the caller does not pass a reference, or a
+reference to a mismatched type of variable, an exception is thrown as part of
+argument handling in the signature.
+
+I<Since version 0.41> named parameters may also use refalias assignment, using
+the syntax C<:\VAR> - such as C<:\@items>.
+
+As with other parameters, a defaulting expression can be provided, which makes
+the parameter optional for the caller. If the caller does not provide a
+corresponding value, this value is used as if the caller passed it. In this
+case, note that the defaulting expression must still yield a I<reference to> a
+container of the appropriate shape to match the declared parameter variable.
+While all of the C<=>, C<//=> and C<||=> operators can be used here, because
+the value must be a reference, it is unlikely that the distinction between
+testing for definedness vs boolean truth will be useful.
+
+Note that I<as of version 0.41> optional named refalias parameters are
+allowed, but a limitation of the implementation means that if a corresponding
+value for the parameter is not provided by the caller and the defaulting
+expression yields a reference to an incompatible variable, the resulting
+exception message fails to identify the name of the variable involved; instead
+just quoting three questionmarks:
+
+=for highlighter
+
+   $ perl -E 'use Sublike::Extended "sub"; sub f ( :\@arr = \undef ) {}  f()'
+   refaliases are experimental at -e line 1.
+   Expected named argument '???' to main::f to be a reference to ARRAY at -e line 1.
+
+=for highlighter language=perl
 
 The body of the function can see the value stored by the referred variable
 and make modifications to it. Any such modifications will be reflected in the
-variable whose reference was passed by the caller.
+variable whose reference was passed by the caller, or the value created by the
+defaulting expression if it was used.
 
 =head1 KEYWORDS
 

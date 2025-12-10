@@ -35,7 +35,7 @@ static const struct XSParseSublikeHooks parse_afunc_hooks = {
 static const struct XSParseSublikeHooks parse_rfunc_hooks = {
   .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::func/rfunc",
-  .flags = XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS,
+  .flags = XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS,
 };
 
 static const struct XSParseSublikeHooks parse_nafunc_hooks = {

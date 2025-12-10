@@ -1,7 +1,7 @@
 package Melian;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Perl client to the Melian cache
-$Melian::VERSION = '0.004';
+$Melian::VERSION = '0.006';
 use v5.34;
 use Carp qw(croak);
 use IO::Socket::INET;
@@ -206,12 +206,12 @@ sub fetch_by_int_from {
 
 sub fetch_by_int {
     my ($self, $table_id, $column_id, $id) = @_;
-    return $self->fetch_by_string($table_id, $column_id, pack('V', $id));
+    return $self->fetch_by_string($table_id, $column_id, pack 'V', $id);
 }
 
 # $conn, $table_id, $column_id, $id
 sub fetch_by_int_with {
-    return fetch_by_string_with($_[0], $_[1], $_[2], pack('V', $_[3]));
+    return fetch_by_string_with($_[0], $_[1], $_[2], pack 'V', $_[3]);
 }
 
 sub load_schema_from_describe {
@@ -244,7 +244,7 @@ sub load_schema_from_file {
     return $decoded;
 }
 
-# table1#0|60|id:int,table2#1|45|id:int;hostname:string
+# table1#0|60|id#0:int,table2#1|45|id#0:int;hostname#1:string
 sub load_schema_from_spec {
     my $spec = shift;
     my %data;
@@ -415,7 +415,7 @@ Melian - Perl client to the Melian cache
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -520,11 +520,11 @@ If you're chasing microseconds, this is the mode for you.
 Melian needs a schema so it knows which table IDs and column IDs correspond
 to which names. A schema looks something like:
 
-    people#0|60|id:int
+    people#0|60|id#0:int
 
 Or:
 
-    people#0|60|id:int,cats#1|45|id:int;name:string
+    people#0|60|id#0:int,cats#1|45|id#0:int;name#1:string
 
 The format is simple:
 
@@ -532,7 +532,7 @@ The format is simple:
 
 =item *
 
-C<table_name#table_id>
+C<table_name#table_id> (multiple tables separated by C<,>)
 
 =item *
 
@@ -547,6 +547,8 @@ C<|column_name#column_id:column_type> (multiple columns separated by C<;>)
 You do NOT need to write this schema unless you want to. If you do not supply
 one, Melian will request it automatically from the server at startup.
 
+If you provide a schema, it should match the schema set for the Melian server.
+
 =head2 Accessing table and column IDs
 
 Once the client is constructed:
@@ -556,8 +558,8 @@ Once the client is constructed:
 Each table entry contains:
 
     {
-        name    => "cats",
         id      => 1,
+        name    => "cats",
         period  => 45,
         indexes => [
             { id => 0, column => "id",   type => "int"    },
@@ -565,12 +567,11 @@ Each table entry contains:
         ],
     }
 
-If you use the functional API, you probably want to extract these once at
-startup and store them in constants:
+If you use the functional API, you probably want to store them in constants:
 
     use constant {
         'CAT_ID_TABLE'    => 1,
-        'CAT_ID_COLUMN'   => 0, # integer ID
+        'CAT_ID_COLUMN'   => 0, # integer column
         'CAT_NAME_COLUMN' => 1, # string column
     };
 
@@ -583,7 +584,7 @@ This saves name lookups on every request.
     my $melian = Melian->new(
         'dsn'         => 'unix:///tmp/melian.sock',
         'timeout'     => 1, # Only relevant for TCP/IP
-        'schema_spec' => 'people#0|60|id:int',
+        'schema_spec' => 'people#0|60|id#0:int',
     );
 
 Creates a new client and automatically loads the schema.
@@ -594,46 +595,101 @@ You may specify:
 
 =item * C<schema> — already-parsed schema hashref
 
+    my $melian = Melian->new(
+        'schema' => {
+            'id'      => 1,
+            'name'    => 'cats',
+            'period'  => 45,
+            'indexes' => [
+                { 'id' => 0, 'column' => "id",   'type' => 'int'    },
+                { 'id' => 1, 'column' => "name", 'type' => 'string' },
+            ],
+        }
+        ...
+    );
+
+You would normally either provide a spec, a file, or nothing (to let
+Melian fetch it from the server).
+
 =item * C<schema_spec> — inline schema description
+
+    my $melian = Melian->new(
+        'schema_spec' => 'cats#0|45|id#0:int;name#1:string',
+        ...
+    );
 
 =item * C<schema_file> — path to JSON schema file
 
+    my $melian = Melian->new(
+        'schema_file' => '/etc/melian/schema.json',
+        ...
+    );
+
 =item * nothing — Melian will ask the server for the schema
+
+    my $melian = Melian->new(...);
 
 =back
 
 =head2 C<connect()>
 
+    $melian->connect();
+
 Opens the underlying socket. Called automatically by C<new()>.
 
 =head2 C<disconnect()>
 
-Closes the socket.
+    $melian->disconnect();
+
+Closes the socket. Called automatically when instance goes out
+of scope, so you don't need to think about this.
 
 =head2 C<fetch_raw($table_id, $column_id, $key_bytes)>
+
+    my $encoded_data = $melian->fetch_raw( 0, 0, pack 'V', 20 );
+    my $encoded_data = $melian->fetch_raw( 0, 1, 'Pixel' );
 
 Fetches a raw JSON string. Does NOT decode it. Assumes input is encoded
 correctly.
 
+You probably don't want to use this. See C<fetch_by_int()>,
+C<fetch_by_int_from()>, C<fetch_by_string()>, and
+C<fetch_by_string_from()> instead.
+
 =head2 C<fetch_raw_from($table_name, $column_name, $key_bytes)>
+
+    my $encoded_data = $melian->fetch_raw_from( 'cats', 'id', pack 'V', 20 );
+    my $encoded_data = $melian->fetch_raw_from( 'cats', 'name', 'Pixel' );
 
 Same as above, but uses names instead of IDs.
 
+You probably don't want to use this. See C<fetch_by_int()>,
+C<fetch_by_int_from()>, C<fetch_by_string()>, and
+C<fetch_by_string_from()> instead.
+
 =head2 C<fetch_by_string($table_id, $column_id, $string_key)>
+
+    my $hashref = $melian->fetch_by_string( 0, 1, 'Pixel' );
 
 Fetches JSON from the server and decodes into a Perl hashref.
 
 =head2 C<fetch_by_string_from($table_name, $column_name, $string_key)>
 
-Name-based version.
+    my $hashref = $melian->fetch_by_string( 'cats', 'name', 'Pixel' );
+
+Name-based version. Slightly slower than using IDs.
 
 =head2 C<fetch_by_int($table_id, $column_id, $int)>
 
-Same as C<fetch_by_string>, but the key is packed as a 32-bit integer.
+    my $hashref = $melian->fetch_by_int( 0, 0, 5 );
+
+Same as C<fetch_by_string>, but for integer-based column searches.
 
 =head2 C<fetch_by_int_from($table_name, $column_name, $int)>
 
-Name-based version.
+    my $hashref = $melian->fetch_by_int_from( 'cats', 'id', 5 );
+
+Name-based version. Slightly slower than using IDs.
 
 =head1 FUNCTIONS
 
@@ -642,16 +698,34 @@ socket returned by C<create_connection()>.
 
 =head2 C<create_connection(%args)>
 
+    my $conn = Melian->create_connection(%same_args_as_new);
+
 Returns a raw socket connected to the server. Same options as C<new()>, but
 no object is created.
 
 =head2 C<fetch_raw_with($conn, $table_id, $column_id, $key_bytes)>
 
+    my $encoded_data = fetch_raw_with( $conn, 0, 0, pack 'V', 20 );
+    my $encoded_data = fetch_raw_with( $conn, 0, 1, 'Pixel' );
+
+Similar to C<fetch_raw()> but uses the connection object you get back from
+C<create_connection()>.
+
+You probably don't want to use this. See C<fetch_by_int_with()> and
+C<fetch_by_string_with()> instead.
+
 =head2 C<fetch_by_string_with($conn, $table_id, $column_id, $string_key)>
+
+    my $hashref = fetch_by_string_with( $conn, 0, 1, 'Pixel' );
+
+Behaves like the corresponding OO method but skips object overhead and
+schema lookup.
 
 =head2 C<fetch_by_int_with($conn, $table_id, $column_id, $int)>
 
-These behave like the corresponding OO methods but skip object overhead and
+    my $hashref = fetch_by_int_with( $conn, 0, 0, 5 );
+
+Behaves like the corresponding OO method but skips object overhead and
 schema lookup.
 
 =head2 C<table_of($schema, $table_name)>
@@ -695,7 +769,7 @@ and C<sysread> directly in Perl.
 
 =item *
 
-If you care about performance, resolve table and column IDs once at startup.
+If you care about performance, use table and column IDs with the functional interface.
 
 =back
 
@@ -715,7 +789,7 @@ Gonzalo Diethelm
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Sawyer X.
+This software is Copyright (c) 2025 by Sawyer X, Gonzalo Diethelm.
 
 This is free software, licensed under:
 

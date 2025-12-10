@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::Gemini;
-$App::SpreadRevolutionaryDate::MsgMaker::Gemini::VERSION = '0.52';
+$App::SpreadRevolutionaryDate::MsgMaker::Gemini::VERSION = '0.53';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with Gemini prompt
 
 use Moose;
@@ -85,7 +85,7 @@ around BUILDARGS => sub {
 sub compute {
   my $self = shift;
 
-  my $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key= ' . $self->api_key;
+  my $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key= ' . $self->api_key;
 
   my $today = DateTime->now(locale => $self->locale);
   my $prompt = $self->prompt->{$self->process};
@@ -184,7 +184,7 @@ App::SpreadRevolutionaryDate::MsgMaker::Gemini - MsgMaker class for L<App::Sprea
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 METHODS
 

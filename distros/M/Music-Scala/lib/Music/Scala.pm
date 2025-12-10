@@ -1,7 +1,7 @@
 # -*- Perl -*-
 #
 # Scala scale (musical tuning and temperament) support for Perl, based
-# on specification at: http://www.huygens-fokker.org/scala/
+# on specification at: https://www.huygens-fokker.org/scala/
 #
 # Ratio to cent and cent to ratio equations lifted from "Musimathics,
 # volume 1", pp. 45-46. MIDI conversion probably from wikipedia.
@@ -18,7 +18,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number reftype/;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 ##############################################################################
 #
@@ -864,15 +864,6 @@ Check the C<eg/> and C<t/> directories of the distribution of this
 module for example code.
 
 =head1 BUGS
-
-=head2 Reporting Bugs
-
-If the bug is in the latest version, send a report to the author.
-Patches that fix problems or add new features are welcome.
-
-L<http://github.com/thrig/Music-Scala>
-
-=head2 Known Issues
 
 Negative cents are likely not handled well, or at all. The specification
 frowns on negative ratios, but does allow for negative cents, so

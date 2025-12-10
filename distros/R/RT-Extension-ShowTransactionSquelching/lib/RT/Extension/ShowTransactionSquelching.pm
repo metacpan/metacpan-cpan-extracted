@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ShowTransactionSquelching;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ Works with RT 4.2 and greater versions.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -39,7 +39,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -61,7 +61,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2022 by Best Practical Solutions, LLC
+This software is Copyright (c) 2014-2025 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

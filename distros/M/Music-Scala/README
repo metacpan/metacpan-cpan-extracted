@@ -9,8 +9,7 @@ run perldoc(1) on Music::Scala for documentation
 
 
 to install from source code, with dependencies:
-
-  git clone https://github.com/thrig/Music-Scala
+  git clone https://thrig.me/src/Music-Scala.git
   cd Music-Scala
   cpanm .
 
@@ -23,8 +22,8 @@ DEPENDENCIES
 
 Some knowledge of music theory, notably scales, tuning, and temperaments.
 
-http://www.huygens-fokker.org/scala/ and in particular
-http://www.huygens-fokker.org/docs/scales.zip will likely be of some use.
+https://www.huygens-fokker.org/scala/ and in particular
+https://www.huygens-fokker.org/docs/scales.zip will likely be of some use.
 
 
 COPYRIGHT AND LICENCE

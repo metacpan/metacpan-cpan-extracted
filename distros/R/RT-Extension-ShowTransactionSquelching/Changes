@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ShowTransactionSquelching
 
+0.03 2025-12-09
+ - Update for RT 6
+
 0.02 2022-03-04
  - Add RT 5 support
 

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/nqounet/p5-json-rpc-spec.svg?branch=master)](https://travis-ci.org/nqounet/p5-json-rpc-spec) [![Coverage Status](http://codecov.io/github/nqounet/p5-json-rpc-spec/coverage.svg?branch=master)](https://codecov.io/github/nqounet/p5-json-rpc-spec?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/JSON-RPC-Spec.svg)](https://metacpan.org/release/JSON-RPC-Spec)
+[![Build Status](https://travis-ci.org/nqounet/p5-json-rpc-spec.svg?branch=main)](https://travis-ci.org/nqounet/p5-json-rpc-spec) [![Coverage Status](http://codecov.io/github/nqounet/p5-json-rpc-spec/coverage.svg?branch=main)](https://codecov.io/github/nqounet/p5-json-rpc-spec?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/JSON-RPC-Spec.svg)](https://metacpan.org/release/JSON-RPC-Spec)
 # NAME
 
 JSON::RPC::Spec - Yet another JSON-RPC 2.0 Implementation
@@ -42,7 +42,7 @@ As a feature.
 
 constructor.
 
-options ["coder" in JSON::RPC::Spec::Common](https://metacpan.org/pod/JSON::RPC::Spec::Common#coder) and ["router"](#router) are available.
+options ["coder" in JSON::RPC::Spec::Common](https://metacpan.org/pod/JSON%3A%3ARPC%3A%3ASpec%3A%3ACommon#coder) and ["router"](#router) are available.
 
 ## register
 
@@ -83,11 +83,11 @@ parse JSON and triggered method. returns HASH.
 
 ## compose
 
-See ["compose" in JSON::RPC::Spec::Client](https://metacpan.org/pod/JSON::RPC::Spec::Client#compose) for full documentation.
+See ["compose" in JSON::RPC::Spec::Client](https://metacpan.org/pod/JSON%3A%3ARPC%3A%3ASpec%3A%3AClient#compose) for full documentation.
 
 ## router
 
-similar [Router::Simple](https://metacpan.org/pod/Router::Simple).
+similar [Router::Simple](https://metacpan.org/pod/Router%3A%3ASimple).
 
 # DEBUGGING
 
@@ -99,11 +99,11 @@ PERL_JSON_RPC_SPEC_DEBUG = 1
 
 # SEE ALSO
 
-[JSON::RPC](https://metacpan.org/pod/JSON::RPC)
+[JSON::RPC](https://metacpan.org/pod/JSON%3A%3ARPC)
 
-[JSON::RPC::Dispatcher](https://metacpan.org/pod/JSON::RPC::Dispatcher)
+[JSON::RPC::Dispatcher](https://metacpan.org/pod/JSON%3A%3ARPC%3A%3ADispatcher)
 
-[JSON::RPC::Common](https://metacpan.org/pod/JSON::RPC::Common)
+[JSON::RPC::Common](https://metacpan.org/pod/JSON%3A%3ARPC%3A%3ACommon)
 
 # LICENSE
 

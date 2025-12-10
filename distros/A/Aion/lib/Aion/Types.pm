@@ -91,7 +91,7 @@ sub subtype(@) {
 		}
 	}
 
-	my $type = Aion::Type->new(name => $name);
+	my $type = Aion::Type->new(name => $name, coerce => []);
 
 	$type->{message} = $message if $message;
 	$type->{init} = $init_where if $init_where;
@@ -401,6 +401,14 @@ subtype "Any";
 	coerce &Str => from &Undef => via { "" };
 	coerce &Int => from &Num => via { int($_+($_ < 0? -.5: .5)) };
 	coerce &Bool => from &Any => via { !!$_ };
+	
+	#coerce &Num => from &Str => via { 0+$_ };
+	
+	subtype 'Join[R]', as &Str, where { 1 };
+	coerce &Join, from &ArrayRef, via { join A, @$_ };
+	
+	subtype 'Split[S]', as &ArrayRef, where { 1 };
+	coerce &Split, from &Str, via { [split A, $_] };
 };
 
 1;
@@ -411,7 +419,7 @@ __END__
 
 =head1 NAME
 
-Aion::Types is a library of standard validators and is used to create new validators
+Aion::Types - a library of standard validators and it is used to create new validators
 
 =head1 SYNOPSIS
 
@@ -1658,6 +1666,32 @@ Hashes or objects with the C<%{}> operator overloaded.
 	$x ~~ HashLike      # -> 1
 	$x ~~ HashLike[Int] # -> ""
 	$x ~~ HashLike[Num] # -> 1
+
+=head1 Coerces
+
+=head2 Join[R] as Str
+
+String type with conversion of arrays to a string through a delimiter.
+
+	Join([' '])->coerce([qw/a b c/]) # => a b c
+	
+	package JoinExample { use Aion;
+		has s => (isa => Join[', '], coerce => 1);
+	}
+	
+	JoinExample->new(s => [qw/a b c/])->s # => a, b, c
+	
+	JoinExample->new(s => 'string')->s # => string
+
+=head2 Split[S] as ArrayRef
+
+	Split([' '])->coerce('a b c') # --> [qw/a b c/]
+	
+	package SplitExample { use Aion;
+		has s => (isa => Split[qr/\s*,\s*/], coerce => 1);
+	}
+	
+	SplitExample->new(s => 'a, b, c')->s # --> [qw/a b c/]
 
 =head1 AUTHOR
 

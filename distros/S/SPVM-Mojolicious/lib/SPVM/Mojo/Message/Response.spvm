@@ -258,7 +258,10 @@ class Mojo::Message::Response extends Mojo::Message {
     
     my $version = $self->version;
     $self->{start_buffer} = StringBuffer->new;
-    $self->{start_buffer}->push("HTTP/$version $code $msg\x0d\x0a");
+    
+    my $start_line = "HTTP/$version $code $msg\x0d\x0a";
+    
+    $self->{start_buffer}->push($start_line);
   }
   
   private method _status_class : int ($codes : int[]) {

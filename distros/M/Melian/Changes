@@ -1,3 +1,12 @@
+0.006     2025-12-09 17:01:53+01:00 Europe/Amsterdam
+
+    * Another small fix to docs.
+
+0.005     2025-12-09 12:30:28+01:00 Europe/Amsterdam
+
+    * Improve docs a bit.
+    * Add Gonzalo Diethelm as copyright holder.
+
 0.004     2025-12-05 15:00:41+01:00 Europe/Amsterdam
 
     * Added functional interface which is much faster.

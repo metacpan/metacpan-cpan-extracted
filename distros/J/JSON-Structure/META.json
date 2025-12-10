@@ -1,0 +1,80 @@
+{
+   "abstract" : "JSON Structure schema validation for Perl",
+   "author" : [
+      "JSON Structure Contributors"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "json",
+      "schema",
+      "validation",
+      "structure"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSON-Structure",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "1.004000",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "1.0"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::Structure" : {
+         "file" : "lib/JSON/Structure.pm",
+         "version" : "0.01"
+      },
+      "JSON::Structure::InstanceValidator" : {
+         "file" : "lib/JSON/Structure/InstanceValidator.pm",
+         "version" : "0.01"
+      },
+      "JSON::Structure::SchemaValidator" : {
+         "file" : "lib/JSON/Structure/SchemaValidator.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/json-structure/sdk/issues"
+      },
+      "homepage" : "https://json-structure.github.io/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/json-structure/sdk.git",
+         "web" : "https://github.com/json-structure/sdk/tree/main/perl"
+      }
+   },
+   "version" : "v0.5.5",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

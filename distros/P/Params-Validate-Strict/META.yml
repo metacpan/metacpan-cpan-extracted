@@ -37,6 +37,7 @@ requires:
   List::Util: '1.33'
   Params::Get: '0.13'
   Scalar::Util: '0'
+  Unicode::GCString: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
@@ -44,5 +45,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict
   homepage: https://metacpan.org/pod/Params::Validate::Strict
   repository: git://github.com/nigelhorne/Params-Validate-Strict.git
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

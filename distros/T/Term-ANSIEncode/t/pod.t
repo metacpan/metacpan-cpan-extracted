@@ -2,6 +2,7 @@
 use 5.008;
 use strict;
 use warnings FATAL => 'all';
+use Test2::Require::AuthorTesting;
 use Test::More;
 
 # Ensure a recent version of Test::Pod

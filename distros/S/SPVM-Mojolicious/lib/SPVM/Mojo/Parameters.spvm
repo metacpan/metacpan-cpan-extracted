@@ -12,7 +12,46 @@ class Mojo::Parameters {
   interface Stringable;
   
   # Fields
-  has pairs : rw string[];
+  has pairs : rw string[]
+    get {
+      unless (exists $self->{pairs}) {
+        my $string = $self->{string};
+        $self->{string} = undef;
+        
+        $self->{pairs} = new string[0];
+        
+        my $pairs = StringList->new_ref($self->{pairs});
+        
+        if (length $string) {
+          for my $pair (@{Fn->split("&", $string)}) {
+            if (my $match = Re->m($pair, "^([^=]+)(?:=(.*))?$")) {
+              my $name = $match->cap1;
+              my $value = $match->cap2;
+              
+              Re->s((mutable string)$name, ["\+", "g"], " ");
+              
+              Re->s((mutable string)$value, ["\+", "g"], " ");
+              unless ($value) {
+                $value = "";
+              }
+              
+              $name  = Mojo::Util->url_unescape($name);
+              $value = Mojo::Util->url_unescape($value);
+              
+              $pairs->push($name);
+              $pairs->push($value);
+            }
+          }
+        }
+      }
+      
+      return $self->{pairs};
+    }
+    set {
+      $self->{pairs} = $_;
+      delete $self->{string};
+    }
+  ;
   
   # Undocumented Fields
   has string : string;
@@ -53,7 +92,7 @@ class Mojo::Parameters {
       die "The length of \$pairs must be an even number if it is an array.";
     }
     
-    my $pairs = StringList->new_ref($self->{pairs});
+    my $pairs = StringList->new_ref($self->pairs);
     
     my $new = $pairs_array;
     
@@ -206,9 +245,7 @@ class Mojo::Parameters {
       die "The name \$name must be defined.";
     }
     
-    $self->_parse;
-    
-    my $pairs = StringList->new_ref($self->{pairs});
+    my $pairs = StringList->new_ref($self->pairs);
     
     my $i     = 0;
     while ($i < $pairs->length) {
@@ -227,9 +264,7 @@ class Mojo::Parameters {
 
     my $hash = Hash->new;
     
-    $self->_parse;
-    
-    my $pairs = StringList->new_ref($self->{pairs});
+    my $pairs = StringList->new_ref($self->pairs);
     
     for (my $i = 0; $i < $pairs->length; $i += 2) {
       my $name = $pairs->get($i);
@@ -272,9 +307,7 @@ class Mojo::Parameters {
     }
     
     # Build pairs (HTML Living Standard)
-    $self->_parse;
-    
-    my $pairs = StringList->new_ref($self->{pairs});
+    my $pairs = StringList->new_ref($self->pairs);
     
     unless ($pairs->length) {
       return "";
@@ -297,39 +330,6 @@ class Mojo::Parameters {
     }
     
     return Fn->join("&", $key_values->get_array);
-  }
-  
-  private method _parse : void () {
-    
-    my $string = $self->{string};
-    $self->{string} = undef;
-    
-    $self->{pairs} = new string[0];
-    
-    my $pairs = StringList->new_ref($self->{pairs});
-    
-    if (length $string) {
-      for my $pair (@{Fn->split("&", $string)}) {
-        if (my $match = Re->m($pair, "^([^=]+)(?:=(.*))?$")) {
-          my $name = $match->cap1;
-          my $value = $match->cap2;
-          
-          Re->s((mutable string)$name, ["\+", "g"], " ");
-          
-          Re->s((mutable string)$value, ["\+", "g"], " ");
-          unless ($value) {
-            $value = "";
-          }
-          
-          $name  = Mojo::Util->url_unescape($name);
-          $value = Mojo::Util->url_unescape($value);
-          
-          $pairs->push($name);
-          $pairs->push($value);
-        }
-      }
-    }
-    
   }
   
 }

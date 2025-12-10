@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate;
-$App::SpreadRevolutionaryDate::VERSION = '0.52';
+$App::SpreadRevolutionaryDate::VERSION = '0.53';
 # ABSTRACT: Spread date and time from Revolutionary (Republican) Calendar on Bluesky, Twitter, Mastodon, Freenode and Liberachat.
 
 use Moose;
@@ -118,7 +118,7 @@ App::SpreadRevolutionaryDate - Spread date and time from Revolutionary (Republic
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 METHODS
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker;
-$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.52';
+$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.53';
 # ABSTRACT: Role providing interface for crafting a message to be spread by L<App::SpreadRevolutionaryDate>.
 
 use Moose::Role;
@@ -108,7 +108,7 @@ App::SpreadRevolutionaryDate::MsgMaker - Role providing interface for crafting a
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

@@ -45,7 +45,7 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   has buffer : StringBuffer;
   
-  has _cache : Hash;
+  has _caches_all_h : Hash of Hash;
   
   # Old Fields
   has content_buffer : rw StringBuffer;
@@ -53,7 +53,7 @@ class Mojo::Message extends Mojo::EventEmitter {
   # Instance Methods
   protected method init : void () {
     
-    $self->{_cache} = Hash->new;
+    $self->{_caches_all_h} = Hash->new;
     
     $self->{buffer} = StringBuffer->new;
     
@@ -103,6 +103,7 @@ class Mojo::Message extends Mojo::EventEmitter {
     # "multipart/form-data"
     elsif (Re->m($type, ["multipart/form-data", "i"])) {
       my $formdata = $self->_parse_formdata;
+      
       for my $_ (@$formdata) {
         $params->append([$_->(object[])->[0], $_->(object[])->[1]]);
       }
@@ -168,16 +169,26 @@ class Mojo::Message extends Mojo::EventEmitter {
     # Content-Length or Connection (unless chunked transfer encoding is used)
     my $content = $self->content;
     my $headers = $content->headers;
-    if    ($content->is_multipart)                           { $headers->remove("Content-Length"); }
-    elsif ($content->is_chunked || $headers->content_length) { return; }
-    if    ($content->is_dynamic)                             { $headers->set_connection("close"); }
-    else                                                     { $headers->set_content_length($self->body_size); }
+    if ($content->is_multipart) {
+      $headers->remove("Content-Length");
+    }
+    elsif ($content->is_chunked || $headers->content_length) {
+      return;
+    }
+    
+    if ($content->is_dynamic) {
+      $headers->set_connection("close");
+    }
+    else {
+      $headers->set_content_length($self->body_size);
+    }
   }
   
   method get_body_chunk : string ($offset : int) {
     
     $self->emit(progress => "body", $offset);
     my $chunk = $self->content->get_body_chunk($offset);
+    
     if (!$chunk || length $chunk) {
       return $chunk;
     }
@@ -216,8 +227,6 @@ class Mojo::Message extends Mojo::EventEmitter {
     return ($self->{state} // "") eq "finished";
   }
   
-  method is_limit_exceeded : int () { return $self->{limit}; }
-  
   method json : object () {
     
     if ($self->content->is_multipart) {
@@ -245,7 +254,7 @@ class Mojo::Message extends Mojo::EventEmitter {
       }
       
       if ($len > $self->max_line_size) {
-        $self->_limit("Maximum start-line size exceeded");
+        die "Maximum start-line size exceeded";
         return;
       }
       if ($self->extract_start_line((mutable string)$self->{buffer}->get_string)) {
@@ -259,26 +268,16 @@ class Mojo::Message extends Mojo::EventEmitter {
       my $buffer = $self->{buffer};
       $self->{buffer} = StringBuffer->new;
       my $content = $self->content;
-      $content->parse($buffer->get_string);
+      
+      $content = $content->parse($buffer->get_string);
+      
       $self->{content} = $content;
     }
     
     # Check message size
     my $max = $self->max_message_size;
     if ($max != 0 && $max < $self->{raw_size}) {
-      $self->_limit("Maximum message size exceeded");
-      return;
-    }
-    
-    # Check header size
-    if ($self->headers->is_limit_exceeded) {
-      $self->_limit("Maximum header size exceeded");
-      return;
-    }
-    
-    # Check buffer size
-    if ($self->content->is_limit_exceeded) {
-      $self->_limit("Maximum buffer size exceeded");
+      die "Maximum message size exceeded";
       return;
     }
     
@@ -287,11 +286,6 @@ class Mojo::Message extends Mojo::EventEmitter {
     if ($self->content->is_finished) {
       $self->finish;
     }
-  }
-  
-  private method _limit : void ($message : string) {
-    ++$self->{limit};
-    die $message;
   }
   
   method save_to : void ($path : string) {
@@ -347,7 +341,13 @@ class Mojo::Message extends Mojo::EventEmitter {
     my $parts = (List of Mojo::Content)List->new(new Mojo::Content[0]);
     $parts->push($content);
     
-    while (my $part = (Mojo::Content)$parts->shift) {
+    while (1) {
+      
+      unless ($parts->length) {
+        last;
+      }
+      
+      my $part = (Mojo::Content)$parts->shift;
       
       if ($part->is_multipart) {
         $parts->unshift_($part->(Mojo::Content::MultiPart)->parts);
@@ -364,7 +364,7 @@ class Mojo::Message extends Mojo::EventEmitter {
         $filename = $m->cap1;
       }
       
-      if ($upload && !$filename || !$upload && $filename) {
+      if ($upload && !length $filename || !$upload && length $filename) {
         next;
       }
       
@@ -373,16 +373,16 @@ class Mojo::Message extends Mojo::EventEmitter {
         $name = $m->cap1;
       }
       
-      if (!$name) {
+      if (!length $name) {
         next;
       }
       
-      my $part_string = (string)undef;
+      my $part_ = (object)$part;
       unless ($upload) {
-        $part_string = $part->(Mojo::Content::Single)->asset->slurp;
+        $part_ = $part->(Mojo::Content::Single)->asset->slurp;
       }
       
-      $formdata->push([(object)$name, $part_string, $filename]);
+      $formdata->push([(object)$name, $part_, $filename]);
     }
     
     return $formdata->to_array;
@@ -427,10 +427,11 @@ class Mojo::Message extends Mojo::EventEmitter {
   private method _cache : object ($method : string, $all : int, $name : string) {
     
     # Cache objects by name
-    my $caches = (Hash)$self->{_cache}->get($method);
+    my $caches_all_h = $self->{_caches_all_h};
     
-    unless ($caches) {
-      $caches = Hash->new;
+    unless ($caches_all_h->{$method}) {
+      
+      $caches_all_h->{$method} = Hash->new;
       
       my $items = (object[])undef;
       if ($method eq "uploads") {
@@ -440,24 +441,23 @@ class Mojo::Message extends Mojo::EventEmitter {
         $items = $self->cookies;
       }
       
-      for my $_ (@$items) {
+      for my $item (@$items) {
         my $name = (string)undef;
         if ($method eq "uploads") {
-          $name = $_->(Mojo::Upload)->name;
+          $name = $item->(Mojo::Upload)->name;
         }
         elsif ($method eq "cookies") {
-          $name = $_->(Mojo::Cookie)->name;
+          $name = $item->(Mojo::Cookie)->name;
         }
         
-        my $list = (List)$caches->get($name);
-        unless ($list) {
-          $list = List->new;
+        unless ($caches_all_h->{$method}{$name}) {
+          $caches_all_h->{$method}{$name} = List->new;
         }
-        $list->push($_);
+        $caches_all_h->{$method}{$name}->(List)->push($item);
       }
     }
     
-    my $objects_list = $caches->get($name)->(List) // List->new;
+    my $objects_list = $caches_all_h->{$method}{$name}->(List) // List->new;
     my $objects = $objects_list->to_array;
     
     if ($all) {

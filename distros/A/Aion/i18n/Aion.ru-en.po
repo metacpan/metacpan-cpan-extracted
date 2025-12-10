@@ -40,6 +40,9 @@ msgstr "File lib/Class/All/Stringify.pm:"
 msgid "Проверяет, что `$package` — это суперкласс для данного или сам этот класс."
 msgstr "Checks that `$package` is a super class for a given or this class itself."
 
+msgid "Реализацию метода `isa` Aion не меняет и она находит как суперклассы, так и роли (так как и те и другие добавляются в `@ISA` пакета)."
+msgstr "Aion does not change the implementation of the `isa` method and it finds both superclasses and roles (since both are added to the `@ISA` package)."
+
 msgid "Проверяет, что `$package` — это роль, которая используется в классе или другой роли."
 msgstr "Checks that `$package` is a role that is used in a class or another role."
 
@@ -131,21 +134,35 @@ msgstr "The default value is set in the designer if there is no parameter with t
 msgid "Если `$value` является подпрограммой, то подпрограмма считается конструктором значения фичи. Используется ленивое вычисление, если нет атрибута `lazy`."
 msgstr "If `$value` is a subroutine, then the subroutine is considered the feature's value constructor. Lazy evaluation is used if there is no `lazy` attribute."
 
-msgid "Атрибут `lazy` включает или отключает ленивое вычисление значения по умолчанию (`default`)."
-msgstr "The `lazy` attribute enables or disables lazy evaluation of the default value (`default`)."
+msgid "Аспект `lazy` включает или отключает ленивое вычисление значения по умолчанию (`default`)."
+msgstr "The `lazy` aspect enables or disables lazy evaluation of the default value (`default`)."
 
 msgid "По умолчанию он включен только если значение по умолчанию является подпрограммой."
 msgstr "By default it is only enabled if the default is a subroutine."
 
-msgid "`$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер.\n"
-"Этимология – впустить."
-msgstr "`$sub` is called after installing the property in the constructor (`new`) or through the setter.\n"
-"Etymology - let in."
+msgid "С помощью аспекта `eon` реализуется паттерн **Dependency Injection**."
+msgstr "The `eon` aspect implements the **Dependency Injection** pattern."
 
-msgid "`$sub` вызывается перед возвратом свойства из объекта через геттер.\n"
-"Этимология – выпустить."
-msgstr "`$sub` is called before returning the property from the object through the gutter.\n"
-"Etymology - release."
+msgid "Он связывает свойство с сервисом из контейнера `$Aion::pleroma`."
+msgstr "It associates a property with a service from the `$Aion::pleroma` container."
+
+msgid "Значением аспекта может быть ключ сервиса или 1, тогда ключём будет пакет в `isa => Object['Packet']`"
+msgstr "The aspect value can be the service key or 1, then the key will be the package in `isa => Object['Packet']`"
+
+msgid "Пример с 1-й:"
+msgstr "Example from 1st:"
+
+msgid "`$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер."
+msgstr "`$sub` is called after setting the property in the constructor (`new`) or via a setter."
+
+msgid "Этимология `trigger` – впустить."
+msgstr "The etymology of `trigger` is to let in."
+
+msgid "`$sub` вызывается перед возвратом свойства из объекта через геттер."
+msgstr "`$sub` is called before returning a property from an object via a getter."
+
+msgid "Этимология `release` – выпустить."
+msgstr "The etymology of `release` is to release."
 
 msgid "Меняет имя свойства в конструкторе."
 msgstr "Changes the property name in the constructor."

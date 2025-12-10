@@ -11,7 +11,7 @@ warn $JSON::RPC::Spec::VERSION;
 
 my $run;
 my $times = 1;
-my $opt = shift || '';
+my $opt   = shift || '';
 
 if ($opt eq '--run') {
     $run   = 1;

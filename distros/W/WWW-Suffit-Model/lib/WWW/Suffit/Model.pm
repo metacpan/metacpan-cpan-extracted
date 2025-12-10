@@ -181,7 +181,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use parent 'Acrux::DBI';
 
@@ -293,4 +293,3 @@ sub schema { shift->{'_schema'} // '' }
 1;
 
 __END__
-

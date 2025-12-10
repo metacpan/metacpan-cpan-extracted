@@ -4,6 +4,20 @@
 All modifications where created by Mark Overmeer, unless explicitly
 stated differently.
 
+version 1.02: Tue  9 Dec 13:49:31 CET 2025
+
+	Changes:
+	- remove the blank before kB in BYTES.
+
+	Fixes:
+	- remove correct redundant separator from thousands in %d
+	- do not use %F and %T in date formats, for broken Windows
+	  github issue #2 [Phil Perry]
+
+	Improvements:
+	- flexible format for the DT modifier
+	- formats for DATE modifier
+
 version 1.01: Thu  4 Dec 16:43:36 CET 2025
 
 	Improvements:

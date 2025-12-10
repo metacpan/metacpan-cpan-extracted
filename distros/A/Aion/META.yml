@@ -5,11 +5,14 @@ author:
 build_requires:
   Carp: '0'
   Cwd: '0'
+  Data::Dumper: '0'
   File::Basename: '0'
   File::Find: '0'
   File::Path: '0'
   File::Slurper: '0'
   File::Spec: '0'
+  String::Diff: '0'
+  Term::ANSIColor: '0'
   Test::More: '0.98'
   lib: '0'
   open: '0'
@@ -35,7 +38,7 @@ no_index:
 provides:
   Aion:
     file: lib/Aion.pm
-    version: '1.2'
+    version: '1.3'
   Aion::Meta::Feature:
     file: lib/Aion/Meta/Feature.pm
   Aion::Meta::FeatureConstruct:
@@ -48,6 +51,8 @@ provides:
     file: lib/Aion/Meta/Subroutine.pm
   Aion::Meta::Util:
     file: lib/Aion/Meta/Util.pm
+  Aion::Pleroma:
+    file: lib/Aion/Pleroma.pm
   Aion::Type:
     file: lib/Aion/Type.pm
   Aion::Types:
@@ -69,7 +74,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion/issues
   homepage: https://github.com/darviarush/perl-aion
   repository: https://github.com/darviarush/perl-aion.git
-version: '1.2'
+version: '1.3'
 x_authority: cpan:DART
 x_contributors:
   - 'Iaroslav O. Kosmina <darviarush@ya.ru>'
