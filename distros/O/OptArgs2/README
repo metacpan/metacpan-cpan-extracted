@@ -2,13 +2,13 @@ NAME
     OptArgs2 - command-line argument and option processor
 
 VERSION
-    v2.0.15 (2025-04-25)
+    v2.0.17 (2025-12-11)
 
 SYNOPSIS
         #!/usr/bin/env perl
         use OptArgs2;
 
-        # For simple scripts use optargs()
+    For simple scripts use optargs():
 
         my $args = optargs(
             comment => 'script to paint things',
@@ -28,8 +28,8 @@ SYNOPSIS
 
         print "Painting $args->{item}\n" unless $args->{quiet};
 
-        # For complex multi-command applications
-        # use cmd(), subcmd() and class_optargs()
+    For complex multi-command applications use cmd(), subcmd() and
+    class_optargs():
 
         cmd 'My::app' => (
             comment => 'handy work app',
@@ -66,7 +66,7 @@ SYNOPSIS
                     required => 1,
                     comment  => 'the item to paint',
                 },
-                color => {
+                my_colour => {
                     isa     => '--Str',
                     alias   => 'c',
                     comment => 'your faviourite',
@@ -112,8 +112,8 @@ DESCRIPTION
 
     API changes: optargs(), cmd(), subcmd()
         Commands and subcommands are now explicitly defined using
-        "optargs()", "cmd()" and "subcmd()". The arguments to
-        "optargs()" have changed to match "cmd()".
+        optargs(), cmd() and subcmd(). The arguments to optargs() have
+        changed to match cmd().
 
     Deprecated: arg(), opt(), fallback arguments
         Optargs definitions must now be defined in an array reference
@@ -130,6 +130,9 @@ DESCRIPTION
         existing Bool options most likely would become Flag options
         instead.
 
+    This module used to duplicate itself on CPAN as Getopt::Args2, but
+    as of the version 2 series that is no longer the case.
+
   Simple Commands
     To demonstrate the simple use case (i.e. with no subcommands) lets
     put the code from the synopsis in a file called "paint" and observe
@@ -138,17 +141,21 @@ DESCRIPTION
         $ ./paint
         usage: paint ITEM [OPTIONS...]
 
-          arguments:
-            ITEM          the item to paint *required*
+          Synopsis:
+            script to paint things
 
-          options:
-            --help,  -h   print a usage message and exit
-            --quiet, -q   output nothing while working
+          Arguments:
+            ITEM            (Str)   the item to paint *required*
 
-    The "optargs()" function parses the command line (@ARGV) according
-    to the included declarations and returns a single HASH reference. If
+          Options:
+            --help,      -h         print a Help message and exit
+            --quiet,     -q         output nothing while working
+
+    The optargs() function parses the command line (@ARGV) according to
+    the included declarations and returns a single HASH reference. If
     the command is not called correctly then an exception is thrown
     containing an automatically generated usage message as shown above.
+
     Because OptArgs2 fully knows the valid arguments and options it can
     detect a wide range of errors:
 
@@ -171,13 +178,16 @@ DESCRIPTION
         $ ./paint
         usage: paint ITEM [MESSAGE...] [OPTIONS...]
 
-          arguments:
-            ITEM          the item to paint, *required*
-            MESSAGE       the message to paint on the item
+          Synopsis:
+            script to paint things
 
-          options:
-            --help,  -h   print a usage message and exit
-            --quiet, -q   output nothing while working
+          Arguments:
+            ITEM            (Str)   the item to paint *required*
+            MESSAGE         (Str)   the message to paint on the item
+
+          Options:
+            --help,      -h         print a Help message and exit
+            --quiet,     -q         output nothing while working
 
     Note that optional arguments are surrounded by square brackets, and
     that three dots (...) are postfixed to greedy arguments. A greedy
@@ -194,7 +204,7 @@ DESCRIPTION
 
         optargs => [
             ...
-            colour => {
+            my_colour => {
                 isa           => '--Str',
                 default       => 'blue',
                 comment       => 'the colour to use',
@@ -205,23 +215,26 @@ DESCRIPTION
 
         usage: paint ITEM [MESSAGE...] [OPTIONS...]
 
-          arguments:
-            ITEM               the item to paint
-            MESSAGE            the message to paint on the item
+          Synopsis:
+            script to paint things
 
-          options:
-            --colour=STR, -c   the colour to use [blue]
-            --help,       -h   print a usage message and exit
-            --quiet,      -q   output nothing while working
+          Arguments:
+            ITEM            (Str)   the item to paint *required*
+            MESSAGE         (Str)   the message to paint on the item
+
+          Options:
+            --help,      -h         print a Help message and exit
+            --my-colour, -c [blue]  the colour to paint
+            --quiet,     -q         output nothing while working
 
   Multi-Level Commands
     Commands with subcommands require a different coding model and
     syntax which we will describe over three phases:
 
     Definitions
-        Your command structure is defined using calls to the "cmd()" and
-        "subcmd()" functions. The first argument to both functions is
-        the name of the Perl class that implements the (sub-)command.
+        Your command structure is defined using calls to the cmd() and
+        subcmd() functions. The first argument to both functions is the
+        name of the Perl class that implements the (sub-)command.
 
             cmd 'App::demo' => (
                 comment => 'the demo command',
@@ -260,12 +273,13 @@ DESCRIPTION
                 ],
             );
 
-            # Command hierarchy for the above code,
-            # printed by using '-h' twice:
-            #
-            #     demo COMMAND [OPTIONS...]
-            #         demo foo ACTION [OPTIONS...]
-            #         demo bar [OPTIONS...]
+        The command hierarchy for the above code is displayed when help
+        is asked for twice:
+
+            $ demo -h -h
+            demo COMMAND [OPTIONS...]
+                demo foo ACTION [OPTIONS...]
+                demo bar [OPTIONS...]
 
         An argument of type 'SubCmd' is an explicit indication that
         subcommands can occur in that position. The command hierarchy is
@@ -274,10 +288,10 @@ DESCRIPTION
         one or more separate packages or plugins, as you like.
 
     Parsing
-        The "class_optargs()" function is called to parse the @ARGV
-        array and call the appropriate "arg()" and "opt()" definitions
-        as needed. It's first argument is generally the top-level
-        command name you used in your first "cmd()" call.
+        The class_optargs() function is called to parse the @ARGV array
+        and call the appropriate arg() and opt() definitions as needed.
+        It's first argument is generally the top-level command name you
+        used in your first cmd() call.
 
             my ($class, $opts, $file) = class_optargs('App::demo');
             require $file;
@@ -286,17 +300,19 @@ DESCRIPTION
 
         The additional return value $class is the name of the actual
         (sub-)command to which the $opts HASHref applies. Usage
-        exceptions are raised just the same as with the "optargs()"
+        exceptions are raised just the same as with the optargs()
         function.
 
             error: unknown option "--invalid"
 
             usage: demo COMMAND [OPTIONS...]
 
-                COMMAND       command to run
-                  bar           demo bar
-                  foo           demo foo
+              Command:      command to run *required*
+                bar         demo bar
+                foo ACTION  demo foo
 
+              Options:
+                --help,  -h   print a Help message and exit
                 --quiet, -q   run quietly
 
         Note that options are inherited by subcommands.
@@ -333,10 +349,10 @@ DESCRIPTION
                     ],
                 }
 
-            The reason for keeping this separate from lib/App/demo.pm is
-            speed of loading. I don't want to have to load all of the
-            modules that App::demo itself uses just to find out that I
-            called the command incorrectly.
+            My reason for keeping this separate from lib/App/demo.pm is
+            speed. I don't want users to wait while loading all modules
+            that App::demo itself uses, just to find out that the
+            command was called incorrectly.
 
         bin/demo
             The command script itself is then usually fairly short:
@@ -350,11 +366,10 @@ DESCRIPTION
                 $class->new($opts)->run;
 
   Argument Definition
-    Arguments are key/hashref pairs defined inside an optargs =>
-    arrayref like so:
+    Arguments are key/hashref pairs defined inside the optargs arrayref.
 
         optargs => [
-            name => {
+            file_name => {
                 isa      => 'Str',
                 comment  => 'the file to parse',
                 default  => '-',
@@ -364,9 +379,15 @@ DESCRIPTION
             },
         ],
 
-    Any underscores in the name (i.e. the optargs "key") are replaced by
-    dashes (-) for presentation and command-line parsing. The following
-    parameters are accepted:
+    Any underscores in the name (i.e. the optargs "key") are kept for
+    presentation, matching the $ENV_KEY convention:
+
+        usage: cmd [FILE_NAME] [OPTIONS...]
+
+          Arguments:
+            FILE_NAME           (Str)  the file to parse
+
+    The following argument parameters are accepted:
 
     comment
         Required. Used to generate the usage/help message.
@@ -388,7 +409,7 @@ DESCRIPTION
         will raise an error when the given argument doesn't match any
         subcommand. However, when fallthru is true the
         non-subcommand-matching argument will be passed back to the
-        "class_optargs()" caller.
+        class_optargs() caller.
 
         This is typically useful when you have aliases that you can
         expand into real subcommands.
@@ -400,10 +421,15 @@ DESCRIPTION
             ------------------------------
              'Str'           '=s'
              'Int'           '=i'
+             'Input'         '=s'
              'Num'           '=f'
              'ArrayRef'      's@'
              'HashRef'       's%'
              'SubCmd'        '=s'
+
+        The "Input" type is for automatically reading the contents of a
+        file into the optargs result. When the argument is '-' then the
+        result comes from "STDIN".
 
     isa_name
         When provided this parameter will be presented instead of the
@@ -419,12 +445,12 @@ DESCRIPTION
         setting.
 
   Option Definition
-    Options are defined like arguments inside an optargs => arrayref
-    like so, the key difference being the leading "--" for the "isa"
+    Options are defined inside the optargs arrayref, similarly to
+    arguments. The key difference is the leading "--" for the "isa"
     parameter:
 
         optargs => [
-            colour => {
+            my_colour => {
                 isa          => '--Str',
                 alias        => 'c',
                 comment      => 'the colour to paint',
@@ -433,9 +459,10 @@ DESCRIPTION
             },
         ],
 
-    Any underscores in the name (i.e. the optargs "key") are replaced by
-    dashes (-) for presentation and command-line parsing. The following
-    parameters are accepted:
+    Any underscores in the option name are replaced by dashes (-) for
+    presentation, but both "--my_colour" and "--my-colour" are accepted.
+
+    The following construction parameters are valid:
 
     alias
         A single character alias.
@@ -475,8 +502,13 @@ DESCRIPTION
              '--Counter'                      '+'
              '--HashRef'                      's%'
              '--Int'                          '=i'
+             '--Input'                        '=s'
              '--Num'                          '=f'
              '--Str'                          '=s'
+
+        The "Input" type is for automatically placing the contents of a
+        file into the optargs result. When the argument '-' is provided
+        then the result comes from "STDIN".
 
     isa_name
         When provided this parameter will be presented instead of the
@@ -493,15 +525,17 @@ DESCRIPTION
         is primarily to support --help or --version options which would
         typically override usage errors.
 
-            version => (
-                isa     => '--Flag',
-                alias   => 'V',
-                comment => 'print version string and exit',
-                trigger => sub {
-                    my ( $cmd, $value ) = @_;
-                    die "$cmd version $VERSION\n";
-                }
-            );
+            optargs => [
+                version => (
+                    isa     => '--Flag',
+                    alias   => 'V',
+                    comment => 'print version string and exit',
+                    trigger => sub {
+                        my ( $cmd, $value ) = @_;
+                        die "$cmd version $VERSION\n";
+                    }
+                ),
+            ],
 
         The trigger subref is passed two parameters: a OptArgs2::Cmd
         object and the value (if any) of the option. The OptArgs2::Cmd
@@ -551,6 +585,7 @@ DESCRIPTION
         option      ArrayRef    -               --option Str
         option      HashRef     -               --option Str
         option      Int         -               --option Int
+        option      Input       -               --option Str
         option      Num         -               --option Num
         option      Str         -               --option Str
         option      *           XX              --option XX
@@ -560,8 +595,8 @@ DESCRIPTION
 FUNCTIONS
     The following functions are exported by default.
 
-    class_optargs( $class, [ @argv ] ) -> ($subclass, $opts, $file)
-        Parse @ARGV by default (or @argv when given) for the arguments
+    class_optargs( $class, [ @list ] ) -> ($subclass, $opts, $file)
+        Parse @ARGV by default (or @list when given) for the arguments
         and options defined for command $class. @ARGV will first be
         decoded using Encode::Locale.
 
@@ -583,10 +618,10 @@ FUNCTIONS
         "OptArgs2::Usage::*") for missing or invalid arguments/options.
         Uses OptArgs2::Pager for Help output.
 
-        As an aid for testing, if the passed in argument @argv (not
-        @ARGV) contains a HASH reference, the key/value combinations of
-        the hash will be added as options. An undefined value means a
-        boolean option.
+        As an aid for testing, if the passed in argument @list contains
+        a HASH reference, the key/value combinations of the hash will be
+        added as options. An undefined value is taken to mean a boolean
+        option.
 
     cols() -> Integer
         Returns the terminal column width. Only exported on request.
@@ -609,7 +644,7 @@ FUNCTIONS
             to define them again in child subcommands.
 
         no_help
-            By default "cmd()" automatically adds a default '--help'
+            By default cmd() automatically adds a default '--help'
             option. When used once a standard help message is displayed.
             When used twice a help tree showing subcommands is
             displayed. To disable the automatic help set "no_help" to a
@@ -617,7 +652,7 @@ FUNCTIONS
 
         show_color
             Boolean indicating if usage messages should use ANSI
-            terminal color codes to highlight different elements. True
+            terminal colour codes to highlight different elements. True
             by default.
 
         show_default
@@ -628,10 +663,10 @@ FUNCTIONS
     optargs( @cmd_optargs ) -> HASHref
         This is a convenience function for single-level commands that:
 
-        *   passes it's arguments directly to "cmd()",
+        *   passes it's arguments directly to cmd(),
 
-        *   calls "class_optargs()" to parse '@ARGV' and returns the
-            $opts HASHref result directly.
+        *   calls class_optargs() to parse '@ARGV' and returns the $opts
+            HASHref result directly.
 
     rows() -> Integer
         Returns the terminal row height. Only exported on request.
@@ -640,7 +675,7 @@ FUNCTIONS
         Defines the subcommand $subclass of a previously defined
         (sub-)command.
 
-        Accepts the same parameters as "cmd()" in addition to the
+        Accepts the same parameters as cmd() in addition to the
         following:
 
         hidden
@@ -655,10 +690,7 @@ FUNCTIONS
         "main").
 
 SEE ALSO
-    OptArgs2::Pager, OptArgs2::StatusLine, Getopt::Long, Encode::Locale
-
-    This module used to duplicate itself on CPAN as Getopt::Args2, but
-    as of the version 2 series that is no longer the case.
+    Getopt::Long, Encode::Locale, OptArgs2::Pager, OptArgs2::StatusLine
 
 SUPPORT & DEVELOPMENT
     This distribution is managed via github:

@@ -1,9 +1,9 @@
 package Neo4j::Bolt::Point;
 # ABSTRACT: Representation of Neo4j geographic point structs
 
-$Neo4j::Bolt::Point::VERSION = '0.5000';
+$Neo4j::Bolt::Point::VERSION = '0.5001';
 
-use strict;
+use v5.12;
 use warnings;
 
 use parent 'Neo4j::Types::Point';

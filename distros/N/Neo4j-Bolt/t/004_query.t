@@ -1,10 +1,11 @@
+use v5.12;
+use warnings;
 use Test::More;
 use blib;
 use Cwd;
 use URI::bolt;
 use Neo4j::Bolt;
 use File::Spec;
-use strict;
 
 
 my $neo_info;

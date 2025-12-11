@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t t/lib/Business/NAB/*.t t/lib/Business/NAB/AccountInformation/*.t t/lib/Business/NAB/Acknowledgement/*.t t/lib/Business/NAB/Australian/DirectEntry/*.t t/lib/Business/NAB/Australian/DirectEntry/Payments/*.t t/lib/Business/NAB/Australian/DirectEntry/Report/*.t t/lib/Business/NAB/BPAY/*.t t/lib/Business/NAB/BPAY/Payments/*.t t/lib/Business/NAB/BPAY/Payments/Results/*.t t/lib/Business/NAB/BPAY/Remittance/*.t t/lib/Business/NAB/BPAY/Remittance/File/*.t"
   }

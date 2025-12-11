@@ -46,6 +46,7 @@ my %args   = (
     '-eu_url' => "file://$Bin/../t/data/sample_eu.xml",
     # the default HMT url takes too long to download. Let's use sample data to speed it up.
     '-hmt_url'       => "file://$Bin/../t/data/sample_hmt.csv",
+    '-moha_url'      => "file://$Bin/../t/data/sample_moha.xml",
     '-sanction_file' => $sanction_file // ''
 );
 

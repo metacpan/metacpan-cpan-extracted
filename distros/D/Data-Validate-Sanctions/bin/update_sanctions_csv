@@ -13,6 +13,7 @@ my $sanction_file;
 my $hmt_url;
 my $ofac_sdn_url;
 my $ofac_consolidated_url;
+my $moha_url;
 
 GetOptions(
     "eu_token|token|t=s"               => \$eu_token,
@@ -21,6 +22,7 @@ GetOptions(
     "hmt_url|hmt=s"                    => \$hmt_url,
     "ofac_sdn_url|ofac=s"              => \$ofac_sdn_url,
     "ofac_consolidated_url|ofac_con=s" => \$ofac_consolidated_url,
+    "moha_url|moha=s"                  => \$moha_url,
 
     'help|?' => \$help,
 );

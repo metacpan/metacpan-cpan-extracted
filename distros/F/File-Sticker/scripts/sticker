@@ -6,7 +6,7 @@ sticker - sticks tags onto files, populates a database with file meta-data
 
 =head1 VERSION
 
-version 4.0101
+version 4.301
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ version 4.0101
     sticker --update file ...
 
     sticker --query query-string ...
-    sticker --file_info file ...
+    sticker [--read_all] --file_info file ...
     sticker --db_info file ...
     sticker --has_data file
     sticker --tags
@@ -341,7 +341,6 @@ sub process_args () {
     $op->getoptions($opts,
 	       'verbose+',
 	       'manpage',
-	       'manpage',
 	       'dbname=s',
 	       'topdir=s',
                'primary_table|table=s',
@@ -582,6 +581,7 @@ MAIN: {
         wanted_fields=>$opts->{wanted_fields},
         field_order=>$opts->{field_order},
         taggable_fields=>$opts->{taggable_fields},
+        read_all=>$opts->{read_all},
         disable=>$opts->{disable},
         primary_table=>$opts->{primary_table},
         derive=>$opts->{derive},

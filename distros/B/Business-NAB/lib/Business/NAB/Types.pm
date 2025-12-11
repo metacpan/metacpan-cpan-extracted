@@ -1,5 +1,5 @@
 package Business::NAB::Types;
-$Business::NAB::Types::VERSION = '0.01';
+$Business::NAB::Types::VERSION = '0.02';
 =head1 NAME
 
 Business::NAB::Types

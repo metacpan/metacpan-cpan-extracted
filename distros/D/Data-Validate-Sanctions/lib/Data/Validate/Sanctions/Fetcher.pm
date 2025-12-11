@@ -18,7 +18,7 @@ use Digest::SHA qw(sha256_hex);
 use Encode      qw(encode);
 
 use constant MAX_REDIRECTS => 3;
-our $VERSION = '0.19';    # VERSION
+our $VERSION = '0.20';    # VERSION
 
 =head2 config
 
@@ -93,7 +93,7 @@ sub config {
         'MOHA-Sanctions' => {
             description => 'MOHA: Sanction list made by the ministry of home affairs Malaysia',
             url         => $args{moha_url}
-                || 'https://www.moha.gov.my/images/SenaraiKementerianDalamNegeri/September2024/ENG/SENARAI%20KDN%202024_5SEPTEMBER2024-ENG.xml',
+                || 'https://www.moha.gov.my/utama/images/Perkhidmatan%20KDN/Membanteras%20Pembiayaan%20Keganasan/SENARAI_KDN_2025_UPDATE.xml',
             parser => \&_moha_xml,
         },
     };
@@ -119,7 +119,17 @@ sub _ofac_xml_zip {
 sub _date_to_epoch {
     my $date = shift;
 
-    $date = "$3-$2-$1" if $date =~ m/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    return unless defined $date && $date ne '';
+
+    # Handle ISO 8601 format (YYYY-MM-DDTHH:MM:SS+TZ or variations)
+    if ($date =~ m/^(\d{4})-(\d{2})-(\d{2})(?:T[\d:+-]+)?/) {
+        # Already in YYYY-MM-DD format, just remove time/timezone part
+        $date = "$1-$2-$3";
+    }
+    # Handle DD/MM/YYYY or DD-MM-YYYY format
+    elsif ($date =~ m/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/) {
+        $date = "$3-$2-$1";
+    }
 
     my $result = eval { Date::Utility->new($date)->epoch; };
     return $result;
@@ -554,23 +564,94 @@ sub _moha_xml {
         return;
     }
 
-    # Access the creation date for the publish timestamp
-    my $publish_date  = $data->{'TaggedPDF-doc'}{'x:xmpmeta'}{'rdf:RDF'}{'rdf:Description'}{'xmp:CreateDate'};
+    # Try to find the creation date
+    my $publish_date;
+
+    # Check if it's a standalone tag at the beginning
+    if (exists $data->{'xmp:CreateDate'}) {
+        $publish_date = $data->{'xmp:CreateDate'};
+    }
+    # Check if it's nested within the rdf:Description
+    elsif (exists $data->{'TaggedPDF-doc'}
+        && exists $data->{'TaggedPDF-doc'}{'x:xmpmeta'}
+        && exists $data->{'TaggedPDF-doc'}{'x:xmpmeta'}{'rdf:RDF'}
+        && exists $data->{'TaggedPDF-doc'}{'x:xmpmeta'}{'rdf:RDF'}{'rdf:Description'})
+    {
+        $publish_date = $data->{'TaggedPDF-doc'}{'x:xmpmeta'}{'rdf:RDF'}{'rdf:Description'}{'xmp:CreateDate'};
+    }
+    # If not found, try to extract it from the raw XML
+    elsif ($raw_data =~ /<xmp:CreateDate>([^<]+)<\/xmp:CreateDate>/) {
+        $publish_date = $1;
+    }
+
     my $publish_epoch = _date_to_epoch($publish_date);
     die "Invalid or missing creation date in XML\n" unless $publish_epoch;
 
     # Access the relevant table structure
-    my $tables = $data->{'TaggedPDF-doc'}{'Part'}{'Table'};
-
+    my $tables  = $data->{'TaggedPDF-doc'}{'Document'}{'Table'};
     my $dataset = [];
+
+    # Handle both array and single table formats
+    $tables = [$tables] if ref $tables eq 'HASH';
+
     foreach my $table (@$tables) {
         my $rows = $table->{'TBody'}{'TR'};
         next unless ref $rows eq 'ARRAY';
 
-        # Skip the header row
-        foreach my $row (@$rows[1 .. $#$rows]) {
-            my $cells = $row->{'TD'};
-            next unless @$cells >= 13;
+        # Determine if the first row is a header row
+        my $start_index = 0;
+        if (@$rows > 0) {
+            my $first_row = $rows->[0];
+            my @first_cells;
+            if (exists $first_row->{'TH'}) {
+                if (ref $first_row->{'TH'} eq 'ARRAY') {
+                    push @first_cells, @{$first_row->{'TH'}};
+                } else {
+                    push @first_cells, $first_row->{'TH'};
+                }
+            }
+            if (exists $first_row->{'TD'}) {
+                if (ref $first_row->{'TD'} eq 'ARRAY') {
+                    push @first_cells, @{$first_row->{'TD'}};
+                } else {
+                    push @first_cells, $first_row->{'TD'};
+                }
+            }
+
+            # Check if the first cell contains a header-like value
+            my $first_id = ref $first_cells[0]{'P'} eq 'ARRAY' ? join(' ', @{$first_cells[0]{'P'}}) : $first_cells[0]{'P'};
+            if ($first_id =~ /^\(1\)/ || $first_id =~ /^No\./) {
+                # This is a header row, skip it
+                $start_index = 1;
+            }
+        }
+
+        # Process all data rows
+        foreach my $row (@$rows[$start_index .. $#$rows]) {
+            # Get cells from a mix of TD and TH tags
+            my $cells;
+            my @all_cells;
+
+            # Handle TH cells
+            if (exists $row->{'TH'}) {
+                if (ref $row->{'TH'} eq 'ARRAY') {
+                    push @all_cells, @{$row->{'TH'}};
+                } else {
+                    push @all_cells, $row->{'TH'};
+                }
+            }
+
+            # Handle TD cells
+            if (exists $row->{'TD'}) {
+                if (ref $row->{'TD'} eq 'ARRAY') {
+                    push @all_cells, @{$row->{'TD'}};
+                } else {
+                    push @all_cells, $row->{'TD'};
+                }
+            }
+
+            $cells = \@all_cells;
+            next unless $cells && @$cells >= 11;    # Need at least 11 cells for the required data
 
             my $name                  = $cells->[2]{'P'};
             my $date_of_birth         = $cells->[5]{'P'};

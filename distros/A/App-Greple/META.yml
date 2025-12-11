@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,18 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '9.2101'
+    version: '10.00'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
     file: lib/App/Greple/Filter.pm
   App::Greple::Grep:
+    file: lib/App/Greple/Grep.pm
+  App::Greple::Grep::Block:
+    file: lib/App/Greple/Grep.pm
+  App::Greple::Grep::Match:
+    file: lib/App/Greple/Grep.pm
+  App::Greple::Grep::Result:
     file: lib/App/Greple/Grep.pm
   App::Greple::Pattern:
     file: lib/App/Greple/Pattern.pm
@@ -45,6 +51,8 @@ provides:
     file: lib/App/Greple/Regions.pm
   App::Greple::Text:
     file: lib/App/Greple/Grep.pm
+  App::Greple::Util:
+    file: lib/App/Greple/Util.pm
   App::Greple::colors:
     file: lib/App/Greple/colors.pm
   App::Greple::debug:
@@ -53,8 +61,6 @@ provides:
     file: lib/App/Greple/dig.pm
   App::Greple::find:
     file: lib/App/Greple/find.pm
-  App::Greple::line:
-    file: lib/App/Greple/line.pm
   App::Greple::perl:
     file: lib/App/Greple/perl.pm
   App::Greple::pgp:
@@ -62,17 +68,18 @@ provides:
   App::Greple::select:
     file: lib/App/Greple/select.pm
 requires:
-  Getopt::EX: v2.2.1
+  Clone: '0'
+  Getopt::EX: '3.02'
   Hash::Util: '0'
   List::BinarySearch: '0'
   List::Util: '1.45'
-  Term::ANSIColor::Concise: '2.08'
-  perl: v5.18.2
+  Term::ANSIColor::Concise: '3.01'
+  perl: v5.24.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
   repository: https://github.com/kaz-utashiro/greple.git
-version: '9.2101'
+version: '10.00'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -4,7 +4,7 @@
       "Mark A. Jensen (majensen -at- cpan -dot- org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -27,20 +27,20 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::OpenSSL" : "0",
+            "Alien::Base::Wrapper" : "0.04",
             "ExtUtils::MakeMaker" : "7.12",
-            "Neo4j::Client" : "0.54",
+            "Neo4j::Client" : "0.56",
             "Try::Tiny" : "0"
          }
       },
       "develop" : {
          "recommends" : {
-            "Path::Tiny" : "0",
-            "Pod::Markdown" : "0"
+            "Path::Tiny" : "0.054",
+            "Pod::Markdown" : "3.100"
          },
          "requires" : {
             "Devel::PPPort" : "3.63",
-            "Inline::C" : "0"
+            "Inline::C" : "0.56"
          }
       },
       "runtime" : {
@@ -48,10 +48,8 @@
             "Mozilla::CA" : "0"
          },
          "requires" : {
-            "Alien::OpenSSL" : "0",
-            "DateTime" : "0",
             "JSON::PP" : "0",
-            "Neo4j::Client" : "0.54",
+            "Neo4j::Client" : "0.56",
             "Neo4j::Types" : "2.00",
             "URI" : "0",
             "XSLoader" : "0.14",
@@ -61,7 +59,8 @@
       "test" : {
          "requires" : {
             "Test::Exception" : "0",
-            "Test::Neo4j::Types" : "0.06"
+            "Test::Neo4j::Types" : "0.06",
+            "Try::Tiny" : "0"
          }
       }
    },
@@ -76,7 +75,7 @@
          "web" : "https://github.com/majensen/perlbolt"
       }
    },
-   "version" : "0.5000",
+   "version" : "0.5001",
    "x_contributors" : [
       "Mark A. Jensen <majensen@cpan.org>",
       "Arne Johannessen <ajnn@cpan.org>"

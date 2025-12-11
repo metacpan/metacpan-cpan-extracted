@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Report::HeaderRecord;
-$Business::NAB::Australian::DirectEntry::Report::HeaderRecord::VERSION = '0.01';
+$Business::NAB::Australian::DirectEntry::Report::HeaderRecord::VERSION = '0.02';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Report::HeaderRecord

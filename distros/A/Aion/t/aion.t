@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 1.2
+# 1.3
 # 
 # # SYNOPSIS
 # 
@@ -473,36 +473,68 @@ local ($::_g0 = do {$ex1->has_x}, $::_e0 = do {""}); ::ok defined($::_g0) == def
 local ($::_g0 = do {$ex1->x}, $::_e0 = do {6}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$ex1->x     # -> 6' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## eon => (1|$key)
+# ## eon => (1|2|$key)
 # 
 # С помощью аспекта `eon` реализуется паттерн **Dependency Injection**.
 # 
 # Он связывает свойство с сервисом из контейнера `$Aion::pleroma`.
 # 
-# Значением аспекта может быть ключ сервиса или 1, тогда ключём будет пакет в `isa => Object['Packet']`
+# Значением аспекта может быть ключ сервиса, 1 или 2.
 # 
-# Пример с 1-й:
+# * Если 1 – тогда ключём будет пакет в `isa => Object['Packet']`.
+# * Если 2 – тогда ключём будет "пакет#свойство".
 # 
-::done_testing; }; subtest 'eon => (1|$key)' => sub { 
-package CounterEon { use Aion;
-	has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
-}
-
-package AccomulatorEon { use Aion;
-	has counter => (eon => 'ex.counter');
-}
-
+# Файл lib/CounterEon.pm:
+#@> lib/CounterEon.pm
+#>> package CounterEon;
+#>> #@eon ex.counter
+#>> use Aion;
+#>> 
+#>> has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
+#>> 
+#>> 1;
+#@< EOF
+# 
+# Файл lib/AccomulatorEon.pm:
+#@> lib/AccomulatorEon.pm
+#>> package AccomulatorEon;
+#>> #@eon
+#>> use Aion;
+#>> 
+#>> has power => (isa => Object['PowerEon'], eon => 2);
+#>> 
+#>> 1;
+#@< EOF
+# 
+# Файл lib/PowerEon.pm:
+#@> lib/PowerEon.pm
+#>> package PowerEon;
+#>> use Aion;
+#>> 
+#>> has counter => (eon => 'ex.counter');
+#>> 	
+#>> #@eon
+#>> sub power { shift->new }
+#>> 
+#>> 1;
+#@< EOF
+# 
+::done_testing; }; subtest 'eon => (1|2|$key)' => sub { 
 {
+	use Aion::Pleroma;
 	local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
 		'ex.counter' => 'CounterEon#new',
 		AccomulatorEon => 'AccomulatorEon#new',
+		'PowerEon#power' => 'PowerEon#power',
 	});
 	
 	my $counter = $Aion::pleroma->get('ex.counter');
 
-local ($::_g0 = do {$counter->accomulator->counter}, $::_e0 = do {$counter}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '	$counter->accomulator->counter # -> $counter' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$counter->accomulator->power->counter}, $::_e0 = do {$counter}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '	$counter->accomulator->power->counter # -> $counter' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
+# 
+# См. [Aion::Pleroma](https://metacpan.org/pod/Aion::Pleroma).
 # 
 # ## trigger => $sub
 # 

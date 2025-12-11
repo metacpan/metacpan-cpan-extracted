@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/kaz-utashiro/greple/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple.svg)](https://metacpan.org/release/App-Greple)
+[![Actions Status](https://github.com/kaz-utashiro/greple/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kaz-utashiro/greple/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple.svg)](https://metacpan.org/release/App-Greple)
 # NAME
 
 greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 9.2101
+Version 10.00
 
 # SYNOPSIS
 
@@ -16,7 +16,7 @@ Version 9.2101
       -x, --le   pattern   lexical expression (same as bare pattern)
       -e, --and  pattern   pattern match across line boundary
       -r, --must pattern   pattern cannot be compromised
-      -t, --may  pattern   pattern may be exist
+      -t, --may  pattern   pattern may exist
       -v, --not  pattern   pattern not to be matched
       -E, --re   pattern   regular expression
           --fe   pattern   fixed expression
@@ -24,8 +24,8 @@ Version 9.2101
       --select index       select indexed pattern from -f file
     MATCH
       -i, --ignore-case    ignore case
-      -G, --capture-group  match capture groups rather than whole pattern
-      -S, --stretch        stretch matched area to the enclosing block
+      -G, --capture-group  match capture groups rather than the whole pattern
+      -S, --stretch        stretch the matched area to the enclosing block
       --need=[+-]n         required positive match count
       --allow=[+-]n        acceptable negative match count
       --matchcount=n[,m]   required match count for each block
@@ -33,75 +33,77 @@ Version 9.2101
       -l                   list filename only
       -c                   print count of matched block only
       -n                   print line number
+      -b                   print block number
       -H, -h               do or do not display filenames
       -o                   print only the matching part
       --all                print entire data
       -m, --max=n[,m]      max count of blocks to be shown
       -A,-B,-C [n]         after/before/both match context
-      --join               delete newline in the matched part
-      --joinby=string      replace newline in the matched text by string
-      --nonewline          do not add newline character at block end
-      --filestyle=style    how filename printed (once, separate, line)
-      --linestyle=style    how line number printed (separate, line)
-      --separate           set filestyle and linestyle both "separate"
-      --format LABEL=...   define line number and file name format
-      --frame-top          top frame
-      --frame-middle       middle frame
-      --frame-bottom       bottom frame
+      --join               remove newline in the matched part
+      --joinby=string      replace newline in the matched text with a string
+      --nonewline          do not add newline character at the end of block
+      --filestyle=style    how filenames are printed (once, separate, line)
+      --linestyle=style    how line numbers are printed (separate, line)
+      --blockstyle=style   how block numbers are printed (separate, line)
+      --separate           set filestyle, linestyle, blockstyle "separate"
+      --format LABEL=...   define the format for line number and file name
+      --frame-top          top frame line
+      --frame-middle       middle frame line
+      --frame-bottom       bottom frame line
     FILE
       --glob=glob          glob target files
       --chdir=dir          change directory before search
       --readlist           get filenames from stdin
     COLOR
-      --color=when         use terminal color (auto, always, never)
+      --color=when         use terminal colors (auto, always, never)
       --nocolor            same as --color=never
-      --colormap=color     R, G, B, C, M, Y etc.
+      --colormap=color     R, G, B, C, M, Y, etc.
       --colorsub=...       shortcut for --colormap="sub{...}"
       --colorful           use default multiple colors
-      --colorindex=flags   color index method: Ascend/Descend/Block/Random/Unique/Group
-      --random             use random color each time (--colorindex=R)
-      --uniqcolor          use different color for unique string (--colorindex=U)
-      --uniqsub=func       preprocess function before check uniqueness
+      --colorindex=flags   color index method: Ascend/Descend/Block/Random/Unique/Group/GP
+      --random             use a random color each time (--colorindex=R)
+      --uniqcolor          use a different color for each unique string (--colorindex=U)
+      --uniqsub=func       preprocess function to check uniqueness
       --ansicolor=s        ANSI color 16, 256 or 24bit
       --[no]256            same as --ansicolor 256 or 16
-      --regioncolor        use different color for inside/outside regions
-      --face               set/unset visual effects
+      --regioncolor        use different color for inside and outside regions
+      --face               enable or disable visual effects
     BLOCK
-      -p, --paragraph      paragraph mode
-      --border=pattern     border pattern
-      --block=pattern      block of records
-      --blockend=s         block end mark (Default: "--")
-      --join-blocks        join back-to-back consecutive blocks
+      -p, --paragraph      enable paragraph mode
+      --border=pattern     specify a border pattern
+      --block=pattern      specify a block of records
+      --blockend=s         block-end mark (Default: "--")
+      --join-blocks        join consecutive blocks that are back-to-back
     REGION
       --inside=pattern     select matches inside of pattern
       --outside=pattern    select matches outside of pattern
-      --include=pattern    reduce matches to the area
-      --exclude=pattern    reduce matches to outside of the area
-      --strict             strict mode for --inside/outside --block
+      --include=pattern    limit matches to the area
+      --exclude=pattern    limit matches to outside of the area
+      --strict             enable strict mode for --inside/outside --block
     CHARACTER CODE
-      --icode=name         file encoding
-      --ocode=name         output encoding
+      --icode=name         input file encoding
+      --ocode=name         output file encoding
     FILTER
       --if,--of=filter     input/output filter command
-      --pf=filter          post process filter command
-      --noif               disable default input filter
+      --pf=filter          post-process filter command
+      --noif               disable the default input filter
     RUNTIME FUNCTION
-      --begin=func         call function before search
-      --end=func           call function after search
-      --prologue=func      call function before command execution
-      --epilogue=func      call function after command execution
-      --postgrep=func      call function after each grep operation
-      --callback=func      callback function for matched string
+      --begin=func         call a function before starting the search
+      --end=func           call a function after completing the search
+      --prologue=func      call a function before executing the command
+      --epilogue=func      call a function after executing the command
+      --postgrep=func      call a function after each grep operation
+      --callback=func      callback function for each matched string
     OTHER
-      --usage[=expand]     show this message
-      --exit=n             command exit status
+      --usage[=expand]     show this help message
+      --exit=n             set the command exit status
       --norc               skip reading startup file
-      --man                display command or module manual page
-      --show               display module file
-      --path               show module file path
-      --error=action       action after read error
-      --warn=type          run time error control
-      --alert [name=#]     set alert parameter (size/time)
+      --man                display the manual page for the command or module
+      --show               display the module file contents
+      --path               display the path to the  module file
+      --error=action       action to take after a read error occurs
+      --warn=type          runtime error handling type
+      --alert [name=#]     set alert parameters (size/time)
       -d flags             display info (f:file d:dir c:color m:misc s:stat)
 
 # INSTALL
@@ -110,46 +112,27 @@ Version 9.2101
 
     $ cpanm App::Greple
 
-# SUMMARY (AI GENERATED)
+# SUMMARY
 
-**GREPLE** is a sophisticated and versatile grep-like command-line tool
-designed primarily for advanced text searching and manipulation in
-document files. While it can handle various text formats, it
-particularly excels in processing structured documents, such as source
-code, markup files, and other text-based content. Here are some key
-features that make greple especially suitable for document processing:
+**greple** is a grep-like tool designed for searching structured text
+such as source code and documents.  Key features include:
 
-- Flexible pattern matching: greple supports complex search
-patterns, including multi-line matching and logical combinations of
-keywords, which is particularly useful for searching within structured
-documents.
-- Region control: With options like `--inside`, `--outside`,
-`--include`, and `--exclude`, greple allows precise targeting of
-specific sections within documents, such as code blocks, comments, or
-particular markup regions.
-- Block-oriented processing: The ability to define and work with
-custom text blocks makes it ideal for handling document structures
-like paragraphs, sections, or other logical units within a text.
-- Multi-byte text support: greple is particularly adept at
-handling Asian languages, especially Japanese, making it valuable for
-multilingual document processing.
-- Extensibility through modules: Users can create custom modules
-to implement document-specific search and manipulation functions,
-enhancing its capabilities for particular document types or formats.
-- Colorized output: The advanced color options allow for clear
-visualization of search results, which is particularly helpful when
-analyzing document structure or content.
-- Integration with other text processing tools: greple can be
-easily combined with other Unix tools and custom scripts for more
-complex document analysis and transformation tasks.
+- **Flexible pattern matching**: Multiple keyword search with AND/OR/NOT
+logic, including multi-line matching and lexical expressions.
+- **Region control**: Target specific sections with `--inside`,
+`--outside`, `--include`, and `--exclude` options.  Useful for
+searching only within code blocks, comments, or other delimited
+regions.
+- **Block-oriented processing**: Define and search custom text blocks
+such as paragraphs or function definitions.
+- **Multi-byte support**: Native handling of Japanese and other Asian
+languages with proper character encoding.
+- **Extensibility**: Module system allows custom search patterns and
+filters for specific document types or use cases.
 
-While greple can be used for various text processing tasks, its
-feature set is particularly well-suited for working with structured
-documents, source code files, and other text-based content where
-context, structure, and precise matching are important. It may not be
-the best choice for processing very large data files or high-volume
-log analysis, but it excels in scenarios where detailed examination
-and manipulation of document content is required.
+While it can be used for general text search, greple excels at
+searching source code, structured documents, and multi-byte text where
+context and precision matter.
 
 # DESCRIPTION
 
@@ -159,13 +142,13 @@ and manipulation of document content is required.
 
 **greple** can take multiple search patterns with the `-e` option, but
 unlike the [egrep(1)](http://man.he.net/man1/egrep) command, it will search them in AND context.
-For example, the next command print lines those containing all of
+For example, the next command prints lines that contain all of
 `foo` and `bar` and `baz`.
 
     greple -e foo -e bar -e baz ...
 
 Each word can appear in any order and any place in the string.  So
-this command find all of following lines.
+this command finds all of the following lines.
 
     foo bar baz
     baz bar foo
@@ -177,7 +160,7 @@ If you want to use OR syntax, use regular expression.
 
     greple -e foo -e bar -e baz -e 'yabba|dabba|doo'
 
-This command will print lines those contains all of `foo`, `bar` and
+This command will print lines that contain all of `foo`, `bar` and
 `baz` and one or more of `yabba`, `dabba` or `doo`.
 
 Multiple patterns may be described in a file line-by-line, and
@@ -197,8 +180,8 @@ The two commands below work the same way.
 
 ### NOT
 
-Use option `-v` to specify keyword which should not found in the data
-record.  Next example will show lines those contain both `foo` and
+Use option `-v` to specify keyword which should not be found in the data
+record.  Next example shows lines that contain both `foo` and
 `bar` but none of `yabba`, `dabba` or `doo`.
 
     greple -e foo -e bar -v yabba -v dabba -v doo
@@ -206,15 +189,15 @@ record.  Next example will show lines those contain both `foo` and
 
 ### MAY
 
-When you are focusing on multiple words, there may be words those are
-not necessary but would be of interest if there were.
+When you are focusing on multiple words, there may be words that are
+not necessary but would be of interest if they were present.
 
 Use option `--may` or `-t` (tentative) to specify that kind of
-words.  They will be a subject of search, and highlighted if exist,
+words.  They will be a subject of search, and highlighted if they exist,
 but are optional.
 
-Next command print all lines including `foo` and `bar`, and
-highlight `baz` as well.
+Next command prints all lines including `foo` and `bar`, and
+highlights `baz` as well.
 
     greple -e foo -e bar -t baz
 
@@ -243,8 +226,8 @@ baz` to search lines including all of them.
 
     greple 'foo bar baz'
 
-Next command show lines which include `foo`, but does not include
-`bar`, and highlight `baz` if exists.
+Next command shows lines which include `foo`, but do not include
+`bar`, and highlights `baz` if it exists.
 
     greple 'foo -bar ?baz'
 
@@ -268,15 +251,15 @@ in the bare or `--le` pattern.
 
 ## FLEXIBLE BLOCKS
 
-Default data block **greple** search and print is a line.  Using
+Default data block **greple** searches and prints is a line.  Using
 `--paragraph` (or `-p` in short) option, series of text separated by
-empty line is taken as a record block.  So next command will print
+empty line is taken as a record block.  So the next command prints
 whole paragraph which contains the word `foo`, `bar` and `baz`.
 
     greple -p 'foo bar baz'
 
-Block also can be defined by pattern.  Next command treat the data as
-a series of 10-line unit.
+Block can also be defined by pattern.  Next command treats the data as
+a series of 10-line units.
 
     greple -n --border='(.*\n){1,10}'
 
@@ -290,14 +273,14 @@ script.
 Using option `--inside` and `--outside`, you can specify the text
 area to be matched.  Next commands search only in mail header and body
 area respectively.  In these cases, data block is not changed, so
-print lines which contains the pattern in the specified area.
+print lines which contain the pattern in the specified area.
 
     greple --inside '\A(.+\n)+' pattern
 
     greple --outside '\A(.+\n)+' pattern
 
 Option `--inside`/`--outside` can be used repeatedly to enhance the
-area to be matched.  There are similar option
+area to be matched.  There are similar options
 `--include`/`--exclude`, but they are used to trim down the area.
 
 These four options also take user defined function and any complex
@@ -321,7 +304,7 @@ module.  Modules are invoked by `-M` option immediately after command
 name.
 
 For example, **greple** does not have recursive search option, but it
-can be implemented by `--readlist` option which accept target file
+can be implemented by `--readlist` option which accepts target file
 list from standard input.  Using **find** module, it can be written
 like this:
 
@@ -342,8 +325,8 @@ but this command is finally translated into following option list.
 
 ## INCLUDED MODULES
 
-This release include some sample modules.  Read document in each
-modules for detail.  You can read the document by `--man` option or
+The distribution includes some sample modules.  Read document in each
+module for detail.  You can read the document by `--man` option or
 [perldoc](https://metacpan.org/pod/perldoc) command.
 
     greple -Mdig --man
@@ -413,15 +396,15 @@ Classes" in perlrecharclass](https://metacpan.org/pod/perlrecharclass#Extended-B
 
 - **-e** _pattern_, **--and**=_pattern_
 
-    Specify the positive match pattern.  Next command print lines contains
+    Specify the positive match pattern.  Next command prints lines containing
     all of `foo`, `bar` and `baz`.
 
         greple -e foo -e bar -e baz
 
 - **-t** _pattern_, **--may**=_pattern_
 
-    Specify the optional (tentative) match pattern.  Next command print
-    lines contains `foo` and `bar`, and highlight `baz` if exists.
+    Specify the optional (tentative) match pattern.  Next command prints
+    lines containing `foo` and `bar`, and highlights `baz` if it exists.
 
         greple -e foo -e bar -t baz
 
@@ -439,15 +422,15 @@ Classes" in perlrecharclass](https://metacpan.org/pod/perlrecharclass#Extended-B
 
         greple -r foo -r bar -e baz
 
-    Because `-t` promote all other `-e` patterns required, next command
-    do the same thing.  Mixing `-r`, `-e` and `-t` is not recommended,
+    Because `-t` promotes all other `-e` patterns to required, the next command
+    does the same thing.  Mixing `-r`, `-e` and `-t` is not recommended,
     though.
 
         greple -r foo -e bar -t baz
 
 - **-v** _pattern_, **--not**=_pattern_
 
-    Specify the negative match pattern.  Because it does not affect to the
+    Specify the negative match pattern.  Because it does not affect the
     bare pattern argument, you can narrow down the search result like
     this.
 
@@ -464,7 +447,7 @@ even if they are separated by newlines.
     greple -e 'foo bar baz'
 
 This is done by converting pattern `foo bar baz` to
-`foo\s+bar\+baz`, so that word separator can match one or more white
+`foo\s+bar\s+baz`, so that word separator can match one or more white
 spaces.
 
 As for Asian wide characters, pattern is cooked as zero or more white
@@ -480,7 +463,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     start with `-` means **negative** pattern, `?` means **optional**, and
     `+` does **required**.
 
-    The next example prints lines which containing `foo` and `yabba`,
+    The next example prints lines containing `foo` and `yabba`,
     and none of `bar` and `dabba`, with highlighting `baz` and `doo`
     if they exist.
 
@@ -495,11 +478,11 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
 - **-x** \[**+?-**\]**&**_function_, **--le**=\[**+?-**\]**&**_function_
 
-    If the pattern start with ampersand (`&`), it is treated as a
+    If the pattern starts with ampersand (`&`), it is treated as a
     function, and the function is called instead of searching pattern.
-    Function call interface is same as the one for block/region options.
+    Function call interface is the same as the one for block/region options.
 
-    If you have a definition of _odd\_line_ function in you `.greplerc`,
+    If you have a definition of _odd\_line_ function in your `.greplerc`,
     which is described in this manual later, you can print odd number
     lines like this:
 
@@ -599,8 +582,8 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         greple --matchcount=,3 ';' file
 
-    In fact, _min_ and _max_ can repeat to represent multiple range.
-    Missing, negative or zero _max_ means infinite.  Next command find
+    In fact, _min_ and _max_ can repeat to represent multiple ranges.
+    Missing, negative or zero _max_ means infinite.  Next command finds
     match count 0 to 10, 20 to 30, and 40-or-greater.
 
         greple --matchcount=,10,20,30,40
@@ -636,6 +619,25 @@ If you don't want these conversion, use `-E` (or `--re`) option.
         (?(<b>) \] | )      # closing "]" if start with "["   \
         $                   # EOL
 
+    DEFINE patterns are supported for defining reusable subpatterns.
+    Lines starting with `(?(DEFINE)` are used for declarations only and
+    not included as search patterns.  Other patterns can reference these
+    definitions using `(?&name)` syntax.
+
+        (?(DEFINE)(?<digit>\d+))
+        (?&digit)+
+        (?&digit){4}
+
+    When writing DEFINE and pattern on the same line, place the pattern
+    first and DEFINE at the end (recommended in ["(DEFINE)" in perlre](https://metacpan.org/pod/perlre#DEFINE)):
+
+        (?&digit)+(?(DEFINE)(?<digit>\d+))
+
+    Or prefix with `(?:)` (empty non-capturing group that does nothing)
+    to place DEFINE at the beginning:
+
+        (?:)(?(DEFINE)(?<digit>\d+))(?&digit)+
+
     If multiple files are specified, a separate group pattern is generated
     for each file.
 
@@ -645,11 +647,6 @@ If you don't want these conversion, use `-E` (or `--re`) option.
         greple -f pattern_file@2,7:9
 
         greple -f pattern_file --select 2,7:9
-
-    Next `[index]` style is obsolete and will be deprecated in the
-    future.
-
-        greple -f pattern_file[2,7:9]
 
     See [App::Greple::subst](https://metacpan.org/pod/App%3A%3AGreple%3A%3Asubst) module.
 
@@ -661,7 +658,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ANumbers) module.  Take a look at the module document for
     detail.
 
-    Next command use 2nd and 7,8,9th lines in the pattern file.
+    Next command uses 2nd and 7,8,9th lines in the pattern file.
 
         greple -f pattern_file --select 2,7:9
 
@@ -679,6 +676,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
     Show line number.
 
+- **-b**, **--block-number**
+
+    Show block number.
+
 - **-h**, **--no-filename**
 
     Do not display filename.
@@ -695,7 +696,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
 - **--all**
 
-    Print entire file.  This option does not affect to seach behavior or
+    Print entire file.  This option does not affect search behavior or
     block treatment.  Just print all contents.  Can be negated by the
     **--no-all** option
 
@@ -712,11 +713,11 @@ If you don't want these conversion, use `-E` (or `--re`) option.
         greple -m -10      # remove last 10 blocks
         greple -m  10,10   # remove 10 blocks from 10th (10-19)
 
-    This option does not affect to search performance and command exit
+    This option does not affect search performance or command exit
     status.
 
-    Note that **grep** command also has same option, but it's behavior is
-    different when invoked to multiple files.  **greple** produces given
+    Note that **grep** command also has the same option, but its behavior is
+    different when invoked with multiple files.  **greple** produces given
     number of output for each file, while **grep** takes it as a total
     number of output.
 
@@ -728,7 +729,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         greple -m 0,10,10
 
-    Next command get first 20 (by `20,`) and get last 10 (by `,-10`),
+    Next command gets first 20 (by `20,`) and gets last 10 (by `,-10`),
     producing same result.  Empty string behaves like absence for
     _length_ and zero for _offset_.
 
@@ -799,20 +800,28 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     beginning of each line.  Style _separate_ prints line number in the
     separate line before each line or block.
 
+- **--blockstyle**=\[`line`,`separate`\], **--bs**
+
+    Default style is _line_, and **greple** prints block numbers at the
+    beginning of each line.  Style _separate_ prints block number in the
+    separate line before each line or block.
+
 - **--separate**
 
-    Shortcut for `--filestyle=separate` `--linestyle=separate`.
-    This is convenient to use block mode search and visiting each location
-    from supporting tool, such as Emacs.
+    Shortcut for `--filestyle=separate` `--linestyle=separate`
+    `--blockstyle=separate`.  This is convenient to use block mode search
+    and visiting each location from supporting tool, such as Emacs.
 
 - **--format** **LABEL**=_format_
 
-    Define the format string of line number (LINE) and file name (FILE) to
-    be displayed.  Default is:
+    Define the format string of line number (LINE), file name (FILE) and
+    block number (BLOCK) to be displayed.  Default is:
 
         --format LINE='%d:'
 
         --format FILE='%s:'
+
+        --format BLOCK='%s:'
 
     Format string is passed to `sprintf` function.  Tab character can be
     expressed as `\t`.
@@ -844,7 +853,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     repeating option, `--glob` file expansion will be done for every
     directories.
 
-        greple --chdir '/usr/man/man?' --glob '*.[0-9]' ...
+        greple --chdir '/usr/share/man/man?' --glob '*.[0-9]' ...
 
 - **--readlist**
 
@@ -975,9 +984,9 @@ If you don't want these conversion, use `-E` (or `--re`) option.
         BLOCKEND  Block end mark
         PROGRESS  Progress status with -dnf option
 
-    In current release, `BLOCKEND` mark is colored with `E` effect
-    recently implemented in [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) module, which allows to fill up
-    the line with background color.  This effect uses irregular escape
+    The `BLOCKEND` mark is colored with `E` effect provided by
+    [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) module, which allows to fill up the line with background
+    color.  This effect uses irregular escape
     sequence, and you may need to define `LESSANSIENDCHARS` environment
     as "mK" to see the result with [less](https://metacpan.org/pod/less) command.
 
@@ -1071,8 +1080,15 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
     - G (Group)
 
-        Valid only when used with the **--capture-group** (or **-G**)
-        option. Assigns an index number corresponding to each capture group.
+        Valid only with **-G** option.  Assigns a sequential index to each
+        capture group across all patterns, starting from 0.  For example, if
+        the first pattern has 2 groups and the second has 3, indices are
+        assigned as 0, 1, 2, 3, 4.  Patterns without capture groups count as
+        one group.  Use `--cm N` to skip color for specific indices.
+
+    - GP (Group per Pattern)
+
+        Same as **G**, but index resets to 0 for each pattern.
 
     - U (Unique)
 
@@ -1094,8 +1110,8 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
     Use different colors for different string matched.
 
-    Next example prints all words start by `color` and display them all
-    in different colors.
+    Next example prints all words starting with `color` and displays them
+    all in different colors.
 
         greple --uniqcolor 'colou?r\w*'
 
@@ -1170,12 +1186,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
     Print a paragraph which contains the pattern.  Each paragraph is
     delimited by two or more successive newlines by default.  Be aware
-    that an empty line is not a paragraph delimiter if which contains
+    that an empty line is not a paragraph delimiter if it contains
     space characters.  Example:
 
-        greple -np 'setuid script' /usr/man/catl/perl.l
-
-        greple -pe '^struct sockaddr' /usr/include/sys/socket.h
+        greple -np -C4 -e 'find myself' script/greple
 
     It changes the unit of context specified by `-A`, `-B`, `-C`
     options.  Space gap between paragraphs are also treated as a block
@@ -1375,10 +1389,12 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     pass-phrase is asked for each file.  If you want to input pass-phrase
     only once to find from multiple files, use `-Mpgp` module.
 
-    If the filter start with `&`, perl subroutine is called instead of
+    If the filter starts with `&`, perl subroutine is called instead of
     external command.  You can define the subroutine in `.greplerc` or
     modules.  **Greple** simply call the subroutine, so it should be
-    responsible for process control.
+    responsible for process control.  It may have to use `POSIX::_exit()`
+    to avoid executing an `END` block on exit or calling destructor on
+    the object.
 
 - **--noif**
 
@@ -1395,7 +1411,7 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         greple --of 'cat -n' string file1 file2 ...
 
-    If the filter start with `&`, perl subroutine is called instead of
+    If the filter starts with `&`, perl subroutine is called instead of
     external command.  You can define the subroutine in `.greplerc` or
     modules.
 
@@ -1461,14 +1477,17 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 - **--postgrep**=_function_(_..._)
 - **--postgrep**=_function_=_..._
 
-    Specify the function called after each search operation.  Funciton is
-    called with `App::Greple::Grep` object which cotains all information
-    about the search.  This interface highly depends on the internal
-    structure, so use with the utmost caution.
+    Specify the function called after each search operation.  Function is
+    called with [App::Greple::Grep](https://metacpan.org/pod/App%3A%3AGreple%3A%3AGrep) object which contains all information
+    about the search.
 
-    The search results are held as a list of blocks.  By emptying the
-    contents of a block element, the matches for that block can be
-    canceled.
+    The search results are held as a list of [App::Greple::Grep::Result](https://metacpan.org/pod/App%3A%3AGreple%3A%3AGrep%3A%3AResult)
+    objects.  Each result contains a block and matched regions.  By
+    emptying the contents of a result element, the matches for that block
+    can be canceled.
+
+    See [App::Greple::Grep](https://metacpan.org/pod/App%3A%3AGreple%3A%3AGrep) for details about the object structure and
+    callback mechanism.
 
 - **--callback**=_function_(_..._)
 
@@ -1586,13 +1605,9 @@ interpreted as a bare word.
 
 - **--norc**
 
-    Do not read startup file: `~/.greplerc`.  This option have to be
+    Do not read startup file: `~/.greplerc`.  This option has to be
     placed before any other options including `-M` module options.
-    Setting `GREPLE_NORC` environment have same effect.
-
-- **--persist**
-
-    Use `--error=retry`.  Will be deprecated in the future.
+    Setting `GREPLE_NORC` environment has the same effect.
 
 - **--error**=_action_
 
@@ -1635,7 +1650,7 @@ interpreted as a bare word.
 
     Control runtime message mainly about file operation related to
     `--error` option.  Repeatable.  Value is optional and 1 is assumed
-    when omitted.  So `-wall` option is same as `-wall=1` and enables
+    when omitted.  So `-wall` option is the same as `-wall=1` and enables
     all messages, and `-wall=0` disables all.
 
     Types are:
@@ -1921,7 +1936,9 @@ option interfaces, and change the command name. (2013.11)
 
 [grep(1)](http://man.he.net/man1/grep), [perl(1)](http://man.he.net/man1/perl)
 
-[App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
+[App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [App::Greple::Grep](https://metacpan.org/pod/App%3A%3AGreple%3A%3AGrep)
+
+[https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
 
 [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX), [https://github.com/kaz-utashiro/Getopt-EX](https://github.com/kaz-utashiro/Getopt-EX)
 

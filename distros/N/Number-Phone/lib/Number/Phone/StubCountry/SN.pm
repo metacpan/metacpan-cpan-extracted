@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135859;
+our $VERSION = 1.20251210153525;
 
 my $formatters = [
                 {
@@ -68,20 +68,10 @@ my $validators = {
         ',
                 'mobile' => '
           7(?:
-            (?:
-              [06-8]\\d|
-              [19]0|
-              21
-            )\\d|
-            5(?:
-              0[01]|
-              [19]0|
-              2[25]|
-              3[356]|
-              [4-7]\\d|
-              8[35]
-            )
-          )\\d{5}
+            [015-8]\\d|
+            21|
+            90
+          )\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -101,14 +91,14 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"2213394", "Outside\ Dakar",
-"2213399", "Outside\ Dakar",
-"221338", "Dakar",
-"2213393", "Outside\ Dakar",
-"2213395", "Outside\ Dakar",
-"2213396", "Outside\ Dakar",
+$areanames{en} = {"2213396", "Outside\ Dakar",
 "2213398", "Outside\ Dakar",
-"2213397", "Outside\ Dakar",};
+"2213394", "Outside\ Dakar",
+"2213397", "Outside\ Dakar",
+"2213393", "Outside\ Dakar",
+"221338", "Dakar",
+"2213399", "Outside\ Dakar",
+"2213395", "Outside\ Dakar",};
 my $timezones = {
                '' => [
                        'Africa/Dakar'

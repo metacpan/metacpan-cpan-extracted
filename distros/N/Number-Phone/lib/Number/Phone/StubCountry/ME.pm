@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135858;
+our $VERSION = 1.20251210153524;
 
 my $formatters = [
                 {
@@ -94,16 +94,16 @@ my $validators = {
                 'voip' => '78[1-49]\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"38241", "Cetinje",
-"38240", "Niksic\/Pluzine\/Savnik",
+$areanames{en} = {"38252", "Pljevlja\/Zabljak",
 "38233", "Budva",
+"38241", "Cetinje",
 "38250", "Bijelo\ Polje\/Mojkovac",
-"38252", "Pljevlja\/Zabljak",
-"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
-"38231", "Herceg\ Novi",
-"38230", "Bar\/Ulcinj",
 "3822", "Danilovgad\/Kolasin\/Podgorica",
-"38232", "Kotor\/Tivat",};
+"38231", "Herceg\ Novi",
+"38232", "Kotor\/Tivat",
+"38230", "Bar\/Ulcinj",
+"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
+"38240", "Niksic\/Pluzine\/Savnik",};
 my $timezones = {
                '' => [
                        'Europe/Podgorica'

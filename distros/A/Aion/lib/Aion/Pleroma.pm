@@ -27,7 +27,7 @@ has pleroma => (is => 'ro', isa => HashRef[Str], default => sub {
 		my ($pkg, $sub, $key) = ($1, $2, $3);
 		my $action = join "#", $pkg, $sub || 'new';
 		
-		$key = $key ne ""? $key: $pkg;
+		$key = $key ne ""? $key: ($sub? "$pkg#$sub": $pkg);
 		
 		close($f), die "The eon $key is $pleroma{$key}, but added other $action" if exists $pleroma{$key};
 		
@@ -119,7 +119,7 @@ File lib/Ex/Eon/AnimalEon.pm:
 	#@eon ex.cat
 	sub cat { __PACKAGE__->new(role => 'cat') }
 	
-	#@eon ex.dog
+	#@eon
 	sub dog { __PACKAGE__->new(role => 'dog') }
 	
 	1;
@@ -128,11 +128,11 @@ File etc/annotation/eon.ann:
 
 	Ex::Eon::AnimalEon#,2=
 	Ex::Eon::AnimalEon#cat,10=ex.cat
-	Ex::Eon::AnimalEon#dog,13=ex.dog
+	Ex::Eon::AnimalEon#dog,13=Ex::Eon::AnimalEon#dog
 
 
 
-	Aion::Pleroma->new->pleroma # --> {"Ex::Eon::AnimalEon" => "Ex::Eon::AnimalEon#new", "ex.dog" => "Ex::Eon::AnimalEon#dog", "ex.cat" => "Ex::Eon::AnimalEon#cat"}
+	Aion::Pleroma->new->pleroma # --> {"Ex::Eon::AnimalEon" => "Ex::Eon::AnimalEon#new", "Ex::Eon::AnimalEon#dog" => "Ex::Eon::AnimalEon#dog", "ex.cat" => "Ex::Eon::AnimalEon#cat"}
 
 =head2 eon
 
@@ -152,7 +152,7 @@ Receive an eon from the container.
 
 	my $pleroma = Aion::Pleroma->new;
 	$pleroma->get('') # -> undef
-	$pleroma->get('ex.dog')->role # => dog
+	$pleroma->get('Ex::Eon::AnimalEon#dog')->role # => dog
 
 =head2 resolve ($key)
 
@@ -160,7 +160,7 @@ Get an eon from the container or an exception if it is not there.
 
 	my $pleroma = Aion::Pleroma->new;
 	$pleroma->resolve('e.ibex') # @=> e.ibex is'nt eon!
-	$pleroma->resolve('ex.dog')->role # => dog
+	$pleroma->resolve('Ex::Eon::AnimalEon#dog')->role # => dog
 
 =head1 AUTHOR
 

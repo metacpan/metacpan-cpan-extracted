@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135859;
+our $VERSION = 1.20251210153526;
 
 my $formatters = [
                 {
@@ -168,7 +168,7 @@ my $validators = {
             (?:
               [25]0|
               33|
-              8[78]|
+              8[078]|
               9[0-57-9]
             )\\d{3}|
             6(?:

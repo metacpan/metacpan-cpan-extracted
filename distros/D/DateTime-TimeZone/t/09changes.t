@@ -34,7 +34,8 @@ use Test::Fatal;
 
     is( $dt->hour, 2, 'A/S 1997: hour should be 2' );
 
-    $dt->set_time_zone('UTC')->add( minutes => 1 )
+    $dt->set_time_zone('UTC')
+        ->add( minutes => 1 )
         ->set_time_zone('Australia/Sydney');
 
     is( $dt->hour, 2, 'A/S 1997: hour should still be 2' );
@@ -72,7 +73,8 @@ use Test::Fatal;
 
     is( $dt->hour, 1, 'A/S 2002: hour should be 1' );
 
-    $dt->set_time_zone('UTC')->add( minutes => 1 )
+    $dt->set_time_zone('UTC')
+        ->add( minutes => 1 )
         ->set_time_zone('Australia/Sydney');
 
     is( $dt->hour, 3, 'A/S 2002: hour should be 3' );
@@ -142,7 +144,8 @@ use Test::Fatal;
 
     is( $dt->hour, 1, 'E/V 1982: hour should be 1' );
 
-    $dt->set_time_zone('UTC')->add( minutes => 1 )
+    $dt->set_time_zone('UTC')
+        ->add( minutes => 1 )
         ->set_time_zone('Europe/Vienna');
 
     is( $dt->hour, 3, 'E/V 1982: hour should be 3' );
@@ -177,7 +180,8 @@ use Test::Fatal;
 
     is( $dt->hour, 2, 'E/V 1997: hour should be 2' );
 
-    $dt->set_time_zone('UTC')->add( minutes => 1 )
+    $dt->set_time_zone('UTC')
+        ->add( minutes => 1 )
         ->set_time_zone('Europe/Vienna');
 
     is( $dt->hour, 2, 'E/V 1997: hour should still be 2' );
@@ -465,7 +469,8 @@ SKIP:
 
     is( $dt->hour, 2, 'hour should be 2 in vienna at 00:59:00 UTC' );
 
-    $dt->set_time_zone('UTC')->add( minutes => 1 )
+    $dt->set_time_zone('UTC')
+        ->add( minutes => 1 )
         ->set_time_zone('Europe/Vienna');
 
     is( $dt->hour, 2, 'hour should be 2 in vienna at 01:00:00 UTC' );

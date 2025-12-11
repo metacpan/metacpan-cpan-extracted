@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use OptArgs2;
+
+my $args = optargs(
+    comment => 'script to paint things',
+    optargs => [
+        item => {
+            isa      => 'Str',
+            required => 1,
+            comment  => 'the item to paint',
+        },
+        message => {
+            isa     => 'Str',
+            comment => 'the message to paint on the item',
+            greedy  => 1,
+        },
+        my_colour => {
+            isa          => '--Str',
+            alias        => 'c',
+            comment      => 'the colour to paint',
+            default      => 'blue',
+            show_default => 1,
+        },
+        quiet => {
+            isa     => '--Flag',
+            alias   => 'q',
+            comment => 'output nothing while working',
+        },
+    ],
+);
+
+print "Painting on $args->{item} in $args->{my_colour}: $args->{message}\n"
+  unless $args->{quiet};
+

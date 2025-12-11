@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Gif;
-$File::Sticker::Scribe::Gif::VERSION = '4.0101';
+$File::Sticker::Scribe::Gif::VERSION = '4.301';
 =head1 NAME
 
 File::Sticker::Scribe::Gif - read, write and standardize meta-data from GIF file
 
 =head1 VERSION
 
-version 4.0101
+version 4.301
 
 =head1 SYNOPSIS
 

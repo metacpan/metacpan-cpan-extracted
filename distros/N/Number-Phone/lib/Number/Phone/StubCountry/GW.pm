@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135857;
+our $VERSION = 1.20251210153523;
 
 my $formatters = [
                 {
@@ -54,47 +54,47 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"24544334", "Mansaba",
-"24544325", "Brá",
-"24544394", "Bula",
-"24544353", "Pirada",
-"24544335", "Farim",
-"24544332", "Bissora",
-"24544320", "Bissau",
-"24544341", "Bafatá",
-"24544322", "St\.\ Luzia",
-"24544391", "Canchungo",
-"24544331", "Mansôa",
-"24544342", "Bambadinca",
-"24544321", "Bissau",
-"24544392", "Cacheu",
-"24544393", "S\.\ Domingos",
-"24544370", "Buba",
-"24544354", "Pitche",
-"24544397", "Bigene",
-"24544396", "Ingoré",
-"24544352", "Sonaco",
-"24544351", "Gabu",};
-$areanames{pt} = {"245393", "S\.\ Domingos",
-"245342", "Bambadinca",
-"245331", "Mansôa",
-"245335", "Farim",
-"245392", "Cacheu",
-"245394", "Bula",
-"245321", "Bissau",
-"245325", "Brá",
+$areanames{pt} = {"245331", "Mansôa",
+"245353", "Pirada",
 "245351", "Gabú",
 "245396", "Ingoré",
-"245332", "Bigene\/Bissorã",
-"245353", "Pirada",
-"245341", "Bafatá",
-"245320", "Bissau",
-"245334", "Mansaba",
+"245394", "Bula",
+"245335", "Farim",
+"245392", "Cacheu",
 "245370", "Buba",
-"245391", "Canchungo",
-"245354", "Pitche",
+"245341", "Bafatá",
 "245322", "Sta\.\ Luzia",
-"245352", "Sonaco",};
+"245352", "Sonaco",
+"245354", "Pitche",
+"245391", "Canchungo",
+"245393", "S\.\ Domingos",
+"245332", "Bigene\/Bissorã",
+"245334", "Mansaba",
+"245321", "Bissau",
+"245320", "Bissau",
+"245325", "Brá",
+"245342", "Bambadinca",};
+$areanames{en} = {"24544334", "Mansaba",
+"24544396", "Ingoré",
+"24544351", "Gabu",
+"24544352", "Sonaco",
+"24544391", "Canchungo",
+"24544325", "Brá",
+"24544320", "Bissau",
+"24544392", "Cacheu",
+"24544394", "Bula",
+"24544332", "Bissora",
+"24544354", "Pitche",
+"24544331", "Mansôa",
+"24544342", "Bambadinca",
+"24544397", "Bigene",
+"24544341", "Bafatá",
+"24544321", "Bissau",
+"24544353", "Pirada",
+"24544322", "St\.\ Luzia",
+"24544393", "S\.\ Domingos",
+"24544335", "Farim",
+"24544370", "Buba",};
 my $timezones = {
                '' => [
                        'Atlantic/Reykjavik'

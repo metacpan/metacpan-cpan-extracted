@@ -1,5 +1,5 @@
 package Business::NAB::CSV;
-$Business::NAB::CSV::VERSION = '0.01';
+$Business::NAB::CSV::VERSION = '0.02';
 # undocument abstract class for parsing/creating CSV lines
 # mostly delegated to Text::CSV_XS
 

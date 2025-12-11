@@ -1,8 +1,11 @@
 package Neo4j::Bolt::Cxn;
+use v5.12;
+use warnings;
+
 use Carp qw/croak/;
 
 BEGIN {
-  our $VERSION = "0.5000";
+  our $VERSION = "0.5001";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::ResultStream;
   require XSLoader;
@@ -24,7 +27,7 @@ sub run_query {
     croak "Arg 1 should be Cypher query string";
   }
   if ($parms && !(ref $parms == 'HASH')) {
-    croak "Arg 2 should be a hashref of { param => $value, ... }";
+    croak "Arg 2 should be a hashref of { param => \$value, ... }";
   }
   croak "No connection" unless $self->connected;
   utf8::upgrade($query);
@@ -33,12 +36,12 @@ sub run_query {
 
 sub send_query {
   my $self = shift;
-  my ($query, $parms) = @_;
+  my ($query, $parms, $db) = @_;
   unless ($query) {
     croak "Arg 1 should be Cypher query string";
   }
   if ($parms && !(ref $parms == 'HASH')) {
-    croak "Arg 2 should be a hashref of { param => $value, ... }";
+    croak "Arg 2 should be a hashref of { param => \$value, ... }";
   }
   croak "No connection" unless $self->connected;
   utf8::upgrade($query);
@@ -95,19 +98,21 @@ L</"errmsg()">.
 Returns a string representing the major and minor Bolt protocol version of the 
 server, as "<major>.<minor>", or the empty string if not connected.
 
-=item run_query($cypher_query, [$param_hash])
+=item run_query($cypher_query, [$param_hash], [$db_name])
 
 Run a L<Cypher|https://neo4j.com/docs/cypher-manual/current/> query on
 the server. Returns a L<Neo4j::Bolt::ResultStream> which can be iterated
 to retrieve query results as Perl types and structures. [$param_hash]
 is an optional hashref of the form C<{ param =E<gt> $value, ... }>.
+If C<$db_name> is not given, the value of the global variable
+C<$Neo4j::Bolt::DEFAULT_DB> will be used instead.
 
-=item send_query($cypher_query, [$param_hash])
+=item send_query($cypher_query, [$param_hash], [$db_name])
 
 Send a L<Cypher|https://neo4j.com/docs/cypher-manual/current/> query to
 the server. All results (except error info) are discarded.
 
-=item do_query($cypher_query, [$param_hash])
+=item do_query($cypher_query, [$param_hash], [$db_name])
 
   ($stream, @rows) = do_query($cypher_query);
   $stream = do_query($cypher_query, $param_hash);

@@ -4,7 +4,7 @@
       "Mark Lawrence <nomad@null.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -19,14 +19,8 @@
          "inc"
       ],
       "package" : [
-         "OptArgs2::Arg",
          "OptArgs2::CODEREF",
-         "OptArgs2::Cmd",
-         "OptArgs2::CmdBase",
-         "OptArgs2::Opt",
-         "OptArgs2::OptArgBase",
-         "OptArgs2::Status",
-         "OptArgs2::SubCmd"
+         "OptArgs2::Status"
       ]
    },
    "prereqs" : {
@@ -73,6 +67,6 @@
          "url" : "ssh://git@github.com/mlawren/p5-OptArgs.git"
       }
    },
-   "version" : "v2.0.15",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v2.0.17",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,11 +1,49 @@
 Revision History for File-Sticker
 =================================
 
+v4.301 2025-12-11
+-----------------
+
+* 2025-12-11 17:21:13 +1100
+  error with release process
+
+v4.3 2025-12-11
+---------------
+
+* 2025-12-11 17:08:40 +1100
+  Adding ID3-v2.4 "Mood" tag to MP3 files
+
+v4.2 2025-12-04
+---------------
+
+* 2025-12-04 15:47:53 +1100
+  new version
+* 2025-12-04 15:45:01 +1100
+  Create "Derive" plugins, for derived values.
+
+v4.101 2025-08-23
+-----------------
+
+* 2025-08-23 13:01:13 +1000
+  fix for options
+
+v4.1 2025-06-05
+---------------
+
+* 2025-06-05 16:17:20 +1000
+  Making the new fields create_date and alt_text
+* 2025-06-05 13:27:17 +1000
+  Rolling back the FreeFields excursion
+
 v4.0101 2025-03-21
 ------------------
 
 * 2025-03-21 08:22:31 +1100
   fixed bug with field deletion
+
+v4.01 2025-03-17
+----------------
+
 * 2025-03-17 06:46:16 +1100
   Fixing a bug with Exif
 
@@ -26,26 +64,6 @@ v4.00 2025-03-04
   and no longer need Reader modules
 * 2025-03-04 05:21:48 +1100
   Combining reading and writing
-
-v3.03 2024-06-25
-----------------
-
-* 2024-06-25 13:22:54 +1000
-  Added composer and performer to MP3 known fields.
-
-v3.0204 2024-06-21
-------------------
-
-* 2024-06-21 00:48:05 +1000
-  Fixing field deletion for MP3 files
-* 2024-01-05 00:35:39 +1100
-  do not phantom the date_added field
-* 2023-09-27 13:38:28 +1000
-  more tweaking dates
-* 2023-09-27 11:21:55 +1000
-  trying some more
-* 2023-09-27 10:38:04 +1000
-  derive date_added as file date
 
 ===================================
 End of changes in the last 365 days

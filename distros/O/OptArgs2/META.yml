@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
   File::Spec: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +22,8 @@ no_index:
     - t
     - inc
   package:
-    - OptArgs2::Arg
     - OptArgs2::CODEREF
-    - OptArgs2::Cmd
-    - OptArgs2::CmdBase
-    - OptArgs2::Opt
-    - OptArgs2::OptArgBase
     - OptArgs2::Status
-    - OptArgs2::SubCmd
 requires:
   Carp: '0'
   Encode::Locale: '0'
@@ -44,5 +38,5 @@ resources:
   bugtracker: https://github.com/mlawren/p5-OptArgs/issues
   homepage: https://github.com/mlawren/p5-OptArgs
   repository: ssh://git@github.com/mlawren/p5-OptArgs.git
-version: v2.0.15
+version: v2.0.17
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -138,6 +138,17 @@ subcmd 'demo::arg::hashref' => (
     ],
 );
 
+subcmd 'demo::arg::infile' => (
+    comment => 'InFile argument',
+    optargs => [
+        file => {
+            isa      => 'Input',
+            comment  => 'isa: Input, name: file',
+            required => 1,
+        },
+    ],
+);
+
 subcmd 'demo::arg::int' => (
     comment => 'Int argument',
     optargs => [
@@ -248,6 +259,12 @@ subcmd 'demo::opt' => (
             comment => 'isa: Counter, name: counter_default_3',
             default => -3,
             alias   => 'f',
+        },
+
+        file => {
+            isa     => '--Input',
+            alias   => 'F',
+            comment => 'isa: Input, name: file',
         },
 
         flag => {

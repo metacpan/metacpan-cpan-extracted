@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Exif;
-$File::Sticker::Scribe::Exif::VERSION = '4.0101';
+$File::Sticker::Scribe::Exif::VERSION = '4.301';
 =head1 NAME
 
 File::Sticker::Scribe::Exif - read, write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 4.0101
+version 4.301
 
 =head1 SYNOPSIS
 
@@ -37,31 +37,6 @@ use List::MoreUtils qw(uniq);
 
 use parent qw(File::Sticker::Scribe);
 
-BEGIN {
-    # Set the user-defined fields for EXIF
-    %Image::ExifTool::UserDefined::sticker = (
-        GROUPS => { 0 => 'XMP', 1 => 'XMP-sticker', 2 => 'Image' },
-        NAMESPACE => { 'sticker' => 'http://ns.katspace.org/sticker/1.0/' },
-        WRITABLE => 'string',
-        # To maximize flexibility, this is going to be a plain string
-        # which we will populate with YAML data.
-        FreeFields => { },
-    );
-
-    %Image::ExifTool::UserDefined = (
-        # new XMP namespaces (ie. XMP-xxx) must be added to the Main XMP table:
-        'Image::ExifTool::XMP::Main' => {
-            sticker => {
-                SubDirectory => {
-                    TagTable => 'Image::ExifTool::UserDefined::sticker'
-                },
-            },
-        }
-    );
-    Image::ExifTool::XMP::RegisterNamespace(\%Image::ExifTool::UserDefined::sticker);
-}
-
-# FOR DEBUGGING
 =head1 DEBUGGING
 
 =head2 whoami
@@ -234,10 +209,32 @@ sub read_meta {
     }
     $meta{copyright} = $copyright if $copyright;
 
+    # Alt text!
+    my $alt_text = '';
+    foreach my $field (qw(AltTextAccessibility))
+    {
+        if (exists $info->{$field} and $info->{$field} and !$alt_text)
+        {
+            $alt_text = $info->{$field};
+        }
+    }
+    $meta{alt_text} = $alt_text if $alt_text;
+
+    # CreateDate is going to be treated as a separate field
+    my $create_date = '';
+    foreach my $field (qw(CreateDate))
+    {
+        if (exists $info->{$field} and $info->{$field} and !$create_date)
+        {
+            $create_date = $info->{$field};
+        }
+    }
+    $meta{create_date} = $create_date if $create_date;
+
     # There are multiple fields which could be used as a file date.
     # Check through them until you find a non-empty one.
     my $date = '';
-    foreach my $field (qw(CreateDate DateTimeOriginal Date PublishedDate PublicationDate))
+    foreach my $field (qw(DateTimeOriginal Date PublishedDate PublicationDate))
     {
         if (exists $info->{$field} and $info->{$field} and !$date)
         {
@@ -308,18 +305,18 @@ Title
 
     # -------------------------------------------------
     # Freeform Fields
-    # These are stored as YAML data in the XMP-sticker:FreeFields field.
+    # These are stored as YAML data in the Instructions field.
     # They used to be stored in the XMP:Description field,
     # before then the ImageDescription field, before then the UserComment field
     # so they need to be checked too.
     # -------------------------------------------------
-    if (exists $info->{FreeFields}
-            and $info->{FreeFields}
-            and $info->{FreeFields} =~ /^---/)
+    if (exists $info->{Instructions}
+            and $info->{Instructions}
+            and $info->{Instructions} =~ /^---/)
     {
-        say STDERR sprintf("FreeFields='%s'", $info->{FreeFields}) if $self->{verbose} > 2;
+        say STDERR sprintf("Instructions='%s'", $info->{Instructions}) if $self->{verbose} > 2;
         my $data;
-        eval {$data = Load($info->{FreeFields});};
+        eval {$data = Load($info->{Instructions});};
         if ($@)
         {
             warn __PACKAGE__, " Load of YAML data failed: $@";
@@ -452,6 +449,14 @@ sub replace_one_field {
     {
         $success = $et->SetNewValue('Location', $value);
     }
+    elsif ($field eq 'create_date')
+    {
+        $success = $et->SetNewValue('CreateDate', $value);
+    }
+    elsif ($field eq 'alt_text')
+    {
+        $success = $et->SetNewValue('AltTextAccessibility', $value);
+    }
     elsif ($field eq 'description')
     {
         # Okay, here's the messy relationship between the description,
@@ -472,9 +477,9 @@ sub replace_one_field {
         #
         # So then I used the XMP:Description (Description) field for the
         # freeform data, because GIMP neither reads nor overwrites that.
+        # But other things do...
         # 
-        # But then I discovered you could DEFINE YOUR OWN fields in EXIF,
-        # so I defined XMP-sticker:FreeFields to put my freeform YAML data into.
+        # So now I use the Instructions field.
 
         # Before the decription is written, the freeform data
         # needs to be converted to its new home.
@@ -641,7 +646,7 @@ sub _get_the_real_file {
 
 =head2 _read_freeform_data
 
-Read the freeform data as YAML data from the XMP-sticker:FreeFields field.
+Read the freeform data as YAML data from the Instructions field.
  
     my $ydata = $self->_read_freeform_data(exif=>$exif);
 
@@ -657,8 +662,8 @@ sub _read_freeform_data {
 
     my $ydata;
     my $et = $args{exif};
-    my $ystring = $et->GetValue('FreeFields');
-    $ystring = $et->GetNewValue('FreeFields') if !$ystring;
+    my $ystring = $et->GetValue('Instructions');
+    $ystring = $et->GetNewValue('Instructions') if !$ystring;
     say STDERR "ystring=$ystring" if $self->{verbose} > 2;
     if ($ystring and $ystring =~ /^---/) # YAML data needs prefix
     {
@@ -678,7 +683,7 @@ sub _read_freeform_data {
 
 =head2 _write_freeform_data
 
-Write the freeform data as YAML data into the XML-sticker:FreeFields field
+Write the freeform data as YAML data into the Instructions field
 This overwrites whatever is there, it does not check.
     
     $self->_write_freeform_data(newdata=>\%newdata,exif=>$exif);
@@ -706,13 +711,13 @@ sub _write_freeform_data {
     }
     my $ystring = Dump($newdata);
     say STDERR "ystring=$ystring" if $self->{verbose} > 2;
-    my $success = $et->SetNewValue('XMP-sticker:FreeFields', $ystring);
+    my $success = $et->SetNewValue('Instructions', $ystring);
     return $success;
 } # _write_freeform_data
 
 =head2 _convert_freeform_data
 
-Convert the freeform data so that it is placed into the XMP-sticker:FreeFields
+Convert the freeform data so that it is placed into the Instructions
 field rather than the XMP:Description, UserComment or ImageDescription field.
  
     $self->_convert_freeform_data(exif=>$exif);
@@ -726,10 +731,10 @@ sub _convert_freeform_data {
 
     my $et = $args{exif};
     # Check if it needs conversion at all.
-    # If the XMP-sticker:FreeFields field is not empty
+    # If the Instructions field is not empty
     # and contains YAML data, then nothing needs to be done.
-    my $ystring = $et->GetValue('XMP-sticker:FreeFields');
-    $ystring = $et->GetNewValue('XMP-sticker:FreeFields') if !$ystring;
+    my $ystring = $et->GetValue('Instructions');
+    $ystring = $et->GetNewValue('Instructions') if !$ystring;
     if ($ystring and $ystring =~ /^---/) # Assume YAML data
     {
         # no conversion needed
@@ -738,7 +743,7 @@ sub _convert_freeform_data {
 
     # ------------------------------------
     # Conversion needed
-    # Read from XMP:Description, write into XMP-sticker:FreeFields
+    # Read from XMP:Description, write into Instructions
     # Otherwise read from ImageDescription. 
     # The YAML data might be in UserComment instead if old.
     # ------------------------------------
@@ -771,7 +776,7 @@ sub _convert_freeform_data {
         }
         else # data is okay
         {
-            $success = $et->SetNewValue('XMP-sticker:FreeFields', $ystring);
+            $success = $et->SetNewValue('Instructions', $ystring);
             if ($success)
             {
                 # Clear out the XMP:Description field
@@ -801,7 +806,7 @@ sub _convert_freeform_data {
         # Put some empty data in there.
         my %newdata = ();
         my $nystring = Dump(\%newdata);
-        $success = $et->SetNewValue('XMP-sticker:FreeFields', $nystring);
+        $success = $et->SetNewValue('Instructions', $nystring);
     }
 
     return $success;

@@ -812,7 +812,7 @@ use strict;
 	},
 	CI => {
 		alpha2_code => "CI",
-		olson_name => "C\x{f4}te d'Ivoire",
+		olson_name => "C\x{f4}te d\x{2019}Ivoire",
 		regions => {
 			"" => {
 				location_coords => "+0519-00402",

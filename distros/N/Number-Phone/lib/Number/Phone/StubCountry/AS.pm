@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135854;
+our $VERSION = 1.20251210153518;
 
 my $formatters = [
                 {
@@ -2335,6 +2335,9 @@ my $timezones = {
                '323' => [
                           'America/Los_Angeles'
                         ],
+               '324' => [
+                          'America/New_York'
+                        ],
                '325' => [
                           'America/Chicago'
                         ],
@@ -3050,7 +3053,7 @@ my $timezones = {
                           'America/Denver'
                         ],
                '437' => [
-                          'America/Winnipeg'
+                          'America/Toronto'
                         ],
                '438' => [
                           'America/Toronto'

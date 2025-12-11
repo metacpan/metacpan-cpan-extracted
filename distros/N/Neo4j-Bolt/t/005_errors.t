@@ -1,3 +1,5 @@
+use v5.12;
+use warnings;
 use Test::More;
 use Test::Exception;
 use Try::Tiny;
@@ -5,7 +7,6 @@ use URI::bolt;
 use Cwd qw/getcwd/;
 use Neo4j::Bolt;
 use File::Spec;
-use strict;
 
 my $neo_info;
 my $nif = File::Spec->catfile('t','neo_info');

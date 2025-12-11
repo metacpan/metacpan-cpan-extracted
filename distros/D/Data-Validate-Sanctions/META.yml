@@ -25,7 +25,7 @@ build_requires:
   Test::Warn: '0.23'
   Test::Warnings: '0.026'
   YAML: '0'
-  perl: '5.008005'
+  perl: '5.020'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.64'
@@ -47,13 +47,13 @@ no_index:
 provides:
   Data::Validate::Sanctions:
     file: lib/Data/Validate/Sanctions.pm
-    version: '0.19'
+    version: '0.20'
   Data::Validate::Sanctions::Fetcher:
     file: lib/Data/Validate/Sanctions/Fetcher.pm
-    version: '0.19'
+    version: '0.20'
   Data::Validate::Sanctions::Redis:
     file: lib/Data/Validate/Sanctions/Redis.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   Carp: '0'
   Clone: '0'
@@ -84,14 +84,14 @@ requires:
   YAML::XS: '0'
   constant: '0'
   parent: '0'
-  perl: '5.008005'
+  perl: '5.020'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/deriv-com/perl-Data-Validate-Sanctions/issues
   homepage: https://github.com/deriv-com/perl-Data-Validate-Sanctions
   repository: https://github.com/deriv-com/perl-Data-Validate-Sanctions.git
-version: '0.19'
+version: '0.20'
 x_authority: cpan:DERIV
 x_contributors:
   - 'Tazeek <tazeek.rakib@gmail.com>'
@@ -102,18 +102,19 @@ x_contributors:
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
   - 'Tom Molesworth <tom@binary.com>'
   - 'mat-fs <53427463+mat-fs@users.noreply.github.com>'
-  - 'LQ <qiangliu@deriv.com>'
+  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'chylli-deriv <chylli@deriv.com>'
+  - 'gaurav-deriv <gaurav.dhanuka@regentmarkets.com>'
+  - 'heshan-deriv <109588077+heshan-deriv@users.noreply.github.com>'
   - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
   - 'Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>'
-  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
   - 'nihal-deriv <105702884+nihal-deriv@users.noreply.github.com>'
   - 'Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>'
   - 'Chylli <chylli.email@gmail.com>'
   - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
   - 'Evgeniy Vostrov <107458551+evgeniy-deriv@users.noreply.github.com>'
-  - 'heshan-deriv <109588077+heshan-deriv@users.noreply.github.com>'
+  - 'heshan-deriv <heshan@regentmarkets.com>'
   - 'jafrul-deriv <150781410+jafrul-deriv@users.noreply.github.com>'
   - 'lq <liuqiang1981@gmail.com>'
   - 'naif-deriv <112558231+naif-deriv@users.noreply.github.com>'

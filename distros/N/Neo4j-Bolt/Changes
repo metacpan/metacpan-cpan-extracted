@@ -1,5 +1,17 @@
 Revision history for Perl module Neo4j::Bolt
 
+0.5001  2025-12-10
+    - More reliable XS build using Alien::Base::Wrapper
+    - Error message when trying to install on a Perl without 64-bit integers
+      (if you need 32-bit support, please open an issue on GitHub)
+    - Change the warning category for an outdated libneo4j-omni version
+      from 'misc' to 'Neo4j::Bolt'
+    - Use pragmas 'strict' and 'warnings' more consistently
+    - Add optional database name argument to send_query(); this previously
+      undocumented argument already existed for run_query() and do_query()
+    - Add missing documentation for element_id in Node and Relationship
+    - Remove dependency on DateTime module
+
 0.5000  2024-11-08
     - Update for Neo4j v5.0+ / libneo4j-omni v5.0.4 (Neo4j::Client 0.54)
     - Include element_id where appropriate

@@ -1,4 +1,4 @@
-use strict;
+use v5.12;
 use warnings;
 use Test::More;
 use Neo4j::Bolt::NeoValue;

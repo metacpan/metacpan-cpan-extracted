@@ -61,7 +61,7 @@ do { my $x = {
                                       'YAML::XS' => '0',
                                       'constant' => '0',
                                       'parent' => '0',
-                                      'perl' => '5.008005',
+                                      'perl' => '5.020',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -93,7 +93,7 @@ do { my $x = {
                                    'Test::Warn' => '0.23',
                                    'Test::Warnings' => '0.026',
                                    'YAML' => '0',
-                                   'perl' => '5.008005',
+                                   'perl' => '5.020',
                                    'utf8' => '0'
                                  }
                  }

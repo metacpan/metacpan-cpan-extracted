@@ -1,3 +1,26 @@
+v2.0.17 (2025-12-11)
+
+    Improvements:
+        - Minor documentation updates.
+
+    Packaging:
+        - Index previously hidden packages.
+
+v2.0.16 (2025-12-05) TRIAL RELEASE
+
+    New Features:
+        - "Input" type that reads the contents of a file or STDIN
+
+    Improvements:
+        - Improve StatusLine test coverage.
+        - Improve Pager test coverage.
+        - Split (most) packages into separate files
+        - Update documentation examples and highlight underscore
+          handling
+
+    Bug Fixes:
+        - rt.cpan.org #149795: Trigger example uses deprecated syntax
+
 v2.0.15 (2025-04-25)
 
     No changes from v2.0.14.

@@ -1,0 +1,32 @@
+# ignore build artifacts
+^blib/
+^Makefile$
+^Makefile.old$
+^Build$
+^Build.bat$
+^_build/
+^pm_to_blib$
+
+# meta files created on build
+^MYMETA.yml$
+^MYMETA.json$
+
+# editor junk
+~$
+\.swp$
+\.bak$
+^#.*#$
+
+# version control
+^\.git/
+^\.github/
+
+# temp
+^tmp/
+^local/
+
+# ide junk
+^\.vscode/
+
+#git
+\.gitignore$

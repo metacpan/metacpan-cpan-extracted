@@ -1,11 +1,10 @@
 package Neo4j::Bolt::DateTime;
 # ABSTRACT: Representation of Neo4j date/time related structs
 
-$Neo4j::Bolt::DateTime::VERSION = '0.5000';
+$Neo4j::Bolt::DateTime::VERSION = '0.5001';
 
-use strict;
+use v5.12;
 use warnings;
-use DateTime;
 
 use parent 'Neo4j::Types::DateTime';
 
@@ -93,6 +92,7 @@ sub tz_offset {
 
 sub as_DateTime {
   my ($self) = @_;
+  require DateTime;
   my $dt;
   for ($self->{neo4j_type}) {
     /^Date$/ && do {

@@ -1,7 +1,7 @@
 use v5.14.0;
 use warnings;
 
-package JMAP::Tester::UA::LWP 0.105;
+package JMAP::Tester::UA::LWP 0.107;
 
 use Moo;
 with 'JMAP::Tester::Role::UA';
@@ -81,10 +81,13 @@ sub request {
   if ($logger->can($log_method)) {
     $self->lwp->set_my_handler(request_send => sub {
       my ($req) = @_;
-      $logger->$log_method({
-        ($log_extra ? %$log_extra : ()),
-        http_request => $req,
-      });
+      $logger->$log_method(
+        $tester,
+        {
+          ($log_extra ? %$log_extra : ()),
+          http_request => $req,
+        }
+      );
       return;
     });
   }
@@ -113,7 +116,7 @@ JMAP::Tester::UA::LWP
 
 =head1 VERSION
 
-version 0.105
+version 0.107
 
 =head1 PERL VERSION
 

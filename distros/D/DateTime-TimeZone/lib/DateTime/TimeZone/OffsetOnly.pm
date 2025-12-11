@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.65';
+our $VERSION = '2.66';
 
 use parent 'DateTime::TimeZone';
 
@@ -95,7 +95,7 @@ DateTime::TimeZone::OffsetOnly - A DateTime::TimeZone object that just contains 
 
 =head1 VERSION
 
-version 2.65
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -125,9 +125,11 @@ used.
 
 =head2 $tz->name()
 
+This returns the offset string form.
+
 =head2 $tz->short_name_for_datetime()
 
-Both of these methods return the offset in string form.
+This returns the offset string form.
 
 =head1 SUPPORT
 

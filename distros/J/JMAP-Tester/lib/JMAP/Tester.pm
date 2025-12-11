@@ -1,7 +1,7 @@
 use v5.14.0;
 use warnings;
 
-package JMAP::Tester 0.105;
+package JMAP::Tester 0.107;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use Moo;
@@ -116,17 +116,55 @@ my $Failsafe = sub {
   });
 };
 
+#pod =attr json_pretty
+#pod
+#pod This is a boolean which, if true, will cause the JMAP::Tester object to
+#pod canonicalize and pretty-print generated JSON.
+#pod
+#pod =cut
+
+has json_pretty => (
+  is => 'ro',
+  default => 0,
+);
+
+#pod =attr json_codec
+#pod
+#pod This is an object that implements the JSON API, roughly meaning that it
+#pod provides C<encode> and C<decode> methods.  You probably won't need to use
+#pod anything but the default version outside of exceptional cases.
+#pod
+#pod =cut
+
 has json_codec => (
   is => 'bare',
+  reader => '_json_codec',
+  lazy => 1,
   handles => {
-    json_encode => 'encode',
     json_decode => 'decode',
   },
   default => sub {
-    require JSON;
-    return JSON->new->utf8->convert_blessed;
+    my ($self) = @_;
+
+    require JSON::XS;
+    my $json = JSON::XS->new->utf8->convert_blessed;
+
+    if ($self->json_pretty) {
+      $json = $json->pretty->canonical;
+    }
+    return $json;
   },
 );
+
+sub json_encode {
+  my ($self, $data) = @_;
+
+  if ($data->$_isa('JMAP::Tester::JSONLiteral')) {
+    return $data->bytes;
+  }
+
+  $self->_json_codec->encode($data);
+}
 
 #pod =attr use_json_typists
 #pod
@@ -172,6 +210,24 @@ has ua => (
     require JMAP::Tester::UA::LWP;
     JMAP::Tester::UA::LWP->new;
   },
+);
+
+#pod =attr ident
+#pod
+#pod This is a (preferably short) string that can be used to identify this
+#pod JMAP::Tester object.  It's used in request logging, so that client telemetry
+#pod can be correlated to a specific client object.  If no ident is given, an ident
+#pod will be generated, but it is not guaranteed to be unique.
+#pod
+#pod =cut
+
+has ident => (
+  is => 'ro',
+  default => sub {
+    my ($self) = @_;
+    state $ident_counter = 0;
+    return "jmap-tester-" . (++$ident_counter);
+  }
 );
 
 #pod =attr default_using
@@ -303,51 +359,59 @@ sub request {
 
   my %default_args = %{ $self->default_arguments };
 
-  my $request = _ARRAY0($input_request)
-              ? { methodCalls => $input_request }
-              : { %$input_request };
+  my $request;
 
-  for my $call (@{ $request->{methodCalls} }) {
-    my $copy = [ @$call ];
-    if (defined $copy->[2]) {
-      $seen{$call->[2]}++;
-    } else {
-      my $next;
-      do { $next = $ident++ } until ! $seen{$ident}++;
-      $copy->[2] = $next;
-    }
+  if ($input_request->$_isa('JMAP::Tester::JSONLiteral')) {
+    # We'll be "encoding" (read: not really encoding) this directly, with no
+    # munging of the content, no creation of call ids, etc.
+    $request = $input_request;
+  } else {
+    $request = _ARRAY0($input_request)
+             ? { methodCalls => $input_request }
+             : { %$input_request };
 
-    my %arg = (
-      %default_args,
-      %{ $copy->[1] // {} },
-    );
-
-    for my $key (keys %arg) {
-      if ( ref $arg{$key}
-        && ref $arg{$key} eq 'SCALAR'
-        && ! defined ${ $arg{$key} }
-      ) {
-        delete $arg{$key};
+    for my $call (@{ $request->{methodCalls} }) {
+      my $copy = [ @$call ];
+      if (defined $copy->[2]) {
+        $seen{$call->[2]}++;
+      } else {
+        my $next;
+        do { $next = $ident++ } until ! $seen{$ident}++;
+        $copy->[2] = $next;
       }
+
+      my %arg = (
+        %default_args,
+        %{ $copy->[1] // {} },
+      );
+
+      for my $key (keys %arg) {
+        if ( ref $arg{$key}
+          && ref $arg{$key} eq 'SCALAR'
+          && ! defined ${ $arg{$key} }
+        ) {
+          delete $arg{$key};
+        }
+      }
+
+      $copy->[1] = \%arg;
+
+      # Originally, I had a second argument, \%stash, which was the same for the
+      # whole ->request, so you could store data between munges.  Removed, for
+      # now, as YAGNI. -- rjbs, 2019-03-04
+      $self->munge_method_triple($copy);
+
+      push @suffixed, $copy;
     }
 
-    $copy->[1] = \%arg;
+    $request->{methodCalls} = \@suffixed;
 
-    # Originally, I had a second argument, \%stash, which was the same for the
-    # whole ->request, so you could store data between munges.  Removed, for
-    # now, as YAGNI. -- rjbs, 2019-03-04
-    $self->munge_method_triple($copy);
+    $request = $request->{methodCalls}
+      if $ENV{JMAP_TESTER_NO_WRAPPER} && _ARRAY0($input_request);
 
-    push @suffixed, $copy;
-  }
-
-  $request->{methodCalls} = \@suffixed;
-
-  $request = $request->{methodCalls}
-    if $ENV{JMAP_TESTER_NO_WRAPPER} && _ARRAY0($input_request);
-
-  if ($self->_has_default_using && ! exists $request->{using}) {
-    $request->{using} = $self->default_using;
+    if ($self->_has_default_using && ! exists $request->{using}) {
+      $request->{using} = $self->default_using;
+    }
   }
 
   my $json = $self->json_encode($request);
@@ -370,7 +434,7 @@ sub request {
     my ($res) = @_;
 
     unless ($res->is_success) {
-      $self->_logger->log_jmap_response({ http_response => $res });
+      $self->_logger->log_jmap_response($self, { http_response => $res });
       return Future->fail(
         JMAP::Tester::Result::Failure->new({ http_response => $res })
       );
@@ -405,11 +469,14 @@ sub _jresponse_from_hresponse {
     abort("illegal response to JMAP request: $data");
   }
 
-  $self->_logger->log_jmap_response({
-    jmap_array    => $items,
-    json          => $json,
-    http_response => $http_res,
-  });
+  $self->_logger->log_jmap_response(
+    $self,
+    {
+      jmap_array    => $items,
+      json          => $json,
+      http_response => $http_res,
+    }
+  );
 
   return $self->response_class->new({
     items => $items,
@@ -492,7 +559,7 @@ sub upload {
     my ($res) = @_;
 
     unless ($res->is_success) {
-      $self->_logger->log_upload_response({ http_response => $res });
+      $self->_logger->log_upload_response($self, { http_response => $res });
       return Future->fail(
         JMAP::Tester::Result::Failure->new({ http_response => $res })
       );
@@ -501,11 +568,14 @@ sub upload {
     my $json = $res->decoded_content;
     my $blob = $self->apply_json_types( $self->json_decode( $json ) );
 
-    $self->_logger->log_upload_response({
-      json          => $json,
-      blob_struct   => $blob,
-      http_response => $res,
-    });
+    $self->_logger->log_upload_response(
+      $self,
+      {
+        json          => $json,
+        blob_struct   => $blob,
+        http_response => $res,
+      }
+    );
 
     return Future->done(
       JMAP::Tester::Result::Upload->new({
@@ -628,9 +698,7 @@ sub download {
   my $future = $res_f->then(sub {
     my ($res) = @_;
 
-    $self->_logger->log_download_response({
-      http_response => $res,
-    });
+    $self->_logger->log_download_response($self, { http_response => $res });
 
     unless ($res->is_success) {
       return Future->fail(
@@ -1051,7 +1119,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.105
+version 0.107
 
 =head1 OVERVIEW
 
@@ -1119,10 +1187,28 @@ lower the minimum required perl.
 If true, this indicates that the various network-accessing methods should
 return L<Future> objects rather than immediate results.
 
+=head2 json_pretty
+
+This is a boolean which, if true, will cause the JMAP::Tester object to
+canonicalize and pretty-print generated JSON.
+
+=head2 json_codec
+
+This is an object that implements the JSON API, roughly meaning that it
+provides C<encode> and C<decode> methods.  You probably won't need to use
+anything but the default version outside of exceptional cases.
+
 =head2 use_json_typists
 
 This attribute governs the conversion of JSON data into typed objects, using
 L<JSON::Typist>.  This attribute is true by default.
+
+=head2 ident
+
+This is a (preferably short) string that can be used to identify this
+JMAP::Tester object.  It's used in request logging, so that client telemetry
+can be correlated to a specific client object.  If no ident is given, an ident
+will be generated, but it is not guaranteed to be unique.
 
 =head2 default_using
 

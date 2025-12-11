@@ -1,4 +1,4 @@
-requires 'perl', '5.008005';
+requires 'perl', '5.020';
 
 requires 'DateTime::Format::Strptime', 0;
 requires 'File::ShareDir', 0;

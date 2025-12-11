@@ -52,7 +52,7 @@ has role => (is => 'ro');
 #@eon ex.cat
 sub cat { __PACKAGE__->new(role => 'cat') }
 
-#@eon ex.dog
+#@eon
 sub dog { __PACKAGE__->new(role => 'dog') }
 
 1;
@@ -62,11 +62,11 @@ sub dog { __PACKAGE__->new(role => 'dog') }
 ```
 Ex::Eon::AnimalEon#,2=
 Ex::Eon::AnimalEon#cat,10=ex.cat
-Ex::Eon::AnimalEon#dog,13=ex.dog
+Ex::Eon::AnimalEon#dog,13=Ex::Eon::AnimalEon#dog
 ```
 
 ```perl
-Aion::Pleroma->new->pleroma # --> {"Ex::Eon::AnimalEon" => "Ex::Eon::AnimalEon#new", "ex.dog" => "Ex::Eon::AnimalEon#dog", "ex.cat" => "Ex::Eon::AnimalEon#cat"}
+Aion::Pleroma->new->pleroma # --> {"Ex::Eon::AnimalEon" => "Ex::Eon::AnimalEon#new", "Ex::Eon::AnimalEon#dog" => "Ex::Eon::AnimalEon#dog", "ex.cat" => "Ex::Eon::AnimalEon#cat"}
 ```
 
 ## eon
@@ -90,7 +90,7 @@ $pleroma->eon # --> { "ex.cat" => $cat }
 ```perl
 my $pleroma = Aion::Pleroma->new;
 $pleroma->get('') # -> undef
-$pleroma->get('ex.dog')->role # => dog
+$pleroma->get('Ex::Eon::AnimalEon#dog')->role # => dog
 ```
 
 ## resolve ($key)
@@ -100,7 +100,7 @@ $pleroma->get('ex.dog')->role # => dog
 ```perl
 my $pleroma = Aion::Pleroma->new;
 $pleroma->resolve('e.ibex') # @=> e.ibex is'nt eon!
-$pleroma->resolve('ex.dog')->role # => dog
+$pleroma->resolve('Ex::Eon::AnimalEon#dog')->role # => dog
 ```
 
 # AUTHOR

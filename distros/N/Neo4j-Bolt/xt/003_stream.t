@@ -1,3 +1,5 @@
+use v5.12;
+use warnings;
 use Test::More;
 use Test::Exception;
 use Neo4j::Client;

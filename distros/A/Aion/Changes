@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion
 
+1.4 2025-12-11T07:32:57Z
+
+    - aspect eon work with 2
+
 1.3 2025-12-09T22:04:20Z
 
     - added dependency injection: aspect eon

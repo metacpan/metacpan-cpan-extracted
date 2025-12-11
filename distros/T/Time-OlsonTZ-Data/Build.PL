@@ -14,13 +14,28 @@ my $build = Module::Build->new(
 		"strict" => 0,
 		"warnings" => 0,
 	},
-	build_requires => {
-		"Module::Build" => "0.26",
-		"Test::More" => "0.41",
-		"perl" => "5.006",
-		"strict" => 0,
-		"warnings" => 0,
-	},
+	(eval { Module::Build->VERSION('0.4004'); 1 } ? (
+		test_requires => {
+			"Test::More" => "0.41",
+			"perl" => "5.006",
+			"strict" => 0,
+			"warnings" => 0,
+		},
+		build_requires => {
+			"Module::Build" => "0.26",
+			"perl" => "5.006",
+			"strict" => 0,
+			"warnings" => 0,
+		}
+	) : (
+		build_requires => {
+			"Module::Build" => "0.26",
+			"Test::More" => "0.41",
+			"perl" => "5.006",
+			"strict" => 0,
+			"warnings" => 0,
+		}
+	)),
 	requires => {
 		"Carp" => 0,
 		"Exporter" => 0,
@@ -32,16 +47,16 @@ my $build = Module::Build->new(
 		"warnings" => 0,
 	},
 	dynamic_config => 0,
-	meta_add => { distribution_type => "module" },
 	meta_merge => {
 		"meta-spec" => { version => "2" },
 		resources => {
 			bugtracker => {
-				mailto => "bug-Time-OlsonTZ-Download".
-					"\@rt.cpan.org",
-				web => "https://rt.cpan.org/Public/Dist/".
-					"Display.html?Name=".
-					"Time-OlsonTZ-Download",
+				web => "https://github.com/Grinnz/Time-OlsonTZ-Data/issues",
+			},
+			repository => {
+				type => "git",
+				url => "https://github.com/Grinnz/Time-OlsonTZ-Data.git",
+				web => "https://github.com/Grinnz/Time-OlsonTZ-Data",
 			},
 		},
 	},

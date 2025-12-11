@@ -1,9 +1,11 @@
 package NeoCon;
+use v5.12;
+use warnings;
+
 use IPC::Run qw/run/;
 use Carp qw/croak/;
 use File::Spec;
 use Cwd;
-use strict;
 
 my $VERBOSE = $ENV{NEOCON_VERBOSE} // 0;
 my $REUSE = $ENV{NEOCON_REUSE} // 1;

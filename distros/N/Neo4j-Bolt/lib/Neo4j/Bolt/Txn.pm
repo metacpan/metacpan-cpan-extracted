@@ -1,8 +1,11 @@
 package Neo4j::Bolt::Txn;
+use v5.12;
+use warnings;
+
 use Carp qw/croak/;
 
 BEGIN {
-  our $VERSION = "0.5000";
+  our $VERSION = "0.5001";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::ResultStream;  
   require XSLoader;
@@ -41,8 +44,8 @@ sub run_query {
   unless ($query) {
     die "Arg 1 should be Cypher query string";
   }
-  if ($parms && !(ref $parms == 'HASH')) {
-    die "Arg 2 should be a hashref of { param => $value, ... }";
+  if (defined $parms && !(ref $parms eq 'HASH')) {
+    die "Arg 2 should be a hashref of { param => \$value, ... }";
   }
   utf8::upgrade($query);
   return $self->run_query_($query, $parms ? $parms : {}, 0);
@@ -54,8 +57,8 @@ sub send_query {
   unless ($query) {
     die "Arg 1 should be Cypher query string";
   }
-  if ($parms && !(ref $parms == 'HASH')) {
-    die "Arg 2 should be a hashref of { param => $value, ... }";
+  if (defined $parms && !(ref $parms eq 'HASH')) {
+    die "Arg 2 should be a hashref of { param => \$value, ... }";
   }
   utf8::upgrade($query);
   return $self->run_query_($query, $parms // {}, 1);

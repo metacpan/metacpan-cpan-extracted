@@ -6,11 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'File/Sticker.pm',
     'File/Sticker/Database.pm',
+    'File/Sticker/Derive.pm',
+    'File/Sticker/Derive/Common.pm',
+    'File/Sticker/Derive/Title.pm',
     'File/Sticker/Scribe.pm',
     'File/Sticker/Scribe/Exif.pm',
     'File/Sticker/Scribe/Gif.pm',

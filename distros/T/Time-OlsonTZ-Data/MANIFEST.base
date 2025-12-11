@@ -10,6 +10,7 @@ lib/Time/OlsonTZ/Data.pm
 lib/Time/OlsonTZ/Data.pm.tpl
 lib/Time/OlsonTZ/Data/country_selection.tzp
 prebuild
+prepend_changes
 t/links.t
 t/names.t
 t/pod_cvg.t

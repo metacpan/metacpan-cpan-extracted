@@ -1,0 +1,25 @@
+#!perl
+
+use 5.040;
+use Path::Tiny 'path';
+use Time::Piece 'localtime';
+
+use lib path(__FILE__)->realpath->sibling('lib')->stringify;
+use Time::OlsonTZ::Data qw(olson_version olson_canonical_names olson_link_names);
+
+my $module_version = Time::OlsonTZ::Data->VERSION;
+my $olson_version = olson_version;
+my $canonical = keys %{+olson_canonical_names};
+my $links = keys %{+olson_link_names};
+my $date = localtime->strftime('%Y-%m-%d');
+
+my $prepend_changes = <<"EOF";
+$module_version - $date
+
+  * Olson database version $olson_version: $canonical canonical zones, $links links
+
+EOF
+
+path(__FILE__)->realpath->sibling('Changes')->edit_utf8(sub {
+  $_ = $prepend_changes . $_
+});

@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Mp3;
-$File::Sticker::Scribe::Mp3::VERSION = '4.0101';
+$File::Sticker::Scribe::Mp3::VERSION = '4.301';
 =head1 NAME
 
 File::Sticker::Scribe::Mp3 - read, write and standardize meta-data from MP3 file
 
 =head1 VERSION
 
-version 4.0101
+version 4.301
 
 =head1 SYNOPSIS
 
@@ -110,6 +110,7 @@ sub known_fields {
         performer=>'TEXT',
         description=>'TEXT',
         genre=>'TEXT',
+        mood=>'TEXT',
         song=>'TEXT',
         url=>'TEXT',
         year=>'NUMBER',
@@ -161,6 +162,10 @@ sub read_meta {
         elsif ($field eq 'genre')
         {
             $meta{'genre'} = $mp3->genre();
+        }
+        elsif ($field eq 'mood')
+        {
+            $meta{'mood'} = $mp3->select_id3v2_frame_by_descr('TMOO');
         }
         elsif ($field eq 'year')
         {
@@ -253,6 +258,10 @@ sub replace_one_field {
     {
         $mp3->genre_set($value);
     }
+    elsif ($field eq 'mood')
+    {
+        $mp3->select_id3v2_frame_by_descr('TMOO', $value);
+    }
     elsif ($field eq 'year')
     {
         $mp3->year_set($value);
@@ -295,7 +304,7 @@ sub replace_one_field {
 =head2 delete_field_from_file
 
 Remove the given field. This does no checking.
-This doesn't completely remove it, merely sets it to the empty string.
+For some fields, they cannot be removed, merely set to the empty string.
 
     $scribe->delete_field_from_file(filename=>$filename,field=>$field);
 
@@ -327,6 +336,10 @@ sub delete_field_from_file {
     elsif ($field eq 'creator')
     {
         $mp3->artist_set('');
+    }
+    elsif ($field eq 'mood')
+    {
+        $mp3->select_id3v2_frame_by_descr('TMOO', undef);
     }
     elsif ($field eq 'performer')
     {

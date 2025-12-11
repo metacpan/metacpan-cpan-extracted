@@ -31,6 +31,7 @@ lib/Neo4j/Bolt/ResultStream.pm
 lib/Neo4j/Bolt/ResultStream.xs
 lib/Neo4j/Bolt/CResultStream.pm
 lib/Neo4j/Bolt/CResultStream.xs
+lib/Neo4j/Bolt/Txn.md
 lib/Neo4j/Bolt/Txn.pm
 lib/Neo4j/Bolt/Txn.xs
 lib/Neo4j/Bolt/CTypeHandlers.md

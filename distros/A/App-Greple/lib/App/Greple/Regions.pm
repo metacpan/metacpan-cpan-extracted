@@ -1,6 +1,6 @@
 package App::Greple::Regions;
 
-use v5.14;
+use v5.24;
 use warnings;
 no  warnings "experimental::regex_sets";
 use Carp;
@@ -103,10 +103,9 @@ sub match_regions {
 
     while (/$regex/gp) {
 	##
-	## this is much faster than:
-	## my($s, $e) = ($-[0], $+[0]);
-	##
-	## calling pos() cost is not neglective, either.
+	## Using $-[0]/$+[0] is extremely slow with UTF-8 text.
+	## Still not fixed in Perl 5.34.
+	## https://qiita.com/kaz-utashiro/items/2facc87ea9ba25e81cd9
 	##
 	my $pos = pos();
 	push @regions, [ $pos - length(${^MATCH}), $pos ];
@@ -128,7 +127,7 @@ sub match_regions_by_group {
 	    for my $i (1 .. $#-) {
 		$-[$i] // next;
 		push @regions, [ $-[$i], $+[$i] ];
-		push @{$regions[-1]}, $i if $index
+		push @{$regions[-1]}, $i - 1 if $index
 	    }
 	}
     }
@@ -144,7 +143,7 @@ sub classify_regions {
     my @by = @{+shift};
     my @table;
     for my $i (keys @by) {
-	my($from, $to) = @{$by[$i]};
+	my($from, $to) = $by[$i]->@*;
 	while (@list and $list[0][1] < $from) {
 	    shift @list;
 	}
@@ -153,7 +152,7 @@ sub classify_regions {
 	}
 	my $t = $table[$i] = [];
 	for (my $i = 0; ($i < @list) and ($list[$i][0] < $to); $i++) {
-	    push @$t, [ @{$list[$i]} ];
+	    push @$t, [ $list[$i]->@* ];
 	}
     }
     @table;
@@ -164,7 +163,7 @@ sub classify_regions_strict {
     my @by = @{+shift};
     my @table;
     for my $i (keys @by) {
-	my($from, $to) = @{$by[$i]};
+	my($from, $to) = $by[$i]->@*;
 	while (@list and $list[0][0] < $from) {
 	    shift @list;
 	}

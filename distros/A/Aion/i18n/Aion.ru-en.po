@@ -146,11 +146,25 @@ msgstr "The `eon` aspect implements the **Dependency Injection** pattern."
 msgid "Он связывает свойство с сервисом из контейнера `$Aion::pleroma`."
 msgstr "It associates a property with a service from the `$Aion::pleroma` container."
 
-msgid "Значением аспекта может быть ключ сервиса или 1, тогда ключём будет пакет в `isa => Object['Packet']`"
-msgstr "The aspect value can be the service key or 1, then the key will be the package in `isa => Object['Packet']`"
+msgid "Значением аспекта может быть ключ сервиса, 1 или 2."
+msgstr "The aspect value can be a service key, 1 or 2."
 
-msgid "Пример с 1-й:"
-msgstr "Example from 1st:"
+msgid "* Если 1 – тогда ключём будет пакет в `isa => Object['Packet']`.\n"
+"* Если 2 – тогда ключём будет \"пакет#свойство\"."
+msgstr "* If 1 – then the key will be the package in `isa => Object['Packet']`.\n"
+"* If 2 – then the key will be “package#property”."
+
+msgid "Файл lib/CounterEon.pm:"
+msgstr "File lib/CounterEon.pm:"
+
+msgid "Файл lib/AccomulatorEon.pm:"
+msgstr "File lib/AccomulatorEon.pm:"
+
+msgid "Файл lib/PowerEon.pm:"
+msgstr "lib/PowerEon.pm file:"
+
+msgid "См. [Aion::Pleroma](https://metacpan.org/pod/Aion::Pleroma)."
+msgstr "See [Aion::Pleroma](https://metacpan.org/pod/Aion::Pleroma)."
 
 msgid "`$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер."
 msgstr "`$sub` is called after setting the property in the constructor (`new`) or via a setter."

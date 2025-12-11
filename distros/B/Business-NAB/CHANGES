@@ -1,14 +1,22 @@
 ==================================================
-Changes from 2024-11-25 00:00:00 +0000 to present.
+Changes from 2024-12-10 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.01 at 2025-11-25 10:45:31 +0000
+version 0.02 at 2025-12-10 14:43:23 +0000
 -----------------------------------------
 
-  Change: 7f1ba085f5878a178a20d8c20af974ca02a44c6f
+  Change: 7907d40edf3de7ebd8b475308638652d7141e6ad
   Author: Lee Johnson <lee@payprop.com>
-  Date : 2025-11-25 10:38:54 +0000
+  Date : 2025-12-10 08:53:46 +0000
+
+    add LICENSE.md
+
+    the same as found in the dist .gz file just renamed to .md for github 
+
+  Change: f5b943403505e35cf771799b637a4cae534ddc3a
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-11-25 10:46:33 +0000
 
     convert the dist to Dist::Zilla
 

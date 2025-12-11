@@ -1,17 +1,16 @@
-use v5.10;
+use v5.12;
+use warnings;
+
+use Alien::Base::Wrapper qw( Neo4j::Client !export );
+use Config;
 use ExtUtils::MakeMaker;
-use Neo4j::Client;
-use Alien::OpenSSL;
 use Data::Dumper;
+use Text::ParseWords qw/shellwords/;
 use Try::Tiny;
 use File::Spec;
-use Config;
 use Cwd qw/realpath/;
-use strict;
 
-# ensure that only Neo4j::Client library is used.
-
-my $LDDLFLAGS = $Config{lddlflags};
+die "OS unsupported\n64 bit integers required\n" unless $Config{use64bitint};
 
 my $META = {
   resources => {
@@ -37,12 +36,12 @@ my $META = {
     develop => {
       requires => {
         'Devel::PPPort' => '3.63',
-	'Inline::C' => 0,  # in t/Boltfile.pm, used via xt/003_stream.t
+        'Inline::C' => '0.56',  # in t/Boltfile.pm, used via xt/003_stream.t
 	#'IPC::Run' => 0,  # in t/lib/NeoCon.pm, but not actually used anywhere
       },
       recommends => {
-        'Path::Tiny' => 0,  # pod2md.PL
-        'Pod::Markdown' => 0,  # pod2md.PL
+        'Path::Tiny' => '0.054',  # pod2md.PL
+        'Pod::Markdown' => '3.100',  # pod2md.PL
       },
     },
   },
@@ -62,36 +61,38 @@ if ($neo_info) {
   };
 }
 
-my @ccflags;
+my @define;
 
 # NEO4J_BOLT_TYPES_FAST enables special case code in CTypeHandlers that will
 #  read the hash ref entries of Neo4j::Bolt::DateTime & friends directly when
 #  used as query parameters. Without it, they will be read using the generic
 #  Neo4j::Types methods instead. This works just as well, but is slower.
-push @ccflags, '-DNEO4J_BOLT_TYPES_FAST' unless $ENV{NO_NEO4J_BOLT_TYPES_FAST};
+push @define, '-DNEO4J_BOLT_TYPES_FAST' unless $ENV{NO_NEO4J_BOLT_TYPES_FAST};
 
 # NEO4J_CORE_BOOLS sets the boolean values returned from Neo4j to be Perl core
 #  "distinguished" booleans on Perl v5.36 and newer. Without it, blessed
 #  JSON::PP::Boolean instances will always be used, even on Perl v5.36+.
-push @ccflags, '-DNEO4J_CORE_BOOLS' unless $ENV{NO_NEO4J_CORE_BOOLS};
+push @define, '-DNEO4J_CORE_BOOLS' unless $ENV{NO_NEO4J_CORE_BOOLS};
+
+my %alien_flags = Alien::Base::Wrapper->mm_args;
+$alien_flags{DEFINE} = join ' ', shellwords($alien_flags{DEFINE} // ''), @define;
+$alien_flags{INC} = join ' ', shellwords($alien_flags{INC} // ''), '-iquote'.realpath('include');
 
 WriteMakefile(
   NAME => 'Neo4j::Bolt',
   VERSION_FROM => 'lib/Neo4j/Bolt.pm',
   MIN_PERL_VERSION => '5.012',
   CONFIGURE_REQUIRES => {
-    'Alien::OpenSSL' => 0,
+    'Alien::Base::Wrapper' => '0.04',
     'ExtUtils::MakeMaker' => '7.12',
-    'Neo4j::Client' => '0.54',
+    'Neo4j::Client' => '0.56',
     'Try::Tiny' => 0,
   },
   BUILD_REQUIRES => {
     'ExtUtils::Typemaps' => '3.24',  # embedded typemap
   },
   PREREQ_PM => {
-    'Alien::OpenSSL' => 0,
-    'DateTime' => 0,
-    'Neo4j::Client' => '0.54',
+    'Neo4j::Client' => '0.56',
     'Neo4j::Types' => '2.00',
     'JSON::PP' => 0,
     'URI' => 0,
@@ -100,16 +101,12 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Test::Exception' => 0,
     'Test::Neo4j::Types' => '0.06',
+    'Try::Tiny' => 0,
   },
   ABSTRACT => "Neo4j server agent using Bolt protocol",
   AUTHOR => ['Mark A. Jensen (majensen -at- cpan -dot- org)'],
   LICENSE => 'apache_2_0',
-  CCFLAGS => join(' ',Neo4j::Client->cflags,@ccflags),
-  LIBS => join(' ',Neo4j::Client->libs_static,Alien::OpenSSL->libs_static),
-  INC => "-iquote".realpath('.')."/include",
-  # avoid a factory libneo4j-client in a standard location (possibly
-  # in lddlflags):
-  LDDLFLAGS => join(' ',Neo4j::Client->libs_static,$LDDLFLAGS),
+  %alien_flags,
   test => {TESTS => 't/*.t'},
   clean => {FILES => "include/ppport.h t/neo_info"},
   PL_FILES => { "pod2md.PL" => [qw(
@@ -163,7 +160,7 @@ END
 
 sub prompt_for_db {
   my %neo_info;
-  my $ans;
+  my $ans = '';
   while ($ans !~ /^[yn]/i) {
     $ans = prompt("Perform read-only tests on a local database?: ", "n");
   }
@@ -172,7 +169,7 @@ sub prompt_for_db {
   $neo_info{host} = prompt("Host:port: ", "localhost:7687");
   $neo_info{user} = prompt("User: ","");
   $neo_info{pass} = prompt("Pass: ","");
-  undef $ans;
+  $ans = '';
   while ($ans !~ /^[yn]/i) {
     $ans = prompt("Will you allow add/delete tests on your database (cruft will be removed)?: ", "n");
   }

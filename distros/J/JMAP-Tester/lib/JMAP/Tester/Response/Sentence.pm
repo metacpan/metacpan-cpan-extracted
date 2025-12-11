@@ -1,5 +1,5 @@
 use v5.14.0;
-package JMAP::Tester::Response::Sentence 0.105;
+package JMAP::Tester::Response::Sentence 0.107;
 # ABSTRACT: a single triple within a JMAP response
 
 use Moo;
@@ -141,7 +141,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.105
+version 0.107
 
 =head1 OVERVIEW
 

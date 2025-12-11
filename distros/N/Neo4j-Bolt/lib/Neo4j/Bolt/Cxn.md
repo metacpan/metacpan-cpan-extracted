@@ -34,19 +34,21 @@ a call to `Neo4j::Bolt->connect()`.
     Returns a string representing the major and minor Bolt protocol version of the 
     server, as "&lt;major>.&lt;minor>", or the empty string if not connected.
 
-- run\_query($cypher\_query, \[$param\_hash\])
+- run\_query($cypher\_query, \[$param\_hash\], \[$db\_name\])
 
     Run a [Cypher](https://neo4j.com/docs/cypher-manual/current/) query on
     the server. Returns a [Neo4j::Bolt::ResultStream](/lib/Neo4j/Bolt/ResultStream.md) which can be iterated
     to retrieve query results as Perl types and structures. \[$param\_hash\]
     is an optional hashref of the form `{ param => $value, ... }`.
+    If `$db_name` is not given, the value of the global variable
+    `$Neo4j::Bolt::DEFAULT_DB` will be used instead.
 
-- send\_query($cypher\_query, \[$param\_hash\])
+- send\_query($cypher\_query, \[$param\_hash\], \[$db\_name\])
 
     Send a [Cypher](https://neo4j.com/docs/cypher-manual/current/) query to
     the server. All results (except error info) are discarded.
 
-- do\_query($cypher\_query, \[$param\_hash\])
+- do\_query($cypher\_query, \[$param\_hash\], \[$db\_name\])
 
         ($stream, @rows) = do_query($cypher_query);
         $stream = do_query($cypher_query, $param_hash);

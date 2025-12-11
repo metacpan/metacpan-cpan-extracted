@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,6 @@
       "build" : {
          "requires" : {
             "Module::Build" : "0.26",
-            "Test::More" : "0.41",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -42,24 +41,36 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.41",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
       }
    },
    "provides" : {
       "Time::OlsonTZ::Data" : {
          "file" : "lib/Time/OlsonTZ/Data.pm",
-         "version" : "0.202502"
+         "version" : "0.202503"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Time-OlsonTZ-Download@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Time-OlsonTZ-Download"
+         "web" : "https://github.com/Grinnz/Time-OlsonTZ-Data/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Grinnz/Time-OlsonTZ-Data.git",
+         "web" : "https://github.com/Grinnz/Time-OlsonTZ-Data"
+      }
    },
-   "version" : "0.202502",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.202503",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,9 @@
+use v5.12;
+use warnings;
 use Test::More;
 use Neo4j::Bolt::NeoValue;
+
+my ($n1, $n2, $r1, $s, $v);
 
 $n1 = bless { id => 236874, element_id => "236874", labels => ["La", "bels"] }, "Neo4j::Bolt::Node";
 $s = { _node => 236874, _element_id => "236874", _labels => ["La", "bels"] };

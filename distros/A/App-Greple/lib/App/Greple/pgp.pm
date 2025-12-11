@@ -1,33 +1,65 @@
 =head1 NAME
 
-pgp - Greple module to handle pgp files
+pgp - Greple module to handle PGP encrypted files
 
 =head1 SYNOPSIS
 
-greple -Mpgp [ --pass phrase ]
+greple -Mpgp pattern *.gpg
+
+greple -Mpgp --pgppass 'passphrase' pattern file.gpg
 
 =head1 DESCRIPTION
 
-Invoke PGP decrypt command for files with I<.pgp>, I<.gpg> or I<.asc>
-suffix.  PGP passphrase is asked only once at the beginning of command
-execution.
+Enables searching within PGP/GPG encrypted files.  Files with
+I<.pgp>, I<.gpg>, or I<.asc> extensions are automatically decrypted.
+Passphrase is requested interactively once and cached for subsequent
+files.
 
-=head1 OPTION
+=head1 REQUIREMENTS
+
+This module requires the B<gpg> (GnuPG) command to be installed and
+available in PATH.
+
+=head1 OPTIONS
 
 =over 7
 
 =item B<--pgppass> I<passphrase>
 
-You can specify PGP passphrase by this option.  Generally, it is not
-recommended to use.
+Specify the PGP passphrase directly.  B<Not recommended> for security
+reasons as the passphrase may be visible in process listings or shell
+history.  Use interactive input instead when possible.
 
 =back
+
+=head1 SECURITY NOTES
+
+=over 4
+
+=item *
+
+The passphrase is stored in memory during execution and cleared when
+no longer needed.
+
+=item *
+
+Decrypted content is processed through pipes and not written to disk.
+
+=item *
+
+Avoid using B<--pgppass> option in scripts or command history.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Greple>, L<gpg(1)>
 
 =cut
 
 package App::Greple::pgp;
 
-use v5.14;
+use v5.24;
 use warnings;
 use Carp;
 

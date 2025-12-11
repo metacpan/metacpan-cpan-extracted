@@ -1,9 +1,9 @@
 package Neo4j::Bolt::Relationship;
 # ABSTRACT: Representation of Neo4j Relationship
 
-$Neo4j::Bolt::Relationship::VERSION = '0.5000';
+$Neo4j::Bolt::Relationship::VERSION = '0.5001';
 
-use strict;
+use v5.12;
 use warnings;
 
 use parent 'Neo4j::Types::Relationship';
@@ -75,9 +75,12 @@ Neo4j::Bolt::Relationship - Representation of a Neo4j Relationship
  $reln = ( $cxn->run_query($q)->fetch_next )[0];
  
  $reln_id       = $reln->{id};
+ $reln_eltid    = $reln->{element_id};
  $reln_type     = $reln->{type};
  $start_node_id = $reln->{start};
+ $start_node_el = $reln->{start_element_id};
  $end_node_id   = $reln->{end};
+ $end_node_el   = $reln->{end_element_id};
  $properties    = $reln->{properties} // {};
  %properties    = %$properties;
  
@@ -107,13 +110,19 @@ L<Neo4j::Types::Relationship>:
 
 =over
 
+=item * L<B<element_id()>|Neo4j::Types::Relationship/"element_id">
+
 =item * L<B<get()>|Neo4j::Types::Relationship/"get">
 
 =item * L<B<id()>|Neo4j::Types::Relationship/"id">
 
 =item * L<B<properties()>|Neo4j::Types::Relationship/"properties">
 
+=item * L<B<start_element_id()>|Neo4j::Types::Relationship/"start_element_id">
+
 =item * L<B<start_id()>|Neo4j::Types::Relationship/"start_id">
+
+=item * L<B<end_element_id()>|Neo4j::Types::Relationship/"end_element_id">
 
 =item * L<B<end_id()>|Neo4j::Types::Relationship/"end_id">
 
@@ -130,16 +139,20 @@ The following additional method is provided:
  $simple = $reln->as_simple;
  
  $reln_id       = $simple->{_relationship};
+ $reln_el       = $simple->{_element_id};
  $reln_type     = $simple->{_type};
  $start_node_id = $simple->{_start};
+ $start_node_el = $simple->{_start_element_id};
  $end_node_id   = $simple->{_end};
+ $end_node_el   = $simple->{_end_element_id};
  $value1        = $simple->{property1};
  $value2        = $simple->{property2};
 
 Get relationship as a simple hashref in the style of L<REST::Neo4p>.
 
-The value of properties named C<_relationship>, C<_type>, C<_start>
-or C<_end> will be replaced with the relationship's metadata.
+The value of properties named C<_relationship>, C<_element_id>,
+C<_type>, C<_start>, C<_start_element_id>, C<_end>, or
+C<_end_element_id> will be replaced with the relationship's metadata.
 
 =back
 

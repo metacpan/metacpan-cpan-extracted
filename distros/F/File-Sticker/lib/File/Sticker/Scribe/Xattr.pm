@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Xattr;
-$File::Sticker::Scribe::Xattr::VERSION = '4.0101';
+$File::Sticker::Scribe::Xattr::VERSION = '4.301';
 =head1 NAME
 
 File::Sticker::Scribe::Xattr - read, write and standardize meta-data from ExtAttr file
 
 =head1 VERSION
 
-version 4.0101
+version 4.301
 
 =head1 SYNOPSIS
 

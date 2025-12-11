@@ -38,6 +38,7 @@ If a query returns the same node twice, two separate
 This class provides the following methods defined by
 [Neo4j::Types::Node](https://metacpan.org/pod/Neo4j::Types::Node):
 
+- [**element\_id()**](https://metacpan.org/pod/Neo4j::Types::Node#element_id)
 - [**get()**](https://metacpan.org/pod/Neo4j::Types::Node#get)
 - [**id()**](https://metacpan.org/pod/Neo4j::Types::Node#id)
 - [**labels()**](https://metacpan.org/pod/Neo4j::Types::Node#labels)
@@ -50,14 +51,15 @@ The following additional method is provided:
         $simple  = $node->as_simple;
         
         $node_id = $simple->{_node};
+        $eid     = $simple->{_element_id};
         @labels  = @{ $simple->{_labels} };
         $value1  = $simple->{property1};
         $value2  = $simple->{property2};
 
     Get node as a simple hashref in the style of [REST::Neo4p](https://metacpan.org/pod/REST::Neo4p).
 
-    The value of properties named `_node` or `_labels` will be
-    replaced with the node's metadata.
+    The value of properties named `_node`, `_element_id`, or
+    `_labels` will be replaced with the node's metadata.
 
 # SEE ALSO
 

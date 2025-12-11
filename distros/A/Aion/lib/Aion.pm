@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "1.3";
+our $VERSION = "1.4";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -146,15 +146,22 @@ sub eon_aspect {
 	my ($key, $feature) = @_;
 
 	die "eon is not compatible with default!" if $feature->{opt}{default};
-	
+
 	require Aion::Pleroma, $pleroma = Aion::Pleroma->new unless $pleroma;
-	
+
 	if($key eq 1) {
 		my $isa = $feature->{opt}{isa};
 		$key = $isa && $isa->{name} eq "Object" && $isa->{args}[0]
 			or die "use: has $feature->{name} => (isa => Object[...], eon => 1)";
 	}
-	
+	elsif($key eq 2) {
+		my $isa = $feature->{opt}{isa};
+		$key = ($isa && $isa->{name} eq "Object" && $isa->{args}[0]
+			or die "use: has $feature->{name} => (isa => Object[...], eon => 2)")
+		. "#$feature->{name}";
+		
+	}
+
 	default_aspect(sub { $pleroma->resolve($key) }, $feature);
 }
 
@@ -529,7 +536,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-1.3
+1.4
 
 =head1 SYNOPSIS
 
@@ -987,34 +994,70 @@ By default it is only enabled if the default is a subroutine.
 	$ex1->has_x # -> ""
 	$ex1->x     # -> 6
 
-=head2 eon => (1|$key)
+=head2 eon => (1|2|$key)
 
 The C<eon> aspect implements the B<Dependency Injection> pattern.
 
 It associates a property with a service from the C<$Aion::pleroma> container.
 
-The aspect value can be the service key or 1, then the key will be the package in C<< isa =E<gt> Object['Packet'] >>
+The aspect value can be a service key, 1 or 2.
 
-Example from 1st:
+=over
 
-	package CounterEon { use Aion;
-		has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
-	}
+=item * If 1 – then the key will be the package in C<< isa =E<gt> Object['Packet'] >>.
+
+=item * If 2 – then the key will be “package#property”.
+
+=back
+
+File lib/CounterEon.pm:
+
+	package CounterEon;
+	#@eon ex.counter
+	use Aion;
 	
-	package AccomulatorEon { use Aion;
-		has counter => (eon => 'ex.counter');
-	}
+	has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
 	
+	1;
+
+File lib/AccomulatorEon.pm:
+
+	package AccomulatorEon;
+	#@eon
+	use Aion;
+	
+	has power => (isa => Object['PowerEon'], eon => 2);
+	
+	1;
+
+lib/PowerEon.pm file:
+
+	package PowerEon;
+	use Aion;
+	
+	has counter => (eon => 'ex.counter');
+		
+	#@eon
+	sub power { shift->new }
+	
+	1;
+
+
+
 	{
+		use Aion::Pleroma;
 		local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
 			'ex.counter' => 'CounterEon#new',
 			AccomulatorEon => 'AccomulatorEon#new',
+			'PowerEon#power' => 'PowerEon#power',
 		});
 		
 		my $counter = $Aion::pleroma->get('ex.counter');
 	
-		$counter->accomulator->counter # -> $counter
+		$counter->accomulator->power->counter # -> $counter
 	}
+
+See L<Aion::Pleroma>.
 
 =head2 trigger => $sub
 

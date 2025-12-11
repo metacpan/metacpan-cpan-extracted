@@ -5,6 +5,8 @@ exclude = [
     "lib/DateTime/TimeZone/Catalog.pm",
     "lib/DateTime/TimeZone/{Africa,America,Antarctica,Asia,Atlantic,Australia,Europe,Indian,Pacific}/**/*",
     "lib/DateTime/TimeZone/{CET,CST6CDT,EET,EST5EDT,EST,HST,MET,MST7MDT,MST,PST8PDT,WET}.pm",
+    "META.yml",
+    "MYMETA.yml",
     "t/00-*",
     "t/author-*",
     "t/release-*",
@@ -16,51 +18,68 @@ exclude = [
 [commands.omegasort-gitignore]
 type = "both"
 include = "**/.gitignore"
-cmd = [ "omegasort", "--sort=path" ]
+cmd = ["omegasort", "--sort=path", "--unique"]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
-expect_stderr = true
 
 [commands.omegasort-stopwords]
 type = "both"
 include = ".stopwords"
-cmd = [ "omegasort", "--sort=text", "--case-insensitive" ]
+cmd = ["omegasort", "--sort=text", "--case-insensitive", "--unique"]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
-expect_stderr = true
 
 [commands.perlcritic]
 type = "lint"
-include = [ "**/*.{pl,pm,t,psgi}" ]
-cmd = [ "perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc" ]
+include = ["**/*.{pl,pm,t,psgi}"]
+cmd = ["perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 2
 
 [commands.perltidy]
 type = "both"
-include = [ "**/*.{pl,pm,t,psgi}" ]
-cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
-lint_flags = [ "--assert-tidy", "--no-standard-output", "--outfile=/dev/null" ]
-tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
+include = ["**/*.{pl,pm,t,psgi}"]
+cmd = ["perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc"]
+lint_flags = ["--assert-tidy", "--no-standard-output", "--outfile=/dev/null"]
+tidy_flags = ["--backup-and-modify-in-place", "--backup-file-extension=/"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 2
-expect_stderr = true
+ignore_stderr = "Begin Error Output Stream"
 
 [commands.podchecker]
 type = "lint"
-include = [ "**/*.{pl,pm,pod}" ]
-cmd = [ "podchecker", "--warnings", "--warnings" ]
-ok_exit_codes = [ 0, 2 ]
+include = ["**/*.{pl,pm,pod}"]
+cmd = ["podchecker", "--warnings", "--warnings"]
+ok_exit_codes = [0, 2]
 lint_failure_exit_codes = 1
-expect_stderr = true
+ignore_stderr = [".+ pod syntax OK", ".+ does not contain any pod commands"]
 
 [commands.podtidy]
 type = "tidy"
-include = [ "**/*.{pl,pm,pod}" ]
-cmd = [ "podtidy", "--columns", "80", "--inplace", "--nobackup" ]
+include = ["**/*.{pl,pm,pod}"]
+cmd = ["podtidy", "--columns", "80", "--inplace", "--nobackup"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
+
+[commands.prettier]
+type = "both"
+include = ["**/*.yml"]
+cmd = ["prettier", "--no-config", "--prose-wrap", "always", "--print-width", "100"]
+lint_flags = "--check"
+tidy_flags = "--write"
+ok_exit_codes = 0
+lint_failure_exit_codes = 1
+ignore_stderr = "Code style issues"
+
+[commands.taplo]
+type = "both"
+include = "**/*.toml"
+cmd = ["taplo", "format", "--option", "indent_string=    ", "--option", "column_width=100"]
+lint_flags = "--check"
+ok_exit_codes = 0
+lint_failure_exit_codes = 1
+ignore_stderr = "INFO taplo.+"

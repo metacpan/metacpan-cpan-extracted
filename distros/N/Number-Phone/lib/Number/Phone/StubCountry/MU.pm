@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135858;
+our $VERSION = 1.20251210153524;
 
 my $formatters = [
                 {
@@ -109,7 +109,7 @@ my $validators = {
               9[0-8]
             )|
             7(?:
-              0[0-6]|
+              0[0-7]|
               3[013]
             )
           )\\d{5}
@@ -129,59 +129,59 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{fr} = {"23020", "Région\ Nord",
-"230217", "Région\ Nord",
-"230213", "Région\ Nord",
-"230218", "Región\ Nord",
-"230210", "Région\ Nord",
-"23024", "Région\ Nord",
-"2304", "Région\ Centrale",
-"230212", "Région\ Nord",
-"230214", "Région\ Nord",
-"2306", "Région\ Sud",
+$areanames{es} = {"23028", "Región\ Norte",
+"23020", "Región\ Norte",
+"230210", "Región\ Norte",
+"230215", "Región\ Norte",
+"23026", "Región\ Norte",
+"230213", "Región\ Norte",
+"230211", "Región\ Norte",
+"2304", "Región\ Central",
+"230218", "Región\ Norte",
+"23024", "Región\ Norte",
+"23027", "Región\ Norte",
+"230217", "Región\ Norte",
+"230212", "Región\ Norte",
+"230216", "Región\ Norte",
+"230214", "Región\ Norte",
+"23023", "Región\ Norte",
+"2306", "Región\ Sur",};
+$areanames{en} = {"23020", "North\ Region",
+"23081", "Agalega",
+"23028", "North\ Region",
+"23026", "North\ Region",
+"230215", "North\ Region",
+"230210", "North\ Region",
+"230218", "North\ Region",
+"2304", "Central\ Region",
+"230211", "North\ Region",
+"230213", "North\ Region",
+"23083", "Rodrigues",
+"23024", "North\ Region",
+"230217", "North\ Region",
+"23027", "North\ Region",
+"23023", "North\ Region",
+"230214", "North\ Region",
+"230216", "North\ Region",
+"230212", "North\ Region",
+"2306", "South\ Region",};
+$areanames{fr} = {"230212", "Région\ Nord",
 "230216", "Région\ Nord",
-"23026", "Région\ Nord",
-"23028", "Région\ Nord",
+"230214", "Région\ Nord",
 "23023", "Région\ Nord",
+"2306", "Région\ Sud",
+"23024", "Région\ Nord",
+"230217", "Région\ Nord",
+"23027", "Région\ Nord",
+"230210", "Région\ Nord",
+"23026", "Région\ Nord",
 "230215", "Région\ Nord",
 "230211", "Région\ Nord",
-"23027", "Région\ Nord",};
-$areanames{en} = {"230212", "North\ Region",
-"230214", "North\ Region",
-"23024", "North\ Region",
-"2304", "Central\ Region",
-"230213", "North\ Region",
-"230218", "North\ Region",
-"230210", "North\ Region",
-"23020", "North\ Region",
-"230217", "North\ Region",
-"230215", "North\ Region",
-"230211", "North\ Region",
-"23027", "North\ Region",
-"23083", "Rodrigues",
-"23026", "North\ Region",
-"23028", "North\ Region",
-"23023", "North\ Region",
-"2306", "South\ Region",
-"230216", "North\ Region",
-"23081", "Agalega",};
-$areanames{es} = {"230215", "Región\ Norte",
-"230211", "Región\ Norte",
-"23027", "Región\ Norte",
-"23028", "Región\ Norte",
-"23026", "Región\ Norte",
-"23023", "Región\ Norte",
-"2306", "Región\ Sur",
-"230216", "Región\ Norte",
-"230212", "Región\ Norte",
-"230214", "Región\ Norte",
-"2304", "Región\ Central",
-"23024", "Región\ Norte",
-"230218", "Región\ Norte",
-"230213", "Región\ Norte",
-"230210", "Región\ Norte",
-"23020", "Región\ Norte",
-"230217", "Región\ Norte",};
+"230213", "Région\ Nord",
+"230218", "Región\ Nord",
+"2304", "Région\ Centrale",
+"23020", "Région\ Nord",
+"23028", "Région\ Nord",};
 my $timezones = {
                '' => [
                        'Indian/Mauritius'

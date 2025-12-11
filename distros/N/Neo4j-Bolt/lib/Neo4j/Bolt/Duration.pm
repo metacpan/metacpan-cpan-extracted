@@ -1,11 +1,10 @@
 package Neo4j::Bolt::Duration;
 # ABSTRACT: Representation of Neo4j duration struct
 
-$Neo4j::Bolt::Duration::VERSION = '0.5000';
+$Neo4j::Bolt::Duration::VERSION = '0.5001';
 
-use strict;
+use v5.12;
 use warnings;
-use DateTime;
 
 use parent 'Neo4j::Types::Duration';
 
@@ -27,6 +26,7 @@ sub nanoseconds {
 
 sub as_DTDuration {
   my ($self) = @_;
+  require DateTime::Duration;
   return DateTime::Duration->new(
     months => $self->{months},
     days => $self->{days},

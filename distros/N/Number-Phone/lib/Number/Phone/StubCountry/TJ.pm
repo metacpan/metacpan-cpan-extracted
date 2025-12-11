@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135859;
+our $VERSION = 1.20251210153525;
 
 my $formatters = [
                 {
@@ -50,7 +50,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[0-57-9]',
+                  'leading_digits' => '\\d',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
@@ -103,8 +103,10 @@ my $validators = {
             [09]\\d|
             1[0-27-9]|
             2[0-27]|
-            [34]0|
+            3[08]|
+            40|
             5[05]|
+            66|
             7[01578]|
             8[078]
           )\\d{7}
@@ -116,66 +118,66 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9923479", "Ayni",
-"9923318", "Muminobod",
-"9923442", "Gafurov",
-"9923451", "Chkalovsk",
-"9923242", "Khuroson",
-"9923251", "Kabodion",
-"9923246", "Vakhsh",
-"9923250", "Sarband",
-"9923132", "Jirgital",
-"9923136", "Vakhdat",
-"9923454", "Istravshan",
-"9923552", "Darvaz",
-"9923141", "Yavan",
-"9923556", "Rushan",
-"9923156", "Tavildara",
-"9923316", "Parkhar",
-"9923455", "Jabarrasulov",
-"9923312", "Dangara",
-"9923462", "Isfara",
-"9923522", "Khorog",
-"9923138", "Nurek",
-"9923475", "Pendjikent",
-"99237", "Dushanbe",
-"9923453", "Asht",
+$areanames{en} = {"9923316", "Parkhar",
+"9923139", "Hissar",
 "9923248", "Djilikul",
-"9923245", "Bokhtar",
-"9923154", "Tadjikabad",
-"9923554", "Murgab",
-"9923135", "Fayzabad",
-"9923467", "Kanibadam",
-"9923443", "Kayrakum",
-"9923314", "Temurmalik",
-"9923551", "Vanj",
-"9923243", "Abdurakhmana\ Jami",
-"9923464", "Ganchi",
-"992331700", "Khovaling",
-"9923133", "Nurobod",
-"9923311", "Vose",
-"9923445", "Matchinskiy",
-"9923252", "Panj",
-"9923130", "Tursun\-Zade",
-"9923465", "Taboshar",
-"9923153", "Varzob",
-"9923553", "Ishkashim",
-"9923137", "Rudaki",
-"9923131", "Rasht",
-"9923240", "Shaartuz",
-"9923247", "Kolkhozabad",
+"9923479", "Ayni",
 "9923422", "Khujand",
+"9923252", "Panj",
+"9923455", "Jabarrasulov",
+"9923156", "Tavildara",
+"9923131", "Rasht",
+"9923453", "Asht",
+"9923132", "Jirgital",
+"9923251", "Kabodion",
+"9923454", "Istravshan",
+"9923242", "Khuroson",
+"9923551", "Vanj",
+"9923445", "Matchinskiy",
+"9923465", "Taboshar",
+"9923154", "Tadjikabad",
+"9923153", "Varzob",
+"9923443", "Kayrakum",
+"9923552", "Darvaz",
 "9923155", "Shakhrinav",
-"9923222", "Kurgan\-Tube",
-"9923555", "Roshtkala",
+"9923456", "Shakhristan",
+"9923467", "Kanibadam",
+"9923464", "Ganchi",
+"9923314", "Temurmalik",
 "9923249", "Kumsangir",
-"9923452", "Zafarabad",
+"9923138", "Nurek",
 "9923322", "Kulyab",
 "9923315", "M\.\ Khamadoni",
+"9923240", "Shaartuz",
+"9923311", "Vose",
+"9923312", "Dangara",
+"9923245", "Bokhtar",
+"9923554", "Murgab",
+"9923462", "Isfara",
+"9923442", "Gafurov",
+"9923136", "Vakhdat",
+"9923553", "Ishkashim",
+"9923243", "Abdurakhmana\ Jami",
+"9923555", "Roshtkala",
+"9923247", "Kolkhozabad",
 "9923441", "Spitamen",
-"9923456", "Shakhristan",
+"9923522", "Khorog",
+"9923556", "Rushan",
+"9923222", "Kurgan\-Tube",
+"9923133", "Nurobod",
+"9923318", "Muminobod",
+"9923141", "Yavan",
+"9923452", "Zafarabad",
+"9923137", "Rudaki",
 "9923134", "Rogun",
-"9923139", "Hissar",};
+"9923135", "Fayzabad",
+"99237", "Dushanbe",
+"9923246", "Vakhsh",
+"9923475", "Pendjikent",
+"9923451", "Chkalovsk",
+"9923250", "Sarband",
+"992331700", "Khovaling",
+"9923130", "Tursun\-Zade",};
 my $timezones = {
                '' => [
                        'Asia/Dushanbe'

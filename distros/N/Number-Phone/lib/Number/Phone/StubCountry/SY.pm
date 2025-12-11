@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135859;
+our $VERSION = 1.20251210153525;
 
 my $formatters = [
                 {
@@ -88,25 +88,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96321", "Aleppo",
-"96322", "Al\-Rakkah",
-"96325", "Menbej",
-"96334", "Palmyra",
-"96314", "Al\-Quneitra",
-"96323", "Edleb",
-"96344", "Hamah",
-"96351", "Deir\ Ezzour",
-"96315", "Dara",
-"96312", "Al\-Nebek",
-"96311", "Damascus\ and\ rural\ areas",
-"96352", "Alhasakah",
-"96341", "Lattakia",
-"96333", "Hamah",
-"96353", "Al\-Kameshli",
-"96316", "Al\-Swedaa",
-"96313", "Al\-Zabadani",
+$areanames{en} = {"96322", "Al\-Rakkah",
 "96331", "Homs",
-"96343", "Tartous",};
+"96312", "Al\-Nebek",
+"96341", "Lattakia",
+"96352", "Alhasakah",
+"96316", "Al\-Swedaa",
+"96351", "Deir\ Ezzour",
+"96311", "Damascus\ and\ rural\ areas",
+"96321", "Aleppo",
+"96314", "Al\-Quneitra",
+"96343", "Tartous",
+"96333", "Hamah",
+"96313", "Al\-Zabadani",
+"96323", "Edleb",
+"96334", "Palmyra",
+"96315", "Dara",
+"96325", "Menbej",
+"96353", "Al\-Kameshli",
+"96344", "Hamah",};
 my $timezones = {
                '' => [
                        'Asia/Damascus'

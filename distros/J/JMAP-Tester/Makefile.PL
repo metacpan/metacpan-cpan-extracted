@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.026000;
 
 use ExtUtils::MakeMaker 6.78;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JMAP-Tester",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "JMAP::Tester",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -25,9 +25,10 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "Future" => 0,
     "HTTP::Request" => 0,
-    "JSON" => 0,
+    "HTTP::Response" => 0,
     "JSON::MaybeXS" => 0,
     "JSON::Typist" => "0.005",
+    "JSON::XS" => 0,
     "LWP::UserAgent" => 0,
     "Module::Runtime" => 0,
     "Moo" => 0,
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
     "URI" => 0,
     "URI::Escape" => 0,
     "URI::QueryParam" => 0,
+    "experimental" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -46,7 +48,6 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "HTTP::Response" => 0,
     "JSON::Typist" => "0.005",
     "Scalar::Util" => 0,
     "Test::Abortable" => 0,
@@ -55,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.105",
+  "VERSION" => "0.107",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,9 +75,9 @@ my %FallbackPrereqs = (
   "Future" => 0,
   "HTTP::Request" => 0,
   "HTTP::Response" => 0,
-  "JSON" => 0,
   "JSON::MaybeXS" => 0,
   "JSON::Typist" => "0.005",
+  "JSON::XS" => 0,
   "LWP::UserAgent" => 0,
   "Module::Runtime" => 0,
   "Moo" => 0,
@@ -94,6 +95,7 @@ my %FallbackPrereqs = (
   "URI" => 0,
   "URI::Escape" => 0,
   "URI::QueryParam" => 0,
+  "experimental" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "warnings" => 0

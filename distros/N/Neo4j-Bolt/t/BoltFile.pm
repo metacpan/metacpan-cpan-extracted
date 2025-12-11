@@ -1,12 +1,13 @@
 package t::BoltFile;
-use Neo4j::Client;
+use v5.12;
+use warnings;
+
+use Neo4j::Client 0.56;
 use File::Spec;
 BEGIN {
   use lib 'lib';
 }
-use Inline C => Config =>
-  LIBS => Neo4j::Client->libs_static,
-  CCFLAGS => Neo4j::Client->cflags;
+use Inline with => 'Neo4j::Client';
 
 use Inline C => <<'END_BOLTFILE_C';
 

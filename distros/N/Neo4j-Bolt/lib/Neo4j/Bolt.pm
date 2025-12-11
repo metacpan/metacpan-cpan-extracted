@@ -1,8 +1,14 @@
 package Neo4j::Bolt;
+use v5.12;
+use warnings;
+use warnings::register;
+
 use Cwd qw/realpath getcwd/;
 
 BEGIN {
-  our $VERSION = "0.5000";
+  our $VERSION = "0.5001";
+  my @min_lib_version = (5,0,7);
+
   require Neo4j::Bolt::Cxn;
   require Neo4j::Bolt::Txn;
   require Neo4j::Bolt::ResultStream;
@@ -10,11 +16,10 @@ BEGIN {
   require XSLoader;
   XSLoader::load();
 
-  my @min_lib_version = (5,0,4);
   if (my $lib_version = _check_neo4j_omni_version(@min_lib_version)) {
-    warnings::warnif( "misc", sprintf
-      "Neo4j::Client is outdated and should be upgraded (want libneo4j-omni %i.%i.%i, found %s)",
-      @min_lib_version, $lib_version );
+    warnings::warnif( sprintf
+      "libneo4j-omni %s is outdated: %i.%i.%i or later is recommended (reinstall first Neo4j::Client, then Neo4j::Bolt)",
+      $lib_version, @min_lib_version );
   }
 }
 our $DEFAULT_DB = "neo4j";
@@ -84,6 +89,10 @@ L<libneo4j-client|https://github.com/cleishm/libneo4j-client> library
 implementing the Neo4j L<Bolt|https://boltprotocol.org/> network
 protocol. It uses Ingy's L<Inline::C> to do all the hard XS work.
 
+The Alien module L<Neo4j::Client> provides the library. A Perl warning
+in the C<Neo4j::Bolt> category is emitted at load time if an outdated
+library version is detected.
+
 =head2 Return Types
 
 L<Neo4j::Bolt::ResultStream> returns rows resulting from queries made 
@@ -112,14 +121,17 @@ L<Paths|Neo4j::Bolt::Path> are represented in the following formats:
 
  # Node:
  bless {
-   id => $node_id,  labels => [$label1, $label2, ...],
+   id => $node_id,  element_id => $node_eid,
+   labels => [$label1, $label2, ...],
    properties => {prop1 => $value1, prop2 => $value2, ...}
  }, 'Neo4j::Bolt::Node'
 
  # Relationship:
  bless {
-   id => $reln_id,  type => $reln_type,
-   start => $start_node_id,  end => $end_node_id,
+   id    => $reln_id,        element_id       => $reln_eid,
+   start => $start_node_id,  start_element_id => $start_node_eid,
+   end   => $end_node_id,    end_element_id   => $end_node_eid,
+   type  => $reln_type,
    properties => {prop1 => $value1, prop2 => $value2, ...}
  }, 'Neo4j::Bolt::Relationship'
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135858;
+our $VERSION = 1.20251210153523;
 
 my $formatters = [
                 {
@@ -82,9 +82,9 @@ my $validators = {
           (?:
             1(?:
               0[0-8]|
-              1[0-7]|
+              1\\d|
               2[014]|
-              30
+              [34]0
             )|
             7\\d\\d
           )\\d{6}
@@ -96,33 +96,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"25441", "Mombasa\/Mariakani\/Kilifi",
-"25442", "Malindi\/Lamu\/Garsen",
-"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
-"25455", "Bungoma\/Busia",
-"25452", "Kericho\/Bomet",
-"25451", "Nakuru\/Njoro\/Molo",
-"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
-"25469", "Marsabit\/Moyale",
-"25446", "Garissa\/Hola\/Wajir\/Mandera",
-"25457", "Kisumu\/Siaya\/Maseno",
-"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
-"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
+$areanames{en} = {"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
+"25462", "Nanyuki",
 "25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
-"25460", "Muranga\/Kerugoya",
-"2542", "Nairobi",
-"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
-"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
-"25464", "Meru\/Maua\/Chuka",
-"25467", "Kiambu\/Kikuyu",
-"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
-"25459", "Homabay\/Migori",
-"25450", "Naivasha\/Narok\/Gilgil",
 "25468", "Embu",
+"25469", "Marsabit\/Moyale",
 "25466", "Thika\/Ruiru",
+"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
 "25461", "Nyeri\/Karatina",
+"25457", "Kisumu\/Siaya\/Maseno",
+"25459", "Homabay\/Migori",
+"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
+"25467", "Kiambu\/Kikuyu",
+"25451", "Nakuru\/Njoro\/Molo",
+"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
+"25452", "Kericho\/Bomet",
+"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
+"25460", "Muranga\/Kerugoya",
+"25455", "Bungoma\/Busia",
+"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
+"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
+"25464", "Meru\/Maua\/Chuka",
+"25442", "Malindi\/Lamu\/Garsen",
+"25446", "Garissa\/Hola\/Wajir\/Mandera",
+"2542", "Nairobi",
 "25465", "Nyahururu\/Maralal",
-"25462", "Nanyuki",};
+"25441", "Mombasa\/Mariakani\/Kilifi",
+"25450", "Naivasha\/Narok\/Gilgil",};
 my $timezones = {
                '' => [
                        'Africa/Nairobi'

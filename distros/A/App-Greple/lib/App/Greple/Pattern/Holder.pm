@@ -1,6 +1,6 @@
 package App::Greple::Pattern::Holder;
 
-use v5.14;
+use v5.24;
 use warnings;
 use Data::Dumper;
 use Carp;
@@ -121,7 +121,7 @@ sub load_file {
 
     for my $file (@_) {
 	my $select;
-	if (!-f $file and $file =~ s/(?:(?<b>\[)|\@) (?<n>[\d:,]+) (?(<b>)\]|) $//x) {
+	if (!-f $file and $file =~ s/\@ (?<n>[\d:,]+) $//x) {
 	    $select = $+{n};
 	}
 	open my $fh, '<:encoding(utf8)', $file or die "$file: $!\n";
@@ -137,11 +137,41 @@ sub load_file {
 	    };
 	    @p = @p[@select];
 	}
+	##
+	## Collect DEFINE patterns
+	##
+	my %DEFINE;
+	for (@p) {
+	    if (/^\Q(?(DEFINE)(?<\E(?<name>[^>]+)/) {
+		$DEFINE{$+{name}} = $_;
+	    }
+	}
 	@p = do {
-	    map  { chomp ; s{\s*//.*$}{}r }
+	    map  { chomp; s{\s*//.*$}{}r }
 	    grep { not m{^\s*(?:#|//|$)} }
+	    grep { not m{^\Q(?(DEFINE)\E} }
 	    @p;
 	};
+	##
+	## Append DEFINE to each pattern that references it
+	##
+	if (%DEFINE) {
+	    for my $p (@p) {
+		my %define;
+		(sub {
+		    my($str, $seen) = @_;
+		    $seen //= {};
+		    while ($str =~ /\(\?&(?<name>[^)]+)\)/g) {
+			my $name = $+{name};
+			next if $seen->{$name}++;
+			my $def = $DEFINE{$name} or next;
+			$define{$name} //= $def;
+			__SUB__->($def, $seen);
+		    }
+		})->($p);
+		$p .= "(?x:\n" . join("\n", values %define) . ")" if %define;
+	    }
+	}
 	$obj->append({ flag => $flag }, @p);
     }
 }

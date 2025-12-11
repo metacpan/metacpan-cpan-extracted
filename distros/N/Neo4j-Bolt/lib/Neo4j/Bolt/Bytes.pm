@@ -1,7 +1,7 @@
 package Neo4j::Bolt::Bytes;
 # ABSTRACT: Representation of a Neo4j byte array
 
-$Neo4j::Bolt::Duration::VERSION = '0.5000';
+$Neo4j::Bolt::Bytes::VERSION = '0.5001';
 
 use v5.12;
 use warnings;

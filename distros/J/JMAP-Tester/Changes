@@ -1,5 +1,13 @@
 Revision history for JMAP-Tester
 
+0.107     2025-12-11 13:26:56+11:00 Australia/Melbourne
+        - add a means to test the Tester, then do so
+        - add a means to supply hand-crafted JSON to $tester->request
+        - switch from JSON to JSON::XS
+
+0.106     2025-12-11 09:17:48+11:00 Australia/Melbourne
+        - add an "ident" property to the Tester, which will show up in logging
+
 0.105     2025-12-09 11:44:18+11:00 Australia/Melbourne
         - add a (temporary!) second arg to ->download to allow setting the
           Accept header

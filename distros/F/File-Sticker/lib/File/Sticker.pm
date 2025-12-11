@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '4.0101';
+$File::Sticker::VERSION = '4.301';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 4.0101
+version 4.301
 
 =head1 SYNOPSIS
 
@@ -33,6 +33,9 @@ use Hash::Merge;
 use Module::Pluggable instantiate => 'new',
 search_path => ['File::Sticker::Scribe'],
 sub_name => 'all_scribes';
+use Module::Pluggable instantiate => 'new',
+search_path => ['File::Sticker::Derive'],
+sub_name => 'derivers';
 
 # FOR DEBUGGING
 =head1 DEBUGGING
@@ -68,7 +71,7 @@ sub new {
     my $self = bless ({%parameters}, ref ($class) || $class);
 
     my %new_args = ();
-    foreach my $key (qw(wanted_fields verbose topdir))
+    foreach my $key (qw(wanted_fields verbose topdir read_all derive))
     {
         if (exists $self->{$key})
         {
@@ -105,6 +108,27 @@ sub new {
                 $self->{_scribe_pri}->{$priority} = [];
             }
             push @{$self->{_scribe_pri}->{$priority}}, $rd;
+        }
+    }
+    # -------------------------------------
+    # Derivers
+    # Find out what derivers are available and enabled.
+    my @derivers = $self->derivers();
+    # Sort by order, numerically
+    @derivers = sort {$a->order() <=> $b->order()} @derivers;
+    $self->{_derivers} = [];
+    foreach my $dd (@derivers)
+    {
+        my $nm = $dd->name();
+        if ($to_disable{$nm})
+        {
+            print STDERR "DISABLE DERIVER: ${nm}\n" if $self->{verbose} > 1;
+        }
+        else
+        {
+            print STDERR "DERIVER: ${nm}\n" if $self->{verbose} > 1;
+            $dd->init(%new_args);
+            push @{$self->{_derivers}}, $dd;
         }
     }
 
@@ -545,9 +569,11 @@ sub delete_missing_files {
 
 =head2 derive_values
 
-Derive common values from the existing meta-data.
+Derive values from the existing meta-data.
+Updates the passed-in meta hash.
+Calls plugins to do so.
 
-    $sticker->derive_values(filename=>$filename,
+    my $new_meta = $sticker->derive_values(filename=>$filename,
         meta=>$meta);
 
 =cut
@@ -557,92 +583,12 @@ sub derive_values {
     my %args = @_;
     say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
 
-    my $filename = $args{filename};
     my $meta = $args{meta};
-
-    my $fp = path($filename);
-    if (-r $filename)
+    foreach my $dd (@{$self->{_derivers}})
     {
-        $meta->{file} = $fp->realpath->stringify;
-    }
-    else
-    {
-        $meta->{file} = $fp->absolute->stringify;
-    }
-    $meta->{basename} = $fp->basename();
-    $meta->{id_name} = $fp->basename(qr/\.\w+/);
-    if ($meta->{basename} =~ /\.(\w+)$/)
-    {
-        $meta->{ext} = $1;
-    }
-
-    # title
-    if (!$meta->{title})
-    {
-        my @words = wordsplit($meta->{id_name});
-        my $title = join(' ', @words);
-        $title =~ s/(\w+)/\u\L$1/g; # title case
-        $title =~ s/(\d+)$/ $1/; # trailing numbers
-        $meta->{title} = $title;
-    }
-
-    if ($self->{topdir})
-    {
-        $meta->{relpath} = $fp->relative($self->{topdir})->stringify;
-        my $rel_parent = $fp->parent->relative($self->{topdir})->stringify;
-        if ($meta->{relpath} =~ /\.\./) # we got a problem
-        {
-            $meta->{relpath} =~ s!\.\./!!g;
-            $rel_parent =~ s!\.\./!!g;
-        }
-
-        # Check if a thumbnail exists
-        # It could be a jpg or a png
-        # Note that if the file itself is a jpg or png, we can use it as the thumbnail
-        if (-r $fp->parent . '/.thumbnails/' . $meta->{id_name} . '.jpg')
-        {
-            $meta->{thumbnail} = $rel_parent . '/.thumbnails/' . $meta->{id_name} . '.jpg'
-        }
-        elsif (-r $fp->parent . '/.thumbnails/' . $meta->{id_name} . '.png')
-        {
-            $meta->{thumbnail} = $rel_parent . '/.thumbnails/' . $meta->{id_name} . '.png'
-        }
-        elsif ($meta->{ext} =~ /jpg|png|gif/)
-        {
-            $meta->{thumbnail} = $meta->{relpath};
-        }
-
-        # Make this grouping stuff simple:
-        # take it as the *directory* where the file is;
-        # this is because that's how it is *grouped* together with other files, yes?
-        # But use the directory relative to the "top" directory, the first two or three parts of it.
-
-        my @bits = split(/\//, $rel_parent);
-        splice(@bits,3);
-        $meta->{grouping} = join(' ', @bits);
-
-        # also make "section" fields, which are each separate bit of the "grouping"
-        for (my $i=0; $i < @bits; $i++)
-        {
-            my $id = $i + 1;
-            $meta->{"section${id}"} = $bits[$i];
-        }
-    }
-    if (-r $filename)
-    {
-        my $stat = $fp->stat;
-        $meta->{filesize} = $stat->size;
-
-        $meta->{filedate} = strftime '%Y-%m-%d %H:%M:%S', localtime $stat->mtime;
-        if (!$meta->{linkdate})
-        {
-            $meta->{linkdate} = $meta->{filedate};
-        }
-        if (!$meta->{date_added})
-        {
-            $meta->{date_added} =
-            ($meta->{date} ? $meta->{date} : $meta->{filedate});
-        }
+        my $nm = $dd->name();
+        say STDERR "Derive($nm)" if $self->{verbose} > 2;
+        $dd->derive(%args,meta=>$meta);
     }
 
     return $meta;
@@ -685,5 +631,5 @@ Please report any bugs or feature requests to the author.
 
 =cut
 
-1; # End of Text::ParseStory
+1; # End of File::Sticker
 __END__

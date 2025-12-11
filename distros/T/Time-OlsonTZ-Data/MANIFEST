@@ -351,6 +351,7 @@ lib/Time/OlsonTZ/Data/Pacific/Tarawa.tz
 lib/Time/OlsonTZ/Data/Pacific/Tongatapu.tz
 lib/Time/OlsonTZ/Data/country_selection.tzp
 prebuild
+prepend_changes
 t/links.t
 t/names.t
 t/pod_cvg.t

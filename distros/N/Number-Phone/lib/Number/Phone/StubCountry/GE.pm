@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135857;
+our $VERSION = 1.20251210153522;
 
 my $formatters = [
                 {
@@ -104,7 +104,10 @@ my $validators = {
           )\\d\\d|
           5(?:
             0(?:
-              0[17]0|
+              0(?:
+                1[09]|
+                70
+              )|
               505
             )|
             1(?:
@@ -134,7 +137,7 @@ my $validators = {
               0(?:
                 0(?:
                   0\\d|
-                  11|
+                  1[12]|
                   22|
                   3[0-6]|
                   44|
@@ -171,7 +174,10 @@ my $validators = {
               )|
               6[89]\\d\\d|
               7(?:
-                [0147-9]\\d\\d|
+                (?:
+                  [0147-9]\\d|
+                  22
+                )\\d|
                 5(?:
                   00|
                   [57]5
@@ -206,81 +212,81 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995360", "Dmanisi",
-"995352", "Kvareli",
-"995423", "Xulo",
-"995346", "Dusheti",
-"995496", "Ozurgeti",
-"995370", "Gori",
-"995433", "Kharagauli",
-"995341", "Rustavi",
-"995414", "Xobi",
-"995473", "Oni",
-"995491", "Terdjola",
-"995349", "Akhmeta",
-"995357", "Marneuli",
-"995366", "Adigeni",
-"995355", "Signagi",
-"995361", "Ninotsminda",
-"995443", "Gagra",
-"995448", "Gulripshi",
-"995369", "Kareli",
-"995371", "Kaspi",
-"995445", "Ochamchire",
-"995432", "Vani",
-"995410", "Mestia",
-"995472", "Tsageri",
-"995427", "Xelvachauri",
-"995364", "Aspindza",
-"995422", "Batumi",
-"995358", "Bolnisi",
-"995353", "Gurdjaani",
-"995437", "Lentekhi",
-"995374", "Tigvi",
-"995435", "Sachkhere",
-"995442", "Sukhumi",
-"995416", "Tsalendjikha",
-"995425", "Qeda",
-"995344", "Tskhinvali",
-"995411", "Samtredia",
+$areanames{en} = {"995353", "Gurdjaani",
 "995494", "lanchxuti",
-"995419", "Choxatauri",
-"995447", "Gali",
-"995434", "Bagdati",
-"995418", "Martvili",
-"995413", "Senaki",
-"995367", "Bordjomi",
+"995496", "Ozurgeti",
+"995364", "Aspindza",
+"995366", "Adigeni",
+"995412", "Abasha",
+"995350", "Telavi",
+"995426", "Kobuleti",
 "995345", "Stefanstminda\/Kazbegi",
 "995424", "Shuaxevi",
-"995362", "Akhalkalaki",
-"995350", "Telavi",
-"995495", "Khoni",
-"995372", "Gardabani",
-"995497", "Tkibuli",
-"995444", "Gudauta",
-"995351", "Sagaredjo",
-"995359", "TetriTskaro",
-"995347", "Djava",
-"995365", "Akhaltsikhe",
-"995342", "Akhalgori",
-"995356", "DedoplisTskaro",
-"995492", "Zestafoni",
-"995363", "Tsalka",
-"995368", "Khashuri",
-"995354", "Lagodekhi",
-"995373", "Mtskheta",
 "995417", "Chkhorotskhu",
-"995412", "Abasha",
-"995446", "Tkvarcheli",
-"995479", "Chiatura",
-"995431", "Kutaisi",
-"995348", "Tianeti",
-"995426", "Kobuleti",
+"995443", "Gagra",
+"995341", "Rustavi",
+"995359", "TetriTskaro",
+"995432", "Vani",
+"995418", "Martvili",
+"995374", "Tigvi",
+"995472", "Tsageri",
+"995437", "Lentekhi",
+"995358", "Bolnisi",
+"995419", "Choxatauri",
+"995433", "Kharagauli",
+"995473", "Oni",
+"995371", "Kaspi",
+"995448", "Gulripshi",
+"995413", "Senaki",
+"995365", "Akhaltsikhe",
+"995495", "Khoni",
+"995352", "Kvareli",
+"995491", "Terdjola",
+"995410", "Mestia",
+"995447", "Gali",
+"995361", "Ninotsminda",
 "995439", "Ambrolauri",
-"995493", "Poti",
+"995442", "Sukhumi",
+"995425", "Qeda",
+"995346", "Dusheti",
+"995357", "Marneuli",
+"995344", "Tskhinvali",
+"995479", "Chiatura",
+"99532", "Tbilisi",
+"995492", "Zestafoni",
+"995351", "Sagaredjo",
+"995362", "Akhalkalaki",
+"995416", "Tsalendjikha",
+"995427", "Xelvachauri",
+"995355", "Signagi",
+"995414", "Xobi",
+"995422", "Batumi",
+"995445", "Ochamchire",
+"995367", "Bordjomi",
+"995497", "Tkibuli",
 "995436", "Tskaltubo",
+"995434", "Bagdati",
+"995368", "Khashuri",
+"995349", "Akhmeta",
+"995372", "Gardabani",
+"995435", "Sachkhere",
+"995431", "Kutaisi",
+"995369", "Kareli",
+"995373", "Mtskheta",
+"995348", "Tianeti",
+"995370", "Gori",
+"995360", "Dmanisi",
+"995411", "Samtredia",
+"995493", "Poti",
+"995363", "Tsalka",
 "995415", "Zugdidi",
-"99532", "Tbilisi",};
+"995356", "DedoplisTskaro",
+"995347", "Djava",
+"995354", "Lagodekhi",
+"995446", "Tkvarcheli",
+"995444", "Gudauta",
+"995342", "Akhalgori",
+"995423", "Xulo",};
 my $timezones = {
                '' => [
                        'Asia/Tbilisi'

@@ -20,9 +20,10 @@ do { my $x = {
                                       'Encode' => '0',
                                       'Future' => '0',
                                       'HTTP::Request' => '0',
-                                      'JSON' => '0',
+                                      'HTTP::Response' => '0',
                                       'JSON::MaybeXS' => '0',
                                       'JSON::Typist' => '0.005',
+                                      'JSON::XS' => '0',
                                       'LWP::UserAgent' => '0',
                                       'Module::Runtime' => '0',
                                       'Moo' => '0',
@@ -34,8 +35,9 @@ do { my $x = {
                                       'URI' => '0',
                                       'URI::Escape' => '0',
                                       'URI::QueryParam' => '0',
+                                      'experimental' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => 'v5.14.0',
+                                      'perl' => 'v5.26.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -47,14 +49,14 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'HTTP::Response' => '0',
                                    'JSON::Typist' => '0.005',
                                    'Scalar::Util' => '0',
                                    'Test::Abortable' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Deep::JType' => '0.005',
                                    'Test::Fatal' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'perl' => 'v5.26.0'
                                  }
                  }
      };

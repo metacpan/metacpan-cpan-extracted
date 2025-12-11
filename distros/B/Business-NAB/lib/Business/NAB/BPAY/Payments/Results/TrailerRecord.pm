@@ -1,5 +1,5 @@
 package Business::NAB::BPAY::Payments::Results::TrailerRecord;
-$Business::NAB::BPAY::Payments::Results::TrailerRecord::VERSION = '0.01';
+$Business::NAB::BPAY::Payments::Results::TrailerRecord::VERSION = '0.02';
 =head1 NAME
 
 Business::NAB::BPAY::Payments::TrailerRecord

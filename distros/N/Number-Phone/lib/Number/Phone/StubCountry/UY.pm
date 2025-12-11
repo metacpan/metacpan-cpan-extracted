@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250913135859;
+our $VERSION = 1.20251210153526;
 
 my $formatters = [
                 {
@@ -109,25 +109,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"598433", "Canelones",
-"598452", "Colonia\ del\ Scaramento",
-"598477", "Artigas",
-"598463", "Tacuarembo",
-"5982", "Montevideo",
-"598473", "Salto",
-"598462", "Rivera",
-"598445", "Treinta\ y\ Tres",
-"598453", "Mercedes\/Soriano",
-"598434", "San\ Jose\ de\ Mayo",
+$areanames{en} = {"5984364", "Trinidad\/Flores",
+"598433", "Canelones",
 "598464", "Melo\/Cerro\ Largo",
-"5984364", "Trinidad\/Flores",
-"598472", "Paysandu",
-"598436", "Durazno",
+"598435", "Florida",
+"598453", "Mercedes\/Soriano",
+"598462", "Rivera",
+"598473", "Salto",
+"598445", "Treinta\ y\ Tres",
 "598447", "Rocha",
 "598456", "Fray\ Bentos\/Rio\ Negro",
-"598444", "Minas\/Lavalleja",
-"598435", "Florida",
-"59842", "San\ Carlos",};
+"598452", "Colonia\ del\ Scaramento",
+"598463", "Tacuarembo",
+"598436", "Durazno",
+"598434", "San\ Jose\ de\ Mayo",
+"598477", "Artigas",
+"5982", "Montevideo",
+"598472", "Paysandu",
+"59842", "San\ Carlos",
+"598444", "Minas\/Lavalleja",};
 my $timezones = {
                '' => [
                        'America/Montevideo'

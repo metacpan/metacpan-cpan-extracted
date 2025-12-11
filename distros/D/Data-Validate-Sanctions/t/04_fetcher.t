@@ -295,6 +295,53 @@ subtest '_epoch_to_date' => sub {
     is Data::Validate::Sanctions::Fetcher::_epoch_to_date(-315619200), '1960-01-01', 'Epoch timestamp for a date in the past';
 };
 
+# Test _date_to_epoch function
+subtest '_date_to_epoch' => sub {
+    # ISO 8601 format tests
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-02-04T17:53:20+08:00'), 1738627200, 'ISO 8601 with timezone offset');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-02-04T09:53:20Z'),      1738627200, 'ISO 8601 with Z timezone');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-02-04T17:53:20+0800'),  1738627200, 'ISO 8601 with compact timezone');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-02-04T17:53:20'),       1738627200, 'ISO 8601 without timezone');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-02-04'),                1738627200, 'ISO 8601 date only');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2023-12-31'),                1703980800, 'ISO 8601 end of year');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2024-01-01'),                1704067200, 'ISO 8601 start of year');
+
+    # DD/MM/YYYY and DD-MM-YYYY format tests
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('04/02/2025'), 1738627200, 'DD/MM/YYYY format');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('04-02-2025'), 1738627200, 'DD-MM-YYYY format');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('31/12/2023'), 1703980800, 'DD/MM/YYYY end of year');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('01/01/2024'), 1704067200, 'DD/MM/YYYY start of year');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('4/2/2025'),   1738627200, 'Single digit day/month with slash');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('4-2-2025'),   1738627200, 'Single digit day/month with dash');
+
+    # Edge cases and invalid inputs
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch(undef),          undef, 'Undefined input returns undef');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch(''),             undef, 'Empty string returns undef');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('   '),          undef, 'Whitespace only returns undef');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('invalid-date'), undef, 'Invalid date format');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025/02/04'),   undef, 'YYYY/MM/DD format not supported');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('Feb 4, 2025'),  undef, 'Month name format not supported');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025.02.04'),   undef, 'Dot separator not supported');
+
+    # Invalid dates that match regex but are not valid dates
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-13-01'), undef, 'Invalid month (13)');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2025-02-30'), undef, 'Invalid day for February');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('32/01/2025'), undef, 'Invalid day (32)');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('01/13/2025'), undef, 'Invalid month in DD/MM/YYYY');
+
+    # Leap year tests
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('29/02/2024'), 1709164800, 'Valid leap year date');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('29/02/2023'), undef,      'Invalid leap year date');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2024-02-29'), 1709164800, 'Valid leap year in ISO format');
+
+    # Boundary date tests
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('1970-01-01'), 0,          'Unix epoch start');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('01/01/1970'), 0,          'Unix epoch start DD/MM/YYYY');
+    is(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2038-01-19'), 2147472000, 'Near 2038 boundary');
+    ok(Data::Validate::Sanctions::Fetcher::_date_to_epoch('2050-01-01'), 'Far future date works');
+
+};
+
 # Test _clean_url
 subtest '_clean_url' => sub {
     # Test URL with token parameter
@@ -360,7 +407,7 @@ subtest 'UNSC Sanctions' => sub {
 
     my $source_name = 'UNSC-Sanctions';
     ok $data->{$source_name}, 'Sanctions are loaded from the sample file';
-    is $data->{$source_name}{updated},           1729123202, "Sanctions update date matches the content of sample file";
+    is $data->{$source_name}{updated},           1729123200, "Sanctions update date matches the content of sample file";
     is scalar @{$data->{$source_name}{content}}, 7,          "Number of names matches the content of the sample file";
 
     is_deeply find_entry_by_name($data->{$source_name}, 'MOHAMMAD NAIM'),
@@ -405,25 +452,25 @@ subtest 'MOHA Sanctions' => sub {
     my $source_name = 'MOHA-Sanctions';
     my $parsed_data = $fetcher->{$source_name};
 
-    my $publish_date_string = "2024-09-09T01:52:15Z";
-    my $publish_date_epoch  = 1725846735;
+    my $publish_date_string = "2025-02-04T17:53:20+08:00";
+    my $publish_date_epoch  = 1738627200;
 
     ok $parsed_data, 'Sanctions are loaded from the sample file';
 
     is $parsed_data->{updated}, $publish_date_epoch, "Sanctions update date matches the content of sample file";
 
     my @data = $parsed_data->{content}->@*;
-    is scalar @data, 99, "Number of names matches the content of the sample file";
+    is scalar @data, 77, "Number of names matches the content of the sample file";
 
     my $entry = find_entry_by_name($parsed_data, "Zahar bin Abdullah");
     cmp_deeply $entry->{names}, ["Zahar bin Abdullah", "Abu Zahar"], "Multiple names extracted correctly";
 
     cmp_deeply find_entry_by_name($parsed_data, "Abu Zahar") == $entry, 1, "Can find entry by alias name";
 
-    cmp_deeply $entry->{dob_text}, ["24.04.1981"], "Date of birth extracted correctly";
+    cmp_deeply $entry->{dob_text}, ["24.4.1981"], "Date of birth extracted correctly";
 
     $entry = find_entry_by_name($parsed_data, "Mohamad Alsaied Alhmidan");
-    cmp_deeply $entry->{dob_text}, ["20.02.1976", "13.02.1975", "15.02.1976", "07.01.1977"], "Multiple Date of birth extracted correctly";
+    cmp_deeply $entry->{dob_text}, ["20.2.1976", "13.2.1975", "15.2.1976", "7.1.1977"], "Multiple Date of birth extracted correctly";
 
 };
 
