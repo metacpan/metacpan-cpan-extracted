@@ -86,8 +86,6 @@ Inherited, see L<Mail::Message::Field::Structured/"METHODS">
   encoding    Mail::Message::Field::Full        'q'
   force       Mail::Message::Field::Full        false
   language    Mail::Message::Field::Full        undef
-  log         Mail::Reporter                    'WARNINGS'
-  trace       Mail::Reporter                    'WARNINGS'
 
 =over 2
 
@@ -103,10 +101,6 @@ Inherited, see L<Mail::Message::Field::Structured/"METHODS">
 
 =item language => $language
 
-=item log => LEVEL
-
-=item trace => LEVEL
-
 =back
 
 =back
@@ -115,21 +109,13 @@ Inherited, see L<Mail::Message::Field::Structured/"METHODS">
 
 Extends L<"Attributes" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Attributes">.
 
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
-
 =head2 The field
 
 Extends L<"The field" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"The field">.
 
 =over 4
 
-=item $any-E<gt>B<isStructured>()
+=item $any-E<gt>B<isStructured>( [$name] )
 
 Inherited, see L<Mail::Message::Field/"The field">
 
@@ -440,43 +426,7 @@ Extends L<"Error handling" in Mail::Message::Field::Structured|Mail::Message::Fi
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -502,66 +452,66 @@ Extends L<"DETAILS" in Mail::Message::Field::Structured|Mail::Message::Field::St
 
 =over 4
 
-=item Warning: Field content is not numerical: $content
+=item Error: class $package does not implement method $method.
 
-The numeric value of a field is requested (for instance the C<Lines> or
-C<Content-Length> fields should be numerical), however the data contains
-weird characters.
-Cast by C<toInt()>
-
-=item Error: Field name too long (max $length), in '$name'
-
-It is not specified in the RFCs how long a field name can be, but
-at least it should be a few characters shorter than the line wrap.
-Cast by C<fold()>
-
-=item Warning: Illegal character in charset '$charset'
-
-The field is created with an utf8 string which only contains data from the
-specified character set.  However, that character set can never be a valid
-name because it contains characters which are not permitted.
-Cast by C<encode()>
-
-=item Warning: Illegal character in field name $name
-
-A new field is being created which does contain characters not permitted
-by the RFCs.  Using this field in messages may break other e-mail clients
-or transfer agents, and therefore mutulate or extinguish your message.
-Cast by C<consume()>
-
-=item Warning: Illegal character in language '$lang'
-
-The field is created with data which is specified to be in a certain language,
-however, the name of the language cannot be valid: it contains characters
-which are not permitted by the RFCs.
-Cast by C<encode()>
-
-=item Warning: Illegal encoding '$encoding', used 'q'
-
-The RFCs only permit base64 (C<b > or C<B >) or quoted-printable
-(C<q> or C<Q>) encoding.  Other than these four options are illegal.
-Cast by C<encode()>
-
-=item Error: No attributes for DKIM headers
-
-Is is not possible to add attributes to this field.
-Cast by C<addAttribute()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Warning: field content is not numerical: $content
+
+The numeric value of a field is requested (for instance the C<Lines> or
+C<Content-Length> fields should be numerical), however the data contains
+weird characters.
+Cast by C<toInt()>
+
+=item Error: field name too long (max $count), in '$name'.
+
+It is not specified in the RFCs how long a field name can be, but
+at least it should be a few characters shorter than the line wrap.
+Cast by C<fold()>
+
+=item Warning: illegal character in charset '$name'.
+
+The field is created with an utf8 string which only contains data from the
+specified character set.  However, that character set can never be a valid
+name because it contains characters which are not permitted.
+Cast by C<encode()>
+
+=item Warning: illegal character in field name $name.
+
+A new field is being created which does contain characters not permitted
+by the RFCs.  Using this field in messages may break other e-mail clients
+or transfer agents, and therefore mutulate or extinguish your message.
+Cast by C<consume()>
+
+=item Warning: illegal character in language '$name'.
+
+The field is created with data which is specified to be in a certain language,
+however, the name of the language cannot be valid: it contains characters
+which are not permitted by the RFCs.
+Cast by C<encode()>
+
+=item Warning: illegal encoding '$name', using 'q'.
+
+The RFCs only permit base64 (C<b > or C<B >) or quoted-printable
+(C<q> or C<Q>) encoding.  Other than these four options are illegal.
+Cast by C<encode()>
+
+=item Error: no attributes for DKIM headers.
+
+Is is not possible to add attributes to this field.
+Cast by C<addAttribute()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

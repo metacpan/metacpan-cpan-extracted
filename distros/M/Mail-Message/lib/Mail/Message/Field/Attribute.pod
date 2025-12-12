@@ -76,12 +76,10 @@ To speed things up, attributes are not derived from the L<Mail::Reporter|Mail::R
 base-class.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option           --Defined in     --Default
-  charset                             'us-ascii'
-  language                            undef
-  log                Mail::Reporter   'WARNINGS'
-  trace              Mail::Reporter   'WARNINGS'
-  use_continuations                   <C<true>>
+ -Option           --Default
+  charset            'us-ascii'
+  language           undef
+  use_continuations  <C<true>>
 
 =over 2
 
@@ -98,10 +96,6 @@ RFC2231 adds the possibility to specify a language with the field.  When no
 language is specified, none is included in the encoding.  Valid language
 names are defined by RFC2130.  This module has only limited support for
 this feature.
-
-=item log => LEVEL
-
-=item trace => LEVEL
 
 =item use_continuations => BOOLEAN
 
@@ -130,14 +124,6 @@ but not supported by some Mail User Agents.
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
-
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
@@ -148,43 +134,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -277,23 +227,23 @@ Merging is required by the field parsing.
 
 =over 4
 
-=item Warning: Illegal character in parameter name '$name'
+=item Error: class $package does not implement method $method.
 
-The specified parameter name contains characters which are not permitted by
-the RFCs.  You can better change the name into something which is accepted,
-or risk applications to corrupt or ignore the message.
-Cast by C<new()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Error: Too late to merge: value already changed.
+=item Warning: illegal character in parameter name '$name'.
+
+The specified parameter name contains characters which are not permitted by
+the RFCs.  You can better change the name into something which is accepted,
+or risk applications to corrupt or ignore the message.
+Cast by C<new()>
+
+=item Error: too late to merge: value already changed.
 
 Cast by C<mergeComponent()>
 
@@ -301,8 +251,8 @@ Cast by C<mergeComponent()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail::Field;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'HTML::FromMail::Page';
@@ -18,7 +18,9 @@ use base 'HTML::FromMail::Page';
 use strict;
 use warnings;
 
-use Mail::Message::Field::Full;
+use Log::Report 'html-frommail';
+
+use Mail::Message::Field::Full ();
 
 #--------------------
 
@@ -51,12 +53,11 @@ sub htmlBody($$$)
 {	my ($self, $field, $args) = @_;
 
 	my $settings = $self->settings;
-
-	my $wrap    = $args->{wrap} || $settings->{wrap};
-	my $content = $args->{content} || $settings->{content} || (defined $wrap && 'REFOLD') || 'DECODED';
+	my $wrap     = $args->{wrap} || $settings->{wrap};
+	my $content  = $args->{content} || $settings->{content} || (defined $wrap && 'REFOLD') || 'DECODED';
 
 	if($field->isa('Mail::Message::Field::Addresses'))
-	{	my $how = $args->{address} || $settings->{address} || 'MAILTO';
+	{	my $how  = $args->{address} || $settings->{address} || 'MAILTO';
 		$how eq 'PLAIN' or return $self->addressField($field, $how, $args)
 	}
 
@@ -100,8 +101,7 @@ sub addressField($$$)
 		return join ",<br />", @links;
 	}
 
-	$self->log(ERROR => "Don't know address field formatting '$how'");
-	'';
+	error __x"don't know address field formatting '{how}'.", how => $how;
 }
 
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,16 +10,18 @@
 
 
 package Mail::Message::Field::Structured;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field::Full';
+use parent 'Mail::Message::Field::Full';
 
 use strict;
 use warnings;
 
-use Mail::Message::Field::Attribute;
-use Storable 'dclone';
+use Log::Report     'mail-message', import => [ qw// ];
+
+use Mail::Message::Field::Attribute ();
+use Storable        qw/dclone/;
 
 #--------------------
 
@@ -65,7 +67,7 @@ sub attributes() { values %{$_[0]->{MMFS_attrs}} }
 sub beautify()   { delete $_[0]->{MMFF_body} }
 
 
-sub attrPairs() { map +($_->name, $_->value), $_[0]->attributes }
+sub attrPairs()  { map +($_->name, $_->value), $_[0]->attributes }
 
 #--------------------
 

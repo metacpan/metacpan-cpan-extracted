@@ -14,7 +14,6 @@ lib/Spreadsheet/Edit/Preload.pm
 t/00_compile.t
 t/10_Preload.t
 t/20_logmsg.t
-t/21_logmsg_default.t
 t/60_all.t
 t/90_Log.t
 t/author-pod-coverage.t

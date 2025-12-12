@@ -67,18 +67,6 @@ Inherited, see L<Mail::Box::Dir::Message/"Attributes">
 
 Inherited, see L<Mail::Box::Message/"Attributes">
 
-=item $obj-E<gt>B<guessTimestamp>()
-
-The filename of a C<Mail::Box::Maildir::Message> contains a timestamp.  This
-is a wild guess about the actual time of sending of the message: it is the
-time of receipt which may be seconds to hours off.  But is still a good
-guess...  When the message header is not parsed, then this date is used.
-Improves base, see L<Mail::Message/"The header">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
 =item $obj-E<gt>B<seqnr>( [$integer] )
 
 Inherited, see L<Mail::Box::Message/"Attributes">
@@ -135,7 +123,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|$text|\$text|\@lines, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -147,7 +135,7 @@ Inherited, see L<Mail::Message::Construct::Rebuild/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|ARRAY-$of-$things] )
+=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|\@addrs|\@fields] )
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -246,6 +234,14 @@ Inherited, see L<Mail::Message/"The header">
 =item $obj-E<gt>B<get>($fieldname)
 
 Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<guessTimestamp>()
+
+The filename of a C<Mail::Box::Maildir::Message> contains a timestamp.  This
+is a wild guess about the actual time of sending of the message: it is the
+time of receipt which may be seconds to hours off.  But is still a good
+guess...  When the message header is not parsed, then this date is used.
+Improves base, see L<Mail::Message/"The header">
 
 =item $obj-E<gt>B<head>( [$head] )
 
@@ -475,35 +471,7 @@ Extends L<"Error handling" in Mail::Box::Dir::Message|Mail::Box::Dir::Message/"E
 
 Inherited, see L<Mail::Message::Construct/"METHODS">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -514,14 +482,6 @@ Inherited, see L<Mail::Message/"Error handling">
 =item $obj-E<gt>B<shortString>()
 
 Inherited, see L<Mail::Message/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =back
 
@@ -628,62 +588,10 @@ and should not break when applications crash.
 
 =over 4
 
-=item Error: Cannot coerce a $class object into a $class object
-
-Cast by C<coerce()>
-
-=item Error: Cannot create parser for $filename.
-
-For some reason (the previous message have told you already) it was not possible
-to create a message parser for the specified filename.
-Cast by C<parser()>
-
-=item Error: Cannot include forward source as $include.
+=item Error: Cannot include forward source as $kind.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
-Cast by C<forward()>
-
-=item Error: Cannot include reply source as $include.
-
-Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
-choices are C<NO>, C<INLINE>, and C<ATTACH>.
-Cast by C<reply()>
-
-=item Error: Cannot write message to $filename: $!
-
-When a modified or new message is written to disk, it is first written
-to a temporary file in the folder directory.  For some reason, it is
-impossible to create this file.
-Cast by C<create()>
-
-=item Error: Failed to move $new to $filename: $!
-
-When a modified or new message is written to disk, it is first written
-to a temporary file in the folder directory.  Then, the new file is
-moved to replace the existing file.  Apparently, the latter fails.
-Cast by C<create()>
-
-=item Error: Method bounce requires To, Cc, or Bcc
-
-The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
-else without modification; you must specified it's new destination.
-If you have the urge not to specify any destination, you probably
-are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
-L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
-Cast by C<bounce()>
-
-=item Error: Method forwardAttach requires a preamble
-
-Cast by C<forwardAttach()>
-
-=item Error: Method forwardEncapsulate requires a preamble
-
-Cast by C<forwardEncapsulate()>
-
-=item Error: No address to create forwarded to.
-
-If a forward message is created, a destination address must be specified.
 Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
@@ -693,11 +601,85 @@ find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
 Cast by C<send()>
 
-=item Error: No rebuild rule $name defined.
+=item Error: cannot coerce a $type object into a $me object.
+
+Cast by C<coerce()>
+
+=item Error: cannot include reply source as $kind.
+
+Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
+choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
+
+=item Error: cannot read message from a $source}.
+
+Cast by C<read()>
+
+=item Fault: cannot rename file $from to $to: $!
+
+Cast by C<filename()>
+
+=item Fault: cannot rename file $from to $to: $!
+
+Cast by C<labelsToFilename()>
+
+=item Fault: cannot write message to $file: $!
+
+When a modified or new message is written to disk, it is first written
+to a temporary file in the folder directory.  For some reason, it is
+impossible to create this file.
+Cast by C<create()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: coercion starts with some object, not '$type'.
+
+Cast by C<coerce()>
+
+=item Fault: failed to rename file $from to $to: $!
+
+When a modified or new message is written to disk, it is first written
+to a temporary file in the folder directory.  Then, the new file is
+moved to replace the existing file.  Apparently, the latter fails.
+Cast by C<create()>
+
+=item Error: method bounce requires To, Cc, or Bcc.
+
+The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
+else without modification; you must specified it's new destination.
+If you have the urge not to specify any destination, you probably
+are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
+L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
+
+=item Error: method forwardAttach requires a preamble.
+
+Cast by C<forwardAttach()>
+
+=item Error: method forwardEncapsulate requires a preamble.
+
+Cast by C<forwardEncapsulate()>
+
+=item Error: method forwardNo requires a To.
+
+Cast by C<forwardNo()>
+
+=item Error: method forwardNo requires a body.
+
+Cast by C<forwardNo()>
+
+=item Error: no rebuild rule $name defined.
 
 Cast by C<rebuild()>
 
-=item Error: Only build() Mail::Message's; they are not in a folder yet
+=item Error: only build() Mail::Message's; they are not in a folder yet.
 
 You may wish to construct a message to be stored in a some kind
 of folder, but you need to do that in two steps.  First, create a
@@ -706,23 +688,34 @@ L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get 
 into the right message type, adding storage information and the like.
 Cast by C<build()>
 
-=item Error: Package $package does not implement $method.
+=item Error: please install Email::Simple.
 
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
+Cast by C<coerce()>
 
-=item Error: Unable to read delayed body.
+=item Error: please install MIME::Entity.
+
+Cast by C<coerce()>
+
+=item Error: please install Mail::Internet.
+
+Cast by C<coerce()>
+
+=item Error: select parts via '$what'?
+
+Cast by C<parts()>
+
+=item Warning: skipped unknown key '$key' in build.
+
+Cast by C<build()>
+
+=item Error: unable to read delayed body for message $msgid.
 
 For some reason, the header of the message could be read, but the body
 cannot.  Probably the file has disappeared or the permissions were
 changed during the progress of the program.
 Cast by C<loadBody()>
 
-=item Error: Unable to read delayed head.
+=item Error: unable to read delayed head for message $msgid.
 
 L<Mail::Box|Mail::Box> tries to be I<lazy> with respect to parsing messages.  When a
 directory organized folder is opened, only the filenames of messages are
@@ -731,16 +724,12 @@ a message is used for the first time here, but has disappeared or is
 unreadible for some other reason.
 Cast by C<loadBody()>
 
-=item Error: coercion starts with some object
-
-Cast by C<coerce()>
-
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

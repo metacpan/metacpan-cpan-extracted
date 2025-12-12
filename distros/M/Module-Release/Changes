@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.137 2025-12-12T04:22:24Z
+	* new -c option to specify changes entry on the command line
+
 2.136 2025-01-03T06:51:12Z
 	* refresh distro and move to BRIANDFOY
 

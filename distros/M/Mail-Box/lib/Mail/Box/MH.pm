@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::MH;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Dir';
@@ -18,11 +18,12 @@ use parent 'Mail::Box::Dir';
 use strict;
 use warnings;
 
+use Log::Report      'mail-box', import => [ qw/__x error fault trace/ ];
+
 use Mail::Box::MH::Index   ();
 use Mail::Box::MH::Message ();
 use Mail::Box::MH::Labels  ();
 
-use Carp;
 use File::Spec::Functions  qw/rel2abs/;
 use File::Basename         qw/basename/;
 
@@ -75,9 +76,9 @@ sub create($@)
 	return $class if -d $directory;
 
 	mkdir $directory, 0700
-		or $class->log(ERROR => "Cannot create MH folder $name: $!"), return;
+		or fault __x"cannot create MH folder {name}", name => $name;
 
-	$class->log(PROGRESS => "Created folder $name.");
+	trace "Created folder $name.";
 	$class;
 }
 
@@ -172,16 +173,7 @@ sub listSubFolders(@)
 	grep $class->foundIn("$dir/$_"), @dirs;
 }
 
-
-sub openSubFolder($)
-{	my ($self, $name) = @_;
-
-	my $subdir = $self->nameOfSubFolder($name);
-	-d $subdir || mkdir $subdir, 0755
-		or $self->log(WARNING => "Cannot create subfolder $name for $self: $!"), return;
-
-	$self->SUPER::openSubFolder($name, @_);
-}
+#-------------
 
 sub topFolderWithMessages() { 1 }
 
@@ -198,20 +190,16 @@ sub appendMessages(@)
 	my $self     = $class->new(@_, access => 'r')
 		or return ();
 
-	my $directory= $self->directory;
-	-d $directory or return;
-
 	my $locker   = $self->locker;
 	$locker->lock
-		or $self->log(ERROR => "Cannot append message without lock on $self."), return;
+		or error __x"cannot append message without lock on {folder}.", folder => $self->name;
 
 	my $msgnr    = $self->highestMessageNumber +1;
 
+	my $directory= $self->directory;
 	foreach my $message (@messages)
 	{	my $filename = "$directory/$msgnr";
-		$message->create($filename)
-			or $self->log(ERROR => "Unable to write message for $self to $filename: $!\n");
-
+		$message->create($filename);
 		$msgnr++;
 	}
 
@@ -222,6 +210,18 @@ sub appendMessages(@)
 	$self->close(write => 'NEVER');
 
 	@messages;
+}
+
+#--------------------
+
+sub openSubFolder($)
+{	my ($self, $name) = @_;
+
+	my $subdir = $self->nameOfSubFolder($name);
+	-d $subdir || mkdir $subdir, 0755
+		or fault __x"cannot create directory {dir} for subfolder {name}", dir => $subdir, name => $name;
+
+	$self->SUPER::openSubFolder($name, @_);
 }
 
 #--------------------
@@ -246,15 +246,13 @@ sub index()
 {	my $self  = shift;
 	$self->{MBM_keep_index} or return ();
 
-	$self->{MBM_index} //=
-		$self->{MBM_index_type}->new(filename => $self->{MBM_index_filename}, $self->logSettings);
+	$self->{MBM_index} //= $self->{MBM_index_type}->new(filename => $self->{MBM_index_filename});
 }
 
 
 sub labels()
 {	my $self = shift;
-	$self->{MBM_labels} //=
-		$self->{MBM_labels_type}->new(filename => $self->{MBM_labels_filename}, $self->logSettings);
+	$self->{MBM_labels} //= $self->{MBM_labels_type}->new(filename => $self->{MBM_labels_filename});
 }
 
 sub readMessageFilenames
@@ -295,14 +293,13 @@ sub readMessages(@)
 
 	my $body_type   = $args{body_delayed_type};
 	my $head_type   = $args{head_delayed_type};
-	my @log         = $self->logSettings;
 
 	foreach my $msgnr (@msgnrs)
 	{	my $msgfile = "$directory/$msgnr";
 
 		my $head;
 		$head       = $index->get($msgfile) if $index;
-		$head     ||= $head_type->new(@log);
+		$head     ||= $head_type->new;
 
 		my $message = $args{message_type}->new(
 			head       => $head,
@@ -314,7 +311,7 @@ sub readMessages(@)
 		my $labref  = $labels ? $labels->get($msgnr) : ();
 		$message->label(seen => 1, $labref ? @$labref : ());
 
-		$message->storeBody($body_type->new(@log, message => $message));
+		$message->storeBody($body_type->new(message => $message));
 		$self->storeMessage($message);
 	}
 
@@ -342,6 +339,7 @@ sub delete(@)
 
 sub writeMessages($)
 {	my ($self, $args) = @_;
+	my $renumber = exists $args->{renumber} ? $args->{renumber} : 1;
 
 	# Write each message.  Two things complicate life:
 	#   1 - we may have a huge folder, which should not be on disk twice
@@ -351,9 +349,8 @@ sub writeMessages($)
 
 	my $locker    = $self->locker;
 	$locker->lock
-		or $self->log(ERROR => "Cannot write folder $self without lock."), return;
+		or error __x"cannot write folder {name} without lock.", name => $self->name;
 
-	my $renumber  = exists $args->{renumber} ? $args->{renumber} : 1;
 	my $directory = $self->directory;
 	my @messages  = @{$args->{messages}};
 

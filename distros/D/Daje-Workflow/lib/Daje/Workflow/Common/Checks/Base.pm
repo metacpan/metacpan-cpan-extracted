@@ -1,6 +1,6 @@
 package Daje::Workflow::Common::Checks::Base;
 use Mojo::Base -base, -signatures;
-use v5.40;
+use v5.42;
 
 # NAME
 #
@@ -37,6 +37,7 @@ has 'error';
 has 'model';
 
 1;
+
 
 
 

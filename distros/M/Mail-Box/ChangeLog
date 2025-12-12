@@ -3,14 +3,20 @@
 
 TODO: Mail::Box::Message::new(body_type) not used?
 
-#!!! This is the maintenance version of this module.  When you start fresh,
-#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
-#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+#!!! Mail::Box 3 compatibility is still maintained on github in branch
+#!!! maint3, and published.  So: you may find newer versions with major
+#!!! number 3.  Use (at least) version 4 for new developments.
+#!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
-version 3.012: Thu 27 Nov 14:16:04 CET 2025
+version 4.00: Thu 11 Dec 14:03:32 CET 2025
 
 	Changes:
-	- maintenance release with Mail::Box version 3 compatibility.
+	- use Mail::Box 4 exception model: use Log::Report
+	- remove SpamAssassin support; not used and out-dated.
+
+version 3.012:
+
+	Changes:
 	- mid-life upgrade project: require minimal Perl version 5.16
 	- remove deprecated use of Mail::Box::Tie, use ::ARRAY or ::HASH
 	- rename ::Manager::threads() into ::discoverThreads().  Old name

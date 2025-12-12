@@ -80,8 +80,6 @@ lib/Mail/Box/Search.pm
 lib/Mail/Box/Search.pod
 lib/Mail/Box/Search/Grep.pm
 lib/Mail/Box/Search/Grep.pod
-lib/Mail/Box/Search/SpamAssassin.pm
-lib/Mail/Box/Search/SpamAssassin.pod
 lib/Mail/Box/Test.pm
 lib/Mail/Box/Thread/Manager.pm
 lib/Mail/Box/Thread/Manager.pod
@@ -101,8 +99,6 @@ lib/Mail/Message/Head/Delayed.pm
 lib/Mail/Message/Head/Delayed.pod
 lib/Mail/Message/Head/Subset.pm
 lib/Mail/Message/Head/Subset.pod
-lib/Mail/Message/Wrapper/SpamAssassin.pm
-lib/Mail/Message/Wrapper/SpamAssassin.pod
 lib/Mail/Server.pm
 lib/Mail/Server.pod
 scripts/lsmail

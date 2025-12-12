@@ -58,6 +58,10 @@ Extends L<"Other methods" in HTML::FromMail::Format|HTML::FromMail::Format/"Othe
 
 Inherited, see L<HTML::FromMail::Format/"Other methods">
 
+=item $obj-E<gt>B<export>($object, %options)
+
+Z<>
+
 =item $obj-E<gt>B<lookup>($tag, \%options)
 
 Inherited, see L<HTML::FromMail::Format/"Other methods">
@@ -78,10 +82,24 @@ Inherited, see L<HTML::FromMail::Format/"Other methods">
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Fault: cannot write to $out: $!
+
+Cast by C<export()>
+
+=item Error: install Template::Magic for this formatter.
+
+Cast by C<magic()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.01,
-built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Search;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Reporter';
@@ -18,7 +18,7 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
 
 #--------------------
 
@@ -32,20 +32,17 @@ sub init($)
 	  = $in eq 'BODY'    ? (0,1)
 	  : $in eq 'HEAD'    ? (1,0)
 	  : $in eq 'MESSAGE' ? (1,1)
-	  :    ($self->log(ERROR => "Search in BODY, HEAD or MESSAGE not $in."), return);
+	  :    error __x"search in BODY, HEAD or MESSAGE, not {what UNKNOWN}.", what => $in;
 
-	! $self->{MBS_check_head} || $self->can('inHead')
-		or $self->log(ERROR => "Cannot search in header."), return;
-
-	! $self->{MBS_check_body} || $self->can('inBody')
-		or $self->log(ERROR => "Cannot search in body."), return;
+	! $self->{MBS_check_head} || $self->can('inHead') or error __x"cannot search in header.";
+	! $self->{MBS_check_body} || $self->can('inBody') or error __x"cannot search in body.";
 
 	my $deliver             = $args->{deliver};
 	$self->{MBS_deliver}
 	  = ref $deliver eq 'CODE' ? sub { $deliver->($self, $_[0]) }
 	  : !defined $deliver      ? undef
 	  : $deliver eq 'DELETE'   ? sub { $_[0]->{part}->toplevel->label(deleted => 1) }
-	  :    $self->log(ERROR => "Don't know how to deliver results in $deliver.");
+	  :    error __x"don't know how to deliver results in {what UNKNOWN}.", what => $deliver;
 
 	my $logic               = $args->{logical}  || 'REPLACE';
 	$self->{MBS_negative}   = $logic =~ s/\s*NOT\s*$//;
@@ -56,8 +53,8 @@ sub init($)
 	$self->{MBS_limit}      = $args->{limit}    || 0;
 	$self->{MBS_decode}     = $args->{decode}   || 1;
 	$self->{MBS_no_deleted} = not $args->{deleted};
-	$self->{MBS_delayed}    = defined $args->{delayed} ? $args->{delayed} : 1;
-	$self->{MBS_multiparts} = defined $args->{multiparts} ? $args->{multiparts} : 1;
+	$self->{MBS_delayed}    = exists $args->{delayed} ? $args->{delayed} : 1;
+	$self->{MBS_multiparts} = exists $args->{multiparts} ? $args->{multiparts} : 1;
 
 	$self;
 }
@@ -82,7 +79,7 @@ sub search(@)
 	  : $object->isa('Mail::Box')     ? $object->messages
 	  : $object->isa('Mail::Message') ? ($object)
 	  : $object->isa('Mail::Box::Thread::Node') ? $object->threadMessages
-	  :   croak "Expect messages to search, not $object.";
+	  :   error __x"expect messages to search, not {what UNKNOWN}.", what => $object;
 
 	my $take = 0;
 	   if($limit < 0) { $take = -$limit; @messages = reverse @messages }
@@ -103,7 +100,7 @@ sub search(@)
 		  =  $set && $logic eq 'OR'  ? 1
 		  : !$set && $logic eq 'AND' ? 0
 		  : $self->{MBS_negative}    ? ! $self->searchPart($message)
-		  :   $self->searchPart($message);
+		  :    $self->searchPart($message);
 
 		$message->label($label => $selected) if defined $label;
 		if($selected)

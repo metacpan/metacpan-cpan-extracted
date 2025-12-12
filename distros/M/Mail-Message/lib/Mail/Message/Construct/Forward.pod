@@ -52,12 +52,12 @@ matter, as long as it is present.  See C<Mail::Message::Body::Multipart>.
 
 =over 2
 
-=item Bcc => ADDRESSES
+=item Bcc => $string|$address|\@addresses
 
 Receivers of blind carbon copies: their names will not be published to
 other message receivers.
 
-=item Cc => ADDRESSES
+=item Cc => $string|$address|\@addresses
 
 The carbon-copy receivers, by default none.
 
@@ -65,7 +65,7 @@ The carbon-copy receivers, by default none.
 
 The date to be used in the message sent.
 
-=item From => ADDRESSES
+=item From => $string|$address|\@addresses
 
 Your identification, by default taken from the C<To> field of the
 source message.
@@ -83,15 +83,15 @@ subroutine specified by CODE.  The subroutine will be called passing
 the subject of the original message as only argument.  By default,
 the L<forwardSubject()|Mail::Message::Construct::Forward/"Constructing a message"> method is used.
 
-=item To => ADDRESSES
+=item To => $string|$address|\@addresses
 
-The destination of your message. Obligatory.  The ADDRESSES may be
-specified as string, a L<Mail::Address|Mail::Address> object, or as array of
+The destination of your message. Obligatory.  The addresses may be
+specified as string, a L<Mail::Address|Mail::Address> object, or as ARRAY of
 L<Mail::Address|Mail::Address> objects.
 
-=item body => OBJECT
+=item body => $body
 
-If you specify a fully prepared body OBJECT, it will be used as forwarded
+If you specify a fully prepared C<$body> object, it will be used as forwarded
 message contents.  In this case, only the headers are constructed for you.
 
 =item include => 'NO'|'INLINE'|'ATTACH'|'ENCAPSULATE'
@@ -108,14 +108,14 @@ It is only possible to inline textual messages, therefore binary or
 multi-part messages will always be enclosed as attachment.
 Read the details in section L</Creating a forward>.
 
-=item preamble => STRING|BODY
+=item preamble => STRING|$body
 
 Part which is attached before the forwarded message.  If no preamble
 is given, then it is constructed from the prelude and postlude.  When
 these are also not present, you will still get a one liner: the result
 of L<forwardPrelude()|Mail::Message::Construct::Forward/"Constructing a message">
 
-=item signature => BODY|MESSAGE
+=item signature => $body|$message
 
 The signature to be added in case of a multi-part forward.  The mime-type
 of the signature body should indicate this is a used as such.  However,
@@ -190,14 +190,14 @@ the postlude.
 Passed to L<Mail::Message::Body::stripSignature(max_lines)|Mail::Message::Body::Construct/"Constructing a body">.  Only
 effective for single-part messages.
 
-=item postlude => BODY
+=item postlude => $body
 
 The line(s) which to be added after the quoted reply lines.  Create a
 body for it first.  This should not include the signature, which has its
 own option.  The signature will be added after the postlude when the
 forwarded message is C<INLINE>d.
 
-=item prelude => BODY
+=item prelude => $body
 
 The line(s) which will be added before the quoted forwarded lines.
 If nothing is specified, the result of the L<forwardPrelude()|Mail::Message::Construct::Forward/"Constructing a message"> method
@@ -381,31 +381,34 @@ an original message as attachment.
 
 =over 4
 
-=item Error: Cannot include forward source as $include.
+=item Error: Cannot include forward source as $kind.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
 Cast by C<forward()>
 
-=item Error: Method forwardAttach requires a preamble
+=item Error: method forwardAttach requires a preamble.
 
 Cast by C<forwardAttach()>
 
-=item Error: Method forwardEncapsulate requires a preamble
+=item Error: method forwardEncapsulate requires a preamble.
 
 Cast by C<forwardEncapsulate()>
 
-=item Error: No address to create forwarded to.
+=item Error: method forwardNo requires a To.
 
-If a forward message is created, a destination address must be specified.
-Cast by C<forward()>
+Cast by C<forwardNo()>
+
+=item Error: method forwardNo requires a body.
+
+Cast by C<forwardNo()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

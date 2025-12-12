@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,17 @@
 
 
 package User::Identity::Collection::Users;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Collection';
+use parent 'User::Identity::Collection';
 
 use strict;
 use warnings;
 
-use User::Identity;
+use Log::Report     'user-identity';
+
+use User::Identity  ();
 
 #--------------------
 

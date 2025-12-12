@@ -1,16 +1,13 @@
 package Bitcoin::Crypto::Script::Common;
-$Bitcoin::Crypto::Script::Common::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Script::Common::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Types::Common -sigs, -types;
+use namespace::autoclean;
 
 use Bitcoin::Crypto qw(btc_script btc_tapscript);
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
 
 sub _make_PKH
 {
@@ -57,23 +54,6 @@ sub _make_TR
 		->add('OP_CHECKSIG');
 }
 
-sub _get_method
-{
-	my ($class, $type) = @_;
-
-	my $method = '_make_' . $type;
-	Bitcoin::Crypto::Exception::ScriptType->raise(
-		"cannot create common script of type $type"
-	) unless $class->can($method);
-
-	return $method;
-}
-
-signature_for new => (
-	method => Str,
-	positional => [Str, ByteStr],
-);
-
 sub new
 {
 	my ($class, $type, $data) = @_;
@@ -81,16 +61,21 @@ sub new
 	return $class->fill($type, undef, $data);
 }
 
-signature_for fill => (
-	method => Str,
-	positional => [Str, Maybe [BitcoinScript], ByteStr],
-);
-
 sub fill
 {
 	my ($class, $type, $script, $data) = @_;
 
-	my $method = $class->_get_method($type);
+	state $methods = {
+		PKH => '_make_PKH',
+		SH => '_make_SH',
+		WSH => '_make_WSH',
+		TR => '_make_TR',
+	};
+
+	my $method = $methods->{$type} // Bitcoin::Crypto::Exception::ScriptType->raise(
+		"cannot create common script of type $type"
+	);
+
 	return $class->$method($script, $data);
 }
 

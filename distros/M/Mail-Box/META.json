@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Cwd" : "0",
             "Date::Parse" : "0",
             "Devel::GlobalDestruction" : "0.09",
@@ -50,12 +49,20 @@
             "File::Spec" : "0.7",
             "File::Temp" : "0",
             "IO::Scalar" : "0",
-            "Mail::Message" : ">= 3.013, < 4.0",
-            "Mail::Transport" : ">= 3.003, < 4.0",
-            "Object::Realize::Later" : ">= 0.19, < 4.0",
+            "Log::Report" : "1.42",
+            "Mail::Message" : "4.000",
+            "Mail::Transport" : "4.000",
+            "Object::Realize::Later" : "4.000",
             "POSIX" : "0",
             "Scalar::Util" : "1.13",
+            "String::Print" : "1.01",
             "Sys::Hostname" : "0"
+         },
+         "x_optional" : {
+            "HTML::FromMail" : "0, <4.0",
+            "Mail::Box::IMAP4" : "3.0, <4.0",
+            "Mail::Box::POP3" : "3.0, <4.0",
+            "Mail::Box::Parser::C" : "3.0, <4.0"
          }
       },
       "test" : {
@@ -77,7 +84,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box"
       }
    },
-   "version" : "3.012",
+   "version" : "4.00",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,
@@ -93,6 +100,12 @@
             "stylesheet" : "/oodoc.css",
             "templates" : "html",
             "webpages" : "../public_html/mailbox/html"
+         },
+         {
+            "export" : "website",
+            "markup" : "html",
+            "publish" : "../public_html/mail-box/doctree",
+            "serializer" : "json"
          }
       ],
       "include" : [

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,20 +10,22 @@
 
 
 package Mail::Message::Head::Subset;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Head';
+use parent 'Mail::Message::Head';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw// ];
 
 use Object::Realize::Later
 	becomes        => 'Mail::Message::Head::Complete',
 	realize        => 'load',
 	believe_caller => 1;
 
-use Date::Parse qw/str2time/;
+use Date::Parse       qw/str2time/;
 
 #--------------------
 

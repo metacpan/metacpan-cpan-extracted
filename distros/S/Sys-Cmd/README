@@ -1,42 +1,60 @@
 NAME
-    Sys::Cmd - run a system command or spawn a system processes
+    Sys::Cmd - Run a system command or spawn a process
 
 VERSION
-    v0.986.0 (2025-12-04)
+    v0.986.3 (2025-12-11)
 
 SYNOPSIS
         use Sys::Cmd qw/run runsub spawn/;
 
-        my $output   = run( 'ls', '--long' );    # /usr/bin/ls --long
-        my @numbered = run( 'cat', '-n',         # /usr/bin/cat -n <<EOF
-            {                                    # > X
-                input => "X\nY\nZ\n",            # > Y
-            }                                    # > Z
-        );                                       # EOF
+    Catch a command's standard output, warning on anything sent to
+    stderr, raise an exception on abnormal exit:
 
-        my $ls = runsub( 'ls',                   # Does nothing... yet
+        my $output = run( 'ls', '--long' );
+
+    Commands can be fed input from Perl and return separate lines in in
+    array context:
+
+        my @XYZ = run( 'cat', '-n', { input => "X\nY\nZ\n", } );
+
+    Put outputs and exit value directly into scalars, in which case no
+    warnings or exceptions are triggered:
+
+        my ($out, $err, $exit);
+        run( 'ls', 'FILE_NOT_FOUND', {
+            out => \$out,
+            err => \$err,
+            exit => \$exit,
+        });
+
+    A type of templating exists for multiple calls to the same command
+    with pre-defined defaults:
+
+        my $ls = runsub( 'ls',        # Returns a subref
             {
                 dir => '/tmp',
-                out => \$output,
+                out => \$out,
             }
         );
-        $ls->( 'here' );                         # Runs in /tmp and puts
-        $ls->( '-l', 'there');                   # (long) output in $output
+        $ls->()                       &&  print $out;
+        $ls->({ dir => '/elsewhere'}) &&  print $out;
 
-        # Spawn a process for asynchronous interaction
-        my $proc = spawn( @cmd, { encoding => 'iso-8859-3' } );
-        while ( my $line = $proc->stdout->getline ) {
+    Use "spawn" for asynchronous interaction:
+
+        my $proc = spawn( @cmd );
+        printf "pid %d\n", $proc->pid;
+
+        while ( defined ( my $line = $proc->stdout->getline ) ) {
             $proc->stdin->print("thanks\n");
         }
         warn $proc->stderr->getlines;
 
-        $proc->close();    # Finished talking to file handles
-        $proc->wait_child && die "Non-zero exit!: " . $proc->exit;
+        $proc->wait_child || warn $proc->status;
 
 DESCRIPTION
     Sys::Cmd lets you run a system command and capture its output, or
-    spawn and interact with a process through its stdin, stdout and
-    error handles.
+    spawn and interact with a process through its "stdin", "stdout" and
+    "stderr" handles.
 
     It provides something of a superset of Perl's builtin external
     process functions ("system", "qx//", "fork"+"exec", and "open"):
@@ -49,15 +67,15 @@ DESCRIPTION
 
     *   Raise exception on failure (run)
 
-    *   Capture output and error separately (run, spawn)
+    *   Capture output, error and exit separately (run, spawn)
+
+    *   Sensible exit and signal values
 
     *   Asynchronous interaction through file handles (spawn)
 
-    *   Sensible exit values (spawn)
-
     *   Template functions for repeated calls (runsub, spawnsub)
 
-COMMAND PROCESSING
+  Command Path
     All functions take a @cmd list that specifies the command and its
     arguments. The first element of @cmd determines what/how things are
     run:
@@ -73,18 +91,16 @@ COMMAND PROCESSING
 
     The remaining scalar elements of @cmd are passed as arguments.
 
-OPTIONS
-    The @cmd list may also include an optional "\%opts" HASH reference
-    to adjust aspects of the execution.
+  Common Options
+    A function's @cmd list may also include an optional "\%opts" HASH
+    reference to adjust aspects of the execution. The following
+    configuration items (key => default) are common to all Sys::Cmd
+    functions.
 
-    The following configuration items (key => default) are common to all
-    Sys::Cmd functions and are passed to the underlying
-    Sys::Cmd::Process objects at creation time:
-
-    dir => $PWD
-        The working directory the command will be run in. Note that if
-        @cmd is a relative path, it may not be found from the new
-        location.
+    dir => $CWD
+        The working directory the command will be run in. Note that a
+        relative command path might not be valid if the current
+        directory changes.
 
     encoding => $Encode::Locale::ENCODING_LOCALE
         A string value identifying the encoding that applies to
@@ -121,28 +137,33 @@ FUNCTIONS
         lines instead of a scalar string. Accepts the following
         additional configuration keys:
 
-        out => undef
+        out => \$scalar
             A reference to a scalar which is populated with output. When
             given run() returns nothing.
 
-        err => undef
+        err => \$scalar
             A reference to a scalar which is populated with error
             output. When given run() does not warn of errors.
 
+        exit => \$scalar
+            A reference to a scalar which is populated with the exit
+            value. When given run() does not raise an exception on a
+            non-zero exit.
+
     spawn( @cmd, [\%opt] ) => Sys::Cmd::Process
-        Returns a Sys::Cmd::Process object representing the process
-        running @cmd. You can interrogate this and interact with the
-        process via cmdline(), stdin(), stdout(), stderr(), close(),
-        wait_child(), exit(), signal(), core(), etc.
+        Return an object representing the process running according to
+        @cmd and "\%opt". This is the core mechanism underlying "run".
+
+        You can interact with the process object via its cmdline(),
+        stdin(), stdout(), stderr(), close(), wait_child(), exit(),
+        signal(), core() attributes and handles. See Sys::Cmd::Process
+        for details.
 
   Template Functions
     When repeatedly calling a command, possibly with only slightly
     different arguments or environments, a kind of "templating"
     mechanism can be useful, to avoid repeating full configuration
     values and wearing a path lookup penalty each call.
-
-    The Sys::Cmd class itself provides this functionality, exposed as
-    follows:
 
     runsub( @cmd, [\%opt] ) => CODEref
         Returns a subroutine reference representing a *future* command
@@ -170,9 +191,6 @@ FUNCTIONS
                 }
             ));
 
-        (Equivalent to manually calling syscmd(...) below, followed by
-        the "runsub" method).
-
     spawnsub( @cmd, [\%opt] ) => CODEref
         Returns a subroutine reference representing a *future* process
         to be created in the style of "spawn", with default arguments
@@ -188,19 +206,6 @@ FUNCTIONS
             }
             print $_->pid . ': ' . $_->stdout->getlines for @kids;
             $_->wait_child for @kids;
-
-        (Equivalent to manually calling syscmd(...) below followed by
-        the "spawnsub" method).
-
-    syscmd( @cmd, [\%opt] ) => Sys::Cmd
-        Returns a Sys::Cmd object representing a *future* command (or
-        coderef) to be executed in some way. You can then call multiple
-        run() or spawn() *methods* on the object for the actual work.
-        The methods work the same way in terms of input, output, and
-        return values as the exported package functions.
-
-        This function underlies the "runsub" and "spawnsub" functions,
-        but the author finds it less attractive as an interface.
 
 ALTERNATIVES
     AnyEvent::Run, AnyEvent::Util, Argv, Capture::Tiny, Child,

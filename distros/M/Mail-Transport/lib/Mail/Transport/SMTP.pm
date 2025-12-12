@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 3.008.
+# This code is part of Perl distribution Mail-Transport version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,17 @@
 
 
 package Mail::Transport::SMTP;{
-our $VERSION = '3.008';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Transport::Send';
+use parent 'Mail::Transport::Send';
 
 use strict;
 use warnings;
 
-use Net::SMTP         ();
+use Log::Report   'mail-transport', import => [ qw/__x error notice warning/ ];
+
+use Net::SMTP     ();
 
 use constant CMD_OK      => 2;
 
@@ -60,10 +62,10 @@ sub trySend($@)
 
 	# Which are the destinations.
 	! defined $args{To}
-		or $self->log(WARNING => "Use option `to' to overrule the destination: `To' refers to a field");
+		or warning __x"use option `to' to overrule the destination: `To' refers to a field.";
 
 	my @to = map $_->address, $self->destinations($message, $args{to});
-	@to or $self->log(NOTICE => 'No addresses found to send the message to, no connection made'), return 1;
+	@to or notice(__x"no addresses found to send the message to, no connection made."), return 1;
 
 	#### Prepare the message.
 

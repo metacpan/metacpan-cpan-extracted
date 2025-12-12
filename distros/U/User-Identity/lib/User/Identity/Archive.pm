@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package User::Identity::Archive;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Item';
+use parent 'User::Identity::Item';
 
 use strict;
 use warnings;
+
+use Log::Report     'user-identity';
 
 #--------------------
 
@@ -25,7 +27,7 @@ sub type { "archive" }
 
 sub init($)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	if(my $from = delete $args->{from})
 	{	$self->from($from) or return;

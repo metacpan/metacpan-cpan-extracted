@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,12 +10,14 @@
 
 
 package Mail::Message;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error trace/ ];
 
 use Mail::Message::Head::Complete  ();
 use Mail::Message::Body::Lines     ();
@@ -45,7 +47,7 @@ sub rebuild(@)
 	foreach my $rule (@rules)
 	{	next if ref $rule;
 		$self->can($rule)
-			or $self->log(ERROR => "No rebuild rule '$rule' defined.\n"), return 1;
+			or error __x"no rebuild rule '{name}' defined.", name => $rule;
 	}
 
 	# Start off with the message
@@ -148,8 +150,8 @@ sub descendNested($@)
 	return $part if $newnested==$srcnested;
 
 	# Changes in the encapsulated message
-	my $newbody = ref($body)->new(based_on => $body, nested => $newnested);
-	my $rebuild = ref($part)->new(head => $part->head->clone, container => undef);
+	my $newbody   = (ref $body)->new(based_on => $body, nested => $newnested);
+	my $rebuild   = (ref $part)->new(head => $part->head->clone, container => undef);
 
 	$rebuild->body($newbody);
 	$rebuild;
@@ -220,8 +222,7 @@ sub textAlternativeForHtml($@)
 		or return $part;
 
 	my $container = $part->container;
-	my $in_alt    = defined $container
-					&& $container->mimeType eq 'multipart/alternative';
+	my $in_alt    = defined $container && $container->mimeType eq 'multipart/alternative';
 
 	return $part
 		if $in_alt && first { $_->body->mimeType eq 'text/plain' } $container->parts;

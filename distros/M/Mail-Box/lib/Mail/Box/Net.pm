@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Net;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x warning/ ];
 
 use Mail::Box::Net::Message        ();
 use Mail::Message::Body::Lines     ();
@@ -25,8 +27,6 @@ use Mail::Message::Body::Delayed   ();
 use Mail::Message::Body::Multipart ();
 use Mail::Message::Head            ();
 use Mail::Message::Head::Delayed   ();
-
-use Carp;
 
 #--------------------
 
@@ -66,7 +66,7 @@ sub init($)
 	$self->{MBN_password} = $args->{password}     || $pwd;
 
 	! exists $args->{hostname}
-		or $self->log(WARNING => "The term 'hostname' is confusing wrt folder. You probably need 'server_name'");
+		or warning __x"the term 'hostname' is confusing wrt folder. You probably need 'server_name'.";
 
 	$self;
 }

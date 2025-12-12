@@ -22,12 +22,14 @@ HTML::FromMail - base-class for the HTML producers
 
 =head1 DESCRIPTION
 
-This module is designed to put e-mail related data on web-pages.
-This could be used to create web-mail clients.
+This module is designed to put e-mail related data
+on web-pages.  This could be used to create web-mail clients.
 
-B<This is a maintenance release for the old interface>.  Read
-F<https://https://github.com/markov2/perl5-Mail-Box/wiki/> how
-to move to towards version 4.
+B<Be aware:>
+This module version 4.0 and up is not fully compatible with older releases:
+mainly the exception handling has changed.  When you need to upgrade, please read
+F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+B<Version 3 is still maintained> and may see new releases as well.
 
 =head2 Status
 
@@ -285,51 +287,51 @@ For settings available for messages, see L<HTML::FromMail::Message/Settings>.
 
 =over 4
 
-=item Warning: Cannot find $dir/file
+=item Warning: cannot find directory {dir}.
 
 Cast by C<expandFiles()>
 
-=item Error: Cannot find template file or directory $topic in $directory.
+=item Error: cannot find template file or directory $topic in $directory.
 
 The templates directory (see L<new(templates)|HTML::FromMail/"Constructors">) does not contain a template
 for the specified topic (see L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"Constructors">).
 Cast by C<templates()>
 
-=item Error: Cannot read from directory $thing: $!
+=item Fault: cannot read from directory {dir}: $!
 
 Cast by C<expandFiles()>
 
-=item Error: Cannot use $producer for $class: $@
+=item Error: cannot use $producer for $class: $@
 
 The specified producer (see L<new(producers)|HTML::FromMail/"Constructors">) does not exist or produces
 compilation errors.  The problem is displayed.
 Cast by C<producer()>
 
-=item Error: Formatter $class can not be used: $@
+=item Error: formatter $class could not be instantiated.
 
 Cast by C<new()>
 
-=item Error: Formatter $class could not be instantiated
-
-Cast by C<new()>
-
-=item Error: No output directory or file specified.
+=item Error: no output directory or file specified.
 
 Cast by C<export()>
 
-=item Error: No producer for $class objects.
+=item Error: no producer for $class objects.
 
 Cast by C<export()>
 
-=item Warning: No templates for $topic objects.
+=item Warning: no template file $file.
 
 Cast by C<export()>
 
-=item Warning: No templates found in $templates directory
+=item Warning: no templates for $topic objects.
 
 Cast by C<export()>
 
-=item Warning: Skipping $full, which is neither file or directory.
+=item Warning: no templates found in $dir directory.
+
+Cast by C<export()>
+
+=item Warning: skipping {name}, which is neither file or directory.
 
 Cast by C<expandFiles()>
 
@@ -337,8 +339,8 @@ Cast by C<expandFiles()>
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.01,
-built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

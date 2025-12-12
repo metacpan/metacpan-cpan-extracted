@@ -46,12 +46,10 @@ object will call it to construct C<Mail::Box::Thread::Node> objects.
 Either a C<message> or a C<messageId> must be supplied.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option    --Defined in     --Default
-  dummy_type                   undef
-  log         Mail::Reporter   'WARNINGS'
-  message                      undef
-  messageId                    undef
-  trace       Mail::Reporter   'WARNINGS'
+ -Option    --Default
+  dummy_type  undef
+  message     undef
+  messageId   undef
 
 =over 2
 
@@ -59,8 +57,6 @@ Improves base, see L<Mail::Reporter/"Constructors">
 
 Indicates the C<$class> name of dummy messages. Dummy messages are
 placeholders in a L<Mail::Box::Thread::Manager|Mail::Box::Thread::Manager> data structure.
-
-=item log => LEVEL
 
 =item message => $message
 
@@ -71,8 +67,6 @@ must be a L<Mail::Box::Message|Mail::Box::Message>.
 
 The C<$msgid> for the message which is stored in this node.  Only
 specify it when you don't have the message yet.
-
-=item trace => LEVEL
 
 =back
 
@@ -88,10 +82,6 @@ Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
 Returns C<true> if the message is a dummy. A dummy is a "hole" in a thread
 which has follow-ups but does not have a message.
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<messageId>()
 
@@ -110,43 +100,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -392,21 +346,25 @@ Returns the sum of the size of all the messages in the thread.
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Error: thread node needs a message object or msgid.
+
+Cast by C<new()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

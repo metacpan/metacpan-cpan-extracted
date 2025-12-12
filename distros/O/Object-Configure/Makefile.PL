@@ -32,7 +32,8 @@ WriteMakefile(
 	}, PREREQ_PM => {			# Dependencies (with versions)
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'Config::Abstraction' => 0.36,
+		'Config::Abstraction' => 0.37,
+		'File::Spec' => 0,
 		'Log::Abstraction' => 0.26,
 		'Params::Get' => 0.13,
 		'Return::Set' => 0,

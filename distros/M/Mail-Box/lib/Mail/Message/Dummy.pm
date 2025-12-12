@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Dummy;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Message';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
 
 #--------------------
 
@@ -27,7 +29,7 @@ sub init($)
 	$self->SUPER::init($args);
 
 	exists $args->{messageId}
-		or $self->log(ERROR => "Message-Id is required for a dummy."), return undef;
+		or error __x"the messageId is required for a dummy.";
 
 	$self;
 }
@@ -35,14 +37,9 @@ sub init($)
 sub isDummy()    { 1 }
 
 
-sub head()
-{	shift->log(ERROR => "You cannot take the head of a dummy message");
-	();
-}
+sub head(;$) { error __x"you cannot take the head of a dummy message." }
 
-sub body()
-{	shift->log(ERROR => "You cannot take the body of a dummy message");
-	();
-}
+
+sub body(;$) { error __x"you cannot take the body of a dummy message." }
 
 1;

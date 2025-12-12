@@ -144,8 +144,8 @@ sections 6.3.8 (LIST question) and 7.2.2 (LIST answer)
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 3.010,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

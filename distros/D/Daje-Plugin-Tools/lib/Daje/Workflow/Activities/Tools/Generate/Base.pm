@@ -37,7 +37,7 @@ use Daje::Database::View::VToolsVersion;
 use Daje::Database::View::VToolsObjectsTypes;
 use Daje::Database::View::VToolsObjectsTables;
 use Daje::Database::Helper::LoadParameters;
-
+use POSIX;
 
 has 'versions';
 has 'tables';
@@ -74,7 +74,10 @@ sub load_generate_data($self, $tools_projects_pkey) {
             push @{$version}, $data;
         }
         $versions->{versions} = $version;
+        $versions->{data_sectioner} = "__DATA__";
+        $versions->{date_time} = strftime "%Y-%m-%d %H:%M:%S", localtime time;
         $versions->{project_name} = $self->load_project_name($tools_projects_pkey);
+        $versions->{name_space} = $self->get_parameter('Sql', 'Output Name Space', $tools_projects_pkey);
         $self->versions($versions);
     }
     return 1;

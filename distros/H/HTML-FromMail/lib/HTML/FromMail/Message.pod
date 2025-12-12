@@ -437,17 +437,21 @@ implemented) in HTML::FromMail::Default::HTMLifiers.
 
 =over 4
 
-=item Warning: No field name specified in $template
+=item Error: foreachPart not used within part.
+
+Cast by C<htmlForeachPart()>
+
+=item Error: foreachPart outside multipart.
+
+Cast by C<htmlForeachPart()>
+
+=item Warning: no field name specified in $template.
 
 Cast by C<htmlField()>
 
-=item Error: foreachPart not used within part
+=item Error: part outside a 'message' block.
 
-Cast by C<htmlForeachPart()>
-
-=item Error: foreachPart outside multipart
-
-Cast by C<htmlForeachPart()>
+Cast by C<htmlPart()>
 
 =item Error: use of 'addresses' outside field container
 
@@ -465,8 +469,8 @@ Cast by C<htmlName()>
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.01,
-built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

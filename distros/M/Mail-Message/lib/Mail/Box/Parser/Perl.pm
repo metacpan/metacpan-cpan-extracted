@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -9,20 +9,21 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 
-#XXX WARNING: large overlap with Mail::Box::Parser:C; you may need to change both!
-
 package Mail::Box::Parser::Perl;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Box::Parser';
+use parent 'Mail::Box::Parser';
 
 use strict;
 use warnings;
 
-use Mail::Message::Field;
-use List::Util 'sum';
-use IO::File   ();
+use Log::Report   'mail-message', import => [ qw/__x error fault info warning trace/ ];
+
+use List::Util    qw/sum/;
+use IO::File      ();
+
+use Mail::Message::Field ();
 
 my $empty_line = qr/^\015?\012?$/;
 
@@ -30,11 +31,11 @@ my $empty_line = qr/^\015?\012?$/;
 
 sub init(@)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	$self->{MBPP_mode}     = $args->{mode} || 'r';
 	$self->{MBPP_filename} = $args->{filename} || ref $args->{file}
-		or $self->log(ERROR => "Filename or handle required to create a parser."), return;
+		or error __x"filename or handle required to create a parser.";
 
 	$self->start(file => $args->{file});
 	$self;
@@ -53,14 +54,14 @@ sub start(@)
 	$self->openFile(%args) or return;
 	$self->takeFileInfo;
 
-	$self->log(PROGRESS => "Opened folder ".$self->filename." to be parsed");
+	trace "opened folder ".$self->filename." to be parsed";
 	$self;
 }
 
 
 sub stop()
 {	my $self = shift;
-	$self->log(NOTICE => "Close parser for file ".$self->filename);
+	trace "close parser for file " . $self->filename;
 	$self->closeFile;
 }
 
@@ -70,7 +71,7 @@ sub restart()
 	$self->closeFile;
 	$self->openFile(@_) or return;
 	$self->takeFileInfo;
-	$self->log(NOTICE => "Restarted parser for file ".$self->filename);
+	trace "restarted parser for file " . $self->filename;
 	$self;
 }
 
@@ -88,6 +89,7 @@ sub filePosition(;$)
 	@_ ? $self->file->seek(shift, 0) : $self->file->tell;
 }
 
+
 sub readHeader()
 {	my $self  = shift;
 	my $file  = $self->file or return ();
@@ -100,7 +102,7 @@ sub readHeader()
 		my ($name, $body) = split /\s*\:\s*/, $line, 2;
 
 		unless(defined $body)
-		{	$self->log(WARNING => "Unexpected end of header in ".$self->filename.":\n $line");
+		{	warning __x"unexpected end of header in {file}:\n {line}", file => $self->filename, line => $line;
 
 			if(@ret && $self->fixHeaderErrors)
 			{	$ret[-1][1] .= ' '.$line;  # glue err line to previous field

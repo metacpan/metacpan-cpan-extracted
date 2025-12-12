@@ -1,7 +1,7 @@
 package Melian;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Perl client to the Melian cache
-$Melian::VERSION = '0.006';
+$Melian::VERSION = '0.007';
 use v5.34;
 use Carp qw(croak);
 use IO::Socket::INET;
@@ -262,11 +262,12 @@ sub load_schema_from_spec {
         );
 
         my @columns;
-        my $column_id = 0;
         foreach my $column_data ( split m{;}, $columns ) {
-            my ( $column_name, $column_type ) = split /:/, $column_data;
+            my ( $column_data, $column_type ) = split /:/, $column_data;
+            my ( $column_name, $column_id )   = split m{#}, $column_data;
+
             push @{ $table_entry{'indexes'} }, {
-                'id'     => $column_id++,
+                'id'     => $column_id,
                 'column' => $column_name,
                 'type'   => $column_type,
             }
@@ -415,7 +416,7 @@ Melian - Perl client to the Melian cache
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

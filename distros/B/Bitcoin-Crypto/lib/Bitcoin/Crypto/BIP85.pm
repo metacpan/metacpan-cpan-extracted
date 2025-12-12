@@ -1,21 +1,18 @@
 package Bitcoin::Crypto::BIP85;
-$Bitcoin::Crypto::BIP85::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::BIP85::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use List::Util qw(all);
 use Crypt::Mac::HMAC qw(hmac);
 use Crypt::Digest::SHAKE;
 
 use Bitcoin::Crypto qw(btc_prv btc_extprv);
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Util qw(mnemonic_from_entropy);
+use Bitcoin::Crypto::Util::Internal qw(mnemonic_from_entropy);
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
 
 has param 'key' => (
 	isa => InstanceOf ['Bitcoin::Crypto::Key::ExtPrivate'],
@@ -36,7 +33,7 @@ sub _adjust_length
 }
 
 signature_for derive_entropy => (
-	method => Object,
+	method => !!1,
 	positional => [DerivationPath, Maybe [PositiveInt], {default => undef}],
 );
 
@@ -58,7 +55,7 @@ sub derive_entropy
 }
 
 signature_for derive_mnemonic => (
-	method => Object,
+	method => !!1,
 	named => [
 		words => Enum [12, 18, 24],
 		{default => 24},
@@ -101,7 +98,7 @@ sub derive_mnemonic
 }
 
 signature_for derive_prv => (
-	method => Object,
+	method => !!1,
 	named => [
 		index => PositiveOrZeroInt,
 		{default => 0},
@@ -120,7 +117,7 @@ sub derive_prv
 }
 
 signature_for derive_extprv => (
-	method => Object,
+	method => !!1,
 	named => [
 		index => PositiveOrZeroInt,
 		{default => 0},
@@ -136,13 +133,13 @@ sub derive_extprv
 
 	my $entropy = $self->derive_entropy($spec_path);
 	return btc_extprv->new(
-		key_instance => substr($entropy, 32, 32),
+		_key_instance => substr($entropy, 32, 32),
 		chain_code => substr($entropy, 0, 32),
 	);
 }
 
 signature_for derive_bytes => (
-	method => Object,
+	method => !!1,
 	named => [
 		bytes => Int->where(q{$_ >= 16 && $_ <= 64}),
 		{default => 64},
@@ -206,7 +203,7 @@ using L<Bitcoin::Crypto::Key::Private/to_wif>.
 
 This application returns an extended private key instead of its serialized
 version, but can be serialized using
-L</Bitcoin::Crypto::Key::ExtPrivate/to_serialized>.
+L<Bitcoin::Crypto::Key::ExtPrivate/to_serialized>.
 
 =item * C<HEX>: L</derive_bytes>
 

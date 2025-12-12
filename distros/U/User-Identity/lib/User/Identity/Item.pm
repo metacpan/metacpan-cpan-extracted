@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,21 +10,22 @@
 
 
 package User::Identity::Item;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
 
-use Scalar::Util qw/weaken/;
-use Carp;
+use Log::Report     'user-identity';
+
+use Scalar::Util    qw/weaken/;
 
 #--------------------
 
 sub new(@)
 {	my $class = shift;
-	return undef unless @_;       # no empty users.
+	@_ or return undef;       # no empty users.
 
 	unshift @_, 'name' if @_ %2;  # odd-length list: starts with nick
 
@@ -32,8 +33,8 @@ sub new(@)
 	my $self = (bless {}, $class)->init(\%args);
 
 	if(my @missing = keys %args)
-	{	local $" = '", "';
-		warn "WARNING: Unknown ".(@missing==1? 'option' : 'options' ). " \"@missing\" for a $class\n";
+	{	warning __xn"unknown option '{name}' for {class}.", "unknown options {names} for {class}",
+			scalar @missing, name => $missing[0], names => \@missing, class => $class;
 	}
 
 	$self;
@@ -42,9 +43,8 @@ sub new(@)
 sub init($)
 {	my ($self, $args) = @_;
 
-	unless(defined($self->{UII_name} = delete $args->{name}))
-	{	croak "ERROR: Each item requires a name";
-	}
+	$self->{UII_name} = delete $args->{name}
+		// error __x"each item requires a name.";
 
 	$self->{UII_description} = delete $args->{description};
 	$self;
@@ -76,21 +76,18 @@ sub addCollection(@)
 	my $object;
 	if(ref $_[0])
 	{	$object = shift;
-		$object->isa('User::Identity::Collection') or croak "ERROR: $object is not a collection";
+		$object->isa('User::Identity::Collection') or error __x"this {object} is not a collection.", object => $object;
 	}
 	else
 	{	unshift @_, 'type' if @_ % 2;
 		my %args  = @_;
-		my $type  = delete $args{type};
-
-		$type or croak "ERROR: Don't know what type of collection you want to add";
+		my $type  = delete $args{type} or panic "no collection type specified";
 
 		my $class = $collectors{$type} || $collectors{$type.'s'} || $type;
 		eval "require $class";
-		$@ and croak "ERROR: Cannot load collection module $type ($class); $@\n";
+		$@ and error __x"cannot load collection module {type} ({class}): {err}", type => $type, class => $class, err => $@;
 
 		$object = $class->new(%args);
-		defined $object or croak "ERROR: Creation of a collection via $class failed\n";
 	}
 
 	$object->parent($self);
@@ -118,17 +115,14 @@ sub collection($;$)
 }
 
 
-
 sub add($$)
 {	my ($self, $collname) = (shift, shift);
 	my $collection
 	  = ref $collname && $collname->isa('User::Identity::Collection') ? $collname
 	  :   ($self->collection($collname) || $self->addCollection($collname));
 
-	unless($collection)
-	{	carp "No collection $collname";
-		return;
-	}
+	defined $collection
+		or error __x"invalid collection {name}.", name => $collname;
 
 	$collection->addRole(@_);
 }

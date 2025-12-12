@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Transport::IMAP4;{
-our $VERSION = '3.010';
+our $VERSION = '4.000';
 }
 
 use parent 'Mail::Transport::Receive';
 
 use strict;
 use warnings;
+
+use Log::Report 'mail-box-imap4';
 
 use Digest::HMAC_MD5;   # only availability check for CRAM_MD5
 use Mail::IMAPClient  ();
@@ -117,7 +119,7 @@ sub authentication(@)
 
 sub domain(;$)
 {	my $self = shift;
-	return $self->{MTI_domain} = shift if @_;
+	@_ and return $self->{MTI_domain} = shift;
 	$self->{MTI_domain} || ($self->remoteHost)[0];
 }
 
@@ -134,21 +136,14 @@ sub createImapClient($@)
 
 	my ($host, $port) = $self->remoteHost;
 
-	my $debug_level = $self->logPriority('DEBUG')+0;
-	if($self->log <= $debug_level || $self->trace <= $debug_level)
-	{	tie *dh, 'Mail::IMAPClient::Debug', $self;
-		push @args, Debug => 1, Debug_fh => \*dh;
-	}
-
 	my $client = $class->new(
 		Server => $host, Port => $port,
 		User   => undef, Password => undef,   # disable auto-login
 		Uid    => 1,                          # Safer
 		Peek   => 1,                          # Don't set \Seen automaticly
 		@args,
-	);
+	) or error __x"cannot create imap client: {error}", error => $@;
 
-	$self->log(ERROR => $@), return undef if $@;
 	$client;
 }
 
@@ -162,16 +157,12 @@ sub login(;$)
 	my ($interval, $retries, $timeout) = $self->retry;
 
 	my ($host, $port, $username, $password) = $self->remoteHost;
-	unless(defined $username)
-	{	$self->log(ERROR => "IMAP4 requires a username and password");
-		return;
-	}
-	unless(defined $password)
-	{	$self->log(ERROR => "IMAP4 username $username requires a password");
-		return;
-	}
+	defined $username or error __x"IMAP4 requires a username and password";
+	defined $password or error __x"IMAP4 username {user} requires a password", user => $username;
 
 	my $warn_fail;
+	my $service = "$username\@$host:$port";
+
 	while(1)
 	{
 		foreach my $auth ($self->authentication)
@@ -182,10 +173,8 @@ sub login(;$)
 			$imap->Authmechanism(undef);   # disable auto-login
 			$imap->Authcallback(undef);
 
-			unless($imap->connect)
-			{	$self->log(ERROR => "IMAP cannot connect to $host: ", $imap->LastError);
-				return undef;
-			}
+			$imap->connect
+				or error __x"IMAP4 cannot connect to {service}: {error}", service => $host, error => $imap->LastError;
 
 			$imap->User($username);
 			$imap->Password($password);
@@ -193,16 +182,17 @@ sub login(;$)
 			$imap->Authcallback($challenge) if defined $challenge;
 
 			if($imap->login)
-			{	$self->log(NOTICE => "IMAP4 authenication $mechanism to $username\@$host:$port successful");
+			{	notice __x"IMAP4 authenication {type} to {service} successful", type => $mechanism, service => $service;
 				return $self;
 			}
 		}
 
 		--$retries != 0
-			or $self->log(ERROR => "Couldn't contact to $username\@$host:$port"), return undef;
+			or error __x"couldn't contact to IMAP4 {service}", service => $service;
 
 		$warn_fail++
-			or $self->log(WARNING => "Failed attempt to login $username\@$host, retrying ".($retries+1)." times");
+			or warning __x"failed attempt to login {user}, retrying {retries} times.",
+				user => "$username\@$host", retries => $retries + 1;
 
 		sleep $interval if $interval;
 	}
@@ -218,7 +208,7 @@ sub currentFolder(;$)
 	my $name = shift;
 
 	if(defined $self->{MTI_folder} && $name eq $self->{MTI_folder})
-	{	$self->log(DEBUG => "Folder $name already selected.");
+	{	trace "folder $name already selected.";
 		return $name;
 	}
 
@@ -230,7 +220,7 @@ sub currentFolder(;$)
 
 	if($name eq '/' || $imap->select($name))
 	{	$self->{MTI_folder} = $name;
-		$self->log(NOTICE => "Selected folder $name");
+		notice __x"selected IMAP4 folder {name}.", name => $name;
 		return 1;
 	}
 
@@ -244,11 +234,11 @@ sub currentFolder(;$)
 
 	if(first { $_ eq $name } $self->folders)
 	{	$self->{MTI_folder} = $name;
-		$self->log(NOTICE => "Couldn't select $name but it does exist.");
+		notice __x"couldn't select folder {name} but it does exist.", name => $name;
 		return 0;
 	}
 
-	$self->log(NOTICE => "Folder $name does not exist!");
+	notice __x"folder {name} does not exist!", name => $name;
 	undef;
 }
 
@@ -399,7 +389,7 @@ sub flagsToLabels($@)
 	}
 
 	if($what eq 'REPLACE')
-	{	my %found = map { ($_ => 1) } @_;
+	{	my %found = map +($_ => 1), @_;
 		foreach my $f (keys %flags2labels)
 		{	next if $found{$f};
 			my $lab = $flags2labels{$f};
@@ -436,7 +426,7 @@ sub fetch($@)
 {	my ($self, $msgs, @info) = @_;
 	return () unless @$msgs;
 	my $imap   = $self->imapClient or return ();
-	my %msgs   = map +($_->unique => {message => $_} ), @$msgs;
+	my %msgs   = map +($_->unique => +{message => $_} ), @$msgs;
 	my $lines  = $imap->fetch( [keys %msgs], @info );
 
 	# It's a pity that Mail::IMAPClient::fetch_hash cannot be used for
@@ -494,22 +484,20 @@ sub appendMessage($$)
 
 sub destroyDeleted($)
 {	my ($self, $folder) = @_;
-	defined $folder or return;
-
-	my $imap = shift->imapClient or return;
-	$imap->expunge($folder);
+	my $imap = $self->imapClient;
+	defined $folder && $imap ? $imap->expunge($folder) : undef;
 }
 
 
 sub createFolder($)
-{	my $imap = shift->imapClient or return ();
-	$imap->create(shift);
+{	my $imap = shift->imapClient;
+	$imap ? $imap->create(shift) : ();
 }
 
 
 sub deleteFolder($)
-{	my $imap = shift->imapClient or return ();
-	$imap->delete(shift);
+{	my $imap = shift->imapClient;
+	$imap ? $imap->delete(shift) : ();
 }
 
 #--------------------

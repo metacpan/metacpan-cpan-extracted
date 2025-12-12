@@ -3,13 +3,15 @@
 # Call    show_all [-v] filename  (file contains message without From line)
 #   or    show_all [-v] <message  (message at stdin)
 
-sub usage() { die "Usage: $0 [-v] [filename]" }
-
 # example:
 #     show_all -v <msg
 
 use strict;
 use warnings;
+
+use Log::Report;
+
+sub usage() { die "Usage: $0 [-v] [filename]" }
 
 # Select the browser you use, to display the result
 my $display = sub {
@@ -19,7 +21,7 @@ my $display = sub {
 };
 
 my $verbose = @ARGV && $ARGV[0] eq '-v' ? shift @ARGV : 0;
-usage unless @ARGV;
+@ARGV or usage;
 
 #my $template_system;     # use default = OODoc
 my $template_system = 'HTML::FromMail::Format::Magic';
@@ -46,17 +48,17 @@ use File::Temp 'tempdir';
 
 my ($filename, $file);
 if(@ARGV)
-{   $filename = shift @ARGV;
-    open $file, '<', $filename
-      or die "Cannot read message from $file\n";
+{	$filename = shift @ARGV;
+	open $file, '<', $filename
+		or fault "cannot read message from $file";
 }
 else
-{   $filename = "stdin";
-    $file = \*STDIN;
+{	$filename = "stdin";
+	$file = \*STDIN;
 }
 
 my $msg = Mail::Message->read($file);
-die "No message read.\n" unless $msg;
+	or error "no message read.";
 
 $msg->printStructure if $verbose;
 
@@ -68,8 +70,8 @@ $msg->printStructure if $verbose;
 $templates = File::Spec->catdir('examples', $templates)
    unless -d $templates;
 
-die "Cannot find templates in $templates for the example. In which directory are you?\n"
-   unless -d $templates;
+-d $templates
+	or error "cannot find templates in $templates for the example. In which directory are you?";
 
 print "Taking templates from $templates\n" if $verbose;
 
@@ -80,17 +82,12 @@ print "Taking templates from $templates\n" if $verbose;
 my $temp  = tempdir;
 print "Producing output in $temp.\n" if $verbose;
 
-my @template_system
-  = defined $template_system ? (formatter => $template_system) : ();
+my @template_system = defined $template_system ? (formatter => $template_system) : ();
 
-my $fmt   = HTML::FromMail->new
- ( templates => $templates
- , @template_system
- );
+my $fmt   = HTML::FromMail->new(templates => $templates, @template_system);
 
-my $start = $fmt->export($msg, output => $temp);
-
-die "Failed to produce html.\n" unless defined $start;
+my $start = $fmt->export($msg, output => $temp)
+	or error "failed to produce html.";
 
 #
 # Force open browser to load the produced page
@@ -99,6 +96,6 @@ die "Failed to produce html.\n" unless defined $start;
 print "Displaying $start\n" if $verbose;
 
 system($display->($start))==0
-  or die "Couldn't send instruction to the browser.\n";
+  or error "couldn't send instruction to the browser.";
 
 print "Ready!\n" if $verbose;

@@ -64,12 +64,10 @@ Inherited, see L<Mail::Reporter/"Constructors">
   description  User::Identity::Item        undef
   folder_type                              <from parent>
   item_type    User::Identity::Collection  Mail::Box::Identity
-  log          Mail::Reporter              'WARNINGS'
   manager                                  <from parent>
   name         User::Identity::Item        'folders'
   parent       User::Identity::Item        undef
   roles        User::Identity::Collection  undef
-  trace        Mail::Reporter              'WARNINGS'
 
 =over 2
 
@@ -78,8 +76,6 @@ Inherited, see L<Mail::Reporter/"Constructors">
 =item folder_type => $class
 
 =item item_type => CLASS
-
-=item log => LEVEL
 
 =item manager => $object
 
@@ -90,8 +86,6 @@ A pre-prepared L<Mail::Box::Manager|Mail::Box::Manager> C<$object> (could be a L
 =item parent => OBJECT
 
 =item roles => $role|\@roles
-
-=item trace => LEVEL
 
 =back
 
@@ -114,13 +108,13 @@ Inherited, see L<User::Identity::Item/"Attributes">
 Returns the type of folder (on this location).  When specified, then
 C<$folderclass> must be a L<Mail::Box|Mail::Box> extension.
 
+=encoding utf8
+
+=pod
+
 =item $obj-E<gt>B<itemType>()
 
 Inherited, see L<User::Identity::Collection/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<manager>()
 
@@ -219,43 +213,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -277,22 +235,13 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
 =item Error: cannot create a $type to add this to my collection.
 
 Some options are specified to create a C<$type> object, which is native to
 this collection.  However, for some reason this failed.
 Cast by C<addRole()>
 
-=item Error: cannot load collection module for $type ($class): $err
+=item Error: cannot load collection module for $type ($class): $@
 
 Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
@@ -307,6 +256,15 @@ Cast by C<renameRole()>
 =item Error: cannot rename $from into $to: doesn't exist.
 
 Cast by C<renameRole()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
 
 =item Error: nvalid collection $name.
 
@@ -327,8 +285,8 @@ Cast by C<addRole()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

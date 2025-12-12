@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,14 +10,16 @@
 
 
 package Mail::Message::Field::Full;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field';
+use parent 'Mail::Message::Field';
 
 use strict;
 use warnings;
 use utf8;
+
+use Log::Report       'mail-message', import => [ qw/__x error warning/ ];
 
 use Encode            ();
 use MIME::QuotedPrint ();
@@ -210,7 +212,7 @@ sub encode($@)
 	my ($charset, $lang, $encoding);
 
 	if($charset = $args{charset})
-	{	$self->log(WARNING => "Illegal character in charset '$charset'")
+	{	warning __x"illegal character in charset '{name}'.", name => $charset
 			if $charset =~ m/[\x00-\ ()<>@,;:"\/[\]?.=\\]/;
 	}
 	else
@@ -218,13 +220,13 @@ sub encode($@)
 	}
 
 	if($lang = $args{language})
-	{	$self->log(WARNING => "Illegal character in language '$lang'")
+	{	warning __x"illegal character in language '{name}'.", name => $lang
 			if $lang =~ m/[\x00-\ ()<>@,;:"\/[\]?.=\\]/;
 	}
 
 	if($encoding = $args{encoding})
 	{	unless($encoding =~ m/^[bBqQ]$/ )
-		{	$self->log(WARNING => "Illegal encoding '$encoding', used 'q'");
+		{	warning __x"illegal encoding '{name}', using 'q'.", name => $encoding;
 			$encoding = 'q';
 		}
 	}

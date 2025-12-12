@@ -78,13 +78,11 @@ Inherited, see L<Mail::Box/"Constructors">
   lock_type          Mail::Box        Mail::Box::Locker::DotLock
   lock_wait          Mail::Box        10 seconds
   locker             Mail::Box        undef
-  log                Mail::Reporter   'WARNINGS'
   manager            Mail::Box        undef
   message_type       Mail::Box        Mail::Box::File::Message
   multipart_type     Mail::Box        Mail::Message::Body::Multipart
   remove_when_empty  Mail::Box        true
   save_on_exit       Mail::Box        true
-  trace              Mail::Reporter   'WARNINGS'
   trusted            Mail::Box        <depends on folder location>
   write_policy                        undef
 
@@ -116,7 +114,7 @@ in memory, is implemented like this:
 
 =item fix_headers => BOOLEAN
 
-=item folder => FOLDERNAME
+=item folder => $name
 
 =item folderdir => $directory
 
@@ -156,8 +154,6 @@ produced by default.
 
 =item locker => OBJECT
 
-=item log => LEVEL
-
 =item manager => $manager
 
 =item message_type => CLASS
@@ -167,8 +163,6 @@ produced by default.
 =item remove_when_empty => BOOLEAN
 
 =item save_on_exit => BOOLEAN
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -207,10 +201,6 @@ Inherited, see L<Mail::Box/"Attributes">
 =item $obj-E<gt>B<isTrusted>()
 
 Inherited, see L<Mail::Box/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -255,19 +245,19 @@ Improves base, see L<Mail::Box/"The folder">
   lock_type                   NONE
   message    Mail::Box        undef
   messages   Mail::Box        undef
-  share      Mail::Box        <C<false>>
+  share      Mail::Box        false
 
 =over 2
 
-=item folder => FOLDERNAME
+=item folder => $name
 
 =item lock_type => ...
 
 See L<Mail::Box::new(lock_type)|Mail::Box/"Constructors"> for possible values.
 
-=item message => MESSAGE
+=item message => $message
 
-=item messages => ARRAY-OF-MESSAGES
+=item messages => $message|\@messages
 
 =item share => BOOLEAN
 
@@ -341,7 +331,7 @@ Inherited, see L<Mail::Box/"The messages">
 
 Inherited, see L<Mail::Box/"The messages">
 
-=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [$msgs]] )
+=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [\@msgs]] )
 
 Inherited, see L<Mail::Box/"The messages">
 
@@ -582,43 +572,7 @@ Extends L<"Error handling" in Mail::Box|Mail::Box/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -659,43 +613,35 @@ Extends L<"DETAILS" in Mail::Box|Mail::Box/"DETAILS">.
 
 =over 4
 
-=item Error: Cannot append messages to folder file $filename: $!
+=item Error: cannot append messages to folder file $file: $!
 
 Appending messages to a not-opened file-organized folder may fail when the
 operating system does not allow write access to the file at hand.
 Cast by C<appendMessages()>
 
-=item Error: Cannot create directory $dir for folder $name.
+=item Fault: cannot create directory $dir for folder $name: $!
 
 While creating a file-organized folder, at most one level of directories
 is created above it.  Apparently, more levels of directories are needed,
 or the operating system does not allow you to create the directory.
 Cast by C<create()>
 
-=item Error: Cannot create folder file $name: $!
+=item Fault: cannot create folder file $file: $!
 
 The file-organized folder file cannot be created for the indicated reason.
 In common cases, the operating system does not grant you write access to
 the directory where the folder file should be stored.
 Cast by C<create()>
 
-=item Error: Cannot get a lock on $type folder $self.
+=item Error: cannot get a lock on $type folder $name.
 
-A lock is required to get access to the folder.  If no locking is needed,
-specify the NONE lock type.
 Cast by C<new()>
 
-=item Error: Cannot move away sub-folder $dir
+=item Fault: cannot move away sub-folder $dir: $!
 
 Cast by C<moveAwaySubFolder()>
 
-=item Warning: Cannot remove folder $name file $filename: $!
-
-Writing an empty folder will usually cause that folder to be removed,
-which fails for the indicated reason.  L<new(remove_when_empty)|Mail::Box/"Constructors">
-Cast by C<write()>
-
-=item Warning: Cannot remove folder $name file $filename: $!
+=item Warning: cannot remove folder $name file $filename: $!
 
 Writing an empty folder will usually cause that folder to be removed,
 which fails for the indicated reason.  L<new(remove_when_empty)|Mail::Box/"Constructors">
@@ -703,14 +649,14 @@ controls whether the empty folder will removed; setting it to C<false>
 (C<0>) may be needed to avoid this message.
 Cast by C<write()>
 
-=item Error: Cannot replace $filename by $tempname, to update folder $name: $!
+=item Fault: cannot replace $to by $from to update folder $name: $!
 
 The replace policy wrote a new folder file to update the existing, but
 was unable to give the final touch: replacing the old version of the
 folder file for the indicated reason.
 Cast by C<write()>
 
-=item Warning: Changes not written to read-only folder $self.
+=item Warning: changes not written to read-only folder $name.
 
 You have opened the folder read-only --which is the default set
 by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
@@ -718,32 +664,37 @@ Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mo
 the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
 Cast by C<close()>
 
-=item Error: Copying failed for one message.
+=item Error: class $package does not implement method $method.
 
-For some reason, for instance disc full, removed by external process, or
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: copying failed for one message.
+
+For some reason, for instance disk full, removed by external process, or
 read-protection, it is impossible to copy one of the messages.  Copying will
 proceed for the other messages.
 Cast by C<copyTo()>
 
-=item Error: Destination folder $name is not writable.
+=item Error: destination folder $name is not writable.
 
 The folder where the messages are copied to is not opened with write
 access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
 to the folder which is controlled by your operating system.
 Cast by C<copyTo()>
 
-=item Warning: Different messages with id $msgid
+=item Warning: different messages with id $msgid.
 
 The message id is discovered more than once within the same folder, but the
 content of the message seems to be different.  This should not be possible:
 each message must be unique.
 Cast by C<messageId()>
 
-=item Info: File $filename for folder $self does not exist.
-
-Cast by C<new()>
-
-=item Error: File too short to get write message $nr ($size, $need)
+=item Error: file $name too short to get write message $msgnr ($size < $expect)
 
 L<Mail::Box|Mail::Box> is lazy: it tries to leave messages in the folders until they
 are used, which saves time and memory usage.  When this message appears,
@@ -757,14 +708,14 @@ to do with Windows incorrectly handling multiple filehandles open in the
 same file.
 Cast by C<write()>
 
-=item Warning: Folder $name file $file is write-protected.
+=item Warning: folder $name file $file is write-protected.
 
 The folder is opened writable or for appending via L<new(access)|Mail::Box/"Constructors">,
 but the operating system does not permit writing to the C<$file>.  The folder
 will be opened read-only.
 Cast by C<new()>
 
-=item Error: Folder $name not deleted: not writable.
+=item Warning: folder $name not deleted: not writable.
 
 The folder must be opened with write access via L<new(access)|Mail::Box/"Constructors">, otherwise
 removing it will be refused.  So, you may have write-access according to
@@ -772,13 +723,17 @@ the operating system, but that will not automatically mean that this
 C<delete> method permits you to.  The reverse remark is valid as well.
 Cast by C<delete()>
 
-=item Error: Invalid timespan '$timespan' specified.
+=item Error: folder file $name does not exist.
+
+Cast by C<new()>
+
+=item Error: invalid timespan '$span'.
 
 The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
 Cast by C<timespan2seconds()>
 
-=item Warning: Message-id '$msgid' does not contain a domain.
+=item Warning: message-id '$msgid' does not contain a domain.
 
 According to the RFCs, message-ids need to contain a unique random part,
 then an C<@>, and then a domain name.  This is made to avoid the creation
@@ -786,34 +741,27 @@ of two messages with the same id.  The warning emerges when the C<@> is
 missing from the string.
 Cast by C<messageId()>
 
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: Unable to create subfolder $name of $folder.
-
-The copy includes the subfolders, but for some reason it was not possible
-to copy one of these.  Copying will proceed for all other sub-folders.
-Cast by C<copyTo()>
-
-=item Error: Unable to update folder $self.
+=item Error: unable to update folder $name.
 
 When a folder is to be written, both replace and inplace write policies are
 tried,  If both fail, the whole update fails.  You may see other, related,
 error messages to indicate the real problem.
 Cast by C<write()>
 
+=item Error: unknown value to folder->close(write => $when).
+
+Cast by C<close()>
+
+=item Error: you cannot add a message which is already part of a folder to a new one.  Please use moveTo or copyTo.
+
+Cast by C<addMessage()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Field::Date;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field::Structured';
+use parent 'Mail::Message::Field::Structured';
 
 use warnings;
 use strict;
+
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 use POSIX qw/mktime tzset/;
 
@@ -68,8 +70,7 @@ sub date() { $_[0]->{MMFD_date} }
 
 sub addAttribute($;@)
 {	my $self = shift;
-	$self->log(ERROR => 'No attributes for date fields.');
-	$self;
+	error __x"no attributes for date fields.";
 }
 
 

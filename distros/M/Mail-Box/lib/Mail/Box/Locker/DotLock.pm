@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Locker::DotLock;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Locker';
@@ -18,7 +18,8 @@ use parent 'Mail::Box::Locker';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error fault warning/ ];
+
 use File::Spec::Functions qw/catfile/;
 use Errno                 qw/EEXIST/;
 use Fcntl                 qw/O_CREAT O_EXCL O_WRONLY O_NONBLOCK/;
@@ -46,7 +47,7 @@ sub folder(;$)
 		my $filename
 		  = $org eq 'FILE'     ? $folder->filename . '.lock'
 		  : $org eq 'DIRECTORY'? catfile($folder->directory, '.lock')
-		  :    croak "Need lock file name for DotLock.";
+		  :    error __x"Dotlock requires a lock file name.";
 
 		$self->filename($filename);
 	}
@@ -55,6 +56,21 @@ sub folder(;$)
 }
 
 #--------------------
+
+sub unlock()
+{	my $self = shift;
+	$self->hasLock
+		or return $self;
+
+	my $lock = $self->filename;
+
+	unlink $lock
+		or warning __x"couldn't remove lockfile {file}: {rc}", file => $lock, rc => $!;
+
+	$self->SUPER::unlock;
+	$self;
+}
+
 
 sub _try_lock($)
 {	my ($self, $lockfile) = @_;
@@ -66,33 +82,17 @@ sub _try_lock($)
 		and $lock->close, return 1;
 
 	$! == EEXIST
-		or $self->log(ERROR => "lockfile $lockfile can never be created: $!"), return 0;
+		or fault __x"lockfile {file} can never be created", file => $lockfile;
 
 	1;
 }
-
-
-sub unlock()
-{	my $self = shift;
-	$self->hasLock
-		or return $self;
-
-	my $lock = $self->filename;
-
-	unlink $lock
-		or $self->log(WARNING => "Couldn't remove lockfile $lock: $!");
-
-	$self->SUPER::unlock;
-	$self;
-}
-
 
 sub lock()
 {	my $self   = shift;
 
 	my $lockfile = $self->filename;
 	$self->hasLock
-		and $self->log(WARNING => "Folder already locked with file $lockfile"), return 1;
+		and warning(__x"folder already locked with file {file}.", file => $lockfile), return 1;
 
 	my $timeout  = $self->timeout;
 	my $end      = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
@@ -105,13 +105,13 @@ sub lock()
 
 		if(-e $lockfile && -A $lockfile > $expire)
 		{	unlink $lockfile
-				or $self->log(ERROR => "Failed to remove expired lockfile $lockfile: $!"), last;
+				or fault __x"failed to remove expired lockfile {file}", file => $lockfile;
 
-			$self->log(WARNING => "Removed expired lockfile $lockfile");
+			warning __x"removed expired lockfile {file}.", file => $lockfile;
 			redo;
 		}
 
-		last unless --$end;
+		--$end or last;
 		sleep 1;
 	}
 

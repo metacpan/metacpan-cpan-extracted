@@ -42,32 +42,32 @@ Extends L<"METHODS" in Mail::Message::TransferEnc|Mail::Message::TransferEnc/"ME
 
 =over 4
 
-=item Error: Decoder for transfer encoding $type does not work: $@
+=item Error: class $package does not implement method $method.
 
-Compiling the required transfer encoding resulted in errors, which means
-that the decoder can not be used.
-Cast by C<create()>
-
-=item Warning: No decoder for transfer encoding $type.
-
-A decoder for the specified type of transfer encoding is not implemented.
-Cast by C<create()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Error: decoder for transfer encoding $type does not work: $@
+
+Compiling the required transfer encoding resulted in errors, which means
+that the decoder can not be used.
+Cast by C<create()>
+
+=item Error: no decoder for transfer encoding $type.
+
+A decoder for the specified type of transfer encoding is not implemented.
+Cast by C<create()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

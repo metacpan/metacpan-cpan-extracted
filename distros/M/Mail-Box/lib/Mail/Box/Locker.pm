@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Locker;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Reporter';
@@ -18,7 +18,8 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error panic/ ];
+
 use Scalar::Util     qw/weaken/;
 use Devel::GlobalDestruction qw/in_global_destruction/;
 
@@ -37,26 +38,21 @@ my %lockers = (
 
 sub new(@)
 {	my ($class, %args) = @_;
-
-	$class eq __PACKAGE__
-		or return $class->SUPER::new(%args);
+	$class eq __PACKAGE__ or return $class->SUPER::new(%args);
 
 	# Try to figure out which locking method we really want (bootstrap)
 
 	my $method
 	  = ! defined $args{method}      ? 'DOTLOCK'
 	  : ref $args{method} eq 'ARRAY' ? 'MULTI'
-	  :   uc $args{method};
+	  :    uc $args{method};
 
-	my $create = $lockers{$method} || $args{$method};
-
-	local $"   = ' or ';
-	$create
-		or confess "no locking method $method defined: use @{[ keys %lockers ]}";
+	my $create = $lockers{$method} || $args{$method}
+		or error __x"no locking method {name} defined: use {avail}.", name => $method, avail => [ keys %lockers ];
 
 	# compile the locking module (if needed)
 	eval "require $create";
-	confess $@ if $@;
+	error __x"failed to use locking module {class}:\n{error}", class => $create, error => $@ if $@;
 
 	$args{use} = $args{method} if ref $args{method} eq 'ARRAY';
 	$create->SUPER::new(%args);
@@ -83,7 +79,7 @@ sub expires(;$) { my $self = shift; @_ ? $self->{MBL_expires} = shift : $self->{
 
 sub name { $_[0]->notImplemented }
 
-sub lockMethod($$$$) { confess "Method removed: use inheritance to implement own method." }
+sub lockMethod($$$$) { panic "Method removed: use inheritance to implement own method." }
 
 
 sub folder(;$)

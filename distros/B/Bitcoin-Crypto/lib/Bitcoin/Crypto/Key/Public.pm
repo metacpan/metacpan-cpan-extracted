@@ -1,31 +1,23 @@
 package Bitcoin::Crypto::Key::Public;
-$Bitcoin::Crypto::Key::Public::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Key::Public::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use Carp qw(carp);
 
 use Bitcoin::Crypto::Script;
 use Bitcoin::Crypto::Base58 qw(encode_base58check);
 use Bitcoin::Crypto::Bech32 qw(encode_segwit);
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Constants;
-use Bitcoin::Crypto::Util qw(hash160 get_public_key_compressed);
+use Bitcoin::Crypto::Constants qw(:bip44 :witness);
+use Bitcoin::Crypto::Util::Internal qw(hash160 get_public_key_compressed);
 use Bitcoin::Crypto::Helpers qw(ecc);
-
-use namespace::clean;
 
 extends qw(Bitcoin::Crypto::Key::Base);
 
 sub _is_private { 0 }
-
-signature_for get_hash => (
-	method => Object,
-	positional => [],
-);
 
 sub get_hash
 {
@@ -33,11 +25,6 @@ sub get_hash
 
 	return hash160($self->to_serialized);
 }
-
-signature_for get_xonly_key => (
-	method => Object,
-	positional => [],
-);
 
 sub get_xonly_key
 {
@@ -47,7 +34,7 @@ sub get_xonly_key
 }
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	positional => [ByteStr],
 );
 
@@ -62,22 +49,20 @@ sub from_serialized
 }
 
 signature_for witness_program => (
-	method => Object,
+	method => !!1,
 	positional => [PositiveOrZeroInt, {default => 0}, HashRef, {default => sub { {} }}],
 );
 
 sub witness_program
 {
 	state $data_sources = {
-		(Bitcoin::Crypto::Constants::segwit_witness_version) => sub {
+		(SEGWIT_WITNESS_VERSION) => sub {
 			return shift->get_hash;
 		},
-		(Bitcoin::Crypto::Constants::taproot_witness_version) => sub {
+		(TAPROOT_WITNESS_VERSION) => sub {
 			my ($self, $params) = @_;
 
-			$self = $self->get_taproot_output_key($params->{tweak_suffix})
-				unless $self->taproot_output;
-
+			$self = $self->get_taproot_output_key($params->{tweak_suffix});
 			return $self->get_xonly_key;
 		},
 	};
@@ -96,27 +81,17 @@ sub witness_program
 	return $program;
 }
 
-signature_for get_legacy_address => (
-	method => Object,
-	positional => [],
-);
-
 sub get_legacy_address
 {
 	my ($self) = @_;
 
 	Bitcoin::Crypto::Exception::AddressGenerate->raise(
 		'legacy addresses can only be created with BIP44 in legacy (BIP44) mode'
-	) unless $self->has_purpose(Bitcoin::Crypto::Constants::bip44_purpose);
+	) unless $self->has_purpose(BIP44_PURPOSE);
 
 	my $pkh = $self->network->p2pkh_byte . $self->get_hash;
 	return encode_base58check($pkh);
 }
-
-signature_for get_compat_address => (
-	method => Object,
-	positional => [],
-);
 
 sub get_compat_address
 {
@@ -129,15 +104,10 @@ sub get_compat_address
 
 	Bitcoin::Crypto::Exception::AddressGenerate->raise(
 		'compat addresses can only be created with BIP44 in compat (BIP49) mode'
-	) unless $self->has_purpose(Bitcoin::Crypto::Constants::bip44_compat_purpose);
+	) unless $self->has_purpose(BIP44_COMPAT_PURPOSE);
 
 	return $self->witness_program->get_legacy_address;
 }
-
-signature_for get_segwit_address => (
-	method => Object,
-	positional => [],
-);
 
 sub get_segwit_address
 {
@@ -150,7 +120,7 @@ sub get_segwit_address
 
 	Bitcoin::Crypto::Exception::AddressGenerate->raise(
 		'segwit addresses can only be created with BIP44 in segwit (BIP84) mode'
-	) unless $self->has_purpose(Bitcoin::Crypto::Constants::bip44_segwit_purpose);
+	) unless $self->has_purpose(BIP44_SEGWIT_PURPOSE);
 
 	Bitcoin::Crypto::Exception::AddressGenerate->raise(
 		'segwit addresses must not be generated with uncompressed keys to avoid potential fund loss'
@@ -160,7 +130,7 @@ sub get_segwit_address
 }
 
 signature_for get_taproot_address => (
-	method => Object,
+	method => !!1,
 	positional => [Maybe [BitcoinScriptTree], {default => undef}],
 );
 
@@ -175,36 +145,31 @@ sub get_taproot_address
 
 	Bitcoin::Crypto::Exception::AddressGenerate->raise(
 		'taproot addresses can only be created with BIP44 in taproot (BIP86) mode'
-	) unless $self->has_purpose(Bitcoin::Crypto::Constants::bip44_taproot_purpose);
+	) unless $self->has_purpose(BIP44_TAPROOT_PURPOSE);
 
 	my $taproot_program = $self->witness_program(
-		Bitcoin::Crypto::Constants::taproot_witness_version,
+		TAPROOT_WITNESS_VERSION,
 		defined $script_tree ? {tweak_suffix => $script_tree->get_merkle_root} : {}
 	);
 
 	return encode_segwit($self->network->segwit_hrp, $taproot_program->run->stack_serialized);
 }
 
-signature_for get_address => (
-	method => Object,
-	positional => [],
-);
-
 sub get_address
 {
 	my ($self) = @_;
 
 	return $self->get_taproot_address
-		if $self->has_purpose(Bitcoin::Crypto::Constants::bip44_taproot_purpose);
+		if $self->has_purpose(BIP44_TAPROOT_PURPOSE);
 
 	return $self->get_segwit_address
-		if $self->has_purpose(Bitcoin::Crypto::Constants::bip44_segwit_purpose);
+		if $self->has_purpose(BIP44_SEGWIT_PURPOSE);
 
 	return $self->get_compat_address
-		if $self->has_purpose(Bitcoin::Crypto::Constants::bip44_compat_purpose);
+		if $self->has_purpose(BIP44_COMPAT_PURPOSE);
 
 	return $self->get_legacy_address
-		if $self->has_purpose(Bitcoin::Crypto::Constants::bip44_purpose);
+		if $self->has_purpose(BIP44_PURPOSE);
 
 	return $self->get_taproot_address
 		if $self->network->supports_segwit;
@@ -270,9 +235,8 @@ I<clearer:> C<clear_purpose>
 
 =head3 taproot_output
 
-Boolean value indicating if this key was obtained through taproot tweaking.
-Taproot output keys are used to sign and verify schnorr signatures in P2TR
-outputs. Default: C<false>
+Boolean value indicating if this key was obtained through taproot tweaking or
+should be used with Schnorr signatures. Default: C<false>
 
 I<writer:> C<set_taproot_output>
 
@@ -331,8 +295,9 @@ can be passed.
 
 	$pub = $object->get_taproot_output_key($tweak_suffix = undef)
 
-Returns a new public key instance that represents an output taproot key.
-Optional C<$tweak_suffix> can be passed as bytestring.
+Returns a new public key instance that represents an output taproot key, or
+this key if it is marked as L</taproot_output>. Optional C<$tweak_suffix> can
+be passed as bytestring.
 
 =head3 get_xonly_key
 
@@ -439,24 +404,6 @@ a script tree)
 B<NOTE>: The rules this function uses to choose the address type B<will>
 change when more up-to-date address types are implemented. Use
 other address functions if this is not what you want.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * KeyCreate - key couldn't be created correctly
-
-=item * Verify - couldn't verify the message correctly
-
-=item * NetworkConfig - incomplete or corrupted network configuration
-
-=item * AddressGenerate - address could not be generated (see BIP44 constraint notes)
-
-=back
 
 =head1 SEE ALSO
 

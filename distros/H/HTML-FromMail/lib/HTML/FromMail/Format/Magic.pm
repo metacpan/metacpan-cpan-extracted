@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail::Format::Magic;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'HTML::FromMail::Format';
@@ -18,11 +18,11 @@ use base 'HTML::FromMail::Format';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report 'html-frommail';
 
 BEGIN
 {	eval { require Template::Magic };
-	$@ and die "Install Template::Magic for this formatter\n";
+	$@ and error __x"install Template::Magic for this formatter.";
 }
 
 #--------------------
@@ -34,7 +34,7 @@ sub magic() { $_[0]->{HFFM_magic} }
 #-----------
 
 sub export($@)
-{	my ($self, %args) = @_;
+{	my ($self, $message, %args) = @_;
 
 	my $magic = $self->{HFFM_magic} = Template::Magic->new(
 		markers       => 'HTML',
@@ -42,7 +42,7 @@ sub export($@)
 	);
 
 	open my($out), ">", $args{output}
-		or $self->log(ERROR => "Cannot write to $args{output}: $!"), return;
+		or fault __x"cannot write to {out}", out => $args{output};
 
 	my $oldout = select $out;
 	$magic->print($args{input});
@@ -53,14 +53,13 @@ sub export($@)
 }
 
 
-
 sub lookupTemplate($$)
 {	my ($self, $args, $zone) = @_;
 
 	# Lookup the method to be called.
 	my $method = 'html' . ucfirst($zone->id);
-	my $prod   = $args->{producer};
-	return undef unless $prod->can($method);
+	my $prod   = $args->{producer} or panic;
+	$prod->can($method) or return undef;
 
 	# Split zone attributes into hash.  Added to %$args.
 	my $param = $zone->attributes || '';
@@ -82,14 +81,14 @@ sub lookupTemplate($$)
 our $msg_zone;  # hack
 sub containerText($)
 {	my ($self, $args) = @_;
-	my $zone = $args->{zone};
+	my $zone = $args->{zone} or panic;
 	$msg_zone = $zone if $zone->id eq 'message';  # hack
 	$zone->content;
 }
 
 sub processText($$)
 {	my ($self, $text, $args) = @_;
-	my $zone = $args->{zone};
+	my $zone = $args->{zone} or panic;
 
 	# this hack is needed to get things to work :(
 	# but this will not work in the future.
@@ -100,13 +99,13 @@ sub processText($$)
 
 sub lookup($$)
 {	my ($self, $what, $args) = @_;
-	my $zone  = $args->{zone} or confess;
+	my $zone  = $args->{zone} or panic;
 	$zone->lookup($what);
 }
 
 sub onFinalToken($)
 {	my ($self, $args) = @_;
-	my $zone = $args->{zone} or confess;
+	my $zone = $args->{zone} or panic;
 	! defined $zone->content;
 }
 

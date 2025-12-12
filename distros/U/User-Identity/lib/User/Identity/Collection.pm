@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,21 +10,20 @@
 
 
 package User::Identity::Collection;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Item';
+use parent 'User::Identity::Item';
 
 use strict;
 use warnings;
 
-use User::Identity ();
+use Log::Report     'user-identity';
 
-use Hash::Ordered  ();
+use User::Identity  ();
+use Hash::Ordered   ();
 
-use Carp;
-use List::Util     qw/first/;
-
+use List::Util      qw/first/;
 
 #--------------------
 
@@ -38,22 +37,18 @@ use overload '@{}' => sub { [ $_[0]->roles ] };
 
 #--------------------
 
-sub type { "people" }
+sub type { 'people' }
 
 
 sub init($)
 {	my ($self, $args) = @_;
 	defined($self->SUPER::init($args)) or return;
 
-	$self->{UIC_itype} = delete $args->{item_type} or die;
+	$self->{UIC_itype} = delete $args->{item_type} or panic;
 	tie %{$self->{UIC_roles}}, 'Hash::Ordered';
+
 	my $roles = $args->{roles};
-
-	my @roles
-	  = ! defined $roles      ? ()
-	  : ref $roles eq 'ARRAY' ? @$roles
-	  :   $roles;
-
+	my @roles = ! defined $roles ? () : ref $roles eq 'ARRAY' ? @$roles : $roles;
 	$self->addRole($_) for @roles;
 	$self;
 }
@@ -75,12 +70,12 @@ sub addRole(@)
 	if(ref $_[0] && ref $_[0] ne 'ARRAY')
 	{	$role = shift;
 		$role->isa($maintains)
-			or croak "ERROR: Wrong type of role for ".ref($self) . ": requires a $maintains but got a ". ref($role);
+			or error __x"wrong type of role for {collection}: requires a {expect} but got a {type}.",
+				collection => ref $self, expect => $maintains, type => ref $role;
 	}
 	else
-	{	$role = $maintains->new(ref $_[0] ? @{$_[0]} :  @_);
-		defined $role
-			or croak "ERROR: Cannot create a $maintains to add this to my collection.";
+	{	$role = $maintains->new(ref $_[0] ? @{$_[0]} :  @_)
+			or error __x"cannot create a {type} to add this to my collection.", type => $maintains;
 	}
 
 	$role->parent($self);
@@ -102,16 +97,11 @@ sub renameRole($$$)
 {	my ($self, $which, $newname) = @_;
 	my $name = ref $which ? $which->name : $which;
 
-	if(exists $self->{UIC_roles}{$newname})
-	{	$self->log(ERROR => "cannot rename $name into $newname: already exists");
-		return ();
-	}
+	! exists $self->{UIC_roles}{$newname}
+		or error __x"cannot rename {from} into {to}: already exists", from => $name, to => $newname;
 
-	my $role = delete $self->{UIC_roles}{$name};
-	unless(defined $role)
-	{	$self->log(ERROR => "cannot rename $name into $newname: doesn't exist");
-		return ();
-	}
+	my $role = delete $self->{UIC_roles}{$name}
+		or error __x"cannot rename {from} into {to}: doesn't exist", from => $name, to => $newname;
 
 	$role->name($newname);   # may imply change other attributes.
 	$self->{UIC_roles}{$newname} = $role;

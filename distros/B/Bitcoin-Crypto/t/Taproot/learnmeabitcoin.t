@@ -1,7 +1,8 @@
 use Test2::V0;
 use Bitcoin::Secp256k1;
 use Bitcoin::Crypto qw(btc_prv btc_pub btc_transaction btc_script_tree btc_tapscript);
-use Bitcoin::Crypto::Util qw(lift_x to_format get_taproot_ext);
+use Bitcoin::Crypto::Util qw(lift_x to_format);
+use Bitcoin::Crypto::Constants qw(:sighash :script);
 
 use lib 't/lib';
 use TransactionStore;
@@ -32,7 +33,7 @@ subtest 'should sign/verify key path spend case' => sub {
 		'transaction hash ok';
 
 	# try signing
-	$prv->sign_transaction($tx, signing_index => 0, sighash => Bitcoin::Crypto::Constants::sighash_all);
+	$prv->sign_transaction($tx, signing_index => 0, sighash => SIGHASH_ALL);
 	is [map { to_format [hex => $_] } @{$tx->inputs->[0]->witness}], [
 		'b693a0797b24bae12ed0516a2f5ba765618dca89b75e498ba5b745b71644362298a45ca39230d10a02ee6290a91cebf9839600f7e35158a447ea182ea0e022ae01'
 		],
@@ -48,7 +49,7 @@ subtest 'should sign/verify simple script path spend case' => sub {
 		tree => [
 			{
 				id => 0,
-				leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
 				script => $script,
 			}
 		]
@@ -69,13 +70,16 @@ subtest 'should sign/verify simple script path spend case' => sub {
 	is to_format [hex => $tx->get_hash], '5ff05f74d385bd39e344329330461f74b390c1b5ead87c4f51b40c555b75719d',
 		'transaction hash ok';
 
-	# manual signing (custom script)
-	# script with witness must be OP_8 OP_8 OP_EQUAL
-	my $input_witness = [];
-	$tx->inputs->[1]->set_witness($input_witness);
-	push @$input_witness, "\x08";
-	push @$input_witness, $script->to_serialized;
-	push @$input_witness, $tree->get_control_block(0, $pub)->to_serialized;
+	# signing a custom script
+	$tx->sign(
+		signing_index => 1,
+		script_tree => $tree,
+		leaf_id => 0,
+		public_key => $pub,
+		)
+		->add_number(8)
+		->finalize;
+
 	is [map { to_format [hex => $_] } @{$tx->inputs->[1]->witness}], [
 		'08',
 		'5887',
@@ -103,16 +107,14 @@ subtest 'should sign/verify script path spend case with signature' => sub {
 		btc_prv->from_serialized([hex => '9b8de5d7f20a8ebb026a82babac3aa47a008debbfde5348962b2c46520bd5189']);
 	$script_prv->set_taproot_output(!!1);
 
-	my $script = btc_tapscript->new
-		->push($script_prv->get_public_key->get_xonly_key)
-		->add('OP_CHECKSIG');
-
 	my $tree = btc_script_tree->new(
 		tree => [
 			{
 				id => 0,
-				leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
-				script => $script,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
+				script => btc_tapscript->new
+					->push($script_prv->get_public_key->get_xonly_key)
+					->add('OP_CHECKSIG'),
 			}
 		]
 	);
@@ -131,20 +133,15 @@ subtest 'should sign/verify script path spend case with signature' => sub {
 	is to_format [hex => $tx->get_hash], '797505b104b5fb840931c115ea35d445eb1f64c9279bf23aa5bb4c3d779da0c2',
 		'transaction hash ok';
 
-	# manual signing (custom script)
-	my $input_witness = [];
-	$tx->inputs->[0]->set_witness($input_witness);
-	push @$input_witness, $script_prv->sign_message(
-		$tx->get_digest(
-			signing_index => 0,
-			signing_subscript => $script->to_serialized,
-			taproot_ext_flag => 1,
-			taproot_ext => get_taproot_ext(1, script_tree => $tree, leaf_id => 0),
-			sighash => Bitcoin::Crypto::Constants::sighash_all,
+	# signing a custom script
+	$tx->sign(
+		signing_index => 0,
+		script_tree => $tree,
+		leaf_id => 0,
+		public_key => $pub,
 		)
-	) . pack('C', Bitcoin::Crypto::Constants::sighash_all);
-	push @$input_witness, $script->to_serialized;
-	push @$input_witness, $tree->get_control_block(0, $pub)->to_serialized;
+		->add_signature($script_prv, sighash => SIGHASH_ALL)
+		->finalize;
 
 	is [map { to_format [hex => $_] } @{$tx->inputs->[0]->witness}], [
 		'01769105cbcbdcaaee5e58cd201ba3152477fda31410df8b91b4aee2c4864c7700615efb425e002f146a39ca0a4f2924566762d9213bd33f825fad83977fba7f01',
@@ -168,27 +165,27 @@ subtest 'should sign/verify script path spend case with tree' => sub {
 				[
 					[
 						{
-							leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+							leaf_version => TAPSCRIPT_LEAF_VERSION,
 							script => btc_tapscript->from_serialized([hex => '5187']),
 						},
 						{
-							leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+							leaf_version => TAPSCRIPT_LEAF_VERSION,
 							script => btc_tapscript->from_serialized([hex => '5287']),
 						}
 					],
 					{
 						id => 0,
-						leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+						leaf_version => TAPSCRIPT_LEAF_VERSION,
 						script => $script,
 					}
 				],
 				{
-					leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+					leaf_version => TAPSCRIPT_LEAF_VERSION,
 					script => btc_tapscript->from_serialized([hex => '5487']),
 				}
 			],
 			{
-				leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
 				script => btc_tapscript->from_serialized([hex => '5587']),
 			}
 		]
@@ -208,13 +205,15 @@ subtest 'should sign/verify script path spend case with tree' => sub {
 	is to_format [hex => $tx->get_hash], '992af7eb67f37a4dfaa64ea6f03a70c35b6063ba5ee3fe41734c3460b4006463',
 		'transaction hash ok';
 
-	# manual signing (custom script)
-	# script with witness must be OP_3 OP_3 OP_EQUAL
-	my $input_witness = [];
-	$tx->inputs->[0]->set_witness($input_witness);
-	push @$input_witness, "\x03";
-	push @$input_witness, $script->to_serialized;
-	push @$input_witness, $tree->get_control_block(0, $pub)->to_serialized;
+	$tx->sign(
+		transaction => $tx,
+		signing_index => 0,
+		script_tree => $tree,
+		leaf_id => 0,
+		public_key => $pub,
+		)
+		->add_number(3)
+		->finalize;
 
 	is [map { to_format [hex => $_] } @{$tx->inputs->[0]->witness}], [
 		'03',

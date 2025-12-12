@@ -5,13 +5,14 @@
 #        folder    = any kind of folder
 #        directory = where the output will be
 
-sub usage() { die "Usage: $0 [-v] folder\n" }
-
 # example:
 #     demo.pl -v $MAIL
 
+sub usage() { die "Usage: $0 [-v] folder\n" }
+
 use strict;
 use warnings;
+
 use File::Spec::Functions;
 
 # Select the browser you use, to display the result
@@ -22,7 +23,7 @@ my $display = sub {
 };
 
 my $verbose = @ARGV && $ARGV[0] eq '-v' ? shift @ARGV : 0;
-usage unless @ARGV;
+@ARGV or usage;
 
 #my $template_system;     # use default = OODoc
 #my $template_system  = 'HTML::FromMail::Format::Magic';
@@ -40,6 +41,7 @@ use lib '/home/markov/shared/perl/Template/lib';   # OODoc::Template
 # Here the real work starts
 use Mail::Box::Manager;
 use HTML::FromMail;
+use Log::Report;
 
 use File::Temp 'tempdir';
 
@@ -47,16 +49,15 @@ use File::Temp 'tempdir';
 # Get the folder
 #
 
-if(@ARGV < 1)
-{   warn "ERROR: No folder name specified\n";
-    die;
-}
+@ARGV >= 1
+	or error "no email folder name specified.";
+
 my $filename = shift;
 
 my $temp = @ARGV ? shift : tempdir;
 if(@ARGV)
-{   warn "ERROR: too many command-line arguments\n";
-    usage;
+{	warning "too many command-line arguments.";
+	usage;
 }
 
 #
@@ -65,10 +66,10 @@ if(@ARGV)
 
 my $mgr      = Mail::Box::Manager->new;
 my $folder   = $mgr->open($filename)
-   or die "ERROR: Cannot open folder $filename\n";
+	or fault "cannot open folder $filename";
 
 my $msg      = $folder->message(0)
-  or die "The folder is empty... one message is required\n";
+	or error "The folder is empty... one message is required";
 
 $msg->printStructure if $verbose;
 
@@ -78,10 +79,10 @@ $msg->printStructure if $verbose;
 #
 
 $templates = catdir 'examples', $templates
-   unless -d $templates;
+	unless -d $templates;
 
-die "Cannot find templates in $templates for the example. In which directory are you?\n"
-   unless -d $templates;
+-d $templates
+	or error "cannot find templates in $templates for the example. In which directory are you?";
 
 print "Taking templates from $templates\n" if $verbose;
 
@@ -99,44 +100,43 @@ sub message_directory($)
 # Compose settings, in this case, for each page the same so only one
 # formatter object is needed.
 
-my %message_settings = 
- ( message_directory => \&message_directory
- );
+my %message_settings = (
+	message_directory => \&message_directory,
+);
 
-my %field_settings =
- ( address => 'MAILTO'
- );
+my %field_settings = (
+	address => 'MAILTO',
+);
 
-my %settings =
- ( message => \%message_settings
- , field   => \%field_settings
- );
+my %settings = (
+	message => \%message_settings,
+	field   => \%field_settings,
+);
 
-my @template_system
-  = defined $template_system ? (formatter => $template_system) : ();
+my @template_system = defined $template_system ? (formatter => $template_system) : ();
 
-my $fmt   = HTML::FromMail->new
- ( @template_system
- , templates => $templates
- , settings  => \%settings
- );
+my $fmt   = HTML::FromMail->new(
+	@template_system,
+	templates => $templates,
+	settings  => \%settings,
+);
 
-$fmt->export
-  ( $msg
-  , use      => [ 'message/index.html', 'message/details.html' ]
-  , output   => $temp
-  );
+$fmt->export(
+	$msg,
+	use      => [ 'message/index.html', 'message/details.html' ],
+	output   => $temp,
+);
 
-my $reply = $msg->reply
-  ( include     => 'INLINE'
-  , group_reply => 1
-  );
+my $reply = $msg->reply(
+	include     => 'INLINE',
+	group_reply => 1,
+);
 
-$fmt->export
-  ( $reply
-  , use      => 'message/reply.html'
-  , output   => $temp
-  );
+$fmt->export(
+	$reply,
+	use      => 'message/reply.html',
+	output   => $temp,
+);
 
 #
 # Force open browser to load the produced page
@@ -146,6 +146,6 @@ my $start = catfile $temp, 'index.html';
 print "Displaying $start\n" if $verbose;
 
 system($display->($start))==0
-  or die "Couldn't send instruction to the browser.\n";
+	or fault "Couldn't send instruction to the browser";
 
 print "Ready!\n" if $verbose;

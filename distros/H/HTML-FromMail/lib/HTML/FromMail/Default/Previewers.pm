@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail::Default::Previewers;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'HTML::FromMail::Object';
@@ -18,7 +18,8 @@ use base 'HTML::FromMail::Object';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report 'html-frommail';
+
 use File::Basename qw/basename dirname/;
 
 #--------------------
@@ -78,7 +79,7 @@ sub previewHtml($$$$$)
 	}
 	substr($decoded, $max) = '' if length $decoded > $max;
 
-	+{	%$attach,
+	 +{	%$attach,
 		image => '',            # this is not an image
 		html  => { text => $decoded },
 	  };
@@ -87,7 +88,7 @@ sub previewHtml($$$$$)
 
 BEGIN
 {	eval   { require Image::Magick };
-	if($@) { warn "No Image::Magick installed" }
+	if($@) { warning __x"Image::Magick not installed." }
 	else   { push @previewers, image => \&previewImage }
 }
 
@@ -97,7 +98,8 @@ sub previewImage($$$$$)
 	my $filename = $attach->{filename};
 	my $magick   = Image::Magick->new;
 	my $error    = $magick->Read($filename);
-	length $error and __PACKAGE__->log(ERROR => "Cannot read image from $filename: $error"), return;
+	length $error
+		and error __x"cannot read image from {fn}: {error}", fn => $filename, error => $error;
 
 	my %image;
 	my ($srcw, $srch) = @image{ qw/width height/ } = $magick->Get( qw/width height/ );
@@ -113,7 +115,8 @@ sub previewImage($$$$$)
 	if($reqw < $srcw || $reqh < $srch)
 	{	# Size reduction is needed.
 		$error   = $magick->Resize(width => $reqw, height => $reqh);
-		length $error and __PACKAGE__->log(ERROR => "Cannot resize image from $filename: $error"), return;
+		length $error
+			and error __x"cannot resize image from {fn}: {error}", fn => $filename, error => $error;
 
 		my ($resw, $resh) = @image{ qw/smallwidth smallheight/ } = $magick->Get( qw/width height/ );
 
@@ -121,7 +124,8 @@ sub previewImage($$$$$)
 		@image{ qw/smallfile smallurl/ } = ($outfile, basename($outfile));
 
 		$error      = $magick->Write($outfile);
-		length $error and __PACKAGE__->log(ERROR => "Cannot write smaller image from $filename to $outfile: $error"), return;
+		length $error
+			and error __x"cannot write smaller image from {fn} to {out}: {error}", in => $filename, out => $outfile, error => $error;
 	}
 	else
 	{	@image{ qw/smallfile smallurl smallwidth smallheight/ } = ($filename, $attach->{url}, $srcw, $srch);

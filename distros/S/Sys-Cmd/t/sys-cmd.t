@@ -202,45 +202,49 @@ my @fail = (
 );
 
 sub do_test {
-    my $t = shift;
+    my $t     = shift;
+    my @argv  = grep { !ref } @{ $t->{cmdline} };
+    my ($opt) = grep { ref } @{ $t->{cmdline} };
 
     # run the command
-    my $cmd = eval { spawn( @{ $t->{cmdline} } ) };
+
+    my $proc = eval { spawn( @{ $t->{cmdline} } ) };
     if ( $t->{fail} ) {
-        ok( !$cmd,
-            $t->{test} . ': command failed: ' . ( defined $cmd ? $cmd : '' ) );
+        ok( !$proc,
+                $t->{test}
+              . ': command failed: '
+              . ( defined $proc ? $proc : '' ) );
         like( $@, $t->{fail}, $t->{test} . ': expected error message' );
         return;
     }
     die $@ if $@;
 
-    isa_ok( $cmd, 'Sys::Cmd' );
+    isa_ok( $proc, 'Sys::Cmd::Process' );
 
     # test the handles
     for my $handle (qw( stdin stdout stderr )) {
-        isa_ok( $cmd->$handle, 'IO::Handle' );
+        isa_ok( $proc->$handle, 'IO::Handle' );
         if ( $handle eq 'stdin' ) {
             my $opened = !exists $t->{result}{input};
-            is( $cmd->$handle->opened, $opened,
-                "$t->{test}: $handle @{[ !$opened && 'not ']}opened" );
+            is( $proc->$handle->opened,
+                $opened, "$t->{test}: $handle @{[ !$opened && 'not ']}opened" );
         }
         else {
-            ok( $cmd->$handle->opened, "$t->{test}: $handle opened" );
+            ok( $proc->$handle->opened, "$t->{test}: $handle opened" );
         }
     }
 
-    my @argv = grep { !ref } @{ $t->{cmdline} };
-    is( [ $cmd->cmdline ], \@argv, $t->{test} . ': cmdline ' . "@argv" );
+    is( [ $proc->cmdline ], \@argv, $t->{test} . ': cmdline ' . "@argv" );
 
     # Set @argv to just the script arguments
     shift @argv;
     shift @argv;
 
     # get the outputs
-    my $errput = join '', $cmd->stderr->getlines();
+    my $errput = join '', $proc->stderr->getlines();
     is( $errput, $t->{result}->{err} // '', $t->{test} . ': stderr match' );
 
-    my $output = join '', $cmd->stdout->getlines();
+    my $output = join '', $proc->stdout->getlines();
     ok( !!$output, $t->{test} . ': stdout returned something' ) || return;
 
     my $info;
@@ -248,19 +252,33 @@ sub do_test {
     die $@ if $@;
     ok( !!$info, $t->{test} . ': output parses to $info' );
 
-    my $env = $cmd->_env_merged;
-    if ( exists $t->{result}->{dir} and $^O eq 'MSWin32' ) {
-        $env->{PWD} = $t->{result}->{dir};
+    is( $info->{argv}, \@argv, $t->{test} . ": argument match @argv" );
+
+    {
+        local %ENV = %ENV;
+        while ( my ( $key, $val ) = each %{ $opt->{env} // {} } ) {
+            my $keybytes = encode( $ENCODING_LOCALE, $key, Encode::FB_CROAK );
+            if ( defined $val ) {
+                $ENV{$keybytes} =
+                  encode( $ENCODING_LOCALE, $val, Encode::FB_CROAK );
+            }
+            else {
+                delete $ENV{$keybytes};
+            }
+        }
+        if ( exists $t->{result}->{dir} and $^O eq 'MSWin32' ) {
+            $ENV{PWD} = $t->{result}->{dir};
+        }
+
+        is( $info->{env}, \%ENV, $t->{test} . ': environments match' );
     }
 
-    is( $info->{argv}, \@argv, $t->{test} . ": argument match @argv" );
-    is( $info->{env},  $env,   $t->{test} . ': environment match' );
     is(
         $info->{input},
         $t->{result}{input} || '',
         $t->{test} . ': input match'
     );
-    is( $info->{pid}, $cmd->pid, $t->{test} . ': pid match' );
+    is( $info->{pid}, $proc->pid, $t->{test} . ': pid match' );
     is(
         $info->{cwd},
         fc( $t->{result}{dir} || $cwd ),
@@ -268,11 +286,11 @@ sub do_test {
     );
 
     # close and check
-    $cmd->close();
-    $cmd->wait_child();
-    is( $cmd->exit,   0,               $t->{test} . ': exit 0' );
-    is( $cmd->signal, 0,               $t->{test} . ': no signal received' );
-    is( $cmd->core,   $t->{core} || 0, $t->{test} . ': no core dumped' );
+    $proc->close();
+    $proc->wait_child();
+    is( $proc->exit,   0,               $t->{test} . ': exit 0' );
+    is( $proc->signal, 0,               $t->{test} . ': no signal received' );
+    is( $proc->core,   $t->{core} || 0, $t->{test} . ': no core dumped' );
 }
 
 for my $t ( @tests, @fail ) {
@@ -347,70 +365,111 @@ SKIP: {
 }
 
 subtest 'run', sub {
-    my ( $out, $err, $info );
+    my ( $out, $err, $info, $exit );
     my $errstr = 'Parachute Please! ' . ( $no_utf8 ? '' : '✈️' );
-    $info = $out = $err = undef;
-    $out  = run(@info_pl);
-    eval $out;
-    die $@ if $@;
-    is ref($info), 'HASH', 'run() returned $info = { ... }';
 
-    {
-        local $SIG{__WARN__} = sub {
-            $err = shift;
-        };
-        run(
-            @info_pl,
-            {
-                env => { SYS_CMD_ERR => $errstr },
-            }
-        );
+    subtest 'return out', sub {
+        $info = $out = $err = $exit = undef;
+        no_warnings { $out = run(@info_pl) };
         eval $out;
         die $@ if $@;
         is ref($info), 'HASH', 'run() returned $info = { ... }';
+    };
+
+    subtest 'warn on stderr', sub {
+        $info = $out = $err = $exit = undef;
+        $err =
+          warning { run( @info_pl, { env => { SYS_CMD_ERR => $errstr }, } ) };
         like $err, qr/$errstr/, 'stderr raised warning ' . $errstr;
-    }
+    };
 
-    $info = $out = $err = undef;
-    run(
-        @info_pl,
-        {
-            out => \$out,
-            err => \$err,
-        }
-    );
-    eval $out;
-    die $@ if $@;
-    is ref($info), 'HASH', 'run() put $info into \$out';
-    is $err,       '',     'run() $err empty on zero warnings';
+    subtest 'catch out, err and exit in vars', sub {
+        $info = $out = $err = $exit = undef;
+        ok(
+            no_warnings {
+                run(
+                    @info_pl,
+                    {
+                        out  => \$out,
+                        err  => \$err,
+                        exit => \$exit,
+                    }
+                )
+            },
+            'no warnings'
+        );
+        eval $out;
+        die $@ if $@;
+        is ref($info), 'HASH', 'run() put $info into \$out';
+        is $err,       '',     'run() $err empty on zero warnings';
+        is $exit,      0,      'run() $exit set 0';
 
-    $info = $out = $err = undef;
-    run(
-        @info_pl,
-        {
-            out => \$out,
-            err => \$err,
-            env => { SYS_CMD_ERR => $errstr },
-        }
-    );
-    eval $out;
-    die $@ if $@;
-    is ref($info), 'HASH',         'run() put $info into \$out';
-    is $err,       $errstr . "\n", '$err is ' . $errstr;
+        $info = $out = $err = $exit = undef;
+        ok(
+            no_warnings {
+                run(
+                    @info_pl,
+                    {
+                        out  => \$out,
+                        err  => \$err,
+                        env  => { SYS_CMD_ERR => $errstr },
+                        exit => \$exit,
+                    }
+                )
+            },
+            'no warnings'
+        );
+        eval $out;
+        die $@ if $@;
+        is ref($info), 'HASH',         'run() put $info into \$out';
+        is $err,       $errstr . "\n", '$err is ' . $errstr;
+        is $exit,      0,              'run() $exit set 0';
+
+        $info = $out = $err = $exit = undef;
+        ok(
+            no_warnings {
+                ok(
+                    lives {
+                        run(
+                            @info_pl,
+                            {
+                                out => \$out,
+                                err => \$err,
+                                env => {
+                                    SYS_CMD_ERR  => $errstr,
+                                    SYS_CMD_EXIT => 2,
+                                },
+                                exit => \$exit,
+                            }
+                        )
+                    },
+                    'no exception'
+                )
+            },
+            'no warnings'
+        );
+        eval $out;
+        die $@ if $@;
+
+        is ref($info), 'HASH',         'run() put $info into \$out';
+        is $err,       $errstr . "\n", '$err is ' . $errstr;
+        is $exit,      2,              "exit is $exit";
+    };
 
     # Test early ->core. Cannot test ->exit here, as even on exception
     # $proc->{exit} jumps into existance, and wait_child uses
     # ->has_exit.
-    $info = $out = $err = undef;
+    $info = $out = $err = $exit = undef;
     my $proc = spawn(@info_pl);
-    eval { $proc->core };
+
     like(
-        $@,
+        dies { $proc->core },
         qr/before wait_child/,
         'exit,core,signal only valid after wait_child'
     );
     $proc->wait_child;
     is $proc->core, 0, 'core status 0';
+
 };
 
 SKIP: {
@@ -420,7 +479,7 @@ SKIP: {
     subtest 'Sys::Cmd', sub {
         my ( $out, @out );
         @out = $ls->run();
-        is scalar @out, 3, 'ls in t';
+        is scalar @out, 4, 'ls t/';
 
         @out = ();
         $ls->run( '../lib', { out => \$out } );

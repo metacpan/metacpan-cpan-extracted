@@ -1,5 +1,8 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+7.023 - Revert change to ':all' to no longer set $Carp::RefArgFormatter.
+        Minor tweaks to docs and tests.
+7.022 - :all and :carp import tags install $Carp::RefArgFormatter
 7.021 - add RefArgFormatter & test case; fix bug in shared test lib
 7.020 - Allow ":Configvar='value'" import options
 7.019 - Changed Useqq("spacedots") to "showspaces" and using ␣ instead of Middle Dot

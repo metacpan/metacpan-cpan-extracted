@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Field::DKIM;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field::Structured';
+use parent 'Mail::Message::Field::Structured';
 
 use warnings;
 use strict;
+
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 use URI      ();
 
@@ -25,9 +27,7 @@ use URI      ();
 sub init($)
 {	my ($self, $args) = @_;
 	$self->{MMFD_tags} = +{ v => 1, a => 'rsa-sha256' };
-
 	$self->SUPER::init($args);
-	$self;
 }
 
 sub parse($)
@@ -53,8 +53,7 @@ sub produceBody()
 
 sub addAttribute($;@)
 {	my $self = shift;
-	$self->log(ERROR => 'No attributes for DKIM headers.');
-	$self;
+	error __x"no attributes for DKIM headers.";
 }
 
 
@@ -66,7 +65,6 @@ sub addTag($$)
 
 
 sub tag($) { $_[0]->{MMFD_tags}{lc $_[1]} }
-
 
 #--------------------
 

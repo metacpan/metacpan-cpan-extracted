@@ -24,5 +24,6 @@ t/prereq.t
 t/reload.t
 t/simple.t
 t/strict.t
+t/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

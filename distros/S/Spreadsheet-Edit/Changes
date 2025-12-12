@@ -1,5 +1,9 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1001.001 : btwbt mini-tracebacks now show outer-most frame first.
+           *Removed* support for user-specified btw prefix strings
+           (lots of complexity for mostly-imaginary real benefits).
+           *Removed* :color/:nocolor import tag support. Use $ENV{NO_COLOR} instead.
 1000.030 : Remove LO-search debug messages from t/00_compile.t
            Test colorized btw* messages and expose colorize() function.
 1000.029 : Avoid showing any internal frames in tracebacks involving apply* etc.

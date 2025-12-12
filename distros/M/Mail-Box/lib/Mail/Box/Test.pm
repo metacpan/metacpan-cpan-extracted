@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -13,13 +13,15 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Box::Test;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Exporter';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw// ];
 
 use File::Copy            qw/copy/;
 use List::Util            qw/first/;

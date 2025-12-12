@@ -2,7 +2,7 @@ use Test2::V0;
 use Crypt::Digest::SHA256 qw(sha256);
 use Bitcoin::Crypto qw(btc_script btc_transaction btc_prv btc_utxo);
 use Bitcoin::Crypto::Util qw(to_format);
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Constants qw(:sighash);
 
 use lib 't/lib';
 use TransactionStore;
@@ -13,7 +13,7 @@ my $prv = btc_prv->from_serialized("\x12" x 32);
 subtest 'should checksig a non-standard transaction' => sub {
 	$tx = btc_transaction->new;
 
-	btc_utxo->new(
+	my $utxo = btc_utxo->new(
 		txid => [hex => '0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9'],
 		output_index => 0,
 		output => {
@@ -22,11 +22,9 @@ subtest 'should checksig a non-standard transaction' => sub {
 				->add('OP_BOOLAND'),
 			value => 1_00000000,
 		},
-	)->register;
-
-	$tx->add_input(
-		utxo => [[hex => '0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9'], 0],
 	);
+
+	$tx->add_input(utxo => $utxo);
 
 	$tx->add_output(
 		value => 1_00000000,
@@ -37,7 +35,7 @@ subtest 'should checksig a non-standard transaction' => sub {
 
 	# Manual signing
 	my $input = $tx->inputs->[0];
-	my $sighash = Bitcoin::Crypto::Constants::sighash_none;
+	my $sighash = SIGHASH_NONE;
 	my $digest = $tx->get_digest(
 		signing_index => 0,
 		signing_subscript => $input->utxo->output->locking_script->to_serialized,
@@ -67,6 +65,47 @@ subtest 'should not allow input value smaller than output' => sub {
 	my $ex = dies { $tx->verify };
 	isa_ok $ex, 'Bitcoin::Crypto::Exception::Transaction';
 	like $ex, qr/value exceeds input/, 'error message ok';
+};
+
+subtest 'should require an extra element in CHECKMULTISIG to be present' => sub {
+	$tx = btc_transaction->new;
+
+	my $utxo = btc_utxo->new(
+		txid => [hex => '0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9'],
+		output_index => 0,
+		output => {
+			locking_script => btc_script->new
+				->push_number(1)
+				->push_bytes($prv->get_public_key->to_serialized)
+				->push_number(1)
+				->add('OP_CHECKMULTISIG'),
+			value => 1,
+		},
+	);
+
+	$tx->add_input(
+		utxo => $utxo,
+	);
+
+	$tx->add_output(
+		value => 1,
+		locking_script => [
+			P2PKH => $prv->get_public_key->get_legacy_address,
+		],
+	);
+
+	# Manual signing
+	my $input = $tx->inputs->[0];
+	my $digest = $tx->get_digest(
+		signing_index => 0,
+		signing_subscript => $input->utxo->output->locking_script->to_serialized,
+	);
+	my $signature = $prv->sign_message($digest);
+	$signature .= pack 'C', SIGHASH_ALL;
+	$input->signature_script
+		->push_bytes($signature);
+
+	ok dies { $tx->verify }, 'input verification ok';
 };
 
 subtest 'should serialize and deserialize mixed segwit txs' => sub {
@@ -142,14 +181,14 @@ subtest 'should correctly handle extra SIGHASH_SINGLE inputs' => sub {
 		]
 	);
 
-	my $flags = Bitcoin::Crypto::Transaction::Flags->new(strict_signatures => !!0);
-
 	ok lives {
-		$tx->verify(flags => $flags);
+		$tx->verify;
 	}, 'this transaction verified ok';
 };
 
-subtest 'should not verify segwit transactions with uncompressed public keys (P2WSH)' => sub {
+# this is considered a policy, "not be relayed or mined by default" - so the
+# validation should pass if a block contains such transaction already
+subtest 'should verify segwit transactions with uncompressed public keys (P2WSH)' => sub {
 	$prv->set_compressed(0);
 	my $other_prv = btc_prv->from_serialized("\x13" x 32);
 
@@ -184,9 +223,7 @@ subtest 'should not verify segwit transactions with uncompressed public keys (P2
 
 	$other_prv->sign_transaction($tx, redeem_script => $redeem_script, signing_index => 0, multisig => [1, 1]);
 
-	my $ex = dies { $tx->verify };
-	isa_ok $ex, 'Bitcoin::Crypto::Exception::TransactionScript';
-	like $ex, qr/compressed/, 'error string ok';
+	ok lives { $tx->verify }, 'verification ok';
 };
 
 subtest 'should not allow to create transactions using incorrect network addresses' => sub {
@@ -220,6 +257,15 @@ subtest 'should correctly verify a transaction with unexecuted codeseparator' =>
 	);
 
 	ok lives { $tx->verify }, 'transaction verification should succeed';
+};
+
+subtest 'should serialize tx into the witness form, if it was deserialized with empty witness data' => sub {
+	my $original_form =
+		'01000000000101ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000ffffffff0100000000000000000e6a0c7769746e65737320746573740000000000';
+	$tx = btc_transaction->from_serialized([hex => $original_form]);
+	ok $tx->had_witness_flag, 'witness flag ok';
+
+	is to_format [hex => $tx->to_serialized(witness => !!1)], $original_form, 'serialized ok';
 };
 
 done_testing;

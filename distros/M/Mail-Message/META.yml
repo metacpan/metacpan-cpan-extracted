@@ -20,7 +20,6 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
   Date::Format: '0'
   Date::Parse: '0'
   Encode: '2.26'
@@ -33,6 +32,7 @@ requires:
   IO::Lines: '0'
   IO::Scalar: '0'
   List::Util: '0'
+  Log::Report: '1.42'
   MIME::Base64: '0'
   MIME::QuotedPrint: '0'
   MIME::Types: '1.004'
@@ -40,16 +40,17 @@ requires:
   POSIX: '0'
   Scalar::Util: '1.13'
   Storable: '0'
+  String::Print: '1.01'
   Sys::Hostname: '0'
   Time::HiRes: '1.51'
   Time::Zone: '0'
   URI: '1.23'
-  User::Identity: '>= 1.02, < 4.0'
+  User::Identity: '4.0'
 resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Message/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Message.git
-version: '3.020'
+version: '4.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

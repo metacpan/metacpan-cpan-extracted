@@ -1,18 +1,16 @@
 package Bitcoin::Crypto::Script::Tree;
-$Bitcoin::Crypto::Script::Tree::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Script::Tree::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard;
+use Types::Common -sigs;
+use List::Util qw(first);
 
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Util qw(tagged_hash pack_compactsize has_even_y);
+use Bitcoin::Crypto::Util::Internal qw(tagged_hash pack_compactsize has_even_y);
 use Bitcoin::Crypto::Transaction::ControlBlock;
-
-use namespace::clean;
 
 # recursive structure - a binary tree
 has param 'tree' => (
@@ -21,6 +19,7 @@ has param 'tree' => (
 
 has field '_tree_cache' => (
 	lazy => 1,
+	clearer => -public,
 );
 
 # this is flat traversal algorithm that avoids deep recursion warnings in deep
@@ -125,30 +124,15 @@ sub _tree_paths_action
 	return (\%paths, $action);
 }
 
-sub _find_leaf_action
-{
-	my ($self, $id) = @_;
-
-	my $leaf;
-	my $action = sub {
-		return if defined $leaf;
-
-		my ($node) = @_;
-
-		$leaf = $node
-			if defined $node->{id} && $node->{id} == $id;
-	};
-
-	return (\$leaf, $action);
-}
-
 sub _build_tree_cache
 {
 	my ($self) = @_;
 
 	my @leaves;
+	my ($paths, $paths_action) = $self->_tree_paths_action;
+
 	my $root = $self->_traverse(
-		undef,
+		$paths_action,
 		sub {
 			my $leaf = shift;
 			push @leaves, $leaf;
@@ -157,14 +141,10 @@ sub _build_tree_cache
 
 	return {
 		leaves => \@leaves,
+		paths => $paths,
 		root => $root,
 	};
 }
-
-signature_for get_merkle_root => (
-	method => Object,
-	positional => [],
-);
 
 sub get_merkle_root
 {
@@ -173,42 +153,48 @@ sub get_merkle_root
 	return $self->_tree_cache->{root}{hash};
 }
 
-signature_for get_tapleaf_hash => (
-	method => Object,
-	positional => [Int],
-);
+sub _get_tapleaf
+{
+	my ($self, $leaf_id) = @_;
+
+	my $leaf = first { exists $_->{id} && $_->{id} == $leaf_id } @{$self->_tree_cache->{leaves}};
+	Bitcoin::Crypto::Exception::ScriptTree->raise(
+		"no such block with id=$leaf_id"
+	) unless defined $leaf;
+
+	return $leaf;
+}
+
+sub get_tapleaf_script
+{
+	my ($self, $leaf_id) = @_;
+
+	return $self->_get_tapleaf($leaf_id)->{script};
+}
 
 sub get_tapleaf_hash
 {
 	my ($self, $leaf_id) = @_;
 
-	my @leaves = grep { exists $_->{id} && $_->{id} == $leaf_id } @{$self->_tree_cache->{leaves}};
-	my $leaf = shift @leaves;
-
-	Bitcoin::Crypto::Exception::ScriptTree->raise(
-		"no such block with id=$leaf_id"
-	) unless defined $leaf;
-
-	return $leaf->{hash};
+	return $self->_get_tapleaf($leaf_id)->{hash};
 }
 
-signature_for get_tree_paths => (
-	method => Object,
-	positional => [],
-);
+sub get_tapleaf_version
+{
+	my ($self, $leaf_id) = @_;
+
+	return $self->_get_tapleaf($leaf_id)->{leaf_version};
+}
 
 sub get_tree_paths
 {
 	my ($self) = @_;
-	my ($paths, $action) = $self->_tree_paths_action;
 
-	my $result = $self->_traverse($action);
-
-	return $paths;
+	return $self->_tree_cache->{paths};
 }
 
 signature_for from_path => (
-	method => Str,
+	method => !!1,
 	positional => [HashRef, ArrayRef [ByteStr]],
 );
 
@@ -231,30 +217,23 @@ sub from_path
 }
 
 signature_for get_control_block => (
-	method => Object,
+	method => !!1,
 	positional => [Int, InstanceOf ['Bitcoin::Crypto::Key::Public']],
 );
 
 sub get_control_block
 {
 	my ($self, $leaf_id, $pubkey) = @_;
+	my $cache = $self->_tree_cache;
 
-	my ($paths_ref, $paths_action) = $self->_tree_paths_action;
-	my ($leaf_ref, $leaf_action) = $self->_find_leaf_action($leaf_id);
-
-	my $root = $self->_traverse($paths_action, $leaf_action);
-
-	Bitcoin::Crypto::Exception::ScriptTree->raise(
-		"no such block with id=$leaf_id"
-	) unless defined $$leaf_ref;
-
-	my $tapkey = $pubkey->get_taproot_output_key($root->{hash});
+	my $leaf_version = $self->get_tapleaf_version($leaf_id);
+	my $tapkey = $pubkey->get_taproot_output_key($cache->{root}{hash});
 	my $parity = has_even_y($tapkey);
 
 	return Bitcoin::Crypto::Transaction::ControlBlock->new(
-		control_byte => ${$leaf_ref}->{leaf_version} | !$parity,
+		control_byte => $leaf_version | !$parity,
 		public_key => $pubkey,
-		script_blocks => $paths_ref->{$leaf_id} // [],
+		script_blocks => $cache->{paths}{$leaf_id} // [],
 	);
 }
 
@@ -288,8 +267,8 @@ Optional C<id> is used to identify the leaf in the tree, which is used in
 methods like L</get_control_block>.
 
 Currently, C<leaf_version> must be equal to
-C<Bitcoin::Crypto::Constants::tapscript_leaf_version>, since other versions are
-reserved for future use.
+L<Bitcoin::Crypto::Constants/TAPSCRIPT_LEAF_VERSION>, since other
+versions are reserved for future use.
 
 If the leaf is prehashed or not known, it can be represented as this structure
 instead:
@@ -322,18 +301,18 @@ Example structure:
 	[
 		{
 			id => 0,
-			leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+			leaf_version => TAPSCRIPT_LEAF_VERSION,
 			script => [hex => '2071981521ad9fc9036687364118fb6ccd2035b96a423c59c5430e98310a11abe2ac']
 		},
 		[
 			{
 				id => 1,
-				leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
 				script => [hex => '20d5094d2dbe9b76e2c245a2b89b6006888952e2faa6a149ae318d69e520617748ac']
 			},
 			{
 				id => 2,
-				leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
 				script => [hex => '20c440b462ad48c7a77f94cd4532d8f2119dcebbd7c9764557e62726419b08ad4cac']
 			}
 		]
@@ -347,7 +326,7 @@ disclosing information about a script:
 		{hash => [hex => 'f154e8e8e17c31d3462d7132589ed29353c6fafdb884c5a6e04ea938834f0d9d']},
 		[
 			{
-				leaf_version => Bitcoin::Crypto::Constants::tapscript_leaf_version,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
 				script => [hex => '20d5094d2dbe9b76e2c245a2b89b6006888952e2faa6a149ae318d69e520617748ac']
 			},
 			{hash => [hex => 'd7485025fceb78b9ed667db36ed8b8dc7b1f0b307ac167fa516fe4352b9f4ef7']},
@@ -385,6 +364,20 @@ could look like this:
 Calculates a merkle root of the script tree. Returns a bytestring which is the
 root hash of the tree.
 
+=head3 get_tapleaf_script
+
+	$script = $tree->get_tapleaf_script($leaf_id)
+
+Returns a tapleaf script of a leaf with given C<$leaf_id>. If such leaf does
+not exist, an exception is thrown. Returns a script instance.
+
+=head3 get_tapleaf_version
+
+	$int = $tree->get_tapleaf_version($leaf_id)
+
+Returns a tapleaf version of a leaf with given C<$leaf_id>. If such leaf does
+not exist, an exception is thrown. Returns an integer.
+
 =head3 get_tapleaf_hash
 
 	$hash = $tree->get_tapleaf_hash($leaf_id)
@@ -408,17 +401,13 @@ of L<Bitcoin::Crypto::Transaction::ControlBlock>.
 Returns a hash reference of paths for each of leaves in the tree which have an
 id. Each path is an array reference - same as what L</from_path> takes as input.
 
-=head1 EXCEPTIONS
+=head3 clear_tree_cache
 
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
+	$tree->clear_tree_cache()
 
-=over
-
-=item * ScriptTree - general error with the tree
-
-=back
+Clears the internal cache of the tree, forcing recalculation of merkle root and
+all leaf hashes. Must be done after the internal structure of the tree
+changed.
 
 =head1 SEE ALSO
 

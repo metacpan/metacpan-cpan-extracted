@@ -1,11 +1,9 @@
 package Bitcoin::Crypto::BIP44;
-$Bitcoin::Crypto::BIP44::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::BIP44::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard;
 
 use Scalar::Util qw(blessed);
 
@@ -13,8 +11,6 @@ use Bitcoin::Crypto::DerivationPath;
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
 
 sub _get_network_constant
 {
@@ -92,11 +88,6 @@ use overload
 	q{""} => sub { shift->as_string },
 	fallback => 1;
 
-signature_for as_string => (
-	method => Object,
-	positional => [],
-);
-
 sub as_string
 {
 	my ($self) = @_;
@@ -116,11 +107,6 @@ sub as_string
 	return sprintf "%s/%u/%u",
 		$path, $self->change, $self->index;
 }
-
-signature_for get_derivation_path => (
-	method => Object,
-	positional => [],
-);
 
 sub get_derivation_path
 {
@@ -268,18 +254,6 @@ indirectly by just stringifying the object.
 	my $path_obj = $object->get_derivation_path()
 
 Returns an object of class L<Bitcoin::Crypto::DerivationPath>.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * NetworkConfig - incomplete or corrupted network configuration
-
-=back
 
 =head1 SEE ALSO
 

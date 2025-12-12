@@ -1,18 +1,16 @@
 package Bitcoin::Crypto::Role::SignVerify;
-$Bitcoin::Crypto::Role::SignVerify::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Role::SignVerify::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
-use Try::Tiny;
+use Mooish::Base -standard, -role;
+use Types::Common -sigs;
+use Feature::Compat::Try;
 
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Helpers qw(ecc);
-use Bitcoin::Crypto::Transaction::Sign;
+use Bitcoin::Crypto::Helpers qw(ecc make_strict_der_signature);
+use Bitcoin::Crypto::Transaction::AutoSigner;
 use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Transaction::Flags;
-use Moo::Role;
 
 requires qw(
 	raw_key
@@ -22,16 +20,19 @@ requires qw(
 
 my %algorithms = (
 	default => {
-		signing_method => sub {
+		sign => sub {
 			my ($key, $digest) = @_;
 
 			return ecc->sign_digest($key->raw_key, $digest);
 		},
-		verification_method => sub {
+		verify => sub {
 			my ($key, $signature, $digest, $flags) = @_;
 
-			# strict DER used to be a standardness rule, but became consensus later on
-			if ($flags->strict_signatures) {
+			if (!$flags->strict_signatures) {
+				$signature = make_strict_der_signature($signature);
+			}
+
+			if ($flags->low_s_signatures) {
 				my $normalized = ecc->normalize_signature($signature);
 				return !!0 if $normalized ne $signature;
 			}
@@ -40,12 +41,12 @@ my %algorithms = (
 		},
 	},
 	schnorr => {
-		signing_method => sub {
+		sign => sub {
 			my ($key, $digest) = @_;
 
 			return ecc->sign_digest_schnorr($key->raw_key, $digest);
 		},
-		verification_method => sub {
+		verify => sub {
 			my ($key, $signature, $digest) = @_;
 
 			return ecc->verify_digest_schnorr($key->raw_key('public_xonly'), $signature, $digest);
@@ -54,7 +55,7 @@ my %algorithms = (
 );
 
 signature_for sign_message => (
-	method => Object,
+	method => !!1,
 	positional => [BitcoinDigest],
 );
 
@@ -69,33 +70,25 @@ sub sign_message
 
 	return Bitcoin::Crypto::Exception::Sign->trap_into(
 		sub {
-			return $algorithms{$algorithm}{signing_method}->($self, $digest_result->hash);
+			return $algorithms{$algorithm}{sign}->($self, $digest_result->hash);
 		}
 	);
 }
 
-signature_for sign_transaction => (
-	method => Object,
-	positional => [
-		InstanceOf ['Bitcoin::Crypto::Transaction'],
-		HashRef, {slurpy => !!1}
-	],
-);
-
 sub sign_transaction
 {
-	my ($self, $transaction, $args) = @_;
+	my ($self, $transaction, %args) = @_;
 
-	$args->{transaction} = $transaction;
-	$args->{key} = $self;
-	my $signer = Bitcoin::Crypto::Transaction::Sign->new($args);
+	$args{transaction} = $transaction;
+	$args{key} = $self;
+	my $signer = Bitcoin::Crypto::Transaction::AutoSigner->new(%args);
 	$signer->sign;
 
 	return;
 }
 
 signature_for verify_message => (
-	method => Object,
+	method => !!1,
 	head => [BitcoinDigest, ByteStr],
 	named => [
 		flags => Maybe [InstanceOf ['Bitcoin::Crypto::Transaction::Flags']],
@@ -110,17 +103,17 @@ sub verify_message
 	my $algorithm = $self->taproot_output ? 'schnorr' : 'default';
 	my $flags = $args->{flags} // Bitcoin::Crypto::Transaction::Flags->new;
 
-	my $valid = !!0;
 	try {
-		$valid = $algorithms{$algorithm}{verification_method}->(
+		return $algorithms{$algorithm}{verify}->(
 			$self,
 			$signature,
 			$digest_result->hash,
 			$flags,
 		);
-	};
-
-	return $valid;
+	}
+	catch ($e) {
+		return !!0;
+	}
 }
 
 1;

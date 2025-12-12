@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,24 +46,24 @@
             "File::Temp" : "0.19",
             "IO::Socket::IP" : "0",
             "List::Util" : "0",
-            "Mail::Box" : ">= 3.007, < 4.0",
-            "Mail::Box::Manage::User" : ">= 3, < 4.0",
-            "Mail::Box::Net" : ">= 3, < 4.0",
-            "Mail::Box::Search" : ">= 3, < 4.0",
-            "Mail::Box::Test" : ">= 3, < 4.0",
+            "Log::Report" : "1.42",
+            "Mail::Box" : "4.0",
+            "Mail::Box::Manage::User" : "4.0",
+            "Mail::Box::Net" : "4.0",
+            "Mail::Box::Search" : "4.0",
             "Mail::IMAPClient" : "3.42",
-            "Mail::Message" : ">= 3.013, < 4.0",
-            "Mail::Message::Body::Lines" : ">= 3, < 4.0",
-            "Mail::Message::Head::Complete" : ">= 3, < 4.0",
-            "Mail::Message::Head::Delayed" : ">= 3, < 4.0",
-            "Mail::Server" : ">= 3, < 4.0",
-            "Mail::Transport::Receive" : ">= 3.004, < 4.0",
-            "Scalar::Util" : "0",
-            "Test::More" : "0"
+            "Mail::Message" : "4.0",
+            "Mail::Message::Body::Lines" : "4.0",
+            "Mail::Message::Head::Complete" : "4.0",
+            "Mail::Message::Head::Delayed" : "4.0",
+            "Mail::Server" : "4.0",
+            "Mail::Transport::Receive" : "4.0",
+            "Scalar::Util" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Mail::Box::Test" : "4.0",
             "Test::More" : "1",
             "Test::Pod" : "1"
          }
@@ -78,7 +78,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-IMAP4"
       }
    },
-   "version" : "3.010",
+   "version" : "4.000",
    "x_oodist" : {
       "email" : "perl@overmeer.net",
       "first_year" : 2001,

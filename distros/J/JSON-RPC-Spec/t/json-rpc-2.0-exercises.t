@@ -68,4 +68,91 @@ subtest 'invalid jsonrpc version 2' => sub {
       or diag explain $res;
 };
 
+subtest 'invalid id(HASH)' => sub {
+    my $res;
+    $res = $rpc->parse_without_encode(
+        '{"jsonrpc":"2.0","method":"sum","params":[1,2],"id":{}}');
+    is ref $res, 'HASH';
+    ok exists $res->{error};
+    is_deeply $res,
+      {
+        "jsonrpc" => "2.0",
+        "error"   => {
+            "code"    => -32600,
+            "message" => "Invalid Request"
+        },
+        "id" => undef
+      },
+      'invalid id'
+      or diag explain $res;
+};
+
+subtest 'invalid id(ARRAY)' => sub {
+    my $res;
+    $res = $rpc->parse_without_encode(
+        '{"jsonrpc":"2.0","method":"sum","params":[1,2],"id":[]}');
+    is ref $res, 'HASH';
+    ok exists $res->{error};
+    is_deeply $res,
+      {
+        "jsonrpc" => "2.0",
+        "error"   => {
+            "code"    => -32600,
+            "message" => "Invalid Request"
+        },
+        "id" => undef
+      },
+      'invalid id'
+      or diag explain $res;
+};
+
+subtest 'invalid id(BOOLEAN)' => sub {
+    my $res;
+    $res = $rpc->parse_without_encode(
+        '{"jsonrpc":"2.0","method":"sum","params":[1,2],"id":false}');
+    is ref $res, 'HASH';
+    ok exists $res->{error};
+    is_deeply $res,
+      {
+        "jsonrpc" => "2.0",
+        "error"   => {
+            "code"    => -32600,
+            "message" => "Invalid Request"
+        },
+        "id" => undef
+      },
+      'invalid id'
+      or diag explain $res;
+};
+
+subtest 'valid id(NULL)' => sub {
+    my $res;
+    $res = $rpc->parse_without_encode(
+        '{"jsonrpc":"2.0","method":"sum","params":[1,2],"id":null}');
+    is ref $res, 'HASH';
+    is_deeply $res,
+      {
+        jsonrpc => "2.0",
+        result  => 3,
+        id      => undef
+      },
+      'valid id'
+      or diag explain $res;
+};
+
+subtest 'valid id(String)' => sub {
+    my $res;
+    $res = $rpc->parse_without_encode(
+        '{"jsonrpc":"2.0","method":"sum","params":[1,2],"id":"!\"#$%&()"}');
+    is ref $res, 'HASH';
+    is_deeply $res,
+      {
+        jsonrpc => "2.0",
+        result  => 3,
+        id      => q{!"#$%&()}
+      },
+      'valid id'
+      or diag explain $res;
+};
+
 done_testing;

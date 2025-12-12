@@ -1,13 +1,13 @@
 package Bitcoin::Crypto::Base58;
-$Bitcoin::Crypto::Base58::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Base58::VERSION = '4.003';
+use v5.14;
 use warnings;
+
 use Exporter qw(import);
 use Crypt::Misc qw(encode_b58b decode_b58b);
 use Types::Common -sigs, -types;
 
-use Bitcoin::Crypto::Util qw(hash256);
+use Bitcoin::Crypto::Util::Internal qw(hash256);
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Types -types;
 
@@ -136,20 +136,6 @@ Base58 with checksum validation. These functions are used with legacy /
 compatibility addresses as well as WIF strings and extended key serialization.
 
 Arguments are the same as base functions mentioned above.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception::Base58> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * Base58InputFormat - input was not suitable for base58 operations due to invalid format
-
-=item * Base58InputChecksum - checksum validation has failed
-
-=back
 
 =head1 SEE ALSO
 

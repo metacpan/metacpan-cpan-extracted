@@ -19,9 +19,13 @@ use t_TestCommon qw/bug/; # Test2::V0 etc.
 
 use Data::Dumper::Interp;
 
+diag "AT TOP";
+
 sub check_vars(@) {
   my %changed = @_;
   my $lno = (caller)[2];
+diag "check_vars lno=$lno\n";
+diag dvis '%changed\n';
   no strict 'refs';
   foreach my $name (@VARNAMES) {
     my $exp = exists($changed{$name}) ? vis($changed{$name}) : vis($defaults{$name});
@@ -35,6 +39,7 @@ main::check_vars();
 
 sub change_one($$) {
   my ($name, $setting) = @_;
+diag "change_one name=$name setting=$setting\n";
   state %changed;
   #oops if exists $changed{$name};
   $changed{$name} = eval $setting; confess "<$setting> $@" if $@;

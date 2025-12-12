@@ -56,10 +56,20 @@ Z<>
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: no folder specified to tie to.
+
+Cast by C<new()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

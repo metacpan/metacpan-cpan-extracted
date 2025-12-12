@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Head::Delayed;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Message::Head';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
 
 use Object::Realize::Later
 	becomes        => 'Mail::Message::Head::Complete',
@@ -27,7 +29,7 @@ use Scalar::Util   qw/weaken/;
 
 #--------------------
 
-sub build(@) { $_[0]->log(ERROR => "Cannot build() a delayed header.") }
+sub build(@) { error __x"cannot build() a delayed header." }
 
 sub init($$)
 {	my ($self, $args) = @_;
@@ -41,23 +43,18 @@ sub init($$)
 	$self;
 }
 
-sub isDelayed() {1}
-
 sub modified(;$)
 {	return 0 if @_==1 || !$_[1];
-	shift->forceRealize->modified(1);
+	$_[0]->forceRealize->modified(1);
 }
 
+sub isDelayed()  { 1 }
 sub isModified() { 0 }
-
-sub isEmpty() { 0 }
+sub isEmpty()    { 0 }
 
 #--------------------
 
-sub get($;$)
-{	my $self = shift;
-	$self->load->get(@_);
-}
+sub get($;$) { shift->load->get(@_) }
 
 #--------------------
 
@@ -77,6 +74,8 @@ sub read($)
 }
 
 sub load() { $_[0] = $_[0]->message->loadHead }
-sub setNoRealize($) { $_[0]->log(INTERNAL => "Setting field on a delayed?") }
+
+
+sub setNoRealize($) { error __x"attempt to set field on a delayed header." }
 
 1;

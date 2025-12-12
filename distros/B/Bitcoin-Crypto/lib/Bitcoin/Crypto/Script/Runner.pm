@@ -1,27 +1,25 @@
 package Bitcoin::Crypto::Script::Runner;
-$Bitcoin::Crypto::Script::Runner::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Script::Runner::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
 
-use Try::Tiny;
+use Mooish::Base -standard;
+use Types::Common -sigs;
+
 use Scalar::Util qw(blessed);
 use List::Util qw(any);
 
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Helpers qw(pad_hex);
+use Bitcoin::Crypto::Helpers qw(pad_hex ensure_length standard_push die_no_trace);
 use Bitcoin::Crypto::Script::Transaction;
 use Bitcoin::Crypto::Transaction::Flags;
-
-use namespace::clean;
+use Bitcoin::Crypto::Constants qw(:script USE_BIGINTS);
 
 has field 'script' => (
 	isa => InstanceOf ['Bitcoin::Crypto::Script'],
 	writer => 1,
+	handles => [qw(_compiler)],
 );
 
 has option 'transaction' => (
@@ -45,22 +43,17 @@ has param 'flags' => (
 );
 
 has field 'stack' => (
-	isa => ArrayRef [Str],
+	isa => ArrayRef [ByteStr],
 	writer => -hidden,
 );
 
 has field 'alt_stack' => (
-	isa => ArrayRef [Str],
+	isa => ArrayRef [ByteStr],
 	writer => -hidden,
 );
 
 has field 'pos' => (
 	isa => PositiveOrZeroInt,
-	writer => -hidden,
-);
-
-has field 'operations' => (
-	isa => ArrayRef [ArrayRef],
 	writer => -hidden,
 );
 
@@ -70,12 +63,13 @@ has field 'codeseparator' => (
 	clearer => -hidden,
 );
 
-has field '_valid' => (
-	isa => Bool,
+has field '_opcode_count' => (
+	isa => Int,
 	writer => 1,
-	predicate => 1,
-	clearer => 1,
 );
+
+# shortcut for quick access
+sub operations { $_[0]->_compiler->operations }
 
 sub _trigger_transaction
 {
@@ -86,7 +80,7 @@ sub _trigger_transaction
 
 sub _stack_error
 {
-	die 'stack error';
+	die_no_trace 'stack error';
 }
 
 sub _invalid_script
@@ -109,6 +103,10 @@ sub to_int
 	my ($self, $bytes, $max_bytes) = @_;
 	$max_bytes //= 4;
 
+	# too big vector cannot be interpreted as a number - see CScriptNum
+	die_no_trace 'script numeric value too big to be interpreted as a number'
+		if length $bytes > $max_bytes;
+
 	return 0 if !length $bytes;
 
 	my $negative = !!0;
@@ -119,12 +117,20 @@ sub to_int
 		substr $bytes, -1, 1, chr($ord - 0x80);
 	}
 
-	my $value = Math::BigInt->from_bytes(scalar reverse $bytes);
-	$value->bneg if $negative;
+	my $value;
+	if (USE_BIGINTS) {
+		$value = Math::BigInt->from_bytes(scalar reverse $bytes);
+		$value->bneg if $negative;
+	}
+	else {
+		my $bytes = ensure_length scalar(reverse $bytes), 8;
+		my ($higher, $lower) = unpack 'NN', $bytes;
+		$value = ($higher << 32) + $lower;
+		$value = -$value if $negative;
+	}
 
-	# too big vector cannot be interpreted as a number - see CScriptNum
-	die "script numeric value $value out of range"
-		if abs($value) > 2**($max_bytes * 8 - 1) - 1;
+	die_no_trace 'number is not minimally encoded'
+		if ref $self && $self->flags->minimal_data && $bytes ne $self->from_int($value);
 
 	return $value;
 }
@@ -133,14 +139,30 @@ sub from_int
 {
 	my ($self, $value) = @_;
 
-	if (!blessed $value) {
-		$value = Math::BigInt->new($value);
+	my $bytes;
+	my $negative;
+	if (USE_BIGINTS) {
+		if (!blessed $value) {
+			$value = Math::BigInt->new($value);
+		}
+
+		return '' if $value == 0;
+
+		$negative = $value < 0;
+		$value->babs if $negative;
+
+		$bytes = reverse pack 'H*', pad_hex($value->to_hex);
 	}
+	else {
+		return '' if $value == 0;
+		$negative = $value < 0;
+		$value = abs $value if $negative;
 
-	my $negative = $value < 0;
-	$value->babs if $negative;
+		$bytes = pack 'V', $value & 0xffffffff;
+		$bytes .= pack 'V', $value >> 32;
 
-	my $bytes = reverse pack 'H*', pad_hex($value->to_hex);
+		$bytes =~ s/\x00+$//;
+	}
 
 	my $last = substr $bytes, -1, 1;
 	my $ord = ord $last;
@@ -162,6 +184,7 @@ sub from_int
 sub to_bool
 {
 	my ($self, $bytes) = @_;
+	$bytes //= '';
 
 	my $len = length $bytes;
 	return !!0 if $len == 0;
@@ -174,6 +197,7 @@ sub to_bool
 sub to_minimal_bool
 {
 	my ($self, $bytes) = @_;
+	$bytes //= '';
 
 	return undef unless $bytes eq "\x01" or $bytes eq '';
 	return length $bytes == 1;
@@ -186,15 +210,6 @@ sub from_bool
 	return !!$value ? "\x01" : '';
 }
 
-sub _advance
-{
-	my ($self, $count) = @_;
-	$count //= 1;
-
-	$self->_set_pos($self->pos + $count);
-	return;
-}
-
 sub _register_codeseparator
 {
 	my ($self) = @_;
@@ -203,10 +218,19 @@ sub _register_codeseparator
 	return;
 }
 
-signature_for stack_serialized => (
-	method => Object,
-	positional => [],
-);
+sub _increment_opcode_count
+{
+	my ($self, $number) = @_;
+
+	# numify from bigint
+	$number = "$number";
+
+	$self->_set_opcode_count($self->_opcode_count + $number);
+
+	$self->_script_error('script non-push opcode count exceeded')
+		if !$self->is_tapscript
+		&& $self->_opcode_count > SCRIPT_MAX_OPCODES;
+}
 
 sub stack_serialized
 {
@@ -218,7 +242,7 @@ sub stack_serialized
 }
 
 signature_for execute => (
-	method => Object,
+	method => !!1,
 	positional => [BitcoinScript, ArrayRef [ByteStr], {default => []}],
 );
 
@@ -227,13 +251,21 @@ sub execute
 	my ($self, $script, $initial_stack) = @_;
 
 	$self->start($script, $initial_stack);
-	1 while $self->step;
+	if (!$self->success) {
+		my $stepper = $self->_step;
+
+		# optimization: a lot of operations may want to check bytestrings here, but
+		# all bytestrings were already checked and accepted
+		local $Bitcoin::Crypto::Types::CHECK_BYTESTRINGS = !!0;
+
+		1 while $stepper->();
+	}
 
 	return $self;
 }
 
 signature_for start => (
-	method => Object,
+	method => !!1,
 	positional => [BitcoinScript, ArrayRef [ByteStr], {default => []}],
 );
 
@@ -245,302 +277,169 @@ sub start
 	$self->_set_alt_stack([]);
 	$self->_set_pos(0);
 	$self->_clear_codeseparator;
-	$self->_clear_valid;
 
-	try {
-		Bitcoin::Crypto::Exception::ScriptCompilation->trap_into(
+	my $compiler = $self->_compiler;
+	my $is_tapscript = $self->is_tapscript;
+	$compiler->assert_valid;
+
+	Bitcoin::Crypto::Exception::ScriptRuntime->raise(
+		'cannot run tapscript without taproot flag'
+	) if $is_tapscript && !$self->flags->taproot;
+
+	# set and increment opcode count. Incrementing is checking for too many
+	# opcodes (SCRIPT_MAX_OPCODES)
+	$self->_set_opcode_count(0);
+	$self->_increment_opcode_count($compiler->opcode_count // 0);
+
+	# run this ONLY if the script was not marked as "unconditionally valid"
+	if (!$compiler->unconditionally_valid) {
+		Bitcoin::Crypto::Exception::ScriptRuntime->trap_into(
 			sub {
-				die 'cannot run tapscript without taproot flag'
-					if $self->is_tapscript && !$self->flags->taproot;
+				die_no_trace 'script size exceeded'
+					if !$is_tapscript
+					&& length $script->to_serialized > SCRIPT_MAX_SIZE;
 
-				$self->compile;
+				die_no_trace 'maximum stack element size exceeded'
+					if any { $_->[0]->pushop && length $_->[2] > SCRIPT_MAX_ELEMENT_SIZE } @{$self->operations};
 			}
 		);
 
 		Bitcoin::Crypto::Exception::ScriptPush->trap_into(
 			sub {
-				die 'maximum initial stack element size exceeded'
-					if $self->is_tapscript && @$initial_stack > Bitcoin::Crypto::Constants::script_max_stack_elements;
-				die 'maximum initial stack element size exceeded'
-					if any { length $_ > Bitcoin::Crypto::Constants::script_max_element_size } @$initial_stack;
+				die_no_trace 'maximum initial stack element count exceeded'
+					if $is_tapscript && @$initial_stack > SCRIPT_MAX_STACK_ELEMENTS;
+
+				die_no_trace 'maximum initial stack element size exceeded'
+					if any { length $_ > SCRIPT_MAX_ELEMENT_SIZE } @$initial_stack;
 
 				$self->_set_stack($initial_stack);
 			}
 		);
 	}
-	catch {
-		my $ex = $_;
-
-		if ($ex->isa('Bitcoin::Crypto::Exception::ScriptSuccess')) {
-			$self->_set_valid(!!1);
-			$self->_set_operations([]);
-		}
-		else {
-			die $ex;
-		}
-	};
 
 	return $self;
 }
 
-signature_for step => (
-	method => Object,
-	positional => [],
-);
+sub _step
+{
+	my ($self) = @_;
+
+	# if pos is undefined, execution was not yet started
+	my $pos = $self->pos;
+	return sub { !!0 }
+		unless defined $pos;
+
+	my $operations = $self->operations;
+	my $has_transaction = $self->has_transaction;
+
+	return sub {
+		my $compiled_op = $operations->[$pos];
+
+		# out of operations
+		return !!0 unless defined $compiled_op;
+		my ($op, $raw_op, @args) = @{$compiled_op};
+
+		Bitcoin::Crypto::Exception::TransactionScript->raise(
+			'no transaction is set for the script runner'
+		) if $op->needs_transaction && !$has_transaction;
+
+		Bitcoin::Crypto::Exception::ScriptRuntime->trap_into(
+			sub {
+				$op->execute($self, @args);
+			},
+			"error at pos $pos (" . $op->name . ")"
+		);
+
+		# cannot trust $pos anymore. Jumps in script could've happened
+		$pos = $self->pos + 1;
+		$self->_set_pos($pos);
+		return !!1;
+	};
+}
 
 sub step
 {
 	my ($self) = @_;
 
-	# optimization: a lot of operations may want to check bytestrings here, but
-	# all bytestrings were already checked and accepted
-	local $Bitcoin::Crypto::Types::CHECK_BYTESTRINGS = !!0;
-
-	my $pos = $self->pos;
-
-	return !!0
-		unless defined $pos;
-
-	return !!0
-		unless $pos < @{$self->operations};
-
-	my ($op, $raw_op, @args) = @{$self->operations->[$pos]};
-
-	Bitcoin::Crypto::Exception::Transaction->raise(
-		'no transaction is set for the script runner'
-	) if $op->needs_transaction && !$self->has_transaction;
-
-	Bitcoin::Crypto::Exception::ScriptRuntime->trap_into(
-		sub {
-			$op->execute($self, @args);
-		},
-		"error at pos $pos (" . $op->name . ")"
-	);
-
-	$self->_advance;
-	return !!1;
+	return $self->_step->();
 }
 
-signature_for subscript => (
-	method => Object,
-	positional => [],
-);
-
-sub subscript
+sub _subscript_legacy
 {
-	my ($self) = @_;
-	my $start = ($self->codeseparator // -1) + 1;
-	my @operations = @{$self->operations};
+	my ($self, $sigs) = @_;
 
-	my $witness = $self->transaction->this_input->is_segwit;
+	my $start = ($self->codeseparator // -1) + 1;
+	my $operations = $self->operations;
+
+	my %sigs_lookup = map { $_ => 1 } grep { length $_ // '' } @{$sigs // []};
 
 	my $result = '';
-	foreach my $operation (@operations[$start .. $#operations]) {
-		my ($op, $raw_op) = @$operation;
-		next if !$witness && $op->name eq 'OP_CODESEPARATOR';
+	foreach my $operation (@{$operations}[$start .. $#$operations]) {
+		my ($op, $raw_op, $pushop_data) = @$operation;
+
+		my $name = $op->name;
+		next if $name eq 'OP_CODESEPARATOR';
+		next if $op->pushop && $sigs_lookup{$pushop_data} && standard_push($name, $pushop_data);
+
 		$result .= $raw_op;
 	}
 
-	# NOTE: signature is not removed from the subscript for non-witness, since
-	# runner doesn't know what it is
+	if ($self->flags->const_script) {
+		my $orig = $self->script->to_serialized;
+		$self->_invalid_script('script is not constant')
+			if $result ne $orig;
+	}
 
 	return $result;
 }
 
-signature_for compile => (
-	method => Object,
-	positional => [],
-);
-
-sub compile
+sub _subscript_segwit
 {
-	my ($self) = @_;
-	my $opcode_class = $self->script->opcode_class;
-	my $serialized = $self->script->to_serialized;
-	my @ops;
+	my $self = shift;
 
-	my $data_push = sub {
-		my ($size) = @_;
+	my $codeseparator = $self->codeseparator;
 
-		Bitcoin::Crypto::Exception::ScriptSyntax->raise(
-			'no PUSHDATA size in the script'
-		) unless defined $size;
+	return $self->script->to_serialized
+		unless defined $codeseparator;
 
-		Bitcoin::Crypto::Exception::ScriptSyntax->raise(
-			'not enough bytes of data in the script'
-		) if length $serialized < $size;
-
-		return substr $serialized, 0, $size, '';
-	};
-
-	my %context = (
-		op_if => undef,
-		op_else => undef,
-		previous_context => undef,
-	);
-
-	my %special_ops = (
-		OP_PUSH => sub {
-			my ($op) = @_;
-			my $size = $op->[0]->code;
-
-			push @$op, $data_push->($size);
-			$op->[1] .= $op->[2];
-		},
-		OP_PUSHDATA1 => sub {
-			my ($op) = @_;
-			my $raw_size = substr $serialized, 0, 1, '';
-			my $size = unpack 'C', $raw_size;
-
-			push @$op, $data_push->($size);
-			$op->[1] .= $raw_size . $op->[2];
-		},
-		OP_PUSHDATA2 => sub {
-			my ($op) = @_;
-			my $raw_size = substr $serialized, 0, 2, '';
-			my $size = unpack 'v', $raw_size;
-
-			push @$op, $data_push->($size);
-			$op->[1] .= $raw_size . $op->[2];
-		},
-		OP_PUSHDATA4 => sub {
-			my ($op) = @_;
-			my $raw_size = substr $serialized, 0, 4, '';
-			my $size = unpack 'V', $raw_size;
-
-			push @$op, $data_push->($size);
-			$op->[1] .= $raw_size . $op->[2];
-		},
-		OP_IF => sub {
-			my ($op) = @_;
-
-			if ($context{op_if}) {
-				%context = (
-					previous_context => {%context},
-				);
-			}
-			$context{op_if} = $op;
-		},
-		OP_ELSE => sub {
-			my ($op, $pos) = @_;
-
-			Bitcoin::Crypto::Exception::ScriptSyntax->raise(
-				'OP_ELSE found but no previous OP_IF or OP_NOTIF'
-			) if !$context{op_if};
-
-			Bitcoin::Crypto::Exception::ScriptSyntax->raise(
-				'multiple OP_ELSE for a single OP_IF'
-			) if @{$context{op_if}} > 2;
-
-			$context{op_else} = $op;
-
-			push @{$context{op_if}}, $pos;
-		},
-		OP_ENDIF => sub {
-			my ($op, $pos) = @_;
-
-			Bitcoin::Crypto::Exception::ScriptSyntax->raise(
-				'OP_ENDIF found but no previous OP_IF or OP_NOTIF'
-			) if !$context{op_if};
-
-			push @{$context{op_if}}, undef
-				if @{$context{op_if}} == 2;
-			push @{$context{op_if}}, $pos;
-
-			if ($context{op_else}) {
-				push @{$context{op_else}}, $pos;
-			}
-
-			if ($context{previous_context}) {
-				%context = %{$context{previous_context}};
-			}
-			else {
-				%context = ();
-			}
-		},
-	);
-
-	$special_ops{OP_NOTIF} = $special_ops{OP_IF};
-	my @debug_ops;
-	my $position = 0;
-
-	try {
-		while (length $serialized) {
-			my $this_byte = substr $serialized, 0, 1, '';
-			my $opcode;
-			my @to_push;
-
-			try {
-				$opcode = $opcode_class->get_opcode_by_code(ord $this_byte);
-				push @to_push, $this_byte;
-			}
-			catch {
-				my $err = $_;
-				push @debug_ops, unpack 'H*', $this_byte;
-				die $err;
-			};
-
-			push @debug_ops, $opcode->name;
-			unshift @to_push, $opcode;
-
-			if ($opcode->has_on_compilation) {
-				$opcode->on_compilation->($self, $opcode);
-			}
-
-			if (exists $special_ops{$opcode->name}) {
-				$special_ops{$opcode->name}->(\@to_push, $position);
-			}
-
-			push @ops, \@to_push;
-			$position += 1;
-		}
-
-		Bitcoin::Crypto::Exception::ScriptSyntax->raise(
-			'some OP_IFs were not closed'
-		) if $context{op_if};
-	}
-	catch {
-		my $ex = $_;
-		if (blessed $ex && $ex->isa('Bitcoin::Crypto::Exception::ScriptCompilation')) {
-			$ex->set_script(\@debug_ops);
-			$ex->set_error_position($position);
-		}
-
-		die $ex;
-	};
-
-	$self->_set_operations(\@ops);
+	my $operations = $self->operations;
+	return join '', map { $_->[1] } @{$operations}[$codeseparator + 1 .. $#$operations];
 }
 
-signature_for success => (
-	method => Object,
-	positional => [],
-);
+sub subscript
+{
+	goto \&_subscript_segwit
+		if $_[0]->transaction->this_input->is_segwit;
+
+	goto \&_subscript_legacy;
+}
 
 sub success
 {
 	my ($self) = @_;
 
-	return $self->_valid if $self->_has_valid;
+	return !!1 if $self->_compiler->unconditionally_valid;
+	return !!0 if $self->pos != @{$self->operations};
 
 	my $stack = $self->stack;
 	return !!0 if !$stack;
 	return !!0 if !$stack->[-1];
 	return !!0 if !$self->to_bool($stack->[-1]);
-	return !!0 if $self->is_tapscript && @$stack > 1;
+
+	# NOTE: clean_stack rule does not check altstack, because altstack can only
+	# be manipulated by the script itself, so there is no chance for witness
+	# malleability
+	if (@$stack > 1) {
+		my $segwit = $self->has_transaction && $self->transaction->is_native_segwit;
+		return !!0 if $segwit || $self->is_tapscript || $self->flags->clean_stack;
+	}
+
 	return !!1;
 }
 
-signature_for is_tapscript => (
-	method => Object,
-	positional => [],
-);
-
 sub is_tapscript
 {
-	my ($self) = @_;
-
-	my $script = $self->script;
+	my $script = shift->script;
 	return $script && $script->isa('Bitcoin::Crypto::Tapscript');
 }
 
@@ -636,18 +535,7 @@ Array reference - alt stack, used by C<OP_TOALTSTACK> and C<OP_FROMALTSTACK>.
 
 B<Not assignable in the constructor>
 
-Array reference - An array of operations to be executed. Same as
-L<Bitcoin::Crypto::Script/operations> and automatically obtained by calling it.
-
-	[
-		[OP_XXX (Object), raw (String), ...],
-		...
-	]
-
-The first element of each subarray is the L<Bitcoin::Crypto::Script::Opcode>
-object. The second element is the raw opcode string, usually single byte. The
-rest of elements are metadata and is dependant on the op type. This metadata is
-used during script execution.
+A proxy to L<Bitcoin::Crypto::Script/operations> of the selected L</script>.
 
 =head3 pos
 
@@ -691,14 +579,7 @@ done in a single line:
 
 	my $stack = $runner->execute($script)->stack;
 
-If errors occur, they will be thrown as exceptions. See L</EXCEPTIONS>.
-
-=head3 compile
-
-	$object->compile()
-
-Fills L</operations> based on the contents of L</script>. May throw an
-exception in case of both success and failure. Advanced use only.
+If errors occur, an exception will be thrown.
 
 =head3 start
 
@@ -774,39 +655,38 @@ Returns true if currently executed script is a tapscript.
 
 =head2 Helper methods
 
-=head3 to_int, from_int
+=head3 to_int
+
+=head3 from_int
 
 	my $int = $runner->to_int($byte_vector, $max_bytes = 4);
 	my $byte_vector = $runner->from_int($int);
 
 These methods encode and decode numbers in format which is used on L</stack>.
 
-BigInts are used. C<to_int> will return an instance of L<Math::BigInt>, while
-C<from_int> can accept it (but it should also handle regular numbers just
-fine). C<to_int> limits the size of an integer to C<$max_bytes>.
+C<to_int> limits the size of an integer to C<$max_bytes>.
 
-=head3 to_bool, to_minimal_bool, from_bool
+On 32-bit machines, BigInts are used. C<to_int> will return an instance of
+L<Math::BigInt>, while C<from_int> can accept it (but it should also handle
+regular numbers just fine). On 64-bit machines, perl numbers will be used.
+
+Most of the time, the internal representation of integers on the stack should
+not matter. If it does matter though, C<BITCOIN_CRYPTO_USE_BIGINTS>
+environmental variable can be set to C<1> to force use of BigInts on 64 bit
+machines.
+
+=head3 to_bool
+
+=head3 to_minimal_bool
+
+=head3 from_bool
 
 These methods encode and decode booleans in format which is used on L</stack>.
-C<to_minimal_bool> variant is used to enforce MINIMALIF rule.
+C<to_minimal_bool> variant is used to enforce L<Bitcoin::Crypto::Transaction::Flags/minimal_if>.
 
 =head3 stack_serialized
 
 Returns the serialized stack. Any null vectors will be transformed to C<0x00>.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * ScriptRuntime - script has encountered a runtime exception - the transaction is invalid
-
-=item * ScriptCompilation - script compilation has encountered a problem
-
-=back
 
 =head1 SEE ALSO
 

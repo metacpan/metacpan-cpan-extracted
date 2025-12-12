@@ -1,23 +1,19 @@
 package Bitcoin::Crypto::Transaction::Input;
-$Bitcoin::Crypto::Transaction::Input::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::Input::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use Scalar::Util qw(blessed);
-use Try::Tiny;
+use Feature::Compat::Try;
 
 use Bitcoin::Crypto qw(btc_script btc_utxo);
-use Bitcoin::Crypto::Constants;
-use Bitcoin::Crypto::Util qw(to_format pack_compactsize unpack_compactsize);
+use Bitcoin::Crypto::Constants qw(:transaction);
+use Bitcoin::Crypto::Util::Internal qw(to_format pack_compactsize unpack_compactsize);
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Script::Common;
-
-use namespace::clean;
 
 has param 'utxo_location' => (
 	coerce => Tuple [ByteStr, PositiveOrZeroInt],
@@ -37,17 +33,23 @@ has param 'signature_script' => (
 has param 'sequence_no' => (
 	isa => IntMaxBits [32],
 	writer => 1,
-	default => Bitcoin::Crypto::Constants::max_sequence_no,
+	default => MAX_SEQUENCE_NO,
 );
 
-has option 'witness' => (
+has param 'witness' => (
 	coerce => ArrayRef [ByteStr],
 	writer => 1,
+	default => sub { [] },
 );
 
 with qw(
 	Bitcoin::Crypto::Role::ShallowClone
 );
+
+sub has_witness
+{
+	return @{shift->witness} > 0;
+}
 
 sub _nested_script
 {
@@ -63,50 +65,6 @@ sub _nested_script
 	return $real_script;
 }
 
-# script code for segwit digests (see script_base)
-sub _script_code
-{
-	my ($self) = @_;
-	my $utxo = $self->utxo;
-
-	my $locking_script = $utxo->output->locking_script;
-	my $program;
-	my %types = (
-		P2TR => sub {
-
-			# get taproot key from P2TR (ignore the first two OPs - version and push)
-			my $pubkey = substr $locking_script->to_serialized, 2;
-			$program = Bitcoin::Crypto::Script::Common->new(P2TR => $pubkey);
-		},
-		P2WPKH => sub {
-
-			# get script hash from P2WPKH (ignore the first two OPs - version and push)
-			my $hash = substr $locking_script->to_serialized, 2;
-			$program = Bitcoin::Crypto::Script::Common->new(PKH => $hash);
-		},
-		P2WSH => sub {
-
-			# TODO: this is not complete, as it does not take OP_CODESEPARATORs into account
-			# NOTE: Transaction::Digest sets witness to signing_subscript
-			$program = btc_script->from_serialized(($self->witness // [''])->[-1]);
-		},
-	);
-
-	my $type = $utxo->output->locking_script->type;
-
-	if ($type eq 'P2SH') {
-
-		# nested - nothing should get here without checking if nested script is native segwit
-		my $nested = $self->_nested_script;
-		$type = $nested->type;
-
-		$locking_script = $nested;
-	}
-
-	$types{$type}->();
-	return $program;
-}
-
 sub _build_utxo
 {
 	my ($self) = @_;
@@ -115,46 +73,39 @@ sub _build_utxo
 }
 
 around BUILDARGS => sub {
-	my ($orig, $class, @params) = @_;
-	my %hash_params = @params;
-	my $utxo = delete $hash_params{utxo};
+	my ($orig, $class, %params) = @_;
+	my $utxo = $params{utxo};
 
-	if ($utxo) {
-		if (blessed $utxo && $utxo->isa('Bitcoin::Crypto::Transaction::UTXO')) {
-			return {
-				%hash_params,
-				utxo => $utxo,
-				utxo_location => [$utxo->txid, $utxo->output_index],
-			};
-		}
-		elsif (ref $utxo eq 'ARRAY') {
-			return {
-				%hash_params,
-				utxo_location => $utxo,
-			};
-		}
+	if (ref $utxo eq 'ARRAY') {
+		delete $params{utxo};
+
+		return {
+			%params,
+			utxo_location => $utxo,
+		};
+	}
+	elsif (blessed $utxo && $utxo->isa('Bitcoin::Crypto::Transaction::UTXO')) {
+		return {
+			%params,
+			utxo_location => [$utxo->txid, $utxo->output_index],
+		};
 	}
 
-	return $class->$orig(@params);
+	return $class->$orig(%params);
 };
-
-signature_for utxo_registered => (
-	method => Object,
-	positional => [],
-);
 
 sub utxo_registered
 {
 	my ($self) = @_;
 
-	try { $self->utxo } unless $self->has_utxo;
-	return $self->has_utxo;
+	try {
+		$self->utxo unless $self->has_utxo;
+		return !!1;
+	}
+	catch ($e) {
+		return !!0;
+	}
 }
-
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
 
 sub to_serialized
 {
@@ -166,13 +117,10 @@ sub to_serialized
 	# - signature script length, 1-9 bytes
 	# - signature script
 	# - sequence number, 4 bytes
-	my $serialized = '';
-
-	$serialized .= $self->prevout;
+	my $serialized = $self->prevout;
 
 	my $script = $self->signature_script->to_serialized;
-	$serialized .= pack_compactsize(length $script);
-	$serialized .= $script;
+	$serialized .= pack_compactsize(length $script) . $script;
 
 	$serialized .= pack 'V', $self->sequence_no;
 
@@ -180,7 +128,7 @@ sub to_serialized
 }
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	head => [ByteStr],
 	named => [
 		pos => Maybe [ScalarRef [PositiveOrZeroInt]],
@@ -195,11 +143,9 @@ sub from_serialized
 	my $partial = !!$args->{pos};
 	my $pos = $partial ? ${$args->{pos}} : 0;
 
-	my $transaction_hash = scalar reverse substr $serialized, $pos, 32;
-	$pos += 32;
-
-	my $transaction_output_index = unpack 'V', substr $serialized, $pos, 4;
-	$pos += 4;
+	my ($transaction_hash, $transaction_output_index) = unpack "\@$pos a32V", $serialized;
+	$transaction_hash = reverse $transaction_hash;
+	$pos += 36;
 
 	my $script_size = unpack_compactsize $serialized, \$pos;
 
@@ -207,11 +153,8 @@ sub from_serialized
 		'serialized input script data is corrupted'
 	) if $pos + $script_size > length $serialized;
 
-	my $script = substr $serialized, $pos, $script_size;
-	$pos += $script_size;
-
-	my $sequence = unpack 'V', substr $serialized, $pos, 4;
-	$pos += 4;
+	my ($script, $sequence) = unpack "\@$pos a${script_size}V", $serialized;
+	$pos += $script_size + 4;
 
 	Bitcoin::Crypto::Exception::Transaction->raise(
 		'serialized input data is corrupted'
@@ -226,11 +169,6 @@ sub from_serialized
 		sequence_no => $sequence,
 	);
 }
-
-signature_for is_segwit => (
-	method => Object,
-	positional => [],
-);
 
 sub is_segwit
 {
@@ -251,73 +189,72 @@ sub is_segwit
 	return !!0;
 }
 
-signature_for is_taproot => (
-	method => Object,
-	positional => [],
-);
-
 sub is_taproot
 {
-	my ($self) = @_;
-
-	return $self->utxo->output->locking_script->is_taproot;
+	return shift->utxo->output->locking_script->is_taproot;
 }
-
-signature_for prevout => (
-	method => Object,
-	positional => [],
-);
 
 sub prevout
 {
-	my ($self) = @_;
-	my ($txid, $index) = @{$self->utxo_location};
+	my ($txid, $index) = @{shift->utxo_location};
 
-	return scalar reverse($txid) . pack 'V', $index;
+	return pack 'a32V', scalar(reverse $txid), $index;
 }
-
-signature_for serialized_witness => (
-	method => Object,
-	positional => [],
-);
 
 sub serialized_witness
 {
 	my ($self) = @_;
-	my $serialized = '';
 
-	my @witness = $self->has_witness ? @{$self->witness} : ();
+	my $witness = $self->witness;
 
-	$serialized .= pack_compactsize(scalar @witness);
-	foreach my $witness_item (@witness) {
-		$serialized .= pack_compactsize(length $witness_item);
-		$serialized .= $witness_item;
-	}
-
-	return $serialized;
+	return join '',
+		pack_compactsize(scalar @{$witness}),
+		(map { pack_compactsize(length $_) . $_ } @{$witness}),
+		;
 }
-
-signature_for script_base => (
-	method => Object,
-	positional => [],
-);
 
 sub script_base
 {
 	my ($self) = @_;
 
 	if ($self->is_segwit) {
-		return $self->_script_code;
+		my $utxo = $self->utxo;
+
+		my $locking_script = $utxo->output->locking_script;
+		my $program;
+		my %types = (
+			P2WPKH => sub {
+
+				# get script hash from P2WPKH (ignore the first two OPs - version and push)
+				my $hash = substr $locking_script->to_serialized, 2;
+				$program = Bitcoin::Crypto::Script::Common->new(PKH => $hash);
+			},
+			P2WSH => sub {
+
+				# NOTE: Transaction::Digest sets witness to signing_subscript,
+				# which takes OP_CODESEPARATORs into account
+				$program = btc_script->from_serialized(($self->witness // [''])->[-1]);
+			},
+		);
+
+		my $type = $utxo->output->locking_script->type;
+
+		if ($type eq 'P2SH') {
+
+			# nested - nothing should get here without checking if nested script is native segwit
+			my $nested = $self->_nested_script;
+			$type = $nested->type;
+
+			$locking_script = $nested;
+		}
+
+		$types{$type}->();
+		return $program;
 	}
 	else {
 		return $self->utxo->output->locking_script;
 	}
 }
-
-signature_for dump => (
-	method => Object,
-	positional => [],
-);
 
 sub dump
 {
@@ -342,17 +279,20 @@ sub dump
 	push @result, 'value: ' . $utxo->output->value
 		if $utxo;
 	push @result, sprintf 'sequence: 0x%X', $self->sequence_no;
-	push @result, 'locking script: ' . to_format [hex => $utxo->output->locking_script->to_serialized]
+	push @result, 'locking script: ' . $utxo->output->locking_script->dump
 		if $utxo;
 
 	if (!$self->signature_script->is_empty) {
-		push @result, 'signature script: ' . to_format [hex => $self->signature_script->to_serialized];
+		push @result, 'signature script: ' . $self->signature_script->dump;
 	}
 
 	if ($self->has_witness) {
 		push @result, 'witness: ';
 		foreach my $witness (@{$self->witness}) {
-			push @result, to_format [hex => $witness];
+			my $hex_el = to_format [hex => $witness];
+			$hex_el = '<empty>' unless length $hex_el;
+
+			push @result, $hex_el;
 		}
 	}
 
@@ -514,29 +454,11 @@ Returns true if this input references a taproot output.
 Returns a bytestring with prevout data ready to be encoded in places like
 digest preimages. Mostly used internally.
 
-=head3 script_base
-
-	$script = $object->script_base()
-
-Returns a base script for the digest. Mostly used internally.
-
 =head3 dump
 
 	$text = $object->dump()
 
 Returns a readable description of the input.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * Transaction - general error with transaction
-
-=back
 
 =head1 SEE ALSO
 

@@ -1,27 +1,23 @@
 package Bitcoin::Crypto::Script::Opcode;
-$Bitcoin::Crypto::Script::Opcode::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Script::Opcode::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
-use List::Util qw(notall);
+use Mooish::Base -standard;
 
 use Crypt::Digest::RIPEMD160 qw(ripemd160);
 use Crypt::Digest::SHA256 qw(sha256);
 use Crypt::Digest::SHA1 qw(sha1);
+use List::Util qw(notall);
+use Feature::Compat::Try;
 
 use Bitcoin::Crypto qw(btc_pub);
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Constants qw(:script :sighash :transaction);
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Helpers qw(ecc);
-use Bitcoin::Crypto::Util qw(hash160 hash256 get_public_key_compressed lift_x);
+use Bitcoin::Crypto::Util::Internal qw(hash160 hash256);
+use Bitcoin::Crypto::Helpers qw(standard_push check_strict_public_key check_strict_der_signature die_no_trace);
 use Bitcoin::Crypto::Transaction::Input;
-
-use namespace::clean;
 
 has param 'name' => (
 	isa => Str,
@@ -36,14 +32,20 @@ has param 'needs_transaction' => (
 	default => 0,
 );
 
-has param 'pushes' => (
+has param 'pushop' => (
+	isa => Bool,
+	default => 0,
+);
+
+has param 'sigop' => (
 	isa => Bool,
 	default => 0,
 );
 
 # args for coderef are:
-# - Bitcoin::Crypto::Script::Runner instance
-# - Bitcoin::Crypto::Script::Opcode instance
+# - Bitcoin::Crypto::Script::Compiler instance
+# - Compiled opcode (array from compile method in Runner)
+# - Compilation context (hashref)
 has option 'on_compilation' => (
 	isa => CodeRef,
 );
@@ -61,46 +63,203 @@ sub _verify_stack
 	my $class = shift;
 	my $runner = shift;
 
-	if (@{$runner->stack} + @{$runner->alt_stack} > Bitcoin::Crypto::Constants::script_max_stack_elements) {
+	if (@{$runner->stack} + @{$runner->alt_stack} > SCRIPT_MAX_STACK_ELEMENTS) {
 		$runner->_invalid_script('maximum stack size exceeded');
 	}
 }
 
-sub _OP_NUM
+sub _compile_OP_NUM
 {
 	my ($class, $num) = @_;
 
-	return sub {
-		my $runner = shift;
+	# avoid cyclical uses
+	require Bitcoin::Crypto::Script::Runner;
+	my $to_push = $num == 0 ? '' : Bitcoin::Crypto::Script::Runner->from_int($num);
 
-		push @{$runner->stack}, $num == 0 ? '' : $runner->from_int($num);
-		$class->_verify_stack($runner);
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		push @$op, $to_push;
 	};
+}
+
+sub _compile_OP_PUSH
+{
+	my ($class, $size) = @_;
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		push @$op, $compiler->_compile_data_push($context, $size);
+		$op->[1] .= $op->[2];
+	};
+}
+
+sub _compile_OP_PUSHDATA
+{
+	my ($class, $length) = @_;
+
+	state $formats = {
+		1 => 'C',
+		2 => 'v',
+		4 => 'V',
+	};
+
+	my $format = $formats->{$length}
+		// die 'bad pushdata length';
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		my $raw_size = substr $context->{serialized}, $context->{offset}, $length;
+		my $size = unpack $format, $raw_size;
+		$context->{offset} += $length;
+
+		push @$op, $compiler->_compile_data_push($context, $size);
+		$op->[1] .= $raw_size . $op->[2];
+	};
+}
+
+sub _compile_OP_IF
+{
+	my ($class) = @_;
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		if ($context->{branch}{if}) {
+			my $prev = {%{$context->{branch}}};
+			$context->{branch} = {
+				previous => $prev,
+			};
+		}
+
+		$context->{branch}{if} = $op;
+		$context->{branch}{execution_chain} = [$op];
+	};
+}
+
+sub _compile_OP_ELSE
+{
+	my ($class) = @_;
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		$compiler->_invalid_script(
+			'OP_ELSE found but no previous OP_IF or OP_NOTIF'
+		) if !$context->{branch}{if};
+
+		# set up jump point for previous else
+		my $chain = $context->{branch}{execution_chain};
+		push @{$chain->[-1]}, $context->{position};
+
+		# save else for later
+		push @{$chain}, $op;
+	};
+}
+
+sub _compile_OP_ENDIF
+{
+	my ($class) = @_;
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		$compiler->_invalid_script(
+			'OP_ENDIF found but no previous OP_IF or OP_NOTIF'
+		) if !$context->{branch}{if};
+
+		# set up jump point for last execution element (if or else)
+		my $chain = $context->{branch}{execution_chain};
+		push @{$chain->[-1]}, $context->{position};
+
+		if ($context->{branch}{previous}) {
+			$context->{branch} = $context->{branch}{previous};
+		}
+		else {
+			delete $context->{branch};
+		}
+	};
+}
+
+sub _compile_OP_VERIF
+{
+	my ($class) = @_;
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		$compiler->_invalid_script('OP_VERIF encountered');
+	};
+}
+
+sub _compile_disabled
+{
+	my ($class) = @_;
+
+	return sub {
+		my ($compiler, $op, $context) = @_;
+
+		$compiler->_invalid_script($op->[0]->name . ' is disabled');
+	};
+}
+
+sub __checksig
+{
+	my ($runner, $sig, $hashtype, $raw_pubkey, $preimage) = @_;
+
+	state $allowed_sighash = {
+		map { $_ => !!1 } (
+			SIGHASH_ALL,
+			SIGHASH_ALL | SIGHASH_ANYONECANPAY,
+			SIGHASH_SINGLE,
+			SIGHASH_SINGLE | SIGHASH_ANYONECANPAY,
+			SIGHASH_NONE,
+			SIGHASH_NONE | SIGHASH_ANYONECANPAY,
+		)
+	};
+
+	if (defined $hashtype) {
+		$runner->_invalid_script('bad sighash')
+			if $runner->flags->strict_encoding
+			&& !$allowed_sighash->{$hashtype};
+
+		$runner->_invalid_script('non-strict DER signature')
+			if $runner->flags->strict_signatures
+			&& !check_strict_der_signature($sig);
+	}
+
+	$runner->_invalid_script('non-strict pubkey')
+		if $runner->flags->strict_encoding && !check_strict_public_key($raw_pubkey);
+
+	my $pubkey;
+	try {
+		$pubkey = btc_pub->from_serialized($raw_pubkey)
+	}
+	catch ($e) {
+		return !!0;
+	}
+
+	$runner->_script_error('public keys must be compressed')
+		if $runner->flags->compressed_pubkeys
+		&& $runner->transaction->is_segwit
+		&& !$pubkey->compressed;
+
+	return $pubkey->verify_message($preimage, $sig, flags => $runner->flags);
 }
 
 sub _OP_PUSHDATA
 {
-	my ($class) = @_;
+	my ($class, $opcode_name) = @_;
 
 	return sub {
 		my ($runner, $bytes) = @_;
 
-		$runner->_invalid_script('maximum stack element size exceeded')
-			if length $bytes > Bitcoin::Crypto::Constants::script_max_element_size;
+		$runner->_invalid_script("push opcode for data is not minimal in $opcode_name")
+			if $runner->flags->minimal_data && !standard_push($opcode_name, $bytes);
 
 		push @{$runner->stack}, $bytes;
-		$class->_verify_stack($runner);
-	};
-}
-
-sub _OP_1NEGATE
-{
-	my ($class) = @_;
-
-	return sub {
-		my $runner = shift;
-
-		push @{$runner->stack}, $runner->from_int(-1);
 		$class->_verify_stack($runner);
 	};
 }
@@ -123,6 +282,18 @@ sub _OP_NOP
 	return sub { };
 }
 
+sub _OP_NOP_UPGRADEABLE
+{
+	my ($class) = @_;
+
+	return sub {
+		my $runner = shift;
+
+		$runner->_invalid_script('upgradeable NOP encountered')
+			if $runner->flags->illegal_upgradeable_nops;
+	};
+}
+
 sub _OP_VER
 {
 	my ($class) = @_;
@@ -138,27 +309,22 @@ sub _OP_IF
 	my ($class, $inverted) = @_;
 
 	return sub {
-		my ($runner, $else_pos, $endif_pos) = @_;
+		my ($runner, $next_else_or_endif) = @_;
 		my $stack = $runner->stack;
 
 		$runner->_stack_error unless @$stack >= 1;
 		my $value = pop @$stack;
-		$value = $runner->is_tapscript ? $runner->to_minimal_bool($value) : $runner->to_bool($value);
-		$runner->_invalid_script unless defined $value;
+
+		my $minimal_if = $runner->is_tapscript
+			|| ($runner->has_transaction && $runner->transaction->is_segwit && $runner->flags->minimal_if);
+
+		$value = $minimal_if ? $runner->to_minimal_bool($value) : $runner->to_bool($value);
+		$runner->_invalid_script('OP_IF argument is not minimal') unless defined $value;
+
 		$value = !$value if $inverted;
 
-		if ($value) {
-
-			# continue execution
-		}
-		else {
-			if (defined $else_pos) {
-				$runner->_set_pos($else_pos);
-			}
-			else {
-				$runner->_set_pos($endif_pos);
-			}
-		}
+		$runner->_set_pos($next_else_or_endif)
+			unless $value;
 	}
 }
 
@@ -168,9 +334,9 @@ sub _OP_ELSE
 	my ($class) = @_;
 
 	return sub {
-		my ($runner, $endif_pos) = @_;
+		my ($runner, $next_else_or_endif) = @_;
 
-		$runner->_set_pos($endif_pos);
+		$runner->_set_pos($next_else_or_endif);
 	};
 }
 
@@ -898,17 +1064,19 @@ sub _OP_CHECKSIG
 
 		my $raw_pubkey = pop @$stack;
 		my $sig = pop @$stack;
+		my $sig_orig = $sig;
 
 		my $hashtype = unpack 'C', substr $sig, -1, 1, '';
-		my $pubkey = btc_pub->from_serialized($raw_pubkey);
 
-		# this is only a policy:
-		# https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#restrictions-on-public-key-type
-		# $runner->_script_error('SegWit validation requires compressed public key')
-		# 	if !$pubkey->compressed && $runner->transaction->is_native_segwit;
+		my $preimage = $runner->transaction->get_digest(
+			signatures => [$sig_orig],
+			sighash => $hashtype,
+		);
 
-		my $preimage = $runner->transaction->get_digest($runner->subscript, $hashtype);
-		my $result = $pubkey->verify_message($preimage, $sig, flags => $runner->flags);
+		my $result = __checksig($runner, $sig, $hashtype, $raw_pubkey, $preimage);
+
+		$runner->_script_error('non-empty signature verification failed')
+			if !$result && $runner->flags->null_fail && $sig ne '';
 
 		push @$stack, $runner->from_bool($result);
 	};
@@ -933,43 +1101,59 @@ sub _OP_CHECKMULTISIG
 
 	return sub {
 		my $runner = shift;
-
 		my $stack = $runner->stack;
+
 		$runner->_stack_error unless @$stack >= 1;
-
 		my $pubkeys_num = $runner->to_int(pop @$stack);
-		$runner->_stack_error unless $pubkeys_num > 0 && @$stack >= $pubkeys_num;
-		my @pubkeys = splice @$stack, -$pubkeys_num;
+		$runner->_stack_error unless @$stack >= $pubkeys_num;
+		$runner->_script_error('OP_CHECKMULTISIG negative number of public keys')
+			if $pubkeys_num < 0;
+		$runner->_script_error('OP_CHECKMULTISIG maximum number of public keys exceeded')
+			if $pubkeys_num > SCRIPT_MAX_MULTISIG_PUBKEYS;
+		$runner->_increment_opcode_count($pubkeys_num);
+		my @pubkeys = $pubkeys_num ? splice @$stack, -$pubkeys_num : ();
 
-		$runner->_script_error('SegWit validation requires all public keys to be compressed')
-			if $runner->transaction->is_native_segwit && notall { get_public_key_compressed($_) } @pubkeys;
-
+		$runner->_stack_error unless @$stack >= 1;
 		my $signatures_num = $runner->to_int(pop @$stack);
-		$runner->_stack_error unless $signatures_num > 0 && @$stack >= $signatures_num;
-		my @signatures = splice @$stack, -$signatures_num;
+		$runner->_stack_error unless @$stack >= $signatures_num;
+		$runner->_script_error('OP_CHECKMULTISIG negative number of signatures')
+			if $signatures_num < 0;
+		$runner->_script_error('OP_CHECKMULTISIG number of signatures exceeds the number of public keys')
+			if $signatures_num > $pubkeys_num;
+		my @signatures = $signatures_num ? splice @$stack, -$signatures_num : ();
+		my @signatures_left = @signatures;
 
-		my $subscript = $runner->subscript;
-		my $found;
-		while (my $sig = shift @signatures) {
-			my $hashtype = substr $sig, -1, 1, '';
+		# Remove extra unused value from the stack
+		$runner->_stack_error unless @$stack >= 1;
+		my $unused = pop @$stack;
+		$runner->_script_error('OP_CHECKMULTISIG dummy argument must be empty')
+			if $runner->flags->null_dummy && length $unused;
 
-			my $digest = $runner->transaction->get_digest($subscript, unpack 'C', $hashtype);
+		my $found = !!1;
+		my %digests;
+		while (defined(my $sig = pop @signatures_left)) {
+			my $hashtype = unpack 'C', substr $sig, -1, 1, '';
+
+			my $preimage = $digests{$hashtype // ''} //= $runner->transaction->get_digest(
+				signatures => \@signatures,
+				sighash => $hashtype,
+			);
+
 			$found = !!0;
-			while (my $raw_pubkey = shift @pubkeys) {
-				my $pubkey = btc_pub->from_serialized($raw_pubkey);
-				$found = $pubkey->verify_message($digest, $sig, flags => $runner->flags);
-				last if $found;
+			while (defined(my $raw_pubkey = pop @pubkeys)) {
+				$found = __checksig($runner, $sig, $hashtype, $raw_pubkey, $preimage);
+				last if $found || @signatures_left + 1 > @pubkeys;
 			}
 
 			last if !$found;
 		}
 
-		# Remove extra unused value from the stack
-		my $unused = pop @$stack;
-		$runner->_script_error('OP_CHECKMULTISIG dummy argument must be empty')
-			if $runner->flags->nulldummy && length $unused;
+		# checking is correct if we have no more signatures to check and the
+		# last one was found correctly
+		my $result = $found && !@signatures_left;
+		$runner->_script_error('non-empty signature verification failed')
+			if !$result && $runner->flags->null_fail && notall { $_ eq '' } @signatures;
 
-		my $result = $found && !@signatures;
 		push @$stack, $runner->from_bool($result);
 	};
 }
@@ -1004,22 +1188,20 @@ sub _OP_CHECKLOCKTIMEVERIFY
 		my $c1 = $runner->to_int($stack->[-1], 5);
 		my $c2 = $runner->transaction->locktime;
 
-		$runner->_invalid_script
+		$runner->_invalid_script('negative number')
 			if $c1 < 0;
 
-		my $c1_is_height = $c1 < Bitcoin::Crypto::Constants::locktime_height_threshold;
-		my $c2_is_height = $c2 < Bitcoin::Crypto::Constants::locktime_height_threshold;
+		my $c1_is_height = $c1 < LOCKTIME_HEIGHT_THRESHOLD;
+		my $c2_is_height = $c2 < LOCKTIME_HEIGHT_THRESHOLD;
 
-		$runner->_invalid_script
+		$runner->_invalid_script('type mismatch')
 			unless !!$c1_is_height == !!$c2_is_height;
 
 		$runner->_invalid_script
 			if $c1 > $c2;
 
-		$runner->_invalid_script
-			if $transaction->this_input->sequence_no == Bitcoin::Crypto::Constants::max_sequence_no;
-
-		pop @$stack;
+		$runner->_invalid_script('maximum sequence in input')
+			if $transaction->this_input->sequence_no == MAX_SEQUENCE_NO;
 	};
 }
 
@@ -1039,29 +1221,27 @@ sub _OP_CHECKSEQUENCEVERIFY
 
 		my $c1 = $runner->to_int($stack->[-1], 5);
 
-		$runner->_invalid_script
+		$runner->_invalid_script('negative number')
 			if $c1 < 0;
 
 		if (!($c1 & (1 << 31))) {
-			$runner->_invalid_script
+			$runner->_invalid_script('bad transaction version')
 				if $transaction->version < 2;
 
 			my $c2 = $transaction->this_input->sequence_no;
 
-			$runner->_invalid_script
+			$runner->_invalid_script("no mask in input's sequence")
 				if $c2 & (1 << 31);
 
 			my $c1_is_time = $c1 & (1 << 22);
 			my $c2_is_time = $c2 & (1 << 22);
 
-			$runner->_invalid_script
+			$runner->_invalid_script('type mismatch')
 				if !!$c1_is_time ne !!$c2_is_time;
 
 			$runner->_invalid_script
 				if ($c1 & 0x0000ffff) > ($c2 & 0x0000ffff);
 		}
-
-		pop @$stack;
 	};
 }
 
@@ -1072,27 +1252,33 @@ sub _build_opcodes
 	my %opcodes = (
 		OP_0 => {
 			code => 0x00,
-			pushes => !!1,
-			runner => $class->_OP_NUM(0),
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_NUM(0),
+			runner => $class->_OP_PUSHDATA,
 		},
 		OP_PUSHDATA1 => {
 			code => 0x4c,
-			pushes => !!1,
-			runner => $class->_OP_PUSHDATA,
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_PUSHDATA(1),
+			runner => $class->_OP_PUSHDATA('OP_PUSHDATA1'),
 		},
 		OP_PUSHDATA2 => {
 			code => 0x4d,
-			pushes => !!1,
-			runner => $class->_OP_PUSHDATA,
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_PUSHDATA(2),
+			runner => $class->_OP_PUSHDATA('OP_PUSHDATA2'),
 		},
 		OP_PUSHDATA4 => {
 			code => 0x4e,
-			pushes => !!1,
-			runner => $class->_OP_PUSHDATA,
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_PUSHDATA(4),
+			runner => $class->_OP_PUSHDATA('OP_PUSHDATA4'),
 		},
 		OP_1NEGATE => {
 			code => 0x4f,
-			runner => $class->_OP_1NEGATE,
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_NUM(-1),
+			runner => $class->_OP_PUSHDATA,
 		},
 		OP_RESERVED => {
 			code => 0x50,
@@ -1108,32 +1294,30 @@ sub _build_opcodes
 		},
 		OP_IF => {
 			code => 0x63,
+			on_compilation => $class->_compile_OP_IF,
 			runner => $class->_OP_IF,
 		},
 		OP_NOTIF => {
 			code => 0x64,
+			on_compilation => $class->_compile_OP_IF,
 			runner => $class->_OP_IF(!!1),
 		},
 		OP_VERIF => {
 			code => 0x65,
-			on_compilation => sub {
-				my ($runner, $opcode) = @_;
-				$runner->_invalid_script;
-			},
+			on_compilation => $class->_compile_OP_VERIF,
 		},
 		OP_VERNOTIF => {
 			code => 0x66,
-			on_compilation => sub {
-				my ($runner, $opcode) = @_;
-				$runner->_invalid_script;
-			},
+			on_compilation => $class->_compile_OP_VERIF,
 		},
 		OP_ELSE => {
 			code => 0x67,
+			on_compilation => $class->_compile_OP_ELSE,
 			runner => $class->_OP_ELSE,
 		},
 		OP_ENDIF => {
 			code => 0x68,
+			on_compilation => $class->_compile_OP_ENDIF,
 			runner => $class->_OP_ENDIF,
 		},
 		OP_VERIFY => {
@@ -1220,9 +1404,41 @@ sub _build_opcodes
 			code => 0x7d,
 			runner => $class->_OP_TUCK,
 		},
+		OP_CAT => {
+			code => 0x7e,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_SUBSTR => {
+			code => 0x7f,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_LEFT => {
+			code => 0x80,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_RIGHT => {
+			code => 0x81,
+			on_compilation => $class->_compile_disabled,
+		},
 		OP_SIZE => {
 			code => 0x82,
 			runner => $class->_OP_SIZE,
+		},
+		OP_INVERT => {
+			code => 0x83,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_AND => {
+			code => 0x84,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_OR => {
+			code => 0x85,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_XOR => {
+			code => 0x86,
+			on_compilation => $class->_compile_disabled,
 		},
 		OP_EQUAL => {
 			code => 0x87,
@@ -1248,6 +1464,14 @@ sub _build_opcodes
 			code => 0x8c,
 			runner => $class->_OP_1SUB,
 		},
+		OP_2MUL => {
+			code => 0x8d,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_2DIV => {
+			code => 0x8e,
+			on_compilation => $class->_compile_disabled,
+		},
 		OP_NEGATE => {
 			code => 0x8f,
 			runner => $class->_OP_NEGATE,
@@ -1271,6 +1495,26 @@ sub _build_opcodes
 		OP_SUB => {
 			code => 0x94,
 			runner => $class->_OP_SUB,
+		},
+		OP_MUL => {
+			code => 0x95,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_DIV => {
+			code => 0x96,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_MOD => {
+			code => 0x97,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_LSHIFT => {
+			code => 0x98,
+			on_compilation => $class->_compile_disabled,
+		},
+		OP_RSHIFT => {
+			code => 0x99,
+			on_compilation => $class->_compile_disabled,
 		},
 		OP_BOOLAND => {
 			code => 0x9a,
@@ -1348,21 +1592,25 @@ sub _build_opcodes
 		OP_CHECKSIG => {
 			code => 0xac,
 			needs_transaction => !!1,
+			sigop => !!1,
 			runner => $class->_OP_CHECKSIG,
 		},
 		OP_CHECKSIGVERIFY => {
 			code => 0xad,
 			needs_transaction => !!1,
+			sigop => !!1,
 			runner => $class->_OP_CHECKSIGVERIFY
 		},
 		OP_CHECKMULTISIG => {
 			code => 0xae,
 			needs_transaction => !!1,
+			sigop => !!1,
 			runner => $class->_OP_CHECKMULTISIG,
 		},
 		OP_CHECKMULTISIGVERIFY => {
 			code => 0xaf,
 			needs_transaction => !!1,
+			sigop => !!1,
 			runner => $class->_OP_CHECKMULTISIGVERIFY
 		},
 		OP_CHECKLOCKTIMEVERIFY => {
@@ -1381,23 +1629,25 @@ sub _build_opcodes
 		$opcodes{"OP_PUSH$num"} = {
 			name => 'OP_PUSH',
 			code => $num,
-			pushes => !!1,
-			runner => $class->_OP_PUSHDATA,
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_PUSH($num),
+			runner => $class->_OP_PUSHDATA('OP_PUSH'),
 		};
 	}
 
 	for my $num (1 .. 16) {
 		$opcodes{"OP_$num"} = {
 			code => 0x50 + $num,
-			pushes => !!1,
-			runner => $class->_OP_NUM($num),
+			pushop => !!1,
+			on_compilation => $class->_compile_OP_NUM($num),
+			runner => $class->_OP_PUSHDATA,
 		};
 	}
 
 	for my $num (1, 4 .. 10) {
 		$opcodes{"OP_NOP$num"} = {
 			code => 0xaf + $num,
-			runner => $class->_OP_NOP,
+			runner => $class->_OP_NOP_UPGRADEABLE,
 		};
 	}
 
@@ -1436,11 +1686,17 @@ sub opcodes_reverse
 	};
 }
 
+# this is how Bitcoin Core classifies opcodes as "push opcode"
+sub non_push_opcode
+{
+	$_[0]->code > 0x60;
+}
+
 sub execute
 {
 	my ($self, @args) = @_;
 
-	die $self->name . ' is not implemented'
+	die_no_trace $self->name . ' is not implemented'
 		unless $self->implemented;
 
 	return $self->runner->(@args);
@@ -1457,23 +1713,13 @@ sub _make_unknown
 	);
 }
 
-signature_for get_opcode_by_code => (
-	method => Str,
-	positional => [IntMaxBits [8]],
-);
-
 sub get_opcode_by_code
 {
 	my ($self, $code) = @_;
-	my $hash = $self->opcodes_reverse;
 
-	return $hash->{$code} // $self->_make_unknown($code);
+	return $self->opcodes_reverse->{$code}
+		// $self->_make_unknown($code);
 }
-
-signature_for get_opcode_by_name => (
-	method => Str,
-	positional => [Str],
-);
 
 sub get_opcode_by_name
 {

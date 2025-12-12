@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Identity;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent qw/User::Identity::Item Mail::Reporter/;
@@ -18,7 +18,9 @@ use parent qw/User::Identity::Item Mail::Reporter/;
 use strict;
 use warnings;
 
-use Mail::Box::Collection;
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
+
+use Mail::Box::Collection ();
 
 # tests in tests/52message/30collect.t
 
@@ -68,7 +70,7 @@ sub location(;$)
 	return $self->{MBI_location} if defined $self->{MBI_location};
 
 	my $parent = $self->parent
-		or $self->log(ERROR => "Toplevel directory requires explicit location"), return undef;
+		or error __x"toplevel directory requires explicit location.";
 
 	$self->folderType->nameOfSubFolder($self->name, $parent->parent->location)
 }
@@ -80,7 +82,7 @@ sub folderType()
 	return $self->{MBI_ftype} if defined $self->{MBI_ftype};
 
 	my $parent = $self->parent
-		or $self->log(ERROR => "Toplevel directory requires explicit folder type"), return undef;
+		or error __x"toplevel directory requires explicit folder type.";
 
 	$parent->parent->folderType;
 }
@@ -200,7 +202,7 @@ sub addSubfolder(@)
 	if(defined $subs) { ; }
 	elsif(!$self->inferiors)
 	{	my $name = $self->fullname;
-		$self->log(ERROR => "It is not permitted to add subfolders to $name");
+		error __x"it is not permitted to add subfolders to {folder}.", folder => $name;
 		return undef;
 	}
 	else
@@ -217,7 +219,7 @@ sub remove(;$)
 {	my $self = shift;
 
 	my $parent = $self->parent
-		or $self->log(ERROR => "The toplevel folder cannot be removed this way"), return ();
+		or error __x"the toplevel folder cannot be removed this way.";
 
 	@_ or return $parent->removeRole($self->name);
 

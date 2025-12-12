@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,17 @@
 
 
 package Mail::Box::Manager;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
-use Mail::Box;
+use Log::Report  'mail-box', import => [ qw/__x error info trace warning/ ];
+
+use Mail::Box    ();
 
 use List::Util   qw/first/;
 use Scalar::Util qw/weaken blessed/;
@@ -146,7 +148,7 @@ sub open(@)
 	{	# Complicated folder URL
 		my %decoded = $self->decodeFolderURL($name);
 		keys %decoded
-			or $self->log(ERROR => "Illegal folder URL '$name'."), return;
+			or error __x"illegal folder URL '{name}'.", name => $name;
 
 		# accept decoded info
 		@args{keys %decoded} = values %decoded;
@@ -184,10 +186,8 @@ sub open(@)
 		$args{folderdir} = $name = "imap4s://$un\@$srv:$port";
 	}
 
-	unless(defined $name && length $name)
-	{	$self->log(ERROR => "No foldername specified to open.");
-		return undef;
-	}
+	defined $name && length $name
+		or error __x"no foldername specified to open.";
 
 	$args{folderdir} ||= $self->{MBM_folderdirs}->[0]
 		if $self->{MBM_folderdirs};
@@ -195,13 +195,13 @@ sub open(@)
 	$args{access} ||= 'r';
 
 	if($args{create} && $args{access} !~ m/w|a/)
-	{	$self->log(WARNING => "Will never create a folder $name without having write access.");
+	{	warning __x"will never create a folder {name} without having write access.", name => $name;
 		undef $args{create};
 	}
 
 	# Do not open twice.
 	my $folder = $self->isOpenFolder($name)
-		and $self->log(ERROR => "Folder $name is already open."), return undef;
+		and error __x"folder {name} is already open.", name => $name;
 
 	#
 	# Which folder type do we need?
@@ -221,7 +221,7 @@ sub open(@)
 		}
 
 		$folder_type
-			or $self->log(ERROR => "Folder type $type is unknown, using autodetect.");
+			or warning __x"folder type {type} is unknown, using autodetect.", $type => $type;
 	}
 
 	unless($folder_type)
@@ -268,7 +268,7 @@ sub open(@)
 	return if $require_failed{$class};
 	eval "require $class";
 	if($@)
-	{	$self->log(ERROR => "Failed for folder default $class: $@");
+	{	error __x"failed for folder default {class}: {errors}", class => $class, errors => $@;
 		$require_failed{$class}++;
 		return ();
 	}
@@ -277,11 +277,11 @@ sub open(@)
 	$folder = $class->new(@defaults, %args);
 	unless(defined $folder)
 	{	$args{access} eq 'd'
-			or $self->log(WARNING => "Folder does not exist, failed opening $folder_type folder $name.");
+			or error __x"folder {name} does not exist, failed opening {type}.", type => $folder_type, name => $name;
 		return;
 	}
 
-	$self->log(PROGRESS => "Opened folder $name ($folder_type).");
+	trace "Opened folder $name ($folder_type).";
 	push @{$self->{MBM_folders}}, $folder;
 	$folder;
 }
@@ -363,11 +363,11 @@ sub appendMessages(@)
 	if(blessed $folder)
 	{	# An open file.
 		$folder->isa('Mail::Box')
-			or $self->log(ERROR => "Folder $folder is not a Mail::Box; cannot add a message.\n"), return ();
+			or error __x"folder {name} is not a Mail::Box; cannot add a message.", name => $folder;
 
 		foreach my $msg (@messages)
 		{	$msg->isa('Mail::Box::Message') && $msg->folder or next;
-			$self->log(WARNING => "Use moveMessage() or copyMessage() to move between open folders.");
+			warning __x"use moveMessage() or copyMessage() to move between open folders.";
 		}
 
 		return $folder->addMessages(@messages);
@@ -430,7 +430,7 @@ sub copyMessage(@)
 	while(@_ && blessed $_[0])
 	{	my $message = shift;
 		$message->isa('Mail::Box::Message')
-			or $self->log(ERROR => "Use appendMessage() to add messages which are not in a folder.");
+			or error __x"use appendMessage() to add messages which are not in a folder.";
 		push @messages, $message;
 	}
 
@@ -441,9 +441,9 @@ sub copyMessage(@)
 
 	# Try to resolve filenames into opened-files.
 	$folder   = $self->isOpenFolder($folder) || $folder
-		unless ref $folder;
+		unless blessed $folder;
 
-	unless(ref $folder)
+	unless(blessed $folder)
 	{	my @c = $self->appendMessages(@messages, %args, folder => $folder);
 		if($args{_delete})
 		{	$_->label(deleted => 1) for @messages;
@@ -484,24 +484,20 @@ sub discoverThreads(@)
 	my $folders = delete $args{folder} || delete $args{folders};
 	push @folders, ( !$folders ? () : ref $folders eq 'ARRAY' ? @$folders : $folders );
 
-	@folders
-		or $self->log(INTERNAL => "No folders specified.");
-
 	my $threads;
-	if(ref $type)
-	{	# Already prepared object.
-		$type->isa($base)
-			or $self->log(INTERNAL => "You need to pass a $base derived");
+	if(blessed $type)   # Already prepared object?
+	{	$type->isa($base)
+			or error __x"you need to pass a {base} derived threader, got {class}.", base => $base, class => ref $type;
 		$threads = $type;
 	}
 	else
 	{	# Create an object.  The code is compiled, which safes us the
 		# need to compile Mail::Box::Thread::Manager when no threads are needed.
 		eval "require $type";
-		$self->log(INTERNAL => "Unusable threader $type: $@") if $@;
+		$@ and error __x"unusable threader {class}: {errors}", class => $type, errors => $@;
 
 		$type->isa($base)
-			or $self->log(INTERNAL => "You need to pass a $base derived");
+			or error __x"threader {class} is not derived from {base}.", class => $type, base => $base;
 
 		$threads = $type->new(manager => $self, %args);
 	}

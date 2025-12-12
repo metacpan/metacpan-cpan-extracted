@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Locker::NFS;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Locker';
@@ -18,9 +18,10 @@ use parent 'Mail::Box::Locker';
 use strict;
 use warnings;
 
-use Sys::Hostname;
-use Carp;
-use Fcntl  qw/O_CREAT O_WRONLY/;
+use Log::Report      'mail-box', import => [ qw/__x fault warning/ ];
+
+use Sys::Hostname    qw/hostname/;
+use Fcntl            qw/O_CREAT O_WRONLY/;
 
 #--------------------
 
@@ -69,23 +70,13 @@ sub _try_lock($$)
 	$linkcount == 2;
 }
 
-sub _unlock($$)
-{	my ($self, $tmpfile, $lockfile) = @_;
-
-	unlink $lockfile
-		or warn "Couldn't remove lockfile $lockfile: $!\n";
-
-	unlink $tmpfile;
-	$self;
-}
-
 
 sub lock()
 {	my $self     = shift;
 	my $folder   = $self->folder;
 
 	$self->hasLock
-		and $self->log(WARNING => "Folder $folder already locked over nfs"), return 1;
+		and warning(__x"folder {name} already locked over NFS.", name => $folder), return 1;
 
 	my $lockfile = $self->filename;
 	my $tmpfile  = $self->_construct_tmpfile or return;
@@ -95,9 +86,9 @@ sub lock()
 
 	if(-e $lockfile && -A $lockfile > $expires)
 	{	unlink $lockfile
-			or $self->log(ERROR => "Unable to remove expired lockfile $lockfile: $!"), return 0;
+			or fault __x"Unable to remove expired lockfile {file}", file => $lockfile;
 
-		$self->log(WARNING => "Removed expired lockfile $lockfile.");
+		warning __x"removed expired lockfile {file}.", file => $lockfile;
 	}
 
 	while(1)
@@ -123,6 +114,17 @@ sub isLocked()
 	$self->SUPER::unlock;
 
 	1;
+}
+
+
+sub _unlock($$)
+{	my ($self, $tmpfile, $lockfile) = @_;
+
+	unlink $lockfile
+		or fault __x"couldn't remove lockfile {file}", file => $lockfile;
+
+	unlink $tmpfile;
+	$self;
 }
 
 sub unlock($)

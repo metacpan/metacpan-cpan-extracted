@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +25,15 @@ requires:
   File::Spec: '0.7'
   IO::Socket: '0'
   List::Util: '0'
-  Mail::Reporter: '>= 3, < 4.0'
+  Log::Report: '1.42'
+  Mail::Reporter: '4'
   Net::SMTP: '0'
+  String::Print: '1.01'
 resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Transport/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Transport.git
-version: '3.008'
+version: '4.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

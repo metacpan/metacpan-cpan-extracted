@@ -4,14 +4,20 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
-#!!! This is the maintenance version of this module.  When you start fresh,
-#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
-#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+#!!! Mail::Box 3 compatibility is still maintained on github in branch
+#!!! maint3, and published.  So: you may find newer versions with major
+#!!! number 3.  Use (at least) version 4 for new developments.
+#!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
-version 3.00:
+version 4.00: Fri 12 Dec 10:24:09 CET 2025
 
 	Changes:
-	- maintenance release with Mail::Box version 3 compatibility.
+	- use Mail::Box 4 exception model: use Log::Report
+
+	Improvements:
+	- use base -> use parent
+
+version 3.00:
 
 	Improvements:
 	- add bugtracker to meta

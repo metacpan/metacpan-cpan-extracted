@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,12 +10,14 @@
 
 
 package Mail::Message;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error info trace/ ];
 
 use Mail::Message::Body::Multipart ();
 use Mail::Address  ();
@@ -66,8 +68,7 @@ sub reply(@)
 		}
 	}
 	else
-	{	$self->log(ERROR => "Cannot include reply source as $include.");
-		return;
+	{	error __x"cannot include reply source as {kind}.", kind => $include;
 	}
 
 	#
@@ -97,9 +98,9 @@ sub reply(@)
 	# Create a subject
 	my $srcsub  = delete $args{Subject};
 	my $subject
-	= ! defined $srcsub ? $self->replySubject($self->subject)
-	: ref $srcsub       ? $srcsub->($self->subject)
-	:                     $srcsub;
+	  = ! defined $srcsub ? $self->replySubject($self->subject)
+	  : ref $srcsub       ? $srcsub->($self->subject)
+	  :    $srcsub;
 
 	# Create a nice message-id
 	my $msgid   = delete $args{'Message-ID'};
@@ -112,8 +113,8 @@ sub reply(@)
 	# Prelude
 	my $prelude
 	  = defined $args{prelude} ? $args{prelude}
-	  : exists $args{prelude}  ? undef
-	  :   [ $self->replyPrelude($to) ];
+	  : exists  $args{prelude} ? undef
+	  :    [ $self->replyPrelude($to) ];
 
 	$prelude     = Mail::Message::Body->new(data => $prelude)
 		if defined $prelude && ! blessed $prelude;
@@ -133,7 +134,7 @@ sub reply(@)
 		$signature    = $signature->body
 			if defined $signature && $signature->isa('Mail::Message');
 
-		$total = $body->concatenate($prelude, $body, $postlude, (defined $signature ? "-- \n" : undef), $signature);
+		$total = $body->concatenate($prelude, $body, $postlude, (defined $signature ? "-- \n$signature" : undef));
 	}
 	elsif($include eq 'ATTACH')
 	{	my $intro = $prelude->concatenate($prelude, ["\n", "[Your message is attached]\n"], $postlude);
@@ -157,7 +158,7 @@ sub reply(@)
 		for sort grep /^[A-Z]/, keys %args;
 
 	# Ready
-	$self->log(PROGRESS => 'Reply created from '.$origid);
+	trace "Reply created from $origid";
 	$self->label(replied => 1);
 	$reply;
 }

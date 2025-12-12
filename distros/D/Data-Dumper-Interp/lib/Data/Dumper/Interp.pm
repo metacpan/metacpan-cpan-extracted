@@ -26,8 +26,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-11-26'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.022'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-12-11'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -54,7 +54,8 @@ use Scalar::Util qw(blessed reftype refaddr looks_like_number weaken);
 use List::Util 1.45 qw(min max first none all any sum0);
 use Data::Structure::Util qw/circular_off/;
 use Regexp::Common qw/RE_balanced RE_quoted/;
-use Term::ReadKey ();
+#use Term::ReadKey ();
+use Term::Size 0.211 ();
 use Sub::Identify qw/sub_name sub_fullname get_code_location/;
 use File::Basename qw/basename/;
 use overload ();
@@ -467,6 +468,7 @@ sub __win_forceqsh(_) {
   #  * \ quotes \ ONLY(?) if immediately followed by " or \"
   #    otherwise \\ means two backslashes.
   #FIXME TODO UNFINISHED
+  #TODO - rewrite using Win32::ShellQuote ???
   s/\\(?=")/\\\\/g;
   s/"/\\"/g;
   s/\\\z/\\\\/g; # because the closing " will follow
@@ -644,8 +646,9 @@ sub RefArgFormatter {
   my ($item, %opts) = @_;
   $opts{Maxdepth} //= 3;
   $opts{MaxStringwidth} //= 1000;
-  $opts{Refaddr} //= 1;
-  $opts{Objects} //= {objects => 1, overloads => "tagged"};
+  # Use whatever global defaults the user may have set...
+  #$opts{Refaddr} //= 1;
+  #$opts{Objects} //= {objects => 1, overloads => "tagged"};
   my $obj = Data::Dumper::Interp::visnew;
   for my $optname (keys %opts) {
     $obj->$optname($opts{$optname});
@@ -684,20 +687,22 @@ sub _get_terminal_width() {  # returns undef if unknowable
        ;
     my ($width, $height);
     if ($fh) {
-      # Some platforms (bsd?) carp if the terminal size can not be determined.
-      # We don't want to see any such warnings.  Also there might be a
-      # __WARN__ trap which we don't want to trigger
-      #
-      # Sigh.  It never ends!  On some platforms (different libc?)
-      # "stty" directly prints "stdin is not a tty" which we can not trap.
-      # Probably this is a bug in Term::Readkey where it should redirect
-      # such messages to /dev/null.  So we have to do it here.
-      require Capture::Tiny;
-      () = Capture::Tiny::capture_merged(sub{
-        delete local $SIG{__WARN__};
-        delete local $SIG{__DIE__};
-        ($width, $height) = eval{ Term::ReadKey::GetTerminalSize($fh) };
-      });
+       ($width, $height) = Term::Size::chars($fh);
+
+#      # Some platforms (bsd?) carp if the terminal size can not be determined.
+#      # We don't want to see any such warnings.  Also there might be a
+#      # __WARN__ trap which we don't want to trigger
+#      #
+#      # Sigh.  It never ends!  On some platforms (different libc?)
+#      # "stty" directly prints "stdin is not a tty" which we can not trap.
+#      # Probably this is a bug in Term::Readkey where it should redirect
+#      # such messages to /dev/null.  So we have to do it here.
+#      require Capture::Tiny;
+#      () = Capture::Tiny::capture_merged(sub{
+#        delete local $SIG{__WARN__};
+#        delete local $SIG{__DIE__};
+#        ($width, $height) = eval{ Term::ReadKey::GetTerminalSize($fh) };
+#      });
     }
     return $width; # possibly undef (sometimes seems to be zero ?!?)
   }
@@ -2112,6 +2117,14 @@ sub quotekey(_) { # Quote a hash key if not a valid bareword
             "\"$_[0]\""
 }
 
+sub _install_CarpRefArgFormatter() {
+  my $prev = $Carp::RefArgFormatter;
+  if ($prev && $prev != \&RefArgFormatter) {
+    croak("\$Carp::RefArgFormatter was previously set to another handler: $prev = ",visnew->vis($prev))
+  }
+  $Carp::RefArgFormatter = \&RefArgFormatter;
+}
+
 # Must be declared after global like $Debug etc.
 sub import {
   my $class = shift;
@@ -2130,6 +2143,9 @@ sub import {
     }
     elsif (/^:DEFAULT/) {
       push @args, @EXPORT;
+    }
+    elsif (/^:carp/) {
+      _install_CarpRefArgFormatter();
     }
     elsif (/^:all/) {
       # Generate all modifier combinations as suffixes in alphabetical order.
@@ -2362,7 +2378,7 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
     say visnew->viso($struct);
       # --> {debt => bless({...lots of stuff...},'Math::BigInt')}
 
-    # These do the same thing
+    # These all do the same thing
     say visnew->Objects(0)->vis($struct);
     { local $Data::Dumper::Interp::Objects=0; say vis $struct; }
     say viso $struct;   # 'viso' is not exported by default
@@ -2381,12 +2397,11 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say Data::Dumper::Interp->new()
             ->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
 
-  #-------- CARP TRACEBACK FORMATTING --------
+  #-------- RefArgFormatter for Carp --------
 
   use Carp;
   $Carp::RefArgFormatter = \&Data::Dumper::Interp::RefArgFormatter;
-
-  # Now cluck and confess will format references with 'vis'
+  # Now ref arguments will be formatted in tracebacks
 
   #-------- UTILITY FUNCTIONS --------
   say u($might_be_undef);  # $_[0] // "undef"
@@ -2413,7 +2428,7 @@ with pre- and post-processing to "improve" the results:
 
 =over 2
 
-=item * One line if possible, else folded to terminal width, WITHOUT newline.
+=item * One line if possible, else folded to terminal width. Always WITHOUT a final newline.
 
 =item * Safely printable Unicode characters appear as themselves.
 
@@ -2456,7 +2471,7 @@ from interpolating it beforehand.
 
 The 'd' is for "B<d>ebugging".  Like C<ivis> but labels expansions
 with "expr=" and shows spaces visibly as '·'.  Other debug-oriented
-formatting may also occur (TBD).
+formatting may also occur.
 
 =head2 vis [I<SCALAREXPR>B<]>
 
@@ -2474,11 +2489,11 @@ C<hvis> formats key => value pairs in parenthesis.
 =head2 FUNCTION (and METHOD) VARIATIONS
 
 Variations of the above five functions have extra characters
-in their names to imply certain options.
-For example C<visq> is like C<vis> but
-shows strings in single-quoted form (implied by the 'B<q>' suffix).
+in their names to imply options.
+For example C<ivisq>, C<visq> etc. are like C<ivis> etc. but
+show strings in single-quoted form (implied by the 'B<q>' suffix).
 
-There are no fixed function names; you can use any combination of
+There are no fixed function names; you can use any modifier
 characters in any order, prefixed or suffixed to the primary name
 with optional '_' separators.
 The function will be I<generated> when it is imported* or called as a method.
@@ -2487,10 +2502,9 @@ The available modifier characters are:
 
 =over 2
 
-B<l> - omit parenthesis to return a bare list with "avis" or "hvis"; omit quotes from a string formatted by "vis".
+B<l> - omit parenthesis to return a bare list with "avis" or "hvis"; omit quotes from strings formatted by "vis".
 
 B<o> - show object internals (see C<Objects>);
-
 
 B<r> - show abbreviated addresses in refs (see C<Refaddr>).
 
@@ -2502,9 +2516,9 @@ B<c> - Show control characters as "Control Picture" characters
 
 B<C> - condense strings of repeated characters
 
-B<d> - ("debug-friendly") Condense strings; show spaces as middle-dot if STDOUT is utf-encoding
+B<d> - ("debug-friendly") Condense strings; show spaces as middle-dot.
 
-B<h> - show numbers > 9 in hexadecimal
+B<h> - show numbers in hexadecimal
 
 B<O> - Optimize for strings containing binary octets.
 
@@ -2522,11 +2536,6 @@ B<u> - show numbers with underscores between groups of three digits
 
 =back
 
-Functions must be imported explicitly
-unless they are imported by default (see list below).
-
-=for HIDE or created via the :all tag.
-
 To avoid having to import functions in advance, you can
 use them as methods and import only the C<visnew> function:
 
@@ -2543,8 +2552,13 @@ via the AUTOLOAD mechanism).
 
 * To save memory, only stub declarations with prototypes are generated
 for imported functions.
-Bodies are generated when actually used via the AUTOLOAD mechanism.
+Bodies are only generated when they are called, via the AUTOLOAD mechanism.
 Use the C<:debug> import tag to see details.
+
+=head2 RefArgFormatter
+
+$Carp::RefArgFormatter may be set to a ref to this sub
+to format arguments using 'vis' in tracebacks (see L<Carp>).
 
 =head1 Import options
 
@@ -2560,7 +2574,10 @@ By default the following are imported:
 The following special import tags are available:
 
   :all - Imports all function variations, spelled with modifier
-         letters appended to the basic name in alphabetical order
+         letters appended to the basic name in alphabetical order.
+
+  :carp - Format ref args in Carp tracebacks with C<vis>
+          (installs $Carp::RefArgFormatter)
 
   :debug - Show functions/methods as they are generated
 
@@ -2592,12 +2609,6 @@ The following special import tags are available:
 =for HIDE
 =for HIDE You could have used alternate names for the same function such as C<avis2ql>,
 =for HIDE C<q2avisl>, C<q_2_avis_l> etc. if called as methods or explicitly imported.
-
-
-=head2 RefArgFormatter
-
-Carp::RefArgFormatter may be set to a ref to this sub (or a wrapper)
-to format arguments using 'vis' in tracebacks (see L<Carp>).
 
 =head1 Showing Abbreviated Addresses
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,15 @@
 
 
 package Mail::Box::Parser;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 #--------------------
 
@@ -60,7 +60,7 @@ sub defaultParserType(;$)
 	if(@_)
 	{	$parser_type = shift;
 		return $parser_type if $parser_type->isa( __PACKAGE__ );
-		confess "Parser $parser_type does not extend " . __PACKAGE__ . "\n";
+		error __x"parser {type} does not extend {pkg}.", type => $parser_type, pkg => __PACKAGE__;
 	}
 
 	# Already determined which parser we want?

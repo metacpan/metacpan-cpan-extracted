@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 3.008.
+# This code is part of Perl distribution Mail-Transport version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,16 +10,17 @@
 
 
 package Mail::Transport;{
-our $VERSION = '3.008';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
-use Carp;
-use File::Spec;
+use Log::Report   'mail-transport', import => [ qw/__x error panic/ ];
+
+use File::Spec    ();
 
 #--------------------
 
@@ -47,8 +48,7 @@ sub new(@)
 	# auto restart by creating the right transporter.
 
 	my %args = @_;
-	my $via  = lc($args{via} || '')
-		or croak "No transport protocol provided";
+	my $via  = lc($args{via} // '') or panic "no transport protocol provided";
 
 	$via     = 'Mail::Transport'.$mailers{$via} if exists $mailers{$via};
 	eval "require $via";
@@ -72,10 +72,10 @@ sub init($)
 	{	$self->{MT_exec} = $exec;
 
 		File::Spec->file_name_is_absolute($exec)
-			or $self->log(WARNING => "Avoid program abuse: specify an absolute path for $exec.");
+			or error __x"avoid program abuse: specify an absolute path for {program}.", program => $exec;
 
 		-x $exec
-			or $self->log(WARNING => "Executable $exec does not exist."), return undef;
+			or error __x"executable {program} does not exist.", program => $exec;
 	}
 
 	$self;
@@ -83,16 +83,10 @@ sub init($)
 
 #--------------------
 
-sub remoteHost()
-{	my $self = shift;
-	@$self{ qw/MT_hostname MT_port MT_username MT_password/ };
-}
+sub remoteHost() { @{$_[0]}{ qw/MT_hostname MT_port MT_username MT_password/ } }
 
 
-sub retry()
-{	my $self = shift;
-	@$self{ qw/MT_interval MT_retry MT_timeout/ };
-}
+sub retry() { @{$_[0]}{ qw/MT_interval MT_retry MT_timeout/ } }
 
 
 my @safe_directories = qw(/usr/local/bin /usr/bin /bin /sbin /usr/sbin /usr/lib);

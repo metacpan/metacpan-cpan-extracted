@@ -125,12 +125,11 @@ objects within this collection.
 
 =item parent => OBJECT
 
-=item roles => ROLE|ARRAY
+=item roles => $role|\@roles
 
-Immediately add some roles to this collection.  In case of an ARRAY,
-each element of the array is passed separately to L<addRole()|User::Identity::Collection/"Maintaining roles">. So,
-you may end-up with an ARRAY of arrays each grouping a set of options
-to create a role.
+Immediately add some C<@roles> to this collection.  In case of an ARRAY,
+each element is passed separately to L<addRole()|User::Identity::Collection/"Maintaining roles">. So, you may end-up
+with an ARRAY of ARRAYS each grouping a set of options to create a role.
 
 =back
 
@@ -277,19 +276,13 @@ Improves base, see L<User::Identity::Item/"Searching">
 
 =over 4
 
-=item Error: $object is not a collection.
-
-The first argument is an object, but not of a class which extends
-L<User::Identity::Collection|User::Identity::Collection>.
-Cast by C<addCollection()>
-
-=item Error: Cannot create a $type to add this to my collection.
+=item Error: cannot create a $type to add this to my collection.
 
 Some options are specified to create a C<$type> object, which is native to
 this collection.  However, for some reason this failed.
 Cast by C<addRole()>
 
-=item Error: Cannot load collection module for $type ($class).
+=item Error: cannot load collection module for $type ($class): $@
 
 Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
@@ -297,33 +290,24 @@ the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
 Cast by C<addCollection()>
 
-=item Error: Cannot rename $name into $newname: already exists
+=item Error: cannot rename $from into $to: already exists.
 
 Cast by C<renameRole()>
 
-=item Error: Cannot rename $name into $newname: doesn't exist
+=item Error: cannot rename $from into $to: doesn't exist.
 
 Cast by C<renameRole()>
 
-=item Error: Creation of a collection via $class failed.
-
-The C<$class> did compile, but it was not possible to create an object
-of that class using the options you specified.
-Cast by C<addCollection()>
-
-=item Error: Don't know what type of collection you want to add.
-
-If you add a collection, it must either by a collection object or a
-list of options which can be used to create a collection object.  In
-the latter case, the type of collection must be specified.
-Cast by C<addCollection()>
-
-=item Warning: No collection $name
+=item Error: nvalid collection $name.
 
 The collection with C<$name> does not exist and can not be created.
 Cast by C<add()>
 
-=item Error: Wrong type of role for $collection: requires a $expect but got a $type
+=item Error: this $object is not a collection.
+
+Cast by C<addCollection()>
+
+=item Error: wrong type of role for $collection: requires a $expect but got a $type.
 
 Each C<$collection> groups sets of roles of one specific type (C<$expect>).  You
 cannot add objects of a different C<$type>.
@@ -333,8 +317,8 @@ Cast by C<addRole()>
 
 =head1 SEE ALSO
 
-This module is part of User-Identity version 3.00,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 4.00,
+built on December 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

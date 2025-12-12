@@ -59,7 +59,7 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.22"
+         "version" : "0.24"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
@@ -70,6 +70,10 @@
       "Daje::Workflow::Activities::Document::Builder" : {
          "file" : "lib/Daje/Workflow/Activities/Document/Builder.pm",
          "version" : "0.01"
+      },
+      "Daje::Workflow::Activities::Files::Save" : {
+         "file" : "lib/Daje/Workflow/Activities/Files/Save.pm",
+         "version" : "1.11"
       },
       "Daje::Workflow::Activities::Save" : {
          "file" : "lib/Daje/Workflow/Activities/Save.pm"
@@ -143,7 +147,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.22",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

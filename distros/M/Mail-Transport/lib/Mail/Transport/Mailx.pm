@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 3.008.
+# This code is part of Perl distribution Mail-Transport version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,15 @@
 
 
 package Mail::Transport::Mailx;{
-our $VERSION = '3.008';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Transport::Send';
+use parent 'Mail::Transport::Send';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report   'mail-transport', import => [ qw/__x fault error/ ];
 
 #--------------------
 
@@ -28,8 +28,8 @@ sub init($)
 
 	$self->SUPER::init($args) or return;
 
-	$self->{MTM_program} = $args->{proxy} || $self->findBinary('mailx') || $self->findBinary('Mail')
-		|| $self->findBinary('mail') or return;
+	$self->{MTM_program} = $args->{proxy} || $self->findBinary('mailx') || $self->findBinary('Mail') || $self->findBinary('mail')
+		or error __x"cannot find binary of mailx.";
 
 	$self->{MTM_style} = $args->{style} // ( $^O =~ m/linux|freebsd|bsdos|netbsd|openbsd/ ? 'BSD' : 'RFC822' );
 	$self;
@@ -56,17 +56,14 @@ sub _try_send_bsdish($$)
 	if((open $mailer, '|-')==0)
 	{	close STDOUT;
 		{	exec $program, @options, @to }
-		$self->log(NOTICE => "Cannot start contact to $program: $!");
-		exit 1;
+		fault __x"cannot open pipe to {program}", program => $program;
 	}
 
 	$self->putContent($message, $mailer, body_only => 1);
 
 	$mailer->close
-		or $self->log(ERROR => "Sending via mailx mailer $program failed: $! ($?)"), return 0;
+		or fault __x"errors when closing Mailx mailer {program}", program => $program;
 
-	my $msgid = $message->messageId;
-	$self->log(PROGRESS => "Message $msgid send.");
 	1;
 }
 
@@ -78,12 +75,12 @@ sub trySend($@)
 
 	my $program = $self->{MTM_program};
 	open my $mailer, '|-', $program, '-t'
-		or $self->log(NOTICE => "Cannot start contact to $program: $!"), return 0;
+		or fault __x"cannot open pipe to {program}", program => $program;
 
 	$self->putContent($message, $mailer);
 
 	$mailer->close
-		or $self->log(ERROR => "Sending via mailx mailer $program failed: $! ($?)"), return 0;
+		or fault __x"errors when closing Mailx mailer {program}", program => $program;
 
 	1;
 }

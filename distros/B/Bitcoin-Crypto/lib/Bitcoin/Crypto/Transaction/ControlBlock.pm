@@ -1,18 +1,14 @@
 package Bitcoin::Crypto::Transaction::ControlBlock;
-$Bitcoin::Crypto::Transaction::ControlBlock::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::ControlBlock::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types, -sigs;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 
 use Bitcoin::Crypto qw(btc_pub);
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Util qw(lift_x);
-
-use namespace::clean;
+use Bitcoin::Crypto::Util::Internal qw(lift_x);
 
 has param 'control_byte' => (
 	isa => IntMaxBits [8],
@@ -28,7 +24,7 @@ has param 'script_blocks' => (
 );
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	positional => [ByteStr],
 );
 
@@ -45,11 +41,6 @@ sub from_serialized
 	);
 }
 
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
-
 sub to_serialized
 {
 	my ($self) = @_;
@@ -58,11 +49,6 @@ sub to_serialized
 		. $self->public_key->get_xonly_key
 		. join '', @{$self->script_blocks};
 }
-
-signature_for get_leaf_version => (
-	method => Object,
-	positional => [],
-);
 
 sub get_leaf_version
 {

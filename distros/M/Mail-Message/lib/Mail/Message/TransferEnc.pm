@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::TransferEnc;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
+
+use Log::Report     'mail-message', import => [ qw/__x error/ ];
 
 #--------------------
 
@@ -32,17 +34,11 @@ my %encoder = (
 sub create($@)
 {	my ($class, $type) = (shift, shift);
 
-	my $encoder = $encoder{lc $type};
-	unless($encoder)
-	{	$class->new(@_)->log(WARNING => "No decoder for transfer encoding $type.");
-		return;
-	}
+	my $encoder = $encoder{lc $type}
+		or error __x"no decoder for transfer encoding {type}.", type => $type;
 
 	eval "require $encoder";
-	if($@)
-	{	$class->new(@_)->log(ERROR => "Decoder for transfer encoding $type does not work:\n$@");
-		return;
-	}
+	$@ and error __x"decoder for transfer encoding {type} does not work:\n{error}", type => $type, error => $@;
 
 	$encoder->new(@_);
 }

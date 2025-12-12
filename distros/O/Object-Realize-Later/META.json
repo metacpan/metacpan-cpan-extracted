@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Log::Report" : "1.42",
             "Scalar::Util" : "0"
          }
       },
@@ -59,7 +60,7 @@
          "web" : "https://github.com/markov2/perl5-Object-Realize-Later"
       }
    },
-   "version" : "3.00",
+   "version" : "4.00",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

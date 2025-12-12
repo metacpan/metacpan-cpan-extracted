@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,16 @@
 
 
 package Mail::Message::Body;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report     'mail-message', import => [ qw/__x error fault info panic/ ];
+
 use Scalar::Util     qw/weaken refaddr blessed/;
 use File::Basename   qw/basename/;
 
@@ -45,9 +46,7 @@ my $body_count = 0;  # to be able to compare bodies for equivalence.
 
 sub new(@)
 {	my $class = shift;
-
-	$class eq __PACKAGE__
-		or return $class->SUPER::new(@_);
+	$class eq __PACKAGE__ or return $class->SUPER::new(@_);
 
 	my %args  = @_;
 	exists $args{file} ? Mail::Message::Body::File->new(@_) : Mail::Message::Body::Lines->new(@_);
@@ -60,7 +59,6 @@ sub _data_from_lines(@)      { $_[0]->notImplemented }
 
 sub init($)
 {	my ($self, $args) = @_;
-
 	$self->SUPER::init($args);
 
 	$self->{MMB_modified} = $args->{modified} || 0;
@@ -79,7 +77,7 @@ sub init($)
 		{	$self->_data_from_filehandle($file) or return;
 		}
 		else
-		{	croak "message body: illegal datatype `".ref($file)."' for file option";
+		{	error __x"message body: illegal datatype '{type}' for file option.", type => ref $file // $file;
 		}
 	}
 	elsif(defined(my $data = $args->{data}))
@@ -92,7 +90,7 @@ sub init($)
 		{	$self->_data_from_lines($data) or return;
 		}
 		else
-		{	croak "message body: illegal datatype `".ref($data)."' for data option";
+		{	error __x"message body: illegal datatype '{type}' for data option.", type => ref $data // $data;
 		}
 	}
 	elsif(! $self->isMultipart && ! $self->isNested)
@@ -102,8 +100,7 @@ sub init($)
 
 	# Set the content info
 
-	my ($transfer, $disp, $descr, $cid, $lang) = @$args{
-		qw/transfer_encoding disposition description content_id language/ };
+	my ($transfer, $disp, $descr, $cid, $lang) = @$args{ qw/transfer_encoding disposition description content_id language/ };
 
 	if(defined $filename)
 	{	$disp //= Mail::Message::Field->new(
@@ -191,8 +188,7 @@ sub isNested() {0}
 
 
 sub partNumberOf($)
-{	shift->log(ERROR => 'part number needs multi-part or nested');
-	'ERROR';
+{	error __x"part number needs multi-part or nested.";
 }
 
 #--------------------
@@ -204,7 +200,7 @@ sub type(;$)
 	delete $self->{MMB_mime};
 	my $type = shift // 'text/plain';
 
-	$self->{MMB_type} = ref $type ? $type->clone : Mail::Message::Field->new('Content-Type' => $type);
+	$self->{MMB_type} = blessed $type ? $type->clone : Mail::Message::Field->new('Content-Type' => $type);
 }
 
 
@@ -280,14 +276,14 @@ sub checked(;$)
 }
 
 
-sub nrLines(@)  { $_[0]->notImplemented }
+sub nrLines(@) { $_[0]->notImplemented }
 
 
-sub size(@)  { $_[0]->notImplemented }
+sub size(@)    { $_[0]->notImplemented }
 
 #--------------------
 
-sub string() { $_[0]->notImplemented }
+sub string()   { $_[0]->notImplemented }
 
 sub string_unless_carp()
 {	my $self  = shift;
@@ -313,11 +309,16 @@ sub printEscapedFrom($) { $_[0]->notImplemented }
 sub write(@)
 {	my ($self, %args) = @_;
 	my $filename = $args{filename}
-		or die "No filename for write() body";
+		or error __x"no filename parameter for write() body.";
 
-	open my $out, '>', $filename or return;
+#XXX encoding?
+	open my $out, '>', $filename
+		or fault __x"cannot open {file} to write body", file => $filename;
+
 	$self->print($out);
-	$out->close or return undef;
+	$out->close
+		or fault __x"error closing {file} after write body", file => $filename;
+
 	$self;
 }
 
@@ -418,7 +419,7 @@ sub AUTOLOAD(@)
 	return $self->$call(@_) if $self->can($call);  # now loaded
 
 	# AUTOLOAD inheritance is a pain
-	confess "Method $call() is not defined for a ", ref $self;
+	panic "method $call() is not defined for a " . ref $self;
 }
 
 #--------------------

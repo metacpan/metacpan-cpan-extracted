@@ -1,31 +1,25 @@
 package Bitcoin::Crypto::Key::Private;
-$Bitcoin::Crypto::Key::Private::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Key::Private::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
+
+use Mooish::Base -standard;
 use Bitcoin::BIP39 qw(bip39_mnemonic_to_entropy entropy_to_bip39_mnemonic);
-use Types::Common -sigs, -types;
+use Types::Common -sigs;
 use List::Util qw(none);
 
 use Bitcoin::Crypto::Key::Public;
 use Bitcoin::Crypto::Base58 qw(encode_base58check decode_base58check);
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Constants qw(:key);
 use Bitcoin::Crypto::Network;
-use Bitcoin::Crypto::Util qw(validate_wif);
+use Bitcoin::Crypto::Util::Internal qw(validate_wif);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
+use Bitcoin::Crypto::Types -types;
 
 extends qw(Bitcoin::Crypto::Key::Base);
 
 sub _is_private { 1 }
-
-signature_for to_wif => (
-	method => Object,
-	positional => [],
-);
 
 sub to_wif
 {
@@ -36,77 +30,83 @@ sub to_wif
 	my $wifdata = $self->network->wif_byte;
 
 	# key entropy - 32B
-	$wifdata .= ensure_length $bytes, Bitcoin::Crypto::Constants::key_max_length;
+	$wifdata .= ensure_length $bytes, KEY_MAX_LENGTH;
 
 	# additional byte for compressed key - 1B
-	$wifdata .= Bitcoin::Crypto::Constants::wif_compressed_byte if $self->compressed;
+	$wifdata .= WIF_COMPRESSED_BYTE if $self->compressed;
 
 	return encode_base58check($wifdata);
 }
 
+signature_for from_serialized => (
+	method => !!1,
+	positional => [BitcoinSecret],
+);
+
 signature_for from_wif => (
-	method => Str,
-	positional => [Str, Maybe [Str], {default => undef}],
+	method => !!1,
+	positional => [BitcoinSecret, Maybe [Str], {default => undef}],
 );
 
 sub from_wif
 {
-	my ($class, $wif, $network) = @_;
+	my ($class, $secret, $network) = @_;
 
-	Bitcoin::Crypto::Exception::KeyCreate->raise(
-		'base58 string is not valid WIF'
-	) unless validate_wif($wif);
+	return $secret->unmask_to(
+		sub {
+			my ($wif) = @_;
 
-	my $decoded = decode_base58check($wif);
-	my $private = substr $decoded, 1;
+			Bitcoin::Crypto::Exception::KeyCreate->raise(
+				'base58 string is not valid WIF'
+			) unless validate_wif($wif);
 
-	my $compressed = 0;
-	if (length($private) > Bitcoin::Crypto::Constants::key_max_length) {
-		chop $private;
-		$compressed = 1;
-	}
+			my $decoded = decode_base58check($wif);
+			my $private = substr $decoded, 1;
 
-	my $wif_network_byte = substr $decoded, 0, 1;
-	my @found_networks =
-		Bitcoin::Crypto::Network->find(sub { shift->wif_byte eq $wif_network_byte });
-	@found_networks = grep { $_ eq $network } @found_networks
-		if defined $network;
+			my $compressed = 0;
+			if (length($private) > KEY_MAX_LENGTH) {
+				chop $private;
+				$compressed = 1;
+			}
 
-	if (@found_networks > 1) {
-		my $default_network = Bitcoin::Crypto::Network->get->id;
+			my $wif_network_byte = substr $decoded, 0, 1;
+			my @found_networks =
+				Bitcoin::Crypto::Network->find(sub { shift->wif_byte eq $wif_network_byte });
+			@found_networks = grep { $_ eq $network } @found_networks
+				if defined $network;
 
-		Bitcoin::Crypto::Exception::KeyCreate->raise(
-			'found multiple networks possible for given WIF: ' . join ', ', @found_networks
-		) if none { $_ eq $default_network } @found_networks;
+			if (@found_networks > 1) {
+				my $default_network = Bitcoin::Crypto::Network->get->id;
 
-		@found_networks = ($default_network);
-	}
+				Bitcoin::Crypto::Exception::KeyCreate->raise(
+					'found multiple networks possible for given WIF: ' . join ', ', @found_networks
+				) if none { $_ eq $default_network } @found_networks;
 
-	Bitcoin::Crypto::Exception::KeyCreate->raise(
-		"network name $network cannot be used for given WIF"
-	) if @found_networks == 0 && defined $network;
+				@found_networks = ($default_network);
+			}
 
-	Bitcoin::Crypto::Exception::NetworkConfig->raise(
-		"couldn't find network for WIF byte $wif_network_byte"
-	) if @found_networks == 0;
+			Bitcoin::Crypto::Exception::KeyCreate->raise(
+				"network name $network cannot be used for given WIF"
+			) if @found_networks == 0 && defined $network;
 
-	my $instance = $class->from_serialized($private);
-	$instance->set_compressed($compressed);
-	$instance->set_network(@found_networks);
-	return $instance;
+			Bitcoin::Crypto::Exception::NetworkConfig->raise(
+				"couldn't find network for WIF byte $wif_network_byte"
+			) if @found_networks == 0;
+
+			my $instance = $class->from_serialized($private);
+			$instance->set_compressed($compressed);
+			$instance->set_network(@found_networks);
+			return $instance;
+		}
+	);
 }
-
-signature_for get_public_key => (
-	method => Object,
-	positional => [],
-);
 
 sub get_public_key
 {
 	my ($self) = @_;
 
 	my $public = Bitcoin::Crypto::Key::Public->new(
-		key_instance => $self->raw_key('public'),
+		_key_instance => $self->raw_key('public'),
 		compressed => $self->compressed,
 		network => $self->network,
 		purpose => $self->purpose,
@@ -142,7 +142,7 @@ Bitcoin::Crypto::Key::Private - Bitcoin private keys
 	# signature is returned as byte string
 	# use to_format to get the representation you need
 
-	use Bitcoin::Crypto::Util qw(to_format);
+	use Bitcoin::Crypto::Util::Internal qw(to_format);
 	my $sig_hex = to_format [hex => $sig];
 
 	# signature verification
@@ -184,9 +184,8 @@ I<clearer:> C<clear_purpose>
 
 =head3 taproot_output
 
-Boolean value indicating if this key was obtained through taproot tweaking.
-Taproot output keys are used to sign and verify schnorr signatures in P2TR
-outputs. Default: C<false>
+Boolean value indicating if this key was obtained through taproot tweaking or
+should be used with Schnorr signatures. Default: C<false>
 
 I<writer:> C<set_taproot_output>
 
@@ -204,6 +203,8 @@ or L</from_wif> instead.
 This creates a new key from string data. Argument C<$serialized> is a
 formatable bytestring containing the private key entropy.
 
+This method accepts a secret argument. See L<Bitcoin::Crypto::Secret> for details.
+
 Returns a new key object instance.
 
 =head3 to_serialized
@@ -215,7 +216,7 @@ which can be further formated with C<to_format> utility.
 
 =head3 from_wif
 
-	$key_object = $class->from_wif($str, $network = undef)
+	$key_object = $class->from_wif($wif, $network = undef)
 
 Creates a new private key from Wallet Import Format string.
 
@@ -224,6 +225,8 @@ if you use many networks and some have the same WIF byte.
 
 This method will change compression and network states of the created private
 key, as this data is included in WIF format.
+
+This method accepts a secret argument. See L<Bitcoin::Crypto::Secret> for details.
 
 Returns class instance.
 
@@ -244,8 +247,9 @@ key.
 
 	$prv = $object->get_taproot_output_key($tweak_suffix = undef)
 
-Returns a new private key object that represents an output taproot key.
-Optional C<$tweak_suffix> can be passed as bytestring.
+Returns a new private key instance that represents an output taproot key, or
+this key if it is marked as L</taproot_output>. Optional C<$tweak_suffix> can
+be passed as bytestring.
 
 =head3 sign_message
 
@@ -272,7 +276,8 @@ only works for standard script types, if your script is non-standard then you
 will have to sign manually.
 
 For taproot, this signs using key path spending. Spending with script path
-needs a custom solution using L</sign_message>.
+needs a custom solution using L</sign_message>. C<script_tree> parameter can be
+passed if taproot output had a script path.
 
 Note that the module will let you sign any transaction with any private key.
 You have to manually run L<Bitcoin::Crypto::Transaction/verify> to ensure you
@@ -314,8 +319,16 @@ can look like this (taken from C<ex/tx/multisig_redeem.pl> example):
 
 =item * C<sighash>
 
-The sighash which should be used for the signature. By default C<SIGHASH_ALL>
-is used.
+The sighash which should be used for the signature. By default L<Bitcoin::Crypto::Constants/SIGHASH_ALL>
+is used for pre-taproot outputs and L<Bitcoin::Crypto::Constants/SIGHASH_DEFAULT> for taproot
+outputs.
+
+=item * C<script_tree>
+
+L<Bitcoin::Crypto::Script::Tree> instance for use in taproot. Same script tree
+must be passed as used in generation of the address to correctly tweak the key.
+If the key was already tweaked (L</get_taproot_output_key>), this parameter can
+be skipped, as no double-tweaking will happen.
 
 =back
 
@@ -346,26 +359,6 @@ function to fail. You can encode like this (for UTF-8):
 
 	use Encode qw(encode);
 	$message = encode('UTF-8', $message);
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * Sign - couldn't sign the message correctly
-
-=item * ScriptType - couldn't automatically sign the given script type
-
-=item * Verify - couldn't verify the message correctly
-
-=item * KeyCreate - key couldn't be created correctly
-
-=item * NetworkConfig - incomplete or corrupted network configuration
-
-=back
 
 =head1 SEE ALSO
 

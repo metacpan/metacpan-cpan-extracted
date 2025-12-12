@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,16 +10,17 @@
 
 
 package Mail::Message::Part;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message';
+use parent 'Mail::Message';
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error panic/ ];
+
 use Scalar::Util    qw/weaken/;
-use Carp;
 
 #--------------------
 
@@ -30,7 +31,7 @@ sub init($)
 	$self->SUPER::init($args);
 
 	exists $args->{container}
-		or confess "No container specified for part.\n";
+		or error __x"no container specified for part.";
 
 	weaken($self->{MMP_container})
 		if $self->{MMP_container} = $args->{container};
@@ -61,15 +62,14 @@ sub coerce($@)
 
 sub buildFromBody($$;@)
 {	my ($class, $body, $container) = (shift, shift, shift);
-	my @log  = $body->logSettings;
 
-	my $head = Mail::Message::Head::Complete->new(@log);
+	my $head = Mail::Message::Head::Complete->new;
 	while(@_)
 	{	if(ref $_[0]) {$head->add(shift)}
 		else          {$head->add(shift, shift)}
 	}
 
-	my $part = $class->new(head => $head, container => $container, @log);
+	my $part = $class->new(head => $head, container => $container);
 
 	$part->body($body);
 	$part;
@@ -77,7 +77,7 @@ sub buildFromBody($$;@)
 
 sub container(;$)
 {	my $self = shift;
-	return $self->{MMP_container} unless @_;
+	@_ or return $self->{MMP_container};
 
 	$self->{MMP_container} = shift;
 	weaken($self->{MMP_container});
@@ -93,7 +93,7 @@ sub isPart() { 1 }
 
 sub partNumber()
 {	my $self = shift;
-	my $body = $self->container or confess 'no container';
+	my $body = $self->container or panic 'no container';
 	$body->partNumberOf($self);
 }
 
@@ -101,7 +101,7 @@ sub readFromParser($;$)
 {	my ($self, $parser, $bodytype) = @_;
 
 	my $head = $self->readHead($parser) //
-		Mail::Message::Head::Complete->new(message => $self, field_type => $self->{MM_field_type}, $self->logSettings);
+		Mail::Message::Head::Complete->new(message => $self, field_type => $self->{MM_field_type});
 
 	my $body = $self->readBody($parser, $head, $bodytype) //
 		Mail::Message::Body::Lines->new(data => []);
@@ -123,8 +123,7 @@ sub printEscapedFrom($)
 
 sub destruct()
 {	my $self = shift;
-	$self->log(ERROR =>'You cannot destruct message parts, only whole messages');
-	undef;
+	error __x"you cannot destruct message parts, only whole messages.";
 }
 
 1;

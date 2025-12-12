@@ -4,7 +4,7 @@ require 5.016;
 
 use IO::Handle;
 
-my $version  = '3.01';
+my $version  = '4.00';
 my $git      = "https://github.com/markov2/perl5-HTML-FromMail";
 my $publish  = "../public_html/html-frommail";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -46,9 +46,10 @@ my %oodist   = (
 );
 
 my %requires = (
-	'Mail::Box'        => "2.051, <4.0",
-	'HTML::FromText'   => 2.03,
-	'OODoc::Template'  => 0.01,  # default template system
+	'Mail::Box'        => '4.00',
+	'HTML::FromText'   => '2.03',
+	'OODoc::Template'  => '0.19',  # default template system
+	'Log::Report'      => '1.42',
 );
 
 # See README.md for uses

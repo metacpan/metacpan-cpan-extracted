@@ -1,92 +1,105 @@
 package BitcoinCoreTest;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 
 use Test2::V0;
-use JSON::MaybeXS qw(decode_json);
 
-use Bitcoin::Crypto qw(btc_transaction btc_utxo);
-use Bitcoin::Crypto::Transaction::Output;
-use Bitcoin::Crypto::Script::Runner;
+use Bitcoin::Crypto qw(btc_script btc_tapscript);
 use Bitcoin::Crypto::Transaction::Flags;
 
+use Exporter qw(import);
+our @EXPORT = qw(
+	get_flags
+	get_file_data
+	script_from_readable
+);
+
+BEGIN {
+	eval { require JSON::MaybeXS; 1 }
+		or skip_all 'This test requires module JSON::MaybeXS';
+
+	JSON::MaybeXS->import(qw(decode_json));
+}
+
+# returns consensus flags object. With reverse arguments, returns consensus
+# without given flags
 sub get_flags
 {
-	my ($string) = @_;
+	my ($string, $reverse) = @_;
+	$reverse //= !!0;
 
 	state $core_to_perl = {
 		P2SH => 'p2sh',
-		DERSIG => 'strict_signatures',
+		DERSIG => 'der_signatures',
 		CHECKLOCKTIMEVERIFY => 'checklocktimeverify',
 		CHECKSEQUENCEVERIFY => 'checksequenceverify',
-		NULLDUMMY => 'nulldummy',
+		NULLDUMMY => 'null_dummy',
 		WITNESS => 'segwit',
 		TAPROOT => 'taproot',
+
+		CONST_SCRIPTCODE => 'const_script',
+		LOW_S => 'low_s_signatures',
+		STRICTENC => 'strict_encoding',
+		MINIMALIF => 'minimal_if',
+		NULLFAIL => 'null_fail',
+		SIGPUSHONLY => 'signature_pushes_only',
+		MINIMALDATA => 'minimal_data',
+		CLEANSTACK => 'clean_stack',
+		DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM => 'known_witness',
+		WITNESS_PUBKEYTYPE => 'compressed_pubkeys',
+		DISCOURAGE_UPGRADABLE_NOPS => 'illegal_upgradeable_nops',
 	};
 
-	my %flags = map { $core_to_perl->{$_} => !!1 } split /,/, $string;
+	my %flags = map { $core_to_perl->{$_} => !$reverse }
+		grep { defined $core_to_perl->{$_} }
+		split /,/, $string;
 
-	return Bitcoin::Crypto::Transaction::Flags->new_empty(%flags);
+	my $method = $reverse ? 'new_full' : 'new_empty';
+	return Bitcoin::Crypto::Transaction::Flags->$method(%flags);
 }
 
-sub test_validation
+sub get_file_data
 {
-	my ($case_name, $single_case_ind) = @_;
+	my ($case_name) = @_;
 
-	my $data = do {
-		local $/;
+	local $/;
 
-		my $file_location = $ENV{RELEASE_TESTS_DATA} // 'xt/data';
-		my $file = "$file_location/$case_name.json";
-		open my $fh, '<', $file
-			or skip_all "$case_name test requires file $file";
+	my $file_location = $ENV{RELEASE_TESTS_DATA}
+		or die 'no RELEASE_TESTS_DATA environmental variable was specified';
 
-		decode_json(readline $fh);
-	};
+	my $file = "$file_location/$case_name.json";
+	open my $fh, '<', $file
+		or die "$case_name test requires file $file";
 
-	my $script_runner = Bitcoin::Crypto::Script::Runner->new;
-	foreach my $case_ind (0 .. $#$data)
-	{
-		next if defined $single_case_ind && $single_case_ind != $case_ind;
-		my $case = $data->[$case_ind];
+	return decode_json(readline $fh);
+}
 
-		subtest "should pass $case_name index $case_ind ($case->{comment})" => sub {
-			my $tx = btc_transaction->from_serialized([hex => $case->{tx}]);
+sub script_from_readable
+{
+	my ($readable_string, $tapscript) = @_;
+	$tapscript //= !!0;
 
-			my @last_outputs =
-				map { Bitcoin::Crypto::Transaction::Output->from_serialized([hex => $_]) } @{$case->{prevouts}};
-			foreach my $input (@{$tx->inputs}) {
-				btc_utxo->new(
-					txid => $input->utxo_location->[0],
-					output_index => $input->utxo_location->[1],
-					output => shift @last_outputs,
-				)->register;
-			}
+	my $script = $tapscript ? btc_tapscript->new : btc_script->new;
+	my @parts = grep { length } split /\s+/, $readable_string;
 
-			$script_runner->set_transaction($tx);
-			$script_runner->set_flags(get_flags $case->{flags});
-			my $index = $case->{index};
-			my $input = $tx->inputs->[$index];
-
-			foreach my $sub_case ([!!1, $case->{success}], [!!0, $case->{failure}]) {
-				my ($success, $sub_case_data) = @$sub_case;
-				next unless $sub_case_data;
-
-				$input->set_signature_script([hex => $sub_case_data->{scriptSig}]);
-				$input->set_witness([map { [hex => $_] } @{$sub_case_data->{witness}}]);
-
-				if ($success) {
-					ok lives { $tx->verify_script($index, $script_runner) }, 'success case ok';
-				}
-				else {
-					my $ex = dies { $tx->verify_script($index, $script_runner) };
-					isa_ok $ex, 'Bitcoin::Crypto::Exception::Transaction';
-				}
-			}
-		};
+	foreach my $part (@parts) {
+		if ($part =~ m/^-?[0-9]+$/) {
+			$script->push_number($part);
+		}
+		elsif ($part =~ m/^0x([0-9a-f]+)$/i) {
+			$script->add_raw([hex => $1]);
+		}
+		elsif ($part =~ m/^'([^']*)'$/) {
+			$script->push_bytes($1 // '');
+		}
+		else {
+			$part =~ s/^OP_//;
+			$script->add("OP_$part");
+		}
 	}
+
+	return $script;
 }
 
 1;

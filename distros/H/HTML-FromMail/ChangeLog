@@ -4,22 +4,23 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
-#!!! This is the maintenance version of this module.  When you start fresh,
-#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
-#!!! Convert? See F<https://https://github.com/markov2/perl5-Mail-Box/wiki/>
+#!!! Mail::Box 3 compatibility is still maintained on github in branch
+#!!! maint3, and published.  So: you may find newer versions with major
+#!!! number 3.  Use (at least) version 4 for new developments.
+#!!! Convert? See https://https://github.com/markov2/perl5-Mail-Box/wiki/ 
 
-version 3.01: Fri 21 Nov 13:49:38 CET 2025
+version 4.00: Thu 11 Dec 13:28:45 CET 2025
 
 	Changes:
-	- maintenance release with Mail::Box version 3 compatibility.
+	- use Mail::Box 4 exception model: use Log::Report
 
 	Fixes:
 	- fix test when Template::Magic is not installed.
 	  gituhub issue #1, cpantesters [Slaven Rezic]
 
 	Improvements:
-	- organization of methods.
-	- remove Bundle::TemplateMagic references
+	- method documentation reorganization.
+	- Carp/die to Log::Report
 
 version 3.00: Wed 19 Nov 12:09:30 CET 2025
 

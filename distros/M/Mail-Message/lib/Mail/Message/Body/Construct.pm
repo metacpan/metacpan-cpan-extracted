@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message::Body;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 # Mail::Message::Body::Construct adds functionality to Mail::Message::Body
@@ -18,7 +18,8 @@ our $VERSION = '3.020';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
+
 use Scalar::Util  qw/blessed/;
 
 use Mail::Message::Body::String ();
@@ -51,14 +52,14 @@ sub concatenate(@)
 	my @unified;
 	foreach (grep defined, @_)
 	{	push @unified,
-		  ! ref $_          ? $_
-		: ref $_ eq 'ARRAY' ? @$_
-		: $_->isa('Mail::Message')       ? $_->body->decoded
-		: $_->isa('Mail::Message::Body') ? $_->decoded
-		: carp "Cannot concatenate element ".$_;
+			  ! ref $_          ? $_
+			: ref $_ eq 'ARRAY' ? @$_
+			: $_->isa('Mail::Message')       ? $_->body->decoded
+			: $_->isa('Mail::Message::Body') ? $_->decoded
+			: 	error(__x"cannot concatenate element {which}", which => $_);
 	}
 
-	ref($self)->new(
+	(ref $self)->new(
 		based_on  => $self,
 		mime_type => 'text/plain',
 		data      => join('', @unified),
@@ -86,28 +87,29 @@ sub stripSignature($@)
 
 	return $self if $self->mimeType->isBinary;
 
-	my $pattern = !defined $args{pattern} ? qr/^--\s?$/
-				: !ref $args{pattern}     ? qr/^\Q${args{pattern}}/
-				:                           $args{pattern};
+	my $p       = $args{pattern};
+	my $pattern = ! defined $p ? qr/^--\s?$/
+				: ! ref $p     ? qr/^\Q$p/
+				:    $p;
 
 	my $lines   = $self->lines;   # no copy!
-	my $stop    = defined $args{max_lines}? @$lines - $args{max_lines}
-				: exists $args{max_lines} ? 0
-				:                           @$lines-10;
+	my $stop    = defined $args{max_lines} ? @$lines - $args{max_lines}
+				: exists $args{max_lines}  ? 0
+				:    @$lines-10;
 
 	$stop = 0 if $stop < 0;
 	my ($sigstart, $found);
 
 	if(ref $pattern eq 'CODE')
 	{	for($sigstart = $#$lines; $sigstart >= $stop; $sigstart--)
-		{	next unless $pattern->($lines->[$sigstart]);
+		{	$pattern->($lines->[$sigstart]) or next;
 			$found = 1;
 			last;
 		}
 	}
 	else
 	{	for($sigstart = $#$lines; $sigstart >= $stop; $sigstart--)
-		{	next unless $lines->[$sigstart] =~ $pattern;
+		{	$lines->[$sigstart] =~ $pattern or next;
 			$found = 1;
 			last;
 		}

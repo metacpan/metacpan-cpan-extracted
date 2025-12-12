@@ -28,7 +28,7 @@ There are currently three implementations of this module:
 
 =over 4
 
-=item * L<Mail::Box::Parser|Mail::Box::Parser>::C
+=item * L<Mail::Box::Parser::C|Mail::Box::Parser::C>
 
 A fast parser written in C<C>.  This package is released as separate
 module on CPAN, because the module distribution via CPAN can not
@@ -69,11 +69,9 @@ case of MH-like mailboxes, each message is contained in a single file,
 so each message has its own parser object.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option           --Defined in     --Default
-  fix_header_errors                   false
-  log                Mail::Reporter   'WARNINGS'
-  trace              Mail::Reporter   'WARNINGS'
-  trusted                             false
+ -Option           --Default
+  fix_header_errors  false
+  trusted            false
 
 =over 2
 
@@ -83,10 +81,6 @@ When header errors are detected, the parsing of the header will
 be stopped.  Other header lines will become part of the body of
 the message.  Set this flag to have the erroneous line added to
 the previous header line.
-
-=item log => LEVEL
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -125,10 +119,6 @@ the current setting is returned.
 
   $folder->parser->fixHeaderErrors(1);
   my $folder = $mgr->open('folder', fix_header_errors => 1);
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<trusted>()
 
@@ -266,43 +256,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -324,23 +278,20 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Error: Filename or handle required to create a parser.
+=item Error: class $package does not implement method $method.
 
-A message parser needs to know the source of the message at creation.  These
-sources can be a filename (string), file handle object, or GLOB.
-See new(filename) and new(file).
-Cast by C<new()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Unexpected end of header in $source: $line
+=item Error: parser $type does not extend $pkg.
+
+Cast by C<defaultParserType()>
+
+=item Warning: unexpected end of header in $source: $line
 
 While parsing a message from the specified source (usually a file name),
 the parser found a syntax error.  According to the MIME specification in the
@@ -358,8 +309,8 @@ Cast by C<readHeader()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

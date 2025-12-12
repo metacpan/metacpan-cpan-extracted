@@ -63,14 +63,12 @@ Inherited, see L<Mail::Reporter/"Constructors">
   folder_type                        from parent
   inferiors                          1
   location                           undef
-  log          Mail::Reporter        'WARNINGS'
   manager                            <from parent>
   marked                             undef
   name         User::Identity::Item  <required>
   only_subs                          <foldertype and name dependent>
   parent       User::Identity::Item  undef
   subf_type                          <same as parent>
-  trace        Mail::Reporter        'WARNINGS'
 
 =over 2
 
@@ -91,8 +89,6 @@ Can this folder have children?  If not, this is cleared.
 
 The location of this folder.  Often, only the manager can figure-out
 where this folder really is.
-
-=item log => LEVEL
 
 =item manager => $object
 
@@ -117,8 +113,6 @@ See L<Mail::Box::topFolderWithMessages()|Mail::Box/"Sub-folders">
 
 The type for a subfolder collection, must extend class
 L<Mail::Box::Collection|Mail::Box::Collection>.
-
-=item trace => LEVEL
 
 =back
 
@@ -161,10 +155,6 @@ Returns the directory or filename of the folder.  If this is not pre-defined,
 it is computed based on the knowledge about the folder type.  Be sure to set
 the location of the toplevel folder to the folderdir of the user to get
 this to work.
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<manager>()
 
@@ -252,43 +242,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -379,38 +333,7 @@ the collection, the L<Mail::Box::Collection|Mail::Box::Collection>.
 
 =over 4
 
-=item Error: It is not permitted to add subfolders to $name
-
-The L<inferiors()|Mail::Box::Identity/"Attributes"> flag prohibits the creation of subfolders to this
-folder.
-Cast by C<addSubfolder()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: The toplevel folder cannot be removed this way
-
-The L<Mail::Box::Identity|Mail::Box::Identity> folder administration structure requires
-a top directory.  That top is registered somewhere (for instance
-by a L<Mail::Box::Manage::User|Mail::Box::Manage::User>).  If you need to remove the top,
-you have to look for a method of that object.
-Cast by C<remove()>
-
-=item Error: Toplevel directory requires explicit folder type
-
-Cast by C<folderType()>
-
-=item Error: Toplevel directory requires explicit location
-
-Cast by C<location()>
-
-=item Error: cannot load collection module for $type ($class): $err
+=item Error: cannot load collection module for $type ($class): $@
 
 Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
@@ -418,21 +341,52 @@ the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
 Cast by C<addCollection()>
 
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: it is not permitted to add subfolders to $folder.
+
+The L<inferiors()|Mail::Box::Identity/"Attributes"> flag prohibits the creation of subfolders to this
+folder.
+Cast by C<addSubfolder()>
+
 =item Error: nvalid collection $name.
 
 The collection with C<$name> does not exist and can not be created.
 Cast by C<add()>
 
+=item Error: the toplevel folder cannot be removed this way
+
+The L<Mail::Box::Identity|Mail::Box::Identity> folder administration structure requires
+a top directory.  That top is registered somewhere (for instance
+by a L<Mail::Box::Manage::User|Mail::Box::Manage::User>).  If you need to remove the top,
+you have to look for a method of that object.
+Cast by C<remove()>
+
 =item Error: this $object is not a collection.
 
 Cast by C<addCollection()>
+
+=item Error: toplevel directory requires explicit folder type.
+
+Cast by C<folderType()>
+
+=item Error: toplevel directory requires explicit location.
+
+Cast by C<location()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

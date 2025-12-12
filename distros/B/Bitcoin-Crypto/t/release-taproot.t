@@ -9,21 +9,56 @@ BEGIN {
 # HARNESS-DURATION-LONG
 use Test2::V0;
 
-BEGIN {
-	eval { require JSON::MaybeXS; 1 }
-		or skip_all 'This test requires module JSON::MaybeXS';
-}
+use Bitcoin::Crypto qw(btc_transaction btc_utxo);
+use Bitcoin::Crypto::Transaction::Output;
+use Bitcoin::Crypto::Script::Runner;
 
 use lib 't/lib';
 use BitcoinCoreTest;
 
-# test data from Bitcoin Core, mentioned in
-# https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki#test-vectors
-#
-# test data was prepared as follows:
-# - tests with pre-taproot serialization rules were adjusted or truncated
-# - flags and final flag was truncated from each test to save space
+my $case_name = 'taproot';
 
-BitcoinCoreTest::test_validation('taproot');
+my $data = get_file_data($case_name);
+
+my $script_runner = Bitcoin::Crypto::Script::Runner->new;
+foreach my $case_ind (0 .. $#$data)
+{
+	my $case = $data->[$case_ind];
+
+	subtest "should pass $case_name index $case_ind ($case->{comment})" => sub {
+		my $tx = btc_transaction->from_serialized([hex => $case->{tx}]);
+
+		my @last_outputs =
+			map { Bitcoin::Crypto::Transaction::Output->from_serialized([hex => $_]) } @{$case->{prevouts}};
+		foreach my $input (@{$tx->inputs}) {
+			btc_utxo->new(
+				txid => $input->utxo_location->[0],
+				output_index => $input->utxo_location->[1],
+				output => shift @last_outputs,
+			)->register;
+		}
+
+		$script_runner->set_transaction($tx);
+		$script_runner->set_flags(get_flags $case->{flags});
+		my $index = $case->{index};
+		my $input = $tx->inputs->[$index];
+
+		foreach my $sub_case ([!!1, $case->{success}], [!!0, $case->{failure}]) {
+			my ($success, $sub_case_data) = @$sub_case;
+			next unless $sub_case_data;
+
+			$input->set_signature_script([hex => $sub_case_data->{scriptSig}]);
+			$input->set_witness([map { [hex => $_] } @{$sub_case_data->{witness}}]);
+
+			if ($success) {
+				ok lives { $tx->verify_script($index, $script_runner) }, 'success case ok';
+			}
+			else {
+				my $ex = dies { $tx->verify_script($index, $script_runner) };
+				isa_ok $ex, 'Bitcoin::Crypto::Exception::Transaction';
+			}
+		}
+	};
+}
 
 done_testing;

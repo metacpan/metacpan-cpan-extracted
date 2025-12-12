@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Locker::Flock;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Locker';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x error fault warning/ ];
 
 use Fcntl         qw/:DEFAULT :flock/;
 use Errno         qw/EAGAIN/;
@@ -46,11 +48,11 @@ sub lock()
 	my $folder = $self->folder;
 
 	! $self->hasLock
-		or $self->log(WARNING => "Folder $folder already flocked."), return 1;
+		or warning(__x"folder {name} already flocked.", name => $folder), return 1;
 
 	my $filename = $self->filename;
 	open my $fh, $lockfile_access_mode, $filename
-		or $self->log(ERROR => "Unable to open flock file $filename for $folder: $!"), return 0;
+		or fault __x"unable to open flock file {file} for {folder}", file => $filename, folder => $folder;
 
 	my $timeout = $self->timeout;
 	my $end     = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
@@ -62,7 +64,7 @@ sub lock()
 		}
 
 		$! == EAGAIN
-			or $self->log(ERROR => "Will never get a flock on $filename for $folder: $!"), last;
+			or fault __x"will never get a flock on {file} for {folder}", file => $filename, folder => $folder;
 
 		--$end or last;
 		sleep 1;
@@ -76,12 +78,8 @@ sub isLocked()
 {	my $self     = shift;
 	my $filename = $self->filename;
 
-	open my($fh), $lockfile_access_mode, $filename;
-	unless($fh)
-	{	my $folder = $self->folder;
-		$self->log(ERROR => "Unable to check lock file $filename for $folder: $!");
-		return 0;
-	}
+	open my($fh), $lockfile_access_mode, $filename
+		or fault __x"unable to check lock file {file} for {folder}", file => $filename, folder => $self->folder;
 
 	$self->_try_lock($fh) or return 0;
 	$self->_unlock($fh);

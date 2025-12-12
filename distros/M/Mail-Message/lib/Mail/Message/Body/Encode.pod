@@ -265,29 +265,29 @@ C<undef> if there is no such handler.
 
 =over 4
 
-=item Warning: Charset $name is not known
+=item Warning: Content-Transfer-Encoding '$te' requires explicit charset, defaulted to utf-8.
+
+Cast by C<encode()>
+
+=item Warning: charset '$name' is not known.
 
 The encoding or decoding of a message body encounters a character set which
 is not understood by Perl's Encode module.
 Cast by C<encode()>
 
-=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
-
-Cast by C<encode()>
-
-=item Warning: No decoder defined for transfer encoding $name.
+=item Warning: no decoder defined for transfer encoding '$encoding'.
 
 The data (message body) is encoded in a way which is not currently understood,
 therefore no decoding (or recoding) can take place.
 Cast by C<encode()>
 
-=item Warning: No encoder defined for transfer encoding $name.
+=item Warning: no encoder defined for transfer encoding '$encoding'.
 
 The data (message body) has been decoded, but the required encoding is
 unknown.  The decoded data is returned.
 Cast by C<encode()>
 
-=item Warning: Unknown line terminator $eol ignored
+=item Error: unknown line terminator '$eol'.
 
 Cast by C<eol()>
 
@@ -295,8 +295,8 @@ Cast by C<eol()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

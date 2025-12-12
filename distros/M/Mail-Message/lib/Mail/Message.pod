@@ -58,10 +58,6 @@ the messages in mailboxes (folders) is implemented in this class.  Methods
 which are related to folders is implemented in the L<Mail::Box::Message|Mail::Box::Message>
 extension.
 
-B<This is a maintenance release for the old interface>.  Read
-F<https://github.com/markov2/perl5-Mail-Box/wiki/> how
-to move towards version 4.
-
 The main methods are L<get()|Mail::Message/"The header">, to get information from a message header
 field, and L<decoded()|Mail::Message/"The body"> to get the intended content of a message.
 But there are many more which can assist your program.
@@ -137,19 +133,17 @@ because the header fields can be updated, for instance when labels change.
 
 Inherited, see L<Mail::Reporter/"Constructors">
 
- -Option    --Defined in     --Default
-  body                         undef
-  body_type                    Mail::Message::Body::Lines
-  deleted                      false
-  field_type                   undef
-  head                         undef
-  head_type                    Mail::Message::Head::Complete
-  labels                       +{}
-  log         Mail::Reporter   'WARNINGS'
-  messageId                    undef
-  modified                     false
-  trace       Mail::Reporter   'WARNINGS'
-  trusted                      false
+ -Option    --Default
+  body        undef
+  body_type   Mail::Message::Body::Lines
+  deleted     false
+  field_type  undef
+  head        undef
+  head_type   Mail::Message::Head::Complete
+  labels      +{}
+  messageId   undef
+  modified    false
+  trusted     false
 
 =over 2
 
@@ -179,14 +173,13 @@ of L<Mail::Message::Head|Mail::Message::Head>. See also L<head()|Mail::Message/"
 
 Default type of head to be created for L<readHead()|Mail::Message/"Internals">.
 
-=item labels => ARRAY|HASH
+=item labels => \@pairs|\%settings
 
-Initial values of the labels.  In case of L<Mail::Box::Message|Mail::Box::Message>'s, this
-shall reflect the state the message is in.  For newly constructed
-L<Mail::Message|Mail::Message>'s, this may be anything you want, because L<coerce()|Mail::Message/"Internals">
-will take care of the folder specifics once the message is added to one.
-
-=item log => LEVEL
+Initial C<%settings> of the labels.  In case of L<Mail::Box::Message|Mail::Box::Message> type
+objectss, this shall reflect the state the message is in inside the
+folder.  For newly constructed L<Mail::Message|Mail::Message> objectss, this may be
+anything you want, because L<coerce()|Mail::Message/"Internals"> will take care of the folder
+specifics once the message is added to one.
 
 =item messageId => $id
 
@@ -201,8 +194,6 @@ Flags this message as being modified from the beginning on.  Usually,
 modification is auto-detected, but there may be reasons to be extra
 explicit.
 
-=item trace => LEVEL
-
 =item trusted => BOOLEAN
 
 Is this message from a trusted source?  If not, the content must be
@@ -216,14 +207,6 @@ body data is decoded or used for transmission.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 Constructing a message
 
@@ -273,7 +256,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|$text|\$text|\@lines, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -285,7 +268,7 @@ Inherited, see L<Mail::Message::Construct::Rebuild/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|ARRAY-$of-$things] )
+=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|\@addrs|\@fields] )
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -799,7 +782,7 @@ between these fields and the labels in the DETAILS chapter.
 The method will carefully only affect the result of L<modified()|Mail::Message/"Flags"> when
 there is a real change of flags, so not for each call to L<label()|Mail::Message/"Flags">.
 
-=item $obj-E<gt>B<modified>( [$flag] )
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
 
 Returns (optionally after setting) whether this message is flagged as
 being modified.  See isModified().
@@ -950,35 +933,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Message::Construct/"METHODS">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -993,14 +948,6 @@ and Kilobytes).  Without C<$value>, the size of the message head is used.
 Convert the message header to a short string (without trailing newline),
 representing the most important facts (for debugging purposes only).  For
 now, it only reports size and subject.
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =back
 
@@ -1226,18 +1173,6 @@ Mbox folders have no special means of storing information about messages
 adding fields to the message header when something special comes up.
 This feature is also enabled for POP3, although whether that works
 depends on the POP server.
-A mail user agent (MUA) will set this flag when the user has opened the
-message once.
-
-=back
-
-=head3 Status and X-Status fields
-
-Mbox folders have no special means of storing information about messages
-(except the message separator line), and therefore have to revert to
-adding fields to the message header when something special comes up.
-This feature is also enabled for POP3, although whether that works
-depends on the POP server.
 
 All applications which can handle mbox folders support the C<Status> and
 C<X-Status> field convensions.  The following encoding is used:
@@ -1256,42 +1191,10 @@ it is closed.
 
 =over 4
 
-=item Error: Cannot coerce a $class object into a $class object
-
-Cast by C<coerce()>
-
-=item Error: Cannot include forward source as $include.
+=item Error: Cannot include forward source as $kind.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
-Cast by C<forward()>
-
-=item Error: Cannot include reply source as $include.
-
-Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
-choices are C<NO>, C<INLINE>, and C<ATTACH>.
-Cast by C<reply()>
-
-=item Error: Method bounce requires To, Cc, or Bcc
-
-The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
-else without modification; you must specified it's new destination.
-If you have the urge not to specify any destination, you probably
-are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
-L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
-Cast by C<bounce()>
-
-=item Error: Method forwardAttach requires a preamble
-
-Cast by C<forwardAttach()>
-
-=item Error: Method forwardEncapsulate requires a preamble
-
-Cast by C<forwardEncapsulate()>
-
-=item Error: No address to create forwarded to.
-
-If a forward message is created, a destination address must be specified.
 Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
@@ -1301,11 +1204,63 @@ find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
 Cast by C<send()>
 
-=item Error: No rebuild rule $name defined.
+=item Error: cannot coerce a $type object into a $me object.
+
+Cast by C<coerce()>
+
+=item Error: cannot include reply source as $kind.
+
+Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
+choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
+
+=item Error: cannot read message from a $source}.
+
+Cast by C<read()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: coercion starts with some object, not '$type'.
+
+Cast by C<coerce()>
+
+=item Error: method bounce requires To, Cc, or Bcc.
+
+The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
+else without modification; you must specified it's new destination.
+If you have the urge not to specify any destination, you probably
+are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
+L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
+
+=item Error: method forwardAttach requires a preamble.
+
+Cast by C<forwardAttach()>
+
+=item Error: method forwardEncapsulate requires a preamble.
+
+Cast by C<forwardEncapsulate()>
+
+=item Error: method forwardNo requires a To.
+
+Cast by C<forwardNo()>
+
+=item Error: method forwardNo requires a body.
+
+Cast by C<forwardNo()>
+
+=item Error: no rebuild rule $name defined.
 
 Cast by C<rebuild()>
 
-=item Error: Only build() Mail::Message's; they are not in a folder yet
+=item Error: only build() Mail::Message's; they are not in a folder yet.
 
 You may wish to construct a message to be stored in a some kind
 of folder, but you need to do that in two steps.  First, create a
@@ -1314,25 +1269,32 @@ L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get 
 into the right message type, adding storage information and the like.
 Cast by C<build()>
 
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: coercion starts with some object
+=item Error: please install Email::Simple.
 
 Cast by C<coerce()>
+
+=item Error: please install MIME::Entity.
+
+Cast by C<coerce()>
+
+=item Error: please install Mail::Internet.
+
+Cast by C<coerce()>
+
+=item Error: select parts via '$what'?
+
+Cast by C<parts()>
+
+=item Warning: skipped unknown key '$key' in build.
+
+Cast by C<build()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Head::Complete;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Head';
+use parent 'Mail::Message::Head';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x info trace warning/ ];
 
 use Mail::Box::Parser             ();
 use Mail::Message::Head::Partial  ();
@@ -29,7 +31,7 @@ use Sys::Hostname qw/hostname/;
 
 sub clone(;@)
 {	my $self   = shift;
-	my $copy   = ref($self)->new($self->logSettings);
+	my $copy   = (ref $self)->new;
 
 	$copy->addNoRealize($_->clone) for $self->grepNames(@_);
 	$copy->modified(1);
@@ -53,7 +55,7 @@ sub build(@)
 		defined $content or next;
 
 		if(ref $content && $content->isa('Mail::Message::Field'))
-		{	$self->log(WARNING => "Field objects have an implied name ($name)");
+		{	warning __x"field objects have an implied name ({name})", name => $name;
 			$self->add($content);
 			next;
 		}
@@ -86,27 +88,22 @@ sub add(@)
 	# Create object for this field.
 
 	my $field
-	= @_==1 && blessed $_[0] ? shift     # A fully qualified field is added.
-	: ($self->{MMH_field_type} || 'Mail::Message::Field::Fast')->new(@_);
+	  = @_==1 && blessed $_[0] ? shift     # A fully qualified field is added.
+	  : ($self->{MMH_field_type} // 'Mail::Message::Field::Fast')->new(@_);
 
-	return if !defined $field;
-
-	$field->setWrapLength;
+	defined $field or return;
 
 	# Put it in place.
 
+	$field->setWrapLength;
 	my $known = $self->{MMH_fields};
 	my $name  = $field->name;  # is already lower-cased
 
 	$self->addOrderedFields($field);
 
-	if(defined $known->{$name})
-	{	if(ref $known->{$name} eq 'ARRAY') { push @{$known->{$name}}, $field }
-		else { $known->{$name} = [ $known->{$name}, $field ] }
-	}
-	else
-	{	$known->{$name} = $field;
-	}
+	   if(! defined $known->{$name}) { $known->{$name} = $field }
+	elsif(ref $known->{$name} eq 'ARRAY') { push @{$known->{$name}}, $field }
+	else { $known->{$name} = [ $known->{$name}, $field ] }
 
 	$self->{MMH_modified}++;
 	$field;
@@ -116,10 +113,7 @@ sub add(@)
 sub count($)
 {	my $known = shift->{MMH_fields};
 	my $value = $known->{lc shift};
-
-	! defined $value ? 0
-	: ref $value       ? @$value
-	:                    1;
+	! defined $value ? 0 : ref $value ? @$value : 1;
 }
 
 
@@ -128,9 +122,9 @@ sub names() { $_[0]->knownNames }
 
 sub grepNames(@)
 {	my $self = shift;
+
 	my @take;
 	push @take, (ref $_ eq 'ARRAY' ? @$_ : $_) for @_;
-
 	@take or return $self->orderedFields;
 
 	my $take;
@@ -143,7 +137,7 @@ sub grepNames(@)
 		$take    = qr/^(?:(?:@take))/i;
 	}
 
-	grep { $_->name =~ $take } $self->orderedFields;
+	grep $_->name =~ $take, $self->orderedFields;
 }
 
 
@@ -154,7 +148,7 @@ sub set(@)
 {	my $self = shift;
 	@_!=1 || defined $_[0] or return;
 
-	my $type = $self->{MMH_field_type} || 'Mail::Message::Field::Fast';
+	my $type = $self->{MMH_field_type} // 'Mail::Message::Field::Fast';
 	$self->{MMH_modified}++;
 
 	# Create object for this field.
@@ -195,9 +189,7 @@ sub reset($@)
 	# removed from the ordered list: that's controled by 'weaken'
 
 	my @fields = map $_->clone, @_;
-
-	if(@_==1) { $known->{$name} = $fields[0] }
-	else      { $known->{$name} = [@fields]  }
+	$known->{$name} = @_==1 ? $fields[0] : \@fields;
 
 	$self->addOrderedFields(@fields);
 	$self;
@@ -225,9 +217,8 @@ sub removeField($)
 	{	return delete $known->{$name};
 	}
 
-	$self->log(WARNING => "Cannot remove field $name from header: not found.");
-
-	return;
+	warning __x"cannot remove field {name} from header: not found.";
+	undef;;
 }
 
 
@@ -267,7 +258,7 @@ sub removeSpamGroups(@)
 sub spamDetected()
 {	my $self = shift;
 	my @sgs = $self->spamGroups or return undef;
-	grep { $_->spamDetected } @sgs;
+	grep $_->spamDetected, @sgs;
 }
 
 

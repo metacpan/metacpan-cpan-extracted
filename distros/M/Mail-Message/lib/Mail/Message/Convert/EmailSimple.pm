@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,18 +10,19 @@
 
 
 package Mail::Message::Convert::EmailSimple;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Convert';
+use parent 'Mail::Message::Convert';
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
+
 use Mail::Internet  ();
 use Mail::Header    ();
 use Email::Simple   ();
-use Carp;
 
 use Mail::Message                 ();
 use Mail::Message::Head::Complete ();
@@ -30,10 +31,10 @@ use Mail::Message::Body::Lines    ();
 #--------------------
 
 sub export($@)
-{	my ($thing, $message) = (shift, shift);
+{	my ($thing, $message) = @_;
 
 	$message->isa('Mail::Message')
-		or croak "Export message must be a Mail::Message, but is a ".ref($message).".";
+		or error __x"export message must be a Mail::Message, but is a {class}.", class => ref $message;
 
 	Email::Simple->new($message->string);
 }
@@ -43,7 +44,7 @@ sub from($@)
 {	my ($thing, $email) = (shift, shift);
 
 	$email->isa('Email::Simple')
-		or croak "Converting from Email::Simple but got a ".ref($email).'.';
+		or error __x"converting from Email::Simple but got a {class}.", class => ref $email;
 
 	Mail::Message->read($email->as_string);
 }

@@ -63,11 +63,11 @@ $from_file = Object::Configure::instantiate(
 
 isa_ok($from_file, 'My::Dummy', 'Instantiated object with config file');
 is($from_file->{custom}, 'from_config_file', 'Custom param from config file');
+isa_ok($from_file->{logger}, 'Log::Abstraction', 'Logger configured via config file');
 
 TODO: {
 	local $TODO = 'Fails because of RT#166761';
 
-	isa_ok($from_file->{logger}, 'Log::Abstraction', 'Logger configured via config file');
 	is($from_file->{logger}->{file}, '/tmp/foo', 'Logger has setting from config');
 }
 

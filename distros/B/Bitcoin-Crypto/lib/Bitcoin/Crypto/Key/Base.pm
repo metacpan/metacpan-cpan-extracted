@@ -1,18 +1,15 @@
 package Bitcoin::Crypto::Key::Base;
-$Bitcoin::Crypto::Key::Base::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Key::Base::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard;
+use Types::Common -sigs;
 
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Util qw(to_format tagged_hash lift_x has_even_y);
+use Bitcoin::Crypto::Util::Internal qw(to_format tagged_hash lift_x has_even_y);
 use Bitcoin::Crypto::Helpers qw(ecc);
-
-use namespace::clean;
 
 has param 'taproot_output' => (
 	isa => Bool,
@@ -31,22 +28,12 @@ sub _is_private
 	die __PACKAGE__ . '::_is_private is unimplemented';
 }
 
-signature_for from_serialized => (
-	method => Str,
-	positional => [ByteStr],
-);
-
 sub from_serialized
 {
-	my ($class, $bytes) = @_;
+	my ($class, $data) = @_;
 
-	return $class->new(key_instance => $bytes);
+	return $class->new(_key_instance => $data);
 }
-
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
 
 sub to_serialized
 {
@@ -56,13 +43,15 @@ sub to_serialized
 }
 
 signature_for get_taproot_output_key => (
-	method => Object,
+	method => !!1,
 	positional => [Maybe [ByteStr], {default => undef}],
 );
 
 sub get_taproot_output_key
 {
 	my ($self, $tweak_suffix) = @_;
+
+	return $self if $self->taproot_output;
 
 	my $new_key;
 	if ($self->_is_private) {
@@ -82,7 +71,7 @@ sub get_taproot_output_key
 
 	my $pkg = ref $self;
 	return $pkg->new(
-		key_instance => $new_key,
+		_key_instance => $new_key,
 		purpose => $self->purpose,
 		network => $self->network,
 		taproot_output => !!1,

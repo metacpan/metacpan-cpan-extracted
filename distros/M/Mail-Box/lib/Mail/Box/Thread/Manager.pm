@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Thread::Manager;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Reporter';
@@ -18,18 +18,18 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
-use Carp;
-use Mail::Box::Thread::Node   ();
-use Mail::Message::Dummy      ();
-use Scalar::Util              qw/blessed/;
+use Log::Report             'mail-box', import => [ qw/__x error/ ];
+
+use Mail::Box::Thread::Node ();
+use Mail::Message::Dummy    ();
+use Scalar::Util            qw/blessed/;
 
 #--------------------
 
 sub init($)
 {	my ($self, $args) = @_;
-
 	$self->{MBTM_manager} = $args->{manager}
-		or croak "Need a manager to work with.";
+		or error __x"thread manager needs a folder manager to work with.";
 
 	$self->{MBTM_thread_body}= $args->{thread_body} // 0;
 	$self->{MBTM_thread_type}= $args->{thread_type} // 'Mail::Box::Thread::Node';
@@ -63,7 +63,7 @@ sub includeFolder(@)
 
 	foreach my $folder (@_)
 	{	blessed $folder && $folder->isa('Mail::Box')
-			or croak "Not a folder: $folder";
+			or error __x"attempt to include a none folder: {what UNKNOWN}.", what => $folder;
 
 		my $name = $folder->name;
 		next if exists $index->{$name};
@@ -82,7 +82,7 @@ sub removeFolder(@)
 
 	foreach my $folder (@_)
 	{	blessed $folder && $folder->isa('Mail::Box')
-			or croak "Not a folder: $folder";
+			or error __x"attempt to remove a none folder: {what UNKNOWN}.", what => $folder;
 
 		my $name = $folder->name;
 		delete $index->{$name} or next;
@@ -181,8 +181,8 @@ sub known()
 
 sub sortedKnown(;$$)
 {	my $self    = shift;
-	my $prepare = shift || sub {shift->startTimeEstimate||0};
-	my $compare = shift || sub {(shift) <=> (shift)};
+	my $prepare = shift || sub { $_[0]->startTimeEstimate || 0 };
+	my $compare = shift || sub { $_[0] <=> $_[1] };
 
 	# Special care for double keys.
 	my %value;
@@ -328,7 +328,7 @@ sub outThread($)
 	my $msgid = $message->messageId;
 	my $node  = $self->msgById($msgid) or return $message;
 
-	$node->{MBTM_messages} = [ grep {$_ ne $message} @{$node->{MBTM_messages}} ];
+	$node->{MBTM_messages} = [ grep $_ ne $message, @{$node->{MBTM_messages}} ];
 	$self;
 }
 

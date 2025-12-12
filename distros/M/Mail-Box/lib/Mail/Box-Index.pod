@@ -59,7 +59,6 @@ Only the HTML version of this manual page will list the sections.
       <li>L<Mail::Message::Field/Using study() field>
       <li>L<Mail::Message::Field/Using resent groups> (M<Mail::Message::Head::ResentGroup>)
       <li>L<Mail::Message::Head::ListGroup/Mailing list fields>
-      <li>L<Mail::Message::Head::SpamGroup/Spam fighting fields>
       </ul>
   <li>L<Mail::Message::Field/The field's data>
       <ul>
@@ -153,7 +152,6 @@ Only the HTML version of this manual page will list the sections.
   <li>Searching folders (M<Mail::Box::Search>)
       <ul>
       <li>scan header and body (M<Mail::Box::Search::Grep>)
-      <li>check for spam (M<Mail::Box::Search::SpamAssassin>) 
       </ul>
   <li>Managing messages located in folders (Mail::Box::Message)
   </ul>
@@ -257,8 +255,8 @@ Only the HTML version of this manual page will list the sections.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

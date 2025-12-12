@@ -4,7 +4,7 @@
       "Rutger Vos"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -67,5 +67,6 @@
       },
       "x_MailingList" : "mailto:bio-phylo@googlegroups.com"
    },
-   "version" : "v2.0.1"
+   "version" : "v2.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

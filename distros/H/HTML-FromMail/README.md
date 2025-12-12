@@ -11,6 +11,9 @@ This could be used to create web-mail clients.
 
 ## Installing
 
+**Be aware that version 4 is not fully compatible with releases pre-4**
+See <https://https://github.com/markov2/perl5-Mail-Box/wiki/>
+
 On github, you can find the processed version for each release.  But the
 better source is CPAN; to get it installed simply run:
 

@@ -4,12 +4,7 @@ require 5.016;
 
 use IO::Handle;
 
-my $VERSION = '3.020';
-
-# This is an attempt to automatically convert you configuration parameters.
-# More docs: https://github.com/markov2/perl5-OODoc/wiki/oodist-config
-
-# Use command 'oodist' to produce your whole software release.
+my $version = '4.00';
 my $git      = "https://github.com/markov2/perl5-Mail-Message";
 my $publish  = "../public_html/mail-message";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -52,14 +47,18 @@ my %oodist   = (
 		publish        => "$publish/raw",
 	},
 
-	generate => [ {
+	generate => [
+	  {
+		# Add real pod to the releases
 		format         => 'pod3',
 		podtail        => undef,
-	}, ],
+	  },
+ 	  # You may add HTML formatters here.
+ 		  # You may add exporter configurations here.
+	],
 );
 
 my %requires = (
-	'Carp'           => 0,
 	'Date::Format'   => 0,
 	'Date::Parse'    => 0,
 	'Encode'         => 2.26,
@@ -72,6 +71,7 @@ my %requires = (
 	'IO::Scalar'     => 0,
 	'IO::Lines'      => 0,
 	'List::Util'     => 0,
+	'Log::Report'    => '1.42',
 	'Mail::Address'  => 2.17,
 	'MIME::Base64'   => 0,
 	'MIME::QuotedPrint' => 0,
@@ -79,11 +79,12 @@ my %requires = (
 	'POSIX'          => 0,
 	'Scalar::Util'   => 1.13,
 	'Storable'       => 0,
+	'String::Print'  => 1.01,
 	'Sys::Hostname'  => 0,
 	'Time::HiRes'    => 1.51,
 	'Time::Zone'     => 0,
 	'URI'            => 1.23,
-	'User::Identity' => '1.02, <4.0',
+	'User::Identity' => '4.0',
 );
 
 # See README.md for uses
@@ -97,7 +98,7 @@ my %optional = (
 
 WriteMakefile
 	NAME       => 'Mail::Message',
-	VERSION    => $VERSION,
+	VERSION    => $version,
 	AUTHOR     => 'Mark Overmeer <markov@cpan.org>',
 	ABSTRACT   => 'Processing MIME messages',
 	LICENSE    => 'perl_5',

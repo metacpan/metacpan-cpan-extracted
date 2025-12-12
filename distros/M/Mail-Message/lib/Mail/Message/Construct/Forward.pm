@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,17 +10,19 @@
 
 
 package Mail::Message;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error info trace/ ];
+
 use Mail::Message::Body::Multipart ();
 use Mail::Message::Body::Nested    ();
 
-use Scalar::Util qw/blessed/;
+use Scalar::Util   qw/blessed/;
 
 #--------------------
 
@@ -43,16 +45,15 @@ sub forward(@)
 	return $self->forwardAttach(@_)      if $include eq 'ATTACH';
 	return $self->forwardEncapsulate(@_) if $include eq 'ENCAPSULATE';
 
-	$self->log(ERROR => 'Cannot include forward source as $include.');
+	error __x"cannot include forward source as {kind UNKNOWN}.", kind => $include;
 	undef;
 }
 
 
 sub forwardNo(@)
 {	my ($self, %args) = @_;
-
-	my $body = $args{body}
-		or $self->log(INTERNAL => "No body supplied for forwardNo()");
+	my $body = $args{body} or error __x"method forwardNo requires a body.";
+	my $to   = $args{To}   or error __x"method forwardNo requires a To.";
 
 	#
 	# Collect header info
@@ -66,10 +67,6 @@ sub forwardNo(@)
 	{	my @from = $self->to;
 		$from    = \@from if @from;
 	}
-
-	# To whom to send
-	my $to = $args{To}
-		or $self->log(ERROR => "No address to create forwarded to."), return;
 
 	# Create a subject
 	my $srcsub  = $args{Subject};
@@ -102,7 +99,7 @@ sub forwardNo(@)
 	# Ready
 
 	$self->label(passed => 1);
-	$self->log(PROGRESS => "Forward created from $origid");
+	trace "Forward created from $origid";
 	$forward;
 }
 
@@ -177,7 +174,7 @@ sub forwardAttach(@)
 	}
 
 	my $preamble = $args{preamble}
-		or $self->log(ERROR => 'Method forwardAttach requires a preamble'), return;
+		or error __x"method forwardAttach requires a preamble.";
 
 	my @parts = ($preamble, $body);
 	push @parts, $args{signature} if defined $args{signature};
@@ -191,7 +188,7 @@ sub forwardEncapsulate(@)
 {	my ($self, %args) = @_;
 
 	my $preamble = $args{preamble}
-		or $self->log(ERROR => 'Method forwardEncapsulate requires a preamble'), return;
+		or error __x"method forwardEncapsulate requires a preamble.";
 
 	my $nested   = Mail::Message::Body::Nested->new(nested => $self->clone);
 	my @parts    = ($preamble, $nested);

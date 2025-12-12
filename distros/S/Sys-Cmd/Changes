@@ -1,3 +1,32 @@
+v0.986.3 (2025-12-11)
+
+    API / Behaviour Changes:
+        - Make wait_child() return a boolean
+        - Convert abnormal() attribute to a generic status() one
+
+    Improvements:
+        - Minor documentation fix.
+
+v0.986.2 (2025-12-11)
+
+    Improvements:
+        - Minor documentation updates.
+
+v0.986.1 (2025-12-09) TRIAL RELEASE
+
+    API / Behaviour Changes:
+        - Deprecate the "subcmd" function and remove all documentation
+          references to the Sys::Cmd object.
+
+    Enhancement:
+        - New abnormal() status attribute for Processes.
+
+    Improvements:
+        - run: new optional \$exit ref for capturing the exit value
+        - Simplify Sys::Cmd::Process by refactoring much of it into
+          Sys::Cmd.
+        - Capture stdout and stderr using IO::Select to avoid blocking
+
 v0.986.0 (2025-12-04)
 
     Improvements:

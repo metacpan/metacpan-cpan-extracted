@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Tie::HASH;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Tie';
@@ -18,7 +18,7 @@ use parent 'Mail::Box::Tie';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x warning/ ];
 
 #--------------------
 
@@ -37,8 +37,8 @@ sub FETCH($) { $_[0]->folder->messageId($_[1]) }
 sub STORE($$)
 {	my ($self, $key, $basicmsg) = @_;
 
-	carp "Use undef as key, because the message-id of the message is used."
-		if defined $key && $key ne 'undef';
+	! defined $key || $key eq 'undef'
+		or warning __x"use undef as key, because the message-id of the message is used.";
 
 	$self->folder->addMessages($basicmsg);
 }
@@ -46,8 +46,6 @@ sub STORE($$)
 
 sub FIRSTKEY()
 {	my $self   = shift;
-	my $folder = $self->folder;
-
 	$self->{MBT_each_index} = 0;
 	$self->NEXTKEY();
 }

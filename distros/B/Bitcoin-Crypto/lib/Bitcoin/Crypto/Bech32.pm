@@ -1,14 +1,15 @@
 package Bitcoin::Crypto::Bech32;
-$Bitcoin::Crypto::Bech32::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Bech32::VERSION = '4.003';
+use v5.14;
 use warnings;
+
 use Exporter qw(import);
 use Types::Common -sigs, -types;
 
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Util qw(validate_segwit);
+use Bitcoin::Crypto::Util::Internal qw(validate_segwit);
 use Bitcoin::Crypto::Types -types;
+use Bitcoin::Crypto::Constants qw(:bech32);
 
 our @EXPORT_OK = qw(
 	translate_5to8
@@ -19,9 +20,6 @@ our @EXPORT_OK = qw(
 	decode_segwit
 	get_hrp
 );
-
-use constant BECH32 => 'bech32';
-use constant BECH32M => 'bech32m';
 
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
@@ -406,8 +404,8 @@ Encoding takes up to three arguments which are:
 be between 0 and 31)
 
 =item * optional type, which may be C<'bech32'> or C<'bech32m'> (also available
-in constant values Bitcoin::Crypto::Bech32::BECH32 and
-Bitcoin::Crypto::Bech32::BECH32M)
+in constant values L<Bitcoin::Crypto::Constants/BECH32> and
+L<Bitcoin::Crypto::Constants/BECH32M>)
 
 =back
 
@@ -443,22 +441,6 @@ data in bech32 strings, like so:
 	$hrp = get_hrp($address)
 
 Returns the human readable part encoded in the bech32 address.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception::Bech32> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * Bech32InputFormat - input was not suitable for bech32 operations due to invalid format
-
-=item * Bech32InputData - input was parsed with bech32 operations but contained invalid data
-
-=item * Bech32InputChecksum - checksum validation has failed
-
-=back
 
 =head1 SEE ALSO
 

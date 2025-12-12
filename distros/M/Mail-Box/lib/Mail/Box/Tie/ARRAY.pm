@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Tie::ARRAY;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Tie';
@@ -18,7 +18,8 @@ use parent 'Mail::Box::Tie';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
+
 use Scalar::Util   qw/blessed/;
 
 #--------------------
@@ -44,7 +45,7 @@ sub STORE($$)
 	my $folder = $self->folder;
 
 	$index == $folder->messages
-		or croak "Cannot simply replace messages in a folder: use delete old, then push new.";
+		or error __x"cannot simply replace messages in a folder: use delete old, then push new.";
 
 	$folder->addMessages($msg);
 	$msg;

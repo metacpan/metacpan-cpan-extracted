@@ -13,13 +13,13 @@ use Mail::Box;
 use Test::More;
 use File::Spec;
 
+use Log::Report;
+
 BEGIN
 {   if($windows)
     {   plan skip_all => "not available on MicroSoft Windows.";
         exit 0;
     }
-
-    plan tests => 7;
 }
 
 my $fakefolder = bless {MB_foldername=> 'this'}, 'Mail::Box';
@@ -46,13 +46,14 @@ ok(-f $lockfile);
 ok($locker->hasLock);
 
 # Already got lock, so should return immediately.
-my $warn = '';
-{  $SIG{__WARN__} = sub {$warn = "@_"};
-   $locker->lock;
-}
-ok($warn =~ m/already lockf/,                   'relock no problem');
+ok try(sub { $locker->lock }, hide => 'ALL'), 'relock no problem';
+my @e1 = $@->exceptions;
+cmp_ok @e1, '==', 1;
+like $e1[0]->message->toString, qr/already lockf/;
 
 $locker->unlock;
 ok(not $locker->hasLock);
 
 unlink $lockfile;
+
+done_testing;

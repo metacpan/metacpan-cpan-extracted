@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::IMAP4::Head;{
-our $VERSION = '3.010';
+our $VERSION = '4.000';
 }
 
 use base 'Mail::Message::Head';
@@ -18,7 +18,7 @@ use base 'Mail::Message::Head';
 use warnings;
 use strict;
 
-use Date::Parse;
+use Log::Report 'mail-box-imap4';
 
 #--------------------
 
@@ -54,9 +54,7 @@ sub get($;$)
 	{	$self->addNoRealize($_) for @fields
 	}
 
-	  defined $index ? $fields[$index]
-	: wantarray      ? @fields
-	:                  $fields[0];
+	defined $index ? $fields[$index] : wantarray ? @fields : $fields[0];
 }
 
 sub guessBodySize()  {undef}

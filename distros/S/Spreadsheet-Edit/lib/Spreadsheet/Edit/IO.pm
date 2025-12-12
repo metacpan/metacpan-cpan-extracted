@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.030'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-12-05'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -60,12 +60,12 @@ use Text::CSV ();
 # DDI 5.025 is needed for Windows-aware qsh()
 use Data::Dumper::Interp 5.025 qw/vis visq visO dvis dvisq dvisO ivis ivisq avis hvis qsh qshlist u visnew/;
 
-use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall oops/,
-                           ':btw=IO${lno}:';
+use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall oops :btw/;
 our %SpreadsheetEdit_Log_Options = (
   is_public_api => sub{
      $_[1][3] =~ /(?: ::|^ )(?: [a-z][^:]* | OpenAsCsv | ConvertSpreadsheet )$/x
   },
+  subst_pkg => "IO",
 );
 
 my $progname = path($0)->basename;

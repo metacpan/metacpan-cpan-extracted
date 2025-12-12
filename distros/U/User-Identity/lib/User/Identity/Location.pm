@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,20 +10,22 @@
 
 
 package User::Identity::Location;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Item';
+use parent 'User::Identity::Item';
 
 use strict;
 use warnings;
 
-use User::Identity;
-use Scalar::Util 'weaken';
+use Log::Report     'user-identity';
+
+use User::Identity  ();
+use Scalar::Util    qw/weaken/;
 
 #--------------------
 
-sub type { "location" }
+sub type { 'location' }
 
 
 sub init($)
@@ -79,9 +81,9 @@ sub organization() { $_[0]->{UIL_organization} }
 
 
 sub phone()
-{	my $self = shift;
-
+{	my $self  = shift;
 	my $phone = $self->{UIL_phone} or return ();
+
 	my @phone = ref $phone ? @$phone : $phone;
 	wantarray ? @phone : $phone[0];
 }
@@ -108,12 +110,9 @@ sub fullAddress()
 	defined $city && defined $address or return;
 
 	my $country = $self->country;
-	$country
-	  = defined $country ? "\n$country"
-	  : defined $cc      ? "\n".uc($cc)
-	  :   '';
+	$country    = defined $country ? "\n$country" : defined $cc ? "\n".uc($cc) : '';
 
-	if(defined $org) {$org .= "\n"} else {$org = ''};
+	$org       .= defined $org && length $org ? "\n" : '';
 
 	if($cc eq 'nl')
 	{	$pc = "$1 ".uc($2)."  " if defined $pc && $pc =~ m/(\d{4})\s*([a-zA-Z]{2})/;

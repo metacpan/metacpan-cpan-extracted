@@ -1,23 +1,34 @@
 package Bitcoin::Crypto::Util;
-$Bitcoin::Crypto::Util::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Util::VERSION = '4.003';
+use v5.14;
 use warnings;
 use Exporter qw(import);
-use Unicode::Normalize;
-use Crypt::KeyDerivation qw(pbkdf2);
-use Encode qw(encode);
-use Crypt::Digest::RIPEMD160 qw(ripemd160);
-use Crypt::Digest::SHA256 qw(sha256);
-use Bitcoin::BIP39 qw(gen_bip39_mnemonic entropy_to_bip39_mnemonic);
-use Try::Tiny;
-use Scalar::Util qw(blessed);
 use Types::Common -sigs, -types;
 
 use Bitcoin::Crypto::Helpers qw(parse_formatdesc ecc);
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Constants qw(:key :witness);
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
+
+use Bitcoin::Crypto::Util::Internal qw(
+	validate_segwit
+	get_address_type
+	get_key_type
+	get_public_key_compressed
+	generate_mnemonic
+	get_path_info
+	from_format
+	to_format
+	pack_compactsize
+	unpack_compactsize
+	hash160
+	hash256
+	merkle_root
+	tagged_hash
+	lift_x
+	has_even_y
+	get_taproot_ext
+);
 
 our @EXPORT_OK = qw(
 	validate_wif
@@ -45,231 +56,70 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 signature_for validate_wif => (
-	positional => [Str],
+	positional => [BitcoinSecret],
 );
 
 sub validate_wif
 {
-	my ($wif) = @_;
+	my ($secret) = @_;
+	state $inner_sig = signature(positional => [ByteStr]);
 
-	require Bitcoin::Crypto::Base58;
-	my $byte_wif = Bitcoin::Crypto::Base58::decode_base58check($wif);
-
-	my $last_byte = substr $byte_wif, -1;
-	if (length $byte_wif == Bitcoin::Crypto::Constants::key_max_length + 2) {
-		return $last_byte eq Bitcoin::Crypto::Constants::wif_compressed_byte;
-	}
-	else {
-		return length $byte_wif == Bitcoin::Crypto::Constants::key_max_length + 1;
-	}
+	return $secret->unmask_to(
+		sub {
+			return Bitcoin::Crypto::Util::Internal::validate_wif($inner_sig->(@_));
+		}
+	);
 }
 
 signature_for validate_segwit => (
 	positional => [ByteStr],
 );
 
-sub validate_segwit
-{
-	my ($program) = @_;
-
-	my $version = unpack 'C', $program;
-	Bitcoin::Crypto::Exception::SegwitProgram->raise(
-		'incorrect witness program version ' . ($version // '[null]')
-	) unless defined $version && $version >= 0 && $version <= Bitcoin::Crypto::Constants::max_witness_version;
-
-	$program = substr $program, 1;
-
-	# common validator
-	Bitcoin::Crypto::Exception::SegwitProgram->raise(
-		'incorrect witness program length'
-	) unless length $program >= 2 && length $program <= 40;
-
-	if ($version == 0) {
-
-		# SegWit validator
-		Bitcoin::Crypto::Exception::SegwitProgram->raise(
-			'incorrect witness program length (segwit)'
-		) unless length $program == 20 || length $program == 32;
-	}
-	elsif ($version == 1) {
-
-		# Taproot validator
-
-		# taproot outputs are 32 bytes, but other lengths "remain unencumbered"
-		# do not throw this exception to make bip350 test suite pass (10-Bech32.t)
-
-		# Bitcoin::Crypto::Exception::SegwitProgram->raise(
-		# 	'incorrect witness program length (taproot)'
-		# ) unless length $program == 32;
-	}
-
-	return $version;
-}
-
 signature_for get_address_type => (
 	positional => [Str, Maybe [Str], {default => undef}],
 );
-
-sub get_address_type
-{
-	my ($address, $network_id) = @_;
-
-	require Bitcoin::Crypto::Base58;
-	require Bitcoin::Crypto::Bech32;
-	require Bitcoin::Crypto::Network;
-
-	my $network = Bitcoin::Crypto::Network->get($network_id // ());
-	my $type;
-
-	# first, try segwit
-	if ($network->supports_segwit) {
-		try {
-			Bitcoin::Crypto::Exception::SegwitProgram->raise(
-				'invalid human readable part in address'
-			) unless Bitcoin::Crypto::Bech32::get_hrp($address) eq $network->segwit_hrp;
-
-			my $data = Bitcoin::Crypto::Bech32::decode_segwit($address);
-			my $version = ord substr $data, 0, 1, '';
-
-			$type = 'P2TR'
-				if $version == Bitcoin::Crypto::Constants::taproot_witness_version
-				&& length $data == 32;
-
-			return if $type;
-
-			Bitcoin::Crypto::Exception::SegwitProgram->raise(
-				"invalid segwit address of version $version"
-			) unless $version == Bitcoin::Crypto::Constants::segwit_witness_version;
-
-			$type = 'P2WPKH' if length $data == 20;
-			$type = 'P2WSH' if length $data == 32;
-
-			return if $type;
-
-			Bitcoin::Crypto::Exception::Address->raise(
-				'invalid segwit address'
-			);
-		}
-		catch {
-			die $_ unless blessed $_ && $_->isa('Bitcoin::Crypto::Exception::Bech32InputFormat');
-		};
-
-		return $type if $type;
-	}
-
-	# then, try legacy
-	try {
-		my $data = Bitcoin::Crypto::Base58::decode_base58check($address);
-		my $byte = substr $data, 0, 1, '';
-
-		$type = 'P2PKH' if $byte eq $network->p2pkh_byte;
-		$type = 'P2SH' if $byte eq $network->p2sh_byte;
-
-		Bitcoin::Crypto::Exception::Address->raise(
-			'invalid legacy address'
-		) unless length $data == 20;
-
-		return if $type;
-
-		Bitcoin::Crypto::Exception::Address->raise(
-			'invalid first byte in address'
-		);
-	}
-	catch {
-		die $_ unless blessed $_ && $_->isa('Bitcoin::Crypto::Exception::Base58InputFormat');
-	};
-
-	return $type if $type;
-	Bitcoin::Crypto::Exception::Address->raise(
-		"not an address: $address"
-	);
-}
 
 signature_for get_key_type => (
 	positional => [ByteStr],
 );
 
-sub get_key_type
-{
-	my ($entropy) = @_;
-
-	return 0 if defined get_public_key_compressed($entropy);
-	return 1
-		if length $entropy <= Bitcoin::Crypto::Constants::key_max_length;
-	return undef;
-}
-
 signature_for get_public_key_compressed => (
 	positional => [ByteStr],
 );
 
-sub get_public_key_compressed
-{
-	my ($entropy) = @_;
-
-	my $curve_size = Bitcoin::Crypto::Constants::key_max_length;
-	my $octet = substr $entropy, 0, 1;
-
-	my $has_unc_oc = $octet eq "\x04" || $octet eq "\x06" || $octet eq "\x07";
-	my $is_unc = $has_unc_oc && length $entropy == 2 * $curve_size + 1;
-
-	my $has_com_oc = $octet eq "\x02" || $octet eq "\x03";
-	my $is_com = $has_com_oc && length $entropy == $curve_size + 1;
-
-	return 1 if $is_com;
-	return 0 if $is_unc;
-	return undef;
-}
-
 signature_for mnemonic_to_seed => (
-	positional => [Str, Maybe [Str], {default => undef}],
+	positional => [BitcoinSecret, Maybe [BitcoinSecret], {default => undef}],
 );
 
 sub mnemonic_to_seed
 {
-	my ($mnemonic, $password) = @_;
+	my ($secret_mnemonic, $secret_password) = @_;
 
-	$mnemonic = encode('UTF-8', NFKD($mnemonic));
-	$password = encode('UTF-8', NFKD('mnemonic' . ($password // '')));
+	my $mnemonic = $secret_mnemonic->unmask_to(sub { shift });
+	my $password = $secret_password
+		? $secret_password->unmask_to(sub { shift })
+		: undef;
 
-	return pbkdf2($mnemonic, $password, 2048, 'SHA512', 64);
+	return Bitcoin::Crypto::Util::Internal::mnemonic_to_seed($mnemonic, $password);
 }
 
 signature_for generate_mnemonic => (
 	positional => [PositiveInt, {default => 128}, Str, {default => 'en'}],
 );
 
-sub generate_mnemonic
-{
-	my ($len, $lang) = @_;
-	my ($min_len, $len_div, $max_len) = (128, 32, 256);
-
-	# bip39 specification values
-	Bitcoin::Crypto::Exception::MnemonicGenerate->raise(
-		"required entropy of between $min_len and $max_len bits, divisible by $len_div"
-	) if $len < $min_len || $len > $max_len || $len % $len_div != 0;
-
-	return Bitcoin::Crypto::Exception::MnemonicGenerate->trap_into(
-		sub {
-			my $ret = gen_bip39_mnemonic(bits => $len, language => $lang);
-			$ret->{mnemonic};
-		}
-	);
-}
-
 signature_for mnemonic_from_entropy => (
-	positional => [ByteStr, Str, {default => 'en'}],
+	positional => [BitcoinSecret, Str, {default => 'en'}],
 );
 
 sub mnemonic_from_entropy
 {
-	my ($entropy, $lang) = @_;
+	my ($secret_entropy, $language) = @_;
+	state $inner_sig = signature(positional => [ByteStr]);
 
-	return Bitcoin::Crypto::Exception::MnemonicGenerate->trap_into(
+	return $secret_entropy->unmask_to(
 		sub {
-			entropy_to_bip39_mnemonic(
-				entropy => $entropy,
-				language => $lang
+			return Bitcoin::Crypto::Util::Internal::mnemonic_from_entropy(
+				$inner_sig->(@_), $language
 			);
 		}
 	);
@@ -279,234 +129,37 @@ signature_for get_path_info => (
 	positional => [Defined],
 );
 
-sub get_path_info
-{
-	my ($path) = @_;
-
-	# NOTE: ->coerce may still throw because of exceptions in from_string of DerivationPath
-	return scalar try {
-		DerivationPath->assert_coerce($path);
-	};
-}
-
-# use signature, not signature_for, because of the prototype
-sub from_format ($)
-{
-	state $sig = signature(positional => [Tuple [FormatStr, Str]]);
-	my ($format, $data) = @{($sig->(@_))[0]};
-
-	return parse_formatdesc($format, $data);
-}
-
-# use signature, not signature_for, because of the prototype
-sub to_format ($)
-{
-	state $sig = signature(positional => [Tuple [FormatStr, ByteStr]]);
-	my ($format, $data) = @{($sig->(@_))[0]};
-
-	return parse_formatdesc($format, $data, 1);
-}
-
 signature_for pack_compactsize => (
 	positional => [PositiveOrZeroInt],
 );
-
-sub pack_compactsize
-{
-	my ($value) = @_;
-
-	if ($value <= 0xfc) {
-		return pack 'C', $value;
-	}
-	elsif ($value <= 0xffff) {
-		return "\xfd" . pack 'v', $value;
-	}
-	elsif ($value <= 0xffffffff) {
-		return "\xfe" . pack 'V', $value;
-	}
-	else {
-		# 32 bit archs should not reach this
-		return "\xff" . (pack 'V', $value & 0xffffffff) . (pack 'V', $value >> 32);
-	}
-}
 
 signature_for unpack_compactsize => (
 	positional => [ByteStr, Maybe [ScalarRef [PositiveOrZeroInt]], {default => undef}],
 );
 
-sub unpack_compactsize
-{
-	my ($stream, $pos_ref) = @_;
-	my $partial = !!$pos_ref;
-	my $pos = $partial ? $$pos_ref : 0;
-
-	# if the first byte is 0xfd, 0xfe or 0xff, then CompactSize contains 2, 4 or 8
-	# bytes respectively
-	my $value = ord substr $stream, $pos++, 1;
-	if ($value > 0xfc) {
-		my $length = 1 << ($value - 0xfc);
-
-		Bitcoin::Crypto::Exception->raise(
-			"cannot unpack CompactSize: not enough data in stream"
-		) if length $stream < $length;
-
-		if ($length == 2) {
-			$value = unpack 'v', substr $stream, $pos, 2;
-		}
-		elsif ($length == 4) {
-			$value = unpack 'V', substr $stream, $pos, 4;
-		}
-		else {
-			Bitcoin::Crypto::Exception->raise(
-				"cannot unpack CompactSize: no 64 bit support"
-			) if !Bitcoin::Crypto::Constants::is_64bit;
-
-			my $lower = unpack 'V', substr $stream, $pos, 4;
-			my $higher = unpack 'V', substr $stream, $pos + 4, 4;
-			$value = ($higher << 32) + $lower;
-		}
-
-		$pos += $length;
-	}
-
-	if ($partial) {
-		$$pos_ref = $pos;
-	}
-	else {
-		Bitcoin::Crypto::Exception->raise(
-			"cannot unpack CompactSize: leftover data in stream"
-		) unless $pos == length $stream;
-	}
-
-	return $value;
-}
-
 signature_for hash160 => (
 	positional => [ByteStr],
 );
-
-sub hash160
-{
-	my ($data) = @_;
-
-	return ripemd160(sha256($data));
-}
 
 signature_for hash256 => (
 	positional => [ByteStr],
 );
 
-sub hash256
-{
-	my ($data) = @_;
-
-	return sha256(sha256($data));
-}
-
 signature_for merkle_root => (
 	positional => [ArrayRef [ByteStr]],
 );
-
-sub merkle_root
-{
-	my ($leaves) = @_;
-
-	# avoid checking bytestrings in (possibly very numerous) hash256 calls
-	local $Bitcoin::Crypto::Types::CHECK_BYTESTRINGS = !!0;
-
-	my @parts = map { hash256($_) } @$leaves;
-
-	Bitcoin::Crypto::Exception->raise(
-		'need at least one element to calculate a merkle root'
-	) unless @parts;
-
-	while (@parts > 1) {
-		@parts = map {
-			hash256($parts[$_] . ($parts[$_ + 1] // $parts[$_]))
-		} grep {
-			$_ % 2 == 0
-		} 0 .. $#parts;
-	}
-
-	return $parts[0];
-}
 
 signature_for tagged_hash => (
 	positional => [Str, ByteStr],
 );
 
-sub tagged_hash
-{
-	my ($tag, $message) = @_;
-
-	my $partial = sha256(encode 'UTF-8', $tag);
-	return sha256($partial . $partial . $message);
-}
-
 signature_for lift_x => (
 	positional => [ByteStr],
 );
 
-sub lift_x
-{
-	my ($x) = @_;
-
-	my $key = "\x02" . $x;
-	Bitcoin::Crypto::Exception::KeyCreate->raise(
-		'invalid xonly public key'
-	) unless ecc->verify_public_key($key);
-
-	return $key;
-}
-
 signature_for has_even_y => (
 	positional => [ByteStr | InstanceOf ['Bitcoin::Crypto::Key::Public']],
 );
-
-sub has_even_y
-{
-	my ($key) = @_;
-	$key = $key->raw_key if ref $key;
-
-	return Bitcoin::Crypto::Exception->trap_into(
-		sub {
-			$key = ecc->compress_public_key($key);
-			return substr($key, 0, 1) eq "\x02";
-		}
-	);
-}
-
-signature_for get_taproot_ext => (
-	positional => [PositiveOrZeroInt, HashRef, {slurpy => !!1}],
-);
-
-sub get_taproot_ext
-{
-	my ($ext_flag, $args) = @_;
-
-	if ($ext_flag == 0) {
-		return '';
-	}
-	elsif ($ext_flag == 1) {
-		state $type = Dict [
-			script_tree => BitcoinScriptTree,
-			leaf_id => Int,
-			codesep_pos => Optional [Maybe [PositiveOrZeroInt]],
-		];
-
-		$type->assert_valid($args);
-
-		# https://github.com/bitcoin/bips/blob/master/bip-0342.mediawiki#common-signature-message-extension
-		return $args->{script_tree}->get_tapleaf_hash($args->{leaf_id})
-			. "\x00"
-			. pack('V', $args->{codesep_pos} // 0xffffffff);
-	}
-	else {
-		Bitcoin::Crypto::Exception->raise(
-			"can not create taproot_ext for unknown ext flag $ext_flag"
-		);
-	}
-}
 
 1;
 
@@ -549,10 +202,12 @@ part of other, more specialized packages.
 
 =head2 validate_wif
 
-	$is_wif = validate_wif($str)
+	$is_wif = validate_wif($wif)
 
 Ensures Base58 encoded string looks like encoded private key in WIF format.
-Throws an exception if C<$str> is not valid base58.
+Throws an exception if C<$wif> is not valid base58.
+
+This method accepts a secret argument. See L<Bitcoin::Crypto::Secret> for details.
 
 =head2 validate_segwit
 
@@ -621,9 +276,9 @@ L<Bytes::Random::Secure> in non-blocking mode (via the OO interface).
 
 =head2 mnemonic_from_entropy
 
-	$mnemonic = mnemonic_from_entropy($bytes, $lang = 'en')
+	$mnemonic = mnemonic_from_entropy($entropy, $lang = 'en')
 
-Generates a new mnemonic code from custom entropy given in C<$bytes> (a
+Generates a new mnemonic code from custom entropy given in C<$entropy> (a
 bytestring). This entropy should be of the same bit size as in
 L</"generate_mnemonic">. Returns newly generated BIP39 mnemonic string.
 
@@ -638,6 +293,8 @@ Be aware that the method you use to generate a mnemonic will be a very
 important factor in your key's security. If possible, use real sources of
 randomness (not pseudo-random) or a cryptographically secure pseduo-random
 number generator like the one used by L<Bytes::Random::Secure>.
+
+This method accepts a secret argument. See L<Bitcoin::Crypto::Secret> for details.
 
 =head2 mnemonic_to_seed
 
@@ -661,6 +318,8 @@ it or not. This will only become a problem if you use non-ascii mnemonic and/or
 password. If there's a possibility of non-ascii, always use utf8 and set
 binmodes to get decoded (wide) characters to avoid problems recovering your
 wallet.
+
+This method accepts a secret argument. See L<Bitcoin::Crypto::Secret> for details.
 
 =head2 get_path_info
 

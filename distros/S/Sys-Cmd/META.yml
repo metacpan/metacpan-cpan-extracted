@@ -1,5 +1,5 @@
 ---
-abstract: 'run a system command or spawn a system processes'
+abstract: 'Run a system command or spawn a process'
 author:
   - 'Mark Lawrence <mark@rekudos.net>'
 build_requires:
@@ -24,8 +24,6 @@ no_index:
   directory:
     - t
     - inc
-  package:
-    - Sys::Cmd::Process
 requires:
   Carp: '0'
   Encode: '0'
@@ -41,5 +39,5 @@ resources:
   bugtracker: https://github.com/mlawren/p5-Sys-Cmd/issues
   homepage: https://github.com/mlawren/p5-Sys-Cmd
   repository: ssh://git@github.com/mlawren/p5-Sys-Cmd.git
-version: v0.986.0
+version: v0.986.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

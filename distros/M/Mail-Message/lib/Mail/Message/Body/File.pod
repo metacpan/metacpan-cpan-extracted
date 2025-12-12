@@ -10,6 +10,9 @@ Mail::Message::Body::File - body of a message temporarily stored in a file
    is a Mail::Message::Body
    is a Mail::Reporter
 
+   Mail::Message::Body also extends Mail::Reporter
+   is a Mail::Reporter
+
 =head1 SYNOPSIS
 
   See Mail::Message::Body
@@ -79,48 +82,42 @@ Inherited, see L<Mail::Message::Body/"Constructors">
   file               Mail::Message::Body  undef
   filename           Mail::Message::Body  undef
   language           Mail::Message::Body  undef
-  log                Mail::Reporter       'WARNINGS'
   message            Mail::Message::Body  undef
   mime_type          Mail::Message::Body  'text/plain'
-  modified           Mail::Message::Body  <C<false>>
-  trace              Mail::Reporter       'WARNINGS'
+  modified           Mail::Message::Body  false
   transfer_encoding  Mail::Message::Body  'none'
 
 =over 2
 
-=item based_on => BODY
+=item based_on => $body
 
-=item charset => CHARSET|'PERL'|<undef>
+=item charset => $charset|'PERL'|<undef>
 
 =item checked => BOOLEAN
 
 =item content_id => STRING
 
-=item data => ARRAY-OF-LINES | STRING
+=item data => \@lines|$text
 
-=item description => STRING|FIELD
+=item description => STRING|$field
 
-=item disposition => STRING|FIELD
+=item disposition => STRING|$field
 
 =item eol => 'CR'|'LF'|'CRLF'|'NATIVE'
 
-=item file => FILENAME|FILEHANDLE|IOHANDLE
+=item file => $file|$handle|$io
 
-=item filename => FILENAME
+=item filename => $file
 
-=item language => STRING|ARRAY|LIST|FIELD
+=item language => STRING|\@lang|$field
 
-=item log => LEVEL
+=item message => $message
 
-=item message => MESSAGE
-
-=item mime_type => STRING|FIELD|MIME
+=item mime_type => STRING|$field|$mime
 
 =item modified => BOOLEAN
 
-=item trace => LEVEL
-
-=item transfer_encoding => STRING|FIELD
+=item transfer_encoding => STRING|$field
 
 =back
 
@@ -135,10 +132,6 @@ Extends L<"Attributes" in Mail::Message::Body|Mail::Message::Body/"Attributes">.
 =item $obj-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
 
 Inherited, see L<Mail::Message::Body::Encode/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
@@ -304,7 +297,7 @@ Inherited, see L<Mail::Message::Body/"Access to the payload">
 
 Inherited, see L<Mail::Message::Body/"Access to the payload">
 
-=item $obj-E<gt>B<print>( [$fh] )
+=item $obj-E<gt>B<print>()
 
 Inherited, see L<Mail::Message::Body/"Access to the payload">
 
@@ -360,7 +353,7 @@ Inherited, see L<Mail::Message::Body/"Internals">
 
 Inherited, see L<Mail::Message::Body/"Internals">
 
-=item $obj-E<gt>B<modified>( [$flag] )
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
 
 Inherited, see L<Mail::Message::Body/"Internals">
 
@@ -368,7 +361,7 @@ Inherited, see L<Mail::Message::Body/"Internals">
 
 Inherited, see L<Mail::Message::Body/"Internals">
 
-=item $obj-E<gt>B<read>( $parser, $head, $bodytype, [$chars, [$lines]] )
+=item $obj-E<gt>B<read>()
 
 Inherited, see L<Mail::Message::Body/"Internals">
 
@@ -388,43 +381,11 @@ Extends L<"Error handling" in Mail::Message::Body|Mail::Message::Body/"Error han
 
 Inherited, see L<Mail::Message::Body/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
+=item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -452,51 +413,112 @@ Extends L<"DETAILS" in Mail::Message::Body|Mail::Message::Body/"DETAILS">.
 
 =over 4
 
-=item Error: Cannot write to temporary body file $filename: $!
+=item Warning: Content-Transfer-Encoding '$te' requires explicit charset, defaulted to utf-8.
+
+Cast by C<encode()>
+
+=item Error: cannot concatenate element $which
+
+Cast by C<concatenate()>
+
+=item Fault: cannot open $file to write body: $!
+
+Cast by C<write()>
+
+=item Fault: cannot read from file $name: $!
+
+Cast by C<nrLines()>
+
+=item Fault: cannot read from file $name: $!
+
+Cast by C<string()>
+
+=item Fault: cannot read from file $name: $!
+
+Cast by C<endsOnNewline()>
+
+=item Fault: cannot read from file $name: $!
+
+Cast by C<print()>
+
+=item Fault: cannot read from file $name: $!
+
+Cast by C<lines()>
+
+=item Fault: cannot write body to file $name: $!
+
+Cast by C<new()>
+
+=item Fault: cannot write to file $name: $!
+
+Cast by C<read()>
+
+=item Fault: cannot write to temporary body file $name: $!
 
 The message body is to be stored in a temporary file (probably because it is a
 large body), but for the indicated reason, this file cannot be created.
 Cast by C<new()>
 
-=item Warning: Charset $name is not known
+=item Fault: cannot write to temporary body file $name: $!
+
+Cast by C<new()>
+
+=item Warning: charset '$name' is not known.
 
 The encoding or decoding of a message body encounters a character set which
 is not understood by Perl's Encode module.
 Cast by C<encode()>
 
-=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
+=item Error: class $package does not implement method $method.
 
-Cast by C<encode()>
-
-=item Warning: No decoder defined for transfer encoding $name.
-
-The data (message body) is encoded in a way which is not currently understood,
-therefore no decoding (or recoding) can take place.
-Cast by C<encode()>
-
-=item Warning: No encoder defined for transfer encoding $name.
-
-The data (message body) has been decoded, but the required encoding is
-unknown.  The decoded data is returned.
-Cast by C<encode()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Error: Unable to read file $filename for message body file: $!
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Fault: error closing $file after write body: $!
+
+Cast by C<write()>
+
+=item Warning: no decoder defined for transfer encoding '$encoding'.
+
+The data (message body) is encoded in a way which is not currently understood,
+therefore no decoding (or recoding) can take place.
+Cast by C<encode()>
+
+=item Warning: no encoder defined for transfer encoding '$encoding'.
+
+The data (message body) has been decoded, but the required encoding is
+unknown.  The decoded data is returned.
+Cast by C<encode()>
+
+=item Error: no filename parameter for write() body.
+
+Cast by C<write()>
+
+=item Error: part number needs multi-part or nested.
+
+Cast by C<partNumberOf()>
+
+=item Fault: unable to read file $name for message body file: $!
 
 A L<Mail::Message::Body::File|Mail::Message::Body::File> object is to be created from a named file, but
 it is impossible to read that file to retrieve the lines within.  Therefore,
 no copy to a temporary file can be made.
 Cast by C<new()>
 
-=item Warning: Unknown line terminator $eol ignored
+=item Error: unknown line terminator '$eol'.
 
 Cast by C<eol()>
 
@@ -504,8 +526,8 @@ Cast by C<eol()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -10,9 +10,11 @@ use warnings;
 use Mail::Box::Test;
 use Mail::Box::Mbox;
 
-use Test::More tests => 116;
+use Test::More;
 use File::Compare;
 use File::Copy;
+
+use Log::Report;
 
 #
 # We will work with a copy of the original to avoid that we write
@@ -48,9 +50,11 @@ ok(!$modified);
 # Write unmodified folder.  This should be ready immediately.
 #
 
-ok($folder->write(policy => 'INPLACE'));
-my @progress = $folder->report('PROGRESS');
-ok(grep m/not changed/, @progress);
+ok try { $folder->write(policy => 'INPLACE') } mode => 'DEBUG';
+my @e1 = $@->exceptions;
+cmp_ok scalar @e1, '==', 1, "one exception";
+is $e1[0]->reason, 'TRACE';
+like $e1[0]->message->toString, qr/not changed/;
 
 #
 # All messages must still be delayed.
@@ -214,3 +218,5 @@ cmp_ok($copy->messages, "==", $folder_messages-3, "3 messages fewer");
 is($copy->message(10)->get('subject'), $msg12subject, "move message");
 
 unlink $cpy;
+
+done_testing;

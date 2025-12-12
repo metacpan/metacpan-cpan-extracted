@@ -42,10 +42,8 @@ Improves base, see L<Mail::Box::Locker/"METHODS">
   expires       Mail::Box::Locker  1 hour
   file          Mail::Box::Locker  <folderfile>.lock
   folder        Mail::Box::Locker  <C<undef>>
-  log           Mail::Reporter     'WARNINGS'
   method        Mail::Box::Locker  'DOTLOCK'
   timeout       Mail::Box::Locker  10
-  trace         Mail::Reporter     'WARNINGS'
 
 =over 2
 
@@ -60,13 +58,9 @@ the multi locker is used.
 
 =item folder => $folder
 
-=item log => LEVEL
-
 =item method => $name|CLASS|\@names
 
 =item timeout => $seconds|'NOTIMEOUT'
-
-=item trace => LEVEL
 
 =back
 
@@ -86,13 +80,9 @@ Inherited, see L<Mail::Box::Locker/"Attributes">
 
 Inherited, see L<Mail::Box::Locker/"Attributes">
 
-=item $obj-E<gt>B<folder>( [$folder] )
+=item $obj-E<gt>B<folder>()
 
 Inherited, see L<Mail::Box::Locker/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -138,43 +128,7 @@ Extends L<"Error handling" in Mail::Box::Locker|Mail::Box::Locker/"Error handlin
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -196,28 +150,36 @@ Inherited, see L<Mail::Box::Locker/"Cleanup">
 
 =over 4
 
-=item Warning: Couldn't remove lockfile $lock: $!
+=item Error: Dotlock requires a lock file name.
 
-Cast by C<unlock()>
+Cast by C<folder()>
 
-=item Error: Failed to remove expired lockfile $lockfile: $!
+=item Error: class $package does not implement method $method.
 
-Cast by C<lock()>
-
-=item Warning: Folder already locked with file $lockfile
-
-Cast by C<lock()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Removed expired lockfile $lockfile
+=item Warning: couldn't remove lockfile $file: $!
+
+Cast by C<unlock()>
+
+=item Fault: failed to remove expired lockfile $file: $!
+
+Cast by C<lock()>
+
+=item Warning: folder already locked with file $file
+
+Cast by C<lock()>
+
+=item Fault: lockfile $file can never be created: $!
+
+Cast by C<lock()>
+
+=item Warning: removed expired lockfile $file
 
 Cast by C<lock()>
 
@@ -225,8 +187,8 @@ Cast by C<lock()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

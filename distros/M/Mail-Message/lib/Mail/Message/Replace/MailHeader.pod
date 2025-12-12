@@ -77,10 +77,8 @@ Improves base, see L<Mail::Message::Head/"Constructors">
   MailFrom                         'KEEP'
   Modify                           false
   field_type  Mail::Message::Head  Mail::Message::Field::Fast
-  log         Mail::Reporter       'WARNINGS'
   message     Mail::Message::Head  undef
   modified    Mail::Message::Head  false
-  trace       Mail::Reporter       'WARNINGS'
 
 =over 2
 
@@ -96,13 +94,9 @@ Reformat all header lines when they come in: change the folding.
 
 =item field_type => CLASS
 
-=item log => LEVEL
-
-=item message => MESSAGE
+=item message => $message
 
 =item modified => BOOLEAN
-
-=item trace => LEVEL
 
 =back
 
@@ -111,14 +105,6 @@ Reformat all header lines when they come in: change the folding.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Message::Head::Complete|Mail::Message::Head::Complete/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 The header
 
@@ -146,7 +132,7 @@ Inherited, see L<Mail::Message::Head/"The header">
 
 Inherited, see L<Mail::Message::Head/"The header">
 
-=item $obj-E<gt>B<modified>( [$flage] )
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
 
 Inherited, see L<Mail::Message::Head/"The header">
 
@@ -381,43 +367,7 @@ Extends L<"Error handling" in Mail::Message::Head::Complete|Mail::Message::Head:
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -497,7 +447,7 @@ support it for now: use L<add()|Mail::Message::Replace::MailHeader/"Access to th
 
 What to do when a header line in the form `From ' is encountered. Valid
 values are C<IGNORE> - ignore and discard the header, C<ERROR> - invoke
-an error (call die), C<COERCE> - rename them as Mail-From and C<KEEP>
+an error (die), C<COERCE> - rename them as Mail-From and C<KEEP>
 - keep them.
 
 =item $obj-E<gt>B<modify>( [BOOLEAN] )
@@ -529,8 +479,6 @@ Remove the folding for all instances of C<$tag>, or all fields at once.
 Of course, the C<isa()> class inheritance check should not see our
 nasty trick.
 
-=encoding utf8
-
 =back
 
 =head1 DETAILS
@@ -541,32 +489,36 @@ Extends L<"DETAILS" in Mail::Message::Head::Complete|Mail::Message::Head::Comple
 
 =over 4
 
-=item Warning: Cannot remove field $name from header: not found.
+=item Error: bad Mail-From choice: '$pick'.
+
+Cast by C<mail_from()>
+
+=item Warning: cannot remove field $name from header: not found.
 
 You ask to remove a field which is not known in the header.  Using
 L<delete()|Mail::Message::Replace::MailHeader/"Access to the header">, L<reset()|Mail::Message::Head::Complete/"Access to the header">, or L<set()|Mail::Message::Head::Complete/"Access to the header"> to do the job will not result
 in warnings: those methods check the existence of the field first.
 Cast by C<removeField()>
 
-=item Warning: Field objects have an implied name ($name)
+=item Error: class $package does not implement method $method.
 
-Cast by C<build()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Warning: field objects have an implied name ($name)
+
+Cast by C<build()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

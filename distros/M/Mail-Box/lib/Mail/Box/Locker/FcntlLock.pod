@@ -43,10 +43,8 @@ Inherited, see L<Mail::Box::Locker/"METHODS">
   expires  Mail::Box::Locker  1 hour
   file     Mail::Box::Locker  undef
   folder   Mail::Box::Locker  <C<undef>>
-  log      Mail::Reporter     'WARNINGS'
   method   Mail::Box::Locker  FcntlLock
   timeout  Mail::Box::Locker  10
-  trace    Mail::Reporter     'WARNINGS'
 
 =over 2
 
@@ -56,13 +54,9 @@ Inherited, see L<Mail::Box::Locker/"METHODS">
 
 =item folder => $folder
 
-=item log => LEVEL
-
 =item method => $name|CLASS|\@names
 
 =item timeout => $seconds|'NOTIMEOUT'
-
-=item trace => LEVEL
 
 =back
 
@@ -85,10 +79,6 @@ Inherited, see L<Mail::Box::Locker/"Attributes">
 =item $obj-E<gt>B<folder>( [$folder] )
 
 Inherited, see L<Mail::Box::Locker/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -134,43 +124,7 @@ Extends L<"Error handling" in Mail::Box::Locker|Mail::Box::Locker/"Error handlin
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -192,45 +146,45 @@ Inherited, see L<Mail::Box::Locker/"Cleanup">
 
 =over 4
 
-=item Warning: Folder $folder already lockf'd
-
-Cast by C<lock()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: Unable to check lock file $file for $folder: $!
-
-To check whether the filename is used to flock a folder, the file must be
-opened.  Apparently this fails, which does not mean that the folder is
-locked neither that it is unlocked.
-Cast by C<isLocked()>
-
-=item Error: Unable to open FcntlLock lock file $file for $folder: $!
-
-For FcntlLock style locking, a C<$folder> it must be opened, which does not
-succeed for the specified reason.
-Cast by C<lock()>
-
-=item Error: Will never get a FcntlLock lock at $file for $folder: $!
+=item Fault: Will never get a FcntlLock lock at $file for $folder: $!
 
 Tried to lock the C<$folder>, but it did not succeed.  The error code received
 from the OS indicates that it will not succeed ever, so we do not need to
 try again.
 Cast by C<lock()>
 
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Warning: folder $name already lockf'd.
+
+Cast by C<lock()>
+
+=item Fault: unable to check lock file $file for $folder: $!
+
+To check whether the filename is used to flock a folder, the file must be
+opened.  Apparently this fails, which does not mean that the folder is
+locked neither that it is unlocked.
+Cast by C<isLocked()>
+
+=item Fault: unable to open FcntlLock lock file $file for $folder
+
+For FcntlLock style locking, a C<$folder> it must be opened, which does not
+succeed for the specified reason.
+Cast by C<lock()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

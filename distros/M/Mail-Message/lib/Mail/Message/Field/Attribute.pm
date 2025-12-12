@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,20 +10,20 @@
 
 
 package Mail::Message::Field::Attribute;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error warning/ ];
+
 use Encode    ();
-use Carp;
 
 #--------------------
 
-use Carp 'cluck';
 use overload
 	'""' => sub { $_[0]->value },
 	cmp  => sub {
@@ -50,11 +50,11 @@ sub init($$)
 	my ($attr, $value, $cont) = @$args{ qw/attr value use_continuations/ };
 
 	my $name  = ($attr =~ m/^(.*?)(?:\*\d+)?\*?\s*\=\s*/ ? $1 : $attr);
-	$self->log(WARNING => "Illegal character in parameter name '$name'.")
+	warning __x"illegal character in parameter name '{name}'.", name => $name
 		if $name !~ m/^[!#-'*+\-.0-9A-Z^-~]+$/;
 
 	$self->{MMFF_name}     = $name;
-	$self->{MMFF_usecont}  = defined $cont ? $cont : 1;
+	$self->{MMFF_usecont}  = $cont // 1;
 	$self->{MMFF_charset}  = $args->{charset}  if defined $args->{charset};
 	$self->{MMFF_language} = $args->{language} if defined $args->{language};
 
@@ -159,7 +159,7 @@ sub encode()
 	{	# Simple string, but with continuations
 		while(1)
 		{	push @lines, $pre.'"'. substr($value, 0, 75-length($pre), '') .'"';
-			last unless length $value;
+			length $value or last;
 			$pre = $name . '*' . @lines . '=';
 		}
 
@@ -207,7 +207,7 @@ sub decode()
 sub mergeComponent($)
 {	my ($self, $comp) = @_;
 	my $cont  = $self->{MMFF_cont}
-		or croak "ERROR: Too late to merge: value already changed.";
+		or error __x"too late to merge: value already changed.";
 
 	$self->addComponent($_) for @{$comp->{MMFF_cont}};
 	$self;

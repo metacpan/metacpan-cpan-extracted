@@ -13,6 +13,9 @@ Mail::Message::Body - the data of a body in a message
  Mail::Message::Body
    is a Mail::Reporter
 
+ Mail::Message::Body
+   is a Mail::Reporter
+
  Mail::Message::Body is extended by
    Mail::Message::Body::File
    Mail::Message::Body::Lines
@@ -50,6 +53,8 @@ The body of a message (a L<Mail::Message|Mail::Message> object) is stored in one
 many body types.  The functionality of each body type is equivalent, but there
 are performance differences.  Each body type has its own documentation
 with details about its implementation.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
 
@@ -107,7 +112,11 @@ would be needed to avoid a runtime error.
 
 Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
 
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+
 =head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 
 Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 
@@ -126,33 +135,31 @@ need conversions, first create a body with options which tell what you've
 got, and then call L<encode()|Mail::Message::Body::Encode/"Constructing a body"> for what you need.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option           --Defined in     --Default
-  based_on                            undef
-  charset                             'PERL'
-  checked                             false
-  content_id                          undef
-  data                                undef
-  description                         undef
-  disposition                         undef
-  eol                                 'NATIVE'
-  file                                undef
-  filename                            undef
-  language                            undef
-  log                Mail::Reporter   'WARNINGS'
-  message                             undef
-  mime_type                           'text/plain'
-  modified                            <C<false>>
-  trace              Mail::Reporter   'WARNINGS'
-  transfer_encoding                   'none'
+ -Option           --Default
+  based_on           undef
+  charset            'PERL'
+  checked            false
+  content_id         undef
+  data               undef
+  description        undef
+  disposition        undef
+  eol                'NATIVE'
+  file               undef
+  filename           undef
+  language           undef
+  message            undef
+  mime_type          'text/plain'
+  modified           false
+  transfer_encoding  'none'
 
 =over 2
 
-=item based_on => BODY
+=item based_on => $body
 
-The information about encodings must be taken from the specified BODY,
+The information about encodings must be taken from the specified C<$body>,
 unless specified differently.
 
-=item charset => CHARSET|'PERL'|<undef>
+=item charset => $charset|'PERL'|<undef>
 
 Defines the character-set which is used in the data.  Only useful in
 combination with a C<mime_type> which refers to C<text> in any shape,
@@ -185,7 +192,7 @@ the imagination of the person making the content (for now).
 As a MIME header field, the C<Content-ID> string is expected to
 be inside angle brackets
 
-=item data => ARRAY-OF-LINES | STRING
+=item data => \@lines|$text
 
 The content of the body.  The only way to set the content of a body
 is during the creation of the body.  So if you want to modify the content
@@ -195,21 +202,21 @@ and body information must be guaranteed.  It avoids your hassle in
 calculating the number of lines in the body, and checking whether bad
 characters are enclosed in text.
 
-Specify a reference to an ARRAY of lines, each terminated by a newline.
-Or one STRING which may contain multiple lines, separated and terminated
+Specify C<@lines> each terminated by a newline, or one C<$text> which may
+contain multiple lines, separated and terminated
 by a newline.
 
-=item description => STRING|FIELD
+=item description => STRING|$field
 
 Informal information about the body content.  The data relates to the
 C<Content-Description> field.  Specify a STRING which will become the
-field content, or a real FIELD.
+field content, or a real C<$field> object.
 
-=item disposition => STRING|FIELD
+=item disposition => STRING|$field
 
 How this message can be decomposed.  The data relates to the
 C<Content-Disposition> field.  Specify a STRING which will become the
-field content, or a real FIELD.
+field content, or a real C<$field>.
 
 The content of this field is specified in RFC 1806.  The body of the
 field can be C<inline>, to indicate that the body is intended to be
@@ -235,30 +242,28 @@ BE WARNED that folders with a non-native encoding may appear on your
 platform, for instance in Windows folders handled from a UNIX system.
 The eol encoding has effect on the size of the body!
 
-=item file => FILENAME|FILEHANDLE|IOHANDLE
+=item file => $file|$handle|$io
 
-Read the data from the specified file, file handle, or object of
+Read the data from the specified C<$file> name, file C<$handle>, or object of
 type C<IO::Handle>.
 
-=item filename => FILENAME
+=item filename => $file
 
-[3.001] Overrule/set filename for content-disposition
+[3.001] Overrule/set C<$file> name for content-disposition.
 
-=item language => STRING|ARRAY|LIST|FIELD
+=item language => STRING|\@lang|$field
 
 [3.017] RFC3282 C<Content-Language> field, containing a comma separated
 list of language codes.
 
-=item log => LEVEL
+=item message => $message
 
-=item message => MESSAGE
+The C<$message> where this body belongs to.
 
-The message where this body belongs to.
-
-=item mime_type => STRING|FIELD|MIME
+=item mime_type => STRING|$field|$mime
 
 The type of data which is added.  You may specify a content of a header
-line as STRING, or a FIELD object.  You may also specify a L<MIME::Type|MIME::Type>
+line as STRING, or a C<$field> object.  You may also specify a L<MIME::Type|MIME::Type>
 object.  In any case, it will be kept internally as
 a real field (a L<Mail::Message::Field|Mail::Message::Field> object).  This relates to the
 C<Content-Type> header field.
@@ -273,13 +278,11 @@ is C<text/plain>,
 
 Whether the body is flagged modified, directly from its creation.
 
-=item trace => LEVEL
-
-=item transfer_encoding => STRING|FIELD
+=item transfer_encoding => STRING|$field
 
 The encoding that the data has.  If the data is to be encoded, than you
 will have to call L<encode()|Mail::Message::Body::Encode/"Constructing a body"> after the body is created.  That will
-return a new encoded body.  This field is case-insensitive and relates
+return a new encoded body.  This C<$field> is case-insensitive and relates
 to the C<Content-Transfer-Encoding> field in the header.
 
 =back
@@ -305,15 +308,13 @@ to the C<Content-Transfer-Encoding> field in the header.
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
+Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
+
 =over 4
 
 =item $obj-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
 
 Inherited, see L<Mail::Message::Body::Encode/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
@@ -655,16 +656,14 @@ decode the body before writing it!
 
   use File::Temp;
   my $fn = tempfile;
-  $message->decoded->write(filename => $fn)
-     or die "Couldn't write to $fn: $!\n";
+  $message->decoded->write(filename => $fn);
 
 » example: using the content-disposition information to write
 
   use File::Temp;
   my $dir = tempdir; mkdir $dir or die;
   my $fn  = $message->body->dispositionFilename($dir);
-  $message->decoded->write(filename => $fn)
-     or die "Couldn't write to $fn: $!\n";
+  $message->decoded->write(filename => $fn);
 
 =back
 
@@ -704,9 +703,9 @@ Returns whether the body has changed.
 
 Be sure that the body is loaded.  This returns the loaded body.
 
-=item $obj-E<gt>B<modified>( [$flag] )
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
 
-Change the body modification C<$flag>.  This will force a re-write of the body
+Change the body modification flag.  This will force a re-write of the body
 to a folder file when it is closed.  It is quite dangerous to change the
 body: the same body may be shared between messages within your program.
 
@@ -744,6 +743,8 @@ of the header.
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+
 =over 4
 
 =item $obj-E<gt>B<AUTOLOAD>()
@@ -755,43 +756,11 @@ delayed compilation of additional modules does not help, an error
 will be produced.
 Improves base, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
+=item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -801,7 +770,13 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
 
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+
 =over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
 
 =item $obj-E<gt>B<DESTROY>()
 
@@ -989,38 +964,75 @@ In all other cases, the character-set is known so "easy".
 
 =over 4
 
-=item Warning: Charset $name is not known
+=item Warning: Content-Transfer-Encoding '$te' requires explicit charset, defaulted to utf-8.
+
+Cast by C<encode()>
+
+=item Error: cannot concatenate element $which
+
+Cast by C<concatenate()>
+
+=item Fault: cannot open $file to write body: $!
+
+Cast by C<write()>
+
+=item Warning: charset '$name' is not known.
 
 The encoding or decoding of a message body encounters a character set which
 is not understood by Perl's Encode module.
 Cast by C<encode()>
 
-=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
+=item Error: class $package does not implement method $method.
 
-Cast by C<encode()>
-
-=item Warning: No decoder defined for transfer encoding $name.
-
-The data (message body) is encoded in a way which is not currently understood,
-therefore no decoding (or recoding) can take place.
-Cast by C<encode()>
-
-=item Warning: No encoder defined for transfer encoding $name.
-
-The data (message body) has been decoded, but the required encoding is
-unknown.  The decoded data is returned.
-Cast by C<encode()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Unknown line terminator $eol ignored
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Fault: error closing $file after write body: $!
+
+Cast by C<write()>
+
+=item Error: message body: illegal datatype '$type' for data option.
+
+Cast by C<new()>
+
+=item Error: message body: illegal datatype '$type' for file option.
+
+Cast by C<new()>
+
+=item Warning: no decoder defined for transfer encoding '$encoding'.
+
+The data (message body) is encoded in a way which is not currently understood,
+therefore no decoding (or recoding) can take place.
+Cast by C<encode()>
+
+=item Warning: no encoder defined for transfer encoding '$encoding'.
+
+The data (message body) has been decoded, but the required encoding is
+unknown.  The decoded data is returned.
+Cast by C<encode()>
+
+=item Error: no filename parameter for write() body.
+
+Cast by C<write()>
+
+=item Error: part number needs multi-part or nested.
+
+Cast by C<partNumberOf()>
+
+=item Error: unknown line terminator '$eol'.
 
 Cast by C<eol()>
 
@@ -1028,8 +1040,8 @@ Cast by C<eol()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

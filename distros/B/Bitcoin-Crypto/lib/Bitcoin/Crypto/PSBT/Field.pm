@@ -1,19 +1,15 @@
 package Bitcoin::Crypto::PSBT::Field;
-$Bitcoin::Crypto::PSBT::Field::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::PSBT::Field::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 
 use Bitcoin::Crypto::PSBT::FieldType;
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Util qw(to_format pack_compactsize unpack_compactsize);
-
-use namespace::clean;
+use Bitcoin::Crypto::Util::Internal qw(to_format pack_compactsize unpack_compactsize);
 
 has field 'map' => (
 	isa => InstanceOf ['Bitcoin::Crypto::PSBT::Map'],
@@ -59,11 +55,6 @@ sub BUILD
 
 }
 
-signature_for validate => (
-	method => Object,
-	positional => []
-);
-
 sub validate
 {
 	my ($self) = @_;
@@ -86,22 +77,12 @@ sub validate
 	return $self;
 }
 
-signature_for key => (
-	method => Object,
-	positional => []
-);
-
 sub key
 {
 	my ($self) = @_;
 
 	return $self->type->key_deserializer->($self->raw_key);
 }
-
-signature_for set_raw_key => (
-	method => Object,
-	positional => [Defined]
-);
 
 sub set_raw_key
 {
@@ -118,11 +99,6 @@ sub set_raw_key
 	return;
 }
 
-signature_for set_key => (
-	method => Object,
-	positional => [Defined]
-);
-
 sub set_key
 {
 	my ($self, $key) = @_;
@@ -131,22 +107,12 @@ sub set_key
 	return;
 }
 
-signature_for value => (
-	method => Object,
-	positional => []
-);
-
 sub value
 {
 	my ($self) = @_;
 
 	return $self->type->deserializer->($self->raw_value);
 }
-
-signature_for set_value => (
-	method => Object,
-	positional => [Defined]
-);
 
 sub set_value
 {
@@ -155,11 +121,6 @@ sub set_value
 	$self->set_raw_value($self->type->serializer->($value));
 	return;
 }
-
-signature_for set_map => (
-	method => Object,
-	positional => [Defined],
-);
 
 sub set_map
 {
@@ -171,11 +132,6 @@ sub set_map
 	return;
 }
 
-signature_for serialized_key => (
-	method => Object,
-	positional => [],
-);
-
 sub serialized_key
 {
 	my ($self) = @_;
@@ -184,7 +140,7 @@ sub serialized_key
 }
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	head => [ByteStr],
 	named => [
 		map_type => PSBTMapType,
@@ -230,11 +186,6 @@ sub from_serialized
 	return $self;
 }
 
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
-
 sub to_serialized
 {
 	my ($self) = @_;
@@ -249,11 +200,6 @@ sub to_serialized
 		$value
 		;
 }
-
-signature_for dump => (
-	method => Object,
-	positional => [],
-);
 
 sub dump
 {
@@ -405,18 +351,6 @@ start decoding. It will be set to the next byte after end of input stream.
 	$text = $object->dump()
 
 Returns a readable description of this field.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * PSBT - general error with the PSBT
-
-=back
 
 =head1 SEE ALSO
 

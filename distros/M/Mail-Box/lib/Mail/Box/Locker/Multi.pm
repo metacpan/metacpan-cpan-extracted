@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Locker::Multi;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Locker';
@@ -18,8 +18,9 @@ use parent 'Mail::Box::Locker';
 use strict;
 use warnings;
 
-use Carp;
-use Scalar::Util   qw/blessed/;
+use Log::Report      'mail-box', import => [ qw/trace try/ ];
+
+use Scalar::Util     qw/blessed/;
 
 #--------------------
 
@@ -41,7 +42,7 @@ sub init($)
 			next;
 		}
 
-		my $locker = eval {	Mail::Box::Locker->new(%$args, method => $method, timeout => 1) };
+		my $locker = try { Mail::Box::Locker->new(%$args, method => $method, timeout => 1) };
 		defined $locker or next;
 
 		push @lockers, $locker;
@@ -49,7 +50,7 @@ sub init($)
 	}
 
 	$self->{MBLM_lockers} = \@lockers;
-	$self->log(PROGRESS => "Multi-locking via @used.");
+	trace "Multi-locking via @used.";
 	$self;
 }
 

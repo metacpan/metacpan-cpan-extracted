@@ -1,17 +1,12 @@
 package Bitcoin::Crypto::DerivationPath;
-$Bitcoin::Crypto::DerivationPath::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::DerivationPath::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
 
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Constants qw(:key);
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
 
 has param 'private' => (
 	isa => Bool,
@@ -27,22 +22,12 @@ use overload
 	q{""} => sub { shift->as_string },
 	fallback => 1;
 
-signature_for get_derivation_path => (
-	method => Object,
-	positional => [],
-);
-
 sub get_derivation_path
 {
 	my ($self) = @_;
 
 	return $self;
 }
-
-signature_for get_path_hardened => (
-	method => Object,
-	positional => [],
-);
 
 sub get_path_hardened
 {
@@ -51,17 +36,12 @@ sub get_path_hardened
 	my $path = $self->path;
 	return [
 		map {
-			my $hardened = $_ >= Bitcoin::Crypto::Constants::max_child_keys;
-			my $value = $_ - ($hardened * Bitcoin::Crypto::Constants::max_child_keys);
+			my $hardened = $_ >= MAX_CHILD_KEYS;
+			my $value = $_ - ($hardened * MAX_CHILD_KEYS);
 			[$value, $hardened];
 		} @$path
 	];
 }
-
-signature_for from_string => (
-	method => Str,
-	positional => [Str],
-);
 
 sub from_string
 {
@@ -84,9 +64,9 @@ sub from_string
 
 			Bitcoin::Crypto::Exception->raise(
 				"Derivation path part too large: $part"
-			) if $part >= Bitcoin::Crypto::Constants::max_child_keys;
+			) if $part >= MAX_CHILD_KEYS;
 
-			$part += Bitcoin::Crypto::Constants::max_child_keys if $is_hardened;
+			$part += MAX_CHILD_KEYS if $is_hardened;
 			push @path, $part;
 		}
 	}
@@ -96,11 +76,6 @@ sub from_string
 		path => \@path,
 	);
 }
-
-signature_for as_string => (
-	method => Object,
-	positional => [],
-);
 
 sub as_string
 {
@@ -149,7 +124,7 @@ C<m>).
 
 B<Required in the constructor>. An array reference of unsigned integers - the derivation path.
 Hardened keys are greater than or equal to C<2^31>
-(C<Bitcoin::Crypto::Constants::max_child_keys>).
+(L<Bitcoin::Crypto::Constants/MAX_CHILD_KEYS>).
 
 =head2 Methods
 

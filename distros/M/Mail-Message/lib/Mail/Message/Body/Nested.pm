@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,17 +10,18 @@
 
 
 package Mail::Message::Body::Nested;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Body';
+use parent 'Mail::Message::Body';
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
+
 use Mail::Message::Body::Lines ();
 use Mail::Message::Part        ();
-use Carp;
 
 #--------------------
 
@@ -33,7 +34,7 @@ sub init($)
 	my $nested;
 	if(my $raw = $args->{nested})
 	{	$nested = Mail::Message::Part->coerce($raw, $self)
-			or croak 'Data not convertible to a message (type is ', ref $raw,")\n";
+			or error __x"data not convertible to a message (type is {class})", class => ref $raw;
 	}
 
 	$self->{MMBN_nested} = $nested;
@@ -42,7 +43,7 @@ sub init($)
 
 sub clone()
 {	my $self     = shift;
-	(ref $self)->new($self->logSettings, based_on => $self, nested => $self->nested->clone);
+	(ref $self)->new(based_on => $self, nested => $self->nested->clone);
 }
 
 sub isNested() { 1 }
@@ -64,15 +65,14 @@ sub partNumberOf($)
 
 sub foreachLine($)
 {	my ($self, $code) = @_;
-	$self->log(ERROR => "You cannot use foreachLine on a nested");
-	confess;
+	error __x"you cannot use foreachLine on a nested.";
 }
 
-sub check() { $_[0]->forNested( sub {$_[1]->check} ) }
+sub check() { $_[0]->forNested( sub { $_[1]->check } ) }
 
 sub encode(@)
 {	my ($self, %args) = @_;
-	$self->forNested( sub {$_[1]->encode(%args)} );
+	$self->forNested( sub { $_[1]->encode(%args) } );
 }
 
 sub encoded() { $_[0]->forNested( sub { $_[1]->encoded } ) }
@@ -81,26 +81,25 @@ sub read($$$$)
 {	my ($self, $parser, $head, $bodytype) = @_;
 
 	my $nest = Mail::Message::Part->new(container => undef);
-	$nest->readFromParser($parser, $bodytype)
-		or return;
-
+	$nest->readFromParser($parser, $bodytype) or return;
 	$nest->container($self);
+
 	$self->{MMBN_nested} = $nest;
 	$self;
 }
 
 sub fileLocation()
-{	my $nested   = shift->nested;
+{	my $nested   = $_[0]->nested;
 	( ($nested->head->fileLocation)[0], ($nested->body->fileLocation)[1] );
 }
 
 sub moveLocation($)
-{	my $self   = shift;
-	my $dist   = shift or return $self;  # no move
+{	my ($self, $dest) = @_;
+	$dest or return $self;  # no move
 
 	my $nested = $self->nested;
-	$nested->head->moveLocation($dist);
-	$nested->body->moveLocation($dist);
+	$nested->head->moveLocation($dest);
+	$nested->body->moveLocation($dest);
 	$self;
 }
 

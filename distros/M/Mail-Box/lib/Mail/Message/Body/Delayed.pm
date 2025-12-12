@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message::Body::Delayed;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Reporter';
@@ -18,13 +18,14 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
+
 use Object::Realize::Later
 	becomes          => 'Mail::Message::Body',
 	realize          => 'load',
 	warn_realization => 0,
 	believe_caller   => 1;
 
-use Carp;
 use Scalar::Util     qw/weaken/;
 
 #--------------------
@@ -42,7 +43,7 @@ sub init($)
 
 	$self->{MMB_seqnr}    = -1;  # for overloaded body comparison
 	$self->{MMBD_message} = $args->{message}
-		or $self->log(INTERNAL => "A message must be specified to a delayed body.");
+		or error __x"a message must be specified to a delayed body.";
 
 	weaken($self->{MMBD_message});
 	$self;
@@ -60,8 +61,8 @@ sub modified(;$)
 }
 
 
-sub isModified()  {0}
-sub isDelayed()   {1}
+sub isModified()  { 0 }
+sub isDelayed()   { 1 }
 sub isMultipart() { $_[0]->message->head->isMultipart }
 sub guessSize()   { $_[0]->{MMBD_size} }
 

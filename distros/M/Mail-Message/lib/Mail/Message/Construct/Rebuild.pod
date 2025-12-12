@@ -109,7 +109,7 @@ Z<>
 
 =over 2
 
-=item rules => ARRAY-OF-RULES
+=item rules => \@rules
 
 Rules are method names which can be called on messages and message parts
 objects.  The ARRAY can also list code references which can be called.
@@ -287,7 +287,7 @@ When you have your own routine, you simply call:
 
 =over 4
 
-=item Error: No rebuild rule $name defined.
+=item Error: no rebuild rule $name defined.
 
 Cast by C<rebuild()>
 
@@ -295,8 +295,8 @@ Cast by C<rebuild()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -13,36 +13,50 @@ use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 
 use Spreadsheet::Edit qw/:all logmsg/;
 
-use Spreadsheet::Edit::Log ':btw=L=${lno} F=${fname} P=${pkg}', ':nocolor';
+use Spreadsheet::Edit::Log ':btw';
 
 use File::Basename qw/basename/;
 
 die "oops" unless ! %Spreadsheet::Edit::pkg2currsheet;
 die "oops" unless ! defined $Spreadsheet::Edit::_inner_apply_sheet;
 
+my $fname = basename(__FILE__);
+my $SP = '\\ ';  # used in regexes with /x
+
 sub wrapper($@) {
   my $N = shift;
   btwN $N,@_;
 }
-{ my $baseline = __LINE__;
-  my ($out, $err, $exit) = t_TestCommon::my_capture {
-    { package Foo; main::btw "A1 btw from line ",$baseline+2; }
-    btw "A2 btw from line ",$baseline+3;
-    btwN 0,"BB btwN(0...) from line ",$baseline+4;
-    btwN 0,"B2 btwN(0...) from line ",$baseline+6;
-    wrapper 1,"CC btwN(1,...) from line ",$baseline+6;
-  };
-  local $_ = $out.$err;  # don't care which it goes to
-  #note "OUT:$out\nERR:$err";
-  my $fname = basename(__FILE__);
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=Foo: A1 .* from line (\1)/m,
-      "A1 btw with custom prefix");
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main: A2 .* from line (\1)/m,
-      "A2 btw with custom prefix");
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main: BB btwN\(0...\) from line (\1)/m,
-      "BB btwN(0,...) with custom prefix");
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main: CC btwN\(1,...\) from line (\1)/m,
-      "CC btwN(1,...) with custom prefix");
+
+for my $with_color (0, 1) {
+  my $say_withcolor = $with_color ? "(with color)" : "(no color)";
+  my $color_re = $with_color ? qr/\033.*?m/ : "";
+  $ENV{NO_COLOR} = $with_color ? 0 : 1;
+
+  {
+    my ($out, $err, $exit) = t_TestCommon::my_capture {
+      { package Foo; main::btw "A1 btw from line ",__LINE__; }
+      btw "A2 btw from line ",__LINE__;
+      btwN 0,"BB btwN(0,...) from line ",__LINE__;
+      btwN 0,"B2 btwN(0,...) from line ",__LINE__;
+      wrapper 1,"CC btwN(1,...) from line ",__LINE__;
+    };
+    local $_ = $out.$err;  # don't care which it goes to
+    like($_, qr{^Foo:(\d+)\s*[^\w\s] ${color_re}A1 btw from line \1${color_re}}ms,
+         "A1 btw from other pkg $say_withcolor");
+
+    like($_, qr{^(?:main:)?(\d+)\s*[^\w\s] ${color_re}A2 btw from line \1}ms,
+         "A2 btw from main $say_withcolor");
+
+    like($_, qr{^(?:main:)?(\d+)\s*[^\w\s] ${color_re}BB btwN\(0,...\) from line \1${color_re}}ms,
+         "BB btw from main $say_withcolor");
+
+    like($_, qr{^(?:main:)?(\d+)\s*[^\w\s] ${color_re}B2 btwN\(0,...\) from line \1${color_re}}ms,
+         "B2 btwN(0,...) from main $say_withcolor");
+
+    like($_, qr{^(?:main:)?(\d+)\s*[^\w\s] ${color_re}CC btwN\(1,...\) from line \1${color_re}}ms,
+         "CC btwN(1,...) from main $say_withcolor");
+  }
 }
 
 my $ds1 = "My Source";

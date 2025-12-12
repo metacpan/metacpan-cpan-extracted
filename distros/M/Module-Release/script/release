@@ -92,6 +92,12 @@ the C<perls> configuration setting.
 If there are modified files, added files, or extra files so that
 source control complains, fail.
 
+=item Check that any GPG signatures are correct
+
+If C<gpg_signatures> is present in the config, load
+L<Module::Release::VerifyGPGSignature> and verify the configured
+signatures.
+
 =item Upload to PAUSE
 
 This program used to use FTP uploads, but PAUSE has turned off that feature.
@@ -115,11 +121,29 @@ repository. You should be able to checkout the code from any release.
 Set $ENV{AUTOMATED_TESTING} to true. You can also set C<automated_testing>
 in the configuration file
 
+=item -c STRING
+
+=item --changes STRING
+
+Specify the F<Changes> file entry on the command line. If STRING does
+not start with a C<*>, one will be added to the start along with a space.
+
+    release -c "* some change"
+
+translates to the F<Changes> entry with the date and one bullet item:
+
+	3.11 2025-02-20T22:56:28Z
+		* some change
+
+STRING can also be a multiline string, but this will only append a C<*>
+to the first line if it does not already have on. All lines will be
+indented under the date though.
+
 =item -C
 
 =item --skip-changes
 
-Skip the Changes file. This is also the C<skip_changes> config option
+Skip the F<Changes> file. This is also the C<skip_changes> config option
 
 =item -d
 
@@ -423,6 +447,7 @@ GetOptions(
     'h|help|usage|?'       => sub { usage(0) },
 
     'a|automated-testing!' => \$opts{a},
+    'c|changes=s'          => \$opts{c},
     'C|skip-changes!'      => \$opts{C},
     'd|skip-debug!'        => \$opts{d},
     'D|skip-dist!'         => \$opts{D},
@@ -441,13 +466,14 @@ sub usage {
 	my $err = shift and select STDERR;
 	print <<"USE";
 
-Use: release -aCdDhkmptTvV [-j[N]] [ LOCAL_FILE [ REMOTE_FILE ] ]
+Use: release -acCdDhkmptTvV [-j[N]] [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
 get LOCAL_FILE and REMOTE_FILE automatically (using same name for
 both) if not supplied.
 
 	-a   Set AUTOMATED_TESTING to true
+	-c   Changes entry as a string on the command line
 	-C   Skip Changes file (useful for re-running botched releases)
 	-d   Print extra debugging information
 	-D   Skip building the dist
@@ -642,6 +668,14 @@ else {
 
 $release->_debug( "dist version is <$Version>\n" );
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# check anything signed by GPG
+if( $release->config->gpg_signatures ) {
+	$release->_print("============ Checking GPG signatures\n");
+	$release->load_mixin('Module::Release::VerifyGPGSignature');
+	$release->check_all_gpg_signatures;
+	}
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
@@ -700,7 +734,8 @@ if( $opts{t} // $release->config->dry_run ) {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
 $release->_print("============ Getting Changes\n");
-unless( $release->debug or $opts{C} or $release->config->skip_changes ) {
+
+unless( $opts{C} or $release->config->skip_changes ) {
 	$release->show_recent_contributors;
 
 	my $changes = "Changes";
@@ -708,32 +743,49 @@ unless( $release->debug or $opts{C} or $release->config->skip_changes ) {
 
 	die "Changes file does not exist!\n" unless -e $changes;
 
-	$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
 	my $str = $Version . ' ' . $release->get_release_date . "\n";
 
-	while( <STDIN> ) {
-		$_ =~ s/\A \s* \* \s*/* /x;  # Make top-level bullets (*)
-		$_ =~ s/\A \s* - \s*/\t- /x; # Make second-level bullets (-)
-		$_ =~ s/\A/\t/;              # always indent
+	my $message = do {
+		if( defined $opts{'c'} ) {
+			$opts{'c'}
+			}
+		else {
+			$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
+			local $/;
+			<STDIN>
+			}
+		};
 
-		$str .= $_;
-		$release->_print( "> " );
-		}
+	$message =~ s/^ \s* \* \s*/* /mgx;   # Make top-level bullets (*)
+	$message =~ s/^ \s* - \s*/\t- /mgx;  # Make second-level bullets (-)
 
-	$str .= "\n";
+	$message =~ s/\A\s+//;
+
+    $message =~ s/\A[^*]/* $&/;
+
+	$message =~ s/^/\t/mgx;              # always indent
+	$message =~ s/\s*\z/\n\n/;
+
+	$message = $Version . ' ' . $release->get_release_date . "\n" . $message;
 
 	rename $changes, $bak or die "Could not backup $changes. $!\n";
 
 	open my $in,  '<:encoding(UTF-8)', $bak or $release->_die( "Could not read old $changes file! $!\n" );
 	open my $out, '>:encoding(UTF-8)', $changes;
 
+	# transfer the first part of the existing changes
+	my $header;
 	while( <$in> ) {
-		print $out $_;
+		$header .= $_;
 		last unless m/\S/;
 		}
 
-	print $out $str;
+	$header =~ s/\s*\z/\n\n/;
 
+	# now the new stuff
+	print $out $header, $message;
+
+	# and the rest of the old stuff
 	print $out $_ while( <$in> );
 
 	close $in;
@@ -750,18 +802,17 @@ unless( $release->debug or $opts{C} or $release->config->skip_changes ) {
 			$release->vcs_commit_message( { version => $Version } );
 			}
 		else {
-			sprintf '* for release %s', $Version;
+			sprintf 'release %s', $Version;
 			}
 		};
 
-	my $vcs_commit = `$command "$commit_message" 2>&1`;
+	my $output = $release->run( qq($command "$commit_message") );
 
-	$release->_print( $vcs_commit );
+	$release->_print( $output );
 	}
 else {
-	$release->_print( "Skipping Changes file" );
+	$release->_print( "Skipping Changes file\n" );
 	}
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Build the release in preparation for uploading
@@ -779,7 +830,10 @@ $release->_debug( "This is where I should release stuff\n" );
 while( $release->should_upload_to_pause ) {
 	$release->load_mixin( 'Module::Release::WebUpload::Mojo' );
 	$release->_print("============ Uploading to PAUSE\n");
-	last if $release->debug;
+	if( $release->debug ) {
+		$release->_print("debug is true, so skipping upload");
+		last;
+		}
 	$release->web_upload;
 	last;
 	}

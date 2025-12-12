@@ -1,7 +1,6 @@
 package Bitcoin::Crypto::Types;
-$Bitcoin::Crypto::Types::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Types::VERSION = '4.003';
+use v5.14;
 use warnings;
 
 use Type::Library -base;
@@ -9,8 +8,8 @@ use Type::Coercion;
 use Types::Common -types;
 
 # make sure Math::BigInt is properly loaded - this module loads it
-use Bitcoin::Crypto::Helpers;
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Helpers qw(die_no_trace);
+use Bitcoin::Crypto::Constants qw(:bip44 :psbt USE_BIGINTS);
 
 our $CHECK_BYTESTRINGS = !!1;
 
@@ -18,10 +17,10 @@ __PACKAGE__->add_type(
 	name => 'BIP44Purpose',
 	parent => Maybe [
 		Enum->of(
-			Bitcoin::Crypto::Constants::bip44_purpose,
-			Bitcoin::Crypto::Constants::bip44_compat_purpose,
-			Bitcoin::Crypto::Constants::bip44_segwit_purpose,
-			Bitcoin::Crypto::Constants::bip44_taproot_purpose,
+			BIP44_PURPOSE,
+			BIP44_COMPAT_PURPOSE,
+			BIP44_SEGWIT_PURPOSE,
+			BIP44_TAPROOT_PURPOSE,
 		)
 	],
 );
@@ -69,6 +68,18 @@ $bytestr->coercion->add_type_coercions(
 	HasMethods ['as_string'], q{ $_->as_string },
 );
 
+my $secret = __PACKAGE__->add_type(
+	name => 'BitcoinSecret',
+	parent => InstanceOf->of('Bitcoin::Crypto::Secret') | InstanceOf->of('Crypt::SecretBuffer'),
+);
+
+$secret->coercion->add_type_coercions(
+	Defined, q{
+		require Bitcoin::Crypto::Secret;
+		Bitcoin::Crypto::Secret->new($_);
+	},
+);
+
 my $bytestrlen = __PACKAGE__->add_type(
 	name => 'ByteStrLen',
 	parent => $bytestr,
@@ -104,7 +115,7 @@ my $bytestrlen = __PACKAGE__->add_type(
 
 my $scripttype = __PACKAGE__->add_type(
 	name => 'ScriptType',
-	parent => Enum->of(qw(P2PK P2PKH P2SH P2MS P2WPKH P2WSH P2TR NULLDATA))
+	parent => Enum->of(qw(P2PK P2PKH P2SH P2MS P2WPKH P2WSH P2TR UNKNOWN_SEGWIT NULLDATA))
 );
 
 my $scriptdesc = __PACKAGE__->add_type(
@@ -147,12 +158,22 @@ $digest->coercion->add_type_coercions(
 	},
 );
 
+my $transaction_flags = __PACKAGE__->add_type(
+	name => 'TransactionFlags',
+	parent => InstanceOf->of('Bitcoin::Crypto::Transaction::Flags'),
+);
+
+$transaction_flags->coercion->add_type_coercions(
+	HashRef, q{ require Bitcoin::Crypto::Transaction::Flags; Bitcoin::Crypto::Transaction::Flags->new(%$_) },
+	Undef, q{ require Bitcoin::Crypto::Transaction::Flags; Bitcoin::Crypto::Transaction::Flags->new },
+);
+
 my $psbt_map_type = __PACKAGE__->add_type(
 	name => 'PSBTMapType',
 	parent => Enum->of(
-		Bitcoin::Crypto::Constants::psbt_global_map,
-		Bitcoin::Crypto::Constants::psbt_input_map,
-		Bitcoin::Crypto::Constants::psbt_output_map,
+		PSBT_GLOBAL_MAP,
+		PSBT_INPUT_MAP,
+		PSBT_OUTPUT_MAP,
 	),
 );
 
@@ -180,7 +201,9 @@ __PACKAGE__->add_type(
 			if Bitcoin::Crypto::Constants::ivsize * 8 == $bits;
 
 		# can't handle
-		die 'IntMaxBits only handles up to ' . (Bitcoin::Crypto::Constants::ivsize * 8) . ' bits on this system'
+		die_no_trace 'IntMaxBits only handles up to '
+			. (Bitcoin::Crypto::Constants::ivsize * 8)
+			. ' bits on this system'
 			if Bitcoin::Crypto::Constants::ivsize * 8 < $bits;
 
 		my $limit = 1 << $bits;
@@ -211,14 +234,36 @@ __PACKAGE__->add_type(
 	},
 );
 
-my $satoshi_amount = __PACKAGE__->add_type(
-	name => 'SatoshiAmount',
-	parent => InstanceOf->of('Math::BigInt')->where(q{$_ >= 0}),
-);
+my $satoshi_amount;
+if (USE_BIGINTS) {
+	$satoshi_amount = __PACKAGE__->add_type(
+		name => 'SatoshiAmount',
+		parent => InstanceOf->of('Math::BigInt')->where(q{$_ >= 0}),
+	);
 
-$satoshi_amount->coercion->add_type_coercions(
-	Int | Str, q{ Math::BigInt->new($_) },
-);
+	$satoshi_amount->coercion->add_type_coercions(
+		Int | Str, q{ Math::BigInt->new($_) },
+	);
+}
+else {
+	$satoshi_amount = __PACKAGE__->add_type(
+		name => 'SatoshiAmount',
+		parent => PositiveOrZeroInt,
+	);
+
+	$satoshi_amount->coercion->add_type_coercions(
+		Str, q{
+			if (/^0x/) {
+				hex $_
+			}
+			else {
+				s/_//g;
+				$_
+			}
+		},
+		InstanceOf ['Math::BigInt'], q{ $_->numify },
+	);
+}
 
 my $derivation_path = __PACKAGE__->add_type(
 	name => 'DerivationPath',
@@ -257,6 +302,8 @@ Bitcoin::Crypto::Types - Bitcoin-specific data types
 		IntMaxBits
 		SatoshiAmount
 		DerivationPath
+		TransactionFlags
+		BitcoinSecret
 	);
 
 	use Bitcoin::Crypto::Types -types;
@@ -334,13 +381,37 @@ specified number of bits (parametrizable).
 
 =head2 SatoshiAmount
 
-A non-negative integer, represented as L<Math::BigInt> object. Can be coerced
-from an integer or from a string.
+A non-negative integer, represented as a perl number (on 64 bit) or
+L<Math::BigInt> object (on 32 bit). Can be coerced from an integer or from a
+string.
 
 =head2 DerivationPath
 
 An instance of L<Bitcoin::Crypto::DerivationPath>. Can be coerced from a string
 or a class consuming C<Bitcoin::Crypto::Role::WithDerivationPath>.
+
+=head2 TransactionFlags
+
+An instance of L<Bitcoin::Crypto::Transaction::Flags>. Can be coerced from:
+
+=over
+
+=item * Undef
+
+Same as calling L<Bitcoin::Crypto::Transaction::Flags/new> with no arguments.
+
+=item * HashRef
+
+Same as calling L<Bitcoin::Crypto::Transaction::Flags/new> with arguments
+specified in the hashref.
+
+=back
+
+=head2 BitcoinSecret
+
+A secret value - either instance of L<Bitcoin::Crypto::Secret> or
+L<Crypt::SecretBuffer>. May be coerced from anything defined into
+L<Bitcoin::Crypto::Secret>.
 
 =head1 SEE ALSO
 

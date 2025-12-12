@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -13,13 +13,15 @@
 #XXX Add Simplelists
 
 package Mail::Message::Head::ListGroup;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Head::FieldGroup';
+use parent 'Mail::Message::Head::FieldGroup';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 use List::Util    qw/first/;
 use Scalar::Util  qw/blessed/;
@@ -34,10 +36,8 @@ sub init($$)
 	   if(!defined $address) { ; }
 	elsif(!ref $address || !$address->isa('Mail::Message::Field::Address'))
 	{	require Mail::Message::Field::Address;
-		my $mi   = Mail::Message::Field::Address->coerce($address);
-
-		defined $mi
-			or $self->log(ERROR => "Cannot convert \"$address\" into an address object"), return;
+		my $mi   = Mail::Message::Field::Address->coerce($address)
+			or error __x"cannot convert '{address}' into an address object.", address => $address;
 
 		$address = $mi;
 	}

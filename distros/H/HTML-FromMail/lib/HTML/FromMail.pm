@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'Mail::Reporter';
@@ -18,8 +18,10 @@ use base 'Mail::Reporter';
 use strict;
 use warnings;
 
-use File::Spec::Functions;
-use File::Basename qw/basename dirname/;
+use Log::Report 'html-frommail';
+
+use File::Spec::Functions qw/catfile catdir file_name_is_absolute/;
+use File::Basename        qw/basename dirname/;
 
 my %default_producers = ( # classes will be compiled automatically when used
 	'Mail::Message'        => 'HTML::FromMail::Message',
@@ -31,13 +33,13 @@ my %default_producers = ( # classes will be compiled automatically when used
 
 sub init($)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	# Defining the formatter to be used
 	my $form = $args->{formatter} || {};
 	if(!ref $form)
 	{	eval "require $form";
-		die "ERROR: Formatter $form can not be used:\n$@" if $@;
+		$@ and panic "Formatter $form can not be used:\n$@";
 		$form = $form->new;
 	}
 	elsif(ref $form eq 'HASH')
@@ -45,8 +47,8 @@ sub init($)
 		$form = HTML::FromMail::Format::OODoc->new(%$form);
 	}
 
-	die "ERROR: Formatter $form could not be instantiated\n"
-		unless defined $form;
+	defined $form
+		or error __x"formatter {class} could not be instantiated.", class => $form;
 
 	$self->{HF_formatter} = $form;
 
@@ -82,8 +84,7 @@ sub producer($;$)
 	return ($self->{HF_producer}{$class} = shift) if @_;
 	if(my $prod = $self->{HF_producer}{$class})
 	{	eval "require $prod";
-		$@ and $self->log(ERROR => "Cannot use $prod for $class:\n$@"), return undef;
-
+		$@ and error __x"cannot use {producer} for {class}:\n$@", producer => $prod, class => $class, error => $@;
 		return $prod->new;
 	}
 
@@ -102,23 +103,23 @@ sub templates(;$)
 {	my $self = shift;
 	return $self->{HF_templates} unless @_;
 
-	my $topic    = ref $_[0] ? shift->topic : shift;
+	my $topic    = blessed $_[0] ? shift->topic : shift;
 	my $templates= $self->{HF_templates};
 
-	my $filename = catfile($templates, $topic);
+	my $filename = catfile $templates, $topic;
 	return $filename if -f $filename;
 
-	my $dirname  = catdir($templates, $topic);
+	my $dirname  = catdir $templates, $topic;
 	return $dirname if -d $dirname;
 
-	$self->log(ERROR => "Cannot find template file or directory '$topic' in '$templates'.\n");
-	undef;
+	error __x"cannot find template file or directory '{topic}' in '{directory}'.",
+		topic => $topic, directory => $templates;
 }
 
 
 sub settings($;@)
 {	my $self  = shift;
-	my $topic = ref $_[0] ? shift->topic : shift;
+	my $topic = blessed $_[0] ? shift->topic : shift;
 	@_ or return $self->{HF_settings}{$topic};
 
 	$self->{HF_settings}{$topic} = @_ == 1 ? shift : +{ @_ };
@@ -129,10 +130,10 @@ sub export($@)
 {	my ($self, $object, %args) = @_;
 
 	my $producer  = $self->producer($object)
-		or $self->log(ERROR => "No producer for ",ref($object), " objects."), return;
+		or error __x"no producer for {class} objects.", class => ref $object;
 
 	my $output    = $args{output}
-		or $self->log(ERROR => "No output directory or file specified."), return;
+		or error __x"no output directory or file specified.";
 
 # this cannot be right when $output isa filename?
 #   $self->log(ERROR => "Cannot create output directory $output: $!"), return
@@ -146,18 +147,17 @@ sub export($@)
 
 		foreach my $in (ref $input ? @$input : $input)
 		{	my $fn = file_name_is_absolute($in) ? $in : catfile($templates, $in);
-
-			-f $fn or $self->log(WARNING => "No template file $fn"), next;
+			-f $fn or warning(__x"no template file {file}.", file => $fn), next;
 
 			push @files, $fn;
 		}
 	}
 	else
 	{	my $templates = $self->templates($topic)
-			or $self->log(WARNING => "No templates for $topic objects."), return;
+			or warning(__x"no templates for {topic} objects.", topic => $topic), return;
 
 		@files = $self->expandFiles($templates);
-		@files or $self->log(WARNING => "No templates found in $templates directory.");
+		@files or warning __x"no templates found in {dir} directory.", dir => $templates;
 	}
 
 	my $formatter = $self->formatter(settings => $self->{HF_settings});
@@ -165,7 +165,7 @@ sub export($@)
 
 	foreach my $infile (@files)
 	{	my $basename = basename $infile;
-		my $outfile  = catfile($output, $basename);
+		my $outfile  = catfile $output, $basename;
 		push @outfiles, $outfile;
 
 		$formatter->export(
@@ -187,10 +187,10 @@ sub expandFiles($)
 	return $thing  if -f $thing;
 
 	-d $thing
-		or $self->log(WARNING => "Cannot find $thing"), return ();
+		or warning(__x"cannot find directory {dir}.", dir => $thing), return ();
 
 	opendir DIR, $thing
-		or $self->log(ERROR => "Cannot read from directory $thing: $!"), return ();
+		or fault __x"cannot read from directory {dir}", dir => $thing;
 
 	my @files;
 	while(my $item = readdir DIR)
@@ -208,7 +208,7 @@ sub expandFiles($)
 			next;
 		}
 
-		$self->log(WARNING => "Skipping $full, which is neither file or directory.");
+		warning __x"skipping {name}, which is neither file or directory.", name => $full;
 	}
 
 	closedir DIR;

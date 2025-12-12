@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Mbox;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::File';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw// ];
 
 use Mail::Box::Mbox::Message ();
 
@@ -29,10 +31,7 @@ our $default_sub_extension = '.d';
 
 sub init($)
 {	my ($self, $args) = @_;
-
-    # required during init
 	$self->{MBM_sub_ext} = $args->{subfolder_extension} || $default_sub_extension;
-
 	$self->SUPER::init($args);
 }
 
@@ -50,46 +49,6 @@ sub create($@)
 
 sub subfolderExtension() { $_[0]->{MBM_sub_ext} }
 
-
-sub foundIn($@)
-{	my $class = shift;
-	my $name  = @_ % 2 ? shift : undef;
-	my %args  = @_;
-	$name   ||= $args{folder} or return;
-
-	my $folderdir = $args{folderdir} || $default_folder_dir;
-	my $extension = $args{subfolder_extension} || $default_sub_extension;
-	my $filename  = $class->folderToFilename($name, $folderdir, $extension);
-
-	if(-d $filename)
-	{	# Maildir and MH Sylpheed have a 'new' sub-directory
-		return 0 if -d catdir $filename, 'new';
-		if(opendir my $dir, $filename)
-		{	my @f = grep !/^\./, readdir $dir;   # skip . .. and hidden
-			return 0 if @f && ! grep /\D/, @f;              # MH
-			closedir $dir;
-		}
-
-		return 0                                             # Other MH
-			if -f "$filename/.mh_sequences";
-
-		return 1;      # faked empty Mbox sub-folder (with subsub-folders?)
-	}
-
-	return 0 unless -f $filename;
-	return 1 if -z $filename;               # empty folder is ok
-
-	open my $file, '<:raw', $filename or return 0;
-	local $_;
-	while(<$file>)
-	{	next if /^\s*$/;                    # skip empty lines
-		$file->close;
-		return substr($_, 0, 5) eq 'From '; # found Mbox separator?
-	}
-
-	return 1;
-}
-
 sub delete(@)
 {	my $self = shift;
 	$self->SUPER::delete(@_);
@@ -100,7 +59,7 @@ sub delete(@)
 
 sub writeMessages($)
 {	my ($self, $args) = @_;
-	$self->SUPER::writeMessages($args) or return;
+	$self->SUPER::writeMessages($args);
 
 	if($self->removeEmpty)
 	{	# Can the sub-folder directory be removed?  Don't mind if this
@@ -114,6 +73,7 @@ sub writeMessages($)
 
 sub type() {'mbox'}
 
+#--------------------
 
 sub listSubFolders(@)
 {	my ($thingy, %args)  = @_;
@@ -199,6 +159,46 @@ sub folderToFilename($$;$)
 	}
 
 	$real;
+}
+
+
+sub foundIn($@)
+{	my $class = shift;
+	my $name  = @_ % 2 ? shift : undef;
+	my %args  = @_;
+	$name   ||= $args{folder} or return;
+
+	my $folderdir = $args{folderdir} || $default_folder_dir;
+	my $extension = $args{subfolder_extension} || $default_sub_extension;
+	my $filename  = $class->folderToFilename($name, $folderdir, $extension);
+
+	if(-d $filename)
+	{	# Maildir and MH Sylpheed have a 'new' sub-directory
+		return 0 if -d catdir $filename, 'new';
+		if(opendir my $dir, $filename)
+		{	my @f = grep !/^\./, readdir $dir;   # skip . .. and hidden
+			return 0 if @f && ! grep /\D/, @f;              # MH
+			closedir $dir;
+		}
+
+		return 0                                             # Other MH
+			if -f "$filename/.mh_sequences";
+
+		return 1;      # faked empty Mbox sub-folder (with subsub-folders?)
+	}
+
+	return 0 unless -f $filename;
+	return 1 if -z $filename;               # empty folder is ok
+
+	open my $file, '<:raw', $filename or return 0;
+	local $_;
+	while(<$file>)
+	{	next if /^\s*$/;                    # skip empty lines
+		$file->close;
+		return substr($_, 0, 5) eq 'From '; # found Mbox separator?
+	}
+
+	return 1;
 }
 
 #--------------------

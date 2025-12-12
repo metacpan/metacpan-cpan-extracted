@@ -9,23 +9,23 @@ no warnings qw(experimental::lexical_subs);
 
 package Spreadsheet::Edit::Log;
 
-# Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
+# Allow "use <thismodule> VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.030'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-12-05'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
 use List::Util qw/first any all/;
 use File::Basename qw/dirname basename/;
-use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
+use Data::Dumper::Interp ':DEFAULT', qw/avisl addrvis u/;
 
 use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
 our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest
-                    colorize ERROR_COLOR WARN_COLOR BOLD_COLOR/;
+                    colorize ERROR_COLOR WARN_COLOR BOLD_COLOR SUCCESS_COLOR/;
 
 my %backup_defaults = (
   logdest         => \*STDERR,
@@ -40,156 +40,50 @@ sub set_logdest(*) {
   $backup_defaults{logdest} = $_[0];
 }
 
-my $default_pfx = '$lno';
-
-our %opts = (
-  color => 1,
-);
-
 use constant ERROR_COLOR => "error";
 use constant WARN_COLOR  => "warn";
 use constant BOLD_COLOR  => "norm";
 use constant SUCCESS_COLOR  => "succ";
 
 # Insert escapes to colorize text, provided the terminal supports ansi escapes
+our $colorcodes;
 sub colorize($$) {
-  my ($str, $type) = @_;
-  state $codes;
-  my sub _getcode($;$) {
+  my ($str, $colortype) = @_;
+  return $str
+    if $ENV{NO_COLOR};  # check every time
+  my sub _getcode($$) {
     my ($name, $tput_args) = @_;
-    unless (exists $codes->{$name}) {
-      $tput_args //= $name;
-      $codes->{$name} = `tput $tput_args 2>/dev/null`;
-      $codes->{$name} = undef if $? != 0;
+    unless (exists $colorcodes->{$name}) {
+      $colorcodes->{$name} = `tput $tput_args 2>/dev/null`;
+      $colorcodes->{$name} = undef if $? != 0;
     }
-    return $codes->{$name} // die("terminal does not support $name");
+    return $colorcodes->{$name} // die("no color ($name)");
   }
   my ($color_start, $color_end);
   eval {
     # The basic colors 0-7 => black,red,green,yellow,blue,magenta,cyan,white
     # ("white" is often really light grey)
     $color_start =
-      $type eq BOLD_COLOR    ? _getcode("bold") :
-      $type eq WARN_COLOR    ? _getcode("boldyellow", "setaf 3 bold") :
-      $type eq ERROR_COLOR   ? _getcode("boldred", "setaf 1 bold") :
-      $type eq SUCCESS_COLOR ? _getcode("boldgreen", "setaf 2 bold") :
-      croak "unknown message type '$type'"
+      $colortype eq BOLD_COLOR    ? _getcode("bold", "bold") :
+      $colortype eq WARN_COLOR    ? _getcode("boldyellow", "setaf 3 bold") :
+      $colortype eq ERROR_COLOR   ? _getcode("boldred", "setaf 1 bold") :
+      $colortype eq SUCCESS_COLOR ? _getcode("boldgreen", "setaf 2 bold") :
+      croak "unknown message type '$colortype'"
       ;
-    $color_end = _getcode("sgr0");
+    $color_end = _getcode("sgr0", "sgr0");
   };
   if ($@) {
-    return $str if $@ =~ /terminal/; # not impl for current terminal
+    return $str if $@ =~ /no color/; # disabled or TERM does not support it.
     die $@;
   }
-  my @chunks = map{ $color_start.$_.$color_end } split /\R/, $str, -1;
+  my @chunks = map{ $_ eq "" ? "" : $color_start.$_.$color_end }
+               split /\R/, $str, -1;
   return join "\n", @chunks;
-}
-
-sub import {
-  my $class = shift;
-  my $pkg = caller;
-  state $first_pkg;
-  my @remaining_args;
-  foreach (@_) {
-    local $_ = $_; # mutable copy
-    if (/btw/ && ($first_pkg//=$pkg) ne $pkg) {
-      $default_pfx = '${pkg_space}$lno'; # show package if used in multiple
-    }
-    # Generate customized version of btwN() (called by btw) which uses an
-    # arbitrary prefix expression.  The expression is eval'd each time,
-    # referencing variables $path $fname $lno $package
-    # (it is eval'd multiple times if a [list of level numbers] is given).
-    if (/:btwN=(.*)\z/s) {
-      warn ":btwN is deprecated, just use :btw=... and both btw() and btwN() will be generated\n";
-      $_ = ":btw=$1";
-    }
-    if (/:btw=(.*)\z/s) {
-      _genbtw_funcs($pkg,$1);
-    }
-    elsif (/^:(no)?(\w+)\z/ && exists($opts{$2})) {
-      $opts{$2} = $1 ? 0 : 1;
-    }
-    elsif (/^:(\w+)=(.*)\z/ && exists($opts{$1})) {
-      $opts{$1} = $2;
-    }
-    else {
-      push @remaining_args, $_;
-    }
-  }
-  @_ = ($class, @remaining_args);
-  goto &Exporter::import
-}#import
-
-
-sub _btwTN($$@) {
-  my ($pfxexpr, $N, @strings) = @_;
-#die dvis '## TEX _btwTN: $pfxexpr $N\n';
-  local $@;
-  local $_ = join("", @strings);
-  $pfxexpr = $default_pfx if $pfxexpr eq "__DEFAULT__";
-  s/\n\z//s;
-  my @levels;
-  my $sep = ",";
-  if (ref($N) eq "") {
-    @levels = ($N);
-  }
-  elsif (ref($N) eq 'SCALAR' && defined($$N) && $$N >= 1) {
-    @levels = 0..($$N-1); # mini-traceback
-    #$sep = "<";
-    #$sep = " ← ";
-    #$sep = " ⇽ ";
-    #$sep = " « "; # « exists in both Unicode and latin1
-    $sep = " ⇐ ";
-  }
-  elsif (ref($N) eq 'ARRAY' && all{defined} @$N) {
-    @levels = sort { $a <=> $b } @$N;
-    $sep = " ⇐ " if $#levels == ($levels[-1] - $levels[0]);
-  }
-  else {
-    confess "Invalid N arg to btwN: $N"
-  }
-  my $pfx = "";
-  foreach my $n (@levels) {
-    my ($package, $path, $lno) = caller($n);
-    next unless defined $lno;
-    (my $fname = $path) =~ s/.*[\\\/]//;
-    $fname =~ s/\.pm$//;
-    my $pkg = ($package =~ s/.*:://r);
-    my $pkg_space = $package eq "main" ? "" : "$pkg ";
-    my $s = eval qq< qq<${pfxexpr}> >;
-    croak "ERROR IN btw prefix '$pfxexpr': $@" if $@;
-    $pfx .= $sep if $pfx;
-    $pfx .= $s;
-  }
-  if (ref($N) eq "") {
-    foreach (2..$N) { $pfx .= "«" }
-  }
-  my $fh = _getoptions()->{logdest};
-  $_ = colorize($_, WARN_COLOR) if $opts{color};
-  print $fh "${pfx}: $_\n";
-}#_btwTN
-
-sub _genbtw_funcs($$) {
-  my ($pkg, $pfxexpr) = @_;
-#Carp::cluck dvis '## _gen $pkg $pfxexpr\n';
-  no strict 'refs';
-  my $btwN  = eval{ sub($@) { unshift @_,$pfxexpr; goto &_btwTN } } // die $@;
-  my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
-  my $btwbt = eval{ sub(@)  { unshift @_,\99 ; goto &{"${pkg}::btwN"} } } // die $@;
-  *{"${pkg}::btwN"} = \&$btwN;
-  *{"${pkg}::btw"}  = \&$btw;
-  *{"${pkg}::btwbt"}  = \&$btwbt;
-}
-BEGIN {
-  # Generate the functions used when imported the usual way.
-  # The special prefix "__DEFAULT__" shows just $lno if btw() has only
-  # been imported into a single package, otherwise it is more fully qualified.
-  _genbtw_funcs(__PACKAGE__,'__DEFAULT__');
 }
 
 sub oops(@) {
   my @args = @_;
-  foreach (@args) { $_ = colorize($_, ERROR_COLOR) if $opts{color}; }
+  foreach (@args) { $_ = colorize($_, ERROR_COLOR); }
   my $pkg = caller;
   my $pfx = "\nOOPS";
   #$pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
@@ -206,13 +100,138 @@ sub oops(@) {
   goto &Carp::confess;
 }
 
+our (%btw_importing_pkgs, $multiple_btw_importers);
+sub import {
+  my $class = shift;
+  my $pkg = caller;
+  my @remaining_args;
+  foreach (@_) {
+    if (/^:btw\w*=/ or /^:(no)?color/) {
+      croak "Import tag '${_}' is no longer supported.\n"; # as of v1001.001
+    }
+    if (/btw/) {
+      $multiple_btw_importers = 1
+        if keys(%btw_importing_pkgs) && !$btw_importing_pkgs{$pkg};
+      $btw_importing_pkgs{$pkg}++;
+      if (/^:btw$/) {
+        push @remaining_args, qw/btw btwN btwbt/;
+        next;
+      }
+    }
+    push @remaining_args, $_;
+  }
+
+  @_ = ($class, @remaining_args);
+  goto &Exporter::import
+}#import
+
+sub btwN($@) {
+  my ($N, @strings) = @_;
+#warn dvis '##btwN $N @strings\n';
+  local $@;
+  local $_ = join("", @strings);
+  s/\n\z//s;
+  my (@frames, $pkg_obvious);
+  #my $sep = ">";
+  #my $sep = " → ";
+  #my $sep = " ⇢ ";
+  #my $sep = " » "; # « exists in both Unicode and latin1
+  my $sep = " ⇒ ";
+  my @levels;
+  if (ref($N) eq "") {
+    @levels = ($N);
+  }
+  elsif (ref($N) eq 'SCALAR' && defined($$N) && $$N >= 1) {
+    @levels = 0..($$N-1); # mini-traceback for N levels
+  }
+  elsif (ref($N) eq 'ARRAY' && @$N > 0 && all{defined} @$N) {
+    @levels = sort { $a <=> $b } @$N;  # arbitrary list of levels
+    $sep = "," unless $#levels == ($levels[-1] - $levels[0]);
+  }
+  else {
+    carp "Invalid N arg to btwN: ${\vis($N)}\n";
+    @levels = 0..99; # mini-traceback
+  }
+  if (!caller($levels[0])) {
+    carp "INVALID stack frame level ",avisl(@levels)," (too far back) ";
+    @levels = 0..99; # mini-traceback instead
+  }
+
+  { my (%pkgtail2full, %fname2full, $prev_package);
+    my ($uniq_pkgtails, $uniq_fnames, $all_same_package) = (1, 1, 1);
+    foreach my $n (@levels) {
+      my @c = caller($n);
+      my ($package, $path) = @c[0,1];
+      last if !defined $package;
+      $all_same_package = 0 if $package ne ($prev_package //= $package);
+      my $pkg = ($package =~ s/.*:://r); # abbreviated package
+      $uniq_pkgtails = 0 if ($pkgtail2full{$pkg} //= $package) ne $package;
+      my $fname = ($path =~ s/.*[\\\/]//r);
+      $uniq_fnames = 0 if ($fname2full{$fname} //= $path) ne $path;
+      push @frames, {n=>$n, caller => \@c, pkg => $pkg, fname => $fname};
+    }
+    #if ($all_same_package && $prev_package eq "main") {
+    #  foreach (@frames) { $_->{pkg} = "" };
+    #}
+    if (! $uniq_pkgtails) {
+      foreach (@frames) { $_->{pkg} = $_->{caller}->[0] }; # pkg = package
+    }
+    if (! $uniq_fnames) {
+      foreach (@frames) { $_->{fname} = $_->{caller}->[1]; } # fname = path
+    }
+    $pkg_obvious = ($all_same_package && !$multiple_btw_importers);
+  }
+
+  ##FIXME: Use only ASCII characters if terminal is not UTF enabled? Cf DDI
+
+  my $pfx = "";
+  my ($prev_pkg, $prev_n);
+  for (reverse @frames) {  # show outer frame at the left
+    my ($n, $caller, $pkg, $fname) = @$_{qw/n caller pkg fname/};
+    my $lno = $caller->[2];
+    my $path = $caller->[1];
+    my $s;
+    if ($pkg_obvious || (defined($prev_pkg) && $pkg eq $prev_pkg)) {
+      $s = $lno;
+    } else {
+      my $package = $caller->[0];
+      no strict 'refs';
+      if (my $h = \%{"${package}::SpreadsheetEdit_Log_Options"}) {
+        $pkg = $h->{subst_pkg} if $h->{subst_pkg};
+      }
+      $s = "${pkg}:$lno";
+    }
+    if ($fname ne "${pkg}.pm" && $path ne $0) {
+#warn dvis '###FNCRAM $pkg $fname\n';
+      $s = "[${path}]".$s;
+    }
+    $pfx .= $sep if $pfx;
+    if (defined($prev_n)) {
+      $pfx .= "«" x (($prev_n-$n)-1); # n.b. reverse order (n high to low)
+    }
+    $pfx .= $s;
+    $prev_pkg = $pkg;
+    $prev_n = $n;
+  }
+  $pfx .= "> ";
+
+  $_ = colorize($_, WARN_COLOR);
+  my $msg = "${pfx}${_}\n";
+  my $fh = _getoptions()->{logdest};
+  print $fh $msg;
+}#btwN
+
+sub btw(@) { @_ = (0, @_); goto &btwN; }
+sub btwbt(@) { @_ = (\99, @_); goto &btwN; }
+
 # Return ref to hash of effective options (READ-ONLY).
 # If the first argument is a hashref it is shifted off and
 # used as options which override defaults.
 sub _getoptions {
   my $pkg;
-  my $N=1; while (($pkg=caller($N)//oops) eq __PACKAGE__) { ++$N }
+  my $N=1; while (($pkg=caller($N)||oops) eq __PACKAGE__) { ++$N }
   no strict 'refs';
+  no warnings 'once';
   my $r = *{$pkg."::SpreadsheetEdit_Log_Options"}{HASH};
   +{ %backup_defaults,
     (defined($r) ? %$r : ()),
@@ -437,17 +456,18 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
 =head1 DESCRIPTION
 
 (This is generic, no longer specific to Spreadsheet::Edit.  Someday it might
-be published as a stand-alone distribution rather than packaged with
-Spreadsheet-Edit.)
+become a stand-alone distribution.)
 
-Here are possibly-overkill convenience functions for "verbose logging" and/or debug
-tracing of subroutine calls.
+Here are possibly-overkill convenience functions for "verbose logging"
+and/or debug tracing of subroutine calls.
 
-The resulting message string includes the location of the
-user's call, the name of the public function or method called,
-and a representation of the inputs and outputs.
+Log messages show the name of the I<public> entrypoint called
+by the user, not necessarily the immediate caller of the logging
+function.
 
-The "public" function/method name shown is not necessarily the immediate caller of the logging function.
+The call stack is searched for the nearest call to a 'public' entrypoint,
+which by default is a sub named starting with a lower-case letter.
+The I<is_public_api> callback can be used to change this convention.
 
 =head2 log_call {OPTIONS}, [INPUTS], [RESULTS]
 
@@ -480,8 +500,8 @@ themselves (rather than hex escapes)
 =item 1.
 
 If an item is a reference to a string then the string is inserted
-as-is (unquoted),
-and unless the string is empty, adjacent commas are suppressed.
+as-is without quote,
+and adjacent commas are suppressed (unless the string is empty).
 This allows pasting arbitrary text between values.
 
 =item 2.
@@ -492,67 +512,11 @@ the C<fmt_object> option described below.
 
 =back
 
-B<{OPTIONS}>
-
-(See "Default OPTIONS" below to specify some of these statically)
-
-=over
-
-=item self =E<gt> objref
-
-If your sub is a method, your can pass C<self =E<gt> $self> and
-the the invocant will be displayed separately before the method name.
-To reduce clutter, the invocant is
-displayed for only the first of a series of consecutive calls with the
-same C<self> value.
-
-=item subname_override =E<gt> STRING
-
-STRING is shown instead of the name of the public entry-point function
-identified via calls to I<is_public_api()>
-(which is still invoked to locate where the entry-point was called from).
-
-=item fmt_object =E<gt> CODE
-
-Format a reference to a blessed thing,
-or the value of the C<self> option (if passed) whether blessed or not.
-
-The sub is called with args ($state, $thing).  It should return
-either C<$thing> or an alternative representation string.  By default,
-the type/classname is shown and an abbreviated address (see C<addrvis>
-in L<Data::Dumper::Interp>).
-
-C<$state> is a ref to a hash where you can store anything you want; it persists
-only during the current C<fmt_call> invocation.
-
-=item is_public_api =E<gt> CODE
-
-Recognize a public entry-point in the call stack.
-
-The sub is called repeatedly with
-arguments S<< C<($state, [package,file,line,subname,...])>. >>
-
-The second argument contains results from C<caller(N)>.
-Your sub should return True if the frame represents the call to be described
-in the message.
-
-The default callback looks for any sub named with an initial lower-case letter;
-in other words, it assumes that internal subs start with an underscore
-or capital letter (such as for constants).
-The actual code
-is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>.
-
-=item logdest =E<gt> filehandle or *FILEHANDLE
-
-=back
-
 =head2 $string = fmt_methcall {OPTIONS}, $self, [INPUTS], [RESULTS]
 
 A short-hand for
 
   $string = fmt_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
-
-=head2 log_methcall $self, [INPUTS], [RESULTS]
 
 =head2 log_methcall {OPTIONS}, $self, [INPUTS], [RESULTS]
 
@@ -560,7 +524,7 @@ A short-hand for
 
   log_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
 
-Usually {OPTIONS} can be omitted for a more succinct form.
+Note that {OPTIONS} can usualy be omitted for a more succinct form.
 
 =head2 $frame = nearest_call {OPTIONS};
 
@@ -579,6 +543,29 @@ Returns abbreviated information from C<nearest_call>, possibly ambiguous
 but usually more friendly to humans:  C<$filename> is the I<basename> only
 and C<$subname> omits the Package:: prefix.
 
+=head2 {OPTIONS}
+
+=over
+
+=item self =E<gt> objref
+
+If your sub is a method, your can pass C<self =E<gt> $self> and
+the the invocant will be displayed separately before the method name.
+To reduce clutter, the invocant is
+displayed for only the first of a series of consecutive calls with the
+same C<self> value.
+
+=item subname_override =E<gt> STRING
+
+STRING is shown instead of the name of the public entry-point function
+identified via calls to I<is_public_api()>
+(which is still invoked to locate where the entry-point was called from).
+
+=back
+
+Although not usually helpful, any of the "Default OPTIONS" listed next
+may also be included an {OPTIONS} hash passed to a specific call.
+
 =head2 Default OPTIONS
 
 B<our %SpreadsheetEdit_Log_Options = (...);> in your package
@@ -586,12 +573,49 @@ will be used to override the built-in defaults
 (but are overridden by C<{OPTIONS}> passed in individual calls
 to functions which accept an OPTIONS hash).
 
+=over
+
+=item is_public_api =E<gt> CODE
+
+A callback to recognize a public entry-point.
+
+The sub is called repeatedly with
+arguments S<< C<($state, [package,file,line,subname,...])>. >>
+
+The second argument contains results from C<caller(N)>.
+Your sub should return true if the frame represents the call to be described
+in the message.
+
+The default callback looks for any sub named with an initial lower-case letter;
+in other words, it assumes internal subs start with an underscore
+or capital letter (such as for constants).
+The actual code
+is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>.
+
+=item fmt_object =E<gt> CODE
+
+Format a reference to a blessed thing,
+or the value of the C<self> option (if passed) whether blessed or not.
+
+The sub is called with args ($state, $thing).  It should return
+either C<$thing> or an alternative representation string.  By default,
+the type/classname is shown and an abbreviated address (see C<addrvis>
+in L<Data::Dumper::Interp>).
+
+C<$state> is a ref to a hash where you can store anything you want; it persists
+only during the current C<fmt_call> invocation.
+
+=item logdest =E<gt> filehandle or *FILEHANDLE
+
+=back
+
 The "logdest" option may also be set globally (affects all pacakges)
 by calling
 
-=head3 set_logdest($filehandle or *FILEHANDLE)
+=head3 B<set_logdest($filehandle or *FILEHANDLE)>
 
 Z<>
+
 
 =head1 DEBUG UTILITIES
 
@@ -607,37 +631,28 @@ NOTE: None of these are exported by default.
 
 Print debug trace messages.  I<btw> stands for "by the way...".
 
-C<btw> prints a message to STDERR (or "logdest" - see OPTIONS and "Default OPTIONS").
-preceeded by "linenum:"
-giving the line number I<of the call to btw>.
+B<btw> prints a message to STDERR
+(or "logdest" - see "Default OPTIONS").
+preceeded by "package:linenum> "
+giving the location I<of the call to btw>.
 A newline is appended to the message unless the last STRING already
-ends with a newline.
+ends with a newline.  The message is colorized unless $ENV{NO_COLOR} is true.
 
-This is similar C<warn> when the message omits a final newline
+In effect, C<btw> does what Perl's C<warn> does when the message omits a final newline,
 but with a different presentation.
 
-C<btwN> displays the line number of the call LEVELSBACK
+B<btwN> displays the location of the call LEVELSBACK
 in the call stack (0 is the same as C<btw>, 1 for your caller's location etc.)
 
-C<btwbt> displays an inline mini traceback before the message, like this:
+B<btwbt> displays an inline mini traceback before the message, like this:
 
-  PkgA 565 ⇐ PkgB 330 ⇐ 456 ⇐ 413 : message...
+  main:42 ⇒ PkgA:565 ⇒ PkgB:330 ⇒ 456 ⇒ 413 : message...
 
-By default, only the line numbers of calling locations are shown if the call
-was from package 'main' or Spreadsheet::Edit::Log was imported by only a single module.
+The package name is omitted if it is obvious.
 
-The import tag B<:btw=PFX> imports customized
-C<btw()>, C<btwN()> and C<btwbt()> functions which prefix
-messages with an arbitrary prefix B<PFX>
-which may
-contain I<$lno> I<$path> I<$fname> I<$package> I<$pkg> or I<$pkg_space>
-to interpolate respectively
-the calling line number, file path, file basename,
-package name, S<abbreviated package name (*:: removed).>
-or abbrev. package name followed by a space, or nothing if the package is "main".
+=head2 :btw import tag
 
-Import tag B<:nocolor> prevents colorizing.
-By default C<btw> and C<oops> messages are colorized if the terminal allows.
+imports all three functions (btw, btwN and btwbt).
 
 =head2 oops STRING,STRING,...
 
@@ -652,11 +667,41 @@ then the value from calling C<set_logdest()>, or the built-in default.
 
 =head1 COLORIZE TERMINAL TEXT
 
-=head2 $newstring = colorize($string, SUCCESS_COLOR | ERROR_COLOR | WARN_COLOR | BOLD_COLOR);
+=head2 $newstring = colorize($string, SUCCESS_COLOR | WARN_COLOR | ERROR_COLOR | BOLD_COLOR);
 
 Insert escape sequences to make the text display in an appropriate
-color, provided the process has a tty and $TERM is a terminal type
+color (and turn coloring off at the end of the string),
+provided the process has a tty and $TERM is a terminal type
 which supports ansi color escapes.
+
+The second argument indicates
+respectively green, yellow, red or a bold version of the
+default foreground color.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over
+
+=item NO_COLOR (true to make C<btw> functions and C<colorize> not colorize).
+
+=back
+
+
+=head1 INCOMPATIBLE CHANGES with v1001.001
+
+=over
+
+=item Import tag ':btw=evalstring' no longer supported
+
+This used to allow customizing the prefix part of
+messages from C<btw>, but the code grew too complicated with
+only imagined real benefits.
+
+=item Import tags ':color' and ':nocolor' no longer supported.
+
+Please use C<$ENV{NO_COLOR}> instead.  See L<https://no-color.org/>
+
+=back
 
 =head1 SEE ALSO
 

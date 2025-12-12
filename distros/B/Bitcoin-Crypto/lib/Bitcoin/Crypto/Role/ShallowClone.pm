@@ -1,17 +1,9 @@
 package Bitcoin::Crypto::Role::ShallowClone;
-$Bitcoin::Crypto::Role::ShallowClone::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Role::ShallowClone::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Types::Common -sigs, -types;
-use Moo::Role;
-
-signature_for clone => (
-	method => Object,
-	positional => [
-	],
-);
+use Mooish::Base -standard, -role;
 
 # Clones up to two levels deep - main reference and any plain hash / array
 # references inside it
@@ -37,8 +29,13 @@ sub clone
 
 	# Don't use the constructor because not all state may be assignable this
 	# way
-	return bless \%new_self, ref $self;
+	my $clone = bless \%new_self, ref $self;
+	$clone->_cloned;
+	return $clone;
 }
+
+# overridable to modify after cloning
+sub _cloned { }
 
 1;
 

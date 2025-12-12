@@ -11,7 +11,6 @@ Mail::Box::Search - select messages within a mail box
 
  Mail::Box::Search is extended by
    Mail::Box::Search::Grep
-   Mail::Box::Search::SpamAssassin
    Mail::Server::IMAP4::Search
 
 =head1 SYNOPSIS
@@ -39,14 +38,15 @@ Currently implemented searches:
 Match header or body against a regular expression in a UNIX C<grep> like
 fashion.
 
-=item L<Mail::Box::Search::SpamAssassin|Mail::Box::Search::SpamAssassin>
+=item C<Mail::Box::Search::SpamAssassin>
 
-Try to detect spam, using Mail::SpamAssassin.
+The original implementation supported only SpamAssassin 2.x, and therefore
+this implementation was removed for L<Mail::Box|Mail::Box> 4.
 
-=item Mail::Box::Search::IMAP
+=item C<Mail::Box::Search::IMAP>
 
 Search an IMAP folder for special interface IMAP folders provide for it.
-UNDER CONSTRUCTION till L<Mail::Transport::IMAP4|Mail::Transport::IMAP4> is complete.
+Implementation not completed.
 
 =back
 
@@ -67,19 +67,17 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 Create a filter.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option    --Defined in     --Default
-  binaries                     <C<false>>
-  decode                       <C<true>>
-  delayed                      true
-  deleted                      false
-  deliver                      undef
-  in                           'BODY'
-  label                        undef
-  limit                        0
-  log         Mail::Reporter   'WARNINGS'
-  logical                      'REPLACE'
-  multiparts                   true
-  trace       Mail::Reporter   'WARNINGS'
+ -Option    --Default
+  binaries    <C<false>>
+  decode      <C<true>>
+  delayed     true
+  deleted     false
+  deliver     undef
+  in          'BODY'
+  label       undef
+  limit       0
+  logical     'REPLACE'
+  multiparts  true
 
 =over 2
 
@@ -132,8 +130,6 @@ is positive, the search starts at the first message in the folder or
 thread.  A negative C<$number> starts at the end of the folder.  If the limit
 is set to zero, there is no limit.
 
-=item log => LEVEL
-
 =item logical => 'REPLACE'|'AND'|'OR'|'NOT'|'AND NOT'|'OR NOT'
 
 Only applicable in combination with a C<label>.
@@ -156,8 +152,6 @@ problems handling details received from the search.  When this flag
 is turned off, the body of multiparts will be ignored.  The parts
 search will include the preamble and epilogue.
 
-=item trace => LEVEL
-
 =back
 
 =back
@@ -175,10 +169,6 @@ Z<>
 =item $obj-E<gt>B<doMultiparts>()
 
 Z<>
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<parseDelayed>()
 
@@ -200,43 +190,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -316,44 +270,48 @@ go to the selected filehandle (see C<perldoc -f select>).
 
 =over 4
 
-=item Error: Cannot search in body.
+=item Error: cannot search in body.
 
 The search object does not implement L<inBody()|Mail::Box::Search/"Searching">, and can therefore
 not search a message body.
 Cast by C<new()>
 
-=item Error: Cannot search in header.
+=item Error: cannot search in header.
 
 The search object does not implement L<inHead()|Mail::Box::Search/"Searching">, and can therefore
 not search a message header.
 Cast by C<new()>
 
-=item Error: Don't know how to deliver via results in $way.
+=item Error: class $package does not implement method $method.
 
-The search results cannot be delivered in the specific way, because that is
-not a defined alternative.
-Cast by C<new()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Error: Search in BODY, HEAD or MESSAGE not $in.
+=item Error: don't know how to deliver results in $what.
 
-The C<in> option defines only three names.
+The search results cannot be delivered in the specific way, because that is
+not a defined alternative.
+Cast by C<new()>
+
+=item Error: expect messages to search, not $what.
+
+Cast by C<search()>
+
+=item Error: search in BODY, HEAD or MESSAGE, not $what.
+
+The C<in> option offers only three alternatives.
 Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,18 +10,19 @@
 
 
 package Mail::Message::Head;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/mistake/ ];
+
 use Mail::Message::Head::Complete;
 use Mail::Message::Field::Fast;
 
-use Carp;
 use Scalar::Util   qw/weaken/;
 
 #--------------------
@@ -114,16 +115,16 @@ sub get($;$)
 		  : $index == 0           ? $value
 		  :    undef;
 	}
-	elsif(wantarray)
+
+	if(wantarray)
 	{	return ! defined $value   ? ()
 		  : ref $value eq 'ARRAY' ? @$value
 		  :    ($value);
 	}
-	else
-	{	return ! defined $value   ? undef
-		  : ref $value eq 'ARRAY' ? $value->[-1]
-		  :    $value;
-	}
+
+	    ! defined $value      ? undef
+	  : ref $value eq 'ARRAY' ? $value->[-1]
+	  :    $value;
 }
 
 sub get_all(@) { my @all = shift->get(@_) }   # compatibility, force list
@@ -143,7 +144,7 @@ sub study($;$)
 
 
 sub isMultipart()
-{	my $type = shift->get('Content-Type', 0);
+{	my $type = $_[0]->get('Content-Type', 0);
 	$type && scalar $type->body =~ m[^multipart/]i;
 }
 
@@ -155,9 +156,9 @@ sub read($)
 	my @fields = $parser->readHeader;
 	@$self{ qw/MMH_begin MMH_end/ } = (shift @fields, shift @fields);
 
-	my $type   = $self->{MMH_field_type} || 'Mail::Message::Field::Fast';
+	my $type   = $self->{MMH_field_type} // 'Mail::Message::Field::Fast';
 
-	$self->addNoRealize($type->new( @$_ )) for @fields;
+	$self->addNoRealize( $type->new(@$_) ) for @fields;
 	$self;
 }
 

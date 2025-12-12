@@ -14,6 +14,8 @@ use Mail::Box::Locker::Mutt;
 
 use Test::More;
 
+use Log::Report;
+
 BEGIN {
 	eval qq{
 		use POSIX 'sys_wait_h';
@@ -47,11 +49,10 @@ ok(-f $lockfile,     'lockfile found');
 ok($locker->hasLock, 'locked status');
 
 # Already got lock, so should return immediately.
-my $warn = '';
-{  $SIG{__WARN__} = sub {$warn = "@_"};
-   $locker->lock;
-}
-ok($warn =~ m/already mutt-locked/, 'second attempt');
+ok try(sub { $locker->lock }, hide => 'ALL'), 'second attempt';
+my @e1 = $@->exceptions;
+cmp_ok @e1, '==', 1;
+like $e1[0]->message->toString, qr/already mutt-locked/;
 
 $locker->unlock;
 ok(! $locker->hasLock, 'released lock');

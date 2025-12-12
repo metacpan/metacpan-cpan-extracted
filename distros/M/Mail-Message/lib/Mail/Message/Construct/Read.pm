@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,12 +10,14 @@
 
 
 package Mail::Message;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error warning/ ];
 
 use Mail::Box::Parser::Lines ();
 
@@ -64,7 +66,7 @@ sub read($@)
 			$lines  = _scalar2lines \$_[1]->getline;
 		}
 		else
-		{	$class->log(ERROR => "Cannot read message from $_[1]/$ref");
+		{	error __x"cannot read message from a {source}.", source => $_[1]/$ref;
 			return undef;
 		}
 
@@ -76,13 +78,10 @@ sub read($@)
 
 	my $self = $class->new(%args);
 	$self->readFromParser($parser, $body_type);
-	$self->addReport($parser);
-
 	$parser->stop;
 
 	my $head = $self->head;
-	$head->get('Message-ID')
-		or $head->set('Message-ID' => '<'.$self->messageId.'>');
+	$head->set('Message-ID' => '<'.$self->messageId.'>') unless $head->get('Message-ID');
 
 	$head->delete('Status', 'X-Status')
 		if $strip_status;

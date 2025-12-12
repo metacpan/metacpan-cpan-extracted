@@ -53,14 +53,12 @@ Inherited, see L<Mail::Reporter/"Constructors">
   executable  Mail::Transport  undef
   hostname    Mail::Transport  'localhost'
   interval    Mail::Transport  30
-  log         Mail::Reporter   'WARNINGS'
   password    Mail::Transport  undef
   port        Mail::Transport  undef
   proxy       Mail::Transport  undef
   retry       Mail::Transport  <unlimited>
   style                        <autodetect>
   timeout     Mail::Transport  120
-  trace       Mail::Reporter   'WARNINGS'
   username    Mail::Transport  undef
   via         Mail::Transport  'mailx'
 
@@ -71,8 +69,6 @@ Inherited, see L<Mail::Reporter/"Constructors">
 =item hostname => $host|\@hosts
 
 =item interval => $span
-
-=item log => LEVEL
 
 =item password => $password
 
@@ -94,8 +90,6 @@ distributions).
 
 =item timeout => $span
 
-=item trace => LEVEL
-
 =item username => $username
 
 =item via => CLASS|$name
@@ -107,14 +101,6 @@ distributions).
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Transport::Send|Mail::Transport::Send/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 Sending mail
 
@@ -170,43 +156,7 @@ Extends L<"Error handling" in Mail::Transport::Send|Mail::Transport::Send/"Error
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -228,21 +178,29 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Warning: Message has no destination
+=item Error: cannot find binary of mailx.
 
-It was not possible to figure-out where the message is intended to go to.
-Cast by C<destinations()>
+Cast by C<new()>
 
-=item Error: Package $package does not implement $method.
+=item Fault: cannot open pipe to $program: $!
 
-Fatal error: the specific package (or one of its superclasses) does not
+Cast by C<trySend()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Resent group does not specify a destination
+=item Warning: message has no destination.
+
+It was not possible to figure-out where the message is intended to go to.
+Cast by C<destinations()>
+
+=item Warning: resent group does not specify a destination.
 
 The message which is sent is the result of a bounce (for instance
 created with L<Mail::Message::bounce()|Mail::Message::Construct::Bounce/"Constructing a message">), and therefore starts with a
@@ -258,7 +216,7 @@ As alternative, you may also specify the C<to> option to some of the senders
 found in the message itself about the destination.
 Cast by C<destinations()>
 
-=item Error: Sending via mailx mailer $program failed: $! ($?)
+=item Fault: sending via mailx mailer $program failed: $!
 
 Mailx (in some shape: there are many different implementations) did start
 accepting messages, but did not succeed sending it.
@@ -268,8 +226,8 @@ Cast by C<trySend()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport version 3.008,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -89,7 +89,6 @@ Inherited, see L<Mail::Box/"Constructors">
   lock_type          Mail::Box        'NONE'
   lock_wait          Mail::Box        10 seconds
   locker             Mail::Box        undef
-  log                Mail::Reporter   'WARNINGS'
   manager            Mail::Box        undef
   message_type       Mail::Box        <folder-class>::Message
   multipart_type     Mail::Box        Mail::Message::Body::Multipart
@@ -98,7 +97,6 @@ Inherited, see L<Mail::Box/"Constructors">
   save_on_exit       Mail::Box        true
   server_name                         undef
   server_port                         undef
-  trace              Mail::Reporter   'WARNINGS'
   trusted            Mail::Box        <false>
   username                            undef
 
@@ -120,7 +118,7 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item fix_headers => BOOLEAN
 
-=item folder => FOLDERNAME
+=item folder => $name
 
 =item folderdir => $directory
 
@@ -139,8 +137,6 @@ Inherited, see L<Mail::Box/"Constructors">
 =item lock_wait => $seconds
 
 =item locker => OBJECT
-
-=item log => LEVEL
 
 =item manager => $manager
 
@@ -163,8 +159,6 @@ The name of the C<$host> which contains the remote mail server.
 =item server_port => $number
 
 Port C<$number> in use by the server application.
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -193,10 +187,6 @@ Inherited, see L<Mail::Box/"Attributes">
 =item $obj-E<gt>B<isTrusted>()
 
 Inherited, see L<Mail::Box/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -298,7 +288,7 @@ Inherited, see L<Mail::Box/"The messages">
 
 Inherited, see L<Mail::Box/"The messages">
 
-=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [$msgs]] )
+=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [\@msgs]] )
 
 Inherited, see L<Mail::Box/"The messages">
 
@@ -452,43 +442,7 @@ Extends L<"Error handling" in Mail::Box|Mail::Box/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -514,7 +468,13 @@ Extends L<"DETAILS" in Mail::Box|Mail::Box/"DETAILS">.
 
 =over 4
 
-=item Warning: Changes not written to read-only folder $self.
+=item Error: Folder $name is opened read-only
+
+You can not write to this folder unless you have opened the folder to
+write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set C<true>.
+Cast by C<write()>
+
+=item Warning: changes not written to read-only folder $name.
 
 You have opened the folder read-only --which is the default set
 by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
@@ -522,34 +482,37 @@ Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mo
 the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
 Cast by C<close()>
 
-=item Error: Copying failed for one message.
+=item Error: class $package does not implement method $method.
 
-For some reason, for instance disc full, removed by external process, or
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: copying failed for one message.
+
+For some reason, for instance disk full, removed by external process, or
 read-protection, it is impossible to copy one of the messages.  Copying will
 proceed for the other messages.
 Cast by C<copyTo()>
 
-=item Error: Destination folder $name is not writable.
+=item Error: destination folder $name is not writable.
 
 The folder where the messages are copied to is not opened with write
 access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
 to the folder which is controlled by your operating system.
 Cast by C<copyTo()>
 
-=item Warning: Different messages with id $msgid
+=item Warning: different messages with id $msgid.
 
 The message id is discovered more than once within the same folder, but the
 content of the message seems to be different.  This should not be possible:
 each message must be unique.
 Cast by C<messageId()>
 
-=item Error: Folder $name is opened read-only
-
-You can not write to this folder unless you have opened the folder to
-write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set C<true>.
-Cast by C<write()>
-
-=item Error: Folder $name not deleted: not writable.
+=item Warning: folder $name not deleted: not writable.
 
 The folder must be opened with write access via L<new(access)|Mail::Box/"Constructors">, otherwise
 removing it will be refused.  So, you may have write-access according to
@@ -557,13 +520,13 @@ the operating system, but that will not automatically mean that this
 C<delete> method permits you to.  The reverse remark is valid as well.
 Cast by C<delete()>
 
-=item Error: Invalid timespan '$timespan' specified.
+=item Error: invalid timespan '$span'.
 
 The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
 Cast by C<timespan2seconds()>
 
-=item Warning: Message-id '$msgid' does not contain a domain.
+=item Warning: message-id '$msgid' does not contain a domain.
 
 According to the RFCs, message-ids need to contain a unique random part,
 then an C<@>, and then a domain name.  This is made to avoid the creation
@@ -571,34 +534,24 @@ of two messages with the same id.  The warning emerges when the C<@> is
 missing from the string.
 Cast by C<messageId()>
 
-=item Error: Package $package does not implement $method.
+=item Warning: the term 'hostname' is confusing wrt folder. You probably need 'server_name'.
 
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
+Cast by C<new()>
 
-=item Error: Unable to create subfolder $name of $folder.
+=item Error: unknown value to folder->close(write => $when).
 
-The copy includes the subfolders, but for some reason it was not possible
-to copy one of these.  Copying will proceed for all other sub-folders.
-Cast by C<copyTo()>
+Cast by C<close()>
 
-=item Error: Writing folder $name failed
+=item Error: you cannot add a message which is already part of a folder to a new one.  Please use moveTo or copyTo.
 
-For some reason (you probably got more error messages about this problem)
-it is impossible to write the folder, although you should because there
-were changes made.
-Cast by C<write()>
+Cast by C<addMessage()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

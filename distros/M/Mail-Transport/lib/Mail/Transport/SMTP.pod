@@ -49,14 +49,12 @@ Inherited, see L<Mail::Reporter/"Constructors">
   helo                            <from Net::Config>
   hostname       Mail::Transport  <from Net::Config>
   interval       Mail::Transport  30
-  log            Mail::Reporter   'WARNINGS'
   password                        undef
   port           Mail::Transport  25
   proxy          Mail::Transport  <from Net::Config>
   retry          Mail::Transport  <unlimited>
   smtp_debug                      false
   timeout                         120
-  trace          Mail::Reporter   'WARNINGS'
   username                        undef
   via            Mail::Transport  'smtp'
 
@@ -87,8 +85,6 @@ C<From> line of the message is assumed.
 
 =item interval => $span
 
-=item log => LEVEL
-
 =item password => $password
 
 The password to be used with the C<username> to log in to the remote
@@ -109,8 +105,6 @@ Simulate transmission: the SMTP protocol output will be sent to your screen.
 The number of seconds to C<$wait> for a valid response from the server before
 failing.
 
-=item trace => LEVEL
-
 =item username => $username
 
 Use SASL authentication to contact the remote SMTP server (RFC2554).
@@ -128,14 +122,6 @@ Authen::SASL object.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Transport::Send|Mail::Transport::Send/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 Sending mail
 
@@ -176,7 +162,7 @@ local delivery (which is a smart choice anyway)
 Improves base, see L<Mail::Transport::Send/"Sending mail">
 
  -Option       --Default
-  esmtp_options  {}
+  esmtp_options  +{}
   from           < >
   to             []
 
@@ -244,43 +230,7 @@ Extends L<"Error handling" in Mail::Transport::Send|Mail::Transport::Send/"Error
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -302,25 +252,25 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Warning: Message has no destination
+=item Error: class $package does not implement method $method.
 
-It was not possible to figure-out where the message is intended to go to.
-Cast by C<destinations()>
-
-=item Notice: No addresses found to send the message to, no connection made
-
-Cast by C<trySend()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Resent group does not specify a destination
+=item Warning: message has no destination.
+
+It was not possible to figure-out where the message is intended to go to.
+Cast by C<destinations()>
+
+=item Notice: no addresses found to send the message to, no connection made.
+
+Cast by C<trySend()>
+
+=item Warning: resent group does not specify a destination.
 
 The message which is sent is the result of a bounce (for instance
 created with L<Mail::Message::bounce()|Mail::Message::Construct::Bounce/"Constructing a message">), and therefore starts with a
@@ -336,12 +286,16 @@ As alternative, you may also specify the C<to> option to some of the senders
 found in the message itself about the destination.
 Cast by C<destinations()>
 
+=item Warning: use option `to' to overrule the destination: `To' refers to a field.
+
+Cast by C<trySend()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport version 3.008,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

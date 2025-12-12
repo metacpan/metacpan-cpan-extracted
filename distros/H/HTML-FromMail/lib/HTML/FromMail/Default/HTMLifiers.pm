@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,16 @@
 
 
 package HTML::FromMail::Default::HTMLifiers;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
 
-use HTML::FromText;
-use Carp;
+use Log::Report 'html-frommail';
+
+use HTML::FromText ();
 
 #--------------------
 
@@ -30,16 +31,16 @@ our @htmlifiers = (
 
 sub htmlifyText($$$$)
 {	my ($page, $message, $part, $args) = @_;
-	my $main     = $args->{main} or confess;
+	my $main     = $args->{main} or panic;
 	my $settings = $main->settings('HTML::FromText')
 	  || +{ pre => 1, urls => 1, email => 1, bold => 1, underline => 1};
 
 	my $f = HTML::FromText->new($settings)
-		or croak "Cannot create an HTML::FromText object";
+		or panic "cannot create an HTML::FromText object";
 
-	{	image => '',            # this is not an image
+	 +{	image => '',            # this is not an image
 		html  => { text => $f->parse($part->decoded->string) },
-	}
+	  };
 }
 
 

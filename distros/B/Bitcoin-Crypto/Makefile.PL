@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,26 +14,26 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Bitcoin-Crypto",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Bitcoin::Crypto",
   "PREREQ_PM" => {
     "Bitcoin::BIP39" => "0.002",
     "Bitcoin::Secp256k1" => "0.008",
     "CryptX" => "0.074",
-    "List::Util" => "1.33",
+    "Feature::Compat::Try" => 0,
+    "List::Util" => "1.45",
     "Math::BigInt" => "1.999831",
     "Moo" => "2.003004",
-    "Mooish::AttributeBuilder" => "1.001",
-    "Try::Tiny" => 0,
-    "Type::Tiny" => 2,
-    "namespace::clean" => "0.27"
+    "Mooish::AttributeBuilder" => "1.002",
+    "Mooish::Base" => "1.001",
+    "Type::Tiny" => 2
   },
   "TEST_REQUIRES" => {
-    "Test2::V0" => 0
+    "Test2::V0" => "0.000139"
   },
-  "VERSION" => "4.002",
+  "VERSION" => "4.003",
   "test" => {
-    "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Taproot/*.t t/Transaction/*.t"
+    "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Taproot/*.t t/Transaction/*.t t/Transaction/Signer/*.t"
   }
 );
 
@@ -42,14 +42,14 @@ my %FallbackPrereqs = (
   "Bitcoin::BIP39" => "0.002",
   "Bitcoin::Secp256k1" => "0.008",
   "CryptX" => "0.074",
-  "List::Util" => "1.33",
+  "Feature::Compat::Try" => 0,
+  "List::Util" => "1.45",
   "Math::BigInt" => "1.999831",
   "Moo" => "2.003004",
-  "Mooish::AttributeBuilder" => "1.001",
-  "Test2::V0" => 0,
-  "Try::Tiny" => 0,
-  "Type::Tiny" => 2,
-  "namespace::clean" => "0.27"
+  "Mooish::AttributeBuilder" => "1.002",
+  "Mooish::Base" => "1.001",
+  "Test2::V0" => "0.000139",
+  "Type::Tiny" => 2
 );
 
 

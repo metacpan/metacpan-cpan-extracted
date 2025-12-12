@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Object-Realize-Later version 3.00.
+# This code is part of Perl distribution Object-Realize-Later version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,12 +10,13 @@
 
 
 package Object::Realize::Later;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
 
-use Carp;
-use Scalar::Util 'weaken';
+use Log::Report 'object-release-later';
+
+use Scalar::Util qw/weaken/;
 
 use warnings;
 use strict;
@@ -178,8 +179,8 @@ sub realizationOf($;$)
 sub import(@)
 {	my ($class, %args) = @_;
 
-	confess "Require 'becomes'" unless $args{becomes};
-	confess "Require 'realize'" unless $args{realize};
+	$args{becomes} or panic "import requires 'becomes'";
+	$args{realize} or panic "import requires 'realize'";
 
 	$args{class}                = caller;
 	$args{warn_realization}   ||= 0;
@@ -209,7 +210,7 @@ sub import(@)
 	# Install the code
 
 	eval $eval;
-	die $@ if $@;
+	panic $@ if $@;
 
 	1;
 }

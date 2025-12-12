@@ -6,7 +6,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '3.010';
+my $version  = '4.000';
 my $git      = "https://github.com/markov2/perl5-Mail-Box-IMAP4";
 my $publish  = "../public_html/mail-box-imap4";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -62,21 +62,20 @@ my %prereq = (
 	'File::Temp'       => 0.19,
 	'IO::Socket::IP'   => 0,
 	'List::Util'       => 0,
-	'Mail::IMAPClient' => 3.42,
+	'Log::Report'      => '1.42',
+	'Mail::IMAPClient' => '3.42',
 	'Scalar::Util'     => 0,
-	'Test::More'       => 0,
 
-	'Mail::Box'                    => '3.007, <4.0',
-	'Mail::Box::Manage::User'      => '3, <4.0',
-	'Mail::Box::Net'               => '3, <4.0',
-	'Mail::Box::Search'            => '3, <4.0',
-	'Mail::Box::Test'              => '3, <4.0',
-	'Mail::Message'                => '3.013, <4.0',
-	'Mail::Message::Body::Lines'   => '3, <4.0',
-	'Mail::Message::Head::Complete'=> '3, <4.0',
-	'Mail::Message::Head::Delayed' => '3, <4.0',
-	'Mail::Server'                 => '3, <4.0',
-	'Mail::Transport::Receive'     => '3.004, <4.0',
+	'Mail::Box'                    => '4.0',
+	'Mail::Box::Manage::User'      => '4.0',
+	'Mail::Box::Net'               => '4.0',
+	'Mail::Box::Search'            => '4.0',
+	'Mail::Message'                => '4.0',
+	'Mail::Message::Body::Lines'   => '4.0',
+	'Mail::Message::Head::Complete'=> '4.0',
+	'Mail::Message::Head::Delayed' => '4.0',
+	'Mail::Server'                 => '4.0',
+	'Mail::Transport::Receive'     => '4.0',
 );
 
 WriteMakefile
@@ -108,6 +107,7 @@ WriteMakefile
 				requires => {
 					'Test::More' => 1.00,
 					'Test::Pod'  => 1.00,
+					'Mail::Box::Test' => '4.0',
 				}
 			},
 		},

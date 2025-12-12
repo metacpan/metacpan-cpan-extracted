@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Parser::Lines;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Box::Parser';
+use parent 'Mail::Box::Parser';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x panic warning/ ];
 
 use Mail::Message::Field   ();
 
@@ -24,10 +26,10 @@ use Mail::Message::Field   ();
 
 sub init(@)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
-	$self->{MBPL_lines}  = $args->{lines}  or die "No lines";
-	$self->{MBPL_source} = $args->{source} or die "No source";
+	$self->{MBPL_lines}  = $args->{lines}  or panic "No lines";
+	$self->{MBPL_source} = $args->{source} or panic "No source";
 	$self;
 }
 
@@ -45,7 +47,7 @@ sub readHeader()
 	my $lines = $self->lines;
 	my @ret;
 
-LINE:
+  LINE:
 	while(@$lines)
 	{	my $line = shift @$lines;
 		last if $line =~ $is_empty_line;
@@ -53,7 +55,7 @@ LINE:
 		my ($name, $body) = split /\s*\:\s*/, $line, 2;
 
 		unless(defined $body)
-		{	$self->log(WARNING => "Unexpected end of header in ".$self->source.":\n $line");
+		{	warning __x"unexpected end of header in {source}:\n {line}", source => $self->source, line => $line;
 
 			if(@ret && $self->fixHeaderErrors)
 			{	$ret[-1][1] .= ' '.$line;  # glue err line to previous field
@@ -119,7 +121,7 @@ sub _read_stripped_lines(;$$)
 
 	if(@$seps)
 	{
-	LINE:
+	  LINE:
 		while(1)
 		{	my $line  = shift @$lines or last LINE;
 

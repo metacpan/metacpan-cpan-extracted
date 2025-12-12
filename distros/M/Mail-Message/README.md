@@ -21,6 +21,9 @@ better source is CPAN; to get it installed simply run:
    cpan -i Mail::Message
 ```
 
+**Be aware that version 4 is not fully compatible with releases pre-4**
+See <https://github.com/markov2/perl5-Mail-Box/wiki/>
+
 Including all the options described below:
 
 ```sh

@@ -63,9 +63,9 @@ Extends L<"DETAILS" in Mail::Server|Mail::Server/"DETAILS">.
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
@@ -76,8 +76,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 3.010,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,6 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
   Cwd: '0'
   Date::Parse: '0'
   Devel::GlobalDestruction: '0.09'
@@ -33,17 +32,19 @@ requires:
   File::Spec: '0.7'
   File::Temp: '0'
   IO::Scalar: '0'
-  Mail::Message: '>= 3.013, < 4.0'
-  Mail::Transport: '>= 3.003, < 4.0'
-  Object::Realize::Later: '>= 0.19, < 4.0'
+  Log::Report: '1.42'
+  Mail::Message: '4.000'
+  Mail::Transport: '4.000'
+  Object::Realize::Later: '4.000'
   POSIX: '0'
   Scalar::Util: '1.13'
+  String::Print: '1.01'
   Sys::Hostname: '0'
 resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Box/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Box.git
-version: '3.012'
+version: '4.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001
@@ -58,6 +59,11 @@ x_oodist:
       stylesheet: /oodoc.css
       templates: html
       webpages: ../public_html/mailbox/html
+    -
+      export: website
+      markup: html
+      publish: ../public_html/mail-box/doctree
+      serializer: json
   include:
     - ../HTML-FromMail
     - ../MIME-Types

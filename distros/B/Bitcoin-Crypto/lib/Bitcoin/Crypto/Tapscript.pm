@@ -1,17 +1,13 @@
 package Bitcoin::Crypto::Tapscript;
-$Bitcoin::Crypto::Tapscript::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Tapscript::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard;
 
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Tapscript::Opcode;
-
-use namespace::clean;
 
 extends 'Bitcoin::Crypto::Script';
 

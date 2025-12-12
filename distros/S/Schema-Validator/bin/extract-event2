@@ -1,0 +1,164 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+use LWP::UserAgent;
+use JSON qw(decode_json);
+use HTML::TreeBuilder;
+
+my $url = shift or die "Usage: $0 url";
+my $ua = LWP::UserAgent->new(timeout => 10);
+my $res = $ua->get($url);
+die "Failed to fetch $url: ", $res->status_line unless $res->is_success();
+my $html = $res->decoded_content;
+
+# --------------------
+# Try to parse JSON-LD first
+# --------------------
+my $event;
+my @blocks = ($html =~ m{<script[^>]+type=["']application/ld\+json["'][^>]*>(.+?)</script>}sig);
+for my $blk (@blocks) {
+	my $json;
+	eval { $json = decode_json($blk) };
+	next unless $json;
+
+	my @objs = ref $json eq 'ARRAY' ? @$json : ($json);
+	for my $obj (@objs) {
+		next unless ref $obj eq 'HASH';
+		# accept subtype of Event (MusicEvent, etc.)
+		if ($obj->{ '@type' } && $obj->{ '@type' } =~ /Event$/) {
+			$event = $obj;
+			last;
+		}
+	}
+	last if $event;
+}
+
+# Prepare result fields
+my %info = (
+	title	=> undef,
+	organizer => undef,
+	organizer_url => undef,
+	venue	=> undef,
+	address	 => undef,
+	date		=> undef,
+	time		=> undef,
+	event_url => undef,
+	description => undef,
+);
+
+if ($event) {
+	# From JSON-LD
+	$info{title}	 = $event->{name} // '';
+	$info{event_url} = $event->{url} // $url;
+
+	# Organizer: might be array or object
+	if ($event->{organizer}) {
+		if (ref $event->{organizer} eq 'ARRAY') {
+			$info{organizer}	 = $event->{organizer}[0]{name} // '';
+			$info{organizer_url} = $event->{organizer}[0]{url} // '';
+		} else {
+			$info{organizer}	 = $event->{organizer}{name} // '';
+			$info{organizer_url} = $event->{organizer}{url} // '';
+		}
+	}
+
+	# Venue / Location
+	if ($event->{location}) {
+		$info{venue} = $event->{location}{name} // '';
+		if ($event->{location}{address}) {
+			# Compose a simple address
+			my $addr = $event->{location}{address};
+			my @parts;
+			for my $field (qw/streetAddress addressLocality addressRegion postalCode addressCountry/) {
+				push @parts, $addr->{$field} if defined $addr->{$field};
+			}
+			$info{address} = join(', ', @parts) if @parts;
+		}
+	}
+
+	# Date and time from startDate
+	if (my $start = $event->{startDate}) {
+		if ($start =~ /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}(?::\d{2})?)(.*)$/) {
+			$info{date} = $1;
+			$info{time} = $2;
+		} else {
+			$info{date} = $start;	# fallback
+		}
+	}
+
+	# Description
+	$info{description} = $event->{description} // '';
+}
+
+# --------------------
+# Fallback via HTML if some fields are missing
+# --------------------
+my $tree = HTML::TreeBuilder->new_from_content($html);
+
+# Title fallback
+if (!defined $info{title} or $info{title} eq '') {
+	if (my $h1 = $tree->find('h1')) {
+		$info{title} = $h1->as_text;
+	}
+}
+
+# Organizer fallback (group)
+if ((!defined $info{organizer} or $info{organizer} eq '')
+	and my $host = $tree->look_down(_tag => 'div', sub { $_[0]->as_text =~ /Host Details/i })) {
+	# Inside "Host Details" area
+	$info{organizer} = $host->as_text;
+	$info{organizer} =~ s/Host Details://i;
+	$info{organizer} =~ s/\s+//g;
+}
+
+# Date/time fallback
+if ((!defined $info{date} or $info{date} eq '') or (!defined $info{time} or $info{time} eq '')) {
+	if (my $dt = $tree->look_down(_tag => 'div', sub { $_[0]->as_text =~ /Date & Location/i })) {
+		my $text = $dt->as_text;
+		# Example: "Thu, 18 Dec, 2025 at 07:00 pm (EST)"
+		if ($text =~ /(\w{3}),\s+(\d{1,2} \w{3}),\s+(\d{4}) at (\d{1,2}:\d{2}(?:\s*(?:am|pm))?)/) {
+			$info{date} = "$2, $3";
+			$info{time} = $4;
+		} else {
+			$info{date} = $text;
+		}
+	}
+}
+
+# Venue fallback
+if (!defined $info{venue} or $info{venue} eq '') {
+	# Look for the location name under the header
+	if (my $loc = $tree->look_down(_tag => 'h2')) {
+		$info{venue} = $loc->as_text;
+	}
+}
+
+# Description fallback
+if (!defined $info{description} or $info{description} eq '') {
+	if (my $about = $tree->look_down(_tag => 'div', sub { $_[0]->attr('id') && $_[0]->attr('id') eq 'about' })) {
+		$info{description} = $about->as_text;
+	} else {
+		# Try generic paragraph under "About the event"
+		if (my $para = $tree->look_down(_tag => 'p')) {
+			$info{description} = $para->as_text;
+		}
+	}
+}
+
+$tree->delete();
+
+# --------------------
+# Print results
+# --------------------
+say "Title:\t\t$info{title}";
+say "Organizer:\t$info{organizer}" if($info{'organizer'});
+say "Organizer URL:\t$info{organizer_url}" if($info{'organizer_url'});
+say "Venue:\t\t$info{venue}";
+say "Address:\t$info{address}";
+say "Date:\t\t$info{date}";
+say "Time:\t\t$info{time}";
+say "Event URL:\t$info{event_url}";
+say "Description:\t$info{description}";

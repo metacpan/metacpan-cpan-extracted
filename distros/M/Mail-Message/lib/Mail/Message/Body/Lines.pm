@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,18 +10,18 @@
 
 
 package Mail::Message::Body::Lines;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Body';
+use parent 'Mail::Message::Body';
 
 use strict;
 use warnings;
 
-use Mail::Box::Parser;
-use IO::Lines;
+use Log::Report   'mail-message', import => [ qw/__x fault/ ];
 
-use Carp;
+use Mail::Box::Parser ();
+use IO::Lines         ();
 
 #--------------------
 
@@ -29,7 +29,7 @@ sub _data_from_filename(@)
 {	my ($self, $filename) = @_;
 
 	open my $in, '<:raw', $filename
-		or $self->log(ERROR => "Unable to read file $filename for message body lines: $!"), return;
+		or fault __x"unable to read file {name} for message body lines", name => $filename;
 
 	$self->{MMBL_array} = [ $in->getlines ];
 	$in->close;

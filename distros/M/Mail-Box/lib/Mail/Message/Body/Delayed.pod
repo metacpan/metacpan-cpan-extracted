@@ -11,6 +11,9 @@ Mail::Message::Body::Delayed - body of a Mail::Message but not read yet.
  Mail::Message::Body::Delayed
    is a Mail::Reporter
 
+ Mail::Message::Body::Delayed
+   is a Mail::Reporter
+
 =head1 SYNOPSIS
 
   See Mail::Message::Body
@@ -66,20 +69,14 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 
 Inherited, see L<Mail::Reporter/"Constructors">
 
- -Option --Defined in     --Default
-  log      Mail::Reporter   'WARNINGS'
-  message                   <required>
-  trace    Mail::Reporter   'WARNINGS'
+ -Option --Default
+  message  <required>
 
 =over 2
-
-=item log => LEVEL
 
 =item message => MESSAGE
 
 The MESSAGE object which contains this delayed body.
-
-=item trace => LEVEL
 
 =back
 
@@ -88,14 +85,6 @@ The MESSAGE object which contains this delayed body.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 Error handling
 
@@ -107,43 +96,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -227,9 +180,13 @@ Z<>
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: a message must be specified to a delayed body.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Cast by C<new()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
@@ -240,8 +197,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,21 +10,22 @@
 
 
 package Mail::Message::Body::File;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Body';
+use parent 'Mail::Message::Body';
 
 use strict;
 use warnings;
 
-use Mail::Box::Parser;
-use Mail::Message;
+use Log::Report   'mail-message', import => [ qw/__x fault/ ];
 
-use Carp;
 use File::Temp qw/tempfile/;
 use File::Copy qw/copy/;
 use Fcntl      qw/SEEK_END/;
+
+use Mail::Box::Parser ();
+use Mail::Message     ();
 
 #--------------------
 
@@ -32,11 +33,11 @@ sub _data_from_filename(@)
 {	my ($self, $filename) = @_;
 
 	open my $in, '<:raw', $filename
-		or $self->log(ERROR => "Unable to read file $filename for message body file: $!"), return;
+		or fault __x"unable to read file {name} for message body file", name => $filename;
 
 	my $file   = $self->tempFilename;
 	open my $out, '>:raw', $file
-		or $self->log(ERROR => "Cannot write to temporary body file $file: $!"), return;
+		or fault __x"cannot write to temporary body file {name}", name => $file;
 
 	my $nrlines = 0;
 	local $_;
@@ -51,7 +52,7 @@ sub _data_from_filehandle(@)
 	my $nrlines = 0;
 
 	open my $out, '>:raw', $file
-		or $self->log(ERROR => "Cannot write to temporary body file $file: $!"), return;
+		or fault __x"cannot write to temporary body file {name}", name => $file;
 
 	local $_;
 	while(<$fh>)
@@ -68,7 +69,7 @@ sub _data_from_lines(@)
 	my $file = $self->tempFilename;
 
 	open my $out, '>:raw', $file
-		or $self->log(ERROR => "Cannot write to $file: $!"), return;
+		or fault __x"cannot write body to file {name}", name => $file;
 
 	$out->print(@$lines);
 
@@ -88,17 +89,16 @@ sub clone()
 	$self;
 }
 
+
 sub nrLines()
 {	my $self    = shift;
-
-	return $self->{MMBF_nrlines}
-		if defined $self->{MMBF_nrlines};
+	return $self->{MMBF_nrlines} if defined $self->{MMBF_nrlines};
 
 	my $file    = $self->tempFilename;
 	my $nrlines = 0;
 
 	open my $in, '<:raw', $file
-		or die "Cannot read from $file: $!\n";
+		or fault __x"cannot read from file {name}", name => $file;
 
 	local $_;
 	$nrlines++ while <$in>;
@@ -120,22 +120,24 @@ sub size()
 	$self->{MMBF_size} = $size;
 }
 
+
 sub string()
 {	my $self = shift;
 	my $file = $self->tempFilename;
 
 	open my $in, '<:raw', $file
-		or die "Cannot read from $file: $!\n";
+		or fault __x"cannot read from file {name}", name => $file;
 
 	join '', $in->getlines;
 }
+
 
 sub lines()
 {	my $self = shift;
 	my $file = $self->tempFilename;
 
 	open my $in, '<:raw', $file
-		or die "Cannot read from $file: $!\n";
+		or fault __x"cannot read from file {name}", name => $file;
 
 	my $r = $self->{MMBF_nrlines} = [ $in->getlines ];
 	wantarray ? @$r: $r;
@@ -147,13 +149,14 @@ sub file()
 	$tmp;
 }
 
+
 sub print(;$)
 {	my $self = shift;
 	my $fh   = shift || select;
 
 	my $file = $self->tempFilename;
 	open my $in, '<:raw', $file
-		or croak "Cannot read from $file: $!\n";
+		or fault __x"cannot read from file {name}", name => $file;
 
 	$fh->print($_) while <$in>;
 	$in->close;
@@ -161,24 +164,26 @@ sub print(;$)
 	$self;
 }
 
+
 sub endsOnNewline()
 {	my $self = shift;
 
 	my $file = $self->tempFilename;
 	open my $in, '<:raw', $file
-		or croak "Cannot read from $file: $!\n";
+		or fault __x"cannot read from file {name}", name => $file;
 
 	$in->seek(-1, SEEK_END);
 	$in->read(my $char, 1);
 	$char eq "\n" || $char eq "\r";
 }
 
+
 sub read($$;$@)
 {	my ($self, $parser, $head, $bodytype) = splice @_, 0, 4;
 	my $file = $self->tempFilename;
 
 	open my $out, '>:raw', $file
-		or die "Cannot write to $file: $!.\n";
+		or fault __x"cannot write to file {name}", name => $file;
 
 	(my $begin, my $end, $self->{MMBF_nrlines}) = $parser->bodyAsFile($out, @_);
 	$out->close;
@@ -191,10 +196,7 @@ sub read($$;$@)
 
 sub tempFilename(;$)
 {	my $self = shift;
-
-	  @_                     ? ($self->{MMBF_filename} = shift)
-	: $self->{MMBF_filename} ? $self->{MMBF_filename}
-	:                          ($self->{MMBF_filename} = (tempfile)[1]);
+	@_ ? ($self->{MMBF_filename} = shift) : ($self->{MMBF_filename} //= (tempfile)[1]);
 }
 
 #--------------------

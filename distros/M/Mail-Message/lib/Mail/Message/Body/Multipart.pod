@@ -10,6 +10,9 @@ Mail::Message::Body::Multipart - body of a message with attachments
    is a Mail::Message::Body
    is a Mail::Reporter
 
+   Mail::Message::Body also extends Mail::Reporter
+   is a Mail::Reporter
+
 =head1 SYNOPSIS
 
   See Mail::Message::Body
@@ -107,18 +110,16 @@ Inherited, see L<Mail::Message::Body/"Constructors">
   file               Mail::Message::Body  undef
   filename           Mail::Message::Body  undef
   language           Mail::Message::Body  undef
-  log                Mail::Reporter       'WARNINGS'
   message            Mail::Message::Body  undef
   mime_type          Mail::Message::Body  'multipart/mixed'
-  modified           Mail::Message::Body  <C<false>>
+  modified           Mail::Message::Body  false
   parts                                   undef
   preamble                                undef
-  trace              Mail::Reporter       'WARNINGS'
   transfer_encoding  Mail::Message::Body  'none'
 
 =over 2
 
-=item based_on => BODY
+=item based_on => $body
 
 =item boundary => $separator
 
@@ -127,17 +128,17 @@ This separator must be unique in case the message contains nested
 multiparts (which are not unusual).  If C<undef>, a nice unique boundary
 will be generated.
 
-=item charset => CHARSET|'PERL'|<undef>
+=item charset => $charset|'PERL'|<undef>
 
 =item checked => BOOLEAN
 
 =item content_id => STRING
 
-=item data => ARRAY-OF-LINES | STRING
+=item data => \@lines|$text
 
-=item description => STRING|FIELD
+=item description => STRING|$field
 
-=item disposition => STRING|FIELD
+=item disposition => STRING|$field
 
 =item eol => 'CR'|'LF'|'CRLF'|'NATIVE'
 
@@ -149,17 +150,15 @@ is usually empty, and has no meaning.
 Provide a C<$body> object or plain C<$text> (which will automatically translated
 into a C<text/plain> body).
 
-=item file => FILENAME|FILEHANDLE|IOHANDLE
+=item file => $file|$handle|$io
 
-=item filename => FILENAME
+=item filename => $file
 
-=item language => STRING|ARRAY|LIST|FIELD
+=item language => STRING|\@lang|$field
 
-=item log => LEVEL
+=item message => $message
 
-=item message => MESSAGE
-
-=item mime_type => STRING|FIELD|MIME
+=item mime_type => STRING|$field|$mime
 
 =item modified => BOOLEAN
 
@@ -183,9 +182,7 @@ agents are very capable in warning the user themselves.
 Provide a C<$body> object or plain C<$text> (which will automatically translated
 into a C<text/plain> body).
 
-=item trace => LEVEL
-
-=item transfer_encoding => STRING|FIELD
+=item transfer_encoding => STRING|$field
 
 =back
 
@@ -211,10 +208,6 @@ Extends L<"Attributes" in Mail::Message::Body|Mail::Message::Body/"Attributes">.
 =item $obj-E<gt>B<charsetDetectAlgorithm>( [CODE|undef|METHOD] )
 
 Inherited, see L<Mail::Message::Body::Encode/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
@@ -530,7 +523,7 @@ Inherited, see L<Mail::Message::Body/"Internals">
 
 Inherited, see L<Mail::Message::Body/"Internals">
 
-=item $obj-E<gt>B<modified>( [$flag] )
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
 
 Inherited, see L<Mail::Message::Body/"Internals">
 
@@ -554,43 +547,11 @@ Extends L<"Error handling" in Mail::Message::Body|Mail::Message::Body/"Error han
 
 Inherited, see L<Mail::Message::Body/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
+=item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -606,6 +567,10 @@ Extends L<"Cleanup" in Mail::Message::Body|Mail::Message::Body/"Cleanup">.
 
 Inherited, see L<Mail::Reporter/"Cleanup">
 
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
 =back
 
 =head1 DETAILS
@@ -616,66 +581,95 @@ Extends L<"DETAILS" in Mail::Message::Body|Mail::Message::Body/"DETAILS">.
 
 =over 4
 
-=item Warning: Charset $name is not known
-
-The encoding or decoding of a message body encounters a character set which
-is not understood by Perl's Encode module.
-Cast by C<encode()>
-
-=item Warning: Content-Transfer-Encoding `$encoding' requires explicit charset, defaulted to utf-8
+=item Warning: Content-Transfer-Encoding '$te' requires explicit charset, defaulted to utf-8.
 
 Cast by C<encode()>
 
-=item Error: Data not convertible to a message (type is $type)
-
-An object which is not coercable into a L<Mail::Message::Part|Mail::Message::Part> object was
-passed to the initiation.  The data is ignored.
-Cast by C<new()>
-
-=item Warning: No decoder defined for transfer encoding $name.
-
-The data (message body) is encoded in a way which is not currently understood,
-therefore no decoding (or recoding) can take place.
-Cast by C<encode()>
-
-=item Warning: No encoder defined for transfer encoding $name.
-
-The data (message body) has been decoded, but the required encoding is
-unknown.  The decoded data is returned.
-Cast by C<encode()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: Unknown criterium $what to select parts.
-
-Valid choices for part selections are C<ALL>, C<ACTIVE>, C<DELETED>,
-C<RECURSE> or a code reference.  However, some other argument was passed.
-Cast by C<parts()>
-
-=item Warning: Unknown line terminator $eol ignored
-
-Cast by C<eol()>
-
-=item Error: You cannot use foreachLine on a multipart
+=item Error: You cannot use foreachLine on a multipart.
 
 L<foreachLine()|Mail::Message::Body::Multipart/"METHODS"> should be used on decoded message bodies only, because
 it would attempt to modify part-headers and separators as well, which is
 clearly not acceptable.
 Cast by C<foreachLine()>
 
+=item Error: cannot concatenate element $which
+
+Cast by C<concatenate()>
+
+=item Fault: cannot open $file to write body: $!
+
+Cast by C<write()>
+
+=item Warning: charset '$name' is not known.
+
+The encoding or decoding of a message body encounters a character set which
+is not understood by Perl's Encode module.
+Cast by C<encode()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: data not convertible to a message (type is $type)
+
+An object which is not coercable into a L<Mail::Message::Part|Mail::Message::Part> object was
+passed to the initiation.
+Cast by C<new()>
+
+=item Fault: error closing $file after write body: $!
+
+Cast by C<write()>
+
+=item Warning: no decoder defined for transfer encoding '$encoding'.
+
+The data (message body) is encoded in a way which is not currently understood,
+therefore no decoding (or recoding) can take place.
+Cast by C<encode()>
+
+=item Warning: no encoder defined for transfer encoding '$encoding'.
+
+The data (message body) has been decoded, but the required encoding is
+unknown.  The decoded data is returned.
+Cast by C<encode()>
+
+=item Error: no filename parameter for write() body.
+
+Cast by C<write()>
+
+=item Error: part number needs multi-part or nested.
+
+Cast by C<partNumberOf()>
+
+=item Error: unknown criterium $what to select parts.
+
+Valid choices for part selections are C<ALL>, C<ACTIVE>, C<DELETED>,
+C<RECURSE> or a code reference.  However, some other argument was passed.
+Cast by C<parts()>
+
+=item Error: unknown line terminator '$eol'.
+
+Cast by C<eol()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

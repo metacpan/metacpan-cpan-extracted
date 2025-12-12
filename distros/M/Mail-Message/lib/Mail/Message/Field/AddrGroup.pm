@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Field::AddrGroup;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Collection::Emails';
+use parent 'User::Identity::Collection::Emails';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 use Scalar::Util  qw/blessed/;
 
@@ -48,8 +50,7 @@ sub coerce($@)
 			if $addr->isa('User::Identity::Collection::Emails');
 	}
 
-	$class->log(ERROR => "Cannot coerce a ".(ref($addr)|'string').  " into a $class");
-	();
+	error __x"cannot coerce a {type} into a {class}.", type => ref $addr // 'string', class => $class;
 }
 
 

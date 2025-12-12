@@ -28,3 +28,5 @@ print Data::Dumper->Dump(
     ],
     ['info']
 );
+
+exit $ENV{SYS_CMD_EXIT} if exists $ENV{SYS_CMD_EXIT};

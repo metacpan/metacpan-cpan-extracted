@@ -1,18 +1,13 @@
 package Bitcoin::Crypto::Transaction::Digest::Result;
-$Bitcoin::Crypto::Transaction::Digest::Result::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::Digest::Result::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
+use Mooish::Base -standard;
 
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Util qw(hash256 tagged_hash);
-
-use namespace::clean;
+use Bitcoin::Crypto::Util::Internal qw(hash256 tagged_hash);
 
 use overload
 	q{""} => "as_string",
@@ -34,17 +29,18 @@ has param 'hash' => (
 
 sub _build_hash
 {
-	my ($self) = @_;
+	my $self = shift;
+	my $preimage = $self->preimage;
 
 	Bitcoin::Crypto::Exception->raise(
 		"can't hash without preimage"
-	) unless $self->has_preimage;
+	) unless defined $preimage;
 
 	if ($self->taproot) {
-		return tagged_hash('TapSighash', $self->preimage);
+		return tagged_hash('TapSighash', $preimage);
 	}
 	else {
-		return hash256($self->preimage);
+		return hash256($preimage);
 	}
 }
 

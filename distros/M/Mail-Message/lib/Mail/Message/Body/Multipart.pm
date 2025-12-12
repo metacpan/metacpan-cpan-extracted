@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,16 @@
 
 
 package Mail::Message::Body::Multipart;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Body';
+use parent 'Mail::Message::Body';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report   'mail-message', import => [ qw/__x error panic warning/ ];
+
 use Scalar::Util   qw/blessed/;
 
 use Mail::Message::Body::Lines ();
@@ -41,7 +42,7 @@ sub init($)
 			my $cooked = Mail::Message::Part->coerce($raw, $self);
 
 			defined $cooked
-				or $self->log(ERROR => 'Data not convertible to a message (type is ', ref $raw,")\n"), next;
+				or error __x"data not convertible to a message (type is {class})", class => ref $raw;
 
 			push @parts, $cooked;
 		}
@@ -89,7 +90,6 @@ sub clone()
 		preamble => ($preamble ? $preamble->clone : undef),
 		epilogue => ($epilogue ? $epilogue->clone : undef),
 		parts    => [ map $_->clone, $self->parts('ACTIVE') ],
-		$self->logSettings,
 	);
 
 }
@@ -209,8 +209,7 @@ sub endsOnNewline()
 
 sub foreachLine($)
 {	my ($self, $code) = @_;
-	$self->log(ERROR => "You cannot use foreachLine on a multipart");
-	confess;
+	error __x"you cannot use foreachLine on a multipart.";
 }
 
 sub check()
@@ -233,7 +232,6 @@ sub read($$$$)
 	my $boundary   = $self->boundary;
 
 	$parser->pushSeparator("--$boundary");
-	my @msgopts    = $self->logSettings;
 
 	my $te;
 	$te = lc $1 if +($head->get('Content-Transfer-Encoding') || '') =~ m/(\w+)/;
@@ -243,7 +241,7 @@ sub read($$$$)
 	# Get preamble.
 	my $headtype = ref $head;
 	my $begin    = $parser->filePosition;
-	my $preamble = Mail::Message::Body::Lines->new(@msgopts, @sloppyopts)->read($parser, $head);
+	my $preamble = Mail::Message::Body::Lines->new(@sloppyopts)->read($parser, $head);
 
 	$preamble->nrLines or undef $preamble;
 	$self->{MMBM_preamble} = $preamble if defined $preamble;
@@ -261,7 +259,7 @@ sub read($$$$)
 			last;
 		}
 
-		my $part = Mail::Message::Part->new(@msgopts, container => $self);
+		my $part = Mail::Message::Part->new(container => $self);
 		$part->readFromParser($parser, $bodytype)
 			or last;
 
@@ -272,7 +270,7 @@ sub read($$$$)
 	# Get epilogue
 
 	$parser->popSeparator;
-	my $epilogue = Mail::Message::Body::Lines->new(@msgopts, @sloppyopts)
+	my $epilogue = Mail::Message::Body::Lines->new(@sloppyopts)
 		->read($parser, $head);
 
 	my $end
@@ -324,10 +322,7 @@ sub foreachComponent($)
 	my @new_parts;
 	foreach (@new_bodies)
 	{	my ($part, $body) = @$_;
-		my $new_part = Mail::Message::Part->new(
-			head      => $part->head->clone,
-			container => undef,
-		);
+		my $new_part = Mail::Message::Part->new(head => $part->head->clone, container => undef);
 		$new_part->body($body);
 		push @new_parts, $new_part;
 	}
@@ -348,7 +343,7 @@ sub foreachComponent($)
 
 sub attach(@)
 {	my $self  = shift;
-	ref($self)->new(based_on => $self, parts => [ $self->parts, @_ ]);
+	(ref $self)->new(based_on => $self, parts => [ $self->parts, @_ ]);
 }
 
 
@@ -381,7 +376,7 @@ sub parts(;$)
 	: $what eq 'DELETED' ? (grep  $_->isDeleted, @parts)
 	: $what eq 'ACTIVE'  ? (grep !$_->isDeleted, @parts)
 	: ref $what eq 'CODE'? (grep $what->($_), @parts)
-	: ($self->log(ERROR => "Unknown criterium $what to select parts."), return ());
+	:    error __x"unknown criterium {what} to select parts.", what => $what;
 }
 
 
@@ -389,8 +384,7 @@ sub part($) { $_[0]->{MMBM_parts}[$_[1]] }
 
 sub partNumberOf($)
 {	my ($self, $part) = @_;
-	my $msg   = $self->message
-		or $self->log(ERROR => 'multipart is not connected'), return 'ERROR';
+	my $msg   = $self->message or panic "multipart is not connected.";
 
 	my $base  = $msg->isa('Mail::Message::Part') ? $msg->partNumber.'.' : '';
 
@@ -399,8 +393,7 @@ sub partNumberOf($)
 	{	return $base.($partnr+1)
 			if $parts[$partnr] == $part;
 	}
-	$self->log(ERROR => 'multipart is not found or not active');
-	'ERROR';
+	panic "multipart is not found or not active";
 }
 
 

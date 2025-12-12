@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 3.008.
+# This code is part of Perl distribution Mail-Transport version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,17 +10,18 @@
 
 
 package Mail::Transport::Send;{
-our $VERSION = '3.008';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Transport';
+use parent 'Mail::Transport';
 
 use strict;
 use warnings;
 
-use Carp;
-use File::Spec;
-use Errno 'EAGAIN';
+use Log::Report   'mail-transport', import => [ qw/__x error warning/ ];
+
+use File::Spec    ();
+use Errno         'EAGAIN';
 
 #--------------------
 
@@ -37,11 +38,8 @@ sub new(@)
 sub send($@)
 {	my ($self, $message, %args) = @_;
 
-	unless($message->isa('Mail::Message'))  # avoid rebless.
-	{	$message = Mail::Message->coerce($message);
-		defined $message
-			or confess "Unable to coerce object into Mail::Message.";
-	}
+	$message = Mail::Message->coerce($message)
+		unless $message->isa('Mail::Message');
 
 	$self->trySend($message, %args)
 		and return 1;
@@ -66,7 +64,7 @@ sub send($@)
 
 sub trySend($@)
 {	my $self = shift;
-	$self->log(ERROR => "Transporters of type ".ref($self). " cannot send.");
+	error __x"transporters of type {class} cannot send.", class => ref $self;
 }
 
 
@@ -96,11 +94,11 @@ sub destinations($;$)
 	elsif(my @rgs = $message->head->resentGroups)
 	{	# Create with bounce
 		@to = $rgs[0]->destinations;
-		@to or $self->log(WARNING => "Resent group does not specify a destination"), return ();
+		@to or warning(__x"resent group does not specify a destination."), return ();
 	}
 	else
 	{	@to = $message->destinations;
-		@to or $self->log(WARNING => "Message has no destination"), return ();
+		@to or warning(__x"message has no destination."), return ();
 	}
 
 	@to;

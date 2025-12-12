@@ -107,17 +107,19 @@ sub save_workflow($self, $workflow) {
     return $workflow_pkey;
 }
 
-sub load_context($self) {
+sub load_context($self, $reload = 0) {
     my $context = Daje::Workflow::Database::Model::Context->new(
         db            => $self->db,
         workflow_pkey => $self->workflow_pkey,
         context       => $self->context,
     )->load_fk();
 
-    my $new_context = $self->context();
-    if(exists $new_context->{context}) {
-        foreach my $key(keys %{$new_context->{context}}) {
-            $context->{context}->{$key} = $new_context->{context}->{$key};
+    unless($reload == 1) {
+        my $new_context = $self->context();
+        if (exists $new_context->{context}) {
+            foreach my $key (keys %{$new_context->{context}}) {
+                $context->{context}->{$key} = $new_context->{context}->{$key};
+            }
         }
     }
     $self->context($context);
@@ -172,6 +174,7 @@ sub insert_connector($self, $data) {
 }
 1;
 __END__
+
 
 
 

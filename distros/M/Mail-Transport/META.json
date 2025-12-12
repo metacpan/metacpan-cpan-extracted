@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,8 +42,10 @@
             "File::Spec" : "0.7",
             "IO::Socket" : "0",
             "List::Util" : "0",
-            "Mail::Reporter" : ">= 3, < 4.0",
-            "Net::SMTP" : "0"
+            "Log::Report" : "1.42",
+            "Mail::Reporter" : "4",
+            "Net::SMTP" : "0",
+            "String::Print" : "1.01"
          }
       },
       "test" : {
@@ -65,7 +67,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Transport"
       }
    },
-   "version" : "3.008",
+   "version" : "4.00",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

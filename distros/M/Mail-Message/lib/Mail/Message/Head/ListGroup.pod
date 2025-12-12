@@ -74,10 +74,8 @@ Improves base, see L<Mail::Message::Head::FieldGroup/"Constructors">
   address                                    undef
   head      Mail::Message::Head::FieldGroup  undef
   listname                                   <derived from address>
-  log       Mail::Reporter                   'WARNINGS'
   rfc                                        undef
   software  Mail::Message::Head::FieldGroup  undef
-  trace     Mail::Reporter                   'WARNINGS'
   type      Mail::Message::Head::FieldGroup  undef
   version   Mail::Message::Head::FieldGroup  undef
 
@@ -95,15 +93,11 @@ In any case, the data is converted into a L<Mail::Identity|Mail::Identity>.
 
 A short textual representation of the mailing-list.
 
-=item log => LEVEL
-
 =item rfc => 'rfc2919'|'rfc2369'
 
 Defines the mailing list software follows an rfc.
 
 =item software => STRING
-
-=item trace => LEVEL
 
 =item type => STRING
 
@@ -122,14 +116,6 @@ be C<rfc2919>, C<rfc2369>, or C<undef>.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 The header
 
@@ -227,31 +213,11 @@ Extends L<"Error handling" in Mail::Message::Head::FieldGroup|Mail::Message::Hea
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<details>()
 
 Produce information about the detected/create list group, which may be
 helpful during debugging, by default to the selected file handle.
 Improves base, see L<Mail::Message::Head::FieldGroup/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =item $obj-E<gt>B<notImplemented>()
 
@@ -260,22 +226,6 @@ Inherited, see L<Mail::Reporter/"Error handling">
 =item $obj-E<gt>B<print>( [$fh] )
 
 Inherited, see L<Mail::Message::Head::FieldGroup/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =back
 
@@ -372,16 +322,16 @@ L<https://www.lsoft.com/>.
 
 =over 4
 
-=item Error: Cannot convert "$string" into an address object
+=item Error: cannot convert "$string" into an address object.
 
 The L<new(address)|Mail::Message::Head::ListGroup/"Constructors"> is coerced into a L<Mail::Message::Field::Address|Mail::Message::Field::Address>,
 which fails.  Have a look at L<Mail::Message::Field::Address::coerce()|Mail::Message::Field::Address/"Constructors">
 to see what valid arguments are.
 Cast by C<new()>
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
@@ -392,8 +342,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

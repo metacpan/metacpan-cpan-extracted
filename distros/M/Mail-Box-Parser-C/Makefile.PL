@@ -38,15 +38,15 @@ my %oodist   = (
 		publish        => "$publish/raw",
 	},
 
-	generate => [
-	  {	format         => 'pod3',
+	generate => [ {
+		format         => 'pod3',
 		podtail        => undef,
-	  },
-	],
+	}, ],
 );
 
 my %requires = (
-	'Mail::Message' => '3.0, <4.0',
+	'Mail::Message' => '4.0',
+	'Log::Report'   => '1.42',
 );
 
 WriteMakefile

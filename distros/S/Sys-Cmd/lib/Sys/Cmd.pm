@@ -1,22 +1,35 @@
 package Sys::Cmd;
 use v5.18;
+
 use warnings;
 no warnings "experimental::lexical_subs";
 use feature 'lexical_subs';
-use Carp           ();
-use Encode::Locale ();    # Creates the 'locale' alias
-use Encode 'resolve_alias';
+
+use Carp            qw[];
+use Cwd             qw[getcwd];
+use Encode::Locale  qw[$ENCODING_LOCALE];      # Also Creates the 'locale' alias
+use Encode          qw[encode resolve_alias];
+use IO::Handle      qw[];
+use Log::Any        qw[$log];
+use Proc::FastSpawn qw[];
+use Sys::Cmd::Process;
 use Exporter::Tidy _map => {
-    run      => sub { run( undef, @_ ) },
-    spawn    => sub { spawn( undef, @_ ) },
-    syscmd   => sub { syscmd( undef, @_ ) },
-    runsub   => sub { syscmd( undef, @_ )->runsub },
-    spawnsub => sub { syscmd( undef, @_ )->spawnsub },
+    run    => sub { _syscmd( undef, @_ )->_run },
+    spawn  => sub { _syscmd( undef, @_ )->_spawn },
+    syscmd => sub { _syscmd( undef, @_ ) },
+    runsub => sub {
+        my $cmd = _syscmd( undef, @_ );
+        sub { @_ ? _syscmd( $cmd, @_ )->_run : $cmd->_run }
+    },
+    spawnsub => sub {
+        my $cmd = syscmd( undef, @_ );
+        sub { @_ ? _syscmd( $cmd, @_ )->_spawn : $cmd->_spawn }
+    },
 };
 
-our $VERSION = 'v0.986.0';
+our $VERSION = 'v0.986.3';
 
-### START Class::Inline ### v0.0.1 Tue Dec  2 10:53:28 2025
+### START Class::Inline ### v0.0.1 Thu Dec 11 13:24:56 2025
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
 
@@ -61,27 +74,33 @@ sub _NEW {
               . join( ', ', @missing ) );
     }
     $_[0]{'cmd'} = eval { $_FIELDS->{'cmd'}->{'isa'}->( $_[0]{'cmd'} ) };
-    Carp::confess( 'Sys::Cmd cmd: ' . $@ ) if $@;
+    delete $_[0]{'cmd'} || Carp::confess( 'Sys::Cmd cmd: ' . $@ ) if $@;
     $_[0]{'dir'} = eval { $_FIELDS->{'dir'}->{'isa'}->( $_[0]{'dir'} ) }
       if exists $_[0]{'dir'};
-    Carp::confess( 'Sys::Cmd dir: ' . $@ ) if $@;
+    delete $_[0]{'dir'} || Carp::confess( 'Sys::Cmd dir: ' . $@ ) if $@;
     $_[0]{'encoding'} =
       eval { $_FIELDS->{'encoding'}->{'isa'}->( $_[0]{'encoding'} ) }
       if exists $_[0]{'encoding'};
-    Carp::confess( 'Sys::Cmd encoding: ' . $@ ) if $@;
+    delete $_[0]{'encoding'} || Carp::confess( 'Sys::Cmd encoding: ' . $@ )
+      if $@;
     $_[0]{'env'} = eval { $_FIELDS->{'env'}->{'isa'}->( $_[0]{'env'} ) }
       if exists $_[0]{'env'};
-    Carp::confess( 'Sys::Cmd env: ' . $@ ) if $@;
+    delete $_[0]{'env'} || Carp::confess( 'Sys::Cmd env: ' . $@ ) if $@;
     $_[0]{'mock'} = eval { $_FIELDS->{'mock'}->{'isa'}->( $_[0]{'mock'} ) }
       if exists $_[0]{'mock'};
-    Carp::confess( 'Sys::Cmd mock: ' . $@ ) if $@;
-    map { delete $_[1]->{$_} } 'cmd', 'dir', 'encoding', 'env', 'err', 'input',
-      'mock', 'on_exit', 'out';
+    delete $_[0]{'mock'} || Carp::confess( 'Sys::Cmd mock: ' . $@ ) if $@;
+    map { delete $_[1]->{$_} } '_coderef', 'cmd', 'dir', 'encoding', 'env',
+      'err', 'exit', 'input', 'log_any', 'mock', 'on_exit', 'out';
 }
 
 sub __RO {
     my ( undef, undef, undef, $sub ) = caller(1);
     Carp::confess("attribute $sub is read-only");
+}
+
+sub _coderef {
+    __RO() if @_ > 1;
+    $_[0]{'_coderef'} //= $_FIELDS->{'_coderef'}->{'default'}->( $_[0] );
 }
 sub cmd { __RO() if @_ > 1; $_[0]{'cmd'} // undef }
 sub dir { __RO() if @_ > 1; $_[0]{'dir'} // undef }
@@ -92,18 +111,23 @@ sub encoding {
         $_FIELDS->{'encoding'}->{'isa'}
           ->( $_FIELDS->{'encoding'}->{'default'} );
     };
-    Carp::confess( 'invalid (Sys::Cmd::encoding) default: ' . $@ ) if $@;
+    delete $_[0]{'encoding'}
+      || Carp::confess( 'invalid (Sys::Cmd::encoding) default: ' . $@ )
+      if $@;
     $_[0]{'encoding'};
 }
-sub env   { __RO() if @_ > 1; $_[0]{'env'}   // undef }
-sub err   { __RO() if @_ > 1; $_[0]{'err'}   // undef }
-sub input { __RO() if @_ > 1; $_[0]{'input'} // undef }
+sub env     { __RO() if @_ > 1; $_[0]{'env'}     // undef }
+sub err     { __RO() if @_ > 1; $_[0]{'err'}     // undef }
+sub exit    { __RO() if @_ > 1; $_[0]{'exit'}    // undef }
+sub input   { __RO() if @_ > 1; $_[0]{'input'}   // undef }
+sub log_any { __RO() if @_ > 1; $_[0]{'log_any'} // undef }
 
 sub mock {
     if ( @_ > 1 ) {
-        $_[0]{'mock'} =
-          eval { $_FIELDS->{'mock'}->{'isa'}->( $_[0]{'mock'} // undef ) };
-        Carp::confess( 'invalid (Sys::Cmd::mock) value: ' . $@ ) if $@;
+        $_[0]{'mock'} = eval { $_FIELDS->{'mock'}->{'isa'}->( $_[1] ) };
+        delete $_[0]{'mock'}
+          || Carp::confess( 'invalid (Sys::Cmd::mock) value: ' . $@ )
+          if $@;
     }
     $_[0]{'mock'} // undef;
 }
@@ -113,26 +137,6 @@ sub on_exit {
     $_[0]{'on_exit'} // undef;
 }
 sub out { __RO() if @_ > 1; $_[0]{'out'} // undef }
-
-sub _dump {
-    my $self = shift;
-    my $x    = do {
-        require Data::Dumper;
-        no warnings 'once';
-        local $Data::Dumper::Indent   = 1;
-        local $Data::Dumper::Maxdepth = ( shift // 2 );
-        local $Data::Dumper::Sortkeys = 1;
-        Data::Dumper::Dumper($self);
-    };
-    $x =~ s/.*?{/{/;
-    $x =~ s/}.*?\n$/}/;
-    my $i = 0;
-    my @list;
-    do { @list = caller( $i++ ) } until $list[3] eq __PACKAGE__ . '::_dump';
-    wantarray
-      ? warn "$self $x at $list[1]:$list[2]\n"
-      : "$self $x at $list[1]:$list[2]\n";
-}
 @_CLASS = grep 1,    ### END Class::Inline ###
   {
     cmd => {
@@ -146,12 +150,18 @@ sub _dump {
         },
         required => 1,
     },
+    _coderef => {
+        default => sub {
+            my $c = $_[0]->cmd->[0];
+            ref($c) eq 'CODE' ? $c : undef;
+        },
+    },
     encoding => {
-        default => 'locale',
+        default => $ENCODING_LOCALE,
         isa     => sub {
-            my $e = resolve_alias( $_[0] )
+            resolve_alias( $_[0] )
               || _croak("Unknown Encoding: $_[0]");
-            $e;
+            $_[0];
         },
     },
     env => {
@@ -166,10 +176,12 @@ sub _dump {
             $_[0];
         },
     },
-    input => {},
-    out   => {},
-    err   => {},
-    mock  => {
+    input   => {},
+    log_any => {},
+    out     => {},
+    err     => {},
+    exit    => {},
+    mock    => {
         is  => 'rw',
         isa => sub {
             ( ( not defined $_[0] ) || 'CODE' eq ref $_[0] )
@@ -186,7 +198,7 @@ sub _croak {
     Carp::croak(@_);
 }
 
-my sub merge_args {
+sub _syscmd {
     my $template = shift;
 
     my ( @cmd, $opts );
@@ -208,7 +220,7 @@ my sub merge_args {
             my %env = ( each %{ $template->env }, each %{ $opts->{env} } );
             $opts->{env} = \%env;
         }
-        return { %$template, %$opts };
+        return Sys::Cmd->new( { %$template, %$opts } );
     }
 
     _croak('$cmd must be defined') unless @cmd && defined $cmd[0];
@@ -227,52 +239,263 @@ my sub merge_args {
         }
     }
     $opts->{cmd} = \@cmd;
-    $opts;
+    Sys::Cmd->new($opts);
 }
 
-my sub new_proc {
-    require Sys::Cmd::Process;
-    Sys::Cmd::Process->new(@_);
+my sub _fastspawn {
+    my @cmd = @_;
+
+    # Backup the original 0,1,2 file descriptors
+    open my $old_fd0, '<&', 0;
+    open my $old_fd1, '>&', 1;
+    open my $old_fd2, '>&', 2;
+
+    # Get new handles to descriptors 0,1,2
+    my $fd0 = IO::Handle->new_from_fd( 0, 'r' );
+    my $fd1 = IO::Handle->new_from_fd( 1, 'w' );
+    my $fd2 = IO::Handle->new_from_fd( 2, 'w' );
+
+    # New handles for the child
+    my $stdin  = IO::Handle->new;
+    my $stdout = IO::Handle->new;
+    my $stderr = IO::Handle->new;
+
+    # Pipe our filehandles to new child filehandles
+    pipe( my $child_in, $stdin )        || die "pipe: $!";
+    pipe( $stdout,      my $child_out ) || die "pipe: $!";
+    pipe( $stderr,      my $child_err ) || die "pipe: $!";
+
+    # Make sure that 0,1,2 are inherited (probably are anyway)
+    Proc::FastSpawn::fd_inherit( $_, 1 ) for 0, 1, 2;
+
+    # But don't inherit the rest
+    Proc::FastSpawn::fd_inherit( fileno($_), 0 )
+      for $old_fd0, $old_fd1, $old_fd2,
+      $child_in, $child_out, $child_err,
+      $stdin,    $stdout,    $stderr;
+
+    # Re-open 0,1,2 by duping the child pipe ends
+    open $fd0, '<&', fileno($child_in)  || die "open: $!";
+    open $fd1, '>&', fileno($child_out) || die "open: $!";
+    open $fd2, '>&', fileno($child_err) || die "open: $!";
+
+    # Kick off the new process
+    my $pid = eval {
+        Proc::FastSpawn::spawn(
+            $cmd[0],
+            \@cmd,
+            [
+                map { $_ . '=' . ( defined $ENV{$_} ? $ENV{$_} : '' ) }
+                  keys %ENV
+            ]
+        );
+    };
+    my $err = $@;
+
+    # Restore our local 0,1,2 to the originals
+    open $fd0, '<&', fileno($old_fd0) || die "open: $!";
+    open $fd1, '>&', fileno($old_fd1) || die "open: $!";
+    open $fd2, '>&', fileno($old_fd2) || die "open: $!";
+
+    # Parent doesn't need to see the child or backup descriptors anymore
+    close($_) || die "close: $!"
+      for $old_fd0,
+      $old_fd1,
+      $old_fd2,
+      $child_in,
+      $child_out,
+      $child_err;
+
+    # Complain if the spawn failed for some reason
+    _croak($err) if $err;
+    _croak('Unable to spawn child') unless defined $pid;
+
+    (
+        pid    => $pid,
+        stdin  => $stdin,
+        stdout => $stdout,
+        stderr => $stderr
+    );
 }
 
-sub run {
-    my $opts    = merge_args(@_);
-    my $ref_out = delete $opts->{out};
-    my $ref_err = delete $opts->{err};
-    my $proc    = new_proc($opts);
-    my @err     = $proc->stderr->getlines;
-    my @out     = $proc->stdout->getlines;
-    $proc->wait_child;
+my sub _fork {
+    my $encoding = shift // die 'need encoding';
+    my $code     = shift // die 'need code';
+    my @args     = @_;
+    my ( $stdin, $stdout, $stderr ) =
+      ( IO::Handle->new, IO::Handle->new, IO::Handle->new, );
 
-    if ( $proc->signal != 0 ) {
-        _croak(
-            sprintf(
-                '%s[%d] %s [signal: %d core: %d]',
-                join( '', @err ), $proc->pid, scalar $proc->cmdline,
-                $proc->signal,    $proc->core
-            )
-        );
-    }
-    elsif ( $proc->exit != 0 ) {
-        _croak(
-            sprintf(
-                '%s[%d] %s [exit: %d]',
-                join( '', @err ),      $proc->pid,
-                scalar $proc->cmdline, $proc->exit
-            )
-        );
+    pipe( my $child_in, $stdin )        || die "pipe: $!";
+    pipe( $stdout,      my $child_out ) || die "pipe: $!";
+    pipe( $stderr,      my $child_err ) || die "pipe: $!";
+
+    my $pid = fork();
+    if ( !defined $pid ) {
+        my $why = $!;
+        die "fork: $why";
     }
 
-    if ($ref_err) {
-        $$ref_err = join '', @err;
+    if ( $pid > 0 ) {    # parent
+        close($_) for
+          $child_in,
+          $child_out,
+          $child_err;
+
+        return (
+            pid    => $pid,
+            stdin  => $stdin,
+            stdout => $stdout,
+            stderr => $stderr
+        );
+    }
+
+    # Child
+    $child_err->autoflush(1);
+
+    foreach my $quad (
+        [ \*STDERR, '>&=', fileno($child_err), 1 ],
+        [ \*STDOUT, '>&=', fileno($child_out), 1 ],
+        [ \*STDIN,  '<&=', fileno($child_in),  0 ],
+      )
+    {
+        my ( $fh, $mode, $fileno, $autoflush ) = @$quad;
+
+        open( $fh, $mode, $fileno )
+          or print $child_err sprintf "[%d] open %s, %s: %s\n", $pid,
+          $fh, $mode, $!;
+
+        binmode $fh, ':encoding(' . $encoding . ')'
+          or warn sprintf "[%d] binmode %d(%s) %s: %s", $pid,
+          $fileno, $mode, $encoding, $!;
+
+        $fh->autoflush(1) if $autoflush;
+    }
+
+    close($_) for
+      $stdin,
+      $stdout,
+      $stderr,
+      $child_in,
+      $child_out,
+      $child_err;
+
+    $code->(@args);
+    _exit(0);
+
+    #    exec( @{ $self->cmd } );
+    #    die "exec: $!";
+}
+
+sub _spawn {
+    my $self = shift;
+    my $dir  = $self->dir;
+    my $cwd  = getcwd if defined $dir;
+
+    my $proc = eval {
+        local %ENV = %ENV;
+        my $locale = $self->encoding;
+        while ( my ( $key, $val ) = each %{ $self->env // {} } ) {
+            my $keybytes = encode( $locale, $key, Encode::FB_CROAK );
+            if ( defined $val ) {
+                $ENV{$keybytes} = encode( $locale, $val, Encode::FB_CROAK );
+            }
+            else {
+                delete $ENV{$keybytes};
+            }
+        }
+
+        chdir $dir or die "chdir: $!" if defined $dir;
+        my $oe = $self->on_exit;
+
+        Sys::Cmd::Process->new(
+            cmd => $self->cmd,
+            $oe ? ( on_exit => $oe ) : (),
+            $self->_coderef
+            ? _fork( $self->encoding, @{ $self->cmd } )
+            : _fastspawn(
+                map {
+                    encode(
+                        $locale => $_,
+                        Encode::FB_CROAK | Encode::LEAVE_SRC
+                    )
+                } @{ $self->cmd }
+            )
+        );
+    };
+    my $err = $@;
+    chdir $cwd if defined $dir;
+    die $err   if $err;
+
+    my $enc = ':encoding(' . $self->encoding . ')';
+    binmode( $proc->stdin,  $enc ) or warn "binmode stdin: $!";
+    binmode( $proc->stdout, $enc ) or warn "binmode stdout: $!";
+    binmode( $proc->stderr, $enc ) or warn "binmode stderr: $!";
+
+    $proc->stdin->autoflush(1);
+
+    # some input was provided
+    if ( defined( my $input = $self->input ) ) {
+        local $SIG{PIPE} =
+          sub { warn "Broken pipe when writing to:" . $proc->cmdline };
+
+        if ( ( 'ARRAY' eq ref $input ) && @$input ) {
+            $proc->stdin->print(@$input);
+        }
+        elsif ( length $input ) {
+            $proc->stdin->print($input);
+        }
+
+        $proc->stdin->close;
+    }
+
+    $proc;
+}
+
+sub _run {
+    my $self   = shift;
+    my $proc   = $self->_spawn;
+    my $stderr = $proc->stderr;
+    my $stdout = $proc->stdout;
+
+    # Select idea borrowed from System::Command
+    require IO::Select;
+    my $select = IO::Select->new( $stdout, $stderr );
+    my @err;
+    my @out;
+
+    while ( my @ready = $select->can_read ) {
+        for my $fh (@ready) {
+            my $dest = $fh == $stdout ? \@out : \@err;
+            if ( defined( my $line = <$fh> ) ) {
+                push @$dest, $line;
+            }
+            else {
+                $select->remove($fh);
+                $fh->close;
+            }
+        }
+    }
+
+    $proc->stdin->close;
+    my $ok = $proc->wait_child;
+
+    if ( my $ref = $self->exit ) {
+        $$ref = $proc->exit;
+    }
+    elsif ( !$ok ) {
+        _croak( join( '', @err ) . $proc->status );
+    }
+
+    if ( my $ref = $self->err ) {
+        $$ref = join '', @err;
     }
     elsif (@err) {
         local @Carp::CARP_NOT = (__PACKAGE__);
         Carp::carp @err;
     }
 
-    if ($ref_out) {
-        $$ref_out = join '', @out;
+    if ( my $ref = $self->out ) {
+        $$ref = join '', @out;
     }
     elsif ( defined( my $wa = wantarray ) ) {
         return @out if $wa;
@@ -280,23 +503,9 @@ sub run {
     }
 }
 
-sub spawn {
-    new_proc( merge_args(@_) );
-}
-
-sub syscmd {
-    Sys::Cmd->new( merge_args(@_) );
-}
-
-sub runsub {
-    my $self = shift;
-    sub { $self->run(@_) };
-}
-
-sub spawnsub {
-    my $self = shift;
-    sub { $self->spawn(@_) };
-}
+# Legacy object interface, undocumented.
+sub run   { _syscmd(@_)->_run }
+sub spawn { _syscmd(@_)->_spawn }
 
 1;
 
@@ -304,47 +513,65 @@ __END__
 
 =head1 NAME
 
-Sys::Cmd - run a system command or spawn a system processes
+Sys::Cmd - Run a system command or spawn a process
 
 =head1 VERSION
 
-v0.986.0 (2025-12-04)
+v0.986.3 (2025-12-11)
 
 =head1 SYNOPSIS
 
     use Sys::Cmd qw/run runsub spawn/;
 
-    my $output   = run( 'ls', '--long' );    # /usr/bin/ls --long
-    my @numbered = run( 'cat', '-n',         # /usr/bin/cat -n <<EOF
-        {                                    # > X
-            input => "X\nY\nZ\n",            # > Y
-        }                                    # > Z
-    );                                       # EOF
+Catch a command's standard output, warning on anything sent to stderr,
+raise an exception on abnormal exit:
 
-    my $ls = runsub( 'ls',                   # Does nothing... yet
+    my $output = run( 'ls', '--long' );
+
+Commands can be fed input from Perl and return separate lines in in
+array context:
+
+    my @XYZ = run( 'cat', '-n', { input => "X\nY\nZ\n", } );
+
+Put outputs and exit value directly into scalars, in which case no
+warnings or exceptions are triggered:
+
+    my ($out, $err, $exit);
+    run( 'ls', 'FILE_NOT_FOUND', {
+        out => \$out,
+        err => \$err,
+        exit => \$exit,
+    });
+
+A type of templating exists for multiple calls to the same command with
+pre-defined defaults:
+
+    my $ls = runsub( 'ls',        # Returns a subref
         {
             dir => '/tmp',
-            out => \$output,
+            out => \$out,
         }
     );
-    $ls->( 'here' );                         # Runs in /tmp and puts
-    $ls->( '-l', 'there');                   # (long) output in $output
+    $ls->()                       &&  print $out;
+    $ls->({ dir => '/elsewhere'}) &&  print $out;
 
-    # Spawn a process for asynchronous interaction
-    my $proc = spawn( @cmd, { encoding => 'iso-8859-3' } );
-    while ( my $line = $proc->stdout->getline ) {
+Use C<spawn> for asynchronous interaction:
+
+    my $proc = spawn( @cmd );
+    printf "pid %d\n", $proc->pid;
+
+    while ( defined ( my $line = $proc->stdout->getline ) ) {
         $proc->stdin->print("thanks\n");
     }
     warn $proc->stderr->getlines;
 
-    $proc->close();    # Finished talking to file handles
-    $proc->wait_child && die "Non-zero exit!: " . $proc->exit;
+    $proc->wait_child || warn $proc->status;
 
 =head1 DESCRIPTION
 
 B<Sys::Cmd> lets you run a system command and capture its output, or
-spawn and interact with a process through its stdin, stdout and error
-handles.
+spawn and interact with a process through its C<stdin>, C<stdout> and
+C<stderr> handles.
 
 It provides something of a superset of Perl's builtin external process
 functions ("system", "qx//", "fork"+"exec", and "open"):
@@ -359,17 +586,17 @@ functions ("system", "qx//", "fork"+"exec", and "open"):
 
 =item * Raise exception on failure (run)
 
-=item * Capture output and error separately (run, spawn)
+=item * Capture output, error and exit separately (run, spawn)
+
+=item * Sensible exit and signal values
 
 =item * Asynchronous interaction through file handles (spawn)
-
-=item * Sensible exit values (spawn)
 
 =item * Template functions for repeated calls (runsub, spawnsub)
 
 =back
 
-=head1 COMMAND PROCESSING
+=head2 Command Path
 
 All functions take a C<@cmd> list that specifies the command and its
 arguments. The first element of C<@cmd> determines what/how things are
@@ -390,21 +617,19 @@ result is executed with L<Proc::FastSpawn>.
 
 The remaining scalar elements of C<@cmd> are passed as arguments.
 
-=head1 OPTIONS
+=head2 Common Options
 
-The C<@cmd> list may also include an optional C<\%opts> HASH reference
-to adjust aspects of the execution.
-
-The following configuration items (key => default) are common to all
-B<Sys::Cmd> functions and are passed to the underlying
-L<Sys::Cmd::Process> objects at creation time:
+A function's C<@cmd> list may also include an optional C<\%opts> HASH
+reference to adjust aspects of the execution.  The following
+configuration items (key => default) are common to all B<Sys::Cmd>
+functions.
 
 =over
 
-=item dir => $PWD
+=item dir => $CWD
 
-The working directory the command will be run in. Note that if C<@cmd>
-is a relative path, it may not be found from the new location.
+The working directory the command will be run in. Note that a relative
+command path might not be valid if the current directory changes.
 
 =item encoding => $Encode::Locale::ENCODING_LOCALE
 
@@ -459,24 +684,32 @@ string. Accepts the following additional configuration keys:
 
 =over
 
-=item out => undef
+=item out => \$scalar
 
 A reference to a scalar which is populated with output. When given
 C<run()> returns nothing.
 
-=item err => undef
+=item err => \$scalar
 
 A reference to a scalar which is populated with error output. When
 given C<run()> does not warn of errors.
+
+=item exit => \$scalar
+
+A reference to a scalar which is populated with the exit value. When
+given C<run()> does not raise an exception on a non-zero exit.
 
 =back
 
 =item spawn( @cmd, [\%opt] ) => Sys::Cmd::Process
 
-Returns a L<Sys::Cmd::Process> object representing the process running
-C<@cmd>. You can interrogate this and interact with the process via
-C<cmdline()>, C<stdin()>, C<stdout()>, C<stderr()>, C<close()>,
-C<wait_child()>, C<exit()>, C<signal()>, C<core()>, etc.
+Return an object representing the process running according to C<@cmd>
+and C<\%opt>. This is the core mechanism underlying C<run>.
+
+You can interact with the process object via its C<cmdline()>,
+C<stdin()>, C<stdout()>, C<stderr()>, C<close()>, C<wait_child()>,
+C<exit()>, C<signal()>, C<core()> attributes and handles. See
+L<Sys::Cmd::Process> for details.
 
 =back
 
@@ -487,8 +720,17 @@ different arguments or environments, a kind of "templating" mechanism
 can be useful, to avoid repeating full configuration values and wearing
 a path lookup penalty each call.
 
-The B<Sys::Cmd> class itself provides this functionality, exposed as
-follows:
+=begin comment
+
+=item syscmd( @cmd, [\%opt] ) => Sys::Cmd
+
+Return a B<Sys::Cmd> object representing a I<future> command (or
+coderef) to be executed in some way. You can then call multiple
+C<run()> or C<spawn()> I<methods> on the object for the actual work.
+The methods work the same way in terms of input, output, and return
+values as the exported package functions below.
+
+=end comment
 
 =over
 
@@ -518,9 +760,6 @@ When called, additional arguments and options are I<merged>:
         }
     ));
 
-(Equivalent to manually calling C<syscmd(...)> below, followed by the
-C<runsub> method).
-
 =item spawnsub( @cmd, [\%opt] ) => CODEref
 
 Returns a subroutine reference representing a I<future> process to be
@@ -536,20 +775,6 @@ When called, additional arguments and options are I<merged>.
     }
     print $_->pid . ': ' . $_->stdout->getlines for @kids;
     $_->wait_child for @kids;
-
-(Equivalent to manually calling C<syscmd(...)> below followed by the
-C<spawnsub> method).
-
-=item syscmd( @cmd, [\%opt] ) => Sys::Cmd
-
-Returns a B<Sys::Cmd> object representing a I<future> command (or
-coderef) to be executed in some way. You can then call multiple
-C<run()> or C<spawn()> I<methods> on the object for the actual work.
-The methods work the same way in terms of input, output, and return
-values as the exported package functions.
-
-This function underlies the "runsub" and "spawnsub" functions, but the
-author finds it less attractive as an interface.
 
 =back
 

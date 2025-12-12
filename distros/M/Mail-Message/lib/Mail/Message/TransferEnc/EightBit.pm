@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::TransferEnc::EightBit;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::TransferEnc';
+use parent 'Mail::Message::TransferEnc';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw// ];
 
 #--------------------
 

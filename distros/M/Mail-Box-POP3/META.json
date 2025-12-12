@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,24 +37,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Digest::MD5" : "0",
-            "File::Basename" : "0",
-            "File::Spec" : "0",
             "IO::Socket" : "0",
             "IO::Socket::IP" : "0",
             "List::Util" : "0",
-            "Mail::Box::FastScalar" : ">= 3, < 4.0",
-            "Mail::Box::Net" : ">= 3, < 4.0",
-            "Mail::Box::Parser::Perl" : ">= 3, < 4.0",
-            "Mail::Box::Test" : ">= 3, < 4.0",
-            "Mail::Reporter" : ">= 3, < 4.0",
-            "Mail::Transport::Receive" : ">= 3, < 4.0",
+            "Log::Report" : "1.42",
+            "Mail::Box::FastScalar" : "4.0",
+            "Mail::Box::Net" : "4.0",
+            "Mail::Box::Parser::Perl" : "4.0",
+            "Mail::Box::Test" : "4.0",
+            "Mail::Reporter" : "4.0",
+            "Mail::Transport::Receive" : "4.0",
             "Socket" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
             "Test::More" : "1",
             "Test::Pod" : "1"
          }
@@ -72,7 +72,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-POP3"
       }
    },
-   "version" : "3.008",
+   "version" : "4.000",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

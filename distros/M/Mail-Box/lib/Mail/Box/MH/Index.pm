@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::MH::Index;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Reporter';
@@ -18,8 +18,9 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
+use Log::Report      'mail-box', import => [ qw/__x error info/ ];
+
 use Mail::Message::Head::Subset ();
-use Carp;
 
 #--------------------
 
@@ -28,7 +29,7 @@ sub init($)
 	$self->SUPER::init($args);
 
 	$self->{MBMI_filename}  = $args->{filename}
-		or croak "No index filename specified.";
+		or error __x"MH index requires a filename.";
 
 	$self->{MBMI_head_wrap} = $args->{head_wrap} || 72;
 	$self->{MBMI_head_type} = $args->{head_type} || 'Mail::Message::Head::Subset';
@@ -104,7 +105,7 @@ sub read(;$)
 	my $filename  = $self->filename;
 	my $parser    = Mail::Box::Parser->new(filename => $filename, mode => 'r') or return;
 
-	my @options   = ($self->logSettings, wrap_length => $self->{MBMI_head_wrap});
+	my @options   = (wrap_length => $self->{MBMI_head_wrap});
 	my $type      = $self->{MBMI_head_type};
 	my $index_age = -M $filename;
 	my %index;

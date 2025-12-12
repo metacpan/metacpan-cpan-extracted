@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,16 +10,18 @@
 
 
 package Mail::Message::Field::URIs;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field::Structured';
+use parent 'Mail::Message::Field::Structured';
 
 use warnings;
 use strict;
 
-use URI          ();
-use Scalar::Util qw/blessed/;
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
+
+use URI           ();
+use Scalar::Util  qw/blessed/;
 
 #--------------------
 
@@ -76,8 +78,7 @@ sub URIs() { @{ $_[0]->{MMFU_uris}} }
 
 sub addAttribute($;@)
 {	my $self = shift;
-	$self->log(ERROR => 'No attributes for URI fields.');
-	$self;
+	error __x"no attributes for URI fields.";
 }
 
 #--------------------

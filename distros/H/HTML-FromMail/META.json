@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,8 +38,9 @@
       "runtime" : {
          "requires" : {
             "HTML::FromText" : "2.03",
-            "Mail::Box" : ">= 2.051, < 4.0",
-            "OODoc::Template" : "0.01"
+            "Log::Report" : "1.42",
+            "Mail::Box" : "4.00",
+            "OODoc::Template" : "0.19"
          },
          "x_optional" : {
             "Image::Magick" : "5.0",
@@ -65,7 +66,7 @@
          "web" : "https://github.com/markov2/perl5-HTML-FromMail"
       }
    },
-   "version" : "3.01",
+   "version" : "4.00",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2003,

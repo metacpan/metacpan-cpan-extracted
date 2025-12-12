@@ -115,12 +115,10 @@ If you try to instantiate a L<Mail::Message::Head|Mail::Message::Head>, you will
 be upgraded to a L<Mail::Message::Head::Complete|Mail::Message::Head::Complete> --a full head.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option    --Defined in     --Default
-  field_type                   Mail::Message::Field::Fast
-  log         Mail::Reporter   'WARNINGS'
-  message                      undef
-  modified                     false
-  trace       Mail::Reporter   'WARNINGS'
+ -Option    --Default
+  field_type  Mail::Message::Field::Fast
+  message     undef
+  modified    false
 
 =over 2
 
@@ -129,17 +127,13 @@ Improves base, see L<Mail::Reporter/"Constructors">
 The type of objects that all the fields will have.  This must be
 an extension of L<Mail::Message::Field|Mail::Message::Field>.
 
-=item log => LEVEL
+=item message => $message
 
-=item message => MESSAGE
-
-The MESSAGE where this header belongs to.  Usually, this is not known
+The C<$message> where this header belongs to.  Usually, this is not known
 at creation of the header, but sometimes it is.  If not, call the
-message() method later to set it.
+L<message()|Mail::Message::Head/"The header"> method later to set it.
 
 =item modified => BOOLEAN
-
-=item trace => LEVEL
 
 =back
 
@@ -148,14 +142,6 @@ message() method later to set it.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 The header
 
@@ -193,10 +179,10 @@ partial.  C<names()> will trigger completion, where C<knownNames()> does not.
 Get (after setting) the message where this header belongs to.
 This does not trigger completion.
 
-=item $obj-E<gt>B<modified>( [$flage] )
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
 
-Sets the modified $flag (a BOOLEAN).  Without value, the current setting
-is returned, but in that case you can better use L<isModified()|Mail::Message::Head/"The header">.
+Sets the modified flag to C<BOOLEAN>.  Without value, the current setting is
+returned, but in that case you can better use L<isModified()|Mail::Message::Head/"The header">.
 Changing this flag will not trigger header completion.
 
 » example: 
@@ -324,43 +310,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -470,9 +420,9 @@ you store a message for a longer period of time.
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
@@ -483,8 +433,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

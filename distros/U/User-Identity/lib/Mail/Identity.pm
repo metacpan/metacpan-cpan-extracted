@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,20 +10,22 @@
 
 
 package Mail::Identity;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Item';
+use parent 'User::Identity::Item';
 
 use strict;
 use warnings;
 
-use User::Identity;
-use Scalar::Util 'weaken';
+use Log::Report     'user-identity';
+
+use User::Identity  ();
+use Scalar::Util    qw/weaken/;
 
 #--------------------
 
-sub type() { "email" }
+sub type() { 'email' }
 
 
 sub init($)
@@ -75,8 +77,8 @@ sub charset()
 {	my $self = shift;
 	return $self->{MI_charset} if defined $self->{MI_charset};
 
-	my $user = $self->user     or return undef;
-	$user->charset;
+	my $user = $self->user;
+	defined $user ? $user->charset : undef;
 }
 
 
@@ -84,8 +86,8 @@ sub language()
 {	my $self = shift;
 	return $self->{MI_language} if defined $self->{MI_language};
 
-	my $user = $self->user     or return undef;
-	$user->language;
+	my $user = $self->user;
+	defined $user ? $user->language : undef;
 }
 
 
@@ -153,9 +155,9 @@ sub organization()
 sub phrase()
 {	my $self = shift;
 	return $self->{MI_phrase} if defined $self->{MI_phrase};
-	my $user = $self->user     or return undef;
-	my $full = $user->fullName or return undef;
-	$full;
+
+	my $user = $self->user;
+	defined $user ? $user->fullName : undef;
 }
 
 #signature
@@ -169,8 +171,8 @@ sub username()
 		return $address;
 	}
 
-	my $user = $self->user or return;
-	$user->nickname;
+	my $user = $self->user;
+	defined $user ? $user->nickname : undef;
 }
 
 1;

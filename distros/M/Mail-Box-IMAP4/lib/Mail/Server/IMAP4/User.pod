@@ -47,9 +47,7 @@ Inherited, see L<Mail::Box::Manage::User/"METHODS">
   identity             Mail::Box::Manage::User  <required>
   inbox                Mail::Box::Manage::User  undef
   index_filename                                $folderdir/index
-  log                  Mail::Reporter           'WARNINGS'
   topfolder_name       Mail::Box::Manage::User  '='
-  trace                Mail::Reporter           'WARNINGS'
 
 =over 2
 
@@ -75,11 +73,7 @@ Inherited, see L<Mail::Box::Manage::User/"METHODS">
 
 =item index_filename => FILENAME
 
-=item log => LEVEL
-
 =item topfolder_name => $name
-
-=item trace => LEVEL
 
 =back
 
@@ -122,10 +116,6 @@ Inherited, see L<Mail::Box::Manage::User/"Attributes">
 =item $obj-E<gt>B<indexFilename>()
 
 Returns the filename of the index file.
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<registerType>($type, $class, %options)
 
@@ -251,43 +241,7 @@ Extends L<"Error handling" in Mail::Box::Manage::User|Mail::Box::Manage::User/"E
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -383,94 +337,12 @@ Extends L<"DETAILS" in Mail::Box::Manage::User|Mail::Box::Manage::User/"DETAILS"
 
 =over 4
 
-=item Error: Cannot create folder directory $dir: $!
-
-Cast by C<create()>
-
-=item Error: Cannot rename $name to $new: higher levels missing
-
-Unless you set L<create(create_supers)|Mail::Box::Manage::User/"Manage existing folders">, all higher level folders must
-exist before this new one can be created.
-Cast by C<rename()>
-
-=item Error: Cannot write name for folder in $file: $!
-
-Cast by C<create()>
-
-=item Error: Failed writing folder name to $file: $!
-
-Cast by C<create()>
-
-=item Warning: Folder $name already exists, creation skipped
-
-Cast by C<create()>
-
-=item Error: Folder $name is already open.
-
-You cannot ask the manager for a folder which is already open. In some
-older releases (before MailBox 2.049), this was permitted, but then
-behaviour changed, because many nasty side-effects are to be expected.
-For instance, an L<Mail::Box::update()|Mail::Box/"The folder"> on one folder handle would
-influence the second, probably unexpectedly.
-Cast by C<open()>
-
 =item Error: Folder $name is not a Mail::Box; cannot add a message.
 
 The folder where the message should be appended to is an object which is
 not a folder type which extends L<Mail::Box|Mail::Box>.  Probably, it is not a folder
 at all.
 Cast by C<appendMessage()>
-
-=item Warning: Folder does not exist, failed opening $type folder $name.
-
-The folder does not exist and creating is not permitted (see
-L<open(create)|Mail::Box::Manager/"Manage open folders">) or did not succeed.  When you do not have sufficient
-access rights to the folder (for instance wrong password for POP3),
-this warning will be produced as well.
-
-The manager tried to open a folder of the specified type.  It may help
-to explicitly state the type of your folder with the C<type> option.
-There will probably be another warning or error message which is related
-to this report and provides more details about its cause.  You may also
-have a look at L<new(autodetect)|Mail::Box::Manager/"METHODS"> and L<new(folder_types)|Mail::Box::Manager/"METHODS">.
-Cast by C<open()>
-
-=item Warning: Folder type $type is unknown, using autodetect.
-
-The specified folder type (see L<open(type)|Mail::Box::Manager/"Manage open folders">, possibly derived from
-the folder name when specified as url) is not known to the manager.
-This may mean that you forgot to require the L<Mail::Box|Mail::Box> extension
-which implements this folder type, but probably it is a typo.  Usually,
-the manager is able to figure-out which type to use by itself.
-Cast by C<open()>
-
-=item Error: Illegal folder URL '$url'.
-
-The folder name was specified as URL, but not according to the syntax.
-See L<decodeFolderURL()|Mail::Box::Manager/"Internals"> for an description of the syntax.
-Cast by C<open()>
-
-=item Error: No foldername specified to open.
-
-L<open()|Mail::Box::Manager/"Manage open folders"> needs a folder name as first argument (before the list of options),
-or with the C<folder> option within the list.  If no name was found, the
-MAIL environment variable is checked.  When even that does not result in
-a usable folder, then this error is produced.  The error may be caused by
-an accidental odd-length option list.
-Cast by C<open()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: Unable to remove folder $dir
-
-Cast by C<delete()>
 
 =item Error: Use appendMessage() to add messages which are not in a folder.
 
@@ -485,19 +357,125 @@ to a different folder.  You need to decide between copy or move, which
 both will clone the message (not the body, because they are immutable).
 Cast by C<appendMessage()>
 
-=item Warning: Will never create a folder $name without having write access.
+=item Fault: cannot create folder directory $dir: $!
+
+Cast by C<create()>
+
+=item Error: cannot rename folder $from to $to: higher levels are missing.
+
+Unless you set L<create(create_supers)|Mail::Box::Manage::User/"Manage existing folders">, all higher level folders must
+exist before this new one can be created.
+Cast by C<rename()>
+
+=item Fault: cannot write name for folder in $file: $!
+
+Cast by C<create()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: failed for folder default $class: $@
+
+Cast by C<open()>
+
+=item Fault: failed writing folder name to $file: $!
+
+Cast by C<create()>
+
+=item Warning: folder $name already exists, creation skipped.
+
+Cast by C<create()>
+
+=item Error: folder $name does not exist, failed opening $type.
+
+The folder does not exist and creating is not permitted (see
+L<open(create)|Mail::Box::Manager/"Manage open folders">) or did not succeed.  When you do not have sufficient
+access rights to the folder (for instance wrong password for POP3),
+this warning will be produced as well.
+
+The manager tried to open a folder of the specified type.  It may help
+to explicitly state the type of your folder with the C<type> option.
+There will probably be another warning or error message which is related
+to this report and provides more details about its cause.  You may also
+have a look at L<new(autodetect)|Mail::Box::Manager/"METHODS"> and L<new(folder_types)|Mail::Box::Manager/"METHODS">.
+Cast by C<open()>
+
+=item Error: folder $name is already open.
+
+You cannot ask the manager for a folder which is already open. In some
+older releases (before MailBox 2.049), this was permitted, but then
+behaviour changed, because many nasty side-effects are to be expected.
+For instance, an L<Mail::Box::update()|Mail::Box/"The folder"> on one folder handle would
+influence the second, probably unexpectedly.
+Cast by C<open()>
+
+=item Error: folder $name not under top.
+
+Cast by C<folderCollection()>
+
+=item Warning: folder type $type is unknown, using autodetect.
+
+The specified folder type (see L<open(type)|Mail::Box::Manager/"Manage open folders">, possibly derived from
+the folder name when specified as url) is not known to the manager.
+This may mean that you forgot to require the L<Mail::Box|Mail::Box> extension
+which implements this folder type, but probably it is a typo.  Usually,
+the manager is able to figure-out which type to use by itself.
+Cast by C<open()>
+
+=item Error: illegal folder URL '$url'.
+
+The folder name was specified as URL, but not according to the syntax.
+See L<decodeFolderURL()|Mail::Box::Manager/"Internals"> for an description of the syntax.
+Cast by C<open()>
+
+=item Error: no foldername specified to open.
+
+L<open()|Mail::Box::Manager/"Manage open folders"> needs a folder name as first argument (before the list of options),
+or with the C<folder> option within the list.  If no name was found, the
+MAIL environment variable is checked.  When even that does not result in
+a usable folder, then this error is produced.  The error may be caused by
+an accidental odd-length option list.
+Cast by C<open()>
+
+=item Error: source folder for rename does not exist: $from to $to.
+
+Cast by C<rename()>
+
+=item Error: threader $class is not derived from $base.
+
+Cast by C<discoverThreads()>
+
+=item Fault: unable to remove folder {$name}
+
+Cast by C<delete()>
+
+=item Error: unusable threader $class: $@
+
+Cast by C<discoverThreads()>
+
+=item Warning: will never create a folder $name without having write access.
 
 You have set L<open(create)|Mail::Box::Manager/"Manage open folders">, but only want to read the folder.  Create is
 only useful for folders which have write or append access modes
 (see L<Mail::Box::new(access)|Mail::Box/"Constructors">).
 Cast by C<open()>
 
+=item Error: you need to pass a $base derived threader, got $class.
+
+Cast by C<discoverThreads()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 3.010,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

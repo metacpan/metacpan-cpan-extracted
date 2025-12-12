@@ -6,7 +6,8 @@ use strict;
 use warnings;
 
 use Carp;
-use Config::Abstraction 0.36;
+use Config::Abstraction 0.37;
+use File::Spec;
 use Log::Abstraction 0.26;
 use Params::Get 0.13;
 use Return::Set;
@@ -28,11 +29,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 SYNOPSIS
 
@@ -339,22 +340,35 @@ sub configure {
 				$_config_file_stats{$config_file} = stat($config_file);
 			}
 		}
-	}
 
-	# Sort by class hierarchy to ensure correct order (base -> parent -> child)
-	# This must happen AFTER all files are collected
-	if (@config_files_to_load) {
-		my %class_order;
-		for my $i (0..$#inheritance_chain) {
-			$class_order{$inheritance_chain[$i]} = $i;
+		if(!scalar(@config_files_to_load)) {
+			# Can't find an inheritence tree
+			foreach my $dir(@{$config_dirs}) {
+				my $candidate = File::Spec->catfile($dir, $config_file);
+				if(-r $candidate) {
+					push @config_files_to_load, {
+						file => $candidate,
+						class => $original_class
+					}
+				}
+			}
 		}
-		@config_files_to_load = sort {
-			($class_order{$a->{class}} // 999) <=> ($class_order{$b->{class}} // 999)
-		} @config_files_to_load;
 	}
 
 	# Load and merge configurations from all files
 	if (@config_files_to_load) {
+		# Sort by class hierarchy to ensure correct order (base -> parent -> child)
+		# This must happen AFTER all files are collected
+		if (@config_files_to_load) {
+			my %class_order;
+			for my $i (0..$#inheritance_chain) {
+				$class_order{$inheritance_chain[$i]} = $i;
+			}
+			@config_files_to_load = sort {
+				($class_order{$a->{class}} // 999) <=> ($class_order{$b->{class}} // 999)
+			} @config_files_to_load;
+		}
+
 		# Start with the passed-in defaults
 		my $merged_params = { %$params };
 
@@ -388,7 +402,6 @@ sub configure {
 		}
 
 		$params = $merged_params;
-
 	} elsif (my $config = Config::Abstraction->new(env_prefix => "${class}__")) {
 		# Handle environment variables with inheritance
 		my $merged_config = {};

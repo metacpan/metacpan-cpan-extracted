@@ -8,6 +8,7 @@ MANIFEST			This list of files
 README
 t/00-class-inlined.t
 t/info.pl
+t/run.pl
 t/sys-cmd.t
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)

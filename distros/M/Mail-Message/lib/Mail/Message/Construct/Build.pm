@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,12 +10,14 @@
 
 
 package Mail::Message;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error info warning/ ];
 
 use Mail::Message::Head::Complete  ();
 use Mail::Message::Body::Lines     ();
@@ -32,7 +34,7 @@ sub build(@)
 {	my $class = shift;
 
 	! $class->isa('Mail::Box::Message')
-		or $class->log(ERROR => "Only build() Mail::Message's; they are not in a folder yet"), return undef;
+		or error __x"only build() Mail::Message's; they are not in a folder yet.";
 
 	my @parts
 	  = ! blessed $_[0] ? ()
@@ -87,7 +89,7 @@ sub build(@)
 		elsif($key =~ m/^[A-Z]/)
 		{	push @headerlines, $key, $value }
 		else
-		{	$class->log(WARNING => "Skipped unknown key '$key' in build");
+		{	warning __x"skipped unknown key '{key}' in build.", key => $key;
 		}
 
 		push @parts, grep defined, @data;
@@ -112,13 +114,12 @@ sub build(@)
 
 sub buildFromBody(@)
 {	my ($class, $body) = (shift, shift);
-	my @log     = $body->logSettings;
 
 	my $head;
 	if(blessed $_[0] && $_[0]->isa('Mail::Message::Head')) { $head = shift }
 	else
 	{	defined $_[0] or shift;   # explicit undef as head
-		$head = Mail::Message::Head::Complete->new(@log);
+		$head = Mail::Message::Head::Complete->new;
 	}
 
 	while(@_)
@@ -126,7 +127,7 @@ sub buildFromBody(@)
 		else              { $head->add(shift, shift) }
 	}
 
-	my $message = $class->new(head => $head, @log);
+	my $message = $class->new(head => $head);
 	$message->body($body);
 
 	# be sure the message-id is actually stored in the header.

@@ -32,8 +32,8 @@ You may reply to a whole message or a message part.  You may wish to
 overrule some of the default header settings for the reply immediately,
 or you may do that later with C<set> on the header.
 
-ADDRESSES may be specified as string, or
-a L<Mail::Address|Mail::Address> object, or as array of L<Mail::Address|Mail::Address> objects.
+Addresses may be specified as string, or a L<Mail::Address|Mail::Address> object, or as
+array of L<Mail::Address|Mail::Address> objects.
 
 All C<%options> which are not listed below AND start with a capital, will
 be added as additional headers to the reply message.
@@ -58,17 +58,17 @@ be added as additional headers to the reply message.
 
 =over 2
 
-=item Bcc => ADDRESSES
+=item Bcc => $body|$address|\@addresses
 
 Receivers of blind carbon copies: their names will not be published to
 other message receivers.
 
-=item Cc => ADDRESSES
+=item Cc => $body|$address|\@addresses
 
 The carbon-copy receivers, by default a copy of the C<Cc> field of
 the source message.
 
-=item From => ADDRESSES
+=item From => $body|$address|\@addresses
 
 Your identification, by default taken from the C<To> field of the
 source message.
@@ -86,14 +86,14 @@ subroutine specified by CODE.  The subroutine will be called passing
 the subject of the original message as only argument.  By default,
 L<Mail::Message::replySubject()|Mail::Message::Construct::Reply/"Constructing a message"> is used.
 
-=item To => ADDRESSES
+=item To => $body|$address|\@addresses
 
 The destination of your message.  By default taken from the C<Reply-To>
 field in the source message.  If that field is not present as well, the
 C<From> line is scanned.  If they all fail, C<undef> is returned by this
 method: no reply message produced.
 
-=item body => BODY
+=item body => $body
 
 Usually, the reply method can create a nice, sufficient message from the
 source message's body.  In case you like more complicated reformatting,
@@ -127,16 +127,16 @@ Create a message with the requested type.  By default, it will be a
 L<Mail::Message|Mail::Message>.  This is correct, because it will be coerced into
 the correct folder message type when it is added to that folder.
 
-=item postlude => BODY|LINES
+=item postlude => $body|\@lines
 
-The line(s) which to be added after the quoted reply lines.  Create a
+The C<@lines> which to be added after the quoted reply lines.  Create a
 body for it first.  This should not include the signature, which has its
 own option.  The signature will be added after the postlude when the
 reply is INLINEd.
 
-=item prelude => BODY|LINES
+=item prelude => $body|\@lines
 
-The line(s) which will be added before the quoted reply lines.  If nothing
+The C<@lines> which will be added before the quoted reply lines.  If nothing
 is specified, the result of the L<replyPrelude()|Mail::Message::Construct::Reply/"Constructing a message"> method
 is taken.  When C<undef> is specified, no prelude will be added.
 
@@ -149,7 +149,7 @@ line is in C<$_>.
 By default, C<'E<gt> '> is added before each line.  Specify C<undef> to
 disable quoting.  This option is processed after the body has been decoded.
 
-=item signature => BODY|MESSAGE
+=item signature => $body|$message
 
 The signature to be added in case of a multi-part reply.  The mime-type
 of the signature body should indicate this is a used as such.  However,
@@ -182,16 +182,19 @@ matter, as long as it is present.  See L<Mail::Message::Body::Multipart|Mail::Me
     'X-Extra'       => 'additional header',
   );
 
-=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|ARRAY-$of-$things] )
+=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|\@addrs|\@fields] )
 
-Produces a list of lines (usually only one), which will preceded the
+Produces a LIST of lines (usually only one), which will preceed the
 quoted body of the message.  C<STRING> must comply to the RFC822 email
 address specification, and is usually the content of a C<To> or C<From>
-header line.  If a C<$field> is specified, the field's body must be
-compliant.  Without argument -or when the argument is C<undef>- a
+header line.  If a C<$field> is given, the field's body must be
+compliant.  Without argument --or when the argument is C<undef>-- a
 slightly different line is produced.
 
-An characteristic example of the output is
+In case an ARRAY of C<@addrs> or C<@fields> is passed, the first one is taken.
+This simplified situations where multiple addresses are a allowed.
+
+» example: characteristic example of the output
 
   On Thu Oct 13 04:54:34 1995, him@example.com wrote:
 
@@ -216,7 +219,7 @@ a standard form.  Please contribute improvements.
 
 =over 4
 
-=item Error: Cannot include reply source as $include.
+=item Error: cannot include reply source as $kind.
 
 Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
@@ -226,8 +229,8 @@ Cast by C<reply()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

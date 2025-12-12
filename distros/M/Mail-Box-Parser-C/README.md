@@ -22,6 +22,9 @@ better source is CPAN; to get it installed simply run:
    cpan -i Mail::Box::Parser::C
 ```
 
+**Be aware that version 4 is not fully compatible with releases pre-4**
+See <https://github.com/markov2/perl5-Mail-Box/wiki/>
+
 ## Development &rarr; Release
 
 Important to know, is that I use an extension on POD to write the manuals.

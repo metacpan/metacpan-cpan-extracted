@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package HTML::FromMail::Page;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'HTML::FromMail::Object';
 
 use strict;
 use warnings;
+
+use Log::Report 'html-frommail';
 
 #--------------------
 

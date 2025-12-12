@@ -41,21 +41,15 @@ Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
 
 Inherited, see L<Mail::Reporter/"Constructors">
 
- -Option  --Defined in     --Default
-  filename                   <required>
-  log       Mail::Reporter   'WARNINGS'
-  trace     Mail::Reporter   'WARNINGS'
+ -Option  --Default
+  filename  <required>
 
 =over 2
 
-=item filename => FILENAME
+=item filename => $file
 
-The FILENAME which is used in each directory to store the headers of all
+The C<$file> which is used in each directory to store the headers of all
 mails. The filename must be an absolute path.
-
-=item log => LEVEL
-
-=item trace => LEVEL
 
 =back
 
@@ -71,10 +65,6 @@ Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
 Returns the name of the index file.
 
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
 =back
 
 =head2 Error handling
@@ -87,43 +77,7 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -161,7 +115,8 @@ Print the labels of the specified messages to the opened file.
 
 =item $obj-E<gt>B<read>()
 
-Read all label information from file.
+Read all label information from the file.  When the file does not exist,
+this will return C<undef>.
 
 =item $obj-E<gt>B<write>(@messages)
 
@@ -173,21 +128,41 @@ Write the labels related to the specified C<@messages> to the label file.
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: MH labels require a filename.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Cast by C<new()>
+
+=item Fault: cannot append to MH labels file $file: $!
+
+Cast by C<append()>
+
+=item Fault: cannot write MH labels file to $file: $!
+
+Cast by C<write()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Fault: error while closing MH labels file $file after append: $!
+
+Cast by C<append()>
+
+=item Fault: error while closing MH labels file $file after write: $!
+
+Cast by C<write()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

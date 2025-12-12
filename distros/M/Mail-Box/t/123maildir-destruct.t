@@ -46,4 +46,5 @@ ok(! $folder->message(0)->modified,   'message destructed');
 isa_ok($folder->message(0),  'Mail::Box::Message::Destructed');
 isa_ok($folder->message(0),  'Mail::Box::Message');
 isa_ok($folder->message(10), 'Mail::Box::Maildir::Message');
-$folder->close;
+
+$folder->close(write => 'NEVER');

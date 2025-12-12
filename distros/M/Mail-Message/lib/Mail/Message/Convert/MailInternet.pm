@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,17 +10,18 @@
 
 
 package Mail::Message::Convert::MailInternet;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Convert';
+use parent 'Mail::Message::Convert';
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
+
 use Mail::Internet ();
 use Mail::Header   ();
-use Carp;
 
 use Mail::Message                 ();
 use Mail::Message::Head::Complete ();
@@ -32,7 +33,7 @@ sub export($@)
 {	my ($thing, $message) = (shift, shift);
 
 	$message->isa('Mail::Message')
-		or croak "Export message must be a Mail::Message, but is a ".(ref $message).".";
+		or error __x"export message must be a Mail::Message object, but is {what UNKNOWN}.", what => $message;
 
 	my $mi_head = Mail::Header->new;
 	foreach my $field ($message->head->orderedFields)
@@ -49,7 +50,7 @@ sub from($@)
 {	my ($thing, $mi) = (shift, shift);
 
 	$mi->isa('Mail::Internet')
-		or croak "Converting from Mail::Internet but got a ".(ref $mi).'.';
+		or error __x"converting from Mail::Internet but got {what UNKNOWN}.", what => $mi;
 
 	my $head = Mail::Message::Head::Complete->new;
 	my $body = Mail::Message::Body::Lines->new(data => [ @{$mi->body} ]);
@@ -57,7 +58,7 @@ sub from($@)
 	my $mi_head = $mi->head;
 
 	# The tags of Mail::Header are unordered, but we prefer some ordering.
-	my %tags = map {lc $_ => ucfirst $_} $mi_head->tags;
+	my %tags = map +(lc $_ => ucfirst $_), $mi_head->tags;
 	my @tags;
 	foreach (@pref_order)
 	{	push @tags, $_ if delete $tags{lc $_};

@@ -28,7 +28,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Capture::Tiny" : "0",
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Data::Structure::Util" : "0",
@@ -41,7 +40,7 @@
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "Sub::Identify" : "0",
-            "Term::ReadKey" : "0",
+            "Term::Size" : "0.211",
             "bigrat" : "0.65",
             "constant" : "0",
             "feature" : "0",
@@ -55,6 +54,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Carp::Always" : "0",
             "Clone" : "0",
             "Cwd" : "0",
@@ -78,7 +78,7 @@
             "Path::Tiny" : "0.146",
             "Test2::Plugin::BailOnFail" : "0",
             "Test2::Require::Threads" : "0",
-            "Test2::V0" : "0",
+            "Test2::V0" : "1.302214",
             "Tie::Array" : "0",
             "Tie::Handle" : "0",
             "Tie::Hash" : "0",
@@ -101,7 +101,7 @@
    "provides" : {
       "Data::Dumper::Interp" : {
          "file" : "lib/Data/Dumper/Interp.pm",
-         "version" : "7.021"
+         "version" : "7.022"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/jimav/Data-Dumper-Interp"
       }
    },
-   "version" : "7.021",
+   "version" : "7.022",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "CC0-1.0"

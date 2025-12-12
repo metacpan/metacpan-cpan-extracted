@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Server::IMAP4::User;{
-our $VERSION = '3.010';
+our $VERSION = '4.000';
 }
 
-use base 'Mail::Box::Manage::User';
+use parent 'Mail::Box::Manage::User';
 
 use strict;
 use warnings;
+
+use Log::Report 'mail-box-imap4';
 
 #--------------------
 
@@ -67,7 +69,7 @@ sub _delete($$)
 	if(my $dir = $info->{Directory})
 	{	# Bluntly try to remove, but error is not set
 		if(remove(\1, $dir) != 0 && -d $dir)
-		{	$self->log(error => "Unable to remove folder $dir");
+		{	fault __x"Unable to remove folder {name}", name => $dir;
 			return 0;
 		}
 	}
@@ -83,7 +85,7 @@ sub create($@)
 	my $index   = $self->index->startModify or return undef;
 
 	if(my $info = $index->folder($name))
-	{	$self->log(WARNING => "Folder $name already exists, creation skipped");
+	{	warning __x"folder {name} already exists, creation skipped.", name => $name;
 		return $info;
 	}
 
@@ -94,28 +96,19 @@ sub create($@)
 	# work, we check whether we did too much. This may safe an NFS stat.
 
 	my $dir     = $self->home . '/F' . $uniq;
-	unless(mkdir $dir, 0750)
-	{	my $rc = "$!";
-		unless(-d $dir)   # replaces $!
-		{	$self->log(ERROR => "Cannot create folder directory $dir: $rc");
-			return undef;
-		}
-	}
+	-d $dir or mkdir $dir, 0750
+		or fault __x"cannot create folder directory {dir}", dir => $dir;
 
 	# Write folder name in directory, for recovery purposes.
 	my $namefile = "$dir/name";
 	my $namefh;
-	unless(open $namefh, '>:encoding(utf-8)', $namefile)
-	{	$self->log(ERROR => "Cannot write name for folder in $namefile: $!");
-		return undef;
-	}
+	open $namefh, '>:encoding(utf-8)', $namefile
+		or fault __x"cannot write name for folder in {file}", file => $namefile;
 
 	$namefh->print("$name\n");
 
-	unless($namefh->close)
-	{	$self->log(ERROR => "Failed writing folder name to $namefile: $!");
-		return undef;
-	}
+	$namefh->close
+		or fault __x"failed writing folder name to {file}", file => $namefile;
 
 	# Add folder to the index
 

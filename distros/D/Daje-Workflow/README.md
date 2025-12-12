@@ -78,7 +78,9 @@ at each step ask: what happens next?
 
 [Daje::Workflow::Loader](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ALoader) 
 
-[v5.40](https://metacpan.org/pod/v5.40) 
+[Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper) 
+
+[v5.42](https://metacpan.org/pod/v5.42) 
 
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
 

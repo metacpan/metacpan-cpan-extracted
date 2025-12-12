@@ -186,8 +186,12 @@ sub import {
   #  Do not inport 1- and 2- or 3- character upper-case names, which are
   #  likely to clash with user variables and/or spreadsheet column letters
   #  (when using Spreadsheet::Edit).
+  #
+  #  The :no-Test2 tag is used by subtest .pl scripts which must not
+  #  generate any Test2 events!
   unless (delete $tags{":no-Test2"}) {
-    require Test2::V0; # a huge collection of tools
+    require Test2::V0; # a huge collection of tools (n.b. version is in dist.ini)
+    Test2::V0->VERSION(1.302214);  # AutoPrereqs *does* see this!
     Test2::V0->import::into($target,
       -no_warnings => 1,
       (map{ "!$_" } "A".."AAZ")
@@ -829,7 +833,7 @@ sub clean_capture_output($) {
 sub my_capture(&) {
   my ($out, $err, @results) = &capture($_[0]);
   $out = clean_capture_output($out);
-  $err = clean_capture_errput($err);
+  $err = clean_capture_output($err);
   confess "my_capture: Must be called in list context to receive both stdout & err"
     unless wantarray;
   return( $out, $err, @results );

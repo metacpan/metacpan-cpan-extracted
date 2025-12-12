@@ -63,10 +63,8 @@ Inherited, see L<Mail::Message::Head/"Constructors">
  -Option      --Defined in         --Default
   cache_fields                       false
   field_type    Mail::Message::Head  Mail::Message::Field::Fast
-  log           Mail::Reporter       'WARNINGS'
   message       Mail::Message::Head  undef
   modified      Mail::Message::Head  false
-  trace         Mail::Reporter       'WARNINGS'
 
 =over 2
 
@@ -78,13 +76,9 @@ this value is set to C<false> for C<NO> and C<true> for C<PARTIAL>..
 
 =item field_type => CLASS
 
-=item log => LEVEL
-
-=item message => MESSAGE
+=item message => $message
 
 =item modified => BOOLEAN
-
-=item trace => LEVEL
 
 =back
 
@@ -93,14 +87,6 @@ this value is set to C<false> for C<NO> and C<true> for C<PARTIAL>..
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Message::Head|Mail::Message::Head/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 The header
 
@@ -218,43 +204,7 @@ Extends L<"Error handling" in Mail::Message::Head|Mail::Message::Head/"Error han
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -280,9 +230,9 @@ Extends L<"DETAILS" in Mail::Message::Head|Mail::Message::Head/"DETAILS">.
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
@@ -293,8 +243,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 3.010,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

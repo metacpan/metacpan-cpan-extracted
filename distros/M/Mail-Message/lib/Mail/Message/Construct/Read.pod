@@ -21,10 +21,10 @@ handle.
 
 =over 4
 
-=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|$text|\$text|\@lines, %options)
 
-Read a message from a C<$fh>, C<STRING>, C<SCALAR>, or a reference to an
-C<ARRAY> of lines.  Most C<%options> are passed to the L<new()|Mail::Message/"Constructors"> of the message
+Read a message from a C<$fh>, C<$text> string, reference to a text string, or an
+ARRAY of C<@lines>.  Most C<%options> are passed to the L<new()|Mail::Message/"Constructors"> of the message
 which is created, but a few extra are defined.
 
 Please have a look at L<build()|Mail::Message::Construct::Build/"Constructing a message"> and L<buildFromBody()|Mail::Message::Construct::Build/"Constructing a message"> before thinking about
@@ -47,21 +47,21 @@ with your internal administration, which may have security implications.
   body_type            undef
   parser_class         undef
   seekable             false
-  strip_status_fields  <C<true>>
+  strip_status_fields  true
   trusted              true
 
 =over 2
 
-=item body_type => CLASS
+=item body_type => $type
 
-Force a body type (any specific implementation of a L<Mail::Message::Body|Mail::Message::Body>)
+Force a body C<$type> (any specific extension of the L<Mail::Message::Body|Mail::Message::Body> class)
 to be used to store the message content.  When the body is a multipart or
 nested, this will be overruled.
 
-=item parser_class => CLASS
+=item parser_class => $type
 
-Enforce a certain parser type to be used, which must be an extension of
-the parser class otherwise taken.
+Enforce a certain parser C<$type> to be used, which must be an extension of
+the L<Mail::Box::Parser|Mail::Box::Parser> class otherwise taken.
 
 =item seekable => BOOLEAN
 
@@ -84,7 +84,7 @@ you probably process folders yourself, which is a Bad Thing!
 » example: 
 
   my $msg1 = Mail::Message->read(\*STDIN);
-  my $msg2 = Mail::Message->read(\@lines, log => 'PROGRESS');
+  my $msg2 = Mail::Message->read(\@lines);
   $folder->addMessages($msg1, $msg2);
 
   my $msg3 = Mail::Message->read(<<MSG);
@@ -102,10 +102,20 @@ you probably process folders yourself, which is a Bad Thing!
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: cannot read message from a $source}.
+
+Cast by C<read()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

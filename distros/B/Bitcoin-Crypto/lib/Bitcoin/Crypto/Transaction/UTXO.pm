@@ -1,29 +1,22 @@
 package Bitcoin::Crypto::Transaction::UTXO;
-$Bitcoin::Crypto::Transaction::UTXO::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::UTXO::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 
 use Bitcoin::Crypto::Transaction;
 use Bitcoin::Crypto::Transaction::Output;
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Util qw(to_format);
+use Bitcoin::Crypto::Util::Internal qw(to_format);
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
 
 my %utxos;
 my $loader;
 
 has param 'txid' => (
-	coerce => ByteStr->create_child_type(
-		constraint => q{ length $_ == 32 },
-		coercion => 1
-	),
+	coerce => ByteStrLen [32],
 );
 
 # NOTE: ideally, utxo should point to a transaction, and transaction should
@@ -41,11 +34,6 @@ has param 'output' => (
 		->plus_coercions(HashRef q{ Bitcoin::Crypto::Transaction::Output->new($_) }),
 );
 
-signature_for register => (
-	method => Object,
-	positional => [],
-);
-
 sub register
 {
 	my ($self) = @_;
@@ -54,25 +42,20 @@ sub register
 	return $self
 		if $self->output->is_standard && $self->output->locking_script->type eq 'NULLDATA';
 
-	$utxos{$self->txid}[$self->output_index] = $self;
+	$utxos{$self->txid . $self->output_index} = $self;
 	return $self;
 }
-
-signature_for unregister => (
-	method => Object,
-	positional => [],
-);
 
 sub unregister
 {
 	my ($self) = @_;
 
-	delete $utxos{$self->txid}[$self->output_index];
+	delete $utxos{$self->txid . $self->output_index};
 	return $self;
 }
 
 signature_for get => (
-	method => Str,
+	method => !!1,
 	positional => [ByteStr, PositiveOrZeroInt],
 );
 
@@ -80,36 +63,53 @@ sub get
 {
 	my ($class, $txid, $outid) = @_;
 
-	my $utxo = $utxos{$txid}[$outid];
+	my $utxo = $utxos{$txid . $outid};
 
-	# NOTE: loader should unregister the utxo in its own store
-	if (!$utxo && defined $loader) {
-		$utxo = $loader->($txid, $outid);
-		$utxo->register if $utxo;
+	if (!$utxo) {
+
+		$utxo = $loader->($txid, $outid)
+			if defined $loader;
+
+		Bitcoin::Crypto::Exception::UTXO->raise(
+			sprintf(
+				"no UTXO registered for transaction id %s and output index %s",
+				to_format [hex => $txid],
+				$outid
+			)
+		) unless $utxo;
+
+		$utxo->register;
 	}
-
-	Bitcoin::Crypto::Exception::UTXO->raise(
-		"no UTXO registered for transaction id @{[to_format [hex => $txid]]} and output index $outid"
-	) unless $utxo;
 
 	return $utxo;
 }
 
 signature_for set_loader => (
-	method => Str,
+	method => !!1,
 	positional => [Maybe [CodeRef]],
 );
 
 sub set_loader
 {
-	my ($class, $new_loader) = @_;
-
-	$loader = $new_loader;
+	$loader = pop;
 	return;
 }
 
+sub unload
+{
+	my @result = values %utxos;
+	%utxos = ();
+
+	return \@result;
+}
+
+sub registered_count
+{
+	return scalar keys %utxos;
+}
+
 signature_for extract => (
-	method => Str,
+	method => !!1,
 	positional => [ByteStr],
 );
 
@@ -237,9 +237,30 @@ Replaces an UTXO loader.
 
 The subroutine should accept the same parameters as L</get> and return a
 constructed UTXO object. If possible, the loader should not return the same
-UTXO twice in a single runtime of the script.
+UTXO twice in a single runtime of the script. It will be not informed of UTXOs
+being spent, so it should "hand over" UTXOs while marking them as spent in its
+source.
 
 Returns nothing. Passing undef disables the custom loader.
+
+=head3 unload
+
+	\@utxos = $class->unload()
+
+Removes all UTXOs from the perl memory and returns them as an array reference.
+Returned UTXOs will no longer be visible to L</get> calls.
+
+This may be useful to move the UTXOs gathered in Perl memory to some other
+medium, for example a database. L</set_loader> could be set to load UTXOs from
+a database, and the script could periodically clear them from its memory to store
+them in a persistent storage for later.
+
+=head3 registered_count
+
+	$count = $class->registered_count()
+
+Returns the number of UTXOS currently present in internal perl memory. This can
+be used to decide whether a call to L</unload> is needed or not.
 
 =head3 extract
 
@@ -250,18 +271,6 @@ achieved by calling C<update_utxos> on a transaction object.
 
 Returns nothing. All C<$serialized_tx> outputs will be added to the register as
 new UTXO instances.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * UTXO - UTXO was not found
-
-=back
 
 =head1 SEE ALSO
 

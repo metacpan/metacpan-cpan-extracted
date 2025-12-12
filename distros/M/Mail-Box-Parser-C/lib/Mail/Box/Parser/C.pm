@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-Parser-C version 3.013.
+# This code is part of Perl distribution Mail-Box-Parser-C version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -9,18 +9,18 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 
-#XXX WARNING: large overlap with Mail::Box::Parser:Perl; you may need to change both!
-
 package Mail::Box::Parser::C;{
-our $VERSION = '3.013';
+our $VERSION = '4.00';
 }
 
-use base qw/Mail::Box::Parser DynaLoader/;
+use parent qw/Mail::Box::Parser DynaLoader/;
 
-our $VERSION = '3.013';
+our $VERSION = '4.00';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-box-parser-c';
 
 use Mail::Message::Field ();
 
@@ -52,75 +52,7 @@ sub body_delayed($$$);
 
 #--------------------
 
-sub init(@)
-{	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
-
-	$self->{MBPC_mode}     = $args->{mode} || 'r';
-	$self->{MBPC_filename} = $args->{filename} || ref $args->{file}
-		or $self->log(ERROR => "Filename or handle required to create a parser."), return;
-
-	$self->start(file => $args->{file});
-	$self;
-}
-
-#--------------------
-
 sub boxnr() { $_[0]->{MBPC_boxnr} }
-
-
-sub filename() { $_[0]->{MBPC_filename} }
-sub openMode() { $_[0]->{MBPC_mode} }
-sub file()     { $_[0]->{MBPC_file} }
-
-#--------------------
-
-sub start(@)
-{	my ($self, %args) = @_;
-	$self->openFile(%args) or return;
-	$self->takeFileInfo;
-
-	$self->log(PROGRESS => "Opened folder ".$self->filename." to be parsed");
-	$self;
-}
-
-
-sub stop()
-{	my $self = shift;
-	$self->log(NOTICE => "Close parser for file ".$self->filename);
-	$self->closeFile;
-}
-
-
-sub restart()
-{	my $self     = shift;
-	$self->closeFile;
-	$self->openFile(@_) or return;
-	$self->takeFileInfo;
-	$self->log(NOTICE => "Restarted parser for file ".$self->filename);
-	$self;
-}
-
-
-sub fileChanged()
-{	my $self = shift;
-	my ($size, $mtime) = (stat $self->filename)[7,9];
-	return 0 if !defined $size || !defined $mtime;
-	$size != $self->{MBPC_size} || $mtime != $self->{MBPC_mtime};
-}
-
-
-sub filePosition(;$)
-{	my $boxnr = shift->boxnr;
-	@_ ? set_position($boxnr, shift) : get_position($boxnr);
-}
-
-
-sub takeFileInfo()
-{	my $self = shift;
-	@$self{ qw/MBPC_size MBPC_mtime/ } = (stat $self->filename)[7,9];
-}
-
 
 sub pushSeparator($)
 {	my ($self, $sep) = @_;
@@ -128,6 +60,11 @@ sub pushSeparator($)
 }
 
 sub popSeparator()  { pop_separator $_[0]->boxnr }
+
+sub filePosition(;$)
+{	my $boxnr = shift->boxnr;
+	@_ ? set_position($boxnr, shift) : get_position($boxnr);
+}
 
 sub readHeader()    { read_header $_[0]->boxnr }
 
@@ -153,20 +90,17 @@ sub bodyDelayed(;$$)
 	body_delayed $self->boxnr, $exp_chars // -1, $exp_lines // -1;
 }
 
-
-sub openFile(%)
-{	my ($self, %args) = @_;
-	my %log = $self->logSettings;
+sub openFile($)
+{	my ($self, $args) = @_;
+	my $trace = $args->{trace} || 0;
 
 	my $boxnr;
-	my $name = $args{filename} || $self->filename;
-
-	if(my $file = $args{file})
-	{	$boxnr   = open_filehandle($file, $name // "$file", $log{trace});
+	if(my $file = $args->{file})
+	{	my $name = $args->{filename} || "$file";
+		$boxnr   = open_filehandle($file, $name, $trace);
 	}
 	else
-	{	my $mode = $args{mode} || $self->openMode || 'r';
-		$boxnr   = open_filename($name, $mode, $log{trace});
+	{	$boxnr   = open_filename($args->{filename}, $args->{mode}, $trace);
 	}
 
 	$self->{MBPC_boxnr} = $boxnr;

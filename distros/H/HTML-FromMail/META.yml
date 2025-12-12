@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +21,14 @@ no_index:
     - inc
 requires:
   HTML::FromText: '2.03'
-  Mail::Box: '>= 2.051, < 4.0'
-  OODoc::Template: '0.01'
+  Log::Report: '1.42'
+  Mail::Box: '4.00'
+  OODoc::Template: '0.19'
 resources:
   bugtracker: https://github.com/markov2/perl5-HTML-FromMail/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-HTML-FromMail.git
-version: '3.01'
+version: '4.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2003

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail::Object;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'Mail::Reporter';
@@ -18,15 +18,15 @@ use base 'Mail::Reporter';
 use strict;
 use warnings;
 
+use Log::Report 'html-frommail';
+
 #--------------------
 
 sub init($)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
-	defined($self->{HFO_topic} = $args->{topic})
-		or $self->log(INTERNAL => 'No topic defined for '.ref($self)), exit 1;
-
+	$self->{HFO_topic}    = $args->{topic} // panic "No topic";
 	$self->{HFO_settings} = $args->{settings} || {};
 	$self;
 }

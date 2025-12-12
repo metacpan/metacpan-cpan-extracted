@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-POP3 version 3.008.
+# This code is part of Perl distribution Mail-Box-POP3 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Transport::POP3;{
-our $VERSION = '3.008';
+our $VERSION = '4.000';
 }
 
-use base 'Mail::Transport::Receive';
+use parent 'Mail::Transport::Receive';
 
 use strict;
 use warnings;
+
+use Log::Report  'mail-box-pop3';
 
 use IO::Socket       ();
 use IO::Socket::IP   ();
@@ -66,8 +68,8 @@ sub ids(;@)
 sub messages()
 {	my $self = shift;
 
-	$self->log(ERROR =>"Cannot get the messages of pop3 via messages()."), return ()
-		if wantarray;
+	wantarray
+		or error __x"cannot get all messages of pop3 at once via messages().";
 
 	$self->{MTP_messages};
 }
@@ -77,12 +79,12 @@ sub folderSize() { $_[0]->{MTP_folder_size} }
 
 
 sub header($;$)
-{	my ($self, $uidl) = (shift, shift);
-	return unless $uidl;
-	my $bodylines = shift || 0;;
+{	my ($self, $uidl, $bodylines) = @_;
+	$uidl or return;
 
-	my $socket    = $self->socket      or return;
-	my $n         = $self->id2n($uidl) or return;
+	$bodylines //= 0;;
+	my $socket   = $self->socket      or return;
+	my $n        = $self->id2n($uidl) or return;
 
 	$self->sendList($socket, "TOP $n $bodylines$CRLF");
 }
@@ -94,9 +96,7 @@ sub message($;$)
 
 	my $socket  = $self->socket      or return;
 	my $n       = $self->id2n($uidl) or return;
-	my $message = $self->sendList($socket, "RETR $n$CRLF");
-
-	return unless $message;
+	my $message = $self->sendList($socket, "RETR $n$CRLF") or return;
 
 	# Some POP3 servers add a trailing empty line
 	pop @$message if @$message && $message->[-1] =~ m/^[\012\015]*$/;
@@ -110,7 +110,7 @@ sub message($;$)
 
 sub messageSize($)
 {	my ($self, $uidl) = @_;
-	return unless $uidl;
+	$uidl or return;
 
 	my $list;
 	unless($list = $self->{MTP_n2length})
@@ -170,7 +170,7 @@ sub fetched(;$)
 }
 
 
-sub id2n($;$) { shift->{MTP_uidl2n}{shift()} }
+sub id2n($$) { $_[0]->{MTP_uidl2n}{$_[1]} }
 
 #--------------------
 
@@ -181,10 +181,8 @@ sub socket()
 	my $socket = $self->_connection;
 	return $socket if defined $socket;
 
-	if(exists $self->{MTP_nouidl})
-	{	$self->log(ERROR => "Can not re-connect reliably to server which doesn't support UIDL");
-		return;
-	}
+	exists $self->{MTP_nouidl}
+		or error __x"can not re-connect reliably to server which doesn't support UIDL";
 
 	# (Re-)establish the connection
 	$socket = $self->login or return;
@@ -199,12 +197,12 @@ sub send($$)
 	my $socket = shift;
 	my $response;
 
-	if(eval {print $socket @_})
+	if(eval { print $socket @_} )
 	{	$response = <$socket>;
-		defined $response or $self->log(ERROR => "Cannot read POP3 from socket: $!")
+		defined $response or fault __x"cannot read POP3 from socket";
 	}
 	else
-	{	$self->log(ERROR => "Cannot write POP3 to socket: $@");
+	{	error __x"cannot write POP3 to socket: {error}", error => $@;
 	}
 	$response;
 }
@@ -232,10 +230,8 @@ sub DESTROY()
 }
 
 sub _connection()
-{	my $self = shift;
-
-	my $socket = $self->{MTP_socket};
-	defined $socket or return;
+{	my $self   = shift;
+	my $socket = $self->{MTP_socket} // return;
 
 	# Check if we (still) got a connection
 	eval { print $socket "NOOP$CRLF" };
@@ -255,10 +251,8 @@ sub login(;$)
 	# Check if we can make a connection
 
 	my ($host, $port, $username, $password) = $self->remoteHost;
-	unless($username && $password)
-	{	$self->log(ERROR => "POP3 requires a username and password.");
-		return;
-	}
+	$username && $password
+		or error __x"POP3 requires a username and password.";
 
 	my $socket;
 	if($self->useSSL)
@@ -269,20 +263,16 @@ sub login(;$)
 	{	$socket  = eval { IO::Socket::IP->new("$host:$port") };
 	}
 
-	unless($socket)
-	{	$self->log(ERROR => "Cannot connect to $host:$port for POP3: $!");
-		return;
-	}
+	$socket
+		or fault __x"cannot connect to {service} for POP3", service => "$host:$port";
 
 	# Check if it looks like a POP server
 
 	my $connected;
 	my $authenticate = $self->{MTP_auth};
 	my $welcome      = <$socket>;
-	unless(_OK $welcome)
-	{	$self->log(ERROR => "Server at $host:$port does not seem to be talking POP3.");
-		return;
-	}
+	_OK $welcome
+		or error __x"server at {service} does not seem to be talking POP3.", service => "$host:$port";
 
 	# Check APOP login if automatic or APOP specifically requested
 	if($authenticate eq 'AUTO' || $authenticate eq 'APOP')
@@ -297,12 +287,10 @@ sub login(;$)
 	# requested.
 	unless($connected)
 	{	if($authenticate eq 'AUTO' || $authenticate eq 'LOGIN')
-		{	my $response = $self->send($socket, "USER $username$CRLF")
-				or return;
+		{	my $response = $self->send($socket, "USER $username$CRLF") or return;
 
 			if(_OK $response)
-			{	my $response2 = $self->send($socket, "PASS $password$CRLF")
-					or return;
+			{	my $response2 = $self->send($socket, "PASS $password$CRLF") or return;
 				$connected = _OK $response2;
 			}
 		}
@@ -317,29 +305,24 @@ sub login(;$)
 		if($authenticate eq 'OAUTH2_SEP')
 		{	# Microsofts way
 			# https://learn.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
-			my $response = $self->send($socket, "AUTH XOAUTH2$CRLF")
-				or return;
+			my $response = $self->send($socket, "AUTH XOAUTH2$CRLF") or return;
 
 			if($response =~ /^\+/)   # Office365 sends + here, not +OK
-			{	my $response2 = $self->send($socket, "$token$CRLF")
-					or return;
+			{	my $response2 = $self->send($socket, "$token$CRLF") or return;
 				$connected = _OK $response2;
 			}
 		}
 		else
-		{	my $response = $self->send($socket, "AUTH XOAUTH2 $token$CRLF")
-				or return;
-
+		{	my $response = $self->send($socket, "AUTH XOAUTH2 $token$CRLF") or return;
 			$connected = _OK $response;
 		}
 	}
 
 	# If we're still not connected now, we have an error
 	unless($connected)
-	{	$self->log(ERROR => $authenticate eq 'AUTO' ?
-			"Could not authenticate using any login method" :
-			"Could not authenticate using '$authenticate' method");
-		return;
+	{	$authenticate eq 'AUTO'
+		  ? (error __x"could not authenticate using any login method.")
+		  : (error __x"could not authenticate using '{type}' method", type => $authenticate);
 	}
 
 	$socket;

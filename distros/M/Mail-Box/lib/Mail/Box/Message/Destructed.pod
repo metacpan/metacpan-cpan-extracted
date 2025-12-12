@@ -60,11 +60,9 @@ Improves base, see L<Mail::Reporter/"Constructors">
   head        Mail::Message       undef
   head_type   Mail::Message       Mail::Message::Head::Complete
   labels      Mail::Message       +{}
-  log         Mail::Reporter      'WARNINGS'
   messageId   Mail::Message       undef
   modified    Mail::Message       false
   size        Mail::Box::Message  undef
-  trace       Mail::Reporter      'WARNINGS'
   trusted     Mail::Message       false
 
 =over 2
@@ -83,17 +81,13 @@ Improves base, see L<Mail::Reporter/"Constructors">
 
 =item head_type => $class
 
-=item labels => ARRAY|HASH
-
-=item log => LEVEL
+=item labels => \@pairs|\%settings
 
 =item messageId => $id
 
 =item modified => BOOLEAN
 
 =item size => $bytes
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -110,10 +104,6 @@ Extends L<"Attributes" in Mail::Box::Message|Mail::Box::Message/"Attributes">.
 =item $obj-E<gt>B<folder>( [$folder] )
 
 Inherited, see L<Mail::Box::Message/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<seqnr>( [$integer] )
 
@@ -171,7 +161,7 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item $class-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+=item $class-E<gt>B<read>($fh|$text|\$text|\@lines, %options)
 
 Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
 
@@ -183,7 +173,7 @@ Inherited, see L<Mail::Message::Construct::Rebuild/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
-=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|ARRAY-$of-$things] )
+=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|\@addrs|\@fields] )
 
 Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
 
@@ -394,7 +384,7 @@ Inherited, see L<Mail::Message/"Flags">
 
 Inherited, see L<Mail::Message/"Flags">
 
-=item $obj-E<gt>B<modified>( [BOOLEAN] )
+=item $obj-E<gt>B<modified>( [$flag] )
 
 Inherited, see L<Mail::Message/"Flags">
 
@@ -496,35 +486,7 @@ Extends L<"Error handling" in Mail::Box::Message|Mail::Box::Message/"Error handl
 
 Inherited, see L<Mail::Message::Construct/"METHODS">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -535,14 +497,6 @@ Inherited, see L<Mail::Message/"Error handling">
 =item $obj-E<gt>B<shortString>()
 
 Inherited, see L<Mail::Message/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =back
 
@@ -570,56 +524,10 @@ Extends L<"DETAILS" in Mail::Box::Message|Mail::Box::Message/"DETAILS">.
 
 =over 4
 
-=item Error: Cannot coerce a (class) into destruction
-
-Only real L<Mail::Box::Message|Mail::Box::Message> objects can get destructed into
-L<Mail::Box::Message::Destructed|Mail::Box::Message::Destructed> objects.  L<Mail::Message|Mail::Message> free
-their memory immediately when the last reference is lost.
-Cast by C<coerce()>
-
-=item Error: Cannot include forward source as $include.
+=item Error: Cannot include forward source as $kind.
 
 Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
 C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
-Cast by C<forward()>
-
-=item Error: Cannot include reply source as $include.
-
-Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
-choices are C<NO>, C<INLINE>, and C<ATTACH>.
-Cast by C<reply()>
-
-=item Error: Destructed message has no labels except 'deleted'
-
-Cast by C<label()>
-
-=item Error: Destructed messages can not be undeleted
-
-Once a message is destructed, it can not be revived.  Destruction is an
-optimization in memory usage: if you need an undelete functionality, then
-you can not use L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup">.
-Cast by C<label()>
-
-=item Error: Method bounce requires To, Cc, or Bcc
-
-The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
-else without modification; you must specified it's new destination.
-If you have the urge not to specify any destination, you probably
-are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
-L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
-Cast by C<bounce()>
-
-=item Error: Method forwardAttach requires a preamble
-
-Cast by C<forwardAttach()>
-
-=item Error: Method forwardEncapsulate requires a preamble
-
-Cast by C<forwardEncapsulate()>
-
-=item Error: No address to create forwarded to.
-
-If a forward message is created, a destination address must be specified.
 Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
@@ -629,35 +537,6 @@ find a mail transfer agent to sent this message.  Specify a mailer
 explicitly using the C<via> options.
 Cast by C<send()>
 
-=item Error: No rebuild rule $name defined.
-
-Cast by C<rebuild()>
-
-=item Error: Only build() Mail::Message's; they are not in a folder yet
-
-You may wish to construct a message to be stored in a some kind
-of folder, but you need to do that in two steps.  First, create a
-normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
-L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Box::Message::Destructed/"METHODS">-d
-into the right message type, adding storage information and the like.
-Cast by C<build()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: You cannot instantiate a destructed message
-
-You cannot instantiate a destructed message object directly.  Destruction
-is done by calling L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup"> on any existing
-folder message.
-Cast by C<new()>
-
 =item Error: You cannot take the head/body of a destructed message
 
 The message originated from a folder, but its memory has been freed-up
@@ -666,12 +545,126 @@ your program still tries to get to the header or body data after this
 destruction, which is not possible.
 Cast by C<head()>
 
+=item Error: cannot include reply source as $kind.
+
+Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
+choices are C<NO>, C<INLINE>, and C<ATTACH>.
+Cast by C<reply()>
+
+=item Error: cannot read message from a $source}.
+
+Cast by C<read()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: destructed message can not be undeleted
+
+Once a message is destructed, it can not be revived.  Destruction is an
+optimization in memory usage: if you need an undelete functionality, then
+you can not use L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup">.
+Cast by C<label()>
+
+=item Error: destructed message has no labels except 'deleted', requested is $label.
+
+Cast by C<label()>
+
+=item Error: destructed message has no labels except 'deleted', trying to set @labels.
+
+Cast by C<label()>
+
+=item Error: method bounce requires To, Cc, or Bcc.
+
+The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
+else without modification; you must specified it's new destination.
+If you have the urge not to specify any destination, you probably
+are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
+L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+Cast by C<bounce()>
+
+=item Error: method forwardAttach requires a preamble.
+
+Cast by C<forwardAttach()>
+
+=item Error: method forwardEncapsulate requires a preamble.
+
+Cast by C<forwardEncapsulate()>
+
+=item Error: method forwardNo requires a To.
+
+Cast by C<forwardNo()>
+
+=item Error: method forwardNo requires a body.
+
+Cast by C<forwardNo()>
+
+=item Error: no rebuild rule $name defined.
+
+Cast by C<rebuild()>
+
+=item Error: only build() Mail::Message's; they are not in a folder yet.
+
+You may wish to construct a message to be stored in a some kind
+of folder, but you need to do that in two steps.  First, create a
+normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
+L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Box::Message::Destructed/"METHODS">-d
+into the right message type, adding storage information and the like.
+Cast by C<build()>
+
+=item Error: select parts via '$what'?
+
+Cast by C<parts()>
+
+=item Warning: skipped unknown key '$key' in build.
+
+Cast by C<build()>
+
+=item Error: you cannot coerce a $class into destruction.
+
+Only real L<Mail::Box::Message|Mail::Box::Message> objects can get destructed into
+L<Mail::Box::Message::Destructed|Mail::Box::Message::Destructed> objects.  L<Mail::Message|Mail::Message> free
+their memory immediately when the last reference is lost.
+Cast by C<coerce()>
+
+=item Error: you cannot instantiate a destructed message.
+
+You cannot instantiate a destructed message object directly.  Destruction
+is done by calling L<Mail::Box::Message::destruct()|Mail::Box::Message/"Cleanup"> on any existing
+folder message.
+Cast by C<new()>
+
+=item Error: you cannot set the body on a destructed message.
+
+Cast by C<body()>
+
+=item Error: you cannot set the head on a destructed message.
+
+Cast by C<head()>
+
+=item Error: you cannot set the modified flag on a destructed message.
+
+Cast by C<modified()>
+
+=item Error: you cannot take the body of a destructed message.
+
+Cast by C<body()>
+
+=item Error: you cannot take the head of a destructed message.
+
+Cast by C<head()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 3.012,
-built on November 27, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

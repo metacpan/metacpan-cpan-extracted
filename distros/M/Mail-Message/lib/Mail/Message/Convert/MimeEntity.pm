@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Convert::MimeEntity;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Convert';
+use parent 'Mail::Message::Convert';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 use MIME::Entity   ();
 use MIME::Parser   ();
@@ -30,7 +32,7 @@ sub export($$;$)
 	defined $message or return ();
 
 	$message->isa('Mail::Message')
-		or $self->log(ERROR => "Export message must be a Mail::Message, but is a ".(ref $message)."."), return;
+		or error __x"export message must be a Mail::Message object, but is {what UNKNOWN}.", what => $message;
 
 	$parser ||= MIME::Parser->new;
 	$parser->parse($message->file);
@@ -42,7 +44,7 @@ sub from($)
 	defined $mime_ent or return ();
 
 	$mime_ent->isa('MIME::Entity')
-		or $self->log(ERROR => 'Converting from MIME::Entity but got a '.(ref $mime_ent).'.'), return;
+		or error __x"converting from MIME::Entity but got a {class}.", class => ref $mime_ent;
 
 	Mail::Message->read($mime_ent->as_string);
 }

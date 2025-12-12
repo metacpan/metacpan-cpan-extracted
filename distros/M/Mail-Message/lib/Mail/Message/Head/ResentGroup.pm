@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,19 +10,21 @@
 
 
 package Mail::Message::Head::ResentGroup;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Head::FieldGroup';
+use parent 'Mail::Message::Head::FieldGroup';
 
 use strict;
 use warnings;
 
-use Mail::Message::Field::Fast ();
+use Log::Report   'mail-message', import => [ qw// ];
 
 use Scalar::Util  qw/weaken/;
 use Sys::Hostname qw/hostname/;
 use Mail::Address ();
+
+use Mail::Message::Field::Fast ();
 
 #--------------------
 
@@ -50,7 +52,7 @@ sub init($$)
 
 
 sub from($@)
-{	return $_[0]->resentFrom if @_ == 1;   # backwards compat
+{	@_==1 and return $_[0]->resentFrom;   # backwards compat
 
 	my ($class, $from, %args) = @_;
 	my $head = $from->isa('Mail::Message::Head') ? $from : $from->head;
@@ -139,7 +141,7 @@ sub received() { $_[0]->head->get('Received') }
 
 
 sub receivedTimestamp()
-{	my $received = shift->received or return;
+{	my $received = $_[0]->received or return;
 	my $comment  = $received->comment or return;
 	Mail::Message::Field->dateToTimestamp($comment);
 }

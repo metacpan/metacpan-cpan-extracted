@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,17 @@
 
 
 package Mail::Box::IMAP4::Message;{
-our $VERSION = '3.010';
+our $VERSION = '4.000';
 }
 
-use base 'Mail::Box::Net::Message';
+use parent 'Mail::Box::Net::Message';
 
 use strict;
 use warnings;
 
-use Date::Parse 'str2time';
+use Log::Report 'mail-box-imap4';
+
+use Date::Parse qw/str2time/;
 
 #--------------------
 
@@ -95,7 +97,7 @@ sub labels()
 {	my $self   = shift;
 	my $id     = $self->unique;
 	my $labels = $self->SUPER::labels;
-	$labels    = { %$labels } unless $self->{MBIM_cache_labels};
+	$labels    = +{ %$labels } unless $self->{MBIM_cache_labels};
 
 	if($id && !exists $labels->{seen})
 	{	my $imap = $self->folder->transporter or return;

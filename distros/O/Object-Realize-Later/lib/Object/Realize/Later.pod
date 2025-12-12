@@ -19,6 +19,11 @@ on demand realization of object data.  This is related to the tricks
 on autoloading of data, the lesser known cousin of autoloading of
 functionality.
 
+This module versions 4.0 and up is not fully compatible with older releases:
+mainly the exception handling has changed.  When you need to upgrade, please
+read F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+B<Version 3 is still maintained> and may see new releases as well.
+
 On demand realization is all about performance gain.  Why should you
 spent costly time on realizing an object, when the data on the object is
 never (or not yet) used?  In interactive programs, postponed realization
@@ -243,14 +248,14 @@ Consider this:
        becomes => 'Realized',
        realize => 'load';
 
-  sub new($)      {my($class,$v)=@_; bless {label=>$v}, $class}
-  sub setLabel($) {my $self = shift; $self->{label} = shift}
-  sub load()      {$_[0] = Realized->new($_[0]->{label}) }
+  sub new($)      { my($class,$v)=@_; bless {label=>$v}, $class }
+  sub setLabel($) { my $self = shift; $self->{label} = shift }
+  sub load()      { $_[0] = Realized->new($_[0]->{label}) }
 
   package Realized;  # file Realized.pm or use use(source_module)
-  sub new($)      {my($class,$v)=@_; bless {label=>$v}, $class}
-  sub setLabel($) {my $self = shift; $self->{label} = shift}
-  sub getLabel()  {my $self = shift; $self->{label}}
+  sub new($)      { my($class,$v)=@_; bless {label=>$v}, $class }
+  sub setLabel($) { my $self = shift; $self->{label} = shift }
+  sub getLabel()  { my $self = shift; $self->{label} }
 
   package main;
   my $original = Delayed->new('original');
@@ -409,8 +414,8 @@ be prepared to read the body when needed.  A code snippet:
 
 =head1 SEE ALSO
 
-This module is part of Object-Realize-Later version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Object-Realize-Later version 4.00,
+built on December 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

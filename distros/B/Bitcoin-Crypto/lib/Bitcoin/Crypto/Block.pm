@@ -1,22 +1,18 @@
 package Bitcoin::Crypto::Block;
-$Bitcoin::Crypto::Block::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Block::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use Scalar::Util qw(blessed);
-use Try::Tiny;
+use Feature::Compat::Try;
 
 use Bitcoin::Crypto qw(btc_transaction);
-use Bitcoin::Crypto::Util qw(pack_compactsize unpack_compactsize hash256 to_format);
+use Bitcoin::Crypto::Util::Internal qw(pack_compactsize unpack_compactsize hash256 to_format);
 use Bitcoin::Crypto::Script::Runner;
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
 
 # Block header fields
 has param 'version' => (
@@ -106,38 +102,36 @@ sub _build_height
 		'invalid height in coinbase transaction'
 	) unless $size && ($size == 3 || $size == 5) && length $full_script > $size;
 
-	my $result;
 	try {
-		$result = Bitcoin::Crypto::Script::Runner
-			->to_int(substr $full_script, 1, $size)
-			->numify;
-	};
+		my $result = Bitcoin::Crypto::Script::Runner
+			->to_int(substr $full_script, 1, $size);
 
-	return $result;
+		# numify if bigint
+		return "$result";
+	}
+	catch ($e) {
+		return undef;
+	}
 }
-
-signature_for add_transaction => (
-	method => Object,
-	positional => [ArrayRef, {slurpy => !!1}],
-);
 
 sub add_transaction
 {
-	my ($self, $data) = @_;
+	my ($self, @data) = @_;
 
-	if (@$data == 1) {
-		$data = $data->[0];
+	my $tx;
+	if (@data == 1) {
+		$tx = $data[0];
 
 		Bitcoin::Crypto::Exception::Block->raise(
 			'expected a transaction object'
-		) unless blessed $data && $data->isa('Bitcoin::Crypto::Transaction');
+		) unless blessed $tx && $tx->isa('Bitcoin::Crypto::Transaction');
 	}
 	else {
-		$data = btc_transaction->new(@$data);
+		$tx = btc_transaction->new(@data);
 	}
 
-	$data->set_block($self);
-	push @{$self->transactions}, $data;
+	$tx->set_block($self);
+	push @{$self->transactions}, $tx;
 
 	# Clear cached merkle root if set
 	$self->clear_merkle_root;
@@ -146,7 +140,7 @@ sub add_transaction
 }
 
 signature_for to_serialized => (
-	method => Object,
+	method => !!1,
 	named => [
 		witness => Bool,
 		{default => 1},
@@ -169,15 +163,7 @@ sub to_serialized
 	# - Transaction count (VarInt)
 	# - Transactions (variable length)
 
-	my $serialized = '';
-
-	# Block header (80 bytes)
-	$serialized .= pack 'V', $self->version;
-	$serialized .= scalar reverse $self->prev_block_hash;    # Reversed for little-endian
-	$serialized .= scalar reverse $self->merkle_root;    # Reversed for little-endian
-	$serialized .= pack 'V', $self->timestamp;
-	$serialized .= pack 'V', $self->bits;
-	$serialized .= pack 'V', $self->nonce;
+	my $serialized = $self->get_header;
 
 	# Transaction count
 	$serialized .= pack_compactsize(scalar @{$self->transactions});
@@ -191,14 +177,20 @@ sub to_serialized
 }
 
 signature_for from_serialized => (
-	method => Str,
-	positional => [ByteStr],
+	method => !!1,
+	head => [ByteStr],
+	named => [
+		pos => Maybe [ScalarRef [PositiveOrZeroInt]],
+		{default => undef},
+	],
+	bless => !!0,
 );
 
 sub from_serialized
 {
-	my ($class, $serialized) = @_;
-	my $pos = 0;
+	my ($class, $serialized, $args) = @_;
+	my $partial = !!$args->{pos};
+	my $pos = $partial ? ${$args->{pos}} : 0;
 
 	# optimization - no need to keep checking bytestrings on every level. It
 	# has already been checked.
@@ -209,23 +201,12 @@ sub from_serialized
 	) if length($serialized) < 80;
 
 	# Parse block header (80 bytes)
-	my $version = unpack 'V', substr $serialized, $pos, 4;
-	$pos += 4;
+	my ($version, $prev_block_hash, $merkle_root, $timestamp, $bits, $nonce)
+		= unpack 'Va32a32VVV', $serialized;
+	$pos += 80;
 
-	my $prev_block_hash = scalar reverse substr $serialized, $pos, 32;
-	$pos += 32;
-
-	my $merkle_root = scalar reverse substr $serialized, $pos, 32;
-	$pos += 32;
-
-	my $timestamp = unpack 'V', substr $serialized, $pos, 4;
-	$pos += 4;
-
-	my $bits = unpack 'V', substr $serialized, $pos, 4;
-	$pos += 4;
-
-	my $nonce = unpack 'V', substr $serialized, $pos, 4;
-	$pos += 4;
+	$prev_block_hash = reverse $prev_block_hash;
+	$merkle_root = reverse $merkle_root;
 
 	# Parse transaction count
 	my $tx_count = unpack_compactsize $serialized, \$pos;
@@ -239,40 +220,37 @@ sub from_serialized
 		);
 	}
 
-	Bitcoin::Crypto::Exception::Block->raise(
+	Bitcoin::Crypto::Exception::Transaction->raise(
 		'serialized block data is corrupted'
-	) if $pos != length $serialized;
+	) if !$partial && $pos != length $serialized;
+
+	${$args->{pos}} = $pos
+		if $partial;
 
 	Bitcoin::Crypto::Exception::Block->raise(
 		'block requires a coinbase transaction'
 	) unless @transactions > 0 && $transactions[0]->is_coinbase;
 
-	my $block_args = {
+	my $block = $class->new(
 		version => $version,
 		prev_block_hash => $prev_block_hash,
 		timestamp => $timestamp,
 		bits => $bits,
 		nonce => $nonce,
-	};
+	);
 
-	my $block = $class->new($block_args);
 	@{$block->transactions} = @transactions;
-
-	foreach my $tx (@transactions) {
-		$tx->set_block($block);
-	}
 
 	Bitcoin::Crypto::Exception::Block->raise(
 		'serialized block merkle root is incorrect'
 	) if $block->merkle_root ne $merkle_root;
 
+	foreach my $tx (@transactions) {
+		$tx->set_block($block);
+	}
+
 	return $block;
 }
-
-signature_for get_hash => (
-	method => Object,
-	positional => [],
-);
 
 sub get_hash
 {
@@ -280,25 +258,19 @@ sub get_hash
 	return scalar reverse hash256($self->get_header);
 }
 
-signature_for get_header => (
-	method => Object,
-	positional => [],
-);
-
 sub get_header
 {
 	my ($self) = @_;
 
 	# Return just the 80-byte block header
-	my $header = '';
-	$header .= pack 'V', $self->version;
-	$header .= scalar reverse $self->prev_block_hash;
-	$header .= scalar reverse $self->merkle_root;
-	$header .= pack 'V', $self->timestamp;
-	$header .= pack 'V', $self->bits;
-	$header .= pack 'V', $self->nonce;
-
-	return $header;
+	return pack 'Va32a32VVV',
+		$self->version,
+		scalar(reverse $self->prev_block_hash),
+		scalar(reverse $self->merkle_root),
+		$self->timestamp,
+		$self->bits,
+		$self->nonce,
+		;
 }
 
 sub _trigger_previous
@@ -320,13 +292,8 @@ sub _build_merkle_root
 		'cannot calculate merkle root for empty block'
 	) unless @txs > 0;
 
-	return scalar reverse Bitcoin::Crypto::Util::merkle_root(\@txs);
+	return scalar reverse Bitcoin::Crypto::Util::Internal::merkle_root(\@txs);
 }
-
-signature_for median_time_past => (
-	method => Object,
-	positional => [],
-);
 
 sub median_time_past
 {
@@ -339,8 +306,9 @@ sub median_time_past
 		push @stamps, $current->timestamp;
 
 		# NOTE: since we do not expect full blockchain to be available, exit
-		# the loop early if we didn't get full 11 blocks required for MTP.
-		# Should this warn?
+		# the loop early if we didn't get full 11 blocks required for MTP. Same
+		# would happen if we had a full blockchain, but were using very early
+		# blocks
 		last unless $current->has_previous;
 		$current = $current->previous;
 	}
@@ -349,21 +317,11 @@ sub median_time_past
 	return $stamps[int(@stamps / 2)];
 }
 
-signature_for size => (
-	method => Object,
-	positional => [],
-);
-
 sub size
 {
 	my ($self) = @_;
 	return length $self->to_serialized;
 }
-
-signature_for weight => (
-	method => Object,
-	positional => [],
-);
 
 sub weight
 {
@@ -377,7 +335,7 @@ sub weight
 }
 
 signature_for verify => (
-	method => Object,
+	method => !!1,
 	named => [
 	],
 	bless => !!0,
@@ -403,15 +361,11 @@ sub verify
 	# - block hex vs difficulty
 	# - each transaction
 	# - block subsidy
+	# - BIP141 commitment structure in coinbase transaction
 	# - probably more
 	#
 	# these verifications only make sense in full chain context though
 }
-
-signature_for dump => (
-	method => Object,
-	positional => [],
-);
 
 sub dump
 {
@@ -637,7 +591,7 @@ Returns the serialized block as a binary string.
 
 =head3 from_serialized
 
-	$block = $class->from_serialized($bytes)
+	$block = $class->from_serialized($bytes, %params)
 
 Creates a block object from serialized Bitcoin block data.
 
@@ -645,6 +599,20 @@ Takes the serialized block data as binary string. Does some basic validation of
 the block: checks if a coinbase transaction exists, and if the merkle root
 encoded in the serialized form matches the one calculated from transactions
 (acting like a checksum check).
+
+C<%params> can be any of:
+
+=over
+
+=item * C<pos>
+
+Position for partial string decoding. Optional. If passed, must be a scalar
+reference to an integer value.
+
+This integer will mark the starting position of C<$bytestring> from which to
+start decoding. It will be set to the next byte after end of block stream.
+
+=back
 
 Returns a new block instance.
 

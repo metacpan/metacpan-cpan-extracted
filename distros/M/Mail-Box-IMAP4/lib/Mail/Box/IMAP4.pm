@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 3.010.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::IMAP4;{
-our $VERSION = '3.010';
+our $VERSION = '4.000';
 }
 
 use base 'Mail::Box::Net';
 
 use strict;
 use warnings;
+
+use Log::Report 'mail-box-imap4';
 
 use Mail::Box::IMAP4::Head        ();
 use Mail::Box::IMAP4::Message     ();
@@ -135,10 +137,7 @@ sub readMessages(@)
 	my $name  = $self->name;
 	return $self if $name eq '/';
 
-	my $imap  = $self->transporter;
-	defined $imap or return ();
-
-	my @log   = $self->logSettings;
+	my $imap  = $self->transporter // return;
 	my $seqnr = 0;
 
 	my $cl    = $self->{MBI_c_labels} ne 'NO';
@@ -152,7 +151,7 @@ sub readMessages(@)
 		or return $self;
 
 	foreach my $id ($imap->ids)
-	{	my $head    = $ht->new(@log, @ho);
+	{	my $head    = $ht->new(@ho);
 		my $message = $args{message_type}->new(
 			head      => $head,
 			unique    => $id,
@@ -165,7 +164,7 @@ sub readMessages(@)
 			cache_body   => ($ch ne 'NO'),
 		);
 
-		my $body    = $args{body_delayed_type}->new(@log, message => $message);
+		my $body    = $args{body_delayed_type}->new(message => $message);
 		$message->storeBody($body);
 		$self->storeMessage($message);
 	}
@@ -181,14 +180,14 @@ sub getHead($)
 	my @fields = $imap->getFields($uidl, 'ALL');
 
 	unless(@fields)
-	{	$self->log(WARNING => "Message $uidl disappeared from $self.");
+	{	warning __x"message {id} disappeared from {folder}.", id => $uidl, folder => "$self";
 		return;
 	}
 
 	my $head = $self->{MB_head_type}->new;
 	$head->addNoRealize($_) for @fields;
 
-	$self->log(PROGRESS => "Loaded head of $uidl.");
+	trace "Loaded head of $uidl.";
 	$head;
 }
 
@@ -201,7 +200,7 @@ sub getHeadAndBody($)
 	my $lines = $imap->getMessageAsString($uid);
 
 	unless(defined $lines)
-	{	$self->log(WARNING => "Message $uid disappeared from $self.");
+	{	warning __x"message {id} disappeared from {folder}.", id => $uid, folder => "$self";
 		return ();
 	}
 
@@ -212,21 +211,21 @@ sub getHeadAndBody($)
 
 	my $head = $message->readHead($parser);
 	unless(defined $head)
-	{	$self->log(WARNING => "Cannot find head back for $uid in $self.");
+	{	warning __x"cannot find head back for {id} in {folder}.", id => $uid, folder => $self;
 		$parser->stop;
 		return ();
 	}
 
 	my $body = $message->readBody($parser, $head);
 	unless(defined $body)
-	{	$self->log(WARNING => "Cannot read body for $uid in $self.");
+	{	warning __x"cannot read body for {id} in {folder}.", id => $uid, folder => $self;
 		$parser->stop;
 		return ();
 	}
 
 	$parser->stop;
 
-	$self->log(PROGRESS => "Loaded message $uid.");
+	trace "loaded message $uid.";
 	($head, $body->contentInfoFrom($head));
 }
 
@@ -234,9 +233,7 @@ sub getHeadAndBody($)
 
 sub body(;$)
 {	my $self = shift;
-	unless(@_)
-	{	my $body = $self->{MBI_cache_body} ? $self->SUPER::body : undef;
-	}
+	@_ or return $self->{MBI_cache_body} ? $self->SUPER::body : undef;
 
 	$self->unique();
 	$self->SUPER::body(@_);
@@ -248,10 +245,10 @@ sub write(@)
 {	my ($self, %args) = @_;
 	my $imap  = $self->transporter or return;
 
-	$self->SUPER::write(%args, transporter => $imap) or return;
+	$self->SUPER::write(%args, transporter => $imap);
 
 	if($args{save_deleted})
-	{	$self->log(NOTICE => "Impossible to keep deleted messages in IMAP");
+	{	notice __x"impossible to keep deleted messages in IMAP";
 	}
 	else { $imap->destroyDeleted($self->name) }
 
@@ -318,26 +315,21 @@ sub transporter(;$)
 
 	my $imap;
 	if(@_)
-	{	$imap = $self->{MBI_transport} = shift;
-		defined $imap or return;
+	{	$imap = $self->{MBI_transport} = shift // return;
 	}
 	else
 	{	$imap = $self->{MBI_transport};
 	}
 
-	unless(defined $imap)
-	{	$self->log(ERROR => "No IMAP4 transporter configured");
-		return undef;
-	}
+	defined $imap
+		or error __x"no IMAP4 transporter configured.";
 
 	my $name = $self->name;
 
-	$self->{MBI_selectable} = $imap->currentFolder($name);
-	return $imap
-		if defined $self->{MBI_selectable};
+	$self->{MBI_selectable} = $imap->currentFolder($name)
+		or error "couldn't select IMAP4 folder {name}.", name => $name;
 
-	$self->log(ERROR => "Couldn't select IMAP4 folder $name");
-	undef;
+	$imap;
 }
 
 

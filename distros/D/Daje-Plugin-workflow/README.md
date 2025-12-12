@@ -1,11 +1,11 @@
 [![Actions Status](https://github.com/janeskil1525/Daje-Plugin-Workflow/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/janeskil1525/Daje-Plugin-Workflow/actions?workflow=test)
 # NAME
 
-Daje::Plugin::workflow - It's new $module
+Daje::Plugin::Workflow - Plugin to use Daje::Wrokflow
 
 # SYNOPSIS
 
-    use Daje::Plugin::workflow;
+    use Daje::Plugin::Workflow;
 
     Expected config data
 
@@ -18,7 +18,7 @@ Daje::Plugin::workflow - It's new $module
 
 # DESCRIPTION
 
-Daje::Plugin::workflow is the Mojolicious plugin for Daje::Workflow
+Daje::Plugin::Workflow is the Mojolicious plugin for Daje::Workflow
 
 # REQUIRES
 

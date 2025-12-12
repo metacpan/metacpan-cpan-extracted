@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,18 +10,21 @@
 
 
 package Mail::Message::Field::Addresses;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field::Structured';
+use parent 'Mail::Message::Field::Structured';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error info warning/ ];
 
 use Mail::Message::Field::AddrGroup ();
 use Mail::Message::Field::Address   ();
 
 use List::Util      qw/first/;
+use Scalar::Util    qw/blessed/;
 
 #--------------------
 
@@ -55,15 +58,14 @@ sub init($)
 		delete $args->{body};
 	}
 
-	$self->SUPER::init($args) or return;
-	$self;
+	$self->SUPER::init($args);
 }
 
 #--------------------
 
 sub addAddress(@)
 {	my $self  = shift;
-	my $email = @_ && ref $_[0] ? shift : undef;
+	my $email = blessed $_[0] ? shift : undef;
 	my %args  = @_;
 	my $group = delete $args{group} // '';
 
@@ -101,8 +103,7 @@ sub addresses() { map $_->addresses, $_[0]->groups }
 
 sub addAttribute($;@)
 {	my $self = shift;
-	$self->log(ERROR => 'No attributes for address fields.');
-	$self;
+	error __x"no attributes for address fields.";
 }
 
 #--------------------
@@ -153,7 +154,7 @@ sub parse($)
 			my $angle;
 			if($string =~ s/^\s*\<([^>]*)\>//s) { $angle = $1 }
 			elsif($real_phrase)
-			{	$self->log(WARNING => "Ignore unrelated phrase `$1'")
+			{	warning __x"ignoring addressless phrase '{phrase}'.", phrase => $1
 					if $string =~ s/^\s*\"(.*?)\r?\n//;
 				next ADDRESS;
 			}
@@ -165,7 +166,7 @@ sub parse($)
 			($comment, $string) = $self->consumeComment($string);
 
 			# remove obsoleted route info.
-			return 1 unless defined $angle;
+			defined $angle or return 1;
 			$angle =~ s/^\@.*?\://;
 
 			($email, $angle) = $self->consumeAddress($angle, phrase => $phrase, comment => $comment);
@@ -178,13 +179,13 @@ sub parse($)
 		last if $start_length == length $string;
 	}
 
-	$self->log(WARNING => 'Illegal part in address field '.$self->Name. ": $string\n");
-
+	warning __x"illegal part in address field {name}: {part}.", name => $self->Name, part => $string;
 	0;
 }
 
 sub produceBody()
-{	my @groups = sort {$a->name cmp $b->name} shift->groups;
+{	my $self   = shift;
+	my @groups = sort { $a->name cmp $b->name } $self->groups;
 
 	@groups     or return '';
 	@groups > 1 or return $groups[0]->string;

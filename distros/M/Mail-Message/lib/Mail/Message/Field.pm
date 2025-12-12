@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,18 +10,20 @@
 
 
 package Mail::Message::Field;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-message', import => [ qw/__x error info panic warning/ ];
+
 use Mail::Address    ();
 use IO::Handle       ();
 use Date::Format     qw/strftime/;
+use Scalar::Util     qw/blessed/;
 
 our %_structured;  # not to be used directly: call isStructured!
 my $default_wrap_length = 78;
@@ -49,7 +51,7 @@ sub new(@)
 
 #--------------------
 
-sub length { length shift->folded }
+sub length { length $_[0]->folded }
 
 
 BEGIN {
@@ -64,7 +66,7 @@ BEGIN {
 }
 
 sub isStructured(;$)
-{	my $name  = ref $_[0] ? shift->name : $_[1];
+{	my $name  = $_[1] // (blessed $_[0] ? $_[0]->name : panic);
 	exists $_structured{lc $name};
 }
 
@@ -76,7 +78,8 @@ sub print(;$)
 }
 
 
-sub toString(;$) {shift->string(@_)}
+sub toString(;$) { shift->string(@_) }
+
 sub string(;$)
 {	my $self  = shift;
 	return $self->folded unless @_;
@@ -247,7 +250,7 @@ sub toInt()
 	$self->body =~ m/^\s*(\d+)\s*$/
 		and return $1;
 
-	$self->log(WARNING => "Field content is not numerical: ". $self->toString);
+	warning __x"field content is not numerical: {content}", content => $self->toString;
 	undef;
 }
 
@@ -306,7 +309,8 @@ sub consume($;$)
 	my ($name, $body) = defined $_[1] ? @_ : split(/\s*\:\s*/, (shift), 2);
 
 	$name !~ m/[^\041-\071\073-\176]/
-		or Mail::Reporter->log(WARNING => "Illegal character in field name $name");
+		or warning __x"illegal character in field name '{name}'.", name => $name;
+panic $name if $name =~ m/[^\041-\071\073-\176]/;
 
 	#
 	# Compose the body.
@@ -389,7 +393,7 @@ sub fold($$;$)
 
 	my $lname = CORE::length($name);
 	$lname <= $wrap -5  # Cannot find a real limit in the spec
-		or $thing->log(ERROR => "Field name too long (max ".($wrap-5)."), in '$name'"), return ();
+		or error __x"field name too long (max {count}), in '{name}'.", count => $wrap - 5, name => $name;
 
 	my @folded;
 	while(1)

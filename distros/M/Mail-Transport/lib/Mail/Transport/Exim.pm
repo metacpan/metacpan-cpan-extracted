@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 3.008.
+# This code is part of Perl distribution Mail-Transport version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,16 @@
 
 
 package Mail::Transport::Exim;{
-our $VERSION = '3.008';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Transport::Send';
+use parent 'Mail::Transport::Send';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report   'mail-transport', import => [ qw/__x error fault warning/ ];
+
 use Scalar::Util  qw/blessed/;
 
 #--------------------
@@ -26,13 +27,11 @@ use Scalar::Util  qw/blessed/;
 sub init($)
 {	my ($self, $args) = @_;
 	$args->{via} = 'exim';
+	$self->SUPER::init($args);
 
-	$self->SUPER::init($args) or return;
-
-	$self->{MTS_program} = $args->{proxy}
-		|| ( -x '/usr/sbin/exim4' ? '/usr/sbin/exim4' : undef)
-		|| $self->findBinary('exim', '/usr/exim/bin')
-		or return;
+	$self->{MTS_program} = $args->{proxy} ||
+		( -x '/usr/sbin/exim4' ? '/usr/sbin/exim4' : undef) || $self->findBinary('exim', '/usr/exim/bin')
+		or error __x"cannot find binary for exim.";
 
 	$self;
 }
@@ -49,17 +48,13 @@ sub trySend($@)
 	my $mailer;
 	if(open($mailer, '|-')==0)
 	{	{ exec $program, '-i', '-f', $from, @to; }  # {} to avoid warning
-		$self->log(NOTICE => "Errors when opening pipe to $program: $!");
-		exit 1;
+		fault __x"cannot open pipe to {program}", program => $program;
 	}
 
 	$self->putContent($message, $mailer, undisclosed => 1);
 
-	unless($mailer->close)
-	{	$self->log(ERROR => "Errors when closing Exim mailer $program: $!");
-		$? ||= $!;
-		return 0;
-	}
+	$mailer->close
+		or fault __x"errors when closing Exim mailer {program}", program => $program;
 
 	1;
 }

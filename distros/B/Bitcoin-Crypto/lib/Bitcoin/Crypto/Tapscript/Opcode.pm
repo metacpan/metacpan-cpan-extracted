@@ -1,30 +1,37 @@
 package Bitcoin::Crypto::Tapscript::Opcode;
-$Bitcoin::Crypto::Tapscript::Opcode::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Tapscript::Opcode::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
 
 use List::Util qw(none);
-use Bitcoin::Crypto qw(btc_pub);
-use Bitcoin::Crypto::Util qw(lift_x get_taproot_ext);
+use Bitcoin::Crypto::Util::Internal qw(lift_x get_taproot_ext);
+use Bitcoin::Crypto::Helpers qw(ecc die_no_trace);
 use Bitcoin::Crypto::Script::Opcode;
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Types -types;
-
-use namespace::clean;
+use Bitcoin::Crypto::Constants qw(:sighash);
 
 extends 'Bitcoin::Crypto::Script::Opcode';
+
+sub _compile_OP_SUCCESS
+{
+	my ($class) = @_;
+
+	return sub {
+		my ($compiler) = @_;
+
+		$compiler->_unconditionally_valid_script('OP_SUCCESS encountered');
+	};
+}
 
 sub _OP_CHECKSIG
 {
 	my ($class) = @_;
 
 	return sub {
-		my ($runner) = @_;
+		my $runner = shift;
 
 		my $stack = $runner->stack;
 		$runner->_stack_error unless @$stack >= 2;
@@ -32,15 +39,16 @@ sub _OP_CHECKSIG
 		my $raw_pubkey = pop @$stack;
 		my $sig = pop @$stack;
 
-		my $pubkey;
 		my $known_pubkey_type;
 		my $hashtype;
 
 		# rules according to https://github.com/bitcoin/bips/blob/master/bip-0342.mediawiki#rules-for-signature-opcodes
 		if (length $raw_pubkey == 32) {
-			$pubkey = btc_pub->from_serialized(lift_x $raw_pubkey);
+
+			# TODO: this uses ecc directly and skips creating a new public key
+			# with lift_x - this saves time, but maybe an abstraction for that
+			# should be made as Key::Schnorr (which would use SignVerify)?
 			$known_pubkey_type = !!1;
-			$pubkey->set_taproot_output(!!1);
 		}
 		elsif (length $raw_pubkey == 0) {
 			$runner->_invalid_script('bad pubkey');
@@ -56,43 +64,57 @@ sub _OP_CHECKSIG
 			return;
 		}
 		else {
-			$hashtype = length $sig == 65 ? unpack('C', substr $sig, -1, 1, '') : undef;
-			state $allowed_sighash = [
-				Bitcoin::Crypto::Constants::sighash_all,
-				Bitcoin::Crypto::Constants::sighash_all | Bitcoin::Crypto::Constants::sighash_anyonecanpay,
-				Bitcoin::Crypto::Constants::sighash_single,
-				Bitcoin::Crypto::Constants::sighash_single | Bitcoin::Crypto::Constants::sighash_anyonecanpay,
-				Bitcoin::Crypto::Constants::sighash_none,
-				Bitcoin::Crypto::Constants::sighash_none | Bitcoin::Crypto::Constants::sighash_anyonecanpay,
-			];
+			($sig, $hashtype) = unpack 'a64C', $sig
+				if length $sig == 65;
+
+			state $allowed_sighash = {
+				map { $_ => !!1 } (
+					SIGHASH_ALL,
+					SIGHASH_ALL | SIGHASH_ANYONECANPAY,
+					SIGHASH_SINGLE,
+					SIGHASH_SINGLE | SIGHASH_ANYONECANPAY,
+					SIGHASH_NONE,
+					SIGHASH_NONE | SIGHASH_ANYONECANPAY,
+				)
+			};
 
 			$runner->_invalid_script('bad sighash')
-				if defined $hashtype && none { $hashtype == $_ } @$allowed_sighash;
+				if defined $hashtype && !$allowed_sighash->{$hashtype};
 		}
 
-		$runner->_invalid_script('sigop budget exceeded')
-			unless $runner->transaction->reduce_sigop_budget;
+		my $tx = $runner->transaction;
 
-		my $ext_flag = $runner->transaction->taproot_ext_flag;
+		$runner->_invalid_script('sigop budget exceeded')
+			unless $tx->reduce_sigop_budget;
+
+		my $ext_flag = $tx->taproot_ext_flag;
 		my $ext;
 
 		if ($ext_flag == 1) {
 
-			die 'no script_tree in script transaction object'
-				unless $runner->transaction->has_script_tree;
+			die_no_trace 'no script_tree in script transaction object'
+				unless $tx->has_script_tree;
 
 			# leaf for this script must be defined with id 0 to get a proper hash
 			$ext = get_taproot_ext(
 				$ext_flag,
-				script_tree => $runner->transaction->script_tree,
+				script_tree => $tx->script_tree,
 				leaf_id => 0,
 				codesep_pos => $runner->codeseparator,
 			);
 		}
 
-		my $preimage = $runner->transaction->get_digest($runner->subscript, $hashtype, $ext);
-		my $result =
-			$known_pubkey_type ? $pubkey->verify_message($preimage, $sig, flags => $runner->flags) : !!1;
+		if (!$known_pubkey_type) {
+			push @$stack, $runner->from_bool(!!1);
+			return;
+		}
+
+		my $preimage = $tx->get_digest(
+			sighash => $hashtype,
+			taproot_ext => $ext
+		);
+
+		my $result = ecc->verify_digest_schnorr($raw_pubkey, $sig, $preimage->hash);
 
 		$runner->_invalid_script('signature verification failed') unless $result;
 		push @$stack, $runner->from_bool($result);
@@ -133,11 +155,14 @@ sub _build_opcodes
 	my ($class) = @_;
 	my %parent_opcodes = $class->SUPER::_build_opcodes;
 
+	# NOTE: multisig no longer is a sigop and no longer requires transaction
+
 	my %opcodes = (
 		%parent_opcodes,
 		OP_CHECKSIG => {
 			code => 0xac,
 			needs_transaction => !!1,
+			sigop => !!1,
 			runner => $class->_OP_CHECKSIG,
 		},
 		OP_CHECKMULTISIG => {
@@ -145,9 +170,18 @@ sub _build_opcodes
 			needs_transaction => !!1,
 			runner => $class->_OP_CHECKMULTISIG,
 		},
+		OP_CHECKMULTISIG => {
+			code => 0xae,
+			runner => $class->_OP_CHECKMULTISIG,
+		},
+		OP_CHECKMULTISIGVERIFY => {
+			code => 0xae,
+			runner => $class->_OP_CHECKMULTISIGVERIFY,
+		},
 		OP_CHECKSIGADD => {
 			code => 0xba,
 			needs_transaction => !!1,
+			sigop => !!1,
 			runner => $class->_OP_CHECKSIGADD,
 		},
 	);
@@ -161,11 +195,7 @@ sub _build_opcodes
 
 		$opcodes{"OP_SUCCESS$succ"} = {
 			code => $succ,
-			on_compilation => sub {
-				my ($runner, $opcode) = @_;
-
-				Bitcoin::Crypto::Exception::ScriptSuccess->raise('OP_SUCCESS encountered');
-			},
+			on_compilation => $class->_compile_OP_SUCCESS,
 		};
 	}
 

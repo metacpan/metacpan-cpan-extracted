@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Replace::MailHeader;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Head::Complete';
+use parent 'Mail::Message::Head::Complete';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error panic/ ];
 
 #--------------------
 
@@ -28,7 +30,7 @@ sub new(@)
 
 sub init($)
 {	my ($self, $args) = @_;
-	defined $self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	$self->modify($args->{Modify} || $args->{Reformat} || 0);
 	$self->fold_length($args->{FoldLength} || 79);
@@ -94,7 +96,7 @@ sub mail_from(;$)
 
 	my $choice = uc(shift);
 	$choice =~ /^(IGNORE|ERROR|COERCE|KEEP)$/
-		or die "bad Mail-From choice: '$choice'";
+		or error __x"bad Mail-From choice: '{pick}'.", pick => $choice;
 
 	$self->{MH_mail_from} = $choice;
 }
@@ -150,10 +152,10 @@ sub header(;$)
 }
 
 
-sub header_hashref($) { die "Don't use header_hashref!!!" }
+sub header_hashref($) { panic "Don't use header_hashref!!!" }
 
 
-sub combine($;$) { die "Don't use combine()!!!" }
+sub combine($;$) { panic "Don't use combine()!!!" }
 
 
 sub exists() { $_[0]->count }

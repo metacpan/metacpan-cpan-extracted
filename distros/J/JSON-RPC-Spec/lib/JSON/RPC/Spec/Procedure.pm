@@ -25,6 +25,10 @@ sub parse {
         return $self->_rpc_invalid_request;
     }
     $self->_is_notification(!exists $obj->{id});
+    if (defined $obj->{id} and ref $obj->{id} ne '') {
+        $self->_id(undef);
+        return $self->_rpc_invalid_request;
+    }
     $self->_id($obj->{id});
     my $method = $obj->{method} || '';
 

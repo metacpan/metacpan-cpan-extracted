@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Message::Destructed;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Message';
@@ -18,33 +18,27 @@ use parent 'Mail::Box::Message';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
 
 #--------------------
 
-sub new(@)
-{	my $class = shift;
-	$class->log(ERROR => 'You cannot instantiate a destructed message');
-	undef;
-}
+sub new(@) { error __x"you cannot instantiate a destructed message." }
 
 sub isDummy()    { 1 }
 
 
 sub head(;$)
 {	my ($self, $head) = @_;
-	return undef if @_ && !defined(shift);
-
-	$self->log(ERROR => "You cannot take the head of a destructed message");
+	@_==1 and error __x"you cannot take the head of a destructed message.";
+	defined $head and error __x"you cannot set the head on a destructed message.";
 	undef;
 }
 
 
 sub body(;$)
-{	my $self = shift;
-	return undef if @_ && !defined(shift);
-
-	$self->log(ERROR => "You cannot take the body of a destructed message");
+{	my ($self, $body) = @_;
+	@_==1 and error __x"you cannot take the body of a destructed message.";
+	defined $body and error __x"you cannot set the body on a destructed message.";
 	undef;
 }
 
@@ -53,7 +47,7 @@ sub coerce($)
 {	my ($class, $message) = @_;
 
 	$message->isa('Mail::Box::Message')
-		or $class->log(ERROR=>"Cannot coerce a ",ref($message), " into destruction"), return ();
+		or error __x"you cannot coerce a {class} into destruction.", class => ref $message;
 
 	$message->body(undef);
 	$message->head(undef);
@@ -62,11 +56,12 @@ sub coerce($)
 	bless $message, $class;
 }
 
+
 sub modified(;$)
 {	my $self = shift;
 
 	! @_ || ! $_[0]
-		or $self->log(ERROR => 'Do not set the modified flag on a destructed message');
+		or error __x"you cannot set the modified flag on a destructed message.";
 
 	0;
 }
@@ -81,16 +76,15 @@ sub label($;@)
 	{	my $label = shift;
 		return $self->SUPER::label('deleted') if $label eq 'deleted';
 
-		$self->log(ERROR => "Destructed message has no labels except 'deleted', requested is $label");
-		return 0;
+		error __x"destructed message has no labels except 'deleted', requested is {label}.", label => $label;
 	}
 
 	my %flags = @_;
 	keys %flags==1 && exists $flags{deleted}
-		or $self->log(ERROR => "Destructed message has no labels except 'deleted', trying to set @{[ keys %flags ]}"), return 0;
+		or error __x"destructed message has no labels except 'deleted', trying to set {labels}.", labels => [keys %flags];
 
 	$flags{deleted}
-		or $self->log(ERROR => "Destructed messages can not be undeleted"), return 0;
+		or error __x"destructed message can not be undeleted.";
 
 	1;
 }

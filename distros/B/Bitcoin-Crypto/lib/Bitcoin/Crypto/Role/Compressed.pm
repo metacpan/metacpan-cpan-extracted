@@ -1,14 +1,12 @@
 package Bitcoin::Crypto::Role::Compressed;
-$Bitcoin::Crypto::Role::Compressed::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Role::Compressed::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+
+use Mooish::Base -standard, -role;
+use Types::Common -sigs;
 
 use Carp qw(carp);
-
-use Moo::Role;
 
 has param 'compressed' => (
 	coerce => Bool,
@@ -17,7 +15,7 @@ has param 'compressed' => (
 );
 
 signature_for set_compressed => (
-	method => Object,
+	method => !!1,
 	positional => [Maybe [Bool], {default => undef}],
 );
 

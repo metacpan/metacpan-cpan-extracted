@@ -13,6 +13,8 @@ use Mail::Box;
 use Test::More;
 use File::Spec;
 
+use Log::Report;
+
 my $fakefolder = bless {MB_foldername=> 'this'}, 'Mail::Box';
 
 BEGIN {
@@ -41,11 +43,10 @@ ok(-f $lockfile);
 ok($locker->hasLock);
 
 # Already got lock, so should return immediately.
-my $warn = '';
-{  $SIG{__WARN__} = sub {$warn = "@_"};
-   $locker->lock;
-}
-ok($warn =~ m/already locked over nfs/i, 'relock no problem');
+ok try(sub { $locker->lock }, hide => 'ALL'), 'relock no problem';
+my @e1 = $@->exceptions;
+cmp_ok @e1, '==', 1;
+like $e1[0]->message->toString, qr/already locked over NFS/;
 
 $locker->unlock;
 ok(not $locker->hasLock);

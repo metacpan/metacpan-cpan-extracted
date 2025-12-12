@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,15 @@
 
 
 package User::Identity::Archive::Plain;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Archive';
+use parent 'User::Identity::Archive';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report     'user-identity';
 
 #--------------------
 
@@ -27,12 +27,12 @@ my %abbreviations = (
 	email    => 'Mail::Identity',
 	location => 'User::Identity::Location',
 	system   => 'User::Identity::System',
-	list     => 'User::Identity::Collection::Emails'
+	list     => 'User::Identity::Collection::Emails',
 );
 
 sub init($)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	# Define the keywords.
 
@@ -53,7 +53,7 @@ sub init($)
 		}
 	}
 
-	warn "Option 'only' specifies undefined abbreviation '$_'\n"
+	warning __x"option 'only' specifies undefined abbreviation '{abbrev}'.", abbrev => $_
 		for grep ! defined $self->abbreviation($_), keys %only;
 
 	$self->{UIAP_items}   = {};
@@ -65,7 +65,7 @@ sub init($)
 sub from($@)
 {	my ($self, $in, %args) = @_;
 
-	my $verbose = $args{verbose} || 0;
+	exists $args{verbose} and error "from(verbose) now from Log::Report dispatcher mode";
 	my ($source, @lines);
 
 	if(ref $in)
@@ -73,20 +73,19 @@ sub from($@)
 		= ref $in eq 'ARRAY'     ? ('array', @$in)
 		: ref $in eq 'GLOB'      ? ('GLOB', <$in>)
 		: $in->isa('IO::Handle') ? (ref $in, $in->getlines)
-		: confess "Cannot read from a ", ref $in, "\n";
-	}
-	elsif(open IN, "<", $in)
-	{	$source = "file $in";
-		@lines  = <IN>;
+		:    error __x"cannot read archive from a {type}.", type => ref $in;
 	}
 	else
-	{	warn "Cannot read archive from file $in: $!\n";
-		return $self;
+	{	open my($fh), "<", $in
+			or fault __x"cannot read archive from file {file}", file => $in;
+
+		$source = "file $in";
+		@lines  = $fh->getlines;
 	}
 
-	print "reading data from $source\n" if $verbose;
+	info "reading archive data from {source}.", source => $source;
+	@lines or return $self;
 
-	return $self unless @lines;
 	my $tabstop = $args{tabstop} || $self->defaultTabStop;
 
 	$self->_set_lines($source, \@lines, $tabstop);
@@ -95,7 +94,7 @@ sub from($@)
 	{	$self->_accept_line;
 		my $indent = $self->_indentation($starter);
 
-		print "  adding $starter" if $verbose > 1;
+		trace "  adding $starter";
 
 		my $item   = $self->_collectItem($starter, $indent);
 		$self->add($item->type => $item) if defined $item;
@@ -156,7 +155,7 @@ sub _accept_line()
 	$self->{UIAP_linenr}++;
 }
 
-sub _location()     { @{ (shift) }{ qw/UIAP_source UIAP_linenr/ } }
+sub _location() { @{$_[0]}{ qw/UIAP_source UIAP_linenr/ } }
 
 sub _indentation($)
 {	my ($self, $line) = @_;
@@ -216,12 +215,13 @@ sub _collectItem($$)
 		}
 	}
 
-	return () unless @fields || @items;
+	@fields || @items or return ();
+
+	#XXX needs conversion to Log::Report
 
 	my $warn     = 0;
 	my $warn_sub = $SIG{__WARN__};
-	$SIG{__WARN__}
-		= sub {$warn++; $warn_sub ? $warn_sub->(@_) : print STDERR @_};
+	$SIG{__WARN__} = sub { $warn++; $warn_sub ? $warn_sub->(@_) : print STDERR @_ };
 
 	my $item = $class->new(name => $name, @fields);
 	$SIG{__WARN__} = $warn_sub;
@@ -232,7 +232,7 @@ sub _collectItem($$)
 		warn "  found in $source around line $linenr\n";
 	}
 
-	$item->add($_->type => $_) foreach @items;
+	$item->add($_->type => $_) for @items;
 	$item;
 }
 
@@ -246,13 +246,14 @@ sub defaultTabStop(;$)
 
 sub abbreviation($;$)
 {	my ($self, $name) = (shift, shift);
-	return $self->{UIAP_abbrev}{$name} unless @_;
+	@_ or return $self->{UIAP_abbrev}{$name};
 
 	my $class = shift;
-	return delete $self->{UIAP_abbrev}{$name} unless defined $class;
+	defined $class
+		or return delete $self->{UIAP_abbrev}{$name};
 
 	eval "require $class";
-	die "Class $class is not usable, because of errors:\n$@" if $@;
+	$@ and die $@;
 
 	$self->{UIAP_abbrev}{$name} = $class;
 }

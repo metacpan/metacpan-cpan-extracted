@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Dir;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x error warning/ ];
 
 use Mail::Box::Dir::Message        ();
 use Mail::Message::Body::Lines     ();
@@ -26,7 +28,6 @@ use Mail::Message::Body::Multipart ();
 use Mail::Message::Head            ();
 use Mail::Message::Head::Delayed   ();
 
-use Carp;
 use File::Spec::Functions           qw/rel2abs/;
 
 #--------------------
@@ -35,16 +36,15 @@ sub init($)
 {	my ($self, $args)    = @_;
 
 	$args->{body_type} //= sub { 'Mail::Message::Body::Lines' };
-	$self->SUPER::init($args) or return undef;
+	$self->SUPER::init($args);
 
 	my $class     = ref $self;
 	my $directory = $self->{MBD_directory} = $args->{directory} || $self->directory;
 
 		if(-d $directory) {;}
-	elsif($args->{create} && $class->create($directory, %$args)) {;}
+	elsif($args->{create} && $class->create($directory, %$args)) { ;}
 	else
-	{	$self->log(WARNING => "No directory $directory for folder of $class");
-		return undef;
+	{	error __x"no directory {dir} for folder of type.", dir => $directory, type => $class;
 	}
 
 	# About locking
@@ -55,7 +55,7 @@ sub init($)
 	# Check if we can write to the folder, if we need to.
 
 	if($self->writable && -e $directory && ! -w $directory)
-	{	$self->log(WARNING => "Folder directory $directory is write-protected.");
+	{	warning __x"folder directory {dir} is write-protected.", dir => $directory;
 		$self->access('r');
 	}
 

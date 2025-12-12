@@ -1,20 +1,16 @@
 package Bitcoin::Crypto::PSBT::Map;
-$Bitcoin::Crypto::PSBT::Map::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::PSBT::Map::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use List::Util qw(any);
 
 use Bitcoin::Crypto::PSBT::Field;
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Constants;
-
-use namespace::clean;
+use Bitcoin::Crypto::Constants qw(:psbt);
 
 has param 'type' => (
 	isa => PSBTMapType,
@@ -38,18 +34,13 @@ sub BUILD
 	) if $self->need_index && !defined $self->index;
 }
 
-signature_for name => (
-	method => Object,
-	positional => [],
-);
-
 sub name
 {
 	my ($self) = @_;
 	my %dispatch = (
-		Bitcoin::Crypto::Constants::psbt_global_map => 'Global',
-		Bitcoin::Crypto::Constants::psbt_input_map => 'Input',
-		Bitcoin::Crypto::Constants::psbt_output_map => 'Output',
+		(PSBT_GLOBAL_MAP) => 'Global',
+		(PSBT_INPUT_MAP) => 'Input',
+		(PSBT_OUTPUT_MAP) => 'Output',
 	);
 
 	my $name = $dispatch{$self->type};
@@ -60,24 +51,19 @@ sub name
 	return $name;
 }
 
-signature_for need_index => (
-	method => Object,
-	positional => [],
-);
-
 sub need_index
 {
 	my ($self) = @_;
 	my $type = $self->type;
 
 	return any { $type eq $_ }
-		Bitcoin::Crypto::Constants::psbt_input_map,
-		Bitcoin::Crypto::Constants::psbt_output_map,
+		PSBT_INPUT_MAP,
+		PSBT_OUTPUT_MAP,
 		;
 }
 
 signature_for add => (
-	method => Object,
+	method => !!1,
 	positional => [InstanceOf ['Bitcoin::Crypto::PSBT::Field']],
 );
 
@@ -136,7 +122,7 @@ sub _find
 }
 
 signature_for find => (
-	method => Object,
+	method => !!1,
 	positional => [
 		InstanceOf ['Bitcoin::Crypto::PSBT::FieldType'],
 		Maybe [ByteStr], {default => undef}
@@ -151,7 +137,7 @@ sub find
 }
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	head => [ByteStr],
 	named => [
 		map_type => PSBTMapType,
@@ -179,7 +165,7 @@ sub from_serialized
 	);
 
 	while ($pos < length $serialized) {
-		if (substr($serialized, $pos, 1) eq Bitcoin::Crypto::Constants::psbt_separator) {
+		if (substr($serialized, $pos, 1) eq PSBT_SEPARATOR) {
 			$pos += 1;
 			last;
 		}
@@ -203,11 +189,6 @@ sub from_serialized
 	return $self;
 }
 
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
-
 sub to_serialized
 {
 	my ($self) = @_;
@@ -218,13 +199,8 @@ sub to_serialized
 	}
 
 	my @sorted = map { $encoded{$_} } sort keys %encoded;
-	return join('', @sorted) . Bitcoin::Crypto::Constants::psbt_separator;
+	return join('', @sorted) . PSBT_SEPARATOR;
 }
-
-signature_for dump => (
-	method => Object,
-	positional => [],
-);
 
 sub dump
 {
@@ -275,7 +251,7 @@ This is a helper class which holds a number of PSBT fields in a single namespace
 =head3 type
 
 B<Required in the constructor>. The type of the map. Must be one of the
-C<psbt_*_map> constants defined in C<Bitcoin::Crypto::Constants>.
+C<psbt_*_map> constants defined in L<Bitcoin::Crypto::Constants>.
 
 =head3 index
 
@@ -364,18 +340,6 @@ start decoding. It will be set to the next byte after end of input stream.
 	$text = $object->dump()
 
 Returns a readable description of all the fields in the map.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * PSBT - general error with the PSBT
-
-=back
 
 =head1 SEE ALSO
 

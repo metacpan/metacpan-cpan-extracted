@@ -3,20 +3,26 @@ use Crypt::Digest::RIPEMD160 qw(ripemd160);
 use Crypt::Digest::SHA256 qw(sha256);
 use Encode qw(encode);
 
+use Bitcoin::Crypto qw(btc_extprv btc_script_tree btc_tapscript);
+use Bitcoin::Crypto::Constants qw(:script);
 use Bitcoin::Crypto::Util qw(:all);
 use Bitcoin::Crypto::Helpers qw(ecc);    # loads Math::BigInt
-use Bitcoin::Crypto::Key::ExtPrivate;
+use Bitcoin::Crypto::Secret;
 
 subtest 'testing mnemonic_to_seed' => sub {
-	is mnemonic_to_seed(
-		'われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　らいう',
-		'㍍ガバヴァぱばぐゞちぢ十人十色'
-		),
-		pack(
-			'H*',
-			'a44ba7054ac2f9226929d56505a51e13acdaa8a9097923ca07ea465c4c7e294c038f3f4e7e4b373726ba0057191aced6e48ac8d183f3a11569c426f0de414623'
-		),
-		'seed from mnemonic ok';
+	my $mnemonic =
+		'われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　われる　らいう';
+	my $password = '㍍ガバヴァぱばぐゞちぢ十人十色';
+	my $expected = pack(
+		'H*',
+		'a44ba7054ac2f9226929d56505a51e13acdaa8a9097923ca07ea465c4c7e294c038f3f4e7e4b373726ba0057191aced6e48ac8d183f3a11569c426f0de414623'
+	);
+
+	is mnemonic_to_seed($mnemonic, $password), $expected, 'seed from mnemonic ok';
+
+	is mnemonic_to_seed(Bitcoin::Crypto::Secret->new($mnemonic), Bitcoin::Crypto::Secret->new($password)),
+		$expected,
+		'secret handling ok';
 };
 
 subtest 'testing validate_wif' => sub {
@@ -39,6 +45,10 @@ subtest 'testing validate_wif' => sub {
 			}, 'Bitcoin::Crypto::Exception';
 		}
 	}
+
+	is validate_wif(Bitcoin::Crypto::Secret->new($cases[0][0])),
+		$cases[0][1],
+		'secret handling ok';
 };
 
 subtest 'testing get_path_info' => sub {
@@ -102,11 +112,16 @@ subtest 'testing mnemonic_from_entropy' => sub {
 	my $mnemonic = mnemonic_from_entropy($entropy);
 
 	is $mnemonic,
-		'charge ski orange scorpion kiwi trust lyrics soul scrap tackle drum quote inspire story artwork shuffle exile ahead first slender risk city collect silver';
+		'charge ski orange scorpion kiwi trust lyrics soul scrap tackle drum quote inspire story artwork shuffle exile ahead first slender risk city collect silver',
+		'generated mnemonic ok';
 
 	isa_ok dies {
 		my $mnemonic = mnemonic_from_entropy("\x01" x 17, 'en');
 	}, 'Bitcoin::Crypto::Exception::MnemonicGenerate';
+
+	is mnemonic_from_entropy(Bitcoin::Crypto::Secret->new($entropy)),
+		$mnemonic,
+		'secret handling ok';
 };
 
 subtest 'testing generate_mnemonic / mnemonic_from_entropy' => sub {
@@ -122,7 +137,7 @@ subtest 'testing generate_mnemonic / mnemonic_from_entropy' => sub {
 			my $length = $bits / 8 - 4;
 			ok($mnemonic =~ /^(\w+ ?){$length}$/, "generated mnemonic looks valid ($bits bits)");
 			ok lives {
-				Bitcoin::Crypto::Key::ExtPrivate->from_mnemonic($mnemonic, '', 'en');
+				btc_extprv->from_mnemonic($mnemonic, '', 'en');
 			}, 'generated mnemonic can be imported';
 		}
 	}
@@ -157,24 +172,38 @@ subtest 'testing get_address_type' => sub {
 };
 
 # segwit program passing common length valiadion (no version)
-my $program = "\x55\xff\x33";
+my $bad_program = "\x55";
+my $program = "\x55\xff";
+my $v0_program = $program x 10;
 
-subtest 'should fail validation of segwit version 0 program' => sub {
+subtest 'should validate segwit version 0 program' => sub {
+	is validate_segwit("\x00" . $v0_program), 0, 'version ok';
+
 	isa_ok dies {
 		validate_segwit("\x00" . $program);
 	}, 'Bitcoin::Crypto::Exception::SegwitProgram';
 };
 
-subtest 'should pass validation of segwit version 1 program' => sub {
-	ok lives {
-		validate_segwit("\x01" . $program);
-	};
+subtest 'should validate segwit version 1 program' => sub {
+	is validate_segwit("\x01" . $program), 1, 'version ok';
+
+	isa_ok dies {
+		validate_segwit("\x01" . $bad_program);
+	}, 'Bitcoin::Crypto::Exception::SegwitProgram';
 };
 
-subtest 'should pass validation of segwit version 15 program' => sub {
-	ok lives {
-		validate_segwit("\x0f" . $program);
-	};
+subtest 'should validate max segwit version program' => sub {
+	is validate_segwit("\x10" . $program), 16, 'version ok';
+
+	isa_ok dies {
+		validate_segwit("\x10" . $bad_program);
+	}, 'Bitcoin::Crypto::Exception::SegwitProgram';
+};
+
+subtest 'should not validate segwit version 17 program' => sub {
+	isa_ok dies {
+		validate_segwit("\x11" . $program);
+	}, 'Bitcoin::Crypto::Exception::SegwitProgram';
 };
 
 subtest 'testing to_format' => sub {
@@ -307,13 +336,59 @@ subtest 'testing lift_x' => sub {
 	my $negated = ecc->negate_public_key(from_format [hex => '03' . $key]);
 
 	is lift_x([hex => $key]), $negated, 'result ok';
+	isa_ok dies { lift_x([hex => $negated]) }, 'Bitcoin::Crypto::Exception';
 };
 
-subtest 'has_even_y' => sub {
+subtest 'testing has_even_y' => sub {
 	my $key = '151bb80b24b79955e9e7b50614f354b52bb5362f1147e68870a0e992cdb9eaa4';
 
 	ok has_even_y([hex => '02' . $key]), 'even key ok';
 	ok !has_even_y([hex => '03' . $key]), 'odd key ok';
+	isa_ok dies { has_even_y([hex => $key]) }, 'Bitcoin::Crypto::Exception';
+};
+
+subtest 'testing get_taproot_ext' => sub {
+	my $script = btc_tapscript->new
+		->add('OP_1')
+		->add('OP_ADD')
+		->add('OP_EQUAL');
+
+	my $tree = btc_script_tree->new(
+		tree => [
+			{
+				id => 0,
+				leaf_version => TAPSCRIPT_LEAF_VERSION,
+				script => $script,
+			}
+		]
+	);
+
+	my $expected_base = $tree->get_tapleaf_hash(0) . "\x00";
+
+	is get_taproot_ext(0), '', 'next_flag=0 ok';
+
+	is get_taproot_ext(
+		1,
+		script_tree => $tree,
+		leaf_id => 0,
+		),
+		$expected_base . pack('V', 0xffffffff), 'ext_flag=1 no codeseparator ok';
+
+	is get_taproot_ext(
+		1,
+		script_tree => $tree,
+		leaf_id => 0,
+		codesep_pos => 0,
+		),
+		$expected_base . pack('V', 0), 'zext_flag=1 ero codeseparator ok';
+
+	is get_taproot_ext(
+		1,
+		script_tree => $tree,
+		leaf_id => 0,
+		codesep_pos => 1,
+		),
+		$expected_base . pack('V', 1), 'oext_flag=1 ne codeseparator ok';
 };
 
 done_testing;

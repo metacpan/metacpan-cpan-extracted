@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Maildir;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Dir';
@@ -18,13 +18,14 @@ use parent 'Mail::Box::Dir';
 use strict;
 use warnings;
 
+use Log::Report      'mail-box', import => [ qw/__x error fault info trace/ ];
+
 use Mail::Box::Maildir::Message;
 
-use Carp;
-use File::Copy     qw/move/;
-use File::Basename qw/basename/;
-use Sys::Hostname  qw/hostname/;
-use File::Remove   qw/remove/;
+use File::Copy       qw/move/;
+use File::Basename   qw/basename/;
+use Sys::Hostname    qw/hostname/;
+use File::Remove     qw/remove/;
 
 # Maildir is only supported on UNIX, because the filenames probably
 # do not work on other platforms.  Since MailBox 2.052, the use of
@@ -40,12 +41,12 @@ sub init($)
 {	my ($self, $args) = @_;
 
 	! exists $args->{locker} && (! defined $args->{lock_type} || $args->{lock_type} eq 'NONE')
-		or croak "No locking possible for maildir folders.";
+		or error __x"no locking possible for maildir folders.";
 
 	$args->{lock_type}   = 'NONE';
 	$args->{folderdir} ||= $default_folder_dir;
 
-	$self->SUPER::init($args) or return undef;
+	$self->SUPER::init($args);
 
 	$self->acceptMessages if $args->{accept_new};
 	$self;
@@ -58,11 +59,9 @@ sub create($@)
 	my $folderdir = $args{folderdir} || $default_folder_dir;
 	my $directory = $class->folderToDirectory($name, $folderdir);
 
-	$class->createDirs($directory)
-		or $class->log(ERROR => "Cannot create Maildir folder $name."), return undef;
-
-	$class->log(PROGRESS => "Created folder Maildir $name.");
-	$class;
+	$class->createDirs($directory);
+	trace "created folder Maildir $name.";
+	$directory;
 }
 
 sub foundIn($@)
@@ -145,13 +144,10 @@ sub coerce($)
 	  : ($message->timestamp || time) .'.'. hostname .'.'. $uniq++;
 
 	my $dir = $self->directory;
-	my $tmp = "$dir/tmp/$basename";
-	my $new = "$dir/new/$basename";
+	$coerced->create("$dir/tmp/$basename");
+	my $new = $coerced->create("$dir/new/$basename");
 
-	$coerced->create($tmp) && $coerced->create($new)
-		or $self->log(ERROR => "Cannot create Maildir message file $new."), return undef;
-
-	$self->log(PROGRESS => "Added Maildir message in $new");
+	trace "Added Maildir message in $new";
 	$coerced->labelsToFilename unless $is_native;
 	$coerced;
 }
@@ -162,19 +158,13 @@ sub createDirs($)
 {	my ($thing, $dir) = @_;
 
 	-d $dir || mkdir $dir
-		or $thing->log(ERROR => "Cannot create Maildir folder directory $dir: $!"), return;
+		or fault __x"cannot create Maildir folder directory {dir}", dir => $dir;
 
-	my $tmp = "$dir/tmp";
-	-d $tmp || mkdir $tmp
-		or $thing->log(ERROR => "Cannot create Maildir folder subdir $tmp: $!"), return;
-
-	my $new = "$dir/new";
-	-d $new || mkdir $new
-		or $thing->log(ERROR => "Cannot create Maildir folder subdir $new: $!"), return;
-
-	my $cur = "$dir/cur";
-	-d $cur || mkdir $cur
-		or $thing->log(ERROR =>  "Cannot create Maildir folder subdir $cur: $!"), return;
+	foreach my $sub (qw/tmp new cur/)
+	{	my $subdir = "$dir/$sub";
+		-d $subdir || mkdir $subdir
+			or fault __x"cannot create Maildir folder subdir {dir}", dir => $subdir;
+	}
 
 	$thing;
 }
@@ -184,8 +174,8 @@ sub folderIsEmpty($)
 {	my ($self, $dir) = @_;
 	return 1 unless -d $dir;
 
-	foreach (qw/tmp new cur/)
-	{	my $subdir = "$dir/$_";
+	foreach my $sub (qw/tmp new cur/)
+	{	my $subdir = "$dir/$sub";
 		-d $subdir or next;
 
 		opendir my $dh, $subdir or return 0;
@@ -256,19 +246,18 @@ sub readMessages(@)
 
 	my $newdir  = "$directory/new";
 	my @new     = map +[$_, 0], $self->readMessageFilenames($newdir);
-	my @log     = $self->logSettings;
 
 	foreach (@cur, @new)
 	{	my ($filename, $accepted) = @$_;
 		my $message = $args{message_type}->new(
-			head      => $args{head_delayed_type}->new(@log),
+			head      => $args{head_delayed_type}->new,
 			filename  => $filename,
 			folder    => $self,
 			fix_header=> $self->fixHeaders,
 			labels    => [ accepted => $accepted ],
 		);
 
-		my $body    = $args{body_delayed_type}->new(@log, message => $message);
+		my $body    = $args{body_delayed_type}->new(message => $message);
 		$message->storeBody($body) if $body;
 		$self->storeMessage($message);
 	}
@@ -301,7 +290,7 @@ sub writeMessages($)
 
 	my $tmpdir    = "$directory/tmp";
 	-d $tmpdir || mkdir $tmpdir
-		or $self->log(ERROR => "Cannot create directory $tmpdir: $!"), return;
+		or fault __x"cannot create directory {dir}", dir => $tmpdir;
 
 	foreach my $message (@messages)
 	{	$message->isModified or next;
@@ -311,14 +300,14 @@ sub writeMessages($)
 
 		my $newtmp   = "$directory/tmp/$basename";
 		open my $new, '>:raw', $newtmp
-			or $self->log(ERROR => "Cannot create file $newtmp: $!"), return;
+			or fault __x"cannot create file {file}", file => $newtmp;
 
 		$message->write($new);
 		close $new;
 
 		unlink $filename;
 		move $newtmp, $filename
-			or $self->log(ERROR => "Cannot move $newtmp to $filename: $!"), return;
+			or fault __x"cannot rename {from} to {to}", from => $newtmp, to => $filename;
 	}
 
 	# Remove an empty folder.  This is done last, because the code before
@@ -352,7 +341,7 @@ sub appendMessages(@)
 
 	my $tmpdir   = "$directory/tmp";
 	-d $tmpdir || mkdir $tmpdir
-		or $self->log(ERROR => "Cannot create directory $tmpdir: $!"), return;
+		or fault __x"cannot create directory {dir}", dir => $tmpdir;
 
 	my $msgtype  = $args{message_type} || 'Mail::Box::Maildir::Message';
 
@@ -370,13 +359,9 @@ sub appendMessages(@)
 		}
 
 		my $dir = $self->directory;
-		my $tmp = "$dir/tmp/$basename";
-		my $new = "$dir/new/$basename";
-
-		$coerced->create($tmp) && $coerced->create($new)
-			or $self->log(ERROR => "Cannot append Maildir message in $new to folder $self."), next;
-
-		$self->log(PROGRESS => "Appended Maildir message in $new");
+		$coerced->create("$dir/tmp/$basename");
+		my $new = $coerced->create("$dir/new/$basename");
+		trace "Appended Maildir message in $new";
 	}
 
 	$self->close;

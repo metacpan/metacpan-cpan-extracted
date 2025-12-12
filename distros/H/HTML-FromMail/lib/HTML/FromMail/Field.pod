@@ -243,10 +243,20 @@ is selected.  By default, the names are displayed UNCHANGED.
 Used in combination with C<content REFOLD>, to specify how many characters
 are requested per line.
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: don't know address field formatting '$how'.
+
+Cast by C<addressField()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.01,
-built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

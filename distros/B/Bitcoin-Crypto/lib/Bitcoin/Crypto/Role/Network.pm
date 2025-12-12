@@ -1,15 +1,12 @@
 package Bitcoin::Crypto::Role::Network;
-$Bitcoin::Crypto::Role::Network::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Role::Network::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Scalar::Util qw(blessed);
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
+
+use Mooish::Base -standard, -role;
 
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
-use Moo::Role;
 
 has param 'network' => (
 	coerce => (InstanceOf ['Bitcoin::Crypto::Network'])

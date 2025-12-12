@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail::Message;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'HTML::FromMail::Page';
@@ -18,20 +18,21 @@ use base 'HTML::FromMail::Page';
 use strict;
 use warnings;
 
+use Log::Report 'html-frommail';
+
 use HTML::FromMail::Head  ();
 use HTML::FromMail::Field ();
 use HTML::FromMail::Default::Previewers ();
 use HTML::FromMail::Default::HTMLifiers ();
 
-use Carp;
-use File::Basename 'basename';
+use File::Basename   qw/basename/;
 
 #--------------------
 
 sub init($)
 {	my ($self, $args) = @_;
 	$args->{topic} ||= 'message';
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	$self->{HFM_dispose}  = $args->{disposition};
 	my $settings = $self->settings;
@@ -71,7 +72,7 @@ my $attach_id = 0;
 
 sub createAttachment($$$)
 {	my ($self, $message, $part, $args) = @_;
-	my $outdir   = $args->{outdir} or confess;
+	my $outdir   = $args->{outdir} or panic;
 	my $decoded  = $part->decoded;
 
 	my $filename = $part->label('filename');
@@ -80,10 +81,9 @@ sub createAttachment($$$)
 		$part->label(filename => $filename);
 	}
 
-	$decoded->write(filename => $filename)
-		or return ();
+	$decoded->write(filename => $filename);
 
-	  (	url      => basename($filename),
+	 +(	url      => basename($filename),
 		size     => (-s $filename),
 		type     => $decoded->type->body,
 
@@ -98,7 +98,7 @@ sub htmlField($$)
 
 	my $name  = $args->{name};
 	unless(defined $name)
-	{	$self->log(WARNING => "No field name specified in $args->{input}.");
+	{	warning __x"no field name specified in {template}.", template => $args->{input};
 		$name = "NONE";
 	}
 
@@ -131,7 +131,7 @@ sub htmlName($$)
 {	my ($self, $message, $args) = @_;
 
 	my $field = $self->lookup('field_object', $args)
-		or die "ERROR use of 'name' outside field container\n";
+		or error __x"use of 'name' outside field container.";  #XXX better message?
 
 	$self->fields->htmlName($field, $args);
 }
@@ -141,7 +141,7 @@ sub htmlBody($$)
 {	my ($self, $message, $args) = @_;
 
 	my $field = $self->lookup('field_object', $args)
-		or die "ERROR use of 'body' outside field container\n";
+		or error __x"use of 'body' outside field container";
 
 	$self->fields->htmlBody($field, $args);
 }
@@ -151,7 +151,7 @@ sub htmlAddresses($$)
 {	my ($self, $message, $args) = @_;
 
 	my $field = $self->lookup('field_object', $args)
-		or die "ERROR use of 'body' outside field container\n";
+		or error __x"use of 'addresses' outside field container";
 
 	$self->fields->htmlAddresses($field, $args);
 }
@@ -256,8 +256,6 @@ sub htmlInline($$)
 	$dispose eq 'inline' or return '';
 
 	my @attach  = $self->createAttachment($message, $current, $args);
-	@attach or return "Could not create attachment";
-
 	my $inliner = $self->htmlifier($current->body->mimeType);
 	my $inline  = $inliner->($self, $message, $current, $args);
 
@@ -273,8 +271,6 @@ sub htmlAttach($$)
 	$dispose eq 'attach' or return '';
 
 	my %attach  = $self->createAttachment($message, $current, $args);
-	keys %attach or return "Could not create attachment";
-
 	\%attach;
 }
 
@@ -282,13 +278,11 @@ sub htmlAttach($$)
 sub htmlPreview($$)
 {	my ($self, $message, $args) = @_;
 
-	my $current = $self->lookup('part_object', $args) || $message;
-	my $dispose = $self->disposition($message, $current, $args);
+	my $current   = $self->lookup('part_object', $args) || $message;
+	my $dispose   = $self->disposition($message, $current, $args);
 	$dispose eq 'preview' or return '';
 
-	my %attach  = $self->createAttachment($message, $current, $args);
-	keys %attach or return "Could not create attachment";
-
+	my %attach    = $self->createAttachment($message, $current, $args);
 	my $previewer = $self->previewer($current->body->mimeType);
 	$previewer->($self, $message, $current, \%attach, $args);
 }
@@ -298,8 +292,8 @@ sub htmlForeachPart($$)
 {	my ($self, $message, $args) = @_;
 	my $part     = $self->lookup('part_object', $args) || $message;
 
-	$part or die "ERROR: foreachPart not used within part";
-	$part->isMultipart or die "ERROR: foreachPart outside multipart";
+	$part or error __x"foreachPart not used within part.";
+	$part->isMultipart or error __x"foreachPart outside multipart.";
 
 	my $parentnr = $self->lookup('part_number',$args) || '';
 	$parentnr   .= '.' if length $parentnr;
@@ -320,7 +314,7 @@ sub htmlForeachPart($$)
 
 sub htmlRawText($$)
 {	my ($self, $message, $args) = @_;
-	my $part     = $self->lookup('part_object', $args) || $message;
+	my $part = $self->lookup('part_object', $args) || $message;
 	$self->plain2html($part->decoded->string);
 }
 
@@ -330,7 +324,7 @@ sub htmlPart($$)
 	my $format  = $args->{formatter};
 	my $msg     = $format->lookup('message_text', $args);
 
-	defined $msg or warn("Part outside a 'message' block"), return '';
+	defined $msg or error __x"part outside a 'message' block.";
 	$format->processText($msg, $args);
 }
 

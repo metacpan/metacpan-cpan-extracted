@@ -1,5 +1,5 @@
 
-===== ChangeLog of Mail::Message version 3.*
+===== ChangeLog of Mail::Message version 4.*
 
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
@@ -8,24 +8,29 @@ Limitations to be fixed:
 	- when lines are over 997 chars, then the transfer-encoding should
 	 automatically change from 'none' into 'quoted-printable' or 'base64'
 
-#!!! This is the maintenance version of this module.  When you start fresh,
-#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
-#!!! Convert? See F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+#!!! Mail::Box 3 compatibility is still maintained on github in branch
+#!!! maint3, and published.  So: you may find newer versions with major
+#!!! number 3.  Use (at least) version 4 for new developments.
+#!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
-version 3.020: Mon  8 Dec 10:06:14 CET 2025
+version 4.00: Thu 11 Dec 13:58:01 CET 2025
+
+	Changes:
+	- use Mail::Box 4 exception model: use Log::Report
 
 	Fixes:
 	- ::Field::Date regex [Andy Beverley]
 
 	Improvements:
+	- use Log::Report
+	- use base -> use parent
 	- added tests for parsing date field.
 	- added tests for parsing comment field to release.
 
-version 3.019: Mon 24 Nov 19:46:56 CET 2025
+version 3.019:
 
 	Changes:
 	- remove questions for optional dependencies during install.
-	- maintenance release with Mail::Box version 3 compatibility.
 
 	Fixes:
 	- nested bodies which specify a Content-Transfer-Encoding [Andy Beverly]

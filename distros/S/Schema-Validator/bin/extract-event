@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+
+# Print the details of an event at a URL
+
+use strict;
+use warnings;
+use feature 'say';
+
+use LWP::UserAgent;
+use JSON qw(decode_json);
+
+my $url = shift or die "Usage: $0 <event-url>";
+
+my $ua = LWP::UserAgent->new(timeout => 10);
+my $res = $ua->get($url);
+die 'Fetch failed: ', $res->status_line unless $res->is_success();
+
+my $html = $res->decoded_content;
+
+# ---------------------------------------------
+# Extract all JSON-LD blocks
+# ---------------------------------------------
+my @blocks = ($html =~ m{
+	<script[^>]+type=["']application/ld\+json["'][^>]*>
+	(.+?)
+	</script>
+}sigx);
+
+die 'No JSON-LD blocks found' unless @blocks;
+
+# ---------------------------------------------
+# Find the Event or subtype
+# ---------------------------------------------
+my $event;
+
+for my $raw (@blocks) {
+
+	# Clean HTML entities, trailing spaces, etc.
+	$raw =~ s/&quot;/"/g;
+	$raw =~ s/^\s+|\s+$//g;
+
+	my $json;
+	eval { $json = decode_json($raw); 1 } or next;
+
+	my @items = ref $json eq 'ARRAY' ? @$json : ($json);
+
+	ITEM:
+	for my $item (@items) {
+		next unless ref $item eq 'HASH';
+		next unless $item->{'@type'};
+
+		# Accept Event + all subtypes
+		if ($item->{'@type'} =~ /Event$/i) {
+			$event = $item;
+			last ITEM;
+		}
+	}
+
+	last if $event;
+}
+
+die 'No schema.org Event entry found' unless $event;
+
+# ---------------------------------------------
+# Extract Fields
+# ---------------------------------------------
+my $title = $event->{name} // '';
+my $event_url = $event->{url} // $url;
+
+# Organizer can be object or array
+my $group = '';
+if ($event->{organizer}) {
+	if (ref $event->{organizer} eq 'ARRAY') {
+		$group = $event->{organizer}[0]{name} // '';
+	} else {
+		$group = $event->{organizer}{name} // '';
+	}
+}
+
+my $venue = $event->{location}{name} // '';
+
+my $start = $event->{startDate} // '';
+
+my $email = '';
+if ($event->{organizer}) {
+	if (ref $event->{organizer} eq 'ARRAY') {
+		$email = $event->{organizer}[0]{email} // '';
+	} else {
+		$email = $event->{organizer}{email} // '';
+	}
+}
+
+my ($date, $time) = ('','');
+if ($start =~ /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}(:\d{2})?)/) {
+	$date = $1;
+	$time = $2;
+}
+
+# ---------------------------------------------
+# Output
+# ---------------------------------------------
+say "Title:		$title";
+say "Group:		$group";
+say "Venue:		$venue";
+say "Date:		$date";
+say "Time:		$time";
+say "Email:		$email";
+say "Event URL:\t$event_url";

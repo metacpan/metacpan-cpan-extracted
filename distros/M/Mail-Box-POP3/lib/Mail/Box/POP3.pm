@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-POP3 version 3.008.
+# This code is part of Perl distribution Mail-Box-POP3 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,21 +10,19 @@
 
 
 package Mail::Box::POP3;{
-our $VERSION = '3.008';
+our $VERSION = '4.000';
 }
 
-use base 'Mail::Box::Net';
+use parent 'Mail::Box::Net';
 
 use strict;
 use warnings;
 
-use Mail::Box::POP3::Message;
-use Mail::Box::Parser::Perl;
-use Mail::Box::FastScalar;
+use Log::Report  'mail-box-pop3';
 
-use File::Spec;
-use File::Basename;
-use Carp;
+use Mail::Box::POP3::Message ();
+use Mail::Box::Parser::Perl  ();
+use Mail::Box::FastScalar    ();
 
 #--------------------
 

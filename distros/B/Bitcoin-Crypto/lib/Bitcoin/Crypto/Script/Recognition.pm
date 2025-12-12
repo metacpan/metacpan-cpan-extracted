@@ -1,50 +1,67 @@
 package Bitcoin::Crypto::Script::Recognition;
-$Bitcoin::Crypto::Script::Recognition::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Script::Recognition::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
-use List::Util qw(any);
-use Try::Tiny;
+use Mooish::Base -standard;
 
+use Bitcoin::Crypto::Helpers qw(standard_push);
 use Bitcoin::Crypto::Script::Opcode;
+use Bitcoin::Crypto::Script::Runner;
 
-use namespace::clean;
-
-has param 'script' => (
-	isa => InstanceOf ['Bitcoin::Crypto::Script'],
+has param 'type' => (
+	default => undef,
 );
 
-has field '_script_serialized' => (
-	lazy => sub { $_[0]->script->to_serialized },
+has param 'address' => (
+	default => undef,
 );
 
-has field 'type' => (
-	predicate => 1,
-	writer => 1,
+has param 'segwit_version' => (
+	default => undef,
 );
 
-has field 'address' => (
-	predicate => 1,
-	writer => 1,
-	clearer => 1,
-);
+use constant {
+	KIND_OPCODE => 1,
+	KIND_SEGWIT_VERSION => 2,
+	KIND_NUMBER => 3,
+	KIND_ADDRESS => 4,
+	KIND_DATA => 5,
+	KIND_DATA_REPEATED => 6,
+};
 
-has field '_blueprints' => (
-	builder => 1,
-);
+sub _blueprints
+{
+	my ($class) = @_;
+
+	state $blueprints = {};
+	return $blueprints->{$class} //= $class->_build_blueprints;
+}
 
 sub _build_blueprints
 {
 	# blueprints for standard transaction types
-	return [
+	# constant size script types should be placed first so they are thrown away sooner
+	# more common script types should be placed first so they can be found faster
+	my @blueprints = (
 		[
-			P2PK => [
-				['data', 33, 65],
-				'OP_CHECKSIG',
+			P2TR => [
+				[KIND_SEGWIT_VERSION, 1],
+				[KIND_ADDRESS, 32],
+			]
+		],
+
+		[
+			P2WPKH => [
+				[KIND_SEGWIT_VERSION, 0],
+				[KIND_ADDRESS, 20],
+			],
+		],
+
+		[
+			P2WSH => [
+				[KIND_SEGWIT_VERSION, 0],
+				[KIND_ADDRESS, 32],
 			]
 		],
 
@@ -52,7 +69,7 @@ sub _build_blueprints
 			P2PKH => [
 				'OP_DUP',
 				'OP_HASH160',
-				['address', 20],
+				[KIND_ADDRESS, 20],
 				'OP_EQUALVERIFY',
 				'OP_CHECKSIG',
 			]
@@ -61,148 +78,160 @@ sub _build_blueprints
 		[
 			P2SH => [
 				'OP_HASH160',
-				['address', 20],
+				[KIND_ADDRESS, 20],
 				'OP_EQUAL',
 			]
 		],
 
 		[
-			P2MS => [
-				['op_n', 1 .. 15],
-				['data_repeated', 33, 65],
-				['op_n', 1 .. 15],
-				'OP_CHECKMULTISIG',
+			P2PK => [
+				[KIND_DATA, 33, 65],
+				'OP_CHECKSIG',
 			]
 		],
 
 		[
-			P2WPKH => [
-				'OP_0',
-				['address', 20],
+			'UNKNOWN_SEGWIT' => [
+				[KIND_SEGWIT_VERSION, 0 .. 16],
+				[KIND_DATA, 2 .. 40],
 			],
 		],
 
 		[
-			P2WSH => [
-				'OP_0',
-				['address', 32],
-			]
-		],
-
-		[
-			P2TR => [
-				'OP_1',
-				['address', 32],
-			]
-		],
-
-		[
 			NULLDATA => [
 				'OP_RETURN',
-				['address', 1 .. 75],
+				[KIND_ADDRESS, 1 .. 80],
 			]
 		],
 
 		[
-			NULLDATA => [
-				'OP_RETURN',
-				'OP_PUSHDATA1',
-				['address', 76 .. 80],
+			P2MS => [
+				[KIND_NUMBER, 0 .. 20],
+				[KIND_DATA_REPEATED, 33, 65],
+				[KIND_NUMBER, 0 .. 20],
+				'OP_CHECKMULTISIG',
 			]
 		],
-	];
+	);
+
+	# pre-process blueprints for faster execution
+	foreach my $variant (@blueprints) {
+		my ($type, $parts) = @$variant;
+
+		foreach my $part (@$parts) {
+			if (ref $part) {
+				my ($kind, @vars) = @$part;
+
+				if ($kind == KIND_ADDRESS || $kind == KIND_DATA) {
+
+					# no special handling
+				}
+				elsif ($kind == KIND_DATA_REPEATED) {
+
+					# no special handling
+				}
+				elsif ($kind == KIND_NUMBER || $kind == KIND_SEGWIT_VERSION) {
+					@vars = map { Bitcoin::Crypto::Script::Runner->from_int($_) } @vars;
+				}
+				else {
+					die "invalid blueprint kind: $kind";
+				}
+
+				my %lookup = map { $_ => !!1 } @vars;
+				$part = [$kind, \%lookup];
+			}
+			else {
+				my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_name($part);
+				$part = [KIND_OPCODE, $opcode->code];
+			}
+		}
+	}
+
+	return \@blueprints;
 }
 
 sub _check_blueprint
 {
-	my ($self, $pos, $part, @more_parts) = @_;
-	my $this_script = $self->_script_serialized;
+	my ($class, $ops, $type, $parts) = @_;
 
-	return $pos == length $this_script
-		unless defined $part;
-	return !!0 unless $pos < length $this_script;
+	my $parts_size = @{$parts};
+	my $pos = 0;
 
-	if (!ref $part) {
-		my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_name($part);
-		return !!0 unless chr($opcode->code) eq substr $this_script, $pos, 1;
-		return $self->_check_blueprint($pos + 1, @more_parts);
-	}
-	else {
-		my ($kind, @vars) = @$part;
+	my $address;
+	my $segwit_version;
 
-		if ($kind eq 'address' || $kind eq 'data') {
-			my $len = ord substr $this_script, $pos, 1;
+	foreach my $part (@{$parts}) {
+		my ($kind, $lookup) = @{$part};
+		my $op_data = $ops->[$pos];
+		return undef unless $op_data;
 
-			return !!0 unless any { $_ == $len } @vars;
-			if ($self->_check_blueprint($pos + $len + 1, @more_parts)) {
-				$self->set_address(substr $this_script, $pos + 1, $len)
-					if $kind eq 'address';
-				return !!1;
-			}
+		if ($kind == KIND_OPCODE) {
+			return undef unless $lookup == $op_data->[0]->code;
 		}
-		elsif ($kind eq 'data_repeated') {
+		elsif ($kind == KIND_ADDRESS || $kind == KIND_DATA) {
+			return undef unless $op_data->[0]->pushop;
+			return undef unless $lookup->{length $op_data->[2]};
+			return undef unless standard_push($op_data->[0]->name, $op_data->[2]);
+
+			$address = $op_data->[2]
+				if $kind == KIND_ADDRESS;
+		}
+		elsif ($kind == KIND_NUMBER || $kind == KIND_SEGWIT_VERSION) {
+			return undef unless $op_data->[0]->pushop;
+			return undef unless $lookup->{$op_data->[2]};
+			return undef unless standard_push($op_data->[0]->name, $op_data->[2]);
+
+			# numify bigint on 32 bit arch
+			$segwit_version = '' . Bitcoin::Crypto::Script::Runner->to_int($op_data->[2])
+				if $kind == KIND_SEGWIT_VERSION;
+		}
+		elsif ($kind == KIND_DATA_REPEATED) {
 			my $count = 0;
 			while (1) {
-				my $len = ord substr $this_script, $pos, 1;
-				last unless any { $_ == $len } @vars;
+				return undef unless $op_data && $op_data->[0]->pushop;
+				return undef unless standard_push($op_data->[0]->name, $op_data->[2]);
+				last unless $lookup->{length $op_data->[2]};
 
-				$pos += $len + 1;
+				$pos += 1;
+				$op_data = $ops->[$pos];
 				$count += 1;
 			}
 
-			return !!0 if $count == 0 || $count > 16;
-			my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_name("OP_$count");
-			return !!0 unless chr($opcode->code) eq substr $this_script, $pos, 1;
-			return $self->_check_blueprint($pos, @more_parts);
-		}
-		elsif ($kind eq 'op_n') {
-			my $opcode;
-			try {
-				$opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_code(ord substr $this_script, $pos, 1);
-			};
+			return undef unless $op_data->[0]->pushop;
+			return undef unless Bitcoin::Crypto::Script::Runner->from_int($count) eq $op_data->[2];
 
-			return !!0 unless $opcode;
-			return !!0 unless $opcode->name =~ /\AOP_(\d+)\z/;
-			return !!0 unless any { $_ == $1 } @vars;
-			return $self->_check_blueprint($pos + 1, @more_parts);
+			# check the same opcode again with next blueprint part
+			next;
 		}
-		else {
-			die "invalid blueprint kind: $kind";
-		}
+
+		++$pos;
 	}
+
+	return undef unless $pos == @{$ops};
+
+	return $class->new(
+		type => $type,
+		address => $address,
+		segwit_version => $segwit_version,
+	);
 }
 
 sub check
 {
-	my ($self) = @_;
-	foreach my $variant (@{$self->_blueprints}) {
-		my ($type, $blueprint) = @{$variant};
+	my ($class, $script) = @_;
 
-		# clear address if it was set by previous check
-		$self->clear_address;
-		if ($self->_check_blueprint(0, @{$blueprint})) {
-			$self->set_type($type);
-			last;
+	my $compiler = $script->_compiler;
+	if (!$compiler->has_errors) {
+		my $operations = $compiler->operations;
+
+		foreach my $variant (@{$class->_blueprints}) {
+			my $recognized = $class->_check_blueprint($operations, @{$variant});
+			return $recognized if defined $recognized;
 		}
 	}
 
-	return;
-}
-
-sub get_type
-{
-	my ($self) = @_;
-
-	$self->check;
-	return $self->type;
-}
-
-sub get_address
-{
-	my ($self) = @_;
-
-	$self->check;
-	return $self->address;
+	# unknown
+	return $class->new;
 }
 
 1;

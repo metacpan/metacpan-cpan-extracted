@@ -1,4 +1,4 @@
-# This code is part of Perl distribution User-Identity version 3.00.
+# This code is part of Perl distribution User-Identity version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,15 +10,15 @@
 
 
 package User::Identity;{
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 }
 
-use base 'User::Identity::Item';
+use parent 'User::Identity::Item';
 
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report     'user-identity';
 
 #--------------------
 
@@ -88,8 +88,8 @@ sub fullName()
 
 	my ($first, $prefix, $surname) = @$self{ qw/UI_firstname UI_prefix UI_surname/};
 
-	$surname = ucfirst $self->nickname if  defined $first && ! defined $surname;
-	$first   = $self->firstname        if !defined $first &&   defined $surname;
+	$surname //= ucfirst $self->nickname if defined $first;
+	$first   //= $self->firstname        if defined $surname;
 
 	my $full = join ' ', grep defined, ($first, $prefix, $surname);
 	$full = $self->firstname unless length $full;
@@ -104,10 +104,10 @@ sub formalName()
 {	my $self = shift;
 	return $self->{UI_formal_name} if defined $self->{UI_formal_name};
 
-	my $initials = $self->initials;
+	my $initials  = $self->initials;
 
 	my $firstname = $self->{UI_firstname};
-	$firstname = "($firstname)" if defined $firstname;
+	$firstname    = "($firstname)" if defined $firstname;
 
 	join ' ', grep defined,
 		$self->courtesy, $initials, @$self{ qw/UI_prefix UI_surname UI_titles/ };

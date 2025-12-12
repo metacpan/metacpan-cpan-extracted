@@ -40,9 +40,7 @@ Inherited, see L<Mail::Box::Parser/"METHODS">
  -Option           --Defined in       --Default
   fix_header_errors  Mail::Box::Parser  false
   lines                                 <required>
-  log                Mail::Reporter     'WARNINGS'
   source                                <required>
-  trace              Mail::Reporter     'WARNINGS'
   trusted            Mail::Box::Parser  false
 
 =over 2
@@ -51,11 +49,7 @@ Inherited, see L<Mail::Box::Parser/"METHODS">
 
 =item lines => \@lines
 
-=item log => LEVEL
-
 =item source => $name
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -80,10 +74,6 @@ Inherited, see L<Mail::Box::Parser/"Attributes">
 =item $obj-E<gt>B<lines>()
 
 Returns an ARRAY with the remaining lines.
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<source>()
 
@@ -141,43 +131,7 @@ Extends L<"Error handling" in Mail::Box::Parser|Mail::Box::Parser/"Error handlin
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -199,35 +153,29 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Unexpected end of header in $source: $line
+=item Error: parser $type does not extend $pkg.
 
-While parsing a message from the specified source (usually a file name),
-the parser found a syntax error.  According to the MIME specification in the
-RFCs, each header line must either contain a colon, or start with a blank
-to indicate a folded field.  Apparently, this header contains a line which
-starts on the first position, but not with a field name.
+Cast by C<defaultParserType()>
 
-By default, parsing of the header will be stopped.  If there are more header
-lines after the erroneous line, they will be added to the body of the message.
-In case of L<new(fix_header_errors)|Mail::Box::Parser/"METHODS"> set, the parsing of the header will be continued.
-The erroneous line will be added to the preceding field.
+=item Warning: unexpected end of header in $source:\n $line
+
 Cast by C<readHeader()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

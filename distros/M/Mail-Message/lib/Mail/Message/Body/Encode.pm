@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,16 +10,17 @@
 
 
 package Mail::Message::Body;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Reporter';
+use parent 'Mail::Reporter';
 
 use strict;
 use warnings;
 use utf8;
 
-use Carp;
+use Log::Report   'mail-message', import => [ qw/__x error panic warning/ ];
+
 use MIME::Types    ();
 use File::Basename qw/basename/;
 use Encode         qw/find_encoding from_to encode_utf8/;
@@ -52,7 +53,7 @@ sub _char_enc($)
 	return undef if !$charset || $charset eq 'PERL';
 
 	my $enc = find_encoding $charset
-		or $self->log(WARNING => "Charset `$charset' is not known.");
+		or warning __x"charset '{name}' is not known.", name => $charset;
 
 	$enc;
 }
@@ -101,7 +102,7 @@ sub encode(@)
 
 		if($char_to && $trans_to ne 'none' && $char_to eq 'PERL')
 		{	# We cannot leave the body into the 'PERL' charset when transfer-encoding is applied.
-			$self->log(WARNING => "Content-Transfer-Encoding `$trans_to' requires explicit charset, defaulted to utf-8");
+			warning __x"Content-Transfer-Encoding '{te}' requires explicit charset, defaulted to utf-8.", te => $trans_to;
 			$char_to = 'utf-8';
 		}
 
@@ -133,7 +134,7 @@ sub encode(@)
 	elsif(my $decoder = $self->getTransferEncHandler($trans_was))
 	{	$decoded = $decoder->decode($self, result_type => $bodytype) }
 	else
-	{	$self->log(WARNING => "No decoder defined for transfer encoding $trans_was.");
+	{	warning __x"no decoder defined for transfer encoding '{encoding}'.", encoding => $trans_was;
 		return $self;
 	}
 
@@ -176,7 +177,7 @@ sub encode(@)
 	my $trans;
 	if($trans_to ne 'none')
 	{	$trans = $self->getTransferEncHandler($trans_to)
-			or $self->log(WARNING => "No encoder defined for transfer encoding `$trans_to'.");
+			or warning __x"no encoder defined for transfer encoding '{encoding}'.", encoding => $trans_to;
 	}
 
 	defined $trans ? $trans->encode($recoded, result_type => $bodytype) : $recoded;
@@ -269,7 +270,7 @@ sub eol(;$)
 	  = $eol eq 'CRLF' ? first { !/\015\012$/ } @$lines
 	  : $eol eq 'CR'   ? first { !/\015$/ } @$lines
 	  : $eol eq 'LF'   ? first { /\015\012$|\015$/ } @$lines
-	  : ($self->log(WARNING => "Unknown line terminator $eol ignored"), 1);
+	  :   error(__x"unknown line terminator '{eol}'.", eol => $eol);
 
 	$wrong
 		or return $self;
@@ -339,8 +340,9 @@ sub dispositionFilename(;$)
 	{	$filename = basename $base =~ s/\s+/ /gr =~ s/ $//r =~ s/^ //r =~ s/[^\w .-]//gr;
 	}
 
-	my ($filebase, $ext) = length $filename && $filename =~ m/(.*)\.([^.]+)/ ? ($1, $2)
-	: (part => ($self->mimeType->extensions)[0] || 'raw');
+	my ($filebase, $ext)
+	  = length $filename && $filename =~ m/(.*)\.([^.]+)/ ? ($1, $2)
+	  : (part => ($self->mimeType->extensions)[0] || 'raw');
 
 	my $fn = File::Spec->catfile($dir, "$filebase.$ext");
 
@@ -373,7 +375,7 @@ sub getTransferEncHandler($)
 		or return;
 
 	eval "require $class";
-	confess "Cannot load $class: $@\n" if $@;
+	panic "Cannot load $class: $@\n" if $@;
 
 	$transfer_encoders{$type} = $class->new;
 }

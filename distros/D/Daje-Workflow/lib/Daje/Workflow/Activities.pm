@@ -56,6 +56,7 @@ sub activity($self, $context, $activity, $workflow_data) {
             model         => $self->model,
             activity_data => $activity_data,
         );
+
         my $method = $activity->{method};
         if ($object->can($method)) {
             eval {
@@ -77,7 +78,7 @@ sub activity($self, $context, $activity, $workflow_data) {
             }
         }
         if ($self->error->has_error() == 0) {
-            $workflow_data->{state} = $activity->{resulting_state};
+            $workflow_data->{next_state} = $activity->{resulting_state};
         }
     }
 
@@ -100,6 +101,7 @@ sub _pre_checks($self, $pre_checks) {
 }
 
 1;
+
 
 
 

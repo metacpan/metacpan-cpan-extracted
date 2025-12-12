@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,12 +20,13 @@ no_index:
     - t
     - inc
 requires:
+  Log::Report: '1.42'
   Scalar::Util: '0'
 resources:
   bugtracker: https://github.com/markov2/perl5-Object-Realize-Later/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Object-Realize-Later.git
-version: '3.00'
+version: '4.00'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

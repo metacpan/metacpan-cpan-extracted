@@ -1,16 +1,11 @@
 package Bitcoin::Crypto::Transaction::Digest::Config;
-$Bitcoin::Crypto::Transaction::Digest::Config::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::Digest::Config::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
+use Mooish::Base -standard;
 
 use Bitcoin::Crypto::Types -types;
-
-use namespace::clean;
 
 has param 'signing_index' => (
 	isa => PositiveOrZeroInt,
@@ -46,9 +41,11 @@ sub _default_sighash
 {
 	my ($self, $value) = @_;
 
-	if (!defined $self->sighash) {
-		$self->_set_sighash($value);
-	}
+	my $sighash = $self->sighash;
+	$self->_set_sighash($value)
+		unless defined $sighash;
+
+	return $sighash // $value;
 }
 
 1;

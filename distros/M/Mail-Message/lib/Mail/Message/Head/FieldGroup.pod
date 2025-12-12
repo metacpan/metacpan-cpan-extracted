@@ -67,13 +67,11 @@ distinguished by their name, where the fields always start with a capital.
 The field objects must aways lead the C<%options>.
 Improves base, see L<Mail::Reporter/"Constructors">
 
- -Option  --Defined in     --Default
-  head                       undef
-  log       Mail::Reporter   'WARNINGS'
-  software                   undef
-  trace     Mail::Reporter   'WARNINGS'
-  type                       undef
-  version                    undef
+ -Option  --Default
+  head      undef
+  software  undef
+  type      undef
+  version   undef
 
 =over 2
 
@@ -84,13 +82,9 @@ If no header is specified, a L<Mail::Message::Head::Partial|Mail::Message::Head:
 for you.  If you wish to scan the existing fields in a header, then use
 the L<from()|Mail::Message::Head::FieldGroup/"Constructors"> method.
 
-=item log => LEVEL
-
 =item software => STRING
 
 Name of the software which produced the fields.
-
-=item trace => LEVEL
 
 =item type => STRING
 
@@ -108,14 +102,6 @@ Version number for the software which produced the fields.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
-
-=over 4
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
-
-=back
 
 =head2 The header
 
@@ -238,30 +224,10 @@ Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<details>()
 
 Produce information about the detected/created field group, which may be
 helpful during debugging.  A nicely formatted string is returned.
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =item $obj-E<gt>B<notImplemented>()
 
@@ -271,22 +237,6 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Print the group to the specified C<$fh>.  This is probably only useful for
 debugging purposed.  The output defaults to the selected file handle.
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
 
 =back
 
@@ -306,9 +256,9 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Error: Package $package does not implement $method.
+=item Error: class $package does not implement method $method.
 
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
@@ -319,8 +269,8 @@ Cast by C<notImplemented()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -65,7 +65,7 @@ still insist, use L<Mail::Message::body()|Mail::Message/"The body">.
 
 =over 4
 
-=item Error: Method bounce requires To, Cc, or Bcc
+=item Error: method bounce requires To, Cc, or Bcc.
 
 The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
 else without modification; you must specified it's new destination.
@@ -78,8 +78,8 @@ Cast by C<bounce()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

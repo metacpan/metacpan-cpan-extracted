@@ -1,19 +1,16 @@
 package Bitcoin::Crypto::Transaction::Output;
-$Bitcoin::Crypto::Transaction::Output::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::Output::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Helpers qw(ensure_length);
-use Bitcoin::Crypto::Util qw(to_format pack_compactsize unpack_compactsize);
+use Bitcoin::Crypto::Helpers qw(encode_64bit decode_64bit);
+use Bitcoin::Crypto::Util::Internal qw(pack_compactsize unpack_compactsize);
 use Bitcoin::Crypto::Exception;
-
-use namespace::clean;
+use Bitcoin::Crypto::Constants qw(USE_BIGINTS);
 
 has param 'value' => (
 	writer => 1,
@@ -29,11 +26,6 @@ with qw(
 	Bitcoin::Crypto::Role::ShallowClone
 );
 
-signature_for is_standard => (
-	method => Object,
-	positional => [],
-);
-
 sub is_standard
 {
 	my ($self) = @_;
@@ -41,37 +33,26 @@ sub is_standard
 	return $self->locking_script->has_type;
 }
 
-signature_for set_max_value => (
-	method => Object,
-	positional => [],
-);
-
 sub set_max_value
 {
 	my ($self) = @_;
 
-	$self->set_value('0xffffffffffffffff');
+	if (USE_BIGINTS) {
+		$self->set_value('0xffffffffffffffff');
+	}
+	else {
+		$self->set_value((1 << 63) - 1 + (1 << 63));
+	}
+
 	return $self;
 }
-
-signature_for value_serialized => (
-	method => Object,
-	positional => [],
-);
 
 sub value_serialized
 {
 	my ($self) = @_;
 
-	# NOTE: little endian
-	my $value = $self->value->as_bytes;
-	return scalar reverse ensure_length($value, 8);
+	return encode_64bit($self->value);
 }
-
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
 
 sub to_serialized
 {
@@ -81,19 +62,16 @@ sub to_serialized
 	# - value, 8 bytes
 	# - locking script length, 1-9 bytes
 	# - locking script
-	my $serialized = '';
-
-	$serialized .= $self->value_serialized;
+	my $serialized = $self->value_serialized;
 
 	my $script = $self->locking_script->to_serialized;
-	$serialized .= pack_compactsize(length $script);
-	$serialized .= $script;
+	$serialized .= pack_compactsize(length $script) . $script;
 
 	return $serialized;
 }
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	head => [ByteStr],
 	named => [
 		pos => Maybe [ScalarRef [PositiveOrZeroInt]],
@@ -108,8 +86,10 @@ sub from_serialized
 	my $partial = !!$args->{pos};
 	my $pos = $partial ? ${$args->{pos}} : 0;
 
-	my $value = reverse substr $serialized, $pos, 8;
+	my $value = substr $serialized, $pos, 8;
 	$pos += 8;
+
+	$value = decode_64bit($value);
 
 	my $script_size = unpack_compactsize $serialized, \$pos;
 
@@ -128,15 +108,10 @@ sub from_serialized
 		if $partial;
 
 	return $class->new(
-		value => Math::BigInt->from_bytes($value),
+		value => $value,
 		locking_script => $script,
 	);
 }
-
-signature_for dump => (
-	method => Object,
-	positional => [],
-);
 
 sub dump
 {
@@ -149,7 +124,7 @@ sub dump
 	my @result;
 	push @result, "$type Output$address";
 	push @result, 'value: ' . $self->value;
-	push @result, 'locking script: ' . to_format [hex => $self->locking_script->to_serialized];
+	push @result, 'locking script: ' . $self->locking_script->dump;
 
 	return join "\n", @result;
 }
@@ -186,8 +161,15 @@ interacted with directly.
 
 =head3 value
 
-Non-negative integer value of the output in the smallest unit (satoshi). It is
-an instance of L<Math::BigInt> with type coercions from integers and strings.
+Non-negative integer value of the output in the smallest unit (satoshi).
+
+On 32-bit machines, BigInts are used with type coercions from integers and
+strings. On 64-bit machines, perl numbers will be used.
+
+Most of the time, the internal representation of values should not matter. If
+it does matter though, C<BITCOIN_CRYPTO_USE_BIGINTS> environmental variable can
+be set to C<1> to force use of BigInts on 64 bit machines.
+
 Required.
 
 I<Available in the constructor>.
@@ -267,18 +249,6 @@ start decoding. It will be set to the next byte after end of output stream.
 	$text = $object->dump()
 
 Returns a readable description of the output.
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * Transaction - general error with transaction
-
-=back
 
 =head1 SEE ALSO
 

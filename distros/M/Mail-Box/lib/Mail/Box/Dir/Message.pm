@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Dir::Message;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Message';
@@ -18,7 +18,9 @@ use parent 'Mail::Box::Message';
 use strict;
 use warnings;
 
-use File::Copy qw/move/;
+use Log::Report      'mail-box', import => [ qw/__x error fault trace/ ];
+
+use File::Copy       qw/move/;
 
 #--------------------
 
@@ -26,9 +28,7 @@ sub init($)
 {	my ($self, $args) = @_;
 	$self->SUPER::init($args);
 
-	$self->filename($args->{filename})
-		if $args->{filename};
-
+	$self->filename($args->{filename}) if $args->{filename};
 	$self->{MBDM_fix_header} = $args->{fix_header};
 	$self;
 }
@@ -100,14 +100,11 @@ sub diskDelete()
 sub parser()
 {	my $self   = shift;
 
-	my $parser = Mail::Box::Parser->new(
+	Mail::Box::Parser->new(
 		filename => $self->filename,
 		mode     => 'r',
 		fix_header_errors => $self->fixHeader,
-		$self->logSettings
-	) or $self->log(ERROR => "Cannot create parser for $self->{MBDM_filename}."), return;
-
-	$parser;
+	);
 }
 
 
@@ -125,7 +122,7 @@ sub loadHead()
 
 	$folder->lazyPermitted(0);
 
-	$self->log(PROGRESS => 'Loaded delayed head.');
+	trace "Loaded delayed head.";
 	$self->head;
 }
 
@@ -136,14 +133,15 @@ sub loadBody()
 	my $body     = $self->body;
 	$body->isDelayed or return $body;
 
-	my $head     = $self->head;
-	my $parser   = $self->parser or return;
+	my $parser   = $self->parser;
+	my $msgid    = $self->messageId;
 
+	my $head     = $self->head;
 	if($head->isDelayed)
 	{	$head = $self->readHead($parser)
-			or $self->log(ERROR => 'Unable to read delayed head.'), return;
+			or error __x"unable to read delayed head for message {msgid}.", msgid => $msgid;
 
-		$self->log(PROGRESS => 'Loaded delayed head.');
+		trace "Loaded delayed head for $msgid.";
 		$self->head($head);
 	}
 	else
@@ -152,10 +150,10 @@ sub loadBody()
 	}
 
 	my $newbody  = $self->readBody($parser, $head)
-		or $self->log(ERROR => 'Unable to read delayed body.'), return;
+		or error __x"unable to read delayed body for message {msgid}.", msgid => $msgid;
 
 	$parser->stop;
-	$self->log(PROGRESS => 'Loaded delayed body.');
+	trace "Loaded delayed body for $msgid";
 	$self->storeBody($newbody->contentInfoFrom($head));
 }
 
@@ -170,20 +168,15 @@ sub create($)
 
 	my $new = $filename . '.new';
 	open my $newfh, '>:raw', $new
-		or $self->log(ERROR => "Cannot write message to $new: $!"), return;
+		or fault __x"cannot write message to {file}", file => $new;
 
 	$self->write($newfh);
 	$newfh->close;
 
-	# Accept the new data
-# maildir produces warning where not expected...
-#   $self->log(WARNING => "Failed to remove $old: $!")
-#       if $old && !unlink $old;
-
 	unlink $old if $old;
 
 	move $new, $filename
-		or $self->log(ERROR => "Failed to move $new to $filename: $!"), return;
+		or error __x"failed to rename file {from} to {to}", from => $new, to => $filename;
 
 	$self->modified(0);
 

@@ -52,15 +52,13 @@ Improves base, see L<Mail::Reporter/"Constructors">
   executable    Mail::Transport  undef
   hostname      Mail::Transport  'localhost'
   interval      Mail::Transport  30
-  log           Mail::Reporter   'WARNINGS'
   password      Mail::Transport  undef
   port          Mail::Transport  110
   proxy         Mail::Transport  undef
   retry         Mail::Transport  <unlimited>
-  ssl_options                    <C<undef>>
+  ssl_options                    undef
   timeout       Mail::Transport  120
-  trace         Mail::Reporter   'WARNINGS'
-  use_ssl                        <C<false>>
+  use_ssl                        false
   username      Mail::Transport  undef
   via           Mail::Transport  'sendmail'
 
@@ -83,8 +81,6 @@ use C<OAUTH2>.
 
 =item interval => $span
 
-=item log => LEVEL
-
 =item password => $password
 
 =item port => $port
@@ -103,8 +99,6 @@ Connections will get restarted when they are lost: you have to keep the
 defaults in place during POP actions.
 
 =item timeout => $span
-
-=item trace => LEVEL
 
 =item use_ssl => BOOLEAN
 
@@ -125,10 +119,6 @@ Extends L<"Attributes" in Mail::Transport::Receive|Mail::Transport::Receive/"Att
 =item $obj-E<gt>B<SSLOptions>()
 
 Z<>
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<useSSL>()
 
@@ -191,8 +181,8 @@ Returns the total number of octets used by the mailbox on the remote server.
 
 =item $obj-E<gt>B<header>( $id, [$bodylines] )
 
-Returns a reference to an array which contains the header of the message
-with the specified C<$id>.  C<undef> is returned if something has gone wrong.
+Returns an ARRAY which contains the header of the message with the
+specified C<$id>.  A C<undef> is returned if something has gone wrong.
 
 The optional integer C<$bodylines> specifies the number of lines from the body
 which should be added, by default none.
@@ -316,43 +306,7 @@ Extends L<"Error handling" in Mail::Transport::Receive|Mail::Transport::Receive/
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -374,51 +328,6 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Error: Cannot connect to $host:$port for POP3: $!
-
-Unsuccessful in connecting to the remote POP3 server.
-Cast by C<login()>
-
-=item Error: Cannot get the messages of pop3 via messages()
-
-It is not possible to retrieve all messages on a remote POP3 folder
-at once: each shall be taken separately.  The POP3 folder will hide this
-for you.
-Cast by C<messages()>
-
-=item Error: Cannot re-connect reliably to server which doesn't support UIDL.
-
-The connection to the remote POP3 was lost, and cannot be re-established
-because the server's protocol implementation lacks the necessary information.
-Cast by C<socket()>
-
-=item Error: Cannot read POP3 from socket: $!
-
-It is not possible to read the success status of the previously given POP3
-command.  Connection lost?
-Cast by C<send()>
-
-=item Error: Cannot write POP3 to socket: $@
-
-It is not possible to send a protocol command to the POP3 server.  Connection
-lost?
-Cast by C<send()>
-
-=item Error: Could not authenticate using '$some' method.
-
-The authenication method to get access to the POP3 server did not result in
-a connection.  Maybe you need a different authentication protocol, or your
-username with password are invalid.
-Cast by C<login()>
-
-=item Error: Could not authenticate using any login method.
-
-No authentication method was explicitly prescribed, so both AUTH and APOP were
-tried.  However, both failed.  There are other authentication methods, which
-are not defined by the main POP3 RFC rfc1939.  These protocols are not
-implemented yet.  Please contribute your implementation.
-Cast by C<login()>
-
 =item Error: POP3 Could not do a STAT
 
 For some weird reason, the server does not respond to the STAT call.
@@ -430,16 +339,60 @@ No username and/or no password specified for this POP3 folder, although
 these are obligatory parts in the protocol.
 Cast by C<login()>
 
-=item Error: Package $package does not implement $method.
+=item Fault: cannot connect to $service for POP3: $!
 
-Fatal error: the specific package (or one of its superclasses) does not
+Unsuccessful in connecting to the remote POP3 server.
+Cast by C<login()>
+
+=item Error: cannot get all messages of pop3 at once via messages().
+
+It is not possible to retrieve all messages on a remote POP3 folder
+at once: each shall be taken separately.  The POP3 folder will hide this
+for you.
+Cast by C<messages()>
+
+=item Error: cannot re-connect reliably to server which doesn't support UIDL.
+
+The connection to the remote POP3 was lost, and cannot be re-established
+because the server's protocol implementation lacks the necessary information.
+Cast by C<socket()>
+
+=item Fault: cannot read POP3 from socket: $!
+
+It is not possible to read the success status of the previously given POP3
+command.  Connection lost?
+Cast by C<send()>
+
+=item Error: cannot write POP3 to socket: $@
+
+It is not possible to send a protocol command to the POP3 server.  Connection lost?
+Cast by C<send()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Error: Server at $host:$port does not seem to be talking POP3.
+=item Error: could not authenticate using '$type' method.
+
+The authenication method to get access to the POP3 server did not result in
+a connection.  Maybe you need a different authentication protocol, or your
+username with password are invalid.
+Cast by C<login()>
+
+=item Error: could not authenticate using any login method.
+
+No authentication method was explicitly prescribed, so both AUTH and APOP were
+tried.  However, both failed.  There are other authentication methods, which
+are not defined by the main POP3 RFC rfc1939.  These protocols are not
+implemented yet.  Please contribute your implementation.
+Cast by C<login()>
+
+=item Error: server at $service does not seem to be talking POP3.
 
 The remote server did not respond to an initial exchange of messages as is
 expected by the POP3 protocol.  The server has probably a different
@@ -450,8 +403,8 @@ Cast by C<login()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 version 3.008,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -2,11 +2,13 @@ Build.PL
 Changes
 LICENSE
 README.md
+conf/config.conf
 cpanfile
 lib/Daje/Controller/Workflow.pm
 lib/Daje/Plugin/Workflow.pm
 minil.toml
 t/00_compile.t
+t/basic.t
 META.json
 META.yml
 MANIFEST

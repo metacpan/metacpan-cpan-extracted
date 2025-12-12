@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,17 +10,17 @@
 
 
 package Mail::Message;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
 
 use strict;
 use warnings;
 
+use Log::Report   'mail-message', import => [ qw/__x error trace/ ];
+
 use Mail::Message::Head::Complete ();
 use Mail::Message::Field          ();
-
-use Carp         qw/croak/;
 
 #--------------------
 
@@ -48,8 +48,7 @@ sub bounce(@)
 	{	$rg = Mail::Message::Head::ResentGroup->new(@_);
 	}
 	else
-	{	$self->log(ERROR => "Method bounce requires To, Cc, or Bcc");
-		return undef;
+	{	error __x"method bounce requires To, Cc, or Bcc.";
 	}
 
 	$rg->set(Date => Mail::Message::Field->toDate) unless defined $rg->date;

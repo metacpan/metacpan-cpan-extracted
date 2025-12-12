@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.01.
+# This code is part of Perl distribution HTML-FromMail version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package HTML::FromMail::Format::OODoc;{
-our $VERSION = '3.01';
+our $VERSION = '4.00';
 }
 
 use base 'HTML::FromMail::Format';
@@ -18,8 +18,9 @@ use base 'HTML::FromMail::Format';
 use strict;
 use warnings;
 
-use Carp;
-use OODoc::Template    ();
+use Log::Report 'html-frommail';
+
+use OODoc::Template ();
 
 #--------------------
 
@@ -35,25 +36,25 @@ sub expand($$$$)
 	# Lookup the method to be called.
 	my $method = 'html' . ucfirst($tag);
 	my $prod   = $args->{producer};
-
 	$prod->can($method) or return undef;
 
 	my %info  = (%$args, %$attrs, textref => $textref);
 	$prod->$method($args->{object}, \%info);
 }
 
+
 sub export($@)
-{	my ($self, %args) = @_;
+{	my ($self, $message, %args) = @_;
 
 	my $oodoc  = $self->{HFFM_oodoc} = OODoc::Template->new;
 
 	my $output = $args{output};
 	open my($out), ">", $output
-		or $self->log(ERROR => "Cannot write to $output: $!"), return;
+		or fault __x"cannot write to {out}";
 
 	my $input  = $args{input};
 	open my($in), "<", $input
-		or $self->log(ERROR => "Cannot open template file $input: $!"), return;
+		or fault __x"cannot open template file {in}", in => $input;
 
 	my $template = join '', <$in>;
 	close $in;

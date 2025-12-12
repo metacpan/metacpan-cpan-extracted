@@ -32,14 +32,16 @@ Maintain a folder which has its messages stored on a remote server.  The
 communication between the client application and the server is implemented
 using the IMAP4 protocol.  See also L<Mail::Server::IMAP4|Mail::Server::IMAP4>.
 
+B<Be aware:>
+This module versions 4.0 and up is not fully compatible with older releases:
+mainly the exception handling has changed.  When you need to upgrade, please
+read F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+B<Version 3 is still maintained> and may see new releases as well.
+
 This class uses L<Mail::Transport::IMAP4|Mail::Transport::IMAP4> to hide the transport of
 information, and focusses solely on the correct handling of messages
 within a IMAP4 folder.  More than one IMAP4 folder can be handled by
 one single IMAP4 connection.
-
-B<This is a maintenance release for the old interface>.  Read
-F<https://github.com/markov2/perl5-Mail-Box/wiki/> how
-to move towards version 4.
 
 Extends L<"DESCRIPTION" in Mail::Box::Net|Mail::Box::Net/"DESCRIPTION">.
 
@@ -109,7 +111,6 @@ Improves base, see L<Mail::Box/"Constructors">
   lock_type          Mail::Box        'NONE'
   lock_wait          Mail::Box        10 seconds
   locker             Mail::Box        undef
-  log                Mail::Reporter   'WARNINGS'
   manager            Mail::Box        undef
   message_type       Mail::Box        Mail::Box::IMAP4::Message
   multipart_type     Mail::Box        Mail::Message::Body::Multipart
@@ -118,7 +119,6 @@ Improves base, see L<Mail::Box/"Constructors">
   save_on_exit       Mail::Box        true
   server_name        Mail::Box::Net   undef
   server_port        Mail::Box::Net   143
-  trace              Mail::Reporter   'WARNINGS'
   transporter                         Mail::Transport::IMAP4
   trusted            Mail::Box        <false>
   username           Mail::Box::Net   undef
@@ -226,8 +226,6 @@ same server will try to reuse one connection.
 
 =item locker => OBJECT
 
-=item log => LEVEL
-
 =item manager => $manager
 
 =item message_type => CLASS
@@ -243,8 +241,6 @@ same server will try to reuse one connection.
 =item server_name => $host
 
 =item server_port => $number
-
-=item trace => LEVEL
 
 =item transporter => $object|$class
 
@@ -289,10 +285,6 @@ Inherited, see L<Mail::Box/"Attributes">
 =item $obj-E<gt>B<isTrusted>()
 
 Inherited, see L<Mail::Box/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -643,43 +635,7 @@ Extends L<"Error handling" in Mail::Box::Net|Mail::Box::Net/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -705,44 +661,53 @@ Extends L<"DETAILS" in Mail::Box::Net|Mail::Box::Net/"DETAILS">.
 
 =over 4
 
-=item Warning: Cannot find head back for $uidl in $folder.
+=item Warning: cannot find head back for $id in $folder.
 
 The header was read before, but now seems empty: the IMAP4 server does
 not produce the header lines anymore.
 Cast by C<getHeadAndBody()>
 
-=item Warning: Cannot read body for $uidl in $folder.
+=item Warning: cannot read body for $id in $folder.
 
 The header of the message was retrieved from the IMAP4 server, but the
 body is not read, for an unknown reason.
 Cast by C<getHeadAndBody()>
 
-=item Error: Copying failed for one message.
+=item Error: class $package does not implement method $method.
 
-For some reason, for instance disc full, removed by external process, or
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: copying failed for one message.
+
+For some reason, for instance disk full, removed by external process, or
 read-protection, it is impossible to copy one of the messages.  Copying will
 proceed for the other messages.
 Cast by C<copyTo()>
 
-=item Error: Couldn't select IMAP4 folder $name
+=item Error: couldn't select IMAP4 folder $name.
 
 Cast by C<transporter()>
 
-=item Error: Destination folder $name is not writable.
+=item Error: destination folder $name is not writable.
 
 The folder where the messages are copied to is not opened with write
 access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
 to the folder which is controlled by your operating system.
 Cast by C<copyTo()>
 
-=item Warning: Different messages with id $msgid
+=item Warning: different messages with id $msgid.
 
 The message id is discovered more than once within the same folder, but the
 content of the message seems to be different.  This should not be possible:
 each message must be unique.
 Cast by C<messageId()>
 
-=item Error: Folder $name not deleted: not writable.
+=item Warning: folder $name not deleted: not writable.
 
 The folder must be opened with write access via L<new(access)|Mail::Box/"Constructors">, otherwise
 removing it will be refused.  So, you may have write-access according to
@@ -750,31 +715,31 @@ the operating system, but that will not automatically mean that this
 C<delete> method permits you to.  The reverse remark is valid as well.
 Cast by C<delete()>
 
-=item Notice: Impossible to keep deleted messages in IMAP
+=item Notice: impossible to keep deleted messages in IMAP
 
 Some folder type have a 'deleted' flag which can be stored in the folder to
 be performed later.  The folder keeps that knowledge even when the folder
 is rewritten.  Well, IMAP4 cannot play that trick.
 Cast by C<write()>
 
-=item Error: Invalid timespan '$timespan' specified.
+=item Error: invalid timespan '$span'.
 
 The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
 Cast by C<timespan2seconds()>
 
-=item Warning: Message $uidl disappeared from $folder.
-
-Trying to get the specific message from the server, but it appears to be gone.
-Cast by C<getHead()>
-
-=item Warning: Message $uidl disappeared from $folder.
+=item Warning: message $id disappeared from $folder.
 
 Trying to get the specific message from the server, but it appears to be
 gone.
 Cast by C<getHeadAndBody()>
 
-=item Warning: Message-id '$msgid' does not contain a domain.
+=item Warning: message {id} disappeared from {folder}.
+
+Trying to get the specific message from the server, but it appears to be gone.
+Cast by C<getHead()>
+
+=item Warning: message-id '$msgid' does not contain a domain.
 
 According to the RFCs, message-ids need to contain a unique random part,
 then an C<@>, and then a domain name.  This is made to avoid the creation
@@ -782,31 +747,20 @@ of two messages with the same id.  The warning emerges when the C<@> is
 missing from the string.
 Cast by C<messageId()>
 
-=item Error: No IMAP4 transporter configured
+=item Error: no IMAP4 transporter configured.
 
 Cast by C<transporter()>
 
-=item Error: Package $package does not implement $method.
+=item Error: you cannot add a message which is already part of a folder to a new one.  Please use moveTo or copyTo.
 
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: Unable to create subfolder $name of $folder.
-
-The copy includes the subfolders, but for some reason it was not possible
-to copy one of these.  Copying will proceed for all other sub-folders.
-Cast by C<copyTo()>
+Cast by C<addMessage()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 3.010,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

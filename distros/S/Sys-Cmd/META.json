@@ -1,5 +1,5 @@
 {
-   "abstract" : "run a system command or spawn a system processes",
+   "abstract" : "Run a system command or spawn a process",
    "author" : [
       "Mark Lawrence <mark@rekudos.net>"
    ],
@@ -17,9 +17,6 @@
       "directory" : [
          "t",
          "inc"
-      ],
-      "package" : [
-         "Sys::Cmd::Process"
       ]
    },
    "prereqs" : {
@@ -70,6 +67,6 @@
          "url" : "ssh://git@github.com/mlawren/p5-Sys-Cmd.git"
       }
    },
-   "version" : "v0.986.0",
+   "version" : "v0.986.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

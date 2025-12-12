@@ -62,15 +62,15 @@ in the OPTION list.  Without a specific name, the organization is used as name.
 
 =item description => STRING
 
-=item hostname => DOMAIN
+=item hostname => $name
 
-The hostname of the described system.  It is preferred to use full
+The C<$name> of the described system.  It is preferred to use full
 system names, not abbreviations.  For instance, you can better use
 C<www.tux.aq> than C<www> to avoid confusion.
 
-=item location => NICKNAME|OBJECT
+=item location => $nick|OBJECT
 
-The NICKNAME of a location which is defined for the same user.  You can
+The C<$nick> of a location which is defined for the same user.  You can
 also specify a L<User::Identity::Location|User::Identity::Location> OBJECT.
 
 =item name => STRING
@@ -188,13 +188,7 @@ Inherited, see L<User::Identity::Item/"Searching">
 
 =over 4
 
-=item Error: $object is not a collection.
-
-The first argument is an object, but not of a class which extends
-L<User::Identity::Collection|User::Identity::Collection>.
-Cast by C<addCollection()>
-
-=item Error: Cannot load collection module for $type ($class).
+=item Error: cannot load collection module for $type ($class): $@
 
 Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
@@ -202,30 +196,21 @@ the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
 Cast by C<addCollection()>
 
-=item Error: Creation of a collection via $class failed.
-
-The C<$class> did compile, but it was not possible to create an object
-of that class using the options you specified.
-Cast by C<addCollection()>
-
-=item Error: Don't know what type of collection you want to add.
-
-If you add a collection, it must either by a collection object or a
-list of options which can be used to create a collection object.  In
-the latter case, the type of collection must be specified.
-Cast by C<addCollection()>
-
-=item Warning: No collection $name
+=item Error: nvalid collection $name.
 
 The collection with C<$name> does not exist and can not be created.
 Cast by C<add()>
+
+=item Error: this $object is not a collection.
+
+Cast by C<addCollection()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity version 3.00,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 4.00,
+built on December 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

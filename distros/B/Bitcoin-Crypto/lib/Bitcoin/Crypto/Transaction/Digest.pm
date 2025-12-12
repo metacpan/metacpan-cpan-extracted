@@ -1,34 +1,22 @@
 package Bitcoin::Crypto::Transaction::Digest;
-$Bitcoin::Crypto::Transaction::Digest::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Transaction::Digest::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -types;
+use Mooish::Base -standard;
 
 use Crypt::Digest::SHA256 qw(sha256);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
-use Bitcoin::Crypto::Util qw(hash256 pack_compactsize);
+use Bitcoin::Crypto::Util::Internal qw(hash256 pack_compactsize);
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Constants;
+use Bitcoin::Crypto::Constants qw(:sighash);
 use Bitcoin::Crypto::Transaction::Digest::Config;
 use Bitcoin::Crypto::Transaction::Digest::Result;
-use Bitcoin::Crypto::Transaction::Flags;
-
-use namespace::clean;
 
 has param 'transaction' => (
 	isa => InstanceOf ['Bitcoin::Crypto::Transaction'],
 	weak_ref => 1,
-);
-
-has param 'flags' => (
-	isa => InstanceOf ['Bitcoin::Crypto::Transaction::Flags'],
-	writer => 1,
-	lazy => sub { Bitcoin::Crypto::Transaction::Flags->new },
 );
 
 has field 'config' => (
@@ -56,18 +44,17 @@ has field '_cache' => (
 sub get_digest
 {
 	my ($self) = @_;
-	my $sign_no = $self->signing_index;
-	my $input = $self->transaction->inputs->[$sign_no];
+	my $input = $self->transaction->inputs->[$self->signing_index];
 
 	Bitcoin::Crypto::Exception::Transaction->raise(
-		"can't find input with index $sign_no"
-	) if !$input;
+		"can't find input with index " . $self->signing_index
+	) unless $input;
 
 	my $procedure = '_get_digest_default';
-	if ($self->flags->taproot && $input->is_taproot) {
+	if ($input->is_taproot) {
 		$procedure = '_get_digest_taproot';
 	}
-	elsif ($self->flags->segwit && $input->is_segwit) {
+	elsif ($input->is_segwit) {
 		$procedure = '_get_digest_segwit';
 	}
 
@@ -78,44 +65,58 @@ sub _get_digest_default
 {
 	my ($self) = @_;
 
-	$self->_default_sighash(Bitcoin::Crypto::Constants::sighash_all);
+	my $sighash = $self->_default_sighash(SIGHASH_ALL);
 
-	my $sighash_type = $self->sighash & 31;
-	my $anyonecanpay = $self->sighash & Bitcoin::Crypto::Constants::sighash_anyonecanpay;
+	my $sighash_type = $sighash & 31;
+	my $anyonecanpay = $sighash & SIGHASH_ANYONECANPAY;
 
 	my $transaction = $self->transaction;
 	my $tx_copy = $transaction->clone;
 
-	@{$tx_copy->inputs} = ();
-	foreach my $input (@{$transaction->inputs}) {
-		my $input_copy = $input->clone;
+	my $signing_index = $self->signing_index;
+	my $inputs = $transaction->inputs;
+	my $copy_inputs = $tx_copy->inputs;
+	@{$copy_inputs} = ();
 
-		$input_copy->set_signature_script('');
-		$tx_copy->add_input($input_copy);
-	}
+	foreach my $input_ind (keys @{$inputs}) {
 
-	my $this_input = $tx_copy->inputs->[$self->signing_index];
-	if ($self->signing_subscript) {
-		$this_input->set_signature_script($self->signing_subscript);
-	}
-	else {
-		Bitcoin::Crypto::Exception::Transaction->raise(
-			"can't guess the subscript from a non-standard transaction"
-		) unless $this_input->utxo->output->is_standard;
+		# no other inputs if anyonecanpay - skip cloning and all other work
+		next if $anyonecanpay && $input_ind != $signing_index;
 
-		$this_input->set_signature_script($this_input->script_base->to_serialized);
-	}
+		my $input = $inputs->[$input_ind]->clone;
 
-	# Handle sighashes
-	if ($sighash_type == Bitcoin::Crypto::Constants::sighash_none) {
-		@{$tx_copy->outputs} = ();
-		foreach my $input (@{$tx_copy->inputs}) {
-			$input->set_sequence_no(0)
-				unless $input == $this_input;
+		if ($input_ind == $signing_index) {
+			my $subscript = $self->signing_subscript;
+			if (!$subscript) {
+				Bitcoin::Crypto::Exception::Transaction->raise(
+					"can't guess the subscript from a non-standard transaction"
+				) unless $input->utxo->output->is_standard;
+
+				$subscript = $input->script_base;
+			}
+
+			$input->set_signature_script($subscript);
 		}
+		else {
+			$input->set_signature_script('');
+			$input->set_sequence_no(0)
+				if $sighash_type == SIGHASH_NONE
+				|| $sighash_type == SIGHASH_SINGLE;
+		}
+
+		push @{$copy_inputs}, $input;
 	}
-	elsif ($sighash_type == Bitcoin::Crypto::Constants::sighash_single) {
-		if ($self->signing_index >= @{$transaction->outputs}) {
+
+	# Handle output work for sighashes
+	if ($sighash_type == SIGHASH_NONE) {
+		@{$tx_copy->outputs} = ();
+	}
+	elsif ($sighash_type == SIGHASH_SINGLE) {
+		my $outputs = $transaction->outputs;
+		my $copy_outputs = $tx_copy->outputs;
+		@{$copy_outputs} = ();
+
+		if ($signing_index >= @{$outputs}) {
 
 			# this should verify with constant digest (without hashing)
 			return Bitcoin::Crypto::Transaction::Digest::Result->new(
@@ -123,29 +124,18 @@ sub _get_digest_default
 			);
 		}
 
-		@{$tx_copy->outputs} = ();
-		my @wanted_outputs = @{$transaction->outputs}[0 .. $self->signing_index - 1];
-		foreach my $output (@wanted_outputs) {
+		foreach my $output (@{$outputs}[0 .. $signing_index - 1]) {
 			my $output_copy = $output->clone;
 			$output_copy->set_locking_script('');
 			$output_copy->set_max_value;
-			$tx_copy->add_output($output_copy);
+			push @{$copy_outputs}, $output_copy;
 		}
 
-		$tx_copy->add_output($transaction->outputs->[$self->signing_index]);
-
-		foreach my $input (@{$tx_copy->inputs}) {
-			$input->set_sequence_no(0)
-				unless $input == $this_input;
-		}
-	}
-
-	if ($anyonecanpay) {
-		@{$tx_copy->inputs} = ($this_input);
+		push @{$copy_outputs}, $outputs->[$signing_index];
 	}
 
 	my $serialized = $tx_copy->to_serialized(witness => 0);
-	$serialized .= pack 'V', $self->sighash;
+	$serialized .= pack 'V', $sighash;
 
 	return Bitcoin::Crypto::Transaction::Digest::Result->new(preimage => $serialized);
 }
@@ -154,25 +144,25 @@ sub _get_digest_segwit
 {
 	my ($self) = @_;
 
-	$self->_default_sighash(Bitcoin::Crypto::Constants::sighash_all);
+	my $sighash = $self->_default_sighash(SIGHASH_ALL);
 
-	my $sighash_type = $self->sighash & 31;
-	my $anyonecanpay = $self->sighash & Bitcoin::Crypto::Constants::sighash_anyonecanpay;
+	my $sighash_type = $sighash & 31;
+	my $anyonecanpay = $sighash & SIGHASH_ANYONECANPAY;
 
-	my $transaction = $self->transaction->clone;
-	my $this_input = $transaction->inputs->[$self->signing_index]->clone;
-	$transaction->inputs->[$self->signing_index] = $this_input;
+	my $signing_index = $self->signing_index;
+	my $transaction = $self->transaction;
+	my @inputs = @{$transaction->inputs};
+	my $this_input = $inputs[$signing_index]->clone;
+	$inputs[$signing_index] = $this_input;
 
 	my $empty_hash = "\x00" x 32;
-	my $single = $sighash_type == Bitcoin::Crypto::Constants::sighash_single;
-	my $none = $sighash_type == Bitcoin::Crypto::Constants::sighash_none;
+	my $single = $sighash_type == SIGHASH_SINGLE;
+	my $none = $sighash_type == SIGHASH_NONE;
 
-	if ($self->signing_subscript) {
-
-		# NOTE: sets witness for proper behavior of _script_code in
-		# Bitcoin::Crypto::Transaction::Input for P2WSH
-		$this_input->set_witness([$self->signing_subscript]);
-	}
+	# NOTE: sets witness for proper behavior of _script_code in
+	# Bitcoin::Crypto::Transaction::Input for P2WSH
+	$this_input->set_witness([$self->signing_subscript])
+		if $self->signing_subscript;
 
 	# According to https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki
 	# Double SHA256 of the serialization of:
@@ -190,28 +180,16 @@ sub _get_digest_segwit
 	my $serialized = '';
 	$serialized .= pack 'V', $transaction->version;
 
-	my @prevouts;
-	my @sequences;
-	foreach my $input (@{$transaction->inputs}) {
-		push @prevouts, $input->prevout;
-		push @sequences, pack 'V', $input->sequence_no;
-	}
-
-	my @outputs;
-	foreach my $output (@{$transaction->outputs}) {
-		push @outputs, $output->to_serialized;
-	}
-
 	# handle prevouts
 	$serialized .= $anyonecanpay
 		? $empty_hash
-		: hash256(join '', @prevouts)
+		: hash256(join '', map { $_->prevout } @inputs)
 		;
 
 	# handle sequences
 	$serialized .= $anyonecanpay || $single || $none
 		? $empty_hash
-		: hash256(join '', @sequences)
+		: hash256(join '', map { pack 'V', $_->sequence_no } @inputs)
 		;
 
 	$serialized .= $this_input->prevout;
@@ -225,17 +203,16 @@ sub _get_digest_segwit
 
 	# handle outputs
 	if (!$single && !$none) {
-		$serialized .= hash256(join '', @outputs);
+		$serialized .= hash256(join '', map { $_->to_serialized } @{$transaction->outputs});
 	}
-	elsif ($single && $self->signing_index < @outputs) {
-		$serialized .= hash256($outputs[$self->signing_index]);
+	elsif ($single && $signing_index < @{$transaction->outputs}) {
+		$serialized .= hash256($transaction->outputs->[$signing_index]->to_serialized);
 	}
 	else {
 		$serialized .= $empty_hash;
 	}
 
-	$serialized .= pack 'V', $transaction->locktime;
-	$serialized .= pack 'V', $self->sighash;
+	$serialized .= pack 'VV', $transaction->locktime, $sighash;
 
 	return Bitcoin::Crypto::Transaction::Digest::Result->new(preimage => $serialized);
 }
@@ -244,25 +221,29 @@ sub _get_digest_taproot
 {
 	my ($self) = @_;
 
-	$self->_default_sighash(Bitcoin::Crypto::Constants::sighash_default);
+	my $sighash = $self->_default_sighash(SIGHASH_DEFAULT);
 
-	my $sighash_type = $self->sighash & 3;
-	my $anyonecanpay = $self->sighash & Bitcoin::Crypto::Constants::sighash_anyonecanpay;
+	my $sighash_type = $sighash & 3;
+	my $anyonecanpay = $sighash & SIGHASH_ANYONECANPAY;
 
-	my $transaction = $self->transaction->clone;
-	my $this_input = $transaction->inputs->[$self->signing_index]->clone;
-	$transaction->inputs->[$self->signing_index] = $this_input;
+	my $signing_index = $self->signing_index;
+	my $transaction = $self->transaction;
+	my $this_input = $transaction->inputs->[$signing_index];
 	my $annex = $self->taproot_annex;
 	my $ext_flag = $self->taproot_ext_flag;
 
-	my $all = $sighash_type == Bitcoin::Crypto::Constants::sighash_all
-		|| $sighash_type == Bitcoin::Crypto::Constants::sighash_default;
-	my $single = $sighash_type == Bitcoin::Crypto::Constants::sighash_single;
-	my $none = $sighash_type == Bitcoin::Crypto::Constants::sighash_none;
+	state $allowed_sighash = {
+		map { $_ => !!1 } (
+			SIGHASH_DEFAULT,
+			SIGHASH_ALL,
+			SIGHASH_SINGLE,
+			SIGHASH_NONE,
+		)
+	};
 
 	Bitcoin::Crypto::Exception::Transaction->raise(
 		"can't digest taproot transaction with unknown SIGHASH"
-	) unless $all || $single || $none;
+	) unless $allowed_sighash->{$sighash_type};
 
 	# According to https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki
 	# SHA256 of the serialization of:
@@ -289,11 +270,8 @@ sub _get_digest_taproot
 	# If hash_type & 3 equals SIGHASH_SINGLE:
 	# - sha_single_output (32): the SHA256 of the corresponding output in CTxOut format.
 
-	my $serialized = '';
-	$serialized .= "\x00";    # sighash epoch
-	$serialized .= pack 'C', $self->sighash;
-	$serialized .= pack 'V', $transaction->version;
-	$serialized .= pack 'V', $transaction->locktime;
+	# zero is sighash epoch
+	my $serialized = pack 'CCVV', 0, $sighash, $transaction->version, $transaction->locktime;
 
 	if (!$anyonecanpay) {
 		$serialized .= $self->_cache->{taproot_common_tx_data} //= do {
@@ -302,12 +280,13 @@ sub _get_digest_taproot
 			my @pubkeys;
 			my @sequences;
 			foreach my $input (@{$transaction->inputs}) {
-				push @prevouts, $input->prevout;
-				push @amounts, $input->utxo->output->value_serialized;
-				push @sequences, pack 'V', $input->sequence_no;
+				my $utxo_output = $input->utxo->output;
+				my $pubkey = $utxo_output->locking_script->to_serialized;
 
-				my $pubkey = $input->utxo->output->locking_script->to_serialized;
+				push @prevouts, $input->prevout;
+				push @amounts, $utxo_output->value_serialized;
 				push @pubkeys, pack_compactsize(length $pubkey) . $pubkey;
+				push @sequences, pack 'V', $input->sequence_no;
 			}
 
 			sha256(join '', @prevouts)
@@ -317,57 +296,47 @@ sub _get_digest_taproot
 		};
 	}
 
-	my $outputs = $self->_cache->{taproot_outputs} //= do {
-		my @outputs;
-		foreach my $output (@{$transaction->outputs}) {
-			my $tmp = $output->locking_script->to_serialized;
-			push @outputs, $output->to_serialized;
-		}
+	my $outputs = $self->_cache->{taproot_outputs} //= [
+		map { $_->to_serialized } @{$transaction->outputs}
+	];
 
-		\@outputs;
-	};
-
-	if (!$none && !$single) {
+	if ($sighash_type != SIGHASH_NONE && $sighash_type != SIGHASH_SINGLE) {
 		$serialized .= sha256(join '', @$outputs);
 	}
 
 	$serialized .= pack 'C', $ext_flag * 2 + defined $annex;
 
 	if ($anyonecanpay) {
-		$serialized .= $this_input->prevout;
-		$serialized .= $this_input->utxo->output->value_serialized;
+		my $utxo_output = $this_input->utxo->output;
+		my $pubkey = $utxo_output->locking_script->to_serialized;
 
-		my $pubkey = $this_input->utxo->output->locking_script->to_serialized;
-		$serialized .= pack_compactsize(length $pubkey) . $pubkey;
-
-		$serialized .= pack 'V', $this_input->sequence_no;
+		$serialized .= join '',
+			$this_input->prevout,
+			$utxo_output->value_serialized,
+			pack_compactsize(length $pubkey),
+			$pubkey,
+			pack 'V', $this_input->sequence_no;
 	}
 	else {
-		$serialized .= pack 'V', $self->signing_index;
+		$serialized .= pack 'V', $signing_index;
 	}
 
 	if (defined $annex) {
 		$serialized .= sha256(pack_compactsize(length $annex) . $annex);
 	}
 
-	if ($single && $self->signing_index < @$outputs) {
-		$serialized .= sha256($outputs->[$self->signing_index]);
-	}
-	elsif ($single) {
+	if ($sighash_type == SIGHASH_SINGLE) {
 		Bitcoin::Crypto::Exception::Transaction->raise(
 			"can't digest taproot transaction with SIGHASH_SINGLE without corresponding output"
-		);
+		) unless $signing_index < @$outputs;
+
+		$serialized .= sha256($outputs->[$self->signing_index]);
 	}
 
 	# BIP342 extension
 	if ($ext_flag == 1) {
-		my $ext = $self->taproot_ext;
-
-		Bitcoin::Crypto::Exception::Transaction->raise(
-			"missing taproot extension for ext_flag=1"
-		) unless defined $ext;
-
-		$serialized .= $ext;
+		$serialized .= $self->taproot_ext
+			// Bitcoin::Crypto::Exception::Transaction->raise('missing taproot extension for ext_flag=1');
 	}
 
 	return Bitcoin::Crypto::Transaction::Digest::Result->new(

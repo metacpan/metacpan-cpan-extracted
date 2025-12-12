@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-POP3 version 3.008.
+# This code is part of Perl distribution Mail-Box-POP3 version 4.000.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,16 +10,18 @@
 
 
 package Mail::Box::POP3::Test;{
-our $VERSION = '3.008';
+our $VERSION = '4.000';
 }
 
-use base 'Exporter';
+use parent 'Exporter';
 
 use strict;
 use warnings;
 
-use List::Util 'first';
-use File::Spec ();
+use Log::Report  'mail-box-pop3';
+
+use List::Util    qw/first/;
+use File::Spec    ();
 
 use Mail::Transport::POP3 ();
 
@@ -47,11 +49,11 @@ sub start_pop3_server($;$)
 	$perl = $1;
 	%ENV = ();
 
-	open my $server, "$perl $serverscript $popbox $setting|"
-		or die "Could not start POP3 server\n";
+	open my $server, "$perl $serverscript $popbox $setting |"
+		or fault __x"could not start POP3 test server";
 
 	my $line  = <$server>;
-	my $port  = $line =~ m/(\d+)/ ? $1 : die "Did not get port specification, but '$line'";
+	my $port  = $line =~ m/(\d+)/ ? $1 : error __x"did not get port specification, but '{text}'.", text => $line;
 
 	($server, $port);
 }

@@ -1,29 +1,26 @@
 package Bitcoin::Crypto::Script;
-$Bitcoin::Crypto::Script::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Script::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
+
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use Crypt::Digest::SHA256 qw(sha256);
-use Mooish::AttributeBuilder -standard;
 use Scalar::Util qw(blessed);
 use List::Util qw(any);
-use Types::Common -sigs, -types;
 use Carp qw(carp);
 
-use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Base58 qw(encode_base58check decode_base58check);
 use Bitcoin::Crypto::Bech32 qw(encode_segwit decode_segwit get_hrp);
-use Bitcoin::Crypto::Constants;
-use Bitcoin::Crypto::Util qw(hash160 hash256 get_address_type to_format);
+use Bitcoin::Crypto::Constants qw(:witness);
+use Bitcoin::Crypto::Util::Internal qw(hash160 hash256 get_address_type to_format);
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Script::Opcode;
 use Bitcoin::Crypto::Script::Runner;
+use Bitcoin::Crypto::Script::Compiler;
 use Bitcoin::Crypto::Script::Common;
 use Bitcoin::Crypto::Script::Recognition;
-
-use namespace::clean;
 
 has field '_serialized' => (
 	isa => ByteStr,
@@ -31,32 +28,38 @@ has field '_serialized' => (
 	default => '',
 );
 
-has field 'type' => (
-	isa => Maybe [ScriptType],
+has field '_recognition' => (
+	isa => InstanceOf ['Bitcoin::Crypto::Script::Recognition'],
 	lazy => 1,
+	clearer => -hidden,
+	handles => {
+		get_raw_address => 'address',
+		type => 'type',
+		segwit_version => 'segwit_version',
+	},
 );
 
-has field '_address' => (
-	isa => Maybe [ByteStr],
+has field '_compiler' => (
+	isa => InstanceOf ['Bitcoin::Crypto::Script::Compiler'],
 	lazy => 1,
+	clearer => -hidden,
+	handles => {
+		operations => 'operations',
+		has_errors => 'has_errors',
+		assert_valid => 'assert_valid',
+	},
 );
 
 with qw(Bitcoin::Crypto::Role::Network);
 
-sub _build_type
+sub _build_recognition
 {
-	my ($self) = @_;
-
-	my $rec = Bitcoin::Crypto::Script::Recognition->new(script => $self);
-	return $rec->get_type;
+	return Bitcoin::Crypto::Script::Recognition->check(shift);
 }
 
-sub _build_address
+sub _build_compiler
 {
-	my ($self) = @_;
-
-	my $rec = Bitcoin::Crypto::Script::Recognition->new(script => $self);
-	return $rec->get_address;
+	return Bitcoin::Crypto::Script::Compiler->compile(shift);
 }
 
 sub _build
@@ -198,24 +201,28 @@ sub BUILD
 	}
 }
 
-signature_for is_pushes_only => (
-	method => Object,
-	positional => [],
-);
-
 sub is_pushes_only
 {
 	my ($self) = @_;
 
 	foreach my $op (@{$self->operations}) {
-		return !!0 unless $op->[0]->pushes;
+		return !!0 if $op->[0]->non_push_opcode;
 	}
 
 	return !!1;
 }
 
+# same as add_raw, but does not clear the object - to avoid clearing it
+# multiple times per operation
+sub _add_raw
+{
+	my ($self, $bytes) = @_;
+
+	$self->_set_serialized($self->_serialized . $bytes);
+}
+
 signature_for add_raw => (
-	method => Object,
+	method => !!1,
 	positional => [ByteStr],
 );
 
@@ -223,12 +230,14 @@ sub add_raw
 {
 	my ($self, $bytes) = @_;
 
-	$self->_set_serialized($self->_serialized . $bytes);
+	$self->_add_raw($bytes);
+	$self->_clear_compiler;
+	$self->_clear_recognition;
 	return $self;
 }
 
 signature_for add_operation => (
-	method => Object,
+	method => !!1,
 	positional => [Str],
 );
 
@@ -248,7 +257,7 @@ sub add
 }
 
 signature_for push_bytes => (
-	method => Object,
+	method => !!1,
 	positional => [ByteStr],
 );
 
@@ -259,33 +268,37 @@ sub push_bytes
 	my $len = length $bytes;
 
 	if ($len == 0) {
-		$self->add_operation('OP_0');
+		return $self->add_operation('OP_0');
 	}
-	elsif ($len == 1 && ord($bytes) <= 0x10) {
-		$self->add_operation('OP_' . ord($bytes));
+	elsif ($len == 1) {
+		my $ord = ord($bytes);
+
+		if ($ord <= 0x10 && $ord != 0) {
+			return $self->add_operation("OP_$ord");
+		}
+		elsif ($ord == 0x81) {
+			return $self->add_operation('OP_1NEGATE');
+		}
 	}
-	elsif ($len <= 75) {
+
+	if ($len <= 75) {
 		$self
-			->add_raw(pack 'C', $len)
-			->add_raw($bytes);
+			->_add_raw(pack 'Ca*', $len, $bytes);
 	}
-	elsif ($len < (1 << 8)) {
+	elsif ($len <= 0xff) {
 		$self
 			->add_operation('OP_PUSHDATA1')
-			->add_raw(pack 'C', $len)
-			->add_raw($bytes);
+			->_add_raw(pack 'Ca*', $len, $bytes);
 	}
-	elsif ($len < (1 << 16)) {
+	elsif ($len <= 0xffff) {
 		$self
 			->add_operation('OP_PUSHDATA2')
-			->add_raw(pack 'v', $len)
-			->add_raw($bytes);
+			->_add_raw(pack 'va*', $len, $bytes);
 	}
-	elsif (Bitcoin::Crypto::Constants::is_32bit || $len < (1 << 32)) {
+	elsif ($len <= 0xffffffff) {
 		$self
 			->add_operation('OP_PUSHDATA4')
-			->add_raw(pack 'V', $len)
-			->add_raw($bytes);
+			->_add_raw(pack 'Va*', $len, $bytes);
 	}
 	else {
 		Bitcoin::Crypto::Exception::ScriptPush->raise(
@@ -297,7 +310,7 @@ sub push_bytes
 }
 
 signature_for push_number => (
-	method => Object,
+	method => !!1,
 	positional => [Int | Str | InstanceOf ['Math::BigInt']],
 );
 
@@ -315,58 +328,28 @@ sub push
 
 # this can only detect native segwit in this context, as P2SH outputs are
 # indistinguishable from any other P2SH
-signature_for is_native_segwit => (
-	method => Object,
-	positional => [],
-);
-
 sub is_native_segwit
 {
-	my ($self) = @_;
-	my @segwit_types = qw(P2WPKH P2WSH P2TR);
-
-	my $script_type = $self->type // '';
-
-	return any { $script_type eq $_ } @segwit_types;
+	return defined shift->segwit_version;
 }
-
-signature_for is_taproot => (
-	method => Object,
-	positional => [],
-);
 
 sub is_taproot
 {
-	my ($self) = @_;
-
-	return ($self->type // '') eq 'P2TR';
+	return (shift->type // '') eq 'P2TR';
 }
-
-signature_for get_hash => (
-	method => Object,
-	positional => [],
-);
 
 sub get_hash
 {
-	my ($self) = @_;
-	return hash160($self->_serialized);
+	return hash160(shift->_serialized);
 }
-
-signature_for to_serialized => (
-	method => Object,
-	positional => [],
-);
 
 sub to_serialized
 {
-	my ($self) = @_;
-
-	return $self->_serialized;
+	goto \&_serialized;
 }
 
 signature_for from_serialized => (
-	method => Str,
+	method => !!1,
 	positional => [ByteStr],
 );
 
@@ -374,11 +357,13 @@ sub from_serialized
 {
 	my ($class, $bytes) = @_;
 
-	return $class->new->add_raw($bytes);
+	my $self = $class->new;
+	$self->_set_serialized($bytes);
+	return $self;
 }
 
 signature_for from_standard => (
-	method => Str,
+	method => !!1,
 	positional => [ScriptDesc, {slurpy => !!1}],
 );
 
@@ -396,22 +381,8 @@ sub from_standard
 	);
 }
 
-signature_for operations => (
-	method => Object,
-	positional => [],
-);
-
-sub operations
-{
-	my ($self) = @_;
-
-	my $runner = Bitcoin::Crypto::Script::Runner->new();
-	$runner->start($self);
-	return $runner->operations;
-}
-
 signature_for run => (
-	method => Object,
+	method => !!1,
 	positional => [ArrayRef [ByteStr], {default => []}],
 );
 
@@ -423,38 +394,23 @@ sub run
 	return $runner->execute($self, $initial_stack);
 }
 
-signature_for witness_program => (
-	method => Object,
-	positional => [],
-);
-
 sub witness_program
 {
 	my ($self) = @_;
 
 	my $program = Bitcoin::Crypto::Script->new(network => $self->network);
 	$program
-		->add_operation('OP_' . Bitcoin::Crypto::Constants::segwit_witness_version)
+		->add_operation('OP_' . SEGWIT_WITNESS_VERSION)
 		->push_bytes(sha256($self->to_serialized));
 
 	return $program;
 }
-
-signature_for get_legacy_address => (
-	method => Object,
-	positional => [],
-);
 
 sub get_legacy_address
 {
 	my ($self) = @_;
 	return encode_base58check($self->network->p2sh_byte . $self->get_hash);
 }
-
-signature_for get_compat_address => (
-	method => Object,
-	positional => [],
-);
 
 sub get_compat_address
 {
@@ -468,11 +424,6 @@ sub get_compat_address
 	return $self->witness_program->get_legacy_address;
 }
 
-signature_for get_segwit_address => (
-	method => Object,
-	positional => [],
-);
-
 sub get_segwit_address
 {
 	my ($self) = @_;
@@ -485,15 +436,10 @@ sub get_segwit_address
 	return encode_segwit($self->network->segwit_hrp, $self->witness_program->run->stack_serialized);
 }
 
-signature_for get_address => (
-	method => Object,
-	positional => [],
-);
-
 sub get_address
 {
 	my ($self) = @_;
-	my $address = $self->_address;
+	my $address = $self->get_raw_address;
 
 	return undef
 		unless $self->has_type && defined $address;
@@ -507,8 +453,8 @@ sub get_address
 
 		my $version = pack 'C',
 			$self->is_taproot
-			? Bitcoin::Crypto::Constants::taproot_witness_version
-			: Bitcoin::Crypto::Constants::segwit_witness_version;
+			? TAPROOT_WITNESS_VERSION
+			: SEGWIT_WITNESS_VERSION;
 
 		return encode_segwit($self->network->segwit_hrp, $version . $address);
 	}
@@ -523,22 +469,12 @@ sub get_address
 	}
 }
 
-signature_for has_type => (
-	method => Object,
-	positional => [],
-);
-
 sub has_type
 {
 	my ($self) = @_;
 
 	return defined $self->type;
 }
-
-signature_for is_empty => (
-	method => Object,
-	positional => [],
-);
 
 sub is_empty
 {
@@ -547,23 +483,22 @@ sub is_empty
 	return length $self->_serialized == 0;
 }
 
-signature_for dump => (
-	method => Object,
-	positional => [],
-);
-
 sub dump
 {
 	my ($self) = @_;
 
 	my $ops = $self->operations;
 	my $num = @$ops;
+
+	return 'Empty script' unless $num;
+
 	my $type = $self->type // 'Custom';
+	my $errors = $self->has_errors ? ' (with errors)' : '';
 
 	my @result;
-	CORE::push @result, "$type script, $num ops:";
+	CORE::push @result, "$type script$errors, $num ops:";
 	foreach my $op (@$ops) {
-		CORE::push @result, $op->[0]->name . ': ' . to_format [hex => $op->[1]];
+		CORE::push @result, '  ' . $op->opcode->name . ' (' . (to_format [hex => $op->raw_data]) . ')';
 	}
 
 	return join "\n", @result;
@@ -758,13 +693,48 @@ is not of standard type or the type does not use addresses, returns C<undef>.
 
 Currently handles script of types C<P2PKH>, C<P2SH>, C<P2WPKH>, C<P2WSH>, C<P2TR>.
 
+=head3 get_raw_address
+
+	$raw_address = $object->get_raw_address()
+
+Same as L</get_address>, but does not encode the address with base58 / bech32,
+and does not add any network markers specific for this type of address. Can be
+used to fetch the data encoded in a standard script type, for example output
+xonly public key for C<P2TR>.
+
 =head3 operations
 
 	$ops_aref = $object->operations
 
-Returns an array reference of operations contained in a script. It is the same
-as getting L<Bitcoin::Crypto::Script::Runner/operations> after calling
-C<compile>.
+Returns an array reference - An array of operations to be executed. Same as
+L<Bitcoin::Crypto::Script::Runner/operations>, which is only filled after
+starting the script.
+
+Returned operations are of type L<Bitcoin::Crypto::Script::Compiler::Opcode>.
+
+Note that operations are returned even for invalid scripts. See L</has_errors>
+and L</assert_valid>.
+
+=head3 has_errors
+
+	$bool = $object->has_errors()
+
+Returns a true value if the script is syntax is invalid - has pushes past end
+of the script, opcode errors like unclosed OP_IFs, or opcodes that make it
+invalid on compilation like OP_VERIF.
+
+Note that having errors may not be a good indicator whether the script is
+correct, since it may be unconditionally valid due to OP_SUCCESS (in
+tapscripts). Script can have errors and still be valid because of that. See
+L</assert_valid>.
+
+=head3 assert_valid
+
+	$object->assert_valid
+
+Checks if the script is valid - either it has no errors, or it is marked an
+unconditionally valid. If the script is not valid, the first error will be
+raised as exception. If the script is valid, returns nothing.
 
 =head3 run
 
@@ -799,32 +769,6 @@ Returns true if the script contains only opcodes pushing to the stack.
 	$string = $object->dump
 
 Returns a readable representation of the script
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * ScriptOpcode - unknown opcode was specified
-
-=item * ScriptPush - data pushed to the execution stack is invalid
-
-=item * ScriptType - invalid standard script type name specified
-
-=item * ScriptSyntax - script syntax is invalid
-
-=item * ScriptRuntime - script runtime error
-
-=item * SegwitProgram - Segregated witness address error
-
-=item * NetworkConfig - incomplete or corrupted network configuration
-
-=item * NetworkCheck - address does not belong to the configured network
-
-=back
 
 =head1 SEE ALSO
 

@@ -32,26 +32,36 @@ use v5.42;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
+use Mojo::Util qw { camelize };
 use Data::Dumper;
 use Daje::Document::Builder;
 
 
 sub generate_sql($self) {
-
-    # $self->model->insert_history(
-    #     "New project",
-    #     "Daje::Workflow::Activity::Tools::Generate::SQL::generate_sql",
-    #     1
-    # );
+    my @data;
+     $self->model->insert_history(
+         "Generate SQL",
+         "Daje::Workflow::Activity::Tools::Generate::SQL::generate_sql",
+         1
+     );
 
     try {
-        my $tools_projects_pkey = $self->context->{context}->{payload}->{tools_projects_pkey};
+        my $tools_projects_pkey = $self->context->{context}->{payload}->{tools_projects_fkey};
         if ($self->load_generate_data($tools_projects_pkey)) {
-            $self->build_documents($tools_projects_pkey);
+            my $documents = $self->build_documents($tools_projects_pkey);
+            my $length = scalar @{$documents};
+            for (my $i = 0; $i < $length; $i++) {
+                my $data->{data} = @{$documents}[$i]->{document};
+                my $filename = $self->get_parameter('Sql', 'Output file name', $tools_projects_pkey);
+                $data->{file} = $self->get_parameter('Sql', 'Output Path', $tools_projects_pkey) . '/' . $filename;
+                $data->{path} = 1;
+                push(@data, $data);
+            }
+            $self->context->{context}->{payload}->{sql} = \@data;
         }
     } catch ($e) {
         say $e
-        #$self->error->add_error($e);
+        $self->error->add_error($e);
     };
 }
 
@@ -66,12 +76,10 @@ sub build_documents ($self, $tools_projects_pkey) {
     );
 
     my $data = $self->versions();
-    say Dumper($data);
 
     $builder->process();
 
-    my $documents = $builder->output();
-    my $test = 1;
+    return $builder->output();
 }
 
 

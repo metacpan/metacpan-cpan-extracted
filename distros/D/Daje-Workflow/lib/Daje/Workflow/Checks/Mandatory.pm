@@ -1,5 +1,6 @@
 package Daje::Workflow::Checks::Mandatory;
 use Mojo::Base 'Daje::Workflow::Common::Checks::Base', -base, -signatures;
+use v5.42;
 
 # NAME
 # ====
@@ -52,6 +53,7 @@ sub check($self) {
 }
 
 1;
+
 
 
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Replace::MailInternet;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message';
+use parent 'Mail::Message';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x error/ ];
 
 use Mail::Box::FastScalar        ();
 use Mail::Box::Parser::Perl      ();
@@ -41,8 +43,7 @@ sub init($)
 	$args->{head_type} ||= 'Mail::Message::Replace::MailHeader';
 	$args->{head}      ||= $args->{Header};
 	$args->{body}      ||= $args->{Body};
-
-	defined $self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
 	$self->{MI_wrap}      = $args->{FoldLength} || 79;
 	$self->{MI_mail_from} = $args->{MailFrom};
@@ -68,8 +69,7 @@ sub processRawData($$$)
 		$lines    = [ $data->getlines ];
 	}
 	else
-	{	$self->log(ERROR=> "Mail::Internet does not support this kind of data");
-		return undef;
+	{	error __x"Mail::Internet does not support {what UNKNOWN} data.", what => $data;
 	}
 
 	@$lines or return;
@@ -216,7 +216,7 @@ sub send($@)
 sub head(;$)
 {	my $self = shift;
 	return $self->SUPER::head(@_) if @_;
-	$self->SUPER::head || $self->{MM_head_type}->new(message => $self);
+	$self->SUPER::head // $self->{MM_head_type}->new(message => $self);
 }
 
 
@@ -262,7 +262,7 @@ sub body(@)
 
 	unless(@_)
 	{	my $body = $self->body;
-		return defined $body ? scalar($body->lines) : [];
+		return defined $body ? (scalar $body->lines) : [];
 	}
 
 	my $data = ref $_[0] eq 'ARRAY' ? shift : \@_;
@@ -280,9 +280,8 @@ sub bodyObject(;$) { shift->SUPER::body(@_) }
 
 
 sub remove_sig(;$)
-{	my $self  = shift;
-	my $lines = shift || 10;
-	my $stripped = $self->decoded->stripSignature(max_lines => $lines);
+{	my ($self, $lines) = @_;
+	my $stripped = $self->decoded->stripSignature(max_lines => $lines // 10);
 	$self->body($stripped) if defined $stripped;
 	$stripped;
 }
@@ -350,6 +349,6 @@ sub isa($)
 
 #--------------------
 
-sub coerce() { confess }
+sub coerce() { $_[0]->notImplemented }
 
 1;

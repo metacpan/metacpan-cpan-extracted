@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Thread::Node;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Reporter';
@@ -18,7 +18,8 @@ use parent 'Mail::Reporter';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error/ ];
+
 use List::Util  qw/first/;
 
 #--------------------
@@ -39,7 +40,7 @@ sub init($)
 	{	$self->{MBTN_msgid} = $msgid;
 	}
 	else
-	{	croak "Need to specify message or message-id";
+	{	error __x"thread node needs a message object or msgid.";
 	}
 
 	$self->{MBTN_dummy_type} = $args->{dummy_type};
@@ -144,7 +145,7 @@ sub follows($$)
 
 sub followedBy(@)
 {	my $self = shift;
-	$self->{MBTN_followUps}{$_->messageId} = $_ foreach @_;
+	$self->{MBTN_followUps}{$_->messageId} = $_ for @_;
 	$self;
 }
 
@@ -168,7 +169,7 @@ sub sortedFollowUps()
 
 sub threadToString(;$$$)   # two undocumented parameters for layout args
 {	my $self    = shift;
-	my $code    = shift || sub {shift->head->study('subject')};
+	my $code    = shift || sub { $_[0]->head->study('subject') };
 	my ($first, $other) = (shift || '', shift || '');
 	my $message = $self->message;
 	my @follows = $self->sortedFollowUps;

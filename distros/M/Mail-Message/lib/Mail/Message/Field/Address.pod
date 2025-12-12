@@ -220,7 +220,7 @@ this method in string context.
 
 =over 4
 
-=item Error: Cannot coerce a $type into a Mail::Message::Field::Address
+=item Error: cannot coerce a $type into a $class
 
 When addresses are specified to be included in header fields, they may
 be coerced into L<Mail::Message::Field::Address|Mail::Message::Field::Address> objects first.  What
@@ -249,8 +249,8 @@ Cast by C<addCollection()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

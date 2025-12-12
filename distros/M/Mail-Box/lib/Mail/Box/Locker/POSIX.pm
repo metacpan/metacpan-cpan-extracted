@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Locker::POSIX;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Locker';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x error fault warning/ ];
 
 use Fcntl   qw/F_WRLCK F_UNLCK F_SETLK/;
 use Errno   qw/EAGAIN/;
@@ -57,17 +59,13 @@ sub _unlock($)
 sub lock()
 {	my $self   = shift;
 
-	if($self->hasLock)
-	{	my $folder = $self->folder;
-		$self->log(WARNING => "Folder $folder already lockf'd");
-		return 1;
-	}
+	$self->hasLock
+		and warning(__x"folder {name} already lockf'd.", name => $self->folder), return 1;
 
 	my $file     = $self->filename;
-	my $folder   = $self->folder;
 
 	open my $fh, '+<:raw', $file
-		or $self->log(ERROR => "Unable to open POSIX lock file $file for $folder: $!"), return 0;
+		or fault __x"unable to open POSIX lock file {file} for {folder}", file => $file, $self->folder;
 
 	my $timeout  = $self->timeout;
 	my $end      = $timeout eq 'NOTIMEOUT' ? -1 : $timeout;
@@ -79,7 +77,7 @@ sub lock()
 		}
 
 		$!==EAGAIN
-			or $self->log(ERROR => "Will never get a POSIX lock on $file for $folder: $!"), return 0;
+			or fault __x"will never get a POSIX lock on {file} for {folder}", file => $file, folder => $self->folder;
 
 		--$end or last;
 		sleep 1;
@@ -93,12 +91,8 @@ sub isLocked()
 {	my $self = shift;
 	my $file = $self->filename;
 
-	open my $fh, '<:raw', $file;
-	unless($fh)
-	{	my $folder = $self->folder;
-		$self->log(ERROR => "Unable to check lock file $file for $folder: $!");
-		return 0;
-	}
+	open my $fh, '<:raw', $file
+		or fault __x"unable to check lock file {file} for {folder}", file => $file, folder => $self->folder;
 
 	$self->_try_lock($fh)==0 or return 0;
 	$self->_unlock($fh);

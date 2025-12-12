@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Box::Maildir::Message;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Dir::Message';
 
 use strict;
 use warnings;
+
+use Log::Report      'mail-box', import => [ qw/__x fault info trace/ ];
 
 use File::Copy              qw/move/;
 use File::Spec::Functions   qw/catfile/;
@@ -32,7 +34,8 @@ sub filename(;$)
 	! defined $oldname || $oldname ne $newname
 		or return $newname;
 
-	my ($id, $semantics, $flags) = $newname =~ m!(.*?)(?:\:([12])\,([A-Za-z]*))!  ? ($1, $2, $3) : ($newname, '','');
+	my ($id, $semantics, $flags) =
+		$newname =~ m!(.*?)(?:\:([12])\,([A-Za-z]*))! ? ($1, $2, $3) : ($newname, '', '');
 
 	my %flags;
 	$flags{$_}++ for split //, $flags;
@@ -49,10 +52,12 @@ sub filename(;$)
 	);
 
 	! defined $oldname || move $oldname, $newname
-		or $self->log(ERROR => "Cannot move $oldname to $newname: $!"), return undef;
+		or fault __x"cannot rename file {from} to {to}", from => $oldname, to => $newname;
 
 	$self->SUPER::filename($newname);
 }
+
+#--------------------
 
 
 sub guessTimestamp()
@@ -102,9 +107,9 @@ sub labelsToFilename()
 
 	if($new ne $old)
 	{	move $old, $new
-			or $self->log(ERROR => "Cannot rename $old to $new: $!"), return;
+			or fault __x"cannot rename file {from} to {to}", from => $old, to => $new;
 
-		$self->log(PROGRESS => "Moved $old to $new.");
+		trace "Moved $old to $new.";
 		$self->SUPER::filename($new);
 	}
 

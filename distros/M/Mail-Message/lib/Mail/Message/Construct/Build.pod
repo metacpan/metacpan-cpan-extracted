@@ -306,7 +306,7 @@ the right type.
 
 =over 4
 
-=item Error: Only build() Mail::Message's; they are not in a folder yet
+=item Error: only build() Mail::Message's; they are not in a folder yet.
 
 You may wish to construct a message to be stored in a some kind
 of folder, but you need to do that in two steps.  First, create a
@@ -315,12 +315,16 @@ L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get 
 into the right message type, adding storage information and the like.
 Cast by C<build()>
 
+=item Warning: skipped unknown key '$key' in build.
+
+Cast by C<build()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

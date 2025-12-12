@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 3.012.
+# This code is part of Perl distribution Mail-Box version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Search::Grep;{
-our $VERSION = '3.012';
+our $VERSION = '4.00';
 }
 
 use parent 'Mail::Box::Search';
@@ -18,7 +18,7 @@ use parent 'Mail::Box::Search';
 use strict;
 use warnings;
 
-use Carp;
+use Log::Report      'mail-box', import => [ qw/__x error info/ ];
 
 #--------------------
 
@@ -33,7 +33,7 @@ sub init($)
 	  : ref $deliver eq 'CODE'  ? $deliver
 	  : $deliver eq 'PRINT'     ? sub { $_[0]->printMatch($_[1]) }
 	  : ref $deliver eq 'ARRAY' ? sub { push @$deliver, $_[1] }
-	  :   $deliver;
+	  :    $deliver;
 
 	$self->SUPER::init($args);
 
@@ -43,16 +43,16 @@ sub init($)
 	  : !ref $take             ? do {$take = lc $take; sub { $_[1] eq $take }}
 	  :  ref $take eq 'Regexp' ? sub { $_[1] =~ $take }
 	  :  ref $take eq 'CODE'   ? $take
-	  :    croak "illegal field selector $take";
+	  :     error __x"unsupported field selector {take UNKNOWN}.", take => $take;
 
 	my $match = $args->{match}
-		or croak "no match pattern specified";
+		or error __x"grep requires a match pattern.";
 
 	$self->{MBSG_match_check}
 	= !ref $match             ? sub { index("$_[1]", $match) >= $[ }
 	:  ref $match eq 'Regexp' ? sub { "$_[1]" =~ $match }
 	:  ref $match eq 'CODE'   ? $match
-	:    croak "illegal match pattern $match";
+	:     error __x"unsupported match pattern {match UNKNOWN}.", match => $match;
 
 	$self;
 }

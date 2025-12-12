@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 3.020.
+# This code is part of Perl distribution Mail-Message version 4.00.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,15 @@
 
 
 package Mail::Message::Field::Unstructured;{
-our $VERSION = '3.020';
+our $VERSION = '4.00';
 }
 
-use base 'Mail::Message::Field::Full';
+use parent 'Mail::Message::Field::Full';
 
 use strict;
 use warnings;
+
+use Log::Report   'mail-message', import => [ qw/__x warning/ ];
 
 #--------------------
 
@@ -27,14 +29,10 @@ sub init($)
 	{	$args->{body} = $self->encode($args->{body}, %$args);
 	}
 
-	$self->SUPER::init($args) or return;
+	$self->SUPER::init($args);
 
-	! defined $args->{attributes}
-		or $self->log(WARNING => "Attributes are not supported for unstructured fields");
-
-	! defined $args->{extra}
-		or $self->log(WARNING => "No extras for unstructured fields");
-
+	! defined $args->{attributes} or warning __x"attributes are not supported for unstructured fields.";
+	! defined $args->{extra}      or warning __x"no extras for unstructured fields.";
 	$self;
 }
 

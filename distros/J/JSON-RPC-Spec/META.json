@@ -67,7 +67,7 @@
    "provides" : {
       "JSON::RPC::Spec" : {
          "file" : "lib/JSON/RPC/Spec.pm",
-         "version" : "v1.1.2"
+         "version" : "v1.2.0"
       },
       "JSON::RPC::Spec::Client" : {
          "file" : "lib/JSON/RPC/Spec/Client.pm"
@@ -91,7 +91,7 @@
          "web" : "https://github.com/nqounet/p5-json-rpc-spec"
       }
    },
-   "version" : "v1.1.2",
+   "version" : "v1.2.0",
    "x_authority" : "cpan:NQOUNET",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

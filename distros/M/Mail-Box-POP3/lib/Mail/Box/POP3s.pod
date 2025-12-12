@@ -77,7 +77,6 @@ Inherited, see L<Mail::Box::POP3/"METHODS">
   lock_type          Mail::Box        'NONE'
   lock_wait          Mail::Box        10 seconds
   locker             Mail::Box        undef
-  log                Mail::Reporter   'WARNINGS'
   manager            Mail::Box        undef
   message_type       Mail::Box        Mail::Box::POP3::Message
   multipart_type     Mail::Box        Mail::Message::Body::Multipart
@@ -87,10 +86,9 @@ Inherited, see L<Mail::Box::POP3/"METHODS">
   save_on_exit       Mail::Box        true
   server_name        Mail::Box::Net   undef
   server_port        Mail::Box::Net   995
-  ssl_options        Mail::Box::POP3  <C<undef>>
-  trace              Mail::Reporter   'WARNINGS'
+  ssl_options        Mail::Box::POP3  undef
   trusted            Mail::Box        <false>
-  use_ssl            Mail::Box::POP3  <C<false>>
+  use_ssl            Mail::Box::POP3  false
   username           Mail::Box::Net   undef
 
 =over 2
@@ -133,8 +131,6 @@ Inherited, see L<Mail::Box::POP3/"METHODS">
 
 =item locker => OBJECT
 
-=item log => LEVEL
-
 =item manager => $manager
 
 =item message_type => CLASS
@@ -154,8 +150,6 @@ Inherited, see L<Mail::Box::POP3/"METHODS">
 =item server_port => $number
 
 =item ssl_options => HASH
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -184,10 +178,6 @@ Inherited, see L<Mail::Box/"Attributes">
 =item $obj-E<gt>B<isTrusted>()
 
 Inherited, see L<Mail::Box/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -445,43 +435,7 @@ Extends L<"Error handling" in Mail::Box::POP3|Mail::Box::POP3/"Error handling">.
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -526,46 +480,11 @@ to be lost.  Did the message get destroyed between reading the header
 and reading the body?
 Cast by C<getHeadAndBody()>
 
-=item Warning: Changes not written to read-only folder $self.
-
-You have opened the folder read-only --which is the default set
-by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
-Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mode, or close
-the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
-Cast by C<close()>
-
-=item Error: Copying failed for one message.
-
-For some reason, for instance disc full, removed by external process, or
-read-protection, it is impossible to copy one of the messages.  Copying will
-proceed for the other messages.
-Cast by C<copyTo()>
-
-=item Error: Destination folder $name is not writable.
-
-The folder where the messages are copied to is not opened with write
-access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
-to the folder which is controlled by your operating system.
-Cast by C<copyTo()>
-
-=item Warning: Different messages with id $msgid
-
-The message id is discovered more than once within the same folder, but the
-content of the message seems to be different.  This should not be possible:
-each message must be unique.
-Cast by C<messageId()>
-
 =item Error: Folder $name is opened read-only
 
 You can not write to this folder unless you have opened the folder to
 write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set C<true>.
 Cast by C<write()>
-
-=item Error: Invalid timespan '$timespan' specified.
-
-The string does not follow the strict rules of the time span syntax which
-is permitted as parameter.
-Cast by C<timespan2seconds()>
 
 =item Warning: Message $uidl on POP3 server $name disappeared.
 
@@ -573,47 +492,17 @@ The server indicated the existence of this message before, however it
 has no information about the message anymore.
 Cast by C<getHeadAndBody()>
 
-=item Warning: Message-id '$msgid' does not contain a domain.
-
-According to the RFCs, message-ids need to contain a unique random part,
-then an C<@>, and then a domain name.  This is made to avoid the creation
-of two messages with the same id.  The warning emerges when the C<@> is
-missing from the string.
-Cast by C<messageId()>
-
 =item Warning: POP3 folders cannot be deleted.
 
 Each user has only one POP3 folder on a server.  This folder is created and
 deleted by the server's administrator only.
 Cast by C<delete()>
 
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
-implement this method where it should. This message means that some other
-related classes do implement this method however the class at hand does
-not.  Probably you should investigate this and probably inform the author
-of the package.
-Cast by C<notImplemented()>
-
-=item Error: Unable to create subfolder $name of $folder.
-
-The copy includes the subfolders, but for some reason it was not possible
-to copy one of these.  Copying will proceed for all other sub-folders.
-Cast by C<copyTo()>
-
 =item Error: Update of $nr messages ignored for POP3 folder $name.
 
 The standard POP3 implementation does not support writing from client back
 to the server.  Therefore, modifications may be lost.
 Cast by C<writeMessages()>
-
-=item Error: Writing folder $name failed
-
-For some reason (you probably got more error messages about this problem)
-it is impossible to write the folder, although you should because there
-were changes made.
-Cast by C<write()>
 
 =item Error: You cannot write a message to a pop server (yet)
 
@@ -622,12 +511,68 @@ but the standard protocol only implements retreival.  Feel invited to extend our
 implementation with writing.
 Cast by C<addMessage()>
 
+=item Warning: changes not written to read-only folder $name.
+
+You have opened the folder read-only --which is the default set
+by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
+Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mode, or close
+the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
+Cast by C<close()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+Cast by C<notImplemented()>
+
+=item Error: copying failed for one message.
+
+For some reason, for instance disk full, removed by external process, or
+read-protection, it is impossible to copy one of the messages.  Copying will
+proceed for the other messages.
+Cast by C<copyTo()>
+
+=item Error: destination folder $name is not writable.
+
+The folder where the messages are copied to is not opened with write
+access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
+to the folder which is controlled by your operating system.
+Cast by C<copyTo()>
+
+=item Warning: different messages with id $msgid.
+
+The message id is discovered more than once within the same folder, but the
+content of the message seems to be different.  This should not be possible:
+each message must be unique.
+Cast by C<messageId()>
+
+=item Error: invalid timespan '$span'.
+
+The string does not follow the strict rules of the time span syntax which
+is permitted as parameter.
+Cast by C<timespan2seconds()>
+
+=item Warning: message-id '$msgid' does not contain a domain.
+
+According to the RFCs, message-ids need to contain a unique random part,
+then an C<@>, and then a domain name.  This is made to avoid the creation
+of two messages with the same id.  The warning emerges when the C<@> is
+missing from the string.
+Cast by C<messageId()>
+
+=item Error: unknown value to folder->close(write => $when).
+
+Cast by C<close()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 version 3.008,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

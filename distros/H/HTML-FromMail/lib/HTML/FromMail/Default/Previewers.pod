@@ -121,10 +121,32 @@ Produce a small preview of the text, where all wrappig is removed.
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Image::Magick not installed.
+
+Cast by C<previewImage()>
+
+=item Error: cannot read image from $fn: $error
+
+Cast by C<previewImage()>
+
+=item Error: cannot resize image from $fn: $error
+
+Cast by C<previewImage()>
+
+=item Error: cannot write smaller image from $fn to $out: $error
+
+Cast by C<previewImage()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.01,
-built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

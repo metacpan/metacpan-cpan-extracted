@@ -124,9 +124,6 @@ lib/Mail/Message/TransferEnc/SevenBit.pod
 lib/Mail/Reporter.pm
 lib/Mail/Reporter.pod
 t/001use.t
-t/010reporter-errors.t
-t/011reporter-reports.t
-t/012reporter-callback.t
 t/100field-cfws.t
 t/101field-fast.t
 t/102field-flex.t

@@ -1,22 +1,18 @@
 package Bitcoin::Crypto::Key::NUMS;
-$Bitcoin::Crypto::Key::NUMS::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Key::NUMS::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Common -sigs, -types;
+use Mooish::Base -standard;
+use Types::Common -sigs;
 use Crypt::PRNG qw(random_bytes);
 use Crypt::Digest::SHA256 qw(sha256);
 
 use Bitcoin::Crypto qw(btc_pub);
 use Bitcoin::Crypto::Types -types;
-use Bitcoin::Crypto::Util qw(lift_x);
+use Bitcoin::Crypto::Util::Internal qw(lift_x);
 use Bitcoin::Crypto::Helpers qw(ecc);
-use Bitcoin::Crypto::Constants;
-
-use namespace::clean;
+use Bitcoin::Crypto::Constants qw(:curve);
 
 # 32 random bytes can overflow ecc, but the changes of that are extremely low
 has param 'tweak' => (
@@ -24,16 +20,11 @@ has param 'tweak' => (
 	lazy => sub { random_bytes(32) },
 );
 
-signature_for get_public_key => (
-	method => Object,
-	positional => [],
-);
-
 sub get_public_key
 {
 	my ($self) = @_;
 
-	state $nums_base = lift_x sha256 Bitcoin::Crypto::Constants::curve_generator;
+	state $nums_base = lift_x sha256 CURVE_GENERATOR;
 	return btc_pub->from_serialized(ecc->add_public_key($nums_base, $self->tweak));
 }
 

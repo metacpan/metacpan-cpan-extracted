@@ -1,16 +1,11 @@
 package Bitcoin::Crypto::Exception;
-$Bitcoin::Crypto::Exception::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Exception::VERSION = '4.003';
+use v5.14;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
-use Types::Standard -types;
-use Try::Tiny;
+use Mooish::Base -standard;
+use Feature::Compat::Try;
 use Scalar::Util qw(blessed);
-
-use namespace::clean;
 
 use overload
 	q{""} => "as_string",
@@ -26,7 +21,10 @@ has field 'caller' => (
 	default => sub {
 		for my $call_level (1 .. 20) {
 			my ($package, $file, $line) = caller $call_level;
-			if (defined $package && $package !~ /^(Bitcoin::Crypto|Try::Tiny|Type::Coercion)/) {
+			my $package_ok = defined $package && $package !~ /^(Bitcoin::Crypto|Try::Tiny|Type::Coercion)/;
+			my $file_ok = defined $file && $file !~ /\(eval \d+\)/;
+
+			if ($package_ok && $file_ok) {
 				return [$package, $file, $line];
 			}
 		}
@@ -52,14 +50,12 @@ sub throw
 
 sub trap_into
 {
-	my ($class, $sub, $prefix) = @_;
-
-	my $ret;
+	# try to be fast here. Only unpack arguments if executing the sub fails
 	try {
-		$ret = $sub->();
+		return $_[1]->();
 	}
-	catch {
-		my $ex = $_;
+	catch ($ex) {
+		my ($class, $sub, $prefix) = @_;
 
 		if (blessed $ex) {
 			if ($ex->isa($class)) {
@@ -74,10 +70,10 @@ sub trap_into
 			}
 		}
 
-		$class->raise($prefix ? "$prefix: $ex" : "$ex");
-	};
-
-	return $ret;
+		my $ex_string = "$ex";
+		chomp $ex_string;    # remove \n from die_no_trace
+		$class->raise($prefix ? "$prefix: $ex_string" : $ex_string);
+	}
 }
 
 sub as_string
@@ -101,7 +97,7 @@ sub as_string
 {
 
 	package Bitcoin::Crypto::Exception::Transaction;
-$Bitcoin::Crypto::Exception::Transaction::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Transaction::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
@@ -109,7 +105,7 @@ use parent -norequire, 'Bitcoin::Crypto::Exception';
 {
 
 	package Bitcoin::Crypto::Exception::UTXO;
-$Bitcoin::Crypto::Exception::UTXO::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::UTXO::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
@@ -117,7 +113,7 @@ use parent -norequire, 'Bitcoin::Crypto::Exception';
 {
 
 	package Bitcoin::Crypto::Exception::Sign;
-$Bitcoin::Crypto::Exception::Sign::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Sign::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
@@ -125,129 +121,127 @@ use parent -norequire, 'Bitcoin::Crypto::Exception';
 {
 
 	package Bitcoin::Crypto::Exception::KeyCreate;
-$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::KeyDerive;
-$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicGenerate;
-$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicCheck;
-$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58;
-$Bitcoin::Crypto::Exception::Base58::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Base58::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputFormat;
-$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Base58';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputChecksum;
-$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Base58';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32;
-$Bitcoin::Crypto::Exception::Bech32::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Bech32::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputFormat;
-$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Bech32';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputData;
-$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Bech32';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputChecksum;
-$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Bech32';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::SegwitProgram;
-$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptType;
-$Bitcoin::Crypto::Exception::ScriptType::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::ScriptType::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptOpcode;
-$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptPush;
-$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Block;
-$Bitcoin::Crypto::Exception::Block::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Block::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptTree;
-$Bitcoin::Crypto::Exception::ScriptTree::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::ScriptTree::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptCompilation;
-$Bitcoin::Crypto::Exception::ScriptCompilation::VERSION = '4.002';
-use Moo;
-	use Mooish::AttributeBuilder -standard;
-	use Types::Common -types;
+$Bitcoin::Crypto::Exception::ScriptCompilation::VERSION = '4.003';
+use Mooish::Base -standard;
 
 	extends 'Bitcoin::Crypto::Exception';
 
@@ -280,29 +274,15 @@ use Moo;
 
 {
 
-	package Bitcoin::Crypto::Exception::ScriptSyntax;
-$Bitcoin::Crypto::Exception::ScriptSyntax::VERSION = '4.002';
-use parent -norequire, 'Bitcoin::Crypto::Exception::ScriptCompilation';
-}
-
-{
-
-	package Bitcoin::Crypto::Exception::ScriptSuccess;
-$Bitcoin::Crypto::Exception::ScriptSuccess::VERSION = '4.002';
-use parent -norequire, 'Bitcoin::Crypto::Exception::ScriptCompilation';
-}
-
-{
-
 	package Bitcoin::Crypto::Exception::ScriptRuntime;
-$Bitcoin::Crypto::Exception::ScriptRuntime::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::ScriptRuntime::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::TransactionScript;
-$Bitcoin::Crypto::Exception::TransactionScript::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::TransactionScript::VERSION = '4.003';
 use parent -norequire,
 		'Bitcoin::Crypto::Exception::Transaction',
 		'Bitcoin::Crypto::Exception::ScriptRuntime';
@@ -311,35 +291,35 @@ use parent -norequire,
 {
 
 	package Bitcoin::Crypto::Exception::NetworkCheck;
-$Bitcoin::Crypto::Exception::NetworkCheck::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::NetworkCheck::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::NetworkConfig;
-$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Address;
-$Bitcoin::Crypto::Exception::Address::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::Address::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::AddressGenerate;
-$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Address';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::PSBT;
-$Bitcoin::Crypto::Exception::PSBT::VERSION = '4.002';
+$Bitcoin::Crypto::Exception::PSBT::VERSION = '4.003';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
@@ -374,6 +354,132 @@ Contains inline packages that identify parts that went wrong (like
 C<Bitcoin::Crypto::Exception::Sign> for errors in signature generation). Search
 individual Bitcoin::Crypto packages documentation for a list the exception
 classes to check for extra control flow when needed.
+
+=head1 EXCEPTION SUBCLASSES
+
+This module defines the following subclasses to Bitcoin::Crypto::Exception:
+
+=head2 Bitcoin::Crypto::Exception::Transaction
+
+Thrown when a general problem with a transaction is detected, for example:
+non-script verification failure, corrupted serialized transaction data.
+
+=head2 Bitcoin::Crypto::Exception::UTXO
+
+Thrown when a problem with UTXO is detected, most notably inability to find the UTXO.
+
+=head2 Bitcoin::Crypto::Exception::Sign
+
+Thrown when a problem occurs during signing a transaction or message.
+
+=head2 Bitcoin::Crypto::Exception::KeyCreate
+
+Thrown when a problem occurs during creation of a key.
+
+=head2 Bitcoin::Crypto::Exception::KeyDerive
+
+Thrown when a problem occurs during derivation of a key.
+
+=head2 Bitcoin::Crypto::Exception::MnemonicCheck
+
+Thrown when a mnemonic checking was unsuccessful.
+
+=head2 Bitcoin::Crypto::Exception::Base58
+
+Thrown when a general base58 format problem is detected.
+
+=head2 Bitcoin::Crypto::Exception::Base58InputFormat
+
+Thrown when input does not look like valid base58. Subclass of
+L</Bitcoin::Crypto::Exception::Base58>.
+
+=head2 Bitcoin::Crypto::Exception::Base58InputChecksum
+
+Thrown when base58check input checksum is invalid. Subclass of
+L</Bitcoin::Crypto::Exception::Base58>.
+
+=head2 Bitcoin::Crypto::Exception::Bech32
+
+Thrown when a general Bech32 format problem is detected.
+
+=head2 Bitcoin::Crypto::Exception::Bech32InputFormat
+
+Thrown when input does not look like valid bech32. Subclass of
+L</Bitcoin::Crypto::Exception::Bech32>.
+
+=head2 Bitcoin::Crypto::Exception::Bech32InputData
+
+Thrown when input is valid bech32, but contains invalid data. Subclass of
+L</Bitcoin::Crypto::Exception::Bech32>.
+
+=head2 Bitcoin::Crypto::Exception::Bech32InputChecksum
+
+Thrown when bech32 input checksum is invalid. Subclass of
+L</Bitcoin::Crypto::Exception::Bech32>.
+
+=head2 Bitcoin::Crypto::Exception::SegwitProgram
+
+Thrown when an issue with Segregated Witness program is detected.
+
+=head2 Bitcoin::Crypto::Exception::ScriptType
+
+Thrown when an unexpected script type is encountered.
+
+=head2 Bitcoin::Crypto::Exception::ScriptOpcode
+
+Thrown when unexpected script operation is encountered.
+
+=head2 Bitcoin::Crypto::Exception::ScriptPush
+
+Thrown when bad script push operation is performed.
+
+=head2 Bitcoin::Crypto::Exception::Block
+
+Thrown when a general problem with a block is detected.
+
+=head2 Bitcoin::Crypto::Exception::ScriptTree
+
+Thrown when a general problem with a script tree is detected.
+
+=head2 Bitcoin::Crypto::Exception::ScriptCompilation
+
+Thrown when a script compilation fails. It can only be thrown just
+before the script is executed.
+
+=head2 Bitcoin::Crypto::Exception::ScriptRuntime
+
+Thrown when an error occurs during script runtime.
+
+=head2 Bitcoin::Crypto::Exception::TransactionScript
+
+Thrown when an error occurs in execution of scripts during
+transaction validation. Subclass of
+L</Bitcoin::Crypto::Exception::Transaction> and
+L</Bitcoin::Crypto::Exception::ScriptRuntime>.
+
+=head2 Bitcoin::Crypto::Exception::NetworkCheck
+
+Thrown when an assumption about network is not met. This can happen
+in single-network mode or if a network parameter is used, but it
+does not match the arguments.
+
+=head2 Bitcoin::Crypto::Exception::NetworkConfig
+
+Thrown when network configuration is bad or insufficient to perform
+the operation.
+
+=head2 Bitcoin::Crypto::Exception::Address
+
+Thrown when a general error connected to addresses is encountered.
+
+=head2 Bitcoin::Crypto::Exception::AddressGenerate
+
+Thrown when an error is encountered while generating an address. Subclass of
+L</Bitcoin::Crypto::Exception::Address>.
+
+=head2 Bitcoin::Crypto::Exception::PSBT
+
+Thrown when a problem with PSBT format was encountered.
 
 =head1 INTERFACE
 

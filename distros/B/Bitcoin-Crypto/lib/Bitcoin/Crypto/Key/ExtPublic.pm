@@ -1,33 +1,26 @@
 package Bitcoin::Crypto::Key::ExtPublic;
-$Bitcoin::Crypto::Key::ExtPublic::VERSION = '4.002';
-use v5.10;
-use strict;
+$Bitcoin::Crypto::Key::ExtPublic::VERSION = '4.003';
+use v5.14;
 use warnings;
-use Moo;
+
+use Mooish::Base -standard;
 use Crypt::Mac::HMAC qw(hmac);
-use Types::Common -sigs, -types;
+use Types::Common -sigs;
 
 use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Helpers qw(ensure_length ecc);
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::BIP44;
 
-use namespace::clean;
-
 extends qw(Bitcoin::Crypto::Key::ExtBase);
 
 sub _is_private { 0 }
 
-signature_for derive_key_bip44 => (
-	method => Object,
-	positional => [HashRef, {slurpy => !!1}],
-);
-
 sub derive_key_bip44
 {
-	my ($self, $data) = @_;
+	my ($self, %data) = @_;
 	my $path = Bitcoin::Crypto::BIP44->new(
-		%{$data},
+		%data,
 		coin_type => $self,
 		public => 1,
 	);
@@ -61,7 +54,7 @@ sub _derive_key_partial
 	);
 
 	return $self->new(
-		key_instance => $key,
+		_key_instance => $key,
 		chain_code => $chain_code,
 		child_number => $child_num,
 		parent_fingerprint => $self->get_fingerprint,
@@ -206,22 +199,6 @@ account, effectively only using C<change> and C<index> attributes.
 	$fingerprint = $object->get_fingerprint($len = 4)
 
 Returns a fingerprint of the extended key of C<$len> length (byte string)
-
-=head1 EXCEPTIONS
-
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it
-encounters an error. It can produce the following error types from the
-L<Bitcoin::Crypto::Exception> namespace:
-
-=over
-
-=item * KeyDerive - key couldn't be derived correctly
-
-=item * KeyCreate - key couldn't be created correctly
-
-=item * NetworkConfig - incomplete or corrupted network configuration
-
-=back
 
 =head1 SEE ALSO
 

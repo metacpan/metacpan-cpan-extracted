@@ -39,9 +39,7 @@ Inherited, see L<Mail::Box::Parser/"METHODS">
   file                                  undef
   filename                              <required>
   fix_header_errors  Mail::Box::Parser  false
-  log                Mail::Reporter     'WARNINGS'
   mode                                  'r'
-  trace              Mail::Reporter     'WARNINGS'
   trusted            Mail::Box::Parser  false
 
 =over 2
@@ -52,21 +50,17 @@ Any IO::File or C<GLOB> C<$filehandle> which can be used to read
 the data from.  In case this option is specified, the C<filename> is
 informational only.
 
-=item filename => $name
+=item filename => FILENAME
 
-The C<$name> of the file to be read.
+The name of the file to be read.
 
 =item fix_header_errors => BOOLEAN
-
-=item log => LEVEL
 
 =item mode => $mode
 
 File open C<$mode>, which defaults to C<'r'>, which means `read-only'.
 See C<perldoc -f open> for possible modes.  Only applicable
 when no C<file> is specified.
-
-=item trace => LEVEL
 
 =item trusted => BOOLEAN
 
@@ -95,10 +89,6 @@ Returns the name of the file this parser is working on.
 =item $obj-E<gt>B<fixHeaderErrors>( [BOOLEAN] )
 
 Inherited, see L<Mail::Box::Parser/"Attributes">
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<openMode>()
 
@@ -202,43 +192,7 @@ Extends L<"Error handling" in Mail::Box::Parser|Mail::Box::Parser/"Error handlin
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -260,48 +214,33 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Warning: File $file changed during access.
+=item Error: class $package does not implement method $method.
 
-When a message parser starts working, it takes size and modification time
-of the file at hand.  If the folder is written, it checks whether there
-were changes in the file made by external programs.
-
-Calling L<Mail::Box::update()|Mail::Box/"The folder"> on a folder before it being closed
-will read these new messages.  But the real source of this problem is
-locking: some external program (for instance the mail transfer agent,
-like sendmail) uses a different locking mechanism as you do and therefore
-violates your rights.
-Cast by C<stop()>
-
-=item Error: Package $package does not implement $method.
-
-Fatal error: the specific package (or one of its superclasses) does not
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Warning: Unexpected end of header in $source: $line
+=item Error: filename or handle required to create a parser.
 
-While parsing a message from the specified source (usually a file name),
-the parser found a syntax error.  According to the MIME specification in the
-RFCs, each header line must either contain a colon, or start with a blank
-to indicate a folded field.  Apparently, this header contains a line which
-starts on the first position, but not with a field name.
+Cast by C<new()>
 
-By default, parsing of the header will be stopped.  If there are more header
-lines after the erroneous line, they will be added to the body of the message.
-In case of L<new(fix_header_errors)|Mail::Box::Parser/"METHODS"> set, the parsing of the header will be continued.
-The erroneous line will be added to the preceding field.
+=item Error: parser $type does not extend $pkg.
+
+Cast by C<defaultParserType()>
+
+=item Warning: unexpected end of header in $file:\n $line
+
 Cast by C<readHeader()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 3.020,
-built on December 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.00,
+built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

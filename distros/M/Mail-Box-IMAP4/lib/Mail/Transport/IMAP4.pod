@@ -88,13 +88,11 @@ Improves base, see L<Mail::Reporter/"Constructors">
   hostname      Mail::Transport  'localhost'
   imap_client                    Mail::IMAPClient
   interval      Mail::Transport  30
-  log           Mail::Reporter   'WARNINGS'
   password      Mail::Transport  undef
   port          Mail::Transport  143
   proxy         Mail::Transport  undef
   retry         Mail::Transport  <unlimited>
   timeout       Mail::Transport  120
-  trace         Mail::Reporter   'WARNINGS'
   username      Mail::Transport  undef
   via           Mail::Transport  'imap'
 
@@ -127,8 +125,6 @@ defined by L<Mail::IMAPClient|Mail::IMAPClient>.
 
 =item interval => $span
 
-=item log => LEVEL
-
 =item password => $password
 
 =item port => $port
@@ -138,8 +134,6 @@ defined by L<Mail::IMAPClient|Mail::IMAPClient>.
 =item retry => $count|undef
 
 =item timeout => $span
-
-=item trace => LEVEL
 
 =item username => $username
 
@@ -192,10 +186,6 @@ L<Mail::IMAPClient/authenticate> for the gory details.
 Used in NTLM authentication to define the Windows domain which is
 accessed.  Initially set by L<new(domain)|Mail::Transport::IMAP4/"METHODS"> and defaults to the
 server's name.
-
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Attributes">
 
 =item $obj-E<gt>B<usesSSL>()
 
@@ -256,8 +246,6 @@ Add a folder.
 =item $obj-E<gt>B<createImapClient>($class, %options)
 
 Create an object of C<$class>, which extends L<Mail::IMAPClient>.
-
-All C<%options> will be passed to the constructor (new) of C<$class>.
 
 =item $obj-E<gt>B<currentFolder>( [$foldername] )
 
@@ -380,43 +368,7 @@ Extends L<"Error handling" in Mail::Transport::Receive|Mail::Transport::Receive/
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<addReport>($object)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<errors>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<log>( [$level, [$strings]] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $any-E<gt>B<logPriority>($level)
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<report>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<reportAll>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<trace>( [$level] )
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
-=item $obj-E<gt>B<warnings>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
@@ -440,15 +392,11 @@ Improves base, see L<Mail::Reporter/"Cleanup">
 
 =over 4
 
-=item Error: Cannot connect to $host:$port for IMAP4: $!
+=item Notice: IMAP4 authenication $type to $service successful
 
 Cast by C<login()>
 
-=item Error: IMAP cannot connect to $host: $@
-
-Cast by C<login()>
-
-=item Notice: IMAP4 authenication $mechanism to $host:$port successful
+=item Error: IMAP4 cannot connect to $service: $@
 
 Cast by C<login()>
 
@@ -456,25 +404,49 @@ Cast by C<login()>
 
 Cast by C<login()>
 
-=item Error: IMAP4 username $username requires a password
+=item Error: IMAP4 username $user requires a password
 
 Cast by C<login()>
 
-=item Error: Package $package does not implement $method.
+=item Error: cannot create imap client: {error}
 
-Fatal error: the specific package (or one of its superclasses) does not
+Cast by C<createImapClient()>
+
+=item Error: class $package does not implement method $method.
+
+Fatal error: the specific C<$package> (or one of its superclasses) does not
 implement this method where it should. This message means that some other
 related classes do implement this method however the class at hand does
 not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Error: couldn't contact to IMAP4 $service
+
+Cast by C<login()>
+
+=item Notice: couldn't select folder $name but it does exist.
+
+Cast by C<currentFolder()>
+
+=item Warning: failed attempt to login $user, retrying $retries times.
+
+Cast by C<login()>
+
+=item Notice: folder $name does not exist!
+
+Cast by C<currentFolder()>
+
+=item Notice: selected IMAP4 folder $name.
+
+Cast by C<currentFolder()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 3.010,
-built on November 24, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.000,
+built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
