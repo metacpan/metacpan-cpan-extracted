@@ -1,5 +1,5 @@
 package Net::Stripe::Source;
-$Net::Stripe::Source::VERSION = '0.42';
+$Net::Stripe::Source::VERSION = '0.43';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -48,7 +48,7 @@ Net::Stripe::Source - represent a Source object from Stripe
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 ATTRIBUTES
 

@@ -1,0 +1,476 @@
+NAME
+    Marlin - 🐟 pretty fast class builder with most Moo/Moose features 🐟
+
+SYNOPSIS
+      use v5.20.0;
+      no warnings "experimental::signatures";
+  
+      package Person {
+        use Types::Common -lexical, -all;
+        use Marlin::Util -lexical, -all;
+        use Marlin
+          'name!' => Str,
+          'age?'  => Int,
+          -strict;
+    
+        signature_for introduction => (
+          method   => true,
+          named    => [ audience => Optional[InstanceOf['Person']] ],
+        );
+    
+        sub introduction ( $self, $arg ) {
+          say "Hi " . $arg->audience . "!" if $arg->has_audience;
+          say "My name is " . $self->name . ".";
+        }
+      }
+  
+      package Employee {
+        use Marlin
+          -base =>  [ 'Person' ],
+          'employee_id!',
+          -strict;
+      }
+  
+      my $alice = Person->new( name => 'Alice Whotfia' );
+  
+      my $bob = Employee->new(
+        name         => 'Bob Dobalina',
+        employee_id  => '007',
+      );
+  
+      $alice->introduction( audience => $bob );
+
+DESCRIPTION
+    Marlin is a fast class builder, inspired by Moose and Moo. It supports
+    most of their features, but with a different syntax. Because it uses
+    Class::XSAccessor, Class::XSConstructor, and Type::Tiny::XS, it is usually
+    *slightly* faster though. Especially if you keep things simple and don't
+    use features that force Marlin to fall back to using Pure Perl.
+
+    It may not be as fast as classes built with the Perl builtin `class`
+    syntax introduced in Perl v5.38.0, but has more features and supports Perl
+    versions as old as v5.8.8. (Some features require v5.12.0+.)
+
+    Marlin was created by the developer of Type::Tiny and Sub::HandlesVia and
+    integrates with them.
+
+  Using Marlin
+    Marlin does all of its work at compile time, so doesn't export keywords
+    like `has` into your namespace.
+
+   Declaring Attributes
+    Any strings found in the `use Marlin` line (except a few special ones
+    beginning with a dash, used to configure Marlin) will be assumed to be
+    attributes you want to declare for your class.
+
+      package Address {
+        use Marlin qw( street_address locality region country postal_code );
+      }
+  
+      my $adr = Address->new( street_address => '123 Test Street' );
+      say $adr->street_address;
+
+    Any attributes you declare will will be accepted by the constructor that
+    Marlin creates for your class, and reader/getter methods will be created
+    to access their values.
+
+    Attributes can be followed by a hashref to tailor their behaviour.
+
+      package Address {
+        use Marlin::Util qw( true false );
+    
+        use Marlin
+          street_address  => { is => 'rw', required  => true },
+          locality        => { is => 'rw' },
+          region          => { is => 'rw' },
+          country         => { is => 'rw', required => true },
+          postal_code     => { is => 'rw', predicate => 'has_pc' },
+          ;
+      }
+  
+      my $adr = Address->new(
+        street_address => '123 Test Street',
+        country        => 'North Pole',
+      );
+  
+      $adr->has_pc or die;  # will die as there is no postal_code
+
+    Some behaviours are so commonly useful that there are shortcuts for them.
+
+      # Shortcut for: name => { required => true }
+      use Marlin 'name!';
+  
+      # Shortcut for: name => { predicate => true }
+      use Marlin 'name?';
+  
+      # Shortcut for: name => { is => "rwp" }
+      use Marlin 'name=';
+  
+      # Shortcut for: name => { is => "rw" }
+      use Marlin 'name==';
+  
+      # Shortcut for: name => { init_arg => undef }
+      use Marlin 'name.';
+
+    Using these shortcuts, our previous Address example can be written as:
+
+      package Address {
+        use Marlin qw(
+          street_address==!
+          locality==
+          region==
+          country==!
+          postal_code==?
+        );
+      }
+
+    The order of these trailing modifiers doesn't matter, so 'foo=?' means the
+    same as 'foo?=', though in the double-equals modifier for read-write
+    attributes, the equals signs cannot have a character between them.
+
+    There are also some useful alternatives to providing a full hashref:
+
+      use Types::Common 'Str';
+  
+      # Shortcut for: name => { required => true, isa => Str }
+      use Marlin 'name!' => Str;
+  
+      # Shortcut for: name => { lazy => true, builder => sub { ... } }
+      use Marlin 'name' => sub { ... };
+
+    If we wanted to add type checks to our previous Address example, we might
+    use:
+
+      package Address {
+        use Types::Common 'Str';
+        use Marlin
+          'street_address==!'  => Str,
+          'locality=='         => Str,
+          'region=='           => Str,
+          'country==!'         => Str,
+          'postal_code==?'     => Str,
+          ;
+      }
+
+   Supported Features for Attributes
+    The following Moose/Moo-like features are supported for attributes:
+
+    `is`
+        Supports: bare, ro, rw, rwp, lazy.
+
+    `required`
+        If true, indicates that callers must provide a value for this
+        attribute to the constructor. If false, indicates that it is optional.
+
+        To indicate that the attribute is *forbidden* in the constructor, use
+        a combination of `init_arg => undef` and a strict constructor.
+
+    `init_arg`
+        The name of the parameter passed to the constructor which will be used
+        to populate this attribute.
+
+        Setting to an explicit `undef` prevents constructor from even knowing
+        this attribute exists. (It may still have accessors, lazy defaults,
+        etc.)
+
+    `reader`
+        You can specify the name for a reader method:
+
+          use Marlin name => { reader => "get_name" };
+
+        If you use `reader => 1` or `reader => true`, Marlin will pick a
+        default name for your reader by adding "_get" to the front of
+        attributes that have a leading underscore and "get_" otherwise.
+
+        Marlin supports a number of options to keep your accessors truly
+        private. (More so than just a leading "_".)
+
+        You can specify a scalarref variable to install the reader into:
+
+          use Marlin name => { reader => \( my $get_name ) };
+          ...
+          say $thingy->$get_name();
+
+        From Perl v5.12.0 onwards, the following is also supported:
+
+          use Marlin name => { reader => 'my get_name' };
+          ...
+          say get_name( $thingy );
+
+        From Perl v5.42.0 onwards, the following is also supported:
+
+          use Marlin name => { reader => 'my get_name' };
+          ...
+          say $thingy->&get_name();
+
+    `writer`
+        Like `reader`, but a writer method.
+
+        If you use `writer => 1` or `writer => true`, Marlin will pick a
+        default name for your writer by adding "_set" to the front of
+        attributes that have a leading underscore and "set_" otherwise.
+
+        Supports the same lexical method possibilities as `reader`.
+
+    `accessor`
+        A combination reader or writer, depending on whether it's called with
+        a parameter or not.
+
+        If you use `accessor => 1` or `accessor => true`, Marlin will pick a
+        default name for your writer which is just the same as your
+        attribute's name.
+
+        Supports the same lexical method possibilities as `reader`.
+
+    `clearer`
+        Like `reader`, but a clearer method.
+
+        If you use `clearer => 1` or `clearer => true`, Marlin will pick a
+        default name for your clearer by adding "_clear" to the front of
+        attributes that have a leading underscore and "clear_" otherwise.
+
+        Supports the same lexical method possibilities as `reader`.
+
+    `predicate`
+        Like `reader`, but a predicate method, checking whether a value was
+        supplied for the attribute. (It checks `exists`, not `defined`!)
+
+        If you use `predicate => 1` or `predicate => true`, Marlin will pick a
+        default name for your predicate by adding "_has" to the front of
+        attributes that have a leading underscore and "has_" otherwise.
+
+        Supports the same lexical method possibilities as `reader`.
+
+    `builder`, `default`, and `lazy`
+        The `default` can be set to a coderef or a non-reference value to set
+        a default value for the attribute.
+
+        As an extension to what Moose and Moo allow, you can also set the
+        default to a reference to a string of Perl code.
+
+          default => \'[]'
+
+        Alternatively, `builder` can be used to provide the name of a method
+        to call which will generate a default value.
+
+        If you use `builder => 1` or `builder => true`, Marlin will assume a
+        builder name of "_build_" followed by your attribute name. If you use
+        `builder => sub {...}` then the coderef will be installed with that
+        name.
+
+        If you choose `lazy`, then the default or builder will be run when the
+        value of the attribute is first needed. Otherwise it will be run in
+        the constructor.
+
+        Currently if your class has any non-lazy builders/defaults, this will
+        force the constructor to be implemented in Perl instead of XS. If you
+        use lazy builders/defaults, the constructor may use XS, but the
+        readers/accessors for the affected attributes will be implemented in
+        Perl.
+
+    `trigger`
+        A method name or coderef to call after an attribute has been set.
+
+        If you use `trigger => 1` or `trigger => true`, Marlin will assume a
+        trigger name of "_trigger_" followed by your attribute name.
+
+        Currently if your class has any triggers, this will force the
+        constructor plus the writers/accessors for the affected attributes to
+        be implemented in Perl instead of XS.
+
+    `handles` and `handles_via`.
+        Method delegation.
+
+        Supports `handles_via` like with Sub::HandlesVia.
+
+        Lexical methods are possible here too.
+
+          use v5.42.0;
+  
+          package Person {
+            use Types::Common -lexical, -types;
+    
+            use Marlin
+              name   => Str,
+              emails => {
+                is           => 'ro',
+                isa          => ArrayRef[Str]
+                default      => sub { [] },
+                handles_via  => 'Array',
+                handles      => [
+                  'add_email'       => 'push',
+                  'my find_emails'  => 'grep',
+                ],
+              };
+    
+            sub has_hotmail ( $self ) {
+              my @h = $self->&find_emails( sub { /\@hotmail\./ } );
+              return( @h > 0 );
+            }
+          }
+  
+          my $bob = Person->new( name => 'Bob' );
+          $bob->add_email( 'bob@hotmail.example' );
+          die unless $bob->has_hotmail;
+  
+          die if $bob->can('find_emails');  # will not die
+
+    `isa` and `coerce`
+        A type constraint for an attribute.
+
+        Type checks do not force your constructor to be implemented in Perl,
+        but type coercions do. Any type checks or coercions will force the
+        accessors and writers for those attributes to be implemented in Perl.
+
+        You can use `isa => sub { ... }` like Moo.
+
+    `enum`
+        You can use `enum => ['foo','bar']` as a shortcut for `isa =>
+        Enum['foo','bar']`
+
+    `auto_deref`
+        Rarely used Moose option. If you call a reader or accessor in list
+        context, will automatically apply `@{}` or `%{}` to the value if it's
+        an arrayref or hashref.
+
+    `documentation`
+        Does nothing, but you can put a string of documentation for an
+        attribute here.
+
+   Marlin Options
+    Any strings passed to Marlin that have a leading dash are taking to be
+    options affecting your class.
+
+    `-base` or `-parents` or `-isa` or `-extends`
+        Sets the parent classes of your class.
+
+          package Employee {
+            use Marlin -base => ['Person'], qw( employee_id payroll_number );
+          }
+
+        Marlin currently only supports inheriting from other Marlin classes,
+        or from Class::XSConstructor classes. Other base classes may work,
+        especially if they don't do anything much in their constructor.
+
+        You can include version numbers:
+
+          package Employee {
+            use Marlin -base => ['Person 2.000'], ...;
+          }
+
+        If you've only got one parent class (fairly normal situation!) you can
+        use a scalarref instead of an arrayref:
+
+          package Employee {
+            use Marlin -base => \'Person', qw( employee_id payroll_number );
+          }
+
+        A non-reference string is not supported:
+
+          package Employee {
+            # THIS WILL DIE
+            use Marlin -base => 'Person', qw( employee_id payroll_number );
+          }
+
+    `-with` or `-roles` or `-does`
+          package Payable {
+            use Role::Tiny;
+            requires 'payroll_number';
+          }
+  
+          package Employee {
+            use Marlin
+              -extends => ['Person'],
+              -with    => ['Payable'],
+              qw( employee_id payroll_number );
+          }
+
+        Composes Role::Tiny roles into your class.
+
+        Like `-base`, you can include version numbers.
+
+    `-this` or `-self` or `-class`
+        Specifies the name of your class. If you don't include this, it will
+        just use `caller`, which is normally what you want.
+
+        The following are equivalent:
+
+          package Person {
+            use Marlin 'name!';
+          }
+  
+          use Marlin -this => \'Person', 'name!';
+
+    `-constructor`
+        Tells Marlin to use a constructor name other than `new`:
+
+          package Person {
+            use Marlin -constructor => \'create', 'name!';
+          }
+  
+          my $bob = Person->create( name => 'Bob' );
+
+        It can sometimes be useful to name your constructor something like
+        `_new` if you wish to create your own `new` method wrapping it.
+
+    `-strict` or `-strict_constructor`
+        Tells Marlin to build a constructor like MooX::StrictConstructor or
+        MooseX::StrictConstructor, which will reject unknown arguments.
+
+    `-mods` or `-modifiers`
+        Exports the `before`, `after`, `around`, and `fresh` method modifiers
+        from Class::Method::Modifiers, but lexical versions of them.
+
+   Other Features
+    `BUILD` is supported.
+
+   Major Missing Features
+    Here are some features found in Moo and Moose which are missing from
+    Marlin:
+
+    *   Support for `BUILDARGS`.
+
+        You can work around this by naming your constructor something other
+        than `new`, then wrapping it.
+
+    *   Support for `DEMOLISH`.
+
+        Perl's built-in `DESTROY` still works, of course.
+
+    *   Attributes in roles.
+
+        Marlin's support for roles is minimal. Role::Tiny roles can be
+        composed into classes, but Role::Tiny doesn't allow you to declare
+        attributes.
+
+    *   Extensibility.
+
+        Marlin doesn't offer any official API for building extensions.
+
+BUGS
+    Please report any bugs to <https://github.com/tobyink/p5-marlin/issues>.
+
+SEE ALSO
+    Class::XSAccessor, Class::XSConstructor, Types::Common, Type::Params, and
+    Sub::HandlesVia.
+
+    Moose and Moo.
+
+    Marlin::Manual::Principles, Marlin::Manual::Comparison.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+    🐟
+

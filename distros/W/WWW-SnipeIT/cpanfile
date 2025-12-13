@@ -9,3 +9,4 @@ requires 'Object::Pad', '';
 requires 'HTTP::Request', '';
 requires 'LWP::UserAgent', '';
 requires 'JSON::XS', '';
+requires 'URI', '';

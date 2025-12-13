@@ -20,7 +20,7 @@ Revision history for Debug-Easy
 0.06    July 18, 2014
         Benchmark data turned on for first line only for multiline output.
 
-	    Corrections and additions to documentation.
+        Corrections and additions to documentation.
 
         Additions to code comments
 
@@ -324,17 +324,17 @@ Revision history for Debug-Easy
 2.09    Oct 17, 2023
 
         Added conditional use of Data::Dumper::Simple for better output, but
-		falls back on the distribution included Data::Dumper if not installed.
+        falls back on the distribution included Data::Dumper if not installed.
 
         Change the requirement of threads to its conditional use if it doesn't
-		exist.  This was already mostly implemented in the code, except for
-		the "use" command which forced its requirement.  That has changed.
-		Non-threaded Perls can now use this module.
+        exist.  This was already mostly implemented in the code, except for
+        the "use" command which forced its requirement.  That has changed.
+        Non-threaded Perls can now use this module.
  
 2.10    Nov 27, 2023
 
         Muted the initial message if log level is ERROR.  In other words, be
-		silent.
+        silent.
 
 2.11    Nov 27, 2023
 
@@ -361,7 +361,7 @@ Revision history for Debug-Easy
 2.16    Jun 13, 2025
 
         Some minor documentation changes.  A little optimization.
-		Build Makefile.PL also modified.
+        Build Makefile.PL also modified.
 
 2.17    Aug 29, 2025
 
@@ -370,3 +370,12 @@ Revision history for Debug-Easy
 2.18    Nov 11, 2025
 
         Changed how versioning is handled
+
+2.19    Nov 21, 2025
+
+        Changed COLOR handling
+        Removed DateTime
+
+2.20    Dec 13, 2025
+
+        Optimized module

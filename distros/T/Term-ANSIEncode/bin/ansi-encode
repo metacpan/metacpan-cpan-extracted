@@ -322,19 +322,19 @@ VERSION
 } elsif ($ansi_modes) {
     my $out = "[% BRIGHT WHITE %]-------- [% BRIGHT YELLOW %]Modes supported [% BRIGHT WHITE %]----------[% RESET %]\n";
     if ($c16) {
-        $out .= "        ANSI16:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "            ANSI16:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "        ANSI16:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "            ANSI16:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($c256) {
-        $out .= "       ANSI256:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "           ANSI256:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "       ANSI256:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "           ANSI256:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($crgb) {
-        $out .= "ANSI TrueColor:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "    ANSI TrueColor:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "ANSI TrueColor:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "    ANSI TrueColor:  [% RED %]Not Supported[% RESET %]\n";
     }
     $out .= "[% BRIGHT WHITE %]-----------------------------------[% RESET %]\n";
     $ansi->ansi_output($out);

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.628';
+our $VERSION = '0.629';
 
 use 5.020;
 use Moo;
@@ -251,8 +251,8 @@ sub _traverse_keyword_uniqueItems ($class, $schema, $state) {
 sub _eval_keyword_uniqueItems ($class, $data, $schema, $state) {
   return 1 if not is_type('array', $data);
   return 1 if not $schema->{uniqueItems};
-  return 1 if is_elements_unique($data, my $equal_indices = [], $state);
-  return E($state, 'items at indices %d and %d are not unique', @$equal_indices);
+  return 1 if is_elements_unique($data, my $s = +{ $state->%{qw(scalarref_booleans stringy_numbers)}, equal_indices => [] });
+  return E($state, 'items at indices %d and %d are not unique', $s->{equal_indices}->@*);
 }
 
 # The evaluation implementations of maxContains and minContains are in the Applicator vocabulary,
@@ -362,7 +362,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.628
+version 0.629
 
 =head1 DESCRIPTION
 

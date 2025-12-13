@@ -1,5 +1,9 @@
 Revision history for Env-Assert
 
+0.014     2025-12-13 00:12:38+01:00 Europe/Stockholm
+            * Move segment STATUS after SYNOPSIS in Env::Assert.
+            * Fix test three/envassert-script.t to use regexp to find errors in STDERR.
+
 0.013     2025-12-09 00:10:04+01:00 Europe/Stockholm
             * Move functionality from Env::Assert to Env::Assert::Functions.
             * Make Env::Assert usable by only: "use Env::Assert 'assert';"

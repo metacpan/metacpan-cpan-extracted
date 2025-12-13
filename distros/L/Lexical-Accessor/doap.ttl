@@ -16,12 +16,13 @@
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-recommendation [ doap-deps:on "Hash::FieldHash"^^doap-deps:CpanId ], [
 		doap-deps:on "Sub::HandlesVia 0.025"^^doap-deps:CpanId;
-	], [ doap-deps:on "Type::Utils 0.026"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Name"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Type::Utils 0.026"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Util 1.40"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [ doap-deps:on "Eval::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "Sub::Name"^^doap-deps:CpanId ];
 	doap-deps:test-recommendation [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny 0.006"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
+	doap-deps:test-requirement [
 		doap-deps:on "Types::Standard 0.004"^^doap-deps:CpanId;
-	];
+	], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-lexical-accessor/issues>;
 	doap:created         "2013-10-21"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -31,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Lexical-Accessor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-014>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-lexical-accessor>;
@@ -258,6 +259,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lexical-Accessor-0.014.tar.gz>;
 	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/v_1-000000>
+	a                    doap:Version;
+	dc:identifier        "Lexical-Accessor-1.000000"^^xsd:string;
+	dc:issued            "2025-12-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Various changes to Sub::Accessor::Small, mostly to generate more efficient code, especially delegations.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lexical-Accessor-1.000000.tar.gz>;
+	doap:revision        "1.000000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/amon>
 	a                    foaf:Person;

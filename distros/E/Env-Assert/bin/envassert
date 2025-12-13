@@ -9,7 +9,7 @@ use open ':std', IO => ':encoding(UTF-8)';
 
 # PODNAME: envassert
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
@@ -75,7 +75,7 @@ envassert - Ensure that the environment variables match what you need, or abort.
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

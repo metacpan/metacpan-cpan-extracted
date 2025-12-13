@@ -1,4 +1,4 @@
-package Alien::SDL3 0.05 {
+package Alien::SDL3 v2.28.0 {
     use v5.38;
     use Path::Tiny;
     use Carp;
@@ -40,7 +40,6 @@ package Alien::SDL3 0.05 {
         my $files = ( $^O eq 'MSWin32' ? dlldir : libdir )->visit(
             sub {
                 my ( $path, $state ) = @_;
-                warn $path;
                 $state->{$path}++ if $path =~ m[\.$Config{so}([-\.][\d\.]+)?$];
             },
             { recurse => 1 }

@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.42';
+$Net::Stripe::VERSION = '0.43';
 use Moose;
 use Class::Load;
 use Type::Tiny 1.008004;
@@ -9,7 +9,7 @@ use HTTP::Request::Common qw/GET POST DELETE/;
 use MIME::Base64 qw/encode_base64/;
 use URI::Escape qw/uri_escape/;
 use JSON qw/decode_json/;
-use URI qw//;
+use URI 5.19 qw//;
 use DateTime qw//;
 use Net::Stripe::TypeConstraints;
 use Net::Stripe::Constants;
@@ -1277,7 +1277,7 @@ method _post(Str $path!, HashRef|StripeResourceObject $obj?) {
     my %headers;
     if ( $obj ) {
         my %form_fields = %{ convert_to_form_fields( $obj ) };
-        $headers{Content} = [ %form_fields ] if %form_fields;
+        push @{$headers{Content}}, ( $_, $form_fields{$_} ) for sort( keys( %form_fields ) );
     }
 
     my $req = POST $self->api_base . '/' . $path, %headers;
@@ -1648,6 +1648,9 @@ method _get_all(
                     ( $list, $page )
                 ],
             );
+
+            last unless $page->has_more;
+
         }
     }
     return $list;
@@ -1800,7 +1803,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 
@@ -3892,7 +3895,7 @@ Rusty Conover
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Peter Scott Rusty Conover Sachin Sebastian Sherrard Burton Slobodan Mišković Tom Eliaz
+=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Peter Scott Rusty Conover Sachin Sebastian sherrardb Sherrard Burton Slobodan Mišković Tom Eliaz
 
 =over 4
 
@@ -3970,7 +3973,7 @@ Sachin Sebastian <sachinjsk@users.noreply.github.com>
 
 =item *
 
-Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+sherrardb <32931314+sherrardb@users.noreply.github.com>
 
 =item *
 

@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Sys::Monitor::Lite',
     VERSION_FROM => 'lib/Sys/Monitor/Lite.pm',
-    ABSTRACT     => 'Lightweight system monitoring toolkit with JSON output',
+    ABSTRACT     => 'Lightweight system monitoring toolkit with JSON/YAML output',
     AUTHOR       => 'Shingo Kawamura',
     LICENSE      => 'mit',
     MIN_PERL_VERSION => '5.010',

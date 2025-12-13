@@ -3,15 +3,6 @@ Upstream-Name: Lexical-Accessor
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Lexical-Accessor
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- lib/Sub/HandlesVia/Toolkit/SubAccessorSmall.pm
- t/30shv.t
-Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
  Makefile.PL
@@ -19,6 +10,14 @@ Files: INSTALL
  examples/benchmark.pl
 Copyright: Unknown
 License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Sub/HandlesVia/Toolkit/SubAccessorSmall.pm
+Copyright: Copyright 2025 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t
  t/02moose.t
@@ -36,7 +35,19 @@ License: public-domain
 
 Files: README
  lib/Lexical/Accessor.pm
-Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2017, 2025 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/rt101024.t
+Copyright: This software is copyright (c) 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/90subclassing.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/30shv.t
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
@@ -44,26 +55,18 @@ Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Sub/Accessor/Small.pm
-Copyright: This software is copyright (c) 2013-2014, 2017, 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/90subclassing.t
-Copyright: This software is copyright (c) 2014 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/rt101024.t
-Copyright: This software is copyright (c) 2017 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2017, 2020, 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  

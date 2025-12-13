@@ -218,9 +218,9 @@ Example:
 
 Automatically unsubscribes from active subscriptions.
 
-# Data Units
+# DATA UNITS
 
-## CALLBACK FUNCTIONS
+## callback functions
 
 Example:
 
@@ -250,10 +250,6 @@ The following methods are internal and not intended for external use:
 - `_clean_subs`
 - `_remove_sub`
 - `_add_sub`
-
-# BUG REPORTS
-
-https://github.com/VojtaKrenek/BACnet-Perl/issues
 
 # AUTHOR
 

@@ -5,19 +5,14 @@ no warnings qw( void once uninitialized );
 
 package Sub::Accessor::Small;
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '1.000000';
+our @ISA       = qw/ Exporter::Tiny /;
+
 use Carp             qw( carp croak );
 use Eval::TypeTiny   qw();
 use Exporter::Tiny   qw();
 use Scalar::Util     qw( blessed reftype );
-
-BEGIN {
-	*HAS_SUB_UTIL = eval { require Sub::Util }
-		? sub(){1}
-		: sub(){0};
-	*HAS_SUB_NAME = !HAS_SUB_UTIL() && eval { require Sub::Name }
-		? sub(){1}
-		: sub(){0};
-};
 
 BEGIN {
 	*fieldhash =
@@ -26,11 +21,13 @@ BEGIN {
 		do   { require Hash::Util::FieldHash::Compat; \&Hash::Util::FieldHash::Compat::fieldhash } ;;
 };
 
-our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
-our @ISA       = qw/ Exporter::Tiny /;
-
 fieldhash( our %FIELDS );
+
+my $set_subname_is_fake = 0;
+*set_subname =
+	eval { require Sub::Util } ? \&Sub::Util::set_subname :
+	eval { require Sub::Name } ? \&Sub::Name::subname :
+	do { $set_subname_is_fake++; sub { pop; } };
 
 sub _generate_has : method
 {
@@ -43,10 +40,7 @@ sub _generate_has : method
 		$attr->install_accessors;
 	};
 	
-	HAS_SUB_UTIL ? ($code = Sub::Util::set_subname("$me\::has", $code)) :
-	HAS_SUB_NAME ? ($code = Sub::Name::subname("$me\::has", $code)) :
-		();
-	return $code;
+	return set_subname( "$me\::has", $code );
 }
 
 {
@@ -150,11 +144,8 @@ sub install_coderef
 	if (!ref $target and $target =~ /\A[^\W0-9]\w+\z/)
 	{
 		my $name = "$me->{package}\::$target";
-		HAS_SUB_UTIL ? ($coderef = Sub::Util::set_subname($name, $coderef)) :
-		HAS_SUB_NAME ? ($coderef = Sub::Name::subname($name, $coderef)) :
-			();
 		no strict qw(refs);
-		*$name = $coderef;
+		*$name = set_subname( $name, $coderef );
 		return;
 	}
 		
@@ -225,9 +216,8 @@ sub expand_handles
 			
 		if (ref $me->{builder} eq 'CODE')
 		{
-			HAS_SUB_UTIL or
-			HAS_SUB_NAME or
-			do { require Sub::Util };
+			croak "builder => CODE requires Sub::Util or Sub::Name to be installed"
+				if $set_subname_is_fake;
 			
 			my $code = $me->{builder};
 			defined($name) && defined($me->{package})
@@ -241,7 +231,7 @@ sub expand_handles
 				$subname,
 				{},
 				$me->{_export},
-				Sub::Name::subname($fq_subname, $code),
+				set_subname( $fq_subname, $code ),
 			);
 		}
 	}
@@ -285,14 +275,18 @@ sub canonicalize_default : method
 	my $me = shift;
 	return unless exists $me->{default};
 	
-	unless (ref $me->{default})
-	{
-		my $value = $me->{default};
-		$me->{default} = sub { $value };
+	my $ref = ref $me->{default};
+	
+	if ( $ref eq 'ARRAY' and not @{$me->{default}} ) {
+		$ref = 'SCALAR';
+		$me->{default} = \'[]';
+	}
+	elsif ( $ref eq 'HASH' and not %{$me->{default}} ) {
+		$ref = 'SCALAR';
+		$me->{default} = \'{}';
 	}
 	
-	croak("Invalid default; expected a CODE ref")
-		unless ref $me->{default} eq 'CODE';
+	!$ref or $ref =~ /^(CODE|SCALAR)$/ or croak("Invalid default; expected a non-reference, CODE ref, or SCALAR ref");
 }
 
 sub canonicalize_isa : method
@@ -304,6 +298,12 @@ sub canonicalize_isa : method
 		$me->{isa} ||= sub { blessed($_[0]) && $_[0]->DOES($does) };
 	}
 	
+	if ( $me->{enum} )
+	{
+		require Types::Standard;
+		$me->{isa} = Types::Standard::Enum()->of( $me->{coerce} ? \1: (), @{$me->{enum}} );
+	}
+	
 	if (defined $me->{isa} and not ref $me->{isa})
 	{
 		my $type_name = $me->{isa};
@@ -313,6 +313,12 @@ sub canonicalize_isa : method
 		$me->{isa} = $me->{package}
 			? Type::Utils::dwim_type($type_name, for => $me->{package})
 			: Type::Utils::dwim_type($type_name);
+	}
+	
+	if ( 'CODE' eq ref $me->{isa} )
+	{
+		require Type::Tiny;
+		$me->{isa} = Type::Tiny->new( constraint => $me->{isa} );
 	}
 }
 
@@ -341,6 +347,42 @@ sub canonicalize_opts : method
 	$me->canonicalize_default;
 	$me->canonicalize_builder;
 	$me->canonicalize_trigger;
+}
+
+sub has_simple_accessor : method
+{
+	my $me = shift;
+	return !!0 if !$me->has_simple_reader;
+	return !!0 if !$me->has_simple_writer;
+	return !!1;
+}
+
+sub has_simple_reader : method
+{
+	my $me = shift;
+	return !!0 if $me->{lazy};
+	return !!1;
+}
+
+sub has_simple_writer : method
+{
+	my $me = shift;
+	return !!0 if exists $me->{trigger};
+	return !!0 if exists $me->{isa};
+	return !!0 if $me->{weak_ref};
+	return !!1;
+}
+
+sub has_simple_predicate : method
+{
+	my $me = shift;
+	return !!1;
+}
+
+sub has_simple_clearer : method
+{
+	my $me = shift;
+	return !!1;
 }
 
 sub accessor_kind : method
@@ -379,6 +421,7 @@ sub clearer : method
 sub inline_clearer : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
 	
 	sprintf(
 		q[ delete(%s) ],
@@ -389,9 +432,11 @@ sub inline_clearer : method
 sub inline_access : method
 {
 	my $me = shift;
-	
+	my $selfvar = shift || '$_[0]';
+
 	sprintf(
-		q[ $Sub::Accessor::Small::FIELDS{$_[0]}{%d} ],
+		q[ $Sub::Accessor::Small::FIELDS{%s}{%d} ],
+		$selfvar,
 		$me->{id},
 	);
 }
@@ -399,11 +444,12 @@ sub inline_access : method
 sub inline_access_w : method
 {
 	my $me = shift;
-	my ($expr) = @_;
+	my $selfvar = shift || '$_[0]';
+	my $expr    = shift || die;
 	
 	sprintf(
 		q[ %s = %s ],
-		$me->inline_access,
+		$me->inline_access( $selfvar ),
 		$expr,
 	);
 }
@@ -420,10 +466,11 @@ sub predicate : method
 sub inline_predicate : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
 	
 	sprintf(
 		q[ exists(%s) ],
-		$me->inline_access,
+		$me->inline_access( $selfvar ),
 	);
 }
 
@@ -441,9 +488,10 @@ my $handler_uniq = 0;
 sub inline_handles : method
 {
 	my $me = shift;
-	my ($method) = @_;
+	my $selfvar  = shift || '$_[0]';
+	my $method   = shift || die;
 	
-	my $get = $me->inline_access;
+	my $get = $me->inline_access( $selfvar );
 	
 	my $varname = sprintf('$handler_%d', ++$handler_uniq);
 	$me->{inline_environment}{$varname} = \($method);
@@ -454,7 +502,7 @@ sub inline_handles : method
 	{
 		return sprintf(
 			q[ %s; my $h = %s; %s; shift; my ($m, @a) = @%s; $h->$m(@a, @_) ],
-			$me->inline_default,
+			$me->inline_maybe_write_default( $selfvar ),
 			$get,
 			$death,
 			$varname,
@@ -464,7 +512,7 @@ sub inline_handles : method
 	{
 		return sprintf(
 			q[ %s; my $h = %s; %s; shift; $h->%s(@_) ],
-			$me->inline_default,
+			$me->inline_maybe_write_default( $selfvar ),
 			$get,
 			$death,
 			$varname,
@@ -475,8 +523,9 @@ sub inline_handles : method
 sub inline_get : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
 	
-	my $get = $me->inline_access;
+	my $get = $me->inline_access( $selfvar );
 	
 	if ($me->{auto_deref})
 	{
@@ -489,35 +538,98 @@ sub inline_get : method
 	return $get;
 }
 
-sub inline_default : method
+sub inline_maybe_write_default : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
 	
 	if ($me->{lazy})
 	{
-		my $get = $me->inline_access;
-		
-		if ($me->{default})
-		{
-			$me->{inline_environment}{'$default'} = \($me->{default});
-			
-			return sprintf(
-				q[ %s unless %s; ],
-				$me->inline_access_w( q[$default->($_[0])] ),
-				$me->inline_predicate,
-			);
-		}
-		elsif (defined $me->{builder})
-		{
-			return sprintf(
-				q[ %s unless %s; ],
-				$me->inline_access_w( q($_[0]->) . $me->{builder} ),
-				$me->inline_predicate,
-			);
-		}
+		return sprintf(
+			q[ %s unless %s; ],
+			$me->inline_access_w( $selfvar, $me->inline_default( $selfvar ) ),
+			$me->inline_predicate( $selfvar ),
+		);
 	}
 	
 	return '';
+}
+
+sub _is_bool ($)
+{
+	my $value = shift;
+	return !!0 unless defined $value;
+	return !!0 if ref $value;
+	return !!0 unless Scalar::Util::isdual( $value );
+	return !!1 if  $value && "$value" eq '1' && $value+0 == 1;
+	return !!1 if !$value && "$value" eq q'' && $value+0 == 0;
+	return !!0;
+}
+
+sub _created_as_number ($)
+{
+	my $value = shift;
+	return !!0 if utf8::is_utf8($value);
+	return !!0 unless defined $value;
+	return !!0 if ref $value;
+	require B;
+	my $b_obj = B::svref_2object(\$value);
+	my $flags = $b_obj->FLAGS;
+	return !!1 if $flags & ( B::SVp_IOK() | B::SVp_NOK() ) and !( $flags & B::SVp_POK() );
+	return !!0;
+}
+
+sub _created_as_string ($)
+{
+	my $value = shift;
+	defined($value)
+		&& !ref($value)
+		&& !_is_bool($value)
+		&& !_created_as_number($value);
+}
+
+sub inline_default : method
+{
+	my $me = shift;
+	my $selfvar = shift || '$_[0]';
+	my $preferred_closeover_var = shift || '$default';
+	
+	if (exists $me->{default})
+	{
+		my $ref = ref $me->{default};
+		if ( $ref eq 'CODE' )
+		{
+			$me->{inline_environment}{$preferred_closeover_var} = \($me->{default});
+			return qq[$preferred_closeover_var\->($selfvar)];
+		}
+		elsif ( $ref eq 'SCALAR' )
+		{
+			return ${$me->{default}};
+		}
+		elsif ( !defined $me->{default} )
+		{
+			return 'undef';
+		}
+		elsif ( _is_bool $me->{default} )
+		{
+			return $me->{default} ? '!!1' : '!!0';
+		}
+		elsif ( _created_as_number $me->{default} )
+		{
+			return $me->{default} + 0;
+		}
+		elsif ( _created_as_string $me->{default} )
+		{
+			require B;
+			return B::perlstring( $me->{default} );
+		}
+	}
+	elsif (defined $me->{builder})
+	{
+		return $selfvar . '->' . $me->{builder};
+	}
+	
+	return undef;
 }
 
 sub reader : method
@@ -532,11 +644,34 @@ sub reader : method
 sub inline_reader : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
 	
-	join('',
-		$me->inline_default,
-		$me->inline_get,
-	);
+	if ( $me->{lazy} )
+	{
+		my $flag;
+		my $w = $me->inline_writer( $selfvar, $me->inline_default( $selfvar ), \$flag );
+		
+		if ( $flag )
+		{
+			return sprintf(
+				'( (%s) ? (%s) : (%s) )',
+				$me->inline_predicate( $selfvar ),
+				$me->inline_get( $selfvar ),
+				$w,
+			);
+		}
+		else
+		{
+			return sprintf(
+				'( (%s) ? (%s) : do { %s } )',
+				$me->inline_predicate( $selfvar ),
+				$me->inline_get( $selfvar ),
+				$w,
+			);
+		}
+	}
+	
+	return $me->inline_get( $selfvar );
 }
 
 sub writer : method
@@ -550,38 +685,79 @@ sub writer : method
 
 sub inline_writer : method
 {
-	my $me = shift;
+	my $me      = shift;
+	my $selfvar = shift || '$_[0]';
+	my $expr    = shift || '$_[1]';
+	my $flag    = shift || undef;
 	
-	my $get    = $me->inline_access;
-	my $coerce = $me->inline_type_coercion('$_[1]');
+	my $get    = $me->inline_access( $selfvar );
+	my $coerce = $me->inline_type_coercion( $selfvar, $expr );
 	
-	if ($coerce eq '$_[1]')  # i.e. no coercion
+	# no coercion and simple variable
+	if ($coerce eq $expr and $expr =~ /^\$\w+(?:[-][>])?(?:\[\d+\]|\{[^}]\})*$/)
 	{
 		if (!$me->{trigger} and !$me->{weak_ref})
 		{
+			$$flag = 1 if $flag;
 			return $me->inline_access_w(
-				$me->inline_type_assertion('$_[1]'),
+				$selfvar,
+				$me->inline_type_assertion( $selfvar, $expr ),
 			);
 		}
-		
-		return sprintf(
-			'%s; %s; %s; %s; %s',
-			$me->inline_type_assertion('$_[1]'),
-			$me->inline_trigger('$_[1]', $get),
-			$me->inline_access_w('$_[1]'),
-			$me->inline_weaken,
-			$me->inline_get,
-		);
+		elsif ( !$me->{weak_ref} )
+		{
+			return sprintf(
+				'%s; %s; %s',
+				$me->inline_type_assertion( $selfvar, $expr ),
+				$me->inline_trigger( $selfvar, $expr, $get ),
+				$me->inline_access_w( $selfvar, $expr ),
+			);
+		}
+		else
+		{
+			return sprintf(
+				'%s; %s; %s; %s; %s',
+				$me->inline_type_assertion( $selfvar, $expr ),
+				$me->inline_trigger( $selfvar, $expr, $get ),
+				$me->inline_access_w( $selfvar, $expr ),
+				$me->inline_weaken( $selfvar ),
+				$me->inline_get( $selfvar ),
+			);
+		}
 	}
 	
-	sprintf(
-		'my $val = %s; %s; %s; %s; %s; $val',
-		$coerce,
-		$me->inline_type_assertion('$val'),
-		$me->inline_trigger('$val', $get),
-		$me->inline_access_w('$val'),
-		$me->inline_weaken,
-	);
+	my $ass = $me->inline_type_assertion( $selfvar, '$val' );
+	
+	# Use intermediate variable to store result of coercion and/or default
+	if ( !$me->{trigger} and !$me->{weak_ref} )
+	{
+		sprintf(
+			'my $val = %s; %s',
+			$coerce,
+			$me->inline_access_w( $selfvar, $ass =~ /^do/ ? $ass : "do { $ass }" ),
+		);
+	}
+	elsif ( !$me->{weak_ref} )
+	{
+		sprintf(
+			'my $val = %s; %s; %s; %s',
+			$coerce,
+			$ass,
+			$me->inline_trigger( $selfvar, '$val', $get ),
+			$me->inline_access_w( $selfvar, '$val' ),
+		);
+	}
+	else
+	{
+		sprintf(
+			'my $val = %s; %s; %s; %s; %s; $val',
+			$coerce,
+			$ass,
+			$me->inline_trigger( $selfvar, '$val', $get ),
+			$me->inline_access_w( $selfvar, '$val' ),
+			$me->inline_weaken( $selfvar ),
+		);
+	}
 }
 
 sub accessor : method
@@ -596,46 +772,53 @@ sub accessor : method
 sub inline_accessor : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
+	my $expr    = shift || '$_[1]';
+	my $toggle  = shift || '@_ > 1';
 
-	my $get    = $me->inline_access;
-	my $coerce = $me->inline_type_coercion('$_[1]');
+	my $get    = $me->inline_access( $selfvar );
+	my $coerce = $me->inline_type_coercion( $selfvar, $expr );
 	
-	if ($coerce eq '$_[1]')  # i.e. no coercion
+	if ($coerce eq $expr)  # i.e. no coercion
 	{
 		if (!$me->{lazy} and !$me->{trigger} and !$me->{weak_ref})
 		{
 			return sprintf(
-				'(@_ > 1) ? (%s) : %s',
-				$me->inline_access_w( $me->inline_type_assertion('$_[1]') ),
-				$me->inline_get,
+				'(%s) ? (%s) : %s',
+				$toggle,
+				$me->inline_access_w( $selfvar, $me->inline_type_assertion( $selfvar, $expr ) ),
+				$me->inline_get( $selfvar ),
 			);
 		}
 		
 		return sprintf(
-			'if (@_ > 1) { %s; %s; %s; %s }; %s',
-			$me->inline_type_assertion('$_[1]'),
-			$me->inline_trigger('$_[1]', $get),
-			$me->inline_access_w('$_[1]'),
-			$me->inline_weaken,
-			$me->inline_reader,
+			'if (%s) { %s; %s; %s; %s }; %s',
+			$toggle,
+			$me->inline_type_assertion( $selfvar, $expr ),
+			$me->inline_trigger( $selfvar, $expr, $get ),
+			$me->inline_access_w( $selfvar, $expr ),
+			$me->inline_weaken( $selfvar ),
+			$me->inline_reader( $selfvar ),
 		);
 	}
 	
 	sprintf(
-		'if (@_ > 1) { my $val = %s; %s; %s; %s; %s }; %s',
+		'if (%s) { my $val = %s; %s; %s; %s; %s }; %s',
+		$toggle,
 		$coerce,
-		$me->inline_type_assertion('$val'),
-		$me->inline_trigger('$val', $get),
-		$me->inline_access_w('$val'),
-		$me->inline_weaken,
-		$me->inline_reader,
+		$me->inline_type_assertion( $selfvar, '$val' ),
+		$me->inline_trigger( $selfvar, '$val', $get ),
+		$me->inline_access_w( $selfvar, '$val' ),
+		$me->inline_weaken( $selfvar ),
+		$me->inline_reader( $selfvar ),
 	);
 }
 
 sub inline_type_coercion : method
 {
 	my $me = shift;
-	my ($var) = @_;
+	my $selfvar = shift || '$_[0]';  # usually ignored
+	my $var     = shift || die;
 	
 	my $coercion = $me->{coerce} or return $var;
 	
@@ -686,7 +869,8 @@ sub inline_type_coercion : method
 sub inline_type_assertion : method
 {
 	my $me = shift;
-	my ($var) = @_;
+	my $selfvar = shift || '$_[0]';  # usually ignored
+	my $var     = shift || die;
 	
 	my $type = $me->{isa} or return $var;
 	
@@ -731,25 +915,28 @@ sub inline_type_assertion : method
 sub inline_weaken : method
 {
 	my $me = shift;
+	my $selfvar = shift || '$_[0]';
 	
 	return '' unless $me->{weak_ref};
 	
 	sprintf(
 		q[ Scalar::Util::weaken(%s) if ref(%s) ],
-		$me->inline_access,
-		$me->inline_access,
+		$me->inline_access( $selfvar ),
+		$me->inline_access( $selfvar ),
 	);
 }
 
 sub inline_trigger : method
 {
 	my $me = shift;
-	my ($new, $old) = @_;
+	my $selfvar = shift || '$_[0]';
+	my $new     = shift || die;
+	my $old     = shift || '';
 	
 	my $trigger = $me->{trigger} or return '';
 	
 	$me->{inline_environment}{'$trigger'} = \$trigger;
-	return sprintf('$trigger->($_[0], %s, %s)', $new, $old);
+	return sprintf('$trigger->(%s, %s, %s)', $selfvar, $new, $old);
 }
 
 1;
@@ -820,7 +1007,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017, 2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2020, 2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

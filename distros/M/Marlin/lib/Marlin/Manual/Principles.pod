@@ -1,0 +1,59 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Marlin::Manual::Priniples - getting the most out of Marlin
+
+=head1 DESCRIPTION
+
+Following this advice will help you get the most out of Marlin:
+
+=over
+
+=item *
+
+Aim for objects to be immutable. Mutable objects are a foot gun.
+Marlin defaults to attributes being "ro" for a reason.
+
+=item *
+
+Type coercions are nice, but will slow down your constructor so
+should be used sparingly.
+
+=item *
+
+Eager defaults/builders will slow down your constructors. If you want
+fast constructors, use lazy defaults/builders.
+
+=item *
+
+Lazy defaults/builders will slow down your accessors. If you want
+fast accessors, use eager defaults/builders.
+
+Sorry you can't have it both ways. Though see:
+L<https://github.com/tsee/Class-XSAccessor/pull/14>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Marlin>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

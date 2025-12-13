@@ -23,10 +23,11 @@ my $meta = {
                                        recommends => {
                                                        "Hash::FieldHash" => 0,
                                                        "Sub::HandlesVia" => 0.025,
-                                                       "Sub::Name"       => 0,
+                                                       "Sub::Util"       => "1.40",
                                                        "Type::Utils"     => 0.026,
                                                      },
                                        requires   => { "Eval::TypeTiny" => 0, "Exporter::Tiny" => 0, "perl" => 5.008003 },
+                                       suggests   => { "Sub::Name" => 0 },
                                      },
                         test      => {
                                        recommends => {
@@ -44,11 +45,11 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Lexical::Accessor" => { file => "lib/Lexical/Accessor.pm", version => 0.014 },
-                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.014 },
+                        "Lexical::Accessor" => { file => "lib/Lexical/Accessor.pm", version => "1.000000" },
+                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => "1.000000" },
                         "Sub::HandlesVia::Toolkit::SubAccessorSmall" => {
                           file => "lib/Sub/HandlesVia/Toolkit/SubAccessorSmall.pm",
-                          version => 0.014,
+                          version => "1.000000",
                         },
                       },
   "release_status" => "stable",
@@ -63,7 +64,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project",
                       },
-  "version"        => 0.014,
+  "version"        => "1.000000",
   "x_contributors" => ["Lukas Atkinson (AMON) <amon\@cpan.org>"],
 };
 

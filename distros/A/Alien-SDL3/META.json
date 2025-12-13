@@ -98,7 +98,7 @@
    "provides" : {
       "Alien::SDL3" : {
          "file" : "lib/Alien/SDL3.pm",
-         "version" : "0.05"
+         "version" : "v2.28.0"
       }
    },
    "release_status" : "stable",
@@ -116,8 +116,15 @@
          "web" : "https://github.com/Perl-SDL3/Alien-SDL3.pm"
       }
    },
-   "version" : "0.05",
+   "version" : "v2.28.0",
    "x_authority" : "cpan:SANKO",
+   "x_ignore" : [
+      ".github/FUNDING.yml",
+      ".github/workflows/ci.yml",
+      ".github/workflows/delete_cache.yml",
+      ".gitignore",
+      ".tidyallrc"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

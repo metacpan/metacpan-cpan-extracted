@@ -6,7 +6,7 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Jira plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = '0.8';
+our $VERSION = '1.0';
 
 use Moose::Role;
 use JIRA::REST ();
@@ -53,7 +53,18 @@ sub _build_jira_client {
 
     my $jira_client;
     try {
-        $jira_client = JIRA::REST->new($config->{server_url}, $config->{username}, $config->{password});
+        my %auth_cfg = ( url => $config->{server_url}, );
+        if ( my $token = $config->{token} ) {
+            $auth_cfg{pat} = $token;
+        }
+        elsif ( my $username = $config->{username} ) {
+            $auth_cfg{username} = $username;
+            $auth_cfg{password} = $config->{password};
+        }
+        else {
+            $auth_cfg{anonymous} = 1;
+        }
+        $jira_client = JIRA::REST->new( \%auth_cfg );
     }
     catch {
         error_message("Could not build JIRA client.\nEither configure username or password in your tracker config, .netrc or via Config::Identity, see perldoc JIRA::REST.\nError was:\n'%s'", $_ );
@@ -106,7 +117,7 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
         }
 
         # Get existing branches matching the ticket number
-        my @branches = map { s/^\*?\s+//; $_ }
+        my @branches = map { s/^\*?\s+//r }
             $self->repository->run('branch','--list',$self->jira.'*');
         if (scalar @branches == 0) {
             say 'Creating new branch "'.$branch.'".'
@@ -232,6 +243,8 @@ sub _init_jira_ticket {
     catch {
         error_message( 'Could not fetch JIRA ticket: %s', $id );
     };
+    return
+        unless defined $ticket;
 
     my $transitions;
     try {
@@ -241,6 +254,9 @@ sub _init_jira_ticket {
         require Data::Dumper;
         error_message( 'Could not fetch JIRA transitions for %s: %s', $id, Data::Dumper::Dumper $transitions );
     };
+    return
+        unless defined $transitions;
+
     $self->jira_ticket_transitions( $transitions->{transitions} );
 
     return $ticket;
@@ -311,7 +327,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 =head1 VERSION
 
-version 0.8
+version 1.0
 
 =head1 DESCRIPTION
 
@@ -344,6 +360,11 @@ Username to connect with.
 =head3 password [OPTIONAL]
 
 Password to connect with. Beware: This is stored in clear text! Better use authentication via C<Config::Identity> via C<JIRA::REST> where the credentials can be stored GPG encrypted.
+
+=head3 token [OPTIONAL]
+
+Token to authenticate with. Can be generated in Jira user profile.
+See L<https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html>
 
 =head3 log_time_spent
 
@@ -399,13 +420,26 @@ If C<set_status/stop/transition> is set in config and the current Jira ticket st
         }
     }
 
+or
+
+    {
+        "plugins" : [
+            "Jira"
+        ],
+        "jira" : {
+            "server_url" : "http://localhost:8080",
+            "token" : "NDc4NDkyNDg3ODE3OstHYSeYC1GnuqRacSqvUbookcZk",
+            "log_time_spent" : "1"
+        }
+    }
+
 =head1 AUTHOR
 
 Michael Kröll <pepl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Kröll.
+This software is copyright (c) 2019-2025 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

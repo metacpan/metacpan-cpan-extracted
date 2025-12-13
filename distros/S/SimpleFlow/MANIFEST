@@ -7,4 +7,5 @@ README
 README.md
 dist.ini
 lib/SimpleFlow.pm
+md2pod.pl
 t/01.t

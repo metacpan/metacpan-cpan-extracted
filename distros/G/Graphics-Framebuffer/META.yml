@@ -33,5 +33,5 @@ requires:
   Pod::Usage: '0'
   Term::ReadKey: '0'
   perl: '5.020'
-version: '6.79'
+version: '6.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

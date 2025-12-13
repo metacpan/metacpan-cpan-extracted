@@ -3,15 +3,16 @@
 use strict;
 use warnings FATAL => 'all';
 require 5.010;
+use feature 'say';
 use Test::More;
-use Test::Exception;
+use Test::Exception; # die_ok
 use File::Temp 'tempfile';
 use SimpleFlow qw(task say2);
 # written with Gemini's help
 my $r = task({
 	cmd => 'which ls'
 });
-my ($simple_task, $log_write, $stopping, $dry_run) = (0,0,0,0);
+my ($simple_task, $log_write, $stopping, $dry_run, $overwrite) = (0,0,0,0,0);
 if (
 		($r->{'die'}) &&
 		($r->{done} eq 'now') &&
@@ -70,10 +71,6 @@ if (
 	die 'dry run failed';
 }
 # make a non-existent file
-ok($simple_task, 'Verified: Simple task works');
-ok($log_write,   'Verified: Can write to log files with subroutine "say2"');
-ok($stopping,    'Verified: tasks do not run when output files exist');
-ok($dry_run,     'Verified: dry run works');
 $fh = File::Temp->new(DIR => '/tmp');
 close $fh;
 unlink $fh->filename;
@@ -82,5 +79,28 @@ dies_ok { # Gemini helped
 		cmd => 'ls ' . $fh->filename, # ls on a non-existent file
 	});
 } '"task" dies when it should';
-p $r;
+sleep 1;
+my $mod0 = -M $fname;
+say "\$mod0 = $mod0";
+$r = task({
+	cmd            => "which ln > $fname",
+	overwrite      => 'true',
+	'output.files' => $fname
+});
+printf("$mod0 vs %lf\n", -M $fname);
+if (
+		($mod0 > -M $fname) # the file has been modified
+		&&
+		(-s $fname > 0)
+	) {
+	$overwrite = 1;
+} else {
+	p $r;
+	die 'output files are not overwritten when "overwrite" is true"';
+}
+ok($simple_task, 'Verified: Simple task works');
+ok($log_write,   'Verified: Can write to log files with subroutine "say2"');
+ok($stopping,    'Verified: tasks do not run when output files exist');
+ok($dry_run,     'Verified: dry run works');
+ok($overwrite,   'Verified: "overwrite" option overwrites files in "output.files"');
 done_testing();

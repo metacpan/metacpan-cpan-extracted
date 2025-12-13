@@ -1,0 +1,10 @@
+Build.PL
+Changes.md
+LICENSE
+MANIFEST
+META.json
+README.md
+builder/Alien/SDL3/Builder.pm
+cpanfile
+lib/Alien/SDL3.pm
+t/00_compile.t

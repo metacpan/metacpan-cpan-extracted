@@ -43,7 +43,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Assert
   homepage: https://metacpan.org/dist/Env-Assert
   repository: git://github.com/mikkoi/env-assert.git
-version: '0.013'
+version: '0.014'
 x_contributors:
   - 'Ivan Bessarabov <ivan@bessarabov.ru>'
   - 'gregor herrmann <gregoa@debian.org>'

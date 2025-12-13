@@ -46,5 +46,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure
   homepage: https://metacpan.org/pod/Object::Configure
   repository: git://github.com/nigelhorne/Object-Configure.git
-version: 0.18
+version: 0.19
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

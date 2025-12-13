@@ -2,8 +2,9 @@ package WWW::SnipeIT;
 use v5.26;
 use Object::Pad;
 use WWW::SnipeIT::Hardware;
+use WWW::SnipeIT::Users;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 class SnipeIT {
   
@@ -13,8 +14,9 @@ class SnipeIT {
   method snipe () {
     my $header = ['Content-Type' => 'application/json; charset=UTF-8', 'Authorization' => 'Bearer '.$accessToken];
     my $asset = Hardware->new('header'=> $header, 'endpoint' => $endpoint);
+    my $users = Users->new('header'=> $header, 'endpoint' => $endpoint);
     
-    return {'hardware' => $asset};
+    return {'hardware' => $asset, 'users' => $users};
   }
 }
 
@@ -68,22 +70,18 @@ WWW::SnipeIT - API Access to Snipe-IT
 
 =head1 DESCRIPTION
 
-WWW::SnipeIT is a perl module for accessing the API. It doesnt have all the api features just enough for what I needed.
+Snipe-IT ia a asset inventory management system that can be self-hosted or cloud-hosted. It has a REST API and this module is an easy access to it.
+[https://snipeitapp.com/](https://snipeitapp.com/)
 
 =head1 AUTHOR
 
 Scott E<lt>scotth@cpan.orgE<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2022- Scott
 
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 SEE ALSO
 
 =cut
 

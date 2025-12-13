@@ -6,7 +6,7 @@ use Exporter qw(import);
 use File::Temp;
 use IO::Handle;
 
-our $VERSION = version->declare("v2.19.12");
+our $VERSION = version->declare("v2.19.29");
 
 our %EXPORT_TAGS = (
                      fattr => [ qw(
@@ -450,7 +450,7 @@ Dev::Util::File - General utility functions for files and directories.
 
 =head1 VERSION
 
-Version v2.19.12
+Version v2.19.29
 
 =head1 SYNOPSIS
 
@@ -780,7 +780,7 @@ Comments (begins with #) and blank lines are skipped.
     my @array_list  = read_list(FILE);
 
 B<Note>: The API for this function is maintained to support the existing code base that uses it.
-It would probably be better to use C<Perl6::Slurp> for new code.
+It would probably be better to use C<Perl6::Slurp> or C<File::Slurper> for new code.
 
 =head1 AUTHOR
 

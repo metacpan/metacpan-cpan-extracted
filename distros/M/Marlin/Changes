@@ -1,0 +1,14 @@
+Marlin
+======
+
+Created:      2025-12-11
+Home page:    <https://metacpan.org/release/Marlin>
+Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001001	2025-12-13
+
+ [ Documentation ]
+ - Include Class::Tiny in examples/benchmark.
+
+0.001000	2025-12-12	Initial release

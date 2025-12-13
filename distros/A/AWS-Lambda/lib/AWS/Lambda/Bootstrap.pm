@@ -37,6 +37,9 @@ sub new {
     my ($handler, $function) = split(/[.]/, $env_handler, 2);
     my $runtime_api = $args{runtime_api} // $ENV{'AWS_LAMBDA_RUNTIME_API'} // die '$AWS_LAMBDA_RUNTIME_API is not found';
     my $task_root = $args{task_root} // $ENV{'LAMBDA_TASK_ROOT'} // die '$LAMBDA_TASK_ROOT is not found';
+    my $max_workers = $args{max_workers} // $ENV{'AWS_LAMBDA_MAX_CONCURRENCY'} // 0;
+    die "max_workers must be a non-negative integer, got: $max_workers" 
+        unless $max_workers =~ /^\d+$/ && $max_workers >= 0;
     my $self = bless +{
         task_root      => $task_root,
         handler        => $handler,
@@ -44,6 +47,7 @@ sub new {
         runtime_api    => $runtime_api,
         api_version    => $api_version,
         next_event_url => "http://${runtime_api}/${api_version}/runtime/invocation/next",
+        max_workers    => $max_workers,
         http           => HTTP::Tiny->new(
             # XXX: I want to disable timeout, but it seems HTTP::Tiny does not support it.
             # So, I set a long timeout.
@@ -56,6 +60,29 @@ sub new {
 sub handle_events {
     my $self = shift;
     $self->_init or return;
+
+    if ($self->{max_workers} > 0) {
+        require Parallel::Prefork;
+        my $pm = Parallel::Prefork->new({
+            max_workers => $self->{max_workers},
+            trap_signals => {
+                TERM => 'TERM',
+                HUP  => 'TERM',
+            },
+        });
+        while ($pm->signal_received ne 'TERM') {
+            $pm->start and next;
+            $self->_handle_events;
+            $pm->finish;
+        }
+        $pm->wait_all_children;
+    } else {
+        $self->_handle_events
+    }
+}
+
+sub _handle_events {
+    my $self = shift;
     while(1) {
         $self->handle_event;
     }
@@ -121,6 +148,7 @@ sub lambda_next {
         aws_request_id       => $h->{'lambda-runtime-aws-request-id'},
         invoked_function_arn => $h->{'lambda-runtime-invoked-function-arn'},
         trace_id             => $h->{'lambda-runtime-trace-id'},
+        tenant_id            => $h->{'lambda-runtime-aws-tenant-id'},
     );
 }
 
@@ -218,7 +246,7 @@ __END__
 
 =head1 NAME
 
-AWS::Lambda::Bootstrap - the bootrap script for AWS Lambda Custom Runtime.
+AWS::Lambda::Bootstrap - the bootstrap script for AWS Lambda Custom Runtime.
 
 =head1 SYNOPSIS
 
@@ -233,7 +261,7 @@ Now, you can start using Perl in AWS Lambda!
 
     bootstrap(@ARGV);
 
-Prebuild Perl Runtime Layer includes the C<bootstrap> script.
+Pre-built Perl Runtime Layer includes the C<bootstrap> script.
 So, if you use the Layer, no need to include the C<bootstrap> script into your zip.
 See L<AWS::Lambda> for more details.
 

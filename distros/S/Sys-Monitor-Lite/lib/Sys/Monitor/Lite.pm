@@ -6,7 +6,7 @@ use Time::HiRes qw(sleep);
 use JSON::PP ();
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 my %COLLECTORS = (
     system  => \&_system_info,
@@ -15,18 +15,24 @@ my %COLLECTORS = (
     mem     => \&_memory_usage,
     disk    => \&_disk_usage,
     disk_io => \&_disk_io,
+    mounts  => \&_mount_info,
     net     => \&_network_io,
+    process => \&_process_list,
 );
 
 sub collect_all {
-    return collect();
+    my ($options) = @_;
+    return collect(undef, $options);
 }
 
 sub collect {
-    my ($which) = @_;
+    my ($which, $options) = @_;
     my @names;
     if (!defined $which) {
-        @names = qw(system cpu load mem disk disk_io net);
+        @names = qw(system cpu load mem disk disk_io mounts net);
+        if ($options && ref $options eq 'HASH' && exists $options->{process}) {
+            push @names, 'process';
+        }
     } elsif (ref $which eq 'ARRAY') {
         @names = @$which;
     } else {
@@ -34,9 +40,10 @@ sub collect {
     }
 
     my %data = (timestamp => _timestamp());
+    my %collector_opts = ref $options eq 'HASH' ? %$options : ();
     for my $name (@names) {
         my $collector = $COLLECTORS{$name} or next;
-        my $value = eval { $collector->() };
+        my $value = eval { $collector->($collector_opts{$name}) };
         next if $@;
         $data{$name} = $value;
     }
@@ -121,47 +128,57 @@ sub _memory_usage {
 }
 
 sub _disk_usage {
+    my $mounts = _mounted_filesystems();
     my %seen;
     my @disks;
     my $has_statvfs = POSIX->can('statvfs');
     my $df_stats    = _df_stats();
 
-    if (open my $fh, '<', '/proc/mounts') {
-        while (my $line = <$fh>) {
-            my ($device, $mount, $type) = (split /\s+/, $line)[0..2];
-            next if $seen{$mount}++;
-            next if $mount =~ m{^/(?:proc|sys|dev|run|snap)};
-            next if $type =~ /^(?:proc|sysfs|tmpfs|devtmpfs|cgroup.+|rpc_pipefs|overlay)$/;
-            next unless defined $mount && length $mount;
-            next unless -d $mount;
+    for my $mount_info (@$mounts) {
+        my $mount = $mount_info->{mount};
+        next if $seen{$mount}++;
+        next unless -d $mount;
 
-            my ($total, $used, $free);
-            if ($has_statvfs) {
-                my @stat = eval { POSIX::statvfs($mount) };
-                next unless @stat;
-                my ($bsize, $frsize, $blocks, $bfree, $bavail) = @stat;
-                $total = $blocks * $frsize;
-                $free  = $bavail * $frsize;
-                $used  = $total - ($bfree * $frsize);
-            } else {
-                my $info = $df_stats->{$mount};
-                next unless $info;
+        my ($total, $used, $free, $inode_total, $inode_used, $inode_free);
+        if ($has_statvfs) {
+            my @stat = eval { POSIX::statvfs($mount) };
+            if (@stat) {
+                my ($bsize, $frsize, $blocks, $bfree, $bavail, $files, $ffree) = @stat;
+                $total       = $blocks * $frsize;
+                $free        = $bavail * $frsize;
+                $used        = $total - ($bfree * $frsize);
+                $inode_total = _maybe_number($files);
+                $inode_free  = _maybe_number($ffree);
+                $inode_used  = defined $inode_total && defined $inode_free
+                    ? $inode_total - $inode_free
+                    : undef;
+            }
+        }
+
+        if (!defined $total) {
+            my $info = $df_stats->{$mount};
+            if ($info) {
                 $total = $info->{total};
                 $used  = $info->{used};
                 $free  = $info->{avail};
             }
-
-            push @disks, {
-                mount        => $mount,
-                filesystem   => $device,
-                type         => $type,
-                total_bytes  => $total,
-                used_bytes   => $used,
-                free_bytes   => $free,
-                used_pct     => _percent($used, $total),
-            };
         }
-        close $fh;
+
+        push @disks, {
+            mount           => $mount,
+            filesystem      => $mount_info->{device},
+            type            => $mount_info->{type},
+            options         => $mount_info->{options},
+            read_only       => $mount_info->{read_only},
+            total_bytes     => $total,
+            used_bytes      => $used,
+            free_bytes      => $free,
+            used_pct        => _percent($used, $total),
+            inodes_total    => $inode_total,
+            inodes_used     => $inode_used,
+            inodes_free     => $inode_free,
+            inodes_used_pct => _percent($inode_used, $inode_total),
+        };
     }
 
     if (!@disks && $df_stats && %$df_stats) {
@@ -173,15 +190,41 @@ sub _disk_usage {
                 mount        => $mount,
                 filesystem   => $info->{filesystem},
                 type         => $info->{type} // 'unknown',
+                options      => [],
+                read_only    => undef,
                 total_bytes  => $info->{total},
                 used_bytes   => $info->{used},
                 free_bytes   => $info->{avail},
                 used_pct     => _percent($info->{used}, $info->{total}),
+                inodes_total    => undef,
+                inodes_used     => undef,
+                inodes_free     => undef,
+                inodes_used_pct => undef,
             };
         }
     }
 
     return \@disks;
+}
+
+sub _mount_info {
+    my $mounts = _mounted_filesystems();
+    my %by_mount;
+
+    for my $info (@$mounts) {
+        my $key = _mount_key($info->{mount});
+        next unless length $key;
+        $by_mount{$key} = {
+            present     => 1,
+            mount       => $info->{mount},
+            filesystem  => $info->{device},
+            type        => $info->{type},
+            options     => $info->{options},
+            read_only   => $info->{read_only},
+        };
+    }
+
+    return \%by_mount;
 }
 
 sub _disk_io {
@@ -257,6 +300,137 @@ sub _network_io {
     return \@ifaces;
 }
 
+sub _process_list {
+    my ($opts) = @_;
+    $opts ||= {};
+
+    my $uptime    = _uptime_seconds();
+    my $clk_tck   = POSIX::sysconf(&POSIX::_SC_CLK_TCK) || 100;
+    my $page_size = POSIX::sysconf(&POSIX::_SC_PAGESIZE) || 4096;
+    my $cores     = _cpu_cores() || 1;
+
+    opendir my $dh, '/proc' or return [];
+    my @pids = grep { /^\d+$/ } readdir $dh;
+    closedir $dh;
+
+    my @processes;
+    for my $pid (@pids) {
+        my $stat_path = "/proc/$pid/stat";
+        my $cmd_path  = "/proc/$pid/cmdline";
+        my $status_path = "/proc/$pid/status";
+        next unless -r $stat_path;
+
+        open my $sfh, '<', $stat_path or next;
+        my $stat_line = <$sfh> // '';
+        close $sfh;
+        next unless $stat_line =~ /^(\d+)\s+\((.*)\)\s+(.+)$/;
+
+        my ($parsed_pid, $comm, $rest) = ($1, $2, $3);
+        my @fields = split /\s+/, $rest;
+        next unless @fields >= 22;
+
+        my $state      = $fields[0];
+        my $ppid       = _maybe_number($fields[1]);
+        my $utime      = _maybe_number($fields[11]);
+        my $stime      = _maybe_number($fields[12]);
+        my $starttime  = _maybe_number($fields[19]);
+        my $rss_pages  = _maybe_number($fields[21]);
+        my $threads    = _maybe_number($fields[16]);
+
+        my $elapsed = defined $uptime && defined $starttime
+            ? $uptime - ($starttime / $clk_tck)
+            : undef;
+        my $cpu_pct =
+            defined $elapsed && $elapsed > 0 && defined $utime && defined $stime
+            ? sprintf('%.1f', (($utime + $stime) / $clk_tck) / $elapsed * 100 / $cores)
+            : 0;
+
+        my $rss_bytes = defined $rss_pages ? $rss_pages * $page_size : undef;
+
+        my $cmdline = '';
+        if (open my $cfh, '<', $cmd_path) {
+            local $/ = undef;
+            my $raw = <$cfh> // '';
+            close $cfh;
+            $raw =~ s/\0/ /g;
+            $cmdline = $raw;
+            $cmdline =~ s/\s+$//;
+        }
+
+        my $uid;
+        if (open my $stfh, '<', $status_path) {
+            while (my $line = <$stfh>) {
+                if ($line =~ /^Uid:\s+(\d+)/) {
+                    $uid = _maybe_number($1);
+                    last;
+                }
+            }
+            close $stfh;
+        }
+
+        push @processes, {
+            pid       => _maybe_number($parsed_pid),
+            ppid      => $ppid,
+            name      => $comm,
+            command   => length($cmdline) ? $cmdline : $comm,
+            state     => $state,
+            threads   => $threads,
+            uid       => $uid,
+            cpu_pct   => _maybe_number($cpu_pct),
+            rss_bytes => $rss_bytes,
+        };
+    }
+
+    my @watch = map { lc $_ } @{ $opts->{watch} // [] };
+    my $has_watch = @watch ? 1 : 0;
+
+    my @selected;
+    if ($has_watch) {
+        push @selected, grep { _process_matches($_, \@watch) } @processes;
+    }
+
+    if (my $n = $opts->{top_cpu}) {
+        push @selected, _top_processes(\@processes, 'cpu_pct', $n);
+    }
+
+    if (my $n = $opts->{top_rss}) {
+        push @selected, _top_processes(\@processes, 'rss_bytes', $n);
+    }
+
+    if (!$has_watch && !$opts->{top_cpu} && !$opts->{top_rss}) {
+        return \@processes;
+    }
+
+    my %seen;
+    my @deduped;
+    for my $proc (@selected) {
+        next if $seen{ $proc->{pid} }++;
+        push @deduped, $proc;
+    }
+
+    return \@deduped;
+}
+
+sub _top_processes {
+    my ($processes, $field, $n) = @_;
+    return () unless $processes && @$processes && $n && $field;
+    my @sorted = sort { ($b->{$field} // 0) <=> ($a->{$field} // 0) } @$processes;
+    my $limit = $n < @sorted ? $n : scalar @sorted;
+    return @sorted[0 .. $limit - 1];
+}
+
+sub _process_matches {
+    my ($proc, $watch) = @_;
+    return 0 unless $proc && $watch && @$watch;
+    my $name = lc($proc->{name} // '');
+    my $cmd  = lc($proc->{command} // '');
+    for my $needle (@$watch) {
+        return 1 if index($name, $needle) >= 0;
+        return 1 if index($cmd,  $needle) >= 0;
+    }
+    return 0;
+}
+
 sub _df_stats {
     open my $df, '-|', 'df', '-P', '-k' or return {};
     my %stats;
@@ -283,6 +457,46 @@ sub _df_stats {
     return \%stats;
 }
 
+sub _mounted_filesystems {
+    my %seen;
+    my @mounts;
+
+    if (open my $fh, '<', '/proc/mounts') {
+        while (my $line = <$fh>) {
+            my ($device, $mount, $type, $opts) = (split /\s+/, $line)[0..3];
+            next if $seen{$mount}++;
+            next if $mount =~ m{^/(?:proc|sys|dev|run|snap)};
+            next if $type =~ /^(?:proc|sysfs|tmpfs|devtmpfs|cgroup.+|rpc_pipefs|overlay)$/;
+            next unless defined $mount && length $mount;
+
+            my @options = defined $opts && length $opts ? split(/,/, $opts) : ();
+            my $read_only = grep { $_ eq 'ro' } @options ? 1 : 0;
+
+            push @mounts, {
+                device    => $device,
+                mount     => $mount,
+                type      => $type,
+                options   => \@options,
+                read_only => $read_only,
+            };
+        }
+        close $fh;
+    }
+
+    return \@mounts;
+}
+
+sub _mount_key {
+    my ($path) = @_;
+    return '' unless defined $path && length $path;
+    my $key = $path;
+    $key =~ s{^/}{root_};
+    $key =~ s{[^A-Za-z0-9_.]}{_}g;
+    $key =~ s{_+}{_}g;
+    $key =~ s{_\z}{};
+    return $key;
+}
+
 sub to_json {
     my ($data, %opts) = @_;
     my $encoder = JSON::PP->new->canonical->ascii(0);
@@ -292,6 +506,83 @@ sub to_json {
     return $encoder->encode($data);
 }
 
+sub to_yaml {
+    my ($data) = @_;
+    my $yaml = _yaml_dump($data, 0);
+    $yaml .= "\n" unless $yaml =~ /\n\z/;
+    return $yaml;
+}
+
+sub _yaml_dump {
+    my ($data, $indent) = @_;
+    my $prefix = '  ' x $indent;
+
+    if (!defined $data) {
+        return $prefix . "null\n";
+    }
+
+    if (!ref $data) {
+        return $prefix . _yaml_scalar($data) . "\n";
+    }
+
+    if (ref $data eq 'HASH') {
+        my $out = '';
+        for my $key (sort keys %$data) {
+            my $value = $data->{$key};
+            if (_yaml_is_simple($value)) {
+                $out .= $prefix . $key . ': ' . _yaml_scalar($value) . "\n";
+            } else {
+                $out .= $prefix . "$key:\n" . _yaml_dump($value, $indent + 1);
+            }
+        }
+        return $out eq '' ? $prefix . "{}\n" : $out;
+    }
+
+    if (ref $data eq 'ARRAY') {
+        return $prefix . "[]\n" unless @$data;
+
+        my $out = '';
+        for my $value (@$data) {
+            if (_yaml_is_simple($value)) {
+                $out .= $prefix . '- ' . _yaml_scalar($value) . "\n";
+            } else {
+                $out .= $prefix . "-\n" . _yaml_dump($value, $indent + 1);
+            }
+        }
+        return $out;
+    }
+
+    return $prefix . _yaml_scalar($data) . "\n";
+}
+
+sub _yaml_is_simple {
+    my ($value) = @_;
+    return !ref($value);
+}
+
+sub _yaml_scalar {
+    my ($value) = @_;
+
+    return 'null' unless defined $value;
+
+    if (looks_like_number($value) && $value !~ /^0[0-9]/) {
+        return $value;
+    }
+
+    if ($value eq '') {
+        return "''";
+    }
+
+    if ($value =~ /[\s#:>{}\[\],]|\A[-?]|\n/) {
+        my $escaped = $value;
+        $escaped =~ s/'/''/g;
+        $escaped =~ s/\n/\\n/g;
+        return "'$escaped'";
+    }
+
+    return $value;
+}
+
 sub _timestamp {
     my @t = gmtime();
     return sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ", $t[5]+1900,$t[4]+1,@t[3,2,1,0]);
@@ -299,6 +590,151 @@ sub _timestamp {
 
 sub available_metrics {
     return sort keys %COLLECTORS;
+}
+
+sub metrics_from_thresholds {
+    my ($warn, $crit) = @_;
+    my %roots;
+    for my $expr (@{ $warn // [] }, @{ $crit // [] }) {
+        my $rule = _parse_threshold_expression($expr);
+        next unless $rule->{parts} && @{ $rule->{parts} };
+        $roots{ $rule->{parts}[0] } = 1;
+    }
+    return sort keys %roots;
+}
+
+sub evaluate_thresholds {
+    my ($data, %opts) = @_;
+    die "evaluate_thresholds requires a hash reference of data" unless ref $data eq 'HASH';
+
+    my @warn_expr = @{ $opts{warn} // [] };
+    my @crit_expr = @{ $opts{crit} // [] };
+
+    my @rules;
+    push @rules, map { _build_threshold_rule($_, 'warn') } @warn_expr;
+    push @rules, map { _build_threshold_rule($_, 'crit') } @crit_expr;
+
+    my %paths;
+    for my $rule (@rules) {
+        push @{ $paths{ $rule->{path} }{ $rule->{severity} } }, $rule;
+        $paths{ $rule->{path} }{parts} = $rule->{parts};
+    }
+
+    my $status = 0;
+    my @messages;
+    for my $path (sort keys %paths) {
+        my $info  = $paths{$path};
+        my $value = _dig_value($data, $info->{parts});
+        my $path_status = _evaluate_path_thresholds($value, $info);
+        $status = $path_status if $path_status > $status;
+        push @messages, _format_threshold_message($path, $value, $info);
+    }
+
+    my $label   = _status_label($status);
+    my $message = @messages ? join(' ', $label . ' -', join('; ', @messages)) : $label;
+
+    return {
+        status  => $status,
+        label   => $label,
+        message => $message,
+        details => \%paths,
+    };
+}
+
+sub _build_threshold_rule {
+    my ($expr, $severity) = @_;
+    my $parsed = _parse_threshold_expression($expr);
+    $parsed->{severity} = $severity;
+    return $parsed;
+}
+
+sub _parse_threshold_expression {
+    my ($expr) = @_;
+    die "Invalid threshold expression" unless defined $expr;
+
+    my ($path, $op, $value) = $expr =~ /^([A-Za-z0-9_\.]+)\s*(>=|<=|==|!=|>|<)\s*(.+)$/;
+    die "Invalid threshold expression: $expr" unless defined $path && defined $op;
+
+    $value = _maybe_number($value);
+    my @parts = split /\./, $path;
+    return { path => $path, op => $op, expect => $value, parts => \@parts };
+}
+
+sub _dig_value {
+    my ($data, $parts) = @_;
+    my $current = $data;
+    for my $part (@$parts) {
+        if (ref $current eq 'HASH' && exists $current->{$part}) {
+            $current = $current->{$part};
+            next;
+        }
+        if (ref $current eq 'ARRAY' && $part =~ /^\d+$/ && $part < @$current) {
+            $current = $current->[$part];
+            next;
+        }
+        return undef;
+    }
+    return $current;
+}
+
+sub _evaluate_path_thresholds {
+    my ($value, $info) = @_;
+
+    return 2 unless defined $value;
+
+    for my $rule (@{ $info->{crit} // [] }) {
+        return 2 if _threshold_matched($value, $rule);
+    }
+    for my $rule (@{ $info->{warn} // [] }) {
+        return 1 if _threshold_matched($value, $rule);
+    }
+    return 0;
+}
+
+sub _threshold_matched {
+    my ($value, $rule) = @_;
+
+    return 0 unless defined $rule;
+    my $expected = $rule->{expect};
+    my $op       = $rule->{op};
+
+    if (!defined $value) {
+        return 0;
+    }
+
+    if ($op eq '>')  { return $value >  $expected }
+    if ($op eq '>=') { return $value >= $expected }
+    if ($op eq '<')  { return $value <  $expected }
+    if ($op eq '<=') { return $value <= $expected }
+    if ($op eq '==') { return $value == $expected }
+    if ($op eq '!=') { return $value != $expected }
+    return 0;
+}
+
+sub _format_threshold_message {
+    my ($path, $value, $info) = @_;
+    my $value_str = defined $value ? $value : 'N/A';
+
+    my @parts;
+    if (my $warn = $info->{warn}) {
+        push @parts, map { _format_rule($_) } @$warn;
+    }
+    if (my $crit = $info->{crit}) {
+        push @parts, map { _format_rule($_) } @$crit;
+    }
+
+    my $suffix = @parts ? '(' . join(' ', @parts) . ')' : '';
+    return join('', $path, '=', $value_str, ' ', $suffix) =~ s/\s+\z//r;
+}
+
+sub _format_rule {
+    my ($rule) = @_;
+    return sprintf('%s%s', $rule->{op}, $rule->{expect});
+}
+
+sub _status_label {
+    my ($status) = @_;
+    return $status == 2 ? 'CRIT' : $status == 1 ? 'WARN' : 'OK';
 }
 
 sub _percent {
@@ -352,7 +788,7 @@ __END__
 
 =head1 NAME
 
-Sys::Monitor::Lite - Lightweight system monitoring toolkit with JSON output
+Sys::Monitor::Lite - Lightweight system monitoring toolkit with JSON/YAML output
 
 =head1 SYNOPSIS
 
@@ -361,8 +797,9 @@ Sys::Monitor::Lite - Lightweight system monitoring toolkit with JSON output
 
 =head1 DESCRIPTION
 
-A minimal system monitor that outputs structured JSON data
-for easy automation and integration with jq-lite.
+A minimal system monitor that outputs structured JSON or YAML data
+for easy automation and integration with jq-lite, yq, or other
+tools that consume structured logs.
 
 =head1 FUNCTIONS
 
@@ -388,6 +825,30 @@ L</collect_all> but contains only the requested keys.
 
 Returns a sorted list of metric names that the module can collect.
 
+=head2 metrics_from_thresholds
+
+    my @metrics = Sys::Monitor::Lite::metrics_from_thresholds(
+        ['mem.used_pct>80'],
+        ['load.1min>2'],
+    );
+
+Parses threshold expressions and returns the top-level metrics (e.g.
+C<mem>, C<load>) that they reference. This is useful for preloading only
+the data needed for threshold checks.
+
+=head2 evaluate_thresholds
+
+    my $result = Sys::Monitor::Lite::evaluate_thresholds(
+        $data,
+        warn => ['mem.used_pct>80'],
+        crit => ['mem.used_pct>90'],
+    );
+
+Evaluates warning/critical threshold expressions against a collected
+metrics hashref and returns a structure containing C<status> (0/1/2),
+human-readable C<label>, and a formatted C<message> suitable for CLI
+output.
+
 =head2 to_json
 
     my $json = Sys::Monitor::Lite::to_json($data, pretty => 1);
@@ -395,18 +856,21 @@ Returns a sorted list of metric names that the module can collect.
 Serialises the supplied data structure to a JSON string using
 L<JSON::PP>. Pass C<pretty =E<gt> 1> to enable human-readable output.
 
+=head2 to_yaml
+
+    my $yaml = Sys::Monitor::Lite::to_yaml($data);
+
+Serialises the supplied data structure to a YAML string using a
+minimal built-in emitter.
+
 =head1 EXPORT
 
 This module does not export any symbols by default. Functions can be
 called with their fully-qualified names, e.g. C<Sys::Monitor::Lite::collect_all()>.
 
-=head1 SEE ALSO
-
-L<script/sys-monitor-lite> – command-line interface for this module.
-
 =head1 AUTHOR
 
-Shingo Kawamura E<lt>kpannakoota1@gmail.comE<gt>
+Shingo Kawamura E<lt>pannakoota1@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 package Net::Stripe::PaymentMethod;
-$Net::Stripe::PaymentMethod::VERSION = '0.42';
+$Net::Stripe::PaymentMethod::VERSION = '0.43';
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
 use Kavorka;
@@ -42,7 +42,7 @@ Net::Stripe::PaymentMethod - represent a PaymentMethod object from Stripe
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 ATTRIBUTES
 

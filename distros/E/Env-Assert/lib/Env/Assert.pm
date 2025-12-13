@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Ensure that the environment variables match what you need, or abort.
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 # We define our own import routine because
 # this is the point (when `use Env::Assert` is called)
@@ -75,16 +75,11 @@ Env::Assert - Ensure that the environment variables match what you need, or abor
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
 =for :stopwords env filepath filepaths
-
-=head1 STATUS
-
-Package Env::Assert is currently being developed so changes in the API are possible,
-though not likely.
 
 =for test_synopsis BEGIN { die 'SKIP: no .envdesc file here' }
 
@@ -100,6 +95,11 @@ though not likely.
 
     # use any environment variable
     say $ENV{MY_VAR};
+
+=head1 STATUS
+
+Package Env::Assert is currently being developed so changes in the API are possible,
+though not likely.
 
 =head1 NOTES
 

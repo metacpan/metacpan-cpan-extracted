@@ -34,7 +34,7 @@ class    #
     #~ dnf install SDL2-devel SDL2_image-devel SDL2_mixer-devel SDL2_ttf-devel
     #~ https://github.com/libsdl-org/setup-sdl/issues/20
     # TODO: Write a GH action to test with libs preinstalled
-    field $version  : param //= '3.2.24';
+    field $version  : param //= '3.2.28';
     field $prebuilt : param //= 1;
     field $archive  : param //= sprintf 'https://github.com/libsdl-org/SDL/releases/download/release-%s/SDL3-' . (
         $^O eq 'MSWin32' ?

@@ -10,7 +10,7 @@ use Encode qw(decode);
 use base 'Exporter';				# Use Exporter as the base class
 our @EXPORT_OK = qw(is_valid_datetime load_dynamic_vocabulary);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %dynamic_properties;	# Global variable to store property definitions
 our %dynamic_schema;	# Global variable to store class definitions
@@ -21,7 +21,7 @@ Schema::Validator - Tools for validating and loading Schema.org vocabulary defin
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

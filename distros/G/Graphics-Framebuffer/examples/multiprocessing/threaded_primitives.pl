@@ -280,9 +280,9 @@ my @order : shared = (
     'TrueType Fonts',
     'TrueType Printing',
 
-    #    'Rotate TrueType Fonts',
-    #    'Color Replace None-Clipped',
-    #    'Color Replace Clipped',
+#    'Rotate TrueType Fonts',
+#    'Color Replace None-Clipped',
+#    'Color Replace Clipped',
     'Blitting',
 
     'Blit Move',

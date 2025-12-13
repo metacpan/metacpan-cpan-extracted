@@ -11,5 +11,5 @@ use Env::Assert assert => {
     break_at_first_error => 0,
 };
 
-say 'Control should not reach this point!' || croak 'ERROR';
+say 'Control will reach this point if env requirements are fullfilled!' || croak 'ERROR';
 exit 0;

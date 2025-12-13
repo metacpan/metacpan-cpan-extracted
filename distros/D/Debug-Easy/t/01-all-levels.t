@@ -2,13 +2,22 @@
 use 5.008;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 1; # 115
+use Term::ANSIColor;
+use Test::More tests => 115; # 115
 
 BEGIN {
     use_ok('Debug::Easy') || print "Bail out! Can't load Debug::Easy!\n";
 }
 
-exit(0);
+diag("\n" . colored(['cyan on_black'], q{ _______        _   _              }));
+diag(colored(['cyan on_black'], q{|__   __|      | | (_)             }));
+diag(colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }));
+diag(colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }));
+diag(colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }));
+diag(colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }));
+diag(colored(['cyan on_black'], q{                             __/ | }));
+diag(colored(['cyan on_black'], q{                            |___/  }));
+
 my @LogLevel = qw( ERR WARN NOTICE INFO DEBUG DEBUGMAX );
 my @CodeLevel = ('[ ERROR ]', '[WARNING]', '[NOTICE ]', '[ INFO  ]', '[ DEBUG ]', '[-DEBUG-]');
 

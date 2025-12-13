@@ -4,7 +4,7 @@
       "ICHINOSE Shogo"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "mit"
    ],
@@ -57,6 +57,7 @@
             "JSON::Types" : "0.05",
             "JSON::XS" : "4.0",
             "MIME::Base64" : "0",
+            "Parallel::Prefork" : "0",
             "Plack" : "1.0047",
             "Plack::Middleware::ReverseProxy" : "0.16",
             "Try::Tiny" : "0.30",
@@ -79,19 +80,19 @@
    "provides" : {
       "AWS::Lambda" : {
          "file" : "lib/AWS/Lambda.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       },
       "AWS::Lambda::AL" : {
          "file" : "lib/AWS/Lambda/AL.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       },
       "AWS::Lambda::AL2" : {
          "file" : "lib/AWS/Lambda/AL2.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       },
       "AWS::Lambda::AL2023" : {
          "file" : "lib/AWS/Lambda/AL2023.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       },
       "AWS::Lambda::Bootstrap" : {
          "file" : "lib/AWS/Lambda/Bootstrap.pm"
@@ -118,7 +119,7 @@
          "web" : "https://github.com/shogo82148/p5-aws-lambda"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.7.0",
    "x_contributors" : [
       "ICHINOSE Shogo <shogo82148@gmail.com>",
       "Jose Luis Martinez <jlmartinez@capside.com>",

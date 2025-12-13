@@ -1,7 +1,5 @@
 package Object::Configure;
 
-# TODO: configuration inheritance from parents
-
 use strict;
 use warnings;
 
@@ -29,11 +27,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.18
+0.19
 
 =cut
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 SYNOPSIS
 
@@ -87,7 +85,8 @@ Throughout your class, add code such as:
 
 =head3 CONFIGURATION INHERITANCE
 
-C<Object::Configure> supports configuration inheritance, allowing child classes to inherit and override configuration settings from their parent classes. When a class is configured, the module automatically traverses the inheritance hierarchy (using C<@ISA>) and loads configuration files for each ancestor class in the chain.
+C<Object::Configure> supports configuration inheritance, allowing child classes to inherit and override configuration settings from their parent classes.
+When a class is configured, the module automatically traverses the inheritance hierarchy (using C<@ISA>) and loads configuration files for each ancestor class in the chain.
 
 Configuration files are loaded in order from the most general (base class) to the most specific (child class), with later files overriding earlier ones. For example, if C<My::Child::Class> inherits from C<My::Parent::Class>, which inherits from C<My::Base::Class>, the module will:
 
@@ -108,14 +107,14 @@ This allows you to define common settings in a base class configuration file and
 
 Example:
 
-    # File: config/my-base-class.yml
+    # File: ~/.conf/my-base-class.yml
     ---
     My__Base__Class:
       timeout: 30
       retries: 3
       log_level: info
 
-    # File: config/my-child-class.yml
+    # File: ~/.conf/my-child-class.yml
     ---
     My__Child__Class:
       timeout: 60
@@ -126,6 +125,46 @@ Example:
 Parent configuration files are optional.
 If a parent class's configuration file doesn't exist, the module simply skips it and continues up the inheritance chain.
 All discovered configuration files are tracked in the C<_config_files> array for hot reload support.
+
+=head3 UNIVERSAL CONFIGURATION
+
+All Perl classes implicitly inherit from C<UNIVERSAL>.
+C<Object::Configure> takes advantage of this to provide a mechanism for universal configuration settings
+that apply to all classes by default.
+
+If you create a configuration file named C<universal.yml> (or C<universal.conf>, C<universal.json>, etc.)
+in your configuration directory,
+the settings in its C<UNIVERSAL> section will be inherited by all classes that use C<Object::Configure>,
+unless explicitly overridden by class-specific configuration files.
+
+This is particularly useful for setting application-wide defaults such as logging levels,
+timeout values,
+or other common parameters that should apply across all modules.
+
+Example C<~/.conf/universal.yml>:
+
+    ---
+    UNIVERSAL:
+      timeout: 30
+      retries: 3
+      logger:
+        level: info
+
+With this universal configuration file in place,
+all classes will inherit these default values.
+Individual classes can override any of these settings in their own configuration files:
+
+Example C<~/.conf/my-special-class.yml>:
+
+    ---
+    My__Special__Class:
+      timeout: 120
+      # Inherits retries: 3 and logger.level: info from UNIVERSAL
+
+The universal configuration is loaded first in the inheritance chain,
+followed by parent class configurations,
+and finally the specific class configuration,
+with later configurations overriding earlier ones.
 
 =head2 CHANGING BEHAVIOUR AT RUN TIME
 
@@ -570,11 +609,17 @@ sub _walk_isa {
 	# Recursively process parent classes first
 	foreach my $parent (@isa) {
 		# Skip common base classes that won't have configs
-		next if $parent eq 'Exporter';
-		next if $parent eq 'DynaLoader';
-		next if $parent eq 'UNIVERSAL';
+		# next if $parent eq 'Exporter';
+		# next if $parent eq 'DynaLoader';
+		# next if $parent eq 'UNIVERSAL';
 
 		_walk_isa($parent, $chain, $seen);
+	}
+
+	# If this class has no parents and isn't UNIVERSAL itself,
+	# explicitly add UNIVERSAL as a parent
+	if (!@isa && $class ne 'UNIVERSAL') {
+		_walk_isa('UNIVERSAL', $chain, $seen);
 	}
 
 	# Add current class to chain (after parents)

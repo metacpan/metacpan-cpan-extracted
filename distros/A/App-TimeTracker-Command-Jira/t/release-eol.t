@@ -8,9 +8,18 @@ BEGIN {
 
 use strict;
 use warnings;
-use Test::More;
 
-eval 'use Test::EOL';
-plan skip_all => 'Test::EOL required' if $@;
+# this test was generated with Dist::Zilla::Plugin::EOLTests 0.19
 
-all_perl_files_ok({ trailing_whitespace => 1 });
+use Test::More 0.88;
+use Test::EOL;
+
+my @files = (
+    'lib/App/TimeTracker/Command/Jira.pm',
+    't/00-load.t',
+    't/000-report-versions.t',
+    't/perlcriticrc'
+);
+
+eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;
+done_testing;

@@ -16,7 +16,7 @@ It allows you to query and transform JSON using jq-like syntax — without exter
 * 🪶 **Pure Perl** — no XS or C dependencies
 * 🔍 jq-style filters: `.users[].name`, `.nickname?`, `select(...)`, `map(...)`
 * 🔢 Supports arithmetic & conditionals: `if ... then ... else ... end`
-* 🔧 CLI tool: `jq-lite` with `--null-input`, `--slurp`, `--from-file`, `--yaml`, `--arg`
+* 🔧 CLI tool: `jq-lite` with `--null-input`, `--slurp`, `--from-file`, `--yaml`, `--arg`, `--argjson`
 * 📊 Built-in 100+ jq functions (see [`FUNCTIONS.md`](FUNCTIONS.md))
 * 💻 Interactive mode for exploring JSON
 * 🧰 Works with JSON or YAML input

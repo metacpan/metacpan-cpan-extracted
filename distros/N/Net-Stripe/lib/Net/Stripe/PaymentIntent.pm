@@ -1,5 +1,5 @@
 package Net::Stripe::PaymentIntent;
-$Net::Stripe::PaymentIntent::VERSION = '0.42';
+$Net::Stripe::PaymentIntent::VERSION = '0.43';
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
 use Kavorka;
@@ -81,7 +81,7 @@ Net::Stripe::PaymentIntent - represent an PaymentIntent object from Stripe
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 ATTRIBUTES
 

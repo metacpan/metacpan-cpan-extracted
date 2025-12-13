@@ -1,54 +1,43 @@
-requires 'perl', '5.026000';
-requires 'File::Spec';
-requires 'Config';
+requires 'Capture::Tiny';
+requires 'Carp';
+requires 'Path::Tiny';
+requires 'Storable';
 requires 'XSLoader';
-requires 'Sub::Util';
-requires 'Text::ParseWords';
-requires 'Attribute::Handlers';
-#
-on 'test' => sub {
-    requires 'Test::More' => 0.98;
-    requires 'Data::Dumper';
-    requires 'Math::BigInt';
-    requires 'Devel::CheckBin';
-};
-on 'configure' => sub {
-    requires 'Archive::Tar';
+requires 'perl', 'v5.40.0';
+
+on configure => sub {
     requires 'CPAN::Meta';
-    requires 'Devel::CheckBin';
-    requires 'ExtUtils::Config'  => 0.003;
-    requires 'ExtUtils::Helpers' => 0.020;
+    requires 'Exporter', '5.57';
+    requires 'ExtUtils::Helpers', '0.028';
     requires 'ExtUtils::Install';
-    requires 'ExtUtils::InstallPaths' => 0.002;
+    requires 'ExtUtils::InstallPaths', '0.002';
     requires 'File::Basename';
     requires 'File::Find';
     requires 'File::Path';
     requires 'File::Spec::Functions';
-    requires 'Getopt::Long' => 2.36;
-
-    #requires 'HTTP::Tiny';
-    #requires 'IO::Socket::SSL' => 1.42;
-    requires 'IO::Uncompress::Unzip';
-    requires 'JSON::PP' => 2;
-    requires 'Module::Build::Tiny';
-
-    #requires 'Net::SSLeay' => 1.49;
-    requires 'Path::Tiny' => 0.144;
+    requires 'Getopt::Long', '2.36';
+    requires 'JSON::PP', '2';
+    requires 'Path::Tiny';
+    requires 'perl', 'v5.40.0';
 };
-on 'develop' => sub {
-    requires 'CPAN::Uploader';
-    requires 'Code::TidyAll';
-    requires 'Code::TidyAll::Plugin::ClangFormat';
-    requires 'Code::TidyAll::Plugin::PodTidy';
-    requires 'Perl::Tidy';
-    requires 'Pod::Tidy';
-    requires 'Test::CPAN::Meta';
-    requires 'Test::MinimumVersion::Fast';
-    requires 'Test::PAUSE::Permissions';
-    requires 'Test::Pod' => 1.41;
-    requires 'Test::Spellunker';
-    requires 'Version::Next';
-    requires 'Pod::Markdown::Github';
-    requires 'Software::License::Artistic_2_0';
-    requires 'Minilla';
+
+on build => sub {
+    requires 'DynaLoader';
+    requires 'ExtUtils::CBuilder';
+    requires 'Getopt::Long', '2.36';
+    requires 'Path::Tiny';
+};
+
+on test => sub {
+    requires 'Capture::Tiny';
+    requires 'Data::Dump';
+    requires 'Data::Printer';
+    requires 'IPC::Cmd';
+    requires 'TAP::Harness::Env';
+    requires 'Test2::Plugin::UTF8';
+    requires 'Test2::Tools::Compare';
+    requires 'Test2::V0';
+    recommends 'Benchmark';
+    recommends 'FFI::Platypus', '2';
+    recommends 'Inline::C';
 };

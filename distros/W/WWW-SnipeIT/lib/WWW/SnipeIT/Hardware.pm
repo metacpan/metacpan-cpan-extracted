@@ -2,6 +2,7 @@ package WWW::SnipeIT::Hardware;
 use Modern::Perl '2018';
 
 use Object::Pad;
+use URI;
 
 use HTTP::Request;
 use LWP::UserAgent;
@@ -12,8 +13,6 @@ class Hardware {
 
     field $endpoint :param;
     field $header :param;
-
-
 
     method getHardwareIDByAssetTag ($assetTag) {
         my $url = $endpoint."hardware/bytag/".$assetTag;
@@ -104,6 +103,19 @@ class Hardware {
     method getHardwareByCategory ($searchString) {
         my $url = $endpoint."hardware?category_id=".$searchString;
         my $r = HTTP::Request->new('GET', $url, $header);
+        my $ua = LWP::UserAgent->new();
+        my $res = $ua->request($r);
+        my $results = JSON::XS::decode_json($res->{_content});
+
+        return $results;
+    }
+
+    method getHardware (%params) {
+        my $uri = URI->new($endpoint."hardware");
+        while (my ($key, $value) = each %params) {
+            $uri->query_param($key => $value);
+        }
+        my $r = HTTP::Request->new('GET', $uri->as_string, $header);
         my $ua = LWP::UserAgent->new();
         my $res = $ua->request($r);
         my $results = JSON::XS::decode_json($res->{_content});

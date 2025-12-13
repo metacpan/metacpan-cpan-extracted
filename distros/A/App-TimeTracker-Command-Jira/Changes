@@ -1,5 +1,15 @@
 Revision history for App-TimeTracker-Command-Jira
 
+1.0       2025-12-12 15:24:31+01:00 Europe/Vienna
+
+1.0       2025-12-12 15:22:11+02:00 Europe/Vienna
+
+    - Dummy release as module version has not been updated before
+
+0.9       2025-12-12 15:00:11+02:00 Europe/Vienna
+
+    - Allow Jira token authentication (Jozef Kutej)
+
 0.8       2019-05-09 16:24:11+02:00 Europe/Zurich
 
     - Tidied up POD (Mohammad S Anwar)

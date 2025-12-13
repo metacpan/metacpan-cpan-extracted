@@ -2,6 +2,78 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v2.19.29] - 2025-12-12
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🚧 Build
+
+- *(makefile)* Update required module versions
+
+## [version/v2.19.28] - 2025-12-12
+
+### ⚙️ Miscellaneous Tasks
+
+- Merge branch 'morext'
+
+* morext:
+  build(manifest): Update manifest and signature file
+  docs(file): Update documentation
+  test(strict): Ensure the use of strict and warnings, or equivalents
+  test(tabs): Ensure the use of spaces instead of tabs for indenting
+  test(yath): Preload frequently used test modules
+  test(versions): Ensure that proper versions
+  test(critic): More detailed perlcritic tests for dist
+  style(eol): Remove cruft
+  test(eol): Ensure proper unix line-endings in all files
+  refactor(spell): Augment the spell tests
+  test(yath): Run xt/ tests on --author
+  docs(pod): Amend note on alternates
+  test(critic): Stop using FindBin to specify rc file
+  test(yath): Watch examples dir for changes
+  test(yath): Remove HARNESS-NO-PRELOAD
+- *(version)* Bump version patch level
+
+### 🚜 Refactor
+
+- *(spell)* Augment the spell tests
+
+### 🧪 Testing
+
+- *(file)* Check return values on file ops, skip tests on fail
+- *(file)* Add checks for freebsd and openbsd
+- *(yath)* Remove HARNESS-NO-PRELOAD
+- *(yath)* Watch examples dir for changes
+- *(critic)* Stop using FindBin to specify rc file
+- *(yath)* Run xt/ tests on --author
+- *(eol)* Ensure proper unix line-endings in all files
+- *(critic)* More detailed perlcritic tests for dist
+- *(versions)* Ensure that proper versions
+- *(yath)* Preload frequently used test modules
+- *(tabs)* Ensure the use of spaces instead of tabs for indenting
+- *(strict)* Ensure the use of strict and warnings, or equivalents
+
+### 📚 Documentation
+
+- *(pod)* Amend note on alternates
+- *(file)* Update documentation
+
+### 🎨 Styling
+
+- *(eol)* Remove cruft
+
+### 🚧 Build
+
+- *(manifest)* Update manifest and signature file
+
+## [release/2025/11/25/1032] - 2025-11-25
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v2.19.12] - 2025-11-25
 
 ### ⚙️ Miscellaneous Tasks

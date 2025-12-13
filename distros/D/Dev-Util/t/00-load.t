@@ -75,3 +75,4 @@ my $module_version = version->parse(qq($Dev::Util::VERSION))->stringify;
 diag("Testing Dev::Util $module_version");
 diag("Perl $PERL_VERSION, $EXECUTABLE_NAME");
 
+done_testing;

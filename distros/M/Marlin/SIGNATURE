@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 762563e06298b35f72e2950bd8d3a813c615322d91234886eab72e7cb046229f COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 6ebb235aa7943e9766da569ae408d5b22d1b072d50ee6999b59fe0cd6d9de2eb Changes
+SHA256 1d9dc1e89745701b4c7876fed0c1690fef4408f8de4eae45ea08ed01f02a7b82 INSTALL
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
+SHA256 96b3f766662f1f8d774b3dbcf14d120b615ca73a325c16f9e2216ad781c513e3 MANIFEST
+SHA256 e4ffd66a917e5b00de712a7dacf88f03047b56cff3b15bac0384a24b7f6d48b7 META.json
+SHA256 bc19befac672b0dfeb21175e9821ed1a228bde9c5dce6fce571c766bbb767719 META.yml
+SHA256 55c0802c1eef9ec7662bfc2422b3c2f69009ab3bbda436da3ae8d1aecbd2b4a9 Makefile.PL
+SHA256 d25312d5c5a367ac7228a8a0b0eb28e5969c7ad943024779bf5890021e73827b README
+SHA256 9791a5ce0e84d0395facec82932c2f26b10b26173e43420d19acb8206a238a97 dist.ini
+SHA256 b1fdf0717a36a1c792aee529b4143425ad203165aff4cb19f8746985e535c2a2 doap.ttl
+SHA256 fb347484df9ae20b36aea7d3db0ee5436cbb7ceb344ea3d90bcb2c822096cd6c examples/benchmark.pl
+SHA256 fb3eeb442d552c7796c187fddbaad9fc5c507b96dd35bf00f4509073d751f4e2 examples/can_haz_xs.pl
+SHA256 c9621554d11c374df8308a117a64b5ac6b0f4912d8f37c583f2b5df8aebd1a46 examples/lib/Local/Example/Core.pm
+SHA256 7813a707b9f587b6602e05cb7d4aefe14a47874d427ab02e12d57068c33721fe examples/lib/Local/Example/Marlin.pm
+SHA256 40e63331d268186a721e071f12e33d5d7841ca1da479232fc9f770ef5b6fd878 examples/lib/Local/Example/Moo.pm
+SHA256 9fbe4c373b33bd97e7245e6e864c49a15240b35a26b086e872d37834fded84af examples/lib/Local/Example/Moose.pm
+SHA256 dd1f7eb9fb86022187cf6e37ff90204f74e4b239f7398f6f4e169dd8dd2670ef examples/lib/Local/Example/Plain.pm
+SHA256 184e5a80cc6ac7ce018c6c2532b46ea789124e026ad19f56a584966baab215bd examples/lib/Local/Example/Tiny.pm
+SHA256 bf0773e26e0254a45652f488bd2fe2c853d70be646de8dd41e4061615c9134d3 examples/peek_at_delegations.pl
+SHA256 3bc26537483f50ccdf5bac4f579681eff83790a5d26f127b25d5eb9be3d9c05f examples/test.pl
+SHA256 615db85b807bb00b88c7ceb4f533b0e61ab3e6a1117cd0d32703615797ca6026 lib/Marlin.pm
+SHA256 8e23a330333afccb7739736c084e46561fc5cb4aabcd88f76b0d15515eaa83f9 lib/Marlin/Attribute.pm
+SHA256 eb66dd8a4fb53dd053db07f8a4ad1f9f38f65eb460f9a68672c465b3c3239112 lib/Marlin/Manual/Comparison.pod
+SHA256 f2a08d031ab92dbc5edfc988cc5ebb1d8a9d54d192466e27117c0879326f707d lib/Marlin/Manual/Principles.pod
+SHA256 3ca6152e34d92ee45f8651b0a59cc1aefce0ff21af4e77c5b3f3b091233541a8 lib/Marlin/Util.pm
+SHA256 b93da2e4ef5aa853227b484fed3c34a78950a7e650845ef538a125b3c8a927ad t/00start.t
+SHA256 43c486b6c234f25e29f09ee45f0bdc7b345af6ba7c1d3af5babae1d3732f3bf5 t/01basic.t
+SHA256 903afcc8c1d26aada00917b40c235d13536cb49610a3b508b15cca161bb0e7ec t/integration/comparison-example.t
+SHA256 5ec21868f191daacd9becdb0c54af6c805d6188833360ae800584bb9faec30e7 t/lib/Local/Example/Marlin.pm
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaT1BaAAKCRDOv4Eoaip9
+OWEfAJ4vdY0q9OoPrQnuD7oRXhlsB/W79QCfQ2w8dqleaBCTwA7m/3IviG4BYes=
+=JKrL
+-----END PGP SIGNATURE-----

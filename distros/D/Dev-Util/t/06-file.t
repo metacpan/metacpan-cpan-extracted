@@ -26,10 +26,6 @@ open( my $tff_h, '>', $tff ) or croak "Can't open file for writing\n";
 print { $tff_h } "Owner Persist\nIris Seven\n#Fence\n\n";
 close($tff_h);
 
-my $tsl = $td . "/symlink.$$.test";
-symlink( $tff, $tsl );
-
-socket( my $ts, PF_INET, SOCK_STREAM, ( getprotobyname('tcp') )[2] );
 my $trf = '/bin/cat';
 my $dnf = '/dev/null';
 
@@ -46,15 +42,19 @@ is( file_exists($no_file), 0,
 #======================================#
 
 my $mode = oct(0000);
-chmod $mode, $tff;
+my $chmod_zero_result = chmod $mode, $tff;
 SKIP: {
-    skip "Root user - test not valid", 1 if ( $REAL_USER_ID == 0 );
+    skip "Root user - test not valid",          1 if ( $REAL_USER_ID == 0 );
+    skip "Could not make test file unreadable", 1 unless ($chmod_zero_result);
     is( file_readable($tff), 0,
         'file_readable - non-readable file returns false' );
 }
 $mode = oct(400);
-chmod $mode, $tff;
-is( file_readable($tff), 1, 'file_readable - readable file returns true' );
+my $chmod_400_result = chmod $mode, $tff;
+SKIP: {
+    skip "Could not make test file readable", 1 unless ($chmod_400_result);
+    is( file_readable($tff), 1, 'file_readable - readable file returns true' );
+}
 
 #======================================#
 #            file_writable             #
@@ -65,9 +65,12 @@ SKIP: {
     is( file_writable($tff), 0,
         'file_writable - non-writable file returns false' );
 }
-$mode = oct(200);
+my $chmod_200_result = $mode = oct(200);
 chmod $mode, $tff;
-is( file_writable($tf), 1, 'file_writable - writable file returns true' );
+SKIP: {
+    skip "Could not make test file writable", 1 unless ($chmod_200_result);
+    is( file_writable($tf), 1, 'file_writable - writable file returns true' );
+}
 
 #======================================#
 #           file_executable            #
@@ -76,9 +79,12 @@ is( file_writable($tf), 1, 'file_writable - writable file returns true' );
 is( file_executable($tff), 0,
     'file_executable - non-executable file returns false' );
 $mode = oct(100);
-chmod $mode, $tff;
-is( file_executable($tff), 1,
-    'file_executable - executable file returns true' );
+my $chmod_100_result = chmod $mode, $tff;
+SKIP: {
+    skip "Could not make test file executable", 1 unless ($chmod_100_result);
+    is( file_executable($tff), 1,
+        'file_executable - executable file returns true' );
+}
 
 #======================================#
 #            file_is_empty             #
@@ -191,8 +197,13 @@ is( file_is_plain($td),  0, 'file_is_plain - non-plain file returns false' );
 #        file_is_symbolic_link         #
 #======================================#
 
-is( file_is_symbolic_link($tsl),
-    1, 'file_is_symbolic_link - symbolic link returns true' );
+my $tsl            = $td . "/symlink.$$.test";
+my $symlink_result = symlink( $tff, $tsl );
+SKIP: {
+    skip "Could not create a symlink", 1 unless ($symlink_result);
+    is( file_is_symbolic_link($tsl),
+        1, 'file_is_symbolic_link - symbolic link returns true' );
+}
 is( file_is_symbolic_link($td),
     0, 'file_is_symbolic_link - non-link file returns false' );
 
@@ -209,7 +220,12 @@ is( file_is_pipe($tf), 0, 'file_is_pipe - non-pipe returns false' );
 #            file_is_socket            #
 #======================================#
 
-is( file_is_socket($ts), 1, 'file_is_socket - socket returns true' );
+my $socket_result
+    = socket( my $ts, PF_INET, SOCK_STREAM, ( getprotobyname('tcp') )[2] );
+SKIP: {
+    skip "Can not create a socket", 1 unless ($socket_result);
+    is( file_is_socket($ts), 1, 'file_is_socket - socket returns true' );
+}
 is( file_is_socket($tf), 0, 'file_is_socket - non-socket returns false' );
 
 #======================================#
@@ -222,6 +238,12 @@ if ( is_mac() ) {
 }
 elsif ( is_linux() ) {
     $block_file = '/dev/loop0';
+}
+elsif ( is_freebsd() ) {
+    $block_file = undef;
+}
+elsif ( is_openbsd() ) {
+    $block_file = undef;
 }
 else {
     $block_file = undef;

@@ -41,6 +41,7 @@ Options:
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
   --arg NAME VALUE     Set jq-style variable $NAME to the string VALUE
+  --argjson NAME JSON  Set jq-style variable $NAME to a JSON-decoded value
   -f, --from-file FILE Read jq filter from FILE instead of the command line
                           (use '-' to read the filter from STDIN)
   -n, --null-input     Use null as input instead of reading JSON data
@@ -87,6 +88,25 @@ GetOptions(
         my $value = shift @ARGV;
         $value = '' unless defined $value;
         $arg_vars{$var_name} = "$value";
+    },
+    'argjson=s'       => sub {
+        my ($opt_name, $var_name) = @_;
+        die "[ERROR] --argjson requires a variable name\n" if !defined $var_name || $var_name eq '';
+        if ($var_name !~ /^[A-Za-z_]\w*$/) {
+            die "[ERROR] Invalid variable name '$var_name' for --argjson\n";
+        }
+        die "[ERROR] --argjson requires a value\n" if !@ARGV;
+        my $value_text = shift @ARGV;
+        $value_text = '' unless defined $value_text;
+
+        my $decoded = eval { JQ::Lite::Util::_decode_json($value_text) };
+        if (my $err = $@) {
+            $err =~ s/\s+\z//;
+            warn "[ERROR] Failed to parse JSON for --argjson $var_name: $err\n";
+            exit 2;
+        }
+
+        $arg_vars{$var_name} = $decoded;
     },
 ) or die "[ERROR] Unknown option(s)\n";
 

@@ -4,7 +4,7 @@ App::TimeTracker::Command::Jira - App::TimeTracker Jira plugin
 
 # VERSION
 
-version 0.8
+version 1.0
 
 # DESCRIPTION
 
@@ -37,6 +37,11 @@ Username to connect with.
 ### password \[OPTIONAL\]
 
 Password to connect with. Beware: This is stored in clear text! Better use authentication via `Config::Identity` via `JIRA::REST` where the credentials can be stored GPG encrypted.
+
+### token \[OPTIONAL\]
+
+Token to authenticate with. Can be generated in Jira user profile.
+See [https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html)
 
 ### log\_time\_spent
 
@@ -85,13 +90,26 @@ If `set_status/stop/transition` is set in config and the current Jira ticket sta
         }
     }
 
+or
+
+    {
+        "plugins" : [
+            "Jira"
+        ],
+        "jira" : {
+            "server_url" : "http://localhost:8080",
+            "token" : "NDc4NDkyNDg3ODE3OstHYSeYC1GnuqRacSqvUbookcZk",
+            "log_time_spent" : "1"
+        }
+    }
+
 # AUTHOR
 
 Michael Kröll <pepl@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Kröll.
+This software is copyright (c) 2019-2025 by Michael Kröll.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::NoTabsTests 0.09
+# this test was generated with Dist::Zilla::Plugin::NoTabsTests 0.15
 
 use Test::More 0.88;
 use Test::NoTabs;

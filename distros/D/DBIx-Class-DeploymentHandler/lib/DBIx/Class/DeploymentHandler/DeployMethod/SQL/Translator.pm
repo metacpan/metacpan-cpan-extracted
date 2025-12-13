@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator;
-$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002234';
+$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002235';
 use Moose;
 
 # ABSTRACT: Manage your SQL and Perl migrations in nicely laid out directories
@@ -344,7 +344,7 @@ sub _load_sandbox {
 package %s;
 {
   our $app;
-  $app ||= require $_file;
+  $app ||= do $_file;
   if ( !$app && ( my $error = $@ || $! )) { die $error; }
   $app;
 }
@@ -1147,7 +1147,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2025 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

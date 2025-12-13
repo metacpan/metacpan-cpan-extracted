@@ -13,6 +13,11 @@ my $collect  = undef;
 my $output   = 'json';
 my $pretty   = 0;
 my $help     = 0;
+my @warn;
+my @crit;
+my $check    = 0;
+my @top;
+my @watch;
 
 GetOptions(
     'interval=f' => \$interval,
@@ -20,6 +25,11 @@ GetOptions(
     'collect=s'  => \$collect,
     'output=s'   => \$output,
     'pretty!'    => \$pretty,
+    'warn=s@'    => \@warn,
+    'crit=s@'    => \@crit,
+    'check!'     => \$check,
+    'top=s@'     => \@top,
+    'watch=s@'   => \@watch,
     'help'       => \$help,
 ) or pod2usage(2);
 
@@ -34,28 +44,97 @@ if (@metrics) {
     }
 }
 
+$check ||= @warn || @crit;
+
+if ($check && !@warn && !@crit) {
+    die "--check requires at least one --warn or --crit threshold\n";
+}
+
 $output = lc $output;
 die "Unsupported output format: $output\n"
-    unless $output eq 'json' || $output eq 'jsonl';
+    unless $output eq 'json' || $output eq 'jsonl' || $output eq 'yaml' || $output eq 'yml';
 
 my $encoder_pretty = $output eq 'jsonl' ? 0 : $pretty;
 
-my $run_once = $once || $interval <= 0;
+my $run_once = $once || $interval <= 0 || $check;
 my $sleep_interval = $interval > 0 ? $interval : 5;
+
+my @threshold_metrics = Sys::Monitor::Lite::metrics_from_thresholds(\@warn, \@crit);
+if ($check) {
+    my @unknown_thresholds = grep { !$valid{$_} } @threshold_metrics;
+    if (@unknown_thresholds) {
+        die "Unknown metrics in thresholds: " . join(', ', @unknown_thresholds) . "\n";
+    }
+
+    if (@metrics) {
+        my %seen = map { $_ => 1 } @metrics;
+        push @metrics, grep { !$seen{$_} } @threshold_metrics;
+    } else {
+        @metrics = @threshold_metrics if @threshold_metrics;
+    }
+}
+
+my %proc_opts;
+if (@top) {
+    for my $entry (@top) {
+        my ($field, $count) = $entry =~ /^(\w+)=([0-9]+)$/;
+        die "--top expects format cpu=5 or rss=5\n" unless defined $field && defined $count;
+        if ($field eq 'cpu') {
+            $proc_opts{top_cpu} = $count;
+        } elsif ($field eq 'rss') {
+            $proc_opts{top_rss} = $count;
+        } else {
+            die "Unsupported --top field: $field (use cpu or rss)\n";
+        }
+    }
+}
+
+if (@watch) {
+    my @names;
+    for my $w (@watch) {
+        push @names, split(/,/, $w);
+    }
+    $proc_opts{watch} = [ grep { length } @names ];
+}
+
+my $needs_process = %proc_opts ? 1 : 0;
+if ($needs_process) {
+    if (@metrics) {
+        my %seen = map { $_ => 1 } @metrics;
+        push @metrics, 'process' unless $seen{process};
+    }
+    else {
+        @metrics = ('process');
+    }
+}
 
 while (1) {
     my $data = @metrics
-        ? Sys::Monitor::Lite::collect(\@metrics)
-        : Sys::Monitor::Lite::collect_all();
+        ? Sys::Monitor::Lite::collect(\@metrics, { process => \%proc_opts })
+        : Sys::Monitor::Lite::collect_all({ process => \%proc_opts });
 
-    my %opts = $encoder_pretty ? (pretty => 1) : ();
-    my $json = Sys::Monitor::Lite::to_json($data, %opts);
-    if ($output eq 'jsonl') {
-        $json =~ s/\s+\z//;
-        print $json, "\n";
+    if ($check) {
+        my $result = Sys::Monitor::Lite::evaluate_thresholds(
+            $data,
+            warn => \@warn,
+            crit => \@crit,
+        );
+        print $result->{message}, "\n";
+        exit $result->{status};
+    } elsif ($output eq 'yaml' || $output eq 'yml') {
+        my $yaml = Sys::Monitor::Lite::to_yaml($data);
+        print $yaml;
+        print "\n" unless $yaml =~ /\n\z/;
     } else {
-        print $json;
-        print "\n" unless $json =~ /\n\z/;
+        my %opts = $encoder_pretty ? (pretty => 1) : ();
+        my $json = Sys::Monitor::Lite::to_json($data, %opts);
+        if ($output eq 'jsonl') {
+            $json =~ s/\s+\z//;
+            print $json, "\n";
+        } else {
+            print $json;
+            print "\n" unless $json =~ /\n\z/;
+        }
     }
 
     last if $run_once;
@@ -66,7 +145,7 @@ __END__
 
 =head1 NAME
 
-sys-monitor-lite - Collect lightweight system metrics as JSON
+sys-monitor-lite - Collect lightweight system metrics as JSON or YAML
 
 =head1 SYNOPSIS
 
@@ -75,8 +154,8 @@ sys-monitor-lite - Collect lightweight system metrics as JSON
 
 =head1 DESCRIPTION
 
-Collects metrics exposed by L<Sys::Monitor::Lite> and prints them as JSON or
-JSON Lines. Use C<--collect> to limit which subsystems are gathered.
+Collects metrics exposed by L<Sys::Monitor::Lite> and prints them as JSON,
+JSON Lines, or YAML. Use C<--collect> to limit which subsystems are gathered.
 
 =head1 OPTIONS
 
@@ -93,15 +172,40 @@ Collect a single sample (default when C<--interval> is not provided).
 =item B<--collect LIST>
 
 Comma-separated list of metrics to gather (e.g. C<cpu,mem,disk>). Available
-metrics: system, cpu, load, mem, disk, disk_io, net.
+metrics: system, cpu, load, mem, disk, mounts, disk_io, net, process.
 
 =item B<--output FORMAT>
 
-Output format: C<json> (default) or C<jsonl> for JSON Lines.
+Output format: C<json> (default), C<jsonl> for JSON Lines, or C<yaml>.
 
 =item B<--pretty>
 
 Pretty-print JSON output (ignored for JSON Lines).
+
+=item B<--check>
+
+Run a single collection, evaluate thresholds, print a compact status, and exit
+with a Nagios-compatible exit code (0=OK, 1=WARN, 2=CRIT).
+
+=item B<--warn EXPR>
+
+Warning threshold expression such as C<mem.used_pct>80>. Can be repeated.
+Automatically enables C<--check>.
+
+=item B<--crit EXPR>
+
+Critical threshold expression such as C<mem.used_pct>90>. Can be repeated.
+Automatically enables C<--check>.
+
+=item B<--top FIELD=COUNT>
+
+Return only the top COUNT processes by CPU usage or RSS (e.g. C<--top cpu=5>
+or C<--top rss=10>). Automatically enables the C<process> metric.
+
+=item B<--watch NAMES>
+
+Comma-separated list of process names/commands to include (e.g.
+C<--watch nginx,sssd>). Automatically enables the C<process> metric.
 
 =item B<--help>
 

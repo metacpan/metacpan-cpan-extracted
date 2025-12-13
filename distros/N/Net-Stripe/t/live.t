@@ -107,12 +107,14 @@ my $fake_address = {
 
 my $fake_email = 'anonymous@example.com';
 my $fake_phone = '555-555-1212';
+my $fake_tax_id = undef();
 
 my $fake_billing_details = {
     address => $fake_address,
     email   => $fake_email,
     name    => $fake_name,
     phone   => $fake_phone,
+    tax_id  => $fake_tax_id,
 };
 
 my $fake_card = {
@@ -151,12 +153,14 @@ my $updated_fake_address = {
 
 my $updated_fake_email = 'dr.anonymous@example.com';
 my $updated_fake_phone = '310-555-1212';
+my $updated_fake_tax_id = undef();
 
 my $updated_fake_billing_details = {
     address => $updated_fake_address,
     email   => $updated_fake_email,
     name    => $updated_fake_name,
     phone   => $updated_fake_phone,
+    tax_id  => $updated_fake_tax_id,
 };
 
 my $updated_fake_card = {
@@ -246,32 +250,6 @@ Sources: {
         isa_ok $source, 'Net::Stripe::Source';
         for my $field (qw/amount client_secret created currency flow id livemode metadata owner statement_descriptor status type usage/) {
             ok defined( $source->$field ), "source has $field";
-        }
-    }
-
-    Create_with_receiver_flow_fields: {
-        my %source_args = (
-            type => 'ach_credit_transfer',
-            amount => 1234,
-            currency => 'usd',
-            flow => 'receiver',
-            receiver => {
-                refund_attributes_method => 'manual',
-            },
-            statement_descriptor => 'Statement Descr',
-        );
-        my $source = $stripe->create_source(
-            %source_args,
-        );
-        isa_ok $source, 'Net::Stripe::Source';
-
-        # we cannot use is_deeply on the entire hash because the returned
-        # 'receiver' hash has some keys that do not exist in our hash
-        for my $f ( sort( grep { $_ ne 'receiver' } keys( %source_args ) ) ) {
-            is $source->$f, $source_args{$f}, "source $f matches";
-        }
-        for my $f ( sort( keys( %{$source_args{receiver}} ) ) ) {
-            is $source->receiver->{$f}, $source_args{receiver}->{$f}, "source receiver $f matches";
         }
     }
 
@@ -367,6 +345,12 @@ Sources: {
             source_id => $source->id,
             %updated_source_args,
         );
+
+# HACK, HACK, HACK!!
+# the Stripe API has inconsistent responses for empty address_line2 when passing the empty string.
+# on create, it correctly reflects the empty string, while on update it incorrectly reflects undef/null
+$updated_source_args{owner}->{address} = Storable::dclone( $updated_source_args{owner}->{address} );
+undef( $updated_source_args{owner}->{address}->{line2} );
 
         for my $f ( sort( grep { $_ ne 'owner' } keys( %updated_source_args ) ) ) {
             if ( ref( $updated_source_args{$f} ) eq 'HASH' ) {
@@ -792,12 +776,7 @@ undef( $updated_payment_method_args{billing_details}->{address}->{line2} );
 
         for my $field ( sort( keys( %updated_payment_method_args ) ) ) {
             if ( ref( $updated_payment_method_args{$field} ) eq 'HASH' ) {
-                # PaymentMethod metadata appears to behave differently from
-                # other objects. other objects merge new keys on update where
-                # PaymentMethod seems to overwrite the entire hash with the
-                # passed hash.
-                #my $merged = { %{$payment_method_args{$field} || {}}, %{$updated_payment_method_args{$field} || {}} };
-                my $merged = $updated_payment_method_args{$field};
+                my $merged = { %{$payment_method_args{$field} || {}}, %{$updated_payment_method_args{$field} || {}} };
                 is_deeply $updated->$field, $merged, "updated payment_method $field matches";
             } else {
                 is $updated->$field, $updated_payment_method_args{$field}, "updated payment_method $field matches";
@@ -870,7 +849,7 @@ Plans: {
             my $e = $@;
             isa_ok $e, 'Net::Stripe::Error', 'error raised is an object';
             is $e->type, 'invalid_request_error', 'error type';
-            is $e->message, "No such plan: $id", 'error message';
+            is $e->message, "No such plan: '$id'", 'error message';
         } else {
             fail "no longer can fetch deleted plans";
 
@@ -921,7 +900,7 @@ Coupons: {
             my $e = $@;
             isa_ok $e, 'Net::Stripe::Error', 'error raised is an object';
             is $e->type, 'invalid_request_error', 'error type';
-            is $e->message, "No such coupon: $id", 'error message';
+            is $e->message, "No such coupon: '$id'", 'error message';
         } else {
             fail "no longer can fetch deleted coupons";
 
@@ -1172,7 +1151,7 @@ Charges: {
             my $e = $@;
             isa_ok $e, 'Net::Stripe::Error', 'error raised is an object';
             is $e->type, 'card_error', 'error type';
-            is $e->message, 'Cannot charge a customer that has no active card', 'error message';
+            like $e->message, qr/^This Customer doesn't have any saved payment details/;
         } else {
             fail 'post charge for customer with token id';
         }

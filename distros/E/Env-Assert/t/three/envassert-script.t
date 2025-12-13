@@ -60,23 +60,19 @@ my $path1 = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't',
 subtest 'Script fails with other envdesc file with missing env variables' => sub {
     chdir($path1) || croak "Cannot chdir($path1): $OS_ERROR";
 
-    my $stderr;
-    my $stderr_result = <<'EOF';
-Environment Assert: ERRORS:
-    variables:
-        ANOTHER_MISSING_VAR: Variable ANOTHER_MISSING_VAR is missing from environment
-        A_DIGIT: Variable A_DIGIT is missing from environment
-        A_MISSING_VAR: Variable A_MISSING_VAR is missing from environment
-Errors in environment detected. at bin/using-another.pl line 9.
-BEGIN failed--compilation aborted at bin/using-another.pl line 12.
-EOF
-    script_fails( [ 'bin/using-another.pl', ], { stderr => \$stderr, exit => 255, }, 'Verify errors in output' );
-    is( $stderr, $stderr_result, 'Correct stderr' );
+    my ( $stdout, $stderr );
+    script_fails( [ 'bin/using-another.pl', ], { stdout => \$stdout, stderr => \$stderr, exit => 255, },
+        'Verify errors in output' );
+    ## no critic (RegularExpressions::RequireDotMatchAnything,RegularExpressions::RequireLineBoundaryMatching,RegularExpressions::ProhibitComplexRegexes,RegularExpressions::RequireExtendedFormatting)
+    is( $stdout, q{},                                                                                     'Correct stdout' );
+    is( $stderr, match qr/ANOTHER_MISSING_VAR: Variable ANOTHER_MISSING_VAR is missing from environment/, 'Correct stderr' );
+    is( $stderr, match qr/A_DIGIT: Variable A_DIGIT is missing from environment/,                         'Correct stderr' );
+    is( $stderr, match qr/A_MISSING_VAR: Variable A_MISSING_VAR is missing from environment/,             'Correct stderr' );
 
     done_testing;
 };
 
-subtest 'Script succeeds with other envdesc file' => sub {
+subtest 'Script succeeds with other envdesc file because env requirements are fullfilled' => sub {
     chdir($path1) || croak "Cannot chdir($path1): $OS_ERROR";
 
     ## no critic (Variables::RequireLocalizedPunctuationVars)
@@ -84,8 +80,10 @@ subtest 'Script succeeds with other envdesc file' => sub {
     $ENV{A_DIGIT}             = '123';
     $ENV{A_MISSING_VAR}       = 'is_no_longer_missing';
     $ENV{ANOTHER_MISSING_VAR} = 'is_no_longer_missing';
-    my $stdout = 'Control should not reach this point!';
-    script_runs( [ 'bin/using-another.pl', ], { stdout => \$stdout, }, 'Verify no errors in output' );
+    my ( $stdout, $stderr );
+    script_runs( [ 'bin/using-another.pl', ], { stdout => \$stdout, stderr => \$stderr, }, 'Verify no errors in output' );
+    is( $stdout, qq{Control will reach this point if env requirements are fullfilled!\n}, 'Correct stdout' );
+    is( $stderr, q{},                                                                     'Correct stderr' );
 
     done_testing;
 };

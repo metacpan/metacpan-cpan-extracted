@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "perl" : "5.008"
          }
@@ -62,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/Schema-Validator"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

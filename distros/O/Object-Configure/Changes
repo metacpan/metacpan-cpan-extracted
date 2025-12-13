@@ -1,5 +1,8 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.19	Fri Dec 12 08:07:32 EST 2025
+	Enable reading from universal.yaml etc.
+
 0.18	Thu Dec 11 11:58:01 EST 2025
 	If a parent class hierachy can't be found, ensure we still load the given path/file
 

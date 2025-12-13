@@ -1,10 +1,132 @@
 ==================================================
-Changes from 2019-03-16 00:00:00 +0000 to present.
+Changes from 2024-12-12 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.42 at 2020-03-15 19:54:24 +0000
+version 0.43 at 2025-12-12 23:48:22 +0000
 -----------------------------------------
+
+  Change: 792f303bbcbdebf598d13402c77ad98355e8661b
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-12-12 23:47:09 +0000
+
+    bump version in README.pod 
+
+  Change: b00699dc7896ecfc7415e5829404596f3ac7d9e4
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-12-12 15:05:26 +0000
+
+    Merge pull request #216 from sherrardb/use-uri-5.19
+
+    URI < 5.19 causes error when serializing undef
+    billing_address[tax_id] 
+
+  Change: 981ea6bc7a8d7354ea985351375b0a096f569dcb
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-12-12 20:04:46 +0000
+
+    URI < 5.19 causes error when serializing undef
+    billing_address[tax_id] 
+
+  Change: e76318a3c6480d9396b2b04cb714209155bd1e94
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-12-12 15:02:47 +0000
+
+    Merge pull request #215 from sherrardb/consistent-form-fields
+
+    use consistent order when serializing form fields 
+
+  Change: c5e6072280093a113552ed4dba399a093b1603ba
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-12-12 19:56:42 +0000
+
+    use consistent order when serializing form fields 
+
+  Change: 6667c06f6a9290ca853d7674cd61f41fc23d187c
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-12-12 19:49:02 +0000
+
+    update contributor list 
+
+  Change: 1c93b021a2189f0e92771fd5ddf4f4ae05d34959
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-11-26 16:03:42 +0000
+
+    Merge pull request #214 from sherrardb/fix-failing-tests
+
+    fix failing tests 
+
+  Change: f58007ed666ace5c84fd3c47ce9de93c9aae18f2
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2025-11-26 21:01:25 +0000
+
+    fix failing tests
+
+    * deprecate non-card payment methods for legacy Sources
+
+    <https://support.stripe.com/topics/shutdown-of-the-legacy-sources-api
+    -for-non-card-payment-methods>
+
+    * add tax_id subkey for billing_details
+
+    <https://docs.stripe.com/changelog/basil/2025-04-30/add-tax-id-to-bil
+    ling-details>
+
+    * update expected error message text for
+    Post_charge_for_customer_id_using_token_id 
+
+  Change: 07d6649f567fb9848fc95fedde4cfde836a8c68f
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2022-03-31 15:30:07 +0000
+
+    Merge pull request #211 from sherrardb/extraneous-request-in-get-all
+
+    extraneous request in _get_all() 
+
+  Change: 8e32da7d4c282b2a2039f614df4678606dca9101
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2022-03-31 19:26:14 +0000
+
+    extraneous request in _get_all() * relying on `is_empty()` requires
+    an extraneous API request * after merging lists, use `has_more()` to
+    exit loop * closes <https://github.com/lukec/stripe-perl/issues/210> 
+
+  Change: 433a8eefc364edf020aeebc602d4699256fe1cd4
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2021-02-21 10:48:11 +0000
+
+    Merge pull request #209 from sherrardb/fix-failing-tests
+
+    fix failing tests 
+
+  Change: 114c9c0f613d5ea2b1a4b9580d628e35e5667b24
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2021-02-21 15:44:56 +0000
+
+    fix failing tests
+
+    * certain tests appear to now be failing because of changes in the
+    API response from the Stripe side
+
+    * 'amount' is not allowed for reusable sources. Stripe updated API
+    response for ach_credit_transfer.
+
+    * metadata (re)setting behavior for PaymentMethod is now consistent
+    with other object types
+
+    * the Stripe API now returns quotes around values in some error
+    strings
+
+    * address update behavior for sources has been updated to be similar
+    to that of payment_methods
+
+    * closes <https://github.com/lukec/stripe-perl/issues/207> 
+
+  Change: 0026886aa5ba4c1f27766a6c1e137ea9c499e5ee
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2020-03-12 19:06:39 +0000
+
+    bump version in README.pod 
 
   Change: 423fbd9166eb4450a52363dcd4abde53f97f2770
   Author: sherrardb <32931314+sherrardb@users.noreply.github.com>

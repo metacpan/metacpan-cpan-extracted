@@ -657,9 +657,9 @@ Example:
 
 Automatically unsubscribes from active subscriptions.
 
-=head1 Data Units
+=head1 DATA UNITS
 
-=head2 CALLBACK FUNCTIONS
+=head2 callback functions
 
 Example:
 
@@ -712,13 +712,6 @@ The following methods are internal and not intended for external use:
 =item * C<_add_sub>
 
 =back
-
-
-=head1 BUG REPORTS
-
-https://github.com/VojtaKrenek/BACnet-Perl/issues
-
-=cut
 
 =head1 AUTHOR
 

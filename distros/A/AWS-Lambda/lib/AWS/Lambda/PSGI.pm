@@ -28,7 +28,8 @@ sub new {
 
     if (!defined $self->{invoke_mode}) {
         my $mode = $ENV{PERL5_LAMBDA_PSGI_INVOKE_MODE}
-            || $ENV{AWS_LWA_INVOKE_MODE}; # for compatibility with https://github.com/awslabs/aws-lambda-web-adapter
+            || $ENV{AWS_LWA_INVOKE_MODE} # for compatibility with https://github.com/awslabs/aws-lambda-web-adapter
+            || "BUFFERED";
         $self->{invoke_mode} = uc $mode;
     }
  
@@ -358,7 +359,7 @@ __END__
 
 =head1 NAME
 
-AWS::Lambda::PSGI - It translates enevt of Lambda Proxy Integrations in API Gateway and 
+AWS::Lambda::PSGI - It translates event of Lambda Proxy Integrations in API Gateway and 
 Application Load Balancer into L<PSGI>.
 
 =head1 SYNOPSIS
@@ -400,7 +401,7 @@ The function urls's invoke mode is configured as C<"RESPONSE_STREAM">, and Lambd
                 PERL5_LAMBDA_PSGI_INVOKE_MODE: RESPONSE_STREAM
             # (snip)
 
-In this mode, the PSGI server accespts L<Delayed Response and Streaming Body|https://metacpan.org/pod/PSGI#Delayed-Response-and-Streaming-Body>.
+In this mode, the PSGI server accepts L<Delayed Response and Streaming Body|https://metacpan.org/pod/PSGI#Delayed-Response-and-Streaming-Body>.
 
     my $app = sub {
         my $env = shift;

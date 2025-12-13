@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::VersionHandler::Monotonic;
-$DBIx::Class::DeploymentHandler::VersionHandler::Monotonic::VERSION = '0.002234';
+$DBIx::Class::DeploymentHandler::VersionHandler::Monotonic::VERSION = '0.002235';
 use Moose;
 use DBIx::Class::DeploymentHandler::Types;
 
@@ -110,7 +110,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2025 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

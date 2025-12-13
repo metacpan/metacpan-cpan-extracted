@@ -30,3 +30,10 @@
 
 #git
 \.gitignore$
+
+# manual testing
+^preview\.html$
+^sandbox\.pl$
+
+# Distribution Stuff
+^BACnet-

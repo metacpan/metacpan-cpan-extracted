@@ -1,5 +1,19 @@
 Revision history for Sys-Monitor-Lite
 
+0.06  2025-12-15
+    - Bump version for inode and mount monitoring enhancements.
+
+0.05  2025-12-14
+    - Add lightweight process metric with --top/--watch CLI helpers and
+      basic CPU/RSS sampling from /proc.
+
+0.04  2025-12-13
+    - Add Nagios-style threshold parsing helpers and --check/--warn/--crit
+      CLI switches that return compact status output with exit codes.
+
+0.03  2025-12-13
+    - Add YAML output support for the module and CLI.
+
 0.02  2025-10-22
     - Add disk I/O metrics collector and documentation updates.
 

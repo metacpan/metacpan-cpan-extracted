@@ -1,5 +1,5 @@
 package Net::Stripe::List;
-$Net::Stripe::List::VERSION = '0.42';
+$Net::Stripe::List::VERSION = '0.43';
 use Moose;
 use Kavorka;
 
@@ -66,7 +66,7 @@ Net::Stripe::List - represent a list of objects from Stripe
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 ATTRIBUTES
 

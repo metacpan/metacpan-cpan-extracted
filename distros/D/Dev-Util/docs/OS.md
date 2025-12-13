@@ -4,7 +4,7 @@ Dev::Util::OS - OS discovery and functions
 
 # VERSION
 
-Version v2.19.12
+Version v2.19.29
 
 # SYNOPSIS
 

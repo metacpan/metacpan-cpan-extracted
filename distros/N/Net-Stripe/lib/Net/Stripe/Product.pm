@@ -1,5 +1,5 @@
 package Net::Stripe::Product;
-$Net::Stripe::Product::VERSION = '0.42';
+$Net::Stripe::Product::VERSION = '0.43';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -49,7 +49,7 @@ Net::Stripe::Product - represent a Product object from Stripe
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 ATTRIBUTES
 

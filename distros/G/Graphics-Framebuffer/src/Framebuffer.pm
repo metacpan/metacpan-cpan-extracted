@@ -1257,29 +1257,29 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
 ###
         if ($@) {
             print STDERR qq{
-OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
+                OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
-This is usually caused by one or more of the following:
+                This is usually caused by one or more of the following:
 
-  *  Your account does not have proper permission to access the framebuffer
-     device.
+                *  Your account does not have proper permission to access the framebuffer
+                  device.
 
-     This usually requires adding the "video" group to your account.  This is
-     usually accomplished via the following command (replace "username" with
-     your actual username):
+                This usually requires adding the "video" group to your account.  This is
+                  usually accomplished via the following command (replace "username" with
+                      your actual username):
 
-\tsudo usermod -a -G video username
+                \tsudo usermod -a -G video username
 
-  *  You could be attempting to run this inside X-Windows/Wayland, which
-	 doesn't work.  You MUST run your script outside of X-Windows from the
-     system Console.  If you are inside X-Windows/Wayland, and you do not know
-     how to get to your console, just hit CTRL-ALT-F5 to access one of the
-     consoles.  This has no windows or mouse functionality.  It is command
-     line only (similar to old DOS).
+                *  You could be attempting to run this inside X-Windows/Wayland, which
+                  doesn't work.  You MUST run your script outside of X-Windows from the
+  system Console.  If you are inside X-Windows/Wayland, and you do not know
+  how to get to your console, just hit CTRL-ALT-F5 to access one of the
+  consoles.  This has no windows or mouse functionality.  It is command
+  line only (similar to old DOS).
 
-     To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F8 or
-	 ALT-F7 on some systems).  Linux can have many consoles, which are
-     usually mapped F1 to F9.  One of them is set aside for X-Windows/Wayland.
+To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F8 or
+    ALT-F7 on some systems).  Linux can have many consoles, which are
+  usually mapped F1 to F9.  One of them is set aside for X-Windows/Wayland.
 
 Actual error reported:\n\n$@\n};
             sleep($self->{'RESET'}) ? 10 : 1;
@@ -1287,19 +1287,19 @@ Actual error reported:\n\n$@\n};
         } ## end if ($@)
     } elsif (exists($ENV{'DISPLAY'}) && (-e $self->{'FB_DEVICE'})) {
         print STDERR qq{
-OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
+        OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
-You are attempting to run this inside X-Windows/Wayland, which doesn't work.
-You MUST run your script outside of X-Windows from the system Console.  If
-you are inside X-Windows/Wayland, and you do not know how to get to your
-console, just hit CTRL-ALT-F5 to access one of the consoles.  This has no
-windows or mouse functionality.  It is command line only (similar to old
-DOS).
+        You are attempting to run this inside X-Windows/Wayland, which doesn't work.
+  You MUST run your script outside of X-Windows from the system Console.  If
+  you are inside X-Windows/Wayland, and you do not know how to get to your
+  console, just hit CTRL-ALT-F5 to access one of the consoles.  This has no
+  windows or mouse functionality.  It is command line only (similar to old
+      DOS).
 
 To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F7 or ALT-F8
-on some systems).  Linux can have many consoles, which are usually mapped F1
-to F9.  One of them is set aside for X-Windows/Wayland.
-};
+    on some systems).  Linux can have many consoles, which are usually mapped F1
+  to F9.  One of them is set aside for X-Windows/Wayland.
+  };
 ###
         sleep($self->{'RESET'}) ? 10 : 1;
         exit(1);
@@ -1990,76 +1990,292 @@ Set a single pixel in the set foreground color at position x,y with the given pi
     my $index;
     my $bytes       = $self->{'BYTES'};
     my $color_alpha = $self->{'COLOR_ALPHA'};
-	my ($x_clip,$y_clip,$xx_clip,$yy_clip) = ($self->{'X_CLIP'},$self->{'Y_CLIP'},$self->{'XX_CLIP'},$self->{'YY_CLIP'});
+    my ($x_clip, $y_clip, $xx_clip, $yy_clip) = ($self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'});
     if ($self->{'ACCELERATED'}) {
         c_plot($self->{'SCREEN'}, $x, $y, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $color_alpha, $self->{'DRAW_MODE'}, $bytes, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'},);
     } else {
         my $raw_foreground_color = $self->{'RAW_FOREGROUND_COLOR'};
         my $raw_background_color = $self->{'RAW_BACKGROUND_COLOR'};
         my $draw_mode            = $self->{'DRAW_MODE'};
+
         # Only plot if the pixel is within the clipping region
         unless (($x > $xx_clip) || ($y > $yy_clip) || ($x < $x_clip) || ($y < $y_clip)) {
+
             # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
             # the history buffer.
             unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
                 $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
                 if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $bytes)) {
-					if ($draw_mode == NORMAL_MODE) {
-                        $c = $raw_foreground_color;
-					} else {
-						$c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $bytes;
-						if ($draw_mode == XOR_MODE) {
-							$c ^= $raw_foreground_color;
-						} elsif ($draw_mode == OR_MODE) {
-							$c |= $raw_foreground_color;
-						} elsif ($draw_mode == ALPHA_MODE) {
-							my $back  = $self->get_pixel({ 'x' => $x, 'y' => $y });
-							my $saved = { 'main' => $raw_foreground_color };
-							foreach my $color (qw( red green blue )) {
-								$saved->{$color} = $self->{ 'COLOR_' . uc($color) };
-								$back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $color_alpha) + ($back->{$color} * (1 - $color_alpha));
-							}
-							$back->{'alpha'} = min(255, $color_alpha + $back->{'alpha'});
-							$self->set_color($back);
-							$c                    = $raw_foreground_color;
-							$raw_foreground_color = $saved->{'main'};
-							foreach my $color (qw( red green blue )) {
-								$self->{ 'COLOR_' . uc($color) } = $saved->{$color};
-							}
-						} elsif ($draw_mode == MASK_MODE) {
-							if ($self->{'BITS'} == 32) {
-								$c = $raw_foreground_color if (substr($raw_foreground_color, 0, 3) ne substr($raw_background_color, 0, 3));
-							} else {
-								$c = $raw_foreground_color if ($raw_foreground_color ne $raw_background_color);
-							}
-						} elsif ($draw_mode == UNMASK_MODE) {
-							my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-							if ($self->{'BITS'} == 32) {
-								$c = $raw_foreground_color if (substr($pixel->{'raw'}, 0, 3) eq substr($raw_background_color, 0, 3));
-							} else {
-								$c = $raw_foreground_color if ($pixel->{'raw'} eq $raw_background_color);
-							}
-						} elsif ($draw_mode == AND_MODE) {
-							$c &= $raw_foreground_color;
-						} elsif ($draw_mode == ADD_MODE) {
-							$c += $raw_foreground_color;
-						} elsif ($draw_mode == SUBTRACT_MODE) {
-							$c -= $raw_foreground_color;
-						} elsif ($draw_mode == MULTIPLY_MODE) {
-							$c *= $raw_foreground_color;
-						} elsif ($draw_mode == DIVIDE_MODE) {
-							$c /= $raw_foreground_color;
-						}
-					}
-					substr($self->{'SCREEN'}, $index, $bytes) = $c;
-					if ($@) {
-						warn __LINE__ . " $@" if ($self->{'SHOW_ERRORS'});
-						$self->_fix_mapping();
-					}
+
+                    # Assumes the following lexicals are already computed above:
+                    #   my ($x, $y, $index, $color_alpha, $color_alpha_int);
+                    # And raw color bytes:
+                    #   my $raw_foreground_color = $self->{'RAW_FOREGROUND_COLOR'};
+                    #   my $raw_background_color = $self->{'RAW_BACKGROUND_COLOR'};
+                    # You can hoist these caches at method entry:
+                    my $bytes     = $self->{'BYTES'};
+                    my $bits      = $self->{'BITS'};
+                    my $screenref = \$self->{'SCREEN'};
+                    my $smem_len  = $self->{'fscreeninfo'}->{'smem_len'};
+                    my $max_index = $smem_len - $bytes;
+
+                    return if $index < 0 || $index > $max_index;
+
+                    my $draw_mode = $self->{'DRAW_MODE'};
+
+                    if ($draw_mode == NORMAL_MODE) {
+                        substr($$screenref, $index, $bytes) = $raw_foreground_color;
+                    } else {
+
+                        # Read the current pixel once and reuse
+                        my $cur = substr($$screenref, $index, $bytes) || chr(0) x $bytes;
+                        my $c;
+
+                        if ($draw_mode == XOR_MODE) {
+                            $c = ($cur ^ $raw_foreground_color);
+                        } elsif ($draw_mode == OR_MODE) {
+                            $c = ($cur | $raw_foreground_color);
+                        } elsif ($draw_mode == AND_MODE) {
+                            $c = ($cur & $raw_foreground_color);
+                        } elsif ($draw_mode == MASK_MODE) {
+                            if ($bits == 32) {
+
+                                # Compare RGB only
+                                my $fg3 = substr($raw_foreground_color, 0, 3);
+                                my $bg3 = substr($raw_background_color, 0, 3);
+                                $c = $raw_foreground_color if ($fg3 ne $bg3);
+                            } else {
+                                $c = $raw_foreground_color if ($raw_foreground_color ne $raw_background_color);
+                            }
+                        } elsif ($draw_mode == UNMASK_MODE) {
+                            if ($bits == 32) {
+                                my $cur3 = substr($cur,                  0, 3);
+                                my $bg3  = substr($raw_background_color, 0, 3);
+                                $c = $raw_foreground_color if ($cur3 eq $bg3);
+                            } else {
+                                $c = $raw_foreground_color if ($cur eq $raw_background_color);
+                            }
+                        } elsif ($draw_mode == ALPHA_MODE) {
+
+                            # Prefer integer math for speed and to avoid float overhead
+                            # color_alpha_int should be 0..255 (if you currently have 0..1, convert once: my $color_alpha_int = int(255 * $color_alpha + 0.5);)
+                            my $A    = defined $color_alpha_int ? $color_alpha_int : int(255 * $color_alpha + 0.5);
+                            my $invA = 255 - $A;
+                            if ($bytes == 4) {
+                                my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
+                                my ($r2, $g2, $b2, $a2) = unpack('C4', $raw_foreground_color);
+                                my $r = (($r2 * $A) + ($r1 * $invA)) >> 8;
+                                my $g = (($g2 * $A) + ($g1 * $invA)) >> 8;
+                                my $b = (($b2 * $A) + ($b1 * $invA)) >> 8;
+                                my $a = $a2 + $a1;
+                                $a = 255 if $a > 255;
+                                $c = pack('C4', $r, $g, $b, $a);
+                            } elsif ($bytes == 3) {
+                                my ($r1, $g1, $b1) = unpack('C3', $cur);
+                                my ($r2, $g2, $b2) = unpack('C3', $raw_foreground_color);
+                                my $r = (($r2 * $A) + ($r1 * $invA)) >> 8;
+                                my $g = (($g2 * $A) + ($g1 * $invA)) >> 8;
+                                my $b = (($b2 * $A) + ($b1 * $invA)) >> 8;
+                                $c = pack('C3', $r, $g, $b);
+                            } else {
+
+                                # 16-bit RGB565 path (optional): do channel-wise integer blend
+                                # Example skeleton using 5/6-bit channels; you can replace with existing helpers:
+                                my $p1 = unpack('v', $cur);
+                                my $p2 = unpack('v', $raw_foreground_color);
+                                my $r1 = ($p1 >> 11) & 0x1F;
+                                my $g1 = ($p1 >> 5) & 0x3F;
+                                my $b1 = $p1 & 0x1F;
+                                my $r2 = ($p2 >> 11) & 0x1F;
+                                my $g2 = ($p2 >> 5) & 0x3F;
+                                my $b2 = $p2 & 0x1F;
+                                my $r  = (($r2 * $A) + ($r1 * $invA)) >> 8;
+                                $r = 31 if $r > 31;
+                                my $g = (($g2 * $A) + ($g1 * $invA)) >> 8;
+                                $g = 63 if $g > 63;
+                                my $b = (($b2 * $A) + ($b1 * $invA)) >> 8;
+                                $b = 31 if $b > 31;
+                                my $p = ($r << 11) | ($g << 5) | $b;
+                                $c = pack('v', $p);
+                            } ## end else [ if ($bytes == 4) ]
+                        } elsif ($draw_mode == ADD_MODE) {
+                            if ($bytes == 4) {
+                                my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
+                                my ($r2, $g2, $b2, $a2) = unpack('C4', $raw_foreground_color);
+                                my $r = $r1 + $r2;
+                                $r = 255 if $r > 255;
+                                my $g = $g1 + $g2;
+                                $g = 255 if $g > 255;
+                                my $b = $b1 + $b2;
+                                $b = 255 if $b > 255;
+                                my $a = $a1 + $a2;
+                                $a = 255 if $a > 255;
+                                $c = pack('C4', $r, $g, $b, $a);
+                            } elsif ($bytes == 3) {
+                                my ($r1, $g1, $b1) = unpack('C3', $cur);
+                                my ($r2, $g2, $b2) = unpack('C3', $raw_foreground_color);
+                                my $r = $r1 + $r2;
+                                $r = 255 if $r > 255;
+                                my $g = $g1 + $g2;
+                                $g = 255 if $g > 255;
+                                my $b = $b1 + $b2;
+                                $b = 255 if $b > 255;
+                                $c = pack('C3', $r, $g, $b);
+                            } else {
+
+                                # 16-bit RGB565 add (saturate)
+                                my $p1 = unpack('v', $cur);
+                                my $p2 = unpack('v', $raw_foreground_color);
+                                my $r1 = ($p1 >> 11) & 0x1F;
+                                my $g1 = ($p1 >> 5) & 0x3F;
+                                my $b1 = $p1 & 0x1F;
+                                my $r2 = ($p2 >> 11) & 0x1F;
+                                my $g2 = ($p2 >> 5) & 0x3F;
+                                my $b2 = $p2 & 0x1F;
+                                my $r  = $r1 + $r2;
+                                $r = 31 if $r > 31;
+                                my $g = $g1 + $g2;
+                                $g = 63 if $g > 63;
+                                my $b = $b1 + $b2;
+                                $b = 31 if $b > 31;
+                                my $p = ($r << 11) | ($g << 5) | $b;
+                                $c = pack('v', $p);
+                            } ## end else [ if ($bytes == 4) ]
+                        } elsif ($draw_mode == SUBTRACT_MODE) {
+                            if ($bytes == 4) {
+                                my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
+                                my ($r2, $g2, $b2, $a2) = unpack('C4', $raw_foreground_color);
+                                my $r = $r1 - $r2;
+                                $r = 0 if $r < 0;
+                                my $g = $g1 - $g2;
+                                $g = 0 if $g < 0;
+                                my $b = $b1 - $b2;
+                                $b = 0 if $b < 0;
+                                my $a = $a1 - $a2;
+                                $a = 0 if $a < 0;
+                                $c = pack('C4', $r, $g, $b, $a);
+                            } elsif ($bytes == 3) {
+                                my ($r1, $g1, $b1) = unpack('C3', $cur);
+                                my ($r2, $g2, $b2) = unpack('C3', $raw_foreground_color);
+                                my $r = $r1 - $r2;
+                                $r = 0 if $r < 0;
+                                my $g = $g1 - $g2;
+                                $g = 0 if $g < 0;
+                                my $b = $b1 - $b2;
+                                $b = 0 if $b < 0;
+                                $c = pack('C3', $r, $g, $b);
+                            } else {
+                                my $p1 = unpack('v', $cur);
+                                my $p2 = unpack('v', $raw_foreground_color);
+                                my $r1 = ($p1 >> 11) & 0x1F;
+                                my $g1 = ($p1 >> 5) & 0x3F;
+                                my $b1 = $p1 & 0x1F;
+                                my $r2 = ($p2 >> 11) & 0x1F;
+                                my $g2 = ($p2 >> 5) & 0x3F;
+                                my $b2 = $p2 & 0x1F;
+                                my $r  = $r1 - $r2;
+                                $r = 0 if $r < 0;
+                                my $g = $g1 - $g2;
+                                $g = 0 if $g < 0;
+                                my $b = $b1 - $b2;
+                                $b = 0 if $b < 0;
+                                my $p = ($r << 11) | ($g << 5) | $b;
+                                $c = pack('v', $p);
+                            } ## end else [ if ($bytes == 4) ]
+                        } elsif ($draw_mode == MULTIPLY_MODE) {
+
+                            # Per-channel multiply scaled back to 0..255
+                            if ($bytes == 4) {
+                                my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
+                                my ($r2, $g2, $b2, $a2) = unpack('C4', $raw_foreground_color);
+                                my $r = ($r1 * $r2) >> 8;
+                                my $g = ($g1 * $g2) >> 8;
+                                my $b = ($b1 * $b2) >> 8;
+                                my $a = ($a1 * $a2) >> 8;
+                                $c = pack('C4', $r, $g, $b, $a);
+                            } elsif ($bytes == 3) {
+                                my ($r1, $g1, $b1) = unpack('C3', $cur);
+                                my ($r2, $g2, $b2) = unpack('C3', $raw_foreground_color);
+                                my $r = ($r1 * $r2) >> 8;
+                                my $g = ($g1 * $g2) >> 8;
+                                my $b = ($b1 * $b2) >> 8;
+                                $c = pack('C3', $r, $g, $b);
+                            } else {
+
+                                # 16-bit approximate multiply: expand to 8-bit, multiply, compress back
+                                my $p1 = unpack('v', $cur);
+                                my $p2 = unpack('v', $raw_foreground_color);
+                                my $r1 = (($p1 >> 11) & 0x1F) << 3;
+                                my $g1 = (($p1 >> 5) & 0x3F) << 2;
+                                my $b1 = ($p1 & 0x1F) << 3;
+                                my $r2 = (($p2 >> 11) & 0x1F) << 3;
+                                my $g2 = (($p2 >> 5) & 0x3F) << 2;
+                                my $b2 = ($p2 & 0x1F) << 3;
+                                my $r  = ($r1 * $r2) >> 8;
+                                my $g  = ($g1 * $g2) >> 8;
+                                my $b  = ($b1 * $b2) >> 8;
+                                $r >>= 3;
+                                $g >>= 2;
+                                $b >>= 3;
+                                $r = 31 if $r > 31;
+                                $g = 63 if $g > 63;
+                                $b = 31 if $b > 31;
+                                my $p = ($r << 11) | ($g << 5) | $b;
+                                $c = pack('v', $p);
+                            } ## end else [ if ($bytes == 4) ]
+                        } elsif ($draw_mode == DIVIDE_MODE) {
+                            if ($bytes == 4) {
+                                my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
+                                my ($r2, $g2, $b2, $a2) = unpack('C4', $raw_foreground_color);
+                                my $r = $r2 ? int($r1 * 255 / $r2) : 255;
+                                my $g = $g2 ? int($g1 * 255 / $g2) : 255;
+                                my $b = $b2 ? int($b1 * 255 / $b2) : 255;
+                                my $a = $a2 ? int($a1 * 255 / $a2) : 255;
+                                $r = 255 if $r > 255;
+                                $g = 255 if $g > 255;
+                                $b = 255 if $b > 255;
+                                $a = 255 if $a > 255;
+                                $c = pack('C4', $r, $g, $b, $a);
+                            } elsif ($bytes == 3) {
+                                my ($r1, $g1, $b1) = unpack('C3', $cur);
+                                my ($r2, $g2, $b2) = unpack('C3', $raw_foreground_color);
+                                my $r = $r2 ? int($r1 * 255 / $r2) : 255;
+                                my $g = $g2 ? int($g1 * 255 / $g2) : 255;
+                                my $b = $b2 ? int($b1 * 255 / $b2) : 255;
+                                $r = 255 if $r > 255;
+                                $g = 255 if $g > 255;
+                                $b = 255 if $b > 255;
+                                $c = pack('C3', $r, $g, $b);
+                            } else {
+                                my $p1 = unpack('v', $cur);
+                                my $p2 = unpack('v', $raw_foreground_color);
+                                my $r1 = (($p1 >> 11) & 0x1F) << 3;
+                                my $g1 = (($p1 >> 5) & 0x3F) << 2;
+                                my $b1 = ($p1 & 0x1F) << 3;
+                                my $r2 = (($p2 >> 11) & 0x1F) << 3;
+                                my $g2 = (($p2 >> 5) & 0x3F) << 2;
+                                my $b2 = ($p2 & 0x1F) << 3;
+                                my $r  = $r2 ? int($r1 * 255 / $r2) : 255;
+                                my $g  = $g2 ? int($g1 * 255 / $g2) : 255;
+                                my $b  = $b2 ? int($b1 * 255 / $b2) : 255;
+                                $r >>= 3;
+                                $g >>= 2;
+                                $b >>= 3;
+                                $r = 31 if $r > 31;
+                                $g = 63 if $g > 63;
+                                $b = 31 if $b > 31;
+                                my $p = ($r << 11) | ($g << 5) | $b;
+                                $c = pack('v', $p);
+                            } ## end else [ if ($bytes == 4) ]
+                        } ## end elsif ($draw_mode == DIVIDE_MODE)
+
+                        # If no branch set $c (e.g., MASK condition not met), keep current pixel
+                        substr($$screenref, $index, $bytes) = defined $c ? $c : $cur;
+                    } ## end else [ if ($draw_mode == NORMAL_MODE)]
                 } ## end if ($index >= 0 && $index...)
                 $self->{'history'}->{$y}->{$x} = 1 if (exists($self->{'history'}));
             } ## end unless (exists($self->{'history'...}))
-        }
+        } ## end unless (($x > $xx_clip) ||...)
     } ## end else [ if ($self->{'ACCELERATED'...})]
     $self->{'X'} = $x;
     $self->{'Y'} = $y;
@@ -2118,7 +2334,7 @@ $pixel is a hash reference in the form:
     my $x     = int($params->{'x'});
     my $y     = int($params->{'y'});
     my $bytes = $self->{'BYTES'};
-	my $bits  = $self->{'BITS'};
+    my $bits  = $self->{'BITS'};
 
     # Values outside of the clipping area return undefined.
     unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
@@ -2159,18 +2375,18 @@ $pixel is a hash reference in the form:
                 ($G, $B, $R) = unpack("C$bytes", $color);
             }
         } elsif ($bits == 16) {
-            my $C = unpack('S', $color);
-			my $rl = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'};
-			my $gl = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'};
-			my $bl = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'};
+            my $C  = unpack('S', $color);
+            my $rl = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'};
+            my $gl = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'};
+            my $bl = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'};
 
-            $B = ($bl < 6)  ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 31  : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 63;
+            $B = ($bl < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 31  : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 63;
             $G = ($gl < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
-            $R = ($rl < 6)   ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 31   : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 63;
+            $R = ($rl < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 31   : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 63;
             $R = $R << (8 - $rl);
             $G = $G << (8 - $gl);
             $B = $B << (8 - $bl);
-        } ## end elsif ($self->{'BITS'} ==...)
+        } ## end elsif ($bits == 16)
         return ({ 'red' => $R, 'green' => $G, 'blue' => $B, 'alpha' => $A, 'raw' => $color, 'hex' => sprintf('%02x%02x%02x%02x', $R, $G, $B, $A) });
     } ## end unless (($x > $self->{'XX_CLIP'...}))
     return (undef);
@@ -2308,6 +2524,7 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
 } ## end sub angle_line
 
 sub drawto {
+
 =head2 drawto
 
 Draws a line, in the foreground color, from the last plotted position to the position x,y.  Clipping applies.
@@ -2347,20 +2564,7 @@ Draws a line, in the foreground color, from the last plotted position to the pos
     my $yy_clip     = $self->{'YY_CLIP'};
 
     if ($self->{'ACCELERATED'}) {
-        c_line(
-            $self->{'SCREEN'},
-            $start_x, $start_y, $x_end,   $y_end,
-            $x_clip,  $y_clip,  $xx_clip, $yy_clip,
-            $self->{'INT_RAW_FOREGROUND_COLOR'},
-            $self->{'INT_RAW_BACKGROUND_COLOR'},
-            $self->{'COLOR_ALPHA'},
-            $self->{'DRAW_MODE'},
-            $self->{'BYTES'},
-            $self->{'BITS'},
-            $self->{'BYTES_PER_LINE'},
-            $self->{'XOFFSET'}, $self->{'YOFFSET'},
-            $antialiased,
-        );
+        c_line($self->{'SCREEN'}, $start_x, $start_y, $x_end, $y_end, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $self->{'COLOR_ALPHA'}, $self->{'DRAW_MODE'}, $self->{'BYTES'}, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $antialiased,);
     } else {
         my $width;
         my $height;
@@ -4308,50 +4512,51 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
 
     return if ($back eq $self->{'RAW_FOREGROUND_COLOR'});
     unless ($self->{'ACCELERATED'}) {
-		# This doesn't over-use the system stack.  While flood fill algorithms are famous being a stack memory hog, this one goes easy on it.
-		# Optimized: avoid repeated shift() (O(n)), reduce method-call overhead by
-		# caching small helpers, and use a queue with head index.
-		my $background = $pixel->{'raw'};
-		my @visited    = ();                # Used to be an associative array, which was slower
-		my @queue      = ();
 
-		# queue head index (faster than shift)
-		my $qhead = 0;
-		push @queue, [$x, $y];
+        # This doesn't over-use the system stack.  While flood fill algorithms are famous being a stack memory hog, this one goes easy on it.
+        # Optimized: avoid repeated shift() (O(n)), reduce method-call overhead by
+        # caching small helpers, and use a queue with head index.
+        my $background = $pixel->{'raw'};
+        my @visited    = ();                # Used to be an associative array, which was slower
+        my @queue      = ();
 
-		# small cached subs to reduce repeated hash construction for method calls
-		my $get_pixel = sub {
-			my ($px, $py) = @_;
-			return $self->pixel( { x => $px, y => $py, raw => TRUE } );
-		};
-		my $do_plot = sub {
-			my ($px, $py) = @_;
-			$self->plot( { x => $px, y => $py } );
-		};
+        # queue head index (faster than shift)
+        my $qhead = 0;
+        push @queue, [$x, $y];
 
-		while ($qhead <= $#queue) {
-			my ($cx, $cy) = @{ $queue[$qhead++] };
-			# clip check
-			next
-			  if ( $cx < $x_clip
-				  || $cx > $xx_clip
-				  || $cy < $y_clip
-				  || $cy > $yy_clip );
+        # small cached subs to reduce repeated hash construction for method calls
+        my $get_pixel = sub {
+            my ($px, $py) = @_;
+            return $self->pixel({ x => $px, y => $py, raw => TRUE });
+        };
+        my $do_plot = sub {
+            my ($px, $py) = @_;
+            $self->plot({ x => $px, y => $py });
+        };
 
-			# skip already visited
-			next if ( defined $visited[$cx] && $visited[$cx][$cy] );
+        while ($qhead <= $#queue) {
+            my ($cx, $cy) = @{ $queue[$qhead++] };
 
-			# fetch pixel raw and compare
-			my $curpix = $get_pixel->( $cx, $cy );
-			if ( $curpix eq $background ) {
-				$do_plot->( $cx, $cy );
-				$visited[$cx][$cy] = 1;
+            # clip check
+            next
+              if ( $cx < $x_clip
+                || $cx > $xx_clip
+                || $cy < $y_clip
+                || $cy > $yy_clip);
 
-				# enqueue neighbors (bounds will be checked on dequeue)
-				push @queue, [ $cx + 1, $cy ], [ $cx - 1, $cy ],
-				  [ $cx, $cy + 1 ], [ $cx, $cy - 1 ];
-			}
-		}
+            # skip already visited
+            next if (defined $visited[$cx] && $visited[$cx][$cy]);
+
+            # fetch pixel raw and compare
+            my $curpix = $get_pixel->($cx, $cy);
+            if ($curpix eq $background) {
+                $do_plot->($cx, $cy);
+                $visited[$cx][$cy] = 1;
+
+                # enqueue neighbors (bounds will be checked on dequeue)
+                push @queue, [$cx + 1, $cy], [$cx - 1, $cy], [$cx, $cy + 1], [$cx, $cy - 1];
+            } ## end if ($curpix eq $background)
+        } ## end while ($qhead <= $#queue)
     } else {
         my $width  = int($self->{'W_CLIP'});
         my $height = int($self->{'H_CLIP'});
@@ -4378,82 +4583,82 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
             $pattern = $self->_generate_fill($width, $height, undef, $params->{'hatch'});
         }
 
-		if (defined($pattern)) {
-			my $saved = $self->blit_read(
-				{
-					'x'      => $x_clip,
-					  'y'      => $y_clip,
-					  'width'  => $width,
-					  'height' => $height,
-				}
-			);
-			if ($self->{'BITS'} == 16) {
-				$saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB);
-				$pattern = $self->_convert_16_to_24($pattern, RGB) if (defined($pattern));
-			}
-			eval {
-				my $img = Imager->new(
-					'xsize'             => $width,
-					'ysize'             => $height,
-					'raw_datachannels'  => $tc_bytes,
-					'raw_storechannels' => $tc_bytes,
-					'channels'          => $tc_bytes,
-				);
+        if (defined($pattern)) {
+            my $saved = $self->blit_read(
+                {
+                    'x'      => $x_clip,
+                    'y'      => $y_clip,
+                    'width'  => $width,
+                    'height' => $height,
+                }
+            );
+            if ($self->{'BITS'} == 16) {
+                $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB);
+                $pattern = $self->_convert_16_to_24($pattern, RGB) if (defined($pattern));
+            }
+            eval {
+                my $img = Imager->new(
+                    'xsize'             => $width,
+                    'ysize'             => $height,
+                    'raw_datachannels'  => $tc_bytes,
+                    'raw_storechannels' => $tc_bytes,
+                    'channels'          => $tc_bytes,
+                );
 
-				#            unless ($self->{'DRAW_MODE'}) {
-				$img->read(
-					'xsize'             => $width,
-					'ysize'             => $height,
-					'raw_datachannels'  => $tc_bytes,
-					'raw_storechannels' => $tc_bytes,
-					'channels'          => $tc_bytes,
-					'raw_interleave'    => 0,
-					'data'              => $saved->{'image'},
-					'type'              => 'raw',
-					'allow_incomplete'  => 1
-				);
-				my $fill;
-				if (defined($pattern)) {
-					my $pimg = Imager->new();
-					$pimg->read(
-						'xsize'             => $width,
-						'ysize'             => $height,
-						'raw_datachannels'  => $tc_bytes,
-						'raw_storechannels' => $tc_bytes,
-						'raw_interleave'    => 0,
-						'channels'          => $tc_bytes,
-						'data'              => $pattern,
-						'type'              => 'raw',
-						'allow_incomplete'  => 1
-					);
-					$img->flood_fill(
-						'x'     => $x - $x_clip,
-						'y'     => $y - $y_clip,
-						'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
-						'fill'  => { 'image' => $pimg }
-					);
-				} else {
-					$img->flood_fill(
-						'x'     => $x - $x_clip,
-						'y'     => $y - $y_clip,
-						'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
-					);
-				} ## end else [ if (defined($pattern))]
-				$img->write(
-					'type'          => 'raw',
-					'datachannels'  => $tc_bytes,
-					'storechannels' => $tc_bytes,
-					'interleave'    => 0,
-					'data'          => \$saved->{'image'},
-				);
-				$saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
-			};
-			warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
+                #            unless ($self->{'DRAW_MODE'}) {
+                $img->read(
+                    'xsize'             => $width,
+                    'ysize'             => $height,
+                    'raw_datachannels'  => $tc_bytes,
+                    'raw_storechannels' => $tc_bytes,
+                    'channels'          => $tc_bytes,
+                    'raw_interleave'    => 0,
+                    'data'              => $saved->{'image'},
+                    'type'              => 'raw',
+                    'allow_incomplete'  => 1
+                );
+                my $fill;
+                if (defined($pattern)) {
+                    my $pimg = Imager->new();
+                    $pimg->read(
+                        'xsize'             => $width,
+                        'ysize'             => $height,
+                        'raw_datachannels'  => $tc_bytes,
+                        'raw_storechannels' => $tc_bytes,
+                        'raw_interleave'    => 0,
+                        'channels'          => $tc_bytes,
+                        'data'              => $pattern,
+                        'type'              => 'raw',
+                        'allow_incomplete'  => 1
+                    );
+                    $img->flood_fill(
+                        'x'     => $x - $x_clip,
+                        'y'     => $y - $y_clip,
+                        'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
+                        'fill'  => { 'image' => $pimg }
+                    );
+                } else {
+                    $img->flood_fill(
+                        'x'     => $x - $x_clip,
+                        'y'     => $y - $y_clip,
+                        'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
+                    );
+                } ## end else [ if (defined($pattern))]
+                $img->write(
+                    'type'          => 'raw',
+                    'datachannels'  => $tc_bytes,
+                    'storechannels' => $tc_bytes,
+                    'interleave'    => 0,
+                    'data'          => \$saved->{'image'},
+                );
+                $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            };
+            warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
 
-			$self->blit_write($saved);
-		} else {
-			c_fill($self->{'SCREEN'}, $x, $y, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $color_alpha, $self->{'DRAW_MODE'}, $bytes, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'},);
-		}
+            $self->blit_write($saved);
+        } else {
+            c_fill($self->{'SCREEN'}, $x, $y, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $color_alpha, $self->{'DRAW_MODE'}, $bytes, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'},);
+        }
     } ## end else
 } ## end sub fill
 
@@ -4696,7 +4901,7 @@ The animation will stop if "Q" is pressed
 =cut
 
     my ($self, $image, $rate) = @_;
-    $rate  ||= 1;
+    $rate ||= 1;
 
     ReadMode 4;
     foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
@@ -6608,6 +6813,7 @@ sub _convert_16_to_24 {
 } ## end sub _convert_16_to_24
 
 sub _convert_8_to_32 {
+
     # Convert 8 bit bitmap to 32 bit bitmap
     my ($self, $img, $color_order, $pallette) = @_;
 
@@ -6623,6 +6829,7 @@ sub _convert_8_to_32 {
 } ## end sub _convert_8_to_32
 
 sub _convert_8_to_24 {
+
     # Convert 8 bit bitmap to 24 bit bitmap
     my ($self, $img, $color_order, $pallette) = @_;
 
@@ -6638,6 +6845,7 @@ sub _convert_8_to_24 {
 } ## end sub _convert_8_to_24
 
 sub _convert_8_to_16 {
+
     # Convert 8 bit bitmap to 16 bit bitmap
     my ($self, $img, $color_order, $pallette) = @_;
 
@@ -6653,6 +6861,7 @@ sub _convert_8_to_16 {
 } ## end sub _convert_8_to_16
 
 sub _convert_16_to_32 {
+
     # Convert 16 bit bitmap to 32 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6686,6 +6895,7 @@ sub _convert_16_to_32 {
 } ## end sub _convert_16_to_32
 
 sub _convert_24_to_16 {
+
     # Convert 24 bit bitmap to 16 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6720,6 +6930,7 @@ sub _convert_24_to_16 {
 } ## end sub _convert_24_to_16
 
 sub _convert_32_to_16 {
+
     # Convert 32 bit bitmap to a 16 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6754,6 +6965,7 @@ sub _convert_32_to_16 {
 } ## end sub _convert_32_to_16
 
 sub _convert_32_to_24 {
+
     # Convert a 32 bit bitmap to a 24 bit bitmap.
     my ($self, $img, $color_order) = @_;
 
@@ -6841,11 +7053,7 @@ Convert a 16 bit color value to a 24 bit color value.  This requires the color t
     my $rgb565 = unpack('S', $params->{'color'});
     my ($r, $g, $b);
     my $color_order = $params->{'color_order'};
-    if ($color_order == RGB) {
-        $r = $rgb565 & 31;
-        $g = ($rgb565 >> 5) & 63;
-        $b = ($rgb565 >> 11) & 31;
-    } elsif ($color_order == BGR) {
+    if ($color_order == BGR) {
         $b = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
@@ -6865,7 +7073,11 @@ Convert a 16 bit color value to a 24 bit color value.  This requires the color t
         $g = $rgb565 & 31;
         $b = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
-    }
+    } else {
+        $r = $rgb565 & 31;
+        $g = ($rgb565 >> 5) & 63;
+        $b = ($rgb565 >> 11) & 31;
+	}
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
     $b = int($b * 527 + 23) >> 6;
@@ -6875,15 +7087,13 @@ Convert a 16 bit color value to a 24 bit color value.  This requires the color t
         ($r, $g, $b) = ($b, $g, $r);
     } elsif ($color_order == BRG) {
         ($r, $g, $b) = ($b, $r, $g);
-
-        #    } elsif ($color_order == RGB) { # Redundant, but here for clarity
     } elsif ($color_order == RBG) {
         ($r, $g, $b) = ($r, $b, $g);
     } elsif ($color_order == GRB) {
         ($r, $g, $b) = ($g, $r, $b);
     } elsif ($color_order == GBR) {
         ($r, $g, $b) = ($g, $b, $r);
-    }
+    } # No changes needed for RGB
     $color = pack('CCC', $r, $g, $b);
     return ({ 'color' => $color });
 } ## end sub RGB565_to_RGB888
@@ -6909,11 +7119,7 @@ Convert a 16 bit color value to a 32 bit color value.  This requires the color t
     my $a           = $params->{'alpha'} || 255;
     my $color_order = $self->{'COLOR_ORDER'};
     my ($r, $g, $b);
-    if ($color_order == RGB) {
-        $r = $rgb565 & 31;
-        $g = ($rgb565 >> 5) & 63;
-        $b = ($rgb565 >> 11) & 31;
-    } elsif ($color_order == BGR) {
+	if ($color_order == BGR) {
         $b = $rgb565 & 31;
         $g = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
@@ -6933,7 +7139,11 @@ Convert a 16 bit color value to a 32 bit color value.  This requires the color t
         $g = $rgb565 & 31;
         $b = ($rgb565 >> 5) & 63;
         $r = ($rgb565 >> 11) & 31;
-    }
+    } else {
+        $r = $rgb565 & 31;
+        $g = ($rgb565 >> 5) & 63;
+        $b = ($rgb565 >> 11) & 31;
+	}
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
     $b = int($b * 527 + 23) >> 6;
@@ -6941,8 +7151,6 @@ Convert a 16 bit color value to a 32 bit color value.  This requires the color t
     my $color;
     if ($color_order == BGR) {
         ($r, $g, $b) = ($b, $g, $r);
-
-        #    } elsif ($color_order == RGB) { # Redundant
     } elsif ($color_order == BRG) {
         ($r, $g, $b) = ($b, $r, $g);
     } elsif ($color_order == RBG) {

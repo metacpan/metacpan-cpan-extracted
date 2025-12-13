@@ -1,5 +1,5 @@
 ---
-abstract: 'Lightweight system monitoring toolkit with JSON output'
+abstract: 'Lightweight system monitoring toolkit with JSON/YAML output'
 author:
   - 'Shingo Kawamura'
 build_requires:
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/kawamurashingo/sys-monitor-lite/issues
   homepage: https://github.com/kawamurashingo/sys-monitor-lite
   repository: https://github.com/kawamurashingo/sys-monitor-lite.git
-version: '0.02'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

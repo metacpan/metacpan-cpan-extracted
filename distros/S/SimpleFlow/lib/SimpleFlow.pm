@@ -6,7 +6,7 @@ use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
@@ -19,7 +19,7 @@ use Exporter 'import';
 our @EXPORT = qw(say2 task);
 our @EXPORT_OK = @EXPORT;
 
-sub say2 { # say to both command line and
+sub say2 { # say to both command line and log file
 	my ($msg, $fh) = @_;
 	my $current_sub = (split(/::/,(caller(0))[3]))[-1]; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
 	my @c = caller;
@@ -94,7 +94,7 @@ sub task {
 	}
 	my $msg = "\@ $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
 	say $msg;
-	say {$args->{'log.fh'}} $msg if defined $args->{'log.fh'};
+	say {$args->{'log.fh'}} "\@ $c[1] line $c[2] The command is:\n $args->{cmd})" if defined $args->{'log.fh'};
 	if (defined $args->{'output.files'}) { # avoid "uninitialized value" warning
 		my $ref = ref $args->{'output.files'};
 		if ($ref eq 'ARRAY') {
@@ -230,3 +230,89 @@ You may wish to output results to a logfile using a previously opened filehandle
         overwrite      => 1
     });
     close $fh;
+=head1 Examples
+
+Consider a very complex pipeline in which mistakes are *very* easily made.  SimpleFlow is designed to simplify these steps with a script, with automated checks at every step, in a very intuitive way:
+
+    my $g_tpr = "3md.$group.tpr";
+    task({
+    	cmd           => "echo $val | gmx convert-tpr -s 3md.tpr -o $g_tpr -n cpx.ndx",
+    	'input.files' => ['3md.tpr', 'cpx.ndx'],
+    	'log.fh'      => $log,
+    	'output.files'=> $g_tpr, # only do this once
+    	overwrite     => 'true'
+    });
+    my $subset_xtc = "3md.$group.$n.xtc";
+    task({
+    	cmd            => "echo $val | gmx trjconv -s $g_tpr -f 3md_out$n.xtc -o $subset_xtc -n cpx.ndx",
+    	'input.files'  => ["3md_out$n.xtc", $g_tpr],
+    	'log.fh'       => $log,
+    	'output.files' => $subset_xtc,
+    	overwrite      => 'true'
+    });
+    my $gro = "3md.$group.$n.gro";
+    task({
+    	'input.files'  => [$g_tpr, $subset_xtc],
+    	'log.fh'       => $log,
+    	cmd            => "echo $val | gmx trjconv -s $g_tpr -f $subset_xtc -o $gro",
+    	'output.files' => $gro,
+    	overwrite      => 'true'
+    });
+    mkdir "xvg/$group" unless -d "xvg/$group";
+    my $dir = "xvg/$group/" . sprintf '%u', $n;
+    mkdir $dir unless -d $dir;
+    remove_backups();
+    task({
+    	cmd            => "gmx chi -s $g_tpr -f $subset_xtc -phi -psi -all",
+    	'log.fh'       => $log,
+    	'input.files'  => [$gro, $subset_xtc],
+    	overwrite      => 'true'
+    });
+    foreach my $f (list_regex_files('\.xvg$')) {
+    	rename $f, "$dir/$f";
+    	say2("Moved $f to $dir/$f", $log);
+    }
+
+Every `task` returns a hash, which is printed to a log if specified:
+
+    {
+    cmd               "gmx chi -s 3md.Receptor.tpr -f 3md.Receptor.09.xtc -phi -psi -all",
+    die               1,
+    dir               "/home/con/ui/pipelinePepPriML/default/2puy",
+    done              "now",
+    dry.run           0,
+    duration          0.0776150226593018,
+    exit              0,
+    input.file.size   {
+        3md.Receptor.09.gro   12874711,
+        3md.Receptor.09.xtc   2208928
+    },
+    input.files       [
+        [0] "3md.Receptor.09.gro" (dualvar: 3),
+        [1] "3md.Receptor.09.xtc" (dualvar: 3)
+    ],
+    note              "",
+    output.files      [],
+    overwrite         "true",
+    source.file       "0.sanity.check.pl",
+    source.line       73,
+    stderr            "                       :-) GROMACS - gmx chi, 2025.3 (-:
+
+    Executable:   /home/con/prog/gromacs-2025.3/build/bin/gmx
+    Data prefix:  /home/con/prog/gromacs-2025.3 (source tree)
+    Working dir:  /home/con/ui/pipelinePepPriML/default/2puy
+    Command line:
+      gmx chi -s 3md.Receptor.tpr -f 3md.Receptor.09.xtc -phi -psi -all
+
+    Reading file 3md.Receptor.tpr, VERSION 2025.3 (single precision)
+    Reading file 3md.Receptor.tpr, VERSION 2025.3 (single precision)
+    Analyzing from residue 1 to residue 61
+    60 residues with dihedrals found
+    305 dihedrals found
+    Reading frame     500 time  500.000   
+    j after resetting (nr. active dihedrals) = 179
+    Printing psiMET19.x(...skipping 1338 chars...)",
+        stdout            "",
+        will.do           "done"
+    }
+

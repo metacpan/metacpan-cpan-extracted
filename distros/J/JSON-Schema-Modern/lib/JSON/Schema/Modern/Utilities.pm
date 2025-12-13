@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.628';
+our $VERSION = '0.629';
 
 use 5.020;
 use strictures 2;
@@ -213,9 +213,10 @@ sub is_bignum ($value) {
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
 # $state hashref supports the following fields:
+# - scalarref_booleans (input): treats \0 and \1 as boolean values
 # - stringy_numbers (input): strings will also be compared numerically
 # - path (output): location of the first difference
-# - error (output): description of the difference
+# - error (output): description of the first difference
 sub is_equal ($x, $y, $state = {}) {
   $state->{path} //= '';
 
@@ -276,16 +277,17 @@ sub is_equal ($x, $y, $state = {}) {
 }
 
 # checks array elements for uniqueness. short-circuits on first pair of matching elements
-# if second arrayref is provided, it is populated with the indices of identical items
 # $state hashref supports the following fields:
 # - scalarref_booleans (input): treats \0 and \1 as boolean values
 # - stringy_numbers (input): strings will also be compared numerically
-sub is_elements_unique ($array, $equal_indices = undef, $state = {}) {
-  my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
+# - path (output): location of the first difference
+# - error (output): description of the first difference
+# - equal_indices (output): the indices of identical items
+sub is_elements_unique ($array, $state = {}) {
   foreach my $idx0 (0 .. $array->$#*-1) {
     foreach my $idx1 ($idx0+1 .. $array->$#*) {
-      if (is_equal($array->[$idx0], $array->[$idx1], \%s)) {
-        push @$equal_indices, $idx0, $idx1 if defined $equal_indices;
+      if (is_equal($array->[$idx0], $array->[$idx1], $state)) {
+        push $state->{equal_indices}->@*, $idx0, $idx1 if exists $state->{equal_indices};
         return 0;
       }
     }
@@ -306,6 +308,66 @@ sub unjsonp {
   warn q{argument to unjsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
   return map s!~0!~!gr =~ s!~1!/!gr, split m!/!, $_[0];
 }
+
+# returns a reusable Types::Standard type for json pointers
+# TODO: move this off into its own distribution, see JSON::Schema::Types
+sub json_pointer_type () { Str->where('!length || m{^/} && !m{~(?![01])}'); }
+
+# a URI without a fragment, or with a json pointer fragment
+sub canonical_uri_type () {
+  (InstanceOf['Mojo::URL'])->where(q{!defined($_->fragment) || $_->fragment =~ m{^/} && $_->fragment !~ m{~(?![01])}});
+}
+
+# simple runtime-wide cache of $ids to schema document objects that are sourced from disk
+{
+  my $document_cache = {};
+
+  # Fetches a document from the cache (reading it from disk and creating the document if necessary),
+  # and add it to the evaluator.
+  # Normally this will just be a cache of schemas that are bundled with this distribution or a related
+  # distribution (such as OpenAPI-Modern), as duplicate identifiers are not checked for, unlike for
+  # normal schema additions.
+  # Only JSON-encoded files are supported at this time.
+  sub load_cached_document ($evaluator, $uri) {
+    $uri =~ s/#$//; # older draft $ids use an empty fragment
+
+    # see if it already exists as a document in the cache
+    my $document = $document_cache->{$uri};
+
+    # otherwise, load it from disk using our filename cache and create the document
+    if (not $document and my $filename = get_schema_filename($uri)) {
+      my $file = path($filename);
+      die "uri $uri maps to file $file which does not exist" if not -f $file;
+      my $schema = $evaluator->_json_decoder->decode($file->slurp);
+
+      # avoid calling add_schema, which checksums the file to look for duplicates
+      $document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $evaluator);
+
+      # avoid calling add_document, which checks for duplicate identifiers (and would result in an
+      # infinite loop)
+      die JSON::Schema::Modern::Result->new(
+        output_format => $evaluator->output_format,
+        valid => 0,
+        errors => [ $document->errors ],
+        exception => 1,
+      ) if $document->has_errors;
+
+      $document_cache->{$uri} = $document;
+    }
+
+    return if not $document;
+
+    # bypass the normal collision checks, to avoid an infinite loop: these documents are presumed safe
+    $evaluator->_add_resources_unsafe(
+      map +($_->[0] => +{ $_->[1]->%*, document => $document }),
+        $document->resource_pairs
+    );
+
+    return $document;
+  }
+}
+
+######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
 # get all annotations produced for the current instance data location (that are visible to this
 # schema location) - remember these are hashrefs, not Annotation objects
@@ -494,73 +556,19 @@ sub sprintf_num ($value) {
   is_bignum($value) ? $value->bstr : sprintf('%s', $value);
 }
 
-# returns a reusable Types::Standard type for json pointers
-# TODO: move this off into its own distribution, see JSON::Schema::Types
-sub json_pointer_type () { Str->where('!length || m{^/} && !m{~(?![01])}'); }
+{
+  # simple runtime-wide cache of $ids to filenames that are sourced from disk
+  my $schema_filename_cache = {};
 
-# a URI without a fragment, or with a json pointer fragment
-sub canonical_uri_type () {
-  (InstanceOf['Mojo::URL'])->where(q{!defined($_->fragment) || $_->fragment =~ m{^/} && $_->fragment !~ m{~(?![01])}});
-}
-
-# simple runtime-wide cache of $ids to filenames that are sourced from disk
-my $schema_filename_cache = {};
-
-# adds a mapping from a URI to an absolute filename in the global runtime
-# (available to all instances of the evaluator running in the same process).
-sub register_schema ($uri, $filename) {
-  $schema_filename_cache->{$uri} = $filename;
-}
-
-sub get_schema_filename ($uri) {
-  $schema_filename_cache->{$uri};
-}
-
-# simple runtime-wide cache of $ids to schema document objects that are sourced from disk
-my $document_cache = {};
-
-# Fetches a document from the cache (reading it from disk and creating the document if necessary),
-# and add it to the evaluator.
-# Normally this will just be a cache of schemas that are bundled with this distribution or a related
-# distribution (such as OpenAPI-Modern), as duplicate identifiers are not checked for, unlike for
-# normal schema additions.
-# Only JSON-encoded files are supported at this time.
-sub load_cached_document ($evaluator, $uri) {
-  $uri =~ s/#$//; # older draft $ids use an empty fragment
-
-  # see if it already exists as a document in the cache
-  my $document = $document_cache->{$uri};
-
-  # otherwise, load it from disk using our filename cache and create the document
-  if (not $document and my $filename = $schema_filename_cache->{$uri}) {
-    my $file = path($filename);
-    die "uri $uri maps to file $file which does not exist" if not -f $file;
-    my $schema = $evaluator->_json_decoder->decode($file->slurp);
-
-    # avoid calling add_schema, which checksums the file to look for duplicates
-    $document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $evaluator);
-
-    # avoid calling add_document, which checks for duplicate identifiers (and would result in an
-    # infinite loop)
-    die JSON::Schema::Modern::Result->new(
-      output_format => $evaluator->output_format,
-      valid => 0,
-      errors => [ $document->errors ],
-      exception => 1,
-    ) if $document->has_errors;
-
-    $document_cache->{$uri} = $document;
+  # adds a mapping from a URI to an absolute filename in the global runtime
+  # (available to all instances of the evaluator running in the same process).
+  sub register_schema ($uri, $filename) {
+    $schema_filename_cache->{$uri} = $filename;
   }
 
-  return if not $document;
-
-  # bypass the normal collision checks, to avoid an infinite loop: these documents are presumed safe
-  $evaluator->_add_resources_unsafe(
-    map +($_->[0] => +{ $_->[1]->%*, document => $document }),
-      $document->resource_pairs
-  );
-
-  return $document;
+  sub get_schema_filename ($uri) {
+    $schema_filename_cache->{$uri};
+  }
 }
 
 1;
@@ -577,7 +585,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.628
+version 0.629
 
 =head1 SYNOPSIS
 
@@ -587,14 +595,119 @@ version 0.628
 
 This class contains internal utilities to be used by L<JSON::Schema::Modern>, and other useful helpers.
 
-=for Pod::Coverage is_type get_type is_bignum is_bool is_schema is_equal is_elements_unique jsonp unjsonp local_annotations
+=for Pod::Coverage is_bignum local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
-annotate_self sprintf_num HAVE_BUILTIN true false json_pointer_type canonical_uri_type
-register_schema get_schema_filename load_cached_document
+annotate_self sprintf_num HAVE_BUILTIN true false
+register_schema get_schema_filename
 
 =head1 FUNCTIONS
 
-=for stopwords schemas metaschemas
+=for stopwords schema metaschema dualvar jsonp unjsonp
+
+=head2 is_type
+
+  if (is_type('string', $value)) { ... }
+
+Returns a boolean indicating whether the provided value is of the specified core type (C<null>,
+C<boolean>, C<string>, C<number>, C<object>, C<array>) or C<integer>. Also optionally takes a hashref
+C<{ legacy_ints => 1 }> indicating that draft4 number semantics should apply (where unlike later
+drafts, C<2.0> is B<not> an integer).
+
+=head2 get_type
+
+  my $type = get_type($value);
+
+Returns one of the core types (C<null>, C<boolean>, C<string>, C<number>, C<object>, C<array>) or
+C<integer>. Also optionally takes a hashref C<{ legacy_ints => 1 }> indicating that draft4 number
+semantics should apply. Behaviour is consistent with L</is_type>.
+
+=head2 is_bool
+
+  if (is_bool($value)) { ... }
+
+Equivalent to C<is_type('boolean', $value)>.
+Accepts JSON booleans and L<builtin> booleans, but not dualvars (because JSON encoders do not
+recognize these as booleans).
+
+=head2 is_schema
+
+  if (is_schema($value)) { ... }
+
+Equivalent to C<is_type('object') || is_type('boolean')>.
+
+=head2 is_equal
+
+  if (not is_equal($x, $y, my $state = {})) {
+    say "values differ starting at $state->{path}: $state->{error}";
+  }
+
+Compares two arbitrary data payloads for equality, as per
+L<Instance Equality in the JSON Schema draft2020-12 specification|https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2>.
+
+The optional third argument hashref supports the following fields:
+
+=over 4
+
+=item *
+
+C<scalarref_booleans> (provided by caller input): as in L<JSON::Schema::Modern/scalarref_booleans>
+
+=item *
+
+C<stringy_numbers> (provided by caller input): when set, strings will also be compared numerically, as in L<JSON::Schema::Modern/stringy_numbers>
+
+=item *
+
+C<path> (populated by function): if result is false, the json pointer location of the first difference
+
+=item *
+
+C<error> (populated by function): if result is false, an error description of the first difference
+
+=back
+
+=head2 is_elements_unique
+
+  if (not is_elements_unique($arrayref, my $state = {}) {
+    say "lists differ starting at $state->{path}: $state->{error}";
+  }
+
+Compares all elements of an arrayref for uniqueness.
+
+The optional second argument hashref supports the same options as L</is_equal>, plus:
+
+=over 4
+
+=item *
+
+C<equal_indices> (populated by function): if result is false, the list of indices of the (first set of) equal items found.
+
+=back
+
+=head2 jsonp
+
+  # '/paths/~1foo~1{foo_id}/get/responses'
+  my $jsonp = jsonp(qw(/paths /foo/{foo_id} get responses));
+
+Constructs a json pointer string from a list of path components, with correct escaping; the first
+argument must be C<''> or an already-escaped json pointer, to which the rest of the path components
+are appended.
+
+=head2 unjsonp
+
+  # ('', 'paths', '/foo/{foo_id}', 'get', 'responses')
+  my @components = unjsonp('/paths/~1foo~1{foo_id}/get/responses');
+
+Splits a json pointer string into its path components, with correct unescaping.
+
+=head2 json_pointer_type
+
+A L<Type::Tiny> type representing a json pointer string.
+
+=head2 canonical_uri_type
+
+A L<Type::Tiny> type representing a canonical URI: a L<Mojo::URL> with either no fragment, or with a
+json pointer fragment.
 
 =head2 load_cached_document
 

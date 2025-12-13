@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.628';
+our $VERSION = '0.629';
 
 use 5.020;
 use Moo;
@@ -91,7 +91,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords schema fragmentless subschemas
+=for stopwords schema fragmentless subschema
 
 =head1 NAME
 
@@ -99,7 +99,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.628
+version 0.629
 
 =head1 SYNOPSIS
 

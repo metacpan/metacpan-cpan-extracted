@@ -22,6 +22,7 @@ t/aggregate.t
 t/all.t
 t/any.t
 t/arg_option.t
+t/argjson_cli.t
 t/arithmetic.t
 t/array_constructor.t
 t/arrays.t

@@ -1,0 +1,786 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Marlin::Manual::Comparison - comparing Moo, Moose, and C<class> with Marlin
+
+=head1 EXAMPLES
+
+This section shows the same class hierarchy written with Moo, Moose,
+the Perl C<class> keyword, Marlin, and old-school blessed hashrefs.
+
+=head2 Moo
+
+Here's a simple example of some classes and roles in L<Moo>:
+
+  use v5.20.0;
+  use experimental 'signatures';
+  use Types::Common -lexical, -types;
+  
+  package Local::Example::Moo::NamedThing {
+    use Moo;
+    use MooX::StrictConstructor -late;
+    use MooX::TypeTiny;
+    
+    has name => ( is => 'ro', isa => Str, required => 1 );
+  }
+  
+  package Local::Example::Moo::DoesIntro {
+    use Moo::Role;
+    
+    requires 'name';
+    
+    sub introduction ( $self ) {
+      return sprintf( "Hi, my name is %s!", $self->name );
+    }
+  }
+  
+  package Local::Example::Moo::Person {
+    use Moo;
+    use MooX::StrictConstructor -late;
+    
+    extends 'Local::Example::Moo::NamedThing';
+    with 'Local::Example::Moo::DoesIntro';
+    
+    has age => ( is => 'ro', predicate => 1 );
+  }
+  
+  package Local::Example::Moo::Employee {
+    use Moo;
+    use MooX::StrictConstructor -late;
+    
+    extends 'Local::Example::Moo::Person';
+    
+    has employee_id => ( is => 'ro', required => 1 );
+  }
+  
+  package Local::Example::Moo::Employee::Developer {
+    use Moo;
+    use MooX::StrictConstructor -late;
+    use MooX::TypeTiny;
+    use Sub::HandlesVia;
+    
+    extends 'Local::Example::Moo::Employee';
+    
+    has _languages => (
+      init_arg    => undef,
+      is          => 'lazy',
+      reader      => 'get_languages',
+      clearer     => 'clear_languages',
+      isa         => ArrayRef[Str],
+      default     => [],
+      handles_via => 'Array',
+      handles     => {
+        add_language  => 'push',
+        all_languages => 'elements',
+      },
+    );
+    
+    around introduction => sub ( $next, $self, @args ) {
+      my $orig = $self->$next( @args );
+      if ( my @lang = $self->all_languages ) {
+        return sprintf( "%s I know: %s.", $orig, join q[, ], @lang );
+      }
+      return $orig;
+    };
+  }
+
+=head2 Moose
+
+Note that Moose has its own built-in type constraints and native traits,
+so we'll use them instead of L<Type::Tiny> and L<Sub::HandlesVia>. Apart
+from that, it's very similar to L<Moo>.
+
+We need to remember to make each class immutable or the constructors will
+be extremely slow.
+
+  use v5.20.0;
+  use experimental 'signatures';
+  
+  package Local::Example::Moose::NamedThing {
+    use Moose;
+    use MooseX::StrictConstructor;
+    
+    has name => ( is => 'ro', isa => 'Str', required => 1 );
+    
+    __PACKAGE__->meta->make_immutable;
+  }
+  
+  package Local::Example::Moose::DoesIntro {
+    use Moose::Role;
+    
+    requires 'name';
+    
+    sub introduction ( $self ) {
+      return sprintf( "Hi, my name is %s!", $self->name );
+    }
+  }
+  
+  package Local::Example::Moose::Person {
+    use Moose;
+    use MooseX::StrictConstructor;
+    
+    extends 'Local::Example::Moose::NamedThing';
+    with 'Local::Example::Moose::DoesIntro';
+    
+    has age => ( is => 'ro', predicate => 'has_age' );
+    
+    __PACKAGE__->meta->make_immutable;
+  }
+  
+  package Local::Example::Moose::Employee {
+    use Moose;
+    use MooseX::StrictConstructor;
+    
+    extends 'Local::Example::Moose::Person';
+    
+    has employee_id => ( is => 'ro', required => 1 );
+    
+    __PACKAGE__->meta->make_immutable;
+  }
+  
+  package Local::Example::Moose::Employee::Developer {
+    use Moose;
+    use MooseX::StrictConstructor;
+    
+    extends 'Local::Example::Moose::Employee';
+    
+    has _languages => (
+      init_arg    => undef,
+      is          => 'ro',
+      lazy        => 1,
+      reader      => 'get_languages',
+      clearer     => 'clear_languages',
+      isa         => 'ArrayRef[Str]',
+      default     => sub ($self) { [] },
+      traits      => [ 'Array' ],
+      handles     => {
+        add_language  => 'push',
+        all_languages => 'elements',
+      },
+    );
+    
+    around introduction => sub ( $next, $self, @args ) {
+      my $orig = $self->$next( @args );
+      if ( my @lang = $self->all_languages ) {
+        return sprintf( "%s I know: %s.", $orig, join q[, ], @lang );
+      }
+      return $orig;
+    };
+    
+    __PACKAGE__->meta->make_immutable;
+  }
+
+=head2 Class::Tiny
+
+Class::Tiny's constructors aren't strict, so here we're using a C<BUILD>
+method in the NamedThing class to enforce strictness. Superclasses can
+override C<EXPECTED_KEYS> to indicate what additional keys the constructor
+should allow.
+
+  use v5.20.0;
+  use experimental 'signatures';
+  use Types::Common -lexical, -types, -assert;
+  
+  push @Local::Example::ALL, 'Local::Example::Tiny';
+  
+  package Local::Example::Tiny::NamedThing {
+    use Class::Tiny { name => sub { die "Name is required" } };
+    
+    sub EXPECTED_KEYS {
+      return qr/\A(name)\z/;
+    }
+    
+    sub BUILD ( $self, $args ) {
+      my $expected = $self->EXPECTED_KEYS;
+      die if grep !/$expected/, keys %$args;
+      
+      assert_Str( $args->{name} );
+    }
+  }
+  
+  package Local::Example::Tiny::DoesIntro {
+    use Role::Tiny;
+    
+    requires 'name';
+    
+    sub introduction ( $self ) {
+      return sprintf( "Hi, my name is %s!", $self->name );
+    }
+  }
+  
+  package Local::Example::Tiny::Person {
+    use parent -norequire, 'Local::Example::Tiny::NamedThing';
+    use Class::Tiny 'age';
+    
+    use Role::Tiny::With;
+    with 'Local::Example::Tiny::DoesIntro';
+    
+    sub has_age ( $self ) {
+      exists $self->{age};
+    }
+    
+    sub EXPECTED_KEYS {
+      return qr/\A(name|age)\z/;
+    }
+  }
+  
+  package Local::Example::Tiny::Employee {
+    use parent -norequire, 'Local::Example::Tiny::Person';
+    use Class::Tiny { employee_id => sub { "Employee id is required" } };
+    
+    sub EXPECTED_KEYS {
+      return qr/\A(name|age|employee_id)\z/;
+    }
+  }
+  
+  package Local::Example::Tiny::Employee::Developer {
+    use parent -norequire, 'Local::Example::Tiny::Employee';
+    
+    sub _languages;
+    use Class::Tiny { '_languages' => sub { [] } };
+    
+    sub get_languages ( $self ) {
+      $self->{_languages} //= [];
+    }
+     
+    sub clear_languages ( $self ) {
+      delete $self->{_languages};
+    }
+    
+    use Sub::HandlesVia 'delegations';
+    
+    delegations(
+      attribute   => [ 'get_languages', '{_languages}' ],
+      handles_via => 'Array',
+      handles     => {
+        add_language  => 'push',
+        all_languages => 'elements',
+      }
+    );
+    
+    signature_for add_language => (
+      method => !!1,
+      pos    => [ Str ],
+    );
+    
+    sub introduction ( $self, @args ) {
+      my $orig = $self->next::method( @args );
+      if ( my @lang = $self->all_languages ) {
+        return sprintf( "%s I know: %s.", $orig, join q[, ], @lang );
+      }
+      return $orig;
+    }
+  }
+
+=head2 The core C<class> keyword
+
+  use v5.40.0;
+  use experimental 'class';
+  use Types::Common -lexical, -assert;
+  
+  class Local::Example::Core::NamedThing {
+    field $name :reader :param = die "Name is required";
+    
+    ADJUST {
+      assert_Str $name;
+    }
+  }
+  
+  package Local::Example::Core::DoesIntro {
+    use Role::Tiny;
+    
+    requires 'name';
+    
+    sub introduction ( $self ) {
+      return sprintf( "Hi, my name is %s!", $self->name );
+    }
+  }
+  
+  class Local::Example::Core::Person
+      :isa(Local::Example::Core::NamedThing) {
+    
+    field $age :reader :param = undef;
+    
+    use Role::Tiny::With;
+    with 'Local::Example::Core::DoesIntro';
+    
+    method has_age () {
+      return defined $age;
+    }
+  }
+  
+  class Local::Example::Core::Employee
+      :isa(Local::Example::Core::Person) {
+    
+    field $employee_id :reader :param = die "Employee id is required";
+  }
+  
+  class Local::Example::Core::Employee::Developer
+      :isa(Local::Example::Core::Employee) {
+    
+    field $languages :reader(get_languages) = [];
+    
+    method add_language ( @lang ) {
+      push $languages->@*, map { assert_Str $_ } @lang;
+    }
+    
+    method all_languages () {
+      return $languages->@*;
+    }
+    
+    method clear_languages () {
+      $languages = [];
+    }
+    
+    method introduction ( @args ) {
+      my $orig = $self->next::method( @args );
+      if ( my @lang = $self->all_languages ) {
+        return sprintf( "%s I know: %s.", $orig, join q[, ], @lang );
+      }
+      return $orig;
+    };
+  }
+
+=head2 Marlin
+
+  use v5.20.0;
+  use experimental 'signatures';
+  use Marlin::Util -lexical, -all;
+  use Types::Common -lexical, -types;
+  
+  package Local::Example::Marlin::NamedThing {
+    use Marlin -strict, 'name!' => Str;
+  }
+  
+  package Local::Example::Marlin::DoesIntro {
+    use Role::Tiny;
+    
+    requires 'name';
+    
+    sub introduction ( $self ) {
+      return sprintf( "Hi, my name is %s!", $self->name );
+    }
+  }
+  
+  package Local::Example::Marlin::Person {
+    use Marlin
+      -strict,
+      -extends => [ 'Local::Example::Marlin::NamedThing' ],
+      -with    => [ 'Local::Example::Marlin::DoesIntro' ],
+      qw( age? );
+  }
+  
+  package Local::Example::Marlin::Employee {
+    use Marlin
+      -strict,
+      -extends => [ 'Local::Example::Marlin::Person' ],
+      qw( employee_id! );
+  }
+  
+  package Local::Example::Marlin::Employee::Developer {
+    use Marlin
+      -strict,
+      -extends => [ 'Local::Example::Marlin::Employee' ],
+      -modifiers,
+      _languages => {
+        is          => lazy,
+        isa         => ArrayRef[Str],
+        init_arg    => undef,
+        reader      => 'get_languages',
+        clearer     => 'clear_languages',
+        default     => [],
+        handles_via => 'Array',
+        handles     => {
+          add_language  => 'push',
+          all_languages => 'elements',
+        }
+      };
+      
+    around introduction => sub ( $next, $self, @args ) {
+      my $orig = $self->$next( @args );
+      if ( my @lang = $self->all_languages ) {
+        return sprintf( "%s I know: %s.", $orig, join q[, ], @lang );
+      }
+      return $orig;
+    };
+  }
+
+=head2 Old-School Perl
+
+This is effectively the same thing in old-school Perl, using C<bless>, etc.
+In practice, most people writing Perl classes without an OO framework would
+leave a lot of this out, especially a lot of the correctness checks in the
+constructors. It would be rare to implement C<BUILD> methods. This also
+includes a homegrown basic implementation of roles.
+
+  use v5.20.0;
+  use experimental 'signatures';
+  
+  package Local::Example::Plain::NamedThing {
+    use mro 'c3';
+    
+    sub new ( $invocant, @args ) {
+      my $class = ref($invocant) || $invocant;
+      my %args = ( @args==1 and ref($args[0]) eq 'HASH' )
+        ? %{shift(@args)}
+        : @args;
+      
+      my $self = bless( {}, $class );
+      
+      die "Expected name" if !exists $args{name};
+      die if ( !defined $args{name} or ref $args{name} );
+      $self->{name} = $args{name};
+      
+      if ( $class eq __PACKAGE__ ) {
+        unless ( $args{__no_BUILD__} ) {
+          our $BUILD_CACHE ||= do {
+            no strict 'refs';
+            my $linear_isa = mro::get_linear_isa($class);
+            [
+              map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+              map { "$_\::BUILD" }
+              reverse @$linear_isa
+            ];
+          };
+          $_->( $self, \%args ) for $BUILD_CACHE->@*;
+        }
+        my @unknown = grep !/\A(?:name)\z/, keys %args;
+        die "Unknown parameters: @unknown" if @unknown;
+      }
+      
+      return $self;
+    }
+    
+    sub name ( $self ) {
+      return $self->{name};
+    }
+  }
+
+  package Local::Example::Plain::DoesIntro {
+    sub introduction ( $self ) {
+      return sprintf( "Hi, my name is %s!", $self->name );
+    }
+    sub WITH ( $role, $target=undef ) {
+      no strict 'refs';
+      $target //= caller;
+      
+      *{"$target\::$_"} = \&{"$role\::$_"} for qw/introduction/;
+      
+      my $next = $target->can('DOES');
+      *{"$target\::DOES"} = sub ( $self, $query ) {
+        $query eq $role or $self->$next( $query );
+      };
+      
+      return;
+    }
+  }
+
+  package Local::Example::Plain::Person {
+    use mro 'c3';
+    use parent -norequire, 'Local::Example::Plain::NamedThing';
+    Local::Example::Plain::DoesIntro->WITH;
+
+    sub new ( $invocant, @args ) {
+      my $class = ref($invocant) || $invocant;
+      my %args = ( @args==1 and ref($args[0]) eq 'HASH' )
+        ? %{shift(@args)}
+        : @args;
+      
+      my $self = $invocant->SUPER::new( %args, __no_BUILD__ => 1 );
+      
+      $self->{age} = $args{age} if exists $args{age};
+      
+      if ( $class eq __PACKAGE__ ) {
+        unless ( $args{__no_BUILD__} ) {
+          our $BUILD_CACHE ||= do {
+            no strict 'refs';
+            my $linear_isa = mro::get_linear_isa($class);
+            [
+              map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+              map { "$_\::BUILD" }
+              reverse @$linear_isa
+            ];
+          };
+          $_->( $self, \%args ) for $BUILD_CACHE->@*;
+        }
+        my @unknown = grep !/\A(?:name|age)\z/, keys %args;
+        die "Unknown parameters: @unknown" if @unknown;
+      }
+      
+      return $self;
+    }
+    
+    sub age ( $self ) {
+      return $self->{age};
+    }
+    
+    sub has_age ( $self ) {
+      return exists $self->{age};
+    }
+  }
+
+  package Local::Example::Plain::Employee {
+    use mro 'c3';
+    use parent -norequire, 'Local::Example::Plain::Person';
+    
+    sub new ( $invocant, @args ) {
+      my $class = ref($invocant) || $invocant;
+      my %args = ( @args==1 and ref($args[0]) eq 'HASH' )
+        ? %{shift(@args)}
+        : @args;
+      
+      my $self = $invocant->SUPER::new( %args, __no_BUILD__ => 1 );
+      
+      die "Expected employee_id" if !exists $args{employee_id};
+      $self->{employee_id} = $args{employee_id};
+      
+      if ( $class eq __PACKAGE__ ) {
+        unless ( $args{__no_BUILD__} ) {
+          our $BUILD_CACHE ||= do {
+            no strict 'refs';
+            my $linear_isa = mro::get_linear_isa($class);
+            [
+              map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+              map { "$_\::BUILD" }
+              reverse @$linear_isa
+            ];
+          };
+          $_->( $self, \%args ) for $BUILD_CACHE->@*;
+        }
+        my @unknown = grep !/\A(?:name|age|employee_id)\z/, keys %args;
+        die "Unknown parameters: @unknown" if @unknown;
+      }
+      
+      return $self;
+    }
+    
+    sub employee_id ( $self ) {
+      return $self->{employee_id};
+    }
+  }
+
+  package Local::Example::Plain::Employee::Developer {
+    use mro 'c3';
+    use parent -norequire, 'Local::Example::Plain::Employee';
+
+    sub new ( $invocant, @args ) {
+      my $class = ref($invocant) || $invocant;
+      my %args = ( @args==1 and ref($args[0]) eq 'HASH' )
+        ? %{shift(@args)}
+        : @args;
+      
+      my $self = $invocant->SUPER::new( %args, __no_BUILD__ => 1 );
+      
+      if ( $class eq __PACKAGE__ ) {
+        unless ( $args{__no_BUILD__} ) {
+          our $BUILD_CACHE ||= do {
+            no strict 'refs';
+            my $linear_isa = mro::get_linear_isa($class);
+            [
+              map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+              map { "$_\::BUILD" }
+              reverse @$linear_isa
+            ];
+          };
+          $_->( $self, \%args ) for $BUILD_CACHE->@*;
+        }
+        my @unknown = grep !/\A(?:name|age|employee_id)\z/, keys %args;
+        die "Unknown parameters: @unknown" if @unknown;
+      }
+      
+      return $self;
+    }
+    
+    sub get_languages ( $self ) {
+      $self->{_languages} //= [];
+    }
+    
+    sub clear_languages ( $self ) {
+      delete $self->{_languages};
+    }
+    
+    sub add_language ( $self, @langs ) {
+      for my $lang ( @langs ) {
+        die if ( !defined $lang or ref $lang );
+      }
+      push $self->get_languages->@*, @langs;
+    }
+    
+    sub all_languages ( $self ) {
+      return $self->get_languages->@*;
+    }
+    
+    sub introduction ( $self, @args ) {
+      my $orig = $self->SUPER::introduction( @args );
+      if ( my @lang = $self->all_languages ) {
+        return sprintf( "%s I know: %s.", $orig, join q[, ], @lang );
+      }
+      return $orig;
+    }
+  }
+
+=head1 BENCHMARKS
+
+I wrote three simple coderefs to test the constructor, accessors, and
+delegated methods, plus one that uses all of these kinds of method in
+combination.
+
+Testing constructors:
+
+  my $person_class = "Local::Example::Marlin::Person";
+  my $dev_class    = "Local::Example::Marlin::Employee::Developer";
+  sub {
+    for my $n ( 1 .. 100 ) {
+      my $o1 = $person_class->new( name => 'Alice', age => $n );
+      my $o2 = $dev_class->new( name => 'Carol', employee_id => $n );
+    }
+  }
+
+Testing accessors:
+
+  my $dev_class  = "Local::Example::Marlin::Employee::Developer";
+  my $dev_object = $dev_class->new( name => 'Bob', employee_id => 1 );
+  sub {
+    for my $n ( 1 .. 100 ) {
+      my $name = $dev_object->name;
+      my $id   = $dev_object->employee_id;
+      my $lang = $dev_object->get_languages;
+    }
+  }
+
+Testing delegated methods:
+
+  my $dev_class  = "Local::Example::Marlin::Employee::Developer";
+  my $dev_object = $dev_class->new( name => 'Bob', employee_id => 1 );
+  sub {
+    for my $n ( 1 .. 100 ) {
+      $dev_object->add_language( $_ )
+        for qw/ Perl C C++ Ruby Python Haskell SQL Go Rust Java /;
+      my @all = $dev_object->all_languages;
+      @all == 10 or die;
+      $dev_object->clear_languages;
+    }
+  };
+
+Testing a bit of everything:
+
+  my $person_class = "Local::Example::Marlin::Person";
+  my $dev_class    = "Local::Example::Marlin::Employee::Developer";
+  sub {
+    for my $n ( 1 .. 25 ) {
+      my $person = $person_class->new( name => 'Alice', age => $n );
+      my $dev    = $dev_class->new( name => 'Carol', employee_id => $n, age => 42 );
+      for my $n ( 1 .. 4 ) {
+        $dev->age == 42 or die;
+        $dev->name eq 'Carol' or die;
+        $dev->add_language( $_ )
+          for qw/ Perl C C++ Ruby Python Haskell SQL Go Rust Java /;
+        my @all = $dev->all_languages;
+        @all == 10 or die;
+        $dev->clear_languages;
+      }
+    }
+  }
+
+=head2 Results
+
+The full benchmarking script is included in the distribution tarball,
+so you can run it on your own machine. Exact speeds will depend on your
+hardware and environment.
+
+  [[ CONSTRUCTORS ]]
+           Rate   Tiny  Plain    Moo  Moose Marlin   Core
+  Tiny   1317/s     --    -2%   -48%   -53%   -54%   -72%
+  Plain  1340/s     2%     --   -47%   -53%   -53%   -72%
+  Moo    2527/s    92%    89%     --   -11%   -12%   -47%
+  Moose  2828/s   115%   111%    12%     --    -2%   -40%
+  Marlin 2873/s   118%   114%    14%     2%     --   -39%
+  Core   4727/s   259%   253%    87%    67%    65%     --
+  
+  [[ ACCESSORS ]]
+            Rate   Tiny  Moose  Plain   Core    Moo Marlin
+  Tiny   17345/s     --    -1%    -3%    -7%   -36%   -45%
+  Moose  17602/s     1%     --    -2%    -6%   -35%   -44%
+  Plain  17893/s     3%     2%     --    -4%   -34%   -44%
+  Core   18732/s     8%     6%     5%     --   -31%   -41%
+  Moo    27226/s    57%    55%    52%    45%     --   -14%
+  Marlin 31688/s    83%    80%    77%    69%    16%     --
+  
+  [[ DELEGATIONS ]]
+           Rate   Tiny   Core  Plain  Moose    Moo Marlin
+  Tiny    675/s     --   -56%   -57%   -59%   -61%   -61%
+  Core   1518/s   125%     --    -4%    -8%   -13%   -13%
+  Plain  1581/s   134%     4%     --    -4%    -9%   -10%
+  Moose  1642/s   143%     8%     4%     --    -5%    -6%
+  Moo    1736/s   157%    14%    10%     6%     --    -1%
+  Marlin 1752/s   160%    15%    11%     7%     1%     --
+  
+  [[ COMBINED ]]
+           Rate   Tiny  Plain   Core  Moose    Moo Marlin
+  Tiny    545/s     --   -48%   -56%   -58%   -60%   -64%
+  Plain  1051/s    93%     --   -16%   -19%   -22%   -31%
+  Core   1249/s   129%    19%     --    -4%    -8%   -18%
+  Moose  1304/s   139%    24%     4%     --    -4%   -14%
+  Moo    1355/s   148%    29%     8%     4%     --   -11%
+  Marlin 1519/s   179%    45%    22%    17%    12%     --
+
+=head2 XSUB versus Pure Perl
+
+The following table shows which methods were accellerated via XS.
+
+  ==================================================================
+  Method          Moo     Moose   Tiny    Core    Plain   Marlin 
+  ==================================================================
+  [ NamedThing ]
+  new             PP      PP      pp      XS      PP      XS     
+  name            XS      PP      PP      PP      PP      XS     
+  [ Person ]
+  new             PP      PP      pp      XS      PP      XS     
+  name            xs      pp      pp      pp      pp      XS     
+  age             XS      PP      PP      PP      PP      XS     
+  has_age         XS      PP      PP      PP      PP      XS     
+  introduction    PP      PP      PP      PP      PP      PP     
+  [ Employee ]
+  new             PP      PP      pp      XS      PP      XS     
+  name            xs      pp      pp      pp      pp      XS     
+  age             xs      pp      pp      pp      pp      XS     
+  has_age         xs      pp      pp      pp      pp      XS     
+  employee_id     XS      PP      PP      PP      PP      XS     
+  introduction    pp      pp      pp      pp      pp      PP     
+  [ Employee::Developer ]
+  new             PP      PP      pp      XS      PP      XS     
+  name            xs      pp      pp      pp      pp      XS     
+  age             xs      pp      pp      pp      pp      XS     
+  has_age         xs      pp      pp      pp      pp      XS     
+  employee_id     xs      pp      pp      pp      pp      XS     
+  introduction    PP      PP      PP      PP      PP      PP     
+  get_languages   PP      PP      PP      PP      PP      PP     
+  all_languages   PP      PP      PP      PP      PP      PP     
+  add_language    PP      PP      PP      PP      PP      PP     
+  ==================================================================
+  Key: XS = XSUB, PP = Pure Perl, lowercase = via inheritance.
+  ==================================================================
+
+=head1 SEE ALSO
+
+L<Marlin>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

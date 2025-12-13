@@ -16,7 +16,9 @@ isa_ok( Alien::SDL3->sdldir, ['Path::Tiny'], 'sdldir' );
 isa_ok( Alien::SDL3->incdir, ['Path::Tiny'], 'incdir' );
 isa_ok( Alien::SDL3->libdir, ['Path::Tiny'], 'libdir' );
 #
+diag 'incdir:';
 Alien::SDL3->incdir->visit( sub { diag $_->realpath } );
+diag 'libdir:';
 Alien::SDL3->libdir->visit( sub { diag $_->realpath } );
 #
 done_testing;

@@ -1,13 +1,13 @@
 # Sys::Monitor::Lite
 
-A lightweight system monitoring toolkit. Using the `script/sys-monitor-lite` script you can collect CPU, memory, disk capacity, disk I/O, network, and other Linux metrics in JSON format. It runs entirely on Perl with no external dependencies.
+A lightweight system monitoring toolkit. Using the `script/sys-monitor-lite` script you can collect CPU, memory, disk capacity, disk I/O, network, and other Linux metrics in JSON or YAML format. It runs entirely on Perl with no external dependencies.
 
 ## Features
 
 - Lightweight implementation that simply reads data from `/proc`
-- Collects CPU, load average, memory, disk capacity, disk I/O, network, and system information
+- Collects CPU, load average, memory, disk capacity, disk I/O, network, system information, and lightweight process stats
 - Allows you to choose which metrics to collect from the CLI
-- Supports JSON / JSON Lines output, with `--pretty` for formatted JSON
+- Supports JSON / JSON Lines output (with `--pretty` for formatted JSON) and YAML output
 - Reusable as a module (`Sys::Monitor::Lite`) so scripts can integrate it easily
 
 ## Installation
@@ -48,22 +48,59 @@ script/sys-monitor-lite --interval 5
 script/sys-monitor-lite --interval 10 --collect cpu,mem,disk --output jsonl
 ```
 
+### Output as YAML
+
+```bash
+script/sys-monitor-lite --once --output yaml
+```
+
 ### Key options
 
 | Option | Description |
 | ----------- | ---- |
 | `--interval <seconds>` | Interval for repeated collection. Defaults to 5 seconds. Values ≤ 0 collect only once. |
 | `--once` | Collects metrics once. Equivalent to omitting `--interval`. |
-| `--collect <list>` | Comma-separated list selecting from `system,cpu,load,mem,disk,disk_io,net`. |
-| `--output <format>` | Choose `json` (default) or `jsonl`. |
+| `--collect <list>` | Comma-separated list selecting from `system,cpu,load,mem,disk,disk_io,net,process`. |
+| `--output <format>` | Choose `json` (default), `jsonl`, or `yaml`. |
 | `--pretty` | Format JSON output (`jsonl` ignores this). |
+| `--check` | Run once, evaluate thresholds, and exit with Nagios-style status codes (0=OK, 1=WARN, 2=CRIT). |
+| `--warn <expr>` | Threshold expression like `mem.used_pct>80`. Can be repeated. Implies `--check`. |
+| `--crit <expr>` | Critical threshold expression like `mem.used_pct>90`. Can be repeated. Implies `--check`. |
+| `--top <field=count>` | Collect the top N processes by `cpu` or `rss` (e.g. `--top cpu=5`). Automatically enables the `process` metric. |
+| `--watch <names>` | Comma-separated list of process names/commands to include (e.g. `--watch nginx,sssd`). |
 | `--help` | Show help (POD). |
 
-The JSON output can be combined with tools such as `jq` or `jq-lite`.
+The JSON output can be combined with tools such as `jq` or `jq-lite`, and YAML output works nicely with tools like `yq`.
 
 ```bash
 script/sys-monitor-lite --once | jq '.mem.used_pct'
 ```
+
+### Threshold-based checks
+
+For cron, Ansible, or Nagios-style alerting you can evaluate thresholds and exit with status codes:
+
+```bash
+script/sys-monitor-lite --check \
+  --warn mem.used_pct>80 \
+  --crit mem.used_pct>90
+```
+
+The command prints a compact summary such as `OK - mem.used_pct=42.1 (>80 >90)` and exits with 0/1/2 for OK/WARN/CRIT, respectively.
+
+### Process monitoring shortcuts
+
+You can request lightweight process data without pulling in `top` or `ps`:
+
+```bash
+# Top 5 CPU consumers
+script/sys-monitor-lite --once --top cpu=5
+
+# Top 5 memory consumers and specific daemons
+script/sys-monitor-lite --once --top rss=5 --watch nginx,sssd
+```
+
+The `--top` and `--watch` switches automatically enable the `process` metric, returning PID, command, CPU %, RSS, state, threads, and UID for the matching processes.
 
 ## Using as a Perl Module
 
@@ -74,6 +111,12 @@ my $metrics = collect_all();
 print to_json($metrics, pretty => 1);
 ```
 
+If you prefer YAML, call `to_yaml` instead:
+
+```perl
+print Sys::Monitor::Lite::to_yaml($metrics);
+```
+
 Instead of `collect_all`, you can pass an array reference like `collect(["cpu", "mem"])` to specify which metrics to gather.
 
 ## Available Data
@@ -82,9 +125,11 @@ Instead of `collect_all`, you can pass an array reference like `collect(["cpu", 
 - `cpu`: Number of cores and aggregate CPU utilization (difference over ~100 ms)
 - `load`: Load average over 1, 5, and 15 minutes
 - `mem`: Total, used, and free memory, plus swap usage
-- `disk`: Total capacity, used capacity, and utilization for each mount point
+- `disk`: Total capacity, used capacity, inode counts, and utilization for each mount point
+- `mounts`: Mount table snapshot with filesystem type, options, and read-only status for each mount (usable for detecting missing or unexpected mounts)
 - `disk_io`: Block device read/write I/O counters (bytes, sectors, operations)
 - `net`: Received/sent bytes and packets per interface
+- `process`: PID, parent PID, state, command, CPU %, RSS, threads, and UID per process (optionally filtered via `--top` / `--watch`)
 
 ## License
 

@@ -9,6 +9,7 @@ use List::Util qw(max);
 use utf8;
 
 use Test::More tests => 2087;
+# use Test::More 'no_plan';
 
 BEGIN {
     use_ok('Term::ANSIEncode') || BAIL_OUT('Cannot load Term::ANSIEncode!');
@@ -44,7 +45,7 @@ $max += 6;
 foreach my $code (keys %{$ansi->{'ansi_meta'}}) {
     foreach my $token (sort(keys %{$ansi->{'ansi_meta'}->{$code}})) {
         next if ($token =~ /NEWLINE|LINEFEED|RETURN|HORIZONTAL/);
-#        diag(colored(['white'],"Testing $code -> $token"));
+        diag(colored(['white'],"Testing $code -> $token") . "                       \r\e[1A");
         my $text   = '[% ' . $token . ' %]';
         my $output = $ansi->ansi_decode($text);
 
@@ -59,6 +60,7 @@ foreach my $code (keys %{$ansi->{'ansi_meta'}}) {
         cmp_ok($output,'eq',"$test","$text");
     }
 }
+diag(' ' x 79 . "\n");
 
 exit(0);
 

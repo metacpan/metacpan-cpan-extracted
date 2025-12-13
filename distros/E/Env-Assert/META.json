@@ -98,7 +98,7 @@
          "web" : "https://github.com/mikkoi/env-assert"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_contributors" : [
       "Ivan Bessarabov <ivan@bessarabov.ru>",
       "gregor herrmann <gregoa@debian.org>",

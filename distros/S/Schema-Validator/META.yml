@@ -24,11 +24,12 @@ no_index:
     - inc
 requires:
   JSON::MaybeXS: '0'
+  LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   perl: '5.008'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Schema-Validator
   homepage: https://metacpan.org/pod/Schema::Validator
   repository: git://github.com/nigelhorne/Schema-Validator.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

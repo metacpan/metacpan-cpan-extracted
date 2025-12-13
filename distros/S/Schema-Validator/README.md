@@ -4,7 +4,7 @@ Schema::Validator - Tools for validating and loading Schema.org vocabulary defin
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -15,19 +15,19 @@ Version 0.01
 ## FROM PERL
 
     use Schema::Validator qw(is_valid_datetime load_dynamic_vocabulary);
-    
+
     # Validate datetime strings
     if (is_valid_datetime('2024-11-14')) {
         print "Valid date\n";
     }
-    
+
     if (is_valid_datetime('2024-11-14T15:30:00')) {
         print "Valid datetime\n";
     }
-    
+
     # Load Schema.org vocabulary
     my %schema = load_dynamic_vocabulary();
-    
+
     # Access loaded schema definitions
     print 'Classes: ', scalar(keys %Schema::Validator::dynamic_schema), "\n";
     print 'Properties: ', scalar(keys %Schema::Validator::dynamic_properties), "\n";
@@ -122,16 +122,16 @@ This allows the calling code to continue execution even if vocabulary loading fa
 ## Basic Usage
 
     use Schema::Validator qw(is_valid_datetime load_dynamic_vocabulary);
-    
+
     # Validate user input
     my $date_input = '2024-11-14';
     unless (is_valid_datetime($date_input)) {
         die "Invalid date format\n";
     }
-    
+
     # Load Schema.org vocabulary
     load_dynamic_vocabulary();
-    
+
     # Check if a specific class exists
     if (exists $Schema::Validator::dynamic_schema{'Product'}) {
         print "Product class is defined in Schema.org\n";
@@ -141,16 +141,16 @@ This allows the calling code to continue execution even if vocabulary loading fa
 
     use Schema::Validator qw(load_dynamic_vocabulary);
     use Data::Dumper;
-    
+
     # Load vocabulary
     my %classes = load_dynamic_vocabulary();
-    
+
     # Examine a specific class
     if (my $person = $Schema::Validator::dynamic_schema{'Person'}) {
         print "Person class definition:\n";
         print Dumper($person);
     }
-    
+
     # List all available properties
     my @props = keys %Schema::Validator::dynamic_properties;
     print "Available properties: ", join(', ', sort @props), "\n";
@@ -209,13 +209,13 @@ rather than downloading from Schema.org.
 **Example:**
 
     my %schema_classes = load_dynamic_vocabulary();
-    
+
     # Access specific class definition
     if (exists $Schema::Validator::dynamic_schema{'Person'}) {
         my $person_def = $Schema::Validator::dynamic_schema{'Person'};
         print "Person class loaded\n";
     }
-    
+
     # Access property definitions
     if (exists $Schema::Validator::dynamic_properties{'name'}) {
         my $name_prop = $Schema::Validator::dynamic_properties{'name'};

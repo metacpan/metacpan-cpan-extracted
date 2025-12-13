@@ -1,5 +1,5 @@
 package Net::Stripe::Card;
-$Net::Stripe::Card::VERSION = '0.42';
+$Net::Stripe::Card::VERSION = '0.43';
 use Moose;
 use Kavorka;
 use Net::Stripe::Token;
@@ -65,7 +65,7 @@ Net::Stripe::Card - represent a Card object from Stripe
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 ATTRIBUTES
 
