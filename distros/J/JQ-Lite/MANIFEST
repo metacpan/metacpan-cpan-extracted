@@ -124,6 +124,7 @@ t/tostring.t
 t/transpose.t
 t/trim.t
 t/trimstr.t
+t/try_catch.t
 t/tsv_format.t
 t/type.t
 t/unique_by.t

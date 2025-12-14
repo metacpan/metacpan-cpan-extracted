@@ -215,3 +215,7 @@
 1.51    Dec 13, 2025
 
         Improved testing
+
+1.52    Dec 14, 2025
+
+        Fixed a small bug in the -t token output for underline color

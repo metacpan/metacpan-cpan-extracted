@@ -23,7 +23,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Automatically generated, see share/stations.json
 my %admin_id_to_operator = (
@@ -41,11 +41,17 @@ $buf .= <<'EOF';
 
 sub get_operator {
 	my ($id) = @_;
+	if (not defined $id) {
+		return;
+	}
 	return $admin_id_to_operator{$id};
 }
 
 sub get_operator_abbr {
 	my ($id) = @_;
+	if (not defined $id) {
+		return;
+	}
 	if (my $op = $admin_id_to_operator{$id}) {
 		return $op->[0];
 	}
@@ -54,6 +60,9 @@ sub get_operator_abbr {
 
 sub get_operator_name {
 	my ($id) = @_;
+	if (not defined $id) {
+		return;
+	}
 	if (my $op = $admin_id_to_operator{$id}) {
 		return $op->[1];
 	}

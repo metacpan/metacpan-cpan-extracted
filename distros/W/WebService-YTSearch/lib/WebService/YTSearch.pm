@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Search YouTube
 
-our $VERSION = '0.0304';
+our $VERSION = '0.0401';
 
 use strictures 2;
 use Carp qw(croak);
@@ -36,8 +36,10 @@ has ua => (
 sub search {
     my ( $self, %args ) = @_;
 
+    my $cmd = delete $args{cmd} || 'search';
+
     my $url = Mojo::URL->new( $self->base )
-        ->path('youtube/v3/search')
+        ->path('youtube/v3/' . $cmd)
         ->query(
             %args,
             part => 'snippet',
@@ -88,7 +90,7 @@ WebService::YTSearch - Search YouTube
 
 =head1 VERSION
 
-version 0.0304
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -135,8 +137,13 @@ Create a new C<WebService::YTSearch> object given your API B<key>.
 
 Fetch the results given the B<arguments>.
 
-For the accepted arguments, please see the YouTube reference link
-below (the main one being C<q>).
+To provide a command other than C<search>, use the C<cmd>
+argument. For example:
+
+  $r = $w->search(%arguments, cmd => 'commentThreads', videoId => 'abc123xyz');
+
+For all the accepted arguments, please see the YouTube reference
+linked below.
 
 =head1 SEE ALSO
 
@@ -162,7 +169,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2021-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -14,7 +14,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 # VERSION
 
-Version 0.9915
+Version 0.9920
 
 # DESCRIPTION
 
@@ -277,7 +277,11 @@ Version 0.9915
 
 Эта опция принудительно обновляет кэш-файл, даже если это не требуется.
 
+Команда `xlate` поддерживает длинные опции в стиле GNU, такие как `--to-lang`, `--from-lang`, `--engine` и `--file`. Используйте `xlate -h`, чтобы увидеть все доступные опции.
+
 Вы можете легко использовать этот модуль из командной строки с помощью команды `xlate`, включённой в дистрибутив. Смотрите страницу руководства `xlate` для использования.
+
+Операции с Docker обрабатываются скриптом `dozo`, который также может использоваться как отдельная команда. Скрипт `dozo` поддерживает файл конфигурации `.dozorc` для постоянных настроек контейнера.
 
 Команда `xlate` работает совместно с окружением Docker, поэтому даже если у вас ничего не установлено, вы можете использовать её, если доступен Docker. Используйте опцию `-D` или `-C`.
 
@@ -334,6 +338,10 @@ Version 0.9915
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     [App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+
+- [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
+
+    Библиотека `getoptlong.sh` используется для разбора опций в скриптах `xlate` и `dozo`.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

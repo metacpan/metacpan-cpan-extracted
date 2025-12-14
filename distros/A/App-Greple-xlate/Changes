@@ -1,5 +1,41 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9920 2025-12-14T10:42:27Z
+
+    - fix dist_dir to not load App::Greple::xlate module
+      (avoids Text::ANSI::Fold dependency error in CPAN test)
+    - simplify dockopt array construction in dozo
+    - use prove -b in GitHub Actions for CPAN-like test environment
+
+0.9919 2025-12-14T07:00:34Z
+
+    - rename xrun to dozo (Docker Zone)
+    - fix .dozorc parsing to handle quoted arguments using xargs
+    - use POD for dozo help output
+    - add USAGE section with practical examples
+
+0.9918 2025-12-14T02:43:25Z
+
+    - add --version option to xrun
+    - add -D/--default option and XRUN_DEFAULT_IMAGE env for default image
+    - improve test isolation from .xrunrc files
+
+0.9917 2025-12-13T15:04:34Z
+
+    - use native ARM64 runner for faster Docker image builds
+    - add concurrency control to Docker workflow
+    - add xrun to release hook for automatic version updates
+    - move API and Docker tests to xt/author to prevent
+      unintended API calls and image downloads during cpanm install
+
+0.9916 2025-12-13T13:24:26Z
+
+    - implement GNU-style long options using getoptlong.sh library
+    - all options now have both short and long forms
+      (e.g., -t/--to-lang, -e/--engine, -f/--file)
+    - extract xrun as standalone Docker runner script
+    - xrun supports .xrunrc for default container settings
+
 0.9915 2025-11-14T01:11:02Z
 
     - add Arabic document

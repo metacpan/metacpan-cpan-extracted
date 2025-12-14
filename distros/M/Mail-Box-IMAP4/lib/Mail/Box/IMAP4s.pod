@@ -118,7 +118,7 @@ Inherited, see L<Mail::Box::IMAP4/"METHODS">
 
 =item create => BOOLEAN
 
-=item extract => INTEGER | CODE | METHOD | 'LAZY'| 'ALWAYS'
+=item extract => INTEGER|CODE|METHOD|'LAZY'|'ALWAYS'
 
 =item field_type => CLASS
 
@@ -162,7 +162,7 @@ Inherited, see L<Mail::Box::IMAP4/"METHODS">
 
 =item server_port => $number
 
-=item ssl => HASH|ARRAY
+=item ssl => \%config|\@pairs
 
 Parameters to initialize the SSL connection.
 
@@ -544,7 +544,7 @@ the operating system, but that will not automatically mean that this
 C<delete> method permits you to.  The reverse remark is valid as well.
 Cast by C<delete()>
 
-=item Notice: impossible to keep deleted messages in IMAP
+=item Notice: impossible to keep deleted messages in IMAP folder $name.
 
 Some folder type have a 'deleted' flag which can be stored in the folder to
 be performed later.  The folder keeps that knowledge even when the folder
@@ -588,8 +588,8 @@ Cast by C<addMessage()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 4.000,
-built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.01,
+built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

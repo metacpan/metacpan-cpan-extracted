@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.002002	2025-12-13
+
+ [ Documentation ]
+ - Minor pod fix.
+
+0.002001	2025-12-13
+
+ [ Documentation ]
+ - Minor pod fix.
+
+0.002000	2025-12-13
+
+ - Added: Marlin::Role.
+
 0.001001	2025-12-13
 
  [ Documentation ]

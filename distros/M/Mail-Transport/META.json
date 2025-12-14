@@ -36,6 +36,7 @@
          }
       },
       "runtime" : {
+         "recommends" : {},
          "requires" : {
             "Carp" : "0",
             "Errno" : "0",
@@ -43,7 +44,7 @@
             "IO::Socket" : "0",
             "List::Util" : "0",
             "Log::Report" : "1.42",
-            "Mail::Reporter" : "4",
+            "Mail::Reporter" : "4.00",
             "Net::SMTP" : "0",
             "String::Print" : "1.01"
          }
@@ -67,7 +68,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Transport"
       }
    },
-   "version" : "4.00",
+   "version" : "4.01",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

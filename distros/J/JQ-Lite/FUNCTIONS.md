@@ -16,6 +16,7 @@ Functions are grouped by purpose for easier lookup.
 | `is_empty`              | True if array/object has no elements                 |
 | `default(value)`        | Replace null/undef with fallback                     |
 | `expr // fallback`      | Alternative operator (like jq)                       |
+| `try expr [catch handler]` | Catch and recover from runtime errors              |
 
 ---
 

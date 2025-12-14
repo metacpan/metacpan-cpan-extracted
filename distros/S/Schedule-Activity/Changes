@@ -1,5 +1,12 @@
 Revision history for Schedule::Activity
 
+0.2.6 - 2025-12-13
+	- NodeFilter value supports modulus
+	- NodeFilter elapsed supports modulus
+	- NodeFilter elapsed never matches negative times
+	- Script --attribute=average
+	- Script --attribute=avggrid
+
 0.2.5 - 2025-12-07
 	- NodeFilter supports average values
 	- Attribute cleanup, averages always defined

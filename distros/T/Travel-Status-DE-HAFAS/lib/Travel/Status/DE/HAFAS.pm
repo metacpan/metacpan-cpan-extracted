@@ -23,7 +23,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.23';
+our $VERSION = '6.24';
 
 # {{{ Endpoint Definition
 
@@ -40,6 +40,10 @@ sub new {
 	my $service = $conf{service};
 
 	my $ua = $conf{user_agent};
+
+	if ( defined $service and not exists $hafas_instance->{$service} ) {
+		confess("The service '$service' is not supported");
+	}
 
 	if ( not $ua ) {
 		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
@@ -77,10 +81,6 @@ sub new {
 
 	if ( not defined $service ) {
 		confess("You must specify a service");
-	}
-
-	if ( defined $service and not exists $hafas_instance->{$service} ) {
-		confess("The service '$service' is not supported");
 	}
 
 	my $now = DateTime->now( time_zone => $hafas_instance->{$service}{time_zone}
@@ -805,7 +805,7 @@ sub station {
 	for my $result ( $self->results ) {
 		$eva_count{ $result->station_eva } += 1;
 		$name_count{ $result->station }    += 1;
-		$eva_by_name{ $result->station_eva } = $result->station;
+		$eva_by_name{ $result->station } = $result->station_eva;
 	}
 
 	my @most_frequent_evas = map { $_->[0] } sort { $b->[1] <=> $a->[1] }
@@ -913,7 +913,7 @@ monitors
 
 =head1 VERSION
 
-version 6.23
+version 6.24
 
 =head1 DESCRIPTION
 

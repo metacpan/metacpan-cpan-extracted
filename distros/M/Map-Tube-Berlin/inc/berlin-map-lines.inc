@@ -9,7 +9,6 @@
   <line id="S25"     name="S25"     color="#03D169" />
   <line id="S26"     name="S26"     color="#018A47" />
   <line id="S41/S42" name="S41/S42" color="#AF5937" />
-  <line id="S45"     name="S45"     color="#CD9C53" />
   <line id="S46"     name="S46"     color="#E0BE8E" />
   <line id="S47"     name="S47"     color="#E9A037" />
   <line id="S75"     name="S75"     color="#AFA0C8" />

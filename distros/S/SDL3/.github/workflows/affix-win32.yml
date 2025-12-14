@@ -1,0 +1,51 @@
+---
+jobs:
+  build:
+    name: "${{ inputs.flags == '-Dusethreads' && 'Strawberry' || 'Default' }}"
+    runs-on: '${{ inputs.os }}'
+    steps:
+      - uses: actions/checkout@v5.0.0
+        with:
+          submodules: true
+      - name: Setup Perl environment
+        uses: shogo82148/actions-setup-perl@v1.36.0
+        with:
+          distribution: "${{ inputs.flags == '-Dusethreads' && 'strawberry' || 'default' }}"
+          multi-thread: "${{ inputs.flags == '-Dusethreads' && true || false }}"
+          perl-version: '${{ inputs.perl }}'
+      - name: Install prereqs
+        run: cpanm --installdeps --notest -v .
+      - name: Run tests
+        run: |
+          perl -V
+          
+          perl Build.PL
+          ./Build
+          ./Build test --v
+          
+          if ($LASTEXITCODE -eq 0) {
+            perl -V > test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}.txt
+          } else {
+            Out-File -FilePath "test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}.txt" -InputObject "Error" -Append
+            exit $LASTEXITCODE
+          }
+      - name: Upload results as artifact
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          if-no-files-found: error
+          name: 'test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}'
+          path: 'test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}.txt'
+          retention-days: 1
+name: windows module
+on:
+  workflow_call:
+    inputs:
+      flags:
+        required: false
+        type: string
+      os:
+        required: true
+        type: string
+      perl:
+        required: true
+        type: string

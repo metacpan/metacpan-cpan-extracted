@@ -7,7 +7,7 @@ use open qw(:std :encoding(UTF-8));
 use Storable qw(store);
 use WebService::YTSearch;
 
-my $key = shift || die "Usage: perl $0 12345abcde query num max\n";
+my $key = shift || $ENV{YOUTUBE_API_KEY} || die "Usage: perl $0 12345abcde query num max\n";
 my $q   = shift || 'Gene Boggs';
 my $num = shift || 50;  # Attempt to grab 50 videos at a time
 my $max = shift || 100; # Maximum number of videos to harvest

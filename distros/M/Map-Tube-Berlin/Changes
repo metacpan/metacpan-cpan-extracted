@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2025.1214
+	- data changes
+	  - S45 does not exist anymore
+	  - line changes regarding S47 and S85
+	  - renamed Mohrenstr. -> Anton-Wilhelm-Amo-Str.
+
 2024.1215
 	- data changes
 	  - changed station rename (Messe Nord ICC -> ZOB)

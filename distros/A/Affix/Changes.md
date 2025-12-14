@@ -5,6 +5,16 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.1] - 2025-12-13
+
+### Changed
+
+    - Improved Union marshalling: Union members are now exposed as pins within the hash. This allows clean syntax (like `$u->{member} = 5`) without needing to dereference a reference, while maintaining C-memory aliasing.
+
+### Fixed
+
+    - Fixed `writeback_pointer_generic` to support writing back to scalar output parameters (pointers-to-pointers). This resolves issues where C functions returning handles via arguments would fail to populate the SV*/pin.
+
 ## [v1.0.0] - 2025-12-13
 
     - Stable? Stable. Stable enough.
@@ -86,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
     - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.1...HEAD
+[v1.0.1]: https://github.com/sanko/Affix.pm/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/sanko/Affix.pm/compare/v0.12.0...v1.0.0
 [v0.12.0]: https://github.com/sanko/Affix.pm/compare/0.11...v0.12.0
 [0.11]: https://github.com/sanko/Affix.pm/compare/0.10...0.11

@@ -2,6 +2,7 @@ AGENTS.md
 Build.PL
 CLAUDE.md
 Changes
+DOZO.md
 LICENSE
 MANIFEST.SKIP
 META.json
@@ -80,13 +81,19 @@ lib/App/Greple/xlate/gpt4o.pm
 lib/App/Greple/xlate/gpt5.pm
 lib/App/Greple/xlate/null.pm
 minil.toml
+script/dozo
 script/xlate
 share/XLATE.mk
 share/xlate.el
 t/00_compile.t
 t/01_unit.t
 t/02_run.t
+t/03_dozo.t
+t/04_xlate_script.t
+t/05_translate.t
 t/Util.pm
+xt/author/api_translate.t
+share/getoptlong/getoptlong.sh
 t/runner/README.md
 t/runner/Runner.pm
 META.yml

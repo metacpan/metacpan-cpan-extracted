@@ -6,11 +6,11 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 Travel::Status::DE::DBRIS::Location->mk_ro_accessors(
-	qw(eva id lat lon name admin_id products type is_cancelled is_additional is_separation display_priority
-	  trip_no dep arr sched_dep sched_arr rt_dep rt_arr arr_delay dep_delay delay
+	qw(eva id lat lon name admin_id operator products type is_cancelled is_additional is_separation display_priority
+	  trip_no trip_type dep arr sched_dep sched_arr rt_dep rt_arr arr_delay dep_delay delay
 	  platform sched_platform rt_platform
 	  occupancy_first occupancy_second occupancy
 	)
@@ -36,10 +36,12 @@ sub new {
 		name           => $json->{name},
 		products       => $json->{products},
 		type           => $json->{type},
+		trip_type      => $json->{kategorie},
 		is_cancelled   => $json->{canceled},
 		is_additional  => $json->{additional},
 		sched_platform => $json->{gleis},
 		rt_platform    => $json->{ezGleis},
+		operator       => $opt{operator},
 	};
 
 	if ( $json->{abfahrtsZeitpunkt} ) {

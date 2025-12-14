@@ -16,7 +16,7 @@ App::Greple::xlate - módulo de soporte de traducción para greple
 
 =head1 VERSION
 
-Version 0.9915
+Version 0.9920
 
 =head1 DESCRIPTION
 
@@ -319,7 +319,11 @@ Esta opción fuerza la actualización del archivo de caché aunque no sea necesa
 
 Puedes usar fácilmente este módulo desde la línea de comandos utilizando el comando C<xlate> incluido en la distribución. Consulta la página del manual C<xlate> para su uso.
 
+El comando C<xlate> admite opciones largas al estilo GNU como C<--to-lang>, C<--from-lang>, C<--engine> y C<--file>. Use C<xlate -h> para ver todas las opciones disponibles.
+
 El comando C<xlate> funciona en conjunto con el entorno Docker, por lo que, incluso si no tienes nada instalado localmente, puedes usarlo siempre que Docker esté disponible. Usa la opción C<-D> o C<-C>.
+
+Las operaciones de Docker son gestionadas por el script C<dozo>, que también puede utilizarse como un comando independiente. El script C<dozo> admite el archivo de configuración C<.dozorc> para configuraciones persistentes del contenedor.
 
 Además, dado que se proporcionan makefiles para varios estilos de documentos, es posible la traducción a otros idiomas sin especificaciones especiales. Usa la opción C<-M>.
 
@@ -380,6 +384,10 @@ L<App::Greple::xlate::gpt5>
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
 
 Imagen de contenedor Docker.
+
+=item * L<https://github.com/tecolicom/getoptlong>
+
+La biblioteca C<getoptlong.sh> se utiliza para el análisis de opciones en los scripts C<xlate> y C<dozo>.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

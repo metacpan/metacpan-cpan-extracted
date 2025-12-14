@@ -1,7 +1,7 @@
 This archive contains the distribution SimpleFlow,
-version 0.07:
+version 0.08:
 
-  easy, simple workflow manager (and logger)
+  easy, simple workflow manager (and logger); for keeping track of and debugging large and complex shell command workflows
 
 This software is copyright (c) 2025-present by David E. Condon.
 

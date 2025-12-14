@@ -19,6 +19,14 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  HTML::FormatText: '2.01'
+  HTML::TreeBuilder: '3.13'
+  MIME::Entity: '3.0'
+  Mail::Box: '4.00'
+  Mail::Internet: '2.01'
+  Mail::Transport: '4.00'
+  Net::Domain: '0'
 requires:
   Date::Format: '0'
   Date::Parse: '0'
@@ -50,7 +58,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Message/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Message.git
-version: '4.00'
+version: '4.01'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

@@ -16,7 +16,7 @@ App::Greple::xlate - greple için çeviri destek modülü
 
 =head1 VERSION
 
-Version 0.9915
+Version 0.9920
 
 =head1 DESCRIPTION
 
@@ -319,7 +319,11 @@ Bu seçenek, gerekli olmasa bile önbellek dosyasını güncellemeye zorlar.
 
 Bu modülü, dağıtımda bulunan C<xlate> komutunu kullanarak komut satırından kolayca kullanabilirsiniz. Kullanım için C<xlate> man sayfasına bakın.
 
+C<xlate> komutu, C<--to-lang>, C<--from-lang>, C<--engine> ve C<--file> gibi GNU tarzı uzun seçenekleri destekler. Kullanılabilir tüm seçenekleri görmek için C<xlate -h> kullanın.
+
 C<xlate> komutu Docker ortamı ile uyumlu olarak çalışır, bu nedenle elinizde kurulu bir şey olmasa bile Docker mevcut olduğu sürece kullanabilirsiniz. C<-D> veya C<-C> seçeneğini kullanın.
+
+Docker işlemleri, bağımsız bir komut olarak da kullanılabilen C<dozo> betiği tarafından gerçekleştirilir. C<dozo> betiği, kalıcı konteyner ayarları için C<.dozorc> yapılandırma dosyasını destekler.
 
 Ayrıca, çeşitli belge stilleri için makefiles sağlandığından, özel bir belirtim olmadan diğer dillere çeviri mümkündür. C<-M> seçeneğini kullanın.
 
@@ -380,6 +384,10 @@ L<App::Greple::xlate::gpt5>
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
 
 Docker konteyner görüntüsü.
+
+=item * L<https://github.com/tecolicom/getoptlong>
+
+C<getoptlong.sh> kütüphanesi, C<xlate> ve C<dozo> komut dosyalarında seçenek ayrıştırma için kullanılır.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

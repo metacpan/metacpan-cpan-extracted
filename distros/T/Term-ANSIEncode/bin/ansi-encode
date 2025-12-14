@@ -212,7 +212,7 @@ $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]ATTRIBUTES [% R
             $to .= '[% BRIGHT GREEN %]│[% RESET %][% ' . $name . ' %]' . sprintf(' %-63s',$name) . ' [% RESET %][% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s',$ansi->ansi_description('attributes',$name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
         }
     }
-	$to .= '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-63s','UNDERLINE COLOR color') . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s','Set the underline color using color token.') . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+	$to .= '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-63s','UNDERLINE COLOR color') . '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s','Set the underline color using color token.') . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
 }
 
 {

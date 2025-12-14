@@ -130,7 +130,10 @@ sub parse {
         my $parsing_bone = $bone;
 
         if ( defined $bone->{substitution} ) {
-            if ( defined $self->{val}->{ $bone->{dt} } ) {
+            if (   defined $self->{val}->{ $bone->{dt} }
+                && defined
+                DEFAULT_SUBSTITUTION->{ $self->{val}->{ $bone->{dt} }->{val} } )
+            {
                 $parsing_bone =
                   BACnet::DataTypes::Utils::_property_identifier_value_wrapper(
                     DEFAULT_SUBSTITUTION->{

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 4.00.
+# This code is part of Perl distribution Mail-Transport version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Transport::SMTP;{
-our $VERSION = '4.00';
+our $VERSION = '4.01';
 }
 
 use parent 'Mail::Transport::Send';
@@ -18,7 +18,7 @@ use parent 'Mail::Transport::Send';
 use strict;
 use warnings;
 
-use Log::Report   'mail-transport', import => [ qw/__x error notice warning/ ];
+use Log::Report   'mail-transport', import => [ qw/__x error notice trace warning/ ];
 
 use Net::SMTP     ();
 
@@ -154,14 +154,14 @@ sub contactAnyServer()
 	{	my $server = $self->tryConnectTo($host, Port => $port, %$opts, Timeout => $timeout)
 			or next;
 
-		$self->log(PROGRESS => "Opened SMTP connection to $host.");
+		trace "opened SMTP connection to $host.";
 
 		if(defined $username)
 		{	unless($server->auth($username, $password))
-			{	$self->log(ERROR => "Authentication failed.");
+			{	error __x"authentication for {host} failed.", host => $host;
 				return undef;
 			}
-			$self->log(PROGRESS => "$host: Authentication succeeded.");
+			trace "$host: Authentication succeeded.";
 		}
 
 		return $server;

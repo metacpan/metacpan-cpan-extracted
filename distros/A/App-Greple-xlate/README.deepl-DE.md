@@ -14,7 +14,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # VERSION
 
-Version 0.9915
+Version 0.9920
 
 # DESCRIPTION
 
@@ -277,7 +277,11 @@ Verwenden Sie **--xlate-cache=clear**, um die Cache-Verwaltung zu starten oder u
 
 Sie können dieses Modul einfach von der Kommandozeile aus verwenden, indem Sie den in der Distribution enthaltenen Befehl `xlate` verwenden. Siehe die Manpage `xlate` zur Verwendung.
 
+Der Befehl `xlate` unterstützt lange Optionen im GNU-Stil wie `--to-lang`, `--from-lang`, `--engine` und `--file`. Verwenden Sie `xlate -h`, um alle verfügbaren Optionen zu sehen.
+
 Der Befehl `xlate` arbeitet mit der Docker-Umgebung zusammen, d. h. selbst wenn Sie nichts installiert haben, können Sie ihn verwenden, solange Docker verfügbar ist. Verwenden Sie die Option `-D` oder `-C`.
+
+Docker-Operationen werden durch das `dozo`-Skript ausgeführt, das auch als eigenständiger Befehl verwendet werden kann. Das `dozo`-Skript unterstützt die `.dozorc`-Konfigurationsdatei für dauerhafte Container-Einstellungen.
 
 Da Makefiles für verschiedene Dokumentstile zur Verfügung gestellt werden, ist auch eine Übersetzung in andere Sprachen ohne besondere Angaben möglich. Verwenden Sie die Option `-M`.
 
@@ -334,6 +338,10 @@ Sie müssen die Befehlszeilentools für DeepL und ChatGPT installieren.
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Docker-Container-Abbild.
+
+- [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
+
+    Die `getoptlong.sh`-Bibliothek wird für das Parsen von Optionen in den `xlate`- und `dozo`-Skripten verwendet.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

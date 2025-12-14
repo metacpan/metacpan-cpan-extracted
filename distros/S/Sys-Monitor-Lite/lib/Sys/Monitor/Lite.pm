@@ -6,7 +6,7 @@ use Time::HiRes qw(sleep);
 use JSON::PP ();
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my %COLLECTORS = (
     system  => \&_system_info,
@@ -513,6 +513,33 @@ sub to_yaml {
     return $yaml;
 }
 
+sub to_prometheus {
+    my ($data, %opts) = @_;
+    return '' unless defined $data;
+
+    my $prefix = _sanitize_prefix($opts{prefix});
+    my %base_labels;
+    if ($opts{labels} && ref $opts{labels} eq 'HASH') {
+        for my $key (sort keys %{ $opts{labels} }) {
+            my $label = _label_name($key);
+            next unless length $label;
+            $base_labels{$label} = $opts{labels}{$key};
+        }
+    }
+
+    my $timestamp = $opts{timestamp} ? ($data->{timestamp} // _timestamp()) : undef;
+
+    my @lines;
+    my %type_declared;
+    _prometheus_walk($data, [], \%base_labels, \@lines, {
+        prefix         => $prefix,
+        timestamp      => $timestamp,
+        type_declared  => \%type_declared,
+    });
+
+    return join('', @lines);
+}
+
 sub _yaml_dump {
     my ($data, $indent) = @_;
     my $prefix = '  ' x $indent;
@@ -553,6 +580,124 @@ sub _yaml_dump {
     }
 
     return $prefix . _yaml_scalar($data) . "\n";
+}
+
+sub _prometheus_walk {
+    my ($value, $path, $labels, $output, $ctx) = @_;
+
+    if (!ref $value) {
+        _emit_prom_metric($path, $labels, $value, $output, $ctx);
+        return;
+    }
+
+    if (ref $value eq 'HASH') {
+        my %label_set = %$labels;
+        if (@$path) {
+            for my $key (sort keys %$value) {
+                my $v = $value->{$key};
+                if (!ref($v) && !looks_like_number($v)) {
+                    my $label_name = _label_name($key);
+                    $label_set{$label_name} = $v if length $label_name && defined $v && $v ne '';
+                }
+            }
+        }
+
+        for my $key (sort keys %$value) {
+            my $v = $value->{$key};
+            next if !ref($v) && !looks_like_number($v);
+            _prometheus_walk($v, [@$path, $key], \%label_set, $output, $ctx);
+        }
+        return;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        for my $i (0 .. $#$value) {
+            my %with_index = (%$labels, index => $i);
+            _prometheus_walk($value->[$i], $path, \%with_index, $output, $ctx);
+        }
+        return;
+    }
+}
+
+sub _emit_prom_metric {
+    my ($path, $labels, $value, $output, $ctx) = @_;
+    return unless defined $value && looks_like_number($value);
+    return unless @$path;
+
+    my $name = _metric_name($path, $ctx->{prefix});
+    return unless length $name;
+
+    if (!$ctx->{type_declared}{$name}++) {
+        push @$output, "# TYPE $name gauge\n";
+    }
+
+    my $label_str = _format_prom_labels($labels);
+    my $line      = $name . $label_str . ' ' . $value;
+    if (defined $ctx->{timestamp}) {
+        $line .= ' ' . $ctx->{timestamp};
+    }
+    push @$output, $line . "\n";
+}
+
+sub _format_prom_labels {
+    my ($labels) = @_;
+    return '' unless $labels && %$labels;
+
+    my @pairs;
+    for my $key (sort keys %$labels) {
+        my $name = _label_name($key);
+        next unless length $name;
+        my $value = defined $labels->{$key} ? $labels->{$key} : '';
+        my $escaped = $value;
+        $escaped =~ s/\\/\\\\/g;
+        $escaped =~ s/"/\\"/g;
+        $escaped =~ s/\n/\\n/g;
+        push @pairs, $name . '="' . $escaped . '"';
+    }
+
+    return '' unless @pairs;
+    return '{' . join(',', @pairs) . '}';
+}
+
+sub _sanitize_prefix {
+    my ($prefix) = @_;
+    return '' unless defined $prefix && length $prefix;
+    my $clean = _snake_case($prefix);
+    return '' unless length $clean;
+    $clean .= '_' unless $clean =~ /_\z/;
+    return $clean;
+}
+
+sub _metric_name {
+    my ($path, $prefix) = @_;
+    my @parts = map { _snake_case($_) } @$path;
+    @parts = grep { length } @parts;
+    return '' unless @parts;
+
+    my $name = join('_', @parts);
+    $name = $prefix . $name if defined $prefix && length $prefix;
+    $name = '_' . $name if $name !~ /^[A-Za-z_]/;
+    return $name;
+}
+
+sub _label_name {
+    my ($name) = @_;
+    $name = _snake_case($name);
+    return '' unless length $name;
+    $name = '_' . $name if $name !~ /^[A-Za-z_]/;
+    return $name;
+}
+
+sub _snake_case {
+    my ($text) = @_;
+    return '' unless defined $text && length $text;
+    $text =~ s/([a-z0-9])([A-Z])/$1_$2/g;
+    $text =~ s/[^A-Za-z0-9]+/_/g;
+    $text = lc $text;
+    $text =~ s/^_+//;
+    $text =~ s/_+$//;
+    $text =~ s/_+/_/g;
+    return $text;
 }
 
 sub _yaml_is_simple {
@@ -797,8 +942,9 @@ Sys::Monitor::Lite - Lightweight system monitoring toolkit with JSON/YAML output
 
 =head1 DESCRIPTION
 
-A minimal system monitor that outputs structured JSON or YAML data
-for easy automation and integration with jq-lite, yq, or other
+A minimal system monitor that outputs structured JSON, YAML, or
+Prometheus text exposition for easy automation and integration with
+jq-lite, yq, Prometheus scrape targets, or other
 tools that consume structured logs.
 
 =head1 FUNCTIONS
@@ -862,6 +1008,15 @@ L<JSON::PP>. Pass C<pretty =E<gt> 1> to enable human-readable output.
 
 Serialises the supplied data structure to a YAML string using a
 minimal built-in emitter.
+
+=head2 to_prometheus
+
+    my $text = Sys::Monitor::Lite::to_prometheus($data, prefix => 'sysmon_');
+
+Serialises the supplied data structure into Prometheus exposition format,
+converting keys to snake_case gauge metrics. Pass C<prefix> to prepend a
+metric namespace (e.g. C<sysmon_>), C<labels> to include fixed labels, and
+C<timestamp =E<gt> 1> to append the sample timestamp to each metric line.
 
 =head1 EXPORT
 

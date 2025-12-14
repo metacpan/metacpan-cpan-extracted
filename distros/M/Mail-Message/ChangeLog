@@ -13,6 +13,12 @@ Limitations to be fixed:
 #!!! number 3.  Use (at least) version 4 for new developments.
 #!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
+version 4.01: Sat 13 Dec 12:15:47 CET 2025
+
+	Fixes:
+	- optional modules -> recommends.
+	- recommends minimal Mail::Box 4.
+
 version 4.00: Thu 11 Dec 13:58:01 CET 2025
 
 	Changes:

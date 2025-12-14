@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Server::IMAP4;{
-our $VERSION = '4.000';
+our $VERSION = '4.01';
 }
 
 use parent 'Mail::Server';
@@ -18,7 +18,7 @@ use parent 'Mail::Server';
 use strict;
 use warnings;
 
-use Log::Report 'mail-box-imap4';
+use Log::Report 'mail-box-imap4', import => [];
 
 use Mail::Server::IMAP4::List   ();
 use Mail::Server::IMAP4::Fetch  ();

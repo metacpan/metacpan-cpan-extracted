@@ -6,6 +6,11 @@
 #!!! number 3.  Use (at least) version 4 for new developments.
 #!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
+version 4.01: Sat 13 Dec 12:20:29 CET 2025
+
+	Fixes:
+	- still used some removed logging features.
+
 version 4.000: Wed 10 Dec 19:01:10 CET 2025
 
 	Changes:

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ParseXS;
-$ExtUtils::Builder::ParseXS::VERSION = '0.032';
+$ExtUtils::Builder::ParseXS::VERSION = '0.033';
 use strict;
 use warnings;
 
@@ -36,6 +36,7 @@ sub add_methods {
 			die_on_error => 1,
 		);
 		$args{$_} = $options{$_} for grep { defined $options{$_} } qw/typemap hiertype versioncheck linenumbers optimize prototypes/;
+		$args{typemap} = [ $args{typemap} ] if defined $args{typemap} and not ref $args{typemap};
 
 		push @actions, function(
 			module    => 'ExtUtils::ParseXS',
@@ -45,8 +46,7 @@ sub add_methods {
 		);
 
 		my @dependencies = @{ $options{dependencies} // [] };
-		$args{typemap} //= 'typemap' if -f 'typemap';
-		push @dependencies, $args{typemap} if $args{typemap};
+		push @dependencies, @{ $args{typemap} } if $args{typemap};
 
 		$planner->create_node(
 			target       => $destination,
@@ -99,7 +99,7 @@ ExtUtils::Builder::ParseXS - Essential functions for implementing XS in a Plan
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

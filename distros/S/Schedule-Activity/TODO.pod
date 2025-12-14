@@ -20,11 +20,15 @@ The following are planned as part of the 0.3.0 release.
 
 =item Node filtering for average values (done)
 
-=item Attribute support modulus operator
+=item Attribute support modulus operator (done)
 
-=item Script attribute grid for averages
+=item Script attribute grid for averages (done)
+
+=item Per-activity goals (maybe)
 
 =item Script incremental build supports configuration overwrite (maybe)
+
+=item Automatic attributes per node (maybe)
 
 =back
 
@@ -33,6 +37,8 @@ The following are planned as part of the 0.3.0 release.
 =head2 Goals
 
 Scheduling goals are available starting with 0.2.4.  Goals can specifyC<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=E<gt>'max|min'},name=E<gt>{op=E<gt>'eq|ne',value=E<gt>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based, average value goals seeking is planned at this time.
+
+Setting goals per activity is being considered with/before 0.3.0.  This may not include script support since this can already be achieved with incremental construction and there are potential parsing issues from the commandline.
 
 =head2 Documentation
 
@@ -44,11 +50,17 @@ Attribute recomputation is supported starting with 0.2.2, primarily for merged a
 
 Attribute average values are available for goals starting with 0.2.5, which also cleaned up behavioral questions about initial average values, and averages during time overlaps.  See L<Schedule::Activity/Consistency>.
 
-Rudimentary attribute reporting from the commandline is supported starting with 0.2.2.
+Rudimentary attribute reporting from the commandline is supported starting with 0.2.2, with additional options in 0.2.6.
+
+JSON output from the script is being considered, and would include JSON renderings of the attribute outputs.
+
+Attributes that are internal and automatic per node are being considered.  These attributes would always be of the form C<ACT:node name>, with a configurable prefix.  Such attributes would permit node filtering based on the previous appearance of nodes, without needing to create a separate named attribute.  Coupled with the modulus operator, a node could be activated "every N appearances", for example.
 
 =head2 Node filtering
 
 Average value filtering is available starting with 0.2.5.  The most recent value is always used as the "current value" for the attribute, and the rolling average is updated to the "random current time" when evaluating any NodeFilter.  This permits node activation based on "eventual activation" without explicit checkpointing/materialization of attributes.  The user may still fix the attribute to affect the averages with more granularity as desired.
+
+Floating-point modulus is available starting with 0.2.6.
 
 =head2 Annotations
 
@@ -59,6 +71,8 @@ Annotations may also benefit from a schedule-wide closeness configuration, but n
 =head2 Scheduling
 
 Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation is supported for materialized annotations starting with 0.2.2.  Ideally a finalized savefile could also store materialized annotations, but no timeline has been established.
+
+Weighting for the C<next> array is being considered.
 
 =head2 Tension configuration
 

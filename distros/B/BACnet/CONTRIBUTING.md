@@ -2,15 +2,16 @@
 
 Thank you for your interest in contributing to this Perl project. To ensure consistency and maintainability across the codebase, please follow the guidelines below.
 
+
+## Bug reporting ##  
+   All bug reports, feature requests, and discussions must be submitted through the Git repository’s issue tracker ([https://github.com/VojtaKrenek/BACnet-Perl](https://github.com/VojtaKrenek/BACnet-Perl)). Please do not use CPAN for reporting problems.
+
 ## Workflow and Version Control
 
 1. **Always rebase before submitting a merge request.**  
    Keep your branch up to date with the main branch and use `git rebase` to maintain a clean, linear history.
 
-2. **Report issues via Git, not CPAN.**  
-   All bug reports, feature requests, and discussions must be submitted through the Git repository’s issue tracker ([https://github.com/VojtaKrenek/BACnet-Perl](https://github.com/VojtaKrenek/BACnet-Perl)). Please do not use CPAN for reporting problems.
-
-3. **Commit message conventions**  
+2. **Commit message conventions**  
    Use the following prefixes when writing commit messages:  
    - `feat: description` — for new features  
    - `fix: description` — for bug fixes  

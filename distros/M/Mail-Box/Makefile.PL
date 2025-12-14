@@ -6,7 +6,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version = '4.00';
+my $version = '4.01';
 my $webpages = "../public_html";
 my $git      = "https://github.com/markov2/perl5-Mail-Box";
 my $publish  = "../public_html/mail-box";
@@ -90,19 +90,19 @@ my %requires = (
 	'Sys::Hostname'  => 0.0,
 	'String::Print'  => '1.01',
 
-	'Mail::Message'          => '4.000',
-	'Mail::Transport'        => '4.000',
-	'Object::Realize::Later' => '4.000',
+	'Mail::Message'          => '4.00',
+	'Mail::Transport'        => '4.00',
+	'Object::Realize::Later' => '4.00',
 
 # Currently, it seems to be wise not to depend on these
 #   File::FcntLock
 );
 
 my %optional = (
-	'Mail::Box::Parser::C' => '3.0, <4.0',
-	'Mail::Box::IMAP4'     => '3.0, <4.0',
-	'Mail::Box::POP3'      => '3.0, <4.0',
-	'HTML::FromMail'       => '0, <4.0',
+	'Mail::Box::Parser::C' => '4.00',
+	'Mail::Box::IMAP4'     => '4.00',
+	'Mail::Box::POP3'      => '4.00',
+	'HTML::FromMail'       => '4.00',
 );
 
 WriteMakefile
@@ -128,8 +128,8 @@ WriteMakefile
 		},
 		prereqs => {
 			runtime => {
-				requires => \%requires,
-				optional => \%optional,
+				requires   => \%requires,
+				recommends => \%optional,
 			},
 			develop => {
 				requires => {

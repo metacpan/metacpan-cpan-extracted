@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Require::Perl 'v5.38'; # Data::Checks use builtion::export_lexically. It requires Perl v5.38+
 use Test2::Require::Module 'Data::Checks', '0.09';
 
 use Syntax::Keyword::Assert;

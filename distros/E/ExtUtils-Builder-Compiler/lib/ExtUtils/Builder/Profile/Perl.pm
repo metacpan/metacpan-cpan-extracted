@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.032';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.033';
 use strict;
 use warnings;
 
-use ExtUtils::Helpers 0.027 'split_like_shell';
+use ExtUtils::Builder::Util 0.018 'split_like_shell';
 use File::Basename 'dirname';
 use File::Spec::Functions qw/catdir/;
 
@@ -86,7 +86,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

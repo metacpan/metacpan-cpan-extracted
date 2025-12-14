@@ -14,7 +14,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.9915
+Version 0.9920
 
 # DESCRIPTION
 
@@ -277,7 +277,11 @@ Version 0.9915
 
 你可以使用发行版中的 `xlate` 命令，在命令行中轻松使用该模块。有关用法，请参阅 `xlate` man 页。
 
+`xlate` 命令支持 GNU 风格的长选项，如 `--to-lang`、`--from-lang`、`--engine` 和 `--file`。使用 `xlate -h` 查看所有可用选项。
+
 `xlate` 命令与 Docker 环境协同工作，因此即使你手头没有安装任何东西，只要 Docker 可用，你就可以使用它。使用 `-D` 或 `-C` 选项。
+
+Docker 操作由 `dozo` 脚本处理，该脚本也可作为独立命令使用。`dozo` 脚本支持用于持久化容器设置的 `.dozorc` 配置文件。
 
 此外，由于提供了各种文档样式的 makefile，因此无需特别说明即可翻译成其他语言。使用 `-M` 选项。
 
@@ -334,6 +338,10 @@ Version 0.9915
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Docker 容器镜像。
+
+- [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
+
+    `getoptlong.sh` 库用于在 `xlate` 和 `dozo` 脚本中进行选项解析。
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

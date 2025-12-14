@@ -505,7 +505,7 @@ use Params::Validate::Strict qw(validate_strict);
     my $schema = {
         title => {
             type => 'string',
-            memberof => ['Mr', 'Mrs', 'Ms', 'Dr'],
+            enum => ['Mr', 'Mrs', 'Ms', 'Dr'],
             case_sensitive => 0
         }
     };

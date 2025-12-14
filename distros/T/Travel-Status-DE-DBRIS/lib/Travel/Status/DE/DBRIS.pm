@@ -19,7 +19,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # {{{ Constructors
 
@@ -68,7 +68,8 @@ sub new {
 		  . $station->{eva}
 		  . '&ortId='
 		  . $station->{id}
-		  . '&mitVias=true&maxVias=8';
+		  . '&mitVias=true&maxVias='
+		  . ( $conf{num_vias} // 5 );
 		for my $mot (@mots) {
 			$req .= '&verkehrsmittel[]=' . $mot;
 		}
@@ -472,7 +473,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -552,6 +553,11 @@ network reception) to be cached.
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 you can use an empty hashref to unset the default.
+
+=item B<num_vias> => I<$num> (station)
+
+For each departure, request the names of I<$num> stops between the requested
+station and its terminus. Default: 5.
 
 =item B<modes_of_transit> => I<\@arrayref> (station)
 

@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001001';
+our $VERSION   = '0.002002';
 
 use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
 use Exporter::Tiny qw( mkopt _croak );
@@ -14,7 +14,7 @@ use Scalar::Util qw( blessed );
 use Class::XSAccessor { getters => [ _ATTRS ] };
 use Class::XSConstructor [ undef, '_new' ], _ATTRS;
 use B::Hooks::AtRuntime qw( at_runtime after_runtime );
-use Module::Runtime qw(use_package_optimistically);
+use Module::Runtime qw( use_package_optimistically module_notional_filename );
 use List::Util qw(any);
 
 BEGIN {
@@ -164,6 +164,10 @@ sub new {
 		elsif ( $k =~ /^-(?:modifiers?|mods?)$/ ) {
 			$arg{modifiers} = !!1;
 		}
+		elsif ( $k =~ /^-(?:requires?)$/ ) {
+			_croak("Expected arrayref of required method names") unless ref($v) eq 'ARRAY';
+			$arg{requires} = $v;
+		}
 		else {
 			push @{ $arg{attributes} }, $class->$_parse_attribute( $k, $v );
 		}
@@ -190,6 +194,7 @@ sub setup_steps {
 	my $me = shift;
 	
 	return qw/
+		mark_inc
 		setup_mro
 		setup_inheritance
 		setup_roles
@@ -199,6 +204,14 @@ sub setup_steps {
 		setup_imports
 		optimize_methods
 	/;
+}
+
+sub mark_inc {
+	my $me = shift;
+	
+	$INC{module_notional_filename($me->this)} //= __FILE__;
+	
+	return $me;
 }
 
 sub setup_mro {
@@ -241,6 +254,26 @@ sub setup_roles {
 	at_runtime {
 		Role::Tiny->apply_roles_to_package( $me->this, @roles );
 	};
+
+	my $existing;
+	for my $r ( @roles ) {
+		my $r_meta = $META{$r};
+		if ( blessed $r_meta and $r_meta->isa('Marlin::Role') ) {
+			$existing ||= do {
+				my %e;
+				for my $attr ( @{ $me->attributes } ) {
+					undef $e{$attr->{slot}};
+				}
+				\%e;
+			};
+			for my $attr ( @{ $r_meta->attributes } ) {
+				require Storable;
+				my $copy = Storable::dclone( $attr );
+				$copy->{package} = $me->this;
+				push @{ $me->attributes }, $copy;
+			}
+		}
+	}
 	
 	return $me;
 }
@@ -863,9 +896,10 @@ A non-reference string is not supported:
 
 =item C<< -with >> or C<< -roles >> or C<< -does >>
 
+Composes roles into your class.
+
   package Payable {
-    use Role::Tiny;
-    requires 'payroll_number';
+    use Marlin::Role -requires => ['payroll_number'];
   }
   
   package Employee {
@@ -875,7 +909,7 @@ A non-reference string is not supported:
       qw( employee_id payroll_number );
   }
 
-Composes L<Role::Tiny> roles into your class.
+Marlin classes can accept both L<Marlin::Role> and L<Role::Tiny> roles.
 
 Like C<< -base >>, you can include version numbers.
 
@@ -944,13 +978,6 @@ Perl's built-in C<DESTROY> still works, of course.
 
 =item *
 
-Attributes in roles.
-
-Marlin's support for roles is minimal. L<Role::Tiny> roles can be composed
-into classes, but Role::Tiny doesn't allow you to declare attributes.
-
-=item *
-
 Extensibility.
 
 Marlin doesn't offer any official API for building extensions.
@@ -964,13 +991,15 @@ L<https://github.com/tobyink/p5-marlin/issues>.
 
 =head1 SEE ALSO
 
+L<Marlin::Role>,
+L<Marlin::Util>,
+L<Marlin::Manual::Principles>,
+L<Marlin::Manual::Comparison>.
+
 L<Class::XSAccessor>, L<Class::XSConstructor>, L<Types::Common>,
 L<Type::Params>, and L<Sub::HandlesVia>.
 
 L<Moose> and L<Moo>.
-
-L<Marlin::Manual::Principles>,
-L<Marlin::Manual::Comparison>.
 
 =head1 AUTHOR
 

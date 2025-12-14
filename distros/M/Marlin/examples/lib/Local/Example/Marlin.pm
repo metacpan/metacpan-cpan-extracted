@@ -10,9 +10,7 @@ package Local::Example::Marlin::NamedThing {
 }
 
 package Local::Example::Marlin::DoesIntro {
-	use Role::Tiny;
-	
-	requires 'name';
+	use Marlin::Role -requires => [ 'name' ];
 	
 	sub introduction ( $self ) {
 		return sprintf( "Hi, my name is %s!", $self->name );

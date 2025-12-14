@@ -1,0 +1,80 @@
+---
+jobs:
+  build:
+    name: "${{ inputs.flags == '-Dusethreads' && 'Threads' ||inputs.flags == '-Duselongdouble' && 'Long Double' || inputs.flags == '-Dusequadmath' && 'Quad Math' || 'Default' }}"
+    runs-on: '${{ inputs.os }}'
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5.0.0
+        with:
+          submodules: true
+      - id: cache-perl
+        name: Check perl Cache
+        uses: actions/cache@v4.3.0
+        with:
+          key: '${{ inputs.os }}-perl-v${{ inputs.perl }}${{ inputs.flags }}'
+          path: '~/perl5/'
+      - if: "${{ steps.cache-perl.outputs.cache-hit != 'true' }}"
+        name: 'Build perl ${{ inputs.perl }} from source'
+        run: |
+          \curl -L https://install.perlbrew.pl | bash
+          source ~/perl5/perlbrew/etc/bashrc
+          
+          perlbrew self-upgrade
+          perlbrew install-patchperl
+          perlbrew available
+          perlbrew install-cpanm
+          cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+          cpanm -n -v Devel::PatchPerl
+          
+          perlbrew install --switch --verbose --as cache-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }} -j 12 --notest --noman ${{ inputs.flags }} perl-${{ inputs.perl }}
+      - name: Install prereqs
+        run: |
+          if [[ $(uname -o) == GNU/Linux ]]; then
+            sudo apt-get update -y
+            sudo apt-get install -y valgrind
+          fi
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew switch cache-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}
+          cpanm --installdeps --notest --with-suggests --with-recommends --with-configure -v .
+        shell: bash
+      - env:
+          AUTHOR_TESTING: 0
+          AUTOMATED_TESTING: 1
+        id: test
+        name: Run test suite
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew switch cache-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}
+          perl Build.PL
+          ./Build
+          ./Build test --v
+          command1_exit_code=$?
+          if [ $command1_exit_code -eq 0 ]; then
+            ~/perl5/perlbrew/perls/cache-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}/bin/perl -V > test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}.txt
+            command2_exit_code=$?
+          else
+            echo "Error!" > test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}.txt
+            exit $command1_exit_code
+          fi
+        shell: bash
+      - name: Upload results as artifact
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          if-no-files-found: error
+          name: 'test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}'
+          path: 'test-output-${{ inputs.os }}-${{ inputs.perl }}${{ inputs.flags }}.txt'
+          retention-days: 1
+name: inputs module
+on:
+  workflow_call:
+    inputs:
+      flags:
+        required: false
+        type: string
+      os:
+        required: true
+        type: string
+      perl:
+        required: true
+        type: string

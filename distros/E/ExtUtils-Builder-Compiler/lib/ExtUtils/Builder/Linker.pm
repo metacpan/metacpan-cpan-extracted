@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.032';
+$ExtUtils::Builder::Linker::VERSION = '0.033';
 use strict;
 use warnings;
 
@@ -102,16 +102,7 @@ sub pre_action  {
 			exports   => 1,
 		);
 	}
-	if ($opts{mkdir}) {
-		my $dirname = File::Basename::dirname($to);
-		push @result, function(
-			module    => 'File::Path',
-			function  => 'make_path',
-			exports   => 'explicit',
-			arguments => [ $dirname ],
-			message   => "mkdir $dirname",
-		);
-	}
+	push @result, $self->_mkdir_for($to) if $opts{mkdir};
 	return @result;
 }
 sub post_action { }
@@ -129,6 +120,8 @@ sub link {
 
 1;
 
+# ABSTRACT: An interface around different linkers.
+
 __END__
 
 =pod
@@ -137,11 +130,11 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Builder::Linker
+ExtUtils::Builder::Linker - An interface around different linkers.
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 METHODS
 

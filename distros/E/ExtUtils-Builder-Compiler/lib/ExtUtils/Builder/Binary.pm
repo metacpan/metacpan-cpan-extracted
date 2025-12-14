@@ -1,9 +1,10 @@
 package ExtUtils::Builder::Binary;
-$ExtUtils::Builder::Binary::VERSION = '0.032';
+$ExtUtils::Builder::Binary::VERSION = '0.033';
 use strict;
 use warnings;
 
 use Carp qw//;
+use ExtUtils::Builder::Util qw/function/;
 
 my %allowed_types = map { ($_ => 1) } qw/shared-library static-library loadable-object executable/;
 
@@ -20,6 +21,17 @@ sub type {
 	return $self->{type};
 }
 
+sub _mkdir_for {
+	my ($self, $file) = @_;
+	my $dirname = File::Basename::dirname($file);
+	return function(
+		module    => 'File::Path',
+		function  => 'make_path',
+		exports   => 'explicit',
+		arguments => [ $dirname ],
+		message   => "mkdir $dirname",
+	);
+}
 1;
 
 # ABSTRACT: Helper role for classes producing binary objects
@@ -36,7 +48,7 @@ ExtUtils::Builder::Binary - Helper role for classes producing binary objects
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 AUTHOR
 

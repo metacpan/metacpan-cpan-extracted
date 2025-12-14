@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-POP3 version 4.000.
+# This code is part of Perl distribution Mail-Box-POP3 version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Transport::POP3;{
-our $VERSION = '4.000';
+our $VERSION = '4.01';
 }
 
 use parent 'Mail::Transport::Receive';
@@ -18,7 +18,7 @@ use parent 'Mail::Transport::Receive';
 use strict;
 use warnings;
 
-use Log::Report  'mail-box-pop3';
+use Log::Report  'mail-box-pop3', import => [ qw/error fault __x/ ];
 
 use IO::Socket       ();
 use IO::Socket::IP   ();
@@ -339,7 +339,7 @@ sub status($;$)
 	if($stat !~ m#^\+OK (\d+) (\d+)#)
 	{	delete $self->{MTP_messages};
 		delete $self->{MTP_size};
-		$self->log(ERROR => "POP3 Could not do a STAT");
+		error __x"POP3 Could not do a STAT";
 		return;
 	}
 	$self->{MTP_messages}    = my $nr_msgs = $1;

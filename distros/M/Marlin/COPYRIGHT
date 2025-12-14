@@ -23,10 +23,12 @@ Files: README
  lib/Marlin.pm
  lib/Marlin/Manual/Comparison.pod
  lib/Marlin/Manual/Principles.pod
+ lib/Marlin/Role.pm
  lib/Marlin/Util.pm
  t/00start.t
  t/01basic.t
  t/integration/comparison-example.t
+ t/integration/roles.t
 Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

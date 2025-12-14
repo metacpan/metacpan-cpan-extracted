@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-POP3 version 4.000.
+# This code is part of Perl distribution Mail-Box-POP3 version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::POP3s;{
-our $VERSION = '4.000';
+our $VERSION = '4.01';
 }
 
 use parent 'Mail::Box::POP3';

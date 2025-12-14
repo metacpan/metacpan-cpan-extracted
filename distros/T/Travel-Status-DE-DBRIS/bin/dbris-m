@@ -3,13 +3,13 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use utf8;
 use DateTime;
 use Encode qw(decode);
 use JSON;
-use Getopt::Long qw(:config no_ignore_case);
+use Getopt::Long qw(:config no_ignore_case bundling);
 use List::Util   qw(min max);
 use Travel::Status::DE::DBRIS;
 
@@ -21,6 +21,9 @@ my $use_cache = 1;
 my $cache;
 my $use_colour = 'auto';
 my ( $json_output, $raw_json_output, $with_polyline );
+my @output_args;
+my %show_output;
+my $num_route_entries = 3;
 
 my %known_mot = map { $_ => 1 }
   (qw(ICE EC_IC IR REGIONAL SBAHN BUS SCHIFF UBAHN TRAM ANRUFPFLICHTIG));
@@ -43,6 +46,7 @@ GetOptions(
 	'h|help'               => sub { show_help(0) },
 	'j|with-jid'           => \$show_jid,
 	'm|modes-of-transit=s' => \$mots,
+	'O|output=s@'          => \@output_args,
 	't|time=s'             => \$time,
 	'V|version'            => \&show_version,
 	'cache!'               => \$use_cache,
@@ -51,6 +55,7 @@ GetOptions(
 	'devmode'              => \$developer_mode,
 	'json'                 => \$json_output,
 	'raw-json'             => \$raw_json_output,
+	'route-entries=i'      => \$num_route_entries,
 	'with-polyline'        => \$with_polyline,
 
 ) or show_help(1);
@@ -85,9 +90,22 @@ if ( not $station ) {
 	show_help(1);
 }
 
+# Support for --output=arg1,arg2
+for my $field ( split( qr{,}, join( q{,}, @output_args ) ) ) {
+	if    ( $field eq 'a' ) { $show_output{route_after} = 1 }
+	elsif ( $field eq 'r' ) { $show_output{route}       = 1 }
+	else {
+		$show_output{$field} = 1;
+	}
+}
+
+# the "via"s reported by the backend typically include both the current stop
+# and the terminus. So we requist $num_route_entries + 2 stops to ensure that
+# we end up with at least $num_route_entries usable stops.
 my %opt = (
 	cache          => $cache,
 	station        => $station,
+	num_vias       => $num_route_entries + 2,
 	developer_mode => $developer_mode,
 );
 
@@ -358,6 +376,13 @@ if ( $opt{station} ) {
 		if ($show_jid) {
 			say $result->id =~ s{ }{}gr;
 		}
+		if ( $show_output{route} or $show_output{route_after} ) {
+			my @via = $result->via;
+			if ( @via and $via[-1] eq $result->destination ) {
+				pop(@via);
+			}
+			printf( "  via  %s\n", join( q{ · }, @via ) );
+		}
 		for my $message ( $result->messages ) {
 			say $message->{text};
 		}
@@ -389,15 +414,31 @@ elsif ( $opt{journey} and not( $raw_json_output or $json_output ) ) {
 		}
 	}
 
-	printf( "%s %s am %s\n",
+	printf(
+		"%s %s am %s\n",
 		$trip->type,
-		$trip->line_no // join( q{ / }, $trip->trip_numbers ),
-		$trip->day->strftime('%d.%m.%Y') );
+		$trip->line_no // (
+			$trip->trip_numbers
+			? join( q{ / }, $trip->trip_numbers )
+			: $trip->trip_no
+		),
+		$trip->day->strftime('%d.%m.%Y')
+	);
 
 	if ( $trip->operators ) {
 		printf( "Betrieb: %s\n", join( q{, }, $trip->operators ) );
 	}
 	say q{};
+
+	my $prev_operator;
+	if ( scalar $trip->operators > 1 ) {
+		$prev_operator = q{};
+	}
+
+	my $prev_type;
+	if ( scalar $trip->types > 1 ) {
+		$prev_type = q{};
+	}
 
 	my $prev_trip_no;
 	if ( scalar $trip->trip_numbers > 1 ) {
@@ -437,11 +478,27 @@ elsif ( $opt{journey} and not( $raw_json_output or $json_output ) ) {
 			print($output_reset);
 		}
 
-		if (    defined $prev_trip_no
-			and defined $stop->trip_no
-			and $stop->trip_no ne $prev_trip_no )
+		if (    defined $prev_operator
+			and defined $stop->operator
+			and $stop->operator ne $prev_operator )
 		{
-			printf( '  (%s %s)', $trip->type, $stop->trip_no );
+			printf( '  %s', $stop->operator );
+			$prev_operator = $stop->operator;
+		}
+
+		if (
+			(
+				    defined $prev_trip_no
+				and defined $stop->trip_no
+				and $stop->trip_no ne $prev_trip_no
+			)
+			or (    defined $prev_type
+				and defined $stop->trip_type
+				and $stop->trip_type ne $prev_type )
+		  )
+		{
+			printf( '  (%s %s)', $stop->trip_type, $stop->trip_no );
+			$prev_type    = $stop->trip_type;
 			$prev_trip_no = $stop->trip_no;
 		}
 		print("\n");
@@ -626,7 +683,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 

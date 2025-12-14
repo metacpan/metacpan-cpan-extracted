@@ -22,6 +22,7 @@ lib/Mail/Server/IMAP4/User.pm
 lib/Mail/Server/IMAP4/User.pod
 lib/Mail/Transport/IMAP4.pm
 lib/Mail/Transport/IMAP4.pod
+t/00use.t
 t/10client-read.t
 t/11client-write.t
 t/12client-flags.t

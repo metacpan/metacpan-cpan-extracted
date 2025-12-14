@@ -474,8 +474,8 @@ Cast by C<discoverThreads()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 version 4.000,
-built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 version 4.01,
+built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

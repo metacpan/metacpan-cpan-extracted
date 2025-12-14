@@ -373,9 +373,10 @@ DESCRIPTION
           }
 
     `-with` or `-roles` or `-does`
+        Composes roles into your class.
+
           package Payable {
-            use Role::Tiny;
-            requires 'payroll_number';
+            use Marlin::Role -requires => ['payroll_number'];
           }
   
           package Employee {
@@ -385,7 +386,7 @@ DESCRIPTION
               qw( employee_id payroll_number );
           }
 
-        Composes Role::Tiny roles into your class.
+        Marlin classes can accept both Marlin::Role and Role::Tiny roles.
 
         Like `-base`, you can include version numbers.
 
@@ -437,12 +438,6 @@ DESCRIPTION
 
         Perl's built-in `DESTROY` still works, of course.
 
-    *   Attributes in roles.
-
-        Marlin's support for roles is minimal. Role::Tiny roles can be
-        composed into classes, but Role::Tiny doesn't allow you to declare
-        attributes.
-
     *   Extensibility.
 
         Marlin doesn't offer any official API for building extensions.
@@ -451,12 +446,13 @@ BUGS
     Please report any bugs to <https://github.com/tobyink/p5-marlin/issues>.
 
 SEE ALSO
+    Marlin::Role, Marlin::Util, Marlin::Manual::Principles,
+    Marlin::Manual::Comparison.
+
     Class::XSAccessor, Class::XSConstructor, Types::Common, Type::Params, and
     Sub::HandlesVia.
 
     Moose and Moo.
-
-    Marlin::Manual::Principles, Marlin::Manual::Comparison.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

@@ -5,7 +5,11 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 script/sys-monitor-lite
-t/monitor.t
+t/cli.t
+t/encoding.t
+t/metrics.t
+t/prometheus.t
+t/thresholds.t
 VISION.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

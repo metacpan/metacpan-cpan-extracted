@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.032';
+$ExtUtils::Builder::Compiler::VERSION = '0.033';
 use strict;
 use warnings;
 
-use ExtUtils::Builder::Util qw/command function/;
+use ExtUtils::Builder::Util qw/command/;
 use ExtUtils::Builder::Node;
 
 use parent qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
@@ -65,16 +65,7 @@ sub collect_arguments  {
 sub compile {
 	my ($self, $from, $to, %opts) = @_;
 	my @actions ;
-	if ($opts{mkdir}) {
-		my $dirname = File::Basename::dirname($to);
-		push @actions, function(
-			module    => 'File::Path',
-			function  => 'make_path',
-			exports   => 'explicit',
-			arguments => [ $dirname ],
-			message   => "mkdir $dirname",
-		);
-	}
+	push @actions, $self->_mkdir_for($to) if $opts{mkdir};
 	my @argv = $self->arguments($from, $to, %opts);
 	push @actions, command($self->cc, @argv);
 	my $deps = [ $from, @{ $opts{dependencies} // [] } ];
@@ -97,7 +88,7 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box-IMAP4 version 4.000.
+# This code is part of Perl distribution Mail-Box-IMAP4 version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::IMAP4;{
-our $VERSION = '4.000';
+our $VERSION = '4.01';
 }
 
 use base 'Mail::Box::Net';
@@ -18,7 +18,7 @@ use base 'Mail::Box::Net';
 use strict;
 use warnings;
 
-use Log::Report 'mail-box-imap4';
+use Log::Report 'mail-box-imap4', import => [ qw/__x error notice trace warning/ ];
 
 use Mail::Box::IMAP4::Head        ();
 use Mail::Box::IMAP4::Message     ();
@@ -27,7 +27,7 @@ use Mail::Message::Head::Complete ();
 use Mail::Message::Head::Delayed  ();
 use Mail::Transport::IMAP4        ();
 
-use Scalar::Util   qw/weaken/;
+use Scalar::Util   qw/weaken blessed/;
 
 #--------------------
 
@@ -74,13 +74,10 @@ sub init($)
 	$self->{MBI_c_body}   = $args->{cache_body}   || ($writeable ? 'NO' : 'DELAY');
 
 	my $transport = $args->{transporter} || 'Mail::Transport::IMAP4';
-	$transport = $self->createTransporter($transport, %$args)
-		unless ref $transport;
+	blessed $transport or $transport = $self->createTransporter($transport, %$args);
 
 	$self->transporter($transport);
-
-	defined $transport
-		or return;
+	defined $transport or return;
 
 	$args->{create} ? $self->create($transport, $args) : $self;
 }
@@ -89,7 +86,7 @@ sub create($@)
 {	my($self, $name, $args) =  @_;
 
 	if($args->{access} !~ /w|a/)
-	{	$self->log(ERROR => "You must have write access to create folder $name.");
+	{	error __x"you must have write access to create folder {name}.", name => $name;
 		return undef;
 	}
 
@@ -200,7 +197,7 @@ sub getHeadAndBody($)
 	my $lines = $imap->getMessageAsString($uid);
 
 	unless(defined $lines)
-	{	warning __x"message {id} disappeared from {folder}.", id => $uid, folder => "$self";
+	{	warning __x"message {id} disappeared from {folder}.", id => $uid, folder => $self->name;
 		return ();
 	}
 
@@ -218,7 +215,7 @@ sub getHeadAndBody($)
 
 	my $body = $message->readBody($parser, $head);
 	unless(defined $body)
-	{	warning __x"cannot read body for {id} in {folder}.", id => $uid, folder => $self;
+	{	warning __x"cannot read body for {id} in {folder}.", id => $uid, folder => $self->name;
 		$parser->stop;
 		return ();
 	}
@@ -248,7 +245,7 @@ sub write(@)
 	$self->SUPER::write(%args, transporter => $imap);
 
 	if($args{save_deleted})
-	{	notice __x"impossible to keep deleted messages in IMAP";
+	{	notice __x"impossible to keep deleted messages in IMAP folder {name}.", name => $self->name;
 	}
 	else { $imap->destroyDeleted($self->name) }
 

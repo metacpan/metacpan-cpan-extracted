@@ -193,6 +193,7 @@ sub _split_top_level_pipes {
     my $start = 0;
 
     my $length = length $text;
+    my $in_try = 0;
     for (my $i = 0; $i < $length; $i++) {
         my $char = substr($text, $i, 1);
 
@@ -224,6 +225,20 @@ sub _split_top_level_pipes {
             next;
         }
 
+        if (!$in_try && !@stack && !defined $string) {
+            if (substr($text, $i) =~ /^try\b/) {
+                $in_try = 1;
+                next;
+            }
+        }
+
+        if ($in_try && !@stack && !defined $string) {
+            if (substr($text, $i) =~ /^catch\b/) {
+                $in_try = 0;
+                next;
+            }
+        }
+
         if (exists $closing{$char}) {
             return unless @stack;
             my $open = pop @stack;
@@ -232,6 +247,7 @@ sub _split_top_level_pipes {
         }
 
         next unless $char eq '|';
+        next if $in_try;
         if (substr($text, $i, 2) eq '||') {
             $i++;
             next;
@@ -947,6 +963,14 @@ sub _apply_addition {
         if (looks_like_number($left) && looks_like_number($right)) {
             return 0 + $left + $right;
         }
+
+        my $left_is_num  = looks_like_number($left);
+        my $right_is_num = looks_like_number($right);
+
+        if ($left_is_num != $right_is_num) {
+            die 'addition operands must both be numbers or both be non-numeric';
+        }
+
         $left  = '' unless defined $left;
         $right = '' unless defined $right;
         return "$left$right";

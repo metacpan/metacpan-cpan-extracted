@@ -65,6 +65,90 @@ sub apply {
             return 1;
         }
 
+        if ($normalized =~ /^try\b/) {
+            my $body = $normalized;
+            $body =~ s/^try\s*//;
+
+            my ($try_expr, $catch_expr) = ($body, '');
+
+            my $depth       = 0;
+            my $catch_index = undef;
+            for (my $i = 0; $i < length $body; $i++) {
+                my $ch = substr($body, $i, 1);
+                $depth++ if $ch eq '(';
+                $depth-- if $ch eq ')';
+
+                next if $depth != 0;
+                if (substr($body, $i) =~ /^catch\s+/) {
+                    $catch_index = $i;
+                    last;
+                }
+            }
+
+            if (defined $catch_index) {
+                $try_expr   = substr($body, 0, $catch_index);
+                $catch_expr = substr($body, $catch_index + 5);
+            }
+
+            $try_expr   = JQ::Lite::Util::_strip_wrapping_parens($try_expr // '');
+            $catch_expr = JQ::Lite::Util::_strip_wrapping_parens($catch_expr // '');
+            $catch_expr =~ s/^\s+// if defined $catch_expr;
+
+            @next_results = ();
+
+            VALUE: for my $value (@results) {
+                my $json   = JQ::Lite::Util::_encode_json($value);
+                my @outputs;
+                my $error;
+
+                {
+                    local $@;
+                    eval { @outputs = $self->run_query($json, $try_expr); 1 } or $error = $@;
+                }
+
+                if (!$error) {
+                    push @next_results, @outputs;
+                    next VALUE;
+                }
+
+                my $message = $error;
+                $message =~ s/\s+$// if defined $message;
+
+                if (defined $catch_expr && length $catch_expr) {
+                    my %existing = %{ $self->{_vars} || {} };
+                    local $self->{_vars} = { %existing, error => $message };
+
+                    my ($catch_values, $catch_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $value, $catch_expr);
+                    if ($catch_ok) {
+                        push @next_results, @$catch_values ? @$catch_values : (undef);
+                    }
+                    else {
+                        my @catch_outputs;
+                        my $catch_error;
+
+                        {
+                            local $@;
+                            eval { @catch_outputs = $self->run_query($json, $catch_expr); 1 } or $catch_error = $@;
+                        }
+
+                        if ($catch_error) {
+                            push @next_results, undef;
+                        }
+                        else {
+                            push @next_results, @catch_outputs ? @catch_outputs : (undef);
+                        }
+                    }
+
+                    next VALUE;
+                }
+
+                push @next_results, undef;
+            }
+
+            @$out_ref = @next_results;
+            return 1;
+        }
+
         if (JQ::Lite::Util::_looks_like_expression($normalized)) {
             my @evaluated;
             my $all_ok = 1;

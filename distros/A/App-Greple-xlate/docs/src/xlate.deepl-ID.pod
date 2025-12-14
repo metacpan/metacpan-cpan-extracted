@@ -16,7 +16,7 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
 =head1 VERSION
 
-Version 0.9915
+Version 0.9920
 
 =head1 DESCRIPTION
 
@@ -319,7 +319,11 @@ Opsi ini memaksa untuk memperbarui file cache meskipun tidak diperlukan.
 
 Anda dapat dengan mudah menggunakan modul ini dari baris perintah dengan menggunakan perintah C<xlate> yang disertakan dalam distribusi. Lihat halaman manifes C<xlate> untuk penggunaan.
 
+Perintah C<xlate> mendukung opsi panjang gaya GNU seperti C<--to-lang>, C<--from-lang>, C<--engine>, dan C<--file>. Gunakan C<xlate -h> untuk melihat semua opsi yang tersedia.
+
 Perintah C<xlate> bekerja bersama dengan lingkungan Docker, jadi meskipun Anda tidak memiliki apa pun yang terinstal, Anda dapat menggunakannya selama Docker tersedia. Gunakan opsi C<-D> atau C<-C>.
+
+Operasi Docker ditangani oleh skrip C<dozo>, yang juga dapat digunakan sebagai perintah mandiri. Skrip C<dozo> mendukung berkas konfigurasi C<.dozorc> untuk pengaturan kontainer persisten.
 
 Selain itu, karena tersedia makefile untuk berbagai gaya dokumen, penerjemahan ke dalam bahasa lain dapat dilakukan tanpa spesifikasi khusus. Gunakan opsi C<-M>.
 
@@ -380,6 +384,10 @@ L<App::Greple::xlate::gpt5>
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
 
 Gambar kontainer Docker.
+
+=item * L<https://github.com/tecolicom/getoptlong>
+
+Pustaka C<getoptlong.sh> digunakan untuk penguraian opsi dalam skrip C<xlate> dan C<dozo>.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

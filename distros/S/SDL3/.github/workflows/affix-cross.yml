@@ -1,0 +1,84 @@
+---
+jobs:
+  build:
+    name: "[${{ inputs.arch }}] ${{ inputs.os == 'freebsd' && 'FreeBSD' ||  inputs.os == 'openbsd' && 'OpenBSD' || inputs.os }} ${{ inputs.version }}"
+    runs-on: '${{ inputs.host }}'
+    steps:
+      - uses: actions/checkout@v5.0.0
+        with:
+          submodules: true
+      - env:
+          AUTHOR_TESTING: 0
+          AUTOMATED_TESTING: 1
+        name: 'Test on ${{ inputs.os }}'
+        uses: cross-platform-actions/action@v0.29.0
+        with:
+          architecture: '${{ inputs.arch }}'
+          cpu_count: 4
+          environment_variables: AUTHOR_TESTING AUTOMATED_TESTING
+          memory: 5G
+          operating_system: '${{ inputs.os }}'
+          run: |
+            uname -a
+            echo $SHELL
+            pwd
+            ls -lah
+            whoami
+            env | sort
+            ${{ inputs.setup }}
+            sudo ${{inputs.pkg}} perl5
+            perl -v
+            curl -L https://cpanmin.us | sudo perl - --notest App::cpanminus Module::Build::Tiny
+            sudo cpanm --installdeps --notest .
+            sudo cpanm --test-only -v .
+            command1_exit_code=$?
+            # Check if the first command exited successfully (exit code 0)
+            if [ $command1_exit_code -eq 0 ]; then
+              # Run the second command
+              sudo perl -V > test-output-${{ inputs.os }}-${{ inputs.version }}-perl${{ inputs.perl }}.${{inputs.perl_subversion}}-${{ inputs.arch }}.txt
+              command2_exit_code=$?
+            else
+              # Print error message to a file (replace "error.log" with your desired filename)
+              echo "Error!" > test-output-${{ inputs.os }}-${{ inputs.version }}-perl${{ inputs.perl }}.${{inputs.perl_subversion}}-${{ inputs.arch }}.txt
+              # Exit with the first command's exit code
+              exit $command1_exit_code
+            fi
+          shell: bash
+          version: '${{ inputs.version }}'
+      - continue-on-error: true
+        name: Upload results as artifact
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          if-no-files-found: error
+          name: 'test-output-${{ inputs.os }}-${{ inputs.version }}-perl${{ inputs.perl }}.${{inputs.perl_subversion}}-${{ inputs.arch }}'
+          path: 'test-output-${{ inputs.os }}-${{ inputs.version }}-perl${{ inputs.perl }}.${{inputs.perl_subversion}}-${{ inputs.arch }}.txt'
+name: bsd module
+on:
+  workflow_call:
+    inputs:
+      arch:
+        required: true
+        type: string
+      host:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      perl:
+        required: true
+        type: string
+      perl_subversion:
+        default: 2
+        required: false
+        type: string
+      pkg:
+        required: true
+        type: string
+      setup:
+        default: ''
+        required: false
+        type: string
+      version:
+        required: true
+        type: string

@@ -7,7 +7,7 @@ A lightweight system monitoring toolkit. Using the `script/sys-monitor-lite` scr
 - Lightweight implementation that simply reads data from `/proc`
 - Collects CPU, load average, memory, disk capacity, disk I/O, network, system information, and lightweight process stats
 - Allows you to choose which metrics to collect from the CLI
-- Supports JSON / JSON Lines output (with `--pretty` for formatted JSON) and YAML output
+- Supports JSON / JSON Lines output (with `--pretty` for formatted JSON), YAML output, and Prometheus text exposition
 - Reusable as a module (`Sys::Monitor::Lite`) so scripts can integrate it easily
 
 ## Installation
@@ -54,6 +54,14 @@ script/sys-monitor-lite --interval 10 --collect cpu,mem,disk --output jsonl
 script/sys-monitor-lite --once --output yaml
 ```
 
+### Prometheus text output (node_exporter alternative)
+
+```bash
+script/sys-monitor-lite --once --output prometheus --prefix sysmon_
+```
+
+Add `--labels host=...` to attach fixed labels and `--timestamp` to append sample timestamps to each metric line.
+
 ### Key options
 
 | Option | Description |
@@ -61,8 +69,11 @@ script/sys-monitor-lite --once --output yaml
 | `--interval <seconds>` | Interval for repeated collection. Defaults to 5 seconds. Values ≤ 0 collect only once. |
 | `--once` | Collects metrics once. Equivalent to omitting `--interval`. |
 | `--collect <list>` | Comma-separated list selecting from `system,cpu,load,mem,disk,disk_io,net,process`. |
-| `--output <format>` | Choose `json` (default), `jsonl`, or `yaml`. |
+| `--output <format>` | Choose `json` (default), `jsonl`, `yaml`, or `prometheus`. |
 | `--pretty` | Format JSON output (`jsonl` ignores this). |
+| `--prefix <name>` | Prefix metric names (useful for `--output prometheus`, e.g. `sysmon_`). |
+| `--labels <k=v,...>` | Attach fixed labels to Prometheus output (e.g. `--labels host=web1,role=app`). |
+| `--timestamp` | Append timestamps to all outputs (Prometheus uses the sample timestamp at the end of each line). |
 | `--check` | Run once, evaluate thresholds, and exit with Nagios-style status codes (0=OK, 1=WARN, 2=CRIT). |
 | `--warn <expr>` | Threshold expression like `mem.used_pct>80`. Can be repeated. Implies `--check`. |
 | `--crit <expr>` | Critical threshold expression like `mem.used_pct>90`. Can be repeated. Implies `--check`. |

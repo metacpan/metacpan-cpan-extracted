@@ -150,9 +150,9 @@ our $action_command_skeleton = [
         dt   => $object_identifier_string
     ),
     BACnet::DataTypes::Bone->construct(
-        tag          => 2,
-        name         => 'property_identifier',
-        dt           => $enum_string,
+        tag  => 2,
+        name => 'property_identifier',
+        dt   => $enum_string,
     ),
     BACnet::DataTypes::Bone->construct(
         tag  => 3,
@@ -194,9 +194,9 @@ our $object_property_reference_skeleton = [
         dt   => $object_identifier_string
     ),
     BACnet::DataTypes::Bone->construct(
-        tag          => 1,
-        name         => 'property_identifier',
-        dt           => $enum_string,
+        tag  => 1,
+        name => 'property_identifier',
+        dt   => $enum_string,
     ),
     BACnet::DataTypes::Bone->construct(
         tag  => 2,
@@ -419,9 +419,9 @@ our $device_object_property_reference_skeleton = [
         dt   => $object_identifier_string,
     ),
     BACnet::DataTypes::Bone->construct(
-        tag          => 1,
-        name         => 'property_identifier',
-        dt           => $enum_string,
+        tag  => 1,
+        name => 'property_identifier',
+        dt   => $enum_string,
     ),
     BACnet::DataTypes::Bone->construct(
         tag  => 2,
@@ -540,9 +540,9 @@ our $list_of_device_object_reference_skeleton = [
 
 our $property_value_skeleton = [
     BACnet::DataTypes::Bone->construct(
-        tag          => 0,
-        name         => 'property_identifier',
-        dt           => $enum_string,
+        tag  => 0,
+        name => 'property_identifier',
+        dt   => $enum_string,
     ),
     BACnet::DataTypes::Bone->construct(
         tag  => 1,
@@ -656,8 +656,12 @@ our $prop_type_type = {
         dt       => $sequence_of_values_string,
         skeleton => $list_of_time_stamp_skeleton,
     ),
-    37 => undef,
-    41 => undef,
+    37 => BACnet::DataTypes::Bone->construct(
+        dt => $enum_string
+    ),
+    41 => BACnet::DataTypes::Bone->construct(
+        dt => $enum_string
+    ),
     42 => BACnet::DataTypes::Bone->construct(
         dt => $unsigned_int_string
     ),
@@ -737,8 +741,10 @@ our $prop_type_type = {
     79 => BACnet::DataTypes::Bone->construct(
         dt => $enum_string
     ),
-    161 => undef,
-    81  => BACnet::DataTypes::Bone->construct(
+    161 => BACnet::DataTypes::Bone->construct(
+        dt => $enum_string
+    ),
+    81 => BACnet::DataTypes::Bone->construct(
         dt => $bool_string
     ),
     82 => BACnet::DataTypes::Bone->construct(
@@ -758,8 +764,12 @@ our $prop_type_type = {
     88 => BACnet::DataTypes::Bone->construct(
         dt => $unsigned_int_string
     ),
-    90 => undef,
-    92 => undef,
+    90 => BACnet::DataTypes::Bone->construct(
+        dt => $enum_string
+    ),
+    92 => BACnet::DataTypes::Bone->construct(
+        dt => $enum_string
+    ),
     96 => BACnet::DataTypes::Bone->construct(
         dt => $bit_string_string
     ),
@@ -797,7 +807,9 @@ our $prop_type_type = {
         dt => $real_string
     ),
     174 => undef,
-    107 => undef,
+    107 => BACnet::DataTypes::Bone->construct(
+        dt => $enum_string
+    ),
     108 => BACnet::DataTypes::Bone->construct(
         dt => $real_string
     ),

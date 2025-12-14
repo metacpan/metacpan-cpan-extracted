@@ -72,7 +72,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-POP3"
       }
    },
-   "version" : "4.000",
+   "version" : "4.01",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

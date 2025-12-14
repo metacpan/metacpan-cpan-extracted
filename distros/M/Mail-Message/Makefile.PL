@@ -4,7 +4,7 @@ require 5.016;
 
 use IO::Handle;
 
-my $version = '4.00';
+my $version = '4.01';
 my $git      = "https://github.com/markov2/perl5-Mail-Message";
 my $publish  = "../public_html/mail-message";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -91,7 +91,9 @@ my %requires = (
 my %optional = (
 	'HTML::FormatText'  => '2.01',
 	'HTML::TreeBuilder' => '3.13',
+	'Mail::Box'         => '4.00',
 	'Mail::Internet'    => '2.01',
+	'Mail::Transport'   => '4.00',
 	'MIME::Entity'      => '3.0',
 	'Net::Domain'       => 0,
 );
@@ -119,8 +121,8 @@ WriteMakefile
 		},
 		prereqs => {
 			runtime => {
-				requires => \%requires,
-				optional => \%optional,
+				requires   => \%requires,
+				recommends => \%optional,
 			},
 			develop => {
 				requires => {

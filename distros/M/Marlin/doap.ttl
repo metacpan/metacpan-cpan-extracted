@@ -46,7 +46,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin>;
@@ -75,6 +75,48 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.001001.tar.gz>;
 	doap:revision        "0.001001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.002000"^^xsd:string;
+	dc:issued            "2025-12-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Marlin::Role.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002000.tar.gz>;
+	doap:revision        "0.002000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.002001"^^xsd:string;
+	dc:issued            "2025-12-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor pod fix.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002001.tar.gz>;
+	doap:revision        "0.002001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.002002"^^xsd:string;
+	dc:issued            "2025-12-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor pod fix.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002002.tar.gz>;
+	doap:revision        "0.002002"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

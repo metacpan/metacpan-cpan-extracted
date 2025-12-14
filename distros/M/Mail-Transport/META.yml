@@ -19,6 +19,7 @@ no_index:
   directory:
     - t
     - inc
+recommends: {}
 requires:
   Carp: '0'
   Errno: '0'
@@ -26,14 +27,14 @@ requires:
   IO::Socket: '0'
   List::Util: '0'
   Log::Report: '1.42'
-  Mail::Reporter: '4'
+  Mail::Reporter: '4.00'
   Net::SMTP: '0'
   String::Print: '1.01'
 resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Transport/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Transport.git
-version: '4.00'
+version: '4.01'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001

@@ -4,7 +4,7 @@ package BACnet;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 1;
 
@@ -19,7 +19,7 @@ BACnet – Placeholder namespace for the BACnet Perl toolkit
 This namespace serves only as an entry point.  
 The actual implementation is located in:
 
-L<BACnet::Device|https://example.com>
+L<BACnet::Device|https://metacpan.org/pod/BACnet::Device>
 
 Please refer directly to that module for full documentation, usage examples,
 and API details.

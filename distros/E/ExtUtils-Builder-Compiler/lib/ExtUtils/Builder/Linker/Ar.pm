@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Ar;
-$ExtUtils::Builder::Linker::Ar::VERSION = '0.032';
+$ExtUtils::Builder::Linker::Ar::VERSION = '0.033';
 use strict;
 use warnings;
 
@@ -25,9 +25,9 @@ sub add_libraries {
 sub linker_flags {
 	my ($self, $from, $to, %opts) = @_;
 	my @ret;
-	push @ret, $self->new_argument(ranking =>  0, value => $self->static_args);
-	push @ret, $self->new_argument(ranking => 10, value => [ $to ]),
-	push @ret, $self->new_argument(ranking => 75, value => [ @{$from} ]),
+	push @ret, $self->new_argument(ranking =>  0, value => $self->{static_args});
+	push @ret, $self->new_argument(ranking => 10, value => [ $to ]);
+	push @ret, $self->new_argument(ranking => 75, value => [ @{$from} ]);
 	return @ret;
 }
 

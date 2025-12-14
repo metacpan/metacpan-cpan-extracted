@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Marlin::Manual::Priniples - getting the most out of Marlin
+Marlin::Manual::Principles - getting the most out of Marlin
 
 =head1 DESCRIPTION
 

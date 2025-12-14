@@ -12,6 +12,9 @@ my $once     = 0;
 my $collect  = undef;
 my $output   = 'json';
 my $pretty   = 0;
+my $prefix   = '';
+my $labels   = '';
+my $with_timestamp = 0;
 my $help     = 0;
 my @warn;
 my @crit;
@@ -25,6 +28,9 @@ GetOptions(
     'collect=s'  => \$collect,
     'output=s'   => \$output,
     'pretty!'    => \$pretty,
+    'prefix=s'   => \$prefix,
+    'labels=s'   => \$labels,
+    'timestamp!' => \$with_timestamp,
     'warn=s@'    => \@warn,
     'crit=s@'    => \@crit,
     'check!'     => \$check,
@@ -52,7 +58,11 @@ if ($check && !@warn && !@crit) {
 
 $output = lc $output;
 die "Unsupported output format: $output\n"
-    unless $output eq 'json' || $output eq 'jsonl' || $output eq 'yaml' || $output eq 'yml';
+    unless $output eq 'json'
+    || $output eq 'jsonl'
+    || $output eq 'yaml'
+    || $output eq 'yml'
+    || $output eq 'prometheus';
 
 my $encoder_pretty = $output eq 'jsonl' ? 0 : $pretty;
 
@@ -97,6 +107,17 @@ if (@watch) {
     $proc_opts{watch} = [ grep { length } @names ];
 }
 
+my %fixed_labels;
+if (length $labels) {
+    for my $pair (split(/,/, $labels)) {
+        next unless length $pair;
+        my ($key, $value) = split(/=/, $pair, 2);
+        die "--labels expects key=value pairs separated by commas\n"
+            unless defined $key && defined $value && length $key;
+        $fixed_labels{$key} = $value;
+    }
+}
+
 my $needs_process = %proc_opts ? 1 : 0;
 if ($needs_process) {
     if (@metrics) {
@@ -121,6 +142,14 @@ while (1) {
         );
         print $result->{message}, "\n";
         exit $result->{status};
+    } elsif ($output eq 'prometheus') {
+        my %opts;
+        $opts{prefix} = $prefix if length $prefix;
+        $opts{labels} = \%fixed_labels if %fixed_labels;
+        $opts{timestamp} = 1 if $with_timestamp;
+        my $text = Sys::Monitor::Lite::to_prometheus($data, %opts);
+        print $text;
+        print "\n" unless $text =~ /\n\z/;
     } elsif ($output eq 'yaml' || $output eq 'yml') {
         my $yaml = Sys::Monitor::Lite::to_yaml($data);
         print $yaml;
@@ -145,7 +174,7 @@ __END__
 
 =head1 NAME
 
-sys-monitor-lite - Collect lightweight system metrics as JSON or YAML
+sys-monitor-lite - Collect lightweight system metrics as JSON, YAML, or Prometheus text
 
 =head1 SYNOPSIS
 
@@ -155,7 +184,8 @@ sys-monitor-lite - Collect lightweight system metrics as JSON or YAML
 =head1 DESCRIPTION
 
 Collects metrics exposed by L<Sys::Monitor::Lite> and prints them as JSON,
-JSON Lines, or YAML. Use C<--collect> to limit which subsystems are gathered.
+JSON Lines, YAML, or Prometheus text exposition. Use C<--collect> to limit
+which subsystems are gathered.
 
 =head1 OPTIONS
 
@@ -176,11 +206,25 @@ metrics: system, cpu, load, mem, disk, mounts, disk_io, net, process.
 
 =item B<--output FORMAT>
 
-Output format: C<json> (default), C<jsonl> for JSON Lines, or C<yaml>.
+Output format: C<json> (default), C<jsonl> for JSON Lines, C<yaml>, or
+C<prometheus> for a lightweight text exposition format.
 
 =item B<--pretty>
 
 Pretty-print JSON output (ignored for JSON Lines).
+
+=item B<--prefix NAME>
+
+Prefix metric names (useful with Prometheus output), e.g. C<--prefix sysmon_>.
+
+=item B<--labels k=v,...>
+
+Attach fixed labels to Prometheus output such as C<--labels host=node1,role=app>.
+
+=item B<--timestamp>
+
+Include collection timestamps in the output; for Prometheus, the sample
+timestamp is appended at the end of each metric line.
 
 =item B<--check>
 

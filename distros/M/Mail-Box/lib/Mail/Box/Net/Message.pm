@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Box version 4.00.
+# This code is part of Perl distribution Mail-Box version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Net::Message;{
-our $VERSION = '4.00';
+our $VERSION = '4.01';
 }
 
 use parent 'Mail::Box::Message';

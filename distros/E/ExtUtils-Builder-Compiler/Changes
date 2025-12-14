@@ -1,5 +1,11 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.033     2025-12-13 19:27:39+01:00 Europe/Brussels
+          - Don't pass default typemap argument to ParseXS
+          - Change typemap to prefer arrayref form
+          - Add extra_sources and extra_objects to EUB::Conf
+          - Correctly pass arguments to ar
+
 0.032     2025-05-04 16:57:26+02:00 Europe/Brussels
           - Fix compilet.def extension handling
           - Enable static install

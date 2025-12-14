@@ -36,6 +36,12 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "HTML::FromMail" : "4.00",
+            "Mail::Box::IMAP4" : "4.00",
+            "Mail::Box::POP3" : "4.00",
+            "Mail::Box::Parser::C" : "4.00"
+         },
          "requires" : {
             "Cwd" : "0",
             "Date::Parse" : "0",
@@ -50,19 +56,13 @@
             "File::Temp" : "0",
             "IO::Scalar" : "0",
             "Log::Report" : "1.42",
-            "Mail::Message" : "4.000",
-            "Mail::Transport" : "4.000",
-            "Object::Realize::Later" : "4.000",
+            "Mail::Message" : "4.00",
+            "Mail::Transport" : "4.00",
+            "Object::Realize::Later" : "4.00",
             "POSIX" : "0",
             "Scalar::Util" : "1.13",
             "String::Print" : "1.01",
             "Sys::Hostname" : "0"
-         },
-         "x_optional" : {
-            "HTML::FromMail" : "0, <4.0",
-            "Mail::Box::IMAP4" : "3.0, <4.0",
-            "Mail::Box::POP3" : "3.0, <4.0",
-            "Mail::Box::Parser::C" : "3.0, <4.0"
          }
       },
       "test" : {
@@ -84,7 +84,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box"
       }
    },
-   "version" : "4.00",
+   "version" : "4.01",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

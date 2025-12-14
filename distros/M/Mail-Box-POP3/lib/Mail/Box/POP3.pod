@@ -130,7 +130,7 @@ use C<OAUTH2>.
 
 =item create => BOOLEAN
 
-=item extract => INTEGER | CODE | METHOD | 'LAZY'| 'ALWAYS'
+=item extract => INTEGER|CODE|METHOD|'LAZY'|'ALWAYS'
 
 =item field_type => CLASS
 
@@ -620,19 +620,13 @@ server implementation, which is used to test the client.
 
 =over 4
 
-=item Error: Cannot create POP3 client for $name.
-
-The connection to the POP3 server cannot be established.  You may see
-more, related, error messages about the failure.
-Cast by C<popClient()>
-
-=item Error: Cannot find head back for $uidl on POP3 server $name.
+=item Error: Cannot find head back for $id on POP3 server $name.
 
 The server told to have this message, but when asked for its headers, no
 single line was returned.  Did the message get destroyed?
 Cast by C<getHeadAndBody()>
 
-=item Error: Cannot read body for $uidl on POP3 server $name.
+=item Error: Cannot read body for $id on POP3 server $name.
 
 The message's headers are retrieved from the server, but the body seems
 to be lost.  Did the message get destroyed between reading the header
@@ -645,7 +639,7 @@ You can not write to this folder unless you have opened the folder to
 write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set C<true>.
 Cast by C<write()>
 
-=item Warning: Message $uidl on POP3 server $name disappeared.
+=item Warning: Message $id on POP3 server $name disappeared.
 
 The server indicated the existence of this message before, however it
 has no information about the message anymore.
@@ -657,18 +651,11 @@ Each user has only one POP3 folder on a server.  This folder is created and
 deleted by the server's administrator only.
 Cast by C<delete()>
 
-=item Error: Update of $nr messages ignored for POP3 folder $name.
+=item Error: cannot create POP3 client for $name.
 
-The standard POP3 implementation does not support writing from client back
-to the server.  Therefore, modifications may be lost.
-Cast by C<writeMessages()>
-
-=item Error: You cannot write a message to a pop server (yet)
-
-Some extensions to the POP3 protocol do permit writing messages to the server,
-but the standard protocol only implements retreival.  Feel invited to extend our
-implementation with writing.
-Cast by C<addMessage()>
+The connection to the POP3 server cannot be established.  You may see
+more, related, error messages about the failure.
+Cast by C<popClient()>
 
 =item Warning: changes not written to read-only folder $name.
 
@@ -714,6 +701,10 @@ The string does not follow the strict rules of the time span syntax which
 is permitted as parameter.
 Cast by C<timespan2seconds()>
 
+=item Warning: message $id disappeared from POP3 server $name.
+
+Cast by C<getHead()>
+
 =item Warning: message-id '$msgid' does not contain a domain.
 
 According to the RFCs, message-ids need to contain a unique random part,
@@ -726,12 +717,29 @@ Cast by C<messageId()>
 
 Cast by C<close()>
 
+=item Warning: update of $count messages ignored for POP3 folder $name.
+
+The standard POP3 implementation does not support writing from client back
+to the server.  Therefore, modifications may be lost.
+Cast by C<writeMessages()>
+
+=item Error: you cannot write a message to a pop server (yet)
+
+Some extensions to the POP3 protocol do permit writing messages to the server,
+but the standard protocol only implements retreival.  Feel invited to extend our
+implementation with writing.
+Cast by C<addMessage()>
+
+=item Error: you cannot write messages to a pop server (yet)
+
+Cast by C<addMessages()>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 version 4.000,
-built on December 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 version 4.01,
+built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

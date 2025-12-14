@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Transport version 4.00.
+# This code is part of Perl distribution Mail-Transport version 4.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Transport::Receive;{
-our $VERSION = '4.00';
+our $VERSION = '4.01';
 }
 
 use parent 'Mail::Transport';

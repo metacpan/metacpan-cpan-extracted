@@ -1,20 +1,19 @@
-"Schedule::Activity" Version 0.2.5
+"Schedule::Activity" Version 0.2.6
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions, together with event message randomization, attribute tracking and reporting, and secondary event notes.
 
-What's new in version 0.2.5:
+What's new in version 0.2.6:
 ----------------------------
-* NodeFilter supports average values
-* Attribute cleanup, averages always defined
-* Attribute report includes averages
+* NodeFilter value/elapsed supports modulus
+* Script --attribute=average, avggrid
 
 What's new in recent versions:
 ------------------------------
+* NodeFilter supports average values
 * Scheduling goals
 * Incremental schedule construction
-* Script can show attribute grids/averages
 
 Copyright & License:
 --------------------

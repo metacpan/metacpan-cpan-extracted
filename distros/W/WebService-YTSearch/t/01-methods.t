@@ -20,9 +20,18 @@ $mock->routes->get('/youtube/v3/search' => sub {
     is $c->param('key'), '1234567890', 'key param';
     return $c->render(status => 200, json => { ok => 1 });
 });
+$mock->routes->get('/youtube/v3/commentThreads' => sub {
+    my $c = shift;
+    is $c->param('videoId'), 'abc123xyz', 'videoId param';
+    is $c->param('part'), 'snippet', 'part param';
+    is $c->param('key'), '1234567890', 'key param';
+    return $c->render(status => 200, json => { ok => 1 });
+});
 $ws->ua->server->app($mock); # Point the UserAgent to the mock server
 $ws->base('');
 
 lives_ok { $ws->search(q => 'foo') } 'search';
+
+lives_ok { $ws->search(videoId => 'abc123xyz', cmd => 'commentThreads' ) } 'commentThreads';
 
 done_testing();

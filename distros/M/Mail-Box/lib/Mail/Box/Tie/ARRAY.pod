@@ -184,8 +184,8 @@ Cast by C<new()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.00,
-built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.01,
+built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -23,22 +23,22 @@ class    #
     field $meta : reader = CPAN::Meta->load_file('META.json');
 
     # Params to Build script
-    field $install_base : param  //= '';
-    field $installdirs : param   //= '';
-    field $uninst : param        //= 0;    # Make more sense to have a ./Build uninstall command but...
+    field $install_base  : param //= '';
+    field $installdirs   : param //= '';
+    field $uninst        : param //= 0;    # Make more sense to have a ./Build uninstall command but...
     field $install_paths : param //= ExtUtils::InstallPaths->new( dist_name => $meta->name );
-    field $verbose : param       //= 0;
-    field $dry_run : param       //= 0;
-    field $pureperl : param      //= 0;
-    field $jobs : param          //= 1;
-    field $destdir : param       //= '';
-    field $prefix : param        //= '';
+    field $verbose       : param //= 0;
+    field $dry_run       : param //= 0;
+    field $pureperl      : param //= 0;
+    field $jobs          : param //= 1;
+    field $destdir       : param //= '';
+    field $prefix        : param //= '';
     #
     ADJUST {
         -e 'META.json' or die "No META information provided\n";
     }
     method write_file( $filename, $content ) { path($filename)->spew_raw($content) or die "Could not open $filename: $!\n" }
-    method read_file ($filename)             { path($filename)->slurp_utf8          or die "Could not open $filename: $!\n" }
+    method read_file ($filename)             { path($filename)->slurp_utf8         or die "Could not open $filename: $!\n" }
 
     method step_build() {
         for my $pl_file ( find( qr/\.PL$/, 'lib' ) ) {

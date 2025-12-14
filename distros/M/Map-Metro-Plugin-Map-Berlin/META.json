@@ -49,6 +49,6 @@
          "web" : "https://github.com/eserte/Map-Metro-Plugin-Map-Berlin"
       }
    },
-   "version" : "2024.1215",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "2025.1214",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

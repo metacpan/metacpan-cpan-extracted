@@ -1,0 +1,80 @@
+---
+jobs:
+  delete-runs:
+    permissions:
+      actions: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2.1.0
+        with:
+          check_branch_existence: '${{ github.event.inputs.check_branch_existence }}'
+          delete_run_by_conclusion_pattern: |-
+            ${{
+              startsWith(github.event.inputs.delete_run_by_conclusion_pattern, 'Unsuccessful:') &&
+              'action_required,cancelled,failure,skipped' ||
+              github.event.inputs.delete_run_by_conclusion_pattern
+            }}
+          delete_workflow_by_state_pattern: '${{ github.event.inputs.delete_workflow_by_state_pattern }}'
+          delete_workflow_pattern: '${{ github.event.inputs.delete_workflow_pattern }}'
+          dry_run: '${{ github.event.inputs.dry_run }}'
+          keep_minimum_runs: '${{ github.event.inputs.minimum_runs }}'
+          repository: '${{ github.repository }}'
+          retain_days: '${{ github.event.inputs.days }}'
+          token: '${{ github.token }}'
+name: Delete old workflow runs
+on:
+  workflow_dispatch:
+    inputs:
+      check_branch_existence:
+        default: true
+        description: Skip deletions linked to an existing branch
+        options:
+          - false
+          - true
+        required: false
+        type: choice
+      days:
+        default: 30
+        description: Days to retain runs
+        required: true
+      delete_run_by_conclusion_pattern:
+        default: ALL
+        description: 'Run conclusion: action_required, cancelled, failure, skipped, success'
+        options:
+          - ALL
+          - 'Unsuccessful: action_required,cancelled,failure,skipped'
+          - action_required
+          - cancelled
+          - failure
+          - skipped
+          - success
+        required: false
+        type: choice
+      delete_workflow_by_state_pattern:
+        default: ALL
+        description: 'Workflow state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+        options:
+          - ALL
+          - active
+          - deleted
+          - disabled_inactivity
+          - disabled_manually
+        required: false
+        type: choice
+      delete_workflow_pattern:
+        description: Workflow name or filename (omit for all). Use `|` to separate multiple filters (e.g. 'build|deploy').
+        required: false
+      dry_run:
+        default: false
+        description: Simulate deletions
+        options:
+          - false
+          - true
+        required: false
+        type: choice
+      minimum_runs:
+        default: 6
+        description: Minimum runs to keep
+        required: true

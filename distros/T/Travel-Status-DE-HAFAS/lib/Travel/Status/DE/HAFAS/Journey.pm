@@ -11,13 +11,13 @@ use DateTime::Format::Strptime;
 use List::Util qw(any uniq);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '6.23';
+our $VERSION = '6.24';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime tz_offset
 	  is_additional is_cancelled is_partially_cancelled
 	  station station_eva platform sched_platform rt_platform operator
-	  product product_at
+	  product
 	  id name type type_long class number line line_no load delay
 	  route_end route_start origin destination direction)
 );
@@ -437,7 +437,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 6.23
+version 6.24
 
 =head1 DESCRIPTION
 

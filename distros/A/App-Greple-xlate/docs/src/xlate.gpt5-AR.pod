@@ -16,7 +16,7 @@ App::Greple::xlate - وحدة دعم الترجمة لأداة greple
 
 =head1 VERSION
 
-Version 0.9915
+Version 0.9920
 
 =head1 DESCRIPTION
 
@@ -319,7 +319,11 @@ B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة
 
 يمكنك استخدام هذه الوحدة بسهولة من سطر الأوامر باستخدام أمر C<xlate> المُضمَّن في التوزيعة. راجع صفحة الدليل C<xlate> للاستخدام.
 
+يدعم الأمر C<xlate> خيارات طويلة بأسلوب GNU مثل C<--to-lang> وC<--from-lang> وC<--engine> وC<--file>. استخدم C<xlate -h> لرؤية جميع الخيارات المتاحة.
+
 يعمل أمر C<xlate> بالتنسيق مع بيئة Docker، لذا حتى إذا لم يكن لديك أي شيء مُثبّت محليًا، يمكنك استخدامه طالما أن Docker متاح. استخدم خيار C<-D> أو C<-C>.
+
+تُدار عمليات Docker بواسطة البرنامج النصي C<dozo>، والذي يمكن استخدامه أيضًا كأمر مستقل. يدعم البرنامج النصي C<dozo> ملف التهيئة C<.dozorc> لإعدادات الحاوية الدائمة.
 
 أيضًا، نظرًا لتوفّر ملفات make لأنماط مستندات متنوعة، فإن الترجمة إلى لغات أخرى ممكنة دون مواصفات خاصة. استخدم خيار C<-M>.
 
@@ -380,6 +384,10 @@ L<App::Greple::xlate::gpt5>
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
 
 صورة حاوية Docker.
+
+=item * L<https://github.com/tecolicom/getoptlong>
+
+تُستخدم مكتبة C<getoptlong.sh> لتحليل الخيارات في البرنامجين النصيين C<xlate> وC<dozo>.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

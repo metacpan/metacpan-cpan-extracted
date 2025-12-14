@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.032';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.033';
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Carp 'croak';
 use ExtUtils::Config 0.007;
-use ExtUtils::Helpers 0.027 'split_like_shell';
+use ExtUtils::Builder::Util 0.018 'split_like_shell';
 use File::Spec::Functions 'catfile';
 use Perl::OSType 'is_os_type';
 
@@ -212,7 +212,7 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
@@ -127,10 +127,16 @@ sub task {
 		$r{'input.file.size'} = \%input_file_size;
 	}
 	my %output_file_size = map {$_ => -s $_} @output_files;
-	my $n_output_files = scalar @output_files;
-	if ((!$args->{overwrite}) && (scalar @output_files > 0) && (scalar @existing_files == $n_output_files)) { # this has been done before
+	if ((!$args->{overwrite}) && (scalar @output_files > 0) && (scalar @existing_files == scalar @output_files)) { # this has been done before
 		$r{done} = 'before';
 		$r{'will.do'} = 'no';
+		say colored(['black on_green'], "\"$args->{cmd}\"\n") . ' has been done before';
+		$r{done} = 'before';
+		$r{'output.file.size'} = \%output_file_size;
+		p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
+		$r{duration} = 0;
+		p %r;
+		return \%r;
 	} else {
 		$r{done} = 'not yet';
 	}
@@ -140,16 +146,6 @@ sub task {
 		say 'But this is a dry run';
 		say '-------------';
 		$r{duration} = 0;
-		return \%r;
-	}
-	if ($r{done} eq 'before') { # this has been done before
-		p @existing_files;
-		say colored(['black on_green'], "\"$args->{cmd}\"\n") . ' has been done before';
-		$r{done} = 'before';
-		$r{'output.file.size'} = \%output_file_size;
-		p(%r, output => $args->{'log.fh'}) if defined $args->{'log.fh'};
-		$r{duration} = 0;
-		p %r;
 		return \%r;
 	}
 	my $t0 = Time::HiRes::time();
@@ -197,7 +193,7 @@ __END__
 
 =head1 NAME
 
-SimpleFlow - easy, simple workflow manager (and logger)
+SimpleFlow - easy, simple workflow manager (and logger); for keeping track of and debugging large and complex shell command workflows
 
 =head1 SYNOPSIS
 
@@ -230,9 +226,10 @@ You may wish to output results to a logfile using a previously opened filehandle
         overwrite      => 1
     });
     close $fh;
+
 =head1 Examples
 
-Consider a very complex pipeline in which mistakes are *very* easily made.  SimpleFlow is designed to simplify these steps with a script, with automated checks at every step, in a very intuitive way:
+Consider a very complex pipeline in which mistakes are *very* easily made, and there are numerous files to keep track of.  SimpleFlow is designed to simplify these steps with a script, with automated checks at every step, in a very intuitive way:
 
     my $g_tpr = "3md.$group.tpr";
     task({
@@ -261,7 +258,6 @@ Consider a very complex pipeline in which mistakes are *very* easily made.  Simp
     mkdir "xvg/$group" unless -d "xvg/$group";
     my $dir = "xvg/$group/" . sprintf '%u', $n;
     mkdir $dir unless -d $dir;
-    remove_backups();
     task({
     	cmd            => "gmx chi -s $g_tpr -f $subset_xtc -phi -psi -all",
     	'log.fh'       => $log,

@@ -78,7 +78,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-IMAP4"
       }
    },
-   "version" : "4.000",
+   "version" : "4.01",
    "x_oodist" : {
       "email" : "perl@overmeer.net",
       "first_year" : 2001,

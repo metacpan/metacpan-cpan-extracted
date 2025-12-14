@@ -1,5 +1,5 @@
 ---
-abstract: 'easy, simple workflow manager (and logger)'
+abstract: 'easy, simple workflow manager (and logger); for keeping track of and debugging large and complex shell command workflows'
 author:
   - 'David E. Condon <dec986@gmail.com>'
 build_requires: {}
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/hhg7/SimpleFlow/issues
   homepage: https://metacpan.org/dist/SimpleFlow
   repository: git://github.com/hhg7/SimpleFlow
-version: '0.07'
+version: '0.08'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

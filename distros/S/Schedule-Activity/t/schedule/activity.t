@@ -839,14 +839,8 @@ subtest 'Incremental build'=>sub {
 	is_deeply(\%res,\%fullres,'Two activities');
 };
 
-# Goals aren't yet available in Schedule::Activity, but the prototype is working.
-# When that code provides automated searching against this optimization function,
-# then this test can be updated.  Prior to that, however, score maximization should
-# still be possible, and this test establishes the mechanism of testing and the
-# associated probabilities.
-# 
 subtest 'Goal seeking'=>sub {
-	plan tests=>6;
+	plan tests=>7;
 	my ($scheduler,%schedule);
 	$scheduler=Schedule::Activity->new(configuration=>{node=>{
 		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
@@ -867,7 +861,7 @@ subtest 'Goal seeking'=>sub {
 		if(1+$#{$schedule{activities}}!=12)   { next }
 		if($schedule{attributes}{bee}{y}>=10) { $pass=1; $maxouter=$steps }
 	}
-	ok($pass,"Goal scheduling maximized attribute ($steps steps)");
+	ok($pass,"Maximized attribute ($steps steps)");
 	#
 	# Probability of bee=-10 is 1/2^10.
 	# Probability of failure in N trials is (1023/1024)^N
@@ -881,7 +875,7 @@ subtest 'Goal seeking'=>sub {
 		if(1+$#{$schedule{activities}}!=12)   { next }
 		if($schedule{attributes}{bee}{y}<=-10) { $pass=1; $maxouter=$steps }
 	}
-	ok($pass,"Goal scheduling minimized attribute ($steps steps)");
+	ok($pass,"Minimized attribute ($steps steps)");
 	#
 	# To test for inequality (average zero), verify that both extremes are reached
 	# Must achieve sequence 1,2,3,...,10,10, so the average is (1/2+(2+3+...+9)+10/2+10)/10=5.95
@@ -896,7 +890,7 @@ subtest 'Goal seeking'=>sub {
 		if($schedule{attributes}{bee}{avg}>=+5.95) { $seen{max}++ }
 		if($seen{min}&&$seen{max}) { $pass=1; $maxouter=$steps }
 	}
-	ok($pass,"Goal scheduling inequality attribute ($steps steps)");
+	ok($pass,"Inequality attribute ($steps steps)");
 	#
 	# Target a sequence of events with final average zero.
 	# The final node creates a final timestamp that affects the average value computation.
@@ -924,7 +918,7 @@ subtest 'Goal seeking'=>sub {
 		if(1+$#{$schedule{activities}}!=10)   { next }
 		if($schedule{attributes}{bee}{avg}==0) { $pass=1; $maxouter=$steps }
 	}
-	ok($pass,"Goal scheduling equality attribute ($steps steps)");
+	ok($pass,"Equality attribute ($steps steps)");
 	#
 	# For an off-center equality check (since the {value} could well be ignored by the code), suppose the nodes only increase by 1, or by 0 (as opposed to decreasing), and suppose the last step increases by 0 (the final node).
 	# 49.5=(0/2+(1+2+3+4+5+6+7+8+9)+9/2), so the first must be +1, after that however there are quite a few combinations.
@@ -946,7 +940,31 @@ subtest 'Goal seeking'=>sub {
 		if(1+$#{$schedule{activities}}!=12)   { next }
 		if($schedule{attributes}{bee}{avg}==5) { $pass=1; $maxouter=$steps }
 	}
-	ok($pass,"Goal scheduling equality (offcenter) attribute ($steps steps)");
+	ok($pass,"Equality (offcenter) attribute ($steps steps)");
+	#
+	$scheduler=Schedule::Activity->new(configuration=>{node=>{
+		start=>{next=>[qw/A B/],finish=>'finish',tmmin=>2,tmavg=>2,tmmax=>2,attributes=>{bee=>{set=>0}}},
+		finish=>{tmavg=>0},
+		A=>{message=>'A',tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B finish/]},
+		B=>{message=>'B',tmmin=>2,tmavg=>2,tmmax=>2,next=>[qw/A B finish/]}},
+		annotations=>{
+			group=>[{
+				message=>{alternates=>[{message=>'note',attributes=>{bee=>{incr=>1}}}]},
+				nodes=>qr/A/,
+				before=>{min=>1,max=>1},
+				p=>1,
+			}],
+		}
+	});
+	($pass,$steps,$maxouter)=(0,0,14141); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		%schedule=$scheduler->schedule(goal=>{cycles=>$cycles,attribute=>{bee=>{op=>'max'}}},activities=>[[22,'start']],tensionbuffer=>1,tensionslack=>1);
+		if(1+$#{$schedule{activities}}!=12)   { next }
+		if($schedule{attributes}{bee}{y}>=10) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,"Maximized via annotations ($steps steps)");
 	#
 	$scheduler=Schedule::Activity->new(configuration=>{node=>{
 		start=>{next=>[qw/A B/],finish=>'finish',tmavg=>0,attributes=>{bee=>{set=>0}}},
@@ -958,3 +976,4 @@ subtest 'Goal seeking'=>sub {
 	like($@,qr/Excess exceeds/,'Goal scheduling raises last error if no schedule found');
 	#
 };
+

@@ -1,3 +1,16 @@
+Travel::Status::DE::DBRIS 0.19 - Sun Dec 14 2025
+
+    * DBRIS->new, ->new-p: Add optional num_vias key
+    * Journey: rename train, train_no to trip, trip_no. The former accessors
+      are now deprecated and will issue a run-time warning when used.
+    * Journey->trip, ->trip_no: Improve handling of combined operator / line
+      number prefixes; avoid using trip number as type / line number
+    * Journey: New accessors: types, type_at
+    * Location: new accessors: operator, trip_type
+    * dbris-m: Add -Or / -Oa options (show next stops of all departures)
+    * dbris-m: Add --route-entries option
+    * dbris-m: Provide more detailed operator information, if available
+
 Travel::Status::DE::DBRIS 0.18 - Mon Nov 17 2025
 
     * dbris-m: Show trip number changes along the route, if any

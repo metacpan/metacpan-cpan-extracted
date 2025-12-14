@@ -1,5 +1,9 @@
 Revision history for Params-Validate-Strict
 
+0.27	Sat Dec 13 11:03:00 EST 2025
+	Added enum as a synonym of memberof
+	Support unix_timestamp semantic
+
 0.26	Tue Dec  9 20:11:39 EST 2025
 	Don't error if utf-8 doesn't decode
 	Create helper routine _number_of_characters()

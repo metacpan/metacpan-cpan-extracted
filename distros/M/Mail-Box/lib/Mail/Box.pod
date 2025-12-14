@@ -61,7 +61,7 @@ That page is obligatory reading, sorry!
 B<Be aware:>
 This module versions 4.0 and up is not fully compatible with older releases:
 mainly the exception handling has changed.  When you need to upgrade, please
-read F<https://github.com/markov2/perl5-Mail-Box/wiki/>
+read L<the wiki|https://github.com/markov2/perl5-Mail-Box/wiki/>.
 B<Version 3 is still maintained> and may see new releases as well.
 
 C<Mail::Box> is the base class for accessing various types of mailboxes
@@ -73,6 +73,7 @@ file within the same directory.
 
 No object in your program will be of type C<Mail::Box>: it is only used
 as base class for the real folder types.  C<Mail::Box> is extended by
+file, directory, and remote folder types.  See L</Different kinds of folders>
 
 Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
 
@@ -166,25 +167,15 @@ Improves base, see L<Mail::Reporter/"Constructors">
 
 Access-rights to the folder.  Folders are opened for read-only (which
 means write-protected) by default!  The C<$mode> can be
+C<'r'> (read-only, default), C<'a'> (append only), C<'rw'> (read-write),
+and C<'d'> (delete only).
 
-=over 4
+This C<$mode> describes the abstract folder access: how the underlaying files are
+really accessed depends on the action which needs to take place.
 
-=item C<'r'>: read-only (default)
-
-=item C<'a'>: append
-
-=item C<'rw'>: read-write
-
-=item C<'d'>: delete
-
-=back
-
-These MODE has no relation to the modes actually used to open the folder
-files within this module.  For instance, if you specify C<"rw">, and
-open the folder, only read permission on the folder-file is required.
-
-Be warned: writing a MBOX folder may create a new file to replace the old
-folder.  The permissions and owner of the file may get changed by this.
+Be warned: writing a MBOX type folder may create a new file to replace
+the old folder.  The permissions and owner of the file may get changed
+by this.
 
 =item body_delayed_type => CLASS
 
@@ -238,7 +229,7 @@ work when access is granted for writing or appending to the folder.
 Be careful: you may create a different folder type than you expect unless you
 explicitly specify L<Mail::Box::Manager::open(type)|Mail::Box::Manager/"Manage open folders">.
 
-=item extract => INTEGER | CODE | METHOD | 'LAZY'| 'ALWAYS'
+=item extract => INTEGER|CODE|METHOD|'LAZY'|'ALWAYS'
 
 Defines when to parse (process) the content of the message.
 When the header of a message is read, you may want to postpone the
@@ -1522,8 +1513,8 @@ Cast by C<addMessage()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.00,
-built on December 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.01,
+built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
