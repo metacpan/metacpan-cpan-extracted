@@ -429,7 +429,7 @@ c23_nodiscard infix_status infix_type_create_pointer_to(infix_arena_t * arena,
                                                         infix_type ** out_type,
                                                         infix_type * pointee_type) {
     if (!out_type || !pointee_type) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     infix_type * type = infix_arena_calloc(arena, 1, sizeof(infix_type), _Alignof(infix_type));
@@ -460,7 +460,7 @@ c23_nodiscard infix_status infix_type_create_array(infix_arena_t * arena,
                                                    infix_type * element_type,
                                                    size_t num_elements) {
     if (out_type == nullptr || element_type == nullptr) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     if (element_type->size > 0 && num_elements > SIZE_MAX / element_type->size) {
@@ -497,7 +497,7 @@ c23_nodiscard infix_status infix_type_create_flexible_array(infix_arena_t * aren
                                                             infix_type ** out_type,
                                                             infix_type * element_type) {
     if (out_type == nullptr || element_type == nullptr) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     // Flexible arrays of incomplete types (size 0) are generally not allowed.
@@ -540,7 +540,7 @@ c23_nodiscard infix_status infix_type_create_enum(infix_arena_t * arena,
                                                   infix_type ** out_type,
                                                   infix_type * underlying_type) {
     if (out_type == nullptr || underlying_type == nullptr) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     if (underlying_type->category != INFIX_TYPE_PRIMITIVE ||
@@ -574,7 +574,7 @@ c23_nodiscard infix_status infix_type_create_complex(infix_arena_t * arena,
                                                      infix_type ** out_type,
                                                      infix_type * base_type) {
     if (out_type == nullptr || base_type == nullptr || (!is_float(base_type) && !is_double(base_type))) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     infix_type * type = infix_arena_calloc(arena, 1, sizeof(infix_type), _Alignof(infix_type));
@@ -605,7 +605,7 @@ c23_nodiscard infix_status infix_type_create_vector(infix_arena_t * arena,
                                                     infix_type * element_type,
                                                     size_t num_elements) {
     if (out_type == nullptr || element_type == nullptr || element_type->category != INFIX_TYPE_PRIMITIVE) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     if (element_type->size > 0 && num_elements > SIZE_MAX / element_type->size) {
@@ -750,8 +750,12 @@ c23_nodiscard infix_status infix_type_create_packed_struct(infix_arena_t * arena
                                                            size_t alignment,
                                                            infix_struct_member * members,
                                                            size_t num_members) {
-    if (out_type == nullptr || (num_members > 0 && members == nullptr) || alignment == 0) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+    if (out_type == nullptr || (num_members > 0 && members == nullptr)) {
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
+        return INFIX_ERROR_INVALID_ARGUMENT;
+    }
+    if (alignment == 0) {
+        _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_INVALID_ALIGNMENT, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     infix_type * type = infix_arena_calloc(arena, 1, sizeof(infix_type), _Alignof(infix_type));
@@ -797,7 +801,7 @@ c23_nodiscard infix_status infix_type_create_named_reference(infix_arena_t * are
                                                              const char * name,
                                                              infix_aggregate_category_t agg_cat) {
     if (out_type == nullptr || name == nullptr) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     infix_type * type = infix_arena_calloc(arena, 1, sizeof(infix_type), _Alignof(infix_type));

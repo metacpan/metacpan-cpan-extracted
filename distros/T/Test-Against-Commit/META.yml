@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/jkeenan/perl5-test-cpan-against-commit/issues
   homepage: https://thenceforward.net/perl/modules/Test-Against-Commit/
   repository: https://github.com/jkeenan/perl5-test-cpan-against-commit.git
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

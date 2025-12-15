@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Parse::BBCode;
 
-our $VERSION = '0.33';
+our $VERSION = '0.40';
 
 sub import {
     # Replace the regex if passed one.
@@ -56,11 +56,11 @@ Text::Markup::Bbcode - BBcode parser for Text::Markup
 This is the L<BBcode|https://www.bbcode.org/> parser for L<Text::Markup>. It
 reads in the file (relying on a
 L<BOM|https://www.unicode.org/unicode/faq/utf_bom.html#BOM>), hands it off to
-L<Text::Markdown> for parsing, and then returns the generated HTML as an
+L<Parse::BBCode> for parsing, and then returns the generated HTML as an
 encoded UTF-8 string with an C<http-equiv="Content-Type"> element identifying
 the encoding as UTF-8.
 
-It recognizes files with the following extensions as Markdown:
+It recognizes files with the following extensions as BBcode:
 
 =over
 

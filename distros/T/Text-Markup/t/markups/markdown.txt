@@ -2,7 +2,7 @@ Markdown Test File
 ==================
 
 This file tests the [Markdown](https://daringfireball.net/projects/markdown/)
-parser — which is powered by [Text::Markdown](https://p3rl/Text::Markdown).
+parser — which is powered by [Text::Markdown::Discount](https://p3rl.org/Text::Markdown::Discount).
 Öy.
 
 ``` go
@@ -10,3 +10,14 @@ func main() {
     fmt.Println("hello")
 }
 ```
+
+Term 1
+Term 2
+:   Definition a
+
+Term 3
+:   Definition b
+
+| foo | bar |
+| --- | --- |
+| baz | bim |

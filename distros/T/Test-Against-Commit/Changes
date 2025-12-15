@@ -1,5 +1,8 @@
 Revision history for Perl library Test::Against::Commit
 
+0.17 Sun Dec 14 09:25:13 AM EST 2025
+    - Update abstract in documentation; no functional changes
+
 0.16 Fri Sep 26 09:09:42 PM EDT 2025
     - Test-Against-Commit overhaul:  introduce directory structure:
         application directory

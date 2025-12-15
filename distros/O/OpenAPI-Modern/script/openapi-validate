@@ -22,42 +22,40 @@ use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 
 my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
-  "$0 %o",
+  "$0 %o [filename] [filename] ...",
   ['help|usage|?|h', 'print usage information and exit', { shortcircuit => 1 } ],
   [],
   ['strict', 'disallow unknown keywords in embedded JSON Schemas'],
   ['dump-identifiers', 'print a list of all identifiers found in the schema'],
+  ['with-defaults', 'include list of defaults for missing data'],
   [],
-  ['document=s@', 'document filename (if not provided, STDIN is used); can be used more than once'],
 );
 
 print($usage->text), exit if $opt->help;
 
+JSON::Schema::Modern->VERSION('0.630') if $opt->with_defaults;
 my $js = JSON::Schema::Modern->new(%$opt);
 my $exit_val = 0;
 
-foreach my $document_filename (($opt->document//[''])->@*) {
-  my $encoded_document;
+foreach (my $idx = 0; $idx < @ARGV; ++$idx) {
+  my $document_filename = $ARGV[$idx];
+  process(path($document_filename)->slurp('UTF-8'), 0+!$idx, $document_filename);
+}
 
-  if (length $document_filename) {
-    $encoded_document = path($document_filename)->slurp('UTF-8');
-  }
-  else {
-    say 'enter document data, followed by ^D:';
-    local $/;
-    $encoded_document = <STDIN>;
-    STDIN->clearerr;
-  }
+if (not @ARGV) {
+  say 'enter document data, followed by ^D:' if -t STDIN;
+  local $/;
+  my $encoded_document = <STDIN>;
+  STDIN->clearerr;
+  process($encoded_document, 1);
+}
 
+# document content, must be OpenAPI document?, filename identifier
+sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
   my $schema = parse_input($encoded_document);
   my $result;
 
-  if (ref $schema ne 'HASH' or not exists $schema->{openapi}) {
-    # not an OpenAPI document? assume it's a vanilla JSON Schema
-    $result = $js->validate_schema($schema);
-    $js->add_schema($schema);
-  }
-  else {
+  if ($openapi or (ref $schema eq 'HASH' and exists $schema->{openapi})) {
     my $document;
     try {
       $document = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -68,16 +66,21 @@ foreach my $document_filename (($opt->document//[''])->@*) {
       $js->add_document($document) if $opt->dump_identifiers;
     }
     catch ($e) {
-      say $e->$_isa('JSON::Schema::Modern::Result') ? $e->dump: '"'.$e.'"';
+      say $e->$_isa('JSON::Schema::Modern::Result') ? $e->dump : $e;
       exit 2;
     }
 
     $result = JSON::Schema::Modern::Result->new(errors => [ $document->errors ]);
   }
+  else {
+    # not an OpenAPI document? assume it's a vanilla JSON Schema
+    $result = $js->validate_schema($schema);
+    $js->add_schema($schema);
+  }
 
   $exit_val = max($exit_val, $result->valid ? 0 : $result->exception ? 2 : 1);
 
-  say encode(($opt->document//[])->@* > 1 ? { $document_filename => $result } : $result);
+  say encode(@ARGV > 1 ? { $document_filename => $result } : $result);
 }
 
 if ($opt->dump_identifiers) {
@@ -88,7 +91,7 @@ if ($opt->dump_identifiers) {
       document_path => $_->[1]{path},
     }
   ),
-  grep $_->[0] !~ m{^(?:https://json-schema.org/|https://spec.openapis.org/oas/)},
+  grep $_->[0] !~ m{^(?:https?://json-schema.org/|https://spec.openapis.org/oas/)},
   $js->_resource_pairs;
 
   say encode({identifiers => \%identifiers });
@@ -134,7 +137,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.114
+version 0.115
 
 =head1 SYNOPSIS
 
@@ -143,7 +146,8 @@ version 0.114
   openapi-validate \
     [ --strict ] \
     [ --dump-identifiers ] \
-    [ --document [ <filename> ] ... ]
+    [ --with-defaults ] \
+    [ <filename> ] [ ... ]
 
 =head1 DESCRIPTION
 
@@ -166,7 +170,7 @@ F<openapi.yaml> contains:
 
 Run:
 
-  openapi-validate --document openapi.yaml
+  openapi-validate openapi.yaml
 
 produces output:
 
@@ -181,11 +185,11 @@ produces output:
     "valid" : false
   }
 
-Or run:
+JSON documents are also supported, e.g.:
 
-  openapi-validate --document openapi.json
+  openapi-validate openapi.json
 
-produces output:
+produces output for a valid document:
 
   {
     "valid": true
@@ -202,21 +206,30 @@ The following options from L<JSON::Schema::Modern> are available:
 
 =over 4
 
+=item *
 
+L<JSON::Schema::Modern/strict>: disallow unknown keywords in embedded JSON Schemas
+
+=item *
+
+L<JSON::Schema::Modern/dump_identifiers>: print a list of all identifiers found in the schema
+
+=item *
+
+L<JSON::Schema::Modern/with_defaults>: include list of defaults for missing data
 
 =back
 
-* L<JSON::Schema::Modern/strict>: disallow unknown keywords in embedded JSON Schemas
-* L<JSON::Schema::Modern/dump_identifiers>: print a list of all identifiers found in the schema
-
-Additionally, C<--document> is used to provide the filename containing a JSON- or YAML-encoded
-OpenAPI document. You can use the C<--document> option more than once to validate multiple documents
-at the same time, which is faster than using separate processes.
+The remainder of the command line arguments are used to provide the filename containing a JSON- or
+YAML-encoded OpenAPI document. You can use more than one filename to validate multiple documents at
+the same time, which is faster than using separate processes, but the first file must be a valid
+OpenAPI document.
 
 If the file looks like a JSON Schema rather than an OpenAPI document, it will be validated as such,
 and loaded into the evaluator so it can be used as a metaschema by your main document.
 
-If C<--document> is not provided, STDIN is used as input.
+If you provide no filenames, STDIN is used as input, so you can pipe your content directly from
+another process.
 
 =head1 GIVING THANKS
 

@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(7.0.7);
+  our $VERSION = qv(8.0.2);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -89,11 +89,16 @@ sub tweak ($\@\@\@$$\%) {
           my $padix = $gv->padix;
           my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
           $pads = [ map defined ? $_->object_2svref : $_, @p ];
-          $$pads[--$idx][$padix] = $method;
-          $$pads[$idx][$targ]   .= ":compiled";
+          $$pads[--$idx][$padix] = $DEBUG ne "verify" ? $method : sub {
+            goto &$method if $method == $_[0]->can($method_name);
+            require Carp;
+            eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ", B::Deparse->new->coderef2text($cv_obj->object_2svref), "\n"};
+            Carp::confess ("sealed failed: $_[0]->$method_name method lookup differs from $class->$method_name:verified sub!");
+          };
+          $$pads[$idx][$targ]   .= $DEBUG ne "verify" ? ":compiled" : ":verified";
         }
         else {
-          ${$methop->meth_sv->object_2svref} .= ":compiled";
+          ${$methop->meth_sv->object_2svref} .= $DEBUG ne "verify" ? ":compiled" : ":verified";
         }
 
         ++$tweaked;
@@ -196,6 +201,7 @@ sealed - Subroutine attribute for compile-time method lookups on its typed lexic
     use sealed 'debug';   # warns about 'method_named' op tweaks
     use sealed 'deparse'; # additionally warns with the B::Deparse output
     use sealed 'dump';    # warns with the $op->dump during the tree walk
+    use sealed 'verify';  # verifies all CV tweaks
     use sealed 'disabled';# disables all CV tweaks
     use sealed;           # disables all warnings
 

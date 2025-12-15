@@ -1,0 +1,82 @@
+{
+   "abstract" : "DarkPAN::Utils",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DarkPAN-Utils",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "3.02",
+            "Class::Accessor::Validated" : "0.04",
+            "HTTP::Request" : "6.45",
+            "IO::Scalar" : "2.113",
+            "IO::Uncompress::Gunzip" : "2.213",
+            "LWP::UserAgent" : "6.77",
+            "Log::Log4perl" : "1.57",
+            "Pod::Extract" : "0.02",
+            "Pod::Markdown" : "3.400",
+            "Readonly" : "2.05",
+            "Text::Markdown::Discount" : "0.18",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DarkPAN::Utils" : {
+         "file" : "lib/DarkPAN/Utils.pm",
+         "version" : "0.02"
+      },
+      "DarkPAN::Utils::Docs" : {
+         "file" : "lib/DarkPAN/Utils/Docs.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "http://github.com/rlauer6/DarkPAN-Utils"
+      },
+      "homepage" : "http://github.com/rlauer6/DarkPAN-Utils",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/DarkPAN-Utils.git",
+         "web" : "http://github.com/rlauer6/DarkPAN-Utils"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

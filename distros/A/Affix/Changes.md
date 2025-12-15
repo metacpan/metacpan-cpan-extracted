@@ -5,6 +5,18 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.2] - 2025-12-14
+
+### Changed
+
+    - In an attempt to debug mystery failures in SDL3.pm, Affix.pm will warn and return `undef` instead of `croak`ing.
+    - Improved error reporting: if the internal error message is empty, the numeric error code is now included in the warning.
+
+### Fixed
+
+    - [infix] Fixed a critical file descriptor leak on POSIX platforms (Linux/FreeBSD) where the file descriptor returned by `shm_open` was kept open for the lifetime of the trampoline, eventually hitting the process file descriptor limit (EMFILE). The descriptor is now closed immediately after mapping, as intended.
+    - Fixed memory leaks that occurred when trampoline creation failed midway (cleaning up partial arenas, strings, and backend structures).
+
 ## [v1.0.1] - 2025-12-13
 
 ### Changed
@@ -96,7 +108,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
     - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.0.2...HEAD
+[v1.0.2]: https://github.com/sanko/Affix.pm/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/sanko/Affix.pm/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/sanko/Affix.pm/compare/v0.12.0...v1.0.0
 [v0.12.0]: https://github.com/sanko/Affix.pm/compare/0.11...v0.12.0

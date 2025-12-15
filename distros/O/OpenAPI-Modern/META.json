@@ -115,6 +115,8 @@
             "Catalyst::Response" : "0",
             "Class::XSAccessor" : "0",
             "Cpanel::JSON::XS" : "0",
+            "Dancer2::Core::Request" : "0",
+            "Dancer2::Core::Response" : "0",
             "HTTP::Headers" : "6.07",
             "HTTP::Headers::Fast" : "0.21",
             "HTTP::Message::PSGI" : "0",
@@ -240,23 +242,23 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI_3_0" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "OpenAPI::Modern::Utilities" : {
          "file" : "lib/OpenAPI/Modern/Utilities.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       }
    },
    "release_status" : "stable",
@@ -271,7 +273,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.114",
+   "version" : "0.115",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043005"
@@ -1172,7 +1174,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.114",
+                  "tag" : "v0.115",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

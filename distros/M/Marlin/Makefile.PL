@@ -47,10 +47,10 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Marlin"            => { file => "lib/Marlin.pm", version => 0.002002 },
-                        "Marlin::Attribute" => { file => "lib/Marlin/Attribute.pm", version => 0.002002 },
-                        "Marlin::Role"      => { file => "lib/Marlin/Role.pm", version => 0.002002 },
-                        "Marlin::Util"      => { file => "lib/Marlin/Util.pm", version => 0.002002 },
+                        "Marlin"            => { file => "lib/Marlin.pm", version => 0.002005 },
+                        "Marlin::Attribute" => { file => "lib/Marlin/Attribute.pm", version => 0.002005 },
+                        "Marlin::Role"      => { file => "lib/Marlin/Role.pm", version => 0.002005 },
+                        "Marlin::Util"      => { file => "lib/Marlin/Util.pm", version => 0.002005 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -64,7 +64,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin/project",
                       },
-  "version"        => 0.002002,
+  "version"        => 0.002005,
 };
 
 my %dynamic_config;
@@ -74,7 +74,7 @@ do {
 	}
 	
 	if ( "$]" < 5.010000 ) {
-		$meta->{prereqs}{runtime}{'requires'}{'mro::compat'} = 0;
+		$meta->{prereqs}{runtime}{'requires'}{'MRO::Compat'} = 0;
 	}
 
 };

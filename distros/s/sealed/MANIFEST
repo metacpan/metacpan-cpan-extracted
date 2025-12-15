@@ -9,9 +9,10 @@ MANIFEST.SKIP
 README.md
 RegistryCooker.pm.patch
 sealed.xs
-SIGNATURE
 t/bench.pl
 t/signature.pl
+t/verify.pl
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

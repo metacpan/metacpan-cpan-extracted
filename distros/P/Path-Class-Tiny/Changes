@@ -1,5 +1,10 @@
 Revision history for Path-Class-Tiny
 
+0.07      2025-12-14 04:21:31-08:00 America/Los_Angeles
+
+    [New Features]
+    * `slurp` now supports `chomp` in scalar context
+
 0.06      2021-11-05 00:00:55-07:00 America/Los_Angeles
 
     [New Features]

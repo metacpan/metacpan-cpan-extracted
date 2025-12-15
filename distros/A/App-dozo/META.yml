@@ -1,0 +1,41 @@
+---
+abstract: 'Docker with Zero Overhead'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-dozo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::dozo:
+    file: lib/App/dozo.pm
+    version: '0.9923'
+requires:
+  File::Share: '0'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/tecolicom/App-dozo/issues
+  homepage: https://github.com/tecolicom/App-dozo
+  repository: https://github.com/tecolicom/App-dozo.git
+version: '0.9923'
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

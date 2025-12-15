@@ -6,24 +6,25 @@ use DateTime;
 use DateTime::Event::Sunrise;
 use Geo::Local::Server;
 
-my $opt     = {};
-getopts("f:m:", $opt);
+my $opt      = {};
+getopts("f:m:s:", $opt);
 
-my $syntax  = "sunrise_time [-f FILE] [-m +/-minutes]";
-my $file    = $opt->{"f"};
-my $offset  = $opt->{"m"} || 0;
+my $syntax   = "sunrise_time [-s '%H:%M'] [-f FILE] [-m +/-minutes]";
+my $file     = $opt->{"f"};
+my $offset   = $opt->{"m"}  || 0;
+my $strftime = $opt->{"s"} || '%H:%M';
 die("$syntax\n") unless $offset =~ m/^[+-]?\d+$/;
-my $now     = DateTime->now;
-my $gls     = Geo::Local::Server->new(configfile=>$file);
-my $lat     = $gls->lat;
-my $lon     = $gls->lon;
-my $sunrise = DateTime::Event::Sunrise
-                ->sunrise(longitude=>$lon, latitude=>$lat)
-                  ->next($now)
-                    ->add(minutes=>$offset)
-                      ->set_time_zone("local");
+my $now      = DateTime->now;
+my $gls      = Geo::Local::Server->new(configfile=>$file);
+my $lat      = $gls->lat;
+my $lon      = $gls->lon;
+my $sunrise  = DateTime::Event::Sunrise
+                 ->sunrise(longitude=>$lon, latitude=>$lat)
+                   ->next($now)
+                     ->add(minutes=>$offset)
+                       ->set_time_zone("local");
 
-printf "%02d:%02d\n", $sunrise->hour, $sunrise->minute;
+print $sunrise->strftime($strftime). "\n";
 
 __END__
 
@@ -46,6 +47,10 @@ Specify alternate configuration file
 =head2 -m Output offset in minutes
 
 Specify a certain offset before or after the sunrise
+
+=head2 -s strftime
+
+Specify a strftime format default: '%H:%M'
 
 =head1 DESCRIPTION
 

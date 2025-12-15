@@ -1,5 +1,17 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9922 2025-12-15T07:10:27Z
+
+    - improve dozo help message formatting (consistent spacing and argument notation)
+    - add docker run execution info display in dozo (image, env count, container, command)
+    - implement debug mode in dozo (-d shows full docker command, unaffected by -q)
+    - separate trace option: dozo uses -x, xlate uses --trace only (keep -t for --to-lang)
+    - add debug() function for debug output independent of quiet mode
+
+0.9921 2025-12-15T00:16:56Z
+
+    - fix -D option to override -I from .dozorc (use hook)
+
 0.9920 2025-12-14T10:42:27Z
 
     - fix dist_dir to not load App::Greple::xlate module

@@ -7,6 +7,8 @@ Random::Simple - Generate good random numbers in a user consumable way.
 ```perl
 use Random::Simple;
 
+my $prng           = new Random::Simple();
+
 my $coin_flip      = random_int(1, 2);
 my $die_roll       = random_int(1, 6);
 my $random_percent = random_float() * 100;
@@ -14,7 +16,6 @@ my $buffer         = random_bytes(8);
 
 my @arr            = ('red', 'green', 'blue');
 my $rand_item      = random_elem(@arr);
-
 my @mixed          = shuffle_array(@arr);
 ```
 
@@ -54,15 +55,15 @@ get a handful of other useful random related methods.
 
 - **shuffle\_array(@array)**
 
-	returns an array that has been randomized using the Fisher-Yates alorgithm
-
-- **srand()**
-
-    emulates `CORE::srand()` using a better PRNG.
+    returns an array that has been randomized using the Fisher-Yates alorgithm.
 
 - **rand()**
 
     emulates `CORE::rand()` using a better PRNG.
+
+- **srand()**
+
+    emulates `CORE::srand()` using a better PRNG.
 
 - **Random::Simple::seed($seed1, $seed2)**
 

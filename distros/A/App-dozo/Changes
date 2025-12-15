@@ -1,0 +1,83 @@
+Revision history for Perl extension App-dozo
+
+0.9923 2025-12-15T09:24:59Z
+
+    - split from App::Greple::xlate as standalone distribution
+
+0.9922 2025-12-15T07:10:27Z
+
+    - improve help message formatting (consistent spacing and argument notation)
+    - add docker run execution info display (image, env count, container, command)
+    - implement debug mode (-d shows full docker command, unaffected by -q)
+    - separate trace option: use -x for trace mode
+    - add debug() function for debug output independent of quiet mode
+
+0.9921 2025-12-15T00:16:56Z
+
+    - fix -D option to override -I from .dozorc (use hook)
+
+0.9920 2025-12-14T10:42:27Z
+
+    - fix dist_dir to not load App::Greple::xlate module
+    - simplify dockopt array construction
+
+0.9919 2025-12-14T07:00:34Z
+
+    - rename xrun to dozo (Docker with Zero Overhead)
+    - fix .dozorc parsing to handle quoted arguments using xargs
+    - use POD for help output
+    - add USAGE section with practical examples
+
+0.9918 2025-12-14T02:43:25Z
+
+    - add --version option
+    - add -D/--default option and DOZO_DEFAULT_IMAGE env for default image
+    - improve test isolation from .dozorc files
+
+0.9917 2025-12-13T15:04:34Z
+
+    - move Docker tests to xt/author
+    - add to release hook for automatic version updates
+
+0.9916 2025-12-13T13:24:26Z
+
+    - implement GNU-style long options using getoptlong.sh library
+    - all options now have both short and long forms
+    - extract as standalone Docker runner script (as xrun)
+    - support .xrunrc for default container settings
+
+0.9906 2025-02-28T13:05:13Z
+
+    - add paused container handling
+
+0.9902 2025-01-01T02:24:46Z
+
+    - execute "docker run" with "--init" option
+    - add -W option to mount current directory
+
+0.45 2024-11-22T02:14:44Z
+
+    - introduce -L and -K option
+
+0.44 2024-11-01T08:14:59Z
+
+    - run docker with --tty option when stdin is terminal
+    - -H option set HOME to the mount point
+
+0.43 2024-10-31T09:51:34Z
+
+    - introduce -H option to mount the home directory
+
+0.42 2024-10-24T15:44:24Z
+
+    - introduce -U option
+
+0.16 2023-03-14T09:47:33Z
+
+    - change workdir to /work
+    - introduce -C and -B option
+
+0.14 2023-03-13T01:58:23Z
+
+    - original version (as part of App::Greple::xlate)
+

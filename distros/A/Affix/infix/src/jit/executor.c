@@ -213,8 +213,11 @@ c23_nodiscard infix_executable_t infix_executable_alloc(size_t size) {
 #if defined(INFIX_OS_WINDOWS)
     // Windows: Single-mapping W^X. Allocate as RW, later change to RX via VirtualProtect.
     void * code = VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    if (code == nullptr)
+    if (code == nullptr) {
+        _infix_set_system_error(
+            INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, GetLastError(), nullptr);
         return exec;
+    }
     exec.rw_ptr = code;
     exec.rx_ptr = code;
 #elif defined(INFIX_OS_MACOS) || defined(INFIX_OS_ANDROID) || defined(INFIX_OS_OPENBSD) || defined(INFIX_OS_DRAGONFLY)
@@ -246,17 +249,25 @@ c23_nodiscard infix_executable_t infix_executable_alloc(size_t size) {
             close(fd);
         }
     }
-    if (code == MAP_FAILED)
+    if (code == MAP_FAILED) {
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, errno, nullptr);
         return exec;
+    }
     exec.rw_ptr = code;
     exec.rx_ptr = code;
 #else
     // Dual-mapping POSIX platforms (e.g., Linux, FreeBSD). Create two separate views of the same memory.
     exec.shm_fd = shm_open_anonymous();
-    if (exec.shm_fd < 0)
+    if (exec.shm_fd < 0) {
+        _infix_set_system_error(
+            INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, errno, "shm_open failed");
         return exec;
+    }
     if (ftruncate(exec.shm_fd, size) != 0) {
+        _infix_set_system_error(
+            INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, errno, "ftruncate failed");
         close(exec.shm_fd);
+        exec.shm_fd = -1;  // Ensure clean state
         return exec;
     }
     // The RW mapping.
@@ -265,13 +276,21 @@ c23_nodiscard infix_executable_t infix_executable_alloc(size_t size) {
     exec.rx_ptr = mmap(nullptr, size, PROT_READ | PROT_EXEC, MAP_SHARED, exec.shm_fd, 0);
     // If either mapping fails, clean up both and return an error.
     if (exec.rw_ptr == MAP_FAILED || exec.rx_ptr == MAP_FAILED) {
+        int err = errno;  // Capture errno before cleanup
         if (exec.rw_ptr != MAP_FAILED)
             munmap(exec.rw_ptr, size);
         if (exec.rx_ptr != MAP_FAILED)
             munmap(exec.rx_ptr, size);
         close(exec.shm_fd);
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, err, "mmap failed");
         return (infix_executable_t){.rx_ptr = nullptr, .rw_ptr = nullptr, .size = 0, .shm_fd = -1};
     }
+
+    // The mmap mappings hold a reference to the shared memory object, so we don't
+    // need the FD anymore. Keeping it open consumes a file descriptor per trampoline,
+    // causing "shm_open failed" after ~1024 trampolines.
+    close(exec.shm_fd);
+    exec.shm_fd = -1;
 #endif
     exec.size = size;
     INFIX_DEBUG_PRINTF("Allocated JIT memory. RW at %p, RX at %p", exec.rw_ptr, exec.rx_ptr);
@@ -366,6 +385,8 @@ c23_nodiscard bool infix_executable_make_executable(infix_executable_t exec) {
 #if defined(INFIX_OS_WINDOWS)
     // Finalize permissions to Read+Execute.
     result = VirtualProtect(exec.rw_ptr, exec.size, PAGE_EXECUTE_READ, &(DWORD){0});
+    if (!result)
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, GetLastError(), nullptr);
 #elif defined(INFIX_OS_MACOS)
 #if INFIX_MACOS_SECURE_JIT_AVAILABLE  // Placeholder
     static bool g_use_secure_jit_path = false;
@@ -381,9 +402,13 @@ c23_nodiscard bool infix_executable_make_executable(infix_executable_t exec) {
         // However, the current logic does this change via `pthread_jit_write_protect_np`
         // within the allocator itself. For now, this is a placeholder for that logic.
         result = (mprotect(exec.rw_ptr, exec.size, PROT_READ | PROT_EXEC) == 0);
+    if (!result)
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, errno, nullptr);
 #elif defined(INFIX_OS_ANDROID) || defined(INFIX_OS_OPENBSD) || defined(INFIX_OS_DRAGONFLY)
     // Other single-mapping POSIX platforms use mprotect.
     result = (mprotect(exec.rw_ptr, exec.size, PROT_READ | PROT_EXEC) == 0);
+    if (!result)
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, errno, nullptr);
 #else
     // On dual-mapping platforms, the RX mapping is already executable. This is a no-op.
     result = true;
@@ -410,6 +435,8 @@ c23_nodiscard infix_protected_t infix_protected_alloc(size_t size) {
         return prot;
 #if defined(INFIX_OS_WINDOWS)
     prot.rw_ptr = VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    if (!prot.rw_ptr)
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_OUT_OF_MEMORY, GetLastError(), nullptr);
 #else
 #if defined(MAP_ANON)
     prot.rw_ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
@@ -422,8 +449,10 @@ c23_nodiscard infix_protected_t infix_protected_alloc(size_t size) {
         close(fd);
     }
 #endif
-    if (prot.rw_ptr == MAP_FAILED)
+    if (prot.rw_ptr == MAP_FAILED) {
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_OUT_OF_MEMORY, errno, nullptr);
         prot.rw_ptr = nullptr;
+    }
 #endif
     if (prot.rw_ptr)
         prot.size = size;
@@ -460,8 +489,12 @@ c23_nodiscard bool infix_protected_make_readonly(infix_protected_t prot) {
     bool result = false;
 #if defined(INFIX_OS_WINDOWS)
     result = VirtualProtect(prot.rw_ptr, prot.size, PAGE_READONLY, &(DWORD){0});
+    if (!result)
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, GetLastError(), nullptr);
 #else
     result = (mprotect(prot.rw_ptr, prot.size, PROT_READ) == 0);
+    if (!result)
+        _infix_set_system_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_PROTECTION_FAILURE, errno, nullptr);
 #endif
     return result;
 }

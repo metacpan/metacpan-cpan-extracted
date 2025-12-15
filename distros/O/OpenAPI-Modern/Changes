@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.115     2025-12-14 20:15:30Z
+          - drop the --document argument in "openapi-validate" in favour of
+            @ARGV
+          - added --with-defaults option to "openapi-validate" script
+
 0.114     2025-12-09 22:34:18Z
           - support added for parsing and validation of Dancer2 request and
             response objects

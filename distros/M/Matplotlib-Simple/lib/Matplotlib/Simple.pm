@@ -9,7 +9,7 @@ use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.14;
+our $VERSION = 0.16;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Term::ANSIColor;
@@ -62,38 +62,35 @@ sub execute {
 	return $stdout;
 }
 my @ax_methods = (
-	'ArtistList',     'add_child_axes', 'add_collection', 'add_container',
-	'add_image',      'add_line', 'add_patch', 'add_table', 'apply_aspect',
-	'autoscale_view', 'axison',   'bxp', 'callbacks', 'can_pan', 'can_zoom',
-	'child_axes', 'collections', 'containers', 'contains_point', 'dataLim',
-	'drag_pan',   'end_pan',     'fmt_xdata',  'fmt_ydata',      'format_coord',
-	'format_xdata', 'format_ydata','hexbin', 'hist', 'hist2d', 'hlines',
-	'ignore_existing_data_limits', 'in_axes',    'indicate_inset',
-	'indicate_inset_zoom',         'inset_axes', 'invert_xaxis', 'invert_yaxis',
-	'label_outer', 'legend_', 'name', 'pcolorfast', 'redraw_in_frame', 'relim',
-	'reset_position',
-	'scatter',
-	'secondary_xaxis', 'secondary_yaxis', 'set_adjustable', 'set_anchor',
-	'set_aspect', 'set_autoscale_on', 'set_autoscalex_on',  'set_autoscaley_on',
-	'set_axes_locator', 'set_axis_off',    'set_axis_on',   'set_axisbelow',
-	'set_box_aspect',   'set_fc',          'set_forward_navigation_events',
-	'set_frame_on',     'set_mouseover( ', 'set_navigate', 'set_navigate_mode',
-	'set_position',     'set_prop_cycle',  'set_rasterization_zorder',
-	'set_subplotspec',  'set_title',       'set_xbound', 'set_xlabel',
-	'set_xlim',    # ax.set_xlim(left, right), or ax.set_xlim(right = 180)
-	'set_xmargin', 'set_xscale', 'set_xticklabels', 'set_xticks', 'set_ybound',
-	'set_ylabel',  'set_ylim',   'set_ymargin', 'set_yscale', 'set_yticklabels',
-	'set_yticks',  'sharex',     'sharey',      'spines', 'start_pan', 'tables',
-	'text', 'ticklabel_format', 'titleOffsetTrans', 'transAxes', 'transData', 'transLimits',
-	'transScale', 'update_datalim', 'use_sticky_edges', 'viewLim', 'vlines', 'violin',
-	'xaxis',      'xaxis_date',     'xaxis_inverted',   'yaxis',   'yaxis_date',
-	'yaxis_inverted'
+ 'ArtistList',     'add_child_axes', 'add_collection', 'add_container',
+ 'add_image',      'add_line', 'add_patch', 'add_table', 'apply_aspect',
+ 'autoscale_view', 'axison',   'bxp', 'callbacks', 'can_pan', 'can_zoom',
+ 'child_axes', 'collections', 'containers', 'contains_point', 'dataLim',
+ 'drag_pan',   'end_pan',     'fmt_xdata',  'fmt_ydata',      'format_coord',
+ 'format_xdata', 'format_ydata','hexbin', 'hist', 'hist2d', 'hlines',
+ 'ignore_existing_data_limits', 'in_axes',    'indicate_inset',
+'indicate_inset_zoom',         'inset_axes', 'invert_xaxis', 'invert_yaxis',
+ 'label_outer', 'legend_', 'name', 'pcolorfast', 'redraw_in_frame', 'relim',
+ 'reset_position',	'scatter', 'secondary_xaxis', 'secondary_yaxis', 'set_adjustable',
+ 'set_anchor', 'set_aspect', 'set_autoscale_on', 'set_autoscalex_on', 'set_autoscaley_on',
+ 'set_axes_locator', 'set_axis_off',    'set_axis_on',   'set_axisbelow',
+ 'set_box_aspect',   'set_fc',          'set_forward_navigation_events',
+ 'set_frame_on',     'set_mouseover( ', 'set_navigate', 'set_navigate_mode',
+ 'set_position',     'set_prop_cycle',  'set_rasterization_zorder',
+ 'set_subplotspec',  'set_title',       'set_xbound', 'set_xlabel',
+ 'set_xlim',    # ax.set_xlim(left, right), or ax.set_xlim(right = 180)
+ 'set_xmargin', 'set_xscale', 'set_xticklabels', 'set_xticks', 'set_ybound',
+ 'set_ylabel',  'set_ylim',   'set_ymargin', 'set_yscale', 'set_yticklabels',
+ 'set_yticks',  'sharex',     'sharey',      'spines', 'start_pan', 'tables',
+ 'text', 'ticklabel_format', 'titleOffsetTrans', 'transAxes', 'transData', 'transLimits',
+ 'transScale', 'update_datalim', 'use_sticky_edges', 'viewLim', 'vlines', 'violin',
+ 'xaxis',      'xaxis_date',     'xaxis_inverted',   'yaxis',   'yaxis_date',
+ 'yaxis_inverted'
 );
 my @fig_methods = (
 	'add_artist', 'add_axes', 'add_axobserver', 'add_callback', 'add_gridspec',
 	'add_subfigure', 'add_subplot',   'align_labels', 'align_titles',
-	'align_xlabels', 'align_ylabels', 'artists',
-	'autofmt_xdate', #'axes', # same as plt
+	'align_xlabels', 'align_ylabels', 'artists',	'autofmt_xdate', #'axes', # same as plt
 	'bbox', 'bbox_inches', 'canvas', 'clear', 'clf', 'clipbox',
 	'colorbar',    # same name as in plt, have to use on case-by-case
 	'contains',           'convert_xunits', 'convert_yunits', 'delaxes', 'dpi',
@@ -172,12 +169,8 @@ my @plt_methods = (
 	'tight_layout', 'time', 'title', 'tricontour', 'tricontourf', 'tripcolor',
 	'triplot', 'twinx',     'twiny', 'uninstall_repl_displayhook', 'violinplot',
 	'viridis', 'waitforbuttonpress', 'winter', 'xcorr', 'xkcd',# 'vlines'
-	'xlabel',
-	#	'xlim',
-	'xscale',
-	#'xticks',
-	'ylabel', 'ylim', 'yscale',
-	#	'yticks'
+	'xlabel','xscale','ylabel', 'ylim', 'yscale',
+#	'xlim','xticks','yticks'
 );
 
 my @arg = ('cmap', 'data', 'execute', 'fh','ncols', 'plot.type',
@@ -188,9 +181,124 @@ my @cb_arg = (
 'cblocation', # of the colorbar None or {'left', 'right', 'top', 'bottom'}
 'cborientation', # None or {'vertical', 'horizontal'}
 'cb_logscale');
-my @colored_table_args = ('col.labels', 'default_undefined', 'mirror', 'row.labels', 'show.numbers', 'undef.color');
-my $cb_regex = join ('|', @cb_arg);
-my $colored_table_regex = join ('|', @colored_table_args);
+my %opt = (
+	barplot_helper => [
+	'color'
+	, # :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed
+	'edgecolor'	, # optional; The colors of the bar edges.
+	'key.order',    # define the keys in an order (an array reference)
+	'label',        # an array of labels for grouped bar plots
+	'linewidth'
+	, # float or array, optional; Width of the bar edge(s). If 0, don't draw edges
+	'log'	,   # bool, default: False; If *True*, set the y-axis to be log scale.
+	'stacked',    # stack the groups on top of one another; default 0 = off
+	'width',      # float or array, default: 0.8; The width(s) of the bars.
+	'xerr', # float or array-like of shape(N,) or shape(2, N), optional. If not *None*, add horizontal / vertical errorbars to the bar tips. The values are +/- sizes relative to the data:        - scalar: symmetric +/- values for all bars #        - shape(N,): symmetric +/- values for each bar #        - shape(2, N): Separate - and + values for each bar. First row #          contains the lower errors, the second row contains the upper #          errors. #        - *None*: No errorbar. (Default)
+	'yerr',    # same as xerr, but better with bar
+	],
+	boxplot_helper => [
+	 'color', # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
+	 'colors', 'key.order',
+	 'notch', # Whether to draw a notched boxplot (`True`), or a rectangular boxplot (`False`)
+	 'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
+	 'showcaps',    # bool: Show the caps on the ends of whiskers; default "True"
+	 'showfliers',
+	 'showmeans',
+	 'whiskers',    # 0 or 1
+	],
+	colored_table_helper => [@cb_arg,
+		'col.labels',
+		'cmap',		# the cmap used for coloring
+		'default_undefined',	# what value should undefined values be assigned to?
+		'mirror',   # $data{A}{B} = $data{B}{A}
+		'row.labels',	# row labels
+		'show.numbers',# show the numbers or not, by default off.  0 = "off"; "show.numbers" > 0 => "on"
+		'undef.color', # what color will undefined points be
+#		'xlabel',	# xlabel prints in a bad position, so I removed this as a possible option
+#		'ylabel',	# ylabel prints under the row labels
+	],
+	hexbin_helper => [
+	  'cb_logscale',
+	  'cmap',         # "gist_rainbow" by default
+	  'key.order',    # define the keys in an order (an array reference)
+	  'marginals',  # If marginals is *True*, plot the marginal density as colormapped rectangles along the bottom of the x-axis and left of the y-axis.
+	  'mincnt'
+	  , # int >= 0, default: 0 If > 0, only display cells with at least *mincnt*        number of points in the cell.
+	  'vmax'
+	  , #  When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
+	  'vmin'
+	  , # When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
+	  'xbins',    # default 15
+	  'xscale.hexbin', # 'linear', 'log'}, default: 'linear': Use a linear or log10 scale on the horizontal axis.
+	  'ybins',    # default 15
+	  'yscale.hexbin', # 'linear', 'log'}, default: 'linear': Use a linear or log10 scale on the vertical axis.
+	],
+	hist_helper => [
+	  'alpha',    # default 0.5; same for all sets
+	  'bins'
+	  , # nt or sequence or str, default: :rc:`hist.bins`If *bins* is an integer, it defines the number of equal-width bins in the range. If *bins* is a sequence, it defines the bin edges, including the left edge of the first bin and the right edge of the last bin; in this case, bins may be unequally spaced.  All but the last  (righthand-most) bin is half-open
+	  'color', # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
+	  'log',            # if set to > 1, the y-axis will be logarithmic
+	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
+	],
+	hist2d_helper => [
+	  'cb_logscale',
+	  'cmap',         # "gist_rainbow" by default
+	  'cmax',         # All bins that has count < *cmin* or > *cmax* will not be displayed
+	  'cmin',         # color min
+	  'density',      # density : bool, default: False
+	  'key.order',    # define the keys in an order (an array reference)
+	  'logscale',     # logscale, an array of axes that will get log scale
+	  'show.colorbar',
+	  'vmax'
+	  , #  When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
+	  'vmin'
+	  , # When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
+	  'xbins',    # default 15
+	  'xmin', 'xmax',
+	  'ymin', 'ymax',
+	  'ybins',    # default 15
+	],
+	imshow_helper => [
+	  'cblabel', # colorbar label
+	  'cbdrawedges', # for colorbar
+	  'cblocation', # of the colorbar None or {'left', 'right', 'top', 'bottom'}
+	  'cborientation', # None or {'vertical', 'horizontal'}
+	  'cmap', # The Colormap instance or registered colormap name used to map scalar data to colors.
+	  'vmax', # float
+	  'vmin', # flat
+	],
+	pie_helper => [
+		'autopct',    # percent wise
+		#labeldistance and pctdistance are ratios of the radius; therefore they vary between 0 for the center of the pie and 1 for the edge of the pie, and can be set to greater than 1 to place text outside the pie https://matplotlib.org/stable/gallery/pie_and_polar_charts/pie_features.html
+		'labeldistance',
+		'pctdistance',
+   ],
+	plot_helper => [
+	 'key.order',      # an array of key strings (which are defined in data)
+	 'show.legend',    # be default on; should be 0 if off
+	 'set.options'
+	],
+	scatter_helper => [
+	  'color_key',    # which of data keys is the color key
+	  'cmap',         # for 3-set scatterplots; default "gist_rainbow"
+	  'keys'
+	  , # specify the order, otherwise alphabetical #'log', # if set to > 1, the y-axis will be logarithmic # 's', # float or array-like, shape (n, ), optional. The marker size in points**2 (typographic points are 1/72 in.).
+	  'set.options'    # color = 'red', marker = 'v', etc.
+	],
+	violin_helper => [
+	 'color', # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
+	 'colors',
+	 'key.order',
+	 'log',            # if set to > 1, the y-axis will be logarithmic
+	 'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
+	 'whiskers'
+	],
+	wide_helper => [
+	  'color',		   # a hash, with each key assigned to a color "blue" or something
+	  'show.legend',  # be default on; should be 0 if off
+	],
+);
 sub plot_args {    # this is a helper function to other matplotlib subroutines
 	my ($args) = @_;
 	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1];
@@ -279,27 +387,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 	  p @undef_args;
 	  die 'the above args are necessary, but were not defined.';
 	}
-	my @opt = (
-	@reqd_args, @ax_methods, @plt_methods, @fig_methods, @arg,
-	'ax',
-	'color'
-	, # :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed
-	'edgecolor'
-	, #:mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar edges.
-	'key.order',    # define the keys in an order (an array reference)
-	'label',        # an array of labels for grouped bar plots
-	'linewidth'
-	, # float or array, optional; Width of the bar edge(s). If 0, don't draw edges
-	'log'
-	,    # bool, default: False; If *True*, set the y-axis to be log scale.
-	'stacked',    # stack the groups on top of one another; default 0 = off
-	'width',      # float or array, default: 0.8; The width(s) of the bars.
-	'xerr'
-	, # float or array-like of shape(N,) or shape(2, N), optional. If not *None*, add horizontal / vertical errorbars to the bar tips. The values are +/- sizes relative to the data:        - scalar: symmetric +/- values for all bars #        - shape(N,): symmetric +/- values for each bar #        - shape(2, N): Separate - and + values for each bar. First row #          contains the lower errors, the second row contains the upper #          errors. #        - *None*: No errorbar. (Default)
-	'yerr',    # same as xerr, but better with bar
-	);
-	@opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
-	@opt = grep {$_ !~ m/^(?:$colored_table_regex)$/} @opt; # args that shouldn't apply
+	my @opt = ('ax', @reqd_args, @ax_methods, @plt_methods, @fig_methods, @arg, @{ $opt{$current_sub} }	);
 	my $plot      = $args->{plot};
 	my @undef_opt = grep {
 	  my $key = $_;
@@ -483,21 +571,8 @@ sub boxplot_helper {
 	  die 'the above args are necessary, but were not defined.';
 	}
 	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'ax',       # used for multiple plots
-	  'color'
-	  , # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
-	  'colors', 'key.order',
-	  'notch', # Whether to draw a notched boxplot (`True`), or a rectangular boxplot (`False`)
-	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
-	  'showcaps'
-	  ,    # bool: Show the caps on the ends of whiskers; default "True"
-	  'showfliers',
-	  'showmeans',
-	  'whiskers',    # 0 or 1
+	  @ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} }
 	);
-	@opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
-	@opt = grep {$_ !~ m/^(?:$colored_table_regex)$/} @opt;
 	my $plot      = $args->{plot};
 	my @undef_opt = grep {
 	  my $key = $_;
@@ -592,18 +667,7 @@ sub colored_table_helper {
 	}
 #	optional args are below
 	my @defined_args = (@reqd_args, @ax_methods, @plt_methods, @fig_methods, @arg,
-	@cb_arg,
-		'ax',       # used for multiple plots
-		'col.labels',
-		'cmap',		# the cmap used for coloring
-		'default_undefined',	# what value should undefined values be assigned to?
-		'mirror',   # $data{A}{B} = $data{B}{A}
-		'row.labels',	# row labels
-		'show.numbers',# show the numbers or not, by default off.  0 = "off"; "show.numbers" > 0 => "on"
-		'undef.color', # what color will undefined points be
-#		'xlabel',	# xlabel prints in a bad position, so I removed this as a possible option
-#		'ylabel',	# ylabel prints under the row labels
-	);
+	'ax', @{ $opt{$current_sub} });
 	my @bad_args = grep { my $key = $_; not grep {$_ eq $key} @defined_args} keys %{ $args };
 	if (scalar @bad_args > 0) {
 		p @bad_args;
@@ -711,23 +775,8 @@ sub hexbin_helper {
 	}
 	my @opt = (
 	  @ax_methods, @fig_methods, @arg, @plt_methods,
-	  'ax',
-	  'cb_logscale',
-	  'cmap',         # "gist_rainbow" by default
-	  'key.order',    # define the keys in an order (an array reference)
-	  'marginals',  # If marginals is *True*, plot the marginal density as colormapped rectangles along the bottom of the x-axis and left of the y-axis.
-	  'mincnt'
-	  , # int >= 0, default: 0 If > 0, only display cells with at least *mincnt*        number of points in the cell.
-	  'vmax'
-	  , #  When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
-	  'vmin'
-	  , # When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
-	  'xbins',    # default 15
-	  'xscale.hexbin', # 'linear', 'log'}, default: 'linear': Use a linear or log10 scale on the horizontal axis.
-	  'ybins',    # default 15
-	  'yscale.hexbin', # 'linear', 'log'}, default: 'linear': Use a linear or log10 scale on the vertical axis.
+	  'ax', @{ $opt{$current_sub} }
 	);
-	@opt = grep {$_ !~ m/^(?:$colored_table_regex)$/} @opt;
 	my $plot = $args->{plot};
 	@undef_args = grep {
 	  my $key = $_;
@@ -837,20 +886,7 @@ sub hist_helper {
 		p @undef_args;
 		die 'the above args are necessary, but were not defined.';
 	}
-	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'alpha',    # default 0.5; same for all sets
-	  'bins'
-	  , # nt or sequence or str, default: :rc:`hist.bins`If *bins* is an integer, it defines the number of equal-width bins in the range. If *bins* is a sequence, it defines the bin edges, including the left edge of the first bin and the right edge of the last bin; in this case, bins may be unequally spaced.  All but the last  (righthand-most) bin is half-open
-	  'color'
-	  , # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
-	  'log',            # if set to > 1, the y-axis will be logarithmic
-	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
-	  'plots', 'ncols', 'nrows', 'output.file', 'fh',
-	  'execute'         # these will be ignored
-	);
-	@opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
-	@opt = grep {$_ !~ m/^(?:$colored_table_regex)$/} @opt;
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
 	my $plot      = $args->{plot};
 	my @undef_opt = grep {
 		my $key = $_;
@@ -915,28 +951,7 @@ sub hist2d_helper {
 	  p @undef_args;
 	  die 'the above args are necessary, but were not defined.';
 	}
-	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'ax',
-	  'cb_logscale',
-	  'cmap',         # "gist_rainbow" by default
-	  'cmax'
-	  ,   # All bins that has count < *cmin* or > *cmax* will not be displayed
-	  'cmin',         # color min
-	  'density',      # density : bool, default: False
-	  'key.order',    # define the keys in an order (an array reference)
-	  'logscale',     # logscale, an array of axes that will get log scale
-	  'show.colorbar',
-	  'vmax'
-	  , #  When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
-	  'vmin'
-	  , # When using scalar data and no explicit *norm*, *vmin* and *vmax* define the data range that the colormap cover
-	  'xbins',    # default 15
-	  'xmin', 'xmax',
-	  'ymin', 'ymax',
-	  'ybins',    # default 15
-	);
-	@opt = grep {$_ !~ m/^(?:$colored_table_regex)$/} @opt;
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
 	my $plot = $args->{plot};
 	@undef_args = grep {
 	  my $key = $_;
@@ -1066,17 +1081,8 @@ sub imshow_helper {
 	  die 'the above args are necessary, but were not defined.';
 	}
 	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'cblabel', # colorbar label
-	  'cbdrawedges', # for colorbar
-	  'cblocation', # of the colorbar None or {'left', 'right', 'top', 'bottom'}
-	  'cborientation', # None or {'vertical', 'horizontal'}
-	  'cmap', # The Colormap instance or registered colormap name used to map scalar data to colors.
-	  'aux',
-	  'vmax', # float
-	  'vmin', # flat
+	  @ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} }
 	);
-	@opt = grep {$_ !~ m/^(?:$colored_table_regex)$/} @opt;
 	my $plot = $args->{plot};
 	@undef_args = grep {
 	  my $key = $_;
@@ -1087,7 +1093,6 @@ sub imshow_helper {
 	  die
 	"The above arguments aren't defined for $plot->{'plot.type'} in $current_sub";
 	}
-	my $i = 0;
 	print { $args->{fh} } 'd = [';
 	my ($min_val, $max_val) = ('inf', '-inf');
 	foreach my $row (@{ $plot->{data} }) {
@@ -1122,64 +1127,55 @@ sub imshow_helper {
 }
 
 sub pie_helper {
-    my ($args) = @_;
-    my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
-      ; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
-    unless ( ref $args eq 'HASH' ) {
-        die
-"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
-    }
-    my @reqd_args = (
-        'ax',
-        'fh',      # e.g. $py, $fh, which will be passed by the subroutine
-        'plot',    # args to original function
-    );
-    my @undef_args = grep { !defined $args->{$_} } @reqd_args;
-    if ( scalar @undef_args > 0 ) {
-        p @undef_args;
-        die 'the above args are necessary, but were not defined.';
-    }
-    my @opt = (
-        @ax_methods, @plt_methods, @fig_methods, @arg,
-        'autopct',    # percent wise
-        'ax',
-#labeldistance and pctdistance are ratios of the radius; therefore they vary between 0 for the center of the pie and 1 for the edge of the pie, and can be set to greater than 1 to place text outside the pie https://matplotlib.org/stable/gallery/pie_and_polar_charts/pie_features.html
-        'labeldistance',
-        'pctdistance',
-    );
-    @opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
-    my $plot      = $args->{plot};
-    my @undef_opt = grep {
-        my $key = $_;
-        not grep { $_ eq $key } @opt
-    } keys %{$plot};
-    if ( scalar @undef_opt > 0 ) {
-        p @undef_opt;
-        die
-"The above arguments aren't defined for $plot->{'plot.type'} in $current_sub";
-    }
-    my @key_order;
-    if ( defined $plot->{'key.order'} ) {
-        @key_order = @{ $plot->{'key.order'} };
-    }
-    else {
-        @key_order = sort keys %{ $plot->{data} };
-    }
-    $plot->{autopct} = $plot->{autopct} // '';
-    my $opt = '';
-    if ( $plot->{autopct} ne '' ) {
-        $opt .= ", autopct = '$plot->{autopct}'";
-    }
-    foreach
-      my $arg ( grep { defined $plot->{$_} } 'labeldistance', 'pctdistance' )
-    {
-        $opt .= ", $arg = $plot->{$arg}";
-    }
-    say { $args->{fh} } 'labels = ["' . join( '","', @key_order ) . '"]';
-    say { $args->{fh} } 'vals = ['
-      . join( ',', @{ $plot->{data} }{@key_order} ) . ']';
-    my $ax = $args->{ax} // '';
-    say { $args->{fh} } "ax$ax.pie(vals, labels = labels $opt)";
+	my ($args) = @_;
+	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
+	; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
+	unless ( ref $args eq 'HASH' ) {
+	  die
+	"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
+	}
+	my @reqd_args = (
+	  'ax',
+	  'fh',   # e.g. $py, $fh, which will be passed by the subroutine
+	  'plot', # args to original function
+	);
+	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
+	if ( scalar @undef_args > 0 ) {
+	  p @undef_args;
+	  die 'the above args are necessary, but were not defined.';
+	}
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
+	my $plot      = $args->{plot};
+	my @undef_opt = grep {
+	  my $key = $_;
+	  not grep { $_ eq $key } @opt
+	} keys %{$plot};
+	if ( scalar @undef_opt > 0 ) {
+	  p @undef_opt;
+	  die
+	"The above arguments aren't defined for $plot->{'plot.type'} in $current_sub";
+	}
+	my @key_order;
+	if ( defined $plot->{'key.order'} ) {
+	  @key_order = @{ $plot->{'key.order'} };
+	} else {
+	  @key_order = sort keys %{ $plot->{data} };
+	}
+	$plot->{autopct} = $plot->{autopct} // '';
+	my $opt = '';
+	if ( $plot->{autopct} ne '' ) {
+	$opt .= ", autopct = '$plot->{autopct}'";
+	}
+	foreach
+	my $arg ( grep { defined $plot->{$_} } 'labeldistance', 'pctdistance' )
+	{
+	  $opt .= ", $arg = $plot->{$arg}";
+	}
+	say { $args->{fh} } 'labels = ["' . join( '","', @key_order ) . '"]';
+	say { $args->{fh} } 'vals = ['
+	. join( ',', @{ $plot->{data} }{@key_order} ) . ']';
+	my $ax = $args->{ax} // '';
+	say { $args->{fh} } "ax$ax.pie(vals, labels = labels $opt)";
 }
 
 sub plot_helper {
@@ -1200,10 +1196,7 @@ sub plot_helper {
 	  die 'the above args are necessary, but were not defined.';
 	}
 	my @opt = (
-	  @ax_methods, @fig_methods, @arg, @plt_methods,
-	  'key.order',      # an array of key strings (which are defined in data)
-	  'show.legend',    # be default on; should be 0 if off
-	  'set.options'
+	  @ax_methods, @fig_methods, @arg, @plt_methods, 'ax', @{ $opt{$current_sub} }
 	);
 	my $plot      = $args->{plot};
 	my @undef_opt = grep {
@@ -1304,7 +1297,7 @@ sub plot_helper {
 			$options = ", $plot->{'set.options'}{$set}";
 		}
 		my $label = '';
-		if ( $plot->{'show.legend'} > 0 ) {
+		if ( $plot->{'show.legend'} ) {
 			$label = ",label = '$set'";
 		}
 		say { $args->{fh} } "ax$args->{ax}.plot(x, y $label $options) # " . __LINE__;
@@ -1330,14 +1323,7 @@ sub scatter_helper {
 	  p @undef_args;
 	  die 'the above args are necessary, but were not defined.';
 	}
-	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'color_key',    # which of data keys is the color key
-	  'cmap',         # for 3-set scatterplots; default "gist_rainbow"
-	  'keys'
-	  , # specify the order, otherwise alphabetical #'log', # if set to > 1, the y-axis will be logarithmic # 's', # float or array-like, shape (n, ), optional. The marker size in points**2 (typographic points are 1/72 in.).
-	  'set.options'    # color = 'red', marker = 'v', etc.
-	);
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
 	my $plot      = $args->{plot};
 	my @undef_opt = grep {
 	  my $key = $_;
@@ -1489,19 +1475,7 @@ sub violin_helper {
 	  p @undef_args;
 	  die 'the above args are necessary, but were not defined.';
 	}
-	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'ax',       # used for multiple plots
-	  'color'
-	  , # a hash, where keys are the keys in data, and values are colors, e.g. X => 'blue'
-	  'colors',
-	  'key.order',
-	  'log',            # if set to > 1, the y-axis will be logarithmic
-	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
-	  'whiskers',
-	  'plots', 'ncols', 'nrows', 'output.file', 'fh',
-	  'execute'         # these will be ignored
-	);
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
 	my $plot      = $args->{plot};
 	my @undef_opt = grep {
 	  my $key = $_;
@@ -1653,11 +1627,7 @@ sub wide_helper {
 		p @undef_args;
 		die "the above args are necessary for $current_sub, but were not defined.";
 	}
-	my @opt = (
-	  @ax_methods, @plt_methods, @fig_methods, @arg,
-	  'color',		   # a hash, with each key assigned to a color "blue" or something
-	  'show.legend',  # be default on; should be 0 if off
-	);
+	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
 	my $plot      = $args->{plot};
 	$plot->{'show.legend'} = $plot->{'show.legend'} // 1;
 	my @undef_opt = grep {
@@ -1748,18 +1718,18 @@ sub print_type {
    }
    return $type;
 }
-
+my @all_opt;
+foreach my $type (keys %opt) {
+	push @all_opt, @{ $opt{$type} };
+}
 sub plt {
 	my ($args) = @_;
 	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
 	; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
 	unless ( ref $args eq 'HASH' ) {
-	  die
-	"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
+	  die "args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
 	}
-	my @reqd_args = (
-	  'output.file',    # e.g. "my_image.svg"
-	);
+	my @reqd_args = ('output.file'); # e.g. "my_image.svg"
 	my $single_example = 'plt({
 	\'output.file\' => \'/tmp/gospel.word.counts.svg\',
 	\'plot.type\'       => \'bar\',
@@ -1803,11 +1773,8 @@ sub plt {
 		p $args;
 		die 'either "plot.type" or "plots" must be defined, but neither were';
 	}
-	my @defined_args = (
-	@reqd_args, @ax_methods, @fig_methods,  @plt_methods, @cb_arg,
-	@arg,       'add', 'key.order', 'set.options', 'color', 'scale',
-	'colors',   'show.legend', @colored_table_args
-	);
+	my @defined_args = (@reqd_args, @ax_methods, @fig_methods,  @plt_methods,
+	@arg, 'add', 'scale', @all_opt, 'arr');
 	my @bad_args = grep {
 	  my $key = $_;
 	  not grep { $_ eq $key } @defined_args
@@ -1858,11 +1825,11 @@ sub plt {
 	  die 'There are not enough subplots for the data';
 	}
 	my @ax = map { "ax$_" } 0 .. $args->{nrows} * $args->{ncols} - 1;
-	my ( @py, @y, $fh, $temp_py );
+	my ( @py, @y, $fh );
 	my $i = 0;
 	foreach my $ax (@ax) {
-		my $a1i = int $i / $args->{ncols};    # 1st index
-		my $a2i = $i % $args->{ncols};        # 2nd index
+		my $a1i = int $i / $args->{ncols}; # 1st index
+		my $a2i = $i % $args->{ncols};     # 2nd index
 		$y[$a1i][$a2i] = $ax;
 		$i++;
 	}
@@ -1984,11 +1951,6 @@ sub plt {
 			} # sometimes, I need "ax" methods instead of plt, while keeping calling simpler
 		}
 		delete $args->{add};
-	}
-	if ($single_plot == 1) {
-		if ( not defined $args->{'plot.type'} ) {
-			die "\"plot.type\" is not defined for \"$current_sub\"";
-		}
 		if ( $args->{'plot.type'} =~ m/^barh?$/ ) {  # barplot: "bar" and "barh"
 			barplot_helper({
 				fh   => $fh,
@@ -2518,10 +2480,9 @@ Requires python3 and matplotlib installations.
 
 Simplest use case:
 
- use Matplotlib::Simple 'plt';
- plt({
+ use Matplotlib::Simple;
+ bar({
     'output.file'     => '/tmp/gospel.word.counts.png',
-    'plot.type'       => 'bar',
     data              => {
        Matthew => 18345,
        Mark    => 11304,
@@ -2530,14 +2491,12 @@ Simplest use case:
     }
  });
 
-where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<fh> are all specific to C<MatPlotLib::Simple>.
+A nore complete (and slightly faster execution):
 
-As of version 0.11, all plot types are available as their own subroutines for making B<single> plots.
-For example, the above code is equivalent to the shorter version:
-
- use Matplotlib::Simple 'bar';
- bar({
+ use Matplotlib::Simple;
+ plt({
     'output.file'     => '/tmp/gospel.word.counts.png',
+    'plot.type'       => 'bar',
     data              => {
        Matthew => 18345,
        Mark    => 11304,
@@ -2592,6 +2551,7 @@ which produces the following subplots image:
 
 
 C<bar>, C<barh>, C<boxplot>, C<hexbin>, C<hist>, C<hist2d>, C<imshow>, C<pie>, C<plot>, C<scatter>, and C<violinplot> all match the methods in matplotlib itself.
+
 =head1 Examples/Plot Types
 
 Consider the following helper subroutines to generate data to plot:

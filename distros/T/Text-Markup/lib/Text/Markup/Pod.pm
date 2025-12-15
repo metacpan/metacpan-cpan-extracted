@@ -14,7 +14,7 @@ sub import {
 # Disable the use of HTML::Entities.
 $Pod::Simple::XHTML::HAS_HTML_ENTITIES = 0;
 
-our $VERSION = '0.33';
+our $VERSION = '0.40';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -96,7 +96,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2025 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

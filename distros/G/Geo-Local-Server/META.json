@@ -1,16 +1,16 @@
 {
    "abstract" : "Returns the configured coordinates of the local server",
    "author" : [
-      "Michael R. Davis (mdavis@stopllc.com)"
+      "Michael R. Davis"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Local-Server",
    "no_index" : {
@@ -40,5 +40,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Geo-Local-Server/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Geo-Local-Server",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Geo-Local-Server.git"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

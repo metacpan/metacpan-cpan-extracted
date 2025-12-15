@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Local::Server
 
+0.10 2025-12-14
+  - Updated for GitHub
+  - Updated license from BSD to MIT
+
 0.09 2015-01-12
   - Updated scripts to be compatible with older versions of DateTime::Event::Sunrise
   - Updated scripts (-m option) to remove possible math issues in locales that practice daylight savings

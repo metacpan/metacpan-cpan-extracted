@@ -7,7 +7,7 @@ use Text::Markup;
 use Text::Markup::Cmd;
 use utf8;
 
-our $VERSION = '0.33';
+our $VERSION = '0.40';
 
 sub import {
     # Replace Text::Markup::Asciidoc.
@@ -116,7 +116,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2012-2024 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2012-2025 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

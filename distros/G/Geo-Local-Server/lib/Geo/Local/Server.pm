@@ -7,7 +7,7 @@ use Path::Class qw{file};
 #runtime use Win32 if Windows
 #runtime use Sys::Config unless Windows
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Geo::Local::Server - Returns the configured coordinates of the local server
 =head1 SYNOPSIS
 
   use Geo::Local::Server;
-  my $gls=Geo::Local::Server->new;
-  my ($lat, $lon)=$gls->latlon;
+  my $gls         = Geo::Local::Server->new;
+  my ($lat, $lon) = $gls->latlon;
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ Typical use is with the provided scripts
 =head2 One Liner
 
   $ perl -MGeo::Local::Server -e 'printf "Lat: %s, Lon: %s\n", Geo::Local::Server->new->latlon'
-  Lat: 38.780276, Lon: -77.386706
+  Lat: 38.7803, Lon: -77.3867
 
 =head1 METHODS
 
@@ -84,32 +84,32 @@ Returns a list of longitude, latitude and height above the ellipsoid
 sub lonlathae {
   my $self=shift;
   unless ($self->{"lonlathae"}) {
-    my $coordinates="";
-    my $envname=$self->envname;
-    my $file="";
+    my $coordinates = "";
+    my $envname     = $self->envname;
+    my $file        = "";
     if ($envname) {
-      $coordinates=$ENV{$envname} || "";
-      $coordinates=~s/^\s*//; #trim white space from beginning
-      $coordinates=~s/\s*$//; #trim white space from end
+      $coordinates =  $ENV{$envname} || "";
+      $coordinates =~ s/^\s*//; #trim white space from beginning
+      $coordinates =~ s/\s*$//; #trim white space from end
     }
     if ($coordinates) {
       #First Step Pull from environment which can be configured by user
-      my ($lon, $lat, $hae)=split(/\s+/, $coordinates);
-      $self->{"lonlathae"}=[$lon, $lat, $hae];
-    } elsif (defined($file=$self->configfile) and -r $file and defined($self->ci) and $self->ci->SectionExists("wgs84")) {
+      my ($lon, $lat, $hae) = split(/\s+/, $coordinates);
+      $self->{"lonlathae"}  = [$lon, $lat, $hae];
+    } elsif (defined($file = $self->configfile) and -r $file and defined($self->ci) and $self->ci->SectionExists("wgs84")) {
       #We assign the config filename inside the elsif to not load runtime requires if we hit the ENV above.
       #Second Step Pull from file system which can be configured by system
-      my $lat=$self->ci->val(wgs84 => "latitude");
-      my $lon=$self->ci->val(wgs84 => "longitude");
-      my $hae=$self->ci->val(wgs84 => "hae");
-      $self->{"lonlathae"}=[$lon, $lat, $hae];
+      my $lat = $self->ci->val(wgs84 => "latitude");
+      my $lon = $self->ci->val(wgs84 => "longitude");
+      my $hae = $self->ci->val(wgs84 => "hae");
+      $self->{"lonlathae"} = [$lon, $lat, $hae];
     } else {
       #TODO: GeoIP
       #TODO: gpsd
       #TODO: some kind of memory block transfer
-      my $error=qq{Error: None of the following supported coordinate standards are configured.\n\n};
-      $error.=$envname  ? qq{  - Environment variable "$envname" is not set\n} : qq{  - Environment variable is disabled\n};
-      $error.=$file     ? qq{  - Config file "$file" is not readable.\n}       : qq{  - Config file is disabled\n};
+      my $error = qq{Error: None of the following supported coordinate standards are configured.\n\n};
+      $error   .= $envname  ? qq{  - Environment variable "$envname" is not set\n} : qq{  - Environment variable is disabled\n};
+      $error   .= $file     ? qq{  - Config file "$file" is not readable.\n}       : qq{  - Config file is disabled\n};
       die("$error ");
     }
   }
@@ -129,36 +129,38 @@ Sets and returns the name of the environment variable.
 =cut
 
 sub envname {
-  my $self=shift;
-  $self->{"envname"}=shift if $_;
-  $self->{"envname"}="COORDINATES_WGS84_LON_LAT_HAE" unless defined $self->{"envname"};
+  my $self           = shift;
+  $self->{"envname"} = shift if $_;
+  $self->{"envname"} = $self->_envname_default unless defined $self->{"envname"};
   return $self->{"envname"};
 }
+
+sub _envname_default {'COORDINATES_WGS84_LON_LAT_HAE'}
 
 =head2 configfile
 
 Sets and returns the location of the local.coordinates filename.
 
-  my $var=$gls->configfile; #default /etc/local.coordinates or C:\Windows\local.coordinates
+  my $var = $gls->configfile; #default /etc/local.coordinates or C:\Windows\local.coordinates
   $gls->configfile("");     #disable file-based lookup
   $gls->configfile(undef);  #reset to default
 
 =cut
 
 sub configfile {
-  my $self=shift;
-  $self->{"configfile"}=shift if @_;
+  my $self              = shift;
+  $self->{"configfile"} = shift if @_;
   unless (defined $self->{"configfile"}) {
-    my $file="local.coordinates";
-    my $path="/etc"; #default is unix-like systems
+    my $file = "local.coordinates";
+    my $path = "/etc"; #default is unix-like systems
     if ($^O eq "MSWin32") {
       eval("use Win32");
-      $path=eval("Win32::GetFolderPath(Win32::CSIDL_WINDOWS)") unless $@;
+      $path = eval("Win32::GetFolderPath(Win32::CSIDL_WINDOWS)") unless $@;
     } else {
       eval("use Sys::Path");
-      $path=eval("Sys::Path->sysconfdir") unless $@;
+      $path = eval("Sys::Path->sysconfdir") unless $@;
     }
-    $self->{"configfile"}=file($path => $file); #isa Path::Class::File
+    $self->{"configfile"} = file($path => $file); #isa Path::Class::File
   }
   return $self->{"configfile"};
 }
@@ -179,7 +181,7 @@ I recommend building and installing an RPM with the included SPEC file which ins
 
 Otherwise you can export the COORDINATES_WGS84_LON_LAT_HAE variable or add it to your .bashrc file.
 
-  export COORDINATES_WGS84_LON_LAT_HAE="-77.386706 38.780276 63"
+  export COORDINATES_WGS84_LON_LAT_HAE="-77.3867 38.7803 63"
 
 =head2 Format
 
@@ -189,8 +191,8 @@ The /etc/local.coordinates file is an INI file. The [wgs84] section is required 
   version=1
 
   [wgs84]
-  latitude=38.780276
-  longitude=-77.386706
+  latitude=38.7803
+  longitude=-77.3867
   hae=63
 
 =head1 OBJECT ACCESSORS
@@ -199,45 +201,33 @@ The /etc/local.coordinates file is an INI file. The [wgs84] section is required 
 
 Returns the L<Config::IniFiles> object so that you can read additional information from the INI file.
 
-  my $config=$gls->ci; #isa Config::IniFiles
+  my $config = $gls->ci; #isa Config::IniFiles
 
 Example
 
-  my $version=$gls->ci->val("main", "version");
+  my $version = $gls->ci->val("main", "version");
 
 =cut
 
 sub ci {
-  my $self=shift;
-  my $file=$self->configfile; #support for objects that can stringify paths.
-  $self->{'ci'}=Config::IniFiles->new(-file=>"$file")
+  my $self      = shift;
+  my $file      = $self->configfile; #support for objects that can stringify paths.
+  $self->{'ci'} = Config::IniFiles->new(-file=>"$file")
     unless ref($self->{'ci'}) eq "Config::IniFiles";
   return $self->{'ci'};
 }
 
 =head1 BUGS
 
-Please log on RT and send an email to the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
+Please log on GitHub
 
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 
-This program is free software licensed under the...
-
-  The BSD License
-
-The full text of the license can be found in the LICENSE file included with this module.
+MIT
 
 =head1 SEE ALSO
 

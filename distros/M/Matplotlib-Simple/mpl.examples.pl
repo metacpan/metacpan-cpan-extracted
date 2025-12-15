@@ -463,7 +463,6 @@ plt({
 	nrows => 2,
 });
 plt({
-	'output.file' => 'output.images/single.barplot.png',
 	data              => { # simple hash
 		Fri => 76,
 		Mon => 73,
@@ -473,12 +472,13 @@ plt({
 		Tue => 93,
 		Wed => 77
 	},
+	execute      => 0,
+	fh           => $fh,
+	'output.file' => 'output.images/single.barplot.png',
 	'plot.type'  => 'bar',
+	title        => 'Customer Calls by Days',
 	xlabel       => '# of Days',
 	ylabel       => 'Count',
-	title        => 'Customer Calls by Days',
-	execute      => 0,
-	fh => $fh,
 });
 plt({
 	data => {
@@ -1386,6 +1386,21 @@ plt({
 	ncols         => 3,
 	set_figwidth  => 14,
 	suptitle      => 'Colored Table options'
+});
+plt({
+	'plot.type'   => 'plot',
+	data          => {
+		'expo' => [
+			[@x],
+			[map { 1 + 1 / ( $_**2 + 1) } @x]
+		]
+	},
+	execute       => 0,
+	fh            => $fh,
+	hlines        => "1,$x[0],$x[-1], linestyles = 'dashed'",
+	'output.file' => 'output.images/hlines.png',
+	set_xlim      => "$x[0],$x[-1]",
+	'show.legend' => 0
 });
 plt({
 	fh                => $fh,

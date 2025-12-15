@@ -1,25 +1,30 @@
 ---
 abstract: 'Returns the configured coordinates of the local server'
 author:
-  - 'Michael R. Davis (mdavis@stopllc.com)'
+  - 'Michael R. Davis'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Geo-Local-Server
 no_index:
   directory:
     - t
     - inc
 requires:
-  Config::IniFiles: 0
-  Package::New: 0
-  Path::Class: 0
-  Test::Simple: 0.44
-version: 0.09
+  Config::IniFiles: '0'
+  Package::New: '0'
+  Path::Class: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-Local-Server/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-Local-Server
+  repository: https://github.com/mrdvt92/perl-Geo-Local-Server.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

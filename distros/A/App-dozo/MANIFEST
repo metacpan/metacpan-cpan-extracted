@@ -1,0 +1,16 @@
+Build.PL
+CLAUDE.md
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/dozo.pm
+minil.toml
+script/dozo
+t/00_compile.t
+t/03_dozo.t
+xt/author/docker_dozo.t
+share/getoptlong/getoptlong.sh
+META.yml
+MANIFEST

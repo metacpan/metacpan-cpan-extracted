@@ -33,6 +33,7 @@ my @modules = qw(
 	Lexical::Sub
 	List::Util
 	Module::Runtime
+	MRO::Compat
 	Role::Tiny
 	Scalar::Util
 	Sub::HandlesVia
@@ -41,7 +42,6 @@ my @modules = qw(
 	Type::Tiny
 	Type::Tiny::XS
 	constant
-	mro::compat
 	strict
 	warnings
 );
@@ -49,7 +49,7 @@ my @modules = qw(
 diag "\n####";
 for my $mod ( sort @modules ) {
 	eval "require $mod;";
-	diag sprintf( '%-26s %s', $mod, eval { $mod->VERSION } // '-' );
+	diag sprintf( '%-26s %s', $mod, eval { $mod->VERSION } or '-' );
 }
 diag "####";
 

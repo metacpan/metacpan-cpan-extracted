@@ -968,8 +968,12 @@ static infix_status parse_function_signature_details(parser_state * state,
 c23_nodiscard infix_status _infix_parse_type_internal(infix_type ** out_type,
                                                       infix_arena_t ** out_arena,
                                                       const char * signature) {
-    if (!out_type || !out_arena || !signature || *signature == '\0') {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+    if (!out_type || !out_arena) {
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
+        return INFIX_ERROR_INVALID_ARGUMENT;
+    }
+    if (!signature || *signature == '\0') {
+        _infix_set_error(INFIX_CATEGORY_PARSER, INFIX_CODE_EMPTY_SIGNATURE, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     // The top-level public API is responsible for setting g_infix_last_signature_context.
@@ -1078,22 +1082,36 @@ c23_nodiscard infix_status infix_signature_parse(const char * signature,
                                                  size_t * out_num_fixed_args,
                                                  infix_registry_t * registry) {
     _infix_clear_error();
-    if (!signature || !out_arena || !out_ret_type || !out_args || !out_num_args || !out_num_fixed_args) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+
+    //
+    if (!signature) {
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
+    if (*signature == '\0') {
+        _infix_set_error(INFIX_CATEGORY_PARSER, INFIX_CODE_EMPTY_SIGNATURE, 0);
+        return INFIX_ERROR_INVALID_ARGUMENT;
+    }
+    if (!out_arena || !out_ret_type || !out_args || !out_num_args || !out_num_fixed_args) {
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
+        return INFIX_ERROR_INVALID_ARGUMENT;
+    }
+
     g_infix_last_signature_context = signature;
-    // 1. "Parse" stage
+
+    // Parse stage
     infix_type * raw_func_type = nullptr;
     infix_arena_t * parser_arena = nullptr;
     infix_status status = _infix_parse_type_internal(&raw_func_type, &parser_arena, signature);
     if (status != INFIX_SUCCESS)
         return status;
+
     if (raw_func_type->category != INFIX_TYPE_REVERSE_TRAMPOLINE) {
         infix_arena_destroy(parser_arena);
         _infix_set_error(INFIX_CATEGORY_PARSER, INFIX_CODE_UNEXPECTED_TOKEN, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
+
     // Create final arena
     *out_arena = infix_arena_create(8192);
     if (!*out_arena) {
@@ -1101,7 +1119,8 @@ c23_nodiscard infix_status infix_signature_parse(const char * signature,
         _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_OUT_OF_MEMORY, 0);
         return INFIX_ERROR_ALLOCATION_FAILED;
     }
-    // 2. "Copy" stage
+
+    // "Copy" stage
     infix_type * final_func_type = _copy_type_graph_to_arena(*out_arena, raw_func_type);
     infix_arena_destroy(parser_arena);
     if (!final_func_type) {
@@ -1110,7 +1129,8 @@ c23_nodiscard infix_status infix_signature_parse(const char * signature,
         _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_OUT_OF_MEMORY, 0);
         return INFIX_ERROR_ALLOCATION_FAILED;
     }
-    // 3. "Resolve" and 4. "Layout" stages
+
+    // Resolve and layout stages
     status = _infix_resolve_type_graph_inplace(&final_func_type, registry);
     if (status != INFIX_SUCCESS) {
         infix_arena_destroy(*out_arena);
@@ -1118,6 +1138,7 @@ c23_nodiscard infix_status infix_signature_parse(const char * signature,
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     _infix_type_recalculate_layout(final_func_type);
+
     // Unpack the results for the caller from the final, processed function type object.
     *out_ret_type = final_func_type->meta.func_ptr_info.return_type;
     *out_args = final_func_type->meta.func_ptr_info.args;
@@ -1125,6 +1146,7 @@ c23_nodiscard infix_status infix_signature_parse(const char * signature,
     *out_num_fixed_args = final_func_type->meta.func_ptr_info.num_fixed_args;
     return INFIX_SUCCESS;
 }
+
 // Type Printing Logic
 /**
  * @internal
@@ -1539,7 +1561,7 @@ c23_nodiscard infix_status infix_type_print(char * buffer,
                                             infix_print_dialect_t dialect) {
     _infix_clear_error();
     if (!buffer || buffer_size == 0 || !type) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     printer_state state = {buffer, buffer_size, INFIX_SUCCESS};
@@ -1587,7 +1609,7 @@ c23_nodiscard infix_status infix_function_print(char * buffer,
                                                 infix_print_dialect_t dialect) {
     _infix_clear_error();
     if (!buffer || buffer_size == 0 || !ret_type || (num_args > 0 && !args)) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     printer_state state = {buffer, buffer_size, INFIX_SUCCESS};

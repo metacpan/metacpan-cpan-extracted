@@ -183,7 +183,7 @@ c23_nodiscard infix_registry_t * infix_registry_create(void) {
 c23_nodiscard infix_registry_t * infix_registry_create_in_arena(infix_arena_t * arena) {
     _infix_clear_error();
     if (!arena) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return nullptr;
     }
     infix_registry_t * registry = infix_malloc(sizeof(infix_registry_t));
@@ -428,7 +428,7 @@ static char * _registry_parser_parse_name(_registry_parser_state_t * state, char
 c23_nodiscard infix_status infix_register_types(infix_registry_t * registry, const char * definitions) {
     _infix_clear_error();
     if (!registry || !definitions) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     _registry_parser_state_t state = {.p = definitions, .start = definitions};

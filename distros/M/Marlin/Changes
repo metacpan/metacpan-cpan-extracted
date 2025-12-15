@@ -6,6 +6,21 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.002005	2025-12-15
+
+ [ Bug Fixes ]
+ - Remove usage of // operator from test case too.
+
+0.002004	2025-12-15
+
+ [ Bug Fixes ]
+ - Remove usage of // operator.
+
+0.002003	2025-12-15
+
+ [ Bug Fixes ]
+ - Fix case of MRO::Compat dependency on Perl older than v5.10.0.
+
 0.002002	2025-12-13
 
  [ Documentation ]

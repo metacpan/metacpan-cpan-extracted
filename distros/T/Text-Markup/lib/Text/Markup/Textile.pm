@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Text::Textile 2.10;
 
-our $VERSION = '0.33';
+our $VERSION = '0.40';
 
 sub import {
     # Replace the regex if passed one.
@@ -119,7 +119,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2025 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

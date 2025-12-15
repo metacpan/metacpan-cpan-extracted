@@ -1,5 +1,8 @@
 Revision history for Task-BeLike-SHLOMIF
 
+0.0.12     2025-12-15
+    - Add more, including WWW::LinkChecker::Internal
+
 0.0.11     2025-01-29
     - Add more, including Net::GitHub
 

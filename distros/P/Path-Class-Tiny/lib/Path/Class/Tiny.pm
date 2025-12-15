@@ -4,7 +4,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 use Exporter;
 our @EXPORT = qw< cwd path file tempfile tempdir >;						# dir() handled by `import`
@@ -148,8 +148,10 @@ sub slurp
 	else
 	{
 		croak "'split' argument can only be used in list context" if $splitter;
-		croak "'chomp' argument not implemented in scalar context" if exists $args{chomp};
-		return $self->Path::Tiny::slurp(\%args);
+		my $do_chomp = delete $args{chomp};
+		my $data = $self->Path::Tiny::slurp(\%args);
+		chomp $data if $do_chomp;
+		return $data;
 	}
 }
 
@@ -214,7 +216,7 @@ Path::Class::Tiny - a Path::Tiny wrapper for Path::Class compatibility
 
 =head1 VERSION
 
-This document describes version 0.06 of Path::Class::Tiny.
+This document describes version 0.07 of Path::Class::Tiny.
 
 =head1 SYNOPSIS
 
@@ -291,10 +293,15 @@ sent as a hash and B<not> as a hashref.
     my $data = $file->slurp;                        # one big string
     my @data = $file->slurp;                        # one element per line
     my @data = $file->slurp(chomp => 1);            # chomp every line
+    my $data = $file->slurp(chomp => 1);            # chomp trailing newline
     my @data = $file->slurp(iomode => '<:crlf');    # Path::Class style; works
     my @data = $file->slurp(binmode => ':crlf');    # vaguely Path::Tiny style; also works
-    my @data = $file->slurp({binmode => ':crlf'});  # this one doesn't work
-    my $data = $file->slurp(chomp => 1);            # neither does this one, because it's weird
+    my @data = $file->slurp({binmode => ':crlf'});  # this one doesn't work (hashref instead of hash)
+
+Note that this one: C<< my $data = $file->slurp(chomp => 1) >> is a I<little> weird, because,
+assuming your file has multiple lines, you're only going to chomp the last one.  But perhaps your
+file only has one line, in which case autochomping that single line on the way out is quite useful.
+So we make it work even in scalar context.
 
 =head1 DETAILS
 
@@ -553,7 +560,7 @@ If L<Date::Easy> is not installed, you get a runtime error when you call C<mtime
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -565,12 +572,12 @@ You can find documentation for this module with the perldoc command.
 
 =head2 Bugs / Feature Requests
 
-This module is on GitHub.  Feel free to fork and submit patches.  Please note that I develop
-via TDD (Test-Driven Development), so a patch that includes a failing test is much more
-likely to get accepted (or at least likely to get accepted more quickly).
+		This module is on GitHub.  Feel free to fork and submit patches.  Please note that I develop
+		via TDD (Test-Driven Development), so a patch that includes a failing test is much more
+		likely to get accepted (or least likely to get accepted more quickly).
 
-If you just want to report a problem or suggest a feature, that's okay too.  You can create
-an issue on GitHub here: L<https://github.com/barefootcoder/path-class-tiny/issues>.
+		If you just want to report a problem or suggest a feature, that's okay too.  You can create
+		an issue on GitHub here: L<http://github.com/barefootcoder/path-class-tiny/issues>.
 
 =head2 Source Code
 
@@ -585,7 +592,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Buddy Burden.
+This software is Copyright (c) 2025 by Buddy Burden.
 
 This is free software, licensed under:
 

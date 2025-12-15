@@ -14,7 +14,7 @@ App::Greple::xlate — модуль поддержки перевода для g
 
 # VERSION
 
-Version 0.9920
+Version 0.9922
 
 # DESCRIPTION
 

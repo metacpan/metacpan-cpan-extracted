@@ -67,6 +67,6 @@
          "web" : "https://github.com/jkeenan/perl5-test-cpan-against-commit"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

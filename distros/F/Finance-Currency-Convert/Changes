@@ -29,9 +29,21 @@ Revision history for Perl extension Finance::Currency::Convert.
 	- fix test case with floating point comparison
 
 1.07  Mon Jan 13 16:00:00 CEST 2009
-	- add fixed Euro conversion rates for SKK
+	- add fixed Euro conversion rate for SKK
 	- warn if updateRates() is used, but Finance::Quote is not installed
 
 1.08  Sat Jan 1 10:00:00 CEST 2011
-	- add fixed Euro conversion rates for EEK
+	- add fixed Euro conversion rate for EEK
+
+2.00  Sun Dec 14 14:00:00 CEST 2025
+	- fetch currency rates from European Central Bank (ECB)
+	- add fixed Euro conversion rates for LTL, LVL, HRK and BGN
+
+2.01  Sun Dec 14 16:00:00 CEST 2025
+	- fix reading and writing stored rates
+
+2.02  Sun Dec 14 16:00:00 CEST 2025
+	- accept rates file name in constructor
+	- fix: keep setRateFile() semanticas to read the file, too
+	- fix: don't write unknow rate combinations
 

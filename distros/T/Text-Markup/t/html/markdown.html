@@ -6,14 +6,37 @@
 <h1>Markdown Test File</h1>
 
 <p>This file tests the <a href="https://daringfireball.net/projects/markdown/">Markdown</a>
-parser — which is powered by <a href="https://p3rl/Text::Markdown">Text::Markdown</a>.
+parser — which is powered by <a href="https://p3rl.org/Text::Markdown::Discount">Text::Markdown::Discount</a>.
 Öy.</p>
 
-<p><code>go
-func main() {
+<pre><code class="go">func main() {
     fmt.Println("hello")
 }
-</code></p>
+</code></pre>
+
+<dl>
+<dt>Term 1</dt>
+<dt>Term 2</dt>
+<dd>  Definition a</dd>
+<dt>Term 3</dt>
+<dd>  Definition b</dd>
+</dl>
+
+<table>
+<thead>
+<tr>
+<th> foo </th>
+<th> bar </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> baz </td>
+<td> bim </td>
+</tr>
+</tbody>
+</table>
+
 
 </body>
 </html>

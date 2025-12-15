@@ -156,6 +156,7 @@ void code_buffer_append(code_buffer * buf, const void * data, size_t len) {
         return;
     if (len > SIZE_MAX - buf->size) {  // Overflow check
         buf->error = true;
+        _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_INTEGER_OVERFLOW, 0);
         return;
     }
     if (buf->size + len > buf->capacity) {
@@ -163,6 +164,7 @@ void code_buffer_append(code_buffer * buf, const void * data, size_t len) {
         while (new_capacity < buf->size + len) {
             if (new_capacity > SIZE_MAX / 2) {  // Overflow check
                 buf->error = true;
+                _infix_set_error(INFIX_CATEGORY_ALLOCATION, INFIX_CODE_INTEGER_OVERFLOW, 0);
                 return;
             }
             new_capacity *= 2;
@@ -170,6 +172,7 @@ void code_buffer_append(code_buffer * buf, const void * data, size_t len) {
         void * new_code = infix_arena_alloc(buf->arena, new_capacity, 16);
         if (new_code == nullptr) {
             buf->error = true;
+            // infix_arena_alloc already sets INFIX_CODE_OUT_OF_MEMORY, so we don't need to override it here
             return;
         }
         infix_memcpy(new_code, buf->code, buf->size);
@@ -318,7 +321,7 @@ c23_nodiscard infix_status _infix_forward_create_impl(infix_forward_t ** out_tra
                                                       size_t num_fixed_args,
                                                       void * target_fn) {
     if (out_trampoline == nullptr || return_type == nullptr || (arg_types == nullptr && num_args > 0)) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     // Pre-flight check: ensure all types are resolved before passing to ABI layer.
@@ -465,7 +468,7 @@ c23_nodiscard infix_status _infix_forward_create_direct_impl(infix_forward_t ** 
                                                              infix_direct_arg_handler_t * handlers) {
     // 1. Validation and Setup
     if (!out_trampoline || !return_type || (!arg_types && num_args > 0) || !target_fn || !handlers) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
 
@@ -689,7 +692,7 @@ static infix_status _infix_reverse_create_internal(infix_reverse_t ** out_contex
                                                    void * user_data,
                                                    bool is_callback) {
     if (out_context == nullptr || return_type == nullptr || num_fixed_args > num_args) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     // Pre-flight check: ensure all types are fully resolved.
@@ -917,7 +920,7 @@ c23_nodiscard infix_status infix_forward_create_in_arena(infix_forward_t ** out_
                                                          infix_registry_t * registry) {
     _infix_clear_error();
     if (!signature) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
     infix_arena_t * arena = nullptr;
@@ -928,7 +931,8 @@ c23_nodiscard infix_status infix_forward_create_in_arena(infix_forward_t ** out_
     infix_status status;
     if (signature[0] == '@') {
         if (registry == nullptr) {
-            _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);  // Using @Name requires a registry
+            _infix_set_error(
+                INFIX_CATEGORY_GENERAL, INFIX_CODE_MISSING_REGISTRY, 0);  // Using @Name requires a registry
             return INFIX_ERROR_INVALID_ARGUMENT;
         }
         const infix_type * func_type = infix_registry_lookup_type(registry, &signature[1]);
@@ -1006,7 +1010,7 @@ c23_nodiscard infix_status infix_forward_create_direct(infix_forward_t ** out_tr
                                                        infix_registry_t * registry) {
     _infix_clear_error();
     if (!signature || !target_function || !handlers) {
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_NULL_POINTER, 0);
         return INFIX_ERROR_INVALID_ARGUMENT;
     }
 

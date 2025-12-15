@@ -24,5 +24,6 @@ t/04-randx.t
 t/05-random_float.t
 t/06-srand.t
 t/07-random_elem.t
+t/08-shuffle_array.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

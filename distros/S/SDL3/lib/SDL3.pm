@@ -1,4 +1,4 @@
-package SDL3 v0.0.2 {
+package SDL3 v0.0.3 {
     use v5.40;
     use base 'Exporter';
     use Affix qw[:all];

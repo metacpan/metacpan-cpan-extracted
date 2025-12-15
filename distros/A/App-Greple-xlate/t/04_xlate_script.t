@@ -31,8 +31,8 @@ subtest 'help option' => sub {
 
 # Test: version option
 subtest 'version option' => sub {
-    my $out = `$xlate -v 2>&1`;
-    like($out, qr/^\d+\.\d+/, '-v shows version number');
+    my $out = `$xlate --version 2>&1`;
+    like($out, qr/^\d+\.\d+/, '--version shows version number');
 };
 
 # Test: library file option

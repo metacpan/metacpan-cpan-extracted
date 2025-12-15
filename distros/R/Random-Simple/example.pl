@@ -48,10 +48,8 @@ print "\n";
 ########################################################################
 # Undocumented and has potential to change: _rand32() and _rand64()
 #
-# Note: these functions do *NOT* auto seed, so if you call this as your
-# first function call in Random::Simple you will get zero-filled
-# results, which is not going to be what you want. All other function
-# calls will auto seed if they're the first called function
+# These are the raw low-level PRNG methods used to build all the
+# random_* functions
 ########################################################################
 
 for (1 .. 5) {

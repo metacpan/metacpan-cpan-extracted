@@ -18,6 +18,7 @@ t/10-compile.t
 t/30-basics.t
 t/40-more.t
 t/abs.t
+t/advanced_types.t
 t/conf-corpus.t
 t/conf-fuzz.t
 t/conf/abs.yml

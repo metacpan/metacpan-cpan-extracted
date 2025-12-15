@@ -1,0 +1,17 @@
+name           = "App-dozo"
+readme_from    = "script/dozo"
+authors_from   = "script/dozo"
+script_files   = [ "script/dozo" ]
+badges         = [ "github-actions/test", "metacpan" ]
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+hooks = [
+    "perl -Ilib -MApp::dozo=\$VERSION -i -pE 's/^\s*Version \K(\d+(\.\d+)*)$/$VERSION/i' script/dozo",
+    "sed -i '' '/^1;$/q' lib/App/dozo.pm && greple -Mperl -h --nocolor :pod script/dozo >> lib/App/dozo.pm",
+]
+
+[FileGatherer]
+exclude_match = [ '^images/.*', '^share/getoptlong/(?!getoptlong\.sh)' ]

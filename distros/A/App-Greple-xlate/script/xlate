@@ -12,65 +12,68 @@ define pod <<"=cut"
 
 =head1 NAME
 
-    xlate - TRANSlate CLI front-end for App::Greple::xlate module
+xlate - TRANSlate CLI front-end for App::Greple::xlate module
 
 =head1 SYNOPSIS
 
-    xlate [ options ] -t LANG FILE [ greple options ]
-        -h, --help       help
-        -v, --version    show version
-        -d, --debug      debug
-        -n, --dryrun     dry-run
-        -a, --api        use API
-        -c, --check      just check translation area
-        -r, --refresh    refresh cache
-        -u, --update     force update cache
-        -s, --silent     silent mode
-        -t, --to-lang #  target language (required, no default)
-        -b, --from-lang # base language (informational)
-        -e, --engine #   translation engine (*deepl, gpt5, ...)
-        -p, --pattern #  pattern string to determine translation area
-        -f, --file #     pattern file to determine translation area
-        -o, --format #   output format (*xtxt, cm, ifdef, space, space+, colon)
-        -x, --maskfile # file containing mask patterns
-        -g, --glossary # glossary file
-        -w, --wrap #     wrap line by # width
-        -m, --maxlen #   max length per API call
-        -l, --library #  show library files (XLATE.mk, xlate.el)
-        --               end of option
-        N.B. default is marked as *
+xlate [ options ] -t LANG FILE [ greple options ]
 
-    Make options
-        -M, --make       run make
-        -n, --dryrun     dry-run
+  Translation options:
+    -h, --help        help
+        --version     show version
+    -d, --debug       debug mode (currently enables trace)
+        --trace       trace mode
+    -n, --dryrun      dry-run
+    -a, --api         use API
+    -c, --check       just check translation area
+    -r, --refresh     refresh cache
+    -u, --update      force update cache
+    -s, --silent      silent mode
+    -t, --to-lang=#   target language (required, no default)
+    -b, --from-lang=# base language (informational)
+    -e, --engine=#    translation engine (*deepl, gpt5, ...)
+    -p, --pattern=#   pattern string to determine translation area
+    -f, --file=#      pattern file to determine translation area
+    -o, --format=#    output format (*xtxt, cm, ifdef, space, space+, colon)
+    -x, --maskfile=#  file containing mask patterns
+    -g, --glossary=#  glossary file
+    -w, --wrap=#      wrap line by # width
+    -m, --maxlen=#    max length per API call
+    -l, --library=#   show library files (XLATE.mk, xlate.el)
+    --                end of option
+    N.B. default is marked as *
 
-    Docker options
-        -D, --docker *   run xlate on the container with the same parameters
-        -C, --command *  execute following command on the container, or run shell
-        -L, --live *     use the live container
-        N.B. These options terminate option handling
+  Make options:
+    -M, --make        run make
+    -n, --dryrun      dry-run
 
-        -W, --mount-cwd   mount current working directory
-        -H, --mount-home  mount home directory
-        -V, --volume #    specify mount directory
-        -U, --unmount     do not mount
-        -R, --mount-ro    mount read-only
-        -B, --batch       run container in batch mode
-        -N, --name #      specify the name of live container
-        -K, --kill        kill and remove live container
-        -E, --env #       specify an environment variable to be inherited
-        -I, --image #     docker image or version (default: tecolicom/xlate:version)
-        -P, --port #      port mapping
-        -O, --other #     additional docker option
+  Docker options:
+    -D, --docker *    run xlate on the container with the same parameters
+    -C, --command *   execute following command on the container, or run shell
+    -L, --live *      use the live container
+    N.B. These options terminate option handling
 
-    Control Files:
-        *.LANG    translation languages
-        *.FORMAT  translation format (xtxt, cm, ifdef, colon, space)
-        *.ENGINE  translation engine (deepl, gpt5, ...)
+    -W, --mount-cwd    mount current working directory
+    -H, --mount-home   mount home directory
+    -V, --volume=#     specify mount directory
+    -U, --unmount      do not mount
+    -R, --mount-ro     mount read-only
+    -B, --batch        run container in batch mode
+    -N, --name=#       specify the name of live container
+    -K, --kill         kill and remove live container
+    -E, --env=#        specify an environment variable to be inherited
+    -I, --image=#      docker image or version (default: tecolicom/xlate:version)
+    -P, --port=#       port mapping
+    -O, --other=#      additional docker option
+
+  Control Files:
+    *.LANG    translation languages
+    *.FORMAT  translation format (xtxt, cm, ifdef, colon, space)
+    *.ENGINE  translation engine (deepl, gpt5, ...)
 
 =head1 VERSION
 
-    Version 0.9920
+    Version 0.9922
 
 =cut
 
@@ -229,10 +232,11 @@ END
 declare -A OPTS=(
     [&USAGE]="$USAGE"
     # Basic options
-    [     debug | d     # debug mode                       ]=
+    [     debug | d     # debug mode (enables trace)       ]=
+    [     trace         # trace mode                       ]=
     [     quiet | q     # quiet mode                       ]=
     [      help | h  !  # show help                        ]=
-    [   version | v  !  # show version                     ]=
+    [   version      !  # show version                     ]=
     # Translation options
     [       api | a     # use API                          ]=
     [     check | c     # just check translation area      ]=
@@ -280,8 +284,11 @@ declare -a PARSE_ARGS=("$@")
 
 . getoptlong.sh OPTS "${PARSE_ARGS[@]}" || die "getoptlong.sh not found"
 
-# Debug mode
-[[ ${debug:-} ]] && set -x
+# Debug mode (currently enables trace)
+[[ ${debug:-} ]] && trace=1
+
+# Trace mode
+[[ ${trace:-} ]] && set -x
 
 find_gmake() {
     local make
@@ -347,7 +354,7 @@ option+=(--all)
 [[ ${api:-}        ]] || use_clipboard=yes
 [[ ${check:-}      ]] || option+=(--xlate${use_clipboard:+-labor})
 [[ ${wrap:-}       ]] && option+=(--xlate-fold-line --xlate-fold-width=$wrap)
-[[ ${debug:-}      ]] && option+=(-dmo)
+[[ ${trace:-}      ]] && option+=(-dmo)
 [[ ${refresh:-}    ]] && option+=(--xlate-cache=clear)
 [[ ${update:-}     ]] && option+=(--xlate-update)
 [[ ${silent:-}     ]] && option+=(--no-xlate-progress)
@@ -476,6 +483,12 @@ Docker options (C<-I>, C<-E>, C<-W>, C<-H>, C<-V>, C<-U>, C<-R>,
 C<-B>, C<-N>, C<-K>, C<-L>, C<-P>, C<-O>) are passed to B<dozo>.  For details
 on live containers, container naming, and configuration, see L<dozo>.
 
+B<Note:> The generic Docker runner functionality (C<-C>, C<-L> options)
+has been moved to the standalone L<dozo> command. For running arbitrary
+commands or managing live containers, use B<dozo> directly. These options
+in xlate are maintained for backward compatibility but may be deprecated
+in future versions.
+
 =head2 Make Support
 
 xlate utilizes GNU Make for automating and managing translation tasks.
@@ -532,13 +545,17 @@ rules, refer to the F<XLATE.mk> file in the xlate library directory.
 
 Show help message.
 
-=item B<-v>, B<--version>
+=item B<--version>
 
 Show version information.
 
 =item B<-d>, B<--debug>
 
-Enable debug mode.
+Enable debug mode. Currently this enables trace mode.
+
+=item B<--trace>
+
+Enable trace mode (set -x).
 
 =item B<-n>, B<--dryrun>
 
@@ -629,16 +646,22 @@ Dry-run.
 
 =head2 DOCKER OPTIONS
 
-Docker feature is invoked by the C<-D>/C<--docker>, C<-C>/C<--command>
-or C<-L>/C<--live> option.  Once any of these options appear,
-subsequent options are not interpreted, so they should always be the
-last of the Docker-related options.
-
 =over 7
 
 =item B<-D>, B<--docker>
 
 Run B<xlate> on the Docker container with the rest of the parameters.
+Once this option appears, subsequent options are not interpreted by
+xlate, so it should always be the last of the xlate options.
+
+=back
+
+The following options are specific to L<dozo> and are passed through
+when invoking Docker features. These options are maintained for backward
+compatibility but may be removed in future versions. For direct container
+management, use the L<dozo> command instead.
+
+=over 7
 
 =item B<-C> [ I<command> ], B<--command>
 

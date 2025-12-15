@@ -219,3 +219,7 @@
 1.52    Dec 14, 2025
 
         Fixed a small bug in the -t token output for underline color
+
+1.53    Dec 14, 2025
+
+        Made testing much more informative and nice to look at.

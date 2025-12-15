@@ -15,7 +15,6 @@ use lib 't/lib';
 use Helper;
 use Test::JSON::Schema::Acceptance 1.014;
 use Mojo::File 'path';
-use Config;
 
 foreach my $oas_version (map $_->basename, path('t/oas-vocabulary')->list({dir=>1})->each) {
   my $accepter = Test::JSON::Schema::Acceptance->new(

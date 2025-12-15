@@ -12,7 +12,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Configure YAML::XS to not quote numeric strings
 $YAML::XS::QuoteNumericStrings = 0;
@@ -23,7 +23,7 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ Version 0.20
 =head1 DESCRIPTION
 
 App::Test::Generator::SchemaExtractor automatically analyzes Perl modules and generates
-structured YAML schema files suitable for automated test generation.
+structured YAML schema files suitable for automated test generation by L<App::Test::Generator>.
 This module employs
 static analysis techniques to infer parameter types, constraints, and
 method behaviors directly from your source code.
@@ -284,6 +284,51 @@ refine them based on test results and code understanding.
 The module is particularly valuable for large codebases where manual schema
 creation would be prohibitively time-consuming, and for maintaining test
 coverage as code evolves through continuous integration pipelines.
+
+=head2 Advanced Type Detection
+
+The schema extractor includes enhanced type detection capabilities that identify specialized Perl types beyond basic strings and integers.
+L<DateTime> and L<Time::Piece> objects are detected through isa() checks and method call patterns, while date strings (ISO 8601, YYYY-MM-DD) and UNIX timestamps are recognized through regex validation and numeric range checks.
+File handles and file paths are identified via I/O operations and file test operators, coderefs are detected through ref() checks and invocation patterns, and enum-like parameters are extracted from validation code including regex patterns (C</^(a|b|c)$/>), hash lookups, grep statements, and if/elsif chains.
+These detected types are preserved in the generated YAML schemas with appropriate semantic annotations, enabling test generators to create more accurate and meaningful test cases.
+
+=head3 Example Advanced Type Schema
+
+For a method like:
+
+    sub process_event {
+        my ($self, $timestamp, $status, $callback) = @_;
+        croak unless $timestamp > 1000000000;
+        croak unless $status =~ /^(active|pending|complete)$/;
+        croak unless ref($callback) eq 'CODE';
+        $callback->($timestamp, $status);
+    }
+
+The extractor generates:
+
+    ---
+    function: process_event
+    module: MyModule
+    input:
+      timestamp:
+        type: integer
+        # min: 0
+        # max: 2147483647
+        position: 0
+        _note: Unix timestamp
+	semantic: unix_timestamp
+      status:
+        type: string
+        enum:
+          - active
+          - pending
+          - complete
+        position: 1
+        _note: 'Must be one of: active, pending, complete'
+      callback:
+        type: coderef
+        position: 2
+        _note: 'CODE reference - provide sub { } in tests'
 
 =head1 METHODS
 
@@ -1253,6 +1298,8 @@ sub _analyze_code {
 		$self->_analyze_parameter_constraints($p, $param, $code);
 		$self->_analyze_parameter_validation($p, $param, $code);
 
+		$self->_analyze_advanced_types($p, $param, $code);
+
 		# Defined checks
 		if ($code =~ /defined\s*\(\s*\$$param\s*\)/) {
 			$p->{optional} = 0;
@@ -1275,6 +1322,357 @@ sub _analyze_code {
 	return \%params;
 }
 
+sub _analyze_parameter_type {
+	my ($self, $p_ref, $param, $code) = @_;
+	my $p = $$p_ref;
+
+	# Type inference from ref() checks
+	if ($code =~ /ref\s*\(\s*\$$param\s*\)\s*eq\s*['"](ARRAY|HASH|SCALAR)['"]/gi) {
+		my $reftype = lc($1);
+		$p->{type} = $reftype eq 'array' ? 'arrayref' :
+					 $reftype eq 'hash' ? 'hashref' :
+					 'scalar';
+		$self->_log("  CODE: $param is $p->{type} (ref check)");
+	}
+	# ISA checks for objects
+	elsif ($code =~ /\$$param\s*->\s*isa\s*\(\s*['"]([^'"]+)['"]\s*\)/i) {
+		$p->{type} = 'object';
+		$p->{class} = $1;
+		$self->_log("  CODE: $param is object of class $1");
+	}
+	# Blessed references
+	elsif ($code =~ /bless\s+.*\$$param/) {
+		$p->{type} = 'object';
+		$self->_log("  CODE: $param is blessed object");
+	}
+	# Array/hash operations
+	if (!$p->{type}) {
+		if ($code =~ /\@\{\s*\$$param\s*\}/ || $code =~ /push\s*\(\s*\@?\$$param/) {
+			$p->{type} = 'arrayref';
+		}
+		elsif ($code =~ /\%\{\s*\$$param\s*\}/ || $code =~ /\$$param\s*->\s*\{/) {
+			$p->{type} = 'hashref';
+		}
+	}
+}
+
+=head2 _analyze_advanced_types
+
+Enhanced type detection for DateTime, file handles, coderefs, and enums.
+This adds semantic type information that can guide test generation.
+
+=cut
+
+sub _analyze_advanced_types {
+	my ($self, $p_ref, $param, $code) = @_;
+
+	# Dereference once to get the hash reference
+	my $p = $$p_ref;
+
+	# Now pass the dereferenced hash to the detection methods
+	$self->_detect_datetime_type($p, $param, $code);
+	$self->_detect_filehandle_type($p, $param, $code);
+	$self->_detect_coderef_type($p, $param, $code);
+	$self->_detect_enum_type($p, $param, $code);
+}
+
+=head2 _detect_datetime_type
+
+Detect DateTime objects and date/time string parameters.
+
+=cut
+
+sub _detect_datetime_type {
+	my ($self, $p, $param, $code) = @_;
+
+	# Validate param is just a simple word
+	return unless defined $param && $param =~ /^\w+$/;
+
+	# DateTime object detection via isa/UNIVERSAL checks
+	if ($code =~ /\$$param\s*->\s*isa\s*\(\s*['"]DateTime['"]\s*\)/i) {
+		$p->{type} = 'object';
+		$p->{class} = 'DateTime';
+		$p->{semantic} = 'datetime_object';
+		$self->_log("  ADVANCED: $param is DateTime object");
+		return;
+	}
+
+	# Check for DateTime method calls
+	if ($code =~ /\$$param\s*->\s*(ymd|dmy|mdy|hms|iso8601|epoch|strftime)/) {
+		$p->{type} = 'object';
+		$p->{class} = 'DateTime';
+		$p->{semantic} = 'datetime_object';
+		$self->_log("  ADVANCED: $param uses DateTime methods");
+		return;
+	}
+
+	# Time::Piece detection
+	if ($code =~ /\$$param\s*->\s*isa\s*\(\s*['"]Time::Piece['"]\s*\)/i ||
+	    $code =~ /\$$param\s*->\s*(strftime|epoch|year|mon|mday)/) {
+		$p->{type} = 'object';
+		$p->{class} = 'Time::Piece';
+		$p->{semantic} = 'timepiece_object';
+		$self->_log("  ADVANCED: $param is Time::Piece object");
+		return;
+	}
+
+	# String date/time patterns via regex matching
+	if ($code =~ /\$$param\s*=~\s*\/.*?\\d\{4\}.*?\\d\{2\}.*?\\d\{2\}/) {
+		$p->{type} = 'string';
+		$p->{semantic} = 'date_string';
+		$p->{format} = 'YYYY-MM-DD or similar';
+		$self->_log("  ADVANCED: $param validated as date string pattern");
+		return;
+	}
+
+	# ISO 8601 date pattern
+	if ($code =~ /\$$param\s*=~\s*\/.*?[Tt].*?[Zz].*?\//) {
+		$p->{type} = 'string';
+		$p->{semantic} = 'iso8601_string';
+		$p->{matches} = '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/';
+		$self->_log("  ADVANCED: $param validated as ISO 8601 datetime");
+		return;
+	}
+
+	# UNIX timestamp detection (numeric with specific range)
+	if ($code =~ /\$$param\s*>\s*\d{9,}/ || # UNIX timestamps are 10+ digits
+	    $code =~ /time\(\s*\)\s*-\s*\$$param/ ||
+	    $code =~ /\$$param\s*-\s*time\(\s*\)/) {
+		$p->{type} = 'integer';
+		$p->{semantic} = 'unix_timestamp';
+		$p->{min} = 0;
+		$self->_log("  ADVANCED: $param appears to be UNIX timestamp");
+		return;
+	}
+
+	# Date parsing with strptime or similar
+	if ($code =~ /strptime\s*\(\s*\$$param/ ||
+	    $code =~ /DateTime::Format::\w+\s*->\s*parse_datetime\s*\(\s*\$$param/) {
+		$p->{type} = 'string';
+		$p->{semantic} = 'datetime_parseable';
+		$self->_log("  ADVANCED: $param is parsed as datetime");
+		return;
+	}
+}
+
+=head2 _detect_filehandle_type
+
+Detect file handle parameters and file path strings.
+
+=cut
+
+sub _detect_filehandle_type {
+	my ($self, $p, $param, $code) = @_;
+
+	return unless defined $param && $param =~ /^\w+$/;
+
+	# File handle operations
+	if ($code =~ /(?:open|close|read|print|say|sysread|syswrite)\s*\(?\s*\$$param/) {
+		$p->{type} = 'object';
+		$p->{class} = 'IO::Handle';
+		$p->{semantic} = 'filehandle';
+		$self->_log("  ADVANCED: $param is a file handle");
+		return;
+	}
+
+	# Filehandle-specific operations
+	if ($code =~ /\$$param\s*->\s*(readline|getline|print|say|close|flush|autoflush)/) {
+		$p->{type} = 'object';
+		$p->{class} = 'IO::Handle';
+		$p->{semantic} = 'filehandle';
+		$self->_log("  ADVANCED: $param uses filehandle methods");
+		return;
+	}
+
+	# File test operators
+	if ($code =~ /(?:-[frwxoOeszlpSbctugkTBMAC])\s+\$$param/) {
+		$p->{type} = 'string';
+		$p->{semantic} = 'filepath';
+		$self->_log("  ADVANCED: $param is tested as file path");
+		return;
+	}
+
+	# File::Spec operations or path manipulation
+	if ($code =~ /File::(?:Spec|Basename)::\w+\s*\(\s*\$$param/ ||
+	    $code =~ /(?:basename|dirname|fileparse)\s*\(\s*\$$param/) {
+		$p->{type} = 'string';
+		$p->{semantic} = 'filepath';
+		$self->_log("  ADVANCED: $param manipulated as file path");
+		return;
+	}
+
+	# Path validation patterns
+	if ($code =~ /\$$param\s*=~\s*\/.*?[\\\/].*?\//) {
+		$p->{type} = 'string';
+		$p->{semantic} = 'filepath';
+		$self->_log("  ADVANCED: $param validated with path pattern");
+		return;
+	}
+
+	# IO::File detection
+	if ($code =~ /\$$param\s*->\s*isa\s*\(\s*['"]IO::File['"]\s*\)/ ||
+	    $code =~ /IO::File\s*->\s*new\s*\(\s*\$$param/) {
+		$p->{type} = 'object';
+		$p->{class} = 'IO::File';
+		$p->{semantic} = 'filehandle';
+		$self->_log("  ADVANCED: $param is IO::File object");
+		return;
+	}
+}
+
+=head2 _detect_coderef_type
+
+Detect coderef/callback parameters.
+
+=cut
+
+sub _detect_coderef_type {
+	my ($self, $p, $param, $code) = @_;
+
+	return unless defined $param && $param =~ /^\w+$/;
+
+	# ref() check for CODE
+	if ($code =~ /ref\s*\(\s*\$$param\s*\)\s*eq\s*['"]CODE['"]/i) {
+		$p->{type} = 'coderef';
+		$p->{semantic} = 'callback';
+		$self->_log("  ADVANCED: $param is coderef (ref check)");
+		return;
+	}
+
+	# Invocation as coderef - note the escaped @ in \@_
+	if ($code =~ /\$$param\s*->\s*\(/ ||
+	    $code =~ /\$$param\s*->\s*\(\s*\@_\s*\)/ ||
+	    $code =~ /&\s*\{\s*\$$param\s*\}/) {
+		$p->{type} = 'coderef';
+		$p->{semantic} = 'callback';
+		$self->_log("  ADVANCED: $param invoked as coderef");
+		return;
+	}
+
+	# Parameter name suggests callback
+	if ($param =~ /^(?:callback|cb|handler|sub|code|fn|func|on_\w+)$/i) {
+		$p->{type} = 'coderef';
+		$p->{semantic} = 'callback';
+		$self->_log("  ADVANCED: $param name suggests coderef");
+		return;
+	}
+
+	# Blessed coderef (unusual but valid)
+	if ($code =~ /blessed\s*\(\s*\$$param\s*\)/ &&
+	    $code =~ /ref\s*\(\s*\$$param\s*\)\s*eq\s*['"]CODE['"]/i) {
+		$p->{type} = 'object';
+		$p->{class} = 'blessed_coderef';
+		$p->{semantic} = 'callback';
+		$self->_log("  ADVANCED: $param is blessed coderef");
+		return;
+	}
+}
+
+=head2 _detect_enum_type
+
+Detect enum-like parameters with fixed set of valid values.
+
+=cut
+
+sub _detect_enum_type {
+	my ($self, $p, $param, $code) = @_;
+
+	return unless defined $param && $param =~ /^\w+$/;
+
+	# Pattern 1: die/croak unless value is in list
+	# die "Invalid status" unless $status =~ /^(active|inactive|pending)$/;
+	if ($code =~ /unless\s+\$$param\s*=~\s*\/\^?\(([^)]+)\)/) {
+		my $values = $1;
+		my @enum_values = split(/\|/, $values);
+		$p->{type} = 'string' unless $p->{type};
+		$p->{enum} = \@enum_values;
+		$p->{semantic} = 'enum';
+		$self->_log("  ADVANCED: $param is enum with values: " . join(', ', @enum_values));
+		return;
+	}
+
+	# Pattern 2: Hash lookup for validation
+	# my %valid = map { $_ => 1 } qw(red green blue);
+	# die unless $valid{$param};
+	if ($code =~ /\%(\w+)\s*=.*?qw\s*[\(\[<{]([^)\]>}]+)[\)\]>}]/) {
+		my $hash_name = $1;
+		my $values_str = $2;
+		if (defined $values_str && $code =~ /\$$hash_name\s*\{\s*\$$param\s*\}/) {
+			my @enum_values = split(/\s+/, $values_str);
+			$p->{type} = 'string' unless $p->{type};
+			$p->{enum} = \@enum_values;
+			$p->{semantic} = 'enum';
+			$self->_log("  ADVANCED: $param validated via hash lookup: " . join(', ', @enum_values));
+			return;
+		}
+	}
+
+	# Pattern 3: Array grep validation
+	# die unless grep { $_ eq $param } qw(foo bar baz);
+	if ($code =~ /grep\s*\{[^}]*\$$param[^}]*\}\s*qw\s*[\(\[<{]([^)\]>}]+)[\)\]>}]/) {
+		my $values_str = $1;
+		my @enum_values = split(/\s+/, $values_str);
+		$p->{type} = 'string' unless $p->{type};
+		$p->{enum} = \@enum_values;
+		$p->{semantic} = 'enum';
+		$self->_log("  ADVANCED: $param validated via grep: " . join(', ', @enum_values));
+		return;
+	}
+
+	# Pattern 4: Given/when (Perl 5.10+)
+	if ($code =~ /given\s*\(\s*\$$param\s*\)/) {
+		my @enum_values;
+		while ($code =~ /when\s*\(\s*['"]([^'"]+)['"]\s*\)/g) {
+			push @enum_values, $1;
+		}
+		if (@enum_values >= 2) {
+			$p->{type} = 'string' unless $p->{type};
+			$p->{enum} = \@enum_values;
+			$p->{semantic} = 'enum';
+			$self->_log("  ADVANCED: $param has enum values from given/when: " .
+			           join(', ', @enum_values));
+			return;
+		}
+	}
+
+	# Pattern 5: Multiple if/elsif checking specific values
+	my @if_values;
+	while ($code =~ /if\s*\(\s*\$$param\s*eq\s*['"]([^'"]+)['"]\s*\)/g) {
+		push @if_values, $1;
+	}
+	while ($code =~ /elsif\s*\(\s*\$$param\s*eq\s*['"]([^'"]+)['"]\s*\)/g) {
+		push @if_values, $1;
+	}
+	if (@if_values >= 3) {
+		$p->{type} = 'string' unless $p->{type};
+		$p->{enum} = \@if_values;
+		$p->{semantic} = 'enum';
+		$self->_log("  ADVANCED: $param appears to be enum from if/elsif: " .
+		           join(', ', @if_values));
+		return;
+	}
+
+	# Pattern 6: Smart match (~~) with array
+	if ($code =~ /\$$param\s*~~\s*\[([^\]]+)\]/ ||
+	    $code =~ /\$$param\s*~~\s*qw\s*[\(\[<{]([^)\]>}]+)[\)\]>}]/) {
+		my $values_str = $1;
+		my @enum_values;
+		if ($values_str =~ /['"]/) {
+			@enum_values = $values_str =~ /['"](.*?)['"]/g;
+		} else {
+			@enum_values = split(/\s+/, $values_str);
+		}
+		if (@enum_values) {
+			$p->{type} = 'string' unless $p->{type};
+			$p->{enum} = \@enum_values;
+			$p->{semantic} = 'enum';
+			$self->_log("  ADVANCED: $param validated with smart match: " .
+				   join(', ', @enum_values));
+			return;
+		}
+	}
+}
+
 sub _extract_parameters_from_signature {
 	my ($self, $params, $code) = @_;
 
@@ -1285,7 +1683,6 @@ sub _extract_parameters_from_signature {
 			$params->{$1} ||= { _source => 'code' };
 		}
 	}
-
 	# Style 2: my $self = shift; my $arg1 = shift; ...
 	elsif ($code =~ /my\s+\$self\s*=\s*shift/) {
 		my @shifts;
@@ -1294,11 +1691,10 @@ sub _extract_parameters_from_signature {
 		}
 		# Skip $self and get parameters
 		shift @shifts if @shifts && $shifts[0] =~ /^(self|class)$/i;
-		foreach my $param (@shifts) {
+			foreach my $param (@shifts) {
 			$params->{$param} ||= { _source => 'code' };
 		}
 	}
-
 	# Style 3: Function parameters (no $self)
 	if ($code =~ /my\s*\(\s*([^)]+)\)\s*=\s*\@_/s) {
 		my $sig = $1;
@@ -1314,43 +1710,6 @@ sub _extract_parameters_from_signature {
 	foreach my $param (keys %$params) {
 		if ($seen{$param}++) {
 			$self->_log("  WARNING: Duplicate parameter '$param' found");
-		}
-	}
-}
-
-sub _analyze_parameter_type {
-	my ($self, $p_ref, $param, $code) = @_;
-	my $p = $$p_ref;
-
-	# Type inference from ref() checks
-	if ($code =~ /ref\s*\(\s*\$$param\s*\)\s*eq\s*['"](ARRAY|HASH|SCALAR)['"]/gi) {
-		my $reftype = lc($1);
-		$p->{type} = $reftype eq 'array' ? 'arrayref' :
-					 $reftype eq 'hash' ? 'hashref' :
-					 'scalar';
-		$self->_log("  CODE: $param is $p->{type} (ref check)");
-	}
-
-	# ISA checks for objects
-	elsif ($code =~ /\$$param\s*->\s*isa\s*\(\s*['"]([^'"]+)['"]\s*\)/i) {
-		$p->{type} = 'object';
-		$p->{class} = $1;
-		$self->_log("  CODE: $param is object of class $1");
-	}
-
-	# Blessed references
-	elsif ($code =~ /bless\s+.*\$$param/) {
-		$p->{type} = 'object';
-		$self->_log("  CODE: $param is blessed object");
-	}
-
-	# Array/hash operations
-	if (!$p->{type}) {
-		if ($code =~ /\@\{\s*\$$param\s*\}/ || $code =~ /push\s*\(\s*\@?\$$param/) {
-			$p->{type} = 'arrayref';
-		}
-		elsif ($code =~ /\%\{\s*\$$param\s*\}/ || $code =~ /\$$param\s*->\s*\{/) {
-			$p->{type} = 'hashref';
 		}
 	}
 }
@@ -1700,7 +2059,7 @@ sub _write_schema {
 		$package_name = $package_stmt ? $package_stmt->namespace : '';
 	}
 
-	# Clean up schema for output - use the format expected by test generator
+	# Clean up schema for output - use the format expected by App::Test::Generator
 	my $output = {
 		function => $method_name,
 		# confidence => $schema->{_confidence},
@@ -1714,35 +2073,224 @@ sub _write_schema {
 		}
 	};
 
-	# Perhaps no input is given?
+	# Process input parameters with advanced type handling
 	if($schema->{'input'} && (scalar(keys %{$schema->{'input'}}))) {
-		$output->{'input'} = $schema->{'input'};
+		# $output->{'input'} = $schema->{'input'};
+		$output->{'input'} = {};
+
+		foreach my $param_name (keys %{$schema->{'input'}}) {
+			my $param = $schema->{'input'}{$param_name};
+			my $cleaned_param = $self->_serialize_parameter_for_yaml($param);
+			$output->{'input'}{$param_name} = $cleaned_param;
+		}
 	}
+
+	# Process output
 	if($schema->{'output'} && (scalar(keys %{$schema->{'output'}}))) {
 		$output->{'output'} = $schema->{'output'};
 	}
 
 	# Add 'new' field if object instantiation is needed
 	if ($schema->{new}) {
-		$output->{new} = $schema->{new};
+		$output->{new} = $schema->{new} eq $package_name ? undef : $schema->{'new'};
 	}
 
 	open my $fh, '>', $filename;
 	print $fh YAML::XS::Dump($output);
-	print $fh "\n# Generated by ", ref($self), "\n",
-		"# Run this script through fuzz-harness-generator -r\n",
-		"# Input confidence: $schema->{_confidence}{input}\n",
-		"# Output confidence: $schema->{_confidence}{output}\n";
-	if($self->{_notes} && scalar(@{$self->{_notes}})) {
-		print $fh "# Notes:\n";
-		foreach my $note (@{$schema->{_notes}}) {
-			print $fh "#   $note\n";
-		}
-	}
+	print $fh $self->_generate_schema_comments($schema, $method_name);
 	close $fh;
 
 	$self->_log("  Wrote: $filename (input confidence: $schema->{_confidence}{input})" .
 				($schema->{new} ? " [requires: $schema->{new}]" : ""));
+}
+
+=head2 _serialize_parameter_for_yaml
+
+Convert parameter hash to YAML-serializable format with proper type handling.
+
+=cut
+
+sub _serialize_parameter_for_yaml {
+	my ($self, $param) = @_;
+
+	my %cleaned;
+
+	# Copy basic fields that App::Test::Generator expects
+	foreach my $field (qw(type position optional min max matches default)) {
+		$cleaned{$field} = $param->{$field} if defined $param->{$field};
+	}
+
+	# Handle advanced type mappings
+	my $semantic = $param->{semantic};
+
+	if ($semantic) {
+		if ($semantic eq 'datetime_object') {
+			# DateTime objects: test generator needs to know how to create them
+			$cleaned{type} = 'object';
+			$cleaned{class} = $param->{class} || 'DateTime';
+			$cleaned{_note} = 'Requires DateTime object';
+
+		} elsif ($semantic eq 'timepiece_object') {
+			$cleaned{type} = 'object';
+			$cleaned{class} = $param->{class} || 'Time::Piece';
+			$cleaned{_note} = 'Requires Time::Piece object';
+
+		} elsif ($semantic eq 'date_string') {
+			# Date strings: provide regex pattern
+			$cleaned{type} = 'string';
+			$cleaned{matches} ||= '/^\d{4}-\d{2}-\d{2}$/';
+			$cleaned{_example} = '2024-12-12';
+
+		} elsif ($semantic eq 'iso8601_string') {
+			$cleaned{type} = 'string';
+			$cleaned{matches} ||= '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/';
+			$cleaned{_example} = '2024-12-12T10:30:00Z';
+
+		} elsif ($semantic eq 'unix_timestamp') {
+			$cleaned{type} = 'integer';
+			$cleaned{min} ||= 0;
+			$cleaned{max} ||= 2147483647;  # 32-bit max
+			$cleaned{_note} = 'UNIX timestamp';
+
+		} elsif ($semantic eq 'datetime_parseable') {
+			$cleaned{type} = 'string';
+			$cleaned{_note} = 'Must be parseable as datetime';
+
+		} elsif ($semantic eq 'filehandle') {
+			# File handles: special handling needed
+			$cleaned{type} = 'object';
+			$cleaned{class} = $param->{class} || 'IO::Handle';
+			$cleaned{_note} = 'File handle - may need mock in tests';
+
+		} elsif ($semantic eq 'filepath') {
+			# File paths: string with path pattern
+			$cleaned{type} = 'string';
+			$cleaned{matches} ||= '/^[\\w\\/.\\-_]+$/';
+			$cleaned{_note} = 'File path';
+
+		} elsif ($semantic eq 'callback') {
+			# Coderefs: mark as special type
+			$cleaned{type} = 'coderef';
+			$cleaned{_note} = 'CODE reference - provide sub { } in tests';
+
+		} elsif ($semantic eq 'enum') {
+			# Enum: keep as string but add valid values
+			$cleaned{type} = 'string';
+			if ($param->{enum} && ref($param->{enum}) eq 'ARRAY') {
+				$cleaned{enum} = $param->{enum};
+				$cleaned{_note} = 'Must be one of: ' . join(', ', @{$param->{enum}});
+			}
+		}
+	}
+
+	# Handle enum even if not marked with semantic
+	if ($param->{enum} && ref($param->{enum}) eq 'ARRAY') {
+		$cleaned{enum} = $param->{enum};
+	}
+
+	# Handle object class
+	if ($param->{class} && !$cleaned{class}) {
+		$cleaned{class} = $param->{class};
+	}
+
+	# Add format hints where available
+	if ($param->{format}) {
+		$cleaned{_format} = $param->{format};
+	}
+
+	# Remove internal fields
+	delete $cleaned{_source};
+	delete $cleaned{semantic};
+
+	return \%cleaned;
+}
+
+=head2 _generate_schema_comments
+
+Generate helpful comments at the end of the YAML file.
+
+=cut
+
+sub _generate_schema_comments {
+	my ($self, $schema, $method_name) = @_;
+
+	my @comments;
+
+	push @comments, "";
+	push @comments, "# Generated by " . ref($self);
+	push @comments, "# Run: fuzz-harness-generator -r $self->{output_dir}/${method_name}.yaml";
+	push @comments, "#";
+	push @comments, "# Input confidence: $schema->{_confidence}{input}";
+	push @comments, "# Output confidence: $schema->{_confidence}{output}";
+
+	# Add notes about parameters
+	if ($schema->{input}) {
+		my @param_notes;
+		foreach my $param_name (sort keys %{$schema->{input}}) {
+			my $p = $schema->{input}{$param_name};
+
+			if ($p->{semantic}) {
+				push @param_notes, "$param_name: $p->{semantic}";
+			}
+
+			if ($p->{enum}) {
+				push @param_notes, "$param_name: enum with " . scalar(@{$p->{enum}}) . " values";
+			}
+
+			if ($p->{class}) {
+				push @param_notes, "$param_name: requires $p->{class} object";
+			}
+		}
+
+		if (@param_notes) {
+			push @comments, "#";
+			push @comments, "# Parameter types detected:";
+			foreach my $note (@param_notes) {
+				push @comments, "#   - $note";
+			}
+		}
+	}
+
+	# Add general notes
+	if ($schema->{_notes} && scalar(@{$schema->{_notes}})) {
+		push @comments, "#";
+		push @comments, "# Notes:";
+		foreach my $note (@{$schema->{_notes}}) {
+			push @comments, "#   - $note";
+		}
+	}
+
+	# Add warnings for complex types
+	my @warnings;
+	if ($schema->{input}) {
+		foreach my $param_name (keys %{$schema->{input}}) {
+			my $p = $schema->{input}{$param_name};
+
+			if ($p->{type} && $p->{type} eq 'coderef') {
+				push @warnings, "Parameter '$param_name' is a coderef - you'll need to provide a sub {} in tests";
+			}
+
+			if ($p->{semantic} && $p->{semantic} eq 'filehandle') {
+				push @warnings, "Parameter '$param_name' is a filehandle - consider using IO::String or mock";
+			}
+
+			if ($p->{class} && $p->{class} =~ /DateTime/) {
+				push @warnings, "Parameter '$param_name' requires DateTime - ensure DateTime is loaded";
+			}
+		}
+	}
+
+	if (@warnings) {
+		push @comments, "#";
+		push @comments, "# WARNINGS - Manual test setup may be required:";
+		foreach my $warning (@warnings) {
+			push @comments, "#   ! $warning";
+		}
+	}
+
+	push @comments, "";
+
+	return join("\n", @comments);
 }
 
 =head2 _needs_object_instantiation

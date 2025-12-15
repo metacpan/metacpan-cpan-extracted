@@ -18,10 +18,10 @@ output.images/boxplot.png
 output.images/hexbin.png
 output.images/hist2d.png
 output.images/histogram.png
+output.images/hlines.png
 output.images/imshow.multiple.png
 output.images/imshow.single.png
 output.images/pie.png
-output.images/plot.png
 output.images/plot.single.arr.png
 output.images/plot.single.png
 output.images/plots.png
@@ -38,7 +38,6 @@ output.images/single.tab.png
 output.images/single.violinplot.png
 output.images/single.wide.png
 output.images/tab.multiple.png
-output.images/trig.subplots.png
 output.images/violin.png
 output.images/wide.subplots.png
 t/01.all.tests.t

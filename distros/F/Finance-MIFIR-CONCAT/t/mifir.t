@@ -26,6 +26,24 @@ subtest 'mifir concat' => sub {
         'FR19860317ELISADOE##', 'Elisabeth Doe, born 17th March 1986, French national:';
 
     is mifir_concat({
+            cc         => 'fr',
+            date       => '17-03-1986',
+            first_name => 'Juan Cvzxasd',
+            last_name  => 'Casdffbass Fasdff',
+        }
+        ),
+        'FR19860317JUAN#CASDF', 'Juan Casdffbass, born 17th March 1986, French national:';
+
+    is mifir_concat({
+            cc         => 'fr',
+            date       => '17-03-1986',
+            first_name => 'ZqweO ANDRES',
+            last_name  => 'CASTEbeed ROggas',
+        }
+        ),
+        'FR19860317ZQWEOCASTE', 'ZqweO ANDRES, born 17th March 1986, French national:';
+
+    is mifir_concat({
             cc         => 'se',
             date       => '02-12-1944',
             first_name => 'Robert',
@@ -33,6 +51,15 @@ subtest 'mifir concat' => sub {
         }
         ),
         'SE19441202ROBERONEAL', 'Robert O\'Neal, born 2nd December 1944, national of Sweden and Canada';
+
+    is mifir_concat({
+            cc         => 'se',
+            date       => '02-12-1944',
+            first_name => 'MAPULA Robert',
+            last_name  => 'MOGASNS CAR',
+        }
+        ),
+        'SE19441202MAPULMOGAS', 'MAPULA Robert, born 2nd December 1944, national of Sweden and Canada';
 
     is mifir_concat({
             cc         => 'AT',

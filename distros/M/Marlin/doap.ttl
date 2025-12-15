@@ -46,7 +46,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin>;
@@ -117,6 +117,48 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002002.tar.gz>;
 	doap:revision        "0.002002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.002003"^^xsd:string;
+	dc:issued            "2025-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix case of MRO::Compat dependency on Perl older than v5.10.0.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002003.tar.gz>;
+	doap:revision        "0.002003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.002004"^^xsd:string;
+	dc:issued            "2025-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove usage of // operator.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002004.tar.gz>;
+	doap:revision        "0.002004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.002005"^^xsd:string;
+	dc:issued            "2025-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove usage of // operator from test case too.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.002005.tar.gz>;
+	doap:revision        "0.002005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

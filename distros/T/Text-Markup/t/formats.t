@@ -117,7 +117,7 @@ done_testing;
 
 __DATA__
 # Name,Format,Format Module,Required Module,extensions
-markdown,markdown,Text::Markup::Markdown,Text::Markdown 1.000004,md,mkdn,mkd,mdown,markdown
+markdown,markdown,Text::Markup::Markdown,Text::Markdown::Discount 0.13,md,mkdn,mkd,mdown,markdown
 commonmark,markdown,Text::Markup::CommonMark,CommonMark 0.290000,md,mkdn,mkd,mdown,markdown
 html,html,Text::Markup::HTML,,html,htm,xhtml,xhtm
 pod,pod,Text::Markup::Pod,Pod::Simple::XHTML 3.15,pod,pm,pl

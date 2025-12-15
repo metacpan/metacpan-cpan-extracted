@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002002';
+our $VERSION   = '0.002005';
 
 use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
 use Exporter::Tiny qw( mkopt _croak );
@@ -19,7 +19,7 @@ use List::Util qw(any);
 
 BEGIN {
 	if ( $] < 5.010 ) {
-		require mro::compat;
+		require MRO::Compat;
 	}
 };
 
@@ -209,7 +209,8 @@ sub setup_steps {
 sub mark_inc {
 	my $me = shift;
 	
-	$INC{module_notional_filename($me->this)} //= __FILE__;
+	my $file = module_notional_filename($me->this);
+	$INC{$file} = __FILE__ unless defined $file;
 	
 	return $me;
 }

@@ -12,12 +12,6 @@ README.deepl-JA.md
 README.deepl-KO.md
 README.deepl-RU.md
 README.deepl-ZH.md
-README.gpt4-DE.md
-README.gpt4-FR.md
-README.gpt4-JA.md
-README.gpt4-KO.md
-README.gpt4-RU.md
-README.gpt4-ZH.md
 README.gpt5-DE.md
 README.gpt5-FR.md
 README.gpt5-JA.md
@@ -80,6 +74,8 @@ lib/App/Greple/xlate/gpt4.pm
 lib/App/Greple/xlate/gpt4o.pm
 lib/App/Greple/xlate/gpt5.pm
 lib/App/Greple/xlate/null.pm
+lib/App/dozo.pm
+lib/App/xlate.pm
 minil.toml
 script/dozo
 script/xlate

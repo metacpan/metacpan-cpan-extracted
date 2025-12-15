@@ -48,7 +48,7 @@
             "Template" : "0",
             "YAML::XS" : "0",
             "autodie" : "0",
-            "perl" : "5.014"
+            "perl" : "5.036"
          }
       },
       "test" : {
@@ -63,11 +63,13 @@
             "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
+            "JSON::PP" : "0",
             "Test::DescribeMe" : "0",
             "Test::LectroTest" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::Returns" : "0.02"
+            "Test::Returns" : "0.02",
+            "Unicode::Normalize" : "0"
          }
       }
    },
@@ -86,6 +88,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,7 @@
 #!perl -T
 
+# Testing should be friendly and nice looking, not dull ugly text.
+
 use strict;
 use warnings FATAL => 'all';
 
@@ -15,14 +17,14 @@ BEGIN {
     use_ok('Term::ANSIEncode') || BAIL_OUT('Cannot load Term::ANSIEncode!');
 }
 
-diag("\n" . colored(['cyan on_black'], q{ _______        _   _              }));
-diag(colored(['cyan on_black'], q{|__   __|      | | (_)             }));
-diag(colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }));
-diag(colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }));
-diag(colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }));
-diag(colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }));
-diag(colored(['cyan on_black'], q{                             __/ | }));
-diag(colored(['cyan on_black'], q{                            |___/  }));
+diag("\r  \n\r" . colored(['cyan on_black'], q{ _______        _   _              }));
+diag("\r" . colored(['cyan on_black'], q{|__   __|      | | (_)             }));
+diag("\r" . colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }));
+diag("\r" . colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }));
+diag("\r" . colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }));
+diag("\r" . colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }));
+diag("\r" . colored(['cyan on_black'], q{                             __/ | }));
+diag("\r" . colored(['cyan on_black'], q{                            |___/  }));
 
 # utf8 must be enabled
 my $builder = Test::More->builder;
@@ -30,23 +32,31 @@ binmode $builder->output,         ":encoding(UTF-8)";
 binmode $builder->failure_output, ":encoding(UTF-8)";
 binmode $builder->todo_output,    ":encoding(UTF-8)";
 
-diag("\n" . colored(['black on_magenta'],sprintf('%-28s',' Testing object creation ')));
+diag("\r  \n\r" . colored(['bright_yellow on_magenta'],sprintf('%-25s',' Testing object creation ')));
 my $ansi = Term::ANSIEncode->new();
 isa_ok($ansi,'Term::ANSIEncode');
+diag("\e[1A\r" . colored(['bright_yellow on_magenta'],sprintf('%-25s',' Tested object creation ')) . colored(['bright_green'], ' OK'));
 
 my $max = 1;
-diag(colored(['black on_green'],sprintf('%-28s',' Testing tokens ')));
+diag("\r" . colored(['bright_yellow on_blue'],sprintf('%-25s',' Testing tokens ')) . colored(['yellow'],' ...'));
 foreach my $code (keys %{$ansi->{'ansi_meta'}}) {
     foreach my $t (keys %{$ansi->{'ansi_meta'}->{$code}}) {
         $max = max(length($t),$max);
     }
 }
 $max += 6;
-foreach my $code (keys %{$ansi->{'ansi_meta'}}) {
+my @colors = ('red','yellow','green','cyan','magenta','bright_blue');
+foreach my $code (sort(keys %{$ansi->{'ansi_meta'}})) {
+	my $color = shift(@colors);
     foreach my $token (sort(keys %{$ansi->{'ansi_meta'}->{$code}})) {
         next if ($token =~ /NEWLINE|LINEFEED|RETURN|HORIZONTAL/);
-        diag(colored(['white'],"Testing $code -> $token") . "                       \r\e[1A");
         my $text   = '[% ' . $token . ' %]';
+		diag("\r" . clline . '     ' . 
+			colored(['white'], 'Testing') .
+			colored([$color], ' ' . uc($code) . ' ') .
+			colored(['white'], 'tokens -> ') .
+			colored(['bright_yellow'], $text) . clline . "\r\e[1A"
+		);
         my $output = $ansi->ansi_decode($text);
 
         $output =~ s/\e/\\e/gs;
@@ -59,8 +69,14 @@ foreach my $code (keys %{$ansi->{'ansi_meta'}}) {
 
         cmp_ok($output,'eq',"$test","$text");
     }
+	diag("\r" . clline . '     ' .
+		colored(['white'], 'Tested ') .
+		sprintf('%-22s %s',colored([$color], ' ' . uc($code) . ' '), colored(['bright_green'],'OK')) .
+		clline
+	);
+
 }
-diag(' ' x 79 . "\n");
+diag(' ' x 79 . "\r\e[7A" . colored(['bright_yellow on_blue'],sprintf('%-25s',' Tested tokens ')) . colored(['bright_green'],' OK ') . "\n\r " x 7);
 
 exit(0);
 

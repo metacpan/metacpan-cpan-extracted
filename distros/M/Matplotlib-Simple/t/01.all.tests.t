@@ -6,6 +6,7 @@ use autodie ':all';
 use feature 'say';
 use File::Temp 'tempfile';
 use Matplotlib::Simple;
+use Test::Exception; # die_ok
 use File::Path 'rmtree';
 use Test::More;
 
@@ -76,8 +77,7 @@ sub is_valid_svg { # mostly written by Gemini
 	my $expected_namespace = 'http://www.w3.org/2000/svg';
 	# 1. Ensure the file exists
 	unless (-f $filepath) {
-		warn "Error: SVG file either not found or not a file at $filepath\n";
-		return 0;
+		die "Error: SVG file either not found or not a file at $filepath\n";
 	}
 	# 2. Slurp the file content (base Perl method)
 	# This reads the entire file into a scalar variable.
@@ -99,13 +99,62 @@ sub is_valid_svg { # mostly written by Gemini
 		return 0;
 	}
 	unless ($content =~ m/\<dc:title\>made\/written by .+Matplotlib\/Simple\.pm\<\/dc\:title\>/) {
-		warn "comment line not found for $filepath";
-		return 0;
+		die "comment line not found for $filepath";
 	}
-	# All basic checks passed
-	return 1;
+	return 1;# All basic checks passed
 }
-
+dies_ok {
+	plt({
+		data => {
+			A => 1
+		},
+		'plot.type'   => 'bar',
+		'output.file' => '/tmp/t.svg',
+		orientation   => 'blah' # should cause failure
+	});
+} '"plt" barplot dies when bar gets undefined options';
+dies_ok {
+	plt({
+		'plot.type' => 'bar',
+		'output.file' => '/tmp/t.svg'
+	});
+} '"plt" barplot dies when no data is defined';
+dies_ok {
+	plt({
+		data => {
+			A => 1
+		},
+		'output.file' => '/tmp/t.svg'
+	});
+} '"plt" barplot dies when no "plot.type" is defined';
+dies_ok {
+	plt({
+		data => {
+			A => [1,2,3]
+		},
+		'plot.type'   => 'hist',
+		vmax          => 1,
+		'output.file' => '/tmp/t.svg'
+	});
+} '"plt" hist dies when undefined option is used';
+dies_ok {
+	plt({
+		data => {
+			A => [1,2,3]
+		},
+		'plot.type'   => 'hist',
+	});
+} '"plt" hist dies when "output.file" is omitted';
+dies_ok {
+	plt({
+		data => {
+			A => [1,2,3]
+		},
+		execute       => 0,
+		fh            => $python_available,
+		'plot.type'   => 'hist',
+	});
+} '"plt" dies when it is given a scalar that is not a filehandle';
 # Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς
 sub linspace {    # mostly written by Grok
 	my ( $start, $stop, $num, $endpoint ) = @_;   # endpoint means include $stop
@@ -563,7 +612,6 @@ plt({
 	nrows => 2,
 });
 plt({
-	'output.file' => 'output.images/single.barplot.svg',
 	data              => { # simple hash
 		Fri => 76,
 		Mon => 73,
@@ -573,12 +621,13 @@ plt({
 		Tue => 93,
 		Wed => 77
 	},
+	execute      => 0,
+	fh           => $fh,
+	'output.file' => 'output.images/single.barplot.svg',
 	'plot.type'  => 'bar',
+	title        => 'Customer Calls by Days',
 	xlabel       => '# of Days',
 	ylabel       => 'Count',
-	title        => 'Customer Calls by Days',
-	execute      => 0,
-	fh => $fh,
 });
 plt({
 	data => {
@@ -1488,6 +1537,21 @@ plt({
 	suptitle      => 'Colored Table options'
 });
 plt({
+	'plot.type'   => 'plot',
+	data          => {
+		'expo' => [
+			[@x],
+			[map { 1 + 1 / ( $_**2 + 1) } @x]
+		]
+	},
+	execute       => 0,
+	fh            => $fh,
+	hlines        => "1,$x[0],$x[-1], linestyles = 'dashed'",
+	'output.file' => 'output.images/hlines.svg',
+	set_xlim      => "$x[0],$x[-1]",
+	'show.legend' => 0
+});
+plt({
 	fh                => $fh,
 	execute           => 1,
 	ncols             => 3,
@@ -1584,11 +1648,12 @@ plt({
 	],
 	'output.file' => 'output.images/hist2d.svg',
 });
+my @output_files = ('output.images/add.single.svg','output.images/single.wide.svg','output.images/single.array.svg','output.images/wide.subplots.svg','output.images/single.pie.svg','output.images/pie.svg','output.images/single.boxplot.svg','output.images/boxplot.svg','output.images/single.violinplot.svg','output.images/violin.svg','output.images/single.barplot.svg','output.images/single.hexbin.svg','output.images/single.hist2d.svg','output.images/hexbin.svg','output.images/plots.svg','output.images/plot.single.svg','output.images/plot.single.arr.svg','output.images/barplots.svg','output.images/single.hist.svg','output.images/histogram.svg','output.images/single.scatter.svg','output.images/scatterplots.svg','output.images/imshow.single.svg','output.images/imshow.multiple.svg','output.images/single.tab.svg','output.images/tab.multiple.svg','output.images/hlines.svg','output.images/hist2d.svg');
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('output.images/add.single.svg','output.images/single.wide.svg','output.images/single.array.svg','output.images/wide.subplots.svg','output.images/single.pie.svg','output.images/pie.svg','output.images/single.boxplot.svg','output.images/boxplot.svg','output.images/single.violinplot.svg','output.images/violin.svg','output.images/single.barplot.svg','output.images/single.hexbin.svg','output.images/single.hist2d.svg','output.images/hexbin.svg','output.images/plots.svg','output.images/plot.single.svg','output.images/plot.single.arr.svg','output.images/barplots.svg','output.images/single.hist.svg','output.images/histogram.svg','output.images/single.scatter.svg','output.images/scatterplots.svg','output.images/imshow.single.svg','output.images/imshow.multiple.svg','output.images/single.tab.svg','output.images/tab.multiple.svg','output.images/hist2d.svg');
 foreach my $file (@output_files) {
 	ok(-f $file, "Output file ($file) was created.");
 	ok(is_valid_svg($file), "$file is likely a valid SVG file");
+	unlink $file;
 }
 done_testing();
 say 'Now removing test files and directory to save space.';

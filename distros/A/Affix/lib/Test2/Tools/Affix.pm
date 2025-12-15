@@ -19,7 +19,7 @@ package Test2::Tools::Affix v0.12.0 {
                 plan todo skip skip_all done_testing diag note
                 subtest ok isa_ok skip_all is isnt like
                 pass
-                lives dies try_ok warns
+                lives dies try_ok warns warning
                 U D T F DNE array string float number bool hash etc end
                 refcount
                 can_ok isa_ok

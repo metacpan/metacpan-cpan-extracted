@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.113-2-g02f745dd
+package OpenAPI::Modern; # git description: v0.114-12-g14675c3b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use 5.020;
 use utf8;
@@ -24,12 +24,11 @@ use Safe::Isa;
 use List::Util qw(first pairs);
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use Scalar::Util 'looks_like_number';
 use builtin::compat 'indexed';
 use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
-use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique true false);
+use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal true false);
 use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
@@ -1236,7 +1235,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.114
+version 0.115
 
 =head1 SYNOPSIS
 
@@ -1364,7 +1363,7 @@ aims to be but some features are not yet available.
 
 =for Pod::Coverage BUILDARGS FREEZE THAW
 
-=for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId openapi Mojolicious
+=for stopwords schema jsonSchemaDialect metaschema subschema perlish operationId openapi Mojolicious
 
 =head1 CONSTRUCTOR ARGUMENTS
 

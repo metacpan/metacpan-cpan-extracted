@@ -9,10 +9,9 @@ Requires python3 and matplotlib installations.
 
 Simplest use case:
 
- use Matplotlib::Simple 'plt';
- plt({
+ use Matplotlib::Simple;
+ bar({
     'output.file'     => '/tmp/gospel.word.counts.png',
-    'plot.type'       => 'bar',
     data              => {
        Matthew => 18345,
        Mark    => 11304,
@@ -21,14 +20,12 @@ Simplest use case:
     }
  });
 
-where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<fh> are all specific to C<MatPlotLib::Simple>.
+A nore complete (and slightly faster execution):
 
-As of version 0.11, all plot types are available as their own subroutines for making B<single> plots.
-For example, the above code is equivalent to the shorter version:
-
- use Matplotlib::Simple 'bar';
- bar({
+ use Matplotlib::Simple;
+ plt({
     'output.file'     => '/tmp/gospel.word.counts.png',
+    'plot.type'       => 'bar',
     data              => {
        Matthew => 18345,
        Mark    => 11304,
@@ -83,6 +80,7 @@ which produces the following subplots image:
 
 
 C<bar>, C<barh>, C<boxplot>, C<hexbin>, C<hist>, C<hist2d>, C<imshow>, C<pie>, C<plot>, C<scatter>, and C<violinplot> all match the methods in matplotlib itself.
+
 =head1 Examples/Plot Types
 
 Consider the following helper subroutines to generate data to plot:

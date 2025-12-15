@@ -1,5 +1,5 @@
 package Task::BeLike::SHLOMIF;
-$Task::BeLike::SHLOMIF::VERSION = '0.0.11';
+$Task::BeLike::SHLOMIF::VERSION = '0.0.12';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::SHLOMIF - Be like SHLOMIF / Shlomi Fish.
 
 =head1 VERSION
 
-version 0.0.11
+version 0.0.12
 
 =head1 TASK CONTENTS
 
@@ -61,6 +61,8 @@ version 0.0.11
 
 =head3 L<Pod::Xhtml>
 
+=head3 L<QuadPres>
+
 =head3 L<SQ>
 
 =head3 L<Task::FreecellSolver::Testing>
@@ -78,6 +80,8 @@ version 0.0.11
 =head3 L<Test::Some>
 
 =head3 L<Tree::AVL>
+
+=head3 L<WWW::LinkChecker::Internal>
 
 =head2 Favourite Apps
 

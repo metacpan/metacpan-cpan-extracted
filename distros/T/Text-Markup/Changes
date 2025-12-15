@@ -1,5 +1,13 @@
 Revision history for Perl extension Text-Markup.
 
+0.40 2025-12-15T00:10:26Z
+   - Fixed typo in `Build.PL` that prevented the recommendation to install th
+     CommonMark module.
+   - Replaced Text::Markdown with Text::Markdown::Discount, as it seems better
+     maintained and supports tables, code fences, definition lists, and more.
+   - Fixed p3rl.org URLs in tests.
+   - Fixed links to markup parsers incorrectly pasted as Text::Markdown.
+
 0.33  2024-02-15T20:12:54Z
     - Added support for registering a regular expression for Text::Markup::None
       by passing it in the `use` statement. The None parser otherwise is only
@@ -18,9 +26,9 @@ Revision history for Perl extension Text-Markup.
     - Removed very old custom paths to `docutils` (reST) and `asciidoc`
       binaries on Windows. Users must ensure that the proper commands are
       in the PATH, instead.
-    - Added Text::Markdown::Asciidoctor, which uses the `asciidoctor` command,
-      as a updated alternative to Text::Markdown::Asciidoc, which uses the
-      legacy `asciidoc` command. Text::Markdown will not use this formatter by
+    - Added Text::Markup::Asciidoctor, which uses the `asciidoctor` command,
+      as a updated alternative to Text::Markup::Asciidoc, which uses the
+      legacy `asciidoc` command. Text::Markup will not use this formatter by
       default, but when explicitly loaded will be used instead of
       Text::Markup::Asciidoc.
     - Added Text::Markup::CommonMark, which uses the cmark library, via the

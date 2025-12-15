@@ -1,7 +1,7 @@
 ---
 abstract: 'provides CONCAT code generation out of client data according to MIFIR rules'
 author:
-  - 'DERIV <DERIV@cpan.org>'
+  - 'binary.com <BINARY@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -9,48 +9,25 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.98'
+  perl: '5.014000'
 configure_requires:
-  ExtUtils::MakeMaker: '7.64'
+  ExtUtils::MakeMaker: '6.48'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Finance-MIFIR-CONCAT
-no_index:
-  directory:
-    - eg
-    - share
-    - shares
-    - t
-    - xt
-provides:
-  Finance::MIFIR::CONCAT:
-    file: lib/Finance/MIFIR/CONCAT.pm
-    version: '0.01'
 requires:
   Date::Utility: '0'
-  Exporter: '0'
-  File::ShareDir: '0'
   YAML::XS: '0'
-  perl: '5.014'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
+  perl: '5.014000'
 resources:
-  bugtracker: https://github.com/binary-com/perl-Finance-MIFIR-CONCAT/issues
-  homepage: https://github.com/binary-com/perl-Finance-MIFIR-CONCAT
-  repository: https://github.com/binary-com/perl-Finance-MIFIR-CONCAT.git
-version: '0.01'
-x_authority: cpan:DERIV
-x_contributors:
-  - 'Boris Blinov <boris.blinov@binary.com>'
-  - 'chylli-binary <chylli@binary.com>'
-  - 'Jean-Yves Sireau <jy@binary.com>'
-  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
-  - 'Zak B. Elep <zakame@zakame.net>'
+  bugtracker: https://github.com/deriv-com/perl-Finance-MIFIR-CONCAT/issues
+  repository: git://github.com/deriv-com/perl-Finance-MIFIR-CONCAT.git
+version: '0.02'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

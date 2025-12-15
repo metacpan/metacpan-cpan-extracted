@@ -7,7 +7,7 @@ use Text::Markup;
 use HTML::Entities;
 use File::BOM qw(open_bom);
 
-our $VERSION = '0.33';
+our $VERSION = '0.40';
 
  sub import {
     # Set a regex if passed one.
@@ -51,7 +51,7 @@ Text::Markup::None - Turn a file with no known markup into HTML
 
 =head1 Description
 
-This is the default parser used by Text::Markdown in the event that it cannot
+This is the default parser used by L<Text::Markup> in the event that it cannot
 determine the format of a text file. All it does is read the file in (relying
 on a L<BOM|https://www.unicode.org/unicode/faq/utf_bom.html#BOM>, encodes all
 entities, and then returns an HTML string with the file in a C<< <pre> >>
@@ -74,7 +74,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2025 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

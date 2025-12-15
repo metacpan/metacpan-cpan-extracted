@@ -427,8 +427,8 @@ subtest 'Forward Call with Many Arguments' => sub {
 };
 subtest 'Parser Error Reporting' => sub {
     note 'Testing that malformed signatures produce helpful error messages.';
-    like dies { Affix::wrap( $lib_path, 'add', '(int, ^, int)->int' ) }, qr[parse signature], 'wrap() dies on invalid signature';
-    like dies { Affix::sizeof('{int, double') },                         qr[parse signature], 'sizeof() dies on unterminated aggregate';
+    like warning { Affix::wrap( $lib_path, 'add', '(int, ^, int)->int' ) }, qr[parse signature], 'wrap() warning on invalid signature';
+    like warning { Affix::sizeof('{int, double') },                         qr[parse signature], 'sizeof() warning on unterminated aggregate';
 };
 subtest '"Kitchen Sink" Callback' => sub {
     note 'Testing a callback with 10 mixed arguments passed as a direct coderef.';
@@ -524,8 +524,8 @@ subtest 'Type Introspection (sizeof, alignof, offsetof)' => sub {
     is alignof($struct),         4, 'alignof(Struct object)';
     is offsetof( $struct, 'a' ), 0, 'offsetof(object, a)';
     is offsetof( $struct, 'b' ), 4, 'offsetof(object, b)';
-    like dies { offsetof( $struct, 'missing' ) }, qr/Member 'missing' not found/, 'offsetof missing member';
-    like dies { offsetof( Int,     'x' ) },       qr/expects a Struct or Union/,  'offsetof invalid type';
+    like warning { offsetof( $struct, 'missing' ) }, qr/Member 'missing' not found/, 'offsetof missing member';
+    like warning { offsetof( Int,     'x' ) },       qr/expects a Struct or Union/,  'offsetof invalid type';
 };
 subtest 'Memory Management (malloc, calloc, free)' => sub {
     my $ptr = malloc(32);
@@ -544,7 +544,7 @@ subtest 'Memory Management (malloc, calloc, free)' => sub {
     ok free($array_ptr), 'Explicitly calling free() returns true';
 
     # Note: Double-free would crash, so we assume it worked.
-    like( dies { free( find_symbol( load_library($lib_path), 'sum_int_array' ) ) },
+    like( warning { free( find_symbol( load_library($lib_path), 'sum_int_array' ) ) },
         qr/unmanaged/, 'free() croaks when called on an unmanaged pointer' );
 
     # Test that auto-freeing via garbage collection doesn't crash

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.629';
+our $VERSION = '0.630';
 
 use 5.020;
 use Moo;
@@ -102,7 +102,7 @@ sub __create_identifier ($class, $uri, $state) {
   return 1;
 }
 
-sub _eval_keyword_id ($class, $data, $schema, $state) {
+sub _eval_keyword_id ($class, $, $schema, $state) {
   # we already indexed the anchor uri, so there is nothing more to do at evaluation time.
   # we explicitly do NOT set $state->{initial_schema_uri} or change any other $state values.
   return 1
@@ -187,7 +187,7 @@ sub _traverse_keyword_schema ($class, $schema, $state) {
   return 1;
 }
 
-sub _eval_keyword_schema ($class, $data, $schema, $state) {
+sub _eval_keyword_schema ($class, $, $schema, $state) {
   # the dialect can change at any time, even in the middle of a document, where subsequent keywords
   # and vocabularies can change; however if we came to this schema via a $ref it will already be
   # set correctly
@@ -269,7 +269,7 @@ sub _traverse_keyword_recursiveAnchor ($class, $schema, $state) {
   return 1;
 }
 
-sub _eval_keyword_recursiveAnchor ($class, $data, $schema, $state) {
+sub _eval_keyword_recursiveAnchor ($class, $, $schema, $state) {
   return 1 if not $schema->{'$recursiveAnchor'} or exists $state->{recursive_anchor_uri};
 
   # record the canonical location of the current position, to be used against future resolution
@@ -318,8 +318,8 @@ sub _eval_keyword_recursiveRef ($class, $data, $schema, $state) {
 
 *_traverse_keyword_dynamicRef = \&_traverse_keyword_ref;
 
-sub _eval_keyword_dynamicRef ($class, $data, $schema, $state) {
-  my $uri = Mojo::URL->new($schema->{'$dynamicRef'})->to_abs($state->{initial_schema_uri});
+sub __resolve_dynamicRef ($class, $uri, $state) {
+  $uri = Mojo::URL->new($uri)->to_abs($state->{initial_schema_uri});
   my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
   abort($state, 'EXCEPTION: unable to find resource "%s"', $uri) if not $schema_info;
   abort($state, 'EXCEPTION: bad reference to "%s": not a schema', $schema_info->{canonical_uri})
@@ -344,6 +344,11 @@ sub _eval_keyword_dynamicRef ($class, $data, $schema, $state) {
     }
   }
 
+  return $uri;
+}
+
+sub _eval_keyword_dynamicRef ($class, $data, $schema, $state) {
+  my $uri = $class->__resolve_dynamicRef($schema->{'$dynamicRef'}, $state);
   return $class->eval_subschema_at_uri($data, $schema, $state, $uri);
 }
 
@@ -408,7 +413,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.629
+version 0.630
 
 =head1 DESCRIPTION
 

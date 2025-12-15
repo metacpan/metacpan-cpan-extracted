@@ -14,5 +14,6 @@ builder/SDL3/Builder.pm
 cpanfile
 eg/hello_world.pl
 eg/renderer/04-points.pl
+eg/synopsis.pl
 lib/SDL3.pm
 t/000_compile.t

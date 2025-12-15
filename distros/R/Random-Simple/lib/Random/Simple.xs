@@ -13,7 +13,7 @@
 //#include "xoroshiro128starstar.h"
 //#include "splitmix64.h"
 //
-// Other PRGNs just need three functions _seed(S1,S2), _rand32(),
+// Other PRNGs just need three functions _seed(S1,S2), _rand32(),
 // and _rand64()
 
 ///////////////////////////////////////////////////////////////////////
@@ -37,6 +37,6 @@ void _seed(UV seed1, UV seed2)
 
 U32 _bounded_rand(UV range)
 
-double _uint64_to_double(UV num)
+double _uint64_to_double(UV num, U8 inclusive)
 
-double _uint32_to_double(U32 num)
+float _uint32_to_float(U32 num, U8 inclusive)

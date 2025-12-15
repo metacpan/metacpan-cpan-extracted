@@ -24,9 +24,10 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "IPC::System::Simple" => 0,
     "Term::ANSIColor" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "File::Path" => 0,
   "IPC::System::Simple" => 0,
   "Term::ANSIColor" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0
 );
 

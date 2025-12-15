@@ -99,21 +99,39 @@ YAML
   );
 
 
-  die_result(
-    sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => {}) },
-    qr/missing openapi version at /,
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => {});
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => '',
+        error => 'missing openapi version',
+      },
+    ],
     'missing openapi',
   );
 
-  die_result(
-    sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => undef }) },
-    qr/bad openapi version: "" at /,
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => undef });
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => '',
+        error => 'bad openapi version: ""',
+      },
+    ],
     'empty openapi',
   );
 
-  die_result(
-    sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => 'blah' }) },
-    qr/bad openapi version: "blah" at /,
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => 'blah' });
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        keywordLocation => '',
+        error => 'bad openapi version: "blah"',
+      },
+    ],
     'bad openapi',
   );
 
@@ -347,10 +365,7 @@ YAML
   }
 
   foreach my $version (qw(3.3.5 4.0.0 4.1.0 4.1.1)) {
-    die_result(
-      sub {
-        JSON::Schema::Modern::Document::OpenAPI->new(
-          schema => $yamlpp->load_string(<<"YAML"))
+    my $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => $yamlpp->load_string(<<"YAML"));
 ---
 openapi: $version
 info:
@@ -358,9 +373,15 @@ info:
   version: 1.2.3
 paths: {}
 YAML
-      },
-      qr{unrecognized/unsupported openapi version $version},
-      'exception is thrown when the OAD version ('.$version.') has an unsupported major or minor version',
+    cmp_result(
+      [ map $_->TO_JSON, $doc->errors ],
+      [
+        {
+          keywordLocation => '',
+          error => "unrecognized/unsupported openapi version: \"$version\"",
+        },
+      ],
+      'error is generated when the OAD version ('.$version.') has an unsupported major or minor version',
     );
   }
 };

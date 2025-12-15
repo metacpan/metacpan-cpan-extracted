@@ -120,7 +120,7 @@ c23_nodiscard void * infix_arena_alloc(infix_arena_t * arena, size_t size, size_
     // Alignment must be a power of two for the bitwise alignment trick to work.
     if (alignment == 0 || (alignment & (alignment - 1)) != 0) {
         arena->error = true;
-        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_UNKNOWN, 0);  // Programmatic error
+        _infix_set_error(INFIX_CATEGORY_GENERAL, INFIX_CODE_INVALID_ALIGNMENT, 0);  // Programmatic error
         return nullptr;
     }
     infix_arena_t * current_block = arena;

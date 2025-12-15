@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.20
+Version 0.21
 
 # SYNOPSIS
 
@@ -135,11 +135,16 @@ The keyword `undef` is used to indicate that the `function` returns nothing.
 The current supported variables are
 
 - `test_nuls`, inject NUL bytes into strings (default: 1)
+
+    With this test enabled, the function is expected to die when a NUL byte is passed in.
+
 - `test_undef`, test with undefined value (default: 1)
 - `test_empty`, test with empty strings (default: 1)
 - `test_non_ascii`, test with strings that contain non ascii characters (default: 1)
 - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 - `properties`, enable [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) Property tests (default: 0)
+
+All values default to `true`.
 
 ### `%transforms` - list of transformations from input sets to output sets
 
@@ -365,7 +370,9 @@ During fuzzing iterations, there's a 40% probability that a test case will use a
 
 For property-based testing with [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest),
 you can use semantic generators to create realistic test data.
-Fuzz testing support for `semantic` entries is being developed.
+
+`unix_timestamp` is currently fully supported,
+other fuzz testing support for `semantic` entries is being developed.
 
     input:
       email:
@@ -400,6 +407,7 @@ Fuzz testing support for `semantic` entries is being developed.
 - `base64` - Base64-encoded strings
 - `md5` - MD5 hashes (32 hex chars)
 - `sha256` - SHA-256 hashes (64 hex chars)
+- `unix_timestamp`
 
 ## EDGE CASE GENERATION
 
@@ -466,6 +474,7 @@ Supported constraint types:
     and at least one value outside the list (which should die or `croak`, `_STATUS = 'DIES'`).
     This works for strings, integers, and numbers.
 
+- `enum` - synonym of `memberof`
 - `boolean` - automatic boundary tests for boolean fields
 
         input:

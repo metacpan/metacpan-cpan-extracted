@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#	Copyright (C) 2000-2010, Jan Willamowius <jan@willamowius.de>, http://www.willamowius.de/
+#	Copyright (C) 2000-2025, Jan Willamowius <jan@willamowius.de>, https://www.willamowius.de/
 #	All rights reserved.
 #	This is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -21,13 +21,13 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '1.08';
+$VERSION = '2.02';
 
 my %EuroRates = (
          BEF => {EUR=>0.0247899055505,   BEF => 1},
          DEM => {EUR=>0.511291881196,	 DEM => 1},
          ESP => {EUR=>0.00601012104384,  ESP => 1},
-         EUR => {ATS=>13.7603, BEF=>40.3399, DEM=>1.95583, EUR=>1, ESP=>166.386, FIM=>5.94573, FRF=>6.55957, GRD=>340.750, IEP=>.787564, ITL=>1936.27, LUF=>40.3399, NLG=>2.20371, PTE=>200.482, CYP=>0.585274, MTL=>0.429300, SIT=>239.640, SKK=>30.1260, EEK=>15.6466}, 
+         EUR => {ATS=>13.7603, BEF=>40.3399, DEM=>1.95583, EUR=>1, ESP=>166.386, FIM=>5.94573, FRF=>6.55957, GRD=>340.750, IEP=>.787564, ITL=>1936.27, LUF=>40.3399, NLG=>2.20371, PTE=>200.482, CYP=>0.585274, MTL=>0.429300, SIT=>239.640, SKK=>30.1260, EEK=>15.6466, LTL=>3.45303867403, LVL=>1.42287990894, HRK=>0.132722808415, BGN=>0.511291881196}, 
          FRF => {EUR=>0.152449017237, 	 FRF => 1},
          GRD => {EUR=>0.00293470286134,  GRD => 1},
          IEP => {EUR=>1.26973807843, 	 IEP => 1},
@@ -42,16 +42,22 @@ my %EuroRates = (
          SIT => {EUR=>0.00417292605575029, SIT => 1},
          SKK => {EUR=>0.0331939188740623,  SKK => 1},
          EEK => {EUR=>0.0639116485371,  EEK => 1},
+         LTL => {EUR=>0.2896,           LTL => 1},
+         LVL => {EUR=>0.7028,           LVL => 1},
+         HRK => {EUR=>7.5345,           HRK => 1},
+         BGN => {EUR=>1.95583,          BGN => 1},
 		                  );
 
 sub new() {
 	my $proto = shift;
+	my $ratesFile = shift; # optional
 	my $class = ref($proto) || $proto;
 	my $self = {};
 	$self->{CurrencyRates} = \%EuroRates;
-	$self->{RatesFile} = undef;
+	$self->{RatesFile} = $ratesFile;
 	$self->{UserAgent} = "Finance::Currency::Convert $VERSION";
 	bless($self, $class);
+	$self->readRatesFile() if (defined($ratesFile));
 	return $self;
 }
 
@@ -71,10 +77,12 @@ sub setRatesFile() {
 
 sub readRatesFile() {
 	my $self = shift;
-	return if (!defined $self->{RatesFile});
+	if (!defined $self->{RatesFile} || !-r $self->{RatesFile} || !-s $self->{RatesFile} > 0) {
+		warn("Can't read $self->{RatesFile}\n");
+		return;
+	}
 
-	open(RATES, "<$self->{RatesFile}") or return;
-	$self->{CurrencyRates} = (); # clear current table
+	open(RATES, "<", $self->{RatesFile}) or { warn("Can't read $self->{RatesFile}\n") and return };
 	while(local $_ = <RATES>) {
 		my ($source, $targetrates) = split(/\|/, $_);
 		foreach my $target (split(/\:/, $targetrates)) {
@@ -91,29 +99,52 @@ sub writeRatesFile() {
 	my $self = shift;
 	return if (!defined $self->{RatesFile});
 
-	open(RATES, ">$self->{RatesFile}") or return;
+	open(RATES, ">", $self->{RatesFile}) or { warn("Can't access $self->{RatesFile}") and return };
 	foreach my $sourcerate (sort keys %{$self->{CurrencyRates}}) {
 		print RATES "$sourcerate|";
 		foreach my $targetrate (sort keys %{ $self->{CurrencyRates}{$sourcerate}}) {
-			print RATES "$targetrate=" . $self->{CurrencyRates}{$sourcerate}{$targetrate} . ":";
-		};
+			if (exists($self->{CurrencyRates}{$sourcerate}{$targetrate})
+				&& $self->{CurrencyRates}{$sourcerate}{$targetrate} ne '') {
+				print RATES "$targetrate=" . $self->{CurrencyRates}{$sourcerate}{$targetrate} . ":";
+			}
+		}
 		print RATES "\n";
-	};
+	}
 	close(RATES);
+}
+
+sub _getQuoteFetcher() {
+	my $self = shift;
+	# test if Finance::Quote is available
+	eval { require Finance::Quote; };
+	if ($@) {
+		warn "Finance::Quote not installed - can't use updateRates()\n";
+		return undef;
+	};
+	# test if Finance::Quote::CurrencyRates::ECB is available
+	my $ecbAvailable = 0;
+	eval { require Finance::Quote::CurrencyRates::ECB; };
+	if ($@) {
+		warn "Finance::Quote::CurrencyRates::ECB not installed\n";
+	} else {
+		$ecbAvailable = 1;
+	};
+	# get the exchange rates
+	my $q;
+	if ($ecbAvailable) {
+		$q = Finance::Quote->new(currency_rates => {order => ['ECB']});
+	} else {
+		$q = Finance::Quote->new();
+	}
+	$q->user_agent->agent($self->{UserAgent});
+	return $q;
 }
 
 sub updateRates() {
 	my $self = shift;
 	my @CurrencyList = @_;
-	# test if Finance::Quote is available
-	eval { require Finance::Quote; };
-	if ($@) {
-		warn "Finance::Quote not installed - can't use updateRates()\n";
-		return;
-	};
-	# get the exchange rates
-	my $q = Finance::Quote->new;
-	$q->user_agent->agent($self->{UserAgent});
+	my $q = $self->_getQuoteFetcher();
+	return if (!defined($q));
 	foreach my $source (@CurrencyList) {
 		foreach my $target (sort keys %{ $self->{CurrencyRates}}) {
 			$self->setRate($source, $target, $q->currency($source, $target));
@@ -130,12 +161,9 @@ sub updateRate() {
 	my $self = shift;
 	my $source = shift;
 	my $target = shift;
-	# Test if Finance::Quote is available
-	eval { require Finance::Quote; };
-	if ($@) { return; };    # F::Q not installed
-	# get the exchange rates
-	my $q = Finance::Quote->new;
-	$q->user_agent->agent($self->{UserAgent});
+	my $q = $self->_getQuoteFetcher();
+	return if (!defined($q));
+	# get the exchange rate
 	$self->setRate($source, $target, $q->currency($source, $target));
 }
 
@@ -186,10 +214,11 @@ Convert currencies and fetch their exchange rates (with Finance::Quote)
    $amount_euro = $converter->convertToEUR(100, "DEM");
    $amount_dem = $converter->convertFromEUR(100, "DEM");
 
-   $converter->updateRates("EUR", "DEM", "USD");
-   $converter->updateRate("DEM", "USD");
+   $converter->updateRates("USD");
+   $amount_euro = $converter->convertToEUR(100, "USD");
 
    $converter->setRatesFile(".rates");
+   $converter->readRatesFile();
    $converter->writeRatesFile();
 
 
@@ -229,6 +258,12 @@ Currencies with built-in rates (complete):
 	CYP		Cyprus Pound
 	MTL		Maltese Lira
 	SIT		Slovenian Tolars
+	SKK		Swedish Krona
+	EEK		Estonian Koon
+	LTL		Lithuanian Litas
+	LVL		Latvian Lats
+	HRK		Croatian Kuna
+	BGN		Bulgarian Lev
 
 Other currencies (incomplete):
 
@@ -290,7 +325,7 @@ To update a single exchange rate use updateRate.
 
 =head2 UPDATERATE
 
-   $converter->updateRate("DEM, "USD");
+   $converter->updateRate("EUR, "USD");
 
 This will fetch a single exchange rate using Finance::Quote and
 update the exchange rates in memory.
@@ -299,11 +334,11 @@ update the exchange rates in memory.
 
 	$converter->setUserAgent("MyCurrencyAgent 1.0");
 
-Set the user agent string to be used by Finance::Quote.
+Set the user agent string to be used by Finance::Quote, optional.
 
 =head2 SETRATE
 
-	$converter->setRate("EUR", "USD", 999);
+	$converter->setRate("EUR", "USD", 99.99);
 
 Set one exchange rate. Used internally by updateRates,
 but may be of use if you have to add a rate manually.
@@ -312,16 +347,13 @@ but may be of use if you have to add a rate manually.
 
    $converter->setRatesFile(".rates");
 
-Name the file where exchange rates are stored. If it already exists
-it will be read into memory.
+Name the file where exchange rates are stored.
 
 =head2 READRATESFILE
 
    $converter->readRatesFile();
 
-Usually called internally by setRatesFile, but may also be called
-directly to revert to the rates stored in the file.
-Calling readRatesFile() will erase all existing exchange rates in memory.
+Read the rates stored in the rates file, overwriting previous values.
 
 =head2 WRITERATESFILE
 
@@ -333,7 +365,7 @@ with updateRates.
 
 =head1 AUTHOR
 
-  Jan Willamowius <jan@willamowius.de>, http://www.willamowius.de/perl.html
+  Jan Willamowius <jan@willamowius.de>, https://www.willamowius.de/perl.html
 
 =head1 SEE ALSO
 

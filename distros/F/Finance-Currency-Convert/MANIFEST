@@ -4,3 +4,4 @@ Makefile.PL
 MANIFEST
 META.yml
 t/convert.t
+META.json                                Module JSON meta-data (added by MakeMaker)

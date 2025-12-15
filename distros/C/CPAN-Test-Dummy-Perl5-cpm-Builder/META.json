@@ -1,0 +1,62 @@
+{
+   "abstract" : "a dummy builder",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Test-Dummy-Perl5-cpm-Builder",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::Helpers" : "0",
+            "ExtUtils::Install" : "0",
+            "ExtUtils::InstallPaths" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Test::Dummy::Perl5::cpm::Builder" : {
+         "file" : "lib/CPAN/Test/Dummy/Perl5/cpm/Builder.pm",
+         "version" : "2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/perl-CPAN-Test-Dummy-Perl5-cpm-Builder/issues"
+      },
+      "homepage" : "https://github.com/skaji/perl-CPAN-Test-Dummy-Perl5-cpm-Builder",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/perl-CPAN-Test-Dummy-Perl5-cpm-Builder.git",
+         "web" : "https://github.com/skaji/perl-CPAN-Test-Dummy-Perl5-cpm-Builder"
+      }
+   },
+   "version" : "2.1",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
+}
+

@@ -1224,12 +1224,17 @@ typedef enum {
  */
 typedef enum {
     // General Codes (0-99)
-    INFIX_CODE_SUCCESS = 0, /**< No error occurred. */
-    INFIX_CODE_UNKNOWN,     /**< An unspecified error occurred. */
+    INFIX_CODE_SUCCESS = 0,      /**< No error occurred. */
+    INFIX_CODE_UNKNOWN,          /**< An unspecified error occurred. */
+    INFIX_CODE_NULL_POINTER,     /**< A required pointer argument was NULL. */
+    INFIX_CODE_MISSING_REGISTRY, /**< A type registry was required but not provided. */
+
     // Allocation Codes (100-199)
     INFIX_CODE_OUT_OF_MEMORY = 100,       /**< A call to `malloc`, `calloc`, etc. failed. */
     INFIX_CODE_EXECUTABLE_MEMORY_FAILURE, /**< Failed to allocate executable memory from the OS. */
     INFIX_CODE_PROTECTION_FAILURE,        /**< Failed to change memory protection flags (e.g., `mprotect`). */
+    INFIX_CODE_INVALID_ALIGNMENT,         /**< An invalid alignment (0 or not power-of-two) was requested. */
+
     // Parser Codes (200-299)
     INFIX_CODE_UNEXPECTED_TOKEN = 200,   /**< Encountered an unexpected character or token. */
     INFIX_CODE_UNTERMINATED_AGGREGATE,   /**< A struct, union, or array was not properly closed. */
@@ -1238,12 +1243,15 @@ typedef enum {
     INFIX_CODE_INTEGER_OVERFLOW,         /**< An integer overflow occurred during layout calculation. */
     INFIX_CODE_RECURSION_DEPTH_EXCEEDED, /**< A type definition was too deeply nested. */
     INFIX_CODE_EMPTY_MEMBER_NAME,        /**< A named member was declared with an empty name. */
+    INFIX_CODE_EMPTY_SIGNATURE,          /**< The provided signature string was empty. */
+
     // ABI/Layout Codes (300-399)
     INFIX_CODE_UNSUPPORTED_ABI = 300, /**< The current platform's ABI is not supported by `infix`. */
     INFIX_CODE_TYPE_TOO_LARGE,        /**< A data type exceeded the ABI's size limits. */
     INFIX_CODE_UNRESOLVED_NAMED_TYPE, /**< A named type (`@Name`) was not found in the provided registry. */
     INFIX_CODE_INVALID_MEMBER_TYPE,   /**< An aggregate contained an illegal member type (e.g., `void`). */
     INFIX_CODE_LAYOUT_FAILED,         /**< The ABI layer failed to calculate a valid memory layout for a type. */
+
     // Library Loading Codes (400-499)
     INFIX_CODE_LIBRARY_NOT_FOUND = 400, /**< The requested dynamic library could not be found. */
     INFIX_CODE_SYMBOL_NOT_FOUND,        /**< The requested symbol was not found in the library. */

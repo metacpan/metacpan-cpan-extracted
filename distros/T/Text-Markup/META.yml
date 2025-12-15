@@ -18,51 +18,53 @@ name: Text-Markup
 provides:
   Text::Markup:
     file: lib/Text/Markup.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Asciidoc:
     file: lib/Text/Markup/Asciidoc.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Asciidoctor:
     file: lib/Text/Markup/Asciidoctor.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Bbcode:
     file: lib/Text/Markup/Bbcode.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Cmd:
     file: lib/Text/Markup/Cmd.pm
   Text::Markup::CommonMark:
     file: lib/Text/Markup/CommonMark.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Creole:
     file: lib/Text/Markup/Creole.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::HTML:
     file: lib/Text/Markup/HTML.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Markdown:
     file: lib/Text/Markup/Markdown.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Mediawiki:
     file: lib/Text/Markup/Mediawiki.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Multimarkdown:
     file: lib/Text/Markup/Multimarkdown.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::None:
     file: lib/Text/Markup/None.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Pod:
     file: lib/Text/Markup/Pod.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Rest:
     file: lib/Text/Markup/Rest.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Textile:
     file: lib/Text/Markup/Textile.pm
-    version: '0.33'
+    version: '0.40'
   Text::Markup::Trac:
     file: lib/Text/Markup/Trac.pm
-    version: '0.33'
+    version: '0.40'
+recommends:
+  CommonMark: '0.290000'
 requires:
   File::BOM: '0.14'
   HTML::Entities: '0'
@@ -71,7 +73,7 @@ requires:
   Parse::BBCode: '0.15'
   Pod::Simple::XHTML: '3.15'
   Symbol: '0'
-  Text::Markdown: '1.000004'
+  Text::Markdown::Discount: '0.13'
   Text::MediawikiFormat: '1.0'
   Text::MultiMarkdown: '1.000028'
   Text::Textile: '2.10'
@@ -81,5 +83,5 @@ requires:
 resources:
   homepage: https://metacpan.org/pod/Text::Markup
   license: http://dev.perl.org/licenses/
-version: '0.33'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

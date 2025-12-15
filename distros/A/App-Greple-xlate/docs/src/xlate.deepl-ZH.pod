@@ -16,7 +16,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 =head1 VERSION
 
-Version 0.9920
+Version 0.9922
 
 =head1 DESCRIPTION
 

@@ -21,6 +21,7 @@ use Test2::API 'context_do';
 use Test::Needs;
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
 use if $ENV{AUTHOR_TESTING}, 'Test2::Plugin::BailOnFail';
+use if $ENV{AUTHOR_TESTING}, 'Test2::Plugin::SubtestFilter';
 use Test::Deep qw(!array !hash); # import symbols: ignore, re etc
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use JSON::Schema::Modern::Document::OpenAPI;
@@ -52,8 +53,8 @@ YAML
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'plack': classes of type Plack::Request, Plack::Response
 # 'catalyst': classes of type Catalyst::Request, Catalyst::Response
-our @TYPES = qw(mojo lwp plack catalyst dancer2);
-our $TYPE = 'mojo'; # safe default
+our @TYPES = $ENV{TYPE} ? split(/,/, $ENV{TYPE}) : qw(mojo lwp plack catalyst dancer2);
+our $TYPE = $ENV{TYPE} ? (split(/,/, $ENV{TYPE}))[0] : 'mojo'; # safe default
 
 # Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
 sub request ($method, $uri_string, $headers = [], $body_content = undef) {

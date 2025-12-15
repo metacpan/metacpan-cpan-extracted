@@ -147,6 +147,49 @@ TODO: { local $TODO = 'Path::Class::Dir->next expecting basenames but getting fu
   @content = $file->slurp(chomp => 1);
   is_deeply \@content, ["Line1", "Line2"];
 
+  # Test scalar context with chomp
+  {
+    # Single-line file with trailing newline
+    my $single = file('t', 'slurp-single');
+    my $fh = $single->open('w') or die "Can't create $single: $!";
+    print $fh "Single line with newline\n";
+    close $fh;
+
+    my $content = eval { $single->slurp(chomp => 1) };
+    is $content, "Single line with newline",
+        "scalar slurp with chomp removes trailing newline from single-line file";
+
+    $single->remove;
+  }
+
+  {
+    # Multi-line file with trailing newline
+    my $multi = file('t', 'slurp-multi');
+    my $fh = $multi->open('w') or die "Can't create $multi: $!";
+    print $fh "Line1\nLine2\nLine3\n";
+    close $fh;
+
+    my $content = eval { $multi->slurp(chomp => 1) };
+    is $content, "Line1\nLine2\nLine3",
+        "scalar slurp with chomp removes only final trailing newline from multi-line file";
+
+    $multi->remove;
+  }
+
+  {
+    # File without trailing newline
+    my $nonl = file('t', 'slurp-no-newline');
+    my $fh = $nonl->open('w') or die "Can't create $nonl: $!";
+    print $fh "No trailing newline";
+    close $fh;
+
+    my $content = eval { $nonl->slurp(chomp => 1) };
+    is $content, "No trailing newline",
+        "scalar slurp with chomp doesn't break when no trailing newline exists";
+
+    $nonl->remove;
+  }
+
   is_deeply [ $file->slurp( chomp => 1, split => qr/n/ ) ]
     => [ [ 'Li', 'e1' ], [ 'Li', 'e2' ] ],
     "regex split with chomp";

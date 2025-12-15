@@ -8,7 +8,7 @@ use Config;
 use v5.10; # For state
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.24';
+our $VERSION = '0.26';
 our $debug   = 0;
 
 # Check if the UV (unsigned value) Perl type is 64bit
@@ -17,20 +17,20 @@ my $has_64bit = ($Config{uvsize} == 8);
 #############################################################
 
 require XSLoader;
-
 XSLoader::load();
+
+# When this module is loaded (`use`) seed with random bytes from OS
+seed_with_os_random();
 
 use Exporter 'import';
 our @EXPORT = qw(random_int random_bytes random_float random_elem shuffle_array rand srand);
 
 #############################################################
 
-my $has_been_seeded = 0;
-
 # Throw away the first batch to warm up the PRNG, this is helpful
 # if a poor seed (lots of zero bits) was chosen
 sub warmup {
-	my $iter = $_[0];
+	my ($iter) = @_;
 
 	for (my $i = 0; $i < $iter; $i++) {
 		Random::Simple::_rand64(); # C API
@@ -46,8 +46,6 @@ sub seed {
 	}
 
 	Random::Simple::_seed($seed1, $seed2); # C API
-
-	$has_been_seeded = 1;
 }
 
 # Fetch random bytes from the OS supplied method
@@ -142,9 +140,7 @@ sub seed_with_os_random {
 	# Seed the PRNG with the values we just created
 	Random::Simple::_seed($seed1, $seed2); # C API
 
-	$has_been_seeded = 1;
-
-	warmup(1024);
+	warmup(32);
 }
 
 ######################################################################
@@ -153,9 +149,7 @@ sub seed_with_os_random {
 
 # Get a string of random bytes
 sub random_bytes {
-	my $num = shift();
-
-	if (!$has_been_seeded) { seed_with_os_random(); }
+	my ($num) = @_;
 
 	my $octets_needed = $num / 4;
 
@@ -177,8 +171,6 @@ sub random_bytes {
 sub random_int {
 	my ($min, $max) = @_;
 
-	if (!$has_been_seeded) { seed_with_os_random(); }
-
 	if ($max < $min) { die("Max can't be less than min"); }
 
 	my $range = $max - $min + 1; # +1 makes it inclusive
@@ -190,29 +182,25 @@ sub random_int {
 
 # Get a random float between 0 and 1 inclusive
 sub random_float {
-	if (!$has_been_seeded) { seed_with_os_random(); }
-
-	my $num = Random::Simple::_rand64();
 	my $ret = 0;
 
 	if ($has_64bit) {
-		$ret = Random::Simple::_uint64_to_double($num);
+		my $num = Random::Simple::_rand64();
+		$ret    = Random::Simple::_uint64_to_double($num, 1);
 	} else {
-		$ret = Random::Simple::_uint32_to_double($num);
+		my $num = Random::Simple::_rand32();
+		$ret    = Random::Simple::_uint32_to_float($num, 1);
 	}
-
 
 	return $ret;
 }
 
 # Pick a random element from an array
 sub random_elem {
-	if (!$has_been_seeded) { seed_with_os_random(); }
-
 	my @arr = @_;
 
 	my $elem_count = scalar(@arr) - 1;
-	my $idx        = random_int(0, $elem_count);
+	my $idx        = Random::Simple::random_int(0, $elem_count);
 	my $ret        = $arr[$idx];
 
 	return $ret;
@@ -220,10 +208,11 @@ sub random_elem {
 
 # Use the Fisher-Yates algo to shuffle an array in a non-biased way
 sub shuffle_array {
-    my @array = @_;
+	my @array = @_;
+
     my $i = @array;
     while ($i--) {
-        my $j = random_int(0, $i);
+        my $j = Random::Simple::random_int(0, $i);
         @array[$i, $j] = @array[$j, $i];
     }
 
@@ -241,13 +230,16 @@ sub perl_rand64 {
 
 # Our srand() overrides CORE::srand()
 sub srand {
-	my $seed = int($_[0] || 0);
+	my $seed = $_[0];
 
-	if ($seed == 0) {
+	if (!$seed) {
 		$seed = int(rand() * 4294967295); # Random 32bit int
 	}
 
-	# Convert the one 32bit seed into 2x 64bit seeds
+	# Seed has to be an integer
+	$seed = int($seed);
+
+	# Convert one 32bit seed into 2x 64bit seeds
 	my $seed1 = _hash_mur3($seed);  # C API
 	my $seed2 = _hash_mur3($seed1); # C API
 
@@ -262,15 +254,20 @@ sub srand {
 #
 # This prototype is required so we can emulate CORE::rand(@array)
 sub rand(;$) {
-	my $mult = shift() || 1;
+	my ($mult) = @_;
 
-	if (!$has_been_seeded) { seed_with_os_random(); }
+	$mult ||= 1;
+	my $ret;
 
-	my $max  = 2**32 - 2; # minus 2 so we're NOT inclusive
-	my $rand = Random::Simple::_rand32(); # C API
-	my $ret  = $rand / $max;
+	if ($has_64bit) {
+		my $num = Random::Simple::_rand64();
+		$ret    = Random::Simple::_uint64_to_double($num, 0);
+	} else {
+		my $num = Random::Simple::_rand32();
+		$ret    = Random::Simple::_uint32_to_float($num, 0);
+	}
 
-	$ret = $ret * $mult;
+	$ret *= $mult;
 
 	return $ret;
 }
@@ -287,6 +284,8 @@ Random::Simple - Generate good random numbers in a user consumable way.
 
     use Random::Simple;
 
+    my $prng           = new Random::Simple();
+
     my $coin_flip      = random_int(1, 2);
     my $die_roll       = random_int(1, 6);
     my $random_percent = random_float() * 100;
@@ -294,7 +293,6 @@ Random::Simple - Generate good random numbers in a user consumable way.
 
     my @arr            = ('red', 'green', 'blue');
     my $rand_item      = random_elem(@arr);
-
     my @mixed          = shuffle_array(@arr);
 
 =head1 DESCRIPTION
@@ -335,15 +333,15 @@ returns a random element from C<@array>.
 
 =item B<shuffle_array(@array)>
 
-returns an array that has been randomized using the Fisher-Yates alorgithm
-
-=item B<srand()>
-
-emulates C<CORE::srand()> using a better PRNG.
+returns an array that has been randomized using the Fisher-Yates alorgithm.
 
 =item B<rand()>
 
 emulates C<CORE::rand()> using a better PRNG.
+
+=item B<srand()>
+
+emulates C<CORE::srand()> using a better PRNG.
 
 =item B<Random::Simple::seed($seed1, $seed2)>
 

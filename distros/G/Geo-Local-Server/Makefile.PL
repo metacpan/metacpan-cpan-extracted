@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Geo::Local::Server',
     VERSION_FROM => 'lib/Geo/Local/Server.pm',
-    AUTHOR       => 'Michael R. Davis (mdavis@stopllc.com)',
+    AUTHOR       => 'Michael R. Davis',
     ABSTRACT_FROM=> 'lib/Geo/Local/Server.pm',
     PREREQ_PM    => {
                      'Test::Simple'     => 0.44,
@@ -19,4 +19,20 @@ WriteMakefile(
                        scripts/local.coordinates
                       }
                     ],
+  'META_MERGE' => {
+    'resources' => {
+      'homepage' => 'https://github.com/mrdvt92/perl-Geo-Local-Server',
+      'bugtracker' => {
+        'web' => 'https://github.com/mrdvt92/perl-Geo-Local-Server/issues'
+      },
+      'repository' => {
+        'url' => 'git@github.com:mrdvt92/perl-Geo-Local-Server.git',
+        'type' => 'git',
+        'web' => 'https://github.com/mrdvt92/perl-Geo-Local-Server.git'
+      }
+    },
+    'meta-spec' => {
+      'version' => 2
+    }
+  }
 );

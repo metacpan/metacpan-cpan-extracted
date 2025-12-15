@@ -110,12 +110,18 @@ static const char * _get_error_message_for_code(infix_error_code_t code) {
         return "Success";
     case INFIX_CODE_UNKNOWN:
         return "An unknown error occurred";
+    case INFIX_CODE_NULL_POINTER:
+        return "A required pointer argument was NULL";
+    case INFIX_CODE_MISSING_REGISTRY:
+        return "A type registry was required but not provided";
     case INFIX_CODE_OUT_OF_MEMORY:
         return "Out of memory";
     case INFIX_CODE_EXECUTABLE_MEMORY_FAILURE:
         return "Failed to allocate executable memory";
     case INFIX_CODE_PROTECTION_FAILURE:
         return "Failed to change memory protection flags";
+    case INFIX_CODE_INVALID_ALIGNMENT:
+        return "Invalid alignment requested (must be power of two > 0)";
     case INFIX_CODE_UNEXPECTED_TOKEN:
         return "Unexpected token or character";
     case INFIX_CODE_UNTERMINATED_AGGREGATE:
@@ -130,6 +136,8 @@ static const char * _get_error_message_for_code(infix_error_code_t code) {
         return "Type definition is too deeply nested";
     case INFIX_CODE_EMPTY_MEMBER_NAME:
         return "Named type was declared with empty angle brackets";
+    case INFIX_CODE_EMPTY_SIGNATURE:
+        return "The provided signature string was empty";
     case INFIX_CODE_UNSUPPORTED_ABI:
         return "The current platform ABI is not supported";
     case INFIX_CODE_TYPE_TOO_LARGE:

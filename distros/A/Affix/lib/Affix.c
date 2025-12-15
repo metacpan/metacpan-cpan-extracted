@@ -1783,6 +1783,7 @@ XS_INTERNAL(Affix_affix) {
         symbol = infix_library_get_symbol(lib_handle_for_symbol, symbol_name_str);
 
     if (symbol == nullptr) {
+        /* Symbol lookup failed. Clean up implicit handle if we created one. */
         if (created_implicit_handle) {
             const char * lookup_path = SvOK(target_sv) ? SvPV_nolen(target_sv) : "";
             SV ** entry_sv_ptr = hv_fetch(MY_CXT.lib_registry, lookup_path, strlen(lookup_path), 0);
@@ -1796,6 +1797,8 @@ XS_INTERNAL(Affix_affix) {
                 }
             }
         }
+        /* Warn and return undef instead of silent failure or croak */
+        warn("Failed to locate symbol '%s'", symbol_name_str ? symbol_name_str : "(null)");
         XSRETURN_UNDEF;
     }
 
@@ -1814,7 +1817,14 @@ XS_INTERNAL(Affix_affix) {
 
         if (status != INFIX_SUCCESS) {
             safefree(backend);
-            croak("Failed to parse signature for affix_bundle: %s", infix_get_last_error().message);
+            if (parse_arena)
+                infix_arena_destroy(parse_arena);
+            infix_error_details_t err = infix_get_last_error();
+            if (err.message[0] != '\0')
+                warn("Failed to parse signature for affix_bundle: %s", err.message);
+            else
+                warn("Failed to parse signature for affix_bundle (Error Code: %d)", status);
+            XSRETURN_UNDEF;
         }
 
         infix_direct_arg_handler_t * handlers =
@@ -1830,7 +1840,12 @@ XS_INTERNAL(Affix_affix) {
 
         if (status != INFIX_SUCCESS) {
             safefree(backend);
-            croak("Failed to create direct trampoline: %s", infix_get_last_error().message);
+            infix_error_details_t err = infix_get_last_error();
+            if (err.message[0] != '\0')
+                warn("Failed to create direct trampoline: %s", err.message);
+            else
+                warn("Failed to create direct trampoline (Error Code: %d)", status);
+            XSRETURN_UNDEF;
         }
 
         backend->cif = infix_forward_get_direct_code(backend->infix);
@@ -1843,7 +1858,8 @@ XS_INTERNAL(Affix_affix) {
         if (!backend->pull_handler) {
             infix_forward_destroy(backend->infix);
             safefree(backend);
-            croak("Unsupported return type for affix_bundle");
+            warn("Unsupported return type for affix_bundle");
+            XSRETURN_UNDEF;
         }
 
         backend->lib_handle = created_implicit_handle ? lib_handle_for_symbol : nullptr;
@@ -1912,27 +1928,30 @@ XS_INTERNAL(Affix_affix) {
     /* Store reconstruction info */
     affix->sig_str = savepv(signature);
     affix->sym_name = symbol_name_str ? savepv(symbol_name_str) : nullptr;
-    affix->target_addr = symbol;  // The resolved address
+    affix->target_addr = symbol;
 
     if (created_implicit_handle)
         affix->lib_handle = lib_handle_for_symbol;
     else
         affix->lib_handle = nullptr;
 
-#if DEBUG
-    char * blah;
-    Newxz(blah, 1024 * 5, char);
-    infix_registry_print(blah, 1024 * 5, MY_CXT.registry);
-    warn("MY_CXT.registry: %s", blah);
-    warn("infix_forward_create(&affix->infix, \"%s\", %s (%p), MY_CXT.registry);", signature, symbol_name_str, symbol);
-#endif
-
     infix_status status = infix_forward_create(&affix->infix, signature, symbol, MY_CXT.registry);
 
     if (status != INFIX_SUCCESS) {
+        /* Cleanup and Warn */
         SvREFCNT_dec(affix->return_sv);
+        if (affix->sig_str)
+            safefree(affix->sig_str);
+        if (affix->sym_name)
+            safefree(affix->sym_name);
         safefree(affix);
-        croak("Failed to parse signature or create trampoline: %s", infix_get_last_error().message);
+
+        infix_error_details_t err = infix_get_last_error();
+        if (err.message[0] != '\0')
+            warn("Failed to parse signature or create trampoline: %s", err.message);
+        else
+            warn("Failed to parse signature or create trampoline (Error Code: %d)", status);
+        XSRETURN_UNDEF;
     }
 
     affix->cif = infix_forward_get_code(affix->infix);
@@ -1945,8 +1964,13 @@ XS_INTERNAL(Affix_affix) {
     if (affix->ret_pull_handler == nullptr) {
         infix_forward_destroy(affix->infix);
         SvREFCNT_dec(affix->return_sv);
+        if (affix->sig_str)
+            safefree(affix->sig_str);
+        if (affix->sym_name)
+            safefree(affix->sym_name);
         safefree(affix);
-        croak("Unsupported return type in signature");
+        warn("Unsupported return type in signature");
+        XSRETURN_UNDEF;
     }
 
     if (affix->num_args > 0)
@@ -1956,8 +1980,24 @@ XS_INTERNAL(Affix_affix) {
 
     affix->args_arena = infix_arena_create(4096);
     affix->ret_arena = infix_arena_create(1024);
-    if (!affix->args_arena || !affix->ret_arena)
-        croak("Failed to create memory arenas for FFI call");
+    if (!affix->args_arena || !affix->ret_arena) {
+        infix_forward_destroy(affix->infix);
+        SvREFCNT_dec(affix->return_sv);
+        if (affix->c_args)
+            safefree(affix->c_args);
+        if (affix->sig_str)
+            safefree(affix->sig_str);
+        if (affix->sym_name)
+            safefree(affix->sym_name);
+        if (affix->args_arena)
+            infix_arena_destroy(affix->args_arena);
+        // ret_arena might be null, but destroy handles null safely
+        if (affix->ret_arena)
+            infix_arena_destroy(affix->ret_arena);
+        safefree(affix);
+        warn("Failed to create memory arenas for FFI call");
+        XSRETURN_UNDEF;
+    }
 
     affix->plan_length = affix->num_args;
     if (affix->plan_length >= 0)
@@ -1999,8 +2039,15 @@ XS_INTERNAL(Affix_affix) {
             infix_arena_destroy(affix->ret_arena);
             if (affix->plan)
                 safefree(affix->plan);
+            if (affix->c_args)
+                safefree(affix->c_args);
+            if (affix->sig_str)
+                safefree(affix->sig_str);
+            if (affix->sym_name)
+                safefree(affix->sym_name);
             safefree(affix);
-            croak("Unsupported argument type in signature at index %zu", i);
+            warn("Unsupported argument type in signature at index %zu", i);
+            XSRETURN_UNDEF;
         }
 
         affix->plan[i].data.type = type;
@@ -2036,8 +2083,25 @@ XS_INTERNAL(Affix_affix) {
     XSUBADDR_t trigger = use_stack ? Affix_trigger_stack : Affix_trigger_arena;
 
     CV * cv_new = newXSproto_portable(ix == 0 ? rename : nullptr, trigger, __FILE__, /*prototype_buf*/ nullptr);
-    if (UNLIKELY(cv_new == nullptr))
-        croak("Failed to install new XSUB");
+    if (UNLIKELY(cv_new == nullptr)) {
+        infix_forward_destroy(affix->infix);
+        SvREFCNT_dec(affix->return_sv);
+        infix_arena_destroy(affix->args_arena);
+        infix_arena_destroy(affix->ret_arena);
+        if (affix->plan)
+            safefree(affix->plan);
+        if (affix->out_param_info)
+            safefree(affix->out_param_info);
+        if (affix->c_args)
+            safefree(affix->c_args);
+        if (affix->sig_str)
+            safefree(affix->sig_str);
+        if (affix->sym_name)
+            safefree(affix->sym_name);
+        safefree(affix);
+        warn("Failed to install new XSUB");
+        XSRETURN_UNDEF;
+    }
 
     /* Attach Magic for lifecycle management */
     sv_magicext((SV *)cv_new, nullptr, PERL_MAGIC_ext, &Affix_cv_vtbl, (const char *)affix, 0);
@@ -2999,6 +3063,7 @@ XS_INTERNAL(Affix_find_symbol) {
     }
     XSRETURN_UNDEF;
 }
+
 XS_INTERNAL(Affix_pin) {
     dXSARGS;
     dMY_CXT;
@@ -3009,17 +3074,25 @@ XS_INTERNAL(Affix_pin) {
     const char * symbol_name = SvPV_nolen(ST(2));
     const char * signature = SvPV_nolen(ST(3));
     infix_library_t * lib = infix_library_open(lib_path_or_name);
-    if (lib == nullptr)
-        croak(
-            "Failed to load library from path '%s' for pinning: %s", lib_path_or_name, infix_get_last_error().message);
+    if (lib == nullptr) {
+        warn("Failed to load library from path '%s' for pinning: %s", lib_path_or_name, infix_get_last_error().message);
+        XSRETURN_UNDEF;
+    }
     void * ptr = infix_library_get_symbol(lib, symbol_name);
     infix_library_close(lib);
-    if (ptr == nullptr)
-        croak("Failed to locate symbol '%s' in library '%s'", symbol_name, lib_path_or_name);
+    if (ptr == nullptr) {
+        warn("Failed to locate symbol '%s' in library '%s'", symbol_name, lib_path_or_name);
+        XSRETURN_UNDEF;
+    }
     infix_type * type = nullptr;
     infix_arena_t * arena = nullptr;
-    if (infix_type_from_signature(&type, &arena, signature, MY_CXT.registry) != INFIX_SUCCESS)
-        croak_sv(_format_parse_error(aTHX_ "for pin", signature, infix_get_last_error()));
+    if (infix_type_from_signature(&type, &arena, signature, MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for pin", signature, infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
+        if (arena)
+            infix_arena_destroy(arena);
+        XSRETURN_UNDEF;
+    }
     _pin_sv(aTHX_ target_sv, type, ptr, false);
     infix_arena_destroy(arena);
     XSRETURN_YES;
@@ -3044,9 +3117,11 @@ XS_INTERNAL(Affix_sizeof) {
     infix_type * type = nullptr;
     infix_arena_t * arena = nullptr;
     if (infix_type_from_signature(&type, &arena, signature, MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for sizeof", signature, infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
         if (arena)
             infix_arena_destroy(arena);
-        croak_sv(_format_parse_error(aTHX_ "for sizeof", signature, infix_get_last_error()));
+        XSRETURN_UNDEF;
     }
     size_t type_size = infix_type_get_size(type);
     infix_arena_destroy(arena);
@@ -3064,9 +3139,11 @@ XS_INTERNAL(Affix_alignof) {
     infix_type * type = nullptr;
     infix_arena_t * arena = nullptr;
     if (infix_type_from_signature(&type, &arena, signature, MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for alignof", signature, infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
         if (arena)
             infix_arena_destroy(arena);
-        croak_sv(_format_parse_error(aTHX_ "for alignof", signature, infix_get_last_error()));
+        XSRETURN_UNDEF;
     }
     size_t align = (type->category == INFIX_TYPE_ARRAY) ? type->alignment : infix_type_get_alignment(type);
     if (align == 0)
@@ -3087,14 +3164,17 @@ XS_INTERNAL(Affix_offsetof) {
     infix_type * type = nullptr;
     infix_arena_t * arena = nullptr;
     if (infix_type_from_signature(&type, &arena, signature, MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for offsetof", signature, infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
         if (arena)
             infix_arena_destroy(arena);
-        croak_sv(_format_parse_error(aTHX_ "for offsetof", signature, infix_get_last_error()));
+        XSRETURN_UNDEF;
     }
 
     if (type->category != INFIX_TYPE_STRUCT && type->category != INFIX_TYPE_UNION) {
         infix_arena_destroy(arena);
-        croak("offsetof expects a Struct or Union type");
+        warn("offsetof expects a Struct or Union type");
+        XSRETURN_UNDEF;
     }
 
     size_t offset = 0;
@@ -3108,8 +3188,10 @@ XS_INTERNAL(Affix_offsetof) {
         }
     }
     infix_arena_destroy(arena);
-    if (!found)
-        croak("Member '%s' not found in type '%s'", member_name, signature);
+    if (!found) {
+        warn("Member '%s' not found in type '%s'", member_name, signature);
+        XSRETURN_UNDEF;
+    }
     ST(0) = sv_2mortal(newSVuv(offset));
     XSRETURN(1);
 }
@@ -3296,8 +3378,11 @@ XS_INTERNAL(Affix_typedef) {
     }
     sv_catpv(def_sv, ";");
     PING;
-    if (infix_register_types(MY_CXT.registry, SvPV_nolen(def_sv)) != INFIX_SUCCESS)
-        croak_sv(_format_parse_error(aTHX_ "in typedef", SvPV_nolen(def_sv), infix_get_last_error()));
+    if (infix_register_types(MY_CXT.registry, SvPV_nolen(def_sv)) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "in typedef", SvPV_nolen(def_sv), infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
+        XSRETURN_UNDEF;
+    }
 
 #if DEBUG
     char * blah;
@@ -3379,8 +3464,10 @@ void _DumpHex(pTHX_ const void * addr, size_t len, const char * file, int line) 
     PING;
     printf("Dumping %lu bytes from %p at %s line %d\n", (unsigned long)len, addr, file, line);
     PING;
-    if (len == 0)
-        croak("ZERO LENGTH");
+    if (len == 0) {
+        warn("ZERO LENGTH");
+        return;
+    }
     PING;
     for (i = 0; i < len; i++) {
         PING;
@@ -3431,8 +3518,10 @@ void _DD(pTHX_ SV * scalar, const char * file, int line) {
     PUTBACK;
     count = call_pv("Data::Printer::p", G_SCALAR);
     SPAGAIN;
-    if (count != 1)
-        croak("Big trouble\n");
+    if (count != 1) {
+        warn("Big trouble\n");
+        return;
+    }
     STRLEN len;
     const char * s = SvPVx(POPs, len);
     printf("%s at %s line %d\n", s, file, line);
@@ -3469,13 +3558,16 @@ XS_INTERNAL(Affix_malloc) {
     infix_type * type = nullptr;
     infix_arena_t * parse_arena = nullptr;
     if (infix_type_from_signature(&type, &parse_arena, "*void", MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for malloc", "*void", infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
         if (parse_arena)
             infix_arena_destroy(parse_arena);
-        croak_sv(_format_parse_error(aTHX_ "for malloc", "*void", infix_get_last_error()));
+        XSRETURN_UNDEF;
     }
     if (size == 0) {
         infix_arena_destroy(parse_arena);
-        croak("Cannot malloc a zero-sized type");
+        warn("Cannot malloc a zero-sized type");
+        XSRETURN_UNDEF;
     }
     void * ptr = safemalloc(size);
     Affix_Pin * pin;
@@ -3505,14 +3597,17 @@ XS_INTERNAL(Affix_calloc) {
     infix_type * elem_type = nullptr;
     infix_arena_t * parse_arena = nullptr;
     if (infix_type_from_signature(&elem_type, &parse_arena, signature, MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for calloc", signature, infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
         if (parse_arena)
             infix_arena_destroy(parse_arena);
-        croak_sv(_format_parse_error(aTHX_ "for calloc", signature, infix_get_last_error()));
+        XSRETURN_UNDEF;
     }
     size_t elem_size = infix_type_get_size(elem_type);
     if (elem_size == 0) {
         infix_arena_destroy(parse_arena);
-        croak("Cannot calloc a zero-sized type");
+        warn("Cannot calloc a zero-sized type");
+        XSRETURN_UNDEF;
     }
     void * ptr = safecalloc(count, elem_size);
     Affix_Pin * pin;
@@ -3521,8 +3616,15 @@ XS_INTERNAL(Affix_calloc) {
     pin->managed = true;
     pin->type_arena = infix_arena_create(1024);
     infix_type * array_type;
-    if (infix_type_create_array(pin->type_arena, &array_type, elem_type, count) != INFIX_SUCCESS)
-        croak("Failed to create array type graph.");
+    if (infix_type_create_array(pin->type_arena, &array_type, elem_type, count) != INFIX_SUCCESS) {
+        safefree(pin);
+        if (ptr)
+            safefree(ptr);
+        infix_arena_destroy(pin->type_arena);
+        infix_arena_destroy(parse_arena);
+        warn("Failed to create array type graph.");
+        XSRETURN_UNDEF;
+    }
     pin->type = array_type;
     pin->size = (count * elem_size);
     infix_arena_destroy(parse_arena);
@@ -3535,8 +3637,10 @@ XS_INTERNAL(Affix_realloc) {
     if (items != 2)
         croak_xs_usage(cv, "self, new_size");
     Affix_Pin * pin = _get_pin_from_sv(aTHX_ ST(0));
-    if (!pin || !pin->managed)
-        croak("Can only realloc a managed pointer");
+    if (!pin || !pin->managed) {
+        warn("Can only realloc a managed pointer");
+        XSRETURN_NO;
+    }
     UV new_size = SvUV(ST(1));
     size_t old_size = pin->size;
     void * new_ptr = saferealloc(pin->pointer, new_size);
@@ -3556,8 +3660,10 @@ XS_INTERNAL(Affix_free) {
         warn("Affix::free called on a non-pointer object");
         XSRETURN_NO;
     }
-    if (!pin->managed)
-        croak("Cannot free a pointer that was not allocated by Affix (it is unmanaged)");
+    if (!pin->managed) {
+        warn("Cannot free a pointer that was not allocated by Affix (it is unmanaged)");
+        XSRETURN_NO;
+    }
     if (pin->pointer) {
         safefree(pin->pointer);
         pin->pointer = nullptr;
@@ -3579,8 +3685,10 @@ XS_INTERNAL(Affix_cast) {
         ptr_val = pin->pointer;
     else if (SvIOK(arg))
         ptr_val = INT2PTR(void *, SvUV(arg));
-    else
-        croak("Argument to cast must be a Pointer Object or Integer Address");
+    else {
+        warn("Argument to cast must be a Pointer Object or Integer Address");
+        XSRETURN_UNDEF;
+    }
 
     SV * type_sv = ST(1);
     const char * signature = _get_string_from_type_obj(aTHX_ type_sv);
@@ -3591,9 +3699,11 @@ XS_INTERNAL(Affix_cast) {
     infix_arena_t * parse_arena = nullptr;
 
     if (infix_type_from_signature(&new_type, &parse_arena, signature, MY_CXT.registry) != INFIX_SUCCESS) {
+        SV * err_sv = _format_parse_error(aTHX_ "for cast", signature, infix_get_last_error());
+        warn(SvPV_nolen(err_sv));
         if (parse_arena)
             infix_arena_destroy(parse_arena);
-        croak_sv(_format_parse_error(aTHX_ "for cast", signature, infix_get_last_error()));
+        XSRETURN_UNDEF;
     }
 
     /* Value (Copy) vs Pin (Reference) */
@@ -3677,8 +3787,10 @@ XS_INTERNAL(Affix_own) {
         croak_xs_usage(cv, "pin, [should_own]");
 
     Affix_Pin * pin = _get_pin_from_sv(aTHX_ ST(0));
-    if (!pin)
-        croak("Argument is not a pinned pointer");
+    if (!pin) {
+        warn("Argument is not a pinned pointer");
+        XSRETURN_UNDEF;
+    }
 
     if (items > 1) {
         // Don't dirty the memory if value hasn't changed
@@ -3713,12 +3825,14 @@ XS_INTERNAL(Affix_dump) {
     dVAR;
     dXSARGS;
     if (items != 2)
-        croak_xs_usage(cv, "self, length_in_bytes");
+        croak_xs_usage(cv, "scalar, length_in_bytes");
     PING;
     Affix_Pin * pin = _get_pin_from_sv(aTHX_ ST(0));
     PING;
-    if (!pin)
-        croak("self is not a valid pointer");
+    if (!pin) {
+        warn("scalar is not a valid pointer");
+        XSRETURN_EMPTY;
+    }
     if (!pin->pointer) {
         PING;
         warn("Cannot dump a nullptr pointer");
@@ -3778,11 +3892,15 @@ XS_INTERNAL(Affix_memcpy) {
     if (items != 3)
         croak_xs_usage(cv, "dest, src, n");
     void * dest = _resolve_writable_ptr(aTHX_ ST(0));
-    if (!dest)
-        croak("dest must be a pinned pointer or address");
+    if (!dest) {
+        warn("dest must be a pinned pointer or address");
+        XSRETURN_UNDEF;
+    }
     const void * src = _resolve_readable_ptr(aTHX_ ST(1));
-    if (!src)
-        croak("src must be a pinned pointer, address, or string");
+    if (!src) {
+        warn("src must be a pinned pointer, address, or string");
+        XSRETURN_UNDEF;
+    }
     size_t n = (size_t)SvUV(ST(2));
     memcpy(dest, src, n);
     XSRETURN(1);
@@ -3793,11 +3911,15 @@ XS_INTERNAL(Affix_memmove) {
     if (items != 3)
         croak_xs_usage(cv, "dest, src, n");
     void * dest = _resolve_writable_ptr(aTHX_ ST(0));
-    if (!dest)
-        croak("dest must be a pinned pointer or address");
+    if (!dest) {
+        warn("dest must be a pinned pointer or address");
+        XSRETURN_UNDEF;
+    }
     const void * src = _resolve_readable_ptr(aTHX_ ST(1));
-    if (!src)
-        croak("src must be a pinned pointer, address, or string");
+    if (!src) {
+        warn("src must be a pinned pointer, address, or string");
+        XSRETURN_UNDEF;
+    }
     size_t n = (size_t)SvUV(ST(2));
     memmove(dest, src, n);
     XSRETURN(1);
@@ -3808,8 +3930,10 @@ XS_INTERNAL(Affix_memset) {
     if (items != 3)
         croak_xs_usage(cv, "dest, val, n");
     void * dest = _resolve_writable_ptr(aTHX_ ST(0));
-    if (!dest)
-        croak("dest must be a pinned pointer or address");
+    if (!dest) {
+        warn("dest must be a pinned pointer or address");
+        XSRETURN_UNDEF;
+    }
     int val = (int)SvIV(ST(1));
     size_t n = (size_t)SvUV(ST(2));
     memset(dest, val, n);
@@ -3822,8 +3946,10 @@ XS_INTERNAL(Affix_memcmp) {
         croak_xs_usage(cv, "lhs, rhs, n");
     const void * lhs = _resolve_readable_ptr(aTHX_ ST(0));
     const void * rhs = _resolve_readable_ptr(aTHX_ ST(1));
-    if (!lhs || !rhs)
-        croak("arguments must be pinned pointers, addresses, or strings");
+    if (!lhs || !rhs) {
+        warn("arguments must be pinned pointers, addresses, or strings");
+        XSRETURN_UNDEF;
+    }
     size_t n = (size_t)SvUV(ST(2));
     int ret = memcmp(lhs, rhs, n);
     ST(0) = sv_2mortal(newSViv(ret));
@@ -3835,8 +3961,10 @@ XS_INTERNAL(Affix_memchr) {
     if (items != 3)
         croak_xs_usage(cv, "ptr, val, n");
     const void * ptr = _resolve_readable_ptr(aTHX_ ST(0));
-    if (!ptr)
-        croak("ptr must be a pinned pointer, address, or string");
+    if (!ptr) {
+        warn("ptr must be a pinned pointer, address, or string");
+        XSRETURN_UNDEF;
+    }
     int val = (int)SvIV(ST(1));
     size_t n = (size_t)SvUV(ST(2));
     void * res = memchr(ptr, val, n);
@@ -3872,7 +4000,8 @@ XS_INTERNAL(Affix_ptr_add) {
         type = nullptr;
     }
     else {
-        croak("ptr must be a pinned pointer or address");
+        warn("ptr must be a pinned pointer or address");
+        XSRETURN_UNDEF;
     }
 
     IV offset = SvIV(ST(1));
@@ -3897,7 +4026,8 @@ XS_INTERNAL(Affix_ptr_add) {
                     new_pin->type_arena, (infix_type **)&new_pin->type, (infix_type *)elem_copy) != INFIX_SUCCESS) {
                 infix_arena_destroy(new_pin->type_arena);
                 safefree(new_pin);
-                croak("Failed to create decayed array pointer type in ptr_add");
+                warn("Failed to create decayed array pointer type in ptr_add");
+                XSRETURN_UNDEF;
             }
         }
         else {
@@ -3911,7 +4041,8 @@ XS_INTERNAL(Affix_ptr_add) {
         if (infix_type_create_pointer_to(new_pin->type_arena, (infix_type **)&new_pin->type, void_t) != INFIX_SUCCESS) {
             infix_arena_destroy(new_pin->type_arena);
             safefree(new_pin);
-            croak("Failed to create void* type in ptr_add");
+            warn("Failed to create void* type in ptr_add");
+            XSRETURN_UNDEF;
         }
     }
 
@@ -3962,7 +4093,8 @@ XS_INTERNAL(Affix_strdup) {
         infix_arena_destroy(pin->type_arena);
         safefree(dup);
         safefree(pin);
-        croak("Failed to create char* type for strdup");
+        warn("Failed to create char* type for strdup");
+        XSRETURN_UNDEF;
     }
 
     ST(0) = sv_2mortal(_new_pointer_obj(aTHX_ pin));
@@ -4027,8 +4159,10 @@ XS_INTERNAL(Affix_address) {
 
     Affix_Pin * pin = _get_pin_from_sv(aTHX_ ST(0));
 
-    if (!pin)
-        croak("Argument is not a pinned pointer");
+    if (!pin) {
+        warn("Argument is not a pinned pointer");
+        XSRETURN_UNDEF;
+    }
 
     // Return the pointer address as a Perl unsigned integer (UV)
     ST(0) = sv_2mortal(newSVuv(PTR2UV(pin->pointer)));
@@ -4048,7 +4182,7 @@ XS_INTERNAL(Affix_CLONE) {
     MY_CXT.enum_registry = newHV();
     MY_CXT.registry = infix_registry_create();
     if (!MY_CXT.registry)
-        croak("Failed to initialize the global type registry in new thread");
+        warn("Failed to initialize the global type registry in new thread");
     XSRETURN_EMPTY;
 }
 

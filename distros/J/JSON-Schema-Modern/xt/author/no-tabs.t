@@ -165,6 +165,7 @@ my @files = (
     't/unsupported-keywords.t',
     't/validate-schema.t',
     't/vocabularies.t',
+    't/with_defaults.t',
     't/zzz-acceptance-draft2019-09-format.t',
     't/zzz-acceptance-draft2019-09.t',
     't/zzz-acceptance-draft2020-12-format.t',

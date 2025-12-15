@@ -3,25 +3,25 @@ require 5.008001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'Text::Markdown' => '1.000004',
                    'Text::Textile' => '2.10',
                    'Text::MediawikiFormat' => '1.0',
                    'Text::WikiCreole' => '0.07',
-                   'Pod::Simple::XHTML' => '3.15',
-                   'Parse::BBCode' => '0.15',
                    'Symbol' => 0,
-                   'HTML::Tagset' => 0,
+                   'Text::Markdown::Discount' => '0.13',
                    'IPC::Open3' => 0,
-                   'Text::Trac' => '0.10',
+                   'Pod::Simple::XHTML' => '3.15',
                    'HTML::Entities' => 0,
+                   'Parse::BBCode' => '0.15',
+                   'Text::Trac' => '0.10',
+                   'HTML::Tagset' => 0,
                    'Text::MultiMarkdown' => '1.000028',
                    'File::BOM' => '0.14'
                  },
-  'VERSION_FROM' => 'lib/Text/Markup.pm',
-  'NAME' => 'Text::Markup',
   'EXE_FILES' => [],
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site'
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Text/Markup.pm',
+  'NAME' => 'Text::Markup'
 )
 ;

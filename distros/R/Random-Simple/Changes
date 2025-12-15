@@ -1,3 +1,11 @@
+0.26 2025-12-14
+	- Lowered warmup rounds to 32
+	- Require Perl v5.14
+	- Better automatic seeding (less overhead)
+	- `rand()` should be more accurate on 32bit systems
+	- Make `random_float()` inclusive for real this time
+	- Use pcg64 (RXS-M-XS) for `rand64()` calls instead of chaining 2x 32bit calls
+
 0.24 2025-03-31
 	- Add `shuffle_array()` function
 	- Minor fixes for Win32 seeding

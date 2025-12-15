@@ -6,10 +6,9 @@ Requires python3 and matplotlib installations.
 # Single Plots
 Simplest use case:
 
-    use Matplotlib::Simple 'plt';
-    plt({
+    use Matplotlib::Simple;
+    bar({
 	   'output.file'     => '/tmp/gospel.word.counts.png',
-	   'plot.type'       => 'bar',
 	   data              => {
 		  Matthew => 18345,
 		  Mark    => 11304,
@@ -18,14 +17,12 @@ Simplest use case:
 	   }
     });
 
-where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `fh` are all specific to `MatPlotLib::Simple`.
+A nore complete (and slightly faster execution):
 
-As of version 0.11, all plot types are available as their own subroutines for making **single** plots.
-For example, the above code is equivalent to the shorter version:
-
-    use Matplotlib::Simple 'bar';
-    bar({
+    use Matplotlib::Simple;
+    plt({
 	   'output.file'     => '/tmp/gospel.word.counts.png',
+	   'plot.type'       => 'bar',
 	   data              => {
 		  Matthew => 18345,
 		  Mark    => 11304,
@@ -70,7 +67,11 @@ which produces the following subplots image:
 <img width="651" height="424" alt="pies" src="https://github.com/user-attachments/assets/49d3e28b-f897-4b01-9e72-38afa12fa538" />
 
 `bar`, `barh`, `boxplot`, `hexbin`, `hist`, `hist2d`, `imshow`, `pie`, `plot`, `scatter`, and `violinplot` all match the methods in matplotlib itself.
+
+
 # Examples/Plot Types
+
+
 Consider the following helper subroutines to generate data to plot:
 
     sub linspace { # mostly written by Grok

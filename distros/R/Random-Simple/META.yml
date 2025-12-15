@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
+  XSLoader: '0.14'
 configure_requires:
   ExtUtils::MakeMaker: '7.12'
 dynamic_config: 1
@@ -20,9 +21,9 @@ no_index:
     - inc
 requires:
   ExtUtils::MakeMaker: '7.12'
-  perl: '5.012'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/scottchiefbaker/perl-Random-Simple/issues
   repository: https://github.com/scottchiefbaker/perl-Random-Simple.git
-version: '0.24'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

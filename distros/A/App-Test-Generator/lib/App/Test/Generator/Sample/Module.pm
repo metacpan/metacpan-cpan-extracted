@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -33,8 +33,8 @@ Returns a new Sample::Module object.
 =cut
 
 sub new {
-    my ($class) = @_;
-    return bless {}, $class;
+	my $class = $_[0];
+	return bless {}, $class;
 }
 
 =head2 validate_email($email)

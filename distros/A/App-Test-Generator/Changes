@@ -1,5 +1,15 @@
 Revision history for App-Test-Generator
 
+0.21	Sun Dec 14 08:07:09 EST 2025
+	Schemaextractor: don't put the package name as the argument
+	Validate config settings better
+	Fix max string testing with non-ASCII characters
+	Changed rand_str to be a unified generator that randomly produces codepoint strings,
+		grapheme clusters, ZWJ emoji sequences, or aggressive Unicode fuzz strings
+	Schemaextractor: Added advanced type detection for DateTime objects, file handles, coderefs, and enum validation patterns
+	Added enum as a synonym of memberof
+	Added tests for unix_timestamp semantic type
+
 0.20	Fri Dec  5 07:53:43 EST 2025
 	Added the --version flag to fuzz-harness-generator
 	Ensure the max value of string is honoured better

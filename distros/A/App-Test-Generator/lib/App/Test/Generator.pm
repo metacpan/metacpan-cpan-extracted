@@ -4,7 +4,7 @@ package App::Test::Generator;
 # TODO: $seed should be passed to Data::Random::String::Matches
 # TODO: positional args - when config_undef is set, see what happens when not all args are given
 
-use 5.014;
+use 5.036;
 
 use strict;
 use warnings;
@@ -31,12 +31,14 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
 	DEFAULT_PROPERTY_TRIALS => 1000
 };
+
+use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties');
 
 =head1 NAME
 
@@ -44,7 +46,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 
@@ -193,6 +195,8 @@ The current supported variables are
 
 =item * C<test_nuls>, inject NUL bytes into strings (default: 1)
 
+With this test enabled, the function is expected to die when a NUL byte is passed in.
+
 =item * C<test_undef>, test with undefined value (default: 1)
 
 =item * C<test_empty>, test with empty strings (default: 1)
@@ -204,6 +208,8 @@ The current supported variables are
 =item * C<properties>, enable L<Test::LectroTest> Property tests (default: 0)
 
 =back
+
+All values default to C<true>.
 
 =head3 C<%transforms> - list of transformations from input sets to output sets
 
@@ -437,7 +443,9 @@ During fuzzing iterations, there's a 40% probability that a test case will use a
 
 For property-based testing with L<Test::LectroTest>,
 you can use semantic generators to create realistic test data.
-Fuzz testing support for C<semantic> entries is being developed.
+
+C<unix_timestamp> is currently fully supported,
+other fuzz testing support for C<semantic> entries is being developed.
 
   input:
     email:
@@ -491,6 +499,8 @@ Fuzz testing support for C<semantic> entries is being developed.
 =item * C<md5> - MD5 hashes (32 hex chars)
 
 =item * C<sha256> - SHA-256 hashes (64 hex chars)
+
+=item * C<unix_timestamp>
 
 =back
 
@@ -564,6 +574,8 @@ The C<level> argument is an integer that must be one of C<1>, C<5> or C<111>.
 The generator will automatically create test cases for each allowed value (inside the member list),
 and at least one value outside the list (which should die or C<croak>, C<_STATUS = 'DIES'>).
 This works for strings, integers, and numbers.
+
+=item * C<enum> - synonym of C<memberof>
 
 =item * C<boolean> - automatic boundary tests for boolean fields
 
@@ -1225,8 +1237,10 @@ sub generate
 		croak 'Usage: generate(schema_file [, outfile])';
 	}
 
-	# dedup: fuzzing can easily generate repeats, default is to remove duplicates
-	foreach my $field ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup') {
+	# Handle the various possible boolean settings for config values
+	# Note that the default for everything is true
+	foreach my $field (CONFIG_TYPES) {
+		next if($field eq 'properties');	# Not a boolean
 		if(exists($config{$field})) {
 			if(($config{$field} eq 'false') || ($config{$field} eq 'off') || ($config{$field} eq 'no')) {
 				$config{$field} = 0;
@@ -1622,15 +1636,20 @@ sub _validate_config {
 		}
 	}
 
-	# Validate semantic types
+	# Validate input types
 	my $semantic_generators = _get_semantic_generators();
 	for my $param (keys %{$config->{input}}) {
 		my $spec = $config->{input}{$param};
-		if (ref($spec) eq 'HASH' && defined($spec->{semantic})) {
-			my $semantic = $spec->{semantic};
-			unless (exists $semantic_generators->{$semantic}) {
-				carp "Warning: Unknown semantic type '$semantic' for parameter '$param'. Available types: ",
-					join(', ', sort keys %$semantic_generators);
+		if(ref($spec) eq 'HASH') {
+			if(defined($spec->{semantic})) {
+				my $semantic = $spec->{semantic};
+				unless (exists $semantic_generators->{$semantic}) {
+					carp "Warning: Unknown semantic type '$semantic' for parameter '$param'. Available types: ",
+						join(', ', sort keys %$semantic_generators);
+				}
+			}
+			if($spec->{'enum'} && $spec->{'memberof'}) {
+				croak "$param: has both enum and memberof";
 			}
 		}
 	}
@@ -1666,6 +1685,13 @@ sub _validate_config {
 					}
 				}
 			}
+		}
+	}
+
+	# Validate the config variables, checking that they are ones we know
+	foreach my ($k, $v) (%{$config->{'config'}}) {
+		if(!grep { $_ eq $k } (CONFIG_TYPES) ) {
+			croak "unknown config setting $k";
 		}
 	}
 }
@@ -2350,6 +2376,14 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'SHA-256 hashes (64 hex characters)',
+		},
+
+		unix_timestamp => {
+			code => q{
+				Gen {
+					time;
+				}
+			}
 		},
 	};
 }
