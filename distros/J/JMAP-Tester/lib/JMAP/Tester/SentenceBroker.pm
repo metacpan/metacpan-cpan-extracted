@@ -1,8 +1,10 @@
-use v5.14.0;
-package JMAP::Tester::SentenceBroker 0.107;
+use v5.20.0;
+package JMAP::Tester::SentenceBroker 0.108;
 
 use Moo;
 with 'JMAP::Tester::Role::SentenceBroker';
+
+use experimental 'signatures';
 
 use Data::OptList ();
 use JMAP::Tester::Abort;
@@ -15,13 +17,11 @@ has response => (
   required => 1,
 );
 
-sub client_ids_for_items {
-  map {; $_->[2] } @{ $_[1] }
+sub client_ids_for_items ($self, $items_ref) {
+  map {; $_->[2] } @$items_ref;
 }
 
-sub sentence_for_item {
-  my ($self, $item) = @_;
-
+sub sentence_for_item ($self, $item) {
   return JMAP::Tester::Response::Sentence->new({
     name      => $item->[0],
     arguments => $item->[1],
@@ -31,17 +31,13 @@ sub sentence_for_item {
   });
 }
 
-sub paragraph_for_items {
-  my ($self, $items) = @_;
-
+sub paragraph_for_items ($self, $items_ref) {
   return JMAP::Tester::Response::Paragraph->new({
-    sentences       => [ map {; $self->sentence_for_item($_) } @$items ],
+    sentences       => [ map {; $self->sentence_for_item($_) } @$items_ref ],
   });
 }
 
-sub abort {
-  my ($self, $string, $diag_spec) = @_;
-
+sub abort ($self, $string, $diag_spec = undef) {
   $diag_spec //= [ 'Response sentences', sub { [ $_[0]->sentences ] } ];
 
   my @diagnostics;
@@ -76,9 +72,9 @@ sub abort {
   });
 }
 
-sub strip_json_types {
+sub strip_json_types ($self, $struct) {
   state $typist = JSON::Typist->new;
-  $typist->strip_types($_[1]);
+  $typist->strip_types($struct);
 }
 
 no Moo;
@@ -96,7 +92,7 @@ JMAP::Tester::SentenceBroker
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 PERL VERSION
 

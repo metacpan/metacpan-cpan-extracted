@@ -93,8 +93,15 @@ Note: The release process has hooks (in `minil.toml`) that:
 - **t/03_dozo.t** - Unit tests for dozo script functionality
   - Uses temp directories to isolate from real `.dozorc` files
   - Tests option parsing, `.dozorc` loading, and error handling
-  - Does not actually run Docker (tests stop at validation)
+  - Uses `-n` (dryrun) to avoid actual Docker execution
 - **xt/author/docker_dozo.t** - Integration tests requiring Docker
+  - Tests live container lifecycle (create, exec, start, kill)
+  - Tests dryrun mode output
+
+**Dryrun Mode (`-n`):**
+- Shows docker commands without executing them
+- Useful for testing and debugging
+- Used in t/03_dozo.t to avoid Docker dependency during installation
 
 ## Important Context
 

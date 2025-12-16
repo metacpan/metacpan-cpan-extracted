@@ -14,6 +14,7 @@ my $modules = [
   "ExtUtils::Builder::Action::Function",
   "ExtUtils::Builder::Action::Perl",
   "ExtUtils::Builder::Action::Primitive",
+  "ExtUtils::Builder::CPAN::Tool",
   "ExtUtils::Builder::MakeMaker",
   "ExtUtils::Builder::Node",
   "ExtUtils::Builder::Plan",

@@ -19,20 +19,9 @@ Marlin defaults to attributes being "ro" for a reason.
 
 =item *
 
-Type coercions are nice, but will slow down your constructor so
-should be used sparingly.
+Lazy defaults/builders will slow down your accessors. 
 
-=item *
-
-Eager defaults/builders will slow down your constructors. If you want
-fast constructors, use lazy defaults/builders.
-
-=item *
-
-Lazy defaults/builders will slow down your accessors. If you want
-fast accessors, use eager defaults/builders.
-
-Sorry you can't have it both ways. Though see:
+Though see:
 L<https://github.com/tsee/Class-XSAccessor/pull/14>.
 
 =back

@@ -10,19 +10,22 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Tree;
-$Chess::Plisco::Engine::Tree::VERSION = 'v0.8.0';
+$Chess::Plisco::Engine::Tree::VERSION = 'v1.0.0';
 use strict;
 use integer;
 
-use Locale::TextDomain qw('Chess-Plisco');
+use Locale::TextDomain ('Chess-Plisco');
 
 use Chess::Plisco qw(:all);
 # Macros from Chess::Plisco::Macro are already expanded here!
-use Chess::Plisco::Engine::Position;
+use Chess::Plisco::Engine::Position qw(CP_POS_REVERSIBLE_CLOCK);
 
 use Time::HiRes qw(tv_interval);
 
 use constant DEBUG => $ENV{DEBUG_PLISCO_TREE};
+
+use constant CP_POS_SIGNATURE => Chess::Plisco::Engine::Position::CP_POS_SIGNATURE();
+use constant CP_POS_REVERSIBLE_CLOCK => Chess::Plisco::Engine::Position::CP_POS_REVERSIBLE_CLOCK();
 
 use constant MATE => -15000;
 use constant INF => 16383;
@@ -45,18 +48,27 @@ use constant SAFETY_MARGIN => 50;
 # "attractive" than captures that the rook makes.
 my @move_values = (0) x 369;
 
+
+# MVV-LVA values. Looked up via the captured and moving piece ($move & 0x3f).
+my @mvv_lva;
+
+# Usually only queen promotions and sometimes promotions to a knight are
+# interesting. This mask is used to filter them out.
+use constant GOOD_PROMO_MASK => (1 << (CP_QUEEN)) | (1 << (CP_KNIGHT));
+
 sub new {
 	my ($class, %options) = @_;
 
 	my $position = $options{position};
 	my $signatures = $options{signatures};
 
-	# Make sure that the reversible clock does not look beyond the know
+	# Make sure that the reversible clock does not look beyond the known
 	# positions.  This will simplify the detection of a draw by repetition.
 	if ($position->[CP_POS_REVERSIBLE_CLOCK] >= @$signatures) {
 		$position->[CP_POS_REVERSIBLE_CLOCK] = @$signatures - 1;
 	}
 
+	my @killers = map { [] } 0 .. MAX_PLY - 1;
 	my $self = {
 		position => $position,
 		signatures => $signatures,
@@ -66,6 +78,8 @@ sub new {
 		info => $options{info} || sub {},
 		book => $options{book},
 		book_depth => $options{book_depth},
+		killers => \@killers,
+		cutoff_moves => [[], []], # History heuristic, one slot for each side.
 	};
 
 	bless $self, $class;
@@ -203,6 +217,7 @@ sub printPV {
 	}
 }
 
+sub quiesce; # Make it invokable without a method call.
 
 
 sub alphabeta {
@@ -217,11 +232,12 @@ sub alphabeta {
 	if (DEBUG) {
 		my $hex_signature = sprintf '%016x', $position->signature;
 		my $line = join ' ', @{$self->{line}};
+		my $fen = $position->toFEN;
 		$self->indent($ply, "alphabeta: alpha = $alpha, beta = $beta, line: $line,"
-			. " depth: $depth, sig: $hex_signature $position");
+			. " depth: $depth, sig: $hex_signature $fen");
 	}
 
-	if ($position->[CP_POS_HALF_MOVE_CLOCK] >= 100) {
+	if ($position->[CP_POS_HALFMOVE_CLOCK] >= 100) {
 		if (DEBUG) {
 			$self->indent($ply, "draw detected");
 		}
@@ -236,20 +252,16 @@ sub alphabeta {
 	my $signatures = $self->{signatures};
 	my $signature = $position->[CP_POS_SIGNATURE];
 	if ($ply > 1) {
-		my $rc = $position->reversibleClock; # FIXME! Use this!!!
+		my $rc = $position->[CP_POS_REVERSIBLE_CLOCK];
 		my $history_length = $self->{history_length};
 		my $signature_slot = $history_length + $ply;
 		my $max_back = $signature_slot - $rc - 1;
-		my $repetitions = 0;
 		for (my $n = $signature_slot - 5; $n >= $max_back; $n -= 2) {
 			if ($signatures->[$n] == $signature) {
-				++$repetitions;
-				if ($repetitions >= 2 || $n >= $history_length) {
-					if (DEBUG) {
-						$self->indent($ply, "3-fold repetition");
-					}
-					return DRAW;
+				if (DEBUG) {
+					$self->indent($ply, "3-fold repetition");
 				}
+				return DRAW;
 			}
 		}
 	}
@@ -284,47 +296,145 @@ sub alphabeta {
 	}
 
 	if ($depth <= 0) {
-		return $self->quiesce($ply, $alpha, $beta);
+		return quiesce($self, $ply, $alpha, $beta);
 	}
 
 	my @moves = $position->pseudoLegalMoves;
 
-	# Expand the moves with a score so that they can be sorted.
-	# FIXME! Our evaluation function knows the delta for each move from the
-	# PSTs. Maybe it is better to use that value for sorting?
-	my ($pawns, $knights, $bishops, $rooks, $queens) = 
-		@$position[CP_POS_PAWNS .. CP_POS_QUEENS];
-	my $pos_info = $position->[CP_POS_INFO];
-	my $her_pieces = $position->[CP_POS_WHITE_PIECES + (($pos_info & (1 << 4)) >> 4)];
-	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
+	# Sort moves. FIXME!!!! Bad captures must be searched *after* the
+	# quiet moves.
 	my $pv_move;
 	$pv_move = $pline->[$ply - 1] if @$pline >= $ply;
-	foreach my $move (@moves) {
-		if ((($move & 0x7fff) == ($pv_move & 0x7fff))) {
-			$move |= MOVE_ORDERING_PV;
-		} elsif ((($move & 0x7fff) == ($tt_move & 0x7fff))) {
-			$move |= MOVE_ORDERING_TT;
-		} elsif ($depth > 1) {
-			$move |= $position->SEE($move) << 32;
+	my (@pv, @tt, @promotions, @checks, @good_captures, @k1, @k2, @k3, @quiet, @bad_captures);
+	my $killers = $self->{killers}->[$ply];
+	my $k1 = $killers->[0];
+	my $k2 = $killers->[1];
+	my $k3 = $ply > 1 ? $self->{killers}->[$ply - 2]->[0] : 0;
+	if ($depth >= 5) {
+		# Full sorting.
+		my %good_captures;
+		foreach my $move (@moves) {
+			if (((($move) & 0x1fffc0) == (($pv_move) & 0x1fffc0))) {
+				push @pv, $move;
+			} elsif (((($move) & 0x1fffc0) == (($tt_move) & 0x1fffc0))) {
+				push @tt, $move;
+			} elsif (my $promote = ((($move) >> 6) & 0x7)) {
+				if ((GOOD_PROMO_MASK >> $promote) & 1) {
+					push @promotions, $move;
+				} else {
+					push @quiet, $move;
+				}
+			} elsif ($position->moveGivesCheck($move)) {
+				push @checks, $move;
+			} elsif (((($move) >> 3) & 0x7)) {
+				my $see = $position->SEE($move);
+				if ($see >= 0) {
+					$good_captures{$move} = $position->SEE($move);
+				} else {
+					push @bad_captures, $move;
+				}
+			} elsif ($move == $k1) {
+				$k1[0] = $move;
+			} elsif ($move == $k2) {
+				$k2[0] = $move;
+			} elsif ($move == $k3) {
+				$k3[0] = $move;
+			} else {
+				push @quiet, $move;
+			}
 		}
+		@good_captures = sort { $good_captures{$b} <=> $good_captures{$a} } keys %good_captures;
+		@bad_captures = sort { $mvv_lva[$b] <=> $mvv_lva[$a] } @bad_captures;
+	} elsif ($depth >= 4) {
+		# Light sorting.
+		my %good_captures;
+		foreach my $move (@moves) {
+			if (((($move) & 0x1fffc0) == (($pv_move) & 0x1fffc0))) {
+				push @pv, $move;
+			} elsif (((($move) & 0x1fffc0) == (($tt_move) & 0x1fffc0))) {
+				push @tt, $move;
+			} elsif (my $promote = ((($move) >> 6) & 0x7)) {
+				if ((GOOD_PROMO_MASK >> $promote) & 1) {
+					push @promotions, $move;
+				} else {
+					push @quiet, $move;
+				}
+			} elsif (((($move) >> 3) & 0x7)) {
+				my $see = $position->SEE($move);
+				if ($see >= 0) {
+					$good_captures{$move} = $position->SEE($move);
+				} else {
+					push @bad_captures, $move;
+				}
+			} elsif ($move == $k1) {
+				$k1[0] = $move;
+			} elsif ($move == $k2) {
+				$k2[0] = $move;
+			} elsif ($move == $k3) {
+				$k3[0] = $move;
+			} else {
+				push @quiet, $move;
+			}
+		}
+		@good_captures = sort { $good_captures{$b} <=> $good_captures{$a} } keys %good_captures;
+		@bad_captures = sort { $mvv_lva[$b] <=> $mvv_lva[$a] } @bad_captures;
+	} else {
+		# Minimal sorting.
+		foreach my $move (@moves) {
+			if (((($move) & 0x1fffc0) == (($pv_move) & 0x1fffc0))) {
+				push @pv, $move;
+			} elsif (((($move) & 0x1fffc0) == (($tt_move) & 0x1fffc0))) {
+				push @tt, $move;
+			} elsif (my $promote = ((($move) >> 6) & 0x7)) {
+				if ((GOOD_PROMO_MASK >> $promote) & 1) {
+					push @promotions, $move;
+				} else {
+					push @quiet, $move;
+				}
+			} elsif (((($move) >> 3) & 0x7)) {
+				push @good_captures, $move;
+			} elsif ($move == $k1) {
+				$k1[0] = $move;
+			} elsif ($move == $k2) {
+				$k2[0] = $move;
+			} elsif ($move == $k3) {
+				$k3[0] = $move;
+			} else {
+				push @quiet, $move;
+			}
+		}
+		@good_captures = sort { $mvv_lva[$b & 0x3f] <=> $mvv_lva[$a & 0x3f] } @good_captures;
 	}
 
-	# Now sort the moves according to the material gain.
-	@moves = sort { $b <=> $a } @moves;
+	# Apply history bonus and malus to all quiet moves. We store the bonuses
+	# in the upper 32 bits so that we can do a simple integer sort.
+	my $cutoff_moves = $self->{cutoff_moves}->[$position->[CP_POS_TO_MOVE]];
+	foreach my $move (@quiet) {
+		$move |= (($cutoff_moves->[($move & 0x1ffe00) >> 9]) << 32);
+	}
+	@quiet = sort { $b <=> $a } @quiet;
+
+	@moves = (@pv, @tt, @promotions, @checks, @good_captures, @k1, @k2, @k3, @quiet, @bad_captures);
 
 	my $legal = 0;
+	my $moveno = 0;
 	my $pv_found;
+	my $is_null_window = $beta - $alpha == 1;
 	my $tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_ALPHA();
 	my $best_move = 0;
 	my $print_current_move = $ply == 1 && $self->{print_current_move};
 	my $signature_slot = $self->{history_length} + $ply;
+	my @check_info = $position->inCheck;
+	my @backup = @$position;
+	my $best_value = -INF;
 	foreach my $move (@moves) {
+		next if !$position->checkPseudoLegalMove($move, @check_info);
 		my @line;
-		my $state = $position->doMove($move) or next;
+		$position->move($move, 1);
 		$signatures->[$signature_slot] = $position->[CP_POS_SIGNATURE];
 		++$self->{nodes};
 		$self->printCurrentMove($depth, $move, $legal) if $print_current_move;
-		my $val;
+		my $score;
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
 			$self->indent($ply, "move $cn: start search");
@@ -334,88 +444,124 @@ sub alphabeta {
 			if (DEBUG) {
 				$self->indent($ply, "null window search");
 			}
-			$val = -$self->alphabeta($ply + 1, $depth - 1,
-					-$alpha - 1, -$alpha, \@line);
-			if (($val > $alpha) && ($val < $beta)) {
+			$score = -alphabeta($self, $ply + 1, $depth - 1, -$alpha - 1, -$alpha, \@line);
+			if (($score > $alpha) && ($score < $beta)) {
 				if (DEBUG) {
-					$self->indent($ply, "value $val outside null window, re-search");
+					$self->indent($ply, "value $score outside null window, re-search");
 				}
 				undef @line;
-				$val = -$self->alphabeta($ply + 1, $depth - 1,
-						-$beta, -$alpha, \@line);
+				$score = -alphabeta($self, $ply + 1, $depth - 1, -$beta, -$alpha, \@line);
 			}
 		} else {
 			if (DEBUG) {
 				$self->indent($ply, "recurse normal search");
 			}
-			$val = -$self->alphabeta($ply + 1, $depth - 1,
-					-$beta, -$alpha, \@line);
+			$score = -alphabeta($self, $ply + 1, $depth - 1, -$beta, -$alpha, \@line);
 		}
 		++$legal;
+		++$moveno;
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
-			$self->indent($ply, "move $cn: value $val");
+			$self->indent($ply, "move $cn: value $score");
 		}
-		$position->undoMove($state);
+		@$position = @backup;
 		if (DEBUG) {
 			pop @{$self->{line}};
 		}
-		if ($val >= $beta) {
+		if ($score > $best_value) {
+			$best_value = $score;
+			$best_move = $move;
+			$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
+
+			if ($score > $alpha) {
+				$alpha = $score;
+				$pv_found = 1;
+				@$pline = ($move, @line);
+
+				if (DEBUG) {
+					$self->indent($ply, "raise alpha to $alpha");
+				}
+				if ($ply == 1) {
+					$self->{score} = $score;
+					$self->printPV($pline);
+				}
+			}
+		}
+		if ($score >= $beta) {
 			if (DEBUG) {
 				my $hex_sig = sprintf '%016x', $signature;
 				my $cn = $position->moveCoordinateNotation($move);
-				$self->indent($ply, "$cn fail high ($val >= $beta), store $val(BETA) \@depth $depth for $hex_sig");
+				$self->indent($ply, "$cn fail high ($score >= $beta), store $score(BETA) \@depth $depth for $hex_sig");
 			}
 			$tt->store($signature, $depth,
 				Chess::Plisco::Engine::TranspositionTable::TT_SCORE_BETA(),
-				$val, $move);
-			return $beta;
-		}
-		if ($val > $alpha) {
-			$alpha = $val;
-			$pv_found = 1;
-			@$pline = ($move, @line);
+				$score, $move);
 
-			$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
-			$best_move = $move;
-	
-			if (DEBUG) {
-				$self->indent($ply, "raise alpha to $alpha");
+
+			# Quiet move or bad capture failing high?
+			my $first_quiet = 1 + (scalar @moves) - (scalar @quiet) - (scalar @bad_captures);
+			if ($moveno >= $first_quiet && !((($move) >> 3) & 0x7)) {
+				if (DEBUG) {
+					my $cn = $position->moveCoordinateNotation($move);
+					$self->indent($ply, "$cn is quiet and becomes new killer move");
+				}
+
+				# We also allow bad captures to be a killer move.
+				my $killers = $self->{killers}->[$ply];
+				($killers->[0], $killers->[1]) = ($move, $killers->[0]);
+
+				# The history bonus should only be given to real quiet
+				# moves, not bad captures. Later, when we also give
+				# maluses, we still want to give the malus to all
+				# previously searched quiet moves.
+
+				# This is the from and to square as one single integer.
+				my $from_to = ($move & 0x1ffe00) >> 9;
+
+				$cutoff_moves->[$from_to] += $depth * $depth;
+				if (DEBUG) {
+					my $bonus = $depth * $depth;
+					my $cn = $position->moveCoordinateNotation($move);
+					$self->indent($ply, "$cn is quiet and gets history bonus $bonus");
+				}
 			}
-			if ($ply == 1) {
-				$self->{score} = $val;
-				$self->printPV($pline);
-			}
+
+			return $best_value;
 		}
 	}
 
 	if (!$legal) {
 		# Mate or stalemate.
 		if (!$position->inCheck) {
-			$alpha = DRAW;
+			$best_value = DRAW;
 		} else {
 			#$alpha = MATE + $self->{depth} - $depth + 1;
-			$alpha = MATE + $ply;
+			$best_value = MATE + $ply;
 		}
 		if (DEBUG) {
-			$self->indent($ply, "mate/stalemate, score: $alpha");
+			$self->indent($ply, "mate/stalemate, score: $best_value");
 		}
 	}
 
 	if (DEBUG) {
 		my $hex_sig = sprintf '%016x', $signature;
-		my $type;
-		if ($tt_type == TT_SCORE_ALPHA) {
-			$type = 'ALPHA';
+		if ($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT()) {
+			$self->indent($ply, "returning best value $best_value without tt store for $hex_sig");
 		} else {
-			$type = 'EXACT';
+			my $type;
+			if ($tt_type == TT_SCORE_ALPHA) {
+				$type = 'ALPHA';
+			} else {
+				$type = 'EXACT';
+			}
+			$self->indent($ply, "returning best value $best_value, store ($type) \@depth $depth for $hex_sig");
 		}
-		$self->indent($ply, "returning alpha $alpha, store ($type) \@depth $depth for $hex_sig");
 	}
 
-	$tt->store($signature, $depth, $tt_type, $alpha, $best_move);
+	$tt->store($signature, $depth, $tt_type, $best_value, $best_move)
+		if !($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT());
 
-	return $alpha;
+	return $best_value;
 }
 
 sub quiesce {
@@ -437,11 +583,11 @@ sub quiesce {
 	}
 
 	# Expand the search, when in check.
-	if ($position->[CP_POS_IN_CHECK]) {
+	if ($position->inCheck) {
 		if (DEBUG) {
 			$self->indent($ply, "quiescence check extension");
 		}
-		return $self->alphabeta($ply, 1, $alpha, $beta, []);
+		return alphabeta($self, $ply, 1, $alpha, $beta, []);
 	}
 
 	my $tt = $self->{tt};
@@ -468,60 +614,67 @@ sub quiesce {
 		return $tt_value;
 	}
 
-	my $val = $position->evaluate;
+	my $is_null_window = $beta - $alpha == 1;
+
+	my $best_value = $position->evaluate;
 	if (DEBUG) {
-		$self->indent($ply, "static evaluation: $val");
+		$self->indent($ply, "static evaluation: $best_value");
 	}
-	if ($val >= $beta) {
+	if ($best_value >= $beta) {
 		if (DEBUG) {
 			my $hex_sig = sprintf '%016x', $signature;
-			$self->indent($ply, "quiescence standing pat ($val >= $beta), store $val(EXACT) \@depth 0 for $hex_sig");
+			if ($is_null_window) {
+				$self->indent($ply, "quiescence standing pat ($best_value >= $beta) without tt store for $hex_sig");
+			} else {
+				$self->indent($ply, "quiescence standing pat ($best_value >= $beta), store $best_value(EXACT) \@depth 0 for $hex_sig");
+			}
 		}
 		# FIXME! Is that correct?
 		$tt->store($signature, 0,
 			Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT(),
-			$val, 0
-		);
-		return $beta;
+			$best_value, 0
+		) if !$is_null_window ;
+
+		return $best_value;
 	}
 
 	my $tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_ALPHA();
-	if ($val > $alpha) {
-		$alpha = $val;
+	if ($best_value > $alpha) {
+		$alpha = $best_value;
 		# FIXME! Correct?
 		$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
 	}
 
-	my @pseudo_legal = $position->pseudoLegalAttacks;
-	my $pos_info = $position->[CP_POS_INFO];
-	my $her_pieces = $position->[CP_POS_WHITE_PIECES
-			+ !((($position->[CP_POS_INFO] & (1 << 4)) >> 4))];
-	my (@moves);
-	my $signatures = $self->{signatures};
-	my $signature_slot = $self->{history_length} + $ply;
-	foreach my $move (@pseudo_legal) {
-		my $state = $position->doMove($move) or next;
-		$signatures->[$signature_slot] = $position->[CP_POS_SIGNATURE];
-		$position->undoMove($state);
-		my $see = $position->SEE($move);
-
-		# A marginal difference can occur if bishops and knights have different
-		# values.  But we want to ignore that.
-		next if $see <= -CP_PAWN_VALUE;
-
-		# FIXME! Do we have a PV move here?
-		if ($move == $tt_move) {
-			push @moves, MOVE_ORDERING_TT | $move;
+	my @moves = $position->pseudoLegalAttacks;
+	my (@tt, @promotions, @checks, %captures);
+	foreach my $move (@moves) {
+		if (((($move) & 0x1fffc0) == (($tt_move) & 0x1fffc0))) {
+			push @tt, $move;
+		} elsif ((GOOD_PROMO_MASK >> (((($move) >> 6) & 0x7))) & 1) {
+			# Skip underpromotions in quiescence.
+			push @promotions, $move;
+		} elsif ($position->moveGivesCheck($move)) { # FIXME! Too expensive?
+			push @checks, $move;
 		} else {
-			push @moves, ($see << 32) | $move;
+			$captures{$move} = $position->SEE($move);
 		}
 	}
+
+	my @captures = sort { $captures{$b} <=> $captures{$a} } keys %captures;
+	@moves = (@tt, @promotions, @checks, @captures);
+
+	my $signatures = $self->{signatures};
+	my $signature_slot = $self->{history_length} + $ply;
+	my @check_info = $position->inCheck;
+	my @backup = @$position;
 
 	my $legal = 0;
 	my $tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_ALPHA();
 	my $best_move = 0;
-	foreach my $move (sort { $b <=> $a } @moves) {
-		my $state = $position->doMove($move);
+	foreach my $move (@moves) {
+		next if !$position->checkPseudoLegalMove($move, @check_info);
+		$position->move($move, 1);
+		$signatures->[$signature_slot] = $position->[CP_POS_SIGNATURE];
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
 			push @{$self->{line}}, $cn;
@@ -532,31 +685,35 @@ sub quiesce {
 		if (DEBUG) {
 			$self->indent($ply, "recurse quiescence search");
 		}
-		$val = -quiesce($self, $ply + 1, -$beta, -$alpha);
+		my $score = -quiesce($self, $ply + 1, -$beta, -$alpha);
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
-			$self->indent($ply, "move $cn: value: $val");
+			$self->indent($ply, "move $cn: value: $score");
 			pop @{$self->{line}};
 		}
-		$position->undoMove($state);
-		if ($val >= $beta) {
+		@$position = @backup;
+		if ($score >= $beta) {
 			if (DEBUG) {
 				my $hex_sig = sprintf '%016x', $signature;
 				my $cn = $position->moveCoordinateNotation($move);
-				$self->indent($ply, "$cn quiescence fail high ($val >= $beta), store $val(BETA) \@depth 0 for $hex_sig");
+				$self->indent($ply, "$cn quiescence fail high ($score >= $beta), store $score(BETA) \@depth 0 for $hex_sig");
 			}
 			$tt->store($signature, 0,
 				Chess::Plisco::Engine::TranspositionTable::TT_SCORE_BETA(),
-				$val, $move);
-			return $beta;
+				$score, $move);
+
+			return $score;
 		}
-		if ($val > $alpha) {
+		if ($score > $best_value) {
+			$best_value = $score;
+			$best_move = $move;
+		}
+		if ($score > $alpha) {
 			if (DEBUG) {
 				$self->indent($ply, "raise quiescence alpha to $alpha");
 			}
-			$alpha = $val;
+			$alpha = $score;
 			$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
-			$best_move = $move;
 		}
 	}
 
@@ -568,12 +725,17 @@ sub quiesce {
 		} else {
 			$type = 'EXACT';
 		}
-		$self->indent($ply, "quiescence returning alpha $alpha, store ($type) \@depth 0 for $hex_sig");
+		if ($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT()) {
+			$self->indent($ply, "quiescence returning best value $best_value without tt store for $hex_sig");
+		} else {
+			$self->indent($ply, "quiescence returning best value $best_value, store ($type) \@depth 0 for $hex_sig");
+		}
 	}
 
-	$tt->store($signature, 0, $tt_type, $val, $best_move);
+	$tt->store($signature, 0, $tt_type, $best_value, $best_move)
+		if !($is_null_window && $tt_type == Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT());
 
-	return $alpha;
+	return $best_value;
 }
 
 sub rootSearch {
@@ -591,6 +753,11 @@ sub rootSearch {
 	my @line = @$pline;
 	my $alpha = -INF;
 	my $beta = +INF;
+
+	if (DEBUG) {
+		my $fen = $position->toFEN;
+		$self->debug("Searching $fen");
+	}
 	eval {
 		while (++$depth <= $max_depth) {
 			my @lower_windows = (-50, -100, -INF);
@@ -720,7 +887,7 @@ sub getPonderMove {
 	my $pos = $self->{position}->copy;
 
 	# Play our move.
-	$pos->doMove($line[0]);
+	$pos->move($line[0]);
 
 	# And now try to find an entry in the transposition table.
 	my $signature = $pos->[CP_POS_SIGNATURE];
@@ -766,6 +933,18 @@ foreach my $mover (CP_PAWN .. CP_KING) {
 				my $pvalue = $value + $piece_values[$promote] - CP_PAWN_VALUE;
 			}
 		}
+	}
+}
+
+my @mvv_lva_values = (
+	0, CP_PAWN_VALUE, CP_KNIGHT_VALUE, CP_BISHOP_VALUE,
+	CP_ROOK_VALUE, CP_QUEEN_VALUE, 2 * CP_QUEEN_VALUE,
+);
+foreach my $victim (CP_PAWN .. CP_QUEEN) {
+	foreach my $attacker (CP_PAWN .. CP_KING) {
+		$mvv_lva[($victim << 3) | $attacker] =
+			100 * $mvv_lva_values[$victim] - $mvv_lva_values[$attacker];
+		my $idx = ($victim << 3) | $attacker;
 	}
 }
 

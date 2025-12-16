@@ -23,7 +23,6 @@ my $initial = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 my $wanted = $initial;
 
 is $got, $wanted, 'FEN initial position';
-is "$pos", $wanted, 'FEN initial position stringified';
 
 is_deeply(Chess::Plisco->newFromFEN($wanted), $pos, 'newFromFEN');
 

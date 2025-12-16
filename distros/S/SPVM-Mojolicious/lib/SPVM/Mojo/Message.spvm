@@ -426,6 +426,17 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   private method _cache : object ($method : string, $all : int, $name : string) {
     
+    my $tmp_list = (List)undef;
+    if ($method eq "uploads") {
+      $tmp_list = List->new(new Mojo::Upload[0]);
+    }
+    elsif ($method eq "cookies") {
+      $tmp_list = List->new(new Mojo::Cookie[0]);
+    }
+    else {
+      die "[Unexpecgted Error]Invalid _cache method.";
+    }
+    
     # Cache objects by name
     my $caches_all_h = $self->{_caches_all_h};
     
@@ -451,13 +462,13 @@ class Mojo::Message extends Mojo::EventEmitter {
         }
         
         unless ($caches_all_h->{$method}{$name}) {
-          $caches_all_h->{$method}{$name} = List->new;
+          $caches_all_h->{$method}{$name} = $tmp_list->clone;
         }
         $caches_all_h->{$method}{$name}->(List)->push($item);
       }
     }
     
-    my $objects_list = $caches_all_h->{$method}{$name}->(List) // List->new;
+    my $objects_list = $caches_all_h->{$method}{$name}->(List) // $tmp_list->clone;
     my $objects = $objects_list->to_array;
     
     if ($all) {

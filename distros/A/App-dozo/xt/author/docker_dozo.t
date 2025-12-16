@@ -37,6 +37,65 @@ SKIP: {
         my $out = `$dozo -I alpine:latest -B -U pwd 2>&1`;
         like($out, qr{^/$}m, '-U unmount option works (working dir is /)');
     };
+
+    subtest 'live container' => sub {
+        my $image = 'alpine:latest';
+        my $container = 'dozo-test-live';
+
+        # Clean up any existing container
+        `$dozo -I $image -N $container -K 2>&1`;
+
+        # Create live container with sleep to keep it running (detached)
+        `docker run -d --name $container $image sleep 60 2>&1`;
+
+        # Run command in existing running container
+        my $out = `$dozo -I $image -N $container -L -B echo world 2>&1`;
+        unlike($out, qr/create live container/, 'uses existing container');
+        like($out, qr/world/, 'command runs via exec in running container');
+
+        # Stop container and verify restart
+        `docker stop $container 2>&1`;
+        $out = `$dozo -I $image -N $container -L -B echo restarted 2>&1`;
+        like($out, qr/start the $container/, 'restarts stopped container');
+
+        # Kill and recreate
+        $out = `$dozo -I $image -N $container -KL -B echo recreated 2>&1`;
+        like($out, qr/removed|create live container/, 'kills and recreates');
+        like($out, qr/recreated/, 'command runs in new container');
+
+        # Clean up
+        `$dozo -I $image -N $container -K 2>&1`;
+    };
+
+    subtest 'dryrun mode' => sub {
+        my $image = 'alpine:latest';
+        my $container = 'dozo-test-dryrun';
+
+        # Clean up
+        `$dozo -I $image -N $container -K 2>&1`;
+
+        # Dryrun without existing container
+        my $out = `$dozo -I $image -N $container -Ln -B echo test 2>&1`;
+        like($out, qr/create live container/, 'dryrun shows create message');
+        like($out, qr/^docker run\b/m, 'dryrun shows docker run command');
+        unlike($out, qr/^test$/m, 'command not actually executed');
+
+        # Create container for next tests
+        `$dozo -I $image -N $container -L -B true 2>&1`;
+
+        # Dryrun with existing running container
+        $out = `$dozo -I $image -N $container -Ln -B echo test 2>&1`;
+        like($out, qr/^docker exec\b/m, 'dryrun shows docker exec command');
+
+        # Stop container and test dryrun
+        `docker stop $container 2>&1`;
+        $out = `$dozo -I $image -N $container -Ln -B echo test 2>&1`;
+        like($out, qr/^docker start\b/m, 'dryrun shows docker start command');
+        like($out, qr/^docker exec\b/m, 'dryrun shows docker exec after start');
+
+        # Clean up
+        `$dozo -I $image -N $container -K 2>&1`;
+    };
 }
 
 done_testing;

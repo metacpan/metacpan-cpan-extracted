@@ -1,3 +1,11 @@
+Changes w/ 8.0.0:
+
+- Signatures + verification
+
+Changes w/ 7.0.0:
+
+- Source Filter instead of Lexical::Types
+
 Changes w/ 6.0.0:
 
 - Lexical::Types dependency for simple type assignment

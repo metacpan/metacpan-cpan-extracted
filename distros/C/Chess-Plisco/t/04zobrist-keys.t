@@ -14,7 +14,9 @@ use integer;
 
 use Test::More;
 use Data::Dumper;
+
 use Chess::Plisco qw(:all);
+use Chess::Plisco::Engine::Position;
 
 my ($pos, @moves, @expect);
 
@@ -78,7 +80,7 @@ my @tests = (
 plan tests => 5 * @tests;
 
 foreach my $test (@tests) {
-	my $pos = Chess::Plisco->new($test->{fen});
+	my $pos = Chess::Plisco::Engine::Position->new($test->{fen});
 	my $zk_before = $pos->signature;
 	ok defined $zk_before, "$test->{name}: zk defined after move";
 	my $move = $pos->parseMove($test->{san});
@@ -86,7 +88,10 @@ foreach my $test (@tests) {
 	ok $pos->doMove($move), "$test->{name}: do $test->{san}";
 	my $zk_updated = $pos->signature;
 	ok defined $zk_updated, "$test->{name}: zk after move";
-	my $fen = $pos->toFEN;
-	$pos = Chess::Plisco->new($fen);
+	# Internally, we do not check the legality of en-passant captures becuase
+	# the check is relatively expensive, and signatures have to be updated
+	# very often.
+	my $fen = $pos->toFEN(force_en_passant_square => 1);
+	$pos = Chess::Plisco::Engine::Position->new($fen);
 	is $zk_updated, $pos->signature, "$test->{name}: zk updated";
 }

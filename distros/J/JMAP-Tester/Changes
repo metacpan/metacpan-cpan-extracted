@@ -1,5 +1,12 @@
 Revision history for JMAP-Tester
 
+0.108     2025-12-16 09:18:30+11:00 Australia/Melbourne
+        - improve test coverage
+        - replace short-lived UA::Test with LWP and LWP::Protocol::PSGI
+        - correct a few places where confess or abort should've been the other
+          one
+        - removed ->simple_auth, which has long been entirely obsolete
+
 0.107     2025-12-11 13:26:56+11:00 Australia/Melbourne
         - add a means to test the Tester, then do so
         - add a means to supply hand-crafted JSON to $tester->request

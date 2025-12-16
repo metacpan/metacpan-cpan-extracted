@@ -35,7 +35,6 @@
             "Encode" : "0",
             "Future" : "0",
             "HTTP::Request" : "0",
-            "HTTP::Response" : "0",
             "JSON::MaybeXS" : "0",
             "JSON::Typist" : "0.005",
             "JSON::XS" : "0",
@@ -64,13 +63,17 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "HTTP::Response" : "0",
             "JSON::Typist" : "0.005",
+            "LWP::Protocol::PSGI" : "0",
+            "Plack::Request" : "0",
             "Scalar::Util" : "0",
             "Test::Abortable" : "0",
             "Test::Deep" : "0",
             "Test::Deep::JType" : "0.005",
             "Test::Fatal" : "0",
             "Test::More" : "0.96",
+            "lib" : "0",
             "perl" : "v5.26.0"
          }
       }
@@ -87,7 +90,7 @@
          "web" : "https://github.com/fastmail/JMAP-Tester"
       }
    },
-   "version" : "0.107",
+   "version" : "0.108",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -476,7 +479,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.107",
+                  "tag" : "0.108",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

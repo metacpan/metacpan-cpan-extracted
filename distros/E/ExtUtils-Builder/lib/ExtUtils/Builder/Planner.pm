@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.018';
+$ExtUtils::Builder::Planner::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -114,10 +114,10 @@ sub _make_pattern {
 		my $file = ExtUtils::Builder::Util::glob_to_regex($options{file});
 		if ($options{dir}) {
 			my $dir = ExtUtils::Builder::Util::native_to_unix_path($options{dir});
+			$dir =~ s{(?<!/)$}{/}ms;
 			return sub {
 				my ($input) = @_;
 				my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
-				$filename =~ s{(?<!/)$}{/}ms;
 				return if substr($filename, 0, length $options{dir}) ne $dir;
 				return File::Basename::basename($filename) =~ $file;
 			};
@@ -129,10 +129,10 @@ sub _make_pattern {
 		}
 	} elsif ($options{dir}) {
 		my $dir = ExtUtils::Builder::Util::native_to_unix_path($options{dir});
+		$dir =~ s{(?<!/)$}{/}ms;
 		return sub {
 			my ($input) = @_;
 			my $filename = ExtUtils::Builder::Util::native_to_unix_path($input);
-			$filename =~ s{(?<!/)$}{/}ms;
 			return substr($filename, 0, length $options{dir}) eq $options{dir};
 		};
 	} else {
@@ -255,7 +255,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

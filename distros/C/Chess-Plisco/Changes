@@ -1,5 +1,16 @@
 Revision history for Perl extension Chess-Plisco
 
+v1.0.0  2025-12-15
+This version introduces a lot of incompatible changes and will require
+modifications of code that uses the library.
+
+  - toFEN now by default only adds ep square, when ep capture is legal
+	- LAN does now really do long algebraic notation, not coordinate notation
+	- stringification is no longer overloaded, use toFEN instead
+	- changed spelling from half_move/HALF_MOVE/halfMove to
+	  halfmove/HALFMOVE/halfmove everyhwere
+	- engine code is completely separate from the library
+
 v0.8.0  2025-11-16
 	- pondering implemented in engine
 	- improved time management

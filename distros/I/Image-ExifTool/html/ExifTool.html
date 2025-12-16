@@ -743,6 +743,12 @@ effect as a value of 0 for options with numerical values.</p>
     geotagging.  GPS fixes are ignored if the PDOP is greater than this.</td>
     <td align=center>A floating point number, or undef</td>
     <td align=center>undef</td></tr>
+<tr id="GeoHPosErr"><td>GeoHPosErr</td>
+    <td>Expression to set GPSHPositioningError based on value of GPSDOP when
+    geotagging.  For example, use <code>'$GPSDOP * 4'</code> to set
+    GPSHPositioningError to 4 times GPSDOP.</td>
+    <td align=center>Perl expression using <code>$GPSDOP</code></td>
+    <td align=center>undef</td></tr>
 <tr id="GeoMinSats"><td>GeoMinSats</td>
     <td>Minimum number of satellites for geotagging. 
     GPS fixes are ignored if the number of acquired satellites is less than this.</td>
@@ -980,11 +986,12 @@ effect as a value of 0 for options with numerical values.</p>
     of some additional tags as mentioned in the <a href="TagNames/index.html">Tag Name documentation</a>.</td>
     <td align=center>0, 1, 2 or 3</td><td align=center>undef</td></tr>
 <tr id="RequestTags"><td>RequestTags</td><td>List of additional tag and/or group names
-    to request in the next call to <a href="#ExtractInfo">ExtractInfo</a>. This option is
-    useful only for tags/groups which aren't extracted unless specifically requested. Groups
-    are requested by adding a colon after the name (eg. "MacOS:"). Names are converted to lower
-    case as they are added to the list.</td><td>List reference, delimited string of names
-    (any delimiter is allowed), or undef to clear the previous RequestTags list.</td>
+    to request in subsequent calls to <a href="#ExtractInfo">ExtractInfo</a>. This option is
+    useful only for tags/groups which aren't extracted unless specifically requested, or
+    if <a href="#IgnoreTags">IgnoreTags</a> is set to "All". Groups are requested by adding
+    a colon after the name (eg. "MacOS:"). Names are converted to lower case as they are
+    added to the list.</td><td>List reference, delimited string of names (any delimiter is
+    allowed), or undef to clear the previous RequestTags list.</td>
     <td align=center>undef</td></tr>
 <tr id="SaveBin"><td>SaveBin</td><td>Flag to save binary values of tags, accessible through
     calls to <a href="#GetValue">GetValue</a> with a value type of "Bin".</td>
@@ -2072,16 +2079,16 @@ and adjacent identical group names unless the family string begins with a colon.
 </table></blockquote>
 <p>The following families of groups are available:</p>
 <blockquote><table class='norm'>
-<tr><th>Family</th><th>Description</th><th>Examples</th></tr>
+<tr><th>Family</th><th>Description</th><th>Example(s)</th></tr>
 <tr><td align=center>0</td><td>Information Type</td> <td>EXIF, XMP, IPTC</td></tr>
-<tr><td align=center>1</td><td>Specific Location</td><td>IFD0, XMP-dc</td></tr>
+<tr><td align=center>1</td><td>Specific Location</td><td>IFD0, ExifIFD, XMP-dc</td></tr>
 <tr><td align=center>2</td><td>Category</td> <td>Author, Time</td></tr>
 <tr><td align=center>3</td><td>Document Number</td> <td>Main, Doc1, Doc3-2</td></tr>
-<tr><td align=center>4</td><td>Instance Number</td> <td>Copy1, Copy2, Copy3...</td></tr>
-<tr><td align=center>5</td><td>Metadata Path</td> <td>eg. JPEG-APP1-IFD0-ExifIFD</td></tr>
+<tr><td align=center>4</td><td>Instance Number</td> <td>Copy1, Copy2, Copy3</td></tr>
+<tr><td align=center>5</td><td>Metadata Path</td> <td>JPEG-APP1-IFD0-ExifIFD</td></tr>
 <tr><td align=center>6</td><td>EXIF/TIFF Format</td> <td>int8u, int32u, undef, string</td></tr>
 <tr><td align=center>7</td><td>Tag ID</td> <td>ID-271, ID-rights, ID-a9aut</td></tr>
-<tr><td align=center>8</td><td>Alternate File</td> <td>File1, File2, File3...</td></tr>
+<tr><td align=center>8</td><td>Alternate File</td> <td>File1, File2, File3</td></tr>
 </table></blockquote>
 
 <p>Families 0 and 1 are based on the file structure, and are similar except that
@@ -2320,19 +2327,19 @@ APP2, APP3, APP4, APP5, APP6, APP7, APP8, APP9, ASF, Audible, Canon,
 CanonVRD, Composite, DICOM, DjVu, DNG, Ducky, DV, EXE, EXIF, ExifTool, File,
 FITS, FLAC, Flash, FlashPix, FLIR, Font, FotoStation, GeoTiff, GIF, GIMP,
 GM, GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG,
-Jpeg2000, JSON, JUMBF, Leaf, LNK, Lytro, M2TS, MakerNotes, Matroska, Meta,
-MIE, MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, Ogg, OpenEXR, Opus, Palm,
-PanasonicRaw, Parrot, PDF, PhotoCD, PhotoMechanic, Photoshop, PICT, PLIST,
-PNG, PostScript, PrintIM, Protobuf, PSP, QuickTime, Radiance, RAF, Rawzor,
-Real, Red, RIFF, RSRC, RTF, SigmaRaw, Sony, Stim, SVG, Theora, Torrent,
-Trailer, VCard, Vorbis, WTV, XML, XMP, ZIP
+Jpeg2000, JSON, JUMBF, Kandao, Leaf, LNK, Lytro, M2TS, MakerNotes, Matroska,
+Meta, MIE, MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, Ogg, OpenEXR, Opus,
+Palm, PanasonicRaw, Parrot, PDF, PhotoCD, PhotoMechanic, Photoshop, PICT,
+PLIST, PNG, PostScript, PrintIM, Protobuf, PSP, QuickTime, Radiance, RAF,
+Rawzor, Real, Red, RIFF, RSRC, RTF, SigmaRaw, Sony, Stim, SVG, Theora,
+Torrent, Trailer, VCard, Vorbis, WTV, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AAC, AC3, Adobe, AdobeCM, AdobeDNG, AFCP, AIFF, APE, APP10, APP2, Apple,
-ASF, Audible, AudioItemList, AudioKeys, AudioUserData, AVI1, CameraIFD,
-Canon, CanonCustom, CanonDR4, CanonRaw, CanonVRD, Casio, CBOR, Chapter#,
-CIFF, Composite, DICOM, DJI, DjVu, DjVu-Meta, DNG, Ducky, DV, EPPIM, EXE,
-EXIF, ExifIFD, ExifTool, File, FITS, FLAC, Flash, FlashPix, FLIR, Font,
+<td>AAC, AC3, Adobe, AdobeCM, AdobeDNG, AFCP, AIFF, APE, APP2, Apple, AROT, ASF,
+Audible, AudioItemList, AudioKeys, AudioUserData, AVI1, CameraIFD, Canon,
+CanonCustom, CanonDR4, CanonRaw, CanonVRD, Casio, CBOR, Chapter#, CIFF,
+Composite, DICOM, DJI, DjVu, DjVu-Meta, DNG, Ducky, DV, EPPIM, EXE, EXIF,
+ExifIFD, ExifTool, File, FITS, FLAC, Flash, FlashPix, FLIR, Font,
 FotoStation, FujiFilm, FujiIFD, Garmin, GE, GeoTiff, GIF, GIMP,
 GlobParamIFD, GM, Google, GoPro, GPS, GraphConv, GSpherical, H264, HP, HTC,
 HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv,
@@ -2340,10 +2347,10 @@ ICC-chrm, ICC-cicp, ICC-clrt, ICC-header, ICC-meas, ICC-meta, ICC-view,
 ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4,
 IFD0, IFD1, InfiRay, Insta360, InteropIFD, IPTC, IPTC#, ISO, ITC, ItemList,
 iTunes, JFIF, JFXX, JPEG, JPEG-HDR, Jpeg2000, JPS, JSON, JUMBF, JVC,
-KDC_IFD, Keys, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
-KyoceraRaw, Leaf, LeafSubIFD, Leica, LNK, Lyrics3, Lytro, M-RAW, M2TS, MAC,
-MacOS, MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD,
-Microsoft, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+KDC_IFD, Keys, KFIX, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
+KSTB, KVAR, KyoceraRaw, Leaf, LeafSubIFD, Leica, LNK, Lyrics3, Lytro, M-RAW,
+M2TS, MAC, MacOS, MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta,
+MetaIFD, Microsoft, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
 MIE-Flash, MIE-Geo, MIE-GPS, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
 MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-UTM,
 MIE-Video, MIFF, Minolta, MinoltaRaw, MISB, MNG, MOBI, MOI, Motorola, MPC,

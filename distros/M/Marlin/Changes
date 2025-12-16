@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003000	2025-12-15
+
+ - Use a newer version of Class::XSAccessor which allows for type coercion
+   and defaults/builders to run in the constructor.
+
 0.002005	2025-12-15
 
  [ Bug Fixes ]

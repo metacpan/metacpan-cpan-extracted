@@ -1,10 +1,12 @@
-use v5.14.0;
-use warnings;
-
-package JMAP::Tester 0.107;
+package JMAP::Tester 0.108;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
+use v5.20.0;
+use warnings;
+
 use Moo;
+
+use experimental 'signatures';
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
 use Crypt::Mac::HMAC qw(hmac_b64u);
@@ -48,8 +50,8 @@ use namespace::clean;
 #pod   });
 #pod
 #pod   my $response = $jtest->request([
-#pod     [ getMailboxes => {} ],
-#pod     [ getMessageUpdates => { sinceState => "123" } ],
+#pod     [ 'Mailbox/get' => {} ],
+#pod     [ 'Email/changes' => { sinceState => "123" } ],
 #pod   ]);
 #pod
 #pod   # This returns two Paragraph objects if there are exactly two paragraphs.
@@ -58,11 +60,11 @@ use namespace::clean;
 #pod
 #pod   # These get the single Sentence of each paragraph, asserting that there is
 #pod   # exactly one Sentence in each Paragraph, and that it's of the given type.
-#pod   my $mbx = $mbx_p->single('mailboxes');
-#pod   my $msg = $msg_p->single('messageUpdates');
+#pod   my $mbx = $mbx_p->single('Mailbox/get');
+#pod   my $msg = $msg_p->single('Email/changes');
 #pod
 #pod   is( @{ $mbx->arguments->{list} }, 10, "we expect 10 mailboxes");
-#pod   ok( ! $msg->arguments->{hasMoreUpdates}, "we got all the msg updates needed");
+#pod   ok( ! $msg->arguments->{hasMoreChanges}, "we got all the msg updates needed");
 #pod
 #pod By default, all the structures returned have been passed through
 #pod L<JSON::Typist>, so you may want to strip their type data before using normal
@@ -156,9 +158,7 @@ has json_codec => (
   },
 );
 
-sub json_encode {
-  my ($self, $data) = @_;
-
+sub json_encode ($self, $data) {
   if ($data->$_isa('JMAP::Tester::JSONLiteral')) {
     return $data->bytes;
   }
@@ -189,9 +189,7 @@ has _json_typist => (
   },
 );
 
-sub apply_json_types {
-  my ($self, $data) = @_;
-
+sub apply_json_types ($self, $data) {
   return $data unless $self->use_json_typist;
   return $self->_json_typist->apply_types($data);
 }
@@ -285,9 +283,9 @@ has _accounts => (
   predicate => '_has_accounts',
 );
 
-sub accounts {
-  return unless $_[0]->_has_accounts;
-  return %{ $_[0]->_accounts }
+sub accounts ($self) {
+  return unless $self->_has_accounts;
+  return %{ $self->_accounts }
 }
 
 #pod =method primary_account_for
@@ -306,8 +304,7 @@ has _primary_accounts => (
   predicate => '_has_primary_accounts',
 );
 
-sub primary_account_for {
-  my ($self, $using) = @_;
+sub primary_account_for ($self, $using) {
   return unless $self->_has_primary_accounts;
   return $self->_primary_accounts->{ $using };
 }
@@ -347,9 +344,7 @@ sub primary_account_for {
 #pod
 #pod =cut
 
-sub request {
-  my ($self, $input_request) = @_;
-
+sub request ($self, $input_request) {
   Carp::confess("can't perform request: no api_uri configured")
     unless $self->has_api_uri;
 
@@ -450,9 +445,7 @@ sub munge_method_triple {}
 
 sub response_class { 'JMAP::Tester::Response' }
 
-sub _jresponse_from_hresponse {
-  my ($self, $http_res) = @_;
-
+sub _jresponse_from_hresponse ($self, $http_res) {
   # TODO check that it's really application/json!
   my $json = $http_res->decoded_content;
 
@@ -524,8 +517,7 @@ has _logger => (
 #pod
 #pod =cut
 
-sub upload {
-  my ($self, $arg) = @_;
+sub upload ($self, $arg) {
   # TODO: support blob as handle or sub -- rjbs, 2016-11-17
 
   my $uri = $self->upload_uri;
@@ -622,14 +614,11 @@ sub upload {
 
 my %DL_DEFAULT = (name => 'download');
 
-sub _jwt_sub_param_from_uri {
-  my ($self, $to_sign) = @_;
+sub _jwt_sub_param_from_uri ($self, $to_sign) {
   "$to_sign";
 }
 
-sub download_uri_for {
-  my ($self, $arg) = @_;
-
+sub download_uri_for ($self, $arg) {
   Carp::confess("can't compute download URI without configured download_uri")
     unless my $uri = $self->download_uri;
 
@@ -680,8 +669,8 @@ sub download_uri_for {
   return $uri;
 }
 
-sub download {
-  my ($self, $uri_arg, $arg) = @_;
+sub download ($self, $uri_arg, $arg = undef) {
+  $arg //= {};
 
   my $uri = $self->download_uri_for($uri_arg);
 
@@ -714,18 +703,7 @@ sub download {
   return $self->should_return_futures ? $future : $future->$Failsafe->get;
 }
 
-#pod =method simple_auth
-#pod
-#pod   my $auth_struct = $tester->simple_auth($username, $password);
-#pod
-#pod This method respects the C<should_return_futures> attributes of the
-#pod JMAP::Tester object, and in futures mode will return a future that will resolve
-#pod to the Result.
-#pod
-#pod =cut
-
-sub _maybe_auth_header {
-  my ($self) = @_;
+sub _maybe_auth_header ($self) {
   return ($self->_access_token
           ? (Authorization => "Bearer " . $self->_access_token)
           : ());
@@ -744,8 +722,7 @@ sub _now_timestamp {
     $hour, $min, $sec;
 }
 
-sub _get_jwt_config {
-  my ($self) = @_;
+sub _get_jwt_config ($self) {
   return unless my $jwtc = $self->_jwt_config;
   return $jwtc unless $jwtc->{signingKeyValidUntil};
   return $jwtc if $jwtc->{signingKeyValidUntil} gt $self->_now_timestamp;
@@ -760,97 +737,6 @@ has _access_token => (
   init_arg => undef,
 );
 
-sub simple_auth {
-  my ($self, $username, $password) = @_;
-
-  # This is fatal, not a failure return, because it reflects the user screwing
-  # up, not a possible JMAP-related condition. -- rjbs, 2016-11-17
-  Carp::confess("can't simple_auth: no authentication_uri configured")
-    unless $self->has_authentication_uri;
-
-  my $start_json = $self->json_encode({
-    username      => $username,
-    clientName    => (ref $self),
-    clientVersion => $self->VERSION // '0',
-    deviceName    => 'JMAP Testing Client',
-  });
-
-  my $start_req = HTTP::Request->new(
-    POST => $self->authentication_uri,
-    [
-      'Content-Type' => 'application/json; charset=utf-8',
-      'Accept'       => 'application/json',
-    ],
-    $start_json,
-  );
-
-  my $start_res_f = $self->ua->request($self, $start_req, 'auth');
-
-  my $future = $start_res_f->then(sub {
-    my ($res) = @_;
-
-    unless ($res->code == 200) {
-      return Future->fail(
-        JMAP::Tester::Result::Failure->new({
-          ident         => 'failure in auth phase 1',
-          http_response => $res,
-        })
-      );
-    }
-
-    my $start_reply = $self->json_decode( $res->decoded_content );
-
-    unless (grep {; $_->{type} eq 'password' } @{ $start_reply->{methods} }) {
-      return Future->fail(
-        JMAP::Tester::Result::Failure->new({
-          ident         => "password is not an authentication method",
-          http_response => $res,
-        })
-      );
-    }
-
-    my $next_json = $self->json_encode({
-      loginId => $start_reply->{loginId},
-      type    => 'password',
-      value   => $password,
-    });
-
-    my $next_req = HTTP::Request->new(
-      POST => $self->authentication_uri,
-      [
-        'Content-Type' => 'application/json; charset=utf-8',
-        'Accept'       => 'application/json',
-      ],
-      $next_json,
-    );
-
-    return $self->ua->request($self, $next_req, 'auth');
-  })->then(sub {
-    my ($res) = @_;
-    unless ($res->code == 201) {
-      return Future->fail(
-        JMAP::Tester::Result::Failure->new({
-          ident         => 'failure in auth phase 2',
-          http_response => $res,
-        })
-      );
-    }
-
-    my $client_session = $self->json_decode( $res->decoded_content );
-
-    my $auth = JMAP::Tester::Result::Auth->new({
-      http_response   => $res,
-      client_session  => $client_session,
-    });
-
-    $self->configure_from_client_session($client_session);
-
-    return Future->done($auth);
-  });
-
-  return $self->should_return_futures ? $future : $future->$Failsafe->get;
-}
-
 #pod =method get_client_session
 #pod
 #pod   $tester->get_client_session;
@@ -864,9 +750,7 @@ sub simple_auth {
 #pod
 #pod =cut
 
-sub _get_client_session_future {
-  my ($self, $auth_uri) = @_;
-
+sub _get_client_session_future ($self, $auth_uri = undef) {
   $auth_uri //= $self->authentication_uri;
 
   my $auth_req = HTTP::Request->new(
@@ -900,8 +784,7 @@ sub _get_client_session_future {
   });
 }
 
-sub get_client_session {
-  my ($self, $auth_uri) = @_;
+sub get_client_session ($self, $auth_uri = undef) {
   my $future = $self->_get_client_session_future($auth_uri);
   return $self->should_return_futures ? $future : $future->$Failsafe->get;
 }
@@ -920,9 +803,7 @@ sub get_client_session {
 #pod
 #pod =cut
 
-sub update_client_session {
-  my ($self, $auth_uri) = @_;
-
+sub update_client_session ($self, $auth_uri = undef) {
   my $future = $self->_get_client_session_future($auth_uri)->then(sub {
     my ($auth) = @_;
 
@@ -944,9 +825,7 @@ sub update_client_session {
 #pod
 #pod =cut
 
-sub configure_from_client_session {
-  my ($self, $client_session) = @_;
-
+sub configure_from_client_session ($self, $client_session) {
   # It's not crazy to think that we'd also try to pull the primary accountId
   # out of the accounts in the auth struct, but I don't think there's a lot to
   # gain by doing that yet.  Maybe later we'd use it to set the default
@@ -999,9 +878,7 @@ sub configure_from_client_session {
 #pod
 #pod =cut
 
-sub logout {
-  my ($self) = @_;
-
+sub logout ($self) {
   # This is fatal, not a failure return, because it reflects the user screwing
   # up, not a possible JMAP-related condition. -- rjbs, 2017-02-10
   Carp::confess("can't logout: no authentication_uri configured")
@@ -1057,9 +934,7 @@ sub logout {
 #pod
 #pod =cut
 
-sub http_request {
-  my ($self, $http_request) = @_;
-
+sub http_request ($self, $http_request) {
   my $future = $self->ua->request($self, $http_request, 'misc');
   return $self->should_return_futures ? $future : $future->$Failsafe->get;
 }
@@ -1073,9 +948,7 @@ sub http_request {
 #pod
 #pod =cut
 
-sub http_get {
-  my ($self, $url, $headers) = @_;
-
+sub http_get ($self, $url, $headers = undef) {
   my $req = HTTP::Request->new(
     GET => $url,
     (defined $headers ? $headers : ()),
@@ -1093,9 +966,7 @@ sub http_get {
 #pod
 #pod =cut
 
-sub http_post {
-  my ($self, $url, $body, $headers) = @_;
-
+sub http_post ($self, $url, $body, $headers = undef) {
   my $req = HTTP::Request->new(
     POST => $url,
     $headers // [],
@@ -1119,7 +990,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 OVERVIEW
 
@@ -1141,8 +1012,8 @@ You use the test client like this:
   });
 
   my $response = $jtest->request([
-    [ getMailboxes => {} ],
-    [ getMessageUpdates => { sinceState => "123" } ],
+    [ 'Mailbox/get' => {} ],
+    [ 'Email/changes' => { sinceState => "123" } ],
   ]);
 
   # This returns two Paragraph objects if there are exactly two paragraphs.
@@ -1151,11 +1022,11 @@ You use the test client like this:
 
   # These get the single Sentence of each paragraph, asserting that there is
   # exactly one Sentence in each Paragraph, and that it's of the given type.
-  my $mbx = $mbx_p->single('mailboxes');
-  my $msg = $msg_p->single('messageUpdates');
+  my $mbx = $mbx_p->single('Mailbox/get');
+  my $msg = $msg_p->single('Email/changes');
 
   is( @{ $mbx->arguments->{list} }, 10, "we expect 10 mailboxes");
-  ok( ! $msg->arguments->{hasMoreUpdates}, "we got all the msg updates needed");
+  ok( ! $msg->arguments->{hasMoreChanges}, "we got all the msg updates needed");
 
 By default, all the structures returned have been passed through
 L<JSON::Typist>, so you may want to strip their type data before using normal
@@ -1331,14 +1202,6 @@ removed B<at any time>.
 The return value will either be a L<failure
 object|JMAP::Tester::Result::Failure> or an L<upload
 result|JMAP::Tester::Result::Download>.
-
-This method respects the C<should_return_futures> attributes of the
-JMAP::Tester object, and in futures mode will return a future that will resolve
-to the Result.
-
-=head2 simple_auth
-
-  my $auth_struct = $tester->simple_auth($username, $password);
 
 This method respects the C<should_return_futures> attributes of the
 JMAP::Tester object, and in futures mode will return a future that will resolve

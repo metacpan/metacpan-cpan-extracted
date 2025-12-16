@@ -9,7 +9,7 @@ static_install = "auto"
 [release]
 branch = "main"
 hooks = [
-    "perl -Ilib -MApp::dozo=\$VERSION -i -pE 's/^\s*Version \K(\d+(\.\d+)*)$/$VERSION/i' script/dozo",
+    "perl -Ilib -MApp::dozo -i -pE 's/^\s*Version \K(\d+(\.\d+)*)$/$App::dozo::VERSION/i' script/dozo",
     "sed -i '' '/^1;$/q' lib/App/dozo.pm && greple -Mperl -h --nocolor :pod script/dozo >> lib/App/dozo.pm",
 ]
 

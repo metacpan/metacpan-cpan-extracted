@@ -6,10 +6,10 @@ use XSLoader ();
 package Class::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.010';
+our $VERSION   = '0.012';
 
 use Exporter::Tiny 1.000000 qw( mkopt );
-use Ref::Util 0.100 qw( is_plain_arrayref is_plain_hashref is_blessed_ref is_coderef );
+use Ref::Util 0.100 qw( is_plain_arrayref is_plain_hashref is_blessed_ref is_coderef is_plain_scalarref );
 use List::Util 1.45 qw( uniq );
 
 sub import {
@@ -30,13 +30,17 @@ sub import {
 	}
 	inheritance_stuff($package);
 	
-	my ($HAS, $REQUIRED, $ISA, $BUILDALL, $STRICT) = get_vars($package);
+	my ($HAS, $REQUIRED, $ISA, $BUILDALL, $STRICT, $FLAGS, $COERCIONS, $DEFAULTS) = get_vars($package);
+	$FLAGS ||= {};
+	$COERCIONS ||= {};
+	$DEFAULTS ||= {};
 	$$BUILDALL = undef;
 	$$STRICT = !!0;
 	
 	for my $pair (@{ mkopt \@_ }) {
 		my ($name, $thing) = @$pair;
 		my %spec;
+		my $type;
 		
 		if ($name eq '!!') {
 			$$STRICT = !!1;
@@ -49,13 +53,8 @@ sub import {
 		elsif (is_plain_hashref($thing)) {
 			%spec = %$thing;
 		}
-		elsif (is_blessed_ref($thing) and $thing->can('compiled_check')) {
-			%spec = (isa => $thing->compiled_check);
-		}
-		elsif (is_blessed_ref($thing) and $thing->can('check')) {
-			# Support it for compatibility with more basic Type::API::Constraint
-			# implementations, but this will be slowwwwww!
-			%spec = (isa => sub { !! $thing->check($_[0]) });
+		elsif (is_blessed_ref($thing) and $thing->can('compiled_check') || $thing->can('check')) {
+			%spec = ( isa => $thing );
 		}
 		elsif (is_coderef($thing)) {
 			%spec = (isa => $thing);
@@ -69,15 +68,174 @@ sub import {
 			$spec{required} = !!1;
 		}
 		
-		my @unknown_keys = sort grep !/\A(isa|required|is)\z/, keys %spec;
+		if (is_blessed_ref($spec{isa}) and $spec{isa}->can('compiled_check')) {
+			$type = $spec{isa};
+			$spec{isa} = $type->compiled_check;
+		}
+		elsif (is_blessed_ref($spec{isa}) and $spec{isa}->can('check')) {
+			# Support it for compatibility with more basic Type::API::Constraint
+			# implementations, but this will be slowwwwww!
+			$type = $spec{isa};
+			$spec{isa} = sub { !! $type->check($_[0]) };
+		}
+		
+		if (defined $spec{coerce} and !ref $spec{coerce} and $spec{coerce} eq 1) {
+			my $c;
+			if (
+				$type->can('has_coercion')
+				and $type->has_coercion
+				and $type->can('coercion')
+				and is_blessed_ref( $c = $type->coercion )
+				and $c->can('compiled_coercion') ) {
+				$spec{coerce} = $c->compiled_coercion;
+			}
+			elsif ( $type->can('coerce') ) {
+				$spec{coerce} = sub { $type->coerce($_[0]) };
+			}
+		}
+		
+		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce)\z/, keys %spec;
 		if (@unknown_keys) {
 			Exporter::Tiny::_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
 		}
 		
 		push @$HAS, $name;
 		push @$REQUIRED, $name if $spec{required};
-		$ISA->{$name} = $spec{isa} if $spec{isa};
+		$FLAGS->{$name} = $class->_build_flags( \%spec, $type );
+		$ISA->{$name} = $spec{isa} if is_coderef $spec{isa};
+		$COERCIONS->{$name} = $spec{coerce} if is_coderef $spec{coerce};
+		$DEFAULTS->{$name} = $class->_canonicalize_defaults( \%spec ) if exists $spec{default} || defined $spec{builder};
 	}
+}
+
+sub _canonicalize_defaults {
+	my $package = shift;
+	my $spec = shift;
+	if ( defined $spec->{builder} ) {
+		return \$spec->{builder};
+	}
+	elsif ( is_coderef $spec->{default} ) {
+		return $spec->{default};
+	}
+	elsif ( is_plain_scalarref $spec->{default} ) {
+		my $str = ${ $spec->{default} };
+		return eval "sub { $str }";
+	}
+	else {
+		return $spec->{default};
+	}
+}
+
+sub _is_bool ($) {
+	my $value = shift;
+	return !!0 unless defined $value;
+	return !!0 if ref $value;
+	return !!0 unless Scalar::Util::isdual( $value );
+	return !!1 if  $value && "$value" eq '1' && $value+0 == 1;
+	return !!1 if !$value && "$value" eq q'' && $value+0 == 0;
+	return !!0;
+}
+
+sub _created_as_number ($) {
+	my $value = shift;
+	return !!0 if utf8::is_utf8($value);
+	return !!0 unless defined $value;
+	return !!0 if ref $value;
+	require B;
+	my $b_obj = B::svref_2object(\$value);
+	my $flags = $b_obj->FLAGS;
+	return !!1 if $flags & ( B::SVp_IOK() | B::SVp_NOK() ) and !( $flags & B::SVp_POK() );
+	return !!0;
+}
+
+sub _created_as_string ($) {
+	my $value = shift;
+	defined($value)
+		&& !ref($value)
+		&& !_is_bool($value)
+		&& !_created_as_number($value);
+}
+
+sub _build_flags {
+	my $package = shift;
+	my $spec = shift;
+	my $type = shift;
+	
+	my $flags = 0;
+	$flags += 1 if $spec->{required};
+	$flags += 2 if is_coderef $spec->{isa};
+	$flags += 4 if is_coderef $spec->{coerce};
+	$flags += 8 if exists $spec->{default} || defined $spec->{builder};
+	
+	my $has_common_default = 0;
+	if ( exists $spec->{default} and !defined $spec->{default} ) {
+		$has_common_default = 1;
+	}
+	elsif ( exists $spec->{default} and _created_as_number $spec->{default} and $spec->{default} == 0 ) {
+		$has_common_default = 2;
+	}
+	elsif ( exists $spec->{default} and _created_as_number $spec->{default} and $spec->{default} == 1 ) {
+		$has_common_default = 3;
+	}
+	elsif ( exists $spec->{default} and _is_bool $spec->{default} and !$spec->{default} ) {
+		$has_common_default = 4;
+	}
+	elsif ( exists $spec->{default} and _is_bool $spec->{default} and $spec->{default} ) {
+		$has_common_default = 5;
+	}
+	elsif ( exists $spec->{default} and _created_as_string $spec->{default} and $spec->{default} eq '' ) {
+		$has_common_default = 6;
+	}
+	elsif ( exists $spec->{default} and is_plain_scalarref $spec->{default} and ${$spec->{default}} eq '[]' ) {
+		$has_common_default = 7;
+	}
+	elsif ( exists $spec->{default} and is_plain_scalarref $spec->{default} and ${$spec->{default}} eq '{}' ) {
+		$has_common_default = 8;
+	}
+	
+	$flags += ( $has_common_default << 4 );
+	
+	my $has_common_type = 0;
+	if ( $type and $type->isa('Type::Tiny') ) {
+		require Types::Common;
+		if ( $type == Types::Common::Str() ) {
+			$has_common_type = 1;
+		}
+		elsif ( $type == Types::Common::Num() ) {
+			$has_common_type = 2;
+		}
+		elsif ( $type == Types::Common::Int() ) {
+			$has_common_type = 3;
+		}
+		elsif ( $type == Types::Common::ArrayRef() ) {
+			$has_common_type = 4;
+		}
+		elsif ( $type == Types::Common::ArrayRef()->of(Types::Common::Str()) ) {
+			$has_common_type = 5;
+		}
+		elsif ( $type == Types::Common::ArrayRef()->of(Types::Common::Num()) ) {
+			$has_common_type = 6;
+		}
+		elsif ( $type == Types::Common::ArrayRef()->of(Types::Common::Int()) ) {
+			$has_common_type = 7;
+		}
+		elsif ( $type == Types::Common::HashRef() ) {
+			$has_common_type = 8;
+		}
+		elsif ( $type == Types::Common::HashRef()->of(Types::Common::Str()) ) {
+			$has_common_type = 9;
+		}
+		elsif ( $type == Types::Common::HashRef()->of(Types::Common::Num()) ) {
+			$has_common_type = 10;
+		}
+		elsif ( $type == Types::Common::HashRef()->of(Types::Common::Int()) ) {
+			$has_common_type = 11;
+		}
+
+		$flags += ( $has_common_default << 8 );
+	}
+	
+	return 0 + $flags;
 }
 
 sub get_vars {
@@ -89,6 +247,9 @@ sub get_vars {
 		\%{"$package\::__XSCON_ISA"},
 		\${"$package\::__XSCON_BUILD"},
 		\${"$package\::__XSCON_STRICT"},
+		\%{"$package\::__XSCON_FLAGS"},
+		\%{"$package\::__XSCON_COERCIONS"},
+		\%{"$package\::__XSCON_DEFAULTS"},
 	);
 }
 
@@ -101,12 +262,27 @@ sub inheritance_stuff {
 	pop @isa;  # discard $package itself
 	return unless @isa;
 	
-	my ($HAS, $REQUIRED, $ISA) = get_vars($package);
+	my ($HAS, $REQUIRED, $ISA, undef, undef, $FLAGS, $COERCIONS, $DEFAULTS) = get_vars($package);
 	foreach my $parent (@isa) {
-		my ($pHAS, $pREQUIRED, $pISA) = get_vars($parent);
+		my ($pHAS, $pREQUIRED, $pISA, undef, undef, $pFLAGS, $pCOERCIONS, $pDEFAULTS) = get_vars($parent);
 		@$HAS      = uniq(@$HAS, @$pHAS);
 		@$REQUIRED = uniq(@$REQUIRED, @$pREQUIRED);
-		$ISA->{$_} = $pISA->{$_} for keys %$pISA;
+		for my $k ( @$HAS ) {
+			for my $pair ( [$pISA=>$ISA], [$pCOERCIONS=>$COERCIONS], [$pDEFAULTS=>$DEFAULTS] ) {
+				my ( $parent_hash, $this_hash ) = @$pair;
+				if ( exists $parent_hash->{$k} and not $this_hash->{$k} ) {
+					$this_hash->{$k} = $parent_hash->{$k};
+				}
+			}
+			if ( not exists $FLAGS->{$k} ) {
+				my $flags = 0;
+				$flags += 1 if grep $k eq $_, @$REQUIRED;
+				$flags += 2 if exists $ISA->{$k};
+				$flags += 4 if exists $COERCIONS->{$k};
+				$flags += 8 if exists $DEFAULTS->{$k};
+				$FLAGS->{$k} = $flags;
+			}
+		}
 	}
 }
 
@@ -181,7 +357,8 @@ synposis:
   my $obj = Person->new(name => "Alice", height => "170 cm");
 
 The height will be ignored because it's not a defined attribute for the
-class.
+class. (In strict mode, an error would be thrown because of the unrecognized
+parameter instead of it simply being ignored.)
 
 =item *
 
@@ -195,12 +372,56 @@ which also only report the first missing required attribute.
 
 =item *
 
+Supports defaults and builders.
+
+For example:
+
+  use Class::XSAccessor name => { default => '__ANON__' };
+
+Or:
+
+  use Class::XSAccessor name => { default => sub { return '__ANON__' } };
+
+Or:
+
+  use Class::XSAccessor name => { builder => '__fallback_name' };
+  sub __fallback_name {
+    return '__ANON__';
+  }
+
+You can alternatively provide a string of Perl code that will be evaluated
+to generate the default:
+
+  use Class::XSAccessor name => { default => \'sprintf("__%s__", uc "anon")' };
+
+If you expect subclasses to need to override defaults, use a builder.
+Subclasses can simply provide a method of the same name.
+
+The XS code has special faster code paths for the following defaults which
+are all very common values to choose as defaults:
+
+  default => undef,
+  default => 0,
+  default => 1,
+  default => !!0,
+  default => !!1,
+  default => "",
+  default => \'[]',
+  default => \'{}',
+
+If an attribute has a default or builder, its "required" status is ignored.
+
+Builders and coderef defaults are likely to siginificantly slow down your
+constructor.
+
+=item *
+
 Provides support for type constraints.
 
   use Types::Standard qw(Str Int);
   use Class::XSConstructor (
     "name!"    => Str,
-    "age"      => Int,
+    "age"      => { isa => Int, default => 0 },
     "email"    => Str,
     "phone"    => Str,
   );
@@ -210,7 +431,7 @@ Type constraints can also be provided as coderefs returning a boolean:
   use Types::Standard qw(Str Int);
   use Class::XSConstructor (
     "name!"    => Str,
-    "age"      => Int,
+    "age"      => { isa => Int, default => 0 },
     "email"    => sub { !ref($_[0]) and $_[0] =~ /\@/ },
     "phone"    => Str,
   );
@@ -225,6 +446,24 @@ which also only report the first failed check.
 Note that Class::XSConstructor is only building your constructor for you.
 For read-write attributes, I<< checking the type constraint in the accessor
 is your responsibility >>.
+
+=item *
+
+Type coercions.
+
+If your type constraint is a Type::Tiny object which provides a coercion:
+
+  coercion => 1
+
+Otherwise:
+
+  foo => {
+    default => sub { ... },
+    isa     => sub { ... },
+    coerce  => sub { my $oldval = $_[0]}; ...; return $newval },
+  }
+
+Type coercions are likely to siginificantly slow down your constructor.
 
 =item *
 
@@ -347,68 +586,17 @@ you don't need to do this.
 
 Returns nothing.
 
-=item C<< Class::XSConstructor::inheritance_stuff($classname) >>
-
-Checks the C<< @ISA >> variable in the class and makes Class::XSConstructor
-aware of any attributes declared by parent classes. (Though only if those
-parent classes use Class::XSConstructor.)
-
-This is automatically done as part of C<import>, so if you're using C<import>,
-you don't need to do this.
-
-Returns nothing.
-
-=item C<< ($ar_has, $ar_required, $hr_isa, $sr_build, $sr_strict) = Class::XSConstructor::get_vars($classname) >>
-
-Returns references to the variables where Class::XSConstructor stores its
-configuration for the class.
-
-See L</Use of Package Variables>.
-
-=item C<< Class::XSConstructor::populate_build($classname) >>
-
-This will need to be called if the list of C<BUILD> methods that ought to be
-called when constructing an object of the given class changes at runtime.
-(Which would be pretty unusual.)
-
-Returns nothing.
-
 =back
 
 =head2 Use of Package Variables
 
-Class::XSConstructor stores its configuration for class Foo in the following
-global variables:
+Class::XSConstructor stores its configuration for class Foo in a bunch of
+package variables with the prefix C<< Foo::__XSCON_ >>.
+
+The only supported use of these variables that you may need to be aware of
+is:
 
 =over
-
-=item C<< @Foo::__XSCON_HAS >>
-
-A list of all attributes which the constructor should accept (both required
-and optional), including attributes defined by parent classes.
-
-C<inheritance_stuff> will automatically populate this from parent classes,
-and C<import> (which calls C<inheritance_stuff>) will populate it based on
-C<< @optlist >>.
-
-=item C<< @Foo::__XSCON_REQUIRED >>
-
-A list of all attributes which the constructor should require, including
-attributes defined by parent classes.
-
-C<inheritance_stuff> will automatically populate this from parent classes,
-and C<import> (which calls C<inheritance_stuff>) will populate it based on
-C<< @optlist >>.
-
-=item C<< %Foo::__XSCON_ISA >>
-
-A map of attributes to type constraint coderefs, including attributes
-defined by parent classes. Type constraints must be coderefs, not
-L<Type::Tiny> objects.
-
-C<inheritance_stuff> will automatically populate this from parent classes,
-and C<import> (which calls C<inheritance_stuff>) will populate it based on
-C<< @optlist >>, including converting type constraint objects to coderefs.
 
 =item C<< $Foo::__XSCON_BUILD >>
 
@@ -426,31 +614,13 @@ called.
 
 Any other value is invalid.
 
-C<import> will set this to undef.
-
 =item C<< $Foo::__XSCON_STRICT >>
 
 If set to true, indicates that XSConstructor should use a "strict"
 constructor, which complains about the presence of any unrecognized
 keys in the init args hashref.
 
-C<import> will set this to false by default, but set it to true if it
-sees "!!" in C<< @optlist >>.
-
 =back
-
-If these package variables have not been declared, there is a very good
-chance that the constructor will segfault. C<import> will automatically
-declare and populate them for you. C<get_vars> will declare them and
-return a list of references to them.
-
-Although you I<can> set up Class::XSConstructor by fiddling with these
-package variables and then installing the constructor sub, it will
-probably be easier to use C<import>. For L<MooX::XSConstructor>, even
-though I'm obviously intimately familiar with the internals of
-Class::XSConstructor, I just translate the Moo attribute definitions
-into something suitable for C<< @optlist >>, set C<< $SETUP_FOR >>, then
-call C<import>.
 
 =head1 CAVEATS
 

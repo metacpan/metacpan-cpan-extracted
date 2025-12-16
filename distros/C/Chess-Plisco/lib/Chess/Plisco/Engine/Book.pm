@@ -13,7 +13,7 @@
 # ABSTRACT: Opening book for Chess-Plisco engine.
 
 package Chess::Plisco::Engine::Book;
-$Chess::Plisco::Engine::Book::VERSION = 'v0.8.0';
+$Chess::Plisco::Engine::Book::VERSION = 'v1.0.0';
 use strict;
 
 use Chess::Opening::Book::Polyglot;

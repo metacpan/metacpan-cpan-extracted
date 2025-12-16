@@ -32,19 +32,19 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Data::Dumper::Simple" : "0",
-            "Data::Printer" : "0",
+            "Carp" : "1.50",
+            "Data::Dumper::Simple" : "0.11",
+            "Data::Printer" : "1.002001",
             "Dev::Util" : "v2.19.12",
             "English" : "0",
             "Exporter" : "0",
-            "FindBin" : "0",
             "Getopt::Long" : "0",
-            "IPC::Cmd" : "0",
-            "Readonly" : "0",
-            "Term::ANSIColor" : "0",
-            "Term::ReadKey" : "0",
-            "YAML::PP" : "0",
+            "IPC::Cmd" : "1.04",
+            "Path::Tiny" : "0.148",
+            "Readonly" : "2.05",
+            "Term::ANSIColor" : "5.01",
+            "Term::ReadKey" : "2.38",
+            "YAML::PP" : "v0.39.0",
             "autodie" : "0",
             "perl" : "5.018",
             "strict" : "0",
@@ -55,11 +55,10 @@
       },
       "test" : {
          "requires" : {
-            "App::Yath" : "0",
             "ExtUtils::Manifest" : "0",
-            "Test2::Require::AuthorTesting" : "0",
-            "Test2::V0" : "0",
-            "Test::More" : "0"
+            "Test2::Require::AuthorTesting" : "1.302219",
+            "Test2::V0" : "1.302219",
+            "Test::More" : "1.302219"
          }
       }
    },
@@ -71,6 +70,6 @@
          "web" : "https://github.com/mattmartini/Disk-SmartTools"
       }
    },
-   "version" : "v3.3.16",
+   "version" : "v3.3.26",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

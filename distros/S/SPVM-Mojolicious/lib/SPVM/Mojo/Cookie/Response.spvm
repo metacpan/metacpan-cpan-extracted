@@ -51,6 +51,7 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
         "host_only",
         "httponly",
         "max_age",
+        "max-age",
         "path",
         "samesite",
         "secure",
@@ -86,6 +87,9 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
       
       if ($options_h->exists("max_age")) {
         $self->{max_age} = $options_h->{"max_age"}->(int);
+      }
+      elsif ($options_h->exists("max-age")) {
+        $self->{max_age} = $options_h->{"max-age"}->(int);
       }
       
       if ($options_h->exists("path")) {
@@ -201,8 +205,8 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
     }
     
     # "Max-Age"
-    if ((my $max = $self->max_age) >= 0) {
-      $cookie .= "; Max-Age=$max";
+    if (exists $self->{max_age} && $self->{max_age} >= 0) {
+      $cookie .= "; Max-Age=$self->{max_age}";
     }
     
     return $cookie;

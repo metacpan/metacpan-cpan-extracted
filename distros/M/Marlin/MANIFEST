@@ -30,5 +30,6 @@ lib/Marlin/Util.pm
 t/00start.t
 t/01basic.t
 t/integration/comparison-example.t
+t/integration/complex-constructor.t
 t/integration/roles.t
 t/lib/Local/Example/Marlin.pm

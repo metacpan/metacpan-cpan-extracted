@@ -79,7 +79,7 @@ use constant EMPTY => (BLACK_KING + 1);
 
 sub parse_fen;
 
-sub PCOLOR {
+sub PCOLOUR {
 	my ($p) = @_;
 	$p & 1;
 }
@@ -290,8 +290,8 @@ sub evaluate {
 	for (my $sq = 0; $sq < 64; ++$sq) {
 		my $pc = $board[$sq];
 		if ($pc != EMPTY) {
-			$mg[PCOLOR($pc)] += $mg_table[$pc]->[$sq];
-			$eg[PCOLOR($pc)] += $eg_table[$pc]->[$sq];
+			$mg[PCOLOUR($pc)] += $mg_table[$pc]->[$sq];
+			$eg[PCOLOUR($pc)] += $eg_table[$pc]->[$sq];
 			$gamePhase += $gamephaseInc[$pc];
 		}
 	}
@@ -312,10 +312,10 @@ sub evaluate {
 sub parse_fen {
 	my ($fen) = @_;
 
-	my ($pieces, $color, $castling, $ep_square, $hmc, $moveno)
+	my ($pieces, $colour, $castling, $ep_square, $hmc, $moveno)
 			= split /[ \t]+/, $fen;
 
-	if (!(defined $pieces && defined $color && defined $castling)) {
+	if (!(defined $pieces && defined $colour && defined $castling)) {
 		die "Illegal FEN: Incomplete.\n";
 	}
 
@@ -359,9 +359,9 @@ sub parse_fen {
 		}
 	}
 
-	if ('w' eq lc $color) {
+	if ('w' eq lc $colour) {
 		$side2move = WHITE;
-	} elsif ('b' eq lc $color) {
+	} elsif ('b' eq lc $colour) {
 		$side2move = BLACK;
 	} else {
 		die "Illegal FEN: Side to move is neither 'w' nor 'b'.\n";

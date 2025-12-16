@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Bitcoin::PaperWallet.
 
+1.15 Mon Dec 15, 2025
+	- minimum perl version was increased to 5.14 (same as Bitcoin::Crypto)
+
 1.14  Mon Nov 10 2025
 	- paper-wallet now generates taproot addresses in place of segwit addresses by default
 	- new option in paper-wallet: -t, --taproot_addrs - the number of taproot addresses to generate

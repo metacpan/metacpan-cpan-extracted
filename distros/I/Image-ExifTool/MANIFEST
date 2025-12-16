@@ -27,6 +27,7 @@ config_files/fotoware.config
 config_files/frameCount.config
 config_files/gps2utm.config
 config_files/guano.config
+config_files/local_time.config
 config_files/nksc.config
 config_files/onone.config
 config_files/photoshop_paths.config
@@ -65,6 +66,7 @@ html/TagNames/DICOM.html
 html/TagNames/DJI.html
 html/TagNames/DNG.html
 html/TagNames/DPX.html
+html/TagNames/DSF.html
 html/TagNames/DV.html
 html/TagNames/DarwinCore.html
 html/TagNames/DjVu.html
@@ -87,6 +89,7 @@ html/TagNames/GM.html
 html/TagNames/GPS.html
 html/TagNames/GeoTiff.html
 html/TagNames/GoPro.html
+html/TagNames/Google.html
 html/TagNames/H264.html
 html/TagNames/HP.html
 html/TagNames/HTML.html
@@ -102,6 +105,7 @@ html/TagNames/JPEG.html
 html/TagNames/JSON.html
 html/TagNames/JVC.html
 html/TagNames/Jpeg2000.html
+html/TagNames/Kandao.html
 html/TagNames/Kodak.html
 html/TagNames/KyoceraRaw.html
 html/TagNames/LIF.html
@@ -187,6 +191,7 @@ html/TagNames/VCard.html
 html/TagNames/Vorbis.html
 html/TagNames/WPG.html
 html/TagNames/WTV.html
+html/TagNames/WavPack.html
 html/TagNames/XISF.html
 html/TagNames/XMP.html
 html/TagNames/ZIP.html
@@ -290,6 +295,7 @@ lib/Image/ExifTool/DICOM.pm
 lib/Image/ExifTool/DJI.pm
 lib/Image/ExifTool/DNG.pm
 lib/Image/ExifTool/DPX.pm
+lib/Image/ExifTool/DSF.pm
 lib/Image/ExifTool/DV.pm
 lib/Image/ExifTool/DarwinCore.pm
 lib/Image/ExifTool/DjVu.pm
@@ -308,6 +314,7 @@ lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GE.pm
 lib/Image/ExifTool/GIF.pm
 lib/Image/ExifTool/GIMP.pm
+lib/Image/ExifTool/Google.pm
 lib/Image/ExifTool/GM.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
@@ -333,6 +340,7 @@ lib/Image/ExifTool/JPEGDigest.pm
 lib/Image/ExifTool/JSON.pm
 lib/Image/ExifTool/JVC.pm
 lib/Image/ExifTool/Jpeg2000.pm
+lib/Image/ExifTool/Kandao.pm
 lib/Image/ExifTool/Kodak.pm
 lib/Image/ExifTool/KyoceraRaw.pm
 lib/Image/ExifTool/LIF.pm
@@ -449,6 +457,7 @@ lib/Image/ExifTool/Validate.pm
 lib/Image/ExifTool/Vorbis.pm
 lib/Image/ExifTool/WPG.pm
 lib/Image/ExifTool/WTV.pm
+lib/Image/ExifTool/WavPack.pm
 lib/Image/ExifTool/WriteCanonRaw.pl
 lib/Image/ExifTool/WriteExif.pl
 lib/Image/ExifTool/WriteIPTC.pl
@@ -645,6 +654,8 @@ t/Geotag_8.out
 t/Geotag_9.out
 t/GoPro.t
 t/GoPro_2.out
+t/Google.t
+t/Google_2.out
 t/HTML.t
 t/HTML_2.out
 t/ICO.t
@@ -687,6 +698,7 @@ t/KyoceraRaw.t
 t/KyoceraRaw_2.out
 t/LNK.t
 t/LNK_2.out
+t/LNK_3.out
 t/Lang.t
 t/Lang_1.out
 t/Lang_10.out
@@ -1095,6 +1107,7 @@ t/images/Geotag2.log
 t/images/Geotag3.log
 t/images/Geotag_DJI_2020-12-02_[07-50-31].csv
 t/images/GoPro.jpg
+t/images/Google.jpg
 t/images/HTML.html
 t/images/ICC_Profile.icc
 t/images/ICO.ico
@@ -1113,6 +1126,7 @@ t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
 t/images/KyoceraRaw.raw
 t/images/LNK.lnk
+t/images/LNK.url
 t/images/Lytro.lfp
 t/images/M2TS.mts
 t/images/MIE.mie

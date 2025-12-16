@@ -1,5 +1,5 @@
 package App::Bitcoin::PaperWallet;
-$App::Bitcoin::PaperWallet::VERSION = '1.14';
+$App::Bitcoin::PaperWallet::VERSION = '1.15';
 use v5.12;
 use warnings;
 

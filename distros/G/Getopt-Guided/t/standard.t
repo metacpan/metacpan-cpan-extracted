@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 22;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 20;
 use Test::Fatal qw( exception lives_ok );
 use Test::Warn  qw( warning_like );
 
@@ -9,17 +9,22 @@ my $module;
 
 BEGIN {
   $module = 'Getopt::Guided';
-  use_ok $module, qw( getopts getopts3 ) or BAIL_OUT "Cannot loade module '$module'!"
+  use_ok $module, qw( getopts ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
-subtest 'Validate $spec parameter' => sub {
-  plan tests => 5;
+like exception { $module->import( '_private' ) }, qr/not exported/, 'Export error';
 
+subtest 'Validate $spec parameter' => sub {
+  plan tests => 6;
+
+  local @ARGV = ();
   my %opts;
-  like exception { getopts '',     %opts }, qr/isn't a string of alphanumeric/, 'Empty value is not allowed';
-  like exception { getopts 'a:-b', %opts }, qr/isn't a string of alphanumeric/, "'-' character is not allowed";
-  like exception { getopts ':a:b', %opts }, qr/isn't a string of alphanumeric/, "Leading ':' character is not allowed";
-  like exception { getopts 'aba:', %opts }, qr/duplicate option characters/,    'Same option character is not allowed';
+  like exception { getopts undef, %opts }, qr/isn't a non-empty string of alphanumeric/, 'Undefined value is not allowed';
+  like exception { getopts '',     %opts }, qr/isn't a non-empty string of alphanumeric/, 'Empty value is not allowed';
+  like exception { getopts 'a:-b', %opts }, qr/isn't a non-empty string of alphanumeric/, "'-' character is not allowed";
+  like exception { getopts ':a:b', %opts }, qr/isn't a non-empty string of alphanumeric/,
+    "Leading ':' character is not allowed";
+  like exception { getopts 'aba:', %opts }, qr/multiple times/, 'Same option character is not allowed';
   ok getopts( 'a:b', %opts ), 'Succeeded'
 };
 
@@ -45,6 +50,15 @@ subtest 'Single option with option-argument' => sub {
   local @ARGV = qw( -a foo );
   ok getopts( 'a:', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Empty @ARGV' => sub {
+  plan tests => 3;
+
+  local @ARGV = ();
+  ok getopts( 'a:b', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, {}, '%got_opts is empty';
   is @ARGV, 0, '@ARGV is empty'
 };
 
@@ -168,15 +182,6 @@ subtest 'Overwrite option-argument' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Increment flag value' => sub {
-  plan tests => 3;
-
-  local @ARGV = qw( -a foo -v -b -vv -c );
-  ok getopts( 'a:bcv', my %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, v => 3 }, 'Options properly set';
-  is @ARGV, 0, '@ARGV is empty'
-};
-
 subtest 'Slurp option' => sub {
   plan tests => 3;
 
@@ -184,64 +189,4 @@ subtest 'Slurp option' => sub {
   ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => '-b', c => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
-};
-
-subtest 'List of option-arguments; comma (",") option-argument indicator' => sub {
-  plan tests => 4;
-
-  subtest 'List option specified but not used' => sub {
-    plan tests => 3;
-
-    local @ARGV = qw( -a foo -b );
-    ok getopts( 'a:I,b', my %got_opts ), 'Succeeded';
-    is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
-    is @ARGV, 0, '@ARGV is empty'
-  };
-
-  subtest 'List option repeated once' => sub {
-    plan tests => 3;
-
-    local @ARGV = qw( -I lib -a foo -c );
-    ok getopts( 'a:I,c', my %got_opts ), 'Succeeded';
-    is_deeply \%got_opts, { I => [ 'lib' ], a => 'foo', c => 1 }, 'Options properly set';
-    is @ARGV, 0, '@ARGV is empty'
-  };
-
-  subtest 'List option repeated 2 times' => sub {
-    plan tests => 3;
-
-    local @ARGV = qw( -b -I lib -a foo -I local/lib/perl5 );
-    ok getopts( 'I,a:b', my %got_opts ), 'Succeeded';
-    is_deeply \%got_opts, { I => [ 'lib', 'local/lib/perl5' ], a => 'foo', b => 1 }, 'Options properly set';
-    is @ARGV, 0, '@ARGV is empty'
-  };
-
-  subtest 'List option repeated 3 times; 3rd option-argument is undefined' => sub {
-    plan tests => 4;
-
-    local @ARGV = ( '-I', 'lib', '-a', 'foo', '-c', '-I' );
-    my %got_opts;
-    warning_like { ok !getopts( 'a:cI,', %got_opts ), 'Failed' } qr/option requires an argument -- I/, 'Check warning';
-    is_deeply \%got_opts, {}, '%got_opts is empty';
-    is_deeply \@ARGV, [ ( '-I', 'lib', '-a', 'foo', '-c', '-I' ) ], '@ARGV restored'
-  }
-};
-
-subtest 'POD synopsis (getopts processing)' => sub {
-  plan tests => 3;
-
-  local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
-  ok getopts( 'a:bcd,v', my %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
-  is_deeply \@ARGV, [ qw( v1 v2 ) ], 'Options removed from @ARGV'
-};
-
-subtest 'POD synopsis (getopts3 processing)' => sub {
-  plan tests => 3;
-
-  # On purpose don't work with a localized @ARGV
-  my @argv = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
-  ok getopts3( @argv, 'a:bcd,v', my %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
-  is_deeply \@argv, [ qw( v1 v2 ) ], 'Options removed from @argv'
 }

@@ -126,11 +126,11 @@ Remember that the macros are expanded by a rather dumb search and replace.  That
 can lead to problems with parentheses. Say you have a line like this in a test
 written with L<Test::More>
 
-    is cp_pos_material($pos), 0, "material test";
+    is cp_pos_white_king_side_castling_right($pos), 0, "castling test";
 
 But this may be expanded into something like:
 
-    is (($pos->[CP_POS_INFO]) >> 19), 0, "material test";
+    is (($pos->[CP_POS_CASTLING_RIGHTS]) & 0x1), 0, "castling test";
 
 And this is not what you meant.  Now, C<is()> is called with just one
 argument instead of 3 like you expected.
@@ -227,9 +227,13 @@ Same as L<Chess::Plisco/knights>.
 
 Same as L<Chess::Plisco/pawns>.
 
+=item B<cp_pos_turn(POS)>
+
+Same as L<Chess::Plisco/turn>.
+
 =item B<cp_pos_to_move(POS)>
 
-Same as L<Chess::Plisco/toMove>.
+Same as L<Chess::Plisco/turn>.
 
 =item B<cp_pos_castling_rights(POS)>
 
@@ -255,10 +259,6 @@ Same as L<Chess::Plisco/blackQueenSideCastlingRight>.
 
 Same as L<Chess::Plisco/halfMoveClock>.
 
-=item B<cp_pos_reversible_clock(POS)>
-
-Same as L<Chess::Plisco/reversibleClock>.
-
 =item B<cp_pos_half_moves(POS)>
 
 Same as L<Chess::Plisco/halfMoves>.
@@ -266,22 +266,6 @@ Same as L<Chess::Plisco/halfMoves>.
 =item B<cp_pos_en_passant_shift(POS)>
 
 Same as L<Chess::Plisco/enPassantShift>.
-
-=item B<cp_pos_king_shift(POS)>
-
-Same as L<Chess::Plisco/kingShift>.
-
-=item B<cp_pos_in_check(POS)>
-
-Same as L<Chess::Plisco/inCheck>.
-
-=item B<cp_pos_evasion(POS)>
-
-Same as L<Chess::Plisco/evasion>.
-
-=item B<cp_pos_evasion_squares(POS)>
-
-Same as L<Chess::Plisco/evasionSquares>.
 
 =item B<cp_pos_signature(POS)>
 
@@ -291,67 +275,9 @@ Same as L<Chess::Plisco/signature>.
 
 Same as L<Chess::Plisco/material>.
 
-=item B<cp_pos_info(POS)>
+=item B<cp_pos_last_move(POS)>
 
-Same as L<Chess::Plisco/info>.  See also L</Position Info Macros> below!
-
-=back
-
-=head2 Position Info Macros
-
-All these work directly on a position info as returned by L</cp_pos_info>.
-
-=over 4
-
-=item B<cp_pos_info_castling_rights(INFO)>
-
-Same as L</cp_pos_castling_rights> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_white_king_side_castling_right(INFO)>
-
-Same as L</cp_pos_white_king_side_castling_right> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_white_queen_side_castling_right(INFO)>
-
-Same as L</cp_pos_white_queen_side_castling_right> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_black_king_side_castling_right(INFO)>
-
-Same as L</cp_pos_black_king_side_castling_right> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_black_queen_side_castling_right(INFO)>
-
-Same as L</cp_pos_black_queen_side_castling_right> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_to_move(INFO)>
-
-Same as L</cp_pos_to_move> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_en_passant_shift(INFO)>
-
-Same as L</cp_pos_en_passant_shift> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_king_shift(INFO)>
-
-Same as L</cp_pos_king_shift> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_evasion(INFO)>
-
-Same as L</cp_pos_evasion> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
-
-=item B<cp_pos_info_material(INFO)>
-
-Same as L</cp_pos_material> but work directly on position
-info B<INFO> as returned by L</cp_pos_info>.
+Same as L<Chess::Plisco/lastMove>.
 
 =back
 
@@ -403,13 +329,25 @@ Same as L<Chess::Plisco/moveCaptured>.
 
 Same as L<Chess::Plisco/moveSetCaptured> but modifies B<MOVE> directly.
 
+=item B<cp_move_colour(MOVE)>
+
 =item B<cp_move_color(MOVE)>
 
 Same as L<Chess::Plisco/moveCaptured>.
 
+=item B<cp_move_set_colour(MOVE, COLOUR)>
+
 =item B<cp_move_set_color(MOVE, COLOR)>
 
-Same as L<Chess::Plisco/moveSetColor> but modifies B<MOVE> directly.
+Same as L<Chess::Plisco/moveSetColour> but modifies B<MOVE> directly.
+
+=item B<cp_move_en_passant(MOVE)>
+
+Same as L<Chess::Plisco/moveEnPassant>.
+
+=item B<cp_move_set_en_passant(MOVE, FLAG)>
+
+Same as L<Chess::Plisco/moveSetEnPassant> but modifies B<MOVE> directly.
 
 =item B<cp_move_equivalent(MOVE)>
 
@@ -524,6 +462,10 @@ notation ("e4", "c5", ...).
 Calculate the square in coordinate notation ("e4", "c5", ...) for the bit shift
 offset B<SHIFT> (0-63).
 
+=item B<cp_ep_file_to_shift(F, C)>
+
+Same as en passant file B<F>, return the shift for colour B<C>.
+
 =item B<cp_abs(INTEGER)>
 
 Calculate the absolve value of B<INTEGER>.
@@ -535,6 +477,13 @@ Calculate the maximum of B<A> and B<B>.
 =item B<cp_min(A, B)>
 
 Calculate the minimum of B<A> and B<B>.
+
+=item B<cp_clamp(V, LO, HI)>
+
+=item B<clamp V, LO, HI>
+
+If the value of B<V> is within B<[LO, HI]>, returns B<V>; otherwise returns
+the nearest boundary.
 
 =back
 

@@ -90,27 +90,6 @@ is $pos->moveCoordinateNotation($pos->parseMove("0-o-O")), "e8c8", "black 0-o-O"
 
 # Parse promotions with captures.  That should cover everything.  The
 # stress test is done, when parsing the moves from the PGN.
-#
-#      a   b   c   d   e   f   g   h
-#    +---+---+---+---+---+---+---+---+
-#  8 |   |   |   | R |   |   |   |   | En passant not possible.
-#    +---+---+---+---+---+---+---+---+ White king castle: no.
-#  7 |   |   | p |   |   |   |   | K | White queen castle: no.
-#    +---+---+---+---+---+---+---+---+ Black king castle: no.
-#  6 |   |   |   |   |   |   |   |   | Black queen castle: no.
-#    +---+---+---+---+---+---+---+---+ Half move clock (50 moves): 0.
-#  5 |   |   |   |   |   |   |   |   | Half moves: 0.
-#    +---+---+---+---+---+---+---+---+ Next move: white.
-#  4 |   |   |   |   |   |   |   |   | Material: -4.
-#    +---+---+---+---+---+---+---+---+ Black has castled: no.
-#  3 |   |   |   |   |   |   |   |   | White has castled: no.
-#    +---+---+---+---+---+---+---+---+
-#  2 | k |   |   |   |   | P |   |   |
-#    +---+---+---+---+---+---+---+---+
-#  1 |   |   |   |   |   |   | q |   |
-#    +---+---+---+---+---+---+---+---+
-#      a   b   c   d   e   f   g   h
-#
 $fen = "3q4/2P4k/8/8/8/8/K4p2/4R3 w - - 0 1";
 $pos = Chess::Plisco->new($fen);
 

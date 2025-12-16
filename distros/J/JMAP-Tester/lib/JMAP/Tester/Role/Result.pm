@@ -1,9 +1,11 @@
-use v5.14.0;
+use v5.20.0;
 use warnings;
-package JMAP::Tester::Role::Result 0.107;
+package JMAP::Tester::Role::Result 0.108;
 # ABSTRACT: the kind of thing that you get back for a request
 
 use Moo::Role;
+
+use experimental 'signatures';
 
 use JMAP::Tester::Abort ();
 
@@ -26,9 +28,7 @@ requires 'response_payload';
 #pod
 #pod =cut
 
-sub assert_successful {
-  my ($self) = @_;
-
+sub assert_successful ($self) {
   return $self if $self->is_success;
 
   my $str = $self->can('has_ident') && $self->has_ident
@@ -50,8 +50,7 @@ sub assert_successful {
 #pod
 #pod =cut
 
-sub assert_successful_set {
-  my ($self, $name) = @_;
+sub assert_successful_set ($self, $name) {
   $self->assert_successful->sentence_named($name)->as_set->assert_no_errors;
 }
 
@@ -67,8 +66,7 @@ sub assert_successful_set {
 #pod
 #pod =cut
 
-sub assert_single_successful_set {
-  my ($self, $name) = @_;
+sub assert_single_successful_set ($self, $name = undef) {
   $self->assert_successful->single_sentence($name)->as_set->assert_no_errors;
 }
 
@@ -86,7 +84,7 @@ JMAP::Tester::Role::Result - the kind of thing that you get back for a request
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 OVERVIEW
 

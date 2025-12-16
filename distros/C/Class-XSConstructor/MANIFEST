@@ -21,4 +21,7 @@ t/03typenano.t
 t/03typetiny.t
 t/04build.t
 t/05strictconstructor.t
+t/06inherit-from.t
+t/07coercion.t
+t/08defaults.t
 xshelper.h

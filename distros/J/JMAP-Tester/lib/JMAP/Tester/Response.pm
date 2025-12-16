@@ -1,9 +1,10 @@
-use v5.14.0;
+use v5.20.0;
 
-package JMAP::Tester::Response 0.107;
+package JMAP::Tester::Response 0.108;
 # ABSTRACT: what you get in reply to a succesful JMAP request
 
 use Moo;
+use experimental 'signatures';
 
 # We can't use 'sub sentencebroker;' as a stub here as it conflicts
 # with older Role::Tiny versions (2.000006, 2.000008, and others).
@@ -54,17 +55,17 @@ has wrapper_properties => (
   is       => 'ro',
 );
 
-sub items { @{ $_[0]->_items } }
+sub items ($self) { @{ $self->_items } }
 
-sub add_items {
-  $_[0]->sentence_broker->abort("can't add items to " . __PACKAGE__);
+sub add_items ($self, @) {
+  $self->sentence_broker->abort("can't add items to " . __PACKAGE__);
 }
 
 sub default_diagnostic_dumper {
   state $default = do {
     require JSON::MaybeXS;
     state $json = JSON::MaybeXS->new->utf8->convert_blessed->pretty->canonical;
-    sub { $json->encode($_[0]); }
+    sub ($value) { $json->encode($value); }
   };
 
   return $default;
@@ -76,8 +77,7 @@ has _diagnostic_dumper => (
   init_arg  => 'diagnostic_dumper',
 );
 
-sub dump_diagnostic {
-  my ($self, $value) = @_;
+sub dump_diagnostic ($self, $value) {
   $self->_diagnostic_dumper->($value);
 }
 
@@ -95,7 +95,7 @@ JMAP::Tester::Response - what you get in reply to a succesful JMAP request
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 OVERVIEW
 

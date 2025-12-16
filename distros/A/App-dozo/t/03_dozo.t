@@ -65,7 +65,7 @@ subtest '.dozorc parsing' => sub {
     close $fh;
 
     # With -I set in .dozorc, should not get "image must be specified" error
-    my $out = `$dozo echo test 2>&1`;
+    my $out = `$dozo -n echo test 2>&1`;
     unlike($out, qr/image.*must be specified/i, '.dozorc -I option is parsed');
 
     # Test quoted argument with spaces
@@ -93,9 +93,9 @@ subtest '-V option without colon' => sub {
     print $fh "-V /var/run/docker.sock\n";
     close $fh;
 
-    # Should parse without error
-    my $out = `$dozo -B echo test 2>&1`;
-    unlike($out, qr/error|invalid/i, '-V without colon is parsed without error');
+    # Should parse without error (use -n to avoid running docker)
+    my $out = `$dozo -n echo test 2>&1`;
+    unlike($out, qr/no such option|invalid.*option|getoptlong/i, '-V without colon is parsed without error');
 
     # Test multiple paths (comma-separated)
     open $fh, '>', $rc_file or die "Cannot create $rc_file: $!";
@@ -103,8 +103,8 @@ subtest '-V option without colon' => sub {
     print $fh "-V /tmp,/var/tmp\n";
     close $fh;
 
-    $out = `$dozo -B echo test 2>&1`;
-    unlike($out, qr/error|invalid/i, '-V with comma-separated paths is parsed without error');
+    $out = `$dozo -n echo test 2>&1`;
+    unlike($out, qr/no such option|invalid.*option|getoptlong/i, '-V with comma-separated paths is parsed without error');
 
     # Test path with colon (explicit mount) using existing paths
     open $fh, '>', $rc_file or die "Cannot create $rc_file: $!";
@@ -112,8 +112,7 @@ subtest '-V option without colon' => sub {
     print $fh "-V /tmp:/container/tmp\n";
     close $fh;
 
-    $out = `$dozo -B echo test 2>&1`;
-    # Docker might fail for other reasons, but there should be no parsing errors
+    $out = `$dozo -n echo test 2>&1`;
     unlike($out, qr/no such option|invalid.*option|getoptlong/i, '-V with explicit colon mount has no parsing error');
 };
 

@@ -21,7 +21,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '2.02';
+$VERSION = '2.03';
 
 my %EuroRates = (
          BEF => {EUR=>0.0247899055505,   BEF => 1},
@@ -82,7 +82,7 @@ sub readRatesFile() {
 		return;
 	}
 
-	open(RATES, "<", $self->{RatesFile}) or { warn("Can't read $self->{RatesFile}\n") and return };
+	open(RATES, "<", $self->{RatesFile}) or ( warn("Can't read $self->{RatesFile}\n") and return );
 	while(local $_ = <RATES>) {
 		my ($source, $targetrates) = split(/\|/, $_);
 		foreach my $target (split(/\:/, $targetrates)) {
@@ -99,7 +99,7 @@ sub writeRatesFile() {
 	my $self = shift;
 	return if (!defined $self->{RatesFile});
 
-	open(RATES, ">", $self->{RatesFile}) or { warn("Can't access $self->{RatesFile}") and return };
+	open(RATES, ">", $self->{RatesFile}) or ( warn("Can't access $self->{RatesFile}") and return );
 	foreach my $sourcerate (sort keys %{$self->{CurrencyRates}}) {
 		print RATES "$sourcerate|";
 		foreach my $targetrate (sort keys %{ $self->{CurrencyRates}{$sourcerate}}) {

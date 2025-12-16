@@ -20,13 +20,13 @@ ok 1, 'used';
 my $pos = Chess::Plisco->new;
 ok $pos, 'instantiated';
 
-my $color = $pos->toMove;
-is $color, CP_WHITE, 'white to move';
+my $colour = $pos->toMove;
+is $colour, CP_WHITE, 'white to move';
 
 # The array is laid out in a way that allows efficient access to the
 # pieces of the side to move and the side not to move and ...
-is $pos->[CP_POS_WHITE_PIECES + $color], $pos->whitePieces, 'own pieces';
-is $pos->[CP_POS_WHITE_PIECES + !$color], $pos->blackPieces, 'opponent pieces';
+is $pos->[CP_POS_WHITE_PIECES + $colour], $pos->whitePieces, 'own pieces';
+is $pos->[CP_POS_WHITE_PIECES + !$colour], $pos->blackPieces, 'opponent pieces';
 
 # ... and allows to use the type of a piece as an index into the instance
 # for getting the corresponding bitboard of the piece without knowing the type.

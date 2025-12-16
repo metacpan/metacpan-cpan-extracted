@@ -14,8 +14,10 @@
 
 use strict;
 
-use Test::More tests => 9;
+use Test::More tests => 15;
 
+use Chess::Plisco qw(:all);
+# Macros from Chess::Plisco::Macro are already expanded here!
 use Chess::Plisco::Engine::TranspositionTable;
 
 my $tt = Chess::Plisco::Engine::TranspositionTable->new(1);
@@ -56,3 +58,28 @@ ok defined $tt->probe($key, $test_depth - 1, $test_alpha, $test_beta),
 my $collision = $key % scalar @$tt;
 ok !defined $tt->probe($collision, $test_depth - 1, $test_alpha, $test_beta),
 	"type 2 collision";
+
+$tt->clear;
+my $real_move = 0;
+my $from = CP_D7;
+my $to = CP_E8;
+my $promote = CP_ROOK;
+(($real_move) = (($real_move) & ~0x7e00) | (($from)) << 9);
+(($real_move) = (($real_move) & ~0x1f8000) | (($to)) << 15);
+(($real_move) = (($real_move) & ~0x1c0) | (($promote)) << 6);
+
+$tt->store($key, $test_depth, TT_SCORE_EXACT, $test_value, $real_move);
+
+my $best_move;
+my $value = $tt->probe($key, $test_depth - 1, $test_alpha, $test_beta, \$best_move);
+ok defined $value, "stored move retrieved";
+
+ok defined $best_move, 'best move was returned';
+is(((($best_move) >> 9) & 0x3f), $from, 'from square not tampered');
+is(((($best_move) >> 15) & 0x3f), $to, 'to square not tampered');
+is(((($best_move) >> 6) & 0x7), $promote, 'promote piece not tampered');
+
+$tt->clear;
+$tt->store($key, 0, TT_SCORE_EXACT, 42, 1234);
+ok !defined $tt->probe($key, 3, -100, 100, \$best_move),
+	'table does not return quiescence entries during normal search';

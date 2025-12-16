@@ -1,5 +1,5 @@
 package Dist::Build::XS::Import;
-$Dist::Build::XS::Import::VERSION = '0.022';
+$Dist::Build::XS::Import::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -25,14 +25,21 @@ sub add_methods {
 			my @modules = ref $import ? @{ $import } : $import;
 			for my $module (@modules) {
 				my $module_dir = module_dir($module);
-				my $config = catfile($module_dir, 'compile.json');
-				my $include = catdir($module_dir, 'include');
-				croak "No such import $module" if not -d $include and not -e $config;
+				my $found = 0;
 
+				my $include = catdir($module_dir, 'include');
 				if (-d $include) {
 					unshift @{ $args{include_dirs} }, $include;
+					$found++;
 				}
 
+				my $typemap = catfile($module_dir, 'typemap');
+				if (-e $typemap) {
+					unshift @{ $args{typemap} }, $typemap;
+					$found++;
+				}
+
+				my $config = catfile($module_dir, 'compile.json');
 				if (-e $config) {
 					open my $fh, '<:raw', $config or die "Could not open $config: $!";
 					my $content = do { local $/; <$fh> };
@@ -42,10 +49,13 @@ sub add_methods {
 						unshift @{ $args{$key} }, @{ $payload->{$key} || [] };
 					}
 
-					for my $key (%{ $payload->{defines} || {} }) {
+					for my $key (keys %{ $payload->{defines} // {} }) {
 						$args{defines}{$key} //= $payload->{defines}{$key};
 					}
+					$found++;
 				}
+
+				warn "No such import $module\n" if $found == 0;
 			}
 		}
 
@@ -69,7 +79,7 @@ Dist::Build::XS::Import - Dist::Build extension to import headers for other XS m
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -83,7 +93,7 @@ version 0.022
 
 =head1 DESCRIPTION
 
-This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an additional argument to the C<add_xs> function: C<import>. It is a counterpart to L<Dist::Build::XS::Export|Dist::Build::XS::Export>) will add the include dir and compilation flags for the given module.
+This module is an extension of L<Dist::Build::XS|Dist::Build::XS>, adding an additional argument to the C<add_xs> function: C<import>. It is a counterpart to L<Dist::Build::XS::Export|Dist::Build::XS::Export>) will add the include dir, typemap and compilation flags for the given module.
 
 =head1 AUTHOR
 

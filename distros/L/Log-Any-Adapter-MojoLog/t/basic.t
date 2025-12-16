@@ -9,7 +9,7 @@ use Test::More;
 use Log::Any::Adapter::MojoLog;
 use Log::Any qw($log);
 
-my $mojo_log = Mojo::Log->new->level('debug');
+my $mojo_log = Mojo::Log->new->level('trace');
 $mojo_log->unsubscribe('message');
 my @messages;
 $mojo_log->on(message => sub {
@@ -18,7 +18,7 @@ $mojo_log->on(message => sub {
 });
 Log::Any->set_adapter( 'MojoLog', logger => $mojo_log );
 
-_test_log( 'trace',     'debug', 'TEST trace',     'trace' );
+_test_log( 'trace',     'trace', 'TEST trace',     'trace' );
 _test_log( 'debug',     'debug', 'TEST debug',     'debug' );
 _test_log( 'info',      'info',  'TEST info',      'info' );
 _test_log( 'notice',    'info',  'TEST notice',    'notice' );

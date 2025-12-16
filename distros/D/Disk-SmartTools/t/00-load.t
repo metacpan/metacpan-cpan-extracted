@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
 use 5.018;
-use lib 'lib';
 use strict;
 use warnings;
 use version;
 use Test::More;
 
-plan tests => 17;
+plan tests => 18;
 
 BEGIN {
     my @modules = qw(
@@ -30,12 +29,13 @@ BEGIN {
         Data::Printer
         English
         Exporter
-        FindBin
         Getopt::Long
         IPC::Cmd
+        Path::Tiny
         Readonly
         Term::ANSIColor
         Term::ReadKey
+        YAML::PP
     );
 
     foreach my $module (@needed_modules) {
@@ -59,3 +59,4 @@ my $module_version
 diag("Testing Disk::SmartTools $module_version");
 diag("Perl $PERL_VERSION, $EXECUTABLE_NAME");
 
+done_testing;

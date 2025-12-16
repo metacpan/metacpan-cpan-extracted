@@ -18,7 +18,7 @@ SYNOPSIS
         sub startup {
             my $self = shift;
     
-            Log::Any::Adapter->set('MojoLog', logger => $self->app->log);
+            Log::Any::Adapter->set('MojoLog', logger => $self->log);
         }
 
     Mojolicious::Lite app:
@@ -37,9 +37,9 @@ DESCRIPTION
 
 LOG LEVEL TRANSLATION
 
-    Log levels are translated from Log::Any to Mojo::Log as follows:
+    Log level which are not exectly the same are translated from Log::Any
+    to Mojo::Log as follows:
 
-        trace -> debug
         notice -> info
         warning -> warn
         critical -> fatal

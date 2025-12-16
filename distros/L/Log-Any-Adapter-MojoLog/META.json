@@ -1,41 +1,41 @@
 {
    "abstract" : "Log::Any integration for Mojo::Log",
    "author" : [
-      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+      "Joel Berger, <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.051",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Any-Adapter-MojoLog",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.044"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.022"
+            "App::ModuleBuildTiny" : "0.051"
          }
       },
       "runtime" : {
          "requires" : {
             "Log::Any" : "0.14",
             "Log::Any::Adapter" : "0.07",
-            "Mojolicious" : "2.15"
+            "Mojolicious" : "9.20"
          }
       }
    },
    "provides" : {
       "Log::Any::Adapter::MojoLog" : {
          "file" : "lib/Log/Any/Adapter/MojoLog.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,8 @@
          "url" : "http://github.com/jberger/Log-Any-Adapter-MojoLog"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.38.5",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-2.0"
 }

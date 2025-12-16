@@ -30,10 +30,9 @@ no_index:
 provides:
   Getopt::Guided:
     file: lib/Getopt/Guided.pm
-    version: v1.1.0
+    version: v2.0.0
 requires:
   Carp: '1.32'
-  Exporter: '0'
   File::Basename: '0'
   perl: '5.010001'
   strict: '0'
@@ -41,4 +40,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/Getopt-Guided/issues
   repository: https://github.com/XSven/Getopt-Guided.git
-version: v1.1.0
+version: v2.0.0

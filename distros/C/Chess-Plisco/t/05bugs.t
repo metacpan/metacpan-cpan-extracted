@@ -41,7 +41,7 @@ ok $move, 'parse b1c3';
 $undo_info = $pos->doMove($move);
 ok $undo_info;
 ok $pos->undoMove($undo_info);
-is "$pos", "$before";
+is $pos->toFEN, $before->toFEN;
 ok $pos->equals($before);
 
 # Queen moves were not undone correctly.
@@ -52,7 +52,7 @@ ok $move, 'parse d1e2';
 $undo_info = $pos->doMove($move);
 ok $undo_info;
 ok $pos->undoMove($undo_info);
-is "$pos", "$before";
+is $pos->toFEN, $before->toFEN;
 ok $pos->equals($before);
 
 # 2. ...Bxh3 is not undone correctly.
@@ -60,11 +60,11 @@ $pos = Chess::Plisco->new('rnbqkbnr/ppp1pppp/3p4/8/7P/7R/PPPPPPP1/RNBQKBN1 b kq 
 $before = $pos->copy;
 $move = $pos->parseMove('c8h3');
 ok $move, 'parse c8h3';
-is((($move >> 15) & 0x7), CP_BISHOP);
+is((($move) & 0x7), CP_BISHOP);
 $undo_info = $pos->doMove($move);
 ok $undo_info;
 ok $pos->undoMove($undo_info);
-is "$pos", "$before";
+is $pos->toFEN, $before->toFEN;
 ok $pos->equals($before);
 
 done_testing;

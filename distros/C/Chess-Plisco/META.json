@@ -51,8 +51,7 @@
             "constant" : "0",
             "integer" : "0",
             "overload" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "strict" : "0"
          }
       },
       "test" : {
@@ -78,7 +77,7 @@
          "web" : "http://github.com/gflohr/Chess-Plisco.git"
       }
    },
-   "version" : "v0.8.0",
+   "version" : "v1.0.0",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38"
 }

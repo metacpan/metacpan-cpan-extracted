@@ -1,5 +1,8 @@
 Revision history for Perl extension Map::Tube::Paris
 
+0.2.0 2025-12-15
+  - Added newly opened funicular C1.
+
 0.1.1 2025-04-30
   - Require Map::Tube 4.09.
   - Remove -T from shebangs in tests (in accordance with Map::Tube 4.09).

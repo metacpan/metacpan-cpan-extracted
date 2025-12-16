@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine;
-$Chess::Plisco::Engine::VERSION = 'v0.8.0';
+$Chess::Plisco::Engine::VERSION = 'v1.0.0';
 use strict;
 use integer;
 
@@ -87,6 +87,11 @@ sub new {
 		__signatures => [$position->signature],
 		__options => {},
 		__book => Chess::Plisco::Engine::Book->new,
+		__setup => 0,
+		__fen => undef,
+		__turn => CP_WHITE,
+		__started => undef,
+		__moves => [],
 	};
 
 	my $options = UCI_OPTIONS;
@@ -245,9 +250,103 @@ sub __onUciInput {
 sub __onUciCmdFen {
 	my ($self) = @_;
 
-	$self->{__out}->print("$self->{__position}\n");
+	$self->{__out}->print($self->{__position}->toFEN . "\n");
 
 	return $self;
+}
+
+sub __onUciCmdPgn {
+	my ($self) = @_;
+
+	my @now = localtime;
+	my $date = sprintf '%04d.%02d.%02d', $now[5] + 1900, $now[4] + 1, $now[3];
+
+	my $pgn = <<"EOF";
+[Event "Computer Chess Game"]
+[Site "Computer Chess"]
+[Date "$date"]
+[Round "?"]
+EOF
+
+	my $version = $Chess::Plisco::Engine::VERSION || 'development version';
+	if ($self->{__turn} == CP_WHITE) {
+		$pgn .= << "EOF";
+[White "Chess::Plisco $version"]
+[Black "Unknown opponent"]
+EOF
+	} else {
+		$pgn .= << "EOF";
+[White "Unknown opponent"]
+[Black "Chess::Plisco $version"]
+EOF
+	}
+
+	my $state = $self->{__position}->gameOver;
+	my $result;
+	if ($state & CP_GAME_OVER) {
+		if ($state & CP_GAME_WHITE_WINS) {
+			$result = '1-0';
+		} else {
+			$result = '0-1';
+		}
+	} else {
+		$result = '*';
+	}
+
+	$pgn .= qq{[Result "$result"]\n};
+
+	if ($self->{__setup}) {
+		$pgn .= <<"EOF";
+[SetUp "1"]
+[FEN "$self->{__fen}"]
+EOF
+	}
+
+	$pgn .= "\n";
+
+	my $fen = $self->{__setup} ? $self->{__fen} : Chess::Plisco->new->toFEN;
+	my $pos = Chess::Plisco->new($fen);
+
+	my @move_tokens;
+	my $moveno;
+	if ($pos->toMove == CP_WHITE) {
+		$moveno = $pos->[CP_POS_HALFMOVES] >> 1;
+	} else {
+		$moveno = 1 + ($pos->[CP_POS_HALFMOVES] >> 1);
+		push @move_tokens, "$moveno...";
+	}
+
+	foreach my $cn (@{$self->{__moves}}) {
+		if ($pos->toMove == CP_WHITE) {
+			++$moveno;
+			push @move_tokens, "$moveno.";
+		}
+
+		my $move = $pos->parseMove($cn);
+		push @move_tokens, $pos->SAN($move);
+		$pos->doMove($move);
+	}
+	push @move_tokens, $result;
+
+	my $moves = join ' ', @move_tokens;
+	my $last_space = 0;
+	my $line_pos = 0;
+	my @chars = split //, $moves;
+	foreach my $char (@chars) {
+		++$line_pos;
+
+		if ($char eq ' ') {
+			if ($line_pos > 78) {
+				$chars[$last_space] = "\n";
+				$line_pos = 0;
+			}
+		}
+	}
+	chomp $moves;
+
+	$pgn .= "$moves\n";
+
+	$self->{__out}->print($pgn);
 }
 
 sub __onUciCmdBoard {
@@ -357,8 +456,7 @@ sub __onUciCmdGo {
 	};
 
 	if ($params{perft}) {
-		$self->{__position}->perftByCopyWithOutput($params{perft},
-		                                           $self->{__out});
+		$self->{__position}->perftWithOutput($params{perft}, $self->{__out});
 		return $self;
 	}
 
@@ -405,9 +503,11 @@ sub __onUciCmdGo {
 		} else {
 			$self->__output("bestmove $cn");
 		}
+		push @{$self->{__moves}}, $cn;
 	}
 
 	$self->{__watcher}->setBatchMode(0);
+
 
 	return $self;
 }
@@ -546,12 +646,16 @@ sub __onUciCmdPosition {
 
 	my ($type, @moves) = split /[ \t]+/, $args;
 	my $position;
+	$self->{__started} = time;
 	if ('fen' eq lc $type) {
 		my $fen = shift @moves;
 		unless (defined $fen && length $fen) {
 			$self->__info("error: position missing after 'fen'");
 			return;
 		}
+
+		$self->{__moves} = [@moves];
+
 		while (@moves) {
 			if ('moves' eq $moves[0]) {
 				last;
@@ -565,7 +669,12 @@ sub __onUciCmdPosition {
 			$self->__info("error: invalid FEN string: $@");
 			return;
 		}
+		$self->{__setup} = 1;
+		$self->{__fen} = $fen;
+		$self->{__turn} = $position->toMove;
 	} elsif ('startpos' eq lc $type) {
+		$self->{__setup} = 0;
+		$self->{__turn} = CP_WHITE;
 		$position = Chess::Plisco::Engine::Position->new;
 	} else {
 		$self->__info("error: usage: position FEN POSITION | startpos moves [MOVES...]");
@@ -575,6 +684,7 @@ sub __onUciCmdPosition {
 	$self->{__moves} = [];
 	my @signatures = ($position->signature);
 	if ('moves' eq shift @moves) {
+		$self->{__moves} = [@moves];
 		for (my $i = 0; $i < @moves; ++$i) {
 			my $move = $moves[$i];
 			eval { $position->applyMove($move) };

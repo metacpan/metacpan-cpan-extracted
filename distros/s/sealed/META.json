@@ -33,11 +33,12 @@
       "runtime" : {
          "requires" : {
             "B::Generate" : "0",
+            "Types::Common" : "0",
             "perl" : "5.028000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v8.0.2",
+   "version" : "v8.0.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

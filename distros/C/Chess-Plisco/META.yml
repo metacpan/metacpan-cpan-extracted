@@ -43,11 +43,10 @@ requires:
   integer: '0'
   overload: '0'
   strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/gflohr/Chess-Plisco/issues
   homepage: http://www.guido-flohr.net/en/projects#chess-plisco
   repository: git://github.com/gflohr/Chess-Plisco.git
-version: v0.8.0
+version: v1.0.0
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.76'

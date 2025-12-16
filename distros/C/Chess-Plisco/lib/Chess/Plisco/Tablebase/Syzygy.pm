@@ -51,7 +51,7 @@ my $remove_ep = sub {
 
 	my $pos2 = $pos->copy;
 
-	(($pos2->[CP_POS_INFO] = ($pos2->[CP_POS_INFO] & ~(0x3f << 5)) | (0 << 5)));
+	$pos2->[CP_POS_EN_PASSANT_SHIFT] = 0;
 
 	return $pos2;
 };
@@ -269,7 +269,7 @@ my $dtz_before_zeroing = sub {
 };
 
 package Chess::Plisco::Tablebase::Syzygy::Testing;
-$Chess::Plisco::Tablebase::Syzygy::Testing::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::Testing::VERSION = 'v1.0.0';
 sub calc_key {
 	my (undef, $pos, $mirror) = @_;
 
@@ -295,7 +295,7 @@ sub flipdiag {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::MissingTableException;
-$Chess::Plisco::Tablebase::Syzygy::MissingTableException::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::MissingTableException::VERSION = 'v1.0.0';
 use overload '""' => sub { ${$_[0]} };
 
 sub new {
@@ -305,7 +305,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::PairsData;
-$Chess::Plisco::Tablebase::Syzygy::PairsData::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::PairsData::VERSION = 'v1.0.0';
 sub new {
 	my ($class, %args) = @_;
 
@@ -324,7 +324,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::PawnFileData;
-$Chess::Plisco::Tablebase::Syzygy::PawnFileData::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::PawnFileData::VERSION = 'v1.0.0';
 sub new {
 	my ($class) = @_;
 	bless {
@@ -336,7 +336,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::PawnFileDataDtz;
-$Chess::Plisco::Tablebase::Syzygy::PawnFileDataDtz::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::PawnFileDataDtz::VERSION = 'v1.0.0';
 sub new {
 	my ($class, %args) = @_;
 
@@ -349,7 +349,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::Table;
-$Chess::Plisco::Tablebase::Syzygy::Table::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::Table::VERSION = 'v1.0.0';
 use integer;
 
 use Fcntl qw(O_RDONLY O_BINARY);
@@ -1104,7 +1104,7 @@ sub DESTROY {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::WdlTable;
-$Chess::Plisco::Tablebase::Syzygy::WdlTable::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::WdlTable::VERSION = 'v1.0.0';
 use Chess::Plisco qw(:all);
 
 use base qw(Chess::Plisco::Tablebase::Syzygy::Table);
@@ -1294,7 +1294,7 @@ sub probeWdlTable {
 	my $key = $calc_key->($pos);
 
 	my ($cmirror, $mirror, $bside);
-	my $to_move = ((($pos->[CP_POS_INFO] & (1 << 4)) >> 4));
+	my $to_move = $pos->[CP_POS_TURN];
 	if (!$self->{symmetric}) {
 		if ($key ne $self->{key}) {
 			$cmirror = 8;
@@ -1370,7 +1370,7 @@ sub probeWdlTable {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::DtzTable;
-$Chess::Plisco::Tablebase::Syzygy::DtzTable::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::DtzTable::VERSION = 'v1.0.0';
 use Chess::Plisco qw(:all);
 use Chess::Plisco::Macro;
 
@@ -1545,7 +1545,7 @@ sub probeDtzTable {
 	my $key = $calc_key->($pos);
 
 	my ($cmirror, $mirror, $bside);
-	my $to_move = ((($pos->[CP_POS_INFO] & (1 << 4)) >> 4));
+	my $to_move = $pos->[CP_POS_TURN];
 	if (!$self->{symmetric}) {
 		if ($key ne $self->{key}) {
 			$cmirror = 8;
@@ -1652,7 +1652,7 @@ sub probeDtzTable {
 }
 
 package Chess::Plisco::Tablebase::Syzygy;
-$Chess::Plisco::Tablebase::Syzygy::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::Syzygy::VERSION = 'v1.0.0';
 use File::Basename qw(basename);
 use File::Globstar qw(globstar);
 use Locale::TextDomain qw('Chess-Plisco');
@@ -1812,7 +1812,7 @@ sub probeWdl {
 	# Positions where en passant is possible need special care because the
 	# Syzygy tablebases assume that en passant is not possible. Otherwise,
 	# we can just return the result of the probe.
-	my $ep_shift = ((($pos->[CP_POS_INFO] & (0x3f << 5)) >> 5));
+	my $ep_shift = $pos->[CP_POS_EN_PASSANT_SHIFT];
 	return $value if !$ep_shift;
 
 	# Positions resulting from en passant captures have not been considered,
@@ -1829,10 +1829,10 @@ sub probeWdl {
 	my @legal_moves = $pos->legalMoves;
 	my @ep_captures;
 	foreach my $move (@legal_moves) {
-		my $to = (($move) & 0x3f);
+		my $to = ((($move) >> 15) & 0x3f);
 		next if $to != $ep_shift;
 
-		my $piece = (($move >> 15) & 0x7);
+		my $piece = (($move) & 0x7);
 		next if $piece != CP_PAWN;
 
 		push @ep_captures, $move;
@@ -1874,7 +1874,8 @@ sub probeDtz {
 	# Positions where en passant is possible need special care because the
 	# Syzygy tablebases assume that en passant is not possible. Otherwise,
 	# we can just return the result of the probe.
-	my $ep_shift = ((($pos->[CP_POS_INFO] & (0x3f << 5)) >> 5));
+	my $ep_shift = $pos->[CP_POS_EN_PASSANT_SHIFT];
+
 	return $value if !$ep_shift;
 
 	# Positions resulting from en passant captures have not been considered,
@@ -1891,10 +1892,10 @@ sub probeDtz {
 	my @legal_moves = $pos->legalMoves;
 	my @ep_captures;
 	foreach my $move (@legal_moves) {
-		my $to = (($move) & 0x3f);
+		my $to = ((($move) >> 15) & 0x3f);
 		next if $to != $ep_shift;
 
-		my $piece = (($move >> 15) & 0x7);
+		my $piece = (($move) & 0x7);
 		next if $piece != CP_PAWN;
 
 		push @ep_captures, $move;
@@ -1952,7 +1953,7 @@ sub __probeDtzNoEP {
 	return 0 if $wdl == 0;
 
 	if ($success == 2
-	    || !($pos->[CP_POS_WHITE_PIECES + ((($pos->[CP_POS_INFO] & (1 << 4)) >> 4))] & ~$pos->[CP_POS_PAWNS])) {
+	    || !($pos->[CP_POS_WHITE_PIECES + $pos->[CP_POS_TURN]] & ~$pos->[CP_POS_PAWNS])) {
 		return $dtz_before_zeroing->($wdl);
 	}
 
@@ -1961,8 +1962,8 @@ sub __probeDtzNoEP {
 		# Generate all legal non-capturing pawn moves.
 		$moves //= [$pos->legalMoves];
 		foreach my $move (@$moves) {
-			next if (($move >> 15) & 0x7) != CP_PAWN;
-			next if (($move >> 18) & 0x7);
+			next if (($move) & 0x7) != CP_PAWN;
+			next if ((($move) >> 3) & 0x7);
 
 			my $undo = $pos->doMove($move);
 
@@ -1993,8 +1994,8 @@ sub __probeDtzNoEP {
 		# Generate all quite non-pawn moves.
 		$moves //= [$pos->legalMoves];
 		foreach my $move (@$moves) {
-			next if (($move >> 15) & 0x7) == CP_PAWN;
-			next if (($move >> 18) & 0x7);
+			next if (($move) & 0x7) == CP_PAWN;
+			next if ((($move) >> 3) & 0x7);
 
 			my $undo = $pos->doMove($move);
 			eval {
@@ -2018,7 +2019,7 @@ sub __probeDtzNoEP {
 
 			my $v;
 			eval {
-				if (!$pos->[CP_POS_HALF_MOVE_CLOCK]) {
+				if (!$pos->[CP_POS_HALFMOVE_CLOCK]) {
 					if ($wdl == -2) {
 						$v = -1;
 					} else {
@@ -2087,7 +2088,7 @@ sub __probeAb {
 	# Iterate over all non-ep captures.
 	my $v;
 	foreach my $move ($remove_ep->($pos)->legalMoves) {
-		(($move >> 18) & 0x7) or next;
+		((($move) >> 3) & 0x7) or next;
 
 		my $undo = $pos->doMove($move);
 		eval {

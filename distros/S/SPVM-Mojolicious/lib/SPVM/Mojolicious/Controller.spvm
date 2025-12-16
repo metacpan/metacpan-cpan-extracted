@@ -15,6 +15,9 @@ class Mojolicious::Controller {
   use Mojo::Message::Response;
   use Mojo::Log;
   use Mojo::Callback;
+  use Mojo::UserAgent;
+  use Mojo::ByteStream;
+  use Mojo::Collection;
   
   our $ABSOLUTE : string;
   INIT {
@@ -161,8 +164,7 @@ class Mojolicious::Controller {
       return $value isa string[] ? (string[])$value : [(string)$value];
     }
     
-    # Uploads or param values
-    my $req     = $self->req;
+    my $req = $self->req;
     
     return $req->every_param($name);
   }
@@ -173,11 +175,24 @@ class Mojolicious::Controller {
     
     return $uploads;
   }
-
+  
+  method upload : Mojo::Upload ($name : string) {
+    
+    my $every_upload = $self->every_upload($name);
+    
+    my $upload = @$every_upload ? $self->every_upload($name)->[-1] : undef;
+    
+    return $upload;
+  }
+  
   method signed_cookie : string ($name : string) {
     
     # Request cookie
-    return $self->every_signed_cookie($name)->[-1] ;
+    my $every_signed_cookie = $self->every_signed_cookie($name);
+    
+    my $value = @$every_signed_cookie ? $every_signed_cookie->[-1] : undef;
+    
+    return $value;
   }
   
   method set_signed_cookie : string ($name : string, $value : string = undef, $options : object[] = undef) {
@@ -189,11 +204,15 @@ class Mojolicious::Controller {
   }
   
   method every_signed_cookie : string[] ($name : string) {
-
+    
     my $secrets = $self->app->secrets;
     my $results = StringList->new;
     for my $value (@{$self->every_cookie($name)}) {
-
+      
+      unless (is_read_only $value) {
+        $value = copy $value;
+      }
+      
       # Check signature with rotating secrets
       if (my $rep = Re->s((mutable string)$value, "--([^\-]+)$", "")) {
         my $signature = $rep->match->cap1;
@@ -221,7 +240,7 @@ class Mojolicious::Controller {
     
     return $results->get_array;
   }
-
+  
   method finish : void ($code : int = 0, $reason : string = undef) {
     
     my $tx = $self->tx;
@@ -287,7 +306,9 @@ class Mojolicious::Controller {
 
   method param : string ($name : string) {
     
-    my $value = $self->every_param($name)->[-1];
+    my $every_param = $self->every_param($name);
+    
+    my $value = @$every_param ? $self->every_param($name)->[-1] : undef;
     
     return $value;
   }
@@ -383,8 +404,7 @@ class Mojolicious::Controller {
       my $app = $self->app;
       $app->plugins->emit_hook_reverse(after_dispatch => $self);
       
-      # TODO:session
-      # $app->sessions->store($self);
+      $app->sessions->store($self);
     }
   }
   
@@ -418,7 +438,7 @@ class Mojolicious::Controller {
     return $self->session_h->{$name};
   }
   
-  method set_session : void ($name : string, $value : string) {
+  method set_session : void ($name : string, $value : object) {
     
     $self->session_h->{$name} = $value;
   }
@@ -427,7 +447,7 @@ class Mojolicious::Controller {
     return $self->{stash_h}{$name};
   }
   
-  method set_stash : void ($name : string, $value : string) {
+  method set_stash : void ($name : string, $value : object) {
     $self->{stash_h}{$name} = $value;
   }
   
@@ -557,4 +577,90 @@ class Mojolicious::Controller {
     return Mojo::ByteStream->new($content // "");
   }
   
+  method flash : object ($name : string) {
+    
+    # Check old flash
+    my $session = $self->session_h;
+    
+    return $session->{"flash"} ? $session->{"flash"}->(Hash)->{$name}->(object) : undef;
+  }
+  
+  method set_flash : void ($name : string, $value : object) {
+    
+    my $session = $self->session_h;
+    
+    unless ($session->{"new_flash"}) {
+      $session->{"new_flash"} = Hash->new;
+    }
+    
+    $session->{"new_flash"}->(Hash)->{$name} = $value;
+  }
+  
+  method ua : Mojo::UserAgent () {
+    return $self->app->ua;
+  }
+  
+  method config : object ($name : string) {
+    return $self->app->config($name);
+  }
+  
+  method c : Mojo::Collection ($array : object[] = undef) {
+    return Mojo::Collection->new($array);
+  }
+  
+  method b : Mojo::ByteStream ($bytes : string) {
+    return Mojo::ByteStream->new($bytes);
+  }
+  
+  method layout : string () {
+    $self->stash("layout")->(string);
+  }
+  
+  method set_layout : void ($layout : string) {
+    $self->set_stash(layout => $layout);
+  }
+  
+  method title : string () {
+    $self->stash("title")->(string);
+  }
+  
+  method set_title : void ($title : string) {
+    $self->set_stash(title => $title);
+  }
+  
+  method accepts : string[] ($preferences : string[] = undef) {
+    $self->app->renderer->accepts($self, $preferences);
+  }
+  
 }
+
+__END__
+
+TODO: DefaultHelper
+
+sub register {
+  my ($self, $app) = @_;
+  
+  $app->helper($_ => $self->can("_$_"))
+    for qw(csrf_token current_route exception_format inactivity_timeout is_fresh),
+    qw(redirect_to respond_to url_with);
+  
+  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
+  
+  $app->helper('reply.exception',      => sub { shift->helpers->reply->http_exception(@_) });
+  $app->helper('reply.not_found',      => sub { shift->helpers->reply->http_not_found() });
+  $app->helper('reply.http_exception', => \&_http_exception);
+  $app->helper('reply.http_not_found', => \&_http_not_found);
+  $app->helper('reply.html_exception'  => sub { _development('exception', @_) });
+  $app->helper('reply.html_not_found'  => sub { _development('not_found', @_) });
+  $app->helper('reply.json_exception', => \&_json_exception);
+  $app->helper('reply.json_not_found', => \&_json_not_found);
+  $app->helper('reply.txt_exception',  => \&_txt_exception);
+  $app->helper('reply.txt_not_found',  => \&_txt_not_found);
+
+  $app->helper('timing.begin'         => \&_timing_begin);
+  $app->helper('timing.elapsed'       => \&_timing_elapsed);
+  $app->helper('timing.rps'           => \&_timing_rps);
+  $app->helper('timing.server_timing' => \&_timing_server_timing);
+}
+

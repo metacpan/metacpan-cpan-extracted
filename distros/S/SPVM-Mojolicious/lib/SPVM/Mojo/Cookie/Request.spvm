@@ -37,6 +37,8 @@ class Mojo::Cookie::Request extends Mojo::Cookie {
       my $cookie = Mojo::Cookie::Request->new;
       $cookie->{name} = $name;
       $cookie->{value} = $value // "";
+      
+      $cookies->push($cookie);
     }
     
     return $cookies->to_array;

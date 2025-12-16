@@ -32,6 +32,8 @@
     <line id="P_B" name="B" color="#3C91DC"/>
     <!-- RER -->
     <line id="P_C" name="C" color="#FFBE00"/>
+    <!-- Funicular -->
+    <line id="P_C1" name="C1" color="#3C91DC"/>
     <!-- Metro -->
     <line id="P_CDGVAL" name="CDGVal" color="#FFCD0D"/>
     <!-- RER -->
@@ -398,8 +400,8 @@
     <station id="p_834" name="Maisons-Alfort - Les Juilliottes" line="P_8:34" link="p_833,p_835"/>
     <station id="p_835" name="Créteil - L'Échat" line="P_8:35" link="p_834,p_836"/>
     <station id="p_836" name="Créteil - Université" line="P_8:36" link="p_835,p_837"/>
-    <station id="p_837" name="Créteil - Préfecture" line="P_8:37" link="p_836,p_838"/>
-    <station id="p_838" name="Créteil - Pointe du Lac" line="P_8:38" link="p_837"/>
+    <station id="p_837" name="Créteil - Préfecture" line="P_8:37" link="p_836,p_c101"/>
+    <station id="p_c101" name="Créteil - Pointe du Lac" line="P_8:38,P_C1:1" link="p_837,p_c102"/>
     <!-- 9 -->
     <station id="p_901" name="Pont de Sèvres" line="P_9:1" link="p_902" other_link="foot13:p_t215"/>
     <station id="p_902" name="Billancourt" line="P_9:2" link="p_901,p_903"/>
@@ -575,6 +577,11 @@
     <station id="p_c72" name="Étréchy" line="P_C:72" link="p_c71,p_c73"/>
     <station id="p_c73" name="Étampes" line="P_C:73" link="p_c72,p_c74"/>
     <station id="p_c74" name="Saint-Martin-d'Étampes" line="P_C:74" link="p_c73"/>
+    <!-- C1 -->
+    <station id="p_c102" name="Limeil-Brévannes" line="P_C1:2" link="p_c101,p_c103"/>
+    <station id="p_c103" name="Valenton" line="P_C1:3" link="p_c102,p_c104"/>
+    <station id="p_c104" name="La Végétale" line="P_C1:4" link="p_c103,p_c105"/>
+    <station id="p_c105" name="Villa Nova" line="P_C1:5" link="p_c104"/>
     <!-- CDGVal -->
     <station id="p_cdgval01" name="Aéroport Charles de Gaulle Terminal 1" line="P_CDGVAL:1" link="p_cdgval02"/>
     <station id="p_cdgval02" name="Parc PR" line="P_CDGVAL:2" link="p_cdgval01,p_cdgval03"/>

@@ -13,27 +13,27 @@ use strict;
 
 use Test::More;
 
-# Do not "use" the module because we do not want to acti
+# Do not "use" the module because we do not want to activate the source filter.
 require Chess::Plisco::Macro;
 
 my ($code);
 
 $code = 'cp_move_to($move)';
-is Chess::Plisco::Macro::preprocess($code), '(($move) & 0x3f)', $code;
+is Chess::Plisco::Macro::preprocess($code), '((($move) >> 15) & 0x3f)', $code;
 
 $code = 'cp_move_to $move';
-is Chess::Plisco::Macro::preprocess($code), '(($move) & 0x3f)', $code;
+is Chess::Plisco::Macro::preprocess($code), '((($move) >> 15) & 0x3f)', $code;
 
 $code = 'cp_move_to($move); return;';
 is Chess::Plisco::Macro::preprocess($code),
-	'(($move) & 0x3f); return;', $code;
+	'((($move) >> 15) & 0x3f); return;', $code;
 
 $code = 'cp_move_to $move; return;';
 is Chess::Plisco::Macro::preprocess($code),
-	'(($move) & 0x3f); return;', $code;
+	'((($move) >> 15) & 0x3f); return;', $code;
 
 $code = 'cp_move_set_to($move, 32);';
 is Chess::Plisco::Macro::preprocess($code),
-	'(($move) = (($move) & ~0x3f) | ((32) & 0x3f));', $code;
+	'(($move) = (($move) & ~0x1f8000) | ((32)) << 15);', $code;
 
 done_testing;

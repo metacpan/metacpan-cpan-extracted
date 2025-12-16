@@ -3,7 +3,7 @@ package Log::Any::Adapter::MojoLog;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 $VERSION = eval $VERSION;
 
 use Log::Any::Adapter::Util qw(make_method);
@@ -11,10 +11,7 @@ use base qw(Log::Any::Adapter::Base);
 
 use Mojo::Log;
 
-sub init {
-    my ($self) = @_;
-    $self->{logger} ||= Mojo::Log->new;
-}
+sub init { $_[0]->{logger} ||= Mojo::Log->new }
 
 # Create logging methods
 #
@@ -24,7 +21,6 @@ foreach my $method ( Log::Any->logging_methods ) {
     # Map log levels down to Mojo::Log levels where necessary
     #
     for ($mojo_method) {
-        s/trace/debug/;
         s/notice/info/;
         s/warning/warn/;
         s/critical|alert|emergency/fatal/;
@@ -32,46 +28,28 @@ foreach my $method ( Log::Any->logging_methods ) {
 
     make_method(
         $method,
-        sub {
-            my $self = shift;
-            return $self->{logger}->$mojo_method(@_);
-        }
+        sub { shift->{logger}->$mojo_method(@_) }
     );
 }
 
 # Create detection methods: is_debug, is_info, etc.
 #
 
-my $true = sub { 1 };
 foreach my $method ( Log::Any->detection_methods ) {
-    my $mojo_method = $method;
+    my $level = $method;
+    $level =~ s/^is_//;
 
     # Map log levels down to Mojo::Log levels where necessary
     #
-    for ($mojo_method) {
-        s/trace/debug/;
+    for ($level) {
         s/notice/info/;
         s/warning/warn/;
         s/critical|alert|emergency/fatal/;
     }
 
-    my $level;
-    if ($mojo_method eq 'is_fatal') {
-      # is_fatal has been removed since 6.0, it was always true
-      $mojo_method = $true;
-    } elsif (eval { require Mojolicious; Mojolicious->VERSION('6.47'); 1 }) {
-      # as of 6.47 the is_* methods have been removed in favor of
-      # is_level($level)
-      ($level = $mojo_method) =~ s/^is_//;
-      $mojo_method = 'is_level';
-    }
-
     make_method(
         $method,
-        sub {
-            my $self = shift;
-            return $self->{logger}->$mojo_method($level ? $level : ());
-        }
+        sub { $_[0]->{logger}->is_level($level ? $level : ()) }
     );
 }
 
@@ -101,7 +79,7 @@ Mojolicious app:
     sub startup {
         my $self = shift;
 
-        Log::Any::Adapter->set('MojoLog', logger => $self->app->log);
+        Log::Any::Adapter->set('MojoLog', logger => $self->log);
     }
 
 Mojolicious::Lite app:
@@ -120,9 +98,9 @@ be used to pass in the logging object.
 
 =head1 LOG LEVEL TRANSLATION
 
-Log levels are translated from Log::Any to Mojo::Log as follows:
+Log level which are not exectly the same are translated from Log::Any
+to Mojo::Log as follows:
 
-    trace -> debug
     notice -> info
     warning -> warn
     critical -> fatal

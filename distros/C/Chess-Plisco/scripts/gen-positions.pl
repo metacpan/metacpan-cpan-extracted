@@ -117,7 +117,7 @@ sub print_positions {
 		}
 	}
 
-	my $black_fen = "$pos";
+	my $black_fen = $pos->toFEN;
 	$black_fen =~ s/w - -/b - -/;
 	$pos = eval { Chess::Plisco->new($black_fen) };
 	return if $@;

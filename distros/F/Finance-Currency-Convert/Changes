@@ -47,3 +47,6 @@ Revision history for Perl extension Finance::Currency::Convert.
 	- fix: keep setRateFile() semanticas to read the file, too
 	- fix: don't write unknow rate combinations
 
+2.03  Mon Dec 15 14:00:00 CEST 2025
+	- fix: error handling when rate file isn't readable
+

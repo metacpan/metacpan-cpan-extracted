@@ -1,5 +1,5 @@
 use v5.14.0;
-package JMAP::Tester::Logger::HTTP 0.107;
+package JMAP::Tester::Logger::HTTP 0.108;
 
 use Moo;
 
@@ -7,9 +7,7 @@ use namespace::clean;
 
 my %counter;
 
-sub _log_generic {
-  my ($self, $tester, $type, $thing) = @_;
-
+sub _log_generic ($self, $tester, $type, $thing) {
   my $i = $counter{$type}++;
   my $ident = $tester->ident;
   $self->write("=== BEGIN \U$type\E $$.$i ($ident) ===\n");
@@ -22,8 +20,7 @@ for my $which (qw(jmap misc upload download)) {
   for my $what (qw(request response)) {
     my $method = "log_${which}_${what}";
     no strict 'refs';
-    *$method = sub {
-      my ($self, $tester, $arg) = @_;
+    *$method = sub ($self, $tester, $arg) {
       $self->_log_generic($tester, "$which $what", $arg->{"http_$what"});
     }
   }
@@ -45,7 +42,7 @@ JMAP::Tester::Logger::HTTP
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 PERL VERSION
 

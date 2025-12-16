@@ -14,8 +14,8 @@
 ## no critic (TestingAndDebugging::RequireUseStrict)
 
 (do {
-	my $her_color = !$c;
-	my $her_pieces = $p->[CP_POS_WHITE_PIECES + $her_color];
+	my $her_colour = !$c;
+	my $her_pieces = $p->[CP_POS_WHITE_PIECES + $her_colour];
 	my $occupancy = $p->[CP_POS_WHITE_PIECES + $c] | $her_pieces;
 	my $queens = cp_pos_queens($p);
 	$her_pieces

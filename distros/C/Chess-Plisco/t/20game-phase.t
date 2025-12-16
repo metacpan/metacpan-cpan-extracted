@@ -94,7 +94,7 @@ foreach my $test (@tests) {
 	my $old_phase = $position->[$cp_pos_game_phase];
 	my $state = $position->applyMove($test->{move});
 	ok $state, "$test->{name}: apply move $test->{move}";
-	my $new_position = Chess::Plisco::Engine::Position->new("$position");
+	my $new_position = Chess::Plisco::Engine::Position->new($position->toFEN);
 	is $position->[$cp_pos_game_phase], $new_position->[$cp_pos_game_phase],
 			"$test->{name}: $test->{move}: game phase";
 	$position->unapplyMove($state);

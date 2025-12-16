@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002005';
+our $VERSION   = '0.003000';
 
 use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
 use Exporter::Tiny qw( mkopt _croak );
@@ -308,8 +308,12 @@ sub setup_constructor {
 		my @dfn = map {
 			my $name = $_->{slot};
 			my $req  = $_->{required} ? '!'           : '';
-			my @type = $_->{isa}      ? ( $_->{isa} ) : ();
-			defined($_->{init_arg}) ? ( $name . $req, @type ) : ();
+			my $opt  = {};
+			$opt->{isa}     = $_->{isa}     if defined $_->{isa};
+			$opt->{coerce}  = 1             if $_->{coerce} && blessed $_->{isa};
+			$opt->{default} = $_->{default} if !$_->{lazy} && exists $_->{default};
+			$opt->{builder} = $_->{builder} if !$_->{lazy} && defined $_->{builder};
+			defined($_->{init_arg}) ? ( $name . $req, $opt ) : ();
 		} @$attr;
 		push @dfn, '!!' if $me->strict;
 		Class::XSConstructor->import( [ $me->this, $me->constructor ], @dfn );

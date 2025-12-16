@@ -1,8 +1,10 @@
-use v5.14.0;
-package JMAP::Tester::Abort 0.107;
+use v5.20.0;
+package JMAP::Tester::Abort 0.108;
 
 use Moo;
 extends 'Throwable::Error';
+
+use experimental 'signatures';
 
 use namespace::clean;
 
@@ -10,13 +12,12 @@ use Sub::Exporter -setup => {
   exports => {
     abort => sub {
       my $pkg = shift;
-      return sub { die $pkg->new(@_) }
+      return sub (@args) { die $pkg->new(@args) }
     }
   }
 };
 
-around BUILDARGS => sub {
-  my ($orig, $self, @args) = @_;
+around BUILDARGS => sub ($orig, $self, @args) {
   return { message => $args[0] } if @args == 1 && ! ref $args[0];
   return $self->$orig(@args);
 };
@@ -30,11 +31,11 @@ has diagnostics => (
   is => 'ro',
 );
 
-sub as_test_abort_events {
+sub as_test_abort_events ($self) {
   return [
-    [ Ok => (pass => 0, name => $_[0]->message) ],
-    ($_[0]->diagnostics
-      ? (map {; [ Diag => (message => $_) ] } @{ $_[0]->diagnostics })
+    [ Ok => (pass => 0, name => $self->message) ],
+    ($self->diagnostics
+      ? (map {; [ Diag => (message => $_) ] } @{ $self->diagnostics })
       : ()),
   ];
 }
@@ -53,7 +54,7 @@ JMAP::Tester::Abort
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 PERL VERSION
 

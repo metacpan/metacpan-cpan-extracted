@@ -97,6 +97,7 @@ t/pick.t
 t/pipe_select_name.t
 t/pluck.t
 t/range.t
+t/raw_input_cli.t
 t/recurse.t
 t/reduce.t
 t/replace.t

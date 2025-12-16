@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002005';
+our $VERSION   = '0.003000';
 
 use parent 'Sub::Accessor::Small';
 use B ();
@@ -32,13 +32,8 @@ sub requires_pp_constructor {
 	my $me = shift;
 	return !!0 if !defined $me->{init_arg};
 	return !!1 if $me->{init_arg} ne $me->{slot};
-	return !!1 if $me->{coerce};
 	return !!1 if $me->{weak_ref};
 	return !!1 if exists $me->{trigger};
-	unless ( $me->{lazy} ) {
-		return !!1 if exists $me->{default};
-		return !!1 if exists $me->{builder};
-	}
 	return !!0;
 }
 

@@ -21,7 +21,7 @@ name: HealthCheck-Parallel
 provides:
   HealthCheck::Parallel:
     file: lib/HealthCheck/Parallel.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
   HealthCheck: v1.8.1
   Parallel::ForkManager: '0'
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-healthcheck-parallel/issues
   repository: git://github.com/GrantStreetGroup/p5-healthcheck-parallel.git
-version: v0.1.0
+version: v0.2.0
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

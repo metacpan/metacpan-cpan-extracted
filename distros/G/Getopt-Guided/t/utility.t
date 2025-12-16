@@ -14,7 +14,7 @@ subtest 'Utility is broken: getopts has $spec error' => sub {
   script_compiles $utility;
   script_fails $utility, { exit => 255 }, 'Check exit status';
   script_stderr_like
-    qr/\Agetopts: \$spec parameter isn't a string of alphanumeric characters, stopped at \Q$utility\E.*/, ## no critic ( ProhibitComplexRegexes )
+    qr/\Aparse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped at \Q$utility\E.*/, ## no critic ( ProhibitComplexRegexes )
     'Check standard error output'
 };
 

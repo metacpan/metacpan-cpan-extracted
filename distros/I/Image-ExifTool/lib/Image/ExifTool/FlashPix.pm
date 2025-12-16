@@ -1093,7 +1093,7 @@ my %fpxFileType = (
 %Image::ExifTool::FlashPix::DocTable = (
     GROUPS => { 1 => 'MS-DOC', 2 => 'Document' },
     NOTES => 'Tags extracted from the Microsoft Word document table.',
-    VARS => { NO_ID => 1 },
+    VARS => { ID_FMT => 'none' },
     CommentBy => {
         Groups => { 2 => 'Author' },
         Notes => 'enable L<Duplicates|../ExifTool.html#Duplicates> option to extract all entries',
@@ -1454,7 +1454,7 @@ sub ProcessContents($$$)
         my ($w, $h) = unpack('V2',$2);
         $et->FoundTag(ImageWidth => $w);
         $et->FoundTag(ImageHeight => $h);
-        $et->HandleTag($tagTablePtr, OriginalFileName => $name);        
+        $et->HandleTag($tagTablePtr, OriginalFileName => $name);
         if ($$dataPt =~ /\G\x01\0{4}(.{12})/sg) {
             # (first 4 bytes seem to be number of objects, next 4 bytes are zero, then ICC size)
             my $size = unpack('x8V', $1);

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/paper-wallet"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "App::Bitcoin::PaperWallet",
   "PREREQ_PM" => {
     "Bitcoin::Crypto" => "4.000",
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::Script" => 0
   },
-  "VERSION" => "1.14",
+  "VERSION" => "1.15",
   "test" => {
     "TESTS" => "t/*.t"
   }

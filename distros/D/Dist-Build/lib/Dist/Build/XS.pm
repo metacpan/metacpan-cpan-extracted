@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.022';
+$Dist::Build::XS::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -47,6 +47,12 @@ sub add_methods {
 
 		my $xs_dir = dirname($xs_file);
 		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
+
+		if (my $typemap = $args{typemap}) {
+			my @typemaps = ref $args{typemap} ? @{ $typemap } : $typemap;
+			$_ = rel2abs($_) for @typemaps;
+			$args{typemap} = \@typemaps;
+		}
 
 		$planner->parse_xs($xs_file, $c_file, %args, module => $module_name);
 
@@ -147,7 +153,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

@@ -81,5 +81,5 @@ foreach my $test (@tests) {
 		$pos->doMove($move)
 			or die "$test->{name}: illegal move $test->{move}";
 	}
-	is((($pos->[CP_POS_INFO] >> 19)), $test->{material}, "$test->{name}");
+	is($pos->[CP_POS_MATERIAL], $test->{material}, "$test->{name}");
 }

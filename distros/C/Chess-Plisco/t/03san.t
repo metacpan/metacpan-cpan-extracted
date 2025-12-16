@@ -161,13 +161,13 @@ foreach my $test (@tests) {
 	my $promote = $pieces{$3} || CP_NO_PIECE;
 	my $captured = $test->{captured} || CP_NO_PIECE;
 	my $piece = $test->{piece} or die;
-	my $color = $pos->toMove;
+	my $colour = $pos->toMove;
 
 	is($pos->moveFrom($move), $from, "$test->{san} from");
 	is($pos->moveTo($move), $to, "$test->{san} to");
 	is($pos->movePromote($move), $promote, "$test->{san} promote");
 	is($pos->movePiece($move), $piece, "$test->{san} piece");
 	is($pos->moveCaptured($move), $captured, "$test->{san} captured");
-	is($pos->moveColor($move), $color, "$test->{san} color");
+	is($pos->moveColour($move), $colour, "$test->{san} colour");
 	ok $pos->moveLegal($move), "$test->{san} legal";
 }

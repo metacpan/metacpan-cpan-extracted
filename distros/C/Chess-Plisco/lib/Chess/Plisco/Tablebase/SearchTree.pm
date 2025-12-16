@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Tablebase::SearchTree;
-$Chess::Plisco::Tablebase::SearchTree::VERSION = 'v0.8.0';
+$Chess::Plisco::Tablebase::SearchTree::VERSION = 'v1.0.0';
 use strict;
 use integer;
 

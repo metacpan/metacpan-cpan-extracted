@@ -215,10 +215,10 @@ class Mojo::Parameters {
     $self->remove($name);
     
     if ($value isa string) {
-      $self->append([(string)$value]);
+      $self->append([$name, (string)$value]);
     }
     elsif ($value isa string[]) {
-      $self->append((string[])$value);
+      $self->append(Array->merge_string([$name], (string[])$value));
     }
     else {
       die "The type of value \$value must be string or string[].";

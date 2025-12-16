@@ -1,4 +1,8 @@
 [![Actions Status](https://github.com/tecolicom/App-dozo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/App-dozo/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-dozo.svg)](https://metacpan.org/release/App-dozo)
+<div>
+    <p align="center"><img src="https://raw.githubusercontent.com/tecolicom/App-dozo/main/images/dozo-logo.jpeg" width="400"></p>
+</div>
+
 # NAME
 
 dozo - Docker with Zero Overhead
@@ -12,6 +16,7 @@ dozo -I IMAGE \[ options \] \[ command ... \]
     -d, --debug        debug mode (show full command)
     -x, --trace        trace mode (set -x)
     -q, --quiet        quiet mode
+    -n, --dryrun       dry-run mode (do not run docker)
 
     -I, --image=#      Docker image (required unless -D)
     -D, --default      use default image (DOZO_DEFAULT_IMAGE or tecolicom/xlate)
@@ -31,7 +36,7 @@ dozo -I IMAGE \[ options \] \[ command ... \]
 
 # VERSION
 
-Version 
+Version 0.9923
 
 # USAGE
 
@@ -144,6 +149,11 @@ for option parsing.
 - **-q**, **--quiet**
 
     Quiet mode.
+
+- **-n**, **--dryrun**
+
+    Dry-run mode. Show docker commands without executing them.
+    Useful for testing and debugging.
 
 - **-I** _image_, **--image**=_image_
 

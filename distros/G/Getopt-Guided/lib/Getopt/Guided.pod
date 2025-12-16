@@ -6,30 +6,53 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 =head1 SYNOPSIS
 
-  use Getopt::Guided qw( getopts );
+  use Getopt::Guided qw( getopts getopts3 );
 
   local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
 
-  getopts 'a:bcd,v', my %opts;
+  getopts 'a:bcd,v+', my %opts;
 
   # or
 
-  getopts3 @ARGV, 'a:bcd,v', my %opts;
+  getopts3 @ARGV, 'a:bcd,v+', my %opts;
 
   # result
-  # %opts == ( a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
+  # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
+
+
+=head1 ABOUT OPTIONS
+
+An option (command-line option) has a name that is a single alphanumeric
+(C<[[:alnum:]]>) character. It has a delimiter (prefix delimiter) that is
+a hyphen (C<->) character.
+
+Some options require an argument (option-argument). If an option requires an
+argument, an indicator (option-argument indicator) character is attached to
+its name. A common option has a colon (C<:>) indicator. A list option has
+a comma (C<,>) indicator. The POSIX standard knows only common options.
+
+An option that requires no argument is called a flag.  A flag can optionally
+have an indicator (flag indicator) character. A negatable flag has an
+exclamation mark (C<!>) indicator. An incrementable flag has a plus sign
+(C<+>) indicator. The POSIX standard doesn't know flag indicators.
 
 =head1 DESCRIPTION
 
 This module reimplements the C<getopts()> function of the L<Getopts::Std>
 core module.  The new implementation supports only the two-parameter form
-of C<getopts()>.  The first parameter is a string that contains the option
-characters (the options specification).  The second parameter is an empty
-hash (passed by reference) that stores the processing result. Each hash
-key refers to a provided option character and the corresponding hash value
-refers to the option-argument (or C<1> if it is a flag). This module exports
-the C<getopts()> function on request.
+of C<getopts()> where the second parameter is not a hash reference but a hash.
+
+The first parameter is the "options specification" C<$spec>. It is a
+non-empty string that contains a joined list of options (C<E<lt>nameE<gt>
+[ E<lt>indicatorE<gt> ]>).
+
+The second parameter is the "name-value map" C<%opts>. It is an empty hash
+(passed by reference) that stores the C<getopts()> processing result. Each
+hash key refers to an option name and the corresponding hash value refers
+to the option-argument value (or C<!!1> if it is a flag).
+
+This module exports the C<getopts()> function on request.
 
 The new implementation follows the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
@@ -59,37 +82,34 @@ If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
 
 As of version 1.1.0 this module provides the additional function C<getopts3()>.
-This function has a 3rd leading parameter. The parameter is an array of
-argument values. It replaces the implicit use of C<@ARGV>. This module
-exports the C<getopts3()> function on request too.
+This function has a 3rd leading parameter. The parameter is an array (passed
+by reference) of command-line argument values. It replaces the implicit use
+of C<@ARGV>. This module exports the C<getopts3()> function on request too.
 
-=head1 OPTION TYPES
+=head1 REPEATING OPTIONS
 
-An option that requires no option-argument is called a flag. If a flag
-is provided, its hash value is C<1>, which in perl boolean context means
-true. If the same flag is provided multiple times, the implementation could
-keep the hash value. But for perl each positive integer is true in boolean
-context. Therefore each occurrence of the flag increments its hash value
-by one.  For example, this is useful for incrementing a verbosity level
-represented by the C<-v> flag.
+If a flag with no indicator is repeated, its initial C<%opts> hash value
+C<!!1> will not change.
 
-An option that requires an option-argument has either a colon (C<:>) or a
-comma (C<,>) option-argument indicator. The indicator follows the option
-character in the options specification (C<getopts()>'s first parameter).
+If a negatable flag is repeated, its initial C<%opts> hash value C<!!1>
+will be logically negated on each occurrence.
 
-If a C<:> option is repeated, the option-arguments overwrite each other and
-the last argument wins that means it is assigned as a value to the option
-character key in C<%opts>.
+If an incrementable flag is repeated, its initial C<%opts> hash value C<1>
+will be incremented by one on each occurrence.  For example, this is useful
+for incrementing a verbosity level represented by the C<v+> flag.
 
-If a C<,> option is repeated, the option-arguments are pushed to an array.
-A reference to that array is assigned as a value to the option character
-key in C<%opts>.
+If a common option is repeated, the option-arguments overwrite each other
+and the last argument wins that means it is the C<%opts> hash value.
+
+If a list option is repeated, the option-arguments are pushed to an array. A
+reference to that array is the C<%opts> hash value.
 
 =head1 CAVEAT
 
 Even if you are currently using the two-parameter form of the C<getopts()>
 function of C<Getopts::Std>, the new implementation isn't a drop in
-replacement.
+replacement. The most crucial change is the type of the second parameter. The
+second parameter is not a hash reference anymore but a hash.
 
 =head1 SEE ALSO
 

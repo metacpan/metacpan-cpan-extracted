@@ -85,44 +85,8 @@ class Mojolicious::Plugins extends Mojo::EventEmitter {
     }
   }
   
-  method load_plugin : object ($name : string) {
-    
-    # Try all namespaces and full module name
-    my $loaded_class_name = (string)undef;
-    my $namespaces = $self->namespaces;
-    for (my $i = 0; $i < @$namespaces; $i++) {
-      
-      my $namespace = $namespaces->[$i];
-      
-      my $full_name = "${namespace}::$name";
-      
-      eval { &_load($full_name); };
-      
-      unless ($@) {
-        $loaded_class_name = $full_name;
-        last;
-      }
-      
-      eval { &_load($name); };
-      
-      unless ($@) {
-        $loaded_class_name = $name;
-        last;
-      }
-      
-    }
-    
-    unless ($loaded_class_name) {
-      die "Plugin '$name' missing, maybe you need to install it?";
-    }
-    
-    my $object = Native::MethodCall->call_class_method($loaded_class_name, "new");
-    
-    return $object;
-  }
-  
-  method register_plugin : void ($name : string, $app : Mojolicious, $options : object[] = undef) {
-    $self->load_plugin($name)->(Mojolicious::Plugin)->register($app, $options);
+  method register_plugin : void ($plugin : Mojolicious::Plugin, $app : Mojolicious, $options : object[] = undef) {
+    $plugin->register($app, $options);
   }
   
 }

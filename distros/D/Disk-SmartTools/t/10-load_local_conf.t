@@ -8,10 +8,10 @@ use Dev::Util::File qw(dir_suffix_slash);
 
 use Disk::SmartTools qw(:all);
 
-use FindBin qw($RealBin);
+use Path::Tiny qw(cwd);
 
 # set home so tests get the rc file locally instead of the real $HOME
-local $ENV{ HOME } = dir_suffix_slash($RealBin);
+local $ENV{ HOME } = dir_suffix_slash( Path::Tiny->cwd ) . 't';
 
 my $disk_info_athos_ref = {
                             'disks'     => [ 'b', 'c', 'd', 'e', 'f', 'g', 'h' ],

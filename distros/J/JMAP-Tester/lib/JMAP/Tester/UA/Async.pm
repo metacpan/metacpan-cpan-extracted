@@ -1,10 +1,12 @@
-use v5.14.0;
+use v5.20.0;
 use warnings;
 
-package JMAP::Tester::UA::Async 0.107;
+package JMAP::Tester::UA::Async 0.108;
 
 use Moo;
 with 'JMAP::Tester::Role::UA';
+
+use experimental 'signatures';
 
 use Future;
 
@@ -13,9 +15,7 @@ has http_client => (
   required => 1,
 );
 
-sub set_cookie {
-  my ($self, $arg) = @_;
-
+sub set_cookie ($self, $arg) {
   for (qw(api_uri name value)) {
     Carp::confess("can't set_cookie without $_") unless $arg->{$_};
   }
@@ -37,8 +37,7 @@ sub set_cookie {
   );
 }
 
-sub scan_cookies {
-  my ($self, $callback) = @_;
+sub scan_cookies ($self, $callback) {
   return $self->http_client->{cookie_jar}->scan($callback);
 }
 
@@ -51,15 +50,11 @@ has _default_headers => (
   },
 );
 
-sub get_default_header {
-  my ($self, $name) = @_;
-
+sub get_default_header ($self, $name) {
   return scalar $self->_default_headers->{$name};
 }
 
-sub set_default_header {
-  my ($self, $name, $value) = @_;
-
+sub set_default_header ($self, $name, $value) {
   if (defined $value) {
     $self->_default_headers->{$name} = $value;
   } else {
@@ -69,9 +64,7 @@ sub set_default_header {
   return;
 }
 
-sub request {
-  my ($self, $tester, $req, $log_type, $log_extra) = @_;
-
+sub request ($self, $tester, $req, $log_type, $log_extra = undef) {
   my $dh = $self->_default_headers;
   for my $h (keys %$dh) {
     $req->header($h => $dh->{$h}) unless defined $req->header($h);
@@ -119,7 +112,7 @@ JMAP::Tester::UA::Async
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 PERL VERSION
 

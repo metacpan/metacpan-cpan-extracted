@@ -5,6 +5,453 @@ class TestCase::Mojolicious::Controller {
   use Mojo::Transaction::HTTP;
   use Re;
   use FindBin;
+  use Mojo::Cookie::Request;
+  
+  static method flash : int () {
+    
+    # store
+    my $cookie_value = (string)undef;
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      my $c = $app->build_controller($tx);
+      
+      my $sessions = $c->app->sessions;
+      
+      $c->set_flash(s1 => 1);
+      $c->set_flash(s2 => 2);
+      
+      $sessions->store($c);
+      
+      $cookie_value = $c->res->headers->get_set_cookie;
+      
+      my $cookie_headers = Mojo::Util->split_cookie_header($cookie_value);
+      
+      unless ($cookie_headers->[0][0] eq "mojolicious") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][1]) {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][2] eq "expires") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][3]) {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][4] eq "path") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][5] eq "/") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][6] eq "HttpOnly") {
+        return 0;
+      }
+      
+      if ($cookie_headers->[0][7]) {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][8] eq "SameSite") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][9] eq "Lax") {
+        return 0;
+      }
+      
+    }
+    
+    # load
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      my $c = $app->build_controller($tx);
+      
+      my $sessions = $c->app->sessions;
+      
+      $c->req->headers->set_cookie($cookie_value);
+      
+      $sessions->load($c);
+      
+      unless ($c->flash("s1")->(string) eq "1") {
+        return 0;
+      }
+      
+      unless ($c->flash("s2")->(string) eq "2") {
+        return 0;
+      }
+      
+      $sessions->store($c);
+      
+      if ($c->flash("s1")) {
+        return 0;
+      }
+      
+      if ($c->flash("s2")) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method sessions : int () {
+    
+    # store
+    my $cookie_value = (string)undef;
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      my $c = $app->build_controller($tx);
+      
+      my $sessions = $c->app->sessions;
+      
+      $c->set_session(s1 => 1);
+      $c->set_session(s2 => 2);
+      
+      $sessions->store($c);
+      
+      $cookie_value = $c->res->headers->get_set_cookie;
+      
+      my $cookie_headers = Mojo::Util->split_cookie_header($cookie_value);
+      
+      unless ($cookie_headers->[0][0] eq "mojolicious") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][1]) {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][2] eq "expires") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][3]) {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][4] eq "path") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][5] eq "/") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][6] eq "HttpOnly") {
+        return 0;
+      }
+      
+      if ($cookie_headers->[0][7]) {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][8] eq "SameSite") {
+        return 0;
+      }
+      
+      unless ($cookie_headers->[0][9] eq "Lax") {
+        return 0;
+      }
+      
+    }
+    
+    # load
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      my $c = $app->build_controller($tx);
+      
+      my $sessions = $c->app->sessions;
+      
+      $c->req->headers->set_cookie($cookie_value);
+      
+      $sessions->load($c);
+      
+      unless ($c->session("s1")->(string) eq "1") {
+        return 0;
+      }
+      
+      unless ($c->session("s2")->(string) eq "2") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method basic : int () {
+    
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      my $c = $app->build_controller($tx);
+      
+      unless ($c->app == $app) {
+        return 0;
+      }
+      
+      unless ($c->tx == $tx) {
+        return 0;
+      }
+      
+      unless ($c->match is_type Mojolicious::Routes::Match) {
+        return 0;
+      }
+      
+      unless ($c->app->sessions is_type Mojolicious::Sessions) {
+        return 0;
+      }
+      
+      unless ($c->app->log is_type Mojo::Log) {
+        return 0;
+      }
+      
+      unless ($c->req is_type Mojo::Message::Request) {
+        return 0;
+      }
+      
+      unless ($c->res is_type Mojo::Message::Response) {
+        return 0;
+      }
+      
+    }
+    
+    # cookie
+    {
+      my $app = Mojolicious::Lite->new;
+      my $tx = Mojo::Transaction::HTTP->new;
+      my $c = $app->build_controller($tx);
+      
+      my $cookie1 = my $_ = Mojo::Cookie::Request->new;
+      $_->set_name("c1");
+      $_->set_value("1");
+      
+      my $cookie2 = my $_ = Mojo::Cookie::Request->new;
+      $_->set_name("c2");
+      $_->set_value("2");
+      
+      my $cookie31 = my $_ = Mojo::Cookie::Request->new;
+      $_->set_name("c3");
+      $_->set_value("31");
+      
+      my $cookie32 = my $_ = Mojo::Cookie::Request->new;
+      $_->set_name("c3");
+      $_->set_value("32");
+      
+      $c->req->set_cookies([$cookie1, $cookie2, $cookie31, $cookie32]);
+      
+      unless ($c->cookie("c0") == undef) {
+        return 0;
+      }
+      
+      unless ($c->cookie("c1") eq "1") {
+        return 0;
+      }
+      
+      unless ($c->cookie("c2") eq "2") {
+        return 0;
+      }
+      
+      unless ($c->cookie("c3") eq "32") {
+        return 0;
+      }
+      
+      unless (Array->equals($c->every_cookie("c3"), ["31", "32"])) {
+        return 0;
+      }
+      
+    }
+    
+    # set_cookie
+    {
+      {
+        my $app = Mojolicious::Lite->new;
+        my $tx = Mojo::Transaction::HTTP->new;
+        my $c = $app->build_controller($tx);
+        
+        $c->set_cookie(c1 => 1);
+        
+        my $headers = Mojo::Util->split_cookie_header($c->res->headers->get_set_cookie);
+        
+        my $expected = [
+          "c1",
+          "1",
+        ];
+        
+        unless (Array->equals($headers->[0], $expected)) {
+          diag dump $headers;
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $app = Mojolicious::Lite->new;
+        my $tx = Mojo::Transaction::HTTP->new;
+        my $c = $app->build_controller($tx);
+        
+        $c->set_cookie(c1 => 1, {domain => "example.com", expires => 100, httponly => 1, "max-age" => 2, path => "/", samesite => "Lax", secure => 1});
+        
+        my $headers = Mojo::Util->split_cookie_header($c->res->headers->get_set_cookie);
+        
+        my $expected =   [
+          "c1",
+          "1",
+          "expires",
+          "Thu, 01 Jan 1970 00:01:40 GMT",
+          "domain",
+          "example.com",
+          "path",
+          "/",
+          "secure",
+          undef,
+          "HttpOnly",
+          undef,
+          "SameSite",
+          "Lax",
+          "Max-Age",
+          "2",
+        ];
+        
+        unless (Array->equals($headers->[0], $expected)) {
+          diag dump Mojo::Util->split_cookie_header($c->res->headers->get_set_cookie);
+          return 0;
+        }
+        
+      }
+    }
+    
+    # set_signed_cookie, signed_cookie
+    {
+      {
+        my $app = Mojolicious::Lite->new;
+        my $tx = Mojo::Transaction::HTTP->new;
+        my $c = $app->build_controller($tx);
+        
+        $c->set_signed_cookie(c1 => 1);
+        
+        my $headers = Mojo::Util->split_cookie_header($c->res->headers->get_set_cookie);
+        
+        my $expected = [
+          "c1",
+          "1--00b174ad97a69d74cff223790583385cb5b1ed2bae017777bcd9d214087008b3",
+        ];
+        
+        unless (Array->equals($headers->[0], $expected)) {
+          diag dump $headers;
+          return 0;
+        }
+        
+        my $cookie1 = my $_ = Mojo::Cookie::Request->new;
+        $_->set_name($expected->[0]);
+        $_->set_value($expected->[1]);
+        
+        $c->req->set_cookies([$cookie1]);
+        
+        unless ($c->signed_cookie("c1") eq "1") {
+          diag;
+          return 0;
+        }
+        
+        unless (Array->equals($c->every_signed_cookie("c1"), ["1"])) {
+          diag dump $c->every_signed_cookie("c1");
+          return 0;
+        }
+      }
+      
+      {
+        my $app = Mojolicious::Lite->new;
+        my $tx = Mojo::Transaction::HTTP->new;
+        my $c = $app->build_controller($tx);
+        
+        $c->set_signed_cookie(c1 => 1);
+        
+        my $headers = Mojo::Util->split_cookie_header($c->res->headers->get_set_cookie);
+        
+        my $expected = [
+          "c1",
+          "1--00b174ad97a69d74cff223790583385cb5b1ed2bae017777bcd9d214087008b3",
+        ];
+        
+        unless (Array->equals($headers->[0], $expected)) {
+          diag dump $headers;
+          return 0;
+        }
+        
+        my $cookie1 = my $_ = Mojo::Cookie::Request->new;
+        $_->set_name($expected->[0]);
+        $_->set_value($expected->[1] . "unsecure");
+        
+        $c->req->set_cookies([$cookie1]);
+        
+        if ($c->signed_cookie("c1")) {
+          diag;
+          return 0;
+        }
+        
+      }
+    }
+    
+    # param, every_param
+    {
+      {
+        my $app = Mojolicious::Lite->new;
+        my $tx = Mojo::Transaction::HTTP->new;
+        my $c = $app->build_controller($tx);
+        
+        $c->set_stash("mojo.captures", Hash->new({var1 => "1"}));
+        
+        $c->req->url->query->set_param(var1 => "2");
+        
+        $c->req->body_params->set_param(var1 => "3");
+        
+        unless (Array->equals($c->every_param("var1"), ["1"])) {
+          return 0;
+        }
+      }
+      
+      {
+        my $app = Mojolicious::Lite->new;
+        my $tx = Mojo::Transaction::HTTP->new;
+        my $c = $app->build_controller($tx);
+        
+        $c->req->url->query->set_param(var1 => "2");
+        
+        $c->req->body_params->set_param(var1 => "3");
+        
+        unless (Array->equals($c->every_param("var1"), ["3", "2"])) {
+          diag dump $c->every_param("var1");
+          return 0;
+        }
+        
+        unless ($c->param("var1") eq "2") {
+          return 0;
+        }
+        
+        $c->set_param(var1 => "5");
+        
+        unless ($c->param("var1") eq "5") {
+          return 0;
+        }
+        
+      }
+      
+    }
+    
+    return 1;
+  }
   
   static method render_to_string : int () {
     
@@ -115,7 +562,7 @@ EOS
       $c->set_app($app);
       $c->set_tx($tx);
       
-      my $bs = $c->render_to_string({json => Hash->new({"foo" => 1})});
+      my $bs = $c->render_to_string({json => {"foo" => 1}});
       
       unless ($bs->to_string eq "{\"foo\":1}") {
         return 0;

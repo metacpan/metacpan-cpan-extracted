@@ -1,3 +1,7 @@
+1.47  2025-12-15
+    - Promote release to version 1.47 adding jq-compatible --raw-input/-R
+      plain-text processing with optional slurping and CLI regression tests.
+
 1.46  2025-12-14
     - Promote release to version 1.46 with jq-compatible try/catch filter
       support, documentation, and regression tests.

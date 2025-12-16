@@ -7,8 +7,6 @@ of the time at https://lichess.org/@/plisco-bot.
 It only works with Perl versions that are compiled with support for 64
 bit integers!
 
-The software is stable but still considered work in progress.
-
 Since it is reasonably fast and offers a lot of functionality needed for
 chess engines, it can be used for rapid prototyping of a chess engine.
 Writing a basic implementation of the AlphaBeta algorithm with `Chess::Plisco`

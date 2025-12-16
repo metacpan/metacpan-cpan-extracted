@@ -61,62 +61,62 @@ my @tests = (
 	},
 	# http://talkchess.com/forum3/viewtopic.php?f=7&t=77949&p=902361#p902361
 	{
-		name => 'JVMervino 1',
+		name => 'JVMerlino 1',
 		fen => 'r3k2r/8/8/8/3pPp2/8/8/R3K1RR b KQkq e3 0 1',
 		perft => [29, 829, 20501, 624871, 15446339, 485647607]
 	},
 	{
-		name => 'JVMervino 2',
+		name => 'JVMerlino 2',
 		fen => 'r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1',
 		perft => [6, 264, 9467, 422333, 15833292, 706045033]
 	},
 	{
-		name => 'JVMervino 3',
+		name => 'JVMerlino 3',
 		fen => '8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28',
 		perft => [5, 117, 3293, 67197, 1881089, 38633283]
 	},
 	{
-		name => 'JMervino 4',
+		name => 'JVMerlino 4',
 		fen => '8/3K4/2p5/p2b2r1/5k2/8/8/1q6 b - - 1 67',
 		perft => [50, 279, 13310, 54703, 2538084, 10809689, 493407574],
 	},
 	{
-		name => 'JMervino 5',
+		name => 'JVMerlino 5',
 		fen => 'rnbqkb1r/ppppp1pp/7n/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3',
 		perft => [31, 570, 17546, 351806, 11139762, 244063299],
 	},
 	{
-		name => 'JMervino 6',
+		name => 'JVMerlino 6',
 		fen => 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -',
 		perft => [48, 2039, 97862, 4085603, 193690690],
 	},
 	{
-		name => 'JMervino 7',
+		name => 'JVMerlino 7',
 		fen => '8/p7/8/1P6/K1k3p1/6P1/7P/8 w - -',
 		perft => [5, 39, 237, 2002, 14062, 120995, 966152, 8103790],
 	},
 	{
-		name => 'JMervino 8',
+		name => 'JVMerlino 8',
 		fen => 'n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - -',
 		perft => [24, 496, 9483, 182838, 3605103, 71179139],
 	},
 	{
-		name => 'JMervino 9',
+		name => 'JVMerlino 9',
 		fen => 'r3k2r/p6p/8/B7/1pp1p3/3b4/P6P/R3K2R w KQkq -',
 		perft => [17, 341, 6666, 150072, 3186478, 77054993],
 	},
 	{
-		name => 'JMervino 10',
+		name => 'JVMerlino 10',
 		fen => '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -',
 		perft => [14, 191, 2812, 43238, 674624, 11030083, 178633661],
 	},
 	{
-		name => 'JMervino 11',
+		name => 'JVMerlino 11',
 		fen => '8/5p2/8/2k3P1/p3K3/8/1P6/8 b - -',
 		perft => [9, 85, 795, 7658, 72120, 703851, 6627106, 64451405],
 	},
 	{
-		name => 'JMervino 12',
+		name => 'JVMerlino 12',
 		fen => 'r3k2r/pb3p2/5npp/n2p4/1p1PPB2/6P1/P2N1PBP/R3K2R w KQkq -',
 		perft => [33, 946, 30962, 899715, 29179893],
 	},
@@ -135,7 +135,7 @@ foreach my $test (@tests) {
 		no integer;
 		SKIP: {
 			my $started = [gettimeofday];
-			my $got = $pos->perftByUndo($depth);
+			my $got = $pos->perft($depth);
 			my $elapsed = tv_interval($started);
 			my $expect = $perfts[$depth - 0.5];
 			is $got, $expect, "perft depth $depth ($test->{name})";
@@ -148,7 +148,7 @@ foreach my $test (@tests) {
 				if ($eta > $seconds_per_test) {
 					my $skipped = @perfts - $depth;
 					$depth = @perfts;
-					skip "set environment variable CP_SECONDS_PER_TEST to a "
+					skip "set environment variable CP_STRESS_TEST to a "
 						. "value > $seconds_per_test to run more tests",
 						$skipped;
 				}

@@ -1,11 +1,13 @@
-use v5.14.0;
+use v5.20.0;
 use warnings;
-package JMAP::Tester::Role::HTTPResult 0.107;
+package JMAP::Tester::Role::HTTPResult 0.108;
 # ABSTRACT: the kind of thing that you get back for an http request
 
 use Moo::Role;
 
 with 'JMAP::Tester::Role::Result';
+
+use experimental 'signatures';
 
 #pod =head1 OVERVIEW
 #pod
@@ -29,9 +31,7 @@ has http_response => (
 #pod
 #pod =cut
 
-sub response_payload {
-  my ($self) = @_;
-
+sub response_payload ($self) {
   return $self->http_response ? $self->http_response->as_string : '';
 }
 
@@ -49,7 +49,7 @@ JMAP::Tester::Role::HTTPResult - the kind of thing that you get back for an http
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 OVERVIEW
 

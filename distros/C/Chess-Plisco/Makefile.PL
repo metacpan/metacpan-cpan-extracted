@@ -62,8 +62,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "integer" => 0,
     "overload" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
   "TEST_REQUIRES" => {
     "Chess::PGN::Parse" => 0,
@@ -73,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.8.0",
+  "VERSION" => "v1.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -109,8 +108,7 @@ my %FallbackPrereqs = (
   "integer" => 0,
   "lib" => 0,
   "overload" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "strict" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

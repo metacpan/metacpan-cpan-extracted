@@ -20,7 +20,6 @@ use Dev::Util::Query qw(banner display_menu);
 use Dev::Util::File  qw(file_is_block);
 use Disk::SmartTools qw(:all);
 
-use FindBin qw($Bin);
 use Term::ReadKey;
 use Term::ANSIColor;
 use IPC::Cmd qw[can_run run];
@@ -29,7 +28,7 @@ use Data::Dumper::Simple;
 use Data::Printer;
 
 Readonly my $PROGRAM => 'smart_show.pl';
-Readonly my $VERSION => version->declare("v3.3.16");
+Readonly my $VERSION => version->declare("v3.3.26");
 
 ########################################
 #      Define Global Variables         #

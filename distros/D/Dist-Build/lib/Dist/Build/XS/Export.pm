@@ -1,5 +1,5 @@
 package Dist::Build::XS::Export;
-$Dist::Build::XS::Export::VERSION = '0.022';
+$Dist::Build::XS::Export::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -44,12 +44,26 @@ sub add_methods {
 				my $target = abs2rel($source, $args{dir});
 				return copy_header($inner, $module_dir, $source, $target);
 			},
-		);
+		) if $args{dir};
 
 		my @files = ref $args{file} ? @{ $args{file} } : defined $args{file} ? $args{file} : ();
 		for my $file (@files) {
 			$planner->create_phony('code', copy_header($inner, $module_dir, $file, $file));
 		}
+	});
+
+	$planner->add_delegate('export_typemap', sub {
+		my ($self, %args) = @_;
+		my $module_name = $args{module} // $planner->main_module;
+		(my $module_dir = $module_name) =~ s/::/-/g;
+		my $filename    = $args{filename} // 'typemap';
+		my $destination = catfile(qw/blib lib auto share module/, $module_dir, 'typemap');
+
+		my $inner = $planner->new_scope;
+		$inner->load_extension('Dist::Build::Core');
+		$inner->copy_file($filename, $destination);
+
+		$planner->create_phony('code', $destination);
 	});
 
 	$planner->add_delegate('export_flags', sub {
@@ -84,7 +98,7 @@ Dist::Build::XS::Export - Dist::Build extension to export headers for other XS m
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -121,6 +135,22 @@ A file (or a list of files) to export (e.g. C<'foo.h'>).
 =back
 
 At least one of C<dir> and C<file> must be defined. Note that this function can be called multiple times (e.g. for multiple modules).
+
+=head2 export_typemap
+
+This exports the typemap of this module.
+
+=over 4
+
+=item * module
+
+The name of the module to export. This defaults to the main module.
+
+=item * filename
+
+The name of the typemap. This defaults to F<typemap>.
+
+=back
 
 =head2 export_flags
 

@@ -100,6 +100,11 @@ class Mojo::Message::Request extends Mojo::Message {
     return $clone;
   }
   
+  method cookie : Mojo::Cookie::Request ($name : string) {
+    
+    return (Mojo::Cookie::Request)$self->SUPER::cookie($name);
+  }
+  
   method cookies : Mojo::Cookie::Request[] () {
     
     # Parse cookies

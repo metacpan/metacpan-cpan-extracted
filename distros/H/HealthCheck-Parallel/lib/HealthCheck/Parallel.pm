@@ -12,7 +12,7 @@ use Scalar::Util qw( weaken );
 
 # ABSTRACT: A HealthCheck that uses parallelization for running checks
 use version;
-our $VERSION = 'v0.1.0'; # VERSION
+our $VERSION = 'v0.2.0'; # VERSION
 
 sub new {
     my ( $class, %params ) = @_;
@@ -219,7 +219,7 @@ HealthCheck::Parallel - A HealthCheck that uses parallelization for running chec
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.0
 
 =head1 SYNOPSIS
 

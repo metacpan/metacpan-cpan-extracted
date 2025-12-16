@@ -49,7 +49,7 @@ my @modules = qw(
 diag "\n####";
 for my $mod ( sort @modules ) {
 	eval "require $mod;";
-	diag sprintf( '%-26s %s', $mod, eval { $mod->VERSION } or '-' );
+	diag sprintf( '%-26s %s', $mod, eval { $mod->VERSION } || '-' );
 }
 diag "####";
 

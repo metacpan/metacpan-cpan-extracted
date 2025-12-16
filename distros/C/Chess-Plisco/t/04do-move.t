@@ -25,17 +25,17 @@ my @tests = (
 		name => 'e4 after initial',
 		before => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
 		move => 'e2e4',
-		after => 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+		after => 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
 	},
 	{
 		name => 'c5 Sicilian defense',
-		before => 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+		before => 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
 		move => 'c7c5',
-		after => 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2',
+		after => 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
 	},
 	{
 		name => '2. Nf3 Sicilian defense',
-		before => 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2',
+		before => 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
 		move => 'g1f3',
 		after => 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
 	},
@@ -139,7 +139,7 @@ my @tests = (
 		name => 'white pawn blocks check',
 		before => 'r4rk1/1p3pp1/1q2b2p/1B2R3/1Q2n3/1K2PN2/1PP3PP/7R w - - 3 22',
 		move => 'c2c4',
-		after => 'r4rk1/1p3pp1/1q2b2p/1B2R3/1QP1n3/1K2PN2/1P4PP/7R b - c3 0 22',
+		after => 'r4rk1/1p3pp1/1q2b2p/1B2R3/1QP1n3/1K2PN2/1P4PP/7R b - - 0 22',
 	},
 );
 

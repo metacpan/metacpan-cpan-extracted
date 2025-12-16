@@ -1,9 +1,11 @@
-use v5.14.0;
-package JMAP::Tester::Response::Sentence::Set 0.107;
+use v5.20.0;
+package JMAP::Tester::Response::Sentence::Set 0.108;
 # ABSTRACT: the kind of sentence you get in reply to a setFoos call
 
 use Moo;
 extends 'JMAP::Tester::Response::Sentence';
+
+use experimental 'signatures';
 
 use Data::Dumper ();
 use JMAP::Tester::Abort 'abort';
@@ -26,8 +28,8 @@ use namespace::clean;
 #pod
 #pod =cut
 
-sub new_state { $_[0]->arguments->{newState} }
-sub old_state { $_[0]->arguments->{oldState} }
+sub new_state ($self) { $self->arguments->{newState} }
+sub old_state ($self) { $self->arguments->{oldState} }
 
 #pod =method created
 #pod
@@ -83,27 +85,25 @@ sub old_state { $_[0]->arguments->{oldState} }
 #pod
 #pod =cut
 
-sub as_set { $_[0] }
+sub as_set ($self) { $self }
 
-sub created { $_[0]->arguments->{created} // {} }
+sub created ($self) { $self->arguments->{created} // {} }
 
-sub created_id {
-  my ($self, $creation_id) = @_;
+sub created_id ($self, $creation_id) {
   return undef unless my $props = $self->created->{$creation_id};
   return $props->{id};
 }
 
-sub created_creation_ids {
-  keys %{ $_[0]->created }
+sub created_creation_ids ($self) {
+  keys %{ $self->created }
 }
 
-sub created_ids {
-  map {; $_->{id} } values %{ $_[0]->created }
+sub created_ids ($self) {
+  map {; $_->{id} } values %{ $self->created }
 }
 
-sub updated_ids   {
-  my ($self) = @_;
-  my $updated = $_[0]{arguments}{updated} // {};
+sub updated_ids ($self) {
+  my $updated = $self->{arguments}{updated} // {};
 
   if (ref $updated eq 'ARRAY') {
     return @$updated;
@@ -112,10 +112,8 @@ sub updated_ids   {
   return keys %$updated;
 }
 
-sub updated {
-  my ($self) = @_;
-
-  my $updated = $_[0]{arguments}{updated} // {};
+sub updated ($self) {
+  my $updated = $self->{arguments}{updated} // {};
 
   if (ref $updated eq 'ARRAY') {
     return { map {; $_ => undef } @$updated };
@@ -124,21 +122,19 @@ sub updated {
   return $updated;
 }
 
-sub destroyed_ids { @{ $_[0]{arguments}{destroyed} } }
+sub destroyed_ids ($self) { @{ $self->{arguments}{destroyed} } }
 
 # Is this the best API to provide?  I dunno, maybe.  Usage will tell us whether
 # it's right. -- rjbs, 2016-04-11
-sub not_created_ids   { keys %{ $_[0]{arguments}{notCreated} }   }
-sub not_updated_ids   { keys %{ $_[0]{arguments}{notUpdated} }   }
-sub not_destroyed_ids { keys %{ $_[0]{arguments}{notDestroyed} } }
+sub not_created_ids   ($self) { keys %{ $self->{arguments}{notCreated} }   }
+sub not_updated_ids   ($self) { keys %{ $self->{arguments}{notUpdated} }   }
+sub not_destroyed_ids ($self) { keys %{ $self->{arguments}{notDestroyed} } }
 
-sub create_errors     { $_[0]{arguments}{notCreated}   // {} }
-sub update_errors     { $_[0]{arguments}{notUpdated}   // {} }
-sub destroy_errors    { $_[0]{arguments}{notDestroyed} // {} }
+sub create_errors     ($self) { $self->{arguments}{notCreated}   // {} }
+sub update_errors     ($self) { $self->{arguments}{notUpdated}   // {} }
+sub destroy_errors    ($self) { $self->{arguments}{notDestroyed} // {} }
 
-sub assert_no_errors {
-  my ($self) = @_;
-
+sub assert_no_errors ($self) {
   my @errors;
   local $Data::Dumper::Terse = 1;
 
@@ -182,7 +178,7 @@ JMAP::Tester::Response::Sentence::Set - the kind of sentence you get in reply to
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 OVERVIEW
 

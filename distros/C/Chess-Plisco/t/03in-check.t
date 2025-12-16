@@ -10,23 +10,37 @@
 # http://www.wtfpl.net/ for more details.
 
 use strict;
+use integer;
 
-use Test::More tests => 9;
+use Test::More;
+use Data::Dumper;
 use Chess::Plisco qw(:all);
 # Macros from Chess::Plisco::Macro are already expanded here!
 
-my $pos = Chess::Plisco->new;
-ok $pos, 'created';
-is($pos->kingShift, CP_E1, 'initial white');
-my $move = $pos->parseMove('e4');
-ok $move, 'move e4';
-ok $pos->doMove($move), 'doMove e4';
-is($pos->kingShift, CP_E8, 'after 1. e4');
+my ($pos, @moves, @expect);
 
-$pos = Chess::Plisco->new('8/8/4k3/5P2/8/8/8/K7 w - - 0 1', 1);
-ok $pos, 'created';
-is($pos->kingShift, CP_A1, 'white king on a1');
+my @tests = (
+	{
+		name => 'start position',
+	},
+	{
+		name => 'check by black knight',
+		fen => '4k3/8/8/8/8/4n3/8/3K4 w - - 0 1',
+		check => 1,
+	},
+	# FIXME! Add more tests here.
+);
 
-$pos = Chess::Plisco->new('8/8/4k3/5P2/8/8/8/K7 b - - 0 1');
-ok $pos, 'created';
-is($pos->kingShift, CP_E6, 'black king on e6');
+foreach my $test (@tests) {
+	my $pos = Chess::Plisco->new($test->{fen});
+
+	my @check_info = $pos->inCheck;
+
+	if ($test->{check}) {
+		ok $check_info[0];
+	} else {
+		ok !$check_info[0];
+	}
+}
+
+done_testing;

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Code;
-$ExtUtils::Builder::Action::Code::VERSION = '0.018';
+$ExtUtils::Builder::Action::Code::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -61,7 +61,7 @@ ExtUtils::Builder::Action::Code - Action objects for perl code
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

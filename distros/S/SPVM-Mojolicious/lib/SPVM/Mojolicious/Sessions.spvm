@@ -13,8 +13,6 @@ class Mojolicious::Sessions {
   # Fields
   has cookie_domain : rw string;
   
-  has encrypted : rw byte;
-  
   has secure : rw byte;
   
   has cookie_name : rw string;
@@ -23,11 +21,7 @@ class Mojolicious::Sessions {
   
   has default_expiration : rw int;
   
-  has deserialize : rw Mojolicious::Sessions::Callback::Deserialize;
-  
   has samesite : rw string;
-  
-  has serialize : rw Mojolicious::Sessions::Callback::Serialize;
   
   # Class Methods
   static method new : Mojolicious::Sessions () {
@@ -40,15 +34,7 @@ class Mojolicious::Sessions {
     
     $self->{default_expiration} = 3600;
     
-    $self->{deserialize} = method : object ($json : string) {
-      return JSON->new->decode($json);
-    };
-    
     $self->{samesite} = "Lax";
-    
-    $self->{serialize} = method : string ($data : object) {
-      return JSON->new->encode($data);
-    };
     
     return $self;
   }
@@ -56,20 +42,16 @@ class Mojolicious::Sessions {
   # Instance Methods
   method load : void ($c : Mojolicious::Controller) {
     
-    # FUTURE
-    if ($self->encrypted) {
-      die "Encrypted cookie is not supported.";
-    }
-    
     my $value = $c->signed_cookie($self->cookie_name);
     
     unless ($value) {
       return;
     }
     
+    $value = copy $value;
     Re->s((mutable string)$value, ["-", "g"], "=");
     
-    my $session = (Hash)$self->deserialize->(Mojo::Util->b64_decode($value));
+    my $session = (Hash)JSON->new->decode(Mojo::Util->b64_decode($value));
     unless ($session) {
       return;
     }
@@ -121,38 +103,47 @@ class Mojolicious::Sessions {
       return;
     }
     
-    unless (@$session->keys || $stash->{"mojo.active_session"}->(int)) {
+    unless ($session->keys_length || $stash->{"mojo.active_session"}->(int)) {
       return;
     }
     
-    die "TODO";
-    
-=pod
-
     # Don't reset flash for static files
-    my $old = delete $session->{flash};
-    $session->{new_flash} = $old if $stash->{'mojo.static'};
-    delete $session->{new_flash} unless keys %{$session->{new_flash}};
-
+    my $old = $session->delete("flash");
+    if ($stash->{"mojo.static"}) {
+      $session->{"new_flash"} = $old;
+    }
+    
+    my $new_flash = $session->{"new_flash"}->(Hash);
+    unless ($new_flash && $new_flash->keys_length) {
+      $session->delete("new_flash");
+    }
+    
     # Generate "expires" value from "expiration" if necessary
-    my $expiration = $session->{expiration} // $self->default_expiration;
-    my $default    = delete $session->{expires};
-    $session->{expires} = $default || time + $expiration if $expiration || $default;
-
-    my $value = b64_encode $self->serialize->($session), '';
-    $value =~ y/=/-/;
+    my $expiration = $session->exists("expiration") ? $session->{"expiration"}->(int) : $self->default_expiration;
+    my $default = $session->{"expires"};
+    $session->delete("expires");
+    
+    if ($expiration || $default) {
+      if ($default) {
+        $session->{"expires"} = $default;
+      }
+      elsif ($expiration) {
+        $session->{"expires"} = Sys->time + $expiration;
+      }
+    }
+    
+    my $value = Mojo::Util->b64_encode(JSON->new->encode($session), "");
+    Re->s((mutable string)$value, ["=", "g"], "-");
     my $options = {
       domain   => $self->cookie_domain,
-      expires  => $session->{expires},
+      expires  => $session->{"expires"},
       httponly => 1,
       path     => $self->cookie_path,
       samesite => $self->samesite,
       secure   => $self->secure
     };
-    my $method = $self->encrypted ? 'encrypted_cookie' : 'signed_cookie';
-    $c->$method($self->cookie_name, $value, $options);
-
-=cut
-
+    
+    $c->set_signed_cookie($self->cookie_name, $value, $options);
   }
+  
 }

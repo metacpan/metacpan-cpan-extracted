@@ -31,6 +31,7 @@
 #              25) Karsten Gieselmann private communication (OM series)
 #              IB) Iliah Borg private communication (LibRaw)
 #              NJ) Niels Kristian Bech Jensen private communication
+#              KG) Karsten Gieselmann private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -41,7 +42,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '2.90';
+$VERSION = '2.93';
 
 sub PrintLensInfo($$$);
 
@@ -120,6 +121,7 @@ my %olympusLensTypes = (
     '0 38 10' => 'Olympus M.Zuiko Digital ED 20mm F1.4 Pro',
     '0 39 10' => 'Olympus M.Zuiko Digital ED 90mm F3.5 Macro IS Pro', #forum3833
     '0 40 10' => 'Olympus M.Zuiko Digital ED 150-600mm F5.0-6.3', #forum15652
+    '0 41 10' => 'OM System M.Zuiko Digital ED 50-200mm F2.8 IS Pro', #github#352
     # Sigma lenses
     '1 01 00' => 'Sigma 18-50mm F3.5-5.6 DC', #8
     '1 01 10' => 'Sigma 30mm F2.8 EX DN', #NJ
@@ -199,7 +201,9 @@ my %olympusLensTypes = (
   # '65535 07 40' - Seen for LUMIX S 16-35/F4 on Panasonic DC-S1H (ref PH)
     # Other makes
     '24 01 10' => 'Venus Optics Laowa 50mm F2.8 2x Macro', #DonKomarechka
-    'f7 03 10' => 'LAOWA C&D-Dreamer MFT 7.5mm F2.0', #forum3833
+    '247 03 10' => 'LAOWA C&D-Dreamer MFT 7.5mm F2.0', #forum3833
+    '247 10 10' => 'LAOWA C&D-Dreamer MFT 6.0mm F2.0', #KG
+    '65522 02 10' => 'Xiaoyi 42.5mm F1.8', #github363
 );
 
 # lookup for Olympus camera types (ref PH)

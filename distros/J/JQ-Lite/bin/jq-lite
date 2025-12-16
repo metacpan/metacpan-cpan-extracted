@@ -15,6 +15,7 @@ my $decoder;
 my $decoder_module;
 my $decoder_debug   = 0;
 my $decoder_choice;
+my $raw_input       = 0;
 my $raw_output      = 0;
 my $compact_output  = 0;
 my $color_output    = 0;
@@ -35,6 +36,7 @@ Usage:
   jq-lite [options] -f query.jq [file.json]
 
 Options:
+  -R, --raw-input     Read input as raw text instead of JSON (one filter run per line)
   -r, --raw-output     Print raw strings instead of JSON-encoded values
   -c, --compact-output Print JSON results on a single line (no pretty-printing)
   --color              Colorize JSON output (keys, strings, numbers, booleans)
@@ -66,6 +68,7 @@ USAGE
 my ($want_help, $want_version, $help_functions) = (0, 0, 0);
 
 GetOptions(
+    'raw-input|R'    => \$raw_input,
     'raw-output|r'    => \$raw_output,
     'compact-output|c'=> \$compact_output,
     'color'           => \$color_output,
@@ -278,6 +281,7 @@ else {
     $json_text = <STDIN>;
 }
 
+$use_yaml = 0 if $raw_input;
 $use_yaml = 1 if $force_yaml && !$null_input;
 
 if ($use_yaml) {
@@ -285,7 +289,28 @@ if ($use_yaml) {
     warn "[DEBUG] Parsing YAML with $yaml_module\n" if $decoder_debug && $yaml_module;
 }
 
-if ($slurp_input && !$null_input) {
+# ---------- JQ::Lite core ----------
+my $jq = JQ::Lite->new(raw => $raw_output, vars => \%arg_vars);
+
+if ($raw_input) {
+    $use_yaml = 0;    # Raw input is plain text; ignore YAML handling
+}
+
+my @raw_lines;
+if ($raw_input) {
+    my $text = $json_text // '';
+    if ($slurp_input) {
+        $json_text = JSON::PP->new->allow_nonref->encode($text);
+    }
+    else {
+        @raw_lines = split /\r?\n/, $text, -1;
+        if (@raw_lines && $raw_lines[-1] eq '' && $text =~ /\r?\n\z/) {
+            pop @raw_lines;
+        }
+    }
+}
+
+if (!$raw_input && $slurp_input && !$null_input) {
     my $text   = $json_text // '';
     my $length = length $text;
     my $offset = 0;
@@ -310,9 +335,6 @@ if ($slurp_input && !$null_input) {
 
     $json_text = JSON::PP->new->encode(\@values);
 }
-
-# ---------- JQ::Lite core ----------
-my $jq = JQ::Lite->new(raw => $raw_output, vars => \%arg_vars);
 
 sub convert_yaml_to_json {
     my ($text) = @_;
@@ -406,6 +428,10 @@ sub print_results {
 }
 
 # ---------- Interactive mode ----------
+if ($raw_input && !$slurp_input && !defined $query) {
+    die "[ERROR] --raw-input requires a query when not using --slurp.\n";
+}
+
 if (!defined $query) {
     system("stty -icanon -echo");
 
@@ -491,9 +517,24 @@ if (!defined $query) {
 }
 
 # ---------- One-shot mode ----------
-my @results = eval { $jq->run_query($json_text, $query) };
-if ($@) {
-    die "[ERROR] Invalid query: $@\n";
+my @results;
+
+if ($raw_input && !$slurp_input) {
+    my $encoder = JSON::PP->new->allow_nonref;
+    for my $line (@raw_lines) {
+        my $encoded_line = $encoder->encode($line);
+        my @line_results = eval { $jq->run_query($encoded_line, $query) };
+        if ($@) {
+            die "[ERROR] Invalid query: $@\n";
+        }
+        push @results, @line_results;
+    }
+}
+else {
+    @results = eval { $jq->run_query($json_text, $query) };
+    if ($@) {
+        die "[ERROR] Invalid query: $@\n";
+    }
 }
 
 if (!@results) {

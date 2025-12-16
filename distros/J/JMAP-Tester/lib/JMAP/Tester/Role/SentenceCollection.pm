@@ -1,7 +1,9 @@
-use v5.14.0;
-package JMAP::Tester::Role::SentenceCollection 0.107;
+use v5.20.0;
+package JMAP::Tester::Role::SentenceCollection 0.108;
 
 use Moo::Role;
+
+use experimental 'signatures';
 
 requires 'sentence_broker';
 
@@ -15,9 +17,8 @@ BEGIN {
 
     abort
   )) {
-    my $sub = sub {
-      my $self = shift;
-      $self->sentence_broker->$m(@_);
+    my $sub = sub ($self, @rest) {
+      $self->sentence_broker->$m(@rest);
     };
     no strict 'refs';
     *$m = $sub;
@@ -27,15 +28,13 @@ BEGIN {
 requires 'items';
 requires 'add_items';
 
-after add_items => sub { $_[0]->_index_setup };
+after add_items => sub ($self, @) { $self->_index_setup };
 
-sub BUILD {
-  $_[0]->_index_setup;
+sub BUILD ($self, @) {
+  $self->_index_setup;
 }
 
-sub _index_setup {
-  my ($self) = @_;
-
+sub _index_setup ($self) {
   my @cids = $self->client_ids_for_items([ $self->items ]);
 
   my $prev_cid;
@@ -84,9 +83,7 @@ has para_indices => (is => 'bare', accessor => '_para_indices');
 #pod
 #pod =cut
 
-sub sentence {
-  my ($self, $n) = @_;
-
+sub sentence ($self, $n) {
   my @items = $self->items;
   $self->abort("there is no sentence for index $n")
     unless my $item = $items[$n];
@@ -102,9 +99,7 @@ sub sentence {
 #pod
 #pod =cut
 
-sub sentences {
-  my ($self) = @_;
-
+sub sentences ($self) {
   my @sentences = map {; $self->sentence_for_item($_) }
                   $self->items;
 
@@ -152,9 +147,7 @@ sub single_sentence {
 #pod
 #pod =cut
 
-sub sentence_named {
-  my ($self, $name) = @_;
-
+sub sentence_named ($self, $name = undef) {
   Carp::confess("no name given") unless defined $name;
 
   my @sentences = grep {; $_->name eq $name } $self->sentences;
@@ -179,9 +172,7 @@ sub sentence_named {
 #pod
 #pod =cut
 
-sub assert_n_sentences {
-  my ($self, $n) = @_;
-
+sub assert_n_sentences ($self, $n = undef) {
   Carp::confess("no sentence count given") unless defined $n;
 
   my @sentences = $self->sentences;
@@ -202,9 +193,7 @@ sub assert_n_sentences {
 #pod
 #pod =cut
 
-sub paragraph {
-  my ($self, $n) = @_;
-
+sub paragraph ($self, $n) {
   $self->abort("there is no paragraph for index $n")
     unless my $indices = $self->_para_indices->[$n];
 
@@ -222,9 +211,7 @@ sub paragraph {
 #pod
 #pod =cut
 
-sub paragraphs {
-  my ($self) = @_;
-
+sub paragraphs ($self) {
   my @para_indices = @{ $self->_para_indices };
   my @items        = $self->items;
 
@@ -247,9 +234,7 @@ sub paragraphs {
 #pod
 #pod =cut
 
-sub assert_n_paragraphs {
-  my ($self, $n) = @_;
-
+sub assert_n_paragraphs ($self, $n = undef) {
   Carp::confess("no paragraph count given") unless defined $n;
 
   my @para_indices = @{ $self->_para_indices };
@@ -269,9 +254,7 @@ sub assert_n_paragraphs {
 #pod
 #pod =cut
 
-sub paragraph_by_client_id {
-  my ($self, $cid) = @_;
-
+sub paragraph_by_client_id ($self, $cid = undef) {
   Carp::confess("no client id given") unless defined $cid;
 
   $self->abort("there is no paragraph for client_id $cid")
@@ -294,18 +277,14 @@ sub paragraph_by_client_id {
 #pod
 #pod =cut
 
-sub as_triples {
-  my ($self) = @_;
-
+sub as_triples ($self) {
   return [
     map {; $self->sentence_for_item($_)->as_triple }
     $self->items
   ];
 }
 
-sub as_stripped_triples {
-  my ($self) = @_;
-
+sub as_stripped_triples ($self) {
   return $self->strip_json_types($self->as_triples);
 }
 
@@ -318,18 +297,14 @@ sub as_stripped_triples {
 #pod
 #pod =cut
 
-sub as_pairs {
-  my ($self) = @_;
-
+sub as_pairs ($self) {
   return [
     map {; $self->sentence_for_item($_)->as_pair }
     $self->items
   ];
 }
 
-sub as_stripped_pairs {
-  my ($self) = @_;
-
+sub as_stripped_pairs ($self) {
   return $self->strip_json_types($self->as_pairs);
 }
 
@@ -347,7 +322,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 PERL VERSION
 

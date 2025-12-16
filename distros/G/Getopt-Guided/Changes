@@ -1,5 +1,11 @@
 Release history for Getopt-Guided
 
+2.0.0    Tue Dec 16 09:04:28 AM CET 2025
+         - BREAKING CHANGE: Common flags do not increment with repetition
+           anymore; use new incrementable flags instead
+         - Rewrite documentation
+         - Don't use Exporter anymore
+
 1.1.0    Wed Dec  3 07:33:31 AM CET 2025
          - Fix test script and documentation
          - Improve utility integration test script

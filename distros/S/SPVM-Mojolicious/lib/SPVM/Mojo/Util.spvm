@@ -305,47 +305,54 @@ class Mojo::Util {
     return &_header($header, 0);
   }
   
-  private static method _header : string[][] ($str : string, $cookie : int = 0) {
+  private static method _header : string[][] ($str : string, $set_cookie : int = 0) {
     
     my $tree = (List of string[])List->new(new string[][0]);
     my $part = StringList->new;
     
     my $offset = 0;
-    while (my $_ = Re->m($str, "\A[,;\s]*([^=;, ]+)\s*", \$offset)) {
-      $part->push($_->cap1);
-      $part->push(undef);
+    while (my $m = Re->m($str, "\A[,;\s]*([^=;, ]+)\s*", \$offset)) {
+      
+      my $name = $m->cap1;
+      
+      $part->push_([$name, undef]);
       
       my $expires = 0;
-      if ($cookie && $part->length > 2 && Fn->lc($_->cap1) eq "expires") {
+      if ($set_cookie && $part->length > 2 && Fn->lc($m->cap1) eq "expires") {
         $expires = 1;
       }
       
       # Special "expires" value
       my $match = Re->m($str, "\A=\s*$EXPIRES_RE", \$offset);
-      if ($expires && $match) { $part->set($part->length - 1, $match->cap1); }
+      if ($expires && $match) {
+        $part->[-1] = $match->cap1;
+      }
       
       # Quoted value
-      elsif (my $_ = Re->m($str, $QUOTED_VALUE_RE, \$offset)) { $part->set($part->length - 1, &unquote($_->cap1)); }
+      elsif (my $m = Re->m($str, $QUOTED_VALUE_RE, \$offset)) {
+        $part->[-1] = &unquote($m->cap1);
+      }
       
       # Unquoted value
-      elsif (my $_ = Re->m($str, $UNQUOTED_VALUE_RE, \$offset)) { $part->set($part->length - 1, $_->cap1); }
+      elsif (my $m = Re->m($str, $UNQUOTED_VALUE_RE, \$offset)) {
+        $part->[-1] = $m->cap1;
+      }
       
       # Separator
       unless (Re->m($str, "\A[;\s]*,\s*", \$offset)) {
         next;
       }
       
-      $tree->push($part->to_array);
+      $tree->push($part->get_array);
       $part = StringList->new;
     }
     
     if ($part->length > 0) {
-      $tree->push($part);
+      $tree->push($part->get_array);
     }
     
     return $tree->to_array;
   }
-  
   static method unquote : string ($str : string) {
     
     my $str = copy $str;

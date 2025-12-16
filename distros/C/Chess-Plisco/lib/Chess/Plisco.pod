@@ -33,8 +33,7 @@ The library features:
 
 =item magic bitboards for generation of sliding piece moves and attacks
 
-=item handling of moves in Standard-Algebraic Notation (SAN) as well as
-coordinate notation
+=item handling of moves in Standard-Algebraic Notation (SAN) as well as coordinate notation
 
 =item FEN (Forsyth-Edwards Notation) import and export
 
@@ -97,10 +96,10 @@ A "shift" is an integer in the range of 0-63 where 0 is the shift for "a1" and
 A bitboard is an unsigned 64-bit integer.  Each bit stands for one square of
 the chess board.
 
-=item I<Mask>
+=item I<Shift Mask>
 
-A mask is a bitboard with exactly one bit set.  The mask representing "e4" is
-a 1 shifted left 28 bits, because the shift for "e4" is 28.
+A shift mask is a bitboard with exactly one bit set.  The shift mask
+representing "e4" is a 1 shifted left 28 bits, because the shift for "e4" is 28.
 
 =item I<Move>
 
@@ -166,36 +165,69 @@ Clones B<POSITION>.
 
 =back
 
-=head1 OVERLOADED OPERATORS
-
-In string context, the position is encoded in Forsyth-Edwards Notation.  No
-other operators are overloaded.
-
-Note that the Forsyth-Edwards Notation does not cover all aspects of a chess
-position, especially the history of moves.  String-wise equality of two
-instances of a B<Chess::Plisco> does therefore not imply that the two
-positions are identical.  Use the method L</equal> for a strict equality
-check.
-
 =head1 METHODS
 
 =head2 General Methods
 
 =over 4
 
-=item B<toFEN>
+=item B<FEN[, OPTIONS]>
+
+=item B<toFEN[, OPTIONS]>
+
+=item B<fen[, OPTIONS]>
 
 Renders the position to Forsyth-Edwards Notation.  Alternatively, you can just
 use the object as a string:
 
     $position = Chess::Plisco->new;
-    say $position->toFEN;
-    say "$position"; # Does the same as above.
+    say $position->FEN;
+
+B<OPTIONS> is an optional hash (or hash reference). The only supported property
+at the moment is "force_en_passant_square" (alias "force_ep_square"). The
+original FEN standard stated that the en passant square in a FEN string should
+be set regardless of whether a pawn capture is possible respectively legal. The
+de-facto standard today is that the square should be omitted if there is no
+legal en passant capture in the particular position. Passing a truthy value
+will set the en-passant square even if there is no opponent pawn on a
+square that is able to capture or if capturing would leave the own king in
+check. The default is to do a legality check. Important! The behaviour in
+versions prior to 1.x was to follow the old convention.
+
+You should also keep in mind that the library internally uses the old
+convention. In other words, a pawn push by two squares will always set the
+en-passant shift of the position object.
 
 =item B<legalMoves>
 
 Returns a list of legal moves for the current position.  A move is just an
 integer.
+
+=item B<inCheck>
+
+Returns false if the side to move is not in check, a truthy value otherwise.
+The truthy value returned is a bitboard of all pieces giving check.
+
+In array context, the method returns extended information about the check
+that is required by checkPseudoLegalMove, see below. In detail, this is
+the bitboard of all pieces giving check,  the position of the king (0-63),
+and a so-called defence bitboard (64 bits).  To understand the defence
+bitboard, you have to recall how a check can be defended:
+
+1. The king moves out of check, eventually capturing the attacker.
+2. Another piece captures the attacker.
+3. Another piece moves between the piece giving check and the king.
+
+Option 1 will always work. In this case, the defence bitboard will be 0 (and
+can be ignored).
+
+Option 2 only works if there is just one piece giving check. In this case,
+the defence bitboard is identical to the bitboard of the pieces giving check.
+
+Option 3 only works if a sliding piece (queen, rook, or bishop) gives check.
+Knights jump over other pieces and a pawn can only give check from an adjacent
+square. In this case, the defence bitboard includes all squares between the
+king and the piece giving check, including the square of the attacking piece.
 
 =item B<pseudoLegalMoves>
 
@@ -204,25 +236,39 @@ Generates all pseudo-legal moves for the current position.
 Pseudo-legal are all moves that can be executed by the pieces on the side to
 move ignoring whether the side to move is in check after the move.
 
-Only the lower 15 bits of the move are set, that means the start and destination
-square, and a possible promotion piece.
+The only reason why you want to call pseudoLegalMoves is performance because
+filtering out those moves that will leave the king in check is somewhat
+expensive. In a search with alpha beta pruning, it is more efficient to delay
+that check because the engine may decide to prune that move and not try it
+out.
 
-If you also need the captured piece and the color, you either have to call
-L</legalMoves> or you must use the state information returned from L</doMove>
-to retrieve the enriched move.  The first element of the state array is the
-enriched move.
+For a concrete implementation, it is helpful to know how B<legalMoves()> is
+implemented:
+
+    sub legalMoves {
+        my ($self) = @_;
+
+        my @check_info = $self->inCheck($self);
+
+        my @legal;
+        foreach my $move ($self->pseudoLegalMoves) {
+            $move = $self->checkPseudoLegalMove($move, @check_info) or next;
+            push @legal, $move;
+        }
+
+        return @legal;
+    }
+
+The method calls B<inCheck()> in list context and passes that information to
+the legality checker.
 
 =item B<pseudoLegalAttacks>
 
-Like L</pseudoLegalMoves> but only returns "interesting" moves.  Interesting
-moves are captures, promotions, and moves directly giving check.  Discovered
-checks are not generated.  This has performance reasons.
+Like L</pseudoLegalMoves> but only returns "interesting" moves. Interesting
+moves are captures and promotions. Moves giving check would also be
+interesting but they are currently not generated.
 
 You will want to call this method for generating moves in a quiescence search.
-Since quiescence search is imperfect anyway, it is assumed that ignoring
-discovered checks does not have a negative impact.
-
-Future versions of this library may include discovered checks.
 
 =item B<moveNumbers>
 
@@ -231,7 +277,7 @@ standard chess.  These move numbers have the following structure:
 
 =over 8
 
-=item B<color (1 bit)>: Either L</CP_BLACK> or L</CP_WHITE>.
+=item B<colour (1 bit)>: Either L</CP_BLACK> or L</CP_WHITE>.
 
 =item B<capture (3 bits)>: The captured piece if any, one of L</CP_NONE>,
 L</CP_PAWN>, L</CP_KNIGHT>, L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>,
@@ -307,54 +353,32 @@ Returns the bitboard of all knights (black and white).
 
 Returns the bitboard of all pawns (black and white).
 
+=item B<turn>
+
 =item B<toMove>
 
 Returns the side to move, either L</CP_BLACK> or L</CP_WHITE>.
 
-=item B<halfMoves>
+=item B<halfmoves>
 
 Returns the number of half-moves made.  Initially, this is 0.  After white has
 made their first move, it is 1. After black has made their first move, it is
 2, and so on.
 
-=item B<reversibleClock>
+=item B<castlingRights>
 
-Returns the number of reversible moves immediately leading to the current
-position.  The following moves are irreversible:
+Returns the castling state of the position. This is a bitmask with four bits.
+Bit 1 is set if white can castle king-side. Bit 2 is set if white can castle
+queen-side. Bit 3 is set if black can castle king-side. Bit 4 is set if black
+can castle queen-side.
 
-=over 4
+=item B<halfmoveClock>
 
-=item Pawn moves
-
-Reason: A pawn cannot move backwards.
-
-=item Captures
-
-Reason: Captured pieces are gone for good.
-
-=item First king move of each side
-
-Reason: The side to move loses the castling rights.
-
-=item First move of each rook of each side
-
-Reason: The side to move loses at least one of their castling rights.
-
-=item Castlings
-
-Reason: The side to move loses the castling rights.  This is also implied by
-the fact that they are necessarily the first king move.
-
-=back
+Number of subsequent irreversible halfmoves. Irreversible moves in this sense
+are all captures and pawn moves. Changes to the castling state are ignored.
 
 The half-move-clock is important because both players can claim a draw, when
 the half-move clock has reached 100.
-
-=item B<halfMoveClock>
-
-Like L</irreversibleClock> but only captures and pawn moves are considered
-irreversible. Changes to the castling state are ignored.  This is the value
-that is relevant for claiming a draw according to the 50-move Rule.
 
 =item B<signature>
 
@@ -365,7 +389,7 @@ Properties taken into account are:
 
 =item B<piece positions>
 
-=item B<color to move>
+=item B<colour to move>
 
 =item B<castling rights>
 
@@ -383,45 +407,18 @@ seed L</CP_RANDOM_SEED>.  If you turn the constant L</CP_RANDOM_SEED> into
 a non-constant subroutine, you can also get different signatures, whenever
 you re-load the library.
 
-=item B<inCheck>
-
-Returns false if the side to move is not in check, a truthy value otherwise.
-The truthy value returned is a bitboard of all pieces giving check.
-
-=item B<evasion>
-
-If the side to move is in check, returns the required check evasion strategy:
-
-=over 4
-
-=item L</CP_EVASION_KING_MOVE>
-
-The king must move.  This is the case, when multiple pieces give check.
-
-=item L</CP_EVASION_CAPTURE>
-
-Either the king must move or the piece giving check must be captured.
-
-=item L</CP_EVASION_ALL>
-
-Either the king must move, the piece giving check must be captured, or another
-piece must be moved between the king and the attacking piece.
-
-=back
-
-=item B<evasionSquares>
-
-If a check can be evaded by moving a piece between the king and the attacking
-piece of the opponent, this bitboard gives all squares where the check can be
-blocked.  These are all squares between the king and the attacking piece,
-including the square where the attacker is standing.
+The en-passant status only takes a double pawn push into account and does not
+check whether an en-passant capture is actually possible or legal.
 
 =item B<enPassantShift>
 
-If en-passant is possible, returns the shift of the square where the capturing
-pawn has to move.  If en-passant is not possible, 0 is returned.  0 happens to
-be the shift of "a1" but "a1" is not a valid en-passant square.  It is
-therefore safe to use this method in boolean context.
+Returns the shift of the en passant square or 0 if en passant is not possible
+0 happens to be the shift for a1 but since en passant is never possible on a1,
+this is not a problem.
+
+Note that this returns a non-zero value even if an en-passant capture is
+not possible or not legal. It is sufficient that a pawns had been pushed
+two squares in the last move.
 
 =item B<material>
 
@@ -487,14 +484,12 @@ Returns a bitmap of castling rights for the current position:
 
 =item B<kingShift>
 
-Return the shift of the square of the king of the side to move.  This
-information is needed internally.
+Return the shift of the square of the king of the side to move.
 
-=item B<info>
+=item B<lastMove>
 
-Returns an integer encoding various other aspects of the position.  You do not
-need this because there are dedicated methods available for all these
-properties.
+Returns the move (as an integer) that has led to the position. It may be 0,
+when there was no prior move.
 
 =back
 
@@ -523,6 +518,8 @@ If it has a truthy value, the move is not checked for legality.
 
 =item B<SAN(MOVE)>
 
+=item B<san(MOVE)>
+
 Renders the integer B<MOVE> into Standard-Algebraic Notation SAN, for example
 "e4", "Bxc4", "O-O", or "fxe1=Q".
 
@@ -531,10 +528,26 @@ Renders the integer B<MOVE> into Standard-Algebraic Notation SAN, for example
 Renders the integer B<MOVE> into coordinate notation, for example "e2e4" or
 "f2f1q".
 
-=item B<LAN(MOVE)>
+=item B<LAN(MOVE[, OPTIONS])>
 
-Returns the Long Algebraic Notation LAN of the move.  This is an alias for
-L</moveCoordinateNotation>.
+=item B<lan(MOVE[, OPTIONS])>
+
+Returns the Long Algebraic Notation LAN of the move.  The following optional
+options (passed as a hash or hash reference) are supported:
+
+=over 8
+
+=item B<no_hyphen>
+
+Use a hyphen between the from and to square ("e2e4" instead of "e2-e4").
+
+=item B<encode_pawn>
+
+Add a leading "P" for pawn moves, i.e. "Pe2-e4" instead of "e2-e4".
+
+=back
+
+Before version 1.x this was an alias for L</moveCoordinateNotation>.
 
 =item B<moveEquivalent(MOVE1, MOVE2)>
 
@@ -610,13 +623,35 @@ Sets the piece that gets captured in B<MOVE> to B<PIECE> and returns
 the move.  The piece should be one of L</CP_QUEEN>,
 L</CP_ROOK>, L</CP_BISHOP>, L</CP_KNIGHT>, L</CP_PAWN>, L</CP_NO_PIECE>.
 
+=item B<moveColour(MOVE)>
+
 =item B<moveColor(MOVE)>
 
-Extracts the color that does the move.
+Extracts the colour that does the move.
+
+=item B<moveSetColour(MOVE, COLOUR)>
 
 =item B<moveSetColor(MOVE, COLOR)>
 
-Sets the color in B<MOVE> to B<COLOR> and returns the move.
+Sets the colour in B<MOVE> to B<COLOUR> and returns the move.
+
+=item B<moveEnPassant(MOVE)>
+
+Returns 1 if the move is an en passant capture, 0 otherwise.
+
+=item B<moveSetEnPassant(MOVE, FLAG)>
+
+Sets the en passant flag in B<MOVE> to B<FLAG> and returns the move.
+
+=item B<checkPseudoLegalMove(MOVE)>
+
+Checks the legality of B<MOVE> (integer).  The method only makes sense if you
+pass it a move that was produced by B<pseudoLegalMoves>. Otherwise, the
+behaviour is undefined.
+
+The return value is falsy, if the legality check failed. Otherwise the modified
+move is returned. The difference to the original move is that the captured
+piece, the colour, and possible the en passant flag are set.
 
 =item B<moveLegal(MOVE|NOTATION)>
 
@@ -633,14 +668,12 @@ the move as an integer as returned by L</parseMove>.
 The method returns state information that can later be used to undo the move
 and reset the position to the state it had before the move was applied.
 
-Engines should use the method L</doMove> instead because it is faster.
+Engines should use the method L</move> instead because it is faster.
 
 =item B<unapplyMove(STATE)>
 
 If B<STATE> is state information returned by L</applyMove>, takes back the
 move that was given as an argument to L</applyMove>.
-
-Engines should use the method L</undoMove> instead because it is faster.
 
 =item B<doMove(MOVE)>
 
@@ -652,18 +685,31 @@ The method returns false, if the move is illegal.  Note that this is not a
 complete legality check but works only for those moves that
 L</pseudoLegalMoves> has returned for the current position.
 
-This method is fast and is the one that should be used by engines.
-
-The state information returned is an array of various bits of information.
-The first one is the move itself but the captured piece is set in that
-move.
+The method returns state information that can later be used to undo the move
+and reset the position to the state it had before the move was applied.
 
 =item B<undoMove(STATE)>
 
 If B<STATE> is state information returned by L</doMove>, takes back the
 move that was given as an argument to L</doMove>.
 
-This method is fast and is the one that should be used by engines.
+=item B<move(MOVE>)
+
+Does the move B<MOVE> which must be legal because no legality check is
+performed.
+
+Unlike B<doMove()>, the method does not return state information that can be
+used to later undo the move. The caller is responsible for that. A typical
+pattern looks like this:
+
+    my @backup = @$position; # A shallow copy is sufficient.
+    foreach my $move ($position->legalMoves) {
+        my $state = $position->move($move);
+        # ... do something with $position.
+        @$position = @backup;
+    }
+
+Consequently, there is no B<unmove()> method.
 
 =item B<SEE(MOVE)>
 
@@ -740,44 +786,44 @@ This is a class method.
 
 =head2 Methods for Inspecting a Square
 
-The following methods answer the question which piece of which color occupies
+The following methods answer the question which piece of which colour occupies
 a particular location on the chess board.
 
 =over 4
 
 =item B<pieceAtSquare(SQUARE)>
 
-In array context returns a pair of a piece and a color.  In scalar context,
+In array context returns a pair of a piece and a colour.  In scalar context,
 only the piece is returned.  The piece is one of L</CP_PAWN>, L</CP_KNIGHT>,
 L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, L</CP_KING>, or L</CP_NO_PIECE> if
 the square is empty.
 
-The color is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
-C<undef> is returned instead of a color.
+The colour is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
+C<undef> is returned instead of a colour.
 
 This method is relatively expensive!
 
 =item B<pieceAtCoordinates(FILE, RANK)>
 
-In array context returns a pair of a piece and a color.  In scalar context,
+In array context returns a pair of a piece and a colour.  In scalar context,
 only the piece is returned.  The piece is one of L</CP_PAWN>, L</CP_KNIGHT>,
 L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, L</CP_KING>, or L</CP_NO_PIECE> if
 the square is empty.
 
-The color is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
-C<undef> is returned instead of a color.
+The colour is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
+C<undef> is returned instead of a colour.
 
 This method is relatively expensive!
 
 =item B<pieceAtShift(SHIFT)>
 
-In array context returns a pair of a piece and a color.  In scalar context,
+In array context returns a pair of a piece and a colour.  In scalar context,
 only the piece is returned.  The piece is one of L</CP_PAWN>, L</CP_KNIGHT>,
 L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, L</CP_KING>, or L</CP_NO_PIECE> if
 the square is empty.
 
-The color is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
-C<undef> is returned instead of a color.
+The colour is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
+C<undef> is returned instead of a colour.
 
 This method is relatively expensive!
 
@@ -1140,39 +1186,14 @@ is computed from the resulting position, and finally the move is undone.
 
 =over 4
 
-=item B<perftByCopy(POSITION, DEPTH)>
+=item B<perft(DEPTH)>
 
-Does a performance test for position B<POSITION> to depth B<DEPTH>.  Returns
-the number of leaf nodes found.
+Does a performance test to depth B<DEPTH>.  Returns the number of leaf nodes
+found.
 
-Instead of calling L</undoMove> the moves found are applied to a copy of the
-current position that is discarded later.  This is currently slightly faster
-than undoing the move programatically with L</undoMove>.
+=item B<perftWithOutput(DEPTH, FILEHANDLE)>
 
-Note that you have to pass a B<Chess::Plisco> instance as the first argument
-even when calling it as an instance method! This has performance reason.
-
-=item B<perftByUndo(DEPTH)>
-
-Does a performance test for the current position to depth B<DEPTH>.  Returns
-the number of leaf nodes found.
-
-Moves are undone programmatically with L</undoMove>.  This is currently
-slightly slower than just copying the position, see L</perftByCopy>.
-
-=item B<perftByCopyWithOutput(DEPTH, FILEHANDLE)>
-
-Does the the same as B<perftByCopy> but prints out all top-level moves found
-with the number of subnodes for each move.  The time needed is measured
-with L<Time::HiRes/gettimeofday> and reported at the end as well as the
-number of nodes found.
-
-This method can be used directly to implement the command "go perft" for a UCI
-compatible chess engine.
-
-=item B<perftByUndoWithOutput(DEPTH, FILEHANDLE)>
-
-Does the the same as B<perftByUndo> but prints out all top-level moves found
+Does the the same as B<perft> but prints out all top-level moves found
 with the number of subnodes for each move.  The time needed is measured
 with L<Time::HiRes/gettimeofday> and reported at the end as well as the
 number of nodes found.
@@ -1253,7 +1274,7 @@ The macros (all starting with "cp_") are only available when you have loaded
 L<Chess::Plisco::Macro>, see there for more information.
 
 All elements of the position array are documented below under
-L</Accessor Indexes (:accessors)>.
+L</Accessor Indices (:accessors)>.
 
 =head1 EXPORT TAGS
 
@@ -1266,9 +1287,9 @@ L<Chess::Plisco::Macro>.
 
 You can import all constants with the export tag ":all".
 
-=head2 Accessor Indexes (:accessors)
+=head2 Accessor Indices (:accessors)
 
-The array indices were carefully so that the following conditions are met:
+The array indices were carefully selected so that the following conditions are met:
 
 =over 4
 
@@ -1285,6 +1306,34 @@ are guaranteed to be the same and to point to the corresponding piece bitboard.
 
 =over 4
 
+=item B<POS_E<gt>[CP_POS_HALFMOVES]>
+
+The number of halfmoves in this position.
+
+=item B<POS-E<gt>[CP_POS_PAWNS]>
+
+A bitboard of all pawns (black and white) on the board.  See also L</pawns>.
+
+=item B<POS-E<gt>[CP_POS_KNIGHTS]>
+
+A bitboard of all knights (black and white) on the board.  See also L</knights>.
+
+=item B<POS-E<gt>[CP_POS_BISHOPS]>
+
+A bitboard of all bishops (black and white) on the board.  See also L</bishops>.
+
+=item B<POS-E<gt>[CP_POS_QUEENS]>
+
+A bitboard of all rooks (black and white) on the board.  See also L</queens>.
+
+=item B<POS-E<gt>[CP_POS_KINGS]>
+
+A bitboard of all kings (black and white) on the board.  See also L</kings>.
+
+=item B<POS-E<gt>[CP_POS_ROOKS]>
+
+A bitboard of all rooks (black and white) on the board.  See also L</rooks>.
+
 =item B<POS-E<gt>[CP_POS_WHITE_PIECES]>
 
 A bitboard of all white pieces on the board. See also L</whitePieces>.
@@ -1293,57 +1342,49 @@ A bitboard of all white pieces on the board. See also L</whitePieces>.
 
 A bitboard of all black pieces on the board.  See also L</blackPieces>.
 
-=item B<POS-E<gt>[CP_POS_KINGS]>
+=item B<POS-E<gt>[CP_POS_LAST_MOVE]>
 
-A bitboard of all kings (black and white) on the board.  See also L</kings>.
+The last mvoe if any.  See also L</lastMove>.
 
-=item B<POS-E<gt>[CP_POS_QUEENS]>
+=item B<POS-E<gt>[CP_POS_MATERIAL]>
 
-A bitboard of all rooks (black and white) on the board.  See also L</queens>.
+The raw material balance.  See also L</material>.
 
-=item B<POS-E<gt>[CP_POS_ROOKS]>
+=item B<POS-E<gt>[CP_POS_HALFMOVE_CLOCK]>
 
-A bitboard of all rooks (black and white) on the board.  See also L</rooks>.
+The count of halfmoves for the 50-move rule. If it is 100 or more, either side
+can claim a draw.  See also L</halfmoveClock>.
 
-=item B<POS-E<gt>[CP_POS_BISHOPS]>
+=item B<POS-E<gt>[CP_POS_TURN]>
 
-A bitboard of all bishops (black and white) on the board.  See also L</bishops>.
+=item B<POS-E<gt>[CP_POS_TO_MOVE]>
 
-=item B<POS-E<gt>[CP_POS_KNIGHTS]>
+The side whose turn it is.   See also L</turn>.
 
-A bitboard of all knights (black and white) on the board.  See also L</knights>.
+=item B<POS-E<gt>[CP_POS_EN_PASSANT_SHIFT]>
 
-=item B<POS-E<gt>[CP_POS_PAWNS]>
+The position of a pawn where an en-passant capture is theoretically possible.
+It is theoretically possible if a pawn was pushed two squares in the last
+move. Whether it can be captured or whether the capture is legal is ignored
+in this context.
 
-A bitboard of all pawns (black and white) on the board.  See also L</pawns>.
+See also L</enPassantShift>.
 
-=item B<POS-E<gt>[CP_POS_HALF_MOVES]>
+=item B<POS-E<gt>[CP_POS_USR1]>
 
-The number of half-moves made.  See also L</halfMoves>.
+=item B<POS-E<gt>[CP_POS_USR2]>
 
-=item B<POS-E<gt>[CP_POS_HALF_MOVE_CLOCK]>
+=item B<POS-E<gt>[CP_POS_USR3]>
 
-The current value of the half-move clock.  See also L</halfMoveClock>.
+=item B<POS-E<gt>[CP_POS_USR4]>
 
-=item B<POS-E<gt>[CP_POS_IRREVERSIBLE_CLOCK]>
+=item B<POS-E<gt>[CP_POS_USR5]>
 
-The current value of the irreversible clock.  See also L</irreversibleClock>.
+Unused. These slots can be used by a chess engine.
 
-=item B<POS-E<gt>[CP_POS_IN_CHECK]>
+=item B<POS-E<gt>[CP_POS_CASTLING_RIGHTS>
 
-Bitmask of pieces giving check.  See also L</inCheck>.
-
-=item B<POS-E<gt>[CP_POS_EVASION_SQUARES]>
-
-Bitboard of squares where a check can be blocked.  See also L</evasionSquares>.
-
-=item B<POS-E<gt>[CP_POS_SIGNATURE]>
-
-Same as L</signature>.
-
-=item B<POS-E<gt>[CP_POS_INFO]>
-
-Additional properties of the position. See also L</info>.
+The castling rights of the position.  See also L</castlingRights>.
 
 =back
 
@@ -1544,6 +1585,10 @@ generator L</RNG>.
 
 =head1 FAQ
 
+=head2 Is It Colour or Color?
+
+That does not have to be decided. You can use either spelling in this library.
+
 =head2 What Does Plisco Mean?
 
 I originally wrote a chess engine in C and named it "tate", just because I
@@ -1558,33 +1603,6 @@ but all available chess libraries were either too buggy or too slow or both
 for using them. So I decided to write a library that was well tested and
 fast enough, and that library is now B<Chess::Plisco>. The first letter
 P stands for Perl.
-
-=head2 Operation ">>" no method found
-
-The B<Chess::Plisco> overloads the stringification so that you can print
-objects into their FEN representation. That has the disadvantage in Perl that
-you get funny error messages, when you accidentally use any other operator
-on a B<Chess::Plisco> object. Examples:
-
-    $position = Chess::Plisco->new;
-
-    say $position; # Works fine, and prints the FEN representation;
-    $position >> 1; # Errors:
-    # Operation ">>" no method found,
-    #         left argument in overloaded package Chess::Plisco
-    #         right argument has no overloaded magic at SOURCE LOCATION
-
-Unfortunately, B<SOURCE LOCATION> is not neccessarily in your own code. If
-you call a method with a B<Chess::Plisco> object that expects something else,]
-for example an integer, the location will be somewhere in the code of the
-module. Example:
-
-    $position = Chess::Plisco->new;
-    # ...
-    $position->doMove($position); # Ouch!
-
-The location of the error message will now be inside the source code of
-B<Chess::Plisco>.
 
 =head1 COPYRIGHT
 

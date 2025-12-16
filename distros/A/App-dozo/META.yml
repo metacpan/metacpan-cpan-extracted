@@ -26,7 +26,7 @@ no_index:
 provides:
   App::dozo:
     file: lib/App/dozo.pm
-    version: '0.9923'
+    version: '0.9924'
 requires:
   File::Share: '0'
   perl: '5.024'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/tecolicom/App-dozo/issues
   homepage: https://github.com/tecolicom/App-dozo
   repository: https://github.com/tecolicom/App-dozo.git
-version: '0.9923'
+version: '0.9924'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

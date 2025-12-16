@@ -31,7 +31,8 @@ DESCRIPTION
           my $obj = Person->new(name => "Alice", height => "170 cm");
 
         The height will be ignored because it's not a defined attribute for
-        the class.
+        the class. (In strict mode, an error would be thrown because of the
+        unrecognized parameter instead of it simply being ignored.)
 
     *   Supports required attributes using an exclamation mark. The name
         attribute in the synopsis is required.
@@ -42,12 +43,55 @@ DESCRIPTION
         Moose error messages, which also only report the first missing
         required attribute.
 
+    *   Supports defaults and builders.
+
+        For example:
+
+          use Class::XSAccessor name => { default => '__ANON__' };
+
+        Or:
+
+          use Class::XSAccessor name => { default => sub { return '__ANON__' } };
+
+        Or:
+
+          use Class::XSAccessor name => { builder => '__fallback_name' };
+          sub __fallback_name {
+            return '__ANON__';
+          }
+
+        You can alternatively provide a string of Perl code that will be
+        evaluated to generate the default:
+
+          use Class::XSAccessor name => { default => \'sprintf("__%s__", uc "anon")' };
+
+        If you expect subclasses to need to override defaults, use a builder.
+        Subclasses can simply provide a method of the same name.
+
+        The XS code has special faster code paths for the following defaults
+        which are all very common values to choose as defaults:
+
+          default => undef,
+          default => 0,
+          default => 1,
+          default => !!0,
+          default => !!1,
+          default => "",
+          default => \'[]',
+          default => \'{}',
+
+        If an attribute has a default or builder, its "required" status is
+        ignored.
+
+        Builders and coderef defaults are likely to siginificantly slow down
+        your constructor.
+
     *   Provides support for type constraints.
 
           use Types::Standard qw(Str Int);
           use Class::XSConstructor (
             "name!"    => Str,
-            "age"      => Int,
+            "age"      => { isa => Int, default => 0 },
             "email"    => Str,
             "phone"    => Str,
           );
@@ -57,7 +101,7 @@ DESCRIPTION
           use Types::Standard qw(Str Int);
           use Class::XSConstructor (
             "name!"    => Str,
-            "age"      => Int,
+            "age"      => { isa => Int, default => 0 },
             "email"    => sub { !ref($_[0]) and $_[0] =~ /\@/ },
             "phone"    => Str,
           );
@@ -73,6 +117,24 @@ DESCRIPTION
         Note that Class::XSConstructor is only building your constructor for
         you. For read-write attributes, *checking the type constraint in the
         accessor is your responsibility*.
+
+    *   Type coercions.
+
+        If your type constraint is a Type::Tiny object which provides a
+        coercion:
+
+          coercion => 1
+
+        Otherwise:
+
+          foo => {
+            default => sub { ... },
+            isa     => sub { ... },
+            coerce  => sub { my $oldval = $_[0]}; ...; return $newval },
+          }
+
+        Type coercions are likely to siginificantly slow down your
+        constructor.
 
     *   Supports Moose/Moo/Class::Tiny-style `BUILD` methods.
 
@@ -184,60 +246,12 @@ API
 
         Returns nothing.
 
-    Class::XSConstructor::inheritance_stuff($classname)
-        Checks the @ISA variable in the class and makes Class::XSConstructor
-        aware of any attributes declared by parent classes. (Though only if
-        those parent classes use Class::XSConstructor.)
-
-        This is automatically done as part of `import`, so if you're using
-        `import`, you don't need to do this.
-
-        Returns nothing.
-
-    `($ar_has, $ar_required, $hr_isa, $sr_build, $sr_strict) =
-    Class::XSConstructor::get_vars($classname)`
-        Returns references to the variables where Class::XSConstructor stores
-        its configuration for the class.
-
-        See "Use of Package Variables".
-
-    Class::XSConstructor::populate_build($classname)
-        This will need to be called if the list of `BUILD` methods that ought
-        to be called when constructing an object of the given class changes at
-        runtime. (Which would be pretty unusual.)
-
-        Returns nothing.
-
   Use of Package Variables
-    Class::XSConstructor stores its configuration for class Foo in the
-    following global variables:
+    Class::XSConstructor stores its configuration for class Foo in a bunch of
+    package variables with the prefix `Foo::__XSCON_`.
 
-    @Foo::__XSCON_HAS
-        A list of all attributes which the constructor should accept (both
-        required and optional), including attributes defined by parent
-        classes.
-
-        `inheritance_stuff` will automatically populate this from parent
-        classes, and `import` (which calls `inheritance_stuff`) will populate
-        it based on @optlist.
-
-    @Foo::__XSCON_REQUIRED
-        A list of all attributes which the constructor should require,
-        including attributes defined by parent classes.
-
-        `inheritance_stuff` will automatically populate this from parent
-        classes, and `import` (which calls `inheritance_stuff`) will populate
-        it based on @optlist.
-
-    %Foo::__XSCON_ISA
-        A map of attributes to type constraint coderefs, including attributes
-        defined by parent classes. Type constraints must be coderefs, not
-        Type::Tiny objects.
-
-        `inheritance_stuff` will automatically populate this from parent
-        classes, and `import` (which calls `inheritance_stuff`) will populate
-        it based on @optlist, including converting type constraint objects to
-        coderefs.
+    The only supported use of these variables that you may need to be aware of
+    is:
 
     $Foo::__XSCON_BUILD
         If set to "0", indicates that XSConstructor should not try to call
@@ -253,27 +267,10 @@ API
 
         Any other value is invalid.
 
-        `import` will set this to undef.
-
     $Foo::__XSCON_STRICT
         If set to true, indicates that XSConstructor should use a "strict"
         constructor, which complains about the presence of any unrecognized
         keys in the init args hashref.
-
-        `import` will set this to false by default, but set it to true if it
-        sees "!!" in @optlist.
-
-    If these package variables have not been declared, there is a very good
-    chance that the constructor will segfault. `import` will automatically
-    declare and populate them for you. `get_vars` will declare them and return
-    a list of references to them.
-
-    Although you *can* set up Class::XSConstructor by fiddling with these
-    package variables and then installing the constructor sub, it will
-    probably be easier to use `import`. For MooX::XSConstructor, even though
-    I'm obviously intimately familiar with the internals of
-    Class::XSConstructor, I just translate the Moo attribute definitions into
-    something suitable for @optlist, set $SETUP_FOR, then call `import`.
 
 CAVEATS
     Inheritance will automatically work if you are inheriting from another

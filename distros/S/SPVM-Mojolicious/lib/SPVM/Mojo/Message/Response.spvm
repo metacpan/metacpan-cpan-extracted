@@ -103,6 +103,11 @@ class Mojo::Message::Response extends Mojo::Message {
     $self->{max_message_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : 2147483647;
   }
   
+  method cookie : Mojo::Cookie::Response ($name : string) {
+    
+    return (Mojo::Cookie::Response)$self->SUPER::cookie($name);
+  }
+  
   method cookies : Mojo::Cookie::Response[] () {
     
     # Parse cookies

@@ -11,6 +11,8 @@ define pod <<"=cut"
 
 =encoding utf-8
 
+=for html <p align="center"><img src="https://raw.githubusercontent.com/tecolicom/App-dozo/main/images/dozo-logo.jpeg" width="400"></p>
+
 =head1 NAME
 
 dozo - Docker with Zero Overhead
@@ -24,6 +26,7 @@ dozo -I IMAGE [ options ] [ command ... ]
     -d, --debug        debug mode (show full command)
     -x, --trace        trace mode (set -x)
     -q, --quiet        quiet mode
+    -n, --dryrun       dry-run mode (do not run docker)
 
     -I, --image=#      Docker image (required unless -D)
     -D, --default      use default image (DOZO_DEFAULT_IMAGE or tecolicom/xlate)
@@ -43,7 +46,7 @@ dozo -I IMAGE [ options ] [ command ... ]
 
 =head1 VERSION
 
-Version 
+Version 0.9924
 
 =head1 USAGE
 
@@ -151,12 +154,20 @@ docker_find() {
         esac
     done
     shift $((OPTIND - 1))
-    id=$(docker ps -a -q ${status[@]/#/-f status=} -f name="^/$1\$")
+    id=$(command docker ps -a -q ${status[@]/#/-f status=} -f name="^/$1\$")
     [[ $id ]] && echo "$id" || return 1
 }
 
 docker_status() {
-    docker inspect --format='{{.State.Status}}' $1
+    command docker inspect --format='{{.State.Status}}' $1
+}
+
+docker() {
+    if [[ ${dryrun:-} ]]; then
+        echo docker "$@"
+        return 0
+    fi
+    command docker "$@"
 }
 
 ##############################################################################
@@ -200,38 +211,6 @@ if [[ $top_dir && $top_dir != $cwd ]]; then
     mount_dir="$top_dir"
 fi
 
-define USAGE <<END
-$myname - Generic Docker Runner
-
-Usage: $myname [ options ] [ command ... ]
-END
-
-default() { image="${DOZO_DEFAULT_IMAGE:-$default_image}"; }
-
-declare -A OPTS=(
-    [&USAGE]="$USAGE" [&PERMUTE]=
-    [       help | h ! # show help                       ]=
-    [    version     ! # show version                    ]=
-    [      debug | d   # debug mode (show full command)  ]=
-    [      trace | x   # trace mode (set -x)             ]=
-    [      quiet | q   # quiet mode                      ]=
-    [      image | I : # Docker image                    ]=
-    [    default | D ! # use default image               ]=
-    [        env | E @ # environment variable to inherit ]=
-    [  mount-cwd | W   # mount current working directory ]=
-    [ mount-home | H   # mount home directory            ]=
-    [     volume | V @ # additional volume to mount      ]=
-    [    unmount | U   # do not mount                    ]=
-    [ mount-mode     : # mount mode (rw or ro)           ]=rw
-    [   mount-ro | R   # mount read-only                 ]=
-    [      batch | B   # batch mode (non-interactive)    ]=
-    [       name | N : # live container name             ]=
-    [       kill | K   # kill existing container         ]=
-    [       live | L   # use live container              ]=
-    [       port | P @ # port mapping                    ]=
-    [      other | O @ # additional docker option        ]=
-)
-
 ##############################################################################
 # Read .dozorc
 ##############################################################################
@@ -256,6 +235,43 @@ for dir in "${rcpath[@]}"; do
         done < <(xargs printf '%s\0' <<< "$line")
     done < "$rc"
 done
+
+##############################################################################
+# Option definitions
+##############################################################################
+
+define USAGE <<END
+$myname - Generic Docker Runner
+
+Usage: $myname [ options ] [ command ... ]
+END
+
+default() { image="${DOZO_DEFAULT_IMAGE:-$default_image}"; }
+
+declare -A OPTS=(
+    [&USAGE]="$USAGE" [&PERMUTE]=
+    [       help | h ! # show help                       ]=
+    [    version     ! # show version                    ]=
+    [      debug | d   # debug mode (show full command)  ]=
+    [      trace | x   # trace mode (set -x)             ]=
+    [      quiet | q   # quiet mode                      ]=
+    [     dryrun | n   # dry-run mode (do not run docker)]=
+    [      image | I : # Docker image                    ]=
+    [    default | D ! # use default image               ]=
+    [        env | E @ # environment variable to inherit ]=
+    [  mount-cwd | W   # mount current working directory ]=
+    [ mount-home | H   # mount home directory            ]=
+    [     volume | V @ # additional volume to mount      ]=
+    [    unmount | U   # do not mount                    ]=
+    [ mount-mode     : # mount mode (rw or ro)           ]=rw
+    [   mount-ro | R   # mount read-only                 ]=
+    [      batch | B   # batch mode (non-interactive)    ]=
+    [       name | N : # live container name             ]=
+    [       kill | K   # kill existing container         ]=
+    [       live | L   # use live container              ]=
+    [       port | P @ # port mapping                    ]=
+    [      other | O @ # additional docker option        ]=
+)
 
 ##############################################################################
 # Parse options
@@ -300,16 +316,20 @@ fi
 
 if [[ ${live:-} ]]; then
     container=$(container_name)
+    debug "live: container=$container"
     if id=$(docker_find "$container"); then
         status=$(docker_status $id)
+        debug "live: id=$id status=$status"
         case $status in
             exited)
                 warn "start the $container ($id)"
-                id=$(docker start $id) || exit 1
+                docker start $id || exit 1
+                [[ ${dryrun:-} ]] && status=running && debug "live: fake status=running"
                 ;;
             paused)
                 warn "unpause the $container ($id)"
-                id=$(docker unpause $id) || exit 1
+                docker unpause $id || exit 1
+                [[ ${dryrun:-} ]] && status=running && debug "live: fake status=running"
                 ;;
             running)
                 ;;
@@ -317,18 +337,22 @@ if [[ ${live:-} ]]; then
                 warn "unknown status $status of $container ($id)"
                 ;;
         esac
+    else
+        debug "live: container not found"
     fi
-    if id=$(docker_find -s running "$container"); then
+    if [[ ${status:-} == running ]] || id=$(docker_find -s running "$container"); then
+        debug "live: exec/attach id=$id"
         if (( $# > 0 )); then
             declare -a exec_opts
             [[ ! ${batch:-} ]] && exec_opts+=(--interactive)
             [[ ! ${batch:-} ]] && [[ -t 0 ]] && exec_opts+=(--tty)
             export DOCKER_CLI_HINTS=false
-            exec docker exec "${exec_opts[@]}" $id "$@"
+            docker exec "${exec_opts[@]}" $id "$@"
         else
             warn "attach to the $container ($id)"
-            exec docker attach $id
+            docker attach $id
         fi
+        exit
     fi
     warn "create live container \"$container\""
 fi
@@ -387,7 +411,8 @@ if [[ ! ${quiet:-} ]]; then
     warn "docker run ${info}"
 fi
 
-exec docker run "${dockopt[@]}" "${image}" "$@"
+docker run "${dockopt[@]}" "${image}" "$@"
+exit
 
 : <<'=cut'
 
@@ -475,6 +500,11 @@ Enable trace mode (set -x).
 =item B<-q>, B<--quiet>
 
 Quiet mode.
+
+=item B<-n>, B<--dryrun>
+
+Dry-run mode. Show docker commands without executing them.
+Useful for testing and debugging.
 
 =item B<-I> I<image>, B<--image>=I<image>
 

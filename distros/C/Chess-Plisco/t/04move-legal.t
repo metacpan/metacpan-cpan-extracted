@@ -70,8 +70,8 @@ sub make_move {
 
 	my ($from_square, $to_square, $promote) = ($1, $2, $3);
 	my $move = 0;
-	(($move) = (($move) & ~0xfc0) | (($pos->squareToShift($from_square)) & 0x3f) << 6);
-	(($move) = (($move) & ~0x3f) | (($pos->squareToShift($to_square)) & 0x3f));
+	(($move) = (($move) & ~0x7e00) | (($pos->squareToShift($from_square))) << 9);
+	(($move) = (($move) & ~0x1f8000) | (($pos->squareToShift($to_square))) << 15);
 	if ($promote) {
 		my %pieces = (
 			q => CP_QUEEN,
@@ -79,10 +79,10 @@ sub make_move {
 			b => CP_BISHOP,
 			n => CP_KNIGHT,
 		);
-		(($move) = (($move) & ~0x7000) | (($pieces{$promote}) & 0x7) << 12);
+		(($move) = (($move) & ~0x1c0) | (($pieces{$promote})) << 6);
 	}
 
-	(($move) = (($move) & ~0x38000) | (($pos->pieceAtSquare($from_square)) & 0x7) << 15);
+	(($move) = (($move) & ~0x7) | ($pos->pieceAtSquare($from_square)));
 
 	return $move;
 }

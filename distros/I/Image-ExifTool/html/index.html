@@ -64,8 +64,10 @@ web hosting which disables an "unlimited traffic" web site if a single bot hamme
 the site with a moderate load.  An alternate ExifTool homepage is available at
 <a href="http://exiftool.sourceforge.net/">http://exiftool.sourceforge.net/</a></i></p> -->
 
-<p><i class=orng><b>Note:</b> IP's that aggressively download multiple copies of
-the distribution files or access web pages too quickly will be blocked.</i></p>
+<p><i class=orng><b>Note:</b> IP's that access web pages too quickly will be
+blocked, and I have had to get even more strict about blocking access to the
+forum to help deal with a plague of badly-behaving AI bots.  Send an email to
+exiftool@gmail.com if you think you have been wrongly denied access.</i></p>
 
 <div class=wide><table class=links><tr>
 <th><a href="install.html" class=wt>&nbsp;Installing&nbsp;</a></th>
@@ -104,13 +106,13 @@ the distribution files or access web pages too quickly will be blocked.</i></p>
 <p><i class=red><b>(To reduce load on the exiftool.org server,
 the download links now point to SourceForge)</b></i></p>
 
-<p><b>--&gt; <a href="checksums.txt">Click here for the checksums of all distribution
+<p><b>--&gt; <a href="checksums-13.44.txt">Click here for the checksums of all distribution
 packages</a>.</b></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="https://sourceforge.net/projects/exiftool/files/Image-ExifTool-13.36.tar.gz/download">
-Download        Version 13.36</a> (7.5 MB) -
-<a href="history.html">Sept. 9, 2025</a></b></td></tr></table></blockquote>
+<a href="https://sourceforge.net/projects/exiftool/files/Image-ExifTool-13.44.tar.gz/download">
+Download        Version 13.44</a> (7.6 MB) -
+<a href="history.html">Dec. 15, 2025</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -130,12 +132,14 @@ ExifTool supports many different metadata formats including
 <a href="TagNames/ID3.html">ID3</a>,
 <a href="TagNames/ID3.html#Lyrics3">Lyrics3</a>,
 as well as the maker notes of many digital cameras by
+<a href="TagNames/Apple.html">Apple</a>,
 <a href="TagNames/Canon.html">Canon</a>,
 <a href="TagNames/Casio.html">Casio</a>,
 <a href="TagNames/DJI.html">DJI</a>,
 <a href="TagNames/FLIR.html">FLIR</a>,
 <a href="TagNames/FujiFilm.html">FujiFilm</a>,
 <a href="TagNames/GE.html">GE</a>,
+<a href="TagNames/Google.html#HDRPMakerNote">Google</a>,
 <a href="TagNames/GoPro.html">GoPro</a>,
 <a href="TagNames/HP.html">HP</a>,
 <a href="TagNames/JVC.html">JVC/Victor</a>,
@@ -162,11 +166,11 @@ only, and do not include the HTML documentation or other files of the full
 distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td rowspan=2><b><a name="alone">Windows</a></b></td><td><b>
-32-bit: <a href="https://sourceforge.net/projects/exiftool/files/exiftool-13.36_32.zip/download">
-         exiftool-13.36_32.zip</a> (11.1 MB)</b></td></tr>
+32-bit: <a href="https://sourceforge.net/projects/exiftool/files/exiftool-13.44_32.zip/download">
+         exiftool-13.44_32.zip</a> (11.2 MB)</b></td></tr>
 <tr><td><b>64-bit:
-<a href="https://sourceforge.net/projects/exiftool/files/exiftool-13.36_64.zip/download">
-         exiftool-13.36_64.zip</a> (10.9 MB)</b></td></tr>
+<a href="https://sourceforge.net/projects/exiftool/files/exiftool-13.44_64.zip/download">
+         exiftool-13.44_64.zip</a> (11.0 MB)</b></td></tr>
          </table></blockquote>
 
 <p><b>The Windows executable</b> archives include Perl. Just download and un-zip
@@ -184,8 +188,8 @@ if you have any problems/comments with these versions.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="https://sourceforge.net/projects/exiftool/files/ExifTool-13.36.pkg/download">
-         ExifTool-13.36.pkg</a> (5.5 MB)</b></td></tr></table></blockquote>
+<a href="https://sourceforge.net/projects/exiftool/files/ExifTool-13.44.pkg/download">
+         ExifTool-13.44.pkg</a> (5.5 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
 libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
@@ -371,6 +375,7 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td><a href="TagNames/OOXML.html">DOTX, DOTM</a></td><td>R</td><td>Office Open XML Document Template [Macro-enabled]</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/DPX.html">DPX</a></td><td>R</td><td>Digital Picture Exchange</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/DPX.html">DPX</a></td></tr>
 <tr><td><a href="TagNames/CanonVRD.html#DR4">DR4</a></td><td>R/W/C<span class=sup>2</span></td><td>Canon DPP version 4 Recipe</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R/W/C <a href="TagNames/CanonVRD.html">CanonVRD</a><span class=sup>2</span></td></tr>
+<tr><td><a href="TagNames/DSF.html">DSF</a></td><td>R</td><td>DSD Stream File</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/DSF.html">DSF</a> <a href="TagNames/ID3.html">ID3</a> <a href="TagNames/ID3.html#Lyrics3">Lyrics3</a></td></tr>
 <tr><td><a href="TagNames/Olympus.html#DSS">DSS, DS2</a></td><td>R</td><td>Digital Speech Standard [2]</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Olympus.html#DSS">Olympus</a></td></tr>
 <tr><td><a href="TagNames/EXE.html#MachO">DYLIB</a></td><td>R</td><td>MacOS Mach-O executable and library files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/EXE.html#MachO">EXE</a></td></tr>
 <tr><td><a href="TagNames/DV.html">DV</a></td><td>R</td><td>Digital Video</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/DV.html">DV</a></td></tr>
@@ -421,11 +426,12 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td>K25</td><td>R</td><td>Kodak DC25 RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R</td><td>R</td><td>R</td><td>R</td><td>R</td><td>-</td></tr>
 <tr><td>KDC</td><td>R</td><td>Kodak Digital Camera RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R</td><td>R</td><td>R</td><td>R</td><td>R</td><td>R <a href="TagNames/Kodak.html">Kodak</a></td></tr>
 <tr><td><a href="TagNames/iWork.html">KEY, KTH</a></td><td>R</td><td>Apple iWork '09 Keynote presentation/Theme</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/iWork.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
+<tr><td><a href="TagNames/Kandao.html">KVAR</a></td><td>R</td><td>Kandao Video Asset Resource</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Kandao.html">KVAR</a></td></tr>
 <tr><td>LA</td><td>R</td><td>Lossless Audio (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td><a href="TagNames/Lytro.html">LFP, LFR</a></td><td>R</td><td>Lytro Light Field Picture</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Lytro.html">Lytro</a></td></tr>
 <tr><td><a href="TagNames/LIF.html">LIF</a></td><td>R</td><td>Leica Image File</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/LIF.html">LIF</a></td></tr>
 <tr><td><a href="TagNames/LNK.html">LNK</a></td><td>R</td><td>Microsoft Shell Link (Windows shortcut)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/LNK.html">LNK</a></td></tr>
-<tr><td>LRV</td><td>R/W</td><td>Low-Resolution Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W<span class=sup>3</span></td><td>R/W<span class=sup>3</span></td><td>R/W/C</td><td>-</td><td>-</td><td>R/W/C <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
+<tr><td>LRV, LRF</td><td>R/W</td><td>Low-Resolution Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W<span class=sup>3</span></td><td>R/W<span class=sup>3</span></td><td>R/W/C</td><td>-</td><td>-</td><td>R/W/C <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
 <tr><td><a href="TagNames/M2TS.html">M2TS, MTS, M2T, TS</a></td><td>R</td><td>MPEG-2 Transport Stream (used for AVCHD video)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/M2TS.html">M2TS</a> <a href="TagNames/H264.html">H264</a> <a href="TagNames/MISB.html">MISB</a></td></tr>
 <tr><td>M4A, M4B, M4P, M4V</td><td>R/W</td><td>MPEG-4 Audio/Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W<span class=sup>3</span></td><td>R/W<span class=sup>3</span></td><td>R/W/C</td><td>-</td><td>R/D</td><td>R/W/C <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
 <tr><td>MACOS</td><td>R</td><td>MacOS "._" sidecar file (may have any extension)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MacOS.html#XAttr">XAttr</a> <a href="TagNames/RSRC.html">RSRC</a></td></tr>
@@ -517,19 +523,23 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td><a href="TagNames/Torrent.html">TORRENT</a></td><td>R</td><td>BitTorrent description file</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Torrent.html">Torrent</a></td></tr>
 <tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td><a href="TagNames/Text.html">TXT</a></td><td>R</td><td>Text files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Text.html">Text</a></td></tr>
+<tr><td><a href="TagNames/LNK.html#INI">URL</a></td><td>R</td><td>Windows URL Link (INI format)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/LNK.html#INI">INI</a></td></tr>
 <tr><td><a href="TagNames/VCard.html">VCF, VCARD</a></td><td>R</td><td>Virtual Card</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html">VCard</a></td></tr>
 <tr><td>VNT</td><td>R</td><td>Scene7 Vignette (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
 <tr><td><a href="TagNames/VCard.html#VNote">VNT</a></td><td>R</td><td>V-Note document</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html#VNote">VNote</a></td></tr>
 <tr><td>VOB</td><td>R</td><td>Video Object (<a href="TagNames/MPEG.html">MPEG</a>-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a></td></tr>
 <tr><td><a href="TagNames/CanonVRD.html">VRD</a></td><td>R/W/C<span class=sup>2</span></td><td>Canon DPP Recipe Data</td><td>-</td><td>-</td><td>R/W/C</td><td>-</td><td>-</td><td>R/W/C <a href="TagNames/CanonVRD.html">CanonVRD</a><span class=sup>2</span></td></tr>
 <tr><td>VSD</td><td>R</td><td>Microsoft Visio Drawing (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>R</td><td>R</td><td>-</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
+<tr><td><a href="TagNames/OOXML.html">VSDX</a></td><td>R</td><td>Microsoft Visio Drawing XML</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td>WAV</td><td>R</td><td>Windows digital audio WAVeform (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td>WEBM</td><td>R</td><td>Google Web Movie (<a href="TagNames/Matroska.html">Matroska</a>-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Matroska.html">Matroska</a></td></tr>
 <tr><td>WEBP</td><td>R/W</td><td>Google Web Picture (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R/W/C</td><td>-</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td>WMA, WMV</td><td>R</td><td>Windows Media Audio/Video (<a href="TagNames/ASF.html">ASF</a>-based)</td><td>-</td><td>-</td><td>R</td><td>-</td><td>-</td><td>R <a href="TagNames/ASF.html">ASF</a></td></tr>
+<tr><td><a href="TagNames/Font.html">WOFF</a></td><td>R</td><td>Web Open Font Format</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
+<tr><td><a href="TagNames/Font.html">WOFF2</a></td><td>R</td><td>Web Open Font Format 2</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td><a href="TagNames/WPG.html">WPG</a></td><td>R</td><td>WordPerfect Graphics</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/WPG.html">WPG</a></td></tr>
 <tr><td><a href="TagNames/WTV.html">WTV</a></td><td>R</td><td>Windows recorded TV show</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/WTV.html">WTV</a></td></tr>
-<tr><td>WV</td><td>R</td><td>WavePack lossless audio (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
+<tr><td><a href="TagNames/WavPack.html">WV, WVP</a></td><td>R</td><td>WavPack audio</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/WavPack.html">WavPack</a> <a href="TagNames/RIFF.html">RIFF</a> <a href="TagNames/ID3.html">ID3</a> <a href="TagNames/ID3.html#Lyrics3">Lyrics3</a> <a href="TagNames/APE.html">APE</a></td></tr>
 <tr><td><a href="TagNames/SigmaRaw.html">X3F</a></td><td>R/W</td><td>Sigma/Foveon RAW</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W <a href="TagNames/Sigma.html">Sigma</a>, R <a href="TagNames/SigmaRaw.html">SigmaRaw</a></td></tr>
 <tr><td><a href="TagNames/GIMP.html">XCF</a></td><td>R</td><td>GIMP native image format</td><td>R</td><td>R</td><td>R</td><td>R</td><td>-</td><td>R <a href="TagNames/GIMP.html">GIMP</a></td></tr>
 <tr><td><a href="TagNames/XISF.html">XISF</a></td><td>R</td><td>Extensible Image Serialization Format</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/XISF.html">XISF</a></td></tr>
@@ -940,19 +950,19 @@ APP2, APP3, APP4, APP5, APP6, APP7, APP8, APP9, ASF, Audible, Canon,
 CanonVRD, Composite, DICOM, DjVu, DNG, Ducky, DV, EXE, EXIF, ExifTool, File,
 FITS, FLAC, Flash, FlashPix, FLIR, Font, FotoStation, GeoTiff, GIF, GIMP,
 GM, GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG,
-Jpeg2000, JSON, JUMBF, Leaf, LNK, Lytro, M2TS, MakerNotes, Matroska, Meta,
-MIE, MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, Ogg, OpenEXR, Opus, Palm,
-PanasonicRaw, Parrot, PDF, PhotoCD, PhotoMechanic, Photoshop, PICT, PLIST,
-PNG, PostScript, PrintIM, Protobuf, PSP, QuickTime, Radiance, RAF, Rawzor,
-Real, Red, RIFF, RSRC, RTF, SigmaRaw, Sony, Stim, SVG, Theora, Torrent,
-Trailer, VCard, Vorbis, WTV, XML, XMP, ZIP
+Jpeg2000, JSON, JUMBF, Kandao, Leaf, LNK, Lytro, M2TS, MakerNotes, Matroska,
+Meta, MIE, MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, Ogg, OpenEXR, Opus,
+Palm, PanasonicRaw, Parrot, PDF, PhotoCD, PhotoMechanic, Photoshop, PICT,
+PLIST, PNG, PostScript, PrintIM, Protobuf, PSP, QuickTime, Radiance, RAF,
+Rawzor, Real, Red, RIFF, RSRC, RTF, SigmaRaw, Sony, Stim, SVG, Theora,
+Torrent, Trailer, VCard, Vorbis, WTV, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td class=sm>AAC, AC3, Adobe, AdobeCM, AdobeDNG, AFCP, AIFF, APE, APP10, APP2, Apple,
-ASF, Audible, AudioItemList, AudioKeys, AudioUserData, AVI1, CameraIFD,
-Canon, CanonCustom, CanonDR4, CanonRaw, CanonVRD, Casio, CBOR, Chapter#,
-CIFF, Composite, DICOM, DJI, DjVu, DjVu-Meta, DNG, Ducky, DV, EPPIM, EXE,
-EXIF, ExifIFD, ExifTool, File, FITS, FLAC, Flash, FlashPix, FLIR, Font,
+<td class=sm>AAC, AC3, Adobe, AdobeCM, AdobeDNG, AFCP, AIFF, APE, APP2, Apple, AROT, ASF,
+Audible, AudioItemList, AudioKeys, AudioUserData, AVI1, CameraIFD, Canon,
+CanonCustom, CanonDR4, CanonRaw, CanonVRD, Casio, CBOR, Chapter#, CIFF,
+Composite, DICOM, DJI, DjVu, DjVu-Meta, DNG, Ducky, DV, EPPIM, EXE, EXIF,
+ExifIFD, ExifTool, File, FITS, FLAC, Flash, FlashPix, FLIR, Font,
 FotoStation, FujiFilm, FujiIFD, Garmin, GE, GeoTiff, GIF, GIMP,
 GlobParamIFD, GM, Google, GoPro, GPS, GraphConv, GSpherical, H264, HP, HTC,
 HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv,
@@ -960,10 +970,10 @@ ICC-chrm, ICC-cicp, ICC-clrt, ICC-header, ICC-meas, ICC-meta, ICC-view,
 ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4,
 IFD0, IFD1, InfiRay, Insta360, InteropIFD, IPTC, IPTC#, ISO, ITC, ItemList,
 iTunes, JFIF, JFXX, JPEG, JPEG-HDR, Jpeg2000, JPS, JSON, JUMBF, JVC,
-KDC_IFD, Keys, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
-KyoceraRaw, Leaf, LeafSubIFD, Leica, LNK, Lyrics3, Lytro, M-RAW, M2TS, MAC,
-MacOS, MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD,
-Microsoft, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+KDC_IFD, Keys, KFIX, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
+KSTB, KVAR, KyoceraRaw, Leaf, LeafSubIFD, Leica, LNK, Lyrics3, Lytro, M-RAW,
+M2TS, MAC, MacOS, MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta,
+MetaIFD, Microsoft, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
 MIE-Flash, MIE-Geo, MIE-GPS, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
 MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-UTM,
 MIE-Video, MIFF, Minolta, MinoltaRaw, MISB, MNG, MOBI, MOI, Motorola, MPC,
@@ -1506,6 +1516,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="https://itunes.apple.com/us/app/geotagster/id1180435565">GeoTagster</a>: Geotagging from GPX files ($0.99 paid app)</li>
 <li><a href="http://www.exifphotoworker.com/">Exif Photoworker</a>: Smart rename and organize your photos and videos in a few clicks</li>
 <li><a href="https://neededapps.com/metaimage/">MetaImage</a>: Reads, writes and edits your image metadata in a familiar interface</li>
+<li><a href="https://zalodesignstudio.com/portfolio/metascope/">MetaScope</a>: Professional metadata editor for photographers, digital asset managers, and creative teams</li>
 </ul>
 
 <p><b><a name="related_linux">Linux</a></b></p>
@@ -1550,6 +1561,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="https://github.com/JorgenMygindPilgaard/MemoryMate">MemoryMate</a>: Maintain photo and video metadata for family collections</li>
 <li><a href="https://blog.mapillary.com/update/2023/09/07/Mapillary-Desktop-Uploader-4.0.html">Mapillary Desktop Uploader</a>: Upload street-level imagery to an open platform database</li>
 <li><a href="https:/Digikam.org/">Digikam</a>: Open-source digital photo management</li>
+<li><a href="https://github.com/jabberjabberjabber/ImageIndexer">LLMII</a>: Locally Label Metadata and Index Images using AI</li>
 </ul>
 
 <p><b><a name="related_web">Web Browser</a></b></p>

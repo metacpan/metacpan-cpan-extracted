@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v3.3.26] - 2025-12-15
+
+### 🐛 Bug Fixes
+
+- Check for existence of files before deleting
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🚜 Refactor
+
+- *(spell)* Augment the spell tests
+- *(modules)* Convert to Path::Tiny from depreciated FindBin
+
+### 🧪 Testing
+
+- *(yath)* Run xt/ tests on --author
+- *(eol)* Ensure proper unix line-endings in all files
+- *(critic)* More detailed perlcritic tests for dist
+- *(versions)* Ensure that proper versions
+- *(tabs)* Ensure the use of spaces instead of tabs for indenting
+- *(strict)* Ensure the use of strict and warnings, or equivalents
+
+### 📚 Documentation
+
+- *(readme)* Add requirement for smartmontools package (as alien)
+
+## [release/2025/12/04/1056] - 2025-12-04
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v3.3.16] - 2025-12-04
 
 ### ⚙️ Miscellaneous Tasks

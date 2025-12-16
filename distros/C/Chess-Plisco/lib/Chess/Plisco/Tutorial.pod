@@ -60,24 +60,21 @@ first few are:
 
 =over
 
-=item * C<pawns> - one bitboard for the pawns (of both colors)
+=item * C<pawns> - one bitboard for the pawns (of both colours)
 
-=item * C<knights> - one bitboard for the knights (of both colors)
+=item * C<knights> - one bitboard for the knights (of both colours)
 
-=item * C<bishops> - one bitboard for the bishops (of both colors)
+=item * C<bishops> - one bitboard for the bishops (of both colours)
 
-=item * C<rooks> - one bitboard for the rooks (of both colors)
+=item * C<rooks> - one bitboard for the rooks (of both colours)
 
-=item * C<queens> - one bitboard for the queens (of both colors)
+=item * C<queens> - one bitboard for the queens (of both colours)
 
-=item * C<kings> - one bitboard for the kings (of both colors)
+=item * C<kings> - one bitboard for the kings (of both colours)
 
 =item * C<white_pieces> - one bitboard for the white pieces
 
 =item * C<black_pieces> - one bitboard for the black pieces
-
-=item * C<in_check> - one bitboard for all pieces giving check (of the color
-not to move)
 
 =back
 
@@ -115,7 +112,7 @@ for details.
 =head4 Extended Position Description EPD
 
 A similar notation to FEN is the L<https://en.wikipedia.org/wiki/Extended_Position_Description>.
-You can think of it as FEN with meta data.
+You can think of it as FEN with meta data but without move numbers.
 
 =head3 Coordinates and Squares
 
@@ -256,8 +253,8 @@ C<Chess::Plisco>:
 
 Unfortunately, these constants cannot be overridden in derived classes in an
 easy manner.  While C<$class->CP_KNIGHT_VALUE()> would produce the
-overridden value for the caller it would now for just C<CP_KNIGHT_VALUE>.
-Unfortunately, the latter is faster by orders of magnitude and therere the
+overridden value for the caller it would not for just C<CP_KNIGHT_VALUE>.
+Unfortunately, the latter is faster by orders of magnitude and therefore the
 former version is not used.
 
 =head3 Moves
@@ -269,29 +266,25 @@ move are:
 
 =over
 
-=item * 22 (21): side (0 for white, 1 for black) that moves
+=item * 1-3: piece that moves (resp. piece)
 
-=item * 19-21 (18-20): piece that gets captured if any
+=item * 4-6: piece that gets captured if any
 
-=item * 16-18 (15-17): piece that moves (resp. piece)
+=item * 7-9: promotion piece if any
 
-=item * 13-15 (12-14): promotion piece if any
+=item * 10-15: from shift (0-63)
 
-=item * 7-12 (6-11): from shift (0-63)
+=item * 16-21: to shift (0-63)
 
-=item * 1- 6 (0- 5): to shift (0-63)
+=item * 22: side (0 for white, 1 for black) that moves
+
+=item * 23: 1 for en-passant moves, 0 otherwise.
 
 =back
 
-I<The numbers in parentheses are the 0-based bit numbers.>
-
-Only bits 1 to 15 are really needed to characterize a move, and the bits
-13 to 15 are only needed for pawn promotions. The other bits can be
+Only bits 7 to 21 are really needed to characterize a move, and the bits
+7 to 9 are only needed for pawn promotions. The other bits can be
 derived from the position that the move is applied to.
-
-Please note that the piece that gets captured and the color are added by
-L<Chess::Plisco/doMove> to the move.  They are I<not> set, when calling
-L<Chess::Plisco/pseudoLegalMoves> or L<Chess::Plisco/pseudoLegalAttacks>! 
 
 The piece that moves, is the piece that stands on the
 starting square.
@@ -310,6 +303,14 @@ resp. inline functions for accessing individual properties:
 =item * C<cp_move_piece($move)>: the attacking piece
 
 =item * C<cp_move_captured($move)>: the captured piece if any
+
+=item * C<cp_move_colour($move)>: the colour that moves
+
+=item * C<cp_move_color($move)>: the colour that moves
+
+=item * C<cp_move_en_passant($move)>: the en-passant flag
+
+=item * C<cp_move_significant($move)>: the significant bits of a move
 
 =back
 
@@ -330,6 +331,8 @@ an assignment)! For this, use other macros:
 
 =back
 
+There are no macros for setting the colour or the en-passant flag.
+
 =head4 Parsing Moves
 
 The method C<parseMove()> can be used for creating a move.  It expects the
@@ -340,6 +343,8 @@ move in either:
 =item Coordinate Notation
 
 =item Standard Algebraic Notation (SAN)
+
+=item Long Algebraic Notation (LAN)
 
 =back
 
@@ -352,18 +357,23 @@ to a queen.
 Standard Algebraic Notation (SAN) is the notation conventionally used for
 describing chess games. You will find more information about it on the internet.
 
+Long Algebraic Coordination is similar to SAN but always gives the from and
+two square.
+
 Note that the move parser is very forgiving and accepts a lot of moves that
 are not complying with the standard.
 
 =head4 Making Moves Human-Readable
 
-The methods C<SAN> and C<moveCoordinateNotation> can be used to print a move in
-humand-readable format:
+The methods C<SAN>, C<LAN>, and C<moveCoordinateNotation> can be used to print
+a move in humand-readable format:
 
     $pos->SAN($move);
     # Nxe7#
+    $pos->LAN($move);
+    # Nf5xe7#
     $pos->moveCoordinateNotation($move);
-    # d6e7
+    # d5e7
 
 In general, you will prefer printing moves in Standard Algebraic Notation.
 
@@ -545,8 +555,8 @@ do not even need a loop.
 
 Most of the time, the bitboards you are dealing with are sparsely populated
 and it is advantageous to take the second approach.  Only in the exceptional
-case that you want to iterate over a bitboard with all pieces of one color
-or even all pieces of both colors, you are better off using the conventional
+case that you want to iterate over a bitboard with all pieces of one colour
+or even all pieces of both colours, you are better off using the conventional
 approach.
 
 =head2 Game Play
@@ -595,13 +605,8 @@ The other possibility is to undo all modifications made by applying the
 move.  This is, of course, more complicated but often faster than the brute
 force approach.
 
-L<Chess::Plisco> supports both approaches and currently the brute force
-approach seems to be faster (around 10-15 percent) but this maybe depends on
-the hardware or system.  The reason for that is that a shallow copy is
-sufficient for copying a L<Chess::Plisco> object which makes the copying really
-cheap, whereas undoing a move programmatically requires several dereferencings.
-
-But you are encouraged to try it out yourself.
+L<Chess::Plisco> uses the brute force approach because it is faster.  But
+this is considered an implementation detail.
 
 =head4 Undoing Moves Programmatically
 
@@ -610,28 +615,14 @@ This is done with C<undoMove()>:
     $state = $pos->doMove($move);
     $pos->undoMove($state);
 
-Not all recovery information can be stored in the move itself.  Therefore,
-you have to pass the state information returned from C<doMove()> as the
-argument to C<undoMove()>.
-
-The state information is an array reference containing all information needed
-to rever the position.  The first element of that array is the move itself
-but with the captured piece and the color on move updated.  This is
-important to know, when you use L<Chess::Plisco/pseudoLegalMoves> resp.
-L<Chess::Plisco/pseudoLegalAttacks> because these methods do B<not> set
-a possibly captured piece and the color that made the move.
-
 =head4 Undoing Moves By Copying the Position
 
-How you do this depends a little bit on your exact requirements.  It will
-probably look something like this:
+The state information is - at the moment - just a shallow copy of the position
+object and invoking undoMove is another way of saying:
 
-    $copy = bless [@$pos], 'Chess::Plisco'; # or $copy = $pos->copy;
-    $pos->do_move($move);
+    @$pos = @$state
 
-There is also a copy constructor C<copy()> but when you are really concerned
-about performance, then you probably choose the manual copying because it
-safes you a method call.
+Note that C<$pos> is still blessed after this operation.
 
 =head3 Playing Games in PGN Format
 
@@ -670,9 +661,9 @@ Therefore, the move generator in L<Chess::Plisco> works in two stages.
 The above example could be re-written like this:
 
     @moves = $pos->pseudoLegalMoves;
+    my @check_info = $pos->inCheck;
     foreach $move (@moves) {
-        $pos->doMove($move) or next;
-        $pos->undoMove($move);
+        $pos->checkPseudoLegalMove(@check_info) or next;
         print join '|', $pos->SAN($move), $pos->moveCoordinateNotation($move);
     }
 
@@ -682,7 +673,9 @@ may be exited early (this will often happen in chess engines), then these
 extra checks are a waste of time, when you never actually consider the move.
 
 What exactly is a pseudo-legal move is implementation dependent and you should
-not rely on the current implementation.
+not rely on the current implementation. At the moment, it includes all moves
+that are possible by the movement patterns of the pieces but leave the
+king in check.
 
 =head3 Visualizing Bitboards
 
@@ -697,14 +690,20 @@ There is also a method C<dumpAll()> which dumps all bitboards at once.
 
 Finding out whether the side to move is in check, can be done like this:
 
-    $checkers = $pos->[CP_POS_IN_CHECK];
-    # or: $checkers = cp_pos_in_check $pos;
+    $checkers = $pos->inCheck;
     if ($checkers) {
         print "pieces giving check: ", $pos->dumpBitboard($checkers);
     }
 
 In fact, what you get is not a boolean flag but a bitboard with the pieces
 that are giving check.
+
+You can get more information in array context:
+
+    ($checkers, $king_shift, $defence_bb) = $pos->inCheck;
+
+The king shift is the position of the (attacked) king. The defence bitboard
+is a bitboard where any piece may defend the check.
 
 =head3 Checking for Pieces
 
@@ -722,22 +721,22 @@ If you want to know whether it is a white king, you go like this:
     $is_king = $mask & ($pos->[CP_POS_WHITE_PIECES] & $pos->[CP_POS_KINGS]);
     # or: $is_king = $mask & (cp_pos_white_pieces($pos) & cp_pos_kings($pos));
 
-If you want to also check for the color, you additionally have to do the
+If you want to also check for the colour, you additionally have to do the
 bitwise AND of the white or black bitboard.
 
 Finding out which piece is on a particular location can also be done with
 dedicated methods:
 
-    ($piece, $color) = $pos->pieceAtSquare('e4');
-    ($piece, $color) = $pos->pieceAtCoordinates(4, 3);
-    ($piece, $color) = $pos->pieceAtShift(27);
+    ($piece, $colour) = $pos->pieceAtSquare('e4');
+    ($piece, $colour) = $pos->pieceAtCoordinates(4, 3);
+    ($piece, $colour) = $pos->pieceAtShift(27);
     $piece = $pos->pieceAtSquare('e4');
     $piece = $pos->pieceAtCoordinates(4, 3);
     $piece = $pos->pieceAtShift(27);
 
-In array context, you get the piece and the color, in scalar context just the
+In array context, you get the piece and the colour, in scalar context just the
 piece.  The piece is one of C<CP_NO_PIECE>, C<CP_PAWN>, C<CP_KNIGHT>, C<CP_BISHOP>,
-C<CP_QUEEN>, or C<CP_KING>, and the color one of C<CP_WHITE>, C<CP_BLACK>,
+C<CP_QUEEN>, or C<CP_KING>, and the colour one of C<CP_WHITE>, C<CP_BLACK>,
 or C<undef> if there is no piece at all at the specified location.
 
 =head3 Castling State
@@ -797,23 +796,8 @@ the king, and a knight can jump over other pieces.
 
 =back
 
-This information is always stored in a L<Chess::Plisco> object:
-
-    $evasion_strategy = cp_pos_evasion $pos;
-    if (CP_EVASION_KING_MOVE == $evasion_strategy) {
-        say "king must move";
-    } elsif (CP_EVASION_CAPTURE == $evasion_strategy) {
-        say "king can move or piece giving check can be captured";
-    } elsif (CP_EVASION_ALL == $evasion_strategy) {
-        say "king can move, piece can be captured, or check can be blocked:",
-            $pos->dumpBitboard(cp_pos_evasion_squares($pos));
-    }
-
-Remember that the item at C<CP_POS_IN_CHECK> gives you a bitboard with all
+Remember that the method C<inCheck()> gives you a bitboard with all
 pieces giving check.  Alternatively, you can use the macro C<cp_pos_in_check>.
-
-The bitboard at C<CP_POS_EVASION_SQUARES> has bits set for all pieces giving
-check.
 
 =head2 Various Tricks
 
@@ -851,33 +835,6 @@ Alternatively with macros:
         # En-passant.
     }
 
-=head3 Is a Move an En-Passant Capture?
-
-With or without macros this can be done as follows:
-
-    ($piece, $from, $to) =
-        ($pos->movePiece($move), $pos->moveFrom($move), $pos->moveTo($move));
-    $ep_shift = $pos->enPassantShift;
-    if ($ep_shift && $piece == CP_PAWN
-        && ($from - $to) & 0x && $to == $ep_shift) {
-        # En-passant.
-    }
-
-Alternatively with macros:
-
-    ($piece, $from, $to) =
-        (cp_move_piece($move), cp_move_from($move), $cp_move_to($move));
-    $ep_shift = cp_pos_en_passant_shift $pos;
-    if ($ep_shift && $piece == CP_PAWN
-        && ($from - $to) & 0x && $to == $ep_shift) {
-        # En-passant.
-    }
-
-It is crucial to check that en-passant is actually possible.  Otherwise you
-will miss an important edge case.  A black pawn can possibly capture a piece
-on "h1".  But the shift of "h1" is 0 and you must therefore check that the
-en-passant shift of the current position is not 0.
-
 =head3 Is a Move a Castling?
 
 Castlings are all king moves from "e1" to "c1" or "g1", or on the other side
@@ -898,12 +855,12 @@ destination square is two or minus two.  And that can be done a lot faster:
         # It is a castling.
     }
 
-=head3 Toggling Color
+=head3 Toggling Colour
 
 C<CP_WHITE> is defined as 0 and C<CP_BLACK> is defined as 1.  Therefore,
-toggling a color is as easy as:
+toggling a colour is as easy as:
 
-    $color = !$color; # because CP_WHITE == !CP_BLACK
+    $colour = !$colour; # because CP_WHITE == !CP_BLACK
 
 =head3 Accessing the Bitboard for a Certain Piece
 
@@ -940,7 +897,7 @@ and C<CP_BLACK> as 1.  The above code can therefore be shorted a lot:
     $their_pieces = $pos->[CP_POS_WHITE_PIECES + !$pos->toMove];
 
 Remember that a negated 0 is a 1, and a negated 1 is a 0, see
-L</Toggling Color> above.
+L</Toggling Colour> above.
 
 =head3 Understanding C<rMagic> and C<bMagic>
 
@@ -963,7 +920,7 @@ lowercase letters standing for black pieces):
       a b c d e f g h
 
 How can that bishop move? It can reach d3 but not c2 because that is occupied
-by a pawn of the same color.  It can reach d5 B<and> c6 because c6 is
+by a pawn of the same colour.  It can reach d5 B<and> c6 because c6 is
 occupied by an opponent's piece.  The other squares are f5, g6, h7, f3, and
 g2.
 
@@ -989,7 +946,7 @@ It prints out:
 
 Almost correct but the white pawn on c2 is included which is not possible
 because the bishop cannot capture its own pawn.  In order to get the correct
-result you have to mask out the pieces of the same color:
+result you have to mask out the pieces of the same colour:
 
     $fen = 'r1k2b1r/1p6/2n2n2/8/4B3/8/1PP4P/2K2NBR w - - 0 1';
     $pos = Chess::Plisco->new($fen);

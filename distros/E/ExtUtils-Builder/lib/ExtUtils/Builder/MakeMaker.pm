@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MakeMaker;
-$ExtUtils::Builder::MakeMaker::VERSION = '0.018';
+$ExtUtils::Builder::MakeMaker::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -7,6 +7,7 @@ our @ISA;
 
 use ExtUtils::MakeMaker 6.68;
 use ExtUtils::Builder::Planner;
+use ExtUtils::Builder::Util 'unix_to_native_path';
 use ExtUtils::Config::MakeMaker;
 use ExtUtils::Manifest ();
 use version ();
@@ -41,6 +42,7 @@ sub postamble {
 
 	my $planner = ExtUtils::Builder::Planner->new;
 	$planner->add_delegate('makemaker', sub { $maker });
+	$planner->load_extension('ExtUtils::Builder::CPAN::Tool');
 	my $config = ExtUtils::Config::MakeMaker->new($maker);
 	$planner->add_delegate('config', sub { $config });
 	$planner->add_delegate('distribution', sub { $maker->{DIST_NAME} });
@@ -48,29 +50,9 @@ sub postamble {
 	$planner->add_delegate('main_module', sub { $maker->{NAME} });
 	$planner->add_delegate('pureperl_only', sub { $maker->{PUREPERL_ONLY} });
 	$planner->add_delegate('perl_path', sub { $maker->{ABSPERLRUN} });
-	$planner->add_delegate('verbose', sub { !!0 });
 	$planner->add_delegate('uninst', sub { $maker->{UNINST} });
-	$planner->add_delegate('meta', sub { CPAN::Meta->load_file('META.json') });
-	$planner->add_delegate('release_status', sub { CPAN::Meta->load_file('META.json')->release_status });
-	$planner->add_delegate('jobs', sub { 1 });
 
-	$planner->add_delegate('is_os', sub {
-		my ($self, @wanted) = @_;
-		return not not grep { $_ eq $^O } @wanted
-	});
-	$planner->add_delegate('is_os_type', sub {
-		my ($self, $wanted) = @_;
-		require Perl::OSType;
-		return Perl::OSType::is_os_type($wanted);
-	});
-
-	$planner->add_delegate('new_planner', sub {
-		my $inner = ExtUtils::Builder::Planner->new;
-		$inner->add_delegate('config', sub { $config });
-		return $inner;
-	});
-
-	$planner->add_seen($_) for sort keys %{ ExtUtils::Manifest::maniread() };
+	$planner->add_seen(unix_to_native_path($_)) for sort keys %{ ExtUtils::Manifest::maniread() };
 
 	$maker->make_plans($planner, %args) if $maker->can('make_plans');
 	for my $file (glob 'planner/*.pl') {
@@ -104,7 +86,7 @@ ExtUtils::Builder::MakeMaker - A MakeMaker consumer for ExtUtils::Builder Plan o
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -124,11 +106,11 @@ version 0.018
 
 =head1 DESCRIPTION
 
-This MakeMaker extension will call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can add entries to it; these entries will be added to your Makefile. It will also call any C<.pl> files in C</planner> as DSL files, these are run in a new scope so delegates don't leak out. Entries may depend on existing MakeMaker entries and vice-versa. Typically one would make their target a dependency of a MakeMaker entry like C<pure_all> or C<dynamic>.
+This MakeMaker extension will call any C<.pl> files in C</planner> as DSL files, these are run in a new scope so delegates don't leak out; these entries will be added to your Makefile.. It will also call your C<MY::make_plans> method with a L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner> as argument so that you can customize the build in the F<Makefile.PL> itself. Typically one would make their target a dependency of a MakeMaker entry like C<code> (for perl) or C<dynamic> (for XS).
 
 =head1 DELEGATES
 
-By default, the following delegates are defined on your L<planner|ExtUtils::Builder::Planner>:
+This will define all delegates of L<ExtUtils::Builder::CPAN::Tool> in your L<planner|ExtUtils::Builder::Planner>:
 
 =over 4
 

@@ -1,5 +1,11 @@
 This file documents the revision history for Perl extension Log::Any::Adapter::MojoLog.
 
+0.05 2025-12-15
+  - Bump Mojolicious requirement to 9.20
+  - Mojo's "new" trace method points to Log::Any's trace method
+  - Remove some back-compat code
+  - Improve performance slightly
+
 0.04 2018-09-21
   - Fix tests for Mojolicious 8.0
 

@@ -1,3 +1,4 @@
+requires 'perl' => '5.014';
 requires 'Bitcoin::Crypto' => '4.000';
 requires 'Text::QRCode' => 0;
 requires 'List::Util' => '1.29';

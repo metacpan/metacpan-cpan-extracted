@@ -1,7 +1,9 @@
-use v5.14.0;
-package JMAP::Tester::Logger 0.107;
+use v5.20.0;
+package JMAP::Tester::Logger 0.108;
 
 use Moo::Role;
+
+use experimental 'signatures';
 
 use JMAP::Tester::LogWriter;
 use Params::Util qw(_CODELIKE _HANDLE _SCALAR0);
@@ -43,8 +45,7 @@ has writer => (
   required => 1,
 );
 
-sub write {
-  my ($self, $string) = @_;
+sub write ($self, $string) {
   $self->writer->write( $string );
 }
 
@@ -71,7 +72,7 @@ JMAP::Tester::Logger
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 PERL VERSION
 

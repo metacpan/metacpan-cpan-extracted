@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::QuickTime;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessGoPro($$$);
 sub ProcessString($$$);
@@ -251,7 +251,8 @@ my %noYes = ( N => 'No', Y => 'Yes' );
         Notes => 'gyroscope readings in rad/s',
         Binary => 1,
     },
-    HCLT => 'HorizonControl', #3
+    LOGS => 'HealthLogs',
+    HCTL => 'HorizonControl', #3
     HDRV => { Name => 'HDRVideo', PrintConv => \%noYes }, #3/PH (NC)
   # HFLG (APP6) - seen: 0
     HSGT => 'HindsightSettings', #3
@@ -409,6 +410,7 @@ my %noYes = ( N => 'No', Y => 'Yes' );
     },
   # TOCK => { Name => 'OutTime', Unknown => 1, ValueConv => '$val/1000' }, #1 (gpmd)
     TSMP => { Name => 'TotalSamples', Unknown => 1 }, #2 (gpmd)
+    TIMO => 'TimeOffset',
     TYPE => { Name => 'StructureType', Unknown => 1 }, #2 (gpmd,GPMF - eg 'LLLllfFff', fmt c)
     TZON => { # (GPMF) - seen: 60 (fmt s)
         Name => 'TimeZone',
@@ -469,7 +471,8 @@ my %noYes = ( N => 'No', Y => 'Yes' );
     AALP => { Name => 'AudioLevel', Notes => 'dBFS' },
     GPSA => 'GPSAltitudeSystem', # (eg. 'MSLV')
     GRAV => { Name => 'GravityVector', Binary => 1 },
-    HUES => 'PrediminantHue',
+    # DISP - Disparity track
+    HUES => 'PredominantHue',
     IORI => { Name => 'ImageOrientation', Binary => 1, Notes => 'quaternions 0-1' },
     # LRVO - ? Part of LRV Frame Skip
     # LRVS - ? Part of LRV Frame Skip
@@ -485,7 +488,7 @@ my %noYes = ( N => 'No', Y => 'Yes' );
 %Image::ExifTool::GoPro::GPS5 = (
     PROCESS_PROC => \&ProcessString,
     GROUPS => { 1 => 'GoPro', 2 => 'Location' },
-    VARS => { HEX_ID => 0, ID_LABEL => 'Index' },
+    VARS => { ID_FMT => 'dec', ID_LABEL => 'Index' },
     0 => { # (unit='deg')
         Name => 'GPSLatitude',
         PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
@@ -514,7 +517,7 @@ my %noYes = ( N => 'No', Y => 'Yes' );
 %Image::ExifTool::GoPro::GPS9 = (
     PROCESS_PROC => \&ProcessString,
     GROUPS => { 1 => 'GoPro', 2 => 'Location' },
-    VARS => { HEX_ID => 0, ID_LABEL => 'Index' },
+    VARS => { ID_FMT => 'dec', ID_LABEL => 'Index' },
     0 => { # (unit='deg')
         Name => 'GPSLatitude',
         PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
@@ -563,7 +566,7 @@ my %noYes = ( N => 'No', Y => 'Yes' );
 %Image::ExifTool::GoPro::GPRI = (
     PROCESS_PROC => \&ProcessString,
     GROUPS => { 1 => 'GoPro', 2 => 'Location' },
-    VARS => { HEX_ID => 0, ID_LABEL => 'Index' },
+    VARS => { ID_FMT => 'dec', ID_LABEL => 'Index' },
     0 => { # (unit='s')
         Name => 'GPSDateTimeRaw',
         Groups => { 2 => 'Time' },
@@ -595,7 +598,7 @@ my %noYes = ( N => 'No', Y => 'Yes' );
 %Image::ExifTool::GoPro::GLPI = (
     PROCESS_PROC => \&ProcessString,
     GROUPS => { 1 => 'GoPro', 2 => 'Location' },
-    VARS => { HEX_ID => 0, ID_LABEL => 'Index' },
+    VARS => { ID_FMT => 'dec', ID_LABEL => 'Index' },
     0 => { # (unit='s')
         Name => 'GPSDateTime',
         Groups => { 2 => 'Time' },
@@ -626,7 +629,7 @@ my %noYes = ( N => 'No', Y => 'Yes' );
 %Image::ExifTool::GoPro::KBAT = (
     PROCESS_PROC => \&ProcessString,
     GROUPS => { 1 => 'GoPro', 2 => 'Camera' },
-    VARS => { HEX_ID => 0, ID_LABEL => 'Index' },
+    VARS => { ID_FMT => 'dec', ID_LABEL => 'Index' },
     NOTES => 'Battery status information found in GoPro Karma videos.',
      0 => { Name => 'BatteryCurrent',  PrintConv => '"$val A"' },
      1 => { Name => 'BatteryCapacity', PrintConv => '"$val Ah"' },

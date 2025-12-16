@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Macro;
-$Chess::Plisco::Macro::VERSION = 'v0.8.0';
+$Chess::Plisco::Macro::VERSION = 'v1.0.0';
 use strict;
 
 use Filter::Util::Call;
@@ -45,151 +45,104 @@ _define cp_pos_rooks => '$p', '$p->[CP_POS_ROOKS]';
 sub cp_pos_rooks {}
 _define cp_pos_kings => '$p', '$p->[CP_POS_KINGS]';
 sub cp_pos_kings {}
-_define cp_pos_half_move_clock => '$p', '$p->[CP_POS_HALF_MOVE_CLOCK]';
-sub cp_pos_half_move_clock {}
-_define cp_pos_in_check => '$p', '$p->[CP_POS_IN_CHECK]';
-sub cp_pos_in_check {}
-_define cp_pos_half_moves => '$p', '$p->[CP_POS_HALF_MOVES]';
-sub cp_pos_half_moves {}
+_define cp_pos_halfmoves => '$p', '$p->[CP_POS_HALFMOVES]';
+sub cp_pos_halfmoves {}
 _define cp_pos_signature => '$p', '$p->[CP_POS_SIGNATURE]';
 sub cp_pos_signature {}
-_define cp_pos_info => '$p', '$p->[CP_POS_INFO]';
-sub cp_pos_info {}
-_define cp_pos_reversible_clock => '$p', '$p->[CP_POS_REVERSIBLE_CLOCK]';
-sub cp_pos_reversible_clock {}
-
-_define cp_pos_info_castling_rights => '$i', '$i & 0xf';
-sub cp_pos_info_castling_rights {}
-_define cp_pos_info_white_king_side_castling_right => '$i', '$i & (1 << 0)';
-sub cp_pos_info_white_king_side_castling_right {}
-_define cp_pos_info_white_queen_side_castling_right => '$i', '$i & (1 << 1)';
-sub cp_pos_info_white_queen_side_castling_right {}
-_define cp_pos_info_black_king_side_castling_right => '$i', '$i & (1 << 2)';
-sub cp_pos_info_black_king_side_castling_right {}
-_define cp_pos_info_black_queen_side_castling_right => '$i', '$i & (1 << 3)';
-sub cp_pos_info_black_queen_side_castling_right {}
-_define cp_pos_info_to_move => '$i', '(($i & (1 << 4)) >> 4)';
-sub cp_pos_info_to_move {}
-_define cp_pos_info_en_passant_shift => '$i', '(($i & (0x3f << 5)) >> 5)';
-sub cp_pos_info_en_passant_shift {}
-_define cp_pos_info_king_shift => '$i', '(($i & (0x3f << 11)) >> 11)';
-sub cp_pos_info_king_shift {}
-_define cp_pos_info_evasion => '$i', '(($i & (0x3 << 17)) >> 17)';
-sub cp_pos_info_evasion {}
-_define cp_pos_info_material => '$i', '($i >> 19)';
-sub cp_pos_info_material {}
-
-_define _cp_pos_info_set_castling => '$i', '$c',
-	'($i = ($i & ~0xf) | $c)';
-_define _cp_pos_info_set_white_king_side_castling_right => '$i', '$c',
-	'($i = ($i & ~(1 << 0)) | ($c << 0))';
-_define _cp_pos_info_set_white_queen_side_castling_right => '$i', '$c',
-	'($i = ($i & ~(1 << 1)) | ($c << 1))';
-_define _cp_pos_info_set_black_king_side_castling_right => '$i', '$c',
-	'($i = ($i & ~(1 << 2)) | ($c << 2))';
-_define _cp_pos_info_set_black_queen_side_castling_right => '$i', '$c',
-	'($i = ($i & ~(1 << 3)) | ($c << 3))';
-_define _cp_pos_info_set_to_move => '$i', '$c',
-	'($i = ($i & ~(1 << 4)) | ($c << 4))';
-_define _cp_pos_info_set_en_passant_shift => '$i', '$s',
-	'($i = ($i & ~(0x3f << 5)) | ($s << 5))';
-_define _cp_pos_info_set_king_shift => '$i', '$s',
-	'($i = ($i & ~(0x3f << 11)) | ($s << 11))';
-_define _cp_pos_info_set_evasion => '$i', '$e',
-	'($i = ($i & ~(0x3 << 17)) | ($e << 17))';
-_define _cp_pos_info_set_material => '$i', '$m',
-	'($i = (($i & 0x7fffffff) | ($m << 19)))';
-
-_define_from_file _cp_pos_info_update => '$p', '$i' => 'infoUpdate.pm';
-
-_define cp_pos_castling_rights => '$p',
-		'(cp_pos_info_castling_rights(cp_pos_info($p)))';
+_define cp_pos_last_move => '$p', '$p->[CP_POS_LAST_MOVE]';
+sub cp_pos_last_move {}
+_define cp_pos_castling_rights => '$p', '$p->[CP_POS_CASTLING_RIGHTS]';
 sub cp_pos_castling_rights {}
 _define cp_pos_white_king_side_castling_right => '$p',
-		'(cp_pos_info_white_king_side_castling_right(cp_pos_info($p)))';
+		'($p->[CP_POS_CASTLING_RIGHTS] & 1)';
 sub cp_pos_white_king_side_castling_right {}
 _define cp_pos_white_queen_side_castling_right => '$p',
-		'(cp_pos_info_white_queen_side_castling_right(cp_pos_info($p)))';
+		'(($p->[CP_POS_CASTLING_RIGHTS] & 2))';
 sub cp_pos_white_queen_side_castling_right {}
 _define cp_pos_black_king_side_castling_right => '$p',
-		'(cp_pos_info_black_king_side_castling_right(cp_pos_info($p)))';
+		'(($p->[CP_POS_CASTLING_RIGHTS] & 4))';
 sub cp_pos_black_king_side_castling_right {}
 _define cp_pos_black_queen_side_castling_right => '$p',
-		'(cp_pos_info_black_queen_side_castling_right(cp_pos_info($p)))';
+		'($p->[CP_POS_CASTLING_RIGHTS] & 8)';
 sub cp_pos_black_queen_side_castling_right {}
-_define cp_pos_to_move => '$p', '(cp_pos_info_to_move(cp_pos_info($p)))';
+_define cp_pos_turn => '$p', '$p->[CP_POS_TURN]';
+sub cp_pos_turn {}
+_define cp_pos_to_move => '$p', '$p->[CP_POS_TURN]';
 sub cp_pos_to_move {}
-_define cp_pos_en_passant_shift => '$p', '(cp_pos_info_en_passant_shift(cp_pos_info($p)))';
+_define cp_pos_en_passant_shift => '$p', '$p->[CP_POS_EN_PASSANT_SHIFT]';
 sub cp_pos_en_passant_shift {}
-_define cp_pos_king_shift => '$p', '(cp_pos_info_king_shift(cp_pos_info($p)))';
-sub cp_pos_king_shift {}
-_define cp_pos_evasion => '$p', '(cp_pos_info_evasion(cp_pos_info($p)))';
-sub cp_pos_evasion {}
-_define cp_pos_material => '$p', '(cp_pos_info_material(cp_pos_info($p)))';
+_define cp_pos_halfmove_clock => '$p', '$p->[CP_POS_HALFMOVE_CLOCK]';
+sub cp_pos_halfmove_clock {}
+_define cp_pos_material => '$p', '$p->[CP_POS_MATERIAL]';
 sub cp_pos_material {}
 
-_define _cp_pos_set_castling => '$p', '$c',
-	'(_cp_pos_info_set_castling(cp_pos_info($p), $c))';
-_define _cp_pos_set_white_king_side_castling_right => '$p', '$c',
-	'(_cp_pos_info_set_white_king_side_castling_right(cp_pos_info($p), $c))';
-_define _cp_pos_set_white_queen_side_castling_right => '$p', '$c',
-	'(_cp_pos_info_set_white_queen_side_castling_right(cp_pos_info($p), $c))';
-_define _cp_pos_set_black_king_side_castling_right => '$p', '$c',
-	'(_cp_pos_info_set_black_king_side_castling_right(cp_pos_info($p), $c))';
-_define _cp_pos_set_black_queen_side_castling_right => '$p', '$c',
-	'(_cp_pos_info_set_black_queen_side_castling_right(cp_pos_info($p), $c))';
-_define _cp_pos_set_to_move => '$p', '$c',
-	'(_cp_pos_info_set_to_move(cp_pos_info($p), $c))';
-_define _cp_pos_set_en_passant_shift => '$p', '$s',
-	'(_cp_pos_info_set_en_passant_shift(cp_pos_info($p), $s))';
-_define _cp_pos_set_king_shift => '$p', '$s',
-	'(_cp_pos_info_set_king_shift(cp_pos_info($p), $s))';
-_define _cp_pos_set_evasion => '$p', '$e',
-	'(_cp_pos_info_set_evasion(cp_pos_info($p), $e))';
-_define _cp_pos_set_material => '$p', '$m',
-	'(_cp_pos_info_set_material(cp_pos_info($p), $m))';
+# Bits of a move:
+#
+# - moving piece (3 bits)
+# - captured piece (3 bits)
+# - promotion (3 bits)
+# - colour (1 bit)
+# - from (6 bits)
+# - to (6 bits)
+# - en passant flag (1 bit)
+#
+# When ordering moves we often want to use the combination of attacker, victim,
+# and optionally promotion as an index into lookup tables. We want to do just
+# a bitwise AND and not a shift followed by a bitwise and for it.
 
-_define cp_pos_evasion_squares => '$p', '$p->[CP_POS_EVASION_SQUARES]';
-sub cp_pos_evasion_squares {}
-
-_define cp_move_to => '$m', '(($m) & 0x3f)';
-sub cp_move_to {}
-_define cp_move_set_to => '$m', '$v', '(($m) = (($m) & ~0x3f) | (($v) & 0x3f))';
-sub cp_move_set_to {}
-_define cp_move_from => '$m', '(($m >> 6) & 0x3f)';
-sub cp_move_from {}
-_define cp_move_set_from => '$m', '$v',
-		'(($m) = (($m) & ~0xfc0) | (($v) & 0x3f) << 6)';
-sub cp_move_set_from {}
-_define cp_move_promote => '$m', '(($m >> 12) & 0x7)';
-sub cp_move_promote {}
-_define cp_move_set_promote => '$m', '$p',
-		'(($m) = (($m) & ~0x7000) | (($p) & 0x7) << 12)';
-sub cp_move_set_promote {}
-_define cp_move_piece => '$m', '(($m >> 15) & 0x7)';
+_define cp_move_piece => '$m', '(($m) & 0x7)';
 sub cp_move_piece {}
 _define cp_move_set_piece => '$m', '$a',
-		'(($m) = (($m) & ~0x38000) | (($a) & 0x7) << 15)';
+		'(($m) = (($m) & ~0x7) | ($a))';
 sub cp_move_set_piece {}
-_define cp_move_captured => '$m', '(($m >> 18) & 0x7)';
+
+_define cp_move_captured => '$m', '((($m) >> 3) & 0x7)';
 sub cp_move_captured {}
-_define cp_move_set_captured => '$m', '$a',
-		'(($m) = (($m) & ~0x1c0000) | (($a) & 0x7) << 18)';
+_define cp_move_set_captured => '$m', '$c',
+		'(($m) = (($m) & ~0x38) | (($c)) << 3)';
 sub cp_move_set_captured {}
-_define cp_move_color => '$m', '(($m >> 21) & 0x1)';
+
+_define cp_move_promote => '$m', '((($m) >> 6) & 0x7)';
+sub cp_move_promote {}
+_define cp_move_set_promote => '$m', '$p',
+		'(($m) = (($m) & ~0x1c0) | (($p)) << 6)';
+sub cp_move_set_promote {}
+
+_define cp_move_from => '$m', '((($m) >> 9) & 0x3f)';
+sub cp_move_from {}
+_define cp_move_set_from => '$m', '$f',
+		'(($m) = (($m) & ~0x7e00) | (($f)) << 9)';
+sub cp_move_set_from {}
+
+_define cp_move_to => '$m', '((($m) >> 15) & 0x3f)';
+sub cp_move_to {}
+_define cp_move_set_to => '$m', '$t',
+		'(($m) = (($m) & ~0x1f8000) | (($t)) << 15)';
+sub cp_move_set_to {}
+
+_define cp_move_colour => '$m', '((($m) >> 21) & 0x1)';
+sub cp_move_colour {}
+_define cp_move_set_colour => '$m', '$c',
+		'(($m) = (($m) & ~0x200000) | (($c)) << 21)';
+_define cp_move_color => '$m', '((($m) >> 21) & 0x1)';
 sub cp_move_color {}
 _define cp_move_set_color => '$m', '$c',
-		'(($m) = (($m) & ~0x20_0000) | (($c) & 0x1) << 21)';
-sub cp_move_set_captured {}
+		'(($m) = (($m) & ~0x200000) | (($c)) << 21)';
+
+_define cp_move_en_passant => '$m', '((($m) >> 22) & 0x1)';
+sub cp_move_en_passant {}
+_define cp_move_set_en_passant => '$m', '$e',
+		'(($m) = (($m) & ~0x400000) | (($e) & 0x1) << 22)';
+
 _define cp_move_coordinate_notation => '$m', 'cp_shift_to_square(cp_move_from $m) . cp_shift_to_square(cp_move_to $m) . CP_PIECE_CHARS->[CP_BLACK]->[cp_move_promote $m]';
 sub cp_move_coordinate_notation {}
-_define cp_move_significant => '$m', '($m & 0x7fff)';
+
+_define cp_move_significant => '$m', '(($m) & 0x1fffc0)';
 sub cp_move_significant {}
+
 _define cp_move_equivalent => '$m1', '$m2',
 		'(cp_move_significant($m1) == cp_move_significant($m2))';
 sub cp_move_equivalent {}
-_define cp_move_capture_or_promotion => '$m', '($m & 0x1c7000)';
-sub cp_move_capture_or_promotion {}
 
 # Bitboard macros.
 _define cp_bitboard_popcount => '$b', '$c',
@@ -232,13 +185,12 @@ sub cp_square_to_shift {}
 _define cp_shift_to_square => '$s', 'chr(97 + ($s & 0x7)) . (1 + ($s >> 3))';
 sub cp_shift_to_square {}
 
-_define_from_file _cp_moves_from_mask => '$t', '@m', '$b',
-	'movesFromMask.pm';
+_define_from_file _cp_moves_from_mask => '$t', '@m', '$b', 'movesFromMask.pm';
 _define_from_file _cp_promotion_moves_from_mask => '$t', '@m', '$b',
 	'promotionMovesFromMask.pm';
 _define_from_file _cp_pos_move_pinned =>
 	'$p', '$from', '$to', '$ks', '$mp', '$hp', 'movePinned.pm';
-_define_from_file _cp_pos_color_attacked => '$p', '$c', '$shift', 'attacked.pm';
+_define_from_file _cp_pos_colour_attacked => '$p', '$c', '$shift', 'attacked.pm';
 _define_from_file _cp_pos_move_attacked => '$p', '$from', '$to', 'moveAttacked.pm';
 _define _cp_pawn_double_step => '$f', '$t', '(!(($t - $f) & 0x9))';
 
@@ -252,6 +204,8 @@ _define cp_max => '$A', '$B', '((($A) > ($B)) ? ($A) : ($B))';
 sub cp_max {}
 _define cp_min => '$A', '$B', '((($A) < ($B)) ? ($A) : ($B))';
 sub cp_min {}
+
+_define cp_clamp => '$v', '$lo', '$hi', '($v) < ($lo) ? ($lo) : ($v) > ($hi) ? ($hi) : ($v)';
 
 # Zobrist keys.
 _define _cp_zk_lookup => '$p', '$c', '$s', '$zk_pieces[((($p) << 7) | (($c) << 6) | ($s)) - 128]';

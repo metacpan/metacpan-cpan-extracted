@@ -45,11 +45,11 @@
             "SPVM::Getopt::Long" : "0.003",
             "SPVM::IO" : "0.243",
             "SPVM::IO::Socket::SSL" : "0.014",
-            "SPVM::JSON" : "1.002",
+            "SPVM::JSON" : "1.003",
             "SPVM::MIME::Base64" : "1.003",
             "SPVM::Math" : "1.006",
             "SPVM::Mozilla::CA" : "0.001",
-            "SPVM::Regex" : "0.254",
+            "SPVM::Regex" : "0.255",
             "SPVM::Sys" : "0.552",
             "SPVM::Time::HiRes" : "0.005",
             "SPVM::Time::Local" : "0.112",
@@ -68,6 +68,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Mojolicious"
       }
    },
-   "version" : "0.037",
+   "version" : "0.038",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

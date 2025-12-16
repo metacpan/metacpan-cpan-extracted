@@ -50,7 +50,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 require Exporter;
 
-$VERSION = '3.74';
+$VERSION = '3.76';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -862,35 +862,43 @@ my %sRangeMask = (
     },
     GAudio => {
         Name => 'GAudio',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GAudio' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GAudio' },
     },
     GImage => {
         Name => 'GImage',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GImage' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GImage' },
     },
     GPano => {
         Name => 'GPano',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GPano' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GPano' },
+    },
+    GContainer => {
+        Name => 'GContainer',
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GContainer' },
     },
     GSpherical => {
         Name => 'GSpherical',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GSpherical' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GSpherical' },
     },
     GDepth => {
         Name => 'GDepth',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GDepth' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GDepth' },
     },
     GFocus => {
         Name => 'GFocus',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GFocus' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GFocus' },
     },
     GCamera => {
         Name => 'GCamera',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GCamera' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GCamera' },
     },
     GCreations => {
         Name => 'GCreations',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GCreations' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::GCreations' },
+    },
+    Device => {
+        Name => 'Device',
+        SubDirectory => { TagTable => 'Image::ExifTool::Google::Device' },
     },
     dwc => {
         Name => 'dwc',
@@ -907,10 +915,6 @@ my %sRangeMask = (
     LImage => {
         Name => 'LImage',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::LImage' },
-    },
-    Device => {
-        Name => 'Device',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Device' },
     },
     sdc => {
         Name => 'sdc',
@@ -947,10 +951,6 @@ my %sRangeMask = (
     seal => {
         Name => 'seal',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::seal' },
-    },
-    GContainer => {
-        Name => 'GContainer',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GContainer' },
     },
 );
 
@@ -1865,6 +1865,8 @@ my %sPantryItem = (
             What             => { },
         },
     },
+    # more new stuff
+    PointColors => { List => 'Seq' },
 );
 
 # Tiff namespace properties (tiff)
@@ -3665,6 +3667,10 @@ NoLoop:
         # protect against large binary data in unknown tags
         $$tagInfo{Binary} = 1 if $new and length($val) > 65536;
     }
+    if ($$et{OPTIONS}{Verbose}) {
+        my $tagID = join('/',@$props);
+        $et->VerboseInfo($tagID, $tagInfo, Value => $rawVal || $val);
+    }
     # store the value for this tag
     my $key = $et->FoundTag($tagInfo, $val) or return 0;
     # save original components of rational numbers (used when copying)
@@ -3683,21 +3689,17 @@ NoLoop:
         # set group1 dynamically according to the namespace
         $et->SetGroup($key, "$$tagTablePtr{GROUPS}{0}-$ns");
     }
-    if ($$et{OPTIONS}{Verbose}) {
-        if ($added) {
-            my $props;
-            if (@$added > 1) {
-                $$tagInfo{Flat} = 0;    # this is a flattened tag
-                my @props = map { $$_[0] } @$added;
-                $props = ' (' . join('/',@props) . ')';
-            } else {
-                $props = '';
-            }
-            my $g1 = $et->GetGroup($key, 1);
-            $et->VPrint(0, $$et{INDENT}, "[adding $g1:$tag]$props\n");
+    if ($added and $$et{OPTIONS}{Verbose}) {
+        my $props;
+        if (@$added > 1) {
+            $$tagInfo{Flat} = 0;    # this is a flattened tag
+            my @props = map { $$_[0] } @$added;
+            $props = ' (' . join('/',@props) . ')';
+        } else {
+            $props = '';
         }
-        my $tagID = join('/',@$props);
-        $et->VerboseInfo($tagID, $tagInfo, Value => $rawVal || $val);
+        my $g1 = $et->GetGroup($key, 1);
+        $et->VPrint(0, $$et{INDENT}, "[adding $g1:$tag]$props\n");
     }
     # allow read-only subdirectories (eg. embedded base64 XMP/IPTC in NKSC files)
     if ($$tagInfo{SubDirectory} and not $$et{IsWriting}) {
@@ -3710,6 +3712,7 @@ NoLoop:
             DirName  => $$subdir{DirName} || $$tagInfo{Name},
             DataPt   => $dataPt,
             DirLen   => length $$dataPt,
+            TagInfo  => $tagInfo,
             IgnoreProp => $$subdir{IgnoreProp}, # (allow XML to ignore specified properties)
             IsExtended => 1, # (hack to avoid Duplicate warning for embedded XMP)
             NoStruct => 1,   # (don't try to build structures since this isn't true XMP)
@@ -4255,7 +4258,7 @@ sub ProcessXMP($$;$)
         # check leading BOM (may indicate double-encoded UTF)
         pos($$dataPt) = $dirStart;
         if ($$dataPt =~ /\G((\0\0)?\xfe\xff|\xff\xfe(\0\0)?|\xef\xbb\xbf)\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/g) {
-            $double = $1 
+            $double = $1;
         } else {
             # handle UTF-16/32 XML
             pos($$dataPt) = $dirStart;
@@ -4435,7 +4438,7 @@ sub ProcessXMP($$;$)
             $buf2 = pack('C*', unpack("$fmt*",$buff));
         }
         if (Image::ExifTool::GetWarning()) {
-            $et->Warn('Superfluous BOM at start of XMP');
+            $et->Warn('Superfluous BOM at start of XMP') unless $$dirInfo{RAF};
             $dataPt = \$buff;   # use XMP with the BOM removed
         } else {
             $et->Warn('XMP is double UTF-encoded');
@@ -4486,13 +4489,16 @@ sub ProcessXMP($$;$)
         $begin = join "\0", split //, $begin;
         # must reset pos because it was killed by previous unsuccessful //g match
         pos($$dataPt) = $dirStart;
+        my $badEnc;
         if ($$dataPt =~ /\G(\0)?\Q$begin\E\0./sg) {
             # validate byte ordering by checking for U+FEFF character
             if ($1) {
                 # should be big-endian since we had a leading \0
-                $fmt = 'n' if $$dataPt =~ /\G\xfe\xff/g;
+                $fmt = 'n';
+                $badEnc = 1 unless $$dataPt =~ /\G\xfe\xff/g;
             } else {
-                $fmt = 'v' if $$dataPt =~ /\G\0\xff\xfe/g;
+                $fmt = 'v';
+                $badEnc = 1 unless $$dataPt =~ /\G\0\xff\xfe/g;
             }
         } else {
             # check for UTF-32 encoding (with three \0's between characters)
@@ -4502,12 +4508,14 @@ sub ProcessXMP($$;$)
                 $fmt = 0;   # set format to zero as indication we didn't find encoded XMP
             } elsif ($1) {
                 # should be big-endian
-                $fmt = 'N' if $$dataPt =~ /\G\0\0\xfe\xff/g;
+                $fmt = 'N';
+                $badEnc = 1 unless $$dataPt =~ /\G\0\0\xfe\xff/g;
             } else {
-                $fmt = 'V' if $$dataPt =~ /\G\0\0\0\xff\xfe\0\0/g;
+                $fmt = 'V';
+                $badEnc = 1 unless $$dataPt =~ /\G\0\0\0\xff\xfe\0\0/g;
             }
         }
-        defined $fmt or $et->Warn('XMP character encoding error');
+        $badEnc and $et->Warn('Invalid XMP encoding marker');
     }
     # warn if standard XMP is missing xpacket wrapper
     if ($$et{XMP_NO_XPACKET} and $$et{OPTIONS}{Validate} and

@@ -8,7 +8,6 @@ use Test::More 0.88;
 use lib 't/lib';
 use DistGen qw/undent/;
 use XSLoader;
-use ExtUtils::HasCompiler 0.024 'can_compile_loadable_object';
 use Dist::Build::Util ':sharedir';
 
 local $ENV{PERL_INSTALL_QUIET};
@@ -37,7 +36,7 @@ $dist->add_file('planner/shared.pl', undent(<<'	---'));
 	module_sharedir('module-share/Foo-Bar', 'Foo::Bar');
 	---
 
-my $has_compiler = can_compile_loadable_object(quiet => 1);
+my $has_compiler = 1;
 
 if ($has_compiler) {
 	$dist->add_file('lib/Foo/Bar.xs', undent(<<'		---'));

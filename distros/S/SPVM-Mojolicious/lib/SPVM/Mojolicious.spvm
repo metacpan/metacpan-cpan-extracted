@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.037";
+  version "0.038";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -22,6 +22,8 @@ class Mojolicious {
   use Mojolicious::Commands;
   use Mojo::File;
   use FindBin;
+  use Mojolicious::Plugin;
+  use Mojo::UserAgent;
   
   # Fields
   has home : rw Mojo::Home;
@@ -61,9 +63,9 @@ class Mojolicious {
   
   has types : rw Mojolicious::Types;
   
-  has config : rw Hash;
+  has config_h : rw Hash;
   
-  has defaults : rw Hash;
+  has defaults_h : rw Hash;
   
   has data_templates : virtual rw string
     get {
@@ -73,6 +75,8 @@ class Mojolicious {
       $self->renderer->set_data_templates($_);
     }
   ;
+  
+  has ua : rw Mojo::UserAgent;
   
   # Class Methods
   static method new : Mojolicious () {
@@ -124,6 +128,12 @@ class Mojolicious {
     Re->s((mutable string)$moniker, "\.(spvm|t)$", "");
     
     $self->set_moniker($moniker);
+    
+    $self->{defaults_h} = Hash->new;
+    
+    $self->{config_h} = Hash->new;
+    
+    $self->{ua} = Mojo::UserAgent->new;
   }
   
   method build_controller : Mojolicious::Controller ($tx : Mojo::Transaction) {
@@ -133,7 +143,7 @@ class Mojolicious {
     }
     
     # Build default controller
-    my $defaults = $self->defaults;
+    my $defaults = $self->defaults_h;
     
     my $stash = $defaults->clone;
     
@@ -170,8 +180,8 @@ class Mojolicious {
     $self->plugins->on($name, $cb);
   }
   
-  method plugin : void ($name : string, $options : object[] = undef) {
-    $self->plugins->register_plugin($name, $self, $options);
+  method plugin : void ($plugin : Mojolicious::Plugin, $options : object[] = undef) {
+    $self->plugins->register_plugin($plugin, $self, $options);
   }
   
   method handler : void ($tx : Mojo::Transaction) {
@@ -208,8 +218,21 @@ class Mojolicious {
     return $tx;
   }
 
+  method defaults : object ($name : string) {
+    return $self->{defaults_h}{$name};
+  }
+  
+  method set_defaults : void ($name : string, $value : object) {
+    
+    $self->{defaults_h}{$name} = $value;
+  }
+  
+  method config : object ($name : string) {
+    return $self->{config_h}{$name};
+  }
+  
+  method set_config : void ($name : string, $value : object) {
+    $self->{config_h}{$name} = $value;
+  }
+  
 }
-
-
-__END__
-

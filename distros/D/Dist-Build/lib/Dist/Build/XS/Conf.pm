@@ -1,5 +1,5 @@
 package Dist::Build::XS::Conf;
-$Dist::Build::XS::Conf::VERSION = '0.022';
+$Dist::Build::XS::Conf::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ sub add_methods {
 	$planner->add_delegate('add_xs', sub {
 		my ($planner, %args) = @_;
 
-		for my $key (qw/include_dirs library_dirs libraries extra_compiler_flags extra_linker_flags/) {
+		for my $key (qw/include_dirs library_dirs libraries extra_compiler_flags extra_linker_flags extra_sources extra_objects/) {
 			push @{ $args{$key} }, $planner->$key;
 		}
 
@@ -42,7 +42,7 @@ Dist::Build::XS::Conf - Configure-time utilities for Dist::Build for using C hea
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

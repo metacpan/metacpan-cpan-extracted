@@ -13,11 +13,12 @@
 # ABSTRACT: Analyze chess games in PGN format
 
 package Chess::Plisco::Engine::TimeControl;
-$Chess::Plisco::Engine::TimeControl::VERSION = 'v0.8.0';
+$Chess::Plisco::Engine::TimeControl::VERSION = 'v1.0.0';
 use strict;
 
 use Time::HiRes qw(gettimeofday tv_interval);
 
+# Macros from Chess::Plisco::Macro are already expanded here!
 use Chess::Plisco::Engine::TimeControl::MovesToGo;
 
 sub new {
@@ -92,7 +93,7 @@ sub allocateTime {
 		$mtg = $self->movesToGo;
 	}
 
-	my $time_left = $params->{mytime} + $params->{movestogo} * $params->{myinc};
+	my $time_left = $params->{mytime} + $mtg * $params->{myinc};
 
 	# FIXME! Depending on the volatility of the position, there should be
 	# a time cushion that can be used if the evaluation changes a lot between      

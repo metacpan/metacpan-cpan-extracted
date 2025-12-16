@@ -31,13 +31,6 @@ my @tests = (
 		bm => [qw(g5e6)],
 		depth => 3,
 	},
-	{
-		name => 'white do not go for draw by repetition',
-		fen => '1rrk4/7q/4N3/8/8/8/8/K7 b - - 1 1',
-		moves => [qw(d8e8 e6g5 e8d8)],
-		am => [qw(g5e6)],
-		depth => 3,
-	},
 );
 
 foreach my $test (@tests) {

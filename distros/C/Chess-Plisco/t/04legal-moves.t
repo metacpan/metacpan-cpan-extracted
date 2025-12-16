@@ -112,7 +112,7 @@ foreach my $test (@tests) {
 		ok $move, "$test->{name}: parse $movestr";
 		ok $pos->doMove($move), "$test->{name}: premove $movestr should be legal";
 	}
-	my @moves = sort map { chr(97 + ((($_ >> 6) & 0x3f) & 0x7)) . (1 + ((($_ >> 6) & 0x3f) >> 3)) . chr(97 + ((($_) & 0x3f) & 0x7)) . (1 + ((($_) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[(($_ >> 12) & 0x7)] } $pos->legalMoves;
+	my @moves = sort map { chr(97 + (((($_) >> 9) & 0x3f) & 0x7)) . (1 + (((($_) >> 9) & 0x3f) >> 3)) . chr(97 + (((($_) >> 15) & 0x3f) & 0x7)) . (1 + (((($_) >> 15) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[((($_) >> 6) & 0x7)] } $pos->legalMoves;
 	my @expect = sort @{$test->{moves}};
 	is(scalar(@moves), scalar(@expect), "number of moves $test->{name}");
 	is_deeply \@moves, \@expect, "$test->{name} same moves";
@@ -122,8 +122,8 @@ foreach my $test (@tests) {
 
 	foreach my $move ($pos->legalMoves) {
 		# Check the correct piece.
-		my $from_mask = 1 << ((($move >> 6) & 0x3f));
-		my $got_piece = (($move >> 15) & 0x7);
+		my $from_mask = 1 << (((($move) >> 9) & 0x3f));
+		my $got_piece = (($move) & 0x7);
 		my $piece;
 		if ($from_mask & $pos->[CP_POS_PAWNS]) {
 			$piece = CP_PAWN;
@@ -141,26 +141,26 @@ foreach my $test (@tests) {
 			die "Move $move piece is $got_piece, but no match with bitboards\n";
 		}
 
-		my $movestr = chr(97 + ((($move >> 6) & 0x3f) & 0x7)) . (1 + ((($move >> 6) & 0x3f) >> 3)) . chr(97 + ((($move) & 0x3f) & 0x7)) . (1 + ((($move) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[(($move >> 12) & 0x7)];
-		is((($move >> 15) & 0x7), $piece,
+		my $movestr = chr(97 + (((($move) >> 9) & 0x3f) & 0x7)) . (1 + (((($move) >> 9) & 0x3f) >> 3)) . chr(97 + (((($move) >> 15) & 0x3f) & 0x7)) . (1 + (((($move) >> 15) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[((($move) >> 6) & 0x7)];
+		is((($move) & 0x7), $piece,
 			"$test->{name} correct piece for $movestr");
 
 		my $her_pieces = $pos->[CP_POS_WHITE_PIECES + !$pos->toMove];
-		my $to = (($move) & 0x3f);
-		my $to_mask = 1 << ((($move) & 0x3f));
+		my $to = ((($move) >> 15) & 0x3f);
+		my $to_mask = 1 << (((($move) >> 15) & 0x3f));
 		my $ep_shift = $pos->enPassantShift;
 		# Check that the captured piece is set.
 		if ($to_mask & $her_pieces
 		    || ($ep_shift && $ep_shift == $to && $piece == CP_PAWN)) {
-			ok((($move >> 18) & 0x7),
+			ok(((($move) >> 3) & 0x7),
 				"$test->{name}: correct captured piece for $movestr");
 		} else {
-			ok(!(($move >> 18) & 0x7),
+			ok(!((($move) >> 3) & 0x7),
 				"$test->{name}: no captured piece for $movestr");
 		}
 
-		is((($move >> 21) & 0x1), $pos->toMove,
-			"$test->{name} correct color for $movestr");
+		is(((($move) >> 21) & 0x1), $pos->toMove,
+			"$test->{name} correct colour for $movestr");
 	}
 }
 

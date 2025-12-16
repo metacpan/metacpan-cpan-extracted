@@ -10,19 +10,23 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Position;
-$Chess::Plisco::Engine::Position::VERSION = 'v0.8.0';
+$Chess::Plisco::Engine::Position::VERSION = 'v1.0.0';
 use strict;
 use integer;
 
 use Chess::Plisco qw(:all);
 # Macros from Chess::Plisco::Macro are already expanded here!
-use Chess::Plisco::Engine::Tree;
 
-use base qw(Chess::Plisco);
+use base qw(Chess::Plisco Exporter);
 
-use constant CP_POS_GAME_PHASE => 14;
-use constant CP_POS_OPENING_SCORE => 15;
-use constant CP_POS_ENDGAME_SCORE => 16;
+# Additional fields.
+use constant CP_POS_SIGNATURE => CP_POS_USR1;
+use constant CP_POS_REVERSIBLE_CLOCK => CP_POS_USR2;
+use constant CP_POS_GAME_PHASE => CP_POS_USR3;
+use constant CP_POS_OPENING_SCORE => CP_POS_USR4;
+use constant CP_POS_ENDGAME_SCORE => CP_POS_USR5;
+
+our @EXPORT_OK = qw(CP_POS_REVERSIBLE_CLOCK);
 
 use constant PAWN_PHASE => 0;
 use constant KNIGHT_PHASE => 1;
@@ -205,6 +209,20 @@ my @eg_pesto_table = (
 my @op_table;
 my @eg_table;
 
+# The required signature changes for the castlings.
+my @castling_rook_zk_updates;
+
+# The indices are the to squares of the king.
+my @zk_pieces = Chess::Plisco->_zkPieces;
+$castling_rook_zk_updates[CP_C1] = $zk_pieces[384] ^ $zk_pieces[387];
+$castling_rook_zk_updates[CP_G1] = $zk_pieces[389] ^ $zk_pieces[391];
+$castling_rook_zk_updates[CP_C8] = $zk_pieces[504] ^ $zk_pieces[507];
+$castling_rook_zk_updates[CP_G8] = $zk_pieces[509] ^ $zk_pieces[511];
+
+my @zk_ep_files = Chess::Plisco->_zkEpFiles;
+my @zk_castling = Chess::Plisco->_zkCastling;
+my $zk_colour = Chess::Plisco->_zkColour;
+
 # Init tables.
 for (my $piece = CP_PAWN; $piece <= CP_KING; ++$piece) {
 	for (my $shift = 0; $shift < 64; ++$shift) {
@@ -224,9 +242,9 @@ for (my $i = 0; $i < @op_table; ++$i) {
 	my $eg_score = $eg_table[$i];
 	my $shift = $i & 0x3f;
 	my $piece = ($i >> 6) & 0x7;
-	my $color = ($i >> 9);
+	my $colour = ($i >> 9);
 	my $piece_char = $pieces[$piece];
-	$piece_char = lc $piece_char if $color;
+	$piece_char = lc $piece_char if $colour;
 	my $square = Chess::Plisco->shiftToSquare($shift);
 }
 
@@ -253,8 +271,8 @@ my @endgame_deltas;
 
 foreach my $move (Chess::Plisco->moveNumbers) {
 	my $is_ep;
-	my $color = 1 & ($move >> 21);
-	my $captured = 0x7 & ($move >> 18);
+	my $colour = 1 & ($move >> CP_MOVE_COLOUR_OFFSET);
+	my $captured = 0x7 & ($move >> CP_MOVE_CAPTURED_OFFSET);
 	if ($captured == CP_KING) {
 		$captured = CP_PAWN;
 		$is_ep = 1;
@@ -266,30 +284,30 @@ foreach my $move (Chess::Plisco->moveNumbers) {
 		Chess::Plisco->movePiece($move),
 	);
 
-	my $from_index = ($color << 9) | ($piece << 6) | $from;
-	my $to_index = ($color << 9) | ($piece << 6) | $to;
+	my $from_index = ($colour << 9) | ($piece << 6) | $from;
+	my $to_index = ($colour << 9) | ($piece << 6) | $to;
 	my $opening_delta = $op_table[$from_index] - $op_table[$to_index];
 	my $endgame_delta = $eg_table[$from_index] - $eg_table[$to_index];
 	if ($is_ep) {
 		my $ep_to;
-		if ($color == CP_WHITE) {
+		if ($colour == CP_WHITE) {
 			$ep_to = $to - 8;
 		} else {
 			$ep_to = $to + 8;
 		}
-		my $ep_index = ($color << 9) | (CP_PAWN) << 6 | $ep_to;
+		my $ep_index = ($colour << 9) | (CP_PAWN) << 6 | $ep_to;
 		$opening_delta -= $op_table[$ep_index];
 		$endgame_delta -= $eg_table[$ep_index];
 	} elsif ($captured) {
 		# The captured piece must be viewed from the other side.
-		my $captured_index = ((!$color) << 9) | ($captured << 6) | $to;
+		my $captured_index = ((!$colour) << 9) | ($captured << 6) | $to;
 		$opening_delta -= $op_table[$captured_index];
 		$endgame_delta -= $eg_table[$captured_index];
 	}
 
 	if ($promote) {
-		my $promote_index = ($color << 9) | ($promote << 6) | $to;
-		my $promote_pawn_index = ($color << 9) | (CP_PAWN << 6) | $to;
+		my $promote_index = ($colour << 9) | ($promote << 6) | $to;
+		my $promote_pawn_index = ($colour << 9) | (CP_PAWN << 6) | $to;
 		$opening_delta -= $op_table[$promote_index]
 			- $op_table[$promote_pawn_index];
 		$endgame_delta -= $eg_table[$promote_index]
@@ -331,8 +349,8 @@ foreach my $move (Chess::Plisco->moveNumbers) {
 		}
 	}
 
-	$opening_deltas[$move] = $color ? $opening_delta : -$opening_delta;
-	$endgame_deltas[$move] = $color ? $endgame_delta : -$endgame_delta;
+	$opening_deltas[$move] = $colour ? $opening_delta : -$opening_delta;
+	$endgame_deltas[$move] = $colour ? $endgame_delta : -$endgame_delta;
 }
 
 
@@ -341,6 +359,25 @@ sub new {
 	my ($class, @args) = @_;
 
 	my $self = $class->SUPER::new(@args);
+
+	$self->__init;
+
+	return $self;
+}
+
+sub newFromFEN {
+	my ($class, @args) = @_;
+
+	my $self = $class->SUPER::newFromFEN(@args);
+
+	$self->__init;
+
+	return $self;
+}
+
+sub __init {
+	my ($self) = @_;
+
 
 	my $op_phase = 0;
 
@@ -373,25 +410,87 @@ sub new {
 		}
 	}
 
+	$self->[CP_POS_SIGNATURE] = $self->SUPER::signature();
+
 	$self->[CP_POS_OPENING_SCORE] = $op_score;
 	$self->[CP_POS_ENDGAME_SCORE] = $eg_score;
 
 	$self->[CP_POS_GAME_PHASE] = $op_phase;
+	$self->[CP_POS_REVERSIBLE_CLOCK] = $self->[CP_POS_HALFMOVE_CLOCK];
 
 	return $self;
 }
 
-sub doMove {
+sub move {
 	my ($self, $move) = @_;
 
-	my $state = $self->SUPER::doMove($move) or return;
-	($move) = @$state;
+	my $castling = $self->[CP_POS_CASTLING_RIGHTS];
+	my $to_move = $self->[CP_POS_TURN];
+	my $ep_shift = $self->[CP_POS_EN_PASSANT_SHIFT];
+	my $zk_update = $ep_shift ? ($zk_ep_files[$ep_shift & 7]) : 0;
+
+	my $state = $self->SUPER::move($move) or return;
+	$move = $self->[CP_POS_LAST_MOVE];
+
+	my $piece = (($move) & 0x7);
+	my $from = ((($move) >> 9) & 0x3f);
+	my $to = ((($move) >> 15) & 0x3f);
+	if ($piece == CP_KING) {
+		if ((($from - $to) & 0x3) == 0x2) {
+			# Castling. FIXME! Maybe use a lookup table instead.
+			$zk_update ^= $castling_rook_zk_updates[$to];
+		}
+	}
+
+	my $captured = ((($move) >> 3) & 0x7);
+	if ($captured != CP_NO_PIECE) {
+		if ($piece == CP_PAWN && $ep_shift && $to == $ep_shift) {
+			# En passant. The captured piece is not on the to square.
+			my $ep_file = $to & 0x7;
+			my $captured_to = 24 + !$to_move * 8 + $ep_file;
+			$zk_update ^= $zk_pieces[(((CP_PAWN) << 7) | ((!$to_move) << 6) | ($captured_to)) - 128];
+		} else {
+			$zk_update ^= $zk_pieces[((($captured) << 7) | ((!$to_move) << 6) | ($to)) - 128];
+		}
+	}
+
+	$zk_update ^= $zk_pieces[((($piece) << 7) | (($to_move) << 6) | ($from)) - 128];
+	$zk_update ^= $zk_pieces[((($piece) << 7) | (($to_move) << 6) | ($to)) - 128];
+
+	my $promote = ((($move) >> 6) & 0x7);
+	if ($promote) {
+		$zk_update ^= $zk_pieces[(((CP_PAWN) << 7) | (($to_move) << 6) | ($to)) - 128];
+		$zk_update ^= $zk_pieces[((($promote) << 7) | (($to_move) << 6) | ($to)) - 128];
+	}
+
+	if ($piece == CP_PAWN && (!(($to - $from) & 0x9))) {
+		$zk_update ^= $zk_ep_files[$from & 0x7];
+	}
+
+	$zk_update ^= $zk_colour;
+
 	$self->[CP_POS_GAME_PHASE] += $move_phase_deltas[
-		((($move >> 18) & 0x7) << 3) | (($move >> 12) & 0x7)
+		(((($move) >> 3) & 0x7) << 3) | ((($move) >> 6) & 0x7)
 	];
-	my $score_index = ($move & 0x1fffff) | (!(((($self->[CP_POS_INFO] & (1 << 4)) >> 4))) << 21);
+	my $score_index = ($move & 0x3fffff & ~(1 << (CP_MOVE_COLOUR_OFFSET))) | (!($self->[CP_POS_TURN]) << (CP_MOVE_COLOUR_OFFSET));
 	$self->[CP_POS_OPENING_SCORE] += $opening_deltas[$score_index];
 	$self->[CP_POS_ENDGAME_SCORE] += $endgame_deltas[$score_index];
+
+	my $new_castling =  $self->[CP_POS_CASTLING_RIGHTS];
+	my $castling_changed = $new_castling != $castling;
+	if ($castling_changed) {
+		$zk_update ^= $zk_castling[$castling]
+			^ $zk_castling[$new_castling];
+	}
+
+	$self->[CP_POS_SIGNATURE] ^= $zk_update;
+
+	if (!($self->[CP_POS_HALFMOVE_CLOCK])
+	    || $castling_changed) {
+		$self->[CP_POS_REVERSIBLE_CLOCK] = 0;
+	} else {
+		++$self->[CP_POS_REVERSIBLE_CLOCK];
+	}
 
 	return $state;
 }
@@ -399,7 +498,7 @@ sub doMove {
 sub evaluate {
 	my ($self) = @_;
 
-	my $material = (($self->[CP_POS_INFO] >> 19));
+	my $material = $self->[CP_POS_MATERIAL];
 	my $white_pieces = $self->[CP_POS_WHITE_PIECES];
 	my $black_pieces = $self->[CP_POS_BLACK_PIECES];
 	my $pawns = $self->[CP_POS_PAWNS];
@@ -419,6 +518,8 @@ sub evaluate {
 	# than two knights or bishops for one side on the board but in the
 	# exceptional case that this happens, the result would be close enough
 	# anyway.
+	#
+	# FIXME! Just call insufficientMaterial?
 	if (!$pawns) {
 		my $delta = (do {	my $mask = $material >> CP_INT_SIZE * CP_CHAR_BIT - 1;	($material + $mask) ^ $mask;});
 		if ($delta < CP_PAWN_VALUE
@@ -426,7 +527,7 @@ sub evaluate {
 		        && (($delta <= CP_BISHOP_VALUE)
 		            || ($delta == 2 * CP_KNIGHT_VALUE)
 			        || ($delta == CP_KNIGHT_VALUE + CP_BISHOP_VALUE)))) {
-			return Chess::Plisco::Engine::Tree::DRAW();
+			return 0;
 		}
 	}
 
@@ -438,7 +539,7 @@ sub evaluate {
 	my $score = ($self->[CP_POS_OPENING_SCORE] * $op_phase
 		+ $self->[CP_POS_ENDGAME_SCORE] * $eg_phase) / TOTAL_PHASE;
 
-	return (((($self->[CP_POS_INFO] & (1 << 4)) >> 4))) ? -$score : $score;
+	return ($self->[CP_POS_TURN]) ? -$score : $score;
 }
 
 
@@ -465,6 +566,11 @@ sub formatMoves {
 	}
 
 	return @formatted;
+}
+
+# And this is only implemented for testing.
+sub signature {
+	shift->[CP_POS_SIGNATURE];
 }
 
 1;

@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Map::Tube::Paris:
     file: lib/Map/Tube/Paris.pm
-    version: v0.1.1
+    version: v0.2.0
 requires:
   File::Share: '0'
   Map::Tube: '4.09'
@@ -30,5 +30,5 @@ requires:
   namespace::clean: '0'
   perl: '5.014'
 resources: {}
-version: v0.1.1
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -50,7 +50,8 @@ my @tests = (
 
 foreach my $test (@tests) {
 	my $pos = Chess::Plisco->new($test->{fen});
-	ok $pos->[CP_POS_IN_CHECK], "$test->{name} wrong checkers mask"
+	my $checkers = $pos->inCheck;
+	ok $checkers, "$test->{name} wrong checkers mask"
 }
 
 done_testing;

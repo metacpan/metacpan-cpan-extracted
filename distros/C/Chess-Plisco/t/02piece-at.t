@@ -99,19 +99,19 @@ my @tests = (
 
 my $pos = Chess::Plisco->new;
 foreach my $test (@tests) {
-	my ($square, $file, $rank, $shift, $wanted_piece, $wanted_color) = @$test;
+	my ($square, $file, $rank, $shift, $wanted_piece, $wanted_colour) = @$test;
 
-	my ($got_piece, $got_color);
+	my ($got_piece, $got_colour);
 
-	($got_piece, $got_color) = $pos->pieceAtSquare($square);
+	($got_piece, $got_colour) = $pos->pieceAtSquare($square);
 	is $got_piece, $wanted_piece, "pieceAtSquare($square): piece";
-	is $got_color, $wanted_color, "pieceAtSquare($square): color";
+	is $got_colour, $wanted_colour, "pieceAtSquare($square): colour";
 
-	($got_piece, $got_color) = $pos->pieceAtCoordinates($file, $rank);
+	($got_piece, $got_colour) = $pos->pieceAtCoordinates($file, $rank);
 	is $got_piece, $wanted_piece, "pieceAtCoordinates($file, $rank): piece";
-	is $got_color, $wanted_color, "pieceAtCoordinates($file, $rank): color";
+	is $got_colour, $wanted_colour, "pieceAtCoordinates($file, $rank): colour";
 
-	($got_piece, $got_color) = $pos->pieceAtShift($shift);
+	($got_piece, $got_colour) = $pos->pieceAtShift($shift);
 	is $got_piece, $wanted_piece, "pieceAtShift($shift): piece";
-	is $got_color, $wanted_color, "pieceAtShift($shift): color";
+	is $got_colour, $wanted_colour, "pieceAtShift($shift): colour";
 }

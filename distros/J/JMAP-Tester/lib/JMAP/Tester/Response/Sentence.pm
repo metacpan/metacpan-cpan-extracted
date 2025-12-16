@@ -1,8 +1,10 @@
-use v5.14.0;
-package JMAP::Tester::Response::Sentence 0.107;
+use v5.20.0;
+package JMAP::Tester::Response::Sentence 0.108;
 # ABSTRACT: a single triple within a JMAP response
 
 use Moo;
+
+use experimental 'signatures';
 
 use namespace::clean;
 
@@ -31,8 +33,7 @@ has client_id => (is => 'ro', required => 1);
 
 has sentence_broker => (is => 'ro', required => 1);
 
-sub _strip_json_types {
-  my ($self, $whatever) = @_;
+sub _strip_json_types ($self, $whatever) {
   $self->sentence_broker->strip_json_types($whatever);
 }
 
@@ -50,10 +51,10 @@ sub _strip_json_types {
 #pod
 #pod =cut
 
-sub as_triple { [ $_[0]->name, $_[0]->arguments, $_[0]->client_id ] }
+sub as_triple ($self) { [ $self->name, $self->arguments, $self->client_id ] }
 
-sub as_stripped_triple {
-  $_[0]->sentence_broker->strip_json_types($_[0]->as_triple);
+sub as_stripped_triple ($self) {
+  $self->sentence_broker->strip_json_types($self->as_triple);
 }
 
 #pod =method as_pair
@@ -67,10 +68,10 @@ sub as_stripped_triple {
 #pod
 #pod =cut
 
-sub as_pair { [ $_[0]->name, $_[0]->arguments ] }
+sub as_pair ($self) { [ $self->name, $self->arguments ] }
 
-sub as_stripped_pair {
-  $_[0]->sentence_broker->strip_json_types($_[0]->as_pair);
+sub as_stripped_pair ($self) {
+  $self->sentence_broker->strip_json_types($self->as_pair);
 }
 
 #pod =method as_set
@@ -81,9 +82,7 @@ sub as_stripped_pair {
 #pod
 #pod =cut
 
-sub as_set {
-  my ($self) = @_;
-
+sub as_set ($self) {
   unless ($self->name =~ m{/set$}) {
     return $self->sentence_broker->abort(
       sprintf(qq{tried to call ->as_set on sentence named "%s"}, $self->name)
@@ -109,9 +108,7 @@ sub as_set {
 #pod
 #pod =cut
 
-sub assert_named {
-  my ($self, $name) = @_;
-
+sub assert_named ($self, $name) {
   Carp::confess("no name given") unless defined $name;
 
   return $self if $self->name eq $name;
@@ -121,9 +118,7 @@ sub assert_named {
   );
 }
 
-sub TO_JSON {
-  my ($self) = @_;
-
+sub TO_JSON ($self) {
   return [ $self->name, $self->arguments, $self->client_id ];
 }
 
@@ -141,7 +136,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.107
+version 0.108
 
 =head1 OVERVIEW
 

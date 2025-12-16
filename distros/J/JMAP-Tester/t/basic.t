@@ -283,17 +283,10 @@ subtest "calling as_set on non-set sentence" => sub {
   );
 };
 
-subtest "miscellaneous error conditions" => sub {
+subtest "miscellaneous error conditions on 1-paragraph 1-sentence response" => sub {
   my $res_1 = JMAP::Tester::Response->new({
     items => [
       [ welcome => { all => jstr('refugees') }, jstr('xyzzy') ],
-    ],
-  });
-
-  my $res_2 = JMAP::Tester::Response->new({
-    items => [
-      [ welcome => { all  => jstr('refugees') }, jstr('xyzzy') ],
-      [ goodBye => { blue => jstr('skye') }, jstr('a') ],
     ],
   });
 
@@ -305,6 +298,24 @@ subtest "miscellaneous error conditions" => sub {
       "single_sentence checks name",
     );
   }
+
+  {
+    my $error = exception { $res_1->paragraph(0)->sentence_named(undef) };
+    like(
+      $error,
+      qr/no sentence name given/,
+      "paragraph->sentence_named needs defined arg",
+    );
+  }
+};
+
+subtest "miscellaneous errors on 2-paragraph 2-sentence response" => sub {
+  my $res_2 = JMAP::Tester::Response->new({
+    items => [
+      [ welcome => { all  => jstr('refugees') }, jstr('xyzzy') ],
+      [ goodBye => { blue => jstr('skye') }, jstr('a') ],
+    ],
+  });
 
   {
     my $error = exception { $res_2->single_sentence('foo') };
@@ -321,7 +332,18 @@ subtest "miscellaneous error conditions" => sub {
   }
 
   {
+    # "The right thing", below, means "gives us the same sentence as we would
+    # get if we gave the name of that sentence as the arg to ->single.
+    my $p = $res_2->paragraph_by_client_id('xyzzy');
+    ok(
+      $p->single('welcome') == $p->single,
+      "para->single with no arg does the right thing",
+    );
+  }
+
+  {
     my $ok = eval {
+
       $res_2->paragraph_by_client_id('xyzzy')->single('welcome');
       $res_2->paragraph_by_client_id('a')->single('goodBye');
       1;
@@ -331,6 +353,14 @@ subtest "miscellaneous error conditions" => sub {
     ok($ok, "paragraph_by_client_id") or diag $error;
   }
 
+  aborts_ok(
+    sub { $res_2->paragraph(0)->single('wilkommen') },
+    re('single sentence not of expected name'),
+    "paragraph->single with wrong name aborts",
+  );
+};
+
+subtest "miscellaneous errors on 1-paragraph 2-sentence response" => sub {
   my $res_3 = JMAP::Tester::Response->new({
     items => [
       [ welcome => { all => jstr('refugees') }, jstr('xyzzy') ],
@@ -349,6 +379,60 @@ subtest "miscellaneous error conditions" => sub {
     re('found more than one sentence with name "welcome"'),
     "ambiguous by name",
   );
+
+  aborts_ok(
+    sub { $res_3->paragraph(0)->single },
+    re('more than one sentence in paragraph'),
+    "->single on multi-sentence paragraph",
+  );
+
+  {
+    my $ok = eval { $res_3->paragraph(0)->assert_n_sentences(2); 1; };
+    my $error = $@;
+    ok($ok, "successful paragraph->assert_n_sentences") or diag $error;
+  }
+
+  {
+    my $error = exception { $res_3->paragraph(0)->assert_n_sentences(undef) };
+    like(
+      $error,
+      qr/no sentence count given/,
+      "assert_n_sentences needs defined arg",
+    );
+  }
+
+  aborts_ok(
+    sub { $res_3->paragraph(0)->assert_n_sentences(8) },
+    re("expected 8 sentences but got 2"),
+    "assert_n_sentences aborts on count mismatch",
+  );
+};
+
+subtest "construction errors" => sub {
+  {
+    my $error = exception {
+      my $res_helper  = JMAP::Tester::Response->new({
+        items => [
+          [ welcome => { all => jstr('refugees') }, jstr('c1') ],
+          [ welcome => { all => jstr('homeless') }, jstr('c2') ],
+        ],
+      });
+
+      JMAP::Tester::Response::Paragraph->new({
+        sentences => [ $res_helper->sentence(0), $res_helper->sentence(1) ],
+      });
+    };
+
+    like($error, qr/non-uniform client_ids/, "paragraph cids must match");
+  };
+
+  {
+    my $error = exception {
+      JMAP::Tester::Response::Paragraph->new({ sentences => [] });
+    };
+
+    like($error, qr/0-sentence paragraph/, "paragraphs must have sentences");
+  };
 };
 
 subtest "interpreting HTTP responses" => sub {

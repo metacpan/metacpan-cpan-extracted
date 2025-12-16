@@ -52,7 +52,7 @@
    "provides" : {
       "HealthCheck::Parallel" : {
          "file" : "lib/HealthCheck/Parallel.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-healthcheck-parallel"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-2.0",

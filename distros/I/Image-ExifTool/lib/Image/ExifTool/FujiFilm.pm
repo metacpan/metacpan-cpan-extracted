@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.99';
+$VERSION = '2.00';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
@@ -643,8 +643,8 @@ my %faceCategories = (
         Writable => 'int16u',
         PrintConv => {
             1 => 'Right',
-            2 => 'Up', # (or Left?, forum17591)
-            3 => 'Left', # (or Up?, forum17591)
+            2 => 'Left', #forum17591
+            3 => 'Up', #forum17591
             4 => 'Down',
         },
     },
@@ -876,7 +876,7 @@ my %faceCategories = (
     0x144a => { Name => 'WBRed',      Writable => 'int16u' },
     0x144b => { Name => 'WBGreen',    Writable => 'int16u' },
     0x144c => { Name => 'WBBlue',     Writable => 'int16u' },
-    
+
     0x144d => { Name => 'RollAngle',  Writable => 'rational64s' }, #forum14319
     0x3803 => { #forum10037
         Name => 'VideoRecordingMode',
@@ -960,6 +960,7 @@ my %faceCategories = (
             3 => 'Right Eye',
             7 => 'Body',
             8 => 'Head',
+            9 => 'Both Eyes', #forum17635
             11 => 'Bike',
             12 => 'Body of Car',
             13 => 'Front of Car',
@@ -1190,7 +1191,7 @@ my %faceCategories = (
 %Image::ExifTool::FujiFilm::FaceRecInfo = (
     PROCESS_PROC => \&ProcessFaceRec,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    VARS => { NO_ID => 1 },
+    VARS => { ID_FMT => 'none' },
     NOTES => 'Face recognition information.',
     Face1Name => { },
     Face2Name => { },
@@ -1941,7 +1942,7 @@ sub ProcessRAF($$)
     $et->SetFileType() unless $$et{DOC_NUM};
     my $tbl = GetTagTable('Image::ExifTool::FujiFilm::RAFHeader');
     $et->ProcessDirectory({ DataPt => \$buff, DirName => 'RAFHeader', Base => $base }, $tbl);
-    
+
     # extract information from embedded JPEG
     my %dirInfo = (
         Parent => 'RAF',

@@ -368,7 +368,7 @@ foreach my $test (@tests) {
 		ok $move, "$test->{name}: parse $movestr";
 		ok $pos->doMove($move), "$test->{name}: premove $movestr should be legal";
 	}
-	my @moves = sort map { chr(97 + ((($_ >> 6) & 0x3f) & 0x7)) . (1 + ((($_ >> 6) & 0x3f) >> 3)) . chr(97 + ((($_) & 0x3f) & 0x7)) . (1 + ((($_) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[(($_ >> 12) & 0x7)] } $pos->pseudoLegalMoves;
+	my @moves = sort map { chr(97 + (((($_) >> 9) & 0x3f) & 0x7)) . (1 + (((($_) >> 9) & 0x3f) >> 3)) . chr(97 + (((($_) >> 15) & 0x3f) & 0x7)) . (1 + (((($_) >> 15) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[((($_) >> 6) & 0x7)] } $pos->pseudoLegalMoves;
 	my @expect = sort @{$test->{moves}};
 	is(scalar(@moves), scalar(@expect), "number of moves $test->{name}");
 	is_deeply \@moves, \@expect, $test->{name};
@@ -378,8 +378,8 @@ foreach my $test (@tests) {
 
 	foreach my $move ($pos->pseudoLegalMoves) {
 		# Check the correct piece.
-		my $from_mask = 1 << ((($move >> 6) & 0x3f));
-		my $got_piece = (($move >> 15) & 0x7);
+		my $from_mask = 1 << (((($move) >> 9) & 0x3f));
+		my $got_piece = (($move) & 0x7);
 		my $piece;
 		if ($from_mask & $pos->[CP_POS_PAWNS]) {
 			$piece = CP_PAWN;
@@ -397,8 +397,8 @@ foreach my $test (@tests) {
 			die "Move $move piece is $got_piece, but no match with bitboards\n";
 		}
 
-		my $movestr = chr(97 + ((($move >> 6) & 0x3f) & 0x7)) . (1 + ((($move >> 6) & 0x3f) >> 3)) . chr(97 + ((($move) & 0x3f) & 0x7)) . (1 + ((($move) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[(($move >> 12) & 0x7)];
-		is((($move >> 15) & 0x7), $piece, "correct piece for $movestr");
+		my $movestr = chr(97 + (((($move) >> 9) & 0x3f) & 0x7)) . (1 + (((($move) >> 9) & 0x3f) >> 3)) . chr(97 + (((($move) >> 15) & 0x3f) & 0x7)) . (1 + (((($move) >> 15) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[((($move) >> 6) & 0x7)];
+		is((($move) & 0x7), $piece, "correct piece for $movestr");
 	}
 }
 

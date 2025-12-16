@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Util;
-$ExtUtils::Builder::Util::VERSION = '0.018';
+$ExtUtils::Builder::Util::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ sub get_perl {
 		return Devel::FindPerl::find_perl_interpreter($config);
 	}
 	else {
-		return $opts{config}->get('perlpath');
+		return $config->get('perlpath');
 	}
 }
 
@@ -146,7 +146,7 @@ ExtUtils::Builder::Util - Utility functions for ExtUtils::Builder
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 DESCRIPTION
 
