@@ -39,11 +39,10 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Vendor::Default 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 # If you use this file as template to create a new vendor class, please
-# uncomment the following lines
+# uncomment the following lines:
 #use parent qw(Dpkg::Vendor::Default);
 
 =head1 METHODS
@@ -164,6 +163,13 @@ than version or remapped so that it does not get considered as a pre-release
 The returned string is a regex with one capture group for the backport
 delimiter string, or undef if there is no regex.
 
+=item has-fuzzy-native-source ()
+
+The hook is called by dpkg-source when trying to determine whether native
+source packages should be handled as proper native ones, or as incoherent
+and confused native ones, where the source format does not match the source
+version (since dpkg 1.23.0).
+
 =back
 
 =cut
@@ -188,9 +194,9 @@ sub run_hook {
     } elsif ($hook eq 'post-process-changelog-entry') {
         my $fields = shift @params;
     } elsif ($hook eq 'extend-patch-header') {
-	my ($textref, $ch_info) = @params;
+        my ($textref, $ch_info) = @params;
     } elsif ($hook eq 'update-buildflags') {
-	my $flags = shift @params;
+        my $flags = shift @params;
     } elsif ($hook eq 'builtin-system-build-paths') {
         return ();
     } elsif ($hook eq 'build-tainted-by') {
@@ -199,9 +205,11 @@ sub run_hook {
         return;
     } elsif ($hook eq 'backport-version-regex') {
         return;
+    } elsif ($hook eq 'has-fuzzy-native-source') {
+        return 0;
     }
 
-    # Default return value for unknown/unimplemented hooks
+    # Default return value for unknown/unimplemented hooks.
     return;
 }
 

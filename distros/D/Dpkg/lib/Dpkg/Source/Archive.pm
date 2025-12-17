@@ -30,12 +30,11 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Archive 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Carp;
 use Errno qw(ENOENT);
-use File::Temp qw(tempdir);
+use File::Temp;
 use File::Basename qw(basename);
 use File::Spec;
 use File::Find;
@@ -53,24 +52,32 @@ sub create {
     my ($self, %opts) = @_;
     $opts{options} //= [];
     my %spawn_opts;
-    # Possibly run tar from another directory
+    # Possibly run tar from another directory.
     if ($opts{chdir}) {
         $spawn_opts{chdir} = $opts{chdir};
         *$self->{chdir} = $opts{chdir};
     }
-    # Redirect input/output appropriately
+    # Redirect input/output appropriately.
     $self->ensure_open('w');
     $spawn_opts{to_handle} = $self->get_filehandle();
     $spawn_opts{from_pipe} = \*$self->{tar_input};
     # Try to use a deterministic mtime.
     my $mtime = $opts{source_date} // $ENV{SOURCE_DATE_EPOCH} || time;
-    # Call tar creation process
-    $spawn_opts{delete_env} = [ 'TAR_OPTIONS' ];
+    # Call tar creation process.
+    $spawn_opts{delete_env} = [
+        'TAR_OPTIONS',
+    ];
     $spawn_opts{exec} = [
-        $Dpkg::PROGTAR, '-cf', '-', '--format=gnu', '--sort=name',
-                        '--mtime', "\@$mtime", '--clamp-mtime', '--null',
-                        '--numeric-owner', '--owner=0', '--group=0',
-                        @{$opts{options}}, '-T', '-',
+        $Dpkg::PROGTAR,
+        '-cf', '-',
+        '--format=gnu',
+        '--sort=name',
+        '--mtime', "\@$mtime",
+        '--clamp-mtime',
+        '--null',
+        '--numeric-owner', '--owner=0', '--group=0',
+        @{$opts{options}},
+        '-T', '-',
     ];
     *$self->{pid} = spawn(%spawn_opts);
     *$self->{cwd} = getcwd();
@@ -127,26 +134,39 @@ sub extract {
     $opts{options} //= [];
     $opts{in_place} //= 0;
     $opts{no_fixperms} //= 0;
-    my %spawn_opts = (wait_child => 1);
+    my %spawn_opts = (
+        wait_child => 1,
+    );
 
-    # Prepare destination
-    my $template = basename($self->get_filename()) .  '.tmp-extract.XXXXX';
+    # Prepare destination.
     unless (-e $dest) {
-        # Kludge so that realpath works
+        # Kludge so that realpath works.
         mkdir($dest) or syserr(g_('cannot create directory %s'), $dest);
     }
-    my $tmp = tempdir($template, DIR => Cwd::realpath("$dest/.."), CLEANUP => 1);
-    $spawn_opts{chdir} = $tmp;
+    my $tmpdir = File::Temp->newdir(
+        TEMPLATE => basename($self->get_filename()) . '.tmp-extract.XXXXX',
+        DIR => Cwd::realpath("$dest/.."),
+    );
+    $spawn_opts{chdir} = $tmpdir;
 
-    # Prepare stuff that handles the input of tar
-    $self->ensure_open('r', delete_sig => [ 'PIPE' ]);
+    # Prepare stuff that handles the input of tar.
+    $self->ensure_open('r',
+        delete_sig => [
+            'PIPE',
+        ],
+    );
     $spawn_opts{from_handle} = $self->get_filehandle();
 
-    # Call tar extraction process
-    $spawn_opts{delete_env} = [ 'TAR_OPTIONS' ];
+    # Call tar extraction process.
+    $spawn_opts{delete_env} = [
+        'TAR_OPTIONS',
+    ];
     $spawn_opts{exec} = [
-        $Dpkg::PROGTAR, '-xf', '-', '--no-same-permissions',
-                        '--no-same-owner', @{$opts{options}},
+        $Dpkg::PROGTAR,
+        '-xf', '-',
+        '--no-same-permissions',
+        '--no-same-owner',
+        @{$opts{options}},
     ];
     spawn(%spawn_opts);
     $self->close();
@@ -159,7 +179,7 @@ sub extract {
     # extracted); we need --no-same-owner because putting the owner
     # back is tedious - in particular, correct group ownership would
     # have to be calculated using mount options and other madness.
-    fixperms($tmp) unless $opts{no_fixperms};
+    fixperms($tmpdir) unless $opts{no_fixperms};
 
     # If we are extracting "in-place" do not remove the destination directory.
     if ($opts{in_place}) {
@@ -182,7 +202,7 @@ sub extract {
         };
 
         my $move_in_place = sub {
-            my $relpath = File::Spec->abs2rel($File::Find::name, $tmp);
+            my $relpath = File::Spec->abs2rel($File::Find::name, $tmpdir);
             my $destpath = File::Spec->catfile($dest, $relpath);
 
             my ($mode, $atime, $mtime);
@@ -228,29 +248,31 @@ sub extract {
                 or syserr(g_('cannot move %s to %s'), $File::Find::name, $destpath);
         };
 
-        find({
+        my $scan_move_in_place = {
             wanted => $move_in_place,
             no_chdir => 1,
             dangling_symlinks => 0,
-        }, $tmp);
+        };
+        find($scan_move_in_place, $tmpdir);
     } else {
-        # Rename extracted directory
-        opendir(my $dir_dh, $tmp) or syserr(g_('cannot opendir %s'), $tmp);
+        # Rename extracted directory.
+        opendir my $dir_dh, $tmpdir
+            or syserr(g_('cannot opendir %s'), $tmpdir);
         my @entries = grep { $_ ne '.' && $_ ne '..' } readdir($dir_dh);
         closedir($dir_dh);
 
         erasedir($dest);
 
-        if (scalar(@entries) == 1 && ! -l "$tmp/$entries[0]" && -d _) {
-            rename("$tmp/$entries[0]", $dest)
+        if (scalar(@entries) == 1 && ! -l "$tmpdir/$entries[0]" && -d _) {
+            rename "$tmpdir/$entries[0]", $dest
                 or syserr(g_('unable to rename %s to %s'),
-                          "$tmp/$entries[0]", $dest);
+                          "$tmpdir/$entries[0]", $dest);
         } else {
-            rename($tmp, $dest)
-                or syserr(g_('unable to rename %s to %s'), $tmp, $dest);
+            rename $tmpdir, $dest
+                or syserr(g_('unable to rename %s to %s'), $tmpdir, $dest);
         }
     }
-    erasedir($tmp);
+    erasedir($tmpdir);
 }
 
 =head1 CHANGES

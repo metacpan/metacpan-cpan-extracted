@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::OpenPGP::Backend 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use List::Util qw(first);
 use MIME::Base64;
@@ -142,7 +141,7 @@ sub _pgp_dearmor_data {
                    'which is not an interoperable construct, see <%s>'),
                 $filename,
                 'https://tests.sequoia-pgp.org/results.html#ASCII_Armor');
-        hint(g_('sq keyring merge --overwrite --output %s %s'),
+        hint('sq keyring merge --overwrite --output %s %s',
              $filename, $filename);
     }
     return $binary;
@@ -219,12 +218,14 @@ sub dearmor {
 sub inline_verify {
     my ($self, $inlinesigned, $data, @certs) = @_;
 
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
     return OPENPGP_UNSUPPORTED_SUBCMD;
 }
 
 sub verify {
     my ($self, $data, $sig, @certs) = @_;
 
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
     return OPENPGP_UNSUPPORTED_SUBCMD;
 }
 

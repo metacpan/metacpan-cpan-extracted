@@ -84,7 +84,7 @@ YAML
     'incorrect expected entity type',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ $openapi->recursive_get('#/paths/~1foo/post/parameters/2') ],
     [ { name => 'baz', in => 'query', schema => {} }, str('http://localhost:1234/api#/components/parameters/baz') ],
     'successful get through a $ref',
@@ -96,25 +96,25 @@ YAML
     'multiple $refs, landing on the wrong type',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ $openapi->recursive_get('#/components/schemas/foo') ],
     [ { type => 'string' }, str('http://localhost:5678/api#/properties/foo') ],
     'successful get through multiple $refs, with a change of base uri',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ $openapi->recursive_get('#/components/schemas/baz') ],
     [ { type => 'integer' }, str('http://far_far_away/api2#/components/schemas/alpha') ],
     'successful get through multiple $refs, with a change of document',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ $openapi->recursive_get('http://far_far_away/api2#/components/parameters/foo') ],
     [ { name => 'baz', in => 'query', schema => {} }, str('http://localhost:1234/api#/components/parameters/baz') ],
     'successful get through multiple $refs, with a change in document, starting with an absolute uri',
   );
 
-  cmp_deeply(
+  cmp_result(
     [ $openapi->recursive_get('http://far_far_away/api2#/components/schemas/beta/properties/alpha') ],
     [ { type => 'string' }, str('http://far_far_away/api2#/components/schemas/beta/properties/alpha') ],
     'successful get of a schema contained within a schema',

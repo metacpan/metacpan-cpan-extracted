@@ -58,7 +58,18 @@ use Test::More;
         'HTML left alone in ignored (by name) field',
     );
 }
-
+{
+    diag "HTML-ish looking but left alone by ignore_values";
+    my $value = '\<:100';
+    my $req = POST('/', [htmlish => $value]);
+    my ($res, $c) = ctx_request($req);
+    is($res->code, RC_OK, 'response ok');
+    is(
+        $c->req->param('htmlish'),
+        $value,
+        'HTML-ish value left alone in field matching ignore_values pattern',
+    );
+}
 {
     # Test that data in a JSON body POSTed gets scrubbed too
     my $json_body = <<JSON;

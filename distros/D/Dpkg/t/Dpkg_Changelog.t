@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 102;
 use Test::Dpkg qw(:paths);
@@ -23,11 +22,9 @@ use File::Basename;
 
 use Dpkg::File;
 
-BEGIN {
-    use_ok('Dpkg::Changelog');
-    use_ok('Dpkg::Changelog::Debian');
-    use_ok('Dpkg::Vendor', qw(get_current_vendor));
-};
+use ok 'Dpkg::Changelog';
+use ok 'Dpkg::Changelog::Debian';
+use ok 'Dpkg::Vendor', qw(get_current_vendor);
 
 my $datadir = test_get_data_path();
 
@@ -38,7 +35,9 @@ sub setup_changelog
     my $name = shift;
     my $file = "$datadir/$name";
 
-    my $changes = Dpkg::Changelog::Debian->new(verbose => 0);
+    my $changes = Dpkg::Changelog::Debian->new(
+        verbose => 0,
+    );
     $changes->load($file);
 
     my $content = file_slurp($file);
@@ -57,21 +56,27 @@ sub setup_changelog
 
         my $str;
         my $oldest_version = $data[-1]->{Version};
-        $str = $changes->format_range('dpkg', { since => $oldest_version });
+        $str = $changes->format_range('dpkg',
+            {
+                since => $oldest_version,
+            },
+        );
 
         $str = $changes->format_range('rfc822');
 
         ok(1, 'TODO check rfc822 output');
 
-        $str = $changes->format_range('rfc822', { since => $oldest_version });
+        $str = $changes->format_range('rfc822',
+            {
+                since => $oldest_version,
+            },
+        );
 
         ok(1, 'TODO check rfc822 output with ranges');
     }
 
     return ($changes, \@data);
 }
-
-#########################
 
 my $changes;
 my $data;
@@ -103,137 +108,292 @@ my %ref = (
     data => $data,
 );
 
-check_options(%ref, range => { count => 3 },
-              count => 3,
-              versions => [ '2:2.0-1', '1:2.0~rc2-3', '1:2.0~rc2-2' ],
-              name => 'positive count');
-check_options(%ref, range => { count => 3, reverse => 1 },
-              count => 3,
-              versions => [ '1:2.0~rc2-2', '1:2.0~rc2-3', '2:2.0-1' ],
-              name => 'positive reverse count');
-check_options(%ref, range => { count => -3 },
-              count => 3,
-              versions => [
-                    '1:2.0~rc2-1sarge2',
-                    '1:2.0~rc2-1sarge1',
-                    '1.5-1',
-              ],
-              name => 'negative count');
-check_options(%ref, range => { count => 1 },
-              count => 1,
-              versions => [ '2:2.0-1' ],
-              name => 'count 1');
-check_options(%ref, range => { count => 1, default_all => 1 },
-              count => 1,
-              versions => [ '2:2.0-1' ],
-              name => 'count 1 (d_a 1)');
-check_options(%ref, range => { count => -1 },
-              count => 1,
-              versions => [ '1.5-1' ],
-              name => 'count -1');
+check_options(
+    %ref,
+    range => {
+        count => 3,
+    },
+    count => 3,
+    versions => [
+        '2:2.0-1',
+        '1:2.0~rc2-3',
+        '1:2.0~rc2-2',
+    ],
+    name => 'positive count',
+);
+check_options(
+    %ref,
+    range => {
+        count => 3,
+        reverse => 1,
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-2',
+        '1:2.0~rc2-3',
+        '2:2.0-1',
+    ],
+    name => 'positive reverse count',
+);
+check_options(
+    %ref,
+    range => {
+        count => -3,
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-1sarge2',
+        '1:2.0~rc2-1sarge1',
+        '1.5-1',
+    ],
+    name => 'negative count',
+);
+check_options(
+    %ref,
+    range => {
+        count => 1,
+    },
+    count => 1,
+    versions => [
+        '2:2.0-1',
+    ],
+    name => 'count 1',
+);
+check_options(
+    %ref,
+    range => {
+        count => 1,
+        default_all => 1,
+    },
+    count => 1,
+    versions => [
+        '2:2.0-1',
+    ],
+    name => 'count 1 (d_a 1)',
+);
+check_options(
+    %ref,
+    range => {
+        count => -1,
+    },
+    count => 1,
+    versions => [
+        '1.5-1',
+    ],
+    name => 'count -1',
+);
 
-check_options(%ref, range => { count => 3, offset => 2 },
-              count => 3,
-              versions => [
-                    '1:2.0~rc2-2',
-                    '1:2.0~rc2-1sarge3',
-                    '1:2.0~rc2-1sarge2',
-              ],
-              name => 'positive count + positive offset');
-check_options(%ref, range => { count => -3, offset => 4 },
-              count => 3,
-              versions => [
-                    '1:2.0~rc2-3',
-                    '1:2.0~rc2-2',
-                    '1:2.0~rc2-1sarge3',
-              ],
-              name => 'negative count + positive offset');
+check_options(
+    %ref,
+    range => {
+        count => 3,
+        offset => 2,
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-2',
+        '1:2.0~rc2-1sarge3',
+        '1:2.0~rc2-1sarge2',
+    ],
+    name => 'positive count + positive offset',
+);
+check_options(
+    %ref,
+    range => {
+        count => -3,
+        offset => 4,
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-3',
+        '1:2.0~rc2-2',
+        '1:2.0~rc2-1sarge3',
+    ],
+    name => 'negative count + positive offset',
+);
 
-check_options(%ref, range => { count => 4, offset => 5 },
-              count => 2,
-              versions => [ '1:2.0~rc2-1sarge1', '1.5-1' ],
-              name => 'positive count + positive offset (>max)');
-check_options(%ref, range =>  { count => -4, offset => 2 },
-              count => 2,
-              versions => [ '2:2.0-1', '1:2.0~rc2-3' ],
-              name => 'negative count + positive offset (<0)');
+check_options(
+    %ref,
+    range => {
+        count => 4,
+        offset => 5,
+    },
+    count => 2,
+    versions => [
+        '1:2.0~rc2-1sarge1',
+        '1.5-1',
+    ],
+    name => 'positive count + positive offset (>max)',
+);
+check_options(
+    %ref,
+    range => {
+        count => -4,
+        offset => 2,
+    },
+    count => 2,
+    versions => [
+        '2:2.0-1',
+        '1:2.0~rc2-3',
+    ],
+    name => 'negative count + positive offset (<0)',
+);
 
-check_options(%ref, range => { count => 3, offset => -4 },
-              count => 3,
-              versions => [
-                '1:2.0~rc2-1sarge3',
-                '1:2.0~rc2-1sarge2',
-                '1:2.0~rc2-1sarge1',
-              ],
-              name => 'positive count + negative offset');
-check_options(%ref, range => { count => -3, offset => -3 },
-              count => 3,
-              versions => [
-                  '1:2.0~rc2-3',
-                  '1:2.0~rc2-2',
-                  '1:2.0~rc2-1sarge3',
-              ],
-              name => 'negative count + negative offset');
+check_options(
+    %ref,
+    range => {
+        count => 3,
+        offset => -4,
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-1sarge3',
+        '1:2.0~rc2-1sarge2',
+        '1:2.0~rc2-1sarge1',
+    ],
+    name => 'positive count + negative offset',
+);
+check_options(
+    %ref,
+    range => {
+        count => -3,
+        offset => -3,
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-3',
+        '1:2.0~rc2-2',
+        '1:2.0~rc2-1sarge3',
+    ],
+    name => 'negative count + negative offset',
+);
 
-check_options(%ref, range => { count => 5, offset => -2 },
-              count => 2,
-              versions => [ '1:2.0~rc2-1sarge1', '1.5-1' ],
-              name => 'positive count + negative offset (>max)');
-check_options(%ref, range => { count => -5, offset => -4 },
-              count => 3,
-              versions => [ '2:2.0-1', '1:2.0~rc2-3', '1:2.0~rc2-2' ],
-              name => 'negative count + negative offset (<0)');
+check_options(
+    %ref,
+    range => {
+        count => 5,
+        offset => -2,
+    },
+    count => 2,
+    versions => [
+        '1:2.0~rc2-1sarge1',
+        '1.5-1',
+    ],
+    name => 'positive count + negative offset (>max)',
+);
+check_options(
+    %ref,
+    range => {
+        count => -5,
+        offset => -4,
+    },
+    count => 3,
+    versions => [
+        '2:2.0-1',
+        '1:2.0~rc2-3',
+        '1:2.0~rc2-2',
+    ],
+    name => 'negative count + negative offset (<0)',
+);
 
-check_options(%ref, range => { count => 7 },
-              count => 7,
-              name => 'count 7 (max)');
-check_options(%ref, range => { count => -7 },
-              count => 7,
-              name => 'count -7 (-max)');
-check_options(%ref, range => { count => 10 },
-              count => 7,
-              name => 'count 10 (>max)');
-check_options(%ref, range => { count => -10 },
-              count => 7,
-              name => 'count -10 (<-max)');
+check_options(
+    %ref,
+    range => {
+        count => 7,
+    },
+    count => 7,
+    name => 'count 7 (max)',
+);
+check_options(
+    %ref,
+    range => {
+        count => -7,
+    },
+    count => 7,
+    name => 'count -7 (-max)',
+);
+check_options(
+    %ref,
+    range => {
+        count => 10,
+    },
+    count => 7,
+    name => 'count 10 (>max)',
+);
+check_options(
+    %ref,
+    range => {
+        count => -10,
+    },
+    count => 7,
+    name => 'count -10 (<-max)',
+);
 
-check_options(%ref, range => { from => '1:2.0~rc2-1sarge3' },
-              count => 4,
-              versions => [
-                  '2:2.0-1',
-                  '1:2.0~rc2-3',
-                  '1:2.0~rc2-2',
-                  '1:2.0~rc2-1sarge3',
-              ],
-              name => 'from => "1:2.0~rc2-1sarge3"');
-check_options(%ref, range => { since => '1:2.0~rc2-1sarge3' },
-              count => 3,
-              versions => [
-                    '2:2.0-1',
-                    '1:2.0~rc2-3',
-                    '1:2.0~rc2-2',
-              ],
-              name => 'since => "1:2.0~rc2-1sarge3"');
+check_options(
+    %ref,
+    range => {
+        from => '1:2.0~rc2-1sarge3',
+    },
+    count => 4,
+    versions => [
+        '2:2.0-1',
+        '1:2.0~rc2-3',
+        '1:2.0~rc2-2',
+        '1:2.0~rc2-1sarge3',
+    ],
+    name => 'from => "1:2.0~rc2-1sarge3"',
+);
+check_options(
+    %ref,
+    range => {
+        since => '1:2.0~rc2-1sarge3',
+    },
+    count => 3,
+    versions => [
+        '2:2.0-1',
+        '1:2.0~rc2-3',
+        '1:2.0~rc2-2',
+    ],
+    name => 'since => "1:2.0~rc2-1sarge3"',
+);
 $SIG{__WARN__} = sub {};
-check_options(%ref, range => { since => 0 },
-              count => 7,
-              name => 'since => 0 returns all');
+check_options(
+    %ref,
+    range => {
+        since => 0,
+    },
+    count => 7,
+    name => 'since => 0 returns all',
+);
 delete $SIG{__WARN__};
-check_options(%ref, range => { to => '1:2.0~rc2-1sarge2' },
-              count => 3,
-              versions => [
-                    '1:2.0~rc2-1sarge2',
-                    '1:2.0~rc2-1sarge1',
-                    '1.5-1',
-              ],
-              name => 'to => "1:2.0~rc2-1sarge2"');
+check_options(
+    %ref,
+    range => {
+        to => '1:2.0~rc2-1sarge2',
+    },
+    count => 3,
+    versions => [
+        '1:2.0~rc2-1sarge2',
+        '1:2.0~rc2-1sarge1',
+        '1.5-1',
+    ],
+    name => 'to => "1:2.0~rc2-1sarge2"',
+);
 ## no critic (ControlStructures::ProhibitUntilBlocks)
-check_options(%ref, range => { until => '1:2.0~rc2-1sarge2' },
-              count => 2,
-              versions => [ '1:2.0~rc2-1sarge1', '1.5-1' ],
-              name => 'until => "1:2.0~rc2-1sarge2"');
+check_options(
+    %ref,
+    range => {
+        until => '1:2.0~rc2-1sarge2',
+    },
+    count => 2,
+    versions => [
+        '1:2.0~rc2-1sarge1',
+        '1.5-1',
+    ],
+    name => 'until => "1:2.0~rc2-1sarge2"',
+);
 ## use critic
-#TODO: test combinations
+# TODO: Test combinations.
 
 
 ## File: shadow
@@ -245,8 +405,12 @@ check_options(%ref, range => { until => '1:2.0~rc2-1sarge2' },
 
 ($changes, $data) = setup_changelog('fields');
 
-    my $str = $changes->format_range('dpkg', { all => 1 });
-    my $expected = 'Source: fields
+my $str = $changes->format_range('dpkg',
+    {
+        all => 1,
+    },
+);
+my $expected = 'Source: fields
 Version: 2.0-0etch1
 Distribution: stable
 Urgency: high
@@ -283,13 +447,18 @@ Xb-Userfield2: foobar
 Xc-Userfield: foobar
 
 ';
-    if ($vendor eq 'Ubuntu') {
-        $expected =~ s/^(Closes:.*)/$1\nLaunchpad-Bugs-Fixed: 12345 54321 424242 2424242/m;
-    }
-    cmp_ok($str, 'eq', $expected, 'fields handling');
+if ($vendor eq 'Ubuntu') {
+    $expected =~ s/^(Closes:.*)/$1\nLaunchpad-Bugs-Fixed: 12345 54321 424242 2424242/m;
+}
+cmp_ok($str, 'eq', $expected, 'fields handling');
 
-    $str = $changes->format_range('dpkg', { offset => 1, count => 2 });
-    $expected = 'Source: fields
+$str = $changes->format_range('dpkg',
+    {
+        offset => 1,
+        count => 2,
+    },
+);
+$expected = 'Source: fields
 Version: 2.0-1
 Distribution: unstable frozen
 Urgency: medium
@@ -316,13 +485,18 @@ Changes:
 Xc-Userfield: foobar
 
 ';
-    if ($vendor eq 'Ubuntu') {
-        $expected =~ s/^(Closes:.*)/$1\nLaunchpad-Bugs-Fixed: 12345 424242/m;
-    }
-    cmp_ok($str, 'eq', $expected, 'fields handling 2');
+if ($vendor eq 'Ubuntu') {
+    $expected =~ s/^(Closes:.*)/$1\nLaunchpad-Bugs-Fixed: 12345 424242/m;
+}
+cmp_ok($str, 'eq', $expected, 'fields handling 2');
 
-    $str = $changes->format_range('rfc822', { offset => 2, count => 2 });
-    $expected = 'Source: fields
+$str = $changes->format_range('rfc822',
+    {
+        offset => 2,
+        count => 2,
+    },
+);
+$expected = 'Source: fields
 Version: 2.0~b1-1
 Distribution: unstable
 Urgency: low
@@ -350,28 +524,28 @@ Changes:
 Xb-Userfield2: foobar
 
 ';
-    cmp_ok($str, 'eq', $expected, 'fields handling 3');
+cmp_ok($str, 'eq', $expected, 'fields handling 3');
 
-    # Test Dpkg::Changelog::Entry methods
-    is($data->[1]->get_version(), '2.0-1', 'get_version');
-    is($data->[1]->get_source(), 'fields', 'get_source');
-    is(scalar $data->[1]->get_distributions(), 'unstable', 'get_distribution');
-    is(join('|', $data->[1]->get_distributions()), 'unstable|frozen',
-        'get_distributions');
-    is($data->[3]->get_optional_fields(),
-        "Urgency: high\nCloses: 1000000\nXb-Userfield2: foobar\n",
-        'get_optional_fields');
-    is($data->[1]->get_maintainer(), 'Frank Lichtenheld <djpig@debian.org>',
-        'get_maintainer');
-    is($data->[1]->get_timestamp(), 'Sun, 12 Jan 2008 15:49:19 +0100',
-        'get_timestamp');
-    my @items = $data->[1]->get_change_items();
-    is($items[0], "  [ Frank Lichtenheld ]\n", 'change items 1');
-    is($items[4], '  * New upstream release.
+# Test Dpkg::Changelog::Entry methods.
+is($data->[1]->get_version(), '2.0-1', 'get_version');
+is($data->[1]->get_source(), 'fields', 'get_source');
+is(scalar $data->[1]->get_distributions(), 'unstable', 'get_distribution');
+is(join('|', $data->[1]->get_distributions()), 'unstable|frozen',
+    'get_distributions');
+is($data->[3]->get_optional_fields(),
+    "Urgency: high\nCloses: 1000000\nXb-Userfield2: foobar\n",
+    'get_optional_fields');
+is($data->[1]->get_maintainer(), 'Frank Lichtenheld <djpig@debian.org>',
+    'get_maintainer');
+is($data->[1]->get_timestamp(), 'Sun, 12 Jan 2008 15:49:19 +0100',
+    'get_timestamp');
+my @items = $data->[1]->get_change_items();
+is($items[0], "  [ Frank Lichtenheld ]\n", 'change items 1');
+is($items[4], '  * New upstream release.
     - implements a
     - implements b
 ', 'change items 2');
-    is($items[5], "  * Update S-V.\n", 'change items 3');
+is($items[5], "  * Update S-V.\n", 'change items 3');
 
 
 ## File: date-format
@@ -406,9 +580,10 @@ is("$f->{Version}", '0', 'version 0 correctly parsed');
 
 foreach my $test (([ "$datadir/misplaced-tz", 6 ],
                    [ "$datadir/unreleased", 5, 7 ])) {
-
     my $file = shift @$test;
-    my $changes = Dpkg::Changelog::Debian->new(verbose => 0);
+    my $changes = Dpkg::Changelog::Debian->new(
+        verbose => 0,
+    );
     $changes->load($file);
     my @errors = $changes->get_parse_errors();
 

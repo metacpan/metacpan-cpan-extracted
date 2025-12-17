@@ -13,14 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
-use Test::Dpkg qw(:needs);
+use Test::Dpkg qw(:needs :paths);
 use Module::Metadata;
 
-test_needs_srcdir_switch();
+test_chdir_srcdir();
 
 my @files = Test::Dpkg::all_perl_modules();
 
@@ -70,4 +69,4 @@ sub module_version_ok
 
 foreach my $file (@files) {
     module_version_ok($file);
-};
+}

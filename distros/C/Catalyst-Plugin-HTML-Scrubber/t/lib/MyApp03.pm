@@ -20,6 +20,8 @@ __PACKAGE__->config(
             qr{/all_exempt/.+},
         ],
 
+        ignore_values => [ qr{^\\<:\d+$} ],
+
         # params for HTML::Scrubber
         params => [
             allow => [qw/br hr b/],

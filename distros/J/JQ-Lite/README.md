@@ -41,7 +41,7 @@ where **simplicity, readability, and low dependency footprint** matter.
 * 🔧 **CLI tool**: `jq-lite`
 
   * `--null-input`, `--slurp`, `--from-file`
-  * `--yaml`, `--arg`, `--argjson`
+  * `--yaml`, `--arg`, `--argjson`, `--ascii-output`
 * 📊 **100+ built-in jq functions**
   → see [`FUNCTIONS.md`](FUNCTIONS.md)
 * 💻 **Interactive mode** for exploring JSON

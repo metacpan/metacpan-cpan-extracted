@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 59;
 use Test::Dpkg qw(:paths);
 
-BEGIN {
-    use_ok('Dpkg::Checksums');
-}
+use ok 'Dpkg::Checksums';
 
 my $datadir = test_get_data_path();
 
@@ -96,7 +93,7 @@ my $ck = Dpkg::Checksums->new();
 
 is(scalar $ck->get_files(), 0, 'No checksums recorded');
 
-# Check add_from_file()
+# Check add_from_file().
 
 foreach my $f (@data) {
     $ck->add_from_file("$datadir/$f->{file}", key => $f->{file});
@@ -109,7 +106,7 @@ foreach my $alg (keys %str_checksum) {
 
 test_checksums($ck);
 
-# Check add_from_string()
+# Check add_from_string().
 
 foreach my $alg (keys %str_checksum) {
     $ck->add_from_string($alg, $str_checksum{$alg});
@@ -120,13 +117,13 @@ foreach my $alg (keys %str_checksum) {
 
 test_checksums($ck);
 
-# Check remove_file()
+# Check remove_file().
 
 ok($ck->has_file('data-2'), 'To be removed file is present');
 $ck->remove_file('data-2');
-ok(!$ck->has_file('data-2'), 'Remove file is not present');
+ok(! $ck->has_file('data-2'), 'Remove file is not present');
 
-# Check add_from_control()
+# Check add_from_control().
 my $ctrl;
 foreach my $f (@data) {
     next if $f->{file} ne 'data-2';
@@ -138,12 +135,12 @@ $ck->add_from_control($ctrl);
 
 test_checksums($ck);
 
-# Check export_to_control()
+# Check export_to_control().
 
 my $ctrl_export = {};
 $ck->export_to_control($ctrl_export);
 
 foreach my $alg (keys %str_checksum) {
     is($ctrl_export->{"Checksums-$alg"}, $str_checksum{$alg},
-       "Export checksum $alg to a control object");
+        "Export checksum $alg to a control object");
 }

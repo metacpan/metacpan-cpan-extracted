@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::OpenPGP::KeyHandle 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Carp;
 use List::Util qw(any none);
@@ -54,7 +53,7 @@ sub new {
 my $keyid_regex = qr/^(?:0x)?([[:xdigit:]]+)$/;
 
 sub _sanitize {
-    my ($self) = shift;
+    my $self = shift;
 
     my $type = $self->{type};
     if ($type eq 'auto') {

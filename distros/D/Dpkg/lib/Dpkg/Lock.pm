@@ -30,15 +30,14 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Lock 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     file_lock
 );
 
 use Exporter qw(import);
-use Fcntl qw(:flock);
+use Fcntl qw(:flock F_WRLCK F_SETLKW);
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -46,28 +45,34 @@ use Dpkg::ErrorHandling;
 sub file_lock {
     my ($fh, $filename) = @_;
 
-    # A strict dependency on libfile-fcntllock-perl being it an XS module,
-    # and dpkg-dev indirectly making use of it, makes building new perl
-    # package which bump the perl ABI impossible as these packages cannot
-    # be installed alongside.
-    eval q{
-        use File::FcntlLock;
-    };
-    if ($@) {
-        # On Linux systems the flock() locks get converted to file-range
-        # locks on NFS mounts.
-        if ($^O ne 'linux') {
-            warning(g_('File::FcntlLock not available; using flock which is not NFS-safe'));
-        }
-        flock($fh, LOCK_EX)
-            or syserr(g_('failed to get a write lock on %s'), $filename);
-    } else {
-        eval q{
-            my $fs = File::FcntlLock->new(l_type => F_WRLCK);
+    # We cannot have a strict dependency on libfile-fcntllock-perl because
+    # it contains an XS module, and dpkg-dev indirectly making use of it,
+    # which makes building new perl package that bump the perl ABI
+    # impossible as these packages cannot then be installed alongside.
+    #
+    # But if the XS module fails to load, because we are in the middle of an
+    # upgrade with an ABI breaking perl transition, fall back to try to use
+    # the pure Perl module, if available.
+    foreach my $module (qw(File::FcntlLock File::FcntlLock::Pure)) {
+        eval qq{
+            require $module;
+        };
+        if (not $@) {
+            my $fs = $module->new(l_type => F_WRLCK);
             $fs->lock($fh, F_SETLKW)
                 or syserr(g_('failed to get a write lock on %s'), $filename);
+            return;
         }
     }
+
+    # On Linux systems the flock() locks get converted to file-range
+    # locks on NFS mounts.
+    if ($^O ne 'linux') {
+        warning(g_('File::FcntlLock not available; using flock which is not NFS-safe'));
+    }
+    flock $fh, LOCK_EX
+        or syserr(g_('failed to get a write lock on %s'), $filename);
+    return;
 }
 
 =head1 CHANGES

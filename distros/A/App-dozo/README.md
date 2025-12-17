@@ -1,11 +1,11 @@
 [![Actions Status](https://github.com/tecolicom/App-dozo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/App-dozo/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-dozo.svg)](https://metacpan.org/release/App-dozo)
 <div>
-    <p align="center"><img src="https://raw.githubusercontent.com/tecolicom/App-dozo/main/images/dozo-logo.jpeg" width="400"></p>
+    <p align="center"><img src="https://raw.githubusercontent.com/tecolicom/App-dozo/main/images/dozo-logo.png" width="400"></p>
 </div>
 
 # NAME
 
-dozo - Docker with Zero Overhead
+dozo - Dôzo, Docker with Zero Overhead
 
 # SYNOPSIS
 
@@ -36,11 +36,11 @@ dozo -I IMAGE \[ options \] \[ command ... \]
 
 # VERSION
 
-Version 0.9923
+Version 0.9924
 
 # USAGE
 
-When executed without arguments, dozo starts an interactive shell
+When executed without arguments, Dôzo starts an interactive shell
 inside the container.  When arguments are given, they are executed as
 a command.
 
@@ -48,7 +48,7 @@ a command.
     dozo -I alpine ls -la           # run command
 
 By setting `-D` or your favorite image with `-I` in `~/.dozorc`,
-you can simply run dozo without specifying an image.  Since the git
+you can simply run Dôzo without specifying an image.  Since the git
 top directory is automatically mounted, git commands work as expected
 from anywhere in the tree.
 
@@ -61,32 +61,46 @@ installed in the container will remain available for subsequent use.
     $ dozo -L                       # start shell and create container
     # apt update && apt install -y cowsay
     # exit
-    $ dozo -L /usr/games/cowsay Hello
-     _______
-    < Hello >
-     -------
+    $ dozo -L /usr/games/cowsay Dôzo
+     ______
+    < Dôzo >
+     ------
             \   ^__^
              \  (oo)\_______
                 (__)\       )\/\
                     ||----w |
                     ||     ||
 
+# INSTALLATION
+
+Using [cpanminus](https://metacpan.org/pod/App::cpanminus):
+
+    cpanm -n App::dozo
+
+To install the latest version from GitHub:
+
+    cpanm -n https://github.com/tecolicom/App-dozo.git
+
+Alternatively, you can simply place `dozo` and `getoptlong.sh` in
+your PATH.
+
 # DESCRIPTION
 
-**dozo** is a generic Docker runner that simplifies running commands in
-Docker containers.  The name "dozo" comes from the Japanese word
-meaning "please" or "go ahead", and also stands for "Docker with Zero
-Overhead".
+**Dôzo** is a generic Docker runner that simplifies running commands in
+Docker containers.  The name comes from the Japanese word "dôzo"
+(どうぞ) meaning "please" or "go ahead", and also stands for "**D**ocker
+with **Z**ero **O**verhead".  The command name is `dozo` for ease of
+typing.
 
 It automatically configures the tedious Docker options such as volume
 mounts, environment variables, working directories, and interactive
 terminal settings, so you can focus on the command you want to run.
 
-**dozo** is distributed as a standalone module and can be used as a
+**Dôzo** is distributed as a standalone module and can be used as a
 general-purpose Docker runner. It was originally developed as part of
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate) and is used by [xlate](https://metacpan.org/pod/xlate) for Docker operations.
 
-**dozo** uses [getoptlong.sh](https://github.com/tecolicom/getoptlong)
+**Dôzo** uses [getoptlong.sh](https://github.com/tecolicom/getoptlong)
 for option parsing.
 
 ## Key Features
@@ -126,7 +140,7 @@ for option parsing.
 
 - **Standalone Operation**
 
-    **dozo** can operate independently of [xlate](https://metacpan.org/pod/xlate). The distribution includes
+    **Dôzo** can operate independently of [xlate](https://metacpan.org/pod/xlate). The distribution includes
     `getoptlong.sh` as a submodule in the `share/getoptlong` directory.
     If the module is installed via CPAN, it searches for `getoptlong.sh`
     via `File::Share::dist_dir('App-dozo')`. Otherwise, it searches for
@@ -164,7 +178,7 @@ for option parsing.
 
     Use the default Docker image. If `DOZO_DEFAULT_IMAGE` environment
     variable is set, use that image. Otherwise, use
-    `tecolicom/xlate:VERSION` where VERSION is the current dozo version.
+    `tecolicom/xlate:VERSION` where VERSION is the current Dôzo version.
     See ["DEFAULT IMAGE"](#default-image) section for details about the default image.
 
 - **-E** _name_\[=_value_\], **--env**=_name_\[=_value_\]
@@ -234,7 +248,7 @@ state and reduce startup overhead.
 
 ## Container Lifecycle
 
-When `-L` is specified, **dozo** behaves as follows:
+When `-L` is specified, **Dôzo** behaves as follows:
 
 - 1. **Container does not exist**
 
@@ -382,7 +396,7 @@ Multiple [App::Greple](https://metacpan.org/pod/App%3A%3AGreple) extension modul
 ## Git Integration
 
 The image includes a pre-configured git environment optimized for
-document comparison and review. Since **dozo** automatically mounts
+document comparison and review. Since **Dôzo** automatically mounts
 the git top directory by default, git commands work seamlessly with
 full repository context:
 
@@ -416,7 +430,7 @@ and PowerPoint (.pptx) files directly with git
 
     Specifies the default Docker image used when `-D` (`--default`) option
     is given. If not set, `tecolicom/xlate:VERSION` is used where VERSION
-    is the current dozo version.
+    is the current Dôzo version.
 
 ## Inherited Variables
 
@@ -433,7 +447,7 @@ The following environment variables are set inside the container:
 
 - `DOZO_RUNNING_ON_DOCKER=1`
 
-    Indicates the command is running inside a container started by dozo.
+    Indicates the command is running inside a container started by Dôzo.
 
 - `XLATE_RUNNING_ON_DOCKER=1`
 

@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
-use Test::Dpkg qw(:needs);
+use Test::Dpkg qw(:paths);
 
-test_needs_srcdir_switch();
+test_chdir_srcdir();
 
 my @files = Test::Dpkg::all_perl_files();
 
@@ -30,7 +29,7 @@ my $PERL = $ENV{PERL} // $^X // 'perl';
 # Detect compilation warnings that are not found with just «use warnings»,
 # such as redefinition of symbols from multiple imports. We cannot use
 # Test::Strict::syntax_ok because it does not pass -w to perl, and does not
-# check for other issues whenever perl states the syntax is ok.
+# check for other issues whenever perl states the syntax is OK.
 sub syntax_ok {
     my $file = shift;
 

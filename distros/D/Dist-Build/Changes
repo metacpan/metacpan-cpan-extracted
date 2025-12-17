@@ -1,5 +1,8 @@
 Revision history for Dist-Build
 
+0.024     2025-12-16 21:43:32+01:00 Europe/Brussels
+          - Don't copy Dist::Build runtime dependencies to configure until they're all known
+
 0.023     2025-12-15 13:52:26+01:00 Europe/Brussels
           - Add support for importing and exporting typemaps
           - Only export dir if dir is defined

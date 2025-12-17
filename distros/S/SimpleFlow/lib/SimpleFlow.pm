@@ -6,7 +6,7 @@ use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 use Time::HiRes;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
@@ -69,16 +69,18 @@ sub task {
 		p $args;
 		die "the filehandle given to $current_sub isn't actually a filehandle";
 	}
-	my (%input_file_size, @existing_files, @output_files);
+	my (%input_file_size, @existing_files, @output_files, @empty_filenames);
 	if (defined $args->{'input.files'}) {
 		my $ref = ref $args->{'input.files'};
 		my @missing_files;
 		if ($ref eq 'ARRAY') {
 			@missing_files = grep {not -f -r $_ } @{ $args->{'input.files'} };
 			%input_file_size = map { $_ => -s $_ } @{ $args->{'input.files'} };
+			@empty_filenames = grep {length $_ == 0} @{ $args->{'input.files'} };
 		} elsif ($ref eq '') { # scalar
 			@missing_files = grep {not -f -r $_ } ($args->{'input.files'});
 			%input_file_size = map { $_ => -s $_ } ($args->{'input.files'} );
+			@empty_filenames = grep {length $_ == 0} ($args->{'input.files'});
 		} else {
 			p $args;
 			die 'ref type "' . $ref . '" is not allowed for "input.files"';
@@ -91,6 +93,10 @@ sub task {
 			p @missing_files;
 			die 'the above files are missing or are not readable';
 		}
+	}
+	if (scalar @empty_filenames > 0) {
+		p $args;
+		die '0-length filenames are not allowed (found in "input.files")';
 	}
 	my $msg = "\@ $c[1] line $c[2] The command is:\n" . colored(['blue on_bright_red'], $args->{cmd});
 	say $msg;
@@ -105,6 +111,11 @@ sub task {
 			p $args;
 			die "$ref isn't allowed for \"output.files\"";
 		}
+	}
+	@empty_filenames = grep {length $_ == 0} @output_files; # 0-length filenames aren't allowed
+	if (scalar @empty_filenames > 0) {
+		p $args;
+		die '0-length filenames are not allowed (found in "output.files"';
 	}
 	if (scalar @output_files > 0) {
 		@existing_files = grep {-f $_} @output_files;

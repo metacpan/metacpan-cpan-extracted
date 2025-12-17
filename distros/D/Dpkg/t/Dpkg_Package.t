@@ -13,20 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 12;
 
-use_ok('Dpkg::Package');
+use ok 'Dpkg::Package';
 
-ok(pkg_name_is_illegal(undef), 'package name is undef');
-ok(pkg_name_is_illegal(''), 'package name is empty');
-ok(pkg_name_is_illegal('%_&'), 'package name has invalid chars');
-ok(pkg_name_is_illegal('ABC'), 'package name has uppercase chars');
-ok(pkg_name_is_illegal('-abc'), 'package name has a dash');
+ok(pkg_name_is_invalid(undef), 'package name is undef');
+ok(pkg_name_is_invalid(''), 'package name is empty');
+ok(pkg_name_is_invalid('%_&'), 'package name has invalid chars');
+ok(pkg_name_is_invalid('ABC'), 'package name has uppercase chars');
+ok(pkg_name_is_invalid('-abc'), 'package name has a dash');
 
-is(pkg_name_is_illegal('pkg+name-1.0'), undef, 'package name is valid');
+is(pkg_name_is_invalid('pkg+name-1.0'), undef, 'package name is valid');
 
 eval { set_source_name('foo%bar') };
 ok($@, 'cannot set invalid source package name');

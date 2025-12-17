@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
 use Test::Dpkg qw(:paths :needs);
@@ -25,7 +24,6 @@ use Dpkg::ErrorHandling;
 use Dpkg::OpenPGP::ErrorCodes;
 
 test_needs_openpgp_backend();
-
 plan tests => 6;
 
 use_ok('Dpkg::Source::Package');
@@ -47,7 +45,7 @@ is($p->armor_original_tarball_signature("$datadir/package_1.0.orig.tar.sig", $as
    OPENPGP_OK, 'conversion from binary sig to armored asc');
 
 ok(compare($ascfile, "$datadir/package_1.0.orig.tar.asc") == 0,
-   'binary signature converted to OpenPGP ASCII Armor');
+    'binary signature converted to OpenPGP ASCII Armor');
 
 # Grab the output messages.
 eval {
@@ -57,6 +55,6 @@ eval {
 };
 
 ok(compare($ascfile, "$datadir/package_1.0.orig.tar.asc") == 0,
-   'OpenPGP ASCII Armor copied to destination');
+    'OpenPGP ASCII Armor copied to destination');
 
 # TODO: Add actual test cases.

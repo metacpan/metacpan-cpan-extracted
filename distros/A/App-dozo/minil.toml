@@ -13,5 +13,8 @@ hooks = [
     "sed -i '' '/^1;$/q' lib/App/dozo.pm && greple -Mperl -h --nocolor :pod script/dozo >> lib/App/dozo.pm",
 ]
 
+[unsupported]
+os = [ "MSWin32" ]
+
 [FileGatherer]
 exclude_match = [ '^images/.*', '^share/getoptlong/(?!getoptlong\.sh)' ]

@@ -29,8 +29,7 @@ interact with the set of supported compression methods.
 
 package Dpkg::Compression 2.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     compression_is_supported
@@ -61,28 +60,28 @@ use Dpkg::Gettext;
 
 my %COMP = (
     gzip => {
-	file_ext => 'gz',
-	comp_prog => [ 'gzip', '-n' ],
-	decomp_prog => [ 'gunzip' ],
-	default_level => 9,
+        file_ext => 'gz',
+        comp_prog => [ 'gzip', '-n' ],
+        decomp_prog => [ 'gunzip' ],
+        default_level => 9,
     },
     bzip2 => {
-	file_ext => 'bz2',
-	comp_prog => [ 'bzip2' ],
-	decomp_prog => [ 'bunzip2' ],
-	default_level => 9,
+        file_ext => 'bz2',
+        comp_prog => [ 'bzip2' ],
+        decomp_prog => [ 'bunzip2' ],
+        default_level => 9,
     },
     lzma => {
-	file_ext => 'lzma',
-	comp_prog => [ 'xz', '--format=lzma' ],
-	decomp_prog => [ 'unxz', '--format=lzma' ],
-	default_level => 6,
+        file_ext => 'lzma',
+        comp_prog => [ 'xz', '--format=lzma' ],
+        decomp_prog => [ 'unxz', '--format=lzma' ],
+        default_level => 6,
     },
     xz => {
-	file_ext => 'xz',
-	comp_prog => [ 'xz' ],
-	decomp_prog => [ 'unxz' ],
-	default_level => 6,
+        file_ext => 'xz',
+        comp_prog => [ 'xz' ],
+        decomp_prog => [ 'unxz', '--format=xz' ],
+        default_level => 6,
     },
 );
 
@@ -103,9 +102,6 @@ if (any { $Config{osname} eq $_ } qw(linux gnu solaris)) {
 my $default_compression = 'xz';
 my $default_compression_level = undef;
 my $default_compression_threads = 0;
-
-my $regex = join '|', map { $_->{file_ext} } values %COMP;
-my $compression_re_file_ext = qr/(?:$regex)/;
 
 =head1 FUNCTIONS
 
@@ -144,17 +140,17 @@ properties currently include "file_ext" for the file extension,
 "comp_prog" for the name of the compression program and "decomp_prog" for
 the name of the decompression program.
 
-This function is deprecated, please switch to one of the new specialized
-getters instead.
+B<Note>: This function is deprecated, please switch to one of the new
+specialized getters instead.
 
 =cut
 
 sub compression_get_property {
     my ($comp, $property) = @_;
 
-    #warnings::warnif('deprecated',
-    #    'Dpkg::Compression::compression_get_property() is deprecated, ' .
-    #    'use one of the specialized getters instead');
+    warnings::warnif('deprecated',
+        'Dpkg::Compression::compression_get_property() is deprecated, ' .
+        'use one of the specialized getters instead');
     return unless compression_is_supported($comp);
     return $COMP{$comp}{$property} if exists $COMP{$comp}{$property};
     return;
@@ -172,7 +168,7 @@ sub compression_guess_from_filename {
     foreach my $comp (compression_get_list()) {
         my $ext = $COMP{$comp}{file_ext};
         if ($filename =~ /^(.*)\.\Q$ext\E$/) {
-	    return $comp;
+            return $comp;
         }
     }
     return;
@@ -186,7 +182,10 @@ one of the supported compression methods.
 =cut
 
 sub compression_get_file_extension_regex {
-    return $compression_re_file_ext;
+    my $regex_file_ext_alts = join '|', map { $_->{file_ext} } values %COMP;
+    my $regex_file_ext = qr/(?:$regex_file_ext_alts)/;
+
+    return $regex_file_ext;
 }
 
 =item $ext = compression_get_file_extension($comp)

@@ -26,14 +26,14 @@ profiles.
 
 =cut
 
-package Dpkg::BuildProfiles 1.00;
+package Dpkg::BuildProfiles 1.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT_OK = qw(
     get_build_profiles
     set_build_profiles
+    build_profile_is_invalid
     parse_build_profiles
     evaluate_restriction_formula
 );
@@ -83,18 +83,71 @@ sub set_build_profiles {
     Dpkg::BuildEnv::set('DEB_BUILD_PROFILES', join ' ', @profiles);
 }
 
+=item $bool = build_profile_is_invalid($string)
+
+Validate a build profile formula.
+
+=cut
+
+my $profile_name_regex = qr{
+    !?
+    # Be lenient for now. Accept operators for extensibility, uppercase,
+    # and package name characters.
+    [
+        ?/;:=@%*~_
+        A-Z
+        a-z0-9+.\-
+    ]+
+}x;
+
+my $restriction_list_regex = qr{
+    <
+    \s*
+    (
+        $profile_name_regex
+        (?:
+            \s+
+            $profile_name_regex
+        )*
+    )
+    \s*
+    >
+}x;
+
+my $restriction_formula_regex = qr{
+    ^
+    (?:
+        \s*
+        $restriction_list_regex
+    )*
+    \s*
+    $
+}x;
+
+
+sub build_profile_is_invalid($string)
+{
+    return $string !~ $restriction_formula_regex;
+}
+
 =item @profiles = parse_build_profiles($string)
 
 Parses a build profiles specification, into an array of array references.
 
+It will die on invalid syntax.
+
 =cut
 
-sub parse_build_profiles {
-    my $string = shift;
+sub parse_build_profiles($string)
+{
+    if (build_profile_is_invalid($string)) {
+        error(g_("'%s' is not a valid build profile restriction formula"),
+              $string);
+    }
 
-    $string =~ s/^\s*<\s*(.*)\s*>\s*$/$1/;
+    my @restrictions = $string =~ m{$restriction_list_regex}g;
 
-    return map { [ split ' ' ] } split /\s*>\s+<\s*/, $string;
+    return map { [ split ' ' ] } @restrictions;
 }
 
 =item evaluate_restriction_formula(\@formula, \@profiles)
@@ -128,7 +181,7 @@ sub evaluate_restriction_formula {
             }
         }
 
-        # This conjunction evaluated to true so we don't have to evaluate
+        # This conjunction evaluated to true so we do not have to evaluate
         # the others.
         return 1 if $seen_profile;
     }
@@ -138,6 +191,10 @@ sub evaluate_restriction_formula {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.01 (dpkg 1.23.0)
+
+New functions: build_profile_is_invalid().
 
 =head2 Version 1.00 (dpkg 1.17.17)
 

@@ -30,9 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Shlibs 0.03;
 
-use strict;
-use warnings;
-use feature qw(state);
+use v5.36;
 
 our @EXPORT_OK = qw(
     blank_library_paths
@@ -43,7 +41,6 @@ our @EXPORT_OK = qw(
 );
 
 use Exporter qw(import);
-use List::Util qw(none);
 use File::Spec;
 
 use Dpkg::Gettext;
@@ -70,24 +67,28 @@ sub parse_ldso_conf {
     state %visited;
     local $_;
 
+    my %librarypath = map {
+        $_ => 1
+    } (@custom_librarypaths, @system_librarypaths);
+
     open my $fh, '<', $file or syserr(g_('cannot open %s'), $file);
     $visited{$file}++;
     while (<$fh>) {
-	next if /^\s*$/;
-	chomp;
-	s{/+$}{};
-	if (/^include\s+(\S.*\S)\s*$/) {
-	    foreach my $include (glob($1)) {
-		parse_ldso_conf($include) if -e $include
-		    && !$visited{$include};
-	    }
-	} elsif (m{^\s*/}) {
-	    s/^\s+//;
-	    my $libdir = $_;
-	    if (none { $_ eq $libdir } (@custom_librarypaths, @system_librarypaths)) {
-		push @system_librarypaths, $libdir;
-	    }
-	}
+        next if /^\s*$/;
+        chomp;
+        s{/+$}{};
+        if (/^include\s+(\S.*\S)\s*$/) {
+            foreach my $include (glob($1)) {
+                parse_ldso_conf($include) if -e $include
+                    && ! $visited{$include};
+            }
+        } elsif (m{^\s*/}) {
+            my $libdir = s/^\s+//r;
+            if (not exists $librarypath{$libdir}) {
+                $librarypath{$libdir} = 1;
+                push @system_librarypaths, $libdir;
+            }
+        }
     }
     close $fh;
 }
@@ -130,22 +131,10 @@ sub setup_library_paths {
         }
     }
 
-    # Adjust set of directories to consider when we're in a situation of a
-    # cross-build or a build of a cross-compiler.
-    my $multiarch;
-
-    # Detect cross compiler builds.
-    if ($ENV{DEB_TARGET_GNU_TYPE} and
-        ($ENV{DEB_TARGET_GNU_TYPE} ne $ENV{DEB_BUILD_GNU_TYPE}))
-    {
-        $multiarch = gnutriplet_to_multiarch($ENV{DEB_TARGET_GNU_TYPE});
-    }
-    # Host for normal cross builds.
+    # Adjust set of directories to consider during cross builds.
     if (get_build_arch() ne get_host_arch()) {
-        $multiarch = debarch_to_multiarch(get_host_arch());
-    }
-    # Define list of directories containing crossbuilt libraries.
-    if ($multiarch) {
+        my $multiarch = debarch_to_multiarch(get_host_arch());
+
         push @system_librarypaths, "/lib/$multiarch", "/usr/lib/$multiarch";
     }
 
@@ -179,24 +168,28 @@ sub find_library {
 
     setup_library_paths() if not $librarypaths_init;
 
-    my @librarypaths = (@{$rpath}, @custom_librarypaths, @system_librarypaths);
+    my @librarypaths = (
+        @{$rpath},
+        @custom_librarypaths,
+        @system_librarypaths,
+    );
     my @libs;
 
     $root //= '';
     $root =~ s{/+$}{};
     foreach my $dir (@librarypaths) {
-	my $checkdir = "$root$dir";
-	if (-e "$checkdir/$lib") {
-	    my $libformat = Dpkg::Shlibs::Objdump::get_format("$checkdir/$lib");
+        my $checkdir = "$root$dir";
+        if (-e "$checkdir/$lib") {
+            my $libformat = Dpkg::Shlibs::Objdump::get_format("$checkdir/$lib");
             if (not defined $libformat) {
                 warning(g_("unknown executable format in file '%s'"), "$checkdir/$lib");
             } elsif ($format eq $libformat) {
-		push @libs, canonpath("$checkdir/$lib");
-	    } else {
+                push @libs, canonpath("$checkdir/$lib");
+            } else {
                 debug(1, "Skipping lib $checkdir/$lib, libabi=<%s> != objabi=<%s>",
                       $libformat, $format);
-	    }
-	}
+            }
+        }
     }
     return @libs;
 }

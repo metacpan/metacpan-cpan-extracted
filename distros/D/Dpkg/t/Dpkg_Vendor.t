@@ -13,15 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 7;
 
 # Delete variables that can affect the tests.
 delete $ENV{DEB_VENDOR};
 
-use_ok('Dpkg::Vendor', qw(get_vendor_dir get_current_vendor get_vendor_object));
+use ok 'Dpkg::Vendor', qw(
+    get_vendor_dir
+    get_current_vendor
+    get_vendor_object
+);
 
 is(get_vendor_dir(), $ENV{DPKG_ORIGINS_DIR}, 'Check vendor dir');
 

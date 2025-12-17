@@ -8,12 +8,12 @@
 #
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Test::Compile; # git description: v2.057-4-g2b42df1
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::Test::Compile; # git description: v2.058-19-g3dcf7cb
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Common tests to check syntax of your modules, using only core modules
 # KEYWORDS: plugin test compile verify validate load modules scripts
 
-our $VERSION = '2.058';
+our $VERSION = '2.059';
 
 use Moose;
 use Path::Tiny;
@@ -57,7 +57,7 @@ has xt_mode => ( is=>'ro', isa=>'Bool', default=>0 );
 has filename => (
     is => 'ro', isa => 'Str',
     lazy => 1,
-    default => sub { return ($_[0]->xt_mode ? 'xt/author' : 't') . '/00-compile.t' },
+    default => sub { return ($_[0]->xt_mode ? 'xt/author' : 't').'/00-compile.t' },
 );
 
 has phase => (
@@ -107,14 +107,14 @@ has _module_filenames  => (
     traits => ['Array'],
     handles => { _module_filenames => 'sort' },
     lazy => 1,
-    default => sub { [ map { $_->name } @{shift->found_module_files} ] },
+    default => sub { [ map $_->name, @{shift->found_module_files} ] },
 );
 has _script_filenames => (
     isa => 'ArrayRef[Str]',
     traits => ['Array'],
     handles => { _script_filenames => 'sort' },
     lazy => 1,
-    default => sub { [ map { $_->name } @{shift->found_script_files} ] },
+    default => sub { [ map $_->name, @{shift->found_script_files} ] },
 );
 
 around dump_config => sub
@@ -122,12 +122,12 @@ around dump_config => sub
     my ($orig, $self) = @_;
     my $config = $self->$orig;
 
-    $config->{+__PACKAGE__} = {
+    $config->{+__PACKAGE__} = +{
         module_finder => [ sort @{ $self->module_finder } ],
         script_finder => [ sort @{ $self->script_finder } ],
         skips => [ sort $self->skips ],
-        (map { $_ => $self->$_ ? 1 : 0 } qw(fake_home needs_display bail_out_on_fail)),
-        (map { $_ => $self->$_ } qw(filename fail_on_warning bail_out_on_fail phase)),
+        (map +($_ => $self->$_ ? 1 : 0), qw(fake_home needs_display bail_out_on_fail)),
+        (map +($_ => $self->$_), qw(filename fail_on_warning bail_out_on_fail phase)),
         switch => [ $self->switches ],
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
@@ -178,29 +178,29 @@ sub munge_file
 
     return unless $file == $self->_file;
 
-    my @skips = map {; qr/$_/ } $self->skips;
+    my @skips = map qr/$_/, $self->skips;
 
     my @more_files = $self->files;
 
     # we strip the leading lib/, and convert win32 \ to /, so the %INC entry
     # is correct - to avoid potentially loading the file again later
-    my @module_filenames = map { path($_)->relative('lib')->stringify } $self->_module_filenames;
-    push @module_filenames, grep { /\.pm/i } @more_files if @more_files;
+    my @module_filenames = map path($_)->relative('lib')->stringify, $self->_module_filenames;
+    push @module_filenames, grep /\.pm/i, @more_files if @more_files;
 
     @module_filenames = grep {
         (my $module = $_) =~ s{[/\\]}{::}g;
         $module =~ s/\.pm$//;
-        not grep { $module =~ $_ } @skips
+        not grep $module =~ $_, @skips
     } @module_filenames if @skips;
 
     # pod never returns true when loaded
-    @module_filenames = grep { !/\.pod$/ } @module_filenames;
+    @module_filenames = grep !/\.pod$/, @module_filenames;
 
     my @script_filenames = $self->_script_filenames;
-    push @script_filenames, grep { !/\.pm/i } @more_files if @more_files;
+    push @script_filenames, grep !/\.pm/i, @more_files if @more_files;
 
-    $self->log_debug('adding module ' . $_) foreach @module_filenames;
-    $self->log_debug('adding script ' . $_) foreach @script_filenames;
+    $self->log_debug('adding module '.$_) foreach @module_filenames;
+    $self->log_debug('adding script '.$_) foreach @script_filenames;
 
     $file->content(
         $self->fill_in_string(
@@ -230,7 +230,7 @@ __PACKAGE__->meta->make_immutable;
 
 #pod =pod
 #pod
-#pod =for Pod::Coverage::TrustPod
+#pod =for Pod::Coverage
 #pod     mvp_multivalue_args
 #pod     mvp_aliases
 #pod     register_prereqs
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Test::Compile - Common tests to check syntax of your module
 
 =head1 VERSION
 
-version 2.058
+version 2.059
 
 =head1 SYNOPSIS
 
@@ -415,7 +415,7 @@ test still runs on perl 5.6).
 
 This plugin accepts the following options:
 
-=for Pod::Coverage::TrustPod mvp_multivalue_args
+=for Pod::Coverage mvp_multivalue_args
     mvp_aliases
     register_prereqs
     gather_files
@@ -537,6 +537,14 @@ L<Test::Script>
 
 =back
 
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Dist-Zilla-Plugin-Test-Compile>
+and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-Plugin-Test-Compile>.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Compile>
@@ -564,7 +572,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ahmad M. Zawawi Olivier Mengué Kent Fredric Jesse Luehrs David Golden Randy Stauner Harley Pig Graham Knop fayland Peter Shangov Chris Weyl Ricardo SIGNES Marcel Gruenauer
+=for stopwords Ahmad M. Zawawi Olivier Mengué Kent Fredric David Golden Graham Knop Jesse Luehrs Randy Stauner Harley Pig Chris Weyl fayland Marcel Gruenauer Peter Shangov Ricardo SIGNES
 
 =over 4
 
@@ -582,11 +590,15 @@ Kent Fredric <kentnl@cpan.org>
 
 =item *
 
-Jesse Luehrs <doy@tozt.net>
+David Golden <dagolden@cpan.org>
 
 =item *
 
-David Golden <dagolden@cpan.org>
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Jesse Luehrs <doy@tozt.net>
 
 =item *
 
@@ -598,7 +610,7 @@ Harley Pig <harleypig@gmail.com>
 
 =item *
 
-Graham Knop <haarg@haarg.org>
+Chris Weyl <cweyl@alumni.drew.edu>
 
 =item *
 
@@ -606,19 +618,15 @@ fayland <fayland@gmail.com>
 
 =item *
 
+Marcel Gruenauer <hanekomu@gmail.com>
+
+=item *
+
 Peter Shangov <pshangov@yahoo.com>
 
 =item *
 
-Chris Weyl <cweyl@alumni.drew.edu>
-
-=item *
-
 Ricardo SIGNES <rjbs@cpan.org>
-
-=item *
-
-Marcel Gruenauer <hanekomu@gmail.com>
 
 =back
 
@@ -633,7 +641,6 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 ___[ test-compile ]___
-use 5.006;
 use strict;
 use warnings;
 
@@ -656,14 +663,14 @@ plan tests => {{
 }};
 
 my @module_files = (
-{{ join(",\n", map { "    '" . $_ . "'" } map { s/'/\\'/g; $_ } sort @module_filenames) }}
+{{ join(",\n", map { s/'/\\'/g; "    '".$_."'" } sort @module_filenames) }}
 );
 
 {{
     @script_filenames
-        ? 'my @scripts = (' . "\n"
-          . join(",\n", map { "    '" . $_ . "'" } map { s/'/\\'/g; $_ } sort @script_filenames)
-          . "\n" . ');'
+        ? 'my @scripts = ('."\n"
+          .join(",\n", map { s/'/\\'/g; "    '".$_."'" } sort @script_filenames)
+          ."\n".');'
         : ''
 }}
 
@@ -677,7 +684,7 @@ CODE
 
 my @switches = (
     -d 'blib' ? '-Mblib' : '-Ilib',
-{{ @$switches ? '    ' . join(' ', map { q{'} . $_ . q{',} } @$switches) . "\n" : '' }});
+{{ @$switches ? '    '.join(' ', map q{'}.$_.q{',}, @$switches)."\n" : '' }});
 
 use File::Spec;
 use IPC::Open3;
@@ -691,7 +698,7 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
             $^X, @switches, '-e', "require q[$lib]"))
         if $ENV{PERL_COMPILE_TEST_DEBUG};
 
@@ -718,15 +725,15 @@ foreach my $file (@scripts)
     open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
     my $line = <$fh>;
 
-    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*(?:env )?perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
     @switches = (@switches, split(' ', $1)) if $1;
 
     close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
-        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
+        if grep $_ eq '-T', @switches and $ENV{PERL5LIB};
 
     my $stderr = IO::Handle->new;
 
-    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'}.$str.q{'} }
             $^X, @switches, '-c', $file))
         if $ENV{PERL_COMPILE_TEST_DEBUG};
 
@@ -740,7 +747,7 @@ foreach my $file (@scripts)
         and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
-    if (@_warnings = grep { !/\bsyntax OK$/ }
+    if (@_warnings = grep !/\bsyntax OK$/,
         grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
     {
         warn @_warnings;
@@ -753,12 +760,11 @@ CODE
 
 {{
 ($fail_on_warning ne 'none'
-    ? q{is(scalar(@warnings), 0, 'no warnings found')} . "\n"
-        . q{    or diag 'got warnings: ', }
-        . ( $test_more_version > 0.82
+    ? q{is(scalar(@warnings), 0, 'no warnings found') or diag 'got warnings: ', }
+        .($test_more_version > 0.82
             ? q{explain(\@warnings)}
             : q{( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) )}
-          )
+         )
     : '# no warning checks')
 .
 ($fail_on_warning eq 'author'

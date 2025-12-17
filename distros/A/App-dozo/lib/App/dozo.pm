@@ -1,15 +1,15 @@
 package App::dozo;
 
-our $VERSION = "0.9924";
+our $VERSION = "0.9925";
 
 1;
 =encoding utf-8
 
-=for html <p align="center"><img src="https://raw.githubusercontent.com/tecolicom/App-dozo/main/images/dozo-logo.jpeg" width="400"></p>
+=for html <p align="center"><img src="https://raw.githubusercontent.com/tecolicom/App-dozo/main/images/dozo-logo.png" width="400"></p>
 
 =head1 NAME
 
-dozo - Docker with Zero Overhead
+dozo - Dôzo, Docker with Zero Overhead
 
 =head1 SYNOPSIS
 
@@ -40,11 +40,11 @@ dozo -I IMAGE [ options ] [ command ... ]
 
 =head1 VERSION
 
-Version 0.9924
+Version 0.9925
 
 =head1 USAGE
 
-When executed without arguments, dozo starts an interactive shell
+When executed without arguments, Dôzo starts an interactive shell
 inside the container.  When arguments are given, they are executed as
 a command.
 
@@ -52,7 +52,7 @@ a command.
     dozo -I alpine ls -la           # run command
 
 By setting C<-D> or your favorite image with C<-I> in F<~/.dozorc>,
-you can simply run dozo without specifying an image.  Since the git
+you can simply run Dôzo without specifying an image.  Since the git
 top directory is automatically mounted, git commands work as expected
 from anywhere in the tree.
 
@@ -65,10 +65,10 @@ installed in the container will remain available for subsequent use.
     $ dozo -L                       # start shell and create container
     # apt update && apt install -y cowsay
     # exit
-    $ dozo -L /usr/games/cowsay Hello
-     _______
-    < Hello >
-     -------
+    $ dozo -L /usr/games/cowsay Dôzo
+     ______
+    < Dôzo >
+     ------
             \   ^__^
              \  (oo)\_______
                 (__)\       )\/\
@@ -76,22 +76,36 @@ installed in the container will remain available for subsequent use.
                     ||     ||
 
 =cut
+=head1 INSTALLATION
+
+Using L<cpanminus|https://metacpan.org/pod/App::cpanminus>:
+
+    cpanm -n App::dozo
+
+To install the latest version from GitHub:
+
+    cpanm -n https://github.com/tecolicom/App-dozo.git
+
+Alternatively, you can simply place C<dozo> and C<getoptlong.sh> in
+your PATH.
+
 =head1 DESCRIPTION
 
-B<dozo> is a generic Docker runner that simplifies running commands in
-Docker containers.  The name "dozo" comes from the Japanese word
-meaning "please" or "go ahead", and also stands for "Docker with Zero
-Overhead".
+B<Dôzo> is a generic Docker runner that simplifies running commands in
+Docker containers.  The name comes from the Japanese word "dôzo"
+(どうぞ) meaning "please" or "go ahead", and also stands for "B<D>ocker
+with B<Z>ero B<O>verhead".  The command name is C<dozo> for ease of
+typing.
 
 It automatically configures the tedious Docker options such as volume
 mounts, environment variables, working directories, and interactive
 terminal settings, so you can focus on the command you want to run.
 
-B<dozo> is distributed as a standalone module and can be used as a
+B<Dôzo> is distributed as a standalone module and can be used as a
 general-purpose Docker runner. It was originally developed as part of
 L<App::Greple::xlate> and is used by L<xlate> for Docker operations.
 
-B<dozo> uses L<getoptlong.sh|https://github.com/tecolicom/getoptlong>
+B<Dôzo> uses L<getoptlong.sh|https://github.com/tecolicom/getoptlong>
 for option parsing.
 
 =head2 Key Features
@@ -133,7 +147,7 @@ git top directory, and home directory.
 
 =item B<Standalone Operation>
 
-B<dozo> can operate independently of L<xlate>. The distribution includes
+B<Dôzo> can operate independently of L<xlate>. The distribution includes
 C<getoptlong.sh> as a submodule in the C<share/getoptlong> directory.
 If the module is installed via CPAN, it searches for C<getoptlong.sh>
 via C<File::Share::dist_dir('App-dozo')>. Otherwise, it searches for
@@ -175,7 +189,7 @@ it in F<.dozorc> so you don't have to type it every time.
 
 Use the default Docker image. If C<DOZO_DEFAULT_IMAGE> environment
 variable is set, use that image. Otherwise, use
-C<tecolicom/xlate:VERSION> where VERSION is the current dozo version.
+C<tecolicom/xlate:VERSION> where VERSION is the current Dôzo version.
 See L</DEFAULT IMAGE> section for details about the default image.
 
 =item B<-E> I<name>[=I<value>], B<--env>=I<name>[=I<value>]
@@ -247,7 +261,7 @@ state and reduce startup overhead.
 
 =head2 Container Lifecycle
 
-When C<-L> is specified, B<dozo> behaves as follows:
+When C<-L> is specified, B<Dôzo> behaves as follows:
 
 =over 4
 
@@ -435,7 +449,7 @@ Multiple L<App::Greple> extension modules are pre-installed:
 =head2 Git Integration
 
 The image includes a pre-configured git environment optimized for
-document comparison and review. Since B<dozo> automatically mounts
+document comparison and review. Since B<Dôzo> automatically mounts
 the git top directory by default, git commands work seamlessly with
 full repository context:
 
@@ -491,7 +505,7 @@ and PowerPoint (.pptx) files directly with git
 
 Specifies the default Docker image used when C<-D> (C<--default>) option
 is given. If not set, C<tecolicom/xlate:VERSION> is used where VERSION
-is the current dozo version.
+is the current Dôzo version.
 
 =back
 
@@ -512,7 +526,7 @@ The following environment variables are set inside the container:
 
 =item C<DOZO_RUNNING_ON_DOCKER=1>
 
-Indicates the command is running inside a container started by dozo.
+Indicates the command is running inside a container started by Dôzo.
 
 =item C<XLATE_RUNNING_ON_DOCKER=1>
 

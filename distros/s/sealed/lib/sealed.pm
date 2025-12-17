@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(8.0.5);
+  our $VERSION = qv(8.1.4);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -30,7 +30,7 @@ my $p_obj                        = B::svref_2object(sub {&tweak});
 # B::PADOP (w/ ithreads) or B::SVOP
 my $gv_op                        = $p_obj->START->next->next;
 
-sub tweak ($\@\@\@$$\%) {
+sub tweak :prototype($\@\@\@$$\%) {
   my ($op, $lexical_varnames, $pads, $op_stack, $cv_obj, $pad_names, $processed_op) = @_;
   my $tweaked                    = 0;
 
@@ -75,7 +75,20 @@ sub tweak ($\@\@\@$$\%) {
         my $method               = $class->can($method_name)
           or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?\n";
         # replace $methop
-        $gv                      = new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method, $cv_obj->PADLIST);
+        my $m = sub {
+          goto &$method if $method == $_[0]->can($method_name);
+          require Carp;
+          $$pads[$idx][$targ] =~ s/:\w+$/:FAILED/;
+          local $@;
+          eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ",
+                  B::Deparse->new->coderef2text($cv_obj->object_2svref), "\n"};
+          Carp::confess ("sealed failed: $_[0]->$method_name method lookup differs from $class->$method_name:FAILED lookup");
+        };
+
+        $gv                      = new($gv_op->name, $gv_op->flags,
+                                       ref($gv_op) eq "B::PADOP" ? *tweak :
+                                       $DEBUG eq "verify" ? $m : $method,
+                                       $cv_obj->PADLIST);
         $gv->next($methop->next);
         $gv->sibparent($methop->sibparent);
         $op->next($gv);
@@ -91,14 +104,7 @@ sub tweak ($\@\@\@$$\%) {
           my $padix = $gv->padix;
           my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
           $pads = [ map defined ? $_->object_2svref : $_, @p ];
-          $$pads[--$idx][$padix] = $DEBUG ne "verify" ? $method : sub {
-            goto &$method if $method == $_[0]->can($method_name);
-            require Carp;
-            $$pads[$idx][$targ] =~ s/:\w+$/:FAILED/;
-            local $@;
-            eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ", B::Deparse->new->coderef2text($cv_obj->object_2svref), "\n"};
-            Carp::confess ("sealed failed: $_[0]->$method_name method lookup differs from $class->$method_name:FAILED lookup");
-          };
+          $$pads[--$idx][$padix] = $DEBUG eq "verify" ? $m : $method;
           $$pads[$idx][$targ]   .= $DEBUG ne "verify" ? ":compiled" : ":verified";
         }
         else {
@@ -174,60 +180,68 @@ sub import {
   filter_add(bless []);
 }
 
+my %rcache;
+
 sub filter {
   my ($self) = @_;
   my $status = filter_read;
   s/^\s*my\s+([\w:]+)\s+(\$\w+);/my $1 $2 = '$1';/gms if $status > 0;
+
   no warnings 'uninitialized';
-  s(^(\s*sub\s+(\w[\w:]*)?\s*(?::\s*\w+(?:\(.*?\))?)*\s*:\s*[Ss]ealed\s*(?::\s*\w+(?:\(.*?\))?)*\s*(?:\(\S+\))?\s*)\((.*?)\)\s+\{)(
-    my $prefix = $1;
-    my $name   = $2;
-    local $_   = $3;
-    my $suffix = "";
-    my (@types, @stypes, %types, %stypes, @vars, @defaults);
-    s{([\w:]+)?\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{
-      local $@;
-      if ($1 eq "__PACKAGE__" || $1 eq "__PACKAGE__::SUPER"
-          || (length $1 && eval "require $1")) {
-        $suffix .= "my $1 $2 = ";
-        tr!=!!d for my $default = $3;
-        if (($default =~ tr!/!!d)==2) {
-          $suffix .= "shift // $default;";
-        }
-        elsif (($default =~ tr!|!!d)==2) {
-          $suffix .= "shift || $default;";
-        }
-        elsif ($default) {
-          $suffix .= "\@_ ? shift : $default;";
-        }
-        else {
-          $suffix .= "shift;"
-        }
-        push @types, "Object";
-        push @defaults, $default;
-      }
-      elsif (length $1) {
-        push @types, $1;
-        push @stypes, $1 unless $stypes{$1}++;
-        tr!=/|!!d for my $default = $3;
-        push @defaults, $default;
-      }
+  s(^
+    ([^\n]*sub\s+(\w[\w:]*)?\s* #sub declaration and name
+      (?::\s*\w+(?:\(.*?\))?)*\s*:\s*[Ss]ealed\s*(?::\s*\w+(?:\(.*?\))?) #unspaced attrs
+      *\s*(?:\(\S+\))?\s*)\((.*?)\)\s+\{ #prototype and signature and open bracket
+   )(
+     my $prefix = $1; # everything preceding the signature's arglist
+     my $name   = $2; # sub name
+     local $_   = $3; # signature's arglist
+     my $suffix = "";
+     my $t = "";
+     my (@types, @vars, @defaults);
+
+     s{([\w:]+)?\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
+       local $@;
+
+       my $is_ext_class = ($rcache{$1} //= eval "require $1" || 0);
+       my $class = ($is_ext_class || $1 eq "__PACKAGE__") ? $1 : "";
+
+       $suffix .= "my $class $2 = ";
+
+       tr!=!!d for my $default = $3;
+       if (($default =~ tr!/!!d)==2) {
+         $suffix .= "shift // $default;";
+       }
+       elsif (($default =~ tr!|!!d)==2) {
+         $suffix .= "shift || $default;";
+       }
+       elsif ($default) {
+         $suffix .= "\@_ ? shift : $default;";
+       }
+       else {
+         $suffix .= "shift;"
+       }
+
+      push @types, ($is_ext_class || $1 eq "__PACKAGE__") ? "Object" : $1;
+      push @defaults, $default;
       push @vars, substr($2,1);
+
       "$2$3$4"
     }gmse;
+
     if ($name and $DEBUG eq "verify") {
-      my $t = $prefix;
-      $prefix = "";
-      $prefix .= "use Types::Common -types, -sigs; signature_for $name => multiple => [ { named_to_list => 1, named => [";
-      $prefix .= "$vars[$_] => $types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] }," : "") for 0..$#vars;
-      $prefix .= "],},{ positional => [";
-      $prefix .= "$types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] },":"") for 0..$#types;
-      $prefix .= "],},];";
-      $prefix .= $t;
+      $t .= "use Types::Common -types, -sigs; signature_for $name => multiple => [ { named_to_list => 1, named => [";
+      $t .= "$vars[$_] => $types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] }," : "") for 0..$#vars;
+      $t .= "],},{ positional => [";
+      $t .= "$types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] },":"") for 0..$#types;
+      $t .= "],},];";
     }
-    #warn "$prefix ($_) { $suffix";
-    "$prefix ($_) { no warnings qw/experimental shadow/; $suffix";
-  )gmse if $status > 0;
+
+    $prefix .= " ($_)" if $DEBUG eq "verify";
+    warn "$prefix { CHECK{ $t } $suffix";
+    "$prefix { no warnings qw/experimental shadow/; CHECK{ $t } $suffix";
+  )gmsex if $status > 0;
+
   return $status;
 }
 1;

@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 34;
 use Test::Dpkg qw(:paths);
@@ -25,11 +24,15 @@ use File::Spec::Functions qw(abs2rel);
 
 use Dpkg::File;
 
-use_ok('Dpkg::Path', 'canonpath', 'resolve_symlink',
-       'check_files_are_the_same',
-       'check_directory_traversal',
-       'get_pkg_root_dir',
-       'guess_pkg_root_dir', 'relative_to_pkg_root');
+use ok 'Dpkg::Path', qw(
+    canonpath
+    resolve_symlink
+    check_files_are_the_same
+    check_directory_traversal
+    get_pkg_root_dir
+    guess_pkg_root_dir
+    relative_to_pkg_root
+);
 
 my $tmpdir = test_get_temp_path();
 
@@ -49,7 +52,7 @@ is(resolve_symlink("$tmpdir/here/cbis"), "$tmpdir/here/a/b/c", 'resolve_symlink'
 is(resolve_symlink("$tmpdir/tmp"), '/this/does/not/exist', 'resolve_symlink absolute');
 is(resolve_symlink("$tmpdir/here"), $tmpdir, 'resolve_symlink .');
 
-ok(!check_files_are_the_same("$tmpdir/here", $tmpdir), 'Symlink is not the same!');
+ok(! check_files_are_the_same("$tmpdir/here", $tmpdir), 'Symlink is not the same!');
 ok(check_files_are_the_same("$tmpdir/here/a", "$tmpdir/a"), 'Same directory');
 
 sub gen_hier_travbase {

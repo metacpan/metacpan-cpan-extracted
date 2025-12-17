@@ -28,10 +28,9 @@ of dpkg-parsechangelog.
 
 =cut
 
-package Dpkg::Changelog::Parse 2.01;
+package Dpkg::Changelog::Parse 2.02;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     changelog_parse
@@ -46,18 +45,18 @@ use Dpkg::ErrorHandling;
 use Dpkg::Control::Changelog;
 
 sub _changelog_detect_format {
-    my $file = shift;
+    my $filename = shift;
     my $format = 'debian';
 
-    # Extract the format from the changelog file if possible
-    if ($file ne '-') {
+    # Extract the format from the changelog file if possible.
+    if ($filename ne '-') {
         local $_;
 
-        open my $format_fh, '<', $file
-            or syserr(g_('cannot open file %s'), $file);
+        open my $format_fh, '<', $filename
+            or syserr(g_('cannot open file %s'), $filename);
         if (-s $format_fh > 4096) {
             seek $format_fh, -4096, 2
-                or syserr(g_('cannot seek into file %s'), $file);
+                or syserr(g_('cannot seek into file %s'), $filename);
         }
         while (<$format_fh>) {
             $format = $1 if m/\schangelog-format:\s+([0-9a-z]+)\W/;
@@ -95,15 +94,22 @@ Options:
 
 =over
 
-=item B<file>
+=item B<filename>
 
 Set the changelog file to parse.
 Defaults to F<debian/changelog>.
 
+=item B<file>
+
+Deprecated alias for B<filename>.
+It emits a deprecation warning, but if it is required for backwards
+compatibility it can be passed alongside B<filename> and the warning
+will not be emitted.
+
 =item B<label>
 
 Set the changelog name used in output messages.
-Defaults to $opts{file}.
+Defaults to $opts{filename}.
 
 =item B<compression>
 
@@ -133,11 +139,16 @@ sub changelog_parse {
     my (%opts) = @_;
 
     $opts{verbose} //= 1;
-    $opts{file} //= 'debian/changelog';
-    $opts{label} //= $opts{file};
-    $opts{changelogformat} //= _changelog_detect_format($opts{file});
+    if (exists $opts{file} && ! exists $opts{filename}) {
+        warnings::warnif('deprecated',
+            'Dpkg::Changelog::Parse::changelog_parse() option file is deprecated, ' .
+            'switch to use filename, or pass file alongside it');
+    }
+    $opts{filename} //= $opts{file} // 'debian/changelog';
+    $opts{label} //= $opts{filename};
+    $opts{changelogformat} //= _changelog_detect_format($opts{filename});
     $opts{format} //= 'dpkg';
-    $opts{compression} //= $opts{file} ne 'debian/changelog';
+    $opts{compression} //= $opts{filename} ne 'debian/changelog';
 
     my @range_opts = qw(since until from to offset count reverse all);
     $opts{all} = 1 if exists $opts{all};
@@ -160,13 +171,15 @@ sub changelog_parse {
     $changes = $module->new();
     error(g_('changelog format %s is not a Dpkg::Changelog class'), $format)
         unless $changes->isa('Dpkg::Changelog');
-    $changes->set_options(reportfile => $opts{label},
-                          verbose => $opts{verbose},
-                          range => $range);
+    $changes->set_options(
+        reportfile => $opts{label},
+        verbose => $opts{verbose},
+        range => $range,
+    );
 
     # Load and parse the changelog.
-    $changes->load($opts{file}, compression => $opts{compression})
-        or error(g_('fatal error occurred while parsing %s'), $opts{file});
+    $changes->load($opts{filename}, compression => $opts{compression})
+        or error(g_('fatal error occurred while parsing %s'), $opts{filename});
 
     # Get the output into several Dpkg::Control objects.
     my @res;
@@ -189,6 +202,12 @@ sub changelog_parse {
 =back
 
 =head1 CHANGES
+
+=head2 Version 2.02 (dpkg 1.23.0)
+
+New options: 'filename in changelog_parse().
+
+Deprecated options: 'file' in changelog_parse().
 
 =head2 Version 2.01 (dpkg 1.20.6)
 

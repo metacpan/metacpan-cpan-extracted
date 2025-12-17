@@ -13,14 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 7;
 
-BEGIN {
-    use_ok('Dpkg::Exit');
-}
+use ok 'Dpkg::Exit';
 
 my $track = 0;
 

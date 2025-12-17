@@ -1,4 +1,4 @@
-package JMAP::Tester::Sugar 0.108;
+package JMAP::Tester::Sugar 0.109;
 
 use v5.20.0;
 use warnings;
@@ -33,7 +33,7 @@ sub jcreate ($type, $create, $call_id = undef) {
   return jset($type, { create => $create }, $call_id);
 }
 
-package JMAP::Tester::JSONLiteral 0.108 {
+package JMAP::Tester::JSONLiteral 0.109 {
   sub new {
     my ($class, $bytes) = @_;
 
@@ -73,7 +73,7 @@ JMAP::Tester::Sugar
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 PERL VERSION
 

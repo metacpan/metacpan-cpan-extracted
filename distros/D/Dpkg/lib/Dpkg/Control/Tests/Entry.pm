@@ -27,8 +27,7 @@ This class represents a test suite entry.
 
 package Dpkg::Control::Tests::Entry 1.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -56,7 +55,10 @@ sub new {
     my ($this, %opts) = @_;
     my $class = ref($this) || $this;
 
-    my $self = Dpkg::Control->new(type => CTRL_TESTS, %opts);
+    my $self = Dpkg::Control->new(
+        type => CTRL_TESTS,
+        %opts,
+    );
     bless $self, $class;
     return $self;
 }

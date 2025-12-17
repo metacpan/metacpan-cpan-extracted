@@ -44,8 +44,7 @@ spaces are stripped only on the first line of each field.
 
 package Dpkg::Control::HashCore 1.02;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -119,7 +118,7 @@ sub new {
     my $class = ref($this) || $this;
 
     # Object is a scalar reference and not a hash ref to avoid
-    # infinite recursion due to overloading hash-dereferencing
+    # infinite recursion due to overloading hash-dereferencing.
     my $self = \{
         in_order => [],
         out_order => [],
@@ -133,7 +132,7 @@ sub new {
 
     $$self->{fields} = Dpkg::Control::HashCore::Tie->new($self);
 
-    # Options set by the user override default values
+    # Options set by the user override default values.
     $$self->{$_} = $opts{$_} foreach keys %opts;
 
     return $self;
@@ -200,7 +199,8 @@ sub parse {
 
     my $paraborder = 1;
     my $parabody = 0;
-    my $cf; # Current field
+    # Current field.
+    my $cf;
     my $expect_pgp_sig = 0;
     local $_;
 
@@ -208,7 +208,7 @@ sub parse {
         # In the common case there will be just a trailing \n character,
         # so using chomp here which is very fast will avoid the latter
         # s/// doing anything, which gives us a significant speed up.
-	chomp;
+        chomp;
         my $armor = $_;
         s/\s+$//;
 
@@ -216,18 +216,18 @@ sub parse {
 
         my $lead = substr $_, 0, 1;
         next if $lead eq '#';
-	$paraborder = 0;
+        $paraborder = 0;
 
         my ($name, $value) = split /\s*:\s*/, $_, 2;
         if (defined $name and $name =~ m/^\S+?$/) {
-	    $parabody = 1;
+            $parabody = 1;
             if ($lead eq '-') {
-		$self->parse_error($desc, g_('field cannot start with a hyphen'));
-	    }
-	    if (exists $self->{$name}) {
-		unless ($$self->{allow_duplicate}) {
-		    $self->parse_error($desc, g_('duplicate field %s found'), $name);
-		}
+                $self->parse_error($desc, g_('field cannot start with a hyphen'));
+            }
+            if (exists $self->{$name}) {
+                unless ($$self->{allow_duplicate}) {
+                    $self->parse_error($desc, g_('duplicate field %s found'), $name);
+                }
                 if ($$self->{keep_duplicate}) {
                     if (ref $self->{$name} ne 'ARRAY') {
                         # Switch value into an array.
@@ -243,62 +243,62 @@ sub parse {
             } else {
                 $self->{$name} = $value;
             }
-	    $cf = $name;
-	} elsif (m/^\s(\s*\S.*)$/) {
-	    my $line = $1;
-	    unless (defined($cf)) {
-		$self->parse_error($desc, g_('continued value line not in field'));
+            $cf = $name;
+        } elsif (m/^\s(\s*\S.*)$/) {
+            my $line = $1;
+            unless (defined($cf)) {
+                $self->parse_error($desc, g_('continued value line not in field'));
             }
-	    if ($line =~ /^\.+$/) {
-		$line = substr $line, 1;
-	    }
-	    $self->{$cf} .= "\n$line";
+            if ($line =~ /^\.+$/) {
+                $line = substr $line, 1;
+            }
+            $self->{$cf} .= "\n$line";
         } elsif (length == 0 ||
                  ($expect_pgp_sig && $armor =~ m/^-----BEGIN PGP SIGNATURE-----[\r\t ]*$/)) {
-	    if ($expect_pgp_sig) {
-		# Skip empty lines
-		$_ = <$fh> while defined && m/^\s*$/;
-		unless (length) {
-		    $self->parse_error($desc, g_('expected OpenPGP signature, ' .
-		                                 'found end of file after blank line'));
-		}
-		chomp;
-		unless (m/^-----BEGIN PGP SIGNATURE-----[\r\t ]*$/) {
-		    $self->parse_error($desc, g_('expected OpenPGP signature, ' .
-		                                 "found something else '%s'"), $_);
+            if ($expect_pgp_sig) {
+                # Skip empty lines.
+                $_ = <$fh> while defined && m/^\s*$/;
+                unless (length) {
+                    $self->parse_error($desc, g_('expected OpenPGP signature, ' .
+                                                 'found end of file after blank line'));
                 }
-		# Skip OpenPGP signature
-		while (<$fh>) {
-		    chomp;
-		    last if m/^-----END PGP SIGNATURE-----[\r\t ]*$/;
-		}
-		unless (defined) {
-		    $self->parse_error($desc, g_('unfinished OpenPGP signature'));
+                chomp;
+                unless (m/^-----BEGIN PGP SIGNATURE-----[\r\t ]*$/) {
+                    $self->parse_error($desc, g_('expected OpenPGP signature, ' .
+                                                 "found something else '%s'"), $_);
                 }
-		# This does not mean the signature is correct, that needs to
-		# be verified by an OpenPGP backend.
-		$$self->{is_pgp_signed} = 1;
-	    }
+                # Skip OpenPGP signature.
+                while (<$fh>) {
+                    chomp;
+                    last if m/^-----END PGP SIGNATURE-----[\r\t ]*$/;
+                }
+                unless (defined) {
+                    $self->parse_error($desc, g_('unfinished OpenPGP signature'));
+                }
+                # This does not mean the signature is correct, that needs to
+                # be verified by an OpenPGP backend.
+                $$self->{is_pgp_signed} = 1;
+            }
             # Finished parsing one stanza.
             last;
         } elsif ($armor =~ m/^-----BEGIN PGP SIGNED MESSAGE-----[\r\t ]*$/) {
             $expect_pgp_sig = 1;
             if ($$self->{allow_pgp} and not $parabody) {
-                # Skip OpenPGP headers
+                # Skip OpenPGP headers.
                 while (<$fh>) {
                     last if m/^\s*$/;
                 }
             } else {
                 $self->parse_error($desc, g_('OpenPGP signature not allowed here'));
             }
-	} else {
-	    $self->parse_error($desc,
-	                       g_('line with unknown format (not field-colon-value)'));
-	}
+        } else {
+            $self->parse_error($desc,
+                               g_('line with unknown format (not field-colon-value)'));
+        }
     }
 
     if ($expect_pgp_sig and not $$self->{is_pgp_signed}) {
-	$self->parse_error($desc, g_('unfinished OpenPGP signature'));
+        $self->parse_error($desc, g_('unfinished OpenPGP signature'));
     }
 
     return defined($cf);
@@ -377,31 +377,31 @@ sub output {
     }
 
     foreach my $key (@keys) {
-	if (exists $self->{$key}) {
-	    my $value = $self->{$key};
-            # Skip whitespace-only fields
+        if (exists $self->{$key}) {
+            my $value = $self->{$key};
+            # Skip whitespace-only fields.
             next if $$self->{drop_empty} and $value !~ m/\S/;
-	    # Escape data to follow control file syntax
-	    my ($first_line, @lines) = split /\n/, $value;
+            # Escape data to follow control file syntax.
+            my ($first_line, @lines) = split /\n/, $value;
 
-	    my $kv = "$key:";
-	    $kv .= ' ' . $first_line if length $first_line;
-	    $kv .= "\n";
-	    foreach (@lines) {
-		s/\s+$//;
-		if (length == 0 or /^\.+$/) {
-		    $kv .= " .$_\n";
-		} else {
-		    $kv .= " $_\n";
-		}
-	    }
-	    # Print it out
-            if ($fh) {
-	        print { $fh } $kv
-	            or syserr(g_('write error on control data'));
+            my $kv = "$key:";
+            $kv .= ' ' . $first_line if length $first_line;
+            $kv .= "\n";
+            foreach (@lines) {
+                s/\s+$//;
+                if (length == 0 or /^\.+$/) {
+                    $kv .= " .$_\n";
+                } else {
+                    $kv .= " $_\n";
+                }
             }
-	    $str .= $kv if defined wantarray;
-	}
+            # Print it out.
+            if ($fh) {
+                print { $fh } $kv
+                    or syserr(g_('write error on control data'));
+            }
+            $str .= $kv if defined wantarray;
+        }
     }
     return $str;
 }
@@ -419,7 +419,7 @@ Define the order in which fields will be displayed in the output() method.
 sub set_output_order {
     my ($self, @fields) = @_;
 
-    $$self->{out_order} = [@fields];
+    $$self->{out_order} = [ @fields ];
 }
 
 =item $c->apply_substvars($substvars)
@@ -432,31 +432,56 @@ the corresponding value stored in the L<Dpkg::Substvars> object.
 sub apply_substvars {
     my ($self, $substvars, %opts) = @_;
 
-    # Add substvars to refer to other fields
+    # Add substvars to refer to other fields.
     $substvars->set_field_substvars($self, 'F');
 
-    foreach my $f (keys %$self) {
-        my $v = $substvars->substvars($self->{$f}, %opts);
-	if ($v ne $self->{$f}) {
-	    my $sep;
+    my %implicit_field;
+    foreach my $sv ($substvars->get_implicit_substvars()) {
+        my ($n, $f) = split /:/, $sv, 2;
 
-	    $sep = field_get_sep_type($f);
+        push @{$implicit_field{$f}}, $n;
+    }
 
-	    # If we replaced stuff, ensure we're not breaking
-	    # a dependency field by introducing empty lines, or multiple
-	    # commas
+    foreach my $f (keys %$self, keys %implicit_field) {
+        my $sep = field_get_sep_type($f);
+        my $v;
 
-	    if ($sep & (FIELD_SEP_COMMA | FIELD_SEP_LINE)) {
-	        # Drop empty/whitespace-only lines
-	        $v =~ s/\n[ \t]*(\n|$)/$1/;
-	    }
+        if (exists $self->{$f}) {
+            $v = $substvars->substvars($self->{$f}, %opts);
+        } elsif (exists $implicit_field{$f}) {
+            my $sep_str;
 
-	    if ($sep & FIELD_SEP_COMMA) {
-	        $v =~ s/,[\s,]*,/,/g;
-	        $v =~ s/^\s*,\s*//;
-	        $v =~ s/\s*,\s*$//;
-	    }
-	}
+            if ($sep & FIELD_SEP_COMMA) {
+                $sep_str = ', ';
+            } elsif ($sep & FIELD_SEP_SPACE) {
+                $sep_str = ' ';
+            } elsif ($sep & FIELD_SEP_LINE) {
+                $sep_str = "\n ";
+            } else {
+                # For unknown separators, fallback to a space.
+                $sep_str = ' ';
+            }
+
+            $v = join $sep_str, map {
+                $substvars->get("$_:$f")
+            } sort @{$implicit_field{$f}};
+        }
+
+        if (not exists $self->{$f} or $v ne $self->{$f}) {
+            # If we replaced stuff, ensure we are not breaking a dependency
+            # field by introducing empty lines, or multiple commas.
+
+            if ($sep & (FIELD_SEP_COMMA | FIELD_SEP_LINE)) {
+                # Drop empty/whitespace-only lines.
+                $v =~ s/\n[ \t]*(\n|$)/$1/;
+            }
+
+            if ($sep & FIELD_SEP_COMMA) {
+                $v =~ s/,[\s,]*,/,/g;
+                $v =~ s/^\s*,\s*//;
+                $v =~ s/\s*,\s*$//;
+            }
+        }
         # Replace ${} with $, which is otherwise an invalid substitution, but
         # this then makes it possible to use ${} as an escape sequence such
         # as ${}{VARIABLE}.

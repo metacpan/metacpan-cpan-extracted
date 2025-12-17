@@ -41,7 +41,7 @@ YAML
   );
 
   cmp_result(
-    $openapi->validate_request(bless({}, 'Bespoke::Request'))->TO_JSON,
+    $openapi->validate_request(bless({}, 'Bespoke::Request'), my $options = {})->TO_JSON,
     {
       valid => false,
       errors => [
@@ -54,6 +54,13 @@ YAML
       ],
     },
     'request must be a recognized type',
+  );
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+    },
+    'options hash is populated with the conversion attempt',
   );
 
   like(
@@ -98,7 +105,7 @@ YAML
   );
 
   cmp_result(
-    $openapi->validate_request(request('GET', 'http://example.com/foo'), { path_captures => { foo_id => 1 } })->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo'), my $options = { path_captures => { foo_id => 1 } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -111,6 +118,18 @@ YAML
       ],
     },
     'extra path_capture value provided',
+  );
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      uri => isa('Mojo::URL'),
+      path_template => '/foo',
+      method => 'GET',
+      path_captures => { foo_id => 1 },
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo get)))),
+    },
+    'options is populated with all inferred data so far',
   );
 
 
@@ -322,7 +341,7 @@ subtest $::TYPE.': path-item lookup' => sub {
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.'paths: {}'),
   );
-  my $result = $openapi->validate_request(request('GET', 'https://example.com'));
+  my $result = $openapi->validate_request(request('GET', 'https://example.com'), my $options = {});
   isa_ok($result, ['JSON::Schema::Modern::Result'], 'got a result object back');
   cmp_result(
     $result->TO_JSON,
@@ -338,6 +357,15 @@ subtest $::TYPE.': path-item lookup' => sub {
       ],
     },
     'match failure from find_path_item()',
+  );
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+    },
+    'options is populated with all inferred data so far',
   );
 };
 

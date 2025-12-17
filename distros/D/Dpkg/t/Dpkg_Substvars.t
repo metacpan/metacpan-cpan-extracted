@@ -13,19 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
-use Test::More tests => 60;
+use Test::More tests => 64;
 use Test::Dpkg qw(:paths);
 
 use Dpkg ();
 use Dpkg::Arch qw(get_host_arch);
+use Dpkg::Control;
 
+use ok 'Dpkg::Substvars';
+
+# Needed by Dpkg::Substvars functions.
 $ENV{DEB_BUILD_ARCH} = 'amd64';
 $ENV{DEB_HOST_ARCH} = 'amd64';
-
-use_ok('Dpkg::Substvars');
 
 my $datadir = test_get_data_path();
 
@@ -36,14 +37,14 @@ my $s = Dpkg::Substvars->new();
 
 $s->load("$datadir/substvars1");
 
-# simple value tests
+# Simple value tests.
 is($s->get('var1'), 'Some value', 'var1');
 is($s->get('var2'), 'Some other value', 'var2');
 is($s->get('var3'), 'Yet another value', 'var3');
 is($s->get('var4'), undef, 'no var4');
 is($s->get('optional-var5'), 'Optionally used value', 'optional-var5');
 
-# Set automatic variable
+# Set automatic variable.
 $s->set_as_auto('var_auto', 'auto');
 is($s->get('var_auto'), 'auto', 'get var_auto');
 
@@ -55,21 +56,21 @@ var3=Yet another value
 VARS
 is($s->output(), $expected, 'No automatic variables output');
 
-# overriding
+# Overriding.
 $s->set('var1', 'New value');
 is($s->get('var1'), 'New value', 'var1 updated');
 
-# deleting
+# Deleting.
 $s->delete('var3');
 is($s->get('var3'), undef, 'var3 deleted');
 
-# default variables
+# Default variables.
 is($s->get('Newline'), "\n", 'newline');
 is($s->get('Space'), ' ', 'space');
 is($s->get('Tab'), "\t", 'tab');
 is($s->get('dpkg:Version'), $Dpkg::PROGVERSION, 'dpkg version 1');
 
-# special variables
+# Special variables.
 is($s->get('Arch'), undef, 'no arch');
 $s->set_arch_substvars();
 is($s->get('Arch'), get_host_arch(), 'arch');
@@ -111,12 +112,12 @@ is($s->get('ctrl:Some-Field'), 'some-value', 'contents of ctrl:Some-Field');
 is($s->get('ctrl:Other-Field'), 'other-value', 'contents of ctrl:Other-Field');
 is($s->get('ctrl:Alter-Field'), 'alter-value', 'contents of ctrl:Alter-Field');
 
-# Direct replace: few
+# Direct replace: few.
 is($s->substvars('This is a string ${var1} with variables ${binary:Version}'),
                  'This is a string New value with variables 1:2.3.4~5-6.7.8~nmu9+b0',
-                 'direct replace, few times');
+    'direct replace, few times');
 
-# Direct replace: many times (more than the recursive limit)
+# Direct replace: many times (more than the recursive limit).
 $s->set('dr', 'feed');
 is($s->substvars('${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
                  '${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
@@ -142,14 +143,14 @@ is($s->substvars('This is a string with unknown variable ${blubb}'),
                  'substvars missing');
 delete $SIG{__WARN__};
 is($output,
-   'Dpkg_Substvars.t: warning: test substitution variable ${blubb} used, but is not defined' . "\n",
-   'missing variables warning');
+    'Dpkg_Substvars.t: warning: test substitution variable ${blubb} used, but is not defined' . "\n",
+    'missing variables warning');
 
 # Recursive replace: Simple.
 $s->set('rvar', 'recursive ${var1}');
 is($s->substvars('This is a string with ${rvar}'),
                  'This is a string with recursive New value',
-                 'recursive replace simple');
+    'recursive replace simple');
 
 # Recursive replace: Constructed variables.
 $s->set('partref', 'recursive result');
@@ -158,7 +159,7 @@ $s->set('part2', 'rtr');
 $s->set('part3', 'ef}');
 is($s->substvars('Constructed ${part1}${part2}${part3} replace'),
                  'Constructed recursive result replace',
-                 'recursive constructed variable');
+    'recursive constructed variable');
 
 # Recursive replace: Cycle.
 $s->set('ref0', '${ref1}');
@@ -171,9 +172,9 @@ eval {
 };
 $output = $@ // q{};
 is($output,
-   'Dpkg_Substvars.t: error: test too many ${ref0} substitutions ' .
-   "(recursive?) in 'Cycle reference \${ref1}'\n",
-   'recursive cyclic expansion is limited');
+    'Dpkg_Substvars.t: error: test too many ${ref0} substitutions ' .
+    "(recursive?) in 'Cycle reference \${ref1}'\n",
+    'recursive cyclic expansion is limited');
 
 # Recursive replace: Billion laughs.
 $s->set('ex0', ':)');
@@ -193,50 +194,50 @@ eval {
 };
 $output = $@ // q{};
 is($output,
-   'Dpkg_Substvars.t: error: test too many ${ex1} substitutions ' .
-   "(recursive?) in 'Billion laughs :):):):):):):):):):):):):):)" .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   ':):):):):):):):):):):):):):):):):):):):):):):):):):)' .
-   '${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}' .
-   '${ex2}${ex2}${ex2}${ex2}${ex2}' .
-   '${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}' .
-   '${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}' .
-   '${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}' .
-   '${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}' .
-   '${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}' .
-   '${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}' .
-   "'\n",
-   'recursive or exponential expansion is limited');
+    'Dpkg_Substvars.t: error: test too many ${ex1} substitutions ' .
+    "(recursive?) in 'Billion laughs :):):):):):):):):):):):):):)" .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    ':):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+    '${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}' .
+    '${ex2}${ex2}${ex2}${ex2}${ex2}' .
+    '${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}' .
+    '${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}' .
+    '${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}' .
+    '${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}' .
+    '${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}' .
+    '${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}' .
+    "'\n",
+    'recursive or exponential expansion is limited');
 
-# Strange input
+# Strange input.
 is($s->substvars('Nothing to $ ${substitute  here}, is it ${}?, it ${is'),
                  'Nothing to $ ${substitute  here}, is it ${}?, it ${is',
-                 'substvars strange');
+    'substvars strange');
 
-# Warnings about unused variables
+# Warnings about unused variables.
 $output = '';
 $SIG{__WARN__} = sub { $output .= $_[0] };
 $s->warn_about_unused();
 delete $SIG{__WARN__};
 is($output,
-   'Dpkg_Substvars.t: warning: test substitution variable ${var2} unused, but is defined' . "\n",
-   'unused variables warnings');
+    'Dpkg_Substvars.t: warning: test substitution variable ${var2} unused, but is defined' . "\n",
+    'unused variables warnings');
 
-# Disable warnings for a certain variable
+# Disable warnings for a certain variable.
 $s->set_as_used('var_used', 'used');
 $s->mark_as_used('var2');
 $output = '';
@@ -247,7 +248,7 @@ is($output, '', 'disabled unused variables warnings');
 
 $s->delete('var_used');
 
-# Required variables
+# Required variables.
 my $sr;
 
 $expected = <<'VARS';
@@ -258,7 +259,7 @@ is($sr->output(), $expected, 'Required variable preserved');
 
 is($sr->substvars('This is a string with missing the required variable'),
                   'This is a string with missing the required variable',
-   'substvars required substitution missing');
+    'substvars required substitution missing');
 
 eval {
     $sr->warn_about_unused();
@@ -266,14 +267,58 @@ eval {
 };
 $output = $@ // q{};
 is($output,
-   'Dpkg_Substvars.t: error: required substitution variable ${required-var} not used' . "\n",
-   'substvars required substitution not used');
+    'Dpkg_Substvars.t: error: required substitution variable ${required-var} not used' . "\n",
+    'substvars required substitution not used');
 
 is($sr->substvars('This is a string with a required variable ${required-var}'),
                   'This is a string with a required variable Required value',
     'substvars required substitution present');
 
-# Variable filters
+# Implicit variables.
+my $si;
+
+$expected = <<'VARS';
+namespace-1:Build-Profiles$=profile-a
+namespace-2:Build-Profiles$=profile-b
+namespace-a:Depends$=implicit-a
+namespace-b:Depends$=implicit-b
+namespace-y:Unknown-Separator$=value-1
+namespace-z:Unknown-Separator$=value-2
+VARS
+$si = Dpkg::Substvars->new("$datadir/substvars-impl");
+is($si->output(), $expected, 'Implicit variable preserved');
+
+is($si->substvars('This is a string with a required variable ${namespace-a:Depends}'),
+                  'This is a string with a required variable implicit-a',
+    'substvars implicit substitution present');
+
+my $ctrl;
+
+$ctrl = Dpkg::Control->new(type => CTRL_DEB);
+$ctrl->{Recommends} = 'pkg-a, pkg-b';
+$ctrl->apply_substvars($si);
+$expected = <<'CTRL';
+Depends: implicit-a, implicit-b
+Recommends: pkg-a, pkg-b
+Build-Profiles: profile-a profile-b
+Unknown-Separator: value-1 value-2
+CTRL
+is($ctrl->output(), $expected, 'Implicit variables injected in control file');
+
+$ctrl = Dpkg::Control->new(type => CTRL_DEB);
+$ctrl->{Depends} = 'explicit-a, explicit-b';
+$ctrl->{Recommends} = 'pkg-a, pkg-b';
+$ctrl->apply_substvars($si);
+$expected = <<'CTRL';
+Depends: explicit-a, explicit-b
+Recommends: pkg-a, pkg-b
+Build-Profiles: profile-a profile-b
+Unknown-Separator: value-1 value-2
+CTRL
+is($ctrl->output(), $expected,
+    'Implicit variables shadowed by explicit field in control file');
+
+# Variable filters.
 my $sf;
 
 $expected = <<'VARS';
@@ -284,7 +329,9 @@ var1=Some value
 var2=Some other value
 VARS
 $sf = Dpkg::Substvars->new("$datadir/substvars2");
-$sf->filter(remove => sub { $_[0] =~ m/^prefix:/ });
+$sf->filter(
+    remove => sub { $_[0] =~ m/^prefix:/ },
+);
 is($sf->output(), $expected, 'Filter remove variables');
 
 $expected = <<'VARS';
@@ -294,13 +341,17 @@ var1=Some value
 var2=Some other value
 VARS
 $sf = Dpkg::Substvars->new("$datadir/substvars2");
-$sf->filter(keep => sub { $_[0] =~ m/var/ });
+$sf->filter(
+    keep => sub { $_[0] =~ m/var/ },
+);
 is($sf->output(), $expected, 'Filter keep variables');
 
 $expected = <<'VARS';
 prefix:name6=Bar
 VARS
 $sf = Dpkg::Substvars->new("$datadir/substvars2");
-$sf->filter(remove => sub { $_[0] =~ m/var/ },
-            keep => sub { $_[0] =~ m/^prefix:/ });
+$sf->filter(
+    remove => sub { $_[0] =~ m/var/ },
+    keep => sub { $_[0] =~ m/^prefix:/ },
+);
 is($sf->output(), $expected, 'Filter keep and remove variables');

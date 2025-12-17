@@ -29,8 +29,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Package::V3::Quilt 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use List::Util qw(any);
 use File::Spec;
@@ -39,13 +38,12 @@ use File::Copy;
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
 use Dpkg::File;
-use Dpkg::Version;
 use Dpkg::Source::Patch;
 use Dpkg::Source::Functions qw(erasedir chmod_if_needed fs_time);
 use Dpkg::Source::Quilt;
 use Dpkg::Exit;
 
-# Based on wig&pen implementation
+# Based on wig&pen implementation.
 use parent qw(Dpkg::Source::Package::V2);
 
 our $CURRENT_MINOR_VERSION = '0';
@@ -73,7 +71,10 @@ my @module_cmdline = (
 sub describe_cmdline_options {
     my $self = shift;
 
-    my @cmdline = ( $self->SUPER::describe_cmdline_options(), @module_cmdline );
+    my @cmdline = (
+        $self->SUPER::describe_cmdline_options(),
+        @module_cmdline,
+    );
 
     return @cmdline;
 }
@@ -105,10 +106,6 @@ sub can_build {
     my ($code, $msg) = $self->SUPER::can_build($dir);
     return ($code, $msg) if $code == 0;
 
-    my $v = Dpkg::Version->new($self->{fields}->{'Version'});
-    return (0, g_('non-native package version does not contain a revision'))
-        if $v->is_native();
-
     my $quilt = $self->_build_quilt_object($dir);
     $msg = $quilt->find_problems();
     return (0, $msg) if $msg;
@@ -135,21 +132,23 @@ sub apply_patches {
     }
 
     my $quilt = $self->_build_quilt_object($dir);
-    $quilt->load_series(%opts) if $opts{warn_options}; # Trigger warnings
+    # Trigger warnings.
+    $quilt->load_series(%opts) if $opts{warn_options};
 
     # Always create the quilt db so that if the maintainer calls quilt to
-    # create a patch, it's stored in the right directory
+    # create a patch, it is stored in the right directory.
     $quilt->save_db();
 
-    # Update debian/patches/series symlink if needed to allow quilt usage
+    # Update debian/patches/series symlink if needed to allow quilt usage.
     my $series = $quilt->get_series_file();
     my $basename = (File::Spec->splitpath($series))[2];
     if ($basename ne 'series') {
         my $dest = $quilt->get_patch_file('series');
         unlink($dest) if -l $dest;
-        unless (-f _) { # Don't overwrite real files
+        # Do not overwrite real files.
+        unless (-f _) {
             symlink($basename, $dest)
-                or syserr(g_("can't create symlink %s"), $dest);
+                or syserr(g_('cannot create symlink %s'), $dest);
         }
     }
 
@@ -159,13 +158,13 @@ sub apply_patches {
 
     if ($opts{usage} eq 'preparation' and
         $self->{options}{unapply_patches} eq 'auto') {
-        # We're applying the patches in --before-build, remember to unapply
-        # them afterwards in --after-build
+        # We are applying the patches in --before-build, remember to unapply
+        # them afterwards in --after-build.
         my $pc_unapply = $quilt->get_db_file('.dpkg-source-unapply');
         file_touch($pc_unapply);
     }
 
-    # Apply patches
+    # Apply patches.
     my $pc_applied = $quilt->get_db_file('applied-patches');
     $opts{timestamp} = fs_time($pc_applied);
     if ($opts{skip_auto}) {
@@ -197,7 +196,7 @@ sub prepare_build {
     $self->SUPER::prepare_build($dir);
     # Skip .pc directories of quilt by default and ignore difference
     # on debian/patches/series symlinks and d/p/.dpkg-source-applied
-    # stamp file created by ourselves
+    # stamp file created by ourselves.
     my $func = sub {
         my $pathname = shift;
 
@@ -250,7 +249,10 @@ sub check_patches_applied {
     my $patch_obj = Dpkg::Source::Patch->new(filename => $first_patch);
     return unless $patch_obj->check_apply($dir, fatal_dupes => 1);
 
-    $self->apply_patches($dir, usage => 'preparation', verbose => 1);
+    $self->apply_patches($dir,
+        usage => 'preparation',
+        verbose => 1,
+    );
 }
 
 sub register_patch {
@@ -262,17 +264,17 @@ sub register_patch {
     if (-s $tmpdiff) {
         copy($tmpdiff, $patch)
             or syserr(g_('failed to copy %s to %s'), $tmpdiff, $patch);
-        chmod_if_needed(0666 & ~ umask(), $patch)
+        chmod_if_needed(0o666 & ~ umask(), $patch)
             or syserr(g_("unable to change permission of '%s'"), $patch);
     } elsif (-e $patch) {
         unlink($patch) or syserr(g_('cannot remove %s'), $patch);
     }
 
     if (-e $patch) {
-        # Add patch to series file
+        # Add patch to series file.
         $quilt->register($patch_name);
     } else {
-        # Remove auto_patch from series
+        # Remove auto_patch from series.
         $quilt->unregister($patch_name);
     }
     return $patch;

@@ -79,6 +79,29 @@ is_deeply(
 	'Employee type constraints',
 );
 
+is_deeply(
+	\%Person::__XSCON_FLAGS,
+	{
+		name   => 1,
+		age    => 2 + ( 4 << 8 ), # Int=4
+		email  => 0,
+		phone  => 0,
+	},
+	'Person attributes (flags)',
+);
+
+is_deeply(
+	\%Employee::__XSCON_FLAGS,
+	{
+		name   => 1,
+		age    => 2 + ( 4 << 8 ),
+		email  => 0,
+		phone  => 0,
+		employee_id => 1,
+	},
+	'Employee attributes (flags)',
+);
+
 my $alice0 = bless {
 	name         => "Alice",
 	employee_id  => "001",

@@ -13,42 +13,42 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
-use Test::Dpkg qw(:needs);
+use Test::Dpkg qw(:needs :paths);
 
 test_needs_author();
 test_needs_command('cppcheck');
-test_needs_srcdir_switch();
-
+plan skip_all => 'expensive test in short mode' if $ENV{SHORT_TESTING};
 plan tests => 1;
+
+test_chdir_srcdir();
 
 my $builddir = $ENV{abs_top_builddir} || '.';
 
 my @cppcheck_opts = (qw(
-  --quiet
-  --force
-  --error-exitcode=2
-  --inline-suppr
-  --check-level=exhaustive
-  --suppressions-list=t/cppcheck/cppcheck.supp
-  --std=c99 --std=c++14
-  -Ilib
-  -Ilib/compat
-  -Isrc/common
+    --quiet
+    --force
+    --error-exitcode=2
+    --inline-suppr
+    --check-level=exhaustive
+    --suppressions-list=t/cppcheck/cppcheck.supp
+    --std=c99 --std=c++14
+    -Ilib
+    -Ilib/compat
+    -Isrc/common
 ),
-  "-I$builddir",
+    "-I$builddir",
 qw(
-  -D__GNUC__=12
-  -D__GNUC_MINOR__=0
-  -D_DIRENT_HAVE_D_TYPE=1
-  -DWITH_LIBSELINUX=1
-  -DLIBDPKG_VOLATILE_API=1
+    -D__GNUC__=12
+    -D__GNUC_MINOR__=0
+    -D_DIRENT_HAVE_D_TYPE=1
+    -DWITH_LIBSELINUX=1
+    -DLIBDPKG_VOLATILE_API=1
 ), (
-  '--enable=warning,performance,portability,style',
-  '--template=\'{file}:{line}: {severity} ({id}): {message}\''
+    '--enable=warning,performance,portability,style',
+    '--template=\'{file}:{line}: {severity} ({id}): {message}\''
 ));
 my $tags = qx(cppcheck @cppcheck_opts . 2>&1);
 

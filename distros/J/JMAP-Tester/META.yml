@@ -6,6 +6,8 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   HTTP::Response: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   JSON::Typist: '0.005'
   LWP::Protocol::PSGI: '0'
   Plack::Request: '0'
@@ -58,7 +60,7 @@ resources:
   bugtracker: https://github.com/fastmail/JMAP-Tester/issues
   homepage: https://github.com/fastmail/JMAP-Tester
   repository: https://github.com/fastmail/JMAP-Tester.git
-version: '0.108'
+version: '0.109'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -211,6 +213,24 @@ x_Dist_Zilla:
       name: '@RJBS/Git::Remote::Check'
       version: 0.1.2
     -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: 1
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: '@RJBS/Test::Compile'
+      version: '2.058'
+    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
@@ -313,7 +333,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@RJBS/RJBSMisc'
-      version: '5.033'
+      version: '5.034'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
@@ -361,7 +381,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.108'
+          tag: '0.109'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -29,8 +29,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Quilt 0.02;
 
-use strict;
-use warnings;
+use v5.36;
 
 use List::Util qw(any none);
 use File::Spec;
@@ -182,12 +181,25 @@ sub push {
 
     info(g_('applying %s'), $patch) if $opts{verbose};
     eval {
-        $obj->apply($self->{dir}, timestamp => $opts{timestamp},
-                    verbose => $opts{verbose},
-                    force_timestamp => 1, create_dirs => 1, remove_backup => 0,
-                    options => [ '-t', '-F', '0', '-N', '-p1', '-u',
-                                 '-V', 'never', '-E', '-b',
-                                 '-B', ".pc/$patch/", '--reject-file=-' ]);
+        $obj->apply($self->{dir},
+            verbose => $opts{verbose},
+            timestamp => $opts{timestamp},
+            force_timestamp => 1,
+            create_dirs => 1,
+            remove_backup => 0,
+            options => [
+                '-t',
+                '-F', '0',
+                '-N',
+                '-p1',
+                '-u',
+                '-V', 'never',
+                '-E',
+                '-b',
+                '-B', ".pc/$patch/",
+                '--reject-file=-',
+            ],
+        );
     };
     if ($@) {
         info(g_('the patch has fuzz which is not allowed, or is malformed'));
@@ -215,18 +227,29 @@ sub pop {
     info(g_('unapplying %s'), $patch) if $opts{verbose};
     my $backup_dir = $self->get_db_file($patch);
     if (-d $backup_dir and not $opts{reverse_apply}) {
-        # Use the backup copies to restore
+        # Use the backup copies to restore.
         $self->restore_quilt_backup_files($patch);
     } else {
-        # Otherwise reverse-apply the patch
+        # Otherwise reverse-apply the patch.
         my $path = $self->get_patch_file($patch);
         my $obj = Dpkg::Source::Patch->new(filename => $path);
 
-        $obj->apply($self->{dir}, timestamp => $opts{timestamp},
-                    verbose => 0, force_timestamp => 1, remove_backup => 0,
-                    options => [ '-R', '-t', '-N', '-p1',
-                                 '-u', '-V', 'never', '-E',
-                                 '--no-backup-if-mismatch' ]);
+        $obj->apply($self->{dir},
+            verbose => 0,
+            timestamp => $opts{timestamp},
+            force_timestamp => 1,
+            remove_backup => 0,
+            options => [
+                '-R',
+                '-t',
+                '-N',
+                '-p1',
+                '-u',
+                '-V', 'never',
+                '-E',
+                '--no-backup-if-mismatch',
+            ],
+        );
     }
 
     erasedir($backup_dir);
@@ -261,7 +284,7 @@ sub find_problems {
 sub get_series_file {
     my $self = shift;
     my $vendor = lc(get_current_vendor() || 'debian');
-    # Series files are stored alongside patches
+    # Series files are stored alongside patches.
     my $default_series = $self->get_patch_file('series');
     my $vendor_series = $self->get_patch_file("$vendor.series");
     return $vendor_series if -e $vendor_series;
@@ -292,7 +315,7 @@ sub get_patch_dir {
     return File::Spec->catfile($self->{dir}, 'debian', 'patches');
 }
 
-## METHODS BELOW ARE INTERNAL ##
+## Internal methods.
 
 sub _file_load {
     my ($self, $file) = @_;
@@ -334,10 +357,10 @@ sub read_patch_list {
     open(my $series_fh, '<' , $file) or syserr(g_('cannot read %s'), $file);
     while (defined(my $line = <$series_fh>)) {
         chomp $line;
-        # Strip leading/trailing spaces
+        # Strip leading/trailing spaces.
         $line =~ s/^\s+//;
         $line =~ s/\s+$//;
-        # Strip comment
+        # Strip comment.
         $line =~ s/(?:^|\s+)#.*$//;
         next unless $line;
         if ($line =~ /^(\S+)\s+(.*)$/) {
@@ -373,7 +396,7 @@ sub restore_quilt_backup_files {
     my $patch_dir = $self->get_db_file($patch);
     return unless -d $patch_dir;
     info(g_('restoring quilt backup files for %s'), $patch) if $opts{verbose};
-    find({
+    my $scan_quilt = {
         no_chdir => 1,
         wanted => sub {
             return if -d;
@@ -389,11 +412,12 @@ sub restore_quilt_backup_files {
                         or syserr(g_("unable to change permission of '%s'"), $target);
                 }
             } else {
-                # empty files are "backups" for new files that patch created
+                # Empty files are "backups" for new files that patch created.
                 unlink($target);
             }
-        }
-    }, $patch_dir);
+        },
+    };
+    find($scan_quilt, $patch_dir);
 }
 
 =head1 CHANGES

@@ -34,8 +34,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Vendor::Ubuntu 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use List::Util qw(any);
 
@@ -52,20 +51,30 @@ sub run_hook {
         my $src = shift @params;
         my $fields = $src->{fields};
 
-        # check that Maintainer/XSBC-Original-Maintainer comply to
-        # https://wiki.ubuntu.com/DebianMaintainerField
-        if (defined($fields->{'Version'}) and defined($fields->{'Maintainer'}) and
-           $fields->{'Version'} =~ /ubuntu/) {
-           if ($fields->{'Maintainer'} !~ /(?:ubuntu|canonical)/i) {
-               if (length $ENV{DEBEMAIL} and $ENV{DEBEMAIL} =~ /\@(?:ubuntu|canonical)\.com/) {
-                   error(g_('Version number suggests Ubuntu changes, but Maintainer: does not have Ubuntu address'));
-               } else {
-                   warning(g_('Version number suggests Ubuntu changes, but Maintainer: does not have Ubuntu address'));
-               }
-           }
-           unless ($fields->{'Original-Maintainer'}) {
-               warning(g_('Version number suggests Ubuntu changes, but there is no XSBC-Original-Maintainer field'));
-           }
+        # Check that Maintainer/XSBC-Original-Maintainer comply to:
+        # <https://wiki.ubuntu.com/DebianMaintainerField>.
+        if (defined($fields->{'Version'}) and
+            defined($fields->{'Maintainer'}) and
+            $fields->{'Version'} =~ /ubuntu/)
+        {
+            if ($fields->{'Maintainer'} !~ /(?:ubuntu|canonical)/i) {
+                if (length $ENV{DEBEMAIL} and
+                    $ENV{DEBEMAIL} =~ /\@(?:ubuntu|canonical)\.com/)
+                {
+                    error(g_('version number suggests %s vendor changes, ' .
+                             'but the %s field does not have %s vendor address'),
+                          'Ubuntu', 'Maintainer', 'Ubuntu');
+                } else {
+                    warning(g_('version number suggests %s vendor changes, ' .
+                               'but the %s field does not have %s vendor address'),
+                            'Ubuntu', 'Maintainer', 'Ubuntu');
+                }
+            }
+            unless ($fields->{'Original-Maintainer'}) {
+                warning(g_('version number suggests %s vendor changes, ' .
+                           'but there is no %s field'),
+                        'Ubuntu', 'XSBC-Original-Maintainer');
+            }
         }
     } elsif ($hook eq 'package-keyrings') {
         return ($self->SUPER::run_hook($hook),
@@ -90,7 +99,7 @@ sub run_hook {
     } elsif ($hook eq 'post-process-changelog-entry') {
         my $fields = shift @params;
 
-        # Add Launchpad-Bugs-Fixed field
+        # Add Launchpad-Bugs-Fixed field.
         my $bugs = find_launchpad_closes($fields->{'Changes'} // '');
         if (scalar(@$bugs)) {
             $fields->{'Launchpad-Bugs-Fixed'} = join(' ', @$bugs);
@@ -143,35 +152,35 @@ sub add_build_flags {
 
     $self->SUPER::add_build_flags($flags);
 
-    # Per https://wiki.ubuntu.com/DistCompilerFlags
+    # Per <https://wiki.ubuntu.com/DistCompilerFlags>.
     $flags->prepend('LDFLAGS', '-Wl,-Bsymbolic-functions');
 
     # In Ubuntu these flags are set by the compiler, so when disabling the
     # features we need to pass appropriate flags to disable them.
-    if (!$flags->use_feature('hardening', 'stackprotectorstrong') &&
-        !$flags->use_feature('hardening', 'stackprotector')) {
+    if (! $flags->use_feature('hardening', 'stackprotectorstrong') &&
+        ! $flags->use_feature('hardening', 'stackprotector')) {
         my $flag = '-fno-stack-protector';
         $flags->append($_, $flag) foreach @compile_flags;
     }
 
-    if (!$flags->use_feature('hardening', 'stackclash')) {
+    if (! $flags->use_feature('hardening', 'stackclash')) {
         my $flag = '-fno-stack-clash-protection';
         $flags->append($_, $flag) foreach @compile_flags;
     }
 
-    if (!$flags->use_feature('hardening', 'fortify')) {
+    if (! $flags->use_feature('hardening', 'fortify')) {
         $flags->append('CPPFLAGS', '-D_FORTIFY_SOURCE=0');
     }
 
-    if (!$flags->use_feature('hardening', 'format')) {
+    if (! $flags->use_feature('hardening', 'format')) {
         my $flag = '-Wno-format -Wno-error=format-security';
         $flags->append('CFLAGS', $flag);
         $flags->append('CXXFLAGS', $flag);
         $flags->append('OBJCFLAGS', $flag);
         $flags->append('OBJCXXFLAGS', $flag);
-     }
+    }
 
-     if (!$flags->use_feature('hardening', 'branch')) {
+    if (! $flags->use_feature('hardening', 'branch')) {
         my $cpu = $flags->get_option_value('hardening-branch-cpu');
         my $flag;
         if ($cpu eq 'arm64') {
@@ -181,6 +190,7 @@ sub add_build_flags {
         }
         if (defined $flag) {
             $flags->append($_, $flag) foreach @compile_flags;
+            $flags->append('LDFLAGS', $flag);
         }
     }
 

@@ -6,7 +6,7 @@ use XSLoader ();
 package Class::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.013';
 
 use Exporter::Tiny 1.000000 qw( mkopt );
 use Ref::Util 0.100 qw( is_plain_arrayref is_plain_hashref is_blessed_ref is_coderef is_plain_scalarref );
@@ -30,11 +30,7 @@ sub import {
 	}
 	inheritance_stuff($package);
 	
-	my ($HAS, $REQUIRED, $ISA, $BUILDALL, $STRICT, $FLAGS, $COERCIONS, $DEFAULTS) = get_vars($package);
-	$FLAGS ||= {};
-	$COERCIONS ||= {};
-	$DEFAULTS ||= {};
-	$$BUILDALL = undef;
+	my ($HAS, $REQUIRED, $ISA, $BUILDALL, $STRICT, $FLAGS, $COERCIONS, $DEFAULTS, $TT) = get_vars($package);
 	$$STRICT = !!0;
 	
 	for my $pair (@{ mkopt \@_ }) {
@@ -57,7 +53,7 @@ sub import {
 			%spec = ( isa => $thing );
 		}
 		elsif (is_coderef($thing)) {
-			%spec = (isa => $thing);
+			%spec = ( isa => $thing );
 		}
 		elsif (defined $thing) {
 			Exporter::Tiny::_croak("What is %s???", $thing);
@@ -105,6 +101,7 @@ sub import {
 		$ISA->{$name} = $spec{isa} if is_coderef $spec{isa};
 		$COERCIONS->{$name} = $spec{coerce} if is_coderef $spec{coerce};
 		$DEFAULTS->{$name} = $class->_canonicalize_defaults( \%spec ) if exists $spec{default} || defined $spec{builder};
+		$TT->{$name} = $type if is_blessed_ref($type) && $type->isa('Type::Tiny');
 	}
 }
 
@@ -156,6 +153,74 @@ sub _created_as_string ($) {
 		&& !_created_as_number($value);
 }
 
+sub _type_to_number {
+	my ( $type, $no_recurse ) = @_;
+	
+	if ( $type and $type->isa('Type::Tiny') ) {
+		require Types::Common;
+		if ( $type == Types::Common::Any() ) {
+			return 0;
+		}
+		elsif ( $type == Types::Common::Defined() ) {
+			return 1;
+		}
+		elsif ( $type == Types::Common::Ref() ) {
+			return 2;
+		}
+		elsif ( $type == Types::Common::Bool() ) {
+			return 3;
+		}
+		elsif ( $type == Types::Common::Int() ) {
+			return 4;
+		}
+		elsif ( $type == Types::Common::PositiveOrZeroInt() ) {
+			return 5;
+		}
+		elsif ( $type == Types::Common::Num() ) {
+			return 6;
+		}
+		elsif ( $type == Types::Common::PositiveOrZeroNum() ) {
+			return 7;
+		}
+		elsif ( $type == Types::Common::Str() ) {
+			return 8;
+		}
+		elsif ( $type == Types::Common::NonEmptyStr() ) {
+			return 9;
+		}
+		elsif ( $type == Types::Common::ClassName() ) {
+			return 10;
+		}
+		elsif ( $type == Types::Common::Object() ) {
+			return 12;
+		}
+		elsif ( $type == Types::Common::ScalarRef() ) {
+			return 13;
+		}
+		elsif ( $type == Types::Common::CodeRef() ) {
+			return 14;
+		}
+		elsif ( $type == Types::Common::ArrayRef() ) {
+			return 16;
+		}
+		elsif ( $type == Types::Common::HashRef() ) {
+			return 32;
+		}
+		elsif ( $type->is_parameterized and @{ $type->parameters } == 1 and (
+			$type->parameterized_from == Types::Common::ArrayRef()
+			or $type->parameterized_from == Types::Common::HashRef()
+			) ) {
+			return _type_to_number( $type->parameterized_from, 1 ) | _type_to_number( $type->type_parameter, 1 ) unless $no_recurse;
+		}
+	}
+	
+	# Returning 15 indicates an unknown type.
+	# 31 will be an arrayref of some unknown type.
+	# 47 will be an hashref of some unknown type.
+	# Class::XSAccessor won't be able to do the type check internally.
+	return 15;
+}
+
 sub _build_flags {
 	my $package = shift;
 	my $spec = shift;
@@ -195,44 +260,12 @@ sub _build_flags {
 	
 	$flags += ( $has_common_default << 4 );
 	
-	my $has_common_type = 0;
-	if ( $type and $type->isa('Type::Tiny') ) {
-		require Types::Common;
-		if ( $type == Types::Common::Str() ) {
-			$has_common_type = 1;
-		}
-		elsif ( $type == Types::Common::Num() ) {
-			$has_common_type = 2;
-		}
-		elsif ( $type == Types::Common::Int() ) {
-			$has_common_type = 3;
-		}
-		elsif ( $type == Types::Common::ArrayRef() ) {
-			$has_common_type = 4;
-		}
-		elsif ( $type == Types::Common::ArrayRef()->of(Types::Common::Str()) ) {
-			$has_common_type = 5;
-		}
-		elsif ( $type == Types::Common::ArrayRef()->of(Types::Common::Num()) ) {
-			$has_common_type = 6;
-		}
-		elsif ( $type == Types::Common::ArrayRef()->of(Types::Common::Int()) ) {
-			$has_common_type = 7;
-		}
-		elsif ( $type == Types::Common::HashRef() ) {
-			$has_common_type = 8;
-		}
-		elsif ( $type == Types::Common::HashRef()->of(Types::Common::Str()) ) {
-			$has_common_type = 9;
-		}
-		elsif ( $type == Types::Common::HashRef()->of(Types::Common::Num()) ) {
-			$has_common_type = 10;
-		}
-		elsif ( $type == Types::Common::HashRef()->of(Types::Common::Int()) ) {
-			$has_common_type = 11;
-		}
-
-		$flags += ( $has_common_default << 8 );
+	if ( $type ) {
+		my $has_common_type = _type_to_number( $type );
+		$flags += ( $has_common_type << 8 );
+	}
+	elsif ( is_coderef $spec->{isa} ) {
+		$flags += ( 15 << 8 );
 	}
 	
 	return 0 + $flags;
@@ -245,11 +278,12 @@ sub get_vars {
 		\@{"$package\::__XSCON_HAS"},
 		\@{"$package\::__XSCON_REQUIRED"},
 		\%{"$package\::__XSCON_ISA"},
-		\${"$package\::__XSCON_BUILD"},
+		\%{"$package\::__XSCON_BUILD"},
 		\${"$package\::__XSCON_STRICT"},
 		\%{"$package\::__XSCON_FLAGS"},
 		\%{"$package\::__XSCON_COERCIONS"},
 		\%{"$package\::__XSCON_DEFAULTS"},
+		\%{"$package\::__XSCON_TYPETINY"},
 	);
 }
 
@@ -262,23 +296,31 @@ sub inheritance_stuff {
 	pop @isa;  # discard $package itself
 	return unless @isa;
 	
-	my ($HAS, $REQUIRED, $ISA, undef, undef, $FLAGS, $COERCIONS, $DEFAULTS) = get_vars($package);
+	my ($HAS, $REQUIRED, $ISA, undef, undef, $FLAGS, $COERCIONS, $DEFAULTS, $TT) = get_vars($package);
 	foreach my $parent (@isa) {
-		my ($pHAS, $pREQUIRED, $pISA, undef, undef, $pFLAGS, $pCOERCIONS, $pDEFAULTS) = get_vars($parent);
+		my ($pHAS, $pREQUIRED, $pISA, undef, undef, $pFLAGS, $pCOERCIONS, $pDEFAULTS, $pTT) = get_vars($parent);
 		@$HAS      = uniq(@$HAS, @$pHAS);
 		@$REQUIRED = uniq(@$REQUIRED, @$pREQUIRED);
 		for my $k ( @$HAS ) {
-			for my $pair ( [$pISA=>$ISA], [$pCOERCIONS=>$COERCIONS], [$pDEFAULTS=>$DEFAULTS] ) {
+			for my $pair ( [$pISA=>$ISA], [$pCOERCIONS=>$COERCIONS], [$pDEFAULTS=>$DEFAULTS], [$pTT=>$TT] ) {
 				my ( $parent_hash, $this_hash ) = @$pair;
-				if ( exists $parent_hash->{$k} and not $this_hash->{$k} ) {
+				if ( exists $parent_hash->{$k} and not exists $this_hash->{$k} ) {
 					$this_hash->{$k} = $parent_hash->{$k};
 				}
 			}
 			if ( not exists $FLAGS->{$k} ) {
 				my $flags = 0;
 				$flags += 1 if grep $k eq $_, @$REQUIRED;
-				$flags += 2 if exists $ISA->{$k};
-				$flags += 4 if exists $COERCIONS->{$k};
+				if ( is_coderef $ISA->{$k} ) {
+					$flags += 2;
+					if ( is_blessed_ref $TT->{$k} ) {
+						$flags += ( _type_to_number($TT->{$k}) << 8 );
+					}
+					else {
+						$flags += ( 15 << 8 );
+					}
+				}
+				$flags += 4 if is_coderef $COERCIONS->{$k};
 				$flags += 8 if exists $DEFAULTS->{$k};
 				$FLAGS->{$k} = $flags;
 			}
@@ -288,19 +330,21 @@ sub inheritance_stuff {
 
 sub populate_build {
 	my $package = ref($_[0]) || $_[0];
+	my $klass   = ref($_[1]) || $_[1];
+	
 	my (undef, undef, undef, $BUILDALL) = get_vars($package);
 	
-	if (!$package->can('BUILD')) {
-		$$BUILDALL = 0;
+	if (!$klass->can('BUILD')) {
+		$BUILDALL->{$klass} = 0;
 		return;
 	}
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
 	
-	$$BUILDALL  = [
+	$BUILDALL->{$klass} = [
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
-		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($package) }
+		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($klass) }
 	];
 	
 	return;
@@ -436,7 +480,34 @@ Type constraints can also be provided as coderefs returning a boolean:
     "phone"    => Str,
   );
 
-Type constraints are likely to siginificantly slow down your constructor.
+Type constraints are likely to siginificantly slow down your constructor,
+apart from the following type constraints defined in L<Types::Common> which
+are recognized and handled via a pure C codepath:
+
+=over
+
+=item *
+
+These basic types:
+
+B<Any>, B<Item>, B<Defined>, B<Ref>, B<Bool>, B<Int>, B<PositiveOrZeroInt>,
+B<Num>, B<PositiveOrZeroNum>, B<Str>, B<NonEmptyStr>, B<ClassName>,
+B<Object>, B<ScalarRef>, and B<CodeRef>.
+
+=item *
+
+B<ArrayRef> and B<< ArrayRef[x] >> where B<x> is any of the basic types
+listed above.
+
+=item *
+
+B<HashRef> and B<< HashRef[x] >> where B<x> is any of the basic types
+listed above.
+
+=back
+
+So for example, a type check for B<< ArrayRef[PositiveOrZeroInt >> should
+be very fast.
 
 When multiple attributes fail their type check, the constructor will only
 report the first one it encountered, based on the order the attributes were
@@ -591,36 +662,8 @@ Returns nothing.
 =head2 Use of Package Variables
 
 Class::XSConstructor stores its configuration for class Foo in a bunch of
-package variables with the prefix C<< Foo::__XSCON_ >>.
-
-The only supported use of these variables that you may need to be aware of
-is:
-
-=over
-
-=item C<< $Foo::__XSCON_BUILD >>
-
-If set to "0", indicates that XSConstructor should not try to call
-C<BUILD> methods for the class (probably because there are none, so
-it would be a waste of time scanning through the inheritance tree
-looking for them).
-
-If set to an arrayref of coderefs, these will be the methods which
-the constructor calls.
-
-If set to undef, the constructor will populate this method with
-either the value "0" or an arrayref of coderefs next time it is
-called.
-
-Any other value is invalid.
-
-=item C<< $Foo::__XSCON_STRICT >>
-
-If set to true, indicates that XSConstructor should use a "strict"
-constructor, which complains about the presence of any unrecognized
-keys in the init args hashref.
-
-=back
+package variables with the prefix C<< Foo::__XSCON_ >>. If you tamper with
+those, your warranty will be void.
 
 =head1 CAVEATS
 

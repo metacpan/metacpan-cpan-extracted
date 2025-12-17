@@ -24,18 +24,33 @@ use strict;
 use warnings;
 use Test::More;
 
+my @ARR;
+
 {
 	package Local::Person;
 	use Class::XSConstructor qw( name! !! );
 	sub name { $_[0]{name} }
+	sub BUILD {
+		push @ARR, __PACKAGE__;
+	}
 }
 
 {
 	package Local::Employee;
 	our @ISA = 'Local::Person';
+	sub BUILD {
+		push @ARR, __PACKAGE__;
+	}
 }
 
 my $bob = Local::Employee->new( name => 'Bob' );
 is( $bob->name, 'Bob' );
+
+is_deeply( \@ARR, [ 'Local::Person', 'Local::Employee' ] );
+
+is_deeply(
+	\%Local::Person::__XSCON_BUILD,
+	{ 'Local::Employee' => [ \&Local::Person::BUILD, \&Local::Employee::BUILD ] }
+);
 
 done_testing;

@@ -28,8 +28,7 @@ information.
 
 package Dpkg::BuildInfo 1.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT_OK = qw(
     get_build_env_allowed
@@ -49,6 +48,18 @@ the build, but are still not privacy revealing.
 =cut
 
 my @env_allowed = (
+    # Tool behavior.
+    qw(
+        POSIXLY_CORRECT
+        GETCONF_DIR
+    ),
+    # Resolver, see resolv.conf(5), host.conf(5).
+    qw(
+        RESOLV_HOST_CONF
+        RESOLV_MULTI
+        RESOLV_REORDER
+        RES_OPTIONS
+    ),
     # Toolchain.
     qw(
         CC
@@ -89,16 +100,36 @@ my @env_allowed = (
         LDFLAGS
         LDFLAGS_FOR_BUILD
         ARFLAGS
+        LFLAGS
+        YFLAGS
         MAKEFLAGS
         GNUMAKEFLAGS
     ),
     # Dynamic linker, see ld(1).
     qw(
+        LD_ASSUME_KERNEL
+        LD_AUDIT
+        LD_BIND_NOT
+        LD_BIND_NOW
+        LD_DYNAMIC_WEAK
         LD_LIBRARY_PATH
+        LD_ORIGIN_PATH
+        LD_PREFER_MAP_32BIT_EXEC
+        LD_PRELOAD
     ),
-    # Locale, see locale(1).
+    # Timezone, see tzset(3).
+    qw(
+        TZ
+        TZDIR
+    ),
+    # Dates, see getdate(3).
+    qw(
+        DATEMSK
+    ),
+    # Locale, see locale(1), locale(7).
     qw(
         LANG
+        LANGUAGE
         LC_ALL
         LC_CTYPE
         LC_NUMERIC
@@ -112,6 +143,13 @@ my @env_allowed = (
         LC_TELEPHONE
         LC_MEASUREMENT
         LC_IDENTIFICATION
+    ),
+    # Locale paths, see locale(7), catopen(3), iconv(1).
+    qw(
+        LOCPATH
+        I18NPATH
+        NLSPATH
+        GCONV_PATH
     ),
     # Build flags, see dpkg-buildpackage(1).
     qw(

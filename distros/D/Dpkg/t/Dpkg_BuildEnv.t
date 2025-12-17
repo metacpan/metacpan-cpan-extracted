@@ -13,14 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 14;
 
-BEGIN {
-    use_ok('Dpkg::BuildEnv');
-}
+use ok 'Dpkg::BuildEnv';
 
 $ENV{DPKG_TEST_VAR_A} = 100;
 $ENV{DPKG_TEST_VAR_B} = 200;
@@ -42,7 +39,7 @@ is(scalar Dpkg::BuildEnv::list_accessed(), 2, '2 accessed variables');
 is(scalar Dpkg::BuildEnv::list_modified(), 1, '1 modified variable');
 
 ok(Dpkg::BuildEnv::has('DPKG_TEST_VAR_A'), 'variables is present');
-ok(!Dpkg::BuildEnv::has('DPKG_TEST_VAR_Z'), 'variables is not present');
+ok(! Dpkg::BuildEnv::has('DPKG_TEST_VAR_Z'), 'variables is not present');
 
 is(scalar Dpkg::BuildEnv::list_accessed(), 3, '2 accessed variables');
 is(scalar Dpkg::BuildEnv::list_modified(), 1, '1 modified variable');

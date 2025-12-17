@@ -25,6 +25,7 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   "$0 %o [filename] [filename] ...",
   ['help|usage|?|h', 'print usage information and exit', { shortcircuit => 1 } ],
   [],
+  ['output-format=s', 'output format (flag, basic, terse)'],
   ['strict', 'disallow unknown keywords in embedded JSON Schemas'],
   ['dump-identifiers', 'print a list of all identifiers found in the schema'],
   ['with-defaults', 'include list of defaults for missing data'],
@@ -37,9 +38,10 @@ JSON::Schema::Modern->VERSION('0.630') if $opt->with_defaults;
 my $js = JSON::Schema::Modern->new(%$opt);
 my $exit_val = 0;
 
-foreach (my $idx = 0; $idx < @ARGV; ++$idx) {
-  my $document_filename = $ARGV[$idx];
-  process(path($document_filename)->slurp('UTF-8'), 0+!$idx, $document_filename);
+foreach my $document_filename (@ARGV) {
+  my $document_filename = $document_filename;
+  process(path($document_filename)->slurp('UTF-8'),
+    0+!!($ARGV[-1] eq $document_filename), $document_filename);
 }
 
 if (not @ARGV) {
@@ -70,7 +72,7 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
       exit 2;
     }
 
-    $result = JSON::Schema::Modern::Result->new(errors => [ $document->errors ]);
+    $result = $document->validate;
   }
   else {
     # not an OpenAPI document? assume it's a vanilla JSON Schema
@@ -137,13 +139,14 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 SYNOPSIS
 
   openapi-validate --help
 
   openapi-validate \
+    [ --output-format <format> ] \
     [ --strict ] \
     [ --dump-identifiers ] \
     [ --with-defaults ] \
@@ -208,6 +211,10 @@ The following options from L<JSON::Schema::Modern> are available:
 
 =item *
 
+L<JSON::Schema::Modern/output_format>: One of: C<flag>, C<basic>, C<terse>. Defaults to C<basic>.
+
+=item *
+
 L<JSON::Schema::Modern/strict>: disallow unknown keywords in embedded JSON Schemas
 
 =item *
@@ -222,8 +229,8 @@ L<JSON::Schema::Modern/with_defaults>: include list of defaults for missing data
 
 The remainder of the command line arguments are used to provide the filename containing a JSON- or
 YAML-encoded OpenAPI document. You can use more than one filename to validate multiple documents at
-the same time, which is faster than using separate processes, but the first file must be a valid
-OpenAPI document.
+the same time, which is faster than using separate processes; each file is processed in order and
+made available to later documents, and the last file must be a valid OpenAPI document.
 
 If the file looks like a JSON Schema rather than an OpenAPI document, it will be validated as such,
 and loaded into the evaluator so it can be used as a metaschema by your main document.

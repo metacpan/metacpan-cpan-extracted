@@ -60,6 +60,6 @@
          "web" : "https://github.com/kawamurashingo/JQ-Lite"
       }
    },
-   "version" : "1.47",
+   "version" : "1.48",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

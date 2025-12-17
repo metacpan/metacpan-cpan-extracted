@@ -40,7 +40,7 @@ sub send_exception_to_app_insights {
         }
         catch ( $e ) {
             $javonet_version = "2.0.0";
-        }
+        };
 
         my $node_name = eval {hostname()} || "Unknown Host";
 
@@ -86,7 +86,7 @@ sub send_exception_to_app_insights {
         return $response_code;
     }
     catch ( $e ) {
-        return Exception->new($e);
+        return 500;
     }
 }
 

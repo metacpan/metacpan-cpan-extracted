@@ -13,14 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 19;
 
-BEGIN {
-    use_ok('Dpkg::BuildFlags');
-}
+use ok 'Dpkg::BuildFlags';
 
 sub test_optflag
 {
@@ -67,7 +64,7 @@ test_ltoflag($bf);
 
 # Test the overlaid Ubuntu-specific linker flag.
 ok($bf->get('LDFLAGS') =~ m/-Wl,-Bsymbolic-functions/,
-   'LDFLAGS contains -Bsymbolic-functions');
+    'LDFLAGS contains -Bsymbolic-functions');
 
 # Test the optimization flag override only for ppc64el.
 $ENV{DEB_HOST_ARCH} = 'ppc64el';

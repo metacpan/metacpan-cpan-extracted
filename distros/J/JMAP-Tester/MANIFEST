@@ -32,6 +32,7 @@ lib/JMAP/Tester/SentenceBroker.pm
 lib/JMAP/Tester/Sugar.pm
 lib/JMAP/Tester/UA/Async.pm
 lib/JMAP/Tester/UA/LWP.pm
+t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t

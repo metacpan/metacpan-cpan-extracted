@@ -41,7 +41,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.012 },
+                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.013 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -57,7 +57,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project",
                       },
-  "version"        => 0.012,
+  "version"        => 0.013,
 };
 
 my %dynamic_config;

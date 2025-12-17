@@ -28,11 +28,12 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.58"
          }
       },
       "runtime" : {
          "requires" : {
+            "Future::AsyncAwait" : "0.70",
             "IO::Async::Loop" : "0.803",
             "IO::Async::Socket" : "0.803",
             "perl" : "5.034000"
@@ -40,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

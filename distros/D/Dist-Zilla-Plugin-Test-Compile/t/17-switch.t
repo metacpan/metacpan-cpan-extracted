@@ -101,7 +101,7 @@ subtest $_->{test_case} => sub {
 
     cmp_deeply(
         \@warnings,
-        [ map { re(qr/^$_/) } @{ $test->{expected_warnings} } ],
+        [ map re(qr/^$_/), @{ $test->{expected_warnings} } ],
         'got expected warnings from compiling a module with a deprecation warning',
     )
         or diag 'got warning(s): ', explain(\@warnings);

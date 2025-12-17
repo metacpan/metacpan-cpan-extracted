@@ -12,6 +12,7 @@ use Test::Deep ':v1';
 use Test::Deep::JType 0.005; # jstr() in both want and have
 use Test::More;
 use Test::Abortable 'subtest';
+use JMAP::Tester::Logger::HTTP;
 
 use lib 't/lib';
 use JMAP::Tester::MockServer;
@@ -137,6 +138,20 @@ subtest "uploading blobs" => sub {
   is($upload->blob_id, "T-18",        "got the blob id we expect (blob_id)");
   is($upload->type,    "text/plane",  "got the type we expect");
   is($upload->size,    18,            "got the size we expect");
+};
+
+
+subtest 'http logger' => sub {
+  my @lines;
+
+  local $tester->{_logger} = JMAP::Tester::Logger::HTTP->new({
+    writer => sub { push @lines, shift },
+  });
+
+  my $res = $tester->request([[ "Foo/bar" => { baz => 1 } ]]);
+  like($lines[0], qr/BEGIN JMAP REQUEST/, 'got our begin log line');
+  like($lines[1], qr/Foo\/bar.*baz/, 'got our request');
+  like($lines[2], qr/END JMAP REQUEST/, 'got our end log line');
 };
 
 done_testing;

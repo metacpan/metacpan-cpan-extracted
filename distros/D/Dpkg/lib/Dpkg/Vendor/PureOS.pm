@@ -34,8 +34,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Vendor::PureOS 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
@@ -50,11 +49,15 @@ sub run_hook {
         my $src = shift @params;
         my $fields = $src->{fields};
 
-        if (defined($fields->{'Version'}) and defined($fields->{'Maintainer'}) and
-           $fields->{'Version'} =~ /pureos/) {
-               unless ($fields->{'Original-Maintainer'}) {
-                   warning(g_('Version number suggests PureOS changes, but there is no XSBC-Original-Maintainer field'));
-               }
+        if (defined($fields->{'Version'}) and
+            defined($fields->{'Maintainer'}) and
+            $fields->{'Version'} =~ /pureos/)
+        {
+            unless ($fields->{'Original-Maintainer'}) {
+                warning(g_('version number suggests %s vendor changes, ' .
+                           'but there is no %s field'),
+                        'PureOS', 'XSBC-Original-Maintainer');
+            }
         }
 
     } elsif ($hook eq 'keyrings') {

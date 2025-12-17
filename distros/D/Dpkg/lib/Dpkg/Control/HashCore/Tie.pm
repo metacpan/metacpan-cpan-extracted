@@ -36,8 +36,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Control::HashCore::Tie 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Control::FieldsCore;
 
@@ -45,8 +44,9 @@ use Carp;
 use Tie::Hash;
 use parent -norequire, qw(Tie::ExtraHash);
 
-# $self->[0] is the real hash
-# $self->[1] is a reference to the hash contained by the parent object.
+# The class is implemented as an array ref with:
+#   - $self->[0] is the real hash
+#   - $self->[1] is a reference to the hash contained by the parent object
 # This reference bypasses the top-level scalar reference of a
 # Dpkg::Control::Hash, hence ensuring that reference gets DESTROYed
 # properly.

@@ -1,3 +1,7 @@
+1.48  2025-12-17
+    - Added jq-compatible --ascii-output / -a flag for ASCII-escaped output.
+    - Note: Interaction with -r (raw output) and -R (raw input) will be refined in a follow-up release.
+
 1.47  2025-12-15
     - Promote release to version 1.47 adding jq-compatible --raw-input/-R
       plain-text processing with optional slurping and CLI regression tests.
@@ -948,6 +952,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

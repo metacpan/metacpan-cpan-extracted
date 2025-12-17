@@ -43,7 +43,7 @@
             "Locale::gettext" : "0"
          },
          "requires" : {
-            "perl" : "v5.32.1"
+            "perl" : "v5.36.0"
          }
       },
       "test" : {
@@ -64,15 +64,11 @@
       },
       "Dpkg::Arch" : {
          "file" : "lib/Dpkg/Arch.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Dpkg::Archive::Ar" : {
          "file" : "lib/Dpkg/Archive/Ar.pm",
          "version" : "0.01"
-      },
-      "Dpkg::Build::Info" : {
-         "file" : "lib/Dpkg/Build/Info.pm",
-         "version" : "1.02"
       },
       "Dpkg::BuildAPI" : {
          "file" : "lib/Dpkg/BuildAPI.pm",
@@ -104,7 +100,7 @@
       },
       "Dpkg::BuildProfiles" : {
          "file" : "lib/Dpkg/BuildProfiles.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Dpkg::BuildTree" : {
          "file" : "lib/Dpkg/BuildTree.pm",
@@ -132,7 +128,7 @@
       },
       "Dpkg::Changelog::Parse" : {
          "file" : "lib/Dpkg/Changelog/Parse.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       },
       "Dpkg::Checksums" : {
          "file" : "lib/Dpkg/Checksums.pm",
@@ -168,7 +164,7 @@
       },
       "Dpkg::Control::FieldsCore" : {
          "file" : "lib/Dpkg/Control/FieldsCore.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Dpkg::Control::Hash" : {
          "file" : "lib/Dpkg/Control/Hash.pm",
@@ -252,7 +248,7 @@
       },
       "Dpkg::IPC" : {
          "file" : "lib/Dpkg/IPC.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Dpkg::Index" : {
          "file" : "lib/Dpkg/Index.pm",
@@ -344,7 +340,7 @@
       },
       "Dpkg::Source::Package" : {
          "file" : "lib/Dpkg/Source/Package.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Dpkg::Source::Package::V1" : {
          "file" : "lib/Dpkg/Source/Package/V1.pm",
@@ -384,7 +380,11 @@
       },
       "Dpkg::Substvars" : {
          "file" : "lib/Dpkg/Substvars.pm",
-         "version" : "2.03"
+         "version" : "2.04"
+      },
+      "Dpkg::SysInfo" : {
+         "file" : "lib/Dpkg/SysInfo.pm",
+         "version" : "0.01"
       },
       "Dpkg::Vendor" : {
          "file" : "lib/Dpkg/Vendor.pm",
@@ -412,7 +412,7 @@
       },
       "Dpkg::Version" : {
          "file" : "lib/Dpkg/Version.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Test::Dpkg" : {
          "file" : "lib/Test/Dpkg.pm"
@@ -433,6 +433,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.22.21",
+   "version" : "v1.23.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

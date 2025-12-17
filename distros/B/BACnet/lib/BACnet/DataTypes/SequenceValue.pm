@@ -5,8 +5,6 @@ package BACnet::DataTypes::SequenceValue;
 use warnings;
 use strict;
 
-use Data::Dumper;
-
 use BACnet::DataTypes::Utils;
 
 require BACnet::DataTypes::BitString;

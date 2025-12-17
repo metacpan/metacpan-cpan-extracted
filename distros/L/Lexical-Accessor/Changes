@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Lexical-Accessor>
 Bug tracker:  <https://github.com/tobyink/p5-lexical-accessor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.000001	2025-12-16
+
+ - Fix default builder name to match documentation.
+
 1.000000	2025-12-12
 
  - Various changes to Sub::Accessor::Small, mostly to generate more

@@ -1,6 +1,14 @@
 Revision history for Runtime-Debugger
 
 =================
+1.12 - 2025-12-16
+=================
+
+Added rapid prototyping (e) support.
+p now is a copy from e.
+Removed legacy run() function.
+
+=================
 1.11 - 2025-04-01
 =================
 

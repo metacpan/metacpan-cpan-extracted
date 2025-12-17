@@ -44,8 +44,7 @@ future.
 
 package Dpkg::Changelog::Debian 1.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Gettext;
 use Dpkg::File;
@@ -61,60 +60,60 @@ use constant {
     CHANGES_OR_TRAILER => g_('more change data or trailer'),
 };
 
-my $ancient_delimiter_re = qr{
+my $ancient_delimiter_regex = qr{
     ^
-    (?: # Ancient GNU style changelog entry with expanded date
-      (?:
-        \w+\s+                          # Day of week (abbreviated)
-        \w+\s+                          # Month name (abbreviated)
-        \d{1,2}                         # Day of month
+    (?: # Ancient GNU style changelog entry with expanded date.
+        (?:
+            \w+\s+                          # Day of week (abbreviated).
+            \w+\s+                          # Month name (abbreviated).
+            \d{1,2}                         # Day of month.
+            \Q \E
+            \d{1,2}:\d{1,2}:\d{1,2}\s+      # Time.
+            [\w\s]*                         # Timezone.
+            \d{4}                           # Year.
+        )
+        \s+
+        (?:.*)                              # Maintainer name.
+        \s+
+        [<\(]
+            (?:.*)                          # Maintainer email.
+        [\)>]
+    | # Old GNU style changelog entry with expanded date.
+        (?:
+            \w+\s+                          # Day of week (abbreviated).
+            \w+\s+                          # Month name (abbreviated).
+            \d{1,2},?\s*                    # Day of month.
+            \d{4}                           # Year.
+        )
+        \s+
+        (?:.*)                              # Maintainer name.
+        \s+
+        [<\(]
+            (?:.*)                          # Maintainer email.
+        [\)>]
+    | # Ancient changelog header w/o key=value options.
+        (?:\w[-+0-9a-z.]*)                  # Package name.
         \Q \E
-        \d{1,2}:\d{1,2}:\d{1,2}\s+      # Time
-        [\w\s]*                         # Timezone
-        \d{4}                           # Year
-      )
-      \s+
-      (?:.*)                            # Maintainer name
-      \s+
-      [<\(]
-        (?:.*)                          # Maintainer email
-      [\)>]
-    | # Old GNU style changelog entry with expanded date
-      (?:
-        \w+\s+                          # Day of week (abbreviated)
-        \w+\s+                          # Month name (abbreviated)
-        \d{1,2},?\s*                    # Day of month
-        \d{4}                           # Year
-      )
-      \s+
-      (?:.*)                            # Maintainer name
-      \s+
-      [<\(]
-        (?:.*)                          # Maintainer email
-      [\)>]
-    | # Ancient changelog header w/o key=value options
-      (?:\w[-+0-9a-z.]*)                # Package name
-      \Q \E
-      \(
-        (?:[^\(\) \t]+)                 # Package version
-      \)
-      \;?
-    | # Ancient changelog header
-      (?:[\w.+-]+)                      # Package name
-      [- ]
-      (?:\S+)                           # Package version
-      \ Debian
-      \ (?:\S+)                         # Package revision
+        \(
+            (?:[^\(\) \t]+)                 # Package version.
+        \)
+        \;?
+    | # Ancient changelog header.
+        (?:[\w.+-]+)                        # Package name.
+        [- ]
+        (?:\S+)                             # Package version.
+        \ Debian
+        \ (?:\S+)                           # Package revision.
     |
-      Changes\ from\ version\ (?:.*)\ to\ (?:.*):
+        Changes\ from\ version\ (?:.*)\ to\ (?:.*):
     |
-      Changes\ for\ [\w.+-]+-[\w.+-]+:?\s*$
+        Changes\ for\ [\w.+-]+-[\w.+-]+:?\s*$
     |
-      Old\ Changelog:\s*$
+        Old\ Changelog:\s*$
     |
-      (?:\d+:)?
-      \w[\w.+~-]*:?
-      \s*$
+        (?:\d+:)?
+        \w[\w.+~-]*:?
+        \s*$
     )
 }xi;
 
@@ -149,95 +148,98 @@ sub parse {
     local $_;
 
     while (<$fh>) {
-	chomp;
-	if (match_header($_)) {
-	    unless ($expect eq FIRST_HEADING || $expect eq NEXT_OR_EOF) {
-		$self->parse_error($file, $.,
-		    sprintf(g_('found start of entry where expected %s'),
-		    $expect), "$_");
-	    }
-	    unless ($entry->is_empty) {
-		push @{$self->{data}}, $entry;
-		$entry = Dpkg::Changelog::Entry::Debian->new();
-		last if $self->abort_early();
-	    }
-	    $entry->set_part('header', $_);
-	    foreach my $error ($entry->parse_header()) {
-		$self->parse_error($file, $., $error, $_);
-	    }
+        chomp;
+        if (match_header($_)) {
+            unless ($expect eq FIRST_HEADING || $expect eq NEXT_OR_EOF) {
+                $self->parse_error($file, $.,
+                    sprintf(g_('found start of entry where expected %s'),
+                    $expect), "$_");
+            }
+            unless ($entry->is_empty) {
+                push @{$self->{data}}, $entry;
+                $entry = Dpkg::Changelog::Entry::Debian->new();
+                last if $self->abort_early();
+            }
+            $entry->set_part('header', $_);
+            foreach my $error ($entry->parse_header()) {
+                $self->parse_error($file, $., $error, $_);
+            }
             $expect = START_CHANGES;
-	    @blanklines = ();
-	} elsif (m/^(?:;;\s*)?Local variables:/io) {
+            @blanklines = ();
+        } elsif (m/^(?:;;\s*)?Local variables:/io) {
             # Save any trailing Emacs variables at end of file.
             $self->set_unparsed_tail("$_\n" . (file_slurp($fh) // ''));
             last;
-	} elsif (m/^vim:/io) {
+        } elsif (m/^vim:/io) {
             # Save any trailing Vim modelines at end of file.
             $self->set_unparsed_tail("$_\n" . (file_slurp($fh) // ''));
             last;
-	} elsif (m/^\$\w+:.*\$/o) {
-	    next; # skip stuff that look like a RCS keyword
-	} elsif (m/^\# /o) {
-	    next; # skip comments, even that's not supported
-	} elsif (m{^/\*.*\*/}o) {
-	    next; # more comments
-	} elsif (m/$ancient_delimiter_re/) {
-	    # save entries on old changelog format verbatim
-	    # we assume the rest of the file will be in old format once we
-	    # hit it for the first time
-	    $self->set_unparsed_tail("$_\n" . file_slurp($fh));
-	} elsif (m/^\S/) {
-	    $self->parse_error($file, $., g_('badly formatted heading line'), "$_");
-	} elsif (match_trailer($_)) {
-	    unless ($expect eq CHANGES_OR_TRAILER) {
-		$self->parse_error($file, $.,
-		    sprintf(g_('found trailer where expected %s'), $expect), "$_");
-	    }
-	    $entry->set_part('trailer', $_);
-	    $entry->extend_part('blank_after_changes', [ @blanklines ]);
-	    @blanklines = ();
-	    foreach my $error ($entry->parse_trailer()) {
-		$self->parse_error($file, $., $error, $_);
-	    }
-	    $expect = NEXT_OR_EOF;
-	} elsif (m/^ --/) {
-	    $self->parse_error($file, $., g_('badly formatted trailer line'), "$_");
-	} elsif (m/^\s{2,}(?:\S)/) {
-	    unless ($expect eq START_CHANGES or $expect eq CHANGES_OR_TRAILER) {
-		$self->parse_error($file, $., sprintf(g_('found change data' .
-		    ' where expected %s'), $expect), "$_");
-		if ($expect eq NEXT_OR_EOF and not $entry->is_empty) {
-		    # lets assume we have missed the actual header line
-		    push @{$self->{data}}, $entry;
-		    $entry = Dpkg::Changelog::Entry::Debian->new();
-		    $entry->set_part('header', 'unknown (unknown' . ($unknowncounter++) . ') unknown; urgency=unknown');
-		}
-	    }
-	    # Keep raw changes
-	    $entry->extend_part('changes', [ @blanklines, $_ ]);
-	    @blanklines = ();
-	    $expect = CHANGES_OR_TRAILER;
-	} elsif (!m/\S/) {
-	    if ($expect eq START_CHANGES) {
-		$entry->extend_part('blank_after_header', $_);
-		next;
-	    } elsif ($expect eq NEXT_OR_EOF) {
-		$entry->extend_part('blank_after_trailer', $_);
-		next;
-	    } elsif ($expect ne CHANGES_OR_TRAILER) {
-		$self->parse_error($file, $.,
-		    sprintf(g_('found blank line where expected %s'), $expect));
-	    }
-	    push @blanklines, $_;
-	} else {
-	    $self->parse_error($file, $., g_('unrecognized line'), "$_");
-	    unless ($expect eq START_CHANGES or $expect eq CHANGES_OR_TRAILER) {
-		# lets assume change data if we expected it
-		$entry->extend_part('changes', [ @blanklines, $_]);
-		@blanklines = ();
-		$expect = CHANGES_OR_TRAILER;
-	    }
-	}
+        } elsif (m/^\$\w+:.*\$/o) {
+            # Skip stuff that look like a RCS keyword.
+            next;
+        } elsif (m/^\# /o) {
+            # Skip comments, even that is not supported.
+            next;
+        } elsif (m{^/\*.*\*/}o) {
+            # More comments.
+            next;
+        } elsif (m/$ancient_delimiter_regex/) {
+            # Save entries on old changelog format verbatim. We assume the
+            # rest of the file will be in old format once we hit it for the
+            # first time.
+            $self->set_unparsed_tail("$_\n" . file_slurp($fh));
+        } elsif (m/^\S/) {
+            $self->parse_error($file, $., g_('badly formatted heading line'), "$_");
+        } elsif (match_trailer($_)) {
+            unless ($expect eq CHANGES_OR_TRAILER) {
+                $self->parse_error($file, $.,
+                    sprintf(g_('found trailer where expected %s'), $expect), "$_");
+            }
+            $entry->set_part('trailer', $_);
+            $entry->extend_part('blank_after_changes', [ @blanklines ]);
+            @blanklines = ();
+            foreach my $error ($entry->parse_trailer()) {
+                $self->parse_error($file, $., $error, $_);
+            }
+            $expect = NEXT_OR_EOF;
+        } elsif (m/^ --/) {
+            $self->parse_error($file, $., g_('badly formatted trailer line'), "$_");
+        } elsif (m/^\s{2,}(?:\S)/) {
+            unless ($expect eq START_CHANGES or $expect eq CHANGES_OR_TRAILER) {
+                $self->parse_error($file, $., sprintf(g_('found change data' .
+                    ' where expected %s'), $expect), "$_");
+                if ($expect eq NEXT_OR_EOF and not $entry->is_empty) {
+                    # Let us assume we have missed the actual header line.
+                    push @{$self->{data}}, $entry;
+                    $entry = Dpkg::Changelog::Entry::Debian->new();
+                    $entry->set_part('header', 'unknown (unknown' . ($unknowncounter++) . ') unknown; urgency=unknown');
+                }
+            }
+            # Keep raw changes.
+            $entry->extend_part('changes', [ @blanklines, $_ ]);
+            @blanklines = ();
+            $expect = CHANGES_OR_TRAILER;
+        } elsif (! m/\S/) {
+            if ($expect eq START_CHANGES) {
+                $entry->extend_part('blank_after_header', $_);
+                next;
+            } elsif ($expect eq NEXT_OR_EOF) {
+                $entry->extend_part('blank_after_trailer', $_);
+                next;
+            } elsif ($expect ne CHANGES_OR_TRAILER) {
+                $self->parse_error($file, $.,
+                    sprintf(g_('found blank line where expected %s'), $expect));
+            }
+            push @blanklines, $_;
+        } else {
+            $self->parse_error($file, $., g_('unrecognized line'), "$_");
+            unless ($expect eq START_CHANGES or $expect eq CHANGES_OR_TRAILER) {
+                # Let us assume change data if we expected it.
+                $entry->extend_part('changes', [ @blanklines, $_]);
+                @blanklines = ();
+                $expect = CHANGES_OR_TRAILER;
+            }
+        }
     }
 
     unless ($expect eq NEXT_OR_EOF) {
@@ -246,7 +248,7 @@ sub parse {
                                    $expect));
     }
     unless ($entry->is_empty) {
-	push @{$self->{data}}, $entry;
+        push @{$self->{data}}, $entry;
     }
 
     return scalar @{$self->{data}};

@@ -37,9 +37,7 @@ a set of Dpkg::Deps::{Simple,AND,OR,Union} objects depending on the case.
 
 package Dpkg::Deps 1.07;
 
-use strict;
-use warnings;
-use feature qw(current_sub);
+use v5.36;
 
 our @EXPORT = qw(
     deps_concat
@@ -86,12 +84,12 @@ The $v_p and $v_q parameter should be L<Dpkg::Version> objects.
 sub deps_eval_implication {
     my ($rel_p, $v_p, $rel_q, $v_q) = @_;
 
-    # If versions are not valid, we can't decide of any implication
+    # If versions are not valid, we cannot decide of any implication.
     return unless defined($v_p) and $v_p->is_valid();
     return unless defined($v_q) and $v_q->is_valid();
 
-    # q wants an exact version, so p must provide that exact version.  p
-    # disproves q if q's version is outside the range enforced by p.
+    # «q» wants an exact version, so «p» must provide that exact version.
+    # «p» disproves «q» if «q»'s version is outside the range enforced by «p».
     if ($rel_q eq REL_EQ) {
         if ($rel_p eq REL_LT) {
             return ($v_p <= $v_q) ? 0 : undef;
@@ -106,31 +104,33 @@ sub deps_eval_implication {
         }
     }
 
-    # A greater than clause may disprove a less than clause. An equal
-    # cause might as well.  Otherwise, if
-    # p's clause is <<, <=, or =, the version must be <= q's to imply q.
+    # A greater than clause may disprove a less than clause. An equal clause
+    # might as well. Otherwise, if «p»'s clause is <<, <=, or =, the version
+    # must be <= «q»'s to imply «q».
     if ($rel_q eq REL_LE) {
         if ($rel_p eq REL_GT) {
             return ($v_p >= $v_q) ? 0 : undef;
         } elsif ($rel_p eq REL_GE) {
             return ($v_p > $v_q) ? 0 : undef;
-	} elsif ($rel_p eq REL_EQ) {
+        } elsif ($rel_p eq REL_EQ) {
             return ($v_p <= $v_q) ? 1 : 0;
-        } else { # <<, <=
+        } else {
+            # <<, <=
             return ($v_p <= $v_q) ? 1 : undef;
         }
     }
 
-    # Similar, but << is stronger than <= so p's version must be << q's
-    # version if the p relation is <= or =.
+    # Similar, but << is stronger than <= so «p»'s version must be << «q»'s
+    # version if the «p» relation is <= or =.
     if ($rel_q eq REL_LT) {
         if ($rel_p eq REL_GT or $rel_p eq REL_GE) {
             return ($v_p >= $v_p) ? 0 : undef;
         } elsif ($rel_p eq REL_LT) {
             return ($v_p <= $v_q) ? 1 : undef;
-	} elsif ($rel_p eq REL_EQ) {
+        } elsif ($rel_p eq REL_EQ) {
             return ($v_p < $v_q) ? 1 : 0;
-        } else { # <<, <=
+        } else {
+            # <<, <=
             return ($v_p < $v_q) ? 1 : undef;
         }
     }
@@ -141,9 +141,10 @@ sub deps_eval_implication {
             return ($v_p <= $v_q) ? 0 : undef;
         } elsif ($rel_p eq REL_LE) {
             return ($v_p < $v_q) ? 0 : undef;
-	} elsif ($rel_p eq REL_EQ) {
+        } elsif ($rel_p eq REL_EQ) {
             return ($v_p >= $v_q) ? 1 : 0;
-        } else { # >>, >=
+        } else {
+            # >>, >=
             return ($v_p >= $v_q) ? 1 : undef;
         }
     }
@@ -152,7 +153,7 @@ sub deps_eval_implication {
             return ($v_p <= $v_q) ? 0 : undef;
         } elsif ($rel_p eq REL_GT) {
             return ($v_p >= $v_q) ? 1 : undef;
-	} elsif ($rel_p eq REL_EQ) {
+        } elsif ($rel_p eq REL_EQ) {
             return ($v_p > $v_q) ? 1 : 0;
         } else {
             return ($v_p > $v_q) ? 1 : undef;
@@ -301,9 +302,9 @@ sub deps_parse {
         tests_dep => $opts{tests_dep},
     );
 
-    # Merge in a single-line
+    # Merge in a single-line.
     $dep_line =~ s/\s*[\r\n]\s*/ /g;
-    # Strip trailing/leading spaces
+    # Strip trailing/leading spaces.
     $dep_line =~ s/^\s+//;
     $dep_line =~ s/\s+$//;
 
@@ -311,11 +312,11 @@ sub deps_parse {
     foreach my $dep_and (split(/\s*,\s*/m, $dep_line)) {
         my @or_list = ();
         foreach my $dep_or (split(/\s*\|\s*/m, $dep_and)) {
-	    my $dep_simple = Dpkg::Deps::Simple->new($dep_or, %deps_options);
-	    if (not defined $dep_simple->{package}) {
-		warning(g_("can't parse dependency %s"), $dep_or);
-		return;
-	    }
+            my $dep_simple = Dpkg::Deps::Simple->new($dep_or, %deps_options);
+            if (not defined $dep_simple->{package}) {
+                warning(g_('cannot parse dependency %s'), $dep_or);
+                return;
+            }
             if ($opts{virtual} && defined $dep_simple->{relation} &&
                 $dep_simple->{relation} ne '=') {
                 warning(g_('virtual dependency contains invalid relation: %s'),
@@ -326,28 +327,28 @@ sub deps_parse {
             if ($opts{reduce_arch}) {
                 $dep_simple->reduce_arch($opts{host_arch});
                 next if not $dep_simple->arch_is_concerned($opts{host_arch});
-	    }
+            }
             $dep_simple->{restrictions} = undef if not $opts{use_profiles};
             if ($opts{reduce_profiles}) {
                 $dep_simple->reduce_profiles($opts{build_profiles});
                 next if not $dep_simple->profile_is_concerned($opts{build_profiles});
-	    }
-	    push @or_list, $dep_simple;
+            }
+            push @or_list, $dep_simple;
         }
-	next if not @or_list;
-	if (scalar @or_list == 1) {
-	    push @dep_list, $or_list[0];
-	} else {
-	    my $dep_or = Dpkg::Deps::OR->new();
-	    $dep_or->add($_) foreach (@or_list);
-	    push @dep_list, $dep_or;
-	}
+        next if not @or_list;
+        if (scalar @or_list == 1) {
+            push @dep_list, $or_list[0];
+        } else {
+            my $dep_or = Dpkg::Deps::OR->new();
+            $dep_or->add($_) foreach (@or_list);
+            push @dep_list, $dep_or;
+        }
     }
     my $dep_and;
     if ($opts{union}) {
-	$dep_and = Dpkg::Deps::Union->new();
+        $dep_and = Dpkg::Deps::Union->new();
     } else {
-	$dep_and = Dpkg::Deps::AND->new();
+        $dep_and = Dpkg::Deps::AND->new();
     }
     foreach my $dep (@dep_list) {
         if ($opts{union} and not $dep->isa('Dpkg::Deps::Simple')) {
@@ -400,12 +401,12 @@ This function is mainly used to implement the sort() method.
 =cut
 
 my %relation_ordering = (
-	undef => 0,
-	REL_GE() => 1,
-	REL_GT() => 2,
-	REL_EQ() => 3,
-	REL_LT() => 4,
-	REL_LE() => 5,
+    undef => 0,
+    REL_GE() => 1,
+    REL_GT() => 2,
+    REL_EQ() => 3,
+    REL_LT() => 4,
+    REL_LE() => 5,
 );
 
 sub deps_compare {

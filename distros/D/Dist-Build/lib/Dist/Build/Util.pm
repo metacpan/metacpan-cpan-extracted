@@ -1,5 +1,5 @@
 package Dist::Build::Util;
-$Dist::Build::Util::VERSION = '0.023';
+$Dist::Build::Util::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -59,7 +59,7 @@ Dist::Build::Util - Utility functions for Dist::Build
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

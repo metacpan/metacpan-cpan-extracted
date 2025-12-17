@@ -19,7 +19,9 @@ build_requires:
 configure_requires:
   CPAN::Meta: '0'
   CPAN::Meta::Merge: '0'
+  ExtUtils::Builder: '0.019'
   ExtUtils::Builder::Action::Function: '0'
+  ExtUtils::Builder::Compiler: '0.033'
   ExtUtils::Builder::Node: '0'
   ExtUtils::Builder::Planner: '0.016'
   ExtUtils::Builder::Planner::Extension: '0'
@@ -47,37 +49,37 @@ name: Dist-Build
 provides:
   Dist::Build:
     file: lib/Dist/Build.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::Core:
     file: lib/Dist/Build/Core.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::Serializer:
     file: lib/Dist/Build/Serializer.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::ShareDir:
     file: lib/Dist/Build/ShareDir.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::Util:
     file: lib/Dist/Build/Util.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::XS:
     file: lib/Dist/Build/XS.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::XS::Alien:
     file: lib/Dist/Build/XS/Alien.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::XS::Conf:
     file: lib/Dist/Build/XS/Conf.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::XS::Export:
     file: lib/Dist/Build/XS/Export.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::XS::Import:
     file: lib/Dist/Build/XS/Import.pm
-    version: '0.023'
+    version: '0.024'
   Dist::Build::XS::WriteConstants:
     file: lib/Dist/Build/XS/WriteConstants.pm
-    version: '0.023'
+    version: '0.024'
 requires:
   CPAN::Meta: '0'
   CPAN::Meta::Merge: '0'
@@ -115,7 +117,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/dist-build/issues
   repository: git://github.com/Leont/dist-build.git
-version: '0.023'
+version: '0.024'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

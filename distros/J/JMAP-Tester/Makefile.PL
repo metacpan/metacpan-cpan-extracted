@@ -48,6 +48,8 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "HTTP::Response" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "JSON::Typist" => "0.005",
     "LWP::Protocol::PSGI" => 0,
     "Plack::Request" => 0,
@@ -59,7 +61,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "lib" => 0
   },
-  "VERSION" => "0.108",
+  "VERSION" => "0.109",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,6 +80,8 @@ my %FallbackPrereqs = (
   "Future" => 0,
   "HTTP::Request" => 0,
   "HTTP::Response" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "JSON::Typist" => "0.005",
   "JSON::XS" => 0,

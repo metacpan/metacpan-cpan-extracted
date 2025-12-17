@@ -55,7 +55,7 @@
    "provides" : {
       "App::dozo" : {
          "file" : "lib/App/dozo.pm",
-         "version" : "0.9924"
+         "version" : "0.9925"
       }
    },
    "release_status" : "stable",
@@ -70,10 +70,10 @@
          "web" : "https://github.com/tecolicom/App-dozo"
       }
    },
-   "version" : "0.9924",
+   "version" : "0.9925",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }

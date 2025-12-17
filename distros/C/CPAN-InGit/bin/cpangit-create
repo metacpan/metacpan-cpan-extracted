@@ -1,0 +1,108 @@
+#! /usr/bin/env perl
+# PODNAME: cpangit-create
+our $VERSION = '0.001'; # VERSION
+# ABSTRACT: create git branches for custom CPAN trees
+
+use v5.36;
+use FindBin;
+BEGIN { push @INC, "$FindBin::RealBin/../lib" if -f "$FindBin::RealBin/../dist.ini" }
+use CPAN::InGit;
+use Git::Raw::Branch;
+use Getopt::Long;
+use Pod::Usage;
+use version;
+use Log::Any::Adapter 'Stdout', log_level => 'debug';
+
+
+GetOptions(
+   'git-dir=s'  => \(my $git_dir= $ENV{GIT_DIR} // '.'),
+   'from=s'     => \my @sources,
+   'upstream=s' => \my $upstream_url,
+   'corelist=s' => \my $corelist_ver,
+   'help'       => sub { pod2usage(1) },
+) && @ARGV == 1 or pod2usage(2);
+
+pod2usage(-message => "Specify only --from or --upstream, not both", -exit => 2)
+   if defined $upstream_url && @sources;
+
+my $branch_name= shift;
+
+{ # scope to help run destructors in the right order
+   my $git_repo= Git::Raw::Repository->discover($git_dir);
+   my $cpan_repo= CPAN::InGit->new(git_repo => $git_repo);
+   if ($corelist_ver) {
+      # users are likely to specify "5.xx" when it needs to be "v5.xx" or "5.0xx000"
+      $corelist_ver= "v$1.$2"
+         if $corelist_ver =~ /^(\d)\.(\d\d)\z/;
+      $corelist_ver= version->parse($corelist_ver);
+   }
+   $cpan_repo->create_archive_tree($branch_name,
+      (upstream_url => $upstream_url)x!!$upstream_url,
+      (default_import_sources => \@sources)x!!@sources,
+      (corelist_perl_version => $corelist_ver)x!!$corelist_ver,
+   );
+}
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpangit-create - create git branches for custom CPAN trees
+
+=head1 USAGE
+
+  cpangit-create --upstream=URL BRANCH_NAME
+  cpangit-create --from=BRANCH [--from=BRANCH2 ...] BRANCH_NAME
+
+Create a new Archive branch.  If you specify C<--upstream>, it automatically pulls from the
+remote URL as needed and acts like a local cache of the remote archive.  If you specify
+C<--from> it behaves like a curated archive and looks to C<--branch> to import/update modules.
+C<--from> can be specified multiple times.
+
+You can later edit the C<cpan_ingit.json> file to reconfigure a branch.
+
+=head1 OPTIONS
+
+=over
+
+=item --git-dir=PATH
+
+Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from the environment,
+or any git repo above "."
+
+=item --upstream=URL
+
+The URL of the upstream CPAN mirror
+
+=item --from=BRANCH
+
+Set a default source branch to import new moduels from.
+
+=item --corelist=PERL_VER
+
+Set a perl version from which to consult the CoreList to determine which modules are satisfied
+by your application's perl version.
+
+=back
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Michael Conrad, and IntelliTree Solutions.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

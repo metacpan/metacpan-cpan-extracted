@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use Config;
+use Term::ANSIColor qw( colorstrip );
 use e;
 
 sub run {
@@ -20,7 +21,7 @@ sub run {
 
     $out .= $@ if $@;
 
-    $out;
+    colorstrip( $out );
 }
 
 ######################################
@@ -340,7 +341,18 @@ is_deeply
 #             Output
 ######################################
 
-# Say
+# p
+is
+  run( sub { p 111 } ),
+  "111\n",
+  "p - scalar";
+
+is
+  run( sub { local $_ = 123; p } ),
+  "123\n",
+  "p - default";
+
+# say
 is
   run( sub { say 11 } ),
   "11\n",
@@ -412,14 +424,13 @@ is
 #            Time Related
 ######################################
 
-is
-    tm(
-        year  => 2025,
-        month => 3,
-        day   => 14,
-    )->strftime("%Y-%m-%d"),
-    "2025-03-14",
-    "tm - strftime simple check";
+is tm(
+    year  => 2025,
+    month => 3,
+    day   => 14,
+  )->strftime( "%Y-%m-%d" ),
+  "2025-03-14",
+  "tm - strftime simple check";
 
 ######################################
 #         Package Building

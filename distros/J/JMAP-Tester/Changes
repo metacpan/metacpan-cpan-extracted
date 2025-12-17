@@ -1,5 +1,8 @@
 Revision history for JMAP-Tester
 
+0.109     2025-12-17 09:59:32+11:00 Australia/Melbourne
+        - fix a compilation error in the HTTP Logger
+
 0.108     2025-12-16 09:18:30+11:00 Australia/Melbourne
         - improve test coverage
         - replace short-lived UA::Test with LWP and LWP::Protocol::PSGI

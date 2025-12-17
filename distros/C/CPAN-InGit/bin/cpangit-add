@@ -1,0 +1,128 @@
+#! /usr/bin/env perl
+# PODNAME: cpangit-add
+our $VERSION = '0.001'; # VERSION
+# ABSTRACT: import CPAN packages to local CPAN trees
+
+use v5.36;
+use FindBin;
+BEGIN { push @INC, "$FindBin::RealBin/../lib" if -f "$FindBin::RealBin/../dist.ini" }
+use CPAN::InGit;
+use Getopt::Long;
+use Pod::Usage;
+use Log::Any::Adapter 'Stdout', log_level => 'info';
+
+
+my $log_level= Log::Any::Adapter::Util::numeric_level('info');
+GetOptions(
+   'git-dir=s'  => \(my $git_dir= $ENV{GIT_DIR} // '.'),
+   'branch=s'   => \my $branch_name,
+   'verbose|v'  => sub { ++$log_level },
+   'quiet|q'    => sub { --$log_level if $log_level },
+   'help'       => sub { pod2usage(1) },
+) && @ARGV or pod2usage(2);
+
+Log::Any::Adapter->set('Stdout', log_level => $log_level);
+
+my %requirements;
+
+while (@ARGV) {
+   if ($ARGV[0] =~ m,/,) {
+      die "cpanfile not supported yet";
+   }
+   elsif ($ARGV[0] =~ /^\w+(::\w+)*\z/) {
+      my $mod_name= shift;
+      my $ver_spec= 0;
+      if (@ARGV && $ARGV[0] =~ /^[><=0-9]/) {
+         $ver_spec= shift;
+         ($ver_spec =~ /^(>|>=|=|<|<=|)([0-9]+(?:\.[0-9]+(?:_[0-9]+)*))\z/)
+            or die "Unexpected version syntax '$ver_spec'";
+      }
+      if (defined $requirements{$mod_name} && defined $ver_spec) {
+         $requirements{$mod_name} eq $ver_spec
+            or die "Conflicting versions requested for $mod_name: $ver_spec vs $requirements{$mod_name}";
+      }
+      $requirements{$mod_name} //= $ver_spec;
+   }
+}
+
+{ # scope to help run destructors in the right order
+   my $git_repo= Git::Raw::Repository->discover($git_dir);
+   my $cpan_repo= CPAN::InGit->new(git_repo => $git_repo);
+   # If branch name is not provided, use HEAD.  But there must be a working copy.
+   # If the branch name is the same as the one checked out, we need to modify the working
+   # copy instead of the branch itself, but the ArchiveTree object handles that.
+   my $cur_branch= $cpan_repo->workdir_branch_name;
+   die "Must specify --branch=X for bare git repo"
+      unless length $branch_name || length $cur_branch;
+   $branch_name //= $cur_branch;
+
+   my $atree= $cpan_repo->get_archive_tree($branch_name);
+   unless ($atree) {
+      # TODO: diagnose why it returned undef
+      die "No tree named '$branch_name'";
+   }
+
+   $atree->import_modules(\%requirements);
+   # If this is not the working branch, also need to commit it
+   $atree->commit("Imported modules:\n".join('', map "  - $_\n", sort keys %requirements))
+      unless $atree->use_workdir;
+}
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpangit-add - import CPAN packages to local CPAN trees
+
+=head1 NAME
+
+  cpangit-add
+
+=head1 USAGE
+
+  cpangit-add [OPTIONS] [MODULE::NAME [VERSION]] ...
+  cpangit-add [OPTIONS] ./PATH/TO/CPANFILE
+
+Add one or more modules, and their dependencies, to a mirror branch.  This will add the files
+to the index, and you can then review and commit them.
+
+A name with "/" or "\\" in it will be treated as a cpanfile.  A name without will be treated as
+the name of a perl module to fetch from upstream.
+
+=head1 OPTIONS
+
+=over
+
+=item --git-dir=PATH
+
+Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from the environment,
+or any git repo above "."
+
+=item --branch=BRANCH_NAME
+
+Branch name to commit the changes to.  If this is the checked-out branch, the index will be
+updated but no commit will be generated.
+
+=back
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Michael Conrad, and IntelliTree Solutions.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

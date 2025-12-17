@@ -31,8 +31,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::OpenPGP::Backend::SOP 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use POSIX qw(:sys_wait_h);
 
@@ -61,10 +60,10 @@ sub DEFAULT_CMD {
 
 sub _sop_exec
 {
-    my ($self, $io, @exec) = @_;
+    my ($self, %sop) = @_;
 
     my $cmd;
-    if ($io->{verify}) {
+    if ($sop{verify}) {
         $cmd = $self->{cmdv} || $self->{cmd};
     } else {
         $cmd = $self->{cmd};
@@ -72,18 +71,23 @@ sub _sop_exec
 
     return OPENPGP_MISSING_CMD unless $cmd;
 
-    $io->{out} //= '/dev/null';
+    $sop{out} //= '/dev/null';
     my $stderr;
-    spawn(exec => [ $cmd, @exec ],
-          wait_child => 1, nocheck => 1, timeout => 10,
-          from_file => $io->{in}, to_file => $io->{out},
-          error_to_string => \$stderr);
+    spawn(
+        exec => [ $cmd, @{$sop{args}} ],
+        wait_child => 1,
+        no_check => 1,
+        timeout => 10,
+        from_file => $sop{in},
+        to_file => $sop{out},
+        error_to_string => \$stderr,
+    );
     if (WIFEXITED($?)) {
         my $status = WEXITSTATUS($?);
         print { *STDERR } "$stderr" if $status;
         return $status;
     } else {
-        subprocerr("$cmd @exec");
+        subprocerr("$cmd @{$sop{args}}");
     }
 }
 
@@ -99,16 +103,27 @@ sub inline_verify
 {
     my ($self, $inlinesigned, $data, @certs) = @_;
 
-    return $self->_sop_exec({ verify => 1, in => $inlinesigned, out => $data },
-                            'inline-verify', @certs);
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
+
+    return $self->_sop_exec(
+        args => [ 'inline-verify', @certs ],
+        verify => 1,
+        in => $inlinesigned,
+        out => $data,
+    );
 }
 
 sub verify
 {
     my ($self, $data, $sig, @certs) = @_;
 
-    return $self->_sop_exec({ verify => 1, in => $data },
-                            'verify', $sig, @certs);
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
+
+    return $self->_sop_exec(
+        args => [ 'verify', $sig, @certs ],
+        verify => 1,
+        in => $data,
+    );
 }
 
 sub inline_sign
@@ -117,8 +132,11 @@ sub inline_sign
 
     return OPENPGP_NEEDS_KEYSTORE if $key->needs_keystore();
 
-    return $self->_sop_exec({ in => $data, out => $inlinesigned },
-                            qw(inline-sign --as clearsigned --), $key->handle);
+    return $self->_sop_exec(
+        args => [ qw(inline-sign --as clearsigned --), $key->handle ],
+        in => $data,
+        out => $inlinesigned,
+    );
 }
 
 =head1 CHANGES

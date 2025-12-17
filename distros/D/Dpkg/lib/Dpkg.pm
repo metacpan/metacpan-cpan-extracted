@@ -28,8 +28,7 @@ It is also the entry point to the Dpkg module hierarchy.
 
 package Dpkg 2.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT_OK = qw(
     $PROGNAME
@@ -92,8 +91,8 @@ Contains the path to the dpkg architecture tables directory.
 
 our ($PROGNAME) = $0 =~ m{(?:.*/)?([^/]*)};
 
-# The following lines are automatically fixed at install time
-our $PROGVERSION = '1.22.x';
+# The following lines are automatically fixed at install time.
+our $PROGVERSION = '1.23.x';
 our $PROGMAKE = $ENV{DPKG_PROGMAKE} // 'make';
 our $PROGTAR = $ENV{DPKG_PROGTAR} // 'tar';
 our $PROGPATCH = $ENV{DPKG_PROGPATCH} // 'patch';

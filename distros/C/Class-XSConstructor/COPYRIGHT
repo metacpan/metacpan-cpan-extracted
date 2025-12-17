@@ -42,12 +42,12 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/03typenano.t
-Copyright: This software is copyright (c) 2019 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/03typenano.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

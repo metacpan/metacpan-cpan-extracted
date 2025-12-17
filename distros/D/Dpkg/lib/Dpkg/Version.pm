@@ -32,10 +32,10 @@ them.
 
 =cut
 
-package Dpkg::Version 1.03;
+package Dpkg::Version 1.04;
 
-use strict;
-use warnings;
+use v5.36;
+
 # Currently unused, but not removed to not generate warnings on users.
 use warnings::register qw(semantic_change::overload::bool);
 
@@ -105,27 +105,28 @@ Setting this option to true will return undef if the version is invalid
 sub new {
     my ($this, $ver, %opts) = @_;
     my $class = ref($this) || $this;
-    $ver = "$ver" if ref($ver); # Try to stringify objects
+    # Try to stringify objects.
+    $ver = "$ver" if ref($ver);
 
     if ($opts{check}) {
-	return unless version_check($ver);
+        return unless version_check($ver);
     }
 
     my $self = {};
     if ($ver =~ /^([^:]*):(.+)$/) {
-	$self->{epoch} = $1;
-	$ver = $2;
+        $self->{epoch} = $1;
+        $ver = $2;
     } else {
-	$self->{epoch} = 0;
-	$self->{no_epoch} = 1;
+        $self->{epoch} = 0;
+        $self->{no_epoch} = 1;
     }
     if ($ver =~ /(.*)-(.*)$/) {
-	$self->{version} = $1;
-	$self->{revision} = $2;
+        $self->{version} = $1;
+        $self->{revision} = $2;
     } else {
-	$self->{version} = $ver;
-	$self->{revision} = 0;
-	$self->{no_revision} = 1;
+        $self->{version} = $ver;
+        $self->{revision} = 0;
+        $self->{no_revision} = 1;
     }
 
     return bless $self, $class;
@@ -186,9 +187,28 @@ sub revision {
 
 Returns true if the version is native, false if it has a revision.
 
+B<Note>: On some vendors, dpkg has been made incoherent, and a native
+source package format can end up having a non-native version, adding
+to the confusion of the whole concept. And while this method would
+be fine to be used on vendors that have a coherent native source concept,
+this is not a pattern that will be portably relied on. Thus this method
+is being deprecated.
+
 =cut
 
 sub is_native {
+    my $self = shift;
+    warnings::warnif('deprecated',
+        'using Dpkg::Version->is_native() has been made incoherent and ' .
+        'confusing on some dpkg vendors; it is deprecated as not having ' .
+        'portable semantics anymore');
+    return $self->__is_native();
+}
+
+# Internal symbol for dpkg project use only, no API guarantees provided.
+# While a new method could be provided such as has_revision() (and
+# has_epoch()), the intent and semantics would be similar.
+sub __is_native {
     my $self = shift;
     return $self->{no_revision};
 }
@@ -290,17 +310,17 @@ sub version_compare_relation {
     my $res = version_compare($a, $b);
 
     if ($op eq REL_GT) {
-	return $res > 0;
+        return $res > 0;
     } elsif ($op eq REL_GE) {
-	return $res >= 0;
+        return $res >= 0;
     } elsif ($op eq REL_EQ) {
-	return $res == 0;
+        return $res == 0;
     } elsif ($op eq REL_LE) {
-	return $res <= 0;
+        return $res <= 0;
     } elsif ($op eq REL_LT) {
-	return $res < 0;
+        return $res < 0;
     } else {
-	croak "unsupported relation for version_compare_relation(): '$op'";
+        croak "unsupported relation for version_compare_relation(): '$op'";
     }
 }
 
@@ -321,17 +341,17 @@ sub version_normalize_relation {
             $op, "$op$op", "$op=") if ($op eq '>' or $op eq '<');
 
     if ($op eq '>>' or $op eq 'gt') {
-	return REL_GT;
+        return REL_GT;
     } elsif ($op eq '>=' or $op eq 'ge' or $op eq '>') {
-	return REL_GE;
+        return REL_GE;
     } elsif ($op eq '=' or $op eq 'eq') {
-	return REL_EQ;
+        return REL_EQ;
     } elsif ($op eq '<=' or $op eq 'le' or $op eq '<') {
-	return REL_LE;
+        return REL_LE;
     } elsif ($op eq '<<' or $op eq 'lt') {
-	return REL_LT;
+        return REL_LT;
     } else {
-	croak "bad relation '$op'";
+        croak "bad relation '$op'";
     }
 }
 
@@ -368,7 +388,8 @@ sub version_compare_string {
     while (1) {
         my ($a, $b) = (shift @a, shift @b);
         return 0 if not defined($a) and not defined($b);
-        $a ||= 0; # Default order for "no character"
+        # Default order for "no character".
+        $a ||= 0;
         $b ||= 0;
         return 1 if $a > $b;
         return -1 if $a < $b;
@@ -392,14 +413,15 @@ sub version_compare_part {
     while (1) {
         my ($a, $b) = (shift @a, shift @b);
         return 0 if not defined($a) and not defined($b);
-        $a ||= 0; # Default value for lack of version
+        # Default value for lack of version
+        $a ||= 0;
         $b ||= 0;
         if ($a =~ /^\d+$/ and $b =~ /^\d+$/) {
-            # Numerical comparison
+            # Numerical comparison.
             my $cmp = $a <=> $b;
             return $cmp if $cmp;
         } else {
-            # String comparison
+            # String comparison.
             my $cmp = version_compare_string($a, $b);
             return $cmp if $cmp;
         }
@@ -463,7 +485,7 @@ sub version_check {
         return 0;
     }
     if ($str =~ m/([^-+:.0-9a-zA-Z~])/o) {
-        my $msg = sprintf g_("version number contains illegal character '%s'"), $1;
+        my $msg = sprintf g_("version number contains invalid character '%s'"), $1;
         return (0, $msg) if wantarray;
         return 0;
     }
@@ -480,6 +502,10 @@ sub version_check {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.04 (dpkg 1.23.0)
+
+Deprecated method: $v->is_native().
 
 =head2 Version 1.03 (dpkg 1.20.0)
 

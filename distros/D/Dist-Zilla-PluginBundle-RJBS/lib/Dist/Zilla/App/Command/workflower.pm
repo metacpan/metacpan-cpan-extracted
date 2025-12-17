@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::workflower 5.033;
+package Dist::Zilla::App::Command::workflower 5.034;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
 use v5.34.0;
@@ -80,7 +80,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.033
+version 5.034
 
 =head1 SYNOPSIS
 

@@ -13,36 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
-use Test::Dpkg qw(:needs);
+use Test::Dpkg qw(:needs :paths);
 
 test_needs_author();
 test_needs_command('shellcheck');
-test_needs_srcdir_switch();
 
-my @todofiles = qw(
-    dselect/methods/disk/install.sh
-    dselect/methods/disk/setup.sh
-    dselect/methods/disk/update.sh
+test_chdir_srcdir();
+
+my @files_todo = qw(
+    dselect/methods/file/install.sh
+    dselect/methods/file/setup.sh
+    dselect/methods/file/update.sh
     dselect/methods/media/install.sh
     dselect/methods/media/setup.sh
     dselect/methods/media/update.sh
 );
-my @files = qw(
-    autogen
-    build-aux/gen-release
-    build-aux/get-vcs-id
-    build-aux/get-version
-    build-aux/run-script
-    debian/dpkg.cron.daily
-    debian/dpkg.postrm
-    src/dpkg-db-backup.sh
-    src/dpkg-db-keeper.sh
-    src/dpkg-maintscript-helper.sh
-);
+my @files = all_shell_files(@files_todo);
+
 my @shellcheck_opts = (
     '--external-sources', # Allow checking external source files.
     '--exclude=SC1090', # Allow non-constant source.
@@ -52,7 +42,7 @@ my @shellcheck_opts = (
     '--exclude=SC3043', # Allow local keyword.
 );
 
-plan tests => scalar @files;
+plan tests => scalar @files + scalar @files_todo;
 
 sub shell_syntax_ok
 {
@@ -73,4 +63,12 @@ sub shell_syntax_ok
 
 foreach my $file (@files) {
     shell_syntax_ok($file);
+}
+
+TODO: {
+    local $TODO = 'shell scripts not yet fixed';
+
+    foreach my $file (@files_todo) {
+        shell_syntax_ok($file);
+    }
 }

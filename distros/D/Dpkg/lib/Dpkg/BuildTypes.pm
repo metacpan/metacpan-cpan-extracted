@@ -34,8 +34,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::BuildTypes 0.02;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     BUILD_DEFAULT
@@ -167,7 +166,7 @@ sub build_has_none
 {
     my ($bits) = @_;
 
-    return !($current_type & $bits);
+    return ! ($current_type & $bits);
 }
 
 =item build_is($bits)
@@ -190,7 +189,7 @@ Set the current build type to $build_type, which was specified via the
 $build_option command-line option.
 
 The function will check and abort on incompatible build type assignments,
-this behavior can be disabled by using the boolean option "nocheck".
+this behavior can be disabled by using the boolean option "no_check".
 
 =cut
 
@@ -199,7 +198,7 @@ sub set_build_type
     my ($build_type, $build_option, %opts) = @_;
 
     usageerr(g_('cannot combine %s and %s'), $current_option, $build_option)
-        if not $opts{nocheck} and
+        if not $opts{no_check} and
            build_has_none(BUILD_DEFAULT) and $current_type != $build_type;
 
     $current_type = $build_type;
@@ -212,7 +211,7 @@ Set the current build type from a list of comma-separated build type
 components.
 
 The function will check and abort on incompatible build type assignments,
-this behavior can be disabled by using the boolean option "nocheck".
+this behavior can be disabled by using the boolean option "no_check".
 
 =cut
 
@@ -236,7 +235,7 @@ Set the current build type from a list of comma-separated build target
 components.
 
 The function will check and abort on incompatible build type assignments,
-this behavior can be disabled by using the boolean option "nocheck".
+this behavior can be disabled by using the boolean option "no_check".
 
 =cut
 

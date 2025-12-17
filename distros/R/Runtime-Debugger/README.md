@@ -323,20 +323,6 @@ So something like this:
 
 # FUNCTIONS
 
-## run
-
-DEPRECATED! (Use `repl` instead)
-
-Runs the REPL.
-
-    eval run
-
-Sets `$@` to the exit reason like
-'INT' (Control-C) or 'q' (Normal exit/quit).
-
-Note: This method is more stable than repl(), but at the same
-time has limits. [See also](#lossy-undef-variable)
-
 ## repl
 
 Works like eval, but without [the lossy bug](#lossy-undef-variable)
@@ -462,7 +448,7 @@ Some example uses:
     p \%hash
     p $object
 
-## uniq
+## \_uniq
 
 Returns a unique list of elements.
 

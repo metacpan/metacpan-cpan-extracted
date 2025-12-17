@@ -32,14 +32,13 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Package::V3::Bzr 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Cwd;
 use File::Basename;
 use File::Spec;
 use File::Find;
-use File::Temp qw(tempdir);
+use File::Temp;
 
 use Dpkg::Gettext;
 use Dpkg::Compression;
@@ -67,8 +66,8 @@ sub _check_workdir {
               $srcdir);
     }
 
-    # Symlinks from .bzr to outside could cause unpack failures, or
-    # point to files they shouldn't, so check for and don't allow.
+    # Symlinks from .bzr to outside could cause unpack failures, or point to
+    # files they should not, so check for and do not allow.
     if (-l "$srcdir/.bzr") {
         error(g_('%s is a symlink'), "$srcdir/.bzr");
     }
@@ -88,7 +87,7 @@ sub _check_workdir {
 sub can_build {
     my ($self, $dir) = @_;
 
-    return (0, g_("doesn't contain a bzr repository")) unless -d "$dir/.bzr";
+    return (0, g_('does not contain a bzr repository')) unless -d "$dir/.bzr";
     return 1;
 }
 
@@ -99,7 +98,8 @@ sub do_build {
     #my @tar_ignore = map { "--exclude=$_" } @{$self->{options}{tar_ignore}};
     my $diff_ignore_regex = $self->{options}{diff_ignore_regex};
 
-    $dir =~ s{/+$}{}; # Strip trailing /
+    # Strip trailing "/".
+    $dir =~ s{/+$}{};
     my ($dirname, $updir) = fileparse($dir);
 
     if (scalar(@argv)) {
@@ -118,7 +118,7 @@ sub do_build {
     local $_;
 
     # Check for uncommitted files.
-    # To support dpkg-source -i, remove any ignored files from the
+    # To support «dpkg-source -i», remove any ignored files from the
     # output of bzr status.
     open(my $bzr_status_fh, '-|', 'bzr', 'status')
         or subprocerr('bzr status');
@@ -139,9 +139,13 @@ sub do_build {
 
     chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
 
-    my $tmp = tempdir("$dirname.bzr.XXXXXX", DIR => $updir);
-    push_exit_handler(sub { erasedir($tmp) });
-    my $tardir = "$tmp/$dirname";
+    my $tmpdir = File::Temp->newdir(
+        TEMPLATE => "$dirname.bzr.XXXXXX",
+        DIR => $updir,
+        CLEANUP => 0,
+    );
+    push_exit_handler(sub { erasedir($tmpdir) });
+    my $tardir = "$tmpdir/$dirname";
 
     system('bzr', 'branch', $dir, $tardir);
     subprocerr("bzr branch $dir $tardir") if $?;
@@ -154,18 +158,20 @@ sub do_build {
     unlink("$tardir/.bzr/branch/branch-name",
            "$tardir/.bzr/branch/parent");
 
-    # Create the tar file
+    # Create the tar file.
     my $debianfile = "$basenamerev.bzr.tar." . $self->{options}{comp_ext};
     info(g_('building %s in %s'),
          $sourcepackage, $debianfile);
-    my $tar = Dpkg::Source::Archive->new(filename => $debianfile,
-                                         compression => $self->{options}{compression},
-                                         compression_level => $self->{options}{comp_level});
-    $tar->create(chdir => $tmp);
+    my $tar = Dpkg::Source::Archive->new(
+        filename => $debianfile,
+        compression => $self->{options}{compression},
+        compression_level => $self->{options}{comp_level},
+    );
+    $tar->create(chdir => $tmpdir);
     $tar->add_directory($dirname);
     $tar->finish();
 
-    erasedir($tmp);
+    erasedir($tmpdir);
     pop_exit_handler();
 
     $self->add_file($debianfile);
@@ -195,7 +201,7 @@ sub do_extract {
         erasedir($newdirectory);
     }
 
-    # Extract main tarball
+    # Extract main tarball.
     info(g_('unpacking %s'), $tarfile);
     my $tar = Dpkg::Source::Archive->new(
         filename => File::Spec->catfile($self->{basedir}, $tarfile),

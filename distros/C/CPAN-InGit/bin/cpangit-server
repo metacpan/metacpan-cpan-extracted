@@ -1,0 +1,120 @@
+#! /usr/bin/env perl
+# PODNAME: cpangit-server
+our $VERSION = '0.001'; # VERSION
+# ABSTRACT: serve a CPAN tree from a git branch, or all CPAN trees in the git repo
+
+use FindBin;
+BEGIN { push @INC, "$FindBin::RealBin/../lib" if -f "$FindBin::RealBin/../dist.ini" }
+use Mojolicious::Lite;
+use CPAN::InGit::Server;
+use Getopt::Long;
+use Pod::Usage;
+use Log::Any::Adapter;
+use v5.36;
+
+
+my $git_dir= $ENV{GIT_DIR};
+my $base_path= '/';
+my %mount_options;
+{
+   local $Getopt::Long::config= Getopt::Long::ConfigDefaults();
+   Getopt::Long::Configure(qw( no_permute pass_through no_auto_abbrev ));
+   GetOptions(
+      'git-dir=s'        => \$git_dir,
+      'path-base=s'      => \$base_path,
+      'base-path|p=s'    => \$base_path,
+      'tree|t=s'         => \$mount_options{archive_tree},
+      'branch-head-only' => \$mount_options{branch_head_only},
+      'help|h'           => sub { pod2usage(1) },
+   ) or pod2usage(2);
+}
+@ARGV= qw( daemon -m production )
+   unless @ARGV;
+
+Log::Any::Adapter->set( MojoLog => logger => app->log );
+
+die "No such GIT_DIR directory: '$git_dir'\n"
+   if defined $git_dir && !-d $git_dir;
+
+my $git_repo= Git::Raw::Repository->discover($git_dir // '.');
+my $cpan_repo= CPAN::InGit->new(git_repo => $git_repo);
+
+# If user wants a single tree, resolve the name
+if (defined $mount_options{archive_tree}) {
+   my $name= $mount_options{archive_tree};
+   my $atree= $cpan_repo->get_archive_tree($name)
+      or croak($cpan_repo->lookup_tree($name)
+              ? "Tree '$name' does not look like an ArchiveTree"
+              : "Unknown git tree '$name'");
+   $mount_options{archive_tree}= $atree;
+}
+
+# The routes for the server controller can be mounted at any sub-path desired.
+# By default, this mounts every possible Git tree which looks like a valid ArchiveTree layout
+# so you can point cpanm to `-M host:/BRANCH_NAME` or `-M host:/SHA-1` or `-M host:/GIT_TAG`
+CPAN::InGit::Server->mount(app->routes->any($base_path), $cpan_repo, %mount_options);
+
+app->start;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpangit-server - serve a CPAN tree from a git branch, or all CPAN trees in the git repo
+
+=head1 USAGE
+
+  # Serve all trees
+  cpangit-server [--git-dir=PATH] [OPTIONS] MOJO_COMMAND...
+  
+  # Serve one branch
+  cpangit-server --tree=BRANCH_NAME [OPTIONS] MOJO_COMMAND...
+
+This command acts as a CPAN file server, either serving all the repo's branches (and tags and
+SHA-1 hashes) or serving a single specified branch.  OPTIONS are described below. MOJO_OPTIONS
+control how the server is launched, and are described by `mojo --help`.
+
+=head1 OPTIONS
+
+=over
+
+=item --git-dir=PATH
+
+Path to the Git repository of L<CPAN::InGit>.  The default is GIT_DIR from the environment,
+or any git repo above "."
+
+=item --path-base=PATH  (-p PATH)
+
+Base URL from which to serve the branches or single tree.  Default is '/'.
+
+=item --tree=BRANCH_OR_TAG_OR_SHA1 (-t BRANCH)
+
+Serve only a single Git tree from the root path.
+
+=item --branch-head-only
+
+When serving all branches, this prevents serving any Git tree which is not a current branch head.
+For example, C<< /TAG/... >> and C<< /SHA-1/... >> return 404 when this option is enabled.
+
+=back
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Michael Conrad, and IntelliTree Solutions.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.114-12-g14675c3b
+package OpenAPI::Modern; # git description: v0.115-9-g764de30b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 
 use 5.020;
 use utf8;
@@ -103,6 +103,10 @@ sub validate_request ($self, $request, $options = {}) {
     my $path_ok = $self->find_path_item($options, $state);
     delete $options->{errors};
 
+    my $path_item = delete $options->{_path_item};  # after following path-item $refs
+    my $operation = delete $options->{_operation};
+    my $ops = delete $options->{_operation_path_suffix};   # jsonp-encoded
+
     # Reporting a failed find_path_item as an exception will result in a recommended response of
     # [ 500, Internal Server Error ], which is warranted if we consider the lack of a specification
     # entry for this incoming request as an unexpected, server-side error.
@@ -111,10 +115,6 @@ sub validate_request ($self, $request, $options = {}) {
     return $self->_result($state, 1) if not $path_ok;
 
     $request = $options->{request};   # now guaranteed to be a Mojo::Message::Request
-
-    my $path_item = delete $options->{_path_item};  # after following path-item $refs
-    my $operation = delete $options->{_operation};
-    my $ops = delete $options->{_operation_path_suffix};   # jsonp-encoded
 
     # PARAMETERS
     # { $in => { $name => path-item|operation } }  as we process each one.
@@ -235,6 +235,9 @@ sub validate_response ($self, $response, $options = {}) {
     $options->{request} //= $request;
   }
 
+  croak '$response and $options->{response} are inconsistent'
+    if $options->{response} and $response != $options->{response};
+
   # mostly populated by find_path_item
   my $state = { data_path => '/response' };
 
@@ -253,9 +256,11 @@ sub validate_response ($self, $response, $options = {}) {
     return $self->_result($state, 1, 1) if not $path_ok;
 
     $state->{keyword_path} .= delete $options->{_operation_path_suffix};  # jsonp-encoded
-    return $self->_result($state, 0, 1) if not exists $operation->{responses};
 
-    $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
+    # now guaranteed to be a Mojo::Message::Response
+    $options->{response} = $response = _convert_response($response);
+
+    return $self->_result($state, 0, 1) if not exists $operation->{responses};
 
     if ($response->headers->header('Transfer-Encoding')) {
       ()= E({ %$state, data_path => '/response/header/Transfer-Encoding' },
@@ -394,7 +399,7 @@ sub find_path_item ($self, $options, $state = {}) {
     # reachable from a /paths entry, but as this can possibly match more than once, in order to
     # provide an unambiguous result, provide the operation_id as well.
 
-    # the operation path always ends with the method
+    # the operation path always ends with the method, but casing may vary depending on the parent
     my @parts = unjsonp($operation_path);
     my ($path_item_path, $method) = $parts[-2] ne 'additionalOperations'
           # differentiate between these operation paths:
@@ -1235,7 +1240,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 SYNOPSIS
 
@@ -1482,6 +1487,11 @@ C<request> in the hashref represents the original request object that
 corresponds to this response, which can be used to find the appropriate section of the document if
 other values (such as C<operationId>) are not known.
 
+In addition, this values are populated into the hashref:
+
+=for :items * C<response>: the L<Mojo::Message::Response> object that was provided or converted from the
+  provided response
+
 =head2 find_path_item
 
 =for Pod::Coverage find_path
@@ -1499,7 +1509,7 @@ of values can be provided; possible values are:
 
 =item *
 
-C<request>: the object representing the HTTP request. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Dancer2::Core::Request>, L<Mojo::Message::Request>. Converted to a L<Mojo::Message::Request>.
+C<request>: the object representing the HTTP request. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Dancer2::Core::Request>, L<Mojo::Message::Request>. Converted to a L<Mojo::Message::Request> (the value in this hashref will be overwritten).
 
 =item *
 

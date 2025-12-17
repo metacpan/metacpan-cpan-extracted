@@ -30,18 +30,18 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Package::V3::Git 0.02;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Cwd qw(abs_path getcwd);
 use File::Basename;
 use File::Spec;
-use File::Temp qw(tempdir);
+use File::Temp;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
 use Dpkg::Exit qw(push_exit_handler pop_exit_handler);
 use Dpkg::Path qw(find_command);
+use Dpkg::IPC;
 use Dpkg::Source::Functions qw(erasedir);
 
 use parent qw(Dpkg::Source::Package);
@@ -71,8 +71,19 @@ sub _check_workdir {
                  'specified'), $srcdir);
     }
     if (-s "$srcdir/.gitmodules") {
-        error(g_('git repository %s uses submodules; this is not yet supported'),
-              $srcdir);
+        my $stdout;
+
+        spawn(
+            exec => [ qw(git submodule status --recursive) ],
+            chdir => $srcdir,
+            wait_child => 1,
+            to_string => \$stdout,
+        );
+        if (length $stdout) {
+            error(g_('git repository %s uses submodules; ' .
+                     'this is not yet supported'),
+                  $srcdir);
+        }
     }
 
     return 1;
@@ -104,7 +115,10 @@ my @module_cmdline = (
 sub describe_cmdline_options {
     my $self = shift;
 
-    my @cmdline = ( $self->SUPER::describe_cmdline_options(), @module_cmdline );
+    my @cmdline = (
+        $self->SUPER::describe_cmdline_options(),
+        @module_cmdline,
+    );
 
     return @cmdline;
 }
@@ -125,7 +139,7 @@ sub parse_cmdline_option {
 sub can_build {
     my ($self, $dir) = @_;
 
-    return (0, g_("doesn't contain a git repository")) unless -d "$dir/.git";
+    return (0, g_('does not contain a git repository')) unless -d "$dir/.git";
     return 1;
 }
 
@@ -133,7 +147,8 @@ sub do_build {
     my ($self, $dir) = @_;
     my $diff_ignore_regex = $self->{options}{diff_ignore_regex};
 
-    $dir =~ s{/+$}{}; # Strip trailing /
+    # Strip trailing "/".
+    $dir =~ s{/+$}{};
     my ($dirname, $updir) = fileparse($dir);
     my $basenamerev = $self->get_basename(1);
 
@@ -143,9 +158,8 @@ sub do_build {
     chdir $dir or syserr(g_("unable to chdir to '%s'"), $dir);
 
     # Check for uncommitted files.
-    # To support dpkg-source -i, get a list of files
-    # equivalent to the ones git status finds, and remove any
-    # ignored files from it.
+    # To support «dpkg-source -i», get a list of files equivalent to the ones
+    # «git status» finds, and remove any ignored files from it.
     my @ignores = '--exclude-per-directory=.gitignore';
     my $core_excludesfile = qx(git config --get core.excludesfile);
     chomp $core_excludesfile;
@@ -159,15 +173,14 @@ sub do_build {
          '-z', '--others', @ignores) or subprocerr('git ls-files');
     my @files;
     {
-      local $_;
-      local $/ = "\0";
-      while (<$git_ls_files_fh>) {
-          chomp;
-          if (! length $diff_ignore_regex ||
-              ! m/$diff_ignore_regex/o) {
-              push @files, $_;
-          }
-      }
+        local $_;
+        local $/ = "\0";
+        while (<$git_ls_files_fh>) {
+            chomp;
+            if (! length $diff_ignore_regex || ! m/$diff_ignore_regex/o) {
+                push @files, $_;
+            }
+        }
     }
     close($git_ls_files_fh) or syserr(g_('git ls-files exited nonzero'));
     if (@files) {
@@ -175,15 +188,18 @@ sub do_build {
               join(' ', @files));
     }
 
-    # If a depth was specified, need to create a shallow clone and
-    # bundle that.
-    my $tmp;
+    # If a depth was specified, need to create a shallow clone and bundle that.
+    my $tmpdir;
     my $shallowfile;
     if ($self->{options}{git_depth}) {
         chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
-        $tmp = tempdir("$dirname.git.XXXXXX", DIR => $updir);
-        push_exit_handler(sub { erasedir($tmp) });
-        my $clone_dir = "$tmp/repo.git";
+        $tmpdir = File::Temp->newdir(
+            TEMPLATE => "$dirname.git.XXXXXX",
+            DIR => $updir,
+            CLEANUP => 0,
+        );
+        push_exit_handler(sub { erasedir($tmpdir) });
+        my $clone_dir = "$tmpdir/repo.git";
         # file:// is needed to avoid local cloning, which does not
         # create a shallow clone.
         info(g_('creating shallow clone with depth %s'),
@@ -205,15 +221,18 @@ sub do_build {
     info(g_('bundling: %s'), join(' ', @bundle_arg));
     system('git', 'bundle', 'create', "$old_cwd/$bundlefile",
            @bundle_arg,
-           'HEAD', # ensure HEAD is included no matter what
-           '--', # avoids ambiguity error when referring to eg, a debian branch
+           # Ensure HEAD is included no matter what.
+           'HEAD',
+           # Avoids ambiguity error when referring to, for example, a debian
+           # branch.
+           '--',
     );
     subprocerr('git bundle') if $?;
 
     chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
 
-    if (defined $tmp) {
-        erasedir($tmp);
+    if (defined $tmpdir) {
+        erasedir($tmpdir);
         pop_exit_handler();
     }
 
@@ -265,8 +284,8 @@ sub do_extract {
     subprocerr('git bundle') if $?;
 
     if (defined $shallow) {
-        # Move shallow info file into place, so git does not
-        # try to follow parents of shallow refs.
+        # Move shallow info file into place, so git does not try to follow
+        # parents of shallow refs.
         info(g_('setting up shallow clone'));
         my $shallow_orig = File::Spec->catfile($self->{basedir}, $shallow);
         my $shallow_dest = File::Spec->catfile($newdirectory, '.git', 'shallow');

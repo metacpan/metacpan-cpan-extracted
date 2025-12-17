@@ -1,5 +1,5 @@
 # Copyright © 2008-2011 Raphaël Hertzog <hertzog@debian.org>
-# Copyright © 2008-2019 Guillem Jover <guillem@debian.org>
+# Copyright © 2008-2025 Guillem Jover <guillem@debian.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,10 +29,9 @@ is the one that supports the extraction of the source package.
 
 =cut
 
-package Dpkg::Source::Package 2.03;
+package Dpkg::Source::Package 2.04;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT_OK = qw(
     get_default_diff_ignore_regex
@@ -41,9 +40,7 @@ our @EXPORT_OK = qw(
 );
 
 use Exporter qw(import);
-use POSIX qw(:errno_h :sys_wait_h);
 use Carp;
-use File::Temp;
 use File::Copy qw(cp);
 use File::Basename;
 use File::Spec;
@@ -61,22 +58,22 @@ use Dpkg::OpenPGP;
 use Dpkg::OpenPGP::ErrorCodes;
 
 my $diff_ignore_default_regex = '
-# Ignore general backup files
+# Ignore general backup files.
 (?:^|/).*~$|
-# Ignore emacs recovery files
+# Ignore emacs recovery files.
 (?:^|/)\.#.*$|
-# Ignore vi swap files
+# Ignore vi swap files.
 (?:^|/)\..*\.sw.$|
-# Ignore baz-style junk files or directories
+# Ignore baz-style junk files or directories.
 (?:^|/),,.*(?:$|/.*$)|
-# File-names that should be ignored (never directories)
+# File-names that should be ignored (never directories).
 (?:^|/)(?:DEADJOE|\.arch-inventory|\.(?:bzr|cvs|hg|git|mtn-)ignore)$|
-# File or directory names that should be ignored
+# File or directory names that should be ignored.
 (?:^|/)(?:CVS|RCS|\.deps|\{arch\}|\.arch-ids|\.svn|
 \.hg(?:tags|sigs)?|_darcs|\.git(?:attributes|modules|review)?|
 \.mailmap|\.shelf|_MTN|\.be|\.bzr(?:\.backup|tags)?)(?:$|/.*$)
 ';
-# Take out comments and newlines
+# Take out comments and newlines.
 $diff_ignore_default_regex =~ s/^#.*$//mg;
 $diff_ignore_default_regex =~ s/\n//sg;
 
@@ -196,6 +193,16 @@ If set to 1, do not apply Debian changes on the extracted source package.
 If set to 1, do not apply Debian-specific patches. This options is
 specific for source packages using format "2.0" and "3.0 (quilt)".
 
+=item B<certs>
+
+An array ref with a list of certificate keyrings to use for signature
+verification.
+
+=item B<use_vendor_certs>
+
+If set to 0, the check_signature() method will not use vendor specific
+keyrings, only user supplied ones.
+
 =item B<require_valid_signature>
 
 If set to 1, the check_signature() method will be stricter and will error
@@ -218,7 +225,6 @@ source package after its extraction.
 
 =cut
 
-# Class methods
 sub new {
     my ($this, %opts) = @_;
     my $class = ref($this) || $this;
@@ -227,7 +233,11 @@ sub new {
         format => Dpkg::Source::Format->new(),
         options => {},
         checksums => Dpkg::Checksums->new(),
-        openpgp => Dpkg::OpenPGP->new(needs => { api => 'verify' }),
+        openpgp => Dpkg::OpenPGP->new(
+            needs => {
+                api => 'verify',
+            },
+        ),
     };
     bless $self, $class;
     if (exists $opts{options}) {
@@ -253,8 +263,8 @@ sub new {
 
 sub init_options {
     my $self = shift;
-    # Use full ignore list by default
-    # note: this function is not called by V1 packages
+    # Use full ignore list by default.
+    # Note: This function is not called by V1 packages.
     $self->{options}{diff_ignore_regex} ||= $diff_ignore_default_regex;
     $self->{options}{diff_ignore_regex} .= '|(?:^|/)debian/source/local-.*$';
     $self->{options}{diff_ignore_regex} .= '|(?:^|/)debian/files(?:\.new)?$';
@@ -265,18 +275,20 @@ sub init_options {
         $self->{options}{tar_ignore} = [ @tar_ignore_default_pattern ];
     }
     push @{$self->{options}{tar_ignore}},
-         'debian/source/local-options',
-         'debian/source/local-patch-header',
-         'debian/files',
-         'debian/files.new';
+        'debian/source/local-options',
+        'debian/source/local-patch-header',
+        'debian/files',
+        'debian/files.new';
     $self->{options}{copy_orig_tarballs} //= 0;
 
-    # Skip debianization while specific to some formats has an impact
-    # on code common to all formats
+    # Skip debianization while specific to some formats has an impact.
+    # on code common to all formats.
     $self->{options}{skip_debianization} //= 0;
     $self->{options}{skip_patches} //= 0;
 
     # Set default validation checks.
+    $self->{options}{certs} //= [];
+    $self->{options}{use_vendor_certs} //= 1;
     $self->{options}{require_valid_signature} //= 0;
     $self->{options}{require_strong_checksums} //= 0;
 
@@ -293,7 +305,7 @@ sub initialize {
     $self->{basedir} = $dir || './';
     $self->{filename} = $fn;
 
-    # Read the fields
+    # Read the fields.
     my $fields = $self->{fields};
     $fields->load($filename);
     $self->{is_signed} = $fields->get_option('is_pgp_signed');
@@ -375,7 +387,7 @@ sub check_checksums {
     my $checksums = $self->{checksums};
     my $warn_on_weak = 0;
 
-    # add_from_file verify the checksums if they are already existing
+    # The add_from_file() call verifies the checksums if they already exist.
     foreach my $file ($checksums->get_files()) {
         if (not $checksums->has_strong_checksums($file)) {
             if ($self->{options}{require_strong_checksums}) {
@@ -384,8 +396,8 @@ sub check_checksums {
                 $warn_on_weak = 1;
             }
         }
-	my $pathname = File::Spec->catfile($self->{basedir}, $file);
-	$checksums->add_from_file($pathname, key => $file);
+        my $pathname = File::Spec->catfile($self->{basedir}, $file);
+        $checksums->add_from_file($pathname, key => $file);
     }
 
     warning(g_('source package uses only weak checksums')) if $warn_on_weak;
@@ -399,7 +411,10 @@ sub get_basename {
               'Source', 'Version');
     }
     my $v = Dpkg::Version->new($f->{'Version'});
-    my $vs = $v->as_string(omit_epoch => 1, omit_revision => !$with_revision);
+    my $vs = $v->as_string(
+        omit_epoch => 1,
+        omit_revision => ! $with_revision,
+    );
     return $f->{'Source'} . '_' . $vs;
 }
 
@@ -429,11 +444,11 @@ sub find_original_tarballs {
         next unless defined($dir) and -d $dir;
         opendir(my $dir_dh, $dir) or syserr(g_('cannot opendir %s'), $dir);
         push @tar, map { File::Spec->catfile($dir, $_) } grep {
-		($opts{include_main} and
-		 /^\Q$basename\E\.orig\.tar\.$opts{extension}$/) or
-		($opts{include_supplementary} and
-		 /^\Q$basename\E\.orig-[[:alnum:]-]+\.tar\.$opts{extension}$/)
-	    } readdir($dir_dh);
+                ($opts{include_main} and
+                 /^\Q$basename\E\.orig\.tar\.$opts{extension}$/) or
+                ($opts{include_supplementary} and
+                 /^\Q$basename\E\.orig-[[:alnum:]-]+\.tar\.$opts{extension}$/)
+            } readdir($dir_dh);
         closedir($dir_dh);
     }
     return @tar;
@@ -526,11 +541,29 @@ sub check_signature {
     my $dsc = $self->get_filename();
     my @certs;
 
-    push @certs, $self->{openpgp}->get_trusted_keyrings();
+    info(g_('verifying %s'), $dsc);
 
-    foreach my $vendor_keyring (run_vendor_hook('package-keyrings')) {
-        if (-r $vendor_keyring) {
-            push @certs, $vendor_keyring;
+    # User specified signer certificates, otherwise fallback to use the
+    # trusted keyrings.
+    if (@{$self->{options}{certs}}) {
+        push @certs, @{$self->{options}{certs}};
+    } else {
+        foreach my $keyring ($self->{openpgp}->get_trusted_keyrings()) {
+            push @certs, $keyring;
+            warning(g_('using implicit trusted keyring %s is deprecated; ' .
+                       'use --signer-cert with an OpenPGP keyring instead'),
+                    $keyring);
+        }
+    }
+
+    if ($self->{options}{use_vendor_certs}) {
+        foreach my $vendor_keyring (run_vendor_hook('package-keyrings')) {
+            if (-r $vendor_keyring) {
+                push @certs, $vendor_keyring;
+                info(g_('using keyring %s'), $vendor_keyring);
+            } else {
+                info(g_('skipping absent keyring %s'), $vendor_keyring);
+            }
         }
     }
 
@@ -578,12 +611,12 @@ sub extract {
         }
     }
 
-    # Copy orig tarballs
+    # Copy orig tarballs.
     if ($self->{options}{copy_orig_tarballs}) {
         my $basename = $self->get_basename();
         my ($dirname, $destdir) = fileparse($newdirectory);
         $destdir ||= './';
-	my $ext = compression_get_file_extension_regex();
+        my $ext = compression_get_file_extension_regex();
         foreach my $orig (grep { /^\Q$basename\E\.orig(-[[:alnum:]-]+)?\.tar\.$ext$/ }
                           $self->get_files())
         {
@@ -596,7 +629,7 @@ sub extract {
         }
     }
 
-    # Try extract
+    # Try extract.
     $self->do_extract($newdirectory);
 
     # Check for directory traversals.
@@ -606,33 +639,17 @@ sub extract {
         check_directory_traversal($newdirectory, "$newdirectory/debian/");
     }
 
-    # Store format if non-standard so that next build keeps the same format
+    # Store format if non-standard so that next build keeps the same format.
     if ($self->{fields}{'Format'} and
         $self->{fields}{'Format'} ne '1.0' and
         not $self->{options}{skip_debianization})
     {
         my $srcdir = File::Spec->catdir($newdirectory, 'debian', 'source');
         my $format_file = File::Spec->catfile($srcdir, 'format');
-	unless (-e $format_file) {
-	    mkdir($srcdir) unless -e $srcdir;
+        unless (-e $format_file) {
+            mkdir($srcdir) unless -e $srcdir;
             $self->{format}->save($format_file);
-	}
-    }
-
-    # Make sure debian/rules is executable
-    my $rules = File::Spec->catfile($newdirectory, 'debian', 'rules');
-    my @s = lstat($rules);
-    if (not scalar(@s)) {
-        unless ($! == ENOENT) {
-            syserr(g_('cannot stat %s'), $rules);
         }
-        warning(g_('%s does not exist'), $rules)
-            unless $self->{options}{skip_debianization};
-    } elsif (-f _) {
-        chmod($s[2] | 0111, $rules)
-            or syserr(g_('cannot make %s executable'), $rules);
-    } else {
-        warning(g_('%s is not a plain file'), $rules);
     }
 }
 
@@ -641,7 +658,7 @@ sub do_extract {
           'source package; use one of the subclasses';
 }
 
-# Function used specifically during creation of a source package
+# Function used specifically during creation of a source package.
 
 sub before_build {
     my ($self, $dir) = @_;
@@ -675,7 +692,8 @@ sub add_file {
     }
     $self->{checksums}->add_from_file($filename, key => $fn);
     $self->{checksums}->export_to_control($self->{fields},
-					    use_files_for_md5 => 1);
+        use_files_for_md5 => 1,
+    );
 }
 
 sub commit {
@@ -695,10 +713,10 @@ sub write_dsc {
     my $fields = $self->{fields};
 
     foreach my $f (keys %{$opts{override}}) {
-	$fields->{$f} = $opts{override}{$f};
+        $fields->{$f} = $opts{override}{$f};
     }
 
-    unless ($opts{nocheck}) {
+    unless ($opts{no_check}) {
         foreach my $f (qw(Source Version Architecture)) {
             unless (defined($fields->{$f})) {
                 error(g_('missing information for critical output field %s'), $f);
@@ -712,7 +730,7 @@ sub write_dsc {
     }
 
     foreach my $f (keys %{$opts{remove}}) {
-	delete $fields->{$f};
+        delete $fields->{$f};
     }
 
     my $filename = $opts{filename};
@@ -727,6 +745,10 @@ sub write_dsc {
 =back
 
 =head1 CHANGES
+
+=head2 Version 2.04 (dpkg 1.23.0)
+
+New options: certs, use_vendor_certs in $p->check_checksums().
 
 =head2 Version 2.03 (dpkg 1.22.7)
 

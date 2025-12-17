@@ -1,7 +1,7 @@
 package Cron::Toolkit;
 
 # VERSION
-$VERSION = 1.00;
+$VERSION = 1.01;
 
 use strict;
 use warnings;
@@ -989,8 +989,10 @@ sub next {
 
    # set year
    my $year_node   = $self->{nodes}[6];
-   my $year_lowval = $year_node->lowest($tm);
+   my $year_lowval = $year_node->lowest($tm); 
    my $tm_year_low = $self->_set_date( $tm, $year_node->field_type, $year_lowval );
+   $tm_year_low = $self->_minus_one( $tm_year_low, $year_node->field_type );
+
    $tm = $tm_year_low if $tm->is_before($tm_year_low);
 
    my $max_tm = Time::Moment->new(
@@ -1057,6 +1059,7 @@ sub previous {
    my $year_node    = $self->{nodes}[6];
    my $year_highval = $year_node->highest($tm);
    my $tm_year_high = $self->_set_date( $tm, $year_node->field_type, $year_highval );
+   $tm_year_high    = $self->_plus_one( $tm_year_high, $year_node->field_type );
    $tm = $tm_year_high if $tm->is_after($tm_year_high);
 
    # calculate maximum iterations

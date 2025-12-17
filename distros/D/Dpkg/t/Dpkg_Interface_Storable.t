@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 1;
 
-BEGIN {
-    use_ok('Dpkg::Interface::Storable');
-}
+use ok 'Dpkg::Interface::Storable';
 
 # TODO: Add actual test cases.

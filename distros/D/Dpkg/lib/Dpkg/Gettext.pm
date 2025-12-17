@@ -33,9 +33,7 @@ some commonly used aliases.
 
 package Dpkg::Gettext 2.01;
 
-use strict;
-use warnings;
-use feature qw(state);
+use v5.36;
 
 our @EXPORT = qw(
     textdomain

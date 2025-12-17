@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::OpenPGP::Backend::Sequoia 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use POSIX qw(:sys_wait_h);
 use File::Temp;
@@ -64,9 +63,14 @@ sub _sq_exec
     my ($self, $cmd, @exec) = @_;
 
     my ($stdout, $stderr);
-    spawn(exec => [ $cmd, @exec ],
-          wait_child => 1, nocheck => 1, timeout => 10,
-          to_string => \$stdout, error_to_string => \$stderr);
+    spawn(
+        exec => [ $cmd, @exec ],
+        wait_child => 1,
+        no_check => 1,
+        timeout => 10,
+        to_string => \$stdout,
+        error_to_string => \$stderr,
+    );
     if (WIFEXITED($?)) {
         my $status = WEXITSTATUS($?);
         print { *STDERR } "$stdout$stderr" if $status;
@@ -123,7 +127,7 @@ sub inline_verify
     my ($self, $inlinesigned, $data, @certs) = @_;
 
     return OPENPGP_MISSING_CMD unless ($self->{cmdv} || $self->{cmd});
-    return OPENPGP_NO_SIG if @certs == 0;
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
 
     # XXX: sqv does not support --signer-file. See:
     #   <https://gitlab.com/sequoia-pgp/sequoia-sqv/-/issues/11>.
@@ -167,7 +171,7 @@ sub verify
     my ($self, $data, $sig, @certs) = @_;
 
     return OPENPGP_MISSING_CMD unless ($self->{cmdv} || $self->{cmd});
-    return OPENPGP_NO_SIG if @certs == 0;
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
 
     # XXX: sqv does not support --signer-file. See:
     #   <https://gitlab.com/sequoia-pgp/sequoia-sqv/-/issues/11>.

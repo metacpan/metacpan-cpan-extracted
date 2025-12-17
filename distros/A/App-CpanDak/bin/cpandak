@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::CpanDak;
+our $VERSION = '0.0.2'; # VERSION
+# PODNAME: cpandak
+# ABSTRACT: cpanm, with some sort of distroprefs
+
+
+my $app = App::CpanDak->new;
+$app->parse_options(@ARGV);
+exit $app->doit;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpandak - cpanm, with some sort of distroprefs
+
+=head1 VERSION
+
+version 0.0.2
+
+=head1 SYNOPSIS
+
+    cpandak Foo::Bar
+
+    cpandak --installdeps .
+
+Exactly the same way as C<cpanm>.
+
+=head1 DESCRIPTION
+
+This is a subclass of C<App::cpanminus::script> that wraps some of its
+methods to add the ability to apply patches, set environment
+variables, and skip tests, to specific distributions.
+
+The idea comes from L<Distroprefs|CPAN/Configuration for individual
+distributions (Distroprefs)>.
+
+See L<< /C<App::CpanDak> >> for the actual documentation.
+
+=head1 AUTHOR
+
+Gianni Ceccarelli <dakkar@thenautilus.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Gianni Ceccarelli <dakkar@thenautilus.net>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

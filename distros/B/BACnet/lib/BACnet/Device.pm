@@ -6,6 +6,7 @@ use v5.16;
 
 use warnings;
 use strict;
+
 use Data::Dumper;
 
 use BACnet::Subscription;
@@ -22,7 +23,7 @@ use IO::Async::Loop;
 sub new {
     my ( $class, %args ) = @_;
 
-    my @subscriptions = ();    #list of subscriptions
+    my @subscriptions = ();
 
     my $io_loop = IO::Async::Loop->new;
 
@@ -36,9 +37,10 @@ sub new {
     );
 
     my $self = {
-        socket   => undef,
-        id       => $args{id},
-        subs_ptr => \@subscriptions,
+        socket    => undef,
+        id        => $args{id},
+        subs_ptr  => \@subscriptions,
+        invoke_id => 0,
     };
 
     my $socket = BACnet::Socket->new( $self, %args_socket );
@@ -51,8 +53,6 @@ sub new {
 
 sub _react {
     my ( $self, $message, $source_port, $source_ip ) = @_;
-
-    #print "get message: ", Dumper($message), "\n";
 
     if (   !defined $message->{payload}
         || !defined $message->{payload}->{service_request}
@@ -98,6 +98,15 @@ sub _react {
             last;
         }
     }
+}
+
+sub _invoke_id {
+    my ($self) = @_;
+
+    my $result = $self->{invoke_id};
+    $self->{invoke_id} = ( $self->{invoke_id}  + 1) % 256;
+
+    return $result;
 }
 
 sub _clean_subs {
@@ -156,9 +165,11 @@ sub subscribe {
         $sub_time = $subscription->{lifetime} - time();
     }
 
+    my $invoke_id = $self->_invoke_id();
+
     my $packet = BACnet::APDU->construct(
         BACnet::PDUTypes::ConfirmedRequest->construct(
-            invoke_id       => $self->{id},
+            invoke_id       => $invoke_id,
             service_choice  => 'SubscribeCOV',
             service_request =>
               BACnet::ServiceRequestSequences::SubscribeCOV::request(
@@ -176,8 +187,9 @@ sub subscribe {
 
     $self->_add_sub($subscription);
 
-    my $sub_res = $self->{socket}->_send_recv( $packet, $args{host_ip},
-        $args{peer_port}, ( on_response => $args{on_response} ) );
+    my $sub_res =
+      $self->{socket}->_send_recv( $packet, $args{host_ip}, $args{peer_port},
+        ( on_response => $args{on_response}, invoke_id => $invoke_id ) );
 
     if ( !defined $sub_res->result ) {
         _remove_sub( $self, $subscription );
@@ -251,9 +263,11 @@ sub read_property {
         @rest,
     );
 
+    my $invoke_id = $self->_invoke_id();
+
     my $packet = BACnet::APDU->construct(
         BACnet::PDUTypes::ConfirmedRequest->construct(
-            invoke_id       => $self->{id},
+            invoke_id       => $invoke_id,
             service_choice  => 'ReadProperty',
             service_request =>
               BACnet::ServiceRequestSequences::ReadProperty::request(
@@ -266,8 +280,9 @@ sub read_property {
         )
     );
 
-    my $read_res = $self->{socket}->_send_recv( $packet, $args{host_ip},
-        $args{peer_port}, ( on_response => $args{on_response} ) );
+    my $read_res =
+      $self->{socket}->_send_recv( $packet, $args{host_ip}, $args{peer_port},
+        ( on_response => $args{on_response}, invoke_id => $invoke_id ) );
 
     if ( !defined $read_res->result ) {
         return ( undef, "read property failed\n" );
@@ -281,11 +296,11 @@ sub unsubscribe {
 
     $self->_clean_subs();
 
-    print " sub: ", Dumper($subscription), "\n";
+    my $invoke_id = $self->_invoke_id();
 
     my $packet = BACnet::APDU->construct(
         BACnet::PDUTypes::ConfirmedRequest->construct(
-            invoke_id       => $self->{id},
+            invoke_id       => $invoke_id,
             service_choice  => 'SubscribeCOV',
             service_request =>
               BACnet::ServiceRequestSequences::SubscribeCOV::request(
@@ -302,11 +317,13 @@ sub unsubscribe {
         $packet,
         $subscription->{host_ip},
         $subscription->{peer_port},
-        ( on_response => $on_response )
+        ( on_response => $on_response, invoke_id => $invoke_id )
     );
 
+    $sub_res->get;
+
     if ( !defined $sub_res->result ) {
-        return ("subscription failed\n");
+        return ("unsubscription failed\n");
     }
 
     _remove_sub( $self, $subscription );
@@ -320,17 +337,18 @@ sub run {
 
 sub stop {
     my ($self) = @_;
-    $self->{socket}->{loop}->loop_stop;
+    $self->{socket}->_stop();
+}
+
+sub subscriptions {
+    my ($self) = @_;
+
+    $self->_clean_subs();
+    return @{ $self->{subs_ptr} };
 }
 
 sub DESTROY {
     my ($self) = @_;
-
-    my @unsubs = @{ $self->{subs_ptr} };
-
-    foreach my $unsub (@unsubs) {
-        unsubscribe( $self, $unsub );
-    }
 }
 
 1;
@@ -653,9 +671,11 @@ Example:
     $dev->stop();
 
 
-=head2 DESTROY()
+=head2 subscriptions()
 
-Automatically unsubscribes from active subscriptions.
+Returns list of active and less than 60 seconds expired subscriptions.
+
+=head2 DESTROY()
 
 =head1 DATA UNITS
 
@@ -710,6 +730,8 @@ The following methods are internal and not intended for external use:
 =item * C<_remove_sub>
 
 =item * C<_add_sub>
+
+=item * C<_invoke_id>
 
 =back
 

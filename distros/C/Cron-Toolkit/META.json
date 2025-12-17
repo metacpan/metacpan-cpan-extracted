@@ -60,6 +60,6 @@
          "web" : "https://github.com/nathanielgraham/cron-toolkit-perl"
       }
    },
-   "version" : 1,
+   "version" : 1.01,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

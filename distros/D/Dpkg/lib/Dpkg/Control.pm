@@ -138,8 +138,7 @@ Deprecated alias for CTRL_REPO_PKG.
 
 package Dpkg::Control 1.05;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     CTRL_UNKNOWN
@@ -305,7 +304,7 @@ sub set_options {
         $self->set_output_order(field_ordered_list($opts{type}));
     }
 
-    # Options set by the user override default values
+    # Options set by the user override default values.
     $$self->{$_} = $opts{$_} foreach keys %opts;
 }
 

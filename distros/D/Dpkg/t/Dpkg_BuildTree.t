@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 11;
 use Test::Dpkg qw(:paths);
@@ -25,7 +24,7 @@ use File::Spec::Functions qw(abs2rel);
 
 use Dpkg::File;
 
-use_ok('Dpkg::BuildTree');
+use ok 'Dpkg::BuildTree';
 
 my $tmpdir = test_get_temp_path();
 

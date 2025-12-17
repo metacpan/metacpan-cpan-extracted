@@ -14,7 +14,7 @@ use Data::Dumper;
 # Command-line arguments
 # -------------------------------------------------------------------
 
-if (@ARGV < 2) {
+if ( @ARGV < 2 ) {
     die "Usage: $0 <local_ip> <host_ip>\n";
 }
 
@@ -24,12 +24,12 @@ my $host_ip  = $ARGV[1];
 # -------------------------------------------------------------------
 
 sub dump {
-    my ( $device, $message, @rest ) = @_;
+    my ( $device, $message, $port, $ip ) = @_;
     print "Received message:\n", Dumper($message), "\n";
 }
 
 # Device initialization
-my %args = (
+my %args_dev = (
     addr  => $local_ip,
     sport => 47808,
     id    => 42,
@@ -46,7 +46,7 @@ my %args_read_prop = (
     on_response          => \&dump,
 );
 
-my $mydevice = BACnet::Device->new(%args);
+my $mydevice = BACnet::Device->new(%args_dev);
 
 $mydevice->read_property(%args_read_prop);
 

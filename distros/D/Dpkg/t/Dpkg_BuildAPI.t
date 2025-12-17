@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 17;
 use Test::Dpkg qw(:paths);
@@ -24,9 +23,7 @@ $ENV{DEB_HOST_ARCH} = 'amd64';
 use Dpkg::Control;
 use Dpkg::Control::Info;
 
-BEGIN {
-    use_ok('Dpkg::BuildAPI', qw(get_build_api reset_build_api));
-}
+use ok 'Dpkg::BuildAPI', qw(get_build_api reset_build_api);
 
 my $datadir = test_get_data_path();
 

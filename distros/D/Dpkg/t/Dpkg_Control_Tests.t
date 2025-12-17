@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 5;
 use Test::Dpkg qw(:paths);
 
-BEGIN {
-    use_ok('Dpkg::Control::Tests');
-}
+use ok 'Dpkg::Control::Tests';
 
 my $datadir = test_get_data_path();
 

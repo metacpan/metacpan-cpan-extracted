@@ -13,14 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 4;
 
-BEGIN {
-    use_ok('Dpkg::Getopt');
-}
+use ok 'Dpkg::Getopt';
 
 my @expect_argv;
 
@@ -28,11 +25,15 @@ my @expect_argv;
 @expect_argv = qw(-a -b foo -c var);
 is_deeply(\@ARGV, \@expect_argv, 'unbundle short options');
 
-@ARGV = normalize_options(args => [ qw(--option-a --option-b value --option-c=value) ]);
+@ARGV = normalize_options(
+    args => [ qw(--option-a --option-b value --option-c=value) ],
+);
 @expect_argv = qw(--option-a --option-b value --option-c value);
 is_deeply(\@ARGV, \@expect_argv, 'unbundle long options');
 
-@ARGV = normalize_options(args => [ qw(-aaa -bbb --option-a=oa -- --opt=arg -dval) ],
-                          delim => '--');
+@ARGV = normalize_options(
+    args => [ qw(-aaa -bbb --option-a=oa -- --opt=arg -dval) ],
+    delim => '--',
+);
 @expect_argv = qw(-a aa -b bb --option-a oa -- --opt=arg -dval);
 is_deeply(\@ARGV, \@expect_argv, 'unbundle options with delimiter');

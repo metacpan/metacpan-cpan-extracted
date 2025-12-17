@@ -1,6 +1,17 @@
 Revision history for e
 
 =================
+1.37 - 2025-12-16
+=================
+
+`p` and `np` now also use `$_` when no input.
+Can no do:
+   `p for  @list`
+   `p for grep { ... } @list`
+
+repl Tries to use e.
+
+=================
 1.36 - 2025-05-28
 =================
 

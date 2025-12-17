@@ -27,19 +27,19 @@ sub dump {
     print "get message: ", Dumper($message), "\n";
 }
 
-my %args = (
+my %args_dev = (
     addr  => $local_ip,
     sport => 47808,
     id    => 42,
 );
 
-my $mydevice = BACnet::Device->new(%args);
+my $mydevice = BACnet::Device->new(%args_dev);
 
 # ---------------------------------------------------------------
 # Subscription definitions
 # ---------------------------------------------------------------
 
-my %args1 = (
+my %args_sub1 = (
     obj_type                      => 0,
     obj_inst                      => 1,
     issue_confirmed_notifications => FALSE,
@@ -50,7 +50,7 @@ my %args1 = (
     on_response                   => \&dump,
 );
 
-my %args2 = (
+my %args_sub2 = (
     obj_type                      => 0,
     obj_inst                      => 2,
     issue_confirmed_notifications => TRUE,
@@ -61,17 +61,12 @@ my %args2 = (
     on_response                   => \&dump,
 );
 
-sub another_sub {
-    my ( $device, $message, @rest ) = @_;
-    $device->subscribe(%args1);
-}
-
 # ---------------------------------------------------------------
 # Perform subscriptions
 # ---------------------------------------------------------------
 
-my ($new_sub,  $error)  = $mydevice->subscribe(%args1);
-my ($new_sub2, $error2) = $mydevice->subscribe(%args2);
+my ($new_sub,  $error)  = $mydevice->subscribe(%args_sub1);
+my ($new_sub2, $error2) = $mydevice->subscribe(%args_sub2);
 
 # If needed, we could print errors:
 # print "Error: $error\n"   if defined $error;

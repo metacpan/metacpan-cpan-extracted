@@ -13,19 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
-use Test::More;
+use Test::More tests => 2606;
 use Test::Dpkg qw(:paths);
 
-BEGIN {
-    plan tests => 2606;
-
-    use_ok('Dpkg::Control::Types');
-    use_ok('Dpkg::Control::FieldsCore');
-    use_ok('Dpkg::Control');
-}
+use ok 'Dpkg::Control::Types';
+use ok 'Dpkg::Control::FieldsCore';
+use ok 'Dpkg::Control';
 
 #my $datadir = test_get_data_path();
 
@@ -483,9 +478,9 @@ is(field_get_default_value('Priority'), 'optional',
     'default value for Priority field');
 
 is(field_capitalize('invented-field'), 'Invented-Field',
-   'Field Invented-Field capitalization');
-ok(!field_is_official('invented-field'),
-   'Field Invented-Field is not official');
+    'Field Invented-Field capitalization');
+ok(! field_is_official('invented-field'),
+    'Field Invented-Field is not official');
 
 my %known_fields;
 foreach my $type (sort keys %fields) {
@@ -517,13 +512,13 @@ foreach my $type (sort keys %fields) {
             ok(field_is_allowed_in($field, $type),
                "Field $field allowed for type $fields{$type}->{name}");
         } else {
-            ok(!field_is_allowed_in($field, $type),
+            ok(! field_is_allowed_in($field, $type),
                "Field $field not allowed for type $fields{$type}->{name}");
         }
     }
 }
 
-# Check deb822 field parsers
+# Check deb822 field parsers.
 
 my $ctrl = Dpkg::Control->new(type => CTRL_DEB);
 

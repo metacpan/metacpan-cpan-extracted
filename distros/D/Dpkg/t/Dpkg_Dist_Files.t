@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 26;
 use Test::Dpkg qw(:paths);
 
-use_ok('Dpkg::Dist::Files');
+use ok 'Dpkg::Dist::Files';
 
 my $datadir = test_get_data_path();
 
@@ -190,7 +189,9 @@ FILES
 
 $dist->reset();
 $dist->load("$datadir/files-byhand") or error('cannot parse file');
-$dist->filter(remove => sub { $_[0]->{priority} eq 'optional' });
+$dist->filter(
+    remove => sub { $_[0]->{priority} eq 'optional' },
+);
 is($dist->output(), $expected, 'Filter remove priority optional');
 
 $expected = <<'FILES';
@@ -200,7 +201,9 @@ FILES
 
 $dist->reset();
 $dist->load("$datadir/files-byhand") or error('cannot parse file');
-$dist->filter(keep => sub { $_[0]->{priority} eq 'optional' });
+$dist->filter(
+    keep => sub { $_[0]->{priority} eq 'optional' },
+);
 is($dist->output(), $expected, 'Filter keep priority optional');
 
 $expected = <<'FILES';
@@ -209,6 +212,8 @@ FILES
 
 $dist->reset();
 $dist->load("$datadir/files-byhand") or error('cannot parse file');
-$dist->filter(remove => sub { $_[0]->{section} eq 'text' },
-              keep => sub { $_[0]->{priority} eq 'optional' });
+$dist->filter(
+    remove => sub { $_[0]->{section} eq 'text' },
+    keep => sub { $_[0]->{priority} eq 'optional' },
+);
 is($dist->output(), $expected, 'Filter remove section text, keep priority optional');

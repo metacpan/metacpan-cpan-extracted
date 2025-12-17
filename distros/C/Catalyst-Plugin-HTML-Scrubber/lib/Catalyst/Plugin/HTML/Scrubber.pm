@@ -1,5 +1,5 @@
 package Catalyst::Plugin::HTML::Scrubber;
-$Catalyst::Plugin::HTML::Scrubber::VERSION = '0.07';
+$Catalyst::Plugin::HTML::Scrubber::VERSION = '0.08';
 use Moose;
 use namespace::autoclean;
 
@@ -83,7 +83,7 @@ sub _scrub_recurse {
     # whether we should ignore, otherwise, do the needful
     if (ref $data eq 'HASH') {
         for my $key (keys %$data) {
-            if (!$c->_should_scrub_param($conf, $key)) {
+            if (!$c->_should_scrub_param($conf, $key, $data->{$key})) {
                 next;
             }
 
@@ -111,9 +111,12 @@ sub _scrub_recurse {
     } elsif (ref $data eq 'CODE') {
         $c->log->debug("Can't scrub a coderef!");
     } else {
-        # This shouldn't happen, as we should always start with a ref,
-        # and non-ref hash/array values should have been handled above.
-        $c->log->debug("Non-ref to scrub - should this happen?");
+        # Note that at this point we don't know what the param was called
+        # as we'll have called ourself with the value, but that's fine as
+        # name-based checks were already done; we do need to pass the
+        # value ($data) along to allow value-based ignore_values to work.
+        $data = $c->_scrub_value($conf, $data)
+            if $c->_should_scrub_param($conf, '', $data);
     }
 }
 
@@ -133,7 +136,7 @@ sub _scrub_value {
 }
 
 sub _should_scrub_param {
-    my ($c, $conf, $param) = @_;
+    my ($c, $conf, $param, $value) = @_;
     # If we only want to operate on certain params, do that checking
     # now...
     if ($conf && $conf->{ignore_params}) {
@@ -146,6 +149,22 @@ sub _should_scrub_param {
                 return if $param =~ $ignore_param;
             } else {
                 return if $param eq $ignore_param;
+            }
+        }
+    }
+
+    # For cases where there are legitimate values that HTML::Scrubber will
+    # munge... one example was an API where e.g. `<:100' would be eaten.
+    # To allow any param where a `<` is not followed by a `>` in the same
+    # param you could use qr{<[^]+$} or similar.
+    if ($conf && $conf->{ignore_values}) {
+        my $ignore_values = $conf->{ignore_values};
+        if (ref $ignore_values ne 'ARRAY') {
+            $ignore_values = [ $ignore_values ];
+        }
+        for my $ignore_value (@$ignore_values) {
+            if ($value =~ $ignore_value) {
+                return;
             }
         }
     }

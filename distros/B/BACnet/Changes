@@ -1,6 +1,14 @@
 Revision history for BACnet-Perl
 
+0.08 2025-12-13
+    - FIX: add ExtUtils::MakeMaker to CONFIGURE_REQUIRES
 
+0.07 2025-12-13
+    - FIX: add Future::AsyncAwait to PREREQ_PM
+    - FIX: async functions
+
+0.06 2025-12-13
+    - FIX: chaos in Changes 
 
 0.05 2025-12-13
     - FIX: remove Switch from module

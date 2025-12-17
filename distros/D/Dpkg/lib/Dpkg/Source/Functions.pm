@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Functions 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT_OK = qw(
     erasedir
@@ -69,16 +68,16 @@ sub fixperms {
     my ($mode, $modes_set);
     # Unfortunately tar insists on applying our umask _to the original
     # permissions_ rather than mostly-ignoring the original
-    # permissions.  We fix it up with chmod -R (which saves us some
+    # permissions. We fix it up with chmod -R (which saves us some
     # work) but we have to construct a u+/- string which is a bit
-    # of a palaver.  (Numeric doesn't work because we need [ugo]+X
-    # and [ugo]=<stuff> doesn't work because that unsets sgid on dirs.)
-    $mode = 0777 & ~umask;
+    # of a palaver. (Numeric does not work because we need [ugo]+X
+    # and [ugo]=<stuff> does not work because that unsets sgid on dirs.)
+    $mode = 0o777 & ~umask;
     for my $i (0 .. 2) {
         $modes_set .= ',' if $i;
         $modes_set .= qw(u g o)[$i];
         for my $j (0 .. 2) {
-            $modes_set .= $mode & (0400 >> ($i * 3 + $j)) ? '+' : '-';
+            $modes_set .= $mode & (0o400 >> ($i * 3 + $j)) ? '+' : '-';
             $modes_set .= qw(r w X)[$j];
         }
     }
@@ -92,7 +91,7 @@ sub fixperms {
 # but not necessarily ownership of those files.
 sub chmod_if_needed {
     my ($newperms, $pathname) = @_;
-    my $oldperms = (stat $pathname)[2] & 07777;
+    my $oldperms = (stat $pathname)[2] & 0o7777;
 
     return 1 if $oldperms == $newperms;
     return chmod $newperms, $pathname;
@@ -100,7 +99,7 @@ sub chmod_if_needed {
 
 # Touch the file and read the resulting mtime.
 #
-# If the file doesn't exist, create it, read the mtime and unlink it.
+# If the file does not exist, create it, read the mtime and unlink it.
 #
 # Use this instead of time() when the timestamp is going to be
 # used to set file timestamps. This avoids confusion when an
@@ -110,10 +109,10 @@ sub fs_time {
     my $is_temp = 0;
     if (not -e $file) {
         file_touch($file);
-	$is_temp = 1;
+        $is_temp = 1;
     } else {
-	utime(undef, undef, $file) or
-	    syserr(g_('cannot change timestamp for %s'), $file);
+        utime(undef, undef, $file) or
+            syserr(g_('cannot change timestamp for %s'), $file);
     }
     stat($file) or syserr(g_('cannot read timestamp from %s'), $file);
     my $mtime = (stat(_))[9];

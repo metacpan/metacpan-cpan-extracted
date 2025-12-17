@@ -13,19 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 28;
 
 use Dpkg::ErrorHandling;
 
-use_ok('Dpkg::BuildOptions');
+use ok 'Dpkg::BuildOptions';
 
 {
     no warnings; ## no critic (TestingAndDebugging::ProhibitNoWarnings)
-    # Disable warnings related to invalid values fed during
-    # the tests
+    # Disable warnings related to invalid values fed during the tests.
     report_options(quiet_warnings => 1);
 }
 
@@ -38,7 +36,7 @@ ok($dbo->has('foonostripbar'), 'has foonostripbar');
 is($dbo->get('foonostripbar'), undef, 'foonostripbar value');
 ok($dbo->has('parallel'), 'has parallel');
 is($dbo->get('parallel'), 3, 'parallel value');
-ok(!$dbo->has('bazNOCHECK'), 'not has bazNOCHECK');
+ok(! $dbo->has('bazNOCHECK'), 'not has bazNOCHECK');
 
 $dbo->reset();
 $dbo->merge('no opt no-strip parallel = 5 nocheck', 'test');

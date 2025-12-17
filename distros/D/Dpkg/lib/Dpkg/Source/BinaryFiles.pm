@@ -31,8 +31,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::BinaryFiles 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Cwd;
 use File::Path qw(make_path);
@@ -144,7 +143,7 @@ sub detect_binary_files {
         my %exclude;
         my $reldir = File::Spec->abs2rel($File::Find::dir, $self->{dir});
         my $cwd = getcwd();
-        # Apply the pattern both from the top dir and from the inspected dir
+        # Apply the pattern both from the top dir and from the inspected dir.
         chdir $self->{dir}
             or syserr(g_("unable to chdir to '%s'"), $self->{dir});
         $exclude{$_} = 1 foreach glob $exclude_glob;
@@ -161,8 +160,12 @@ sub detect_binary_files {
         }
         return @result;
     };
-    find({ wanted => $check_binary, preprocess => $filter_ignore,
-           no_chdir => 1 }, File::Spec->catdir($self->{dir}, 'debian'));
+    my $scan_binaries = {
+        wanted => $check_binary,
+        preprocess => $filter_ignore,
+        no_chdir => 1,
+    };
+    find($scan_binaries, File::Spec->catdir($self->{dir}, 'debian'));
     error(P_('detected %d unwanted binary file (add it in ' .
              'debian/source/include-binaries to allow its inclusion).',
              'detected %d unwanted binary files (add them in ' .

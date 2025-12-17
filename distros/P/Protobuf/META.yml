@@ -1,0 +1,47 @@
+---
+abstract: "Namespace reservation for Google's Protocol Buffers"
+author:
+  - 'C.J. Collier <cjac@colliertech.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.08'
+  Test::Valgrind: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Protobuf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/protocolbuffers/protobuf/issues
+  repository: https://github.com/protocolbuffers/protobuf.git
+version: '0.001'
+x_clean:
+  FILES: 'Protobuf-* blib'
+x_copyright:
+  holder: 'Google LLC and contributors'
+  year: 2025
+x_dist:
+  COMPRESS: 'gzip -9f'
+  SUFFIX: gz
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

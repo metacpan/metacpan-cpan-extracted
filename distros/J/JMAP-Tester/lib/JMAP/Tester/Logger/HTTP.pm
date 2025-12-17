@@ -1,9 +1,11 @@
 use v5.14.0;
-package JMAP::Tester::Logger::HTTP 0.108;
+package JMAP::Tester::Logger::HTTP 0.109;
 
 use Moo;
 
 use namespace::clean;
+
+use experimental 'signatures';
 
 my %counter;
 
@@ -42,7 +44,7 @@ JMAP::Tester::Logger::HTTP
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 PERL VERSION
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**App-dozo** is a generic Docker runner that simplifies running commands in Docker containers. The name "dozo" comes from the Japanese word meaning "please" or "go ahead", and also stands for "Docker with Zero Overhead". It's a Perl distribution that includes a Bash script (`script/dozo`) as the main executable.
+**App-dozo** is a generic Docker runner that simplifies running commands in Docker containers. The product name is **Dôzo**, which comes from the Japanese word "dôzo" (どうぞ) meaning "please" or "go ahead", and also stands for "**D**ocker with **Z**ero **O**verhead". The command name is `dozo` for ease of typing. It's a Perl distribution that includes a Bash script (`script/dozo`) as the main executable.
 
 The tool automatically handles tedious Docker configuration (volumes, environment variables, working directories, interactive terminal settings), allowing users to focus on the command they want to run. It's git-friendly, automatically mounting the git top directory when available.
 
@@ -140,8 +140,8 @@ Release hooks keep these synchronized. When updating version, update `lib/App/do
 
 ### Relationship to App::Greple::xlate
 
-While dozo was originally developed as part of App::Greple::xlate for Docker-based translation workflows, it's designed to work standalone. The script can find `getoptlong.sh` either:
+While Dôzo was originally developed as part of App::Greple::xlate for Docker-based translation workflows, it's designed to work standalone. The script can find `getoptlong.sh` either:
 1. Via `File::Share::dist_dir('App-dozo')` if installed
 2. In PATH as a fallback
 
-This allows dozo to be used independently as a general-purpose Docker runner.
+This allows Dôzo to be used independently as a general-purpose Docker runner.

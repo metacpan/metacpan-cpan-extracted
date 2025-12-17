@@ -13,13 +13,6 @@ use threads::shared;
 sub new
 {
     my ($class, %args) = @_;
-        #$obj_type,
-        #$obj_inst,
-        #$issue_confirmed_notifications,
-        #$lifetime_in,
-        #$host_ip,
-        #$peer_port,
-        #$on_COV) = @_; #TODO add param for onCOV
 
     my $lifetime;
 
@@ -41,7 +34,7 @@ sub new
         obj_type => $args{obj_type},
         obj_inst => $args{obj_inst},
         issue_confirmed_notifications => $args{issue_confirmed_notifications},
-        lifetime => $lifetime, #time of death
+        lifetime => $lifetime, #time of death in unix standard time
         host_ip => $args{host_ip},
         peer_port => $args{peer_port},
         on_COV => $args{on_COV}

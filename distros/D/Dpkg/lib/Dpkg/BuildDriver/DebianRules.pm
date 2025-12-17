@@ -30,8 +30,9 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::BuildDriver::DebianRules 0.01;
 
-use strict;
-use warnings;
+use v5.36;
+
+use Errno qw(ENOENT);
 
 use Dpkg ();
 use Dpkg::Gettext;
@@ -59,7 +60,7 @@ sub new {
         ctrl => $opts{ctrl},
         root_cmd => $opts{root_cmd} // [],
         as_root => $opts{as_root},
-        debian_rules => $opts{debian_rules},
+        debian_rules => $opts{debian_rules} // [ 'debian/rules' ],
         rrr_override => $opts{rrr_override},
     };
     bless $self, $class;
@@ -136,9 +137,10 @@ sub _parse_rules_requires_root {
                 error(g_('disallowed target in %s field keyword %s'),
                       'Rules-Requires-Root', $keyword)
                     if $target_official{$1};
-            } elsif ($keyword =~ m{^dpkg/(.*)$} and $1 ne 'target-subcommand') {
+            } elsif ($keyword =~ m{^dpkg/(.*)$}) {
                 error(g_('%s field keyword "%s" is unknown in dpkg namespace'),
-                      'Rules-Requires-Root', $keyword);
+                      'Rules-Requires-Root', $keyword)
+                    if $1 ne 'target-subcommand';
             }
             $keywords_impl++;
         } else {
@@ -220,11 +222,23 @@ and if not then make it so.
 sub pre_check {
     my $self = shift;
 
-    if (@{$self->{debian_rules}} == 1 && ! -x $self->{debian_rules}[0]) {
-        warning(g_('%s is not executable; fixing that'),
-                $self->{debian_rules}[0]);
-        # No checks of failures, non fatal.
-        chmod 0755, $self->{debian_rules}[0];
+    if (@{$self->{debian_rules}} == 1) {
+        my $rules = $self->{debian_rules}[0];
+
+        my @sb = lstat $rules;
+        if (@sb == 0) {
+            syserr(g_('cannot stat %s'), $rules) if $! != ENOENT;
+            warning(g_('%s does not exist'), $rules);
+        } elsif (-f _) {
+            if (! -x _) {
+                warning(g_('%s is not executable; fixing that'), $rules);
+
+                chmod($sb[2] | 0o111, $rules)
+                    or syserr(g_('cannot make %s executable'), $rules);
+            }
+        } else {
+            warning(g_('%s is not a plain file'), $rules);
+        }
     }
 }
 

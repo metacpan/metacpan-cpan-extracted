@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
+use v5.36;
 
 eval {
     require Module::Build;
@@ -21,7 +20,7 @@ my $class = Module::Build->subclass(
         require IPC::Cmd;
 
         sub find_command {
-            my (@alts) = @_;
+            my @alts = @_;
 
             foreach my $cmd (@alts) {
                 my $pathname = IPC::Cmd::can_run($cmd);
@@ -84,7 +83,7 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.22.21',
+    dist_version    => '1.23.0',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 
@@ -150,7 +149,7 @@ my $build = $class->new(
 
     },
     requires => {
-        'perl'                  => '5.32.1',
+        'perl'                  => '5.36.0',
     },
 
     data_files => {

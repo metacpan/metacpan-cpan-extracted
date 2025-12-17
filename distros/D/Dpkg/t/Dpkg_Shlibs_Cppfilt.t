@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
 use Test::Dpkg qw(:needs);
@@ -23,15 +22,14 @@ use Config;
 
 test_needs_command('c++filt');
 
-if (defined $Config{bin_ELF} && $Config{bin_ELF} eq 'define') {
-    plan tests => 154;
-} else {
+if (! defined $Config{bin_ELF} || $Config{bin_ELF} ne 'define') {
     plan skip_all => 'only ELF is currently supported';
 }
+plan tests => 154;
 
 use_ok('Dpkg::Shlibs::Cppfilt');
 
-# Simple C++ demangling tests
+# Simple C++ demangling tests.
 is(cppfilt_demangle_cpp('_ZNSt10istrstreamC1EPKcl'),
     'std::istrstream::istrstream(char const*, long)',
     'demangle symbol');
@@ -106,7 +104,7 @@ END
 
 for my $try (1 .. 7) {
     for my $i (0 .. $#mangledtext) {
-	my $demangled = cppfilt_demangle_cpp($mangledtext[$i]) || $mangledtext[$i];
-	is($demangled, $demangledtext[$i], "mass c++ demangling (${try}x" . (${i} + 1) . ')');
+        my $demangled = cppfilt_demangle_cpp($mangledtext[$i]) || $mangledtext[$i];
+        is($demangled, $demangledtext[$i], "mass c++ demangling (${try}x" . (${i} + 1) . ')');
     }
 }

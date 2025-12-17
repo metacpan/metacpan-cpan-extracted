@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
-use Test::Dpkg qw(:needs);
+use Test::Dpkg qw(:needs :paths);
 
 test_needs_author();
 test_needs_module('Test::Spelling');
@@ -27,7 +26,7 @@ if (qx(aspell dicts) !~ m/en_US/) {
     plan skip_all => 'aspell en_US dictionary required for spell checking POD';
 }
 
-test_needs_srcdir_switch();
+test_chdir_srcdir();
 
 my @files = Test::Dpkg::all_perl_files();
 
@@ -100,6 +99,7 @@ modelines
 multiarch
 nocheck
 objdump
+portably
 qa
 quiesced
 reportfile

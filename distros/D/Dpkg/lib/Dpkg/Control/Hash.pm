@@ -28,12 +28,12 @@ field knowledge.
 
 package Dpkg::Control::Hash 1.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
-use Dpkg::Control::Fields; # Force execution of vendor hook.
+# Force execution of vendor hook.
+use Dpkg::Control::Fields;
 
 use parent qw(Dpkg::Control::HashCore);
 

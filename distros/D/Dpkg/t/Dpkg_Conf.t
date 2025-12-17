@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 9;
 use Test::Dpkg qw(:paths);
 
-BEGIN {
-    use_ok('Dpkg::Conf');
-}
+use ok 'Dpkg::Conf';
 
 my $datadir = test_get_data_path();
 
@@ -62,7 +59,10 @@ $count = $conf->load("$datadir/config-mixed");
 is($count, 15, 'Load a config file, mixed options');
 
 @opts = $conf->get_options();
-my @expected_mixed_opts = ( @expected_long_opts, @expected_short_opts );
+my @expected_mixed_opts = (
+    @expected_long_opts,
+    @expected_short_opts,
+);
 is_deeply(\@opts, \@expected_mixed_opts, 'Parse mixed options');
 
 my $expected_mixed_output = <<'MIXED';
@@ -95,7 +95,9 @@ FILTER
 
 $conf = Dpkg::Conf->new(allow_short => 1);
 $conf->load("$datadir/config-mixed");
-$conf->filter(remove => sub { $_[0] =~ m/^--option/ });
+$conf->filter(
+    remove => sub { $_[0] =~ m/^--option/ },
+);
 is($conf->output, $expected_filter, 'Filter remove');
 
 $expected_filter = <<'FILTER';
@@ -105,7 +107,9 @@ FILTER
 
 $conf = Dpkg::Conf->new(allow_short => 1);
 $conf->load("$datadir/config-mixed");
-$conf->filter(keep => sub { $_[0] =~ m/^--option-[a-z]+-quotes/ });
+$conf->filter(
+    keep => sub { $_[0] =~ m/^--option-[a-z]+-quotes/ },
+);
 is($conf->output, $expected_filter, 'Filter keep');
 
 $expected_filter = <<'FILTER';
@@ -114,6 +118,8 @@ FILTER
 
 $conf = Dpkg::Conf->new(allow_short => 1);
 $conf->load("$datadir/config-mixed");
-$conf->filter(remove => sub { $_[0] =~ m/^--option/ },
-              keep => sub { $_[0] =~ m/^--/ });
+$conf->filter(
+    remove => sub { $_[0] =~ m/^--option/ },
+    keep => sub { $_[0] =~ m/^--/ },
+);
 is($conf->output, $expected_filter, 'Filter keep and remove');

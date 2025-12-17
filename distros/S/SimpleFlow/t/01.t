@@ -79,9 +79,22 @@ dies_ok { # Gemini helped
 		cmd => 'ls ' . $fh->filename, # ls on a non-existent file
 	});
 } '"task" dies when it should';
+dies_ok {
+	task({
+		'input.files' => '',
+		cmd           => 'which cp'
+	});
+} '"task" dies when given empty filenames to "input.files" which it should';
+dies_ok {
+	task({
+		'output.files' => '',
+		cmd           => 'which cp'
+	});
+} '"task" dies when given empty filenames to "output.files" which it should';
 sleep 1;
 my $mod0 = -M $fname;
 say "\$mod0 = $mod0";
+say "\$fname = $fname";
 $r = task({
 	cmd            => "which ln > $fname",
 	overwrite      => 'true',
@@ -98,9 +111,28 @@ if (
 	p $r;
 	die 'output files are not overwritten when "overwrite" is true"';
 }
+#my $global_fh = 0;
+#$fh = File::Temp->new(UNLINK => 0, DIR => '/tmp');
+#set_fh($fh);
+#my $luke_11_1 = 'Καὶ ἐγένετο ἐν τῷ εἶναι αὐτὸν';
+#$r = task({ # does NOT specify log.fh, but knows it anyway
+#	cmd    => "echo '$luke_11_1'"
+#});
+#my $logname = $fh->filename;
+#say "wrote to $logname";
+#close $fh;
+#open $fh, '<', $logname;
+#while (<$fh>) {
+#	next unless m/$luke_11_1/;
+#	$global_fh = 1;
+#	last;
+#}
+#close $fh;
+#die 'Could not get text verifying "our" from ' if $global_fh == 0;
 ok($simple_task, 'Verified: Simple task works');
 ok($log_write,   'Verified: Can write to log files with subroutine "say2"');
 ok($stopping,    'Verified: tasks do not run when output files exist');
 ok($dry_run,     'Verified: dry run works');
 ok($overwrite,   'Verified: "overwrite" option overwrites files in "output.files"');
+#ok($global_fh,   'Verified: "set_fh" sets global filehandle.');
 done_testing();

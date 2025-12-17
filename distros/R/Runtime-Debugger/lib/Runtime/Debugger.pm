@@ -21,7 +21,14 @@ use 5.018;
 use strict;
 use warnings FATAL => 'all';
 use Data::Dumper;
-use Data::Printer use_prototypes => 0;
+use Data::Printer(
+    use_prototypes => 0,
+    show_dualvar   => "off",
+    hash_separator => " => ",
+    end_separator  => 1,
+    show_refcount  => 1,
+    alias          => '_p',     # Avoids using 'p' for printing.
+);
 use Term::ReadLine;
 use Term::ANSIColor qw( colored );
 use PadWalker       qw( peek_our  peek_my );
@@ -31,10 +38,10 @@ use YAML::XS();
 use re      qw( eval );       # For debug.
 use feature qw( say );
 use parent  qw( Exporter );
-use subs    qw( uniq );
+use subs    qw( _uniq p );
 
-our $VERSION = '1.11';
-our @EXPORT  = qw( run repl d dd np p );
+our $VERSION = '1.12';
+our @EXPORT  = qw( repl dd d p );
 our %PEEKS;
 
 =head1 NAME
@@ -365,44 +372,6 @@ So something like this:
 
 # API
 
-=head2 run
-
-DEPRECATED! (Use C<repl> instead)
-
-Runs the REPL.
-
- eval run
-
-Sets C<$@> to the exit reason like
-'INT' (Control-C) or 'q' (Normal exit/quit).
-
-Note: This method is more stable than repl(), but at the same
-time has limits. L<See also|/Lossy undef Variable>
-
-=cut
-
-sub run {
-    <<'CODE';
-
-######################################
-#            REPL CODE
-######################################
-use strict;
-use warnings;
-use feature qw(say);
-my $repl = Runtime::Debugger->_init;
-local $@;
-eval {          # Catch loop exit.
-    while ( 1 ) {
-        eval $repl->_step;
-        $repl->_show_error($@) if $@;
-    }
-};
-$repl->_show_error($@) if $@;
-######################################
-CODE
-}
-
 =head2 repl
 
 Works like eval, but without L<the lossy bug|/Lossy undef Variable>
@@ -441,6 +410,8 @@ sub repl {
 sub _init {
     my ( $class, %args ) = @_;
 
+    $class->_init_e_support();
+
     # Setup the terminal.
     $Term::ReadLine::Gnu::has_been_initialized = 0;
     my $term    = Term::ReadLine->new( $class );
@@ -478,6 +449,13 @@ sub _init {
     }
 
     $self;
+}
+
+sub _init_e_support {
+    if ( eval { require e } ) {
+        local $SIG{__WARN__} = sub { };
+        e->import();
+    }
 }
 
 sub _setup_vars {
@@ -520,7 +498,7 @@ sub _set_peeks {
     # Get just the variable names.
     my @vars_lexical = keys %$peek_my;
     my @vars_global  = keys %$peek_our;
-    my @vars_all     = uniq @vars_lexical, @vars_global;
+    my @vars_all     = _uniq @vars_lexical, @vars_global;
 
     $self->{peek_my}      = $peek_my;
     $self->{peek_our}     = $peek_our;
@@ -664,7 +642,7 @@ sub _normalize_var_defaults {
 
     # Make sure all "vars_*" are defined, sorted, and uniq:
     for ( @vars ) {
-        $self->{$_} = [ uniq sort @{ $self->{$_} // [] } ];
+        $self->{$_} = [ _uniq sort @{ $self->{$_} // [] } ];
     }
 
 }
@@ -932,32 +910,6 @@ sub _to_peek {
     $val;
 }
 
-sub _step {
-    my ( $repl ) = @_;
-
-    # Show help when first loading the debugger.
-    if ( not $repl->{step_counter}++ ) {
-        $repl->help;
-    }
-
-    my $input = $repl->term->readline( "perl>" ) // '';
-    say "input_after_readline=[$input]" if $repl->debug;
-
-    # Change "COMMAND ARG" to "$repl->COMMAND(ARG)".
-    $input =~ s/ ^
-        (
-              help
-            | hist
-        ) \b
-        (.*)
-    $ /\$repl->$1($2)/x;
-
-    $repl->_exit( $input ) if $input eq 'q';
-
-    say "input_after_step=[$input]" if $repl->debug;
-    $input;
-}
-
 sub _repl_step {
     my ( $repl ) = @_;
 
@@ -1104,7 +1056,7 @@ sub _complete_arrow {
             # push @$methods, "(";    # Access as method or hash refs.
             push @$methods, "{" if reftype( $obj_or_coderef ) eq "HASH";
             push @$methods, @{ $self->{vars_string} };
-            @$methods = uniq sort @$methods;
+            @$methods = _uniq sort @$methods;
         }
         say "methods: @$methods" if $self->debug >= 2;
 
@@ -1260,12 +1212,12 @@ sub _dump_args {
 
 sub _define_commands {
     (
-        "help",    # Changed in _step to $repl->help().
-        "hist",    # Changed in _step to $repl->hist().
-        "p",       # From Data::Printer and exporting it.
+        "help",    # Changed in _repl_step to $repl->help().
+        "hist",    # Changed in _repl_step to $repl->hist().
+        "p",       # Pretty printer.
         "d",       # Exporting it.
         "dd",      # Exporting it.
-        "q",       # Used in _step to stop the repl.
+        "q",       # Used in _repl_step to stop the repl.
     );
 }
 
@@ -1398,7 +1350,7 @@ sub _history {
     # Getter.
     # Last command should be the first you see upon hiting arrow up
     # and also without any duplicates.
-    my @history = reverse uniq reverse $self->term->GetHistory;
+    my @history = reverse _uniq reverse $self->term->GetHistory;
     pop @history
       if @history and $history[-1] eq "q";    # Don't record quit command.
 
@@ -1501,11 +1453,16 @@ Some example uses:
  p \%hash
  p $object
 
-=cut
+=cut 
+
+sub p {
+    my @args = @_ ? @_ : ( $_ );
+    _p( @args );
+}
 
 # Misc
 
-=head2 uniq
+=head2 _uniq
 
 Returns a unique list of elements.
 
@@ -1514,7 +1471,7 @@ provide a unique function.
 
 =cut
 
-sub uniq (@) {
+sub _uniq (@) {
     my %h;
     grep { not $h{$_}++ } @_;
 }

@@ -5,7 +5,6 @@ package BACnet::DataTypes::Bone;
 use warnings;
 use strict;
 
-use Data::Dumper;
 
 use BACnet::DataTypes::Utils;
 

@@ -28,8 +28,7 @@ This class represent a set of L<Dpkg::Control> objects.
 
 package Dpkg::Index 3.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -56,17 +55,17 @@ sub new {
     my $class = ref($this) || $this;
 
     my $self = {
-	items => {},
-	order => [],
-	unique_tuple_key => 1,
-	get_key_func => sub { return $_[0]->{Package} },
-	type => CTRL_UNKNOWN,
+        items => {},
+        order => [],
+        unique_tuple_key => 1,
+        get_key_func => sub { return $_[0]->{Package} },
+        type => CTRL_UNKNOWN,
         item_opts => {},
     };
     bless $self, $class;
     $self->set_options(%opts);
     if (exists $opts{load}) {
-	$self->load($opts{load});
+        $self->load($opts{load});
     }
 
     return $self;
@@ -160,17 +159,17 @@ otherwise it is the Package field by default.
 sub set_options {
     my ($self, %opts) = @_;
 
-    # Default values based on type
+    # Default values based on type.
     if (exists $opts{type}) {
         my $t = $opts{type};
         if ($t == CTRL_TMPL_PKG) {
-	    $self->{get_key_func} = sub { return $_[0]->{Package}; };
+            $self->{get_key_func} = sub { return $_[0]->{Package}; };
         } elsif ($t == CTRL_TMPL_SRC) {
-	    $self->{get_key_func} = sub { return $_[0]->{Source}; };
+            $self->{get_key_func} = sub { return $_[0]->{Source}; };
         } elsif ($t == CTRL_CHANGELOG) {
-	    $self->{get_key_func} = sub {
-		return $_[0]->{Source} . '_' . $_[0]->{Version};
-	    };
+            $self->{get_key_func} = sub {
+                return $_[0]->{Source} . '_' . $_[0]->{Version};
+            };
         } elsif ($t == CTRL_COPYRIGHT_HEADER) {
             # This is a bit pointless, because the value will almost always
             # be the same, but guarantees that we use a known field.
@@ -205,20 +204,20 @@ sub set_options {
                 };
             }
         } elsif ($t == CTRL_FILE_CHANGES) {
-	    $self->{get_key_func} = sub {
-		return $_[0]->{Source} . '_' . $_[0]->{Version} . '_' .
-		       $_[0]->{Architecture};
-	    };
+            $self->{get_key_func} = sub {
+                return $_[0]->{Source} . '_' . $_[0]->{Version} . '_' .
+                       $_[0]->{Architecture};
+            };
         } elsif ($t == CTRL_FILE_VENDOR) {
-	    $self->{get_key_func} = sub { return $_[0]->{Vendor}; };
+            $self->{get_key_func} = sub { return $_[0]->{Vendor}; };
         } elsif ($t == CTRL_FILE_STATUS) {
-	    $self->{get_key_func} = sub {
-		return $_[0]->{Package} . '_' . $_[0]->{Architecture};
-	    };
+            $self->{get_key_func} = sub {
+                return $_[0]->{Package} . '_' . $_[0]->{Architecture};
+            };
         }
     }
 
-    # Options set by the user override default values
+    # Options set by the user override default values.
     $self->{$_} = $opts{$_} foreach keys %opts;
 }
 
@@ -247,7 +246,7 @@ sub add {
 
     $key //= $self->{get_key_func}($item);
     if (not exists $self->{items}{$key}) {
-	push @{$self->{order}}, $key;
+        push @{$self->{order}}, $key;
     }
     $self->{items}{$key} = $item;
 }
@@ -266,9 +265,9 @@ sub parse {
     my $item = $self->new_item();
     my $i = 0;
     while ($item->parse($fh, $desc)) {
-	$self->add($item);
-	$item = $self->new_item();
-	$i++;
+        $self->add($item);
+        $item = $self->new_item();
+        $i++;
     }
     return $i;
 }
@@ -288,7 +287,11 @@ object.
 
 sub new_item {
     my $self = shift;
-    return Dpkg::Control->new(%{$self->{item_opts}}, type => $self->{type});
+
+    return Dpkg::Control->new(
+        %{$self->{item_opts}},
+        type => $self->{type},
+    );
 }
 
 =item $item = $index->get_by_key($key)
@@ -316,22 +319,24 @@ that must be equal to the field value.
 sub get_keys {
     my ($self, %crit) = @_;
     my @selected = @{$self->{order}};
-    foreach my $s_crit (keys %crit) { # search criteria
-	if (ref($crit{$s_crit}) eq 'Regexp') {
-	    @selected = grep {
-		exists $self->{items}{$_}{$s_crit} and
-		       $self->{items}{$_}{$s_crit} =~ $crit{$s_crit}
-	    } @selected;
-	} elsif (ref($crit{$s_crit}) eq 'CODE') {
-	    @selected = grep {
-		$crit{$s_crit}->($self->{items}{$_}{$s_crit});
-	    } @selected;
-	} else {
-	    @selected = grep {
-		exists $self->{items}{$_}{$s_crit} and
-		       $self->{items}{$_}{$s_crit} eq $crit{$s_crit}
-	    } @selected;
-	}
+
+    # Search criteria.
+    foreach my $s_crit (keys %crit) {
+        if (ref($crit{$s_crit}) eq 'Regexp') {
+            @selected = grep {
+                exists $self->{items}{$_}{$s_crit} and
+                       $self->{items}{$_}{$s_crit} =~ $crit{$s_crit}
+            } @selected;
+        } elsif (ref($crit{$s_crit}) eq 'CODE') {
+            @selected = grep {
+                $crit{$s_crit}->($self->{items}{$_}{$s_crit});
+            } @selected;
+        } else {
+            @selected = grep {
+                exists $self->{items}{$_}{$s_crit} and
+                       $self->{items}{$_}{$s_crit} eq $crit{$s_crit}
+            } @selected;
+        }
     }
     return @selected;
 }
@@ -370,9 +375,9 @@ sub remove {
     my @keys = $self->get_keys(%crit);
     my (%keys, @ret);
     foreach my $key (@keys) {
-	$keys{$key} = 1;
-	push @ret, $self->{items}{$key} if defined wantarray;
-	delete $self->{items}{$key};
+        $keys{$key} = 1;
+        push @ret, $self->{items}{$key} if defined wantarray;
+        delete $self->{items}{$key};
     }
     @{$self->{order}} = grep { not exists $keys{$_} } @{$self->{order}};
     return @ret;
@@ -401,7 +406,7 @@ sub merge {
     my ($self, $other, %opts) = @_;
     $opts{keep_keys} //= 1;
     foreach my $key ($other->get_keys()) {
-	$self->add($other->get_by_key($key), $opts{keep_keys} ? $key : undef);
+        $self->add($other->get_by_key($key), $opts{keep_keys} ? $key : undef);
     }
 }
 
@@ -416,11 +421,11 @@ items themselves as parameters and not the keys.
 sub sort {
     my ($self, $func) = @_;
     if (defined $func) {
-	@{$self->{order}} = sort {
-	    $func->($self->{items}{$a}, $self->{items}{$b})
-	} @{$self->{order}};
+        @{$self->{order}} = sort {
+            $func->($self->{items}{$a}, $self->{items}{$b})
+        } @{$self->{order}};
     } else {
-	@{$self->{order}} = sort @{$self->{order}};
+        @{$self->{order}} = sort @{$self->{order}};
     }
 }
 
@@ -441,12 +446,12 @@ sub output {
     my ($self, $fh) = @_;
     my $str = '';
     foreach my $key ($self->get_keys()) {
-	if (defined $fh) {
-	    print { $fh } $self->get_by_key($key) . "\n";
-	}
-	if (defined wantarray) {
-	    $str .= $self->get_by_key($key) . "\n";
-	}
+        if (defined $fh) {
+            print { $fh } $self->get_by_key($key) . "\n";
+        }
+        if (defined wantarray) {
+            $str .= $self->get_by_key($key) . "\n";
+        }
     }
     return $str;
 }

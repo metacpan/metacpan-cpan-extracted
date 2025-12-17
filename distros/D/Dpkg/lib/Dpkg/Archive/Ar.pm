@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Archive::Ar 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Carp;
 use Fcntl qw(:seek);
@@ -329,7 +328,7 @@ sub extract_member {
 
     $self->_copy_fh_fh({ fh => $self->{fh}, name => $self->{filename} },
                        { fh => $ofh, name => $member->{name} },
-                      $member->{size});
+                       $member->{size});
 
     $ofh->close()
         or syserr(g_('cannot write file %s to the filesystem'),
@@ -384,7 +383,7 @@ sub add_file {
         name => $filename,
         size => $size,
         time => $self->{time},
-        mode => 0100644,
+        mode => 0o100644,
         uid => 0,
         gid => 0,
     );

@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::OpenPGP::Backend::GnuPG 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use POSIX qw(:sys_wait_h);
 use File::Basename;
@@ -87,7 +86,7 @@ sub get_trusted_keyrings {
     }
 
     my @keyrings;
-    foreach my $keyring (qw(trustedkeys.kbx trustedkeys.gpg)) {
+    foreach my $keyring (qw(trustedkeys.gpg trustedkeys.kbx)) {
         push @keyrings, "$keystore/$keyring" if -r "$keystore/$keyring";
     }
     return @keyrings;
@@ -98,8 +97,14 @@ sub _gpg_exec
     my ($self, @exec) = @_;
 
     my ($stdout, $stderr);
-    spawn(exec => \@exec, wait_child => 1, nocheck => 1, timeout => 10,
-          to_string => \$stdout, error_to_string => \$stderr);
+    spawn(
+        exec => \@exec,
+        wait_child => 1,
+        no_check => 1,
+        timeout => 10,
+        to_string => \$stdout,
+        error_to_string => \$stderr,
+    );
     if (WIFEXITED($?)) {
         my $status = WEXITSTATUS($?);
         print { *STDERR } "$stdout$stderr" if $status;
@@ -117,12 +122,32 @@ sub _gpg_options_weak_digests {
     return @gpg_weak_digests;
 }
 
+sub _file_is_keybox($file)
+{
+    my $header;
+
+    open my $fh, '<', $file
+        or syserr(g_('cannot open %s'), $file);
+    my $rc = read $fh, $header, 32;
+    if (! defined $rc || $rc != 32) {
+        syserr(g_('cannot read %s'), $file);
+    }
+    close $fh;
+
+    my ($lead, $magic) = unpack 'a8a4', $header;
+
+    return $magic eq 'KBXf';
+}
+
 sub _gpg_verify {
     my ($self, $signeddata, $sig, $data, @certs) = @_;
 
     return OPENPGP_MISSING_CMD if ! $self->has_verify_cmd();
 
-    my $gpg_home = File::Temp->newdir('dpkg-gpg-verify.XXXXXXXX', TMPDIR => 1);
+    my $gpg_home = File::Temp->newdir(
+        TEMPLATE => 'dpkg-gpg-verify.XXXXXXXX',
+        TMPDIR => 1,
+    );
 
     my @exec;
     if ($self->{cmdv}) {
@@ -137,15 +162,22 @@ sub _gpg_verify {
     push @exec, _gpg_options_weak_digests();
     push @exec, '--homedir', $gpg_home;
     foreach my $cert (@certs) {
-        my $certring = File::Temp->new(UNLINK => 1, SUFFIX => '.pgp');
+        my $certring = File::Temp->new(
+            UNLINK => 1,
+            SUFFIX => '.pgp',
+        );
         my $rc;
-        if ($cert =~ m{\.kbx$}) {
-            # Accept GnuPG apparent keybox-format keyrings as-is.
+        if ($cert =~ m{\.kbx$} || _file_is_keybox($cert)) {
+            # Accept GnuPG apparent or real keybox-format keyrings as-is, but
+            # warn that they are deprecated.
             $rc = 1;
+            warning(g_('using GnuPG specific KeyBox formatted keyring %s is deprecated; ' .
+                       'use an OpenPGP formatted keyring instead'),
+                    $cert);
         } else {
-            # Note that these _pgp_* functions are only necessary while relying on
-            # gpgv, and gpgv itself does not verify multiple signatures correctly
-            # (see https://bugs.debian.org/1010955).
+            # Note that these _pgp_* functions are only necessary while
+            # relying on gpgv, and gpgv itself does not verify multiple
+            # signatures correctly (see https://bugs.debian.org/1010955).
             $rc = $self->dearmor('PUBLIC KEY BLOCK', $cert, $certring);
         }
         $certring = $cert if $rc;
@@ -166,11 +198,15 @@ sub _gpg_verify {
 sub inline_verify {
     my ($self, $inlinesigned, $data, @certs) = @_;
 
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
+
     return $self->_gpg_verify($inlinesigned, undef, $data, @certs);
 }
 
 sub verify {
     my ($self, $data, $sig, @certs) = @_;
+
+    return OPENPGP_MISSING_KEYRINGS if @certs == 0;
 
     return $self->_gpg_verify($data, $sig, undef, @certs);
 }
@@ -178,7 +214,10 @@ sub verify {
 sub _gpg_fixup_newline {
     my $origfile = shift;
 
-    my $signdir = File::Temp->newdir('dpkg-sign.XXXXXXXX', TMPDIR => 1);
+    my $signdir = File::Temp->newdir(
+        TEMPLATE => 'dpkg-sign.XXXXXXXX',
+        TMPDIR => 1,
+    );
     my $signfile = $signdir . q(/) . basename($origfile);
 
     copy($origfile, $signfile);
@@ -218,7 +257,10 @@ sub inline_sign {
     if ($key->type eq 'keyfile') {
         # Promote the keyfile keyhandle to a keystore, this way we share the
         # same gpg-agent and can get any password cached.
-        my $gpg_home = File::Temp->newdir('dpkg-sign.XXXXXXXX', TMPDIR => 1);
+        my $gpg_home = File::Temp->newdir(
+            TEMPLATE => 'dpkg-sign.XXXXXXXX',
+            TMPDIR => 1,
+        );
 
         push @exec, '--homedir', $gpg_home;
         $self->_gpg_exec(@exec, qw(--quiet --no-tty --batch --import), $key->handle);

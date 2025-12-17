@@ -28,10 +28,9 @@ CTRL_* constants exported by L<Dpkg::Control>.
 
 =cut
 
-package Dpkg::Control::FieldsCore 1.03;
+package Dpkg::Control::FieldsCore 1.04;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     field_capitalize
@@ -979,7 +978,7 @@ our %FIELD_ORDER = (
         ),
     ],
     CTRL_FILE_STATUS() => [
-        # Same as fieldinfos in lib/dpkg/parse.c
+        # Same as fieldinfos in «lib/dpkg/parse.c».
         qw(
             package
             essential
@@ -1057,7 +1056,7 @@ sub field_capitalize {
     # Use known fields first.
     return $FIELDS{$field}{name} if exists $FIELDS{$field};
 
-    # Generic case
+    # Generic case.
     return join '-', map { ucfirst } split /-/, $field;
 }
 
@@ -1094,7 +1093,8 @@ sub field_is_allowed_in {
 
     return 0 if not scalar(@types);
     foreach my $type (@types) {
-        next if $type == CTRL_UNKNOWN; # Always allowed
+        # Unknown control type is always allowed.
+        next if $type == CTRL_UNKNOWN;
         return 0 unless $FIELDS{$field}{allowed} & $type;
     }
     return 1;
@@ -1122,12 +1122,6 @@ added to $to otherwise.
 
 sub field_transfer_single {
     my ($from, $to, $field) = @_;
-    if (not defined $field) {
-        warnings::warnif('deprecated',
-            'using Dpkg::Control::Fields::field_transfer_single() with an ' .
-            'an implicit field argument is deprecated');
-        $field = $_;
-    }
     my ($from_type, $to_type) = ($from->get_type(), $to->get_type());
     $field = field_capitalize($field);
 
@@ -1136,6 +1130,12 @@ sub field_transfer_single {
         return $field;
     } elsif ($field =~ /^X([SBC]*)-/i) {
         my $dest = $1;
+
+        if ($dest =~ /SC/i and $from_type == CTRL_TMPL_PKG) {
+            warning(g_('non-sensical field export rules (%s) in field %s in ' .
+                       'binary stanza from source package template control file'),
+                    $dest, $field);
+        }
         if (($dest =~ /B/i and $to_type == CTRL_DEB) or
             ($dest =~ /S/i and $to_type == CTRL_DSC) or
             ($dest =~ /C/i and $to_type == CTRL_FILE_CHANGES))
@@ -1145,12 +1145,12 @@ sub field_transfer_single {
             $to->{$new} = $from->{$field};
             return $new;
         } elsif ($to_type != CTRL_DEB and
-		 $to_type != CTRL_DSC and
-		 $to_type != CTRL_FILE_CHANGES)
-	{
-	    $to->{$field} = $from->{$field};
-	    return $field;
-	}
+                 $to_type != CTRL_DSC and
+                 $to_type != CTRL_FILE_CHANGES)
+        {
+            $to->{$field} = $from->{$field};
+            return $field;
+        }
     } elsif (not field_is_allowed_in($field, $from_type)) {
         warning(g_("unknown information field '%s' in input data in %s"),
                 $field, $from->get_option('name') || g_('control information'));
@@ -1204,7 +1204,7 @@ from the binary version.
 Returns a list with the $source name, and the source $version, or undef
 or an empty list when $ctrl does not contain a binary package control stanza.
 Neither $source nor $version are validated, but that can be done with
-Dpkg::Package::pkg_name_is_illegal() and Dpkg::Version::version_check().
+Dpkg::Package::pkg_name_is_invalid() and Dpkg::Version::version_check().
 
 =cut
 
@@ -1291,8 +1291,8 @@ Breaks, ...). Returns undef for fields which are not dependencies.
 sub field_get_dep_type {
     my $field = lc shift;
 
-    return unless exists $FIELDS{$field};
-    return $FIELDS{$field}{dependency} if exists $FIELDS{$field}{dependency};
+    return $FIELDS{$field}{dependency}
+        if exists $FIELDS{$field} && exists $FIELDS{$field}{dependency};
     return;
 }
 
@@ -1306,7 +1306,8 @@ FIELD_SEP_SPACE, FIELD_SEP_COMMA or FIELD_SEP_LINE.
 sub field_get_sep_type {
     my $field = lc shift;
 
-    return $FIELDS{$field}{separator} if exists $FIELDS{$field}{separator};
+    return $FIELDS{$field}{separator}
+        if exists $FIELDS{$field} && exists $FIELDS{$field}{separator};
     return FIELD_SEP_UNKNOWN;
 }
 
@@ -1320,7 +1321,8 @@ then it returns "undef".
 sub field_get_default_value {
     my $field = lc shift;
 
-    return $FIELDS{$field}{default} if exists $FIELDS{$field}{default};
+    return $FIELDS{$field}{default}
+        if exists $FIELDS{$field} && exists $FIELDS{$field}{default};
     return;
 }
 
@@ -1391,6 +1393,10 @@ sub field_insert_before {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.04 (dpkg 1.23.0)
+
+Remove argument: field_transfer_single() implicit argument usage.
 
 =head2 Version 1.03 (dpkg 1.22.12)
 

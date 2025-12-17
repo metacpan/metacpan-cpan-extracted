@@ -1,0 +1,68 @@
+{
+   "abstract" : "cpanm, with some sort of distroprefs",
+   "author" : [
+      "Gianni Ceccarelli <dakkar@thenautilus.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-CpanDak",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.1101"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::cpanminus" : "< 1.7900",
+            "CPAN::Meta::YAML" : "0",
+            "Carp" : "0",
+            "mro" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Path::Tiny" : "0",
+            "Test2::Tools::LoadModule" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://www.thenautilus.net/cgit/app-cpandak/",
+         "web" : "https://www.thenautilus.net/cgit/app-cpandak/"
+      }
+   },
+   "version" : "0.0.2",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

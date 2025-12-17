@@ -214,9 +214,11 @@ Example:
 
     $dev->stop();
 
-## DESTROY()
+## subscriptions()
 
-Automatically unsubscribes from active subscriptions.
+Returns list of active and less than 60 seconds expired subscriptions.
+
+## DESTROY()
 
 # DATA UNITS
 
@@ -250,6 +252,7 @@ The following methods are internal and not intended for external use:
 - `_clean_subs`
 - `_remove_sub`
 - `_add_sub`
+- `_invoke_id`
 
 # AUTHOR
 

@@ -1,0 +1,14 @@
+.perlcriticrc
+.perltidyrc
+lib/Protobuf.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/02-namespace_autoclean.t
+t/03-moo_immutable.t
+xt/01-critic.t
+xt/98-pod.t
+xt/98-pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

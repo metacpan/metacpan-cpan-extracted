@@ -11,7 +11,6 @@ data/tupletable
 lib/Dpkg.pm
 lib/Dpkg/Arch.pm
 lib/Dpkg/Archive/Ar.pm
-lib/Dpkg/Build/Info.pm
 lib/Dpkg/BuildAPI.pm
 lib/Dpkg/BuildDriver.pm
 lib/Dpkg/BuildDriver/DebianRules.pm
@@ -90,6 +89,7 @@ lib/Dpkg/Source/Package/V3/Quilt.pm
 lib/Dpkg/Source/Patch.pm
 lib/Dpkg/Source/Quilt.pm
 lib/Dpkg/Substvars.pm
+lib/Dpkg/SysInfo.pm
 lib/Dpkg/Vendor.pm
 lib/Dpkg/Vendor/Debian.pm
 lib/Dpkg/Vendor/Default.pm
@@ -242,9 +242,11 @@ t/Dpkg_Source_Patch/partial.patch
 t/Dpkg_Source_Quilt.t
 t/Dpkg_Source_Quilt/parse/debian/patches/series
 t/Dpkg_Substvars.t
+t/Dpkg_Substvars/substvars-impl
 t/Dpkg_Substvars/substvars-req
 t/Dpkg_Substvars/substvars1
 t/Dpkg_Substvars/substvars2
+t/Dpkg_SysInfo.t
 t/Dpkg_Vendor.t
 t/Dpkg_Version.t
 t/minimum-version.t

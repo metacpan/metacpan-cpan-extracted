@@ -107,7 +107,23 @@ DESCRIPTION
           );
 
         Type constraints are likely to siginificantly slow down your
-        constructor.
+        constructor, apart from the following type constraints defined in
+        Types::Common which are recognized and handled via a pure C codepath:
+
+        *   These basic types:
+
+            Any, Item, Defined, Ref, Bool, Int, PositiveOrZeroInt, Num,
+            PositiveOrZeroNum, Str, NonEmptyStr, ClassName, Object, ScalarRef,
+            and CodeRef.
+
+        *   ArrayRef and ArrayRef[x] where x is any of the basic types listed
+            above.
+
+        *   HashRef and HashRef[x] where x is any of the basic types listed
+            above.
+
+        So for example, a type check for ArrayRef[PositiveOrZeroInt should be
+        very fast.
 
         When multiple attributes fail their type check, the constructor will
         only report the first one it encountered, based on the order the
@@ -248,29 +264,8 @@ API
 
   Use of Package Variables
     Class::XSConstructor stores its configuration for class Foo in a bunch of
-    package variables with the prefix `Foo::__XSCON_`.
-
-    The only supported use of these variables that you may need to be aware of
-    is:
-
-    $Foo::__XSCON_BUILD
-        If set to "0", indicates that XSConstructor should not try to call
-        `BUILD` methods for the class (probably because there are none, so it
-        would be a waste of time scanning through the inheritance tree looking
-        for them).
-
-        If set to an arrayref of coderefs, these will be the methods which the
-        constructor calls.
-
-        If set to undef, the constructor will populate this method with either
-        the value "0" or an arrayref of coderefs next time it is called.
-
-        Any other value is invalid.
-
-    $Foo::__XSCON_STRICT
-        If set to true, indicates that XSConstructor should use a "strict"
-        constructor, which complains about the presence of any unrecognized
-        keys in the init args hashref.
+    package variables with the prefix `Foo::__XSCON_`. If you tamper with
+    those, your warranty will be void.
 
 CAVEATS
     Inheritance will automatically work if you are inheriting from another

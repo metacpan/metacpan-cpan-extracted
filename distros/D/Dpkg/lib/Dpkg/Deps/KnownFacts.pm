@@ -34,8 +34,7 @@ packages provided (by the set of installed packages).
 
 package Dpkg::Deps::KnownFacts 2.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Version;
 
@@ -107,9 +106,9 @@ sub add_provided_package {
     push @{$self->{virtualpkg}{$pkg}}, $v;
 }
 
-##
-## The functions below are private to Dpkg::Deps::KnownFacts.
-##
+## Private functions.
+#
+# Note: The functions below are private to Dpkg::Deps::KnownFacts.
 
 sub _find_package {
     my ($self, $dep, $lackinfos) = @_;

@@ -26,6 +26,7 @@ t/argjson_cli.t
 t/arithmetic.t
 t/array_constructor.t
 t/arrays.t
+t/ascii_output_cli.t
 t/assignment.t
 t/avg_by.t
 t/base64_format.t

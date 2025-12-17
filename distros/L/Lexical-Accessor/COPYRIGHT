@@ -3,14 +3,6 @@ Upstream-Name: Lexical-Accessor
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Lexical-Accessor
 
-Files: INSTALL
- LICENSE
- Makefile.PL
- TODO
- examples/benchmark.pl
-Copyright: Unknown
-License: Unknown
-
 Files: Changes
  META.json
  META.yml
@@ -27,6 +19,14 @@ Files: t/01basic.t
 Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ TODO
+ examples/benchmark.pl
+Copyright: Unknown
+License: Unknown
+
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
@@ -38,24 +38,24 @@ Files: README
 Copyright: This software is copyright (c) 2013-2014, 2017, 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/rt101024.t
-Copyright: This software is copyright (c) 2017 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/90subclassing.t
-Copyright: This software is copyright (c) 2014 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/30shv.t
-Copyright: Copyright 2022 Toby Inkster.
+Files: lib/Sub/Accessor/Small.pm
+Copyright: This software is copyright (c) 2013-2014, 2017, 2020, 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Sub/Accessor/Small.pm
-Copyright: This software is copyright (c) 2013-2014, 2017, 2020, 2025 by Toby Inkster.
+Files: t/30shv.t
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/90subclassing.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/rt101024.t
+Copyright: This software is copyright (c) 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

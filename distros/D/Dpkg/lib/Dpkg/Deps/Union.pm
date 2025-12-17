@@ -34,8 +34,7 @@ It inherits from L<Dpkg::Deps::Multiple>.
 
 package Dpkg::Deps::Union 1.00;
 
-use strict;
-use warnings;
+use v5.36;
 
 use parent qw(Dpkg::Deps::Multiple);
 
@@ -93,8 +92,7 @@ sub simplify_deps {
     my ($self, $facts) = @_;
     my @new;
 
-WHILELOOP:
-    while (@{$self->{list}}) {
+    WHILELOOP: while (@{$self->{list}}) {
         my $odep = shift @{$self->{list}};
         foreach my $dep (@new) {
             next WHILELOOP if $dep->merge_union($odep);

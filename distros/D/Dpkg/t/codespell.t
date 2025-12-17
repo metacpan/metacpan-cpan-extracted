@@ -13,50 +13,48 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More;
-use Test::Dpkg qw(:needs);
+use Test::Dpkg qw(:needs :paths);
 
 test_needs_author();
 test_needs_command('codespell');
-test_needs_srcdir_switch();
-
 plan tests => 1;
 
+test_chdir_srcdir();
+
 my @codespell_skip = qw(
-  .git
-  *.po
-  *.pot
-  *.gmo
-  *.add
-  *.cache
-  *.policy
-  *~
-  .libs
-  .deps
-  ChangeLog
-  Makefile.in
-  Makefile
-  configure
-  config.*
-  libtool
-  libtool.m4
-  aclocal.m4
-  autom4te.cache
-  _build
-  build-aux
-  build-tree
-  tmp
+    .git
+    *.po
+    *.pot
+    *.gmo
+    *.add
+    *.cache
+    *.policy
+    *~
+    .libs
+    .deps
+    ChangeLog
+    Makefile.in
+    Makefile
+    configure
+    config.*
+    libtool
+    libtool.m4
+    aclocal.m4
+    autom4te.cache
+    _build
+    build-aux
+    build-tree
+    tmp
 );
 my $codespell_skip = join ',', @codespell_skip;
 
-my @codespell_opts = (qw(
-  --ignore-words=t/codespell/stopwords
-), (
-  "--skip=$codespell_skip"
-));
+my @codespell_opts = (
+    '--ignore-words=t/codespell/stopwords',
+    "--skip=$codespell_skip",
+);
 my $tags = qx(codespell @codespell_opts 2>&1);
 
 # Fixup the output:

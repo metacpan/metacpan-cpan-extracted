@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.36
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.37
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 =head1 SYNOPSIS
 
@@ -1182,7 +1182,8 @@ sub import {
                     show_refcount  => 1,
                 );
             }
-            p( @_ );
+            my @args = @_ ? @_ : ( $_ );
+            p( @args );
         },
         np => sub {
             if ( !$imported{$caller}{"Data::Printer"}++ ) {
@@ -1195,7 +1196,8 @@ sub import {
                     show_refcount  => 1,
                 );
             }
-            np( @_ );
+            my @args = @_ ? @_ : ( $_ );
+            np( @args );
         },
 
         # Dumper.

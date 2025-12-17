@@ -31,8 +31,7 @@ DEB_BUILD_MAINT_OPTIONS.
 
 package Dpkg::BuildOptions 1.02;
 
-use strict;
-use warnings;
+use v5.36;
 
 use List::Util qw(any);
 
@@ -68,8 +67,8 @@ sub new {
 
     my $self = {
         options => {},
-	source => {},
-	envvar => $opts{envvar} // 'DEB_BUILD_OPTIONS',
+        source => {},
+        envvar => $opts{envvar} // 'DEB_BUILD_OPTIONS',
     };
     bless $self, $class;
     $self->merge(Dpkg::BuildEnv::get($self->{envvar}), $self->{envvar});
@@ -104,12 +103,12 @@ sub merge {
     return 0 unless defined $content;
     my $count = 0;
     foreach (split(/\s+/, $content)) {
-	unless (/^([a-z][a-z0-9_-]*)(?:=(\S*))?$/) {
+        unless (/^([a-z][a-z0-9_-]*)(?:=(\S*))?$/) {
             warning(g_('invalid flag in %s: %s'), $source, $_);
             next;
         }
         ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
-	$count += $self->set($1, $2, $source);
+        $count += $self->set($1, $2, $source);
     }
     return $count;
 }
@@ -130,12 +129,12 @@ discarded.
 sub set {
     my ($self, $key, $value, $source) = @_;
 
-    # Sanity checks
+    # Sanity checks.
     if (any { $_ eq $key } qw(terse noopt nostrip nocheck) and defined $value) {
-	$value = undef;
+        $value = undef;
     } elsif ($key eq 'parallel')  {
-	$value //= '';
-	return 0 if $value !~ /^\d*$/;
+        $value //= '';
+        return 0 if $value !~ /^\d*$/;
     }
 
     $self->{options}{$key} = $value;

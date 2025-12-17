@@ -72,8 +72,7 @@ able to open another file.
 
 package Dpkg::Compression::FileHandle 1.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Carp;
 
@@ -84,9 +83,9 @@ use Dpkg::ErrorHandling;
 
 use parent qw(IO::File Tie::Handle);
 
-# Useful reference to understand some kludges required to
-# have the class behave like a filehandle
-# http://blog.woobling.org/2009/10/are-filehandles-objects.html
+# Useful reference to understand some kludges required to have the class
+# behave like a filehandle:
+#   <http://blog.woobling.org/2009/10/are-filehandles-objects.html>
 
 =head1 STANDARD FUNCTIONS
 
@@ -140,29 +139,30 @@ obviously incompatible with automatic detection of the compression method.
 
 =cut
 
-# Class methods
+## Class methods.
+
 sub new {
     my ($this, %opts) = @_;
     my $class = ref($this) || $this;
     my $self = IO::File->new();
     # Tying is required to overload the open functions and to auto-open
-    # the file on first read/write operation
+    # the file on first read/write operation.
     tie *$self, $class, $self; ## no critic (Miscellanea::ProhibitTies)
     bless $self, $class;
-    # Initializations
+    # Initializations.
     *$self->{compression} = 'auto';
     *$self->{compressor} = Dpkg::Compression::Process->new();
     *$self->{add_comp_ext} = $opts{add_compression_extension} ||
         $opts{add_comp_ext} || 0;
     *$self->{allow_sigpipe} = 0;
     if (exists $opts{filename}) {
-	$self->set_filename($opts{filename});
+        $self->set_filename($opts{filename});
     }
     if (exists $opts{compression}) {
-	$self->set_compression($opts{compression});
+        $self->set_compression($opts{compression});
     }
     if (exists $opts{compression_level}) {
-	$self->set_compression_level($opts{compression_level});
+        $self->set_compression_level($opts{compression_level});
     }
     return $self;
 }
@@ -179,28 +179,27 @@ is already open but not in the requested mode, then it errors out.
 sub ensure_open {
     my ($self, $mode, %opts) = @_;
     if (exists *$self->{mode}) {
-	return if *$self->{mode} eq $mode;
-	croak "ensure_open requested incompatible mode: $mode";
+        return if *$self->{mode} eq $mode;
+        croak "ensure_open requested incompatible mode: $mode";
     } else {
-	# Sanitize options.
-	delete $opts{from_pipe};
-	delete $opts{from_file};
-	delete $opts{to_pipe};
-	delete $opts{to_file};
+        # Sanitize options.
+        delete $opts{from_pipe};
+        delete $opts{from_file};
+        delete $opts{to_pipe};
+        delete $opts{to_file};
 
-	if ($mode eq 'w') {
-	    $self->_open_for_write(%opts);
-	} elsif ($mode eq 'r') {
-	    $self->_open_for_read(%opts);
-	} else {
-	    croak "invalid mode in ensure_open: $mode";
-	}
+        if ($mode eq 'w') {
+            $self->_open_for_write(%opts);
+        } elsif ($mode eq 'r') {
+            $self->_open_for_read(%opts);
+        } else {
+            croak "invalid mode in ensure_open: $mode";
+        }
     }
 }
 
-##
-## METHODS FOR TIED HANDLE
-##
+## Tied handle methods.
+
 sub TIEHANDLE {
     my ($class, $self) = @_;
     return $self;
@@ -219,7 +218,7 @@ sub READ {
 }
 
 sub READLINE {
-    my ($self) = shift;
+    my $self = shift;
     $self->ensure_open('r');
     return *$self->{file}->getlines() if wantarray;
     return *$self->{file}->getline();
@@ -230,20 +229,21 @@ sub OPEN {
 
     if (scalar @args == 2) {
         my ($mode, $filename) = @args;
-	$self->set_filename($filename);
-	if ($mode eq '>') {
-	    $self->_open_for_write();
-	} elsif ($mode eq '<') {
-	    $self->_open_for_read();
-	} else {
-	    croak 'Dpkg::Compression::FileHandle does not support ' .
-	          "open() mode $mode";
-	}
+        $self->set_filename($filename);
+        if ($mode eq '>') {
+            $self->_open_for_write();
+        } elsif ($mode eq '<') {
+            $self->_open_for_read();
+        } else {
+            croak 'Dpkg::Compression::FileHandle does not support ' .
+                  "open() mode $mode";
+        }
     } else {
-	croak 'Dpkg::Compression::FileHandle only supports open() ' .
-	      'with 3 parameters';
+        croak 'Dpkg::Compression::FileHandle only supports open() ' .
+              'with 3 parameters';
     }
-    return 1; # Always works (otherwise errors out)
+    # Always works (otherwise errors out).
+    return 1;
 }
 
 sub CLOSE {
@@ -252,7 +252,7 @@ sub CLOSE {
     if (defined *$self->{file}) {
         $ret = *$self->{file}->close(@args) if *$self->{file}->opened();
     } else {
-	$ret = 0;
+        $ret = 0;
     }
     $self->_cleanup();
     return $ret;
@@ -295,9 +295,7 @@ sub BINMODE {
     return;
 }
 
-##
-## NORMAL METHODS
-##
+## Normal methods.
 
 =item $fh->set_compression($comp)
 
@@ -311,7 +309,7 @@ on the filename extension used.
 sub set_compression {
     my ($self, $method) = @_;
     if ($method ne 'none' and $method ne 'auto') {
-	*$self->{compressor}->set_compression($method);
+        *$self->{compressor}->set_compression($method);
     }
     *$self->{compression} = $method;
 }
@@ -340,14 +338,14 @@ of the compression method must be automatically added to the filename
 sub set_filename {
     my ($self, $filename, $add_comp_ext) = @_;
     *$self->{filename} = $filename;
-    # Automatically add compression extension to filename
+    # Automatically add compression extension to filename.
     if (defined($add_comp_ext)) {
-	*$self->{add_comp_ext} = $add_comp_ext;
+        *$self->{add_comp_ext} = $add_comp_ext;
     }
     my $comp_ext_regex = compression_get_file_extension_regex();
     if (*$self->{add_comp_ext} and $filename =~ /\.$comp_ext_regex$/) {
-	warning('filename %s already has an extension of a compressed file ' .
-	        'and add_comp_ext is active', $filename);
+        warning('filename %s already has an extension of a compressed file ' .
+                'and add_comp_ext is active', $filename);
     }
 }
 
@@ -365,17 +363,17 @@ sub get_filename {
     my $self = shift;
     my $comp = *$self->{compression};
     if (*$self->{add_comp_ext}) {
-	if ($comp eq 'auto') {
-	    croak 'automatic detection of compression is ' .
-	          'incompatible with add_comp_ext';
-	} elsif ($comp eq 'none') {
-	    return *$self->{filename};
-	} else {
-	    return *$self->{filename} . '.' .
-	           compression_get_file_extension($comp);
-	}
+        if ($comp eq 'auto') {
+            croak 'automatic detection of compression is ' .
+                  'incompatible with add_comp_ext';
+        } elsif ($comp eq 'none') {
+            return *$self->{filename};
+        } else {
+            return *$self->{filename} . '.' .
+                   compression_get_file_extension($comp);
+        }
     } else {
-	return *$self->{filename};
+        return *$self->{filename};
     }
 }
 
@@ -392,10 +390,10 @@ sub use_compression {
     my $self = shift;
     my $comp = *$self->{compression};
     if ($comp eq 'none') {
-	return 0;
+        return 0;
     } elsif ($comp eq 'auto') {
-	$comp = compression_guess_from_filename($self->get_filename());
-	*$self->{compressor}->set_compression($comp) if $comp;
+        $comp = compression_guess_from_filename($self->get_filename());
+        *$self->{compressor}->set_compression($comp) if $comp;
     }
     return $comp;
 }
@@ -412,7 +410,7 @@ sub get_filehandle {
     return *$self->{file} if exists *$self->{file};
 }
 
-## INTERNAL METHODS
+## Internal methods.
 
 sub _open_for_write {
     my ($self, %opts) = @_;
@@ -422,11 +420,14 @@ sub _open_for_write {
         if exists *$self->{mode};
 
     if ($self->use_compression()) {
-	*$self->{compressor}->compress(from_pipe => \$filehandle,
-            to_file => $self->get_filename(), %opts);
+        *$self->{compressor}->compress(
+            from_pipe => \$filehandle,
+            to_file => $self->get_filename(),
+            %opts,
+        );
     } else {
-	CORE::open($filehandle, '>', $self->get_filename)
-	    or syserr(g_('cannot write %s'), $self->get_filename());
+        CORE::open($filehandle, '>', $self->get_filename)
+            or syserr(g_('cannot write %s'), $self->get_filename());
     }
     *$self->{mode} = 'w';
     *$self->{file} = $filehandle;
@@ -440,12 +441,15 @@ sub _open_for_read {
         if exists *$self->{mode};
 
     if ($self->use_compression()) {
-	*$self->{compressor}->uncompress(to_pipe => \$filehandle,
-		from_file => $self->get_filename(), %opts);
+        *$self->{compressor}->uncompress(
+            to_pipe => \$filehandle,
+            from_file => $self->get_filename(),
+            %opts,
+        );
         *$self->{allow_sigpipe} = 1;
     } else {
-	CORE::open($filehandle, '<', $self->get_filename)
-	    or syserr(g_('cannot read %s'), $self->get_filename());
+        CORE::open($filehandle, '<', $self->get_filename)
+            or syserr(g_('cannot read %s'), $self->get_filename());
     }
     *$self->{mode} = 'r';
     *$self->{file} = $filehandle;
@@ -454,14 +458,16 @@ sub _open_for_read {
 sub _cleanup {
     my $self = shift;
     my $cmdline = *$self->{compressor}{cmdline} // '';
-    *$self->{compressor}->wait_end_process(nocheck => *$self->{allow_sigpipe});
+    *$self->{compressor}->wait_end_process(
+        no_check => *$self->{allow_sigpipe},
+    );
     if (*$self->{allow_sigpipe}) {
         require POSIX;
         unless (($? == 0) || (POSIX::WIFSIGNALED($?) &&
                               (POSIX::WTERMSIG($?) == POSIX::SIGPIPE()))) {
             subprocerr($cmdline);
         }
-	*$self->{allow_sigpipe} = 0;
+        *$self->{allow_sigpipe} = 0;
     }
     delete *$self->{mode};
     delete *$self->{file};
@@ -480,8 +486,8 @@ You can store internal data in a hash but you have to use
 C<*$self->{...}> to access the associated hash like in the example below:
 
     sub set_option {
-	my ($self, $value) = @_;
-	*$self->{option} = $value;
+        my ($self, $value) = @_;
+        *$self->{option} = $value;
     }
 
 =head1 CHANGES

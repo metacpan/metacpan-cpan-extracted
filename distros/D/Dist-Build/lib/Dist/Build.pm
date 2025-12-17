@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.023';
+$Dist::Build::VERSION = '0.024';
 use strict;
 use warnings;
 
@@ -158,7 +158,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

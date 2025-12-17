@@ -26,7 +26,7 @@
             "Data::Trace" : "1.05",
             "Mojolicious" : "0",
             "Parallel::ForkManager" : "0",
-            "Runtime::Debugger" : "1.10",
+            "Runtime::Debugger" : "1.12",
             "Set::Scalar" : "0",
             "Sub::Util" : "0",
             "Term::Table" : "0",
@@ -46,7 +46,7 @@
    "provides" : {
       "e" : {
          "file" : "lib/e.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "url" : "https://github.com/poti1/e"
       }
    },
-   "version" : "1.36",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.37",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

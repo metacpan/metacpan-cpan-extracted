@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Source::Package::V3::Custom 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -74,11 +73,11 @@ sub can_build {
 
 sub do_build {
     my ($self, $dir) = @_;
-    # Update real target format
+    # Update real target format.
     my $format = $self->{options}{target_format};
     error(g_('--target-format option is missing')) unless $format;
     $self->{fields}{'Format'} = $format;
-    # Add all files
+    # Add all files.
     foreach my $file (@{$self->{options}{ARGV}}) {
         $self->add_file($file);
     }

@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::Vendor::Devuan 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 use parent qw(Dpkg::Vendor::Debian);
 
@@ -39,12 +38,12 @@ sub run_hook {
     my ($self, $hook, @params) = @_;
 
     if ($hook eq 'package-keyrings') {
-        return ('/usr/share/keyrings/devuan-keyring.gpg',
-                '/usr/share/keyrings/devuan-maintainers.gpg');
+        return ('/usr/share/keyrings/devuan-keyring.pgp',
+                '/usr/share/keyrings/devuan-maintainers.pgp');
     } elsif ($hook eq 'archive-keyrings') {
-        return ('/usr/share/keyrings/devuan-archive-keyring.gpg');
+        return ('/usr/share/keyrings/devuan-archive-keyring.pgp');
     } elsif ($hook eq 'archive-keyrings-historic') {
-        return ('/usr/share/keyrings/devuan-archive-removed-keys.gpg');
+        return ('/usr/share/keyrings/devuan-archive-removed-keys.pgp');
     } elsif ($hook eq 'extend-patch-header') {
         my ($textref, $ch_info) = @params;
         if ($ch_info->{'Closes'}) {

@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::RJBS 5.033;
+package Dist::Zilla::PluginBundle::RJBS 5.034;
 # ABSTRACT: BeLike::RJBS when you build your dists
 
 use Moose;
@@ -65,7 +65,7 @@ use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git;
 
-package Dist::Zilla::Plugin::RJBSMisc 5.033 {
+package Dist::Zilla::Plugin::RJBSMisc 5.034 {
   use Moose;
   with 'Dist::Zilla::Role::BeforeBuild',
        'Dist::Zilla::Role::AfterBuild',
@@ -302,6 +302,13 @@ sub configure ($self) {
   );
 
   $self->add_plugins(
+    [ 'Test::Compile' => {
+      ($self->dont_compile->@* ? (skip => $self->dont_compile) : ()),
+      bail_out_on_fail => 1,
+    } ],
+  );
+
+  $self->add_plugins(
     [ Prereqs => 'TestMoreWithSubtests' => {
       -phase => 'test',
       -type  => 'requires',
@@ -365,7 +372,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.033
+version 5.034
 
 =head1 DESCRIPTION
 

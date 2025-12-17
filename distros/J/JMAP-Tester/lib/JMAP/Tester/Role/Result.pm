@@ -1,6 +1,6 @@
 use v5.20.0;
 use warnings;
-package JMAP::Tester::Role::Result 0.108;
+package JMAP::Tester::Role::Result 0.109;
 # ABSTRACT: the kind of thing that you get back for a request
 
 use Moo::Role;
@@ -84,7 +84,7 @@ JMAP::Tester::Role::Result - the kind of thing that you get back for a request
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 OVERVIEW
 

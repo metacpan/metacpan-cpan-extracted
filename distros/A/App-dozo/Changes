@@ -1,5 +1,12 @@
 Revision history for Perl extension App-dozo
 
+0.9925 2025-12-17T00:56:17Z
+
+    - rebrand to Dôzo with new stroke-based logo
+    - update logo with semi-transparent background for dark mode
+    - add INSTALLATION section to documentation
+    - fix CPAN Testers failures on non-Linux platforms
+
 0.9924 2025-12-15T12:27:06Z
 
     - add -n/--dryrun option for dry-run mode (show docker commands without executing)

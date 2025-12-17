@@ -30,8 +30,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::OpenPGP::ErrorCodes 0.01;
 
-use strict;
-use warnings;
+use v5.36;
 
 our @EXPORT = qw(
     OPENPGP_OK
@@ -54,6 +53,7 @@ our @EXPORT = qw(
     OPENPGP_MISSING_CMD
     OPENPGP_NEEDS_KEYSTORE
     OPENPGP_CMD_CANNOT_SIGN
+    OPENPGP_MISSING_KEYRINGS
 
     openpgp_errorcode_to_string
 );
@@ -62,7 +62,7 @@ use Exporter qw(import);
 
 use Dpkg::Gettext;
 
-# Error codes based on
+# Error codes based on:
 # https://ietf.org/archive/id/draft-dkg-openpgp-stateless-cli-10.html#section-7
 #
 # Local error codes use a negative number, as that should not conflict with
@@ -89,6 +89,7 @@ use constant {
     OPENPGP_MISSING_CMD => -1,
     OPENPGP_NEEDS_KEYSTORE => -2,
     OPENPGP_CMD_CANNOT_SIGN => -3,
+    OPENPGP_MISSING_KEYRINGS => -4,
 };
 
 my %code2error = (
@@ -112,6 +113,7 @@ my %code2error = (
     OPENPGP_MISSING_CMD() => N_('missing OpenPGP implementation'),
     OPENPGP_NEEDS_KEYSTORE() => N_('specified key needs a keystore'),
     OPENPGP_CMD_CANNOT_SIGN() => N_('OpenPGP backend command cannot sign'),
+    OPENPGP_MISSING_KEYRINGS() => N_('missing OpenPGP keyrings'),
 );
 
 sub openpgp_errorcode_to_string

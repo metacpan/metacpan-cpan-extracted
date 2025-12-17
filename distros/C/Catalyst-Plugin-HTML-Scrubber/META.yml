@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/bigpresh/Catalyst-Plugin-HTML-Scrubber/issues
   homepage: https://github.com/bigpresh/Catalyst-Plugin-HTML-Scrubber
   repository: git://github.com/bigpresh/Catalyst-Plugin-HTML-Scrubber.git
-version: '0.07'
+version: '0.08'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

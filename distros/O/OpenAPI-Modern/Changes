@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.116     2025-12-16 23:36:39Z
+          - the converted response object is now added to the optional hashref
+            used in validate_response()
+          - fix usage of --with-defaults in "openapi-validate'
+
 0.115     2025-12-14 20:15:30Z
           - drop the --document argument in "openapi-validate" in favour of
             @ARGV

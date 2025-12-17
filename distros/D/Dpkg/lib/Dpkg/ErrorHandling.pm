@@ -27,9 +27,7 @@ B<Note>: This is a private module, its API can change at any time.
 
 package Dpkg::ErrorHandling 0.02;
 
-use strict;
-use warnings;
-use feature qw(state);
+use v5.36;
 
 our @EXPORT_OK = qw(
     REPORT_PROGNAME
@@ -284,7 +282,7 @@ sub subprocerr
 
     if (POSIX::WIFEXITED($?)) {
         my $ret = POSIX::WEXITSTATUS($?);
-        error(g_('%s subprocess returned exit status %d'), $p, $ret);
+        error(g_('%s subprocess failed with exit status %d'), $p, $ret);
     } elsif (POSIX::WIFSIGNALED($?)) {
         my $sig = POSIX::WTERMSIG($?);
         error(g_('%s subprocess was killed by signal %d'), $p, $sig);

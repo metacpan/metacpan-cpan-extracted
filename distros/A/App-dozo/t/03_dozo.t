@@ -6,6 +6,14 @@ use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
 
+# Skip tests on platforms without bash
+BEGIN {
+    my $bash_check = `bash --version 2>&1`;
+    if ($? != 0) {
+        plan skip_all => 'bash is not available on this system';
+    }
+}
+
 my $dozo = File::Spec->rel2abs('script/dozo');
 my $getoptlong = File::Spec->rel2abs('share/getoptlong/getoptlong.sh');
 

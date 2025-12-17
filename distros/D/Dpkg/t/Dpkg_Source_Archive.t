@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 4;
 use Test::Dpkg qw(:paths);
@@ -22,9 +21,7 @@ use Test::Dpkg qw(:paths);
 use File::Spec;
 use File::Path qw(make_path);
 
-BEGIN {
-    use_ok('Dpkg::Source::Archive');
-}
+use ok 'Dpkg::Source::Archive';
 
 use Dpkg;
 use Dpkg::File;
@@ -77,9 +74,9 @@ sub test_path_escape
         )) == 0
         or die "cannot create overlay tar archive\n";
 
-   # This is the expected directory, which we'll be comparing against.
+    # This is the expected directory, which we'll be comparing against.
     make_path($expdir);
-    system('cp', '-a', $overdir, $expdir) == 0
+    system('cp', '-RPp', $overdir, $expdir) == 0
         or die "cannot copy overlay hierarchy into expected directory\n";
 
     # Store the expected and out reference directories into a tar to compare
@@ -108,13 +105,13 @@ sub test_path_escape
     # Store the result into a tar to compare its structure against a reference.
     system($Dpkg::PROGTAR, '-cf', "$treedir.tar", '-C', $treedir, '.');
 
-    # Check results
+    # Check results.
     ok(length $warnseen && $warnseen =~ m/points outside source root/,
-       'expected warning seen');
+        'expected warning seen');
     ok(system($Dpkg::PROGTAR, '--compare', '-f', "$expdir.tar", '-C', $treedir) == 0,
-       'expected directory matches');
+        'expected directory matches');
     ok(! -e "$outdir/escaped-file",
-       'expected output directory is empty, directory traversal');
+        'expected output directory is empty, directory traversal');
 }
 
 test_path_escape('in-place');

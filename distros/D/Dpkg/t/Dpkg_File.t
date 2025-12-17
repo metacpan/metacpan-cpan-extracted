@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use strict;
-use warnings;
+use v5.36;
 
 use Test::More tests => 10;
 use Test::Dpkg qw(:paths);
@@ -22,9 +21,7 @@ use Test::Dpkg qw(:paths);
 use File::Compare;
 use File::Path qw(rmtree);
 
-BEGIN {
-    use_ok('Dpkg::File');
-}
+use ok 'Dpkg::File';
 
 my $datadir = test_get_data_path();
 my $tempdir = test_get_temp_path();

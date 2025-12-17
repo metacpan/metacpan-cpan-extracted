@@ -242,23 +242,23 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI_3_0" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       },
       "OpenAPI::Modern::Utilities" : {
          "file" : "lib/OpenAPI/Modern/Utilities.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       }
    },
    "release_status" : "stable",
@@ -273,7 +273,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.115",
+   "version" : "0.116",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043005"
@@ -865,7 +865,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -989,7 +989,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                }
             },
@@ -1000,7 +1000,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                }
             },
@@ -1011,7 +1011,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                }
             },
@@ -1045,7 +1045,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                }
             },
@@ -1157,7 +1157,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1174,12 +1174,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.115",
+                  "tag" : "v0.116",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1229,7 +1229,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1260,7 +1260,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.52.0",
                   "repo_root" : "."
                }
             },
