@@ -1,4 +1,3 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -18,28 +17,32 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %_extra_data = (
     en => {
-        red      => [qw(fire america fox vixen squirrel blush error)],
-        green    => [qw(australia plant)],
+        red      => [qw(fire america fox vixen squirrel blush error tomato cherry strawberry)],
+        green    => [qw(australia plant nettle)],
         blue     => [qw(water sky ice europe male man men daddy dad father son brother boy)],
-        yellow   => [qw(lemon asia warning)],
+        yellow   => [qw(lemon asia warning banana pineapple)],
         magenta  => [qw(female woman women dame mother mom daughter sister girl pink)],
         grey     => [qw(gray mouse mice rat wolf)],
+        white    => [qw(sheep)],
         black    => [qw(africa)],
+        orange   => [qw(carrot)],
         savannah => [qw(savannah lion leo)],
         nocolour => [qw(proto group generator recommend coloured colored json)],
     },
     de => {
-        red      => [qw(feuer amerika fuchs fehler), "f\N{U+00FC}chsin", "eichh\N{U+00F6}rnschen"],
-        green    => [qw(australien pflanze)],
+        red      => [qw(feuer amerika fuchs fehler tomate kirsche erdbeer), "f\N{U+00FC}chsin", "eichh\N{U+00F6}rnschen"],
+        green    => [qw(australien pflanze nessel)],
         blue     => [qw(wasser himmel eis europa mann herr papa vater paps sohn bruder junge), "m\N{U+00E4}nnlich", "m\N{U+00E4}nnchen"],
-        yellow   => [qw(zitrone asien warnung)],
+        yellow   => [qw(zitrone asien warnung banane ananas)],
         magenta  => [qw(frau dame weiblich weib weibschen mutter mama tochter schwester pink), "m\N{U+00E4}dschen"],
         grey     => [qw(maus rat ratte ratten wolf), "m\N{U+00E4}use"],
+        white    => [qw(schaf)],
         black    => [qw(afrika)],
+        orange   => [qw(karotte)],
         savannah => [qw(savanne), "l\N{U+00F6}we", "l\N{U+00F6}win"],
     },
 );
@@ -562,7 +565,7 @@ Data::Displaycolour::Data - Work with display colours (internal data)
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -574,11 +577,11 @@ See L<Data::Displaycolour>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

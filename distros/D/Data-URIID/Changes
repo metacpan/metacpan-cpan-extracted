@@ -1,3 +1,7 @@
+v0.20  2025-12-18Z
+    - Improved documentation
+    - Added most basic support to look up from a Data::TagDB::Tag
+
 v0.19  2025-11-24Z
     - Improved loading time of the modules
     - Updated required version of Data::Identifier to v0.25

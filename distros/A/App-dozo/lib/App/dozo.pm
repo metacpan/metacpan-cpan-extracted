@@ -1,6 +1,6 @@
 package App::dozo;
 
-our $VERSION = "0.9925";
+our $VERSION = "0.9926";
 
 1;
 =encoding utf-8
@@ -20,27 +20,27 @@ dozo -I IMAGE [ options ] [ command ... ]
     -d, --debug        debug mode (show full command)
     -x, --trace        trace mode (set -x)
     -q, --quiet        quiet mode
-    -n, --dryrun       dry-run mode (do not run docker)
+    -n, --dryrun       dry-run mode
 
     -I, --image=#      Docker image (required unless -D)
     -D, --default      use default image (DOZO_DEFAULT_IMAGE or tecolicom/xlate)
     -E, --env=#        environment variable to inherit (repeatable)
     -W, --mount-cwd    mount current working directory
     -H, --mount-home   mount home directory
-    -V, --volume=#     additional volume to mount (repeatable)
     -U, --unmount      do not mount any directory
         --mount-mode=# mount mode (rw or ro, default: rw)
     -R, --mount-ro     mount read-only (shortcut for --mount-mode=ro)
+    -V, --volume=#     additional volume to mount (repeatable)
     -B, --batch        batch mode (non-interactive)
+    -L, --live         use live (persistent) container
     -N, --name=#       live container name
     -K, --kill         kill and remove existing container
-    -L, --live         use live (persistent) container
     -P, --port=#       port mapping (repeatable)
     -O, --other=#      additional docker options (repeatable)
 
 =head1 VERSION
 
-Version 0.9925
+Version 0.9926
 
 =head1 USAGE
 

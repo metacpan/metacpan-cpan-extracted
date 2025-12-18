@@ -1,11 +1,12 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket 0.004;
+package JMAP::Tester::WebSocket 0.005;
 # ABSTRACT: a WebSocket JMAP client made for testing JMAP servers
 
 use Moo;
 use IO::Async::Loop;
+use IO::Async::Timer::Countdown;
 use Net::Async::WebSocket::Client 0.13;
 use Protocol::WebSocket::Request;
 use Params::Util qw(_HASH0 _ARRAY0);
@@ -17,6 +18,19 @@ use JMAP::Tester::WebSocket::Response;
 use JMAP::Tester::WebSocket::Result::Failure;
 
 extends qw(JMAP::Tester);
+
+{
+  package
+    JMAP::Tester::WebSocket::LogEvent;
+
+  use Moo;
+
+  has as_string => (
+    init_arg => 'payload',
+    required => 1,
+    is => 'ro',
+  );
+}
 
 has +json_codec => (
   is => 'bare',
@@ -34,6 +48,10 @@ has +json_codec => (
   },
 );
 
+has 'timeout' => (
+  is => 'rw',
+  default => 30,
+);
 
 has 'ws_api_uri' => (
   is        => 'rw',
@@ -117,13 +135,39 @@ sub request {
 
   my $client = $self->_cached_client || $self->connect_ws;
 
+  $self->_logger->log_jmap_request($self, {
+    http_request => JMAP::Tester::WebSocket::LogEvent->new({ payload => $json }),
+  });
+
   $client->send_text_frame($json);
 
+  my $watchdog = IO::Async::Timer::Countdown->new(
+    delay => $self->timeout,
+    remove_on_expire => 1,
+    on_expire => sub {
+      my $seconds = $self->timeout;
+
+      require Carp;
+      Carp::confess(
+        "JMAP::Tester::WebSocket->request() timed out after $seconds seconds"
+      );
+    },
+  )->start;
+
+  $self->loop->add($watchdog);
+
   my $res = $self->loop->run;
+
+  $watchdog->stop;
+  $self->loop->remove($watchdog);
 
   unless ($self->_cached_client) {
     $self->loop->remove($client);
   }
+
+  $self->_logger->log_jmap_response($self, {
+    http_response => JMAP::Tester::WebSocket::LogEvent->new({ payload => $res }),
+  });
 
   return $self->_jresponse_from_wsresponse($res);
 }
@@ -149,6 +193,21 @@ sub connect_ws {
 
   $self->loop->add($client);
 
+  my $watchdog = IO::Async::Timer::Countdown->new(
+    delay => $self->timeout,
+    remove_on_expire => 1,
+    on_expire => sub {
+      my $seconds = $self->timeout;
+
+      require Carp;
+      Carp::confess(
+        "JMAP::Tester::WebSocket->connect_ws() timed out after $seconds seconds"
+      );
+    },
+  )->start;
+
+  $self->loop->add($watchdog);
+
   $client->connect(
     url => $self->ws_api_uri,
     req => Protocol::WebSocket::Request->new(
@@ -161,6 +220,9 @@ sub connect_ws {
       subprotocol => 'jmap',
     ),
   )->get;
+
+  $watchdog->stop;
+  $self->loop->remove($watchdog);
 
   if ($self->cache_connection) {
     $self->_cached_client($client);
@@ -217,14 +279,14 @@ JMAP::Tester::WebSocket - a WebSocket JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
   use JMAP::Tester::WebSocket;
 
   my $jtest = JMAP::Tester::WebSocket->new({
-    ws_uri => 'ws://jmap.local/account/123',
+    ws_api_uri => 'ws://jmap.local/account/123',
   });
 
   my $response = $jtest->request([
@@ -262,7 +324,7 @@ __END__
 #pod   use JMAP::Tester::WebSocket;
 #pod
 #pod   my $jtest = JMAP::Tester::WebSocket->new({
-#pod     ws_uri => 'ws://jmap.local/account/123',
+#pod     ws_api_uri => 'ws://jmap.local/account/123',
 #pod   });
 #pod
 #pod   my $response = $jtest->request([

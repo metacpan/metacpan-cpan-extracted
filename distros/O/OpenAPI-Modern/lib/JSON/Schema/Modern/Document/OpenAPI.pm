@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 use 5.020;
 use utf8;
@@ -20,6 +20,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use JSON::Schema::Modern::Utilities 0.625 qw(E canonical_uri jsonp is_equal json_pointer_type assert_keyword_type assert_uri_reference load_cached_document get_type);
+use JSON::Schema::Modern::Result 0.630;
 use OpenAPI::Modern::Utilities qw(:constants add_vocab_and_default_schemas);
 use Carp qw(croak carp);
 use Digest::MD5 'md5_hex';
@@ -90,7 +91,11 @@ has path_templates => (
 has defaults => (
   is => 'rwp',
   isa => Map[json_pointer_type, Any],
+  lazy => 1,
+  default => sub { {} },
 );
+
+sub default { $_[0]->defaults->{$_[1]} }
 
 # we define the sub directly, rather than using an 'around', since our root base class is not
 # Moo::Object, so we never got a BUILDARGS to modify
@@ -256,6 +261,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     {
       collect_annotations => 0,
       validate_formats => 1,
+      with_defaults => 1,
       callbacks => {
         # we avoid producing errors here so we don't create extra errors for "not all additional
         # properties are valid" etc
@@ -501,11 +507,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
 # just like the base class's version, except we skip the evaluate step because we already did
 # that as part of traverse.
-sub validate ($class, @args) {
-  my $document = blessed($class) ? $class : $class->new(@args);
+sub validate ($class, %args) {
+  my $with_defaults = delete $args{with_defaults};
+
+  my $document = blessed($class) ? $class : $class->new(%args);
   return JSON::Schema::Modern::Result->new(
     errors => [ $document->errors ],
-    $document->defaults ? (defaults => $document->defaults) : (),
+    $with_defaults ? (defaults => $document->defaults) : (),
   );
 }
 
@@ -625,7 +633,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.116
+version 0.117
 
 =head1 SYNOPSIS
 
@@ -779,6 +787,14 @@ All path templates under C</paths/>, sorted in canonical search order.
 A hashref, mapping json pointer locations in the instance data to the default value assigned
 to the property at this location, taken from C<default> keywords in the metaschema under
 C<properties> and C<patternProperties> keywords.
+
+=head2 default
+
+  my $path = '/components/parameters/MyParameter';
+  my $style = $self->get($path.'/style') || $self->default($path.'/style');
+  my $explode = $self->get($path.'/explode') || $self->default($path.'/explode');
+
+Accesses an individual entry of L</defaults>.
 
 =head1 SEE ALSO
 

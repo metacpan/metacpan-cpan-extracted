@@ -37,12 +37,19 @@ Nodes can only be created by a tree, and cannot be re-inserted once pruned.
 
 =head2 key
 
-The sort key.  Read-only.  (but if you supplied a reference and you modify what it
-points to, you will break the sorting of the tree, so don't do that)
+The sort key.  Writing this attribute will re-key the node, but will not affect it's placement in
+the 'recent' list.  Beware that it is possible to create a mutable key (using tie, or using custom
+compare functions on references), and altering the value of the key without calling this accessor
+will corrupt the sorting of your tree.  Also beware that in trees where duplicates are not allowed,
+setting this to the same key as another node will automatically prune the other node from the tree.
+
+Depending on the compare function, keys may be restricted to integers, numbers, strings or other
+limitations.
 
 =head2 value
 
-The data associated with the node.  Read/Write.
+The data associated with the node.  Read/Write.  This also returns an lvalue so you can directly
+modify or assign new values to the accessor.
 
 =head2 index
 
@@ -154,7 +161,7 @@ Shortcut for C<< $node->tree->iter_new_to_old($node) >>.
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

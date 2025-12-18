@@ -1,5 +1,10 @@
 Revision history for JMAP-Tester-WebSocket
 
+0.005     2025-12-17 14:11:42-05:00 America/New_York
+
+        - Log requests/responses if JMAP_TESTER_LOGGER is set
+        - Add a `timeout` attribute (default 30s) to avoid hanging forever
+
 0.004     2021-08-17 08:47:36-04:00 America/New_York
 
         - work around bugs in older Role::Tiny; this is what you want if you

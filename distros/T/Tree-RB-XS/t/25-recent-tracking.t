@@ -161,4 +161,21 @@ subtest iterators => sub {
    }
 };
 
+subtest recent_limit => sub {
+   my %hash;
+   tie %hash, 'Tree::RB::XS', track_recent => 1, recent_limit => 5;
+   is( tied(%hash)->recent_limit, 5, 'limit is 5' );
+   for (qw( A B C D E F G H I J K L M N O P Q R S )) {
+      ++$hash{$_}
+   }
+   is( \%hash, { S => 1, R => 1, Q => 1, P => 1, O => 1 }, 'most recent 5 remain' );
+   is( tied(%hash)->recent_limit(undef), tied(%hash) );
+   is( tied(%hash)->recent_limit, undef, 'new value is undef' );
+   $hash{A}= 1;
+   $hash{B}= 1;
+   is( \%hash, { A => 1, B => 1, S => 1, R => 1, Q => 1, P => 1, O => 1 }, 'all 7 exist' );
+   tied(%hash)->recent_limit(4);
+   is( \%hash, { A => 1, B => 1, R => 1, S => 1 }, 'most recent 4 remain' );
+};
+
 done_testing;

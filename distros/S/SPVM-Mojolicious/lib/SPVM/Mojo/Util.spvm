@@ -14,6 +14,8 @@ class Mojo::Util {
   use Getopt::Long;
   use Mojo::ByteStream;
   use Compress::Raw::Zlib;
+  use Time::HiRes;
+  use Sys::Time::Constant as TIME;
   
   our $QUOTED_VALUE_RE : string;
   INIT {
@@ -35,6 +37,14 @@ class Mojo::Util {
     $XML = Hash->new({
       "&" => "&amp;", "<" => "&lt;", ">" => "&gt;", "\"" => "&quot;", "'" => "&#39;"
     });
+  }
+  
+  our $MONOTONIC : byte;
+  INIT {
+    eval { Time::HiRes->clock_gettime(TIME->CLOCK_MONOTONIC); }
+    unless ($@) {
+      $MONOTONIC = 1;
+    }
   }
   
   static method b64_encode : string ($string : string, $eol : string = undef) {
@@ -435,4 +445,55 @@ class Mojo::Util {
     return $r == 0;
   }
   
+  static method steady_time : double () {
+    
+    my $steady_time = $MONOTONIC ? Time::HiRes->clock_gettime(TIME->CLOCK_MONOTONIC) : Time::HiRes->time;
+    
+    return $steady_time;
+  }
+  
+  static method get_data_file : string ($data_files : string, $rel_file : string) {
+    
+    # Split files
+    my $files = StringList->new(Re->split(["^@@\s*(.+?)\s*\r?\n", "m"], $data_files));
+    if (@$files) {
+      $files->shift;
+    }
+    
+    # Find data
+    my $template = (string)undef;
+    while (1) {
+      
+      unless (@$files) {
+        last;
+      }
+      
+      my $_ = $files->splice(0, 2);
+      my $name = $_->[0];
+      my $data = $_->[1];
+      
+      if (Re->s((mutable string)$name, "\s*\(\s*base64\s*\)$", "")) {
+        $data = Mojo::Util->b64_decode($data);
+      }
+      
+      if ($name eq $rel_file) {
+        $template = $data;
+        last;
+      }
+    }
+    
+    return $template;
+  }
+  
+  static method trim : string ($str : string) {
+    
+    $str = copy $str;
+    
+    Re->s((mutable string)$str, "^\s+", "");
+    
+    Re->s((mutable string)$str, "\s+$", "");
+    
+    return $str;
+  }
+
 }

@@ -9,7 +9,7 @@ class Mojo::Connection extends Mojo::EventEmitter {
   # Fields
   has handle : rw IO::Socket;
   
-  has timeout : rw int;
+  has timeout : rw double;
   
   has next : rw Mojo::Transaction;
   

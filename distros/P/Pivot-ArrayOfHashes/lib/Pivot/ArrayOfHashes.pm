@@ -1,4 +1,4 @@
-package Pivot::ArrayOfHashes 1.0000;
+package Pivot::ArrayOfHashes 1.0001;
 
 # ABSTRACT: Pivot arrays of hashes, such as those returned by DBI
 
@@ -30,7 +30,8 @@ sub pivot {
         my @s;
         foreach my $key ( sort keys(%$row) ) {
             next if $key eq $opts{pivot_on} || $key eq $opts{pivot_into};
-            push( @s, "$key$data_splitter$row->{$key}" );
+            push( @s,
+                ( $key // '' ) . $data_splitter . ( $row->{$key} // '' ) );
         }
         push( @set, join( $row_splitter, @s ) );
     }
@@ -39,8 +40,13 @@ sub pivot {
     # Whether this is done with hash keys or uniq() is of little consequence, we would have to reexpand them.
     my @grouped = map {
         my $subj = $_;
-        my %h    = map { split( /\Q$data_splitter\E/, $_ ) }
-          ( split( /\Q$row_splitter\E/, $subj ) );
+        my %h    = map {
+
+            # We need to pad with undef in some cases.
+            my @out = split( /\Q$data_splitter\E/, $_ );
+            push( @out, undef ) if @out == 1;
+            @out
+        } ( split( /\Q$row_splitter\E/, $subj ) );
         \%h
     } uniq(@set);
 
@@ -58,8 +64,9 @@ sub pivot {
 
             # Append this row's info iff we are in the group.
             next
-              unless scalar( grep { $subj->{$_} eq $row->{$_} } @orig_keys ) ==
-              scalar(@orig_keys);
+              unless
+              scalar( grep { ( $subj->{$_} // '' ) eq ( $row->{$_} // '' ) }
+                  @orig_keys ) == scalar(@orig_keys);
 
             my $field = $row->{ $opts{pivot_into} };
             $subj->{$field} = $row->{ $opts{pivot_on} };
@@ -84,7 +91,7 @@ Pivot::ArrayOfHashes - Pivot arrays of hashes, such as those returned by DBI
 
 =head1 VERSION
 
-version 1.0000
+version 1.0001
 
 =head1 SYNOPSIS
 

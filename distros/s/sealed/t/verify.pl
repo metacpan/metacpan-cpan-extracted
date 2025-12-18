@@ -1,5 +1,5 @@
 #!/usr/bin/env -S perl -Ilib -Iblib/arch
-use Test::More tests => 6;
+use Test::More tests => 7;
 use v5.38;
 use POSIX 'dup2';
 dup2 fileno(STDERR), fileno(STDOUT);
@@ -13,14 +13,14 @@ $z = Foo->can("foo");
 sub method {$x->foo}
 sub class  {Foo->foo}
 sub anon   {$z->($x)}
-sub bar { 2 }
+sub bar { 2 } # middle level of class heirarchy
 sub reentrant;
 
 BEGIN {
   package Foo;
   use base 'sealed';
   sub foo { shift }
-  sub bar    { 1 }
+  sub bar    { 1 } # lowest level of class heirarchy
   my $n;
   sub _foo :Sealed { my main $x = shift; $n++ ? $x->bar : $x->reentrant }
 }
@@ -28,7 +28,9 @@ sub func   {Foo::foo($x)}
 
 BEGIN {our @ISA=qw/Foo/}
 
-my main $y; #sealed src filter transforms this into: my main $y = 'main';
+
+use constant label => __PACKAGE__;
+my label $y; #sealed src filter transforms this into: my label $y = 'label';
 
 sub sealed :Sealed {
   $y->foo();
@@ -36,22 +38,22 @@ sub sealed :Sealed {
 
 use sealed 'verify';
 
-sub also_sealed :Sealed (__PACKAGE__ $a, Int $b, Str $c="HOLA", Int $d//=3, Int $e||=4) {
+sub also_sealed :Sealed (label $a, Int $b, Str $c="HOLA", Int $d//=3, Int $e||=4) {
     if ($a) {
         my Benchmark $bench;
         my $inner = $a;
-        return sub :Sealed (__PACKAGE__ $z) {
+        return sub :Sealed (label $z) {
             my Foo $b = $a;
             $inner->foo($b->bar($inner->bar, $inner, $bench->new));
             $a = $inner;
             $a->foo;
-            $a->bar; # error!
+            $a->bar;
           };
     }
     $a->bar();
 }
 
-sub reentrant :Sealed { my main $b = shift; local our @Q=1; my $c = $b->_foo; }
+sub reentrant :Sealed (__PACKAGE__ $b) { local our @Q=1; my $c = $b->_foo; }
 
 ok(bless({})->reentrant()==2);
 
@@ -70,7 +72,7 @@ ok(1);
 use constant LOOPS => 3;
 
 sub method2 {
-  my $obj = "main";
+  my $obj = bless {};
   for (1..LOOPS) {
     $obj->foo;
     $obj->bar;
@@ -79,7 +81,7 @@ sub method2 {
 }
 
 sub sealed2 :Sealed {
-  my main $obj; # sealed-src-filter
+  my main $obj = bless {}; # sealed-src-filter
   for (1..LOOPS) {
     $obj->foo;
     $obj->bar;
@@ -94,14 +96,24 @@ cmpthese 1_000_000, {
 
 ok(1);
 
-eval {also_sealed($x,-1)->($x)};
+{
+  package Bar;
+  BEGIN {our @ISA=qw/main/}
+  sub bar { 3 } # top-level of class hierarchy
+  my $z = bless {};
+  eval {$z->also_sealed(-1)->($z)}; # virtual method lookup verboten
+  warn $@;
+  main::ok (length($@) > 0);
+}
+
+eval {also_sealed($x,-1)->($x)}; # x is a Foo-typed lexical, and a Foo-blessed obj
 warn $@;
 ok (length($@) > 0);
 
-eval {also_sealed($x)->($x)};
+eval {also_sealed(bless({}), -1)->($x)};
 warn $@;
 ok (length($@) > 0);
 
-eval {also_sealed($x,"foo")->($x)};
+eval {also_sealed(bless({}),"foo")->($x)};
 warn $@;
 ok (length($@) > 0);

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Exception::Reporter::Summarizer::PlackRequest;
-$Exception::Reporter::Summarizer::PlackRequest::VERSION = '0.001';
+package Exception::Reporter::Summarizer::PlackRequest 0.003;
+
 use parent 'Exception::Reporter::Summarizer';
 # ABSTRACT: a summarizer for Plack::Request objects
 
@@ -69,7 +69,7 @@ sub summarize_request {
   $to_dump{cookies} = $req->cookies;
 
   return {
-    filename => 'request.txt',
+    filename => 'plack_request.txt',
     %{ $self->dump(\%to_dump, { basename => 'request' })  },
     ident    => 'plack request',
   };
@@ -89,7 +89,7 @@ Exception::Reporter::Summarizer::PlackRequest - a summarizer for Plack::Request 
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 OVERVIEW
 

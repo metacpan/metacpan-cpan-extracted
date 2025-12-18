@@ -59,8 +59,8 @@ op_name_to_num(SV * name)
     } else                                                                  \
         param = newSVsv(sv);                                                \
     o = _newOPgen(typenum, flags, param);                                   \
-    if (strEQ(B_class,"B::PADOP")) {                                    \
-       PADOP* p = o;                                                        \
+    if (strEQ(B_class,"B::PADOP")) {                                        \
+       PADOP* p = (PADOP *)o;                                               \
        PADNAME **names = PadnamelistARRAY((PADNAMELIST *)PadlistARRAY(padlist)[0]); \
        names[p->op_padix] = newPADNAMEpvn("&", 1);                          \
     }                                                                       \

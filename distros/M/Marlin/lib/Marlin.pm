@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003001';
+our $VERSION   = '0.004000';
 
 use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
 use Exporter::Tiny qw( mkopt _croak );
@@ -119,7 +119,8 @@ my $_parse_attribute = sub {
 	
 	croak("Bad attribute name: $name") unless $name =~ /\A[^\W0-9]\w*\z/;
 	
-	return { is => 'ro', init_arg => $name, %$ref, slot => $name };
+	my $default_init_arg = exists( $ref->{constant} ) ? undef : $name;
+	return { is => 'ro', init_arg => $default_init_arg, %$ref, slot => $name };
 };
 
 sub new {
@@ -783,6 +784,35 @@ the constructor to be implemented in Perl instead of XS. If you use lazy
 builders/defaults, the constructor may use XS, but the readers/accessors for
 the affected attributes will be implemented in Perl.
 
+=item C<< constant >>
+
+Defines a constant attribute. For example:
+
+  package Person {
+    use Marlin
+      ...,
+      species => { constant => 'Homo sapiens' };
+  }
+  
+  my $bob = Person->new( ... );
+  say $bob->species;
+
+Constants attributes cannot have writers, clearers, predicates, builders,
+defaults, or triggers. They must be a simple non-reference value. They cannot
+be passed to the constructor. They I<can> have a type constraint and coercion,
+which will be used I<once> at compile time. They can have C<handles> and
+C<handles_via>, provided the delegated methods do not attempt to alter the
+constant.
+
+These constant attributes are still intended to be called as object methods.
+Calling them as functions is I<not supported> and even though it might
+sometimes work, no guarantees are provided that it will continue to work.
+
+  say $bob->species;      # GOOD
+  say Person::species();  # BAD
+
+If you want that type of constant, use the L<constant> pragma.
+
 =item C<< trigger >>
 
 A method name or coderef to call after an attribute has been set.
@@ -852,6 +882,55 @@ C<< isa => Enum['foo','bar'] >>
 Rarely used Moose option. If you call a reader or accessor in list context,
 will automatically apply C<< @{} >> or C<< %{} >> to the value if it's an
 arrayref or hashref.
+
+=item C<< storage >>
+
+It is possible to give a hint to Marlin about how to store an attribute.
+
+  use v5.12.0;
+  use Marlin::Util -all, -lexical;
+  use Types::Common -types, -lexical;
+  
+  package Local::User {
+    use Marlin
+      'username!',  => Str,
+      'password!'   => {
+        is            => bare,
+        isa           => Str,
+        writer        => 'change_password',
+        required      => true,
+        storage       => 'PRIVATE',
+        handles_via   => 'String',
+        handles       => { check_password => 'eq' },
+      };
+  }
+  
+  my $bob = Local::User->new( username => 'bd', password => 'zi1ch' );
+  
+  die if exists $bob->{password};   # will not die
+  die if $bob->can('password');     # will not die
+  
+  if ( $bob->check_password( 'zi1ch' ) ) {
+    ...;  # this code should execute
+  }
+  
+  $bob->change_password( 'monk33' );
+
+Note that in the above example, setting C<< is => bare >> prevents any reader
+from being created, so you cannot call C<< $bob->password >> to discover his
+password. This would normally suffer the issue that the password is still
+stored in C<< $bob->{password} >> if you access the object as a hashref.
+
+However, setting C<< storage => "PRIVATE" >> tells Marlin to store the value
+privately so it no longer appears in the hashref, so won't be included in any
+Data::Dumper dumps sent to your logger, etc. This does complicate things if
+you ever need to serialize your object to a file or database though! (Note
+that while the value is not stored in the hashref, it is still stored
+I<somewhere>. A determined Perl hacker can easily figure out where. This
+shouldn't be relied on in place of proper security.)
+
+Marlin supports three storage methods for attributes: "HASH" (the default),
+"PRIVATE" (as above), and "NONE" (only used for constants).
 
 =item C<< documentation >>
 

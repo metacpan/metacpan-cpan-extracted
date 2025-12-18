@@ -95,33 +95,7 @@ class Mojolicious::Renderer {
       return undef;
     }
     
-    # Split files
-    my $files = StringList->new(Re->split(["^@@\s*(.+?)\s*\r?\n", "m"], $self->data_templates));
-    if (@$files) {
-      $files->shift;
-    }
-    
-    # Find data
-    my $template = (string)undef;
-    while (1) {
-      
-      unless (@$files) {
-        last;
-      }
-     
-      my $_ = $files->splice(0, 2);
-      my $name = $_->[0];
-      my $data = $_->[1];
-      
-      if (Re->s((mutable string)$name, "\s*\(\s*base64\s*\)$", "")) {
-        $data = Mojo::Util->b64_decode($data);
-      }
-      
-      if ($name eq $template_name) {
-        $template = $data;
-        last;
-      }
-    }
+    my $template = Mojo::Util->get_data_file($self->data_templates, $template_name);
     
     return $template;
   }

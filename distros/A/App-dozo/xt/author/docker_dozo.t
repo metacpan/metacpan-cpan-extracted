@@ -56,7 +56,7 @@ SKIP: {
         # Stop container and verify restart
         `docker stop $container 2>&1`;
         $out = `$dozo -I $image -N $container -L -B echo restarted 2>&1`;
-        like($out, qr/start the $container/, 'restarts stopped container');
+        like($out, qr/restarting exited container $container/, 'restarts stopped container');
 
         # Kill and recreate
         $out = `$dozo -I $image -N $container -KL -B echo recreated 2>&1`;
@@ -90,7 +90,7 @@ SKIP: {
         # Stop container and test dryrun
         `docker stop $container 2>&1`;
         $out = `$dozo -I $image -N $container -Ln -B echo test 2>&1`;
-        like($out, qr/^docker start\b/m, 'dryrun shows docker start command');
+        like($out, qr/restarting exited container/, 'dryrun shows restart message');
         like($out, qr/^docker exec\b/m, 'dryrun shows docker exec after start');
 
         # Clean up

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Docker with Zero Overhead",
+   "abstract" : "Dôzo, Docker with Zero Overhead",
    "author" : [
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "mit"
    ],
@@ -48,14 +48,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "1.302219"
          }
       }
    },
    "provides" : {
       "App::dozo" : {
          "file" : "lib/App/dozo.pm",
-         "version" : "0.9925"
+         "version" : "0.9926"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/tecolicom/App-dozo"
       }
    },
-   "version" : "0.9925",
+   "version" : "0.9926",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

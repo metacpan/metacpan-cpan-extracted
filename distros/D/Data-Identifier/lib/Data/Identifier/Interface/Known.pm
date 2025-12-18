@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 my @_subobjects = qw(db extractor store fii);
 
@@ -31,6 +31,20 @@ sub known {
                 if ($as eq 'raw' || (defined($extra{rawtype}) && $as eq $extra{rawtype})) {
                     return @{$list};
                 }
+            }
+
+            if ($opts{skip_invalid}) {
+                # Let us try again with only identifiers:
+                my @res;
+
+                @res = grep {defined} map {eval {$_->Data::Identifier::as($as, %opts{@_subobjects, qw(no_defaults)}, %extra{qw(rawtype)})}} @{$list};
+
+                if (defined($listas)) {
+                    require Data::Identifier::Cloudlet;
+                    return Data::Identifier::Cloudlet->new(root => \@res, %opts{@_subobjects})->as($listas, %opts{@_subobjects});
+                }
+
+                return @res;
             }
         } else {
             my @res;
@@ -76,7 +90,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 
@@ -230,11 +244,11 @@ to L<Data::Identifier/new> via C<from>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

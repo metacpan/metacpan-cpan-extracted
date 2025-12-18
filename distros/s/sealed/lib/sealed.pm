@@ -18,17 +18,18 @@ use Filter::Util::Call;
 
 our $VERSION;
 our $DEBUG;
+our $VERIFY_PREFIX = "use Types::Common -types, -sigs;";
 
 BEGIN {
-  our $VERSION = qv(8.1.4);
+  our $VERSION = qv(8.3.3);
   XSLoader::load("sealed", $VERSION);
 }
 
 my %valid_attrs                  = (sealed => 1);
-my $p_obj                        = B::svref_2object(sub {&tweak});
+my $p_obj                        = B::svref_2object(sub {&tweak}); # template sub
 
 # B::PADOP (w/ ithreads) or B::SVOP
-my $gv_op                        = $p_obj->START->next->next;
+my $gv_op                        = $p_obj->START->next->next; # its op of interest
 
 sub tweak :prototype($\@\@\@$$\%) {
   my ($op, $lexical_varnames, $pads, $op_stack, $cv_obj, $pad_names, $processed_op) = @_;
@@ -58,10 +59,10 @@ sub tweak :prototype($\@\@\@$$\%) {
         if (ref($gv_op) eq "B::PADOP") {
           $targ                  = $methop->targ;
 
-          # A little prayer (the PL_curpad we need ain't available now).
+          # A little prayer
           # Not sure if this works better pre-ithread cloning, or post-ithread cloning.
           # I've only used it post-ithread cloning, so YMMV.
-          # $targ collisions are fun; ordering is a WAG with the @op_stack walker down below.
+          # $targ collisions? ordering is a WAG with the @op_stack walker down below.
 
           $method_name           = $$pads[$idx++][$targ] until defined $method_name and not
             (ref $method_name and warn __PACKAGE__ . ": target collision: targ=$targ");
@@ -73,21 +74,29 @@ sub tweak :prototype($\@\@\@$$\%) {
         warn __PACKAGE__, ": compiling $class->$method_name lookup.\n"
           if $DEBUG;
         my $method               = $class->can($method_name)
-          or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?\n";
-        # replace $methop
-        my $m = sub {
+          or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you " .
+          "forget to 'use $class' first?\n";
+
+        my $mverify = sub {
           goto &$method if $method == $_[0]->can($method_name);
           require Carp;
-          $$pads[$idx][$targ] =~ s/:\w+$/:FAILED/;
+          $$pads[$idx][$targ] =~ s/:\w+$/:FAILED/ if ref($gv_op) eq "B::PADOP";
+          ${$methop->meth_sv->object_2svref} =~ s/:\w+$/:FAILED/
+            if ref($gv_op) ne "B::PADOP";
           local $@;
           eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ",
                   B::Deparse->new->coderef2text($cv_obj->object_2svref), "\n"};
-          Carp::confess ("sealed failed: $_[0]->$method_name method lookup differs from $class->$method_name:FAILED lookup");
+          Carp::confess ("sealed verify failed: $_[0]->$method_name method lookup differs " .
+                         "from $class->$method_name:FAILED lookup");
         };
 
+        # replace $methop
+        # in the ithread case, we need to pass an arbitrary typegglob that we will "fix"
+        # in the next conditional block. we choose *tweak arbitrarily for this end.
+        # the non-ithreaded case needs no additional massaging, so we pass a CodeRef.
         $gv                      = new($gv_op->name, $gv_op->flags,
                                        ref($gv_op) eq "B::PADOP" ? *tweak :
-                                       $DEBUG eq "verify" ? $m : $method,
+                                       $DEBUG eq "verify" ? $mverify : $method,
                                        $cv_obj->PADLIST);
         $gv->next($methop->next);
         $gv->sibparent($methop->sibparent);
@@ -97,18 +106,21 @@ sub tweak :prototype($\@\@\@$$\%) {
         no warnings 'uninitialized';
 
         if (ref($gv) eq "B::PADOP") {
-          # the pad entry associated to $gv->padix is (correctly flagged) garbage,
-          # as well as completely missing a padname!
-          # so we answer the prayer by resetting $$pads[--$idx][$gv->padix], which
+          # we answer the prayer by resetting $$pads[--$idx][$gv->padix], which
           # has the correct semantics (for $method) under assignment.
+
           my $padix = $gv->padix;
-          my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
+          my (undef, @p)         = $cv_obj->PADLIST->ARRAY; # new() modified PADLIST
           $pads = [ map defined ? $_->object_2svref : $_, @p ];
-          $$pads[--$idx][$padix] = $DEBUG eq "verify" ? $m : $method;
+          $$pads[--$idx][$padix] = $DEBUG eq "verify" ? $mverify : $method;
+
+          # mark our changes for B::Deparse's source code renderer
           $$pads[$idx][$targ]   .= $DEBUG ne "verify" ? ":compiled" : ":verified";
         }
         else {
-          ${$methop->meth_sv->object_2svref} .= $DEBUG ne "verify" ? ":compiled" : ":verified";
+          # mark our changes for B::Deparse's source code renderer
+          ${$methop->meth_sv->object_2svref} .= $DEBUG ne "verify"
+            ? ":compiled" : ":verified";
         }
 
         ++$tweaked;
@@ -147,7 +159,8 @@ sub MODIFY_CODE_ATTRIBUTES {
 
       if ($op->name eq "pushmark") {
         no warnings 'uninitialized';
-	$tweaked                += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj, $pad_names, %processed_op};
+	$tweaked                += eval {tweak $op, @lexical_varnames, @pads,@op_stack,
+                                           $cv_obj, $pad_names, %processed_op};
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }
 
@@ -167,7 +180,8 @@ sub MODIFY_CODE_ATTRIBUTES {
     }
 
     if (defined $DEBUG and $DEBUG eq "deparse" and $tweaked) {
-      eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ", B::Deparse->new->coderef2text($rv), "\n"};
+      eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ",
+              B::Deparse->new->coderef2text($rv), "\n"};
       warn "B::Deparse: coderef2text() aborted: $@" if $@;
     }
   }
@@ -176,34 +190,38 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub import {
   $DEBUG                         = $_[1];
+  local our $VERIFY_PREFIX = $_[2] if $DEBUG eq "verify" and defined $_[2];
   local $_;
+  local our %rcache;
   filter_add(bless []);
 }
-
-my %rcache;
 
 sub filter {
   my ($self) = @_;
   my $status = filter_read;
+  our $VERIFY_PREFIX;
+  our %rcache;
+  # handle bare typed lexical declarations
   s/^\s*my\s+([\w:]+)\s+(\$\w+);/my $1 $2 = '$1';/gms if $status > 0;
 
+  # NEW in v8.x.y: handle signatures
   no warnings 'uninitialized';
   s(^
-    ([^\n]*sub\s+(\w[\w:]*)?\s* #sub declaration and name
-      (?::\s*\w+(?:\(.*?\))?)*\s*:\s*[Ss]ealed\s*(?::\s*\w+(?:\(.*?\))?) #unspaced attrs
-      *\s*(?:\(\S+\))?\s*)\((.*?)\)\s+\{ #prototype and signature and open bracket
+    ([^\n]*sub\s+(\w[\w:]*)?\s*                               #sub declaration and name
+      (?::\s*\w+(?:\(.*?\))?)*\s*:\s*[Ss]ealed\s*(?::\s*\w+(?:\(.*?\))?)#unspaced attrs
+      *\s*(?:\(\S+\))?\s*)\((.*?)\)\s+\{         #prototype, signature and open bracket
    )(
      my $prefix = $1; # everything preceding the signature's arglist
      my $name   = $2; # sub name
      local $_   = $3; # signature's arglist
      my $suffix = "";
-     my $t = "";
+     my $verify = "";
      my (@types, @vars, @defaults);
 
-     s{([\w:]+)?\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
+     s{(\S+)?\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
        local $@;
 
-       my $is_ext_class = ($rcache{$1} //= eval "require $1" || 0);
+       my $is_ext_class = $rcache{$1} //= eval "require $1";
        my $class = ($is_ext_class || $1 eq "__PACKAGE__") ? $1 : "";
 
        $suffix .= "my $class $2 = ";
@@ -222,28 +240,33 @@ sub filter {
          $suffix .= "shift;"
        }
 
-      push @types, ($is_ext_class || $1 eq "__PACKAGE__") ? "Object" : $1;
-      push @defaults, $default;
-      push @vars, substr($2,1);
+       my $type = $is_ext_class ? "InstanceOf[$1]" : $1;
+       push @types, $type;
+       push @defaults, $default;
+       push @vars, substr($2,1);
 
-      "$2$3$4"
+       "$2$3$4" # drop the class/type info
     }gmse;
 
-    if ($name and $DEBUG eq "verify") {
-      $t .= "use Types::Common -types, -sigs; signature_for $name => multiple => [ { named_to_list => 1, named => [";
-      $t .= "$vars[$_] => $types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] }," : "") for 0..$#vars;
-      $t .= "],},{ positional => [";
-      $t .= "$types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] },":"") for 0..$#types;
-      $t .= "],},];";
+    if ($DEBUG eq "verify") {
+      # implement signature type checks for named subs via Types::Common::signature
+
+      $verify .= "$VERIFY_PREFIX; no strict 'vars'; state \$check = signature multiple => [ { named_to_list => 1, named => [";
+      $verify .= "$vars[$_] => $types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] }," : "") for 0..$#vars;
+      $verify .= "],},{ positional => [";
+      $verify .= "$types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] },":"") for 0..$#types;
+      $verify .= "],},]; &\$check;";
+
+      $prefix .= " ($_,\@_dummy)";
     }
 
-    $prefix .= " ($_)" if $DEBUG eq "verify";
-    warn "$prefix { CHECK{ $t } $suffix";
-    "$prefix { no warnings qw/experimental shadow/; CHECK{ $t } $suffix";
+    # warn "$prefix { {$verify} $suffix;
+    "$prefix { no warnings qw/experimental shadow/; {$verify} $suffix";
   )gmsex if $status > 0;
 
   return $status;
 }
+
 1;
 
 __END__
@@ -267,9 +290,12 @@ sealed - Subroutine attribute for compile-time method lookups on its typed lexic
     use sealed 'debug';   # warns about 'method_named' op tweaks
     use sealed 'deparse'; # additionally warns with the B::Deparse output
     use sealed 'dump';    # warns with the $op->dump during the tree walk
-    use sealed 'verify';  # verifies all CV tweaks
+    use sealed 'verify';  # verifies all CV tweaks, optional VERIFY_PREFIX arg
     use sealed 'disabled';# disables all CV tweaks
     use sealed;           # disables all warnings
+
+    VERIFY_PREFIX arg defaults to "use Types::Common -types, -sigs;", which
+    must export an equivalent API to Types::Common::signature() as "signature()".
 
 =head1 BUGS
 

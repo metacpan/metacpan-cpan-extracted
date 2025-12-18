@@ -1,3 +1,6 @@
+v0.04  2025-12-18Z
+    - Fixed typo in POD
+
 v0.03  2025-04-04Z
     - Added alias be_most_excellent() -> perform()
 

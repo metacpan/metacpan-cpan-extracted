@@ -59,6 +59,8 @@
          "requires" : {
             "CHI" : "0",
             "File::Temp" : "0",
+            "FindBin" : "0",
+            "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
             "LWP::Simple::WithCache" : "0.04",
             "Log::Abstraction" : "0",
@@ -71,6 +73,7 @@
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0",
             "Test::RequiresInternet" : "0",
+            "Test::Which" : "0",
             "Test::Without::Module" : "0",
             "autodie" : "0"
          }
@@ -90,6 +93,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.79",
+   "version" : "0.80",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

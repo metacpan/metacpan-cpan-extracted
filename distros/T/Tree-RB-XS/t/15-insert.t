@@ -68,4 +68,27 @@ subtest foldcase_tree => sub {
 	is( [ $tree->keys ], [ 'a', 'B' ], 'only first 2 keys added' );
 };
 
+subtest insert_as_node => sub {
+	my $tree= Tree::RB::XS->new('foldcase');
+	my $node1= $tree->insert_as_node(AA => 1);
+	my $node2= $tree->insert_as_node(Aa => 2);
+	my $node3= $tree->insert_as_node(aa => 3);
+	is( $node2, undef, "didn't add conflicting key" );
+	is( $node3, undef, "didn't add conflicting key" );
+	$tree->allow_duplicates(1);
+	$node2= $tree->insert_as_node(aa => 2);
+	$node3= $tree->insert_as_node(Aa => 3);
+	is( [$tree->keys], ['AA','aa','Aa'], 'have duplicates' );
+	is( $node1->key, 'AA', 'node1 key' );
+	is( $node2->key, 'aa', 'node2 key' );
+	is( $node3->key, 'Aa', 'node3 key' );
+	my $node4= $tree->put_as_node('aA');
+	is( [$tree->keys], ['aA'], 'replaced all nodes' );
+	ok( $node4 == $node1, 're-used node1' );
+	is( $tree->size, 1, 'put replaced all nodes' );
+	ok( !$node2->tree, 'node2 pruned' );
+	ok( !$node3->tree, 'node3 pruned' );
+	is( $node1->key, 'aA', 'preserved most recent original key' );
+};
+
 done_testing;

@@ -15,6 +15,7 @@ use Mojo::File 'path';
 use Mojo::UserAgent;
 use Digest::MD5 'md5_hex';
 use JSON::Schema::Modern 0.624;
+use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use lib 'lib';  # make sure we load the newly-patched version of our modules
 use OpenAPI::Modern::Utilities qw(OAS_SCHEMAS OAS_VERSIONS);
 

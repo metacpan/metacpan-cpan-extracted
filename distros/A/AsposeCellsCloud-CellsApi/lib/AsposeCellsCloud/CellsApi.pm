@@ -1514,6 +1514,52 @@ sub split_spreadsheet{
 }
 
 #
+# SplitTableRequest
+#
+# Split an Excel worksheet into multiple sheets by column value.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)  Worksheet containing the table.  
+# @tableName  string (required)  Data table that needs to be split.  
+# @splitColumnName  string (required)  Column name to split by.  
+# @saveSplitColumn  boolean (required)  Whether to keep the data in the split column.  
+# @toNewWorkbook  boolean (required)  Export destination control: true - Creates new workbook files containing the split data; false - Adds a new worksheet to the current workbook.  
+# @toMultipleFiles  boolean (required)  true - Exports table data as **multiple separate files** (returned as ZIP archive);false - Stores all data in a **single file** with multiple sheets. Default: false.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SplitTableRequest',
+            description => 'SplitTable Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'split_table' } = { 
+    	summary => 'Split an Excel worksheet into multiple sheets by column value.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub split_table{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
 # SplitRemoteSpreadsheetRequest
 #
 # Split a spreadsheet in cloud storage into the specified format, multi-file.
@@ -2796,8 +2842,8 @@ sub remove_characters_by_position{
 # Finds and removes repeated substrings inside every cell of the chosen range, using user-defined or preset delimiters, while preserving formulas, formatting and data-validation.
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @delimiters  string (required)    
-# @treatConsecutiveDelimitersAsOne  boolean     
+# @delimiters  string (required)  comma, semicolon, space, tab, line-break   
+# @treatConsecutiveDelimitersAsOne  boolean   collapse adjacent delimiters into a single separator.  
 # @caseSensitive  boolean     
 # @worksheet  string     
 # @range  string     

@@ -119,6 +119,16 @@ subtest replace_duplicates => sub {
 	}, 'reverse iter moved back to initial node' );
 };
 
+subtest replace_folded_duplicates => sub {
+	my $tree= Tree::RB::XS->new(allow_duplicates => 1, compare_fn => CMP_FOLDCASE);
+	$tree->insert('AAA');
+	$tree->insert('aAa');
+	$tree->insert('AaA');
+	is( [$tree->keys], ['AAA','aAa','AaA'], 'duplicate folded keys' );
+	$tree->put('aaa');
+	is( [$tree->keys], ['aaa'], 'replaced duplicates' );
+};
+
 subtest put_multi => sub {
 	my $tree= Tree::RB::XS->new(allow_duplicates => 1);
 	$tree->put_multi(1..10);

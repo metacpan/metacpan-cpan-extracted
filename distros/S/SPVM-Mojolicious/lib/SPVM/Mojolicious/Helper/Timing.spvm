@@ -1,0 +1,67 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Helper::Timing {
+  version_from Mojolicious;
+  
+  use Time::HiRes;
+  
+  # Fields
+  has controller : rw Mojolicious::Controller;
+  
+  # Class Methods
+  static method new : Mojolicious::Helper::Timing () {
+    
+    my $self = new Mojolicious::Helper::Timing;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method begin : void ($name : string) {
+    
+    my $c = $self->{controller};
+    
+    $c->shared_stash_h->{"mojo.timing"} //= Hash->new;
+    
+    $c->shared_stash_h->{"mojo.timing"}->(Hash)->{$name} = Time::HiRes->gettimeofday;
+  }
+  
+  method elapsed : double ($name : string){
+    
+    my $c = $self->{controller};
+    
+    my $started = $c->shared_stash_h->{"mojo.timing"}->(Hash)->{$name}->(Sys::Time::Timeval);
+    
+    unless ($started) {
+      die "Started time must be set.";
+    }
+    
+    return Time::HiRes->tv_interval($started, Time::HiRes->gettimeofday);
+  }
+  
+  method rps : string ($elapsed : double) {
+    
+    if ($elapsed == 0) {
+      die "The elapsed \$elapsed must be non-zero.";
+    }
+    
+    return Fn->sprintf("%.3f", 1 / $elapsed);
+  }
+  
+  method server_timing : void ($metric : string, $desc : string = undef, $dur : double = 0) {
+    
+    my $c = $self->{controller};
+    
+    my $value = $metric;
+    if ($desc) {
+      $value .= ";desc=\"$desc\"";
+    }
+    if ($dur > 0) {
+      $value .= ";dur=$dur";
+    }
+    
+    $c->res->headers->append("Server-Timing" => $value);
+  }
+
+}

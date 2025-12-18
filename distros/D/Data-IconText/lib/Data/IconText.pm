@@ -1,4 +1,3 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -23,7 +22,7 @@ use constant {
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -401,6 +400,30 @@ my %_for_version = (
             },
         }
     },
+    v0.05 => {
+        parent => v0.04,
+        identifier => {
+            '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
+                '3f40e34d-4393-42d4-87d4-cc174c322ab9' => 0x1F414,  # sid:352   chicken
+                '8314f14d-cddc-47bf-8a94-63a476d1ae56' => 0x1F986,  # sid:353   duck
+                '2a32ba07-60b3-4646-82e8-76c721d8eeef' => 0x1F410,  # sid:354   goat
+                'f765016e-cd8d-4ba5-9ba7-668836507aff' => 0x1F411,  # sid:355   sheep
+                '01bf3487-b025-410a-9db0-e6e2da534a91' => 0x1F42E,  # sid:356   cow
+                'a90dac85-e939-46a6-bb27-32d4f2491628' => 0x1F437,  # sid:357   pig
+                '5bc2e4d4-4907-4479-b434-1f83975f9949' => 0x1F434,  # sid:358   horse
+                'f0bd66e9-0bb5-40db-835b-0ada069352a3' => 0x1F993,  # sid:359   zebra
+                '19d35668-98f0-49f2-bd46-5370d2260b5f' => 0x1F353,  # sid:384   strawberry
+                '043de895-3045-49a8-b029-4d6682e72465' => 0x1F34C,  # sid:385   banana
+                '1bb416dd-f4b8-4232-a908-592845958337' => 0x1F34D,  # sid:386   pineapple
+                'c429b3e9-7f4d-41cc-9536-67473ea13197' => 0x1F345,  # sid:388   tomato
+                'cafb84fd-f314-440c-8adf-7e3785d73089' => 0x1F955,  # sid:389   carrot
+                '75751a78-cd89-42d9-8edf-e4868a01bfec' => 0x1FAD1,  # sid:391   bell pepper
+                '4080d665-3892-4292-9f16-fa5ca032fe30' => 0x1F34E,  # sid:412   apple
+                '843c5c1c-9589-4d07-a1a2-b28e75d12601' => 0x1F352,  # sid:413   cherry
+                'ed1d35a3-2ae7-42c4-82a4-2793f0e7d4b4' => 0x1F341,  # sid:414   maple
+            },
+        }
+    },
 );
 
 while (1) {
@@ -767,7 +790,7 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -941,11 +964,11 @@ Returns itself.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

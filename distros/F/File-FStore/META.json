@@ -1,7 +1,7 @@
 {
    "abstract" : "module for working with a file store",
    "author" : [
-      "L\u00f6wenfelsen UG (haftungsbeschr\u00e4nkt) <support@loewenfelsen.net>"
+      "Philipp Schafft <lion@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -54,23 +54,23 @@
    "provides" : {
       "File::FStore" : {
          "file" : "lib/File/FStore.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       },
       "File::FStore::Adder" : {
          "file" : "lib/File/FStore/Adder.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       },
       "File::FStore::Base" : {
          "file" : "lib/File/FStore/Base.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       },
       "File::FStore::File" : {
          "file" : "lib/File/FStore/File.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       },
       "File::FStore::Migration" : {
          "file" : "lib/File/FStore/Migration.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "url" : "git://gitea.dev.loewenfelsen.net/phschafft/File-FStore.git"
       }
    },
-   "version" : "v0.05",
+   "version" : "v0.06",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

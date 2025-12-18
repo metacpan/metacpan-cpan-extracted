@@ -1,6 +1,6 @@
 use Test::More 0.88;
 
-use_ok 'Exception::Reporter::Summarizer::PlackRequest', 'compiles okay';
+use_ok 'Exception::Reporter::Summarizer::PlackRequest';
 
 isa_ok(
   Exception::Reporter::Summarizer::PlackRequest->new,

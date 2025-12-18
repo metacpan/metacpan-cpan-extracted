@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,7 +16,7 @@ use parent 'Data::Identifier::Interface::Userdata';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -97,7 +97,7 @@ Data::Identifier::Interface::Subobjects - format independent identifier object
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 
@@ -180,11 +180,11 @@ Returns the keys supported for subobjects.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

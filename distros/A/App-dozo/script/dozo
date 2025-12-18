@@ -26,27 +26,27 @@ dozo -I IMAGE [ options ] [ command ... ]
     -d, --debug        debug mode (show full command)
     -x, --trace        trace mode (set -x)
     -q, --quiet        quiet mode
-    -n, --dryrun       dry-run mode (do not run docker)
+    -n, --dryrun       dry-run mode
 
     -I, --image=#      Docker image (required unless -D)
     -D, --default      use default image (DOZO_DEFAULT_IMAGE or tecolicom/xlate)
     -E, --env=#        environment variable to inherit (repeatable)
     -W, --mount-cwd    mount current working directory
     -H, --mount-home   mount home directory
-    -V, --volume=#     additional volume to mount (repeatable)
     -U, --unmount      do not mount any directory
         --mount-mode=# mount mode (rw or ro, default: rw)
     -R, --mount-ro     mount read-only (shortcut for --mount-mode=ro)
+    -V, --volume=#     additional volume to mount (repeatable)
     -B, --batch        batch mode (non-interactive)
+    -L, --live         use live (persistent) container
     -N, --name=#       live container name
     -K, --kill         kill and remove existing container
-    -L, --live         use live (persistent) container
     -P, --port=#       port mapping (repeatable)
     -O, --other=#      additional docker options (repeatable)
 
 =head1 VERSION
 
-Version 0.9925
+Version 0.9926
 
 =head1 USAGE
 
@@ -89,8 +89,8 @@ installed in the container will remain available for subsequent use.
 help() {
     sed -E \
         -e '/^$/N' \
-        -e '/^\n*(#|=encoding)/d' \
-        -e 's/^(\n*)=[a-z]+[0-9]* */\1/' \
+        -e 's/^(\n*)=head[0-9]* */\1/' \
+        -e '/^\n*[#=]/d' \
         -e '/Version/q' \
         <<< "$pod"
     exit 0
@@ -113,7 +113,7 @@ _warn_buffer=()
 warn() { _warn_buffer+=("$*"); }
 
 debug() {
-    [[ ${debug:-} ]] && echo "$myname: $*" >&2 || true
+    [[ ${debug:-} ]] && echo "debug: $*" >&2 || true
 }
 
 die() {
@@ -143,7 +143,8 @@ container_name() {
         then name=${BASH_REMATCH[2]}
         else name=$myname
         fi
-        [[ ${mount_dir:-} ]] && name+=.${mount_dir##*/}
+        local dir="${mount_dir:-$cwd}"
+        [[ $dir ]] && name+=.${dir##*/}
     fi
     echo "$name"
 }
@@ -166,6 +167,7 @@ docker_status() {
 }
 
 docker() {
+    debug "docker $*"
     if [[ ${dryrun:-} ]]; then
         echo docker "$@"
         return 0
@@ -177,12 +179,17 @@ docker() {
 # Main
 ##############################################################################
 
-# Set PATH for getoptlong.sh
+# Find getoptlong.sh
 dist_dir() {
     perl -MFile::Share=:all -E "say dist_dir '$1'" 2>/dev/null || true
 }
 share=$(dist_dir App-dozo)
 PATH="${share:+$share:$share/getoptlong:}$PATH"
+getoptlong=$(command -v getoptlong.sh) || {
+    basedir="$(cd "$(dirname "$0")/.." && pwd)"
+    [[ -f $basedir/share/getoptlong/getoptlong.sh ]] &&
+        getoptlong="$basedir/share/getoptlong/getoptlong.sh"
+}
 
 # Default environment variables to inherit
 DEFAULT_ENV=(
@@ -254,24 +261,24 @@ default() { image="${DOZO_DEFAULT_IMAGE:-$default_image}"; }
 declare -A OPTS=(
     [&USAGE]="$USAGE" [&PERMUTE]=
     [       help | h ! # show help                       ]=
-    [    version     ! # show version                    ]=
-    [      debug | d   # debug mode (show full command)  ]=
+    [    version |   ! # show version                    ]=
+    [      debug | d   # debug mode                      ]=
     [      trace | x ! # trace mode (set -x)             ]=
     [      quiet | q   # quiet mode                      ]=
-    [     dryrun | n   # dry-run mode (do not run docker)]=
+    [     dryrun | n   # dry-run mode                    ]=
     [      image | I : # Docker image                    ]=
     [    default | D ! # use default image               ]=
     [        env | E @ # environment variable to inherit ]=
     [  mount-cwd | W   # mount current working directory ]=
     [ mount-home | H   # mount home directory            ]=
-    [     volume | V @ # additional volume to mount      ]=
-    [    unmount | U   # do not mount                    ]=
-    [ mount-mode     : # mount mode (rw or ro)           ]=rw
+    [    unmount | U   # do not mount any directory      ]=
+    [ mount-mode |   : # mount mode (rw or ro)           ]=rw
     [   mount-ro | R   # mount read-only                 ]=
+    [     volume | V @ # additional volume to mount      ]=
     [      batch | B   # batch mode (non-interactive)    ]=
+    [       live | L   # use live container              ]=
     [       name | N : # live container name             ]=
     [       kill | K   # kill existing container         ]=
-    [       live | L   # use live container              ]=
     [       port | P @ # port mapping                    ]=
     [      other | O @ # additional docker option        ]=
 )
@@ -280,10 +287,11 @@ declare -A OPTS=(
 # Parse options
 ##############################################################################
 
-. getoptlong.sh OPTS "${rc_opts[@]}" "$@" || die "getoptlong.sh not found"
+[[ $getoptlong ]] || die "getoptlong.sh not found"
+. "$getoptlong" OPTS "${rc_opts[@]}" "$@"
 
 # Flush buffered warnings
-warn() { [[ ${quiet:-} ]] || echo "$myname: $*" >&2; }
+warn() { [[ ${quiet:-} ]] || echo "$*" >&2; }
 for _m in "${_warn_buffer[@]}"; do warn "$_m"; done; _warn_buffer=()
 
 # Apply options
@@ -313,20 +321,18 @@ fi
 
 if [[ ${live:-} ]]; then
     container=$(container_name)
-    debug "live: container=$container"
     if id=$(docker_find "$container"); then
         status=$(docker_status $id)
-        debug "live: id=$id status=$status"
         case $status in
             exited)
-                warn "start the $container ($id)"
-                docker start $id || exit 1
-                [[ ${dryrun:-} ]] && status=running && debug "live: fake status=running"
+                warn "restarting exited container $container ($id)"
+                docker start $id > /dev/null || exit 1
+                [[ ${dryrun:-} ]] && status=running && debug "fake status=running"
                 ;;
             paused)
-                warn "unpause the $container ($id)"
+                warn "unpausing container $container ($id)"
                 docker unpause $id || exit 1
-                [[ ${dryrun:-} ]] && status=running && debug "live: fake status=running"
+                [[ ${dryrun:-} ]] && status=running && debug "fake status=running"
                 ;;
             running)
                 ;;
@@ -335,10 +341,9 @@ if [[ ${live:-} ]]; then
                 ;;
         esac
     else
-        debug "live: container not found"
+        debug "container not found"
     fi
     if [[ ${status:-} == running ]] || id=$(docker_find -s running "$container"); then
-        debug "live: exec/attach id=$id"
         if (( $# > 0 )); then
             declare -a exec_opts
             [[ ! ${batch:-} ]] && exec_opts+=(--interactive)
@@ -346,7 +351,7 @@ if [[ ${live:-} ]]; then
             export DOCKER_CLI_HINTS=false
             docker exec "${exec_opts[@]}" $id "$@"
         else
-            warn "attach to the $container ($id)"
+            warn "attaching to container $container ($id)"
             docker attach $id
         fi
         exit
@@ -400,7 +405,6 @@ dockopt+=(
 )
 
 # Display docker run info
-debug "docker run ${dockopt[*]} ${image} $*"
 if [[ ! ${quiet:-} ]]; then
     info="image=${image} env=${#ENV[@]}"
     [[ ${live:-} && ${container:-} ]] && info+=" container=${container}"

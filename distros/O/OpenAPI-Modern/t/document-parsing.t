@@ -1249,4 +1249,35 @@ YAML
   );
 };
 
+subtest defaults => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    evaluator => JSON::Schema::Modern->new(with_defaults => 1),
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  parameters:
+    MyParameter:
+      name: me
+      in: path
+      required: true
+      schema: {}
+YAML
+
+  cmp_result(
+    $doc->defaults,
+    {
+      '/components/parameters/MyParameter/deprecated' => false,
+      '/components/parameters/MyParameter/allowReserved' => false,
+      '/components/parameters/MyParameter/deprecated' => false,
+      '/components/parameters/MyParameter/explode' => false,
+      '/components/parameters/MyParameter/style' => 'simple',
+      '/jsonSchemaDialect' => DEFAULT_DIALECT->{OAS_VERSION()},
+      '/servers' => [ { url => '/' } ],
+    },
+    'can capture and extract all defaults for a document',
+  );
+
+  is($doc->default('/components/parameters/MyParameter/style'), 'simple', '..and for a single value');
+};
+
 done_testing;

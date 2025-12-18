@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "module for interacting with SIRTX VM code",
-  "AUTHOR" => "L\x{f6}wenfelsen UG (haftungsbeschr\x{e4}nkt) <support\@loewenfelsen.net>",
+  "AUTHOR" => "Philipp Schafft <lion\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.10",
+  "VERSION" => "v0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,7 +1,7 @@
 {
    "abstract" : "Work with display colours",
    "author" : [
-      "L\u00f6wenfelsen UG (haftungsbeschr\u00e4nkt) <support@loewenfelsen.net>"
+      "Philipp Schafft <lion@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -48,11 +48,11 @@
    "provides" : {
       "Data::Displaycolour" : {
          "file" : "lib/Data/Displaycolour.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       },
       "Data::Displaycolour::Data" : {
          "file" : "lib/Data/Displaycolour/Data.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "url" : "ssh://gitea@gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-Displaycolour.git"
       }
    },
-   "version" : "v0.04",
+   "version" : "v0.05",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

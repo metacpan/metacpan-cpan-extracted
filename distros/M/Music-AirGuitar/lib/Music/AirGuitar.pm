@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my @_standard_types = qw(string Data::Identifier Data::TagDB::Tag Data::URIID::Base);
 
@@ -128,7 +128,7 @@ Music::AirGuitar - Interface for air guitars
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,7 @@ The default is C<5:55> (the length of I<Bohemian Rhapsody>).
 
 =head2 be_most_excellent
 
-    my Music::AirGuitar::Performance $performance $guitar->be_most_excellent(%opts);
+    my Music::AirGuitar::Performance $performance = $guitar->be_most_excellent(%opts);
 
 Alias for L</perform>.
 
@@ -229,11 +229,11 @@ Someone might consider this module helpful.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

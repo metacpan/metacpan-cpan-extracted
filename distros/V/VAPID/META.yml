@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,17 +21,20 @@ no_index:
 provides:
   VAPID:
     file: lib/VAPID.pm
-    version: '1.02'
+    version: '1.05'
 requires:
   Crypt::JWT: '0.029'
   CryptX: '0.069'
+  HTTP::Request: '0'
   Import::Export: '1.00'
+  JSON: '0'
+  LWP::UserAgent: '0'
   MIME::Base64: '3.16'
   URI: '1.76'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/VAPID.git
-version: '1.02'
+version: '1.05'
 x_contributors:
   - 'Jan Kasprzak (YENYA) <kas@informatics.muni.cz>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

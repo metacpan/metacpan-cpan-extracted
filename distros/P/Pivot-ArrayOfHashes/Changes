@@ -1,4 +1,8 @@
 Revision history for Pivot-ArrayOfHashes
 
+1.0001 2025-12-17 TEODESIAN
+    - Fix issue where columns with undef values would corrupt pivoted table.
+    - Correct a number of uninitialized value warnings.
+
 1.0000 2025-12-15 TEODESIAN
     - First release to CPAN

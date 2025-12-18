@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
     
 # licensed under Artistic License 2.0 (see LICENSE file)
     
@@ -22,7 +22,7 @@ use File::FStore::File;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 use constant {
     DEFAULT_LINK_STYLE  => '1-level',
@@ -691,7 +691,7 @@ File::FStore - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -1037,7 +1037,7 @@ Returns a new L<File::FStore::Migration> object for this store.
 
 (since v0.01, deprecated since v0.05).
 
-Deprecated proxy for L<File::FStore/export_data>.
+Deprecated proxy for L<File::FStore::Migration/export_data>.
 
 This proxy will be removed in version v0.10. Future versions of this proxy may C<warn> about it's usage.
 
@@ -1105,11 +1105,11 @@ Proxy for L<File::FStore::File/known>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

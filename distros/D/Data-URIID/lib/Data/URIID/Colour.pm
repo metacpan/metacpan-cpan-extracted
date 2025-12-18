@@ -1,4 +1,3 @@
-# Copyright (c) 2023-2024 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2023-2024 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -15,7 +14,7 @@ use overload '""' => \&rgb;
 use Carp;
 use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.19;
+our $VERSION = v0.20;
 
 use parent qw(Data::URIID::Base Data::Identifier::Interface::Known);
 
@@ -130,7 +129,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.19
+version v0.20
 
 =head1 SYNOPSIS
 
@@ -202,11 +201,11 @@ This is an experimental feature! It may be removed or altered at any future vers
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

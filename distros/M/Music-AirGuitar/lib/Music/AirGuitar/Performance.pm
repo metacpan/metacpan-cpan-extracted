@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Carp;
 
 use Music::AirGuitar;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 {
     no strict 'refs'; # This is an invalid access, but it is the only one working in perl v5.24.1, the correct one segfaults.
@@ -93,7 +93,7 @@ Music::AirGuitar::Performance - Interface for air guitars performances
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -166,11 +166,11 @@ in the range 0.0 .. 10.0 (inclusive).
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -1,4 +1,3 @@
-# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -23,7 +22,7 @@ use Data::Identifier::Generate v0.25;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.19;
+our $VERSION = v0.20;
 
 use parent 'Data::URIID::Base';
 
@@ -1568,7 +1567,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.19
+version v0.20
 
 =head1 SYNOPSIS
 
@@ -1698,7 +1697,7 @@ Additional template options. No options are currently defined by this documentat
 
 =head4 Filter
 
-A filter in the sense of templates is a regex (quoted using C<qr//>), or an arrayref with exact values to match or a single string that is split into exact values using space and comma as seperator.
+A filter in the sense of templates is a regex (quoted using C<qr//>), or an arrayref with exact values to match or a single string that is split into exact values using space and comma as separator.
 
 =head4 Template variables
 
@@ -1735,7 +1734,7 @@ Each pattern is a hashref with the following keys:
 (required) The URI scheme to match. E.g. C<https>.
 
 B<Note:>
-C<http> might be considered an invalid valid.
+C<http> might be considered an invalid value.
 
 =item C<host>
 
@@ -1809,11 +1808,11 @@ See also L<Data::Identifier::Wellknown>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

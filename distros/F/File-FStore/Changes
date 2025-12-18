@@ -1,3 +1,6 @@
+v0.06   2025-12-18Z
+    - Improved documentation
+
 v0.05   2025-05-01Z
     - Implement Data::Identifier::Interface::Known in File::FStore and File::FStore::File
     - Deprecated $store->export(), and $store->import_data(), now primary way is via migration

@@ -43,6 +43,7 @@ do { my $x = {
                                       'Getopt::Long::Descriptive' => '0',
                                       'JSON::Schema::Modern' => '0.620',
                                       'JSON::Schema::Modern::Document' => '0.619',
+                                      'JSON::Schema::Modern::Result' => '0.630',
                                       'JSON::Schema::Modern::Utilities' => '0.628',
                                       'JSON::Schema::Modern::Vocabulary' => '0',
                                       'List::Util' => '0',

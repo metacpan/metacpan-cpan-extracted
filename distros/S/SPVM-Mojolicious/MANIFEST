@@ -147,6 +147,8 @@ lib/SPVM/Mojolicious/Controller.pm
 lib/SPVM/Mojolicious/Controller.spvm
 lib/SPVM/Mojolicious/Helper/Reply.pm
 lib/SPVM/Mojolicious/Helper/Reply.spvm
+lib/SPVM/Mojolicious/Helper/Timing.pm
+lib/SPVM/Mojolicious/Helper/Timing.spvm
 lib/SPVM/Mojolicious/Lite.pm
 lib/SPVM/Mojolicious/Lite.spvm
 lib/SPVM/Mojolicious/Plugin.pm
@@ -185,12 +187,14 @@ README.md
 t/basic.t
 t/lib/SPVM/TestCase/Mojo/Template.spvm
 t/lib/SPVM/TestCase/Mojo/Transaction.spvm
+t/lib/SPVM/TestCase/Mojo/Util.spvm
 t/lib/SPVM/TestCase/Mojolicious.spvm
 t/lib/SPVM/TestCase/Mojolicious/Controller.spvm
 t/lib/SPVM/TestCase/Mojolicious/Routes.spvm
 t/lib/SPVM/TestCase/Online.spvm
 t/Mojo-Template.t
 t/Mojo-Transaction.t
+t/Mojo-Util.t
 t/Mojolicious-Controller.t
 t/Mojolicious-Routes.t
 t/online.t

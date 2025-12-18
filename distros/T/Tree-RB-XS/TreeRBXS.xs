@@ -2,6 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #define NEED_mg_findext
+#define NEED_ASSUME
 #include "ppport.h"
 
 /* The core Red/Black algorithm which operates on rbtree_node_t */
@@ -269,6 +270,7 @@ struct TreeRBXS {
 	struct TreeRBXS_iter *hashiter;// iterator used for TIEHASH
 	struct dllist_node recent;     // insertion order tracking
 	size_t recent_count;           // number of nodes being LRU-tracked
+	IV recent_limit;               // maximum allowed recent-tracked nodes
 	bool hashiterset;              // true if the hashiter has been set manually with hseek
 	struct TreeRBXS_item
 	    *prev_inserted_item;       // optimize adjacent inserts by tracking previous insert
@@ -284,6 +286,7 @@ static struct TreeRBXS_item *TreeRBXS_find_item(struct TreeRBXS *tree, struct Tr
 static bool TreeRBXS_is_member(struct TreeRBXS *tree, struct TreeRBXS_item *item);
 static void TreeRBXS_recent_insert_before(struct TreeRBXS *tree, struct TreeRBXS_item *item, struct dllist_node *node_after);
 static void TreeRBXS_recent_prune(struct TreeRBXS *tree, struct TreeRBXS_item *item);
+static void TreeRBXS_truncate_recent(struct TreeRBXS *tree, IV lim, SV **nodes_out);
 static void TreeRBXS_destroy(struct TreeRBXS *tree);
 
 #define TreeRBXS_get_root(tree) ((tree)->root_sentinel.left)
@@ -334,9 +337,15 @@ static SV* GET_TreeRBXS_item_ORIG_KEY(struct TreeRBXS_item *item) {
 #define SET_TreeRBXS_item_ORIG_KEY(item, key) memcpy(item->extra, &key, sizeof(SV*))
 #define GET_TreeRBXS_stack_item_ORIG_KEY(item) ((item)->owner)
 #define SET_TreeRBXS_stack_item_ORIG_KEY(item, key) ((item)->owner= (key))
+#define IS_ITEM_KEY_STORED_IN_EXTRA(item) ((item)->key_type == KEY_TYPE_USTR || (item)->key_type == KEY_TYPE_BSTR)
+#define ITEM_EXTRA_BYTES_NEEDED(stack_item) ( \
+	((stack_item)->orig_key_stored ? sizeof(SV*) : 0) \
+	+(IS_ITEM_KEY_STORED_IN_EXTRA(stack_item)? (stack_item)->ckeylen : 0) )
 
 static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *tree, SV *key, SV *value);
 static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_item *src);
+static struct TreeRBXS_item * TreeRBXS_item_realloc_extra(struct TreeRBXS_item *item, size_t new_extra);
+static void TreeRBXS_item_set_key(struct TreeRBXS_item **item_p, struct TreeRBXS_item *new_key);
 static struct TreeRBXS* TreeRBXS_item_get_tree(struct TreeRBXS_item *item);
 static void TreeRBXS_item_advance_all_iters(struct TreeRBXS_item* item, int flags);
 static void TreeRBXS_item_detach_iter(struct TreeRBXS_item *item, struct TreeRBXS_iter *iter);
@@ -344,6 +353,7 @@ static void TreeRBXS_item_detach_owner(struct TreeRBXS_item* item);
 static void TreeRBXS_item_detach_tree(struct TreeRBXS_item* item, struct TreeRBXS *tree);
 static void TreeRBXS_item_clear(struct TreeRBXS_item* item, struct TreeRBXS *tree);
 static void TreeRBXS_item_free(struct TreeRBXS_item *item);
+static SV* TreeRBXS_wrap_item(struct TreeRBXS_item *item);
 
 struct TreeRBXS_iter {
 	struct TreeRBXS *tree;
@@ -358,6 +368,38 @@ static void TreeRBXS_iter_set_item(struct TreeRBXS_iter *iter, struct TreeRBXS_i
 static void TreeRBXS_iter_advance(struct TreeRBXS_iter *iter, IV ofs);
 static void TreeRBXS_iter_free(struct TreeRBXS_iter *iter);
 
+/* Definitions for XS MAGIC */
+static int TreeRBXS_magic_free(pTHX_ SV* sv, MAGIC* mg);
+static int TreeRBXS_item_magic_free(pTHX_ SV* sv, MAGIC* mg);
+static int TreeRBXS_iter_magic_free(pTHX_ SV* sv, MAGIC *mg);
+
+#ifdef USE_ITHREADS
+static int TreeRBXS_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param);
+#else
+#define TreeRBXS_magic_dup 0
+#endif
+
+#ifdef MGf_LOCAL
+#define MAGIC_LOCAL_NULL ,0
+#else
+#define MAGIC_LOCAL_NULL
+#endif
+
+// magic table for Tree::RB::XS
+static MGVTBL TreeRBXS_magic_vt= {
+	0, 0, 0, 0, TreeRBXS_magic_free, 0, TreeRBXS_magic_dup MAGIC_LOCAL_NULL 
+};
+
+// magic table for Tree::RB::XS::Node
+static MGVTBL TreeRBXS_item_magic_vt= {
+	0, 0, 0, 0, TreeRBXS_item_magic_free, 0, TreeRBXS_magic_dup MAGIC_LOCAL_NULL
+};
+
+static MGVTBL TreeRBXS_iter_magic_vt= {
+	0, 0, 0, 0, TreeRBXS_iter_magic_free, 0, TreeRBXS_magic_dup MAGIC_LOCAL_NULL
+};
+
+
 static void TreeRBXS_init(struct TreeRBXS *tree, SV *owner) {
 	memset(tree, 0, sizeof(struct TreeRBXS));
 	tree->owner= owner;
@@ -367,6 +409,7 @@ static void TreeRBXS_init(struct TreeRBXS *tree, SV *owner) {
 	/* defaults, which can be overridden by _init_tree */
 	tree->key_type= KEY_TYPE_ANY;
 	tree->compare_fn_id= CMP_PERL;
+	tree->recent_limit= -1;
 }
 
 static void TreeRBXS_clear(struct TreeRBXS *tree) {
@@ -418,6 +461,8 @@ static void TreeRBXS_assert_structure(struct TreeRBXS *tree) {
 	} else {
 		if (tree->recent.prev == &tree->recent || tree->recent.next == &tree->recent)
 			croak("recent_count > 0, but list is empty");
+		if (tree->recent_limit >= 0 && tree->recent_count > tree->recent_limit)
+			croak("recent_count > recent_limit");
 	}
 	//warn("Tree is healthy");
 }
@@ -480,13 +525,137 @@ static void TreeRBXS_init_tmp_item(struct TreeRBXS_item *item, struct TreeRBXS *
 	item->value= value;
 }
 
+/* Alter the key of 'item' to be the same as the key of 'new_value', possibly
+ * reallocating item and possibly moving it to a new location in the tree.
+ * The item pointer might change if the memory got reallocated.
+ * The 'new_value' must be a "stack item" whch has not actually been allocated.
+ */
+void TreeRBXS_item_set_key(struct TreeRBXS_item **item_p, struct TreeRBXS_item *new_value) {
+	struct TreeRBXS_item *item= *item_p;
+	struct TreeRBXS *tree= TreeRBXS_item_get_tree(item);
+	int cmp= tree->compare(tree, new_value, item);
+	if (cmp != 0) {
+		rbtree_node_t *node= cmp < 0? rbtree_node_prev(&item->rbnode) : rbtree_node_next(&item->rbnode);
+		struct TreeRBXS_item *neighbor= node? GET_TreeRBXS_item_FROM_rbnode(node) : NULL;
+		int neighbor_cmp= neighbor? tree->compare(tree, new_value, neighbor) : 0;
+		IV new_extra= ITEM_EXTRA_BYTES_NEEDED(new_value);
+		if (IS_ITEM_KEY_STORED_IN_EXTRA(item)) {
+			IV cur_extra= ITEM_EXTRA_BYTES_NEEDED(item);
+			if (new_extra > cur_extra) {
+				item= TreeRBXS_item_realloc_extra(item, new_extra);
+				*item_p= item; /* pass back to caller as well */
+			}
+			/* it is now safe to memcpy() the key from new_value to item */
+		}
+		/* If the new key compares the same direction to the neighbor as it compared
+		   to the old key, then the node needs to move across the neighbor and we need
+		   to prune/insert to get it there.  We also need to run this code if the key
+		   is equal to the neighbor and duplicates are not allowed. */
+		if ((cmp > 0 && neighbor_cmp > 0) || (cmp < 0 && neighbor_cmp < 0)
+			|| (neighbor_cmp == 0 && !tree->allow_duplicates)
+		) {
+			rbtree_node_t * search[2];
+			bool found_identical;
+			/* Advance any iterators pointing at this node */
+			if (item->iter)
+				TreeRBXS_item_advance_all_iters(item, 0);
+			/* cancel the insert optimization if it pointed to this node */
+			if (tree->prev_inserted_item == item) {
+				tree->prev_inserted_item= NULL;
+				tree->prev_inserted_trend= 0;
+			}
+			/* This can't re-use the standard insertion code for nodes because that makes
+			 * assumptions that the tree is changing size, where in this case the size
+			 * remains the same.  Also this code intentionally doesn't modify the 'recent'
+			 * order.
+			 *
+			 * In the spirit of preserving order, make sure this element inserts closest
+			 * to the boundary_item of any duplicates, so use rbtree_find_all to get the
+			 * leftmost/rightmost match, or else the nearest node to insert under.
+			 *
+			 * Also, wait until the last minute to perform the prune operation and key
+			 * value replacement so that if there is a perl exception in a compare function
+			 * we don't leak the node or corrupt the tree.
+			 */
+			found_identical= rbtree_find_all(
+				&tree->root_sentinel,
+				new_value,
+				(int(*)(void*,void*,void*)) tree->compare,
+				tree, -OFS_TreeRBXS_item_FIELD_rbnode,
+				&search[0], &search[1], NULL);
+			/* remove */
+			rbtree_node_prune(&item->rbnode);
+			/* re-insert */
+			if (found_identical) {
+				/* insert-before leftmost, or insert-after rightmost */
+				if (cmp > 0)
+					rbtree_node_insert_before(search[0], &item->rbnode);
+				else
+					rbtree_node_insert_after(search[1], &item->rbnode);
+				/* remove conflicting nodes, if not permitted */
+				if (!tree->allow_duplicates) {
+					rbtree_node_t *rm_node= search[0];
+					do {
+						struct TreeRBXS_item *rm_item= GET_TreeRBXS_item_FROM_rbnode(rm_node);
+						rm_node= (rm_node == search[1])? NULL : rbtree_node_next(rm_node);
+						ASSUME(rm_item != item);
+						TreeRBXS_item_detach_tree(rm_item, tree);
+					} while (rm_node);
+				}
+			}
+			else if (search[0])
+				rbtree_node_insert_after(search[0], &item->rbnode);
+			else
+				rbtree_node_insert_before(search[1], &item->rbnode);
+		}
+		/* alter key */
+		switch (item->key_type) {
+		case KEY_TYPE_ANY:
+		case KEY_TYPE_CLAIM:
+			SvREFCNT_dec(item->keyunion.svkey);
+			if (item->key_type == KEY_TYPE_CLAIM)
+				item->keyunion.svkey= SvREFCNT_inc(new_value->keyunion.svkey);
+			else
+				item->keyunion.svkey= newSVsv(new_value->keyunion.svkey);
+			SvREADONLY_on(item->keyunion.svkey);
+			break;
+		case KEY_TYPE_INT:
+			item->keyunion.ikey= new_value->keyunion.ikey;
+			break;
+		case KEY_TYPE_FLOAT:
+			item->keyunion.nkey= new_value->keyunion.nkey;
+			break;
+		case KEY_TYPE_USTR:
+		case KEY_TYPE_BSTR:
+			/* the buffer length was prepared above */
+			memcpy((char*)item->keyunion.ckey, new_value->keyunion.ckey, new_value->ckeylen);
+			item->ckeylen= new_value->ckeylen;
+			break;
+		default:
+			croak("BUG: un-handled key_type %d", new_value->key_type);
+		}
+	}
+	if (item->orig_key_stored) {
+		/* This is the feature for transformed keys which records the original SV
+		   separate from the one used for node comparisons. So, this needs to run
+		   regardless of whether the keys compared equal above. */
+		ASSUME(new_value->orig_key_stored);
+		SV *orig= GET_TreeRBXS_item_ORIG_KEY(item);
+		SvREFCNT_dec(orig);
+		/* make a copy of the incoming SV */
+		orig= newSVsv(GET_TreeRBXS_stack_item_ORIG_KEY(new_value));
+		SvREADONLY_on(orig);
+		SET_TreeRBXS_item_ORIG_KEY(item, orig);
+	}
+}
+
 /* When insert has decided that the temporary node is permitted to be inserted,
  * this function allocates a real item struct with its own reference counts
  * and buffer data, etc.
  */
 static struct TreeRBXS_item * TreeRBXS_new_item_from_tmp_item(struct TreeRBXS_item *src) {
 	struct TreeRBXS_item *dst;
-	bool is_buffered_key= src->key_type == KEY_TYPE_USTR || src->key_type == KEY_TYPE_BSTR;
+	bool is_buffered_key= IS_ITEM_KEY_STORED_IN_EXTRA(src);
 	/* If the item references a string that is not managed by a SV,
 	   copy that into the space at the end of the allocated block.
 	   Also, if 'owner' is set, it is holding the original SV key
@@ -565,6 +734,76 @@ static bool TreeRBXS_is_member(struct TreeRBXS *tree, struct TreeRBXS_item *item
 	while (node && node->parent)
 		node= node->parent;
 	return node == &tree->root_sentinel;
+}
+
+/* Change the allocated size of the item.  If the pointer changes, also trace
+ * down everything pointing to the old memory location and redirect it to the
+ * new one.
+ */
+static struct TreeRBXS_item *
+TreeRBXS_item_realloc_extra(struct TreeRBXS_item *orig_item, size_t new_extra) {
+	rbtree_node_t *orig_rbnode= &orig_item->rbnode;
+	rbtree_node_t *root_sentinel= rbtree_node_rootsentinel(orig_rbnode);
+	struct TreeRBXS *tree= root_sentinel? GET_TreeRBXS_FROM_root_sentinel(root_sentinel) : NULL;
+	struct dllist_node *orig_llnode= &orig_item->recent;
+	IV orig_ckey_ofs= orig_item->keyunion.ckey - orig_item->extra; /* this may contain garbage depending on key_type */
+
+	struct TreeRBXS_item *item= (struct TreeRBXS_item*)
+		saferealloc(orig_item, sizeof(struct TreeRBXS_item) + new_extra);
+	if (item != orig_item) {
+		/* if the rbnode was in the tree, update parent and children pointers */
+		if (tree) {
+			if (item->rbnode.left->count) {
+				ASSUME(item->rbnode.left->parent == orig_rbnode);
+				item->rbnode.left->parent= &item->rbnode;
+			}
+			if (item->rbnode.right->count) {
+				ASSUME(item->rbnode.right->parent == orig_rbnode);
+				item->rbnode.right->parent= &item->rbnode;
+			}
+			if (item->rbnode.parent == root_sentinel) {
+				ASSUME(root_sentinel->left == orig_rbnode);
+				root_sentinel->left= &item->rbnode;
+			}
+			else if (item->rbnode.parent->left == orig_rbnode)
+				item->rbnode.parent->left= &item->rbnode;
+			else {
+				ASSUME(item->rbnode.parent->right == orig_rbnode);
+				item->rbnode.parent->right= &item->rbnode;
+			}
+			/* if member of the 'recent' linked list, update next and prev */
+			if (item->recent.next) {
+				ASSUME(item->recent.next->prev == orig_llnode);
+				ASSUME(item->recent.prev->next == orig_llnode);
+				item->recent.next->prev= &item->recent;
+				item->recent.prev->next= &item->recent;
+			}
+			/* other possible pointers are the tree's insert optimization */
+			if (tree->prev_inserted_item == orig_item)
+				tree->prev_inserted_item= item;
+		}
+		/* update every iterator which pointed to orig_item to point to new item */
+		if (item->iter) {
+			struct TreeRBXS_iter *cur= item->iter;
+			for (; cur; cur= cur->next_iter) {
+				ASSUME(cur->item == orig_item);
+				cur->item= item;
+			}
+		}
+		/* If a perl object points to this via MAGIC, update that pointer */
+		if (item->owner) {
+			MAGIC* magic= mg_findext(item->owner, PERL_MAGIC_ext, &TreeRBXS_item_magic_vt);
+			ASSUME(magic != NULL);
+			ASSUME(magic->mg_ptr == (char*) orig_item);
+			magic->mg_ptr= (char*) item;
+		}
+		/* and finally, update ckey (for the relevant key types) which points into extra[] */
+		if (IS_ITEM_KEY_STORED_IN_EXTRA(item)) {
+			ASSUME(orig_ckey_ofs >= 0 && orig_ckey_ofs <= sizeof(void*));
+			item->keyunion.ckey= item->extra + orig_ckey_ofs;
+		}
+	}
+	return item;
 }
 
 static void TreeRBXS_item_free(struct TreeRBXS_item *item) {
@@ -986,8 +1225,13 @@ TreeRBXS_insert_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, bo
 		if (cmp == 0) {
 			++tree->prev_inserted_trend;
 			if (overwrite) {
-				if (tree->prev_inserted_dup)
+				if (tree->prev_inserted_dup) {
+					/* the 'hint' provided needs to be the parent-most node of the duplicates */
+					while (hint->parent != &tree->root_sentinel
+						&& tree->compare(tree, stack_item, GET_TreeRBXS_item_FROM_rbnode(hint->parent)) == 0)
+						hint= hint->parent;
 					goto overwrite_multi;
+				}
 				else
 					goto overwrite_single;
 			} else if (tree->allow_duplicates)
@@ -1120,6 +1364,9 @@ static void TreeRBXS_recent_insert_before(struct TreeRBXS *tree, struct TreeRBXS
 		node_before->next= &item->recent;
 		item->recent.prev= node_before;
 		item->recent.next= node_after;
+		// prune oldest node if exceeded limit
+		if (tree->recent_limit >= 0 && tree->recent_count > tree->recent_limit)
+			TreeRBXS_truncate_recent(tree, tree->recent_limit, NULL);
 	}
 }
 
@@ -1136,6 +1383,27 @@ static void TreeRBXS_recent_prune(struct TreeRBXS *tree, struct TreeRBXS_item *i
 		item->recent.next= NULL;
 		item->recent.prev= NULL;
 		--tree->recent_count;
+	}
+}
+
+/* Remove all nodes older than the newest 'lim'-count
+ * The caller may optionally supply 'nodes_out' to receive mortal references
+ * to the removed nodes.  The caller must size it for (tree->recent_count - lim)
+ */
+static void TreeRBXS_truncate_recent(struct TreeRBXS *tree, IV lim, SV **nodes_out) {
+	if (lim >= 0 && tree->recent_count > lim) {
+		IV i, n= tree->recent_count - lim;
+		struct dllist_node *next, *cur= tree->recent.next;
+		for (i= 0; i < n && cur && cur != &tree->recent; i++) {
+			struct TreeRBXS_item *item= GET_TreeRBXS_item_FROM_recent(cur);
+			if (nodes_out)
+				nodes_out[i]= sv_2mortal(TreeRBXS_wrap_item(item));
+			next= cur->next;
+			TreeRBXS_item_detach_tree(item, tree);
+			cur= next;
+		}
+		if (i != n)
+			croak("BUG: recent_count inconsistent with length of linked list");
 	}
 }
 
@@ -1352,28 +1620,6 @@ static int TreeRBXS_magic_free(pTHX_ SV* sv, MAGIC* mg) {
 	}
     return 0; // ignored anyway
 }
-#ifdef USE_ITHREADS
-static int TreeRBXS_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
-    croak("This object cannot be shared between threads");
-    return 0;
-};
-#else
-#define TreeRBXS_magic_dup 0
-#endif
-
-// magic table for Tree::RB::XS
-static MGVTBL TreeRBXS_magic_vt= {
-	0, /* get */
-	0, /* write */
-	0, /* length */
-	0, /* clear */
-	TreeRBXS_magic_free,
-	0, /* copy */
-	TreeRBXS_magic_dup
-#ifdef MGf_LOCAL
-	,0
-#endif
-};
 
 // destructor for Tree::RB::XS::Node
 static int TreeRBXS_item_magic_free(pTHX_ SV* sv, MAGIC* mg) {
@@ -1384,20 +1630,6 @@ static int TreeRBXS_item_magic_free(pTHX_ SV* sv, MAGIC* mg) {
 	return 0;
 }
 
-// magic table for Tree::RB::XS::Node
-static MGVTBL TreeRBXS_item_magic_vt= {
-	0, /* get */
-	0, /* write */
-	0, /* length */
-	0, /* clear */
-	TreeRBXS_item_magic_free,
-	0, /* copy */
-	TreeRBXS_magic_dup
-#ifdef MGf_LOCAL
-	,0
-#endif
-};
-
 // destructor for Tree::RB::XS::Iter
 static int TreeRBXS_iter_magic_free(pTHX_ SV* sv, MAGIC *mg) {
 	if (mg->mg_ptr)
@@ -1405,18 +1637,17 @@ static int TreeRBXS_iter_magic_free(pTHX_ SV* sv, MAGIC *mg) {
 	return 0;
 }
 
-static MGVTBL TreeRBXS_iter_magic_vt= {
-	0, /* get */
-	0, /* write */
-	0, /* length */
-	0, /* clear */
-	TreeRBXS_iter_magic_free,
-	0, /* copy */
-	TreeRBXS_magic_dup
-#ifdef MGf_LOCAL
-	,0
-#endif
+#ifdef USE_ITHREADS
+/* Function that tells ithread users they can't clone the tree
+ * (patches welcome, but it's a hard problem with needing to reconnect the
+ * items and iterators that might be held as perl objects)
+ */
+static int TreeRBXS_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
+    croak("This object cannot be shared between threads");
+    return 0;
 };
+#endif
+
 
 // Return the TreeRBXS struct attached to a Perl object via MAGIC.
 // The 'obj' should be a reference to a blessed SV.
@@ -1676,6 +1907,10 @@ IV init_tree_from_attr_list(
 		case 10: if (strcmp("compare_fn", attrname) == 0) { compare_fn_sv= val; break; }
 			else goto keep_unknown;
 		case 12: if (strcmp("track_recent", attrname) == 0) { tree->track_recent= val && SvTRUE(val); break; }
+			else if (strcmp("recent_limit", attrname) == 0) {
+				tree->recent_limit= val && SvOK(val) && SvIV(val) >= 0? SvIV(val) : -1;
+				break;
+			}
 			else goto keep_unknown;
 		case 15: if (strcmp("compat_list_get", attrname) == 0) { tree->compat_list_get= val && SvTRUE(val); break; }
 			else goto keep_unknown;
@@ -1962,6 +2197,10 @@ STORABLE_freeze(tree, cloning)
 		while ((pos= hv_iternext(treehv))) {
 			av_push(attrs, SvREFCNT_inc(hv_iterkeysv(pos)));
 			av_push(attrs, newSVsv(hv_iterval(treehv, pos)));
+		}
+		if (tree->recent_limit >= 0) {
+			av_push(attrs, newSVpvs("recent_limit"));
+			av_push(attrs, newSViv(tree->recent_limit));
 		}
 
 		/* Build lists of keys and values */
@@ -2288,6 +2527,27 @@ recent_count(tree)
 		RETVAL
 
 void
+recent_limit(tree, newval=NULL)
+	struct TreeRBXS *tree
+	SV *newval
+	PPCODE:
+		if (newval) {
+			if (!SvOK(newval)) {
+				tree->recent_limit= -1;
+			} else if (!looks_like_number(newval) || SvIV(newval) < 0) {
+				croak("Expected non-negative integer");
+			} else {
+				tree->recent_limit= SvIV(newval);
+				TreeRBXS_truncate_recent(tree, tree->recent_limit, NULL);
+			}
+			//ST(0) is $self, so let it be the return value
+		} else {
+			ST(0)= tree->recent_limit < 0? &PL_sv_undef
+			     : sv_2mortal(newSViv(tree->recent_limit));
+		}
+		XSRETURN(1);
+
+void
 _insert_optimization_debug(tree)
 	struct TreeRBXS *tree;
 	PPCODE:
@@ -2303,8 +2563,10 @@ insert(tree, key, val=&PL_sv_undef)
 	SV *key
 	SV *val
 	ALIAS:
-		Tree::RB::XS::put         = 1
-		Tree::RB::XS::STORE       = 1
+		Tree::RB::XS::put            = 1
+		Tree::RB::XS::STORE          = 1
+		Tree::RB::XS::insert_as_node = 2
+		Tree::RB::XS::put_as_node    = 3
 	INIT:
 		struct TreeRBXS_item stack_item, *inserted;
 		SV *oldval= NULL;
@@ -2313,9 +2575,10 @@ insert(tree, key, val=&PL_sv_undef)
 		if (!SvOK(key))
 			croak("Can't use undef as a key");
 		TreeRBXS_init_tmp_item(&stack_item, tree, key, val);
-		inserted= TreeRBXS_insert_item(tree, &stack_item, ix == 1, &oldval);
+		inserted= TreeRBXS_insert_item(tree, &stack_item, (ix & 1), &oldval);
 		ST(0)= ix == 0? sv_2mortal(newSViv(inserted? rbtree_node_index(&inserted->rbnode) : -1))
-			: (oldval? oldval : &PL_sv_undef);
+			: ix == 1? (oldval? oldval : &PL_sv_undef)
+			: (inserted? sv_2mortal(TreeRBXS_wrap_item(inserted)) : &PL_sv_undef);
 		XSRETURN(1);
 
 IV
@@ -2825,30 +3088,20 @@ truncate_recent(tree, max_count)
 		bool keep= !(GIMME_V == G_VOID || GIMME_V == G_SCALAR);
 		IV i, n= 0;
 	PPCODE:
-		if (max_count > 0 && tree->recent_count > max_count) {
+		// prune oldest nodes if exceeded limit
+		if (max_count >= 0 && tree->recent_count > max_count) {
 			n= tree->recent_count - max_count;
-			cur= tree->recent.next;
-			if (keep)
+			if (keep) {
 				EXTEND(SP, n);
-			for (i= 0; i < n && cur && cur != &tree->recent; i++) {
-				item= GET_TreeRBXS_item_FROM_recent(cur);
-				if (keep)
-					ST(i)= sv_2mortal(TreeRBXS_wrap_item(item));
-				next= cur->next;
-				TreeRBXS_item_detach_tree(item, tree);
-				cur= next;
+				TreeRBXS_truncate_recent(tree, max_count, &ST(0));
+				XSRETURN(n);
+			} else {
+				TreeRBXS_truncate_recent(tree, max_count, NULL);
 			}
-			if (i != n)
-				croak("BUG: recent_count inconsistent with length of linked list");
 		}
-		if (keep) {
-			XSRETURN(n);
-		} else if (GIMME_V == G_SCALAR) {
-			ST(0)= sv_2mortal(newSViv(n));
-			XSRETURN(1);
-		} else {
-			XSRETURN(0);
-		}
+		if (GIMME_V == G_SCALAR)
+			PUSHs(sv_2mortal(newSViv(n)));
+		/* else return empty list */
 
 IV
 clear(tree)
@@ -3132,17 +3385,26 @@ cmp_numsplit(key_a, key_b)
 MODULE = Tree::RB::XS              PACKAGE = Tree::RB::XS::Node
 
 SV *
-key(item)
+key(item, newval=NULL)
 	struct TreeRBXS_item *item
+	SV *newval
 	CODE:
-		RETVAL= TreeRBXS_item_wrap_key(item);
+		if (newval) {
+			struct TreeRBXS *tree= TreeRBXS_item_get_tree(item);
+			struct TreeRBXS_item stack_item;
+			TreeRBXS_init_tmp_item(&stack_item, tree, newval, &PL_sv_undef);
+			TreeRBXS_item_set_key(&item, &stack_item);
+		}
+		/* semi-expensive if just setting key, so check for void context */
+		RETVAL= (GIMME_V == G_VOID)? &PL_sv_undef
+			: TreeRBXS_item_wrap_key(item);
 	OUTPUT:
 		RETVAL
 
 SV *
 value(item, newval=NULL)
 	struct TreeRBXS_item *item
-	SV *newval;
+	SV *newval
 	CODE:
 		if (newval)
 			sv_setsv(item->value, newval);

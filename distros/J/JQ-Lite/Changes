@@ -1,3 +1,14 @@
+1.50  2025-12-18
+    - Promote release to version 1.50.
+    - Allow CLI JSON encoding to accept scalar values when processing
+      --argjson and raw input modes, eliminating warnings and exit failures.
+    - Consolidate raw-input handling under a shared UTF-8 encoder to keep
+      per-line and slurped text output consistent.
+
+1.49  2025-12-17
+    - Allow t/path.t to skip cleanly on Perl 5.28 and earlier by removing
+      the hard 5.029 requirement.
+
 1.48  2025-12-17
     - Added jq-compatible --ascii-output / -a flag for ASCII-escaped output.
     - Note: Interaction with -r (raw output) and -R (raw input) will be refined in a follow-up release.
@@ -952,6 +963,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

@@ -1,5 +1,13 @@
 Revision history for Perl extension App-dozo
 
+0.9926 2025-12-18T05:02:27Z
+
+    - fix help output to exclude POD directives like =for html
+    - improve debug output and fix container naming
+    - update logo whale tail design
+    - fix getoptlong.sh discovery in CPAN test environment
+    - add fallback to find getoptlong.sh from script location
+
 0.9925 2025-12-17T00:56:17Z
 
     - rebrand to Dôzo with new stroke-based logo

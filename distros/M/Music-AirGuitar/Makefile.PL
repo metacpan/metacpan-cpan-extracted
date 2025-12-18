@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Provides an interface for air guitars",
-  "AUTHOR" => "L\x{f6}wenfelsen UG (haftungsbeschr\x{e4}nkt) <support\@loewenfelsen.net>",
+  "AUTHOR" => "Philipp Schafft <lion\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.03",
+  "VERSION" => "v0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

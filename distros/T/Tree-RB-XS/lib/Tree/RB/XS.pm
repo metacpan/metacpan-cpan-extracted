@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.19';
+$Tree::RB::XS::VERSION = '0.20';
 # VERSION
 # ABSTRACT: Red/Black Tree and LRU Cache implemented in C
 
@@ -349,6 +349,13 @@ You may toggle this attribute after construction.
 
 =item *
 
+C<recent_limit>
+
+Maximum number of elements in the recent list before auto-truncating them.
+You may alter this attribute after construction.
+
+=item *
+
 C<lookup_updates_recent>
 
 Whether L</lookup> and L</get> methods automatically mark a node as the most recent.
@@ -480,6 +487,11 @@ Returns the number of elements in the tree.
 =head2 recent_count
 
 Returns the number of nodes with insertion-order tracking enabled.  See L</track_recent>.
+
+=head2 recent_limit
+
+If you set this attribute, any time the tree's recent list exceeds this number, the oldest nodes
+on the list will be automatically pruned as per L</truncate_recent>.  The default is C<undef>.
 
 =head2 root_node
 
@@ -630,6 +642,12 @@ the old value, and updates the tree to reference the new value.  If the tree
 allows duplicate keys, this will remove all but one node having this key and
 then set its value.  Only the first old value will be returned.
 
+=head2 put_as_node
+
+  my $node= $tree->put_as_node($key, $new_val);
+
+Same as L</put> but return the node object.
+
 =head2 put_multi
 
   $added_count= $tree->put_multi($k, $v, $k, $v, ...);
@@ -650,6 +668,12 @@ Insert a new node into the tree, and return the index at which it was inserted.
 If L</allow_duplicates> is not enabled, and the node already existed, this returns -1
 and does not change the tree.  If C<allow_duplicates> is enabled, this adds the new
 node after all nodes of the same key, preserving the insertion order.
+
+=head2 insert_as_node
+
+  my $node= $tree->insert_as_node($key, $value);
+
+Same as L</insert> but return the node object.
 
 =head2 insert_multi
 
@@ -1189,7 +1213,7 @@ fast and minimal.  Tree::RB::XS can do the same a bit faster with:
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

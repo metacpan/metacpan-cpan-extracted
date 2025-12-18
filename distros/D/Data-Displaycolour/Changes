@@ -1,4 +1,7 @@
-v0.04  2026-11-30Z
+v0.05  2025-12-18Z
+    - Updated list of extra colours
+
+v0.04  2025-11-30Z
     - Allow to disable fallback colours
     - Updated the colour name matching algo to a better one
     - Updated list of extra terms

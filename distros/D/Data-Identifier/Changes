@@ -1,3 +1,9 @@
+v0.27  2025-12-18Z
+    - Updated documentation
+    - Accept negative numbers for RoarAudio error numbers
+    - Added uuidhexdash, and uuidHEXDASH packing formats
+    - Improved experimental skip_invalid support
+
 v0.26  2025-11-25Z
     - Updated documentation
     - Added experimental Data::Identifier::Wellknown->announce()

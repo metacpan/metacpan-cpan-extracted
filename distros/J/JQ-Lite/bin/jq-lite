@@ -301,9 +301,11 @@ if ($raw_input) {
 
 my @raw_lines;
 if ($raw_input) {
-    my $text = $json_text // '';
+    my $text    = $json_text // '';
+    my $encoder = JSON::PP->new->utf8->allow_nonref;
+
     if ($slurp_input) {
-        $json_text = JSON::PP->new->allow_nonref->encode($text);
+        $json_text = $encoder->encode($text);
     }
     else {
         @raw_lines = split /\r?\n/, $text, -1;
@@ -411,7 +413,7 @@ sub colorize_json {
 # ---------- Output ----------
 sub print_results {
     my @results = @_;
-    my $pp = JSON::PP->new->utf8->canonical;
+    my $pp = JSON::PP->new->utf8->allow_nonref->canonical;
     $pp->pretty unless $compact_output;
     $pp->ascii($ascii_output);
 
@@ -524,7 +526,7 @@ if (!defined $query) {
 my @results;
 
 if ($raw_input && !$slurp_input) {
-    my $encoder = JSON::PP->new->allow_nonref;
+    my $encoder = JSON::PP->new->utf8->allow_nonref;
     for my $line (@raw_lines) {
         my $encoded_line = $encoder->encode($line);
         my @line_results = eval { $jq->run_query($encoded_line, $query) };

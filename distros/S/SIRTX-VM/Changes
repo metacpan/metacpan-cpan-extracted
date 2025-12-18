@@ -1,3 +1,7 @@
+v0.11  2025-12-18Z
+    - Added support for more opcodes in disassembler
+    - Added support for .paddingchunk in assembler
+
 v0.10  2025-11-05Z
     - Fixed invalid integer rendering in SIRTX::VM::Opcode
     - Added basic chunk support in disassembler

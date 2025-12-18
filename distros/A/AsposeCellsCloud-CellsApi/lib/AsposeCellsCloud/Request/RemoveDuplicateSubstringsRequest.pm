@@ -61,8 +61,8 @@ sub new {
 
 # Run Operation Request
 # RemoveDuplicateSubstringsRequest.Spreadsheet : Upload spreadsheet file.  ,
-# RemoveDuplicateSubstringsRequest.delimiters :   ,
-# RemoveDuplicateSubstringsRequest.treatConsecutiveDelimitersAsOne :   ,
+# RemoveDuplicateSubstringsRequest.delimiters : comma, semicolon, space, tab, line-break   ,
+# RemoveDuplicateSubstringsRequest.treatConsecutiveDelimitersAsOne : collapse adjacent delimiters into a single separator.  ,
 # RemoveDuplicateSubstringsRequest.caseSensitive :   ,
 # RemoveDuplicateSubstringsRequest.worksheet :   ,
 # RemoveDuplicateSubstringsRequest.range :   ,
@@ -169,14 +169,14 @@ __PACKAGE__->method_documentation({
      'delimiters' => {
      	datatype => 'string',
      	base_name => 'delimiters',
-     	description => '',
+     	description => 'comma, semicolon, space, tab, line-break ',
      	format => '',
      	read_only => '',
      		},
      'treat_consecutive_delimiters_as_one' => {
      	datatype => 'string',
      	base_name => 'treatConsecutiveDelimitersAsOne',
-     	description => '',
+     	description => 'collapse adjacent delimiters into a single separator.',
      	format => '',
      	read_only => '',
      		},

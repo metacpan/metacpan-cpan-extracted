@@ -47,10 +47,10 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Marlin"            => { file => "lib/Marlin.pm", version => 0.003001 },
-                        "Marlin::Attribute" => { file => "lib/Marlin/Attribute.pm", version => 0.003001 },
-                        "Marlin::Role"      => { file => "lib/Marlin/Role.pm", version => 0.003001 },
-                        "Marlin::Util"      => { file => "lib/Marlin/Util.pm", version => 0.003001 },
+                        "Marlin"            => { file => "lib/Marlin.pm", version => "0.004000" },
+                        "Marlin::Attribute" => { file => "lib/Marlin/Attribute.pm", version => "0.004000" },
+                        "Marlin::Role"      => { file => "lib/Marlin/Role.pm", version => "0.004000" },
+                        "Marlin::Util"      => { file => "lib/Marlin/Util.pm", version => "0.004000" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -64,7 +64,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin/project",
                       },
-  "version"        => 0.003001,
+  "version"        => "0.004000",
 };
 
 my %dynamic_config;

@@ -1,4 +1,3 @@
-# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -22,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.19;
+our $VERSION = v0.20;
 
 my %names = (
     service => {
@@ -246,6 +245,10 @@ sub lookup {
             $uri = $uri->data;
             $type = 'qrcode';
         } elsif ($uri->isa('Data::Identifier')) {
+            $type = $uri->type->uuid;
+            $uri  = $uri->id;
+        } elsif ($uri->isa('Data::TagDB::Tag')) {
+            $uri  = Data::Identifier->new(from => $uri);
             $type = $uri->type->uuid;
             $uri  = $uri->id;
         } elsif (index(blessed($uri), __PACKAGE__) == 0 && $uri->can('ise')) {
@@ -512,7 +515,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.19
+version v0.20
 
 =head1 SYNOPSIS
 
@@ -644,6 +647,7 @@ Alternatively can internally also convert from
 L<Mojo::URL>,
 L<File::FStore::File>,
 L<Data::Identifier>,
+L<Data::TagDB::Tag>,
 L<Data::URIID::Service>,
 L<Data::URIID::Result>,
 and L<Data::URIID::Colour>.
@@ -740,11 +744,11 @@ For a list of known/supported services see L<Data::URIID::Service/"KNOWN/SUPPORT
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

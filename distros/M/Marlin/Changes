@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.004000	2025-12-17
+
+ - Added: Allow attribute declarations to tweak how the attribute will be
+   stored, including allowing inside-out attributes.
+ - Added: Implement constant attributes.
+
 0.003001	2025-12-16
 
  - Use a newer version of Class::XSConstructor with fixes for BUILD

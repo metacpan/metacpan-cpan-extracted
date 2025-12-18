@@ -18,6 +18,8 @@ class Mojolicious::Controller {
   use Mojo::UserAgent;
   use Mojo::ByteStream;
   use Mojo::Collection;
+  use Mojolicious::Helper::Timing;
+  use Mojolicious::Helper::Reply;
   
   our $ABSOLUTE : string;
   INIT {
@@ -54,6 +56,8 @@ class Mojolicious::Controller {
   
   has stash_h : rw Hash;
   
+  has shared_stash_h : rw Hash;
+  
   has session_h : virtual ro Hash
     get {
       my $stash = $self->stash_h;
@@ -80,11 +84,17 @@ class Mojolicious::Controller {
     }
   ;
   
+  # Internal fields
+  has mojo_static : rw byte;
+  
+  # Class Methods
   static method new : Mojolicious::Controller () {
     
     my $self = new Mojolicious::Controller;
     
     $self->{stash_h} = Hash->new;
+    
+    $self->{shared_stash_h} = Hash->new;
     
     return $self;
   }
@@ -451,6 +461,14 @@ class Mojolicious::Controller {
     $self->{stash_h}{$name} = $value;
   }
   
+  method shared_stash : object ($name : string) {
+    return $self->{shared_stash_h}{$name};
+  }
+  
+  method set_shared_stash : void ($name : string, $value : object) {
+    $self->{shared_stash_h}{$name} = $value;
+  }
+  
   method url_for : Mojo::URL ($target : string|Mojo::URL)  {
     
     # Absolute URL
@@ -553,10 +571,28 @@ class Mojolicious::Controller {
   
   method reply : Mojolicious::Helper::Reply () {
     
-    my $reply = Mojolicious::Helper::Reply->new;
-    $reply->set_controller($self);
+    unless ($self->shared_stash_h->exists("reply")) {
+      my $reply = my $_ = Mojolicious::Helper::Reply->new;
+      $_->set_controller($self);
+      
+      $self->shared_stash_h->{"reply"} = $reply;
+    }
     
-    return $reply;
+    
+    return $self->shared_stash_h->{"reply"}->(Mojolicious::Helper::Reply);
+  }
+  
+  method timing : Mojolicious::Helper::Timing () {
+    
+    unless ($self->shared_stash_h->exists("timing")) {
+      my $timing = my $_ = Mojolicious::Helper::Timing->new;
+      $_->set_controller($self);
+      
+      $self->shared_stash_h->{"timing"} = $timing;
+    }
+    
+    
+    return $self->shared_stash_h->{"timing"}->(Mojolicious::Helper::Timing);
   }
   
   method include : Mojo::ByteStream ($options : Hash|object[] = undef) {
@@ -632,35 +668,120 @@ class Mojolicious::Controller {
     $self->app->renderer->accepts($self, $preferences);
   }
   
+  method csrf_token : string () {
+    
+    unless ($self->session_h->exists("csrf_token")) {
+      $self->session_h->{"csrf_token"} = Mojo::Util->hmac_sha1_sum(Sys->process_id . Mojo::Util->steady_time . Sys->rand, $self->app->secrets->[0]);
+    }
+    
+    return $self->session_h->{"csrf_token"}->(string);
+  }
+  
+  method is_current_route : int ($name : string) {
+    
+    my $route = $self->match->endpoint;
+    
+    unless ($route) {
+      return 0;
+    }
+    
+    return $route->name eq $name;
+  }
+
+  method current_route : string () {
+    
+    my $route = $self->match->endpoint;
+    
+    unless ($route) {
+      return "";
+    }
+    
+    return $route->name;
+  }
+  
+  method exception_format : string () {
+    
+    my $stash = $self->stash_h;
+    
+    $stash->{"mojo.exception_format"} //= $self->app->exception_format;
+    
+    return $stash->{"mojo.exception_format"}->(string);
+  }
+  
+  method set_exception_format : void ($format : string) {
+    
+    my $stash = $self->stash_h;
+    
+    $stash->{"mojo.exception_format"} = $format;
+  }
+
+  method set_inactivity_timeout  : void ($timeout : double){
+  
+    my $connection = $self->tx->connection;
+    if ($connection) {
+      $connection->set_timeout($timeout);
+    }
+  }
+  
+  method is_fresh : int ($options : Hash|object[] = undef) {
+    
+    return $self->app->static->is_fresh($self, $options);
+  }
+  
+  method redirect_to : void ($path : string)  {
+    
+    # Don't override 3xx status
+    my $res = $self->res;
+    $res->headers->set_location($self->url_for($path));
+    
+    $self->rendered($res->is_redirect ? 0 : 302);
+  }
+  
+  method respond_to : void ($options : Hash|object[] = undef) {
+    
+    my $options = Fn->to_hash($options);
+    
+    # Find target
+    my $target = (object)undef;
+    my $renderer = $self->app->renderer;
+    my $formats  = Array->copy_string($renderer->accepts($self));
+    unless (@$formats) {
+      $formats = [$renderer->default_format];
+    }
+    for my $format (@$formats) {
+      $target = $options->{$format};
+      unless ($target) {
+        next;
+      }
+      $self->stash_h->{"format"} = $format;
+      last;
+    }
+    
+    # Fallback
+    unless ($target) {
+      $target = $options->{"any"};
+      unless ($target) {
+        $self->rendered(204);
+        return;
+      }
+      $self->stash_h->delete("format");
+    }
+    
+    # Dispatch
+    if ($target isa Mojolicious::Callback) {
+      $target->(Mojolicious::Callback)->($self);
+    }
+    else {
+      $self->render($target->(object[]));
+    }
+  }
+  
+  method url_with : Mojo::URL ($path : string) {
+    
+    my $url = $self->url_for($path);
+    $url->set_query($self->req->url->query->clone);
+    
+    return $url;
+  }
+
 }
-
-__END__
-
-TODO: DefaultHelper
-
-sub register {
-  my ($self, $app) = @_;
-  
-  $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route exception_format inactivity_timeout is_fresh),
-    qw(redirect_to respond_to url_with);
-  
-  $app->helper("reply.$_" => $self->can("_$_")) for qw(asset file static);
-  
-  $app->helper('reply.exception',      => sub { shift->helpers->reply->http_exception(@_) });
-  $app->helper('reply.not_found',      => sub { shift->helpers->reply->http_not_found() });
-  $app->helper('reply.http_exception', => \&_http_exception);
-  $app->helper('reply.http_not_found', => \&_http_not_found);
-  $app->helper('reply.html_exception'  => sub { _development('exception', @_) });
-  $app->helper('reply.html_not_found'  => sub { _development('not_found', @_) });
-  $app->helper('reply.json_exception', => \&_json_exception);
-  $app->helper('reply.json_not_found', => \&_json_not_found);
-  $app->helper('reply.txt_exception',  => \&_txt_exception);
-  $app->helper('reply.txt_not_found',  => \&_txt_not_found);
-
-  $app->helper('timing.begin'         => \&_timing_begin);
-  $app->helper('timing.elapsed'       => \&_timing_elapsed);
-  $app->helper('timing.rps'           => \&_timing_rps);
-  $app->helper('timing.server_timing' => \&_timing_server_timing);
-}
-

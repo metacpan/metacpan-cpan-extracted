@@ -1,0 +1,100 @@
+class TestCase::Mojo::Util {
+  use Mojo::Util;
+  
+  static method split_header : int () {
+    
+    {
+      my $header_value = "session=id; Path=\"/app\"; HttpOnly; Secure";
+      
+      my $headers = Mojo::Util->split_header($header_value);
+      
+      my $expect = [
+        [
+          "session",
+          "id",
+          "Path",
+          "/app",
+          "HttpOnly",
+          undef,
+          "Secure",
+          undef,
+        ]
+      ];
+      
+      unless (Array->equals($headers->[0], $expect->[0])) {
+        diag dump $headers;
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $header_value = "session=id; Path=\"/app\"; HttpOnly; Secure, foo=bar";
+      
+      my $headers = Mojo::Util->split_header($header_value);
+      
+      my $expect = [
+        [
+          "session",
+          "id",
+          "Path",
+          "/app",
+          "HttpOnly",
+          undef,
+          "Secure",
+          undef,
+        ],
+        [
+          "foo",
+          "bar",
+        ]
+      ];
+      
+      unless (Array->equals($headers->[0], $expect->[0])) {
+        diag dump $headers;
+        return 0;
+      }
+      
+      unless (Array->equals($headers->[1], $expect->[1])) {
+        diag dump $headers;
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method split_cookie_header : int () {
+    
+    {
+      my $header_value = "session=id; Path=\"/app\"; HttpOnly; Secure;Expires=Wed, 21 Oct 2025 07:28:00 GMT";
+      
+      my $headers = Mojo::Util->split_cookie_header($header_value);
+      
+      my $expect = [
+        [
+          "session",
+          "id",
+          "Path",
+          "/app",
+          "HttpOnly",
+          undef,
+          "Secure",
+          undef,
+          "Expires",
+          "Wed, 21 Oct 2025 07:28:00 GMT",
+        ]
+      ];
+      
+      unless (Array->equals($headers->[0], $expect->[0])) {
+        diag dump $headers;
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+}

@@ -72,7 +72,7 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
       exit 2;
     }
 
-    $result = $document->validate;
+    $result = $document->validate($opt->with_defaults ? (with_defaults => 1) : ());
   }
   else {
     # not an OpenAPI document? assume it's a vanilla JSON Schema
@@ -139,7 +139,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.116
+version 0.117
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -19,7 +19,7 @@ use SIRTX::VM::Assembler;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1);
 
@@ -84,6 +84,21 @@ my %_logicals_to_sid = (
     east        => 209,
     south       => 210,
     west        => 211,
+);
+
+my %_compare_flags = (
+    with            => 0x0000, # no-op
+    icase           => 0x0001,
+    asciz           => 0x0008,
+    nulls_distinct  => 0x0080,
+    nulls_equal     => 0x0040,
+    nulls_first     => 0x0010,
+    nulls_last      => 0x0020,
+    prefix          => 0x0002,
+    suffix          => 0x0004,
+    seekback_end    => 0x0400,
+    seekback_start  => 0x0200,
+    subject         => 0x0100,
 );
 
 my %_logicals = (
@@ -361,30 +376,8 @@ sub from_template {
         my $flags = 0;
 
         foreach my $flag (@flags) {
-            if ($flag eq 'with') {
-                # no-op
-            } elsif ($flag eq 'icase') {
-                $flags |= 0x0001;
-            } elsif ($flag eq 'asciz') {
-                $flags |= 0x0008;
-            } elsif ($flag eq 'nulls_distinct') {
-                $flags |= 0x0080;
-            } elsif ($flag eq 'nulls_equal') {
-                $flags |= 0x0040;
-            } elsif ($flag eq 'nulls_first') {
-                $flags |= 0x0010;
-            } elsif ($flag eq 'nulls_last') {
-                $flags |= 0x0020;
-            } elsif ($flag eq 'prefix') {
-                $flags |= 0x0002;
-            } elsif ($flag eq 'suffix') {
-                $flags |= 0x0004;
-            } elsif ($flag eq 'seekback_end') {
-                $flags |= 0x0400;
-            } elsif ($flag eq 'seekback_start') {
-                $flags |= 0x0200;
-            } elsif ($flag eq 'subject') {
-                $flags |= 0x0100;
+            if (defined(my $v = $_compare_flags{$flag})) {
+                $flags |= $v;
             } else {
                 croak sprintf('Unsupported compare flag: line %s: flag %s', $line, $flag);
             }
@@ -714,6 +707,8 @@ sub as_text {
                     $command .= sprintf(' %u', shift(@extra));
                 } elsif ($type eq 'undef' && $dst eq 'undef') {
                     $command .= ' undef';
+                } elsif ($type =~ /^"([0-9a-zA-Z]+)"$/ && $dst eq 'undef') {
+                    $command .= ' '.$1;
                 } elsif ($type eq 'autodie' && $dst eq 'true') {
                     $command =~ s/^(\S+)(\s?)/$1!$2/;
                 } elsif ($type eq 'autodie' && $dst eq 'false') {
@@ -751,6 +746,30 @@ sub as_text {
             $command = sprintf('open r%u %s:%u', $P, $sni, $id);
         } elsif ($code == 0 && $codeX == 1 && $S == 7 && $T == (0+1)) {
             $command = sprintf('open r%u %u', $P, unpack('n', $extra));
+        } elsif ($code == 3 && $codeX == 2 && $S == 0) {
+            my $flags = unpack('n', $extra);
+            $command  = sprintf('compare out, r%u r%i', $P, $T);
+            $command .= ' with' if $flags;
+            foreach my $key (sort keys %_compare_flags) {
+                $command .= ' '.$key if $flags & $_compare_flags{$key};
+            }
+        } elsif ($code == 3 && $codeX == 0) {
+            $command = sprintf('jump %u', unpack('n', $extra)*2 + $self->{pos} + 4);
+            if ($P & 0x01) {
+                $command .= ' unless';
+            } else {
+                $command .= ' if';
+            }
+
+            $command .= ' out is valid or'   if $S & 0x01;
+            $command .= ' out is true or'    if $S & 0x02;
+            $command .= ' out is notfine or' if $S & 0x04;
+
+            $command .= ' out < 0 or'        if $T & 0x01;
+            $command .= ' out == 0 or'       if $T & 0x02;
+            $command .= ' out > 0 or'        if $T & 0x04;
+
+            $command =~ s/ or$//;
         }
     }
 
@@ -912,7 +931,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -1057,11 +1076,11 @@ It should not be called directly.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

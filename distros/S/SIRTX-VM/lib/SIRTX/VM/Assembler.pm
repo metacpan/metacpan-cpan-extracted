@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -23,7 +23,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my %_escapes = (
     '\\' => '\\',
@@ -233,6 +233,11 @@ my %_synthetic = (
         '.filechunk'    => [[string => 1, 'any...' => 2] => [] => [
                 ['.chunk', \2],
                 ['.cat', \1],
+                ['.endchunk'],
+            ]],
+        '.paddingchunk' => [['any...' => 1] => [] => [
+                ['.chunk', 'of', 'sni:237'],
+                ['.org', \1],
                 ['.endchunk'],
             ]],
     },
@@ -1315,7 +1320,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -1385,11 +1390,11 @@ C<$filename> may be a file name or a already open file handle.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

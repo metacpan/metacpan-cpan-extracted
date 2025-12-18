@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 25.11
+    version: 25.12
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -997,6 +997,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/MergeRemoteSpreadsheetRequest.pm
   AsposeCellsCloud::Request::SplitSpreadsheetRequest:
     file: lib/AsposeCellsCloud/Request/SplitSpreadsheetRequest.pm
+  AsposeCellsCloud::Request::SplitTableRequest:
+    file: lib/AsposeCellsCloud/Request/SplitTableRequest.pm
   AsposeCellsCloud::Request::SplitRemoteSpreadsheetRequest:
     file: lib/AsposeCellsCloud/Request/SplitRemoteSpreadsheetRequest.pm
   AsposeCellsCloud::Request::ImportDataIntoSpreadsheetRequest:
@@ -1812,5 +1814,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 25.11
+version: 25.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

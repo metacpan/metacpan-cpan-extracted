@@ -8,7 +8,7 @@ use Params::Get 0.13;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.79
+Version 0.80
 
 =cut
 
@@ -339,7 +339,7 @@ locale is used via the LANG environment variable.
 =cut
 
 sub language {
-	my $self = shift;
+	my $self = $_[0];
 
 	unless($self->{_slanguage}) {
 		$self->_find_language();
@@ -367,7 +367,7 @@ Synonym for language, for compatibility with Local::Object::Language
 =cut
 
 sub name {
-	my $self = shift;
+	my $self = $_[0];
 
 	return $self->language();
 }
@@ -383,7 +383,7 @@ on a site that only serves British English, sublanguage() will return undef.
 =cut
 
 sub sublanguage {
-	my $self = shift;
+	my $self = $_[0];
 
 	$self->_trace('Entered sublanguage');
 	unless($self->{_slanguage}) {
@@ -404,7 +404,7 @@ language_code_alpha2() returns undef.
 =cut
 
 sub language_code_alpha2 {
-	my $self = shift;
+	my $self = $_[0];
 
 	$self->_trace('Entered language_code_alpha2');
 	unless($self->{_slanguage}) {
@@ -421,7 +421,7 @@ Synonym for language_code_alpha2, kept for historical reasons.
 =cut
 
 sub code_alpha2 {
-	my $self = shift;
+	my $self = $_[0];
 
 	return $self->language_code_alpha2();
 }
@@ -434,7 +434,7 @@ when you've asked for en-gb, or undef.
 =cut
 
 sub sublanguage_code_alpha2 {
-	my $self = shift;
+	my $self = $_[0];
 
 	unless($self->{_slanguage}) {
 		$self->_find_language();
@@ -454,7 +454,7 @@ e.g. "English (United Kingdom)"
 =cut
 
 sub requested_language {
-	my $self = shift;
+	my $self = $_[0];
 
 	unless($self->{_rlanguage}) {
 		$self->_find_language();
@@ -559,7 +559,12 @@ sub _find_language
 						$sl = $self->_code2country($1);
 						$requested_sublanguage = $1 if(!defined($requested_sublanguage));
 					} elsif($http_accept_language =~ /..-([a-z]{2,3})$/i) {
-						$sl = Locale::Object::Country->new(code_alpha3 => $1);
+						eval {
+							$sl = Locale::Object::Country->new(code_alpha3 => $1);
+						};
+						if($@) {
+							$self->_info($@);
+						}
 					}
 					if($sl) {
 						$self->{_rlanguage} .= ' (' . $sl->name() . ')';
@@ -869,7 +874,7 @@ sub _get_closest
 
 # What's the language being requested? Can be used in both a class and an object context
 sub _what_language {
-	my $self = shift;
+	my $self = $_[0];
 
 	if(ref($self)) {
 		$self->_trace('Entered _what_language');
@@ -1124,7 +1129,7 @@ sub country {
 					$self->{_country} = 'cn';
 				} else {
 					# There is no country called 'eu'
-					$self->_warn({
+					$self->_info({
 						warning => "$ip has country of eu"
 					});
 					$self->{_country} = 'Unknown';

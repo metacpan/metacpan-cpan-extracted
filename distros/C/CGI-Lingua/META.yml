@@ -6,6 +6,8 @@ build_requires:
   CHI: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
+  FindBin: '0'
+  IPC::Run3: '0'
   IPC::System::Simple: '0'
   LWP::Simple::WithCache: '0.04'
   Log::Abstraction: '0'
@@ -18,6 +20,7 @@ build_requires:
   Test::NoWarnings: '0'
   Test::Requires: '0'
   Test::RequiresInternet: '0'
+  Test::Which: '0'
   Test::Without::Module: '0'
   autodie: '0'
 configure_requires:
@@ -58,5 +61,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.79'
+version: '0.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

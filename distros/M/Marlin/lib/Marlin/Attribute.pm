@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003001';
+our $VERSION   = '0.004000';
 
 use parent 'Sub::Accessor::Small';
 use B ();
@@ -22,10 +22,110 @@ sub accessor_kind  {
 	return 'Marlin';
 }
 
+sub canonicalize_opts {
+	my $me = shift;
+	
+	$me->canonicalize_constant;
+	$me->SUPER::canonicalize_opts( @_ );
+	$me->canonicalize_storage;
+}
+
+sub canonicalize_constant {
+	my $me = shift;
+	my $name = $me->{slot};
+	
+	if ( exists $me->{constant} ) {
+		
+		for my $opt ( qw/ writer predicate clearer builder default lazy trigger / ) {
+			Carp::croak("Option '$opt' does not make sense for a constant") if exists $me->{$opt};
+		}
+		
+		# Quickly do coercions and check type constraint if provided.
+		my $check = $me->{isa}
+			? eval sprintf( 'sub { eval { %s; 1 } }', $me->inline_type_coercion('$_[0]', '$_[1]') )
+			: sub { 1 };
+		if ( $me->{coerce} ) {
+			my $coercion  = eval sprintf( 'sub { %s }', $me->inline_type_coercion('$_[0]', '$_[1]') );
+			my $new_value = $me->$coercion( $me->{constant} );
+			if ( $me->$check( $new_value ) ) {
+				$me->{constant} = $new_value;
+			}
+			else {
+				Carp::croak("Coercion result for constant value does not pass its own type constraint");
+			}
+		}
+		
+		if ( ref $me->{constant} ) {
+			Carp::croak("Constant values must be non-references");
+		}
+		elsif ( not $me->$check($me->{constant}) ) {
+			Carp::croak("Constant value fails its own type constraint");
+		}
+		
+		if ( defined $me->{init_arg} ) {
+			Carp::croak("Constants cannot have an init_arg defined");
+		}
+		$me->{init_arg} = undef;
+		
+		if ( defined $me->{storage} and $me->{storage} ne 'NONE' ) {
+			Carp::croak("Storage for constants must be NONE");
+		}
+		
+		$me->{storage} = 'NONE';
+		
+		if ( !defined $me->{reader} and defined $name ) {
+			$me->{reader} = $name;
+		}
+	}
+}
+
+sub canonicalize_storage {
+	my $me = shift;
+	
+	if ( not defined $me->{storage} ) {
+		$me->{storage} = 'HASH';
+	}
+	
+	if ( $me->{storage} eq 'NONE' ) {
+		Carp::croak("Attribute storage NONE only applies to constants")
+			unless exists $me->{constant};
+	}
+	elsif ( $me->{storage} eq 'HASH' or $me->{storage} eq 'PRIVATE' ) {
+		# These are fine
+	}
+	else {
+		Carp::croak("Unknown storage: " . $me->{storage});
+	}
+}
+
 sub inline_access {
 	my $me = shift;
 	my $selfvar = shift || '$_[0]';
-	sprintf( q[%s->{%s}], $selfvar, B::perlstring($me->{slot}) );
+	
+	if ( $me->{storage} eq 'HASH' ) {
+		return sprintf( q[%s->{%s}], $selfvar, B::perlstring($me->{slot}) );
+	}
+	elsif ( $me->{storage} eq 'PRIVATE' ) {
+		$me->SUPER::inline_access( $selfvar );
+	}
+	elsif ( $me->{storage} eq 'NONE' ) {
+		return $me->inline_constant;
+	}
+	else {
+		die;
+	}
+}
+
+sub inline_access_w {
+	my $me = shift;
+	my $selfvar = shift || '$_[0]';
+	my $val     = shift || '$_[1]';
+	
+	if ( $me->{storage} eq 'NONE' ) {
+		Carp::croak("Failed to inline writer code for constant " . $me->{slot});
+	}
+	
+	return $me->SUPER::inline_access_w( $selfvar, $val );
 }
 
 sub requires_pp_constructor {
@@ -34,6 +134,7 @@ sub requires_pp_constructor {
 	return !!1 if $me->{init_arg} ne $me->{slot};
 	return !!1 if $me->{weak_ref};
 	return !!1 if exists $me->{trigger};
+	return !!1 unless $me->{storage} eq 'NONE' || $me->{storage} eq 'HASH';
 	return !!0;
 }
 
@@ -44,21 +145,36 @@ my %cxsa_map = (
 	predicate  => 'exists_predicates',
 );
 
+for my $type ( qw/accessor reader writer predicate clearer/ ) {
+	my $m = "has_simple_$type";
+	my $orig = Sub::Accessor::Small->can($m);
+	my $new = sub {
+		my $me = shift;
+		return !!0 if $me->{storage} ne 'HASH';
+		return $me->$orig( @_ );
+	};
+	no strict 'refs'; *$m = $new;
+}
+
 sub install_accessors {
 	my $me = shift;
 
-	my %args_for_cxsa;
-	for my $type (qw( accessor reader writer predicate clearer )) {
-		next unless defined $me->{$type};
-		if ( exists $cxsa_map{$type} and $me->${\"has_simple_$type"} and !ref $me->{$type} and $me->{$type} !~ /^my\s+/ ) {
-			$args_for_cxsa{$cxsa_map{$type}}{$me->{$type}} = $me->{slot};
-		}
-		else {
-			$me->install_coderef($me->{$type}, $me->$type);
-		}
+	if ( exists $me->{constant} ) {
+		$me->install_constant;
 	}
-	
-	Class::XSAccessor->import( class => $me->{package}, %args_for_cxsa ) if keys %args_for_cxsa;
+	else {
+		my %args_for_cxsa;
+		for my $type (qw( accessor reader writer predicate clearer )) {
+			next unless defined $me->{$type};
+			if ( exists $cxsa_map{$type} and $me->${\"has_simple_$type"} and !ref $me->{$type} and $me->{$type} !~ /^my\s+/ ) {
+				$args_for_cxsa{$cxsa_map{$type}}{$me->{$type}} = $me->{slot};
+			}
+			else {
+				$me->install_coderef($me->{$type}, $me->$type);
+			}
+		}
+		Class::XSAccessor->import( class => $me->{package}, %args_for_cxsa ) if keys %args_for_cxsa;
+	}
 
 	if (defined $me->{handles}) {
 
@@ -93,6 +209,30 @@ sub install_accessors {
 			}
 		}
 	}
+}
+
+sub install_constant {
+	my $me = shift;
+	my $val = $me->{constant};
+	
+	if ( Sub::Accessor::Small::_is_bool($val) ) {
+		Class::XSAccessor->import( class => $me->{package}, $val ? 'true' : 'false', [ $me->{reader} ] );
+		return;
+	}
+	
+	my $code = $me->inline_constant;
+	$me->install_coderef( $me->{reader}, eval "sub () { $code }" );
+}
+
+sub inline_constant {
+	my $me  = shift;
+	my $val = @_ ? shift : $me->{constant};
+	
+	require B;
+	return
+		!defined($val)                                 ? 'undef' :
+		Sub::Accessor::Small::_is_bool($val)           ? ( $val ? '!!1' : '!!0' ) :
+		Sub::Accessor::Small::_created_as_number($val) ? ( 0 + $val ) : B::perlstring($val);
 }
 
 sub install_coderef {
@@ -154,14 +294,14 @@ sub _compile_init {
 			else {
 				$V = sprintf '( exists( %s ) ? %s : %s )', $V, $V, $D;
 			}
-			$P = $T->(sprintf '$self->{%s}', B::perlstring($me->{slot})) . $P;
+			$P = $T->( $me->inline_access('$self') ) . $P;
 		}
 		elsif ( $me->{required} and not $me->{lazy} ) {
 			$code->addf( '%s("Missing key in constructor: %s") unless exists %s;', $me->_croaker, $init_arg, $V);
 		}
 		else {
 			$C .= sprintf 'if ( exists %s ) { ', $V;
-			$P = $T->(sprintf '$self->{%s}', B::perlstring($me->{slot})) . '}' . $P;
+			$P = $T->($me->inline_access('$self')) . '}' . $P;
 		}
 		
 		if ( $N and my $type = $me->{isa} ) {
@@ -194,7 +334,7 @@ sub _compile_init {
 				B::perlstring($init_arg),
 				B::perlstring($type->display_name);
 		}
-		$C .= sprintf '$self->{%s} = %s; ', B::perlstring($me->{slot}), $V;
+		$C .= sprintf '%s; ', $me->inline_access_w('$self', $V);
 	
 		$code->add_line( $C . $P );
 	}

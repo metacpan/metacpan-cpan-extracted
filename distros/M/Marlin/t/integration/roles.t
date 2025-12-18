@@ -4,8 +4,7 @@
 
 =head1 PURPOSE
 
-Tests the example shown in L<Marlin::Manual::Comparison>, with minor
-adaptations to make it run on Perl v5.8.8.
+Tests roles work.
 
 =head1 AUTHOR
 

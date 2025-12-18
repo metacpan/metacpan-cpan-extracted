@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -19,13 +19,14 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
     RE_OID          => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
     RE_URI          => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+:/,
     RE_UINT         => qr/^(?:0|[1-9][0-9]*)$/,
+    RE_SINT         => qr/^(?:0|-?[1-9][0-9]*)$/,
     RE_QID          => qr/^[QPL][1-9][0-9]*$/,
     RE_DOI          => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
     RE_GTIN         => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
@@ -264,10 +265,12 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
 {
     # ISE -> namespace
     my %namespaces_uint = (
-        '2bffc55d-7380-454e-bd53-c5acd525d692' => '744eaf4e-ae93-44d8-9ab5-744105222da6', # roaraudio-error-number: roaraudio-error-namespace
         '4a7fc2e2-854b-42ec-b24f-c7fece371865' => 'ac59062c-6ba2-44de-9f54-09e28f2c0b5c', # e621-post-identifier: e621-post-namespace
         'a0a4fae2-be6f-4a51-8326-6110ba845a16' => '69b7ff38-ca78-43a8-b9ea-66cb02312eef', # e621-pool-identifier: e621-pool-namespace
         '6e3590b6-2a0c-4850-a71f-8ba196a52280' => 'b96e5d94-0767-40fa-9864-5977eb507ae0', # danbooru2chanjp-post-identifier: danbooru2chanjp-post-namespace
+    );
+    my %namespaces_sint = (
+        '2bffc55d-7380-454e-bd53-c5acd525d692' => '744eaf4e-ae93-44d8-9ab5-744105222da6', # roaraudio-error-number: roaraudio-error-namespace
     );
     my %namespaces_simple_tag = (
         '6fe0dbf0-624b-48b3-b558-0394c14bad6a' => '3623de4d-0dd4-4236-946a-2613467d50f1', # e621tag: e621tag-namespace
@@ -278,6 +281,14 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         my $identifier = __PACKAGE__->new(ise => $ise);
         $identifier->{namespace}    //= __PACKAGE__->new(ise => $namespaces_uint{$ise});
         $identifier->{validate}     //= RE_UINT;
+        $identifier->{generate}     //= 'id-based';
+        $identifier->register; # re-register
+    }
+
+    foreach my $ise (keys %namespaces_sint) {
+        my $identifier = __PACKAGE__->new(ise => $ise);
+        $identifier->{namespace}    //= __PACKAGE__->new(ise => $namespaces_sint{$ise});
+        $identifier->{validate}     //= RE_SINT;
         $identifier->{generate}     //= 'id-based';
         $identifier->register; # re-register
     }
@@ -963,7 +974,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 
@@ -1524,7 +1535,7 @@ The following options (all optional) are supported:
 =item C<default>
 
 The default value to return if no other value is available.
-This can be set to C<undef> to let this method return undef (not die).
+This can be set to C<undef> to let this method return C<undef> (not C<die>).
 
 =item C<no_defaults>
 
@@ -1564,11 +1575,11 @@ This is for compatibility with L</displayname> and implementations of other pack
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

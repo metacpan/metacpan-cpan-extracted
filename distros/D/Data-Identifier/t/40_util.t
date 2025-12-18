@@ -3,7 +3,7 @@
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 33;
+use Test::More tests => 37;
 
 use_ok('Data::Identifier::Util');
 use_ok('Data::Identifier');
@@ -15,13 +15,15 @@ my $util = Data::Identifier::Util->new;
 isa_ok($util, 'Data::Identifier::Util');
 
 my %packed = (
-    sid8     => "\33",
-    sid16    => "\0\33",
-    sid32    => "\0\0\0\33",
-    sni8     => "\163",
-    sni16    => "\0\163",
-    sni32    => "\0\0\0\163",
-    uuid128  => "\xf8\x7a\x38\xcb\xfd\x13\x4e\x15\x86\x6c\xe4\x99\x01\xad\xbe\xc5",
+    sid8        => "\33",
+    sid16       => "\0\33",
+    sid32       => "\0\0\0\33",
+    sni8        => "\163",
+    sni16       => "\0\163",
+    sni32       => "\0\0\0\163",
+    uuid128     => "\xf8\x7a\x38\xcb\xfd\x13\x4e\x15\x86\x6c\xe4\x99\x01\xad\xbe\xc5",
+    uuidhexdash => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
+    uuidHEXDASH => 'F87A38CB-FD13-4E15-866C-E49901ADBEC5',
 );
 
 foreach my $key (sort keys %packed) {

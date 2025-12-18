@@ -433,6 +433,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.23.0",
+   "version" : "v1.23.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

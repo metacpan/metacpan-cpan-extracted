@@ -6,6 +6,14 @@ use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
 
+# Set PERL5LIB so child processes can find File::Share's dist_dir
+BEGIN {
+    my $blib = File::Spec->rel2abs('blib/lib');
+    if (-d $blib) {
+        $ENV{PERL5LIB} = join(':', $blib, $ENV{PERL5LIB} // '');
+    }
+}
+
 # Skip tests on platforms without bash
 BEGIN {
     my $bash_check = `bash --version 2>&1`;

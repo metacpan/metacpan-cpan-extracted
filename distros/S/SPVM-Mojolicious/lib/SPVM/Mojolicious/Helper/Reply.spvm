@@ -19,7 +19,133 @@ class Mojolicious::Helper::Reply {
   
   # Instance Methods
   method not_found : void () {
-    die "TODO";
+    $self->http_not_found;
+  }
+  
+  method exception : void ($message : string) {
+    
+    $self->http_exception($message);
+  }
+  
+  method http_exception : void ($message : string) {
+    
+    my $c = $self->{controller};
+    
+    my $format = $c->exception_format;
+    
+    if ($format eq "txt") {
+      $self->txt_exception($message);
+    }
+    
+    if ($format eq "json") {
+      $self->json_exception($message);
+    }
+    
+    $self->html_exception($message);
+  }
+  
+  method http_not_found : void () {
+    
+    my $c = $self->{controller};
+    
+    my $format = $c->exception_format;
+    
+    if ($format eq "txt") {
+      $self->txt_not_found;
+    }
+    
+    if ($format eq "json") {
+      $self->json_not_found;
+    }
+    
+    $self->html_not_found;
+  }
+  
+  method html_exception : void ($message : string) {
+    
+    &_development("exception", $self->{controller}, $message);
+  }
+  
+  method html_not_found : void () {
+    
+    &_development("not_found", $self->{controller});
+  }
+  
+  method txt_exception : void ($message : string) {
+    
+    my $c = $self->{controller};
+    
+    $c->stash_h->{"exception"} = $message;
+    
+    if ($c->app->mode eq "development") {
+      $c->render({text => $message, format => "txt", status => 500}) ;
+      return;
+    }
+    
+    $c->render({text => "Internal Server Error", format => "txt", status => 500});
+  }
+  
+  method txt_not_found : void () {
+    
+    my $c = $self->{controller};
+    
+    $c->render({text => "Not Found", format => "txt", status => 404});
+  }
+  
+  method json_exception : void ($message : string) {
+    
+    my $c = $self->{controller};
+    
+    $c->stash_h->{"exception"} = $message;
+    
+    if ($c->app->mode eq "development") {
+      $c->render({json => {error => $message}, status => 500}) ;
+      return;
+    }
+    
+    $c->render({json => {error => "Internal Server Error"}, status => 500});
+  }
+  
+  method json_not_found : void () {
+    
+    my $c = $self->{controller};
+    
+    $c->render({json => {error => "Not Found"}, status => 404});
+  }
+  
+  static method _development : void ($page : string, $c : Mojolicious::Controller, $message : string = undef) {
+    
+    if ($page eq "exception") {
+      $c->render({inline => q'<html><body><pre><%= $c->stash("exception")->(string) %></pre></body></html>', exception => $message});
+    }
+    elsif ($page eq "not_found") {
+      $c->render({inline => q'<html><body>Not Found</body></html>'});
+    }
+  }
+  
+  method static : void ($file : string) {
+    
+    my $c = $self->{controller};
+    
+    $c->app->static->serve($c, $file);
+    
+    $c->rendered;
+  }
+  
+  method asset : void ($asset : Mojo::Asset) {
+    
+    my $c = $self->{controller};
+    
+    $c->app->static->serve_asset($c, $asset);
+    $c->rendered;
+  }
+  
+  method file : void ($file : string) {
+    
+    my $asset_file = my $_ = Mojo::Asset::File->new;
+    $_->set_path($file);
+    
+    $self->asset($asset_file);
   }
   
 }

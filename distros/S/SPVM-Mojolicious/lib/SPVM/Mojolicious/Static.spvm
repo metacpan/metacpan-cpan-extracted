@@ -14,7 +14,7 @@ class Mojolicious::Static {
   # Fields
   has asset_dir : rw string;
   
-  has classes : rw string[];
+  has data_templates : rw string;
   
   has extra : rw Hash of string;
   
@@ -25,6 +25,8 @@ class Mojolicious::Static {
   # Undocumented Fields
   has assets : Hash;
   
+  has index : Hash;
+  
   # Class Methods
   static method new : Mojolicious::Static () {
     
@@ -34,7 +36,7 @@ class Mojolicious::Static {
     
     $self->{asset_dir} = "assets";
     
-    $self->{classes} = ["main"];
+    $self->{data_templates} = "";
     
     $self->{extra} = Hash->new;
     
@@ -55,6 +57,29 @@ class Mojolicious::Static {
     return $self->file_path("/" . $self->asset_dir . ($assets->{$asset}->(string) // $asset));
   }
   
+  method file : Mojo::Asset ($rel : string) {
+    
+    # Search all paths
+    my $parts = Fn->split("\/", $rel);
+    for my $path (@{$self->paths}) {
+      my $asset = &_get_file(Mojo::File->path(Array->merge_string([$path], $parts))->to_string);
+      unless ($asset) {
+        next;
+      }
+      return $asset;
+    }
+    
+    # Search DATA
+    if (my $asset = $self->_get_data_file($rel)) {
+      return $asset;
+    }
+    
+    # Search extra files
+    my $extra = $self->extra;
+    
+    return $extra->exists($rel) ? &_get_file($extra->{$rel}) : undef;
+  }
+  
   method file_path : string ($file : string) {
     
     unless (Re->m($file, "^\/")) {
@@ -69,7 +94,207 @@ class Mojolicious::Static {
     return "$prefix$file";
   }
   
-  method dispatch : void ($c : Mojolicious::Controller) {
-    die "TODO";
+  method dispatch : int ($c : Mojolicious::Controller) {
+    
+    # Method (GET or HEAD)
+    my $req    = $c->req;
+    my $method = $req->method;
+    unless ($method eq "GET" || $method eq "HEAD") {
+      return 0;
+    }
+    
+    # Canonical path
+    my $stash = $c->stash_h;
+    my $path  = $req->url->path->clone;
+    
+    if ($stash->{"path"}) {
+      die "'path' stash value is not supported.";
+    }
+    
+    $path->canonicalize;
+    my $parts = $path->parts;
+    
+    unless ($parts) {
+      return 0;
+    }
+    
+    # Serve static file and prevent path traversal
+    my $canon_path = Fn->join("/", $parts);
+    if (Re->m($canon_path, "^\.\.\/|\\") || !$self->serve($c, $canon_path)) {
+      return 0;
+    }
+    $c->set_mojo_static(1);
+    
+    # Development assets will be rebuilt a lot, do not let browsers cache them
+    if ($c->app->mode eq "development" && Fn->index($canon_path, $self->asset_dir) == 0) {
+      $c->res->headers->set_cache_control("no-cache");
+    }
+    
+    $c->rendered;
+    
+    return 1;
   }
+  
+  method is_fresh : int ($c  : Mojolicious::Controller, $options : Hash|object[] = undef) {
+    
+    my $options = Fn->to_hash($options);
+    
+    my $res_headers = $c->res->headers;
+    my $last = $options->{"last_modified"}->(string);
+    my $etag = $options->{"etag"}->(string);
+    
+    if ($last) {
+      $res_headers->set_last_modified(Mojo::Date->new($last)->to_string);
+    }
+    if ($etag) {
+      $res_headers->set_etag($etag = Re->m($etag, "^W/\"") ? $etag : "\"$etag\"") ;
+    }
+    
+    # Unconditional
+    my $req_headers = $c->req->headers;
+    my $match  = $req_headers->if_none_match;
+    my $since = $req_headers->if_modified_since;
+    unless (length($since) || $match) {
+      return 0;
+    }
+    
+    # If-None-Match
+    $etag //= $res_headers->etag // "";
+    
+    my $etag_found = 0;
+    for my $_ (@{Fn->split(",", $match)}) {
+      $_ = Mojo::Util->trim($_);
+      if ($_ eq $etag || "W/$_" eq $etag) {
+        $etag_found = 1;
+        last;
+      }
+    }
+    
+    if ($match && !$etag_found) {
+      return 0;
+    }
+    
+    # If-Modified-Since
+    unless (($last //= $res_headers->last_modified) && $since) {
+      return !!$match;
+    }
+    
+    my $is_fresh = &_epoch($last) <= &_epoch($since);
+    
+    return $is_fresh;
+  }
+    
+  method serve : int ($c : Mojolicious::Controller, $rel : string) {
+    
+    $rel = copy $rel;
+    
+    # Prefix
+    if (my $prefix = $self->prefix) {
+      $rel = "/$rel";
+      unless (Re->s((mutable string)$rel, "\Q$prefix\E\/", "/")) {
+        return 0;
+      }
+    }
+    
+    my $asset = $self->file($rel);
+    
+    unless ($asset) {
+      return 0;
+    }
+    
+    $c->app->types->content_type($c, {file => $rel});
+    
+    $self->serve_asset($c, $asset);
+    
+    return 1;;
+  }
+  
+  method serve_asset : void ($c : Mojolicious::Controller, $asset : Mojo::Asset) {
+    
+    # Content-Type
+    if ($asset->is_file) {
+      $c->app->types->content_type($c, {file => $asset->(Mojo::Asset::File)->path});
+    }
+    
+    # Last-Modified and ETag
+    my $res = $c->res;
+    $res->set_code(200);
+    my $headers = $res->headers;
+    $headers->set_accept_ranges("bytes");
+    
+    my $mtime = $asset->mtime;
+    my $options = {etag => Mojo::Util->md5_sum($mtime), last_modified => $mtime};
+    if ($self->is_fresh($c, $options)) {
+      $res->set_code(304);
+      return;
+    }
+    
+    # Range
+    my $range = $c->req->headers->range;
+    unless ($range) {
+      $res->content->(Mojo::Content::Single)->set_asset($asset);
+      return;
+    }
+    
+    # Not satisfiable
+    my $size = $asset->size;
+    unless ($size) {
+      $res->set_code(416);
+      return;
+    }
+    my $range_match = Re->m($range, "^bytes=(\d+)?-(\d+)?");
+    unless ($range_match) {
+      $res->set_code(416);
+      return;
+    }
+    my $start = length($range_match->cap1) ? $range_match->cap1->(int) : 0;
+    my $end = length(my $_ = $range_match->cap2) && $_->(long) < $size ? $_->(long) : $size - 1;
+    
+    if ($start > $end) {
+      $res->set_code(416);
+      return;
+    }
+    
+    # Satisfiable
+    $res->set_code(206);
+    $headers->set_content_length($end - $start + 1);
+    $headers->set_content_range("bytes $start-$end/$size");
+    
+    $asset->set_start_range($start);
+    $asset->set_end_range($end);
+    $res->content->(Mojo::Content::Single)->set_asset($asset);
+  }
+  
+  private static method _epoch : double ($date : string|Long|Double = undef) {
+    return Mojo::Date->new($date)->epoch;
+  }
+  
+  private method _get_data_file : Mojo::Asset ($rel : string) {
+    
+    # Protect files without extensions and templates with two extensions
+    if (!Re->m($rel, "\.\w+$") || Re->m($rel, "\.\w+\.\w+$")) {
+      return undef ;
+    }
+    
+    # Find file
+    my $data = Mojo::Util->get_data_file($self->data_templates, $rel);
+    
+    unless ($data) {
+      return undef;
+    }
+    
+    return Mojo::Asset::Memory->new->add_chunk($data);
+  }
+  
+  private static method _get_file : Mojo::Asset ($path : string) {
+    
+    my $asset_file = (Mojo::Asset::File)undef;
+    if (Sys->f($path) && Sys->r($path)) {
+      $asset_file = my $_ = Mojo::Asset::File->new; 
+      $_->set_path($path);
+    }
+    
+    return $asset_file;
+  }
+  
 }

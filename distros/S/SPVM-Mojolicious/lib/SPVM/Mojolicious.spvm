@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.038";
+  version "0.039";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -78,6 +78,8 @@ class Mojolicious {
   
   has ua : rw Mojo::UserAgent;
   
+  has exception_format : rw string; 
+
   # Class Methods
   static method new : Mojolicious () {
     
@@ -134,6 +136,8 @@ class Mojolicious {
     $self->{config_h} = Hash->new;
     
     $self->{ua} = Mojo::UserAgent->new;
+    
+    $self->{exception_format} = "html";
   }
   
   method build_controller : Mojolicious::Controller ($tx : Mojo::Transaction) {

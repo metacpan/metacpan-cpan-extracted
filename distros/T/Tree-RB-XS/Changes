@@ -1,3 +1,12 @@
+Version 0.20 - 2025-12-17
+  - Fixed bug where 'put' with allow_duplicates did not always replace all other
+    nodes with identical keys
+  - Node keys can now be altered, to re-key a node.
+  - New tree attribute 'recent_limit' auto-prunes oldest nodes when collection
+    grows past that limit.
+  - New tree methods insert_as_node and put_as_node return Node objects for the
+    just-inserted item.
+
 Version 0.19 - 2025-04-11
   - New attribute 'keys_in_recent_order' changes behavior of convenience
     iteration methods, including for tied hashes.

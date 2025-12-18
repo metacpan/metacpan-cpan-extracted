@@ -484,6 +484,7 @@ docs/MergeSpreadsheetsRequest.md
 docs/MergeSpreadsheetsInRemoteFolderRequest.md
 docs/MergeRemoteSpreadsheetRequest.md
 docs/SplitSpreadsheetRequest.md
+docs/SplitTableRequest.md
 docs/SplitRemoteSpreadsheetRequest.md
 docs/ImportDataIntoSpreadsheetRequest.md
 docs/GetPublicKeyRequest.md
@@ -1368,6 +1369,7 @@ lib/AsposeCellsCloud/Request/MergeSpreadsheetsRequest.pm
 lib/AsposeCellsCloud/Request/MergeSpreadsheetsInRemoteFolderRequest.pm
 lib/AsposeCellsCloud/Request/MergeRemoteSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/SplitSpreadsheetRequest.pm
+lib/AsposeCellsCloud/Request/SplitTableRequest.pm
 lib/AsposeCellsCloud/Request/SplitRemoteSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/ImportDataIntoSpreadsheetRequest.pm
 lib/AsposeCellsCloud/Request/GetPublicKeyRequest.pm

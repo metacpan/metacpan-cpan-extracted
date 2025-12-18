@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.26;
+our $VERSION = v0.27;
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -140,6 +140,10 @@ sub pack {
         }
     } elsif ($template eq 'uuid128') {
         return pack('H*', $identifier->uuid(no_defaults => 1) =~ tr/-//dr);
+    } elsif ($template eq 'uuidhexdash') {
+        return $identifier->uuid(no_defaults => 1);
+    } elsif ($template eq 'uuidHEXDASH') {
+        return $identifier->uuid(no_defaults => 1) =~ tr/a-f/A-F/r;
     }
 
     if (defined($v) && defined($pack_template)) {
@@ -204,6 +208,10 @@ sub unpack {
     } elsif ($template eq 'uuid128') {
         croak 'Input has bad length, expected 16 bytes, got '.length($data) unless length($data) == 16;
         return Data::Identifier->new(uuid => join('-', unpack('H8H4H4H4H12', $data)));
+    } elsif ($template eq 'uuidhexdash') {
+        return Data::Identifier->new(uuid => $data);
+    } elsif ($template eq 'uuidHEXDASH') {
+        return Data::Identifier->new(uuid => $data);
     }
 
     if (defined($type) && defined($pack_template)) {
@@ -381,7 +389,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.26
+version v0.27
 
 =head1 SYNOPSIS
 
@@ -446,6 +454,13 @@ and/or if a L<Data::TagMap> is given via L<Data::Identifier::Interface::Subobjec
 
 An UUID as 128 bit (16 byte).
 
+=item C<uuidhexdash>, C<uuidHEXDASH>
+
+(since v0.27)
+
+An UUID in hex-and-hash format.
+Use C<uuidhexdash> for lower case and C<uuidHEXDASH> for upper case.
+
 =back
 
 =head2 unpack
@@ -500,11 +515,11 @@ See also L</parse_sirtx>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 
