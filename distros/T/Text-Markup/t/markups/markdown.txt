@@ -1,8 +1,8 @@
 Markdown Test File
 ==================
 
-This file tests the [Markdown](https://daringfireball.net/projects/markdown/)
-parser — which is powered by [Text::Markdown::Discount](https://p3rl.org/Text::Markdown::Discount).
+This file tests [Markdown](https://daringfireball.net/projects/markdown/)'s
+parser --- which is powered by [Text::Markdown::Discount](https://p3rl.org/Text::Markdown::Discount).
 Öy.
 
 ``` go

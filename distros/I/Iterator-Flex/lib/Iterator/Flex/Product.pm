@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth );
 use Iterator::Flex::Factory 'to_iterator';
@@ -242,7 +242,7 @@ Iterator::Flex::Product - An iterator which produces a Cartesian product of iter
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 

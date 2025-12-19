@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils
@@ -160,7 +160,7 @@ Iterator::Flex::Freeze - Freeze an iterator after every next
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 

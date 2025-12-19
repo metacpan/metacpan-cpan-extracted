@@ -7,7 +7,7 @@ use CommonMark;
 use Text::Markup;
 use File::BOM qw(open_bom);
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 sub import {
     # Replace Text::Markup::Markdown.

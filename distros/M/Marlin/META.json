@@ -40,12 +40,12 @@
             "B::Hooks::AtRuntime" : "0",
             "Class::Method::Modifiers" : "0",
             "Class::XSAccessor" : "1.19",
-            "Class::XSConstructor" : "0.013",
+            "Class::XSConstructor" : "0.014000",
             "Exporter::Tiny" : "1.006002",
             "List::Util" : "1.33",
             "Module::Runtime" : "0",
             "Role::Tiny" : "0",
-            "Sub::Accessor::Small" : "1.000001",
+            "Sub::Accessor::Small" : "1.000002",
             "Sub::HandlesVia" : "0.052000",
             "Type::Tiny" : "2.008000",
             "Type::Tiny::XS" : "0",
@@ -65,19 +65,19 @@
    "provides" : {
       "Marlin" : {
          "file" : "lib/Marlin.pm",
-         "version" : "0.004000"
+         "version" : "0.005000"
       },
       "Marlin::Attribute" : {
          "file" : "lib/Marlin/Attribute.pm",
-         "version" : "0.004000"
+         "version" : "0.005000"
       },
       "Marlin::Role" : {
          "file" : "lib/Marlin/Role.pm",
-         "version" : "0.004000"
+         "version" : "0.005000"
       },
       "Marlin::Util" : {
          "file" : "lib/Marlin/Util.pm",
-         "version" : "0.004000"
+         "version" : "0.005000"
       }
    },
    "release_status" : "stable",
@@ -96,6 +96,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Marlin/project"
    },
-   "version" : "0.004000",
+   "version" : "0.005000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

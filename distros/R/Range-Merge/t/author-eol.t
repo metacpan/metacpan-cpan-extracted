@@ -25,6 +25,7 @@ my @files = (
     't/03-basic-merge-with-data.t',
     't/04.cidrs.t',
     't/05.discrete.t',
+    't/98.overlaps-wrong-ordering.t',
     't/99.leading-zero.t',
     't/author-01-full-bgp-table.t',
     't/author-02-full-bgp-cidr.t',

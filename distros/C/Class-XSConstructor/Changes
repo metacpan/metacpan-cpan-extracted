@@ -3,8 +3,30 @@ Class-XSConstructor
 
 Created:      2018-06-19
 Home page:    <https://metacpan.org/release/Class-XSConstructor>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor>
+Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.014001	2025-12-19
+
+ [ Bug Fixes ]
+ - Consistently use uppercase for TRUE/FALSE as it seems lowercase versions
+   of these constants are not defined on all platforms.
+
+ [ Packaging ]
+ - Update distribution metadata to point to correct bug tracker.
+
+0.014000	2025-12-18
+
+ [ Bug Fixes ]
+ - Support threaded Perls.
+
+ [ Packaging ]
+ - Switch to 6 decimal place version numbers.
+
+ [ Other ]
+ - Added: Class::XSDestructor.
+ - No longer use Ref::Util: use Types::Standard if it's installed or Perl's
+   ref() builtin otherwise.
 
 0.013	2025-12-16
 

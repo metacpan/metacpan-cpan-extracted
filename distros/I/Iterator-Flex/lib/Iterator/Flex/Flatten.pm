@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Iterator::Flex::Utils qw( STATE RETURN EXHAUSTION :IterAttrs :IterStates throw_failure);
 use Iterator::Flex::Factory 'construct_from_iterable', 'to_iterator';
@@ -225,7 +225,7 @@ Iterator::Flex::Flatten - Flatten Iterator Class
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 

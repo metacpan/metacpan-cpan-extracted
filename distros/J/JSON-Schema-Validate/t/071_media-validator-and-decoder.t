@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # This test focuses on register_content_decoder and register_media_validator.
 # We simulate a custom "rot13" contentEncoding and a permissive media validator.

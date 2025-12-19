@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -15,6 +15,7 @@ use Ref::Util;
 use parent 'Iterator::Flex::Base';
 
 use namespace::clean;
+
 
 
 
@@ -126,7 +127,7 @@ Iterator::Flex::Grep - Grep Iterator Class
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 
@@ -134,10 +135,11 @@ version 0.32
 
   $iterator = Ierator::Flex::Grep->new( $coderef, $iterable, ?\%pars );
 
-Returns an iterator equivalent to running C<grep> on C<$iterable> with
-the specified code.
+Returns an iterator equivalent to running C<grep> on each element of
+C<$iterable> with the specified code.
 
-C<$iterable> is converted into an iterator via L<Iterator::Flex::Factory/to_iterator> if required.
+C<$iterable> is converted into an iterator via
+L<Iterator::Flex::Factory/to_iterator> if required.
 
 C<CODE> is I<not> run if C<$iterable> is exhausted.
 

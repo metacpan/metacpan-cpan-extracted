@@ -11,7 +11,7 @@ our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 my $schema_with_definitions =
 {

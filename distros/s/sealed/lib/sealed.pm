@@ -21,7 +21,7 @@ our $DEBUG;
 our $VERIFY_PREFIX = "use Types::Common -types, -sigs;";
 
 BEGIN {
-  our $VERSION = qv(8.3.3);
+  our $VERSION = qv(8.4.2);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -76,6 +76,8 @@ sub tweak :prototype($\@\@\@$$\%) {
         my $method               = $class->can($method_name)
           or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you " .
           "forget to 'use $class' first?\n";
+
+        no warnings 'uninitialized';
 
         my $mverify = sub {
           goto &$method if $method == $_[0]->can($method_name);
@@ -190,9 +192,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub import {
   $DEBUG                         = $_[1];
-  local our $VERIFY_PREFIX = $_[2] if $DEBUG eq "verify" and defined $_[2];
-  local $_;
-  local our %rcache;
+  our $VERIFY_PREFIX = $_[2] if $DEBUG eq "verify" and defined $_[2];
   filter_add(bless []);
 }
 
@@ -201,8 +201,11 @@ sub filter {
   my $status = filter_read;
   our $VERIFY_PREFIX;
   our %rcache;
+
   # handle bare typed lexical declarations
-  s/^\s*my\s+([\w:]+)\s+(\$\w+);/my $1 $2 = '$1';/gms if $status > 0;
+  s/^\s*my\s+(\w[\w:]*)\s+(\$\w+)(.)/$3 eq ";" ? qq(BEGIN{local \$@; eval "require $1"} \
+    my $1 $2; {no strict qw!vars subs!; no warnings 'once'; $2 = $1})
+    : qq(BEGIN {local \$@; eval "require $1"}my $1 $2$3)/gmse if $status > 0;
 
   # NEW in v8.x.y: handle signatures
   no warnings 'uninitialized';
@@ -220,9 +223,11 @@ sub filter {
 
      s{(\S+)?\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
        local $@;
-
-       my $is_ext_class = $rcache{$1} //= eval "require $1";
-       my $class = ($is_ext_class || $1 eq "__PACKAGE__") ? $1 : "";
+       no strict 'refs';
+       my $pkg = caller;
+       my $is_ext_class = $rcache{"$pkg\::$1"} //= eval "package $pkg; require $1"
+         // eval {*{eval "no strict 'vars'; package $pkg; $1"}};
+       my $class = $is_ext_class ? $1 : "";
 
        $suffix .= "my $class $2 = ";
 
@@ -251,7 +256,7 @@ sub filter {
     if ($DEBUG eq "verify") {
       # implement signature type checks for named subs via Types::Common::signature
 
-      $verify .= "$VERIFY_PREFIX; no strict 'vars'; state \$check = signature multiple => [ { named_to_list => 1, named => [";
+      $verify .= "$VERIFY_PREFIX; no strict qw/vars subs/; state \$check = signature multiple => [ { named_to_list => 1, named => [";
       $verify .= "$vars[$_] => $types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] }," : "") for 0..$#vars;
       $verify .= "],},{ positional => [";
       $verify .= "$types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] },":"") for 0..$#types;

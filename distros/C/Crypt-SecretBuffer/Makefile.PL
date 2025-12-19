@@ -110,6 +110,7 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "FindBin" => 0,
     "IO::Handle" => 0,
+    "MIME::Base64" => 0,
     "POSIX" => 0,
     "Test2::Suite" => "0.000139",
     "Test2::Tools::Subtest" => 0,
@@ -117,7 +118,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -138,6 +139,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,
+  "MIME::Base64" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
   "Test2::Suite" => "0.000139",

@@ -39,18 +39,18 @@ sub sealed :Sealed {
 use sealed 'verify';
 
 sub also_sealed :Sealed (label $a, Int $b, Str $c="HOLA", Int $d//=3, Int $e||=4) {
-    if ($a) {
-        my Benchmark $bench;
-        my $inner = $a;
-        return sub :Sealed (label $z) {
-            my Foo $b = $a;
-            $inner->foo($b->bar($inner->bar, $inner, $bench->new));
-            $a = $inner;
-            $a->foo;
-            $a->bar;
-          };
-    }
-    $a->bar();
+  if ($a) {
+    my Benchmark $bench;
+    my $inner = $a;
+    return sub :Sealed (label $z) {
+      my Foo $b = $a;
+      $inner->foo($b->bar($inner->bar, $inner, $bench->new));
+      $a = $inner;
+      $a->foo;
+      $a->bar;
+    };
+  }
+  $a->bar();
 }
 
 sub reentrant :Sealed (__PACKAGE__ $b) { local our @Q=1; my $c = $b->_foo; }

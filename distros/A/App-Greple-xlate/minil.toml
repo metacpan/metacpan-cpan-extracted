@@ -1,6 +1,6 @@
 name = "App-Greple-xlate"
 badges = [ "github-actions/test.yml" ]
-script_files = [ "script/xlate", "script/dozo" ]
+script_files = [ "script/xlate" ]
 authority = "cpan:UTASHIRO"
 
 module_maker = "ModuleBuildTiny"
@@ -10,8 +10,7 @@ static_install = "auto"
 branch = "main"
 hooks = [
     "make -C docs",
-    "perl -Ilib -MApp::Greple::xlate=\$VERSION -i -pE 's/^\s*Version \K(\d+(\.\d+)*)$/$VERSION/i' script/xlate script/dozo",
-    "sed -i '' '/^1;$/q' lib/App/dozo.pm && greple -Mperl -h --nocolor :pod script/dozo >> lib/App/dozo.pm",
+    "perl -Ilib -MApp::Greple::xlate=\$VERSION -i -pE 's/^\s*Version \K(\d+(\.\d+)*)$/$VERSION/i' script/xlate",
     "sed -i '' '/^1;$/q' lib/App/xlate.pm && greple -Mperl -h --nocolor :pod script/xlate >> lib/App/xlate.pm"
 ]
 

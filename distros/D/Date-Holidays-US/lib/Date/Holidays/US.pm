@@ -6,7 +6,7 @@ use POSIX; #strftime to calculate wday
 
 our @EXPORT_OK = qw(is_holiday holidays is_us_holiday us_holidays);
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ Date::Holidays::US - Date::Holidays Adapter for US Federal holidays
 
 =head1 DESCRIPTION
 
-Date::Holidays Adapter for US Federal holidays back to 1880 with updates from 2024.
+Date::Holidays Adapter for US Federal holidays back to 1880 with updates up to 2025.
 
 =head1 METHODS
 
@@ -44,7 +44,7 @@ sub is_holiday {
   my $day   = shift;
   my $wday  = POSIX::strftime(qq{%w}, 0, 0, 0, $day, $month-1, $year-1900); #12:00 am (0-6 starting on Sunday)
 
-  #Ref: https://sgp.fas.org/crs/misc/R41990.pdf
+  #Ref: https://sgp.fas.org/crs/misc/R41990.pdf - Federal Holidays: Evolution and Current Practices (July 1, 2021)
 
   #5 U.S. Code § 6103 - Holidays
   #The history of federal holidays in the United States dates back to June 28, 1870
@@ -139,12 +139,24 @@ sub is_holiday {
     return 'Veterans Day Observed';                                   #Monday after November 11
 
   ##Thanksgiving Day
-  } elsif ($year >= 1870 and $month == 11 and $day >= 22 and $day <= 28 and $wday == 4) {
+  #ref: https://library.law.unc.edu/2024/11/the-history-of-the-thanksgiving-holiday/
+  } elsif ($year >= 1870 and $year  < 1939 and $month == 11 and $day >= 24 and $day <= 30 and $wday == 4) { #Law 1870 but date set by President
+    return 'Thanksgiving Day';                                        #the last Thursday in November precedent from Abraham Lincoln
+  } elsif ($year >= 1939 and $year <= 1941 and $month == 11 and $day >= 17 and $day <= 23 and $wday == 4) {  #FDR "Franksgiving"
+    return 'Thanksgiving Day';                                        #the second to last Thursday by FDR 1939-1941
+  } elsif ($year > 1941 and $month == 11 and $day >= 22 and $day <= 28 and $wday == 4) { #Law signed December 26, 1941
     return 'Thanksgiving Day';                                        #the fourth Thursday in November.
 
   ##Day before Christmas Day
+  #Ref: https://thehill.com/homenews/administration/5655984-trump-declares-christmas-holidays/
+  } elsif ($year == 2019 and $month == 12 and $day == 24) {
+    return 'Day before Christmas Day';                                #Executive Order on Providing for the Closing of Executive Departments and Agencies of the Federal Government on December 24, 2019
+  } elsif ($year == 2020 and $month == 12 and $day == 24) {
+    return 'Day before Christmas Day';                                #Executive Order on Providing for the Closing of Executive Departments and Agencies of the Federal Government on December 24, 2020
   } elsif ($year == 2024 and $month == 12 and $day == 24) {
     return 'Day before Christmas Day';                                #Executive Order on Providing for the Closing of Executive Departments and Agencies of the Federal Government on December 24, 2024
+  } elsif ($year == 2025 and $month == 12 and $day == 24) {
+    return 'Day before Christmas Day';                                #PROVIDING FOR THE CLOSING OF EXECUTIVE DEPARTMENTS AND AGENCIES OF THE FEDERAL GOVERNMENT ON DECEMBER 24, 2025, AND DECEMBER 26, 2025
 
   ##Christmas Day
   } elsif ($year >= 1971 and $month == 12 and $day == 24 and $wday == 5) { #Executive Order 11582 (Feb. 11, 1971)
@@ -154,8 +166,13 @@ sub is_holiday {
   } elsif ($year >= 1909 and $month == 12 and $day == 26 and $wday == 1) { #Executive Order 1076 (May 22, 1909)
     return 'Christmas Day Observed';                                  #Monday after December 25
 
+  } elsif ($year == 2014 and $month == 12 and $day == 26) {
+    return 'Day following Christmas Day';                             #Executive Order -- Closing of Executive Departments and Agencies of the Federal Government on Friday, December 26, 2014
+  } elsif ($year == 2025 and $month == 12 and $day == 26) {
+    return 'Day following Christmas Day';                             #PROVIDING FOR THE CLOSING OF EXECUTIVE DEPARTMENTS AND AGENCIES OF THE FEDERAL GOVERNMENT ON DECEMBER 24, 2025, AND DECEMBER 26, 2025
+
   } elsif ($year >= 1971 and $month == 12 and $day == 31 and $wday == 5) { #Executive Order 11582 (Feb. 11, 1971)
-    return q{New Year's Day Observed};                                 #Friday before January 1
+    return q{New Year's Day Observed};                                #Friday before January 1
 
   # Beginning with the death of President Kennedy in 1963, the incumbent President has issued an Executive order closing
   # Government offices throughout the world as a mark of respect upon the death of each President or former President.
@@ -244,7 +261,7 @@ Michael R. Davis, MRDVT
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Michael R. Davis
+Copyright (C) 2025 by Michael R. Davis
 
 MIT License
 

@@ -1,0 +1,335 @@
+{
+   "Attributes" : [
+      {
+         "Content" : {},
+         "ContentType" : "storable",
+         "Name" : "CustomFieldDefaultValues",
+         "Object" : "RT::System"
+      },
+      {
+         "Content" : {
+            "Due" : "in 3 days",
+            "FinalPriority" : "0",
+            "InitialPriority" : "0"
+         },
+         "ContentType" : "storable",
+         "Name" : "DefaultValues",
+         "Object" : "General",
+         "ObjectType" : "RT::Queue"
+      }
+   ],
+   "SavedSearches" : [
+      {
+         "Content" : {
+            "Format" : "'<a href=\"__WebPath__/Asset/Display.html?id=__id__\">__id__</a>/TITLE:#',\n'<a href=\"__WebHomePath__/Asset/Display.html?id=__id__\">__Name__</a>/TITLE:Name',\nStatus,\nCatalog,\nOwner,\n'__ActiveTickets__ __InactiveTickets__/TITLE:Related tickets',\n'__NEWLINE__',\n'__NBSP__',\n'<small>__Description__</small>',\n'<small>__CreatedRelative__</small>',\n'<small>__LastUpdatedRelative__</small>',\n'<small>__Contacts__</small>'",
+            "Order" : "ASC|ASC|ASC|ASC",
+            "OrderBy" : "Name|||",
+            "Query" : "Catalog = 'AWS Resources' AND Status = '__Active__'",
+            "RowsPerPage" : "50"
+         },
+         "Name" : "Active Assets",
+         "Type" : "Asset",
+         "Object" : "RT::System"
+      },
+      {
+         "Content" : {
+            "Format" : "'<a href=\"__WebPath__/Asset/Display.html?id=__id__\">__id__</a>/TITLE:#',\n'<a href=\"__WebHomePath__/Asset/Display.html?id=__id__\">__Name__</a>/TITLE:Name',\nCatalog,\n'__CustomFieldView.{Region}__',\n'__CustomFieldView.{Instance Type}__',\n'__CustomFieldView.{Reservation Start}__',\n'__CustomFieldView.{Reservation End}__',\n'__CustomFieldView.{Service Type}__',\n'__CustomFieldView.{Product Description}__',\n'<a href=\"__WebPath__/AWS/LinkAsset.html?id=__id__\" target=\"_blank\">Link to Resource</a>/TITLE:Link to Resource'",
+            "Order" : "ASC|ASC|ASC|ASC",
+            "OrderBy" : "CustomField.{Service Type}|||",
+            "Query" : "Catalog = 'AWS Reserved Instances' AND DependedOnBy IS NULL AND CF.{State} = 'active'",
+            "RowsPerPage" : "50"
+         },
+         "Type" : "Asset",
+         "Name" : "Unlinked AWS Reservations",
+         "Object" : "RT::System"
+      }
+   ],
+   "Catalogs" : [
+      {
+         "Description" : "AWS Resources",
+         "Lifecycle" : "aws-assets",
+         "Name" : "AWS Resources"
+      },
+      {
+         "Description" : "",
+         "Lifecycle" : "aws-reservations",
+         "Name" : "AWS Reserved Instances"
+      }
+   ],
+   "CustomFields" : [
+      {
+         "ApplyTo" : [
+            "AWS Resources"
+         ],
+         "Description" : "The AWS generated ID for this resource",
+         "EntryHint" : "ID assigned in AWS",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "AWS ID",
+         "SortOrder" : 0,
+         "Type" : "Freeform",
+         "UniqueValues" : 1
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances",
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Select one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Service Type",
+         "SortOrder" : 0,
+         "Type" : "Select",
+         "Values" : [
+            {
+               "Name" : "EC2",
+               "SortOrder" : 0
+            },
+            {
+               "Name" : "Open Search",
+               "SortOrder" : 0
+            },
+            {
+               "Name" : "RDS",
+               "SortOrder" : 0
+            }
+         ]
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances",
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Instance Type",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances",
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Platform",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances",
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Tenancy",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances",
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Region",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Availability Zone",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "customer",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Engine",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Resources"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Allocated Storage",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Select date",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Reservation Start",
+         "SortOrder" : 0,
+         "Type" : "Date"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Select date",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Reservation End",
+         "SortOrder" : 0,
+         "Type" : "Date"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Duration",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Offering Class",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Offering Type",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Select one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "MultiAZ",
+         "RenderType" : "Checkbox",
+         "SortOrder" : 0,
+         "Type" : "Select",
+         "Values" : [
+            {
+               "Name" : "0",
+               "SortOrder" : 0
+            },
+            {
+               "Name" : "1",
+               "SortOrder" : 0
+            }
+         ]
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "AWS Reserved Instance ID",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "Product Description",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      },
+      {
+         "ApplyTo" : [
+            "AWS Reserved Instances"
+         ],
+         "Description" : "",
+         "EntryHint" : "Enter one value",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 1,
+         "Name" : "State",
+         "SortOrder" : 0,
+         "Type" : "Freeform"
+      }
+   ],
+   "CustomRoles" : [
+      {
+         "Description" : "",
+         "EntryHint" : "",
+         "LookupType" : "RT::Catalog-RT::Asset",
+         "MaxValues" : 0,
+         "Name" : "Customer"
+      }
+   ],
+   "Groups" : [
+      {
+         "Domain" : "UserDefined",
+         "Name" : "AWS Asset Users"
+      }
+   ]
+}

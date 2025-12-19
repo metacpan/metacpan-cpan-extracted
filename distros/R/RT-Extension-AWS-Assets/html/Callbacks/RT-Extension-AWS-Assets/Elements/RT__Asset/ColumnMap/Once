@@ -1,0 +1,21 @@
+<%args>
+$COLUMN_MAP
+</%args>
+<%init>
+$COLUMN_MAP->{PurchaseReservedInstance} = {
+    title => 'Purchase',
+    value => sub {
+        my $Asset = $_[0];
+        return '' unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'SuperUser' );
+        return '' unless $Asset->CatalogObj->Name eq RT->Config->Get('AWSAssetsInstanceCatalog');
+        return '' unless $Asset->FirstCustomFieldValue('Service Type') =~ /^(?:EC2|RDS)$/;
+
+        my $href = RT->Config->Get('WebPath') . "/Helpers/DescribeReservedInstance?id=" . $Asset->Id;
+        return \(
+        qq{<div class="editable gap-2"><button type="button" class="inline-edit-modal edit-icon btn btn-primary rt-btn-x-sm m-1" data-link="$href" data-bs-toggle="tooltip" data-bs-title="}
+            . loc('Purchase Reserved Instance') . q{">}
+            . loc('Purchase')
+            . '</button></div>' );
+    },
+};
+</%init>

@@ -1,5 +1,5 @@
 package Sim::OPT;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2024 by Gian Luca Brunetti.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -40,6 +40,7 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
 use Sim::OPT::Interlinear;
 
+
 our @ISA = qw( Exporter );
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -63,12 +64,498 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.751';
+$VERSION = '0.761';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
 # Sim::OPT
 #################################################################################
+# list of proprietary functions: sub genmodnew
+
+
+our %cryptc;
+our $globcount = 0;   # global counter, starts at 0
+
+
+
+sub getnear
+{
+	my ( $missing, $carrier_r, $countcase ) = @_;
+
+	my %carrier = %{ $carrier_r };
+	my ( @indices, @numfrom, @numto );
+	my @missings = split( "_|-", $missing );
+
+	foreach my $key (sort {$a <=> $b} (keys %carrier ) )
+	{
+	  push( @indices, $key );
+		push( @numfrom, $carrier{$key} );
+	}
+
+	$c = 0;
+	foreach my $el ( @missings )
+	{
+		if ( Sim::OPT::odd( $c ) )
+		{
+			push ( @numto, $el );
+		}
+		$c++;
+	}
+
+	my ( @numchanges, @diffchanges );
+	my $c = 0;
+	foreach my $el ( @numto )
+	{
+		if ( not ( $el eq "$numfrom[$c]" ) )
+		{
+			push ( @numchanges,  $el );
+		}
+		elsif ( $el eq "$numfrom[$c]" )
+		{
+			push ( @numchanges, "x" );
+		}
+		$c++;
+	}
+
+	my ( @nummix, @countvrs, @countsteps );
+	my $c = 0;
+  foreach my $el ( @numchanges )
+	{
+		unless ( $el eq "x" )
+		{
+			my $cn = 0;
+			foreach ( @numfrom )
+			{
+				splice ( @numfrom, $c, 1, $el );
+			}
+      push ( @countsteps, $el );
+			push ( @nummix, [ @numfrom ] );
+			push ( @countvrs, $indices[$c] );
+      $cn++
+		}
+		$c++
+	}
+
+	my ( @box );
+	foreach my $elt_r ( @nummix )
+	{
+		my $line = "";
+		my @elts = @{ $elt_r };
+		my $count = 0;
+		foreach my $elt ( @elts )
+		{
+      $line = $line . $indices[$count] . "-" . $elt . "_";
+			$count++;
+		}
+		chop $line;
+    push ( @box, $line );
+	}
+
+	return( \@box, \@countvrs, \@countsteps );
+}
+
+
+sub define_random_file
+{
+  my ( $newname, $mids_r, $countcase, $baseinsts_r, $dowhat_r ) = @_;
+
+  my %mids      = %{ $mids_r };
+  my @baseinsts = @{ $baseinsts_r };
+  my %dowhat    = %{ $dowhat_r };
+
+  # Take the last base instance as template (same as setpickinst does with pop)
+  my $ins_r = pop( @baseinsts );
+  my %b     = %{ $ins_r };
+
+  my $countblock   = $b{countblock};
+  my @miditers     = @{ $b{miditers} };
+  my @sweeps       = @{ $b{sweeps} };
+  my @sourcesweeps = @{ $b{sourcesweeps} };
+  my @varnumbers   = @{ $b{varnumbers} };
+  my @blocks       = @{ $b{blocks} };
+  my @blockelts    = @{ $b{blockelts} };
+  my %varnums      = %{ $b{varnums} };
+  my %carrier      = %{ $b{carrier} };
+
+  my @winneritems  = @{ $b{winneritems} }      if exists $b{winneritems};
+  my %datastruc    = %{ $b{datastruc} }        if exists $b{datastruc};
+  my %vehicles     = %{ $b{vehicles} }         if exists $b{vehicles};
+  my $instn        = $b{instn}                 if exists $b{instn};
+  my $c            = $b{c}                     if exists $b{c};
+  my $from         = $b{from}                  if exists $b{from};
+
+  my $mypath       = $dowhat{mypath};
+  my $file         = $dowhat{file};
+   
+  my $stamp;
+
+  if ( $dowhat{names} eq "short" )
+	{
+		$stamp = encrypt1( $newname );
+	}
+	elsif ( $dowhat{names} eq "medium" )
+	{
+		$stamp = encrypt0( $newname );
+	}
+
+  # Origin = current configuration; in setpickinst this is usually giveback(%mids)
+  my $origin = giveback( \%mids );
+
+  my ( %to, %orig );
+  my @whatto;
+
+  # This is a single direct jump; treat as "end" step
+  push( @whatto, "end" );
+
+  my $is = $newname;
+
+  # File names & clean names
+  $to{to}      = "$mypath/$file" . "_" . "$is";
+  $to{cleanto} = $is;
+
+  $orig{to}      = "$mypath/$file" . "_" . "$origin";
+  $orig{cleanto} = $origin;
+
+  # Encryption / crypto fields
+  if ( $dowhat{names} eq "short" )
+  {
+    my $crypto  = encrypt1( $is );
+    my $cryptor = encrypt1( $origin );
+
+    $to{crypto}        = "$mypath/$file" . "_" . "$crypto";
+    $to{cleancrypto}   = $crypto;
+    $orig{crypto}      = "$mypath/$file" . "_" . "$cryptor";
+    $orig{cleancrypto} = $cryptor;
+  }
+  elsif ( $dowhat{names} eq "medium" )
+  {
+    my $crypto  = encrypt0( $is );
+    my $cryptor = encrypt0( $origin );
+
+    $to{crypto}        = "$mypath/$file" . "_" . "$crypto";
+    $to{cleancrypto}   = $crypto;
+    $orig{crypto}      = "$mypath/$file" . "_" . "$cryptor";
+    $orig{cleancrypto} = $cryptor;
+  }
+  else # names == long
+  {
+    $to{crypto}        = $to{to};
+    $to{cleancrypto}   = $to{cleanto};
+    $orig{crypto}      = $orig{to};
+    $orig{cleancrypto} = $orig{cleanto};
+  }
+
+  my $countvar  = undef;  # you can fill these if you want to track which var/step moved
+  my $countstep = undef;
+  my $cn        = 0;      # single step
+
+  my @newinstances;
+
+  push( @newinstances,
+  {
+    countcase     => $countcase,
+    countblock    => $countblock,
+    miditers      => \@miditers,
+    winneritems   => \@winneritems,
+    c             => $c,
+    from          => $from,
+
+    to            => \%to,
+    orig          => \%orig,
+    countvar      => $countvar,
+    countstep     => $countstep,
+
+    sweeps        => \@sweeps,
+    sourcesweeps  => \@sourcesweeps,
+    datastruc     => \%datastruc,
+    varnumbers    => \@varnumbers,
+    blocks        => \@blocks,
+    blockelts     => \@blockelts,
+    mids          => \%mids,
+    varnums       => \%varnums,
+    carrier       => \%mids,        # as in your original
+
+    countinstance => $cn,
+    origin        => $origin,
+    instn         => $instn,
+    is            => $is,
+    vehicles      => \%vehicles,
+
+    mypath        => $mypath,
+    file          => $file,
+    whatto        => \@whatto,
+    fire          => "y",
+    gaproc        => "y",
+    stamp         => $stamp,
+  } );
+
+  return \@newinstances;
+}
+
+
+sub cleaninst
+{
+	my %inst = @_;
+	my %pure;
+	foreach my $key ( keys %inst )
+	{
+		unless ( $key eq "" )
+		{
+
+		}
+	}
+}
+
+
+sub giveback
+{
+  my %mids = %{ $_[0] };
+
+  my $string;
+  foreach my $key ( sort { $a <=> $b } ( keys %mids ) )
+  {
+
+    $string = $string . $key . "-" . $mids{$key} . "_";
+  }
+  $string =~ s/_$// ;
+  return( $string );
+}
+
+
+
+sub setpickinst
+{
+  my ( $missing, $mids_r, $countcase, $baseinsts_r, $dowhat_r ) = @_;
+  my %mids = %{ $mids_r };
+  my @baseinsts = @{ $baseinsts_r }; say RELATE "IN setpickinst baseinsts " .dump ( @baseinsts );
+	my $ins_r = pop( @baseinsts );
+	my %b = %{ $ins_r };
+
+	my %dowhat = %{ $dowhat_r }; #say "IN setpickinst \%dowhat " .dump ( %dowhat );
+
+  #my %b = %{ $baseinsts[0] }; say RELATE "IN setpickinst baseinsts " .dump ( \%b );
+  my $countblock = $b{countblock};
+  my @miditers = @{ $b{miditers} }; say RELATE "IN setpickinst \@miditers " .dump ( @miditers );
+  my @sweeps = @{ $b{sweeps} };
+  my @sourcesweeps = @{ $b{sourcesweeps} };
+  my @varnumbers = @{ $b{varnumbers} };
+  my @blocks = @{ $b{blocks} };  say RELATE "IN setpickinst \@blocks " .dump ( @blocks );
+  my @blockelts = @{ $b{blockelts} }; say RELATE "IN setpickinst \@blockelts " .dump ( @blockelts );
+  my %varnums = %{ $b{varnums} };
+  my %carrier = %{ $b{carrier} };
+
+  my $stamp;
+  if ( $dowhat{names} eq "short" )
+  {
+    $stamp = encrypt1( $missing );
+  }
+  elsif ( $dowhat{names} eq "medium" )
+  {
+    $stamp = encrypt0( $missing );
+  }
+
+  $mypath = $dowhat{mypath}; say RELATE "IN setpickinst \$mypath " .dump ( \$mypath ); say "IN setpickinst \$mypath " .dump ( $mypath );
+  $file = $dowhat{file}; say RELATE "IN setpickinst \$file " .dump ( \$file );
+
+	say RELATE "\nMISSING: $missing";
+	say RELATE "\%mids: " . dump( \%mids );
+
+	my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = getnear( $missing, \%mids );
+	my @addinsts = @{ $box_ref }; say RELATE "in setpickinst PRODUCING \@addinsts" . dump( @addinsts );
+	my @countvrs = @{ $countvrs_ref }; say RELATE "in setpickinst PRODUCING \@countvrs" . dump( @countvrs );
+	my @countsteps = @{ $countsteps_ref }; say RELATE "in setpickinst PRODUCING \@countsteps" . dump( @countsteps );
+  my $countvar;
+  my $countstep;
+
+
+	if ( scalar( @addinsts ) > 0 )
+	{
+		my $cn = 0;
+		foreach $addinst ( @addinsts )
+		{
+			$countvar = $countvrs[$cn];
+			$countstep = $countsteps[$cn];
+      my ( $is, %origin, %to, %orig);
+			$is = $addinst;
+
+      $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
+      $to{cleanto} = "$is"; say RELATE "B in setpickinst \$to{cleanto} " .dump ( $to{cleanto} );
+
+			my ( @whatto );
+
+			if ( $cn == 0 )
+			{
+				$origin = giveback ( \%mids );
+				push ( @whatto, "begin" );
+			}
+
+			if ( $cn > 0 )
+			{
+				push ( @whatto, "transition" );
+				$origin = $addinsts[$cn-1];
+			}
+
+			if ( $cn == $#addinsts )
+			{
+				push ( @whatto, "end" );
+        $origin = $addinsts[$cn-1];
+			}
+
+      $orig{to} = "$mypath/$file" . "_" . "$origin"; say RELATE "C in setpickinst \$orig{to} " .dump ( $orig{to} );
+      $orig{cleanto} = "$origin"; say RELATE "D in setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
+
+			say RELATE "in setpickinst : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
+      
+      my ( $crypto, $cryptor );
+      if ( $dowhat{names} eq "short" )
+	    {
+			  $crypto = encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+	      $cryptor = encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+      }
+      elsif ( $dowhat{names} eq "medium" )
+	    {
+	    	$crypto = encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+	      $cryptor = encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+      }
+
+	    if ( $dowhat{names} eq "short" )
+	    {
+	      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+	      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+	      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+	      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+	    }
+      elsif ( $dowhat{names} eq "medium" )
+	    {
+	      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+	      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+	      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+	      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+	    }
+	    else
+	    {
+
+	      $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
+	      $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+	      $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
+	      $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+	    }
+
+      if ( $cn < $#addinsts )
+      {
+				push( @newinstances,
+  			{
+  				countcase => $countcase, countblock => $countblock,
+  				miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
+  				to => \%to, countvar => $countvar, countstep => $countstep,
+  				sweeps => \@sweeps, orig => \%orig,
+  				sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+  				varnumbers => \@varnumbers, blocks => \@blocks,
+  				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+  				countinstance => $cn, carrier => \%mids, origin => $origin,
+  				instn => $cn, is => $is, vehicles => \%vehicles,
+  				mypath => $mypath, file => $file, whatto => \@whatto,
+          fire => "no", from => $origin, gaproc => "yes", stamp => $stamp,
+  			} );
+      }
+      else
+      {
+				push( @newinstances,
+        {
+  				countcase => $countcase, countblock => $countblock,
+  				miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
+  				to => \%to, countvar => $countvar, countstep => $countstep,
+  				sweeps => \@sweeps, orig => \%orig,
+  				sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+  				varnumbers => \@varnumbers, blocks => \@blocks,
+  				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+  				countinstance => $cn, carrier => \%mids, origin => $origin,
+  				instn => $cn, is => $is, vehicles => \%vehicles,
+  				mypath => $mypath, file => $file, whatto => \@whatto,
+          fire => "yes", from => $origin, gaproc => "yes", stamp => $stamp,
+				} );
+      }
+			$cn++;
+		}
+	}
+  else
+	{
+		$countvar = $countvrs[$cn];
+		$countstep = $countsteps[$cn];
+		$is = $addinst;
+
+		my ( %orig, @whatto );
+		$origin = giveback ( \%mids );
+    push ( @whatto, "end" );
+
+		say RELATE "in setpickother : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
+    
+    my ( $crypto, $cryptor );
+    if ( $dowhat{names} eq "short" )
+    {
+      $crypto = encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+      $cryptor = encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+    }
+    if ( $dowhat{names} eq "medium" )
+    {
+    	$crypto = encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+      $cryptor = encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+    }
+
+    $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
+    $to{cleanto} = "$is"; say RELATE "B in setpickinst \$to{cleanto} " .dump ( $to{cleanto} );
+    $orig{to} = "$mypath/$file" . "_" . "$origin"; say RELATE "C in setpickinst \$orig{to} " .dump ( $orig{to} );
+    $orig{cleanto} = "$origin"; say RELATE "D in setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
+
+    if ( $dowhat{names} eq "short" )
+    {
+      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+    }
+    elsif ( $dowhat{names} eq "medium" )
+    {
+      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+    }
+    else
+    {
+
+      $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
+      $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+      $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
+      $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+    }
+
+    push( @newinstances,
+    {
+			countcase => $countcase, countblock => $countblock,
+			miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
+			to => \%to, countvar => $countvar, countstep => $countstep,
+			sweeps => \@sweeps, dowhat => \%dowhat, orig => \%orig,
+			sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+			varnumbers => \@varnumbers, blocks => \@blocks,
+			blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+			countinstance => $cn, carrier => \%mids, origin => $origin,
+			instn => $instn, is => $to{cleanto}, vehicles => \%vehicles,
+			mypath => $mypath, file => $file, whatto => \@whatto,
+      fire => "yes", from => $origin, gaproc => "yes", stamp => $stamp,
+		} );
+	}
+	return ( \@newinstances );
+}
+
+
+sub reconstruct
+{
+	my ( $string ) = @_;
+	my %mids = split( "_|-", $string );
+  return( \%mids );
+}
+
 
 
 sub checkdone
@@ -79,7 +566,7 @@ sub checkdone
 	{
 		if ( $elm =~ /$term/ )
 		{
-			return( "yes" );
+			return( "y" );
 		}
 	}
 }
@@ -254,6 +741,92 @@ sub rotate2d
 	return ( $x_new, $y_new);
 }
 
+
+#sub genstring {
+#    my ( $varnums_r, $blockelts_r, $from ) = @_;
+#    my %varnums   = %{ $varnums_r };   # max levels for each parameter
+#    my @blockelts = @{ $blockelts_r }; # variables active in this block
+#    my @frags = split( "_", $from ); say "\$from: $from"; say "\@frags: " . dump ( @frags );
+#    my @bits;
+#
+#    foreach my $frag ( @frags ) 
+#    {
+#      my @bits = split( "-", $frag );
+#      unless ( $bits[0] ~~ @blockelts )
+#      {  
+#        push( @bits, "$frag" )
+#      }
+#      else 
+#      {
+#      	my $max = $varnums{ $bits[0] };
+#        my $lev = 1 + int( rand( $max ) );
+#        push( @bits, "$var-$lev" );
+#      }
+#      my @obtained = ( join "_", @bits );
+#    }
+#    return @obtained;
+#}
+
+
+
+#@sub genstring {
+#    my ( $varnums_r, $blockelts_r, $from ) = @_;
+#
+#    my %varnums   = %{ $varnums_r };    # max levels for each parameter
+#
+#    my %inblock = map { $_ => 1 } @blockelts;
+#
+#    my @frags    = split /_/, $from;    # e.g. ("v1-2", "v2-3", "v3-1")
+#    my @newfrags;
+#
+#    foreach my $frag ( @frags ) {
+#        my ( $var, $oldlev ) = split /-/, $frag, 2;
+#
+#        # variable not in this block: keep as-is
+#        if ( !$inblock{$var} ) {
+#            push @newfrags, $frag;
+#            next;
+#        }
+#
+#        # variable in this block: pick a new random level between 1 and max
+#        my $max = $varnums{$var};
+#        $max = 1 if !defined $max || $max < 1;  # defensive
+#
+#        my $lev = 1 + int( rand($max) );
+#        push @newfrags, "$var-$lev";
+#    }
+#
+#    my $obtained = join "_", @newfrags;
+#    return $obtained;
+#}
+
+
+sub genstring {
+  my ( $varnums_r, $blockelts_r, $from ) = @_;
+  my %varnums   = %{ $varnums_r }; say "\%varnums: " . dump ( \%varnums );  # max levels for each parameter
+  my @blockelts = @{ $blockelts_r }; say "\@blockelts: " . dump ( @blockelts ); # variables active in this block
+  my @frags = split( "_", $from ); say "\$from: $from"; say "\@frags: " . dump ( @frags );
+  my @bowl;
+
+  foreach my $frag ( @frags ) 
+  {
+    my @bits = split( "-", $frag ); say "\@bits: " . dump ( @bits ); say "\$bits[0]: " . dump ( $bits[0] ); 
+    unless ( $bits[0] ~~ @blockelts )
+    {  
+      push( @bowl, "$frag" ); say $tee "INSERT \$frag $frag";
+    }
+    else 
+    {
+    	my $max = $varnums{ $bits[0] }; say $tee "\$max $max";
+      my $lev = 1 + int( rand( $max ) ); say $tee "\$lev $lev";
+      push( @bowl, "$bits[0]-$lev" ); say $tee "CALC AND INSERT \$bits[0]-\$lev $bits[0]-$lev";
+    }
+  }
+  my $obtained = ( join "_", @bowl ); say "\@obtained: " . dump ( @obtained );
+  return ( $obtained );
+}
+
+
 sub countarray
 {
 	my $c = 1;
@@ -380,8 +953,8 @@ sub addnear
 	my %thiselts = split( "_|-", $this );
 
   my $that;
-	my $done = "no";
-	while ( $done eq "no" )
+	my $done = "n";
+	while ( $done eq "n" )
 	{
 		my @pars = shuffle( @keys );
 		my @signs = shuffle( @signs );
@@ -404,7 +977,7 @@ sub addnear
 			my $firstbit = $par . "-";
 			$that = $this;
 			$that =~ s/$firstbit(\d)/$bit/ ;
-			$done = "yes";
+			$done = "y";
 		}
 	}
 	$pass->[0][0] = $that;
@@ -453,13 +1026,57 @@ sub _clean_
 	return  @storeinfo; # IT IS DESTRUCTIVE.
 }
 
-sub encrypt1
+sub encrypt0
 {
   my ( $thing ) = @_;
   $thing =~ s/.-//g ;
   $thing =~ s/_//g ;
   return( $thing );
 }
+
+
+
+sub encrypt1 {
+    my ( $is, $dirfiles_r ) = @_;
+
+    # already seen: reuse id and keep counters in sync
+    if ( exists $cryptc{$is} ) {
+        my $id = $cryptc{$is};
+
+        if ( defined $dirfiles_r ) {
+            $dirfiles_r->{instcount} = $id
+              if !defined $dirfiles_r->{instcount}
+              || $dirfiles_r->{instcount} < $id;
+        }
+
+        $globcount = $id if $globcount < $id;
+        return "$id";   # digits-only string
+    }
+
+    my $id;
+    if ( defined $dirfiles_r ) {
+        $dirfiles_r->{instcount} = 0
+          unless defined $dirfiles_r->{instcount};
+
+        # keep per-run counter at least as large as global
+        $dirfiles_r->{instcount} = $globcount
+          if $dirfiles_r->{instcount} < $globcount;
+
+        $dirfiles_r->{instcount}++;
+        $id = $dirfiles_r->{instcount};
+    }
+    else {
+        $globcount++;
+        $id = $globcount;
+    }
+
+    $cryptc{$is} = $id;
+    return ( $id );       # digits-only string
+}
+
+
+
+
 
 sub present
 {
@@ -568,8 +1185,8 @@ sub checkduplicates
 			$signal++;
 		}
 	}
-	if ($signal == 0) { return "no"; }
-	else { return "yes" };
+	if ($signal == 0) { return "n"; }
+	else { return "y" };
 }
 
 
@@ -748,7 +1365,17 @@ sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 	my $fullto = "$mypath/$file" . "_" . "$cleanto";
 
 	###my $cleancrypto = $instn . "__"; ###!!!OLD!!!
-	my $cleancrypto = encrypt1( $cleanto );
+	my $cleancrypto;
+
+  if ( $dowhat{names} eq "short" )
+	{
+		$cleancrypto = encrypt1( $cleanto );
+	}
+	elsif ( $dowhat{names} eq "medium" )
+	{
+		$cleancrypto = encrypt0( $cleanto );
+	}
+
 	my $crypto = "$mypath/$file" . "_" . "$cleancrypto";
 
 	my $it;
@@ -759,7 +1386,14 @@ sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 		$it{crypto} = $crypto;
 		$it{cleancrypto} = $cleancrypto;
 	}
-	elsif ( ( $dowhat{names} eq "long" ) or ( $dowhat{names} eq "" ) )
+	elsif ( $dowhat{names} eq "medium" )
+	{
+		$it{to} = $fullto;
+		$it{cleanto} = $cleanto;
+		$it{crypto} = $crypto;
+		$it{cleancrypto} = $cleancrypto;
+	}
+	else
 	{
 		$it{to} = $fullto;
 		$it{cleanto} = $cleanto;
@@ -1215,16 +1849,16 @@ sub gencentres
           $newval = $ar[ int( rand( @ar + 1 ) ) ];
           if ( $hsmax{$key} == $newval )
           {
-            $inv = "no";
+            $inv = "n";
           }
           else
           {
-            $inv = "yes";
+            $inv = "y";
           }
         }
         else
         {
-          if ( $inv == "no" )
+          if ( $inv == "n" )
           {
             @newpair = ( $hsmin{$key}, $hsmax{$key} ); #say $tee "newpair 2: " . dump ( @newpair );
           }
@@ -1372,17 +2006,23 @@ sub solvestar
 	if ( not( scalar( @{ $dirfiles{starpositions} } ) == 0 ) )
 	{
 		$dirfiles{direction} => [ [ "star" ] ],
-		$dirfiles{randomsweeps} => "no", # to randomize the order specified in @sweeps.
-		$dirfiles{randominit} => "no", # to randomize the init levels specified in @miditers.
-		$dirfiles{randomdirs} => "no", # to randomize the directions of descent.
+		$dirfiles{randomsweeps} => "n", # to randomize the order specified in @sweeps.
+		$dirfiles{randominit} => "n", # to randomize the init levels specified in @miditers.
+		$dirfiles{randomdirs} => "n", # to randomize the directions of descent.
 	}
 	return( \%dirfiles )
 }
 
-
+###DDD
 sub takewinning
 {
 	my ( $toitem ) = @_;
+  
+
+  if ( !defined($toitem) or ( $toitem !~ /-\d/ ) )
+  {
+  	die "takewinning() expected clear instance string, got '$toitem'";
+  }
 
 	my %carrier = split( "_|-", $toitem );
 	return( \%carrier );
@@ -1508,7 +2148,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 
 	if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
   {
-		if ( $dirfiles{checksensitivity} eq "yes" )
+		if ( $dirfiles{checksensitivity} eq "y" )
 		{
 			Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $dirfiles{objectivecolumn} );
 		}
@@ -1533,7 +2173,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^([A-Za-z]+)(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
@@ -1553,7 +2193,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /(\d+)ç/ ;
 			$dirfiles{slicenum} = $1;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
@@ -1566,7 +2206,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 
 	if ( $sourceblockelts[0] =~ />/ )
 	{
-		$dirfiles{starsign} = "yes";
+		$dirfiles{starsign} = "y";
 		$sourceblockelts[0] =~ /^(\d+)>/ ;
 		$dirfiles{stardivisions} = $1;
 
@@ -1574,20 +2214,20 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^(\d+)>(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{starsign} = "no";
+		$dirfiles{starsign} = "n";
 		$dirfiles{stardivisions} = "";
 	}
 
 	if ( $sourceblockelts[0] =~ /\|/ )
 	{
-		$dirfiles{random} = "yes";
+		$dirfiles{random} = "y";
 		$sourceblockelts[0] =~ /^(\d+)\|/ ;
 		$dirfiles{randomnum} = $1;
 
@@ -1595,20 +2235,20 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^(\d+)\|(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{random} = "no";
+		$dirfiles{random} = "n";
 		$dirfiles{randomnum} = "";
 	}
 
 	if ( $sourceblockelts[0] =~ /§/ )
 	{
-		$dirfiles{latinhypercube} = "yes";
+		$dirfiles{latinhypercube} = "y";
 		$sourceblockelts[0] =~ /^(\d+)§/ ;
 		$dirfiles{latinhypercubenum} = $1;
 
@@ -1616,20 +2256,20 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^(\d+)§(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{latinhypercube} = "no";
+		$dirfiles{latinhypercube} = "n";
 		$dirfiles{latinhypercubenum} = "";
 	}
 
 	if ( $sourceblockelts[0] =~ /°/ )
 	{
-		$dirfiles{randompick} = "yes";
+		$dirfiles{randompick} = "y";
 		$sourceblockelts[0] =~ /^(\d+)°/ ;
 		$dirfiles{randompicknum} = $1;
 
@@ -1637,21 +2277,21 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^(\d+)°(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{randompick} = "no";
+		$dirfiles{randompick} = "n";
 		$dirfiles{randompicknum} = "";
 	}
 
 
 	if ( $sourceblockelts[0] =~ /ù/ )
 	{
-		$dirfiles{ga} = "yes";
+		$dirfiles{ga} = "y";
 		$sourceblockelts[0] =~ /^(\d+)ù/ ;
 		$dirfiles{ganum} = $1;
 
@@ -1659,42 +2299,42 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^(\d+)ù(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{ga} = "no";
+		$dirfiles{ga} = "n";
 		$dirfiles{ganum} = "";
 	}
 
 
 	if ( $sourceblockelts[0] =~ /</ )
 	{
-		$dirfiles{factorial} = "yes";
+		$dirfiles{factorial} = "y";
 
 		if ( $sourceblockelts[0] =~ /ç/ )
 		{
 			$sourceblockelts[0] =~ /^(\d+)<(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{factorial} = "no";
+		$dirfiles{factorial} = "n";
 	}
 
 	if ( $sourceblockelts[0] =~ /£/ )
 	{
-		$dirfiles{facecentered} = "yes";
-		$dirfiles{factorial} = "yes";
-		$dirfiles{random} = "yes";
-		$dirfiles{starsign} = "yes";
+		$dirfiles{facecentered} = "y";
+		$dirfiles{factorial} = "y";
+		$dirfiles{random} = "y";
+		$dirfiles{starsign} = "y";
 		$sourceblockelts[0] =~ /^(\d+)£/ ;
 		$dirfiles{facecenterednum} = $1;
 		$dowhat{starpositions} = "";
@@ -1706,14 +2346,14 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		{
 			$sourceblockelts[0] =~ /^(\d+)£(\d+)ç/ ;
 			$dirfiles{slicenum} = $2;
-			$dirfiles{pushsupercycle} = "yes";
+			$dirfiles{pushsupercycle} = "y";
 			$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 			push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 		}
 	}
 	else
 	{
-		$dirfiles{facecentered} = "no";
+		$dirfiles{facecentered} = "n";
 	}
 
 	if ( $sourceblockelts[0] =~ /ç/ )
@@ -1727,7 +2367,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		}
 		say $tee "SLICENUM! " . dump( $dirfiles{slicenum} );
 		say $tee "\$countcase $countcase \$countblock $countblock";
-		$dirfiles{pushsupercycle} = "yes";
+		$dirfiles{pushsupercycle} = "y";
 		$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 		push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 	}
@@ -1737,7 +2377,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§|ù)(\d+)é/ ;
 		$dirfiles{revealnum} = $3;
 		say $tee "REVEALNUM! " . dump( $dirfiles{revealnum} );
-		$dirfiles{popsupercycle} = "yes";
+		$dirfiles{popsupercycle} = "y";
 	}
 	else
 	{
@@ -1745,19 +2385,42 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	}
 
 	my @blocks = getblocks( \@sweeps, $countcase );
-
+  ###DDDTHIS
 	my $toitem = getitem( \@winneritems, $countcase, $countblock );
+
+
+
 	$toitem = clean( $toitem, $mypath, $file );
+
+	if ( ( $dowhat{names} eq "short" ) and ( $toitem =~ /^\d+$/ ) )
+	{
+	  my $clear = $inst{$toitem};
+	  if ( (!defined($clear) ) or ( $clear eq "") )
+	  {
+	    my $k = "$mypath/$file" . "_" . $toitem;
+	    $clear = $inst{$k};
+	  }
+
+	  if ( ( !defined($clear) ) or ( $clear eq "" ) )
+	  {
+	  	die "Cannot map crypto toitem '$toitem' to clear instance (names=short)";
+	  }
+	    
+	  $toitem = $clear;
+	}
 
 	my $from = getline($toitem);
 	$from = clean( $from, $mypath, $file );
 
-	my $file = $dowhat{file};
-
 	my %carrier = %{ takewinning( $toitem ) };
 
+
+
+
+
+
 	my @tempvarnumbers;
-	if ( $dirfiles{starsign} eq "yes" )
+	if ( $dirfiles{starsign} eq "y" )
 	{
 		my @newvarnumbers = @{ stararrange( \@sweeps, \@blockelts, \@varnumbers, $countcase, $countblock, $file ) };
 		$dirfiles{varnumbershold} = dclone( \@varnumbers );
@@ -1841,9 +2504,10 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 	sub toil
 	{
-		my ( $blockelts_r, $varnums_r, $basket_r, $c, $mypath, $file ) = @_;
+		my ( $blockelts_r, $varnums_r, $basket_r, $c, $mypath, $file, $dirfiles_ref ) = @_;
 		my @blockelts = @{ $blockelts_r };
 		my %varnums = %{ $varnums_r };
+		my %dirfiles = %{ $dirfiles_ref };
 
 		my @basket = @{ $basket_r };
 		if ( ( $c eq "" ) or ( $c == 0 ) )
@@ -1851,24 +2515,56 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			@box = ();
 		}
 
-		foreach my $var ( @blockelts )
-		{
-			my ( @bucket );
-			my $maxvalue	= $varnums{$var};
+    unless ( $dirfiles{randompick} eq "y" )
+    {
+      foreach my $var ( @blockelts )
+			{
+				my ( @bucket );
+				my $maxvalue	= $varnums{$var};
 
+				foreach my $elt ( @basket )
+				{
+					my $root = $elt->[0];
+					my @bag;
+					my $item;
+					my $cnstep = 1;
+					while ( $cnstep <= $maxvalue)
+					{
+						my $olditem = $root;
+						$item = "$root" . "$var" . "-" . "$cnstep" . "_" ;
+						push ( @bag, [ $item, $var, $cnstep, $olditem, $c ] );
+						$cnstep++;
+					}
+					push ( @bucket, @bag );
+				}
+				@basket = ();
+				@basket = @bucket;
+
+				if ( $c eq "" )
+				{
+					push ( @box, [ @bucket ] );
+				}
+				else
+				{
+					@box = [ @bucket ];
+				}
+			}
+    }
+    else 
+    {
+    	my ( @bucket );
+    	@basket = ();
+      push (@basket, [ $rootitem ] );
 			foreach my $elt ( @basket )
 			{
 				my $root = $elt->[0];
 				my @bag;
 				my $item;
 				my $cnstep = 1;
-				while ( $cnstep <= $maxvalue)
-				{
-					my $olditem = $root;
-					$item = "$root" . "$var" . "-" . "$cnstep" . "_" ;
-					push ( @bag, [ $item, $var, $cnstep, $olditem, $c ] );
-					$cnstep++;
-				}
+				my $var = $blockelts[0];
+				my $olditem = $root;
+				my $item = $olditem ;
+			  push ( @bag, [ $item, $var, $cnstep, $olditem, $c ] );
 				push ( @bucket, @bag );
 			}
 			@basket = ();
@@ -1882,24 +2578,24 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			{
 				@box = [ @bucket ];
 			}
-		}
+    }
 		return( \@box );
 	}
 
 	my ( @bux, @buux );
-	if ( ( $dirfiles{starsign} eq "yes" ) or
-			( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-			( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-			( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-			( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) )
+	if ( ( $dirfiles{starsign} eq "y" ) or
+			( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+			( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+			( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) )
 	{
-		if ( $dirfiles{starsign} eq "yes" )
+		if ( $dirfiles{starsign} eq "y" )
 		{
 			my $c = 0;
 			foreach my $elt ( @blockelts )
 			{
 				my @dummys = ( $elt );
-				my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c, $mypath, $file ) };
+				my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c, $mypath, $file, \%dirfiles ) };
 				@bix = @{ $bix[0] };
 				push( @bux, @bix );
 				$c++;
@@ -1908,10 +2604,10 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 		my ( $tmpblankfile, $bit );
 		my ( @bag, @fills, @fulls );
-		if ( ( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
-		 	or ( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
-			or ( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )
-			or ( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) )	)
+		if ( ( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "ys" ) )
+		 	or ( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+			or ( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )
+			or ( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) )	)
 		{
 			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv";
 			$bit = $file . "_";
@@ -1920,7 +2616,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			@fulls = uniq( map { $_->[0] } @fills );
 		}
 
-		if ( $dirfiles{random} eq "yes" )
+		if ( $dirfiles{random} eq "y" )
 		{
 			my ( $standard ) = prepfactl( \@fulls );
 
@@ -1934,7 +2630,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			}
 		}
 
-		if ( $dirfiles{latinhypercube} eq "yes" )
+		if ( $dirfiles{latinhypercube} eq "y" )
 		{
 			my ( $standard ) = prepfactl( \@fulls );
 			my $numitems = $dirfiles{latinhypercubenum};
@@ -1969,7 +2665,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			}
 		}
 
-		if ( $dirfiles{factorial} eq "yes" )
+		if ( $dirfiles{factorial} eq "y" )
 		{
 			my ( $standard, $ohs_r ) = prepfactl( \@fulls );
 			my %ohs = %{ $ohs_r };
@@ -2020,14 +2716,14 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	}
 	else
 	{
-		unless ( $dirfiles{ga} eq "yes" )
+		unless ( $dirfiles{ga} eq "y" )
 	  {
-	    @bux = @{ toil( \@blockelts, \%varnums, \@basket, "", $mypath, $file ) };
+	    @bux = @{ toil( \@blockelts, \%varnums, \@basket, "", $mypath, $file, \%dirfiles ) };
 	  }
 	  else
 	  {
 	    my @subst = (1);
-	    @bux = @{ toil( \@subst, \%carrier, \@basket, "", $mypath, $file ) };
+	    @bux = @{ toil( \@subst, \%carrier, \@basket, "", $mypath, $file, \%dirfiles ) };
 	  }
 	}
 
@@ -2055,7 +2751,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		return( @finals );
 	}
 
-	if ( $dowhat{pairpoints} eq "yes" )
+	if ( $dowhat{pairpoints} eq "y" )
 	{
 		my @boox;
 		foreach my $el ( @buux )
@@ -2067,7 +2763,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	}
 
 	my ( @finalbox );
-	if ( $dirfiles{starsign} eq "yes" )
+	if ( $dirfiles{starsign} eq "y" )
 	{
 		my @newbuux;
 		foreach my $el ( @buux )
@@ -2163,12 +2859,12 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 		  $inst{$orig{to}} = $orig{crypto};
 
 			%inst = cleaninst( %inst );
-			#unless ( $dirfiles{ga} eq "yes" )
+			#unless ( $dirfiles{ga} eq "y" )
 			#{
 				#
         if ( not ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) )
 				{
-					unless ( $dirfiles{randompick} eq "yes" )
+					unless ( $dirfiles{randompick} eq "y" )
 					{
 						push( @{ $dirfiles{dones} }, $to{cleanto} );
 					}
@@ -2222,7 +2918,7 @@ sub exe
 	my $mypath = $dat{mypath};
 	my $file = $dat{file};
 	my $countcase = $dat{countcase};
-	my $countblock = $dat{countblock};
+	my $countblock = $dat{countblock}; say "\$countblock " . dump( $countblock);
 	my @varnumbers = @{ $dat{varnumbers} };
 	my @miditers = $dat{miditers};
 	my @sweeps = @{ $dat{sweeps} };
@@ -2240,9 +2936,7 @@ sub exe
 	my %orig = %{ $d{orig} };
 	my $countvar = $d{countvar};
 	my $countstep = $d{countstep};
-
-
-
+  
 	my @blockelts = @{ $d{blockelts} };
 	my @sourceblockelts = @{ $d{blockelts} };
 	my @blocks = @{ $d{blocks} };
@@ -2255,7 +2949,7 @@ sub exe
 	say $tee "#Performing a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
 	my $cryptolinks;
-	#unless ( $dirfiles{ga} eq "yes" )
+	#unless ( $dirfiles{ga} eq "y" )
 	#{
 		$cryptolinks = "$mypath/$file" . "_" . "$countcase" . "_cryptolinks.pl"; say $tee "CRYPTOLINKS $cryptolinks";
 		open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
@@ -2270,9 +2964,9 @@ sub exe
 		push( @{ $vehicles{cumulateall} }, @instances );
 	}
 
-	say $tee "BEFORE PROCESSING, INSTANCES: " . dump ( @instances );
+	# say $tee "BEFORE PROCESSING, INSTANCES: " . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
 
-	if ( $dirfiles{ga} eq "yes" )
+	if ( $dirfiles{ga} eq "y" )
 	{
 		say $tee "SHOW \@instances: " . dump ( @instances ); # use Storable;
 		say $tee "#Calling GAs on morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
@@ -2281,12 +2975,25 @@ sub exe
 		my $dowhatstore = "./dowhat-$countcase-$countblock";
     my $dirfilesstore = "./dirfiles-$countcase-$countblock";
 
-		my %carrier = Sim::OPT::Morph::reconstruct( $origin );
-		my $starttarget = Sim::OPT::Morph::giveback( \%mids ); ##say "STARTTARGET $starttarget";
+		my %carrier = reconstruct( $origin );
+		my $starttarget = giveback( \%mids ); ##say "STARTTARGET $starttarget";
+    
+    my ( $startcrypt, $crypto, $cryptor );
 
-		my $startcrypt = encrypt1( $starttarget );
+    if ( $dowhat{names} eq "short" )
+    {
+    	$startcrypt = encrypt1( $starttarget );
+      $crypto = encrypt1( $starttarget );
+		  $cryptor = encrypt1( $starttarget );
+    }
+		elsif ( $dowhat{names} eq "medium" )
+    {
+    	$startcrypt = encrypt0( $starttarget );
+      $crypto = encrypt0( $starttarget );
+		  $cryptor = encrypt0( $starttarget );
+    }
 
-    #%obtained = map { $_{is} = $starttarget } %{ $instances[$#instances] };
+		#%obtained = map { $_{is} = $starttarget } %{ $instances[$#instances] };
 		#%obtained = map { $_{origin} = $starttarget } %{ $instances[$#instances] };
 		#%obtained = map { $_{from} = $starttarget } %{ $instances[$#instances] };
 		#%obtained = map { $_{to}{cleanto} = $starttarget } %{ $instances[$#instances] };
@@ -2295,8 +3002,6 @@ sub exe
 		#%obtained = map { $_{to}{to} = $starttarget } %{ $instances[$#instances] };
 		#%obtained = map { $_{orig}{to} = $starttarget } %{ $instances[$#instances] };
 
-    my $crypto = encrypt1( $starttarget );
-		my $cryptor = encrypt1( $starttarget );
 
 		my $count = 0;
 		foreach $i ( @instances )
@@ -2312,14 +3017,21 @@ sub exe
 			  $to{to} = "$mypath/$file" . "_" . "$starttarget";
 				$orig{to} = "$mypath/$file" . "_" . "$starttarget";
 
-				if ( $dowhat{names} eq "long" )
+				if ( $dowhat{names} eq "short" )
 			  {
 			    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
 			    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
 			    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
 			    $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
 			  }
-			  elsif ( $dowhat{names} eq "short" )
+			  elsif ( $dowhat{names} eq "medium" )
+			  {
+			    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+			    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+			    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+			    $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+			  }
+			  else
 			  {
 			    $to{crypto} = "$mypath/$file" . "_" . "$starttarget";  ### TAKE CARE!!! REASSIGNIMENT!!!
 			    $to{cleancrypto} = $starttarget; ### TAKE CARE!!! REASSIGNIMENT!!!
@@ -2344,7 +3056,7 @@ sub exe
 
 
 		my @juggle;
-		my @prov = @instances; say $tee "BEFORE, INSTANCES: " . dump ( @instances );
+		my @prov = @instances; #say $tee "BEFORE, INSTANCES: " . dump ( @instances );
 		my $pop = pop( @prov );
 		my %instance = %{ $pop };
 
@@ -2361,21 +3073,21 @@ sub exe
 		store \%dirfiles, "$dirfilesstore"; # ATTENTION. use Storable;
 
 
-		say $tee "python $dowhat{ga} $configfile $starttarget $countcase $basestore $dowhatstore $dirfilesstore $dirfiles{ganum}";
+		#say $tee "python $dowhat{ga} $configfile $starttarget $countcase $basestore $dowhatstore $dirfilesstore $dirfiles{ganum}";
 		my @returns = `python $dowhat{ga} $configfile $starttarget $countcase $basestore $dowhatstore $dirfilesstore $dirfiles{ganum}`; #HERE FLOWS THE ACTION
-		say  "RETURNED!: " . dump ( @returns );
+		#say  "RETURNED!: " . dump ( @returns );
 
 
     my @selecteds;
 
 
-    say  "\%mids!: " . dump ( \%mids ); say  "\$countcase!: " . dump ( $countcase );
-		say  "\@juggle!: " . dump ( @juggle ); say  "\%dowhat!: " . dump ( \%dowhat );
+    #say  "\%mids!: " . dump ( \%mids ); say  "\$countcase!: " . dump ( $countcase );
+		#say  "\@juggle!: " . dump ( @juggle ); say  "\%dowhat!: " . dump ( \%dowhat );
 		foreach my $name ( @returns )
 		{
-			chomp $name; say  "\$name!: " . dump ( $name );
-			my $inss_r = Sim::OPT::Morph::setpickinst( $name, \%mids, $countcase, \@juggle, \%dowhat );
-			my @inss = @{ $inss_r }; chomp $name; say  "\@inss!: " . dump ( @inss );
+			chomp $name; #say  "\$name!: " . dump ( $name );
+			my $inss_r = setpickinst( $name, \%mids, $countcase, \@juggle, \%dowhat );
+			my @inss = @{ $inss_r }; chomp $name; #say  "\@inss!: " . dump ( @inss );
 			my $pickedins = $inss[$#inss];
       push ( @selecteds, $pickedins );
 		}
@@ -2394,16 +3106,24 @@ sub exe
 
 			#my $crypto = int( ( scalar( keys %inst ) ) / 5 * 6 );
 			#my $cryptor = $crypto + 1;
-
-			my $crypto = Sim::OPT::encrypt1( $is ); say RELATE "out of setpickinst \$crypto " .dump ( $crypto );
-	    my $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "out of setpickinst \$cryptor " .dump ( $cryptor );
+      my ( $crypto, $cryptor );
+      if ( $dowhat{names} eq "short" )
+		  {
+			  $crypto = Sim::OPT::encrypt1( $is ); say RELATE "out of setpickinst \$crypto " .dump ( $crypto );
+	      $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "out of setpickinst \$cryptor " .dump ( $cryptor );
+      }
+      elsif ( $dowhat{names} eq "medium" )
+		  {
+			  $crypto = Sim::OPT::encrypt0( $is ); say RELATE "out of setpickinst \$crypto " .dump ( $crypto );
+	      $cryptor = Sim::OPT::encrypt0( $origin ); say RELATE "out of setpickinst \$cryptor " .dump ( $cryptor );
+      }
 
 	    $to{to} = "$mypath/$file" . "_" . "$is";  ### TAKE CARE!!! REASSIGNIMENT!!!
 	    $to{cleanto} = "$is"; ### TAKE CARE!!! REASSIGNIMENT!!!
 	    $orig{to} = "$mypath/$file" . "_" . "$origin"; ### TAKE CARE!!! REASSIGNIMENT!!!
 	    $orig{cleanto} = "$origin"; ### TAKE CARE!!! REASSIGNIMENT!!!
 
-			if ( $dowhat{names} eq "long" )
+			if ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) )
 		  {
 		    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
 		    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
@@ -2435,15 +3155,15 @@ sub exe
 		open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
 		say CRYPTOLINKS "" . dump( \%inst );
 		close CRYPTOLINKS;
-    say $tee "ARRIVED 1 ";
+    #say $tee "ARRIVED 1 ";
 		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
 		{
-      say $tee "ARRIVED 2 ";
+      #say $tee "ARRIVED 2 ";
 			say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 			 ( my $simcases_ref, my $simstruct_ref, my $repcases_ref, my $repstruct_ref,
 		    my $mergestruct_ref, my $mergecases_ref, $csim ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles,
-					  inst => \%inst, precedents => \@precedents, postproc => "yes" } );
+					  inst => \%inst, precedents => \@precedents, postproc => "y" } ); # CHECK IF: fire => "y is needed" 
 					$dirfiles{simcases} = $simcases_ref;
 					$dirfiles{simstruct} = $simstruct_ref;
 					$dirfiles{repcases} = $repcases_ref;
@@ -2451,9 +3171,9 @@ sub exe
 					$dirfiles{mergestruct} = $mergestruct_ref;
 					$dirfiles{mergecases} = $mergecases_ref;
 		}
-    say $tee "ARRIVED 3 ";
+    #say $tee "ARRIVED 3 ";
 
-		if ( $dowhat{metamodel} eq "yes" )
+		if ( $dowhat{metamodel} eq "y" )
 		{
 			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
 			$bit = $file . "_";
@@ -2462,23 +3182,36 @@ sub exe
 			@fulls = uniq( map { $_->[0] } @fills );
 		}
 	}
-	elsif ( $dirfiles{randompick} eq "yes" )
+	elsif ( $dirfiles{randompick} eq "y" )
 	{############################################################
-
+    my $randompicknum = $dirfiles{randompicknum}; say $tee "\$randompicknum: $randompicknum"; say $tee "\$from: $from";
 		my ( @sack, @collect );
-    my $randnum = 0;
-		while ( scalar( @sack ) <= $randompicknum )
-		{
-			my $newstring = genstring( \%mids, \%varnums );
+    
+    if ( ( $randompicknum == 0 ) or ( $randompicknum eq "" ) )
+    { say $tee "\$randompicknum is 0, but it cannot. Stopping" and die; }
+    
+		while ( scalar( @sack ) < $randompicknum ) 
+		{ 
+			my $newstring = genstring( \%varnums, \@blockelts, $from ); say $tee "\$newstring: $newstring";
+      
+      if ( $newstring ~~ @{ $dirfiles{dones} } )
+      {
+      	next;
+      }
+      else 
+      {
+      	push( @{ $dirfiles{dones} }, $newstring );
+      	push( @sack, $newstring );
+      }
 
-			$instances_r = Sim::OPT::Morph::setpickinst( $newstring, \%mids, $countcase, \@baseinsts, \%dowhat );
-			@shortinstances = @{ $instances_r }; say $tee "ALL-IMPORTANT ARRIVED INSTANCES TO GO " . dump ( @instances );
+		  $instances_r = define_random_file( $newstring, \%mids, $countcase, \@baseinsts, \%dowhat );
+		  @shortinstances = @{ $instances_r }; #say $tee "ALL-IMPORTANT ARRIVED INSTANCES TO GO " . dump ( @instances );
 
 			foreach my $ir ( @shortinstances )
 			{
 			  my %i = %{ $ir };
-			  my %to = %{ $i{to} }; say $tee "out of setpickinst \%to " .dump ( %to );
-			  my %orig = %{ $i{orig} }; say $tee "out of \%orig \$crypto " .dump ( %orig );
+			  my %to = %{ $i{to} }; #say $tee "out of setpickinst \%to " .dump ( %to );
+			  my %orig = %{ $i{orig} }; #say $tee "out of \%orig \$crypto " .dump ( %orig );
 			  my $is = $i{is}; say $tee "out of setpickinst \$is " .dump ( $is );
 			  my $origin = $i{origin}; say $tee "out of setpickinst \$origin " .dump ( $origin );
 
@@ -2487,10 +3220,19 @@ sub exe
 			  $orig{to} = "$mypath/$file" . "_" . "$origin"; say $tee "C out of setpickinst \$orig{to} " .dump ( $orig{to} );
 			  $orig{cleanto} = "$origin"; say $tee "D out of setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
 
-			  if ( $dowhat{names} eq "long" )
+			  if ( $dowhat{names} eq "short" )
 			  {
 			    my $crypto = Sim::OPT::encrypt1( $is ); say $tee "out of setpickinst \$crypto " .dump ( \$crypto );
 			    my $cryptor = Sim::OPT::encrypt1( $origin ); say $tee "out of setpickinst \$cryptor " .dump ( \$cryptor );
+			    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+			    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+			    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+			    $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+			  }
+			  elsif ( $dowhat{names} eq "medium" )
+			  {
+			    my $crypto = Sim::OPT::encrypt0( $is ); say $tee "out of setpickinst \$crypto " .dump ( \$crypto );
+			    my $cryptor = Sim::OPT::encrypt0( $origin ); say $tee "out of setpickinst \$cryptor " .dump ( \$cryptor );
 			    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
 			    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
 			    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
@@ -2515,8 +3257,8 @@ sub exe
 				%inst = cleaninst( %inst );
 
 			}
-			say $tee "FINALLY, \%inst" . dump( \%inst );
-
+		  #say $tee "FINALLY, \%inst" . dump( \%inst );
+  
 			my @pop = @shortinstances;
 			my $leadinst_ref = pop( @pop );
 
@@ -2525,8 +3267,8 @@ sub exe
 			#print EXPORTINSTS "$precious ";
 			#close EXPORTINSTS;
 
-			say $tee "16ARRIVED 3,LAUNCHING MORPHING WITH \$configfile $configfile, \@shortinstances, " . dump( @shortinstances ) . ", ...0000000000000000000000
-			\$fire $fire, \%dirfiles,  " . dump( %dirfiles ) . ", \%dowhat, "  . dump( %dowhat ) . ", \%vehicles, " . dump( %vehicles ) . " \%inst " . dump( %inst ), ;
+			#say $tee "16ARRIVED 3,LAUNCHING MORPHING WITH \$configfile $configfile, \@shortinstances, " . dump( @shortinstances ) . ", ...0000000000000000000000
+			#\$fire $fire, \%dirfiles,  " . dump( %dirfiles ) . ", \%dowhat, "  . dump( %dowhat ) . ", \%vehicles, " . dump( %vehicles ) . " \%inst " . dump( %inst ), ;
 			Sim::OPT::Morph::morph( $configfile, \@shortinstances, \%dirfiles, \%dowhat, \%vehicles, \%inst );
 
 			my @lastinstance = ();
@@ -2535,30 +3277,35 @@ sub exe
 			{
 				if ( $c == $#shortinstances )
 				{
-
 					push ( @lastinstance, $inst );
 				}
 				$c++;
 			}
+      
+      if ( $dowhat{simulate} eq "y" )
+      {
+      	#say $tee "ARRIVED 4, WITH $precious";
+				#say $tee "LAUNCHING SIM WITH  \@lastinstance, " . dump( @lastinstance ) . ", \$fire $fire, \%dirfiles,  " . dump( %dirfiles ) .
+				#     ", \%vehicles, " . dump( %vehicles ) . ", \%dowhat, "  . dump( %dowhat ) . " \%inst " . dump( %inst ), ;
+				Sim::OPT::Sim::sim( { instances => \@lastinstance, dowhat => \%dowhat, dirfiles => \%dirfiles, vehicles => \%vehicles, precious => $precious, inst => \%inst, fire => "y"  } );
+      }
+			
+			if ( $dowhat{descend} eq "y" )
+      {
+				say $tee "#Descending to catch performance " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
+				Sim::OPT::Descend::descend(	{ instances => \@lastinstance, dowhat => \%dowhat, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, precious => "$precious" } );
+				say $tee "#Moving on " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
+      }
 
-			say $tee "ARRIVED 4, WITH $precious";
-			say $tee "LAUNCHING SIM WITH  \@lastinstance, " . dump( @lastinstance ) . ", \$fire $fire, \%dirfiles,  " . dump( %dirfiles ) .
-			     ", \%vehicles, " . dump( %vehicles ) . ", \%dowhat, "  . dump( %dowhat ) . " \%inst " . dump( %inst ), ;
-			Sim::OPT::Sim::sim( { instances => \@lastinstance, dowhat => \%dowhat, dirfiles => \%dirfiles, vehicles => \%vehicles, precious => $precious, inst => \%inst, fire => "yes"  } );
-
-			say $tee "#Descending to catch performance " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
-			Sim::OPT::Descend::descend(	{ instances => \@lastinstance, dowhat => \%dowhat, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, precious => "$precious" } );
-			say $tee "#Moving on " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
-
-			if ( not ( $is ~~ @sack ) )
-			{
-				push ( @sack, $is );
+			#if ( not ( $is ~~ @sack ) )
+			#{
 				push ( @collect, @lastinstance );
-			}
+			#}
 			$randnumc++;
 		}
 
 		my @instances = @collect;
+		@instances = uniq( @instances );
 
 		#my $cryptolinks = "$mypath/$file" . "_" . "$countcase" . "_cryptolinks.pl";
 		#open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
@@ -2572,7 +3319,7 @@ sub exe
 			 ( my $simcases_ref, my $simstruct_ref, my $repcases_ref, my $repstruct_ref,
 		    my $mergestruct_ref, my $mergecases_ref, $csim ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles,
-					  inst => \%inst, precedents => \@precedents } );
+					  inst => \%inst, precedents => \@precedents, , postproc => "y" } );
 					$dirfiles{simcases} = $simcases_ref;
 					$dirfiles{simstruct} = $simstruct_ref;
 					$dirfiles{repcases} = $repcases_ref;
@@ -2581,8 +3328,7 @@ sub exe
 					$dirfiles{mergecases} = $mergecases_ref;
 		}
 
-
-		if ( $dowhat{metamodel} eq "yes" )
+		if ( $dowhat{metamodel} eq "y" )
 		{
 			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
 			$bit = $file . "_";
@@ -2590,11 +3336,11 @@ sub exe
 			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
 			@fulls = uniq( map { $_->[0] } @fills );
 		}
-
-
-
 	}
-  elsif ( $dirfiles{OLDrandompick} eq "yes" ) #DDD
+
+
+
+  elsif ( $dirfiles{OLDrandompick} eq "y" ) #DDD
 	{
 		say $tee "#Calling randomly picked morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
@@ -2632,7 +3378,7 @@ sub exe
 					$dirfiles{mergestruct} = $mergestruct_ref;
 					$dirfiles{mergecases} = $mergecases_ref;
 		}
-		if ( $dowhat{metamodel} eq "yes" )
+		if ( $dowhat{metamodel} eq "y" )
 		{
 			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
 			$bit = $file . "_";
@@ -2659,7 +3405,7 @@ sub exe
 			( my $simcases_ref, my $simstruct_ref, my $repcases_ref, my $repstruct_ref,
 			 my $mergestruct_ref, my $mergecases_ref, $csim ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dowhat => \%dowhat, dirfiles => \%dirfiles,
-					  vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, onlyrep => "yes" } );
+					  vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, onlyrep => "y" } );
 			$dirfiles{simcases} = $simcases_ref;
 			$dirfiles{simstruct} = $simstruct_ref;
 			$dirfiles{repcases} = $repcases_ref;
@@ -2778,7 +3524,7 @@ sub opt
 	require $configfile;
 
 	my $instn = 1;
-	my %inst;
+	our %inst;
 
 	if ( $dowhat{mypath} eq "" )
 	{
@@ -2825,7 +3571,7 @@ sub opt
 		Sim::OPT::sense( $dowhat{justchecksensitivity}, $mypath, $dowhat{objectivecolumn}, "stop" );
 	}
 
-  if ( $dowhat{randomsweeps} eq "yes" ) #IT SHUFFLES  @sweeps UNDER REQUESTED SETTING.
+  if ( $dowhat{randomsweeps} eq "y" ) #IT SHUFFLES  @sweeps UNDER REQUESTED SETTING.
   {
     my @newsweeps;
     foreach my $arrayref ( @sweeps )
@@ -2846,7 +3592,7 @@ sub opt
 
   my $i = 0;
   my @newarr;
-  if ( $dowhat{randomdirs} eq "yes" )
+  if ( $dowhat{randomdirs} eq "y" )
   { #IT SHUFFLES  $dowhat{direction} UNDER REQUESTED SETTINGS.
     foreach my $directionref ( @{ $dowhat{direction} } )
     {
@@ -2916,7 +3662,7 @@ sub opt
     $dowhat{starorder} = [ @newarr ];
   }
 
-  if ( $dowhat{randominit} eq "yes" )
+  if ( $dowhat{randominit} eq "y" )
   {
     my %i = 0;
     foreach $arr ( @varnumbers )
@@ -2996,7 +3742,7 @@ sub opt
 
 		my ( @gencentres, @genextremes, @genpoints, $genextremes_ref, $gencentres_ref );
 
-		if ( $dowhat{outstarmode} eq "yes" )
+		if ( $dowhat{outstarmode} eq "y" )
 		{
 			if ( ( $dowhat{stardivisions} ne "" ) and ( $dowhat{starpositions} eq "" ) )
 			{
@@ -3008,9 +3754,9 @@ sub opt
 			if ( not( scalar( @{ $dowhat{starpositions} } ) == 0 ) )
 			{
 				$dowhat{direction} => [ [ "star" ] ];
-				$dowhat{randomsweeps} => "no"; # to randomize the order specified in @sweeps.
-				$dowhat{randominit} => "no"; # to randomize the init levels specified in @miditers.
-				$dowhat{randomdirs} => "no"; # to randomize the directions of descent.
+				$dowhat{randomsweeps} => "n"; # to randomize the order specified in @sweeps.
+				$dowhat{randominit} => "n"; # to randomize the init levels specified in @miditers.
+				$dowhat{randomdirs} => "n"; # to randomize the directions of descent.
 
 				my @sweeps = @{ starsweep( \@varnumbers, \@sweeps ) };
 
@@ -3158,9 +3904,9 @@ OPT can work on a given set of pre-simulated results without launching new simul
 
 By default the behaviour of the program is sequential.
 
-OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "|" or by a "°"); latin hypercube searches (the first number has to be preceded by a "§"). The simbols "ç" and "é" preceding the first number make possible to cumulate the search results, possibly in a nested manner. "ç" opens the first block and "é" opens the last block. Following that instruction, at the end of the execution of the last block, the results of the previous blocks are cumulated in the evaluation. The number preceding the "é", when present, tells how many top-performing metamodel results have to be refreshed with real samples (simulations).
+OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "°"; latin hypercube searches (the first number has to be preceded by a "§"). The simbols "ç" and "é" preceding the first number make possible to cumulate the search results, possibly in a nested manner. "ç" opens the first block and "é" opens the last block. Following that instruction, at the end of the execution of the last block, the results of the previous blocks are cumulated in the evaluation. The number preceding the "é", when present, tells how many top-performing metamodel results have to be refreshed with real samples (simulations).
 
-For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "yes" to the variable $dowhat{metamodel}.
+For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "y" to the variable $dowhat{metamodel}.
 
 OPT can perform variance-based preliminary sensitivity analyses on the basis of metamodels.
 
@@ -3180,7 +3926,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2024 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

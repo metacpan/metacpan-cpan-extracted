@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Exporter 'import';
 
@@ -702,7 +702,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -738,6 +738,11 @@ error.
 
 See L<Iterator::Flex::Manual::Overview/Capabilities> for a full list
 of capabilities.
+
+=head2 Iterator methods
+
+See L<Iterator::Flex::Base> for methods available to all iterators which
+provide means of adapting existing iterators, as well as other conveniences.
 
 =head2 Generator Parameters
 

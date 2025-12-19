@@ -1,5 +1,16 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9923 2025-12-19T10:15:57Z
+
+    - Docker build improvements:
+      * use git clone with submodules instead of cpanm direct install
+      * introduce COMMIT and TAG build arguments for clearer separation
+      * only clone share/getoptlong submodule (skip t/runner)
+    - Makefile simplification:
+      * use dozo for container execution
+      * add latest tag alongside version tag
+    - change t/runner submodule URL from SSH to HTTPS
+
 0.9922 2025-12-15T07:10:27Z
 
     - improve dozo help message formatting (consistent spacing and argument notation)

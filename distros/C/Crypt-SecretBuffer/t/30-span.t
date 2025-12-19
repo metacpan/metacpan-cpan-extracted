@@ -2,7 +2,9 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test2AndUtils;
 use Encode qw( encode decode );
-use Crypt::SecretBuffer qw( secret UTF8 ISO8859_1 UTF16LE UTF16BE HEX MATCH_NEGATE MATCH_MULTI );
+use MIME::Base64;
+use Crypt::SecretBuffer qw( secret UTF8 ISO8859_1 UTF16LE UTF16BE HEX BASE64
+  MATCH_NEGATE MATCH_MULTI );
 
 subtest constructors => sub {
    my $buf= secret("abcdef");
@@ -133,10 +135,19 @@ subtest starts_with => sub {
    note $@;
    # it will return a byte of the UTF8 encoding
    $s->encoding(ISO8859_1);
-   ok $s->starts_with(qr/[\xC4]/), 'starts with byte';
+   ok $s->starts_with(qr/[\xC4]/), 'starts with byte (using charset)';
+   ok $s->starts_with("\xC4"), 'starts with byte (using literal)';
    # it will decode the character
    $s->encoding('UTF-8');
-   ok $s->starts_with(qr/[\x{100}]/), 'starts with utf-8 char';
+   ok $s->starts_with(qr/[\x{100}]/), 'starts with utf-8 char (using charset)';
+   ok $s->starts_with("\x{100}"), 'starts with utf-8 char (using literal)';
+
+   $s= secret("\x01\xFF")->span;
+   ok( $s->starts_with(secret("\x01\xFF")->span), 'starts_with a ISO-8859-1 span' );
+   ok( $s->starts_with(secret("01FF")->span(encoding => HEX)), 'starts_with a HEX span' );
+   $x= "\x01\xFF";
+   utf8::encode($x);
+   ok( $s->starts_with(secret($x)->span(encoding => UTF8)), 'starts_with a UTF-8 span' );
 };
 
 subtest ends_with => sub {
@@ -151,18 +162,24 @@ subtest ends_with => sub {
    # This tests the reverse decoding of various encodings
    $s= $s->buf;
    ok( $s->span(encoding => HEX)->ends_with(qr/[\xEF]/), 'parse hex in reverse' );
+   $s= secret(encode_base64("A"));
+   ok( $s->span(encoding => BASE64)->ends_with('A'), 'parse base64 in reverse' );
+   $s= secret(encode_base64("AB"));
+   ok( $s->span(encoding => BASE64)->ends_with('AB'), 'parse base64 in reverse' );
+   $s= secret(encode_base64("ABC"));
+   ok( $s->span(encoding => BASE64)->ends_with('ABC'), 'parse base64 in reverse' );
    $s= secret(encode('UTF-8', "123\x{123}"));
-   ok( $s->span(encoding => UTF8)->ends_with(qr/[\x{123}]/), 'parse utf8 2-byte in reverse' );
+   ok( $s->span(encoding => UTF8)->ends_with("23\x{123}"), 'parse utf8 2-byte in reverse' );
    $s= secret(encode('UTF-8', "123\x{1234}"));
-   ok( $s->span(encoding => UTF8)->ends_with(qr/[\x{1234}]/), 'parse utf8 3-byte in reverse' );
+   ok( $s->span(encoding => UTF8)->ends_with("23\x{1234}"), 'parse utf8 3-byte in reverse' );
    $s= secret(encode('UTF-8', "123\x{12345}"));
    ok( $s->span(encoding => UTF8)->ends_with(qr/[\x{12345}]/), 'parse utf8 4-byte in reverse' );
    $s= secret(encode('UTF-16LE', "123\x{1234}"));
-   ok( $s->span(encoding => UTF16LE)->ends_with(qr/[\x{1234}]/), 'parse utf-16le in reverse' );
+   ok( $s->span(encoding => UTF16LE)->ends_with("23\x{1234}"), 'parse utf-16le in reverse' );
    $s= secret(encode('UTF-16LE', "123\x{12345}"));
-   ok( $s->span(encoding => UTF16LE)->ends_with(qr/[\x{12345}]/), 'parse utf-16le surrogates in reverse' );
+   ok( $s->span(encoding => UTF16LE)->ends_with("23\x{12345}"), 'parse utf-16le surrogates in reverse' );
    $s= secret(encode('UTF-16BE', "123\x{1234}"));
-   ok( $s->span(encoding => UTF16BE)->ends_with(qr/[\x{1234}]/), 'parse utf-16be in reverse' );
+   ok( $s->span(encoding => UTF16BE)->ends_with("23\x{1234}"), 'parse utf-16be in reverse' );
    $s= secret(encode('UTF-16BE', "123\x{12345}"));
    ok( $s->span(encoding => UTF16BE)->ends_with(qr/[\x{12345}]/), 'parse utf-16be surrogates in reverse' );
 };
@@ -175,11 +192,29 @@ subtest parse => sub {
    is $s, object { call pos => 5; call len => 3; }, 'remaining value';
 
    $s= $s->buf->span;
-   is $s->parse('=', MATCH_NEGATE|MATCH_MULTI), object { call pos => 0; call len => 4; }, 'parse name by MATCH_NEGATE =';
+   is $s->parse('=', MATCH_NEGATE|MATCH_MULTI),
+      object { call pos => 0; call len => 4; },
+      'parse name by MATCH_NEGATE =';
 
    $s= secret("1=2==3=4")->span;
-   is $s->rparse('==', MATCH_NEGATE|MATCH_MULTI), object { call pos => 5; call len => 3; }, 'parse value by reverse MATCH_NEGATE =';
+   is $s->rparse('==', MATCH_NEGATE|MATCH_MULTI),
+      object { call pos => 5; call len => 3; },
+      'parse value by reverse MATCH_NEGATE =';
    is $s, object { call pos => 0; call len => 5; }, 'remianing buffer';
+   
+   # capture entire line with a negated match
+   $s= secret("qwerty")->span;
+   is $s->parse('0', MATCH_NEGATE|MATCH_MULTI),
+      object { call pos => 0; call len => 6; },
+      'parse entire line with negated match';
+
+   $s= secret('')->span;
+   is $s->parse('-', MATCH_NEGATE|MATCH_MULTI), undef, 'parse from empty buffer';
+
+   $s= secret('-')->span;
+   is $s->parse('', MATCH_NEGATE|MATCH_MULTI),
+      object { call len => 0; },
+      'parse nothing from nonempty buffer';
 };
 
 subtest trim => sub {
@@ -238,6 +273,13 @@ subtest copy_iso8859 => sub {
    is( $s->length, 6, 'span is 6 bytes' );
    ok( !eval { $s->copy }, 'copy died' );
    like( $@, qr/ends beyond buffer/, 'error message' );
+
+   # Copy empty span
+   my $x;
+   secret("-")->span(0,0)->copy_to($x);
+   is( $x, '', 'empty string from empty span' );
+   secret->span->copy_to($x);
+   is( $x, '', 'empty string from buffer lacking any storage' );
 };
 
 subtest copy_widechar => sub {
@@ -278,6 +320,17 @@ subtest copy_hex => sub {
          call length => 3;
       },
       'convert from hex' );
+};
+
+subtest copy_base64 => sub {
+   for my $str (qw( 123 three_times4 remainder1 remainder_2 )) {
+      my $b64= encode_base64($str, '');
+      my $tmp;
+      secret($str)->span->copy_to($tmp, encoding => BASE64);
+      is( $tmp, $b64, "encode $str" );
+      secret($b64)->span(encoding => BASE64)->copy_to($tmp, encoding => ISO8859_1);
+      is( $tmp, $str, "decode $b64" );
+   }
 };
 
 done_testing;

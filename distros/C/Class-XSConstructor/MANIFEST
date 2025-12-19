@@ -14,6 +14,7 @@ dist.ini
 doap.ttl
 examples/benchmarks.pl
 lib/Class/XSConstructor.pm
+lib/Class/XSDestructor.pm
 ppport.h
 t/01basic.t
 t/02types.t
@@ -24,4 +25,5 @@ t/05strictconstructor.t
 t/06inherit-from.t
 t/07coercion.t
 t/08defaults.t
+t/99destroy.t
 xshelper.h

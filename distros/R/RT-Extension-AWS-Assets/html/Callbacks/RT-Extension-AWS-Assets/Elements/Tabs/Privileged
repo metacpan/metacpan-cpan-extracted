@@ -1,0 +1,27 @@
+<%init>
+
+# Assets only
+return unless $Path =~ m{^/Asset/};
+my $id = $DECODED_ARGS->{'id'};
+return unless $id && $id =~ /^\d+$/;
+
+my $asset = LoadAsset($id);
+return unless $asset->Id;
+
+# Only for the AWS catalogs
+my $catalog_name = $asset->CatalogObj->Name;
+return unless $catalog_name eq RT->Config->Get('AWSAssetsInstanceCatalog')
+    || $catalog_name eq RT->Config->Get('AWSAssetsReservedInstancesCatalog');
+
+if ( $asset->CurrentUserHasRight('ModifyAsset') ){
+    PageMenu()->child( 'actions' )->child(
+        'update_from_aws' => title => loc( 'Update from AWS' ),
+        path => '/Asset/Display.html?AWSUpdate=true;id=' . $id,
+    );
+}
+
+</%init>
+<%args>
+$Path
+$Has_Query
+</%args>

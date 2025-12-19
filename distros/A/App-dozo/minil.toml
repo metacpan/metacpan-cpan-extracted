@@ -1,5 +1,4 @@
 name           = "App-dozo"
-abstract       = "Dôzo, Docker with Zero Overhead"
 readme_from    = "script/dozo"
 authors_from   = "script/dozo"
 script_files   = [ "script/dozo" ]

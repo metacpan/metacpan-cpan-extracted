@@ -1,2 +1,7 @@
+0.02 2025-12-19T10:52:03+01:00
+ - Add check_material_type() subroutine.
+ - Add tests.
+ - Fix doc syntax.
+
 0.01 2025-04-13T17:00:20+02:00
  - First version.

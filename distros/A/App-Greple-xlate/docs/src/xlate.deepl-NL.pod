@@ -16,7 +16,7 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
 =head1 VERSION
 
-Version 0.9922
+Version 0.9923
 
 =head1 DESCRIPTION
 
@@ -323,7 +323,7 @@ Het C<xlate> commando ondersteunt GNU-stijl lange opties zoals C<--to-lang>, C<-
 
 Het C<xlate> commando werkt samen met de Docker omgeving, dus zelfs als je niets geïnstalleerd hebt, kun je het gebruiken zolang Docker beschikbaar is. Gebruik de optie C<-D> of C<-C>.
 
-Docker-operaties worden afgehandeld door het C<dozo> script, dat ook als zelfstandig commando kan worden gebruikt. Het C<dozo> script ondersteunt het C<.dozorc> configuratiebestand voor persistente containerinstellingen.
+Docker-operaties worden afgehandeld door L<App::dozo>, dat ook als zelfstandig commando kan worden gebruikt. Het C<dozo> commando ondersteunt het C<.dozorc> configuratiebestand voor persistente containerinstellingen.
 
 Omdat er makefiles voor verschillende documentstijlen worden meegeleverd, is vertaling naar andere talen mogelijk zonder speciale specificaties. Gebruik de optie C<-M>.
 
@@ -379,6 +379,8 @@ L<App::Greple::xlate::gpt4>
 
 L<App::Greple::xlate::gpt5>
 
+L<App::dozo> - Generieke Docker runner gebruikt door xlate voor containeroperaties
+
 =over 2
 
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
@@ -387,7 +389,7 @@ Docker containerafbeelding.
 
 =item * L<https://github.com/tecolicom/getoptlong>
 
-De C<getoptlong.sh> bibliotheek wordt gebruikt voor het parsen van opties in de C<xlate> en C<dozo> scripts.
+De C<getoptlong.sh> bibliotheek gebruikt voor optie parsing in het C<xlate> script en L<App::dozo>.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

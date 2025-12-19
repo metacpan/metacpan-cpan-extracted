@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.93.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 07ad20f0cf1fcaca87bbf6ca3a4828376cc5ccec78de6396480aef204cebddfb Changes
+SHA256 ef4618479296f7c15f158cbe6fdb74a4703755b53b64cfccee6d5dc82954ef7e MANIFEST
+SHA256 7b0d268555d2b9a9f79dfdef76f530465bd63c46db1e9c577da846987c053c43 META.yml
+SHA256 a90109e10dc367857b14ef963283c6f53cc4230bf064a876ce3c830e58a007fa Makefile.PL
+SHA256 53c4f1558758d937c6f300c3d7566ba397af43e698a58cf59d46eae0571d2d01 README
+SHA256 c7e95e02432f61f3ad109832a1985cd862d6567065aaf8bf8161bde75dbf59af bin/rt-import-aws-assets.in
+SHA256 3827ae8ffa979198849b45aab76aa541feb6792bca5075c9548473978bd3fdfc bin/rt-unlink-retired-reservations.in
+SHA256 66ef803c40aac449dc7887640a3595b1ea0bff5a55ef041a97c8920900db6771 etc/AWSAssets_Config.pm
+SHA256 fccd4832c88161325f5e9087d3bad34753de394b5f32dff667ed43dc2fd56f88 etc/sample-initialdata.json
+SHA256 cc63bb6d9a54100b94e4155212a4da4eef931365bedc0a26cfe32dee35d77660 html/AWS/LinkAsset.html
+SHA256 f620c9fdcff632e8f8c2bdd15f4a93759149a3d5add7d9ea5f5c08390255fb46 html/Callbacks/RT-Extension-AWS-Assets/Asset/Display.html/BeforeProcessArguments
+SHA256 e089c7d230267759db316161fea2940a1aab3b2bce874880f35467e6b00cc368 html/Callbacks/RT-Extension-AWS-Assets/Elements/RT__Asset/ColumnMap/Once
+SHA256 6a2e3336ecada7fa708b087ddd5519876c428e81cb559b3b97b5fe91fdd2d5f8 html/Callbacks/RT-Extension-AWS-Assets/Elements/Tabs/Privileged
+SHA256 53d4e27b3cbcc84c2410d1186b09d1a176aa8fd306a1b0c10e45fd235e7d339a html/Callbacks/RT-Extension-AWS-Assets/Search/Elements/BuildFormatString/Default
+SHA256 f6dbf0c43dcde9289a0f3e94f132238a12df12ecd77d5f697cc1acf1a8d85fc0 html/Helpers/DescribeReservedInstance
+SHA256 99833329cf773d5c88d78cfb07f1d83b3a18d9d98f1e16018cfcaf25a1515ff5 html/Helpers/PurchaseReservedInstance
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 aa71b16c882fd2d8af83ac3e9761ef314bb45627905359435ae986d3129b199a inc/Module/Install/Include.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 33866e8b2874cec991b3c881bfcfd1630e3fe638f1af6130a82505554253c5be inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 7c4ad7f9916feb5fa7e045af6ac6ecf8230942c18576c100509f978f6504a1db inc/YAML/Tiny.pm
+SHA256 41666c18f86a5de2d870de5f65268a5153e7af2304bac26d53a8199caf7d1d2d lib/RT/Extension/AWS/Assets.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAmlEd1cACgkQDfCig/6s
+gLJpbQf3d85MntAUhOAj348aXx6xpU0ycnMS+QNOi+oAFTapV1BQcAb+nouWYymp
+1idxEjYFaudQjLhnzOoIkPvJEjx4E7UmTJKx9+SRDlIbPes8N0swqPnTFE3wOJth
+p7j6GdMBAS4ctq0chXaExWa1gWzfG2a/mWtYsTop7ihWmScNeljU+ysIzgEAF+qQ
+na4Xk9vWMJgdv/qrfqy/IKZT0XZ81zN2wumltIMQirixw16VCfG9bp/zw2hhjzt3
+Bzgx1BaKzg6qD/OMdilvj2+vZsk4spPHMRZ8cz+5VFfQPDbX6YeOGYhkBSOFHTWG
+l9sv8KLp5ClB5cEVDRe9SxLIlPpn
+=6lNy
+-----END PGP SIGNATURE-----

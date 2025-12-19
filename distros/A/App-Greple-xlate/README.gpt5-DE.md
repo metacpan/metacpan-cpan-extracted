@@ -14,7 +14,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für greple
 
 # VERSION
 
-Version 0.9922
+Version 0.9923
 
 # DESCRIPTION
 
@@ -281,7 +281,7 @@ Der `xlate`-Befehl unterstützt GNU-ähnliche Long-Optionen wie `--to-lang`, `--
 
 Der Befehl `xlate` arbeitet mit der Docker-Umgebung zusammen. Selbst wenn Sie lokal nichts installiert haben, können Sie ihn verwenden, solange Docker verfügbar ist. Verwenden Sie die Option `-D` oder `-C`.
 
-Docker-Operationen werden vom Skript `dozo` ausgeführt, das auch als eigenständiger Befehl verwendet werden kann. Das Skript `dozo` unterstützt die Konfigurationsdatei `.dozorc` für persistente Containereinstellungen.
+Docker-Operationen werden von [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) gehandhabt, das auch als eigenständiger Befehl verwendet werden kann. Der Befehl `dozo` unterstützt die Konfigurationsdatei `.dozorc` für persistente Container-Einstellungen.
 
 Da Makefiles für verschiedene Dokumentstile bereitgestellt werden, ist die Übersetzung in andere Sprachen ohne besondere Spezifikation möglich. Verwenden Sie die Option `-M`.
 
@@ -335,13 +335,15 @@ Sie müssen die Kommandozeilentools für DeepL und ChatGPT installieren.
 
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
+[App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - Generischer Docker-Runner, der von xlate für Container-Operationen verwendet wird
+
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Docker-Container-Image.
 
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
-    Die Bibliothek `getoptlong.sh` wird für die Optionsauswertung in den Skripten `xlate` und `dozo` verwendet.
+    Die Bibliothek `getoptlong.sh`, die für die Optionsanalyse im Skript `xlate` und [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) verwendet wird.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

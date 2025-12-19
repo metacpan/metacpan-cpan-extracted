@@ -6,8 +6,9 @@ no warnings qw( void once uninitialized );
 package Sub::Accessor::Small;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000001';
+our $VERSION   = '1.000002';
 our @ISA       = qw/ Exporter::Tiny /;
+our @EXPORT_OK = qw/ has /;
 
 use Carp             qw( carp croak );
 use Eval::TypeTiny   qw();
@@ -65,6 +66,19 @@ sub _generate_has : method
 	}
 }
 
+sub _create_child : method
+{
+	my $me = shift;
+	my $name = shift;
+	
+	return ref($me)->new_from_has(
+		$name,
+		$me->{package} ? (package => $me->{package}) : (),
+		$me->{_export} ? (_export => $me->{_export}) : (),
+		@_,
+	);
+}
+
 sub has : method
 {
 	my $me = shift;
@@ -79,6 +93,18 @@ sub new : method
 	my $self = bless(\%opts, $me);
 	$self->canonicalize_opts;
 	return $self;
+}
+
+sub make_var_name : method
+{
+	my $me = shift;
+	my $stem = shift;
+	my $sigil = shift || '$';
+	
+	my $varname = sprintf '%s_for_%s', $stem, $me->{slot};
+	$varname =~ s{([\WX])}{sprintf q{X%04XX}, ord($1)}eg;
+	
+	return $sigil . $varname;
 }
 
 sub install_accessors : method
@@ -125,7 +151,7 @@ sub install_accessors : method
 		}
 	}
 	
-	my @return = map $$_,
+	my @return = map { ( ref($_) eq 'REF' or ref($_) eq 'SCALAR' ) ? ${$_} : $_ }
 		$me->{is} eq 'ro'   ? ($me->{reader}) :
 		$me->{is} eq 'rw'   ? ($me->{accessor}) :
 		$me->{is} eq 'rwp'  ? ($me->{reader}, $me->{writer}) :
@@ -325,11 +351,14 @@ sub canonicalize_isa : method
 sub canonicalize_trigger : method
 {
 	my $me = shift;
-	
-	if (defined $me->{trigger} and not ref $me->{trigger})
-	{
-		my $method_name = $me->{trigger};
-		$me->{trigger} = sub { my $self = shift; $self->$method_name(@_) };
+	if ( defined $me->{trigger} ) {
+		# Create an additional slot to hold a mutex, preventing the trigger
+		# from triggering itself. This slot won't have any accessors, etc
+		# so the slot name doesn't need to consist of wordlike characters.
+		# Indeed, it's better to include a non-wordlike character to avoid
+		# collisions.
+		my $slot = sprintf( '%s:trigger_mutex', $me->{slot} );
+		$me->{trigger_mutex} = $me->_create_child( $slot );
 	}
 }
 
@@ -402,7 +431,7 @@ sub inline_to_coderef : method
 		: sprintf('%s %s', $kind, $method_type);
 	# warn "#### $desc\n$src\n";
 	
-	return Eval::TypeTiny::eval_closure(
+	Eval::TypeTiny::eval_closure(
 		source      => $src,
 		environment => $me->{inline_environment},
 		description => $desc,
@@ -425,7 +454,7 @@ sub inline_clearer : method
 	
 	sprintf(
 		q[ delete(%s) ],
-		$me->inline_access,
+		$me->inline_access( $selfvar ),
 	);
 }
 
@@ -493,7 +522,7 @@ sub inline_handles : method
 	
 	my $get = $me->inline_access( $selfvar );
 	
-	my $varname = sprintf('$handler_%d', ++$handler_uniq);
+	my $varname = $me->make_var_name( sprintf 'handler_%d', ++$handler_uniq );
 	$me->{inline_environment}{$varname} = \($method);
 	
 	my $death = 'Scalar::Util::blessed($h) or Carp::croak("Expected blessed object to delegate to; got $h")';
@@ -592,7 +621,7 @@ sub inline_default : method
 {
 	my $me = shift;
 	my $selfvar = shift || '$_[0]';
-	my $preferred_closeover_var = shift || '$default';
+	my $preferred_closeover_var = shift || $me->make_var_name('default');
 	
 	if (exists $me->{default})
 	{
@@ -707,30 +736,35 @@ sub inline_writer : method
 		elsif ( !$me->{weak_ref} )
 		{
 			return sprintf(
-				'%s; %s; %s',
+				'%s; my @old = (%s) ? (%s) : (); %s; %s; %s',
 				$me->inline_type_assertion( $selfvar, $expr ),
-				$me->inline_trigger( $selfvar, $expr, $get ),
+				$me->inline_predicate( $selfvar ),
+				$me->inline_access( $selfvar ),
 				$me->inline_access_w( $selfvar, $expr ),
+				$me->inline_trigger( $selfvar, undef, '@old' ),
+				$me->inline_get( $selfvar ),
 			);
 		}
 		else
 		{
 			return sprintf(
-				'%s; %s; %s; %s; %s',
+				'%s; my @old = (%s) ? (%s) : (); %s; %s; %s; %s',
 				$me->inline_type_assertion( $selfvar, $expr ),
-				$me->inline_trigger( $selfvar, $expr, $get ),
+				$me->inline_predicate( $selfvar ),
+				$me->inline_access( $selfvar ),
 				$me->inline_access_w( $selfvar, $expr ),
+				$me->inline_trigger( $selfvar, undef, '@old' ),
 				$me->inline_weaken( $selfvar ),
 				$me->inline_get( $selfvar ),
 			);
 		}
 	}
 	
-	my $ass = $me->inline_type_assertion( $selfvar, '$val' );
 	
 	# Use intermediate variable to store result of coercion and/or default
 	if ( !$me->{trigger} and !$me->{weak_ref} )
 	{
+		my $ass = $me->inline_type_assertion( $selfvar, '$val' );
 		sprintf(
 			'my $val = %s; %s',
 			$coerce,
@@ -740,21 +774,26 @@ sub inline_writer : method
 	elsif ( !$me->{weak_ref} )
 	{
 		sprintf(
-			'my $val = %s; %s; %s; %s',
+			'my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s',
 			$coerce,
-			$ass,
-			$me->inline_trigger( $selfvar, '$val', $get ),
+			$me->inline_type_assertion( $selfvar, '$val' ),
+			$me->inline_predicate( $selfvar ),
+			$me->inline_access( $selfvar ),
 			$me->inline_access_w( $selfvar, '$val' ),
+			$me->inline_trigger( $selfvar, undef, '@old' ),
+			$me->inline_access( $selfvar ),
 		);
 	}
 	else
 	{
 		sprintf(
-			'my $val = %s; %s; %s; %s; %s; $val',
+			'my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s; $val',
 			$coerce,
-			$ass,
-			$me->inline_trigger( $selfvar, '$val', $get ),
+			$me->inline_type_assertion( $selfvar, '$val' ),
+			$me->inline_predicate( $selfvar ),
+			$me->inline_access( $selfvar ),
 			$me->inline_access_w( $selfvar, '$val' ),
+			$me->inline_trigger( $selfvar, undef, '@old' ),
 			$me->inline_weaken( $selfvar ),
 		);
 	}
@@ -792,23 +831,27 @@ sub inline_accessor : method
 		}
 		
 		return sprintf(
-			'if (%s) { %s; %s; %s; %s }; %s',
+			'if (%s) { %s; my @old = (%s) ? (%s) : (); %s; %s; %s }; %s',
 			$toggle,
 			$me->inline_type_assertion( $selfvar, $expr ),
-			$me->inline_trigger( $selfvar, $expr, $get ),
+			$me->inline_predicate( $selfvar ),
+			$me->inline_access( $selfvar ),
 			$me->inline_access_w( $selfvar, $expr ),
+			$me->inline_trigger( $selfvar, undef, '@old' ),
 			$me->inline_weaken( $selfvar ),
 			$me->inline_reader( $selfvar ),
 		);
 	}
 	
 	sprintf(
-		'if (%s) { my $val = %s; %s; %s; %s; %s }; %s',
+		'if (%s) { my $val = %s; %s; my @old = (%s) ? (%s) : (); %s; %s; %s }; %s',
 		$toggle,
 		$coerce,
 		$me->inline_type_assertion( $selfvar, '$val' ),
-		$me->inline_trigger( $selfvar, '$val', $get ),
+		$me->inline_predicate( $selfvar ),
+		$me->inline_access( $selfvar ),
 		$me->inline_access_w( $selfvar, '$val' ),
+		$me->inline_trigger( $selfvar, undef, '@old' ),
 		$me->inline_weaken( $selfvar ),
 		$me->inline_reader( $selfvar ),
 	);
@@ -855,15 +898,16 @@ sub inline_type_coercion : method
 	}
 	
 	# Otherwise need to close over $coerce
-	$me->{inline_environment}{'$coercion'} = \$coercion;
+	my $coercion_varname = $me->make_var_name('coercion');
+	$me->{inline_environment}{$coercion_varname} = \$coercion;
 	
 	if ( blessed($coercion)
 	and $coercion->can('coerce') )
 	{
-		return sprintf('$coercion->coerce(%s)', $var);
+		return sprintf('%s->coerce(%s)', $coercion_varname, $var);
 	}
 	
-	return sprintf('$coercion->(%s)', $var);
+	return sprintf('%s->(%s)', $coercion_varname, $var);
 }
 
 sub inline_type_assertion : method
@@ -888,7 +932,8 @@ sub inline_type_assertion : method
 	}
 	
 	# Otherwise need to close over $type
-	$me->{inline_environment}{'$type'} = \$type;
+	my $type_varname = $me->make_var_name('type');
+	$me->{inline_environment}{$type_varname} = \$type;
 	
 	# non-Type::Tiny but still supports inlining
 	if ( blessed($type)
@@ -898,7 +943,7 @@ sub inline_type_assertion : method
 		my $inliner = $type->can('inline_check') || $type->can('_inline_check');
 		if ($inliner)
 		{
-			return sprintf('do { %s } ? %s : Carp::croak($type->get_message(%s))', $type->$inliner($var), $var, $var);
+			return sprintf('do { %s } ? %s : Carp::croak(%s->get_message(%s))', $type->$inliner($var), $var, $type_varname, $var);
 		}
 	}
 	
@@ -906,10 +951,10 @@ sub inline_type_assertion : method
 	and $type->can('check')
 	and $type->can('get_message') )
 	{
-		return sprintf('$type->check(%s) ? %s : Carp::croak($type->get_message(%s))', $var, $var, $var);
+		return sprintf('%s->check(%s) ? %s : Carp::croak(%s->get_message(%s))', $type_varname, $var, $var, $type_varname, $var);
 	}
 	
-	return sprintf('$type->(%s) ? %s : Carp::croak("Value %s failed type constraint check")', $var, $var, $var);
+	return sprintf('%s->(%s) ? %s : Carp::croak("Value %s failed type constraint check")', $type_varname, $var, $var, $var);
 }
 
 sub inline_weaken : method
@@ -930,13 +975,44 @@ sub inline_trigger : method
 {
 	my $me = shift;
 	my $selfvar = shift || '$_[0]';
-	my $new     = shift || die;
+	my $new     = shift || $me->inline_access( $selfvar );
 	my $old     = shift || '';
 	
 	my $trigger = $me->{trigger} or return '';
+	my $run_trigger_code;
 	
-	$me->{inline_environment}{'$trigger'} = \$trigger;
-	return sprintf('$trigger->(%s, %s, %s)', $selfvar, $new, $old);
+	if ( ref($trigger) ) {
+		my $trigger_varname = $me->make_var_name('trigger');
+		$me->{inline_environment}{$trigger_varname} = \$trigger;
+		$run_trigger_code = sprintf('%s->(%s, %s, %s)', $trigger_varname, $selfvar, $new, $old);
+	}
+	else {
+		$run_trigger_code = sprintf('%s->%s(%s, %s)', $selfvar, $trigger, $new, $old);
+	}
+	
+	my $mutex = $me->{trigger_mutex};
+	return sprintf(
+		'%s || do { my $tmp = %s; my $g = %s->new(sub { %s }); %s; %s }',
+		$mutex->inline_access($selfvar),
+		$selfvar,
+		$mutex->_guard_class,
+		$mutex->inline_clearer('$tmp'),
+		$mutex->inline_access_w($selfvar, '!!1'),
+		$run_trigger_code,
+	);
+}
+
+sub _guard_class : method
+{
+	return __PACKAGE__ . "::_Guard";
+}
+
+{
+	package #hide
+		Sub::Accessor::Small::_Guard;
+	sub new     { bless( [ $_[1], $_[2] ], $_[0] ) }
+	sub defang  { $_[0][1] = ( @_==2 ? $_[1] : 1 ) }
+	sub DESTROY { $_[0][0]->() unless $_[0][1] }
 }
 
 1;

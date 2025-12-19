@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Ref::Util;
 use Scalar::Util;
@@ -16,8 +16,6 @@ use List::Util;
 use Role::Tiny       ();
 use Role::Tiny::With ();
 use Module::Runtime  ();
-
-Role::Tiny::With::with 'Iterator::Flex::Role';
 
 use Iterator::Flex::Utils qw (
   :default
@@ -239,12 +237,20 @@ sub _name ( $self ) {
 
 
 
+
+
+
+
 # TODO: this is too restrictive. It should allow simple coderefs, or
 # things with a next or __next__.
 
 sub _is_iterator ( $, $obj ) {
     return Ref::Util::is_blessed_ref( $obj ) && $obj->isa( __PACKAGE__ );
 }
+
+
+
+
 
 
 
@@ -292,6 +298,10 @@ sub may ( $self, $meth ) {
 
 
 
+
+
+
+
 sub _namespaces {
     return 'Iterator::Flex';
 }
@@ -307,9 +317,17 @@ sub _namespaces {
 
 
 
+
+
+
+
 sub _role_namespaces {
     return 'Iterator::Flex::Role';
 }
+
+
+
+
 
 
 
@@ -348,9 +366,12 @@ sub _apply_method_to_depends ( $self, $meth ) {
 
 
 
+
 sub is_exhausted ( $self ) {
     $self->get_state == IterState_EXHAUSTED;
 }
+
+
 
 
 
@@ -380,12 +401,10 @@ sub set_exhausted ( $self ) {
 
 
 
-
-
-
 sub _clear_state ( $self ) {
     $self->set_state( IterState_CLEAR );
 }
+
 
 
 
@@ -409,9 +428,108 @@ sub is_error ( $self ) {
 
 
 
+
+
 sub set_error ( $self ) {
     $self->set_state( IterState_ERROR );
 }
+
+
+
+
+
+
+
+
+
+sub throws_on_exhaustion( $self ) {
+    return $REGISTRY{ refaddr $self }[REG_GENERAL][REG_GP_EXHAUSTION][0] eq THROW;
+
+}
+
+
+
+
+
+
+
+
+
+sub returns_on_exhaustion( $self ) {
+    return $REGISTRY{ refaddr $self }[REG_GENERAL][REG_GP_EXHAUSTION][0] eq RETURN;
+
+}
+
+
+
+
+
+
+
+
+
+sub buffer ( $self, $n = 0, $pars = {} ) {
+    require Iterator::Flex::Buffer;
+    Iterator::Flex::Buffer->new( $self, $n, $pars );
+}
+
+
+
+
+
+
+
+
+
+
+sub cache ( $self, $pars = {} ) {
+    require Iterator::Flex::Cache;
+    Iterator::Flex::Cache->new( $self, $pars );
+}
+
+sub icache;
+*icache = \&cache;
+
+
+
+
+
+
+
+
+
+
+
+
+sub cat ( $self, @args ) {
+    require Iterator::Flex::Cat;
+    Iterator::Flex::Cat->new( $self, @args );
+}
+
+sub chain;
+*chain = \&cat;
+
+
+
+
+
+
+
+
+
+
+
+
+sub chunk ( $self, $pars = {} ) {
+    require Iterator::Flex::Chunk;
+    Iterator::Flex::Chunk->new( $self, $pars );
+}
+
+sub ichunk;
+*ichunk = \&chunk;
+
+sub batch;
+*batch = \&chunk;
 
 
 
@@ -459,6 +577,128 @@ sub drain ( $self, $n = undef ) {
     return \@values;
 }
 
+
+
+
+
+
+
+
+
+sub flatten ( $self, $pars = {} ) {
+    require Iterator::Flex::Flatten;
+    return Iterator::Flex::Flatten->new( $self, $pars );
+}
+
+sub iflatten;
+*iflatten = \*flatten;
+
+
+
+
+
+
+
+
+
+
+sub foreach ( $self, $code ) {    ## no critic (BuiltinHomonyms)
+
+    if ( $self->throws_on_exhaustion ) {
+        eval {
+            local $_;    ## no critic (InitializationForLocalVars)
+            while ( $_ = $self->() ) { $code->() }
+            1;
+        } or do {
+            die $@
+              unless Ref::Util::is_blessed_ref( $@ )
+              && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
+        };
+    }
+    elsif ( $self->returns_on_exhaustion ) {
+
+        # optimize for when sentinel is the undefined value
+        if ( !defined $self->sentinel ) {
+            local $_;    ## no critic (InitializationForLocalVars)
+            $code->() while defined( $_ = $self->() );
+        }
+
+        # yeah, this is too slow.  should adapt the logic in Wrap::Return.
+        else {
+            local $_;                          ## no critic (InitializationForLocalVars)
+            $_ = $self->();
+            until ( $self->is_exhausted ) {    ## no critic (UntilBlock)
+                $code->();
+                $_ = $self->();
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+sub gather ( $self, $code, $pars = {} ) {
+    require Iterator::Flex::Gather;
+    Iterator::Flex::Gather->new( $code, $self, $pars );
+}
+
+sub igather;
+*igather = \&gather;
+
+
+
+
+
+
+
+
+
+sub grep ( $self, $code, $pars = {} ) {    ## no critic (BuiltinHomonyms)
+
+    require Iterator::Flex::Grep;
+    Iterator::Flex::Grep->new( $code, $self, $pars );
+}
+
+sub igrep;
+*igrep = \&grep;
+
+
+
+
+
+
+
+
+
+sub map ( $self, $code, $pars = {} ) {    ## no critic (BuiltinHomonyms)
+
+    require Iterator::Flex::Map;
+    Iterator::Flex::Map->new( $code, $self, $pars );
+}
+
+sub imap;
+*imap = \&map;
+
+
+
+
+
+
+
+
+
+sub take ( $self, $n, $pars = {} ) {
+    require Iterator::Flex::Take;
+    Iterator::Flex::Take->new( $self, $n, $pars );
+}
+
 1;
 
 #
@@ -483,11 +723,125 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 
-=head2 _is_iterator
+=head2 may
+
+  $bool = $iter->may( $method );
+
+Similar to L<can|UNIVERSAL/can>, except it checks that the method can
+be called on the iterators which C<$iter> depends on.  For example,
+it's possible that C<$iter> implements a C<rewind> method, but that
+it's dependencies do not.  In that case L<can|UNIVERSAL/can> will
+return true, but C<may> will return false.
+
+=head2 is_exhausted
+
+  $bool = $iter->is_exhausted
+
+Returns true if the iterator is in the L<exhausted state|Iterator::Flex::Manual::Overview/Exhausted State>
+
+=head2 is_error
+
+   $bool = $self->is_error
+
+Returns true if the iterator is in the L<error state|Iterator::Flex::Manual::Overview/Error State>
+
+=head2 throws_on_exhaustion
+
+  $bool = $iter->throws_on_exhaustion;
+
+Returns true if the iterator throws on exhaustion.
+
+=head2 returns_on_exhaustion
+
+  $bool = $iter->returns_on_exhaustion;
+
+Returns true if the iterator returns a sentinel on exhaustion.
+
+=head2 buffer
+
+  $new_iter = $iter->buffer( $capacity = 0, ?\%pars );
+
+Return a new iterator buffering the original iterator via L<Iterator::Flex::Buffer>.
+
+=head2 cache
+
+  $new_iter = $iter->cache( ?\%pars );
+
+Return a new iterator caching the original iterator via L<Iterator::Flex::Cache>.
+
+=head2 cat
+
+=head2 chain
+
+  $new_iter = $iter->cat( @iterables, ?\%pars );
+  $new_iter = $iter->chain( @iterables, ?\%pars );
+
+Return a new iterator concatenating the original iterator with C<@iterables> via L<Iterator::Flex::Cat>.
+
+=head2 chunk
+
+=head2 batch
+
+  $new_iter = $iter->chunk( ?\%pars );
+  $new_iter = $iter->batch( ?\%pars );
+
+Return a new iterator chunking the original iterator via L<Iterator::Flex::Chunk>.
+
+=head2 drain
+
+   \@values = $iter->drain( ?$nelem );
+
+drains the iterator by repeatedly calling C<<$iter->next> until the
+iterator is exhausted.  C<$iter> will I<not> throw if it signals
+exhaustion by throwing.
+
+If C<$nelem> is provided, it will return no more than C<$nelem> at a
+time.
+
+=head2 flatten
+
+  $new_iter = $iter->flatten;
+
+Return a new iterator modifying the original iterator via L<Iterator::Flex::Flatten>.
+
+=head2 foreach
+
+  $iter->foreach( $coderef );
+
+Calls the passed subroutine for each value returned by C<$iter>. The
+value is made available to C<$iter> in the C<$_> variable.
+
+=head2 gather
+
+  $new_iter = $iter->gather( sub { ... }, ?\%pars );
+
+Return a new iterator modifying the original iterator via L<Iterator::Flex::Gather>.
+
+=head2 grep
+
+  $new_iter = $iter->grep( sub { ... }, ?\%pars );
+
+Return a new iterator modifying the original iterator via L<Iterator::Flex::Grep>.
+
+=head2 map
+
+  $new_iter = $iter->map( sub { ... } );
+
+Return a new iterator modifying the original iterator via L<Iterator::Flex::Map>.
+
+=head2 take
+
+    $new_iter = $iter->take( $n, ?\%pars );
+
+Return a new iterator yielding at most C<$n> elements from C<$iter>, via L<Iterator::Flex::Take>.
+
+=begin :internal
+
+=method _is_iterator
 
   $class->_is_iterator( $obj  );
 
@@ -501,23 +855,21 @@ An object which inherits from C<Iterator::Flex::Base>.
 
 =back
 
-=head2 __iter__
+=end :internal
+
+=begin :internal
+
+=method __iter__
 
    $sub = $iter->__iter__;
 
 Returns the subroutine which returns the next value from the iterator.
 
-=head2 may
+=end :internal
 
-  $bool = $iter->may( $method );
+=begin :internal
 
-Similar to L<can|UNIVERSAL/can>, except it checks that the method can
-be called on the iterators which C<$iter> depends on.  For example,
-it's possible that C<$iter> implements a C<rewind> method, but that
-it's dependencies do not.  In that case L<can|UNIVERSAL/can> will
-return true, but C<may> will return false.
-
-=head2 _namespaces
+=method _namespaces
 
  @namespaces = $class->_namespaces;
 
@@ -526,7 +878,11 @@ this returns
 
  Iterator::Flex
 
-=head2 _role_namespaces
+=end :internal
+
+=begin :internal
+
+=method _role_namespaces
 
  @namespaces = $class->_role_namespaces;
 
@@ -535,7 +891,11 @@ returns
 
  Iterator::Flex::Role
 
-=head2 _add_roles
+=end :internal
+
+=begin :internal
+
+=method _add_roles
 
   $class->_add_roles( @roles );
 
@@ -544,58 +904,40 @@ to be a fully qualified name, otherwise it is searched for in the
 namespaces returned by the L</_role_namespaces> class
 method.
 
-=head2 is_exhausted
+=end :internal
 
-An object method which returns true if the iterator is in the
-L<exhausted state|Iterator::Flex::Manual::Overview/Exhausted State>
+=begin :internal
 
-=head2 set_exhausted
+=method set_exhausted
 
-I<Internal method.>
-
-An object method which sets the iterator state status to
+Sets the iterator state status to
 L<exhausted|Iterator::Flex::Manual::Overview/Exhausted State>.
 
 It does I<not> signal exhaustion.
 
-=head2 is_error
+=end :internal
 
-An object method which returns true if the iterator is in the
-L<error state|Iterator::Flex::Manual::Overview/Error State>
-
-=head2 set_error
-
-I<Internal method.>
-
-An object method which sets the iterator state status to
-L<error|Iterator::Flex::Manual::Overview/Error State>.
-
-It does I<not> signal error.
-
-=head2 drain
-
-   \@values = $iter->drain( ?$nelem );
-
-drains the iterator by repeatedly calling C<<$iter->next> until the
-iterator is exhausted.  C<$iter> will I<not> throw if it signals
-exhaustion by throwing.
-
-If C<$nelem> is provided, it will return no more than C<$nelem> at a
-time.
-
-=begin internal
+=begin :internal
 
 =method _clear_state
 
-I<Internal method.>
-
-An  object method which clears the state status.  After
-this call, this will hold:
+Clear the state status.  After this call, this will hold:
 
   $iter->is_error => false
   $iter->is_exhausted => false
 
-=end internal
+=end :internal
+
+=begin :internal
+
+=method set_error
+
+Sets the iterator state status to
+L<error|Iterator::Flex::Manual::Overview/Error State>.
+
+It does I<not> signal error.
+
+=end :internal
 
 =head1 SUPPORT
 

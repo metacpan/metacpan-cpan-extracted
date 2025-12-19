@@ -51,6 +51,7 @@ t/080_prune_instance.t
 t/081_unique-keys.t
 t/082_if-and-shares.t
 t/083_defs_refs.t
+t/084_is_valid.t
 t/900_pod.t
 t/910_coverage.t
 t/920_manifest.t

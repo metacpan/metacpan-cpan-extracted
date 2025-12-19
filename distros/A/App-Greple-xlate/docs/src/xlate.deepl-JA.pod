@@ -16,7 +16,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 =head1 VERSION
 
-Version 0.9922
+Version 0.9923
 
 =head1 DESCRIPTION
 
@@ -323,7 +323,7 @@ C<xlate>コマンドはC<--to-lang>, C<--from-lang>, C<--engine>, C<--file>の�
 
 C<xlate>コマンドはDocker環境と協調して動作するため、手元に何もインストールされていなくても、Dockerが利用可能であれば使用することができます。C<-D>またはC<-C>オプションを使用してください。
 
-Dockerの操作はC<dozo>スクリプトで処理されます。C<dozo>スクリプトは、永続的なコンテナ設定のためのC<.dozorc>設定ファイルをサポートします。
+Dockerの操作はL<App::dozo>で処理され、スタンドアロンコマンドとしても使用できます。C<dozo>コマンドは、永続的なコンテナ設定のためのC<.dozorc>設定ファイルをサポートします。
 
 また、様々なドキュメントスタイルに対応したmakefileが提供されているので、特別な指定なしに他言語への翻訳が可能です。C<-M>オプションを使用してください。
 
@@ -379,6 +379,8 @@ L<App::Greple::xlate::gpt4>
 
 L<App::Greple::xlate::gpt5>
 
+L<App::dozo> - xlateがコンテナ操作に使用する汎用Dockerランナー。
+
 =over 2
 
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
@@ -387,7 +389,7 @@ Dockerコンテナイメージ。
 
 =item * L<https://github.com/tecolicom/getoptlong>
 
-C<getoptlong.sh> ライブラリは C<xlate> と C<dozo> スクリプトのオプション解析に使われます。
+C<getoptlong.sh> ライブラリは C<xlate> スクリプトと L<App::dozo> のオプション解析に使われます。
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

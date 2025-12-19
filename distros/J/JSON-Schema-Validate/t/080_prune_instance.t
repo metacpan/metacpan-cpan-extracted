@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # Basic pruning with properties + additionalProperties:false
 subtest 'prune_instance with properties and additionalProperties:false' => sub

@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # Root schema references external $id with a JSON Pointer fragment:
 #   https://ext.example/s/defs.json#/defs/age

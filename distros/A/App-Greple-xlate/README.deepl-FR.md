@@ -14,7 +14,7 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.9922
+Version 0.9923
 
 # DESCRIPTION
 
@@ -281,7 +281,7 @@ La commande `xlate` prend en charge les options longues de style GNU telles que 
 
 La commande `xlate` fonctionne de concert avec l'environnement Docker, donc même si vous n'avez rien d'installé, vous pouvez l'utiliser tant que Docker est disponible. Utilisez l'option `-D` ou `-C`.
 
-Les opérations Docker sont gérées par le script `dozo`, qui peut également être utilisé comme une commande autonome. Le script `dozo` prend en charge le fichier de configuration `.dozorc` pour les paramètres persistants des conteneurs.
+Les opérations Docker sont gérées par [App::dozo](https://metacpan.org/pod/App%3A%3Adozo), qui peut également être utilisé comme une commande autonome. La commande `dozo` prend en charge le fichier de configuration `.dozorc` pour les paramètres persistants des conteneurs.
 
 De plus, comme des makefiles pour différents styles de documents sont fournis, la traduction dans d'autres langues est possible sans spécification particulière. Utilisez l'option `-M`.
 
@@ -335,13 +335,15 @@ Vous devez installer les outils de ligne de commande pour DeepL et ChatGPT.
 
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
+[App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - Exécutant Docker générique utilisé par xlate pour les opérations sur les conteneurs.
+
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Image de conteneur Docker.
 
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
-    La bibliothèque `getoptlong.sh` est utilisée pour l'analyse des options dans les scripts `xlate` et `dozo`.
+    La bibliothèque `getoptlong.sh` utilisée pour l'analyse des options dans le script `xlate` et [App::dozo](https://metacpan.org/pod/App%3A%3Adozo).
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

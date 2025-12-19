@@ -10,7 +10,7 @@ use JSON;
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # Testing required versus optional properties.
 

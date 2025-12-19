@@ -4,12 +4,23 @@ NAME
 SYNOPSIS
      use MARC::Leader::Utils qw(material_type);
 
+     my $bool = check_material_type($material_type);
      my $material_type = material_type($leader_obj);
 
 DESCRIPTION
     The Perl module with common utilities for work with MARC leader field.
 
 SUBROUTINES
+  "check_material_type"
+     my $bool = check_material_type($material_type);
+
+    Check if material type string is valid.
+
+    Possible strings are book, computer_file, continuing_resource, map,
+    mixed_material, music and visual_material.
+
+    Returns 0/1.
+
   "material_type"
      my $material_type = material_type($leader_obj);
 
@@ -19,8 +30,19 @@ SUBROUTINES
 
     Returned strings are:
 
-    *       book =item * computer_file =item * continuing_resource =item *
-            map =item * mixed_material =item * music =item * visual_material
+    *       book
+
+    *       computer_file
+
+    *       continuing_resource
+
+    *       map
+
+    *       mixed_material
+
+    *       music
+
+    *       visual_material
 
     Returns string.
 
@@ -29,7 +51,32 @@ ERRORS
              Leader object must be a Data::MARC::Leader instance.
              Unsupported material type.
 
-EXAMPLE
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use MARC::Leader::Utils qw(check_material_type);
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 material_type\n";
+             exit 1;
+     }
+     my $material_type = $ARGV[0];
+
+     my $ret = check_material_type($material_type);
+
+     print "Expected material type: $material_type\n";
+     print "Result: $ret\n";
+
+     # Output (book):
+     # Expected material type: book
+     # Result: 1
+
+     # Output (foo):
+     # Expected material type: foo
+     # Result: 0
+
+EXAMPLE2
      use strict;
      use warnings;
 
@@ -54,7 +101,7 @@ EXAMPLE
      # Material type: map
 
 DEPENDENCIES
-    Error::Pure Exporter File::Spec::Functions, File::Share, Readonly.
+    Error::Pure, Exporter, File::Spec::Functions, File::Share, Readonly.
 
 SEE ALSO
     Data::MARC::Leader
@@ -77,5 +124,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

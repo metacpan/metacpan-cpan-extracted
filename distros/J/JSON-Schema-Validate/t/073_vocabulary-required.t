@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # NOTE:
 # _compile_root checks $vocabulary during ->new. If a vocabulary URI is marked true

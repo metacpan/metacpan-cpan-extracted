@@ -4,7 +4,7 @@ Iterator::Flex - Iterators with flexible behaviors
 
 # VERSION
 
-version 0.32
+version 0.33
 
 # SYNOPSIS
 
@@ -33,7 +33,8 @@ iterators need the bells and whistles, but sometimes they are very handy.
 
 See [Iterator::Flex::Common](https://metacpan.org/pod/Iterator%3A%3AFlex%3A%3ACommon) for a set of common iterators.  These
 are pre-made for you.  See [Iterator::Flex::Manual::Using](https://metacpan.org/pod/Iterator%3A%3AFlex%3A%3AManual%3A%3AUsing) for how to
-use them.
+use them.  [Iterator::Flex::Base](https://metacpan.org/pod/Iterator%3A%3AFlex%3A%3ABase) documents additional methods available
+to all iterators.
 
 ## I need to write my own.
 

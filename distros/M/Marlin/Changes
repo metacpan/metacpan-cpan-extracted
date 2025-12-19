@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005000	2025-12-18
+
+ - Use a newer version of Class::XSConstructor with support for
+   destructors.
+ - Use a newer version of Sub::Accessor::Small with improvements for
+   triggers.
+
 0.004000	2025-12-17
 
  - Added: Allow attribute declarations to tweak how the attribute will be

@@ -1,0 +1,200 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+package RT::AWS::Assets::Run;
+
+BEGIN {
+### after:     use lib qw(@RT_LIB_PATH@);
+use lib '/opt/rt6/local/lib /opt/rt6/lib';
+use RT;
+}
+
+use RT::Interface::CLI  qw(GetCurrentUser loc);
+
+__PACKAGE__->run(@ARGV) unless caller;
+
+sub run{
+    my ($class, @args) = @_;
+
+    my %args = $class->process_args(@args);
+    require RT::Extension::AWS::Assets;
+
+    if ( $args{insert} ) {
+        my ($aws_resources, $token);
+
+        do {
+            ($aws_resources, $token) =
+                RT::Extension::AWS::Assets::FetchMultipleAssetsFromAWS(
+                    Region => $args{'region'},
+                    ServiceType => $args{'type'},
+                    ReservedInstances => $args{'reserved'},
+                    Token => $token,
+                    MaxResults => $args{'results'} );
+
+                RT::Extension::AWS::Assets::InsertAWSAssets(
+                    AWSResources => $aws_resources,
+                    Region => $args{'region'},
+                    ServiceType => $args{'type'},
+                    ReservedInstances => $args{'reserved'},
+                    CurrentUser => GetCurrentUser() );
+
+        } while ( $token )
+    }
+
+    if ( $args{update} ) {
+        my ($aws_resources, $token);
+
+        my %asset;
+        do {
+            ($aws_resources, $token) =
+                RT::Extension::AWS::Assets::FetchMultipleAssetsFromAWS(
+                    Region => $args{'region'},
+                    ServiceType => $args{'type'},
+                    ReservedInstances => $args{'reserved'},
+                    Token => $token,
+                    MaxResults => $args{'results'} );
+
+                RT::Extension::AWS::Assets::UpdateAWSAssets(
+                    AWSResources => $aws_resources,
+                    Region => $args{'region'},
+                    ServiceType => $args{'type'},
+                    ReservedInstances => $args{'reserved'},
+                    $args{delete} ? ( updated => \%asset ) : (),
+                    CurrentUser => GetCurrentUser() );
+
+        } while ( $token );
+
+        if ( $args{delete} && %asset ) {
+            my $catalog = RT->Config->Get('AWSAssetsInstanceCatalog');
+            my $assets = RT::Assets->new( RT->SystemUser );
+            $assets->FromSQL(<<"EOF");
+Catalog = '$catalog' AND 'CF.{Service Type}' = '$args{type}' AND 'CF.Region' = '$args{region}' AND Status = '__Active__'
+EOF
+            $assets->Limit( FIELD => 'id', VALUE => [ keys %asset ], OPERATOR => 'NOT IN' );
+            while ( my $asset = $assets->Next ) {
+                my ( $ret, $msg ) = $asset->SetStatus('removed');
+                if ( !$ret ) {
+                    RT->Logger->error("Couldn't update status of asset #@{[$asset->Id]} to removed: $msg");
+                }
+                my $links = $asset->DependsOn;
+                while ( my $link = $links->Next ) {
+                    my $target = $link->TargetObj;
+                    if (   $target->isa('RT::Asset')
+                        && $target->CatalogObj->Name eq RT->Config->Get('AWSAssetsReservedInstancesCatalog') )
+                    {
+                        my ( $ret, $msg ) = $asset->DeleteLink( Type => $link->Type, Target => $link->Target );
+                        if (!$ret) {
+                            RT->Logger->error("Couldn't delete reservation link #@{[$link->Id]}: $msg");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+sub process_args {
+    require Getopt::Long;
+    local @ARGV = @_;
+
+    my %opt;
+    RT::Interface::CLI::Init( \%opt, 'help|h', 'insert|i', 'update|u', 'delete', 'type=s', 'reserved', 'region=s', 'results=i' );
+
+    if ( delete $opt{help} ) {
+        require Pod::Usage;
+        Pod::Usage::pod2usage( { verbose => 2 } );
+        exit;
+    }
+
+    if ( $opt{'insert'} && $opt{'update'} ) {
+        print "Running insert and update at the same time is not supported, exiting.\n";
+        exit;
+    }
+
+    if ( $opt{'insert'} && $opt{'delete'} ) {
+        print "Running insert and delete at the same time is not supported, exiting.\n";
+        exit;
+    }
+
+    if ( $opt{'reserved'} && $opt{'delete'} ) {
+        print "Running reserved and delete at the same time is not supported, exiting.\n";
+        exit;
+    }
+
+    unless ( $opt{'results'} ) {
+        $opt{'results'} = 20;
+    }
+
+    return %opt;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+rt-import-aws-assets - import asset data from AWS
+
+=head1 SYNOPSIS
+
+    rt-import-aws-assets --region='us-east-1' --type=EC2 --insert
+
+=head1 DESCRIPTION
+
+This utility pulls data from the configured AWS account and inserts
+or updates asset records in Request Tracker.
+
+See the main extension documentation for key configuration options
+including the asset catalogs to use.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--region>
+
+Required. The region from which to pull AWS resource information.
+
+=item B<--type>
+
+Required. The AWS service to use when fetching information.
+
+Currently supported: EC2, RDS
+
+=item B<--insert>
+
+When fetching records, create new records for any resources that don't
+exist. Existing records are skipped.
+
+=item B<--update>
+
+Search for existing assets and update configured fields from AWS data.
+
+=item B<--delete>
+
+Work with B<--update> and without C<--reserved>, to delete assets not found
+from AWS.
+
+=item B<--reserved>
+
+Retrieve data for reserved instances for the current C<--type>.
+
+=item B<--results>
+
+The number of results to fetch per request to the AWS API. The minimum is 20,
+maximum is 100. Some AWS APIs do not support paging so this is ignored.
+
+=item B<--debug>
+
+Override the RT log settings and show log messages in the terminal at the
+debug level.
+
+=back
+
+=cut

@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Text::Markdown::Discount;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 sub import {
     # Replace the regex if passed one.
@@ -17,8 +17,17 @@ sub import {
 sub parser {
     my ($file, $encoding, $opts) = @_;
     my %params = @{ $opts };
+
+    unless (defined $params{flags}) {
+          $params{flags} = Text::Markdown::Discount::MKD_NOHEADER
+              | Text::Markdown::Discount::MKD_TOC
+              | Text::Markdown::Discount::MKD_DLEXTRA
+              | Text::Markdown::Discount::MKD_FENCEDCODE
+              | Text::Markdown::Discount::MKD_EXTRA_FOOTNOTE
+              | Text::Markdown::Discount::MKD_IDANCHOR;
+    }
     open_bom my $fh, $file, ":encoding($encoding)";
-    my $html = Text::Markdown::Discount::markdown(join '', <$fh>);
+    my $html = Text::Markdown::Discount::markdown(join('', <$fh>), $params{flags});
     return unless $html =~ /\S/;
     utf8::encode($html);
     return $html if $params{raw};
@@ -81,7 +90,14 @@ regular expression matching the desired extension(s), like so:
 
 Normally this module returns the output wrapped in a minimal HTML document
 skeleton. If you would like the raw output without the skeleton, you can pass
-the C<raw> option to C<parse>.
+the C<raw> parameter to C<parse>.
+
+The Text::Markup::Markdown C<parse> method supports an additional parameter,
+C<flags>, a bitmask of
+L<Text::Markdown::Discount options|https://github.com/Songmu/text-markdown-discount/blob/d6b1325/lib/Text/Markdown/Discount.xs#L16-L46>.
+Use this parameter to replace the default, which is:
+
+  MKD_NOHEADER | MKD_TOC | MKD_DLEXTRA | MKD_FENCEDCODE | MKD_EXTRA_FOOTNOTE | MKD_IDANCHOR
 
 =head1 See Also
 

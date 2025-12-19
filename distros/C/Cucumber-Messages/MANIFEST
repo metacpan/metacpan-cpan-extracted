@@ -13,5 +13,3 @@ lib/Cucumber/Messages/Message.pm
 t/01-load.t
 t/02-instantiation.t
 t/03-deserialize.t
-t/compatibility-kit/package-lock.json
-t/compatibility-kit/package.json

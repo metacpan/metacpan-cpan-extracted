@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+package RT::AWS::Assets::Run;
+
+BEGIN {
+### after:     use lib qw(@RT_LIB_PATH@);
+use lib '/opt/rt6/local/lib /opt/rt6/lib';
+use RT;
+}
+
+use RT::Interface::CLI  qw(GetCurrentUser loc);
+
+__PACKAGE__->run(@ARGV) unless caller;
+
+sub run{
+    my ($class, @args) = @_;
+
+    my %args = $class->process_args(@args);
+    require RT::Extension::AWS::Assets;
+
+    my $assets = RT::Assets->new(RT->SystemUser);
+    $assets->FromSQL("Catalog = 'AWS Reserved Instances' AND 'CF.{Reservation End}' < 'now' AND DependedOnBy IS NOT NULL");
+
+    while ( my $asset = $assets->Next ) {
+        my $depended_on_by = $asset->DependedOnBy;
+
+        while ( my $link = $depended_on_by->Next ) {
+            my ($ok, $msg) = $asset->DeleteLink( Type => 'DependsOn', Base => $link->Base );
+
+            RT->Logger->error("Unable to delete link for asset " . $asset->Id . ", $msg") unless $ok;
+        }
+
+        # The search finds assets where Reservation End has passed, so also
+        # set State to retired. This can also get set by re-syncing with AWS.
+        unless ( $asset->FirstCustomFieldValue('State') eq 'retired' ) {
+            my ($ok, $msg) = $asset->AddCustomFieldValue( Field => 'State', Value => 'retired' );
+
+            RT->Logger->error("Unable to set State for asset " . $asset->Id . ", $msg") unless $ok;
+        }
+
+    }
+
+    return;
+}
+
+sub process_args {
+    require Getopt::Long;
+    local @ARGV = @_;
+
+    my %opt;
+    RT::Interface::CLI::Init( \%opt, 'help|h' );
+
+    if ( delete $opt{help} ) {
+        require Pod::Usage;
+        Pod::Usage::pod2usage( { verbose => 2 } );
+        exit;
+    }
+
+    return %opt;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+rt-unlink-retired-reservations - remove links for retired reservations
+
+=head1 SYNOPSIS
+
+    rt-unlink-retired-reservations
+
+=head1 DESCRIPTION
+
+When a reservation is past its end date, it no longer provides a discount in
+AWS. This script runs the following query to find any reservations that are
+past the end date, but are still linked to an AWS resource asset:
+
+"Catalog = 'AWS Reserved Instances' AND 'CF.{Reservation End}' < 'now' AND DependedOnBy IS NOT NULL"
+
+It unlinks all found assets so it's clear those AWS resources may need a new
+reservation.
+
+It also sets the State custom field to 'retired' if it is not already that value.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--debug>
+
+Override the RT log settings and show log messages in the terminal at the
+debug level.
+
+=back
+
+=cut

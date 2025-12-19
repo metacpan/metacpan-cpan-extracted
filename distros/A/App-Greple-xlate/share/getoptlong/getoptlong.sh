@@ -4,7 +4,7 @@
 # GetOptLong: Getopt Library for Bash Script
 # Copyright 2025 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=0.02}
+: ${GOL_VERSION:=0.3.0}
 ###############################################################################
 # Check for nameref support (bash 4.3+)
 declare -n > /dev/null 2>&1 || { echo "Does not support ${BASH_VERSION}" >&2 ; exit 1 ; }
@@ -30,6 +30,7 @@ _gol_dest()  {
 _gol_type()  { [[ ${_opts["$1"]} =~ ^([^[:alnum:]]+) ]] && echo "${_MATCH[1]}" || _gol_die "$1: unexpected" ; }
 _gol_debug() { [[ ${_opts["&DEBUG"]:-} ]] && _gol_warn DEBUG: "${@}" || : ; }
 _gol_plusone() { [[ $1 =~ ^[0-9]+$ ]] && echo $(( $1 + 1 )) || echo 1 ; }
+_gol_vstr() { printf "%03d." ${1//./ } ; }
 # Main redirection function - sets up environment and delegates to implementation
 _gol_redirect() { local _name ;
     declare -n _opts=$GOL_OPTHASH
@@ -69,7 +70,7 @@ gol_init() { local _key ;
 }
 ################################################################################
 gol_init_() { local _key _aliases _alias _help ;
-    [[ $_REQUIRE && $GOL_VERSION < $_REQUIRE ]] && _gol_die "getoptlong version $GOL_VERSION < $_REQUIRE"
+    [[ $_REQUIRE && $(_gol_vstr $GOL_VERSION) < $(_gol_vstr $_REQUIRE) ]] && _gol_die "getoptlong version $GOL_VERSION < $_REQUIRE"
     for _key in "${!_opts[@]}" ; do
 	[[ $_key =~ ^[$_MARKS] ]] && continue
 	_gol_init_entry "$_key"

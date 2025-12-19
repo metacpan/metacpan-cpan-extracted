@@ -10,9 +10,21 @@ use Scalar::Util qw(blessed);
 use Readonly;
 
 # Constants.
-Readonly::Array our @EXPORT => qw(material_type);
+Readonly::Array our @EXPORT => qw(check_material_type material_type);
+Readonly::Array our @MATERIAL_TYPES => qw(book computer_file continuing_resource map
+	mixed_material music visual_material);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
+
+sub check_material_type {
+	my $material_type = shift;
+
+	if (any { $material_type eq $_ } @MATERIAL_TYPES) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
 sub material_type {
 	my $leader = shift;
@@ -66,6 +78,7 @@ MARC::Leader::Utils - Utilities for MARC::Leader.
 
  use MARC::Leader::Utils qw(material_type);
 
+ my $bool = check_material_type($material_type);
  my $material_type = material_type($leader_obj);
 
 =head1 DESCRIPTION
@@ -73,6 +86,16 @@ MARC::Leader::Utils - Utilities for MARC::Leader.
 The Perl module with common utilities for work with MARC leader field.
 
 =head1 SUBROUTINES
+
+=head2 C<check_material_type>
+
+ my $bool = check_material_type($material_type);
+
+Check if material type string is valid.
+
+Possible strings are book, computer_file, continuing_resource, map, mixed_material, music and visual_material.
+
+Returns 0/1.
 
 =head2 C<material_type>
 
@@ -88,11 +111,17 @@ Returned strings are:
 =over 8
 
 =item * book
+
 =item * computer_file
+
 =item * continuing_resource
+
 =item * map
+
 =item * mixed_material
+
 =item * music
+
 =item * visual_material
 
 =back
@@ -105,7 +134,35 @@ Returns string.
          Leader object must be a Data::MARC::Leader instance.
          Unsupported material type.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
+
+=for comment filename=check_material_type.pl
+
+ use strict;
+ use warnings;
+
+ use MARC::Leader::Utils qw(check_material_type);
+
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 material_type\n";
+         exit 1;
+ }
+ my $material_type = $ARGV[0];
+
+ my $ret = check_material_type($material_type);
+
+ print "Expected material type: $material_type\n";
+ print "Result: $ret\n";
+
+ # Output (book):
+ # Expected material type: book
+ # Result: 1
+
+ # Output (foo):
+ # Expected material type: foo
+ # Result: 0
+
+=head1 EXAMPLE2
 
 =for comment filename=material_type.pl
 
@@ -134,8 +191,8 @@ Returns string.
 
 =head1 DEPENDENCIES
 
-L<Error::Pure>
-L<Exporter>
+L<Error::Pure>,
+L<Exporter>,
 L<File::Spec::Functions>,
 L<File::Share>,
 L<Readonly>.
@@ -172,6 +229,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

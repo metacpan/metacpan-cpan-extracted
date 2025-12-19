@@ -15,7 +15,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.9922
+Version 0.9923
 
 # DESCRIPTION
 
@@ -385,8 +385,8 @@ The `xlate` command works in concert with the Docker environment, so
 even if you do not have anything installed on hand, you can use it as
 long as Docker is available.  Use `-D` or `-C` option.
 
-Docker operations are handled by the `dozo` script, which can also be
-used as a standalone command.  The `dozo` script supports the
+Docker operations are handled by [App::dozo](https://metacpan.org/pod/App%3A%3Adozo), which can also be
+used as a standalone command.  The `dozo` command supports the
 `.dozorc` configuration file for persistent container settings.
 
 Also, since makefiles for various document styles are provided,
@@ -448,6 +448,8 @@ You have to install command line tools for DeepL and ChatGPT.
 
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
+[App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - Generic Docker runner used by xlate for container operations
+
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Docker container image.
@@ -455,7 +457,7 @@ You have to install command line tools for DeepL and ChatGPT.
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
     The `getoptlong.sh` library used for option parsing in the `xlate`
-    and `dozo` scripts.
+    script and [App::dozo](https://metacpan.org/pod/App%3A%3Adozo).
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

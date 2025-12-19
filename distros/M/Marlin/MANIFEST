@@ -32,6 +32,8 @@ t/01basic.t
 t/integration/comparison-example.t
 t/integration/complex-constructor.t
 t/integration/constant.t
+t/integration/destructors.t
 t/integration/roles.t
 t/integration/storage.t
+t/integration/triggers.t
 t/lib/Local/Example/Marlin.pm

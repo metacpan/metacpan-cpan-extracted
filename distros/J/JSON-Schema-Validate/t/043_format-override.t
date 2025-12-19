@@ -10,7 +10,7 @@ use JSON;
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # Builtin date-time accepts RFC3339; we override to force a very strict Z-only, no fraction.
 

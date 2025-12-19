@@ -39,10 +39,13 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Type::Tiny::XS" : "0",
+            "Types::Standard" : "1.000000"
+         },
          "requires" : {
             "Exporter::Tiny" : "1.000000",
             "List::Util" : "1.45",
-            "Ref::Util" : "0.100",
             "perl" : "5.008008"
          }
       },
@@ -61,13 +64,17 @@
    "provides" : {
       "Class::XSConstructor" : {
          "file" : "lib/Class/XSConstructor.pm",
-         "version" : "0.013"
+         "version" : "0.014001"
+      },
+      "Class::XSDestructor" : {
+         "file" : "lib/Class/XSDestructor.pm",
+         "version" : "0.014001"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor"
+         "web" : "https://github.com/tobyink/p5-class-xsconstructor/issues"
       },
       "homepage" : "https://metacpan.org/release/Class-XSConstructor",
       "license" : [
@@ -80,6 +87,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project"
    },
-   "version" : "0.013",
+   "version" : "0.014001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

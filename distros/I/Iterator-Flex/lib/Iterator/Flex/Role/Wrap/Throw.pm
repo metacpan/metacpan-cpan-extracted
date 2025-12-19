@@ -6,7 +6,7 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use List::Util 'first';
 use Iterator::Flex::Utils qw( INPUT_EXHAUSTION PASSTHROUGH );
@@ -139,7 +139,7 @@ Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterat
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SUPPORT
 

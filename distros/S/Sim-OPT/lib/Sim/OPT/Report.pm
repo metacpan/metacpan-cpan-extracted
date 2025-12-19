@@ -1,5 +1,5 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2024 by Gian Luca Brunetti.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -18,11 +18,14 @@ use Set::Intersection;
 use List::Compare;
 use IO::Tee;
 use File::Copy qw( move copy );
+
 use Sim::OPT;
 use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
+
+
 use Data::Dumper;
 #$Data::Dumper::Indent = 0;
 #$Data::Dumper::Useqq  = 1;
@@ -40,7 +43,7 @@ use Switch::Back;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.119';
+$VERSION = '0.121';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -101,7 +104,6 @@ sub newretrieve
   my %inst = %{ $dt{inst} };
   my %dowhat = %{ $dt{dowhat} };
   #my $csim = $dt{csim};
-  my $postprocessga = $dt{postprocessga};
 
   @{ $dirfiles{dones} } = uniq( @{ $dirfiles{dones} } );
   #%inst = %{ Sim::OPT::washhash( \%inst ) }; say $tee "3 HERE IN OPT SUB CALLBLOCK \%onst: " . dump( \%onst );
@@ -162,7 +164,18 @@ sub newretrieve
   my $countstep = $d{countstep}; #say $tee "HERE IN NEWRETRIEVE \$countstep: " . dump( $countstep );
 
   my %to = %{ $d{to} }; #say $tee "HERE IN NEWRETRIEVE \%to: " . dump( %to );
-  my $thisto = $to{to}; #say $tee "\$thisto: $thisto";
+  #####my $thisto = $to{to}; #say $tee "\$thisto: $thisto";!!!!!
+
+
+  my $thisto;
+  if ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) )
+  {
+    $thisto= $to{crypto}; #say $tee "\$thisto: $thisto";
+  }
+  else
+  {
+    $thisto= $to{to}; #say $tee "\$thisto: $thisto";
+  }
 
   my $cleanto = $inst{$thisto}; #say $tee "\$cleanto: $cleanto";
 
@@ -930,23 +943,25 @@ TTT
   close TOFILE;
   close RETLIST;
   close RETBLOCK;
+  
 
   if ( $dowhat{neweraseres} eq "y" )
   {
+    my $flfile = $resfile;
+    $flfile =~ s/\.res/\.fl/ ;
     if ( -e $resfile )
     {
       `rm -f $resfile` ;
       say $tee "rm -f $resfile";
     }
-  }
 
-  if ( $dowhat{newerasefl} eq "y" )
-  {
     if ( -e $flfile )
     {
       `rm -f $flfile` ;
     }
+    say $tee "rm -f $flfile";
   }
+
   return ( \@retcases, \@retstruct, \@notecases );
 }  # END SUB NEWRETRIEVE
 
@@ -1064,7 +1079,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $is = $d{is};
   my $double;
 
-  if ( $fire eq "yes" )
+  if ( $fire eq "y" )
   {
     $double = $repfile;
     $repfile = $dirfiles{repfile} . "-fire-$stamp.csv";###DDD!!!
@@ -1099,7 +1114,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   open( REPBLOCK, ">>$repblock" ) or die( "$!" );
 
   my $divert;
-  if ( $dirfiles{launching} eq "yes" )
+  if ( $dirfiles{launching} eq "y" )
   {
     say $tee "YES.";
     $divert = $repfile . ".revealnum.csv";
@@ -1129,7 +1144,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
 
 
-  if ( ( ( $fire eq "yes" ) or ( $dowhat{reportbasics} eq "y" ) ) and ( $precomputed eq "" ) )
+  if ( ( ( $fire eq "y" ) or ( $dowhat{reportbasics} eq "y" ) ) and ( $precomputed eq "" ) )
   {
     my @hfiles = @{ $dowhat{helperfiles} };
     my @hpatterns = @{ $dowhat{helperpatterns} };
@@ -1152,7 +1167,7 @@ sub newreport # This function retrieves the results of interest from the texts f
         $line =~ s/^ +//;
 
         ###if ( $line =~ /$hpattern/ ) ###CHANGED
-        if ( $line =~ /^$hpattern/ )
+        if ( $line =~ /$hpattern/ )
         { #say $tee "CHECK LINE-$line";
           chomp $line;
 
@@ -1167,7 +1182,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
     $result =~ s/,$// ;
 
-    if ( $fire eq "yes" )
+    if ( $fire eq "y" )
     {
       open( REPFILE, ">$repfile" );
     }
@@ -1447,7 +1462,7 @@ sub newreport # This function retrieves the results of interest from the texts f
         push ( @winbag, $thing );
         print REPFILE $thing;
         print REPFILE ",";
-        if ( $dirfiles{launching} eq "yes" )
+        if ( $dirfiles{launching} eq "y" )
         {
           print DIVERT $thing;
           print DIVERT ",";
@@ -1455,7 +1470,7 @@ sub newreport # This function retrieves the results of interest from the texts f
         $count++;
       }
       print REPFILE "\n";
-      if ( $dirfiles{launching} eq "yes" )
+      if ( $dirfiles{launching} eq "y" )
       {
         print DIVERT "\n";
       }
@@ -1491,7 +1506,7 @@ sub newreport # This function retrieves the results of interest from the texts f
     foreach my $el ( @box )
     {
       say REPFILE $el;
-      if ( $dirfiles{launching} eq "yes" )
+      if ( $dirfiles{launching} eq "y" )
       {
         say DIVERT $el;
       }
@@ -1500,7 +1515,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   }
   close REPFILE;
 
-  if ( $dirfiles{launching} eq "yes" )
+  if ( $dirfiles{launching} eq "y" )
   {
     close DIVERT;
   }
@@ -1514,7 +1529,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   }
   if (not( -e $repfile ) ){ die; };
 
-  if ( $dirfiles{launching} eq "yes" )
+  if ( $dirfiles{launching} eq "y" )
   {
     say $tee "JUMPING";
     next;
@@ -1575,7 +1590,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

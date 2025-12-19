@@ -35,8 +35,10 @@ BEGIN {
 	# Store in a hashref instead of inside-out.
 	sub inline_access {
 		my $me = shift;
+		my $selfvar = shift || '$_[0]';
 		sprintf(
-			q[ $_[0]{%s} ],
+			q[ %s->{%s} ],
+			$selfvar,
 			$me->{slot},
 		);
 	}

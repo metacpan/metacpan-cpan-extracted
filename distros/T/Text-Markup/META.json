@@ -58,66 +58,66 @@
    "provides" : {
       "Text::Markup" : {
          "file" : "lib/Text/Markup.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Asciidoc" : {
          "file" : "lib/Text/Markup/Asciidoc.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Asciidoctor" : {
          "file" : "lib/Text/Markup/Asciidoctor.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Bbcode" : {
          "file" : "lib/Text/Markup/Bbcode.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Cmd" : {
          "file" : "lib/Text/Markup/Cmd.pm"
       },
       "Text::Markup::CommonMark" : {
          "file" : "lib/Text/Markup/CommonMark.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Creole" : {
          "file" : "lib/Text/Markup/Creole.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::HTML" : {
          "file" : "lib/Text/Markup/HTML.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Markdown" : {
          "file" : "lib/Text/Markup/Markdown.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Mediawiki" : {
          "file" : "lib/Text/Markup/Mediawiki.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Multimarkdown" : {
          "file" : "lib/Text/Markup/Multimarkdown.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::None" : {
          "file" : "lib/Text/Markup/None.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Pod" : {
          "file" : "lib/Text/Markup/Pod.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Rest" : {
          "file" : "lib/Text/Markup/Rest.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Textile" : {
          "file" : "lib/Text/Markup/Textile.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Text::Markup::Trac" : {
          "file" : "lib/Text/Markup/Trac.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -127,6 +127,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

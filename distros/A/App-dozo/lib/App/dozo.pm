@@ -1,6 +1,6 @@
 package App::dozo;
 
-our $VERSION = "0.9926";
+our $VERSION = "0.9927";
 
 1;
 =encoding utf-8
@@ -40,7 +40,7 @@ dozo -I IMAGE [ options ] [ command ... ]
 
 =head1 VERSION
 
-Version 0.9926
+Version 0.9927
 
 =head1 USAGE
 
@@ -88,6 +88,8 @@ To install the latest version from GitHub:
 
 Alternatively, you can simply place C<dozo> and C<getoptlong.sh> in
 your PATH.
+
+B<Dôzo> requires Bash 4.3 or later.
 
 =head1 DESCRIPTION
 

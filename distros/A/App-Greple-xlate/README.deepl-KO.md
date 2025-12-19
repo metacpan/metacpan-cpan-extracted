@@ -14,7 +14,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 # VERSION
 
-Version 0.9922
+Version 0.9923
 
 # DESCRIPTION
 
@@ -281,7 +281,7 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
 `xlate` 명령은 Docker 환경과 함께 작동하므로 아무것도 설치되어 있지 않더라도 Docker를 사용할 수 있으면 사용할 수 있습니다. `-D` 또는 `-C` 옵션을 사용합니다.
 
-Docker 작업은 `dozo` 스크립트로 처리되며, 독립 실행형 명령으로도 사용할 수 있습니다. `dozo` 스크립트는 영구 컨테이너 설정을 위한 `.dozorc` 구성 파일을 지원합니다.
+Docker 작업은 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo)으로 처리되며, 독립 실행형 명령으로도 사용할 수 있습니다. `dozo` 명령은 영구 컨테이너 설정을 위한 `.dozorc` 구성 파일을 지원합니다.
 
 또한 다양한 문서 스타일에 대한 메이크파일이 제공되므로 특별한 지정 없이 다른 언어로 번역이 가능합니다. `-M` 옵션을 사용합니다.
 
@@ -335,13 +335,15 @@ DeepL 및 ChatGPT용 명령줄 도구를 설치해야 합니다.
 
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
+[App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - xlate에서 컨테이너 작업에 사용하는 일반 Docker 러너입니다.
+
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     도커 컨테이너 이미지.
 
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
-    `getoptlong.sh` 라이브러리는 `xlate` 및 `dozo` 스크립트에서 옵션 구문 분석에 사용됩니다.
+    `getoptlong.sh` - `xlate` 스크립트 및 [App::dozo](https://metacpan.org/pod/App%3A%3Adozo)에서 옵션 구문 분석에 사용되는 &lt;m id=5 /> 라이브러리.
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.07
+Version 1.08
 
 # SYNOPSIS
 
@@ -128,6 +128,20 @@ thus avoiding hard-coded paths into forms.
         my $script_name = $info->script_name();
         # ...
         print "<form method=\"POST\" action=$script_name name=\"my_form\">\n";
+
+### API SPECIFICATION
+
+#### INPUT
+
+None.
+
+#### OUTPUT
+
+    {
+      type => 'string',
+      'min' => 1,
+      'nomatch' => qr/^[\/\\]/    # Does not return absolute path
+    }
 
 ## script\_path
 
@@ -383,6 +397,24 @@ Useful for debugging or generating keys for a cache.
     my $string_representation = $info->as_string();
     my $raw_string = $info->as_string({ raw => 1 });
 
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      raw => {
+        'type' => 'boolean',
+        'optional' => 1,
+      }
+    }
+
+#### OUTPUT
+
+    {
+      type => 'string',
+      optional => 1,
+    }
+
 ## protocol
 
 Returns the connection protocol, presumably 'http' or 'https', or undef if
@@ -513,6 +545,37 @@ it will replace the "get\_cookie" method in the future.
 
     my $name = CGI::Info->new()->cookie('name');
     print "Your name is $name\n";
+
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      cookie_name => {
+        'type' => 'string',
+        'min' => 1,
+        'matches' => qr/^[!#-'*+\-.\^_`|~0-9A-Za-z]+$/    # RFC6265
+      }
+    }
+
+#### OUTPUT
+
+Cookie not set: `undef`
+
+Cookie set:
+
+    {
+      type => 'string',
+      optional => 1,
+      matches => qr/      # RFC6265
+        ^
+        (?:
+          "[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*"   # quoted
+        | [\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*     # unquoted
+        )
+        $
+      /x
+    }
 
 ## status
 

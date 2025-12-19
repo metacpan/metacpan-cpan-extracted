@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # prefixItems validates first 2, items validates the rest, therefore no unevaluated items left.
 my $schema_ok =

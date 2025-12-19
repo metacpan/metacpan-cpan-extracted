@@ -19,7 +19,7 @@ Marlin defaults to attributes being "ro" for a reason.
 
 =item *
 
-Lazy defaults/builders will slow down your accessors. 
+Lazy defaults/builders will slow down your accessors.
 
 Though see:
 L<https://github.com/tsee/Class-XSAccessor/pull/14>.

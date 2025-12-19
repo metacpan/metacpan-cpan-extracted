@@ -19,7 +19,7 @@ name: Calendar-Indonesia-Holiday
 provides:
   Calendar::Indonesia::Holiday:
     file: lib/Calendar/Indonesia/Holiday.pm
-    version: '0.354'
+    version: '0.355'
 requires:
   DateTime: '0'
   Exporter: '5.57'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday
   homepage: https://metacpan.org/release/Calendar-Indonesia-Holiday
   repository: git://github.com/perlancar/perl-Calendar-Indonesia-Holiday.git
-version: '0.354'
+version: '0.355'
 x_Dist_Zilla:
   perl:
     version: '5.040002'

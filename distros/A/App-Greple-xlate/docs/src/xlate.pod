@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.9922
+Version 0.9923
 
 =head1 DESCRIPTION
 
@@ -426,8 +426,8 @@ The C<xlate> command works in concert with the Docker environment, so
 even if you do not have anything installed on hand, you can use it as
 long as Docker is available.  Use C<-D> or C<-C> option.
 
-Docker operations are handled by the C<dozo> script, which can also be
-used as a standalone command.  The C<dozo> script supports the
+Docker operations are handled by L<App::dozo>, which can also be
+used as a standalone command.  The C<dozo> command supports the
 C<.dozorc> configuration file for persistent container settings.
 
 Also, since makefiles for various document styles are provided,
@@ -491,6 +491,8 @@ L<App::Greple::xlate::gpt4>
 
 L<App::Greple::xlate::gpt5>
 
+L<App::dozo> - Generic Docker runner used by xlate for container operations
+
 =over 2
 
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
@@ -500,7 +502,7 @@ Docker container image.
 =item * L<https://github.com/tecolicom/getoptlong>
 
 The C<getoptlong.sh> library used for option parsing in the C<xlate>
-and C<dozo> scripts.
+script and L<App::dozo>.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

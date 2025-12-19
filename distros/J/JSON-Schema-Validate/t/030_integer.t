@@ -10,7 +10,7 @@ use JSON;
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
-}
+};
 
 # Testing minimum, and maximum value for integers
 my $js = JSON::Schema::Validate->new({

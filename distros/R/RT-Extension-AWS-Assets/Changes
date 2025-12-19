@@ -1,0 +1,27 @@
+Revision history for RT-Extension-AWS-Assets
+
+0.06 2025-12-18
+ - Support purchasing reserved instances on asset search results page
+ - Make FetchSingleAssetFromAWS work
+
+0.05 2025-09-15
+ - Update for RT 6
+ - Update lifecycles with additional statuses
+ - Add a removed status for de-provisioned AWS assets
+ - Add a sync option to set asset status to removed for deleted AWS assets
+ - Limit the reservation linking page to active assets
+
+0.04 2024-05-16
+ - Remove duplicate debug option defined in rt-import-aws-assets
+ - Add asset Id to an error message to provide more context when debugging
+
+0.03 2024-04-19
+ - In rt-unlink-retired-reservations, also set State to retired if that is not
+   the current value.
+
+0.02 2024-03-08
+ - Add asset lifecycle config for reservations
+ - Add script to unlink retired reservations
+
+0.01 2024-02-13
+ - Initial version

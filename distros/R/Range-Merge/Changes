@@ -1,3 +1,7 @@
+2.253531  2025-12-19 01:43:23+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [Bugfix] Improper handling of some overlaps!
+
 2.242740  2024-09-30 16:48:35-06:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * Reject IP address octets with leading zeros

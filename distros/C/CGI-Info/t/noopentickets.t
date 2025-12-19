@@ -5,6 +5,7 @@ use warnings;
 
 use Test::DescribeMe qw(author);
 use Test::Most tests => 4;
+use Test::RequiresInternet;
 
 use constant URL => 'https://api.github.com/repos/nigelhorne/CGI-Info/issues';
 use constant SITE =>'api.github.com';

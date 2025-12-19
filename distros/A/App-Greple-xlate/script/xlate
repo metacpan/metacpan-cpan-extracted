@@ -73,7 +73,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 0.9922
+    Version 0.9923
 
 =cut
 
@@ -98,6 +98,11 @@ die() {
     exit 1
 }
 
+# Check bash version (4.3+ required for getoptlong.sh)
+if ((BASH_VERSINFO[0] < 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 3))); then
+    die "bash 4.3+ required (found $BASH_VERSION)"
+fi
+
 git_topdir() {
     [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || return
     local dir="$(git rev-parse --show-superproject-working-tree)"
@@ -110,8 +115,14 @@ git_topdir() {
 ##############################################################################
 
 # Set PATH for getoptlong.sh
-share=$(dist_dir App::Greple::xlate)
-PATH="$share:$share/getoptlong:$PATH"
+share=$(dist_dir App::Greple::xlate 2>/dev/null) || share=
+basedir="${0%/*/*}"
+if [[ $share ]]; then
+    PATH="$share/getoptlong:$PATH"
+elif [[ -f $basedir/share/getoptlong/getoptlong.sh ]]; then
+    share="$basedir/share"
+    PATH="$share/getoptlong:$PATH"
+fi
 
 # Find dozo command
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -230,7 +241,7 @@ Usage: $myname [ options ] -t LANG FILE [ greple options ]
 END
 
 declare -A OPTS=(
-    [&USAGE]="$USAGE"
+    [&USAGE]="$USAGE" [&REQUIRE]=0.2
     # Basic options
     [     debug | d     # debug mode (enables trace)       ]=
     [     trace         # trace mode                       ]=
@@ -481,10 +492,10 @@ arbitrary commands.
 
 Docker options (C<-I>, C<-E>, C<-W>, C<-H>, C<-V>, C<-U>, C<-R>,
 C<-B>, C<-N>, C<-K>, C<-L>, C<-P>, C<-O>) are passed to B<dozo>.  For details
-on live containers, container naming, and configuration, see L<dozo>.
+on live containers, container naming, and configuration, see L<App::dozo>.
 
 B<Note:> The generic Docker runner functionality (C<-C>, C<-L> options)
-has been moved to the standalone L<dozo> command. For running arbitrary
+has been moved to the standalone L<App::dozo> command. For running arbitrary
 commands or managing live containers, use B<dozo> directly. These options
 in xlate are maintained for backward compatibility but may be deprecated
 in future versions.
@@ -656,10 +667,10 @@ xlate, so it should always be the last of the xlate options.
 
 =back
 
-The following options are specific to L<dozo> and are passed through
+The following options are specific to L<App::dozo> and are passed through
 when invoking Docker features. These options are maintained for backward
 compatibility but may be removed in future versions. For direct container
-management, use the L<dozo> command instead.
+management, use the L<App::dozo> command instead.
 
 =over 7
 
@@ -669,7 +680,7 @@ Execute command on the Docker container, or run shell if no command.
 
 =item B<-L> [ I<command> ], B<--live>
 
-Use live (persistent) container.  See L<dozo> for details.
+Use live (persistent) container.  See L<App::dozo> for details.
 
 =item B<-W>, B<--mount-cwd>
 
@@ -783,7 +794,7 @@ Specifies translation engine.
 
 L<App::Greple::xlate>
 
-L<dozo> - Generic Docker runner used by xlate for container operations
+L<App::dozo> - Generic Docker runner used by xlate for container operations
 
 =head1 AUTHOR
 

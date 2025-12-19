@@ -7,7 +7,7 @@ use Text::Markup;
 use Text::Markup::Cmd;
 use utf8;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 sub import {
     # Replace Text::Markup::Asciidoc.

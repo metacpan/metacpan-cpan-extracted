@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Text::Markup;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 sub import {
     # Replace the regex if passed one.

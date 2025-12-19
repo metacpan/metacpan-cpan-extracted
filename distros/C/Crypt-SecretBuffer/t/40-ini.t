@@ -40,7 +40,7 @@ END
       { key => span_equal_to('b'), value => span_equal_to('2') },
       'line 3 "b=2"';
    is $ini->parse_next($s),
-      { error => T, context => T },
+      { error => match(qr/lacks delimiter/), context => T },
       'syntax error';
    is $ini->parse_next($s),
       { comment => span_equal_to("comment about stuff") },

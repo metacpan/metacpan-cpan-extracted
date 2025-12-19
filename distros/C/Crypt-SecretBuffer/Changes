@@ -1,3 +1,19 @@
+Version 0.012 - 2025-12-19
+  - String patterns passed to scanning functions (scan, index, rindex, and
+    various methods of Span) can now be perl unicode strings, or SecretBuffer
+    objects, or Span objects (with their own encoding) and matches will be
+    compared codepoint by codepoint.
+  - Added BASE64 encoding
+  - New exportable memcmp function, and method of SecretBuffer and Span objects
+  - Exceptions in unmask_to and unmask_secrets_to now pass through to caller
+    more correctly.
+  - SecretBuffer overloads 'cmp' with the new memcmp function, so you can now
+    compare buffers directly with cmp, lt, gt, eq and so on.
+    (Span objects do not, yet, to avoid the complicated question of how best to
+     compare mismatched encodings)
+  - Fix debug-build-perl asertion failure in Span->copy_to when copying from
+    buffer of capacity=0
+
 Version 0.011 - 2025-12-02
   - Fix bug in parsing strings of '$encoding' parameters that could return
     an uninitialized value for an invalid encoding.

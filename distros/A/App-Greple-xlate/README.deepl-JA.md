@@ -14,7 +14,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 # VERSION
 
-Version 0.9922
+Version 0.9923
 
 # DESCRIPTION
 
@@ -281,7 +281,7 @@ PerlのPodスタイルで書かれた文書中の通常のテキストブロッ�
 
 `xlate`コマンドはDocker環境と協調して動作するため、手元に何もインストールされていなくても、Dockerが利用可能であれば使用することができます。`-D`または`-C`オプションを使用してください。
 
-Dockerの操作は`dozo`スクリプトで処理されます。`dozo`スクリプトは、永続的なコンテナ設定のための`.dozorc`設定ファイルをサポートします。
+Dockerの操作は[App::dozo](https://metacpan.org/pod/App%3A%3Adozo)で処理され、スタンドアロンコマンドとしても使用できます。`dozo`コマンドは、永続的なコンテナ設定のための`.dozorc`設定ファイルをサポートします。
 
 また、様々なドキュメントスタイルに対応したmakefileが提供されているので、特別な指定なしに他言語への翻訳が可能です。`-M`オプションを使用してください。
 
@@ -335,13 +335,15 @@ DeepLおよびChatGPT用のコマンドラインツールをインストール�
 
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
+[App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - xlateがコンテナ操作に使用する汎用Dockerランナー。
+
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Dockerコンテナイメージ。
 
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
-    `getoptlong.sh` ライブラリは `xlate` と `dozo` スクリプトのオプション解析に使われます。
+    `getoptlong.sh` ライブラリは `xlate` スクリプトと [App::dozo](https://metacpan.org/pod/App%3A%3Adozo) のオプション解析に使われます。
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

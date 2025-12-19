@@ -17,21 +17,25 @@ BEGIN {
     use_ok('Term::ANSIEncode') || BAIL_OUT('Cannot load Term::ANSIEncode!');
 }
 
-diag("\r  \n\r" . colored(['cyan on_black'], q{ _______        _   _              }));
-diag("\r" . colored(['cyan on_black'], q{|__   __|      | | (_)             }));
-diag("\r" . colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }));
-diag("\r" . colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }));
-diag("\r" . colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }));
-diag("\r" . colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }));
-diag("\r" . colored(['cyan on_black'], q{                             __/ | }));
-diag("\r" . colored(['cyan on_black'], q{                            |___/  }));
-
 # utf8 must be enabled
 my $builder = Test::More->builder;
 binmode $builder->output,         ":encoding(UTF-8)";
 binmode $builder->failure_output, ":encoding(UTF-8)";
 binmode $builder->todo_output,    ":encoding(UTF-8)";
 
+# ╔ ╗ ╚ ╝ ═ ║
+diag("\n\r" . colored(['bright_yellow'], "\e[4m                                    "));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{ _______        _   _              }) . colored(['yellow'], '◣'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{|__   __|      | | (_)             }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   | | ___  ___| |_ _ _ __   __ _  }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   | |/ _ \/ __| __| | '_ \ / _` | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   | |  __/\__ \ |_| | | | | (_| | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{                             __/ | }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏') . colored(['cyan on_black'], q{Term::ANSIEncode            |___/  }) . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'], '▏                                   ') . colored(['yellow'], '█'));
+diag("\r" . colored(['bright_yellow'],        '◥████████████████████████████████████'));
+diag("\r  \n\r  " x 12 . "\e[13A");
 diag("\r  \n\r" . colored(['bright_yellow on_magenta'],sprintf('%-25s',' Testing object creation ')));
 my $ansi = Term::ANSIEncode->new();
 isa_ok($ansi,'Term::ANSIEncode');

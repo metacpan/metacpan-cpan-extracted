@@ -1,6 +1,6 @@
 package App::xlate;
 
-our $VERSION = "0.9922";
+our $VERSION = "0.9923";
 
 1;
 =encoding utf-8
@@ -68,7 +68,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 0.9922
+    Version 0.9923
 
 =cut
 =head1 DESCRIPTION
@@ -136,10 +136,10 @@ arbitrary commands.
 
 Docker options (C<-I>, C<-E>, C<-W>, C<-H>, C<-V>, C<-U>, C<-R>,
 C<-B>, C<-N>, C<-K>, C<-L>, C<-P>, C<-O>) are passed to B<dozo>.  For details
-on live containers, container naming, and configuration, see L<dozo>.
+on live containers, container naming, and configuration, see L<App::dozo>.
 
 B<Note:> The generic Docker runner functionality (C<-C>, C<-L> options)
-has been moved to the standalone L<dozo> command. For running arbitrary
+has been moved to the standalone L<App::dozo> command. For running arbitrary
 commands or managing live containers, use B<dozo> directly. These options
 in xlate are maintained for backward compatibility but may be deprecated
 in future versions.
@@ -311,10 +311,10 @@ xlate, so it should always be the last of the xlate options.
 
 =back
 
-The following options are specific to L<dozo> and are passed through
+The following options are specific to L<App::dozo> and are passed through
 when invoking Docker features. These options are maintained for backward
 compatibility but may be removed in future versions. For direct container
-management, use the L<dozo> command instead.
+management, use the L<App::dozo> command instead.
 
 =over 7
 
@@ -324,7 +324,7 @@ Execute command on the Docker container, or run shell if no command.
 
 =item B<-L> [ I<command> ], B<--live>
 
-Use live (persistent) container.  See L<dozo> for details.
+Use live (persistent) container.  See L<App::dozo> for details.
 
 =item B<-W>, B<--mount-cwd>
 
@@ -438,7 +438,7 @@ Specifies translation engine.
 
 L<App::Greple::xlate>
 
-L<dozo> - Generic Docker runner used by xlate for container operations
+L<App::dozo> - Generic Docker runner used by xlate for container operations
 
 =head1 AUTHOR
 

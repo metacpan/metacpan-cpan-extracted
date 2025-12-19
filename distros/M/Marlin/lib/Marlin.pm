@@ -6,13 +6,14 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004000';
+our $VERSION   = '0.005000';
 
 use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
 use Exporter::Tiny qw( mkopt _croak );
 use Scalar::Util qw( blessed );
 use Class::XSAccessor { getters => [ _ATTRS ] };
 use Class::XSConstructor [ undef, '_new' ], _ATTRS;
+use Class::XSDestructor;
 use B::Hooks::AtRuntime qw( at_runtime after_runtime );
 use Module::Runtime qw( use_package_optimistically module_notional_filename );
 use List::Util qw(any);
@@ -201,6 +202,7 @@ sub setup_steps {
 		setup_roles
 		canonicalize_attributes
 		setup_constructor
+		setup_destructor
 		setup_accessors
 		setup_imports
 		optimize_methods
@@ -319,6 +321,14 @@ sub setup_constructor {
 		push @dfn, '!!' if $me->strict;
 		Class::XSConstructor->import( [ $me->this, $me->constructor ], @dfn );
 	}
+	
+	return $me;
+}
+
+sub setup_destructor {
+	my $me = shift;
+	
+	Class::XSDestructor->import( [ $me->this, 'DESTROY' ] );
 	
 	return $me;
 }
@@ -820,9 +830,77 @@ A method name or coderef to call after an attribute has been set.
 If you use C<< trigger => 1 >> or C<< trigger => true >>, Marlin will assume
 a trigger name of "_trigger_" followed by your attribute name.
 
+Marlin's triggers are a little more sophisticated than Moose's: within the
+trigger, you can call the setter again without worrying about re-triggering
+the trigger.
+
+  use v5.42.0;
+  
+  package Person {
+    use Types::Common -types, -lexical;
+    use Marlin::Util -all, -lexical;
+    
+    use Marlin
+      first_name => {
+        is      => 'rw',
+        isa     => Str,
+        trigger => sub ($me) { $self->clear_full_name }
+      },
+      last_name => {
+        is      => 'rw',
+        isa     => Str,
+        trigger => sub ($me) { $self->clear_full_name }
+      },
+      full_name => {
+        is      => 'lazy',
+        isa     => Str,
+        clearer => true,
+        builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+      };
+  }
+
 Currently if your class has any triggers, this will force the constructor
 plus the writers/accessors for the affected attributes to be implemented
 in Perl instead of XS.
+
+It is usually possible to design your API in ways that don't require
+triggers.
+
+  use v5.42.0;
+  
+  package Person {
+    use Types::Common -types, -lexical;
+    use Marlin::Util -all, -lexical;
+    
+    use Marlin
+      first_name => {
+        is      => 'ro',
+        isa     => Str,
+        writer  => 'my set_first_name',
+      },
+      last_name => {
+        is      => 'ro',
+        isa     => Str,
+        writer  => 'my set_last_name',
+      },
+      full_name => {
+        is      => 'lazy',
+        isa     => Str,
+        clearer => true,
+        builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+      };
+    
+    signature_for rename => (
+      method  => true,
+      named   => [ first_name => Optional[Str], last_name => Optional[Str] ],
+    );
+    
+    sub rename ( $self, $arg ) {
+      $self->&set_first_name($arg->first_name) if $arg->has_first_name;
+      $self->&set_last_name($arg->last_name) if $arg->has_last_name;
+      return $self;
+    }
+  }
 
 =item C<< handles >> and C<< handles_via >>.
 
@@ -1038,7 +1116,7 @@ from L<Class::Method::Modifiers>, but lexical versions of them.
 
 =head3 Other Features
 
-C<BUILD> is supported.
+C<BUILD> and C<DEMOLISH> are supported.
 
 =head3 Major Missing Features
 
@@ -1056,15 +1134,13 @@ C<new>, then wrapping it.
 
 =item *
 
-Support for C<DEMOLISH>.
-
-Perl's built-in C<DESTROY> still works, of course.
-
-=item *
-
 Extensibility.
 
 Marlin doesn't offer any official API for building extensions.
+
+=item *
+
+The metaobject protocol.
 
 =back
 

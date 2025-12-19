@@ -1,14 +1,15 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.011';
+$Crypt::SecretBuffer::VERSION = '0.012';
 
 use strict;
 use warnings;
 use Carp;
 use Scalar::Util ();
 use parent qw( DynaLoader );
-use overload '""' => \&stringify;
+use overload '""' => \&stringify,
+             'cmp' => \&memcmp;
 
 sub dl_load_flags {0x01} # Share extern symbols with other modules
 bootstrap Crypt::SecretBuffer;
@@ -16,11 +17,11 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.011';
+$Crypt::SecretBuffer::Exports::VERSION = '0.012';
 use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
-      secret_buffer secret unmask_secrets_to
-      NONBLOCK AT_LEAST ISO8859_1 ASCII UTF8 UTF16LE UTF16BE HEX
+      secret_buffer secret unmask_secrets_to memcmp
+      NONBLOCK AT_LEAST ISO8859_1 ASCII UTF8 UTF16LE UTF16BE HEX BASE64
       MATCH_MULTI MATCH_REVERSE MATCH_NEGATE MATCH_ANCHORED
    );
    *NONBLOCK=       *Crypt::SecretBuffer::NONBLOCK;
@@ -31,6 +32,7 @@ use Exporter 'import';
    *UTF16LE=        *Crypt::SecretBuffer::UTF16LE;
    *UTF16BE=        *Crypt::SecretBuffer::UTF16BE;
    *HEX=            *Crypt::SecretBuffer::HEX;
+   *BASE64=         *Crypt::SecretBuffer::BASE64;
    *MATCH_MULTI=    *Crypt::SecretBuffer::MATCH_MULTI;
    *MATCH_REVERSE=  *Crypt::SecretBuffer::MATCH_REVERSE;
    *MATCH_NEGATE=   *Crypt::SecretBuffer::MATCH_NEGATE;
@@ -379,20 +381,15 @@ the scope of this exposure.
 
 =head2 unmask_to
 
-  $buf->unmask_to(\&coderef);
+  @ret= $buf->unmask_to(sub{
+    # use $_[0]
+  });
 
-Pass the secret value as an argument to a code-ref.  If you want to prevent the secret from
-leaking into perl's heap, the coderef should be an XS function.  If you pass it to a perl
-function and load the parameter into a local variable, then it leaks into perl's heap.
-You *might* be OK if you pass it to a perl function and leave it in C<< @_ >> until passing it
-to an XS function.
+Pass the secret value as an argument to a code-ref, and propagate the return value.
+(C<wantarray> is propagated to the coderef).
 
-This is equivalent to, but more efficient than
-
-  {
-    local $buf->{stringify_mask}= undef;
-    coderef->($buf);
-  }
+If you want to prevent the secret from leaking into perl's heap, the coderef should be an XS
+function, or strictly use C<< $_[0] >> without copying it to a 'my' variable.
 
 See also: L</unmask_secrets_to>.
 
@@ -436,16 +433,18 @@ start with '[' and must end with either ']' or '+'.
 
 The C<$flags> may be a bitwise OR of the L</Match Flags> and one
 L<Character Encoding|/Character Encodings>.
-If your pattern is a plain string (not regexp), B<< you must encode it with
-the same encoding >>.
-
-  my $str= "\x{100}";
-  utf8::encode($str);
-  my ($ofs, $len)= $buf->scan($str, UTF8);
-
 Note that C<$ofs> and C<$len> are still byte positions, and still suitable for
 L</substr> on the buffer, which is different from Perl's substr on a unicode
 string which works in terms of characters.
+
+For a more convenient interface to this method, use L</span> to create a
+L<Span object|Crypt::SecretBuffer::Span> and then call its methods.
+
+=head2 memcmp
+
+  $cmp= $buf->memcmp($buf2);
+
+Like the 'cmp' operator, but always compares on a byte-by-byte basis.
 
 =head2 append_random
 
@@ -573,10 +572,18 @@ Shorthand function for calling L</new>.
 
 =item unmask_secrets_to
 
-  unmask_secrets_to \&coderef, $arg1, $arg2, ...;
+  @ret= unmask_secrets_to \&coderef, $arg1, $arg2, ...;
 
 Call a coderef with a list of arguments, and any argument which is a SecretBuffer will be
-replaced by a scalar referencing the actual secret.
+replaced by a scalar referencing the actual secret.  The return values are passed through,
+as well as the C<wantarray> context.
+
+=item memcmp
+
+  $cmp= memcmp($thing1, $thing2);
+
+This function always compares bytes, and the arguments can be L<SecretBuffer|Crypt::SecretBuffer>
+objects, L<Span|Crypt::SecretBuffer::Span> objects, scalar-refs, and scalars.
 
 =back
 
@@ -600,6 +607,12 @@ Bytes are restricted to 7-bit ASCII.  High bytes throw an exception.
 Decode hexadecimal from the buffer before comparing to bytes in the search string.
 Hex is case-insensitive and whitespace is ignored, allowing the data to be line-wraped.
 There must be a multiple of two hex characters, and each byte's characters must be adjacent.
+
+=item BASE64
+
+Decode Base64 (C<< A-Za-z0-9+/= >>, with '=' used to pad to a multiple of 4 characters) from the
+buffer before comparing to bytes in the search string.  The decoder skips across whitespace and
+control characters.
 
 =item UTF8
 
@@ -674,6 +687,17 @@ You can also just use it with L<Inline::C> if you want to skip the hassle of an 
   print test(Crypt::SecretBuffer->new(length => 10))."\n";
   1;
 
+You can also look up individual functions at runtime to avoid depending on SecretBuffer being
+installed.  Every function pointer is stored by name in C<< %Crypt::SecretBuffer::C_API >>
+and also individually by their full prototype in global SVs for convenient and reliable access:
+
+  typedef const char * (*sb_SvPVbyte_p)(SV *, STRLEN *);
+  SV *sv= get_sv("Crypt::SecretBuffer::C_API::const char * secret_buffer_SvPVbyte(SV *, STRLEN *)", 0);
+  if (sv) {
+    sb_SvPVbyte_p sb_SvPVbyte= (sb_SvPVbyte_p) SvIV(sv);
+    ...
+  }
+
 The complete API documentation is found in
 L<SecretBuffer.h|https://metacpan.org/dist/Crypt-SecretBuffer/source/SecretBuffer.h>
 
@@ -685,7 +709,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 AUTHOR
 

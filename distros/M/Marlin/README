@@ -303,9 +303,77 @@ DESCRIPTION
         If you use `trigger => 1` or `trigger => true`, Marlin will assume a
         trigger name of "_trigger_" followed by your attribute name.
 
+        Marlin's triggers are a little more sophisticated than Moose's: within
+        the trigger, you can call the setter again without worrying about
+        re-triggering the trigger.
+
+          use v5.42.0;
+  
+          package Person {
+            use Types::Common -types, -lexical;
+            use Marlin::Util -all, -lexical;
+    
+            use Marlin
+              first_name => {
+                is      => 'rw',
+                isa     => Str,
+                trigger => sub ($me) { $self->clear_full_name }
+              },
+              last_name => {
+                is      => 'rw',
+                isa     => Str,
+                trigger => sub ($me) { $self->clear_full_name }
+              },
+              full_name => {
+                is      => 'lazy',
+                isa     => Str,
+                clearer => true,
+                builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+              };
+          }
+
         Currently if your class has any triggers, this will force the
         constructor plus the writers/accessors for the affected attributes to
         be implemented in Perl instead of XS.
+
+        It is usually possible to design your API in ways that don't require
+        triggers.
+
+          use v5.42.0;
+  
+          package Person {
+            use Types::Common -types, -lexical;
+            use Marlin::Util -all, -lexical;
+    
+            use Marlin
+              first_name => {
+                is      => 'ro',
+                isa     => Str,
+                writer  => 'my set_first_name',
+              },
+              last_name => {
+                is      => 'ro',
+                isa     => Str,
+                writer  => 'my set_last_name',
+              },
+              full_name => {
+                is      => 'lazy',
+                isa     => Str,
+                clearer => true,
+                builder => sub ($me) { join q[ ], $me->first_name, $me->last_name }
+              };
+    
+            signature_for rename => (
+              method  => true,
+              named   => [ first_name => Optional[Str], last_name => Optional[Str] ],
+            );
+    
+            sub rename ( $self, $arg ) {
+              $self->&set_first_name($arg->first_name) if $arg->has_first_name;
+              $self->&set_last_name($arg->last_name) if $arg->has_last_name;
+              return $self;
+            }
+          }
 
     `handles` and `handles_via`.
         Method delegation.
@@ -503,7 +571,7 @@ DESCRIPTION
         from Class::Method::Modifiers, but lexical versions of them.
 
    Other Features
-    `BUILD` is supported.
+    `BUILD` and `DEMOLISH` are supported.
 
    Major Missing Features
     Here are some features found in Moo and Moose which are missing from
@@ -514,13 +582,11 @@ DESCRIPTION
         You can work around this by naming your constructor something other
         than `new`, then wrapping it.
 
-    *   Support for `DEMOLISH`.
-
-        Perl's built-in `DESTROY` still works, of course.
-
     *   Extensibility.
 
         Marlin doesn't offer any official API for building extensions.
+
+    *   The metaobject protocol.
 
 BUGS
     Please report any bugs to <https://github.com/tobyink/p5-marlin/issues>.

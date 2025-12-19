@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.6.1
+## Version v0.7.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/11/26
+## Modified 2025/12/17
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,7 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.6.1';
+    our $VERSION = 'v0.7.0';
 };
 
 use v5.16.0;
@@ -34,6 +34,10 @@ sub new
 {
     my $class  = shift( @_ );
     my $schema = shift( @_ );
+    if( defined( $schema ) && ( !ref( $schema ) || ref( $schema ) ne 'HASH' ) )
+    {
+        die( "You provided a value (", overload::StrVal( $schema ), "), but it is not an hash reference. You must create a new $class object like this: $class->new( \$schema, \%opts );" );
+    }
 
     my $self =
     {
@@ -130,7 +134,7 @@ sub new
     {
         $self->{formats}->{ $_ } = $opts->{format}->{ $_ } for( keys( %{$opts->{format}} ) );
     }
-    $self->{vocab_support} = $opts->{vocab_support} ? { %{ $opts->{vocab_support} } } : {};
+    $self->{vocab_support} = $opts->{vocab_support} ? { %{$opts->{vocab_support}} } : {};
 
     $self->_check_vocabulary_required unless( $self->{ignore_req_vocab} );
     $self->_register_builtin_media_validators() if( $self->{content_assert} );
@@ -293,7 +297,7 @@ sub extensions
 sub get_trace
 {
     my( $self ) = @_;
-    return( [ @{ $self->{last_trace} || [] } ] );
+    return( [@{ $self->{last_trace} || [] }] );
 }
 
 # Accessor-only method. See trace_limit for its mutator alter ego.
@@ -320,6 +324,20 @@ sub is_trace_on { $_[0]->{trace_on} ? 1 : 0 }
 sub is_unique_keys_enabled { $_[0]->{unique_keys} ? 1 : 0 }
 
 sub is_unknown_required_vocab_ignored { $_[0]->{ignore_req_vocab} ? 1 : 0 }
+
+sub is_valid
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+
+    my $opts = $self->_get_args_as_hash( @_ );
+    # Optional: allow overriding max_errors for this call only
+    # (e.g. $v->is_valid( $data, max_errors => 1 );)
+    $opts->{max_errors} //= 1;
+
+    # validate already populates $self->{errors}; is_valid just returns boolean
+    return( $self->validate( $data, $opts ) ? 1 : 0 );
+}
 
 # Example:
 # my $pruned = $js->prune_instance( $incoming_data );
@@ -742,7 +760,9 @@ sub unique_keys
 
 sub validate
 {
-    my( $self, $data ) = @_;
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
 
     $self->{errors}     = [];
     $self->{last_error} = '';
@@ -772,6 +792,7 @@ sub validate
         $self->{vocab_checked} = 1;
     }
 
+    # Because Perl scalar are not JSON scalar, we force the Perl structure into strict JSON types, eliminating all Perl duality and guaranteeing predictable validation semantics.
     if( $self->{normalize_instance} )
     {
         my $json = JSON->new->allow_nonref(1)->canonical(1);
@@ -792,7 +813,7 @@ sub validate
         resolver        => $self->{resolver},
         formats         => $self->{formats},
         errors          => $self->{errors},
-        max_errors      => $self->{max_errors},
+        max_errors      => ( ( defined( $opts->{max_errors} ) && $opts->{max_errors} =~ /^\d+$/ ) ? $opts->{max_errors} : $self->{max_errors} ),
         error_count     => 0,
 
         # paths / recursion
@@ -803,16 +824,16 @@ sub validate
 
         # annotation (for unevaluated*)
         ann_mode        => 1,
-        compile_on      => $self->{compile_on} ? 1 : 0,
+        compile_on      => ( defined( $opts->{compile_on} ) ? ( $opts->{compile_on} ? 1 : 0 ) : ( $self->{compile_on} ? 1 : 0 ) ),
 
         # trace
-        trace_on        => $self->{trace_on} ? 1 : 0,
+        trace_on        => ( defined( $opts->{trace_on} ) ? ( $opts->{trace_on} ? 1 : 0 ) : ( $self->{trace_on} ? 1 : 0 ) ),
         trace_sample    => $self->{trace_sample} || 0,
-        trace_limit     => $self->{trace_limit}  || 0,
+        trace_limit     => ( defined( $opts->{trace_limit} ) && $opts->{trace_limit} =~ /^\d+$/ ) ? $opts->{trace_limit} : ( $self->{trace_limit} || 0 ),
         trace           => [],
 
         # content assertion & helpers
-        content_assert   => $self->{content_assert} ? 1 : 0,
+        content_assert   => ( defined( $opts->{content_assert} ) ? ( $opts->{content_assert} ? 1 : 0 ) : ( $self->{content_assert} ? 1 : 0 ) ),
         media_validators => $self->{media_validators},
         content_decoders => $self->{content_decoders},
 
@@ -907,13 +928,13 @@ sub _apply_ref
         {
             # or pulled from id_index; same one used in compile_js
             my $root_schema = $ctx->{root}->{schema} or return( _err_res( $ctx, $schema_ptr, "missing schema", '$ref' ) );
-    
+
             my $node = _jsv_resolve_internal_ref( $root_schema, $ref );
             if( $node )
             {
                 return( _v( $ctx, $ref, $node, $inst ) );
             }
-    
+
             return _err_res(
                 $ctx,
                 $schema_ptr,
@@ -1033,6 +1054,67 @@ sub _compile_js_node
         return( $seen->{ $sp } );
     }
 
+    # Support pointer-alias schemas such as:
+    # definitions => { address => "#/definitions/jp_address" }
+    if( defined( $S ) && !ref( $S ) && $S =~ /^#\// )
+    {
+        my $target_ptr = $S;
+
+        # If we already compiled that pointer, just alias it
+        if( exists( $seen->{ $target_ptr } ) )
+        {
+            $seen->{ $sp } = $seen->{ $target_ptr };
+            return( $seen->{ $target_ptr } );
+        }
+
+        my $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
+
+        # Follow chains of pointer-aliases
+        if( defined( $target_schema ) && !ref( $target_schema ) )
+        {
+            my %followed;
+            while(
+                defined( $target_schema ) &&
+                !ref( $target_schema ) &&
+                $target_schema =~ /^#\//
+            )
+            {
+                last if( $followed{ $target_schema }++ );
+                $target_ptr    = $target_schema;
+                $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
+            }
+        }
+
+        unless( defined( $target_schema ) )
+        {
+            # Could not resolve: emit a no-op validator (server still enforces)
+            my $id = $$counter_ref++;
+            my $fn = "jsv_node_${id}";
+            $seen->{ $sp } = $fn;
+            push( @$funcs, <<JS_RUNTIME );
+// $sp (unresolved pointer-alias $S)
+function $fn(inst, path, ctx)
+{
+}
+JS_RUNTIME
+            return( $fn );
+        }
+
+        unless( ref( $target_schema ) eq 'HASH' )
+        {
+            die(
+                "Internal error: pointer-alias '$S' at '$sp' did not resolve to an object schema " .
+                "(got " . ( ref( $target_schema ) || 'scalar' ) . ")."
+            );
+        }
+
+        my $base_fn = $self->_compile_js_node( $target_schema, $target_ptr, $seen, $funcs, $counter_ref, $root, $opts );
+
+        # Alias this pointer to the target validator
+        $seen->{ $sp } = $base_fn;
+        return( $base_fn );
+    }
+
     # NOTE: $ref
     # 0) $ref handling (internal refs only)
     if( ref( $S ) eq 'HASH' &&
@@ -1056,6 +1138,24 @@ sub _compile_js_node
             my $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
 
 
+            # Support "pointer alias" schemas such as:
+            # definitions => { address => "#/definitions/jp_address" }
+            # Keep resolving until we reach a real schema hash.
+            if( defined( $target_schema ) && !ref( $target_schema ) )
+            {
+                my %followed;
+                while(
+                    defined( $target_schema ) &&
+                    !ref( $target_schema ) &&
+                    $target_schema =~ /^#\//
+                )
+                {
+                    last if( $followed{ $target_schema }++ );
+                    $target_ptr    = $target_schema;
+                    $target_schema = _jsv_resolve_internal_ref( $root, $target_ptr );
+                }
+            }
+
             unless( defined( $target_schema ) )
             {
                 # Pointer could not be resolved. As a safety fallback,
@@ -1071,6 +1171,13 @@ function $fn(inst, path, ctx)
 
 JS_RUNTIME
                 return( $fn );
+            }
+
+            unless( ref( $target_schema ) eq 'HASH' )
+            {
+                die( "Internal error: \$ref target '$target_ptr' did not resolve to a schema object (got " .
+                     ( defined( $target_schema ) ? ref( $target_schema ) || 'scalar' : 'undef' ) .
+                     "). If you are using pointer-alias definitions, they must ultimately resolve to an object schema." );
             }
 
             # Compile the target, then merge sibling keywords
@@ -1093,7 +1200,8 @@ JS_RUNTIME
             # Now compile the current node again, but skip the $ref
             my $local_S = { %$S };  # shallow copy
             delete( $local_S->{'$ref'} );
-            my $local_fn = $self->_compile_js_node( $local_S, $sp, $seen, $funcs, $counter_ref, $root, $opts );
+            my $local_sp = _join_ptr( $sp, '__local__' );
+            my $local_fn = $self->_compile_js_node( $local_S, $local_sp, $seen, $funcs, $counter_ref, $root, $opts );
 
             if( $local_fn ne $wrapper_fn )
             {
@@ -1963,7 +2071,7 @@ sub _compile_node
     my $has_enum    = exists( $S->{enum} );
     my $enum_vals   = $S->{enum};
 
-    my %numk = map{ $_ => $S->{$_} } grep{ exists( $S->{ $_ } ) }
+    my %numk = map{ $_ => $S->{ $_ } } grep{ exists( $S->{ $_ } ) }
                qw( multipleOf minimum maximum exclusiveMinimum exclusiveMaximum );
 
     my $has_strlen = ( exists( $S->{minLength} ) || exists( $S->{maxLength} ) || exists( $S->{pattern} ) ) ? 1 : 0;
@@ -1974,7 +2082,7 @@ sub _compile_node
         exists( $S->{uniqueKeys} ) &&
         ref( $S->{uniqueKeys} ) eq 'ARRAY';
 
-    # Precompile child closures (same structure your interpreter walks)
+    # Precompile child closures (same structure our interpreter walks)
     my %child;
 
     # Arrays
@@ -2528,6 +2636,7 @@ sub _first_error_text
 sub _get_args_as_hash
 {
     my $self = shift( @_ );
+    return( {} ) if( !scalar( @_ ) );
     my $ref = {};
     if( scalar( @_ ) == 1 &&
         defined( $_[0] ) &&
@@ -2541,7 +2650,7 @@ sub _get_args_as_hash
     }
     else
     {
-        die( "Uneven number of parameters provided." );
+        die( "Uneven number of parameters provided: '", join( "', '", map( overload::StrVal( $_ ), @_ ) ), "'" );
     }
     return( $ref );
 }
@@ -2639,7 +2748,7 @@ sub _join_ptr
     {
         next unless( defined( $token ) );
 
-        # Proper JSON Pointer escaping
+        # Proper rfc6901 JSON Pointer escaping
         $token =~ s/~/~0/g;
         $token =~ s/\//~1/g;
 
@@ -2692,7 +2801,7 @@ sub _jsv_resolve_internal_ref
     TOKEN:
     for my $tok ( @tokens )
     {
-        # JSON Pointer unescaping
+        # rfc6901 JSON Pointer unescaping
         $tok =~ s/~1/\//g;
         $tok =~ s/~0/~/g;
 
@@ -3087,13 +3196,24 @@ sub _k_object_all
 {
     my( $ctx, $sp, $S, $H ) = @_;
 
+    my $ok = 1;
+
+    my $bail_if_max = sub
+    {
+        return( $ctx->{max_errors} && $ctx->{error_count} >= $ctx->{max_errors} ) ? 1 : 0;
+    };
+
     if( exists( $S->{minProperties} ) && ( scalar( keys( %$H ) ) ) < $S->{minProperties} )
     {
-        return( _err_res( $ctx, $sp, "object has fewer than minProperties $S->{minProperties}", 'minProperties' ) );
+        _err_res( $ctx, $sp, "object has fewer than minProperties $S->{minProperties}", 'minProperties' );
+        $ok = 0;
+        return( { ok => 0, props => {}, items => {} } ) if( $bail_if_max->() );
     }
     if( exists( $S->{maxProperties} ) && ( scalar( keys( %$H ) ) ) > $S->{maxProperties} )
     {
-        return( _err_res( $ctx, $sp, "object has more than maxProperties $S->{maxProperties}", 'maxProperties' ) );
+        _err_res( $ctx, $sp, "object has more than maxProperties $S->{maxProperties}", 'maxProperties' );
+        $ok = 0;
+        return( { ok => 0, props => {}, items => {} } ) if( $bail_if_max->() );
     }
 
     # Merge required from:
@@ -3138,14 +3258,15 @@ sub _k_object_all
         my $msg = "required property '$rq' is missing "
                 . "(required: $need_str; present: $have_str)";
 
-        return(
-            _err_res(
-                $ctx,
-                _join_ptr( $sp, $rq ),
-                $msg,
-                'required'
-            )
+        _err_res(
+            $ctx,
+            _join_ptr( $sp, $rq ),
+            $msg,
+            'required'
         );
+
+        $ok = 0;
+        return( { ok => 0, props => {}, items => {} } ) if( $bail_if_max->() );
     }
 
     if( exists( $S->{propertyNames} ) && ref( $S->{propertyNames} ) eq 'HASH' )
@@ -3153,7 +3274,11 @@ sub _k_object_all
         for my $k ( keys( %$H ) )
         {
             my $r = _v( $ctx, _join_ptr( $sp, "propertyNames" ), $S->{propertyNames}, $k );
-            return( $r ) unless( $r->{ok} );
+            if( !$r->{ok} )
+            {
+                $ok = 0;
+                return( { ok => 0, props => {}, items => {} } ) if( $bail_if_max->() );
+            }
         }
     }
 
@@ -3175,7 +3300,13 @@ sub _k_object_all
         if( exists( $props->{ $k } ) )
         {
             my $r = _v( $ctx, _join_ptr( $sp, "properties/$k" ), $props->{ $k }, $v );
-            return( $r ) unless( $r->{ok} );
+            if( !$r->{ok} )
+            {
+                $ok = 0;
+                pop( @{$ctx->{ptr_stack}} );
+                return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+                next;
+            }
             $ann{ $k } = 1;
             $matched   = 1;
         }
@@ -3185,10 +3316,17 @@ sub _k_object_all
             local $@;
             for my $re ( keys( %$patprops ) )
             {
-                my $ok = eval{ $k =~ /$re/ };
-                next unless( $ok );
+                my $re_ok = eval{ $k =~ /$re/ };
+                next unless( $re_ok );
+
                 my $r = _v( $ctx, _join_ptr( $sp, "patternProperties/$re" ), $patprops->{ $re }, $v );
-                return( $r ) unless( $r->{ok} );
+                if( !$r->{ok} )
+                {
+                    $ok = 0;
+                    pop( @{$ctx->{ptr_stack}} );
+                    return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+                    next;
+                }
                 $ann{ $k } = 1;
                 $matched   = 1;
             }
@@ -3198,12 +3336,22 @@ sub _k_object_all
         {
             if( $addl_set && !_is_true( $addl ) && !_is_hash( $addl ) )
             {
-                return( _err_res( $ctx, _join_ptr( $sp, $k ), "additionalProperties not allowed: '$k'", 'additionalProperties' ) );
+                _err_res( $ctx, _join_ptr( $sp, $k ), "additionalProperties not allowed: '$k'", 'additionalProperties' );
+                $ok = 0;
+                pop( @{$ctx->{ptr_stack}} );
+                return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+                next;
             }
             elsif( ref( $addl ) eq 'HASH' )
             {
                 my $r = _v( $ctx, _join_ptr( $sp, "additionalProperties" ), $addl, $v );
-                return( $r ) unless( $r->{ok} );
+                if( !$r->{ok} )
+                {
+                    $ok = 0;
+                    pop( @{$ctx->{ptr_stack}} );
+                    return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+                    next;
+                }
                 $ann{ $k } = 1;
             }
         }
@@ -3219,7 +3367,9 @@ sub _k_object_all
             for my $need ( @{$depR->{ $k } || []} )
             {
                 next if( exists( $H->{ $need } ) );
-                return( _err_res( $ctx, _join_ptr( $sp, $need ), "dependentRequired: '$need' required when '$k' is present", 'dependentRequired' ) );
+                _err_res( $ctx, _join_ptr( $sp, $need ), "dependentRequired: '$need' required when '$k' is present", 'dependentRequired' );
+                $ok = 0;
+                return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
             }
         }
     }
@@ -3230,7 +3380,11 @@ sub _k_object_all
         {
             next unless( exists( $H->{ $k } ) );
             my $r = _v( $ctx, _join_ptr( $sp, "dependentSchemas/$k" ), $depS->{ $k }, $H );
-            return( $r ) unless( $r->{ok} );
+            if( !$r->{ok} )
+            {
+                $ok = 0;
+                return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+            }
         }
     }
 
@@ -3238,22 +3392,33 @@ sub _k_object_all
     {
         my @unknown = grep { !$ann{ $_ } } keys( %$H );
         my $UE = $S->{unevaluatedProperties};
+
         if( !_is_true( $UE ) && !_is_hash( $UE ) )
         {
-            return( _err_res( $ctx, $sp, "unevaluatedProperties not allowed: " . join( ',', @unknown ), 'unevaluatedProperties' ) ) if( @unknown );
+            if( @unknown )
+            {
+                _err_res( $ctx, $sp, "unevaluatedProperties not allowed: " . join( ',', @unknown ), 'unevaluatedProperties' );
+                $ok = 0;
+                return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+            }
         }
         elsif( ref( $UE ) eq 'HASH' )
         {
             for my $k ( @unknown )
             {
                 my $r = _v( $ctx, _join_ptr( $sp, "unevaluatedProperties" ), $UE, $H->{ $k } );
-                return( $r ) unless( $r->{ok} );
+                if( !$r->{ok} )
+                {
+                    $ok = 0;
+                    return( { ok => 0, props => \%ann, items => {} } ) if( $bail_if_max->() );
+                    next;
+                }
                 $ann{ $k } = 1;
             }
         }
     }
 
-    return( { ok => 1, props => \%ann, items => {} } );
+    return( { ok => ( $ok ? 1 : 0 ), props => \%ann, items => {} } );
 }
 
 sub _k_string
@@ -3770,7 +3935,7 @@ sub _t
     my( $ctx, $schema_ptr, $keyword, $inst_path, $outcome, $note ) = @_;
     return unless( $ctx->{trace_on} );
 
-    if( $ctx->{trace_limit} && @{ $ctx->{trace} } >= $ctx->{trace_limit} )
+    if( $ctx->{trace_limit} && @{$ctx->{trace}} >= $ctx->{trace_limit} )
     {
         return;
     }
@@ -4212,13 +4377,21 @@ You could also do:
         prune_unknown    => 1,
         trace_on         => 1,
         trace_limit      => 200,
-        trace_sample     => 1,
+        unique_keys      => 1,
     )->register_builtin_formats;
 
     my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
         or die( $js->error );
 
     print "ok\n";
+
+    # Override instance options for one call only (backward compatible)
+    $js->validate( $data, max_errors => 1 )
+        or die( $js->error );
+
+    # Quick boolean check (records at most one error by default)
+    $js->is_valid({ name => 'head', next => { name => 'tail' } })
+        or die( $js->error );
 
 Generating a browser-side validator with L</compile_js>:
 
@@ -4288,7 +4461,7 @@ In your HTML:
 
 =head1 VERSION
 
-v0.6.1
+v0.7.0
 
 =head1 DESCRIPTION
 
@@ -4638,7 +4811,7 @@ Supported JavaScript options:
 
 =over 4
 
-=item C<ecma =E<gt> "auto" | YEAR>
+=item * C<ecma =E<gt> "auto" | YEAR>
 
 Controls which JavaScript regexp features the generated code will try to use.
 
@@ -4648,6 +4821,18 @@ Controls which JavaScript regexp features the generated code will try to use.
 When C<ecma> is a number C<E<gt>= 2018>, patterns that use Unicode property escapes (e.g. C<\p{scx=Katakana}>) are compiled with the C</u> flag and will take advantage of Script / Script_Extensions support when the browser has it.
 
 In C<"auto"> mode the generator emits cautious compatibility shims: “advanced” patterns are wrapped in C<try/catch>; if the browser cannot compile them, those checks are silently skipped on the client (and are still enforced server-side by Perl).
+
+=item * C<max_errors =E<gt> 200>
+
+Defaults to 200.
+
+Set the maximum number of errors to be recorded.
+
+=item * C<name =E<gt> "myValidator">
+
+Defaults to C<validate>
+
+Sets a custom name for the JavaScript validation function.
 
 =back
 
@@ -4909,6 +5094,32 @@ Read-only accessor.
 
 Returns true if unknown required vocabularies are being ignored, false otherwise.
 
+=head2 is_valid
+
+    my $ok = $js->is_valid( $data );
+
+    my $ok = $js->is_valid(
+        $data,
+        max_errors     => 1,     # default for is_valid
+        trace_on       => 0,
+        trace_limit    => 0,
+        compile_on     => 0,
+        content_assert => 0,
+    );
+
+Validate C<$data> against the compiled schema and return a boolean.
+
+This is a convenience method intended for “yes/no” checks. It behaves like L</validate> but defaults to C<< max_errors => 1 >> so that, on failure, only one error is recorded.
+
+On failure, the single recorded error can be retrieved with L</error>:
+
+    $js->is_valid( $data )
+        or die( $js->error );
+
+Per-call options are passed through to L</validate> and may override the instance configuration for this call only (e.g. C<max_errors>, C<trace_on>, C<trace_limit>, C<compile_on>, C<content_assert>).
+
+Returns 1 on success, 0 on failure.
+
 =head2 prune_instance
 
     my $pruned = $jsv->prune_instance( $instance );
@@ -5058,6 +5269,17 @@ Declare which vocabularies the host supports, as a hash reference:
 
 Resets internal vocabulary-checked state so the declaration is enforced on next C<validate>.
 
+By default, this module supports all vocabularies required by 2020-12.
+
+However, you can restrict support:
+
+    $js->set_vocabulary_support({
+        'https://json-schema.org/draft/2020-12/vocab/core'         => 1,
+        'https://json-schema.org/draft/2020-12/vocab/applicator'   => 1,
+        'https://json-schema.org/draft/2020-12/vocab/format'       => 0,
+        'https://mycorp/vocab/internal'                            => 1,
+    });
+
 It returns the current object.
 
 =head2 trace
@@ -5102,13 +5324,65 @@ Returns the object for method chaining.
 
     my $ok = $js->validate( $data );
 
-Validate a decoded JSON instance against the compiled schema. Returns a boolean.
-On failure, inspect C<< $js->error >> to retrieve the L<error object|JSON::Schema::Validate::Error> that stringifies for a concise message (first error), or C<< $js->errors >> for an array reference of L<error objects|JSON::Schema::Validate::Error> like:
+    my $ok = $js->validate(
+        $data,
+        max_errors      => 5,
+        trace_on        => 1,
+        trace_limit     => 200,
+        compile_on      => 0,
+        content_assert  => 1,
+    );
+
+Validate a decoded JSON instance against the compiled schema and return a boolean.
+
+On failure, inspect C<< $js->error >> to retrieve the L<error object|JSON::Schema::Validate::Error> that stringifies for a concise message (first error), or C<< $js->errors >> for an array reference of L<error objects|JSON::Schema::Validate::Error>.
+
+Example:
+
+    my $ok = $js->validate( $data ) or die( $js->error );
+
+Each error is a L<JSON::Schema::Validate::Error> object:
 
     my $err = $js->error;
-    say $err->path; # #/properties~1name
-    say $err->message; # string shorter than minLength 1
-    say "$err"; # error object will stringify
+    say $err->path;           # #/properties~1name
+    say $err->schema_pointer; # #/properties/name
+    say $err->keyword;        # minLength
+    say $err->message;        # string shorter than minLength 1
+    say "$err";               # stringifies to a concise message
+
+=head3 Per-call option overrides
+
+C<validate> accepts optional named parameters (hash or hash reference) that override the validator’s instance configuration for this call only.
+
+Currently supported overrides:
+
+=over 4
+
+=item * C<max_errors>
+
+Maximum number of errors to collect before stopping validation.
+
+=item * C<trace_on>, C<trace_limit>
+
+Enable tracing and limit the number of trace entries.
+
+=item * C<compile_on>
+
+Enable on-the-fly compilation during validation.
+
+=item * C<content_assert>
+
+Enable media-type / content assertions.
+
+=back
+
+All options are optional and backward compatible. If omitted, the instance configuration is used.
+
+=head3 Relationship to C<is_valid>
+
+L</is_valid> is a convenience wrapper around C<validate> that defaults C<< max_errors => 1 >> and is intended for fast boolean checks:
+
+    $js->is_valid( $data ) or die( $js->error );
 
 =head1 BEHAVIOUR NOTES
 
@@ -5116,7 +5390,7 @@ On failure, inspect C<< $js->error >> to retrieve the L<error object|JSON::Schem
 
 =item * Recursion & Cycles
 
-The validator guards on the pair C<(schema_pointer, instance_address)>, so self-referential schemas and cyclic instance graphs won’t infinite-loop.
+The validator guards on the pair C<(schema_pointer, instance_address)>, so self-referential schemas and cyclic instance graphs will not infinite-loop.
 
 =item * Union Types with Inline Schemas
 

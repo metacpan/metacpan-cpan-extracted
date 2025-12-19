@@ -102,7 +102,7 @@ void secret_buffer_set_len(secret_buffer *buf, size_t new_len) {
 }
 
 /* Return a pointer to some data and the length of that data, using SvPVbyte or equivalent
- * for SecretBuffer or SecretBuffer::SPan objects.
+ * for SecretBuffer or SecretBuffer::Span objects.
  */
 const char *secret_buffer_SvPVbyte(SV *thing, STRLEN *len_out) {
    secret_buffer *src_buf;

@@ -1,7 +1,15 @@
 Revision history for Perl extension Date::Holidays::US.
 
+0.09 2025-12-18
+  - Added Day before and following Christmas Day 2025 - Impacts 2025
+  - Added Day before Christmas Day 2019 and 2020 - Impacts 2019-2020
+  - Added Day following Christmas Day 2014 - Impacts 2014
+
+0.08 2025-12-18
+  - Fixed Thanksgiving Day between 1870 and 1941 - Impacts 1870-1938 when 5 Thursdays in November and 1939-1941
+
 0.07 2024-12-30
-   - Added National Day of Mourning for President Carter (Jan 9, 2025), Impacts 2025
+  - Added National Day of Mourning for President Carter (Jan 9, 2025), Impacts 2025
 
 0.06 2024-12-25
   - Added National Day of Mourning holidays, Impacts 1963, 1973, 1994, 2004, 2007, and 2018
@@ -10,7 +18,7 @@ Revision history for Perl extension Date::Holidays::US.
   - Fixed Inauguration Day logic when Jan 20th falls on a Sunday. Impacts 1985, 2013, 2041, 2069, 2097...
 
 0.04 2024-12-20
-  - Added Tuesday, December 24, 2024, the Day before Christmas Day per Executive Order
+  - Added Tuesday, December 24, 2024, the Day before Christmas Day per Executive Order. Impacts 2024
 
 0.03 2022-09-06
   - Updated holidays function to dynamically calculate dates in the year as we expand is_holiday logic

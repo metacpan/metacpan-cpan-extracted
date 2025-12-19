@@ -14,8 +14,10 @@ Files: README
  t/integration/comparison-example.t
  t/integration/complex-constructor.t
  t/integration/constant.t
+ t/integration/destructors.t
  t/integration/roles.t
  t/integration/storage.t
+ t/integration/triggers.t
 Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

@@ -16,7 +16,7 @@ App::Greple::xlate - greple 的翻译支持模块
 
 =head1 VERSION
 
-Version 0.9922
+Version 0.9923
 
 =head1 DESCRIPTION
 
@@ -323,7 +323,7 @@ B<xlate>模块可为每个文件存储翻译的缓存文本，并在执行前读
 
 C<xlate>命令与 Docker 环境协同工作，因此即使本地未安装任何东西，只要有 Docker 可用就能使用。请使用C<-D>或C<-C>选项。
 
-Docker 操作由 C<dozo> 脚本处理，也可以作为独立命令使用。C<dozo> 脚本支持使用 C<.dozorc> 配置文件来持久化容器设置。
+Docker 操作由L<App::dozo>处理，它也可以作为独立命令使用。C<dozo>命令支持C<.dozorc>配置文件以持久化容器设置。
 
 此外，由于提供了适用于各种文档样式的 makefile，无需特殊指定即可翻译成其他语言。请使用C<-M>选项。
 
@@ -379,6 +379,8 @@ L<App::Greple::xlate::gpt4>
 
 L<App::Greple::xlate::gpt5>
 
+L<App::dozo> - 由 xlate 用于容器操作的通用 Docker 运行器
+
 =over 2
 
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
@@ -387,7 +389,7 @@ Docker 容器镜像。
 
 =item * L<https://github.com/tecolicom/getoptlong>
 
-C<getoptlong.sh> 库用于在 C<xlate> 和 C<dozo> 脚本中进行选项解析。
+用于在C<xlate>脚本和L<App::dozo>中进行选项解析的C<getoptlong.sh>库。
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

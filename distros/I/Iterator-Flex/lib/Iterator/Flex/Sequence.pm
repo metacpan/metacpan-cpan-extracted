@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Scalar::Util;
 use List::Util;
@@ -216,7 +216,7 @@ Iterator::Flex::Sequence - Numeric Sequence Iterator Class
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 

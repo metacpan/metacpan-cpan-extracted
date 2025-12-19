@@ -1,5 +1,6 @@
 Changes
 CONCEPT
+examples/check_material_type.pl
 examples/material_type.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -20,7 +21,8 @@ README
 SIGNATURE
 t/MARC-Leader-Utils/01-use.t
 t/MARC-Leader-Utils/02-version.t
-t/MARC-Leader-Utils/03-material_type.t
+t/MARC-Leader-Utils/03-check_material_type.t
+t/MARC-Leader-Utils/04-material_type.t
 Utils.pm
 xt/MARC-Leader-Utils/01-pod_coverage.t
 xt/MARC-Leader-Utils/02-pod.t

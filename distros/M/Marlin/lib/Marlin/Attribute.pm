@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004000';
+our $VERSION   = '0.005000';
 
 use parent 'Sub::Accessor::Small';
 use B ();
@@ -277,7 +277,10 @@ sub _compile_init {
 		my $V = sprintf '$args{%s}', B::perlstring($init_arg);
 		my $T = do {
 			if ( $me->{trigger} ) {
-				sub { sprintf '$self->%s(%s)', $me->{trigger}, join q{, }, @_ }
+				sub {
+					$code->add_variable( $me->make_var_name('trigger'), \$me->{trigger} );
+					$me->inline_trigger('$self');
+				},
 			}
 			else {
 				sub { '' };
@@ -294,14 +297,14 @@ sub _compile_init {
 			else {
 				$V = sprintf '( exists( %s ) ? %s : %s )', $V, $V, $D;
 			}
-			$P = $T->( $me->inline_access('$self') ) . $P;
+			$P = $T->() . $P;
 		}
 		elsif ( $me->{required} and not $me->{lazy} ) {
 			$code->addf( '%s("Missing key in constructor: %s") unless exists %s;', $me->_croaker, $init_arg, $V);
 		}
 		else {
 			$C .= sprintf 'if ( exists %s ) { ', $V;
-			$P = $T->($me->inline_access('$self')) . '}' . $P;
+			$P = $T->() . '}' . $P;
 		}
 		
 		if ( $N and my $type = $me->{isa} ) {

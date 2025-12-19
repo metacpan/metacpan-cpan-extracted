@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM       => 'lib/JSON/Schema/Validate.pm',
     PL_FILES            => {},
     PREREQ_PM           => {
+        'overload'          => 0,
         'strict'            => 0,
         'utf8'              => 0,
         'warnings'          => 0,

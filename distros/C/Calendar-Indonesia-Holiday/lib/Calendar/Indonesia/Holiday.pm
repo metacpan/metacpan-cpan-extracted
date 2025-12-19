@@ -13,9 +13,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-08-14'; # DATE
+our $DATE = '2025-12-19'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.354'; # VERSION
+our $VERSION = '0.355'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -40,6 +40,8 @@ our %argsrels_date_or_day_month_year = (
     req_one => [qw/day date/],
 );
 
+our $year;
+
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'List Indonesian public holidays',
@@ -63,12 +65,14 @@ my @fixed_holidays = (
         tags       => [qw/national/],
         fixed_date => 1,
     },
-    my $christmas = {
-        day        => 25, month => 12,
-        ind_name   => "Natal",
-        eng_name   => "Christmas",
-        tags       => [qw/international religious religion=christianity/],
-        fixed_date => 1,
+    my $christmas = sub {
+        return {
+            day        => 25, month => 12,
+            ind_name   => ($year && ($year >= 2025) ? "Kelahiran Yesus Kristus" : "Natal"),
+            eng_name   => "Christmas",
+            tags       => [qw/international religious religion=christianity/],
+            fixed_date => 1,
+        };
     },
     my $labord = {
         day         => 1, month => 5,
@@ -102,8 +106,6 @@ sub _add_original_date {
         $r->{eng_name} .= " (commemorated on $opts->{original_date})";
     }
 }
-
-our $year;
 
 sub _h_chnewyear {
     my ($r, $opts) = @_;
@@ -611,8 +613,9 @@ our %year_holidays;
 
 # decreed ?
 {
+    local $year = 2002;
     my $eidulf2002;
-    $year_holidays{2002} = [
+    $year_holidays{$year} = [
         _h_chnewyear ({_expand_dm("12-02")}, {hyear=>2553}),
         _h_eidula    ({_expand_dm("23-02")}, {hyear=>1422}),
         _h_hijra     ({_expand_dm("15-03")}, {hyear=>1423}),
@@ -629,14 +632,15 @@ our %year_holidays;
         _jointlv     ({_expand_dm("05-12")}, {holiday=>$eidulf2002}),
         _jointlv     ({_expand_dm("09-12")}, {holiday=>$eidulf2002}),
         _jointlv     ({_expand_dm("10-12")}, {holiday=>$eidulf2002}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
 # decreed nov 25, 2002
 {
+    local $year = 2003;
     my $eidulf2003;
-    $year_holidays{2003} = [
+    $year_holidays{$year} = [
         _h_chnewyear ({_expand_dm("01-02")}, {hyear=>2554}),
         _h_eidula    ({_expand_dm("12-02")}, {hyear=>1423}),
         _h_hijra     ({_expand_dm("03-03")}, {hyear=>1424, original_date=>'2003-03-04'}),
@@ -653,7 +657,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("24-11")}, {holiday=>$eidulf2003}),
         _jointlv     ({_expand_dm("27-11")}, {holiday=>$eidulf2003}),
         _jointlv     ({_expand_dm("28-11")}, {holiday=>$eidulf2003}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
     my $indep2003 = clone($indep); $indep2003->{day} = 18;
     _add_original_date($indep2003, {original_date=>'2003-08-17'});
@@ -661,8 +665,9 @@ our %year_holidays;
 
 # decreed jul 17, 2003
 {
+    local $year = 2004;
     my $eidulf2004;
-    $year_holidays{2004} = [
+    $year_holidays{$year} = [
         _h_chnewyear ({_expand_dm("22-01")}, {hyear=>2555}),
         _h_eidula    ({_expand_dm("02-02")}, {hyear=>1424, original_date=>'2004-02-01'}),
         _h_hijra     ({_expand_dm("23-02")}, {hyear=>1425, original_date=>'2004-02-01'}),
@@ -741,9 +746,10 @@ our %year_holidays;
 
 # decreed jul 24, 2006
 {
+    local $year = 2007;
     my $ascension2007;
     my $eidulf2007;
-    $year_holidays{2007} = [
+    $year_holidays{$year} = [
         _h_hijra     ({_expand_dm("20-01")}, {hyear=>1428}),
         _h_chnewyear ({_expand_dm("18-02")}, {hyear=>2558}),
         _h_nyepi     ({_expand_dm("19-03")}, {hyear=>1929}),
@@ -762,16 +768,17 @@ our %year_holidays;
         _jointlv     ({_expand_dm("12-10")}, {holiday=>$eidulf2007}),
         _jointlv     ({_expand_dm("15-10")}, {holiday=>$eidulf2007}),
         _jointlv     ({_expand_dm("16-10")}, {holiday=>$eidulf2007}),
-        _jointlv     ({_expand_dm("21-12")}, {holiday=>$christmas}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("21-12")}, {holiday=>$christmas->()}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
     ];
 }
 
 # decreed feb 5, 2008 (?)
 {
+    local $year = 2008;
     my $hijra2008a;
     my $eidulf2008;
-    $year_holidays{2008} = [
+    $year_holidays{$year} = [
         ($hijra2008a =
         _h_hijra     ({_expand_dm("10-01")}, {hyear=>1429})),
         _h_chnewyear ({_expand_dm("07-02")}, {hyear=>2559}),
@@ -791,7 +798,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("29-09")}, {holiday=>$eidulf2008}),
         _jointlv     ({_expand_dm("30-09")}, {holiday=>$eidulf2008}),
         _jointlv     ({_expand_dm("03-10")}, {holiday=>$eidulf2008}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -817,7 +824,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("02-01")}, {holiday=>$newyear}),
         _jointlv     ({_expand_dm("18-09")}, {holiday=>$eidulf2009}),
         _jointlv     ({_expand_dm("23-09")}, {holiday=>$eidulf2009}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -840,7 +847,7 @@ our %year_holidays;
 
         _jointlv     ({_expand_dm("09-09")}, {holiday=>$eidulf2010}),
         _jointlv     ({_expand_dm("13-09")}, {holiday=>$eidulf2010}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -864,7 +871,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("29-08")}, {holiday=>$eidulf2011}),
         _jointlv     ({_expand_dm("01-09")}, {holiday=>$eidulf2011}),
         _jointlv     ({_expand_dm("02-09")}, {holiday=>$eidulf2011}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -887,7 +894,7 @@ our %year_holidays;
 
         _jointlv     ({_expand_dm("21-08")}, {holiday=>$eidulf2012}),
         _jointlv     ({_expand_dm("22-08")}, {holiday=>$eidulf2012}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -914,7 +921,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("06-08")}, {holiday=>$eidulf2013}),
         _jointlv     ({_expand_dm("07-08")}, {holiday=>$eidulf2013}),
         _jointlv     ({_expand_dm("14-10")}, {holiday=>$eidula2013}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -953,7 +960,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("30-07")}, {holiday=>$eidulf2014}),
         _jointlv     ({_expand_dm("31-07")}, {holiday=>$eidulf2014}),
         _jointlv     ({_expand_dm("01-08")}, {holiday=>$eidulf2014}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -984,7 +991,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("16-07")}, {holiday=>$eidulf2015}),
         _jointlv     ({_expand_dm("20-07")}, {holiday=>$eidulf2015}),
         _jointlv     ({_expand_dm("21-07")}, {holiday=>$eidulf2015}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -1012,7 +1019,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("04-07")}, {holiday=>$eidulf2016}),
         _jointlv     ({_expand_dm("05-07")}, {holiday=>$eidulf2016}),
         _jointlv     ({_expand_dm("08-07")}, {holiday=>$eidulf2016}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -1083,7 +1090,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("18-06")}, {holiday=>$eidulf2018}),
         _jointlv     ({_expand_dm("19-06")}, {holiday=>$eidulf2018}),
         _jointlv     ({_expand_dm("20-06")}, {holiday=>$eidulf2018}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -1116,7 +1123,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("03-06")}, {holiday=>$eidulf2019}),
         _jointlv     ({_expand_dm("04-06")}, {holiday=>$eidulf2019}),
         _jointlv     ({_expand_dm("07-06")}, {holiday=>$eidulf2019}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
     ];
 }
 
@@ -1159,7 +1166,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("21-08")}, {holiday=>$hijra2020}),
         _jointlv     ({_expand_dm("28-10")}, {holiday=>$mawlid2020}),
         _jointlv     ({_expand_dm("30-10")}, {holiday=>$mawlid2020}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
         _jointlv     ({_expand_dm("31-12")}, {holiday=>$eidulf2020}),
     );
 }
@@ -1252,7 +1259,7 @@ our %year_holidays;
 # -
 {
     # 2023 holidays
-    my ($chnewyear2023, $nyepi2023, $eidulf2023, $eidula2023, $vesakha2023, $christmas);
+    my ($chnewyear2023, $nyepi2023, $eidulf2023, $eidula2023, $vesakha2023);
     $year_holidays{2023} = [
         # - new year
         ($chnewyear2023 = _h_chnewyear ({_expand_dm("22-01")}, {hyear=>2574})),
@@ -1283,7 +1290,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("02-06")}, {holiday=>$vesakha2023}),
         _jointlv     ({_expand_dm("28-06")}, {holiday=>$eidula2023}),
         _jointlv     ({_expand_dm("30-06")}, {holiday=>$eidula2023}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     );
 }
 
@@ -1296,7 +1303,7 @@ our %year_holidays;
 # - decree reference for election
 {
     # 2024 holidays
-    my ($chnewyear2024, $nyepi2024, $eidulf2024, $ascension2024, $eidula2024, $vesakha2024, $christmas);
+    my ($chnewyear2024, $nyepi2024, $eidulf2024, $ascension2024, $eidula2024, $vesakha2024);
     local $year = 2024;
     $year_holidays{$year} = [
         # - new year
@@ -1329,7 +1336,7 @@ our %year_holidays;
         _jointlv     ({_expand_dm("10-05")}, {holiday=>$ascension2024}),
         _jointlv     ({_expand_dm("24-05")}, {holiday=>$vesakha2024}),
         _jointlv     ({_expand_dm("18-06")}, {holiday=>$eidula2024}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     );
 }
 
@@ -1344,7 +1351,7 @@ our %year_holidays;
 # - https://www.kemenkopmk.go.id/pemerintah-tetapkan-cuti-bersama-18-agustus-2025-untuk-peringatan-hut-ke-80-ri
 {
     # 2025 holidays
-    my ($chnewyear2025, $nyepi2025, $eidulf2025, $ascension2025, $eidula2025, $vesakha2025, $christmas);
+    my ($chnewyear2025, $nyepi2025, $eidulf2025, $ascension2025, $eidula2025, $vesakha2025);
     local $year = 2025;
     $year_holidays{$year} = [
         # - new year
@@ -1377,15 +1384,50 @@ our %year_holidays;
         _jointlv     ({_expand_dm("30-05")}, {holiday=>$ascension2025}),
         _jointlv     ({_expand_dm("18-07")}, {holiday=>$indep}),
         _jointlv     ({_expand_dm("09-06")}, {holiday=>$eidula2025}),
-        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas->()}),
     );
 }
 
+# decreed sep 19, 2024 (SKB No 1497/2025, 2/2025, 5/2025)
+#
+# ref:
+# - https://www.kemenkopmk.go.id/sites/default/files/pengumuman/2025-09/SKB%20Libur%20Nasional%20dan%20Cuti%20Bersama%20Tahun%202026.pdf
+#
 {
     # 2026 holidays
-    1;
-}
+    my ($chnewyear2026, $nyepi2026, $eidulf2026, $ascension2026, $eidula2026, $vesakha2026);
+    local $year = 2026;
+    $year_holidays{$year} = [
+        # - new year
+        _h_isramiraj ({_expand_dm("16-01")}, {hyear=>1447}),
+        ($chnewyear2026 = _h_chnewyear ({_expand_dm("17-02")}, {hyear=>2577})),
+        ($nyepi2026 = _h_nyepi({_expand_dm("19-03")}, {hyear=>1948})),
+        ($eidulf2026 = _h_eidulf({_expand_dm("21-03")}, {hyear=>1447, day=>1})),
+        _h_eidulf    ({_expand_dm("22-03")}, {hyear=>1447, day=>2}),
+        _h_goodfri   ({_expand_dm("03-04")}),
+        _h_easter    ({_expand_dm("05-04")}),
+        # - labor day
+        ($ascension2026 = _h_ascension({_expand_dm("14-05")})),
+        ($eidula2026 = _h_eidula({_expand_dm("27-05")}, {hyear=>1447})),
+        _h_vesakha   ({_expand_dm("31-05")}, {hyear=>2570}),
+        # - pancasila day
+        _h_hijra     ({_expand_dm("16-06")}, {hyear=>1448}),
+        # - independence day
+        _h_mawlid({_expand_dm("25-08")}, {hyear=>1448}),
+        # - christmas
+    ];
 
+    push @{ $year_holidays{$year} }, (
+        _jointlv     ({_expand_dm("16-02")}, {holiday=>$chnewyear2026}),
+        _jointlv     ({_expand_dm("18-03")}, {holiday=>$nyepi2026}),
+        _jointlv     ({_expand_dm("20-03")}, {holiday=>$eidulf2026}),
+        _jointlv     ({_expand_dm("23-03")}, {holiday=>$eidulf2026}),
+        _jointlv     ({_expand_dm("24-03")}, {holiday=>$eidulf2026}),
+        _jointlv     ({_expand_dm("15-05")}, {holiday=>$ascension2026}),
+        _jointlv     ({_expand_dm("28-05")}, {holiday=>$eidula2026}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas->()}),
+    );
+}
 
 my @years     = sort keys %year_holidays;
 our $min_year = $years[0];
@@ -1401,7 +1443,8 @@ for my $y (reverse @years) {
 my @holidays;
 for my $year ($min_year .. $max_year) {
     my @hf;
-    for my $h0 (@fixed_holidays) {
+    for my $h00 (@fixed_holidays) {
+        my $h0 = ref($h00) eq 'CODE' ? $h00->() : $h00;
         next if $h0->{year_start} && $year < $h0->{year_start};
         next if $h0->{year_en}    && $year > $h0->{year_end};
         my $h = clone $h0;
@@ -1771,7 +1814,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.354 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2025-08-14.
+This document describes version 0.355 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2025-12-19.
 
 =head1 SYNOPSIS
 
@@ -1857,7 +1900,7 @@ This module provides functions to list Indonesian holidays. There is a
 command-line script interface for this module: L<list-idn-holidays> and a few
 others distributed in L<App::IndonesianHolidayUtils> distribution.
 
-Calendar years supported: 1990-2025.
+Calendar years supported: 1990-2026.
 
 Note: Note that sometimes the holiday (as set by law) falls at a different date
 than the actual religious commemoration date. When you use the C<detail> option,
@@ -1901,7 +1944,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2025
+Contains data from years 1990 to 2026
 
 This function is not exported by default, but exportable.
 
@@ -2036,7 +2079,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2025
+Contains data from years 1990 to 2026
 
 This function is not exported by default, but exportable.
 
@@ -2094,7 +2137,7 @@ List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 1990 to 2025
+Contains data from years 1990 to 2026
 
 This function is not exported by default, but exportable.
 
@@ -2673,7 +2716,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2025
+Contains data from years 1990 to 2026
 
 This function is not exported by default, but exportable.
 

@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Lexical-Accessor>
 Bug tracker:  <https://github.com/tobyink/p5-lexical-accessor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.000002	2025-12-18
+
+ - Major improvements to trigger implementation.
+ - Reduce chance of collisions in the names of closed over variables.
+
 1.000001	2025-12-16
 
  - Fix default builder name to match documentation.

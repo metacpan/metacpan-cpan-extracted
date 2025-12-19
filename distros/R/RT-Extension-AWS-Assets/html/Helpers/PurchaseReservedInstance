@@ -1,0 +1,119 @@
+% $r->content_type('application/json; charset=utf-8');
+<% JSON({
+    actions => \@results,
+}) |n %>
+% $m->abort;
+
+<%INIT>
+Abort('Permission Denied')
+    unless $session{'CurrentUser'}->HasRight( Object => RT->System, Right => 'SuperUser' );
+
+my $Asset = RT::Asset->new( $session{'CurrentUser'} );
+$Asset->Load($id);
+
+my $type = $Asset->FirstCustomFieldValue('Service Type');
+Abort('Invalid Asset') unless $type =~ /^(?:EC2|RDS)$/;
+
+my $region = $Asset->FirstCustomFieldValue('Region');
+my $credentials = RT::Extension::AWS::Assets::AWSCredentials();
+my $service = Paws->service( $type, credentials => $credentials, region => $region );
+
+my $checks_failure;
+my @results;
+my $resource;
+if ( $type eq 'EC2' ) {
+    if ( $ARGS{ReservedInstancesOfferingId} ) {
+        my $result;
+        eval {
+            $result = $service->PurchaseReservedInstancesOffering(
+                InstanceCount               => 1,
+                ReservedInstancesOfferingId => $ARGS{ReservedInstancesOfferingId},
+            );
+        };
+        if ( $result && $result->ReservedInstancesId ) {
+            push @results, loc('Purchase succeeded');
+            $resource = RT::Extension::AWS::Assets::FetchSingleAssetFromAWS(
+                AWSID             => $result->ReservedInstancesId,
+                ServiceType       => $type,
+                Region            => $region,
+                ReservedInstances => 1,
+            );
+
+        }
+        else {
+            push @results, loc('Purchase might have failed, please confirm manually');
+            RT->Logger->error("Purchase reserved EC2 $ARGS{ReservedInstancesOfferingId} failed: $@");
+        }
+    }
+    else {
+        $checks_failure = 1;
+        push @results, loc('Missing ReservedInstancesOfferingId');
+    }
+}
+else {
+    if ( $ARGS{ReservedDBInstancesOfferingId} ) {
+        my $result;
+        eval {
+            $result = $service->PurchaseReservedDBInstancesOffering(
+                DBInstanceCount               => 1,
+                ReservedDBInstancesOfferingId => $ARGS{ReservedDBInstancesOfferingId},
+            );
+        };
+
+        if ( $result && $result->ReservedDBInstance ) {
+            push @results, loc('Purchase succeeded');
+            $resource = $result->ReservedDBInstance;
+            # Can't fetch it right away probably because it's still in pending state
+            # $result = RT::Extension::AWS::Assets::FetchSingleAssetFromAWS(
+            #     AWSID             => $result->ReservedDBInstance->LeaseId,
+            #     ServiceType       => $type,
+            #     Region            => $region,
+            #     ReservedInstances => 1,
+            # );
+        }
+        else {
+            push @results, loc('Purchase might have failed, please confirm manually');
+            RT->Logger->error("Purchase reserved DB $ARGS{ReservedDBInstancesOfferingId} failed: $@");
+        }
+    }
+    else {
+        $checks_failure = 1;
+        push @results, loc('Missing ReservedDBInstancesOfferingId');
+    }
+}
+
+if ( $resource ) {
+    my ($reserved_asset) = RT::Extension::AWS::Assets::InsertAWSAssets(
+        ServiceType       => $type,
+        ReservedInstances => 1,
+        AWSResources      => [$resource],
+        CurrentUser       => $session{CurrentUser},
+    );
+    if ($reserved_asset) {
+        my ( $ret, $msg )
+            = $Asset->AddLink( Target => 'asset:' . $reserved_asset->Id, Type => 'DependsOn' );
+        push @results, $msg;
+    }
+    else {
+        push @results, loc('Could not insert new reserved instance to RT');
+    }
+}
+else {
+    push @results, loc('Could not fetch new reserved instance');
+}
+
+$r->headers_out->{'HX-Trigger'} = JSON(
+    {   actionsChanged => { messages => \@results, isWarning => $checks_failure },
+        $checks_failure
+        ? ( validationFailed => [] )
+        : ( requestSucceeded => 1, collectionsChanged => { class => 'RT::Asset', id => $Asset->Id } ),
+    },
+    ascii => 1,
+);
+
+Abort( loc("Validation error"), Code => HTTP::Status::HTTP_UNPROCESSABLE_CONTENT ) if $checks_failure;
+</%INIT>
+
+<%ARGS>
+$id
+</%ARGS>

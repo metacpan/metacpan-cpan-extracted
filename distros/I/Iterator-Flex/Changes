@@ -1,5 +1,22 @@
 Revision history for Iterator-Flex
 
+0.33      2025-12-18 12:38:43 EST
+
+  [ENHANCEMENT]
+
+    * iterators have new predicates (throws_on_exhaustion,
+      returns_on_exhaustion) to determine exhaustion handling
+
+    * Iterator methods which begin with 'i' are available without the
+      leading 'i'.  The previous ones (e.g. imap, ichunk) are
+      deprecated but still available.  As these are methods on
+      existing iterators, the leading 'i' is superfluous.
+
+    * New iterator method, foreach
+
+    * Added iterator methods which track the existing adapters:
+      cat/chain, gather, take, buffer
+
 0.32      2025-10-02 14:37:03 EDT
 
   [TESTS]

@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016-2021 Joelle Maslak
+# Copyright (C) 2016-2025 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Range::Merge;
-$Range::Merge::VERSION = '2.242740';
+$Range::Merge::VERSION = '2.253531';
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ sub _range2cidr($ranges) {
 # Sorts by starting address and then by reverse (less specific to more
 # specific)
 sub _sort($ranges) {
-    my (@output) = sort { ( $a->[0] <=> $b->[0] ) || ( $b->[1] <=> $a->[0] ) } @$ranges;
+    my (@output) = sort { ( $a->[0] <=> $b->[0] ) || ( $b->[1] <=> $a->[1] ) } @$ranges;
     return \@output;
 }
 
@@ -225,7 +225,7 @@ Range::Merge - Merges ranges of data including subset/superset ranges
 
 =head1 VERSION
 
-version 2.242740
+version 2.253531
 
 =head1 SYNOPSIS
 
@@ -328,7 +328,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016-2021 by Joelle Maslak.
+This software is copyright (c) 2016-2025 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

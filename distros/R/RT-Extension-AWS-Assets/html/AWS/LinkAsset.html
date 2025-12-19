@@ -1,0 +1,96 @@
+<& /Elements/Header, Title => loc("Link Reservation #[_1]: [_2], Instance Type: [_3]", $AssetObj->id, $AssetObj->Name, $AssetObj->FirstCustomFieldValue('Instance Type')) &>
+<& /Elements/Tabs &>
+
+% $m->callback(CallbackName => 'BeforeActionList', ARGSRef => \%ARGS, Asset => $AssetObj, Results => \@results);
+
+<& /Elements/ListActions, actions => \@results &>
+
+<form action="<% RT->Config->Get('WebPath') %>/AWS/LinkAsset.html" method="post">
+<input type="hidden" name="id" value="<% $id %>" />
+<div><p class="text-center">Running with query: <% $Query %></p></div>
+
+<& /Elements/CollectionList,
+    %ARGS,
+    Collection     => $assets,
+    Query          => $Query,
+    OrderBy        => $OrderBy,
+    Order          => $Order,
+    Rows           => $Rows,
+    DisplayFormat => "'__RadioButton.{SelectedAsset}__', $Format",
+    Format         => $Format,
+    Class          => 'RT::Assets',
+    ObjectType     => 'RT::Asset',
+    AllowSorting   => 0,
+    ShowNavigation => 0,
+    InlineEdit     => 0,
+&>
+
+<& /Elements/Submit,
+    Name => "LinkReservation",
+    Caption => "Link Reservation",
+    Label => loc("Link"),
+&>
+</form>
+
+<%init>
+
+my @results;
+my $AssetObj = LoadAsset($id);
+
+$m->callback(CallbackName => 'Initial', %ARGS, AssetObj => $AssetObj);
+
+if ( $ARGS{'SelectedAsset'} ) {
+    # Add a DependedOnBy from the id on the page to the selected asset
+    my $link_asset = LoadAsset($ARGS{'SelectedAsset'});
+    my ($ok, $msg) = $link_asset->AddLink( Target => 'asset:' . $AssetObj->Id, Type => 'DependsOn' );
+
+    push @results, $msg;
+    if ( not $ok ) {
+        RT->Logger->error('Unable to add link to asset ' . $ARGS{'SelectedAsset'} . ": $msg");
+    }
+}
+
+# By default, we want to find assets in the $AWSAssetsInstanceCatalog that match
+# for EC2: Region, Service Type, Instance Type
+# for RDS: Region, Service Type, Instance Type, Engine
+
+$Query = "Catalog = '" . RT->Config->Get('AWSAssetsInstanceCatalog')
+    . "' AND Status = '__Active__'"
+    . "  AND 'CF.{Region}' = '" . $AssetObj->FirstCustomFieldValue('Region')
+    . "' AND 'CF.{Service Type}' = '" . $AssetObj->FirstCustomFieldValue('Service Type')
+    . "' AND 'CF.{Instance Type}' = '" . $AssetObj->FirstCustomFieldValue('Instance Type') . "'";
+
+if ( $AssetObj->FirstCustomFieldValue('Service Type') eq 'RDS' ) {
+    my $engine = $AssetObj->FirstCustomFieldValue('Product Description');
+
+    # Fix inconsistent postgresql vs. postgres
+    $engine = 'postgres' if $engine eq 'postgresql';
+
+    $Query .= " AND 'CF.{Engine}' = '$engine'";
+}
+
+$Query .= " AND DependsOn IS NULL";
+
+my $assets = RT::Assets->new( $session{'CurrentUser'} );
+my ($ok, $msg) = $assets->FromSQL( $Query );
+
+unless ( $ok ) {
+    RT->Logger->error("Error loading assets: $msg");
+}
+
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Path      => '/Asset/Display.html',
+    Arguments => { id => $AssetObj->Id },
+);
+
+</%init>
+<%args>
+$id      => undef
+
+$Query   => undef
+$Format  => RT->Config->Get('AWSAssetsLinkFormat')
+$Rows    => 20
+$OrderBy => RT->Config->Get('DefaultSearchResultOrderBy')
+$Order   => RT->Config->Get('DefaultSearchResultOrder')
+</%args>

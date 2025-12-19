@@ -9,7 +9,7 @@ Date::Holidays::US - Date::Holidays Adapter for US Federal holidays
 
 # DESCRIPTION
 
-Date::Holidays Adapter for US Federal holidays back to 1880 with updates from 2022.
+Date::Holidays Adapter for US Federal holidays back to 1880 with updates up to 2025.
 
 # METHODS
 
@@ -28,7 +28,7 @@ Returns a holiday name or undef given three arguments (year, month, day).
 
 ## is\_us\_holiday
 
-Wrapper around is\_holiday function per the API specification. See ["is\_holiday1" in Date::Holidays](https://metacpan.org/pod/Date::Holidays#is_holiday1)
+Wrapper around is\_holiday function per the API specification. See ["is\_holiday1" in Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays#is_holiday1)
 
 ## holidays
 
@@ -45,15 +45,13 @@ Returns a hash reference containing all of the holidays in the specified year.  
 
 ## us\_holidays
 
-Wrapper around holidays function per the API specification. See ["holidays1" in Date::Holidays](https://metacpan.org/pod/Date::Holidays#holidays1)
+Wrapper around holidays function per the API specification. See ["holidays1" in Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays#holidays1)
 
 # TODO
 
-Add Federal Holidays for President mark of respect holidays (e.g. 2007-01-02 for Gerald R. Ford, the thirty-eighth President of the United States)
-
 # SEE ALSO
 
-[Date::Holidays](https://metacpan.org/pod/Date::Holidays), [Date::Holidays::USFederal](https://metacpan.org/pod/Date::Holidays::USFederal)
+[Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) (wrapper), [Date::Holidays::USFederal](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AUSFederal) (defunct), [Date::Holidays::USExtended](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AUSExtended) (e.g., Valentine's Day, Mother's Day, etc.)
 
 # AUTHOR
 
@@ -61,6 +59,6 @@ Michael R. Davis, MRDVT
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Michael R. Davis
+Copyright (C) 2025 by Michael R. Davis
 
 MIT License

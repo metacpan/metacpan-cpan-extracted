@@ -1,5 +1,11 @@
 Revision history for Perl extension Text-Markup.
 
+0.41 2025-12-18T14:19:18Z
+   - Tweaked the Markdown configuration to generate IDs for headers and to
+     parse and emit footnotes and "smartypants" punctuation.
+   - Added the `flags` parameter to Text::Markup::Markdown::parse, which
+     replaces the default flags.
+
 0.40 2025-12-15T00:10:26Z
    - Fixed typo in `Build.PL` that prevented the recommendation to install th
      CommonMark module.

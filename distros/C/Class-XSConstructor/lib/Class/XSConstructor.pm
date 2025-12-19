@@ -6,11 +6,28 @@ use XSLoader ();
 package Class::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014001';
 
-use Exporter::Tiny 1.000000 qw( mkopt );
-use Ref::Util 0.100 qw( is_plain_arrayref is_plain_hashref is_blessed_ref is_coderef is_plain_scalarref );
+use Exporter::Tiny 1.000000 qw( mkopt _croak );
 use List::Util 1.45 qw( uniq );
+
+BEGIN {
+	if ( eval { require Types::Standard; 1 } ) {
+		Types::Standard->import(
+			qw/ is_ArrayRef is_HashRef is_ScalarRef is_CodeRef is_Object /
+		);
+	}
+	else {
+		eval q|
+			require Scalar::Util;
+			sub is_ArrayRef  ($) { ref $_[0] eq 'ARRAY' }
+			sub is_HashRef   ($) { ref $_[0] eq 'HASH' }
+			sub is_ScalarRef ($) { ref $_[0] eq 'SCALAR' or ref $_[0] eq 'REF' }
+			sub is_CodeRef   ($) { ref $_[0] eq 'CODE' }
+			sub is_Object    ($) { !!Scalar::Util::blessed($_[0]) }
+		|;
+	}
+};
 
 sub import {
 	my $class = shift;
@@ -43,20 +60,20 @@ sub import {
 			next;
 		}
 		
-		if (is_plain_arrayref($thing)) {
+		if (is_ArrayRef($thing)) {
 			%spec = @$thing;
 		}
-		elsif (is_plain_hashref($thing)) {
+		elsif (is_HashRef($thing)) {
 			%spec = %$thing;
 		}
-		elsif (is_blessed_ref($thing) and $thing->can('compiled_check') || $thing->can('check')) {
+		elsif (is_Object($thing) and $thing->can('compiled_check') || $thing->can('check')) {
 			%spec = ( isa => $thing );
 		}
-		elsif (is_coderef($thing)) {
+		elsif (is_CodeRef($thing)) {
 			%spec = ( isa => $thing );
 		}
 		elsif (defined $thing) {
-			Exporter::Tiny::_croak("What is %s???", $thing);
+			_croak("What is %s???", $thing);
 		}
 		
 		if ($name =~ /\A(.*)\!\z/) {
@@ -64,11 +81,11 @@ sub import {
 			$spec{required} = !!1;
 		}
 		
-		if (is_blessed_ref($spec{isa}) and $spec{isa}->can('compiled_check')) {
+		if (is_Object($spec{isa}) and $spec{isa}->can('compiled_check')) {
 			$type = $spec{isa};
 			$spec{isa} = $type->compiled_check;
 		}
-		elsif (is_blessed_ref($spec{isa}) and $spec{isa}->can('check')) {
+		elsif (is_Object($spec{isa}) and $spec{isa}->can('check')) {
 			# Support it for compatibility with more basic Type::API::Constraint
 			# implementations, but this will be slowwwwww!
 			$type = $spec{isa};
@@ -81,7 +98,7 @@ sub import {
 				$type->can('has_coercion')
 				and $type->has_coercion
 				and $type->can('coercion')
-				and is_blessed_ref( $c = $type->coercion )
+				and is_Object( $c = $type->coercion )
 				and $c->can('compiled_coercion') ) {
 				$spec{coerce} = $c->compiled_coercion;
 			}
@@ -92,16 +109,16 @@ sub import {
 		
 		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce)\z/, keys %spec;
 		if (@unknown_keys) {
-			Exporter::Tiny::_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
+			_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
 		}
 		
 		push @$HAS, $name;
 		push @$REQUIRED, $name if $spec{required};
 		$FLAGS->{$name} = $class->_build_flags( \%spec, $type );
-		$ISA->{$name} = $spec{isa} if is_coderef $spec{isa};
-		$COERCIONS->{$name} = $spec{coerce} if is_coderef $spec{coerce};
+		$ISA->{$name} = $spec{isa} if is_CodeRef $spec{isa};
+		$COERCIONS->{$name} = $spec{coerce} if is_CodeRef $spec{coerce};
 		$DEFAULTS->{$name} = $class->_canonicalize_defaults( \%spec ) if exists $spec{default} || defined $spec{builder};
-		$TT->{$name} = $type if is_blessed_ref($type) && $type->isa('Type::Tiny');
+		$TT->{$name} = $type if is_Object($type) && $type->isa('Type::Tiny');
 	}
 }
 
@@ -111,10 +128,10 @@ sub _canonicalize_defaults {
 	if ( defined $spec->{builder} ) {
 		return \$spec->{builder};
 	}
-	elsif ( is_coderef $spec->{default} ) {
+	elsif ( is_CodeRef $spec->{default} ) {
 		return $spec->{default};
 	}
-	elsif ( is_plain_scalarref $spec->{default} ) {
+	elsif ( is_ScalarRef $spec->{default} ) {
 		my $str = ${ $spec->{default} };
 		return eval "sub { $str }";
 	}
@@ -228,8 +245,8 @@ sub _build_flags {
 	
 	my $flags = 0;
 	$flags += 1 if $spec->{required};
-	$flags += 2 if is_coderef $spec->{isa};
-	$flags += 4 if is_coderef $spec->{coerce};
+	$flags += 2 if is_CodeRef $spec->{isa};
+	$flags += 4 if is_CodeRef $spec->{coerce};
 	$flags += 8 if exists $spec->{default} || defined $spec->{builder};
 	
 	my $has_common_default = 0;
@@ -251,10 +268,10 @@ sub _build_flags {
 	elsif ( exists $spec->{default} and _created_as_string $spec->{default} and $spec->{default} eq '' ) {
 		$has_common_default = 6;
 	}
-	elsif ( exists $spec->{default} and is_plain_scalarref $spec->{default} and ${$spec->{default}} eq '[]' ) {
+	elsif ( exists $spec->{default} and is_ScalarRef $spec->{default} and ${$spec->{default}} eq '[]' ) {
 		$has_common_default = 7;
 	}
-	elsif ( exists $spec->{default} and is_plain_scalarref $spec->{default} and ${$spec->{default}} eq '{}' ) {
+	elsif ( exists $spec->{default} and is_ScalarRef $spec->{default} and ${$spec->{default}} eq '{}' ) {
 		$has_common_default = 8;
 	}
 	
@@ -264,7 +281,7 @@ sub _build_flags {
 		my $has_common_type = _type_to_number( $type );
 		$flags += ( $has_common_type << 8 );
 	}
-	elsif ( is_coderef $spec->{isa} ) {
+	elsif ( is_CodeRef $spec->{isa} ) {
 		$flags += ( 15 << 8 );
 	}
 	
@@ -284,6 +301,7 @@ sub get_vars {
 		\%{"$package\::__XSCON_COERCIONS"},
 		\%{"$package\::__XSCON_DEFAULTS"},
 		\%{"$package\::__XSCON_TYPETINY"},
+		\%{"$package\::__XSCON_DEMOLISH"},
 	);
 }
 
@@ -311,16 +329,16 @@ sub inheritance_stuff {
 			if ( not exists $FLAGS->{$k} ) {
 				my $flags = 0;
 				$flags += 1 if grep $k eq $_, @$REQUIRED;
-				if ( is_coderef $ISA->{$k} ) {
+				if ( is_CodeRef $ISA->{$k} ) {
 					$flags += 2;
-					if ( is_blessed_ref $TT->{$k} ) {
+					if ( is_Object $TT->{$k} ) {
 						$flags += ( _type_to_number($TT->{$k}) << 8 );
 					}
 					else {
 						$flags += ( 15 << 8 );
 					}
 				}
-				$flags += 4 if is_coderef $COERCIONS->{$k};
+				$flags += 4 if is_CodeRef $COERCIONS->{$k};
 				$flags += 8 if exists $DEFAULTS->{$k};
 				$FLAGS->{$k} = $flags;
 			}
@@ -345,6 +363,29 @@ sub populate_build {
 	$BUILDALL->{$klass} = [
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
 		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($klass) }
+	];
+	
+	return;
+}
+
+sub populate_demolish {
+	my $package = ref($_[0]) || $_[0];
+	my $klass   = ref($_[1]) || $_[1];
+	
+	my $DEMOLISHALL = [ get_vars($package) ]->[9];
+	
+	if (!$klass->can('DEMOLISH')) {
+		$DEMOLISHALL->{$klass} = 0;
+		return;
+	}
+	
+	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
+	no strict 'refs';
+	
+	$DEMOLISHALL->{$klass} = [
+		reverse
+		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+		map { "$_\::DEMOLISH" } reverse @{ mro::get_linear_isa($klass) }
 	];
 	
 	return;
@@ -679,14 +720,9 @@ An easy way to do this is to use L<parent> before using Class::XSConstructor.
     use Class::XSAccessor { getters => [qw(employee_id)] };
   }
 
-=head1 BUGS
-
-Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor>.
-
 =head1 SEE ALSO
 
-L<Class::Tiny>, L<Class::XSAccessor>.
+L<Class::Tiny>, L<Class::XSAccessor>, L<Class::XSDestructor>.
 
 =head1 AUTHOR
 
@@ -698,7 +734,7 @@ To everybody in I<< #xs >> on irc.perl.org.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018-2019 by Toby Inkster.
+This software is copyright (c) 2018-2019, 2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

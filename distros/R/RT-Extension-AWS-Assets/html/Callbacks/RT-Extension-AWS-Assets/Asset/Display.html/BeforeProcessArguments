@@ -1,0 +1,43 @@
+<%init>
+
+my ($result, $message);
+
+if ( $ARGSRef->{'AWSUpdate'} && $ARGSRef->{'AWSUpdate'} eq 'true' ) {
+
+    my $reserved = 0;
+    $reserved = 1 if $AssetObj->CatalogObj->Name eq RT->Config->Get('AWSAssetsReservedInstancesCatalog');
+
+    my $asset_id_cf = 'AWS ID';
+    $asset_id_cf = 'AWS Reserved Instance ID' if $reserved;
+
+    # Make sure we have required params
+    if ( $AssetObj->FirstCustomFieldValue("$asset_id_cf")
+         && $AssetObj->FirstCustomFieldValue('Service Type')
+         && $AssetObj->FirstCustomFieldValue('Region') ) {
+
+        $result = RT::Extension::AWS::Assets::ReloadFromAWS($AssetObj, $asset_id_cf, $reserved);
+
+        if ( $result ) {
+            $message = 'Asset information updated from AWS.';
+        }
+        else {
+            $message = "Error retrieving information from AWS, ask your RT admin for details.";
+        }
+
+    }
+    else {
+        $result = 0;
+        $message = 'Set AWS ID, Service Type, and Region to load resource information from AWS.';
+    }
+}
+
+if ( $message ) {
+    push @{$ActionsRef}, $message;
+}
+
+</%init>
+<%args>
+$ARGSRef
+$AssetObj
+$ActionsRef
+</%args>

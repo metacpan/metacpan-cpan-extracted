@@ -12,6 +12,7 @@ requires 'Getopt::EX::termcolor';
 requires 'App::optex::textconv', '1.07';
 requires 'App::sdif', '4.41';
 requires 'Text::ANSI::Fold', '2.30';
+requires 'App::dozo', '0.9927';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

@@ -1,0 +1,10 @@
+<%init>
+if ( $ARGSRef->{Class} eq 'RT::Assets' ) {
+    push @$Fields, 'PurchaseReservedInstance';
+}
+</%init>
+
+<%args>
+$Fields
+$ARGSRef
+</%args>

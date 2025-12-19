@@ -16,7 +16,7 @@ App::Greple::xlate - وحدة دعم الترجمة لأداة greple
 
 =head1 VERSION
 
-Version 0.9922
+Version 0.9923
 
 =head1 DESCRIPTION
 
@@ -323,7 +323,7 @@ B<Greple> B<xlate> تعثر الوحدة على كتل النص المطلوبة
 
 يعمل أمر C<xlate> بالتنسيق مع بيئة Docker، لذا حتى إذا لم يكن لديك أي شيء مُثبّت محليًا، يمكنك استخدامه طالما أن Docker متاح. استخدم خيار C<-D> أو C<-C>.
 
-تُدار عمليات Docker بواسطة البرنامج النصي C<dozo>، والذي يمكن استخدامه أيضًا كأمر مستقل. يدعم البرنامج النصي C<dozo> ملف التهيئة C<.dozorc> لإعدادات الحاوية الدائمة.
+تتم إدارة عمليات Docker بواسطة L<App::dozo>، والذي يمكن استخدامه أيضًا كأمر مستقل. يدعم أمر C<dozo> ملف الإعدادات C<.dozorc> لإعدادات الحاوية الدائمة.
 
 أيضًا، نظرًا لتوفّر ملفات make لأنماط مستندات متنوعة، فإن الترجمة إلى لغات أخرى ممكنة دون مواصفات خاصة. استخدم خيار C<-M>.
 
@@ -379,6 +379,8 @@ L<App::Greple::xlate::gpt4>
 
 L<App::Greple::xlate::gpt5>
 
+L<App::dozo> - مشغّل Docker عام يُستخدم بواسطة xlate لعمليات الحاويات
+
 =over 2
 
 =item * L<https://hub.docker.com/r/tecolicom/xlate>
@@ -387,7 +389,7 @@ L<App::Greple::xlate::gpt5>
 
 =item * L<https://github.com/tecolicom/getoptlong>
 
-تُستخدم مكتبة C<getoptlong.sh> لتحليل الخيارات في البرنامجين النصيين C<xlate> وC<dozo>.
+مكتبة C<getoptlong.sh> المستخدمة لتحليل الخيارات في البرنامج النصي C<xlate> وL<App::dozo>.
 
 =item * L<https://github.com/DeepLcom/deepl-python>
 

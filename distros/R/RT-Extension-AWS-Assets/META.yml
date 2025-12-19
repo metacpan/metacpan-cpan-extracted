@@ -1,0 +1,31 @@
+---
+abstract: 'RT-Extension-AWS-Assets Extension'
+author:
+  - '=for html <p>All bugs should be reported via email to <a'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: gpl_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-AWS-Assets
+no_index:
+  directory:
+    - etc
+    - html
+    - inc
+requires:
+  Paws: 0
+  perl: 5.10.1
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/bestpractical/rt-extension-aws-assets
+version: '0.06'
+x_module_install_rtx_version: '0.44'
+x_requires_rt: 6.0.0
+x_rt_too_new: 6.2.0

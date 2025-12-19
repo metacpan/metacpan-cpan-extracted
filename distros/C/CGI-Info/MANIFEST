@@ -35,6 +35,7 @@ t/eof.t
 t/eol.t
 t/expect.t
 t/fixme.t
+t/fuzz.t
 t/gv.t
 t/is_mobile.t
 t/is_robot.t

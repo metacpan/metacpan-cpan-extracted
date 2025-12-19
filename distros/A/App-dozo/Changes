@@ -1,5 +1,14 @@
 Revision history for Perl extension App-dozo
 
+0.9927 2025-12-19T03:55:03Z
+
+    - require bash 4.3+ and document in INSTALLATION
+    - require getoptlong 0.2+ via [&REQUIRE] directive
+    - skip tests on bash versions older than 4.3
+    - simplify getoptlong.sh sourcing via PATH
+    - update getoptlong submodule to v0.3.0
+    - enable shallow clone for getoptlong submodule
+
 0.9926 2025-12-18T05:02:27Z
 
     - fix help output to exclude POD directives like =for html

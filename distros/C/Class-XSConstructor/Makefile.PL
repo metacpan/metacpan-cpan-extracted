@@ -23,12 +23,12 @@ my $meta = {
                                      },
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                         runtime   => {
-                                       requires => {
-                                         "Exporter::Tiny" => "1.000000",
-                                         "List::Util" => 1.45,
-                                         "perl" => 5.008008,
-                                         "Ref::Util" => "0.100",
-                                       },
+                                       recommends => { "Type::Tiny::XS" => 0, "Types::Standard" => "1.000000" },
+                                       requires   => {
+                                                       "Exporter::Tiny" => "1.000000",
+                                                       "List::Util" => 1.45,
+                                                       "perl" => 5.008008,
+                                                     },
                                      },
                         test      => {
                                        recommends => { "Types::Standard" => "1.000000" },
@@ -41,12 +41,13 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.013 },
+                        "Class::XSConstructor" => { file => "lib/Class/XSConstructor.pm", version => 0.014001 },
+                        "Class::XSDestructor"  => { file => "lib/Class/XSDestructor.pm", version => 0.014001 },
                       },
   "release_status" => "stable",
   "resources"      => {
                         bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor",
+                                          web => "https://github.com/tobyink/p5-class-xsconstructor/issues",
                                         },
                         homepage     => "https://metacpan.org/release/Class-XSConstructor",
                         license      => ["http://dev.perl.org/licenses/"],
@@ -57,7 +58,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Class-XSConstructor/project",
                       },
-  "version"        => 0.013,
+  "version"        => 0.014001,
 };
 
 my %dynamic_config;

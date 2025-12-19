@@ -2,7 +2,7 @@ NAME
     Iterator::Flex - Iterators with flexible behaviors
 
 VERSION
-    version 0.32
+    version 0.33
 
 SYNOPSIS
 DESCRIPTION
@@ -34,6 +34,8 @@ DESCRIPTION
   Where are the iterators?
     See Iterator::Flex::Common for a set of common iterators. These are
     pre-made for you. See Iterator::Flex::Manual::Using for how to use them.
+    Iterator::Flex::Base documents additional methods available to all
+    iterators.
 
   I need to write my own.
     See Iterator::Flex::Manual::Authoring for how to write your own flexible

@@ -1,5 +1,5 @@
 package Sim::OPT::Descend;
-# Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2022 by Gian Luca Brunetti.
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -20,13 +20,15 @@ use Data::Dump qw(dump);
 use Data::Dumper;
 use IO::Tee;
 use feature 'say';
+use Switch::Back;
+
 use Sim::OPT;
 use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
-use Switch::Back;
+
 
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Useqq  = 1;
@@ -40,7 +42,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.165'; # our $VERSION = '';
+$VERSION = '0.167'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -58,6 +60,31 @@ sub even
     my $number = abs shift;
     return 1 if $number == 0;
     return odd ($number - 1);
+}
+
+sub auto_objcol {
+  my ( $file ) = @_;
+  open( my $FH, '<', $file ) or die "Cannot open $file: $!";
+  my $line = <$FH>;
+  close $FH;
+
+  unless ( defined( $line ) )
+  {
+    return( 0 ); 
+  }
+  chomp $line;
+  my @f = split( /,/, $line );
+
+  my $c = 0;
+  for my $i (0 .. $#f) {
+    my $v = $f[$i];
+    # numeric? (integer/float/scientific)
+    if ( defined ( $v ) and ( $v =~ /^\s*[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?\s*$/ ) )
+    {
+      $c = $i;
+    }
+  } say $tee "!!! OBJECTIVECOLUMN: $c";
+  return( $c );
 }
 
 sub descend
@@ -174,7 +201,7 @@ sub descend
   #say $tee "RELAUNCHED IN DESCEND WITH INST " . dump( %inst );
 
   my ( $direction, $starorder );
-  if ( $outstarmode eq "yes" )
+  if ( $outstarmode eq "y" )
   {
     $direction = ${$dowhat{direction}}[$countcase][$countblock];
     $starorder = ${$dowhat{starorder}}[$countcase][$countblock];
@@ -213,7 +240,7 @@ sub descend
 
 
   my @starpositions;
-  if ( $outstarmode eq "yes" )
+  if ( $outstarmode eq "y" )
   {
     @starpositions = @{ $dowhat{starpositions} };
   }
@@ -239,21 +266,21 @@ sub descend
 
   my $repfile = $dirfiles{repfile};
 
-  if ( $fire eq "yes" )
+  if ( $fire eq "y" )
   {
     $repfile = $dirfiles{repfile} . "-fire-$stamp.csv";###DDD!!!
   }
 
   if ( not( $repfile ) ){ die; }
 
-  if ( ( not ( $fire eq "yes" ) ) and ( ( $dowhat{ga} eq "yes" ) or ( $dowhat{ga} eq "randompick" ) ) )
+  if ( ( not ( $fire eq "y" ) ) and ( ( $dowhat{ga} eq "y" ) or ( $dowhat{randompick} eq "y" ) ) )
   {
     Sim::OPT::washduplicates( $repfile );
   }
 
   my $sortmixed = $dirfiles{sortmixed};
 
-  if ( $fire eq "yes" )
+  if ( $fire eq "y" )
   {
     $sortmixed = $dirfiles{sortmixed} . "-fire-$stamp.csv";###DDD!!!
   }
@@ -300,7 +327,7 @@ sub descend
   #  sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
   #}
 
-  #say $tee " \$repfile " . dump($repfile);
+  say $tee "!!!!IN DESCEND \$repfile " . dump($repfile);
   if ( not( -e $repfile ) ){ die "There isn't \$repfile: $repfile"; };
 
 
@@ -331,13 +358,16 @@ sub descend
 
   my $throwclean = $repfile;
   $throwclean =~ s/\.csv//;
-  my $selectmixed = "$throwclean-select.csv";
+  my $selectmixed = "$throwclean-select.csv"; say $tee "!!!! \$throwclean-select.csv: $throwclean-select.csv";
 
+  
   my $remember;
 
   sub cleanselect
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
-    my ( $repfile, $selectmixed ) = @_;
+    my ( $repfile, $selectmixed, $inst_r ) = @_;
+    $inst_r ||= {};
+
     #say $tee "Cleaning results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
     open( MIXFILE, $repfile ) or die( "$!" );
     my @lines = <MIXFILE>;
@@ -351,11 +381,45 @@ sub descend
       {
         chomp $line;
         $line =~ s/\n/°/g;
-        $line =~ s/\s+/,/g;
+        #$line =~ s/\s+/,/g;
         $line =~ s/°/\n/g;
-        $line =~ s/,,/,/g;
+        #$line =~ s/,,/,/g;
+        $line =~ s/[()%]//g;
+        $line =~ s/,?//;
+        $line =~ s/,?//;
+        $line =~ s/,?//;
+        $line =~ s/ ?//;
+        $line =~ s/ ?//;
         my @elts = split(/,/, $line); #say $tee "ELTS: " . dump( @elts );
         my $touse = $elts[0];
+
+
+        ###DDDTHIS
+        $touse = Sim::OPT::clean( $touse, $mypath, $file );
+
+        if ( ( $dowhat{names} eq "short" ) and ( $touse =~ /^\d+$/ ) )
+        {
+          my $clear = $inst_r->{$touse};
+
+          if ( ( !defined($clear) ) or ( $clear eq "" ) )
+          {
+            my $k = "$mypath/$file" . "_" . $touse;
+            $clear = $inst_r->{$k};
+          }
+
+
+
+
+
+          if ( ( !defined($clear) ) or ( $clear eq "" ) )
+          {
+            die "Cannot map crypto id '$touse' to clear instance (names=short)";
+          }
+          $touse = $clear;
+        }
+
+
+
 
         my ( @elements, @names, @obtaineds, @newnames ); #say $tee "\@keepcolumns: " . dump( @keepcolumns );
         foreach my $elm_ref (@keepcolumns)
@@ -366,7 +430,7 @@ sub descend
           push ( @elements, $elts[$number] ); #say $tee "\PUSH \$elts[\$number]: " . dump( $elts[$number] );
           #say $tee "\$elts: $elts, \$number: $number";
           push ( @names, $name );
-        } #say $tee "ELEMENTS: ". dump( @elements ); #say $tee "NAMES: ". dump( @names );
+        } say $tee "ELEMENTS: ". dump( @elements ); say $tee "NAMES: ". dump( @names );
 
         if ( not ( scalar( @weighttransforms ) == 0 ) )
         {
@@ -381,22 +445,29 @@ sub descend
             push ( @newnames, $newname );
             $coun++;
           }
-          @names = @newnames;
         }
         else
         {
           @obtaineds = @elements;
+          @newnames = @names;
         }
-        #say $tee "ELEMENTS: ". dump( @elements ); #say $tee "\@obtaineds: ". dump( @obtaineds );
-        #say $tee "NAMES: ". dump( @names ); #say $tee "NEWNAMES: ". dump( @newnames );
+        say $tee "ELEMENTS: ". dump( @elements ); say $tee "\@obtaineds: ". dump( @obtaineds );
+        say $tee "NAMES: ". dump( @names ); say $tee "NEWNAMES: ". dump( @newnames );
 
         print SELECTEDMIXED "$touse,";
 
         my $coun = 0; #say $tee "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
         foreach my $elt ( @obtaineds )
         {
-          print SELECTEDMIXED "$names[$coun],";
-          print SELECTEDMIXED "$elt,";
+          print SELECTEDMIXED "$newnames[$coun],";
+          unless ( $coun == $#obtaineds )
+          {
+            print SELECTEDMIXED "$elt,";
+          }
+          else 
+          {
+            print SELECTEDMIXED "$elt";
+          }
           $coun++;
         }
         print SELECTEDMIXED "\n";
@@ -407,10 +478,10 @@ sub descend
 
   if ( $precomputed eq "" )###DDD!!!
   {
-    cleanselect( $repfile, $selectmixed );
+    cleanselect( $repfile, $selectmixed, \%inst );
   }
 
-  #say $tee "IN DESCEND AFTER CLEANSELECT; INST " . dump( %inst );
+  say $tee "IN DESCEND AFTER CLEANSELECT; INST " . dump( %inst );
 
 
   my $throw = $selectmixed;
@@ -419,8 +490,8 @@ sub descend
   sub weight
   {
     my ( $selectmixed, $weight ) = @_;
-    #say $tee "Scaling results for case " . ( $countcase + 1 ). ", block " . ( $countcase + 1 ) . ".";
-    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );
+    say $tee "Scaling results for case " . ( $countcase + 1 ). ", block " . ( $countcase + 1 ) . ".";
+    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );say $tee "!!!! \$throw-weight.csv: $throw-weight.csv";
     my @lines = <SELECTEDMIXED>;
     close SELECTEDMIXED;
 
@@ -459,7 +530,7 @@ sub descend
     foreach my $colref ( @containerone )
     {
       my @column = @{ $colref }; # DEREFERENCE
-
+    
       if ( max( @column ) != 0) # FILLS THE UNTRACTABLE VALUES
       {
         push ( @maxes, max( @column ) );
@@ -468,33 +539,33 @@ sub descend
       {
         push ( @maxes, "NOTHING1" );
       }
-
+    
       push ( @mins, min( @column ) );
-
+    
       foreach my $el ( @column )
       {
         my $eltrans;
         if ( $maxes[ $countcolm ] != 0 )
         {
-          print TOFILE "\$weights[\$countcolm]: $weights[$countcolm]\n";
+          print $tee "\$weights[\$countcolm]: $weights[$countcolm]\n";
           $eltrans = ( $el / $maxes[$countcolm] ) ;
         }
         else
         {
           $eltrans = "NOTHING2" ;
         }
-        push ( @{ $containertwo[$countcolm] }, $eltrans) ; print TOFILE "ELTRANS: $eltrans\n";
+        push ( @{ $containertwo[$countcolm] }, $eltrans) ; print $tee "ELTRANS: $eltrans\n";
       }
       $countcolm++;
     }
-    #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
-    #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
-    #say $tee "\@containernames: " . dump( @containernames );
+    say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
+    say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
+    say $tee "\@containernames: " . dump( @containernames );
 
     my $countrow = 0;
     foreach ( @lines )
     {
-      my ( @c1row, @c2row );
+      my ( @c1row, @c2row, @cnamesrow );
 
       foreach my $c1_ref ( @containerone )
       {
@@ -546,6 +617,7 @@ sub descend
       {
         print WEIGHT "$cnamesrow[$countel],";
         print WEIGHT "$el,";
+        $countel++;
       }
 
       foreach my $el ( @c2row )
@@ -565,7 +637,7 @@ sub descend
     weight( $selectmixed, $weight ); #
   }
 
-  #say $tee "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
+  say $tee "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
 
   my $weighttwo = $weight;
 
@@ -573,6 +645,12 @@ sub descend
   if ( $precomputed ne "" )###DDD!!!
   {
     $weighttwo = $repfile; ############### TAKE CARE!
+  }
+
+  if ( $objectivecolumn eq "" )
+  {
+    $dowhat{objectivecolumn} = auto_objcol( $weighttwo );
+    $objectivecolumn = $dowhat{objectivecolumn};
   }
 
 
@@ -588,18 +666,18 @@ sub descend
   {
     my ( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode,
      $instn, $inst_r, $dirfiles_r, $vehicles_r, $countcase, $countblock, $fire ) = @_;
-    #say $tee "Processing results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
-    my %inst = %{ $inst_r }; #say $tee "IN SORTMIXED \%inst" . dump( \%inst );
+    say $tee "Processing results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
+    my %inst = %{ $inst_r }; say $tee "IN SORTMIXED \%inst" . dump( \%inst );
     my %dirfiles = %{ $dirfiles_r };
     my %vehicles = %{ $vehicles_r };
 
-    if ( $searchname eq "no" )###################################
+    if ( $searchname eq "n" )###################################
     {
-      open( WEIGHTTWO, $weighttwo ) or die( "$!" ); #say $tee "IN SORTMIXED \$weighttwo" . dump( $weighttwo );
+      open( WEIGHTTWO, $weighttwo ) or die( "$!" ); say $tee "!!!!!IN SORTMIXED \$weighttwo" . dump( $weighttwo );
       my @lines = <WEIGHTTWO>;
       close WEIGHTTWO;
 
-      if ( $dirfiles{popsupercycle} eq "yes" )
+      if ( $dirfiles{popsupercycle} eq "y" )
       {
         my $openblock = pop( @{ $vehicles{nesting}{$dirfiles{nestclock}} } );
         while ( $openblock <= $countblock )
@@ -607,14 +685,14 @@ sub descend
           push( @lines, @{ $vehicles{$countcase}{$openblock} } );
           $openblock++;
         }
-        unless ( $dowhat{metamodel} eq "yes" )
+        unless ( $dowhat{metamodel} eq "y" )
         {
           $dirfiles{nestclock} = $dirfiles{nestclock} - 1;
         }
       }
 
       @lines = uniq( @lines );
-      say $tee "\$objectivecolumn: $objectivecolumn, LINES! " . dump( @lines );
+      say $tee "!!!!!!!!!!\$objectivecolumn: $objectivecolumn, FIRSTLINE! " . dump( $lines[0] ) . "OF \$weighttwo: $weighttwo";
 
       my @splitteds;
       foreach my $line ( @lines )
@@ -646,7 +724,7 @@ sub descend
           @sorted = sort { (split( ',', $b ))[ $objectivecolumn ] <=> ( split( ',', $a ))[ $objectivecolumn ] } @lines;
         }
       }
-      elsif ( ( $direction eq "star" ) and ( $outstarmode eq "yes" ) )
+      elsif ( ( $direction eq "star" ) and ( $outstarmode eq "y" ) )
       {
         if ( $starorder eq "<" )
         {
@@ -659,7 +737,7 @@ sub descend
           @sorted = sort { (split( ',', $b))[ 0 ] <=> ( split( ',', $a))[ 0 ] } @lines;
         }
       }
-      elsif ( ( $direction eq "star" ) and ( $outstarmode ne "yes" ) )
+      elsif ( ( $direction eq "star" ) and ( $outstarmode ne "y" ) )
       {
         if ( $starorder eq "<" )
         {
@@ -694,8 +772,9 @@ sub descend
 
       open( SORTMIXED, ">$sortmixed" ) or die( "$!" );
       if ( not( -e $sortmixed ) ){ die; };
+      say $tee "!!!!!!!!IN SORTMIXED \$sortmixed" . dump( $sortmixed );
 
-      open( TOTRES, ">>$totres" ) or die;
+      open( TOTRES, ">>$totres" ) or die; say $tee "!!!!!!!!IN SORTMIXED \$totres" . dump( $totres );
 
       foreach my $line ( @sorted )
       {
@@ -707,7 +786,7 @@ sub descend
       close SORTMIXED;
 
 
-      if ( $fire eq "yes" ) ###DDD!!! ATTENTION
+      if ( $fire eq "y" ) ###DDD!!! ATTENTION
       {
         open( SORTMIXED, "$sortmixed" ) or die( "$!" );
         {
@@ -727,7 +806,7 @@ sub descend
 
       #########################################à
     }
-    elsif ( $searchname eq "yes" )###################################à
+    elsif ( $searchname eq "y" )###################################à
     {
       my @theselines;
       if ( ( $weighttwo ne "" ) and ( -e $weighttwo ) )
@@ -737,7 +816,7 @@ sub descend
         close WEIGHTTWO;
       }
 
-      if ( $dirfiles{popsupercycle} eq "yes" )
+      if ( $dirfiles{popsupercycle} eq "y" )
       {
         my $openblock = pop( @{ $vehicles{nesting}{$dirfiles{nestclock}} } );
         while ( $openblock <= $countblock )
@@ -745,7 +824,7 @@ sub descend
           push( @lines, @{ $vehicles{$countcase}{$openblock} } );
           $openblock++;
         }
-        unless ( $dowhat{metamodel} eq "yes" )
+        unless ( $dowhat{metamodel} eq "y" )
         {
           $dirfiles{nestclock} = $dirfiles{nestclock} - 1;
         }
@@ -811,7 +890,7 @@ sub descend
           @sorted = sort { (split( ',', $b ))[ $objectivecolumn ] <=> ( split( ',', $a ))[ $objectivecolumn ] } @lines;
         }
       }
-      elsif ( ( $direction eq "star" ) and ( $outstarmode eq "yes" ) )
+      elsif ( ( $direction eq "star" ) and ( $outstarmode eq "y" ) )
       {
         if ( $starorder eq "<" )
         {
@@ -824,7 +903,7 @@ sub descend
           @sorted = sort { (split( ',', $b))[ 0 ] <=> ( split( ',', $a))[ 0 ] } @lines;
         }
       }
-      elsif ( ( $direction eq "star" ) and ( $outstarmode ne "yes" ) )
+      elsif ( ( $direction eq "star" ) and ( $outstarmode ne "y" ) )
       {
         if ( $starorder eq "<" )
         {
@@ -840,7 +919,7 @@ sub descend
         }
       }
 
-      say $tee "SORTED!!: " . dump( @sorted );
+      say $tee "!!! SORTED!!: " . dump( @sorted );
 
       open ( ORDEREDFILE, ">>$orderedfile" ) or die;
       open( TOTRES, ">>$totres" ) or die;
@@ -856,14 +935,13 @@ sub descend
     }#######################################################
     close SORTMIXED;
   } ### END SUB sortmixed
-
   close SORTMIXED;
   if ( not( -e $weighttwo) ){ die; };
   if ( not( $sortmixed) ){ die; };
   my $firedvalue = sortmixed( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode,
   $instn, \%inst, \%dirfiles, \%vehicles, $countcase, $countblock, $fire );
 
-  #say $tee "IN DESCEND AFTER SORTMIXED; INST " . dump( %inst );
+  say $tee "IN DESCEND AFTER SORTMIXED; INST " . dump( %inst );
 
   if ( $firedvalue ne "" )
   {
@@ -900,7 +978,7 @@ sub descend
     my %varnums = %{ $varnums_r };
     close SORTMIXED;
 
-		if ( $dowhat{metamodel} eq "yes" )
+		if ( $dowhat{metamodel} eq "y" )
 		{
 		  sub cleanres
 		  {
@@ -1055,7 +1133,7 @@ sub descend
 	      foreach my $blankline ( @blanklines )
 	      {
 	        chomp $blankline;
-	        my $signal = "no";
+	        my $signal = "n";
 	        foreach my $ordline ( @ordlines )
 	        {
 	          chomp $ordline;
@@ -1063,10 +1141,10 @@ sub descend
 	          if ( ( $row[0] =~ /$blankline/ ) or ( /$blankline/ =~ $row[0] ) )
 	          {
 	            say PREPFILE "$blankline" . "," . "$row[1]" ;
-	            $signal = "yes";
+	            $signal = "y";
 	          }
 	        }
-	        if ( $signal eq "no" )
+	        if ( $signal eq "n" )
 	        {
 	          say PREPFILE $blankline ;
 	        }
@@ -1151,7 +1229,7 @@ sub descend
     my ( $sortmixed, $carrier_r, $blockelts_r, $searchname, $orderedfile, $direction, $starorder, $mids_r,
     $blocks_r, $totres, $objectivecolumn, $ordres, $starpositions_r, $countstring, $starnumber, $ordtot,
     $file, $ordmeta, $orderedfile, $dirfiles_r, $countcase, $countblock, $varnums_r, $vehicles_r, $inst_r ) = @_;
-    my %carrier = %{ $carrier_r };
+    my %carrier = %{ $carrier_r }; say $tee "HERE 3 CARRIER: " . dump( \%carrier );
     my @blockelts = @{ $blockelts_r };
     my @blocks = @{ $blocks_r };
     my @starpositions = @{ $starpositions_r };
@@ -1160,17 +1238,17 @@ sub descend
     my %vehicles = %{ $vehicles_r };
     my $slicenum = $dirfiles->{slicenum};
     my %inst = %{ $inst_r };
-    #say $tee "HERE 3 CARRIER: " . dump( \%carrier );
+    
 
     close SORTMIXED;
     my @lines;
-    if ( $searchname eq "no" )
+    if ( $searchname eq "n" )
     {
       open( SORTMIXED, $sortmixed ) or die( "$!" );
       @lines = <SORTMIXED>;
       close SORTMIXED;
     }
-    elsif ( $searchname eq "yes" )
+    elsif ( $searchname eq "y" )
     {
       open( ORDEREDFILE, $orderedfile ) or die( "$!" );
       @lines = <ORDEREDFILE>;
@@ -1186,7 +1264,7 @@ sub descend
     my $winnerentry;
     if ( ( $direction eq ">" ) or ( ( $direction eq "star"  ) and ( $starorder eq ">"  ) ) )
     {
-      $winnerentry = $lines[0];
+      $winnerentry = $lines[0]; say $tee "!!! \$winnerenty = \$lines[0]: $winnerenty";
       if ( scalar( @{ $vehicles{nesting}{$dirfiles{nestclock}} } ) > 0 )
       {
         push( @{ $vehicles{$countcase}{$countblock} }, @lines[0..$slicenum]);
@@ -1211,8 +1289,8 @@ sub descend
     }
     chomp $winnerentry;
 
-    my @winnerelms = split( /,/, $winnerentry );
-    my $winneritem = $winnerelms[0];
+    my @winnerelms = split( /,/, $winnerentry ); say $tee "!!! \@winnerelms: " . dump( @winnerelms );
+    my $winneritem = $winnerelms[0]; say $tee "!!! \$winneritem: $winneritem";
 
     #say $tee "HERE WINNERITEM BEFORE CLEANING: $winneritem.";
     $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
@@ -1258,15 +1336,15 @@ sub descend
     {
       #if ( $sourceblockelts[0] =~ />/ )
       #{
-      #  $dirfiles{starsign} = "yes";
+      #  $dirfiles{starsign} = "y";
       #}
 
-      if ( ( $dirfiles{starsign} eq "yes" ) or
-    			( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-          ( ( $dirfiles{randompick} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-    			( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-    			( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-    			( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) ) ### BEGINNING OF THE PART ON STAR CONFIGURATIONS
+      if ( ( $dirfiles{starsign} eq "y" ) or
+    			( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    			( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    			( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) ) ### BEGINNING OF THE PART ON STAR CONFIGURATIONS
       {
         open( TOTRES, "$totres" ) or die;
         my @lins = <TOTRES>;
@@ -1301,7 +1379,7 @@ sub descend
           }
           else
           {
-            #say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+            say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
           }
         }
 
@@ -1349,7 +1427,7 @@ sub descend
               }
               else
               {
-                #say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+                say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
               }
             }
             elsif ( $direction eq "star" )
@@ -1364,7 +1442,7 @@ sub descend
               }
               else
               {
-                #say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+                say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
               }
             }
 
@@ -1381,13 +1459,13 @@ sub descend
         my @morphcases = grep -d, <$mypath/$file_*>;
         unless ( $direction eq "star" )
         {
-          #say $tee "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";
+          say $tee "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";
         }
 
         @totalcases = uniq( @totalcases );
         my $netinstnum = scalar( @totalcases );
 
-        #say $tee "#Net number of instances: $netinstnum." ;
+        say $tee "#Net number of instances: $netinstnum." ;
         open( RESPONSE , ">>$mypath/response.txt" );
         unless ( $direction eq "star" )
         {
@@ -1412,7 +1490,7 @@ sub descend
           }
           else
           {
-            #say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
+            say $tee "THE OBJECTIVE IS NOT CLEAR IN THE \%dowhat PARAMETER OF THE CONFIGURATION FILE.";
           }
 
           my $num = scalar( @lines );
@@ -1433,7 +1511,7 @@ sub descend
           $direction, $starorder, $ordmeta, \%varnums, $countblock );
 
         my @lines;
-        if ( $dirfiles{metamodel} eq "yes" )
+        if ( $dirfiles{metamodel} eq "y" )
         {
           open( ORDMETA, $ordmeta ) or die( "$!" );
           @lines = <ORDMETA>;
@@ -1441,13 +1519,13 @@ sub descend
         }
         else
         {
-          if ( $searchname eq "no" )
+          if ( $searchname eq "n" )
           {
             open( SORTMIXED, $sortmixed ) or die( "$!" );
             @lines = <SORTMIXED>;
             close SORTMIXED;
           }
-          elsif ( $searchname eq "yes" )
+          elsif ( $searchname eq "y" )
           {
             open( ORDEREDFILE, $orderedfile ) or die( "$!" );
             @lines = <ORDEREDFILE>;
@@ -1489,9 +1567,9 @@ sub descend
         chomp $winnerentry;
 
 
-        if ( $dirfiles{popsupercycle} = "yes" )
+        if ( $dirfiles{popsupercycle} = "y" )
         {
-          $dirfiles{launching} = "yes";
+          $dirfiles{launching} = "y";
           my $revealnum = $dirfiles{revealnum} - 1;
           my $revealfile = $file . "_" . "reveal-" . "$countcase-$countblock.csv";
           my @group = @lines[0..$revealnum];
@@ -1511,14 +1589,14 @@ sub descend
               push( @instancees, $instance );
               if ( $dowhat{morph} eq "y" )
               {
-                #say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
               if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
               {
 
-                #say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
                   $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
                     { instances => \@instancees, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles, inst => \%inst } );
@@ -1530,28 +1608,55 @@ sub descend
               }
             }
           }
-          if ( $dowhat{metamodel} eq "yes" )
+          if ( $dowhat{metamodel} eq "y" )
           {
             $dirfiles{nestclock} = $dirfiles{nestclock} - 1;
           }
-          $dirfiles{launching} = "no";
+          $dirfiles{launching} = "n";
         }
 
-        my @winnerelms = split( /,/, $winnerentry );
-        my $winneritem = $winnerelms[0];
+        my @winnerelms = split( /,/, $winnerentry ); say $tee "!!!! \@winnerelms: " . dump( @winnerelms );
+        my $winneritem = $winnerelms[0]; say $tee "!!!! \$winnerelms[0]: " . dump( $winnerelms[0] );
 
         $countblock = 0;
         $countcase++; ####!!!
 
         $countstring++;
         $dirfiles{countstring} = $countstring;
+
+
+        ###DDDTHIS
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
+
+
+
+
+        if ( ( $dowhat{names} eq "short" ) and ( $winneritem =~ /^\d+$/ ) )
+        {
+          my $clear = $inst{$winneritem};
+          if ( (!defined($clear) ) or ( $clear eq "") )
+          {
+            my $k = "$mypath/$file" . "_" . $winneritem;
+            $clear = $inst{$k};
+          }
+
+          if ( ( !defined($clear) ) and ( $clear eq "" ) )
+          {
+            die "Cannot map crypto winner '$winneritem' to clear instance (names=short)";
+          }
+            
+          $winneritem = $clear;
+        }
+
+
 
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
 
+
+
         @varnumbers = @{ dclone( $dirfiles{varnumbershold} ) };
         @miditers = @{ dclone( $dirfiles{miditershold} ) };
-
+        say $tee "WINNERITEMS: " . dump( @winneritems );
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
@@ -1560,16 +1665,16 @@ sub descend
       } ### END OF THE PART ON STAR CONFIGURATIONS
       else
       {
-        #say $tee "IN CASE END NOT STARSIGN.";
+        say $tee "IN CASE END NOT STARSIGN.";
         $countblock = 0;
         $countcase++; ####!!!
 
         $countstring++;
         $dirfiles{countstring} = $countstring;
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
-
+        say $tee "\$winneritem: " . dump( $winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
-
+        say $tee "WINNERITEMS: " . dump( @winneritems );
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
@@ -1579,12 +1684,12 @@ sub descend
     }
     elsif( $countblock < $#blocks )
     {
-      if ( ( $dirfiles{starsign} eq "yes" ) or
-    			( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-          ( ( $dirfiles{randompick} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-    			( ( $dirfiles{latinhypercube} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-    			( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
-    			( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) )
+      if ( ( $dirfiles{starsign} eq "y" ) or
+    			( ( $dirfiles{random} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+          ( ( $dirfiles{randompick} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    			( ( $dirfiles{latinhypercube} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
+    			( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) )
       { ### BEGINNING OF THE PART ABOUT STAR CONFIGURATIONS
         my $metafile = $sortmixed . "_tmp_meta.csv";
         my $ordmeta = $sortmixed . "_ordmeta.csv";
@@ -1595,7 +1700,7 @@ sub descend
           $direction, $starorder, $ordmeta, \%varnums, $countblock );
 
         my @lines;
-        if ( $dirfiles{metamodel} eq "yes" )
+        if ( $dirfiles{metamodel} eq "y" )
         {
           open( ORDMETA, $ordmeta ) or die( "$!" );
           @lines = <ORDMETA>;
@@ -1603,13 +1708,13 @@ sub descend
         }
         else
         {
-          if ( $searchname eq "no" )
+          if ( $searchname eq "n" )
           {
             open( SORTMIXED, $sortmixed ) or die( "$!" );
             @lines = <SORTMIXED>;
             close SORTMIXED;
           }
-          elsif ( $searchname eq "yes" )
+          elsif ( $searchname eq "y" )
           {
             open( ORDEREDFILE, $orderedfile ) or die( "$!" );
             @lines = <ORDEREDFILE>;
@@ -1645,9 +1750,9 @@ sub descend
         }
         chomp $winnerentry;
 
-        if ( $dirfiles{popsupercycle} = "yes" )
+        if ( $dirfiles{popsupercycle} = "y" )
         {
-          $dirfiles{launching} = "yes";
+          $dirfiles{launching} = "y";
           my $revealnum = $dirfiles{revealnum} - 1;
           my $revealfile = $file . "_" . "reveal-" . "$countcase-$countblock.csv";
           my @group = @lines[0..$revealnum];
@@ -1667,7 +1772,7 @@ sub descend
               push( @instancees, $instance );
               if ( $dowhat{morph} eq "y" )
               {
-                #say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+                say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
                 my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
               }
 
@@ -1692,7 +1797,7 @@ sub descend
               #}
             }
           }
-          $dirfiles{launching} = "no";
+          $dirfiles{launching} = "n";
         }
 
         my @winnerelms = split( /,/, $winnerentry );
@@ -1706,7 +1811,7 @@ sub descend
         @miditers = @{ dclone( $dirfiles{miditershold} ) };
 
         $countblock++; ### !!!        push ( @{ $winneritems[$countcase][$countblock + 1] }, $winneritem );
-
+        say $tee "WINNERITEMS: " . dump( @winneritems );
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
         miditers => \@miditers,  winneritems => \@winneritems,
         dirfiles => \%dirfiles, varnumbers => \@varnumbers,
@@ -1714,11 +1819,11 @@ sub descend
         sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
       } ### END OF THE PART ABOUT STAR CONFIGURATIONS
       else
-      { #say $tee "RELAUNCHING WITH INST " . dump( %inst );
+      { say $tee "!!!! RELAUNCHING WITH INST " . dump( %inst ); 
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
-
+        say $tee "!!!! \winneritem: " . dump( @winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
-
+        say $tee "!!!! WINNERITEMS: " . dump( @winneritems );
         $countblock++; ### !!!
 
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
@@ -1774,7 +1879,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

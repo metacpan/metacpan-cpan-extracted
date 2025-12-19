@@ -36,7 +36,7 @@ dozo -I IMAGE \[ options \] \[ command ... \]
 
 # VERSION
 
-Version 0.9926
+Version 0.9927
 
 # USAGE
 
@@ -83,6 +83,8 @@ To install the latest version from GitHub:
 
 Alternatively, you can simply place `dozo` and `getoptlong.sh` in
 your PATH.
+
+**Dôzo** requires Bash 4.3 or later.
 
 # DESCRIPTION
 

@@ -12,13 +12,12 @@ use Object::Configure 0.12;
 use File::Spec;
 use Log::Abstraction 0.10;
 use Params::Get 0.13;
-use Params::Validate::Strict 0.11;
+use Params::Validate::Strict 0.21;
 use Net::CIDR;
 use Return::Set;
 use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
-use Log::Any qw($log);
 # use Cwd;
 # use JSON::Parse;
 use List::Util ();	# Can go when expect goes
@@ -35,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =head1 SYNOPSIS
 
@@ -172,7 +171,7 @@ sub new
 
 	# Validate logger object has required methods
 	if(defined $params->{'logger'}) {
-		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('warn') && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
 			Carp::croak("Logger must be an object with info() and error() methods");
 		}
 	}
@@ -209,6 +208,20 @@ thus avoiding hard-coded paths into forms.
 	my $script_name = $info->script_name();
 	# ...
 	print "<form method=\"POST\" action=$script_name name=\"my_form\">\n";
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+  {
+    type => 'string',
+    'min' => 1,
+    'nomatch' => qr/^[\/\\]/	# Does not return absolute path
+  }
 
 =cut
 
@@ -668,6 +681,7 @@ sub params {
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
 		} elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
+			# TODO:  Do I really need this anymore?
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",
 				"Enter key=value pairs - end with quit\n";
@@ -689,6 +703,8 @@ sub params {
 		if(my $query = $ENV{'QUERY_STRING'}) {
 			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
 				$self->_warn('Multipart/form-data not supported for GET');
+				$self->{status} = 501;	# Not implemented
+				return;
 			}
 			$query =~ s/\\u0026/\&/g;
 			@pairs = split(/&/, $query);
@@ -915,7 +931,8 @@ sub params {
 						$value = Params::Validate::Strict::validate_strict({
 							schema => { $key => $schema },
 							args => { $key => $value },
-							unknown_parameter_handler => 'warn',
+							unknown_parameter_handler => 'die',
+							logger => $self->{'logger'}
 						});
 					};
 					if($@) {
@@ -923,7 +940,13 @@ sub params {
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
-					$value = $value->{$key};
+					if(scalar keys %{$value}) {
+						$value = $value->{$key};
+					} else {
+						$self->_info("Block $key = $value");
+						$self->status(422);
+						next;	# Skip to the next parameter
+					}
 				}
 			}
 		}
@@ -1069,6 +1092,8 @@ sub param {
 
 sub _sanitise_input($) {
 	my $arg = shift;
+
+	return if(!defined($arg));
 
 	# Remove hacking attempts and spaces
 	$arg =~ s/[\r\n]//g;
@@ -1314,15 +1339,43 @@ Useful for debugging or generating keys for a cache.
     my $string_representation = $info->as_string();
     my $raw_string = $info->as_string({ raw => 1 });
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    raw => {
+      'type' => 'boolean',
+      'optional' => 1,
+    }
+  }
+
+=head4 OUTPUT
+
+  {
+    type => 'string',
+    optional => 1,
+  }
+
 =cut
 
 sub as_string
 {
 	my $self = shift;
 
+	my $args = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params(undef, @_) || {},
+		schema => {
+			raw => {
+				'type' => 'boolean',
+				'optional' => 1
+			}
+		}
+	});
+
 	# Retrieve object parameters
 	my $params = $self->params() || return '';
-	my $args = Params::Get::get_params(undef, @_);
+
 	my $rc;
 
 	if($args->{'raw'}) {
@@ -1443,6 +1496,9 @@ sub tmpdir {
 		if((-d $dir) && (-w $dir)) {
 			return $self->_untaint_filename({ filename => $dir });
 		}
+	}
+	if($params->{'default'} && ref($params->{'default'})) {
+		croak(ref($self), ': tmpdir must be given a scalar');
 	}
 	return $params->{default} ? $params->{default} : File::Spec->tmpdir();
 }
@@ -1860,23 +1916,8 @@ Deprecated - use cookie() instead.
 
 sub get_cookie {
 	my $self = shift;
-	my $params = Params::Get::get_params('cookie_name', @_);
 
-	# Validate field argument
-	if(!defined($params->{'cookie_name'})) {
-		$self->_warn('cookie_name argument not given');
-		return;
-	}
-
-	# Load cookies if not already loaded
-	unless($self->{jar}) {
-		if(defined $ENV{'HTTP_COOKIE'}) {
-			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
-		}
-	}
-
-	# Return the cookie value if it exists, otherwise return undef
-	return $self->{jar}->{$params->{'cookie_name'}};
+	return $self->cookie(\@_);
 }
 
 =head2 cookie
@@ -1891,15 +1932,60 @@ it will replace the "get_cookie" method in the future.
     my $name = CGI::Info->new()->cookie('name');
     print "Your name is $name\n";
 
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    cookie_name => {
+      'type' => 'string',
+      'min' => 1,
+      'matches' => qr/^[!#-'*+\-.\^_`|~0-9A-Za-z]+$/	# RFC6265
+    }
+  }
+
+=head4 OUTPUT
+
+Cookie not set: C<undef>
+
+Cookie set:
+
+  {
+    type => 'string',
+    optional => 1,
+    matches => qr/	# RFC6265
+      ^
+      (?:
+        "[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*"   # quoted
+      | [\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*     # unquoted
+      )
+      $
+    /x
+  }
+
 =cut
 
-sub cookie {
-	my ($self, $field) = @_;
+sub cookie
+{
+	my $self = shift;
+        my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params('cookie_name', @_),
+		schema => {
+			cookie_name => {
+				'type' => 'string',
+				'min' => 1,
+				'matches' => qr/^[!#-'*+\-.\^_`|~0-9A-Za-z]+$/	# RFC6265
+			}
+		}
+	});
+
+	my $field = $params->{'cookie_name'};
 
 	# Validate field argument
 	if(!defined($field)) {
-		$self->_warn('what cookie do you want?');
-		return;
+		$self->_error('what cookie do you want?');
+		Carp::croak('what cookie do you want?');
 	}
 
 	# Load cookies if not already loaded
@@ -2034,13 +2120,15 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
-	# FIXME: add caller's function
-	# if(($level eq 'warn') || ($level eq 'info')) {
-		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
-	# }
+	if(ref($self) && scalar(@messages)) {
+		# FIXME: add caller's function
+		# if(($level eq 'warn') || ($level eq 'info')) {
+			push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
+		# }
 
-	if(scalar(@messages) && (my $logger = $self->{'logger'})) {
-		$self->{'logger'}->$level(join('', grep defined, @messages));
+		if(scalar(@messages) && (my $logger = $self->{'logger'})) {
+			$self->{'logger'}->$level(join('', grep defined, @messages));
+		}
 	}
 }
 
@@ -2072,6 +2160,17 @@ sub _warn {
 	$self->_log('warn', $params->{'warning'});
 	if(!defined($self->{'logger'})) {
 		Carp::carp($params->{'warning'});
+	}
+}
+
+# Emit an error message somewhere
+sub _error {
+	my $self = shift;
+	my $params = Params::Get::get_params('warning', @_);
+
+	$self->_log('error', $params->{'warning'});
+	if(!defined($self->{'logger'})) {
+		Carp::croak($params->{'warning'});
 	}
 }
 

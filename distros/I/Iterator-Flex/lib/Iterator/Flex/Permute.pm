@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( :IterAttrs :IterStates throw_failure );
@@ -352,7 +352,7 @@ Iterator::Flex::Permute - Permute Iterator Class
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 

@@ -1,6 +1,6 @@
 package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
-# Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
+# Author: Gian Luca Brunetti. (gianluca.brunetti@polimi.it)
 # Copyright reserved.  2018-2024.
 # GPL License 3.0 or newer.
 # This is a program for filling a design space multivariate discrete dataseries
@@ -28,6 +28,7 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
+
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted or commented.
 
 our @ISA = qw( Exporter );
@@ -168,7 +169,7 @@ sub adjustmode
 sub preparearr
 {
   my @lines = @_;
-  my $optformat = "yes";
+  my $optformat = "y";
   my @arr;
   if ( $lines[1] =~ /_/ )
   {
@@ -190,7 +191,7 @@ sub preparearr
   }
   else
   {
-    $optformat = "no";
+    $optformat = "n";
     my @arrnumbers;
     foreach my $line ( @lines )
     {
@@ -437,11 +438,11 @@ sub calcdist
       $strength = ( 1 - $dist );
     }
 
-    if ( ( $el3 ne "" ) and ( $elt3 ne "" ) and ( $condweight = "yes") )
+    if ( ( $el3 ne "" ) and ( $elt3 ne "" ) and ( $condweight = "y") )
     {
       $strength = ( $strength * $el3 * $elt3 );
     }
-    elsif ( ( $elt3 ne "" ) and ( $condweight = "yes") )
+    elsif ( ( $elt3 ne "" ) and ( $condweight = "y") )
     {
       $strength = ( $strength * $elt3 );
     }
@@ -517,7 +518,7 @@ sub calcdistgrad
       $strength = ( 1 - $dist );
     }
 
-    if ( ( $el3 ne "" ) and ( $elt3 ne "" ) and ( $condweight = "yes") )
+    if ( ( $el3 ne "" ) and ( $elt3 ne "" ) and ( $condweight = "y") )
     {
       $strength = ( $strength * $el3 * $elt3 );
     }
@@ -1444,7 +1445,7 @@ sub wei
     }
   }
 
-  if ( $fulldo eq "yes" )
+  if ( $fulldo eq "y" )
   {
     %bank = ();
   }
@@ -1826,7 +1827,7 @@ sub mixlimbo
     }
     else
     {
-      if ( not ( $linearprecedence eq "no" ) )
+      if ( not ( $linearprecedence eq "n" ) )
       {unless ( $pos1 == $pos2 )
           {
             my $diffp = ( $pos1 - $pos2 );
@@ -1975,10 +1976,10 @@ sub interlinear
   #my @mode = ( "wei", "near", "near", "purelin" ); # a sequence
   @weights = (  ); #my @weights = ( 0.7, 0.3 ); # THE FIRST IS THE WEIGHT FOR linear interpolation, THE SECOND FOR nearest neighbour.
   # THEY ARE FRACTIONS OF 1 AND MUST GIVE 1 IN TOTAL. IF THE VALUES ARE UNSPECIFIED (IE. IF THE ARRAY IS EMPTY), THE VALUES ARE UNWEIGHTED.
-  $linearprecedence = "no"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "yes", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "no", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
+  $linearprecedence = "n"; # PRECEDENCE TO LINEAR INTERPOLATES. IF "y", THE VALUES DERIVED FROM LINEAR INTERPOLATION, WHERE PRESENT, WILL SUPERSEDE THE VALUES DERIVED FROM THE NEAREST NEIGHBUR STRATEGY. IF "n", THE OPPOSITE. IT CAN BE ACTIVE ONLY IF LOGARITHMIC IS OFF. IT WORKS WITH "LINEAR" AND "EXPONENTIAL"
   $relaxmethod = "logarithmic"; #It is relative to the "linnear" method. Options: "logarithmic", "linear" or "exponential". THE FARTHER NEIGHBOURS ARE WEIGHT LESS THAN THE NEAREST ONES: INDEED, LOGARITHMICALLY, LINEARLY OR EXPONENTIALLY. THE LOGARITHM BASE IS $relaxlimit OR $nearrelaxlimit, DEPENDING FROM THE CONTEXT. THE LINEAR MULTIPLICATOR OR THE EXPONENT IS DEFINED BY $overwerightnearest.
   $relaxlimit = 1; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF PURE LINEAR INTERPOLATION. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INTERPOLATES ALSO NEAREST NEIGHBOURS. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS.
-  $overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "yes". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
+  $overweightnearest = 1; #A NUMBER. IT IS MADE NULL BY THE $logarithmicrelax "y". THE HIGHER THE NUMBER, THE GREATER THE OVERWEIGHT GIVEN TO THE NEAREST. IN THIS MANNER, THE OVERWEIGHT IS NOT LOGARITHMIC, LIKE IT WHERE OTHERWISE, BUT LINEAR. THIS SLOWS DOWN THE COMPUTATIONS. UNLESS THE OVERWEIGHT IS 1, WHICH MAKES THE OVERWEIGHTING NULL.
   $nearrelaxlimit = 0; #THIS IS THE CEILING FOR THE RELAXATION OF THE RELATIONS OF THE NEAREST NEIGHBOUR STRATEGY. For greatest precision: 0, or a negative number near 0. IF > = 0, THE PROGRAM INCREASES THE DISTANCE OF THE NEAREST NEIGHBOURS INCLUDED. THE HIGHER THE NUMBER, THE FARTHER THE NEIGHBOURS. ONE IS NOT LIKELY TO WANT TO USE THIS OPTION.
   $nearconcurrencies = 1; #Requested minimum number of concurrencies for the nearest neighbour method. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
   $parconcurrencies = 1; #Requested minimum number of concurrencies for the linear interpolations for each parameter of each instance. Minimum value: 1. The more the requested concurrencies, the greatest the precision, the slowest the convergence.
@@ -1996,11 +1997,11 @@ sub interlinear
   $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIABILITY) TELLING HOW WELL-ROOTED IN SIMULATED REALITY A DERIVED POINT MUST BE FOR MERGING IT IN THE CALCULATIONS FOR MERGING IT IN THE METAMODEL. A VALUE BETWEEN 1 (JUST SIMULATED POINT) AND 0 (SIMULATED POINTS AND "META"POINTS WITH THE SAME RIGHT ) MUST BE SPECIFIED. If 0, no entry barrier.
   $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
   $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
-  $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
+  $condweight = "y"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
   $nfiltergrads = ""; # DO NOT USE. do not take into account the gradients which in the ranking of strengths are below a certain position. If unspecified: inactive.
   $limit_checkdistgrads = ""; # LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF GRADIENTS. IF NULL, NO BARRIER. AS A NUMBER, 1/5 OR 1/10 OF THE TOTAL INSTANCES SHOULD BE A GOOD PLACE TO START AS A COMPROMISE BETWEEN SPEED AND RELIABILITY.
   $limit_checkdistpoints = ""; # DO NOT USE. LIMIT OF RELATIONS TAKEN INTO ACCOUNT IN CALCULATING THE NET OF POINTS. IF NULL, NO BARRIER. 10000 IS A GOOD COMPROMISE BETWEEN SPEED AND RELIABILITY.
-  $fulldo = "no"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "yes" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
+  $fulldo = "n"; # TO SEARCH FOR MAXIMUM PRECISION AT THE EXPENSES OF SPEED. "y" MAKES THE GRADIENTS BE RECALCULATED AT EACH COMPUTATION CYCLE.
   $lvconversion = "";
   $limitgrads = "";
   #@weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" );
@@ -2254,11 +2255,11 @@ sub printend
   open( NEWFILE, ">$newfile" ) or die;
   foreach my $entry ( @arr )
   {
-    if ( $optformat eq "yes" )
+    if ( $optformat eq "y" )
     {
       print NEWFILE "$entry->[0],$entry->[2]\n";
     }
-    elsif ( $optformat eq "no" )
+    elsif ( $optformat eq "n" )
     {
       my $coun = 0;
       foreach my $item ( @{ $entry->[1] } )
@@ -2447,7 +2448,7 @@ Gian Luca Brunetti (2018-24) E<lt>gianluca.brunetti@polimi.itE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 
-Copyright (C) 2018-22 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or newer.
+Copyright (C) 2018-22 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or newer.
 
 
 =cut

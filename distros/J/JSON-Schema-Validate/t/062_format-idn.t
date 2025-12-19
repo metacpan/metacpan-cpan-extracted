@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( 'Cannot load JSON::Schema::Validate' );
-}
+};
 
 my $have_idn = eval{ require Net::IDN::Encode; 1 } ? 1 : 0;
 

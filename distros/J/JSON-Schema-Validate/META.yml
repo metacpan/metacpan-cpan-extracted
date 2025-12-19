@@ -27,6 +27,7 @@ requires:
   JSON: '0'
   List::Util: '0'
   Scalar::Util: '0'
+  overload: '0'
   perl: '5.016000'
   strict: '0'
   utf8: '0'
@@ -35,5 +36,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/JSON-Schema-Validate/issues
   repository: https://gitlab.com/jackdeguest/JSON-Schema-Validate
-version: v0.6.1
+version: v0.7.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

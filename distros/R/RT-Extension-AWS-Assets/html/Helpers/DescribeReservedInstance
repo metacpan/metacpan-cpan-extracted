@@ -1,0 +1,133 @@
+<div class="modal-dialog modal-dialog-centered modal-md modal-dialog-scrollable" role="document" aria-labelledby="purchase-reserved-instance-title">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="purchase-reserved-instance-title"><% $title %></h5>
+      <a href="javascript:void(0)" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </a>
+    </div>
+    <div class="modal-body">
+% if ( $offering ) {
+      <form id="purchase-reserved-instance" hx-swap="none" hx-post="<% RT->Config->Get('WebPath') %>/Helpers/PurchaseReservedInstance" enctype="multipart/form-data" data-changed="true">
+        <input type="hidden" class="hidden" name="id" value="<% $Asset->id %>" />
+%   my @fields;
+%   if ( $type eq 'EC2' ) {
+        <input type="hidden" class="hidden" name="ReservedInstancesOfferingId" value="<% $offering->ReservedInstancesOfferingId %>" />
+%       @fields = qw/ProductDescription InstanceType AvailabilityZone Duration OfferingType RecurringCharges/;
+%   } else {
+        <input type="hidden" class="hidden" name="ReservedDBInstancesOfferingId" value="<% $offering->ReservedDBInstancesOfferingId %>" />
+%       @fields = qw/ProductDescription DBInstanceClass MultiAZ Duration OfferingType RecurringCharges/;
+%   }
+        <div class="row">
+%       for my $field ( @fields ) {
+          <div class="col-6">
+            <&| /Elements/LabeledValue, Label => loc($field) &>
+%           if ( $field eq 'RecurringCharges' ) {
+%             my ( $amount, $frequency );
+%             if ( $type eq 'EC2' ) {
+%                 $amount = $offering->$field->[0]->Amount;
+%                 $frequency = $offering->$field->[0]->Frequency;
+%             } else {
+%                 $amount = $offering->$field->[0]->RecurringChargeAmount;
+%                 $frequency = $offering->$field->[0]->RecurringChargeFrequency;
+%             }
+              <% $offering->CurrencyCode %> <% $amount %>/<% $frequency %>
+%             if ( $frequency eq 'Hourly' ) {
+              <br><% $offering->CurrencyCode %> <% sprintf '%.02f', $amount * 24 * 30 %>/<% loc('Monthly') %>
+%             }
+%           } elsif ( $field eq 'Duration' ) {
+              <% RT::Date->new( $session{CurrentUser} )->DurationAsString( $offering->$field ) %>
+%           } else {
+              <% $offering->$field %>
+%           }
+            </&>
+          </div>
+%       }
+
+%       if ( $last_reserved_asset ) {
+%         my $end = $last_reserved_asset->FirstCustomFieldValue('Reservation End');
+%         my $today = RT::Date->new($session{CurrentUser});
+%         $today->SetToNow;
+          <div class="col-6">
+            <&| /Elements/LabeledValue, Label => loc('Current Reservation End') &>
+              <% $end %>
+%             if ( $end gt $today->ISO( Time => 0, Timezone => 'UTC' ) ) {
+              <span class="text-danger">(<% loc('Not Expired') %>)</span>
+%             } else {
+              <span>(<% loc('Expired') %>)</span>
+%             }
+            </&>
+          </div>
+%       }
+        </div>
+        <div class="row mt-2">
+          <div class="col-12 text-end">
+            <input type="button" class="btn btn-primary submit" value="<&|/l&>Purchase</&>" data-bs-dismiss="modal" />
+          </div>
+        </div>
+      </form>
+% } else {
+      <p class="mb-1 ms-3"><&|/l&>No appropriate offerings found.</&></p>
+% }
+    </div>
+  </div>
+</div>
+% $m->abort;
+
+<%INIT>
+Abort('Permission Denied')
+    unless $session{'CurrentUser'}->HasRight( Object => RT->System, Right => 'SuperUser' );
+
+my $Asset = RT::Asset->new( $session{'CurrentUser'} );
+$Asset->Load($id);
+
+my $type = $Asset->FirstCustomFieldValue('Service Type');
+Abort('Invalid Asset') unless $type =~ /^(?:EC2|RDS)$/;
+
+my $last_reserved_asset;
+for my $link ( @{ $Asset->DependsOn->ItemsArrayRef || [] } ) {
+    my $reserved_asset = $link->TargetObj;
+    next unless $reserved_asset->CatalogObj->Name eq RT->Config->Get('AWSAssetsReservedInstancesCatalog');
+    $last_reserved_asset = $reserved_asset
+        if !$last_reserved_asset
+        || $last_reserved_asset->FirstCustomFieldValue('Reservation End')
+        lt $reserved_asset->FirstCustomFieldValue('Reservation End');
+}
+
+my $offering;
+
+my $credentials = RT::Extension::AWS::Assets::AWSCredentials();
+my $service = Paws->service( $type, credentials => $credentials, region => $Asset->FirstCustomFieldValue('Region') );
+
+if ( $type eq 'EC2' ) {
+    my $result = $service->DescribeReservedInstancesOfferings(
+        AvailabilityZone   => $Asset->FirstCustomFieldValue('Availability Zone'),
+        InstanceType       => $Asset->FirstCustomFieldValue('Instance Type'),
+        ProductDescription => $Asset->FirstCustomFieldValue('Platform'),
+        MaxDuration        => 31536000, # 1y
+        MinDuration        => 31536000,
+        MaxInstanceCount   => 1,
+        InstanceTenancy    => 'default',
+        OfferingClass      => 'standard',
+        OfferingType       => 'No Upfront',
+    );
+    $offering = $result->ReservedInstancesOfferings->[0];
+}
+else {
+    my $result = $service->DescribeReservedDBInstancesOfferings(
+        'DBInstanceClass'    => $Asset->FirstCustomFieldValue('Instance Type'),
+        'ProductDescription' => $Asset->FirstCustomFieldValue('Engine'),
+        'MultiAZ'            => $Asset->FirstCustomFieldValue('MultiAZ'),
+        'Duration'           => '1y',
+        'OfferingType'       => 'No Upfront',
+    );
+    $offering = $result->ReservedDBInstancesOfferings->[0];
+}
+
+my $title = loc( 'Purchase Reserved Instance for Asset [_1]', $Asset->Name );
+
+</%INIT>
+
+<%ARGS>
+$id
+</%ARGS>

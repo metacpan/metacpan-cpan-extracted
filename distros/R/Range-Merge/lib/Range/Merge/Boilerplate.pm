@@ -5,7 +5,7 @@
 
 package Range::Merge::Boilerplate;
 # ABSTRACT: Generic Boilerplate (copied from JTM::Bootstrap)
-$Range::Merge::Boilerplate::VERSION = '2.242740';
+$Range::Merge::Boilerplate::VERSION = '2.253531';
 
 use v5.22;
 use strict;
@@ -78,7 +78,7 @@ Range::Merge::Boilerplate - Generic Boilerplate (copied from JTM::Bootstrap)
 
 =head1 VERSION
 
-version 2.242740
+version 2.253531
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016-2021 by Joelle Maslak.
+This software is copyright (c) 2016-2025 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

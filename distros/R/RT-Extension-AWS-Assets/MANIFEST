@@ -1,0 +1,32 @@
+bin/rt-import-aws-assets.in
+bin/rt-unlink-retired-reservations.in
+Changes
+etc/AWSAssets_Config.pm
+etc/sample-initialdata.json
+html/AWS/LinkAsset.html
+html/Callbacks/RT-Extension-AWS-Assets/Asset/Display.html/BeforeProcessArguments
+html/Callbacks/RT-Extension-AWS-Assets/Elements/RT__Asset/ColumnMap/Once
+html/Callbacks/RT-Extension-AWS-Assets/Elements/Tabs/Privileged
+html/Callbacks/RT-Extension-AWS-Assets/Search/Elements/BuildFormatString/Default
+html/Helpers/DescribeReservedInstance
+html/Helpers/PurchaseReservedInstance
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/Substitute.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/YAML/Tiny.pm
+lib/RT/Extension/AWS/Assets.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE                                Public-key signature (added by MakeMaker)

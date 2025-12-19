@@ -1,5 +1,5 @@
 package Sim::OPT::Takechance;
-# Copyright (C) 2014-2015 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2014-2015 by Gian Luca Brunetti.
 # This is "Sim::OPT::Takechance", a program that can produce efficient search structures for block coordinate descent given some initialization blocks (subspaces).
 # Its strategy is based on making a search path more efficient than the average randomly chosen ones, by selecting the search moves
 # so that (a) the search wake is fresher than the average random ones and (b) the search moves are more novel than the average random ones.
@@ -42,6 +42,7 @@ use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
+
 
 
 our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
@@ -858,7 +859,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2014-2015 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

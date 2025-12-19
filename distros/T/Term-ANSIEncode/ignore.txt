@@ -19,3 +19,4 @@ src/ANSIEncode.pm
 fix
 build
 t/*.pl
+t/pod.t

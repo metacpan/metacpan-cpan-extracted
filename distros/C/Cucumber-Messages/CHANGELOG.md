@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [31.0.1] - 2025-12-18
+### Fixed
+- Removed circular dependency between messages and compatibility-kit([#362](https://github.com/cucumber/messages/pull/362))
+
 ## [31.0.0] - 2025-11-18
 ### Added
 - Add `location` to `Pickle` ([#308](https://github.com/cucumber/messages/pull/308))
@@ -618,7 +622,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v31.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v31.0.1...HEAD
+[31.0.1]: https://github.com/cucumber/messages/compare/v31.0.0...v31.0.1
 [31.0.0]: https://github.com/cucumber/messages/compare/v30.1.0...v31.0.0
 [30.1.0]: https://github.com/cucumber/messages/compare/v30.0.0...v30.1.0
 [30.0.0]: https://github.com/cucumber/messages/compare/v29.0.1...v30.0.0

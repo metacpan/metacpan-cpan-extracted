@@ -10,7 +10,7 @@ use JSON ();
 BEGIN
 {
     use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( 'Cannot load JSON::Schema::Validate' );
-}
+};
 
 my $EXT_ID  = 'https://example.com/ext.json';
 my $EXT_DOC =

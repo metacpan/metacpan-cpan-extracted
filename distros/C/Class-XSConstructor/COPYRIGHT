@@ -13,27 +13,27 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: README
- lib/Class/XSConstructor.pm
- t/01basic.t
- t/02types.t
- t/03typetiny.t
- t/04build.t
-Copyright: This software is copyright (c) 2018-2019 by Toby Inkster.
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/99destroy.t
+Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/05strictconstructor.t
+Files: lib/Class/XSDestructor.pm
+ t/05strictconstructor.t
  t/06inherit-from.t
  t/07coercion.t
  t/08defaults.t
 Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
-Copyright: Copyright 2025 Toby Inkster.
+Files: t/01basic.t
+ t/02types.t
+ t/03typetiny.t
+ t/04build.t
+Copyright: This software is copyright (c) 2018-2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -42,12 +42,17 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: dist.ini
-Copyright: Copyright 2018 Toby Inkster.
+Files: README
+ lib/Class/XSConstructor.pm
+Copyright: This software is copyright (c) 2018-2019, 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/03typenano.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

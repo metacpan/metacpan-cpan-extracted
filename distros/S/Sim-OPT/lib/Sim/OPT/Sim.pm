@@ -1,5 +1,5 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2023 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2023 by Gian Luca Brunetti.
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -31,6 +31,7 @@ use Sim::OPT::Morph;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
+
 no strict;
 no warnings;
 use warnings::unused;
@@ -40,7 +41,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.095'; # our $VERSION = '';
+$VERSION = '0.097'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -97,7 +98,7 @@ sub sim
   my $precious = $dat{precious};
   my %inst = %{ $dat{inst} };
   my @precedents = @{ $dat{precedents} };
-  my $postproc = $dat{$postproc};
+  my $postproc = $dat{postproc};
   my $winningvalue;
 
 	if ( $tofile eq "" )
@@ -147,7 +148,7 @@ sub sim
 
   #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
   #{
-  #  if ( $dirfiles{checksensitivity} eq "yes" )
+  #  if ( $dirfiles{checksensitivity} eq "y" )
   #  {
   #    Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $sense{objectivecolumn} );
   #  }
@@ -199,7 +200,7 @@ sub sim
     my $fire = $dt{fire};
     my $gaproc = $dt{gaproc};
 
-    if ( ( $fire eq "yes" ) and ( $precious ne "" ) )
+    if ( ( $fire eq "y" ) and ( $precious ne "" ) )
     {
       $repfile = $dirfiles{repfile} . "-fire-$is.csv";###DDD!!!
     }
@@ -222,7 +223,7 @@ sub sim
 
     #if ( ( $dowhat{simulate} eq "y")
     #  and ( ( ( not ( $to{cleanto} ~~ ( @trieds ) ) ) or ( not ( $precious eq "" ) ) )
-    #    or ( ( $gaproc eq "yes" ) and ( $fire eq "yes" ) ) ) )
+    #    or ( ( $gaproc eq "y" ) and ( $fire eq "y" ) ) ) )
 
     {
       my $counttool = 1;
@@ -288,7 +289,7 @@ sub sim
                 push ( @simcases, $resfile );
                 print SIMLIST "$resfile\n";
 
-                unless ( ( $preventsim eq "y" ) or ( $dowhat{inactivatesim} eq "y" ) or ( $dowhat{simulate} eq "n" ) or ( $postproc eq "yes") )
+                unless ( ( $preventsim eq "y" ) or ( $dowhat{inactivatesim} eq "y" ) or ( $dowhat{simulate} eq "n" ) or ( $postproc eq "y") )
                 {
                   if ( $simnetwork eq "y" )
                   {
@@ -349,7 +350,8 @@ XXX
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\ $printthis";
                     if ($exeonfiles eq "y")
                     {
-                      print `$printthis`;
+                      `$printthis`;
+                      say $tee "$printthis";
                     }
                     print OUTFILE "TWO, $resfile\n";
                   }
@@ -382,7 +384,8 @@ XXX
                     ####print $tee "$printthis";
                     if ($exeonfiles eq "y")
                     {
-                      print `$printthis`;
+                      `$printthis`;
+                      say $tee "$printthis";
                     }
                   }
                 }
@@ -566,7 +569,7 @@ XXX
 
     if ( $dowhat{newretrieve} eq "y" )
     {
-      unless ( ( $postproc eq "yes") )
+      unless ( ( $postproc eq "y") )
       {
         my @resultretrieve = Sim::OPT::Report::newretrieve(
         {
@@ -660,7 +663,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

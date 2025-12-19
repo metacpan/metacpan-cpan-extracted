@@ -1,5 +1,5 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2024 by Gian Luca Brunetti
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -36,7 +36,7 @@ no warnings;
 
 
 our @EXPORT = qw(
-morph translate translate_surfaces_simple translate_surfaces rotate_surface translate_vertices shift_vertices rotate
+morph translate translate_surface_simple translate_surface rotate_surface translate_vertices shift_vertices rotate
 rotatez make_generic_change reassign_construction change_thickness
 recalculateish daylightcalc daylightcalc_other change_config checkfile change_climate recalculatenet apply_constraints
 reshape_windows warp use_modish export_toenergyplus genchange genprop change_groundreflectance constrain_geometry
@@ -48,460 +48,1084 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.163'; # our $VERSION = '';
+$VERSION = '0.171'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
 
 
-sub getnear
-{
-	my ( $missing, $carrier_r, $countcase ) = @_;
 
-	my %carrier = %{ $carrier_r };
-	my ( @indices, @numfrom, @numto );
-	my @missings = split( "_|-", $missing );
 
-	foreach my $key (sort {$a <=> $b} (keys %carrier ) )
-	{
-	  push( @indices, $key );
-		push( @numfrom, $carrier{$key} );
-	}
 
-	$c = 0;
-	foreach my $el ( @missings )
-	{
-		if ( Sim::OPT::odd( $c ) )
-		{
-			push ( @numto, $el );
-		}
-		$c++;
-	}
 
-	my ( @numchanges, @diffchanges );
-	my $c = 0;
-	foreach my $el ( @numto )
-	{
-		if ( not ( $el eq "$numfrom[$c]" ) )
-		{
-			push ( @numchanges,  $el );
-		}
-		elsif ( $el eq "$numfrom[$c]" )
-		{
-			push ( @numchanges, "x" );
-		}
-		$c++;
-	}
+#DDD 
+sub getcrossing 
+{ # THIS RETURNS THE INTERSECTION POINT BETWEEN TWO LINES COINTANING ONE SEGMENT EACH, DESCRIBED WITH TWO POINTS.
+    my ($x1, $y1, $z1,   # point A of segment 1
+        $x2, $y2, $z2,   # point B of segment 1
+        $x3, $y3, $z3,   # point C of segment 2
+        $x4, $y4, $z4) = @_;  # point D of segment 2
 
-	my ( @nummix, @countvrs, @countsteps );
-	my $c = 0;
-  foreach my $el ( @numchanges )
-	{
-		unless ( $el eq "x" )
-		{
-			my $cn = 0;
-			foreach ( @numfrom )
-			{
-				splice ( @numfrom, $c, 1, $el );
-			}
-      push ( @countsteps, $el );
-			push ( @nummix, [ @numfrom ] );
-			push ( @countvrs, $indices[$c] );
-      $cn++
-		}
-		$c++
-	}
+    my $tolerance = 0.000000001; #tolerance
 
-	my ( @box );
-	foreach my $elt_r ( @nummix )
-	{
-		my $line = "";
-		my @elts = @{ $elt_r };
-		my $count = 0;
-		foreach my $elt ( @elts )
-		{
-      $line = $line . $indices[$count] . "-" . $elt . "_";
-			$count++;
-		}
-		chop $line;
-    push ( @box, $line );
-	}
+    # Points
+    my @A = ($x1, $y1, $z1);
+    my @B = ($x2, $y2, $z2);
+    my @C = ($x3, $y3, $z3);
+    my @D = ($x4, $y4, $z4);
 
-	return( \@box, \@countvrs, \@countsteps );
+    # Direction vectors r = B - A, s = D - C
+    my @r = ($B[0]-$A[0], $B[1]-$A[1], $B[2]-$A[2]);
+    my @s = ($D[0]-$C[0], $D[1]-$C[1], $D[2]-$C[2]);
+
+    # w0 = A - C
+    my @w0 = ($A[0]-$C[0], $A[1]-$C[1], $A[2]-$C[2]);
+
+    # Dot products
+    my $a = $r[0]*$r[0] + $r[1]*$r[1] + $r[2]*$r[2];         # r·r
+    my $b = $r[0]*$s[0] + $r[1]*$s[1] + $r[2]*$s[2];         # r·s
+    my $c = $s[0]*$s[0] + $s[1]*$s[1] + $s[2]*$s[2];         # s·s
+    my $d = $r[0]*$w0[0] + $r[1]*$w0[1] + $r[2]*$w0[2];      # r·w0
+    my $e = $s[0]*$w0[0] + $s[1]*$w0[1] + $s[2]*$w0[2];      # s·w0
+
+    my $den = $a*$c - $b*$b; # determinant of the 2×2 linear system that solves for the parameters 𝑡 t and 𝑢 u in the line–line closest‐point equations. It is the key value that tells you whether the two lines are: parallel or collinear intersecting skew.
+
+    # Case 1: parallel or collinear -> undef
+    return undef if abs($den) < $tolerance;
+
+    # Solve for parameters t, u on the infinite lines
+    my $t = ($b*$e - $c*$d) / $den;
+    my $u = ($a*$e - $b*$d) / $den;
+
+    # Points on each line
+    my @P = ( $A[0] + $t*$r[0],
+              $A[1] + $t*$r[1],
+              $A[2] + $t*$r[2] );
+
+    my @Q = ( $C[0] + $u*$s[0],
+              $C[1] + $u*$s[1],
+              $C[2] + $u*$s[2] );
+
+    # Distance between P and Q
+    my $dx = $P[0] - $Q[0];
+    my $dy = $P[1] - $Q[1];
+    my $dz = $P[2] - $Q[2];
+    my $dist2 = $dx*$dx + $dy*$dy + $dz*$dz;
+
+    if ($dist2 <= $tolerance*$tolerance) 
+    {
+        # Case 2: lines intersect (maybe outside segments) -> return intersection
+        return [ @P ];  # P and Q are (numerically) the same
+    } 
+    else 
+    {
+        # Case 3: skew lines -> return closest point (midpoint between P and Q)
+        return [
+            ($P[0] + $Q[0]) / 2,
+            ($P[1] + $Q[1]) / 2,
+            ($P[2] + $Q[2]) / 2,
+        ];
+    }
 }
 
 
-sub cleaninst
+sub rotateabout
 {
-	my %inst = @_;
-	my %pure;
-	foreach my $key ( keys %inst )
-	{
-		unless ( $key eq "" )
-		{
+  my ($x, $y, $z,        # point to rotate (P)
+  $x4, $y4, $z4,     # point D on axis
+  $x5, $y5, $z5,     # point E on axis
+  $deg) = @_;        # angle in DEGREES
 
-		}
-	}
+  # convert degrees -> radians
+  my $theta = $deg * pi / 180;
+
+  # Vector v = P - D
+  my $vx = $x  - $x4;
+  my $vy = $y  - $y4;
+  my $vz = $z  - $z4;
+
+  # Axis direction k = (E - D) normalized
+  my $ux = $x5 - $x4;
+  my $uy = $y5 - $y4;
+  my $uz = $z5 - $z4;
+
+  my $len = sqrt( ($ux * $ux) + ($uy * $uy) + ($uz * $uz) );
+  die "Axis points D and E coincide\n" if $len == 0;
+
+  $ux = ($ux / $len);
+  $uy = ($uy / $len);
+  $uz = ($uz / $len);
+
+  my $ct = cos($theta);
+  my $st = sin($theta);
+
+  # k·v
+  my $dot = ( ($ux * $vx) + ($uy * $vy) + ($uz * $vz) );
+
+  # k × v
+  my $cx = ( ($uy * $vz) - ($uz * $vy) );
+  my $cy = ( ($uz * $vx) - ($ux * $vz) );
+  my $cz = ( ($ux * $vy) - ($uy * $vx) );
+
+  # Rodrigues formula
+  my $rx = ( ($vx * $ct) + ($cx * $st) + ($ux * $dot * (1 - $ct) ) );
+  my $ry = ( ($vy * $ct) + ($cy * $st) + ($uy * $dot * (1 - $ct) ) );
+  my $rz = ( ($vz * $ct) + ($cz * $st) + ($uz * $dot * (1 - $ct) ) );
+
+  # Shift back by D
+  $rx = $rx + $x4;
+  $ry = $ry + $y4;
+  $rz = $rz + $z4;
+
+  return ($rx, $ry, $rz);
 }
 
 
-sub giveback
+
+sub closest_point_on_segment_3d 
 {
-  my %mids = %{ $_[0] };
+    my ($x1, $y1, $z1,   # A
+        $x2, $y2, $z2,   # B
+        $x3, $y3, $z3) = @_;  # C
 
-  my $string;
-  foreach my $key ( sort { $a <=> $b } ( keys %mids ) )
-  {
+    # Vector v = B - A (segment direction)
+    my $vx = $x2 - $x1;
+    my $vy = $y2 - $y1;
+    my $vz = $z2 - $z1;
 
-    $string = $string . $key . "-" . $mids{$key} . "_";
-  }
-  $string =~ s/_$// ;
-  return( $string );
+    # Handle degenerate segment (A == B)
+    my $len2 = $vx*$vx + $vy*$vy + $vz*$vz;
+    if ( $len2 == 0 ) 
+    {
+        # Segment is a point: closest point is A itself
+        return ($x1, $y1, $z1, 0.0);
+    }
+
+    # Vector w = C - A
+    my $wx = $x3 - $x1;
+    my $wy = $y3 - $y1;
+    my $wz = $z3 - $z1;
+
+    # Projection parameter t on infinite line
+    my $t = ($wx*$vx + $wy*$vy + $wz*$vz) / $len2;
+
+    # Clamp t to [0, 1] to stay on the segment
+    if    ($t < 0) { $t = 0; }
+    elsif ($t > 1) { $t = 1; }
+
+    # Closest point P = A + t * v
+    my $px = $x1 + $t * $vx;
+    my $py = $y1 + $t * $vy;
+    my $pz = $z1 + $t * $vz;
+
+    # Return closest point and the parameter t
+    return ($px, $py, $pz, $t);
+
+    # USAGE EXAMPLE
+    # my ($px, $py, $pz, $t) =
+    # closest_point_on_segment_3d($x1, $y1, $z1,
+    #                             $x2, $y2, $z2,
+    #                             $x3, $y3, $z3);
+}
+
+
+
+
+sub plane_quad_intersection 
+{
+    my (
+        $x1,$y1,$z1,   # A - point on plane
+        $x2,$y2,$z2,   # B - point on plane
+        $x3,$y3,$z3,   # C - point on plane
+        $px0,$py0,$pz0,  # P0 - quad vertices
+        $px1,$py1,$pz1,  # P1
+        $px2,$py2,$pz2,  # P2
+        $px3,$py3,$pz3   # P3
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Build normal vector n = (B-A) x (C-A)
+    my $abx = $x2 - $x1;
+    my $aby = $y2 - $y1;
+    my $abz = $z2 - $z1;
+
+    my $acx = $x3 - $x1;
+    my $acy = $y3 - $y1;
+    my $acz = $z3 - $z1;
+
+    my $nx = $aby * $acz - $abz * $acy;
+    my $ny = $abz * $acx - $abx * $acz;
+    my $nz = $abx * $acy - $aby * $acx;
+
+    # If normal is near zero, A,B,C are collinear -> degenerate plane
+    my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
+    if ( $nlen2 < $EPS*$EPS )
+    {
+        return () ;
+    }
+
+    # Quad vertices as arrays for convenience
+    my @P = (
+        [ $px0, $py0, $pz0 ],
+        [ $px1, $py1, $pz1 ],
+        [ $px2, $py2, $pz2 ],
+        [ $px3, $py3, $pz3 ],
+    );
+
+    # Signed distances di = n·(Pi - A)
+    my @d;
+    for my $i (0..3) {
+        my $dx = $P[$i][0] - $x1;
+        my $dy = $P[$i][1] - $y1;
+        my $dz = $P[$i][2] - $z1;
+        $d[$i] = $nx*$dx + $ny*$dy + $nz*$dz;
+    }
+
+    my @ints;  # intersection points
+
+    # Helper to push a point, avoiding duplicates (within tolerance)
+    my $push_unique = sub 
+    {
+        my ($x,$y,$z) = @_;
+        for my $q (@ints) 
+        {
+            my $dx = $q->[0] - $x;
+            my $dy = $q->[1] - $y;
+            my $dz = $q->[2] - $z;
+            my $dist2 = $dx*$dx + $dy*$dy + $dz*$dz;
+            return if $dist2 < $EPS*$EPS;
+        }
+        push ( @ints, [ $x, $y, $z ] );
+    };
+
+    # Check each of the 4 edges: (0-1), (1-2), (2-3), (3-0)
+    for my $i (0..3) {
+        my $j = ($i + 1) % 4;
+
+        my $di = $d[$i];
+        my $dj = $d[$j];
+
+        my $Pi = $P[$i];
+        my $Pj = $P[$j];
+
+        # Both vertices exactly on plane -> whole edge in plane (special case)
+        if ( ( abs($di) < $EPS ) and ( abs($dj) < $EPS ) )
+        {
+            # Here you might choose to treat the whole edge as intersection.
+            # For the purpose of returning just points, we can add both endpoints.
+            $push_unique->($Pi->[0], $Pi->[1], $Pi->[2]);
+            $push_unique->($Pj->[0], $Pj->[1], $Pj->[2]);
+            next;
+        }
+
+        # One endpoint exactly on the plane: add that vertex
+        if ( abs($di) < $EPS ) 
+        {
+            $push_unique->($Pi->[0], $Pi->[1], $Pi->[2]);
+            next;
+        }
+        
+        if (abs($dj) < $EPS) 
+        {
+            $push_unique->($Pj->[0], $Pj->[1], $Pj->[2]);
+            next;
+        }
+
+        # If signs differ, edge crosses the plane
+        if ($di * $dj < 0) 
+        {
+            # Linear interpolation factor along Pi->Pj
+            my $t = $di / ($di - $dj);  # between 0 and 1
+            my $x = $Pi->[0] + $t * ($Pj->[0] - $Pi->[0]);
+            my $y = $Pi->[1] + $t * ($Pj->[1] - $Pi->[1]);
+            my $z = $Pi->[2] + $t * ($Pj->[2] - $Pi->[2]);
+            $push_unique->($x, $y, $z);
+        }
+    }
+
+    # @ints now contains 0,1,2 or (degenerate cases) more points
+    return( @ints );   # list of arrayrefs [x,y,z]
+
+    # Example usage
+		# my @pts = plane_quad_intersection(
+		#     # Plane points A,B,C
+		#     $x1, $y1, $z1,
+		#     $x2, $y2, $z2,
+		#     $x3, $y3, $z3,
+		#     # Quad P0..P3
+		#     $qx0, $qy0, $qz0,
+		#     $qx1, $qy1, $qz1,
+		#     $qx2, $qy2, $qz2,
+		#     $qx3, $qy3, $qz3,
+		# );
+}
+
+
+
+
+sub distance_3d 
+{
+    my ($x1, $y1, $z1,   # Point 1
+        $x2, $y2, $z2) = @_;  # Point 2
+
+    my $dx = $x2 - $x1;
+    my $dy = $y2 - $y1;
+    my $dz = $z2 - $z1;
+
+    return ( sqrt( $dx*$dx + $dy*$dy + $dz*$dz ) );
+}
+
+
+
+
+sub line_plane_intersection 
+{
+    my (
+        $x1, $y1, $z1,   # P0: point on plane
+        $x2, $y2, $z2,   # P1: point on plane
+        $x3, $y3, $z3,   # P2: point on plane
+        $x4, $y4, $z4,   # A: first point of segment/line
+        $x5, $y5, $z5    # B: second point of segment/line
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Plane normal n = (P1 - P0) x (P2 - P0)
+    my $u1 = $x2 - $x1;
+    my $u2 = $y2 - $y1;
+    my $u3 = $z2 - $z1;
+
+    my $v1 = $x3 - $x1;
+    my $v2 = $y3 - $y1;
+    my $v3 = $z3 - $z1;
+
+    my $nx = $u2 * $v3 - $u3 * $v2;
+    my $ny = $u3 * $v1 - $u1 * $v3;
+    my $nz = $u1 * $v2 - $u2 * $v1;
+
+    # Degenerate plane (points collinear)
+    my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
+    return undef if $nlen2 < $EPS * $EPS;
+
+    # Line direction d = B - A
+    my $dx = $x5 - $x4;
+    my $dy = $y5 - $y4;
+    my $dz = $z5 - $z4;
+
+    # w = A - P0
+    my $wx = $x4 - $x1;
+    my $wy = $y4 - $y1;
+    my $wz = $z4 - $z1;
+
+    # Denominator: n · d
+    my $den = $nx*$dx + $ny*$dy + $nz*$dz;
+
+    # If den ~ 0, line is parallel to plane (or lies in it)
+    if ( abs($den) < $EPS ) 
+    {
+        # Check if line lies in plane: n · w ≈ 0
+        my $num = $nx*$wx + $ny*$wy + $nz*$wz;
+        return undef;  # either parallel disjoint or infinite solutions; we treat as "no single point"
+    }
+
+    # t = - (n · w) / (n · d)
+    my $num = $nx*$wx + $ny*$wy + $nz*$wz;
+    my $t   = - $num / $den;
+
+    # Intersection point: A + t * d
+    my $ix = $x4 + $t * $dx;
+    my $iy = $y4 + $t * $dy;
+    my $iz = $z4 + $t * $dz;
+
+    return ($ix, $iy, $iz, $t);
+
+    # Usage example:
+		# my ($ix, $iy, $iz, $t) =
+		#     line_plane_intersection_3d(
+		#         $px1, $py1, $pz1,   # plane point 1
+		#         $px2, $py2, $pz2,   # plane point 2
+		#         $px3, $py3, $pz3,   # plane point 3
+		#         $sx1, $sy1, $sz1,   # segment point A
+		#         $sx2, $sy2, $sz2    # segment point B
+		#     );
+}
+
+
+
+
+sub closest_point_on_plane 
+{
+    my (
+        $x1, $y1, $z1,   # A - point on plane
+        $x2, $y2, $z2,   # B - point on plane
+        $x3, $y3, $z3,   # C - point on plane
+        $xp, $yp, $zp    # P - external point
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Vectors AB and AC
+    my $abx = $x2 - $x1;
+    my $aby = $y2 - $y1;
+    my $abz = $z2 - $z1;
+
+    my $acx = $x3 - $x1;
+    my $acy = $y3 - $y1;
+    my $acz = $z3 - $z1;
+
+    # Plane normal n = AB x AC
+    my $nx = $aby * $acz - $abz * $acy;
+    my $ny = $abz * $acx - $abx * $acz;
+    my $nz = $abx * $acy - $aby * $acx;
+
+    # Check degenerate plane (three points almost collinear)
+    my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
+    return undef if $nlen2 < $EPS * $EPS;
+
+    # w = P - A
+    my $wx = $xp - $x1;
+    my $wy = $yp - $y1;
+    my $wz = $zp - $z1;
+
+    # t = (n·w) / (n·n)
+    my $dot = $nx*$wx + $ny*$wy + $nz*$wz;
+    my $t   = $dot / $nlen2;
+
+    # Projection: P_proj = P - t * n
+    my $xq = $xp - $t * $nx;
+    my $yq = $yp - $t * $ny;
+    my $zq = $zp - $t * $nz;
+
+    return ($xq, $yq, $zq);
+
+    # Usage:
+		# my ($xq, $yq, $zq) =
+		#     closest_point_on_plane_3d(
+		#         $x1, $y1, $z1,
+		#         $x2, $y2, $z2,
+		#         $x3, $y3, $z3,
+		#         $xp, $yp, $zp
+    # );
+}
+
+
+
+
+sub line_perp_to_line_and_plane 
+{
+    my (
+        $x1, $y1, $z1,     # Line point A
+        $x2, $y2, $z2,     # Line point B
+        $xp, $yp, $zp,     # Point P on the line, through which new line passes
+        $xa, $ya, $za,     # Plane point P0
+        $xb, $yb, $zb,     # Plane point P1
+        $xc, $yc, $zc      # Plane point P2
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Direction of given line v = B - A
+    my $vx = $x2 - $x1;
+    my $vy = $y2 - $y1;
+    my $vz = $z2 - $z1;
+
+    # Plane normal n = (P1-P0) x (P2-P0)
+    my $u1 = $xb - $xa;
+    my $u2 = $yb - $ya;
+    my $u3 = $zb - $za;
+
+    my $v1 = $xc - $xa;
+    my $v2 = $yc - $ya;
+    my $v3 = $zc - $za;
+
+    my $nx = $u2*$v3 - $u3*$v2;
+    my $ny = $u3*$v1 - $u1*$v3;
+    my $nz = $u1*$v2 - $u2*$v1;
+
+    # Check degenerate plane (three points almost collinear)
+    my $nlen2 = $nx*$nx + $ny*$ny + $nz*$nz;
+    return undef if $nlen2 < $EPS * $EPS;
+
+    # For the new line to be perpendicular to the plane,
+    # its direction must be parallel to n.
+    # For it to be perpendicular to the original line,
+    # we need v · n = 0 (line parallel to plane).
+    my $vdotn = $vx*$nx + $vy*$ny + $vz*$nz;
+    return undef if abs($vdotn) > $EPS;  # no solution if not ~0
+
+    # Direction of new line: just use the plane normal n
+    my $dx = $nx;
+    my $dy = $ny;
+    my $dz = $nz;
+
+    # Optionally normalize (not strictly necessary):
+    my $dlen = sqrt( $dx*$dx + $dy*$dy + $dz*$dz );
+    $dx /= $dlen;
+    $dy /= $dlen;
+    $dz /= $dlen;
+
+    # Return the new line as P + t * d
+    return ($xp, $yp, $zp, $dx, $dy, $dz);
+}
+
+
+
+sub line_perp_to_line_and_parallel_to_line 
+{
+    my (
+        $x1, $y1, $z1,     # Line 1 point A
+        $x2, $y2, $z2,     # Line 1 point B
+        $xp, $yp, $zp,     # Point P through which new line passes
+        $x3, $y3, $z3,     # Line 2 point C
+        $x4, $y4, $z4      # Line 2 point D
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Direction of first line v1 = B - A
+    my $v1x = $x2 - $x1;
+    my $v1y = $y2 - $y1;
+    my $v1z = $z2 - $z1;
+
+    # Direction of second line v2 = D - C
+    my $v2x = $x4 - $x3;
+    my $v2y = $y4 - $y3;
+    my $v2z = $z4 - $z3;
+
+    # Check second line is not degenerate
+    my $v2len2 = $v2x*$v2x + $v2y*$v2y + $v2z*$v2z;
+    return undef if $v2len2 < $EPS * $EPS;
+
+    # For new line to be:
+    # - parallel to line 2: direction = v2
+    # - perpendicular to line 1: v1 · v2 = 0
+    my $dot = $v1x*$v2x + $v1y*$v2y + $v1z*$v2z;
+    return undef if abs($dot) > $EPS;   # no solution if not perpendicular
+
+    # Optionally normalize v2 (not strictly necessary for a direction vector)
+    my $v2len = sqrt($v2len2);
+    my $dx = $v2x / $v2len;
+    my $dy = $v2y / $v2len;
+    my $dz = $v2z / $v2len;
+
+    # New line: passes through P with direction (dx,dy,dz)
+    # L(t) = (xp,yp,zp) + t * (dx,dy,dz)
+    return ($xp, $yp, $zp, $dx, $dy, $dz);
+}
+
+
+sub closest_point_on_line 
+{
+    my (
+        $x1, $y1, $z1,   # A - first point on line
+        $x2, $y2, $z2,   # B - second point on line
+        $xp, $yp, $zp    # P - external point
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Line direction v = B - A
+    my $vx = $x2 - $x1;
+    my $vy = $y2 - $y1;
+    my $vz = $z2 - $z1;
+
+    my $vlen2 = $vx*$vx + $vy*$vy + $vz*$vz;
+
+    # Degenerate case: A and B are the same point → line collapses
+    return undef if $vlen2 < $EPS * $EPS;
+
+    # w = P - A
+    my $wx = $xp - $x1;
+    my $wy = $yp - $y1;
+    my $wz = $zp - $z1;
+
+    # t = (w·v) / (v·v)
+    my $t = ($wx*$vx + $wy*$vy + $wz*$vz) / $vlen2;
+
+    # Closest point Q = A + t*v
+    my $qx = $x1 + $t * $vx;
+    my $qy = $y1 + $t * $vy;
+    my $qz = $z1 + $t * $vz;
+
+    return ($qx, $qy, $qz, $t);
+
+    # Example usage
+		# my ($qx, $qy, $qz, $t) =
+		#     closest_point_on_line_3d(
+		#         $x1, $y1, $z1,
+		#         $x2, $y2, $z2,
+		#         $xp, $yp, $zp
+		#     );
+    # 
+		# If one wants the closest point on the segment AB, this should be checked:
+		# if ($t < 0) {
+		#     # closest point is A
+		# } elsif ($t > 1) {
+		#     # closest point is B
+		# }
+}
+
+
+
+sub perpendicular_line_parallel_to_plane 
+{
+    my (
+        $x1, $y1, $z1,     # Line point A
+        $x2, $y2, $z2,     # Line point B
+        $xp, $yp, $zp,     # Point through which new line must pass
+        $xa, $ya, $za,     # Plane point P0
+        $xb, $yb, $zb,     # Plane point P1
+        $xc, $yc, $zc      # Plane point P2
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Direction of given line v = B - A
+    my $vx = $x2 - $x1;
+    my $vy = $y2 - $y1;
+    my $vz = $z2 - $z1;
+
+    # Plane normal n = (P1-P0) x (P2-P0)
+    my $u1 = $xb - $xa;
+    my $u2 = $yb - $ya;
+    my $u3 = $zb - $za;
+
+    my $v1 = $xc - $xa;
+    my $v2 = $yc - $ya;
+    my $v3 = $zc - $za;
+
+    my $nx = $u2*$v3 - $u3*$v2;
+    my $ny = $u3*$v1 - $u1*$v3;
+    my $nz = $u1*$v2 - $u2*$v1;
+
+    # Check that line and plane are not parallel
+    # If v is parallel to plane => v ⋅ n == 0 => no perpendicular line exists
+    my $vdotn = $vx*$nx + $vy*$ny + $vz*$nz;
+    if ( abs( $vdotn ) < $EPS )
+    {
+        return( undef );
+    }
+
+    # Direction of new line is perpendicular to both v and n:
+    # d = v × n
+    my $dx = $vy*$nz - $vz*$ny;
+    my $dy = $vz*$nx - $vx*$nz;
+    my $dz = $vx*$ny - $vy*$nx;
+
+    # Ensure non-zero direction
+    my $dlen2 = $dx*$dx + $dy*$dy + $dz*$dz;
+    if ( $dlen2 < ( $EPS * $EPS ) )
+    {
+        return( undef );
+    }
+
+    # Return the new line as: point (xp,yp,zp) and direction (dx,dy,dz)
+    return( $xp, $yp, $zp, $dx, $dy, $dz );
+
+    # Usage example
+		# my @line = perpendicular_line_parallel_to_plane(
+		#     0,0,0,   1,0,0,       # line through (0,0,0)->(1,0,0)
+		#     0,1,0,                 # pass through point (0,1,0)
+		#     0,0,0,  0,0,1,  0,1,0  # plane z=0-1 defined by 3 points
+		# );
+}
+
+
+
+
+sub line_perp_to_two_lines 
+{
+    my (
+        $x1, $y1, $z1,     # Line 1 point A
+        $x2, $y2, $z2,     # Line 1 point B
+        $xp, $yp, $zp,     # Point P through which new line passes
+        $x3, $y3, $z3,     # Line 2 point C
+        $x4, $y4, $z4      # Line 2 point D
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Direction of first line v1 = B - A
+    my $v1x = $x2 - $x1;
+    my $v1y = $y2 - $y1;
+    my $v1z = $z2 - $z1;
+
+    # Direction of second line v2 = D - C
+    my $v2x = $x4 - $x3;
+    my $v2y = $y4 - $y3;
+    my $v2z = $z4 - $z3;
+
+    # Check for degenerate lines
+    my $v1len2 = $v1x*$v1x + $v1y*$v1y + $v1z*$v1z;
+    my $v2len2 = $v2x*$v2x + $v2y*$v2y + $v2z*$v2z;
+    return undef if $v1len2 < $EPS*$EPS;
+    return undef if $v2len2 < $EPS*$EPS;
+
+    # Direction of new line must be perpendicular to both:
+    # d = v1 × v2
+    my $dx = $v1y*$v2z - $v1z*$v2y;
+    my $dy = $v1z*$v2x - $v1x*$v2z;
+    my $dz = $v1x*$v2y - $v1y*$v2x;
+
+    my $dlen2 = $dx*$dx + $dy*$dy + $dz*$dz;
+
+    # If cross product is (near) zero, the lines are parallel or collinear:
+    # then there is no unique direction perpendicular to both.
+    return undef if $dlen2 < $EPS*$EPS;
+
+    # Normalize direction (optional, but convenient)
+    my $dlen = sqrt($dlen2);
+    $dx /= $dlen;
+    $dy /= $dlen;
+    $dz /= $dlen;
+
+    # New line: L(t) = P + t * d
+    return ($xp, $yp, $zp, $dx, $dy, $dz);
+}
+
+
+sub line_perp_to_line_and_parallel_to_line 
+{
+    my (
+        $x1, $y1, $z1,     # Line 1 point A
+        $x2, $y2, $z2,     # Line 1 point B
+        $xp, $yp, $zp,     # Point P through which new line passes
+        $x3, $y3, $z3,     # Line 2 point C
+        $x4, $y4, $z4      # Line 2 point D
+    ) = @_;
+
+    my $EPS = 1e-9;
+
+    # Direction of first line v1 = B - A
+    my $v1x = $x2 - $x1;
+    my $v1y = $y2 - $y1;
+    my $v1z = $z2 - $z1;
+
+    # Direction of second line v2 = D - C
+    my $v2x = $x4 - $x3;
+    my $v2y = $y4 - $y3;
+    my $v2z = $z4 - $z3;
+
+    # Check second line is not degenerate
+    my $v2len2 = $v2x*$v2x + $v2y*$v2y + $v2z*$v2z;
+    return undef if $v2len2 < $EPS * $EPS;
+
+    # For the new line to be:
+    # - parallel to line 2: direction = v2
+    # - perpendicular to line 1: v1 · v2 = 0
+    my $dot = $v1x*$v2x + $v1y*$v2y + $v1z*$v2z;
+    return undef if abs($dot) > $EPS;   # no solution if not perpendicular
+
+    # Optionally normalize v2 (not required, but convenient)
+    my $v2len = sqrt($v2len2);
+    my $dx = $v2x / $v2len;
+    my $dy = $v2y / $v2len;
+    my $dz = $v2z / $v2len;
+
+    # New line: L(t) = P + t * d
+    return ($xp, $yp, $zp, $dx, $dy, $dz);
+
+    # On failure (undef).
+}
+
+
+
+sub angle_between_lines 
+{
+    my (
+        $x1, $y1, $z1,   # Line 1 point A1
+        $x2, $y2, $z2,   # Line 1 point B1
+        $x3, $y3, $z3,   # Line 2 point A2
+        $x4, $y4, $z4    # Line 2 point B2
+    ) = @_;
+
+    my $EPS = 1e-12;
+
+    # Direction vectors
+    my $v1x = $x2 - $x1;
+    my $v1y = $y2 - $y1;
+    my $v1z = $z2 - $z1;
+
+    my $v2x = $x4 - $x3;
+    my $v2y = $y4 - $y3;
+    my $v2z = $z4 - $z3;
+
+    # Lengths
+    my $len1 = sqrt( $v1x*$v1x + $v1y*$v1y + $v1z*$v1z );
+    my $len2 = sqrt( $v2x*$v2x + $v2y*$v2y + $v2z*$v2z );
+
+    # Degenerate line(s)
+    if ( ( $len1 < $EPS ) or ( $len2 < $EPS ) )
+    {
+        return( undef );
+    }
+    
+    # Dot product
+    my $dot = $v1x*$v2x + $v1y*$v2y + $v1z*$v2z;
+
+    # Cosine of angle
+    my $cos_theta = $dot / ($len1 * $len2);
+
+    # Clamp for numerical safety
+    $cos_theta =  1 if $cos_theta > 1;
+    $cos_theta = -1 if $cos_theta < -1;
+
+    # Angle in radians
+    my $theta_rad = acos($cos_theta);
+
+    # Convert to degrees
+    my $theta_deg = $theta_rad * 180 / pi;
+
+    return $theta_deg;   # in [0, 180]
+
+    # Usage example:
+		# my $angle = angle_between_lines_deg(
+		#     0,0,0,  1,0,0,    # line 1: x-axis
+		#     0,0,0,  0,1,0     # line 2: y-axis
+		# );
+		# On failure (undef).
+}
+
+
+
+
+sub angle_between_xy_projections 
+{
+    my (
+        $x1, $y1, $z1,   # Line 1 point A
+        $x2, $y2, $z2,   # Line 1 point B
+        $x3, $y3, $z3,   # Line 2 point C
+        $x4, $y4, $z4    # Line 2 point D
+    ) = @_;
+
+    my $EPS = 1e-12;
+
+    # Direction vectors projected onto xy
+    my $v1x = $x2 - $x1;
+    my $v1y = $y2 - $y1;
+
+    my $v2x = $x4 - $x3;
+    my $v2y = $y4 - $y3;
+
+    # Lengths
+    my $len1 = sqrt( $v1x*$v1x + $v1y*$v1y );
+    my $len2 = sqrt( $v2x*$v2x + $v2y*$v2y );
+
+    if ( ( $len1 < $EPS ) or ( $len2 < $EPS ) )  
+    {
+        return( undef );
+    }    # degenerate
+
+    # Normalize
+    $v1x /= $len1; $v1y /= $len1;
+    $v2x /= $len2; $v2y /= $len2;
+
+    # Dot and cross in 2D
+    my $dot   = $v1x*$v2x + $v1y*$v2y;
+    my $cross = $v1x*$v2y - $v1y*$v2x;  # z-component of v1 × v2
+
+    # Signed angle in radians, range (-pi, pi]
+    my $theta_rad = atan2($cross, $dot);
+
+    # Convert to degrees
+    my $theta_deg = $theta_rad * 180 / pi;
+
+    # Already in (-180, 180], so return as is
+    return( $theta_deg );   # in [0, 180)
+
+    # Example use:
+		# my $angle = angle_between_xy_projections_deg(
+		#     0,0,0,  1,1,0,    # line 1
+		#     0,0,0,  1,0,0     # line 2
+		# );
+}
+
+
+
+sub getazimuth
+{
+    my (
+        $x3, $y3, $z3,   # Line 2 point C
+        $x4, $y4, $z4    # Line 2 point D
+        ) = @_;
+    my $angle = angle_between_xy_projections (
+        0, 0, 0,   # Line 1 point A
+        1, 0, 0,   # Line 1 point B
+        $x3, $y3, $z3,   # Line 2 point C
+        $x4, $y4, $z4    # Line 2 point D
+        );
+
+    my $az = ( $angle + 180 );
+
+    if ( $az > 360 )
+    {
+        $az = ( $az - 360 );
+    }
+
+    if ( $az < 0 )
+    {
+        $az = ( $az + 360 );
+    }
+    return( $az );
 }
 
 
 sub setpickedinsts
 {
-	my ( $instances_ref, $inst_ref, $dirfiles_ref ) = @_;
-	my @instances = @{ $instances_ref };
-	my %inst = %{ $inst_ref };
-	my %dirfiles = %{ $dirfiles_ref };
+    my ( $instances_ref, $inst_ref, $dirfiles_ref ) = @_;
+    my @instances = @{ $instances_ref };
+    my %inst = %{ $inst_ref };
+    my %dirfiles = %{ $dirfiles_ref };
 
-	my @newinstances;
-
-
-	my $countinst = 0;
-	foreach my $instance ( @instances )
-	{
-		my %d = %{ $instance };
-		my $countcase = $d{countcase};
-		my $countblock = $d{countblock};
-		my @miditers = @{ $d{miditers} };
-		my $countvar = $d{countvar};
-		my $countstep = $d{countstep};
-		my @sweeps = @{ $d{sweeps} };
-		my @sourcesweeps = @{ $d{sourcesweeps} };
-		my @blockelts = @{ $d{blockelts} };
-		my @blocks = @{ $d{blocks} };
-		my $origin = $d{origin};
-		my %to = %{ $d{to} };
-		my %orig = %{ $d{orig} };
-		my $from = $origin;
-		my %varnums = %{ $d{varnums} };
-		my %mids = %{ $d{mids} };
-		my %carrier = %{ $d{carrier} };
-		my $varnumber = $countvar;
-		my $stepsvar = $varnums{$countvar};
-		my $is;
-		my @addinsts;
-
-		my $missing = $origin;
-		my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = getnear( $missing, \%mids, $countcase );
-		my @addinsts = @{ $box_ref };
-		my @countvrs = @{ $countvrs_ref };
-		my @countsteps = @{ $countsteps_ref };
-
-		if ( scalar( @addinsts ) > 0 )
-		{
-			my $cn = 0;
-			foreach $addinst ( @addinsts )
-			{
-				my $countvar = $countvrs[$cn];
-				my $countstep = $countsteps[$cn];
-				$is = $addinst;
-				my %to = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $is, \%carrier, $file, \@blockelts, $mypath ) };
-
-				my ( %orig, @whatto );
-
-				if ( $cn == 0 )
-				{
-					$origin = giveback ( \%mids );
-					%orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
-
-					push ( @whatto, "begin" );
-				}
-
-				if ( $cn > 0 )
-				{
-					push ( @whatto, "transition" );
-					$origin = $addinsts[$cn-1];
-					%orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
-				}
-
-				if ( $cn == $#addinsts )
-				{
-					push ( @whatto, "end" );
-					%orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
-				}
-
-				my %i = %{ $inst_ref };
-				my %inst = $i{inst};
-				my %to = %{ $inst{to} };
-				my %orig = %{ $inst{orig} };
-
-				#my $crypto = int( ( scalar( keys %inst ) ) / 5 * 6 );
-				#my $cryptor = $crypto + 1;
-
-				my $crypto = Sim::OPT::encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-		    my $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
-
-		    $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
-		    $to{cleanto} = "$is"; say RELATE "B in setpickinst \$to{cleanto} " .dump ( $to{cleanto} );
-		    $orig{to} = "$mypath/$file" . "_" . "$origin"; say RELATE "C in setpickinst \$orig{to} " .dump ( $orig{to} );
-		    $orig{cleanto} = "$origin"; say RELATE "D in setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
-
-		    if ( $dowhat{names} eq "long" )
-		    {
-		      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
-		      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
-		      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
-		      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
-		    }
-
-		    if ( $dowhat{names} eq "short" )
-		    {
-
-		      $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
-		      $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-		      $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
-		      $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-		    }
-
-				#say $tee "HERE : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
-				push( @newinstances,
-				{
-					countcase => $countcase, countblock => $countblock,
-					miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
-					to => \%to, countvar => $countvar, countstep => $countstep,
-					sweeps => \@sweeps, dowhat => \%dowhat, orig => \%orig,
-					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-					varnumbers => \@varnumbers, blocks => \@blocks,
-					blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-					countinstance => $count, carrier => \%carrier, origin => $origin,
-					instn => $instn, is => $is, vehicles => \%vehicles,
-					mypath => $mypath, file => $file, whatto => \@whatto,
-				} );
-
-				$cn++;
-			}
-		}
-		else
-		{
-			push( @newinstances, $instance );
-		}
-	}
-	#say $tee "IN MORPH PRINT NEWINSTANCES scalar " . scalar( @newinstances ) . dump ( @newinstances );
-
-	@instances = @newinstances; # REASSIGNMENT!!!!!!
-	#say $tee "GOING TO GIVE INSTANCES: " .dump( @instances );
-	#say $tee "AND HAD INST: " .dump( \%inst );
-	my (  $newinstnames_r, $newinst_r ) = Sim::OPT::filterinsts_winsts( \@instances, \%inst );
-	%inst = %{ $newinst_r }; # REASSIGNMENT!!!!!!
-	my @newinstnames = @{ $newinstnames_r };
-	push( @{ $dirfiles{dones} }, @newinstnames );
-	@{ $dirfiles{dones} } = uniq ( @{ $dirfiles{dones} } );
-
-	#say $tee "NEWINST: " . dump( %inst );
-	#say $tee "IN MORPH PRINT INSTANCES AFTER " . scalar( @instances ) . dump ( @instances );
-
-	$countinst++;
-
-	return( \@instances, \%inst, \%dirfiles );
-}
+    my @newinstances;
 
 
-sub setpickinst
-{
-  my ( $missing, $mids_r, $countcase, $baseinsts_r, $dowhat_r ) = @_;
-  my %mids = %{ $mids_r };
-  my @baseinsts = @{ $baseinsts_r }; say RELATE "IN setpickinst baseinsts " .dump ( @baseinsts );
-	my $ins_r = pop( @baseinsts );
-	my %b = %{ $ins_r };
+    my $countinst = 0;
+    foreach my $instance ( @instances )
+    {
+        my %d = %{ $instance };
+        my $countcase = $d{countcase};
+        my $countblock = $d{countblock};
+        my @miditers = @{ $d{miditers} };
+        my $countvar = $d{countvar};
+        my $countstep = $d{countstep};
+        my @sweeps = @{ $d{sweeps} };
+        my @sourcesweeps = @{ $d{sourcesweeps} };
+        my @blockelts = @{ $d{blockelts} };
+        my @blocks = @{ $d{blocks} };
+        my $origin = $d{origin};
+        my %to = %{ $d{to} };
+        my %orig = %{ $d{orig} };
+        my $from = $origin;
+        my %varnums = %{ $d{varnums} };
+        my %mids = %{ $d{mids} };
+        my %carrier = %{ $d{carrier} };
+        my $varnumber = $countvar;
+        my $stepsvar = $varnums{$countvar};
+        my $is;
+        my @addinsts;
 
-	my %dowhat = %{ $dowhat_r }; #say "IN setpickinst \%dowhat " .dump ( %dowhat );
+        my $missing = $origin;
+        my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = Sim::OPT::getnear( $missing, \%mids, $countcase );
+        my @addinsts = @{ $box_ref };
+        my @countvrs = @{ $countvrs_ref };
+        my @countsteps = @{ $countsteps_ref };
 
-  #my %b = %{ $baseinsts[0] }; say RELATE "IN setpickinst baseinsts " .dump ( \%b );
-  my $countblock = $b{countblock};
-  my @miditers = @{ $b{miditers} }; say RELATE "IN setpickinst \@miditers " .dump ( @miditers );
-  my @sweeps = @{ $b{sweeps} };
-  my @sourcesweeps = @{ $b{sourcesweeps} };
-  my @varnumbers = @{ $b{varnumbers} };
-  my @blocks = @{ $b{blocks} };  say RELATE "IN setpickinst \@blocks " .dump ( @blocks );
-  my @blockelts = @{ $b{blockelts} }; say RELATE "IN setpickinst \@blockelts " .dump ( @blockelts );
-  my %varnums = %{ $b{varnums} };
-  my %carrier = %{ $b{carrier} };
-  my $stamp = Sim::OPT::encrypt1( $missing );
-
-  $mypath = $dowhat{mypath}; say RELATE "IN setpickinst \$mypath " .dump ( \$mypath ); say "IN setpickinst \$mypath " .dump ( $mypath );
-  $file = $dowhat{file}; say RELATE "IN setpickinst \$file " .dump ( \$file );
-
-	say RELATE "\nMISSING: $missing";
-	say RELATE "\%mids: " . dump( \%mids );
-
-	my ( $box_ref, $countvrs_ref, $countsteps_ref  ) = getnear( $missing, \%mids );
-	my @addinsts = @{ $box_ref }; say RELATE "in setpickinst PRODUCING \@addinsts" . dump( @addinsts );
-	my @countvrs = @{ $countvrs_ref }; say RELATE "in setpickinst PRODUCING \@countvrs" . dump( @countvrs );
-	my @countsteps = @{ $countsteps_ref }; say RELATE "in setpickinst PRODUCING \@countsteps" . dump( @countsteps );
-  my $countvar;
-  my $countstep;
-
-
-	if ( scalar( @addinsts ) > 0 )
-	{
-		my $cn = 0;
-		foreach $addinst ( @addinsts )
-		{
-			$countvar = $countvrs[$cn];
-			$countstep = $countsteps[$cn];
-      my ( $is, %origin, %to, %orig);
-			$is = $addinst;
-
-      $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
-      $to{cleanto} = "$is"; say RELATE "B in setpickinst \$to{cleanto} " .dump ( $to{cleanto} );
-
-			my ( @whatto );
-
-			if ( $cn == 0 )
-			{
-				$origin = Sim::OPT::Morph::giveback ( \%mids );
-				push ( @whatto, "begin" );
-			}
-
-			if ( $cn > 0 )
-			{
-				push ( @whatto, "transition" );
-				$origin = $addinsts[$cn-1];
-			}
-
-			if ( $cn == $#addinsts )
-			{
-				push ( @whatto, "end" );
-        $origin = $addinsts[$cn-1];
-			}
-
-      $orig{to} = "$mypath/$file" . "_" . "$origin"; say RELATE "C in setpickinst \$orig{to} " .dump ( $orig{to} );
-      $orig{cleanto} = "$origin"; say RELATE "D in setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
-
-			say RELATE "in setpickinst : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
-
-			my $crypto = Sim::OPT::encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-	    my $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
-
-
-	    if ( $dowhat{names} eq "long" )
-	    {
-	      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
-	      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
-	      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
-	      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
-	    }
-
-	    if ( $dowhat{names} eq "short" )
-	    {
-
-	      $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
-	      $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-	      $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
-	      $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-	    }
-
-      if ( $cn < $#addinsts )
-      {
-				push( @newinstances,
-  			{
-  				countcase => $countcase, countblock => $countblock,
-  				miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
-  				to => \%to, countvar => $countvar, countstep => $countstep,
-  				sweeps => \@sweeps, orig => \%orig,
-  				sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-  				varnumbers => \@varnumbers, blocks => \@blocks,
-  				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-  				countinstance => $cn, carrier => \%mids, origin => $origin,
-  				instn => $cn, is => $is, vehicles => \%vehicles,
-  				mypath => $mypath, file => $file, whatto => \@whatto,
-          fire => "no", from => $origin, gaproc => "yes", stamp => $stamp,
-  			} );
-      }
-      else
-      {
-				push( @newinstances,
+        if ( scalar( @addinsts ) > 0 )
         {
-  				countcase => $countcase, countblock => $countblock,
-  				miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
-  				to => \%to, countvar => $countvar, countstep => $countstep,
-  				sweeps => \@sweeps, orig => \%orig,
-  				sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-  				varnumbers => \@varnumbers, blocks => \@blocks,
-  				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-  				countinstance => $cn, carrier => \%mids, origin => $origin,
-  				instn => $cn, is => $is, vehicles => \%vehicles,
-  				mypath => $mypath, file => $file, whatto => \@whatto,
-          fire => "yes", from => $origin, gaproc => "yes", stamp => $stamp,
-				} );
-      }
-			$cn++;
-		}
-	}
-  else
-	{
-		$countvar = $countvrs[$cn];
-		$countstep = $countsteps[$cn];
-		$is = $addinst;
+            my $cn = 0;
+            foreach $addinst ( @addinsts )
+            {
+                my $countvar = $countvrs[$cn];
+                my $countstep = $countsteps[$cn];
+                $is = $addinst;
+                my %to = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $is, \%carrier, $file, \@blockelts, $mypath ) };
 
-		my ( %orig, @whatto );
-		$origin = Sim::OPT::Morph::giveback ( \%mids );
-    push ( @whatto, "end" );
+                my ( %orig, @whatto );
 
-		say RELATE "in setpickother : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
+                if ( $cn == 0 )
+                {
+                    $origin = Sim::OPT::giveback ( \%mids );
+                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
 
-    my $crypto = Sim::OPT::encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
-    my $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                    push ( @whatto, "begin" );
+                }
 
-    $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
-    $to{cleanto} = "$is"; say RELATE "B in setpickinst \$to{cleanto} " .dump ( $to{cleanto} );
-    $orig{to} = "$mypath/$file" . "_" . "$origin"; say RELATE "C in setpickinst \$orig{to} " .dump ( $orig{to} );
-    $orig{cleanto} = "$origin"; say RELATE "D in setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
+                if ( $cn > 0 )
+                {
+                    push ( @whatto, "transition" );
+                    $origin = $addinsts[$cn-1];
+                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                }
 
-    if ( $dowhat{names} eq "long" )
-    {
-      $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
-      $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
-      $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
-      $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+                if ( $cn == $#addinsts )
+                {
+                    push ( @whatto, "end" );
+                    %orig = %{ Sim::OPT::extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath, "" ) };
+                }
+
+                my %i = %{ $inst_ref };
+                my %inst = $i{inst};
+                my %to = %{ $inst{to} };
+                my %orig = %{ $inst{orig} };
+
+                #my $crypto = int( ( scalar( keys %inst ) ) / 5 * 6 );
+                #my $cryptor = $crypto + 1;
+
+                my ( $crypto, $cryptor );
+                if ( $dowhat{names} eq "short" )
+                { 
+                  $crypto = Sim::OPT::encrypt1( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+                  $cryptor = Sim::OPT::encrypt1( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                }
+                elsif ( $dowhat{names} eq "medium" )
+                { 
+                  $crypto = Sim::OPT::encrypt0( $is ); say RELATE "in setpickinst \$crypto " .dump ( \$crypto );
+                  $cryptor = Sim::OPT::encrypt0( $origin ); say RELATE "in setpickinst \$cryptor " .dump ( \$cryptor );
+                }
+
+                $to{to} = "$mypath/$file" . "_" . "$is";  say RELATE "A in setpickinst \$to{to} " .dump ( $to{to} );
+                $to{cleanto} = "$is"; say RELATE "B in setpickinst \$to{cleanto} " .dump ( $to{cleanto} );
+                $orig{to} = "$mypath/$file" . "_" . "$origin"; say RELATE "C in setpickinst \$orig{to} " .dump ( $orig{to} );
+                $orig{cleanto} = "$origin"; say RELATE "D in setpickinst \$orig{cleanto} " .dump ( $orig{cleanto} );
+
+                if ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) )
+                {
+                  $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
+                  $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
+                  $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
+                  $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
+                }
+                elsif ( $dowhat{names} eq "long" )
+                {
+
+                  $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
+                  $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+                  $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
+                  $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
+                }
+
+                #say $tee "HERE : \$countinst: $countinst, \$cn $cn, \$addinst: $addinst, \$origin: $origin, \$is: $is, \%to: " . dump( \%to ) . "\%orig: " . dump( \%orig );
+                push( @newinstances,
+                {
+                    countcase => $countcase, countblock => $countblock,
+                    miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
+                    to => \%to, countvar => $countvar, countstep => $countstep,
+                    sweeps => \@sweeps, dowhat => \%dowhat, orig => \%orig,
+                    sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+                    varnumbers => \@varnumbers, blocks => \@blocks,
+                    blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+                    countinstance => $count, carrier => \%carrier, origin => $origin,
+                    instn => $instn, is => $is, vehicles => \%vehicles,
+                    mypath => $mypath, file => $file, whatto => \@whatto,
+                } );
+
+                $cn++;
+            }
+        }
+        else
+        {
+            push( @newinstances, $instance );
+        }
     }
+    #say $tee "IN MORPH PRINT NEWINSTANCES scalar " . scalar( @newinstances ) . dump ( @newinstances );
 
-    if ( $dowhat{names} eq "short" )
-    {
+    @instances = @newinstances; # REASSIGNMENT!!!!!!
+    #say $tee "GOING TO GIVE INSTANCES: " .dump( @instances );
+    #say $tee "AND HAD INST: " .dump( \%inst );
+    my (  $newinstnames_r, $newinst_r ) = Sim::OPT::filterinsts_winsts( \@instances, \%inst );
+    %inst = %{ $newinst_r }; # REASSIGNMENT!!!!!!
+    my @newinstnames = @{ $newinstnames_r };
+    push( @{ $dirfiles{dones} }, @newinstnames );
+    @{ $dirfiles{dones} } = uniq ( @{ $dirfiles{dones} } );
 
-      $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
-      $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-      $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
-      $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-    }
-    push( @newinstances,
-    {
-			countcase => $countcase, countblock => $countblock,
-			miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
-			to => \%to, countvar => $countvar, countstep => $countstep,
-			sweeps => \@sweeps, dowhat => \%dowhat, orig => \%orig,
-			sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-			varnumbers => \@varnumbers, blocks => \@blocks,
-			blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-			countinstance => $cn, carrier => \%mids, origin => $origin,
-			instn => $instn, is => $to{cleanto}, vehicles => \%vehicles,
-			mypath => $mypath, file => $file, whatto => \@whatto,
-      fire => "yes", from => $origin, gaproc => "yes", stamp => $stamp,
-		} );
-	}
-	return ( \@newinstances );
-}
+    #say $tee "NEWINST: " . dump( %inst );
+    #say $tee "IN MORPH PRINT INSTANCES AFTER " . scalar( @instances ) . dump ( @instances );
 
+    $countinst++;
 
-sub reconstruct
-{
-	my ( $string ) = @_;
-	my %mids = split( "_|-", $string );
-  return( \%mids );
+    return( \@instances, \%inst, \%dirfiles );
 }
 
 
@@ -546,7 +1170,7 @@ sub morph
 	my @filter_columns = @main::filter_columns;
 	my %vals = %main::vals;
 
-  say  "RECEIVED NOW INSTANCES" . dump ( @instances );
+  #say  "RECEIVED NOW INSTANCES" . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
 
 	if ( $tofile eq "" )
 	{
@@ -773,7 +1397,7 @@ sub morph
 
 
 
-	if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{latinhypercube} eq "yes" ) )
+	if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) )
 	{
 		my ( $instances_ref, $inst_ref, $dirfiles_ref ) = setpickedinsts( \@instances, \%inst, \%dirfiles );
 	  @instances = @{ $instances_ref };
@@ -781,7 +1405,7 @@ sub morph
 		%dirfiles = %{ $dirfiles_ref };
 	}
 
-  my @collect;
+    my @collect;
 	foreach $instance_r ( @instances )
 	{
 		%d = %{ $instance_r };
@@ -789,7 +1413,7 @@ sub morph
 	}
 	say $tee "NOW COLLECTED INSTANCES " . dump( @collect );
 
-  my $counti = 0;
+    my $counti = 0;
 	foreach my $instance ( @instances )
 	{
 		my %d = %{ $instance };
@@ -921,7 +1545,7 @@ sub morph
 				#my $semph = 0;
 				#unless ( ( $exeonfiles eq "n" ) or ( $semph > 0 ) )
 				#{
-				#	my $starttarget = giveback( \%mids );
+				#	my $starttarget = Sim::OPT::giveback( \%mids );
 				#	$starttarget = "$mypath/$file" . "_" . "$starttarget"; say $tee "\$starttarget $starttarget";
 				#	if ( not ( -e $starttarget ) )
 				#	{
@@ -930,15 +1554,15 @@ sub morph
 				#	}
 				#	$semph++;
 				#}
-        my $target = $to{crypto};
+                my $target = $to{crypto};
 				my $orig = $orig{crypto};
 
-				my $starttarget = giveback( \%mids );  #say $tee "STARTTARGET $starttarget";
+				my $starttarget = Sim::OPT::giveback( \%mids );  #say $tee "STARTTARGET $starttarget";
 
-				#if ( ( ( ( $countblock > 0 ) and ( $countstep > 1 ) ) and ( not ( ( $dirfiles{randompick} eq "yes" ) and ( $dirfiles{ga} eq "yes" ) ) ) )
-				#  or ( ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) ) ) )
+				#if ( ( ( ( $countblock > 0 ) and ( $countstep > 1 ) ) and ( not ( ( $dirfiles{randompick} eq "y" ) and ( $dirfiles{ga} eq "y" ) ) ) )
+				#  or ( ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{ga} eq "y" ) ) ) )
 				{
-					unless ( $gaproc eq "yes" )
+					unless ( $gaproc eq "y" )
 					{
 						open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
 					}
@@ -953,9 +1577,9 @@ sub morph
 
 						unless ($exeonfiles eq "n")
 						{
-							if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{latinhypercube} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
+							if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
 							{
-								if ( ( "begin" ~~ @whatto ) and ( not ( "end" ~~ @whatto ) ) and ( $dowhat{jumpinst} eq "yes" ) )
+								if ( ( "begin" ~~ @whatto ) and ( not ( "end" ~~ @whatto ) ) and ( $dowhat{jumpinst} eq "y" ) )
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
@@ -969,7 +1593,7 @@ sub morph
 										print $tee "LEVEL 1a: cp -R $orig $target\n\n";
 									}
 								}
-								elsif ( ( "begin" ~~ @whatto )  and ( not ( "end" ~~ @whatto ) ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
+								elsif ( ( "begin" ~~ @whatto )  and ( not ( "end" ~~ @whatto ) ) and ( not ( $dowhat{jumpinst} eq "y" ) ) )
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}";
@@ -986,7 +1610,7 @@ sub morph
 								}
 
 								if ( ( "transition" ~~ @whatto ) and ( not ( "begin" ~~ @whatto) ) and
-								            ( not ( "end" ~~ @whatto) ) and ( $dowhat{jumpinst} eq "yes" ) )
+								            ( not ( "end" ~~ @whatto) ) and ( $dowhat{jumpinst} eq "y" ) )
 								{
 									$orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
@@ -1002,7 +1626,7 @@ sub morph
 									}
 								}
 								elsif ( ( "transition" ~~ @whatto ) and ( not ( "begin" ~~ @whatto) ) and
-								            ( not ( "end" ~~ @whatto) ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
+								            ( not ( "end" ~~ @whatto) ) and ( not ( $dowhat{jumpinst} eq "y" ) ) )
 								{
 									$orig = "$orig{crypto}";
 									$target = "$to{crypto}";
@@ -1018,9 +1642,9 @@ sub morph
 									}
 								}
 
-								if ( ( "end" ~~ @whatto ) and ( $dowhat{jumpinst} eq "yes" ) )
+								if ( ( "end" ~~ @whatto ) and ( $dowhat{jumpinst} eq "y" ) )
 								{
-	                $orig = "$orig{crypto}" . "-trans-$stamp";
+	                                $orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}";
 									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
 									{
@@ -1033,9 +1657,9 @@ sub morph
 										print  "LEVEL 1e1: cp -R $orig $target\n\n";
 									}
 								}
-                elsif ( ( "end" ~~ @whatto ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
+                                elsif ( ( "end" ~~ @whatto ) and ( not ( $dowhat{jumpinst} eq "y" ) ) )
 								{
-	                $orig = "$orig{crypto}";
+	                                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
 									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
 									{
@@ -1051,7 +1675,7 @@ sub morph
 
 								if ( "IMPOSSIBLE" eq "SOMETHING" )
 								{
-	                $orig = "$orig{crypto}";
+	                                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
 									if ( ( not ( -e $orig ) ) and ( $origin eq $starttarget ) )
 									{
@@ -1067,8 +1691,8 @@ sub morph
 
 							}
 
-							if ( ( not ( $dirfiles{randompick} eq "yes" ) ) and ( not ( $dirfiles{latinhypercube} eq "yes" ) )
-							 and ( not ( $dirfiles{ga} eq "yes" ) ) )
+							if ( ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{latinhypercube} eq "y" ) )
+							 and ( not ( $dirfiles{ga} eq "y" ) ) )
 							{
 								$orig;
 								$target = "$to{crypto}";
@@ -1171,7 +1795,7 @@ sub morph
 										} #
 										elsif ( $modtype eq "translate_surface" )
 										{
-											translate_surfaces($to, $stepsvar, $countop, $countstep, \@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+											translate_surface($to, $stepsvar, $countop, $countstep, \@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "rotate_surface" )              #
 										{
@@ -1247,7 +1871,7 @@ sub morph
 										}
 										else
 										{
-											say $tee "Can't recognize the modification type. So quitting.";
+											say $tee "Can't recognize the modification type $modtype. So quitting.";
 											die( "$!" );
 										}
 									}
@@ -2045,7 +2669,7 @@ YYY
 } # end sub translate
 
 
-sub translate_surfaces
+sub translate_surface
 {
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
@@ -2224,7 +2848,14 @@ $printthis";
 			}
 		}
 	}
-}    # END SUB translate_surfaces
+}    # END SUB translate_surface
+
+
+
+
+
+
+
 
 
 sub rotate_surface
@@ -2982,19 +3613,20 @@ sub change_thickness
 	my %vertnummenu = %{ $menus[1] };
 
 	say $tee "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+    
+    my @grouplistings = @{ $$thickness_change[$countop][0] };
+	my @entries_to_change = @{ $$thickness_change[$countop][1] };
+	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][2] };
+	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][3] };
 
-	my @entries_to_change = @{ $$thickness_change[$countop][0] };
-	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] };
-	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] };
-
-	my $thiscount = 0;
+	
 	my ( $entry_to_change, $countstrata, $stratum_to_change, $min, $max, $change_stratum, $enter_change_entry, $swing, $pace, $thickness );
-	my ( @strata_to_change, @min_max_values , @change_strata, @change_entries, @change_entries_with_thicknesses );
-	if ( $stepsvar > 1 )
+	my ( @strata_to_change, @min_max_values , @change_strata, @change_entries, @change_entries_with_thicknesses, $grouplisting );
+	my $thiscount = 0;
+    if ( $stepsvar > 1 )
 	{
 		foreach my $entrypair_to_change ( @entries_to_change )
 		{
-
 			if ( not( ref( $entrypair_to_change ) ) )
 			{
 				$entry_to_change = $entrypair_to_change;
@@ -3004,12 +3636,14 @@ sub change_thickness
 				my $group_to_change = $entrypair_to_change->[0];
 				my $entry_to_change = $entrypair_to_change->[1];
 			}
-
+            
+            $grouplisting = $grouplistings[$thiscount];
 			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] };
+            @min_max_values_refs = @{ $groups_of_couples_of_min_max_values[$thiscount] };
 			$countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
 			{
-				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] };
+                my @min_max_values = @{ $min_max_values_refs[$countstrata] };
 				my $min   = $min_max_values[0];
 				my $max   = $min_max_values[1];
 				my $swing = $max - $min;
@@ -3028,13 +3662,13 @@ prj -file $fileconfig -mode script<<YYY
 b
 e
 a
+$grouplisting
 $entry_to_change
 $stratum_to_change
 n
 $thickness
 -
 >
-a
 y
 -
 -
@@ -3042,7 +3676,18 @@ y
 y
 
 y
+-
+-
+prj -file $fileconfig -mode script
+m
+c
 b
+#
+y
+-
+-
+-
+-
 -
 YYY
 ";
@@ -3055,14 +3700,13 @@ prj -file $fileconfig -mode script<<YYY
 b
 e
 a
-$group_to_change
+$grouplisting
 $entry_to_change
 $stratum_to_change
 n
 $thickness
 -
 >
-a
 y
 -
 -
@@ -3070,7 +3714,18 @@ y
 y
 
 y
+-
+-
+prj -file $fileconfig -mode script
+m
+c
 b
+#
+y
+-
+-
+-
+-
 -
 YYY
 ";
@@ -4300,6 +4955,7 @@ sub pin_obstructions
 } # END SUB pin_obstructions
 
 
+
 sub apply_constraints
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
@@ -4317,8 +4973,12 @@ sub apply_constraints
 	my @numberfiles = @{ $apply_constraints[$countop][1] };
 	my @configfiles = @{ $apply_constraints[$countop][2] };
 	my @incrs = @{ $apply_constraints[$countop][3] };
-  my @filestoedit = @{ $apply_constraints[$countop][4] };
+        my @filestoedit = @{ $apply_constraints[$countop][4] };
 	my $separator = $apply_constraints[$countop][5];
+	my $subtype = $apply_constraints[$countop][6];
+	my @vertpair = @{ $apply_constraints[$countop][7] };
+	my $firstpoint = $vertpair[0];
+	my $secondpoint = $vertpair[1];
 
 	my ( %ver, %obs, %nod, %comp );
 	my %verts = %numvertmenu;
@@ -4392,7 +5052,7 @@ sub apply_constraints
 	75 => "0\n0\nc0\nc0\ncw", 76 => "0\n0\nc0\nc0\ncx" );
 
   my $countfile = 0;
-	foreach my $sourcefile ( @sourcefiles )
+  foreach my $sourcefile ( @sourcefiles )
   {
 
 	my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
@@ -4413,7 +5073,7 @@ sub apply_constraints
 				my $vertnum = $rowelts[5];
 				@{ $ver{$numberfiles[$countfile]}{$vertnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3] );
 			}
-	    if   ($rowelts[0] eq "*obs" )
+	                if   ($rowelts[0] eq "*obs" )
 			{
 				my $obsnum = $rowelts[13];
 				@{ $obs{$numberfiles[$countfile]}{$obsnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3],
@@ -4426,27 +5086,27 @@ sub apply_constraints
 			my $countnode = -1;
 			my $countcomponent = -1;
 			my $countcomp = 0;
-			my $semaphore_node = "no";
-			my $semaphore_component = "no";
-			my $semaphore_connection = "no";
+			my $semaphore_node = "n";
+			my $semaphore_component = "n";
+			my $semaphore_connection = "n";
 			my ($component_letter, $type, $data_1, $data_2, $data_3, $data_4);
 			foreach my $line (@lines)
 			{
 				if ( $line =~ m/Fld. Type/ )
 				{
-					$semaphore_node eq "yes";
+					$semaphore_node eq "y";
 				}
-				if ( $semaphore_node eq "yes" )
+				if ( $semaphore_node eq "y" )
 				{
 					$countnode++;
 				}
 				if ( $line =~ m/Type C\+ L\+/ )
 				{
-					$semaphore_component eq "yes";
-					$semaphore_node = "no";
+					$semaphore_component eq "y";
+					$semaphore_node = "n";
 				}
 
-				if ( ($semaphore_node eq "yes") and ( $semaphore_component eq "no" ) and ( $countnode >= 0))
+				if ( ($semaphore_node eq "y") and ( $semaphore_component eq "n" ) and ( $countnode >= 0))
 				{
 					my $node_letter = $nodes[$countnode];
 					my $fluid = $row[1];
@@ -4457,19 +5117,19 @@ sub apply_constraints
 					@{ $nod{$countnode} } = ( $node_letter, $fluid, $type, $height, $data_2, $data_1 ); # PLURAL
 				}
 
-				if ( $semaphore_component eq "yes" )
+				if ( $semaphore_component eq "y" )
 				{
 					$countcomponent++;
 				}
 
 				if ( $line =~ m/\+Node/ )
 				{
-					$semaphore_connection eq "yes";
-					$semaphore_component = "no";
-					$semaphore_node = "no";
+					$semaphore_connection eq "y";
+					$semaphore_component = "n";
+					$semaphore_node = "n";
 				}
 
-				if ( ($semaphore_component eq "yes") and ( $semaphore_connection eq "no" ) and ( $countcomponent > 0))
+				if ( ($semaphore_component eq "y") and ( $semaphore_connection eq "n" ) and ( $countcomponent > 0))
 				{
 					if ($countcomponent % 2 == 1) # $number is odd
 					{
@@ -4497,8 +5157,8 @@ sub apply_constraints
 	  $countfile++;
   }
 
- 	my ( $swing, $base, $pace, $val );
- 	my $count = 0;
+  my ( $swing, $base, $pace, $val );
+  my $count = 0;
   foreach $incr ( @incrs )
   {
 	  if ( ref ( $incr ) )
@@ -4520,7 +5180,6 @@ sub apply_constraints
   }
 
 	my %eds;
-	my @eeds;
 	foreach my $file ( @filestoedit )
 	{
     my $myfile = "$to$file";
@@ -4564,9 +5223,6 @@ sub apply_constraints
 						my $end = $beginning + $length;
 						$eds{$name}{end} = $end; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{end}: " . dump( $eds{$name}{end} );
 						$eds{$name}{rightpart} = $rightpart; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{rightpart}: " . dump( $eds{$name}{rightpart} );
-						push ( @eeds, $name ); #say $tee "AAAPPLY_CONSTRAINTS \@eeds: " . dump( @eeds );
-
-
 					}
 				}
 			}
@@ -4618,7 +5274,7 @@ sub apply_constraints
 		  foreach my $line ( @lines )
 		  {
 			  if ( $line =~ /#&&/ )
-			  { say $tee "APPPLY_CONSTRAINTS \$line: " . dump( $line );
+			  {       #say $tee "APPPLY_CONSTRAINTS \$line: " . dump( $line );
 				  $line =~ s/ +/ /;
 				  my @splits = split( "$separator", $line ); say $tee "APPPLY_CONSTRAINTS \@splits: " . dump( @splits );
 
@@ -4628,7 +5284,7 @@ sub apply_constraints
 					$rightpart =~ s/ +/ /; say $tee "APPPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
 				  my @elms = split( / /, $rightpart ); say $tee "APPPLY_CONSTRAINTS \@elms: " . dump( @elms );
 
-		      foreach my $elm ( @elms )
+		          foreach my $elm ( @elms )
 				  {
 						chomp $elm;
 					  my ( $name, $number ) = split( "-", $elm );
@@ -4638,10 +5294,10 @@ sub apply_constraints
 					  {
 						  #if ( $eds{$name}{line} eq $cnt )
 						  #{
-                $splits[$eds{$name}{position}] = $eds{$name}{newvalue};
+                                                          $splits[$eds{$name}{position}] = $eds{$name}{newvalue};
 
-                #$line = ( substr( $line, 0, $eds{$name}{beginning} ) ) . ( substr( $line, $eds{$name}{end} ) ); say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
-							  #substr( $line, $eds{$name}{beginning}, 0) = $eds{$name}{newvalue}; say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
+                                                          #$line = ( substr( $line, 0, $eds{$name}{beginning} ) ) . ( substr( $line, $eds{$name}{end} ) ); say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
+					                  #substr( $line, $eds{$name}{beginning}, 0) = $eds{$name}{newvalue}; say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
 
 							  #unless ( $line =~ /#&&/ )
 							  #{
@@ -4655,7 +5311,7 @@ sub apply_constraints
 					foreach my $split ( @splits )
 					{
 						$split = $split . "$separator";
-            $novelline = $novelline . $split;
+                                                $novelline = $novelline . $split;
 					}
 					$line = $novelline . "\n";
 			  }
@@ -4665,6 +5321,13 @@ sub apply_constraints
 	    }
 		  close OFILE;
 	  }
+	  
+	  #my ( $xmove, $ymove, $zmove );
+	  #if ( $subtype eq "pairedmove" )
+	  #{
+	  #  $xmove = - ( $ver{$...}{$firstpoint}->[0] - $ver{$...}{$secondpoint}->[0] ); DDD
+	    
+
 
     foreach my $output ( @tooutputs )
     {
@@ -6581,7 +7244,7 @@ sub read_controls
 	{
 		if ( $line =~ /Control function/ )
 		{
-			$semaphore_loop eq "yes";
+			$semaphore_loop eq "y";
 			$countloopcontrol = -1;
 			$countloop++;
 			$loop_letter = $letters[$countloop];
@@ -6591,16 +7254,16 @@ sub read_controls
 			$countloopcontrol++;
 			my @row = split(/\s+/, $line);
 			$loop_hour = $row[3];
-			$semaphore_loopcontrol eq "yes";
+			$semaphore_loopcontrol eq "y";
 			$loopcontrol_letter = $period_letters[$countloopcontrol];
 		}
 
-		if ( ($semaphore_loop eq "yes") and ($semaphore_loopcontrol eq "yes") and ($line =~ /No. of data items/ ) )
+		if ( ($semaphore_loop eq "y") and ($semaphore_loopcontrol eq "y") and ($line =~ /No. of data items/ ) )
 		{
 			$doline = $countlines + 1;
 		}
 
-		if ( ($semaphore_loop eq "yes" ) and ($semaphore_loopcontrol eq "yes") and ($countlines == $doline) )
+		if ( ($semaphore_loop eq "y" ) and ($semaphore_loopcontrol eq "y") and ($countlines == $doline) )
 		{
 			my @row = split(/\s+/, $line);
 			my $max_heating_power = $row[1];
@@ -6615,13 +7278,13 @@ sub read_controls
 			$max_heating_power, $min_heating_power, $max_cooling_power,
 			$min_cooling_power, $heating_setpoint, $cooling_setpoint );
 
-			$semaphore_loopcontrol = "no";
+			$semaphore_loopcontrol = "n";
 			$doline = "";
 		}
 
 		if ($line =~ /Control mass/ )
 		{
-			$semaphore_flow eq "yes";
+			$semaphore_flow eq "y";
 			$countflowcontrol = -1;
 			$countflow++;
 			$flow_letter = $letters[$countflow];
@@ -6631,23 +7294,23 @@ sub read_controls
 			$countflowcontrol++;
 			my @row = split(/\s+/, $line);
 			$flow_hour = $row[3];
-			$semaphore_flowcontrol eq "yes";
+			$semaphore_flowcontrol eq "y";
 			$flowcontrol_letter = $period_letters[$countflowcontrol];
 		}
 
-		if ( ($semaphore_flow eq "yes") and ($semaphore_flowcontrol eq "yes") and ($line =~ /No. of data items/ ) )
+		if ( ($semaphore_flow eq "y") and ($semaphore_flowcontrol eq "y") and ($line =~ /No. of data items/ ) )
 		{
 			$doline = $countlines + 1;
 		}
 
-		if ( ($semaphore_flow eq "yes" ) and ($semaphore_flowcontrol eq "yes") and ($countlines == $doline) )
+		if ( ($semaphore_flow eq "y" ) and ($semaphore_flowcontrol eq "y") and ($countlines == $doline) )
 		{
 			my @row = split(/\s+/, $line);
 			my $flow_setpoint = $row[1];
 			my $flow_onoff = $row[2];
 			my $flow_fraction = $row[3];
 			push( @{ $flowcontrol[$countflow][$countflowcontrol]}, $flow_letter, $flowcontrol_letter, $flow_hour, $flow_setpoint, $flow_onoff, $flow_fraction );
-			$semaphore_flowcontrol = "no";
+			$semaphore_flowcontrol = "n";
 			$doline = "";
 		}
 		$countlines++;
@@ -7102,7 +7765,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

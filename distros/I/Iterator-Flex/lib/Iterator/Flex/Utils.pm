@@ -8,12 +8,13 @@ use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
 use Exporter 'import';
 use experimental 'declared_refs';
+use Module::Runtime;
 
 our %REGISTRY;
 
@@ -301,7 +302,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SUBROUTINES
 

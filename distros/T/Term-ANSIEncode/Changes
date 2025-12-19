@@ -223,3 +223,15 @@
 1.53    Dec 14, 2025
 
         Made testing much more informative and nice to look at.
+
+1.54    Dec 18, 2025
+
+        Filtered output of "-t" option to color support of terminal
+
+1.55    Dec 18, 2025
+
+        Shrank the bin/ansi-encode source a bit my compressing repetitions
+
+1.56    Dec 18, 2025
+
+        Revamped the module to make the source easy to read.

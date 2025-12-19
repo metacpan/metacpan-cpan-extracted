@@ -14,7 +14,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 # VERSION
 
-Version 0.9922
+Version 0.9923
 
 # DESCRIPTION
 
@@ -281,7 +281,7 @@ Version 0.9922
 
 Команда `xlate` работает совместно со средой Docker, поэтому даже если у вас ничего не установлено, вы можете использовать ее, пока доступен Docker. Используйте опцию `-D` или `-C`.
 
-Операции Docker выполняются с помощью скрипта `dozo`, который также может использоваться как отдельная команда. Скрипт `dozo` поддерживает конфигурационный файл `.dozorc` для постоянных настроек контейнера.
+Операции Docker выполняются командой [App::dozo](https://metacpan.org/pod/App%3A%3Adozo), которая также может использоваться как отдельная команда. Команда `dozo` поддерживает конфигурационный файл `.dozorc` для постоянных настроек контейнера.
 
 Кроме того, поскольку в комплекте поставляются make-файлы для различных стилей документов, перевод на другие языки возможен без специальных уточнений. Используйте опцию `-M`.
 
@@ -335,13 +335,15 @@ Version 0.9922
 
 [App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
+[App::dozo](https://metacpan.org/pod/App%3A%3Adozo) - общий Docker runner, используемый xlate для операций с контейнерами.
+
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
     Образ контейнера Docker.
 
 - [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong)
 
-    Библиотека `getoptlong.sh` используется для разбора опций в скриптах `xlate` и `dozo`.
+    Библиотека `getoptlong.sh` используется для разбора опций в скрипте `xlate` и [App::dozo](https://metacpan.org/pod/App%3A%3Adozo).
 
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 

@@ -14,11 +14,17 @@ BEGIN {
     }
 }
 
-# Skip tests on platforms without bash
+# Skip tests on platforms without bash or with old bash
 BEGIN {
     my $bash_check = `bash --version 2>&1`;
     if ($? != 0) {
         plan skip_all => 'bash is not available on this system';
+    }
+    if ($bash_check =~ /version (\d+)\.(\d+)/) {
+        my ($major, $minor) = ($1, $2);
+        if ($major < 4 || ($major == 4 && $minor < 3)) {
+            plan skip_all => "bash 4.3+ required (found $major.$minor)";
+        }
     }
 }
 

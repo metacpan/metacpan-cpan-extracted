@@ -11,6 +11,8 @@
 
 SV*
 join_with_commas(AV *av) {
+    dTHX;
+
     SV *out = newSVpvs("");
     I32 len = av_len(av) + 1;
 
@@ -68,6 +70,7 @@ xscon_create_instance(const char* klass) {
 
 static bool
 _S_pv_is_integer (char* const pv) {
+    dTHX;
     const char* p;
     p = &pv[0];
 
@@ -87,6 +90,7 @@ _S_pv_is_integer (char* const pv) {
 
 static bool
 _S_nv_is_integer (NV const nv) {
+    dTHX;
     if(nv == (NV)(IV)nv){
         return TRUE;
     }
@@ -100,6 +104,7 @@ _S_nv_is_integer (NV const nv) {
 
 bool
 _is_class_loaded (SV* const klass ) {
+    dTHX;
     HV *stash;
     GV** gvp;
     HE* he;
@@ -145,6 +150,7 @@ _is_class_loaded (SV* const klass ) {
 static bool
 xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_keyname, STRLEN isa_hash_keylen)
 {
+    dTHX;
     assert(value);
 
     // 15 indicates an unknown type constraint
@@ -386,17 +392,17 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
         
         SV** valref;
         SV* val;
-        bool has_value = false;
+        bool has_value = FALSE;
         
         if (hv_exists(args, keyname, keylen)) {
             // Value provided in args hash
             valref = hv_fetch(args, keyname, keylen, 0);
             val = newSVsv(*valref);
-            has_value = true;
+            has_value = TRUE;
         }
         else if ( flags & 8 ) {
             // There is a default/builder
-            has_value = true;
+            has_value = TRUE;
             // Some very common defaults are worth hardcoding into the flags
             // so we won't even need to do a hash lookup to find the default
             // value.
@@ -483,7 +489,7 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
                         }
                     }
                     else {
-                        has_value = false;
+                        has_value = FALSE;
                         if ( flags & 1 ) {
                             croak("Attribute '%s' is required", keyname);
                         }
@@ -621,6 +627,78 @@ xscon_buildall(const char* pkg, const char* klass, SV* const object, SV* const a
 }
 
 static void
+xscon_demolishall(const char* pkg, const char* klass, SV* const object, I32 in_global_destruction) {
+    dTHX;
+
+    assert(object);
+
+    HV* const stash = gv_stashpv(pkg, 1);
+    assert(stash != NULL);
+    
+    SV *pkgsv = newSVpv(pkg, 0);
+    SV *klasssv = newSVpv(klass, 0);
+    
+    /* get cache stuff */
+    SV** const globref = hv_fetch(stash, "__XSCON_DEMOLISH", 16, 0);
+    HV* demolishall_hash = GvHV(*globref);
+    
+    STRLEN klass_len = strlen(klass);
+    SV** demolishall = hv_fetch(demolishall_hash, klass, klass_len, 0);
+    
+    if ( !demolishall || !SvOK(*demolishall) ) {
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 2);
+        PUSHs(pkgsv);
+        PUSHs(klasssv);
+        PUTBACK;
+        count = call_pv("Class::XSConstructor::populate_demolish", G_VOID);
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        
+        demolishall = hv_fetch(demolishall_hash, klass, klass_len, 0);
+    }
+    
+    if (!SvOK(*demolishall)) {
+        croak("something should have happened!");
+    }
+    
+    if (!SvROK(*demolishall)) {
+        return;
+    }
+
+    AV* const demolishes = (AV*)SvRV(*demolishall);
+    I32 const len = av_len(demolishes) + 1;
+    SV** tmp;
+    SV* demolish;
+    I32 i;
+
+    for (i = 0; i < len; i++) {
+        tmp = av_fetch(demolishes, i, 0);
+        assert(tmp);
+        demolish = *tmp;
+        
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 2);
+        PUSHs(object);
+        XPUSHs(sv_2mortal(newSViv((IV)in_global_destruction)));
+        PUTBACK;
+        count = call_sv(demolish, G_VOID);
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+}
+
+static void
 xscon_strictcon(const char* pkg, SV* const object, SV* const args) {
     dTHX;
 
@@ -684,6 +762,7 @@ void
 new_object(SV* klass, ...)
 CODE:
 {
+    dTHX;
     const char* klassname;
     SV* args;
     SV* object;
@@ -702,10 +781,50 @@ CODE:
 }
 
 void
+destroy(SV* object, ...)
+CODE:
+{
+    dTHX;
+    char *destructor_package_name = (char *) CvXSUBANY(cv).any_ptr;
+    const char* klassname = SvROK(object) ? sv_reftype(SvRV(object), 1) : SvPV_nolen_const(object);
+    I32 in_global_destruction = PL_dirty;
+    xscon_demolishall(destructor_package_name, klassname, object, in_global_destruction);
+    XSRETURN(0);
+}
+
+void
 install_constructor(char* name)
 CODE:
 {
+    dTHX;
     CV *cv = newXS(name, XS_Class__XSConstructor_new_object, (char*)__FILE__);
+    if (cv == NULL)
+        croak("ARG! Something went really wrong while installing a new XSUB!");
+    
+    char *full = savepv(name);
+    const char *last = NULL;
+    for (const char *p = full; (p = strstr(p, "::")); p += 2) {
+        last = p;
+    }
+    char *pkg;
+    if (last) {
+        size_t len = (size_t)(last - full);
+        pkg = (char *)malloc(len + 1);
+        memcpy(pkg, full, len);
+        pkg[len] = '\0';
+    } else {
+        pkg = strdup("");
+    }
+    
+    CvXSUBANY(cv).any_ptr = pkg;
+}
+
+void
+install_destructor(char* name)
+CODE:
+{
+    dTHX;
+    CV *cv = newXS(name, XS_Class__XSConstructor_destroy, (char*)__FILE__);
     if (cv == NULL)
         croak("ARG! Something went really wrong while installing a new XSUB!");
     

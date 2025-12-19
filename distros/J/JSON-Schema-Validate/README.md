@@ -39,13 +39,21 @@ You could also do:
         prune_unknown    => 1,
         trace_on         => 1,
         trace_limit      => 200,
-        trace_sample     => 1,
+        unique_keys      => 1,
     )->register_builtin_formats;
 
     my $ok = $js->validate({ name => 'head', next => { name => 'tail' } })
         or die( $js->error );
 
     print "ok\n";
+
+    # Override instance options for one call only (backward compatible)
+    $js->validate( $data, max_errors => 1 )
+        or die( $js->error );
+
+    # Quick boolean check (records at most one error by default)
+    $js->is_valid({ name => 'head', next => { name => 'tail' } })
+        or die( $js->error );
 
 Generating a browser-side validator with ["compile\_js"](#compile_js):
 
@@ -115,7 +123,7 @@ In your HTML:
 
 # VERSION
 
-v0.6.1
+v0.7.0
 
 # DESCRIPTION
 
@@ -404,6 +412,18 @@ Supported JavaScript options:
 
     In `"auto"` mode the generator emits cautious compatibility shims: “advanced” patterns are wrapped in `try/catch`; if the browser cannot compile them, those checks are silently skipped on the client (and are still enforced server-side by Perl).
 
+- `max_errors =E<gt 200>`
+
+    Defaults to 200.
+
+    Set the maximum number of errors to be recorded.
+
+- `name => "myValidator"`
+
+    Defaults to `validate`
+
+    Sets a custom name for the JavaScript validation function.
+
 ### JavaScript keyword coverage
 
 The generated JS implements a pragmatic subset of the Perl engine:
@@ -638,6 +658,32 @@ Read-only accessor.
 
 Returns true if unknown required vocabularies are being ignored, false otherwise.
 
+## is\_valid
+
+    my $ok = $js->is_valid( $data );
+
+    my $ok = $js->is_valid(
+        $data,
+        max_errors     => 1,     # default for is_valid
+        trace_on       => 0,
+        trace_limit    => 0,
+        compile_on     => 0,
+        content_assert => 0,
+    );
+
+Validate `$data` against the compiled schema and return a boolean.
+
+This is a convenience method intended for “yes/no” checks. It behaves like ["validate"](#validate) but defaults to `max_errors => 1` so that, on failure, only one error is recorded.
+
+On failure, the single recorded error can be retrieved with ["error"](#error):
+
+    $js->is_valid( $data )
+        or die( $js->error );
+
+Per-call options are passed through to ["validate"](#validate) and may override the instance configuration for this call only (e.g. `max_errors`, `trace_on`, `trace_limit`, `compile_on`, `content_assert`).
+
+Returns 1 on success, 0 on failure.
+
 ## prune\_instance
 
     my $pruned = $jsv->prune_instance( $instance );
@@ -752,6 +798,17 @@ Declare which vocabularies the host supports, as a hash reference:
 
 Resets internal vocabulary-checked state so the declaration is enforced on next `validate`.
 
+By default, this module supports all vocabularies required by 2020-12.
+
+However, you can restrict support:
+
+    $js->set_vocabulary_support({
+        'https://json-schema.org/draft/2020-12/vocab/core'         => 1,
+        'https://json-schema.org/draft/2020-12/vocab/applicator'   => 1,
+        'https://json-schema.org/draft/2020-12/vocab/format'       => 0,
+        'https://mycorp/vocab/internal'                            => 1,
+    });
+
 It returns the current object.
 
 ## trace
@@ -796,19 +853,67 @@ Returns the object for method chaining.
 
     my $ok = $js->validate( $data );
 
-Validate a decoded JSON instance against the compiled schema. Returns a boolean.
-On failure, inspect `$js->error` to retrieve the [error object](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AValidate%3A%3AError) that stringifies for a concise message (first error), or `$js->errors` for an array reference of [error objects](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AValidate%3A%3AError) like:
+    my $ok = $js->validate(
+        $data,
+        max_errors      => 5,
+        trace_on        => 1,
+        trace_limit     => 200,
+        compile_on      => 0,
+        content_assert  => 1,
+    );
+
+Validate a decoded JSON instance against the compiled schema and return a boolean.
+
+On failure, inspect `$js->error` to retrieve the [error object](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AValidate%3A%3AError) that stringifies for a concise message (first error), or `$js->errors` for an array reference of [error objects](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AValidate%3A%3AError).
+
+Example:
+
+    my $ok = $js->validate( $data ) or die( $js->error );
+
+Each error is a [JSON::Schema::Validate::Error](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AValidate%3A%3AError) object:
 
     my $err = $js->error;
-    say $err->path; # #/properties~1name
-    say $err->message; # string shorter than minLength 1
-    say "$err"; # error object will stringify
+    say $err->path;           # #/properties~1name
+    say $err->schema_pointer; # #/properties/name
+    say $err->keyword;        # minLength
+    say $err->message;        # string shorter than minLength 1
+    say "$err";               # stringifies to a concise message
+
+### Per-call option overrides
+
+`validate` accepts optional named parameters (hash or hash reference) that override the validator’s instance configuration for this call only.
+
+Currently supported overrides:
+
+- `max_errors`
+
+    Maximum number of errors to collect before stopping validation.
+
+- `trace_on`, `trace_limit`
+
+    Enable tracing and limit the number of trace entries.
+
+- `compile_on`
+
+    Enable on-the-fly compilation during validation.
+
+- `content_assert`
+
+    Enable media-type / content assertions.
+
+All options are optional and backward compatible. If omitted, the instance configuration is used.
+
+### Relationship to `is_valid`
+
+["is\_valid"](#is_valid) is a convenience wrapper around `validate` that defaults `max_errors => 1` and is intended for fast boolean checks:
+
+    $js->is_valid( $data ) or die( $js->error );
 
 # BEHAVIOUR NOTES
 
 - Recursion & Cycles
 
-    The validator guards on the pair `(schema_pointer, instance_address)`, so self-referential schemas and cyclic instance graphs won’t infinite-loop.
+    The validator guards on the pair `(schema_pointer, instance_address)`, so self-referential schemas and cyclic instance graphs will not infinite-loop.
 
 - Union Types with Inline Schemas
 
@@ -899,3 +1004,13 @@ Copyright(c) 2025 DEGUEST Pte. Ltd.
 All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 4833:
+
+    Unterminated C<...> sequence
+
+    Unknown E content in E&lt;gt 200>

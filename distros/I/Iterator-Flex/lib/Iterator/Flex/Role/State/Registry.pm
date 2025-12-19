@@ -6,7 +6,7 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_STATE :IterStates );
 
@@ -67,7 +67,7 @@ Iterator::Flex::Role::State::Registry - Iterator State is kept in the registry
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 METHODS
 

@@ -642,6 +642,27 @@ substr(buf, ofs, count_sv=NULL, replacement=NULL)
          XSRETURN(1);
       }
 
+IV
+memcmp(lhs, rhs, reverse=false)
+   SV *lhs
+   SV *rhs
+   bool reverse
+   ALIAS:
+      Crypt::SecretBuffer::Span::memcmp = 1
+      Crypt::SecretBuffer::Exports::memcmp = 2
+   INIT:
+      STRLEN lhs_len, rhs_len;
+      const char *lhs_buf= secret_buffer_SvPVbyte(lhs, &lhs_len);
+      const char *rhs_buf= secret_buffer_SvPVbyte(rhs, &rhs_len);
+   CODE:
+      RETVAL= memcmp(lhs_buf, rhs_buf, (lhs_len < rhs_len? lhs_len : rhs_len));
+      if (RETVAL == 0 && lhs_len != rhs_len)
+         RETVAL= lhs_len < rhs_len? -1 : 1;
+      if (reverse)
+         RETVAL= -RETVAL;
+   OUTPUT:
+      RETVAL
+
 UV
 append_random(buf, count, flags=0)
    auto_secret_buffer buf
@@ -744,10 +765,8 @@ unmask_to(buf, coderef)
       EXTEND(SP, 1);
       PUSHs(secret_buffer_get_stringify_sv(buf));
       PUTBACK;
-      count= call_sv(coderef, G_EVAL|GIMME_V);
+      count= call_sv(coderef, GIMME_V);
       SPAGAIN;
-      if (SvTRUE(ERRSV))
-         croak_sv(ERRSV);
       XSRETURN(count);
 
 bool
@@ -789,10 +808,8 @@ unmask_secrets_to(coderef, ...)
             PUSHs(ST(i));
       }
       PUTBACK;
-      count= call_sv(coderef, G_EVAL|GIMME_V);
+      count= call_sv(coderef, GIMME_V);
       SPAGAIN;
-      if (SvTRUE(ERRSV))
-         croak_sv(ERRSV);
       XSRETURN(count);
 
 void
@@ -986,6 +1003,8 @@ scan(self, pattern=NULL, flags= 0)
       //   1 == return bool
       //   2 == return self
       int ret_type= (ix >> 4) & 0xF;
+      if (ret_type != 1 && parse.encoding == SECRET_BUFFER_ENCODING_BASE64)
+         croak("Cannot perform parse, trim, or scan on base64 (pos / lim of result would not be whole bytes)");
       int op= (ix >> 8);
       bool matched;
       if (!pattern) {
@@ -1105,7 +1124,7 @@ copy_to(self, ...)
          croak("transcode failed: %s", src.error? src.error : dst.error);
       // If the output was actually a SV, assign that now
       if (dst_sv) {
-         sv_setpvn_mg(dst_sv, dst_buf->data, dst_buf->len);
+         sv_setpvn_mg(dst_sv, dst_buf->len? dst_buf->data : "", dst_buf->len);
          // and if no encoding was requested, upgrade to wide characters
          if (dst_encoding == SECRET_BUFFER_ENCODING_UTF8 && dst_encoding_req < 0)
             SvUTF8_on(dst_sv);
@@ -1136,6 +1155,7 @@ BOOT:
    EXPORT_ENCODING("UTF16LE",  "UTF-16LE",   SECRET_BUFFER_ENCODING_UTF16LE);
    EXPORT_ENCODING("UTF16BE",  "UTF-16BE",   SECRET_BUFFER_ENCODING_UTF16BE);
    EXPORT_ENCODING("HEX",      "HEX",        SECRET_BUFFER_ENCODING_HEX);
+   EXPORT_ENCODING("BASE64",   "BASE64",     SECRET_BUFFER_ENCODING_BASE64);
 #undef EXPORT_ENCODING
    // Set up an array of _encodings so that the accessor can return an existing SV
    AV *encodings= get_av("Crypt::SecretBuffer::_encodings", GV_ADD);

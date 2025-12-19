@@ -14,6 +14,7 @@ subtest index_str => sub {
    is($buf->index('abc', -4), -1, 'negative offset beyond substring');
    is($buf->index("6", $buf->length-1), $buf->length-1, 'find last byte starting from last byte');
    is($buf->index("6", -1), $buf->length-1, 'find last byte using negative index');
+   is($buf->index(secret("\0abc")), 6, 'Use secretbuffer as pattern' );
 };
 
 subtest rindex_str => sub {
@@ -25,6 +26,7 @@ subtest rindex_str => sub {
    is($buf->rindex('nope'), -1, 'return -1 when not found');
    is($buf->rindex("a", 0), 0, 'find first byte starting from first byte');
    is($buf->rindex("6", -1), 12, 'find last byte using negative index');
+   is($buf->index(secret("\0abc")), 6, 'Use secretbuffer as pattern' );
 };
 
 sub _render_char {
