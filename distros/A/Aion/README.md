@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Aion.svg)](https://metacpan.org/release/Aion) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion+1.4)
+[![Actions Status](https://github.com/darviarush/perl-aion/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion?logo=perl)](https://github.com/darviarush/perl-aion/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion.svg)](https://metacpan.org/release/Aion) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion+1.5)
 # NAME
 
 Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями
 
 # VERSION
 
-1.4
+1.5
 
 # SYNOPSIS
 
@@ -391,17 +391,32 @@ $node->parent   # -> undef
 
 Указывает тип, а точнее – валидатор, фичи.
 
+Может принимать:
+
+* `Aion::Type` – Aion сразу импортирует в пакет все типы из [Aion::Types](https://metacpan.org/pod/Aion::Types).
+* Строки воспримаются как пакеты и оборачиваются в `Object`.
+* Подпрограммы – тестируемое значение передаётся в `$_` и подпрограмма возвращает булево значение.
+* Объекты с перегруженным оператором `&{}`. Если у такого объекта есть ещё и метод `coerce`, то он будет учавствовать в приведениях, если указать `coerce => 1`.
+
 ```perl
+package Externalis {
+	use overload '&{}' => sub { sub { /^\d+$/ } };
+	sub coerce { int $_ }
+}
+
 package ExIsa { use Aion;
-	has x => (is => 'ro', isa => Int);
+	has x => (isa => Int);
+	has y => (isa => sub { /^\d+$/ });
+	has z => (isa => bless({}, 'Externalis'), coerce => 1);
 }
 
 ExIsa->new(x => 'str') # @-> Set feature x must have the type Int. The it is 'str'!
 ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!
 ExIsa->new(x => 10)->x			  # -> 10
-```
 
-Список валидаторов см. в [Aion::Types](https://metacpan.org/pod/Aion::Types).
+ExIsa->new(y => 'abc') # @-> Set feature y must have the type External[CODE
+ExIsa->new(z => ' 6 xyz')->z # -> 6
+```
 
 ## coerce => (1|0)
 
@@ -518,6 +533,8 @@ sub power { shift->new }
 
 1;
 ```
+
+Используем плерому локально:
 
 ```perl
 {
@@ -741,6 +758,37 @@ Cat->new->is_cat # -> 1
 Dog->new->is_cat # -> 0
 Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse
 ```
+
+# SEE ALSO
+
+Экосистема Aion:
+
+* [Aion::Annotation](https://metacpan.org/pod/Aion::Annotation)
+* [Aion::Carp](https://metacpan.org/pod/Aion::Carp)
+* [Aion::Enum](https://metacpan.org/pod/Aion::Enum)
+* [Aion::Format](https://metacpan.org/pod/Aion::Format)
+* [Aion::Fs](https://metacpan.org/pod/Aion::Fs)
+* [Aion::Query](https://metacpan.org/pod/Aion::Query)
+* [Aion::Run](https://metacpan.org/pod/Aion::Run)
+* [Aion::Spirit](https://metacpan.org/pod/Aion::Spirit)
+* [Aion::Surf](https://metacpan.org/pod/Aion::Surf)
+* [Aion::Telemetry](https://metacpan.org/pod/Aion::Telemetry)
+* [config](https://metacpan.org/release/DART/config-1.4.5/view/lib/config.pm)
+* [Liveman](https://metacpan.org/pod/Liveman)
+
+Подобные ООП-фреймворки:
+
+* [Mouse](https://metacpan.org/pod/Mouse)
+* [Moose](https://metacpan.org/pod/Moose)
+* [Moo](https://metacpan.org/pod/Moo)
+* [Mo](https://metacpan.org/pod/Mo)
+* [M](https://metacpan.org/pod/M)
+* [Class::Accessor](https://metacpan.org/pod/Class::Accessor)
+* [Acme::Has::Tiny](https://metacpan.org/pod/Acme::Has::Tiny)
+
+Не Moose-подобные:
+
+* [Object::Pad](https://metacpan.org/pod/Object::Pad)
 
 # AUTHOR
 

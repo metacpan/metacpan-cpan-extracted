@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # PODNAME: cpangit-create
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # ABSTRACT: create git branches for custom CPAN trees
 
 use v5.36;
@@ -92,7 +92,7 @@ by your application's perl version.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

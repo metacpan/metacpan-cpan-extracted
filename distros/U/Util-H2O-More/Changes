@@ -208,3 +208,7 @@
 	- added POD about opt2h2o's support for Getopt::Long's ability
 	  to define negative options; e.g., "option6!" is able to
 	  accept "--option6" and "--no-option6".
+
+0.4.3 Fri Dec 19 03:27:00 2025
+	- POD updates only, added examples show where and how some
+	  of these provided keywords would be helpful

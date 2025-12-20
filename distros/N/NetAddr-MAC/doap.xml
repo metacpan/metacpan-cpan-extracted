@@ -28,12 +28,19 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Jon Miner</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jon.miner@wisc.edu" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Oliver Gorwits</foaf:name>
       <foaf:mbox rdf:resource="mailto:oliver@cpan.org" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://www.opensource.org/licenses/mit-license.php" />
   <homepage rdf:resource="https://github.com/djzort/NetAddr-MAC" />
+  <bug-database rdf:resource="https://github.com/djzort/NetAddr-MAC/issues" />
   <repository>
     <GitRepository>
       <browse rdf:resource="https://github.com/djzort/NetAddr-MAC" />

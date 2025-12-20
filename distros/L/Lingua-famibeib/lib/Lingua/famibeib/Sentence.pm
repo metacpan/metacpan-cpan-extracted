@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use List::Util qw(any);
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use parent 'Lingua::famibeib::Fragment';
 
@@ -92,6 +92,7 @@ sub _upgrade {
     my ($pkg, $self) = @_;
     my $words = $self->{words};
     my $type = $words->[-1];
+    my $sublevel = 0;
     my $main_verb;
 
     croak 'Not a sentence, bad type: '.$type unless any {$type->eq($_)} @_sentence_ends;
@@ -99,10 +100,14 @@ sub _upgrade {
     for (my $i = 0; $i < (scalar(@{$words}) - 1); $i++) {
         my $word = $words->[$i];
 
-        if ($word->is_verb) {
+        if ($word->is_verb && $sublevel == 0) {
             $main_verb //= $word;
         } elsif ($word->is_application && any {$word->eq($_)} @_sentence_ends) {
             croak 'Not a well formed sentence: inner sentence type found: '.$word;
+        } elsif ($word->as_string =~ /^tus/ && $word->is_application) {
+            $sublevel++;
+        } elsif ($word->as_string =~ /^tut/ && $word->is_application) {
+            $sublevel--;
         }
     }
 
@@ -128,7 +133,7 @@ Lingua::famibeib::Sentence - module to interact with the famibeib sentences
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -183,21 +188,21 @@ Returns whether the sentence is an exclamation (C<tuboik>).
 
     my Lingua::famibeib::Word $main_verb = $sentence->main_verb;
 
-(experimental since v0.01)
+(since v0.01)
 
 Returns the main verb of the sentence as a L<Lingua::famibeib::Word>.
 
 B<Note:>
-This is still experimental and might return a verb that is not the main verb as the main verb.
-Future versions will most likely improve this.
+This method requires a well formed sentence to work correctly.
+For non-well formed sentences the wrong verb might be returned.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

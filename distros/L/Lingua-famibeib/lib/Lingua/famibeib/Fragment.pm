@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Carp;
 
 use Lingua::famibeib::Word;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use parent 'Data::Identifier::Interface::Subobjects';
 
@@ -74,7 +74,7 @@ Lingua::famibeib::Fragment - module to interact with the famibeib fragments
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -121,11 +121,11 @@ Returns the current fragment as a string.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

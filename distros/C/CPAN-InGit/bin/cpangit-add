@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # PODNAME: cpangit-add
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # ABSTRACT: import CPAN packages to local CPAN trees
 
 use v5.36;
@@ -112,7 +112,7 @@ updated but no commit will be generated.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

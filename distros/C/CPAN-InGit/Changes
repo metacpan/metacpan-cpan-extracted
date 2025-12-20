@@ -1,2 +1,10 @@
+0.002 - 2025-12-19
+  - Sort 02packages.details.txt case-insensitive so that it works with
+    binary search required by CPAN::02Packages::Search used by App::cpm
+  - Server:
+      - Refresh cache if a branch receives new commits
+      - Limit cache to 20 trees (LRU) when Tree::RB::XS is available
+      - Fix bugs in ability to generate .tar.gz files from dist dir
+
 0.001 - 2025-12-16
   - Initial mostly-usable release

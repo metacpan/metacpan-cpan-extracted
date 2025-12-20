@@ -1,0 +1,12 @@
+<clacks>
+    <appname>Test Server</appname>
+    <socket>/home/cavac/src/Net-Clacks/t/test_clacks.sock</socket>
+    <pingtimeout>10</pingtimeout>
+    <interclackspingtimeout>5</interclackspingtimeout>
+    <username>testuser</username>
+    <password>testpass</password>
+    <throttle>
+        <maxsleep>50</maxsleep>
+        <step>10</step>
+    </throttle>
+</clacks>

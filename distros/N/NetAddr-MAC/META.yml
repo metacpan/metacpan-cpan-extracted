@@ -16,7 +16,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,22 +30,22 @@ requires:
   Carp: '0'
   Exporter: '0'
   List::Util: '0'
-  base: '0'
   constant: '0'
   perl: v5.10.0
   strict: '0'
-  vars: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/djzort/NetAddr-MAC/issues
   homepage: https://github.com/djzort/NetAddr-MAC
   repository: https://github.com/djzort/NetAddr-MAC.git
-version: '0.98'
+version: '0.99'
 x_author_pledge:
   version: 1
 x_contributors:
   - 'Dean Hamstead <djzort@cpan.org>'
   - 'James C Sinclair <james.sinclair@linode.com>'
+  - 'Jon Miner <jon.miner@wisc.edu>'
   - 'Oliver Gorwits <oliver@cpan.org>'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.40.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

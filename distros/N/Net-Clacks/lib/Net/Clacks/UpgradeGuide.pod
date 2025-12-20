@@ -369,6 +369,18 @@ Fix missing requirements for the "DBI" module in Makefile.PL
 
 This version is fully backwards compatible to Version 30
 
+=head2 VERSION 32
+
+Fix various performance problems and reliability issues under high load.
+
+This version is fully backwards compatible to Version 31
+
+=head2 VERSION 33
+
+Fix problems with MANIFEST
+
+This version is fully backwards compatible to Version 32
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

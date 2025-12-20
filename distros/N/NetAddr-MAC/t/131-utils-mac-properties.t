@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 272;
+use Test::More tests => 304;
 use Test::Trap;
 
 BEGIN {
@@ -245,6 +245,44 @@ BEGIN {
         ok( mac_is_universal($mac),
             'universal correctly identified from ' . $mac );
         ok( !mac_is_local($mac), 'local = false from ' . $mac );
+    }
+
+
+    my @vrrp4macs = qw(
+      00-00-5E-00-01-00
+      00005E.000101
+    );
+
+    for my $mac ( @vrrp4macs ) {
+        ok( mac_is_universal($mac),
+            'universal correctly identified from ' . $mac );
+        ok( !mac_is_local($mac), 'local = false from ' . $mac );
+        ok( mac_is_vrrp($mac), 'correctly ID as vrrp ' . $mac );
+        ok( mac_is_vrrp4($mac), 'correctly ID as vrrp4 ' . $mac );
+        ok( !mac_is_vrrp6($mac), 'correctly ID as not vrrp6 ' . $mac );
+    }
+
+    my @vrrp6macs = qw(
+      00-00-5E-00-02-00
+      00005E000201
+    );
+
+    for my $mac ( @vrrp6macs ) {
+        ok( mac_is_universal($mac),
+            'universal correctly identified from ' . $mac );
+        ok( !mac_is_local($mac), 'local = false from ' . $mac );
+        ok( mac_is_vrrp($mac), 'correctly ID as vrrp ' . $mac );
+        ok( mac_is_vrrp6($mac), 'correctly ID as vrrp6 ' . $mac );
+        ok( !mac_is_vrrp4($mac), 'correctly ID as not vrrp4 ' . $mac );
+    }
+
+    my @vrrpmacs = ( @vrrp4macs, @vrrp6macs );
+
+    for my $mac ( @vrrpmacs ) {
+        ok( mac_is_universal($mac),
+            'universal correctly identified from ' . $mac );
+        ok( !mac_is_local($mac), 'local = false from ' . $mac );
+        ok( mac_is_vrrp($mac), 'correctly ID as vrrp ' . $mac );
     }
 
 }

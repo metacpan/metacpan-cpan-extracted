@@ -3,6 +3,17 @@ Upstream-Name: Class-XSConstructor
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Class-XSConstructor
 
+Files: lib/Class/XSDestructor.pm
+ t/05strictconstructor.t
+ t/06inherit-from.t
+ t/07coercion.t
+ t/08defaults.t
+ t/09initarg.t
+ t/10triggers.t
+ t/11weaken.t
+Copyright: This software is copyright (c) 2025 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
  Makefile.PL
@@ -19,14 +30,6 @@ Files: Changes
  doap.ttl
  t/99destroy.t
 Copyright: Copyright 2025 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Class/XSDestructor.pm
- t/05strictconstructor.t
- t/06inherit-from.t
- t/07coercion.t
- t/08defaults.t
-Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t

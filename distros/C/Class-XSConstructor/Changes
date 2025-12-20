@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <https://github.com/tobyink/p5-class-xsconstructor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.015001	2025-12-19
+
+ [ Documentation ]
+ - Document some newer features.
+
+0.015000	2025-12-19
+
+ - Added: Support `init_arg`.
+ - Added: Support `trigger`.
+ - Added: Support `weak_ref`.
+ - More use of constants instead of weird hard-coded numbers everywhere.
+ - Some minor cleanups of the code.
+
 0.014001	2025-12-19
 
  [ Bug Fixes ]

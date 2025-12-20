@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.pod
 dist.ini
 examples/AUTOLOAD.pl
 examples/Advent2022.pl

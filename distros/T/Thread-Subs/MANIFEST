@@ -1,0 +1,19 @@
+Changes
+lib/Thread/Subs.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-nothreads.t
+t/02-threads.t
+t/03-anyevent.t
+t/04-mojo.t
+t/05-future.t
+t/06-threads-posix.t
+t/07-stress.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

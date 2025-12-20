@@ -1,0 +1,45 @@
+Thread-Subs
+
+Thread::Subs is a Perl library which allows you to declare that some
+subs are executed by a static pool of worker threads in parallel with
+your main thread.  It hides most of the complexity of parallelism
+behind ordinary subroutine calls which return async result objects.
+
+Requires Perl v5.14+ with support for threads enabled.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Thread::Subs
+
+You can also look for information at:
+
+    GitHub Home (report bugs here)
+        https://github.com/TFBW/Thread-Subs
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Thread-Subs
+
+    Search CPAN
+        https://metacpan.org/release/Thread-Subs
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Brett Watson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -27,7 +27,8 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12'
+                                      'Test::Spelling' => '0.17',
+                                      'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
@@ -35,11 +36,9 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Exporter' => '0',
                                       'List::Util' => '0',
-                                      'base' => '0',
                                       'constant' => '0',
                                       'perl' => 'v5.10.0',
                                       'strict' => '0',
-                                      'vars' => '0',
                                       'warnings' => '0'
                                     }
                     },

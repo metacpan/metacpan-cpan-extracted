@@ -24,7 +24,7 @@ my $meta = {
                                          "B::Hooks::AtRuntime"      => 0,
                                          "Class::Method::Modifiers" => 0,
                                          "Class::XSAccessor"        => 1.19,
-                                         "Class::XSConstructor"     => "0.014000",
+                                         "Class::XSConstructor"     => "0.015000",
                                          "Exporter::Tiny"           => 1.006002,
                                          "List::Util"               => 1.33,
                                          "Module::Runtime"          => 0,
@@ -47,10 +47,10 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Marlin"            => { file => "lib/Marlin.pm", version => "0.005000" },
-                        "Marlin::Attribute" => { file => "lib/Marlin/Attribute.pm", version => "0.005000" },
-                        "Marlin::Role"      => { file => "lib/Marlin/Role.pm", version => "0.005000" },
-                        "Marlin::Util"      => { file => "lib/Marlin/Util.pm", version => "0.005000" },
+                        "Marlin"            => { file => "lib/Marlin.pm", version => "0.006000" },
+                        "Marlin::Attribute" => { file => "lib/Marlin/Attribute.pm", version => "0.006000" },
+                        "Marlin::Role"      => { file => "lib/Marlin/Role.pm", version => "0.006000" },
+                        "Marlin::Util"      => { file => "lib/Marlin/Util.pm", version => "0.006000" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -64,7 +64,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin/project",
                       },
-  "version"        => "0.005000",
+  "version"        => "0.006000",
 };
 
 my %dynamic_config;

@@ -25,5 +25,8 @@ t/05strictconstructor.t
 t/06inherit-from.t
 t/07coercion.t
 t/08defaults.t
+t/09initarg.t
+t/10triggers.t
+t/11weaken.t
 t/99destroy.t
 xshelper.h

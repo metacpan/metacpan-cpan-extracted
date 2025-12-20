@@ -1,2 +1,8 @@
+v0.02  2025-12-19Z
+    - Added support to build and parse a number word
+    - Fully implemented main verb calculation
+    - Added experimental $word->combine()
+    - Let $modifier->register also register the corresponding Data::Identifier
+
 v0.01  2025-11-24Z
     - Initial release

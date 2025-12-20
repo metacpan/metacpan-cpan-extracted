@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use v5.10;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '0.98';
+$NetAddr::MAC::VERSION = '0.99';
 
 use Carp qw( croak );
+use Exporter 'import';
 use List::Util qw( first );
 
 use constant EUI48LENGTHHEX => 12;
@@ -15,31 +16,7 @@ use constant EUI48LENGTHDEC => 6;
 use constant EUI64LENGTHHEX => 16;
 use constant EUI64LENGTHDEC => 8;
 
-use constant ETHER2TOKEN => (
-## see also http://www-01.ibm.com/support/docview.wss?uid=nas114157020a771b25d862567250003b62c
-## note this table is rotated compared to the above link,
-## so that the hex values line up as a linear array :)
-## 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-    qw(00 80 40 c0 20 a0 60 e0 10 90 50 d0 30 b0 70 f0),    # 0
-    qw(08 88 48 c8 28 a8 68 e8 18 98 58 d8 38 b8 78 f8),    # 1
-    qw(04 84 44 c4 24 a4 64 e4 14 94 54 d4 34 b4 74 f4),    # 2
-    qw(0c 8c 4c cc 2c ac 6c ec 1c 9c 5c dc 3c bc 7c fc),    # 3
-    qw(02 82 42 c2 22 a2 62 e2 12 92 52 d2 32 b2 72 f2),    # 4
-    qw(0a 8a 4a ca 2a aa 6a ea 1a 9a 5a da 3a ba 7a fa),    # 5
-    qw(06 86 46 c6 26 a6 66 e6 16 96 56 d6 36 b6 76 f6),    # 6
-    qw(0e 8e 4e ce 2e ae 6e ee 1e 9e 5e de 3e be 7e fe),    # 7
-    qw(01 81 41 c1 21 a1 61 e1 11 91 51 d1 31 b1 71 f1),    # 8
-    qw(09 89 49 c9 29 a9 69 e9 19 99 59 d9 39 b9 79 f9),    # 9
-    qw(05 85 45 c5 25 a5 65 e5 15 95 55 d5 35 b5 75 f5),    # a
-    qw(0d 8d 4d cd 2d ad 6d ed 1d 9d 5d dd 3d bd 7d fd),    # b
-    qw(03 83 43 c3 23 a3 63 e3 13 93 53 d3 33 b3 73 f3),    # c
-    qw(0b 8b 4b cb 2b ab 6b eb 1b 9b 5b db 3b bb 7b fb),    # d
-    qw(07 87 47 c7 27 a7 67 e7 17 97 57 d7 37 b7 77 f7),    # e
-    qw(0f 8f 4f cf 2f af 6f ef 1f 9f 5f df 3f bf 7f ff),    # f
-);
-
-use base qw( Exporter );
-use vars qw( %EXPORT_TAGS );
+our %EXPORT_TAGS;
 
 %EXPORT_TAGS = (
     all => [
@@ -47,6 +24,7 @@ use vars qw( %EXPORT_TAGS );
           mac_is_eui48     mac_is_eui64
           mac_is_unicast   mac_is_multicast
           mac_is_broadcast mac_is_vrrp
+          mac_is_vrrp4     mac_is_vrrp6
           mac_is_hsrp      mac_is_hsrp2
           mac_is_msnlb
           mac_is_local     mac_is_universal
@@ -63,6 +41,7 @@ use vars qw( %EXPORT_TAGS );
           mac_is_eui48     mac_is_eui64
           mac_is_unicast   mac_is_multicast
           mac_is_broadcast mac_is_vrrp
+          mac_is_vrrp4     mac_is_vrrp6
           mac_is_hsrp      mac_is_hsrp2
           mac_is_msnlb
           mac_is_local     mac_is_universal
@@ -342,6 +321,13 @@ sub is_broadcast {
 sub is_vrrp {
     my $self = shift;
 
+    return is_vrrp4( $self ) || is_vrrp6( $self );
+}
+
+
+sub is_vrrp4 {
+    my $self = shift;
+
     return
         is_eui48($self) &&
         $self->{mac}->[0] == 0 &&
@@ -349,6 +335,20 @@ sub is_vrrp {
         $self->{mac}->[2] == hex('0x5e') &&
         $self->{mac}->[3] == 0 &&
         $self->{mac}->[4] == 1;
+
+}
+
+
+sub is_vrrp6 {
+    my $self = shift;
+
+    return
+        is_eui48($self) &&
+        $self->{mac}->[0] == 0 &&
+        $self->{mac}->[1] == 0 &&
+        $self->{mac}->[2] == hex('0x5e') &&
+        $self->{mac}->[3] == 0 &&
+        $self->{mac}->[4] == 2;
 
 }
 
@@ -529,7 +529,13 @@ sub as_sun {
 sub as_tokenring {
 
     my $self = shift;
-    return join( q{-}, map { (ETHER2TOKEN)[$_] } @{ $self->{mac} } )
+
+    return join '-', map {
+        my $byte = $_;
+        my $rev  = 0;
+        $rev = ($rev << 1) | ($byte & 1), $byte >>= 1 for 1..8;
+        sprintf '%02x', $rev
+    } @{ $self->{mac} };
 }
 
 
@@ -690,6 +696,43 @@ sub mac_is_vrrp {
 
 }
 
+
+sub mac_is_vrrp4 {
+
+    my $mac = shift;
+    croak 'please use is_vrrp4'
+      if ref $mac eq __PACKAGE__;
+    if ( ref $mac ) {
+        my $e = 'argument must be a string';
+        croak "$e\n" if $NetAddr::MAC::die_on_error;
+        $NetAddr::MAC::errstr = $e;
+
+        return
+    }
+
+    $mac = _mac_to_integers($mac) or return;
+    return is_vrrp4( { mac => $mac } )
+
+}
+
+
+sub mac_is_vrrp6 {
+
+    my $mac = shift;
+    croak 'please use is_vrrp6'
+      if ref $mac eq __PACKAGE__;
+    if ( ref $mac ) {
+        my $e = 'argument must be a string';
+        croak "$e\n" if $NetAddr::MAC::die_on_error;
+        $NetAddr::MAC::errstr = $e;
+
+        return
+    }
+
+    $mac = _mac_to_integers($mac) or return;
+    return is_vrrp6( { mac => $mac } )
+
+}
 
 
 sub mac_is_hsrp {
@@ -984,7 +1027,7 @@ NetAddr::MAC - MAC hardware address functions and object (EUI48 and EUI64)
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -1193,13 +1236,29 @@ Returns true if mac address is determined to be a broadcast address
 
 =head2 is_vrrp
 
+Returns true if mac address is determined to be a Virtual Router Redundancy (VRRP) address (RFC 5798 s7.4)
+
+i.e. 00-00-5E-00-01-XX or 00-00-5E-00-02-XX
+
+always returns false for eui64.
+
+I'm not quite sure what to do with 01-00-5E-00-00-12, suggestions welcomed.
+
+=head2 is_vrrp4
+
 Returns true if mac address is determined to be a Virtual Router Redundancy (VRRP) address
 
 i.e. 00-00-5E-00-01-XX
 
 always returns false for eui64.
 
-I'm not quite sure what to do with 01-00-5E-00-00-12, suggestions welcomed.
+=head2 is_vrrp6
+
+Returns true if mac address is determined to be a Virtual Router Redundancy (VRRP) address
+
+i.e. 00-00-5E-00-02-XX
+
+always returns false for eui64.
 
 =head2 is_hsrp
 
@@ -1290,14 +1349,14 @@ Returns the mac address normalized as a hexadecimal string that is 0 padded and 
 =head2 as_pgsql
 
 Returns the mac address normalized as a hexadecimal string that is 0 padded and has a I<:> in the middle of the hex string.
-this appears in the pgsql documentation along with the single dash version
+this appears in the postgresql documentation along with the single dash version
 
  001122:334455
 
 =head2 as_singledash
 
 Returns the mac address normalized as a hexadecimal string that is 0 padded and has a dash in the middle of the hex string.
-this appears in the pgsql documentation.
+this appears in the postgresql documentation. Aruba networks also seem to use this format.
 
  001122-334455
 
@@ -1351,9 +1410,21 @@ Returns true if mac address in $mac is determined to be a unicast address
 
 =head2 mac_is_vrrp($mac)
 
+Returns true if mac address is $mac is determined to be a Virtual Router Redundancy (VRRP) address (RFC 5798 s7.4)
+
+i.e. 00-00-5E-00-01-XX or 00-00-5E-00-02-XX
+
+=head2 mac_is_vrrp4($mac)
+
 Returns true if mac address is $mac is determined to be a Virtual Router Redundancy (VRRP) address
 
 i.e. 00-00-5E-00-01-XX
+
+=head2 mac_is_vrrp6($mac)
+
+Returns true if mac address is $mac is determined to be a Virtual Router Redundancy (VRRP) address
+
+i.e. 00-00-5E-00-02-XX
 
 =head2 mac_is_hsrp($mac)
 
@@ -1546,11 +1617,7 @@ feedback so I can improve!
 
 =head1 SUPPORT
 
-Please use the RT system on CPAN to lodge bugs.
-
-Many young people like to use Github, so by all means send me pull requests at
-
-  https://github.com/djzort/NetAddr-MAC
+Just use github: L<https://github.com/djzort/NetAddr-MAC>
 
 =head1 MOTIVATION
 
@@ -1586,7 +1653,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstad.
 
 This is free software, licensed under:
 

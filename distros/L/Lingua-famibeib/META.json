@@ -1,7 +1,7 @@
 {
    "abstract" : "module to interact with the famibeib language",
    "author" : [
-      "L\u00f6wenfelsen UG (haftungsbeschr\u00e4nkt) <support@loewenfelsen.net>"
+      "Philipp Schafft <lion@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -47,27 +47,27 @@
    "provides" : {
       "Lingua::famibeib" : {
          "file" : "lib/Lingua/famibeib.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "Lingua::famibeib::Fragment" : {
          "file" : "lib/Lingua/famibeib/Fragment.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "Lingua::famibeib::Modifier" : {
          "file" : "lib/Lingua/famibeib/Modifier.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "Lingua::famibeib::Sentence" : {
          "file" : "lib/Lingua/famibeib/Sentence.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "Lingua::famibeib::Text" : {
          "file" : "lib/Lingua/famibeib/Text.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       },
       "Lingua::famibeib::Word" : {
          "file" : "lib/Lingua/famibeib/Word.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "url" : "ssh://gitea@gitea.dev.loewenfelsen.net/phschafft/Lingua-famibeib.git"
       }
    },
-   "version" : "v0.01",
+   "version" : "v0.02",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

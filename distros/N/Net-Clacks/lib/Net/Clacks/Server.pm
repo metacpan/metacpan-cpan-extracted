@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 31;
+our $VERSION = 33;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -1168,42 +1168,59 @@ sub _clientInput($self) {
     foreach my $clientsocket (@inclients) {
         my $cid = $clientsocket->_getClientID();
 
+        # Skip if client already marked for removal or doesn't exist
+        next if(!defined($self->{clients}->{$cid}));
+        next if(contains($cid, $self->{toremove}));
+
         my $totalread = 0;
         my $readchunksleft = 3;
         while(1) {
             my $rawbuffer;
+            my $bytes;
             my $readok = 0;
             eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-                sysread($self->{clients}->{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
+                $bytes = sysread($self->{clients}->{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
                 $readok = 1;
             };
             if(!$readok) {
+                # Exception during read - disconnect
                 push @{$self->{toremove}}, $cid;
                 last;
             }
-            if(defined($rawbuffer) && length($rawbuffer)) {
-                $totalread += length($rawbuffer);
-                push @{$self->{clients}->{$cid}->{charbuffer}}, split//, $rawbuffer;
-                $readchunksleft--;
-                if(!$readchunksleft) {
-                    last;
+            if(!defined($bytes)) {
+                # undef = error, check if temporary (EAGAIN/EWOULDBLOCK) or permanent
+                if(!$ERRNO{EAGAIN} && !$ERRNO{EWOULDBLOCK}) {
+                    # Permanent error - disconnect
+                    push @{$self->{toremove}}, $cid;
                 }
-                next;
+                last;
             }
-            last;
+            if($bytes == 0) {
+                # EOF - peer closed connection, disconnect immediately
+                push @{$self->{toremove}}, $cid;
+                last;
+            }
+            # $bytes > 0, we have data
+            $totalread += $bytes;
+            push @{$self->{clients}->{$cid}->{charbuffer}}, split//, $rawbuffer;
+            $readchunksleft--;
+            if(!$readchunksleft) {
+                last;
+            }
         }
         
         # Check if we could read data from a socket that was marked as readable.
-        # Thanks to SSL, this might ocxasionally fail. Don't bail out at the first
-        # error, only if multiple happen one after the other
+        # Thanks to SSL, this might occasionally fail. Don't bail out at the first
+        # error, only if multiple happen one after the other.
+        # Note: EOF and permanent errors are now handled above, so this failcount
+        # is mainly for SSL renegotiation edge cases.
         if($totalread) {
             $self->{clients}->{$cid}->{failcount} = 0;
         } else {
             $self->{clients}->{$cid}->{failcount}++;
-            
-            if($self->{clients}->{$cid}->{failcount} > 5) {
-                # Socket was active multiple times but delivered no data?
-                # EOF, maybe, possible, perhaps?
+
+            if($self->{clients}->{$cid}->{failcount} > 2) {
+                # Socket marked readable but no data after 3 attempts
                 push @{$self->{toremove}}, $cid;
             }
         }
@@ -1245,8 +1262,24 @@ sub _clientOutput($self, $forceclientid = '') {
             push @{$self->{toremove}}, $cid;
             next;
         }
-        if(!$self->{clients}->{$cid}->{socket}->opened || $self->{clients}->{$cid}->{socket}->error || ($ERRNO ne '' && !$ERRNO{EWOULDBLOCK})) {
-            print STDERR "webPrint write failure: $ERRNO\n";
+        if(!defined($written)) {
+            # syswrite returned undef - check error type
+            if($ERRNO{EPIPE}) {
+                # Peer closed connection
+                print STDERR "Client $cid: connection closed by peer (EPIPE)\n";
+                push @{$self->{toremove}}, $cid;
+                next;
+            } elsif(!$ERRNO{EAGAIN} && !$ERRNO{EWOULDBLOCK}) {
+                # Other permanent error
+                print STDERR "Write error for $cid: $ERRNO\n";
+                push @{$self->{toremove}}, $cid;
+                next;
+            }
+            # EAGAIN/EWOULDBLOCK - try again later
+            next;
+        }
+        if(!$self->{clients}->{$cid}->{socket}->opened || $self->{clients}->{$cid}->{socket}->error) {
+            print STDERR "Socket error for $cid\n";
             push @{$self->{toremove}}, $cid;
             next;
         }

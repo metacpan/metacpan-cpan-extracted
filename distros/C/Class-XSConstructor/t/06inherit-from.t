@@ -49,8 +49,13 @@ is( $bob->name, 'Bob' );
 is_deeply( \@ARR, [ 'Local::Person', 'Local::Employee' ] );
 
 is_deeply(
-	\%Local::Person::__XSCON_BUILD,
-	{ 'Local::Employee' => [ \&Local::Person::BUILD, \&Local::Employee::BUILD ] }
+	$Local::Person::__XSCON_BUILD{'Local::Employee'},
+	[ \&Local::Person::BUILD, \&Local::Employee::BUILD ],
+);
+
+is_deeply(
+	$Local::Person::__XSCON_BUILD{'Local::Person'},
+	undef,
 );
 
 done_testing;

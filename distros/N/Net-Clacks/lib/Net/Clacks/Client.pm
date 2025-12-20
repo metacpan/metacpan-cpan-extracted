@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 31;
+our $VERSION = 33;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -18,7 +18,7 @@ no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::Prohib
 
 use IO::Socket::IP;
 #use IO::Socket::UNIX;
-use Time::HiRes qw[sleep usleep];
+use Time::HiRes qw[sleep usleep time];
 use Sys::Hostname;
 use IO::Select;
 use IO::Socket::SSL;
@@ -128,9 +128,16 @@ sub init($self, $username, $password, $clientname, $iscaching) {
 }
 
 sub reconnect($self) {
+    # Clean up old selector before deleting socket
+    if(defined($self->{selector}) && defined($self->{socket})) {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            $self->{selector}->remove($self->{socket});
+        };
+    }
     if(defined($self->{socket})) {
         delete $self->{socket};
     }
+    undef $self->{selector};
 
     if(!$self->{firstconnect}) {
         # Not our first connection (=real reconnect).
@@ -282,7 +289,6 @@ sub doNetwork($self, $readtimeout = 0) {
     }
 
     {
-        my $select = IO::Select->new($self->{socket});
         my @temp;
         eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
             @temp = $self->{selector}->can_read($readtimeout);
@@ -1130,14 +1136,14 @@ sub disconnect($self) {
 
     $self->flush();
     $self->{outbuffer} .= "QUIT\r\n";
-    my $endtime = time + 1; # Wait a maximum of one second to send
+    my $endtime = time + 0.5; # Wait a maximum of one half second to send
     while(1) {
         last if(time > $endtime);
         $self->doNetwork();
         last if(!length($self->{outbuffer}));
         sleep(0.05);
     }
-    sleep(0.5); # Wait another half second for the OS to flush the socket
+    sleep(0.1); # Wait another tenth of a second for the OS to flush the socket
 
     delete $self->{socket};
     $self->{needreconnect} = 1;

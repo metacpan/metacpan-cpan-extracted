@@ -1,5 +1,5 @@
 package CPAN::InGit::ArchiveTree;
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # ABSTRACT: An object managing a CPAN file structure in a Git Tree
 
 
@@ -128,7 +128,7 @@ sub write_package_details($self) {
 
       END
    # List can be huge, so try to be efficient about stringifying it
-   @mod_list= sort { $a->[0] cmp $b->[0] } @mod_list;
+   @mod_list= sort { fc $a->[0] cmp fc $b->[0] } @mod_list;
    my @lines;
    for (@mod_list) {
       push @lines, sprintf("%s %s  %s\n", $_->[0], $_->[1] // 'undef', $_->[2]);
@@ -510,7 +510,7 @@ working branch, the index also gets updated.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

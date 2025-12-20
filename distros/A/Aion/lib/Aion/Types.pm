@@ -1,14 +1,13 @@
 package Aion::Types;
 # Типы-валидаторы для Aion
 
-use 5.22.0;
-no strict; no warnings; no diagnostics;
 use common::sense;
 
 use Aion::Meta::Util qw/subref_is_reachable/;
 use Aion::Type;
 use List::Util qw/all any first/;
 use Exporter qw/import/;
+require overload;
 use Scalar::Util qw/looks_like_number reftype refaddr blessed/;
 use Sub::Util qw//;
 
@@ -30,7 +29,7 @@ sub _Isa {
 
 	die "Anonymous subroutine cannot use :Isa!" if $subname eq '__ANON__';
 	
-	my @signature = eval "package $pkg; map { ref(\$_)? \$_: __PACKAGE__->can(\$_)->() } ($data)";
+	my @signature = eval "package $pkg; map { UNIVERSAL::isa(\$_, 'Aion::Type')? \$_: __PACKAGE__->can(\$_)? __PACKAGE__->can(\$_)->(): Aion::Types::External([\$_]) } ($data)";
 	die if $@;
 
 	die "$pkg\::$subname has no return type!" if @signature == 0;
@@ -58,30 +57,53 @@ sub _Isa {
 
 BEGIN {
 my $TRUE = sub {1};
+my $INIT_ARGS = sub { @{&ARGS} = map External([$_]), @{&ARGS} };
+my $INIT_KW_ARGS = sub { @{&ARGS} = List::Util::pairmap { $a => External([$b]) } @{&ARGS} };
 
 # Создание типа
 sub subtype(@) {
-	my $save = my $name = shift;
+	my $subtype = shift;
 	my %o = @_;
 
 	my ($as, $init_where, $where, $awhere, $message) = delete @o{qw/as init_where where awhere message/};
 
-	die "subtype $save unused keys left: " . join ", ", keys %o if keys %o;
+	$as = External([$as]) if defined $as;
+	
+	die "subtype $subtype unused keys left: " . join ", ", keys %o if keys %o;
 
-	my $is_maybe_arg; my $is_arg;
-	$name =~ s/(`?)(\[).*/ $is_maybe_arg = $1; $is_arg = $2; ''/e;
+	die "subtype format is Name or Name[args] or Name`[args]" if $subtype !~ /^([A-Z_]\w*)(?:(\`)?\[(.*)\])?$/i;
+	my ($name, $is_maybe_arg, $is_arg) = ($1, $2, $3);
 
 	my $pkg = scalar caller;
-	die "subtype $save: ${pkg}::$name exists!" if *{"${pkg}::$name"}{CODE};
+	die "subtype $subtype: ${pkg}::$name exists!" if *{"${pkg}::$name"}{CODE};
 
 	if($is_maybe_arg) {
-		die "subtype $save: needs a awhere" if !$awhere;
+		die "subtype $subtype: needs an awhere" if !$awhere;
 	} else {
-		die "subtype $save: awhere is excess" if $awhere;
+		die "subtype $subtype: awhere is excess" if $awhere;
 	}
 
-	die "subtype $save: needs a where" if $is_arg && !($where || $awhere);
+	die "subtype $subtype: needs a where" if $is_arg && !($where || $awhere);
 
+	my $init_types = do { given($is_arg) {
+		$INIT_ARGS when /^[A-Z]\w*(,\s*[A-Z]\w*)?\.\.\.$/;
+		$INIT_KW_ARGS when /^[a-z]\w*\s*=>\s*[A-Z],?\s*\.\.\.$/;
+		when(/\b[A-Z]\b/) {
+			my @args = split /\s*,\s*/, $is_arg;
+			my @typeno = grep { $args[$_] =~ /^[A-Z]/ } 0..@args-1;
+			(sub { my ($typeno) = @_; sub {
+				my $args = &ARGS;
+				$args->[$_] = External([$args->[$_]]) for @$typeno;
+			} })->(\@typeno);
+		}
+	}};
+	
+	if($init_types) {
+		$init_where = $init_where
+			? (sub { my ($t, $w) = @_; sub { $t->(); $w->() } })->($init_types, $init_where)
+			: $init_types;
+	}
+	
 	if($as && $as->{test} != $TRUE) {
 		if(!$where && !$awhere) {
 			$where = (sub { my ($as) = @_; sub { $as->test } })->($as);
@@ -91,6 +113,7 @@ sub subtype(@) {
 		}
 	}
 
+	# Тут coerce - прототип - единый для всех порождаемых типов одного типа с разными аргументами
 	my $type = Aion::Type->new(name => $name, coerce => []);
 
 	$type->{message} = $message if $message;
@@ -153,7 +176,7 @@ subtype "Any";
 			where { my $val = $_; any { $_->include($val) } ARGS };
 		subtype "Intersection[A, B...]", as &Control,
 			where { my $val = $_; all { $_->include($val) } ARGS };
-		subtype "Exclude[A, B...]", as &Control,
+		subtype "Exclude[A...]", as &Control,
 			where { my $val = $_; !any { $_->include($val) } ARGS };
 		subtype "Option[A]", as &Control,
 			init_where {
@@ -170,26 +193,41 @@ subtype "Any";
 
 
 	subtype "Item", as &Any;
+		sub External($) {
+			local $_ = $_[0][0];
+			UNIVERSAL::isa($_, 'Aion::Type')? $_:
+			defined($_) && ref $_ eq ""? Object([$_]): do {
+				CodeLike()->validate($_, "External type");
+				Aion::Type->new(
+					name => 'External',
+					as => &Item,
+					args => $_[0],
+					test => $_,
+					UNIVERSAL::can($_, 'coerce')
+						? (coerce => [[&Any, (sub { my ($ex) = @_; sub { $ex->coerce } })->($_)]])
+						: (),
+				)
+			}
+		}
 		subtype "Bool", as &Item, where { ref $_ eq "" and /^(1|0|)\z/ };
 		subtype "BoolLike", as &Item, where {
 			return 1 if overload::Method($_, 'bool');
 			my $m = overload::Method($_, '0+');
 			Bool()->include($m ? $m->($_) : $_) };
-		subtype "Enum[A...]", as &Item, where { $_ ~~ ARGS };
+		subtype "Enum[e...]", as &Item, where { $_ ~~ ARGS };
 		subtype "Maybe[A]", as &Item, where { !defined($_) || A->test };
 		subtype "Undef", as &Item, where { !defined $_ };
 		subtype "Defined", as &Item, where { defined $_ };
 			subtype "Value", as &Defined, where { "" eq ref $_ };
 				subtype "Version", as &Value, where { "VSTRING" eq ref \$_ };
-				my $init_limit = sub { if(@{&ARGS} == 1) { SELF->{min} = 0; SELF->{max} = A } else { SELF->{min} = A; SELF->{max} = B } };
 				subtype "Str", as &Value, where { "SCALAR" eq ref \$_ };
 					subtype "Uni", as &Str,	where { utf8::is_utf8($_) || /[\x80-\xFF]/a };
 					subtype "Bin", as &Str, where { !utf8::is_utf8($_) && !/[\x80-\xFF]/a };
 					subtype "NonEmptyStr", as &Str,	where { /\S/ };
-					subtype "StartsWith[S]", as &Str,
+					subtype "StartsWith[start]", as &Str,
 						init_where { M = qr/^${\ quotemeta A}/ },
 						where { $_ =~ M };
-					subtype "EndsWith[S]", as &Str,
+					subtype "EndsWith[end]", as &Str,
 						init_where { N = qr/${\ quotemeta A}$/ },
 						where { $_ =~ N };
 					subtype "Email", as &Str, where { /@/ };
@@ -199,20 +237,19 @@ subtype "Any";
 					subtype "Html", as &Str, where { /^\s*<(!doctype\s+html|html)\b/i };
 					subtype "StrDate", as &Str, where { /^\d{4}-\d{2}-\d{2}\z/ };
 					subtype "StrDateTime", as &Str, where { /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/ };
-					subtype "StrMatch[qr/.../]", as &Str, where { $_ =~ A };
+					subtype "StrMatch[regexp]", as &Str, where { $_ =~ A };
 					subtype "ClassName", as &Str, where { !!$_->can('new') };
 					subtype "RoleName", as &Str, where { !$_->can('new') && !!(@{"$_\::ISA"} || first { *{$_}{CODE} } values %{"$_\::"}) };
-
+					subtype "StrRat", as &Str, where { m!\s*/\s*!? &Num->include($`) && &Num->include($`): &Num->test };
 					subtype "Num", as &Str, where { looks_like_number($_) && /[\dfn]\z/i };
 						subtype "PositiveNum", as &Num, where { $_ >= 0 };
-						subtype "Int", as &Num,	where { /^-?\d+\z/ };
+						subtype "Int", as &Num,	where { /^[-+]?\d+\z/ };
 							subtype "PositiveInt", as &Int, where { $_ >= 0 };
 							subtype "Nat", as &Int, where { $_ > 0 };
-					subtype "Rat", as &Str, where { &Num->test || /^(-?\d+(\/\d+)?)\z/in };
 
 
 			subtype "Ref", as &Defined, where { "" ne ref $_ };
-				subtype "Tied`[A]", as &Ref,
+				subtype "Tied`[class]", as &Ref,
 					where { my $ref = reftype($_); !!(
 						$ref eq "HASH"? tied %$_:
 						$ref eq "ARRAY"? tied @$_:
@@ -227,34 +264,20 @@ subtype "Any";
 					};
 				subtype "LValueRef", as &Ref, where { ref $_ eq "LVALUE" };
 				subtype "FormatRef", as &Ref, where { ref $_ eq "FORMAT" };
-				my $code_ref_awhere = sub {
-					defined(A)? do {
-						my $n = Sub::Util::subname($_);
-						ref A? $n =~ A: $n eq A
-					} : 1
-					and defined(B)? do {
-						my $n = Sub::Util::prototype($_);
-						ref B? $n =~ B: $n eq B
-					} : 1
-				};
-				subtype "CodeRef`[name, proto]", as &Ref,
-					where { ref $_ eq "CODE" }
-					awhere { ref $_ eq "CODE" and $code_ref_awhere->() };
-					subtype "ReachableCodeRef`[name, proto]", as &CodeRef,
-						where { subref_is_reachable($_) }
-						awhere { subref_is_reachable($_) and $code_ref_awhere->() };
-					subtype "UnreachableCodeRef`[name, proto]", as &CodeRef,
-						where { !subref_is_reachable($_) }
-						awhere { !subref_is_reachable($_) and $code_ref_awhere->() };
-					subtype "Isa[A...]", as &CodeRef,
+				subtype "CodeRef", as &Ref, where { ref $_ eq "CODE" };
+					subtype "NamedCode[subname]", as &CodeRef, where { Sub::Util::subname($_) ~~ A };
+					subtype "ProtoCode[prototype]", as &CodeRef, where { Sub::Util::prototype($_) ~~ A };
+					subtype "ForwardRef", as &CodeRef, where { !subref_is_reachable($_) };
+					subtype "ImplementRef", as &CodeRef, where { subref_is_reachable($_) };
+					subtype "Isa[type...]", as &CodeRef,
 						init_where {
 						    my $pkg = caller(2);
-							M = [ map { ref $_? $_: eval "package $pkg; $_" } ARGS ]
+							SELF->{args} = [ map { External([UNIVERSAL::isa($_, 'Aion::Type')? $_: $pkg->can($_)? $pkg->can($_)->(): $_]) } ARGS ]
 						}
 						where {
 							my $subroutine = $Aion::Isa{pack "J", refaddr $_} or return "";
 							my $signature = $subroutine->{signature};
-							my $args = M;
+							my $args = ARGS;
 							return "" if @$signature != @$args;
 							my $i = 0;
 							for my $type (@$args) {
@@ -263,13 +286,13 @@ subtype "Any";
 							1
 						};
 				subtype "RegexpRef", as &Ref, where { ref $_ eq "Regexp" };
-				subtype "ScalarRefRef`[A]", as &Ref,
+				subtype "ValueRef`[A]", as &Ref,
 					where { ref($_) ~~ ["SCALAR", "REF"] }
 					awhere { ref($_) ~~ ["SCALAR", "REF"] && A->include($$_) };
-					subtype "ScalarRef`[A]", as &ScalarRefRef,
+					subtype "ScalarRef`[A]", as &ValueRef,
 						where { ref $_ eq "SCALAR" }
 						awhere { ref $_ eq "SCALAR" && A->include($$_) };
-					subtype "RefRef`[A]", as &ScalarRefRef,
+					subtype "RefRef`[A]", as &ValueRef,
 						where { ref $_ eq "REF" }
 						awhere { ref $_ eq "REF" && A->include($$_) };
 				subtype "GlobRef", as &Ref, where { ref $_ eq "GLOB" };
@@ -278,10 +301,10 @@ subtype "Any";
 				subtype "ArrayRef`[A]", as &Ref,
 					where { ref $_ eq "ARRAY" }
 					awhere { my $A = A; ref $_ eq "ARRAY" && all { $A->test } @$_ };
-				subtype "HashRef`[H]", as &Ref,
+				subtype "HashRef`[A]", as &Ref,
 					where { ref $_ eq "HASH" }
 					awhere { my $A = A; ref $_ eq "HASH" && all { $A->test } values %$_ };
-				subtype "Object`[O]", as &Ref,
+				subtype "Object`[class]", as &Ref,
 					where { blessed($_) ne "" }
 					awhere { blessed($_) && $_->isa(A) };
 					subtype "Me", as &Object,
@@ -340,7 +363,8 @@ subtype "Any";
 			subtype "ArrayLike`[A]", as &Ref,
 				where { reftype($_) eq "ARRAY" || !!overload::Method($_, '@{}') }
 				awhere { &ArrayLike->test && do { my $A = A; all { $A->test } @$_ }};
-				subtype "Lim[A, B?]", as &ArrayLike,
+				my $init_limit = sub { if(@{&ARGS} == 1) { SELF->{min} = 0; SELF->{max} = A } else { SELF->{min} = A; SELF->{max} = B } };
+				subtype "Lim[from, to?]", as &ArrayLike,
 					init_where => $init_limit,
 					where { SELF->{min} <= @$_ && @$_ <= SELF->{max} };
 			subtype "HashLike`[A]", as &Ref,
@@ -348,7 +372,7 @@ subtype "Any";
 				awhere { &HashLike->test && do { my $A = A; all { $A->test } values %$_ }};
 					subtype "HasProp[p...]", as &HashLike,
 						where { my $x = $_; all { exists $x->{$_} } ARGS };
-					subtype "LimKeys[A, B?]", as &HashLike,
+					subtype "LimKeys[from, to?]", as &HashLike,
 						init_where => $init_limit,
 						where { SELF->{min} <= scalar keys %$_ && scalar keys %$_ <= SELF->{max} };
 						
@@ -358,10 +382,10 @@ subtype "Any";
 			subtype "Overload`[m...]", as &Like,
 				where { !!overload::Overloaded($_) }
 				awhere { my $x = $_; all { overload::Method($x, $_) } ARGS };
-			subtype "InstanceOf[A...]", as &Like, where { my $x = $_; all { $x->isa($_) } ARGS };
-			subtype "ConsumerOf[A...]", as &Like, where { my $x = $_; all { $x->DOES($_) } ARGS };
+			subtype "InstanceOf[class...]", as &Like, where { my $x = $_; all { $x->isa($_) } ARGS };
+			subtype "ConsumerOf[role...]", as &Like, where { my $x = $_; all { $x->DOES($_) } ARGS };
 			subtype "StrLike", as &Like, where { !blessed($_) or !!overload::Method($_, '""') };
-				subtype "Len[A, B?]", as &StrLike,
+				subtype "Len[from, to?]", as &StrLike,
 					init_where => $init_limit,
 					where { SELF->{min} <= length($_) && length($_) <= SELF->{max} };
 
@@ -377,7 +401,7 @@ subtype "Any";
 				subtype "Range[from, to]", as &NumLike, where { A <= $_ && $_ <= B };
 
 				my $_8bits;
-				subtype "Bytes[N]", as &NumLike,
+				subtype "Bytes[n]", as &NumLike,
 					init_where {
 						my $bits = A < 8? 8: ($_8bits //= do {
 							require Math::BigInt;
@@ -388,7 +412,7 @@ subtype "Any";
 						M = $N-1;
 					}
 					where { N <= $_ && $_ <= M };
-				subtype "PositiveBytes[N]", as &NumLike,
+				subtype "PositiveBytes[n]", as &NumLike,
 					init_where {
 						my $bits = A < 8? 8: ($_8bits //= do {
 							require Math::BigInt;
@@ -402,13 +426,14 @@ subtype "Any";
 	coerce &Int => from &Num => via { int($_+($_ < 0? -.5: .5)) };
 	coerce &Bool => from &Any => via { !!$_ };
 	
-	#coerce &Num => from &Str => via { 0+$_ };
-	
-	subtype 'Join[R]', as &Str, where { 1 };
+	subtype 'Join[separator]', as &Str, where { 1 };
 	coerce &Join, from &ArrayRef, via { join A, @$_ };
 	
-	subtype 'Split[S]', as &ArrayRef, where { 1 };
+	subtype 'Split[separator]', as &ArrayRef, where { 1 };
 	coerce &Split, from &Str, via { [split A, $_] };
+	
+	subtype "Rat", as 'Math::BigRat', where { 1 };
+	coerce &Rat => from &StrRat => via { Math::BigRat->new($_) };
 };
 
 1;
@@ -469,13 +494,14 @@ Validator hierarchy:
 		Control
 			Union[A, B...]
 			Intersection[A, B...]
-			Exclude[A, B...]
+			Exclude[A...]
 			Option[A]
-			Wantarray[A, S]
+			Wantarray[A, B]
 		Item
+			External[type]
 			Bool
 			BoolLike
-			Enum[A...]
+			Enum[e...]
 			Maybe[A]
 			Undef
 			Defined
@@ -485,8 +511,8 @@ Validator hierarchy:
 						Uni
 						Bin
 						NonEmptyStr
-						StartsWith
-						EndsWith
+						StartsWith[start]
+						EndsWith[end]
 						Email
 						Tel
 						Url
@@ -494,56 +520,62 @@ Validator hierarchy:
 						Html
 						StrDate
 						StrDateTime
-						StrMatch[qr/.../]
-						ClassName[A]
-						RoleName[A]
-						Rat
+						StrMatch[regexp]
+						ClassName
+						RoleName
+						Join[separator]
+						Split[separator]
+						StrRat
 						Num
 							PositiveNum
 							Int
 								PositiveInt
 								Nat
 				Ref
-					Tied`[A]
+					Tied`[class]
 					LValueRef
 					FormatRef
-					CodeRef`[name, proto]
-						ReachableCodeRef`[name, proto]
-						UnreachableCodeRef`[name, proto]
+					CodeRef
+						NamedCode[subname]
+						ProtoCode[prototype]
+						ForwardRef
+						ImplementRef
+						Isa[A...]
 					RegexpRef
-					ScalarRefRef`[A]
-						RefRef`[A]
+					ValueRef`[A]
 						ScalarRef`[A]
+						RefRef`[A]
 					GlobRef
 						FileHandle
 					ArrayRef`[A]
-					HashRef`[H]
-					Object`[O]
+					HashRef`[A]
+					Object`[class]
 						Me
-					Map[K, V]
+						Rat
+					Map[A => B]
 					Tuple[A...]
 					CycleTuple[A...]
 					Dict[k => A, ...]
 					RegexpLike
 					CodeLike
 					ArrayLike`[A]
-						Lim[A, B?]
+						Lim[from, to?]
 					HashLike`[A]
 						HasProp[p...]
-						LimKeys[A, B?]
+						LimKeys[from, to?]
 				Like
 					HasMethods[m...]
 					Overload`[m...]
-					InstanceOf[A...]
-					ConsumerOf[A...]
+					InstanceOf[class...]
+					ConsumerOf[role...]
 					StrLike
-						Len[A, B?]
+						Len[from, to?]
 					NumLike
 						Float
 						Double
 						Range[from, to]
-						Bytes[A, B?]
-						PositiveBytes[A, B?]
+						Bytes[n]
+						PositiveBytes[n]
 
 =head1 SUBROUTINES
 
@@ -580,12 +612,12 @@ Used with C<subtype> to extend the created C<$super_type> type.
 Initializes a type with new arguments. Used with C<subtype>.
 
 	BEGIN {
-		subtype 'LessThen[A]',
-			init_where { Num->validate(A, "Argument LessThen[A]") }
+		subtype 'LessThen[n]',
+			init_where { Num->validate(A, "Argument LessThen[n]") }
 			where { $_ < A };
 	}
 	
-	eval { LessThen["string"] }; $@  # ~> Argument LessThen\[A\]
+	eval { LessThen["string"] }; $@  # ^=> Argument LessThen[n]
 	
 	5 ~~ LessThen[5]  # -> ""
 
@@ -603,7 +635,7 @@ Uses C<$code> as a test. The value for the test is passed to C<$_>.
 
 Used with C<subtype>. Required if the type has arguments.
 
-	subtype 'Ex[A]' # @-> subtype Ex[A]: needs a where
+	subtype 'Ex[a]' # @-> subtype Ex[a]: needs a where
 
 =head2 awhere ($code)
 
@@ -612,7 +644,7 @@ Used with C<subtype>.
 If the type can be with or without arguments, then it is used to check the set with arguments, and C<where> - without.
 
 	BEGIN {
-		subtype 'GreatThen`[A]',
+		subtype 'GreatThen`[num]',
 			where { $_ > 0 }
 			awhere { $_ > A }
 		;
@@ -626,11 +658,11 @@ If the type can be with or without arguments, then it is used to check the set w
 
 Required if arguments are optional.
 
-	subtype 'Ex`[A]', where {} # @-> subtype Ex`[A]: needs a awhere
+	subtype 'Ex`[a]', where {} # @-> subtype Ex`[a]: needs an awhere
 	subtype 'Ex', awhere {} # @-> subtype Ex: awhere is excess
 	
 	BEGIN {
-		subtype 'MyEnum`[A...]',
+		subtype 'MyEnum`[item...]',
 			as Str,
 			awhere { $_ ~~ scalar ARGS }
 		;
@@ -651,7 +683,7 @@ Arguments of the current type. In a scalar context, it returns a reference to an
 The first, second, third and fifth type arguments.
 
 	BEGIN {
-		subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
+		subtype "Seria[a,b,c,d]", where { A < B && B < $_ && $_ < C && C < D };
 	}
 	
 	2.5 ~~ Seria[1,2,3,4] # -> 1
@@ -663,7 +695,7 @@ Used in C<init_where>, C<where> and C<awhere>.
 C<M> and C<N> are shorthand for C<< SELF-E<gt>{M} >> and C<< SELF-E<gt>{N} >>.
 
 	BEGIN {
-		subtype "BeginAndEnd[A, B]",
+		subtype "BeginAndEnd[begin, end]",
 			init_where {
 				N = qr/^${\ quotemeta A}/;
 				M = qr/${\ quotemeta B}$/;
@@ -818,6 +850,37 @@ If the routine returns different values in array and scalar contexts, then the C
 
 The top-level type in the hierarchy of scalar types.
 
+=head2 External[type]
+
+Sets C<type> to C<Aion::Type>.
+
+=over
+
+=item * If C<type> is C<Aion::Type>, then returns it unchanged.
+
+=item * If C<type> is a string, then wraps it in C<Object>.
+
+=item * If C<type> can be called, then wraps it in C<< Aion::Type-E<gt>new(test =E<gt> $type, ...) >>. And if it has a C<coerce> method, it will use it for transformations. Thanks to this, it is possible to use external types like C<Type::Tiny> in the C<Aion> ecosystem.
+
+=back
+
+	External['Aion'] # -> Object['Aion']
+	External[sub { /^x/ }] ~~ 'xyz' # -> 1
+	
+	package MyInt {
+		use overload "&{}" => sub {
+			sub { /^[+-]?[0-9]+$/ }
+		};
+		
+		sub coerce { /\./? int($_): $_ }
+	}
+	
+	my $myint = bless {}, 'MyInt';
+	
+	External([$myint]) ~~ '+123' # -> 1
+	External([$myint])->coerce(10.1) # => 10
+	External([$myint])->coerce('abc') # => abc
+
 =head2 Bool
 
 C<1> is true. C<0>, C<""> or C<undef> is false.
@@ -834,9 +897,9 @@ C<1> is true. C<0>, C<""> or C<undef> is false.
 
 Enumeration.
 
-	3 ~~ Enum[1,2,3]   # -> 1
-	"cat" ~~ Enum["cat", "dog"] # -> 1
-	4 ~~ Enum[1,2,3]   # -> ""
+	3 ~~ Enum[1,2,3];            # -> 1
+	"cat" ~~ Enum["cat", "dog"]; # -> 1
+	4 ~~ Enum[1,2,3];            # -> ""
 
 =head2 Maybe[A]
 
@@ -868,9 +931,9 @@ Defined values without references.
 	\3 ~~ Value    # -> ""
 	undef ~~ Value # -> ""
 
-=head2 Len[A, B?]
+=head2 Len[from, to?]
 
-Specifies a length value from C<A> to C<B>, or from 0 to C<A> if C<B> is missing.
+Specifies a length value from C<from> to C<to>, or from 0 to C<from> if C<to> is missing.
 
 	"1234" ~~ Len[3]   # -> ""
 	"123" ~~ Len[3]    # -> 1
@@ -916,19 +979,19 @@ Binary strings without the utf8 flag and octets with numbers less than 128.
 	"↭" ~~ Bin # -> ""
 	do {no utf8; "↭" ~~ Bin }   # -> ""
 
-=head2 StartsWith[S]
+=head2 StartsWith[begin]
 
-The line starts with C<S>.
+The line starts with C<begin>.
 
-	"Hi, world!" ~~ StartsWith["Hi,"] # -> 1
-	"Hi world!" ~~ StartsWith["Hi,"] # -> ""
+	"Hi, world!" ~~ StartsWith["Hi,"]; # -> 1
+	"Hi world!" ~~ StartsWith["Hi,"];  # -> ""
 
-=head2 EndsWith[S]
+=head2 EndsWith[end]
 
-The line ends with C<S>.
+The line ends with C<end>.
 
-	"Hi, world!" ~~ EndsWith["world!"] # -> 1
-	"Hi, world" ~~ EndsWith["world!"]  # -> ""
+	"Hi, world!" ~~ EndsWith["world!"]; # -> 1
+	"Hi, world" ~~ EndsWith["world!"];  # -> ""
 
 =head2 NonEmptyStr
 
@@ -950,8 +1013,8 @@ Lines with C<@>.
 
 The telephone format is a plus sign and seven or more digits.
 
-	"+1234567" ~~ Tel # -> 1
-	"+1234568" ~~ Tel # -> 1
+	"+1234567" ~~ Tel  # -> 1
+	"+1234568" ~~ Tel  # -> 1
 	"+ 1234567" ~~ Tel # -> ""
 	"+1234567 " ~~ Tel # -> ""
 
@@ -974,10 +1037,10 @@ Paths start with a slash.
 
 HTML starts with C<< E<lt>!doctype html >> or C<< E<lt>html >>.
 
-	"<HTML" ~~ Html   # -> 1
-	" <html" ~~ Html     # -> 1
+	"<HTML" ~~ Html            # -> 1
+	" <html" ~~ Html           # -> 1
 	" <!doctype html>" ~~ Html # -> 1
-	" <html1>" ~~ Html   # -> ""
+	" <html1>" ~~ Html         # -> ""
 
 =head2 StrDate
 
@@ -993,7 +1056,7 @@ Date and time in the format C<yyyy-mm-dd HH:MM:SS>.
 	"2012-12-01 00:00:00" ~~ StrDateTime  # -> 1
 	"2012-12-01 00:00:00 " ~~ StrDateTime # -> ""
 
-=head2 StrMatch[qr/.../]
+=head2 StrMatch[regexp]
 
 Matches a string against a regular expression.
 
@@ -1025,19 +1088,33 @@ The role name is a package without the C<new> method, with C<@ISA>, or with any 
 	'Aion::Type' ~~ RoleName # -> ""
 	'Nouname::Empty::Package' ~~ RoleName # -> ""
 
+=head2 StrRat
+
+String representation of rational numbers.
+
+Since in perl rational numbers are supported using the C<bigrat> pragma, which turns all rational numbers into C<Math::BigRat>, it is used in a ghost to C<Rat>.
+
+	"6/7" ~~ StrRat  # -> 1
+	"-6/7" ~~ StrRat # -> 1
+	"+6/7" ~~ StrRat # -> 1
+	6 ~~ StrRat      # -> 1
+	"inf" ~~ StrRat  # -> 1
+	"+Inf" ~~ StrRat # -> 1
+	"NaN" ~~ StrRat  # -> 1
+	"-nan" ~~ StrRat # -> 1
+	6.5 ~~ StrRat    # -> 1
+	"6.5 " ~~ StrRat # -> ''
+
 =head2 Rat
 
-Rational numbers.
+Rational numbers. Short for C<Object['Math::BigRat']>. Has a ghost.
 
-	"6/7" ~~ Rat  # -> 1
-	"-6/7" ~~ Rat # -> 1
-	6 ~~ Rat      # -> 1
-	"inf" ~~ Rat  # -> 1
-	"+Inf" ~~ Rat # -> 1
-	"NaN" ~~ Rat  # -> 1
-	"-nan" ~~ Rat # -> 1
-	6.5 ~~ Rat    # -> 1
-	"6.5 " ~~ Rat # -> ''
+	use Math::BigRat;
+	use Math::BigFloat;
+	use Math::BigInt;
+	
+	"6/7" ~~ Rat # -> ""
+	Math::BigRat->new("6/7") ~~ Rat # -> 1
 
 =head2 Num
 
@@ -1256,56 +1333,75 @@ Format.
 	*EXAMPLE_FMT{FORMAT} ~~ FormatRef   # -> 1
 	\1 ~~ FormatRef				# -> ""
 
-=head2 CodeRef`[name, proto]
+=head2 CodeRef
 
 Subroutine.
 
-	sub {} ~~ CodeRef	# -> 1
-	\1 ~~ CodeRef		# -> ""
-	
-	sub code_ex ($;$) { ... }
-	
-	\&code_ex ~~ CodeRef['main::code_ex']         # -> 1
-	\&code_ex ~~ CodeRef['code_ex']               # -> ""
-	\&code_ex ~~ CodeRef[qr/_/]                   # -> 1
-	\&code_ex ~~ CodeRef[undef, '$;$']            # -> 1
-	\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/] # -> 1
-	\&code_ex ~~ CodeRef[undef, '@']              # -> ""
-	\&code_ex ~~ CodeRef['main::code_ex', '$;$']  # -> 1
+	sub {} ~~ CodeRef # -> 1
+	\1 ~~ CodeRef     # -> ""
 
-=head2 ReachableCodeRef`[name, proto]
+=head2 NamedCode[name]
 
-Subroutine with body.
+The subroutine with the specified name. C<name> – string or regular character.
 
-	sub code_forward ($;$);
+	sub code_ex { ... }
 	
-	\&code_ex ~~ ReachableCodeRef['main::code_ex']        # -> 1
-	\&code_ex ~~ ReachableCodeRef['code_ex']              # -> ""
-	\&code_ex ~~ ReachableCodeRef[qr/_/]                  # -> 1
-	\&code_ex ~~ ReachableCodeRef[undef, '$;$']           # -> 1
-	\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/]         # -> 1
-	\&code_ex ~~ ReachableCodeRef[undef, '@']             # -> ""
-	\&code_ex ~~ ReachableCodeRef['main::code_ex', '$;$'] # -> 1
-	
-	\&code_forward ~~ ReachableCodeRef # -> ""
+	\&code_ex ~~ NamedCode['main::code_ex'] # -> 1
+	\&code_ex ~~ NamedCode['code_ex']       # -> ""
+	\&code_ex ~~ NamedCode[qr/_/]           # -> 1
 
-=head2 UnreachableCodeRef`[name, proto]
+=head2 ProtoCode[prototype]
+
+A subroutine with the specified prototype.
+
+	sub codex ($;$);
+	
+	\&codex ~~ ProtoCode['@']     # -> ""
+	\&codex ~~ ProtoCode['$;$']   # -> 1
+	\&codex ~~ ProtoCode[qr/^\$/] # -> 1
+
+=head2 ForwardRef
 
 Subroutine without body.
 
-	\&nouname ~~ UnreachableCodeRef # -> 1
-	\&code_ex ~~ UnreachableCodeRef # -> ""
-	\&code_forward ~~ UnreachableCodeRef['main::code_forward', '$;$'] # -> 1
+	sub code_ref {};
+	sub code_forward;
+	
+	\&code_forward ~~ ForwardRef # -> 1
+	\&code_ref ~~ ForwardRef     # -> ""
+
+A subroutine without a body is usually used for pre-declaration, but XS functions also have no body:
+
+	\&UNIVERSAL::isa ~~ ForwardRef # -> 1
+
+Calling an undeclared function using C<\&> creates a reference to the previously declared function:
+
+	main->can('nouname') ~~ ForwardRef # -> ""
+	
+	\&nouname ~~ ForwardRef # -> 1
+	
+	main->can('nouname') ~~ ForwardRef # -> 1
+
+=head2 ImplementRef
+
+Subroutine with body.
+
+	sub code_ref {};
+	sub code_forward;
+	
+	\&code_ref ~~ ImplementRef     # -> 1
+	\&code_forward ~~ ImplementRef # -> ""
 
 =head2 Isa[A...]
 
 A link to a subroutine with the corresponding signature.
 
-	sub sig_ex :Isa(Int => Str) {}
+	sub sig_ex :Isa(Aion => Int => Str) {}
 	
-	\&sig_ex ~~ Isa[Int => Str]        # -> 1
-	\&sig_ex ~~ Isa[Int => Str => Num] # -> ""
-	\&sig_ex ~~ Isa[Int => Num]        # -> ""
+	\&sig_ex ~~ Isa[Aion => Int => Str] # -> 1
+	\&sig_ex ~~ Isa[Object['Aion'] => Int => Str] # -> 1
+	\&sig_ex ~~ Isa[Aion => Str => Num] # -> ""
+	\&sig_ex ~~ Isa[Int => Num] # -> ""
 
 Subroutines without a body are not wrapped in a signature handler, and the signature is remembered to validate the conformity of a subsequently declared subroutine with a body. Therefore the function has no signature.
 
@@ -1320,14 +1416,14 @@ Regular expression.
 	qr// ~~ RegexpRef # -> 1
 	\1 ~~ RegexpRef   # -> ""
 
-=head2 ScalarRefRef`[A]
+=head2 ValueRef`[A]
 
-A reference to a scalar or a reference to a reference.
+A reference to a scalar or reference.
 
-	\12    ~~ ScalarRefRef                    # -> 1
-	\12    ~~ ScalarRefRef                    # -> 1
-	\-1.2  ~~ ScalarRefRef[Num]               # -> 1
-	\\-1.2 ~~ ScalarRefRef[ScalarRefRef[Num]] # -> 1
+	\12    ~~ ValueRef                 # -> 1
+	\12    ~~ ValueRef                 # -> 1
+	\-1.2  ~~ ValueRef[Num]            # -> 1
+	\\-1.2 ~~ ValueRef[ValueRef[Num]] # -> 1
 
 =head2 ScalarRef`[A]
 

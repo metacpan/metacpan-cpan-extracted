@@ -48,13 +48,14 @@ Any
 	Control
 		Union[A, B...]
 		Intersection[A, B...]
-		Exclude[A, B...]
+		Exclude[A...]
 		Option[A]
-		Wantarray[A, S]
+		Wantarray[A, B]
 	Item
+		External[type]
 		Bool
 		BoolLike
-		Enum[A...]
+		Enum[e...]
 		Maybe[A]
 		Undef
 		Defined
@@ -64,8 +65,8 @@ Any
 					Uni
 					Bin
 					NonEmptyStr
-					StartsWith
-					EndsWith
+					StartsWith[start]
+					EndsWith[end]
 					Email
 					Tel
 					Url
@@ -73,56 +74,62 @@ Any
 					Html
 					StrDate
 					StrDateTime
-					StrMatch[qr/.../]
-					ClassName[A]
-					RoleName[A]
-					Rat
+					StrMatch[regexp]
+					ClassName
+					RoleName
+					Join[separator]
+					Split[separator]
+					StrRat
 					Num
 						PositiveNum
 						Int
 							PositiveInt
 							Nat
 			Ref
-				Tied`[A]
+				Tied`[class]
 				LValueRef
 				FormatRef
-				CodeRef`[name, proto]
-					ReachableCodeRef`[name, proto]
-					UnreachableCodeRef`[name, proto]
+				CodeRef
+					NamedCode[subname]
+					ProtoCode[prototype]
+					ForwardRef
+					ImplementRef
+					Isa[A...]
 				RegexpRef
-				ScalarRefRef`[A]
-					RefRef`[A]
+				ValueRef`[A]
 					ScalarRef`[A]
+					RefRef`[A]
 				GlobRef
 					FileHandle
 				ArrayRef`[A]
-				HashRef`[H]
-				Object`[O]
+				HashRef`[A]
+				Object`[class]
 					Me
-				Map[K, V]
+					Rat
+				Map[A => B]
 				Tuple[A...]
 				CycleTuple[A...]
 				Dict[k => A, ...]
 				RegexpLike
 				CodeLike
 				ArrayLike`[A]
-					Lim[A, B?]
+					Lim[from, to?]
 				HashLike`[A]
 					HasProp[p...]
-					LimKeys[A, B?]
+					LimKeys[from, to?]
 			Like
 				HasMethods[m...]
 				Overload`[m...]
-				InstanceOf[A...]
-				ConsumerOf[A...]
+				InstanceOf[class...]
+				ConsumerOf[role...]
 				StrLike
-					Len[A, B?]
+					Len[from, to?]
 				NumLike
 					Float
 					Double
 					Range[from, to]
-					Bytes[A, B?]
-					PositiveBytes[A, B?]
+					Bytes[n]
+					PositiveBytes[n]
 ```
 
 # SUBROUTINES
@@ -165,12 +172,12 @@ eval { subtype 'Many' }; $@ # ~> subtype Many: main::Many exists!
 
 ```perl
 BEGIN {
-	subtype 'LessThen[A]',
-		init_where { Num->validate(A, "Argument LessThen[A]") }
+	subtype 'LessThen[n]',
+		init_where { Num->validate(A, "Argument LessThen[n]") }
 		where { $_ < A };
 }
 
-eval { LessThen["string"] }; $@  # ~> Argument LessThen\[A\]
+eval { LessThen["string"] }; $@  # ^=> Argument LessThen[n]
 
 5 ~~ LessThen[5]  # -> ""
 ```
@@ -192,7 +199,7 @@ BEGIN {
 Используется с `subtype`. Необходимо, если у типа есть аргументы.
 
 ```perl
-subtype 'Ex[A]' # @-> subtype Ex[A]: needs a where
+subtype 'Ex[a]' # @-> subtype Ex[a]: needs a where
 ```
 
 ## awhere ($code)
@@ -203,7 +210,7 @@ subtype 'Ex[A]' # @-> subtype Ex[A]: needs a where
 
 ```perl
 BEGIN {
-	subtype 'GreatThen`[A]',
+	subtype 'GreatThen`[num]',
 		where { $_ > 0 }
 		awhere { $_ > A }
 	;
@@ -219,11 +226,11 @@ BEGIN {
 Необходимо, если аргументы необязательны.
 
 ```perl
-subtype 'Ex`[A]', where {} # @-> subtype Ex`[A]: needs a awhere
+subtype 'Ex`[a]', where {} # @-> subtype Ex`[a]: needs an awhere
 subtype 'Ex', awhere {} # @-> subtype Ex: awhere is excess
 
 BEGIN {
-	subtype 'MyEnum`[A...]',
+	subtype 'MyEnum`[item...]',
 		as Str,
 		awhere { $_ ~~ scalar ARGS }
 	;
@@ -246,7 +253,7 @@ BEGIN {
 
 ```perl
 BEGIN {
-	subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
+	subtype "Seria[a,b,c,d]", where { A < B && B < $_ && $_ < C && C < D };
 }
 
 2.5 ~~ Seria[1,2,3,4] # -> 1
@@ -260,7 +267,7 @@ BEGIN {
 
 ```perl
 BEGIN {
-	subtype "BeginAndEnd[A, B]",
+	subtype "BeginAndEnd[begin, end]",
 		init_where {
 			N = qr/^${\ quotemeta A}/;
 			M = qr/${\ quotemeta B}$/;
@@ -436,6 +443,33 @@ $s  # -> 3
 
 Тип верхнего уровня в иерархии скалярных типов.
 
+## External[type]
+
+Правращает `type` в `Aion::Type`.
+
+* Если `type` - `Aion::Type`, то возвращает его без изменений.
+* Если `type` строка, то оборачивает его в `Object`.
+* Если `type` можно вызвать, то оборачивает его в `Aion::Type->new(test => $type, ...)`. А если он имеет метод `coerce`, то будет его использовать для преобразований. Благодаря этому можно в экосистеме `Aion` использовать внешние типы вроде `Type::Tiny`.
+
+```perl
+External['Aion'] # -> Object['Aion']
+External[sub { /^x/ }] ~~ 'xyz' # -> 1
+
+package MyInt {
+	use overload "&{}" => sub {
+		sub { /^[+-]?[0-9]+$/ }
+	};
+	
+	sub coerce { /\./? int($_): $_ }
+}
+
+my $myint = bless {}, 'MyInt';
+
+External([$myint]) ~~ '+123' # -> 1
+External([$myint])->coerce(10.1) # => 10
+External([$myint])->coerce('abc') # => abc
+```
+
 ## Bool
 
 `1` is true. `0`, `""` or `undef` is false.
@@ -455,9 +489,9 @@ undef ~~ Bool # -> 1
 Перечисление.
 
 ```perl
-3 ~~ Enum[1,2,3]   # -> 1
-"cat" ~~ Enum["cat", "dog"] # -> 1
-4 ~~ Enum[1,2,3]   # -> ""
+3 ~~ Enum[1,2,3];            # -> 1
+"cat" ~~ Enum["cat", "dog"]; # -> 1
+4 ~~ Enum[1,2,3];            # -> ""
 ```
 
 ## Maybe[A]
@@ -498,9 +532,9 @@ undef ~~ Defined # -> ""
 undef ~~ Value # -> ""
 ```
 
-## Len[A, B?]
+## Len[from, to?]
 
-Определяет значение длины от `A` до `B` или от 0 до `A`, если `B` отсутствует.
+Определяет значение длины от `from` до `to` или от 0 до `from`, если `to` отсутствует.
 
 ```perl
 "1234" ~~ Len[3]   # -> ""
@@ -556,22 +590,22 @@ do {no utf8; "↭" ~~ Uni} # -> 1
 do {no utf8; "↭" ~~ Bin }   # -> ""
 ```
 
-## StartsWith\[S]
+## StartsWith\[begin]
 
-Строка начинается с `S`.
+Строка начинается с `begin`.
 
 ```perl
-"Hi, world!" ~~ StartsWith["Hi,"] # -> 1
-"Hi world!" ~~ StartsWith["Hi,"] # -> ""
+"Hi, world!" ~~ StartsWith["Hi,"]; # -> 1
+"Hi world!" ~~ StartsWith["Hi,"];  # -> ""
 ```
 
-## EndsWith\[S]
+## EndsWith\[end]
 
-Строка заканчивается на `S`.
+Строка заканчивается на `end`.
 
 ```perl
-"Hi, world!" ~~ EndsWith["world!"] # -> 1
-"Hi, world" ~~ EndsWith["world!"]  # -> ""
+"Hi, world!" ~~ EndsWith["world!"]; # -> 1
+"Hi, world" ~~ EndsWith["world!"];  # -> ""
 ```
 
 ## NonEmptyStr
@@ -599,8 +633,8 @@ do {no utf8; "↭" ~~ Bin }   # -> ""
 Формат телефонов — знак плюс и семь или больше цифр.
 
 ```perl
-"+1234567" ~~ Tel # -> 1
-"+1234568" ~~ Tel # -> 1
+"+1234567" ~~ Tel  # -> 1
+"+1234568" ~~ Tel  # -> 1
 "+ 1234567" ~~ Tel # -> ""
 "+1234567 " ~~ Tel # -> ""
 ```
@@ -629,10 +663,10 @@ URL-адреса веб-сайтов — это строка с префиксо
 HTML начинается с `<!doctype html` или `<html`.
 
 ```perl
-"<HTML" ~~ Html   # -> 1
-" <html" ~~ Html     # -> 1
+"<HTML" ~~ Html            # -> 1
+" <html" ~~ Html           # -> 1
 " <!doctype html>" ~~ Html # -> 1
-" <html1>" ~~ Html   # -> ""
+" <html1>" ~~ Html         # -> ""
 ```
 
 ## StrDate
@@ -653,7 +687,7 @@ HTML начинается с `<!doctype html` или `<html`.
 "2012-12-01 00:00:00 " ~~ StrDateTime # -> ""
 ```
 
-## StrMatch[qr/.../]
+## StrMatch[regexp]
 
 Сопоставляет строку с регулярным выражением.
 
@@ -691,20 +725,36 @@ package ExRole2 {
 'Nouname::Empty::Package' ~~ RoleName # -> ""
 ```
 
-## Rat
+## StrRat
 
-Рациональные числа.
+Строковое представление рациональных чисел.
+
+Так как в perl рациональные числа поддерживаются с помощью прагмы `bigrat`, который все рациональные числа превращает в `Math::BigRat`, то используется в привидении к `Rat`.
 
 ```perl
-"6/7" ~~ Rat  # -> 1
-"-6/7" ~~ Rat # -> 1
-6 ~~ Rat      # -> 1
-"inf" ~~ Rat  # -> 1
-"+Inf" ~~ Rat # -> 1
-"NaN" ~~ Rat  # -> 1
-"-nan" ~~ Rat # -> 1
-6.5 ~~ Rat    # -> 1
-"6.5 " ~~ Rat # -> ''
+"6/7" ~~ StrRat  # -> 1
+"-6/7" ~~ StrRat # -> 1
+"+6/7" ~~ StrRat # -> 1
+6 ~~ StrRat      # -> 1
+"inf" ~~ StrRat  # -> 1
+"+Inf" ~~ StrRat # -> 1
+"NaN" ~~ StrRat  # -> 1
+"-nan" ~~ StrRat # -> 1
+6.5 ~~ StrRat    # -> 1
+"6.5 " ~~ StrRat # -> ''
+```
+
+## Rat
+
+Рациональные числа. Сокращение для `Object['Math::BigRat']`. Имеет приведение.
+
+```perl
+use Math::BigRat;
+use Math::BigFloat;
+use Math::BigInt;
+
+"6/7" ~~ Rat # -> ""
+Math::BigRat->new("6/7") ~~ Rat # -> 1
 ```
 
 ## Num
@@ -956,52 +1006,77 @@ format EXAMPLE_FMT =
 \1 ~~ FormatRef				# -> ""
 ```
 
-## CodeRef`[name, proto]
+## CodeRef
 
 Подпрограмма.
 
 ```perl
-sub {} ~~ CodeRef	# -> 1
-\1 ~~ CodeRef		# -> ""
-
-sub code_ex ($;$) { ... }
-
-\&code_ex ~~ CodeRef['main::code_ex']         # -> 1
-\&code_ex ~~ CodeRef['code_ex']               # -> ""
-\&code_ex ~~ CodeRef[qr/_/]                   # -> 1
-\&code_ex ~~ CodeRef[undef, '$;$']            # -> 1
-\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/] # -> 1
-\&code_ex ~~ CodeRef[undef, '@']              # -> ""
-\&code_ex ~~ CodeRef['main::code_ex', '$;$']  # -> 1
+sub {} ~~ CodeRef # -> 1
+\1 ~~ CodeRef     # -> ""
 ```
 
+## NamedCode[name]
 
-## ReachableCodeRef`[name, proto]
-
-Подпрограмма с телом.
+Подпрограмма с указанным именем. `name` – строка или регулярка.
 
 ```perl
-sub code_forward ($;$);
+sub code_ex { ... }
 
-\&code_ex ~~ ReachableCodeRef['main::code_ex']        # -> 1
-\&code_ex ~~ ReachableCodeRef['code_ex']              # -> ""
-\&code_ex ~~ ReachableCodeRef[qr/_/]                  # -> 1
-\&code_ex ~~ ReachableCodeRef[undef, '$;$']           # -> 1
-\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/]         # -> 1
-\&code_ex ~~ ReachableCodeRef[undef, '@']             # -> ""
-\&code_ex ~~ ReachableCodeRef['main::code_ex', '$;$'] # -> 1
-
-\&code_forward ~~ ReachableCodeRef # -> ""
+\&code_ex ~~ NamedCode['main::code_ex'] # -> 1
+\&code_ex ~~ NamedCode['code_ex']       # -> ""
+\&code_ex ~~ NamedCode[qr/_/]           # -> 1
 ```
 
-## UnreachableCodeRef`[name, proto]
+## ProtoCode[prototype]
+
+Подпрограмма с указанным прототипом.
+
+```perl
+sub codex ($;$);
+
+\&codex ~~ ProtoCode['@']     # -> ""
+\&codex ~~ ProtoCode['$;$']   # -> 1
+\&codex ~~ ProtoCode[qr/^\$/] # -> 1
+```
+
+## ForwardRef
 
 Подпрограмма без тела.
 
 ```perl
-\&nouname ~~ UnreachableCodeRef # -> 1
-\&code_ex ~~ UnreachableCodeRef # -> ""
-\&code_forward ~~ UnreachableCodeRef['main::code_forward', '$;$'] # -> 1
+sub code_ref {};
+sub code_forward;
+
+\&code_forward ~~ ForwardRef # -> 1
+\&code_ref ~~ ForwardRef     # -> ""
+```
+
+Подпрограмма без тела обычно используется для предварительного объявления, однако XS-функции так же не имеют тела:
+
+```perl
+\&UNIVERSAL::isa ~~ ForwardRef # -> 1
+```
+
+Обращение к необъявленной функции через `\&` создаёт ссылку на предварительно-объявленную фунцию:
+
+```perl
+main->can('nouname') ~~ ForwardRef # -> ""
+
+\&nouname ~~ ForwardRef # -> 1
+
+main->can('nouname') ~~ ForwardRef # -> 1
+```
+
+## ImplementRef
+
+Подпрограмма с телом.
+
+```perl
+sub code_ref {};
+sub code_forward;
+
+\&code_ref ~~ ImplementRef     # -> 1
+\&code_forward ~~ ImplementRef # -> ""
 ```
 
 ## Isa[A...]
@@ -1009,11 +1084,12 @@ sub code_forward ($;$);
 Ссылка на подпрограмму с соответствующей сигнатурой.
 
 ```perl
-sub sig_ex :Isa(Int => Str) {}
+sub sig_ex :Isa(Aion => Int => Str) {}
 
-\&sig_ex ~~ Isa[Int => Str]        # -> 1
-\&sig_ex ~~ Isa[Int => Str => Num] # -> ""
-\&sig_ex ~~ Isa[Int => Num]        # -> ""
+\&sig_ex ~~ Isa[Aion => Int => Str] # -> 1
+\&sig_ex ~~ Isa[Object['Aion'] => Int => Str] # -> 1
+\&sig_ex ~~ Isa[Aion => Str => Num] # -> ""
+\&sig_ex ~~ Isa[Int => Num] # -> ""
 ```
 
 Подпрограммы без тела не оборачиваются в обработчик сигнатуры, а сигнатура запоминается для валидации соответствия впоследствии объявленной подпрограммы с телом. Поэтому функция не имеет сигнатуры.
@@ -1033,15 +1109,15 @@ qr// ~~ RegexpRef # -> 1
 \1 ~~ RegexpRef   # -> ""
 ```
 
-## ScalarRefRef`[A]
+## ValueRef`[A]
 
-Ссылка на скаляр или ссылка на ссылку.
+Ссылка на скаляр или ссылку.
 
 ```perl
-\12    ~~ ScalarRefRef                    # -> 1
-\12    ~~ ScalarRefRef                    # -> 1
-\-1.2  ~~ ScalarRefRef[Num]               # -> 1
-\\-1.2 ~~ ScalarRefRef[ScalarRefRef[Num]] # -> 1
+\12    ~~ ValueRef                 # -> 1
+\12    ~~ ValueRef                 # -> 1
+\-1.2  ~~ ValueRef[Num]            # -> 1
+\\-1.2 ~~ ValueRef[ValueRef[Num]] # -> 1
 ```
 
 ## ScalarRef`[A]

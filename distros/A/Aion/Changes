@@ -1,5 +1,11 @@
 Revision history for Perl extension Aion
 
+1.5 2025-12-19T13:03:59Z
+
+    - added External[A]
+    - isa => A and :Isa and Isa[A...] work with External: sub, 'ClassName' and callable objects with coerce
+    - Rat go to Math::BigRat with coerce, and added StrRat for test in coerce
+
 1.4 2025-12-11T07:32:57Z
 
     - aspect eon work with 2

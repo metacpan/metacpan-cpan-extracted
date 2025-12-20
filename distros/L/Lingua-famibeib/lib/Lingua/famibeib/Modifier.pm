@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -177,6 +177,8 @@ sub register {
     $_registered_by_string{$self->as_string} //= $self;
     $_registered_by_uuid{$self->as('uuid')} //= $self;
 
+    $self->as('Data::Identifier')->register;
+
     return $self;
 }
 
@@ -222,7 +224,7 @@ Lingua::famibeib::Modifier - module to interact with the famibeib word modifiers
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -353,13 +355,16 @@ B<Note:>
 Base and common modifiers are already registered by this module.
 Hence it is hardly needed to call this method at all.
 
+B<Note:>
+This method also registers the corresponding L<Data::Identifier> instance (since v0.02).
+
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -11,6 +11,7 @@ my $exe = abs_path(File::Spec->catfile($FindBin::Bin, '..', 'bin', 'jq-lite'));
 
 sub run_cli {
     my ($input, @args) = @_;
+    local $SIG{PIPE} = 'IGNORE';
     my $err = gensym;
     my $pid = open3(my $in, my $out, $err, $^X, $exe, @args);
     if (defined $input) {

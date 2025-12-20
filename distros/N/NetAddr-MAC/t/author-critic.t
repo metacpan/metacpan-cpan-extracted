@@ -11,5 +11,5 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "t/.perlcriticrc") x!! -e "t/.perlcriticrc";
+use Test::Perl::Critic;
 all_critic_ok();

@@ -48,7 +48,7 @@ $Aion::Type::SELF = {
 # * init (CodeRef) — Инициализатор типа.
 # * test (CodeRef) — Чекер.
 # * a_test (CodeRef) — Используется для проверки типа с аргументами, если аргументы не указаны, то используется test.
-# * coerce (HashRef) — Массив преобразователей в этот тип: TypeName => sub {}.
+# * coerce (ArrayRef) — Массив преобразователей в этот тип: [Type => sub {}].
 # * message (CodeRef) — Сообщение об ошибке.
 # * title (Str) — Заголовок.
 # * description (Str) — Описание.

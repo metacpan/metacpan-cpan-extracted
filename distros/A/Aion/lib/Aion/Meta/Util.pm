@@ -2,6 +2,7 @@ package Aion::Meta::Util;
 
 use common::sense;
 
+require overload;
 use Scalar::Util qw//;
 use Exporter qw/import/;
 
@@ -73,14 +74,17 @@ sub val_to_str($;$) {
 		}
 	}
 	else {
-		my $no_str = Scalar::Util::looks_like_number($v)
-		 	|| ref $v;
+		my $no_str = ref $v || Scalar::Util::looks_like_number($v);
 
 		if(ref $v eq 'Regexp') {
 			$v = "$v";
 			$v =~ s{^\(\?\^?([a-z]*):(.*)\)$}{qr/$2/$1}si;
 		}
-		else {$v = "$v"}
+		else {
+			$v = overload::Overloaded($v) && !overload::Method($v, '""')
+				? join("#", Scalar::Util::reftype($v), Scalar::Util::refaddr($v))
+				: "$v";
+		}
 		$v = substr($v, 0, MAX_SCALAR_LENGTH) . '...'
 			if length($v) > MAX_SCALAR_LENGTH;
 		$no_str ? $v : "'${\ $v =~ s/['\\]/\\$&/gr }'"

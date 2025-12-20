@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provides C<baptise>, semantically and idiomatically just like C<bless> but creates accessors for you. It does other cool things to make Perl code easier to read and maintain, too.",
+   "abstract" : "Convenience utilities built on Util::H2O (baptise, d2o, INI/YAML/HTTP helpers, Getopt helpers)",
    "author" : [
       "oodler577 <oodler@cpan.org>"
    ],
@@ -48,7 +48,7 @@
          "web" : "https://github.com/oodler577/p5-Util-H2O-More"
       }
    },
-   "version" : "0.4.2",
+   "version" : "0.4.3",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,7 +1,7 @@
 This archive contains the distribution Util-H2O-More,
-version 0.4.2:
+version 0.4.3:
 
-  Provides C<baptise>, semantically and idiomatically just like C<bless> but creates accessors for you. It does other cool things to make Perl code easier to read and maintain, too.
+  Convenience utilities built on Util::H2O (baptise, d2o, INI/YAML/HTTP helpers, Getopt helpers)
 
 This software is copyright (c) 2023-present by oodler577.
 

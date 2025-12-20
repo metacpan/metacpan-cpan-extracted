@@ -1,6 +1,13 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
 
+5.0.1 2025-12-17 (part of Zonemaster v2025.2 release)
+
+ [Fixes]
+- Updates LDNS submodule to v1.8.4 #202
+- RRList.pm: drop misplaced =back  #233
+
+
 5.0.0 2025-06-26 (part of Zonemaster v2025.1 release)
 
  [Breaking changes]

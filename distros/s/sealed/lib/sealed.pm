@@ -21,7 +21,7 @@ our $DEBUG;
 our $VERIFY_PREFIX = "use Types::Common -types, -sigs;";
 
 BEGIN {
-  our $VERSION = qv(8.4.2);
+  our $VERSION = qv(8.5.1);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -192,7 +192,11 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub import {
   $DEBUG                         = $_[1];
-  our $VERIFY_PREFIX = $_[2] if $DEBUG eq "verify" and defined $_[2];
+  our $VERIFY_PREFIX = $_[2] if $DEBUG eq "verify" and @_ == 3;
+  local $@;
+  my $pkg = caller;
+  eval {"package $pkg; use class; use types"}; # enable perl type system
+  die $@ if $@;
   filter_add(bless []);
 }
 
@@ -201,6 +205,7 @@ sub filter {
   my $status = filter_read;
   our $VERIFY_PREFIX;
   our %rcache;
+  my $pkg = caller;
 
   # handle bare typed lexical declarations
   s/^\s*my\s+(\w[\w:]*)\s+(\$\w+)(.)/$3 eq ";" ? qq(BEGIN{local \$@; eval "require $1"} \
@@ -220,13 +225,16 @@ sub filter {
      my $suffix = "";
      my $verify = "";
      my (@types, @vars, @defaults);
-
-     s{(\S+)?\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
+     my $entry;
+     s{(\S+)\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
+       $entry++;
        local $@;
        no strict 'refs';
-       my $pkg = caller;
+
        my $is_ext_class = $rcache{"$pkg\::$1"} //= eval "package $pkg; require $1"
-         // eval {*{eval "no strict 'vars'; package $pkg; $1"}};
+         // eval {*{eval "no strict 'vars'; package $pkg; $1"}}
+         // eval "use types; use class; my $1 $2" // !$@;
+
        my $class = $is_ext_class ? $1 : "";
 
        $suffix .= "my $class $2 = ";
@@ -253,7 +261,7 @@ sub filter {
        "$2$3$4" # drop the class/type info
     }gmse;
 
-    if ($DEBUG eq "verify") {
+    if ($entry and $DEBUG eq "verify") {
       # implement signature type checks for named subs via Types::Common::signature
 
       $verify .= "$VERIFY_PREFIX; no strict qw/vars subs/; state \$check = signature multiple => [ { named_to_list => 1, named => [";
@@ -297,10 +305,13 @@ sealed - Subroutine attribute for compile-time method lookups on its typed lexic
     use sealed 'dump';    # warns with the $op->dump during the tree walk
     use sealed 'verify';  # verifies all CV tweaks, optional VERIFY_PREFIX arg
     use sealed 'disabled';# disables all CV tweaks
+    use sealed 'types';   # enables builtin Perl::Types type system optimizations
     use sealed;           # disables all warnings
 
     VERIFY_PREFIX arg defaults to "use Types::Common -types, -sigs;", which
     must export an equivalent API to Types::Common::signature() as "signature()".
+
+    NOTE: as of 8.5.0, import activates the Perl Type System automatically.
 
 =head1 BUGS
 

@@ -1,5 +1,5 @@
 package CPAN::InGit::MirrorTree;
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # ABSTRACT: Subclass of ArchiveTree which automatically mirrors files from upstream
 
 
@@ -174,7 +174,7 @@ Also return the C<Git::Raw::BLOB>.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

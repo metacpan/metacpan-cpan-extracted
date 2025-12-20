@@ -1,17 +1,16 @@
 use 5.008008;
 use strict;
 use warnings;
-use XSLoader ();
 
 package Class::XSConstructor;
-
-our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014001';
 
 use Exporter::Tiny 1.000000 qw( mkopt _croak );
 use List::Util 1.45 qw( uniq );
 
 BEGIN {
+	our $AUTHORITY = 'cpan:TOBYINK';
+	our $VERSION   = '0.015001';
+	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
 			qw/ is_ArrayRef is_HashRef is_ScalarRef is_CodeRef is_Object /
@@ -27,6 +26,9 @@ BEGIN {
 			sub is_Object    ($) { !!Scalar::Util::blessed($_[0]) }
 		|;
 	}
+	
+	require XSLoader;
+	__PACKAGE__->XSLoader::load($VERSION);
 };
 
 sub import {
@@ -47,7 +49,10 @@ sub import {
 	}
 	inheritance_stuff($package);
 	
-	my ($HAS, $REQUIRED, $ISA, $BUILDALL, $STRICT, $FLAGS, $COERCIONS, $DEFAULTS, $TT) = get_vars($package);
+	undef $_->{$package} for fetch_vars( $package, qw/ %BUILD %DEMOLISH / );
+	
+	my ($HAS, $REQUIRED, $ISA, $STRICT, $FLAGS, $COERCIONS, $DEFAULTS, $TT, $INIT_ARGS, $TRIGGERS ) =
+		fetch_vars( $package, qw/ @HAS @REQUIRED %ISA $STRICT %FLAGS %COERCIONS %DEFAULTS %TYPETINY %INIT_ARGS %TRIGGERS / );
 	$$STRICT = !!0;
 	
 	for my $pair (@{ mkopt \@_ }) {
@@ -107,18 +112,24 @@ sub import {
 			}
 		}
 		
-		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce)\z/, keys %spec;
+		if ( $spec{required} and exists $spec{init_arg} and not defined $spec{init_arg} ) {
+			_croak("Required attribute $name cannot have undef init_arg");
+		}
+		
+		my @unknown_keys = sort grep !/\A(isa|required|is|default|builder|coerce|init_arg|trigger|weak_ref)\z/, keys %spec;
 		if (@unknown_keys) {
 			_croak("Unknown keys in spec: %d", join ", ", @unknown_keys);
 		}
 		
 		push @$HAS, $name;
 		push @$REQUIRED, $name if $spec{required};
-		$FLAGS->{$name} = $class->_build_flags( \%spec, $type );
+		$FLAGS->{$name} = $class->_build_flags( $name, \%spec, $type );
 		$ISA->{$name} = $spec{isa} if is_CodeRef $spec{isa};
 		$COERCIONS->{$name} = $spec{coerce} if is_CodeRef $spec{coerce};
 		$DEFAULTS->{$name} = $class->_canonicalize_defaults( \%spec ) if exists $spec{default} || defined $spec{builder};
 		$TT->{$name} = $type if is_Object($type) && $type->isa('Type::Tiny');
+		$INIT_ARGS->{$name} = $spec{init_arg} if exists $spec{init_arg};
+		$TRIGGERS->{$name} = $spec{trigger} if $spec{trigger};
 	}
 }
 
@@ -240,14 +251,19 @@ sub _type_to_number {
 
 sub _build_flags {
 	my $package = shift;
+	my $name = shift;
 	my $spec = shift;
 	my $type = shift;
 	
 	my $flags = 0;
-	$flags += 1 if $spec->{required};
-	$flags += 2 if is_CodeRef $spec->{isa};
-	$flags += 4 if is_CodeRef $spec->{coerce};
-	$flags += 8 if exists $spec->{default} || defined $spec->{builder};
+	$flags |= XSCON_FLAG_REQUIRED              if $spec->{required};
+	$flags |= XSCON_FLAG_HAS_TYPE_CONSTRAINT   if is_CodeRef $spec->{isa};
+	$flags |= XSCON_FLAG_HAS_TYPE_COERCION     if is_CodeRef $spec->{coerce};
+	$flags |= XSCON_FLAG_HAS_DEFAULT           if exists($spec->{default}) || defined($spec->{builder});
+	$flags |= XSCON_FLAG_NO_INIT_ARG           if exists($spec->{init_arg}) && !defined($spec->{init_arg});
+	$flags |= XSCON_FLAG_HAS_INIT_ARG          if defined($spec->{init_arg}) && ( $spec->{init_arg} ne $name );
+	$flags |= XSCON_FLAG_HAS_TRIGGER           if $spec->{trigger};
+	$flags |= XSCON_FLAG_WEAKEN                if $spec->{weak_ref};
 	
 	my $has_common_default = 0;
 	if ( exists $spec->{default} and !defined $spec->{default} ) {
@@ -275,34 +291,45 @@ sub _build_flags {
 		$has_common_default = 8;
 	}
 	
-	$flags += ( $has_common_default << 4 );
+	$flags |= ( $has_common_default << +XSCON_BITSHIFT_DEFAULTS );
 	
 	if ( $type ) {
 		my $has_common_type = _type_to_number( $type );
-		$flags += ( $has_common_type << 8 );
+		$flags |= ( $has_common_type << +XSCON_BITSHIFT_TYPES );
 	}
 	elsif ( is_CodeRef $spec->{isa} ) {
-		$flags += ( 15 << 8 );
+		$flags |= ( 15 << +XSCON_BITSHIFT_TYPES );
 	}
 	
-	return 0 + $flags;
+	return $flags;
 }
 
+# use fetch_vars instead
 sub get_vars {
 	my $package = shift;
+	fetch_vars( $package, qw/ @HAS @REQUIRED %ISA %BUILD $STRICT %FLAGS %COERCIONS %DEFAULTS %TYPETINY %DEMOLISH / );
+}
+
+sub fetch_vars {
 	no strict 'refs';
-	(
-		\@{"$package\::__XSCON_HAS"},
-		\@{"$package\::__XSCON_REQUIRED"},
-		\%{"$package\::__XSCON_ISA"},
-		\%{"$package\::__XSCON_BUILD"},
-		\${"$package\::__XSCON_STRICT"},
-		\%{"$package\::__XSCON_FLAGS"},
-		\%{"$package\::__XSCON_COERCIONS"},
-		\%{"$package\::__XSCON_DEFAULTS"},
-		\%{"$package\::__XSCON_TYPETINY"},
-		\%{"$package\::__XSCON_DEMOLISH"},
-	);
+	my $package = shift;
+	my @r;
+	for my $var ( @_ ) {
+		my ( $sigil, $rest ) = ( $var =~ /^(.)(.+)$/ );
+		if ( $sigil eq '$' ) {
+			push @r, \${ "$package\::__XSCON_" . uc($rest) };
+		}
+		elsif ( $sigil eq '@' ) {
+			push @r, \@{ "$package\::__XSCON_" . uc($rest) };
+		}
+		elsif ( $sigil eq '%' ) {
+			push @r, \%{ "$package\::__XSCON_" . uc($rest) };
+		}
+		else {
+			die;
+		}
+	}
+	wantarray ? @r : (@r > 1) ? die : $r[0];
 }
 
 sub inheritance_stuff {
@@ -314,13 +341,18 @@ sub inheritance_stuff {
 	pop @isa;  # discard $package itself
 	return unless @isa;
 	
-	my ($HAS, $REQUIRED, $ISA, undef, undef, $FLAGS, $COERCIONS, $DEFAULTS, $TT) = get_vars($package);
+	my ($HAS, $REQUIRED, $ISA, $FLAGS, $COERCIONS, $DEFAULTS, $TT, $INIT_ARGS, $TRIGGERS) =
+		fetch_vars( $package, qw/ @HAS @REQUIRED %ISA %FLAGS %COERCIONS %DEFAULTS %TYPETINY %INIT_ARGS %TRIGGERS / );
+	
 	foreach my $parent (@isa) {
-		my ($pHAS, $pREQUIRED, $pISA, undef, undef, $pFLAGS, $pCOERCIONS, $pDEFAULTS, $pTT) = get_vars($parent);
+		my ($pHAS, $pREQUIRED, $pISA, $pFLAGS, $pCOERCIONS, $pDEFAULTS, $pTT, $pINIT_ARGS, $pTRIGGERS) =
+			fetch_vars( $parent, qw/ @HAS @REQUIRED %ISA %FLAGS %COERCIONS %DEFAULTS %TYPETINY %INIT_ARGS %TRIGGERS / );
+		
 		@$HAS      = uniq(@$HAS, @$pHAS);
 		@$REQUIRED = uniq(@$REQUIRED, @$pREQUIRED);
+		
 		for my $k ( @$HAS ) {
-			for my $pair ( [$pISA=>$ISA], [$pCOERCIONS=>$COERCIONS], [$pDEFAULTS=>$DEFAULTS], [$pTT=>$TT] ) {
+			for my $pair ( [$pISA=>$ISA], [$pCOERCIONS=>$COERCIONS], [$pDEFAULTS=>$DEFAULTS], [$pTT=>$TT], [$pINIT_ARGS=>$INIT_ARGS], [$pTRIGGERS=>$TRIGGERS] ) {
 				my ( $parent_hash, $this_hash ) = @$pair;
 				if ( exists $parent_hash->{$k} and not exists $this_hash->{$k} ) {
 					$this_hash->{$k} = $parent_hash->{$k};
@@ -328,18 +360,22 @@ sub inheritance_stuff {
 			}
 			if ( not exists $FLAGS->{$k} ) {
 				my $flags = 0;
-				$flags += 1 if grep $k eq $_, @$REQUIRED;
+				$flags |= XSCON_FLAG_REQUIRED           if grep $k eq $_, @$REQUIRED;
+				$flags |= XSCON_FLAG_HAS_TYPE_COERCION  if is_CodeRef $COERCIONS->{$k};
+				$flags |= XSCON_FLAG_HAS_DEFAULT        if exists $DEFAULTS->{$k};
+				$flags |= XSCON_FLAG_NO_INIT_ARG        if exists $INIT_ARGS->{$k} && !defined $INIT_ARGS->{$k};
+				$flags |= XSCON_FLAG_HAS_INIT_ARG       if defined $INIT_ARGS->{$k} && $INIT_ARGS->{$k} && $INIT_ARGS->{$k} ne $k;
+				$flags |= XSCON_FLAG_HAS_TRIGGER        if $TRIGGERS->{$k};
+				$flags |= XSCON_FLAG_WEAKEN             if $pFLAGS->{$k} & XSCON_FLAG_WEAKEN;
 				if ( is_CodeRef $ISA->{$k} ) {
-					$flags += 2;
+					$flags |= XSCON_FLAG_HAS_TYPE_CONSTRAINT;
 					if ( is_Object $TT->{$k} ) {
-						$flags += ( _type_to_number($TT->{$k}) << 8 );
+						$flags |= ( _type_to_number($TT->{$k}) << +XSCON_BITSHIFT_TYPES );
 					}
 					else {
-						$flags += ( 15 << 8 );
+						$flags |= ( 15 << +XSCON_BITSHIFT_TYPES );
 					}
 				}
-				$flags += 4 if is_CodeRef $COERCIONS->{$k};
-				$flags += 8 if exists $DEFAULTS->{$k};
 				$FLAGS->{$k} = $flags;
 			}
 		}
@@ -350,17 +386,17 @@ sub populate_build {
 	my $package = ref($_[0]) || $_[0];
 	my $klass   = ref($_[1]) || $_[1];
 	
-	my (undef, undef, undef, $BUILDALL) = get_vars($package);
+	my ( $BUILD ) = fetch_vars( $package, '%BUILD' );
 	
 	if (!$klass->can('BUILD')) {
-		$BUILDALL->{$klass} = 0;
+		$BUILD->{$klass} = 0;
 		return;
 	}
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
 	
-	$BUILDALL->{$klass} = [
+	$BUILD->{$klass} = [
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
 		map { "$_\::BUILD" } reverse @{ mro::get_linear_isa($klass) }
 	];
@@ -372,17 +408,17 @@ sub populate_demolish {
 	my $package = ref($_[0]) || $_[0];
 	my $klass   = ref($_[1]) || $_[1];
 	
-	my $DEMOLISHALL = [ get_vars($package) ]->[9];
+	my ( $DEMOLISH ) = fetch_vars( $package, '%DEMOLISH' );
 	
 	if (!$klass->can('DEMOLISH')) {
-		$DEMOLISHALL->{$klass} = 0;
+		$DEMOLISH->{$klass} = 0;
 		return;
 	}
 	
 	require( $] >= 5.010 ? "mro.pm" : "MRO/Compat.pm" );
 	no strict 'refs';
 	
-	$DEMOLISHALL->{$klass} = [
+	$DEMOLISH->{$klass} = [
 		reverse
 		map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
 		map { "$_\::DEMOLISH" } reverse @{ mro::get_linear_isa($klass) }
@@ -390,8 +426,6 @@ sub populate_demolish {
 	
 	return;
 }
-
-__PACKAGE__->XSLoader::load($VERSION);
 
 1;
 
@@ -403,7 +437,7 @@ __END__
 
 =head1 NAME
 
-Class::XSConstructor - a super-fast (but limited) constructor in XS
+Class::XSConstructor - a super-fast constructor in XS
 
 =head1 SYNOPSIS
 
@@ -547,7 +581,7 @@ listed above.
 
 =back
 
-So for example, a type check for B<< ArrayRef[PositiveOrZeroInt >> should
+So for example, a type check for B<< ArrayRef[PositiveOrZeroInt] >> should
 be very fast.
 
 When multiple attributes fail their type check, the constructor will only
@@ -576,6 +610,36 @@ Otherwise:
   }
 
 Type coercions are likely to siginificantly slow down your constructor.
+
+=item *
+
+Supports C<init_arg> like L<Moose> and L<Moo>.
+
+  use Class::XSConstructor 'name' => { init_arg => 'moniker' };
+  
+  my $obj = __PACKAGE__->new( moniker => 'Bob' );
+  say $obj->{name};  # ==> "Bob"
+
+=item *
+
+Supports C<trigger>, which may be a method name or a coderef. Triggers
+are only fired when the attribute is passed to the constructor explicitly.
+Defaults and builders do not trigger the trigger.
+
+=item *
+
+Supports C<weak_ref> like L<Moose> and L<Moo>.
+
+  use Class::XSConstructor 'thing' => { weak_ref => !!1 };
+  
+  my $array  = [];
+  my $object = __PACKAGE__->new( thing => $array );
+  
+  defined $object->{thing} or die;  # lives
+  
+  undef $array;
+  
+  defined $object->{thing} or die;  # dies
 
 =item *
 
@@ -719,6 +783,33 @@ An easy way to do this is to use L<parent> before using Class::XSConstructor.
     use Class::XSConstructor qw( employee_id! );
     use Class::XSAccessor { getters => [qw(employee_id)] };
   }
+
+Using any of the following features means that your fast XS constructor
+will be calling your own coderefs, which are presumably written in Perl
+and thus not so fast. This can slow down your constructor significantly:
+
+=over
+
+=item *
+
+Builders and defaults, except for the eight specially optimized default values.
+
+=item *
+
+Triggers.
+
+=item *
+
+Type constraints (except for the specially optimized ones) and type coercions.
+
+=item *
+
+Defining any C<BUILD> methods or inheriting from classes which do.
+
+=back
+
+These can all be useful features of course, but if speed is critical, consider
+looking at ways to eliminate them.
 
 =head1 SEE ALSO
 

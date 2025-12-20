@@ -10,6 +10,7 @@ build_requires:
   Test2::Tools::Compare: '0.000156'
   Test2::Tools::Subtest: '0'
   Test2::V0: '0'
+  Test::Mojo: '0'
   experimental: '0'
   lib: '0'
   parent: '0'
@@ -54,7 +55,7 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-CPAN-InGit/issues
   repository: https://github.com/nrdvana/perl-CPAN-InGit.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

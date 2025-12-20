@@ -35,8 +35,6 @@ Zonemaster::LDNS::RRList - class representing lists of resource records.
 
 Creates a new empty L<Zonemaster::LDNS::RRList> object.
 
-=back
-
 =item new($rrs)
 
 Creates a new L<Zonemaster::LDNS::RRList> object for the given resource records.

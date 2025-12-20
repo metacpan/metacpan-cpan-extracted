@@ -1,5 +1,10 @@
 NetAddr::MAC - A MAC address object
 
+0.99    2025-12-19
+        - Add functions for vrrp4 and vrrp6 thanks to Jon (jon@jjminer.org) via GH#4
+        - Use our rather than vars, and just import Exporter. Its time.
+        - Rework how tokenring is calculated to use bit shifts. Just for my amusement.
+
 0.98    2022-07-08
         - Relicense to MIT
         - No other changes

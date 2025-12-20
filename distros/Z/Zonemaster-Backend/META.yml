@@ -54,11 +54,11 @@ requires:
   Router::Simple::Declare: 0
   Starman: 0
   Try::Tiny: 0.12
-  Zonemaster::Engine: 8
-  Zonemaster::LDNS: 5
+  Zonemaster::Engine: 8.001
+  Zonemaster::LDNS: 5.000001
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-backend
-version: 11.5.0
+version: 12.0.0

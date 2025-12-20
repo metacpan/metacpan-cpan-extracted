@@ -57,12 +57,13 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Compare" => "0.000156",
     "Test2::Tools::Subtest" => 0,
     "Test2::V0" => 0,
+    "Test::Mojo" => 0,
     "experimental" => 0,
     "lib" => 0,
     "parent" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,6 +102,7 @@ my %FallbackPrereqs = (
   "Test2::Tools::Compare" => "0.000156",
   "Test2::Tools::Subtest" => 0,
   "Test2::V0" => 0,
+  "Test::Mojo" => 0,
   "Time::Piece" => 0,
   "experimental" => 0,
   "lib" => 0,

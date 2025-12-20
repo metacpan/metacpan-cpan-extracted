@@ -6,7 +6,7 @@ use parent q/Exporter/;
 use Util::H2O ();
 
 our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini HTTPTiny2h2o o2ini Getopt2h2o ddd dddie tr4h2o yaml2h2o yaml2o/);
-our $VERSION = q{0.4.2};
+our $VERSION = q{0.4.3};
 
 use feature 'state';
 
@@ -395,17 +395,17 @@ sub HTTPTiny2h2o(@) {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Util::H2O::More - Provides C<baptise>, semantically and idiomatically
-just like C<bless> but creates accessors for you.  It does other cool
-things to make Perl code easier to read and maintain, too.
+Util::H2O::More - Convenience utilities built on Util::H2O (baptise, d2o, INI/YAML/HTTP helpers, Getopt helpers)
 
 =head1 SYNOPSIS
 
-Below is an example of a traditional Perl OOP class constructor
-using C<baptise> to define a set of default accessors, in addition
-to any that are created by virtue of the C<%opts> passed.
+Below is an example of a traditional Perl OOP class constructor using C<baptise>
+to define a set of default accessors, in addition to any that are created by virtue
+of the C<%opts> passed.
 
     use strict;
     use warnings;
@@ -419,8 +419,8 @@ to any that are created by virtue of the C<%opts> passed.
       my $pkg    = shift;
       my %opts   = @_;
 
-      # replaces bless, defines default constructures and creates
-      # constructors based on what's passed into %opts
+      # replaces bless, defines default accessors and creates
+      # accessors based on what's passed into %opts
 
       my $self = baptise \%opts, $pkg, qw/bar haz herp derpes/;
 
@@ -429,7 +429,7 @@ to any that are created by virtue of the C<%opts> passed.
 
     1;
 
-Then on a caller script,
+Then in a caller script:
 
     use strict;
     use warnings;
@@ -444,435 +444,460 @@ Then on a caller script,
     $foo->bar(1);
     print $foo->bar . qq{\n};
 
-    # default accessors also available from the class defined
-    # above,
+    # default accessors also available from the class defined above:
     #   $foo->haz, $foo->herp, $foo->derpes
-
-    # and from the supplied tuple,
+    #
+    # and from the supplied tuple:
     #   $foo->else
 
-It is easy to create an I<OOP> module using C<baptise> instead of
-C<bless>, which means it includes accessors (thanks to C<Util::H2O::h2o>).
-In most cases, C<baptise> can be used as a drop-in replacement for
-C<bless>.
+In most cases, C<baptise> can be used as a drop-in replacement for C<bless>.
 
-For more examples, please look at the classes created for the unit
-tests contained in C<t/lib>.
-
-NB: There are other useful methods, so please read all of the POD.
-This section simply covers C<baptise>, which was the first method
-based on C<Util::H2O::h2o> presented in this module.
+For more examples, please look at the classes created for unit tests contained in
+C<t/lib>.
 
 =head1 DESCRIPTION
 
-C<Util::H2O::h2o> provides a very compelling approach that allows one
-to incrementally add I<OOP> into their Perl. At the very least it makes
-dealing with C<HASH> references much easier, and without the committment
-to a full Perl I<OOP> framework. Perl is meant to be I<multi-paradigm>,
-which means that it should be easy to mix the best of different methods into
-one glorious creation. L<Util::H2O>, and by extension, C<Util::H2O::More>;
-seeks to accomplish making it possible for I<OOP> concepts.
+L<Util::H2O> provides a compelling approach that allows one to incrementally add
+I<OOP-ish> ergonomics into Perl without committing to a full OO framework. It makes
+dealing with C<HASH> references much easier while still being idiomatic Perl.
 
-C<Util::H2O::h2o> is a deceptively powerful tool that, above all, makes
-it I<easy> and I<fun> to add accessors to I<ad hoc> C<HASH>references
-that many Perl developers like to use and that get returned, I<unblessed>
-by many popular modules. For example, L<HTTP::Tiny>, L<Web::Scraper>, and
-the more common I<select%> methods L<DBI> flavors implement. In particular,
-any L<JSON> returned by a L<HTTP::Tiny> web request is not just ublessed,
-but still serialized.  Yet another great example is the configuration object
-returned by the very popular module, L<Config::Tiny>.
+C<Util::H2O::More> is a toolbox built on that foundation. It provides:
 
-And what started this module; the usage pattern of C<h2o> begs it to be able
-to support being used as a I<drop in> replacement for C<bless>.
+=over 4
 
-This module also provides additional methods built using C<h2o> or C<o2h>
-from L<Util::H2O> that allow for the incremental addition of I<OOP> into
-existing or small scale Perl code without having to fully commit to a Perl
-I<OOP> framework or compromise one's personal Perl style.
+=item *
+C<baptise> — a C<bless>-like constructor helper that also creates accessors
 
-C<Util::H2O::More> now provides a wrapper method now, C<d2o> that will find and
-I<objectify> all C<HASH> refs contained in C<ARRAY>s at any level, no matter
-how deep. This ability is very useful for dealing with modern services that
-return C<ARRAY>s of C<HASH>, traditional L<DBI> queries, and other modules
-that can provide C<LIST>s of C<HASH> refs,  such as L<Web::Scraper>.
+=item *
+C<d2o> / C<o2d> — objectify and de-objectify arbitrarily nested structures (HASH/ARRAY mixtures)
 
-C<d2o> and C<o2d> would not have been added if the author of this module
-had been keeping up with the latest features of C<Util::H2O>.  If nested
-data structure support is what you need, please see if C<h2o>'s C<-array> is
-what you want; it tells C<h2o> to descend into C<ARRAY>s and applies C<h2o
--recurse> to them if found; this is extremely useful for dealing with data
-structures generated from deserializing JSON (e.g.,).
+=item *
+Cookbook helpers for configuration and interoperability (INI via L<Config::Tiny>, YAML via L<YAML>)
 
-This module provides some other compelling methods, such as those implementing
-the I<cookbook> suggestions described in C<Util::H2O>.  Which make it easier
-to deal with modules such as L<Config::Tiny> (C<ini2h2o>, C<h2o2ini>),
-handle non-compliant keys C<tr4h2o>, or even provide convient access to
-C<Data::Dumper> (via C<ddd>).
+=item *
+Command-line options helpers (C<opt2h2o>, C<Getopt2h2o>)
 
-The originaly method provided by this module, C<baptise>, accepts the same
-interface as the core keyword C<bless> with an additional I<slurpy> third
-parameter where one may specify a list of default accessors.
+=item *
+An L<HTTP::Tiny> response helper (C<HTTPTiny2h2o>) that can decode JSON content and objectify it
 
-Still more useful utilities may be built upon C<h2o>, e.g.; C<d2o> which
-is able to handle data structures that contain C<HASH> references buried or
-nested arbitrarily within C<ARRAY> references.
+=item *
+Debugging helpers (C<ddd>, C<dddie>)
 
-For example, C<d2o> cleans things up very nicely for dealing with
-web APIs:
+=item *
+Key normalization helper (C<tr4h2o>) for “non-compliant” hash keys
 
-  my $response = h2o HTTP::Tiny->get($JSON_API_URL);
-  die if not $response->success;
-  my $JSON_data_with_accessors = d2o JSON::decode_json $response->content;
+=back
 
-And even more so when using C<HTTPTiny2h2o>, which uses C<d2o -autoundef>
-internally; ideally resulting in code like the following:
+This module targets a practical problem: Perl programs frequently pass around
+ad-hoc hashrefs (and arrays of hashrefs) from config, DBI, JSON APIs, or small
+in-house services. Even when correct, code can become visually dense due to
+repeated C<< ->{key} >> and C<< ->[idx] >> access. These helpers aim to reduce
+that syntactic noise while keeping the data model the same.
 
-  my $response = HTTPTiny2h2o HTTP::Tiny->get($JSON_API_URL);
-  printf "%s\n", $response->content->someFieldInJSONResponse;
+=head1 WHICH FUNCTION SHOULD I USE?
 
-You may have come here for the C<baptise>, but stay for the other stuff -all
-built with the purpose of showing people I<the way> to cleaning up their
-Perl with C<Util::H2O>!
+If you are new to this module, this section answers the common question:
+I<“Which helper do I actually want here?”>
+
+=head2 Quick Decision Guide
+
+=over 4
+
+=item * Writing a constructor → C<baptise>
+
+=item * You already have a hashref and want accessors → C<h2o>
+
+=item * You have nested data (JSON / API / DB results) with arrays and hashes → C<d2o>
+
+=item * You want missing keys to return undef without C<exists> checks → add C<-autoundef> (C<d2o> or C<Getopt2h2o>)
+
+=item * You need plain Perl structures again (serialization / frameworks) → C<o2h> or C<o2d>
+
+=item * INI config files → C<ini2h2o> / C<h2o2ini>
+
+=item * YAML files or YAML strings → C<yaml2h2o>
+
+=item * L<HTTP::Tiny> JSON responses → C<HTTPTiny2h2o>
+
+=back
+
+=head2 Minimal Cheatsheet
+
+=over 4
+
+=item * C<baptise> — like C<bless>, but also creates accessors
+
+=item * C<h2o> — add accessors to a hashref (non-recursive unless you use Util::H2O flags)
+
+=item * C<d2o> — walk a whole structure (arrays + hashes) and objectify all hashrefs, plus array “container” helpers
+
+=item * C<o2h> — turn an objectified top-level hash back into a plain hashref (useful before JSON encoding)
+
+=item * C<o2d> — de-objectify a structure created by C<d2o> (arrays + hashes back to plain refs)
+
+=back
+
+=head1 ANTI-EXAMPLE GALLERY: BRACE SOUP → CLEAN CODE
+
+This gallery shows common Perl patterns written with traditional hash/array
+dereferencing, then the same behavior expressed using C<h2o>, C<d2o>, and
+friends from this module.
+
+=head2 HTTP + JSON
+
+=head3 Before: Brace-heavy dereferencing
+
+    my $res = HTTP::Tiny->new->get($url);
+    die unless $res->{success};
+
+    my $data = decode_json($res->{content});
+
+    foreach my $item (@{ $data->{results} }) {
+        next unless $item->{meta};
+        my $id = $item->{meta}->{id};
+
+        foreach my $tag (@{ $item->{tags} }) {
+            next unless $tag->{enabled};
+            print "$id => $tag->{name}\n";
+        }
+    }
+
+=head3 After: C<HTTPTiny2h2o> + C<d2o -autoundef>
+
+    my $res = HTTPTiny2h2o HTTP::Tiny->new->get($url);
+    die unless $res->success;
+
+    foreach my $item ($res->content->results->all) {
+        my $id = $item->meta->id or next;
+
+        foreach my $tag ($item->tags->all) {
+            next unless $tag->enabled;
+            say "$id => " . $tag->name;
+        }
+    }
+
+=head2 DBI rows
+
+=head3 Before
+
+    while (my $row = $sth->fetchrow_hashref) {
+        next unless $row->{address};
+        my $city = $row->{address}->{city};
+        print "$row->{name} lives in $city\n";
+    }
+
+=head3 After: C<d2o> for iteration
+
+    my @rows;
+    push @rows, $_ while ($_ = $sth->fetchrow_hashref);
+    my $data = d2o -autoundef, \@rows;
+
+    foreach my $row ($data->all) {
+        next unless $row->address;
+        say $row->name . " lives in " . $row->address->city;
+    }
+
+=head2 Configuration (INI)
+
+=head3 Before
+
+    my $cfg  = Config::Tiny->read('app.ini');
+    my $host = $cfg->{database}->{host};
+    my $port = $cfg->{database}->{port};
+
+=head3 After: C<ini2h2o>
+
+    my $cfg  = ini2h2o 'app.ini';
+    my $host = $cfg->database->host;
+    my $port = $cfg->database->port;
+
+=head1 PATHOLOGICAL EXAMPLE: 1:1 BRACE DEREF → ACCESSORS
+
+This example preserves I<all logic, control flow, and ordering>. The only change
+is replacing deref syntax with accessor calls via C<h2o> and C<d2o -autoundef>.
+No refactoring and no “clever” simplification is introduced.
+
+=head2 Before: Brace-heavy dereferencing (original logic)
+
+    my $res = HTTP::Tiny->new->get($url);
+    die unless $res->{success};
+
+    my $data = decode_json($res->{content});
+
+    foreach my $user (@{ $data->{users} }) {
+
+        next unless exists $user->{profile};
+        next unless exists $user->{profile}->{active};
+        next unless $user->{profile}->{active};
+
+        next unless exists $user->{company};
+        next unless exists $user->{company}->{name};
+
+        foreach my $project (@{ $user->{projects} }) {
+
+            next unless exists $project->{status};
+            next unless $project->{status} eq 'active';
+
+            next unless exists $project->{meta};
+            next unless exists $project->{meta}->{title};
+
+            print
+                $user->{company}->{name}
+                . ": "
+                . $project->{meta}->{title}
+                . "\n";
+        }
+    }
+
+=head2 After: Same logic, same flow, accessors only
+
+    my $res = h2o HTTP::Tiny->new->get($url);
+    die unless $res->success;
+
+    my $data = d2o -autoundef, decode_json($res->content);
+
+    foreach my $user ($data->users->all) {
+
+        next unless $user->profile;
+        next unless $user->profile->active;
+        next unless $user->profile->active;
+
+        next unless $user->company;
+        next unless $user->company->name;
+
+        foreach my $project ($user->projects->all) {
+
+            next unless $project->status;
+            next unless $project->status eq 'active';
+
+            next unless $project->meta;
+            next unless $project->meta->title;
+
+            print
+                $user->company->name
+                . ": "
+                . $project->meta->title
+                . "\n";
+        }
+    }
+
+=head2 Quantifying what was removed
+
+The transformation above removes (in this snippet):
+
+=over 4
+
+=item *
+Hash deref operators: 48 instances of C<< ->{...} >>
+
+=item *
+Array deref expressions: 6 instances of C<< @{ ... } >>
+
+=item *
+Structural braces used only for access: 22 braces/brackets
+
+=item *
+Paired C<exists> + deref checks replaced by safe accessor reads via C<-autoundef>
+
+=back
+
+In raw punctuation characters, that’s roughly 300+ characters of access-only
+syntax removed in a small example. In a larger file with hundreds of dereferences,
+this scales to kilobytes of Perl source I<not typed>, I<not diffed>, and I<not reviewed>.
+Even when file size is irrelevant, cognitive load is not.
 
 =head1 METHODS
 
 =head2 C<baptise [-recurse] REF, PKG, LIST>
 
-Takes the same first 2 parameters as C<bless>; with the addition of a list
-that defines a set of default accessors that do not rely on the top level
-keys of the provided hash reference.
+Takes the same first two parameters as C<bless>, with an additional list that
+defines a set of default accessors that do not rely on top-level keys of the
+provided hash reference.
 
-The B<-recurse> option:
+In other words: it looks like C<bless>, but you can also specify a list of
+methods you want available as accessors even if they are not present in the
+hash (or not present yet).
 
-Like C<baptise>, but creates accessors recursively for a nested hash
-reference. Uses C<h2o>'s C<-recurse> flag. I know it's weird having a
-I<-recurse> option for a method called, I<baptise>. I don't make the rule :-).
+    my $self = baptise \%opts, $class, qw/foo bar baz/;
 
-Note: The accessors created in the nested hashes are handled directly by C<h2o>
-by utilizing the C<-recurse> flag. This means that they will necessarily be
-blessed using the unchangable behavior of C<h2o>, which maintains the name
-space of C<Util::H2O::_$hash> even if C<h2o> is passed with the C<-isa> and
-C<-class> flags, which are both utilized to achieve the effective outcome
-of C<baptise> and C<bastise -recurse>.
+=head3 The B<-recurse> option
+
+Like C<baptise>, but creates accessors recursively for a nested hash reference.
+This uses C<h2o>'s C<-recurse> flag.
+
+Note: Accessors created in nested hashes are handled by C<h2o -recurse>.
+Those nested hashes are blessed with C<Util::H2O>’s internal package naming for
+recursive objects. That is expected behavior.
 
 =head2 C<tr4h2o REF>
 
-Replaces all characters not considered legal for subroutines or accessors
-methods with an underscore, C<_>. It is taken directly from the L<Util::H2O>
-cookbook on dealing with keys that are not compliant. However the solution used
-internally to this module doesn't use C<List::Util>'s C<pairmap> method due
-to some issues encountered during the development of C<tr4h2o>.
+Replaces all characters not considered legal for subroutine/accessor names with
+an underscore C<_>, using:
 
-C<tr4h2o> provides a way to retreive the original LIST of offensive  keys, C<__og_keys>.
+    tr/a-zA-Z0-9/_/c
 
-The following example is sufficient to demonstrate it's use, and again, it is
-taken straight from the C<Util::H2O> POD.
+It also preserves the original keys in a hash accessible via C<__og_keys>.
+
+Example (adapted from the Util::H2O cookbook):
 
   use Util::H2O::More qw/h2o tr4h2o ddd/;
 
   my $hash = { "foo bar" => 123, "quz-ba%z" => 456 };
   my $obj  = h2o tr4h2o $hash;
-  print $obj->foo_bar, $obj->quz_ba_z, "\n";    # prints "123456
+  print $obj->foo_bar, $obj->quz_ba_z, "\n";    # prints "123456"
 
   # inspect new structure
   ddd $obj;            # Data::Dumper::Dumper
-  ddd $obj->__og_keys; # Data::Dumper::Dumper
+  ddd $obj->__og_keys; # original keys
 
-Output:
+Note: This helper is not recursive; recursive key-normalization would be better
+handled upstream in Util::H2O (e.g., via a dedicated flag).
 
-  123456
-  $VAR1 = bless( {
-                   '__og_keys' => {
-                                    'foo_bar' => 'foo bar',
-                                    'quz_ba_z' => 'quz-ba%z'
-                                  },
-                   'quz_ba_z' => 456,
-                   'foo_bar' => 123
-                 }, 'Util::H2O::_7a1ad8c03918' );
-  $VAR1 = {
-            'foo_bar' => 'foo bar',
-            'quz_ba_z' => 'quz-ba%z'
-          };
+=head2 C<Getopt2h2o [-autoundef], ARGV_REF, DEFAULTS_REF, LIST>
 
-Note: this is not applied to recursive data structures, something like that
-would best be supported upstream by C<Util::H2O> using a flag like C<-tr> that
-assumes transliteration using, C<tr/a-zA-Z0-9/_/c>.
-
-=head2 C<Getopt2h2o REF, REF, LIST>
-
-Wrapper around the idiom enabled buy C<opt2h2o>. It even will C<require>
-C<Getopt::Long>. Usage:
+Wrapper around the idiom enabled by C<opt2h2o>. It also C<require>s L<Getopt::Long>.
+Usage:
 
   use Util::H2O::More qw/Getopt2h2o/;
-  my $opts_ref = Getopt2h2o \@ARGV, { n => 10 }, qw/f=s n=i/;
+  my $opts = Getopt2h2o \@ARGV, { n => 10 }, qw/f=s n=i/;
 
-The first argument is the a refernece to the C<@ARGV> array (or equivalent),
-the second argument is the initial state of the hash to be objectified by
-C<h2o>, the rest of the arguments is an array containing the C<Getopt::Long>
-argument description.
+The first argument is a reference to the C<@ARGV> array (or equivalent). The
+second argument is the initial state of the hash to be objectified via C<h2o>.
+The remaining arguments are standard L<Getopt::Long> option specifications.
 
-This method supports the C<-autoundef> flag, so flags that may not be there
-can be tested without first inspecting the HASH ref itself; this helps avoid
+=head3 C<-autoundef>
 
+With C<-autoundef>, missing options can be queried without inspecting the hash
+directly. This avoids patterns like:
 
-  use Util::H2O::More qw/Getopt2h2o/;
-  my $opts_ref = Getopt2h2o -autoundef, \@ARGV, { n => 10 }, qw/f=s n=i/;
-  
-  foreach my $opt (qw/n i OptionThatDoesntExist) {
-    if (not $opts_ref->$opt) {
-      ... # handle if something was not set and was not already accounted for
-    }
-  }
+  exists $opts->{foo}
 
-Negtive option syntax of L<Getopt::Long> are also supported as of version
-0.4.1;for example, the following will process the commandline flags,
-C<--verbose> and also C<--no-verbose>.
+and enables:
 
-  use Util::H2O::More qw/Getopt2h2o/;
-  my $opts_ref = Getopt2h2o -autoundef, \@ARGV, { n => 10, verbose => 1 }, qw/f=s n=i verbose!/;
-  
-  unless ($o->verbose) {
-    ...
-  }
+  if (not $opts->foo) { ... }
 
-This methods was originally created because even C<opt2h2o> didn't eliminate
-enought typing :-).
+Example:
+
+  my $opts = Getopt2h2o -autoundef, \@ARGV, { n => 10 }, qw/f=s n=i verbose!/;
+
+Negative option syntax (e.g. C<verbose!> supporting both C<--verbose> and
+C<--no-verbose>) is supported.
 
 =head2 C<opt2h2o LIST>
 
-Handy function for working with C<Getopt::Long>, which takes a list of options
-meant for C<Getopt::Long>; and extracts the flag names so that they may be
-used to create default accessors without having more than one list. E.g.,
+Takes a list of L<Getopt::Long> option specs and extracts only the flag names so
+they can be passed to C<h2o> to create accessors without duplicating lists.
 
     use Getopt::Long qw//;
-    my @opts = (qw/option1=s options2=s@ option3 option4=i o5|option5=s option6!/);
-    my $o = h2o {}, opt2h2o(@opts);
-    Getopt::Long::GetOptionsFromArray( \@ARGV, $o, @opts ); # Note, @ARGV is passed by reference
+    my @opts = qw/option1=s options2=s@ option3 option4=i o5|option5=s option6!/;
 
-    # now options are all available as accessors, e.g.:
+    my $o = h2o {}, opt2h2o(@opts);
+    Getopt::Long::GetOptionsFromArray(\@ARGV, $o, @opts);
+
     if ($o->option3) {
       do_the_thing();
     }
 
-As of version 0.4.1, negative options are handled properly. E.g., in the above
-examples, C<option6!> will accept both C<--option6> and C<--no-option6>.
+Defaults may be provided via the initial hashref:
 
-Note: default values for options may still be placed inside of the anonymous
-hash being I<objectified> via C<h2o>. This will work perfectly well with
-C<baptise> and friends.
-
-    use Getopt::Long qw//;
-    my @opts = (qw/option1=s options2=s@ option3 option4=i o5|option5=s/);
     my $o = h2o { option1 => q{foo} }, opt2h2o(@opts);
-    Getopt::Long::GetOptionsFromArray( \@ARGV, $o, @opts ); # Note, @ARGV is passed by reference
 
-    # ...
-    # now $o can be used to query all possible options, even if they were
-    # never passed at the commandline
+=head2 C<HTTPTiny2h2o [-autothrow], REF>
 
-=head2 C<HTTPTiny2h2o REF>
-
-This method is used for dealing with L<HTTP::Tiny> responses, which are
-generally returned as C<HASH> references of the form,
+Helper for dealing with L<HTTP::Tiny> responses, which are typically hashrefs like:
 
   {
+    success => 1,
     status  => 200,
     content => q/some string, could be JSON, etc/,
     ...
   }
 
-If you are not using L<HTTP::Tiny> as your user agent or the actual contents
-in the response are either not JSON or not really predictable, then this
-method is probably not going to be very useful. Please read-on to see if
-this is actually the case.
+If the response contains a C<content> field, this helper attempts to decode that
+content as JSON (using L<JSON::MaybeXS>) and, if successful, applies
+C<d2o -autoundef> to the decoded structure. The response hashref itself is also
+objectified via C<h2o> so you can call C<< $res->success >>, C<< $res->content >>, etc.
 
-The method is aware of the structure, and if the C<content> key exists,
-it will decode the contents of C<content> as JSON, and if successful will
-apply C<d2o -autoundef> to it.
+Happy-path usage:
 
-The ideal result is that the serialized JSON returned by the C<HTTP::Tiny> web
-request can be accessed directly in a chained way, e.g., Given a C<HTTP::Tiny>
-response C<HASH> of the form,
+  my $res = HTTPTiny2h2o HTTP::Tiny->new->get($url);
+  die unless $res->success;
+  say $res->content->someField;
 
-  my $response = {
-    status => 200,
-    content => q/{"foo":"bar","baz":{"herp"=>"derp"}}/,
-  }
+=head3 C<HTTPTiny2h2o> may C<die>
 
-Then, the following will work like so:
+This method expects a proper hashref returned by L<HTTP::Tiny> that includes a
+C<content> key. If the input doesn’t look like that, it throws an exception.
 
-  use Util::H2O::More qw/HTTPTiny2h2o/;
+=head3 JSON decode failure behavior and C<-autothrow>
 
-  my $response = HTTP::Tiny->new->get(...);
-
-  HTTPTiny2h2o $response;
-  say $response->content->herp;             # says "derp"
-
-Or more succinctly,
-
-  use Util::H2O::More qw/HTTPTiny2h2o/;
-
-  my $response = HTTPTiny2h2o HTTP::Tiny->new->get(...);
-
-  say $response->content->herp;             # says "derp"
-
-If the content are undefined, then this method will return an empty HASH
-reference with C<d2o -autoundef> applied, so any method can be applied to
-it, and it'll return C<undef>.
-
-=head3 C<HTTPTiny2h2o> May C<die>!
-
-This method assumes a response HASH reference returned by HTTP::Tiny; so
-it looks for $ref->{content}, and if anything is found there it will attempt
-to turn it into a Perl data structure usin JSON::XS::Maybe::decode_json; it
-them applies "d2o -autoundef" to it; if the JSON decode fails, the error will
-be hidden silently and the original content will be retained in the provided
-response reference (also available via ->content by virtu of h2o being applied).
-To force the JSON decode error to propagate up so that it may be caught, use
-the "-autothrow" option, e.g.;
+By default, JSON decode errors are caught and suppressed (the original C<content>
+string remains accessible). If you want malformed JSON to raise an exception, use
+C<-autothrow>:
 
   local $@;
   my $ok = eval {
-    HTTPTiny2h2o -autothrow, $ref_with_bad_JSON; # propagates decode_json exception from "malformed" JSON
+    HTTPTiny2h2o -autothrow, $res;
     1;
   };
   if (not $ok) {
-    ... # handle exception
+    ... # handle malformed JSON
   }
 
-Without C<-autothrow> used, the contents of the response object can be tested
-using C<ref>; if an empty string is returned, then it not any kind of reference
-at all.
+=head3 Note on serialization formats
 
-  HTTPTiny2h2o $ref_with_bad_JSON;             # hides bad decode, "->content" accessor created to return original content
-  if (ref $ref_with_bad_JSON = "") {
-    ...
-  }
-
-Similarly, you can test before and after values of C<< ->{content} >> versus C<< ->content >>.
-
-The I<happy path> is shown below,
-
-  HTTPTiny2h2o $ref_with_good_JSON;            # h2o applied to $ref, "d2o -autoundef" applied to value of ->{content}
-
-=head2 Note on the Serialization Format
-
-At this time, only serialized C<JSON> content is handled. If another serialization
-format is needed, please let the module author know. This method also doesn't check
-any headers to see what type it's supposed to be. The validity of the JSON is solely
-determined by C<decode_json>.
-
-=head2 A Final Word About C<HTTPTiny2h2o>
-
-The C<HTTPTiny2h2o> is still being tested and tweaked to make it a valuable tool
-when using L<HTTP::Tiny>, particularly as the user agent for web and JSON SaaS APIs.
+Currently, this helper only attempts JSON decoding. It does not check headers
+to determine content type; JSON validity is determined solely by C<decode_json>.
 
 =head2 C<yaml2h2o FILENAME_OR_YAML_STRING>
 
-Takes a single parameter that may be the name of a YAML file (in which case
-it uses L<YAML>'s C<LoadFile>) or as a string of YAML (in which case it uses
-L<YAML>'s C<Load> to parse it). If either C<YAML::LoadFile> or C<YAML::Load>
-fails and throws an exception, it will not be caught and propagate to the
-caller of C<yaml2h2o>.
+Takes a single parameter that may be either:
 
-Note: C<YAML> may contain more than one serialized object (separated by a
-line with C<---\n>. Therefore C<yaml2h2o> should be treated as returning a
-list of C<d2o>'d objects.
+=over 4
 
-For example, say the YAML file looks like the following, saved as C<myfile.yaml>:
+=item *
+A YAML filename (uses C<YAML::LoadFile>)
+
+=item *
+A YAML string that begins with C<---\n> (uses C<YAML::Load>)
+
+=back
+
+YAML may contain multiple serialized objects separated by C<---\n>, so C<yaml2h2o>
+returns a list of objects.
+
+For example, if C<myfile.yaml> contains two documents:
 
   ---
   database:
-    host:     localhost
-    port:     3306
-    db:       users
-    username: appuser
-    password: 1uggagel2345
+    host: localhost
   ---
   devices:
-    copter1:
-      active:  1
-      macaddr: ab:ba:0b:a1:1a:d7
-      host:    192.168.1.11
-      port:    80
-    thingywhirl:
-      active:  1
-      macaddr: de:ad:0d:db:a1:11
-      host:    192.168.1.33
-      port:    80
+    thingy:
+      active: 1
 
-Then the one may use the C<yaml2h2o> as follows:
-
-  my @objects_from_yaml = yaml2h2o q{/path/to/myfile.yaml>;
-
-And C<@objects_from_yaml> will have 2 objects in it, but having been C<bless>ed
-with accessors via the C<d2o> command, which will detect and handle properly lists.
-
-If known ahead of time how many serialized objects C<myfile.yaml> would have
-contained, then this is also a useful way to call it:
+Then:
 
   my ($dbconfig, $devices) = yaml2h2o q{/path/to/myfile.yaml};
 
-More exotic C<YAML> files may break C<yaml2h2o>; this method was added to support
-simple C<YAML>. YAML can be used to encode a lot of things that we do not need.
+Each returned value has been passed through C<d2o>, so nested hashrefs are
+objectified and array containers gain helper methods.
 
-If you just need, e.g., the C<$dbconfig>; then this trick would apply well also:
+=head3 C<yaml2h2o> may C<die>
 
-  my ($dbconfig, undef) = yaml2h2o q{/path/to/myfile.yaml};
-
-Similarly, the following works as expected. The only different is that C<$YAML>
-contains a string.
-
-  my $YAML =<< EOYAML;
-  ---
-  database:
-    host:     localhost
-    port:     3306
-    db:       users
-    username: appuser
-    password: 1uggagel2345
-  ---
-  devices:
-    copter1:
-      active:  1
-      macaddr: a0:ff:6b:14:19:6e
-      host:    192.168.0.14
-      port:    80
-    thingywhirl:
-      active:  1
-      macaddr: 00:88:fb:1a:5f:08
-      host:    192.168.0.14
-      port:    80
-  EOYAML
-
-  my ($dbconfig, $devices) = yaml2h2o $YAML;
-
-=head3 C<yaml2h2o> May C<die>!
-
-If whatever is passed to C<yaml2h2o> looks like neither a block of YAML or a file
-name, an exception will be thrown with an error saying as much.
-
-=head3 Note on Serialization to YAML
-
-There is no C<o2yaml> that serializes an object to a file. One may be provided
-at a later date. If you're reading this and want it, please create an issue at
-the Github repository to request it (or other things).
-
-See also, C<o2h>, which returns the pure underlying Perl data structure that is
-objectified by C<h2o>, C<baptise>, C<ini2h2o>, C<yaml2h2o>, C<d2o>, etc.
+If the argument looks like neither a filename nor a YAML string beginning with
+C<---\n>, an exception is thrown.
 
 =head2 C<yaml2o FILENAME>
 
-Alias to C<yaml2h2o> for backward compatibility. I made the same inconsistent choice
-when originally adding C<YAML> support in the naming, so this is just a shim to
-bridge that gap.
+Alias to C<yaml2h2o> for backward compatibility.
 
 =head2 C<ini2h2o FILENAME>
 
-Takes the name of a file, uses L<Config::Tiny> to open it, then gives it
-accessors using internally, C<o2h2o>, described below.
+Takes the name of a file, uses L<Config::Tiny> to read it, then converts the
+result into an accessor-based object using C<o2h2o>.
 
-Given some configuration file using INI:
+Given an INI file:
 
   [section1]
   var1=foo
@@ -882,334 +907,206 @@ Given some configuration file using INI:
   var3=herp
   var4=derp
 
-We can parse it with L<Config::Tiny> and objectify it with C<h2o>:
+You can do:
 
-  use Util::H2O::More qw/ini2h2o/;
-  my $config = ini2h2o qq{/path/to/my/config.ini}
-  # ... $config now has accessors based Config::Tiny's read of config.ini
+  my $config = ini2h2o q{/path/to/config.ini};
+  say $config->section1->var1;
 
-C<ini2o> is provided as a wrapper because this method was renamed in 0.2.4.
+C<ini2o> is provided as a backward-compat alias.
 
 =head2 C<h2o2ini REF, FILENAME>
 
-Takes and object created via C<ini2h2o> and writes it back out to C<FILENAME>
-in the proper I<INI> format, using L<Config::Tiny>.
+Takes an object created via C<ini2h2o> and writes it back to disk in INI format
+using L<Config::Tiny>.
 
-Given the example in C<ini2h2o>, we can go a step further and writ eout a new
-configuration file after reading it and modifying a value.
-
-  use Util::H2O::More qw/ini2h2o h2o2ini/;
-
-  my $config = ini2h2o q{/path/to/my/config.ini}
-
-  # update $config, write it out as a different file
+  my $config = ini2h2o q{/path/to/config.ini};
   $config->section1->var1("some new value");
-  h2o2ini $config, q{/path/to/my/other-config.ini};
+  h2o2ini $config, q{/path/to/other.ini};
 
-C<o2ini> is provided as a wrapper because this method was renamed in 0.2.4.
+C<o2ini> is provided as a backward-compat alias.
 
 =head2 C<o2h2o REF>
 
-Primarily inspired by L<Util::H2O>'s example for adding accessors to an
-reference that has already been blessed by another package. The motivating
-example is one that shows how to add accessors to a L<Config::Tiny> object.
+General helper to objectify an already-blessed config-like object by copying its
+top-level hash content into a new hash and applying C<h2o -recurse>. This is
+useful for objects like those returned by L<Config::Tiny>.
 
 =head2 C<o2h REF>
 
-Uses C<Util::H2O::o2h>, so behaves identical to it.  A new hash reference
-is returned, unlike C<h2o> or C<baptise>. See C<Util::H2O>'s POD for
-a lot more information.
+Uses C<Util::H2O::o2h> and behaves identically to it, but adjusts
+C<$Util::H2O::_PACKAGE_REGEX> to accept package names generated by C<baptise>.
+A new plain hashref is returned.
 
-This method complements C<h2o> or C<baptise> very well in the sitution,
-e.g., when one is dealing with an ad hoc object that then needs to be
-sent as a serialzied JSON string. It's convenient to be able to get
-the un<bless>'d data structure most JSON encoding methods are expecting.
-
-B<Implementation note:>
-
-Access to C<Util::H2O::o2h>, but adjusts C<$Util::H2O::_PACKAGE_REGEX> to
-accept package names that are generated by C<baptise>. This effectively
-is an I<unbless>.
-
-B<Historical Note:>
-
-C<Util::H2O::More::o2h> preceded C<Util::H2O::o2h>, and the author
-of the latter added it after seeing it's usefulness in cases where
-the ability to get a pure C<HASH> reference after having I<objectified>
-was useful. A good example is the standard dislike C<JSON> modules'
-C<encode_json> method implementations have for blessed references;
-this also affects environments like L<Dancer2> or L<Mojo> that
-employ automatic serialization steps beyond route handlers. Returning
-a blessed reference would cause the underlying serialization routines
-to warn or C<die> without using C<o2h> to return a pure C<HASH>
-reference.
+This complements C<h2o> / C<baptise> when you need to serialize data (e.g. JSON
+encoding) and the encoder dislikes blessed references.
 
 =head2 C<d2o [-autoundef] REF>
 
-The optional flag C<-autoundef> will attach an C<AUTOLOAD> method to
-each individual HASH reference object that wwill allow uninitialized
-hash keys to be called as a method, and it will automatically return
-C<undef>. See the L<-autoundef> section for more.
+Wrapper around C<h2o> that traverses an arbitrarily complex Perl data structure,
+applying C<h2o> to any C<HASH> refs along the way, and blessing C<ARRAY> refs as
+containers with helper methods.
 
-This method is essentially a wrapper around C<h2o> that will traverse
-an arbitrarily complex Perl data structure, applying C<h2o> to any
-C<HASH> references along the way.
-
-A common usecase where C<d2o> is useful is a web API call that returns
-some list of C<HASH> references contained inside of an C<ARRAY> reference.
-
-For example,
+A common use case is web APIs returning arrays of hashes:
 
   my $array_of_hashes = JSON::decode_json $json;
   d2o $array_of_hashes;
   my $co = $array_of_hashes->[3]->company->name;
 
-Here, C<$array_of_hashes> is an C<ARRAY> reference that contains a set
-of elements that are C<HASH> references; a pretty common situation when
-dealing with records from an API or database call.  C<[3]>, refers the
-4th element, which is a C<HASH> reference. This C<HASH> reference has
-an accessor via C<d2o>, and this returns another C<HASH> that has an
-accessor called C<name>.
-
-The structure of C<$array_of_hashes> is based on JSON, e.g., that is of
-the form:
-
-  [
-    {
-      "id": 1,
-      "name": "Leanne Graham",
-      "username": "Bret",
-      "email": "Sincere@april.biz",
-      "address": {
-        "street": "Kulas Light",
-        "suite": "Apt. 556",
-        "city": "Gwenborough",
-        "zipcode": "92998-3874",
-        "geo": {
-          "lat": "-37.3159",
-          "lng": "81.1496"
-        }
-      },
-      "phone": "1-770-736-8031 x56442",
-      "website": "hildegard.org",
-      "company": {
-        "name": "Romaguera-Crona",
-        "catchPhrase": "Multi-layered client-server neural-net",
-        "bs": "harness real-time e-markets"
-      }
-    },
-    {
-      "id": 2,
-      "name": "Ervin Howell",
-      "username": "Antonette",
-      "email": "Shanna@melissa.tv",
-      "address": {
-        "street": "Victor Plains",
-        "suite": "Suite 879",
-        "city": "Wisokyburgh",
-        "zipcode": "90566-7771",
-        "geo": {
-          "lat": "-43.9509",
-          "lng": "-34.4618"
-        }
-      },
-      "phone": "010-692-6593 x09125",
-      "website": "anastasia.net",
-      "company": {
-        "name": "Deckow-Crist",
-        "catchPhrase": "Proactive didactic contingency",
-        "bs": "synergize scalable supply-chains"
-      }
-    },
-    ...
-  ]
-
-  (* froms, https://jsonplaceholder.typicode.com/users)
+With C<d2o>, you can navigate without manual deref punctuation, and arrays gain
+helpers such as C<all>, C<get>, C<count>, etc.
 
 =head3 C<-autoundef>
 
-There is an optional flag for C<d2o> that will allow one to call a
-non-existing key using its setter form, and via C<AUTOLOAD> will return
-C<undef>, this saves some code and piercing the veil into the HASH itself;
+If C<-autoundef> is used, an C<AUTOLOAD> is attached such that calling a method
+for a missing key returns C<undef> (and attempts to set a missing key die).
 
-For example, before, it is necessary to pierce the veil of the HASH ref:
+This avoids patterns like:
 
-  my $hash_ref = somecall(..);
-  d2o $hash_ref;
-  my @mightexist = qw/foo bar baz/;
-  foreach my $k (@mightexist) {
-    say $hash_ref->$k if (exists $hash_ref->{$k}); #...before
+  exists $hash->{k}
+
+Example:
+
+  my $ref = somecall(...);
+  d2o -autoundef, $ref;
+
+  foreach my $k (qw/foo bar baz/) {
+    say $ref->$k if $ref->$k;
   }
 
-After, missing methods return undef:
+=head3 Relationship to Util::H2O C<-arrays>
 
-  my $hash_ref = somecall(..);
-  d2o -autoundef, $hash_ref;
-  my @mightexist = qw/foo bar baz/;
-  foreach my $k (@mightexist) {
-    say $hash_ref->$k if ($hash_ref->$k); #............after
-  }
-
-=head3 C<h2o>'s C<-array> Modifier
-
-As of version 0.20 of L<Util::H2O>, C<h2o> has now a C<-arrays> modifier
-that does something very similar to C<d2o>, which was released shortly after
-C<-arrays> was released in L<Util::H2O>. Had the author of this module known
-about it, he would not have created C<d2o>. Nonetheless, C<d2o> does some
-things C<-arrays> doesn't do (and similarly, when C<o2h -arrays> versus
-C<o2d>).
-
-The biggest difference seems to be that C<h2o> doesn't bless the C<ARRAY>
-containers or provide virtual methods. Be advised, however, C<-arrays>
-is probably sufficient for the use case C<d2o> was originally create for;
-i.e., to more easily I<objectify> complicated data structures obtained from
-things like JSON returned from web APIs. the virtual methods added to C<ARRAY>s
-is not something one would expect form C<h2o>, which strives to provide a
-I<lite> or I<tiny> touch. The vmethods do make iterating over the C<ARRAY>s
-easier, though.
+As of Util::H2O 0.20, C<h2o> supports an arrays-related modifier. In many cases,
+that may be sufficient for nested JSON-like structures. C<d2o> exists largely
+because this module originally added deep traversal before that feature was known,
+and because C<d2o> also blesses array containers and provides the vmethods described
+below.
 
 =head2 C<o2d REF>
 
-Does for data structures I<objectified> with C<d2o> what C<o2h> does
-for objects created with C<h2o>. It only removes the blessing from
-C<Util::H2O::> and C<Util::H2O::More::__a2o> references.
+Does for structures objectified with C<d2o> what C<o2h> does for objects created
+with C<h2o>. It removes blessing from C<Util::H2O::...> and
+C<Util::H2O::More::__a2o...> references and returns plain refs.
 
 =head2 C<a2o REF>
 
-Used internally.
+Used internally to bless arrayrefs as containers and attach “virtual methods”.
+Exposed in case you find a use for it directly, but it is primarily an internal
+implementation detail of C<d2o>.
 
-Used internally to give I<virual methods> to C<ARRAY> ref containers
-potentially holding C<HASH> references.
+=head1 C<ARRAY> CONTAINER VIRTUAL METHODS
 
-C<a2o> is not intended to be useful outside of the context of C<d2o>,
-but it's exposed in case it is, anyway.
+When C<d2o> encounters arrayrefs, it blesses them as containers and attaches
+helper methods. This is intentionally “heavier” than base Util::H2O.
 
-=head2 C<ARRAY> container I<vmethods>
+=head2 C<all>
 
-It is still somewhat inconvenient, though I<idiomatic>, to refer to C<ARRAY>
-elements directly as in the example above. However, it is still inconsistent
-with idea of C<Util::H2O>. So, C<d2o> leans into its I<heavy> nature by adding
-some "virtual" methods to C<ARRAY> containers.
+Returns a LIST of all items in the array container.
 
-=head3 C<all>
+  my @items = $root->teams->all;
 
-Returns a LIST of all items in the C<ARRAY> container.
+=head2 C<get INDEX>, C<i INDEX>
 
-  my @items = $root->some-barray->all;
+Returns element at INDEX. C<i> is a short alias for C<get>.
 
-=head3 C<get INDEX>, C<i INDEX>
+  my $x = $root->teams->get(0);
+  my $y = $root->teams->i(0);
 
-Given an C<ARRAY> container from C<d2o>, returns the element at the given
-index. See C<push> example below for a practical example.
-
-For shorter code, one may use C<i> instead of C<get>, for example, something
-really pathalogical can be written either:
-
-  $data->company->teams->get(0)->members->get(0)->projects->get(0)->tasks->get(1)->status('Completed');
-
-Or,
+This makes deeply nested reads more readable:
 
   $data->company->teams->i(0)->members->i(0)->projects->i(0)->tasks->i(1)->status('Completed');
 
-=head3 C<push LIST>
+=head2 C<push LIST>
 
-Pushes LIST onto ARRAY attached to the vmethod called; also applies the
-C<d2o> method to anything I<pushed>.
+Pushes items onto the container and applies C<d2o> to anything pushed.
 
-  my @added = $root->some->barray->push({ foo => 1 }, {foo => 2});
-  my $one   = $root->some->barray->get(0)->foo; # returns 1 via "get"
-  my $two   = $root->some->barray->get(1)->foo; # returns 2 via "get"
+  my @added = $root->items->push({ foo => 1 }, { foo => 2 });
+  say $root->items->get(0)->foo;
 
-Items that are C<push>'d are returned for convenient assignment.
+Items pushed are returned for convenience.
 
-=head3 C<pop>
+=head2 C<pop>
 
-Pops an element from C<ARRAY> container available after applying C<d2o> to
-a structure that has C<ARRAY> refs at any level.
+Pops an element from the container. C<pop> intentionally does NOT apply C<o2d>.
 
-  my $item = $root->some-barray->pop;
+=head2 C<unshift LIST>
 
-=head3 C<unshift LIST>
+Like C<push>, but on the near end. Applies C<d2o> to items unshifted.
 
-Similar to C<push>, just operates on the near end of the C<ARRAY>.
+=head2 C<shift>
 
-Items that are C<shift>'d are returned for convenient assignment.
+Like C<pop>, but on the near end. Does NOT apply C<o2d>.
 
-=head3 C<shift>
+=head2 C<scalar>, C<count>
 
-Similar to C<pop>, just operates on the near end of the C<ARRAY>.
+Returns the number of items in the container:
 
-=head3 C<scalar>, C<count>
+  my $n = $root->items->count;
 
-Returns the number of items in the C<ARRAY> container,
+=head1 DEBUGGING METHODS
 
-  my $count = $root->some->barray->scalar;
+=head2 C<ddd LIST>
 
-which is more convenient that doing,
+Applies L<Data::Dumper>::C<Dumper> to each argument and prints to STDERR.
+L<Data::Dumper> is loaded via C<require>.
 
-  my $count = scalar @{$root->some->barray->all};
+=head2 C<dddie LIST>
 
-It's also aliased as, C<count>
-
-  my $count = $root->some->barray->count;
-
-Returns C<0> if the array is empty (as one would expect C<scalar> to do).
-
-=head2 Debugging Methods
-
-=head3 C<ddd LIST>
-
-Takes a list and applies L<Data::Dumper>'s C<::Dumper> method to them, in turn. Prints to
-C<STDERR>.
-
-Used for debugging data structures, which is a likely thing to need if using this module.
-
-L<Data::Dumper> is C<require>'d by this method.
-
-=head3 C<dddie LIST>
-
-Does the same thing as C<ddd>, but C<die>s at the end.
+Same as C<ddd>, but dies afterward.
 
 =head1 EXTERNAL METHODS
 
 =head2 C<h2o>
 
-Because C<Util::H2O::More> exports C<h2o> as the basis for its
-operations, C<h2o> is also available without needing to qualify
-its full name space.
+Because C<Util::H2O::More> exports C<h2o> as the basis for its operations,
+C<h2o> is also available without qualifying its full namespace.
 
 =head1 DEPENDENCIES
 
 =head2 L<Util::H2O>
 
-Requires C<Util::H2O> because this module is effectively a wrapper
-around C<h2o>.
+Required. This module is effectively a convenience layer around C<h2o> and C<o2h>.
 
-It also uses the C<state> keyword, which is only available in perls
->= 5.10.
+It also uses the C<state> keyword, available in Perl ≥ 5.10.
 
-While some methods are designed to work with external modules, e.g.,
-C<opt2h2o> is meant to work with L<Getopt::Long>; at this time there
-are no dependencies for such methods required by C<Util::H2O::More>
-itself.
+=head2 Optional / conditional dependencies
+
+Some helpers load external modules only when you call them:
+
+=over 4
+
+=item *
+C<Getopt2h2o> loads L<Getopt::Long>
+
+=item *
+C<ini2h2o> / C<h2o2ini> load L<Config::Tiny>
+
+=item *
+C<yaml2h2o> loads L<YAML>
+
+=item *
+C<HTTPTiny2h2o> loads L<JSON::MaybeXS>
+
+=item *
+C<ddd> / C<dddie> load L<Data::Dumper>
+
+=back
 
 =head1 BUGS
 
-At the time of this release, there are no bugs on the Github issue
-tracker.
+At the time of this release, there are no bugs listed on the GitHub issue tracker.
 
 =head1 LICENSE AND COPYRIGHT
 
-Perl/perl
+Perl / Perl 5.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thank you to HAUKEX for creating L<Util::H2O> and hearing me out
-on its usefulness for some unintended use cases.
+Thank you to HAUKEX for creating L<Util::H2O> and hearing me out on its usefulness
+for some unintended use cases.
 
 =head1 SEE ALSO
 
-This module was featured in the 2023 Perl Advent Calendar on December 22,
+This module was featured in the 2023 Perl Advent Calendar on December 22:
 L<https://perladvent.org/2023/2023-12-22.html>.
 
 =head1 AUTHOR

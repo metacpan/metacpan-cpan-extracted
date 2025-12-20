@@ -1,5 +1,5 @@
 NAME
-    Class::XSConstructor - a super-fast (but limited) constructor in XS
+    Class::XSConstructor - a super-fast constructor in XS
 
 SYNOPSIS
       package Person {
@@ -122,7 +122,7 @@ DESCRIPTION
         *   HashRef and HashRef[x] where x is any of the basic types listed
             above.
 
-        So for example, a type check for ArrayRef[PositiveOrZeroInt should be
+        So for example, a type check for ArrayRef[PositiveOrZeroInt] should be
         very fast.
 
         When multiple attributes fail their type check, the constructor will
@@ -151,6 +151,30 @@ DESCRIPTION
 
         Type coercions are likely to siginificantly slow down your
         constructor.
+
+    *   Supports `init_arg` like Moose and Moo.
+
+          use Class::XSConstructor 'name' => { init_arg => 'moniker' };
+  
+          my $obj = __PACKAGE__->new( moniker => 'Bob' );
+          say $obj->{name};  # ==> "Bob"
+
+    *   Supports `trigger`, which may be a method name or a coderef. Triggers
+        are only fired when the attribute is passed to the constructor
+        explicitly. Defaults and builders do not trigger the trigger.
+
+    *   Supports `weak_ref` like Moose and Moo.
+
+          use Class::XSConstructor 'thing' => { weak_ref => !!1 };
+  
+          my $array  = [];
+          my $object = __PACKAGE__->new( thing => $array );
+  
+          defined $object->{thing} or die;  # lives
+  
+          undef $array;
+  
+          defined $object->{thing} or die;  # dies
 
     *   Supports Moose/Moo/Class::Tiny-style `BUILD` methods.
 
@@ -279,6 +303,23 @@ CAVEATS
         use Class::XSConstructor qw( employee_id! );
         use Class::XSAccessor { getters => [qw(employee_id)] };
       }
+
+    Using any of the following features means that your fast XS constructor
+    will be calling your own coderefs, which are presumably written in Perl
+    and thus not so fast. This can slow down your constructor significantly:
+
+    *   Builders and defaults, except for the eight specially optimized
+        default values.
+
+    *   Triggers.
+
+    *   Type constraints (except for the specially optimized ones) and type
+        coercions.
+
+    *   Defining any `BUILD` methods or inheriting from classes which do.
+
+    These can all be useful features of course, but if speed is critical,
+    consider looking at ways to eliminate them.
 
 SEE ALSO
     Class::Tiny, Class::XSAccessor, Class::XSDestructor.

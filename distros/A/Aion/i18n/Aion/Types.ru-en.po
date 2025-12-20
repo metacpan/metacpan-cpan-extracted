@@ -103,6 +103,18 @@ msgstr "If the routine returns different values in array and scalar contexts, th
 msgid "Тип верхнего уровня в иерархии скалярных типов."
 msgstr "The top-level type in the hierarchy of scalar types."
 
+msgid "Правращает `type` в `Aion::Type`."
+msgstr "Sets `type` to `Aion::Type`."
+
+msgid ""
+"* Если `type` - `Aion::Type`, то возвращает его без изменений.\n"
+"* Если `type` строка, то оборачивает его в `Object`.\n"
+"* Если `type` можно вызвать, то оборачивает его в `Aion::Type->new(test => $type, ...)`. А если он имеет метод `coerce`, то будет его использовать для преобразований. Благодаря этому можно в экосистеме `Aion` использовать внешние типы вроде `Type::Tiny`."
+msgstr ""
+"* If `type` is `Aion::Type`, then returns it unchanged.\n"
+"* If `type` is a string, then wraps it in `Object`.\n"
+"* If `type` can be called, then wraps it in `Aion::Type->new(test => $type, ...)`. And if it has a `coerce` method, it will use it for transformations. Thanks to this, it is possible to use external types like `Type::Tiny` in the `Aion` ecosystem."
+
 msgid "Перечисление."
 msgstr "Enumeration."
 
@@ -118,8 +130,8 @@ msgstr "Everything except `undef`."
 msgid "Определённые значения без ссылок."
 msgstr "Defined values without references."
 
-msgid "Определяет значение длины от `A` до `B` или от 0 до `A`, если `B` отсутствует."
-msgstr "Specifies a length value from `A` to `B`, or from 0 to `A` if `B` is missing."
+msgid "Определяет значение длины от `from` до `to` или от 0 до `from`, если `to` отсутствует."
+msgstr "Specifies a length value from `from` to `to`, or from 0 to `from` if `to` is missing."
 
 msgid "Perl версии."
 msgstr "Perl version."
@@ -133,11 +145,11 @@ msgstr "Unicode strings with the utf8 flag or if decoding to utf8 occurs without
 msgid "Бинарные строки без флага utf8 и октетов с номерами меньше 128."
 msgstr "Binary strings without the utf8 flag and octets with numbers less than 128."
 
-msgid "Строка начинается с `S`."
-msgstr "The line starts with `S`."
+msgid "Строка начинается с `begin`."
+msgstr "The line starts with `begin`."
 
-msgid "Строка заканчивается на `S`."
-msgstr "The line ends with `S`."
+msgid "Строка заканчивается на `end`."
+msgstr "The line ends with `end`."
 
 msgid "Строка с одним или несколькими символами, не являющимися пробелами."
 msgstr "A string containing one or more non-blank characters."
@@ -172,8 +184,14 @@ msgstr "The class name is a package with a `new` method."
 msgid "Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом."
 msgstr "The role name is a package without the `new` method, with `@ISA`, or with any one method."
 
-msgid "Рациональные числа."
-msgstr "Rational numbers."
+msgid "Строковое представление рациональных чисел."
+msgstr "String representation of rational numbers."
+
+msgid "Так как в perl рациональные числа поддерживаются с помощью прагмы `bigrat`, который все рациональные числа превращает в `Math::BigRat`, то используется в привидении к `Rat`."
+msgstr "Since in perl rational numbers are supported using the `bigrat` pragma, which turns all rational numbers into `Math::BigRat`, it is used in a ghost to `Rat`."
+
+msgid "Рациональные числа. Сокращение для `Object['Math::BigRat']`. Имеет приведение."
+msgstr "Rational numbers. Short for `Object['Math::BigRat']`. Has a ghost."
 
 msgid "Числа."
 msgstr "Numbers."
@@ -223,11 +241,23 @@ msgstr "Format."
 msgid "Подпрограмма."
 msgstr "Subroutine."
 
-msgid "Подпрограмма с телом."
-msgstr "Subroutine with body."
+msgid "Подпрограмма с указанным именем. `name` – строка или регулярка."
+msgstr "The subroutine with the specified name. `name` – string or regular character."
+
+msgid "Подпрограмма с указанным прототипом."
+msgstr "A subroutine with the specified prototype."
 
 msgid "Подпрограмма без тела."
 msgstr "Subroutine without body."
+
+msgid "Подпрограмма без тела обычно используется для предварительного объявления, однако XS-функции так же не имеют тела:"
+msgstr "A subroutine without a body is usually used for pre-declaration, but XS functions also have no body:"
+
+msgid "Обращение к необъявленной функции через `\\&` создаёт ссылку на предварительно-объявленную фунцию:"
+msgstr "Calling an undeclared function using `\\&` creates a reference to the previously declared function:"
+
+msgid "Подпрограмма с телом."
+msgstr "Subroutine with body."
 
 msgid "Ссылка на подпрограмму с соответствующей сигнатурой."
 msgstr "A link to a subroutine with the corresponding signature."
@@ -238,8 +268,8 @@ msgstr "Subroutines without a body are not wrapped in a signature handler, and t
 msgid "Регулярное выражение."
 msgstr "Regular expression."
 
-msgid "Ссылка на скаляр или ссылка на ссылку."
-msgstr "A reference to a scalar or a reference to a reference."
+msgid "Ссылка на скаляр или ссылку."
+msgstr "A reference to a scalar or reference."
 
 msgid "Ссылка на скаляр."
 msgstr "Reference to a scalar."

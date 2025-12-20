@@ -1,5 +1,5 @@
 package CPAN::InGit::Server;
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # ABSTRACT: A Mojolicious::Controller that serves the ArchiveTrees from a git repo
 
 
@@ -22,9 +22,17 @@ sub archive_tree($c) {
       my $branch_name= $c->branch_name;
       my $cache= $c->branch_cache;
       my $atree= $cache->{$branch_name};
+      if ($atree) {
+         # check whether branch has updated since cached
+         my $current_tree= $c->cpan_repo->lookup_tree($branch_name);
+         unless (defined $current_tree and $atree->tree->id eq $current_tree->id) {
+            delete $cache->{$branch_name};
+            $atree= undef;
+         }
+      }
       if (!$atree && ($atree= $c->cpan_repo->get_archive_tree($branch_name))) {
          if ($c->branch_head_only && !defined $atree->branch) {
-            $c->log->debug("Branch $branch_name was not actually a branch HEAD");
+            $c->log->debug("Branch '$branch_name' is not a branch HEAD");
             $atree= undef;
          } else {
             $cache->{$branch_name}= $atree;
@@ -46,9 +54,10 @@ sub branch_cache($c) {
 sub branch_head_only($c) { $c->stash('branch_head_only') }
 
 sub _new_cache {
-   state $have_tree_rb_xs= eval { require Tree::RB::XS; };
+   # the 'recent_limit' feature was added in 0.20
+   state $have_tree_rb_xs= eval 'use Tree::RB::XS 0.20';
    my %hash;
-   tie %hash, 'Tree::RB::XS'#, lru_limit => 100
+   tie %hash, 'Tree::RB::XS', track_recent => 1, recent_limit => 20
       if $have_tree_rb_xs;
    \%hash;
 }
@@ -247,7 +256,7 @@ selector portion of the paths.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

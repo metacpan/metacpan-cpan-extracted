@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 1.3
+# 1.4
 # 
 # # SYNOPSIS
 # 
@@ -391,17 +391,32 @@ local ($::_g0 = do {$node->parent}, $::_e0 = do {undef}); ::ok defined($::_g0) =
 # 
 # Указывает тип, а точнее – валидатор, фичи.
 # 
+# Может принимать:
+# 
+# * `Aion::Type` – Aion сразу импортирует в пакет все типы из [Aion::Types](https://metacpan.org/pod/Aion::Types).
+# * Строки воспримаются как пакеты и оборачиваются в `Object`.
+# * Подпрограммы – тестируемое значение передаётся в `$_` и подпрограмма возвращает булево значение.
+# * Объекты с перегруженным оператором `&{}`. Если у такого объекта есть ещё и метод `coerce`, то он будет учавствовать в приведениях, если указать `coerce => 1`.
+# 
 ::done_testing; }; subtest 'isa => $type' => sub { 
+package Externalis {
+	use overload '&{}' => sub { sub { /^\d+$/ } };
+	sub coerce { int $_ }
+}
+
 package ExIsa { use Aion;
-	has x => (is => 'ro', isa => Int);
+	has x => (isa => Int);
+	has y => (isa => sub { /^\d+$/ });
+	has z => (isa => bless({}, 'Externalis'), coerce => 1);
 }
 
 eval {ExIsa->new(x => 'str')}; local ($::_g0 = $@, $::_e0 = 'Set feature x must have the type Int. The it is \'str\'!'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, 'ExIsa->new(x => \'str\') # @-> Set feature x must have the type Int. The it is \'str\'!' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 eval {ExIsa->new->x}; local ($::_g0 = $@, $::_e0 = 'Get feature x must have the type Int. The it is undef!'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, 'ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {ExIsa->new(x => 10)->x}, $::_e0 = do {10}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'ExIsa->new(x => 10)->x			  # -> 10' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-# 
-# Список валидаторов см. в [Aion::Types](https://metacpan.org/pod/Aion::Types).
+eval {ExIsa->new(y => 'abc')}; local ($::_g0 = $@, $::_e0 = 'Set feature y must have the type External[CODE'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, 'ExIsa->new(y => \'abc\') # @-> Set feature y must have the type External[CODE' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {ExIsa->new(z => ' 6 xyz')->z}, $::_e0 = do {6}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'ExIsa->new(z => \' 6 xyz\')->z # -> 6' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
 # 
 # ## coerce => (1|0)
 # 
@@ -518,6 +533,8 @@ local ($::_g0 = do {$ex1->x}, $::_e0 = do {6}); ::ok defined($::_g0) == defined(
 #>> 
 #>> 1;
 #@< EOF
+# 
+# Используем плерому локально:
 # 
 ::done_testing; }; subtest 'eon => (1|2|$key)' => sub { 
 {
@@ -741,6 +758,37 @@ local ($::_g0 = do {Cat->new->is_cat}, $::_e0 = do {1}); ::ok defined($::_g0) ==
 local ($::_g0 = do {Dog->new->is_cat}, $::_e0 = do {0}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Dog->new->is_cat # -> 0' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 eval {Mouse->new}; local ($::_g0 = $@, $::_e0 = 'Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, 'Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
 
+# 
+# # SEE ALSO
+# 
+# Экосистема Aion:
+# 
+# * [Aion::Annotation](https://metacpan.org/pod/Aion::Annotation)
+# * [Aion::Carp](https://metacpan.org/pod/Aion::Carp)
+# * [Aion::Enum](https://metacpan.org/pod/Aion::Enum)
+# * [Aion::Format](https://metacpan.org/pod/Aion::Format)
+# * [Aion::Fs](https://metacpan.org/pod/Aion::Fs)
+# * [Aion::Query](https://metacpan.org/pod/Aion::Query)
+# * [Aion::Run](https://metacpan.org/pod/Aion::Run)
+# * [Aion::Spirit](https://metacpan.org/pod/Aion::Spirit)
+# * [Aion::Surf](https://metacpan.org/pod/Aion::Surf)
+# * [Aion::Telemetry](https://metacpan.org/pod/Aion::Telemetry)
+# * [config](https://metacpan.org/release/DART/config-1.4.5/view/lib/config.pm)
+# * [Liveman](https://metacpan.org/pod/Liveman)
+# 
+# Подобные ООП-фреймворки:
+# 
+# * [Mouse](https://metacpan.org/pod/Mouse)
+# * [Moose](https://metacpan.org/pod/Moose)
+# * [Moo](https://metacpan.org/pod/Moo)
+# * [Mo](https://metacpan.org/pod/Mo)
+# * [M](https://metacpan.org/pod/M)
+# * [Class::Accessor](https://metacpan.org/pod/Class::Accessor)
+# * [Acme::Has::Tiny](https://metacpan.org/pod/Acme::Has::Tiny)
+# 
+# Не Moose-подобные:
+# 
+# * [Object::Pad](https://metacpan.org/pod/Object::Pad)
 # 
 # # AUTHOR
 # 

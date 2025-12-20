@@ -19,6 +19,7 @@ t/01-compile.t
 t/10-mutable-tree.t
 t/11-archive-tree.t
 t/12-mirror-tree.t
+t/20-server.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/lib/Test2AndUtils.pm

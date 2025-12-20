@@ -92,7 +92,7 @@ is_deeply(
 	\%Person::__XSCON_FLAGS,
 	{
 		name   => 1,
-		age    => 2 + ( 15 << 8 ),
+		age    => 2 + ( 15 << 16 ),
 		email  => 0,
 		phone  => 0,
 	},
@@ -103,7 +103,7 @@ is_deeply(
 	\%Employee::__XSCON_FLAGS,
 	{
 		name   => 1,
-		age    => 2 + ( 15 << 8 ),
+		age    => 2 + ( 15 << 16 ),
 		email  => 0,
 		phone  => 0,
 		employee_id => 1,

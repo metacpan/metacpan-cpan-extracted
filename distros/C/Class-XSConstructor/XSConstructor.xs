@@ -9,6 +9,39 @@
 
 #define XSCON_xc_stash(a)       ( (HV*)XSCON_av_at((a), XSCON_XC_STASH) )
 
+struct delete_ent_ctx {
+    HV *hv;
+    SV *key;
+};
+
+static void
+delete_mutex(pTHX_ void *p)
+{
+    struct delete_ent_ctx *ctx = (struct delete_ent_ctx *)p;
+    hv_delete_ent(ctx->hv, ctx->key, G_DISCARD, 0);
+}
+
+static void
+dec_sv_refcnt(pTHX_ void *p)
+{
+    SV *sv = (SV *)p;
+    SvREFCNT_dec(sv);
+}
+
+enum {
+    XSCON_FLAG_REQUIRED             =    1,
+    XSCON_FLAG_HAS_TYPE_CONSTRAINT  =    2,
+    XSCON_FLAG_HAS_TYPE_COERCION    =    4,
+    XSCON_FLAG_HAS_DEFAULT          =    8,
+    XSCON_FLAG_NO_INIT_ARG          =   16,
+    XSCON_FLAG_HAS_INIT_ARG         =   32,
+    XSCON_FLAG_HAS_TRIGGER          =   64,
+    XSCON_FLAG_WEAKEN               =  128,
+
+    XSCON_BITSHIFT_DEFAULTS         =    8,
+    XSCON_BITSHIFT_TYPES            =   16,
+};
+
 SV*
 join_with_commas(AV *av) {
     dTHX;
@@ -337,6 +370,98 @@ xscon_check_type(int flags, SV* const val, HV* const isa_hash, char* isa_hash_ke
     } // switch ( flags )
 }
 
+void
+xscon_run_trigger(SV *object,
+                  const char *attr_name,
+                  int attr_flags,
+                  HV *trigger_hash)
+{
+    dTHX;
+    dSP;
+
+    STRLEN attr_len = strlen(attr_name);
+
+    SV *mutexkey_sv;
+    SV **svp;
+    SV *trigger_sv;
+    SV *value_sv;
+
+    HV *object_hv = (HV *)SvRV(object);
+
+    mutexkey_sv = newSV(attr_len + sizeof(":trigger_mutex") - 1);
+    sv_setpvn(mutexkey_sv, attr_name, attr_len);
+    sv_catpvs(mutexkey_sv, ":trigger_mutex");
+
+    if (hv_exists_ent(object_hv, mutexkey_sv, 0)) {
+        SvREFCNT_dec(mutexkey_sv);
+        return;
+    }
+
+    hv_store_ent(object_hv, mutexkey_sv, newSViv(1), 0);
+
+    ENTER;
+    SAVETMPS;
+
+    /* Ensure the key SV is released */
+    SAVEDESTRUCTOR_X(dec_sv_refcnt, (void *)mutexkey_sv);
+
+    /* Ensure the mutex is deleted on scope exit */
+    struct delete_ent_ctx *ctx;
+    Newxz(ctx, 1, struct delete_ent_ctx);
+    ctx->hv  = object_hv;
+    ctx->key = mutexkey_sv;
+    SAVEDESTRUCTOR_X(delete_mutex, ctx);
+
+    svp = hv_fetch(trigger_hash, attr_name, attr_len, 0);
+    if (!svp || !SvOK(*svp)) {
+        FREETMPS;
+        LEAVE;
+        return;
+    }
+
+    trigger_sv = *svp;
+
+    svp = hv_fetch(object_hv, attr_name, attr_len, 0);
+    value_sv = svp ? *svp : &PL_sv_undef;
+
+    if (!SvROK(trigger_sv)) {
+
+        /* ----------------------------------------------
+         * Trigger is a method name (string)
+         * Perl: $object->$trigger($object->{$attr_name})
+         * ---------------------------------------------- */
+
+        PUSHMARK(SP);
+        XPUSHs((SV *)object);   /* invocant */
+        XPUSHs(value_sv);
+        PUTBACK;
+
+        call_method(SvPV_nolen(trigger_sv), G_VOID);
+
+    }
+    else if (SvTYPE(SvRV(trigger_sv)) == SVt_PVCV) {
+
+        /* ----------------------------------------------
+         * Trigger is a coderef
+         * Perl: $trigger->($object, $object->{$attr_name})
+         * ---------------------------------------------- */
+
+        PUSHMARK(SP);
+        XPUSHs((SV *)object);
+        XPUSHs(value_sv);
+        PUTBACK;
+
+        call_sv(trigger_sv, G_VOID);
+
+    }
+    else {
+        croak("Unexpected trigger type");
+    }
+
+    FREETMPS;
+    LEAVE;
+}
+
 static void
 xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV* const args, bool const is_cloning)
 {
@@ -358,7 +483,9 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
     SV** tmp;
     SV** tmp2;
     char* keyname;
+    char* init_arg;
     STRLEN keylen;
+    STRLEN init_arg_len;
     int flags;
 
     /* find out allowed attributes */
@@ -377,6 +504,10 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
     HV* const COERCIONS_hash = GvHV(*COERCIONS_globref);
     SV** const DEFAULTS_globref = hv_fetch(stash, "__XSCON_DEFAULTS", 16, 0);
     HV* const DEFAULTS_hash = GvHV(*DEFAULTS_globref);
+    SV** const TRIGGERS_globref = hv_fetch(stash, "__XSCON_TRIGGERS", 16, 0);
+    HV* const TRIGGERS_hash = GvHV(*TRIGGERS_globref);
+    SV** const INIT_ARGS_globref = hv_fetch(stash, "__XSCON_INIT_ARGS", 17, 0);
+    HV* const INIT_ARGS_hash = GvHV(*INIT_ARGS_globref);
 
     /* copy allowed attributes */
     for (i = 0; i < HAS_len; i++) {
@@ -384,29 +515,38 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
         assert(tmp);
         attr = *tmp;
         keyname = SvPV(attr, keylen);
+        init_arg = SvPV(attr, init_arg_len);
         
         tmp2 = hv_fetch(FLAGS_hash, keyname, keylen, 0);
         assert(tmp2);
         fliggity = *tmp2;
         flags = (int)SvIV(fliggity);
         
+        if ( flags & XSCON_FLAG_HAS_INIT_ARG && !( flags & XSCON_FLAG_NO_INIT_ARG ) ) {
+            SV** tmp = hv_fetch(INIT_ARGS_hash, init_arg, init_arg_len, 0);
+            SV* tmp2 = *tmp;
+            init_arg = SvPV(tmp2, init_arg_len);
+        }
+        
         SV** valref;
         SV* val;
         bool has_value = FALSE;
+        bool value_was_from_args = FALSE;
         
-        if (hv_exists(args, keyname, keylen)) {
+        if ( (!( flags & XSCON_FLAG_NO_INIT_ARG )) && hv_exists(args, init_arg, init_arg_len) ) {
             // Value provided in args hash
-            valref = hv_fetch(args, keyname, keylen, 0);
+            valref = hv_fetch(args, init_arg, init_arg_len, 0);
             val = newSVsv(*valref);
             has_value = TRUE;
+            value_was_from_args = TRUE;
         }
-        else if ( flags & 8 ) {
+        else if ( flags & XSCON_FLAG_HAS_DEFAULT ) {
             // There is a default/builder
             has_value = TRUE;
             // Some very common defaults are worth hardcoding into the flags
             // so we won't even need to do a hash lookup to find the default
             // value.
-            I32 has_common_default = ( flags >> 4 ) & 15;
+            I32 has_common_default = ( flags >> XSCON_BITSHIFT_DEFAULTS ) & 255;
             switch ( has_common_default ) {
                 // Undef
                 case 1:
@@ -490,25 +630,35 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
                     }
                     else {
                         has_value = FALSE;
-                        if ( flags & 1 ) {
-                            croak("Attribute '%s' is required", keyname);
+                        if ( flags & XSCON_FLAG_REQUIRED ) {
+                            if ( flags & XSCON_FLAG_HAS_INIT_ARG && strcmp(keyname, init_arg) != 0 ) {
+                                croak("Attribute '%s' (init arg '%s') is required", keyname, init_arg);
+                            }
+                            else {
+                                croak("Attribute '%s' is required", keyname);
+                            }
                         }
                     }
             }
         }
-        else if ( flags & 1 ) {
-            croak("Attribute '%s' is required", keyname);
+        else if ( flags & XSCON_FLAG_REQUIRED ) {
+            if ( flags & XSCON_FLAG_HAS_INIT_ARG && strcmp(keyname, init_arg) != 0 ) {
+                croak("Attribute '%s' (init arg '%s') is required", keyname, init_arg);
+            }
+            else {
+                croak("Attribute '%s' is required", keyname);
+            }
         }
         
         if ( has_value ) {
             /* there exists an isa check */
-            if ( flags & 2 ) {
-                int type_flags = flags >> 8;
+            if ( flags & XSCON_FLAG_HAS_TYPE_CONSTRAINT ) {
+                int type_flags = flags >> XSCON_BITSHIFT_TYPES;
                 bool result = xscon_check_type(type_flags, newSVsv(val), ISA_hash, keyname, keylen);
             
                 /* we failed type check */
                 if ( !result ) {
-                    if ( flags & 4 && hv_exists(COERCIONS_hash, keyname, keylen) ) {
+                    if ( flags & XSCON_FLAG_HAS_TYPE_COERCION && hv_exists(COERCIONS_hash, keyname, keylen) ) {
                         SV** const coercion = hv_fetch(COERCIONS_hash, keyname, keylen, 0);
                         SV* newval;
                         
@@ -542,6 +692,14 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
             }
             
             (void)hv_store((HV *)SvRV(object), keyname, keylen, val, 0);
+            
+            if ( value_was_from_args && flags & XSCON_FLAG_HAS_TRIGGER ) {
+                xscon_run_trigger(object, keyname, flags, TRIGGERS_hash);
+            }
+            
+            if ( SvROK(val) && flags & XSCON_FLAG_WEAKEN ) {
+                sv_rvweaken(val);
+            }
         }
     }
 }
@@ -755,8 +913,23 @@ xscon_strictcon(const char* pkg, SV* const object, SV* const args) {
     }
 }
 
-
 MODULE = Class::XSConstructor  PACKAGE = Class::XSConstructor
+
+BOOT:
+{
+    HV *stash = gv_stashpv("Class::XSConstructor", GV_ADD);
+
+    newCONSTSUB(stash, "XSCON_FLAG_REQUIRED",             newSViv(XSCON_FLAG_REQUIRED));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_TYPE_CONSTRAINT",  newSViv(XSCON_FLAG_HAS_TYPE_CONSTRAINT));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_TYPE_COERCION",    newSViv(XSCON_FLAG_HAS_TYPE_COERCION));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_DEFAULT",          newSViv(XSCON_FLAG_HAS_DEFAULT));
+    newCONSTSUB(stash, "XSCON_FLAG_NO_INIT_ARG",          newSViv(XSCON_FLAG_NO_INIT_ARG));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_INIT_ARG",         newSViv(XSCON_FLAG_HAS_INIT_ARG));
+    newCONSTSUB(stash, "XSCON_FLAG_HAS_TRIGGER",          newSViv(XSCON_FLAG_HAS_TRIGGER));
+    newCONSTSUB(stash, "XSCON_FLAG_WEAKEN",               newSViv(XSCON_FLAG_WEAKEN));
+    newCONSTSUB(stash, "XSCON_BITSHIFT_DEFAULTS",         newSViv(XSCON_BITSHIFT_DEFAULTS));
+    newCONSTSUB(stash, "XSCON_BITSHIFT_TYPES",            newSViv(XSCON_BITSHIFT_TYPES));
+}
 
 void
 new_object(SV* klass, ...)

@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provides C<baptise>, semantically and idiomatically just like C<bless> but creates accessors for you. It does other cool things to make Perl code easier to read and maintain, too.",
+  "ABSTRACT" => "Convenience utilities built on Util::H2O (baptise, d2o, INI/YAML/HTTP helpers, Getopt helpers)",
   "AUTHOR" => "oodler577 <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "YAML" => 0
   },
-  "VERSION" => "0.4.2",
+  "VERSION" => "0.4.3",
   "test" => {
     "TESTS" => "t/*.t"
   }

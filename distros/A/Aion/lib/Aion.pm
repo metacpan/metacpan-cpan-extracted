@@ -1,9 +1,8 @@
 package Aion;
-use 5.22.0;
-no strict; no warnings; no diagnostics;
+
 use common::sense;
 
-our $VERSION = "1.4";
+our $VERSION = "1.5";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -119,9 +118,8 @@ sub is_aspect {
 sub isa_aspect {
 	my ($isa, $feature) = @_;
 	my ($construct, $name) = @$feature{qw/construct name/};
-	die "has: $name - isa maybe Aion::Type" unless UNIVERSAL::isa($isa, 'Aion::Type');
 
-	$feature->{isa} = $isa;
+	$feature->{isa} = Aion::Types::External[$isa];
 
 	$construct->add_release("${\$feature->meta}\{isa}->validate(\$val, 'Get feature $name');") if ISA =~ /ro|rw/;
 
@@ -536,7 +534,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-1.4
+1.5
 
 =head1 SYNOPSIS
 
@@ -718,11 +716,11 @@ The creator of the aspect has the parameters:
 
 =over
 
-=item * C<$value> — aspect value.
+=item * C<$value> – aspect value.
 
-=item * C<$feature> - meta-object describing the feature (C<Aion::Meta::Feature>).
+=item * C<$feature> – meta-object describing the feature (C<Aion::Meta::Feature>).
 
-=item * C<$aspect_name> — aspect name.
+=item * C<$aspect_name> – aspect name.
 
 =back
 
@@ -867,11 +865,11 @@ Additional permits:
 
 =over
 
-=item * C<+> - the feature is required in the constructor parameters. C<+> is not used with C<->.
+=item * C<+> – the feature is required in the constructor parameters. C<+> is not used with C<->.
 
-=item * C<-> - the feature cannot be installed via the constructor. '-' is not used with C<+>.
+=item * C<-> – the feature cannot be installed via the constructor. '-' is not used with C<+>.
 
-=item * C<*> - do not increment the value's reference counter (apply C<weaken> to the value after installing it in the feature).
+=item * C<*> – do not increment the value's reference counter (apply C<weaken> to the value after installing it in the feature).
 
 =item * C<?> – create a predicate.
 
@@ -922,15 +920,37 @@ The function with C<*> does not hold the meaning:
 
 Indicates the type, or rather - a validator, feature.
 
+Can take:
+
+=over
+
+=item * C<Aion::Type> – Aion immediately imports all types from L<Aion::Types> into the package.
+
+=item * Strings are treated as packets and wrapped in C<Object>.
+
+=item * Subroutines - the test value is passed to C<$_> and the subroutine returns a boolean value.
+
+=item * Objects with overloaded C<&{}> operator. If such an object also has a C<coerce> method, then it will participate in casts if C<< coerce =E<gt> 1 >> is specified.
+
+=back
+
+	package Externalis {
+		use overload '&{}' => sub { sub { /^\d+$/ } };
+		sub coerce { int $_ }
+	}
+	
 	package ExIsa { use Aion;
-		has x => (is => 'ro', isa => Int);
+		has x => (isa => Int);
+		has y => (isa => sub { /^\d+$/ });
+		has z => (isa => bless({}, 'Externalis'), coerce => 1);
 	}
 	
 	ExIsa->new(x => 'str') # @-> Set feature x must have the type Int. The it is 'str'!
 	ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!
 	ExIsa->new(x => 10)->x			  # -> 10
-
-For a list of validators, see L<Aion::Types>.
+	
+	ExIsa->new(y => 'abc') # @-> Set feature y must have the type External[CODE
+	ExIsa->new(z => ' 6 xyz')->z # -> 6
 
 =head2 coerce => (1|0)
 
@@ -1042,7 +1062,7 @@ lib/PowerEon.pm file:
 	
 	1;
 
-
+We use pleroma locally:
 
 	{
 		use Aion::Pleroma;
@@ -1242,6 +1262,66 @@ The Isa attribute allows you to declare the required functions:
 	Cat->new->is_cat # -> 1
 	Dog->new->is_cat # -> 0
 	Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse
+
+=head1 SEE ALSO
+
+Aion Ecosystem:
+
+=over
+
+=item * L<Aion::Annotation>
+
+=item * L<Aion::Carp>
+
+=item * L<Aion::Enum>
+
+=item * L<Aion::Format>
+
+=item * L<Aion::Fs>
+
+=item * L<Aion::Query>
+
+=item * L<Aion::Run>
+
+=item * L<Aion::Spirit>
+
+=item * L<Aion::Surf>
+
+=item * L<Aion::Telemetry>
+
+=item * LLL<https://metacpan.org/release/DART/config-1.4.5/view/lib/config.pm>
+
+=item * L<Liveman>
+
+=back
+
+Similar OOP frameworks:
+
+=over
+
+=item * L<Mouse>
+
+=item * L<Moose>
+
+=item * L<Moo>
+
+=item * L<Mo>
+
+=item * L<M>
+
+=item * L<Class::Accessor>
+
+=item * L<Acme::Has::Tiny>
+
+=back
+
+Non-Moose-like:
+
+=over
+
+=item * L<Object::Pad>
+
+=back
 
 =head1 AUTHOR
 

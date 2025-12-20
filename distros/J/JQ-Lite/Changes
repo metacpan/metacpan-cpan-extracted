@@ -1,3 +1,7 @@
+1.51  2025-12-20
+    - Ignore SIGPIPE in the from_file_stdin test helper so closed pipes
+      from the CLI under test do not terminate the harness.
+
 1.50  2025-12-18
     - Promote release to version 1.50.
     - Allow CLI JSON encoding to accept scalar values when processing
@@ -963,6 +967,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 
