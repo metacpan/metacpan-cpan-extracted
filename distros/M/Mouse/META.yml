@@ -21,7 +21,7 @@ conflicts:
   MouseX::AttributeHelpers: '< 0.06'
   MouseX::NativeTraits: '< 1.00'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ no_index:
 provides:
   Mouse:
     file: lib/Mouse.pm
-    version: v2.6.0
+    version: v2.6.1
   Mouse::Exporter:
     file: lib/Mouse/Exporter.pm
   Mouse::Meta::Attribute:
@@ -63,7 +63,7 @@ provides:
   Mouse::Meta::Role::Application:
     file: lib/Mouse/Meta/Role/Application.pm
   Mouse::Meta::Role::Application::RoleSummation:
-    file: lib/Mouse/Tiny.pm
+    file: lib/Mouse/Meta/Role/Composite.pm
   Mouse::Meta::Role::Composite:
     file: lib/Mouse/Meta/Role/Composite.pm
   Mouse::Meta::Role::Method:
@@ -76,18 +76,15 @@ provides:
     file: lib/Mouse/PurePerl.pm
   Mouse::Role:
     file: lib/Mouse/Role.pm
-    version: v2.6.0
+    version: v2.6.1
   Mouse::Spec:
     file: lib/Mouse/Spec.pm
-    version: v2.6.0
-  Mouse::Tiny:
-    file: lib/Mouse/Tiny.pm
-    version: v2.5.12
+    version: v2.6.1
   Mouse::TypeRegistry:
     file: lib/Mouse/TypeRegistry.pm
   Mouse::Util:
     file: lib/Mouse/Util.pm
-    version: v2.6.0
+    version: v2.6.1
   Mouse::Util::MetaRole:
     file: lib/Mouse/Util/MetaRole.pm
   Mouse::Util::TypeConstraints:
@@ -108,7 +105,7 @@ resources:
   bugtracker: https://github.com/xslate/p5-Mouse/issues
   homepage: https://github.com/xslate/p5-Mouse
   repository: https://github.com/xslate/p5-Mouse.git
-version: v2.6.0
+version: v2.6.1
 x_contributors:
   - 'Aleksandr Matveev <a.matveev@corp.mail.ru>'
   - 'Alex Solovey <a.solovey@gmail.com>'
@@ -126,6 +123,7 @@ x_contributors:
   - 'Fuji, Goro <fuji.goro@dena.jp>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'Fuji, Goro <goro-fuji@cookpad.com>'
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Ingy dot Net <ingy@ingy.net>'
   - 'Jesse Vincent <jesse@bestpractical.com>'
   - 'Joel Bernstein <joel.bernstein@vidicom.co.uk>'

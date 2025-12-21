@@ -10,6 +10,7 @@ WriteMakefile
   },
   'EXE_FILES' => [],
   'VERSION_FROM' => 'lib/List/Gen.pm',
+  'LICENSE' => 'perl',
   'PREREQ_PM' => {
       'Scalar::Util' => 0,
       'Filter::Simple' => 0,

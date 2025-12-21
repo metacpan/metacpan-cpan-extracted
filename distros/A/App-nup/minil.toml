@@ -1,0 +1,20 @@
+name           = "App-nup"
+readme_from    = "script/nup"
+authors_from   = "script/nup"
+script_files   = [ "script/nup" ]
+badges         = [ "github-actions/test", "metacpan" ]
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+hooks = [
+    "perl -Ilib -MApp::nup -i -pE 's/^\\s*Version \\K(\\d+(\\.\\d+)*)$/$App::nup::VERSION/i' script/nup",
+    "sed -i '' '/^1;$/q' lib/App/nup.pm && greple -Mperl -h --nocolor :pod script/nup >> lib/App/nup.pm",
+]
+
+[unsupported]
+os = [ "MSWin32" ]
+
+[FileGatherer]
+exclude_match = [ '^share/getoptlong/(?!getoptlong\.sh)', '^MEMO\.md$' ]

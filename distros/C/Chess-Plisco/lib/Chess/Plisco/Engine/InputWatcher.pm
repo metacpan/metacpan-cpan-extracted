@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::InputWatcher;
-$Chess::Plisco::Engine::InputWatcher::VERSION = 'v1.0.0';
+$Chess::Plisco::Engine::InputWatcher::VERSION = 'v1.0.1';
 use strict;
 
 use IO::Select;

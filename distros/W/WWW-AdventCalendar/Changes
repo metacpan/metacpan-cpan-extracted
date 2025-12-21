@@ -1,5 +1,10 @@
 Revision history for WWW-AdventCalendar
 
+1.114     2025-12-20 18:37:55+11:00 Australia/Melbourne
+        - make the design responsive so it's less terrible on mobile (thanks,
+          Dave Cross!)
+        - eliminate some complaints about encoding when articles are not ASCII
+
 1.113     2022-12-31 19:32:24-05:00 America/New_York
         - removed support for Google Analytics tracker
         - update packaging and metadata

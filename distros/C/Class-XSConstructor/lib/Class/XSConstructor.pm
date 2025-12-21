@@ -9,7 +9,7 @@ use List::Util 1.45 qw( uniq );
 
 BEGIN {
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.015001';
+	our $VERSION   = '0.015002';
 	
 	if ( eval { require Types::Standard; 1 } ) {
 		Types::Standard->import(
@@ -131,6 +131,13 @@ sub import {
 		$INIT_ARGS->{$name} = $spec{init_arg} if exists $spec{init_arg};
 		$TRIGGERS->{$name} = $spec{trigger} if $spec{trigger};
 	}
+	
+	my %allow = map {
+		( $FLAGS->{$_} & XSCON_FLAG_NO_INIT_ARG )  ? () :
+		( $FLAGS->{$_} & XSCON_FLAG_HAS_INIT_ARG ) ? ( $INIT_ARGS->{$_} => 1 ) :
+		( $_ => 1 );
+	} @$HAS;
+	@{ fetch_vars( $package, qw/@ALLOW/ ) } = sort keys %allow;
 }
 
 sub _canonicalize_defaults {

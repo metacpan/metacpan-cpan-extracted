@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use constant _LOAD_PATH_GLOBAL => User::Information::Path->new([qw(git global)]);
 
@@ -99,9 +99,9 @@ User::Information::Source::Git - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
-~=head1 SYNOPSIS
+=head1 SYNOPSIS
 
     use User::Information::Source::Git;
 
@@ -109,11 +109,11 @@ This is a provider using git.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

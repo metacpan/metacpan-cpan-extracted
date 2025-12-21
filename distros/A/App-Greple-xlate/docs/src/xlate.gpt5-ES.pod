@@ -16,7 +16,7 @@ App::Greple::xlate - módulo de soporte de traducción para greple
 
 =head1 VERSION
 
-Version 0.9923
+Version 0.9924
 
 =head1 DESCRIPTION
 

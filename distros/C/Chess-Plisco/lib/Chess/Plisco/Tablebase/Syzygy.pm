@@ -269,7 +269,7 @@ my $dtz_before_zeroing = sub {
 };
 
 package Chess::Plisco::Tablebase::Syzygy::Testing;
-$Chess::Plisco::Tablebase::Syzygy::Testing::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::Testing::VERSION = 'v1.0.1';
 sub calc_key {
 	my (undef, $pos, $mirror) = @_;
 
@@ -295,7 +295,7 @@ sub flipdiag {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::MissingTableException;
-$Chess::Plisco::Tablebase::Syzygy::MissingTableException::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::MissingTableException::VERSION = 'v1.0.1';
 use overload '""' => sub { ${$_[0]} };
 
 sub new {
@@ -305,7 +305,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::PairsData;
-$Chess::Plisco::Tablebase::Syzygy::PairsData::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::PairsData::VERSION = 'v1.0.1';
 sub new {
 	my ($class, %args) = @_;
 
@@ -324,7 +324,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::PawnFileData;
-$Chess::Plisco::Tablebase::Syzygy::PawnFileData::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::PawnFileData::VERSION = 'v1.0.1';
 sub new {
 	my ($class) = @_;
 	bless {
@@ -336,7 +336,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::PawnFileDataDtz;
-$Chess::Plisco::Tablebase::Syzygy::PawnFileDataDtz::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::PawnFileDataDtz::VERSION = 'v1.0.1';
 sub new {
 	my ($class, %args) = @_;
 
@@ -349,7 +349,7 @@ sub new {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::Table;
-$Chess::Plisco::Tablebase::Syzygy::Table::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::Table::VERSION = 'v1.0.1';
 use integer;
 
 use Fcntl qw(O_RDONLY O_BINARY);
@@ -1104,7 +1104,7 @@ sub DESTROY {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::WdlTable;
-$Chess::Plisco::Tablebase::Syzygy::WdlTable::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::WdlTable::VERSION = 'v1.0.1';
 use Chess::Plisco qw(:all);
 
 use base qw(Chess::Plisco::Tablebase::Syzygy::Table);
@@ -1370,7 +1370,7 @@ sub probeWdlTable {
 }
 
 package Chess::Plisco::Tablebase::Syzygy::DtzTable;
-$Chess::Plisco::Tablebase::Syzygy::DtzTable::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::DtzTable::VERSION = 'v1.0.1';
 use Chess::Plisco qw(:all);
 use Chess::Plisco::Macro;
 
@@ -1652,7 +1652,7 @@ sub probeDtzTable {
 }
 
 package Chess::Plisco::Tablebase::Syzygy;
-$Chess::Plisco::Tablebase::Syzygy::VERSION = 'v1.0.0';
+$Chess::Plisco::Tablebase::Syzygy::VERSION = 'v1.0.1';
 use File::Basename qw(basename);
 use File::Globstar qw(globstar);
 use Locale::TextDomain qw('Chess-Plisco');

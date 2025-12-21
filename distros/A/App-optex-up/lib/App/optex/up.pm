@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 =encoding utf-8
 
@@ -75,6 +75,12 @@ Set the line style for ansicolumn.  Available styles are C<none>,
 C<truncate>, C<wrap>, and C<wordwrap>.  Default is C<wrap> (inherited
 from ansicolumn's document mode).
 
+=item B<--fold>, B<-F>
+
+Enable fold mode (disable page mode).  In fold mode, the entire
+content is split evenly across columns without pagination.  Page
+mode is the default.
+
 =item B<--pager>=I<COMMAND>
 
 Set the pager command.  Default is C<$PAGER> or C<less>.
@@ -86,6 +92,16 @@ Disable pager.  Output goes directly to stdout.
 =back
 
 =head1 EXAMPLES
+
+Display perldoc output in multiple columns:
+
+    optex -Mup perldoc App::optex::up
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/optex-up/main/images/perldoc.png">
+
+=end html
 
 List files in multiple columns with pager:
 
@@ -106,6 +122,10 @@ Use 2 rows (upper and lower):
 Use 2x2 grid (4-up):
 
     optex -Mup -G2x2 -- ls -l
+
+Fold mode (no pagination):
+
+    optex -Mup -F -- man perl
 
 Use a different border style:
 
@@ -169,6 +189,7 @@ my $config = Getopt::EX::Config->new(
     'height'       => undef,
     'border-style' => 'heavy-box',
     'line-style'   => undef,
+    'fold'         => undef,
     'pager'        => $ENV{PAGER} || 'less',
     'no-pager'     => undef,
 );
@@ -178,7 +199,7 @@ sub finalize {
     $config->deal_with($argv,
         'grid|G=s', 'pane-width|S=i', 'pane|C=i', 'row|R=i', 'height=i',
         'border-style|bs=s', 'line-style|ls=s',
-        'pager=s', 'no-pager|nopager');
+        'fold|F', 'pager:s', 'no-pager|nopager');
 
     if (my $grid = $config->{grid}) {
         my($c, $r) = $grid =~ /^(\d+)[x,](\d+)$/
@@ -201,10 +222,25 @@ sub finalize {
     my $pager        = $config->{pager};
     $pager .= ' -F +Gg' if $pager =~ /\bless\b/;
 
-    my $column = "ansicolumn --bs $border_style --cm BORDER=L13 -DP -C $cols";
-    $column .= " --height=$height" if defined $height;
-    $column .= " --ls $line_style" if defined $line_style;
-    my $filter = $config->{'no-pager'} ? $column : "$column|$pager";
+    # Build default ansicolumn options
+    my @ac_opts = ("--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");
+    push @ac_opts, "--height=$height" if defined $height;
+    push @ac_opts, "--ls=$line_style" if defined $line_style;
+    push @ac_opts, "--no-page" if $config->{fold};
+
+    # If command is ansicolumn, apply default options and pager
+    if (@$argv && $argv->[0] eq 'ansicolumn') {
+        # Insert defaults after 'ansicolumn', so user options take precedence
+        splice @$argv, 1, 0, @ac_opts;
+        if ($config->{'no-pager'} || $pager eq '') {
+            return;  # No filter needed
+        }
+        $mod->setopt(default => "-Mutil::filter --of='$pager'");
+        return;
+    }
+
+    my $column = join ' ', 'ansicolumn', @ac_opts;
+    my $filter = ($config->{'no-pager'} || $pager eq '') ? $column : "$column|$pager";
     $mod->setopt(default => "-Mutil::filter --of='$filter'");
 }
 

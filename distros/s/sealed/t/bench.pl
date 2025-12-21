@@ -1,7 +1,7 @@
 #!/usr/bin/env -S perl -Ilib -Iblib/arch
 use Test::More tests => 3;
 use POSIX 'dup2';
-dup2 fileno(STDERR), fileno(STDOUT);
+POSIX::dup2 fileno(STDERR), fileno(STDOUT);
 use strict;
 use warnings;
 use Benchmark ':all';

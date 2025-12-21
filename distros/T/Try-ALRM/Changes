@@ -61,3 +61,6 @@ Revision history for Perl extension Try::ALRM.
         - fixed min Perl version to 5.10 to get rid of failing test reports
         - there are no versions 0.83-0.98
         - jumped to 0.99 so we can get her to 1.0 at some point
+
+1.00 Sat Dec 20 11:04:00 2026
+	- AI assisted POD update

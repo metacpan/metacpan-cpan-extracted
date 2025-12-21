@@ -21,6 +21,8 @@ use Chess::Plisco::Engine::Position;
 use Chess::Plisco::Engine::TranspositionTable;
 use Chess::Plisco::Engine::TimeControl;
 
+use TreeFactory;
+
 sub new {
 	my ($class, $epdfile, $limit, %params) = @_;
 
@@ -82,13 +84,10 @@ sub __solve {
 		$params{mate} = $dm;
 	}
 
-	my $tree = Chess::Plisco::Engine::Tree->new(
-		position => $position,
-		tt => Chess::Plisco::Engine::TranspositionTable->new(16),
-		watcher => $self->{__watcher},
-		signatures => [$position->signature],
-	);
-	my $tc = Chess::Plisco::Engine::TimeControl->new($tree, %params);
+	my $factory = TreeFactory->new(%params);
+	my $tree = $factory->tree;
+	$tree->{position} = $position->copy;
+
 	my $move = $position->moveCoordinateNotation($tree->think);
 	if (@bm) {
 		my $found;

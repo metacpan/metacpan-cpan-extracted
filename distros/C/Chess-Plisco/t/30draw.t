@@ -27,6 +27,7 @@ my @tests = (
 	{
 		name => 'white go for draw by repetition',
 		fen => '1rrk4/7q/4N3/8/8/8/8/K7 b - - 1 1',
+		# FIXME! This conflicts with the UCI go parameter moves!
 		moves => [qw(d8e8 e6g5 e8d8 g5e6 d8e8 e6g5 e8d8)],
 		bm => [qw(g5e6)],
 		depth => 3,

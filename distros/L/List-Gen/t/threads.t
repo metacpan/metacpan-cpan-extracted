@@ -3,6 +3,11 @@ use strict;
 use warnings;
 $|=1;
 BEGIN {
+    $] >= 5.016 or eval q{
+        use Test::More skip_all => 'threads not reliable before perl 5.16';
+        exit;
+    };
+
     eval q{
         BEGIN {die if %Devel::Cover::}
         use threads;

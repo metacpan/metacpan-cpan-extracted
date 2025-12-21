@@ -1,3 +1,8 @@
+0.63 2025-12-21
+ - Remove the non-portable tests for Perl's "super" code points, testing 
+   values beyond 0x7FFF_FFFF isn’t necessary.
+ - Documentation typo corrections by @HuaChunbo
+
 0.62 2017-04-11
   - Only check for missing Module::Install related modules in Makefile.PL
 

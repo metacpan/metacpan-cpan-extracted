@@ -8,7 +8,7 @@ use 5.010;
 
 # ABSTRACT: The functionality of Env::Assert and bin/envassert.
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -201,7 +201,7 @@ Env::Assert::Functions - The functionality of Env::Assert and bin/envassert.
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

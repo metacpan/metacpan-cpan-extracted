@@ -17,7 +17,7 @@ FUNCTIONS
         $string = decode_utf8($octets);
         $string = decode_utf8($octets, $fallback);
 
-    Returns an decoded representation of $octets in UTF-8 encoding as a
+    Returns a decoded representation of $octets in UTF-8 encoding as a
     character string.
 
     $fallback is an optional "CODE" reference which provides a
@@ -34,7 +34,7 @@ FUNCTIONS
     which can't be interchanged. $is_usv is a boolean indicating whether or
     not $octets represent a encoded Unicode scalar value. $position is a
     unsigned integer containing the zero based octet position at which the
-    error occurred within the octets provided to "decode_utf8()". $fallback
+    error occurred within the octets provided to decode_utf8(). $fallback
     must return a character string consisting of zero or more Unicode scalar
     values. Unicode scalar values consist of code points in the range
     U+0000..U+D7FF and U+E000..U+10FFFF.
@@ -60,7 +60,7 @@ FUNCTIONS
     $is_usv is a boolean indicating whether or not $codepoint is a Unicode
     scalar value. $position is a unsigned integer containing the zero based
     character position at which the error occurred within the string
-    provided to "encode_utf8()". $fallback must return a character string
+    provided to encode_utf8(). $fallback must return a character string
     consisting of zero or more Unicode scalar values.Unicode scalar values
     consist of code points in the range U+0000..U+D7FF and U+E000..U+10FFFF.
 

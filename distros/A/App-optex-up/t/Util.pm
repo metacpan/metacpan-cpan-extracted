@@ -13,6 +13,13 @@ my($script, $module) = ('optex', 'App::optex');
 
 my $script_path = get_path($script, $module) or die Dumper \%INC;
 
+# Add ansicolumn script directory to PATH for child processes
+if (my $ac_path = get_path('ansicolumn', 'App::ansicolumn')) {
+    my($vol, $dir, $file) = File::Spec->splitpath($ac_path);
+    my $ac_dir = File::Spec->catpath($vol, $dir, '');
+    $ENV{PATH} = "$ac_dir:$ENV{PATH}";
+}
+
 sub optex {
     Runner->new($script_path, @_);
 }

@@ -2,8 +2,8 @@ use Test::More;
 {
 	package Foo;
 
-	use Meow;
 	use Basic::Types::XS qw/Num Str ArrayRef/;
+	use Meow;
 
 	ro only => Default(Num, sub { 100 });
 
@@ -25,8 +25,8 @@ use Test::More;
 {
 	package Zap;
 	
-	use Meow;
 	use Basic::Types::XS qw/Str/;
+	use Meow;
 	
 	rw boo => Str;
 

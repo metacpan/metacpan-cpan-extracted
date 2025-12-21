@@ -18,10 +18,9 @@ use Filter::Util::Call;
 
 our $VERSION;
 our $DEBUG;
-our $VERIFY_PREFIX = "use Types::Common -types, -sigs;";
 
 BEGIN {
-  our $VERSION = qv(8.5.1);
+  our $VERSION = qv(8.5.5);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -191,11 +190,11 @@ sub MODIFY_CODE_ATTRIBUTES {
 }
 
 sub import {
+  no warnings qw/uninitialized redefine/;
   $DEBUG                         = $_[1];
-  our $VERIFY_PREFIX = $_[2] if $DEBUG eq "verify" and @_ == 3;
   local $@;
-  my $pkg = caller;
-  eval {"package $pkg; use class; use types"}; # enable perl type system
+  my $pkg                        = caller;
+  eval "package $pkg; use types; use class"; # enable perl type system
   die $@ if $@;
   filter_add(bless []);
 }
@@ -203,14 +202,8 @@ sub import {
 sub filter {
   my ($self) = @_;
   my $status = filter_read;
-  our $VERIFY_PREFIX;
   our %rcache;
   my $pkg = caller;
-
-  # handle bare typed lexical declarations
-  s/^\s*my\s+(\w[\w:]*)\s+(\$\w+)(.)/$3 eq ";" ? qq(BEGIN{local \$@; eval "require $1"} \
-    my $1 $2; {no strict qw!vars subs!; no warnings 'once'; $2 = $1})
-    : qq(BEGIN {local \$@; eval "require $1"}my $1 $2$3)/gmse if $status > 0;
 
   # NEW in v8.x.y: handle signatures
   no warnings 'uninitialized';
@@ -223,21 +216,11 @@ sub filter {
      my $name   = $2; # sub name
      local $_   = $3; # signature's arglist
      my $suffix = "";
-     my $verify = "";
-     my (@types, @vars, @defaults);
      my $entry;
-     s{(\S+)\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
-       $entry++;
-       local $@;
-       no strict 'refs';
+     s{(\S*)\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
+       $entry++ if length $1;
 
-       my $is_ext_class = $rcache{"$pkg\::$1"} //= eval "package $pkg; require $1"
-         // eval {*{eval "no strict 'vars'; package $pkg; $1"}}
-         // eval "use types; use class; my $1 $2" // !$@;
-
-       my $class = $is_ext_class ? $1 : "";
-
-       $suffix .= "my $class $2 = ";
+       $suffix .= "my $1 $2 = ";
 
        tr!=!!d for my $default = $3;
        if (($default =~ tr!/!!d)==2) {
@@ -253,29 +236,22 @@ sub filter {
          $suffix .= "shift;"
        }
 
-       my $type = $is_ext_class ? "InstanceOf[$1]" : $1;
-       push @types, $type;
-       push @defaults, $default;
-       push @vars, substr($2,1);
-
        "$2$3$4" # drop the class/type info
     }gmse;
 
-    if ($entry and $DEBUG eq "verify") {
-      # implement signature type checks for named subs via Types::Common::signature
-
-      $verify .= "$VERIFY_PREFIX; no strict qw/vars subs/; state \$check = signature multiple => [ { named_to_list => 1, named => [";
-      $verify .= "$vars[$_] => $types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] }," : "") for 0..$#vars;
-      $verify .= "],},{ positional => [";
-      $verify .= "$types[$_], " . (length($defaults[$_]) ? "{ default => $defaults[$_] },":"") for 0..$#types;
-      $verify .= "],},]; &\$check;";
-
+    if ($DEBUG eq "verify") {
       $prefix .= " ($_,\@_dummy)";
+      $suffix = "" unless $entry;
     }
 
-    # warn "$prefix { {$verify} $suffix;
-    "$prefix { no warnings qw/experimental shadow/; {$verify} $suffix";
+#    warn "$prefix { $suffix";
+    "$prefix { no warnings qw/experimental shadow/; $suffix";
   )gmsex if $status > 0;
+
+  # handle bare typed lexical declarations
+  s/(^|;)\s*my\s+(\w[\w:]*)\s+(\$\w+)(.)/$4 eq ";"
+    ? qq($1BEGIN{local \$@; eval "require $2"} my $2 $3$4 {no strict qw!vars subs!; no warnings 'once'; $3 = $2})
+    : qq($1BEGIN{local \$@; eval "require $2"} my $2 $3$4)/gmse if $status > 0;
 
   return $status;
 }
@@ -303,13 +279,10 @@ sealed - Subroutine attribute for compile-time method lookups on its typed lexic
     use sealed 'debug';   # warns about 'method_named' op tweaks
     use sealed 'deparse'; # additionally warns with the B::Deparse output
     use sealed 'dump';    # warns with the $op->dump during the tree walk
-    use sealed 'verify';  # verifies all CV tweaks, optional VERIFY_PREFIX arg
+    use sealed 'verify';  # verifies all CV tweaks
     use sealed 'disabled';# disables all CV tweaks
     use sealed 'types';   # enables builtin Perl::Types type system optimizations
     use sealed;           # disables all warnings
-
-    VERIFY_PREFIX arg defaults to "use Types::Common -types, -sigs;", which
-    must export an equivalent API to Types::Common::signature() as "signature()".
 
     NOTE: as of 8.5.0, import activates the Perl Type System automatically.
 

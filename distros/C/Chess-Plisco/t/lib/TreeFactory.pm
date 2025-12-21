@@ -15,11 +15,14 @@ use strict;
 
 use Test::More;
 
+use Time::HiRes qw(gettimeofday);
+
 use Chess::Plisco::EPD;
 use Chess::Plisco::Engine::Tree;
 use Chess::Plisco::Engine::Position;
 use Chess::Plisco::Engine::TranspositionTable;
 use Chess::Plisco::Engine::TimeControl;
+use Chess::Plisco::Engine::LimitsType;
 
 sub new {
 	my ($class, %args) = @_;
@@ -44,8 +47,34 @@ sub new {
 		info => $info,
 		signatures => \@signatures,
 	);
+	if ($args{mate}) {
+		$tree->{max_depth} = 2 * $args{mate} - 1;
+	} elsif ($args{depth}) {
+		$tree->{max_depth} = $args{depth};
+	}
 
-	my $tc = Chess::Plisco::Engine::TimeControl->new($tree, %args);
+	my $tc = Chess::Plisco::Engine::TimeControl->new($tree);
+
+	my $limits = Chess::Plisco::Engine::LimitsType->new;
+	$limits->{time}->[0] = $args{wtime};
+	$limits->{time}->[1] = $args{btime};
+	$limits->{inc}->[0] = $args{winc};
+	$limits->{inc}->[1] = $args{binc};
+	$limits->{start_time} = [gettimeofday];
+	$limits->{movestogo} = $args{movestogo};
+	$limits->{depth} = $args{depth};
+	$limits->{infinite} = $args{infinite};
+	$limits->{ponder} = $args{ponder};
+	$limits->{nodes} = $args{nodes};
+	$limits->{mate} = $args{mate};
+
+	my %params;
+	$params{move_overhead} = 10;
+	$params{ponder} = $args{ponder};
+
+	my $tc = Chess::Plisco::Engine::TimeControl->new($tree);
+	my $original_time_adjust = -1;
+	$tc->init($limits, $position->turn, $position->halfmoves + 1, \%params, $original_time_adjust);
 
 	bless {
 		__tree => $tree,

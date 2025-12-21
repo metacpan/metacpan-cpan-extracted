@@ -9,6 +9,7 @@
 package Finance::Currency::Convert;
 
 use strict;
+use warnings;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
 require Exporter;
@@ -21,7 +22,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '2.03';
+$VERSION = '2.08';
 
 my %EuroRates = (
          BEF => {EUR=>0.0247899055505,   BEF => 1},
@@ -57,7 +58,7 @@ sub new() {
 	$self->{RatesFile} = $ratesFile;
 	$self->{UserAgent} = "Finance::Currency::Convert $VERSION";
 	bless($self, $class);
-	$self->readRatesFile() if (defined($ratesFile));
+	$self->readRatesFile() if (defined($ratesFile) && (-e $self->{RatesFile}));
 	return $self;
 }
 
@@ -72,12 +73,12 @@ sub setRate() {
 sub setRatesFile() {
 	my $self = shift;
 	$self->{RatesFile} = shift;
-	$self->readRatesFile();
+	$self->readRatesFile() if (-e $self->{RatesFile});
 }
 
 sub readRatesFile() {
 	my $self = shift;
-	if (!defined $self->{RatesFile} || !-r $self->{RatesFile} || !-s $self->{RatesFile} > 0) {
+	if (!defined $self->{RatesFile} || !(-r $self->{RatesFile}) || !(-s $self->{RatesFile}) > 0) {
 		warn("Can't read $self->{RatesFile}\n");
 		return;
 	}
@@ -104,6 +105,7 @@ sub writeRatesFile() {
 		print RATES "$sourcerate|";
 		foreach my $targetrate (sort keys %{ $self->{CurrencyRates}{$sourcerate}}) {
 			if (exists($self->{CurrencyRates}{$sourcerate}{$targetrate})
+				&& defined($self->{CurrencyRates}{$sourcerate}{$targetrate})
 				&& $self->{CurrencyRates}{$sourcerate}{$targetrate} ne '') {
 				print RATES "$targetrate=" . $self->{CurrencyRates}{$sourcerate}{$targetrate} . ":";
 			}
@@ -202,8 +204,7 @@ __END__
 
 =head1 NAME
 
-Finance::Currency::Convert -
-Convert currencies and fetch their exchange rates (with Finance::Quote)
+Finance::Currency::Convert - Convert currencies and fetch their exchange rates
 
 =head1 SYNOPSIS
 
@@ -225,7 +226,7 @@ Convert currencies and fetch their exchange rates (with Finance::Quote)
 =head1 DESCRIPTION
 
 This module converts currencies. It has built in the fixed exchange
-rates for all Euro currencies (as of November 2000). If you wish to use other / more
+rates for all Euro currencies (as of December 2025). If you wish to use other / more
 currencies, you can automatically fetch their exchange rates from
 the internet and (optionally) store them in a file for later reference.
 
@@ -366,6 +367,16 @@ with updateRates.
 =head1 AUTHOR
 
   Jan Willamowius <jan@willamowius.de>, https://www.willamowius.de/perl.html
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2001 - 2025 by Jan Willamowius
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.30.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
 
 =head1 SEE ALSO
 

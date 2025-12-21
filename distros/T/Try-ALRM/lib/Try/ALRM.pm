@@ -3,7 +3,7 @@ use warnings;
 
 package Try::ALRM;
 
-our $VERSION = q{0.99};
+our $VERSION = q{1.00};
 
 use Exporter qw/import/;
 our @EXPORT    = qw(try_once retry ALRM finally timeout tries);
@@ -110,460 +110,255 @@ __PACKAGE__
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Try::ALRM - Provides try/catch-like semantics for an ALRM thrown by CORE::alarm
+Try::ALRM - Try/catch-style semantics for handling timeouts using CORE::alarm
 
 =head1 SYNOPSIS
 
-The primary method in this module is meant to be C<retry>,
+C<Try::ALRM> provides a structured, readable way to use C<alarm> and
+C<$SIG{ALRM}> without scattering signal handlers, local variables, and
+cleanup logic throughout your code.
+
+The primary entry point is C<retry>, which retries a block multiple times
+when an alarm fires:
+
+    use Try::ALRM;
 
     retry {
-      my ($attempts) = @_;                # @_ is populated as described in this line
-      printf qq{Attempt %d/%d ... \n}, $attempts, tries;
+      my ($attempts) = @_;
+      printf "Attempt %d/%d...\n", $attempts, tries;
       sleep 5;
     }
     ALRM {
-      my ($attempts) = @_;                # @_ is populated as described in this line
-      printf qq{\tTIMED OUT};
-      if ( $attempts < tries ) {
-          printf qq{ - Retrying ...\n};
-      }
-      else {
-          printf qq{ - Giving up ...\n};
+      my ($attempts) = @_;
+      print "\tTIMED OUT";
+      if ($attempts < tries) {
+        print " - retrying...\n";
+      } else {
+        print " - giving up...\n";
       }
     }
     finally {
-      my ( $attempts, $successful ) = @_; # Note: @_ is populated as described in this line when called with retry
-      my $tries   = tries;                # "what was the limit on number of tries?" Here it will be 4
-      my $timeout = timeout;              # "what was the timeout allowed?" Here it will be 3
+      my ($attempts, $successful) = @_;
+      my $limit   = tries;
+      my $timeout = timeout;
 
-      # test and handle ultimate outcome after attempts
       if ($successful) {
-        # timeout did NOT occur after $attempts attempts 
+        print "Succeeded after $attempts attempts\n";
+      } else {
+        print "Failed after $limit attempts\n";
       }
-      else {
-        # timeout DID occur after trying $tries times
-      }
-    } timeout => 3, tries => 4;
+    }
+    timeout => 3,
+    tries   => 4;
 
-Which is equivalent to ... well, checkout the implementation of C<Try::ALRM::retry(&;@)>,
-because it is equivalent to that I<:-)>.
+=head2 Single-attempt usage
 
-However, it should be pointed out that the module provides a method called, C<try_once>,
-that is a reduced case of C<retry> where C<< tries => 1 >>.  There might be benefits to
-using C<retry> instead, but the code might not ready very clearly with the workd I<retry>.
-Originally, there was a method called C<try>, but because this might conflict with a more
-popular module that exports a C<try> keyword, the decision was made to use C<try_once>.
-It's not pretty, but it's clear.
+C<try_once> is a reduced form of C<retry> equivalent to C<< tries => 1 >>.
+It exists because “retry” can read awkwardly when no retry is intended.
 
-    use Try::ALRM;
-     
     try_once {
-      my ($attempts) = @_;                # @_ is populated as described in this line
-      print qq{ doing something that might timeout ...\n};
+      my ($attempts) = @_;
+      print "Doing something that might timeout...\n";
       sleep 6;
     }
     ALRM {
-      my ($attempts) = @_;                # @_ is populated as described in this line
-      print qq{ Wake Up!!!!\n};
+      print "Wake up!\n";
     }
     finally {
-      my ( $attempts, $successful ) = @_; # Note: @_ is populated as described in this line when called with retry
-      my $tries   = tries;                # "what was the limit on number of tries?" Here it will be 4
-      my $timeout = timeout;              # "what was the timeout allowed?" Here it will be 3
+      my ($attempts, $successful) = @_;
+      print $successful ? "Completed\n" : "Timed out\n";
+    }
+    timeout => 1;
 
-      # test and handle ultimate outcome after attempts
-      if ($successful) {
-        # timeout did NOT occur after $attempts attempts 
-      }
-      else {
-        # timeout DID occur after trying $tries times
-      }
-    } timeout => 1;
+=head1 IMPROVEMENT OVER RAW alarm
 
-Which is essentially equivalent to just,
+=head2 Traditional alarm usage
 
-    local $SIG{ALRM} = sub { print qq{ Wake Up!!!!\n} };
+    local $SIG{ALRM} = sub {
+        print "Wake up!\n";
+    };
+
     alarm 1;
-    print qq{ doing something that might timeout ...\n};
+    print "Doing something that might timeout...\n";
     sleep 6;
-    alarm 0; # reset alarm, end of 'try' block implies this "reset"
+    alarm 0;
+
+This works, but quickly becomes hard to reason about when retries,
+cleanup, or shared state are involved.
+
+=head2 Equivalent Try::ALRM version
+
+    try_once {
+      print "Doing something that might timeout...\n";
+      sleep 6;
+    }
+    ALRM {
+      print "Wake up!\n";
+    }
+    timeout => 1;
+
+What improved:
+
+=over 4
+
+=item *
+Signal handling is localized and declarative
+
+=item *
+C<alarm 0> cleanup is automatic
+
+=item *
+Retry and finalization hooks are explicit
+
+=item *
+Control flow reads top-to-bottom
+
+=back
 
 =head1 DESCRIPTION
 
-C<Try::ALRM> provides I<try/catch>-like semantics for handling code being
-guarded by C<alarm>. Because it's localized and I<probably> expected, C<ALRM>
-signals can be treated as exceptions.
+C<Try::ALRM> provides try/catch-like semantics around C<alarm>.
+Because C<ALRM> signals are localized and expected, they can be treated
+as a form of exception without using C<die>.
 
-C<alarm> is extremely useful, but it can be cumbersome do add in code. The
-goal of this module is to make it more idiomatic, and therefore more accessible.
-It also allows for the C<ALRM> signal itself to be treated more semantically
-as an exception. Which makes it a more natural to write and read in Perl.
+Internally, this module uses Perl prototypes to coerce lexical blocks
+into C<CODE> references, in the same spirit as L<Try::Tiny>. The result
+is a structured syntax:
 
-Internally, the I<keywords> are implemented as prototypes and uses the same
-sort of coersion of a lexical bloc to a subroutine reference that is used
-in L<Try::Tiny>.
+    retry { ... }
+    ALRM  { ... }
+    finally { ... }
+
+This structure improves readability without changing the underlying
+mechanics of C<alarm> or C<$SIG{ALRM}>.
 
 =head1 EXPORTS
 
-This module exports 6 methods:
+This module exports six keywords.
 
-B<NOTE>: C<Try::ALRM::try_once> and C<Try::ALRM::retry> are mutually exclusive, but
-one of them is I<required> to invoke any benefits of using this module.
+B<NOTE>: Either C<try_once> or C<retry> is required. They are mutually
+exclusive.
+
+=head2 try_once BLOCK
+
+Runs BLOCK once with an alarm set to the current timeout value.
+
+If an alarm fires, the C<ALRM> block is executed (if provided), followed
+by C<finally>. The alarm is always cleared automatically.
+
+=head2 retry BLOCK
+
+Runs BLOCK up to C<tries> times. Each attempt receives the current
+attempt count via C<@_>.
+
+Retries stop when either:
 
 =over 4
 
-=item C<try_once BLOCK>
+=item *
+The block completes without an alarm
 
-Meant to be used I<instead> of C<Try::ARLM::retry>.
-
-Primary BLOCK, attempted once with a timeout set by C<$Try::ALRM::TIMEOUT>. If
-an C<ALRM> signal is sent, the BLOCK described by C<ALRM> will be called to handle
-the signal. If C<ALRM> is not defined, the normal mechanisms of handling C<$SIG{ALRM}>
-will be employed. Mutually exclusive of C<retry>.
-
-Accepts blocks: C<ALRM>, C<finally>; and trailing modifier C<< timeout => INT >>.
-
-B<Note>: that C<try_once> is essentially a trival case of C<retry> with C<< tries => 1 >>; and
-in the future it may just become a wrapper around this case. For now it is its own
-independant implementation.
-
-=item C<retry BLOCK>
-
-Meant to be the primary method, not to be used with C<Try::ARLM::try_once>.
-
-Primary BLOCK, attempted C<$Try::ALRM::TRIES> number of times with a timeout
-governed by C<$Try::ALRM::TIMEOUT>. If an C<ALRM> signal is sent and the number
-of C<tries> has not been exhausted, the C<retry> BLOCK will be tried again.
-This continues until an C<ALRM> signal is not triggered or if the number of
-C<$Try::ALRM::TRIES> has been reached.
-
-Accepts blocks: C<ALRM>, C<finally>; and trailing modifiers C<< timeout => INT >>,
-and C<< tries => INT >>.
-
-C<retry> makes values available to each C<BLOCK> that is called via C<@_>, see
-description of each BLOCK below for more details. This also applies to the BLOCK
-provided for C<retry>.
-
-I<NB>:
-
-B<BLOCK> is treated as a C<CODE> block internally, and is passed a single value
-that defines what number attempt, please see the examples; all of which contain
-lines such as,
-
-  my $attempts = shift;
-  ...
-
-=item C<ALRM BLOCK>
-
-Optional.
-
-Called when an C<ALRM> signal is detected. If no C<ALRM> BLOCK is defined and
-C<$SIG{ALRM}> is not a assigned a C<CODE> ref to handle an I<ALRM> signal, then
-not including the C<ALRM> block ends up being a I<no-op> in most cases.
-
-When called with C<retry>, C<@_> contains the number of attempts that have been
-made so far.
-
-  retry {
-    ...
-  }
-  ALRM {
-    my ($attempts) = @_;
-  };
-
-I<NB>:
-
-B<BLOCK> is treated as a C<CODE> block internally, and is passed a single value
-that defines what number attempt, please see the examples; all of which contain
-lines such as,
-
-  my $attempts = shift;
-  ...
-
-=item C<finally BLOCK>
-
-Optional.
-
-This BLOCK is called unconditionally. When called with C<try_once>, C<@_> contains an
-indication there being a timeout or not in the attempted block.
-
-When called with C<retry>, C<@_> also contains the number of attempts that have been
-made before the attempts ceased. There is also a value that is passed that indicates
-if C<ALRM> had been invoked;
-
-  ...
-  finally {
-    my ($attempts, $succeedful) = @_; 
-  };
-
-When used with C<try_once>, C<@_> is empty. Note that C<try_once> is essentially a trival case
-of C<retry> with C<< tries => 1 >>; and in the future it may just become a wrapper around
-this case.
-
-B<BLOCK> is treated as a C<CODE> block internally, and is passed a single value
-that defines what number attempt, please see the examples; all of which contain
-lines such as,
-
-  my ($attempts, $successful) = @_;
-  ...
-
-=item C<timeout INT>
-
-Setter/getter for C<$Try::ALRM::TIMEOUT>, which governs the default timeout in number
-of seconds. This can be temporarily overridden using the trailing modifier C<< timeout => INT >>
-that is supported via C<try_once> and C<retry>. 
-
-  timeout 10; # sets $Try::ALRM::TIMEOUT to 10
-  try_once {
-    ...
-  }
-  ALRM {
-    my ($attempts) = @_;
-  };
-
-Can be overridden by I<trailing modifier>, C<< timeout => INT >>.
-
-The default value is in the code, but at the time of this writing
-it is set to B<60> seconds.
-
-=item C<tries INT>
-
-Setter/getter for C<$Try::ALRM::TRIES>, which governs the number of attempts C<retry>
-will make before giving up. This can be temporarily overridden using the trailing modifier
-C<< tries => INT >> that is supported via C<retry>.
-
-  timeout 10; # sets $Try::ALRM::TIMEOUT to 10
-  tries   12; # sets $Try:::ALRM::TRIES to 12 
-  retry {
-    ...
-  }
-  ALRM {
-    my ($attempts) = @_;
-  };
-
-Can be overridden by I<trailing modifier>, C<< tries => INT >>.
-
-The default value is in the code, but at the time of this writing
-it is set to B<3> attempts.
+=item *
+The retry limit is reached
 
 =back
+
+=head2 ALRM BLOCK
+
+Optional handler executed when an alarm fires. Receives the current
+attempt count.
+
+=head2 finally BLOCK
+
+Optional block executed unconditionally at the end.
+
+Receives:
+
+    my ($attempts, $successful) = @_;
+
+=head2 timeout INT
+
+Getter/setter for the default timeout in seconds.
+
+May also be supplied as a trailing modifier:
+
+    try_once { ... } timeout => 2;
+
+=head2 tries INT
+
+Getter/setter for retry limit.
+
+May also be supplied as a trailing modifier:
+
+    retry { ... } tries => 5;
 
 =head1 PACKAGE ENVIRONMENT
 
-This module exposes C<$Try::ALRM::TIMEOUT> and C<$TRY::ALRM::TRIES> as
-package variables; they can be modified in traditional ways. The module also
-provides different ways to set these at both script or package scope (using
-the C<timeout> and C<tries> setters, respectively), and at a local execution
-scope (using I<trailing modifiers>.
-
-=head1 USAGE
-
-L<Try::ALRM> doesn't really have options, it's more of a structure. So this
-section is meant to descript that structure and ways to control it. 
+The following package variables are exposed:
 
 =over 4
 
-=item C<try_once>
+=item *
+C<$Try::ALRM::TIMEOUT>
 
-This familiar idiom include the block of code that may run longer than one
-wishes and is need of an C<alarm> signal.
-
-  # default timeout is $Try::ALRM::TIMEOUT
-  try {
-    this_subroutine_call_may_timeout();
-  };
-
-If just C<try_once> is used here, what happens is functionall equivalent to:
-
-  alarm 60; # e.g., the default value of $Try::ALRM::TIMEOUT
-  this_subroutine_call_may_timeout();
-  alarm 0;
-
-And the default handler for C<$SIG{ALRM}> is invoked if an C<ALRM> is
-ssued.
-
-=item C<retry>
-
-  # default timeout is $Try::ALRM::TIMEOUT
-  # default number of tries is $Try::ALRM::TRIES
-  retry {
-    this_subroutine_call_may_timeout_and_we_want_to_retry();
-  };
-
-=item C<ALRM>
-
-This keyword is for setting C<$SIG{ALRM}> with the block that gets passed to
-it; e.g.:
-
-  # default timeout is $Try::ALRM::TIMEOUT
-  try {
-    this_subroutine_call_may_timeout();
-  }
-  ALRM {
-    print qq{ Alarm Clock!!!!\n};
-  };
-
-The addition of the C<ALRM> block above is functionally equivalent to the typical
-idiom of using C<alarm> and setting C<$SIG{ALRM}>,
-
-  local $SIG{ALRM} = sub { print qq{ Alarm Clock!!!!\n} };
-  alarm 60; # e.g., the default value of $Try::ALRM::TIMEOUT
-  this_subroutine_call_may_timeout();
-  alarm 0;
-
-So while this module present C<alarm> with I<try/catch> semantics, there are no
-actualy exceptions getting thrown via C<die>; the traditional signal handling mechanism
-is being invoked as the exception handler.
+=item *
+C<$Try::ALRM::TRIES>
 
 =back
+
+They may be set globally, lexically (via setters), or temporarily via
+trailing modifiers.
 
 =head1 TRAILING MODIFIERS
 
-A side effect of using Perl I<prototypes> to achieve the block structure of this module
-is that passing options is much more naturally done so as a comma delimited list of
-trailing I<key>/I<value> pairs at the end of the entire stucture.
+Trailing modifiers are written as key/value pairs after the final block:
 
-As has been show in the previous examples, the modifiers are specifed as follows:
-
-  retry {
-    ...
-  }
-  ALRM {
-    ...
-  },
-  finally {
-    ...
-  } timeout => 5, tries => 10;
-
-  #^^ Note, there is NO comma between the closing '}' and 'timeout'; this
-  # is due the implementation using a prototype that results in keyword syntax
-  # similar to grep or map, e.g., map { } key1 => $val1, key2 => $val2;
-
-This style of providing modifiers to the behavior of the C<retry>/C<try_once>
-block is referred to here as I<trailing modifiers>.
-
-This module has two trailing modifiers that can be set.
-
-=over 4
-
-=item C<< timeout => INT >>
-
-Due to limitations with the way Perl prototypes work for creating syntactical structures,
-the most idiomatic solution is to use a setter/getter function to update the package
-variable:
-
-  timeout 10; # changes $Try::ALRM::TIMEOUT to 10
-  try {
-    this_subroutine_call_may_timeout();
-  }
-  ALRM {
-    print qq{ Alarm Clock!!!!\n};
-  };
-
-If used without an input value, C<timeout> returns the current value of C<$Try::ALRM::TIMEOUT>.
-
-=item Trailing after the last BLOCK
-
-  try {
-    this_subroutine_call_may_timeout();
-  }
-  ALRM {
-    print qq{ Alarm Clock!!!!\n};
-  } timeout => 10; # NB: applies temporarily!
-
-This approach utilizes the effect of defining a Perl prototype, C<&>, which coerces a lexical
-block into a subroutine reference (i.e., C<CODE>). The I<< key => value >> syntax was chosen as
-a compromise because it makes things a lot more clear I<and> makes the implementation of the
-blocks a lot easier (use the source to see how, I<Luke>).
-
-The timeout value passed to C<alarm> internally is controlled with the package variable,
-C<$Try::ALRM::TIMEOUT>. So this module presents 2 different ways to control the value of
-this variable.
-
-The addition of this timeout affects $Try::ALRM::TIMEOUT for the duration of the C<try_once> block,
-internally is using C<local> to set C<$Try::ALRM::TIMEOUT>. The reason for this is so that
-C<timeout> may continue to function properly as a getter I<inside> of the C<try_once> block.
-
-=item C<< tries => INT >>
-
-Sets the number of attempts made by a C<retry> block. Impacts the value of C<Try::ALRM::TIMEOUT>
-locally for each C<retry> block. See code examples in this document to see what a C<retry>
-block with C<< tries => INT >> looks like.
-
-=back
-
-=head3 C<try_once>/C<ALRM>/C<finally> Examples
-
-Using the two methods above, the following code demonstrats the usage of C<timeout> and the
-effect of the trailing timeout value,
-
-    # set timeout (persists)
-    timeout 5;
-    printf qq{now %d seconds timeout\n}, timeout;
-     
-    # try/ALRM
-    try {
-      printf qq{ doing something that might timeout before %d seconds are up ...\n}, timeout;
-      sleep 6;
+    retry {
+      ...
     }
     ALRM {
-      print qq{Alarm Clock!!\n};
-    } timeout => 1; # <~ trailing timeout
-    
-    # will still be 5 seconds
-    printf qq{now %d seconds timeout\n}, timeout;
+      ...
+    }
+    finally {
+      ...
+    } timeout => 5, tries => 10;
 
-The output of this block is,
+This mirrors Perl constructs like C<map> and C<grep>.
 
-  default timeout is 60 seconds
-  timeout is set globally to 5 seconds
-  timeout is now set locally to 1 seconds
-  Alarm Clock!!
-  timeout is set globally to 5 seconds
+=head1 WHY USE THIS MODULE?
 
-=head2 Setting the Number of Tries
-
-The number of total attempts made by C<retry> is controlled by the package variable,
-C<$Try::ALRM::TRIES>. And it provides similar controls to what is provided for controlling
-the timeout.
+C<Try::ALRM> does not replace C<alarm>.
+It makes C<alarm>-based logic:
 
 =over 4
 
-=item Using the C<tries> keyword will affect the package variable C<$Try::ALRM::TRIES> if
-passed an integer value. If passed nothing, the current value of C<$Try::ALRM::TRIES> will
-be returned
+=item *
+Easier to read
 
-=item Trailing value after the last BLOCK
+=item *
+Safer to modify
 
-An example is best here,
+=item *
+Less error-prone
 
-  retry {
-    ...
-  } timeout => 10, tries => 5;
-
-Using the trailing values in this way allows the number of attempts to be temporarily
-set to the RHS value of C<< tries => >>.
+=item *
+More expressive
 
 =back
 
-=head1 Bugs
+=head1 BUGS
 
-Very likey. This project was motivated by a couple of factors: learning
-more about Perl I<prototypes> (which this author finds awesome) and
-seeing if C<ALRM> can be treated as a localized exception (turns out,
-I<it can!>).
+Almost certainly.
 
-Milage May Vary, as I<they> say. If found, please file issue on GH repo.
+This module was motivated both by curiosity about Perl prototypes and
+by the practical question of whether C<ALRM> could be treated as a
+localized exception.
 
-The module's purpose is essentially complete, and changes that are made
-will be strictly to fix bugs in the code or POD. Please report them, and
-I will find them eventually.
-
-=head1 AUTHOR
-
-oodler577
+Mileage may vary. Please report issues.
 
 =head1 PERL ADVENT 2022
 
@@ -574,14 +369,17 @@ oodler577
 
 =head1 ACKNOWLEDGEMENTS
 
-"I<This module is dedicated to the least of you amongst us and to all
-of those who have died suddenly.>"
+"I<This module is dedicated to the least of you amongst us, the defenseless
+unborn, and to all of those who have died suddenly.>"
+
+=head1 AUTHOR
+
+Brett Estrade (OODLER) L<< <oodler@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by oodler577
+Copyright (C) 2022-Present by Brett Estrade
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.30.0
-or, at your option, any later version of Perl 5 you may have
-available.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

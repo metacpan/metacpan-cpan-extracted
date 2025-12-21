@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 30;
 use lib qw(../lib lib t/lib);
 use List::Gen::Lazy '*';
 use List::Gen::Testing;
@@ -40,6 +40,23 @@ use List::Gen::Testing;
 }
 {
     my $gen;
+    my $pipe = lazypipe 3, 2, 0, $gen, 42;
+
+    t 'lazypipe start 3',
+        is => $pipe->next, 3;
+
+    $gen = mutable gen {done if $_ > 5; $_**2} 1, 10;
+
+    my @got;
+    while ((my $x) = $pipe->next) {
+        push @got, $x;
+    }
+
+    t 'lazypipe rest 3',
+        is => "@got", '2 0 1 4 9 16 25 42';
+}
+{
+    my $gen;
     my $pipe = lazyflatten 3, 2, 0, $gen, do {my $x = 5; sub {$x > 0 ? $x-- : ()}}, 42;
 
     t 'lazyflatten start',
@@ -69,6 +86,23 @@ use List::Gen::Testing;
 
     t 'lazyflatten rest 2',
         is => "@got", '2 0 1 4 9 16 25 36 49 64 81 100 5 4 3 2 1 42';
+}
+{
+    my $gen;
+    my $pipe = lazyflatten 3, 2, 0, $gen, do {my $x = 5; sub {$x > 0 ? $x-- : ()}}, 42;
+
+    t 'lazyflatten start 3',
+        is => $pipe->next, 3;
+
+    $gen = mutable gen {done if $_ > 5; $_**2} 1, 10;
+
+    my @got;
+    while ((my $x) = $pipe->next) {
+        push @got, $x;
+    }
+
+    t 'lazyflatten rest 3',
+        is => "@got", '2 0 1 4 9 16 25 5 4 3 2 1 42';
 }
 {
     my $fib; $fib = lazy 0, 1, gen {$fib->($_) + $fib->($_ + 1)};

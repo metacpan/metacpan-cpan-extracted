@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -18,7 +18,7 @@ use File::ValueFile::Simple::Reader;
 use User::Information::Base;
 use User::Information::Path;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %_typeinfo = (
     (map {$_ => 'bool'}             qw(directory-add-analyze file-on-unlink-to-tag pool-lazy-cache-reload pool-lazy-store-reload httpd-reuse-address)),
@@ -123,7 +123,7 @@ User::Information::Source::Tagpool - generic module for extracting information f
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -133,11 +133,11 @@ This is a provider for tagpool data.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provides try/catch-like semantics for an ALRM thrown by CORE::alarm",
+  "ABSTRACT" => "Try/catch-style semantics for handling timeouts using CORE::alarm",
   "AUTHOR" => "oodler577 <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.99",
+  "VERSION" => "1.00",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -9,8 +9,8 @@ MANIFEST.SKIP
 t/basic.t
 t/data/firefox.png
 t/data/pngified.txt
-t/data/somesulmic.jpg
-t/data/sunrise.jpg
+t/data/somesulmic.jpeg
+t/data/sunrise.jpeg
 t/data/tolstoy.png
 t/imager.t
 xt/pod.t

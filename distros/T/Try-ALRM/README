@@ -1,7 +1,7 @@
 This archive contains the distribution Try-ALRM,
-version 0.99:
+version 1.00:
 
-  Provides try/catch-like semantics for an ALRM thrown by CORE::alarm
+  Try/catch-style semantics for handling timeouts using CORE::alarm
 
 This software is copyright (c) 2022-present by oodler577.
 

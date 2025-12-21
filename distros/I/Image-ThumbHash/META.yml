@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/mauke/Image-ThumbHash/issues
   repository: https://codeberg.org/mauke/Image-ThumbHash.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

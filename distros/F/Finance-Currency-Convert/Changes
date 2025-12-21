@@ -50,3 +50,16 @@ Revision history for Perl extension Finance::Currency::Convert.
 2.03  Mon Dec 15 14:00:00 CEST 2025
 	- fix: error handling when rate file isn't readable
 
+2.04  Mon Dec 20 12:00:00 CEST 2025
+	- add 2 tests
+	- improve module meta data
+
+2.05  Mon Dec 20 12:30:00 CEST 2025
+	- fix tests when Finance::Quote is not available
+
+2.06  Mon Dec 20 18:30:00 CEST 2025
+	- set dummy rates when testing without Finance::Quote
+
+2.07  Mon Dec 20 19:30:00 CEST 2025
+	- fix warning when rates file doesn't exist, yet
+

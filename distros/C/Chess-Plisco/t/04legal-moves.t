@@ -103,6 +103,13 @@ my @tests = (
 		fen => 'r4rk1/1p3pp1/1q2b2p/1B2R3/1Q2n3/1K2PN2/1PP3PP/7R w - - 3 22',
 		moves => [qw(e5e6 e5d5 b4c4 b5c4 c2c4)],
 	},
+	{
+		name => 'GitHub #42',
+		fen => '3r1r2/pp5k/1n6/4Pp2/4B3/3p4/P2Q1K2/8 w - f6 0 31',
+		moves => [qw(a2a3 a2a4 d2a5 d2b2 d2b4 d2c1 d2c2 d2c3 d2d1 d2d3 d2e1
+			d2e2 d2e3 d2f4 d2g5 d2h6 e4b7 e4c6 e4d3 e4d5 e4f3 e4f5 e4g2 e4h1
+			e5e6 e5f6 f2e1 f2e3 f2f1 f2f3 f2g1 f2g2 f2g3)]
+	},
 );
 
 foreach my $test (@tests) {

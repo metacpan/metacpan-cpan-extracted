@@ -45,6 +45,7 @@ Options:
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
   --arg NAME VALUE     Set jq-style variable $NAME to the string VALUE
+  --rawfile NAME FILE  Set jq-style variable $NAME to the raw contents of FILE
   --argjson NAME JSON  Set jq-style variable $NAME to a JSON-decoded value
   -f, --from-file FILE Read jq filter from FILE instead of the command line
                           (use '-' to read the filter from STDIN)
@@ -114,6 +115,33 @@ GetOptions(
 
         $arg_vars{$var_name} = $decoded;
     },
+    'rawfile=s'        => sub {
+        my ($opt_name, $var_name) = @_;
+        die "[ERROR] --rawfile requires a variable name\n" if !defined $var_name || $var_name eq '';
+        if ($var_name !~ /^[A-Za-z_]\w*$/) {
+            die "[ERROR] Invalid variable name '$var_name' for --rawfile\n";
+        }
+        die "[ERROR] --rawfile requires a file path\n" if !@ARGV;
+        my $file_path = shift @ARGV;
+        $file_path = '' unless defined $file_path;
+
+        if (!-f $file_path) {
+            warn "[ERROR] Cannot open file '$file_path' for --rawfile $var_name: $!\n";
+            exit 2;
+        }
+
+        open my $fh, '<', $file_path
+          or do {
+            warn "[ERROR] Cannot open file '$file_path' for --rawfile $var_name: $!\n";
+            exit 2;
+          };
+        local $/;
+        my $content = <$fh>;
+        close $fh;
+        $content = '' unless defined $content;
+
+        $arg_vars{$var_name} = $content;
+    },
 ) or die "[ERROR] Unknown option(s)\n";
 
 if ($help_functions) {
@@ -127,7 +155,7 @@ if ($want_help) {
 }
 
 if ($want_version) {
-    print "jq-lite version $JQ::Lite::VERSION\n";
+    print "jq-lite $JQ::Lite::VERSION (c) Shingo Kawamura\n";
     exit 0;
 }
 
@@ -664,3 +692,123 @@ EOF
 }
 
 print_results(@results);
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+jq-lite - minimal jq-style JSON filter (pure Perl)
+
+=head1 SYNOPSIS
+
+  jq-lite [options] filter [file ...]
+
+  cat users.json | jq-lite '.users[].name'
+  jq-lite '.items | sort | first' data.json
+  jq-lite -R -s -c 'split("\n")' logfile.txt
+
+=head1 DESCRIPTION
+
+B<jq-lite> is a lightweight, jq-style JSON filter implemented
+entirely in pure Perl.
+
+It is intended for use on systems where B<jq> is unavailable but Perl
+is present, providing awk/sed-like convenience for processing JSON
+and YAML data.
+
+Features include:
+
+=over 4
+
+=item *
+
+jq-style filters: dot traversal, pipes, basic selectors,
+and commonly used built-in functions
+
+=item *
+
+Command-line options such as C<-R>, C<-r>, C<-c>, C<-a>, C<--slurp>,
+C<--null-input>, C<--from-file>, C<--arg>, C<--argjson>,
+C<--rawfile>, and C<--yaml>
+
+=item *
+
+Pure Perl implementation with no XS, no external binaries,
+and no runtime dependencies beyond core modules
+
+=back
+
+B<jq-lite> aims to be compatible with B<jq> where practical,
+but does not implement all jq features.
+
+It is not a drop-in replacement for jq, but a pragmatic alternative
+for constrained or minimal environments.
+
+In particular, some advanced expressions and comparisons may behave
+differently from jq.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-r>, B<--raw-output>
+
+Output strings without JSON quoting.
+
+=item B<-R>, B<--raw-input>
+
+Read input as raw text, treating each line as a separate value.
+Use B<-s> together with B<-R> to process the entire input as a single string.
+
+=item B<-s>, B<--slurp>
+
+Read the entire input into a single value.
+
+=item B<-a>, B<--ascii-output>
+
+Escape non-ASCII characters in output.
+
+=item B<--arg> I<name> I<value>
+
+Define a string variable.
+
+=item B<--argjson> I<name> I<value>
+
+Define a JSON variable.
+
+=item B<--yaml>
+
+Force YAML input parsing.
+
+=item B<-h>, B<--help>
+
+Display help and exit.
+
+=back
+
+=head1 SEE ALSO
+
+L<JQ::Lite>,
+B<jq>(1),
+B<awk>(1),
+B<sed>(1),
+B<perl>(1)
+
+=head1 HOMEPAGE
+
+https://kawamurashingo.github.io/JQ-Lite/
+
+=head1 AUTHOR
+
+川村慎吾 (Shingo Kawamura)
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is released under the same terms as Perl itself.
+
+=head1 DISCLAIMER
+
+jq-lite is provided "as is", without warranty of any kind.
+

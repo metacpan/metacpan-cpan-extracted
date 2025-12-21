@@ -1,4 +1,3 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -7,7 +6,7 @@
 
 package File::URIList;
 
-use v5.10;
+use v5.20;
 use strict;
 use warnings;
 
@@ -15,13 +14,13 @@ use Fcntl qw(SEEK_SET);
 use URI;
 use URI::file;
 use Carp;
-use parent 'Data::Identifier::Interface::Userdata';
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
 use constant {
     CRLF => "\015\012",
 };
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_check_defaults = (
     blank_lines => 'die',
@@ -97,7 +96,7 @@ sub write_list {
                 print $fh $ent->uri, CRLF;
             } elsif ($ent->isa('Data::URIID::Result')) {
                 print $fh $ent->url, CRLF;
-            } elsif ($ent->isa('Data::URIID::Base')) {
+            } elsif ($ent->isa('Data::URIID::Base') || $ent->isa('Data::Identifier::Interface::Simple')) {
                 print $fh $ent->as('uri'), CRLF;
             } elsif ($ent->isa('Data::Identifier::Cloudlet')) {
                 $self->write_list($ent->roots);
@@ -252,7 +251,7 @@ File::URIList - module for reading and writing RFC 2483 URI lists
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -262,7 +261,7 @@ This module implements an interface to URI lists as defined by RFC 2483.
 
 All methods in this module C<die> on error unless documented otherwise.
 
-This module inherit from L<Data::Identifier::Interface::Userdata>.
+This module inherits from L<Data::Identifier::Interface::Userdata>, and L<Data::Identifier::Interface::Subobjects>.
 
 =head1 METHODS
 
@@ -366,6 +365,7 @@ Currently
 L<URI>,
 L<Data::Identifier>,
 L<Data::Identifier::Cloudlet>,
+L<Data::Identifier::Interface::Simple>,
 L<Data::URIID::Base> (including L<Data::URIID::Result>), and
 L<File::URIList>
 objects are supported. Other types might as well be supported.
@@ -441,11 +441,11 @@ All limitation of L</rewind> apply. In addition the filehande (or file) passed t
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

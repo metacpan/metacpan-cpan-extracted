@@ -970,6 +970,36 @@ package Sidef::Types::Array::Array {
         bless \@arr;
     }
 
+    sub _int_min_max {
+        my ($self, $order) = @_;
+
+        @$self || return undef;
+
+        my $item = $self->[0];
+
+        foreach my $i (1 .. $#$self) {
+            my $value = $self->[$i];
+            $item = $value if (($$value <=> $$item) == $order);
+        }
+
+        $item;
+    }
+
+    sub imax {
+        @_ = ($_[0], 1);
+        goto &_int_min_max;
+    }
+
+    sub imin {
+        @_ = ($_[0], -1);
+        goto &_int_min_max;
+    }
+
+    sub iminmax {
+        my ($self) = @_;
+        ($self->imin, $self->imax);
+    }
+
     sub _min_max {
         my ($self, $order) = @_;
 
@@ -2567,6 +2597,7 @@ package Sidef::Types::Array::Array {
         bless \@diffs, ref($self);
     }
 
+    *deltas          = \&differences;
     *diffs           = \&differences;
     *nth_differences = \&differences;
 
@@ -2887,13 +2918,30 @@ package Sidef::Types::Array::Array {
     }
 
     sub unique {
-        my ($self) = @_;
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            return $self->uniq_by($block);
+        }
 
         my @sorted = do {
+
             my @arr;
+            my $numeric = 1;
+
             foreach my $i (0 .. $#$self) {
+
                 CORE::push(@arr, [$i, $self->[$i]]);
+
+                if ($numeric and (ref($self->[$i]) ne 'Sidef::Types::Number::Number' or ref(${$self->[$i]}) eq 'Math::MPC')) {
+                    $numeric = 0;
+                }
             }
+
+            if ($numeric) {
+                return $self->iuniq;
+            }
+
             CORE::sort { $a->[1] cmp $b->[1] } @arr;
         };
 
@@ -2910,6 +2958,28 @@ package Sidef::Types::Array::Array {
 
     *uniq     = \&unique;
     *distinct = \&unique;
+
+    sub iuniq {
+        my ($self) = @_;
+
+        my @sorted = do {
+            my @arr;
+            foreach my $i (0 .. $#$self) {
+                CORE::push(@arr, [$i, $self->[$i], ${$self->[$i]}]);
+            }
+            CORE::sort { $a->[2] <=> $b->[2] } @arr;
+        };
+
+        my @unique;
+        my $max = $#sorted;
+
+        for (my $i = 0 ; $i <= $max ; $i++) {
+            $unique[$sorted[$i][0]] = $sorted[$i][1];
+            ++$i while ($i < $max and $sorted[$i][2] == $sorted[$i + 1][2]);
+        }
+
+        bless [grep { defined($_) } @unique], ref($self);
+    }
 
     sub last_unique {
         my ($self) = @_;
@@ -3295,6 +3365,19 @@ package Sidef::Types::Array::Array {
 
         if (defined $block) {
             return bless [CORE::sort { scalar $block->run($a, $b) } @$self], ref($self);
+        }
+
+        my $numeric = 1;
+
+        foreach my $item (@$self) {
+            if (ref($item) ne 'Sidef::Types::Number::Number' or ref($$item) eq 'Math::MPC') {
+                $numeric = 0;
+                last;
+            }
+        }
+
+        if ($numeric) {
+            return $self->isort;
         }
 
         bless [CORE::sort { $a cmp $b } @$self], ref($self);

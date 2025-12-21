@@ -1,6 +1,6 @@
-# 🧩 JQ::Lite — Lightweight jq in Pure Perl
+# 🧩 jq-lite — Lightweight jq in Pure Perl
 
-![JQ::Lite](./images/JQ_Lite_sm.png)
+![JQ::Lite](./images/JQ_Lite_sm_2.png)
 
 [![MetaCPAN](https://img.shields.io/cpan/v/JQ-Lite.svg)](https://metacpan.org/release/JQ-Lite)
 [![Alpine Linux](https://img.shields.io/badge/Alpine-Linux%20community-0D597F?logo=alpinelinux\&logoColor=white)](https://pkgs.alpinelinux.org/package/edge/community/x86_64/jq-lite)
@@ -10,9 +10,9 @@
 
 ---
 
-## ✨ What is JQ::Lite?
+## ✨ What is jq-lite?
 
-**JQ::Lite** is a **pure-Perl JSON query engine** inspired by [`jq`](https://stedolan.github.io/jq/).
+**jq-lite** is a **pure-Perl JSON query engine** inspired by [`jq`](https://stedolan.github.io/jq/).
 
 It lets you **query and transform JSON using jq-like syntax**
 — **without external binaries, native libraries, or compilation**.
@@ -41,14 +41,14 @@ where **simplicity, readability, and low dependency footprint** matter.
 * 🔧 **CLI tool**: `jq-lite`
 
   * `--null-input`, `--slurp`, `--from-file`
-  * `--yaml`, `--arg`, `--argjson`, `--ascii-output`
+  * `--yaml`, `--arg`, `--rawfile`, `--argjson`, `--ascii-output`
 * 📊 **100+ built-in jq functions**
   → see [`FUNCTIONS.md`](FUNCTIONS.md)
 * 💻 **Interactive mode** for exploring JSON
 * 🧰 **JSON & YAML input**
 * 🌐 **Runs almost anywhere Perl runs**
   → even legacy or air-gapped systems
-  → see [`VISION.md`](VISION.md)
+  → see [`DESIGN.md`](DESIGN.md)
 
 ---
 
@@ -243,14 +243,14 @@ jq-lite '.users[].nickname? // .name' users.json
 ## 📚 Documentation
 
 * 📘 **Functions**: [`FUNCTIONS.md`](FUNCTIONS.md)
-* 🧭 **Vision & portability**: [`VISION.md`](VISION.md)
+* 🧭 **Design**: [`DESIGN.md`](DESIGN.md)
 * 📦 **MetaCPAN**: [https://metacpan.org/pod/JQ::Lite](https://metacpan.org/pod/JQ::Lite)
 
 ---
 
 ## 👤 Author
 
-**Shingo Kawamura (川村慎吾)**
+**川村慎吾 (Shingo Kawamura)**
 📧 [pannakoota1@gmail.com](mailto:pannakoota1@gmail.com)
 
 ---
@@ -258,5 +258,11 @@ jq-lite '.users[].nickname? // .name' users.json
 ## 📜 License
 
 Same terms as Perl itself.
+
+
+
+
+
+
 
 

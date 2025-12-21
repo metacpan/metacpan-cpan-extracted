@@ -769,18 +769,6 @@ Returns true if all the given values are prime numbers.
 
 =cut
 
-=head2 allsqrtmod
-
-    allsqrtmod(a, n)
-
-Given two integers C<a> and C<n>, return a sorted array of all modular square roots of C<a> mod C<|n|>. If no square root exists, an empty array is returned.
-
-    say allsqrtmod(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
-
-Aliases: I<sqrtmod_all>
-
-=cut
-
 =head2 almost_prime_divisors
 
     n.almost_prime_divisors
@@ -1185,6 +1173,18 @@ The beta function (also called the Euler integral of the first kind).
 Defined as:
 
     beta(a, b) = gamma(a)*gamma(b) / gamma(a+b)
+
+=cut
+
+=head2 bigomega_sum
+
+    bigomega_sum(n, k=0)
+
+Returns the sum of the generalized Omega function C<Ω_k(j)>, for C<j=1..n>.
+
+    say bigomega_sum(100, 0)      #=> 239
+    say bigomega_sum(100, 1)      #=> 2815
+    say bigomega_sum(100, 2)      #=> 66799
 
 =cut
 
@@ -3093,6 +3093,25 @@ Exponential function: C<2^x>.
 
 =cut
 
+=head2 exp_bigomega
+
+    exp_bigomega(n,k)
+
+Returns the result of C<k**bigomega(n)>.
+
+=cut
+
+=head2 exp_bigomega_sum
+
+    exp_bigomega_sum(n,k)
+
+Partial sums of the C<exp_bigomega()> function.
+
+    exp_bigomega_sum(n,  2)    # Sum_{k=1..n} 2^bigomega(k)
+    exp_bigomega_sum(n, -1)    # Sum_{k=1..n} (-1)^bigomega(k) = liouville_sum(n)
+
+=cut
+
 =head2 exp_mangoldt
 
     exp_mangoldt(n)
@@ -3137,6 +3156,44 @@ Complex numbers are also supported:
 Equivalent with:
 
     exp(n) / b**k        # for some positive integer value of k
+
+=cut
+
+=head2 exp_omega
+
+    exp_omega(n,k)
+
+Returns the result of C<k**omega(n)>.
+
+=cut
+
+=head2 exp_omega_sum
+
+    exp_omega_sum(n,k)
+
+Partial sums of the C<exp_omega()> function.
+
+    exp_omega_sum(n,  2)    # Sum_{k=1..n} 2^omega(k)
+    exp_omega_sum(n, -1)    # Sum_{k=1..n} (-1)^omega(k)
+
+=cut
+
+=head2 exp_squarefree_omega
+
+    exp_squarefree_omega(n,k)
+
+Returns the result of C<k**omega(n) * mu(n)**2>.
+
+=cut
+
+=head2 exp_squarefree_omega_sum
+
+    exp_squarefree_omega_sum(n,k)
+
+Partial sums of the C<exp_squarefree_omega()> function.
+
+    exp_squarefree_omega_sum(n,  3)     # Sum_{k=1..n} 3^omega(k) * mu(k)^2
+    exp_squarefree_omega_sum(n, -1)     # Sum_{k=1..n} (-1)^omega(k) * mu(k)^2 = mertens(n)
 
 =cut
 
@@ -3198,13 +3255,13 @@ Equivalent with (but much faster):
 
 =head2 factorial_valuation
 
-    factorial_valuation(n, p)
+    factorial_valuation(n, k)
 
-Returns the number of times C<n!> is divisible by C<p>, where C<p> is a prime number.
+Returns the number of times C<n!> is divisible by C<k>, where C<k> is either prime or composite.
 
 Equivalent with (but more efficient):
 
-    valuation(n!, p)
+    valuation(n!, k)
 
 Aliases: I<factorial_power>
 
@@ -3263,6 +3320,18 @@ Equivalent with:
     n.factor_map {|p,k| ... }.sum
 
 Aliases: I<factors_sum>
+
+=cut
+
+=head2 factor_upto
+
+    n.factor_upto(limit)
+
+Returns an array of factors of C<n>, using trial division, the Pollard Rho method and the Elliptic Curve method, based on heuristic bounds to find all the prime factors of C<n> that are less than C<limit>.
+
+The product of the factors will give back C<n>. However, the last factor may be composite.
+
+B<NOTE:> some factors may be larger than C<limit>. Also, it's not guaranteed that a prime factor less than C<limit> is always found, even when it exists.
 
 =cut
 
@@ -5537,6 +5606,18 @@ Example:
 
 =cut
 
+=head2 linear_forms_primes
+
+    linear_forms_primes(A, B, [a_1, b_1], ..., [a_k, b_k])
+
+Returns an array with values C<m> in the range C<[A, B]>, such that C<m * a_1 + b_1>, C<m * a_2 + b_2>, ..., C<m * a_k + b_k> are all prime.
+
+    say linear_forms_primes(1, 100, [1, 0])                     # primes in range 1..100
+    say linear_forms_primes(1, 500, [1, 0], [1, 2])             # lesser of twin primes in range 1..500
+    say linear_forms_primes(1, 200, [2,-1], [4,-1], [6, -1])    # OEIS: A124486
+
+=cut
+
 =head2 liouville
 
     liouville(n)
@@ -6746,6 +6827,18 @@ Returns the sum of k-omega primes <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 omega_sum
+
+    omega_sum(n, k=0)
+
+Returns the sum of the generalized omega function C<ω_k(j)>, for C<j=1..n>.
+
+    say omega_sum(100, 0)      #=> 171
+    say omega_sum(100, 1)      #=> 2298
+    say omega_sum(100, 2)      #=> 59962
+
+=cut
+
 =head2 one
 
     Num.one
@@ -6886,6 +6979,30 @@ Returns the count of k-almost primes <= C<n>, or in the range C<a..b>.
     say 2.almost_prime_count(50, 100)       # count of semiprimes in range 50..100
 
 Aliases: I<almost_primepi>, I<pi_k>
+
+=cut
+
+=head2 pillai
+
+    pillai(n, k=1)
+
+Pillai's arithmetical function: C<Sum_{k=1..n} gcd(k, n)>. (OEIS: A018804)
+
+Generalized as:
+
+    pillai(n,k) = Sum_{1 <= x_1, x_2, ..., x_k <= n} gcd(x_1, x_2, ..., x_k, n)^k
+
+Which has the identity:
+
+    pillai(n,k) = Sum_{d|n} mu(n/d) * d^k * tau(d)
+
+=cut
+
+=head2 pillai_sum
+
+    pillai_sum(n,k=1)
+
+Partial sums of the generalized Pillai arithmetical function C<pillai(n,k)>.
 
 =cut
 
@@ -7512,6 +7629,18 @@ Aliases: I<nth_prime>
 
 =cut
 
+=head2 prime_cluster
+
+    prime_cluster(lo, hi, *diffs)
+
+Returns an array of primes C<p> such that C<p+diffs[0]>, C<p+diffs[1]>, etc, are also primes.
+
+    say prime_cluster(1, 100, 2)    # twin primes <= 100
+
+Aliases: I<sieve_prime_cluster>
+
+=cut
+
 =head2 prime_divisors
 
     prime_divisors(n)
@@ -7918,6 +8047,19 @@ Aliases: I<dedekind_psi>
 
 =cut
 
+=head2 psi_sum
+
+    n.psi_sum(k=1)
+
+Returns the sum of the Dedekind psi function C<ψ_k(j)>, for C<j=1..n>.
+
+    say psi_sum(100, 1)      #=> 7664
+    say psi_sum(100, 2)      #=> 400576
+
+Aliases: I<dedekind_psi_sum>
+
+=cut
+
 =head2 pyramidal
 
     n.pyramidal(k)
@@ -8261,6 +8403,35 @@ The k-th root of C<n>, defined as:
 
 =cut
 
+=head2 rootmod
+
+    rootmod(a, k, n)
+
+Returns a solution C<x> to the following congruence:
+
+    x^k == a (mod n)
+
+Return C<NaN> if a solution does not exist.
+
+    say rootmod(2131968,5,10000000000)          #=> 7811648
+    say rootmod(15,3,1000000000000000000117)    #=> 72574612502199260377
+
+=cut
+
+=head2 rootmod_all
+
+    rootmod_all(a, k, n)
+
+Returns an array with all the solutions C<x> to the following congruence:
+
+    x^k == a (mod n)
+
+If no solution exists, an empty array is returned.
+
+    say rootmod_all(243, 5, 1000)    #=> [3, 203, 403, 603, 803]
+
+=cut
+
 =head2 roots_of_unity
 
     roots_of_unity(n)
@@ -8442,6 +8613,19 @@ Defined as:
     x / abs(x)
 
 Aliases: I<sign>
+
+=cut
+
+=head2 sigma_sum
+
+    sigma_sum(n, k=1, j=0)
+
+Returns the sum of C<m^j * sigma_k(m)>, for C<m=1..n>, computed in C<O(sqrt(n))> steps.
+
+    say sigma_sum(100, 0)      #=> 482
+    say sigma_sum(100, 1)      #=> 8299
+    say sigma_sum(100, 2)      #=> 407819
+    say sigma_sum(100, 2, 3)   #=> 207528104123
 
 =cut
 
@@ -8686,8 +8870,22 @@ Returns the length of the period of continued fraction for square root of C<n>. 
 
 Modular square root of C<a>, returning a solution C<r>, such that C<r^2 = a (mod m)>.
 
-    say sqrtmod(544, 800)         #=> 512
-    say sqrtmod(436, 1752)        #=> 1010
+    say sqrtmod(544, 800)         #=> 288
+    say sqrtmod(436, 1752)        #=> 134
+
+=cut
+
+=head2 sqrtmod_all
+
+    sqrtmod_all(a, n)
+
+Returns an array with all the solutions C<x> to the following congruence:
+
+    x^2 == a (mod n)
+
+If no solution exists, an empty array is returned.
+
+    say sqrtmod_all(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
 
 =cut
 
@@ -9234,6 +9432,19 @@ Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 Returns an array with the totient values for the range C<a..b>.
 
     say totient_range(7, 17)  #=> [6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16]
+
+=cut
+
+=head2 totient_sum
+
+    totient_sum(n, k=1)
+
+Returns the sum of the Jordan totient function C<J_k(j)>, for C<j=1..n>.
+
+    say totient_sum(100, 1)      #=> 3044
+    say totient_sum(100, 2)      #=> 280608
+
+Aliases: I<euler_phi_sum>, I<jordan_totient_sum>
 
 =cut
 

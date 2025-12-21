@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::TranspositionTable;
-$Chess::Plisco::Engine::TranspositionTable::VERSION = 'v1.0.0';
+$Chess::Plisco::Engine::TranspositionTable::VERSION = 'v1.0.1';
 use strict;
 use integer;
 
@@ -58,7 +58,7 @@ sub resize {
 }
 
 sub probe {
-	my ($self, $lookup_key, $depth, $alpha, $beta, $bestmove) = @_;
+	my ($self, $lookup_key, $ply, $depth, $alpha, $beta, $bestmove) = @_;
 
 	my $entry = $self->[$lookup_key % scalar @$self] or return;
 
@@ -72,12 +72,8 @@ sub probe {
 
 	if ($edepth >= $depth) {
 		if ($flags == TT_SCORE_EXACT) {
-			if ($value <= Chess::Plisco::Engine::Tree::MATE
-					+ Chess::Plisco::Engine::Tree::MAX_PLY) {
-					$value += ($edepth - $depth);
-			} elsif ($value >= -Chess::Plisco::Engine::Tree::MATE
-					- Chess::Plisco::Engine::Tree::MAX_PLY) {
-					$value -= ($edepth - $depth);
+			if ($value == Chess::Plisco::Engine::Tree::MATE) {
+				$value = $value + $ply;
 			}
 
 			return $value;

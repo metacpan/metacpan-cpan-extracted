@@ -5,7 +5,7 @@ use warnings qw(all FATAL uninitialized);
 use Carp qw(croak);
 use Exporter 5.57 qw(import);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $_BACKEND = 'PP';
 

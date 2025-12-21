@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING.md
 lib/List/Gen.pm
 lib/List/Gen/Benchmark.pm
 lib/List/Gen/Cookbook.pm
@@ -10,10 +11,10 @@ lib/List/Gen/Lazy/Ops.pm
 lib/List/Gen/Perl6.pm
 lib/List/Generator.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
+MANIFEST.SKIP
 META.yml
 README
-t/lib/List/Gen/Testing.pm
 t/00-load.t
 t/01-load.t
 t/02-load.t
@@ -21,6 +22,7 @@ t/03-load.t
 t/04-load.t
 t/05-load.t
 t/06-load.t
+t/lib/List/Gen/Testing.pm
 t/listgen.t
 t/listgen_builtins.t
 t/listgen_lazy.t
@@ -31,4 +33,5 @@ t/listgenerator.t
 t/pod-coverage.t
 t/pod.t
 t/threads.t
+t/manifest.t
 META.json                                Module JSON meta-data (added by MakeMaker)

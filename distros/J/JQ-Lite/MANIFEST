@@ -1,6 +1,7 @@
 bin/jq-lite
 Changes
 CONTRIBUTING.md
+DESIGN.md
 download.sh
 FUNCTIONS.md
 install-jq-lite.ps1
@@ -99,6 +100,7 @@ t/pipe_select_name.t
 t/pluck.t
 t/range.t
 t/raw_input_cli.t
+t/rawfile_cli.t
 t/recurse.t
 t/reduce.t
 t/replace.t
@@ -111,6 +113,7 @@ t/select_stream.t
 t/setpath.t
 t/slice.t
 t/slurp_cli.t
+t/smoke_cli.t
 t/sort_by.t
 t/sort_desc.t
 t/sort_unique.t
@@ -134,4 +137,3 @@ t/uri_format.t
 t/values.t
 t/walk.t
 t/yaml_cli.t
-VISION.md

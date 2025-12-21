@@ -39,7 +39,7 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = 'v1.0.0';
+$Chess::Plisco::VERSION = 'v1.0.1';
 use strict;
 use integer;
 
@@ -2467,11 +2467,11 @@ sub checkPseudoLegalMove {
 			$is_ep = 1;
 
 			# Removing the pawn may discover a check.
-			my $move_mask = (1 << $from) | $to_mask;
+			my $from_mask = 1 << $from;
 			my $captured_mask = $ep_pawn_masks[$ep_shift];
 
-			my $occupancy = ($self->[CP_POS_WHITE_PIECES] | $self->[CP_POS_BLACK_PIECES])
-					& ((~$move_mask) ^ $captured_mask);
+			my $occupancy = ($self->[CP_POS_WHITE_PIECES] | $self->[CP_POS_BLACK_PIECES] | $to_mask)
+					& ~$from_mask & ~$captured_mask;
 			if (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & $her_pieces
 				& ($self->[CP_POS_BISHOPS] | $self->[CP_POS_QUEENS])) {
 				return;

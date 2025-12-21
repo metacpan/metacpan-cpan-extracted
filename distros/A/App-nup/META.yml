@@ -1,0 +1,43 @@
+---
+abstract: 'N-up output wrapper for optex -Mup'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-nup
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::nup:
+    file: lib/App/nup.pm
+    version: '0.99'
+requires:
+  App::optex: '0'
+  App::optex::up: '1.01'
+  File::Share: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/tecolicom/App-nup/issues
+  homepage: https://github.com/tecolicom/App-nup
+  repository: https://github.com/tecolicom/App-nup.git
+version: '0.99'
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

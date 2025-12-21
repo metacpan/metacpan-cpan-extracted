@@ -75,15 +75,17 @@ subtest 'Script fails with other envdesc file with missing env variables' => sub
 subtest 'Script succeeds with other envdesc file because env requirements are fullfilled' => sub {
     chdir($path1) || croak "Cannot chdir($path1): $OS_ERROR";
 
-    ## no critic (Variables::RequireLocalizedPunctuationVars)
-    local %ENV = map { $_ => $ENV{$_} } keys %ENV;
-    $ENV{A_DIGIT}             = '123';
-    $ENV{A_MISSING_VAR}       = 'is_no_longer_missing';
-    $ENV{ANOTHER_MISSING_VAR} = 'is_no_longer_missing';
+    local %ENV = (
+        ( map { $_ => $ENV{$_} } keys %ENV ),
+        A_DIGIT             => '123',
+        A_MISSING_VAR       => 'is_no_longer_missing',
+        ANOTHER_MISSING_VAR => 'is_no_longer_missing',
+    );
+
     my ( $stdout, $stderr );
     script_runs( [ 'bin/using-another.pl', ], { stdout => \$stdout, stderr => \$stderr, }, 'Verify no errors in output' );
-    is( $stdout, qq{Control will reach this point if env requirements are fullfilled!\n}, 'Correct stdout' );
-    is( $stderr, q{},                                                                     'Correct stderr' );
+    is( $stdout, qq{Control will reach this point if env requirements are fulfilled!\n}, 'Correct stdout' );
+    is( $stderr, q{},                                                                    'Correct stderr' );
 
     done_testing;
 };

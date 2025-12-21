@@ -20,9 +20,9 @@ lib/Chess/Plisco/Engine.pm
 lib/Chess/Plisco/Engine.pod
 lib/Chess/Plisco/Engine/Book.pm
 lib/Chess/Plisco/Engine/InputWatcher.pm
+lib/Chess/Plisco/Engine/LimitsType.pm
 lib/Chess/Plisco/Engine/Position.pm
 lib/Chess/Plisco/Engine/TimeControl.pm
-lib/Chess/Plisco/Engine/TimeControl.pod
 lib/Chess/Plisco/Engine/TimeControl/MovesToGo.pm
 lib/Chess/Plisco/Engine/TranspositionTable.pm
 lib/Chess/Plisco/Engine/Tree.pm
@@ -45,6 +45,7 @@ lib/Chess/Plisco/Tablebase/Syzygy.pod
 lib/Chess/Plisco/Tutorial.pod
 perlcritic.rc
 scripts/debug-log-to-graphviz.pl
+scripts/extract-scores.pl
 scripts/gen-positions.pl
 scripts/moves-to-go.pl
 scripts/moves-to-go.py
@@ -104,6 +105,7 @@ t/30dm1-epd.t
 t/30dm2-epd.t
 t/30dm3-epd.t
 t/30draw.t
+t/31engine-move-overhead.t
 t/Flohr.pgn
 t/author-critic.t
 t/author-pod-syntax.t

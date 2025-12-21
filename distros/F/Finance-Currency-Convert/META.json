@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Convert currencies and fetch their exchange rates",
    "author" : [
-      "unknown"
+      "Jan Willamowius <jan@willamowius.de>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -29,9 +29,25 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "perl" : "5.005005"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "2.03",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/willamowius/perl-finance-currency-convert/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/willamowius/perl-finance-currency-convert.git",
+         "web" : "https://github.com/willamowius/perl-finance-currency-convert"
+      }
+   },
+   "version" : "2.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

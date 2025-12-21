@@ -10,12 +10,13 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine;
-$Chess::Plisco::Engine::VERSION = 'v1.0.0';
+$Chess::Plisco::Engine::VERSION = 'v1.0.1';
 use strict;
 use integer;
 
 use POSIX qw(:sys_wait_h);
 use Locale::TextDomain qw(Chess-Plisco);
+use Time::HiRes qw(gettimeofday tv_interval);
 
 use Chess::Plisco qw(:all);
 
@@ -25,6 +26,7 @@ use Chess::Plisco::Engine::Tree;
 use Chess::Plisco::Engine::InputWatcher;
 use Chess::Plisco::Engine::TranspositionTable;
 use Chess::Plisco::Engine::Book;
+use Chess::Plisco::Engine::LimitsType;
 
 # These figures are taken from 
 use constant MIN_HASH_SIZE => 1;
@@ -73,6 +75,13 @@ use constant UCI_OPTIONS => [
 		type => 'check',
 		default => 'false',
 	},
+	{
+		name => 'Move Overhead',
+		type => 'spin',
+		min => 0,
+		max => 5000,
+		default => 10,
+	},
 ];
 
 my $uci_options = UCI_OPTIONS;
@@ -92,6 +101,10 @@ sub new {
 		__turn => CP_WHITE,
 		__started => undef,
 		__moves => [],
+		__continued => 0,
+		__move_overheads => [],
+		__last_params => {},
+		__original_time_adjust => -1,
 	};
 
 	my $options = UCI_OPTIONS;
@@ -103,6 +116,40 @@ sub new {
 	$self->{__tt} = Chess::Plisco::Engine::TranspositionTable->new($tt_size);
 
 	bless $self, $class;
+
+	$self->__calibrateNPS;
+
+	return $self;
+}
+
+sub __calibrateNPS {
+	my ($self) = @_;
+
+	no integer;
+
+	my $position = Chess::Plisco::Engine::Position->new;
+
+	my $watcher = Chess::Plisco::Engine::InputWatcher->new(\*STDIN);
+	$watcher->setBatchMode(1);
+
+	my %options = (
+		position => $position,
+		tt => $self->{__tt},
+		watcher => $watcher,
+		info => sub {},
+		signatures => [],
+	);
+	my $tree = Chess::Plisco::Engine::Tree->new(%options);
+	$tree->{max_depth} = 3;
+	$tree->{start_time} = [gettimeofday];
+
+	$tree->think;
+
+	my $elapsed = 1000 * tv_interval($tree->{start_time});
+	$elapsed ||= 1;
+	$self->{__nps} = $tree->{nodes} / $elapsed;
+
+	$tree->{tt}->clear;
 }
 
 sub uci {
@@ -413,6 +460,8 @@ sub __cancelSearch {
 sub __onUciCmdGo {
 	my ($self, $args) = @_;
 
+	$self->{__start_time} = [gettimeofday];
+
 	if ($self->__cancelSearch) {
 		# Remember the arguments to this go command and re-try as soon as the
 		# currently still running search terminates.
@@ -477,11 +526,64 @@ sub __onUciCmdGo {
 		$options{book} = $self->{__book};
 		$options{book_depth} = $self->{__options}->{BookDepth};
 	}
+
 	my $tree = Chess::Plisco::Engine::Tree->new(%options);
 	$tree->{debug} = 1 if $self->{__debug};
 	$tree->{ponder} = 1 if $params{ponder};
+	$tree->{start_time} = $self->{__start_time};
+	if ($params{depth}) {
+		$tree->{max_depth} = $params{depth};
+	} elsif ($params{mate}) {
+		$tree->{max_depth} = 2 * $params{mate} - 1;
+	} elsif ($params{movetime}) {
+		$tree->{maximum} = $tree->{optimum} = $params{movetime};
+		$tree->{fixed_time} = 1;
+	} elsif ($params{infinite}) {
+		$tree->{max_depth} = Plisco::Engine::Tree->MAX_PLY;
+	} elsif ($params{node}) {
+		$tree->{max_nodes} = $params{node};
+	} else {
+		$tree->{use_time_management} = 1;
+	}
 
-	my $tc = $self->{__tc} = Chess::Plisco::Engine::TimeControl->new($tree, %params);
+	if ($self->{__continued}) {
+		$self->{__continued} = $self->__measureMoveOverhead(%params)
+	}
+	$self->{__last_params} = {%params};
+
+	my $tc = $self->{__tc} = Chess::Plisco::Engine::TimeControl->new($tree);
+
+	my $limits = Chess::Plisco::Engine::LimitsType->new;
+	# $limits->{moves} = FIXME!
+	$limits->{time}->[0] = $params{wtime};
+	$limits->{time}->[1] = $params{btime};
+	$limits->{inc}->[0] = $params{winc};
+	$limits->{inc}->[1] = $params{binc};
+	$limits->{start_time} = $self->{__start_time};
+	$limits->{movestogo} = $params{movestogo};
+	$limits->{depth} = $params{depth};
+	#$limits-{mate} = FIXME!
+	$limits->{infinite} = $params{infinite};
+	$limits->{ponder} = $params{ponder};
+	$limits->{nodes} = $params{nodes};
+
+	$params{move_overhead} = $self->{__options}->{'Move Overhead'};
+
+	$tc->init(
+		$limits, $tree->{position}->turn,
+		$tree->{position}->[CP_POS_HALFMOVES] + 1,
+		\%params, \$self->{__original_time_adjust},
+	);
+
+	# This is the logic from checkTime() of the tree.
+	{
+		no integer;
+		my $max_nodes = $self->{__nps} >> 2;
+		my $dyn_nodes = ($tree->{maximum} * $self->{__nps}) >> 13;
+		$tree->{nodes_to_tc} = ($max_nodes < $dyn_nodes) ? $max_nodes : $dyn_nodes;
+		$tree->{nodes_to_tc} = 50 if $tree->{nodes_to_tc} < 50;
+		$tree->{nodes_to_tc} = 5000 if $tree->{nodes_to_tc} > 500;
+	}
 
 	$self->{__tree} = $tree;
 
@@ -492,6 +594,13 @@ sub __onUciCmdGo {
 	if ($@) {
 		$self->__output("unexpected exception: $@");
 	}
+	{
+		no integer;
+		$self->{__last_search_time} = int(1000 * tv_interval($self->{__start_time}));
+	}
+	my $elapsed = $self->{__last_search_time} || 1;
+	$self->{__nps} = (1000 * $tree->{nodes}) / $elapsed;
+
 	delete $self->{__tree};
 	delete $self->{__tc};
 
@@ -512,12 +621,37 @@ sub __onUciCmdGo {
 	return $self;
 }
 
+sub __measureMoveOverhead {
+	my ($self, %params) = @_;
+
+	return if !defined $self->{__last_search_time};
+
+	my $my_time = $self->{__position}->turn == CP_WHITE ? 'wtime' : 'btime';
+	my $my_inc = $self->{__position}->turn == CP_WHITE ? 'winc' : 'binc';
+
+	my $last_params = $self->{__last_params};
+	return if !($params{$my_time} && $last_params->{$my_time});
+	return if $params{$my_inc} != $last_params->{$my_inc};
+
+	my $expected_time = $last_params->{$my_time} + $params{$my_inc} - $self->{__last_search_time};
+	my $overhead = $expected_time - $params{$my_time};
+	if ($overhead >= 0) {
+		push @{$self->{__move_overheads}}, $overhead;
+		push @{$self->{__move_overheads}}, $overhead if @{$self->{__move_overheads}} < 2;
+		shift @{$self->{__move_overheads}} if @{$self->{__move_overheads}} > 3;
+		my @values = sort { $a <=> $b } @{$self->{__move_overheads}};
+		$self->{__options}->{'Move Overhead'} = $values[1];
+	}
+
+	return $self;
+}
+
 sub __onUciCmdPonderhit {
 	my ($self) = @_;
 
 	return if !$self->{__tc};
 
-	$self->{__tc}->onPonderhit;
+	delete $self->{__tree}->{ponder};
 
 	return $self;
 }
@@ -541,6 +675,7 @@ sub __onUciCmdSetoption {
 	}
 
 	my ($name, $value) = map { $self->__trim($_) } ($1, $2);
+	$name = 'Move Overhead' if $name eq 'MoveOverhead';
 	if (!exists $uci_options{$name}) {
 		$self->__output("info Error: unsupported option '$name'");
 		return $self;
@@ -634,6 +769,18 @@ sub __onUciCmdStop {
 	return $self;
 }
 
+sub __movelistContinuous {
+	my ($self, $last_moves) = @_;
+
+	return if @{$self->{__moves}} - @$last_moves != 1;
+
+	for (my $i = 0; $i < @$last_moves; ++$i) {
+		return if $self->{__moves}->[$i] ne $last_moves->[$i];
+	}
+
+	return $self;
+}
+
 sub __onUciCmdPosition {
 	my ($self, $args) = @_;
 
@@ -647,6 +794,11 @@ sub __onUciCmdPosition {
 	my ($type, @moves) = split /[ \t]+/, $args;
 	my $position;
 	$self->{__started} = time;
+
+	my $last_setup = $self->{__setup};
+	my $last_fen = $self->{__fen};
+	my @last_moves = @{$self->{__moves}};
+
 	if ('fen' eq lc $type) {
 		my $fen = shift @moves;
 		unless (defined $fen && length $fen) {
@@ -671,7 +823,7 @@ sub __onUciCmdPosition {
 		}
 		$self->{__setup} = 1;
 		$self->{__fen} = $fen;
-		$self->{__turn} = $position->toMove;
+		$self->{__turn} = $position->turn;
 	} elsif ('startpos' eq lc $type) {
 		$self->{__setup} = 0;
 		$self->{__turn} = CP_WHITE;
@@ -698,6 +850,11 @@ sub __onUciCmdPosition {
 			push @signatures, $position->signature;
 		}
 	}
+
+	# Check whether this continues an ongoing game.
+	$self->{__continued} = $self->{__fen} eq $last_fen
+		&& $self->{__setup} == $last_setup
+		&& $self->__movelistContinuous(\@last_moves);
 
 	$self->{__position} = $position;
 	$self->{__signatures} = \@signatures;
@@ -745,7 +902,7 @@ sub __onUciCmdUci {
 	my ($self) = @_;
 
 	my $version = $Chess::Plisco::Engine::VERSION || 'development version';
-	$self->__output("id Plisco $version");
+	$self->__output("id name Plisco $version");
 	$self->__output("id author Guido Flohr <guido.flohr\@cantanea.com>");
 
 	my $options = UCI_OPTIONS;

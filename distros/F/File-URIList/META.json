@@ -1,7 +1,7 @@
 {
    "abstract" : "module for reading and writing RFC 2483 URI lists",
    "author" : [
-      "L\u00f6wenfelsen UG (haftungsbeschr\u00e4nkt) <support@loewenfelsen.net>"
+      "Philipp Schafft <lion@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -31,15 +31,14 @@
       },
       "runtime" : {
          "recommends" : {
-            "Data::Identifier" : "v0.15.0",
-            "Data::Identifier::Cloudlet" : "v0.16.0"
+            "Data::Identifier" : "v0.27.0"
          },
          "requires" : {
             "Carp" : "1.35",
-            "Fcntl" : "1.15",
+            "Fcntl" : "1.13",
             "URI" : "5.17",
             "URI::file" : "5.17",
-            "perl" : "v5.10.0"
+            "perl" : "v5.20.0"
          }
       },
       "test" : {
@@ -53,7 +52,7 @@
    "provides" : {
       "File::URIList" : {
          "file" : "lib/File/URIList.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -63,7 +62,7 @@
          "url" : "ssh://gitea@gitea.dev.loewenfelsen.net/11201-Loewenfelsen/File-URIList.git"
       }
    },
-   "version" : "v0.03",
+   "version" : "v0.04",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

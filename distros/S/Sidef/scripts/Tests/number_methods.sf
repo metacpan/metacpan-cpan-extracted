@@ -6,6 +6,9 @@
 #   07 March 2023: 2.020s (with MPU)
 #   07 March 2023: 2.418s (without MPU)
 
+#local Num!USE_CONJECTURES = true
+#local Num!VERBOSE = true
+
 assert_eq(8 >> 32, 0)
 assert_eq(112 >> 32, 0)
 assert_eq(208 >> 64, 0)
@@ -93,7 +96,7 @@ assert(2**128 + 1 -> is_div(5704689200685129054723) -> not)
 assert_eq(factorial_valuation(3**25 + 1, 2), 847288609427)
 assert_eq(factorial_valuation(3**25 - 1, 3), 423644304696)
 assert_eq(factorial_valuation(3**25, 127), 6724512769)
-assert_eq(factorial_valuation(2**128 + 1, 2**64 + 1), 18446744073709551615)
+assert_eq(factorial_valuation(2**128 + 1, 2**64 + 1), 5057672949897538906173183)
 assert_eq(factorial_valuation(2**128 + 1, 43), 8101961117165201511032728748375433594)
 
 assert_eq(10.by{ .is_div(3) }, [0, 3, 6, 9, 12, 15, 18, 21, 24, 27])
@@ -1542,5 +1545,274 @@ assert_eq(egypt_greedy(5/121), %n[25, 757, 763309, 873960180913, 152761279564209
 
 assert_eq(egypt_greedy(43/97).sum{.inv}, 43/97)
 assert_eq(egypt_greedy(97/43).sum{.inv}, 97/43)
+
+assert_eq(prime_cluster(1, 100, 2), primes(100).grep{ _+2 -> is_prime })
+assert_eq(prime_cluster(78977932125503-1e6, 78977932125503+1e6, 1..14 -> map {|k| 4*k*(k+1) }...), [78977932125503])
+
+do {
+
+    func f(n, c) {
+
+        var lo = 1
+        var hi = 2*lo
+
+        var diffs = (1 ..^ n -> map {|k| c*k*(k+1) })
+
+        loop {
+            var terms = prime_cluster(lo, hi, diffs...).grep {|p| !is_prime(p + c*n*(n+1)) }
+            if (terms) {
+                return terms[0]
+            }
+            lo = hi+1
+            hi = 2*lo
+        }
+    }
+
+    assert_eq(1..14 -> map {|n| f(n, 4) }, %n[2, 3, 29, 5, 23, 269, 272879, 149, 61463, 929, 7426253, 2609, 233, 59])
+    assert_eq(1..12 -> map {|n| f(n, 6) }, %n[2, 19, 5, 67, 7, 281, 1051, 6791, 11, 115599457, 365705201, 79352440891])
+    assert_eq(1..11 -> map {|n| f(n, 7) }, %n[2, 3, 59, 5, 89, 599, 3329, 617, 269, 21107, 9833477])
+    assert_eq(1..14 -> map {|n| f(n, 8) }, %n[2, 3, 151, 181, 13, 811, 23671, 92221, 45417481, 5078503, 4861, 20379346831, 12180447943, 31])
+    assert_eq(1..13 -> map {|n| f(n, 9) }, %n[2, 11, 13, 5, 19, 173, 3163, 83, 21013, 878359, 3676219, 239, 43])
+}
+
+with (1e6.random_prime) {|p|
+    assert_eq(factor_upto(p**5, 1e6), 5.of(p))
+}
+
+assert_eq(10!.divisors.sum {|k| factorial_valuation(10, k) }, 312)
+assert_eq(1520802979.factor_upto(38998), %n[6269, 242591])
+
+assert_eq(sigma_sum(100, 0), 482)
+assert_eq(sigma_sum(100, 1), 8299)
+assert_eq(sigma_sum(100, 2), 407819)
+
+assert_eq(totient_sum(100, 0), 1)
+assert_eq(totient_sum(100, 1), 3044)
+assert_eq(totient_sum(100, 2), 280608)
+
+assert_eq(20.of{.pillai },    [0]+20.of{.pillai_sum   }.diffs)
+assert_eq(20.of{.pillai(2) }, [0]+20.of{.pillai_sum(2)}.diffs)
+assert_eq(20.of{.pillai(3) }, [0]+20.of{.pillai_sum(3)}.diffs)
+assert_eq(20.of{.pillai(4) }, [0]+20.of{.pillai_sum(4)}.diffs)
+
+assert_eq([0]+20.of{ .sigma_sum }.diffs, 20.of { .sigma })
+assert_eq([0]+20.of{ .sigma_sum(0,1) }.diffs, 20.of { .tau * _ })
+assert_eq([0]+20.of{ .sigma_sum(1,1) }.diffs, 20.of { .sigma * _ })
+assert_eq([0]+20.of{ .sigma_sum(2,1) }.diffs, 20.of { .sigma(2) * _ })
+assert_eq([0]+20.of{ .sigma_sum(2,2) }.diffs, 20.of { .sigma(2) * _*_ })
+assert_eq([0]+20.of{ .sigma_sum(0,2) }.diffs, 20.of { .tau * _*_ })
+assert_eq([0]+20.of{ .sigma_sum(1,2) }.diffs, 20.of { .sigma * _*_ })
+assert_eq([0]+20.of{ .sigma_sum(2,0) }.diffs, 20.of { .sigma(2) })
+assert_eq([0]+20.of{ .sigma_sum(1) }.diffs, 20.of { .sigma(1) })
+assert_eq([0]+20.of{ .sigma_sum(0) }.diffs, 20.of { .tau })
+
+assert_eq(20.of{.psi(0)}.acc, 20.of{.psi_sum(0)})
+assert_eq(20.of{.psi(1)}.acc, 20.of{.psi_sum(1)})
+assert_eq(20.of{.psi(2)}.acc, 20.of{.psi_sum(2)})
+assert_eq(20.of{.psi(3)}.acc, 20.of{.psi_sum(3)})
+
+assert_eq(20.of{.totient(0)}.acc, 20.of{.totient_sum(0)})
+assert_eq(20.of{.totient(1)}.acc, 20.of{.totient_sum(1)})
+assert_eq(20.of{.totient(2)}.acc, 20.of{.totient_sum(2)})
+assert_eq(20.of{.totient(3)}.acc, 20.of{.totient_sum(3)})
+
+assert_eq(20.of{.omega(0)}.acc, 20.of{.omega_sum(0)})
+assert_eq(20.of{.omega(1)}.acc, 20.of{.omega_sum(1)})
+assert_eq(20.of{.omega(2)}.acc, 20.of{.omega_sum(2)})
+assert_eq(20.of{.omega(3)}.acc, 20.of{.omega_sum(3)})
+
+assert_eq(20.of{.bigomega(0)}.acc, 20.of{.bigomega_sum(0)})
+assert_eq(20.of{.bigomega(1)}.acc, 20.of{.bigomega_sum(1)})
+assert_eq(20.of{.bigomega(2)}.acc, 20.of{.bigomega_sum(2)})
+assert_eq(20.of{.bigomega(3)}.acc, 20.of{.bigomega_sum(3)})
+
+assert_eq(20.of{.exp_omega(0)}.acc, 20.of{.exp_omega_sum(0)})
+assert_eq(20.of{.exp_omega(1)}.acc, 20.of{.exp_omega_sum(1)})
+assert_eq(20.of{.exp_omega(2)}.acc, 20.of{.exp_omega_sum(2)})
+assert_eq(20.of{.exp_omega(-1)}.acc, 20.of{.exp_omega_sum(-1)})
+
+assert_eq(20.of{.exp_squarefree_omega(0)}.acc, 20.of{.exp_squarefree_omega_sum(0)})
+assert_eq(20.of{.exp_squarefree_omega(1)}.acc, 20.of{.exp_squarefree_omega_sum(1)})
+assert_eq(20.of{.exp_squarefree_omega(2)}.acc, 20.of{.exp_squarefree_omega_sum(2)})
+assert_eq(20.of{.exp_squarefree_omega(-1)}.acc, 20.of{.exp_squarefree_omega_sum(-1)})
+
+assert_eq(20.of{.exp_bigomega(0)}.acc, 20.of{.exp_bigomega_sum(0)})
+assert_eq(20.of{.exp_bigomega(1)}.acc, 20.of{.exp_bigomega_sum(1)})
+assert_eq(20.of{.exp_bigomega(2)}.acc, 20.of{.exp_bigomega_sum(2)})
+assert_eq(20.of{.exp_bigomega(-1)}.acc, 20.of{.exp_bigomega_sum(-1)})
+
+assert_eq(liouville_sum(1e6+1234), -514)
+
+assert_eq(3.strong_fermat_psp(2,13981,15841), [15841])
+assert_eq(3.strong_fermat_psp(2,15841-10,15841+10), [15841])
+assert_eq(3.strong_fermat_psp(2,13981-10,13981+10), [])
+assert_eq(3.strong_fermat_psp(2,635401-10,635401+10), [635401])
+assert_eq(3.strong_fermat_psp(2,950797-10,950797+10), [])
+
+assert_eq(3.squarefree_strong_fermat_psp(2,13981,15841), [15841])
+assert_eq(3.squarefree_strong_fermat_psp(2,15841-10,15841+10), [15841])
+assert_eq(3.squarefree_strong_fermat_psp(2,13981-10,13981+10), [])
+assert_eq(3.squarefree_strong_fermat_psp(2,635401-10,635401+10), [635401])
+assert_eq(3.squarefree_strong_fermat_psp(2,950797-10,950797+10), [])
+
+assert_eq(3.almost_primes(2**65 - 100, 2**65 + 100).sum, 1365059061454506819408)
+assert_eq(3.squarefree_almost_primes(2**65 - 100, 2**65 + 100).sum, 1291272085159668613085)
+assert_eq(3.omega_primes(2**65 - 100, 2**65 + 100).sum, 1807780919223536058347)
+
+assert_eq(prime_powers(50, 100), %n[53, 59, 61, 64, 67, 71, 73, 79, 81, 83, 89, 97])
+
+assert_eq(linear_forms_primes(1, 41, [1, 41]), %n[2, 6, 12, 18, 20, 26, 30, 32, 38])
+assert_eq(linear_forms_primes(1, 1000, [1, 41]), primes(42, 1000+41).map{_-41})
+assert_eq(linear_forms_primes(1, 50, [1, 1]), %n[1, 2, 4, 6, 10, 12, 16, 18, 22, 28, 30, 36, 40, 42, 46])
+assert_eq(linear_forms_primes(1, 1000, [1, 1]), 1000.primes.map{.dec})
+assert_eq(linear_forms_primes(1, 1000, [1, 41]), primes(42, 1000+41).map{_-41})
+assert_eq(linear_forms_primes(1, 100, [1,1], [2,1]), %n[1, 2, 6, 18, 30, 36, 78, 96])
+assert_eq(linear_forms_primes(1, 1000, [1,1], [2,1]), 1000.primes.map{.dec}.grep{2*_ + 1 -> is_prime})
+assert_eq(linear_forms_primes(1, 1000, [1,1],[2,1],[3,1]), %n[2, 6, 36, 210, 270, 306, 330, 336, 600, 726])
+assert_eq(linear_forms_primes(1, 10000, [1,1],[2,1],[3,1],[4,1]), %n[330, 1530, 3060, 4260, 4950, 6840])
+assert_eq(linear_forms_primes(3060, 3060, [1,1],[2,1],[3,1],[4,1]), %n[3060])
+assert_eq(linear_forms_primes(3060, 3061, [1,1],[2,1],[3,1],[4,1]), %n[3060])
+assert_eq(linear_forms_primes(3059, 3060, [1,1],[2,1],[3,1],[4,1]), %n[3060])
+assert_eq(linear_forms_primes(3061, 3060, [1,1],[2,1],[3,1],[4,1]), %n[])
+assert_eq(linear_forms_primes(3100, 3060, [1,1],[2,1],[3,1],[4,1]), %n[])
+assert_eq(linear_forms_primes(1, 12000,  [1,1],[2,1],[3,1],[4,1],[5,1]), %n[10830])
+assert_eq(linear_forms_primes(9538620, 9993270,  [1,1],[2,1],[3,1],[4,1],[5,1]), %n[9538620, 9780870, 9783060, 9993270])
+assert_eq(linear_forms_primes(9538620+1, 9993270,  [1,1],[2,1],[3,1],[4,1], [5,1]), %n[9780870, 9783060, 9993270])
+
+assert_eq(linear_forms_primes(1, 1000,  [1,-1],[2,-1],[3,-1]), %n[4, 6, 24, 30, 84, 90, 174, 234, 240, 294, 420, 660, 954])
+assert_eq(linear_forms_primes(1, 10000, [1,-1],[2,-1],[3,-1],[4,-1]), %n[6, 90, 1410, 1890])
+assert_eq(linear_forms_primes(1, 500, [2,-1],[4,-1],[6,-1]), %n[2, 3, 12, 15, 42, 45, 87, 117, 120, 147, 210, 330, 477])
+assert_eq(linear_forms_primes(1, 1000, [2,-1],[4,-1],[6,-1]), 1..1000 -> grep {|m| [[2,-1], [4,-1], [6,-1]].all { is_prime(_[0]*m + _[1]) }})
+assert_eq(linear_forms_primes(1, 400, [2,1],[4,3],[8,7]), %n[2, 5, 20, 44, 89, 179, 254, 359])
+assert_eq(linear_forms_primes(1, 500, [2,1],[4,3],[8,7]), %n[2, 5, 20, 44, 89, 179, 254, 359])
+assert_eq(linear_forms_primes(254, 254, [2,1],[4,3],[8,7]), %n[254])
+assert_eq(linear_forms_primes(255, 254, [2,1],[4,3],[8,7]), %n[])
+assert_eq(linear_forms_primes(1000, 254, [2,1],[4,3],[8,7]), %n[])
+assert_eq(linear_forms_primes(253, 254, [2,1],[4,3],[8,7]), %n[254])
+assert_eq(linear_forms_primes(253, 253, [2,1],[4,3],[8,7]), %n[])
+assert_eq(linear_forms_primes(1, 500, [2,-1],[4,-1],[8,-1]), %n[3, 6, 21, 45, 90, 180, 255, 360])
+assert_eq(linear_forms_primes(1, 400, [2,-1],[4,-1],[8,-1]), %n[3, 6, 21, 45, 90, 180, 255, 360])
+assert_eq(linear_forms_primes(1, 500, [2,-1],[4,-1],[8,-1],[16,-1]), %n[3, 45, 90, 180, 255])
+assert_eq(linear_forms_primes(1, 500, [17,1],[23,5]), %n[18, 24, 66, 126, 186, 216, 378, 384, 426])
+assert_eq(linear_forms_primes(1, 450, [17,1],[23,5]), %n[18, 24, 66, 126, 186, 216, 378, 384, 426])
+assert_eq(linear_forms_primes(1, 1000, [17,1],[23,5]), 1..1000 -> grep { is_prime(17*_ + 1) && is_prime(23*_ + 5) })
+
+assert_eq(linear_forms_primes(1, 500, [17,4],[15,-8],[19, 2]), %n[5, 9, 11, 65, 75, 105, 125, 159, 191, 221, 231, 291, 341, 369, 419, 461, 471, 479])
+assert_eq(linear_forms_primes(1, 500, [17,4],[15,+8],[19, 2]), %n[5, 11, 45, 65, 105, 159, 161, 189, 221, 275, 291, 299, 431, 479])
+assert_eq(linear_forms_primes(1, 500, [1,0], [1,2]), %n[3, 5, 11, 17, 29, 41, 59, 71, 101, 107, 137, 149, 179, 191, 197, 227, 239, 269, 281, 311, 347, 419, 431, 461])
+
+assert_eq(linear_forms_primes(2**128 + 1, 2**128 + 10000, [1, 0], [1, 2]), %n[340282366920938463463374607431768213887, 340282366920938463463374607431768214757])
+assert_eq(linear_forms_primes(1, 10000, [1, 0], [1, 2**128]), %n[421, 463, 757, 1783, 3301, 3907, 4201, 5647, 6067, 6337, 7933, 7963, 9547])
+
+assert_eq(linear_forms_primes(1, 100, [5, 5]), [])
+assert_eq(linear_forms_primes(1, 100), [])
+
+do {
+    func f(n, multiple = 1, alpha = 1) {
+
+        var terms = (1..n -> map {|k| [multiple * k, alpha] })
+
+        var A = 1
+        var B = 2*A
+
+        loop {
+            var arr = linear_forms_primes(A, B, terms...)
+
+            if (arr) {
+                return arr[0]
+            }
+
+            A = B+1
+            B = 2*A
+        }
+    }
+
+    assert_eq({ f(_, 1, +1) } `map` 1..8, %n[1, 1, 2, 330, 10830, 25410,  512820,  512820]);     # A088250
+    assert_eq({ f(_, 1, -1) } `map` 1..8, %n[3, 3, 4, 6,   6,     154770, 2894220, 2894220]);    # A088651
+    assert_eq({ f(_, 9, +1) } `map` 1..8, %n[2, 2, 4, 170, 9860,  23450,  56980,   56980]);      # A372238
+    assert_eq({ f(_, 2, -1) } `map` 1..8, %n[2, 2, 2, 3,   3,     77385,  1447110, 1447110]);    # A124492
+    assert_eq({ f(_, 2, +1) } `map` 1..8, %n[1, 1, 1, 165, 5415,  12705,  256410,  256410]);     # A071576
+
+    assert_eq({ f(_, _, +1) } `map` 1..8, %n[1, 1, 2, 765,  2166, 4235,  73260,  2780085]);
+    assert_eq({ f(_, _, -1) } `map` 1..8, %n[3, 2, 2, 3225, 18,   25795, 413460, 7505190]);
+
+    assert_eq({ f(_, _, -13) } `map` 1..6, %n[15, 8,  6,  15,  24, 2800]);
+    assert_eq({ f(_, _, +13) } `map` 1..6, %n[4,  12, 10, 90,  18, 40705]);
+    assert_eq({ f(_, _, -23) } `map` 1..6, %n[25, 13, 10, 255, 6,  5]);
+    assert_eq({ f(_, _, +23) } `map` 1..6, %n[6,  9,  10, 60,  48, 13300]);
+
+    assert_eq({ f(_, 1, +23) } `map` 1..6, %n[6, 18, 30, 210, 240, 79800]);
+    assert_eq({ f(_, 1, -23) } `map` 1..8, %n[25, 26, 30, 30, 30, 30, 142380, 1319010]);
+
+    assert_eq({ f(_, 1, +101) } `map` 1..6, %n[2,   6,   96,  180, 3990, 1683990]);
+    assert_eq({ f(_, 1, -101) } `map` 1..6, %n[103, 104, 104, 240, 3630, 78540]);
+}
+
+assert_eq(linear_forms_primes(1, 1e3, [2, 1], [4, 1], [6, 1]), %n[1, 3, 18, 105, 135, 153, 165, 168, 300, 363, 585, 618, 648, 765, 828]);    # A124408
+assert_eq(linear_forms_primes(1, 1e4, [2, 1], [4, 1], [6, 1], [8, 1]),          %n[165, 765, 1530, 2130, 2475, 3420, 5415, 7695, 9060]);     # A124409
+assert_eq(linear_forms_primes(1, 1e5, [2, 1], [4, 1], [6, 1], [8, 1], [10, 1]), %n[5415, 12705, 13020, 44370, 82950, 98280]);                # A124410
+assert_eq(linear_forms_primes(1, 1e6, [2, 1], [4, 1], [6, 1], [8, 1], [10, 1], [12, 1]), %n[12705, 13020, 105525, 256410, 966840]);          # A124411
+
+func A318646(n) {
+    var terms = [6, 12, 1 .. n-2 -> map{|k| 9 * 2**k }...].map { [_, 1] }
+
+    var A = 1
+    var B = 2*A
+
+    loop {
+
+        var arr = linear_forms_primes(A, B, terms...).grep {|k| k.valuation(2) >= n-4 }
+
+        if (arr) {
+            return arr[0]
+        }
+
+        A = B+1
+        B = 2*A
+    }
+}
+
+assert_eq(A318646.map(3..9), %n[1, 1, 380, 380, 780320, 950560, 950560])
+assert_eq(linear_forms_primes(78977932125503-1e6, 78977932125503+1e6, [1, 0], 1..14 -> map {|k| [1, 4*k*(k+1)] }...), [78977932125503])
+
+do {
+    var n = 10
+    var terms = [6, 12, 1 .. n-2 -> map{|k| 9 * 2**k }...].map { [_, 1] }
+
+    var A = 3208386195840-1e6
+    var B = 3208386195840+1e6
+
+    var arr = linear_forms_primes(A, B, terms...).grep {|k| k.valuation(2) >= n-4 }
+    assert_eq(arr, [3208386195840])
+}
+
+do {
+
+    func f(n, c) {
+
+        var lo = 1
+        var hi = 2*lo
+
+        var diffs = (1 ..^ n -> map {|k| [1, c*k*(k+1)] })
+
+        loop {
+            var terms = linear_forms_primes(lo, hi, [1, 0], diffs...).grep {|p| !is_prime(p + c*n*(n+1)) }
+            if (terms) {
+                return terms[0]
+            }
+            lo = hi+1
+            hi = 2*lo
+        }
+    }
+
+    assert_eq(f(16, 7), 17)
+    assert_eq(1..14 -> map {|n| f(n, 4) }, %n[2, 3, 29, 5, 23, 269, 272879, 149, 61463, 929, 7426253, 2609, 233, 59])
+    assert_eq(1..9  -> map {|n| f(n, 6) }, %n[2, 19, 5, 67, 7, 281, 1051, 6791, 11])
+    assert_eq(1..11 -> map {|n| f(n, 7) }, %n[2, 3, 59, 5, 89, 599, 3329, 617, 269, 21107, 9833477])
+    assert_eq(1..11 -> map {|n| f(n, 8) }, %n[2, 3, 151, 181, 13, 811, 23671, 92221, 45417481, 5078503, 4861])
+    assert_eq(1..13 -> map {|n| f(n, 9) }, %n[2, 11, 13, 5, 19, 173, 3163, 83, 21013, 878359, 3676219, 239, 43])
+}
+
+assert_eq(invmod(0, 1), 0)
 
 say "** Tests passed!"

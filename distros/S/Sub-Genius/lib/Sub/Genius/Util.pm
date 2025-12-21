@@ -294,85 +294,161 @@ sub precache {
 
 1;
 
+=encoding UTF-8
+
 =head1 NAME
 
-Sub::Genius::Util - Helper module for dumping Perl code
+Sub::Genius::Util - Utilities for generating and inspecting Perl code from Sub::Genius plans
 
 =head1 SYNOPSIS
 
-This is implemented for use with L<stubby>, please look at that script
-to see how it's used. This module is lightly documented, to say the least.
+    use Sub::Genius::Util;
+
+    # Generate a standalone Perl script from a plan
+    print Sub::Genius::Util->plan2nodeps(
+        plan => q{ A & B & C }
+    );
+
+This module is primarily intended for use by tooling such as
+L<stubby>, but its methods may also be invoked directly when exploring,
+debugging, or materializing Sub::Genius plans.
 
 =head1 DESCRIPTION
 
-Useful for dumping a Perl code for starting a module or script that
-implements the subroutines that are involved in the execution of a C<plan>.
+C<Sub::Genius::Util> provides helper routines that operate I<on top of>
+L<Sub::Genius> to make execution plans concrete and inspectable.
 
-Given a PRE, dumps a Perl script with the subroutines implied by the
-symbols in the PREs as subroutines. It might be most effective when called
-as a one liner,
+Where C<Sub::Genius> focuses on expressing and executing concurrency
+semantics, this module focuses on:
 
-This could get unweildy if you have a concurrent model in place, but
-anyone reviewing this POD should be able to figure out the best way to
-leverage C<plan2perl>.
+=over 4
 
-Each subroutine takes the approximate form,
+=item *
+Generating Perl code from declarative plans
+
+=item *
+Materializing execution order explicitly
+
+=item *
+Bootstrapping scripts or modules from plans
+
+=item *
+Eliminating runtime dependency on Sub::Genius when desired
+
+=back
+
+The utilities in this module are most commonly used during development,
+experimentation, or build-time code generation, rather than in
+long-running production systems.
+
+=head2 Generated Subroutine Shape
+
+When generating Perl code that corresponds to plan symbols, each
+subroutine is emitted with a conventional structure compatible with
+C<Sub::Genius::run_once>:
 
     sub C {
-      my $scope      = shift;    # execution context passed by Sub::Genius::run_once
-      state $mystate = {};       # sticks around on subsequent calls
-      my    $myprivs = {};       # reaped when execution is out of sub scope
-    
-      #-- begin subroutine implementation here --#
-      print qq{Sub C: ELOH! Replace me, I am just placeholder!\n};
-    
-      # return $scope, which will be passed to next subroutine
+      my $scope      = shift;    # execution context
+      state $mystate = {};       # persistent state (coroutine-style)
+      my    $myprivs = {};       # lexical scratch space
+
+      # --- implementation goes here ---
+      print qq{Sub C: placeholder\n};
+
       return $scope;
     }
 
+This reflects the core Sub::Genius execution model, where a mutable
+C<$scope> hash reference is threaded through the execution plan.
+
 =head1 METHODS
 
-C<subs2perl>
+=head2 subs2perl
 
-Implemented to support the accompanying utility used for initialing a script with
-L<Sub::Genius>.
+    Sub::Genius::Util->subs2perl(...);
 
-C<plan2nodeps>
+Generates Perl subroutine stubs corresponding to the symbols implied by
+a plan.
 
-Given a PRE, dumps a Perl script that can be run without loading L<Sub::Genius>
-by providing explicit calls, that also pass along a C<$scope> variable.
+This method exists to support tooling that initializes scripts or
+modules intended to be executed under Sub::Genius. The generated code
+is a starting point and is expected to be edited by hand.
 
-    $ perl -MSub::Genius::Util -e 'print Sub::Genius::Util->plan2nodeps(plan => q{A&B&C&D&E&F&G})' > my-script.pl
-    
-    # does explicitly what Sub::Genius::run_once does, give a sequentialized plan
-    # generated from the PRE, 'A&B&C&D&E&F&G'
-    
-    my $scope = { };
-    $scope    = G($scope);
-    $scope    = D($scope);
-    $scope    = F($scope);
-    $scope    = B($scope);
-    $scope    = E($scope);
-    $scope    = H($scope);
-    $scope    = C($scope);
-    $scope    = A($scope);
+=head2 plan2nodeps
 
-C<precache>
+    Sub::Genius::Util->plan2nodeps( plan => $pre );
 
-Accepts various parameters for invoking L<Sub::Genius>'s caching feature
-and options. Returns a necessarily initialized Sub::Genius instance. Since
-this uses Sub::Genius' native handling of caching, the PRE will not be
-repeatedly cached unless forced. 
+Given a PRE, generates a standalone Perl script that explicitly encodes
+the execution order implied by the plan.
+
+The resulting script:
+
+=over 4
+
+=item *
+Does not depend on L<Sub::Genius> at runtime
+
+=item *
+Contains explicit subroutine calls
+
+=item *
+Passes a C<$scope> variable between calls
+
+=back
+
+Example:
+
+    perl -MSub::Genius::Util \
+         -e 'print Sub::Genius::Util->plan2nodeps(
+               plan => q{A&B&C&D}
+             )' > my-script.pl
+
+This produces code equivalent to what
+C<Sub::Genius::run_once> would execute dynamically, but fully spelled
+out:
+
+    my $scope = {};
+    $scope = C($scope);
+    $scope = A($scope);
+    $scope = D($scope);
+    $scope = B($scope);
+    $scope = E($scope);
+
+The exact order depends on the chosen valid serialization.
+
+=head2 precache
+
+    my $sg = Sub::Genius::Util->precache(%opts);
+
+Invokes Sub::Genius caching facilities and returns an initialized
+C<Sub::Genius> instance.
+
+This method centralizes cache-related setup and ensures that PREs are
+compiled only once unless explicitly forced. It is primarily intended
+for build-time or tooling workflows.
+
+=head1 DESIGN NOTES
+
+This module is intentionally narrow in scope.
+
+It does not attempt to abstract away the mechanics of Sub::Genius or hide
+how execution plans are linearized. Instead, it aims to make those
+mechanics explicit and inspectable.
+
+If you find yourself calling these utilities repeatedly at runtime, it
+is worth reconsidering whether code generation is the appropriate tool
+for that use case.
 
 =head1 SEE ALSO
 
-L<Sub::Genius>
+L<Sub::Genius>,
+L<Sub::Genius::Example>,
+L<stubby>
 
 =head1 COPYRIGHT AND LICENSE
 
-Same terms as perl itself.
+Same terms as Perl itself.
 
 =head1 AUTHOR
 
 OODLER 577 E<lt>oodler@cpan.orgE<gt>
-

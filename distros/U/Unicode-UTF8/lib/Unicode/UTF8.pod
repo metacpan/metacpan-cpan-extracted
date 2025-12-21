@@ -22,7 +22,7 @@ specified by Unicode and ISO/IEC 10646:2011.
     $string = decode_utf8($octets);
     $string = decode_utf8($octets, $fallback);
 
-Returns an decoded representation of C<$octets> in UTF-8 encoding as a character
+Returns a decoded representation of C<$octets> in UTF-8 encoding as a character
 string.
 
 C<$fallback> is an optional C<CODE> reference which provides a error-handling 

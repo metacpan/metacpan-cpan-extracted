@@ -175,123 +175,180 @@ sub run_precache {
 exit;
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-stubby - commandline tool for dumping stub Perl programs sequentialized using L<Sub::Genius>.
+stubby - Command-line tool for generating and inspecting Perl programs derived from Sub::Genius plans
 
 =head1 SYNOPSIS
 
-=head2 Generate code that is dependent on L<Sub::Genius>:
+C<stubby> is a development and tooling utility for working with
+L<Sub::Genius>. It can generate Perl code, enumerate valid execution
+orders, visualize plans, and pre-cache compiled automata.
 
-Example redirects to a file, C<./spawn-combine.pl>
+=head2 Generate code that depends on L<Sub::Genius>
 
-    $ stubby init --run once -p "can bejust a list of subroutines" > ./spawn-combine.pl
+Generate a Perl script that invokes Sub::Genius at runtime.
+The example below redirects output to C<./spawn-combine.pl>:
 
-=head2 Generate code that is I<not> dependent on L<Sub::Genius>:
+    $ stubby init --run once \
+        -p "subA subB subC" \
+        > ./spawn-combine.pl
 
-Example redirects to a file, C<./spawn-combine.pl>
+The generated script includes C<use Sub::Genius ();> and executes the
+plan dynamically.
 
-    $ stubby init --run nodeps -p "init ( subA & subB ) middle ( subA & suB ) fin" > ./spawn-combine.pl
+=head2 Generate code with no dependency on L<Sub::Genius>
 
-Note: while this necessarily causes a PRE to be cached, the code
-generated also doesn't C<use Sub::Genius ();>, so the caching effect on
-this subcommand is only as useful for making this command faster. See
-C<precache> subcommand below for a more useful approach for caching.
+Generate a fully expanded, dependency-free Perl script. The execution
+order is made explicit and Sub::Genius is not required at runtime:
 
-=head2 Pre-cache PREs (may be reasonably called, a I<compile> step):
+    $ stubby init --run nodeps \
+        -p "init ( subA & subB ) middle ( subC & subD ) fin" \
+        > ./spawn-combine.pl
 
-C<precache> outputs the absolute path to the cache file on completion.
+Note: although this necessarily causes the PRE to be compiled and cached,
+the generated code does not C<use Sub::Genius ();>. In this mode, caching
+only serves to speed up the C<stubby> invocation itself.
 
-    $ CACHEFILE=$(stubby precache -p "init (subA & subB ) middle (subC & subD) fin")
-    $ echo Cache file is ${CACHEFILE}
+For intentional or distributable caching, see the C<precache> subcommand
+below.
 
-    $ CACHEFILE=$(stubby precache -f ./my-preplan.preplan -d put/in/here)
-    $ echo Cache file is ${CACHEFILE}
+=head2 Pre-cache PREs (a compiler-like step)
 
-Note: C<./my-preplan.preplan> should generate the same checksum (and cache)
-as the PRE specified using C<-p> in the first example.
+The C<precache> subcommand compiles a PRE into a minimized DFA and stores
+it in the cache directory. On success, it prints the absolute path to the
+cache file:
+
+    $ CACHEFILE=$(stubby precache \
+        -p "init ( subA & subB ) middle ( subC & subD ) fin")
+
+    $ echo "Cache file is ${CACHEFILE}"
+
+PREs may also be supplied from a file:
+
+    $ CACHEFILE=$(stubby precache \
+        -f ./my-preplan.preplan \
+        -d ./cache)
+
+The following file contents produce the same checksum and cache entry as
+the inline PRE above:
 
     init
-      (subA & subB )
+      ( subA & subB )
     middle
-      (subC & subD)
+      ( subC & subD )
     fin
 
-C<Sub::Genius> tries very hard to generate a consistent representation
-of the PREs, basically by minifying them.
+C<Sub::Genius> normalizes PREs aggressively (stripping whitespace,
+comments, and adding explicit symbol delimiters) so semantically
+equivalent PREs produce the same cache key.
 
 =head1 DESCRIPTION
 
-General commandline tool for doing usefuly things while developing or
-distributing applications that use L<Sub::Genius>.
+C<stubby> is a general-purpose command-line tool intended to support
+development, debugging, and distribution of applications built on
+L<Sub::Genius>.
 
-C<export> - dumps the minimized DFA resulting from the C<PRE> in GraphViz's
-C<dot> format. Useful with programs such as C<xdot>, which is a viewer; in
-addition to the rendering programs provided by GraphViz, such as C<dot>, C<circo>,
-etc.
+It provides several subcommands, each addressing a different stage of
+the workflow.
 
-C<init> -  generates boilerplate Perl to help start a script, module,
-or project that is using C<Sub::Genius>.
+=head2 Subcommands Overview
 
-C<list> - enumerates all I<valid> strings accepted by the PRE that is provided;
-this is useful for verifying all of the orderings in which the PRE describes the
-serialized execution plan.
+=over 4
 
-C<precache> - provides a compiler-I<like> tool for precaching PREs
-that L<Sub::Genius> is able to use natively for skipping the potentially
-expensive step of convering a PRE (I<preplan>) to a DFA (the thing L<FLAT>
-uses to generate valid (i.e., I<sequentially consistent>) execution plans.
+=item C<export>
+
+Dumps the minimized DFA produced from a PRE in GraphViz C<dot> format.
+This is useful for visualization with tools such as C<xdot>, C<dot>,
+C<circo>, or other GraphViz renderers.
+
+=item C<init>
+
+Generates boilerplate Perl code to help start a script, module, or
+project that uses Sub::Genius. Depending on options, the generated code
+may invoke Sub::Genius dynamically or be fully dependency-free.
+
+=item C<list>
+
+Enumerates all I<valid> execution orders (strings) accepted by the PRE.
+This is useful for verifying correctness assumptions and understanding
+the full range of sequentially consistent orderings.
+
+=item C<precache>
+
+Compiles a PRE into a DFA and stores it in the cache directory, allowing
+Sub::Genius to skip the potentially expensive PRE-to-DFA conversion step
+at runtime.
+
+=back
 
 =head1 OPTIONS FOR SUBCOMMAND C<export>
 
 =over 4
 
-=item C<-f|--prefile> C<path/to/PRE.preplan>
+=item C<-f | --prefile> C<path/to/PRE.preplan>
 
-Specify the PRE from a file. Mutually exclusive with C<-p|--preplan>.
+Read the PRE from a file. Mutually exclusive with C<-p|--preplan>.
 
-=item C<-p|--preplan> C<PRE>
+=item C<-p | --preplan> C<PRE>
 
-An the actual PRE that is to be cached. Mutually exclusive with
-C<-f|--prefile>, which can be used to specify a PRE in a text file.
+Provide the PRE directly on the command line. Mutually exclusive with
+C<-f|--prefile>.
 
 =back
 
 =head1 OPTIONS FOR SUBCOMMAND C<init>
 
-The C<init> subcommand does not convert a PRE to a DFA, it simply takes a
-space delimited list of subroutine names, that are then used to generate
-minimal subroutine stubs. It is then a starting point for the developer
-of the code to manually edit the PRE (contained as a scalar string,
-C<$preplan>) and implement the bodies of the subroutines.
+The C<init> subcommand does not enumerate execution orders. Instead, it
+extracts symbol names from the PRE (or list of subroutines) and generates
+Perl code stubs suitable for manual editing.
 
 =over 4
 
-=item C<-x|--run>
+=item C<-x | --run>
 
-Choose invocation method to use in the code. The default is C<once>.
+Selects the execution style embedded in the generated code.
+Default is C<once>.
 
-Options include:
+Supported values:
 
-C<once>   - generates code that invokes C<Sub::Genius::run_once>.
+=over 4
 
-C<any>    - generates code that invokes C<Sub::Genius::run_any>.
+=item C<once>
 
-C<all>    - generates code that invokes C<Sub::Genius::run_once>, in a C<do { ... } while ()> loop.
+Generate code that invokes C<Sub::Genius::run_once>.
 
-C<nodeps> - generates code that is free of any dependencies, including C<Sub::Genius>.
+=item C<any>
 
-=item C<-p|--preplan>
+Generate code that invokes C<Sub::Genius::run_any>.
 
-An actual PRE, when used with C<-x|--run> C<[ once | any | all ]>, the subroutine
-names are stripped and used, but the PRE is not converted to a DFA. 
+=item C<all>
 
-when used with C<-x|--run nodeps>, the PRE is necessarily generates subroutine calls
-that must necessarily be I<sequentially consistent>.
+Generate code that invokes C<Sub::Genius::run_once> inside a loop to
+iterate over all valid execution orders.
 
-=item C<-f|--prefile>
+=item C<nodeps>
 
-Specify the PRE from a file. Mutually exclusive with C<-p|--preplan>.
+Generate code with no dependency on Sub::Genius. All subroutine calls
+are explicit and sequentialized.
+
+=back
+
+=item C<-p | --preplan>
+
+Provide the PRE inline.
+
+When used with C<once>, C<any>, or C<all>, the PRE is parsed only to
+extract symbol names; no DFA is built.
+
+When used with C<nodeps>, the PRE is necessarily compiled and a valid
+sequential ordering is emitted.
+
+=item C<-f | --prefile>
+
+Read the PRE from a file. Mutually exclusive with C<-p|--preplan>.
 
 =back
 
@@ -299,61 +356,54 @@ Specify the PRE from a file. Mutually exclusive with C<-p|--preplan>.
 
 =over 4
 
-=item C<-f|--prefile> C<path/to/PRE.preplan>
+=item C<-f | --prefile> C<path/to/PRE.preplan>
 
-Specify the PRE from a file. Mutually exclusive with C<-p|--preplan>.
+Read the PRE from a file. Mutually exclusive with C<-p|--preplan>.
 
-=item C<-p|--preplan> C<PRE>
+=item C<-p | --preplan> C<PRE>
 
-An the actual PRE that is to be cached. Mutually exclusive with
-C<-f|--prefile>, which can be used to specify a PRE in a text file.
+Provide the PRE directly on the command line.
 
 =back
 
 =head1 OPTIONS FOR SUBCOMMAND C<precache>
 
-Effectively compiles a PRE using L<Sub::Genius>'s caching feature. As
-long as PREs that produced the same C<checksum> by C<Sub::Genius> and
-the C<cachedir> is the same, this allows one to prepare and distribute
-any number of pre-compiled DFAs. For sufficiently large or highly shuffled
-PREs, this can be leveraged to virtually eliminate the overhead associated
-with using C<Sub::Genius> in deployed code..
+The C<precache> subcommand explicitly prepares cached DFAs for reuse.
+This is especially useful for large or highly shuffled PREs.
 
 =over 4
 
-=item C<-d|--cachedir> C<path/to/cachedir>
+=item C<-d | --cachedir> C<path/to/cachedir>
 
-Specifies the C<cachedir> to use for saving the cached DFAs. See
-L<Sub::Genius> for more information about caching. This option is passed
-to the C<cachedir> parameter of the constructor.
+Directory in which to store cached DFAs. Passed directly to the
+C<cachedir> parameter of C<Sub::Genius->new>.
 
-=item C<-f|--prefile> C<path/to/PRE.preplan>
+=item C<-f | --prefile> C<path/to/PRE.preplan>
 
-Specify the PRE from a file. Mutually exclusive with C<-p|--preplan>.
+Read the PRE from a file. Mutually exclusive with C<-p|--preplan>.
 
-=item C<-p|--preplan> C<PRE>
+=item C<-p | --preplan> C<PRE>
 
-An the actual PRE that is to be cached. Mutually exclusive with
-C<-f|--prefile>, which can be used to specify a PRE in a text file.
+Provide the PRE directly on the command line.
 
 =item C<--force>
 
-Forces re-caching of previously cached DFAs, or at least for those matching
-the C<checksum> and are located in the same C<cachedir>.
+Force regeneration of the cache entry even if a matching checksum
+already exists in the cache directory.
 
 =back
 
 =head1 SEE ALSO
 
-L<Sub::Genius>
+L<Sub::Genius>, L<Sub::Genius::Util>, L<Sub::Genius::Example>
 
 =head1 BUGS
 
-I<Probably>
+I<Probably.> If you find one, it is almost certainly real.
 
 =head1 COPYRIGHT AND LICENSE
 
-perl5
+Same terms as Perl itself.
 
 =head1 AUTHOR
 

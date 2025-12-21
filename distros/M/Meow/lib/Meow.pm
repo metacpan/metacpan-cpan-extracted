@@ -3,7 +3,7 @@ package Meow;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 require XSLoader;
 XSLoader::load('Meow', $VERSION);
@@ -20,7 +20,7 @@ Meow - Object ฅ^•ﻌ•^ฅ Orientation
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
@@ -197,6 +197,26 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 		1;
 	}
 
+	{
+		package Foo::Marlin;
+		use Types::Common -lexical, qw/Int/;
+		use Marlin
+			'one' => { isa => Int, default => 100 },
+			'two' => { isa => Int, default => 200 };
+
+		1;
+	}
+
+
+	{
+		package Foo::Extends::Marlin;
+
+		use Marlin
+			-extends => [qw/Foo::Marlin/];
+
+		1;
+	}
+
 
 	my $r = timethese(1000000, {
 		'Moo' => sub {
@@ -220,13 +240,16 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 
 ...
 
-	      Meow: 1.14885 wallclock secs ( 1.13 usr +  0.02 sys =  1.15 CPU) @ 869565.22/s (n=1000000)
-	       Moo: 1.62831 wallclock secs ( 1.63 usr +  0.00 sys =  1.63 CPU) @ 613496.93/s (n=1000000)
-	     Mouse: 0.840958 wallclock secs ( 0.84 usr +  0.00 sys =  0.84 CPU) @ 1190476.19/s (n=1000000)
-		   Rate   Moo  Meow Mouse
-	Moo    613497/s    --  -29%  -48%
-	Meow   869565/s   42%    --  -27%
-	Mouse 1190476/s   94%   37%    --
+	Benchmark: timing 1000000 iterations of Marlin, Meow, Moo, Mouse...
+	    Marlin: 0.911942 wallclock secs ( 0.89 usr +  0.02 sys =  0.91 CPU) @ 1098901.10/s (n=1000000)
+	      Meow: 1.64158 wallclock secs ( 1.63 usr +  0.02 sys =  1.65 CPU) @ 606060.61/s (n=1000000)
+	       Moo: 1.64699 wallclock secs ( 1.64 usr +  0.00 sys =  1.64 CPU) @ 609756.10/s (n=1000000)
+	     Mouse: 0.889783 wallclock secs ( 0.88 usr +  0.00 sys =  0.88 CPU) @ 1136363.64/s (n=1000000)
+		    Rate   Meow    Moo Marlin  Mouse
+	Meow    606061/s     --    -1%   -45%   -47%
+	Moo     609756/s     1%     --   -45%   -46%
+	Marlin 1098901/s    81%    80%     --    -3%
+	Mouse  1136364/s    87%    86%     3%     --
 
 Note: Type::Tiny::XS is installed and so is the other optional XS dependancies for Moo.
 

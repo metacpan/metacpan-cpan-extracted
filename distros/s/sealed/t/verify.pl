@@ -1,8 +1,8 @@
 #!/usr/bin/env -S perl -Ilib -Iblib/arch
+use POSIX 'dup2';
+POSIX::dup2 fileno(STDERR), fileno(STDOUT);
 use Test::More tests => 7;
 use v5.38;
-use POSIX 'dup2';
-dup2 fileno(STDERR), fileno(STDOUT);
 use strict;
 use warnings;
 use Benchmark ':all';
@@ -30,7 +30,7 @@ BEGIN {our @ISA=qw/Foo/}
 
 
 use constant label => __PACKAGE__;
-my label $y; #sealed src filter transforms this into: my label $y = 'label';
+my label $y; #sealed src filter transforms this into: my label $y = label;
 
 sub sealed :Sealed {
   $y->foo();
@@ -38,7 +38,7 @@ sub sealed :Sealed {
 
 use sealed 'verify';
 
-sub also_sealed :Sealed (label $a, Int $b, Str $c="HOLA", Int $d//=3, Int $e||=4) {
+sub also_sealed :Sealed (label $a, integer $b, string $c="HOLA", integer $d//=3, integer $e||=4) {
   if ($a) {
     my Benchmark $bench;
     my $inner = $a;

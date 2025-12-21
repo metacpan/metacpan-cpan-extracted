@@ -873,9 +873,9 @@ xscon_strictcon(const char* pkg, SV* const object, SV* const args) {
         return;
     }
 
-    SV** const HAS_globref = hv_fetch(stash, "__XSCON_HAS", 11, 0);
-    AV* const HAS_array = GvAV(*HAS_globref);
-    I32 const HAS_len = av_len(HAS_array) + 1;
+    SV** const ALLOW_globref = hv_fetch(stash, "__XSCON_ALLOW", 13, 0);
+    AV* const ALLOW_array = GvAV(*ALLOW_globref);
+    I32 const ALLOW_len = av_len(ALLOW_array) + 1;
 
     AV *badattrs = newAV();
 
@@ -888,8 +888,8 @@ xscon_strictcon(const char* pkg, SV* const object, SV* const args) {
         bool found = FALSE;
 
         I32 i;
-        for (i = 0; i < HAS_len; i++) {
-            SV* const attr = *av_fetch(HAS_array, i, TRUE);
+        for (i = 0; i < ALLOW_len; i++) {
+            SV* const attr = *av_fetch(ALLOW_array, i, TRUE);
             if (sv_eq(k, attr)) {
                 found = TRUE;
                 break;

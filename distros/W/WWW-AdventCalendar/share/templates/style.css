@@ -311,3 +311,28 @@ pre {
 }
 
 /* END CHRISTMAS:  Move to "extra CSS" */
+
+/* Responsive design rules */
+
+img, svg, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+pre {
+  overflow-x: auto;
+}
+
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 800px) {
+  #contentwrapper {
+    width: 95%;
+    min-width: 0;
+  }
+}

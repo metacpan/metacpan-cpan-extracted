@@ -1,4 +1,4 @@
-package WWW::AdventCalendar 1.113;
+package WWW::AdventCalendar 1.114;
 # ABSTRACT: a calendar for a month of articles (on the web)
 
 use Moose;
@@ -12,7 +12,6 @@ use Color::Palette::Schema;
 use DateTime::Format::W3CDTF;
 use DateTime;
 use DateTime;
-use Email::Simple;
 use File::Basename;
 use File::Copy qw(copy);
 use File::Path 2.07 qw(remove_tree);
@@ -497,17 +496,24 @@ sub read_articles {
 
     open my $fh, '<:encoding(utf-8)', $file;
     my $content = do { local $/; <$fh> };
-    my $document = Email::Simple->new($content);
+    my ($header, $body) = split /\n{2,}/, $content, 2;
+
+    my %header;
+    for my $line (split /\n/, $header) {
+      my ($name, $value) = split /\s*:\s*/, $line, 2;
+      $header{lc $name} = $value;
+    }
+
     my $isodate  = $name;
 
-    die "no title set in $file\n" unless $document->header('title');
+    die "no title set in $file\n" unless $header{title};
 
     my $article  = WWW::AdventCalendar::Article->new(
-      body   => scalar $document->body,
+      body   => scalar $body,
       date   => scalar _parse_isodate($isodate),
-      title  => scalar $document->header('title'),
-      topic  => scalar $document->header('topic'),
-      author => scalar $document->header('author')
+      title  => $header{title},
+      topic  => $header{topic},
+      author => $header{author}
              // scalar $self->default_author,
       calendar => $self,
     );
@@ -537,7 +543,7 @@ WWW::AdventCalendar - a calendar for a month of articles (on the web)
 
 =head1 VERSION
 
-version 1.113
+version 1.114
 
 =head1 DESCRIPTION
 
@@ -643,14 +649,15 @@ new articles that have become available.
 =head1 PERL VERSION
 
 This module should work on any version of perl still receiving updates from
-the Perl 5 Porters.  This means it should work on any version of perl released
-in the last two to three years.  (That is, if the most recently released
-version is v5.40, then this module should work on both v5.40 and v5.38.)
+the Perl 5 Porters.  This means it should work on any version of perl
+released in the last two to three years.  (That is, if the most recently
+released version is v5.40, then this module should work on both v5.40 and
+v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -734,9 +741,13 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Len Jaffe Ricardo Signes Shoichi Kaji
+=for stopwords Dave Cross Len Jaffe Ricardo Signes Shoichi Kaji
 
 =over 4
+
+=item *
+
+Dave Cross <dave@davecross.co.uk>
 
 =item *
 
@@ -754,7 +765,7 @@ Shoichi Kaji <skaji@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

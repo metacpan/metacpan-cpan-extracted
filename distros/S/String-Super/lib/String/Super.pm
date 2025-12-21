@@ -1,4 +1,3 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -13,7 +12,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 
@@ -22,7 +21,13 @@ sub new {
     my $self = bless {
         strings => [],
         result => undef,
+        keep_first => undef,
     }, $pkg;
+
+    if (defined(my $prefix_blob = delete $opts{prefix_blob})) {
+        $self->add_blob($prefix_blob);
+        $self->{keep_first} = 1;
+    }
 
     croak 'Stray options passed' if scalar keys %opts;
 
@@ -69,11 +74,12 @@ sub compact {
 
     {
         my @data = @{$self->{strings}};
+        my $j_start = $self->{keep_first} ? 1 : 0;
 
         # eliminate all strings first that are already part of other strings
         outer:
         for (my $i = 0; $i < scalar(@data); $i++) {
-            for (my $j = 0; $j < scalar(@data); $j++) {
+            for (my $j = $j_start; $j < scalar(@data); $j++) {
                 next if $i == $j;
 
                 if (index($data[$i], $data[$j]) >= 0) {
@@ -146,6 +152,7 @@ sub offset {
 
 sub _compact_n {
     my ($self, $data, $n) = @_;
+    my $j_start = $self->{keep_first} ? 1 : 0;
 
     outer:
     for (my $i = 0; $i < scalar(@{$data}); $i++) {
@@ -153,7 +160,7 @@ sub _compact_n {
 
         next if length($suffix) != $n;
 
-        for (my $j = 0; $j < scalar(@{$data}); $j++) {
+        for (my $j = $j_start; $j < scalar(@{$data}); $j++) {
             next if $i == $j;
 
             #warn sprintf('%u, %u, -> %s, %s', $i, $j, defined($data->[$i]) ? 't' : 'f', defined($data->[$j]) ? 't' : 'f') unless defined($data->[$i]) && defined($data->[$j]);
@@ -180,7 +187,7 @@ String::Super - Compactor for superstrings
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -211,11 +218,27 @@ It is also totally 8 bit/binary safe.
 
 =head2 new
 
-    my String::Super $super = String::Super->new;
+    my String::Super $super = String::Super->new( [ %opts ] );
 
 Creates a new instance. Currently no options are supported.
 
 This constructor C<die>s on any error.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<prefix_blob>
+
+(experimental since v0.02)
+
+Adds a blob (as per L</add_blob>) which is included and will alaways have an offset of C<0> (even if this means inefficient packing).
+This can be used to include data to which the offsets neet to be kept constant.
+
+B<Note:>
+Using this option may result in inefficient packing and/or some packing algorithms being disabled.
+
+=back
 
 =head2 add_blob
 
@@ -283,11 +306,11 @@ This method C<die>s on any error.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

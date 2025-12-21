@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.9923";
+our $VERSION = "0.9924";
 
 use v5.14;
 use warnings;

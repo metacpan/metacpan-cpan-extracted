@@ -101,3 +101,5 @@ Changes for Sub::Genius
              - fixed stubby bugs discovered during 2023 Perl Advent
              - fixed issue with stubby generation in Sub::Genius::Util
              - cleaned up dist.ini
+
+0.314006     2025-12-20 14:30:52-03:14 America/New_York

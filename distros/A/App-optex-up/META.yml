@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::optex::up:
     file: lib/App/optex/up.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   App::ansicolumn: '0'
   App::optex: '1.00'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex-up/issues
   homepage: https://github.com/kaz-utashiro/optex-up
   repository: https://github.com/kaz-utashiro/optex-up.git
-version: '1.00'
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

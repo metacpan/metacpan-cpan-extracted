@@ -87,7 +87,7 @@ package List::Gen;
 
     my $MAX_IDX = eval {require POSIX; POSIX::DBL_MAX()} || 2**53 - 1;
 
-    our $VERSION = '0.976';
+    our $VERSION = '0.979';
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ List::Gen - provides functions for generating lists
 
 =head1 VERSION
 
-version 0.976
+version 0.979
 
 =head1 SYNOPSIS
 
@@ -1230,8 +1230,7 @@ and used automatically.  this includes most generators with implicit caches.
 threads_slice and threads_all can be called without starting the threads
 explicitly.  in that case, they will start with default values.
 
-the threaded methods only work in perl versions 5.10.1 to 5.12.x, patches to
-support other versions are welcome.
+the threaded methods are not reliable in perl versions below 5.16.
 
 =back
 
@@ -1301,31 +1300,34 @@ support other versions are welcome.
     }
 }
 
-    my $op2cv = do {
-        my %unary_only = map {$_ => 1} qw (! \ ~);
-        my %unary_ok   = map {$_ => 1} qw (+ - not);
-        sub {
-            my $op  = shift;
-            my $src = $unary_only{$op} ? "sub {\@_ ? $op \$_[0] : $op \$_}"
-                : 'sub ($$) {'.
-                    ($unary_ok{$op} ? "
-                        if (\@_ == 0) {return ($op \$_)}
-                        if (\@_ == 1) {return ($op \$_[0])}
-                    " : "
-                        if (\@_ == 0) {return (\$a $op \$b)}
-                        if (\@_ == 1) {Carp::croak(q(too few arguments for '$op'))}
-                    ") ."
-                        if (\@_ == 2) {return (\$_[0] $op \$_[1])}
-                        reduce {\$a $op \$b} \@_
-                }";
-            eval $src or die "$@\n$src"
-        }
-    };
-    my %ops = map {$_ => $_->$op2cv} qw (
-        + - / * ** x % . & | ^ < >  << >> <=> cmp lt gt eq ne le ge == != <= >=
-        and or xor && || =~ !~
-        ! \ ~
-    );
+    my ($op2cv, %ops);
+    {
+        no warnings 'qw';
+        $op2cv = do {
+            my %unary_only = map {$_ => 1} qw (! ~ \ );
+            my %unary_ok   = map {$_ => 1} qw (+ - not);
+            sub {
+                my $op  = shift;
+                my $src = $unary_only{$op} ? "sub {\@_ ? $op \$_[0] : $op \$_}"
+                    : 'sub ($$) {'.
+                        ($unary_ok{$op} ? "
+                            if (\@_ == 0) {return ($op \$_)}
+                            if (\@_ == 1) {return ($op \$_[0])}
+                        " : "
+                            if (\@_ == 0) {return (\$a $op \$b)}
+                            if (\@_ == 1) {Carp::croak(q(too few arguments for '$op'))}
+                        ") ."
+                            if (\@_ == 2) {return (\$_[0] $op \$_[1])}
+                            reduce {\$a $op \$b} \@_
+                    }";
+                eval $src or die "$@\n$src"
+            }
+        };
+        %ops = map {$_ => $_->$op2cv} qw (
+            + - / * ** x % . & | ^ < >  << >> <=> cmp lt gt eq ne le ge ==
+            != <= >= and or xor && || =~ !~ ! \ ~
+        );
+    }
     my $ops = join '|' =>
               map  {('\b' x /^\w/).(quotemeta).('\b' x /\w$/)}
               sort {length $b <=> length $a}
@@ -1610,10 +1612,11 @@ support other versions are welcome.
             $_ => sub {$_[0]->hyper($op)}
         } qw (neg ! ~)),
         do {
+            no warnings 'qw';
             my %unary = map {
                 (my $op = $_) =~ s/^u//i;
                 $_ => (eval (m/(..)(.)/?"sub {$1\$_[0]$2}":"sub {$op \$_[0]}") or die $@)
-            } qw (! ~ \ @{} ${} %{} &{} *{} U- U+ u- u+);
+            } qw (! ~ @{} ${} %{} &{} *{} U- U+ u- u+ \ );
             map {
                 my $op = $_;
                 $op => sub {
@@ -4127,12 +4130,12 @@ C< primes > always returns the same generator.
                 }
                 $build->(1000);
                 &iterate(sub {
+                    my $force_trial;
                     if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                         return $n++ if $n == 2;
-                        no warnings;
-                        goto trial_division
+                        $force_trial = 1;
                     }
-                    if ($n <= 9999991) {
+                    if (!$force_trial && $n <= 9999991) {
                         $n > $max and $build->($n * 10)
                            until length($prime) >= $n && substr $prime, $n++, 1;
                         return $n - 1;
@@ -4154,14 +4157,14 @@ C< primes > always returns the same generator.
         $ops{prime} = sub ($) {
             my $n = @_ ? $_[0] : $_;
             return $n == 2 if not $n & 1 or $n < 2;
+            my $force_trial;
             if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
-                no warnings;
-                goto trial_division
+                $force_trial = 1;
             }
-            if ($have_mpu && !$FORCE_PRIME) {
+            if (!$force_trial && $have_mpu && !$FORCE_PRIME) {
                 return Math::Prime::Util::is_prime($n);
             }
-            if ($n < 1e7) {
+            if (!$force_trial && $n < 1e7) {
                 $build->($n * 10) if $n > $max;
                 substr $prime, $n, 1
             }

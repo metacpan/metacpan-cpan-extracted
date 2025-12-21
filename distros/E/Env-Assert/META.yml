@@ -3,6 +3,9 @@ abstract: 'Ensure that the environment variables match what is requested, or abo
 author:
   - 'Mikko Koivunalho <mikkoi@cpan.org>'
 build_requires:
+  File::Path: '0'
+  File::Temp: '0'
+  FileHandle: '0'
   FindBin: '0'
   Test2::Require: '0'
   Test2::V0: '0'
@@ -33,7 +36,6 @@ requires:
   Getopt::Long: '0'
   IO::File: '0'
   Pod::Usage: '0'
-  Test::Perl::Critic: '0'
   constant: '0'
   open: '0'
   perl: '5.010'
@@ -43,7 +45,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Assert
   homepage: https://metacpan.org/dist/Env-Assert
   repository: git://github.com/mikkoi/env-assert.git
-version: '0.014'
+version: '0.015'
 x_contributors:
   - 'Ivan Bessarabov <ivan@bessarabov.ru>'
   - 'gregor herrmann <gregoa@debian.org>'

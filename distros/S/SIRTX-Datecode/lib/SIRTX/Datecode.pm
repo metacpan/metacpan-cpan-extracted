@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2023-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,9 +15,9 @@ use Carp;
 
 use Data::Identifier;
 
-use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Simple);
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 sub new {
@@ -382,7 +382,7 @@ SIRTX::Datecode - module for interacting with SIRTX Datecodes
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -403,6 +403,7 @@ by using a variable precision. They also allow for numeric ordering over their f
 
 This package inherits from
 L<Data::Identifier::Interface::Userdata> (since v0.04),
+L<Data::Identifier::Interface::Subobjects> (since v0.06),
 and L<Data::Identifier::Interface::Simple> (experimental since v0.04).
 
 =head1 METHODS
@@ -509,7 +510,7 @@ it is converted using L</new> with C<from>.
 
 (since v0.05)
 
-Compares two datecodes similar to C<E<lt>=E<gt>>. THis method can be used to order datecodes.
+Compares two datecodes similar to C<E<lt>=E<gt>>. This method can be used to order datecodes.
 To check for them to be equal see L</eq>.
 
 The parameters are parsed the same way as L</eq>.
@@ -611,11 +612,11 @@ Ignored. For compatibility with similar methods. May be supported in later relea
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

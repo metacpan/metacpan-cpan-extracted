@@ -1,0 +1,343 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Sub::Genius::Example - Practical and exploratory examples of Sub::Genius plans
+
+=head1 INTRODUCTION
+
+This document presents a curated collection of Sub::Genius plans intended
+to demonstrate how declarative concurrency can be expressed clearly,
+correctly, and usefully in plain Perl.
+
+The examples range from immediately practical to deliberately non-intuitive.
+Some mirror common real-world concurrency patterns; others are included to
+expose edge cases, equivalence properties, and deeper semantics of Parallel
+Regular Expressions (PREs).
+
+All examples are executable under C<Sub::Genius>, and all plans describe
+I<sequentially consistent> execution in Perl’s uniprocess runtime.
+
+=head1 READING GUIDE
+
+You can read this document in several ways:
+
+=over 4
+
+=item *
+As a cookbook of ready-made concurrency patterns
+
+=item *
+As a reference for designing correct execution plans
+
+=item *
+As an exploration of equivalence and transformation of plans
+
+=item *
+As a bridge between theory and real systems (AI, graphics, pipelines)
+
+=back
+
+=head1 BASIC CONCURRENCY PATTERNS
+
+=head2 Total Ordering (Baseline)
+
+    my $plan = q{ A B C };
+
+Meaning: C<A> must run before C<B>, which must run before C<C>.
+
+This is equivalent to a traditional, linear call chain and serves as a
+baseline for comparison.
+
+=head2 Full Concurrency (Shuffle)
+
+    my $plan = q{ A & B & C };
+
+All three subroutines must run, but in any order. There are 3! valid
+execution orders.
+
+This expresses logical concurrency without threads or synchronization.
+
+=head2 Mixed Ordering
+
+    my $plan = q{ A ( B C ) & ( D E ) F };
+
+Constraints:
+
+=over 4
+
+=item *
+C<A> always runs first
+
+=item *
+C<B> before C<C>
+
+=item *
+C<D> before C<E>
+
+=item *
+The two chains may interleave
+
+=item *
+C<F> always runs last
+
+=back
+
+This models two independent pipelines with internal ordering constraints.
+
+=head1 BARRIER AND FAN-IN PATTERNS
+
+=head2 Initialization Barrier
+
+    my $plan = q{
+      init
+        (
+          load_model
+          &
+          load_tokenizer
+          &
+          load_config
+        )
+      serve
+    };
+
+All initialization steps may run in any order, but C<serve> runs only
+after all have completed.
+
+This pattern appears frequently in services, daemons, and inference servers.
+
+=head2 Fan-Out / Fan-In
+
+    my $plan = q{
+      start
+        (
+          preprocess
+          &
+          analyze
+          &
+          validate
+        )
+      merge
+      finish
+    };
+
+Independent work proceeds concurrently and then rejoins.
+
+=head1 AI / ML PIPELINE EXAMPLES
+
+=head2 Multimodal Feature Extraction
+
+    my $plan = q{
+      ingest
+        (
+          extract_text_features
+          &
+          extract_image_features
+          &
+          extract_metadata_features
+        )
+      merge_features
+      predict
+    };
+
+Each extractor operates independently; all results are required before
+prediction.
+
+=head2 Optional Model Path (Union)
+
+    my $plan = q{
+      load_model
+        (
+          use_fast_model
+          |
+          use_accurate_model
+        )
+      infer
+    };
+
+Exactly one model path is selected. Downstream logic remains unchanged.
+
+=head2 Training with Asynchronous Logging
+
+    my $plan = q{
+      init
+        (
+          load_data
+          &
+          load_model
+          &
+          setup_logger
+        )
+      (
+        train_step
+        &
+        log_metrics
+      )
+      checkpoint
+    };
+
+Logging never blocks training, but checkpointing waits for both.
+
+=head1 GRAPHICS AND RENDERING PIPELINES
+
+=head2 GPU Preparation Barrier
+
+    my $plan = q{
+      startup
+        (
+          load_meshes
+          &
+          load_textures
+          &
+          compile_shaders
+        )
+      upload_to_gpu
+      render_frame
+    };
+
+Prevents rendering before all GPU assets are ready.
+
+=head2 Deferred Rendering Passes
+
+    my $plan = q{
+      begin_frame
+        (
+          geometry_pass
+          &
+          shadow_pass
+        )
+      lighting_pass
+        (
+          postprocess_hdr
+          &
+          postprocess_bloom
+        )
+      composite
+      end_frame
+    };
+
+Expresses a modern deferred rendering pipeline without nested control flow.
+
+=head1 NON-INTUITIVE BUT VALID PLANS
+
+=head2 Nested Shuffle with Choice
+
+    my $plan = q{
+      begin
+        (
+          ( A | B )
+          &
+          ( C D )
+        )
+      end
+    };
+
+Either C<A> or C<B> runs. C<C> always precedes C<D>. The two branches may
+interleave.
+
+This plan remains finite, deterministic, and sequentially consistent.
+
+=head1 PLAN EQUIVALENCE
+
+Two plans are equivalent if they accept the same set of valid execution
+strings after normalization.
+
+=head2 Equivalent Plans via Parentheses
+
+    my $p1 = q{ A ( B C ) D };
+    my $p2 = q{ (A B) (C D) };
+
+Both enforce the same total order.
+
+=head2 Equivalent Plans via Shuffle Commutativity
+
+    my $p1 = q{ (A B) & (C D) };
+    my $p2 = q{ (C D) & (A B) };
+
+Both permit the same interleavings.
+
+=head2 Equivalent Plans via Distribution
+
+    my $p1 = q{ start (fast | safe) end };
+    my $p2 = q{ (start fast end) | (start safe end) };
+
+Choice may be factored inward or outward without changing meaning.
+
+=head1 EXECUTION GRAPHS (DOT)
+
+The following GraphViz DOT graph represents ordering constraints for
+C<(A B) & (C D)>:
+
+    digraph Plan {
+      rankdir=LR;
+      node [shape=box];
+
+      A -> B;
+      C -> D;
+
+      subgraph cluster1 { label="L1"; A; B; }
+      subgraph cluster2 { label="L2"; C; D; }
+    }
+
+This graph shows I<happens-before> constraints, not the full DFA.
+
+Such graphs are useful for:
+
+=over 4
+
+=item *
+Documentation
+
+=item *
+Design review
+
+=item *
+Debugging concurrency intent
+
+=back
+
+=head1 PATHOLOGICAL BUT REALISTIC CASES
+
+=head2 Large Shuffle (Stress Test)
+
+    my $plan = join q{&}, qw( a b c d e f g h i j );
+
+This admits 10! valid execution orders. If your code is correct under this
+plan, it is truly order-independent.
+
+Caching is essential for plans of this nature.
+
+=head1 DESIGN INSIGHT
+
+Sub::Genius does not provide concurrency by executing code in parallel.
+Instead, it provides a rigorous way to:
+
+=over 4
+
+=item *
+Declare concurrency intent
+
+=item *
+Guarantee ordering constraints
+
+=item *
+Explore valid serializations
+
+=item *
+Preserve correctness in a uniprocess runtime
+
+=back
+
+The result is code that is easier to reason about, audit, and extend.
+
+=head1 SEE ALSO
+
+L<Sub::Genius>, L<Sub::Genius::Util>, L<FLAT>, L<Graph::PetriNet>
+
+=head1 AUTHOR
+
+OODLER 577 E<lt>oodler@cpan.orgE<gt>
+
+=head1 LICENSE
+
+Same terms as Perl itself.

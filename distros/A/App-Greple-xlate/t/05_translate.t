@@ -2,6 +2,7 @@ use v5.14;
 use warnings;
 use utf8;
 use Encode;
+use File::Basename;
 
 use Test::More;
 use Data::Dumper;
@@ -9,6 +10,9 @@ use File::Temp qw(tempdir);
 
 use lib '.';
 use t::Util;
+
+# Add perl's bin directory to PATH so script/xlate can find greple
+$ENV{PATH} = dirname($^X) . ":$ENV{PATH}";
 
 $ENV{NO_COLOR} = 1;
 

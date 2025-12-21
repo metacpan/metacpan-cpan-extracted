@@ -40,5 +40,22 @@ do {
 	is_deeply( $return, $expected ) or diag explain( $return );
 };
 
+BEGIN {
+	package Local::Person::Strict;
+	use Class::XSConstructor '!!',
+		name => { init_arg => 'moniker' },
+		age  => { init_arg => undef };
+};
+
+do {
+	my ( $return, $exception ) = do {
+		local $@;
+		my $r = eval { Local::Person::Strict->new( name => 'Bob', age => 1000 ) };
+		( $r, $@ );
+	};
+	like( $exception, qr/unknown attributes/ ) or diag explain( $return );
+};
+
+
 done_testing;
 

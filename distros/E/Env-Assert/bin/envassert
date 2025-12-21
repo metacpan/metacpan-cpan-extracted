@@ -9,7 +9,7 @@ use open ':std', IO => ':encoding(UTF-8)';
 
 # PODNAME: envassert
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
@@ -31,20 +31,28 @@ my $man = 0;
 my $break_at_first_error;
 my $env_desc_filename = ENV_DESC_FILENAME;
 my $exact;
+my $stdin = 0;
 GetOptions(
     'man'                     => \$man,
     'break-at-first-error|b!' => \$break_at_first_error,
     'env-description|e=s'     =>,
     \$env_desc_filename,
     'exact|x!' => \$exact,
+    'stdin!'   => \$stdin,
 ) or pod2usage(2);
 pod2usage( -exitval => 0, -verbose => 2 ) if $man;
 
 sub main {
 
-    open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
-    my @env_desc_rows = <$fh>;
-    close $fh or croak "Cannot close file '$env_desc_filename'";
+    my @env_desc_rows;
+    if ($stdin) {
+        @env_desc_rows = <>;
+    }
+    else {
+        open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
+        @env_desc_rows = <$fh>;
+        close $fh or croak "Cannot close file '$env_desc_filename'";
+    }
 
     my $desc = file_to_desc(@env_desc_rows);
     my %parameters;
@@ -75,7 +83,7 @@ envassert - Ensure that the environment variables match what you need, or abort.
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -85,8 +93,10 @@ Options:
     --help
     --man
     --version
-    --break-at-error
-    --env-description
+    --break-at-first-error, -b
+    --env-description, -e
+    --exact, -x
+    --stdin, -s
 
 =head1 DESCRIPTION
 
@@ -217,6 +227,12 @@ Fail check if environment contains variables not defined in environment descript
 This option will override the equivalent option in .envdesc file.
 Default: false
 
+=item B<-s>, B<--stdin>
+
+Read environment description from STDIN, not from a file.
+Incompatible with option B<--env-description>.
+Default: false
+
 =back
 
 =head1 EXAMPLES
@@ -226,6 +242,16 @@ Default: false
         variables:
             FIRST_VAR: Variable FIRST_VAR is missing from environment
             FOURTH_VAR: Variable FOURTH_VAR is missing from environment
+
+=head2 Embedded In a Script
+
+    #!/usr/bin/env sh
+    # Ensure we have the required environment setup.
+    envassert <<'EOF'
+    NUMERIC_VAR=^[[:digit:]]+$
+    TIME_VAR=^\d{2}:\d{2}:\d{2}$
+    EOF
+    echo "${NUMERIC_VAR}: ${TIME_VAR}"
 
 =head1 DEPENDENCIES
 

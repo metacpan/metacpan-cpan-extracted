@@ -3,5 +3,6 @@ Convert.pm
 Makefile.PL
 MANIFEST
 META.yml
+README.md
 t/convert.t
 META.json                                Module JSON meta-data (added by MakeMaker)

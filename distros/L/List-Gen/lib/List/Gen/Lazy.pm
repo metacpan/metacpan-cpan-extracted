@@ -155,27 +155,29 @@ before 5.10.  the corresponding methods can be used instead.
         my ($fetch, $src, $mutable);
         curse {
             next => sub {
-                top: until ($size) {
-                    @$pipe or return;
-                    $src = shift @$pipe;
-                    $src = $$src->() if ref $src eq 'List::Gen::Thunk';
-                    ($size, $fetch) = isagen($src) ? do {
-                        $mutable = $src->is_mutable && tied(@$src)->can('fsize');
-                        ($src->size, tied(@$src)->can('FETCH'))
-                    } : (1, undef)
-                }
-                if ($fetch) {
-                    my $got = cap $fetch->(undef, $pos);
-                    $size = $mutable->() if $mutable;
-                    if ($size <= $pos) {
-                        $size = $pos = 0;
-                        goto top;
+                top: {
+                    until ($size) {
+                        @$pipe or return;
+                        $src = shift @$pipe;
+                        $src = $$src->() if ref $src eq 'List::Gen::Thunk';
+                        ($size, $fetch) = isagen($src) ? do {
+                            $mutable = $src->is_mutable && tied(@$src)->can('fsize');
+                            ($src->size, tied(@$src)->can('FETCH'))
+                        } : (1, undef)
                     }
-                    $size = $pos = 0     if ++$pos >= $size;
-                    return wantarray ? @$got : pop @$got;
-                } else {
-                    $size = 0;
-                    return $src
+                    if ($fetch) {
+                        my $got = cap $fetch->(undef, $pos);
+                        $size = $mutable->() if $mutable;
+                        if ($size <= $pos) {
+                            $size = $pos = 0;
+                            redo top;
+                        }
+                        $size = $pos = 0     if ++$pos >= $size;
+                        return wantarray ? @$got : pop @$got;
+                    } else {
+                        $size = 0;
+                        return $src
+                    }
                 }
             },
             more => sub {@$pipe or $pos < $size},
@@ -186,58 +188,61 @@ before 5.10.  the corresponding methods can be used instead.
         my ($pipe, $pos, $size) = (\@_, 0, 0);
         my ($type, $src, $ref, $mutable);
         my $next = sub {
-            shift_pipe: until ($size) {
-                @$pipe or return;
-                $src = shift @$pipe;
-                $src = $$src->() if ref $src eq 'List::Gen::Thunk';
-                ($size, $type) = do {
-                    if ($ref = ref $src) {
-                        if ($ref eq 'ARRAY') {
-                            (0 + @$src, 'array')
-                        }
-                        elsif (List::Gen::isagen $src) {
-                            $mutable = tied(@$src)->mutable;
-                            ($src->size, 'gen')
-                        }
-                        elsif (eval {$src->isa('List::Gen::Pipe')}) {
-                            ($src->more, 'pipe')
+            shift_pipe: {
+                until ($size) {
+                    @$pipe or return;
+                    $src = shift @$pipe;
+                    $src = $$src->() if ref $src eq 'List::Gen::Thunk';
+                    ($size, $type) = do {
+                        if ($ref = ref $src) {
+                            if ($ref eq 'ARRAY') {
+                                (0 + @$src, 'array')
+                            }
+                            elsif (List::Gen::isagen $src) {
+                                $mutable = tied(@$src)->mutable;
+                                ($src->size, 'gen')
+                            }
+                            elsif (eval {$src->isa('List::Gen::Pipe')}) {
+                                ($src->more, 'pipe')
+                            }
+                            else {1}
                         }
                         else {1}
                     }
-                    else {1}
                 }
-            }
-            my $got;
-            if ($type) {
-                if ($type eq 'array') {
-                    $got  = \$$src[$pos]
-                }
-                elsif ($type eq 'gen') {
-                    $got  = \$src->get($pos);
-                    $size = $src->size if $mutable;
-                    if ($pos >= $size) {
-                        goto shift_pipe
+                my $got;
+                if ($type) {
+                    if ($type eq 'array') {
+                        $got  = \$$src[$pos]
                     }
-                }
-                else {
-                    $got  = \$src->next;
-                    $size = $src->more
-                }
-            } else {
-                if ($ref eq 'CODE') {
-                    defined ${$got = \$src->()}
-                        ? $pos--
-                        : do {
-                            $pos = $size = 0;
-                            goto shift_pipe
+                    elsif ($type eq 'gen') {
+                        $got  = \$src->get($pos);
+                        $size = $src->size if $mutable;
+                        if ($pos >= $size) {
+                            $size = $pos = 0;
+                            redo shift_pipe;
                         }
+                    }
+                    else {
+                        $got  = \$src->next;
+                        $size = $src->more
+                    }
+                } else {
+                    if ($ref eq 'CODE') {
+                        defined ${$got = \$src->()}
+                            ? $pos--
+                            : do {
+                                $pos = $size = 0;
+                                redo shift_pipe;
+                            }
+                    }
+                    else {$got = \$src}
                 }
-                else {$got = \$src}
+                if (++$pos >= $size) {
+                      $pos  = $size = 0
+                }
+                $$got
             }
-            if (++$pos >= $size) {
-                  $pos  = $size = 0
-            }
-            $$got
         };
         curse {
             next  => $next,

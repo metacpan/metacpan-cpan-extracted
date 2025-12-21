@@ -1,0 +1,346 @@
+#!/usr/bin/env bash
+# vim: filetype=bash :  -*- mode: sh; sh-shell: bash; -*-
+
+set -euo pipefail
+
+define() { IFS='\n' read -r -d '' ${1} || true ; }
+
+myname="${0##*/}"
+
+define pod <<"=cut"
+
+=encoding utf-8
+
+=head1 NAME
+
+nup - N-up output wrapper for optex -Mup
+
+=head1 SYNOPSIS
+
+    nup [ options ] file ...
+    nup -e [ options ] command ...
+
+    -h,   --help             show help
+          --version          show version
+    -d,   --debug            debug mode
+    -n,   --dryrun           dry-run mode
+    -e,   --exec             execute command mode
+    -V,   --parallel         parallel view mode
+    -F,   --fold             fold mode (disable page mode)
+    -H,   --header           show file headers (default: on)
+    -G,   --grid=#           grid layout (e.g., 2x3)
+    -C,   --pane=#           number of columns
+    -R,   --row=#            number of rows
+          --height=#         page height in lines
+    -S,   --pane-width=#     pane width (default: 85)
+    --bs, --border-style=#   border style (default: heavy-box)
+    --ls, --line-style=#     line style (none/truncate/wrap/wordwrap)
+          --pager=#          pager command (empty to disable)
+          --no-pager         disable pager
+
+=head1 VERSION
+
+Version 0.99
+
+=cut
+
+[[ $pod =~ Version\ +([0-9.]+) ]] && my_version=${BASH_REMATCH[1]}
+
+# -h callback: show help from POD
+help() {
+    sed -E \
+        -e '/^$/N' \
+        -e 's/^(\n*)=head[0-9]* */\1/' \
+        -e '/^\n*[#=]/d' \
+        -e '/Version/q' \
+        <<< "$pod"
+    exit 0
+}
+
+# -v callback: show version
+version() {
+    echo "$my_version"
+    exit 0
+}
+
+##############################################################################
+# Utility functions
+##############################################################################
+
+debug() {
+    [[ ${debug:-} ]] && echo "debug: $*" >&2 || true
+}
+
+die() {
+    echo "$myname: $*" >&2
+    exit 1
+}
+
+# Check bash version (4.3+ required for getoptlong.sh)
+if ((BASH_VERSINFO[0] < 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 3))); then
+    die "bash 4.3+ required (found $BASH_VERSION)"
+fi
+
+##############################################################################
+# Setup PATH for getoptlong.sh
+##############################################################################
+
+basedir="${0%/*/*}"
+if [[ -f $basedir/share/getoptlong/getoptlong.sh ]]; then
+    PATH="$basedir/share/getoptlong:$PATH"
+else
+    dist_dir() {
+        perl -MFile::Share=:all -E "say dist_dir '$1'" 2>/dev/null || true
+    }
+    share=$(dist_dir App-nup)
+    PATH="${share:+$share/getoptlong:}$PATH"
+fi
+
+##############################################################################
+# Option definitions
+##############################################################################
+
+define USAGE <<END
+nup - N-up output wrapper for optex -Mup
+
+Usage: $myname [ options ] file ...
+       $myname -e [ options ] command ...
+END
+
+declare -A OPTS=(
+    [&REQUIRE]=0.4 [&USAGE]="$USAGE" [&PERMUTE]=
+    [         help | h  ! # show help         ]=
+    [      version |    ! # show version      ]=
+    [        debug | d    # debug mode        ]=
+    [       dryrun | n    # dry-run mode      ]=
+    [         exec | e    # execute command   ]=
+    [     parallel | V    # parallel view     ]=
+    [         fold | F    # fold mode         ]=
+    [       header | H    # show file headers ]=1
+    [         grid | G  : # grid layout       ]=
+    [         pane | C  : # number of columns ]=
+    [          row | R  : # number of rows    ]=
+    [       height |    : # page height       ]=
+    [   pane-width | S  : # pane width        ]=
+    [ border-style | bs : # border style      ]=
+    [   line-style | ls : # line style        ]=
+    [        pager |    : # pager command     ]=1
+)
+
+##############################################################################
+# Parse options
+##############################################################################
+
+. getoptlong.sh OPTS "$@"
+
+##############################################################################
+# Build module options
+##############################################################################
+
+declare -a up_opts=()
+
+[[ ${grid:-}         ]] && up_opts+=("--grid=$grid")
+[[ ${pane:-}         ]] && up_opts+=("--pane=$pane")
+[[ ${row:-}          ]] && up_opts+=("--row=$row")
+[[ ${height:-}       ]] && up_opts+=("--height=$height")
+[[ ${pane_width:-}   ]] && up_opts+=("--pane-width=$pane_width")
+[[ ${border_style:-} ]] && up_opts+=("--border-style=$border_style")
+[[ ${line_style:-}   ]] && up_opts+=("--line-style=$line_style")
+if [[ $pager != 1 ]]; then
+    if [[ -z $pager ]]; then
+        up_opts+=("--no-pager")
+    else
+        up_opts+=("--pager=$pager")
+    fi
+fi
+[[ $fold ]] && up_opts+=("--fold")
+
+##############################################################################
+# Main
+##############################################################################
+
+# Show help if no arguments and stdin is a terminal
+if (( $# == 0 )) && [[ -t 0 ]]; then
+    help
+fi
+
+# Determine mode: command or file view
+# Command mode if: -e specified, OR ($1 is not a file AND $1 is a command)
+is_command_mode() {
+    [[ ${exec:-} ]] && return 0
+    [[ -f ${1:-} ]] && return 1
+    command -v "${1:-}" >/dev/null 2>&1
+}
+
+if is_command_mode "$@"; then
+    # Command mode: use optex -Mup
+    declare -a cmd=(optex -Mup "${up_opts[@]}" -- "$@")
+else
+    # File view mode: use ansicolumn via optex -Mup
+    # up.pm adds default options (--bs, -DP, -C, etc.)
+    # User-specified options are added here to override defaults
+    declare -a ac_opts=()
+    [[ ${parallel:-} ]] && ac_opts+=(--parallel)
+    [[ $fold ]] && ac_opts+=(--no-page)
+    [[ $header ]] && ac_opts+=(--filename)
+    [[ ${border_style:-} ]] && ac_opts+=("--border-style=$border_style")
+    [[ ${line_style:-}   ]] && ac_opts+=("--line-style=$line_style")
+    declare -a cmd=(optex -Mup "${up_opts[@]}" -- ansicolumn "${ac_opts[@]}" "$@")
+fi
+
+debug "command: ${cmd[*]}"
+
+if [[ ${dryrun:-} ]]; then
+    echo "${cmd[@]}"
+    exit 0
+fi
+
+exec "${cmd[@]}"
+
+: <<'=cut'
+
+=head1 DESCRIPTION
+
+B<nup> is a simple wrapper script for C<optex -Mup>.  It provides a
+convenient way to view files or run commands with N-up output
+formatting using the L<App::optex::up> module.
+
+B<nup> automatically detects the mode based on the first argument:
+if it is an existing file, file view mode is used; if it is an
+executable command, command mode is used.  Use C<-e> option to
+force command mode when needed.
+
+=head1 OPTIONS
+
+=head2 General Options
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Show help message.
+
+=item B<--version>
+
+Show version.
+
+=item B<-d>, B<--debug>
+
+Enable debug mode.
+
+=item B<-n>, B<--dryrun>
+
+Dry-run mode. Show the command without executing.
+
+=item B<-e>, B<--exec>
+
+Force command execution mode. Normally the mode is auto-detected,
+but use this option when you want to execute a file as a command.
+
+=item B<-V>, B<--parallel>
+
+Enable parallel view mode for ansicolumn.  In this mode, each file
+is displayed in its own column without pagination, similar to
+C<--fold>.  Automatically enabled when multiple files are
+specified.  Single file or stdin input results in single column
+output.
+
+=item B<-F>, B<--fold>
+
+Enable fold mode (disable page mode).  In fold mode, the entire
+content is split evenly across columns without pagination.  Page
+mode is the default.
+
+=item B<-H>, B<--header>
+
+Show filename headers in file view mode. Enabled by default.
+Use C<--no-header> to disable.
+
+=back
+
+=head2 Layout Options
+
+=over 4
+
+=item B<-G> I<CxR>, B<--grid>=I<CxR>
+
+Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
+
+=item B<-C> I<N>, B<--pane>=I<N>
+
+Set the number of columns (panes).
+
+=item B<-R> I<N>, B<--row>=I<N>
+
+Set the number of rows.
+
+=item B<--height>=I<N>
+
+Set the page height in lines.
+
+=item B<-S> I<N>, B<--pane-width>=I<N>
+
+Set the pane width in characters. Default is 85.
+
+=back
+
+=head2 Style Options
+
+=over 4
+
+=item B<--border-style>=I<STYLE>, B<--bs>=I<STYLE>
+
+Set the border style. Default is C<heavy-box>.
+
+=item B<--line-style>=I<STYLE>, B<--ls>=I<STYLE>
+
+Set the line style. Available: C<none>, C<truncate>, C<wrap>, C<wordwrap>.
+
+=back
+
+=head2 Pager Options
+
+=over 4
+
+=item B<--pager>=I<COMMAND>
+
+Set the pager command. Default is C<$PAGER> or C<less>.
+Use C<--pager=> (empty) or C<--no-pager> to disable pager.
+
+=item B<--no-pager>
+
+Disable pager.
+
+=back
+
+=head1 EXAMPLES
+
+    nup man nup                # view manual in multi-column
+    nup -C2 man perl           # 2 columns
+    nup -G2x2 man perl         # 2x2 grid (4-up)
+    nup -F man perl            # fold mode (no pagination)
+    nup file1.txt file2.txt    # view files side by side
+    nup -e ./script.sh         # force command mode for a file
+
+=head1 INSTALLATION
+
+Using L<cpanminus|https://metacpan.org/pod/App::cpanminus>:
+
+    cpanm -n App::nup
+
+=head1 SEE ALSO
+
+L<App::optex::up>, L<optex>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2025 Kazumasa Utashiro.
+
+This software is released under the MIT License.
+L<https://opensource.org/licenses/MIT>
+
+=cut

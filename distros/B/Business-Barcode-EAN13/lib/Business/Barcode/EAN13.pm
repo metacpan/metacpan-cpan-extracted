@@ -33,7 +33,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT      = qw//;
 @EXPORT_OK   = qw/valid_barcode check_digit issuer_ccode best_barcode/;
 %EXPORT_TAGS = (all => [@EXPORT_OK]);
-$VERSION     = "2.11";
+$VERSION     = "2.12";
 
 # Private global HoL of country -> prefix lookup
 my %prefix;
@@ -264,6 +264,7 @@ md:484
 am:485
 ge:486
 kz:487
+tj:488
 hk:489
 uk:50
 gr:520,521
@@ -284,11 +285,13 @@ hu:599
 za:600,601
 gh:603
 sn:604
+ug:605
+ao:606
+om:607
 ba:608
 mu:609
 ma:611
 dz:613
-ke:616
 ng:615
 ke:616
 cm:617
@@ -305,8 +308,10 @@ kw:627
 sa:628
 ae:629
 qa:630
+na:631
+rw:632
 fi:64
-cn:69
+cn:680,681,69
 no:70
 il:729
 se:73
@@ -340,7 +345,7 @@ mn:865
 kp:867
 tr:868,869
 nl:87
-kr:880
+kr:880,881
 mm:883
 kh:884
 th:885

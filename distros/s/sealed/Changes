@@ -1,3 +1,7 @@
+Changes w/ 8.5.2
+
+- Native support/dependency with Perl::Types
+
 Changes w/ 8.0.0:
 
 - Signatures + verification

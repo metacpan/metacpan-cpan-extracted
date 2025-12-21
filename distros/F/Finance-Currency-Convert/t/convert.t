@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More qw( no_plan );
+use Test::NoWarnings;
+BEGIN { use_ok('Finance::Currency::Convert') };
 
 use Finance::Currency::Convert;
 
@@ -45,17 +47,26 @@ ok(abs($amount15 - 789.74) <= $e, 'convert LVL to self');
 my $amount16 = $converter->convertFromEUR($converter->convertToEUR(789.74, "HRK") , "HRK");
 ok(abs($amount16 - 789.74) <= $e, 'convert HRK to self');
 
-$converter->updateRates("AUD", "USD");
-my $amount17 = $converter->convertFromEUR(1, "USD");
-ok($amount17 > 0.5, 'sanity check on USD rate');
-ok($amount17 < 2, 'sanity check on USD rate');
-my $amount18 = $converter->convertToEUR(1, "AUD");
-ok($amount18 > 0.1, 'sanity check on AUD rate');
-ok($amount18 < 1, 'sanity check on AUD rate');
+eval "use Finance::Quote";
+if ($@) {
+	# skip online update test, set dummy rates for testing
+	$converter->setRate("USD", "EUR", 0.85337);
+	$converter->setRate("EUR", "USD", 1.17165);
+	$converter->setRate("AUD", "EUR", 0.56414);
+	$converter->setRate("EUR", "AUD", 1.77212);
+} else {
+	$converter->updateRates("AUD", "USD");
+	my $amount17 = $converter->convertFromEUR(1, "USD");
+	ok($amount17 > 0.5, 'sanity check on USD rate');
+	ok($amount17 < 2, 'sanity check on USD rate');
+	my $amount18 = $converter->convertToEUR(1, "AUD");
+	ok($amount18 > 0.1, 'sanity check on AUD rate');
+	ok($amount18 < 1, 'sanity check on AUD rate');
+}
 
-my $fn = 'rates.txt';
+my $fn = '/tmp/rates.txt';
+unlink($fn);
 $converter->setRatesFile($fn);
-$converter->readRatesFile();
 is($converter->convertToEUR(1, "EUR"), 1, "make sure builtin rates still exist - EUR");
 is($converter->convertToEUR(1, "DEM"), 0.511291881196, "make sure builtin rates still exist - DEM");
 ok($converter->convertToEUR(1, "USD") > 0.5 , "make sure previously set rates still exist - USD");
@@ -63,4 +74,5 @@ ok($converter->convertFromEUR(1, "AUD") > 0.5 , "make sure previously set rates 
 $converter->writeRatesFile();
 ok(-f $fn, 'writeRatesFile - file exists');
 ok(-s $fn > 0, 'writeRatesFile - file is non zero');
+unlink($fn) or die("Can't delete $fn");
 

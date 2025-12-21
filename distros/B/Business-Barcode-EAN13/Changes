@@ -1,5 +1,8 @@
 Revision history for Business::Barcode::EAN13.
 
+2.12  Jan Willamowius, Sat Dec 20 2025
+    - update country data
+
 2.11  Jan Willamowius, Sat Mar 20 2021
     - update country data
 

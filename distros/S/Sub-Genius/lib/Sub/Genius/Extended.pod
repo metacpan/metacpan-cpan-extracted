@@ -1,0 +1,798 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Sub::Genius - Allows one to manage concurrent Perl semantics in the uniprocess execution model of perl
+
+This module is basically a thinly veiled wrapper around useful tools found on
+the internet, such as L<FLAT>.
+
+L<Sub::Genius> generates a correctly ordered, sequential series of subroutine
+calls from a declarative I<plan> that may be parallel or concurrent in nature.
+This allows a concurrency plan to be I<serialized> (or I<linearized>) properly
+for execution in a uniprocess (single CPU) environment.
+
+[6] is an exposition of L<sequential consistency> in the I<Chapel> programming
+language, and also provides an interesting read. Chapel itself is interesting,
+as are other “high productivity” HPC languages that came out during the first
+decade of this century (X10, Fortress, etc.).
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+    use Sub::Genius;
+
+    my $plan = q{( A B ) & ( C D ) (Z)};
+    my $sg   = Sub::Genius->new(plan => $plan);
+    $sg->init_plan;
+    $sg->run_once;
+
+    sub A { print qq{A}    }
+    sub B { print qq{B}    }
+    sub C { print qq{C}    }
+    sub D { print qq{D}    }
+    sub Z { print qq{\n\n} }
+
+=head1 DESCRIPTION
+
+Annotated version of the L</SYNOPSIS> follows:
+
+    # D E F I N E  T H E  P L A N
+    my $plan = q{( A B )  &   ( C D )      (Z)};
+    #                 \ /          \ /         |
+    #>>>>>>>>>>>     (L1) <shuff>  (L2) <cat>  L3
+
+    # C O N V E R T  T H E  P L A N  T O  D F A
+    my $sg = Sub::Genius->new(preplan => $plan);
+
+    # I N I T  T H E  P L A N
+    $sg->init_plan;
+
+    # R U N  T H E  P L A N
+    $sg->run_once;
+
+    # NOTE: sub declaration order has no bearing on anything
+
+    sub A { print qq{A}    } #-\
+    sub B { print qq{B}    } #--- Language 1
+
+    sub C { print qq{C}    } #-\
+    sub D { print qq{D}    } #--- Language 2
+
+    sub Z { print qq{\n\n} } #--- Language 3
+
+The following explicit execution orders of the defined subroutines are all valid
+according to the PRE description above:
+
+    # valid execution order 1
+      A(); B(); C(); D(); Z();
+
+    # valid execution order 2
+      A(); C(); B(); D(); Z();
+
+    # valid execution order 3
+      A(); C(); D(); B(); Z();
+
+    # valid execution order 4
+      C(); A(); D(); B(); Z();
+
+    # valid execution order 5
+      C(); D(); A(); B(); Z();
+
+In the example above, using a PRE to describe the relationship among subroutine
+names (these are just multi-character C<symbols>), we are expressing the
+following constraints:
+
+=over 4
+
+=item C<sub A>
+
+I<must> run before C<sub B>
+
+=item C<sub C>
+
+I<must> run before C<sub D>
+
+=item C<sub Z>
+
+is I<always> called last
+
+=back
+
+=head2 Meaningful Subroutine Names
+
+C<FLAT> allows single character symbols to be expressed without decorations:
+
+    my $plan = q{ s ( A (a b) C & ( D E F ) ) f };  # define plan
+    my $sg   = Sub::Genius->new(preplan => $plan);  # convert plan
+
+Concatenation of symbols is implied, and spaces between symbols do not matter.
+The following is equivalent to the PRE above:
+
+    my $plan = q{s(A(ab)C&(DEF))f};                 # define plan
+    my $sg   = Sub::Genius->new(preplan => $plan);  # convert plan
+
+It is important to note that the PRE may contain C<symbols> made up of more than
+one character.
+
+But this can get messy, so we can use longer subroutine names as symbols and
+break it up in a more readable way:
+
+    # define plan
+    my $plan = q{
+      start
+        (
+          sub_A
+          (
+            sub_a
+            sub_b
+          )
+          sub_C
+        &
+         (
+          sub_D
+          sub_E
+          sub_F
+         )
+        )
+      fin
+    };
+
+    # convert plan
+    my $sg = Sub::Genius->new(preplan => $plan);
+
+This is much nicer and starts to look like a more natural expression of
+concurrent semantics, and it allows expression of subroutines as meaningful
+symbols.
+
+=head2 Inline Comments
+
+A final convenience provided during preprocessing of PREs (which can be turned
+I<off> with C<< preprocess => 0 >> passed to C<new>) is support for inline
+comments and empty lines.
+
+For example:
+
+    # define plan
+    my $plan = q{
+      start         # Language 1 (L1) always runs first
+        (
+          sub_A     # Language 2 (L2)
+          (
+            sub_a   # L2
+            sub_b   # L2
+          )
+          sub_C     # L2
+        &           #<~ shuffles L2 and L3
+         (
+          sub_D     # L3
+          sub_E     # L3
+          sub_F     # L3
+         )
+        )
+      fin           # Language 4 (L4) always runs last
+    };
+
+    # convert plan
+    my $sg = Sub::Genius->new(preplan => $plan);
+
+L<Sub::Genius> generates a correctly ordered, sequential series of subroutine
+calls from a declarative I<plan> that may be parallel or concurrent in nature.
+This allows a concurrency plan to be I<serialized> or I<linearized> properly for
+execution in a uniprocess (or single CPU) environment.
+
+It does this by marrying L<FLAT>'s ability to generate a valid string based on a
+Parallel Regular Expression with the concept of that string I<correctly>
+describing a I<sequentially consistent> ordering of Perl subroutine calls. This
+approach allows one to declare a I<concurrent execution plan> that contains both
+I<total> ordering and I<partial> ordering constraints among subroutine calls.
+
+Totally ordered means: I<subroutine B must follow subroutine A>.
+
+   my $plan = q{ A   B };
+
+Partially ordered means: I<subroutine A may lead or lag subroutine B; both must
+be executed>.
+
+   my $plan = q{ A & B };
+
+Using this concept, C<Sub::Genius> can generate a valid sequential ordering of
+subroutine calls from a declarative plan that expresses concurrency.
+
+=head2 perl's Uniprocess Memory Model and Its Execution Environment
+
+While the language Perl is not necessarily constrained by a uniprocess execution
+model, the runtime provided by C<perl> is. This has necessarily restricted the
+expressive semantics that could be extended to DWIM in a concurrent execution
+model.
+
+The problem is that C<perl> has organically grown over the years to run as a
+single process. It is not immediately obvious to many (even seasoned Perl
+programmers) why after all of these years C<perl> does not have “real” threads or
+admit “real” concurrency semantics.
+
+Accepting the truth of the uniprocess model makes it clear, and brings with it a
+lot of freedom. This module is meant to facilitate shared-memory, multi-process
+reasoning within Perl’s fixed uniprocess reality.
+
+The uniprocess model eases reasoning, particularly for shared-memory programming
+semantics and consistency thereof. See [3] for more background on this.
+
+=head2 Atomics and Barriers
+
+When speaking of concurrent semantics in Perl, the topic of atomic primitives
+often comes up, because in a truly multi-process execution environment they are
+important to coordinate competitive access to resources such as files and shared
+memory.
+
+Since this execution model necessarily serializes parallel semantics in a
+sequentially consistent way, there is no need for these mechanisms. Singular
+lines of execution need no coordination because there is no competition for any
+resource (e.g., a file, memory, network port, etc).
+
+=head2 The Expressive Power of Regular Languages
+
+This module is grounded in the expressive power afforded by regular language
+properties to express concurrency. Expansion into more powerful languages such as
+context-sensitive or context-free is not part of the goal.
+
+Since symbols in the PRE are mapped to subroutine names, computational power can
+also be increased by giving a subroutine a C<state> variable, effectively turning
+it into a coroutine. Memory is power. It does not provide unlimited power, but it
+is what makes context-sensitive languages more powerful than regular languages.
+
+Given the paragraph above, C<Sub::Genius> may also be described as a way to
+explore more and more valid execution orderings derived from a graph containing
+all valid orderings. This graph (the DFA) is described precisely by the PRE.
+
+=head2 Use of Well Known Regular Language Properties
+
+C<Sub::Genius> uses C<FLAT>'s ability to transform a regular expression (of the
+regular-language variety, not a Perl regex!) into a deterministic finite automaton
+(DFA). Once achieved, the DFA is minimized and depth-first enumeration of the
+valid strings accepted by the original expression may be considered sequentially
+consistent.
+
+The parallel semantics are achieved by the addition of shuffle of two or more
+regular languages. The result is also a regular language.
+
+From [1]:
+
+    A shuffle w of u and v can be loosely defined as a word that is obtained
+    by first decomposing u and v into individual pieces, and then combining
+    (by concatenation) the pieces to form w, in a way that the order of
+    the pieces in each of u and v is preserved.
+
+This preserves the total ordering required by regular languages u and v, but
+admits the partial ordering (shuffling) of both. A valid string resulting from
+this combination is necessarily sequentially consistent.
+
+From [2]:
+
+    ... the result of any execution is the same as if the operations of
+    all the processors were executed in some sequential order, and the
+    operations of each individual processor appear in this sequence in
+    the order specified by its program.
+
+The shuffle operator provides the concurrent semantics in a way the human mind
+can understand. This is critical for bridging the gap between the concurrent
+semantics people clamor for in Perl and the inherent uniprocess environment of
+the perl runtime.
+
+=head2 Regular Language Operators
+
+The following operators are available via C<FLAT>:
+
+=over 4
+
+=item Concatenation: C<L1 L2>
+
+There is no character for this; it is implied when two symbols are next to one
+another. E.g. C<a b c d>, which can also be expressed as C<abcd> or even
+C<[a][b][c][d]>.
+
+Examples:
+
+      my $plan = q{  a        b        c   };       # single char symbol
+      my $plan = q{symbol1 symbol2 symbol3 };       # multi-char symbol
+
+=item C<|> - Union: C<L1 | L2>
+
+If it looks like an “or”, that is because it is. E.g. C<a|b|c|d> means a valid
+string is: C<'a' or 'b' or 'c' or 'd'>.
+
+In regular languages, union combines the accepted string sets from each language:
+the resulting language accepts all strings from L1 and all strings from L2.
+
+Examples:
+
+      my $plan = q{  a     |    b    |    c   };    # single char symbol
+      my $plan = q{symbol1 | symbol2 | symbol3};    # multi-char symbol
+
+=item C<&> - Shuffle: C<L1 & L2>
+
+This operator is closed under regular languages and allows concurrency to be
+expressed.
+
+It also generates a parallel finite automaton (PFA), which is an e-NFA with an
+additional special transition represented by lambda. This structure preserves
+total and partial ordering among shuffled languages, which leads to guaranteeing
+sequential consistency.
+
+Examples:
+
+      my $plan = q{   a    &    b    &    c   };    # single char symbol
+      my $plan = q{symbol1 & symbol2 & symbol3};    # multi-char symbol
+
+=item C<*> - Kleene Star: C<L1*>
+
+Creates an infinite language; accepts either nothing, or an infinitely repeating
+concatenation of valid strings accepted by L1.
+
+C<Sub::Genius> currently dies if one attempts to use this, though it is supported
+by C<FLAT>. It is not supported here because it admits an infinite language.
+
+One may tell C<Sub::Genius> to not die when an infinite language is detected by
+passing C<allow-infinite> in the constructor, but the behavior is currently
+considered undefined:
+
+      my $plan = q{    a     &     b*     &   c      };
+
+      # without 'allow-infinite' => 1, new() will fail here
+      my $sg = Sub::Genius->new(preplan => $plan, 'allow-infinite' => 1);
+
+=back
+
+=head2 Precedence Using Parentheses
+
+C<(> and C<)> group constituent languages, provide nesting, and explicitly express
+precedence. Parentheses are used liberally in this document for clarity.
+
+      my $plan = q{ s ( A (a b) C & ( D E F ) ) f };
+
+For example, the following preplan isolates six distinct regular languages
+(C<init>, L1-4, C<fin>) and declares total and partial ordering constraints:
+
+    my $plan = q{
+      ##########################################################
+      # Plan Summary:                                          #
+      #  'init' is called first, then 4 out of 8 subroutines   #
+      #   are called based on the union ('|', "or") of each    #
+      #   sub Regular Language. 'fin' is always called last    #
+      ##########################################################
+
+      init # always first
+      (
+        (alpha   | charlie) &   # L1  - 'alpha'   or 'charlie'
+        (whiskey | delta)   &   # L2  - 'whiskey' or 'delta'
+        (bravo   | tango)   &   # L3  - 'bravo'   or 'tango'
+        (foxtrot | zulu)        # L4  - 'foxtrot' or 'zulu'
+        # note: no '&' ^^^^^ since it's last in the chain
+      )
+      fin  # always last
+    };
+
+=head1 RUNTIME METHODS
+
+A minimal set of methods is provided, more so as to not suggest the “right” way
+to use this module.
+
+=over 4
+
+=item C<new>
+
+B<Required parameter:> C<< preplan => $plan >>
+
+Constructor. Requires a single scalar string argument that is a valid PRE
+accepted by L<FLAT>.
+
+    my $plan = q{
+      start
+        (
+          subA
+          (
+            subB_a subB_b
+          )
+          subC
+        &
+          subD subE subF
+        )
+      finish
+    };
+
+    my $sg = Sub::Genius->new(preplan => $plan);
+
+B<Optional parameters:>
+
+=over 4
+
+=item C<< cachedir => $dir >>
+
+Sets cache directory. Default is C<$(pwd)/_Sub::Genius>.
+
+If set to C<undef>, caching is disabled.
+
+=item C<< preprocess => undef|0 >>
+
+Disables preprocessing, which strips comments and adds brackets to all words in
+the PRE.
+
+=item C<< allow-infinite => 1 >>
+
+Default is off.
+
+Note: by default, only finite languages are accepted. C<init_plan> dies if the
+compiled DFA is cyclic (as detected via C<FLAT::DFA::is_finite>). This module is
+about correctness; only finite languages are considered by default.
+
+=back
+
+The reference, if captured by a scalar, can be wholly reset using the same
+parameters as C<new> but calling C<plan_nein>. This is a minor convenience.
+
+=item C<cachedir>
+
+Accessor for the cache directory.
+
+=item C<checksum>
+
+Accessor for the MD5 checksum of the PRE.
+
+=item C<cachefile>
+
+Accessor for the full path of the cache file associated with the PRE.
+
+=item C<init_plan>
+
+Compiles the PRE into an equivalent minimized DFA using L<FLAT>.
+
+    my $sg = Sub::Genius->new(preplan => $plan);
+    $sg->init_plan;
+
+B<Note: Caching>
+
+It is during this call that the PRE is compiled into a DFA. Cached DFAs are read
+in here; if not yet cached, they are saved after compilation.
+
+Caching may be disabled by passing C<< cachedir => undef >> to C<new>.
+
+=item C<run_once>
+
+Returns C<scope> as affected by the executed subroutines.
+
+Accepts optional parameters:
+
+=over 4
+
+=item C<< ns => 'My::Sequentially::Consistent::Methods' >>
+
+Default is C<main::>. Allows a namespace that provides the subroutines to run.
+
+=item C<< scope => {} >>
+
+Initial execution-scoped memory (a data-flow pipeline). If not provided, scope is
+initialized as an empty hashref:
+
+    my $final_scope = $sg->run_once(scope => {}, verbose => undef);
+
+=item C<< verbose => 1|0 >>
+
+Default is off. When enabled, prints diagnostic output.
+
+=back
+
+Runs the execution plan once and returns whatever the last subroutine returns:
+
+    my $plan = join(q{&}, (a..z));
+    my $sg   = Sub::Genius->new(preplan => $plan);
+    $sg->init_plan;
+    my $final_scope = $sg->run_once;
+
+=item C<next>
+
+C<run_once> calls C<next> if it has not been run after C<init_plan>. It will
+continue to call C<next> if C<run_once> is called again, meaning the preplan
+remains in place until C<next> is called again.
+
+Iterating over all valid strings:
+
+    while (my $plan = $sg->next) {
+      print qq{Plan: $plan\n};
+      $sg->run_once;
+    }
+
+Once the iterator has generated all valid strings, the loop concludes.
+
+Note: pipelining is violated in the above example since the loop runs each plan
+with no guaranteed ordering. C<$scope> is only meaningful within each execution
+context.
+
+Final scopes can be captured for later processing:
+
+    my @all_final_scopes;
+    while (my $plan = $sg->next_plan()) {
+      print qq{Plan: $plan\n};
+      my $final_scope = $sg->run_once;
+      push @all_final_scopes, { $plan => $final_scope };
+    }
+
+There are no deterministic guarantees of the ordering of valid strings (i.e.,
+sequentially consistent execution plans).
+
+L<FLAT> provides utilities to enumerate accepted strings. The underlying method
+creates an iterator.
+
+When C<next> is called the first time, an iterator is created and the first
+string is returned. There is currently no way to specify which plan is returned
+first, which is why concurrent semantics should be declared so that any valid
+string is sequentially consistent with the implementation’s memory model.
+
+Perl provides access to these memories via lexical scoping (C<my>, C<local>) and
+persistent subroutine memory (coroutines) via C<state>.
+
+At this time, C<Sub::Genius> only permits finite languages by default, therefore
+there is always a finite list of accepted strings.
+
+As an example, the following admits a large number of orderings: 26! such plans:
+
+    my $plan = join(q{&}, (a..z));
+    my $final_scope = Sub::Genius->new(preplan => $plan)->run_once;
+
+Thus, the following will take a long time, but will complete:
+
+    my $ans; # global to all subroutines executed
+    while (my $plan = $sg->next_plan()) {
+      $sg->run_once;
+    }
+    print qq{ans: $ans\n};
+
+Done right, the output after 26! iterations may very well be:
+
+    ans: 42
+
+A formulation of 26 subroutines operating over shared memory in which all
+cooperative execution of all 26! orderings reduces to C<42> is left as an
+exercise for the reader.
+
+=item C<run_any>
+
+Convenience wrapper around C<new>, C<init_plan>, C<next>, and C<run_once>:
+
+    Sub::Genius->new(preplan => $plan)->run_any();
+
+=item C<plan_nein>
+
+I<DEPRECATED> - this was not a well thought out idea and will be removed in the
+near term, if it does not remove itself first. C<< >:E >>
+
+Resets an existing instance, effectively like calling C<new> again on it without
+recapturing the reference.
+
+=back
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+L<FLAT> is useful for complex semantics, but FA state growth can be extreme as it
+moves from the nondeterministic realm to the deterministic.
+
+In most cases, the more nondeterministic the PRE (e.g., more shuffles / C<&>), the
+longer it takes for the final DFA to be created. A PRE like:
+
+    my $plan = join(q{&}, (a..z));
+
+can overwhelm memory and time on typical systems.
+
+The algorithms in L<FLAT> are classic conversions: PRE → PFA → NFA → DFA → min DFA,
+as discussed in standard automata texts (e.g., [5]).
+
+Two approaches mitigate performance issues:
+
+=over 4
+
+=item *
+Caching (discussed next)
+
+=item *
+Lazy sequentialization (discussed later)
+
+=back
+
+=head1 CACHING
+
+The practicality of converting PREs to DFAs reaches limits quickly as shuffles are
+added. For this reason, C<init_plan> looks for a cache file; if present, it is
+loaded, saving potentially long startup times.
+
+=head2 How Caching Works in Sub::Genius
+
+Caching occurs after compilation to a DFA (via C<init_plan>). Unless disabled via
+C<< cachedir => undef >>, the compiled DFA is stored using L<Storable>.
+
+An MD5 checksum is generated (L<Digest::MD5> C<md5_hex>) on the PRE after
+preprocessing. If preprocessing is disabled, the checksum is generated from the
+raw PRE.
+
+Lifecycle (default behavior):
+
+=over 4
+
+=item 1. Constructor
+
+Instance created with C<preplan>.
+
+=item 2. Preprocessing
+
+Comments stripped, blank lines removed, square brackets added to all words, and
+whitespace removed.
+
+=item 3. Checksum
+
+Generated from the normalized PRE.
+
+=item 4. init_plan
+
+Looks for cached DFA by checksum; if found, retrieves it.
+
+=item 5. Compile if missing
+
+If not cached, compile via L<FLAT>; this can be expensive.
+
+=item 6. Store
+
+Compiled DFA stored in C<cachedir> under the checksum filename.
+
+=back
+
+=head2 Role of Checksumming and PRE Normalization
+
+Normalization includes stripping comments, bracketing all symbols (C<\w>),
+removing newlines and spaces, while preserving operators. This makes caching
+effective across logically identical PREs that differ only by whitespace or
+comments.
+
+=head2 Final Notes on Caching
+
+Caching compiled artifacts is a practical cheat when algorithms are expensive.
+Common examples include L<Inline> (C<_Inline>) and Template Toolkit’s compiled
+template caching.
+
+It would be better if caching were unnecessary, but for highly shuffled PREs it
+is. It may be necessary to precompile PREs on more capable machines than the ones
+that will run them.
+
+This suggests a possible future “best practice”: treat compiled DFAs like build
+artifacts (akin to compilation output for XS modules). If stored files are
+platform-independent, one could imagine distributing a repository of frozen DFAs.
+
+Until proven in the wild, this is speculation. For now: caching is necessary and
+is handled conveniently.
+
+Caching can be disabled:
+
+    my $sg = Sub::Genius->new(preplan => $plan, cachedir => undef);
+
+=head1 LAZY OR NESTED LINEARIZATION
+
+This concept bears more exploration, but the idea is to encapsulate additional
+calls to C<Sub::Genius> inside subroutines used by higher-level PREs. A similar
+pattern exists in L<Web::Scraper> via nested scrapers.
+
+Example:
+
+    my $plan = q{
+      init
+      ( subA
+          &
+          (
+            subB
+
+            _DO_LAZY_SEQ_   #<~ encapsulates another PRE
+
+            subC
+          )
+          &
+        subD
+      )
+      fin
+    };
+
+    my $sg = Sub::Genius->new(preplan => $plan)->init_plan;
+    my $final_scope = $sg->run_any;
+
+    sub _DO_LAZY_SEQ_ {
+      my $scope = shift;
+      my $inner_preplan = q{
+        subA
+          &
+        subB
+          &
+        subC
+          &
+        subD
+          &
+        subE #<~ new to this PRE!
+      };
+      return Sub::Genius->new(preplan => $inner_preplan)->run_any;
+    }
+
+    sub subE {
+      my $scope = shift;
+      print qq{Sneaky sneak subE says, "Hi!"\n};
+      return $scope;
+    }
+
+The above works and benefits from caching at both the outer and inner levels.
+
+=head1 DEBUGGING AND TOOLS
+
+=head2 stubby
+
+This distribution installs a tool called C<stubby> into your C<$PATH>. It helps
+one get started by generating stub code and supports pre-caching (compiling) PREs
+into DFAs.
+
+The PRE → DFA conversion is the most potentially expensive aspect of this approach.
+
+=head2 fash
+
+C<fash> is a bash script wrapper around L<FLAT> to make exploration of PREs easier.
+It can help leverage external tools such as graphviz, JFLAP, and image viewers for
+visualizing underlying automata.
+
+B<Note>: With C<fash>, multi-character symbols must be encased in square brackets
+because it calls L<FLAT> directly.
+
+Example: dump a PFA as GraphViz dot and render to PNG:
+
+    $ fash pfa2gv "[abc]&[def]" | dot -Tpng > my-pfa.png
+
+Then open C<my-pfa.png>.
+
+To see available commands:
+
+    $ fash help
+
+=head2 See Also
+
+L<stubby> and L<fash>.
+
+=head1 SEE ALSO
+
+L<Pipeworks>, L<Sub::Pipeline>, L<Process::Pipeline>, L<FLAT>, L<Graph::PetriNet>
+
+=head2 Good Reads
+
+=over 4
+
+=item * 1. L<https://www.planetmath.org/shuffleoflanguages>
+
+=item * 2. Leslie Lamport, "How to Make a Multiprocessor Computer That Correctly
+Executes Multiprocess Programs", IEEE Trans. Comput. C-28,9 (Sept. 1979), 690-691.
+
+=item * 3. L<https://www.hpl.hp.com/techreports/Compaq-DEC/WRL-95-7.pdf>
+
+=item * 4. L<https://troglodyne.net/video/1615853053>
+
+=item * 5. Introduction to Automata Theory, Languages, and Computation; Hopcroft, Motwani,
+Ullman. Any year.
+
+=item * 6. L<https://chapel-lang.org/docs/language/spec/memory-consistency-model.html#sequential-consistency-for-data-race-free-programs>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Same terms as Perl itself.
+
+=head1 AUTHOR
+
+OODLER 577 E<lt>oodler@cpan.orgE<gt>
+
+=head1 ACKNOWLEDGEMENTS
+
+I<TEODESIAN> (@cpan) is acknowledged for his support and interest in this project,
+in particular his work lifting the veil off of what passes for concurrency these
+days; namely, I<most of the "Async" modules out there are actually fakin' the funk
+with coroutines.> See L<https://troglodyne.net/video/1615853053> for a fun, fresh,
+and informative video on the subject.

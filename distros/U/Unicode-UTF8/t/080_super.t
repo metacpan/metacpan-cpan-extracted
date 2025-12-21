@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib 't';
 
-use Test::More tests => 1537;
+use Test::More tests => 1025;
 use Util       qw[throws_ok];
 
 BEGIN {
@@ -14,9 +14,6 @@ BEGIN {
 my @SUPER = ();
 {
     for (my $i = 0x0011_0000; $i < 0x7FFF_FFFF; $i += 0x200000) {
-        push @SUPER, $i;
-    }
-    for (my $i = 0x8000_0000; $i < 0xFFFF_FFFF; $i += 0x400000) {
         push @SUPER, $i;
     }
 }

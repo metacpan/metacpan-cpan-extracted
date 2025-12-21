@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Ensure that the environment variables match what you need, or abort.
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 # We define our own import routine because
 # this is the point (when `use Env::Assert` is called)
@@ -15,11 +15,22 @@ our $VERSION = '0.014';
 
 use Carp;
 
+use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
+use open ':std', IO => ':encoding(UTF-8)';
+
+use Env::Assert::Functions qw( :all );
+
+use constant { ENV_DESC_FILENAME => '.envdesc', };
+
+# Handle exports
 {
     no warnings 'redefine';    ## no critic [TestingAndDebugging::ProhibitNoWarnings]
 
     sub import {
         my ( $class, $cmd, $args ) = @_;
+
+        # We also allow only: 'use Env::Assert;'
+        croak "Unknown argument '$cmd'" if ( $cmd && $cmd ne 'assert' );
 
         if ( !assert_env( %{$args} ) ) {
             croak 'Errors in environment detected.';
@@ -28,23 +39,27 @@ use Carp;
     }
 }
 
-use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.18 and earlier
-use open ':std', IO => ':encoding(UTF-8)';
-
-use Env::Assert::Functions qw( :all );
-
-local $OUTPUT_AUTOFLUSH = 1;
-
-use constant { ENV_DESC_FILENAME => '.envdesc', };
-
 sub assert_env {
-    my (%args)               = @_;
-    my $env_desc_filename    = $args{'envdesc_file'}         // ENV_DESC_FILENAME;
+    my (%args) = @_;
+    local $OUTPUT_AUTOFLUSH = 1;
+
     my $break_at_first_error = $args{'break_at_first_error'} // 0;
     my $exact                = $args{'exact'}                // 0;
-    open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
-    my @env_desc_rows = <$fh>;
-    close $fh or croak "Cannot close file '$env_desc_filename'";
+
+    my @env_desc_rows;
+    if ( $args{'envdesc'} ) {
+        my $content = $args{'envdesc'};
+        open my $fh, q{<}, \$content
+          or croak 'Cannot open scalar envdesc content';
+        @env_desc_rows = <$fh>;
+        close $fh or croak 'Cannot close scalar envdesc content';
+    }
+    else {
+        my $env_desc_filename = $args{'envdesc_file'} // ENV_DESC_FILENAME;
+        open my $fh, q{<}, $env_desc_filename or croak "Cannot open file '$env_desc_filename'";
+        @env_desc_rows = <$fh>;
+        close $fh or croak "Cannot close file '$env_desc_filename'";
+    }
 
     my $desc = file_to_desc(@env_desc_rows);
     my %parameters;
@@ -75,7 +90,7 @@ Env::Assert - Ensure that the environment variables match what you need, or abor
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -93,8 +108,17 @@ version 0.014
     # .envdesc file:
     # MY_VAR=.+
 
-    # use any environment variable
+    # use any verified environment variable
     say $ENV{MY_VAR};
+
+    # You can inline the envdesc file:
+    use Env::Assert assert => {
+        exact => 1,
+        envdesc => <<'EOF'
+    NUMERIC_VAR=^[[:digit:]]+$
+    TIME_VAR=^\d{2}:\d{2}:\d{2}$
+    EOF
+    };
 
 =head1 STATUS
 
@@ -103,7 +127,7 @@ though not likely.
 
 =head1 NOTES
 
-Functionality of L<Env::Assert> has been moved module L<Env::Assert::Functions> since version 0.013.
+Functionality of L<Env::Assert> has been moved to module L<Env::Assert::Functions> since version 0.013.
 L<Env::Assert> has a different API now.
 
 =head1 METHODS

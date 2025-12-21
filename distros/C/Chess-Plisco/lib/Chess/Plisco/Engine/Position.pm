@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Position;
-$Chess::Plisco::Engine::Position::VERSION = 'v1.0.0';
+$Chess::Plisco::Engine::Position::VERSION = 'v1.0.1';
 use strict;
 use integer;
 

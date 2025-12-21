@@ -22,11 +22,9 @@ share/find-missing-wrapper
 share/json2csv
 share/json2json
 share/meta.json
-share/missing-from-travelynx
 share/old_stations.json
 share/renamed.json
 share/stations.json
-share/stations.xml
 share/xml2json
 share/xml2meta
 t/20-iris-class.t

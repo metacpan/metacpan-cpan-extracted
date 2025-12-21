@@ -19,7 +19,7 @@ no_index:
     - inc
 requires:
   B::Generate: '0'
-  Types::Common: '0'
-  perl: '5.028000'
-version: v8.5.1
+  Perl::Types: '0'
+  perl: '5.038000'
+version: v8.5.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

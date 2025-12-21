@@ -1,7 +1,7 @@
 {
    "abstract" : "Compactor for superstrings",
    "author" : [
-      "L\u00f6wenfelsen UG (haftungsbeschr\u00e4nkt) <support@loewenfelsen.net>"
+      "Philipp Schafft <lion@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
@@ -44,7 +44,7 @@
    "provides" : {
       "String::Super" : {
          "file" : "lib/String/Super.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -54,7 +54,7 @@
          "url" : "ssh://gitea@gitea.dev.loewenfelsen.net/11201-Loewenfelsen/String-Super.git"
       }
    },
-   "version" : "v0.01",
+   "version" : "v0.02",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"
