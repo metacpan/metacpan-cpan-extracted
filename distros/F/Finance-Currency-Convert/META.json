@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Test::NoWarnings" : "0",
+            "Test::RequiresInternet" : "0",
             "perl" : "5.005005"
          }
       }
@@ -48,6 +49,6 @@
          "web" : "https://github.com/willamowius/perl-finance-currency-convert"
       }
    },
-   "version" : "2.08",
+   "version" : "2.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

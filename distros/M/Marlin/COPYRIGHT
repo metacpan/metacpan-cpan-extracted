@@ -8,6 +8,7 @@ Files: README
  lib/Marlin/Manual/Comparison.pod
  lib/Marlin/Manual/Principles.pod
  lib/Marlin/Role.pm
+ lib/Marlin/Struct.pm
  lib/Marlin/Util.pm
  t/00start.t
  t/01basic.t
@@ -17,6 +18,7 @@ Files: README
  t/integration/destructors.t
  t/integration/roles.t
  t/integration/storage.t
+ t/integration/struct.t
  t/integration/triggers.t
 Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
@@ -43,6 +45,7 @@ Files: Changes
  dist.ini
  doap.ttl
  lib/Marlin/Attribute.pm
+ lib/Marlin/TypeConstraint.pm
  t/lib/Local/Example/Marlin.pm
 Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0

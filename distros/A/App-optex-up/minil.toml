@@ -5,7 +5,7 @@ module_maker="ModuleBuildTiny"
 static_install = "auto"
 
 [FileGatherer]
-exclude_match = ['^images/']
+exclude_match = ['^images/', '^App-nup/']
 
 [release]
 do_not_upload_to_cpan = 0

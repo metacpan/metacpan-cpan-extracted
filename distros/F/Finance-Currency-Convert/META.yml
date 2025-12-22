@@ -19,9 +19,10 @@ no_index:
     - inc
 requires:
   Test::NoWarnings: '0'
+  Test::RequiresInternet: '0'
   perl: '5.005005'
 resources:
   bugtracker: https://github.com/willamowius/perl-finance-currency-convert/issues
   repository: https://github.com/willamowius/perl-finance-currency-convert.git
-version: '2.08'
+version: '2.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

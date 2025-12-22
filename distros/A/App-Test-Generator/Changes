@@ -1,5 +1,36 @@
 Revision history for App-Test-Generator
 
+0.22	Sun Dec 21 20:59:58 EST 2025
+	Added better API to generate
+	Added parameter relationship detection (mutually exclusive, required groups, conditional requirements, dependencies, value constraints)
+	Improved Object Detection
+		Detect factory methods that return instances
+		Recognize singleton patterns
+		Identify when constructor needs specific parameters
+		Handle inheritance (when parent class new() is needed)
+	Better Default Value Extraction
+		$param = $param || 'default_value'
+		$param //= 'default_value'
+		$param = defined $param ? $param : 'default'
+	Expanded _detect_list_context to
+		Better distinguish scalar vs list returns
+		Detect void context methods (those that modify state)
+		Recognize chaining patterns more reliably Identify error return conventions (undef on failure, etc.)
+	Add confidence scoring transparency, explain WHY confidence is what it is:
+		_analysis: confidence_factors:
+			- "POD documentation present (+30)"
+			- "Type validation in code (+20)"
+			- "No constraint information (-10)"
+	Add support for:
+		- Signatures (sub foo($x, $y = 5) { })
+		- Postfix dereferencing ($array->@*)
+		- Subroutine attributes (sub foo :Returns(Int) { })
+		- Field declarations (Perl 5.38+)
+	Added a new section to generated YAML:
+		yamltest_hints: boundary_values: [0, 1, 100, 255]
+		detected from code invalid_inputs: ['', undef, -1]
+		from validation checks equivalence_classes: []
+
 0.21	Sun Dec 14 08:07:09 EST 2025
 	Schemaextractor: don't put the package name as the argument
 	Validate config settings better
@@ -157,4 +188,4 @@ Revision history for App-Test-Generator
 	Added edge case test generator for booleans and memberof
 
 0.01	Sun Sep 28 08:43:35 EDT 2025
-        First draft
+	First draft

@@ -6,11 +6,11 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006001';
+our $VERSION   = '0.007000';
 
 use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
 use Exporter::Tiny qw( mkopt _croak );
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken );
 use Class::XSAccessor { getters => [ _ATTRS ] };
 use Class::XSConstructor [ undef, '_new' ], _ATTRS;
 use Class::XSDestructor;
@@ -118,7 +118,7 @@ my $_parse_attribute = sub {
 		$name = $1 . $2;
 	}
 	
-	croak("Bad attribute name: $name") unless $name =~ /\A[^\W0-9]\w*\z/;
+	_croak("Bad attribute name: $name") unless $name =~ /\A[^\W0-9]\w*\z/;
 	
 	my $default_init_arg = exists( $ref->{constant} ) ? undef : $name;
 	return { is => 'ro', init_arg => $default_init_arg, %$ref, slot => $name };
@@ -132,7 +132,7 @@ sub new {
 		parents      => [],
 		roles        => [],
 		attributes   => [],
-		strict       => !!0,
+		strict       => !!1,
 		modifiers    => !!0,
 		constructor  => 'new',
 	);
@@ -160,7 +160,10 @@ sub new {
 			my @got = $class->$_parse_package_list( $v );
 			$arg{constructor} = $got[0][0];
 		}
-		elsif ( $k =~ /^-(?:strict|strict_?constructor)$/ or $k eq '!!' ) {
+		elsif ( $k =~ /^-(?:(?:loose|sloppy)(?:_?constructor)?)$/ ) {
+			$arg{strict} = !!0;
+		}
+		elsif ( $k =~ /^-(?:(?:strict)(?:_?constructor)?)$/ or $k eq '!!' ) {
 			$arg{strict} = !!1;
 		}
 		elsif ( $k =~ /^-(?:modifiers?|mods?)$/ ) {
@@ -504,6 +507,16 @@ sub build_pp_constructor {
 	return $code;
 }
 
+sub make_type_constraint {
+	my $me = shift;
+	my $name = shift;
+	require Marlin::TypeConstraint;
+	my $tc = Marlin::TypeConstraint->new( name => $name, class => $me->this );
+	$tc->{_marlin} = $me;
+	Scalar::Util::weaken( $tc->{_marlin} );
+	return $tc;
+}
+
 1;
 
 __END__
@@ -526,8 +539,7 @@ Marlin - 🐟 pretty fast class builder with most Moo/Moose features 🐟
     use Marlin::Util -lexical, -all;
     use Marlin
       'name!' => Str,
-      'age?'  => Int,
-      -strict;
+      'age?'  => Int;
     
     signature_for introduction => (
       method   => true,
@@ -543,8 +555,7 @@ Marlin - 🐟 pretty fast class builder with most Moo/Moose features 🐟
   package Employee {
     use Marlin
       -base =>  [ 'Person' ],
-      'employee_id!',
-      -strict;
+      'employee_id!';
   }
   
   my $alice = Person->new( name => 'Alice Whotfia' );
@@ -1110,6 +1121,14 @@ it.
 Tells Marlin to build a constructor like L<MooX::StrictConstructor> or 
 L<MooseX::StrictConstructor>, which will reject unknown arguments.
 
+Since version 0.007000, this is the default.
+
+=item C<< -sloppy >> or C<< -sloppy_constructor >> C<< -loose >> or C<< -loose_constructor >>
+
+Switches off the strict constructor.
+
+Option introduced in version 0.007000. This was previously the default.
+
 =item C<< -mods >> or C<< -modifiers >>
 
 Exports the C<before>, C<after>, C<around>, and C<fresh> method modifiers
@@ -1155,6 +1174,7 @@ L<https://github.com/tobyink/p5-marlin/issues>.
 =head1 SEE ALSO
 
 L<Marlin::Role>,
+L<Marlin::Struct>,
 L<Marlin::Util>,
 L<Marlin::Manual::Principles>,
 L<Marlin::Manual::Comparison>.

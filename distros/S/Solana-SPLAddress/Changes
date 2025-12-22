@@ -1,0 +1,20 @@
+Revision history for Perl extension Solana::SPLAddress.
+0.06  Sun Dec 21 20:59:16 2025
+    - add missing src dir to Manifest
+
+0.05  Sun Dec 21 19:32:47 2025
+    - fix POD
+
+0.04  Sun Dec 21 18:10:00 2025
+    - remove .idea files from release
+
+0.03  Sun Dec 21 17:46:09 2025
+    - add readme
+
+0.02  Sun May 25 19:34:00 2025
+    - Fix bug, update test
+
+0.01  Tue Apr 22 10:43:01 2025
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.34.0 -n Solana::SPLAddress
+

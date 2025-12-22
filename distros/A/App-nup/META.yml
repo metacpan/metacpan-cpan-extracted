@@ -1,5 +1,5 @@
 ---
-abstract: 'N-up output wrapper for optex -Mup'
+abstract: 'N-up multi-column paged output for commands and files'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
@@ -26,17 +26,17 @@ no_index:
 provides:
   App::nup:
     file: lib/App/nup.pm
-    version: '0.99'
+    version: '0.9902'
 requires:
   App::optex: '0'
-  App::optex::up: '1.01'
+  App::optex::up: '1.03'
   File::Share: '0'
   perl: '5.016'
 resources:
   bugtracker: https://github.com/tecolicom/App-nup/issues
   homepage: https://github.com/tecolicom/App-nup
   repository: https://github.com/tecolicom/App-nup.git
-version: '0.99'
+version: '0.9902'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

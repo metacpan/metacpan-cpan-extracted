@@ -93,6 +93,17 @@ This will:
 - Upload to CPAN
 - Create git tag
 
+## Related Projects
+
+### App-nup (submodule)
+
+`App-nup` is a wrapper script for `optex -Mup`. When modifying `up.pm`:
+
+- Check if the same changes are needed in `App-nup/script/nup`
+- `App-nup/lib/App/nup.pm` is auto-generated from `script/nup`
+- Keep option documentation order consistent between both projects
+- Update `App-nup/cpanfile` if new `App::optex::up` version is required
+
 ## Dependencies
 
 - Getopt::EX::Config >= 1.00

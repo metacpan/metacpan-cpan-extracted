@@ -160,7 +160,7 @@ subtest 'simple_string method' => sub {
 	is($name_param->{max}, 50, 'max is 50');
 	is($name_param->{optional}, 0, 'parameter is required');
 
-	like($schema->{_confidence}{input}, qr/high|medium/, 'input confidence is high or medium');
+	like($schema->{_confidence}{input}->{'level'}, qr/high|medium/, 'input confidence is high or medium');
 };
 
 # simple_integer analysis
@@ -226,8 +226,8 @@ subtest 'poorly_documented method' => sub {
 	my $schema = $schemas->{poorly_documented};
 	ok($schema, 'poorly_documented schema exists');
 
-	is($schema->{_confidence}{input}, 'medium', 'input confidence is low');
-	is($schema->{_confidence}{output}, 'medium', 'output confidence is low');
+	is($schema->{_confidence}{input}->{'level'}, 'medium', 'input confidence is medium');
+	is($schema->{_confidence}{output}->{'level'}, 'medium', 'output confidence is medium');
 	# Notes might be present or not, depending on what we could infer
 	# Just check the schema exists and has low confidence
 };

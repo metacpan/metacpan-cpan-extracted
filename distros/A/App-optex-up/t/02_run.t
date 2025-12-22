@@ -4,6 +4,14 @@ use utf8;
 use Test::More;
 use File::Spec;
 
+# Set PERL5LIB so child processes can find dependencies
+BEGIN {
+    my $blib = File::Spec->rel2abs('blib/lib');
+    if (-d $blib) {
+        $ENV{PERL5LIB} = join(':', $blib, $ENV{PERL5LIB} // '');
+    }
+}
+
 use lib '.';
 use t::Util;
 

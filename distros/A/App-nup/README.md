@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/tecolicom/App-nup/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/App-nup/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-nup.svg)](https://metacpan.org/release/App-nup)
 # NAME
 
-nup - N-up output wrapper for optex -Mup
+nup - N-up multi-column paged output for commands and files
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ nup - N-up output wrapper for optex -Mup
     -e,   --exec             execute command mode
     -V,   --parallel         parallel view mode
     -F,   --fold             fold mode (disable page mode)
-    -H,   --header           show file headers (default: on)
+    -H,   --filename         show filename headers (default: on)
     -G,   --grid=#           grid layout (e.g., 2x3)
     -C,   --pane=#           number of columns
     -R,   --row=#            number of rows
@@ -28,7 +28,7 @@ nup - N-up output wrapper for optex -Mup
 
 # VERSION
 
-Version 0.01
+Version 0.9901
 
 # DESCRIPTION
 
@@ -80,16 +80,12 @@ force command mode when needed.
     content is split evenly across columns without pagination.  Page
     mode is the default.
 
-- **-H**, **--header**
+- **-H**, **--filename**
 
     Show filename headers in file view mode. Enabled by default.
-    Use `--no-header` to disable.
+    Use `--no-filename` to disable.
 
 ## Layout Options
-
-- **-G** _CxR_, **--grid**=_CxR_
-
-    Set grid layout. For example, `-G2x3` creates 2 columns and 3 rows.
 
 - **-C** _N_, **--pane**=_N_
 
@@ -98,6 +94,10 @@ force command mode when needed.
 - **-R** _N_, **--row**=_N_
 
     Set the number of rows.
+
+- **-G** _CxR_, **--grid**=_CxR_
+
+    Set grid layout. For example, `-G2x3` creates 2 columns and 3 rows.
 
 - **--height**=_N_
 
@@ -142,6 +142,16 @@ force command mode when needed.
 Using [cpanminus](https://metacpan.org/pod/App::cpanminus):
 
     cpanm -n App::nup
+
+# DIAGNOSTICS
+
+Both stdout and stderr of the command are merged and passed through
+the output filter.  Error messages will appear in the paged output.
+
+# EXIT STATUS
+
+The exit status of the executed command is not preserved because
+the output is passed through a filter pipeline.
 
 # SEE ALSO
 

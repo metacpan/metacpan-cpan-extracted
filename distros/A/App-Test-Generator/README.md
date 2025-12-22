@@ -4,15 +4,18 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.21
+Version 0.22
 
 # SYNOPSIS
 
 From the command line:
 
+    # Takes the formal definition of a routine, creates tests against that routine, and runs the test
     fuzz-harness-generator -r t/conf/add.yml
 
-    extract-schemas bin/extract-schemas lib/Sample/Module.pm; fuzz-harness-generator -r schemas/greet.yaml
+    # Attempt to create a formal definition from a routine package, then run tests against that formal definition
+    # This is the holy grail of automatic test generation, just by looking at the source code
+    extract-schemas bin/extract-schemas lib/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yaml
 
 From Perl:
 
@@ -23,6 +26,23 @@ From Perl:
 
     # Generate directly to a file
     App::Test::Generator::generate('t/conf/add.yml', 't/add_fuzz.t');
+
+    # Holy grail mode - read a Perl file, generate tests, and run them
+    # This is a long way away yet, but see t/schema_input.t for a proof of concept
+    my $extractor = App::Test::Generator::SchemaExtractor->new(
+      input_file => 'Foo.pm',
+      output_dir => $dir
+    );
+    my $schemas = $extractor->extract_all();
+    foreach my $schema(keys %{$schemas}) {
+      my $tempfile = '/var/tmp/foo.t';    # Use File::Temp in real life
+      App::Test::Generator->generate(
+        schema => $schemas->{$schema},
+        output_file => $tempfile,
+      );
+      system("$^X -I$dir $tempfile");
+      unlink $tempfile;
+    }
 
 # OVERVIEW
 
@@ -1051,7 +1071,7 @@ Renders property definitions into Perl code for the template.
 
 - [https://nigelhorne.github.io/App-Test-Generator/coverage/](https://nigelhorne.github.io/App-Test-Generator/coverage/): Test Coverage Report
 - [App::Test::Generator::Template](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ATemplate) - Template of the file of tests created by `App::Test::Generator`
-- [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) - Project to create schemas from Perl programs
+- [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) - Create schemas from Perl programs
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict): Schema Definition
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet): Input validation
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet): Output validation

@@ -1,0 +1,45 @@
+Solana-SPLAddress version 0.02
+==============================
+
+NAME
+   Solana-SPLAddress - Perl extension for creating deterministic Solana token addresses
+
+
+SYNOPSIS
+      
+   create_address($seed, $program_id, $bump)
+
+      create address from seed, program_id and bump
+      used to recover already generated address
+
+   find_address($seeds, $program_id)
+
+      find address from seeds and program_id
+      returns address and bump
+   
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Digest::SHA
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2025 by shmakins
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.38.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

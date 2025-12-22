@@ -1,3 +1,8 @@
+Version 0.013 - 2025-12-21
+  - New method $span->cmp($other) is like memcmp but on Unicode codepoints
+  - Span objects now also have overloaded cmp, stringify, and boolean cast
+  - New PEM parser class
+
 Version 0.012 - 2025-12-19
   - String patterns passed to scanning functions (scan, index, rindex, and
     various methods of Span) can now be perl unicode strings, or SecretBuffer

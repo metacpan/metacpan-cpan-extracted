@@ -21,5 +21,5 @@ requires:
   B::Generate: '0'
   Perl::Types: '0'
   perl: '5.038000'
-version: v8.5.5
+version: v8.5.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

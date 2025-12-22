@@ -10,8 +10,7 @@ SYNOPSIS
         use Marlin::Util -lexical, -all;
         use Marlin
           'name!' => Str,
-          'age?'  => Int,
-          -strict;
+          'age?'  => Int;
     
         signature_for introduction => (
           method   => true,
@@ -27,8 +26,7 @@ SYNOPSIS
       package Employee {
         use Marlin
           -base =>  [ 'Person' ],
-          'employee_id!',
-          -strict;
+          'employee_id!';
       }
   
       my $alice = Person->new( name => 'Alice Whotfia' );
@@ -564,6 +562,14 @@ DESCRIPTION
         Tells Marlin to build a constructor like MooX::StrictConstructor or
         MooseX::StrictConstructor, which will reject unknown arguments.
 
+        Since version 0.007000, this is the default.
+
+    `-sloppy` or `-sloppy_constructor` `-loose` or `-loose_constructor`
+        Switches off the strict constructor.
+
+        Option introduced in version 0.007000. This was previously the
+        default.
+
     `-mods` or `-modifiers`
         Exports the `before`, `after`, `around`, and `fresh` method modifiers
         from Class::Method::Modifiers, but lexical versions of them.
@@ -590,7 +596,7 @@ BUGS
     Please report any bugs to <https://github.com/tobyink/p5-marlin/issues>.
 
 SEE ALSO
-    Marlin::Role, Marlin::Util, Marlin::Manual::Principles,
+    Marlin::Role, Marlin::Struct, Marlin::Util, Marlin::Manual::Principles,
     Marlin::Manual::Comparison.
 
     Class::XSAccessor, Class::XSConstructor, Types::Common, Type::Params, and

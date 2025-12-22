@@ -26,6 +26,8 @@ lib/Marlin/Attribute.pm
 lib/Marlin/Manual/Comparison.pod
 lib/Marlin/Manual/Principles.pod
 lib/Marlin/Role.pm
+lib/Marlin/Struct.pm
+lib/Marlin/TypeConstraint.pm
 lib/Marlin/Util.pm
 t/00start.t
 t/01basic.t
@@ -35,5 +37,6 @@ t/integration/constant.t
 t/integration/destructors.t
 t/integration/roles.t
 t/integration/storage.t
+t/integration/struct.t
 t/integration/triggers.t
 t/lib/Local/Example/Marlin.pm

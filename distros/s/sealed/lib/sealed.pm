@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(8.5.5);
+  our $VERSION = qv(8.5.6);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -194,7 +194,7 @@ sub import {
   $DEBUG                         = $_[1];
   local $@;
   my $pkg                        = caller;
-  eval "package $pkg; use types; use class"; # enable perl type system
+  eval "package $pkg; use types; use class" if $DEBUG eq 'types'; # enable perl type system
   die $@ if $@;
   filter_add(bless []);
 }
@@ -297,13 +297,14 @@ stack, eg by using the '?:' ternary operator, will break this logic
 
 =head2 Compiling perl v5.30+ for functional mod_perl2 w/ithreads and httpd 2.4.x w/event mpm
 
-    % ./Configure -Uusemymalloc -Duseshrplib -Dusedtrace -Duseithreads -des && make -j$(nproc) && sudo make -j$(nproc) install
+    % ./Configure -Uusemymalloc -Duseshrplib -Dusedtrace -Duseithreads -des
+    % make -j$(nproc) && sudo make -j$(nproc) install
 
-In an ithread setting, running w/ :sealed subs v4.1+ involves a tuning commitment to
-each ithread it is active on, to avoid garbage collecting the ithread until the
-process is at its global exit point. For mod_perl, ensure you never reap new ithreads
-from the mod_perl portion of the tune, only from the mpm_event worker process tune or
-during httpd server (graceful) restart.
+In an ithread setting, running mod_perl2 involves a tuning commitment to
+each ithread, to avoid garbage collecting the ithread until the process is at its
+global exit point. For mod_perl, ensure you never reap new ithreads from the mod_perl
+portion of the tune, only from the mpm_event worker process tune or during httpd
+server (graceful) restart.
 
 =head1 CAVEATS
 
@@ -315,13 +316,20 @@ module primarily targets end-applications: virtual method lookups and duck
 typing are core elements of any dynamic language's OO feature design, and Perl
 is no different.
 
+Classes derived from 'sealed' should be treated as if they do not support duck
+typing or virtual method lookups.  Best practice is to avoid overriding any methods
+in those classes, but otherwise understand that 'old code' cannot make use of 'new
+code' in sealed classes.
+
 Look into XS if you want peak performance in reusable OO methods you wish
-to provide. The only rational targets for :sealed subs with typed lexicals
-are methods implemented in XS, where the overhead of traditional OO
+to provide. The best targets for :sealed subs with typed lexicals are calls
+to named methods implemented in XS, where the overhead of traditional OO
 virtual-method lookup is on the same order as the actual duration of the
-invoked method call. For nontrivial methods implemented entirely in Perl itself,
-the op-tree processing overhead involved during execution of those methods will
-drown out any performance gains this module would otherwise provide.
+invoked method call.
+
+For nontrivial methods implemented entirely in Perl itself, the op-tree processing
+overhead involved during execution of those methods will drown out any performance
+gains this module would otherwise provide.
 
 =head1 SEE ALSO
 

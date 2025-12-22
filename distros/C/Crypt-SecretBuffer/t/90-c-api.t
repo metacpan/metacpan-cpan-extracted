@@ -20,6 +20,8 @@ is \%Crypt::SecretBuffer::C_API,
          'bool secret_buffer_charset_test_codepoint(const secret_buffer_charset *cset, uint32_t cp)',
       secret_buffer_parse_init =>
          'bool secret_buffer_parse_init(secret_buffer_parse *parse, secret_buffer *buf, size_t pos, size_t lim, int encoding)',
+      secret_buffer_parse_init_from_sv =>
+         'bool secret_buffer_parse_init_from_sv(secret_buffer_parse *parse, SV *sv)',
       secret_buffer_match =>
          'bool secret_buffer_match(secret_buffer_parse *p, SV *pattern, int flags)',
       secret_buffer_match_charset =>

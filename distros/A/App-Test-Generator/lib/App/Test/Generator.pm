@@ -24,6 +24,9 @@ use Data::Section::Simple;
 use File::Basename qw(basename);
 use File::Spec;
 use Module::Load::Conditional qw(check_install can_load);
+use Params::Get;
+use Params::Validate::Strict;
+use Scalar::Util qw(looks_like_number);
 use Template;
 use YAML::XS qw(LoadFile);
 
@@ -31,7 +34,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
@@ -46,15 +49,18 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =head1 SYNOPSIS
 
 From the command line:
 
+  # Takes the formal definition of a routine, creates tests against that routine, and runs the test
   fuzz-harness-generator -r t/conf/add.yml
 
-  extract-schemas bin/extract-schemas lib/Sample/Module.pm; fuzz-harness-generator -r schemas/greet.yaml
+  # Attempt to create a formal definition from a routine package, then run tests against that formal definition
+  # This is the holy grail of automatic test generation, just by looking at the source code
+  extract-schemas bin/extract-schemas lib/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yaml
 
 From Perl:
 
@@ -65,6 +71,23 @@ From Perl:
 
   # Generate directly to a file
   App::Test::Generator::generate('t/conf/add.yml', 't/add_fuzz.t');
+
+  # Holy grail mode - read a Perl file, generate tests, and run them
+  # This is a long way away yet, but see t/schema_input.t for a proof of concept
+  my $extractor = App::Test::Generator::SchemaExtractor->new(
+    input_file => 'Foo.pm',
+    output_dir => $dir
+  );
+  my $schemas = $extractor->extract_all();
+  foreach my $schema(keys %{$schemas}) {
+    my $tempfile = '/var/tmp/foo.t';	# Use File::Temp in real life
+    App::Test::Generator->generate(
+      schema => $schemas->{$schema},
+      output_file => $tempfile,
+    );
+    system("$^X -I$dir $tempfile");
+    unlink $tempfile;
+  }
 
 =encoding utf8
 
@@ -1197,8 +1220,9 @@ sub generate
 		shift;
 	}
 
-	my ($schema_file, $test_file) = @_;
+	my $args = $_[0];
 
+	my ($schema_file, $test_file, $schema);
 	# Globals loaded from the user's conf (all optional except function maybe)
 	my (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases, %transforms);
 	my ($seed, $iterations);
@@ -1206,36 +1230,60 @@ sub generate
 
 	@edge_case_array = ();
 
-	if(defined($schema_file)) {
-		if(my $schema = _load_schema($schema_file)) {
-			# Parse the schema file and load into our structures
-			%input = %{_load_schema_section($schema, 'input', $schema_file)};
-			%output = %{_load_schema_section($schema, 'output', $schema_file)};
-			%transforms = %{_load_schema_section($schema, 'transforms', $schema_file)};
-
-			%cases = %{$schema->{cases}} if(exists($schema->{cases}));
-			%edge_cases = %{$schema->{edge_cases}} if(exists($schema->{edge_cases}));
-			%type_edge_cases = %{$schema->{type_edge_cases}} if(exists($schema->{type_edge_cases}));
-
-			$module = $schema->{module} if(exists($schema->{module}));
-			$function = $schema->{function} if(exists($schema->{function}));
-			if(exists($schema->{new})) {
-				$new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
+	if(ref($args) || defined($_[2])) {
+		# Modern API
+		my $params = Params::Validate::Strict::validate_strict({
+			args => Params::Get::get_params(undef, \@_),
+			schema => {
+				input_file => { type => 'string', optional => 1 },
+				output_file => { type => 'string', optional => 1 },
+				schema => { type => 'hashref', optional => 1 },
+				quiet => { type => 'boolean', optional => 1 },	# Not yet used
 			}
-			$yaml_cases = $schema->{yaml_cases} if(exists($schema->{yaml_cases}));
-			$seed = $schema->{seed} if(exists($schema->{seed}));
-			$iterations = $schema->{iterations} if(exists($schema->{iterations}));
-
-			@edge_case_array = @{$schema->{edge_case_array}} if(exists($schema->{edge_case_array}));
-			_validate_config($schema);
-
-			%config = %{$schema->{config}} if(exists($schema->{config}));
+		});
+		if($params->{'input_file'}) {
+			$schema_file = $params->{'input_file'};
+		} elsif($params->{'schema'}) {
+			$schema = $params->{'schema'};
 		} else {
-			croak "Failed to load schema from $schema_file";
+			croak(__PACKAGE__, ': Usage: generate(input_file|schema [, output_file]');
 		}
+		$test_file = $params->{'output_file'};
 	} else {
-		croak 'Usage: generate(schema_file [, outfile])';
+		# Legacy API
+		($schema_file, $test_file) = ($_[0], $_[1]);
+		if(defined($schema_file)) {
+			$schema = _load_schema($schema_file);
+			if(!defined($schema)) {
+				croak "Failed to load schema from $schema_file";
+			}
+		} else {
+			croak 'Usage: generate(schema_file [, outfile])';
+		}
 	}
+
+	# Parse the schema file and load into our structures
+	%input = %{_load_schema_section($schema, 'input', $schema_file)};
+	%output = %{_load_schema_section($schema, 'output', $schema_file)};
+	%transforms = %{_load_schema_section($schema, 'transforms', $schema_file)};
+
+	%cases = %{$schema->{cases}} if(exists($schema->{cases}));
+	%edge_cases = %{$schema->{edge_cases}} if(exists($schema->{edge_cases}));
+	%type_edge_cases = %{$schema->{type_edge_cases}} if(exists($schema->{type_edge_cases}));
+
+	$module = $schema->{module} if(exists($schema->{module}));
+	$function = $schema->{function} if(exists($schema->{function}));
+	if(exists($schema->{new})) {
+		$new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
+	}
+	$yaml_cases = $schema->{yaml_cases} if(exists($schema->{yaml_cases}));
+	$seed = $schema->{seed} if(exists($schema->{seed}));
+	$iterations = $schema->{iterations} if(exists($schema->{iterations}));
+
+	@edge_case_array = @{$schema->{edge_case_array}} if(exists($schema->{edge_case_array}));
+	_validate_config($schema);
+
+	%config = %{$schema->{config}} if(exists($schema->{config}));
 
 	# Handle the various possible boolean settings for config values
 	# Note that the default for everything is true
@@ -1253,12 +1301,13 @@ sub generate
 	}
 
 	# Guess module name from config file if not set
-	if($module eq 'builtin') {
+	if(!$module) {
+		if($schema_file) {
+			($module = basename($schema_file)) =~ s/\.(conf|pl|pm|yml|yaml)$//;
+			$module =~ s/-/::/g;
+		}
+	} elsif($module eq 'builtin') {
 		undef $module;
-	} elsif(!$module) {
-		(my $guess = basename($schema_file)) =~ s/\.(conf|pl|pm|yml|yaml)$//;
-		$guess =~ s/-/::/g;
-		$module = $guess || 'builtin';
 	}
 
 	if($module && ($module ne 'builtin')) {
@@ -1300,6 +1349,50 @@ sub generate
 			$all_cases{$k} = [ @{$yaml_corpus_data{$k}}, @{$cases{$k}} ];
 		}
 	}
+
+	if(my $hints = delete $schema->{_yamltest_hints}) {
+		if(my $boundaries = $hints->{boundary_values}) {
+			push @edge_case_array, @{$boundaries};
+		}
+		if(my $invalid = $hints->{invalid}) {
+			carp('TODO: handle yamltest_hints->invalid');
+		}
+	}
+
+	# If the schema says the type is numeric, normalize
+	if ($schema->{type} && $schema->{type} =~ /^(integer|number|float)$/) {
+		for (@edge_case_array) {
+			next unless defined $_;
+			$_ += 0 if Scalar::Util::looks_like_number($_);
+		}
+	}
+
+	# Dedup the edge cases
+	my %seen;
+	@edge_case_array = grep {
+		my $key = defined($_) ? (Scalar::Util::looks_like_number($_) ? "N:$_" : "S:$_") : 'U';
+		!$seen{$key}++;
+	} @edge_case_array;
+
+	# Sort the edge cases to keep it consitent across runs
+	@edge_case_array = sort {
+		return -1 if !defined $a;
+		return 1 if !defined $b;
+
+		my $na = Scalar::Util::looks_like_number($a);
+		my $nb = Scalar::Util::looks_like_number($b);
+
+		return $a <=> $b if $na && $nb;
+		return -1 if $na;
+		return 1 if $nb;
+		return $a cmp $b;
+	} @edge_case_array;
+
+	# $self->_log(
+		# 'EDGE CASES: ' . join(', ',
+			# map { defined($_) ? $_ : 'undef' } @edge_case_array
+		# )
+	# );
 
 	# render edge case maps for inclusion in the .t
 	my $edge_cases_code = render_arrayref_map(\%edge_cases);
@@ -1718,7 +1811,7 @@ sub _validate_module {
 	# Check if the module can be found
 	my $mod_info = check_install(module => $module);
 
-	if (!$mod_info) {
+	if($schema_file && !$mod_info) {
 		# Module not found - this is just a warning, not an error
 		# The module might not be installed on the generation machine
 		# but could be on the test machine
@@ -1840,7 +1933,7 @@ sub render_arrayref_map {
 sub q_wrap {
 	my $s = $_[0];
 	for my $p ( ['{','}'], ['(',')'], ['[',']'], ['<','>'] ) {
-		my ($l,$r) = @$p;
+		my ($l, $r) = @$p;
 		return "q$l$s$r" unless $s =~ /\Q$l\E|\Q$r\E/;
 	}
 	for my $d ('~', '!', '%', '^', '=', '+', ':', ',', ';', '|', '/', '#') {
@@ -2748,7 +2841,7 @@ C<seed> and C<iterations> really should be within C<config>.
 
 =item * L<App::Test::Generator::Template> - Template of the file of tests created by C<App::Test::Generator>
 
-=item * L<App::Test::Generator::SchemaExtractor> - Project to create schemas from Perl programs
+=item * L<App::Test::Generator::SchemaExtractor> - Create schemas from Perl programs
 
 =item * L<Params::Validate::Strict>: Schema Definition
 

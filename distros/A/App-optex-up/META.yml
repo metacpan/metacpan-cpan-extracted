@@ -26,10 +26,10 @@ no_index:
 provides:
   App::optex::up:
     file: lib/App/optex/up.pm
-    version: '1.01'
+    version: '1.03'
 requires:
-  App::ansicolumn: '0'
-  App::optex: '1.00'
+  App::ansicolumn: '1.47'
+  App::optex: '1.04'
   Getopt::EX: '3.02'
   Getopt::EX::Config: '1.00'
   Term::ReadKey: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex-up/issues
   homepage: https://github.com/kaz-utashiro/optex-up
   repository: https://github.com/kaz-utashiro/optex-up.git
-version: '1.01'
+version: '1.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

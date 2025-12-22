@@ -61,6 +61,38 @@ bool secret_buffer_parse_init(secret_buffer_parse *parse,
    return true;
 }
 
+/* Initialize a parse struct, either from a Span, or a SecretBuffer, or a plain Scalar.
+ */
+bool secret_buffer_parse_init_from_sv(secret_buffer_parse *parse, SV *sv) {
+   secret_buffer *sb;
+   secret_buffer_span *span;
+   /* Is the sv a Span object? */
+   if ((span= secret_buffer_span_from_magic(sv, 0)) && SvTYPE(SvRV(sv)) == SVt_PVHV) {
+      SV **sb_sv= hv_fetchs((HV*)SvRV(sv), "buf", 1);
+      sb= secret_buffer_from_magic(*sb_sv, SECRET_BUFFER_MAGIC_OR_DIE);
+      return secret_buffer_parse_init(parse, sb, span->pos, span->lim, span->encoding);
+   }
+   /* Is the sv a SecretBuffer? */
+   else if ((sb= secret_buffer_from_magic(sv, 0))) {
+      return secret_buffer_parse_init(parse, sb, 0, sb->len, SECRET_BUFFER_ENCODING_ISO8859_1);
+   }
+   /* It needs to at least be defined */
+   else if (SvOK(sv)) {
+      STRLEN len;
+      char *buf= SvPV(sv, len);
+      Zero(parse, 1, secret_buffer_parse);
+      parse->pos= (U8*) buf;
+      parse->lim= (U8*) buf + len;
+      parse->encoding= SvUTF8(sv)? SECRET_BUFFER_ENCODING_UTF8 : SECRET_BUFFER_ENCODING_ISO8859_1;
+      return true;
+   }
+   else {
+      Zero(parse, 1, secret_buffer_parse);
+      parse->error= "Not a Span, SecretBuffer, or defined scalar";
+      return false;
+   }
+}
+
 /* Scan for a pattern which may be a regex or literal string.
  * Regexes are currently limited to a single charclass.
  */
@@ -396,6 +428,23 @@ static bool sb_parse_match_charset_codepoints(
       return true;
    }
    return false;
+}
+
+int sb_parse_codepointcmp(secret_buffer_parse *lhs, secret_buffer_parse *rhs) {
+   I32 lhs_cp, rhs_cp;
+   while (lhs->pos < lhs->lim && rhs->pos < rhs->lim) {
+      lhs_cp= sb_parse_next_codepoint(lhs);
+      if (lhs_cp < 0)
+         croak("Encoding error in left-hand buffer");
+      rhs_cp= sb_parse_next_codepoint(rhs);
+      if (rhs_cp < 0)
+         croak("Encoding error in right-hand buffer");
+      if (lhs_cp != rhs_cp)
+         return lhs_cp < rhs_cp? -1 : 1;
+   }
+   return (lhs->pos < lhs->lim)?  1 /* right string shorter than left */
+        : (rhs->pos < rhs->lim)? -1 /* left string shorter than right */
+        : 0;
 }
 
 /* UTF-8 decoding helper */

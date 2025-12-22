@@ -69,6 +69,10 @@ typedef struct {
 extern bool secret_buffer_parse_init(secret_buffer_parse *parse,
    secret_buffer *buf, size_t pos, size_t lim, int encoding);
 
+/* Initialize a parse struct, either from a Span, or a SecretBuffer, or a plain Scalar.
+ */
+extern bool secret_buffer_parse_init_from_sv(secret_buffer_parse *parse, SV *sv);
+
 /* Scan through a SecretBuffer looking for the first (and maybe also last)
  * character belonging to a set.  The 'pos' and 'lim' of the parse struct
  * define the range that will be searched, and will be updated with the result

@@ -44,8 +44,8 @@ Revision history for Perl extension Finance::Currency::Convert.
 
 2.02  Sun Dec 14 16:00:00 CEST 2025
 	- accept rates file name in constructor
-	- fix: keep setRateFile() semanticas to read the file, too
-	- fix: don't write unknow rate combinations
+	- fix: keep setRateFile() semantics to read the file, too
+	- fix: don't write unknown rate combinations
 
 2.03  Mon Dec 15 14:00:00 CEST 2025
 	- fix: error handling when rate file isn't readable
@@ -62,4 +62,20 @@ Revision history for Perl extension Finance::Currency::Convert.
 
 2.07  Mon Dec 20 19:30:00 CEST 2025
 	- fix warning when rates file doesn't exist, yet
+
+2.08  Mon Dec 20 20:30:00 CEST 2025
+	- fix warnings for Perl 5.43
+
+2.09  Mon Dec 21 13:00:00 CEST 2025
+	- fix warnings for Perl 5.40
+	- add SECURITY.md
+
+2.10  Mon Dec 22 01:00:00 CEST 2025
+	- only perform online tests with Finance::Quote if internet is available
+
+2.11  Mon Dec 22 09:30:00 CEST 2025
+	- test with Finance::Quote only if actually installed
+
+2.12  Mon Dec 22 10:00:00 CEST 2025
+	- new method rateAvailable()
 

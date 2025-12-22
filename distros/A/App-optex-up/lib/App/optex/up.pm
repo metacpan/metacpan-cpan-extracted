@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.01";
+our $VERSION = "1.03";
 
 =encoding utf-8
 
@@ -26,6 +26,9 @@ refers to printing multiple pages on a single sheet.
 The module automatically calculates the number of columns based on the
 terminal width divided by the pane width (default 85 characters).
 
+Both stdout and stderr are merged and passed through the filter, so
+error messages are also displayed in the multi-column paged output.
+
 The pager command is taken from the C<$PAGER> environment variable if
 set, otherwise defaults to C<less>.  When using C<less>, C<-F +Gg>
 options are automatically appended.  C<-F> causes C<less> to exit
@@ -39,47 +42,55 @@ Module options must be specified before C<--> separator.
 
 =over 4
 
-=item B<--grid>=I<CxR>, B<-G> I<CxR>
+=item B<-C> I<N>, B<--pane>=I<N>
+
+Set the number of columns (panes) directly.
+
+=item B<-R> I<N>, B<--row>=I<N>
+
+Set the number of rows.  The page height is calculated by dividing
+the terminal height by this value.
+
+=item B<-G> I<CxR>, B<--grid>=I<CxR>
 
 Set the grid layout.  For example, C<--grid=2x3> or C<--grid=2,3>
 creates a 2-column, 3-row layout (6-up).  This is equivalent to
 C<-C2 -R3>.
 
-=item B<--pane>=I<N>, B<-C> I<N>
-
-Set the number of columns (panes) directly.
-
-=item B<--row>=I<N>, B<-R> I<N>
-
-Set the number of rows.  The page height is calculated by dividing
-the terminal height by this value.
-
 =item B<--height>=I<N>
 
 Set the page height directly in lines.
 
-=item B<--pane-width>=I<N>, B<-S> I<N>
+=item B<-S> I<N>, B<--pane-width>=I<N>
 
 Set the pane width in characters.  Default is 85.  When B<--pane> is
 not specified, the number of panes is calculated by dividing the
 terminal width by this value.
 
-=item B<--border-style>=I<STYLE>, B<--bs>=I<STYLE>
+=item B<--bs>=I<STYLE>, B<--border-style>=I<STYLE>
 
 Set the border style for ansicolumn.  Default is C<heavy-box>.
 See L<App::ansicolumn> for available styles.
 
-=item B<--line-style>=I<STYLE>, B<--ls>=I<STYLE>
+=item B<--ls>=I<STYLE>, B<--line-style>=I<STYLE>
 
 Set the line style for ansicolumn.  Available styles are C<none>,
 C<truncate>, C<wrap>, and C<wordwrap>.  Default is C<wrap> (inherited
 from ansicolumn's document mode).
 
-=item B<--fold>, B<-F>
+=item B<-F>, B<--fold>
 
 Enable fold mode (disable page mode).  In fold mode, the entire
 content is split evenly across columns without pagination.  Page
 mode is the default.
+
+=item B<-H>, B<--filename>
+
+Show filename headers.  This is passed to ansicolumn.
+
+=item B<-V>, B<--parallel>
+
+Enable parallel view mode.  This is passed to ansicolumn.
 
 =item B<--pager>=I<COMMAND>
 
@@ -190,6 +201,8 @@ my $config = Getopt::EX::Config->new(
     'border-style' => 'heavy-box',
     'line-style'   => undef,
     'fold'         => undef,
+    'filename'     => undef,
+    'parallel'     => undef,
     'pager'        => $ENV{PAGER} || 'less',
     'no-pager'     => undef,
 );
@@ -199,7 +212,8 @@ sub finalize {
     $config->deal_with($argv,
         'grid|G=s', 'pane-width|S=i', 'pane|C=i', 'row|R=i', 'height=i',
         'border-style|bs=s', 'line-style|ls=s',
-        'fold|F', 'pager:s', 'no-pager|nopager');
+        'fold|F', 'filename|H!', 'parallel|V!',
+        'pager:s', 'no-pager|nopager');
 
     if (my $grid = $config->{grid}) {
         my($c, $r) = $grid =~ /^(\d+)[x,](\d+)$/
@@ -223,10 +237,12 @@ sub finalize {
     $pager .= ' -F +Gg' if $pager =~ /\bless\b/;
 
     # Build default ansicolumn options
-    my @ac_opts = ("--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");
+    my @ac_opts = ("-w$term_width", "--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");
     push @ac_opts, "--height=$height" if defined $height;
     push @ac_opts, "--ls=$line_style" if defined $line_style;
-    push @ac_opts, "--no-page" if $config->{fold};
+    push @ac_opts, "--no-page"  if $config->{fold};
+    push @ac_opts, "--filename" if $config->{filename};
+    push @ac_opts, "--parallel" if $config->{parallel};
 
     # If command is ansicolumn, apply default options and pager
     if (@$argv && $argv->[0] eq 'ansicolumn') {
@@ -235,13 +251,13 @@ sub finalize {
         if ($config->{'no-pager'} || $pager eq '') {
             return;  # No filter needed
         }
-        $mod->setopt(default => "-Mutil::filter --of='$pager'");
+        $mod->setopt(default => "-Mutil::filter --of='$pager' --ef='>&1'");
         return;
     }
 
     my $column = join ' ', 'ansicolumn', @ac_opts;
     my $filter = ($config->{'no-pager'} || $pager eq '') ? $column : "$column|$pager";
-    $mod->setopt(default => "-Mutil::filter --of='$filter'");
+    $mod->setopt(default => "-Mutil::filter --of='$filter' --ef='>&1'");
 }
 
 1;

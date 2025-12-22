@@ -1,10 +1,13 @@
 package Crypt::SecretBuffer::Span;
 # VERSION
 # ABSTRACT: Reference a span of bytes within a SecretBuffer
-$Crypt::SecretBuffer::Span::VERSION = '0.012';
+$Crypt::SecretBuffer::Span::VERSION = '0.013';
 use strict;
 use warnings;
 use Crypt::SecretBuffer; # loads XS methods into this package
+use overload 'cmp'  => \&cmp,
+             '""'   => sub { 'Span('.($_[0]->buf->stringify_mask||"[REDACTED]").', pos='.$_[0]->pos.', len='.$_[0]->len.')' },
+             'bool' => sub{1}; # span objects are always true
 
 
 # span holds a ref to buffer, and it's less effort to let perl see it for things like iThread cloning.
@@ -211,13 +214,6 @@ Copy the current span of bytes.  C<copy> returns a new SecretBuffer object.  C<c
 into an existing buffer, which can be either a SecretBuffer or a scalar for non-secrets.  There
 is intentionally I<not> a method to I<return> a scalar, to avoid easily leaking secrets.
 
-=head2 memcmp
-
-  $cmp= $span->memcmp($other_thing);
-
-Compare contents of span byte-by-byte to another Span, SecretBuffer, or plain scalar.
-Returns the same as the 'cmp' operator.
-
 Options:
 
 =over
@@ -233,9 +229,24 @@ specify UTF-8 here, you will instead receive bytes of UTF-8 rather than perl wid
 
 =back
 
+=head2 memcmp
+
+  $cmp= $span->memcmp($other_thing);
+
+Compare contents of span byte-by-byte to another Span, SecretBuffer, or plain scalar.
+Returns the same as the 'cmp' operator.
+
+=head2 cmp
+
+  $cmp= $span->cmp($other_thing);
+
+Iterate codepoints of this Span and compare each numerically to the codepoints of another Span,
+or perl scalar.  Returns the same as the 'cmp' operator.  This method is also used as the
+overloaded 'cmp' operator.
+
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 AUTHOR
 

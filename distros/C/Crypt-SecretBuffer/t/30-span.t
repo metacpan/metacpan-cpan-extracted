@@ -333,4 +333,13 @@ subtest copy_base64 => sub {
    }
 };
 
+subtest codepointcmp => sub {
+   is( secret("A")->span cmp secret("B")->span, -1, 'A cmp B' );
+   is( secret("\xFF")->span cmp "\x{100}", -1, '0xFF cmp 0x100' );
+
+   my $unicode= "\0\x{10}\x{100}\x{1000}\x{10000}\x{10FFFD}";
+   my $utf16= encode('UTF-16LE', $unicode);
+   is( secret($utf16)->span(encoding => 'UTF16LE') cmp $unicode, 0, 'utf16 cmp utf8' );
+};
+
 done_testing;

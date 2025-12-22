@@ -13,7 +13,7 @@ define pod <<"=cut"
 
 =head1 NAME
 
-nup - N-up output wrapper for optex -Mup
+nup - N-up multi-column paged output for commands and files
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ nup - N-up output wrapper for optex -Mup
     -e,   --exec             execute command mode
     -V,   --parallel         parallel view mode
     -F,   --fold             fold mode (disable page mode)
-    -H,   --header           show file headers (default: on)
+    -H,   --filename         show filename headers (default: on)
     -G,   --grid=#           grid layout (e.g., 2x3)
     -C,   --pane=#           number of columns
     -R,   --row=#            number of rows
@@ -40,28 +40,11 @@ nup - N-up output wrapper for optex -Mup
 
 =head1 VERSION
 
-Version 0.99
+Version 0.9902
 
 =cut
 
 [[ $pod =~ Version\ +([0-9.]+) ]] && my_version=${BASH_REMATCH[1]}
-
-# -h callback: show help from POD
-help() {
-    sed -E \
-        -e '/^$/N' \
-        -e 's/^(\n*)=head[0-9]* */\1/' \
-        -e '/^\n*[#=]/d' \
-        -e '/Version/q' \
-        <<< "$pod"
-    exit 0
-}
-
-# -v callback: show version
-version() {
-    echo "$my_version"
-    exit 0
-}
 
 ##############################################################################
 # Utility functions
@@ -101,11 +84,13 @@ fi
 ##############################################################################
 
 define USAGE <<END
-nup - N-up output wrapper for optex -Mup
+nup - N-up multi-column paged output for commands and files
 
 Usage: $myname [ options ] file ...
        $myname -e [ options ] command ...
 END
+
+declare -a up_opts=(--filename)  # up.pm options
 
 declare -A OPTS=(
     [&REQUIRE]=0.4 [&USAGE]="$USAGE" [&PERMUTE]=
@@ -114,46 +99,54 @@ declare -A OPTS=(
     [        debug | d    # debug mode        ]=
     [       dryrun | n    # dry-run mode      ]=
     [         exec | e    # execute command   ]=
-    [     parallel | V    # parallel view     ]=
-    [         fold | F    # fold mode         ]=
-    [       header | H    # show file headers ]=1
-    [         grid | G  : # grid layout       ]=
-    [         pane | C  : # number of columns ]=
-    [          row | R  : # number of rows    ]=
-    [       height |    : # page height       ]=
-    [   pane-width | S  : # pane width        ]=
-    [ border-style | bs : # border style      ]=
-    [   line-style | ls : # line style        ]=
-    [        pager |    : # pager command     ]=1
+    [        pager |   :! # pager command     ]=
+    [     parallel | V   >up_opts # parallel view     ]=
+    [         fold | F   >up_opts # fold mode         ]=
+    [     filename | H   >up_opts # show file headers ]=
+    [         grid | G  :>up_opts # grid layout       ]=
+    [         pane | C  :>up_opts # number of columns ]=
+    [          row | R  :>up_opts # number of rows    ]=
+    [       height |    :>up_opts # page height       ]=
+    [   pane-width | S  :>up_opts # pane width        ]=
+    [ border-style | bs :>up_opts # border style      ]=
+    [   line-style | ls :>up_opts # line style        ]=
 )
+
+##############################################################################
+# Option callbacks
+##############################################################################
+
+# -h callback: show help from POD
+help() {
+    sed -E \
+        -e '/^$/N' \
+        -e 's/^(\n*)=head[0-9]* */\1/' \
+        -e '/^\n*[#=]/d' \
+        -e '/Version/q' \
+        <<< "$pod"
+    exit 0
+}
+
+# --version callback: show version
+version() {
+    echo "$my_version"
+    exit 0
+}
+
+# --pager callback: handle pager option
+pager() {
+    if [[ -z $2 ]]; then
+        up_opts+=("--no-pager")
+    else
+        up_opts+=("--pager=$2")
+    fi
+}
 
 ##############################################################################
 # Parse options
 ##############################################################################
 
 . getoptlong.sh OPTS "$@"
-
-##############################################################################
-# Build module options
-##############################################################################
-
-declare -a up_opts=()
-
-[[ ${grid:-}         ]] && up_opts+=("--grid=$grid")
-[[ ${pane:-}         ]] && up_opts+=("--pane=$pane")
-[[ ${row:-}          ]] && up_opts+=("--row=$row")
-[[ ${height:-}       ]] && up_opts+=("--height=$height")
-[[ ${pane_width:-}   ]] && up_opts+=("--pane-width=$pane_width")
-[[ ${border_style:-} ]] && up_opts+=("--border-style=$border_style")
-[[ ${line_style:-}   ]] && up_opts+=("--line-style=$line_style")
-if [[ $pager != 1 ]]; then
-    if [[ -z $pager ]]; then
-        up_opts+=("--no-pager")
-    else
-        up_opts+=("--pager=$pager")
-    fi
-fi
-[[ $fold ]] && up_opts+=("--fold")
 
 ##############################################################################
 # Main
@@ -177,23 +170,12 @@ if is_command_mode "$@"; then
     declare -a cmd=(optex -Mup "${up_opts[@]}" -- "$@")
 else
     # File view mode: use ansicolumn via optex -Mup
-    # up.pm adds default options (--bs, -DP, -C, etc.)
-    # User-specified options are added here to override defaults
-    declare -a ac_opts=()
-    [[ ${parallel:-} ]] && ac_opts+=(--parallel)
-    [[ $fold ]] && ac_opts+=(--no-page)
-    [[ $header ]] && ac_opts+=(--filename)
-    [[ ${border_style:-} ]] && ac_opts+=("--border-style=$border_style")
-    [[ ${line_style:-}   ]] && ac_opts+=("--line-style=$line_style")
-    declare -a cmd=(optex -Mup "${up_opts[@]}" -- ansicolumn "${ac_opts[@]}" "$@")
+    declare -a cmd=(optex -Mup "${up_opts[@]}" -- ansicolumn "$@")
 fi
 
 debug "command: ${cmd[*]}"
 
-if [[ ${dryrun:-} ]]; then
-    echo "${cmd[@]}"
-    exit 0
-fi
+[[ ${dryrun:-} ]] && cmd=(echo "${cmd[@]}")
 
 exec "${cmd[@]}"
 
@@ -251,20 +233,16 @@ Enable fold mode (disable page mode).  In fold mode, the entire
 content is split evenly across columns without pagination.  Page
 mode is the default.
 
-=item B<-H>, B<--header>
+=item B<-H>, B<--filename>
 
 Show filename headers in file view mode. Enabled by default.
-Use C<--no-header> to disable.
+Use C<--no-filename> to disable.
 
 =back
 
 =head2 Layout Options
 
 =over 4
-
-=item B<-G> I<CxR>, B<--grid>=I<CxR>
-
-Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
 
 =item B<-C> I<N>, B<--pane>=I<N>
 
@@ -273,6 +251,10 @@ Set the number of columns (panes).
 =item B<-R> I<N>, B<--row>=I<N>
 
 Set the number of rows.
+
+=item B<-G> I<CxR>, B<--grid>=I<CxR>
+
+Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
 
 =item B<--height>=I<N>
 
@@ -327,6 +309,16 @@ Disable pager.
 Using L<cpanminus|https://metacpan.org/pod/App::cpanminus>:
 
     cpanm -n App::nup
+
+=head1 DIAGNOSTICS
+
+Both stdout and stderr of the command are merged and passed through
+the output filter.  Error messages will appear in the paged output.
+
+=head1 EXIT STATUS
+
+The exit status of the executed command is not preserved because
+the output is passed through a filter pipeline.
 
 =head1 SEE ALSO
 

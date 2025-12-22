@@ -40,7 +40,7 @@ Currencies with built-in rates (complete):
 
         EUR             Euro
         ATS             Austrian Schilling
-        BEF             Belgiam Franc
+        BEF             Belgian Franc
         DEM             German Mark
         ESP             Spanish Peseta
         FIM             Finnish Mark
@@ -53,9 +53,9 @@ Currencies with built-in rates (complete):
         PTE             Portuguese Escudo
         CYP             Cyprus Pound
         MTL             Maltese Lira
-        SIT             Slovenian Tolars
+        SIT             Slovenian Tolar
         SKK             Swedish Krona
-        EEK             Estonian Koon
+        EEK             Estonian Kroon
         LTL             Lithuanian Litas
         LVL             Latvian Lats
         HRK             Croatian Kuna
@@ -71,7 +71,7 @@ Other currencies (incomplete):
 
 # AVAILABLE METHODS
 
-## NEW
+## new
 
     my $converter = new Finance::Currency::Convert;
 
@@ -79,30 +79,36 @@ The newly created conversion object will by default only know how to
 convert Euro currencies. To "teach" it more currencies use updateRate
 or updateRates.
 
-## CONVERT
+## convert
 
     $amount_euro = $converter->convert(100, "DEM", "EUR");
 
 This will convert 100 German Marks into the equivalent
 amount Euro.
 
-## CONVERTTOEURO
+## convertToEUR
 
     $amount_euro = $converter->convertToEUR(100, "DEM");
 
 This will convert 100 German Marks into the equivalent amount Euro.
 This function is simply shorthand for calling convert directly with
-"EUR" als the second (target) currency.
+"EUR" as the second (target) currency.
 
-## CONVERTFROMEURO
+## convertFromEUR
 
     $amount_dem = $converter->convertFromEUR(100, "DEM");
 
 This will convert 100 Euro into the equivalent amount German Marks.
 This function is simply shorthand for calling convert directly with
-"EUR" als the first (source) currency.
+"EUR" as the first (source) currency.
 
-## UPDATERATES
+## rateAvailable
+
+    $available = $converter->rateAvailable("DEM", "EUR");
+
+Check if the conversion rate is available.
+
+## updateRates
 
     $converter->updateRates("USD");
     $converter->updateRates("EUR", "DEM", "USD");
@@ -118,39 +124,39 @@ and load them again with setRatesFile().
 
 To update a single exchange rate use updateRate.
 
-## UPDATERATE
+## updateRate
 
     $converter->updateRate("EUR, "USD");
 
 This will fetch a single exchange rate using Finance::Quote and
 update the exchange rates in memory.
 
-## SETUSERAGENT
+## setUserAgent
 
         $converter->setUserAgent("MyCurrencyAgent 1.0");
 
 Set the user agent string to be used by Finance::Quote, optional.
 
-## SETRATE
+## setRate
 
         $converter->setRate("EUR", "USD", 99.99);
 
 Set one exchange rate. Used internally by updateRates,
 but may be of use if you have to add a rate manually.
 
-## SETRATESFILE
+## setRatesFile
 
     $converter->setRatesFile(".rates");
 
 Name the file where exchange rates are stored.
 
-## READRATESFILE
+## readRatesFile
 
     $converter->readRatesFile();
 
 Read the rates stored in the rates file, overwriting previous values.
 
-## WRITERATESFILE
+## writeRatesFile
 
     $converter->writeRatesFile();
 

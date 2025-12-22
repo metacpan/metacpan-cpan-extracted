@@ -37,6 +37,8 @@ sub sealed :Sealed {
 }
 
 use sealed 'verify';
+use types;
+use class;
 
 sub also_sealed :Sealed (label $a, integer $b, string $c="HOLA", integer $d//=3, integer $e||=4) {
   if ($a) {

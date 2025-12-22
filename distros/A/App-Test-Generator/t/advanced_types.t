@@ -280,7 +280,7 @@ subtest 'datetime_object method' => sub {
 	ok($dt_param, 'dt parameter detected');
 	# POD parser sets type to 'datetime' from the description, then code analysis enhances it
 	ok($dt_param->{type}, 'has a type');
-	is($dt_param->{class}, 'DateTime', 'class is DateTime');
+	is($dt_param->{isa}, 'DateTime', 'class is DateTime');
 	is($dt_param->{semantic}, 'datetime_object', 'semantic type is datetime_object');
 };
 
@@ -294,8 +294,8 @@ subtest 'timepiece_object method' => sub {
 	# POD parser may set type to 'time' from description
 	ok($tp_param->{type}, 'has a type');
 	# But class should be detected from code
-	ok($tp_param->{class}, 'has a class');
-	like($tp_param->{class}, qr/Time::Piece|DateTime/, 'class is Time::Piece or DateTime');
+	ok($tp_param->{isa}, 'has a class');
+	like($tp_param->{isa}, qr/Time::Piece|DateTime/, 'class is Time::Piece or DateTime');
 	ok($tp_param->{semantic}, 'has semantic type');
 };
 
@@ -358,8 +358,8 @@ subtest 'file_handle method' => sub {
 	ok($fh_param, 'fh parameter detected');
 	# Type may be detected as 'file' from POD or 'object' from code
 	ok($fh_param->{type}, 'has a type');
-	ok($fh_param->{class} || $fh_param->{semantic}, 'has class or semantic type');
-	ok($fh_param->{semantic} =~ /filehandle|file/ || $fh_param->{class} =~ /IO::Handle/,
+	ok($fh_param->{isa} || $fh_param->{semantic}, 'has class or semantic type');
+	ok($fh_param->{semantic} =~ /filehandle|file/ || $fh_param->{isa} =~ /IO::Handle/,
 	   'indicates file handle');
 };
 
@@ -457,9 +457,9 @@ subtest 'io_file_object method' => sub {
 	ok($file_param, 'file parameter detected');
 	# Type may be 'io' from POD or 'object' from code
 	ok($file_param->{type}, 'has a type');
-	ok($file_param->{class}, 'has a class');
+	ok($file_param->{isa}, 'has a class');
 	# Class should be either IO::File or IO::Handle (both are valid)
-	like($file_param->{class}, qr/IO::(File|Handle)/, 'class is IO::File or IO::Handle');
+	like($file_param->{isa}, qr/IO::(File|Handle)/, 'class is IO::File or IO::Handle');
 };
 
 # File operations detection
@@ -520,7 +520,7 @@ open $yaml_fh, '<', $dt_yaml or die "Can't read YAML: $!";
 $yaml_content = do { local $/; <$yaml_fh> };
 close $yaml_fh;
 
-like($yaml_content, qr/class:\s*DateTime/, 'YAML contains DateTime class');
+like($yaml_content, qr/isa:\s*DateTime/, 'YAML contains DateTime class');
 like($yaml_content, qr/Parameter types detected:/, 'YAML contains parameter notes');
 
 # Check YAML content for coderef

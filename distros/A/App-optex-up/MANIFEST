@@ -11,6 +11,7 @@ t/00_compile.t
 t/01_options.t
 t/02_run.t
 t/Util.pm
+t/runner/README.md
 t/runner/Runner.pm
 META.yml
 MANIFEST

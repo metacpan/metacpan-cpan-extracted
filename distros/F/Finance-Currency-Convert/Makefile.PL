@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'	=> 'Finance::Currency::Convert',
     'VERSION_FROM' => 'Convert.pm', # finds $VERSION
-	'PREREQ_PM' => { 'Test::NoWarnings' => 0 },
+	'PREREQ_PM' => { 'Test::NoWarnings' => 0, 'Test::RequiresInternet' => 0 },
 	'ABSTRACT_FROM' => 'Convert.pm', # retrieve abstract from module
 	'AUTHOR' => 'Jan Willamowius <jan@willamowius.de>',
 	'LICENSE' => 'perl',

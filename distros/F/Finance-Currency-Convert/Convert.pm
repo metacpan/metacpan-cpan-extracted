@@ -22,7 +22,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '2.08';
+$VERSION = '2.12';
 
 my %EuroRates = (
          BEF => {EUR=>0.0247899055505,   BEF => 1},
@@ -78,7 +78,7 @@ sub setRatesFile() {
 
 sub readRatesFile() {
 	my $self = shift;
-	if (!defined $self->{RatesFile} || !(-r $self->{RatesFile}) || !(-s $self->{RatesFile}) > 0) {
+	if (!defined $self->{RatesFile} || !(-r $self->{RatesFile}) || !((-s $self->{RatesFile}) > 0)) {
 		warn("Can't read $self->{RatesFile}\n");
 		return;
 	}
@@ -174,6 +174,13 @@ sub setUserAgent() {
 	$self->{UserAgent} = shift;
 }
 
+sub rateAvailable {
+	my $self = shift;
+	my $source = shift;
+	my $target = shift;
+	return defined($self->{CurrencyRates}->{$source}{$target});
+}
+
 sub convert() {
 	my $self = shift;
 	my $amount = shift;
@@ -245,7 +252,7 @@ Currencies with built-in rates (complete):
 
 	EUR		Euro
 	ATS		Austrian Schilling
-	BEF		Belgiam Franc
+	BEF		Belgian Franc
 	DEM		German Mark
 	ESP		Spanish Peseta
 	FIM		Finnish Mark
@@ -258,9 +265,9 @@ Currencies with built-in rates (complete):
 	PTE		Portuguese Escudo
 	CYP		Cyprus Pound
 	MTL		Maltese Lira
-	SIT		Slovenian Tolars
+	SIT		Slovenian Tolar
 	SKK		Swedish Krona
-	EEK		Estonian Koon
+	EEK		Estonian Kroon
 	LTL		Lithuanian Litas
 	LVL		Latvian Lats
 	HRK		Croatian Kuna
@@ -276,7 +283,7 @@ Other currencies (incomplete):
 
 =head1 AVAILABLE METHODS
 
-=head2 NEW
+=head2 new
 
    my $converter = new Finance::Currency::Convert;
 
@@ -284,30 +291,36 @@ The newly created conversion object will by default only know how to
 convert Euro currencies. To "teach" it more currencies use updateRate
 or updateRates.
 
-=head2 CONVERT
+=head2 convert
 
    $amount_euro = $converter->convert(100, "DEM", "EUR");
 
 This will convert 100 German Marks into the equivalent
 amount Euro.
 
-=head2 CONVERTTOEURO
+=head2 convertToEUR
 
    $amount_euro = $converter->convertToEUR(100, "DEM");
 
 This will convert 100 German Marks into the equivalent amount Euro.
 This function is simply shorthand for calling convert directly with
-"EUR" als the second (target) currency.
+"EUR" as the second (target) currency.
 
-=head2 CONVERTFROMEURO
+=head2 convertFromEUR
 
    $amount_dem = $converter->convertFromEUR(100, "DEM");
 
 This will convert 100 Euro into the equivalent amount German Marks.
 This function is simply shorthand for calling convert directly with
-"EUR" als the first (source) currency.
+"EUR" as the first (source) currency.
 
-=head2 UPDATERATES
+=head2 rateAvailable
+
+   $available = $converter->rateAvailable("DEM", "EUR");
+
+Check if the conversion rate is available.
+
+=head2 updateRates
 
    $converter->updateRates("USD");
    $converter->updateRates("EUR", "DEM", "USD");
@@ -324,39 +337,39 @@ and load them again with setRatesFile().
 To update a single exchange rate use updateRate.
 
 
-=head2 UPDATERATE
+=head2 updateRate
 
    $converter->updateRate("EUR, "USD");
 
 This will fetch a single exchange rate using Finance::Quote and
 update the exchange rates in memory.
 
-=head2 SETUSERAGENT
+=head2 setUserAgent
 
 	$converter->setUserAgent("MyCurrencyAgent 1.0");
 
 Set the user agent string to be used by Finance::Quote, optional.
 
-=head2 SETRATE
+=head2 setRate
 
 	$converter->setRate("EUR", "USD", 99.99);
 
 Set one exchange rate. Used internally by updateRates,
 but may be of use if you have to add a rate manually.
 
-=head2 SETRATESFILE
+=head2 setRatesFile
 
    $converter->setRatesFile(".rates");
 
 Name the file where exchange rates are stored.
 
-=head2 READRATESFILE
+=head2 readRatesFile
 
    $converter->readRatesFile();
 
 Read the rates stored in the rates file, overwriting previous values.
 
-=head2 WRITERATESFILE
+=head2 writeRatesFile
 
    $converter->writeRatesFile();
 

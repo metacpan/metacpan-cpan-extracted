@@ -1,13 +1,13 @@
 package App::nup;
 
-our $VERSION = "0.99";
+our $VERSION = "0.9902";
 
 1;
 =encoding utf-8
 
 =head1 NAME
 
-nup - N-up output wrapper for optex -Mup
+nup - N-up multi-column paged output for commands and files
 
 =head1 SYNOPSIS
 
@@ -21,7 +21,7 @@ nup - N-up output wrapper for optex -Mup
     -e,   --exec             execute command mode
     -V,   --parallel         parallel view mode
     -F,   --fold             fold mode (disable page mode)
-    -H,   --header           show file headers (default: on)
+    -H,   --filename         show filename headers (default: on)
     -G,   --grid=#           grid layout (e.g., 2x3)
     -C,   --pane=#           number of columns
     -R,   --row=#            number of rows
@@ -34,7 +34,7 @@ nup - N-up output wrapper for optex -Mup
 
 =head1 VERSION
 
-Version 0.99
+Version 0.9902
 
 =cut
 =head1 DESCRIPTION
@@ -89,20 +89,16 @@ Enable fold mode (disable page mode).  In fold mode, the entire
 content is split evenly across columns without pagination.  Page
 mode is the default.
 
-=item B<-H>, B<--header>
+=item B<-H>, B<--filename>
 
 Show filename headers in file view mode. Enabled by default.
-Use C<--no-header> to disable.
+Use C<--no-filename> to disable.
 
 =back
 
 =head2 Layout Options
 
 =over 4
-
-=item B<-G> I<CxR>, B<--grid>=I<CxR>
-
-Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
 
 =item B<-C> I<N>, B<--pane>=I<N>
 
@@ -111,6 +107,10 @@ Set the number of columns (panes).
 =item B<-R> I<N>, B<--row>=I<N>
 
 Set the number of rows.
+
+=item B<-G> I<CxR>, B<--grid>=I<CxR>
+
+Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
 
 =item B<--height>=I<N>
 
@@ -165,6 +165,16 @@ Disable pager.
 Using L<cpanminus|https://metacpan.org/pod/App::cpanminus>:
 
     cpanm -n App::nup
+
+=head1 DIAGNOSTICS
+
+Both stdout and stderr of the command are merged and passed through
+the output filter.  Error messages will appear in the paged output.
+
+=head1 EXIT STATUS
+
+The exit status of the executed command is not preserved because
+the output is passed through a filter pipeline.
 
 =head1 SEE ALSO
 
