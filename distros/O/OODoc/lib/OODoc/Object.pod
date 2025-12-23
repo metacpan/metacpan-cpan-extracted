@@ -68,10 +68,9 @@ options when used with many other method defined by OODoc.
 
 =over 4
 
-=item $obj-E<gt>B<publish>(\%options)
+=item $obj-E<gt>B<manual>()
 
-Extract the data of an object for export, and register it in the index.
-A HASH is returned which should get filled with useful data.
+The manual of the text object is returned.
 
 =item $obj-E<gt>B<unique>()
 
@@ -79,10 +78,21 @@ Returns a unique id for this text item.  This is the easiest way to
 see whether two references to the same (overloaded) objects point to
 the same thing. The ids are numeric.
 
-example: 
+» example: 
 
   if($obj1->unique == $obj2->unique) {...}
   if($obj1 == $obj2) {...}   # same via overload
+
+=back
+
+=head2 Collected
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Extract the data of an object for export, and register it in the index.
+A HASH is returned which should get filled with useful data.
 
 =back
 
@@ -94,20 +104,20 @@ example:
 
 You have used the option with C<$name>, which is not defined with the
 instantiation (the C<new> method) of this object.
-Cast by new()
+Cast by C<new()>
 
 =item Error: unknown object attributes for $pkg: '$names'
 
 You have used more than one option which is not defined to instantiate
 the object.
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

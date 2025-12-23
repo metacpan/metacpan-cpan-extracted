@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Ar;
-$ExtUtils::Builder::Linker::Ar::VERSION = '0.033';
+$ExtUtils::Builder::Linker::Ar::VERSION = '0.034';
 use strict;
 use warnings;
 

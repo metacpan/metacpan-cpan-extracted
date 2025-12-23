@@ -52,4 +52,9 @@ use ExtUtils::Builder::Compiler::Unixy;
 	eq_or_diff([ $compiler->compile('file.c', 'file.o')->to_command ], [[qw/cc -Ufoo -o file.o -c file.c/]], 'Got "cc -Ufoo -o file.o -c file.c"');
 }
 
+{
+	my $compiler = ExtUtils::Builder::Compiler::Unixy->new(cc => [ 'cc' ], cccdlflags => [ '-fPIC' ], type => 'executable', standard => 'c11');
+	$compiler->add_defines({ foo => undef });
+	eq_or_diff([ $compiler->compile('file.c', 'file.o')->to_command ], [[qw/cc -std=c11 -Ufoo -o file.o -c file.c/]], 'Got "cc -Ufoo -o file.o -c file.c"');
+}
 done_testing;

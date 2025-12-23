@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.04.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution OODoc version 3.05.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -9,19 +9,16 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Format::Pod;{
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 }
 
 use parent 'OODoc::Format';
 
 use strict;
 use warnings;
+use utf8;
 
 use Log::Report    'oodoc';
 
@@ -221,7 +218,7 @@ sub showExamples(@)
 
 	foreach my $example (@$examples)
 	{	my $name    = $self->cleanup($manual, $example->name);
-		$output->print("\nexample: $name\n\n");
+		$output->print("\n» example: $name\n\n");
 		$output->print($self->cleanup($manual, $example->description));
 		$output->print("\n");
 	}
@@ -241,7 +238,7 @@ sub showDiagnostics(@)
 		my $type    = $diag->type;
 		$output->print("\n=item $type: $name\n\n");
 		$output->print($self->cleanup($manual, $diag->description));
-		$output->print("Cast by ", $diag->subroutine->name, "()\n");
+		$output->print("Cast by C<", $diag->subroutine->name, "()>\n");
 		$output->print("\n");
 	}
 	$self;

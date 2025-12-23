@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Scalar::Util ();
 use Quiq::Stacktrace;
@@ -588,10 +588,10 @@ sub set {
     while (@_) {
         my $key = shift;
         $self->{$key} = shift;
-        #eval {$self->{$key} = shift};
-        #if ($@) {
-        #    $self->throw($@);
-        #}
+        # eval {$self->{$key} = shift};
+        # if ($@) {
+        #     $self->throw($@);
+        # }
     }
 
     return;
@@ -1766,7 +1766,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

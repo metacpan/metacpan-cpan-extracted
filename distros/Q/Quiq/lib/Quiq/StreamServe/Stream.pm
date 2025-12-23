@@ -38,7 +38,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Quiq::StreamServe::Block;
 use Quiq::FileHandle;
@@ -172,6 +172,128 @@ sub new {
         blockA => \@blocks,
         sectionH => Quiq::Hash->new(\%section),
     );
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 lookup() - Suche Feld
+
+=head4 Synopsis
+
+  $val = $class->lookup($file,$name);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Stream-Datei
+
+=item $name
+
+Name des gesuchten Feldes
+
+=back
+
+=head4 Returns
+
+(String) Wert oder C<undef>
+
+=head4 Description
+
+Durchsuche den Stream $file nach dem ersten Vorkommen des Feldes $name
+und liefere dessen Wert zurück. Kommt das Feld im Stream nicht vor,
+liefere C<undef>.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub lookup {
+    my ($class,$file,$name) = @_;
+
+    my $val = undef;
+    my $fh = Quiq::FileHandle->new('<',$file);
+    while (<$fh>) {
+        chomp;
+        if ($_ eq '') {
+            # Wir übergehen Leerzeilen
+            next;
+        }
+        my ($key,$str) = split /\t/,$_,2;
+        if ($key eq $name) {
+            $val = $str;
+            last;
+        }
+    }
+    $fh->close;
+
+    return $val;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 lookupHeader() - Suche Feld im Header
+
+=head4 Synopsis
+
+  $val = $class->lookupHeader($file,$name);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Stream-Datei
+
+=item $name
+
+Name des gesuchten Feldes
+
+=back
+
+=head4 Returns
+
+(String) Wert oder C<undef>
+
+=head4 Description
+
+Durchsuche den Header des Streams $file nach dem ersten Vorkommen des
+Feldes $name und liefere dessen Wert zurück. Kommt das Feld im Stream
+nicht vor, liefere C<undef>. Die Felder des Headers beginnen mit einem
+Stern (C<*>). Gegenüber Metjode lookup() ist die Methode lookupHeader()
+effizienter, da sie nach Lesen der Headerfelder stoppt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub lookupHeader {
+    my ($class,$file,$name) = @_;
+
+    my $val = undef;
+    my $fh = Quiq::FileHandle->new('<',$file);
+    while (<$fh>) {
+        chomp;
+        if ($_ eq '' || $_ =~ /^BEGIN/) {
+            # Wir übergehen Leerzeilen und die BEGIN-Zeile
+            next;
+        }
+        my ($key,$str) = split /\t/,$_,2;
+        if (substr($key,0,1) ne '*') {
+            # Stoppe nach Lesen des Headers
+            last;
+        }
+        if ($key eq $name) {
+            $val = $str;
+            last;
+        }
+    }
+    $fh->close;
+
+    return $val;
 }
 
 # -----------------------------------------------------------------------------
@@ -348,7 +470,7 @@ Die Blockart
 
 =item $sloppy
 
-Wenn gesetzt, wirf keine Exception, wenn die Blockart nicht existiet,
+Wenn gesetzt, wirf keine Exception, wenn die Blockart nicht existiert,
 sondern liefere eine leere Liste.
 
 =back
@@ -562,7 +684,7 @@ sub try {
 
 # -----------------------------------------------------------------------------
 
-=head3 type() - Typ des Stream
+=head3 type() - Typ des Streams
 
 =head4 Synopsis
 
@@ -622,7 +744,7 @@ sub type {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.27;
+our $VERSION = v0.28;
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -389,7 +389,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.27
+version v0.28
 
 =head1 SYNOPSIS
 

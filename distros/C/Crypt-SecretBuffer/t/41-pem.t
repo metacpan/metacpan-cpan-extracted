@@ -37,6 +37,26 @@ END
    is( $pem->serialize->memcmp($buf), 0, 'serialize' );
 };
 
+# I frequently encounter PEM data where the END marker lacks a newline.
+subtest missing_final_newline => sub {
+   my $buf= secret("-----BEGIN SOMETHING-----\nVGVzdA==\n-----END SOMETHING-----");
+   my $canonical= "-----BEGIN SOMETHING-----\nVGVzdA==\n-----END SOMETHING-----\n";
+   my $pem= Crypt::SecretBuffer::PEM->parse($buf->span);
+   is( $pem,
+       object {
+         call label => 'SOMETHING';
+         call content => object {
+            call [ memcmp => "VGVzdA==\n" ], 0;
+            call [ cmp => "Test" ], 0;
+         };
+       },
+       'parse'
+   ) or diag explain $pem;
+
+   is( $pem->serialize->memcmp($canonical), 0, 'serialize' );
+};
+
+
 subtest empty_content => sub {
    my $buf= secret(<<END);
 -----BEGIN THE THING-----

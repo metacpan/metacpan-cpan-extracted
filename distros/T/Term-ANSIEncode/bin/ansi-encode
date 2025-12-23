@@ -118,7 +118,7 @@ my $help_text = <<'SMALL';
 ╟─────────────────────────────────────────────────────────────────────────╢
 ║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                 [% RESET %]║
 ║     -[% BRIGHT BLUE %]a[% RESET %] or --[% BRIGHT BLUE %]ansi-modes[% RESET %]                                                  ║
-║         Show supported ANSI modes                                       ║
+║         Show supported ANSI color modes                                 ║
 ║                                                                         ║
 ║     -[% BRIGHT BLUE %]c[% RESET %] or --[% BRIGHT BLUE %]colors[% RESET %]                                                      ║
 ║         Show available colors                                           ║
@@ -172,8 +172,8 @@ $to .= "$bar                         ▐[% YELLOW %]░[% RESET %]▌      ▐[%
 $to .= "$bar                         ▐[% YELLOW %]░[% RESET %]▌      ▐[% YELLOW %]░[% RESET %]▌       ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌[% YELLOW %]░[% RESET %]▌    ▐[% YELLOW %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌   ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]█▄▄▄▄▄▄▄▄▄                         $bar\n";
 $to .= "$bar                         ▐[% GREEN %]░[% RESET %]▌      ▐[% GREEN %]░[% RESET %]▌       ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░░[% RESET %]▌     ▐[% GREEN %]░░░░░░░░░░░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌  ▐[% GREEN %]░[% RESET %]▌  ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░░░░░░░░░░░[% RESET %]▌                        $bar\n";
 $to .= "$bar                         ▐[% GREEN %]░[% RESET %]▌      ▐[% GREEN %]░[% RESET %]▌       ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌[% GREEN %]░[% RESET %]▌    ▐[% GREEN %]░[% RESET %]█▀▀▀▀▀▀▀▀▀  ▐[% GREEN %]░[% RESET %]▌   ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌  ▀▀▀▀▀▀▀▀▀█[% GREEN %]░[% RESET %]▌                        $bar\n";
-$to .= "$bar                         ▐[% MAGENTA %]░[% RESET %]▌      ▐[% MAGENTA %]░[% RESET %]▌       ▐[% MAGENTA %]░[% RESET %]▌ ▐[% MAGENTA %]░[% RESET %]▌▐[% MAGENTA %]░[% RESET %]▌   ▐[% MAGENTA %]░[% RESET %]▌           ▐[% MAGENTA %]░[% RESET %]▌    ▐[% MAGENTA %]░[% RESET %]▌▐[% MAGENTA %]░[% RESET %]▌           ▐[% MAGENTA %]░[% RESET %]▌                        $bar\n";
-$to .= "$bar                         ▐[% MAGENTA %]░[% RESET %]▌      ▐[% MAGENTA %]░[% RESET %]█▄▄▄▄▄▄▄█[% MAGENTA %]░[% RESET %]▌ ▐[% MAGENTA %]░[% RESET %]▌ ▐[% MAGENTA %]░[% RESET %]▌  ▐[% MAGENTA %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% MAGENTA %]░[% RESET %]▌     ▐[% MAGENTA %]░[% RESET %]▐[% MAGENTA %]░[% RESET %]▌  ▄▄▄▄▄▄▄▄▄█[% MAGENTA %]░[% RESET %]▌                        $bar\n";
+$to .= "$bar                         ▐[% CYAN %]░[% RESET %]▌      ▐[% CYAN %]░[% RESET %]▌       ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌▐[% CYAN %]░[% RESET %]▌   ▐[% CYAN %]░[% RESET %]▌           ▐[% CYAN %]░[% RESET %]▌    ▐[% CYAN %]░[% RESET %]▌▐[% CYAN %]░[% RESET %]▌           ▐[% CYAN %]░[% RESET %]▌                        $bar\n";
+$to .= "$bar                         ▐[% CYAN %]░[% RESET %]▌      ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌  ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% CYAN %]░[% RESET %]▌     ▐[% CYAN %]░[% RESET %]▐[% CYAN %]░[% RESET %]▌  ▄▄▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌                        $bar\n";
 $to .= "$bar                         ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌  ▐[% BLUE %]░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌                        $bar\n";
 $to .= "$bar                          ▀        ▀▀▀▀▀▀▀▀▀▀▀   ▀    ▀   ▀▀▀▀▀▀▀▀▀▀▀   ▀        ▀▀   ▀▀▀▀▀▀▀▀▀▀▀                         $bar\n";
 
@@ -391,7 +391,7 @@ FRAMES
     print "\n╔", '═' x 131, "╗\n";
     $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n");
     print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
-    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'COLOR 0 - COLOR 231', 'B_COLOR 0 - B_COLOR 231', 'GRAY 0 - GRAY 28', 'B_GRAY 0 - B_GRAY 28');
+    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'COLOR 16 - COLOR 231', 'B_COLOR 16 - B_COLOR 231', 'GRAY 0 - GRAY 28', 'B_GRAY 0 - B_GRAY 28');
     print "\n║";
     my $width = 4;
     my $count = 1;

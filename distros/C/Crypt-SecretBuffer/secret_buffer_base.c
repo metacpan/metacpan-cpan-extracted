@@ -11,14 +11,15 @@
  * Specify UNDEF_OK if you want input C<undef> to translate to C<NULL> even when OR_DIE is
  * requested.
  */
-void *secret_buffer_auto_ctor(SV *owner) {
+static void *secret_buffer_auto_ctor(pTHX_ SV *owner) {
    secret_buffer *buf= NULL;
    Newxz(buf, 1, secret_buffer);
    buf->wrapper= owner;
    return buf;
 }
 secret_buffer* secret_buffer_from_magic(SV *obj, int flags) {
-   return (secret_buffer*) secret_buffer_X_from_magic(
+   dTHX;
+   return (secret_buffer*) secret_buffer_X_from_magic(aTHX_
       obj, flags,
       &secret_buffer_magic_vtbl, "secret_buffer",
       secret_buffer_auto_ctor);
@@ -31,6 +32,7 @@ secret_buffer* secret_buffer_from_magic(SV *obj, int flags) {
  * Always returns a secret_buffer, or croaks on failure.
  */
 secret_buffer* secret_buffer_new(size_t capacity, SV **ref_out) {
+   dTHX;
    SV *ref= sv_2mortal(newRV_noinc((SV*) newHV()));
    sv_bless(ref, gv_stashpv("Crypt::SecretBuffer", GV_ADD));
    secret_buffer *buf= secret_buffer_from_magic(ref, SECRET_BUFFER_MAGIC_AUTOCREATE);
@@ -47,6 +49,7 @@ secret_buffer* secret_buffer_new(size_t capacity, SV **ref_out) {
  * deducing the exact length of the secret.
  */
 void secret_buffer_realloc(secret_buffer *buf, size_t new_capacity) {
+   dTHX;
    if (buf->capacity != new_capacity) {
       if (new_capacity) {
          char *old= buf->data;
@@ -105,6 +108,7 @@ void secret_buffer_set_len(secret_buffer *buf, size_t new_len) {
  * for SecretBuffer or SecretBuffer::Span objects.
  */
 const char *secret_buffer_SvPVbyte(SV *thing, STRLEN *len_out) {
+   dTHX;
    secret_buffer *src_buf;
    secret_buffer_span *span;
    // The string is not NUL-terminated, so the user must use this value
@@ -143,6 +147,7 @@ const char *secret_buffer_SvPVbyte(SV *thing, STRLEN *len_out) {
 void secret_buffer_splice(secret_buffer *buf, size_t ofs, size_t len,
       const char *replacement, size_t replacement_len
 ) {
+   dTHX;
    IV tail_len;
    const char *splice_pos;
 
@@ -246,6 +251,7 @@ IV secret_buffer_append_random(secret_buffer *buf, size_t n, unsigned flags) {
  * Also warn if Perl has buffered data for this handle.
  */
 IV secret_buffer_append_sysread(secret_buffer *buf, PerlIO *stream, size_t count) {
+   dTHX;
    int ret;
    int stream_fd= PerlIO_fileno(stream);
    if (stream_fd < 0)
@@ -285,6 +291,7 @@ IV secret_buffer_append_sysread(secret_buffer *buf, PerlIO *stream, size_t count
  * Also flush any perl buffer, first.
  */
 IV secret_buffer_syswrite(secret_buffer *buf, PerlIO *stream, IV offset, IV count) {
+   dTHX;
    int stream_fd= PerlIO_fileno(stream);
    /* translate negative offset or negative count, in the manner of substr */
    offset= normalize_offset(offset, buf->len);
@@ -314,6 +321,7 @@ IV secret_buffer_syswrite(secret_buffer *buf, PerlIO *stream, IV offset, IV coun
  * elsewhere in memory, but 
  */
 IV secret_buffer_append_read(secret_buffer *buf, PerlIO *stream, size_t count) {
+   dTHX;
    int stream_fd= PerlIO_fileno(stream);
    int n_buffered= PerlIO_get_cnt(stream);
    char *perlbuffer;

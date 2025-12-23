@@ -11,7 +11,7 @@ use File::Glob        qw/bsd_glob/;
 use File::Slurper     qw/read_text read_binary read_lines/;
 use File::Spec::Functions qw/catfile rel2abs devnull/;
 use File::Basename    qw/basename dirname/;
-use Getopt::Long      qw/GetOptions :config gnu_getopt/;
+use Getopt::Long      qw/GetOptions :config gnu_getopt bundling/;
 use HTML::Entities    qw/encode_entities/;
 use JSON              ();
 use List::Util        qw/first/;
@@ -26,6 +26,10 @@ use OODoc::Parser     ();
 ###
 
 my $tmpdir      = $ENV{TMPDIR} || '/tmp';
+
+my @parser_rules = (
+	[ '#oodist: ' => sub { 1 } ],    # ignore lines marked oodist
+);
 
 my $default_pmhead = <<'__PMHEAD';
 This code is part of Perl distribution $distribution version $version.
@@ -73,8 +77,6 @@ sub introduce2oodoc();
 ###
 ### Command-line parsing
 ###
-
-Getopt::Long::Configure 'bundling';
 
 GetOptions
 	'all!'          => \(my $make_all),
@@ -287,7 +289,7 @@ sub extract_distro($%)
 	my $p_config = $dist_config->{parser} || { };
 	my $pmheadfn = rel2abs delete $p_config->{pmhead} || 'PMHEAD.txt', $dir;
 	my $select   = delete $p_config->{select} || qr[^ lib/ .*? \.(?:pod|pm) $ ]x;
-	my $parser   = OODoc::Parser->new(%$p_config, index => $doc->index);
+	my $parser   = OODoc::Parser->new(%$p_config, index => $doc->index, additional_rules => \@parser_rules);
 
 	if($is_root)
 	{	my $pmhead   = -f $pmheadfn ? read_text $pmheadfn : $default_pmhead;
@@ -754,7 +756,7 @@ sub create_export($$)
 
 	my $exportfn = catfile $dest, "$distvname-$name.$serial";
 
-	info "** Publish export into $exportfn" ;
+	info "*  publish export into $exportfn" ;
 	$exporter->write($exportfn, $tree, pretty_print => 1);
 
 	1;
@@ -860,7 +862,7 @@ __HEAD
 
 	if($html_output) {
 		my $webpages = $html_output =~ s/\Q$html_docroot\E$//r;
-		print "my \$webpages = ${ $p->($webpages) }\n";
+		print "my \$webpages = ${ $p->($webpages) };\n";
 	}
 
 	my $git          = qx(git config --get remote.origin.url 2>/dev/null);
@@ -937,7 +939,7 @@ __POD
 
 	push @generate, $html_output ? <<__HTML : "\t  # You may add HTML formatters here.\n";
 	  {	format         => 'html',
-		webpages       => "\$webpages${ $html_docroot eq '/' ? \'' : \$html_docroot },
+		webpages       => "\$webpages${ $html_docroot eq '/' ? \'' : \$html_docroot }",
 		publish        => "\$publish/${ \basename $makefile->{HTML_PACKAGE}}",
 		docroot        => ${ $p->($html_docroot) },
 		templates      => ${ $p->($makefile->{HTML_TEMPLATES}  // 'html') },
@@ -959,6 +961,8 @@ sub merge3()
 {
 	print <<__MERGE;
 
+my %requires;
+
 WriteMakefile
 	...
 	META_MERGE => {
@@ -969,20 +973,28 @@ WriteMakefile
 				url  => "\$git.git",
 				web  => \$git,
 			},
+			bugtracker => {
+				web  => "\$git/issues",
+			},
 			homepage => \$homepage,
 			license  => [ 'http//dev.perl.org/licenses/' ],
 		},
 		prereqs => {
+			runtime => {
+				requires => \\%requires,
+				recommends => {},
+				suggests   => {},
+			},
 			develop => {
 				requires => {
 					'OODoc' => '3.00',
-				}
+				},
 			},
 			test => {
 				requires => {
 					'Test::More' => 1.00,
 					'Test::Pod'  => 1.00,
-				}
+				},
 			},
 		},
 

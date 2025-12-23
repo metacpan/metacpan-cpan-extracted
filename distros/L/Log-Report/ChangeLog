@@ -7,6 +7,18 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.44: Mon 22 Dec 16:56:48 CET 2025
+
+	Changes:
+	- rename exception 'classes' into exception 'tags'.  Backwards compatible.
+
+	Fixes:
+	- converted die message get a 'die' tag, as the docs promissed.
+
+	Improvements:
+	- move documentation about format strings to ::Message.
+	- minimize LR imports.
+
 version 1.43: Fri  5 Dec 11:32:36 CET 2025
 
 	Improvements:

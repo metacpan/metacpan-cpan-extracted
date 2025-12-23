@@ -82,6 +82,10 @@ Extends L<"Attributes" in OODoc::Export|OODoc::Export/"Attributes">.
 
 Inherited, see L<OODoc::Export/"Attributes">
 
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<markupStyle>()
 
 Inherited, see L<OODoc::Export/"Attributes">
@@ -90,10 +94,6 @@ Inherited, see L<OODoc::Export/"Attributes">
 
 Inherited, see L<OODoc::Export/"Attributes">
 
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
-
 =item $obj-E<gt>B<serializer>()
 
 Inherited, see L<OODoc::Export/"Attributes">
@@ -101,6 +101,18 @@ Inherited, see L<OODoc::Export/"Attributes">
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Export|OODoc::Export/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -131,6 +143,10 @@ Inherited, see L<OODoc::Export/"Output">
 Inherited, see L<OODoc::Export/"Output">
 
 =item $obj-E<gt>B<processingManual>($manual|undef)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<referTo>($manual, $object)
 
 Inherited, see L<OODoc::Export/"Output">
 
@@ -165,18 +181,18 @@ Extends L<"DETAILS" in OODoc::Export|OODoc::Export/"DETAILS">.
 
 =item Fault: cannot write output to $file: $!
 
-Cast by write()
+Cast by C<write()>
 
 =item Fault: write errors to $file: $!
 
-Cast by write()
+Cast by C<write()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

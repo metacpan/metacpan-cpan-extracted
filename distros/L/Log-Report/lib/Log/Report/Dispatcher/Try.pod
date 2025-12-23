@@ -299,14 +299,19 @@ die, otherwise an empty LIST (C<undef>).
 
  -Option--Default
   class   undef
+  tag     undef
 
 =over 2
 
 =item class => $class|REGEX
 
-Only return the exception if it was fatal, and in the same time in
-the specified C<$class> (as string) or matches the REGEX.
-See L<Log::Report::Message::inClass()|Log::Report::Message/"Processing">
+Deprecated alternative for C<tag>.
+
+=item tag => $tag|REGEX
+
+[1.44] Only return the exception if it was fatal, and in the same time in
+the specified C<$tag> (as string) or matches the REGEX.
+See L<Log::Report::Message::taggedWith()|Log::Report::Message/"Processing">
 
 =back
 
@@ -318,8 +323,8 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.43,
-built on December 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.44,
+built on December 22, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

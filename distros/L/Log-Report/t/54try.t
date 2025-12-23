@@ -99,12 +99,13 @@ ok defined($@->wasFatal->message), 'Can reach message';
 # conversions by Log::Report::Die, see t/*die.t
 
 my $die = try { die "oops" };
-ok(ref $@, 'caught die');
+ok(ref $@, 'caught die oops');
 isa_ok($@, 'Log::Report::Dispatcher::Try');
 my $die_ex = $@->wasFatal;
 isa_ok($die_ex, 'Log::Report::Exception');
 is($die_ex->reason, 'ERROR');
 like("$@", qr[^try-block stopped with ERROR: oops at ] );
+is_deeply [ $die_ex->message->tags ], [ 'die' ], 'tagged with die';
 
 my $croak = try { croak "oops2" };
 ok(ref $@, 'caught croak');

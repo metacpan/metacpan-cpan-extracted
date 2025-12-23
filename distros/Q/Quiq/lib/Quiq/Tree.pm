@@ -30,7 +30,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Scalar::Util ();
 use Quiq::AnsiColor;
@@ -147,6 +147,12 @@ Liste geliefert.
 Liefere die Liste der Pfade [$path,$value] zu den Blattknoten des Baums $ref.
 Diese Liste ist nützlich, um die Zugriffspfade zu den Blattknoten
 zu ermitteln.
+
+=head4 Examples
+
+Zeige die Pfade aller Blattknoten eines ZUGFeRD-Baums:
+
+  $ perl -MQuiq::Zugferd -E '$t = Quiq::Zugferd->new("en16931")->tree; for (Quiq::Tree->leafPaths($t)) {say "@$_"}'
 
 =cut
 
@@ -408,7 +414,7 @@ sub setLeafValue {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

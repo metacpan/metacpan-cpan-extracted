@@ -119,15 +119,11 @@ Inherited, see L<OODoc::Text/"Attributes">
 
 =item $obj-E<gt>B<manual>()
 
-Inherited, see L<OODoc::Text/"Attributes">
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
 Inherited, see L<OODoc::Text/"Attributes">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<subroutine>()
 
@@ -173,12 +169,16 @@ Inherited, see L<OODoc::Text/"Collected">
 
 Inherited, see L<OODoc::Text/"Collected">
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

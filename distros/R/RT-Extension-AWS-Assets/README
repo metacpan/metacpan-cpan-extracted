@@ -65,7 +65,7 @@ CONFIGURATION
             'EC2' => ['Instance Type', 'Platform', 'Placement:Tenancy', 'Placement:Availability Zone', 'Tags:Name', 'Tags:customer'],
             'RDS' => ['Instance Type', 'Engine', 'Allocated Storage', 'Availability Zone', 'Name', 'MultiAZ', 'TagList:customer'],
             'EC2:RI' => ['Instance Type', 'Platform', 'Tenancy', 'Reservation Start', 'Reservation End', 'Duration', 'Offering Class', 'Offering Type', 'Name', 'Product Description', 'State'],
-            'RDS:RI' => ['Instance Type', 'Platform', 'Reservation Start', 'Reservation End', 'Duration', 'Offering Type', 'Name', 'MultiAZ', 'Product Description', 'State'],
+            'RDS:RI' => ['Instance Type', 'Platform', 'Reservation Start', 'Reservation End', 'Duration', 'Offering Type', 'Name', 'MultiAZ', 'Product Description', 'State', 'AWS Reserved Instance ID'],
         }
         );
 

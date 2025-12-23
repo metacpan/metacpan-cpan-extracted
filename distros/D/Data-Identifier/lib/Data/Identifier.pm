@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.27;
+our $VERSION = v0.28;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -666,6 +666,11 @@ sub as {
         $opts{$_} //= $self->so_get($_, default => undef) foreach Data::Identifier::Interface::Subobjects->KEYS;
     }
 
+    if (defined(my $so = $opts{so})) {
+        require Data::Identifier::Interface::Subobjects; # Is this required?
+        $opts{$_} //= $so->so_get($_, default => undef) foreach Data::Identifier::Interface::Subobjects->KEYS;
+    }
+
     $self = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
 
     if ($as eq 'uuid' || $as eq 'oid' || $as eq 'uri' || $as eq 'sid' || $as eq 'ise') {
@@ -974,7 +979,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.27
+version v0.28
 
 =head1 SYNOPSIS
 
@@ -1351,6 +1356,9 @@ Defaults to false.
 
 An instance of L<Data::TagDB>. This is used to create instances of related packages.
 
+B<Note:>
+This will likely be deprecated in future versions. Use subobjects if possible.
+
 =item C<default>
 
 Same as in L</uuid>.
@@ -1360,9 +1368,15 @@ Same as in L</uuid>.
 An instance of L<Data::URIID>. This is used to create instances of related packages
 such as L<Data::URIID::Result>.
 
+B<Note:>
+This will likely be deprecated in future versions. Use subobjects if possible.
+
 =item C<fii>
 
 An instance of L<File::Information>. This is used to create instances of related packages.
+
+B<Note:>
+This will likely be deprecated in future versions. Use subobjects if possible.
 
 =item C<no_defaults>
 
@@ -1377,6 +1391,17 @@ This can be used to ease implementation of other methods that are required to ac
 
 An instance of L<File::FStore>. This is used to create instances of related packages
 such as L<File::FStore::File>.
+
+B<Note:>
+This will likely be deprecated in future versions. Use subobjects if possible.
+
+=item C<so>
+
+(experimental since v0.28)
+
+A L<Data::Identifier::Interface::Subobjects> that is used to create the new object as needed.
+
+If C<$identifier> is a L<Data::Identifier::Interface::Subobjects> then subobjects from C<$identifier> are preferred.
 
 =back
 

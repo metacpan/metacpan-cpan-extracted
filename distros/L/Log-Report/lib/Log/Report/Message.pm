@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,14 +10,15 @@
 
 
 package Log::Report::Message;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
 
 use warnings;
 use strict;
 
-use Log::Report 'log-report';
+use Log::Report       'log-report', import => [ qw/textdomain/ ];
+
 use POSIX             qw/locale_h/;
 use List::Util        qw/first/;
 use Scalar::Util      qw/blessed/;
@@ -62,6 +63,9 @@ sub new($@)
 	{	s/\s+$//, s/^\s+// for $s{_plural};
 	}
 
+	my $tags  = delete $s{_tag} // delete $s{_tags} // delete $s{_class} // delete $s{_classes} // [];
+	$s{_tags} = ref $tags eq 'ARRAY' ? $tags : [ split /[,\s]+/, $tags ];
+
 	bless \%s, $class;
 }
 
@@ -85,10 +89,8 @@ sub context() { $_[0]->{_context}}
 sub msgctxt() { $_[0]->{_msgctxt}}
 
 
-sub classes()
-{	my $class = $_[0]->{_class} || $_[0]->{_classes} || [];
-	ref $class ? @$class : split(/[\s,]+/, $class);
-}
+sub tags() { @{$_[0]->{_tags}} }
+*classes = \&tags;
 
 
 sub to(;$)
@@ -107,10 +109,13 @@ sub valueOf($) { $_[0]->{$_[1]} }
 
 #--------------------
 
-sub inClass($)
-{	my @classes = shift->classes;
-	ref $_[0] eq 'Regexp' ? (first { $_ =~ $_[0] } @classes) : (first { $_ eq $_[0] } @classes);
+sub taggedWith($)
+{	my ($self, $match) = @_;
+	ref $match eq 'Regexp' ? (first { $_ =~ $$match } $self->tags) : (first { $_ eq $match } $self->tags);
 }
+
+
+*inClass = \&taggedWith;
 
 
 sub toString(;$)
@@ -138,10 +143,10 @@ sub toString(;$)
 	# translate the msgid
 	my $domain = $self->{_domain};
 	blessed $domain && $domain->isa('Log::Report::Minimal::Domain')
-		or $domain = textdomain $domain;
+		or $domain = $self->{_domain} = textdomain $domain;
 
-	my $format = $domain->translate($self, $locale || $oldloc);
-	defined $format or return ();
+	my $format = $domain->translate($self, $locale || $oldloc)
+		// return ();
 
 	# fill-in the fields
 	my $text = $self->{_expand} ? $domain->interpolate($format, $self) : "$prepend$format$append";
@@ -161,9 +166,7 @@ sub toHTML(;$) { to_html($_[0]->toString($_[1])) }
 
 sub untranslated()
 {	my $self = shift;
-	  (defined $self->{_prepend} ? $self->{_prepend} : '')
-	. (defined $self->{_msgid}   ? $self->{_msgid}   : '')
-	. (defined $self->{_append}  ? $self->{_append}  : '');
+	($self->{_prepend} // '') . ($self->{_msgid} // '') . ($self->{_append} // '');
 }
 
 
@@ -171,11 +174,11 @@ sub concat($;$)
 {	my ($self, $what, $reversed) = @_;
 	if($reversed)
 	{	$what .= $self->{_prepend} if defined $self->{_prepend};
-		return ref($self)->new(%$self, _prepend => $what);
+		return (ref $self)->new(%$self, _prepend => $what);
 	}
 
 	$what = $self->{_append} . $what if defined $self->{_append};
-	ref($self)->new(%$self, _append => $what);
+	(ref $self)->new(%$self, _append => $what);
 }
 
 #--------------------

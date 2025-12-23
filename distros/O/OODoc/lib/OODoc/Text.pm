@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.04.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution OODoc version 3.05.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Text;{
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 }
 
 use parent 'OODoc::Object';
@@ -72,6 +68,8 @@ sub container(;$)
 	@_ ? ($self->{OT_container} = shift) : $self->{OT_container};
 }
 
+sub manual(;$) { $_[0]->container->manual }
+
 
 sub linenr() { $_[0]->{OT_linenr} }
 
@@ -79,12 +77,6 @@ sub linenr() { $_[0]->{OT_linenr} }
 sub where()
 {	my $self = shift;
 	( $self->manual->source, $self->linenr );
-}
-
-
-sub manual(;$)
-{	my $self = shift;
-	$self->container->manual;
 }
 
 
@@ -98,7 +90,7 @@ sub extends(;$)
 
 #--------------------
 
-sub openDescription() { \shift->{OT_descr} }
+sub openDescription() { \($_[0]->{OT_descr}) }
 
 
 sub findDescriptionObject()
@@ -121,23 +113,34 @@ sub examples() { @{ $_[0]->{OT_examples}} }
 
 sub publish($%)
 {	my ($self, $args) = @_;
-	my $exporter = $args->{exporter} or panic;
-	my $manual   = $args->{manual}   or panic;
+	my $exporter   = $args->{exporter} or panic;
+	my $manual     = $args->{manual}   or panic;
+	my $inherited  = $manual->inherited($self);
 
 	my $p = $self->SUPER::publish($args);
-	$p->{type}      = $exporter->markup(lc $self->type);
-	$p->{inherited} = $exporter->boolean($manual->inherited($self));
+	$p->{type}     = $exporter->markup(lc $self->type);
 
-	if(my $name  = $self->name)
+	if(my $name = $self->name)
 	{	$p->{name} = $exporter->markupString($name);
 	}
 
-	my $descr    = $self->description // '';
+	my $descr;
+	if($inherited)
+	{	# This node has nothing extra wrt its base implementation
+		$descr    = 'Inherited, see M<'. $exporter->referTo($manual, $self).'>';
+		$p->{extends}  = $self->unique;
+	}
+	else
+	{	$descr    = $self->description // '';
+
+		# Any kind of text can contain examples
+		my @e     = map $_->publish($args)->{id}, $self->examples;
+		$p->{examples} = \@e if @e;
+	}
+
 	$p->{intro}  = $exporter->markupBlock($descr)
 		if length $descr;
 
-	my @e        = map $_->publish($args)->{id}, $self->examples;
-	$p->{examples} = \@e if @e;
 	$p;
 }
 

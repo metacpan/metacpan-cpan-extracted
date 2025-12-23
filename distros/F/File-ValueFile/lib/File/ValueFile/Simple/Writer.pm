@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -11,7 +10,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use parent 'Data::Identifier::Interface::Userdata';
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
 use Carp;
 use URI::Escape qw(uri_escape uri_escape_utf8);
@@ -61,7 +60,7 @@ my %_old_style_relation = (
     'd926eb95-6984-415f-8892-233c13491931' => 'tag-links',
 );
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 
 
@@ -121,10 +120,14 @@ sub new {
 }
 
 
-#@returns Data::Identifier
 sub format {
     my ($self, %opts) = @_;
-    return $self->{format} if defined $self->{format};
+
+    if (defined $self->{format}) {
+        return $self->{format}->as($opts{as}, so => $self) if defined $opts{as};
+        return $self->{format};
+    }
+
     return $opts{default} if exists $opts{default};
     croak 'No value for format';
 }
@@ -582,7 +585,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -590,7 +593,7 @@ version v0.09
 
 This module provides a simple way to write ValueFile files.
 
-This module inherit from L<Data::Identifier::Interface::Userdata>.
+This module inherits from L<Data::Identifier::Interface::Userdata> (since v0.06), and L<Data::Identifier::Interface::Subobjects> (since v0.10).
 
 =head1 METHODS
 
@@ -646,6 +649,8 @@ A hashref with values as can be passed to L</style>.
 Returns the format of the file. This requires the format to be given via L</new>.
 If no format is set the default is returned.
 If no default is given this method dies.
+
+(experimental since v0.10) Optionally takes a C<as> which allows converting as per L<Data::Identifier/as>.
 
 =head2 features
 
@@ -867,11 +872,11 @@ The tagname to be written is subject to normal character set rules. Therefore it
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

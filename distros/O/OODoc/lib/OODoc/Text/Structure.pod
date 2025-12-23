@@ -136,7 +136,7 @@ Inherited, see L<OODoc::Text/"Attributes">
 
 =item $obj-E<gt>B<manual>()
 
-Inherited, see L<OODoc::Text/"Attributes">
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -147,10 +147,6 @@ Inherited, see L<OODoc::Text/"Attributes">
 Returns the name of this chapter, section or sub-section beautified to
 normal caps.  If the name does not contain lower-case characters, then
 the whole string is lower-cased, and then the first upper-cased.
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<type>()
 
@@ -180,7 +176,7 @@ is returned.
 Represent the location of this chapter, section, or subsection as
 one string, separated by slashes.
 
-example: path expression
+» example: path expression
 
   print $subsect->path;
   # may print:  METHODS/Container/Search
@@ -221,13 +217,17 @@ L<emptyExtension()|OODoc::Text::Structure/"Constructors"> on each sub-class pass
 collect subroutines to be listed.  However, in some cases, nothing is
 to be listed after all, and in that case, this method returns C<true>.
 
-example: 
+» example: 
 
   unless($chapter->isEmpty) ...
 
 =item $obj-E<gt>B<openDescription>()
 
 Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -261,8 +261,8 @@ Returns the list of subroutines which are related to this text object.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

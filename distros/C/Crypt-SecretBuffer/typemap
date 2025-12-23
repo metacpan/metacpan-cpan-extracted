@@ -31,8 +31,8 @@ O_SECRET_BUFFER_ASYNC_RESULT
 
 INPUT
 O_IO_FLAGS
-   $var= parse_io_flags($arg);
+   $var= parse_io_flags(aTHX_ $arg);
 
 INPUT
 O_ALLOC_FLAGS
-   $var= parse_alloc_flags($arg);
+   $var= parse_alloc_flags(aTHX_ $arg);

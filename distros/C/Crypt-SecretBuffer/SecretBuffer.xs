@@ -1,3 +1,4 @@
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -204,8 +205,8 @@ static MGVTBL secret_buffer_span_magic_vtbl = {
 #endif
 };
 
-typedef void* secret_buffer_X_auto_ctor(SV *owner);
-void* secret_buffer_X_from_magic(SV *obj, int flags,
+typedef void* secret_buffer_X_auto_ctor(pTHX_ SV *owner);
+void* secret_buffer_X_from_magic(pTHX_ SV *obj, int flags,
    const MGVTBL *mg_vtbl, const char *mg_desc,
    secret_buffer_X_auto_ctor *auto_ctor
 ) {
@@ -225,7 +226,7 @@ void* secret_buffer_X_from_magic(SV *obj, int flags,
       return magic->mg_ptr;
 
    if (flags & SECRET_BUFFER_MAGIC_AUTOCREATE && auto_ctor) {
-      void *data= auto_ctor(sv);
+      void *data= auto_ctor(aTHX_ sv);
       magic = sv_magicext(sv, NULL, PERL_MAGIC_ext, mg_vtbl, (const char*) data, 0);
 #ifdef USE_ITHREADS
       magic->mg_flags |= MGf_DUP;
@@ -327,6 +328,7 @@ int secret_buffer_stringify_magic_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param) {
 #endif
 
 SV* secret_buffer_get_stringify_sv(secret_buffer *buf) {
+   dTHX;
    MAGIC mg;
    SV *sv= buf->stringify_sv;
    if (!sv) {
@@ -338,7 +340,7 @@ SV* secret_buffer_get_stringify_sv(secret_buffer *buf) {
    }
    /* Run the get magic immediately in case caller forgets */
    mg.mg_ptr= (char*) buf;
-   secret_buffer_stringify_magic_get(sv, &mg);
+   secret_buffer_stringify_magic_get(aTHX_ sv, &mg);
    return sv;
 }
 
@@ -348,7 +350,7 @@ SV* secret_buffer_get_stringify_sv(secret_buffer *buf) {
 /* Convenience to convert string parameters to the corresponding integer so that Perl-side
  * doesn't always need to import the flag constants.
  */
-IV parse_io_flags(SV *sv) {
+static IV parse_io_flags(pTHX_ SV *sv) {
    if (!sv || !SvOK(sv))
       return 0;
    if (SvIOK(sv))
@@ -361,7 +363,7 @@ IV parse_io_flags(SV *sv) {
    croak("Unknown flag %s", SvPV_nolen(sv));
 }
 
-IV parse_alloc_flags(SV *sv) {
+static IV parse_alloc_flags(pTHX_ SV *sv) {
    if (!sv || !SvOK(sv))
       return 0;
    if (SvIOK(sv))
@@ -552,7 +554,7 @@ index(buf, pattern, ofs_sv= &PL_sv_undef)
             lim= max + 1;
          else {
             STRLEN len; // needs to be byte count, so can't SvCUR without converting to bytes first
-            const char *str= SvPVbyte(pattern, len);
+            (void) SvPVbyte(pattern, len);
             lim= max + len;
          }
          // re-clamp lim to end of buffer
@@ -664,6 +666,7 @@ memcmp(lhs, rhs, reverse=false)
       STRLEN lhs_len, rhs_len;
       const char *lhs_buf= secret_buffer_SvPVbyte(lhs, &lhs_len);
       const char *rhs_buf= secret_buffer_SvPVbyte(rhs, &rhs_len);
+      PERL_UNUSED_VAR(ix);
    CODE:
       RETVAL= memcmp(lhs_buf, rhs_buf, (lhs_len < rhs_len? lhs_len : rhs_len));
       if (RETVAL == 0 && lhs_len != rhs_len)
@@ -869,7 +872,7 @@ new(class_or_obj, ...)
       );
       bool subspan= span && ix == 2;
       IV base_pos= subspan? span->pos : 0;
-      IV pos, lim, len, base_lim;
+      IV pos=0, lim=0, len=0, base_lim=0;
       int encoding= span? span->encoding : 0, i;
       SV *encoding_sv= NULL;
       bool have_pos= false, have_lim= false, have_len= false;
@@ -932,7 +935,7 @@ new(class_or_obj, ...)
       //warn("  base_lim=%d pos=%d  lim=%d", (int) base_lim, (int)pos, (int)lim);
       // check encoding
       if (encoding_sv) {
-         if (!parse_encoding(encoding_sv, &encoding))
+         if (!parse_encoding(aTHX_ encoding_sv, &encoding))
             croak("Unknown encoding '%s'", SvPV_nolen(encoding_sv));
       }
       PUSHs(new_mortal_span_obj(aTHX_ buf, pos, lim, encoding));
@@ -975,7 +978,7 @@ encoding(span, newval_sv= NULL)
       if (!encodings) croak("BUG");
    PPCODE:
       if (newval_sv)
-         if (!parse_encoding(newval_sv, &span->encoding))
+         if (!parse_encoding(aTHX_ newval_sv, &span->encoding))
             croak("Invalid encoding");
       enc_const= *av_fetch(encodings, span->encoding, 1);
       if (!enc_const || !SvOK(enc_const))
@@ -1103,7 +1106,7 @@ copy_to(self, ...)
          croak("expected even-length list of (key => val)");
       for (; next_arg < items; next_arg+= 2) {
          if (0 == strcmp(SvPV_nolen(ST(next_arg)), "encoding")) {
-            if (!parse_encoding(ST(next_arg+1), &dst_encoding_req))
+            if (!parse_encoding(aTHX_ ST(next_arg+1), &dst_encoding_req))
                croak("Unknown encoding");
          }
       }
@@ -1150,7 +1153,6 @@ cmp(lhs, rhs, reverse=false)
    bool reverse
    INIT:
       secret_buffer_parse lhs_parse, rhs_parse;
-      I32 lhs_cp, rhs_cp;
       if (!secret_buffer_parse_init_from_sv(&lhs_parse, lhs))
          croak("%s", lhs_parse.error);
       if (!secret_buffer_parse_init_from_sv(&rhs_parse, rhs))
@@ -1163,6 +1165,7 @@ cmp(lhs, rhs, reverse=false)
       RETVAL
 
 BOOT:
+   int i;
    HV *stash= gv_stashpvs("Crypt::SecretBuffer", 1);
 #define EXPORT_CONST(name, const) \
    newCONSTSUB(stash, name, make_enum_dualvar(aTHX_ const, newSVpvs_share(name)))
@@ -1187,7 +1190,7 @@ BOOT:
    // Set up an array of _encodings so that the accessor can return an existing SV
    AV *encodings= get_av("Crypt::SecretBuffer::_encodings", GV_ADD);
    av_fill(encodings, SECRET_BUFFER_ENCODING_MAX);
-   for (int i= 0; i <= SECRET_BUFFER_ENCODING_MAX; i++)
+   for (i= 0; i <= SECRET_BUFFER_ENCODING_MAX; i++)
       if (enc[i] && av_store(encodings, i, enc[i]))
          SvREFCNT_inc(enc[i]);
    SECRET_BUFFER_EXPORT_FUNCTION_POINTERS

@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,15 +10,16 @@
 
 
 package Log::Report::Exception;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
 
 use warnings;
 use strict;
 
-use Log::Report      'log-report';
+use Log::Report      'log-report', import => [ qw/__x error report/ ];
 use Log::Report::Util qw/is_fatal to_html/;
+
 use POSIX             qw/locale_h/;
 use Scalar::Util      qw/blessed/;
 
@@ -61,13 +62,17 @@ sub message(;$)
 
 	my $msg  = shift;
 	blessed $msg && $msg->isa('Log::Report::Message')
-		or panic "message() of exception expects Log::Report::Message";
+		or error __x"message() of exception expects Log::Report::Message, got {what UNKNOWN}.", what => $msg;
+
 	$self->{message} = $msg;
 }
 
 #--------------------
 
-sub inClass($) { $_[0]->message->inClass($_[1]) }
+sub taggedWith($) { $_[0]->message->taggedWith($_[1]) }
+
+
+*inClass = \&taggedWith;
 
 
 sub throw(@)

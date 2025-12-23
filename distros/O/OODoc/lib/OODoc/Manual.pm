@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.04.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution OODoc version 3.05.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Manual;{
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 }
 
 use parent 'OODoc::Object';
@@ -36,8 +32,9 @@ my @chapter_names = qw/
 	Inheritance
 	Synopsis
 	Description
-	Overload
+	Overloaded
 	Methods
+	Functions
 	Exports
 	Details
 	Diagnositcs
@@ -95,6 +92,7 @@ sub stripped()  { $_[0]->{OM_stripped} }
 sub isPurePod() { $_[0]->{OM_pure_pod} }
 sub index()     { $_[0]->{OM_index}    }
 sub distribution() { $_[0]->{OM_distr} }
+sub manual()    { $_[0] }
 
 #--------------------
 
@@ -599,13 +597,13 @@ sub finalize(%)
 
 sub stats()
 {	my $self     = shift;
-	my $chapters = $self->chapters || return;
+	my $package  = $self->package;
+	my $chapters = $self->chapters or return "no manual for $package";
 	my $subs     = $self->ownSubroutines;
 	my $options  = map $_->options, $self->ownSubroutines;
 	my $diags    = $self->diagnostics;
 	my $examples = $self->examples;
 	my $manual   = $self->name;
-	my $package  = $self->package;
 	my $head     = $manual eq $package ? "manual $manual" : "manual $manual for $package";
 
 	<<STATS;

@@ -1,3 +1,9 @@
+Version 0.015 - 2025-12-22
+  - Fix 5.8 and C89 compatibility
+
+Version 0.014 - 2025-12-22
+  - Fix MULTIPLICITY (ithreads) support
+
 Version 0.013 - 2025-12-21
   - New method $span->cmp($other) is like memcmp but on Unicode codepoints
   - Span objects now also have overloaded cmp, stringify, and boolean cast

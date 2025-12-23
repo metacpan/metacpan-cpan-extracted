@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,14 +10,14 @@
 
 
 package Log::Report::Dispatcher;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
 
 use warnings;
 use strict;
 
-use Log::Report 'log-report';
+use Log::Report 'log-report', import => [ qw/__x N__ __ alert error info panic textdomain trace/ ];
 use Log::Report::Util qw/parse_locale expand_reasons %reason_code escape_chars use_errno/;
 
 use POSIX      qw/strerror/;

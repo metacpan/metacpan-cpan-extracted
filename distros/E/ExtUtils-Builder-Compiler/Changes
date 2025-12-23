@@ -1,5 +1,14 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.034     2025-12-22 17:02:29+01:00 Europe/Brussels
+          - Rename EUB::AutoDetect::C to EUB::BuildTools::FromPerl
+          - Add standard option to compilers
+          - Refactor C++ support
+          - Add static_library_file delegate to FromPerl
+          - Eliminate EUB::Multilingual
+          - Automatically add dependencies on implicit typemaps
+          - Allow .c inputs on module_for_xs
+
 0.033     2025-12-13 19:27:39+01:00 Europe/Brussels
           - Don't pass default typemap argument to ParseXS
           - Change typemap to prefer arrayref form

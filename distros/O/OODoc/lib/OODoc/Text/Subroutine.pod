@@ -128,7 +128,7 @@ current manual.
 
 =item $obj-E<gt>B<manual>()
 
-Inherited, see L<OODoc::Text/"Attributes">
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -142,10 +142,6 @@ result may be C<undef> or empty.
 =item $obj-E<gt>B<path>()
 
 Returns the path of the text structure which contains this subroutine.
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<type>()
 
@@ -226,6 +222,10 @@ that will be stored.
 Returns a list of all options as defined by this documentation item in
 one manual.
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
+
 =back
 
 =head1 DIAGNOSTICS
@@ -234,11 +234,11 @@ one manual.
 
 =item Warning: no default for option $name defined in $file line $linenr
 
-Cast by collectedOptions()
+Cast by C<collectedOptions()>
 
 =item Warning: no option $name for default in $file line $linenr
 
-Cast by collectedOptions()
+Cast by C<collectedOptions()>
 
 =item Warning: subroutine $name extended by different type:
 
@@ -249,15 +249,15 @@ between these places.
 
 In very rare cases, this warning can be ignored, but usually these
 situation is errorneous of confusing for the users of the library.
-Cast by extends()
+Cast by C<extends()>
 
 =item Warning: subroutine $name() extended by different type:\n  $type1 in $file1 line $line1\n  $type2 in $file2 line $line2
 
-Cast by extends()
+Cast by C<extends()>
 
 =item Warning: subroutine $name() location conflict:\n  $path1 in $file1 line $line1\n  $path2 in $file2 line $line2
 
-Cast by location()
+Cast by C<location()>
 
 =item Warning: subroutine $self location conflict: $here $super
 
@@ -266,14 +266,14 @@ manual pages.  You may change the level of clearness about the
 exact location (place in the chapter in one page, and in a subsection
 in the next), as long as it is not conflicting (the subsection must
 be a part of the chapter).
-Cast by location()
+Cast by C<location()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

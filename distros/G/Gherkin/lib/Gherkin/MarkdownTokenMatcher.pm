@@ -1,5 +1,5 @@
 package Gherkin::MarkdownTokenMatcher;
-$Gherkin::MarkdownTokenMatcher::VERSION = '37.0.0';
+$Gherkin::MarkdownTokenMatcher::VERSION = '37.0.1';
 use strict;
 use warnings;
 

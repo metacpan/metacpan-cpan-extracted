@@ -120,13 +120,13 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 Inherited, see L<OODoc::Format/"Attributes">
 
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<project>()
 
 Inherited, see L<OODoc::Format/"Attributes">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
@@ -139,6 +139,18 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<workdir>()
 
 Inherited, see L<OODoc::Format/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Format::Pod|OODoc::Format::Pod/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -286,56 +298,56 @@ Extends L<"DETAILS" in OODoc::Format::Pod|OODoc::Format::Pod/"DETAILS">.
 
 =item Error: cannot link to a $package
 
-Cast by link()
+Cast by C<link()>
 
 =item Fault: cannot read prelimary pod from $file: $!
 
-Cast by simplifyPod()
+Cast by C<simplifyPod()>
 
 =item Fault: cannot write final pod to $file: $!
 
-Cast by simplifyPod()
+Cast by C<simplifyPod()>
 
 =item Error: chapter without name in template
 
 In your template file, a C<{chapter}> statement is used, which is
 erroneous, because it requires a chapter name.
-Cast by templateChapter()
+Cast by C<templateChapter()>
 
 =item Error: illegal show option choice: $value
 
-Cast by showOptions()
+Cast by C<showOptions()>
 
 =item Error: illegal value for show_option_table: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_sub_description: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_subroutine: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: missing required chapter $name in $manual
 
-Cast by showRequiredChapter()
+Cast by C<showRequiredChapter()>
 
 =item Warning: no meaning for container $tags in chapter block
 
-Cast by templateChapter()
+Cast by C<templateChapter()>
 
 =item Fault: write to $file failed: $!
 
-Cast by simplifyPod()
+Cast by C<simplifyPod()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

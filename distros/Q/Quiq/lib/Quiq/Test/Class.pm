@@ -213,7 +213,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -1296,7 +1296,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

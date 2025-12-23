@@ -12,7 +12,7 @@ BEGIN {
     plan skip_all => "Error messages on $^O differ too much."
         if $^O =~ /haiku$/;
 
-    plan tests => 27;
+	plan tests => 27;
 }
 
 use DieTests;
@@ -24,6 +24,7 @@ my $errstr = "$!";
 sub process($)
 {   my $err   = shift;
     my ($opt, $reason, $message) = die_decode $err;
+
 #   $err =~ s/\d+\.?$/XX/;
     my $errno = $opt->{errno}    || 'no errno';
     my $loc   = $opt->{location};
@@ -38,6 +39,7 @@ $loca
 $stack
 __RESULT
     $r =~ s!\\!/!g;   # Windows
+
     $r;
 }
 

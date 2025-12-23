@@ -436,6 +436,21 @@ msgstr "Translates the packet to the FS path in `@INC`. The package file must ex
 msgid "Переводит путь из ФС в `@INC` в пакет. Без параметра использует `$_`."
 msgstr "Translates the path from FS to `@INC` into a package. Without a parameter, uses `$_`."
 
+msgid "Создаёт файловый дескриптор. Он умеет закрываться, как только на него исчезнет последняя ссылка."
+msgstr "Creates a file descriptor. It knows how to close as soon as the last link to it disappears."
+
+msgid "Так же имеет метод `path`, к-й возвращает путь к файлу."
+msgstr "It also has a `path` method, which returns the path to the file."
+
+msgid "Создаёт файловый дескриптор с возможностью автозакрытия, как только пропадёт последняя на него ссылка."
+msgstr "Creates a file descriptor with the ability to auto-close as soon as the last link to it disappears."
+
+msgid "Так же имеет метод `path` возвращающий переданный в него путь."
+msgstr "It also has a `path` method that returns the path passed to it."
+
+msgid "Мы находимся в ОС семейства UNIX."
+msgstr "We are on a UNIX family OS."
+
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 

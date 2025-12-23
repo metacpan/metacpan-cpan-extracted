@@ -2,7 +2,6 @@ ChangeLog
 LICENSE
 MANIFEST
 Makefile.PL
-README
 README-oodist.md
 README.md
 bin/oodist

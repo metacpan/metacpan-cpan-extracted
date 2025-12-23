@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [31.1.0] - 2025-12-22
+### Added
+- [Ruby] Add a way to analyse and compare the strength of `TestStepResult` messages (To be used in query) ([#365](https://github.com/cucumber/messages/pull/365))
+
+### Fixed
+- [Ruby] Fix the `TimeConversion` helper file generating a non-conformant `Timestamp` message
+- [Ruby] Improve the `TimeConversion` helper for translating back from a Timestamp by avoiding a rounding error
+
+### Removed
+- [Ruby] Removed the `TimeConversion` helpers that did not serve a purpose in message building
+
 ## [31.0.1] - 2025-12-18
 ### Fixed
-- Removed circular dependency between messages and compatibility-kit([#362](https://github.com/cucumber/messages/pull/362))
+- Removed circular dependency between messages and compatibility-kit ([#362](https://github.com/cucumber/messages/pull/362))
 
 ## [31.0.0] - 2025-11-18
 ### Added
@@ -622,7 +633,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v31.0.1...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v31.1.0...HEAD
+[31.1.0]: https://github.com/cucumber/messages/compare/v31.0.1...v31.1.0
 [31.0.1]: https://github.com/cucumber/messages/compare/v31.0.0...v31.0.1
 [31.0.0]: https://github.com/cucumber/messages/compare/v30.1.0...v31.0.0
 [30.1.0]: https://github.com/cucumber/messages/compare/v30.0.0...v30.1.0

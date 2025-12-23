@@ -34,7 +34,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Quiq::Shell;
 use Quiq::File::Image;
@@ -571,7 +571,7 @@ sub morph {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

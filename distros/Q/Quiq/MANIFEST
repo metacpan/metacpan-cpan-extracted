@@ -263,6 +263,7 @@ lib/Quiq/Zugferd/2.3.2/profile/basicwl/Factur-X_1.07.2_BASICWL_urn_un_unece_unce
 lib/Quiq/Zugferd/2.3.2/profile/basicwl/Factur-X_1.07.2_BASICWL_urn_un_unece_uncefact_data_standard_ReusableAggregateBusinessInformationEntity_100.xsd
 lib/Quiq/Zugferd/2.3.2/profile/basicwl/Factur-X_1.07.2_BASICWL_urn_un_unece_uncefact_data_standard_UnqualifiedDataType_100.xsd
 lib/Quiq/Zugferd/2.3.2/profile/basicwl/template.xml
+lib/Quiq/Zugferd/2.3.2/profile/en16931/8._ZUGFeRD_2.3.2_Technischer_Anhang_Profil_EN16931.pdf
 lib/Quiq/Zugferd/2.3.2/profile/en16931/Factur-X_1.07.2_EN16931.xsd
 lib/Quiq/Zugferd/2.3.2/profile/en16931/Factur-X_1.07.2_EN16931_urn_un_unece_uncefact_data_standard_QualifiedDataType_100.xsd
 lib/Quiq/Zugferd/2.3.2/profile/en16931/Factur-X_1.07.2_EN16931_urn_un_unece_uncefact_data_standard_ReusableAggregateBusinessInformationEntity_100.xsd
@@ -287,6 +288,7 @@ lib/Quiq/Zugferd/Entity/Position.pm
 lib/Quiq/Zugferd/Entity/Rechnung.pm
 lib/Quiq/Zugferd/Entity/Umsatzsteuer.pm
 lib/Quiq/Zugferd/Entity/Verkaeufer.pm
+lib/Quiq/Zugferd/Entity/ZuAbschlagPosition.pm
 lib/Quiq/Zugferd/Tree.pm
 LICENSE
 Makefile.PL
@@ -549,6 +551,7 @@ t/bin/Quiq/Zugferd/Entity/Position.t
 t/bin/Quiq/Zugferd/Entity/Rechnung.t
 t/bin/Quiq/Zugferd/Entity/Umsatzsteuer.t
 t/bin/Quiq/Zugferd/Entity/Verkaeufer.t
+t/bin/Quiq/Zugferd/Entity/ZuAbschlagPosition.t
 t/bin/Quiq/Zugferd/Tree.t
 t/data/class/MyClass1.pm
 t/data/class/MyClass2.pm

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.033';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.034';
 use strict;
 use warnings;
 
@@ -86,12 +86,12 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 
- $planner->load_extension('ExtUtils::Builder::AutoDetect::C',
-    profile => '@Perl',
+ $planner->load_extension('ExtUtils::Builder::BuildTools::FromPerl', '0.034',
+    profiles => ['@Perl'],
  );
 
 =head1 DESCRIPTION

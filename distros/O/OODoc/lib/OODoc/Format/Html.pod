@@ -136,6 +136,7 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<manual>( [$manual] )
 
 Returns (optionally after setting) the C<$manual> which is being processed.
+Improves base, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<markers>( [$filehandle] )
 
@@ -150,10 +151,6 @@ Returns a string with html for the page header block.
 
 Inherited, see L<OODoc::Format/"Attributes">
 
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
-
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
@@ -165,6 +162,18 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<workdir>()
 
 Inherited, see L<OODoc::Format/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Format|OODoc::Format/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -213,7 +222,7 @@ These options can be overruled by values specified in the template file.
 
 =back
 
-example: template specification
+» example: template specification
 
 Default:
 
@@ -253,7 +262,7 @@ which are specified as C<$location> for templates into hash of filenames
 names and related formatting options.  The C<$format> is an array of options
 which can be overruled by values which the C<$location> is specified as hash.
 
-example: expanding template specification into files
+» example: expanding template specification into files
 
   my $exp = $self->expandTemplate("html/manual", [show => 'NO']);
   while(my ($fn,$opts) = each %$exp) {print "$fn @$opts\n"}
@@ -436,7 +445,7 @@ are listed or C<error> for diagnostics.
 
 =back
 
-example: use of the template tag "index"
+» example: use of the template tag "index"
 
   <table cellspacing="10">
   <!--{index DIAGNOSTICS type => error, starting_with => A}-->
@@ -513,7 +522,7 @@ and otherwise the project total version.
 
 =item Error: cannot find chapter NAME in manual $file
 
-Cast by templateName()
+Cast by C<templateName()>
 
 =item Error: cannot find template source '$name'
 
@@ -521,123 +530,123 @@ Somewhere was specified to use C<$name> (a file or directory) as source
 for a template.  However, it does not seem to exist.  Unfortunately,
 the location where the source is specified is not known when the
 error is produced.
-Cast by expandTemplate()
+Cast by C<expandTemplate()>
 
 =item Fault: cannot write html manual to $file: $!
 
-Cast by createManual()
+Cast by C<createManual()>
 
 =item Fault: cannot write html to $fn: $!
 
-Cast by createOtherPages()
+Cast by C<createOtherPages()>
 
 =item Fault: cannot write markers to $file: $!
 
-Cast by createManual()
+Cast by C<createManual()>
 
 =item Error: chapter NAME in manual $manual has illegal shape
 
-Cast by templateName()
+Cast by C<templateName()>
 
 =item Error: chapter without name in template $file
 
-Cast by templateChapter()
+Cast by C<templateChapter()>
 
 =item Error: chapter without name in template $fn
 
 In your template file, a {chapter} statement is used, which is
 erroneous, because it requires a chapter name.
-Cast by templateChapter()
+Cast by C<templateChapter()>
 
 =item Fault: chmod of $fn to $mode failed: $!
 
-Cast by createOtherPages()
+Cast by C<createOtherPages()>
 
 =item Fault: copy from $from to $to failed: $!
 
-Cast by createOtherPages()
+Cast by C<createOtherPages()>
 
 =item Error: expect one name with 'a'
 
-Cast by templateHref()
+Cast by C<templateHref()>
 
 =item Fault: html source directory $dir: $!
 
-Cast by createOtherPages()
+Cast by C<createOtherPages()>
 
 =item Error: illegal show option choice: $value
 
-Cast by showOptions()
+Cast by C<showOptions()>
 
 =item Error: illegal value for show_option_table: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_sub_description: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_subroutine: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value to show_sections: $value
 
-Cast by templateList()
+Cast by C<templateList()>
 
 =item Error: missing path for $dest
 
-Cast by templateHref()
+Cast by C<templateHref()>
 
 =item Error: missing required chapter $name in $manual
 
-Cast by showRequiredChapter()
+Cast by C<showRequiredChapter()>
 
 =item Error: no group named as attribute for index
 
 In your template file, an {index} statement is used without a chapter name
 or 'ALL'.  Therefore, it is unclear which kind of index has to
 be built.
-Cast by templateList()
+Cast by C<templateList()>
 
 =item Error: no group named as attribute for list
 
-Cast by templateIndex()
+Cast by C<templateIndex()>
 
 =item Warning: no meaning for container $tags in chapter block
 
-Cast by templateChapter()
+Cast by C<templateChapter()>
 
 =item Warning: no meaning for container $tags in index block
 
-Cast by templateList()
+Cast by C<templateList()>
 
 =item Warning: no meaning for container $tags in list block
 
-Cast by templateIndex()
+Cast by C<templateIndex()>
 
 =item Error: not a manual, so no automatic template title in $file
 
-Cast by templateTitle()
+Cast by C<templateTitle()>
 
 =item Error: not a manual, so no manual name for template $file
 
-Cast by templateManual()
+Cast by C<templateManual()>
 
 =item Error: not a manual, so no name for template $file
 
-Cast by templateName()
+Cast by C<templateName()>
 
 =item Error: unknown group $name as list attribute
 
-Cast by templateIndex()
+Cast by C<templateIndex()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

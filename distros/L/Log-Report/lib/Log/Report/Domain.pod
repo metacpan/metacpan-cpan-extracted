@@ -43,21 +43,26 @@ Log::Report::Domain - administer one text-domain
 
 =head1 DESCRIPTION
 
-L<Log::Report> can handle multiple sets of packages at the same
-time: in the usual case a program consists of more than one software
-distribution, each containing a number of packages.  Each module
-in an application belongs to one of these sets, by default the domain set
-'default'.
+L<Log::Report> can handle multiple sets of packages used by your program at the same
+time.  In the common case, your program consists of more than one imported software
+distribution, each containing a number of packages.  So separate the L<Log::Report|Log::Report>
+configuration for each distribution, you should explicitly assign each package
+to a set, to a namespace.  This is (in translation lingo) a I<domain> or I<text domain>.
+The default domain has name C<default>.
 
-For C<Log::Report>, those packags sets are differentiated via the
-text-domain value in the C<use> statement:
+For C<Log::Report>, those package sets are selected with the text-domain
+value in the C<use> statement:
 
   use Log::Report 'my-domain';
 
-There are many things you can configure per (text)domain.  This is not
-only related to translations, but also -for instance- for text formatting
-configuration.  The administration for the configuration is managed in
-this package.
+There are many things you can configure per (text)domain.  This is
+not only related to translations, but also -for instance- for text
+formatting configuration (L<String::Print|String::Print> options).  The administration
+for the configuration is managed in this package.
+
+This class extends L<Log::Report::Minimal::Domain|Log::Report::Minimal::Domain>, which can be used when your
+program does not want any overhead from the powerful L<Log::Report|Log::Report> features.
+In that case, your program invokes L<Log::Report::Optional|Log::Report::Optional>.
 
 Extends L<"DESCRIPTION" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"DESCRIPTION">.
 
@@ -99,11 +104,12 @@ but one packages in your distribution, it will only contain the name of
 the DOMAIN.  For one package, it will contain configuration information.
 These C<%options> are used for all packages which use the same DOMAIN.
 See chapter L</Configuring> below.
+Improves base, see L<Log::Report::Minimal::Domain/"Attributes">
 
  -Option         --Defined in                  --Default
   config                                         undef
   context_rules                                  undef
-  formatter                                      PRINTI
+  formatter        Log::Report::Minimal::Domain  PRINTI
   native_language                                'en_US'
   translator                                     created internally
   where            Log::Report::Minimal::Domain  <required>
@@ -125,10 +131,6 @@ a L<Log::Report::Translator::Context|Log::Report::Translator::Context> helper ob
 
 =item formatter => CODE|\%config|'PRINTI'
 
-Selects the formatter used for the errors messages.  The default is the
-string C<PRINTI>, which will use L<String::Print::printi()|String::Print/"FUNCTIONS">: interpolation
-with curly braces around the variable names.
-
 =item native_language => CODESET
 
 This is the language which you have used to write the translatable and
@@ -147,6 +149,10 @@ Set the object which will do the translations for this domain.
 =item $obj-E<gt>B<contextRules>()
 
 Z<>
+
+=item $obj-E<gt>B<format>()
+
+Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
 
 =item $obj-E<gt>B<isConfigured>()
 
@@ -247,15 +253,15 @@ version of L<Log::Report|Log::Report>.
 
 =head3 configuring your own formatter
 
-[0.91] The C<PRINTI> is a special constants for L<configure(formatter)|Log::Report::Domain/"Attributes">, and
+[0.91] The C<PRINTI> is a special constants for L<configure(formatter)|Log::Report::Minimal::Domain/"Attributes">, and
 will use L<String::Print|String::Print> function C<printi()>, with the standard tricks.
 
   textdomain 'some-domain',
-    formatter =>
-      { class     => 'String::Print',    # default
-        method    => 'sprinti',          # default
-        %options    # constructor options for the class
-      );
+    formatter => {
+       class     => 'String::Print',    # default
+       method    => 'sprinti',          # default
+       %options,   # constructor options for String::Print
+    );
 
 When you want your own formatter, or configuration of C<String::Print>,
 you need to pass a CODE.  Be aware that you may loose magic added by
@@ -314,8 +320,8 @@ Cast by C<setContext()>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.43,
-built on December 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.44,
+built on December 22, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

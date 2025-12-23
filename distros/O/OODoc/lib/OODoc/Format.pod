@@ -153,13 +153,13 @@ Code for the format.
 Returns the L<OODoc::Manifest|OODoc::Manifest> object which maintains the names
 of created files.
 
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<project>()
 
 Returns the name of this project.
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
@@ -174,6 +174,18 @@ contains any character, so should be handled with care.
 
 Returns the name of the work directory: the top location for all
 the output files.
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Object|OODoc::Object/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -659,58 +671,58 @@ Z<>
 =item Error: formatter $name has compilation errors: $err
 
 The formatter which is specified does not compile, so can not be used.
-Cast by new()
+Cast by C<new()>
 
 =item Error: formatter for $name does not know the version
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: formatter has no project name
 
 A formatter was created without a name specified for the project at
 hand.  This should be passed with L<new(project)|OODoc::Format/"Constructors">.
-Cast by new()
+Cast by C<new()>
 
 =item Error: illegal show option choice: $value
 
-Cast by showOptions()
+Cast by C<showOptions()>
 
 =item Error: illegal value for show_option_table: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_sub_description: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_subroutine: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: missing required chapter $name in $manual
 
-Cast by showRequiredChapter()
+Cast by C<showRequiredChapter()>
 
 =item Error: no formatter specified
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: no index specified
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: no working directory specified for $name
 
 The formatter has to know where the output can be written.  This
 directory must be provided via L<new(workdir)|OODoc::Format/"Constructors">, but was not specified.
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

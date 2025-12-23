@@ -81,7 +81,7 @@ static bool sbc_test_codepoint(pTHX_ const secret_buffer_charset *cset, uint32_t
       if (!cset->rx) return false;
       SV *test_sv= sv_2mortal(newSV(8));
       char *utf8_buf= SvPVX(test_sv);
-      char *end = uvchr_to_utf8(utf8_buf, cp);
+      char *end = (char*) uvchr_to_utf8((U8*) utf8_buf, cp);
       *end= '\0';
       SvPOK_on(test_sv);
       SvCUR_set(test_sv, (end - utf8_buf));
@@ -256,7 +256,8 @@ static bool parse_simple_charclass(pTHX_ secret_buffer_charset *cset, SV *qr_ref
       cset->unicode_above_7F= SECRET_BUFFER_CHARSET_TESTUNI;
    // Apply negation
    if (negated) {
-      for (int i = 0; i < 4; i++)
+      int i;
+      for (i = 0; i < 4; i++)
          bitmap[i] = ~bitmap[i];
       if (cset->unicode_above_7F == SECRET_BUFFER_CHARSET_NOUNI)
          cset->unicode_above_7F= SECRET_BUFFER_CHARSET_ALLUNI;
@@ -267,11 +268,12 @@ static bool parse_simple_charclass(pTHX_ secret_buffer_charset *cset, SV *qr_ref
 /* Build bitmap by testing each byte through regex engine */
 static void build_charset_via_regex_engine(pTHX_ secret_buffer_charset *cset) {
    SV *test_sv= sv_2mortal(newSV(2));
+   int c;
    SvPOK_on(test_sv);
    SvCUR_set(test_sv, 1);
    char *buf= SvPVX(test_sv);
    //warn("Run regex test on chars 0x00-0xFF\n");
-   for (int c= 0; c < 256; c++) {
+   for (c= 0; c < 256; c++) {
       buf[0]= (char) c;
       /* find the next match */
       I32 result = pregexec(cset->rx, buf, buf+1, buf, 0, test_sv, 1);
@@ -328,8 +330,9 @@ secret_buffer_charset *secret_buffer_charset_from_regexpref(SV *qr_ref) {
    cset->rx = rx;
 
    if (!parse_simple_charclass(aTHX_ cset, qr_ref)) {
+      int i;
       // reset bitmap
-      for (int i= 0; i < sizeof(cset->bitmap)/sizeof(cset->bitmap[0]); i++)
+      for (i= 0; i < sizeof(cset->bitmap)/sizeof(cset->bitmap[0]); i++)
          cset->bitmap[i]= 0;
       // Need to use regex engine and cache results of first 256 codepoints.
       build_charset_via_regex_engine(aTHX_ cset);

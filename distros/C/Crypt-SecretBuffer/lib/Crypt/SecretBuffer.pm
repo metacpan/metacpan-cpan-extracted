@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.013';
+$Crypt::SecretBuffer::VERSION = '0.015';
 
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.013';
+$Crypt::SecretBuffer::Exports::VERSION = '0.015';
 use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret unmask_secrets_to memcmp
@@ -196,6 +196,10 @@ stringification of the buffer reveals the secret or not.  For instance:
 or:
 
   $buf->unmask_to(\&some_xs_function);
+
+or:
+
+  unmask_secrets_to($buf, \&some_xs_function);
 
 There is no guarantee that the XS function in that example wouldn't make a copy of your secret,
 but this at least provides the secret buffer directly to the XS code that calls C<SvPV> without
@@ -397,18 +401,16 @@ See also: L</unmask_secrets_to>.
 
   $ofs= $buf->index($str_or_charclass, $from_offset=0);
 
-Like Perl's C<index> function, it scans the string from an optional offset and
-returns the location the string was found, or -1 if it doesn't exist.  This can
-also scan for a character class provided in a C<< qr// >> expression, like the
-L</scan> function.  C<$from_offset> may be negative to count backward from the
-end of the buffer.
+Like Perl's C<index> function, it scans the string from an optional offset and returns the
+location the string was found, or -1 if it doesn't exist.  This can also scan for a character
+class provided in a C<< qr// >> expression, like the L</scan> function supports.
+C<$from_offset> may be negative to count backward from the end of the buffer.
 
 =head2 rindex
 
   $ofs= $buf->index($str_or_charclass, $from_offset=-1);
 
-Like L</index> but in reverse, where the default C<$from_offset> is -1 (end of
-buffer).
+Like L</index> but in reverse, where the default C<$from_offset> is -1 (end of buffer).
 
 =head2 scan
 
@@ -417,7 +419,7 @@ buffer).
 This function scans through the buffer looking for the first match of a string
 or a character class.  The scan can optionally be limited to an offset and
 length describing a substring of the buffer.  The return value is the position
-of the start of the match, and number of I<bytes> matched (which can be greater
+of the start of the match and number of I<bytes> matched (which can be greater
 than one when matching a character class in UTF-8, or if C<MATCH_MULTI> flag is
 requested).  Unlike C<index> or C<rindex>, on failure the return value will be
 C<< (C<$ofs> + C<$len>, 0) >>, or with MATCH_REVERSE, C<< (C<$ofs>, 0) >>.
@@ -426,8 +428,8 @@ C<< ($ofs, $len) >> rather than just starting before C<< $ofs+$len >>.
 
 Eventually, this function may be enhanced with full regex support, but for now
 it is limited to one character class and optionally a '+' modifier as an alias
-for flag MATCH_MULTI.  Until that enhancement occurs, your regex notation must
-start with '[' and must end with either ']' or '+'.
+for flag C<MATCH_MULTI>.  Until that enhancement occurs, your regex notation must
+start with C<[> and must end with either C<]> or C<+>.
 
   ($ofs, $len)= $buf->scan(qr/[\w]+/); # implies MATCH_MULTI
 
@@ -435,16 +437,17 @@ The C<$flags> may be a bitwise OR of the L</Match Flags> and one
 L<Character Encoding|/Character Encodings>.
 Note that C<$ofs> and C<$len> are still byte positions, and still suitable for
 L</substr> on the buffer, which is different from Perl's substr on a unicode
-string which works in terms of characters.
+string which works in terms of codepoint counts.
 
-For a more convenient interface to this method, use L</span> to create a
+For a more convenient interface to this functionality, use L</span> to create a
 L<Span object|Crypt::SecretBuffer::Span> and then call its methods.
 
 =head2 memcmp
 
   $cmp= $buf->memcmp($buf2);
 
-Like the 'cmp' operator, but always compares on a byte-by-byte basis.
+Compare contents of the buffer byte-by-byte to another SecretBuffer (or Span, or plain scalar)
+in the same manner as the C function C<memcmp>.  (returns C<< <0 >>, C<0>, or C<< >0 >>)
 
 =head2 append_random
 
@@ -709,7 +712,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 AUTHOR
 

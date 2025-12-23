@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -15,7 +14,7 @@ use Carp;
 use Data::Identifier v0.08;
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -85,7 +84,7 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -123,11 +122,11 @@ registered using L<Data::Identifier/register>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

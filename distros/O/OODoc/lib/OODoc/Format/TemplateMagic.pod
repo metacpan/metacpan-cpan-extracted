@@ -25,7 +25,7 @@ Takes a Template::Magic::Zone object to process the text after the
 tag.  You may also specify a string, for instance a modified
 attribute list.  The return is a list of key-value pairs with data.
 
-example: of valid arguments
+» example: of valid arguments
 
   <!--{examples expand NO list ALL}-->   # old style
   <!--{examples expand => NO, list => ALL}-->
@@ -36,8 +36,8 @@ example: of valid arguments
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

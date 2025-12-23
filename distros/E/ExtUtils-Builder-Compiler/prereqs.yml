@@ -1,3 +1,12 @@
 runtime:
   requires:
-    ExtUtils::Builder: 0.016
+    ExtUtils::Builder: 0.018
+    ExtUtils::Config: 0.007
+    Perl::OSType: 0
+    parent: 0
+    perl: 5.010
+test:
+  requires:
+    Test::More: 0.88
+  recommends:
+    Test::Differences: 0

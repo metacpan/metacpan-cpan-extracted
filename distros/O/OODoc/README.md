@@ -2,10 +2,26 @@
 
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-OODoc>
+  * Sponsor me: <https://markov.solutions/sponsor/index-en.html>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
   * Indexed from CPAN: <https://metacpan.org/release/OODoc>
 
-# Development &rarr; Release
+## Installing
+
+On github, you can find the processed version for each release.  But the
+better source is CPAN; to get it installed simply run:
+
+```sh
+   cpan -i OODoc
+```
+
+The 'export' feature of OODoc produces a dump of the extracted code
+documentation.  The dump itself is described in manual page
+<OODoc::Export|https://metacpan.org/dist/OODoc/view/lib/OODoc/Export.pod#the-Tree>.
+One (currently the only one) application which can be used to read this data
+was produced by Tuyan Tatliparmak, <available on GitHub|https://github.com/TuT597/Perl-Docs>
+
+## Development &rarr; Release
 
 Important to know, is that I use an extension on POD to write the manuals.
 The "raw" unprocessed version is visible on GitHub.  It will run without
@@ -18,13 +34,6 @@ existed, sorry for the confusion)
 
 Clone from github for the "raw" version.  For instance, when you want
 to contribute a new feature.
-
-On github, you can find the processed version for each release.  But the
-better source is CPAN; to get it installed simply run:
-
-```sh
-   cpan -i OODoc
-```
 
 ## Contributing
 

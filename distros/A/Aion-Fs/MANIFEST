@@ -9,10 +9,16 @@ i18n/Aion/Fs.ru-en.po
 i18n/Aion/Fs/Find.ru-en.po
 lib/Aion/Fs.md
 lib/Aion/Fs.pm
+lib/Aion/Fs/Cat.md
+lib/Aion/Fs/Cat.pm
 lib/Aion/Fs/Find.md
 lib/Aion/Fs/Find.pm
+lib/Aion/Fs/Lay.md
+lib/Aion/Fs/Lay.pm
 minil.toml
 t/aion/fs.t
+t/aion/fs/cat.t
 t/aion/fs/find.t
+t/aion/fs/lay.t
 META.yml
 MANIFEST

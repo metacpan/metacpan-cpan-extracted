@@ -27,7 +27,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Quiq::Hash;
 
@@ -252,7 +252,8 @@ sub get {
 
 =head4 Description
 
-Liefere den ersten nichtleeren Wert der Attribute @keys.
+Liefere den ersten nichtleeren Wert der Attribute @keys. Attribute, die
+nicht existieren, werden übergangen.
 
 =cut
 
@@ -263,8 +264,8 @@ sub getFirst {
     # @_: @keys
 
     for my $key (@_) {
-        my $val = $self->get($key);
-        if ($val ne '') {
+        my $val = $self->get($key,1);
+        if (defined($val) && $val ne '') {
             return $val;
         }
     }
@@ -290,7 +291,7 @@ sub getFirst {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

@@ -53,6 +53,7 @@
             "Exporter" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0",
+            "Symbol" : "0",
             "Time::HiRes" : "0",
             "common::sense" : "0",
             "config" : "0",
@@ -65,11 +66,14 @@
          "requires" : {
             "Carp" : "0",
             "Cwd" : "0",
+            "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Find" : "0",
             "File::Path" : "0",
             "File::Slurper" : "0",
             "File::Spec" : "0",
+            "String::Diff" : "0",
+            "Term::ANSIColor" : "0",
             "Test::More" : "0.98",
             "lib" : "0",
             "open" : "0"
@@ -79,10 +83,16 @@
    "provides" : {
       "Aion::Fs" : {
          "file" : "lib/Aion/Fs.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.2.3"
+      },
+      "Aion::Fs::Cat" : {
+         "file" : "lib/Aion/Fs/Cat.pm"
       },
       "Aion::Fs::Find" : {
          "file" : "lib/Aion/Fs/Find.pm"
+      },
+      "Aion::Fs::Lay" : {
+         "file" : "lib/Aion/Fs/Lay.pm"
       }
    },
    "release_status" : "stable",
@@ -97,7 +107,7 @@
          "web" : "https://github.com/darviarush/perl-aion-fs"
       }
    },
-   "version" : "0.2.2",
+   "version" : "0.2.3",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

@@ -20,6 +20,7 @@ lib/Dist/Build/XS/Conf.pm
 lib/Dist/Build/XS/Export.pm
 lib/Dist/Build/XS/Import.pm
 lib/Dist/Build/XS/WriteConstants.pm
+prereqs.yml
 t/00-compile.t
 t/lib/DistGen.pm
 t/simple.t

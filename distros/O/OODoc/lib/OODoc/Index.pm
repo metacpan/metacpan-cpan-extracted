@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.04.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution OODoc version 3.05.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Index;{
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 }
 
 use parent 'OODoc::Object';

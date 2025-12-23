@@ -1,7 +1,12 @@
+# Pfade anzeigen:
+# perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new("en16931")->showPaths'
+#
+# name;mandatory;text;path
 BG-1;0;Freitexte zur Rechnung;ExchangedDocument.IncludedNote
 BG-16;0;Zahlungsanweisungen;SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.SpecifiedTradeSettlementPaymentMeans
 BG-21;0;Zuschläge auf Dokumentebene;SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.SpecifiedTradeAllowanceCharge
 BG-23;1;Umsatzaufschlüsselung;SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.ApplicableTradeTax
 BG-24;0;Rechnungsbegründende Unterlagen;SupplyChainTradeTransaction.ApplicableHeaderTradeAgreement.AdditionalReferencedDocument
 BG-25;1;Rechnungspositionen;SupplyChainTradeTransaction.IncludedSupplyChainTradeLineItem
+BG-27_BG-28;0;SupplyChainTradeTransaction.IncludedSupplyChainTradeLineItem.[0].SpecifiedLineTradeSettlement.SpecifiedTradeAllowanceCharge
 BG-32;0;Artikelattribute;SupplyChainTradeTransaction.IncludedSupplyChainTradeLineItem.[0].SpecifiedTradeProduct.ApplicableProductCharacteristic

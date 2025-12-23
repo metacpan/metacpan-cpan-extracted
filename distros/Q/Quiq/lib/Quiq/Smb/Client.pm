@@ -43,10 +43,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
-use Filesys::SmbClient ();
 use Quiq::Path;
+use Quiq::Unindent;
+use Filesys::SmbClient ();
 
 # -----------------------------------------------------------------------------
 
@@ -80,13 +81,28 @@ Object
 Instantiiere eine Objekt der Klasse und liefere eine Referenz auf
 dieses Objekt zurück.
 
+Die Eigenschaft C<configuration> gehört nicht zu C<Filesys::SmbClient>,
+sondern ist speziell hinzugefügt. Wenn gesetzt, wird die Datei
+C<~/.smb/smb.conf> mit dem angegebenen Text (SMB-Konfiguration)
+vor der Instantiierung geschrieben. Andernfalls wird eine leere
+Datei angelegt. Die Konfiguration scheint nicht (einmalig) während
+Konstruktoraufrufs gelesen zu werden, sondern bei späteren (der
+ersten?) Operation. Daher ist Vorsicht bei mehreren Objekten
+geboten (TODO: dies genauer untersuchen).
+
 =head4 Example
 
   my $smb = Quiq::Smb->new(
       username => 'elbrusfse',
       password => 'geheim',
       workgroup => 'ZEPPELIN_HV',
-      debug => 0,
+      debug => 0, # 0 .. 10
+      configuration => '
+          [global]
+          client min protocol = CORE
+          client use spnego = no
+          client ntlmv2 auth = no
+      ',
   );
 
 =cut
@@ -94,11 +110,18 @@ dieses Objekt zurück.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my $class = shift;
-    # @_: %args 
+    my ($class,%args) = @_;
+
+    my $p = Quiq::Path->new;
+
+    my $confFile = '~/.smb/smb.conf';
+
+    my $conf = $args{'configuration'} // '';
+    $conf = Quiq::Unindent->string($conf);
+    $p->write($confFile,$conf);
 
     return $class->SUPER::new(
-        smb => Filesys::SmbClient->new(@_),
+        smb => Filesys::SmbClient->new(%args),
     );
 }
 
@@ -422,7 +445,7 @@ sub rename {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

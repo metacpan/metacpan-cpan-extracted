@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.04.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution OODoc version 3.05.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Parser::Markov;{
-our $VERSION = '3.04';
+our $VERSION = '3.05';
 }
 
 use parent 'OODoc::Parser';
@@ -67,7 +63,7 @@ sub setBlock($)
 {	my ($self, $ref) = @_;
 	$self->{OPM_block} = $ref;
 	$self->inDoc(1);
-	$self;
+	$ref;
 }
 
 
@@ -414,12 +410,12 @@ sub docSubroutine($$$$)
 	my $type = $1;
 
 	my ($name, $params)
-	  = $type eq 'tie'      ? $line =~ m/^([$@%*]\w+)\,?\s*(.*?)\s*$/
+	  = $type eq 'tie'      ? $line =~ m/^([\$\@\%\*]\w+)\,?\s*(.*?)\s*$/
 	  : $type eq 'overload' ? $line =~ m/^(\S+)\s*(.*?)\s*$/
 	  :    $line =~ m/^(\w+)\s*(.*?)\s*$/;
 
 	defined $name
-		or error __x"subroutine without name in {file} line {line}", file => $fn, line => $ln;
+		or error __x"subroutine type '{type}' without name in {file} line {line}", type => $type, file => $fn, line => $ln;
 
 	my $container = $self->{OPM_subsection} || $self->{OPM_section} || $self->{OPM_chapter}
 		or error __x"subroutine {name} outside chapter in {file} line {line}", name => $name, file => $fn, line => $ln;
@@ -538,10 +534,10 @@ sub docExample($$$$)
 	$line =~ s/^\#.*//;
 
 	my $container = $self->activeSubroutine
-				|| $self->{OPM_subsubsection}
-				|| $self->{OPM_subsection}
-				|| $self->{OPM_section}
-				|| $self->{OPM_chapter};
+		|| $self->{OPM_subsubsection}
+		|| $self->{OPM_subsection}
+		|| $self->{OPM_section}
+		|| $self->{OPM_chapter};
 
 	defined $container
 		or error __x"example outside chapter in {file} line {linenr}", file => $fn, linenr => $ln;
@@ -578,7 +574,11 @@ sub forgotCut($$$$)
 sub decomposeM($$)
 {	my ($self, $manual, $link) = @_;
 
-	my ($subroutine, $option) = $link =~ s/(?:^|\:\:) (\w+) \( (.*?) \)$//x ? ($1, $2) : ('', '');
+	my ($subroutine, $option) = $link =~ s/
+		(?:^|\:\:)      # skip till last ::
+		(\w+ | '[^']+') # sub or overload between quotes
+		\( (.*?) \)     # parameters
+		$//x ? ($1, $2) : ('', '');
 
 	my $man;
 		if(not length($link)) { $man = $manual }
@@ -599,9 +599,9 @@ sub decomposeM($$)
 		$man = $link;
 	}
 
-	blessed $man or return (
-		$manual,
-		$man . (length $subroutine ? " subroutine $subroutine" : '') . (length $option ? " option $option" : ''),
+	blessed $man or return ($manual, $man
+	  . (length $subroutine ? " subroutine $subroutine" : '')
+	  . (length $option ? " option $option" : ''),
 	);
 
 	defined $subroutine && length $subroutine
@@ -787,10 +787,12 @@ sub cleanupHtml($$$)
 
 		if($type =~ m/^\:?html\b/ )
 		{	$type    = 'html';
-			$capture = $self->cleanupHtml($manual, $capture, is_html => 1);
+			$capture = $self->cleanupHtml($manual, $capture, %args, is_html => 1);
 		}
 
-		return $self->cleanupHtml($manual, $before) . $capture . $self->cleanupHtml($manual, $after);
+		return $self->cleanupHtml($manual, $before, %args)
+		     . $capture
+		     . $self->cleanupHtml($manual, $after, %args);
 	}
 
 	for($string)
@@ -800,10 +802,8 @@ sub cleanupHtml($$$)
 #			s#(?<!\b[BCEFILSXMP<])\<#&lt;#g;
 			s#([=-])\>#$1\&gt;#g;
 		}
-		s# ([A-Z]) (?: \<\<\s*(.*?)\s*\>\> | \<(.*?)\> ) #
-			$self->_htmlReformat($manual, $1, $+, \%args) #gxe;
-
-		s#^\=over(?:\s+\d+)?(.*?)\n=back#$self->_htmlItems($manual, $1)#gmes;
+		s# ([A-Z]) (?: \<\<\s*(.*?)\s*\>\> | \<(.*?)\> ) # $self->_htmlReformat($manual, $1, $+, \%args) #gxe;
+		s#^\=over(?:\s+\d+)?(.*?)=back#$self->_htmlItems($manual, $1)#gmes;
 		s#^\=pod\b##gm;
 
 		my ($label, $level, $title);
@@ -815,10 +815,18 @@ sub cleanupHtml($$$)
 
 		next if $is_html;
 
+		# Paragraphs are hard to detect.  It is where POD and HTML have
+		# other ideas.  Very tricky :-(
+
 		s!((?:(?:^|\n)
 			[^\ \t\n]+[^\n]*      # line starting with blank: para
 		)+)
 		!<p>$1</p>!gsx;
+
+		s!\<p\>\n\<(/?ol|/?ul)\>\</p\>!<$1>!g; # overeager
+		s!\n*\<p\>\n\<(li)\>(.*?)\</p\>!\n<$1>$2!g;
+
+		# fixed code blocks
 
 		s!((?:(?:^|\n)            # start of line
 			[\ \t]+[^\n]+         # line starting with blank: pre
@@ -958,12 +966,18 @@ sub autoMarkup($$%)
 		my $st  = $sub->openDescription;
 		$$st    = $self->_markupText($$st, "$w()", %args, params => $params);
 
+	OPTION:
 		foreach my $option (@options)
 		{	next if $manual->inherited($option);
 			my $p    = $self->_collectParams($params, option => $option->parameters);
 
 			my $name = $option->name;
 			my $default = $sub->default($name);
+			unless($default)
+			{	warning __x"option {where} has no default", where => "$w($name)";
+				next OPTION;
+			}
+
 			my $v    = $default->value;
 			my $q    = $self->_collectParams($p, default => $v);
 
@@ -1011,6 +1025,30 @@ sub finalizeManual($%)
 sub filenameToPackage($)
 {   my ($thing, $fn) = @_;
     $fn =~ s!^lib/!!r =~ s#/#::#gr =~ s/\.(?:pm|pod)$//gr;
+}
+
+sub formatReferTo($$)
+{	my ($self, $manual, $object) = @_;
+
+	return $manual->name
+		if $object->isa('OODoc::Manual');
+
+	return $manual->name . '/"' . $object->name . '"'
+		if $object->isa('OODoc::Text::Structure');
+
+	my $page = $object->manual eq $manual ? '' : ($object->manual->name . '::');
+
+	return $page . $object->name . '()'
+		if $object->isa('OODoc::Text::Subroutine');
+
+	return $page . $object->subroutine->name . '(' . $object->name . ')'
+		if $object->isa('OODoc::Text::Option') || $object->isa('OODoc::Text::Default');
+
+	return $page . $object->subroutine->name . '()'
+		if $object->isa('OODoc::Text::Diagnostic');
+
+	panic ref $object;
+
 }
 
 #--------------------

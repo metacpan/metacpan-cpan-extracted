@@ -35,6 +35,10 @@ Current serialization formats:
 
 =back
 
+At the moment, there is one application which can be used to
+read these dumps: Tuyan Tatliparmak implemented the L<document
+viewer|https://github.com/TuT597/Perl-Docs>, downloadable at GitHub.
+
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
 
 =head1 OVERLOADED
@@ -100,6 +104,10 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 Z<>
 
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<markupStyle>()
 
 Z<>
@@ -108,10 +116,6 @@ Z<>
 
 Z<>
 
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
-
 =item $obj-E<gt>B<serializer>()
 
 The label for this serializer.
@@ -119,6 +123,18 @@ The label for this serializer.
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Object|OODoc::Object/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -154,6 +170,11 @@ Manual pages may be written in different syntaxes.  In the document tree,
 the main structure is parsed, but the text blocks are not: they are only
 processed at output time.  Calling this method sets the interpretation
 mode for text blocks.
+
+=item $obj-E<gt>B<referTo>($manual, $object)
+
+[3.05] Let the parser produce a piece of text which it would use to refer
+to the C<$object> when used in the C<$manual>.
 
 =item $obj-E<gt>B<tree>($doc, %options)
 
@@ -200,28 +221,23 @@ The exporters will each create the same data tree, but implement different seria
 In the following examples, magnifactured JSON dumps are shown.  Be aware the JSON
 does not sort fields, so your output looks less organized.
 
-=head2 the Tree
+=head2 The Document Tree
 
 The data-structure refers to a few capitalized comments:
 
 =over 4
 
-=item MARKUP
+=item * MARKUP; the output markup used for text.  Currently only "html" is supported.
 
-The output markup used for text.  Currently only "html" is supported.
+=item * META; distribution meta-data, as provided by its F<MYMETA.json>.
 
-=item META
+=item * SAFE; no HTML, but does never contain any HTML conflicting data.  Is does not contain links.
 
-Distribution meta-data, as provided by its F<MYMETA.json>.
-
-=item SAFE
-
-No HTML, but does never contain any HTML conflicting data.  Is
-does not contain links.
+=item * REF; refers to a node in the index by name.
 
 =back
 
-=head3 root
+=head3 Tree root
 
 The root:
 
@@ -269,7 +285,7 @@ with OODoc, for instance OODoc itself at L<https://metacpan.org/XXX>
 
   { "id": REF,
     "name": "Mail::Box",                       # MARKUP
-    "version": "3.14",                         # or undef
+    "version": "3.14",                         # or undef, SAFE
     "title": "Manage a mailbox",               # MARKUP
     "package": "lib/Mail/Box.pm",              # SAFE
     "distribution": "Mail-Box",                # SAFE
@@ -281,7 +297,7 @@ with OODoc, for instance OODoc itself at L<https://metacpan.org/XXX>
 The chapters are sorted logically, as they appear in traditional unix manual pages,
 with a few extensions.
 
-=head3 Inheritance
+=head3 Class Inheritance
 
 The manual contains a details inheritance relationship structure, which MAY
 use the following fields:
@@ -307,11 +323,11 @@ a list of nested blocks.
 
 Each (text) block has same features:
 
-  { "id": REF,                                 # SAFE
+  { "id": REF,
+    "type": "section",                         # SAFE
     "name": "Constructors",                    # MARKUP
     "level": 2,                                # SAFE
-    "type": "section",                         # SAFE
-    "extends": REFERENCE,                      #XXX TODO
+    "extends": REF,
     "intro": "Intro to this section.",         # MARKUP
     "examples": [ REF, ... ],
     "subroutines": [ REF, ... ],
@@ -322,6 +338,14 @@ The examples, subroutines and nested blocks are to be kept in their order.
 
 The description and examples are about the content of the whole block.
 Subroutines will also have specific descriptions and examples.
+
+[3.05] When the C<extends> field is set, then this block is included in the tree
+to indicate that the element was inherited from the super-class.  The C<intro>
+text will contain something like "inherited from I<location>.".  In this case,
+the C<id> looks like C<id1519-id2852> which means: C<id1519> is the full
+description base node, and in this case we use it in manual page C<id2852>.
+The C<extends> field will contain C<id1519>, and can be used by the viewer to
+show the full object text.
 
 =head3 Subroutines
 
@@ -345,10 +369,10 @@ There are a few types of subroutines:
 
 Each subroutine looks like this:
 
-  { "id": REF,                               # SAFE
+  { "id": REF,
+    "type": "i_method",                      # MARKUP
     "name": "producePages",                  # MARKUP
     "call": "$obj->producePages()" ],        # MARKUP
-    "type": "i_method",                      # MARKUP
     "intro": "Create the manual ...",        # MARKUP
     "examples": [ REF, ... ],
     "options: [ REF, ... ],
@@ -360,18 +384,18 @@ Each subroutine looks like this:
 Most subroutine forms can have options.  They are passed as
 list sorted by name.
 
-  { "id": REF,                               # SAFE
-    "name": "beautify",                      # MARKUP
+  { "id": REF,
     "type": "option",                        # SAFE
+    "name": "beautify",                      # MARKUP
     "params": "true|false",                  # MARKUP
     "intro": "Make the output better"        # MARKUP
   }
 
 The defaults look like this:
 
-  { "id": REF,                               # SAFE
-    "name": "beautify",                      # MARKUP
+  { "id": REF,
     "type": "default",                       # SAFE
+    "name": "beautify",                      # MARKUP
     "value": "<true>",                       # MARKUP
   }
 
@@ -382,9 +406,9 @@ The option is required when the default value is C<< <required> >>.
 Every block of text, and every subroutine can have a number of
 examples.  Examples do not always have a name.
 
-  { "id": REF,                               # SAFE
-    "name": "how to produce pages",          # MARKUP
+  { "id": REF,
     "type": "example",                       # SAFE
+    "name": "how to produce pages",          # MARKUP
     "intro": "Like this"                     # MARKUP
   }
 
@@ -395,7 +419,7 @@ sorted errors first, then by description text.  Other types of
 diagnostics will be added soon, to match the levels offered by
 L<Log::Report|Log::Report>.
 
-  { "id": REF,                               # SAFE
+  { "id": REF,
     "type": "error"/"warning"/"info"...,     # SAFE
     "name": "Missing ...",                   # MARKUP
     "intro: "This error is shown when...",   # MARKUP
@@ -408,22 +432,22 @@ L<Log::Report|Log::Report>.
 
 =item Error: exporter $name has compilation errors: $err
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: exporter serializer '$name' is unknown.
 
-Cast by new()
+Cast by C<new()>
 
-=item Error: only HTML markup is currently supported.
+=item Error: only HTML markup is currently supported, found $style.
 
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

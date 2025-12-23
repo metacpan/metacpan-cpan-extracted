@@ -110,13 +110,13 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 Inherited, see L<OODoc::Format/"Attributes">
 
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<project>()
 
 Inherited, see L<OODoc::Format/"Attributes">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
@@ -129,6 +129,18 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<workdir>()
 
 Inherited, see L<OODoc::Format/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Format|OODoc::Format/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -313,7 +325,7 @@ can be used with a list of formatting options which are passed to
 L<showChapter()|OODoc::Format/"Page generation">.  This will help you to produce pages which have
 pre-planned changes in layout.
 
-B<. Example: format options>
+=head4 » Example: format options
 
   use OODoc;
   my $doc = OODoc->new(...);
@@ -333,7 +345,7 @@ C<COPYRIGHTS> chapters are very personal.  You can fill these in by
 extending the POD generator, as described in the next section, or take
 a very simple approach simply using L<createManual(append)|OODoc::Format::Pod/"Page generation">.
 
-B<. Example: appending text to a page>
+=head4 » Example: appending text to a page
 
   use OODoc;
   my $doc = OODoc->new(...);
@@ -352,7 +364,7 @@ functionality of a class by creating a new class.  This provides an
 easy way to add, change or remove chapters from the produced manual
 pages.
 
-B<. Example: remove chapter inheritance>
+=head4 » Example: remove chapter inheritance
 
   $doc->formatter('MyPod', %format_options);
 
@@ -363,7 +375,7 @@ B<. Example: remove chapter inheritance>
 The C<MyPod> package is extending the standard POD generator, by overruling
 the default behavior of C<chapterInheritance()> by producing nothing.
 
-B<. Example: changing the chapter's output>
+=head4 » Example: changing the chapter's output
 
   $doc->formatter('MyPod', %format_options);
 
@@ -385,7 +397,7 @@ COMMERCIAL
   $self;
  }
 
-B<. Example: adding to a chapter's output>
+=head4 » Example: adding to a chapter's output
 
   $doc->formatter('MyPod', %format_options);
 
@@ -412,7 +424,7 @@ the L<OODoc::Format::Pod2|OODoc::Format::Pod2> will be used.   It's nearly a dro
 replacement by its default behavior.  When you specify
 your own template file, every thing can be made.
 
-B<. Example: formatting with template>
+=head4 » Example: formatting with template
 
   use OODoc;
   my $doc = OODoc->new(...);
@@ -426,7 +438,7 @@ B<. Example: formatting with template>
      ],
   );
 
-B<. Example: format options within template>
+=head4 » Example: format options within template
 
 The template van look like this:
 
@@ -444,50 +456,50 @@ not quotes, comma's and exactly one blank between the strings.
 
 =item Error: cannot link to a $package
 
-Cast by link()
+Cast by C<link()>
 
 =item Fault: cannot read prelimary pod from $file: $!
 
-Cast by simplifyPod()
+Cast by C<simplifyPod()>
 
 =item Fault: cannot write final pod to $file: $!
 
-Cast by simplifyPod()
+Cast by C<simplifyPod()>
 
 =item Fault: cannot write prelimary pod manual to $file: $!
 
-Cast by createManual()
+Cast by C<createManual()>
 
 =item Error: illegal show option choice: $value
 
-Cast by showOptions()
+Cast by C<showOptions()>
 
 =item Error: illegal value for show_option_table: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_sub_description: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: illegal value for show_subroutine: $value
 
-Cast by showSubroutine()
+Cast by C<showSubroutine()>
 
 =item Error: missing required chapter $name in $manual
 
-Cast by showRequiredChapter()
+Cast by C<showRequiredChapter()>
 
 =item Fault: write to $file failed: $!
 
-Cast by simplifyPod()
+Cast by C<simplifyPod()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

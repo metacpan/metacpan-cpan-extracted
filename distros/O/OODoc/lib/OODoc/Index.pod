@@ -61,13 +61,25 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 =over 4
 
-=item $obj-E<gt>B<publish>(\%options)
+=item $obj-E<gt>B<manual>()
 
 Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Object|OODoc::Object/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -115,14 +127,14 @@ Returns the names of all defined packages.
 A call to L<addManual()|OODoc::Index/"The Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Index/"The Manual Repository"> or L<mainManual()|OODoc::Index/"The Manual Repository">.
-Cast by addManual()
+Cast by C<addManual()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

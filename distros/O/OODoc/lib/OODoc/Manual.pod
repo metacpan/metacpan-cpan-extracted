@@ -53,7 +53,7 @@ String comparison takes place between a manual name and another
 manual name which may be a manual object or any other string or
 stringifyable object.
 
-example: 
+» example: 
 
   if($manual eq 'OODoc') ...
   if($man1 eq $man2) ...
@@ -144,6 +144,10 @@ Z<>
 
 Returns whether this package has real code related to it.
 
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<package>()
 
 Returns the package of the manual.
@@ -151,10 +155,6 @@ Returns the package of the manual.
 =item $obj-E<gt>B<parser>()
 
 Returns the parser which has produced this manual object.
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<source>()
 
@@ -175,6 +175,8 @@ Returns the version of this manual information.
 =back
 
 =head2 Collected
+
+Extends L<"Collected" in OODoc::Object|OODoc::Object/"Collected">.
 
 =over 4
 
@@ -210,13 +212,17 @@ insensitive).  Without any type, all are selected.
 All examples of all chapters within this manual together, especially
 useful for counting.
 
-example: 
+» example: 
 
   print scalar $manual->examples;
 
 =item $obj-E<gt>B<name>()
 
 Returns the name of the manual, which is found in the NAME chapter.
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =item $obj-E<gt>B<subroutine>($name)
 
@@ -229,7 +235,7 @@ manuals, then these other manuals will be searched as well.
 All subroutines of all chapters within this manual together, especially
 useful for counting.
 
-example: 
+» example: 
 
   print scalar $manual->subroutines;
 
@@ -249,7 +255,7 @@ Call L<OODoc::Text::Structure::all()|OODoc::Text::Structure/"Collected"> on all 
 and C<$parameters>.  In practice, this means that you can simply collect
 kinds of information from various parts within the manual page.
 
-example: 
+» example: 
 
   my @diags = $manual->all('diagnostics');
 
@@ -379,7 +385,7 @@ more detail.  The most detailed location for the description is returned.
 [2.01] Returns a string which can be used as index of headings used in this
 manual page.
 
-example: 
+» example: 
 
   print $manual->overview;
 
@@ -399,7 +405,7 @@ Each documentation part requires a chapter "NAME" which starts with
 the manual name followed by a dash.  Apparently, this was not found
 in the indicated file.  This chapter description must be anywhere
 after the package statement leading the name-space.
-Cast by name()
+Cast by C<name()>
 
 =item Error: The NAME chapter does not have the right format in $file
 
@@ -409,38 +415,38 @@ manual's name, one dash ('-'), and then a brief explanation. For instance:
 
   =chapter NAME
   OODoc::Manual - one manual about a package
-Cast by name()
+Cast by C<name()>
 
 =item Error: no distribution is specified for manual $name
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: no source filename is specified for manual $name
 
 You have to specify where you found the information for the manual.  This
 does not need to be the name of an existing file, but usually it will be.
-Cast by new()
+Cast by C<new()>
 
 =item Error: no version is specified for manual $name
 
-Cast by new()
+Cast by C<new()>
 
 =item Warning: order conflict '$take' before '$insert' in $file line $linenr
 
 The order of the objects in a sub-class shall be the same as that of
 the super class, otherwise the result of merging of the information
 received from both classes is undertermined.
-Cast by mergeStructure()
+Cast by C<mergeStructure()>
 
 =item Error: package name is not specified
 
 You try to instantiate a manual, but have not specified the name
 of the package which is described in this manual, which is required.
-Cast by new()
+Cast by C<new()>
 
 =item Warning: section without location in $manual: $section
 
-Cast by expand()
+Cast by C<expand()>
 
 =item Warning: subroutine $name location conflict: $here and $there
 
@@ -458,24 +464,24 @@ This warning means that the location of the method in this manual page
 is not related to that of the same method in an other page.  For instance,
 in the first page it is listed in chapter "METHODS", and in the second
 in chapter "FUNCTIONS".
-Cast by mostDetailedLocation()
+Cast by C<mostDetailedLocation()>
 
 =item Warning: subroutine '$name' location conflict:\n  $p1 in $man1\n  $p2 in $man2
 
-Cast by mostDetailedLocation()
+Cast by C<mostDetailedLocation()>
 
 =item Error: two chapters named $name in $file line $line1 and $line2
 
 The indicated file contains two chapters with the same name, which
 is not permitted.  Join the contents of both parts.
-Cast by chapter()
+Cast by C<chapter()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

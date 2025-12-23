@@ -17,31 +17,15 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "ExtUtils::Builder::Compiler",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "DynaLoader" => 0,
-    "ExtUtils::Builder" => "0.016",
-    "ExtUtils::Builder::Action::Command" => 0,
-    "ExtUtils::Builder::Node" => 0,
-    "ExtUtils::Builder::Planner" => "0.007",
-    "ExtUtils::Builder::Planner::Extension" => 0,
-    "ExtUtils::Builder::Util" => "0.018",
+    "ExtUtils::Builder" => "0.018",
     "ExtUtils::Config" => "0.007",
-    "File::Basename" => 0,
-    "File::Spec::Functions" => 0,
-    "File::Temp" => 0,
     "Perl::OSType" => 0,
-    "parent" => 0,
-    "sort" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
-    "Cwd" => 0,
-    "ExtUtils::Builder::Planner" => "0.007",
-    "IPC::Open2" => 0,
-    "Test::More" => "0.89"
+    "Test::More" => "0.88"
   },
-  "VERSION" => "0.033",
+  "VERSION" => "0.034",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,26 +33,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Cwd" => 0,
-  "DynaLoader" => 0,
-  "ExtUtils::Builder" => "0.016",
-  "ExtUtils::Builder::Action::Command" => 0,
-  "ExtUtils::Builder::Node" => 0,
-  "ExtUtils::Builder::Planner" => "0.007",
-  "ExtUtils::Builder::Planner::Extension" => 0,
-  "ExtUtils::Builder::Util" => "0.018",
+  "ExtUtils::Builder" => "0.018",
   "ExtUtils::Config" => "0.007",
-  "File::Basename" => 0,
-  "File::Spec::Functions" => 0,
-  "File::Temp" => 0,
-  "IPC::Open2" => 0,
   "Perl::OSType" => 0,
-  "Test::More" => "0.89",
-  "parent" => 0,
-  "sort" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => "0.88",
+  "parent" => 0
 );
 
 

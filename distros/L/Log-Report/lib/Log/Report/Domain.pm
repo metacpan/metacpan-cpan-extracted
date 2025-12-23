@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,19 +10,19 @@
 
 
 package Log::Report::Domain;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
-use base 'Log::Report::Minimal::Domain';
+use parent 'Log::Report::Minimal::Domain';
 
 use warnings;
 use strict;
 
-use Log::Report        'log-report';
+use Log::Report        'log-report', import => [ qw/__x error fault panic warning/ ];
 use Log::Report::Util  qw/parse_locale/;
-use Scalar::Util       qw/blessed/;
+use Log::Report::Translator ();
 
-use Log::Report::Translator;
+use Scalar::Util       qw/blessed/;
 
 #--------------------
 
@@ -48,7 +48,6 @@ sub configure(%)
 		%args   = (%$set, %args);
 	}
 
-	# 'formatter' is mainly handled by the base-class, but documented here.
 	my $format = $args{formatter} || 'PRINTI';
 	$args{formatter} = $format = {} if $format eq 'PRINTI';
 

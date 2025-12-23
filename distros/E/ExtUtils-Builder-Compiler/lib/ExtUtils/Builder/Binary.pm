@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Binary;
-$ExtUtils::Builder::Binary::VERSION = '0.033';
+$ExtUtils::Builder::Binary::VERSION = '0.034';
 use strict;
 use warnings;
 
@@ -48,7 +48,7 @@ ExtUtils::Builder::Binary - Helper role for classes producing binary objects
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 AUTHOR
 

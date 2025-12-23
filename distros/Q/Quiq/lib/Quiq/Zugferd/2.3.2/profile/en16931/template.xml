@@ -143,13 +143,13 @@
         </ram:BillingSpecifiedPeriod>
          <ram:SpecifiedTradeAllowanceCharge>
            <ram:ChargeIndicator>
-             <udt:Indicator></udt:Indicator>
+             <udt:Indicator>BG-27-1_BG-28-1</udt:Indicator>
            </ram:ChargeIndicator>
-           <ram:CalculationPercent></ram:CalculationPercent>
-           <ram:BasisAmount currencyID=""></ram:BasisAmount>
-           <ram:ActualAmount currencyID=""></ram:ActualAmount>
-           <ram:ReasonCode></ram:ReasonCode>
-           <ram:Reason></ram:Reason>
+           <ram:CalculationPercent>BT-138_BT-143</ram:CalculationPercent>
+           <ram:BasisAmount currencyID="">BT-137_BT-142</ram:BasisAmount>
+           <ram:ActualAmount currencyID="">BT-136_BT-141</ram:ActualAmount>
+           <ram:ReasonCode>BT-140_BT-145</ram:ReasonCode>
+           <ram:Reason>BT-139_BT-144</ram:Reason>
            <ram:CategoryTradeTax>
              <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
              <ram:TypeCode></ram:TypeCode>
@@ -499,10 +499,10 @@
       </ram:ApplicableTradeTax>
       <ram:BillingSpecifiedPeriod>
         <ram:StartDateTime>
-          <udt:DateTimeString format=""></udt:DateTimeString>
+          <udt:DateTimeString format="BT-73-0">BT-73</udt:DateTimeString>
         </ram:StartDateTime>
         <ram:EndDateTime>
-          <udt:DateTimeString format=""></udt:DateTimeString>
+          <udt:DateTimeString format="BT-74-0">BT-74</udt:DateTimeString>
         </ram:EndDateTime>
       </ram:BillingSpecifiedPeriod>
       <ram:SpecifiedTradeAllowanceCharge>

@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 =encoding utf8
 
@@ -13,7 +13,7 @@ Quiq - Class library for rapid development
 
 =head1 DESCRIPTION
 
-Diese Klassenbibliothek enthält 258 anwendungsunabhängige Klassen,
+Diese Klassenbibliothek enthält 259 anwendungsunabhängige Klassen,
 die ich in Projekten nutze. Die Klassen sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
@@ -1020,7 +1020,7 @@ L<Quiq::Zugferd::Entity> - Basisklasse der Entitätsklassen
 
 =item *
 
-L<Quiq::Zugferd::Entity::Attribut> - Position
+L<Quiq::Zugferd::Entity::Attribut> - Artikelattribut
 
 =item *
 
@@ -1052,6 +1052,10 @@ L<Quiq::Zugferd::Entity::Verkaeufer> - Verkäufer
 
 =item *
 
+L<Quiq::Zugferd::Entity::ZuAbschlagPosition> - Zu- oder Abschlage auf Position
+
+=item *
+
 L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
 
 =back
@@ -1062,7 +1066,7 @@ L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.232';
+our $VERSION = '1.233';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2859,6 +2859,10 @@ sub delete {
 
   $dir = $class->dir($path);
 
+=head4 Alias
+
+parent()
+
 =head4 Returns
 
 String
@@ -2876,6 +2880,11 @@ geliefert.
 sub dir {
     my ($class,$path) = @_;
     return $path =~ m|(.*)/|? $1: '';
+}
+
+{
+    no warnings 'once';
+    *parent = \&dir;
 }
 
 # -----------------------------------------------------------------------------
@@ -4590,7 +4599,7 @@ sub uid {
 
 =head1 VERSION
 
-1.232
+1.233
 
 =head1 AUTHOR
 

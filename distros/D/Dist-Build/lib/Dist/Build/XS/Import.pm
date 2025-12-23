@@ -1,5 +1,5 @@
 package Dist::Build::XS::Import;
-$Dist::Build::XS::Import::VERSION = '0.024';
+$Dist::Build::XS::Import::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -79,7 +79,7 @@ Dist::Build::XS::Import - Dist::Build extension to import headers for other XS m
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

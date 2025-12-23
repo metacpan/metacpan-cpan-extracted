@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,7 +10,7 @@
 
 
 package Log::Report::Dispatcher::Try;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
 use base 'Log::Report::Dispatcher';
@@ -18,7 +18,8 @@ use base 'Log::Report::Dispatcher';
 use warnings;
 use strict;
 
-use Log::Report 'log-report', syntax => 'SHORT';
+use Log::Report 'log-report', import => [ qw/__x error/ ];
+
 use Log::Report::Exception ();
 use Log::Report::Util      qw/%reason_code expand_reasons/;
 use List::Util             qw/first/;
@@ -104,8 +105,10 @@ sub wasFatal(@)
 	my $ex = first { $_->isFatal } @{$self->{exceptions}}
 		or return ();
 
+	my $tag = $args{tag} // $args{class};
+
 	# There can only be one fatal exception.  Is it in the class?
-	(!$args{class} || $ex->inClass($args{class})) ? $ex : ();
+	(! $tag || $ex->taggedWith($tag)) ? $ex : ();
 }
 
 

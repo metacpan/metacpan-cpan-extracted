@@ -80,13 +80,25 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 The name of the file which is read or will be written.
 
-=item $obj-E<gt>B<publish>(\%options)
+=item $obj-E<gt>B<manual>()
 
 Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Object|OODoc::Object/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -139,23 +151,23 @@ The MANIFEST file of a distributed package should be located in the top
 directory of that packages.  All files of the distribution are in that
 same directory, or one of its sub-directories, otherwise they will not
 be packaged.
-Cast by relative()
+Cast by C<relative()>
 
 =item Fault: cannot read manifest file $file: $!
 
 The manifest file could not be opened for reading.
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot write manifest $file: $!
 
-Cast by write()
+Cast by C<write()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

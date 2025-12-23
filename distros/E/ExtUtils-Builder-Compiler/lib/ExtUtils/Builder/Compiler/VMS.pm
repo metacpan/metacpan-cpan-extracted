@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::VMS;
-$ExtUtils::Builder::Compiler::VMS::VERSION = '0.033';
+$ExtUtils::Builder::Compiler::VMS::VERSION = '0.034';
 use strict;
 use warnings;
 
@@ -41,6 +41,7 @@ sub compile_flags {
 	my @ret;
 	my @include_dirs = map { $_->{value} } @{ $self->{include_dirs} };
 	my @defines = map { defined $_->{value} ? $_->{value} ne '' ? qq/"$_->{key}=$_->{value}"/ : qq{"$_->{key}"} : Carp::croak("Can't undefine '$_->{key}'") } @{ $self->{defines} };
+	push @ret, $self->new_argument(ranking => 15, value => [ "/STANDARD=\U$self->{standard}"]) if $self->{standard};
 	push @ret, $self->new_argument(ranking => 30, value => [ '/include=' . join ',', @include_dirs ]) if @include_dirs;
 	push @ret, $self->new_argument(ranking => 40, value => [ '/define=' . join ',', @defines ])     if @defines;
 	push @ret, $self->new_argument(ranking => 75, value => [ "/obj=$to", $from ]);
@@ -63,7 +64,7 @@ ExtUtils::Builder::Compiler::VMS - Class for compiling with a VMS compiler
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 AUTHOR
 

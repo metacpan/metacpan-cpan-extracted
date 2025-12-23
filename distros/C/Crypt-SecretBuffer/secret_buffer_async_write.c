@@ -30,7 +30,7 @@ typedef struct {
    char secret[];
 } secret_buffer_async_result;
 
-SV *secret_buffer_async_result_wrap_with_object(secret_buffer_async_result *result) {
+static SV *secret_buffer_async_result_wrap_with_object(pTHX_ secret_buffer_async_result *result) {
    SV *ref= sv_2mortal(newRV_noinc(newSV(0)));
    MAGIC *mg= sv_magicext(SvRV(ref), NULL, PERL_MAGIC_ext, &secret_buffer_async_result_magic_vtbl, (const char *)result, 0);
 #ifdef USE_ITHREADS
@@ -39,27 +39,13 @@ SV *secret_buffer_async_result_wrap_with_object(secret_buffer_async_result *resu
    return sv_bless(ref, gv_stashpv("Crypt::SecretBuffer::AsyncResult", GV_ADD));
 }
 
-secret_buffer_async_result* secret_buffer_async_result_from_magic(SV *obj, int flags) {
-   SV *sv;
-   MAGIC *magic;
-
-   if ((!obj || !SvOK(obj)) && (flags & SECRET_BUFFER_MAGIC_UNDEF_OK))
-      return NULL;
-
-   if (!sv_isobject(obj)) {
-      if (flags & SECRET_BUFFER_MAGIC_OR_DIE)
-         croak("Not an object");
-      return NULL;
-   }
-   sv = SvRV(obj);
-   if (SvMAGICAL(sv) && (magic = mg_findext(sv, PERL_MAGIC_ext, &secret_buffer_async_result_magic_vtbl)))
-      return (secret_buffer_async_result*) magic->mg_ptr;
-   if (flags & SECRET_BUFFER_MAGIC_OR_DIE)
-      croak("Object lacks 'secret_buffer_async_result' magic");
-   return NULL;
+static secret_buffer_async_result* secret_buffer_async_result_from_magic(SV *obj, int flags) {
+   dTHX;
+   return (secret_buffer_async_result*) secret_buffer_X_from_magic(aTHX_
+      obj, flags, &secret_buffer_async_result_magic_vtbl, "secret_buffer_async_result", NULL);
 }
 
-secret_buffer_async_result *secret_buffer_async_result_new(int fd, secret_buffer *buf, size_t ofs, size_t count) {
+static secret_buffer_async_result *secret_buffer_async_result_new(int fd, secret_buffer *buf, size_t ofs, size_t count) {
    secret_buffer_async_result *result= (secret_buffer_async_result *)
       malloc(sizeof(secret_buffer_async_result) + count);
    Zero(((char*)result), sizeof(secret_buffer_async_result) + count, char);
@@ -102,7 +88,7 @@ secret_buffer_async_result *secret_buffer_async_result_new(int fd, secret_buffer
 }
 
 /* One refcount is held by the main thread, and one by the worker thread */
-void secret_buffer_async_result_release(secret_buffer_async_result *result, bool from_thread) {
+static void secret_buffer_async_result_release(secret_buffer_async_result *result, bool from_thread) {
    bool destroy= false, cleanup_thread_half= false, cleanup_perl_half= false;
    ASYNC_RESULT_MUTEX_LOCK(result);
    if (from_thread) {
@@ -111,6 +97,7 @@ void secret_buffer_async_result_release(secret_buffer_async_result *result, bool
    } else {
       /* check whether thread exited without cleaning up, and dec refcount if so */
       if (!result->ready && !ASYNC_RESULT_IS_THREAD_ALIVE(result)) {
+         dTHX;
          warn("writer thread died without cleaning up");
          cleanup_thread_half= true;
          result->ready= true;
@@ -157,13 +144,13 @@ void secret_buffer_async_result_release(secret_buffer_async_result *result, bool
    }
 }
 
-void secret_buffer_async_result_acquire(secret_buffer_async_result *result) {
+static void secret_buffer_async_result_acquire(secret_buffer_async_result *result) {
    ASYNC_RESULT_MUTEX_LOCK(result);
    ++result->refcount;
    ASYNC_RESULT_MUTEX_UNLOCK(result);
 }
 
-int secret_buffer_async_result_magic_free(pTHX_ SV *sv, MAGIC *mg) {
+static int secret_buffer_async_result_magic_free(pTHX_ SV *sv, MAGIC *mg) {
    secret_buffer_async_result_release((secret_buffer_async_result *) mg->mg_ptr, false);
    return 0;
 }
@@ -302,6 +289,7 @@ void *secret_buffer_async_writer(void *arg) {
 }
 
 IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count, SV **ref_out) {
+   dTHX;
    IV total_written= 0;
    secret_buffer_async_result *result= NULL;
    int fd;
@@ -415,7 +403,7 @@ IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count
 #endif
    if (ref_out)
       /* Caller requests a reference to the result */
-      *ref_out= secret_buffer_async_result_wrap_with_object(result);
+      *ref_out= secret_buffer_async_result_wrap_with_object(aTHX_ result);
    else
       /* nobody cares, so release our reference to the result.  The thread will carry on silently */
       secret_buffer_async_result_release(result, false);

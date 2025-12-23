@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,7 +10,7 @@
 
 
 package MojoX::Log::Report;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
 use Mojo::Base 'Mojo::Log';  # implies use strict etc

@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.007001	2025-12-22
+
+ [ Bug Fixes ]
+ - Get Marlin::Struct working on Perl older than 5.12.0.
+
 0.007000	2025-12-21
 
  - Added: Marlin::Struct.

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.033';
+$ExtUtils::Builder::Compiler::VERSION = '0.034';
 use strict;
 use warnings;
 
@@ -16,6 +16,7 @@ sub new {
 		cc           => $cc,
 		include_dirs => [],
 		defines      => [],
+		standard     => $args{standard},
 	}, $class;
 	$self->_init(%args);
 	return $self;
@@ -57,6 +58,12 @@ sub default_define_ranking {
 	return 40;
 }
 
+sub set_standard {
+	my ($self, $version) = @_;
+	$self->{standard} = $version;
+	return;
+}
+
 sub collect_arguments  {
 	my ($self, @args) = @_;
 	return ($self->SUPER::collect_arguments, $self->compile_flags(@args));
@@ -88,7 +95,7 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 DESCRIPTION
 

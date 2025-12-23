@@ -5,10 +5,10 @@ use warnings;
 package Marlin::TypeConstraint;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007000';
+our $VERSION   = '0.007001';
 
 use parent 'Type::Tiny::Class';
-use Types::Common qw( signature Any Optional ArrayRef is_TypeTiny assert_ArrayRef );
+use Types::Common qw( signature Any Optional ArrayRef is_TypeTiny is_ArrayRef );
 
 sub exportables {
 	my $me = shift;
@@ -37,14 +37,23 @@ sub coderef_but_cooler {
 		],
 	);
 	
-	return sub (;$) {
-		if ( @_ == 1 ) {
-			assert_ArrayRef $_[0];
-			my $args = $sig->( @{ $_[0] } );
-			return $me->class->new( $args );
+	my $coderef = sub (;@) {
+		my ( $params, $r );
+		$params = shift if is_ArrayRef $_[0];
+		if ( $params ) {
+			my $args = $sig->( @$params );
+			$r = $me->class->new( $args );
 		}
-		return $me;
+		else {
+			$r = $me;
+		}
+		wantarray ? ( $r, @_ ) : $r;
 	};
+	
+	require Scalar::Util && &Scalar::Util::set_prototype( $coderef, ';$' )
+		if Eval::TypeTiny::NICE_PROTOTYPES;
+	
+	return $coderef;
 }
 
 1;

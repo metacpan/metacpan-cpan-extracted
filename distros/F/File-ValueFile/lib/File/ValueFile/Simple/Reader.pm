@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -11,7 +10,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use parent 'Data::Identifier::Interface::Userdata';
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
 use Carp;
 use Fcntl qw(SEEK_SET);
@@ -30,7 +29,7 @@ use constant {
     DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
 };
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 
 
@@ -304,9 +303,12 @@ sub read_as_taglist {
     state $tagpool_source_format              = Data::Identifier->new(uuid => 'e5da6a39-46d5-48a9-b174-5c26008e208e', displayname => 'tagpool-source-format')->register;
     state $tagpool_taglist_format_v1          = Data::Identifier->new(uuid => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa', displayname => 'tagpool-taglist-format-v1')->register;
     state $tagpool_httpd_htdirectories_format = Data::Identifier->new(uuid => '25990339-3913-4b5a-8bcf-5042ef6d8b5e', displayname => 'tagpool-httpd-htdirectories-format')->register;
-    my ($self) = @_;
+    my ($self, %opts) = @_;
+    my $as = delete $opts{as};
     my %list;
     my $format;
+
+    croak 'Stray options passed' if scalar keys %opts;
 
     $self->read_to_cb(sub {
             my (undef, @line) = @_;
@@ -357,14 +359,20 @@ sub read_as_taglist {
             }
         });
 
+    return [map {$_->as($as, so => $self)} values %list] if defined $as;
+
     return [values %list];
 }
 
 
-#@returns Data::Identifier
 sub format {
     my ($self, %opts) = @_;
-    return $self->{format} if defined $self->{format};
+
+    if (defined $self->{format}) {
+        return $self->{format}->as($opts{as}, so => $self) if defined $opts{as};
+        return $self->{format};
+    }
+
     return $opts{default} if exists $opts{default};
     croak 'No value for format';
 }
@@ -400,7 +408,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -408,7 +416,7 @@ version v0.09
 
 This module provides a simple way to read ValueFile files.
 
-This module inherit from L<Data::Identifier::Interface::Userdata>.
+This module inherits from L<Data::Identifier::Interface::Userdata> (since v0.06), and L<Data::Identifier::Interface::Subobjects> (since v0.10).
 
 =head1 METHODS
 
@@ -487,7 +495,7 @@ If there is any error, this method dies.
 
 =head2 read_as_taglist
 
-    my $list = $reader->read_as_taglist;
+    my $list = $reader->read_as_taglist( [ %opts ] );
 
 Reads the file as a tag list. Returns the list of found tags as an arrayref of L<Data::Identifier> elements.
 
@@ -495,6 +503,16 @@ This method supports a number of standard formats.
 If the format is not known the code falls back to a generic handler.
 
 If there is any error, this method dies.
+
+The following, all optional, options are supported:
+
+=over
+
+=item C<as>
+
+Return the value as the given type as per L<Data::Identifier/as>.
+
+=back
 
 See also:
 L<File::ValueFile::Simple::Writer/write_taglist>.
@@ -508,6 +526,8 @@ L<File::ValueFile::Simple::Writer/write_taglist>.
 Returns the format of the file. This requires the file to be read first.
 If no format is set yet the default is returned.
 If no default is given this method dies.
+
+(experimental since v0.10) Optionally takes a C<as> which allows converting as per L<Data::Identifier/as>.
 
 =head2 features
 
@@ -523,11 +543,11 @@ Elements of the list returned are instances L<Data::Identifier>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

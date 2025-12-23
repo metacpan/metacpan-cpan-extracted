@@ -19,7 +19,7 @@ use_ok('OODoc::Text::Structure');
 use_ok('OODoc::Format');
 use_ok('OODoc::Format::Html');
 use_ok('OODoc::Format::Pod');
-use_ok('OODoc::Format::Pod2');
+#use_ok('OODoc::Format::Pod2');  requires Template/Magic.pm
 use_ok('OODoc::Format::Pod3');
 use_ok('OODoc::Export');
 use_ok('OODoc::Export::JSON');

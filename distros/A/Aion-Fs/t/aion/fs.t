@@ -1,11 +1,11 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  use String::Diff qw//; use Data::Dumper qw//; use Term::ANSIColor qw//;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} }  my $white = Term::ANSIColor::color('BRIGHT_WHITE'); my $red = Term::ANSIColor::color('BRIGHT_RED'); my $green = Term::ANSIColor::color('BRIGHT_GREEN'); my $reset = Term::ANSIColor::color('RESET'); my @diff = ( 	remove_open => "$white\[$red", 	remove_close => "$white]$reset", 	append_open => "$white\{$green", 	append_close => "$white}$reset", );  sub _string_diff { 	my ($got, $expected, $chunk) = @_; 	$got = substr($got, 0, length $expected) if $chunk == 1; 	$got = substr($got, -length $expected) if $chunk == -1; 	String::Diff::diff_merge($got, $expected, @diff) }  sub _struct_diff { 	my ($got, $expected) = @_; 	String::Diff::diff_merge( 		Data::Dumper->new([$got], ['diff'])->Indent(0)->Useqq(1)->Dump, 		Data::Dumper->new([$expected], ['diff'])->Indent(0)->Useqq(1)->Dump, 		@diff 	) }  # 
 # # NAME
 # 
 # Aion::Fs - утилиты для файловой системы: чтение, запись, поиск, замена файлов и т.д.
 # 
 # # VERSION
 # 
-# 0.2.1
+# 0.2.2
 # 
 # # SYNOPSIS
 # 
@@ -17,23 +17,23 @@ lay mkpath "hello/moon.txt", "noreplace";
 lay mkpath "hello/big/world.txt", "hellow!";
 lay mkpath "hello/small/world.txt", "noenter";
 
-::like scalar do {mtime "hello";}, qr{^\d+(\.\d+)?$}, 'mtime "hello";  # ~> ^\d+(\.\d+)?$';
+::like scalar do {mtime "hello";}, qr{^\d+(\.\d+)?$}, 'mtime "hello";  # ~> ^\d+(\.\d+)?$'; undef $::_g0; undef $::_e0;
 
-::is_deeply scalar do {[map cat, grep -f, find ["hello/big", "hello/small"]];}, scalar do {[qw/ hellow! noenter /]}, '[map cat, grep -f, find ["hello/big", "hello/small"]];  # --> [qw/ hellow! noenter /]';
+local ($::_g0 = do {[map cat, grep -f, find ["hello/big", "hello/small"]];}, $::_e0 = do {[qw/ hellow! noenter /]}); ::is_deeply $::_g0, $::_e0, '[map cat, grep -f, find ["hello/big", "hello/small"]];  # --> [qw/ hellow! noenter /]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 my @noreplaced = replace { s/h/$a $b H/ }
     find "hello", "-f", "*.txt", qr/\.txt$/, sub { /\.txt$/ },
         noenter "*small*",
             errorenter { warn "find $_: $!" };
 
-::is_deeply scalar do {\@noreplaced;}, scalar do {["hello/moon.txt"]}, '\@noreplaced; # --> ["hello/moon.txt"]';
+local ($::_g0 = do {\@noreplaced;}, $::_e0 = do {["hello/moon.txt"]}); ::is_deeply $::_g0, $::_e0, '\@noreplaced; # --> ["hello/moon.txt"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {cat "hello/world.txt";}, "hello/world.txt :utf8 Hi!", 'cat "hello/world.txt";       # => hello/world.txt :utf8 Hi!';
-::is scalar do {cat "hello/moon.txt";}, "noreplace", 'cat "hello/moon.txt";        # => noreplace';
-::is scalar do {cat "hello/big/world.txt";}, "hello/big/world.txt :utf8 Hellow!", 'cat "hello/big/world.txt";   # => hello/big/world.txt :utf8 Hellow!';
-::is scalar do {cat "hello/small/world.txt";}, "noenter", 'cat "hello/small/world.txt"; # => noenter';
+local ($::_g0 = do {cat "hello/world.txt";}, $::_e0 = "hello/world.txt :utf8 Hi!"); ::ok $::_g0 eq $::_e0, 'cat "hello/world.txt";       # => hello/world.txt :utf8 Hi!' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {cat "hello/moon.txt";}, $::_e0 = "noreplace"); ::ok $::_g0 eq $::_e0, 'cat "hello/moon.txt";        # => noreplace' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {cat "hello/big/world.txt";}, $::_e0 = "hello/big/world.txt :utf8 Hellow!"); ::ok $::_g0 eq $::_e0, 'cat "hello/big/world.txt";   # => hello/big/world.txt :utf8 Hellow!' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {cat "hello/small/world.txt";}, $::_e0 = "noenter"); ::ok $::_g0 eq $::_e0, 'cat "hello/small/world.txt"; # => noenter' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is_deeply scalar do {[find "hello", "*.txt"];}, scalar do {[qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]}, '[find "hello", "*.txt"]; # --> [qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]';
+local ($::_g0 = do {[find "hello", "*.txt"];}, $::_e0 = do {[qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]}); ::is_deeply $::_g0, $::_e0, '[find "hello", "*.txt"]; # --> [qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 my @dirs;
 
@@ -43,11 +43,11 @@ while(<$iter>) {
     push @dirs, $_;
 }
 
-::is_deeply scalar do {\@dirs;}, scalar do {[qw!  hello  hello/big hello/small  !]}, '\@dirs; # --> [qw!  hello  hello/big hello/small  !]';
+local ($::_g0 = do {\@dirs;}, $::_e0 = do {[qw!  hello  hello/big hello/small  !]}); ::is_deeply $::_g0, $::_e0, '\@dirs; # --> [qw!  hello  hello/big hello/small  !]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 erase reverse find "hello";
 
-::is scalar do {-e "hello";}, scalar do{undef}, '-e "hello";  # -> undef';
+local ($::_g0 = do {-e "hello";}, $::_e0 = do {undef}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-e "hello";  # -> undef' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION
@@ -71,21 +71,21 @@ erase reverse find "hello";
 # Считывает файл. Если параметр не указан, использует `$_`.
 # 
 ::done_testing; }; subtest 'cat ($file)' => sub { 
-::like scalar do {cat "/etc/passwd"}, qr{root}, 'cat "/etc/passwd"  # ~> root';
+::like scalar do {cat "/etc/passwd"}, qr{root}, 'cat "/etc/passwd"  # ~> root'; undef $::_g0; undef $::_e0;
 
 # 
 # `cat` читает со слоем `:utf8`. Но можно указать другой слой следующим образом:
 # 
 
 lay "unicode.txt", "↯";
-::is scalar do {length cat "unicode.txt"}, scalar do{1}, 'length cat "unicode.txt"            # -> 1';
-::is scalar do {length cat["unicode.txt", ":raw"]}, scalar do{3}, 'length cat["unicode.txt", ":raw"]   # -> 3';
+local ($::_g0 = do {length cat "unicode.txt"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'length cat "unicode.txt"            # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {length cat["unicode.txt", ":raw"]}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'length cat["unicode.txt", ":raw"]   # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # `cat` вызывает исключение в случае ошибки операции ввода-вывода:
 # 
 
-::like scalar do {eval { cat "A" }; $@}, qr{cat A: No such file or directory}, 'eval { cat "A" }; $@  # ~> cat A: No such file or directory';
+::like scalar do {eval { cat "A" }; $@}, qr{cat A: No such file or directory}, 'eval { cat "A" }; $@  # ~> cat A: No such file or directory'; undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -106,10 +106,10 @@ lay "unicode.txt", "↯";
 # * `lay`, использует слой `:utf8`. Для указания иного слоя используется массив из двух элементов в параметре `$file`:
 # 
 ::done_testing; }; subtest 'lay ($file?, $content)' => sub { 
-::is scalar do {lay "unicode.txt", "↯"}, "unicode.txt", 'lay "unicode.txt", "↯"  # => unicode.txt';
-::is scalar do {lay ["unicode.txt", ":raw"], "↯"}, "unicode.txt", 'lay ["unicode.txt", ":raw"], "↯"  # => unicode.txt';
+local ($::_g0 = do {lay "unicode.txt", "↯"}, $::_e0 = "unicode.txt"); ::ok $::_g0 eq $::_e0, 'lay "unicode.txt", "↯"  # => unicode.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {lay ["unicode.txt", ":raw"], "↯"}, $::_e0 = "unicode.txt"); ::ok $::_g0 eq $::_e0, 'lay ["unicode.txt", ":raw"], "↯"  # => unicode.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::like scalar do {eval { lay "/", "↯" }; $@}, qr{lay /: Is a directory}, 'eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory';
+::like scalar do {eval { lay "/", "↯" }; $@}, qr{lay /: Is a directory}, 'eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory'; undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -138,7 +138,7 @@ lay "unicode.txt", "↯";
 # Если фильтр -X не является файловой функцией perl, то выбрасывается исключение:
 # 
 ::done_testing; }; subtest 'find (;$path, @filters)' => sub { 
-::like scalar do {eval { find "example", "-h" }; $@}, qr{Undefined subroutine &Aion::Fs::h called}, 'eval { find "example", "-h" }; $@   # ~> Undefined subroutine &Aion::Fs::h called';
+::like scalar do {eval { find "example", "-h" }; $@}, qr{Undefined subroutine &Aion::Fs::h called}, 'eval { find "example", "-h" }; $@   # ~> Undefined subroutine &Aion::Fs::h called'; undef $::_g0; undef $::_e0;
 
 # 
 # В этом примере `find` не может войти в подкаталог и передаёт ошибку в функцию `errorenter` (см. ниже) с установленными переменными `$_` и `$!` (путём к каталогу и сообщением ОС об ошибке). 
@@ -148,16 +148,16 @@ lay "unicode.txt", "↯";
 
 mkpath ["example/", 0];
 
-::is_deeply scalar do {[find "example"]}, scalar do {["example"]}, '[find "example"]                  # --> ["example"]';
-::is_deeply scalar do {[find "example", noenter "-d"]}, scalar do {["example"]}, '[find "example", noenter "-d"]    # --> ["example"]';
+local ($::_g0 = do {[find "example"]}, $::_e0 = do {["example"]}); ::is_deeply $::_g0, $::_e0, '[find "example"]                  # --> ["example"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[find "example", noenter "-d"]}, $::_e0 = do {["example"]}); ::is_deeply $::_g0, $::_e0, '[find "example", noenter "-d"]    # --> ["example"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::like scalar do {eval { find "example", errorenter { die "find $_: $!" } }; $@}, qr{find example: Permission denied}, 'eval { find "example", errorenter { die "find $_: $!" } }; $@   # ~> find example: Permission denied';
+::like scalar do {eval { find "example", errorenter { die "find $_: $!" } }; $@}, qr{find example: Permission denied}, 'eval { find "example", errorenter { die "find $_: $!" } }; $@   # ~> find example: Permission denied'; undef $::_g0; undef $::_e0;
 
 mkpath for qw!ex/1/11 ex/1/12 ex/2/21 ex/2/22!;
 
 my $count = 0;
 find "ex", sub { find_stop if ++$count == 3; 1};
-::is scalar do {$count}, scalar do{3}, '$count # -> 3';
+local ($::_g0 = do {$count}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$count # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -209,7 +209,7 @@ find "ex", sub { find_stop if ++$count == 3; 1};
 ::done_testing; }; subtest 'find_stop ()' => sub { 
 my $count = 0;
 find "ex", sub { find_stop if ++$count == 3; 1};
-::is scalar do {$count}, scalar do{3}, '$count # -> 3';
+local ($::_g0 = do {$count}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$count # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## erase (@paths)
@@ -217,8 +217,8 @@ find "ex", sub { find_stop if ++$count == 3; 1};
 # Удаляет файлы и пустые каталоги. Возвращает `@paths`. При ошибке ввода-вывода выбрасывает исключение.
 # 
 ::done_testing; }; subtest 'erase (@paths)' => sub { 
-::like scalar do {eval { erase "/" }; $@}, qr{erase dir /: Device or resource busy}, 'eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy';
-::like scalar do {eval { erase "/dev/null" }; $@}, qr{erase file /dev/null: Permission denied}, 'eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied';
+::like scalar do {eval { erase "/" }; $@}, qr{erase dir /: Device or resource busy}, 'eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy'; undef $::_g0; undef $::_e0;
+::like scalar do {eval { erase "/dev/null" }; $@}, qr{erase file /dev/null: Permission denied}, 'eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied'; undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -246,7 +246,7 @@ find "ex", sub { find_stop if ++$count == 3; 1};
 local $_ = "replace.ex";
 lay "abc";
 replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
-::is scalar do {cat}, "¡bc", 'cat  # => ¡bc';
+local ($::_g0 = do {cat}, $::_e0 = "¡bc"); ::ok $::_g0 eq $::_e0, 'cat  # => ¡bc' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -267,12 +267,12 @@ replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 # 
 ::done_testing; }; subtest 'mkpath (;$path)' => sub { 
 local $_ = ["A", 0755];
-::is scalar do {mkpath}, "A", 'mkpath   # => A';
+local ($::_g0 = do {mkpath}, $::_e0 = "A"); ::ok $::_g0 eq $::_e0, 'mkpath   # => A' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::like scalar do {eval { mkpath "/A/" }; $@}, qr{mkpath /A: Permission denied}, 'eval { mkpath "/A/" }; $@   # ~> mkpath /A: Permission denied';
+::like scalar do {eval { mkpath "/A/" }; $@}, qr{mkpath /A: Permission denied}, 'eval { mkpath "/A/" }; $@   # ~> mkpath /A: Permission denied'; undef $::_g0; undef $::_e0;
 
 mkpath "A///./file";
-::is scalar do {-d "A"}, scalar do{1}, '-d "A"  # -> 1';
+local ($::_g0 = do {-d "A"}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-d "A"  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -288,9 +288,9 @@ mkpath "A///./file";
 # 
 ::done_testing; }; subtest 'mtime (;$path)' => sub { 
 local $_ = "nofile";
-::like scalar do {eval { mtime }; $@}, qr{mtime nofile: No such file or directory}, 'eval { mtime }; $@  # ~> mtime nofile: No such file or directory';
+::like scalar do {eval { mtime }; $@}, qr{mtime nofile: No such file or directory}, 'eval { mtime }; $@  # ~> mtime nofile: No such file or directory'; undef $::_g0; undef $::_e0;
 
-::like scalar do {mtime ["/"]}, qr{^\d+(\.\d+)?$}, 'mtime ["/"]   # ~> ^\d+(\.\d+)?$';
+::like scalar do {mtime ["/"]}, qr{^\d+(\.\d+)?$}, 'mtime ["/"]   # ~> ^\d+(\.\d+)?$'; undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -310,10 +310,10 @@ local $_ = "nofile";
 # 
 ::done_testing; }; subtest 'sta (;$path)' => sub { 
 local $_ = "nofile";
-::like scalar do {eval { sta }; $@}, qr{sta nofile: No such file or directory}, 'eval { sta }; $@  # ~> sta nofile: No such file or directory';
+::like scalar do {eval { sta }; $@}, qr{sta nofile: No such file or directory}, 'eval { sta }; $@  # ~> sta nofile: No such file or directory'; undef $::_g0; undef $::_e0;
 
-::like scalar do {sta(["/"])->{ino}}, qr{^\d+$}, 'sta(["/"])->{ino} # ~> ^\d+$';
-::like scalar do {sta(".")->{atime}}, qr{^\d+(\.\d+)?$}, 'sta(".")->{atime} # ~> ^\d+(\.\d+)?$';
+::like scalar do {sta(["/"])->{ino}}, qr{^\d+$}, 'sta(["/"])->{ino} # ~> ^\d+$'; undef $::_g0; undef $::_e0;
+::like scalar do {sta(".")->{atime}}, qr{^\d+(\.\d+)?$}, 'sta(".")->{atime} # ~> ^\d+(\.\d+)?$'; undef $::_g0; undef $::_e0;
 
 # 
 # ### See also
@@ -345,42 +345,42 @@ local $_ = "nofile";
 {
     local $^O = "freebsd";
 
-::is_deeply scalar do {path "."}, scalar do {{path => ".", file => ".", name => "."}}, '    path "."        # --> {path => ".", file => ".", name => "."}';
-::is_deeply scalar do {path ".bashrc"}, scalar do {{path => ".bashrc", file => ".bashrc", name => ".bashrc"}}, '    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}';
-::is_deeply scalar do {path ".bash.rc"}, scalar do {{path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}}, '    path ".bash.rc"  # --> {path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}';
-::is_deeply scalar do {path ["/"]}, scalar do {{path => "/", dir => "/"}}, '    path ["/"]      # --> {path => "/", dir => "/"}';
+local ($::_g0 = do {path "."}, $::_e0 = do {{path => ".", file => ".", name => "."}}); ::is_deeply $::_g0, $::_e0, '    path "."        # --> {path => ".", file => ".", name => "."}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path ".bashrc"}, $::_e0 = do {{path => ".bashrc", file => ".bashrc", name => ".bashrc"}}); ::is_deeply $::_g0, $::_e0, '    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path ".bash.rc"}, $::_e0 = do {{path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}}); ::is_deeply $::_g0, $::_e0, '    path ".bash.rc"  # --> {path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path ["/"]}, $::_e0 = do {{path => "/", dir => "/"}}); ::is_deeply $::_g0, $::_e0, '    path ["/"]      # --> {path => "/", dir => "/"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
     local $_ = "";
-::is_deeply scalar do {path}, scalar do {{path => ""}}, '    path            # --> {path => ""}';
-::is_deeply scalar do {path "a/b/c.ext.ly"}, scalar do {{path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}, '    path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}';
+local ($::_g0 = do {path}, $::_e0 = do {{path => ""}}); ::is_deeply $::_g0, $::_e0, '    path            # --> {path => ""}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path "a/b/c.ext.ly"}, $::_e0 = do {{path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}); ::is_deeply $::_g0, $::_e0, '    path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path +{dir  => "/", ext => "ext.ly"}}, "/.ext.ly", '    path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly';
-::is scalar do {path +{file => "b.c", ext => "ly"}}, "b.ly", '    path +{file => "b.c", ext => "ly"}      # => b.ly';
-::is scalar do {path +{path => "a/b/f.c", dir => "m"}}, "m/f.c", '    path +{path => "a/b/f.c", dir => "m"}   # => m/f.c';
+local ($::_g0 = do {path +{dir  => "/", ext => "ext.ly"}}, $::_e0 = "/.ext.ly"); ::ok $::_g0 eq $::_e0, '    path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{file => "b.c", ext => "ly"}}, $::_e0 = "b.ly"); ::ok $::_g0 eq $::_e0, '    path +{file => "b.c", ext => "ly"}      # => b.ly' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{path => "a/b/f.c", dir => "m"}}, $::_e0 = "m/f.c"); ::ok $::_g0 eq $::_e0, '    path +{path => "a/b/f.c", dir => "m"}   # => m/f.c' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
     local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
-::is scalar do {path}, "f", '    path # => f';
-::is scalar do {path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"}}, "m/y//j.ext", '    path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # => m/y//j.ext';
-::is scalar do {path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"}}, "/y/j.ext", '    path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext';
+local ($::_g0 = do {path}, $::_e0 = "f"); ::ok $::_g0 eq $::_e0, '    path # => f' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"}}, $::_e0 = "m/y//j.ext"); ::ok $::_g0 eq $::_e0, '    path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # => m/y//j.ext' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"}}, $::_e0 = "/y/j.ext"); ::ok $::_g0 eq $::_e0, '    path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
     local $^O = "MSWin32"; # also os2, symbian and dos
 
-::is_deeply scalar do {path "."}, scalar do {{path => ".", file => ".", name => "."}}, '    path "."        # --> {path => ".", file => ".", name => "."}';
-::is_deeply scalar do {path ".bashrc"}, scalar do {{path => ".bashrc", file => ".bashrc", name => ".bashrc"}}, '    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}';
-::is_deeply scalar do {path "/"}, scalar do {{path => "\\", dir => "\\", folder => "\\"}}, '    path "/"        # --> {path => "\\", dir => "\\", folder => "\\"}';
-::is_deeply scalar do {path "\\"}, scalar do {{path => "\\", dir => "\\", folder => "\\"}}, '    path "\\"       # --> {path => "\\", dir => "\\", folder => "\\"}';
-::is_deeply scalar do {path ""}, scalar do {{path => ""}}, '    path ""         # --> {path => ""}';
-::is_deeply scalar do {path "a\\b\\c.ext.ly"}, scalar do {{path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}, '    path "a\\b\\c.ext.ly"   # --> {path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}';
+local ($::_g0 = do {path "."}, $::_e0 = do {{path => ".", file => ".", name => "."}}); ::is_deeply $::_g0, $::_e0, '    path "."        # --> {path => ".", file => ".", name => "."}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path ".bashrc"}, $::_e0 = do {{path => ".bashrc", file => ".bashrc", name => ".bashrc"}}); ::is_deeply $::_g0, $::_e0, '    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path "/"}, $::_e0 = do {{path => "\\", dir => "\\", folder => "\\"}}); ::is_deeply $::_g0, $::_e0, '    path "/"        # --> {path => "\\", dir => "\\", folder => "\\"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path "\\"}, $::_e0 = do {{path => "\\", dir => "\\", folder => "\\"}}); ::is_deeply $::_g0, $::_e0, '    path "\\"       # --> {path => "\\", dir => "\\", folder => "\\"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path ""}, $::_e0 = do {{path => ""}}); ::is_deeply $::_g0, $::_e0, '    path ""         # --> {path => ""}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path "a\\b\\c.ext.ly"}, $::_e0 = do {{path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}); ::is_deeply $::_g0, $::_e0, '    path "a\\b\\c.ext.ly"   # --> {path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path +{dir  => "/", ext => "ext.ly"}}, "\\.ext.ly", '    path +{dir  => "/", ext => "ext.ly"}    # => \\.ext.ly';
-::is scalar do {path +{dir  => "\\", ext => "ext.ly"}}, "\\.ext.ly", '    path +{dir  => "\\", ext => "ext.ly"}   # => \\.ext.ly';
-::is scalar do {path +{file => "b.c", ext => "ly"}}, "b.ly", '    path +{file => "b.c", ext => "ly"}      # => b.ly';
-::is scalar do {path +{path => "a/b/f.c", dir => "m/r/"}}, "m\\r\\f.c", '    path +{path => "a/b/f.c", dir => "m/r/"}   # => m\\r\\f.c';
+local ($::_g0 = do {path +{dir  => "/", ext => "ext.ly"}}, $::_e0 = "\\.ext.ly"); ::ok $::_g0 eq $::_e0, '    path +{dir  => "/", ext => "ext.ly"}    # => \\.ext.ly' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{dir  => "\\", ext => "ext.ly"}}, $::_e0 = "\\.ext.ly"); ::ok $::_g0 eq $::_e0, '    path +{dir  => "\\", ext => "ext.ly"}   # => \\.ext.ly' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{file => "b.c", ext => "ly"}}, $::_e0 = "b.ly"); ::ok $::_g0 eq $::_e0, '    path +{file => "b.c", ext => "ly"}      # => b.ly' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{path => "a/b/f.c", dir => "m/r/"}}, $::_e0 = "m\\r\\f.c"); ::ok $::_g0 eq $::_e0, '    path +{path => "a/b/f.c", dir => "m/r/"}   # => m\\r\\f.c' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path +{path => "a/b/f.c", dir => undef, ext => undef}}, "f", '    path +{path => "a/b/f.c", dir => undef, ext => undef} # => f';
-::is scalar do {path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"}}, 'x:m\y\j.ext', '    path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # \> x:m\y\j.ext';
-::is scalar do {path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"}}, '\y\j.ext', '    path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"} # \> \y\j.ext';
+local ($::_g0 = do {path +{path => "a/b/f.c", dir => undef, ext => undef}}, $::_e0 = "f"); ::ok $::_g0 eq $::_e0, '    path +{path => "a/b/f.c", dir => undef, ext => undef} # => f' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"}}, $::_e0 = 'x:m\y\j.ext'); ::ok $::_g0 eq $::_e0, '    path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # \> x:m\y\j.ext' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"}}, $::_e0 = '\y\j.ext'); ::ok $::_g0 eq $::_e0, '    path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"} # \> \y\j.ext' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -396,9 +396,9 @@ local $_ = "nofile";
         ext    => "txt",
     };
 
-::is_deeply scalar do {path "Work1:Documents/Letters/Letter1.txt"}, scalar do {$path}, '    path "Work1:Documents/Letters/Letter1.txt" # --> $path';
+local ($::_g0 = do {path "Work1:Documents/Letters/Letter1.txt"}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path "Work1:Documents/Letters/Letter1.txt" # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "Work", file => "Letter1.pm", ext => "txt"}}, "Work:Letter1.txt", '    path {volume => "Work", file => "Letter1.pm", ext => "txt"} # => Work:Letter1.txt';
+local ($::_g0 = do {path {volume => "Work", file => "Letter1.pm", ext => "txt"}}, $::_e0 = "Work:Letter1.txt"); ::ok $::_g0 eq $::_e0, '    path {volume => "Work", file => "Letter1.pm", ext => "txt"} # => Work:Letter1.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -414,9 +414,9 @@ local $_ = "nofile";
         ext    => "txt",
     };
 
-::is_deeply scalar do {path "/cygdrive/c/Documents/Letters/Letter1.txt"}, scalar do {$path}, '    path "/cygdrive/c/Documents/Letters/Letter1.txt" # --> $path';
+local ($::_g0 = do {path "/cygdrive/c/Documents/Letters/Letter1.txt"}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path "/cygdrive/c/Documents/Letters/Letter1.txt" # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "c", file => "Letter1.pm", ext => "txt"}}, "/cygdrive/c/Letter1.txt", '    path {volume => "c", file => "Letter1.pm", ext => "txt"} # => /cygdrive/c/Letter1.txt';
+local ($::_g0 = do {path {volume => "c", file => "Letter1.pm", ext => "txt"}}, $::_e0 = "/cygdrive/c/Letter1.txt"); ::ok $::_g0 eq $::_e0, '    path {volume => "c", file => "Letter1.pm", ext => "txt"} # => /cygdrive/c/Letter1.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -432,10 +432,10 @@ local $_ = "nofile";
         ext    => 'txt',
     };
 
-::is_deeply scalar do {path 'c:\Documents\Letters\Letter1.txt'}, scalar do {$path}, '    path \'c:\Documents\Letters\Letter1.txt\' # --> $path';
+local ($::_g0 = do {path 'c:\Documents\Letters\Letter1.txt'}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path \'c:\Documents\Letters\Letter1.txt\' # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "c", file => "Letter1.pm", ext => "txt"}}, 'c:Letter1.txt', '    path {volume => "c", file => "Letter1.pm", ext => "txt"} # \> c:Letter1.txt';
-::is scalar do {path {dir => 'r\t\\',  file => "Letter1",    ext => "txt"}}, 'r\t\Letter1.txt', '    path {dir => \'r\t\\\',  file => "Letter1",    ext => "txt"} # \> r\t\Letter1.txt';
+local ($::_g0 = do {path {volume => "c", file => "Letter1.pm", ext => "txt"}}, $::_e0 = 'c:Letter1.txt'); ::ok $::_g0 eq $::_e0, '    path {volume => "c", file => "Letter1.pm", ext => "txt"} # \> c:Letter1.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {dir => 'r\t\\',  file => "Letter1",    ext => "txt"}}, $::_e0 = 'r\t\Letter1.txt'); ::ok $::_g0 eq $::_e0, '    path {dir => \'r\t\\\',  file => "Letter1",    ext => "txt"} # \> r\t\Letter1.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -453,7 +453,7 @@ local $_ = "nofile";
         ext    => "EXTENSION",
     };
 
-::is_deeply scalar do {path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION"}, scalar do {$path}, '    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION" # --> $path';
+local ($::_g0 = do {path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION";}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION"; # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
     $path = {
         path        => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7',
@@ -472,10 +472,10 @@ local $_ = "nofile";
         version     => 7,
     };
 
-::is_deeply scalar do {path 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7'}, scalar do {$path}, '    path \'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7\' # --> $path';
+local ($::_g0 = do {path 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7'}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path \'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7\' # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"}}, "DISK:FILENAME.EXTENSION", '    path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"} # => DISK:FILENAME.EXTENSION';
-::is scalar do {path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"}}, '$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION', '    path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"} # \> $USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION';
+local ($::_g0 = do {path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"}}, $::_e0 = "DISK:FILENAME.EXTENSION"); ::ok $::_g0 eq $::_e0, '    path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"} # => DISK:FILENAME.EXTENSION' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"}}, $::_e0 = '$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION'); ::ok $::_g0 eq $::_e0, '    path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"} # \> $USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -493,12 +493,12 @@ local $_ = "nofile";
         ext     => "txt",
     };
 
-::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+local ($::_g0 = do {path $path->{path}}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path $path->{path} # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"}}, "%sysname#module1>File.txt", '    path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"} # => %sysname#module1>File.txt';
-::is scalar do {path {module => "module1", file => "File.pm"}}, "%#module1>File.pm", '    path {module => "module1", file => "File.pm"} # => %#module1>File.pm';
-::is scalar do {path {sysname => "sysname", file => "File.pm"}}, "%sysname#>File.pm", '    path {sysname => "sysname", file => "File.pm"} # => %sysname#>File.pm';
-::is scalar do {path {dir => "dir>subdir>", file => "File.pm", ext => "txt"}}, "dir>subdir>File.txt", '    path {dir => "dir>subdir>", file => "File.pm", ext => "txt"} # => dir>subdir>File.txt';
+local ($::_g0 = do {path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"}}, $::_e0 = "%sysname#module1>File.txt"); ::ok $::_g0 eq $::_e0, '    path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"} # => %sysname#module1>File.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {module => "module1", file => "File.pm"}}, $::_e0 = "%#module1>File.pm"); ::ok $::_g0 eq $::_e0, '    path {module => "module1", file => "File.pm"} # => %#module1>File.pm' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {sysname => "sysname", file => "File.pm"}}, $::_e0 = "%sysname#>File.pm"); ::ok $::_g0 eq $::_e0, '    path {sysname => "sysname", file => "File.pm"} # => %sysname#>File.pm' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {dir => "dir>subdir>", file => "File.pm", ext => "txt"}}, $::_e0 = "dir>subdir>File.txt"); ::ok $::_g0 eq $::_e0, '    path {dir => "dir>subdir>", file => "File.pm", ext => "txt"} # => dir>subdir>File.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -517,7 +517,7 @@ local $_ = "nofile";
         ext    => "Ext/Ext",
     };
 
-::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+local ($::_g0 = do {path $path->{path}}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path $path->{path} # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
     $path = {
         path => '.$.Directory.Directory.',
@@ -525,11 +525,11 @@ local $_ = "nofile";
         folder => '.$.Directory.Directory',
     };
 
-::is_deeply scalar do {path '.$.Directory.Directory.'}, scalar do {$path}, '    path \'.$.Directory.Directory.\' # --> $path';
+local ($::_g0 = do {path '.$.Directory.Directory.'}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path \'.$.Directory.Directory.\' # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "ADFS::HardDisk.", file => "File"}}, "ADFS::HardDisk.$.File", '    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File';
-::is scalar do {path {folder => "x"}}, "x.", '    path {folder => "x"}  # => x.';
-::is scalar do {path {dir    => "x."}}, "x.", '    path {dir    => "x."} # => x.';
+local ($::_g0 = do {path {volume => "ADFS::HardDisk.", file => "File"}}, $::_e0 = "ADFS::HardDisk.$.File"); ::ok $::_g0 eq $::_e0, '    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {folder => "x"}}, $::_e0 = "x."); ::ok $::_g0 eq $::_e0, '    path {folder => "x"}  # => x.' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {dir    => "x."}}, $::_e0 = "x."); ::ok $::_g0 eq $::_e0, '    path {dir    => "x."} # => x.' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -544,13 +544,13 @@ local $_ = "nofile";
         ext    => "doc",
     };
 
-::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
-::is scalar do {path $path}, "$path->{path}", '    path $path         # => $path->{path}';
+local ($::_g0 = do {path $path->{path}}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path $path->{path} # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path $path}, $::_e0 = "$path->{path}"); ::ok $::_g0 eq $::_e0, '    path $path         # => $path->{path}' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is_deeply scalar do {path 'report'}, scalar do {{path => 'report', file => 'report', name => 'report'}}, '    path \'report\' # --> {path => \'report\', file => \'report\', name => \'report\'}';
+local ($::_g0 = do {path 'report'}, $::_e0 = do {{path => 'report', file => 'report', name => 'report'}}); ::is_deeply $::_g0, $::_e0, '    path \'report\' # --> {path => \'report\', file => \'report\', name => \'report\'}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "x", file => "f"}}, "x:f", '    path {volume => "x", file => "f"} # => x:f';
-::is scalar do {path {folder => "x"}}, "x:", '    path {folder => "x"} # => x:';
+local ($::_g0 = do {path {volume => "x", file => "f"}}, $::_e0 = "x:f"); ::ok $::_g0 eq $::_e0, '    path {volume => "x", file => "f"} # => x:f' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {path {folder => "x"}}, $::_e0 = "x:"); ::ok $::_g0 eq $::_e0, '    path {folder => "x"} # => x:' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 {
@@ -565,9 +565,9 @@ local $_ = "nofile";
         volume => "VOLUME",
     };
 
-::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+local ($::_g0 = do {path $path->{path}}, $::_e0 = do {$path}); ::is_deeply $::_g0, $::_e0, '    path $path->{path} # --> $path' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path {volume => "x", file => "f"}}, scalar do{' f  x'}, '    path {volume => "x", file => "f"} # -> \' f  x\'';
+local ($::_g0 = do {path {volume => "x", file => "f"}}, $::_e0 = do {' f  x'}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '    path {volume => "x", file => "f"} # -> \' f  x\'' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
 
 
@@ -607,9 +607,9 @@ local $_ = "nofile";
 # 
 ::done_testing; }; subtest 'transpath ($path?, $from, $to)' => sub { 
 local $_ = ">x>y>z.doc.zip";
-::is scalar do {transpath "vos", "unix"}, '/x/y/z.doc.zip', 'transpath "vos", "unix"       # \> /x/y/z.doc.zip';
-::is scalar do {transpath "vos", "VMS"}, '[.x.y]z.doc.zip', 'transpath "vos", "VMS"        # \> [.x.y]z.doc.zip';
-::is scalar do {transpath $_, "vos", "RiscOS"}, '.x.y.z/doc/zip', 'transpath $_, "vos", "RiscOS" # \> .x.y.z/doc/zip';
+local ($::_g0 = do {transpath "vos", "unix"}, $::_e0 = '/x/y/z.doc.zip'); ::ok $::_g0 eq $::_e0, 'transpath "vos", "unix"       # \> /x/y/z.doc.zip' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {transpath "vos", "VMS"}, $::_e0 = '[.x.y]z.doc.zip'); ::ok $::_g0 eq $::_e0, 'transpath "vos", "VMS"        # \> [.x.y]z.doc.zip' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {transpath $_, "vos", "RiscOS"}, $::_e0 = '.x.y.z/doc/zip'); ::ok $::_g0 eq $::_e0, 'transpath $_, "vos", "RiscOS" # \> .x.y.z/doc/zip' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # 
@@ -619,7 +619,7 @@ local $_ = ">x>y>z.doc.zip";
 # 
 ::done_testing; }; subtest 'splitdir (;$dir)' => sub { 
 local $^O = "unix";
-::is_deeply scalar do {[ splitdir "/x/" ]}, scalar do {["", "x", ""]}, '[ splitdir "/x/" ]    # --> ["", "x", ""]';
+local ($::_g0 = do {[ splitdir "/x/" ]}, $::_e0 = do {["", "x", ""]}); ::is_deeply $::_g0, $::_e0, '[ splitdir "/x/" ]    # --> ["", "x", ""]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## joindir (;$dirparts)
@@ -628,9 +628,9 @@ local $^O = "unix";
 # 
 ::done_testing; }; subtest 'joindir (;$dirparts)' => sub { 
 local $^O = "unix";
-::is scalar do {joindir qw/x y z/}, "x/y/z", 'joindir qw/x y z/    # => x/y/z';
+local ($::_g0 = do {joindir qw/x y z/}, $::_e0 = "x/y/z"); ::ok $::_g0 eq $::_e0, 'joindir qw/x y z/    # => x/y/z' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path +{ dir => joindir qw/x y z/ }}, "x/y/z/", 'path +{ dir => joindir qw/x y z/ } # => x/y/z/';
+local ($::_g0 = do {path +{ dir => joindir qw/x y z/ }}, $::_e0 = "x/y/z/"); ::ok $::_g0 eq $::_e0, 'path +{ dir => joindir qw/x y z/ } # => x/y/z/' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## splitext (;$ext)
@@ -639,7 +639,7 @@ local $^O = "unix";
 # 
 ::done_testing; }; subtest 'splitext (;$ext)' => sub { 
 local $^O = "unix";
-::is_deeply scalar do {[ splitext ".x." ]}, scalar do {["", "x", ""]}, '[ splitext ".x." ]    # --> ["", "x", ""]';
+local ($::_g0 = do {[ splitext ".x." ]}, $::_e0 = do {["", "x", ""]}); ::is_deeply $::_g0, $::_e0, '[ splitext ".x." ]    # --> ["", "x", ""]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## joinext (;$extparts)
@@ -648,9 +648,9 @@ local $^O = "unix";
 # 
 ::done_testing; }; subtest 'joinext (;$extparts)' => sub { 
 local $^O = "unix";
-::is scalar do {joinext qw/x y z/}, "x.y.z", 'joinext qw/x y z/    # => x.y.z';
+local ($::_g0 = do {joinext qw/x y z/}, $::_e0 = "x.y.z"); ::ok $::_g0 eq $::_e0, 'joinext qw/x y z/    # => x.y.z' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {path +{ ext => joinext qw/x y z/ }}, ".x.y.z", 'path +{ ext => joinext qw/x y z/ } # => .x.y.z';
+local ($::_g0 = do {path +{ ext => joinext qw/x y z/ }}, $::_e0 = ".x.y.z"); ::ok $::_g0 eq $::_e0, 'path +{ ext => joinext qw/x y z/ } # => .x.y.z' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## include (;$pkg)
@@ -673,9 +673,9 @@ local $^O = "unix";
 # 
 ::done_testing; }; subtest 'include (;$pkg)' => sub { 
 use lib "lib";
-::like scalar do {include("A")->new}, qr{A=HASH\(0x\w+\)}, 'include("A")->new               # ~> A=HASH\(0x\w+\)';
-::is_deeply scalar do {[map include, qw/A N/]}, scalar do {[qw/A N/]}, '[map include, qw/A N/]          # --> [qw/A N/]';
-::is scalar do {{ local $_="N"; include->ex }}, scalar do{123}, '{ local $_="N"; include->ex }   # -> 123';
+::like scalar do {include("A")->new}, qr{A=HASH\(0x\w+\)}, 'include("A")->new               # ~> A=HASH\(0x\w+\)'; undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map include, qw/A N/]}, $::_e0 = do {[qw/A N/]}); ::is_deeply $::_g0, $::_e0, '[map include, qw/A N/]          # --> [qw/A N/]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {{ local $_="N"; include->ex }}, $::_e0 = do {123}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '{ local $_="N"; include->ex }   # -> 123' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## catonce (;$file)
@@ -688,10 +688,10 @@ use lib "lib";
 ::done_testing; }; subtest 'catonce (;$file)' => sub { 
 local $_ = "catonce.txt";
 lay "result";
-::is scalar do {catonce}, scalar do{"result"}, 'catonce  # -> "result"';
-::is scalar do {catonce}, scalar do{undef}, 'catonce  # -> undef';
+local ($::_g0 = do {catonce}, $::_e0 = do {"result"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'catonce  # -> "result"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {catonce}, $::_e0 = do {undef}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'catonce  # -> undef' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::like scalar do {eval { catonce[] }; $@}, qr{catonce not use ref path\!}, 'eval { catonce[] }; $@ # ~> catonce not use ref path!';
+::like scalar do {eval { catonce[] }; $@}, qr{catonce not use ref path\!}, 'eval { catonce[] }; $@ # ~> catonce not use ref path!'; undef $::_g0; undef $::_e0;
 
 # 
 # ## wildcard (;$wildcard)
@@ -708,8 +708,8 @@ lay "result";
 # * Остальные символы экранируются с помощью `quotemeta`.
 # 
 ::done_testing; }; subtest 'wildcard (;$wildcard)' => sub { 
-::is scalar do {wildcard "*.{pm,pl}"}, '(?^usn:^.*?\.(pm|pl)$)', 'wildcard "*.{pm,pl}"  # \> (?^usn:^.*?\.(pm|pl)$)';
-::is scalar do {wildcard "?_??_**"}, '(?^usn:^._[^/]_[^/]*?$)', 'wildcard "?_??_**"  # \> (?^usn:^._[^/]_[^/]*?$)';
+local ($::_g0 = do {wildcard "*.{pm,pl}"}, $::_e0 = '(?^usn:^.*?\.(pm|pl)$)'); ::ok $::_g0 eq $::_e0, 'wildcard "*.{pm,pl}"  # \> (?^usn:^.*?\.(pm|pl)$)' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {wildcard "?_??_**"}, $::_e0 = '(?^usn:^._[^/]_[^/]*?$)'); ::ok $::_g0 eq $::_e0, 'wildcard "?_??_**"  # \> (?^usn:^._[^/]_[^/]*?$)' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # Используется в фильтрах функции `find`.
@@ -737,9 +737,9 @@ lay "result";
 # 
 ::done_testing; }; subtest 'goto_editor ($path, $line)' => sub { 
 goto_editor "mypath", 10;
-::is scalar do {cat "ed.txt"}, "mypath:10\n", 'cat "ed.txt"  # => mypath:10\n';
+local ($::_g0 = do {cat "ed.txt"}, $::_e0 = "mypath:10\n"); ::ok $::_g0 eq $::_e0, 'cat "ed.txt"  # => mypath:10\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::like scalar do {eval { goto_editor "`", 1 }; $@}, qr{`:1 --> 512}, 'eval { goto_editor "`", 1 }; $@  # ~> `:1 --> 512';
+::like scalar do {eval { goto_editor "`", 1 }; $@}, qr{`:1 --> 512}, 'eval { goto_editor "`", 1 }; $@  # ~> `:1 --> 512'; undef $::_g0; undef $::_e0;
 
 # 
 # ## from_pkg (;$pkg)
@@ -747,8 +747,8 @@ goto_editor "mypath", 10;
 # Переводит пакет в путь ФС. Без параметра использует `$_`.
 # 
 ::done_testing; }; subtest 'from_pkg (;$pkg)' => sub { 
-::is scalar do {from_pkg "Aion::Fs"}, "Aion/Fs.pm", 'from_pkg "Aion::Fs"  # => Aion/Fs.pm';
-::is_deeply scalar do {[map from_pkg, "Aion::Fs", "A::B::C"]}, scalar do {["Aion/Fs.pm", "A/B/C.pm"]}, '[map from_pkg, "Aion::Fs", "A::B::C"]  # --> ["Aion/Fs.pm", "A/B/C.pm"]';
+local ($::_g0 = do {from_pkg "Aion::Fs"}, $::_e0 = "Aion/Fs.pm"); ::ok $::_g0 eq $::_e0, 'from_pkg "Aion::Fs"  # => Aion/Fs.pm' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map from_pkg, "Aion::Fs", "A::B::C"]}, $::_e0 = do {["Aion/Fs.pm", "A/B/C.pm"]}); ::is_deeply $::_g0, $::_e0, '[map from_pkg, "Aion::Fs", "A::B::C"]  # --> ["Aion/Fs.pm", "A/B/C.pm"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## to_pkg (;$path)
@@ -756,8 +756,8 @@ goto_editor "mypath", 10;
 # Переводит путь из ФС в пакет. Без параметра использует `$_`.
 # 
 ::done_testing; }; subtest 'to_pkg (;$path)' => sub { 
-::is scalar do {to_pkg "Aion/Fs.pm"}, "Aion::Fs", 'to_pkg "Aion/Fs.pm"  # => Aion::Fs';
-::is_deeply scalar do {[map to_pkg, "Aion/Fs.md", "A/B/C.md"]}, scalar do {["Aion::Fs", "A::B::C"]}, '[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]';
+local ($::_g0 = do {to_pkg "Aion/Fs.pm"}, $::_e0 = "Aion::Fs"); ::ok $::_g0 eq $::_e0, 'to_pkg "Aion/Fs.pm"  # => Aion::Fs' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map to_pkg, "Aion/Fs.md", "A/B/C.md"]}, $::_e0 = do {["Aion::Fs", "A::B::C"]}); ::is_deeply $::_g0, $::_e0, '[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## from_inc (;$pkg)
@@ -765,10 +765,10 @@ goto_editor "mypath", 10;
 # Переводит пакет в путь ФС в `@INC`. Файл с пакетом должен существовать в одном из путей `@INC`. Без параметра использует `$_`.
 # 
 ::done_testing; }; subtest 'from_inc (;$pkg)' => sub { 
-::is scalar do {from_inc "Aion::Fs"}, scalar do{$INC{'Aion/Fs.pm'}}, 'from_inc "Aion::Fs" # -> $INC{\'Aion/Fs.pm\'}';
-::is_deeply scalar do {[map from_inc, "A::B::C", "Aion::Fs"]}, scalar do {[$INC{'Aion/Fs.pm'}]}, '[map from_inc, "A::B::C", "Aion::Fs"]  # --> [$INC{\'Aion/Fs.pm\'}]';
+local ($::_g0 = do {from_inc "Aion::Fs"}, $::_e0 = do {$INC{'Aion/Fs.pm'}}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'from_inc "Aion::Fs" # -> $INC{\'Aion/Fs.pm\'}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map from_inc, "A::B::C", "Aion::Fs"]}, $::_e0 = do {[$INC{'Aion/Fs.pm'}]}); ::is_deeply $::_g0, $::_e0, '[map from_inc, "A::B::C", "Aion::Fs"]  # --> [$INC{\'Aion/Fs.pm\'}]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {from_inc "A::B::C"}, scalar do{undef}, 'from_inc "A::B::C" # -> undef';
+local ($::_g0 = do {from_inc "A::B::C"}, $::_e0 = do {undef}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'from_inc "A::B::C" # -> undef' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## to_inc (;$path)
@@ -776,10 +776,99 @@ goto_editor "mypath", 10;
 # Переводит путь из ФС в `@INC` в пакет. Без параметра использует `$_`.
 # 
 ::done_testing; }; subtest 'to_inc (;$path)' => sub { 
-::is scalar do {to_inc $INC{'Aion/Fs.pm'}}, "Aion::Fs", 'to_inc $INC{\'Aion/Fs.pm\'} # => Aion::Fs';
-::is_deeply scalar do {[map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]}, scalar do {["Aion::Fs"]}, '[map to_inc,"A/B/C.pm", $INC{\'Aion/Fs.pm\'}]  # --> ["Aion::Fs"]';
+local ($::_g0 = do {to_inc $INC{'Aion/Fs.pm'}}, $::_e0 = "Aion::Fs"); ::ok $::_g0 eq $::_e0, 'to_inc $INC{\'Aion/Fs.pm\'} # => Aion::Fs' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]}, $::_e0 = do {["Aion::Fs"]}); ::is_deeply $::_g0, $::_e0, '[map to_inc,"A/B/C.pm", $INC{\'Aion/Fs.pm\'}]  # --> ["Aion::Fs"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::is scalar do {to_inc 'Aion/Fs.pm'}, scalar do{undef}, 'to_inc \'Aion/Fs.pm\' # -> undef';
+local ($::_g0 = do {to_inc 'Aion/Fs.pm'}, $::_e0 = do {undef}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'to_inc \'Aion/Fs.pm\' # -> undef' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## ilay (;$path)
+# 
+# Создаёт файловый дескриптор. Он умеет закрываться, как только на него исчезнет последняя ссылка.
+# 
+# Так же имеет метод `path`, к-й возвращает путь к файлу.
+# 
+::done_testing; }; subtest 'ilay (;$path)' => sub { 
+my $test_file = "test_ilay_complete.txt";
+
+my $f = ilay $test_file;
+print $f "Line 1\n";
+print $f "Line 2\n";
+
+my $std = select $f; $| = 1; select $std;
+local ($::_g0 = do {-s $f}, $::_e0 = do {14}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-s $f # -> 14' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {$f->path}, $::_e0 = "test_ilay_complete.txt"); ::ok $::_g0 eq $::_e0, '$f->path # => test_ilay_complete.txt' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {fileno($f) > 0}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'fileno($f) > 0 # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+undef $f;
+
+local ($::_g0 = do {cat $test_file}, $::_e0 = "Line 1\nLine 2\n"); ::ok $::_g0 eq $::_e0, 'cat $test_file # => Line 1\nLine 2\n' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local $_ = [$test_file, ':raw'];
+my $f = ilay;
+
+my $str = "string";
+my $num = 42;
+my $end = "END";
+
+*FD = *$f{IO};
+format FD =
+@<<<<<<<< @||||| @>>>>>
+$str,     $num,  $end
+.
+
+write FD;
+
+$str = 'int';
+
+write FD;
+
+undef *FD;
+undef $f;
+
+my $table = << 'TABLE';
+string      42      END
+int         42      END
+TABLE
+
+local ($::_g0 = do {cat $test_file}, $::_e0 = do {$table}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'cat $test_file # -> $table' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ### See also
+# 
+# * [IO::Handle](https://perldoc.perl.org/IO::Handle).
+# 
+# ## icat (;$file)
+# 
+# Создаёт файловый дескриптор с возможностью автозакрытия, как только пропадёт последняя на него ссылка.
+# 
+# Так же имеет метод `path` возвращающий переданный в него путь.
+# 
+::done_testing; }; subtest 'icat (;$file)' => sub { 
+local $_ = "test_icat_complete.txt";
+lay "Line 1\nLine 2\nLine 3\nBinary\x00\x01\x02";
+
+my $f = icat;
+
+my $bytes = read $f, my $buf, 6;
+local ($::_g0 = do {$bytes}, $::_e0 = do {6}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$bytes # -> 6' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$buf}, $::_e0 = "Line 1"); ::ok $::_g0 eq $::_e0, '$buf # => Line 1' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {scalar <$f>}, $::_e0 = do {"\n"}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'scalar <$f> # -> "\n"' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[<$f>]}, $::_e0 = do {["Line 2\n", "Line 3\n", "Binary\x00\x01\x02"]}); ::is_deeply $::_g0, $::_e0, '[<$f>] # --> ["Line 2\n", "Line 3\n", "Binary\x00\x01\x02"]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ### See also
+# 
+# * [IO::Handle](https://perldoc.perl.org/IO::Handle).
+# 
+# ## isUNIX ()
+# 
+# Мы находимся в ОС семейства UNIX.
+# 
+::done_testing; }; subtest 'isUNIX ()' => sub { 
+local ($::_g0 = do {isUNIX =~ /^(1|)$/}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'isUNIX =~ /^(1|)$/ # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # AUTHOR

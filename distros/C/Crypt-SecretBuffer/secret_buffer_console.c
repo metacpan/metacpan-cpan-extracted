@@ -53,6 +53,7 @@ static bool restore_console_state(int fd, console_state *prev_state) {
  * or -1 for temporary error. croaks on fatal error.
  */
 int secret_buffer_append_console_line(secret_buffer *buf, PerlIO *stream) {
+   dTHX;
    /* PerlIO may or may not be backed by a real OS file descriptor */
    int stream_fd= PerlIO_fileno(stream);
    /* Disable echo, if possible */

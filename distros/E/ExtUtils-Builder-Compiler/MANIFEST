@@ -10,8 +10,8 @@ README
 dist.ini
 lib/ExtUtils/Builder/ArgumentCollector.pm
 lib/ExtUtils/Builder/AutoDetect/C.pm
-lib/ExtUtils/Builder/AutoDetect/Cpp.pm
 lib/ExtUtils/Builder/Binary.pm
+lib/ExtUtils/Builder/BuildTools/FromPerl.pm
 lib/ExtUtils/Builder/Compiler.pm
 lib/ExtUtils/Builder/Compiler/MSVC.pm
 lib/ExtUtils/Builder/Compiler/Unixy.pm
@@ -27,12 +27,11 @@ lib/ExtUtils/Builder/Linker/PE/GCC.pm
 lib/ExtUtils/Builder/Linker/PE/MSVC.pm
 lib/ExtUtils/Builder/Linker/Unixy.pm
 lib/ExtUtils/Builder/Linker/XCOFF.pm
-lib/ExtUtils/Builder/MultiLingual.pm
 lib/ExtUtils/Builder/ParseXS.pm
 lib/ExtUtils/Builder/Profile/Perl.pm
 prereqs.yml
 t/30-compiler-unixy.t
 t/30-linker-elf-gcc.t
-t/40-autodetect-executable.t
-t/40-autodetect-loadable-object.t
+t/40-fromperl-executable.t
+t/40-fromperl-loadable-object.t
 xt/author/pod-syntax.t

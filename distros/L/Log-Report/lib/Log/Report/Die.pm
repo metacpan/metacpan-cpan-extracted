@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,10 +10,10 @@
 
 
 package Log::Report::Die;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
-use base 'Exporter';
+use parent 'Exporter';
 
 use warnings;
 use strict;
@@ -64,7 +64,7 @@ sub die_decode($%)
 	  : @stack      ? 'PANIC'
 	  :               $args{on_die} || 'ERROR';
 
-	(\%opt, $reason, join("\n", @msg));
+	(\%opt, $reason, join("\n", @msg), 'die');
 }
 
 
@@ -96,7 +96,7 @@ sub _exception_dbix($$)
 	  : @stack       ? 'PANIC'
 	  :                $on_die || 'ERROR';
 
-	(\%opts, $reason, $message);
+	(\%opts, $reason, $message, 'exception, dbix');
 }
 
 my %_libxml_errno2reason = (1 => 'WARNING', 2 => 'MISTAKE', 3 => 'ERROR');
@@ -114,7 +114,7 @@ sub _exception_libxml($$)
 			. ' (' . $exc->domain . ' error ' . $exc->code . ')';
 
 	my $reason = $_libxml_errno2reason{$exc->level} || 'PANIC';
-	(\%opts, $reason, $msg);
+	(\%opts, $reason, $msg, 'exception, libxml');
 }
 
 sub exception_decode($%)
@@ -136,7 +136,7 @@ sub exception_decode($%)
 	my $reason = $errno ? 'FAULT' : ($args{on_die} || 'ERROR');
 
 	# hopefully stringification is overloaded
-	(\%opt, $reason, "$exception");
+	(\%opt, $reason, "$exception", 'exception');
 }
 
 "to die or not to die, that's the question";

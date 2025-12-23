@@ -23,7 +23,8 @@ Log::Report - report a problem, with exceptions and translation support
   print __"Hello World\n";      # no interpolation, optional translation
   print __x'Hello World';       # SYNTAX ERROR: quote is alternative for ::
 
-  # Functions replacing die/warn/carp, casting exceptions.
+  # Functions replacing die/warn/carp, casting exceptions but not message
+  # objects and no translation support.
   error "oops";                 # exception like die(), no translation
   -f $config or panic "Help!";  # alert/error/fault/info/...more
 
@@ -43,7 +44,7 @@ Log::Report - report a problem, with exceptions and translation support
 
   dispatcher SYSLOG => 'syslog' # also send to syslog,
     charset => 'iso-8859-1',    # explicit character conversions
-    locale => 'en_US';          # overrule user's locale
+    locale  => 'en_US';         # overrule user's locale
 
   dispatcher close => 'default' # stop default die/warn dispatcher
 
@@ -53,7 +54,7 @@ Log::Report - report a problem, with exceptions and translation support
   fault "cannot allocate $size bytes";     # no translation, ok
   fault __x"cannot allocate $size bytes";  # not translatable, wrong
 
-  # Translation depending on count
+  # Output (optionally with translation) depending on count
   # Leading and trailing whitespace stay magically outside translation
   # tables.  @files in scalar context.  Special parameter with _
   print __xn"found one file\n", "found {_count} files", @files;
@@ -73,8 +74,8 @@ Log::Report - report a problem, with exceptions and translation support
   info __"Hello World!";      # in Dutch, if translation table found
 
   # Exception classes, see Log::Report::Exception
-  try { error __x"something", _class => 'parsing,schema' };
-  if($@->wasFatal->inClass('parsing')) ...
+  try { error __x"something", _tags => 'parsing,schema' };
+  if($@->wasFatal->taggedWith('parsing')) ...
 
 =head1 DESCRIPTION
 
@@ -83,11 +84,11 @@ which are closely related in one:
 
 =over 4
 
-=item 1. logging (like L<Log::Log4Perl> and syslog), and
+=item 1. logging (like Log::Log4Perl and syslog), and
 
 =item 2. exceptions (like 'error' and 'info'), with
 
-=item 3. translations (like C<gettext> and L<Locale::TextDomain>)
+=item 3. translations (like C<gettext> and Locale::TextDomain)
 
 =back
 
@@ -288,9 +289,9 @@ that you shall not use a comma after the block when there are C<%options>
 specified.  On the other hand, you shall use a semi-colon after the
 block if there are no arguments.
 
-B<Be warned> that the {} are interpreted as subroutine, which means that,
-for instance, it has its own C<@_>.  The manual-page of Try::Tiny
-lists a few more side-effects of this.
+B<Be warned> that the C<{}> are interpreted as subroutine, which
+means that --for instance-- it has its own C<@_> parameter list.
+The manual-page of Try::Tiny lists a few more side-effects of this.
 
 » example: 
 
@@ -623,11 +624,11 @@ in L<Log::Report::Optional|Log::Report::Optional>.  It defaults to '0': my direc
 
 =over 2
 
-=item import => FUNCTION|ARRAY
+=item import => $function|\@functions
 
 [0.998] When not specified, the C<syntax> option determines the list
-of functions which are being exported.  With this option, the C<syntax>
-option is ignored and only the specified FUNCTION(s) are imported.
+of C<@functions> which are being exported.  With this option, the C<syntax>
+option is ignored and only the specified C<@functions> are imported.
 
 =item message_class => CLASS
 
@@ -659,12 +660,12 @@ pollute your namespace with the useful abbrev functions.
   use Log::Report 'my-domain',    # in one package, top of distr
     mode            => 'VERBOSE',
     syntax          => 'REPORT',  # report ERROR, not error()
-    translator      => Log::Report::Translator::POT->new
-      ( lexicon => '/home/mine/locale'  # translation tables
-      ),
-    native_language => 'nl_NL'; # untranslated msgs are Dutch
+    translator      => Log::Report::Translator::POT->new(
+       lexicon => '/home/mine/locale', # translation tables
+    ),
+    native_language => 'nl_NL';   # untranslated msgs are Dutch
 
-  use Log::Report import => 'try';      # or ARRAY of functions
+  use Log::Report import => 'try';     # or ARRAY of functions
 
 =item B<textdomain>( <[$name],$config>|<$name, 'DELETE'|'EXISTS'>|$domain )
 
@@ -755,7 +756,7 @@ The following ideas are the base of this implementation:
 
 =over 4
 
-=item . simplification
+=item * simplification
 
 Handling errors and warnings is probably the most labor-intensive
 task for a programmer: when programs are written correctly, up-to
@@ -763,7 +764,7 @@ three-quarters of the code is related to testing, reporting, and
 handling (problem) conditions.  Simplifying the way to create reports,
 simplifies programming and maintenance.
 
-=item . multiple dispatchers
+=item * multiple dispatchers
 
 It is not the location where the (for instance) error occurs which
 determines what will happen with the text, but the main application which
@@ -772,7 +773,7 @@ Based on the `reason' classification, they can get ignored, send to one
 or multiple dispatchers, like Log::Dispatch, Log::Log4perl,
 or UNIX syslog.
 
-=item . delayed translations
+=item * delayed translations
 
 The background ideas are that of Locale::TextDomain, based
 on C<gettext()>.  However, in the C<Log::Report> infrastructure,
@@ -780,7 +781,7 @@ translations are postponed until the text is dispatched to a screen
 or log-file; the same report can be sent to syslog in (for instance)
 English and to the user interface in Dutch.
 
-=item . context sensitive
+=item * context sensitive
 
 Using contexts, you can set-up how to translate or rewrite messages,
 to improve messages.  A typical problem is whether to use gender in
@@ -828,37 +829,37 @@ Defined by C<Log::Report> are
 
 =over 4
 
-=item . trace (debug, program)
+=item * trace (debug, program)
 
 The message will be used when some logger has debugging enabled.  The
 messages show steps taken by the program, which are of interest by the
 developers and maintainers of the code, but not for end-users.
 
-=item . assert (program)
+=item * assert (program)
 
 Shows an unexpected condition, but continues to run.  When you want the
 program to abort in such situation, that use C<panic>.
 
-=item . info (verbose, program)
+=item * info (verbose, program)
 
 These messages show larger steps in the execution of the program.
 Experienced users of the program usually do not want to see all these
 intermediate steps.  Most programs will display info messages (and
 higher) when some C<verbose> flag is given on the command-line.
 
-=item . notice (program)
+=item * notice (program)
 
 An user may need to be aware of the program's accidental smart behavior,
 for instance, that it initializes a lasting C<Desktop> directory in your
 home directory.  Notices should be sparse.
 
-=item . warning (program)
+=item * warning (program)
 
 The program encountered some problems, but was able to work around it
 by smart behavior.  For instance, the program does not understand a
 line from a log-file, but simply skips the line.
 
-=item . mistake (user)
+=item * mistake (user)
 
 When a user does something wrong, but what is correctable by smart
 behavior of the program.  For instance, in some configuration file,
@@ -868,7 +869,7 @@ interprets this as "yes", producing a mistake message as warning.
 It is much nicer to tell someone that he/she made a mistake, than
 to call that an error.
 
-=item . error (user)
+=item * error (user)
 
 The user did something wrong, which is not automatically correctable
 or the program is not willing to correct it automatically for reasons
@@ -876,7 +877,7 @@ of code quality.  For instance, an unknown option flag is given on the
 command-line.  These are configuration issues, and have no useful
 value in C<$!>.  The program will be stopped, usually before taken off.
 
-=item . fault (system)
+=item * fault (system)
 
 The program encountered a situation where it has no work-around.  For
 instance, a file cannot be opened to be written.  The cause of that
@@ -884,7 +885,7 @@ problem can be some user error (i.e. wrong filename), or external
 (you accidentally removed a directory yesterday).  In any case, the
 C<$!> (C<$ERRNO>) variable is set here.
 
-=item . alert (system)
+=item * alert (system)
 
 Some external cause disturbs the execution of the program, but the
 program stays alive and will try to continue operation.  For instance,
@@ -893,7 +894,7 @@ database can be reached and the program continues as if nothing happened.
 The cause is external, so C<$!> is set.  Usually, a system administrator
 needs to be informed about the problem.
 
-=item . failure (system)
+=item * failure (system)
 
 Some external cause makes it impossible for this program to continue.
 C<$!> is set, and usually the system administrator wants to be
@@ -903,7 +904,7 @@ The difference with C<fault> is subtile and not always clear.  A fault
 reports an error returned by an operating system call, where the failure
 would report an operational problem, like a failing mount.
 
-=item . panic (program)
+=item * panic (program)
 
 All above report classes are expected: some predictable situation
 is encountered, and therefore a message is produced.  However, programs
@@ -1038,99 +1039,30 @@ untranslated, with all unprocessed parameters still at hand.
 
 See L<Log::Report::Dispatcher::Try|Log::Report::Dispatcher::Try> and L<Log::Report::Exception|Log::Report::Exception>.
 
-=head2 Formats for interpolation and translation
+=head2 Interpolation via formats
 
-In above examples, you see C<__x()> everywhere.  When you use this,
-you get two benefits:
+Interpolation via formats is optional.
+
+In shown examples, you see C<__x()> everywhere.  Using that function
+is required when you wish to use translations (later in your project),
+but also has many other benefits.  The functions C<__x> and friends
+create a L<Log::Report::Message|Log::Report::Message> object.
+
+Continue reading:
 
 =over 4
 
-=item 1. interpolation
+=item * L<Log::Report::Message/"Why use format strings?">
 
-=item 2. optional translation
+=item * L<Log::Report::Message/"Messages with plural forms">
+
+=item * L<Log::Report::Message/"Interpolation with String::Print">
+
+=item * L<Log::Report::Message/"Automatic parameters">
 
 =back
 
-Simple perl scripts will use C<print()> with variables in the string.
-However, when the content of the variable gets more unpredictable or
-needs some pre-processing, then it gets tricky.  When you do want to
-introduce translations (in the far future of your successful project)
-it gets impossible.  Let me give you some examples:
-
-  print "product: $name\n";    # simple perl
-
-  # Will not work because "$name" is interpolated too early
-  print translate("product: $name"), "\n";
-
-  # This is the gettext solution, with formats
-  printf translate("product: %s\n"), $name;
-
-  # With named in stead of positional parameters
-  print translate("product: {p}\n", p => $name);
-
-  # With Log::Report, the translate() is hidden in __x()
-  print __x"product: {p}\n", p => $name;
-
-Besides making translation possible, interpolation via format strings
-is much cleaner than in the simpelest perl way.  For instance, these
-cases:
-
-  # Safety measures while interpolation
-  my $name = undef;
-  print "product: $name\n";   # uninitialized warning
-  print __x"product: {p}\n", p => $name;  # --> product: undef
-
-  # Interpolation of more complex data
-  my @names = qw/a b c/;
-  print "products: ", join(', ', @names), "\n";
-  print __x"products: {p}\n", p => \@names;
-
-  # Padded values hard to do without format strings
-  print "padded counter: ", ' ' x (6-length $c), "$c\n";
-  printf "padded counter: %6d\n", $counter;
-  print __x"padded counter: {c%6d}\n", c => $counter;
-
-So: using formats has many advantages.  Advice: use simple perl only in
-trace and assert messages, maybe also with panics.  For serious output
-of your program, use formatted output.
-
-=head3 Format with String::Print
-
-This L<Log::Report|Log::Report> module uses L<String::Print|String::Print> to handle formatted strings.
-On object of that module is hidden in the logic of L<__x()|Log::Report/"Messages (optionally translatable)"> and friends.
-
-L<String::Print|String::Print> is a very capable format string processor, and you should
-really B<read its manual> page to see how it can help you.  It would be
-possible to support an other formatter (pretty simple even), but this is
-not (yet) supported.
-
-=head4 » Example: using format features
-
-  # This tries to display the $param as useful and safe as possible,
-  # where you have totally no idea what its contents is.
-  error __x"illegal parameter {p UNKNOWN}.", p => $param;
-  # ---> "illegal parameter 'accidentally passed text'."
-  # ---> "illegal parameter Unexpected::Object::Type."
-
-  # fault() adds ": $!", with $! translated when configured.
-  open my($fh), "<:encoding(utf-8)", $filename
-  	 or fault __x"cannot read {file}", file => $filename;
-
-  # Auto-abbreviation
-  trace __x"first lines: '{text EL}'\n", text => $t;
-  # ---> "first lines: 'This text is long, we sho⋯'.\n"
-
-  trace __x"first lines: {text CHOP}\n", text => $t;
-  # ---> "This text is long, we [+3712 chars]\n"
-
-  info __x"file {file} size {size BYTES}\n", file => $fn, size => -s $fn;
-  # --> "/etc/passwd size 23kB\n"
-
-There are more nice standard interpolation modifiers, and you can add
-your own.  Besides, you can add serializers which determine how
-objects are inlined.
-
-=head3 Translations
+=head3 Translation
 
 Translating is optional.
 
@@ -1345,8 +1277,8 @@ Cast by C<import()>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.43,
-built on December 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.44,
+built on December 22, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

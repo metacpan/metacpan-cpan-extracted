@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.27;
+our $VERSION = v0.28;
 
 my @_subobjects = qw(db extractor store fii);
 
@@ -90,7 +90,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.27
+version v0.28
 
 =head1 SYNOPSIS
 

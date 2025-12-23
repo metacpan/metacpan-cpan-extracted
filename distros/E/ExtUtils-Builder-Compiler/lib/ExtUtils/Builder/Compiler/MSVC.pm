@@ -1,16 +1,21 @@
 package ExtUtils::Builder::Compiler::MSVC;
-$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.033';
+$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.034';
 use strict;
 use warnings;
 
-use parent qw/ExtUtils::Builder::Compiler ExtUtils::Builder::MultiLingual/;
+use parent qw/ExtUtils::Builder::Compiler/;
 
 sub _init {
 	my ($self, %args) = @_;
 	$args{cc} //= ['cl'];
+	$self->{language} = $args{language} // 'C';
 	$self->ExtUtils::Builder::Compiler::_init(%args);
-	$self->ExtUtils::Builder::MultiLingual::_init(%args);
 	return;
+}
+
+sub language {
+	my $self = shift;
+	return $self->{language};
 }
 
 sub compile_flags {
@@ -18,6 +23,7 @@ sub compile_flags {
 	my @ret;
 	push @ret, $self->new_argument(ranking => 5,  value => ['/NOLOGO']);
 	push @ret, $self->new_argument(ranking => 10, value => [qw{/TP /EHsc}]) if $self->language eq 'C++';
+	push @ret, $self->new_argument(ranking => 15, value => [ "/std:$self->{standard}"]) if $self->{standard};
 	push @ret, $self->new_argument(ranking => 75, value => [ "/Fo$to", '/c', $from ]);
 	push @ret, map { $self->new_argument(ranking => $_->{ranking}, value => [ "/I$_->{value}" ]) } @{ $self->{include_dirs} };
 	for my $entry (@{ $self->{defines} }) {
@@ -44,7 +50,7 @@ ExtUtils::Builder::Compiler::MSVC - Class for compiling with Microsoft Visual C
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 AUTHOR
 

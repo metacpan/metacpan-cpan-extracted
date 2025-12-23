@@ -21,31 +21,31 @@ no_index:
 provides:
   Data::Identifier:
     file: lib/Data/Identifier.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Cloudlet:
     file: lib/Data/Identifier/Cloudlet.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Generate:
     file: lib/Data/Identifier/Generate.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Interface::Known:
     file: lib/Data/Identifier/Interface/Known.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Interface::Simple:
     file: lib/Data/Identifier/Interface/Simple.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Interface::Subobjects:
     file: lib/Data/Identifier/Interface/Subobjects.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Interface::Userdata:
     file: lib/Data/Identifier/Interface/Userdata.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Util:
     file: lib/Data/Identifier/Util.pm
-    version: v0.27.0
+    version: v0.28.0
   Data::Identifier::Wellknown:
     file: lib/Data/Identifier/Wellknown.pm
-    version: v0.27.0
+    version: v0.28.0
 recommends:
   Crypt::URandom: '0.36'
   Digest::SHA: 5.95_01
@@ -60,7 +60,7 @@ requires:
   perl: v5.20.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-Identifier.git
-version: v0.27
+version: v0.28
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

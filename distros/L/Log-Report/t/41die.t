@@ -18,4 +18,5 @@ use DieTests;
 
 # we need a short stack trace
 sub simple_wrapper() { DieTests::run_tests() }
+
 simple_wrapper();

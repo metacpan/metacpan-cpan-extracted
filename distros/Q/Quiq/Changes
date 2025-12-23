@@ -1,3 +1,53 @@
+1.133.2025-12-22
+================
+
+[Quiq::Smb::Client]
+* Konfiguration hinzugefügt
+
+[Quiq::StreamServe::Block]
+* getFirst(): Übergehe nicht-existente Attribute
+
+[Quiq::StreamServe::Stream]
+* lookup(): Methode hinzugefügt
+* lookupHeader(): Methode hinzugefügt
+
+[Quiq::Zugferd]
+* Doku hinzugefügt
+* Template erweitert
+
+[Quiq::Zugferd::Entity::Position]
+* Zu/Abschläge ergänzt
+
+[Quiq::Zugferd::Entity::Rechnung]
+* addFreitext(): Methode hinzugefügt
+
+[Quiq::Zugferd::Entity::Verkäufer]
+* Auftragsreferenz entfernt
+* Kontaktdaten hinzugefügt
+
+[Quiq::Zugferd::Entity::ZuAbschlagPosition]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd::Tree]
+* reduceTree(): Returnwert (Referenz auf Baum) hinzugefügt
+
+[Quiq::Exit]
+* check(): ^C wird toleriert
+
+[Quiq::Mustang]
+* new(): Option -javaDir (Pfad zum Programm C{java}) hinzugefügt
+
+[Quiq::Path]
+* dir(): Alias parent() hinzugefügt
+
+[Quiq::Tree]
+* leafPaths(): Doku um Beispiel ergänzt
+
+[Quiq::Zugferd]
+* combine(): Anhang ohne Pfad ergänzt
+* showPaths(): Methode hinzugefügt
+* toXml(): um zusätzliche Business Terms erweitert
+
 1.132 2025-10-20
 ================
 

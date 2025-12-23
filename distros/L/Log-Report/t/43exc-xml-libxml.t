@@ -27,7 +27,7 @@ isa_ok $error, 'XML::LibXML::Error';
 
 #warn Dumper exception_decode($error);
 my @dec = exception_decode($error);
-my $msg = pop @dec;
+my $msg = delete $dec[2];
 
 # error code changed from libxml2 2.9.9 to 2.9.10
 my $rc = delete $dec[0]{errno};
@@ -37,6 +37,8 @@ cmp_ok $rc, '>', 13000, 'error code';
 is_deeply \@dec,
   , [ { location => [ 'libxml', '', '1', 'parser' ], errno => 'RC' }
     , 'ERROR'
+    , undef    # removed into $msg
+    , 'exception, libxml'
     ], 'error 1';
 
 # the message may vary over libxml2 versions

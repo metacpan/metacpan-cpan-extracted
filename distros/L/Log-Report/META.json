@@ -64,7 +64,7 @@
          "web" : "https://github.com/markov2/perl5-Log-Report"
       }
    },
-   "version" : "1.43",
+   "version" : "1.44",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2007,

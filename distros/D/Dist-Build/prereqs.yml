@@ -1,0 +1,15 @@
+runtime:
+  requires:
+    perl: 5.010
+    CPAN::Meta: 2.142060
+    ExtUtils::Builder: 0.019
+    ExtUtils::Builder::Compiler: 0.034
+    ExtUtils::Config: 0
+    ExtUtils::InstallPaths: 0
+    ExtUtils::Helpers: 0.028
+    Getopt::Long: 2.36
+    List::Util: 1.33
+    TAP::Harness: 3.29
+test:
+  requires:
+    Test::More: 0.88

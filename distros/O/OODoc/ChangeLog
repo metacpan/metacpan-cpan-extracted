@@ -7,6 +7,21 @@ TODO:
 	- subs could not only list 'Inherited from', but also 'Extended by'
 	- in POD, group "Inherited" referenced subs?
 
+version 3.05: Mon 22 Dec 16:31:08 CET 2025
+
+	Fixes:
+	- do not check loadable Pod2: needs optional Template/Magic
+	  [Slaven Rezic] cpantesters, rt.cpan.org #169881
+	- remove lines added by oodist.
+	- export functions and overloaded.
+
+	Improvements:
+	- example header formatting
+	- error option without default
+	- add bugtracker to merge3
+	- add runtime/requires to merge3
+	- export now understands inheritance
+
 version 3.04: Fri 12 Sep 13:58:58 CEST 2025
 
 	Changes:

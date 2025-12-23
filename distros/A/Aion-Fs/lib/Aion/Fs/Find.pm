@@ -1,9 +1,10 @@
 package Aion::Fs::Find;
 
 use common::sense;
-use Aion::Fs qw//;
+use Scalar::Util qw//;
+require Aion::Fs;
 
-use overload
+use overload fallback => 1,
 	'<>' => sub { shift->next },
 	'&{}' => sub {
 		my ($self) = @_;
@@ -65,7 +66,7 @@ sub next {
 	};
 	
 	if($@) {
-		die if ref $@ ne "Aion::Fs::stop";
+		die unless ref $@ eq "Aion::Fs::Find" and Scalar::Util::reftype $@ eq "SCALAR";
 	}
 
 	$path

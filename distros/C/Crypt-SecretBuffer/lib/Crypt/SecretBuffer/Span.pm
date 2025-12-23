@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::Span;
 # VERSION
 # ABSTRACT: Reference a span of bytes within a SecretBuffer
-$Crypt::SecretBuffer::Span::VERSION = '0.013';
+$Crypt::SecretBuffer::Span::VERSION = '0.015';
 use strict;
 use warnings;
 use Crypt::SecretBuffer; # loads XS methods into this package
@@ -56,9 +56,10 @@ Crypt::SecretBuffer::Span - Reference a span of bytes within a SecretBuffer
 =head1 DESCRIPTION
 
 This module represents a span of bytes in a L<Crypt::SecretBuffer>, optionally with a character
-encoding.  The methods on this object inspect the bytes of the SecretBuffer to alter the byte
-range or return new Span objects for sub-ranges.  When you've narrowed-in on the data you
-want, you can extract it to another SecretBuffer object or a non-secret scalar using L</copy_to>.
+encoding.  The methods on this object inspect the bytes of the SecretBuffer, and update the
+boundaries of the span or return new Span objects for sub-spans.  When you've narrowed-in on
+the data you want, you can extract it to another SecretBuffer object or a non-secret scalar
+using L</copy_to>.
 
 This module provides some basic parsing ability for SecretBuffer text.  While the "right tool for
 the job" would normally be Perl's regex engine, I have found no practical way to apply regexes to
@@ -220,12 +221,12 @@ Options:
 
 =item encoding => $encoding
 
-Encode bytes/characters written into the destination using the specified encoding.  The
-bytes/characters are read from the current buffer using the Span's C<encoding> attribute.  The
-default is to assume the same destination encoding as the source and copy the bytes literally,
-*unless* the destination is a Perl scalar and the source encoding was a type of unicode, in which
-case the default is to copy as Perl "wide characters" (which is internally UTF-8).  But, if you
-specify UTF-8 here, you will instead receive bytes of UTF-8 rather than perl wide characters.
+Specify the encoding for the destination.  The bytes/characters are read from the current buffer
+using the Span's C<encoding> attribute.  The default is to assume the same destination encoding
+as the source and simply duplicate the byte string, *unless* the destination is a Perl scalar
+and the source encoding was a type of unicode, in which case the default is to copy as Perl
+"wide characters" (which is internally UTF-8).  If you specify UTF-8 here, you will receive
+bytes of UTF-8 rather than perl wide characters.
 
 =back
 
@@ -233,20 +234,20 @@ specify UTF-8 here, you will instead receive bytes of UTF-8 rather than perl wid
 
   $cmp= $span->memcmp($other_thing);
 
-Compare contents of span byte-by-byte to another Span, SecretBuffer, or plain scalar.
-Returns the same as the 'cmp' operator.
+Compare contents of the span byte-by-byte to another Span (or SecretBuffer, or plain scalar) in
+the same manner as the C function C<memcmp>.  (returns C<< <0 >>, C<0>, or C<< >0 >>)
 
 =head2 cmp
 
   $cmp= $span->cmp($other_thing);
 
-Iterate codepoints of this Span and compare each numerically to the codepoints of another Span,
-or perl scalar.  Returns the same as the 'cmp' operator.  This method is also used as the
-overloaded 'cmp' operator.
+Iterate codepoints of this Span and compare each numerically to the codepoints of another Span
+(or SecretBuffer, or plain scalar).  This method is also used as the overloaded 'cmp' operator.
+This is B<not> a locale-aware comparison.
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 AUTHOR
 

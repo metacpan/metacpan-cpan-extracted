@@ -1,15 +1,17 @@
 package Aion::Fs;
-use 5.22.0;
-no strict; no warnings; no diagnostics;
+
 use common::sense;
 
-our $VERSION = "0.2.2";
+our $VERSION = "0.2.3";
 
 use Exporter qw/import/;
 use Scalar::Util   qw//;
 use List::Util     qw//;
 use Time::HiRes    qw//;
+use Aion::Fs::Cat;
+use Aion::Fs::Lay;
 use Aion::Fs::Find;
+use Symbol qw//;
 
 our @EXPORT = our @EXPORT_OK = grep {
 	ref \$Aion::Fs::{$_} eq "GLOB" && *{$Aion::Fs::{$_}}{CODE} && !/^(?:_|(NaN|import)\z)/
@@ -488,6 +490,30 @@ sub mkpath (;$) {
 	$path
 }
 
+# Получить итератор на файл
+sub icat(;$) {
+	my ($file) = @_ == 0? $_: @_;
+	my $layer = ":utf8";
+	($file, $layer) = @$file if ref $file;
+    
+	my $f = Symbol::gensym;
+	open $f, "<$layer", $file or die "icat $file: $!";
+
+	Aion::Fs::Cat->new(f => $f, path => $file)
+}
+
+# Получить файловый дескриптор для вывода
+sub ilay(;$) {
+	my ($file) = @_ == 0? $_: @_;
+	my $layer = ":utf8";
+	($file, $layer) = @$file if ref $file;
+	
+	my $f = Symbol::gensym;
+	open $f, ">$layer", $file or die "ilay $file: $!";
+	
+	Aion::Fs::Lay->new(f => $f, path => $file)
+}
+
 # Считать файл
 sub cat(;$) {
     my ($file) = @_ == 0? $_: @_;
@@ -579,15 +605,17 @@ sub find(;@) {
     $files = [$files] unless ref $files;
 
 	my @noenters; my $errorenter = sub {};
-	my $ex = @_ && ref($_[$#_]) =~ /^Aion::Fs::(noenter|errorenter)\z/
+	
+	my $ex = @_ && ref($_[$#_]) eq 'Aion::Fs::Find'
 		? pop
 		: undef;
 
 	if($ex) {
-		if($1 eq "errorenter") {
+		bless $ex, 'Aion::Fs';
+		if(Scalar::Util::reftype $ex eq 'CODE') {
 			$errorenter = $ex;
 		} else {
-			$errorenter = pop @$ex if ref $ex->[$#$ex] eq "Aion::Fs::errorenter";
+			$errorenter = bless pop @$ex, undef if Scalar::Util::reftype($ex->[$#$ex]) eq "CODE";
 			push @noenters, _filters @$ex;
 		}
 	}
@@ -608,24 +636,24 @@ sub find(;@) {
 
 # Не входить в подкаталоги
 sub noenter(@) {
-	bless [@_], "Aion::Fs::noenter"
+	bless [@_], "Aion::Fs::Find"
 }
 
 # Вызывается для всех ошибок ввода-вывода
 sub errorenter(&) {
-	bless shift, "Aion::Fs::errorenter"
+	bless shift, "Aion::Fs::Find"
 }
 
 # Останавливает find будучи вызван с одного из его фильтров, errorenter или noenter
 sub find_stop() {
-	die bless {}, "Aion::Fs::stop"
+	die bless \(my $stop = 1), "Aion::Fs::Find"
 }
 
 # Производит замену во всех указанных файлах. Возвращает файлы в которых замен не было
 sub replace(&@) {
     my $fn = shift;
 	my @noreplace; local $_; my $pkg = caller;
-	my $aref = "${pkg}::a";	my $bref = "${pkg}::b";
+	my $aref = "$pkg\::a";	my $bref = "$pkg\::b";
     for $$aref (@_) {
 		if(ref $$aref) { ($$aref, $$bref) = @$$aref } else { $$bref = ":utf8" }
         my $file = $_ = cat [$$aref, $$bref];
@@ -741,7 +769,7 @@ Aion::Fs - utilities for the file system: reading, writing, searching, replacing
 
 =head1 VERSION
 
-0.2.2
+0.2.3
 
 =head1 SYNOPSIS
 
@@ -1295,7 +1323,7 @@ Splits a file path into its components or assembles it from its components.
 	        ext    => "EXTENSION",
 	    };
 	
-	    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION" # --> $path
+	    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION"; # --> $path
 	
 	    $path = {
 	        path        => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7',
@@ -1641,6 +1669,97 @@ Translates the path from FS to C<@INC> into a package. Without a parameter, uses
 	[map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]  # --> ["Aion::Fs"]
 	
 	to_inc 'Aion/Fs.pm' # -> undef
+
+=head2 ilay (;$path)
+
+Creates a file descriptor. It knows how to close as soon as the last link to it disappears.
+
+It also has a C<path> method, which returns the path to the file.
+
+	my $test_file = "test_ilay_complete.txt";
+	
+	my $f = ilay $test_file;
+	print $f "Line 1\n";
+	print $f "Line 2\n";
+	
+	my $std = select $f; $| = 1; select $std;
+	-s $f # -> 14
+	
+	$f->path # => test_ilay_complete.txt
+	fileno($f) > 0 # -> 1
+	
+	undef $f;
+	
+	cat $test_file # => Line 1\nLine 2\n
+	
+	local $_ = [$test_file, ':raw'];
+	my $f = ilay;
+	
+	my $str = "string";
+	my $num = 42;
+	my $end = "END";
+	
+	*FD = *$f{IO};
+	format FD =
+	@<<<<<<<< @||||| @>>>>>
+	$str,     $num,  $end
+	.
+	
+	write FD;
+	
+	$str = 'int';
+	
+	write FD;
+	
+	undef *FD;
+	undef $f;
+	
+	my $table = << 'TABLE';
+	string      42      END
+	int         42      END
+	TABLE
+	
+	cat $test_file # -> $table
+
+=head3 See also
+
+=over
+
+=item * LLL<https://perldoc.perl.org/IO::Handle>.
+
+=back
+
+=head2 icat (;$file)
+
+Creates a file descriptor with the ability to auto-close as soon as the last link to it disappears.
+
+It also has a C<path> method that returns the path passed to it.
+
+	local $_ = "test_icat_complete.txt";
+	lay "Line 1\nLine 2\nLine 3\nBinary\x00\x01\x02";
+	
+	my $f = icat;
+	
+	my $bytes = read $f, my $buf, 6;
+	$bytes # -> 6
+	$buf # => Line 1
+	
+	scalar <$f> # -> "\n"
+	[<$f>] # --> ["Line 2\n", "Line 3\n", "Binary\x00\x01\x02"]
+
+=head3 See also
+
+=over
+
+=item * LLL<https://perldoc.perl.org/IO::Handle>.
+
+=back
+
+=head2 isUNIX ()
+
+We are on a UNIX family OS.
+
+	isUNIX =~ /^(1|)$/ # -> 1
 
 =head1 AUTHOR
 

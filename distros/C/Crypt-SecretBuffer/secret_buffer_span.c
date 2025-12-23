@@ -2,13 +2,14 @@
  * SecretBuffer Span Magic
  */
 
-void *secret_buffer_span_auto_ctor(SV *owner) {
+void *secret_buffer_span_auto_ctor(pTHX_ SV *owner) {
    secret_buffer_span *span= NULL;
    Newxz(span, 1, secret_buffer_span);
    return span;
 }
 secret_buffer_span* secret_buffer_span_from_magic(SV *objref, int flags) {
-   return (secret_buffer_span*) secret_buffer_X_from_magic(
+   dTHX;
+   return (secret_buffer_span*) secret_buffer_X_from_magic(aTHX_
       objref, flags,
       &secret_buffer_span_magic_vtbl, "secret_buffer_span",
       secret_buffer_span_auto_ctor);

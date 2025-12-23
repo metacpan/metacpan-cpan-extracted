@@ -7,6 +7,11 @@ on 'develop' => sub {
 	requires 'Minilla', 'v3.1.19';
 	requires 'Liveman', '1.0';
 	requires 'Software::License::GPL_3';
+	requires 'Test::CPAN::Meta';
+	requires 'Test::MinimumVersion::Fast';
+	requires 'Test::PAUSE::Permissions';
+	requires 'Test::Pod';
+	requires 'Test::Spellunker';
 	requires 'V';
 	requires 'Version::Next';
 };
@@ -16,11 +21,14 @@ on 'test' => sub {
 
 	requires 'Carp';
 	requires 'Cwd';
+	requires 'Data::Dumper';
 	requires 'File::Basename';
 	requires 'File::Find';
 	requires 'File::Path';
 	requires 'File::Slurper';
 	requires 'File::Spec';
+	requires 'String::Diff';
+	requires 'Term::ANSIColor';
 	requires 'lib';
 	requires 'open';
 };
@@ -28,6 +36,7 @@ on 'test' => sub {
 requires 'Exporter';
 requires 'List::Util';
 requires 'Scalar::Util';
+requires 'Symbol';
 requires 'Time::HiRes';
 requires 'common::sense';
 requires 'config';

@@ -5,7 +5,7 @@ package RT::Extension::AWS::Assets;
 use Paws;
 use Paws::Credential::Explicit;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -91,7 +91,7 @@ for reserved instances.
         'EC2' => ['Instance Type', 'Platform', 'Placement:Tenancy', 'Placement:Availability Zone', 'Tags:Name', 'Tags:customer'],
         'RDS' => ['Instance Type', 'Engine', 'Allocated Storage', 'Availability Zone', 'Name', 'MultiAZ', 'TagList:customer'],
         'EC2:RI' => ['Instance Type', 'Platform', 'Tenancy', 'Reservation Start', 'Reservation End', 'Duration', 'Offering Class', 'Offering Type', 'Name', 'Product Description', 'State'],
-        'RDS:RI' => ['Instance Type', 'Platform', 'Reservation Start', 'Reservation End', 'Duration', 'Offering Type', 'Name', 'MultiAZ', 'Product Description', 'State'],
+        'RDS:RI' => ['Instance Type', 'Platform', 'Reservation Start', 'Reservation End', 'Duration', 'Offering Type', 'Name', 'MultiAZ', 'Product Description', 'State', 'AWS Reserved Instance ID'],
     }
     );
 
@@ -380,6 +380,7 @@ sub UpdateAWSAsset {
             $method = 'End' if ( $cf_name eq 'Reservation End' );
             $method = 'InstanceType' if ( $service eq 'EC2' && $cf_name eq 'Name' );
             $method = 'ReservedDBInstanceId' if ( $service eq 'RDS' && $cf_name eq 'Name' );
+            $method = 'LeaseId' if ( $service eq 'RDS' && $cf_name eq 'AWS Reserved Instance ID' );
         }
 
         # Fixups (mostly) done, start setting values
@@ -601,6 +602,13 @@ sub UpdateAWSAssets {
 
         my $asset_found = 0;
         $asset_found = 1 if $assets->Count;
+
+        # New purchased reserved db instance's Lease ID could be empty
+        if ( !$asset_found && $args{'ServiceType'} eq 'RDS' && $args{'ReservedInstances'} ) {
+            my $name = $resource->ReservedDBInstanceId;
+            $assets->FromSQL(qq<Catalog = '$catalog' AND 'CF.{$asset_id_cf}' IS NULL AND Name = '$name'>);
+            $asset_found = 1 if $assets->Count;
+        }
 
         unless ( $asset_found ) {
             RT->Logger->debug("No asset found for " . $resource_id . ", skipping");

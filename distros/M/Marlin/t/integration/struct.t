@@ -29,13 +29,13 @@ use Marlin::Struct
 my $A = Employee->new( name => 'Alice', employee_id => 1 );
 ok( $A->name, 'Alice' );
 ok( $A->employee_id, 1 );
-ok is_Employee $A;
-ok is_Person $A;
+ok is_Employee( $A );
+ok is_Person( $A );
 
 my $B = Employee[ 'Bob', 2 ];
 ok( $B->name, 'Bob' );
 ok( $B->employee_id, 2 );
-ok is_Employee $B;
-ok is_Person $B;
+ok is_Employee( $B );
+ok is_Person( $B );
 
 done_testing;

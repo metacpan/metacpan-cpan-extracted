@@ -30,7 +30,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-Log-Report/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Log-Report.git
-version: '1.43'
+version: '1.44'
 x_oodist:
   email: markov@cpan.org
   first_year: 2007

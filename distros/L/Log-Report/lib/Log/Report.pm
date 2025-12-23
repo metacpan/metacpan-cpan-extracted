@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.43.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Log-Report version 1.44.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -10,7 +10,7 @@
 
 
 package Log::Report;{
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 }
 
 use base 'Exporter';
@@ -313,11 +313,11 @@ sub try(&@)
 	if(!$is_exception && $err && !$disp->wasFatal)
 	{	# Decode errors which do not origin from Log::Report reports
 		# Native exceptions are already logged.
-		my ($opts, $reason, $text) = blessed $err
+		my ($opts, $reason, $text, $tags) = blessed $err
 		  ? Log::Report::Die::exception_decode($err)
 		  : Log::Report::Die::die_decode($err, on_die => $disp->die2reason);
 
-		$disp->log($opts, $reason, __$text);
+		$disp->log($opts, $reason, __x($text, _tags => $tags));
 	}
 
 	$disp->died($err)

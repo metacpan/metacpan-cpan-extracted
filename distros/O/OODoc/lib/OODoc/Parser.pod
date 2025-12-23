@@ -93,13 +93,25 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 =over 4
 
-=item $obj-E<gt>B<publish>(\%options)
+=item $obj-E<gt>B<manual>()
 
 Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Collected
+
+Extends L<"Collected" in OODoc::Object|OODoc::Object/"Collected">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Collected">
 
 =back
 
@@ -163,7 +175,7 @@ See L<OODoc::Format::cleanup(create_link)|OODoc::Format/"Page generation">.
 
 =item is_html => BOOLEAN
 
-Some changes will not be made when C<is_html> is C<true>, for instance,
+Some changes will not be made when this is C<true>, for instance,
 a "E<lt>" will stay that way, not being translated in a "E<amp>lt;".
 
 =back
@@ -189,6 +201,12 @@ See L<OODoc::Format::cleanup(create_link)|OODoc::Format/"Page generation">.
 [3.01] The parser gets a last chance to work on C<$manual> documentation,
 after all documents have been collected and intergrated.
 
+=item $obj-E<gt>B<formatReferTo>($manual, $object)
+
+[3.05] Transform a text C<$object> into a link in the parser specific syntax,
+as it can be used in the C<$manual> to get to refer to the C<$object>.  This
+output can be enclosed in an C<< M < > >> tag.
+
 =item $obj-E<gt>B<skipManualLink>($package)
 
 Returns C<true> if the C<$package> name matches one of the links to be
@@ -198,8 +216,8 @@ skipped, set by L<new(skip_links)|OODoc::Parser/"Constructors">.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -5,7 +5,7 @@ Aion::Fs - утилиты для файловой системы: чтение, 
 
 # VERSION
 
-0.2.2
+0.2.3
 
 # SYNOPSIS
 
@@ -453,7 +453,7 @@ sta(".")->{atime} # ~> ^\d+(\.\d+)?$
         ext    => "EXTENSION",
     };
 
-    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION" # --> $path
+    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION"; # --> $path
 
     $path = {
         path        => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7',
@@ -780,6 +780,95 @@ to_inc $INC{'Aion/Fs.pm'} # => Aion::Fs
 [map to_inc,"A/B/C.pm", $INC{'Aion/Fs.pm'}]  # --> ["Aion::Fs"]
 
 to_inc 'Aion/Fs.pm' # -> undef
+```
+
+## ilay (;$path)
+
+Создаёт файловый дескриптор. Он умеет закрываться, как только на него исчезнет последняя ссылка.
+
+Так же имеет метод `path`, к-й возвращает путь к файлу.
+
+```perl
+my $test_file = "test_ilay_complete.txt";
+
+my $f = ilay $test_file;
+print $f "Line 1\n";
+print $f "Line 2\n";
+
+my $std = select $f; $| = 1; select $std;
+-s $f # -> 14
+
+$f->path # => test_ilay_complete.txt
+fileno($f) > 0 # -> 1
+
+undef $f;
+
+cat $test_file # => Line 1\nLine 2\n
+
+local $_ = [$test_file, ':raw'];
+my $f = ilay;
+
+my $str = "string";
+my $num = 42;
+my $end = "END";
+
+*FD = *$f{IO};
+format FD =
+@<<<<<<<< @||||| @>>>>>
+$str,     $num,  $end
+.
+
+write FD;
+
+$str = 'int';
+
+write FD;
+
+undef *FD;
+undef $f;
+
+my $table = << 'TABLE';
+string      42      END
+int         42      END
+TABLE
+
+cat $test_file # -> $table
+```
+
+### See also
+
+* [IO::Handle](https://perldoc.perl.org/IO::Handle).
+
+## icat (;$file)
+
+Создаёт файловый дескриптор с возможностью автозакрытия, как только пропадёт последняя на него ссылка.
+
+Так же имеет метод `path` возвращающий переданный в него путь.
+
+```perl
+local $_ = "test_icat_complete.txt";
+lay "Line 1\nLine 2\nLine 3\nBinary\x00\x01\x02";
+
+my $f = icat;
+
+my $bytes = read $f, my $buf, 6;
+$bytes # -> 6
+$buf # => Line 1
+
+scalar <$f> # -> "\n"
+[<$f>] # --> ["Line 2\n", "Line 3\n", "Binary\x00\x01\x02"]
+```
+
+### See also
+
+* [IO::Handle](https://perldoc.perl.org/IO::Handle).
+
+## isUNIX ()
+
+Мы находимся в ОС семейства UNIX.
+
+```perl
+isUNIX =~ /^(1|)$/ # -> 1
 ```
 
 # AUTHOR

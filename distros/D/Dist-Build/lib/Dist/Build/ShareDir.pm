@@ -1,5 +1,5 @@
 package Dist::Build::ShareDir;
-$Dist::Build::ShareDir::VERSION = '0.024';
+$Dist::Build::ShareDir::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -66,7 +66,7 @@ Dist::Build::ShareDir - Sharedir support for Dist::Build
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

@@ -86,11 +86,11 @@ This is a required argument.
 
 =back
 
-example: first example
+» example: first example
 
 This is an example for subroutine 'subr'.
 
-example: another example
+» example: another example
 
 This is another example for subroutine 'subr'.
 
@@ -173,25 +173,25 @@ In-page links, but now with alternative text:
 =item Error: oops, something went wrong
 
 Errors reflect problems in the running code.
-Cast by subr()
+Cast by C<subr()>
 
 =item Fault: ouch, that hurts; system fault: $!
 
 Faults are system errors which make it into errors.
-Cast by subr()
+Cast by C<subr()>
 
 =item Info: transfer completed
 
 Info statements usually show at verbose runs, to elaborate on
 steps made.
-Cast by subr()
+Cast by C<subr()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.04,
-built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.05,
+built on December 22, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

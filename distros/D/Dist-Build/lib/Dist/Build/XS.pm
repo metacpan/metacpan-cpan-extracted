@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.024';
+$Dist::Build::XS::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -28,8 +28,8 @@ sub add_methods {
 
 		my $config = $args{config} // $planner->config;
 
-		$planner->load_extension('ExtUtils::Builder::ParseXS',       0.016, config => $config) unless $planner->can('parse_xs');
-		$planner->load_extension('ExtUtils::Builder::AutoDetect::C', 0.016, config => $config) unless $planner->can('compile');
+		$planner->load_extension('ExtUtils::Builder::ParseXS',              0.034, config => $config) unless $planner->can('parse_xs');
+		$planner->load_extension('ExtUtils::Builder::BuildTools::FromPerl', 0.034, config => $config) unless $planner->can('compile');
 
 		my $xs_base = $args{xs_base} // 'lib';
 		my ($module_name, $xs_file);
@@ -43,20 +43,33 @@ sub add_methods {
 			$module_name = $planner->main_module;
 			$xs_file = catfile($xs_base, split /::/, $module_name) . '.xs';
 		}
-		my $module_version = $args{version} // $planner->version;
 
-		my $xs_dir = dirname($xs_file);
-		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
+		my $source_dir = dirname($xs_file);
+		my $c_file;
 
-		if (my $typemap = $args{typemap}) {
-			my @typemaps = ref $args{typemap} ? @{ $typemap } : $typemap;
-			$_ = rel2abs($_) for @typemaps;
-			$args{typemap} = \@typemaps;
+		my $language = $args{language} // 'C';
+
+		if ($xs_file =~ /\.c$/) {
+			$c_file = $xs_file;
+		} else {
+			$c_file = $planner->c_file_for_xs($xs_file, $source_dir);
+
+			if (my $typemap = $args{typemap}) {
+				my @typemaps = ref $args{typemap} ? @{ $typemap } : $typemap;
+				$_ = rel2abs($_) for @typemaps;
+				$args{typemap} = \@typemaps;
+			}
+			my %parse_args;
+			$parse_args{$_} = $args{$_} for grep { exists $args{$_} } qw/typemap versioncheck prototypes/;
+			$parse_args{dependencies} = $args{xs_dependencies} if exists $args{xs_dependencies};
+			$parse_args{hiertypes} = 1 if uc $language eq 'C++';
+
+			$planner->parse_xs($xs_file, $c_file, %parse_args, module => $module_name);
 		}
 
-		$planner->parse_xs($xs_file, $c_file, %args, module => $module_name);
+		my $o_file = $planner->obj_file(basename($c_file, '.c'), $source_dir);
 
-		my $o_file = $planner->obj_file(basename($c_file, '.c'), $xs_dir);
+		my $module_version = $args{version} // $planner->version;
 
 		my %defines = (
 			%{ $args{defines} // {} },
@@ -67,11 +80,13 @@ sub add_methods {
 		my $compiler_flags = get_flags($args{extra_compiler_flags});
 		$planner->compile($c_file, $o_file,
 			type         => 'loadable-object',
-			profile      => '@Perl',
+			profiles     => ['@Perl'],
 			defines      => \%defines,
 			include_dirs => [ dirname($xs_file), @{ $args{include_dirs} // [] } ],
 			extra_args   => $compiler_flags,
-			config       => $config,
+			dependencies => $args{dependencies},
+			language     => $language,
+			standard     => $args{standard},
 		);
 
 		my @objects = $o_file;
@@ -83,13 +98,17 @@ sub add_methods {
 			my %defines = (%{ $args{defines} // {} }, %{ $options{defines} // {} });
 			my @include_dirs = (@{ $args{include_dirs} // [] }, @{ $options{include_dirs} // [] });
 			my @compiler_flags = (@{ $compiler_flags // [] }, @{ $options{flags} // [] });
+			my @dependencies = (@{ $args{dependencies} // [] }, @{ $options{dependencies} // [] });
+			my $standard = exists $options{standard} ? $options{standard} : $args{standard};
 			$planner->compile($options{source}, $object,
 				type         => 'loadable-object',
-				profile      => '@Perl',
+				profiles     => ['@Perl'],
 				defines      => \%defines,
 				include_dirs => \@include_dirs,
 				extra_args   => \@compiler_flags,
-				config       => $config,
+				dependencies => \@dependencies,
+				language     => $language,
+				standard     => $standard,
 			);
 			push @objects, $object;
 		}
@@ -99,13 +118,13 @@ sub add_methods {
 		my $lib_file = $planner->extension_filename($module_name);
 		$planner->link(\@objects, $lib_file,
 			type         => 'loadable-object',
-			profile      => '@Perl',
+			profiles     => ['@Perl'],
 			module_name  => $module_name,
 			mkdir        => 1,
 			extra_args   => get_flags($args{extra_linker_flags}),
 			library_dirs => $args{library_dirs},
 			libraries    => $args{libraries},
-			config       => $config,
+			language     => $language,
 		);
 
 		$planner->create_phony('dynamic', $lib_file);
@@ -153,7 +172,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -223,6 +242,10 @@ A hash containing additional defines for this object.
 =item * flags
 
 An array containing additional flags for this compilation.
+
+=item * dependencies
+
+An array containing additional dependencies for this compilation.
 
 =back
 
