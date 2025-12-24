@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+declare -A OPTS=(
+    [ debug | d ]=0
+    [ border-style | bs :>ansicolumn ]=
+    [ pane         | C  :>ansicolumn ]=
+    [ paragraph    | p   >ansicolumn ]=
+)
+
+. getoptlong.sh OPTS "$@"
+
+if   (( debug == 1 )) ; then getoptlong dump
+elif (( debug >  1 )) ; then getoptlong dump -a | column
+fi
+
+   BOLD=(--cm '<blue3>DI'  -E '(?<ast>[*_]{3,})(.*?)(\g{ast})'
+         --cm '<blue3>D'   -E '(?<![*])(?<ast>[*]{2})(?!\*)([^*]*?)(\g{ast})')
+      H=(--cm '555D/#009E' -E '^#\h+.*\n'
+	 --cm 'L25D/#55fE' -E '^##\h+.*\n'
+	 --cm 'L00D/#ddf'  -E '^###+.*\n')
+LITERAL=(--cm '/L23'       -E '(?<!`)`(?!`)(?s:.*?)`')
+  QUOTE=(--cm '/L23;E'     -E '^\h*(?<bt>`{3,}).*\n((?s:.*?))^\h*\g{bt}' --exclude '`{3,}')
+
+for tag in BOLD H LITERAL QUOTE ; do
+    declare -n array=$tag
+    grepleopt+=( "${array[@]}" )
+done
+
+PAT='\h*([*-]|\d+\.)\h+' 
+
+while (( $# > 0 )) ; do
+    greple -G --all --need=0 "${grepleopt[@]}" $1 \
+	| greple \
+	    -Mtee ansifold --separate='\r' --autoindent "^$PAT|" -sw80 -- \
+	    -E "^$PAT.*\n" --crmode --all --no-color \
+	| ansicolumn -DP -C 85/,DUP,1,GE,EXCH,1,IF "${ansicolumn[@]}" \
+	| less +Gg
+    shift
+done

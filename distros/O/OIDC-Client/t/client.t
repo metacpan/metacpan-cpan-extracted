@@ -190,7 +190,7 @@ sub test_claim_mapping_from_config {
   subtest "claim_mapping from config" => sub {
 
     # Given
-    my %claim_key = (
+    my %claim_mapping = (
       login     => 'sub',
       lastname  => 'lastName',
       firstname => 'firstName',
@@ -201,7 +201,7 @@ sub test_claim_mapping_from_config {
         provider      => 'my_provider',
         id            => 'my_client_id',
         secret        => 'my_client_secret',
-        claim_mapping => \%claim_key,
+        claim_mapping => \%claim_mapping,
       },
     );
 
@@ -209,7 +209,7 @@ sub test_claim_mapping_from_config {
     my $claim_mapping = $client->claim_mapping;
 
     # Then
-    cmp_deeply($claim_mapping, \%claim_key,
+    cmp_deeply($claim_mapping, \%claim_mapping,
                'from config');
   };
 }
@@ -2818,11 +2818,18 @@ sub test_get_claim_value {
 
     # Given
     my %claims = (
-      'sub' => 'my_subject',
+      sub => 'my_subject',
+      exp => 1234,
+      resource_access => {
+        account => {
+          roles => [qw/role1 role2/],
+        }
+      }
     );
-    my %claim_key = (
+    my %claim_mapping = (
       login     => 'sub',
       last_name => 'lastName',
+      roles     => 'resource_access.account.roles',
     );
     my $client = $class->new(
       log    => $log,
@@ -2830,7 +2837,7 @@ sub test_get_claim_value {
         provider      => 'my_provider',
         id            => 'my_client_id',
         secret        => 'my_client_secret',
-        claim_mapping => \%claim_key,
+        claim_mapping => \%claim_mapping,
       },
     );
 
@@ -2844,6 +2851,18 @@ sub test_get_claim_value {
       # Then
       is($claim_value, 'my_subject',
          'expected claim value');
+    }
+    {
+      # When
+      my $claim_value = $client->get_claim_value(
+        name     => 'roles',
+        claims   => \%claims,
+        optional => 1,
+      );
+
+      # Then
+      cmp_deeply($claim_value, [qw/role1 role2/],
+                 'expected claim value for extended name');
     }
     {
       # When
@@ -2864,7 +2883,7 @@ sub test_get_claim_value {
           name   => 'last_name',
           claims => \%claims,
         );
-      } qr/OIDC: the 'lastName' claim is not present/,
+      } qr/OIDC: the 'lastName' key is not present/,
         'not present in claims and required';
     }
     {

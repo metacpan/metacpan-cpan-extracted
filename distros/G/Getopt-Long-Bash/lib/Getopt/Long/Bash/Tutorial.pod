@@ -1,0 +1,314 @@
+=encoding utf-8
+
+=head1 NAME
+
+Getopt::Long::Bash::Tutorial - Getting started with getoptlong.sh
+
+=head1 INTRODUCTION
+
+B<getoptlong.sh> is a Bash library that brings Perl's L<Getopt::Long>-style
+option parsing to shell scripts. If you've ever wished for cleaner, more
+powerful option handling in Bash, this tutorial will get you started.
+
+=head1 YOUR FIRST SCRIPT
+
+Let's create a simple script that accepts a few options:
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ verbose | v  ]=
+        [ output  | o :]=/dev/stdout
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+    echo "Verbose: $verbose"
+    echo "Output: $output"
+    echo "Remaining args: $@"
+
+Save this as C<myscript.sh>, make it executable, and try:
+
+    $ ./myscript.sh -v -o result.txt file1.txt file2.txt
+    Verbose: 1
+    Output: result.txt
+    Remaining args: file1.txt file2.txt
+
+That's it! With just a few lines, you have:
+
+=over 4
+
+=item * Short (C<-v>) and long (C<--verbose>) option support
+
+=item * Options with arguments (C<-o result.txt>)
+
+=item * Default values (C</dev/stdout>)
+
+=item * Automatic separation of options from arguments
+
+=back
+
+=head1 UNDERSTANDING THE BASICS
+
+=head2 The Options Array
+
+Options are defined in a Bash associative array using C<declare -A>.
+Each key-value pair defines one option: the key specifies the option
+name and type, the value sets the default.
+
+    declare -A OPTS=(
+        [name|alias TYPE]=DEFAULT
+    )
+
+=head2 Option Names and Aliases
+
+The first name is the "long" option (C<--verbose>), aliases after C<|>
+are typically short options (C<-v>). Hyphens in names become underscores
+in variable names.
+
+    [ verbose | v ]=       # --verbose or -v
+    [ output  | o ]=       # --output or -o
+    [ dry-run | n ]=       # --dry-run or -n (variable becomes $dry_run)
+
+=head2 Option Types
+
+The type specifier after the option name determines how arguments are handled.
+
+=head3 Flag Options (default)
+
+A flag takes no argument. When specified, the variable is set to C<1>.
+
+    [ verbose | v ]=       # -v, --verbose sets $verbose to 1
+
+=head3 Required Argument (C<:>)
+
+The colon means the option requires an argument.
+
+    [ output | o :]=       # -o file.txt, --output=file.txt
+
+=head3 Optional Argument (C<?>)
+
+Question mark means the argument is optional. The variable is set to
+empty string if no argument given, or to the argument value if provided.
+Use C<[[ -v var ]]> to check if the option was specified.
+
+    [ config | c ?]=       # --config or --config=myfile.conf
+
+=head1 STEP-BY-STEP EXAMPLES
+
+=head2 Example 1: A Simple Backup Script
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ verbose | v    # Show detailed output ]=
+        [ dry-run | n    # Show what would be done ]=
+        [ dest    | d :  # Destination directory ]=/backup
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+    # Check for source files
+    if (( $# == 0 )); then
+        echo "Usage: $0 [options] <files...>" >&2
+        exit 1
+    fi
+
+    for file in "$@"; do
+        [[ -n "$verbose" ]] && echo "Backing up: $file"
+        if [[ -z "$dry_run" ]]; then
+            cp "$file" "$dest/"
+        else
+            echo "[DRY RUN] Would copy $file to $dest/"
+        fi
+    done
+
+Try it:
+
+    $ ./backup.sh -v -n file1.txt file2.txt
+    Backing up: file1.txt
+    [DRY RUN] Would copy file1.txt to /backup/
+    Backing up: file2.txt
+    [DRY RUN] Would copy file2.txt to /backup/
+
+=head2 Example 2: Using Arrays for Multiple Values
+
+Sometimes you need to accept the same option multiple times:
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ include | I @]=
+        [ exclude | X @]=
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+    echo "Include paths:"
+    for path in "${include[@]}"; do
+        echo "  - $path"
+    done
+
+    echo "Exclude patterns:"
+    for pattern in "${exclude[@]}"; do
+        echo "  - $pattern"
+    done
+
+The C<@> suffix creates an array. Try it:
+
+    $ ./example.sh -I /usr/lib -I /opt/lib -X "*.bak" -X "*.tmp"
+    Include paths:
+      - /usr/lib
+      - /opt/lib
+    Exclude patterns:
+      - *.bak
+      - *.tmp
+
+=head2 Example 3: Using Hashes for Key-Value Pairs
+
+For configuration-style options:
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ define | D %]=
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+    echo "Defined variables:"
+    for key in "${!define[@]}"; do
+        echo "  $key = ${define[$key]}"
+    done
+
+The C<%> suffix creates an associative array:
+
+    $ ./example.sh -D NAME=MyApp -D VERSION=1.0 -D DEBUG
+    Defined variables:
+      NAME = MyApp
+      VERSION = 1.0
+      DEBUG = 1
+
+Note: C<-D DEBUG> without a value is treated as C<DEBUG=1>.
+
+=head2 Example 4: Verbosity Levels
+
+Use C<+> for incremental flags:
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ verbose | v +]=0
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+    if (( verbose >= 3 )); then
+        echo "Maximum verbosity: showing everything"
+    elif (( verbose >= 2 )); then
+        echo "High verbosity: showing details"
+    elif (( verbose >= 1 )); then
+        echo "Verbose mode on"
+    else
+        echo "Quiet mode"
+    fi
+
+Try different verbosity levels:
+
+    $ ./example.sh
+    Quiet mode
+    $ ./example.sh -v
+    Verbose mode on
+    $ ./example.sh -vvv
+    Maximum verbosity: showing everything
+
+=head1 HELP MESSAGES
+
+getoptlong.sh automatically provides C<--help> / C<-h>. Text after C<#>
+in the option definition becomes the help description. Use C<&USAGE> to
+set the synopsis line.
+
+    #!/usr/bin/env bash
+
+    declare -A OPTS=(
+        [ &USAGE ]="Usage: $(basename $0) [options] <files...>"
+        [ input   | i :  # Input file to process ]=
+        [ output  | o :  # Output file (default: stdout) ]=/dev/stdout
+        [ verbose | v    # Enable verbose output ]=
+    )
+
+    . getoptlong.sh OPTS "$@"
+
+Output:
+
+    $ ./example.sh --help
+    Usage: example.sh [options] <files...>
+
+    Options:
+      -h, --help                 show help
+      -i, --input <value>        Input file to process
+      -o, --output <value>       Output file (default: stdout) (default: /dev/stdout)
+      -v, --verbose              Enable verbose output
+
+=head1 VALIDATION
+
+Add validation to ensure correct input. Use C<=i> for integers, C<=f>
+for floats, or C<=(regex)> for pattern matching:
+
+    [ count | c :=i                    ]=1     # Must be an integer
+    [ ratio | r :=f                    ]=0.5   # Must be a number
+    [ mode  | m :=(^(fast|slow|auto)$) ]=auto  # Must match regex
+
+Invalid input produces an error:
+
+    $ ./example.sh --count abc
+    getoptlong: option '--count' requires integer value
+
+=head1 MULTI-STEP USAGE
+
+The one-liner form is convenient, but for more control use the explicit
+multi-step form. This is useful when you need to handle parse errors
+yourself, configure advanced options, or process subcommands.
+
+    #!/usr/bin/env bash
+
+    . getoptlong.sh
+
+    declare -A OPTS=(
+        [ verbose | v  ]=
+        [ output  | o :]=
+    )
+
+    getoptlong init OPTS
+    getoptlong parse "$@" || exit 1
+    eval "$(getoptlong set)"
+
+    # Now use $verbose, $output, and "$@"
+
+=head1 NEXT STEPS
+
+Now that you understand the basics, read L<getoptlong> for the complete
+reference manual and look at the C<ex/> directory for more examples
+including subcommand handling (C<ex/subcmd.sh>).
+
+=head1 SEE ALSO
+
+L<getoptlong> - Complete reference manual
+
+L<Getopt::Long::Bash>
+
+L<https://github.com/tecolicom/getoptlong>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 COPYRIGHT
+
+Copyright 2025 Kazumasa Utashiro
+
+=head1 LICENSE
+
+MIT License
+
+=cut

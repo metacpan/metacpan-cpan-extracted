@@ -1,0 +1,31 @@
+#  Recompile page only if last compile > 10 seconds ago
+#
+<start_html cache="&cache">
+
+The most recent time this page was run was <? localtime ?>
+__PERL__
+
+sub cache {
+
+    #  Self ref
+    #
+    my $self=shift();
+
+
+    #  Get cache file mtime (modified time)
+    #
+    my $mtime=${ $self->cache_mtime() };
+
+
+    #  If older than 10 seconds force recompile
+    #
+    if ((time()-$mtime) > 10) { 
+        $self->cache_compile(1) 
+    };
+
+
+    #  Done
+    #
+    return \undef;
+
+}

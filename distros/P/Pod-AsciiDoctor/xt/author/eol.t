@@ -12,8 +12,10 @@ my @files = (
     't/00-compile.t',
     't/00-load.t',
     't/01-conversion.t',
+    't/cli-apps.t',
     't/data/bullets_list.pod',
-    't/data/pod.pm'
+    't/data/pod.pm',
+    't/data/with_unicode.pod'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

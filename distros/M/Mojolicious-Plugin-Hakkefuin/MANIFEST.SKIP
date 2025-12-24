@@ -1,0 +1,34 @@
+# Skip hidden files and directories (any depth)
+(^|/)\.[^/]+
+
+# Skip underscore-prefixed files and directories (any depth)
+(^|/)_[^/]+
+
+# Skip build/generated artifacts
+^blib/
+^_build/
+^Build$
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MANIFEST\.bak$
+^MYMETA\.(?:json|yml)$
+\.tar\.gz$
+
+# Skip editor/backup noise
+~$
+\.swp$
+
+# Skip specific files
+(^|/)cpanfile\.snapshot$
+\.ini$
+(^|/)t/.*/migrations/.*\.db$
+
+# Skip development/support directories
+(^|/)\.vscode/
+(^|/)\.git/
+(^|/)backup/
+(^|/)example/
+(^|/)test/
+(^|/)action/
+(^|/)old-travis\.yml$

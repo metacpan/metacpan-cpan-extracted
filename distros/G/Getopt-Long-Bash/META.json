@@ -1,0 +1,79 @@
+{
+   "abstract" : "Bash option parsing that does what you mean",
+   "author" : [
+      "Kazumasa Utashiro"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.29",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Getopt-Long-Bash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Getopt::Long::Bash" : {
+         "file" : "lib/Getopt/Long/Bash.pm",
+         "version" : "v0.6.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tecolicom/getoptlong/issues"
+      },
+      "homepage" : "https://github.com/tecolicom/getoptlong",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tecolicom/getoptlong.git",
+         "web" : "https://github.com/tecolicom/getoptlong"
+      }
+   },
+   "version" : "0.6.0",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>",
+      "google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

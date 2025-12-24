@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.2" xmlns="http://docbook.org/ns/docbook"><refmeta><refentrytitle>WebDyne::Cache</refentrytitle><manvolnum>3pm</manvolnum></refmeta><refnamediv><refname>WebDyne::Cache</refname><refpurpose>WebDyne module to cache dynamic output for improved performance.</refpurpose></refnamediv><refsynopsisdiv><programlisting>#  Sample time.psp compiled to cached static HTML. Every time this page is requested it will show
+#  the same time unless an interval of more than 10 seconds has elapsed.
+#
+&lt;start_html>
+The most recent time this page was run was &lt;? localtime ?>
+__PERL__
+use WebDyne::Static;
+use WebDyne::Cache (\&amp;cache);
+
+sub cache {
+    
+    #  Self ref
+    #
+    my $self=shift();
+
+    #  Get file last modified time (mtime)
+    #
+    my $mtime=${ $self->cache_mtime() };
+
+    #  If older than 10 seconds force recompile
+    #
+    if ((time()-$mtime) > 10) { 
+        $self->cache_compile(1) 
+    };
+
+    #  Done
+    #
+    return \1;
+
+}</programlisting></refsynopsisdiv><refsection><title>DESCRIPTION</title><para>The WebDyne::Cache module works in conjunction with the WebDyne::Static module to allow less frequent running of dynamic code, speeding up responsiveness for CPU or I/O heavy
+    pages.</para><para>The WebDyne framework will continue to monitor for changes in the source file and recompile if the source .psp file is updated, regardless of the response of any caching
+    directive.</para></refsection><refsection><title>USAGE</title><para>The WebDyne::Cache code must be invoked in the requested page via one of two ways:</para><orderedlist><listitem><para>Via use of the WebDyne::Cache module, supplying a code ref as an parameter option as in the synopis:</para><programlisting>&lt;start_html>
+...
+__PERL__
+use WebDyne::Static;
+use WebDyne::Cache qw(\&amp;cache);
+sub cache {
+...</programlisting></listitem><listitem><para>Via use of the meta-data field, with supply of the code ref in the &lt;head> section of the document, e.g. </para><programlisting>&lt;start_html meta="%{ 'WebDyne' => 'cache=&amp;cache;static=1' }">
+...
+__PERL__
+sub cache {
+...</programlisting><para>Or:</para><programlisting>&lt;html>
+&lt;head>
+&lt;title>Cache Demo&lt;/title>
+&lt;meta name="WebDyne" content="cache=&amp;cache;static=1">
+&lt;/head>
+&lt;body>
+...
+__PERL__
+sub cache {
+...</programlisting></listitem></orderedlist><para>In both cases the routine must flag to the WebDyne engine that the page should be recompiled. After whatever logic is required to make that determination (time elapsed, user input
+    etc.) it should call the cache_compile() method with a true value to flag recompilation is required. </para></refsection><refsection><title>METHODS</title><para>Methods below are not actually specific to the WebDyne::Cache module (they are presented by the main WebDyne module), but are listed here for convenience:</para><variablelist><varlistentry><term>cache_mtime()</term><listitem><para>Return a scalar ref of the cache file modification time in Unix epoch seconds.</para></listitem></varlistentry><varlistentry><term>cache_compile()</term><listitem><para>Flag that page recompilation is required by supplying a true value.</para></listitem></varlistentry></variablelist></refsection><refsection><title>OPTIONS</title><para>WebDyne::Cache takes a single subroutine reference as an import parameter. No other options are available</para></refsection><refsection><title>AUTHOR</title><para>Andrew Speer &lt;andrew.speer@isolutions.com.au> and contributors.</para></refsection><refsection><title>LICENSE and COPYRIGHT</title><para>This file is part of WebDyne.</para><para>This software is copyright (c) 2025 by Andrew Speer &lt;andrew.speer@isolutions.com.au>.</para><para>This is free software; you can redistribute it and/or modify it underthe same terms as the Perl 5 programming language system itself.</para><para>Full license text is available at:</para><para>&lt;http://dev.perl.org/licenses/></para></refsection></refentry>

@@ -14,7 +14,6 @@ nixPkgs = [
 [phases.install]
 cmds = [
   "git clone https://github.com/aspeer/WebDyne.git .",
-  "git checkout development",
   "cpanm --installdeps ."
 ]
 
@@ -24,11 +23,11 @@ cmds = [
   "cpanm --installdeps .",
   "sh packer.sh",
   "cp packer/webdyne.psgi.pp /app/",
-  "cp examples/server_time.psp /app/",
+  "cp lib/WebDyne/time.psp /app/",
 ]
 
 [start]
-cmd = "/app/webdyne.psgi.pp /app/server_time.psp"
+cmd = "/app/webdyne.psgi.pp /app/time.psp"
 
 [variables]
 DOCUMENT_ROOT = "~"

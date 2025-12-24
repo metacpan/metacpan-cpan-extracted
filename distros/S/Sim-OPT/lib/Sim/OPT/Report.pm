@@ -140,7 +140,7 @@ sub newretrieve
   my %d = %{ $dt{instance} };
 
   my $countinstance = $d{instn}; #say $tee "HERE IN NEWRETRIEVE \$countinstance: " . dump( $countinstance );
-
+  my $instn = $d{instn};
   my $countcase = $d{countcase}; #say $tee "HERE IN NEWRETRIEVE \$countcase: " . dump( $countcase );
   my $countblock = $d{countblock}; #say $tee "HERE IN NEWRETRIEVE \$countblock: " . dump( $countblock );
   my %datastruc = %{ $d{datastruc} }; #say $tee "HERE IN NEWRETRIEVE \%datastruc: " . dump( \%datastruc );
@@ -277,7 +277,11 @@ YYY
 
         my @retrdata = @$retrdata_ref;
 
-        unless (-e "$retfile")
+        if ( -e "$retfile" )
+        {
+          say $tee `rm -f $retfile`;
+        }
+
         {
           my $printthis =
 "cd $thisto/cfg
@@ -329,7 +333,11 @@ ZZZ
 
       if ( $themereport eq "loads" )
       {
-        unless (-e "$retfile")
+        if ( -e $retfile )
+          {
+            say $tee `rm -f $retfile` ;
+          }
+
         {
           $printthis =
 "cd $thisto/cfg
@@ -358,9 +366,13 @@ TTT
       }
       elsif ( $themereport eq "tempsstats" )
       {
-        unless (-e "$retfile")
+        if ( -e $retfile )
         {
-          $printthis =
+          say $tee `rm -f $retfile` ;
+        }
+        
+        {
+        $printthis =
 "cd $thisto/cfg
 res -file $resfile -mode script<<TTT
 
@@ -380,14 +392,15 @@ m
 TTT
 ";
         }
-        else
-        {
-          say $tee "THERE ALREADY IS A RETFILE!";
-        }
       }
       elsif ( $themereport eq "dhs" ) # dhs = degree hours
       {
-        unless (-e "$retfile")
+        
+        if ( -e $retfile )
+        {
+          say $tee `rm -f $retfile` ;
+        }
+
         {
           $printthis =
 "cd $thisto/cfg
@@ -414,14 +427,14 @@ m
 TTT
 ";
         }
-        else
-        {
-          say $tee "THERE ALREADY IS A RETFILE!";
-        }
       }
       elsif ( $themereport eq "surfflow" ) # flow through surface
       {
-        unless (-e "$retfile")
+        if ( -e $retfile )
+        {
+          say $tee `rm -f $retfile` ;
+        }
+
         {
           $printthis =
 "cd $thisto/cfg
@@ -446,14 +459,14 @@ $what
 TTT
 ";
         }
-        else
-        {
-          say $tee "THERE ALREADY IS A RETFILE!";
-        }
       }
       elsif ( $themereport eq "surftemps" ) # temps at inside face of surface
       {
-        unless (-e "$retfile")
+        if ( -e $retfile )
+        {
+          say $tee `rm -f $retfile` ;
+        }
+
         {
           $printthis =
 "cd $thisto/cfg
@@ -480,10 +493,6 @@ y
 TTT
 ";
         }
-        else
-        {
-          say $tee "THERE ALREADY IS A RETFILE!";
-        }
       }
 
       if ( ($exeonfiles eq "y") or ( $dowhat{newretrieve} eq "y" ) )
@@ -505,7 +514,11 @@ TTT
       my @retrdata = @$retrdata_ref;
       #my $insert = eval { $adhoclines }; say $tee "\$insert: $insert";
       my $printthis;
-      unless (-e "$retfile")
+      if ( -e $retfile )
+      {
+        say $tee `rm -f $retfile` ;
+      }
+
       {
         if ( $themereport eq "radent" )
         {
@@ -803,7 +816,7 @@ TTT
                       } );
                   }
 
-                  unless ( ( $dowhat{inactivateres} eq "y" ) or ( -e $retfile ) )
+                  unless ( $dowhat{inactivateres} eq "y" )
                   {
                     say $tee "#Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: going to write $retfile.\ ";
 
@@ -917,7 +930,7 @@ TTT
                                       column => $column,
                                       reportstrategy => $reportstrategy,
                                     } );
-
+                  say $tee "IN RETRIEVE WORKING FOR \$resfile $resfile at iteration $countinstance";
                   $countitem++;
                 }
               }
@@ -951,15 +964,13 @@ TTT
     $flfile =~ s/\.res/\.fl/ ;
     if ( -e $resfile )
     {
-      `rm -f $resfile` ;
-      say $tee "rm -f $resfile";
+      say $tee `rm -f $resfile` ;
     }
 
     if ( -e $flfile )
     {
-      `rm -f $flfile` ;
+      say $tee `rm -f $flfile` ;
     }
-    say $tee "rm -f $flfile";
   }
 
   return ( \@retcases, \@retstruct, \@notecases );
@@ -1082,7 +1093,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   if ( $fire eq "y" )
   {
     $double = $repfile;
-    $repfile = $dirfiles{repfile} . "-fire-$stamp.csv";###DDD!!!
+    $repfile = $dirfiles{repfile} . "-fire-$stamp.csv";
   }
 
   my $origin = $d{origin};
@@ -1428,10 +1439,9 @@ sub newreport # This function retrieves the results of interest from the texts f
               $countline++;
             }
           }
-          else
+          else 
           {
-            open ( NOTFOUND, ">./notfound.txt" ) or die $! ;
-            say NOTFOUND $retfile;
+            say $tee "THERE IS NO RESULT FILE $retfile. Quitting.";
           }
         }
       }
@@ -1442,21 +1452,19 @@ sub newreport # This function retrieves the results of interest from the texts f
     {
       my $count = 0;
       foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
-      {
-        chomp $thing;
-        $thing =~ s/\s+/,/g ;
+      { #say $tee "IN REPORT looking into \$mergestruct $mergestruct \$countcase $countcase \$countblock $countblock \$countinstance $countinstance ";
+        chomp $thing; 
+        $thing =~ s/\s+/,/g ; #say $tee "IN REPORT \$thing $thing ";
         if ( $count == 0 )
-        {
-          $thing =~ s/$mypath\/// ;
-          $thing =~ /^(\w+__)/ ;
-          my $head = $1;
-          my $oldhead = $head;
-          $head = "$mypath/" . $head;
-          my $newhead = $inst{$head};
+        { 
+          $thing =~ s/$mypath\/// ; #say $tee "IN REPORT MODthing $thing "; say $tee "IN REPORT \$mypath $mypath "; 
+          my ( $head ) = $thing =~ /^\Q$file\E_([^\/]+)(?:\/|$)/; #say $tee "IN REPORT \$head $head ";
+          my $newhead = $inst{$head}; #say $tee "IN REPORT \$newhead $newhead ";
           if ( $newhead ne "" )
           {
-            $newhead = $newhead . "__";
-            $thing =~ s/^$oldhead/$newhead/ ;
+            $newhead = $newhead . "__"; #say $tee "IN REPORT \$newhead $newhead ";
+            my $filend = $file . "_" . $head ;
+            $thing =~ s/^$filend/$newhead/ ; #say $tee "IN REPORT NEWthing $thing ";
           }
         }
         push ( @winbag, $thing );

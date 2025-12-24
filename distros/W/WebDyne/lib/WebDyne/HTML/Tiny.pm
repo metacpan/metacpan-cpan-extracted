@@ -58,7 +58,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug load
@@ -326,6 +326,8 @@ sub _start_html {
         include
         include_script
         include_style
+        static
+        cache
     );
     debug('start_html %s', Dumper(\%attr_page));
 
@@ -335,18 +337,31 @@ sub _start_html {
     my @html=$WEBDYNE_DTD;
 
 
+    #  Static, cache ? If so mark as such in HTML::Tiny object to be 
+    #  reviewed at end of parse by Treebuilder. Not ideal, good enough
+    #
+    foreach my $attr (qw(static cache)) {
+        if (my $value=$attr_page{$attr}) {
+            debug("found attr: $attr, setting to value: $value");
+            $self->{"_${attr}"}=$value;
+            $self->{'_static'} ||=1 if ($attr eq 'cache');
+        }
+    }
+
+
     #  Add meta section
     #
     my @meta;
     if (my $hr=$attr_page{'meta'}) {
         debug('have meta hr: %s', Dumper($hr));
-        @meta=$self->meta({content => $attr_page{'meta'}})
+        @meta=$self->meta({content => $attr_page{'meta'}});
+        debug('processed to: %s', Dumper(\@meta));
     }
     else {
         debug('no meta run');
     }
-
-
+    
+    
     #  Logic error below, replaced by above
     #
     #my @meta=$self->meta({ content=>$attr_page{'meta'} })

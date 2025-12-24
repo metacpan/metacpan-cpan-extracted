@@ -61,8 +61,8 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.036';
-chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
+$VERSION='2.038';
+chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.ref'); <> if -f $_ });
 
 
 #  Debug load
@@ -134,16 +134,14 @@ sub html_sr {
     #  Supplied with class and options hash. Options can be supplied as hash ref
     #  or hash, convert.
     #
-    my ($fn, $opt_hr, @param)=@_;;
+    my ($fn, $opt_hr, @param)=@_;
     if (ref($fn)) {
         $opt_hr=$fn
     }
     elsif (ref($opt_hr) ne 'HASH') {
-        $opt_hr={ %{$opt_hr}, @param } if $opt_hr;
+        $opt_hr={ $opt_hr, @param } if $opt_hr;
     }
     $opt_hr->{'filename'}=$fn unless ref($fn);
-    #use Data::Dumper;
-    #die Dumper($opt_hr);
 
 
     #  Capture handler output
@@ -174,7 +172,7 @@ sub html_sr {
     
     #  Run
     #
-    defined($handler->handler($r)) || return err();
+    defined($handler->handler(grep {$_} $r, $opt_hr->{'param'})) || return err();
 
 
     #  Manual cleanup
@@ -377,6 +375,7 @@ sub handler : method {    # no subsort
         debug("webdyne_cache_dn $WEBDYNE_CACHE_DN");
         $cache_pn=File::Spec->catfile($WEBDYNE_CACHE_DN, $srce_inode);
         $cache_mtime=((-f $cache_pn) && (stat(_))[9]);
+        debug("webdyne_cache file: $cache_pn, cache_mtime: $cache_mtime");
     }
     else {
         debug('no webdyne_cache_dn');
@@ -606,44 +605,52 @@ sub handler : method {    # no subsort
                 cache_cr   => $cache,
                 srce_inode => $srce_inode
             );
-            $cache_inode=${
             
-                #  OK - what does this do ? It calls the cache code ref in the document via the eval_cr code execution
-                #  routine which is supplied as follows
-                #
-                #  $_[0] = self (instance) ref
-                #  $_[1] = r (request ref)
-                #  $_[2] = CGI (CGI ref)
-                #  $_[3] = \%param above
-                #
-                #  And we are executing code '$_[3]->{'cache_cr'}->($_[0], $_[3]->{'srce_inode'}', so
-                #  $cache->($self, $srce_inode)
-                #
-                #  Change mind - back to not supplying r, CGI as standard. User can request
-                #
-                ##$eval_cr->($self, undef, \%param, q[$_[3]->{'cache_cr'}->($_[0], $_[3]->{'srce_inode'})], 0) ||
-                #  
-                #  Before we added r,CGI as params for eval_cr it looked like this
-                #
-                #$eval_cr->($self, undef, \%param, q[$_[1]->{'cache_cr'}->($_[0], $_[1]->{'srce_inode'})], 0) ||
-                $eval_cr->($self, undef, \%param, q[$_[1]->{'cache_cr'}->($_[0], $_[1]->{'srce_inode'})], 0) ||
-                    return $self->err_html(
-                    errsubst(
-                        'error in cache code: %s', errstr() || $@ || 'no inode returned'
-                    ));
-            }
+            #  Use to take return of cache code as inode but not obvious. Now force user to run $self->inode(<something>) in cache
+            #  code to set. Keep here as reminder though.
+            #
+            #$cache_inode=${
+            
+            #  OK - what does this do ? It calls the cache code ref in the document via the eval_cr code execution
+            #  routine which is supplied as follows
+            #
+            #  $_[0] = self (instance) ref
+            #  $_[1] = r (request ref)
+            #  $_[2] = CGI (CGI ref)
+            #  $_[3] = \%param above
+            #
+            #  And we are executing code '$_[3]->{'cache_cr'}->($_[0], $_[3]->{'srce_inode'}', so
+            #  $cache->($self, $srce_inode)
+            #
+            #  Change mind - back to not supplying r, CGI as standard. User can request
+            #
+            ##$eval_cr->($self, undef, \%param, q[$_[3]->{'cache_cr'}->($_[0], $_[3]->{'srce_inode'})], 0) ||
+            #  
+            #  Before we added r,CGI as params for eval_cr it looked like this
+            #
+            #$eval_cr->($self, undef, \%param, q[$_[1]->{'cache_cr'}->($_[0], $_[1]->{'srce_inode'})], 0) ||
+            $eval_cr->($self, undef, \%param, q[$_[1]->{'cache_cr'}->($_[0], $_[1]->{'srce_inode'})], 0) ||
+                return $self->err_html(
+                errsubst(
+                    'error in cache code: %s', errstr() || $@ || 'no inode returned'
+                ));
+            #}
         }
         else {
+        
+            #  See above. Same rationale
+            #
+            #$cache_inode=${
             debug('non-CODE cache type');
-            $cache_inode=${
-                $eval_cr->($self, undef, $srce_inode, $cache, 0) ||
-                    return $self->err_html(
-                    errsubst(
-                        'error in cache code: %s', errstr() || $@ || 'no inode returned'
-                    ));
-            }
+            $eval_cr->($self, undef, $srce_inode, $cache, 0) ||
+                return $self->err_html(
+                errsubst(
+                    'error in cache code: %s', errstr() || $@ || 'no inode returned'
+                ));
+            #}
         }
-        $cache_inode=$cache_inode ? md5_hex($srce_inode, $cache_inode) : $self->{'_inode'};
+        #$cache_inode=$cache_inode ? md5_hex($srce_inode, $cache_inode) : $self->{'_inode'};
+        $cache_inode=$self->{'_inode'};
 
         #  Will probably make inodes with algorithm below some day so we can implement a "maxfiles type limit on
         #  the number of cache files generated. Not today though ..
@@ -655,13 +662,26 @@ sub handler : method {    # no subsort
 
             #  Using a cache file, different inode.
             #
-            debug("goto RENDER_BEGIN, inode node was $srce_inode, now $cache_inode");
-            $self->{'_inode'}=$cache_inode;
+            debug("goto RENDER_BEGIN, inode node was $srce_inode, now $cache_inode, _compile: %s", $self->{'_compile'} || 0 );
             goto RENDER_BEGIN;
-
             #return &handler($self,$r,$param_hr); #should work instead of goto for pendants
+
+        }
+        else {
+        
+            #  Same inode, nothing to do.
+            #
+            debug('inode not changed, proceeding');
+            
         }
 
+    }
+    else {
+    
+        #  No cache code to run
+        #
+        debug('not running cache code');
+        
     }
 
 
@@ -670,15 +690,26 @@ sub handler : method {    # no subsort
     #
     my $html_sr;
     if ($self->{'_static'} || ($meta_hr && ($meta_hr->{'html'} || $meta_hr->{'static'}))) {
+    
+    
+        #  It's flagged static, passed first hurdle. We might need to save away - but only if we're not a 
+        #  child handler. $r->main() gives undef if we *are* the main request handler.
+        #
+        #  Remove test for main child handler but keep as reminder
+        #
+        #if (! $r->main()) {
 
-        #my $cache_pn=File::Spec->catfile($WEBDYNE_CACHE_DN, $srce_inode);
+        #  We are the main request handler. So process
+        #
+        debug('static flag detected, in main handler');
         if ($cache_pn && (-f (my $fn="${cache_pn}.html")) && ((stat(_))[9] >= $srce_mtime) && !$self->{'_compile'}) {
 
             #  Cache file exists, and is not stale, and user/cache code does not want a recompile. Tell Apache or FCGI
             #  to serve it up directly.
             #
             debug("returning pre-rendered file ${cache_pn}.html");
-            if ($MP2 || $ENV{'FCGI_ROLE'} || $ENV{'psgi.version'}) {
+            unless($MOD_PERL && !$MP2) {
+            #if ($MP2 || $ENV{'FCGI_ROLE'} || $ENV{'psgi.version'}) {
 
                 #  Do this way for mod_perl2, FCGI. Note to self need r->output_filter or
                 #  Apache 2 seems to add junk characters at end of output
@@ -692,7 +723,7 @@ sub handler : method {    # no subsort
                 #  Apache bug ? Need to set content type on r also
                 $r->content_type($WEBDYNE_CONTENT_TYPE_HTML);
                 debug("set content type to: $WEBDYNE_CONTENT_TYPE_HTML, running");
-                return $r_child->run();
+                return $r_child->run($self);
 
             }
             else {
@@ -711,7 +742,7 @@ sub handler : method {    # no subsort
             #  Cache file defined, but out of date of non-existant. Register callback handler to write HTML output
             #  after render complete
             #
-            debug('storing to disk cache html %s', \$data_ar->[0]);
+            debug("storing inode: %s to disk file: ${cache_pn}.html, cache html %s", $self->{'_inode'}, \$data_ar->[0]);
             my $cr=sub {
                 &cache_html(
                     "${cache_pn}.html", ($meta_hr->{'static'} || $self->{'_static'}) ? $html_sr : \$data_ar->[0])
@@ -731,6 +762,16 @@ sub handler : method {    # no subsort
             $MP2 ? $r->pool->cleanup_register($cr) : $r->register_cleanup($cr);
         }
 
+        #}
+        #else {
+        #    debug('in child handler, not saving');
+        #}
+
+    }
+    else {
+    
+        debug('not static code, not saving to cache or serving');
+        
     }
 
 
@@ -3990,9 +4031,12 @@ sub cache_mtime {
     #  inode if given
     #
     my $self=shift();
+    debug("self: $self");
     my $inode_pn=${
         $self->cache_filename(@_) || return err()};
-    \(stat($inode_pn))[9] if $inode_pn;
+    debug("inode_pn: $inode_pn");
+    my $mtime=$inode_pn ? (stat($inode_pn))[9] : undef;
+    return \$mtime;
 
 }
 
@@ -4015,21 +4059,6 @@ sub cache_filename {
     my $inode=@_ ? shift() : $self->{'_inode'};
     my $inode_pn=File::Spec->catfile($WEBDYNE_CACHE_DN, $inode) if $WEBDYNE_CACHE_DN;
     \$inode_pn;
-
-}
-
-
-sub cache_inode {
-
-    #  Get cache inode string, or generate new unique inode
-    #
-    my $self=shift();
-    @_ && ($self->{'_inode'}=md5_hex($self->{'_inode'}, $_[0]));
-
-    #  See comment in handler section about future inode gen
-    #
-    #@_ && ($self->{'_inode'}.=('_'. md5_hex($_[0])));
-    \$self->{'_inode'};
 
 }
 
@@ -4107,12 +4136,31 @@ sub meta {
 sub static {
 
 
-    #  Set static flag for this instance only. If all instances wanted
+    #  Set/get static flag for this instance only. If all instances wanted
     #  set in meta data. This method used by WebDyne::Static module
     #
-    my $self=shift();
-    $self->{'_static'}=1;
+    my ($self, $static)=@_;
+    debug("self: $self, static: $static");
+    
+    
+    #  Set or get
+    #
+    if (defined($static)) {
+        
 
+        #  Set
+        #
+        $self->meta()->{'static'}=$static;
+        return $self->{'_static'}=$static;
+        
+    }
+    else {
+    
+        #  Get
+        #
+        return $self->meta()->{'static'} || $self->{'_static'} || 0
+        
+    }
 
 }
 
@@ -4167,13 +4215,19 @@ sub select {
 
 sub inode {
 
-
-    #  Return inode name
+    #  Return or set inode name
     #
     my $self=shift();
-    @_ ? $self->{'_inode'}=shift() : ($self->{'_inode'} ||= do {
-         md5_hex( $self->{'_r'} ? $self->{'_r'}->{'filename'} : $self.rand() ) 
-    });
+    my $r=$self->r() ||
+        return err('unable to get request handler');
+    if (@_) {
+        $self->{'_inode'}=md5_hex(ref($self), $r->location, $r->filename(), shift());
+    }
+    else {
+        $self->{'_inode'} ||=
+            md5_hex(ref($self), $r->location, $r->filename());
+    }
+    return $self->{'_inode'};
 
 }
 
@@ -4412,8 +4466,8 @@ __END__
 
 =head1 NAME
 
-WebDyne - Dynamic Perl web application framework with template
-    compilation and modular design
+WebDyne - Dynamic Perl web application framework with template compilation and modular design. Designed to be used via Plack/Starman/PSGI or Apache mod_perl web servers, but supports
+    standalone HTML output
 
 =head1 SYNOPSIS
 
@@ -4437,23 +4491,13 @@ SYNOPSIS
 
 =head1 DESCRIPTION
 
-I<<< WebDyne >>>  is a high-performance, dynamic Perl web application framework. It provides method to integrate Perl code in
- HTMLfiles with dynamic compilation, caching, and a modular architecture.
- WebDyne is designed for flexibility and performance, supporting both CGI
- and persistent environments (mod_perl, PSGI). The core interface for
- scripts is via the  html  and html_sr  functions, which render .psp templates to HTML.
+I<<< WebDyne >>>  is a high-performance, dynamic Perl web application framework. It provides method to integrate Perl code in HTML files with dynamic compilation, caching, and a modular architecture. WebDyne is designed for flexibility and performance, supporting both CGI and persistent environments (mod_perl, PSGI). The core interface for scripts is via the html  and  html_sr  functions, which render .psp templates to HTML.
 
-WebDyne can be used directly from scripts or as a handler in persistent environments. It supports advanced features such as block
- rendering, custom handlers, caching, and integration with Apache via
- mod_perl and PSGI servers such as Plack and Starman.
+WebDyne can be used directly from scripts or as a handler in persistent environments. It supports advanced features such as block rendering, custom handlers, caching, and integration with Apache via mod_perl, and PSGI servers such as Plack and Starman.
 
-Comprehensive documentation around the construction and options within .psp files, and the general usage of WebDyne within an Apache or
- PSGI server are available in the doc directory of the Perl module or from
- the Github repository.
+Comprehensive documentation around the construction and options within .psp files, and the general usage of WebDyne within an Apache or PSGI server are available in the doc directory of the Perl module or from the  L<Github repository|https://github.com/aspeer/WebDyne> .
 
-The simplest representation of a .psp file that can be rendered is as follows. This example uses several syntactic shortcuts from brevity
- that are not standard HTML, however the output generated by WebDyne is
- alway standards compliant HTML.
+The simplest representation of a .psp file that can be rendered is as follows. This example uses several syntactic shortcuts for brevity that are not standard HTML, however the output generated by WebDyne is alway standards compliant HTML.
 
     <start_html>
     The current server time is: <? localtime() ?>
@@ -4471,7 +4515,7 @@ The simplest representation of a .psp file that can be rendered is as follows. T
 
 =item * B<<< html($filename, \%options, ...) >>>
 
-Renders a .psp file to HTML and returns the result as a string. This is a convenience wrapper around html_sr .
+Renders a .psp file to HTML and returns the result as a string. This is a convenience wrapper around  html_sr .
 
 I<<< Arguments: >>> 
 
@@ -4497,8 +4541,7 @@ I<<< Options: >>>
 
 Renders a .psp file to HTML and returns a scalar reference to the result. This is the core rendering function for scripts.
 
-I<<< Arguments and options are as for
-          html. >>>
+I<<< Arguments and options are as for html. >>>
 
 =item * B<<< handler($r, \%params) >>>
 
@@ -4508,7 +4551,7 @@ Main request handler for mod_perl and PSGI environments. Not typically used dire
 
 =head1 OPTIONS
 
-The following options can be passed to  html  and html_sr :  
+The following options can be passed to  html  and  html_sr :  
 
 =over
 
@@ -4518,11 +4561,11 @@ application .psp filename to render (defaults to first argument).
 
 =item * B<<< handler >>>
 
-Custom handler class to use for rendering.
+Custom handler class to use for rendering. Defaults to the inbuilt WebDyne handler
 
 =item * B<<< outfile >>>
 
-Filehandle to write output to (optional). 
+File handle to write output to (optional).
 
 =back
 

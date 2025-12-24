@@ -45,7 +45,7 @@ calc_newctl checkfile constrain_controls read_controls read_control_constraints 
 apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
 vary_net read_net apply_node_changes readobsfile obs_modify
 decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
-gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr
+gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr genmodnew
 ); # our @EXPORT = qw( );
 
 $VERSION = '0.171'; # our $VERSION = '';
@@ -1138,7 +1138,7 @@ sub morph
 	my %dirfiles = %{ $dirfiles_r };
 	my %dowhat = %{ $dowhat_r };
 	my %vehicles = %{ $vehicles_r };
-	my %inst = %{ $inst_r };
+	my %inst = %{ $inst_r }; 
 	my @precedents = @{ $precedents_r };
 
 	my $mypath = $main::mypath;
@@ -1150,13 +1150,13 @@ sub morph
 	my $outfile = $main::outfile;
 	my $tofile = $main::tofile;
 	my $simnetwork = $main::simnetwork;
-  my $max_processes = $main::max_processes;
+        my $max_processes = $main::max_processes;
 
 	my %simtitles = %main::simtitles;
 	my %retrievedata = %main::retrievedata;
 	my @keepcolumns = @main::keepcolumns;
 	my @weights = @main::weights;
-  my @weighttransforms = @main::weighttransforms;
+        my @weighttransforms = @main::weighttransforms;
 	my @weightsaim = @main::weightsaim;
 	my @varthemes_report = @main::varthemes_report;
 	my @varthemes_variations = @main::varthemes_variations;
@@ -1170,16 +1170,18 @@ sub morph
 	my @filter_columns = @main::filter_columns;
 	my %vals = %main::vals;
 
-  #say  "RECEIVED NOW INSTANCES" . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
-
 	if ( $tofile eq "" )
 	{
 		$tofile = "./report.txt";
 	}
 
 	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
-
+    #say $tee "NOW!!! IN MORPH RECEIVED \%inst: " . dump( \%inst );
 	say $tee "\n# Now in Sim::OPT::Morph.\n";
+
+    #say $tee "RECEIVED NOW INSTANCES" . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
+
+    #say $tee "MORPH ENTER: steps = " . scalar(@instances);
 
 	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
 	if ( not ( $preventsim ) ) { $preventsim = "n"; }
@@ -1397,7 +1399,8 @@ sub morph
 
 
 
-	if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) )
+	#if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) )
+    if ( $dirfiles{latinhypercube} eq "y" )
 	{
 		my ( $instances_ref, $inst_ref, $dirfiles_ref ) = setpickedinsts( \@instances, \%inst, \%dirfiles );
 	  @instances = @{ $instances_ref };
@@ -1405,13 +1408,17 @@ sub morph
 		%dirfiles = %{ $dirfiles_ref };
 	}
 
+    say $tee "NOWMORPH!!! \@instances: " . dump( @instances );
+    #say $tee "NOWMORPH!!! \%inst: " . dump( \%inst );
+    #say $tee "NOWMORPH!!! \%dirfiles: " . dump( \%dirfiles );
+
     my @collect;
 	foreach $instance_r ( @instances )
 	{
 		%d = %{ $instance_r };
 		push( @collect, $d{is} );
 	}
-	say $tee "NOW COLLECTED INSTANCES " . dump( @collect );
+	#say $tee "NOW COLLECTED INSTANCES " . dump( @collect );
 
     my $counti = 0;
 	foreach my $instance ( @instances )
@@ -1530,6 +1537,7 @@ sub morph
 				my $export_toenergyplus = $vals{$countmorphing}{$countvar}{export_toenergyplus};
 				my $skipop = $vals{$countmorphing}{$countvar}{skipop};
 				my $todos = $vals{$countmorphing}{$countvar}{todos};
+				my @genmodnew = @{ $vals{$countmorphing}{$countvar}{genmodnew} };
 				# genchange
 				my ( @cases_to_sim, @files_to_convert );
 				my ( @obs, @node, @component, @loopcontrol, @flowcontrol, @new_loopcontrol, @new_flowcontrol ); # THINGS GLOBAL AS REGARDS TO COUNTER ZONE CYCLES
@@ -1570,7 +1578,7 @@ sub morph
 
 					#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
 					if ( ( $dowhat{actonmodels} eq "y" ) and ( not ( $dowhat{inactivatemorph} eq "y" ) ) )
-					{ say $tee "HERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$is: $is \$from: $from, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
+					{ #say $tee "HERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$is: $is \$from: $from, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 						push ( @morphcases, $is );
 
 						print MORPHLIST "$to{cleanto}\n";
@@ -1752,7 +1760,7 @@ sub morph
 								`cd $to`;
 								say $tee "cd $to\n";
                 #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 9 ";
-								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
+								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; #say $tee "SO, LAUNCHLINE! " . dump( $launchline );
 
 								if ( ( $stepsvar > 1 ) and ( not ( eval ( $skip ) ) ) )
 								{
@@ -1831,6 +1839,10 @@ sub morph
 										{
 
 											apply_constraints( $to, $stepsvar, $countop, $countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+										}
+										elsif ( $modtype eq "genmodnew" )
+										{
+											genmodnew( $to, $stepsvar, $countop, $countstep, \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 										}
 										elsif ( $modtype eq "change_thickness" )
 										{
@@ -2171,14 +2183,14 @@ sub morph
 															}
 
 															if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
-															{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
+															{   #say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
 																recalculateish
 																( $to, $stepsvar, $countop,
 																	$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 															}
 
 															if ( defined( $rebuildconstr->[$countop] ) and ( $action eq "rebuildconstr" ) )
-															{   say $tee "FOR $to CALLED \$rebuildconstr EX-POST " . dump( $rebuildconstr );
+															{   #say $tee "FOR $to CALLED \$rebuildconstr EX-POST " . dump( $rebuildconstr );
 																rebuildconstr
 																( $to, $stepsvar, $countop,
 																	$countstep, \@applytype, $rebuildconstr, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
@@ -3541,10 +3553,10 @@ sub reassign_construction
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $reassign_construction, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
-        say $tee "AAA \$to $to"  ;
-        say $tee "AAA \$stepsvar $stepsvar" ;
-        say $tee "AAA \$countop $countop"  ;
-        say $tee "AAA \$countstep $countstep" ;
+        #say $tee "AAA \$to $to"  ;
+        #say $tee "AAA \$stepsvar $stepsvar" ;
+        #say $tee "AAA \$countop $countop"  ;
+        #say $tee "AAA \$countstep $countstep" ;
 	my @applytype = @{ $applytype_ref };
 	my $zone_letter = $applytype[$countop][3];
 
@@ -3750,7 +3762,7 @@ $printthis";
 
 sub readobsfile
 {    # THIS READS A GEO FILE TO GET THE DATA OF THE REQUESTED OBSTRUCTIONS
-	my ( $fullgeopath ) = @_; say $tee "\$fullgeopath: $fullgeopath";
+	my ( $fullgeopath ) = @_; #say $tee "\$fullgeopath: $fullgeopath";
 
 	open( GEOF, "$fullgeopath" ) or die;
 	my @lines = <GEOF>;
@@ -4156,7 +4168,7 @@ sub rebuildconstr
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	my @zone_letters = @{ $rebuildconstr }; say $tee "ZONE LETTERS: " . dump( @zone_letters ) ;
+	my @zone_letters = @{ $rebuildconstr }; #say $tee "ZONE LETTERS: " . dump( @zone_letters ) ;
 
 	$launchline = " -file $to/cfg/$fileconfig -mode script";
 
@@ -4956,6 +4968,9 @@ sub pin_obstructions
 
 
 
+
+
+
 sub apply_constraints
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
@@ -5276,20 +5291,20 @@ sub apply_constraints
 			  if ( $line =~ /#&&/ )
 			  {       #say $tee "APPPLY_CONSTRAINTS \$line: " . dump( $line );
 				  $line =~ s/ +/ /;
-				  my @splits = split( "$separator", $line ); say $tee "APPPLY_CONSTRAINTS \@splits: " . dump( @splits );
+				  my @splits = split( "$separator", $line ); #say $tee "APPPLY_CONSTRAINTS \@splits: " . dump( @splits );
 
 				  my @transitional = split( /#&&/, $line );
 				  my $rightpart = $transitional[1];
 				  $rightpart =~ s/^ +//;
-					$rightpart =~ s/ +/ /; say $tee "APPPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
-				  my @elms = split( / /, $rightpart ); say $tee "APPPLY_CONSTRAINTS \@elms: " . dump( @elms );
+					$rightpart =~ s/ +/ /; #say $tee "APPPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
+				  my @elms = split( / /, $rightpart ); #say $tee "APPPLY_CONSTRAINTS \@elms: " . dump( @elms );
 
 		          foreach my $elm ( @elms )
 				  {
 						chomp $elm;
 					  my ( $name, $number ) = split( "-", $elm );
 
-						say $tee "APPPLY_CONSTRAINTS \$name: " . dump( $name );
+						#say $tee "APPPLY_CONSTRAINTS \$name: " . dump( $name );
 					  if ( $eds{$name}{file} eq $file )
 					  {
 						  #if ( $eds{$name}{line} eq $cnt )

@@ -55,12 +55,14 @@ has 'session' => (
   is       => 'ro',
   isa      => 'HashRef',
   required => 1,
+  traits   => ['OIDC::Client::Trait::HashStore'],
 );
 
 has 'stash' => (
   is       => 'ro',
   isa      => 'HashRef',
   required => 1,
+  traits   => ['OIDC::Client::Trait::HashStore'],
 );
 
 has 'redirect' => (
@@ -115,7 +117,13 @@ has 'audience_cache' => (
   builder => '_build_audience_cache',
 );
 
-sub _build_is_base_url_local   { return shift->base_url =~ m[^http://localhost\b] }
+has 'after_touching_session' => (
+  is      => 'ro',
+  isa     => 'CodeRef',
+  default => sub { sub {} },
+);
+
+sub _build_is_base_url_local   { return shift->base_url =~ m[^https?://localhost\b] }
 sub _build_login_redirect_uri  { return shift->_build_redirect_uri_from_path('login') }
 sub _build_logout_redirect_uri { return shift->_build_redirect_uri_from_path('logout') }
 
@@ -141,6 +149,8 @@ sub _build_audience_cache {
   return CHI->new(%$cache_config, namespace => "OIDC-${provider}-Audience");
 }
 
+after write_session  => sub { shift->after_touching_session->() };
+after delete_session => sub { shift->after_touching_session->() };
 
 =head1 METHODS
 
@@ -207,12 +217,12 @@ sub redirect_to_authorize {
 
   my $authorize_url = $self->client->auth_url(%args);
 
-  $self->session->{oidc_auth}{$state} = {
+  $self->write_session(['oidc_auth', $state], {
     nonce      => $nonce,
     provider   => $self->client->provider,
     target_url => $params{target_url} ? $params{target_url}
                                       : $self->current_url,
-  };
+  });
 
   $self->log_msg(debug => "OIDC: redirecting to provider : $authorize_url");
   $self->redirect->($authorize_url);
@@ -622,8 +632,10 @@ sub build_user_from_claims {
 
   return $user_class->new(
     (
-      map { $_ => $claims->{ $mapping->{$_} } }
-      grep { exists $claims->{ $mapping->{$_} } }
+      map {
+        my $val = $self->client->get_claim_value(name => $_, claims => $claims, optional => 1);
+        defined $val ? ($_ => $val) : ();
+      }
       keys %$mapping
     ),
     defined $role_prefix ? (role_prefix => $role_prefix) : (),
@@ -775,10 +787,10 @@ sub redirect_to_logout {
 
   my $logout_url = $self->client->logout_url(%args);
 
-  $self->session->{oidc_logout}{$state} = {
+  $self->write_session(['oidc_logout', $state], {
     provider   => $self->client->provider,
     target_url => $params{target_url},
-  };
+  });
 
   $self->log_msg(debug => "OIDC: redirecting to idp for log out : $logout_url");
   $self->redirect->($logout_url);
@@ -1094,7 +1106,7 @@ sub _extract_auth_data {
   my $state = $self->request_params->{state}
     or OIDC::Client::Error::Authentication->throw("OIDC: no state parameter in request");
 
-  my $auth_data = delete $self->session->{oidc_auth}{$state}
+  my $auth_data = $self->delete_session(['oidc_auth', $state])
     or OIDC::Client::Error::Authentication->throw("OIDC: no authorisation data for state : '$state'");
 
   return $auth_data;
@@ -1104,16 +1116,19 @@ sub _extract_auth_data {
 sub _get_audience_store {
   my ($self, $audience, $key) = @_;
 
+  my $store_mode = $self->client->store_mode;
+
   my $audience_store;
-  if ($self->client->store_mode eq 'cache') {
-    $audience_store = $self->audience_cache->get($audience) || {};
+  if ($store_mode eq 'cache') {
+    $audience_store = $self->audience_cache->get($audience);
   }
   else {
-    my $provider = $self->client->provider;
-    my $store = $self->client->store_mode eq 'session' ? $self->session : $self->stash;
-    $audience_store = $store->{oidc}{provider}{$provider}{audience}{$audience} ||= {};
+    my $meth = $store_mode eq 'session' ? 'read_session' : 'read_stash';
+    my @path = ('oidc', 'provider', $self->client->provider, 'audience', $audience);
+    $audience_store = $self->$meth(\@path);
   }
 
+  $audience_store ||= {};
   return $key ? $audience_store->{$key} : $audience_store;
 }
 
@@ -1121,11 +1136,17 @@ sub _get_audience_store {
 sub _set_audience_store {
   my ($self, $audience, $key, $value) = @_;
 
-  my $audience_store = $self->_get_audience_store($audience);
-  $audience_store->{$key} = $value;
+  my $store_mode = $self->client->store_mode;
 
-  if ($self->client->store_mode eq 'cache') {
+  if ($store_mode eq 'cache') {
+    my $audience_store = $self->audience_cache->get($audience);
+    $audience_store->{$key} = $value;
     $self->audience_cache->set($audience, $audience_store);
+  }
+  else {
+    my $meth = $store_mode eq 'session' ? 'write_session' : 'write_stash';
+    my @path = ('oidc', 'provider', $self->client->provider, 'audience', $audience, $key);
+    $self->$meth(\@path, $value);
   }
 }
 
@@ -1144,14 +1165,18 @@ Note that only the data from the current provider is deleted.
 sub delete_stored_data {
   my $self = shift;
 
-  if ($self->client->store_mode eq 'cache') {
+  my $store_mode = $self->client->store_mode;
+
+  if ($store_mode eq 'cache') {
     $self->audience_cache->clear();
   }
   else {
-    my $provider = $self->client->provider;
-    my $store = $self->client->store_mode eq 'session' ? $self->session : $self->stash;
-    delete $store->{oidc}{provider}{$provider};
+    my $meth = $store_mode eq 'session' ? 'delete_session' : 'delete_stash';
+    my @path = ('oidc', 'provider', $self->client->provider);
+    $self->$meth(\@path);
   }
+
+  return;
 }
 
 

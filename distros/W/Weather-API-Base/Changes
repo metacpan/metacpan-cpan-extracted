@@ -1,10 +1,14 @@
 Revision history for Weather-API-Base
 
+0.4     2025-12-23
+        - Minimum version of Test2-Suite.
+        - num_to_mon and mon_to_num added for NOAA::Aurora.
+
 0.3     2024-12-09
-        ts_to_iso_date added.
+        - ts_to_iso_date added.
 
 0.2     2024-11-04
-        Unit conversion changes/additions.
+        - Unit conversion changes/additions.
 
 0.1     2024-11-03
-        First release.
+        - First release.

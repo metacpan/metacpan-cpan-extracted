@@ -1,0 +1,8 @@
+<html> @0
+  <head> @0.0
+    <title> @0.0.0
+      "Static Test"
+    <meta content="static=1" name="WebDyne" /> @0.0.1
+  <body> @0.1
+    <p> @0.1.0
+      "Static page via meta attributeParam value: {'count'} ?>"

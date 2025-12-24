@@ -30,7 +30,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Shortcut error handler.
@@ -57,12 +57,13 @@ sub import {
 
     #  Will only work if called from within a __PERL__ block in WebDyne
     #
+    my $class=shift();
     my $self_cr=UNIVERSAL::can(scalar(caller), 'self') || return;
     my $self=$self_cr->()                              || return;
 
     $self->set_handler('WebDyne::Chain');
     my $meta_hr=$self->meta();
-    push @{$meta_hr->{'webdynechain'}}, __PACKAGE__;
+    push @{$meta_hr->{'webdynechain'}}, $class;
 
 
 }

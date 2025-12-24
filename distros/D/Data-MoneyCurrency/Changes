@@ -1,5 +1,8 @@
 Revision history for Data-MoneyCurrency
 
+0.29    Mon Dec 22 19:22:41 CET 2025
+        - BG uses the Euro from 1 Jan 2026
+
 0.28    Sat Oct 18 12:11:23 CEST 2025
         - new currecy xcg in SX and CW
         - ZWG is iso currency

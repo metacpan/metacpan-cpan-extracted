@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry><refmeta><refentrytitle>wddebug</refentrytitle><manvolnum>1</manvolnum></refmeta><refnamediv><refname>wddebug</refname><refpurpose>enable or disable debugging in the WebDyne packages</refpurpose></refnamediv><refsynopsisdiv><cmdsynopsis><command>wddebug [--OPTION]</command></cmdsynopsis><cmdsynopsis><command>wddebug --enable</command></cmdsynopsis><cmdsynopsis><command>wddebug --enable --directory /opt/perl5</command></cmdsynopsis></refsynopsisdiv><refsection><title>Description</title><para>By default debugging is optimized out of the WebDyne modules to increase performance. This script can be used to enable or disable debugging for troubleshooting purposes. Debugging
+    can be turned on or off in the WebDyne modules by running this script with the appropriate option. With no options the script will return the current status of debugging in the WebDyne
+    modules.</para></refsection><refsection><title>Options</title><para><variablelist><varlistentry><term>--status</term><listitem><para>Display the current debug status of the WebDyne modules. The default if no option given.</para></listitem></varlistentry><varlistentry><term>--enable</term><listitem><para>Enable debugging in the WebDyne modules.</para></listitem></varlistentry><varlistentry><term>--disable</term><listitem><para>Disable debugging in the WebDyne modules.</para></listitem></varlistentry><varlistentry><term>--directory</term><listitem><para>Specify the directory containing the WebDyne modules.</para></listitem></varlistentry><varlistentry><term>--yes</term><listitem><para>Automatically confirm the prompt to proceed with enabling or disabling debugging.</para></listitem></varlistentry><varlistentry><term>--help|?</term><listitem><para>Display a brief help message and exit.</para></listitem></varlistentry><varlistentry><term>--man</term><listitem><para> Display the full manual page.</para></listitem></varlistentry><varlistentry><term>--version</term><listitem><para>Display the script version and exit.</para></listitem></varlistentry></variablelist></para></refsection><refsection><title>Examples</title><programlisting language="sh"># Show current status
+#
+$ wddebug
+debug location: /opt/perl5/lib/perl5/
+debug  enabled: WebDyne.pm
+debug disabled: WebDyne/Handler.pm
+...
+
+# Turn on debugging for WebDyne modules 
+#
+$ wddebug --enable
+
+# Turn off debugging
+#
+$ wddebug --disable
+
+# Install modules from source with debugging enabled
+#
+$ WEBDYNE_DEBUG=1 perl Makefile.PL
+$ make install</programlisting></refsection><refsection><title>Notes</title><para>Debugging is enabled in all source modules in the form of debug('message') calls. These calls are optimized out of the code during installation via a PM_FILTER in MakeMaker unless
+    the WEBDYNE_DEBUG environment variable is set. Once optimised out the debug calls are not available for use as they are converted in the code to the form `<code>0 &amp;&amp;
+    debug('message')</code>, which is optimised away by the Perl compiler. This script will enable or disable the debug calls in already installed modules by adding or removing the <code>0
+    &amp;&amp;</code> prefix from the code. <emphasis role="bold">As this edits installed modules it is not recommended for use in a production environment</emphasis>. If debugging is
+    necessary it is better to install WebDyne on a test system with the command:</para><para><programlisting>$ WEBDYNE_DEBUG=1 perl Makefile.PL &amp;&amp; make install</programlisting></para></refsection><refsection><title>Debugging</title><para>Actual debugging output is controlled by environment variables. See the WebDyne documentation for more information but in brief, setting the <envar>WEBDYNE_DEBUG</envar> environment
+    variable to a value of 1 will enable all debugging output. Setting it to a string value that corresponds to a module or method will filter the debugging output to that module or
+    method.</para><para><programlisting># Debug compilation of a file
+#
+WEBDYNE_DEBUG=1 wdcompile time.psp
+
+# Debug render of a file
+#
+WEBDYNE_DEBUG=1 wdrender time.psp
+
+# Debug a specific method
+#
+WEBDYNE_DEBUG=render wdrender time.psp
+
+# Multiple methods can be debugged
+#
+WEBDYNE_DEBUG=render,compile wdrender time.psp
+</programlisting></para></refsection><refsection><title>Author</title><para>Written by Andrew Speer, <email>andrew@webdyne.org</email></para></refsection><refsection><title>LICENSE and COPYRIGHT</title><para>This file is part of WebDyne.</para><para>This software is copyright (c) 2025 by Andrew Speer &lt;andrew.speer@isolutions.com.au>.</para><para>This is free software; you can redistribute it and/or modify it underthe same terms as the Perl 5 programming language system itself.</para><para>Full license text is available at:</para><para>&lt;http://dev.perl.org/licenses/></para></refsection></refentry>

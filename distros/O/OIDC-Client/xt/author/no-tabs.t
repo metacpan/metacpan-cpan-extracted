@@ -27,6 +27,7 @@ my @files = (
     'lib/OIDC/Client/Role/LoggerWrapper.pm',
     'lib/OIDC/Client/TokenResponse.pm',
     'lib/OIDC/Client/TokenResponseParser.pm',
+    'lib/OIDC/Client/Trait/HashStore.pm',
     'lib/OIDC/Client/User.pm',
     'lib/OIDC/Client/Utils.pm',
     't/00-compile.t',

@@ -5,16 +5,25 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007001';
+our $VERSION   = '0.008000';
 
 use parent 'Sub::Accessor::Small';
+
 use B ();
 use Class::XSAccessor ();
+use Scalar::Util ();
 use Marlin ();
 
+sub new {
+	my $class = shift;
+	my $me    = $class->SUPER::new( @_ );
+	Scalar::Util::weaken( $me->{marlin} );
+	return $me;
+}
+
 sub _croaker {
-	shift;
-	Marlin->_croaker( @_ );
+	my $me = shift;
+	$me->{_marlin} ? $me->{_marlin}->_croaker( @_ ) : Marlin->_croaker( @_ );
 }
 
 sub accessor_kind  {
@@ -237,18 +246,7 @@ sub install_coderef {
 	
 	if ( $target =~ /^my\s+(.+)$/ ) {
 		my $lexname = $1;
-		if ( Marlin::_HAS_NATIVE_LEXICAL_SUB ) {
-			no warnings ( "$]" >= 5.037002 ? 'experimental::builtin' : () );
-			builtin::export_lexically( $lexname, $coderef );
-			return;
-		}
-		elsif ( Marlin::_HAS_MODULE_LEXICAL_SUB ) {
-			'Lexical::Sub'->import( $lexname, $coderef );
-			return;
-		}
-		else {
-			$target = $lexname;
-		}
+		$me->{_marlin}->_lexport( $lexname, $coderef );
 	}
 	
 	return $me->SUPER::install_coderef( @_ );

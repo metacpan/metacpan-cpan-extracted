@@ -1,0 +1,41 @@
+---
+abstract: 'Bash option parsing that does what you mean'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-Long-Bash
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Getopt::Long::Bash:
+    file: lib/Getopt/Long/Bash.pm
+    version: v0.6.0
+requires:
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/tecolicom/getoptlong/issues
+  homepage: https://github.com/tecolicom/getoptlong
+  repository: https://github.com/tecolicom/getoptlong.git
+version: 0.6.0
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+  - 'google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

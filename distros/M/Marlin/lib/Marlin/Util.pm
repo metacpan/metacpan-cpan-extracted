@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007001';
+our $VERSION   = '0.008000';
 
 use parent 'Exporter::Tiny';
 
@@ -97,6 +97,9 @@ Export these with C<< use Marlin::Util -bool >> or C<< use Marlin::Util -all >>.
 =item C<false>
 
 =back
+
+These are essentially the same as the C<true> and C<false> constants defined
+in the L<builtin> package.
 
 =head1 BUGS
 

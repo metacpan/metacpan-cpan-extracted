@@ -1,7 +1,7 @@
 {
-	"version" : "0.0.6",
-	"name"    : "File Find Mason",
-	"author"  : "Brian Blackmore",
+	"version" : "0.0.7",
+	"name"    : "File-Find-Mason",
+	"author"  : ["Brian Blackmore <brian@mediaalpha.com>"],
 	"abstract": "Quickly identify Mason files in Perl repositories",
 	"license" : ["gpl_3"],
 	"prereqs" : {
@@ -14,9 +14,12 @@
 			"requires": {
 				"perl": "5.16.3",
 				"File::Find": "1.20"
+			},
+			"suggests": {
+				"Getopt::Long": "2.58"
 			}
 		},
-		"build": {
+		"test": {
 			"requires": {
 				"Cwd": "3.40",
 				"File::Find": "1.20",
@@ -26,8 +29,8 @@
 		}
 	},
 	"resources": {
-		"bugtracker": {"web":"https://github.com/blb8/perl-file-find-mason/issues"},
-		"repository": {"url":"git://github.com/blb8/perl-file-find-mason.git"}
+		"bugtracker": {"web":"https://github.com/MediaAlpha/perl-file-find-mason/issues"},
+		"repository": {"url":"https://github.com/MediaAlpha/perl-file-find-mason.git"}
 	},
 	"meta-spec": {"url":"http://search.cpan.org/perldoc?CPAN::Meta::Spec","version":"2"},
 	"dynamic_config": 1,

@@ -5,10 +5,10 @@ use warnings;
 package Marlin::TypeConstraint;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007001';
+our $VERSION   = '0.008000';
 
 use parent 'Type::Tiny::Class';
-use Types::Common qw( signature Any Optional ArrayRef is_TypeTiny is_ArrayRef );
+use Types::Common qw( signature ArrayRef HashRef is_ArrayRef is_HashRef to_TypeTiny );
 
 sub exportables {
 	my $me = shift;
@@ -18,35 +18,37 @@ sub exportables {
 	return \@ex;
 }
 
-sub coderef_but_cooler {
+sub _cool_sig {
 	my $me  = shift;
-
-	my $sig = signature(
+	
+	$me->{_cool_sig} ||= signature(
+		want_object   => 1,
 		subname       => $me->name,
-		package       => $me->{_marlin}{_caller},
+		package       => $me->{_marlin}->caller,
 		bless         => 0,
 		list_to_named => 1,
 		named         => [
 			map {
 				my $attr = $_;
 				my $name = exists($attr->{init_arg}) ? $attr->{init_arg} : $attr->{slot};
-				my $type = $attr->{isa} ? to_TypeTiny( $attr->{isa} ) : Any;
+				my $type = $attr->{isa} ? to_TypeTiny( $attr->{isa} ) : 1;
 				my $opts = { optional => !$attr->{required} };
 				defined( $name ) ? ( $name, $type, $opts ) : ();
 			} @{ $me->{_marlin}->attributes_with_inheritance }
 		],
 	);
+}
+
+sub coderef_but_cooler {
+	my $me    = shift;
+	my $sig   = $me->_cool_sig->coderef->compile;
+	my $klass = $me->class;
 	
 	my $coderef = sub (;@) {
-		my ( $params, $r );
-		$params = shift if is_ArrayRef $_[0];
-		if ( $params ) {
-			my $args = $sig->( @$params );
-			$r = $me->class->new( $args );
-		}
-		else {
-			$r = $me;
-		}
+		my $r =
+			is_HashRef($_[0])   ? $klass->new(shift) :
+			is_ArrayRef($_[0])  ? $klass->new($sig->(@{+shift})) :
+			$me;
 		wantarray ? ( $r, @_ ) : $r;
 	};
 	
@@ -54,6 +56,27 @@ sub coderef_but_cooler {
 		if Eval::TypeTiny::NICE_PROTOTYPES;
 	
 	return $coderef;
+}
+
+sub has_coercion {
+	return !!1;
+}
+
+sub _build_coercion {
+	my $me = shift;
+	
+	my $sig   = $me->_cool_sig->coderef->compile;
+	my $klass = $me->class;
+	
+	#warn( $me->_cool_sig->coderef->code );
+	
+	return $me
+		->SUPER::_build_coercion( @_ )
+		->add_type_coercions(
+			HashRef,   sprintf( q{%s->new($_)}, B::perlstring($klass) ),
+			ArrayRef,  sub { $klass->new($sig->(@$_)) },
+		)
+		->freeze;
 }
 
 1;

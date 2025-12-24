@@ -1,3 +1,99 @@
+commit bb3c767e0b51e61ede2fde84d20d5991eb849bc8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Dec 24 20:07:00 2025 +1030
+
+    VERSION increment: 2.038
+
+commit acbc6e90bf2aa962ddf34c0696fb93ae514ae18d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Dec 24 20:05:40 2025 +1030
+
+    Update t.other examples with better descriptions
+
+commit 4a0178beb048e95ac4e7a4f8781736f62008d079
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Dec 24 17:59:44 2025 +1030
+
+    Add time, time_cache and time_static files from t.other
+
+commit c87fff41c7262d9b29ea33c4c60c087cf6a47490
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Dec 24 17:55:05 2025 +1030
+
+    Add cache tests
+
+commit acff1c318255c716c66a3e8638ef3b2a9afd9fd2
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 22 20:24:26 2025 +1030
+
+    fix bug with cache flag not working in start_html attr or meta tags
+
+commit c130a143ec73b90d7586ebb0409a239cfb3061fd
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 22 18:39:35 2025 +1030
+
+    interim commit with static and cache flags now supported in start_html metadata and distinct attributes
+
+commit f082699bcc1aae99e949c9b9beb3ff34312f2fcc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 9 18:51:24 2025 +1030
+
+    interim commit
+
+commit e1d6470e66f11fb94b94849ab6d9c775cdbe4756
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 18:41:48 2025 +1030
+
+    Add Constant.pm.xml
+
+commit 2778591cb357bc48be1c49bb3686bf8a89d575e2
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 18:11:01 2025 +1030
+
+    Add Static.pm.md, update static() method in WebDyne
+
+commit c76fc4a566493413c60a5851c116ed68b343b155
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 18:02:04 2025 +1030
+
+    Add Static.pm.xml doc
+
+commit 14ba29792885229cce2ecdce1f6d536b41b95ef1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 13:17:18 2025 +1030
+
+    VERSION increment: 2.037
+
+commit fc56b51ee088688c8980fd462e37ae5f29417273
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 13:17:13 2025 +1030
+
+    Add Chain.pm.md doc file to MANIFEST
+
+commit a9e0e3784508ec0ded4e005e50baae5d21d00141
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 13:10:42 2025 +1030
+
+    Add Chain.md doc file
+
+commit 5334867eb13366aeca010167d6296d81d16406c0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 13:08:28 2025 +1030
+
+    Add INSTALL.md file
+
+commit 04b6276053d84de7a48385d3b4365606edecb1ec
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 13:06:02 2025 +1030
+
+    Update documentation
+
+commit c8d8d3e8ac53f06185fb2d5bcf26b28260b9a752
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 8 12:59:29 2025 +1030
+
+    Initial commit after cleanup and adding some doc file
+
 commit 4e44d5e407eb1e3022f11a4f5cf7bd323dd12a36
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Thu Dec 4 12:46:29 2025 +1030

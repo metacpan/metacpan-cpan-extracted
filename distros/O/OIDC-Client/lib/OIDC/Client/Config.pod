@@ -278,7 +278,49 @@ Encoding algorithm used
 
 =head2 provider."provider".claim_mapping
 
-Used to map token claims or user information to an L<OIDC::Client::User> object.
+Used to map token claims or user information to an L<OIDC::Client::User> object
+when calling the L<OIDC::Client::Plugin/"build_user_from_userinfo( $user_class )">,
+L<OIDC::Client::Plugin/"build_user_from_claims( $claims, $user_class )"> or
+L<OIDC::Client::Plugin/"build_user_from_identity( $user_class )"> methods.
+
+The keys are the user attributes and the values are the keys of the claims.
+If needed, to walk down the data tree of a claim, use the dot character.
+
+For example, with this configured claim mapping :
+
+    <claim_mapping>
+        login      sub
+        lastname   family_name
+        firstname  given_name
+        email      contact.email
+        roles      roles
+    </claim_mapping>
+
+And the JSON claims :
+
+    {
+        "sub": "4d586782",
+        "family_name": "Doe",
+        "given_name": "John",
+        "contact": {
+            "email": "doej@example.com",
+            "country": "France"
+        },
+        "roles": [
+            "role1",
+            "role2"
+        ]
+    }
+
+The resulted Perl object is :
+
+    bless {
+        login     => '4d586782',
+        lastname  => 'Doe',
+        firstname => 'John',
+        email     => 'doej@example.com',
+        roles     => ['role1', 'role2']
+    }, 'OIDC::Client::User'
 
 By default, no mapping is used.
 

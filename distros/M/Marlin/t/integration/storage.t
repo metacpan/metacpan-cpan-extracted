@@ -69,4 +69,10 @@ is(
 	bless( { username => 'bd' }, 'Local::User' ),
 );
 
+is(
+	Marlin->find_meta( ref $bob )->to_string( $bob ),
+	q{LocalUser[username => "bd"]},
+	'Private attribute excluded from stringification',
+);
+
 done_testing;

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Dynamic Perl web application framework with template     compilation and modular design",
+   "abstract" : "Dynamic Perl web application framework with template compilation and modular design. Designed to be used via Plack/Starman/PSGI or Apache mod_perl web servers, but supports     standalone HTML output",
    "author" : [
       "Andrew Speer <andrew.speer@isolutions.com.au>"
    ],
@@ -66,7 +66,7 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "2.036",
+   "version" : "2.038",
    "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

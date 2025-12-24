@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use App::newver;
+
+my $newver = App::newver->init(@ARGV);
+$newver->run;
+
+=head1 NAME
+
+newver - Scan upstream for new software versions
+
+=head1 SYNOPSIS
+
+  newver [options] file [program] ...
+
+=head1 DESCRIPTION
+
+B<newver> is a program that scans for new software versions from upstream
+web pages and reports any new versions that were found. It similar to the
+Debian packaging tool L<uscan(1)>, but does not handle fetching new upstream
+sources and isn't associated with specific packaging schemes (like debs in the
+case of L<uscan(1)>).
+
+B<newver> takes the name of scan file to read from as argument. Additional
+arguments are interpretted as the names of specific programs to scan updates
+for in the scan file. If no specific programs are given, then each program in
+the scan file is scanned.
+
+=head2 Scan File
+
+B<newver> reads configuration from a scan file, which is an INI file that
+contains the list of programs to scan for new versions for.
+
+B<newver> INI files consist of program sections marked with the name of the
+program enclosed in square brackets. Each section contains a list of key-value
+pair lines, with the key and value be separated by an equals sign. Leading
+and trailing whitespace is trimmed from the key and value string.
+
+Lines starting with a hash (C<#>) are treated as comments and ignored. Blank
+lines are also ignored.
+
+The following are valid configuration fields for program sections in a scan
+file:
+
+=over 4
+
+=item [I<program>]
+
+Each individual program in a scan file is marked by the name of the program
+encloesd in square brackets, like section headings in a traditional INI file.
+
+=item B<Version> = I<version>
+
+String of the program's current version number. When scanning for new
+software versions, B<newver> will look for versions that are considered to be
+greater than this version.
+
+Either this field or C<VersionScan> are required.
+
+=item B<VersionScan> = I<file> -- I<match>
+
+Scan for the program's current version number in C<file> matching the regex
+C<match>. C<match> must contain C<@VERSION@>, which will capture the version
+number. B<newver> will look for the first match and use that as the captured
+version.
+
+Either this field or C<Version> are required.
+
+=item B<Page> = I<url>
+
+URL to scan for new upstream releases from.
+
+This field is required.
+
+=item B<Match> = I<match>
+
+Regex to use that matches upstream software releases. C<match> must contain
+C<@VERSION@>, which will be used to capture the new version number. C<match>
+will be matched against each page's C<href> attribute under an C<E<lt>aC<gt>>
+element.
+
+This field is required.
+
+=item B<ReturnURL> = I<url>
+
+URL to report for updated versions, instead of the default behavior of
+reporting the newest matched URL. Occurances of C<@VERSION@> in I<url> will
+be replaced by the new version string.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<j>|B<--json>
+
+Report output as JSON. The outputted JSON structure will look something like
+this:
+
+  {
+      "perl" : {
+          "current" : "5.016",
+          "program" : "perl",
+          "url" : "https://github.com/Perl/perl5/archive/refs/tags/v5.43.6.tar.gz",
+          "version" : "5.43.6"
+      }
+  }
+
+=item B<-s>|B<--serial>
+
+Execute scans serially instead of in parallel.
+
+=item B<-V>|B<--verbose>
+
+Enable verbose output. B<newver> will print verbose messages to standard error.
+
+=item B<-h>|B<--help>
+
+Print help message and exit.
+
+=item B<-v>|B<--version>
+
+Print version and exit.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Example Scan File
+
+  # Example scan file
+  # Lines starting with '#' are read as comments and ignored
+  [noss]
+      Version = 2.00
+      # Look for <a> hrefs that match the following
+      Page = https://www.cpan.org/authors/id/S/SA/SAMYOUNG/
+      Match = WWW-Noss-@VERSION@.tar.gz
+
+  [perl]
+      # Look for current version in Makefile.PL matching the regex
+      VersionScan = Makefile.PL -- MIN_PERL_VERSION => '@VERSION@'
+      Page = https://github.com/repology/libversion/tags
+      Match = @VERSION@.tar.gz
+
+  [libversion]
+      Version = 3.0.3
+      Page = https://github.com/repology/libversion/tags
+      Match = @VERSION@.tar.gz
+
+=head1 AUTHOR
+
+Written by L<Samuel Young|samyoung12788@gmail.com>
+
+This project's source can be found on its
+L<Codeberg page|https://codeberg.org/1-1sam/newver.git>. Comments and pull
+requests are welcome.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+=head1 SEE ALSO
+
+L<uscan(1)>
+
+=cut
+
+1;

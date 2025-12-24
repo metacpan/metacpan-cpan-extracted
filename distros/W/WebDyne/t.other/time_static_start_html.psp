@@ -1,0 +1,4 @@
+#  Run compile once and service static page thereafter
+#
+<start_html static=1>
+The current server time is: <? localtime() ?>

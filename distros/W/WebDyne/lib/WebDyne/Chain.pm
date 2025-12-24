@@ -37,7 +37,7 @@ use Data::Dumper;
 #  Version information in a formate suitable for CPAN etc. Must be
 #  all on one line
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug using WebDyne debug handler
@@ -74,6 +74,22 @@ errnofatal(1);
 BEGIN {
     eval {require Time::HiRes;    Time::HiRes->import('time')};
     eval {require Devel::Confess; Devel::Confess->import(qw(no_warnings))};
+}
+
+
+sub import {
+
+
+    #  Will only work if called from within a __PERL__ block in WebDyne
+    #
+    my ($class, @import)=@_;
+    my $self_cr=UNIVERSAL::can(scalar caller, 'self') || return;
+    my $self=$self_cr->()                             || return;
+    $self->set_handler($class);
+    my $meta_hr=$self->meta();
+    push @{$meta_hr->{'webdynechain'}}, @import;
+
+
 }
 
 
@@ -135,6 +151,8 @@ sub handler : method {
     else {
         debug('could not find any module chain info');
     }
+    debug('module: %s', Dumper(\@module));
+
 
 
     #  WebDyne::Chain must be the first handler in line, Webdyne the last
@@ -249,7 +267,7 @@ sub handler : method {
 
     #  Only get here if subrequest invoked.
     HANDLER_COMPLETE:
-    return &Apache::OK;
+    return $MP2 ? &Apache::OK : HTTP_OK;
 
 
 }
@@ -468,22 +486,119 @@ sub UNIVERSAL::AUTOLOAD {
     goto RENDER_ERROR;
 
 }
+1;
 
 __END__
 
-=head1 Name
+=pod
 
-WebDyne::Chain - WebDyne chaining module, allows extension of base WebDyne class
+=head1 WebDyne::Chain.pm(3pm)
 
-=head1 Description
+=head1 NAME
 
-WebDyne::Chain is a module that allows extension of the base WebDyne class with other modules, such as WebDyne::Session,
-WebDyne::Template etc..
+WebDyne::Chain - WebDyne chaining module, allows extension of base WebDyne handler pipeline with additional modules.
 
-=head1 Documentation
+=head1 SYNOPSIS
 
-Information on configuration and usage is availeble from the WebDyne site, http://webdyne.org/ - or from a snapshot of
-current documentation in PDF format available in the WebDyne source /doc directory.
+SYNOPSIS
+
+    #  Basic usage in a simple chain.psp file:
+    #
+    <start_html>
+    Server local time is: <? localtime ?>
+    __PERL__
+    use WebDyne::Chain qw(WebDyne::Session)
+
+    #  Render with wdrender. Note the session variable
+    #
+    $ wdrender --header ./chain.psp
+    Status: 200
+    X-Frame-Options: SAMEORIGIN
+    Pragma: no-cache
+    Cache-Control: no-cache, no-store, must-revalidate
+    Expires: 0
+    Content-Type: text/html; charset=UTF-8
+    Set-cookie: session=3653dbc88d665db9a4bfabf27a01310c; path=/
+    X-Content-Type-Options: nosniff
+    Content-Length: 242
+    
+    <!DOCTYPE html><html lang="en"><head><title>Untitled Document</title><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"></head>
+    <body><p>Server local time is: Sun Dec  7 21:56:17 2025</p></body></html>
+
+    # Or extend manually from command line for testing. Does not require use of WebDyne::Chain
+    # in page.
+    #
+    $ WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp 
+
+=head1 DESCRIPTION
+
+WebDyne::Chain allows chaining of modules within the WebDyne pipeline. This allows custom modules to insert themselves into the server handler pipeline, whereby they can make changes to the input or output of WebDyne pages. Common uses may include:
+
+=over
+
+=item * Setting or getting session tracking data
+
+=item * Checking for authentication status and redirecting if not valid
+
+=item * Rewriting input URL's or parameters, or rewriting output HTML
+
+=item * Tracking user state from a database connection
+
+=back
+
+WebDyne includes two example Chain modules in the base package:
+
+=over
+
+=item * B<<< WebDyne::Session >>>
+
+Sets/gets a session cookie in the headers
+
+=item * B<<< WebDyne::Filter >>>
+
+Rewrite Request or Response headers, HTML content
+
+=back
+
+=head1 USAGE
+
+WebDyne::Chain allows nomination of modules to chain in a psp page via the import method when using the module. At it's simplest you can import just the modules you want.
+
+    <start_html>
+    Server local time is <? localtime ?>
+    __PERL__
+    use WebDyne::Chain qw(WebDyne::Session WebDyne::State);
+    1;
+
+WebDyne::Chain will automatically add any methods made available by the chained modules into the page, e.g.
+
+    <start_html>
+    Session ID is: <? shift()->session_id() ?>
+    __PERL__
+    #  WebDyne::Session exposes the session_id() method used above
+    #
+    use WebDyne::Chain qw(WebDyne::Session);
+
+In reality most modules that can be loaded by WebDyne::Chain will work when loaded standalone, e.g. the code below is the equivalent to loading WebDyne::Session via WebDyne::Chain:
+
+    <start_html>
+    Session ID is: <? shift()->session_id() ?>
+    __PERL__
+    #  Will autoload WebDyne::Chain and add itself into the handler pipeline
+    #
+    use WebDyne::Session;
+
+=head1 METHODS
+
+WebDyne::Chain does not expose any public methods
+
+=head1 OPTIONS
+
+WebDyne::Chain does not expose any options other than the names of modules to add to the handler chain via the import() method on module use - as seen in the Usage section above.
+
+=head1 AUTHOR
+
+Andrew Speer <andrew.speer@isolutions.com.au> and contributors.
 
 =head1 LICENSE and COPYRIGHT
 
@@ -498,13 +613,4 @@ Full license text is available at:
 
 L<http://dev.perl.org/licenses/>
 
-=head1 Author
-
-Andrew Speer, andrew@webdyne.org
-
-=head1 Bugs
-
-Please report any bugs or feature requests to "bug-webdyne-chain at rt.cpan.org", or via
-http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebDyne-Chain
-
-
+=cut

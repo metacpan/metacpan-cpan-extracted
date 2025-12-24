@@ -1,0 +1,18 @@
+name           = "Getopt-Long-Bash"
+readme_from    = "script/getoptlong"
+badges         = [ "github-actions/test", "metacpan" ]
+module_maker   = "ModuleBuildTiny"
+static_install = "auto"
+
+script_files   = [ "script/getoptlong", "script/getoptlong.sh" ]
+tag_format     = "v%v"
+
+[release]
+branch = "main"
+hooks = [
+    "perl -Ilib -MGetopt::Long::Bash -i -pE 's/^: \\$\\{GOL_VERSION:=\\K[\\d.]+/$Getopt::Long::Bash::VERSION/' script/getoptlong.sh",
+    "perl -Ilib -MGetopt::Long::Bash -i -0777 -pE 's/(?<=^=head1 VERSION\\n\\n)[\\d.]+/$Getopt::Long::Bash::VERSION/m' script/getoptlong",
+]
+
+[unsupported]
+os = [ "MSWin32" ]

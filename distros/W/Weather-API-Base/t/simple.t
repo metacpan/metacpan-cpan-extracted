@@ -91,6 +91,7 @@ subtest 'ts_to_iso_date' => sub {
 subtest 'datetime_to_ts' => sub {
     is(datetime_to_ts('1970-01-12 13:46:40Z'), 1000000, 'Date OK');
     is(datetime_to_ts('1970-01-12 13:46:40', 1), 1000000, 'Date OK');
+    is(datetime_to_ts('2025-07-03 03:00:00Z'), 1751511600, 'Date OK');
     ok(abs(datetime_to_ts('1970-01-12 13:46:40')-1000000) < 13*3600, 'Local date');
 };
 
@@ -117,6 +118,20 @@ subtest 'convert_units' => sub {
         my $res = pop @{$_};
         is(convert_units(@{$_}), float($res, tolerance => 0.01), "Convert $_->[2] $_->[0] to $_->[1]");
     }
+};
+
+subtest 'num_to_mon' => sub {
+    is(num_to_mon(), undef, 'No input');
+    is(num_to_mon(13), undef, 'Out of range');
+    is(num_to_mon(1), 'Jan', 'January');
+};
+
+subtest 'mon_to_num' => sub {
+    is(mon_to_num(), undef, 'No input');
+    is(mon_to_num('Jan'), 1, 'January');
+    is(mon_to_num('jan', 1), "01", 'Padded January');
+    is(mon_to_num('Dec'), 12, 'December');
+    is(mon_to_num('Dec', 1), 12, 'December still');
 };
 
 subtest '_get_ua' => sub {

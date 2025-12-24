@@ -29,8 +29,11 @@ sub run
     {
         die "Output filename not specified! Use the -o|--output flag!";
     }
-    my $adoc = Pod::AsciiDoctor->new();
-    $adoc->parse_from_filehandle( path( shift @ARGV )->openr() );
+    my $adoc        = Pod::AsciiDoctor->new();
+    my $in_filename = shift(@ARGV);
+    my $in_fh       = path( $in_filename, );
+    my $in          = $in_fh->openr_utf8();
+    $adoc->parse_from_filehandle($in);
     my $USE_STDOUT = ( $output_fn eq '-' );
     if ($USE_STDOUT)
     {
@@ -60,7 +63,7 @@ XML::Grammar::Screenplay::App::FromProto
 
 =head1 VERSION
 
-version 0.102002
+version 0.102003
 
 =head1 VERSION
 

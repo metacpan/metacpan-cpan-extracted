@@ -51,7 +51,7 @@ local $SIG{__DIE__}=\&Carp::confess;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Run main
@@ -96,6 +96,7 @@ sub main {
         'repeat|r|num|n=s',
         'loop',
         'get=s@',
+        'delay=i',
         'man',
         'version'
     ) || pod2usage(2);
@@ -225,6 +226,12 @@ sub main {
             #
             #print("SV: ",  scalar @{$gladiator_ar}, "\n") if $opt{'leak'};
             #@{$gladiator_ar} = ();
+            
+            #  Delay (presumably to test caching code)
+            #
+            if (my $delay=$opt{'delay'}) {
+                sleep $delay
+            }
 
         }
 
@@ -239,7 +246,7 @@ sub main {
 }
 
 
-__END__# https://github.com/aspeer/pl-markpod.git 
+__END__
 
 
 
@@ -251,7 +258,7 @@ __END__# https://github.com/aspeer/pl-markpod.git
 
 =head1 NAME
 
-wdrender - parse and render WebDyne pages
+wdrender - parse and render WebDyne files
 
 =head1 SYNOPSIS
 
@@ -259,10 +266,9 @@ C<<<< wdrender [OPTIONS] FILE >>>>
 
 =head1 Description
 
-The  C<<<< wdrender >>>>  command displays the HTML that would be generated from a psp page using the WebDyne perl module.
+The  C<<<< wdrender >>>>  command displays the HTML that would be generated from a .psp page using the WebDyne perl module.
 
-By default  C<<<< wdrender >>>>  will use the internal WebDyne handler when building the output, but can optionally use other WebDyne
- modules (such as  C<<<< WebDyne::Chain >>>> ) by using the C<<<< --handler >>>>  option..
+By default  C<<<< wdrender >>>>  will use the internal WebDyne handler when building the output, but can optionally use other WebDyne modules (such as C<<<< WebDyne::Chain >>>> ) by using the  C<<<< --handler >>>>  option.
 
 =head1 Options
 
@@ -274,7 +280,7 @@ Show brief help message.
 
 =item * B<<< --handler >>>
 
-Use a different WebDyne handler module. Currently the only other handler module available is C<<<< WebDyne::Chain >>>> .
+Use a different WebDyne handler module. Currently the only other handler module available is  C<<<< WebDyne::Chain >>>> .
 
 =item * B<<< --status >>>
 
@@ -302,11 +308,15 @@ Specify the output file.
 
 =item * B<<< --repeat | --r | --num | --n >>>
 
-Specify the number of times to repeat the rendering.
+Specify the number of times to repeat the rendering. Used for consistency testing
 
 =item * B<<< --loop >>>
 
 Enable looping. Used for leak testing.
+
+=item * B<<< --get >>>
+
+Parameters for simulating a HTTP GET request
 
 =item * B<<< --man >>>
 
@@ -320,21 +330,30 @@ Display the script version and exit.
 
 =head1 Examples
 
+    # Reference file saved as time.psp
+    #
+    <start_html>
+    The current server time is: <? localtime() ?>
+
     # Show the HTML rendered version of time.psp
+    #
     wdrender time.psp
 
     # Show the HTML rendered version of time.psp with headers
+    #
     wdrender --header time.psp
 
     # Show the HTML rendered version of time.psp chaining with the WebDyne::Session module
+    #
     WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp
+
+    # Simulate a GET request, i.e. adding ?test=1 to URI
+    #
+    wdrender --get="test=1" checkbox.psp
 
 =head1 Notes
 
-The  C<<<< wdrender >>>>  command will attempt to build the HTML as faithfully as possible from the command line environment, but may
- not be able to exactly duplicate the HTML generated under a real Web
- Server. As an example if a psp page takes advantge of the Apache request
- handler when generating HTML, the  C<<<< wdrender >>>>  commend will not be able to duplicate that environment.
+The  C<<<< wdrender >>>>  command will attempt to build the HTML as faithfully as possible from the command line environment, but may not be able to exactly duplicate the HTML generated under a real Web Server. As an example if a .psp page takes advantage of the Apache request handler when generating HTML, the  C<<<< wdrender >>>>  commend will not be able to duplicate that environment.
 
 =head1 Author
 

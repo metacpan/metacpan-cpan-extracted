@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug load
@@ -173,6 +173,12 @@ sub compile {
             last;
         }
     }
+    
+    
+    #  Supply html_tiny object ref to Treebuilder so it can run things like start_html
+    #
+    my $html_tiny_or=$self->html_tiny() ||
+        return err('unable to get html_tiny_or ref');
 
 
     #  Get new TreeBuilder object. Note api_version flows through to HTML::Parser constructor
@@ -180,7 +186,7 @@ sub compile {
     my $tree_or=WebDyne::HTML::TreeBuilder->new(
 
         api_version 	=> 3,
-        html_tiny_or   	=> $self->html_tiny(),
+        html_tiny_or   	=> $html_tiny_or,
         r		=> $r
 
     ) || return err('unable to create HTML::TreeBuilder object');
@@ -318,8 +324,12 @@ sub compile {
             all_fg  => 1,
 
         }) || return err();
+    debug('meta_ar: %s', Dumper($meta_ar));
     foreach my $tag_ar (@{$meta_ar}) {
         my $attr_hr=$tag_ar->[WEBDYNE_NODE_ATTR_IX] || next;
+        debug('meta attr_hr: %s', Dumper($attr_hr));
+        $attr_hr=$self->subst_attr(undef, $attr_hr);
+        debug('meta attr_hr post subst: %s', Dumper($attr_hr));
         if ($attr_hr->{'name'}=~/^webdyne$/i) {
             my @meta=split(/;/, $attr_hr->{'content'});
             debug('meta %s', Dumper(\@meta));
@@ -331,6 +341,9 @@ sub compile {
                 my $hr=$self->subst_attr(undef, {$name => $value}) ||
                     return err();
                 $meta{$name}=$hr->{$name};
+                if ($name eq 'cache') {
+                    $meta{'static'} ||= 1;
+                }
             }
 
             #  Do not want anymore
@@ -342,7 +355,33 @@ sub compile {
 
                 }) || return err();
         }
+        elsif (ref($attr_hr->{'content'}) eq 'HASH') {
+            while (my($meta_key, $meta_value)=each %{$attr_hr->{'content'}}) {
+                if ($meta_key=~/^webdyne$/i) {
+                    my @meta=split(/;/, $meta_value);
+                    debug('meta %s', Dumper(\@meta));
+                    foreach my $meta (@meta) {
+                        my ($name, $value)=split(/[=:]/, $meta, 2);
+                        defined($value) || ($value=1);
+                        $meta{$name}=$value;
+                        if ($name eq 'cache') {
+                            $meta{'static'} ||= 1;
+                        }
+                    }
+                }
+            }
+        } 
     }
+    
+    
+    #  And look for any static or cache tags found in start_html and noted 
+    #
+    foreach my $attr (qw(static cache)) {
+        if (my $value=$html_tiny_or->{"_${attr}"}) {
+            $meta{$attr}=$value;
+        }
+    }
+    debug('final inode meta: %s', Dumper(\%meta));
     
     
     #  If <api> or <htmx) tag used in page compress down to just the <api>/<htmx> nodes and throw

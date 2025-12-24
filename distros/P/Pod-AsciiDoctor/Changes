@@ -2,6 +2,10 @@ Revision history for Pod-AsciiDoctor
 
 NOT USED - Please use github http://github.com/benignbala/pod-asciidoctor
 
+0.102003    2025-12-24
+
+    - Make bin/pod2asciidoctor handle UTF-8 properly
+
 0.102002    2024-03-15
 
     - Fix italic markup:

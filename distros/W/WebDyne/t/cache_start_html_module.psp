@@ -1,0 +1,11 @@
+<start_html>
+Cached page via use WebDyne::Cache module
+Param value: <? $_[1]->{'count'} ?>
+__PERL__
+use WebDyne::Cache (\&cache);
+sub cache {
+    my $self=shift();
+    my $count=$self->r->{'param'}{'count'};
+    $self->cache_compile(1) if ($count%2);
+    return \undef;
+}

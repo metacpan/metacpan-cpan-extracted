@@ -18,8 +18,8 @@ faster, easier and more enjoyable experience.
 Getting Started
 ===============
 
-Install the WebDyne module from CPAN using cpanminus or cpan, and install Plack for the PSGI
-version.
+Install the WebDyne module from CPAN using cpanminus (cpanm) or cpan, and install Plack for the
+PSGI version.
 
     #  Use cpan if you don't have cpanm
     #
@@ -27,9 +27,9 @@ version.
     Building and testing Webdyne-2.04 ... OK
 
     $ cpanm Plack
-    Building and testing Webdyne-1.0051 ... OK
+    Building and testing Plack-1.0051 ... OK
 
-Run the PSGI variant in test mode and connect to the server to check that it is working
+Run the PSGI variant in test mode and connect to the server to check that it is working.
 
     $ webdyne.psgi --test
     HTTP::Server::PSGI: Accepting connections at http://0:5000/
@@ -47,3 +47,5 @@ Run the PSGI variant against that directory
     # 
     $ webdyne.psgi /location/of/app.psp
     HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+See the documentation at https://webdyne.org for more examples and information.

@@ -1051,7 +1051,7 @@ sub wei
     my $co = 0;
     foreach my $weldref ( @weldaarrs )
     {
-      my @parsws = @{ $parswelds[$co] }; say $tee "\@parsws: " . dump( @parsws );
+      my @parsws = @{ $parswelds[$co] }; #say $tee "\@parsws: " . dump( @parsws );
       my @weldarr = @{ $weldref };
       my @weldarr__;
       if ( ( $limit_checkdistgrads ne "" ) or ( $limit_checkdistpoints ne "" ) )
@@ -1096,7 +1096,7 @@ sub wei
       %weldbank = %{ clean( \%weldbank, $nfiltergrads, "weld" ) };
 
       %bank = %{ mixbank( \%bank, \%weldbank, \@parsws ) };
-      say $tee "KEYS \%bank: " . ( keys %bank );
+      #say $tee "KEYS \%bank: " . ( keys %bank );
 
       $co++;
     }
@@ -1431,7 +1431,7 @@ sub wei
   }
 
   %wand = %{ $wand_ref };
-  say $tee "\nDONE.";
+  #say $tee "\nDONE.";
   %nears = %{ $nears_ref };
 
   @limb0;
@@ -2059,7 +2059,7 @@ sub interlinear
 
 
   my ( $factlev_ref ) = tellstepsize( \%factlevels, $lvconversion );
-  my %factlev = %{ $factlev_ref }; say $tee " \%factlev: " . dump( %factlev );
+  my %factlev = %{ $factlev_ref }; #say $tee " \%factlev: " . dump( %factlev );
   say $tee "Understood step sizes.";
 
 ###--###

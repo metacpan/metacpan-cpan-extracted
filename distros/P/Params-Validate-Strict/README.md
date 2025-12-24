@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.27
+Version 0.28
 
 # SYNOPSIS
 
@@ -686,12 +686,141 @@ The schema can define the following rules for each parameter:
 
     All cross-validations must pass for the overall validation to succeed.
 
-If a parameter is optional and its value is `undef`,
-validation will be skipped for that parameter.
+- `relationships`
 
-If the validation fails, the function will `croak` with an error message describing the validation failure.
+    A reference to an array that defines validation rules based on relationships between parameters.
+    Relationship validations are performed after all individual parameter validations have passed,
+    but before cross-validations.
 
-If the validation is successful, the function will return a reference to a new hash containing the validated and (where applicable) coerced parameters.  Integer and number parameters will be coerced to their respective types.
+    Each relationship is a hash reference with a `type` field and additional fields depending on the type:
+
+    - **mutually\_exclusive**
+
+        Parameters that cannot be specified together.
+
+            relationships => [
+              {
+                type => 'mutually_exclusive',
+                params => ['file', 'content'],
+                description => 'Cannot specify both file and content'
+              }
+            ]
+
+    - **required\_group**
+
+        At least one parameter from the group must be specified.
+
+            relationships => [
+              {
+                type => 'required_group',
+                params => ['id', 'name'],
+                logic => 'or',
+                description => 'Must specify either id or name'
+              }
+            ]
+
+    - **conditional\_requirement**
+
+        If one parameter is specified, another becomes required.
+
+            relationships => [
+              {
+                type => 'conditional_requirement',
+                if => 'async',
+                then_required => 'callback',
+                description => 'When async is specified, callback is required'
+              }
+            ]
+
+    - **dependency**
+
+        One parameter requires another to be present.
+
+            relationships => [
+              {
+                type => 'dependency',
+                param => 'port',
+                requires => 'host',
+                description => 'port requires host to be specified'
+              }
+            ]
+
+    - **value\_constraint**
+
+        Specific value requirements between parameters.
+
+            relationships => [
+              {
+                type => 'value_constraint',
+                if => 'ssl',
+                then => 'port',
+                operator => '==',
+                value => 443,
+                description => 'When ssl is specified, port must equal 443'
+              }
+            ]
+
+    - **value\_conditional**
+
+        Parameter required when another has a specific value.
+
+            relationships => [
+              {
+                type => 'value_conditional',
+                if => 'mode',
+                equals => 'secure',
+                then_required => 'key',
+                description => "When mode equals 'secure', key is required"
+              }
+            ]
+
+    If a parameter is optional and its value is `undef`,
+    validation will be skipped for that parameter.
+
+    If the validation fails, the function will `croak` with an error message describing the validation failure.
+
+    If the validation is successful, the function will return a reference to a new hash containing the validated and (where applicable) coerced parameters.  Integer and number parameters will be coerced to their respective types.
+
+    The `description` field is optional but recommended for clearer error messages.
+
+## Example Usage
+
+    my $schema = {
+      host => { type => 'string' },
+      port => { type => 'integer' },
+      ssl => { type => 'boolean' },
+      file => { type => 'string', optional => 1 },
+      content => { type => 'string', optional => 1 }
+    };
+
+    my $relationships = [
+      {
+        type => 'mutually_exclusive',
+        params => ['file', 'content']
+      },
+      {
+        type => 'required_group',
+        params => ['host', 'file']
+      },
+      {
+        type => 'dependency',
+        param => 'port',
+        requires => 'host'
+      },
+      {
+        type => 'value_constraint',
+        if => 'ssl',
+        then => 'port',
+        operator => '==',
+        value => 443
+      }
+    ];
+
+    my $validated = validate_strict(
+      schema => $schema,
+      input => $input,
+      relationships => $relationships
+    );
 
 # MIGRATION FROM LEGACY VALIDATORS
 

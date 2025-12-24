@@ -1,5 +1,9 @@
 Changes for OIDC-Client distribution
 
+1.06 2025-12-23
+  - Added support for the 'after_touching_session' callback (needed for Dancer2)
+  - Claim mapping configuration : added the ability to walk down the data tree of a claim using the dot character
+
 1.05 2025-10-28
   - Possible configuration breaking change : 'post' and 'basic' auth methods are renamed to 'client_secret_basic' and 'client_secret_post'
   - Possible configuration breaking change : 'client_secret_basic' becomes the default client authentication method

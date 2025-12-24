@@ -146,6 +146,22 @@ sub test_redirect_to_authorize_with_minimum_parameters {
   };
 }
 
+sub test_redirect_to_authorize_with_after_touching_session_attribute {
+  subtest "redirect_to_authorize() with 'after_touching_session' attribute" => sub {
+
+    # Given
+    my $cpt = 0;
+    my $obj = build_object(attributes => {after_touching_session => sub { $cpt += 12 }});
+
+    # When
+    $obj->redirect_to_authorize();
+
+    # Then
+    is($cpt, 12,
+       'after_touching_session coderef has been executed once');
+  };
+}
+
 sub test_get_token_KO {
   subtest "get_token() - 'authorization_code' grant type with provider error" => sub {
 
@@ -500,6 +516,22 @@ sub test_get_token_ok {
                undef,
                'no access token in session');
   };
+
+  subtest "get_token() - with 'after_touching_session' attribute" => sub {
+
+    # Given
+    my $cpt = 0;
+    my $obj = build_object(config         => {token_endpoint_grant_type => 'client_credentials'},
+                           token_response => {access_token => 'my_access_token'},
+                           attributes     => {after_touching_session => sub { $cpt += 1 }});
+
+    # When
+    $obj->get_token();
+
+    # Then
+    is($cpt, 1,
+       'after_touching_session coderef has been executed once');
+  };
 }
 
 sub test_refresh_token_with_exceptions {
@@ -587,11 +619,11 @@ sub test_refresh_token_ok {
     cmp_deeply(get_refresh_token($obj),
                'my_refresh_token',
                'expected stored refresh token');
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
                                               refresh_token => 'my_old_refresh_token' ] ],
                'expected call to client->get_token');
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'verify_jwt_token', [ $obj->client, token                     => 'my_id_token',
                                                      expected_subject          => 'my_subject',
                                                      expected_audience         => 'my_id',
@@ -675,7 +707,7 @@ sub test_refresh_token_ok {
     cmp_deeply(get_identity($obj),
                undef,
                'no stored identity');
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
                                               refresh_token => 'my_old_refresh_token',
                                               refresh_scope => 'custom scope' ] ],
@@ -716,7 +748,7 @@ sub test_refresh_token_ok {
     cmp_deeply(get_identity($obj),
                undef,
                'no stored identity');
-    cmp_deeply([ $obj->client->next_call(6) ],
+    cmp_deeply([ $obj->client->next_call(5) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
                                               refresh_token => 'my_old_audience_refresh_token' ] ],
                'expected call to client->get_token');
@@ -766,11 +798,11 @@ sub test_refresh_token_ok {
     cmp_deeply(get_access_token($obj),
                undef,
                'no stored access token');
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
                                               refresh_token => 'my_old_refresh_token' ] ],
                'expected call to client->get_token');
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'verify_jwt_token', [ $obj->client, token                     => 'my_id_token',
                                                      expected_subject          => 'my_subject',
                                                      expected_audience         => 'my_id',
@@ -843,7 +875,7 @@ sub test_exchange_token_ok {
     cmp_deeply(get_refresh_token($obj, 'my_audience'),
                'my_exchanged_refresh_token',
                'expected stored refresh token');
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'exchange_token', [ $obj->client, token    => 'my_access_token',
                                                    audience => 'my_audience' ] ],
                'expected call to client->exchange_token');
@@ -1166,7 +1198,7 @@ sub test_get_userinfo {
     is($userinfo->{sub}, 'DOEJ',
        'expected subject');
 
-    cmp_deeply([ $obj->client->next_call(6) ],
+    cmp_deeply([ $obj->client->next_call(5) ],
                [ 'get_userinfo', [ $obj->client, access_token => 'my_access_token', token_type => undef ] ],
                'expected call to client->get_userinfo');
   };
@@ -1316,7 +1348,7 @@ sub test_build_user_from_identity {
       roles     => 'roles',
     );
     my $obj = build_object(
-      config  => { claim_mapping => \%claim_mapping },
+      config => { claim_mapping => \%claim_mapping },
     );
     my %identity = (
       subject    => 'DOEJ',
@@ -1459,7 +1491,7 @@ sub test_redirect_to_logout_with_id_token {
     is($obj->redirect->(), 'my_logout_url',
        'expected redirect');
 
-    cmp_deeply([ $obj->client->next_call(7) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'logout_url', bag($obj->client, id_token                 => 'my_id_token',
                                                  post_logout_redirect_uri => 'my_logout_redirect_uri',
                                                  state                    => $state,
@@ -2208,6 +2240,20 @@ sub test_delete_stored_data {
        undef,
        'access token has been deleted');
   };
+
+  subtest "delete_stored_data() - data in session" => sub {
+
+    # Given
+    my $cpt = 0;
+    my $obj = build_object(attributes => {after_touching_session => sub { $cpt += 1 }});
+
+    # When
+    $obj->delete_stored_data();
+
+    # Then
+    is($cpt, 1,
+       'after_touching_session coderef has been executed once');
+ };
 }
 
 sub build_object {

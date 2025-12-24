@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0" xmlns="http://docbook.org/ns/docbook">
+  <refmeta>
+    <refentrytitle>WebDyne::Chain.pm</refentrytitle>
+
+    <manvolnum>3pm</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>WebDyne::Chain</refname>
+
+    <refpurpose>WebDyne chaining module, allows extension of base WebDyne handler pipeline with additional modules.</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <title>SYNOPSIS</title>
+
+    <programlisting language="perl">#  Basic usage in a simple chain.psp file:
+#
+&lt;start_html&gt;
+Server local time is: &lt;? localtime ?&gt;
+__PERL__
+use WebDyne::Chain qw(WebDyne::Session)
+
+
+#  Render with wdrender. Note the session variable
+#
+$ wdrender --header ./chain.psp
+Status: 200
+X-Frame-Options: SAMEORIGIN
+Pragma: no-cache
+Cache-Control: no-cache, no-store, must-revalidate
+Expires: 0
+Content-Type: text/html; charset=UTF-8
+Set-cookie: session=3653dbc88d665db9a4bfabf27a01310c; path=/
+X-Content-Type-Options: nosniff
+Content-Length: 242
+
+&lt;!DOCTYPE html&gt;&lt;html lang="en"&gt;&lt;head&gt;&lt;title&gt;Untitled Document&lt;/title&gt;&lt;meta charset="UTF-8"&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport"&gt;&lt;/head&gt;
+&lt;body&gt;&lt;p&gt;Server local time is: Sun Dec  7 21:56:17 2025&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+
+
+# Or extend manually from command line for testing. Does not require use of WebDyne::Chain
+# in page.
+#
+$ WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp 
+
+</programlisting>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>WebDyne::Chain allows chaining of modules within the WebDyne pipeline. This allows custom modules to insert themselves into the server handler pipeline, whereby they can make changes
+    to the input or output of WebDyne pages. Common uses may include:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Setting or getting session tracking data</para>
+      </listitem>
+
+      <listitem>
+        <para>Checking for authentication status and redirecting if not valid</para>
+      </listitem>
+
+      <listitem>
+        <para>Rewriting input URL's or parameters, or rewriting output HTML</para>
+      </listitem>
+
+      <listitem>
+        <para>Tracking user state from a database connection</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>WebDyne includes two example Chain modules in the base package:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>WebDyne::Session</term>
+
+        <listitem>
+          <para>Sets/gets a session cookie in the headers</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>WebDyne::Filter</term>
+
+        <listitem>
+          <para>Rewrite Request or Response headers, HTML content</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>USAGE</title>
+
+    <para>WebDyne::Chain allows nomination of modules to chain in a psp page via the import method when using the module. At it's simplest you can import just the modules you want.</para>
+
+    <programlisting>&lt;start_html&gt;
+Server local time is &lt;? localtime ?&gt;
+__PERL__
+use WebDyne::Chain qw(WebDyne::Session WebDyne::State);
+1;</programlisting>
+
+    <para>WebDyne::Chain will automatically add any methods made available by the chained modules into the page, e.g.</para>
+
+    <programlisting>&lt;start_html&gt;
+Session ID is: &lt;? shift()-&gt;session_id() ?&gt;
+__PERL__
+#  WebDyne::Session exposes the session_id() method used above
+#
+use WebDyne::Chain qw(WebDyne::Session);</programlisting>
+
+    <para>In reality most modules that can be loaded by WebDyne::Chain will work when loaded standalone, e.g. the code below is the equivalent to loading WebDyne::Session via
+    WebDyne::Chain:</para>
+
+    <programlisting>&lt;start_html&gt;
+Session ID is: &lt;? shift()-&gt;session_id() ?&gt;
+__PERL__
+#  Will autoload WebDyne::Chain and add itself into the handler pipeline
+#
+use WebDyne::Session;</programlisting>
+  </refsect1>
+
+  <refsect1>
+    <title>METHODS</title>
+
+    <para>WebDyne::Chain does not expose any public methods</para>
+  </refsect1>
+
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <para>WebDyne::Chain does not expose any options other than the names of modules to add to the handler chain via the import() method on module use - as seen in the Usage section above.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>Andrew Speer &lt;andrew.speer@isolutions.com.au&gt; and contributors.</para>
+  </refsect1>
+
+  <refsect1>
+    <title>LICENSE</title>
+
+    <para>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See <ulink
+    url="http://dev.perl.org/licenses/">http://dev.perl.org/licenses/</ulink>.</para>
+  </refsect1>
+</refentry>

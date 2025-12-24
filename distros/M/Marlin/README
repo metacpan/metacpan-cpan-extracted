@@ -200,6 +200,12 @@ DESCRIPTION
           ...
           say $thingy->&get_name();
 
+        If you use the 'my get_name' syntax on Perl versions too old to
+        support lexical subs, they will be installed as a normal sub in the
+        caller package. (Note that the caller package might differ from the
+        class currently being built, especially in the case of Marlin::Struct
+        classes.)
+
     `writer`
         Like `reader`, but a writer method.
 
@@ -482,8 +488,8 @@ DESCRIPTION
         attribute here.
 
    Marlin Options
-    Any strings passed to Marlin that have a leading dash are taking to be
-    options affecting your class.
+    Any strings passed to Marlin that have a leading dash are taken to be
+    options affecting how Marlin builds your class.
 
     `-base` or `-parents` or `-isa` or `-extends`
         Sets the parent classes of your class.
@@ -493,8 +499,9 @@ DESCRIPTION
           }
 
         Marlin currently only supports inheriting from other Marlin classes,
-        or from Class::XSConstructor classes. Other base classes may work,
-        especially if they don't do anything much in their constructor.
+        or from Class::XSConstructor, Moo, and Moose classes. Other base
+        classes *may* work, especially if they don't do anything much in their
+        constructor.
 
         You can include version numbers:
 
@@ -516,6 +523,18 @@ DESCRIPTION
             use Marlin -base => 'Person', qw( employee_id payroll_number );
           }
 
+        You can technically manually set your @ISA, but must do it *before*
+        Marlin creates your class; otherwise Marlin won't be able to see any
+        attribute definitions in parent classes.
+
+          package Employee {
+            use Person 1.0;
+            BEGIN { @ISA = ( 'Person' ) };
+            use Marlin qw( employee_id payroll_number );
+          }
+
+        I don't know why you'd want to do that though.
+
     `-with` or `-roles` or `-does`
         Composes roles into your class.
 
@@ -530,7 +549,8 @@ DESCRIPTION
               qw( employee_id payroll_number );
           }
 
-        Marlin classes can accept both Marlin::Role and Role::Tiny roles.
+        Marlin classes can accept roles built with Marlin::Role, Role::Tiny,
+        Moo::Role, or Moose::Role.
 
         Like `-base`, you can include version numbers.
 
@@ -538,13 +558,18 @@ DESCRIPTION
         Specifies the name of your class. If you don't include this, it will
         just use `caller`, which is normally what you want.
 
-        The following are equivalent:
+        The following are roughly equivalent:
 
           package Person {
             use Marlin 'name!';
           }
   
           use Marlin -this => \'Person', 'name!';
+
+        The main difference is what scope any lexical subs Marlin creates will
+        end up in. (And if your version of Perl is too old to support lexical
+        subs, the "scope" they will be installed in is actually the caller
+        package!)
 
     `-constructor`
         Tells Marlin to use a constructor name other than `new`:
@@ -591,6 +616,81 @@ DESCRIPTION
         Marlin doesn't offer any official API for building extensions.
 
     *   The metaobject protocol.
+
+  API
+    Marlin provides an API of sorts.
+
+    `my $meta = Marlin->new( @args )`
+        Creates an object representing a class, but doesn't build the class
+        yet.
+
+    `my $meta = Marlin->find_meta( $class_name )`
+        Returns an object representing an existing class or role. Will
+        automatically import Moose and Moo classes and roles too.
+
+    `$meta->do_setup`
+        Builds the class.
+
+    `$meta->caller`
+        Returns the name of the package which called Marlin.
+
+    `$meta->this`
+        Returns the name of the class being built.
+
+    `$meta->parents`
+        Returns an arrayref of parents. Each parent is itself an arrayref with
+        the first element being the class name and the second element being a
+        version number.
+
+    `$meta->roles`
+        Returns an arrayref of roles. Each role is itself an arrayref with the
+        first element being the class name and the second element being a
+        version number.
+
+    `$meta->attributes`
+        Returns an arrayref of attributes defined in this class. Includes
+        attributes from composed roles, but not inherited attributes from
+        parent classes. Each attribute is either a hashref or a
+        Marlin::Attribute object.
+
+        Calling `$meta->canonicalize_attributes` will replace any hashrefs in
+        this list with Marlin::Attribute objects.
+
+    `$meta->attributes_with_inheritance`
+        Like `$meta->attributes`, but includes parent classes.
+
+    `$meta->strict`
+        Boolean indicating if the constructor will be strict.
+
+    `$meta->constructor`
+        Name of the constructor method. Usually "new".
+
+    `$meta->modifiers`
+        Boolean indicating whether Marlin should export
+        Class::Method::Modifiers keywords into the package.
+
+    `$meta->inhaled_from`
+        Usually undef, but may be "Moose", "Moose::Role", "Moo", or
+        "Moo::Role" to indicate that this metadata was imported from Moose or
+        Moo.
+
+    `$meta->short_name`
+        The package name without any colons. This is used in the
+        stringification provided by `to_string`.
+
+    `$meta->is_struct`
+        Boolean indicating that the class was created by Marlin::Struct.
+
+    `$meta->to_string( $object )`
+        Stringifies the object to a representation useful in debugging, etc.
+
+    `$meta->to_arrayref( $object )`
+        Creates an arrayref representation of the object which closely
+        resembles the string representation.
+
+    `Marlin->can_lexical`
+        Returns true if Marlin is running in an environment that supports
+        lexical subs.
 
 BUGS
     Please report any bugs to <https://github.com/tobyink/p5-marlin/issues>.

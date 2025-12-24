@@ -1,5 +1,12 @@
 Revision history for Params-Validate-Strict
 
+0.28	Tue Dec 23 20:28:19 EST 2025
+	Added relationship validator
+	Handle undefined value in 'isa' test
+	Fixed handling of min or max set to 0
+	Allow type to be 'Str' or 'Bool' to be compatible with other schema definitions
+	Increased test coverage
+
 0.27	Sat Dec 13 11:03:00 EST 2025
 	Added enum as a synonym of memberof
 	Support unix_timestamp semantic

@@ -12,6 +12,7 @@ t/30-basics.t
 t/40-more.t
 t/50-even-more.t
 t/60-most.t
+t/70-more.t
 t/alternative.t
 t/array.t
 t/comment-spelling.t

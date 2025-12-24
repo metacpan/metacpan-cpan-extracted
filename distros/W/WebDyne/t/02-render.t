@@ -112,9 +112,10 @@ sub main {
             #  Iterate twice to make sure no change over multiple iterations
             #
             foreach my $count (1..2) {
-
-
-
+            
+            
+                #  Go through all stages of compile
+                #
                 foreach my $stage ((0..5), 'final') {
 
 
@@ -182,7 +183,7 @@ sub main {
                         pass("$test_fn pass on stage: $stage");
                     }
                     else {
-                        fail(diag("$test_fn fail on stage: $stage"));
+                        fail(diag("$test_fn fail on stage: $stage count: $count"));
                         diag("ACTUAL: $string_actual");
                         diag("EXPECT: $string_expect");
                         eval { require Text::Diff } || do {

@@ -109,7 +109,7 @@ sub sim
   $tee = new IO::Tee(\*STDOUT, ">>$tofile" ); # GLOBAL
   say $tee "\nNow in Sim::OPT::Sim.\n";
 
-  say $tee "RECEIVED DATA IN SIM: " . dump( @_ );
+ #say $tee "RECEIVED DATA IN SIM: " . dump( @_ );
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -160,13 +160,13 @@ sub sim
 	my $skipreport = $vals{skipreport};
   my %notecases;
 
-  my @trieds; say $tee "HERE IN SIM \@precedents: " . dump( \@precedents );
+  my @trieds; #say $tee "HERE IN SIM \@precedents: " . dump( \@precedents );
   foreach $prec_r ( @precedents )
   {
     my %prec = %{ $prec_r };
     my %to = %{ $prec{to} };
     push ( @trieds, $to{cleanto} );
-  } say $tee "HERE IN SIM \@trieds: " . dump( \@trieds );
+  } #say $tee "HERE IN SIM \@trieds: " . dump( \@trieds );
 
   my @allinstances = @instances ;
   push( @allinstances, @precedents );
@@ -195,7 +195,7 @@ sub sim
     my @blocks = @{ $dt{blocks} }; #say $tee "HERE IN SIM \@blocks: " . dump( @blocks );
     my %varnums = %{ $dt{varnums} }; #say $tee "HERE IN SIM \%varnums: " . dump( \%varnums );
     my %mids = %{ $dt{mids} }; #say $tee "HERE IN SIM \%mids: " . dump( \%mids );
-    my $countinstance = $dt{instn}; #say $tee "HERE IN SIM \$countinstance: " . dump( $countinstance );
+    my $countinstance = $instn; #say $tee "HERE IN SIM \$countinstance: " . dump( $countinstance );
 
     my $fire = $dt{fire};
     my $gaproc = $dt{gaproc};
@@ -216,7 +216,7 @@ sub sim
     my $countdir = 0;
 
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
-    my $simelt = $to{crypto}; say $tee "SIMELT: $simelt";
+    my $simelt = $to{crypto}; #say $tee "SIMELT: $simelt";
     my $shortsimelt = $simelt;
     $shortsimelt =~ s/$mypath\///;
     my ( $shortresfile, $shortflfile );
@@ -310,7 +310,7 @@ $step
 y
 s
 $simnetwork
-Results for $simelt-$dates_to_sim
+Results! for $simelt-$dates_to_sim
 y
 y
 -
@@ -335,7 +335,7 @@ $before
 $step
 s
 y
-Results for $simelt-$dates_to_sim
+Results! for $simelt-$dates_to_sim
 y
 y
 -
@@ -350,8 +350,8 @@ XXX
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\ $printthis";
                     if ($exeonfiles eq "y")
                     {
-                      `$printthis`;
-                      say $tee "$printthis";
+                      say $tee `$printthis`;
+                      #say $tee "$printthis";
                     }
                     print OUTFILE "TWO, $resfile\n";
                   }
@@ -370,7 +370,7 @@ $step
 y
 s
 $simnetwork
-Results for $simelt-$dates_to_sim
+Results! for $simelt-$dates_to_sim
 y
 y
 -
@@ -384,8 +384,8 @@ XXX
                     ####print $tee "$printthis";
                     if ($exeonfiles eq "y")
                     {
-                      `$printthis`;
-                      say $tee "$printthis";
+                      say $tee `$printthis`;
+                      #say $tee "$printthis";
                     }
                   }
                 }

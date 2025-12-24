@@ -42,7 +42,7 @@ require Exporter;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
@@ -238,7 +238,7 @@ sub debug {
 
     #  Get the debug message
     #
-    my $debug=$_[1] ? sprintf(shift(), @_) : shift();
+    my $debug=$#_ ? sprintf(shift(), @_) : shift();
 
 
     #  Filtering ?

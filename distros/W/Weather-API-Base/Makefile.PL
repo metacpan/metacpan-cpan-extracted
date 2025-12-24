@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test2::V0'               => '0',
+        'Test2::V0'               => '0.000143',
         'Test2::Tools::Exception' => '0',
         'HTTP::Response'          => '0',
         'JSON'                    => '0'

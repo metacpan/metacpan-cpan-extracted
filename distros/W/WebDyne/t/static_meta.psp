@@ -1,0 +1,12 @@
+<html>
+<head>
+<title>Static Test</title>
+<!-- Set static meta parameter -->
+<meta name="WebDyne" content="static=1">
+</head>
+<body>
+<p>
+Static page via meta attribute
+Param value: <? $_[1]->{'count'} ?>
+</body>
+</html>

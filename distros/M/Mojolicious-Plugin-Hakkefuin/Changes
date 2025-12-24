@@ -1,0 +1,36 @@
+Revision history for perl distribution Mojolicious::Plugin::Hakkefuin
+
+0.1.3       2025-12-24 17:32:40+08:00
+            - Lock screen flow: stabilize lock/unlock cookies and CSRF handling (#1)
+            - Backend tests: align Mojo::Hakkefuin::Backend::* coverage, fix migrations cleanup (#2)
+            - App tests: Mojolicious Lite/Full suites cleaned up (sockets, tmp dirs, migrations) (#3)
+            - Controller overrides: honor per-request cookie/session TTL updates (#4)
+            - Docs: refresh README, add CONTRIBUTING/SECURITY, fix POD coverage (#9)
+            - DB performance: avoid repeated table checks and ensure cookie/identity/expiry indexes exist (#12, #13)
+            - Token generation: reuse random generators to reduce overhead (#14)
+            - Sessions: build shared Mojo::Hakkefuin::Sessions once, not per request (#15)
+
+0.1.2       2025-12-21 02:17:04+08:00
+            v0.1.2-beta (YataMirror)
+            - Switch backend queries to SQL::Abstract (Mojo::Pg), fix update paths and identify handling, and allow the mysql alias with aligned env naming (Achmad Yusri Afandi)
+            - Refine session/cookie handling with separate expiry rows, configurable cookie max_age, renamed version helper, and corrected method loading/calls (Achmad Yusri Afandi / yusrideb)
+            - Harden database setup: ensure sqlite dir creation, use int IDs, ship DBD::mysql, and refresh Makefile.PL/cpanfile (Achmad Yusri Afandi / yusrideb)
+            - Expand testing and CI with backend test modules, recursive prove runs, GitHub Actions replacing Travis, updated Perl matrix (incl. 5.32/5.36), and cleaned envs (Achmad Yusri Afandi / yusrideb)
+            - Update documentation: README and plugin POD fixes, year refresh, and link formatting corrections (Achmad Yusri Afandi / yusrideb)
+
+0.1.1       2020-03-19 05:58:00+08:00
+            v0.1.1-beta - on GitHub release
+            - Use term MariaDB as instead of MySQL (yusrideb)
+            - Prepare module to support lock and unlock session #1 (yusrideb)
+            - Prepare unit tests for separate testing
+              between Mojolicious Lite and Mojolicious Full #3 (yusrideb)
+            - fix bugs from version 0.1-alpha (yusrideb)
+            - fix commit history #5 (RudyBodo)
+            - Add LICENSE file  (yusrideb)
+
+0.1.0      2019-06-18 06:18:00+08:00
+            v0.1-alpha - on GitHub release
+            - Login and Logout
+            - CSRF Protection
+            - Backend available for SQLite, MySQL, dan PostgreSQL
+            All authentication activities are saved to the database via Mojo::Hakkefuin::Backend Module.

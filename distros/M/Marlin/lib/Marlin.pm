@@ -6,34 +6,229 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007001';
+our $VERSION   = '0.008000';
 
-use constant _ATTRS => qw( this parents roles attributes strict constructor modifiers );
-use Exporter::Tiny qw( mkopt _croak );
-use Scalar::Util qw( blessed weaken );
-use Class::XSAccessor { getters => [ _ATTRS ] };
-use Class::XSConstructor [ undef, '_new' ], _ATTRS;
+use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct );
+use B::Hooks::AtRuntime   qw( at_runtime after_runtime );
+use Class::XSAccessor     { getters => [ _ATTRS ] };
+use Class::XSConstructor  [ undef, '_new' ], _ATTRS;
 use Class::XSDestructor;
-use B::Hooks::AtRuntime qw( at_runtime after_runtime );
-use Module::Runtime qw( use_package_optimistically module_notional_filename );
-use List::Util qw(any);
+use Exporter::Tiny        qw( mkopt _croak );
+use List::Util 1.45       qw( any uniqstr );
+use Module::Runtime       qw( use_package_optimistically module_notional_filename );
+use Scalar::Util          qw( blessed weaken );
+use Types::Common         qw( -is );
 
 BEGIN {
-	if ( $] < 5.010 ) {
-		require MRO::Compat;
-	}
+	require MRO::Compat if $] < 5.010;
 };
 
 BEGIN {
 	*_HAS_NATIVE_LEXICAL_SUB = ( "$]" >= 5.037002 )
 		? sub () { !!1 }
 		: sub () { !!0 };
-	*_HAS_MODULE_LEXICAL_SUB = ( "$]" >= 5.011002 and eval('require Lexical::Sub') )
+	*_HAS_MODULE_LEXICAL_SUB = ( "$]" >= 5.011002 and eval('require Lexical::Sub; 1') )
 		? sub () { !!1 }
 		: sub () { !!0 };
 };
 
-our %META;
+{
+	our %META;
+
+	sub find_meta {
+		my $me   = shift;
+		my $for  = shift;
+		if ( my $class = blessed $for ) {
+			$for = $class;
+		}
+		if ( not exists $META{$for} ) {
+			$me->try_inhale( $for );
+		}
+		$META{$for};
+	}
+
+	sub store_meta {
+		my $me = shift;
+		if ( blessed $me ) {
+			$META{$me->this} = $me;
+		}
+		else {
+			my $for  = shift;
+			my $meta = shift;
+			$META{$for} = $meta;
+		}
+	}
+}
+
+sub try_inhale {
+	my $me = shift;
+	my $k = shift;
+	
+	( my $k_short = $k ) =~ s/(::|')//g;
+	
+	no strict 'refs';
+	
+	# Native or already inhaled 
+	{
+		our %META;
+		return !!1 if $META{$k};
+	}
+	
+	# Inhale Class::XSAccessor
+	if ( @{"$k\::__XSCON_HAS"} ) {
+		my $has = \@{"$k\::__XSCON_HAS"};
+		my $isa = \%{"$k\::__XSCON_ISA"};
+		my $req = \@{"$k\::__XSCON_REQUIRED"};
+		my $str =  ${"$k\::__XSCON_STRICT"};
+		my $coe = \%{"$k\::__XSCON_COERCIONS"};
+		my $def = \%{"$k\::__XSCON_DEFAULTS"};
+		my $tt  = \%{"$k\::__XSCON_TYPETINY"};
+		my $tri = \%{"$k\::__XSCON_TRIGGERS"};
+		my $ia  = \%{"$k\::__XSCON_INIT_ARGS"};
+		my $flg = \%{"$k\::__XSCON_FLAGS"};
+		
+		my @attrs = map {
+			my $slot = $_;
+			{
+				is       => 'bare',
+				package  => $k,
+				slot     => $slot,
+				$tt->{$slot} ? ( isa => $tt->{$slot} ) : $isa->{$slot} ? ( isa => $isa->{$slot} ): (),
+				$coe->{$slot} ? ( coerce => $coe->{$slot} ) : (),
+				$tri->{$slot} ? ( trigger => $tri->{$slot} ) : (),
+				exists( $ia->{$slot} ) ? ( init_arg => $ia->{$slot} ) : (),
+				isScalarRef( $def->{$slot} ) ? ( builder => ${$def->{$slot}} ) : exists($def->{$slot}) ? ( default => $def->{$slot} ) : (),
+				required => !!( grep $_ eq $slot, @{ $req || [] }),
+				( $flg->{$slot} & Class::XSConstructor::XSCON_FLAG_WEAKEN ) ? ( weak_ref => 1 ) : (),
+			};
+		} @{ $has || [] };
+		
+		__PACKAGE__->_new(
+			this         => $k,
+			attributes   => \@attrs,
+			parents      => [ @{"$k\::ISA"} ],
+			roles        => [],
+			strict       => $str,
+			constructor  => "__Marlin_${k_short}_new", # ???
+			inhaled_from => 'Class::XSConstructor',
+			short_name   => $k_short,
+		)->store_meta;
+		return 'Class::XSConstructor';
+	}
+	
+	# Inhale Moose
+	if ( $INC{'Moose.pm'} and my $moose_meta = do {
+		require Moose::Util;
+		Moose::Util::find_meta($k);
+	} ) {
+		# Moose classes
+		if ( $moose_meta->isa('Moose::Meta::Class') ) {
+			if ( $moose_meta->is_mutable and $k ne 'Moose::Object' ) {
+				require Carp;
+				Carp::carp("Marlin inhaled a mutable Moose class: $k");
+			}
+			
+			my @attrs = map {
+				my $attr = $_;
+				{
+					is       => $attr->{is} || 'bare',
+					package  => $attr->definition_context->{package} || $k,
+					slot     => $attr->name,
+					$attr->has_type_constraint ? ( isa => Types::Common::to_TypeTiny($attr->type_constraint) ) : (),
+					$attr->should_coerce ? ( coerce => 1 ) : (),
+					$attr->has_trigger ? ( trigger => $attr->trigger ) : (),
+					init_arg => $attr->init_arg,
+					$attr->has_builder ? ( builder => $attr->builder ) : $attr->has_default ? ( default => $attr->default ) : (),
+					$attr->is_required ? ( required => 1 ) : (),
+					$attr->is_weak_ref ? ( weak_ref => 1 ) : (),
+					$attr->is_lazy ? ( lazy => 1 ) : (),
+				};
+			} $moose_meta->get_all_attributes;
+			
+			__PACKAGE__->_new(
+				this         => $k,
+				attributes   => \@attrs,
+				parents      => [ @{"$k\::ISA"} ],
+				roles        => [ uniqstr( map { $_->name } @{ $moose_meta->roles } ) ],
+				strict       => !!Moose::Util::does_role($moose_meta, 'MooseX::StrictConstructor::Trait::Class'),
+				constructor  => $moose_meta->constructor_name,
+				inhaled_from => 'Moose',
+				short_name   => $k_short,
+			)->store_meta;
+			
+			return 'Moose';
+		}
+		# Moose roles
+		elsif ( $moose_meta->isa('Moose::Meta::Role') ) {
+			my @attrs = map {
+				my $name = $_;
+				my $attr = $moose_meta->get_attribute($_);
+				{
+					is       => $attr->{is} || 'bare',
+					package  => $attr->{definition_context}{package} || $k,
+					slot     => $name,
+					%$attr,
+					defined $attr->{isa} ? ( isa => Types::Common::to_TypeTiny($attr->{isa}) ) : (),
+				};
+			} $moose_meta->get_attribute_list;
+			
+			use Marlin::Role;
+			'Marlin::Role'->_new(
+				this         => $k,
+				attributes   => \@attrs,
+				roles        => [ uniqstr( map { $_->name } @{ $moose_meta->get_roles } ) ],
+				inhaled_from => 'Moose::Role',
+			)->store_meta;
+			
+			return 'Moose::Role';
+		}
+	}
+	
+	# Inhale Moo
+	if ( $INC{'Moo.pm'} and Moo->can('is_class') and Moo->is_class($k) ) {
+		my $maker = Moo->_constructor_maker_for( $k );
+		
+		my $specs = $maker->all_attribute_specs;
+		my @attr =
+			sort { $a->{index} <=> $b->{index} }
+			map  { +{ slot => $_, package => $k, %{ $specs->{$_} } }; }
+			keys %$specs;
+		
+		__PACKAGE__->_new(
+			this         => $k,
+			attributes   => \@attr,
+			parents      => [ @{"$k\::ISA"} ],
+			roles        => [ keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
+			strict       => Moo::Role::does_role($maker, 'MooX::StrictConstructor::Role::Constructor::Base'),
+			constructor  => 'new',
+			inhaled_from => 'Moo',
+			short_name   => $k_short,
+		)->store_meta;
+		
+		return 'Moo';
+	}
+
+	# Inhale Moo::Role
+	if ( $INC{'Moo/Role.pm'} and Moo::Role->can('is_role') and Moo::Role->is_role($k) ) {
+		my @attr;
+		my @specs = @{ $Moo::Role::INFO{$k}{attributes} };
+		while ( my ( $name, $spec ) = splice @specs, 0, 2 ) {
+			push @attr, +{ slot => $name, package => $k, %$spec };
+		}
+		
+		require Marlin::Role;
+		'Marlin::Role'->_new(
+			this         => $k,
+			attributes   => \@attr,
+			roles        => [ keys %{ $Role::Tiny::APPLIED_TO{$k} } ],
+			inhaled_from => 'Moo::Role',
+		)->store_meta;
+		
+		return 'Moo::Role';
+	}
+	
+	return !!0;
+}
 
 sub can_lexical {
 	_HAS_NATIVE_LEXICAL_SUB || _HAS_MODULE_LEXICAL_SUB;
@@ -45,8 +240,8 @@ sub _croaker {
 
 sub import {
 	my $class = shift;
-	my $me = $class->new( -caller => [ scalar(caller) ], @_ );
-	$META{$me->this} = $me;
+	my $me = $class->new( -caller => [ scalar(CORE::caller) ], @_ );
+	$me->store_meta;
 	$me->do_setup;
 }
 
@@ -54,18 +249,18 @@ my $_parse_package_list = sub {
 	my ( $class, $v ) = @_;
 	
 	my @r;
-	if ( ref $v eq 'HASH' ) {
+	if ( is_HashRef $v ) {
 		$v = [ $v ];
 	}
-	if ( ref $v eq 'ARRAY' ) {
+	if ( is_ArrayRef $v ) {
 		push @r, map {
 			my $x = $_;
-			ref($x) eq 'HASH'
+			is_HashRef($x)
 				? ( map { [ $_ => $x->{$_} ] } sort keys %$x )
 				: [ split /\s+/, $x ]
 		} @$v;
 	}
-	elsif ( ref $v eq 'SCALAR' ) {
+	elsif ( is_ScalarRef $v ) {
 		push @r, [ split /\s+/, $$v ];
 	}
 	
@@ -83,7 +278,7 @@ my $_parse_attribute = sub {
 			coerce   => !!( $tc->DOES('Type::API::Constraint::Coercible') and $tc->has_coercion ),
 		};
 	}
-	elsif ( ref($ref) eq 'CODE' ) {
+	elsif ( is_CodeRef $ref ) {
 		my $builder = $ref;
 		$ref = {
 			lazy     => !!1,
@@ -154,6 +349,7 @@ sub new {
 		}
 		elsif ( $k =~ /^-(?:caller)$/ ) {
 			my @got = $class->$_parse_package_list( $v );
+			_croak("Can be only one caller") if @got != 1 || exists $arg{caller};
 			$arg{caller} = $got[0][0];
 		}
 		elsif ( $k =~ /^-(?:constructor)$/ ) {
@@ -170,7 +366,7 @@ sub new {
 			$arg{modifiers} = !!1;
 		}
 		elsif ( $k =~ /^-(?:requires?)$/ ) {
-			_croak("Expected arrayref of required method names") unless ref($v) eq 'ARRAY';
+			_croak("Expected arrayref of required method names") unless is_ArrayRef $v;
 			$arg{requires} = $v;
 		}
 		else {
@@ -178,11 +374,13 @@ sub new {
 		}
 	}
 	
-	if ( my $caller = delete $arg{caller} ) {
+	if ( my $caller = $arg{caller} ) {
 		$arg{this} ||= $caller;
 	}
 	
 	_croak "Not sure what class to create" unless $arg{this};
+	
+	( $arg{short_name} = $arg{this} ) =~ s/(::|')//g;
 	
 	return $class->_new( \%arg );
 }
@@ -240,8 +438,7 @@ sub setup_inheritance {
 		no strict 'refs';
 		\@{sprintf("%s::ISA", $me->this)};
 	};
-	my %already;
-	@$ISA = grep { not $already{$_}++ } @$ISA, @parents;
+	@$ISA = uniqstr( @$ISA, @parents );
 	
 	return $me;
 }
@@ -249,22 +446,42 @@ sub setup_inheritance {
 sub setup_roles {
 	my $me = shift;
 	
-	my %already;
-	my @roles =
-		grep { not $already{$_}++ }
+	my @roles = uniqstr(
 		map {
 			my ( $pkg, $ver ) = @$_;
 			&use_package_optimistically( $pkg, defined($ver) ? $ver : () );
-		} @{ $me->roles } or return $me;
+		} @{ $me->roles }
+	) or return $me;
 	
-	require Role::Tiny;
+	my ( @moose_roles, @tiny_roles );
+	if ( $INC{'Moose/Role.pm'} ) {
+		require Moose::Util;
+		for my $r ( @roles ) {
+			my $m = Moose::Util::find_meta( $r );
+			if ( $m and $m->isa('Moose::Meta::Role') ) {
+				push @moose_roles, $r;
+			}
+			else {
+				push @tiny_roles, $r;
+			}
+		}
+	}
+	else {
+		@tiny_roles = @roles;
+	}
+	
 	at_runtime {
-		Role::Tiny->apply_roles_to_package( $me->this, @roles );
-	};
+		require Role::Tiny;
+		Role::Tiny->apply_roles_to_package( $me->this, @tiny_roles );
+	} if @tiny_roles;
+	
+	at_runtime {
+		Moose::Util::ensure_all_roles( $me->this, @moose_roles );
+	} if @moose_roles;
 
 	my $existing;
 	for my $r ( @roles ) {
-		my $r_meta = $META{$r};
+		my $r_meta = $me->find_meta( $r );
 		if ( blessed $r_meta and $r_meta->isa('Marlin::Role') ) {
 			$existing ||= do {
 				my %e;
@@ -274,8 +491,8 @@ sub setup_roles {
 				\%e;
 			};
 			for my $attr ( @{ $r_meta->attributes } ) {
-				require Storable;
-				my $copy = Storable::dclone( $attr );
+				require Clone;
+				my $copy = Clone::clone( $attr );
 				$copy->{package} = $me->this;
 				push @{ $me->attributes }, $copy;
 			}
@@ -292,7 +509,7 @@ sub canonicalize_attributes {
 	@{ $me->attributes } = map {
 		blessed( $_ )
 			? $_
-			: Marlin::Attribute->new( %$_, package => $me->this );
+			: Marlin::Attribute->new( %$_, package => $me->this, marlin => $me );
 	} @{ $me->attributes };
 	
 	return $me;
@@ -363,19 +580,28 @@ sub setup_imports {
 		);
 	}
 	
-	while ( @imports ) {
-		my ( $lexname, $coderef ) = splice( @imports, 0, 2 );
-		if ( Marlin::_HAS_NATIVE_LEXICAL_SUB ) {
+	$me->_lexport( @imports );
+	
+	return $me;
+}
+
+sub _lexport {
+	my $me = shift;
+	my $caller;
+	
+	while ( @_ ) {
+		my ( $lexname, $coderef ) = splice( @_, 0, 2 );
+		if ( _HAS_NATIVE_LEXICAL_SUB ) {
 			no warnings ( "$]" >= 5.037002 ? 'experimental::builtin' : () );
 			builtin::export_lexically( $lexname, $coderef );
 		}
-		elsif ( Marlin::_HAS_MODULE_LEXICAL_SUB ) {
+		elsif ( _HAS_MODULE_LEXICAL_SUB ) {
 			'Lexical::Sub'->import( $lexname, $coderef );
 		}
 		else {
 			no strict 'refs';
-			my $package = $me->this;
-			*{"$package\::$lexname"} = $coderef;
+			$caller ||= $me->caller;
+			*{"$caller\::$lexname"} = $coderef;
 		}
 	}
 	
@@ -417,41 +643,18 @@ sub attributes_with_inheritance {
 	my @isa = @{ +mro::get_linear_isa($me->this) };
 	no strict 'refs';
 	
+	# If anything in the inheritance tree appears to be a
+	# Class::XSAccessor class, attempt to reconstruct it.
+	#
 	for my $k ( @isa ) {
-		next if $META{$k};
-		next if !@{"$k\::__XSCON_HAS"};
-		
-		my $has = \@{"$k\::__XSCON_HAS"};
-		my $isa = \%{"$k\::__XSCON_ISA"};
-		my $req = \@{"$k\::__XSCON_REQUIRED"};
-		my $str =  ${"$k\::__XSCON_STRICT"};
-		
-		my @attrs = map {
-			my $slot = $_;
-			{
-				is       => 'bare',
-				package  => $k,
-				slot     => $slot,
-				$isa->{$slot} ? ( isa => $isa->{$slot} ): (),
-				required => !!( grep $_ eq $slot, @{ $req || [] }),
-			};
-		} @{ $has || [] };
-		
-		$META{$k} = __PACKAGE__->_new(
-			this        => $k,
-			attributes  => \@attrs,
-			parents     => [ @{"$k\::ISA"} ],
-			roles       => [],
-			strict      => $str,
-			constructor => '__Marlin_new', # ???
-		);
+		$me->try_inhale( $k );
 	}
 	
 	my %already;
 	return [
 		reverse
 		grep { not $already{$_->{slot}}++ }
-		map  { $META{$_} ? reverse( @{ $META{$_}->canonicalize_attributes->attributes } ) : () }
+		map  { my $m = $me->find_meta($_); $m ? reverse( @{ $m->canonicalize_attributes->attributes } ) : () }
 		@isa
 	];
 }
@@ -460,14 +663,13 @@ sub build_pp_constructor {
 	my $me   = shift;
 	my $attr = shift;
 	
-	require Types::Common;
 	require Eval::TypeTiny::CodeAccumulator;
 	my $code = Eval::TypeTiny::CodeAccumulator->new;
 	$code->add_line( 'sub {' );
 	$code->increase_indent;
 	$code->add_line( 'my $class    = ref( $_[0] ) ? ref( shift ) : shift;' );
 	$code->add_line( 'my $self     = bless( {}, $class );' );
-	$code->addf( 'my %%args     = ( @_ == 1 and %s ) ? %%{+shift} : @_;', Types::Common::HashRef()->inline_check('$_[0]') );
+	$code->addf( 'my %%args     = ( @_ == 1 and %s ) ? %%{+shift} : @_;', Types::Common::HashRef->inline_check('$_[0]') );
 	$code->add_line( 'my $no_build = delete $args{__no_BUILD__};' );
 	$code->add_gap;
 	for my $at ( @$attr ) {
@@ -491,8 +693,7 @@ sub build_pp_constructor {
 			map { exists($_->{init_arg}) ? $_->{init_arg} : $_->{slot} }
 			@$attr;
 		my $check = do {
-			require Types::Standard;
-			my $enum = Types::Standard::Enum()->of( @allowed );
+			my $enum = Types::Common::Enum->of( @allowed );
 			$enum->can( '_regexp' )
 				? sprintf( '/\\A%s\\z/', $enum->_regexp )
 				: $enum->inline_check( '$_' );
@@ -515,6 +716,113 @@ sub make_type_constraint {
 	$tc->{_marlin} = $me;
 	Scalar::Util::weaken( $tc->{_marlin} );
 	return $tc;
+}
+
+sub to_arrayref {
+	my $me = shift;
+	my $object = shift;
+	
+	my $is_struct = $me->is_struct;
+	my @pos;
+	my @named;
+	
+	for my $attr ( @{ $me->attributes_with_inheritance } ) {
+		my $storage    = ( $attr->{storage} ||= 'HASH' ); next if $storage eq 'PRIVATE';
+		my $has_value  = $storage eq 'HASH' ? exists($object->{$attr->{slot}}) : $attr->predicate->($object);
+		my $value      = !$has_value ? undef : $storage eq 'HASH' ? $object->{$attr->{slot}} : $attr->reader->($object);
+		
+		if ( $is_struct and $attr->{required} ) {
+			push @pos, $value;
+		}
+		elsif ( $has_value ) {
+			push @named, $attr->{init_arg} || $attr->{slot}, $value;
+		}
+	}
+	
+	return [ @pos, @named ];
+}
+
+sub _stringify_value {
+	my $me = shift;
+	my $attr = shift;
+	my $value = shift;
+	
+	if ( my $r = ref $value ) {
+		if ( is_Object $value and my $meta = $me->find_meta( ref($value) ) ) {
+			return $meta->to_string( $value ) if $meta->is_struct;
+		}
+		return '{...}' if $r eq 'HASH';
+		return '[...]' if $r eq 'ARRAY';
+		return 'sub{...}' if $r eq 'CODE';
+		return q{\\} . $me->_stringify_value(undef, $$value) if $r eq 'SCALAR';
+		return "${r}->new(...)" if is_Object $value;
+		return '...';
+	}
+	
+	my $isa = ( $attr and is_TypeTiny $attr->{isa} ) ? $attr->{isa} : Types::Common::Any;
+	
+	if ( $isa and $isa->is_a_type_of(Types::Common::Bool) and is_Bool $value ) {
+		return $value ? 'true' : 'false';
+	}
+	
+	if ( $isa and $isa->is_a_type_of(Types::Common::Num) and is_Num $value ) {
+		return 0 + $value;
+	}
+	
+	if ( $isa and $isa->is_a_type_of(Types::Common::Str) and is_Str $value ) {
+		return is_SimpleStr( $value ) ? B::perlstring( $value ) : q{"..."};
+	}
+	
+	if ( ! defined $value ) {
+		return 'undef';
+	}
+	
+	if ( Sub::Accessor::Small::_is_bool( $value ) ) {
+		return $value ? 'true' : 'false';
+	}
+	
+	if ( Sub::Accessor::Small::_created_as_number( $value ) ) {
+		return 0 + $value;
+	}
+	
+	if ( Sub::Accessor::Small::_created_as_string( $value ) ) {
+		return is_SimpleStr( $value ) ? B::perlstring( $value ) : q{"..."};
+	}
+	
+	return '...';
+}
+
+sub to_string {
+	my $me = shift;
+	my $object = shift;
+	
+	my $is_struct = $me->is_struct;
+	my @pos;
+	my @named;
+	
+	for my $attr ( @{ $me->attributes_with_inheritance } ) {
+		my $storage    = ( $attr->{storage} ||= 'HASH' ); next if $storage eq 'PRIVATE';
+		my $has_value  = $storage eq 'HASH' ? exists($object->{$attr->{slot}}) : $attr->predicate->($object);
+		my $value      = !$has_value ? undef : $storage eq 'HASH' ? $object->{$attr->{slot}} : $attr->reader->($object);
+		
+		if ( $is_struct and $attr->{required} ) {
+			push @pos, $me->_stringify_value($attr, $value);
+		}
+		elsif ( $has_value ) {
+			push @named, [
+				( $attr->{slot} =~ /\A[^\W0-9][\w]*\z/ ) ? $attr->{slot} : B::perlstring($attr->{slot}),
+				$me->_stringify_value($attr, $value),
+			];
+		}
+	}
+	
+	return sprintf(
+		'%s[%s%s%s]',
+		$me->short_name || 'Object',
+		join( q{, }, @pos ),
+		( @pos && @named ) ? q{, } : q{},
+		join( q{, }, map { sprintf q{%s => %s}, @$_ } @named ),
+	);
 }
 
 1;
@@ -739,6 +1047,11 @@ From Perl v5.42.0 onwards, the following is also supported:
   use Marlin name => { reader => 'my get_name' };
   ...
   say $thingy->&get_name();
+
+If you use the C<< 'my get_name' >> syntax on Perl versions too old to support
+lexical subs, they will be installed as a normal sub in the caller package.
+(Note that the caller package might differ from the class currently being
+built, especially in the case of L<Marlin::Struct> classes.)
 
 =item C<< writer >>
 
@@ -1033,8 +1346,8 @@ here.
 
 =head3 Marlin Options
 
-Any strings passed to Marlin that have a leading dash are taking to be
-options affecting your class.
+Any strings passed to Marlin that have a leading dash are taken to be
+options affecting how Marlin builds your class.
 
 =over
 
@@ -1047,8 +1360,8 @@ Sets the parent classes of your class.
   }
 
 Marlin currently only supports inheriting from other Marlin classes, or
-from L<Class::XSConstructor> classes. Other base classes may work,
-especially if they don't do anything much in their constructor.
+from L<Class::XSConstructor>, L<Moo>, and L<Moose> classes. Other base classes
+I<may> work, especially if they don't do anything much in their constructor.
 
 You can include version numbers:
 
@@ -1070,6 +1383,18 @@ A non-reference string is not supported:
     use Marlin -base => 'Person', qw( employee_id payroll_number );
   }
 
+You can technically manually set your C<< @ISA >>, but must do it I<before>
+Marlin creates your class; otherwise Marlin won't be able to see any
+attribute definitions in parent classes.
+
+  package Employee {
+    use Person 1.0;
+    BEGIN { @ISA = ( 'Person' ) };
+    use Marlin qw( employee_id payroll_number );
+  }
+
+I don't know why you'd want to do that though.
+
 =item C<< -with >> or C<< -roles >> or C<< -does >>
 
 Composes roles into your class.
@@ -1085,7 +1410,8 @@ Composes roles into your class.
       qw( employee_id payroll_number );
   }
 
-Marlin classes can accept both L<Marlin::Role> and L<Role::Tiny> roles.
+Marlin classes can accept roles built with L<Marlin::Role>, L<Role::Tiny>,
+L<Moo::Role>, or L<Moose::Role>.
 
 Like C<< -base >>, you can include version numbers.
 
@@ -1094,13 +1420,17 @@ Like C<< -base >>, you can include version numbers.
 Specifies the name of your class. If you don't include this, it will
 just use C<caller>, which is normally what you want.
 
-The following are equivalent:
+The following are roughly equivalent:
 
   package Person {
     use Marlin 'name!';
   }
   
   use Marlin -this => \'Person', 'name!';
+
+The main difference is what scope any lexical subs Marlin creates will end
+up in. (And if your version of Perl is too old to support lexical subs,
+the "scope" they will be installed in is actually the caller package!)
 
 =item C<< -constructor >>
 
@@ -1163,6 +1493,100 @@ Marlin doesn't offer any official API for building extensions.
 =item *
 
 The metaobject protocol.
+
+=back
+
+=head2 API
+
+Marlin provides an API of sorts.
+
+=over
+
+=item C<< my $meta = Marlin->new( @args ) >>
+
+Creates an object representing a class, but doesn't build the class yet.
+
+=item C<< my $meta = Marlin->find_meta( $class_name ) >>
+
+Returns an object representing an existing class or role. Will automatically
+import Moose and Moo classes and roles too.
+
+=item C<< $meta->do_setup >>
+
+Builds the class.
+
+=item C<< $meta->caller >>
+
+Returns the name of the package which called Marlin.
+
+=item C<< $meta->this >>
+
+Returns the name of the class being built.
+
+=item C<< $meta->parents >>
+
+Returns an arrayref of parents. Each parent is itself an arrayref with the
+first element being the class name and the second element being a version
+number.
+
+=item C<< $meta->roles >>
+
+Returns an arrayref of roles. Each role is itself an arrayref with the
+first element being the class name and the second element being a version
+number.
+
+=item C<< $meta->attributes >>
+
+Returns an arrayref of attributes defined in this class. Includes attributes
+from composed roles, but not inherited attributes from parent classes.
+Each attribute is either a hashref or a L<Marlin::Attribute> object.
+
+Calling C<< $meta->canonicalize_attributes >> will replace any hashrefs
+in this list with Marlin::Attribute objects.
+
+=item C<< $meta->attributes_with_inheritance >>
+
+Like C<< $meta->attributes >>, but includes parent classes.
+
+=item C<< $meta->strict >>
+
+Boolean indicating if the constructor will be strict.
+
+=item C<< $meta->constructor >>
+
+Name of the constructor method. Usually "new".
+
+=item C<< $meta->modifiers >>
+
+Boolean indicating whether Marlin should export L<Class::Method::Modifiers>
+keywords into the package.
+
+=item C<< $meta->inhaled_from >>
+
+Usually undef, but may be "Moose", "Moose::Role", "Moo", or "Moo::Role" to
+indicate that this metadata was imported from Moose or Moo.
+
+=item C<< $meta->short_name >>
+
+The package name without any colons. This is used in the stringification
+provided by C<to_string>.
+
+=item C<< $meta->is_struct >>
+
+Boolean indicating that the class was created by L<Marlin::Struct>.
+
+=item C<< $meta->to_string( $object ) >>
+
+Stringifies the object to a representation useful in debugging, etc.
+
+=item C<< $meta->to_arrayref( $object ) >>
+
+Creates an arrayref representation of the object which closely resembles
+the string representation.
+
+=item C<< Marlin->can_lexical >>
+
+Returns true if Marlin is running in an environment that supports lexical subs.
 
 =back
 

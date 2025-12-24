@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+define() { IFS='\n' read -r -d '' ${1} || true ; }
+
+. "${0%/*}"/../getoptlong.sh
+
+define pod <<"=cut"
+
+=encoding utf-8
+
+=head1 NAME
+
+    cmap - Term::ANSIColor::Concise demo/test script
+
+=head1 SYNOPSIS
+
+    cmap [ options ]
+
+        -f # , --format    specify color format (*hsl, rgb, lch)
+        -m # , --mod       set color modifier (ex. +r180%y50)
+        -r   , --reverse   flip foreground/background color
+        -L # , --leader    set leader string
+        -l # , --label     set label string
+        -C # , --column    set column number
+        -o # , --xyz-order set X,Y,Z order
+        -[XYZ] #           set X,Y,Z values
+
+        -h   , --help      show help
+        -d   , --debug     debug
+        -n   , --dryrun    dry-run
+        -t   , --terse     terse message
+        -q   , --quiet     quiet mode
+        -v   , --verbose   verbose mode
+        -M # , --package   select color handling package
+        -I # , --include   include Perl module path
+
+=cut
+
+note()   { [[ $quiet ]] && return ; echo "$@" ; }
+warn()   { note "$@" >&2 ; }
+die()    { warn "$@" ; exit 1 ; }
+
+my_help() {
+    case $1 in
+    man)
+	perldoc $0 ;;
+    *)
+	sed -r \
+	    -e '/^$/N' \
+	    -e '/^\n*(#|=encoding)/d' \
+	    -e 's/^(\n*)=[a-z]+[0-9]* */\1/' \
+	    -e '/Version/q' \
+	    <<< $pod
+	;;
+    esac
+    exit
+}
+
+define USAGE <<END
+cmap - Term::ANSIColor::Concise demo/test script
+
+cmap [ options ]
+END
+
+declare -A OPTS=(
+    [&USAGE]="$USAGE"
+    [      format | f :                                         ]=hsl
+    [ default-mod | D :                                         ]="+r180%y50"
+    [        mods | m @ # set color MODIFIER (ex. +r180%y50)    ]=
+    [     package | M : # select color handling PACKAGE         ]=
+    [      leader | L :                                         ]="██  "
+    [               X @                                         ]=
+    [               Y @                                         ]=
+    [               Z @                                         ]=
+    [   xyz-order | o :                                         ]=
+    [       terse | t                                           ]=
+    [       quiet | q                                           ]=
+    [       label | l ?                                         ]=
+    [     reverse | r                                           ]=
+    [      column | C :                                         ]=
+    [     verbose | v                                           ]=
+    [      dryrun | n                                           ]=
+    [       debug | d +                                         ]=0
+    [       trace | x                                           ]=
+    [       usage | u                                           ]=
+    [         man                                               ]=
+    [     include | I : # include Perl module path              ]=./lib
+    [     message     %                                         ]=
+#   [     message     % #                                       ]="([BEGIN]=$'HELLO\n' [END]=$'\nGOODBY')"
+)
+getoptlong init OPTS PERMUTE= DEBUG=${DEBUG_ME:-}
+getoptlong callback man   'my_help'  \
+                    usage 'my_help'
+getoptlong callback --before X xyz Y xyz Z xyz
+xyz() { eval "$1=()" ; }
+
+label() { [[ $1 ]] || label='hasta la vista  '; }
+trace() { [[ $1 ]] && set -x || set +x ; }
+getoptlong callback $(printf "%s - \n" label trace)
+
+format() {
+    (( $# == 0 )) && return
+    local _fmt=${@:$#}
+    case $_fmt in
+    hsl)
+	xyz_order="x z y"
+	X=($(seq 0 60 359))      # Hue
+	Y=($(seq 0 5 99))        # Lightness
+	Z=(20,80,100)            # Saturation
+	;;
+    rgb)
+	xyz_order="x y z"
+	X=(0 51 102 153 204 255) # Red
+	Y=($(seq 0 15 255))      # Green
+	Z=(0,128,255)            # Blue
+	;;
+    rgb-chart)
+	format=rgb
+	xyz_order="x y z"
+	X=($(seq 0 2 255))       # Red
+	Y=($(seq 0 15 255))      # Green
+	Z=(0,128,255)            # Blue
+	label=" "
+	terse=yes
+	leader=
+	mod=";"
+	;;
+    lch)
+	xyz_order="y z x"
+	X=($(seq 0 60 359))      # Hue
+	Y=($(seq 0 5 99))        # Luminance
+	Z=(20,60,100)            # Chroma
+	;;
+    *)
+	die "$_fmt: unknown format"
+    esac
+}
+getoptlong callback format -
+[[ $format ]] && format $format
+
+getoptlong parse "$@" && eval "$(getoptlong set)"
+
+[[ $package ]] && export TAC_COLOR_PACKAGE=${package}
+[[ $include ]] && export PERL5LIB=${include}:$PERL5LIB
+(( $debug > 1 )) && dump_opt=-a
+(( $debug > 0 )) && {
+    gol_dump ${dump_opt-} | column
+    declare -p mods
+    declare -p message
+}
+
+declare -A xyz=(
+    [x]=0 [y]=1 [z]=2
+    [0]=0 [1]=1 [2]=2
+)
+reorder() {
+    local orig=("$@") ans p n
+    for p in $xyz_order ; do
+	n=${xyz[$p]}
+	ans+=(${orig[$n]})
+    done
+    echo ${ans[@]}
+}
+
+table() {
+    local mod=$1
+    local IFS=$' \t\n,'
+    for z in ${Z[@]} ; do
+	local option=(--separate $'\n')
+	for x in ${X[@]} ; do
+	    local ys=${Y[0]} ye=${Y[$(( ${#Y[@]} - 1 ))]}
+	    [[ $terse ]] || option+=("x=$x,y=$ys-$ye,z=$z")
+	    for y in ${Y[@]} ; do
+		col=$(printf "%s(%03d,%03d,%03d)" ${format} $(reorder $x $y $z))
+		[[ $reverse ]] && arg="$col/$col$mod" \
+		               || arg="$col$mod/$col"
+		text="${leader}${label:-$col$mod}"
+		option+=(-c "$arg" "$text")
+	    done
+	done
+	if [[ $dryrun ]] ; then
+	    echo ansiecho "${option[@]}"
+	else
+	    ansiecho "${option[@]}" | ansicolumn -C ${column:-${#X[@]}} --cu=1 --margin=0
+	fi
+    done
+}
+
+(( $# > 0 )) && echo "$@"
+[[ ${#mods[@]} == 0 ]] && mods=(${default_mod})
+
+[[ -v message[BEGIN] ]] && echo "${message[BEGIN]}"
+
+for mod in "${mods[@]}" ; do
+    table $mod
+done
+
+[[ -v message[END] ]] && echo "${message[END]}"

@@ -22,11 +22,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -722,6 +722,96 @@ TODO: gives an idea of what the field will be, e.g. C<filename>.
 
 All cross-validations must pass for the overall validation to succeed.
 
+=item * C<relationships>
+
+A reference to an array that defines validation rules based on relationships between parameters.
+Relationship validations are performed after all individual parameter validations have passed,
+but before cross-validations.
+
+Each relationship is a hash reference with a C<type> field and additional fields depending on the type:
+
+=over 4
+
+=item * B<mutually_exclusive>
+
+Parameters that cannot be specified together.
+
+  relationships => [
+    {
+      type => 'mutually_exclusive',
+      params => ['file', 'content'],
+      description => 'Cannot specify both file and content'
+    }
+  ]
+
+=item * B<required_group>
+
+At least one parameter from the group must be specified.
+
+  relationships => [
+    {
+      type => 'required_group',
+      params => ['id', 'name'],
+      logic => 'or',
+      description => 'Must specify either id or name'
+    }
+  ]
+
+=item * B<conditional_requirement>
+
+If one parameter is specified, another becomes required.
+
+  relationships => [
+    {
+      type => 'conditional_requirement',
+      if => 'async',
+      then_required => 'callback',
+      description => 'When async is specified, callback is required'
+    }
+  ]
+
+=item * B<dependency>
+
+One parameter requires another to be present.
+
+  relationships => [
+    {
+      type => 'dependency',
+      param => 'port',
+      requires => 'host',
+      description => 'port requires host to be specified'
+    }
+  ]
+
+=item * B<value_constraint>
+
+Specific value requirements between parameters.
+
+  relationships => [
+    {
+      type => 'value_constraint',
+      if => 'ssl',
+      then => 'port',
+      operator => '==',
+      value => 443,
+      description => 'When ssl is specified, port must equal 443'
+    }
+  ]
+
+=item * B<value_conditional>
+
+Parameter required when another has a specific value.
+
+  relationships => [
+    {
+      type => 'value_conditional',
+      if => 'mode',
+      equals => 'secure',
+      then_required => 'key',
+      description => "When mode equals 'secure', key is required"
+    }
+  ]
+
 =back
 
 If a parameter is optional and its value is C<undef>,
@@ -730,6 +820,49 @@ validation will be skipped for that parameter.
 If the validation fails, the function will C<croak> with an error message describing the validation failure.
 
 If the validation is successful, the function will return a reference to a new hash containing the validated and (where applicable) coerced parameters.  Integer and number parameters will be coerced to their respective types.
+
+The C<description> field is optional but recommended for clearer error messages.
+
+=back
+
+=head2 Example Usage
+
+  my $schema = {
+    host => { type => 'string' },
+    port => { type => 'integer' },
+    ssl => { type => 'boolean' },
+    file => { type => 'string', optional => 1 },
+    content => { type => 'string', optional => 1 }
+  };
+
+  my $relationships = [
+    {
+      type => 'mutually_exclusive',
+      params => ['file', 'content']
+    },
+    {
+      type => 'required_group',
+      params => ['host', 'file']
+    },
+    {
+      type => 'dependency',
+      param => 'port',
+      requires => 'host'
+    },
+    {
+      type => 'value_constraint',
+      if => 'ssl',
+      then => 'port',
+      operator => '==',
+      value => 443
+    }
+  ];
+
+  my $validated = validate_strict(
+    schema => $schema,
+    input => $input,
+    relationships => $relationships
+  );
 
 =head1 MIGRATION FROM LEGACY VALIDATORS
 
@@ -806,7 +939,7 @@ sub validate_strict
 					next;
 				} elsif($unknown_parameter_handler eq 'ignore') {
 					if($logger) {
-						$logger->debug(__PACKAGE__ . "$schema_description: Unknown parameter '$key'");
+						$logger->debug(__PACKAGE__ . ": $schema_description: Unknown parameter '$key'");
 					}
 					next;
 				} else {
@@ -883,7 +1016,8 @@ sub validate_strict
 		if((ref($rules) eq 'HASH') && $is_optional) {
 			my $look_for_default = 0;
 			if($are_positional_args == 1) {
-				if(!defined(@{$args}[$rules->{'position'}])) {
+				# if(!defined(@{$args}[$rules->{'position'}])) {
+				if(!defined($args->[$rules->{position}])) {
 					$look_for_default = 1;
 				}
 			} else {
@@ -919,17 +1053,17 @@ sub validate_strict
 
 		# Validate based on rules
 		if(ref($rules) eq 'HASH') {
-			if((my $min = $rules->{'min'}) && (my $max = $rules->{'max'})) {
+			if(defined(my $min = $rules->{'min'}) && defined(my $max = $rules->{'max'})) {
 				if($min > $max) {
 					_error($logger, "validate_strict($key): min must be <= max ($min > $max)");
 				}
 			}
 
 			if($rules->{'memberof'}) {
-				if(my $min = $rules->{'min'}) {
+				if(defined(my $min = $rules->{'min'})) {
 					_error($logger, "validate_strict($key): min ($min) makes no sense with memberof");
 				}
-				if(my $max = $rules->{'max'}) {
+				if(defined(my $max = $rules->{'max'})) {
 					_error($logger, "validate_strict($key): max ($max) makes no sense with memberof");
 				}
 			}
@@ -944,7 +1078,7 @@ sub validate_strict
 				if($rule_name eq 'type') {
 					my $type = lc($rule_value);
 
-					if($type eq 'string') {
+					if(($type eq 'string') || ($type eq 'str')) {
 						if(ref($value)) {
 							_error($logger, $rules->{'error_msg'} || "$rule_description: Parameter '$key' must be a string");
 						}
@@ -998,7 +1132,7 @@ sub validate_strict
 								_error($logger, "$rule_description: Parameter '$key' must be an hashref");
 							}
 						}
-					} elsif($type eq 'boolean') {
+					} elsif(($type eq 'boolean') || ($type eq 'bool')) {
 						if(!defined($value)) {
 							next;	# Skip if bool is undefined
 						}
@@ -1060,7 +1194,7 @@ sub validate_strict
 						$rule_value = $custom_types->{$type}->{'min'};
 						$type = $custom_types->{$type}->{'type'};
 					}
-					if($type eq 'string') {
+					if(($type eq 'string') || ($type eq 'str')) {
 						if($rule_value < 0) {
 							if($rules->{'error_msg'}) {
 								_error($logger, $rules->{'error_msg'});
@@ -1080,7 +1214,7 @@ sub validate_strict
 							_error($logger, $rules->{'error_msg'} || "$rule_description: '$key' can't be decoded");
 							$invalid_args{$key} = 1;
 						}
-					} elsif($rules->{'type'} eq 'arrayref') {
+					} elsif($type eq 'arrayref') {
 						if(!defined($value)) {
 							next;	# Skip if array is undefined
 						}
@@ -1099,7 +1233,7 @@ sub validate_strict
 							}
 							$invalid_args{$key} = 1;
 						}
-					} elsif($rules->{'type'} eq 'hashref') {
+					} elsif($type eq 'hashref') {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
@@ -1145,7 +1279,7 @@ sub validate_strict
 						$rule_value = $custom_types->{$type}->{'max'};
 						$type = $custom_types->{$type}->{'type'};
 					}
-					if($type eq 'string') {
+					if(($type eq 'string') || ($type eq 'str')) {
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
 						}
@@ -1158,7 +1292,7 @@ sub validate_strict
 							_error($logger, $rules->{'error_msg'} || "$rule_description: '$key' can't be decoded");
 							$invalid_args{$key} = 1;
 						}
-					} elsif($rules->{'type'} eq 'arrayref') {
+					} elsif($type eq 'arrayref') {
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
 						}
@@ -1177,7 +1311,7 @@ sub validate_strict
 							}
 							$invalid_args{$key} = 1;
 						}
-					} elsif($rules->{'type'} eq 'hashref') {
+					} elsif($type eq 'hashref') {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
@@ -1220,7 +1354,7 @@ sub validate_strict
 					}
 					eval {
 						my $re = (ref($rule_value) eq 'Regexp') ? $rule_value : qr/\Q$rule_value\E/;
-						if($rules->{'type'} eq 'arrayref') {
+						if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 							my @matches = grep { $_ =~ $re } @{$value};
 							if(scalar(@matches) != scalar(@{$value})) {
 								if($rules->{'error_msg'}) {
@@ -1250,7 +1384,7 @@ sub validate_strict
 					if(!defined($value)) {
 						next;	# Skip if string is undefined
 					}
-					if($rules->{'type'} eq 'arrayref') {
+					if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 						my @matches = grep { /$rule_value/ } @{$value};
 						if(scalar(@matches)) {
 							if($rules->{'error_msg'}) {
@@ -1332,6 +1466,9 @@ sub validate_strict
 						}
 					}
 				} elsif($rule_name eq 'isa') {
+					if(!defined($value)) {
+						next;	# Skip if object not given
+					}
 					if($rules->{'type'} eq 'object') {
 						if(!$value->isa($rule_value)) {
 							_error($logger, "$rule_description: Parameter '$key' must be a '$rule_value' object");
@@ -1365,7 +1502,7 @@ sub validate_strict
 						_error($logger, "$rule_description: Parameter '$key' has meaningless can value $rule_value");
 					}
 				} elsif($rule_name eq 'element_type') {
-					if($rules->{'type'} eq 'arrayref') {
+					if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 						my $type = $rule_value;
 						my $custom_type = $custom_types->{$rule_value};
 						if($custom_type && $custom_type->{'type'}) {
@@ -1381,7 +1518,7 @@ sub validate_strict
 									last;
 								}
 							}
-							if($type eq 'string') {
+							if(($type eq 'string') || ($type eq 'Str')) {
 								if(ref($member)) {
 									if($rules->{'error_msg'}) {
 										_error($logger, $rules->{'error_msg'});
@@ -1439,7 +1576,7 @@ sub validate_strict
 					}
 				} elsif($rule_name eq 'schema') {
 					# Nested schema Run the given schema against each element of the array
-					if($rules->{'type'} eq 'arrayref') {
+					if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 						if(ref($value) eq 'ARRAY') {
 							foreach my $member(@{$value}) {
 								if(!validate_strict({ input => { $key => $member }, schema => { $key => $rule_value }, custom_types => $custom_types })) {
@@ -1537,6 +1674,11 @@ sub validate_strict
 		$validated_args{$key} = $value;
 	}
 
+	# Validate parameter relationships
+	if (my $relationships = $params->{'relationships'}) {
+		_validate_relationships(\%validated_args, $relationships, $logger, $schema_description);
+	}
+
 	if(my $cross_validation = $params->{'cross_validation'}) {
 		foreach my $validator_name(keys %{$cross_validation}) {
 			my $validator = $cross_validation->{$validator_name};
@@ -1593,35 +1735,6 @@ sub _number_of_characters
 	return Unicode::GCString->new($value)->length();
 }
 
-# Helper to log error or croak
-sub _error
-{
-	my $logger = shift;
-	my $message = join('', @_);
-
-	my @call_details = caller(0);
-	if($logger) {
-		$logger->error(__PACKAGE__, ' line ', $call_details[2], ": $message");
-	} else {
-		croak(__PACKAGE__, ' line ', $call_details[2], ": $message");
-		# Be absolutely sure, sometimes croak doesn't die for me in Test::Most scripts
-		die (__PACKAGE__, ' line ', $call_details[2], ": $message");
-	}
-}
-
-# Helper to log warning or carp
-sub _warn
-{
-	my $logger = shift;
-	my $message = join('', @_);
-
-	if($logger) {
-		$logger->warn(__PACKAGE__, ": $message");
-	} else {
-		carp(__PACKAGE__, ": $message");
-	}
-}
-
 sub _apply_nested_defaults {
 	my ($input, $schema) = @_;
 	my %result = %$input;
@@ -1640,6 +1753,182 @@ sub _apply_nested_defaults {
 	}
 
 	return \%result;
+}
+
+sub _validate_relationships {
+	my ($validated_args, $relationships, $logger, $description) = @_;
+
+	return unless ref($relationships) eq 'ARRAY';
+
+	foreach my $rel (@$relationships) {
+		my $type = $rel->{type} or next;
+
+		if ($type eq 'mutually_exclusive') {
+			_validate_mutually_exclusive($validated_args, $rel, $logger, $description);
+		} elsif ($type eq 'required_group') {
+			_validate_required_group($validated_args, $rel, $logger, $description);
+		} elsif ($type eq 'conditional_requirement') {
+			_validate_conditional_requirement($validated_args, $rel, $logger, $description);
+		} elsif ($type eq 'dependency') {
+			_validate_dependency($validated_args, $rel, $logger, $description);
+		} elsif ($type eq 'value_constraint') {
+			_validate_value_constraint($validated_args, $rel, $logger, $description);
+		} elsif ($type eq 'value_conditional') {
+			_validate_value_conditional($validated_args, $rel, $logger, $description);
+		} else {
+			_error($logger, "Unknown relationship type $type");
+		}
+	}
+}
+
+sub _validate_mutually_exclusive {
+	my ($args, $rel, $logger, $description) = @_;
+
+	my @params = @{$rel->{params} || []};
+	return unless @params >= 2;
+
+	my @present = grep { exists($args->{$_}) && defined($args->{$_}) } @params;
+
+	if (@present > 1) {
+		my $msg = $rel->{description} || 'Cannot specify both ' . join(' and ', @present);
+		_error($logger, "$description: $msg");
+	}
+}
+
+sub _validate_required_group {
+	my ($args, $rel, $logger, $description) = @_;
+
+	my @params = @{$rel->{params} || []};
+	return unless @params >= 2;
+
+	my @present = grep { exists($args->{$_}) && defined($args->{$_}) } @params;
+
+	if (@present == 0) {
+		my $msg = $rel->{description} ||
+			'Must specify at least one of: ' . join(', ', @params);
+		_error($logger, "$description: $msg");
+	}
+}
+
+sub _validate_conditional_requirement {
+	my ($args, $rel, $logger, $description) = @_;
+
+	my $if_param = $rel->{if} or return;
+	my $then_param = $rel->{then_required} or return;
+
+	# If the condition parameter is present and defined
+	if (exists($args->{$if_param}) && defined($args->{$if_param})) {
+		# Check if it's truthy (for booleans and general values)
+		if ($args->{$if_param}) {
+			# Then the required parameter must also be present
+			unless (exists($args->{$then_param}) && defined($args->{$then_param})) {
+				my $msg = $rel->{description} || "When $if_param is specified, $then_param is required";
+				_error($logger, "$description: $msg");
+			}
+		}
+	}
+}
+
+sub _validate_dependency {
+	my ($args, $rel, $logger, $description) = @_;
+
+	my $param = $rel->{param} or return;
+	my $requires = $rel->{requires} or return;
+
+	# If param is present, requires must also be present
+	if (exists($args->{$param}) && defined($args->{$param})) {
+		unless (exists($args->{$requires}) && defined($args->{$requires})) {
+			my $msg = $rel->{description} || "$param requires $requires to be specified";
+			_error($logger, "$description: $msg");
+		}
+	}
+}
+
+sub _validate_value_constraint {
+	my ($args, $rel, $logger, $description) = @_;
+
+	my $if_param = $rel->{if} or return;
+	my $then_param = $rel->{then} or return;
+	my $operator = $rel->{operator} or return;
+	my $value = $rel->{value};
+	return unless defined $value;
+
+	# If the condition parameter is present and truthy
+	if (exists($args->{$if_param}) && defined($args->{$if_param}) && $args->{$if_param}) {
+		# Check if the then parameter exists
+		if (exists($args->{$then_param}) && defined($args->{$then_param})) {
+			my $actual = $args->{$then_param};
+			my $valid = 0;
+
+			if ($operator eq '==') {
+				$valid = ($actual == $value);
+			} elsif ($operator eq '!=') {
+				$valid = ($actual != $value);
+			} elsif ($operator eq '<') {
+				$valid = ($actual < $value);
+			} elsif ($operator eq '<=') {
+				$valid = ($actual <= $value);
+			} elsif ($operator eq '>') {
+				$valid = ($actual > $value);
+			} elsif ($operator eq '>=') {
+				$valid = ($actual >= $value);
+			}
+
+			unless ($valid) {
+				my $msg = $rel->{description} || "When $if_param is specified, $then_param must be $operator $value (got $actual)";
+				_error($logger, "$description: $msg");
+			}
+		}
+	}
+}
+
+sub _validate_value_conditional {
+	my ($args, $rel, $logger, $description) = @_;
+
+	my $if_param = $rel->{if} or return;
+	my $equals = $rel->{equals};
+	my $then_param = $rel->{then_required} or return;
+	return unless defined $equals;
+
+	# If the parameter has the specific value
+	if (exists($args->{$if_param}) && defined($args->{$if_param})) {
+		if ($args->{$if_param} eq $equals) {
+			# Then the required parameter must be present
+			unless (exists($args->{$then_param}) && defined($args->{$then_param})) {
+				my $msg = $rel->{description} ||
+					"When $if_param equals '$equals', $then_param is required";
+				_error($logger, "$description: $msg");
+			}
+		}
+	}
+}
+
+# Helper to log error or croak
+sub _error
+{
+	my $logger = shift;
+	my $message = join('', @_);
+
+	my @call_details = caller(0);
+	if($logger) {
+		$logger->error(__PACKAGE__, ' line ', $call_details[2], ": $message");
+	}
+	croak(__PACKAGE__, ' line ', $call_details[2], ": $message");
+	# Be absolutely sure, sometimes croak doesn't die for me in Test::Most scripts
+	die (__PACKAGE__, ' line ', $call_details[2], ": $message");
+}
+
+# Helper to log warning or carp
+sub _warn
+{
+	my $logger = shift;
+	my $message = join('', @_);
+
+	if($logger) {
+		$logger->warn(__PACKAGE__, ": $message");
+	} else {
+		carp(__PACKAGE__, ": $message");
+	}
 }
 
 =head1 AUTHOR

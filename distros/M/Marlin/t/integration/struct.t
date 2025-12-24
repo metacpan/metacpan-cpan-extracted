@@ -23,7 +23,7 @@ use Test2::V0;
 use Data::Dumper;
 
 use Marlin::Struct
-	Person    => [ 'name!' ],
+	Person    => [ 'name!', 'age' ],
 	Employee  => [ 'employee_id!', -base => \'Person' ];
 
 my $A = Employee->new( name => 'Alice', employee_id => 1 );
@@ -37,5 +37,23 @@ ok( $B->name, 'Bob' );
 ok( $B->employee_id, 2 );
 ok is_Employee( $B );
 ok is_Person( $B );
+
+is( to_Person( { name => 'Carol' } ), bless( { name => 'Carol' }, Person->class ) );
+is( to_Person( [ 'Dave' ] ), bless( { name => 'Dave' }, Person->class ) );
+is( to_Person( [ 'Eve', age => 33 ] ), bless( { name => 'Eve', age => 33 }, Person->class ) );
+
+tie( my $person, Person );
+$person = { name => 'Fred' };
+is( $person, bless( { name => 'Fred' }, Person->class ) );
+$person = [ 'George' ];
+is( $person, bless( { name => 'George' }, Person->class ) );
+$person = Employee[ 'Harriet', 8 ];
+is( $person, bless( { name => 'Harriet', employee_id => 8 }, Employee->class ) );
+
+like( dies { $person = 1 }, qr/did not pass type constraint "Person"/ );
+
+my $i = Employee[ 'Ingrid', age => 40, employee_id => 9 ];
+is( "$i", q{Employee["Ingrid", 9, age => 40]} );
+is( [@$i], ["Ingrid", 9, age => 40] );
 
 done_testing;

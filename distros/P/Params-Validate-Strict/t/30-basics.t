@@ -17,7 +17,7 @@ subtest 'Valid Inputs' => sub {
 	my $schema = {
 		username => { type => 'string', min => 3, max => 50, nomatch => qr/\d/ },
 		age => { type => 'integer', min => 0, max => 150 },
-		email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/, min => 1 },
+		email => { type => 'str', matches => qr/^[^@]+@[^@]+\.[^@]+$/, min => 1 },
 		bio => { type => 'string', optional => 1, 'min' => 10, 'max' => 10 },
 		price => { type => 'number', min => 0 },
 		quantity => { type => 'number', min => 1, optional => 0 },
@@ -198,7 +198,7 @@ subtest 'Invalid Inputs' => sub {
 
 	$schema = {
 		'obj' => { 'type' => 'object', optional => 1, can => 'bar' },
-		'discount' => { 'type' => 'boolean' },
+		'discount' => { 'type' => 'bool' },
 	};
 	my $args15 = { discount => 2 }; # Invalid discount
 	my $validated_params15 = eval { validate_strict(schema => $schema, args => $args15) };

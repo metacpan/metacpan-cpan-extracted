@@ -1,0 +1,35 @@
+---
+abstract: 'Scan upstream for new software versions'
+author:
+  - 'Samuel Young <samyoung12788@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-newver
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Getopt::Long: '0'
+  HTML::TreeBuilder: '5.00'
+  JSON::PP: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Parallel::ForkManager: v0.7.6
+  URI: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://codeberg.org/1-1sam/newver/issues
+  repository: https://codeberg.org/1-1sam/newver.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

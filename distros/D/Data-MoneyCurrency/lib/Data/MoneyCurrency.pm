@@ -1,6 +1,6 @@
 # ABSTRACT: Get information for different currencies
 package Data::MoneyCurrency;
-$Data::MoneyCurrency::VERSION = '0.28';
+$Data::MoneyCurrency::VERSION = '0.29';
 use strict;
 use warnings;
 use utf8;
@@ -112,7 +112,7 @@ my $rh_currencies_for_country = {
     bd   => ['bdt'],
     be   => ['eur'],
     bf   => ['xof'],
-    bg   => ['bgn'],
+    bg   => ['eur'],
     bh   => ['bhd'],
     bi   => ['bif'],
     bj   => ['xof'],
@@ -151,7 +151,7 @@ my $rh_currencies_for_country = {
     dj   => ['djf'],
     dk   => ['dkk'],
     dm   => ['xcd'],
-    do   => ['dop'],
+    'do' => ['dop'],
     dy   => ['xof'],
     dz   => ['dzd'],
     ec   => ['usd'],
@@ -373,7 +373,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 

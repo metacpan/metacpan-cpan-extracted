@@ -1,0 +1,3 @@
+<start_html static=1>
+Static page via start_html static attribute
+Param value: <? $_[1]->{'count'} ?>

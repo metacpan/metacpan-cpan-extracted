@@ -1,0 +1,19 @@
+<html>
+<head>
+<title>Cache Test</title>
+<!-- Set static meta parameter -->
+<meta name="WebDyne" content="cache=&cache">
+</head>
+<body>
+<p>
+Cached page via meta attribute
+Param value: <? $_[1]->{'count'} ?>
+</body>
+</html>
+__PERL__
+sub cache {
+    my $self=shift();
+    my $count=$self->r->{'param'}{'count'};
+    $self->cache_compile(1) if ($count%2);
+    return \undef;
+}

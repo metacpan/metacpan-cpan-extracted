@@ -1,0 +1,4 @@
+<start_html meta="%{ 'WebDyne' => 'static=1' }">
+Static page via start_html meta attribute
+Param value: <? $_[1]->{'count'} ?>
+

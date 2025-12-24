@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Find qw//;
 
-our $VERSION='0.0.6';
+our $VERSION='0.0.7';
 
 my %default=(
 	verbose    =>0,
@@ -83,7 +83,7 @@ File::Find::Mason - Find files that contain Mason components
 
 =head1 VERSION
 
-Version 0.0.6
+Version 0.0.7
 
 =head1 SYNOPSIS
 
@@ -173,5 +173,26 @@ If files are not found or not readable, an error will be given when C<verbose> i
 =item * Shebangs/modelines match the beginning of the line anywhere in the file.
 
 =back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 by MediaAlpha.  All rights reserved.
+
+=head1 LICENSE
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=head1 DISCLAIMER
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
 =cut

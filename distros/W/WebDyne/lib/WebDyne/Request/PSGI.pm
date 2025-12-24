@@ -47,7 +47,7 @@ use WebDyne::Request::Fake;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug load
@@ -349,6 +349,7 @@ sub redirect {
 sub run {
 
     my ($r, $self)=@_;
+    debug("self: $self, r:$r");
     if (-f $r->{'filename'}) {
         debug('file is %s', $r->{'filename'});
         return ref($self)->handler($r);

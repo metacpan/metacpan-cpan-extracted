@@ -352,7 +352,7 @@ should allow.
   use Types::Common -lexical, -types;
   
   package Local::Example::Marlin::NamedThing {
-    use Marlin -strict, 'name!' => Str;
+    use Marlin 'name!' => Str;
   }
   
   package Local::Example::Marlin::DoesIntro {
@@ -365,7 +365,6 @@ should allow.
   
   package Local::Example::Marlin::Person {
     use Marlin
-      -strict,
       -extends => [ 'Local::Example::Marlin::NamedThing' ],
       -with    => [ 'Local::Example::Marlin::DoesIntro' ],
       qw( age? );
@@ -373,14 +372,12 @@ should allow.
   
   package Local::Example::Marlin::Employee {
     use Marlin
-      -strict,
       -extends => [ 'Local::Example::Marlin::Person' ],
       qw( employee_id! );
   }
   
   package Local::Example::Marlin::Employee::Developer {
     use Marlin
-      -strict,
       -extends => [ 'Local::Example::Marlin::Employee' ],
       -modifiers,
       _languages => {

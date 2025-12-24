@@ -4,7 +4,7 @@
       "S\u00e9bastien Mourlhou"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -84,9 +84,9 @@
          "web" : "https://github.com/sebmourlhou/oidc-client"
       }
    },
-   "version" : "1.05",
-   "x_generated_by_perl" : "v5.28.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "1.06",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

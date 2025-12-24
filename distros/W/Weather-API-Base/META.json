@@ -47,7 +47,7 @@
             "HTTP::Response" : "0",
             "JSON" : "0",
             "Test2::Tools::Exception" : "0",
-            "Test2::V0" : "0"
+            "Test2::V0" : "0.000143"
          }
       }
    },
@@ -59,6 +59,6 @@
          "web" : "https://github.com/dkechag/Weather-API-Base"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

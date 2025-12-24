@@ -6,7 +6,7 @@ use Types::Common -lexical, -types;
 push @Local::Example::ALL, 'Local::Example::Marlin';
 
 package Local::Example::Marlin::NamedThing {
-	use Marlin -strict, 'name!' => Str;
+	use Marlin 'name!' => Str;
 }
 
 package Local::Example::Marlin::DoesIntro {
@@ -19,7 +19,6 @@ package Local::Example::Marlin::DoesIntro {
 
 package Local::Example::Marlin::Person {
 	use Marlin
-		-strict,
 		-extends => [ 'Local::Example::Marlin::NamedThing' ],
 		-with    => [ 'Local::Example::Marlin::DoesIntro' ],
 		qw( age? );
@@ -27,14 +26,12 @@ package Local::Example::Marlin::Person {
 
 package Local::Example::Marlin::Employee {
 	use Marlin
-		-strict,
 		-extends => [ 'Local::Example::Marlin::Person' ],
 		qw( employee_id! );
 }
 
 package Local::Example::Marlin::Employee::Developer {
 	use Marlin
-		-strict,
 		-extends => [ 'Local::Example::Marlin::Employee' ],
 		-modifiers,
 		_languages => {

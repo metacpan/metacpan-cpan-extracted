@@ -6,6 +6,23 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008000	2025-12-23
+
+ [ Documentation ]
+ - Better documentation of Marlin::Struct.
+ - Document API.
+ - Omit -strict from examples as that is now the default.
+
+ [ Other ]
+ - Classes built with Marlin::Struct now provide a default stringification
+   and arrayrefification.
+ - Internally use Clone::clone() instead of Storage::dclone() as it can
+   cope with coderefs.
+ - Marlin can now inherit from Moose and Moo classes and compose Moose and
+   Moo roles.
+ - Provide some useful utility API methods.
+ - Various small improvements to Marlin::Struct.
+
 0.007001	2025-12-22
 
  [ Bug Fixes ]

@@ -35,7 +35,7 @@ use WebDyne::Request::PSGI;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug load
@@ -66,7 +66,7 @@ sub run {
         my $size=(stat($fn))[7];
         $hr->{'Content-Length'}=$size;
         my $ext=($fn=~/\.(\w+)$/) && $1;
-        $hr->{'Content-Type'}=$WEBDYNE_MIME_TYPE_HR->{$ext} || 'text/plain';
+        $hr->{'Content-Type'}=$WEBDYNE_MIME_TYPE_HR->{$ext} || $WEBDYNE_CONTENT_TYPE_TEXT;
         $r->send_http_header();
         while (<$fh>) {$r->print($_)}
         $fh->close();

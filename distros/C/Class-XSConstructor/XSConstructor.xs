@@ -498,17 +498,12 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
     HV* const FLAGS_hash = GvHV(*FLAGS_globref);
     
     /* Type constraints, coercions, and defaults */
-    SV** const ISA_globref = hv_fetch(stash, "__XSCON_ISA", 11, 0);
-    HV* const ISA_hash = GvHV(*ISA_globref);
-    SV** const COERCIONS_globref = hv_fetch(stash, "__XSCON_COERCIONS", 17, 0);
-    HV* const COERCIONS_hash = GvHV(*COERCIONS_globref);
-    SV** const DEFAULTS_globref = hv_fetch(stash, "__XSCON_DEFAULTS", 16, 0);
-    HV* const DEFAULTS_hash = GvHV(*DEFAULTS_globref);
-    SV** const TRIGGERS_globref = hv_fetch(stash, "__XSCON_TRIGGERS", 16, 0);
-    HV* const TRIGGERS_hash = GvHV(*TRIGGERS_globref);
-    SV** const INIT_ARGS_globref = hv_fetch(stash, "__XSCON_INIT_ARGS", 17, 0);
-    HV* const INIT_ARGS_hash = GvHV(*INIT_ARGS_globref);
-
+    HV* ISA_hash = NULL;
+    HV* COERCIONS_hash = NULL;
+    HV* DEFAULTS_hash = NULL;
+    HV* TRIGGERS_hash = NULL;
+    HV* INIT_ARGS_hash = NULL;
+    
     /* copy allowed attributes */
     for (i = 0; i < HAS_len; i++) {
         tmp = av_fetch(HAS_array, i, 0);
@@ -523,6 +518,11 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
         flags = (int)SvIV(fliggity);
         
         if ( flags & XSCON_FLAG_HAS_INIT_ARG && !( flags & XSCON_FLAG_NO_INIT_ARG ) ) {
+            if ( !INIT_ARGS_hash ) {
+               SV** const INIT_ARGS_globref = hv_fetch(stash, "__XSCON_INIT_ARGS", 17, 0);
+               INIT_ARGS_hash = GvHV(*INIT_ARGS_globref);
+            }
+            
             SV** tmp = hv_fetch(INIT_ARGS_hash, init_arg, init_arg_len, 0);
             SV* tmp2 = *tmp;
             init_arg = SvPV(tmp2, init_arg_len);
@@ -584,6 +584,10 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
                     break;
                 // For anything else, we need to consult the defaults hash.
                 default:
+                    if ( !DEFAULTS_hash ) {
+                        SV** const DEFAULTS_globref = hv_fetch(stash, "__XSCON_DEFAULTS", 16, 0);
+                        DEFAULTS_hash = GvHV(*DEFAULTS_globref);
+                    }
                     if ( hv_exists(DEFAULTS_hash, keyname, keylen) ) {
                         SV** const def = hv_fetch(DEFAULTS_hash, keyname, keylen, 0);
                         // Coderef, call as method
@@ -653,11 +657,19 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
         if ( has_value ) {
             /* there exists an isa check */
             if ( flags & XSCON_FLAG_HAS_TYPE_CONSTRAINT ) {
+                if ( !ISA_hash ) {
+                    SV** const ISA_globref = hv_fetch(stash, "__XSCON_ISA", 11, 0);
+                    ISA_hash = GvHV(*ISA_globref);
+                }
                 int type_flags = flags >> XSCON_BITSHIFT_TYPES;
                 bool result = xscon_check_type(type_flags, newSVsv(val), ISA_hash, keyname, keylen);
             
                 /* we failed type check */
                 if ( !result ) {
+                    if ( !COERCIONS_hash ) {
+                        SV** const COERCIONS_globref = hv_fetch(stash, "__XSCON_COERCIONS", 17, 0);
+                        COERCIONS_hash = GvHV(*COERCIONS_globref);
+                    }
                     if ( flags & XSCON_FLAG_HAS_TYPE_COERCION && hv_exists(COERCIONS_hash, keyname, keylen) ) {
                         SV** const coercion = hv_fetch(COERCIONS_hash, keyname, keylen, 0);
                         SV* newval;
@@ -694,6 +706,10 @@ xscon_initialize_object(const char* pkg, const char* klass, SV* const object, HV
             (void)hv_store((HV *)SvRV(object), keyname, keylen, val, 0);
             
             if ( value_was_from_args && flags & XSCON_FLAG_HAS_TRIGGER ) {
+                if ( !TRIGGERS_hash ) {
+                   SV** const TRIGGERS_globref = hv_fetch(stash, "__XSCON_TRIGGERS", 16, 0);
+                   TRIGGERS_hash = GvHV(*TRIGGERS_globref);
+                }
                 xscon_run_trigger(object, keyname, flags, TRIGGERS_hash);
             }
             

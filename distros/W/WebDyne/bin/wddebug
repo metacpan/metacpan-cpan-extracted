@@ -44,7 +44,7 @@ $Data::Dumper::Indent=1;
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Run main
@@ -123,7 +123,7 @@ sub main {
         $webdyne_dn=$webdyne_pm=$INC{'WebDyne.pm'};
         my $webdyne_fn=(File::Spec->splitpath($webdyne_dn))[2];
         $webdyne_dn=~s/\Q$webdyne_fn\E$//;
-        print "debug location: $webdyne_dn\n"
+        print "debug module location: $webdyne_dn\n"
     }
     else {
         $webdyne_pm=File::Spec->catfile($webdyne_dn, 'WebDyne.pm');
@@ -144,7 +144,7 @@ sub main {
     #
     my $webdyne_display_dn;
     unless ($webdyne_dn=$opt{'directory'}) {
-        $webdyne_dn=$INC{'WebDyne/Base.pm'};
+        $webdyne_dn=$INC{'WebDyne/Util.pm'};
         my $webdyne_fn=(File::Spec->splitpath($webdyne_dn))[2];
         $webdyne_dn=~s/\Q$webdyne_fn\E$//;
         $webdyne_display_dn=realpath(File::Spec->catdir($webdyne_dn, File::Spec->updir));
@@ -266,7 +266,6 @@ sub status {
     my ($debug, $found);
     while (my $line=<$fh>) {
         next unless ($line=~/^\s*(\d?)\s+&&\s+debug/ || $line=~/^\s*debug/);
-
         #print "line $line, $1\n";
         $debug=($1 eq '0') ? 0 : 1;
         $found++;
@@ -292,265 +291,125 @@ sub status {
 }
 
 __END__
-
 # Documentation in Markdown. Convert to POD using markpod from 
 #
 # https://github.com/aspeer/pl-markpod.git 
 
-=begin markdown
 
-# NAME
+=pod
 
-wddebug - This script is used to enable or disable debugging in the WebDyne packages.
-
-# SYNOPSIS
-
-`wddebug [--option]`
-
-`wddebug --directory /opt/perl5`
-
-# DESCRIPTION
-
-By default debugging is optimized out of the WebDyne modules. This script can be used to enable or disable debugging in those modules for troubleshooting purposes.
-Debugging can be turned on or off in the WebDyne modules by running this script with the appropriate options. With no options the script will return the current status
-of debugging in the WebDyne modules.
-
-#  METHODOLOGY
-
-Debugging is enabled in all soucre modules in the form of debug('message') calls. These calls are optimized out of the code during installation via a PM_FILTER in MakeMaker
-unless the WEBDYNE_DEBUG environment variable is set. Once optimised out the debug calls are not available for use as they are converted in the code to the form `0 && debug('message')`,
-which is optimised away by the perl compilers.  This script will enable or disable the debug calls in already installed moduled by adding or removing the `0 &&` prefix from the code. 
-
-As this edits installed modules it is not recommended for use in a production environment. If debugging is neccessary it is better to install WebDyne on a test system with the command
-
-```sh
-#  Install WebDyne with debugging enabled via MakeMaker
-perl Makefile.PL WEBDYNE_DEBUG=1
-make install
-```
-
-```sh
-#  Install WebDyne with debugging enabled via cpanm
-WEBDYNE_DEBUG=1 cpanm WebDyne
-```
-
-# OPTIONS
-
-- `--status`
-  Display the current debug status of the WebDyne modules. The default if no option given
-
-- `--enable`
-  Enable debugging in the WebDyne modules.
-
-- `--disable`
-  Disable debugging in the WebDyne modules.
-
-- `--directory`
-  Specify the directory containing the WebDyne modules.
-
-- `--yes`
-  Automatically confirm the prompt to proceed with enabling or disabling debugging.
-
-- `--help | -?`
-  Display a brief help message and exit.
-
-- `--man`
-  Display the full manual.
-
-- `--version`
-  Display the script version and exit.
-
-
-# EXAMPLES
-
-```sh
-# Turn on debugging in the WebDyne modules:
-wddebug --enable
-````
-
-```sh
-# Turn off debugging in the WebDyne modules in /opt/perl5:
-wddebug --disable --directory /opt/perl5
-```
-
-# DEBUGGING
-
-Actual debugging output is controlled by enviornment variables. See the WebDyne documentation for more information but 
-in brief, setting the `WEBDYNE_DEBUG` environment variable to a value of 1 will enable all debugging output. Setting it
-to a string value that corresponds to a module or method will filter the debugging output to that module or method.
-
-```sh
-# Debug compilation of a file
-WEBDYNE_DEBUG=1 wdcompile time.psp
-```
-
-```sh
-# Debug render of a file
-WEBDYNE_DEBUG=1 wdrender time.psp
-```
-
-```sh
-# Debug a specific method
-WEBDYNE_DEBUG=render wdrender time.psp
-```
-
-```sh
-# Multiple methods can be debugged
-WEBDYNE_DEBUG=render,compile wdrender time.psp
-```
-
-# AUTHOR
-
-Andrew Speer <andrew.speer@isolutions.com.au>
-
-# LICENSE and COPYRIGHT
-
-This file is part of WebDyne.
-
-This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-Full license text is available at:
-
-<http://dev.perl.org/licenses/>
-
-=end markdown
-
+=head1 wddebug(1)
 
 =head1 NAME
 
-wddebug - This script is used to enable or disable debugging in the WebDyne packages.
-
+wddebug - enable or disable debugging in the WebDyne packages
 
 =head1 SYNOPSIS
 
-C<wddebug [--option]>
+C<<<< wddebug [--OPTION] >>>>
 
-C<wddebug --directory /opt/perl5>
+C<<<< wddebug --enable >>>>
 
+C<<<< wddebug --enable --directory /opt/perl5 >>>>
 
-=head1 DESCRIPTION
+=head1 Description
 
-By default debugging is optimized out of the WebDyne modules. This script can be used to enable or disable debugging in those modules for troubleshooting purposes.
-Debugging can be turned on or off in the WebDyne modules by running this script with the appropriate options. With no options the script will return the current status
-of debugging in the WebDyne modules.
+By default debugging is optimized out of the WebDyne modules to increase performance. This script can be used to enable or disable debugging for troubleshooting purposes. Debugging can be turned on or off in the WebDyne modules by running this script with the appropriate option. With no options the script will return the current status of debugging in the WebDyne
+ modules.
 
-
-=head1 METHODOLOGY
-
-Debugging is enabled in all soucre modules in the form of debug('message') calls. These calls are optimized out of the code during installation via a PM_FILTER in MakeMaker
-unless the WEBDYNE_DEBUG environment variable is set. Once optimised out the debug calls are not available for use as they are converted in the code to the form C<0 && debug('message')>,
-which is optimised away by the perl compilers.  This script will enable or disable the debug calls in already installed moduled by adding or removing the C<0 &&> prefix from the code. 
-
-As this edits installed modules it is not recommended for use in a production environment. If debugging is neccessary it is better to install WebDyne on a test system with the command
-
-
- #  Install WebDyne with debugging enabled via MakeMaker
- perl Makefile.PL WEBDYNE_DEBUG=1
- make install
-
- #  Install WebDyne with debugging enabled via cpanm
- WEBDYNE_DEBUG=1 cpanm WebDyne
-
-=head1 OPTIONS
+=head1 Options
 
 =over
 
-=item -
+=item * B<<< --status >>>
 
-C<--status>
-  Display the current debug status of the WebDyne modules. The default if no option given
+Display the current debug status of the WebDyne modules. The default if no option given.
 
+=item * B<<< --enable >>>
 
+Enable debugging in the WebDyne modules.
 
-=item -
+=item * B<<< --disable >>>
 
-C<--enable>
-  Enable debugging in the WebDyne modules.
+Disable debugging in the WebDyne modules.
 
+=item * B<<< --directory >>>
 
+Specify the directory containing the WebDyne modules.
 
-=item -
+=item * B<<< --yes >>>
 
-C<--disable>
-  Disable debugging in the WebDyne modules.
+Automatically confirm the prompt to proceed with enabling or disabling debugging.
 
+=item * B<<< --help|? >>>
 
+Display a brief help message and exit.
 
-=item -
+=item * B<<< --man >>>
 
-C<--directory>
-  Specify the directory containing the WebDyne modules.
+ Display the full manual page.
 
+=item * B<<< --version >>>
 
-
-=item -
-
-C<--yes>
-  Automatically confirm the prompt to proceed with enabling or disabling debugging.
-
-
-
-=item -
-
-C<--help | -?>
-  Display a brief help message and exit.
-
-
-
-=item -
-
-C<--man>
-  Display the full manual.
-
-
-
-=item -
-
-C<--version>
-  Display the script version and exit.
-
-
+Display the script version and exit.
 
 =back
 
+=head1 Examples
 
-=head1 EXAMPLES
+    # Show current status
+    #
+    $ wddebug
+    debug location: /opt/perl5/lib/perl5/
+    debug  enabled: WebDyne.pm
+    debug disabled: WebDyne/Handler.pm
+    ...
+    
+    # Turn on debugging for WebDyne modules 
+    #
+    $ wddebug --enable
+    
+    # Turn off debugging
+    #
+    $ wddebug --disable
+    
+    # Install modules from source with debugging enabled
+    #
+    $ WEBDYNE_DEBUG=1 perl Makefile.PL
+    $ make install
 
+=head1 Notes
 
- # Turn on debugging in the WebDyne modules:
- wddebug --enable
- ````
- 
- ```sh
- # Turn off debugging in the WebDyne modules in /opt/perl5:
- wddebug --disable --directory /opt/perl5
+Debugging is enabled in all source modules in the form of debug('message') calls. These calls are optimized out of the code during installation via a PM_FILTER in MakeMaker unless the WEBDYNE_DEBUG environment variable is set. Once optimised out the debug calls are not available for use as they are converted in the code to the form ` C<<<< 0 &&
+    debug('message') >>>> , which is optimised away by the Perl compiler. This script will enable or disable the debug calls in already installed modules by adding or removing the  C<<<< 0
+    && >>>>  prefix from the code.  B<<< As this edits installed modules it is not recommended for use in a production environment >>> . If debugging is necessary it is better to install WebDyne on a test system with the command:
 
-=head1 DEBUGGING
+    $ WEBDYNE_DEBUG=1 perl Makefile.PL && make install
 
-Actual debugging output is controlled by enviornment variables. See the WebDyne documentation for more information but 
-in brief, setting the C<WEBDYNE_DEBUG> environment variable to a value of 1 will enable all debugging output. Setting it
-to a string value that corresponds to a module or method will filter the debugging output to that module or method.
+=head1 Debugging
 
+Actual debugging output is controlled by environment variables. See the WebDyne documentation for more information but in brief, setting the  WEBDYNE_DEBUG  environment variable to a value of 1 will enable all debugging output. Setting it to a string value that corresponds to a module or method will filter the debugging output to that module or
+ method.
 
- # Debug compilation of a file
- WEBDYNE_DEBUG=1 wdcompile time.psp
+    # Debug compilation of a file
+    #
+    WEBDYNE_DEBUG=1 wdcompile time.psp
+    
+    # Debug render of a file
+    #
+    WEBDYNE_DEBUG=1 wdrender time.psp
+    
+    # Debug a specific method
+    #
+    WEBDYNE_DEBUG=render wdrender time.psp
+    
+    # Multiple methods can be debugged
+    #
+    WEBDYNE_DEBUG=render,compile wdrender time.psp
 
- # Debug render of a file
- WEBDYNE_DEBUG=1 wdrender time.psp
+=head1 Author
 
- # Debug a specific method
- WEBDYNE_DEBUG=render wdrender time.psp
-
- # Multiple methods can be debugged
- WEBDYNE_DEBUG=render,compile wdrender time.psp
-
-=head1 AUTHOR
-
-Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
-
+Written by Andrew Speer,  <andrew@webdyne.org>
 
 =head1 LICENSE and COPYRIGHT
 

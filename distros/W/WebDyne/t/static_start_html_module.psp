@@ -1,0 +1,5 @@
+<start_html>
+Static page via use WebDyne::Static module
+Param value: <? $_[1]->{'count'} ?>
+__PERL__
+use WebDyne::Static;

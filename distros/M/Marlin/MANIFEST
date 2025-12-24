@@ -35,6 +35,8 @@ t/integration/comparison-example.t
 t/integration/complex-constructor.t
 t/integration/constant.t
 t/integration/destructors.t
+t/integration/moo-inherit.t
+t/integration/moose-inherit.t
 t/integration/roles.t
 t/integration/storage.t
 t/integration/struct.t

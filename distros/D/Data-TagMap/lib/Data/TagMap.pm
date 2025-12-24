@@ -1,4 +1,3 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -12,9 +11,9 @@ use strict;
 use warnings;
 
 use Carp;
-use parent 'Data::Identifier::Interface::Userdata';
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects);
 
-use Data::Identifier v0.22;
+use Data::Identifier v0.28;
 
 use constant {
     WK_HOST_DEFINED_IDENTIFIER => Data::Identifier->new(uuid => 'f8eb04ef-3b8a-402c-ad7c-1e6814cb1998'),
@@ -25,7 +24,7 @@ use constant {
 
 my %_valid_meta_ranges = map {$_ => undef} map {$_, $_.'_low', $_.'_mid', $_.'_high'} qw(sid sni raen chat0w colours unicodecp wd inode glyph individual);
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 
@@ -213,7 +212,7 @@ sub get {
     }
 
     foreach my $res (@res) {
-        $res = $res->Data::Identifier::as($as);
+        $res = $res->Data::Identifier::as($as, so => $self);
     }
 
     if (wantarray) {
@@ -297,7 +296,7 @@ Data::TagMap - module for working with tag maps
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -307,7 +306,7 @@ This module implements a way to map between host defined tag identifiers and tag
 
 All methods in this module C<die> on error unless documented otherwise.
 
-This module inherit from L<Data::Identifier::Interface::Userdata>.
+This module inherits from L<Data::Identifier::Interface::Userdata>, and L<Data::Identifier::Interface::Subobjects>.
 
 =head1 METHODS
 
@@ -480,9 +479,9 @@ This method is sensitive to it's context (scalar or list).
 
 =head2 reverse_get
 
-    my $hdi  = $map->reverse_get($as, $id);
+    my $hdi  = $map->reverse_get($id);
     # or:
-    my @hdis = $map->reverse_get($as, @ids);
+    my @hdis = $map->reverse_get(@ids);
 
 (experimental since v0.02)
 
@@ -493,11 +492,11 @@ This method is sensitive to it's context (scalar or list).
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

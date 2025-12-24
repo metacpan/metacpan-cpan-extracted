@@ -2,7 +2,7 @@
 
 # NAME #
 
-wdrender - parse and render WebDyne pages
+wdrender - parse and render WebDyne files
 
 # SYNOPSIS #
 
@@ -10,10 +10,9 @@ wdrender - parse and render WebDyne pages
 
 # Description #
 
-The  `wdrender`  command displays the HTML that would be generated from a psp page using the WebDyne perl module.
+The  `wdrender`  command displays the HTML that would be generated from a \.psp page using the WebDyne perl module.
 
-By default  `wdrender`  will use the internal WebDyne handler when building the output, but can optionally use other WebDyne
- modules \(such as  `WebDyne::Chain` ) by using the `--handler`  option..
+By default  `wdrender`  will use the internal WebDyne handler when building the output, but can optionally use other WebDyne modules \(such as `WebDyne::Chain` ) by using the  `--handler`  option.
 
 # Options #
 
@@ -23,7 +22,7 @@ By default  `wdrender`  will use the internal WebDyne handler when building the 
 
 * **--handler**
 
-    Use a different WebDyne handler module. Currently the only other handler module available is `WebDyne::Chain` .
+    Use a different WebDyne handler module. Currently the only other handler module available is  `WebDyne::Chain` .
 
 * **--status**
 
@@ -51,11 +50,15 @@ By default  `wdrender`  will use the internal WebDyne handler when building the 
 
 * **--repeat | --r | --num | --n**
 
-    Specify the number of times to repeat the rendering.
+    Specify the number of times to repeat the rendering. Used for consistency testing
 
 * **--loop**
 
     Enable looping. Used for leak testing.
+
+* **--get**
+
+    Parameters for simulating a HTTP GET request
 
 * **--man**
 
@@ -68,26 +71,40 @@ By default  `wdrender`  will use the internal WebDyne handler when building the 
 # Examples #
 
 ```sh
+# Reference file saved as time.psp
+#
+<start_html>
+The current server time is: <? localtime() ?>
+
+```
+
+```sh
 # Show the HTML rendered version of time.psp
+#
 wdrender time.psp
 ```
 
 ```sh
 # Show the HTML rendered version of time.psp with headers
+#
 wdrender --header time.psp
 ```
 
 ```sh
 # Show the HTML rendered version of time.psp chaining with the WebDyne::Session module
+#
 WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp
+```
+
+```sh
+# Simulate a GET request, i.e. adding ?test=1 to URI
+#
+wdrender --get="test=1" checkbox.psp
 ```
 
 # Notes #
 
-The  `wdrender`  command will attempt to build the HTML as faithfully as possible from the command line environment, but may
- not be able to exactly duplicate the HTML generated under a real Web
- Server. As an example if a psp page takes advantge of the Apache request
- handler when generating HTML, the  `wdrender`  commend will not be able to duplicate that environment.
+The  `wdrender`  command will attempt to build the HTML as faithfully as possible from the command line environment, but may not be able to exactly duplicate the HTML generated under a real Web Server. As an example if a \.psp page takes advantage of the Apache request handler when generating HTML, the  `wdrender`  commend will not be able to duplicate that environment.
 
 # Author #
 

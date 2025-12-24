@@ -7,7 +7,7 @@ build_requires:
   HTTP::Response: '0'
   JSON: '0'
   Test2::Tools::Exception: '0'
-  Test2::V0: '0'
+  Test2::V0: '0.000143'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -26,5 +26,5 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/dkechag/Weather-API-Base.git
-version: '0.3'
+version: '0.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,8 +10,9 @@ use Time::Local;
 
 use Exporter 'import';
 
-our @EXPORT_OK   = qw(ts_to_date ts_to_iso_date datetime_to_ts convert_units);
+our @EXPORT_OK   = qw(ts_to_date ts_to_iso_date datetime_to_ts convert_units mon_to_num num_to_mon);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
+our @months      = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 
 =head1 NAME
 
@@ -19,7 +20,7 @@ Weather::API::Base - Base/util module for Weather API clients
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 =head1 SYNOPSIS
 
@@ -203,6 +204,20 @@ to a timestamp (for midnight in the former case). Will use local timezone unless
 you either pass a true second argument or use datetime with the C<Z> (Zulu time)
 suffix. Accepts any date/time divider, so strict ISO with C<T> will work as well.
 
+=head2 C<mon_to_num>
+
+    my $month_no = mon_to_num($month_abbrev, $pad_zero?);
+
+Takes a 3-letter English month abbreviation and returns the month number (1-12,
+zero-padded if second argument is true). Case insensitive.
+
+=head2 C<num_to_mon>
+
+    my $month_abbr = num_to_mon($month_no);
+
+Takes the month number (1-12) and returns the 3-letter English month abbreviation
+(capital first letter).
+
 =cut
 
 my $geocache;
@@ -264,9 +279,32 @@ sub datetime_to_ts {
         ? timegm($6, $5, $4, $3, $2 - 1, $1)
         : timelocal($6, $5, $4, $3, $2 - 1, $1)
         if $date =~
-        /(\d{4})-(\d{2})-(\d{2})(?:.(\d{2}):(\d{2}):(\d{2})([Zz])?)?/;
+        /(\d{4})-(\d{2})-(\d{2})(?:[ _Tt](\d{2}):(\d{2}):(\d{2})([Zz])?)?/;
 
     croak("Unrecognized date format (try 'YYYY-MM-DD' or 'YYYY-MM-DD HH:mm:ss')");
+}
+
+sub mon_to_num {
+    my $month = shift;
+    my $pad   = shift;
+
+    return unless $month;
+
+    my %map;
+    $map{lc($months[$_-1])} = $_ for 1..12;
+
+    my $num = $map{lc($month)};
+
+    return "0$num" if $pad && length($num) < 2;
+
+    return $num;
+}
+
+sub num_to_mon {
+    my $num = shift;
+    return unless $num && $num > 0 && $num < 13;
+
+    return $months[$num-1];
 }
 
 sub _verify_lat_lon {
@@ -442,6 +480,10 @@ hourly forecasts etc, there are monthly subscriptions.
 An alternative source for multi-source forecasts is Apple's WeatherKit (based on
 the old Dark Sky weather API). It offers 500k calls/day for free, but requires a
 paid Apple developer account.
+
+=head2 L<NOAA::Aurora>
+
+ Simple client for NOAA's Aurora Forecast Service.
 
 =head1 AUTHOR
 

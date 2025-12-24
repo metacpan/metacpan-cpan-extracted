@@ -1,0 +1,9 @@
+<html> @0
+  <head> @0.0
+    <title> @0.0.0
+      "Cache Test"
+    <meta content="cache=&amp;cache" name="WebDyne" /> @0.0.1
+  <body> @0.1
+    <p> @0.1.0
+      "Cached page via meta attributeParam value: {'count'} ?>"
+    "__PERL__sub cache { my $self=shift(); my $count=$self->r->{'param..."

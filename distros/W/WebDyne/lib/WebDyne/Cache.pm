@@ -29,7 +29,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug
@@ -55,6 +55,7 @@ sub import {
     my %param=(@param == 1) ? (cache => @param) : @param;
     my $meta_hr=$self->meta() || return err();
     $meta_hr->{'cache'}=$param{'cache'};
+    $meta_hr->{'static'}=1;
 
 }
 
@@ -72,6 +73,7 @@ sub handler : method {
         'unable to get cache handler name - have you set the WebDyneCacheHandler var ?'
         );
     $self->cache($cache);
+    $self->static(1);
     $self->SUPER::handler($r, @_);
 
 }

@@ -25,8 +25,9 @@ my $meta = {
                                          "Class::Method::Modifiers" => 0,
                                          "Class::XSAccessor"        => 1.19,
                                          "Class::XSConstructor"     => 0.015002,
+                                         "Clone"                    => 0,
                                          "Exporter::Tiny"           => 1.006002,
-                                         "List::Util"               => 1.33,
+                                         "List::Util"               => 1.45,
                                          "Module::Runtime"          => 0,
                                          "perl"                     => 5.008008,
                                          "Role::Tiny"               => 0,
@@ -47,12 +48,12 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Marlin"                 => { file => "lib/Marlin.pm", version => 0.007001 },
-                        "Marlin::Attribute"      => { file => "lib/Marlin/Attribute.pm", version => 0.007001 },
-                        "Marlin::Role"           => { file => "lib/Marlin/Role.pm", version => 0.007001 },
-                        "Marlin::Struct"         => { file => "lib/Marlin/Struct.pm", version => 0.007001 },
-                        "Marlin::TypeConstraint" => { file => "lib/Marlin/TypeConstraint.pm", version => 0.007001 },
-                        "Marlin::Util"           => { file => "lib/Marlin/Util.pm", version => 0.007001 },
+                        "Marlin"                 => { file => "lib/Marlin.pm", version => "0.008000" },
+                        "Marlin::Attribute"      => { file => "lib/Marlin/Attribute.pm", version => "0.008000" },
+                        "Marlin::Role"           => { file => "lib/Marlin/Role.pm", version => "0.008000" },
+                        "Marlin::Struct"         => { file => "lib/Marlin/Struct.pm", version => "0.008000" },
+                        "Marlin::TypeConstraint" => { file => "lib/Marlin/TypeConstraint.pm", version => "0.008000" },
+                        "Marlin::Util"           => { file => "lib/Marlin/Util.pm", version => "0.008000" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -66,7 +67,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin/project",
                       },
-  "version"        => 0.007001,
+  "version"        => "0.008000",
 };
 
 my %dynamic_config;

@@ -1,0 +1,98 @@
+{
+   "abstract" : "Mojolicious Web Authentication.",
+   "author" : [
+      "Achmad Yusri Afandi <yusrideb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Hakkefuin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "test",
+         "example",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "mariadb" : {
+         "description" : "MariaDB/MySQL backend support",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Mojo::mysql" : "0"
+               }
+            }
+         }
+      },
+      "pg" : {
+         "description" : "PostgreSQL backend support",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Mojo::Pg" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "CellBIS::Random" : "0",
+            "CellBIS::SQL::Abstract" : "1.2",
+            "Mojo::SQLite" : "0",
+            "Mojolicious" : "0",
+            "String::Random" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "IO::Socket::UNIX" : "0",
+            "Mojo::Date" : "0",
+            "Mojo::File" : "0",
+            "Mojo::URL" : "0",
+            "Mojolicious::Lite" : "0",
+            "Socket" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/CellBIS/mojo-hakkefuin/issues"
+      },
+      "homepage" : "https://github.com/CellBIS/mojo-hakkefuin",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CellBIS/mojo-hakkefuin.git",
+         "web" : "https://github.com/CellBIS/mojo-hakkefuin"
+      }
+   },
+   "version" : "v0.1.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

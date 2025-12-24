@@ -16,7 +16,7 @@
 <!-- Heading section with status code as page title -->
 
 <title>WebDyne Error ^{status}</title>
-<meta charset="!{! $WEBDYNE_META->{'charset'} !}"/>
+<meta charset="UTF-8">
 
 <!-- Embedded style sheet for formatting -->
 <style>

@@ -7,7 +7,7 @@ push @Local::Example::ALL, 'Local::Example::Marlin';
 {
 	package Local::Example::Marlin::NamedThing;
 	use Types::Common -types;
-	use Marlin -strict, 'name!' => Str;
+	use Marlin 'name!' => Str;
 }
 
 {
@@ -25,7 +25,6 @@ push @Local::Example::ALL, 'Local::Example::Marlin';
 {
 	package Local::Example::Marlin::Person;
 	use Marlin
-		-strict,
 		-extends => [ 'Local::Example::Marlin::NamedThing' ],
 		-with    => [ 'Local::Example::Marlin::DoesIntro' ],
 		qw( age? );
@@ -34,7 +33,6 @@ push @Local::Example::ALL, 'Local::Example::Marlin';
 {
 	package Local::Example::Marlin::Employee;
 	use Marlin
-		-strict,
 		-extends => [ 'Local::Example::Marlin::Person' ],
 		qw( employee_id! );
 }
@@ -44,7 +42,6 @@ push @Local::Example::ALL, 'Local::Example::Marlin';
 	use Marlin::Util 'lazy';
 	use Types::Common -types;
 	use Marlin
-		-strict,
 		-extends => [ 'Local::Example::Marlin::Employee' ],
 		-modifiers,
 		_languages => {

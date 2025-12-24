@@ -1,0 +1,17 @@
+bin/newver
+Changes
+example/example.ini
+lib/App/newver.pm
+lib/App/newver/INI.pm
+lib/App/newver/Scanner.pm
+lib/App/newver/Version.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00_load.t
+t/10_ini.t
+t/20_version.t
+t/data/test.ini
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

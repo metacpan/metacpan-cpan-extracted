@@ -32,7 +32,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Get mod_perl version taking intio account legacy strings. Clear $@ after evals
@@ -131,7 +131,6 @@ my %constant_temp;
     #  "varname" hash parm, and (b) that param is not undef
     #
     WEBDYNE_STRICT_VARS         => 1,
-    WEBDYNE_STRICT_DEFINED_VARS => 0,
 
 
     #  When a perl method loaded by a user calls another method within
@@ -645,12 +644,15 @@ sub import {
     #  Return if already loaded
     #
     (my $class_fn=$class)=~s{::}{/}g;
-    return if $INC{"{$class_fn}.pm"};
+    $class_fn.='.pm';
+    #return if $INC{$class_fn};
     
     
     #  Load local constants file
     #
-    &local_constant_load($class);
+    #unless ($INC{$class_fn}) {
+        &local_constant_load($class);
+    #}
     
     
     #  Get hash ref of Constants file from class calling up, calling

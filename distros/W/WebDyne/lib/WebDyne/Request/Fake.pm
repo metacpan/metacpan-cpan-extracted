@@ -44,7 +44,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.036';
+$VERSION='2.038';
 
 
 #  Debug load
@@ -298,10 +298,42 @@ sub log_error {
 }
 
 
+sub lookup_file0 {
+
+    #  Old, simplistic version
+    #
+    my ($r, $fn)=@_;
+    my $r_child=ref($r)->new(filename => $fn, main=>$r) || return err();
+
+}
+
+
 sub lookup_file {
 
     my ($r, $fn)=@_;
-    my $r_child=ref($r)->new(filename => $fn) || return err();
+    my $r_child;
+    if ($fn!~WEBDYNE_PSP_EXT_RE) { # fastest
+
+
+        #  Static file. Should migrate to this module but OK is PSGI for moment
+        #
+        require WebDyne::Request::PSGI::Static;
+        $r_child=WebDyne::Request::PSGI::Static->new(filename => $fn, prev => $r) ||
+            return err();
+
+    }
+    else {
+
+
+        #  Subrequest
+        #
+        $r_child=ref($r)->new(filename => $fn, prev => $r) || return err();
+
+    }
+
+    #  Return child
+    #
+    return $r_child;
 
 }
 
@@ -318,7 +350,8 @@ sub lookup_uri {
 sub main {
 
     my $r=shift();
-    @_ ? $r->{'main'}=shift() : $r->{'main'} || $r;
+    #@_ ? $r->{'main'}=shift() : $r->{'main'} || $r;
+    @_ ? $r->{'main'}=shift() : $r->{'main'};
 
 }
 
@@ -410,7 +443,9 @@ sub pool {
 sub run {
 
     my ($r, $self)=@_;
+    debug("r: $r, self: $self");
     (ref($self) || $self)->handler($r);
+    #(ref($self) ? $self : $self)->handler($r);
 
 }
 

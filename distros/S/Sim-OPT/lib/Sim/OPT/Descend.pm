@@ -40,9 +40,10 @@ no warnings;
 @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 %EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.167'; # our $VERSION = '';
+our @EXPORT = qw( descend prepareblank tee repcache ); # our @EXPORT = qw( );
+
+$VERSION = '0.169'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -83,7 +84,7 @@ sub auto_objcol {
     {
       $c = $i;
     }
-  } say $tee "!!! OBJECTIVECOLUMN: $c";
+  } #say $tee "!!! OBJECTIVECOLUMN: $c";
   return( $c );
 }
 
@@ -168,7 +169,7 @@ sub descend
 
   my %d = %{ $instances[0] };
   my $countcase = $d{countcase}; #say $tee "HERE IN DESCEND \$countcase: " . dump( $countcase );
-  my $countblock = $d{countblock}; #say $tee "HERE IN DESCEND \$countblock: " . dump( $countblock );
+  my $countblock = $d{countblock}; say $tee "HERE IN DESCEND \$countblock: " . dump( $countblock );
   my %datastruc = %{ $d{datastruc} }; #say $tee "HERE IN DESCEND \%datastruc: " . dump( \%datastruc );
   my @varnumbers = @{ $d{varnumbers} };
   @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "HERE IN DESCEND \@varnumbers: " . dump( @varnumbers );
@@ -198,12 +199,14 @@ sub descend
   my $is = $d{is}; ###DDD!!! JUST USED IN FIRING MODE
   my $stamp = $d{stamp};
 
+  my $from     = $instances[0]{origin} // $instances[0]{from}; 
+
   #say $tee "RELAUNCHED IN DESCEND WITH INST " . dump( %inst );
 
   my ( $direction, $starorder );
   if ( $outstarmode eq "y" )
   {
-    $direction = ${$dowhat{direction}}[$countcase][$countblock];
+    $direction = ${$dowhat{direction}}[$countcase][$countblock]; 
     $starorder = ${$dowhat{starorder}}[$countcase][$countblock];
     if ( $direction eq "" )
     {
@@ -234,6 +237,9 @@ sub descend
       $starorder = ${$dowhat{starorder}}[0][0];
     }
 	}
+
+  #say $tee "\$direction: $direction ";
+  #say $tee "\${\$dowhat{direction}}[\$countcase][\$countblock]: ${$dowhat{direction}}[$countcase][$countblock]"; 
 
   my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
@@ -327,7 +333,7 @@ sub descend
   #  sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
   #}
 
-  say $tee "!!!!IN DESCEND \$repfile " . dump($repfile);
+  #say $tee "!!!!IN DESCEND \$repfile " . dump($repfile);
   if ( not( -e $repfile ) ){ die "There isn't \$repfile: $repfile"; };
 
 
@@ -337,7 +343,7 @@ sub descend
   my @winneritems = @{ $dat{winneritems} };
   my $countvar = $dat{countvar};
   my $countstep = $dat{countstep};
-
+  
 
   my $counthold = 0;
 
@@ -348,7 +354,8 @@ sub descend
   my $varnumber = $countvar;
   my $stepsvar = $varnums{$countvar};
 
-  #say $tee "Descending into case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
+
+  say $tee "Descending into case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
 
   my @columns_to_report = @{ $reporttempsdata[1] };
   my $number_of_columns_to_report = scalar(@columns_to_report);
@@ -358,21 +365,58 @@ sub descend
 
   my $throwclean = $repfile;
   $throwclean =~ s/\.csv//;
-  my $selectmixed = "$throwclean-select.csv"; say $tee "!!!! \$throwclean-select.csv: $throwclean-select.csv";
+  my $selectmixed = "$throwclean-select.csv"; #say $tee "!!!! \$throwclean-select.csv: $throwclean-select.csv";
 
   
   my $remember;
 
   sub cleanselect
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
-    my ( $repfile, $selectmixed, $inst_r ) = @_;
+    my ( $repfile, $selectmixed, $inst_r, $countblock, $varnums_r, $blockelts_r, $from, $dowhat_r ) = @_;
     $inst_r ||= {};
+    my %varnums = %$varnums_r; #say $tee "IN DESCENT \@blockelts  " . dump( @blockelts );
+    my @blockelts = @$blockelts_r;
+    my %dowhat = %$dowhat_r;
 
-    #say $tee "Cleaning results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
-    open( MIXFILE, $repfile ) or die( "$!" );
+    #say $tee "IN DESCENT \@blockelts " . dump( @blockelts );
+    my $expected_r = Sim::OPT::enumerate(\%varnums, \@blockelts, $from); #say $tee "IN DESCENT \$countblock $countblock \$expected_r " . dump( $expected_r );
+    
+    
+    my %present;
+    open( MIXFILE, $repfile ) or die "$!";
     my @lines = <MIXFILE>;
-    @lines = uniq( @lines );
-    close MIXFILE; #say $tee "\@lines: " . dump( @lines );
+    close MIXFILE;
+
+    @lines = uniq(@lines);
+
+    foreach my $ln (@lines)
+    {
+      chomp $ln;
+      next if $ln =~ /^\s*$/;
+
+      my $id = Sim::OPT::instid( $ln, $file ); say $tee "IN DESCENT \$countblock $countblock \$id " . dump( $id );# NOT $repfile
+      if ( defined($id) and $id ne "" )
+      {
+        $dirfiles{reps}{$id} = $ln; say $tee "IN DESCENT WRITING \$dirfiles{reps}{\$id} \$dirfiles{reps}{$id} " . dump( $dirfiles{reps}{$id} );# NOT $repfile
+        $present{$id} = 1; say $tee "IN DESCENT \$countblock $countblock \$present{\$id} \$present{$id} " . dump( $present{$id} );# NOT $repfile
+      }
+    }
+
+    open( MIXFILE, ">>$repfile" ) or die "$!";
+    for my $id ( @{ $expected_r } )
+    {
+      next if $present{$id};
+
+      if ( exists $dirfiles{reps}{$id} )
+      {
+        say MIXFILE $dirfiles{reps}{$id}; say $tee "IN DESCENT \$countblock $countblock \$dirfiles{reps}{\$id} \$dirfiles{reps}{$id} " . dump( $dirfiles{reps}{$id} );# NOT $repfile
+      }
+    }
+    close MIXFILE;
+
+    open( MIXFILE, "$repfile" ) or die $!;
+    my @lines = <MIXFILE>;
+    close MIXFILE;
 
     open( SELECTEDMIXED, ">$selectmixed" ) or die( "$!" );
     foreach my $line (@lines)
@@ -381,23 +425,26 @@ sub descend
       {
         chomp $line;
         $line =~ s/\n/°/g;
-        #$line =~ s/\s+/,/g;
         $line =~ s/°/\n/g;
-        #$line =~ s/,,/,/g;
         $line =~ s/[()%]//g;
         $line =~ s/,?//;
         $line =~ s/,?//;
         $line =~ s/,?//;
         $line =~ s/ ?//;
         $line =~ s/ ?//;
+
+        my $id = Sim::OPT::instid( $line, $repfile );
+        if( ( defined( $id ) ) and ( $id ne "" ) ) 
+        { 
+          $dirfiles{repcache}{$id} = $line; 
+        }
+
         my @elts = split(/,/, $line); #say $tee "ELTS: " . dump( @elts );
         my $touse = $elts[0];
 
-
-        ###DDDTHIS
         $touse = Sim::OPT::clean( $touse, $mypath, $file );
 
-        if ( ( $dowhat{names} eq "short" ) and ( $touse =~ /^\d+$/ ) )
+        if ( ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) ) and ( $touse =~ /^\d+$/ ) )
         {
           my $clear = $inst_r->{$touse};
 
@@ -408,18 +455,12 @@ sub descend
           }
 
 
-
-
-
           if ( ( !defined($clear) ) or ( $clear eq "" ) )
           {
             die "Cannot map crypto id '$touse' to clear instance (names=short)";
           }
           $touse = $clear;
         }
-
-
-
 
         my ( @elements, @names, @obtaineds, @newnames ); #say $tee "\@keepcolumns: " . dump( @keepcolumns );
         foreach my $elm_ref (@keepcolumns)
@@ -430,7 +471,7 @@ sub descend
           push ( @elements, $elts[$number] ); #say $tee "\PUSH \$elts[\$number]: " . dump( $elts[$number] );
           #say $tee "\$elts: $elts, \$number: $number";
           push ( @names, $name );
-        } say $tee "ELEMENTS: ". dump( @elements ); say $tee "NAMES: ". dump( @names );
+        } #say $tee "ELEMENTS: ". dump( @elements ); say $tee "NAMES: ". dump( @names );
 
         if ( not ( scalar( @weighttransforms ) == 0 ) )
         {
@@ -451,26 +492,36 @@ sub descend
           @obtaineds = @elements;
           @newnames = @names;
         }
-        say $tee "ELEMENTS: ". dump( @elements ); say $tee "\@obtaineds: ". dump( @obtaineds );
-        say $tee "NAMES: ". dump( @names ); say $tee "NEWNAMES: ". dump( @newnames );
+        #say $tee "ELEMENTS: ". dump( @elements ); #say $tee "\@obtaineds: ". dump( @obtaineds );
+        #say $tee "NAMES: ". dump( @names ); #say $tee "NEWNAMES: ". dump( @newnames );
 
-        print SELECTEDMIXED "$touse,";
-
-        my $coun = 0; #say $tee "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
-        foreach my $elt ( @obtaineds )
+        if ( !defined( $dirfiles{countnettotrowlength}  ) ) #THIS SWITCHES OFF AFTER THE FIRST PASS
         {
-          print SELECTEDMIXED "$newnames[$coun],";
-          unless ( $coun == $#obtaineds )
-          {
-            print SELECTEDMIXED "$elt,";
-          }
-          else 
-          {
-            print SELECTEDMIXED "$elt";
-          }
-          $coun++;
+          $dirfiles{totrowlength} = ( scalar( @obtaineds ) * 2 );
+          $dirfiles{countnettotrowlength}++; #THIS CALCULATES THE LENGTH OF THE ROW AND STORES IT
         }
-        print SELECTEDMIXED "\n";
+        
+        say $tee "IN DESCEND \$dowhat{discard} $dowhat{discard}";
+        unless ( $obtaineds[-1] eq $dowhat{discard} )
+        {
+          print SELECTEDMIXED "$touse,";
+
+          my $coun = 0; #say $tee "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
+          foreach my $elt ( @obtaineds )
+          {
+            print SELECTEDMIXED "$newnames[$coun],";
+            unless ( $coun == $#obtaineds )
+            {
+              print SELECTEDMIXED "$elt,";
+            }
+            else 
+            {
+              print SELECTEDMIXED "$elt";
+            }
+            $coun++;
+          }
+          print SELECTEDMIXED "\n";
+        }
       }
     }
     close SELECTEDMIXED;
@@ -478,10 +529,10 @@ sub descend
 
   if ( $precomputed eq "" )###DDD!!!
   {
-    cleanselect( $repfile, $selectmixed, \%inst );
+    cleanselect( $repfile, $selectmixed, \%inst, $countblock, \%varnums, \@blockelts, $from, \%dowhat );
   }
 
-  say $tee "IN DESCEND AFTER CLEANSELECT; INST " . dump( %inst );
+  say $tee "IN DESCEND AFTER CLEANSELECT; INST " . dump( \%inst );
 
 
   my $throw = $selectmixed;
@@ -491,7 +542,7 @@ sub descend
   {
     my ( $selectmixed, $weight ) = @_;
     say $tee "Scaling results for case " . ( $countcase + 1 ). ", block " . ( $countcase + 1 ) . ".";
-    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );say $tee "!!!! \$throw-weight.csv: $throw-weight.csv";
+    open( SELECTEDMIXED, $selectmixed ) or die( "$!" );#say $tee "!!!! \$throw-weight.csv: $throw-weight.csv";
     my @lines = <SELECTEDMIXED>;
     close SELECTEDMIXED;
 
@@ -526,7 +577,7 @@ sub descend
     }
 
 
-    $countcolm = 0;
+    my $countcolm = 0;
     foreach my $colref ( @containerone )
     {
       my @column = @{ $colref }; # DEREFERENCE
@@ -558,9 +609,9 @@ sub descend
       }
       $countcolm++;
     }
-    say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
-    say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
-    say $tee "\@containernames: " . dump( @containernames );
+    #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
+    #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
+    #say $tee "\@containernames: " . dump( @containernames );
 
     my $countrow = 0;
     foreach ( @lines )
@@ -637,7 +688,7 @@ sub descend
     weight( $selectmixed, $weight ); #
   }
 
-  say $tee "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
+  #say $tee "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
 
   my $weighttwo = $weight;
 
@@ -692,7 +743,7 @@ sub descend
       }
 
       @lines = uniq( @lines );
-      say $tee "!!!!!!!!!!\$objectivecolumn: $objectivecolumn, FIRSTLINE! " . dump( $lines[0] ) . "OF \$weighttwo: $weighttwo";
+      say $tee "\$objectivecolumn: $objectivecolumn, FIRSTLINE! " . dump( $lines[0] ) . "OF \$weighttwo: $weighttwo";
 
       my @splitteds;
       foreach my $line ( @lines )
@@ -768,13 +819,13 @@ sub descend
         }
       }
 
-      say $tee "SORTED!: " . dump( @sorted );
+      #say $tee "SORTED!: " . dump( @sorted );
 
       open( SORTMIXED, ">$sortmixed" ) or die( "$!" );
       if ( not( -e $sortmixed ) ){ die; };
-      say $tee "!!!!!!!!IN SORTMIXED \$sortmixed" . dump( $sortmixed );
+      #say $tee "!!!!!!!!IN SORTMIXED \$sortmixed" . dump( $sortmixed );
 
-      open( TOTRES, ">>$totres" ) or die; say $tee "!!!!!!!!IN SORTMIXED \$totres" . dump( $totres );
+      open( TOTRES, ">>$totres" ) or die; #say $tee "!!!!!!!!IN SORTMIXED \$totres" . dump( $totres );
 
       foreach my $line ( @sorted )
       {
@@ -947,6 +998,198 @@ sub descend
   {
     return( $firedvalue );
   }
+
+
+
+
+ 
+
+
+
+  ###HERE
+
+  #say $tee "TOTRES DEBUG: totres=[$totres]";
+  #say $tee "TOTRES DEBUG: exists=" . (defined($totres) && -e $totres ? 1 : 0) . " readable=" . (defined($totres) && -r $totres ? 1 : 0);
+  #say $tee "TOTRES DEBUG: cwd=" . `pwd`;
+
+  open( TOTRES, "<$totres" ) or die "Cannot open totres '$totres': $!";
+  my @lins = <TOTRES>;
+  close TOTRES;
+  
+  my @newlins;
+  foreach my $lin ( @lins )
+  {
+    chomp $lin;
+    my @elts = split( /,/, $lin );
+    @elts = @elts[ 0 .. $dirfiles{totrowlength} ];
+    push( @newlins, [ map { $_ } @elts ] );
+  }
+  
+
+  $dirfiles{counttotfiles}++;
+  my $newtotdest = $totres . ".old" . $dirfiles{counttotfiles};
+  say $tee `mv -f $totres $newtotdest`;
+
+   
+  my $counterline = 0;
+  open( TOTRES, ">$totres" ) or die( "$!" );
+  my ( @containerone, @containernames, @containertitles, @containertwo, @containerthree, @maxes, @mins );
+  foreach my $newlin_r (@newlins)
+  {
+
+    my @elts = @{ $newlin_r };
+    my $touse = shift( @elts ); # IT CHOPS AWAY THE FIRST ELEMENT DESTRUCTIVELY
+    my $countel = 0;
+    my $countcol = 0;
+    my $countcn = 0;
+    foreach my $elt ( @elts )
+    {
+      if ( odd( $countel ) )
+      {
+        push ( @{ $containerone[ $countcol ] }, $elt );
+        $countcol++;
+      }
+      else
+      {
+        push ( @{ $containernames[$countcn] }, $elt );
+        $countcn++;
+      }
+      $countel++;
+    }
+    push ( @containertitles, $touse );
+  }
+
+  my $countcolm = 0;
+  foreach my $colref ( @containerone )
+  {
+    my @column = @{ $colref }; # DEREFERENCE
+  
+    if ( max( @column ) != 0) # FILLS THE UNTRACTABLE VALUES
+    {
+      push ( @maxes, max( @column ) );
+    }
+    else
+    {
+      push ( @maxes, "NOTHING1" );
+    }
+  
+    push ( @mins, min( @column ) );
+  
+    foreach my $el ( @column )
+    {
+      my $eltrans;
+      if ( $maxes[ $countcolm ] != 0 )
+      {
+        print $tee "\$weights[\$countcolm]: $weights[$countcolm]\n";
+        $eltrans = ( $el / $maxes[$countcolm] ) ;
+      }
+      else
+      {
+        $eltrans = "NOTHING2" ;
+      }
+      push ( @{ $containertwo[$countcolm] }, $eltrans) ; print $tee "ELTRANS: $eltrans\n";
+    }
+    $countcolm++;
+  }
+  #say $tee "HERE \@containerone: " . dump( @containerone ); #say $tee "\@containertwo: " . dump( @containertwo );
+  #say $tee "\@maxes: " . dump( @maxes ); #say $tee "\@mins: " . dump( @mins );
+  #say $tee "\@containernames: " . dump( @containernames );
+
+  my @newbowl;
+  my $countrow = 0;
+  foreach ( @newlins )
+  {
+    my ( @c1row, @c2row, @cnamesrow );
+
+    foreach my $c1_ref ( @containerone )
+    {
+      my @c1col = @{ $c1_ref };
+      push( @c1row, $c1col[ $countrow ] );
+    }
+
+    foreach my $cnames_ref ( @containernames )
+    {
+      my @cnamescol = @{ $cnames_ref };
+      push( @cnamesrow, $cnamescol[ $countrow ] );
+    }
+
+    foreach my $c2_ref ( @containertwo )
+    {
+      my @c2col = @{ $c2_ref };
+      push( @c2row, $c2col[ $countrow ] );
+    }
+
+    my $wsum = 0;
+    my $counterin = 0;
+    foreach my $elt ( @c2row )
+    {
+      my $newelt = ( $elt * abs( $weights[$counterin] ) );
+      $wsum = ( $wsum + $newelt );
+      $counterin++;
+    }
+
+    my @row;
+    push( @row, $containertitles[ $countrow ] );
+
+    my $countel = 0;
+    foreach my $el ( @c1row )
+    {
+      push( @row, $cnamesrow[$countel] );
+      push( @row, $el );
+      $countel++;
+    }
+
+    foreach my $el ( @c2row )
+    {
+      push( @row, $el );
+    }
+
+    push( @row, $wsum );
+
+    push( @newbowl, [ @row ] );
+
+    $countrow++;
+  }
+
+
+  my @sortthis; #say $tee "0 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}, \$direction: $direction ";
+  if ( $direction eq "<" )
+  {
+    @sortthis = sort { $a->[$dowhat{objectivecolumn}] <=> $b->[$dowhat{objectivecolumn}] } @newbowl; #say $tee "1 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
+  }
+  elsif ( $direction eq ">" )
+  {
+    @sortthis = sort { $b->[$dowhat{objectivecolumn}] <=> $a->[$dowhat{objectivecolumn}] } @newbowl; #say $tee "2 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
+  }
+  else
+  {
+    @sortthis = @newbowl;   #say $tee "3 \$dowhat{objectivecolumn} $dowhat{objectivecolumn}";
+  }
+  
+  my @bag;
+  foreach my $elts_r ( @sortthis )
+  {
+    my @elts = @{ $elts_r };
+    
+    if ( $elts[0] ~~ @bag )
+    {
+      push( @bag, $elts[0] );
+      next;
+    }
+    else 
+    {
+      push( @bag, $elts[0] );
+    }
+    
+
+    my $string = join( ",", @elts );
+    say TOTRES $string;
+  }
+  close TOTRES;
+
+
+
+
 
   sub metamodel
 	{
@@ -1195,9 +1438,6 @@ sub descend
       }
       close METAFILE;
 
-
-
-
 	    open( METAFILE, "$metafile" ) or die "THERE IS NO METAFILE $metafile!\n";
 	    my @totlines = <METAFILE>;
       @totlines = uniq( @totlines );
@@ -1229,7 +1469,7 @@ sub descend
     my ( $sortmixed, $carrier_r, $blockelts_r, $searchname, $orderedfile, $direction, $starorder, $mids_r,
     $blocks_r, $totres, $objectivecolumn, $ordres, $starpositions_r, $countstring, $starnumber, $ordtot,
     $file, $ordmeta, $orderedfile, $dirfiles_r, $countcase, $countblock, $varnums_r, $vehicles_r, $inst_r ) = @_;
-    my %carrier = %{ $carrier_r }; say $tee "HERE 3 CARRIER: " . dump( \%carrier );
+    my %carrier = %{ $carrier_r }; #say $tee "HERE 3 CARRIER: " . dump( \%carrier );
     my @blockelts = @{ $blockelts_r };
     my @blocks = @{ $blocks_r };
     my @starpositions = @{ $starpositions_r };
@@ -1264,7 +1504,7 @@ sub descend
     my $winnerentry;
     if ( ( $direction eq ">" ) or ( ( $direction eq "star"  ) and ( $starorder eq ">"  ) ) )
     {
-      $winnerentry = $lines[0]; say $tee "!!! \$winnerenty = \$lines[0]: $winnerenty";
+      $winnerentry = $lines[0]; #say $tee "!!! \$winnerenty = \$lines[0]: $winnerenty";
       if ( scalar( @{ $vehicles{nesting}{$dirfiles{nestclock}} } ) > 0 )
       {
         push( @{ $vehicles{$countcase}{$countblock} }, @lines[0..$slicenum]);
@@ -1289,8 +1529,8 @@ sub descend
     }
     chomp $winnerentry;
 
-    my @winnerelms = split( /,/, $winnerentry ); say $tee "!!! \@winnerelms: " . dump( @winnerelms );
-    my $winneritem = $winnerelms[0]; say $tee "!!! \$winneritem: $winneritem";
+    my @winnerelms = split( /,/, $winnerentry ); #say $tee "!!! \@winnerelms: " . dump( @winnerelms );
+    my $winneritem = $winnerelms[0]; #say $tee "!!! \$winneritem: $winneritem";
 
     #say $tee "HERE WINNERITEM BEFORE CLEANING: $winneritem.";
     $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
@@ -1346,9 +1586,11 @@ sub descend
     			( ( $dirfiles{factorial} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) or
     			( ( $dirfiles{facecentered} eq "y" ) and ( $dowhat{metamodel} eq "y" ) ) ) ### BEGINNING OF THE PART ON STAR CONFIGURATIONS
       {
-        open( TOTRES, "$totres" ) or die;
+        open( TOTRES, "<$totres" ) or die;
         my @lins = <TOTRES>;
         close TOTRES;
+
+
 
         my @lins = uniq( @lins );
         my @sorted;
@@ -1408,7 +1650,7 @@ sub descend
 
           if ( $countstring == $starnumber )
           {
-            open( TOTTOT, "$tottot" ) or die;
+            open( TOTTOT, "<$tottot" ) or die;
             my @totlines = <TOTTOT>;
             close TOTTOT;
 
@@ -1615,8 +1857,8 @@ sub descend
           $dirfiles{launching} = "n";
         }
 
-        my @winnerelms = split( /,/, $winnerentry ); say $tee "!!!! \@winnerelms: " . dump( @winnerelms );
-        my $winneritem = $winnerelms[0]; say $tee "!!!! \$winnerelms[0]: " . dump( $winnerelms[0] );
+        my @winnerelms = split( /,/, $winnerentry ); #say $tee "!!!! \@winnerelms: " . dump( @winnerelms );
+        my $winneritem = $winnerelms[0]; #say $tee "!!!! \$winnerelms[0]: " . dump( $winnerelms[0] );
 
         $countblock = 0;
         $countcase++; ####!!!
@@ -1631,7 +1873,7 @@ sub descend
 
 
 
-        if ( ( $dowhat{names} eq "short" ) and ( $winneritem =~ /^\d+$/ ) )
+        if ( ( ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) ) ) and ( $winneritem =~ /^\d+$/ ) )
         {
           my $clear = $inst{$winneritem};
           if ( (!defined($clear) ) or ( $clear eq "") )
@@ -1819,7 +2061,7 @@ sub descend
         sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
       } ### END OF THE PART ABOUT STAR CONFIGURATIONS
       else
-      { say $tee "!!!! RELAUNCHING WITH INST " . dump( %inst ); 
+      { #say $tee "!!!! RELAUNCHING WITH INST " . dump( %inst ); 
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
         say $tee "!!!! \winneritem: " . dump( @winneritem );
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
