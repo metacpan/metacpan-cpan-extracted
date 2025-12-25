@@ -14,7 +14,7 @@ use List::MoreUtils qw( uniq );
 use Term::Choose::Util qw();
 
 use App::DBBrowser::Credentials;
-use App::DBBrowser::Opt::DBGet;
+
 
 sub new {
     my ( $class, $info, $opt ) = @_;
@@ -32,81 +32,38 @@ sub get_db_driver {
 }
 
 
-sub env_variables {
-    my ( $sf ) = @_;
-    return [ qw( DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
-}
-
-
-sub read_login_data {
-    my ( $sf ) = @_;
-    return [
-        { name => 'host', secret => 0 },
-        { name => 'port', secret => 0 },
-        { name => 'user', secret => 0 },
-        { name => 'pass', secret => 1 },
-    ];
-}
-
-
-sub read_attributes {
-    my ( $sf ) = @_;
-    return [
-        { name => 'ib_dialect',                    },
-        { name => 'ib_role',                       },
-        { name => 'ib_charset',  default => 'UTF8' },
-        { name => 'LongReadLen', default => 80     },
-    ];
-}
-
-
-sub set_attributes {
-    my ( $sf ) = @_;
-    return [
-        { name => 'ib_enable_utf8', default => 1, values => [ 0, 1 ] },
-        { name => 'LongTruncOk',    default => 0, values => [ 0, 1 ] },
-        { name => 'ChopBlanks',     default => 0, values => [ 0, 1 ] },
-    ];
-}
-
-
 sub get_db_handle {
     my ( $sf, $db ) = @_;
-    my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
-    my $db_opt          = $db_opt_get->read_db_config_files();
-    my $login_data      = $db_opt_get->get_login_data( $db, $db_opt );
-    my $env_var_yes     = $db_opt_get->enabled_env_vars( $db, $db_opt );
-    my $read_attributes = $db_opt_get->get_read_attributes( $db, $db_opt );
-    my $set_attributes  = $db_opt_get->get_set_attributes( $db, $db_opt );
-
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
-    my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
-    my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
+    my $dsn = "dbi:Firebird:dbname=$db";
     my $show_sofar = 'DB '. basename( $db );
-    my $host = $cred->get_login( 'host', $show_sofar, $settings );
+    my $host = $cred->get_login( 'host', $show_sofar );
     if ( defined $host ) {
         $show_sofar .= "\n" . 'Host: ' . $host;
         $dsn .= ";host=$host" if length $host;
     }
-    my $port = $cred->get_login( 'port', $show_sofar, $settings );
+    my $port = $cred->get_login( 'port', $show_sofar );
     if ( defined $port ) {
         $show_sofar .= "\n" . 'Port: ' . $port;
         $dsn .= ";port=$port" if length $port;
     }
-    my $dbh_attributes = $set_attributes;
+    my $connect_attr = $sf->{o}{connect_attr};
+    my $dbh_attributes = {};
 
-    for my $key ( keys %$read_attributes ) {
-        if ( $key =~ /^(?:ib_dialect|ib_role|ib_charset)\z/ ) {
-            #$show_sofar .= "\n" . $key . ': ' . $read_attributes->{$key};
-            $dsn .= ";$key=$read_attributes->{$key}";
+    for my $key ( keys %$connect_attr ) {
+        if ( ! length $connect_attr->{$key} ) {
+            next;
+        }
+        elsif ( $key =~ /^(?:ib_dialect|ib_role|ib_charset)\z/ ) {
+            $dsn .= ";$key=$connect_attr->{$key}";
         }
         else {
-            $dbh_attributes->{$key} = $read_attributes->{$key};
+            $dbh_attributes->{$key} = $connect_attr->{$key};
         }
     }
-    my $user = $cred->get_login( 'user', $show_sofar, $settings );
+    my $user = $cred->get_login( 'user', $show_sofar );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;
-    my $passwd = $cred->get_login( 'pass', $show_sofar, $settings );
+    my $passwd = $cred->get_login( 'pass', $show_sofar );
     my $dbh = DBI->connect( $dsn, $user, $passwd, {
         PrintError => 0,
         RaiseError => 1,
@@ -121,7 +78,7 @@ sub get_db_handle {
 sub get_databases {
     my ( $sf ) = @_;
     return \@ARGV if @ARGV;
-    my $file_firebird_dbs = catfile $sf->{i}{app_dir}, 'Firebird_databases.json';
+    my $file_firebird_dbs = sprintf $sf->{i}{db_cache_file_fmt}, $sf->{i}{plugin};
     my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $saved_databases = $ax->read_json( $file_firebird_dbs ) // [];

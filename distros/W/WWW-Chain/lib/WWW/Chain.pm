@@ -1,7 +1,8 @@
 package WWW::Chain;
+our $VERSION = '0.101';
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: A web request chain
-$WWW::Chain::VERSION = '0.100';
+
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;
@@ -135,13 +136,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WWW::Chain - A web request chain
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -234,7 +237,7 @@ Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Torsten Raudssus.
+This software is copyright (c) 2025 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

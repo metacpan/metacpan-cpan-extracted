@@ -208,7 +208,7 @@ sub __get_history {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
-    my $saved_subqueries = $h_ref->{ $sf->{i}{driver} }{ $sf->{d}{db} } // [];
+    my $saved_subqueries = $h_ref->{ $sf->{i}{plugin} }{ $sf->{d}{db} } // [];
     my ( $subquery_history, $print_history ) = $sf->__session_history();
     return $saved_subqueries, $subquery_history, $print_history;
 }
@@ -228,7 +228,7 @@ sub __edit_sq_history_file {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $driver = $sf->{i}{driver};
+    my $plugin = $sf->{i}{plugin};
     my $db = $sf->{d}{db};
     my @pre = ( undef );
     my ( $add, $edit, $remove ) = ( '- Add', '- Edit', '- Remove' );
@@ -238,7 +238,7 @@ sub __edit_sq_history_file {
     STORED: while ( 1 ) {
         my $top_lines = [ $sf->{d}{db_string}, 'Stored Subqueries:' ];
         my $h_ref = $ax->read_json( $sf->{i}{f_subqueries} ) // {};
-        my $saved_subqueries = $h_ref->{$driver}{$db} // [];
+        my $saved_subqueries = $h_ref->{$plugin}{$db} // [];
         my @tmp_info = (
             @$top_lines,
             map( line_fold( $_->{name}, { init_tab => '  ', subseq_tab => '    ' } ), @$saved_subqueries ), #
@@ -275,10 +275,10 @@ sub __edit_sq_history_file {
         }
         if ( $changed ) {
             if ( @$saved_subqueries ) {
-                $h_ref->{$driver}{$db} = $saved_subqueries;
+                $h_ref->{$plugin}{$db} = $saved_subqueries;
             }
             else {
-                delete $h_ref->{$driver}{$db};
+                delete $h_ref->{$plugin}{$db};
             }
             $ax->write_json( $sf->{i}{f_subqueries}, $h_ref );
             $any_change++;

@@ -43,6 +43,7 @@ t/compact.t
 t/compact_output_cli.t
 t/contains.t
 t/contains_function.t
+t/contains_subset_function.t
 t/count.t
 t/csv_format.t
 t/decode_utf8_input.t
@@ -71,6 +72,7 @@ t/has_function.t
 t/if_then_else.t
 t/index.t
 t/indices.t
+t/inside.t
 t/is_empty.t
 t/join.t
 t/json_formatter.t

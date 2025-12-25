@@ -1,0 +1,453 @@
+=head1 NAME
+
+PAGI::Server::Compliance - HTTP/1.1, WebSocket, and Security Compliance Documentation
+
+=head1 DESCRIPTION
+
+This document details the compliance testing results for PAGI::Server against
+HTTP/1.1 (RFC 7230/7231), WebSocket (RFC 6455), and common security attack vectors.
+
+PAGI::Server demonstrates full HTTP/1.1 compliance, strong security posture,
+stable resource management, and 71% WebSocket RFC 6455 compliance.
+
+=head1 TEST ENVIRONMENT
+
+=over 4
+
+=item * B<Server>: PAGI::Server with IO::Async and EV backend
+
+=item * B<Platform>: macOS Darwin / Linux
+
+=item * B<Event Loop>: EV with kqueue (macOS) or epoll (Linux)
+
+=item * B<Test Date>: December 2025
+
+=back
+
+=head1 RESULTS SUMMARY
+
+    +---------------------------+-------+--------+--------+
+    | Category                  | Tests | Passed | Failed |
+    +---------------------------+-------+--------+--------+
+    | HTTP/1.1 Compliance       |    10 |     10 |      0 |
+    | Slow HTTP Attacks         |     4 |      4 |      0 |
+    | Concurrent Attack+Traffic |     1 |      1 |      0 |
+    | Request Smuggling         |     6 |      6 |      0 |
+    | nikto Scanner             |     4 |      4 |      0 |
+    | Protocol Fuzzing          |    49 |     49 |      0 |
+    | Memory/Resource Leaks     |     4 |      4 |      0 |
+    | WebSocket (Autobahn)      |   301 |    215 |     86 |
+    +---------------------------+-------+--------+--------+
+
+=head1 HTTP/1.1 COMPLIANCE
+
+PAGI::Server is fully compliant with RFC 7230 (HTTP/1.1 Message Syntax and Routing)
+and RFC 7231 (HTTP/1.1 Semantics and Content).
+
+=head2 Compliance Tests
+
+    +------------------------------+----------+--------+--------+
+    | Test                         | Expected | Actual | Status |
+    +------------------------------+----------+--------+--------+
+    | Normal request               |      200 |    200 | PASS   |
+    | HTTP/1.1 missing Host        |      400 |    400 | PASS   |
+    | HTTP/1.0 no Host             |      200 |    200 | PASS   |
+    | Content-Length: abc          |      400 |    400 | PASS   |
+    | Content-Length: -1           |      400 |    400 | PASS   |
+    | Content-Length: overflow     |      413 |    413 | PASS   |
+    | Content-Length: with spaces  |      400 |    400 | PASS   |
+    | URI > 8KB                    |      414 |    414 | PASS   |
+    | Header > 8KB                 |      431 |    431 | PASS   |
+    | CL+TE conflict               |      200 |    200 | PASS   |
+    +------------------------------+----------+--------+--------+
+
+=head2 RFC 7230 Section 5.4 - Host Header
+
+HTTP/1.1 requests without a Host header correctly return 400 Bad Request.
+HTTP/1.0 requests without Host are allowed per specification.
+
+=head2 RFC 7230 Section 3.3.3 - Message Body Length
+
+Transfer-Encoding takes precedence over Content-Length when both are present,
+providing protection against HTTP request smuggling attacks.
+
+=head1 SECURITY TESTING
+
+=head2 Slow HTTP Attack Resistance
+
+PAGI::Server's async architecture provides natural resistance to slow HTTP attacks.
+Unlike pre-fork servers (Apache, Starman), slow connections don't consume worker
+processes.
+
+=head3 Slowloris Attack (Slow Headers)
+
+    Test: 500 connections sending headers very slowly (10 second intervals)
+    Duration: 30 seconds
+    Result: Service remained fully available
+    Status: PASS
+
+=head3 Slow POST Attack (Slow Body)
+
+    Test: 500 connections sending POST body very slowly
+    Duration: 30 seconds
+    Result: Server actively closed slow connections
+    Status: PASS
+
+=head3 Slow Read Attack
+
+    Test: 500 connections reading responses very slowly (32 bytes per 5 seconds)
+    Duration: 30 seconds
+    Result: Service remained fully available
+    Status: PASS
+
+=head3 Concurrent Attack + Normal Traffic
+
+    Test: Slowloris attack while serving normal traffic
+    Attack: 500 slow connections
+    Normal traffic results:
+      - Requests/sec: 3,843
+      - Total requests: 76,963
+      - Errors: 0
+      - p99 latency: 33ms
+    Status: PASS
+
+=head2 HTTP Request Smuggling
+
+PAGI::Server is B<NOT VULNERABLE> to HTTP Request Smuggling attacks.
+
+=head3 CL.TE and TE.CL Attack Vectors
+
+Transfer-Encoding always takes precedence over Content-Length per RFC 7230
+Section 3.3.3. Smuggled data is rejected with 400 Bad Request.
+
+=head3 Transfer-Encoding Obfuscation
+
+All obfuscation techniques are handled safely:
+
+    +-------------------------+-------------------+
+    | Variant                 | Result            |
+    +-------------------------+-------------------+
+    | Normal chunked          | TE recognized     |
+    | CHUNKED (uppercase)     | TE recognized     |
+    | Space before colon      | TE recognized     |
+    | Tab after colon         | TE recognized     |
+    | Lowercase header        | TE recognized     |
+    | Line folding (obs-fold) | TE recognized     |
+    | Null byte in value      | 400 Rejected      |
+    | Vertical tab            | 400 Rejected      |
+    | Form feed               | 400 Rejected      |
+    +-------------------------+-------------------+
+
+=head3 Duplicate Content-Length Headers
+
+    +----------------------------------+---------------+
+    | Test                             | Result        |
+    +----------------------------------+---------------+
+    | Duplicate CL (same values)       | 400 Rejected  |
+    | Duplicate CL (different values)  | 400 Rejected  |
+    | CL with leading zeros            | 200 Accepted  |
+    | CL with + sign                   | 400 Rejected  |
+    +----------------------------------+---------------+
+
+=head2 Protocol Fuzzing
+
+49/49 fuzzing tests passed. Server never crashed or became unresponsive.
+
+=head3 Malformed Request Lines
+
+Empty requests, missing path/version, invalid HTTP version, null bytes in
+method/path all correctly return 400 Bad Request.
+
+=head3 Malformed Headers
+
+Headers without colon, empty header names, null bytes in headers all correctly
+return 400 Bad Request. Excessive headers (>100) return 431.
+
+=head3 Extreme Sizes
+
+    +----------------------+-------------------------+
+    | Test                 | Result                  |
+    +----------------------+-------------------------+
+    | 1MB URI              | Timeout (protected)     |
+    | 1MB header value     | Timeout (protected)     |
+    | 100KB single header  | 431 Header Too Large    |
+    +----------------------+-------------------------+
+
+=head3 Binary/Random Data
+
+Random bytes, all nulls, and mixed binary + HTTP data are handled safely
+without crashes.
+
+=head2 nikto Security Scanner
+
+No critical or high-severity vulnerabilities found. Security headers
+(X-Frame-Options, X-Content-Type-Options) are application-level responsibilities
+and can be added using the L<PAGI::Middleware::SecurityHeaders> middleware.
+
+=head1 RESOURCE MANAGEMENT
+
+=head2 Memory Usage Under Sustained Load
+
+    +-----------+------------+--------+-------------+
+    | Requests  | RSS (KB)   | Growth | Growth/100K |
+    +-----------+------------+--------+-------------+
+    | Initial   |     28,392 |      - |           - |
+    | 100K      |     30,048 | +1,656 |      +1,656 |
+    | 200K      |     31,048 | +2,656 |      +1,000 |
+    | 500K      |     32,736 | +4,344 |        +563 |
+    | 1,000K    |     34,944 | +6,552 |        +440 |
+    +-----------+------------+--------+-------------+
+
+Memory growth of ~6.5 MB over 1 million requests (~6.5 bytes/request) is normal
+Perl memory allocator behavior, not a leak. Growth rate decreases over time.
+
+=head2 File Descriptor Management
+
+    +--------------------------------+--------------------+
+    | Phase                          | File Descriptors   |
+    +--------------------------------+--------------------+
+    | Initial (idle)                 |                 35 |
+    | During load (100 concurrent)   |                135 |
+    | After load (idle)              |                 35 |
+    | After 1M requests              |                 35 |
+    +--------------------------------+--------------------+
+
+File descriptors return to baseline after connections close.
+
+=head2 Connection Object Cleanup
+
+WebSocket frame parsers, connection objects after exceptions, and connections
+after partial responses are all properly cleaned up.
+
+=head1 WEBSOCKET COMPLIANCE (RFC 6455)
+
+Tested against the Autobahn Testsuite v25.10.1, the industry-standard WebSocket
+conformance test suite.
+
+=head2 Results Summary
+
+    +---------------+-------+--------------------------------+
+    | Behavior      | Count | Description                    |
+    +---------------+-------+--------------------------------+
+    | OK            |   202 | Passed                         |
+    | NON-STRICT    |    10 | Minor deviations, acceptable   |
+    | INFORMATIONAL |     3 | Informational only             |
+    | FAILED        |    86 | Failed tests                   |
+    | UNIMPLEMENTED |   216 | Compression (intentional)      |
+    +---------------+-------+--------------------------------+
+
+Pass rate (excluding compression): B<215/301 (71%)>
+
+=head2 Results by Category
+
+    +----------+----------------------+----+--------+---------------------------+
+    | Category | Description          | OK | Failed | Notes                     |
+    +----------+----------------------+----+--------+---------------------------+
+    |        1 | Text/Binary Messages | 16 |      0 | All pass                  |
+    |        2 | Ping/Pong            | 11 |      0 | Control frame size OK     |
+    |        3 | Reserved Bits        |  7 |      0 | RSV bits validated        |
+    |        4 | Opcodes              | 10 |      0 | Reserved opcodes rejected |
+    |        5 | Fragmentation        | 14 |      6 | Edge cases                |
+    |        6 | UTF-8 Handling       | 99 |     42 | Streaming validation      |
+    |        7 | Close Handling       | 30 |      1 | Close codes validated     |
+    |        9 | Limits/Performance   | 14 |     37 | Large messages (>64KB)    |
+    |       10 | Misc                 |  1 |      0 | All pass                  |
+    |    12-13 | Compression          |  0 |      0 | 216 unimplemented         |
+    +----------+----------------------+----+--------+---------------------------+
+
+=head2 Validations Implemented in PAGI::Server
+
+=over 4
+
+=item * B<RSV Bits (Category 3)>
+
+Validates RSV1-3 must be 0 when no extensions are negotiated.
+Closes connection with 1002 Protocol Error if non-zero.
+
+=item * B<Reserved Opcodes (Category 4)>
+
+Rejects opcodes 3-7 and 11-15 with 1002 Protocol Error.
+
+=item * B<Control Frame Size (Category 2)>
+
+Rejects ping/pong/close frames with payload >125 bytes per RFC 6455 Section 5.5.
+
+=item * B<Close Code Validation (Category 7)>
+
+Validates close codes per RFC 6455 Section 7.4.1:
+
+    Valid: 1000-1003, 1007-1011, 3000-4999
+    Invalid: 0-999, 1004-1006, 1012-2999, 5000+
+
+=item * B<Close Frame Format>
+
+Rejects close frames with 1-byte payload (must be 0 or >=2 bytes).
+
+=item * B<Close Reason UTF-8>
+
+Validates close reason is valid UTF-8.
+
+=back
+
+=head2 Known Limitations
+
+These limitations are in the Protocol::WebSocket library, not PAGI::Server:
+
+=over 4
+
+=item * B<UTF-8 Streaming (Category 6)>
+
+Invalid UTF-8 in fragmented messages is validated at message end, not per-fragment.
+
+=item * B<Fragmentation Edge Cases (Category 5)>
+
+Complex interleaved control/data frame scenarios.
+
+=item * B<Large Messages (Category 9)>
+
+Default 64KB limit. Configurable via C<max_ws_frame_size>:
+
+    my $server = PAGI::Server->new(
+        max_ws_frame_size => 16 * 1024 * 1024,  # 16MB
+    );
+
+=back
+
+=head2 Compression (Categories 12-13)
+
+PAGI does not implement WebSocket compression (permessage-deflate per RFC 7692).
+This is optional and intentionally not supported. 216 tests are marked
+UNIMPLEMENTED, which is the correct behavior.
+
+=head1 IMPLEMENTED PROTECTIONS
+
+=head2 Request Parsing
+
+=over 4
+
+=item * B<RFC 7230 Section 5.4>: HTTP/1.1 Host header requirement - returns 400
+
+=item * B<RFC 7230 Section 3.3.3>: TE takes precedence over CL (smuggling protection)
+
+=item * Request line size limit (8KB default) - returns 414
+
+=item * Header size limit (8KB default) - returns 431
+
+=item * Header count limit (100 default) - returns 431
+
+=item * Content-Length validation - returns 400/413
+
+=item * Duplicate Content-Length rejection - returns 400
+
+=item * Control character rejection in headers - returns 400
+
+=back
+
+=head2 WebSocket
+
+=over 4
+
+=item * Frame size limit (C<--max-ws-frame-size>, default 64KB)
+
+=item * Receive queue limit (C<--max-receive-queue>, default 1000 messages)
+
+=item * RSV bits validation (closes with 1002)
+
+=item * Reserved opcode rejection (closes with 1002)
+
+=item * Control frame size validation (closes with 1002)
+
+=item * Close code validation (closes with 1002)
+
+=back
+
+=head2 Resource Protection
+
+=over 4
+
+=item * Connection idle timeout (60 seconds default)
+
+=item * Graceful shutdown with timeout (30 seconds default)
+
+=item * Listener backlog limit (2048 default)
+
+=back
+
+=head1 ARCHITECTURE ADVANTAGES
+
+PAGI::Server's async architecture provides inherent protection against certain
+attack classes:
+
+    +------------------+--------------+-------------------------+
+    | Server           | Architecture | Slowloris Vulnerability |
+    +------------------+--------------+-------------------------+
+    | Apache           | Pre-fork     | HIGH - Workers exhaust  |
+    | Starman          | Pre-fork     | HIGH - Workers exhaust  |
+    | Gazelle          | Pre-fork     | HIGH - Workers exhaust  |
+    | PAGI::Server     | Async        | LOW - Event loop OK     |
+    | Uvicorn (Python) | Async        | LOW - Similar to PAGI   |
+    | Nginx            | Event-driven | LOW - Designed for this |
+    +------------------+--------------+-------------------------+
+
+=head1 RECOMMENDATIONS
+
+=head2 Production Deployment
+
+For production deployments, consider:
+
+=over 4
+
+=item 1.
+
+Use a reverse proxy (nginx, HAProxy) for TLS termination, rate limiting,
+and per-IP connection limits.
+
+=item 2.
+
+Enable the L<PAGI::Middleware::SecurityHeaders> middleware for security headers.
+
+=item 3.
+
+Set appropriate limits for your use case:
+
+    my $server = PAGI::Server->new(
+        timeout           => 60,      # Connection idle timeout
+        max_header_size   => 8192,    # 8KB header limit
+        max_header_count  => 100,     # Max headers per request
+        max_body_size     => 10_000_000,  # 10MB body limit
+        max_ws_frame_size => 1_000_000,   # 1MB WebSocket frames
+        shutdown_timeout  => 30,      # Graceful shutdown timeout
+    );
+
+=back
+
+=head2 Performance Optimization
+
+For optimal performance on macOS, set the EV backend to kqueue:
+
+    LIBEV_FLAGS=8 pagi-server --loop EV --app myapp.pl
+
+=head1 SEE ALSO
+
+L<PAGI::Server> - The main server module
+
+L<PAGI::Middleware::SecurityHeaders> - Security headers middleware
+
+L<RFC 7230|https://tools.ietf.org/html/rfc7230> - HTTP/1.1 Message Syntax and Routing
+
+L<RFC 7231|https://tools.ietf.org/html/rfc7231> - HTTP/1.1 Semantics and Content
+
+L<RFC 6455|https://tools.ietf.org/html/rfc6455> - The WebSocket Protocol
+
+L<Autobahn Testsuite|https://github.com/crossbario/autobahn-testsuite> - WebSocket test suite
+
+=head1 AUTHOR
+
+John Napiorkowski E<lt>jjnapiork@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

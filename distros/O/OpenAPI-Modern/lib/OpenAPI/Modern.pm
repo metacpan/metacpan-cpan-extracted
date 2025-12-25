@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.116-4-gce29225e
+package OpenAPI::Modern; # git description: v0.117-8-g4bc78ab8
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use 5.020;
 use utf8;
@@ -636,9 +636,9 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
   # if the uri doesn't match against the path alone, we can immediately bail (and keep looking for
   # another /paths entry that might match)... this also saves us needless parsing of server objects
-  do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, $path_pattern.'$' }
+  do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, $path_pattern.'\z' }
     if exists $state->{debug};
-  return if $uri !~ m/$path_pattern$/;
+  return if $uri !~ m/$path_pattern\z/;
 
   # identify the unmatched part of the request URI, to be later matched against server urls
   my $uri_prefix = substr($uri, 0, -length($&));
@@ -708,7 +708,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
       split /(%00)/, $normalized_server_url;  # all NULs appear as %00 in the stringified form
     do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, '^'.$server_pattern }
       if exists $state->{debug};
-    next if $uri_prefix !~ m/^$server_pattern$/;
+    next if $uri_prefix !~ m/^$server_pattern\z/;
 
     # extract all capture values from server variables: ($1 .. $n)...
     # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
@@ -717,7 +717,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
     # ...and punycode-decode those from the host, and url-unescape those from the path
     my $host_variable_count = ()= ($normalized_server_url->host//'') =~ /\x00/g;
     @server_capture_values = (
-      (map +(/^xn--(.+)$/ ? punycode_decode($1) : $_), @server_capture_values[0 .. $host_variable_count-1]),
+      (map +(/^xn--(.+)\z/ ? punycode_decode($1) : $_), @server_capture_values[0 .. $host_variable_count-1]),
       (map _uri_decode($_), @server_capture_values[$host_variable_count .. $#server_capture_values]));
 
     # we have a match, so preserve our new $state values created via _resolve_ref
@@ -866,7 +866,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # occurring before the first non-whitespace octet of the field line value, or after the last
   # non-whitespace octet of the field line value, is excluded by parsers when extracting the field
   # line value from a field line."
-  my @values = map s/^\s*//r =~ s/\s*$//r, map split(/,/, $_), $headers->every_header($header_name)->@*;
+  my @values = map s/^\s*//r =~ s/\s*\z//r, map split(/,/, $_), $headers->every_header($header_name)->@*;
 
   my @types = $self->_type_in_schema($header_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
 
@@ -883,7 +883,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   elsif (grep $_ eq 'object', @types) {
     if ($header_obj->{explode}//false) {
       # style=simple, explode=true: "R=100,G=200,B=150" -> { "R": 100, "G": 200, "B": 150 }
-      $data = +{ map m/^([^=]*)=?(.*)$/g, @values };
+      $data = +{ map m/^([^=]*)=?(.*)\z/g, @values };
     }
     else {
       # style=simple, explode=false: "R,100,G,200,B,150" -> { "R": 100, "G": 200, "B": 150 }
@@ -893,7 +893,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   else {
     # when validating as a single string, preserve internal whitespace in each individual header
     # but strip leading/trailing whitespace
-    $data = join ', ', map s/^\s*//r =~ s/\s*$//r, $headers->every_header($header_name)->@*;
+    $data = join ', ', map s/^\s*//r =~ s/\s*\z//r, $headers->every_header($header_name)->@*;
 
     if (grep $_ eq 'boolean', @types) {
       $data = false if $data eq '0' or $data eq 'false' or $data eq '';
@@ -953,14 +953,14 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   # strip media-type parameters (e.g. charset) from Content-Type
   my $content_type = (split(/;/, $message->headers->content_type//'', 2))[0] // '';
 
-  return E({ %$state, data_path => $state->{data_path} =~ s{body$}{header}r, keyword => 'content' },
+  return E({ %$state, data_path => $state->{data_path} =~ s{body\z}{header}r, keyword => 'content' },
       'missing header: Content-Type')
     if not length $content_type;
 
   # FIXME: needs to handle media-type parameters when selecting for a decoder, see RFC9110 §8.3.1
 
   my $media_type = (first { fc($content_type) eq fc } keys $content_obj->%*)
-    // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+$} } keys $content_obj->%*);
+    // (first { m{([^/]+)/\*\z} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+\z} } keys $content_obj->%*);
   $media_type //= '*/*' if exists $content_obj->{'*/*'};
   return E({ %$state, keyword => 'content', recommended_response => [ 415 ] },
       'incorrect Content-Type "%s"', $content_type)
@@ -1138,7 +1138,7 @@ sub _convert_request ($request) {
   if ($request->isa('HTTP::Request')) {
     $req->method($request->method);
     $req->url(Mojo::URL->new($request->uri));
-    $req->version($request->protocol =~ s{^HTTP/(\d\.\d)$}{$1}r) if $request->protocol;
+    $req->version($request->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $request->protocol;
     $req->headers->add(@$_) foreach pairs $request->headers->flatten;
 
     my $body = $request->content;
@@ -1177,7 +1177,7 @@ sub _convert_response ($response) {
 
   if ($response->isa('HTTP::Response')) {
     $res->code($response->code);
-    $res->version($response->protocol =~ s{^HTTP/(\d\.\d)$}{$1}r) if $response->protocol;
+    $res->version($response->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $response->protocol;
     $res->headers->add(@$_) foreach pairs $response->headers->flatten;
     my $body = $response->content;
     $res->body($body) if length $body;
@@ -1240,7 +1240,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.117
+version 0.118
 
 =head1 SYNOPSIS
 
@@ -1780,11 +1780,11 @@ L<https://json-schema.org>
 
 =item *
 
-L<https://www.openapis.org/>
+L<https://www.openapis.org>
 
 =item *
 
-L<https://learn.openapis.org/>
+L<https://learn.openapis.org>
 
 =item *
 
@@ -1800,7 +1800,7 @@ L<https://spec.openapis.org/oas/v3.2>
 
 =item *
 
-L<https://spec.openapis.org/oas/>
+L<https://spec.openapis.org/oas>
 
 =back
 

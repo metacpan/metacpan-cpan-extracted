@@ -500,8 +500,8 @@ my $schema_dir = File::Spec->catdir($tempdir, 'schemas');
 ok(-d $schema_dir, 'schema directory created');
 
 # Check YAML content for enum
-my $enum_yaml = File::Spec->catfile($schema_dir, 'enum_validation.yaml');
-ok(-f $enum_yaml, 'enum_validation.yaml file created');
+my $enum_yaml = File::Spec->catfile($schema_dir, 'enum_validation.yml');
+ok(-f $enum_yaml, 'enum_validation.yml file created');
 
 open my $yaml_fh, '<', $enum_yaml or die "Can't read YAML: $!";
 my $yaml_content = do { local $/; <$yaml_fh> };
@@ -513,8 +513,8 @@ like($yaml_content, qr/enum:/, 'YAML contains enum field');
 like($yaml_content, qr/active/, 'YAML contains enum value');
 
 # Check YAML content for DateTime
-my $dt_yaml = File::Spec->catfile($schema_dir, 'datetime_object.yaml');
-ok(-f $dt_yaml, 'datetime_object.yaml file created');
+my $dt_yaml = File::Spec->catfile($schema_dir, 'datetime_object.yml');
+ok(-f $dt_yaml, 'datetime_object.yml file created');
 
 open $yaml_fh, '<', $dt_yaml or die "Can't read YAML: $!";
 $yaml_content = do { local $/; <$yaml_fh> };
@@ -524,8 +524,8 @@ like($yaml_content, qr/isa:\s*DateTime/, 'YAML contains DateTime class');
 like($yaml_content, qr/Parameter types detected:/, 'YAML contains parameter notes');
 
 # Check YAML content for coderef
-my $callback_yaml = File::Spec->catfile($schema_dir, 'callback_sub.yaml');
-ok(-f $callback_yaml, 'callback_sub.yaml file created');
+my $callback_yaml = File::Spec->catfile($schema_dir, 'callback_sub.yml');
+ok(-f $callback_yaml, 'callback_sub.yml file created');
 
 open $yaml_fh, '<', $callback_yaml or die "Can't read YAML: $!";
 $yaml_content = do { local $/; <$yaml_fh> };

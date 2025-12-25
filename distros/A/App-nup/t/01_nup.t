@@ -56,11 +56,10 @@ subtest 'file view with options' => sub {
     like $out, qr/--bs round-box/, 'border-style passed to up.pm';
 };
 
-# TODO: --no-filename doesn't work correctly with passthru initial value
-# subtest 'no-filename option' => sub {
-#     my $out = nup('--no-filename script/nup');
-#     unlike $out, qr/--filename/, 'no --filename flag';
-# };
+subtest 'no-filename option' => sub {
+    my $out = nup('--no-filename script/nup');
+    like $out, qr/--no-filename/, '--no-filename passed to up.pm';
+};
 
 subtest 'parallel option' => sub {
     my $out = nup('-V script/nup');

@@ -1,0 +1,40 @@
+---
+abstract: 'A CLI for writing running Advent of Code solutions written in Perl'
+author:
+  - 'Aleks Rutins <keeper@farthergate.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-puzzl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::puzzl:
+    file: lib/App/puzzl.pm
+    version: '0.01'
+  App::puzzl::new:
+    file: lib/App/puzzl/new.pm
+  App::puzzl::run:
+    file: lib/App/puzzl/run.pm
+requires:
+  perl: v5.28.0
+resources:
+  repository: git://git.sr.ht/~aleksrutins/App-puzzl
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

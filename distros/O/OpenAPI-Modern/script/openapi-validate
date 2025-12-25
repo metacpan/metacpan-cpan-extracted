@@ -20,6 +20,7 @@ use Feature::Compat::Try;
 use List::Util 'max';
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
+use OpenAPI::Modern::Utilities ':constants';
 
 my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   "$0 %o [filename] [filename] ...",
@@ -29,6 +30,7 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   ['strict', 'disallow unknown keywords in embedded JSON Schemas'],
   ['dump-identifiers', 'print a list of all identifiers found in the schema'],
   ['with-defaults', 'include list of defaults for missing data'],
+  ['upgrade:s', 'upgrade to the target version (default value: '.OAS_VERSIONS->[-1].')'],
   [],
 );
 
@@ -54,11 +56,11 @@ if (not @ARGV) {
 
 # document content, must be OpenAPI document?, filename identifier
 sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
-  my $schema = parse_input($encoded_document);
+  my ($filetype, $schema) = parse_input($encoded_document);
   my $result;
 
+  my $document;
   if ($openapi or (ref $schema eq 'HASH' and exists $schema->{openapi})) {
-    my $document;
     try {
       $document = JSON::Schema::Modern::Document::OpenAPI->new(
         $document_filename ? (canonical_uri => $document_filename) : (),
@@ -82,7 +84,13 @@ sub process ($encoded_document, $openapi = 0, $document_filename = undef) {
 
   $exit_val = max($exit_val, $result->valid ? 0 : $result->exception ? 2 : 1);
 
-  say encode(@ARGV > 1 ? { $document_filename => $result } : $result);
+  if ($result->valid and defined $opt->upgrade and (not @ARGV or $document_filename eq $ARGV[-1])) {
+    my $new_schema = $document->upgrade($opt->upgrade || ());
+    say encode($new_schema, $filetype);
+  }
+  else {
+    say encode(@ARGV > 1 ? { $document_filename => $result } : $result);
+  }
 }
 
 if ($opt->dump_identifiers) {
@@ -107,24 +115,32 @@ sub parse_input ($input) {
   if ($input =~ /^(\{|\[\|["0-9]|true\b|false\b|null\b)/) {
     # this looks like json
     state $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->allow_nonref(1)->utf8(0);
-    return $json_decoder->decode($input);
+    return (json => $json_decoder->decode($input));
   }
   else {
     # well I suppose it must be yaml
     require YAML::PP;
     state $yaml_decoder = YAML::PP->new(boolean => 'JSON::PP');
-    return $yaml_decoder->load_string($input);
+    return (yaml => $yaml_decoder->load_string($input));
   }
 }
 
-sub encode ($input) {
-  my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
-    ->convert_blessed(1)
-    ->utf8(0)
-    ->canonical(1)
-    ->pretty(1);
-  $encoder->indent_length(2) if $encoder->can('indent_length');
-  $encoder->encode($input);
+sub encode ($input, $filetype = 'json') {
+  if ($filetype eq 'json') {
+    my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
+      ->convert_blessed(1)
+      ->utf8(0)
+      ->canonical(1)
+      ->pretty(1);
+    $encoder->indent_length(2) if $encoder->can('indent_length');
+    $encoder->encode($input);
+  }
+  elsif ($filetype eq 'yaml') {
+    YAML::PP->new(boolean => 'JSON::PP')->dump_string($input);
+  }
+  else {
+    die "unsupported file type $filetype";
+  }
 }
 
 __END__
@@ -139,7 +155,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.117
+version 0.118
 
 =head1 SYNOPSIS
 
@@ -150,6 +166,7 @@ version 0.117
     [ --strict ] \
     [ --dump-identifiers ] \
     [ --with-defaults ] \
+    [ --upgrade [ <version> ] ] \
     [ <filename> ] [ ... ]
 
 =head1 DESCRIPTION
@@ -227,10 +244,14 @@ L<JSON::Schema::Modern/with_defaults>: include list of defaults for missing data
 
 =back
 
+In addition, the C<--upgrade> option can be used to output the upgraded version of your OpenAPI
+document (to the latest supported version, if version is not specified) after validating the
+document.
+
 The remainder of the command line arguments are used to provide the filename containing a JSON- or
 YAML-encoded OpenAPI document. You can use more than one filename to validate multiple documents at
 the same time, which is faster than using separate processes; each file is processed in order and
-made available to later documents, and the last file must be a valid OpenAPI document.
+made available to later documents, and the last file must be an OpenAPI document.
 
 If the file looks like a JSON Schema rather than an OpenAPI document, it will be validated as such,
 and loaded into the evaluator so it can be used as a metaschema by your main document.

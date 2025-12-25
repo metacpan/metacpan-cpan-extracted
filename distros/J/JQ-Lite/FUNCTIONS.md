@@ -42,13 +42,26 @@ Functions are grouped by purpose for easier lookup.
 | `ascii_upcase()`, `ascii_downcase()` | ASCII-only case conversion           |
 | `trim()`, `ltrimstr()`, `rtrimstr()` | Trim whitespace or prefixes/suffixes |
 | `startswith()`, `endswith()`         | Prefix/suffix test                   |
-| `contains(value)`                    | Substring or array inclusion         |
+| `contains(value)`                    | Substring or array inclusion (legacy array semantics) |
+| `contains_subset(value)`             | jq-style subset inclusion for arrays |
+| `inside(container)`                  | Whether input is inside container    |
 | `split(sep)`, `join(sep)`            | Split and join                       |
 | `substr(start, len)`                 | Substring extraction                 |
 | `replace(old, new)`                  | Replace substring (literal)          |
 | `@json`, `@csv`, `@tsv`, `@base64`, `@base64d`, `@uri` | Format value as JSON, CSV/TSV row, Base64 string, decode Base64 text, or percent-encoded URI |
 | `explode()`, `implode()`             | String ↔ Unicode code points         |
 | `tostring`, `tojson`, `fromjson`     | Serialization utilities              |
+
+**Array containment semantics**
+
+- `contains(value)`: keeps the legacy behavior for arrays—it searches for an
+  element equal to the provided value. Nested arrays must match exactly (order
+  and length) to satisfy equality. Objects still use subset semantics and
+  strings still use substring matching.
+- `contains_subset(value)`: opt-in jq-style subset matching for arrays. The
+  right-hand array is satisfied when every element can be matched anywhere in
+  the left-hand array (order-insensitive) with multiset counting. Nested arrays
+  and objects are compared recursively using the same subset rules.
 
 ---
 

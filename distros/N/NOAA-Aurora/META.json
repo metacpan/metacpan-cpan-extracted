@@ -1,0 +1,59 @@
+{
+   "abstract" : "Simple client for NOAA's Aurora Forecast Service",
+   "author" : [
+      "Dimitrios Kechagias <dkechag@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "NOAA-Aurora",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Weather::API::Base" : "0.4",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::V0" : "0.000143"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dkechag/NOAA-Aurora.git",
+         "web" : "https://github.com/dkechag/NOAA-Aurora"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

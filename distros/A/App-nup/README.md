@@ -8,27 +8,32 @@ nup - N-up multi-column paged output for commands and files
     nup [ options ] file ...
     nup -e [ options ] command ...
 
-    -h,   --help             show help
+      -h, --help             show help
           --version          show version
-    -d,   --debug            debug mode
-    -n,   --dryrun           dry-run mode
-    -e,   --exec             execute command mode
-    -V,   --parallel         parallel view mode
-    -F,   --fold             fold mode (disable page mode)
-    -H,   --filename         show filename headers (default: on)
-    -G,   --grid=#           grid layout (e.g., 2x3)
-    -C,   --pane=#           number of columns
-    -R,   --row=#            number of rows
-          --height=#         page height in lines
-    -S,   --pane-width=#     pane width (default: 85)
+      -d, --debug            debug mode
+      -n, --dryrun           dry-run mode
+      -e, --exec             execute command mode
+      -V, --parallel         parallel view mode
+      -F, --fold             fold mode (disable page mode)
+      -H, --filename         show filename headers (default: on)
+      -G, --grid=#           grid layout (e.g., 2x3)
+      -C, --pane=#           number of columns
+      -R, --row=#            number of rows
+      -P, --page=#           page height in lines
+      -S, --pane-width=#     pane width (default: 85)
     --bs, --border-style=#   border style (default: heavy-box)
     --ls, --line-style=#     line style (none/truncate/wrap/wordwrap)
+    --cm, --colormap=#       color mapping (LABEL=COLOR)
+          --white-board      black on white board
+          --black-board      white on black board
+          --green-board      white on green board
+          --slate-board      white on dark slate board
           --pager=#          pager command (empty to disable)
           --no-pager         disable pager
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # DESCRIPTION
 
@@ -99,7 +104,7 @@ force command mode when needed.
 
     Set grid layout. For example, `-G2x3` creates 2 columns and 3 rows.
 
-- **--height**=_N_
+- **-P** _N_, **--page**=_N_
 
     Set the page height in lines.
 
@@ -109,13 +114,22 @@ force command mode when needed.
 
 ## Style Options
 
-- **--border-style**=_STYLE_, **--bs**=_STYLE_
+- **--bs**=_STYLE_, **--border-style**=_STYLE_
 
     Set the border style. Default is `heavy-box`.
 
-- **--line-style**=_STYLE_, **--ls**=_STYLE_
+- **--ls**=_STYLE_, **--line-style**=_STYLE_
 
     Set the line style. Available: `none`, `truncate`, `wrap`, `wordwrap`.
+
+- **--cm**=_SPEC_, **--colormap**=_SPEC_
+
+    Set color mapping. Specify as `LABEL=COLOR` (e.g., `--cm=BORDER=R`).
+    Available labels: `TEXT`, `BORDER`.
+
+- **--white-board**, **--black-board**, **--green-board**, **--slate-board**
+
+    Predefined color schemes for board-style display.
 
 ## Pager Options
 

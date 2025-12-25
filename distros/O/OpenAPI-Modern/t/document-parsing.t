@@ -53,7 +53,7 @@ subtest 'basic document validation' => sub {
           instanceLocation => '/'.$_,
           keywordLocation => ignore,  # a $defs somewhere
           absoluteKeywordLocation => ignore,
-          error => re(qr/^got string, not (object|array)$/),
+          error => re(qr/^got string, not (object|array)\z/),
         }, qw(externalDocs security servers tags));
         splice @e, 1, 0,
           {
@@ -1056,7 +1056,7 @@ subtest '3.0 document' => sub {
         instanceLocation => '/'.$_,
         keywordLocation => '/properties/'.$_.'/type',
         absoluteKeywordLocation => DEFAULT_METASCHEMA->{'3.0'}.'#/properties/'.$_.'/type',
-        error => re(qr/^got string, not (object|array)$/),
+        error => re(qr/^got string, not (object|array)\z/),
       }, qw(security servers tags)),
       {
         instanceLocation => '',
@@ -1080,11 +1080,17 @@ paths: {}
 components:
   schemas:
     OAS_3.0_schema:
+      exclusiveMinimum: true
+      exclusiveMaximum: true
+      # missing "minimum" and "maximum"
       type: array
       # missing "items" here
       anyOf:
         - type: array
           # no "items" here either
+          exclusiveMinimum: true
+          exclusiveMaximum: true
+          # no "minimum" or "maximum" here either
 YAML
 
   cmp_result(
@@ -1095,13 +1101,23 @@ YAML
         absoluteKeywordLocation => 'http://localhost:1234/api#/components/schemas/OAS_3.0_schema/anyOf/0',
         error => '"items" must be present if type is "array"',
       },
+      (map +{
+        keywordLocation => '/components/schemas/OAS_3.0_schema/anyOf/0',
+        absoluteKeywordLocation => 'http://localhost:1234/api#/components/schemas/OAS_3.0_schema/anyOf/0',
+        error => '"m'.$_.'imum" must be present when "exclusiveM'.$_.'imum" is used',
+      }, qw(in ax)),
       {
         keywordLocation => '/components/schemas/OAS_3.0_schema',
         absoluteKeywordLocation => 'http://localhost:1234/api#/components/schemas/OAS_3.0_schema',
         error => '"items" must be present if type is "array"',
       },
+      (map +{
+        keywordLocation => '/components/schemas/OAS_3.0_schema',
+        absoluteKeywordLocation => 'http://localhost:1234/api#/components/schemas/OAS_3.0_schema',
+        error => '"m'.$_.'imum" must be present when "exclusiveM'.$_.'imum" is used',
+      }, qw(in ax)),
     ],
-    'missing "items" keywords are identified',
+    'missing "items", "minimum", "maximum" keywords are identified',
   );
 
 
@@ -1128,13 +1144,13 @@ YAML
     superbagof(   # given the gratuitous use of oneOfs, the full error structure is hard to read
       {
         instanceLocation => '/components/schemas/OAS_3.0_schema/items/nullable',
-        keywordLocation => re(qr{/\$ref/properties/nullable/type$}),
+        keywordLocation => re(qr{/\$ref/properties/nullable/type\z}),
         absoluteKeywordLocation => DEFAULT_DIALECT->{'3.0'}.'/properties/nullable/type',
         error => 'got integer, not boolean',
       },
       {
         instanceLocation => '/components/schemas/OAS_3.0_schema/items',
-        keywordLocation => re(qr{/\$ref/properties$}),
+        keywordLocation => re(qr{/\$ref/properties\z}),
         absoluteKeywordLocation => DEFAULT_DIALECT->{'3.0'}.'/properties',
         error => 'not all properties are valid',
       },
@@ -1266,7 +1282,6 @@ YAML
   cmp_result(
     $doc->defaults,
     {
-      '/components/parameters/MyParameter/deprecated' => false,
       '/components/parameters/MyParameter/allowReserved' => false,
       '/components/parameters/MyParameter/deprecated' => false,
       '/components/parameters/MyParameter/explode' => false,

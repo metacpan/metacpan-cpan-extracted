@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.018;
 
 use ExtUtils::MakeMaker;
 
@@ -13,17 +13,57 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "PAGI",
+  "EXE_FILES" => [
+    "bin/pagi-server"
+  ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.018",
   "NAME" => "PAGI",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.001001",
+  "PREREQ_PM" => {
+    "Cookie::Baker" => "0.11",
+    "Future" => "0.50",
+    "Future::AsyncAwait" => "0.66",
+    "HTTP::MultiPartParser" => "0.02",
+    "HTTP::Parser::XS" => "0.17",
+    "Hash::MultiValue" => "0.16",
+    "IO::Async" => "0.802",
+    "IO::Socket::IP" => "0.43",
+    "JSON::MaybeXS" => "1.004003",
+    "Protocol::WebSocket" => "0.26",
+    "URI::Escape" => "5.09"
+  },
+  "TEST_REQUIRES" => {
+    "Net::Async::HTTP" => "0.49",
+    "Net::Async::WebSocket::Client" => "0.14",
+    "Test2::V0" => "0.000159",
+    "Test::Future::IO::Impl" => "0.14",
+    "URI" => "1.60"
+  },
+  "VERSION" => "0.001007",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t t/app/*.t t/endpoint/*.t t/middleware/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/util/*.t t/websocket/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Cookie::Baker" => "0.11",
+  "Future" => "0.50",
+  "Future::AsyncAwait" => "0.66",
+  "HTTP::MultiPartParser" => "0.02",
+  "HTTP::Parser::XS" => "0.17",
+  "Hash::MultiValue" => "0.16",
+  "IO::Async" => "0.802",
+  "IO::Socket::IP" => "0.43",
+  "JSON::MaybeXS" => "1.004003",
+  "Net::Async::HTTP" => "0.49",
+  "Net::Async::WebSocket::Client" => "0.14",
+  "Protocol::WebSocket" => "0.26",
+  "Test2::V0" => "0.000159",
+  "Test::Future::IO::Impl" => "0.14",
+  "URI" => "1.60",
+  "URI::Escape" => "5.09"
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

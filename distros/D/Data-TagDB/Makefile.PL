@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Work with Tag databases",
-  "AUTHOR" => "L\x{f6}wenfelsen UG (haftungsbeschr\x{e4}nkt) <support\@loewenfelsen.net>",
+  "AUTHOR" => "Philipp Schafft <lion\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -19,9 +19,11 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.35",
     "DBI" => "1.643",
-    "Data::Identifier" => "0.12.0",
-    "Data::URIID" => "0.8.0",
+    "Data::Identifier" => "0.28.0",
+    "Data::URIID" => "0.20.0",
     "Encode" => "3.06",
+    "File::ValueFile::Simple::Reader" => "0.10.0",
+    "File::ValueFile::Simple::Writer" => "0.10.0",
     "URI" => "1.5"
   },
   "TEST_REQUIRES" => {
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.10",
+  "VERSION" => "v0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,9 +41,11 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.35",
   "DBI" => "1.643",
-  "Data::Identifier" => "0.12.0",
-  "Data::URIID" => "0.8.0",
+  "Data::Identifier" => "0.28.0",
+  "Data::URIID" => "0.20.0",
   "Encode" => "3.06",
+  "File::ValueFile::Simple::Reader" => "0.10.0",
+  "File::ValueFile::Simple::Writer" => "0.10.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30",

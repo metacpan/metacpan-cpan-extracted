@@ -1,6 +1,5 @@
 package # hide from PAUSE
 App::DBBrowser::CreateDropAttach;
-
 use warnings;
 use strict;
 use 5.016;
@@ -11,7 +10,6 @@ use App::DBBrowser::Auxil;
 use App::DBBrowser::CreateDropAttach::AttachDB;
 use App::DBBrowser::CreateDropAttach::CreateTable;
 use App::DBBrowser::CreateDropAttach::DropTable;
-use App::DBBrowser::Opt::DBSet;
 
 
 sub new {
@@ -31,19 +29,18 @@ sub create_drop_or_attach {
     state $old_idx_cda = 0;
 
     CREATE_DROP_ATTACH: while ( 1 ) {
-        my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases, $db_setting ) = (
-             '- Create TABLE', '- Drop TABLE',   '- Create VIEV', '- Drop VIEW',   '- Attach DB',     '- Detach DB',     '  DB Settings'
+        my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
+             '- Create TABLE', '- Drop TABLE',   '- Create VIEV', '- Drop VIEW',   '- Attach DB',     '- Detach DB'
         );
         my @entries;
         push @entries, $create_table if $sf->{o}{enable}{create_table};
         push @entries, $drop_table   if $sf->{o}{enable}{drop_table};
         push @entries, $create_view  if $sf->{o}{enable}{create_view};
         push @entries, $drop_view    if $sf->{o}{enable}{drop_view};
-        if ( $sf->{i}{driver} eq 'SQLite' ) {
+        if ( $sf->{i}{dbms} =~ /^(?:SQLite|DuckDB)\z/ ) {
             push @entries, $attach_databases;
             push @entries, $detach_databases;
         }
-        push @entries, $db_setting   if $sf->{o}{enable}{db_settings};
         if ( ! @entries ) {
             return;
         }
@@ -109,19 +106,6 @@ sub create_drop_or_attach {
             }
             if ( $changed ) {
                 return 2;
-            }
-        }
-        elsif ( $choice eq $db_setting ) {
-            my $changed;
-            if ( ! eval {
-                my $db_opt_set = App::DBBrowser::Opt::DBSet->new( $sf->{i}, $sf->{o} );
-                $changed = $db_opt_set->database_setting( $sf->{d}{db} );
-                1 }
-            ) {
-                $ax->print_error_message( $@ );
-            }
-            if ( $changed ) {
-                return 3;
             }
         }
     }

@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.436';
+our $VERSION = '2.438';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,27 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.436
+Version 2.438
+
+
+
+=head1 BACKWARD INCOMPATIBLE CHANGES
+
+=over
+
+=item
+
+Table names and column names are now unquoted by default (see L</Identifiers>).
+
+=item
+
+Saved subqueries are saved now at plugin level instead at driver level.
+
+=item
+
+How plugin and database configuration data is saved has changed.
+
+=back
 
 =head1 SYNOPSIS
 
@@ -54,14 +74,15 @@ Version 2.436
 
     db-browser
 
-    db-browser data source, ...
+    db-browser database, ...
 
 When the C<db-browser> is called with the argument C<-h|--help>, it displays a menu. The menu entry I<Help> shows this
 documentation - see L</OPTIONS>.
 
 If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin.
 
-If C<db-browser> is called with arguments, those arguments are used as the available data sources.
+If C<db-browser> is called with arguments, those arguments are treated as the list of available databases (or as
+available ODBC data sources when using the DBD::ODBC driver).
 
 =head2 SQLite/Firebird
 
@@ -216,10 +237,6 @@ Attach DB
 
 Detach DB
 
-=item
-
-DB Settings
-
 =back
 
 For I<Create Table>, I<Drop Table>, I<Create View> and I<Drop View>, see L</WRITE ACCESS>.
@@ -227,8 +244,6 @@ For I<Create Table>, I<Drop Table>, I<Create View> and I<Drop View>, see L</WRIT
 These entries are available if enabled in L</Extensions>.
 
 I<Attach DB> is available for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current database.
-
-For DB Settings, see L</DB Settings>.
 
 =head3 Tables Entries
 
@@ -497,9 +512,6 @@ automatically.
 
 After a directory has been chosen, a submenu is opened where one can choose the source file.
 
-If the previous submenu I<Source directory> is not shown due to the settings described before, it is possible to change
-the source directory in this submenu by selecting I<Change dir>.
-
 Selecting the prompt line of the I<Files> submenu (I<Choose a File:>) allows one to set the parse settings described in
 L</Import Data>.
 
@@ -683,24 +695,32 @@ Change the parse settings and reparse the data with the new settings.
 
 =back
 
+=head1 GLOABL SETTINGS
+
+=head2 Select plugins
+
+Choose the required database plugins.
+
+=head2 Gloabl settings
+
+=head3 Menu Memory
+
+If enabled, saves the menu position while entering a submenu.
+
+=head3 Mouse Mode
+
+Set the I<Mouse mode> (see L<Term::Choose/mouse>).
+
 =head1 OPTIONS
 
 The options menu is accessed with C<db-browser -h>.
 
-=head2 Plugins
+Select the database plugin and then configure the following options.
 
-Choose the required database plugins.
+=head2 Connect data
 
-=head2 DB Settings
-
-These driver-specific I<DB Settings> are used as the default database settings.
-
-In the prompt line menu of the L</Tables Menu>, the entry I<DB Settings> (if enabled in L</Extensions>) allows users to
-make database-specific settings. If no database-specific settings are set, these global settings (for the database
-plugin) I<DB Settings> are used.
-
-User-defined database plugins: The options offered to be set in each option and whether the user's selections are
-considered depend on the plugin.
+By selecting the prompt line of the plugin settings menu (Configure plugin-name), you can set the connect data at
+database level.
 
 =over
 
@@ -722,10 +742,6 @@ to the database.
 
 For the meaning of these driver-specific attributes, refer to the appropriate driver documentation.
 
-=item Reset DB
-
-Reset database-specific parameters to the global I<DB Settings>.
-
 =back
 
 =head2 Extensions
@@ -743,8 +759,6 @@ Add menu entries to menus:
 =item Join
 
 =item Union
-
-=item DB settings
 
 =back
 
@@ -1096,6 +1110,14 @@ Data Type Guessing
 When this option is enabled and a table is created, C<SQL::Type::Guess> is used to guess the data types. These data types
 are then used as defaults when the user is prompted for data types.
 
+=item
+
+Encode data for type guessing
+
+If enabled, the data passed to C<SQL::Type::Guess> is encoded.
+
+The setting of this option can affect the size of C<max> in C<varchar(max)> if strings contain multibyte characters.
+
 =back
 
 =head3 Add Form Fields
@@ -1142,10 +1164,6 @@ Printing unfiltered arbitrary binary data could break the output.
 If I<squash_spaces> is enabled, consecutive spaces are squashed to one space, and leading and trailing spaces are
 removed.
 
-=head3 Indentation
-
-Set the indentation width for the SQL substatements.
-
 =head3 Undef String
 
 Set the string that will be shown on the screen instead of an undefined field.
@@ -1153,40 +1171,6 @@ Set the string that will be shown on the screen instead of an undefined field.
 On C<MSWin32>, only single-byte character sets are supported when entering the setting I<Undef string>, I<user>,
 I<host>, or I<port> with the C<db-browser>'s readline. However, it is possible to edit the entry in configuration files
 directly after the entry was created with this options menu.
-
-=head3 Warnings
-
-Enable/disable:
-
-=over
-
-=item
-
-C<File::Find> warnings when searching for C<SQLite> databases.
-
-=item
-
-Warnings (e.g., UTF-8 warnings) when printing a table.
-
-=back
-
-=head3 Progress Bar
-
-Set the progress bar threshold. If the number of fields (rows x columns) exceeds the threshold, a progress bar is shown
-while preparing the data for output.
-
-=head3 Tab Width
-
-Set the number of spaces between columns.
-
-=head3 Max width expanded
-
-Set a maximum width of the expanded table row output. I<Max width expanded> set to C<0> means no maximum width. See
-option L</Expand Table>.
-
-=head3 Pad row edges
-
-Add a space at the beginning and end of each table row.
 
 =head3 Color
 
@@ -1198,10 +1182,50 @@ reset (C<\e[0m>) is added at the end of each row.
 If the terminal width is insufficient and I<Trunc fract first> is enabled, the first step to reduce the column width is
 to truncate the fraction part of numbers to 2 decimal places.
 
+=head3 Indentation
+
+Set the indentation width for the SQL substatements.
+
+=head3 Pad row edges
+
+Add a space at the beginning and end of each table row.
+
+=head3 Tab Width
+
+Set the number of spaces between columns.
+
+=head3 Expand Table Rows
+
+Expand table rows:
+
+=over
+
+=item C<YES>
+
+If C<Return> is pressed, the selected table row is printed with each column in its line. The first row is not expanded
+if the cursor auto-jumped to the first row.
+
+=item C<NO>
+
+Don't expand table rows.
+
+=back
+
+=head3 Max width expanded rows
+
+Set a maximum width of the expanded table row output. I<Max width expanded> set to C<0> means no maximum width. See
+option L</Expand Table>.
+
 =head3 Truncate Column Threshold
 
 Columns with a width below or equal to I<Trunc col threshold> are only trimmed if it is still necessary to reduce the
 row width, even after all columns wider than I<Trunc col threshold> have been trimmed to I<Trunc col threshold>.
+
+=head3 DB2 Encoding
+
+For C<DB2> databases only: set the application code set.
+
+Data from a DB2 database is decoded using this encoding.
 
 =head2 Import Data
 
@@ -1462,26 +1486,26 @@ The encoding of the exported CSV file.
 
 =head2 Miscellaneous
 
-=head3 Menu Memory
+=head3 Warnings
 
-If enabled, saves the menu position while entering a submenu.
-
-=head3 Expand Table
-
-Expand table rows:
+Enable/disable:
 
 =over
 
-=item C<YES>
+=item
 
-If C<Return> is pressed, the selected table row is printed with each column in its line. The first row is not expanded
-if the cursor auto-jumped to the first row.
+C<File::Find> warnings when searching for C<SQLite> databases.
 
-=item C<NO>
+=item
 
-Don't expand table rows.
+Warnings (e.g., UTF-8 warnings) when printing a table.
 
 =back
+
+=head3 Progress Bar
+
+Set the progress bar threshold. If the number of fields (rows x columns) exceeds the threshold, a progress bar is shown
+while preparing the data for output.
 
 =head3 Search
 
@@ -1502,16 +1526,6 @@ case-insensitive search
 case-sensitive search
 
 =back
-
-=head3 Mouse Mode
-
-Set the I<Mouse mode> (see L<Term::Choose/mouse>).
-
-=head3 DB2 Encoding
-
-For C<DB2> databases only: set the application code set.
-
-Data from a DB2 database is decoded using this encoding.
 
 =head2 Help
 

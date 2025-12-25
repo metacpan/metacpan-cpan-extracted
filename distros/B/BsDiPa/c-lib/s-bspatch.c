@@ -41,6 +41,7 @@ static void *a_bspatch_alloc(void *vp, size_t size);
 static void a_bspatch_free(void *vp, void *dat);
 
 static inline s_bsdipa_off_t a_bspatch_xin(uint8_t const *buf);
+static inline int a_bspatch_check_add_positive(s_bsdipa_off_t a, s_bsdipa_off_t b);
 static inline int a_bspatch_check_add(s_bsdipa_off_t a, s_bsdipa_off_t b);
 
 static void *
@@ -79,6 +80,15 @@ a_bspatch_xin(uint8_t const *buf){
 		y = -y;
 
 	return y;
+}
+
+static inline int
+a_bspatch_check_add_positive(s_bsdipa_off_t a, s_bsdipa_off_t b){
+	int rv;
+
+	rv = (a < s_BSDIPA_OFF_MAX - b);
+
+	return rv;
 }
 
 static inline int
@@ -134,11 +144,19 @@ s_bsdipa_patch_parse_header(struct s_bsdipa_header *hp, uint8_t const *dat){
 	x = a_bspatch_xin(dat);
 	if(x < 0)
 		goto jleave;
-	/* If we generated the header, the latter is true. */
-	if(x >= s_BSDIPA_OFF_MAX || (uint64_t)x >= SIZE_MAX / sizeof(s_bsdipa_off_t))
-		goto jleave;
-	if(x - hp->h_extra_len != hp->h_diff_len)
-		goto jleave;
+	if(x == 0){
+		if(hp->h_ctrl_len != 0 || hp->h_diff_len != 0 || hp->h_extra_len != 0)
+			goto jleave;
+	}else{
+		if(x >= s_BSDIPA_OFF_MAX || (uint64_t)x >= SIZE_MAX / sizeof(s_bsdipa_off_t))
+			goto jleave;
+		if(x - hp->h_extra_len != hp->h_diff_len)
+			goto jleave;
+
+		/* Since v0.9.0 bsdipa generates patches testable like so */
+		if(x + 1 < hp->h_ctrl_len / ((s_bsdipa_off_t)sizeof(s_bsdipa_off_t) * 3))
+			goto jleave;
+	}
 	hp->h_before_len = x;
 
 	rv = s_BSDIPA_OK;
@@ -148,6 +166,7 @@ jleave:
 
 enum s_bsdipa_state
 s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
+	uint8_t any_tick;
 	s_bsdipa_off_t aftpos, respos, ctrl[3];
 	enum s_bsdipa_state rv;
 
@@ -208,7 +227,12 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 	if(pcp->pc_after_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
 
-	if(pcp->pc_header.h_before_len < 0 || pcp->pc_header.h_before_len >= s_BSDIPA_OFF_MAX)
+	if((respos = pcp->pc_header.h_before_len) == 0){
+		if(pcp->pc_header.h_ctrl_len != 0 || pcp->pc_header.h_diff_len != 0 || pcp->pc_header.h_extra_len != 0)
+			goto jleave;
+	}else if(respos < 0 || respos >= s_BSDIPA_OFF_MAX)
+		goto jleave;
+	else if(respos - pcp->pc_header.h_extra_len != pcp->pc_header.h_diff_len)
 		goto jleave;
 
 	rv = s_BSDIPA_FBIG;
@@ -232,8 +256,8 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 
 	rv = s_BSDIPA_INVAL;
 
-	for(aftpos = respos = 0; respos < pcp->pc_header.h_before_len;){
-		s_bsdipa_off_t i, j;
+	for(any_tick = 0, aftpos = respos = 0; respos < pcp->pc_header.h_before_len; any_tick = 1){
+		s_bsdipa_off_t i, j, k;
 
 		if(pcp->pc_header.h_ctrl_len < (s_bsdipa_off_t)sizeof(s_bsdipa_off_t) * 3)
 			goto jleave;
@@ -244,30 +268,36 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 			pcp->pc_ctrl_dat += sizeof(s_bsdipa_off_t);
 		}
 
-		if(ctrl[0] < 0 || ctrl[0] >= s_BSDIPA_OFF_MAX)
+		if((k = ctrl[1]) < 0 || k >= s_BSDIPA_OFF_MAX)
 			goto jleave;
-		if(ctrl[1] < 0 || ctrl[1] >= s_BSDIPA_OFF_MAX)
+		if((j = ctrl[0]) < 0 || j >= s_BSDIPA_OFF_MAX)
+			goto jleave;
+
+		/* A data-less control (but the first) is "malicious" */
+		if(any_tick && k == 0 && j == 0)
 			goto jleave;
 
 		/* Add in diff */
-		j = ctrl[0];
+		/*j = ctrl[0];*/
 		if(j != 0){
 			if(pcp->pc_header.h_diff_len < j)
 				goto jleave;
 			pcp->pc_header.h_diff_len -= j;
 
-			if(!a_bspatch_check_add(respos, j) || respos + j > pcp->pc_header.h_before_len)
+			if(!a_bspatch_check_add_positive(respos, j) || respos + j > pcp->pc_header.h_before_len)
 				goto jleave;
-			if(!a_bspatch_check_add(aftpos, j))
+			if(!a_bspatch_check_add_positive(aftpos, j))
 				goto jleave;
 
 			for(i = j; i--;)
 				pcp->pc_restored_dat[respos++] = *--pcp->pc_diff_dat;
 			respos -= j;
 
-			for(i = 0; i < j; ++i)
-				if(a_bspatch_check_add(aftpos, i) && aftpos + i < (s_bsdipa_off_t)pcp->pc_after_len)
-					pcp->pc_restored_dat[respos + i] += pcp->pc_after_dat[aftpos + i];
+			k = j;
+			if(aftpos + k >= (s_bsdipa_off_t)pcp->pc_after_len)
+				k = (s_bsdipa_off_t)pcp->pc_after_len - aftpos;
+			for(i = 0; i < k; ++i)
+				pcp->pc_restored_dat[respos + i] += pcp->pc_after_dat[aftpos + i];
 
 			respos += j;
 			aftpos += j;
@@ -280,7 +310,7 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 				goto jleave;
 			pcp->pc_header.h_extra_len -= j;
 
-			if(!a_bspatch_check_add(respos, j) || respos + j > pcp->pc_header.h_before_len)
+			if(!a_bspatch_check_add_positive(respos, j) || respos + j > pcp->pc_header.h_before_len)
 				goto jleave;
 
 			memcpy(&pcp->pc_restored_dat[respos], pcp->pc_extra_dat, j);
@@ -289,13 +319,15 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 			respos += j;
 		}
 
-		/* */
+		/**/
 		j = ctrl[2];
-		if(!a_bspatch_check_add(aftpos, j))
-			goto jleave;
-		aftpos += j;
-		if(aftpos < 0)
-			goto jleave;
+		if(j != 0){
+			if(!a_bspatch_check_add(aftpos, j))
+				goto jleave;
+			aftpos += j;
+			if(aftpos < 0)
+				goto jleave;
+		}
 	}
 
 	rv = s_BSDIPA_OK;

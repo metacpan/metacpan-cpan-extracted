@@ -3,49 +3,44 @@ abstract: 'Provides the Bit::Set and Bit::Set::DB libraries'
 author:
   - 'Christos Argyropoulos <chrisarg@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   FFI::Platypus::Buffer: '0'
-  File::Spec: '0'
+  FFI::Platypus::Memory: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Bit-Set
-no_index:
-  directory:
-    - eg
-    - examples
-    - inc
-    - share
-    - t
-    - xt
 provides:
   Bit::Set:
     file: lib/Bit/Set.pm
-    version: '0.05'
+    version: '0.09'
   Bit::Set::DB:
     file: lib/Bit/Set/DB.pm
-    version: '0.05'
-  Bit::Set::DB::SETOP_COUNT_OPTS:
-    file: lib/Bit/Set/DB.pm
-    version: '0.05'
+    version: '0.09'
+  Bit::Set::DB::OO:
+    file: lib/Bit/Set/DB/OO.pm
+    version: '0.09'
+  Bit::Set::OO:
+    file: lib/Bit/Set/OO.pm
+    version: '0.09'
 requires:
   Alien::Bit: '0'
   Exporter: '0'
   FFI::Platypus: '1.00'
   FFI::Platypus::Record: '0'
+  Scalar::Util: '0'
   constant: '0'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/chrisarg/Bit-Set
   repository: https://github.com/chrisarg/Bit-Set.git
-version: '0.05'
-x_generated_by_perl: v5.38.0
+version: '0.09'
+x_generated_by_perl: v5.40.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

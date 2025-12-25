@@ -34,6 +34,7 @@ WriteMakefile(
 		'Pod::Simple' => 0,
 		'Pod::Usage' => 0,
 		'Return::Set' => 0.03,
+		'Safe' => 0,
 		'Template' => 0,
 		'YAML::XS' => 0
 	},
@@ -55,6 +56,7 @@ WriteMakefile(
 		'Test::Needs' => 0,
 		'Test::Returns' => 0.02,
 		'Unicode::Normalize' => 0,
+		'Unicode::GCString' => 0,
 	}, dist => $dist,
 	clean	 => { FILES => 'App-Test-Generator-*' },
 	META_MERGE => {

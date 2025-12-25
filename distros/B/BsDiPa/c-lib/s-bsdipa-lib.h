@@ -2,28 +2,30 @@
  *@ BSDiff: create or apply binary difference patch.
  *@
  *@ Remarks:
- *@ - if s_BSDIPA_32 is configured, 31-bit instead of 63-bit limits.
- *@ - Note: the real limit is maximally SIZE_MAX/sizeof(s_bsdipa_off_t)
+ *@ - If s_BSDIPA_32 is defined, 31-bit instead of 63-bit limits.
+ *@ - Note: the real limit is maximally
+ *@	MIN(s_BSDIPA_OFF_MAX, SIZE_MAX) / sizeof(s_bsdipa_off_t)
  *@   (with 32-bit size_t this can be restrictive)!
- *@ - algorithm requires a lot of memory, multiple times the input size!
+ *@ - Algorithm requires a lot of memory, multiple times the input size!
  *@   With s_BSDIPA_32 the overhead can almost be halved.
- *@ - code requires an ISO STD C99 environment.
+ *@ - Code requires an ISO STD C99 environment.
  *@
  *@ Changes to original bsdiff / libdivsufsort:
- *@ - optional (s_BSDIPA_32) 31-bit limits, thus smaller header/control data,
+ *@ - Optional (s_BSDIPA_32) 31-bit limits, thus smaller header/control data,
  *@   as well as smaller (about halved) memory overhead.
- *@ - the s_BSDIPA_MAGIC_WINDOW is configurable: the original is bound to
+ *@ - The s_BSDIPA_MAGIC_WINDOW is configurable: the original is bound to
  *@   (32- and) 64-bit binary diffs (8), but eg 16 or 32 are better (for text).
- *@ - data serialization is in big endian/network byte order.
- *@ - no bzip2 compression: callee should compress result.
+ *@ - Data serialization is in big endian/network byte order.
+ *@ - No bzip2 compression: callee should compress result.
  *@   NOTE: compression is necessary since data is stored in full, meaning
  *@   that identical bytes are stored as NUL.
- *@   The s-bsdipa-io.h header is a readily available layer for this.
- *@ - no file I/O, everything is stored on the heap.
- *@ - internally diff- and extra data share heap to reduce memory overhead.
- *@ -- as a result diff data is stored in reverse order, last byte first.
- *@ - memory allocation is solely done via user provided allocator.
- *@ - the header includes the extra data length, so that all information
+ *@ -- The s-bsdipa-io.h header is a readily available I/O layer.
+ *@    NOTE: I/O layers may impose further size limit restrictions!
+ *@ - No file I/O, everything is stored on the heap.
+ *@ - Internally diff- and extra data share heap to reduce memory overhead.
+ *@ -- As a result diff data is stored in reverse order, last byte first.
+ *@ - Memory allocation is solely done via user provided allocator.
+ *@ - The header includes the extra data length, so that all information
  *@   is available through it.
  *@
  *@ Informational: original bsdiff file format:
@@ -124,7 +126,9 @@
 #ifndef s_BSDIPA_LIB_H
 #define s_BSDIPA_LIB_H
 
-#include <s-bsdipa-config.h> /* s_BSDIPA_{VERSION,CONTACT,32,MAGIC_WINDOW} */
+/* s_BSDIPA_{VERSION,CONTACT, 32,MAGIC_WINDOW,SMALL}.
+ * The latter three must be tested via defined(). */
+#include <s-bsdipa-config.h>
 
 #include <sys/types.h>
 
@@ -137,7 +141,9 @@ extern "C" {
 
 /* Integer type for header and control block triples: file size / offsets.
  * For easy overflow avoidance (left hand value) we also test >s_BSDOFF_MAX-1.
- * The real limit is even smaller (patch preparation ~SIZE_MAX/sizeof(s_bsdipa_off_t)). */
+ * The real limit is even smaller; for patch preparation:
+ *	MIN(s_BSDIPA_OFF_MAX, SIZE_MAX) / sizeof(s_bsdipa_off_t)
+ * (I/O layers of s-bsdipa-io.h may impose further size constraints.) */
 #ifdef s_BSDIPA_32
 # define s_BSDIPA_OFF_MAX INT32_MAX
 # define s_BSDIPA_OFF_MIN INT32_MIN

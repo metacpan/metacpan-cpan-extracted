@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.120';
+our $VERSION = '0.202';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
@@ -10,6 +10,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Git;
+use Dist::Zilla::PluginBundle::Git::VersionManager;
 
 has manual_version => (
   is      => 'ro',
@@ -72,13 +73,6 @@ has no_cpan => (
   isa     => 'Bool',
   lazy    => 1,
   default => sub { $_[0]->payload->{no_cpan} },
-);
-
-has no_changelog_from_git => (
-  is      => 'ro',
-  isa     => 'Bool',
-  lazy    => 1,
-  default => sub { $_[0]->payload->{no_changelog_from_git} },
 );
 
 has no_changes => (
@@ -251,13 +245,8 @@ sub configure {
           format    => $v_format,
         }
       ]);
-    } else {
-      $self->add_plugins([
-        'Git::NextVersion' => {
-          version_regexp => '^([0-9]+\.[0-9]+)$',
-        }
-      ]);
     }
+    # Git::VersionManager handles versioning for non-task distributions
   }
 
   for (@run_options) {
@@ -273,8 +262,12 @@ sub configure {
     }
   }
 
+  # PkgVersion only when NOT using @Git::VersionManager (which uses RewriteVersion)
+  if ($self->is_task || $self->manual_version) {
+    $self->add_plugins('PkgVersion');
+  }
+
   $self->add_plugins(qw(
-    PkgVersion
     MetaConfig
     MetaJSON
     PodSyntaxTests
@@ -329,23 +322,7 @@ sub configure {
 
   $self->add_plugins('Prereqs::FromCPANfile');
 
-  unless ($self->no_changes) {
-    if ($self->no_changelog_from_git) {
-      $self->add_plugins(qw(
-        NextRelease
-      ));
-    } else {
-      $self->add_plugins([
-        'ChangelogFromGit' => {
-          max_age => 99999,
-          tag_regexp => '^v?(\d.+)$',
-          file_name => 'Changes',
-          wrap_column => 74,
-          debug => 0,
-        }
-      ]);
-    }
-  }
+  # NextRelease is handled by @Git::VersionManager
 
   if ($self->is_task) {
     $self->add_plugins('TaskWeaver');
@@ -357,10 +334,19 @@ sub configure {
     }
   }
 
-  $self->add_bundle('@Git' => {
-    tag_format => '%v',
-    push_to    => [ qw(origin) ],
-  });
+  unless ($self->is_task || $self->manual_version) {
+    $self->add_bundle('@Git::VersionManager' => {
+      'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
+      'Git::Tag.tag_format' => '%v',
+      'Git::Push.push_to' => 'origin',
+      $self->no_changes ? ( 'NextRelease.format' => '' ) : (),
+    });
+  } else {
+    $self->add_bundle('@Git' => {
+      tag_format => '%v',
+      push_to    => [ qw(origin) ],
+    });
+  }
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -379,7 +365,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.120
+version 0.202
 
 =head1 SYNOPSIS
 
@@ -407,7 +393,6 @@ are default):
   no_makemaker = 0
   no_installrelease = 0
   no_changes = 0
-  no_changelog_from_git = 0
   no_podweaver = 0
   xs = 0
   installrelease_command = cpanm .
@@ -419,11 +404,9 @@ In default configuration it is equivalent to:
   -remove = GatherDir
   -remove = PruneCruft
 
-  [Git::NextVersion]
   [PkgVersion]
   [MetaConfig]
   [MetaJSON]
-  [NextRelease]
   [PodSyntaxTests]
   [GithubMeta]
 
@@ -438,24 +421,16 @@ In default configuration it is equivalent to:
   config_plugin = @Author::GETTY
 
   [Repository]
-  
+
   [Git::CheckFor::CorrectBranch]
   release_branch = master
 
-  [@Git]
-  tag_format = %v
-  push_to = origin
-
-  [ChangelogFromGit]
-  max_age = 99999
-  tag_regexp = ^v(.+)$
-  file_name = Changes
-  wrap_column = 74
-  debug = 0
+  [@Git::VersionManager]
+  ; handles versioning, changelog (NextRelease), commits, tags, and push
 
 If the C<task> argument is given to the bundle, PodWeaver is replaced with
-TaskWeaver and Git::NextVersion is replaced with AutoVersion, you can also
-give independent a bigger major version with C<version>:
+TaskWeaver and AutoVersion is used for versioning (instead of
+@Git::VersionManager). You can also give a bigger major version with C<version>:
 
   [@Author::GETTY]
   task = 1
@@ -531,15 +506,10 @@ will add L<Dist::Zilla::Plugin::Repository> instead.
 If set to 1, this attribute will disable L<Dist::Zilla::Plugin::UploadToCPAN>.
 By default a dzil release would release to L<CPAN|http://www.cpan.org/>.
 
-=head2 no_changelog_from_git
-
-If set to 1, then L<Dist::Zilla::Plugin::ChangelogFromGit> will be disabled, and
-L<Dist::Zilla::Plugin::NextRelease> will be used instead.
-
 =head2 no_changes
 
-If set to 1, then neither L<Dist::Zilla::Plugin::ChangelogFromGit> or
-L<Dist::Zilla::Plugin::NextRelease> will be used.
+If set to 1, then L<Dist::Zilla::Plugin::NextRelease> (from @Git::VersionManager)
+will not generate changes entries.
 
 =head2 no_podweaver
 
@@ -584,7 +554,7 @@ L<Dist::Zilla::Plugin::Authority>
 
 L<Dist::Zilla::PluginBundle::Git>
 
-L<Dist::Zilla::Plugin::ChangelogFromGit>
+L<Dist::Zilla::PluginBundle::Git::VersionManager>
 
 L<Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch>
 
@@ -622,7 +592,7 @@ Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
+This software is copyright (c) 2025 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

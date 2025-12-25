@@ -5,15 +5,18 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.436';
+our $VERSION = '2.438';
 
-#use bytes; # required
+use Encode       qw( decode );
+#use bytes;      # required
 use Scalar::Util qw( looks_like_number );
+
+use DBI::Const::GetInfoType;
 
 
 sub new {
     my ( $class, $info, $opt ) = @_;
-    my $db_module = $info->{plugin};
+    my $db_module = "App::DBBrowser::DB::$info->{plugin}";
     eval "require $db_module" or die $@;
     my $plugin = $db_module->new( $info, $opt );
     bless { Plugin => $plugin }, $class;
@@ -95,34 +98,28 @@ sub get_databases {
 
 
 sub get_schemas {
-    my ( $sf, $dbh, $db, $is_system_db, $has_attached_db ) = @_;
+    my ( $sf, $dbh, $db, $is_system_db ) = @_;
     my ( $user_schemas, $sys_schemas );
     my $driver = $dbh->{Driver}{Name}; #
+    my $dbms = $sf->{Plugin}{i}{dbms};
     if ( $sf->{Plugin}->can( 'get_schemas' ) ) {
-        ( $user_schemas, $sys_schemas ) = $sf->{Plugin}->get_schemas( $dbh, $db, $is_system_db, $has_attached_db );
+        ( $user_schemas, $sys_schemas ) = $sf->{Plugin}->get_schemas( $dbh, $db, $is_system_db );
     }
     else {
-        if ( $driver eq 'SQLite' ) {
-            if ( $has_attached_db ) {
-                # If a SQLite database has databases attached, set $schema to `undef`.
-                # If $schema is `undef`, `$dbh->table_info( undef, $schema, '%', '' )` returns all schemas - main, temp and
-                # aliases of attached databases with its tables.
-                $user_schemas = [ undef ];
-            }
-            else {
-                $user_schemas = [ 'main' ];
-            }
+        if ( $dbms eq 'SQLite' ) {
+            $user_schemas = [];
         }
-        elsif( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+        elsif( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
             # MySQL 8.0 Reference Manual / MySQL Glossary / Schema:
             # In MySQL, physically, a schema is synonymous with a database.
             # You can substitute the keyword SCHEMA instead of DATABASE in MySQL SQL syntax,
             $user_schemas = [ $db ];
         }
-        elsif ( $driver eq 'Firebird' ) {
+        elsif ( $dbms eq 'Firebird' ) {
             $user_schemas = [];
         }
-        elsif ( $driver eq 'Oracle' ) {
+        elsif ( $dbms eq 'Oracle' ) {
+            # To separate system schemas from the user schemas.
             my ( $tmp_user_schemas, $tmp_sys_schemas ) = ( [], [] );
             for my $sch ( $dbh->selectall_array( "SELECT USERNAME, ORACLE_MAINTAINED FROM ALL_USERS" ) ) {
                 if ( $sch->[1] =~ /^N/i ) {
@@ -150,16 +147,6 @@ sub get_schemas {
             else {
                 $table_schem = 'TABLE_SCHEM';
             }
-            my $regex_sys;
-            if ( $driver eq 'Pg' ) {
-                $regex_sys = qr/^(?:pg_|information_schema$)/i;
-            }
-            elsif ( $driver eq 'DB2' ) {
-                $regex_sys = qr/^(?:SYS|SQLJ$|NULLID$)/i;
-            }
-            elsif ( $driver eq 'Informix' ) {
-                $regex_sys = qr/^informix\z/i;
-            }
             my $sth;
             if ( $driver eq 'ODBC' ) {
                 $sth = $dbh->table_info( undef, '%', undef, undef );
@@ -168,6 +155,20 @@ sub get_schemas {
                 $sth = $dbh->table_info( undef, '%', '', '' );
             }
             my $info = $sth->fetchall_hashref( $table_schem );
+            my $regex_sys;
+            if ( $dbms eq 'Pg' ) {
+                $regex_sys = qr/^(?:pg_|information_schema$)/i;
+            }
+            elsif ( $dbms eq 'DB2' ) {
+                $regex_sys = qr/^(?:SYS|SQLJ$|NULLID$)/i;
+            }
+            elsif ( $dbms eq 'Informix' ) {
+                $regex_sys = qr/^informix\s*\z/i;
+            }
+            elsif ( $dbms eq 'MSSQL' ) {
+                $regex_sys = qr/^(?:sys|information_schema)\z/i;
+            }
+
             for my $schema ( sort keys %$info ) {
                 if ( defined $regex_sys && $schema =~ $regex_sys ) {
                     push @$sys_schemas, $schema;
@@ -184,7 +185,7 @@ sub get_schemas {
         return [], [ @$user_schemas, @$sys_schemas ];
     }
     else {
-        if ( $driver eq 'Pg' && ! @$user_schemas ) {
+        if ( $dbms eq 'Pg' && ! @$user_schemas ) {
             # 5.9.2. The Public Schema
             # In the previous sections we created tables without specifying any schema names. By default such tables
             # (and other objects) are automatically put into a schema named “public”. Every new database contains such a schema.
@@ -196,11 +197,11 @@ sub get_schemas {
 }
 
 
-sub tables_info { # not documented
-    my ( $sf, $dbh, $schema, $is_system_schema ) = @_;
+sub tables_info {
+    my ( $sf, $dbh, $schema, $is_system_schema, $db_attached ) = @_;
     my $driver = $sf->get_db_driver();
     if ( $sf->{Plugin}->can( 'tables_info' ) ) {
-        return $sf->{Plugin}->tables_info( $dbh, $schema, $is_system_schema );
+        return $sf->{Plugin}->tables_info( $dbh, $schema, $is_system_schema, $db_attached );
     }
     my ( $table_cat, $table_schem, $table_name, $table_type );
     if ( $driver eq 'Pg' ) {
@@ -242,33 +243,53 @@ sub tables_info { # not documented
         $sth = $dbh->table_info( undef, $schema, '%', '' );
     }
     my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
+    my $dbms = $sf->{Plugin}{i}{dbms};
+    my $db_odbc;
+    if ( $driver eq 'ODBC' && $dbms eq 'MariaDB' ) {
+        # `table_info` returns everything.
+        $db_odbc = $dbh->get_info( $GetInfoType{SQL_DATABASE_NAME} );
+        # ODBC: $db is the data source name and not the database name
+    }
     my ( @user_table_keys, @sys_table_keys );
     my $tables_info = {};
+
     for my $info_table ( @$info_tables ) {
-        if ( $driver =~ /^(?:Informix|Sybase)\z/ && defined $schema && $schema ne $info_table->{$table_schem} ) {
-            # Informix: `table_info` returns everything.
+        if ( $driver =~ /^(?:Informix|Sybase)\z/ ) {
+            if ( defined $schema && $schema ne $info_table->{$table_schem} ) {
+                # `table_info` returns everything.
+                next;
+            }
+            $info_table->{$table_type} =~ s/\s+\z// if $driver eq 'Informix';
+        }
+        if ( length $db_odbc && $db_odbc ne $info_table->{$table_cat} ) {
             next;
         }
-        if ( $driver eq 'SQLite' && $info_table->{$table_type} =~ /^(?:INDEX|TRIGGER)\z/ ) {
-            next;
-        }
-        if ( $driver eq 'Oracle' && $info_table->{$table_type} eq 'SEQUENCE' ) {
-            next;
-        }
-        # The table name in $table_key is used in the tables-menu but not in SQL code.
-        # To get the table names for SQL code it is used the 'quote_table' routine in Auxil.pm.
-        my $table_key;
-        if ( $driver eq 'SQLite' && ! defined $schema ) {
-            # attached databases, schema is undef
+        if ( $dbms eq 'SQLite') {
+            if ( $info_table->{$table_type} =~ /^(?:INDEX|TRIGGER)\z/ ) {
+                next;
+            }
             if ( $info_table->{$table_name} eq 'sqlite_temp_master' ) {
                 next; # no temp tables
             }
-            if ( $info_table->{$table_schem} =~ /^main\z/i ) {
-                $table_key = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
-                # \x{001f} keeps the main tables on top of the tables menu.
+        }
+        if ( $dbms eq 'Oracle' && $info_table->{$table_type} eq 'SEQUENCE' ) {
+            next;
+        }
+        my $table_key;
+        # The table name in $table_key is used in the tables-menu but not in SQL code.
+        # To get the table names for SQL code it is used the 'quote_table' routine in Auxil.pm.
+        if ( $db_attached ) {
+            if ( $dbms eq 'SQLite' ) {
+                if ( $info_table->{$table_schem} =~ /^main\z/i ) {
+                    $table_key = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
+                    # \x{001f} keeps the main tables on top of the tables menu.
+                }
+                else {
+                    $table_key = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
+                }
             }
-            else {
-                $table_key = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
+            elsif ( $dbms eq 'DuckDB' ) {
+                $table_key = sprintf "[%s] %s", $info_table->{$table_cat}, $info_table->{$table_name};
             }
         }
         else {
@@ -277,25 +298,20 @@ sub tables_info { # not documented
         if ( $is_system_schema ) {
             push @sys_table_keys, $table_key;
         }
+        elsif ( $dbms eq 'SQLite' && $info_table->{$table_name} =~ /^sqlite_/i ) {
+            push @sys_table_keys, $table_key;
+        }
+        elsif ( $info_table->{$table_type} =~ /^SYSTEM/i ) {
+            push @sys_table_keys, $table_key;
+        }
         else {
-            if ( $info_table->{$table_type} =~ /^SYSTEM/ || ( $driver eq 'SQLite' && $info_table->{$table_name} =~ /^sqlite_/ ) ) {
-                push @sys_table_keys, $table_key;
-            }
-            else {
-                push @user_table_keys, $table_key;
-            }
+            push @user_table_keys, $table_key;
         }
         $tables_info->{$table_key} = [ @{$info_table}{@keys} ];
     }
     return $tables_info, [ sort @user_table_keys ], [ sort @sys_table_keys ];
 }
 
-
-
-# Sybase untested
-
-# Sysbase:
-#   SET quoted_identifier ON
 
 
 
@@ -315,7 +331,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.436
+Version 2.438
 
 =head1 DESCRIPTION
 
@@ -323,7 +339,7 @@ A database plugin provides the database specific methods. C<App::DBBrowser> cons
 C</^App::DBBrowser::DB::[^:']+\z/> and which is located in one of the C<@INC> directories, as a database plugin.
 
 The user can add an installed database plugin to the available plugins in the options menu (C<db-browser -h>) by
-selecting I<Plugins>.
+selecting I<Select plugins>.
 
 A suitable database plugin provides the methods mentioned in this documentation.
 
@@ -370,164 +386,7 @@ Returns the database handle.
 
 C<db-browser> expects a C<DBI> database handle with the attribute I<RaiseError> activated.
 
-=head2 Optional methods
-
-=head4 get_schemas( $dbh, $database )
-
-C<$dbh> is the database handle returned by the method C<db_hanlde>.
-
-If the driver is C<SQLite>, a third argument is passed to C<get_schemas>; if the database has attached databases, the
-third argument is true, otherwise it is false.
-
-Returns the user schemas as an array reference and the system schemas as an array reference (if any).
-
-If the option I<System data> is true, user schemas and system schemas are used, otherwise only the user schemas are used.
-
-=begin comment
-
-=head3 DB configuration methods
-
-If the following methods are available, the C<db-browser> user can configure the different database settings in the
-options menu.
-
-If the database driver is C<SQLite>, only C<set_attributes> is used.
-
-=head4 read_login_data()
-
-Returns a reference to an array of hashes. The hashes have one or two key-value pairs:
-
-    { name => 'string', secret => true/false }
-
-C<name> holds the field name for example like "user" or "host".
-
-If C<secret> is true, the user input should not be echoed to the terminal. Also the data is not stored in the plugin
-configuration file if C<secret> is true.
-
-An example C<read_login_data> method:
-
-    sub read_login_data {
-        my ( $self ) = @_;
-        return [
-            { name => 'host', secret => 0 },
-            { name => 'port', secret => 0 },
-            { name => 'user', secret => 0 },
-            { name => 'pass', secret => 1 },
-        ];
-    }
-
-The information returned by the method C<read_login_data> is used to build the I<DB Settings> menu entry I<Fields> and
-I<Login Data>.
-
-=head4 env_variables()
-
-Returns a reference to an array of environment variables.
-
-An example C<env_variables> method:
-
-    sub env_variables {
-        my ( $self ) = @_;
-        return [ qw( DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
-    }
-
-See the option I<ENV Variables> in I<DB Settings>.
-
-=head4 set_attributes()
-
-Returns a reference to an array of hashes. The hashes have two or three key-value pairs:
-
-    { name => 'string', default => index, values => [ value_1, value_2, value_3, ... ] }
-
-The value of C<name> is the name of the database connection attribute.
-
-C<values> holds the available values for that attribute as an array reference.
-
-The C<values> array entry of the index position C<default> is used as the default value.
-
-Example from the plugin C<App::DBBrowser::DB::SQLite>:
-
-    sub set_attributes {
-        my ( $self ) = @_;
-        return [
-            { name => 'sqlite_unicode',             default => 1, values => [ 0, 1 ] },
-            { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
-        ];
-    }
-
-The information returned by the method C<set_attributes> is used to build the menu entry I<Set Attributes> in
-L<db-browser/OPTIONS>.
-
-=head4 read_attributes()
-
-Returns a reference to an array of hashes. The hashes have one to two key-value pairs:
-
-    { name => 'string', prompt => 'string' }
-
-The value of C<name> is the name of the database connection attribute.
-
-The value of C<default> is used as the default value. The C<default> entry is optional.
-
-Example from the plugin C<App::DBBrowser::DB::Firebird>:
-
-    sub read_attributes {
-        my ( $sf ) = @_;
-        return [
-            { name => 'ib_dialect',                   },
-            { name => 'ib_role',                      },
-            { name => 'ib_charset', default => 'UTF8' },
-        ];
-    }
-
-The information returned by the method C<read_attributes> is used to build the menu entry I<Read Attributes> in
-L<db-browser/OPTIONS>.
-
-The I<DB Options> can be accessd with the module C<App::DBBrowser::Opt::DBGet> as shown here in an example
-for a C<mysql> database:
-
-    use App::DBBrowser::Opt::DBGet;
-
-    my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $info, $opt );
-
-    my $login_data  = $db_opt_get->login_data( $db );
-    my $env_var_yes = $db_opt_get->enabled_env_vars( $db );
-    my $attributes  = $db_opt_get->attributes( $db );
-
-If C<$db> is defined, the settings for C<$db> are returned else the global plugin settings are returned.
-
-The available C<$login_data> keys are the result of the I<Fields>* settings, the C<name> values are the result of the
-I<Login Data>* settings:
-
-    $login_data:
-    {
-        host => { name => 'localhost', secret => 0 },
-        user => { name => 'user_name', secret => 0 },
-        pass => { name => undef,       secret => 1 },
-    }
-
-
-The result of the I<ENV Variables>* settings:
-
-    $env_var_yes:
-    {
-        DBI_HOST => 1,
-        DBI_PORT => 1,
-        DBI_USER => 0,
-        DBI_PASS => 0,
-    }
-
-The result of the I<Attributes>* settings:
-
-    $attributes:
-    {
-        mysql_enable_utf8        => 0,
-        mysql_enable_utf8mb4     => 1,
-        mysql_bind_type_guessing => 1,
-    }
-
-* OPTIONS/DB Options/DB Settings/$plugin
-
-=end comment
-
-=head1 EXAMPLE
+=head3 EXAMPLE
 
     package App::DBBrowser::DB::MyPlugin;
     use strict;
@@ -558,6 +417,63 @@ The result of the I<Attributes>* settings:
     }
 
     1;
+
+=head2 Optional methods
+
+=head4 get_schemas( $dbh, $database, $is_system_db )
+
+C<$dbh> is the database handle returned by the method C<db_hanlde> and C<$database> is the database name. If
+C<is_system_db> is true, then the database is a system database.
+
+Returns the user schemas as an array reference and the system schemas as an array reference (if any).
+
+If the option I<System data> is true, user schemas and system schemas are used, otherwise only the user schemas are used.
+
+=head4 tables_info( $dbh, $schema, $is_system_schema )
+
+C<$dbh> is the database handle and C<$schema> is the schema name. If C<is_system_schema> is true, then the schema is a
+system schema.
+
+Returns three values:
+
+The first value is a hash reference where the keys are the table keys (table names), and the values are array references
+containing the following elements: table category, table schema, table name, and table type.
+
+The second value is an array reference containing the list of user table keys.
+
+The third value is an array reference containing the list of system table keys.
+
+=head4 EXAMPLE
+
+    sub tables_info {
+        my ( $sf, $dbh, $schema, $is_system_schema ) = @_;
+        my $sth = $dbh->table_info( undef, $schema, '%', '' );
+        my $table_cat   = 'TABLE_CAT';
+        my $table_schem = 'TABLE_SCHEM';
+        my $table_name  = 'TABLE_NAME';
+        my $table_type  = 'TABLE_TYPE';
+        my @fields = ( $table_cat, $table_schem, $table_name, $table_type );
+        my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @fields } );
+        my ( @user_table_keys, @sys_table_keys );
+        my $tables_info = {};
+
+        for my $info_table ( @$info_tables ) {
+            my $table_key = $info_table->{$table_name};
+            if ( $is_system_schema ) {
+                push @sys_table_keys, $table_key;
+            }
+            else {
+                if ( $info_table->{$table_type} =~ /^SYSTEM/ ) {
+                    push @sys_table_keys, $table_key;
+                }
+                else {
+                    push @user_table_keys, $table_key;
+                }
+            }
+            $tables_info->{$table_key} = [ @{$info_table}{@fields} ];
+        }
+        return $tables_info, [ sort @user_table_keys ], [ sort @sys_table_keys ];
+    }
 
 =head1 AUTHOR
 

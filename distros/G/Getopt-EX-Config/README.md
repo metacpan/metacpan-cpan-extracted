@@ -15,7 +15,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -161,6 +161,9 @@ for detail.
 
     In this case, `\%config` and `$config` should be identical.
 
+    Config keys must start with a letter (a-z, A-Z).  Keys starting with
+    underscore or other characters are reserved for internal use.
+
 - **deal\_with**
 
     You can get argument reference in `initialize()` or `finalize()`
@@ -179,6 +182,31 @@ for detail.
             our($mod, $argv) = @_;
             $config->deal_with($argv,
                                "width!", "code!", "name=s");
+        }
+
+- **configure**(_options_)
+
+    Set [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) configuration options.  Returns the object itself
+    for method chaining.  Internally uses [Getopt::Long::Parser](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3AParser) so that
+    global configuration is not affected.
+
+        $config->configure('pass_through');
+        $config->deal_with($argv, "width!", "name=s");
+
+    Or with method chaining:
+
+        $config->configure('pass_through')->deal_with($argv, ...);
+
+- **argv**
+
+    Returns the remaining arguments after `deal_with` processing.  When
+    used with `pass_through` configuration, unrecognized options are
+    preserved and can be retrieved with this method.
+
+        sub finalize {
+            our($mod, $argv) = @_;
+            $config->configure('pass_through')->deal_with($argv, "width!", "name=s");
+            my @extra = $config->argv;  # unrecognized options
         }
 
 # VARIABLES

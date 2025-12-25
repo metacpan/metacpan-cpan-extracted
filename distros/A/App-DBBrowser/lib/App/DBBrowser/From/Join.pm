@@ -30,10 +30,11 @@ sub new {
 
 sub __available_joins {
     my ( $sf ) = @_;
-    if ( $sf->{i}{driver} eq 'SQLite' ) {
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms eq 'SQLite' ) {
         return [ 'INNER JOIN', 'LEFT JOIN', 'CROSS JOIN' ];
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         return [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'CROSS JOIN' ];
     }
     else {
@@ -42,9 +43,9 @@ sub __available_joins {
 }
 
 
-my $join_info      = '  Info';
-my $subquery_table = '  Subquery';
-my $cte_table      = '  Cte';
+my $join_info     = '  Info';
+my $from_subquery = '  Subquery';
+my $from_cte      = '  Cte';
 
 
 sub join_tables {
@@ -71,8 +72,8 @@ sub join_tables {
             default_alias => 'a',
         };
         my @choices = map { "- $_" } @$table_keys;
-        push @choices, $subquery_table if $sf->{o}{enable}{j_derived};
-        push @choices, $cte_table      if $sf->{o}{enable}{j_cte};
+        push @choices, $from_subquery if $sf->{o}{enable}{j_derived};
+        push @choices, $from_cte      if $sf->{o}{enable}{j_cte};
         push @choices, $join_info;
         my @pre = ( undef );
         my $menu = [ @pre, @choices ];
@@ -99,14 +100,14 @@ sub join_tables {
             next MASTER;
         }
         my $master;
-        if ( $master_key eq $subquery_table ) {
+        if ( $master_key eq $from_subquery ) {
             my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->subquery( $sql );
             if ( ! defined $master ) {
                 next MASTER;
             }
         }
-        elsif ( $master_key eq $cte_table ) {
+        elsif ( $master_key eq $from_cte ) {
             my $sq = App::DBBrowser::From::Cte->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $master = $sq->cte( $sql );
             if ( ! defined $master ) {
@@ -224,8 +225,8 @@ sub __add_slave_with_join_condition {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @choices = map { '- '. $_ } @$table_keys;
-    push @choices, $subquery_table if $sf->{o}{enable}{j_derived};
-    push @choices, $cte_table     if $sf->{o}{enable}{j_cte};
+    push @choices, $from_subquery if $sf->{o}{enable}{j_derived};
+    push @choices, $from_cte     if $sf->{o}{enable}{j_cte};
     push @choices, $join_info;
     my $old_idx_slave = 0;
 
@@ -258,14 +259,14 @@ sub __add_slave_with_join_condition {
         my $slave_key = $menu->[$idx_slave];
         my $bu_data = $ax->clone_data( $data );
         my $slave;
-        if ( $slave_key eq $subquery_table ) {
+        if ( $slave_key eq $from_subquery ) {
             my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->subquery( $sql );
             if ( ! defined $slave ) {
                 next SLAVE;
             }
         }
-        elsif ( $slave_key eq $cte_table ) {
+        elsif ( $slave_key eq $from_cte ) {
             my $sq = App::DBBrowser::From::Cte->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $slave = $sq->cte( $sql );
             if ( ! defined $slave ) {
@@ -283,13 +284,13 @@ sub __add_slave_with_join_condition {
         push @{$data->{aliases}}, [ $slave, $slave_alias ];
         ( $data->{col_names}{$slave}, undef ) = $ax->column_names_and_types( $slave . " " . $slave_alias );
         if ( ! defined $data->{col_names}{$slave} ) {
-            $sf->__reset_to_backuped_join_data( $sql, $data, $bu_data );
+            $sf->__reset_to_backed_up_join_data( $sql, $data, $bu_data );
             next SLAVE;
         }
         if ( $sql->{join_data}[-1]{join_type} ne 'CROSS JOIN' ) {
             my $ok = $sf->__add_join_condition( $sql, $data );
             if ( ! $ok ) {
-                $sf->__reset_to_backuped_join_data( $sql, $data, $bu_data );
+                $sf->__reset_to_backed_up_join_data( $sql, $data, $bu_data );
                 next SLAVE;
             }
         }
@@ -299,7 +300,7 @@ sub __add_slave_with_join_condition {
 }
 
 
-sub __reset_to_backuped_join_data {
+sub __reset_to_backed_up_join_data {
      my ( $sf, $sql, $data, $bu_data ) = @_;
     $sql->{join_data}[-1] = { join_type => $sql->{join_data}[-1]{join_type} };
     delete @{$data}{ keys %$data };

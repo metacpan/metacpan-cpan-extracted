@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "0.9902";
+our $VERSION = "0.9903";
 
 1;
 =encoding utf-8
@@ -14,27 +14,32 @@ nup - N-up multi-column paged output for commands and files
     nup [ options ] file ...
     nup -e [ options ] command ...
 
-    -h,   --help             show help
+      -h, --help             show help
           --version          show version
-    -d,   --debug            debug mode
-    -n,   --dryrun           dry-run mode
-    -e,   --exec             execute command mode
-    -V,   --parallel         parallel view mode
-    -F,   --fold             fold mode (disable page mode)
-    -H,   --filename         show filename headers (default: on)
-    -G,   --grid=#           grid layout (e.g., 2x3)
-    -C,   --pane=#           number of columns
-    -R,   --row=#            number of rows
-          --height=#         page height in lines
-    -S,   --pane-width=#     pane width (default: 85)
+      -d, --debug            debug mode
+      -n, --dryrun           dry-run mode
+      -e, --exec             execute command mode
+      -V, --parallel         parallel view mode
+      -F, --fold             fold mode (disable page mode)
+      -H, --filename         show filename headers (default: on)
+      -G, --grid=#           grid layout (e.g., 2x3)
+      -C, --pane=#           number of columns
+      -R, --row=#            number of rows
+      -P, --page=#           page height in lines
+      -S, --pane-width=#     pane width (default: 85)
     --bs, --border-style=#   border style (default: heavy-box)
     --ls, --line-style=#     line style (none/truncate/wrap/wordwrap)
+    --cm, --colormap=#       color mapping (LABEL=COLOR)
+          --white-board      black on white board
+          --black-board      white on black board
+          --green-board      white on green board
+          --slate-board      white on dark slate board
           --pager=#          pager command (empty to disable)
           --no-pager         disable pager
 
 =head1 VERSION
 
-Version 0.9902
+Version 0.9903
 
 =cut
 =head1 DESCRIPTION
@@ -112,7 +117,7 @@ Set the number of rows.
 
 Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
 
-=item B<--height>=I<N>
+=item B<-P> I<N>, B<--page>=I<N>
 
 Set the page height in lines.
 
@@ -126,13 +131,22 @@ Set the pane width in characters. Default is 85.
 
 =over 4
 
-=item B<--border-style>=I<STYLE>, B<--bs>=I<STYLE>
+=item B<--bs>=I<STYLE>, B<--border-style>=I<STYLE>
 
 Set the border style. Default is C<heavy-box>.
 
-=item B<--line-style>=I<STYLE>, B<--ls>=I<STYLE>
+=item B<--ls>=I<STYLE>, B<--line-style>=I<STYLE>
 
 Set the line style. Available: C<none>, C<truncate>, C<wrap>, C<wordwrap>.
+
+=item B<--cm>=I<SPEC>, B<--colormap>=I<SPEC>
+
+Set color mapping. Specify as C<LABEL=COLOR> (e.g., C<--cm=BORDER=R>).
+Available labels: C<TEXT>, C<BORDER>.
+
+=item B<--white-board>, B<--black-board>, B<--green-board>, B<--slate-board>
+
+Predefined color schemes for board-style display.
 
 =back
 

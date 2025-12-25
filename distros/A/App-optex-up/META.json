@@ -45,7 +45,7 @@
             "App::ansicolumn" : "1.47",
             "App::optex" : "1.04",
             "Getopt::EX" : "3.02",
-            "Getopt::EX::Config" : "1.00",
+            "Getopt::EX::Config" : "1.01",
             "Term::ReadKey" : "0",
             "perl" : "v5.16.0"
          }
@@ -59,7 +59,7 @@
    "provides" : {
       "App::optex::up" : {
          "file" : "lib/App/optex/up.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-up"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

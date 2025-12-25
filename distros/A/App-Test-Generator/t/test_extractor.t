@@ -286,8 +286,8 @@ subtest 'output detection' => sub {
 my $schema_dir = File::Spec->catdir($tempdir, 'schemas');
 ok(-d $schema_dir, 'schema directory created');
 
-my $simple_string_yaml = File::Spec->catfile($schema_dir, 'simple_string.yaml');
-ok(-f $simple_string_yaml, 'simple_string.yaml file created');
+my $simple_string_yaml = File::Spec->catfile($schema_dir, 'simple_string.yml');
+ok(-f $simple_string_yaml, 'simple_string.yml file created');
 
 # YAML file content
 open my $yaml_fh, '<', $simple_string_yaml or die "Can't read YAML: $!";

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.630';
+our $VERSION = '0.631';
 
 use 5.020;
 use Moo;
@@ -34,7 +34,7 @@ sub evaluation_order ($class) { 7 }
 
 # This vocabulary should be evaluated after the Applicator vocabulary.
 sub keywords ($class, $spec_version) {
-  die 'Unevaluated not implemented in '.$spec_version if $spec_version =~ /^draft(?:[467]|2019-09)$/;
+  die 'Unevaluated not implemented in '.$spec_version if $spec_version =~ /^draft(?:[467]|2019-09)\z/;
   qw(unevaluatedItems unevaluatedProperties);
 }
 
@@ -157,7 +157,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.630
+version 0.631
 
 =head1 DESCRIPTION
 

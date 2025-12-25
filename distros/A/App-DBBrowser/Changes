@@ -1,6 +1,63 @@
 Revision history for App-DBBrowser
 
 
+2.438   2025-12-25
+    - Backwards incompatible changes:
+        Table names and column names are not quoted by default.
+        Saved subqueries: saved at plugin level instead at driver level.
+        Changes in how configuration data is saved.
+    - Bug fixes:
+        Bug fix in quoting attached databases.
+        Bug fixes in the Documentation.
+        DB2: decode only text columns.
+        Bugfixes in format functions.
+        Set the default for sqlite_string_mode to a valid value.
+        Bug fix in the window function frame clause.
+        Reset the where statement from delete/update.
+        Informix remove trailing spaces from table-type to fix empty table list in drop_table.
+        Informix: fixed system schema regexp.
+    - Updates:
+        Updated options menus.
+        Refactoring options.
+        Update plugins.
+        Refactoring scalar functions.
+        Removed comment from the App::DBBrowser::DB documentation.
+        Added 'tables_info' to the plugin documentation.
+        Drop table info: use select_statement_results from Table.pm the get the data.
+        Pg epoch_to_timestamp: removed timestamptz cast from to_timestamp.
+        Extensions.pm: replaced requires with uses.
+        Unlink empty config files.
+    - New:
+        ODBC: query the DBMS name and set the appropriate SQL dialect.
+        Added SQL dialects for MSSQL and DuckDB.
+
+2.437_05  2025-12-17
+        - Bugfix: reset where statement from delete/update.
+        - Bugfix in window function frame clause.
+        - ODBC: removed option to set the appropriate SQL dialect.
+        - ODBC: query the dbms name and set the appropriate SQL dialect.
+
+2.437_04  2025-12-15
+        - Bugfix default value sqlite_string_mode.
+        - ODBC: new option to set the appropriate SQL dialect.
+        - Code adjustments for MSSQL.
+
+2.437_03  2025-12-04
+        - Added 'tables_info' to the plugin documentation.
+        - Removed comment from the App::DBBrowser::DB POD.
+        - Bugfix in App::DBBrowser::Opt::Set::set_options.
+        - Bugfixes in format functions.
+        - Code adjustments for DuckDB.
+        - Refactoring scalar functions.
+        - DB2: decode only text columns.
+        - Update options menus.
+        - Unifying options.
+        - Bugfix quoting attached databases.
+        - Bugfixes documentation.
+        - Update plugins.
+        - Table names and column names are not quoted by default.
+        - Saved subqueries: saved at plugin level instead at driver level.
+
 2.436  2025-10-24
         - Skip unnecessary step when extended values/arguments are disabled.
 

@@ -77,13 +77,16 @@ sub __select_stmt {
     else {
         $stmt = "SELECT $select_col FROM $sql->{table} WHERE $where_col IS NOT NULL";
     }
-    if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+    if ( $sql->{order_by_stmt} ) {
+        $stmt .= " " . $sql->{order_by_stmt};
+    }
+    if ( $sql->{limit_stmt} =~ /^LIMIT\b/i ) {
+        $stmt .= " " . $sql->{limit_stmt};
         $stmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
-        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
     }
     else {
-        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
         $stmt .= " " . $sql->{offset_stmt} if $sql->{offset_stmt};
+        $stmt .= " " . $sql->{limit_stmt}  if $sql->{limit_stmt};
     }
     return $stmt;
 }
@@ -221,17 +224,17 @@ sub __choose_interval {
 sub __stmt_epoch_to_date {
     my ( $sf, $col, $interval ) = @_;
     #my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{i}{driver};
-    if ( $driver eq 'SQLite' ) {
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms eq 'SQLite' ) {
         return "DATE($col/$interval,'unixepoch','localtime')";
     }
-    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')";
     }
-    elsif ( $driver eq 'Pg' ) {
+    elsif ( $dbms =~ /^(?:Pg|DuckDB)\z/ ) { ##
         return "TO_TIMESTAMP(${col}::bigint/$interval)::date";
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'Firebird' ) {
         #my $firebird_major_version = $ax->major_server_version();
         my $firebird_major_version = 3; ##
         if ( $firebird_major_version >= 4 ) {
@@ -243,14 +246,18 @@ sub __stmt_epoch_to_date {
             return "CAST(DATEADD(CAST($col AS BIGINT)/$interval SECOND TO DATE '1970-01-01') AS VARCHAR(10))";
         }
     }
-    elsif ( $driver eq 'DB2' ) {
+    elsif ( $dbms eq 'DB2' ) {
         return "TIMESTAMP('1970-01-01') + ($col/$interval) SECONDS";
     }
-    elsif ( $driver eq 'Informix' ) {
+    elsif ( $dbms eq 'Informix' ) {
         return "TO_CHAR(DBINFO('utc_to_datetime',$col/$interval),'%Y-%m-%d')";
     }
-    elsif ( $driver eq 'Oracle' ) {
+    elsif ( $dbms eq 'Oracle' ) {
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD')";
+    }
+    elsif ( $dbms eq 'MSSQL' ) { # no timezone
+        return "CAST(DATEADD(s,$col,'1970-01-01') AS DATE)"            if $interval == 1;
+        return "CAST(DATEADD(s,$col/$interval,'1970-01-01') AS DATE)";
     }
 }
 
@@ -258,12 +265,12 @@ sub __stmt_epoch_to_date {
 sub __stmt_epoch_to_timestamp {
     my ( $sf, $col, $interval ) = @_;
     #my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{i}{driver};
-    if ( $driver eq 'Pg' ) {
-        return "TO_TIMESTAMP(${col}::bigint)::timestamptz"              if $interval == 1;
-        return "TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamptz";
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms =~ /^(?:Pg|DuckDB)\z/ ) { ##
+        return "TO_TIMESTAMP(${col}::bigint)"              if $interval == 1;
+        return "TO_TIMESTAMP(${col}::bigint/$interval.0)";
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'Firebird' ) {
         #my $firebird_major_version = $ax->major_server_version();
         my $firebird_major_version = 3; ##
         if ( $firebird_major_version >= 4 ) {
@@ -279,9 +286,18 @@ sub __stmt_epoch_to_timestamp {
             return "DATEADD(MILLISECOND,CAST($col AS BIGINT)/$interval,TIMESTAMP '1970-01-01')";
         }
     }
-    elsif ( $driver eq 'Oracle' ) {
+    elsif ( $dbms eq 'Oracle' ) {
         return "(TIMESTAMP '1970-01-01 00:00:00 UTC' + $col * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE"            if $interval == 1;
         return "(TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE";
+    }
+    elsif ( $dbms eq 'MSSQL' ) {
+        #return "DATEADD(s,$col,CAST('1970-01-01T00:00:00+00:00' AS datetimeoffset(0)))"             if $interval == 1;;
+        #return "DATEADD(s,$col/$interval.0,CAST('1970-01-01T00:00:00+00:00' AS datetimeoffset(3)))" if $interval == 1_000;
+        #return "DATEADD(s,$col/$interval.0,CAST('1970-01-01T00:00:00+00:00' AS datetimeoffset(6)))" if $interval == 1_000_000;
+        return "DATEADD(s,$col,'1970-01-01 00:00:00') AT TIME ZONE 'UTC'"                                                                    if $interval == 1;
+        return "DATEADD(ms,$col%$interval,DATEADD(s,$col/$interval,CONVERT(datetime2(3),'1970-01-01 00:00:00.000'))) AT TIME ZONE 'UTC'"     if $interval == 1_000;
+        return "DATEADD(mcs,$col%$interval,DATEADD(s,$col/$interval,CONVERT(datetime2(6),'1970-01-01 00:00:00.000000'))) AT TIME ZONE 'UTC'" if $interval == 1_000_000;
+        #return "DATEADD(ns,$col%1000000000,DATEADD(s,$col/1000000000,CONVERT(datetime2(7),'1970-01-01 00:00:00.0000000'))) AT TIME ZONE 'UTC'"
     }
 }
 
@@ -289,23 +305,28 @@ sub __stmt_epoch_to_timestamp {
 sub __stmt_epoch_to_datetime {
     my ( $sf, $col, $interval ) = @_;
     #my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{i}{driver};
-    if ( $driver eq 'SQLite' ) {
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms eq 'SQLite' ) {
         return "DATETIME($col,'unixepoch','localtime')"                       if $interval == 1;
         return "DATETIME($col/$interval.0,'unixepoch','localtime','subsec')";
     }
-    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {   # DATE_FORMAT and STR_TO_DATE ##
+    elsif ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {   # DATE_FORMAT and STR_TO_DATE ##
         # mysql: FROM_UNIXTIME doesn't work with negative timestamps
         return "FROM_UNIXTIME($col)"             if $interval == 1;
         return "FROM_UNIXTIME($col * 0.001)"     if $interval == 1_000;
         return "FROM_UNIXTIME($col * 0.000001)";
     }
-    elsif ( $driver eq 'Pg' ) {
+    elsif ( $dbms eq 'Pg' ) {
         return "TO_CHAR(TO_TIMESTAMP(${col}::bigint)::timestamp,'yyyy-mm-dd hh24:mi:ss')"                 if $interval == 1;
         return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamp,'yyyy-mm-dd hh24:mi:ss.ff3')" if $interval == 1_000;
         return "TO_CHAR(TO_TIMESTAMP(${col}::bigint/$interval.0)::timestamp,'yyyy-mm-dd hh24:mi:ss.ff6')";
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'DuckDB' ) {
+        return "TO_TIMESTAMP($col)::timestamp"                                            if $interval == 1;
+        return "STRFTIME(TO_TIMESTAMP($col/$interval)::timestamp,'%Y-%m-%d %H:%M:%S.%g')" if $interval == 1_000;
+        return "TO_TIMESTAMP($col/$interval)::timestamp";
+    }
+    elsif ( $dbms eq 'Firebird' ) {
         #my $firebird_major_version = $ax->major_server_version();
         my $firebird_major_version = 3; ##
         if ( $firebird_major_version >= 4 ) {
@@ -321,19 +342,25 @@ sub __stmt_epoch_to_datetime {
             return "CAST(DATEADD(MILLISECOND,CAST($col AS BIGINT)/$interval.0,TIMESTAMP '1970-01-01') AS VARCHAR(24))";
         }
     }
-    elsif ( $driver eq 'DB2' ) { # TO_DATE and TO_CHAR ##
+    elsif ( $dbms eq 'DB2' ) { # TO_DATE and TO_CHAR ##
         return "TIMESTAMP('1970-01-01 00:00:00',0) + $col SECONDS"              if $interval == 1;
         return "TIMESTAMP('1970-01-01 00:00:00',3) + ($col/$interval) SECONDS"  if $interval == 1_000;
         return "TIMESTAMP('1970-01-01 00:00:00',6) + ($col/$interval) SECONDS";
     }
-    elsif ( $driver eq 'Informix' ) { # TO_CHAR ##
+    elsif ( $dbms eq 'Informix' ) { # TO_CHAR ##
         return "DBINFO('utc_to_datetime',$col)"            if $interval == 1;
         return "DBINFO('utc_to_datetime',$col/$interval)";
     }
-    elsif ( $driver eq 'Oracle' ) {
+    elsif ( $dbms eq 'Oracle' ) {
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS')"                if $interval == 1;
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS.FF3')"  if $interval == 1_000;
         return "TO_CHAR((TIMESTAMP '1970-01-01 00:00:00 UTC' + $col/$interval * INTERVAL '1' SECOND) AT TIME ZONE SESSIONTIMEZONE,'YYYY-MM-DD HH24:MI:SS.FF6')";
+    }
+    elsif ( $dbms eq 'MSSQL' ) {
+        return "CONVERT(VARCHAR(19),DATEADD(s,$col,'1970-01-01 00:00:00'),20)"            if $interval == 1;
+        return "CONVERT(VARCHAR(19),DATEADD(s,$col/$interval,'1970-01-01 00:00:00'),20)";
+        #return "FORMAT(DATEADD(SECOND,$col,'1970-01-01 00:00:00'),'yyyy-MM-dd HH:mm:ss')"            if $interval == 1; ##
+        #return "FORMAT(DATEADD(SECOND,$col/$interval,'1970-01-01 00:00:00'),'yyyy-MM-dd HH:mm:ss')";
     }
 }
 

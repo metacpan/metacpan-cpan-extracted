@@ -1,6 +1,6 @@
 #!/bin/sh -
 
-VERSION=0.8.0
+VERSION=0.9.0
 CONTACT='Steffen Nurpmeso <steffen@sdaoden.eu>'
 
 while [ $# -gt 0 ]; do
@@ -17,6 +17,7 @@ done
 	[ -n "$s_BSDIPA_MAGIC_WINDOW" ] &&
 		echo '#define s_BSDIPA_MAGIC_WINDOW '"$s_BSDIPA_MAGIC_WINDOW" ||
 		echo '#undef s_BSDIPA_MAGIC_WINDOW'
+	[ -n "$s_BSDIPA_SMALL" ] && echo '#define s_BSDIPA_SMALL' || echo '#undef s_BSDIPA_SMALL'
 	echo '#endif'
 } > ./s-bsdipa-config.h
 

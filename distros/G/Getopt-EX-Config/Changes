@@ -1,5 +1,20 @@
 Revision history for Perl extension Getopt-EX-Config
 
+1.01 2025-12-24T12:11:21Z
+
+    - Add configure() method for Getopt::Long configuration
+      * Use Getopt::Long::Parser internally (no global config pollution)
+      * Support method chaining: $config->configure('pass_through')->deal_with(...)
+
+    - Add argv() method to retrieve remaining arguments after deal_with()
+      * Useful with pass_through to get unrecognized options
+
+    - Add config key validation
+      * Keys must start with a letter (a-z, A-Z)
+      * Keys starting with underscore are reserved for internal use
+
+    - Update MCP server documentation
+
 1.00 2025-12-08T02:21:55Z
 
     - Remove -C short option from --config to avoid conflicts with

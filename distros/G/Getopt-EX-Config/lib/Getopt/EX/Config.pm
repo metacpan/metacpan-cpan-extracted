@@ -3,13 +3,12 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our $REPLACE_UNDERSCORE = 1;
 
 use Data::Dumper;
-use Getopt::Long qw(GetOptionsFromArray);
-Getopt::Long::Configure qw(bundling);
+use Getopt::Long;
 
 use List::Util qw(first);
 use Hash::Util qw(lock_keys);
@@ -31,6 +30,9 @@ sub import {
 sub new {
     my $class = shift;
     my $config = ref $_[0] eq 'HASH' ? shift : { @_ };
+    for my $key (keys %$config) {
+        $key =~ /^[a-zA-Z]/ or die "$key: config key must start with a letter\n";
+    }
     my $caller = caller;
     $CONFIG{$caller} = bless $config, $class;
     $config;
@@ -47,7 +49,19 @@ sub deal_with {
     }
     my($my_argv, $argv) = split_argv(shift);
     $obj->getopt($my_argv, @_) if @$my_argv;
+    $obj->{_argv} = [ @$my_argv ];
     return $obj;
+}
+
+sub argv {
+    my $obj = shift;
+    @{ $obj->{_argv} // [] };
+}
+
+sub configure {
+    my $obj = shift;
+    push @{$obj->{_configure}}, @_;
+    $obj;
 }
 
 use Getopt::EX::Func;
@@ -57,12 +71,15 @@ sub getopt {
     my $obj = shift;
     my $argv = shift // [];
     return if @{ $argv } == 0;
-    
+
     # Convert underscore options to underscore|dash format
     @_ = map { ref($_) ? $_ : s/^(\w*_[\w_]*)/"$1|" . ($1 =~ s:_:-:gr)/er } @_
         if $REPLACE_UNDERSCORE;
-    
-    GetOptionsFromArray(
+
+    my $p = Getopt::Long::Parser->new(
+        config => [ 'bundling', @{$obj->{_configure} // []} ]
+    );
+    $p->getoptionsfromarray(
 	$argv,
 	$obj,
 	"config=s" => sub {
@@ -148,7 +165,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -302,6 +319,9 @@ Or call with hash reference.
 
 In this case, C<\%config> and C<$config> should be identical.
 
+Config keys must start with a letter (a-z, A-Z).  Keys starting with
+underscore or other characters are reserved for internal use.
+
 =item B<deal_with>
 
 You can get argument reference in C<initialize()> or C<finalize()>
@@ -320,6 +340,31 @@ definition with that call.
         our($mod, $argv) = @_;
         $config->deal_with($argv,
                            "width!", "code!", "name=s");
+    }
+
+=item B<configure>(I<options>)
+
+Set L<Getopt::Long> configuration options.  Returns the object itself
+for method chaining.  Internally uses L<Getopt::Long::Parser> so that
+global configuration is not affected.
+
+    $config->configure('pass_through');
+    $config->deal_with($argv, "width!", "name=s");
+
+Or with method chaining:
+
+    $config->configure('pass_through')->deal_with($argv, ...);
+
+=item B<argv>
+
+Returns the remaining arguments after C<deal_with> processing.  When
+used with C<pass_through> configuration, unrecognized options are
+preserved and can be retrieved with this method.
+
+    sub finalize {
+        our($mod, $argv) = @_;
+        $config->configure('pass_through')->deal_with($argv, "width!", "name=s");
+        my @extra = $config->argv;  # unrecognized options
     }
 
 =back

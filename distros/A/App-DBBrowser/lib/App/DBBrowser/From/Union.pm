@@ -25,13 +25,14 @@ sub new {
 
 sub __valid_operators {
     my ( $sf ) = @_;
+    my $dbms = $sf->{i}{dbms};
     # Precedence:
     # INTERSECT has priority over UNION or EXCEPT.
     # EXCEPT and UNION are evaluated Left to Right
-    if ( $sf->{i}{driver} eq 'Firebird' ) {
+    if ( $dbms eq 'Firebird' ) {
         return [ 'Union', 'UNION ALL' ];
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:SQLite|Informix)\z/ ) {
+    elsif ( $dbms =~ /^(?:SQLite|Informix)\z/ ) {
         return [ 'UNION', 'UNION ALL', 'INTERSECT', 'EXCEPT' ];
     }
     else {
@@ -51,7 +52,7 @@ sub union_tables {
     my $parentheses = '  Parentheses';
     my @post;
     push @post, $modify if $sf->{o}{enable}{u_edit_stmt};
-    push @post, $parentheses if $sf->{o}{enable}{u_parentheses} && $sf->{i}{driver} !~ /^(?:SQLite|Firebird)\z/;
+    push @post, $parentheses if $sf->{o}{enable}{u_parentheses} && $sf->{i}{dbms} !~ /^(?:SQLite|Firebird)\z/;
     my $set_operators = $sf->__valid_operators();
     $set_operators = [ map { '- ' . $_ } map { s/\b(.)/uc $1/ger } map { lc } @$set_operators ];
     my $menu = [ @pre, @$set_operators, @post ];
@@ -128,11 +129,10 @@ sub __add_table {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @pre = ( undef );
-    my $subquery_table = '  Subquery';
-    my $cte_table      = '  Cte';
+    my ( $from_subquery, $from_cte ) = ( '  Subquery', '  Cte' );
     my @post;
-    push @post, $subquery_table if $sf->{o}{enable}{u_derived};
-    push @post, $cte_table      if $sf->{o}{enable}{u_cte};
+    push @post, $from_subquery if $sf->{o}{enable}{u_derived};
+    push @post, $from_cte      if $sf->{o}{enable}{u_cte};
     my $table_keys;
     if ( $sf->{o}{G}{metadata} ) {
         $table_keys = [ @{$sf->{d}{user_table_keys}}, @{$sf->{d}{sys_table_keys}} ];
@@ -165,7 +165,7 @@ sub __add_table {
         }
         my $table_key = $menu->[$idx_tbl];
         my $table;
-        if ( $table_key eq $subquery_table ) {
+        if ( $table_key eq $from_subquery ) {
             my $sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
             $table = $sq->subquery( $sql );
@@ -180,10 +180,10 @@ sub __add_table {
                 $table .= " " . $alias;
             }
         }
-        elsif ( $table_key eq $cte_table ) {
-            my $sq = App::DBBrowser::From::Cte->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        elsif ( $table_key eq $from_cte ) {
+            my $sq = App::DBBrowser::From::File->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $sql->{subselect_stmts} = $sf->__get_sub_select_stmts( $data );
-            $table = $sq->cte( $sql );
+            $table = $sq->file( $sql );
             if ( ! defined $table ) {
                 next TABLE;
             }

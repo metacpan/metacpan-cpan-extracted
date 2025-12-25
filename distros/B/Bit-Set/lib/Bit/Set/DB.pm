@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB;
-$Bit::Set::DB::VERSION = '0.05';
+$Bit::Set::DB::VERSION = '0.09';
 use strict;
 use warnings;
 use FFI::Platypus::Record;
@@ -9,7 +9,7 @@ use FFI::Platypus::Record;
 {
 
     package Bit::Set::DB::SETOP_COUNT_OPTS;
-$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.05';
+$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.09';
 use FFI::Platypus::Record;
     record_layout_1(
         'int'  => 'num_cpu_threads',
@@ -387,22 +387,26 @@ for my $c_func (@c_functions) {
       unless exists $perl_functions{$c_func};
 }
 
-1;
+
 
 # LLM forgot to export the Bit::Set functions
 use Exporter 'import';
 our @EXPORT_OK   = keys %functions;
 our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
+our @EXPORT = qw(BitDB_new BitDB_free);
+1;
+
+
 __END__
 
 =head1 NAME
 
-Bit::Set::DB - Perl interface for bitset containers from the C<Bit> C library
+Bit::Set::DB - Perl procedural interface for bitset containers from the C<Bit> C library
 
 =head1 VERSION
 
-version 0.05
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -441,7 +445,10 @@ is set to a true value.
 
 GPU offloading is disabled if you set up the C<NOGPU> environment variable.
 
-=head1 FUNCTIONS
+Only the constructor and destructor are exported by default. You can import all functions using the C<:all> tag, or import individual functions as needed.
+
+
+=head1 Functions in the procedural interface
 
 =head2 Creation and Destruction
 
@@ -581,6 +588,7 @@ Perform the respective set operation count on the GPU and store results in C<buf
 =item B<BitDB_minus_count_store_gpu(db1, db2, buffer, opts)>
 
 =back
+
 
 =head1 EXAMPLES
 
@@ -894,43 +902,25 @@ In the Xeon E-2697v4 I used for this work, I obtained the following benchmarks:
 
 =over 5
 
-=item  Test Description                    |   Time (ns)   | Searches/sec | Threads | Result | Speedup |
-
-=item -------------------------------------|---------------|--------------|---------|--------|---------|
-
-=item  Bit::Set operations - Rep1          |   388,479,000 |         2.57 |       1 |    512 |    1.00 |
-
-=item  Bit::Set operations - Rep2          |   389,512,000 |         2.57 |       1 |    512 |    1.00 |
-
-=item  Bit::Set operations - Rep3          |   389,775,000 |         2.57 |       1 |    512 |    1.00 |
-
-=item  Container - CPU                     |    82,856,000 |        12.07 |       1 |    512 |    4.69 |
-
-=item  Container - CPU                     |    62,179,000 |        16.08 |       2 |    512 |    6.25 |
-
-=item  Container - CPU                     |    59,269,000 |        16.87 |       3 |    512 |    6.55 |
-
-=item  Container - CPU                     |    61,368,000 |        16.30 |       4 |    512 |    6.33 |
-
-=item  Container - GPU                     |   261,441,000 |         3.82 |     GPU |    512 |    1.49 |
-
-=item  Container - GPU                     |    62,523,000 |        15.99 |     GPU |    512 |    6.21 |
-
-=item  Container - GPU                     |    61,467,000 |        16.27 |     GPU |    512 |    6.32 |
-
-=item  Container - CPU - PDL               |    12,559,000 |        79.62 |       1 |    512 |   30.93 |
-
-=item  Container - CPU - PDL               |     9,313,000 |       107.38 |       2 |    512 |   41.71 |
-
-=item  Container - CPU - PDL               |     5,441,000 |       183.79 |       3 |    512 |   71.40 |
-
-=item  Container - CPU - PDL               |     4,457,000 |       224.37 |       4 |    512 |   87.16 |
-
-=item  Container - GPU with PDL            |    10,763,000 |        92.91 |     GPU |    512 |   36.09 |
-
-=item  Container - GPU with PDL            |     8,662,000 |       115.45 |     GPU |    512 |   44.85 |
-
-=item  Container - GPU with PDL            |     8,247,000 |       121.26 |     GPU |    512 |   47.11 |
+=item Test Description             | Time (ns)    | Searches/sec | Threads | Result | Speedup
+=item ---------------------------- | ------------ | ------------ | ------- | ------ | -------
+=item Bit::Set operations - Rep1   | 388,479,000  | 2.57         | 1       | 512    | 1.00
+=item Bit::Set operations - Rep2   | 389,512,000  | 2.57         | 1       | 512    | 1.00
+=item Bit::Set operations - Rep3   | 389,775,000  | 2.57         | 1       | 512    | 1.00
+=item Container - CPU              | 82,856,000   | 12.07        | 1       | 512    | 4.69
+=item Container - CPU              | 62,179,000   | 16.08        | 2       | 512    | 6.25
+=item Container - CPU              | 59,269,000   | 16.87        | 3       | 512    | 6.55
+=item Container - CPU              | 61,368,000   | 16.30        | 4       | 512    | 6.33
+=item Container - GPU              | 261,441,000  | 3.82         | GPU     | 512    | 1.49
+=item Container - GPU              | 62,523,000   | 15.99        | GPU     | 512    | 6.21
+=item Container - GPU              | 61,467,000   | 16.27        | GPU     | 512    | 6.32
+=item Container - CPU - PDL        | 12,559,000   | 79.62        | 1       | 512    | 30.93
+=item Container - CPU - PDL        | 9,313,000    | 107.38       | 2       | 512    | 41.71
+=item Container - CPU - PDL        | 5,441,000    | 183.79       | 3       | 512    | 71.40
+=item Container - CPU - PDL        | 4,457,000    | 224.37       | 4       | 512    | 87.16
+=item Container - GPU with PDL     | 10,763,000   | 92.91        | GPU     | 512    | 36.09
+=item Container - GPU with PDL     | 8,662,000    | 115.45       | GPU     | 512    | 44.85
+=item Container - GPU with PDL     | 8,247,000    | 121.26       | GPU     | 512    | 47.11
 
 =back
 
@@ -1410,12 +1400,11 @@ The code for the benchmark runs as a commandline command script and is the follo
 
 =over 4
 
-=item L<Bit::Set|https://metacpan.org/pod/Bit::Set>
+=item L<Alien::Bit|https://metacpan.org/pod/Alien::Bit>
 
-C<Bit::Set> is a Perl module that provides a high-level interface for working with 
-bitsets. It is built on top of the Bit library and offers a more user-friendly 
-API for common bitset operations. It is the parent module of C<Bit::Set::DB> and
-provides further details about the vibecoding of the C<Bit::Set::DB> module.
+This distribution provides the library Bit so that it can be used by other Perl 
+distributions that are on CPAN. It will download Bit from Github and will build 
+the (static and dynamic) versions of the library for use by other Perl modules.
 
 =item L<Bit|https://github.com/chrisarg/Bit>
 
@@ -1429,17 +1418,27 @@ Addison-Wesley ISBN 0-201-49841-3 extended to incorporate additional operations
 fast population counts using the libpocnt library and GPU operations for packed 
 containers of (collections) of Bit(sets).
 
-=item L<Alien::Bit|https://metacpan.org/pod/Alien::Bit>
+=item L<Bit::Set|https://metacpan.org/pod/Bit::Set>
 
-This distribution provides the library Bit so that it can be used by other Perl 
-distributions that are on CPAN. It will download Bit from Github and will build 
-the (static and dynamic) versions of the library for use by other Perl modules.
+C<Bit::Set> is a Perl module that provides a high-level I<procedural> interface 
+for working with bitsets. It is built on top of the Bit library and offers a 
+more user-friendly Perl API for common bitset operations. 
+It is the parent module of C<Bit::Set::DB> and provides further details about 
+the vibecoding of the C<Bit::Set::DB> module.
+
+=item L<Bit::Set::OO|https://metacpan.org/pod/Bit::Set::OO>
+
+Object Oriented interface to the Bit::Set module.
+
+=item L<Bit::Set::DB::OO|https://metacpan.org/pod/Bit::Set::DB::OO>
+
+Object Oriented interface to the Bit::Set::DB module.
 
 =back
 
 =head1 AUTHOR
 
-GitHub Copilot (Claude Sonnet 4), guided by Christos Argyropoulos.
+Christos Argyropoulos with asistance from Github Copilot (Claude Sonnet 4).
 
 =head1 COPYRIGHT AND LICENSE
 

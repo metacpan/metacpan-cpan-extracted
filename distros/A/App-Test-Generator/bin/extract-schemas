@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+
+use Data::Dumper;
 use Getopt::Long;
 use Pod::Usage;
 use FindBin;
@@ -75,14 +77,13 @@ pod2usage(1) if $opts{help};
 pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
 
 # Get input file
-my $input_file = shift @ARGV or pod2usage("Error: No input file specified");
+my $input_file = shift @ARGV or pod2usage('Error: No input file specified');
 
-die "Error: File not found: $input_file\n" unless -f $input_file;
+die "Error: File not found: $input_file" unless -f $input_file;
 
 # Run the extractor
 print "Extracting schemas from: $input_file\n";
-print "Output directory: $opts{output_dir}\n";
-print "\n";
+print "Output directory: $opts{output_dir}\n\n";
 
 my $extractor = App::Test::Generator::SchemaExtractor->new(
 	input_file => $input_file,
@@ -101,16 +102,16 @@ my %iconfidence_counts = (high => 0, medium => 0, low => 0);
 my %oconfidence_counts = (high => 0, medium => 0, low => 0);
 
 foreach my $method (sort keys %$schemas) {
-    my $schema = $schemas->{$method};
-    my $iconf = $schema->{_confidence}{input}->{level};
-    $iconfidence_counts{$iconf}++;
-    my $oconf = $schema->{_confidence}{output}->{level};
-    $oconfidence_counts{$oconf}++;
+	my $schema = $schemas->{$method};
+	my $iconf = $schema->{_confidence}{input}->{level};
+	$iconfidence_counts{$iconf}++;
+	my $oconf = $schema->{_confidence}{output}->{level};
+	$oconfidence_counts{$oconf}++;
 
-    my $param_count = scalar keys %{$schema->{input}};
+	my $param_count = scalar keys %{$schema->{input}};
 
-    printf "%-30s %d params  [%s input confidence] [%s output confidence]\n",
-        $method, $param_count, uc($iconf), uc($oconf);
+	printf "%-30s %d params  [%s input confidence] [%s output confidence]\n",
+		$method, $param_count, uc($iconf), uc($oconf);
 }
 
 print "\n";
@@ -119,17 +120,20 @@ print "  Input:\n";
 print "    High confidence:   $iconfidence_counts{high}\n";
 print "    Medium confidence: $iconfidence_counts{medium}\n";
 print "    Low confidence:    $iconfidence_counts{low}\n";
-print "  Outut:\n";
+print "  Output:\n";
 print "    High confidence:   $oconfidence_counts{high}\n";
 print "    Medium confidence: $oconfidence_counts{medium}\n";
 print "    Low confidence:    $oconfidence_counts{low}\n";
 print "\n";
 
 if ($iconfidence_counts{low} > 0 || $iconfidence_counts{medium} > 0) {
-    print "RECOMMENDATION:\n";
-    print "Review the generated schemas in $opts{output_dir}/\n";
-    print "Focus on methods with medium/low confidence ratings.\n";
-    print "\n";
+	print "RECOMMENDATION:\n",
+		"Review the generated schemas in $opts{output_dir}/\n",
+		"Focus on methods with medium/low confidence ratings.\n\n";
+}
+
+if($opts{'verbose'}) {
+	print "Schemas:\n\t", Dumper($schemas);
 }
 
 print "Schema files written to: $opts{output_dir}/\n";

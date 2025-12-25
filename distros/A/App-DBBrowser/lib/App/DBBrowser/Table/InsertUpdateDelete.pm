@@ -31,13 +31,14 @@ sub table_write_access {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatement->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $dbms = $sf->{i}{dbms};
     my @stmt_types;
     if ( $sf->{d}{table_origin} eq 'ordinary' ) {
         push @stmt_types, 'Insert' if $sf->{o}{enable}{insert_into};
         push @stmt_types, 'Update' if $sf->{o}{enable}{update};
         push @stmt_types, 'Delete' if $sf->{o}{enable}{delete};
     }
-    elsif ( $sf->{d}{table_origin} eq 'join' && $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $sf->{d}{table_origin} eq 'join' && $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         push @stmt_types, 'Update' if $sf->{o}{enable}{update};
     }
     if ( ! @stmt_types ) {
@@ -68,7 +69,7 @@ sub table_write_access {
         $stmt_type =~ s/^-\ //;
         $sf->{d}{stmt_types} = [ $stmt_type ];
         $ax->reset_sql( $sql );
-        if ( $stmt_type eq 'Insert' || $sf->{i}{driver} eq 'SQLite' ) {
+        if ( $stmt_type eq 'Insert' || $dbms eq 'SQLite' ) {
             #if ( $sf->{d}{table_origin} eq 'ordinary' ) {
                 # use tablename without alias:
                 my $table_key = $sf->{d}{table_key};
@@ -199,9 +200,9 @@ sub __first_column_is_autoincrement { ##
     my $dbh = $sf->{d}{dbh};
     my $schema = $sf->{d}{schema};
     my $nq_table = $sf->{d}{tables_info}{$sf->{d}{table_key}}[2];
-    my $driver = $sf->{i}{driver};
-    if ( $driver eq 'SQLite' ) {
-        if ( ! defined $schema ) {
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms eq 'SQLite' ) {
+        if ( $sf->{d}{db_attached} ) {
             # return if a table is from an attached database
             my $main = 'main';
             my $qt_main = $dbh->quote_identifier( $main );
@@ -219,7 +220,7 @@ sub __first_column_is_autoincrement { ##
             return 1;
         }
     }
-    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         my $stmt = "SELECT COUNT(*) FROM information_schema.columns WHERE
                     TABLE_SCHEMA = ?
                 AND TABLE_NAME = ?
@@ -231,7 +232,7 @@ sub __first_column_is_autoincrement { ##
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $driver eq 'Pg' ) {
+    elsif ( $dbms eq 'Pg' ) {
         my $stmt = "SELECT COUNT(*) FROM information_schema.columns WHERE
                     TABLE_SCHEMA = ?
                 AND TABLE_NAME = ?
@@ -245,7 +246,7 @@ sub __first_column_is_autoincrement { ##
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'Firebird' ) {
         my $stmt = "SELECT COUNT(*) FROM RDB\$RELATION_FIELDS WHERE
                 RDB\$RELATION_NAME = ?
             AND RDB\$FIELD_POSITION = 0
@@ -256,7 +257,7 @@ sub __first_column_is_autoincrement { ##
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $nq_table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $driver eq 'DB2' ) {
+    elsif ( $dbms eq 'DB2' ) {
         my $stmt = "SELECT COUNT(*) FROM SYSCAT.COLUMNS WHERE
                 TABSCHEMA = ?
             AND TABNAME = ?
@@ -269,7 +270,7 @@ sub __first_column_is_autoincrement { ##
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
         return $first_col_is_autoincrement;
     }
-    elsif ( $driver eq 'Oracle' ) {
+    elsif ( $dbms eq 'Oracle' ) {
         my $stmt = "SELECT COUNT(*) FROM SYS.ALL_TAB_COLUMNS WHERE
                 OWNER = ?
             AND TABLE_NAME = ?
@@ -278,6 +279,14 @@ sub __first_column_is_autoincrement { ##
             AND COLUMN_ID = 1
             AND IDENTITY_COLUMN = 'YES'";
         my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, $schema, $nq_table );
+        return $first_col_is_autoincrement;
+    }
+    elsif ( $dbms eq 'MSSQL' ) {
+            my $stmt = "SELECT COUNT(*) FROM sys.columns WHERE
+                object_id = OBJECT_ID( ? )
+            AND column_id = 1
+            AND is_identity = 1";
+        my ( $first_col_is_autoincrement ) = $dbh->selectrow_array( $stmt, {}, "$schema.$nq_table" );
         return $first_col_is_autoincrement;
     }
     return;

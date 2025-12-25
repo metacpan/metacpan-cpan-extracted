@@ -4,6 +4,7 @@ requires 'Dist::Zilla', '6.032';
 requires 'Dist::Zilla::Plugin::Alien', '0.011';
 requires 'Dist::Zilla::Plugin::Authority', '1.006';
 requires 'Dist::Zilla::PluginBundle::Git', '2.009';
+requires 'Dist::Zilla::PluginBundle::Git::VersionManager', '0';
 requires 'Dist::Zilla::Plugin::Deprecated', '0.007';
 requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch', '0.006';
 requires 'Dist::Zilla::Plugin::GithubMeta', '0.28';

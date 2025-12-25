@@ -25,9 +25,9 @@ is(run('-Mup --no-pager -- true')->status, 0, '-Mup true');
 like(run('-Mup --no-pager -- echo hello')->stdout, qr/hello/, '-Mup echo hello');
 
 # Test column layout by checking data distribution
-# With -C2 --height=8, 1..10 should split into two columns (1-8 and 9-10)
+# With -C2 -P8, 1..10 should split into two columns (1-8 and 9-10)
 subtest 'column layout' => sub {
-    my $out = optex('-Mup', '--no-pager', '-C2', '--height=8', '--bs=none', '--',
+    my $out = optex('-Mup', '--no-pager', '-C2', '-P8', '--bs=none', '--',
                     'perl', '-e', 'print "$_\n" for 1..10')->run->stdout;
     like($out, qr/^.*\b1\b.*\b9\b.*$/m, '1 and 9 on same line (2 columns)');
     like($out, qr/^.*\b2\b.*\b10\b.*$/m, '2 and 10 on same line (2 columns)');

@@ -11,13 +11,13 @@ use Term::Choose         qw();
 use Term::Form::ReadLine qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::From::Subquery;                      # required
-#use App::DBBrowser::Table::Extensions::Maths;            # required
-#use App::DBBrowser::Table::Extensions::Case;             # required
-#use App::DBBrowser::Table::Extensions::ColAliases;       # required
-#use App::DBBrowser::Table::Extensions::Columns;          # required
-#use App::DBBrowser::Table::Extensions::ScalarFunctions;  # required
-#use App::DBBrowser::Table::Extensions::WindowFunctions;  # required
+use App::DBBrowser::From::Subquery;
+use App::DBBrowser::Table::Extensions::Maths;
+use App::DBBrowser::Table::Extensions::Case;
+use App::DBBrowser::Table::Extensions::ColAliases;
+use App::DBBrowser::Table::Extensions::Columns;
+use App::DBBrowser::Table::Extensions::ScalarFunctions;
+use App::DBBrowser::Table::Extensions::WindowFunctions;
 use App::DBBrowser::Table::Substatement::Aggregate;
 
 
@@ -268,7 +268,6 @@ sub __choose_extension {
             }
         }
         elsif ( $extension eq $e_subquery ) {
-            require App::DBBrowser::From::Subquery;
             my $new_sq = App::DBBrowser::From::Subquery->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $subq = $new_sq->subquery( $sql, $info );
             if ( ! defined $subq ) {
@@ -278,7 +277,6 @@ sub __choose_extension {
             return $subq;
         }
         elsif ( $extension eq $e_scalar_func ) {
-            require App::DBBrowser::Table::Extensions::ScalarFunctions;
             my $new_func = App::DBBrowser::Table::Extensions::ScalarFunctions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $scalar_func_stmt = $new_func->scalar_function( $sql, $clause, $cols, $r_data ); # recursion yes
             if ( ! defined $scalar_func_stmt ) {
@@ -288,7 +286,6 @@ sub __choose_extension {
             return $scalar_func_stmt;
         }
         elsif ( $extension eq $e_window_func ) {
-            require App::DBBrowser::Table::Extensions::WindowFunctions;
             my $wf = App::DBBrowser::Table::Extensions::WindowFunctions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $win_func_stmt = $wf->window_function( $sql, $clause, $cols, $r_data );
             if ( ! defined $win_func_stmt ) {
@@ -298,7 +295,6 @@ sub __choose_extension {
             return $win_func_stmt;
         }
         elsif ( $extension eq $e_case  ) {
-            require App::DBBrowser::Table::Extensions::Case;
             my $new_cs = App::DBBrowser::Table::Extensions::Case->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $case_stmt = $new_cs->case( $sql, $clause, $cols, $r_data ); # recursion yes
             if ( ! defined $case_stmt ) {
@@ -308,7 +304,6 @@ sub __choose_extension {
             return $case_stmt;
         }
         elsif ( $extension eq $e_math  ) {
-            require App::DBBrowser::Table::Extensions::Maths;
             my $new_math = App::DBBrowser::Table::Extensions::Maths->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $arith = $new_math->maths( $sql, $clause, $cols, $r_data ); # recursion yes
             if ( ! defined $arith ) {
@@ -318,7 +313,6 @@ sub __choose_extension {
             return $arith;
         }
         elsif ( $extension eq $e_col ) {
-            require App::DBBrowser::Table::Extensions::Columns;
             my $new_col = App::DBBrowser::Table::Extensions::Columns->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $col = $new_col->columns( $sql, $cols, $info );
             if ( ! defined $col ) {
@@ -343,7 +337,6 @@ sub __choose_extension {
             return '';
         }
         elsif ( $extension eq $e_col_aliases  ) {
-            require App::DBBrowser::Table::Extensions::ColAliases;
             my $new_ca = App::DBBrowser::Table::Extensions::ColAliases->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $col_aliases = $new_ca->column_aliases( $sql );
             if ( ! defined $col_aliases ) {
@@ -410,7 +403,6 @@ sub nested_func_info {
             }
         }
         elsif ( $type eq $case ) {
-            require App::DBBrowser::Table::Extensions::Case;
             my $new_cs = App::DBBrowser::Table::Extensions::Case->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $case_stmt = $new_cs->format_case( $func_info, $case_count );
             $case_stmt =~ s/^\s+// if $info =~ /\(\z/;

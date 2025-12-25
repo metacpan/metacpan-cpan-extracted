@@ -10,6 +10,5 @@ minil.toml
 script/nup
 t/00_compile.t
 t/01_nup.t
-share/getoptlong/getoptlong.sh
 META.yml
 MANIFEST

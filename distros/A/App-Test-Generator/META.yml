@@ -20,6 +20,7 @@ build_requires:
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0.02'
+  Unicode::GCString: '0'
   Unicode::Normalize: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -48,6 +49,7 @@ requires:
   Pod::Simple: '0'
   Pod::Usage: '0'
   Return::Set: '0.03'
+  Safe: '0'
   Template: '0'
   YAML::XS: '0'
   autodie: '0'
@@ -56,5 +58,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

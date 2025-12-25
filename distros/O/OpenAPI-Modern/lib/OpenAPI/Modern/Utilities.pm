@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use 5.020;
 use strictures 2;
@@ -50,7 +50,7 @@ use constant SUPPORTED_OAD_VERSIONS => [ '3.0.4', '3.1.2', '3.2.0' ];
 # in most things, e.g. schemas, we only use major.minor as the version number
 # we don't actually support OAS 3.0.x, but we will bundle its schema so it can be more easily used
 # for validating v3.0 OADs
-use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+$//r, SUPPORTED_OAD_VERSIONS->@* ];
+use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+\z//r, SUPPORTED_OAD_VERSIONS->@* ];
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
 # these are updated automatically at build time via 'update-schemas'
@@ -153,7 +153,7 @@ sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
     my $document = load_cached_document($evaluator, $uri);
 
     # add "latest" alias for each of these documents, mapping to the same document object
-    $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}$}{}r).'/latest', $document);
+    $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}\z}{}r).'/latest', $document);
   }
 }
 
@@ -179,7 +179,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.117
+version 0.118
 
 =head1 SYNOPSIS
 

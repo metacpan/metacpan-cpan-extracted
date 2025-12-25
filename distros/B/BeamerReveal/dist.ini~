@@ -1,0 +1,27 @@
+name             = BeamerReveal
+author           = Walter Daems <wdaems@cpan.org>
+license          = GPL_3
+copyright_holder = Walter Daems
+copyright_year   = 2025
+
+main_module      = bin/beamer-reveal.pl
+
+[@Starter]
+
+[FileFinder::ByName / Perlbins]
+dir  = bin
+file = *.pl
+
+[Encoding]
+encoding = bytes
+match = \.(?:gif|png|jpe?g|pdf|zip|ogg)$
+
+[PodWeaver]
+finder = :InstallModules
+finder = Perlbins
+
+[AutoVersion]
+major = 0
+format = {{ cldr('yyyMMdd') }}.{{ cldr( 'HHmm' ) }}
+
+[PodVersion]

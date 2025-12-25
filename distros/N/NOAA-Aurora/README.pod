@@ -1,0 +1,200 @@
+=head1 NAME
+
+NOAA::Aurora - Simple client for NOAA's Aurora Forecast Service
+
+=head1 SYNOPSIS
+
+  use NOAA::Aurora;
+
+  # Constructor can use RFC 3339 or ISO instead of timestamps for timeseries
+  my $aurora = NOAA::Aurora->new(date_format => 'rfc');
+
+  # Save the latest probability map to an image file
+  $aurora->get_image(hemisphere => 'north', output => 'aurora_north.jpg');
+
+  # Get aurora probability for a given location
+  my $probability = $aurora->get_probability(lat => 51.2, lon => -1.8);
+
+  # Get 3-day forecast as a timeseries
+  my $forecast = $aurora->get_forecast();
+
+  # Get 27-day outlook as a timeseries
+  my $outlook = $aurora->get_outlook();
+
+=head1 DESCRIPTION
+
+NOAA::Aurora provides basic access to the L<NOAA Space Weather Prediction Center (SWPC)|https://www.swpc.noaa.gov/>
+Aurora Forecast API. This service provides real-time aurora forecasts based on solar activity and geomagnetic conditions.
+
+The module fetches aurora probability data, latest aurora images, and the 3-day aurora forecast.
+
+Responses are cached (by default for 120 sec).
+
+=head1 CONSTRUCTOR
+
+=head2 C<new>
+
+    my $aurora = NOAA::Aurora->new(
+        cache       => $cache_secs?,
+        swpc        => $swpc_services_subdomain,
+        date_format => $unix_rfc_or_iso,
+        timeout     => $timeout_sec?,
+        agent       => $user_agent_string?,
+        ua          => $lwp_ua?,
+    );
+  
+Optional parameters:
+
+=over 4
+
+=item * C<cache> : Will cache results for the specified seconds. Default: C<120>.
+
+=item * C<swpc> : Space Weather Prediction Center subdomain. Default: C<services.swpc.noaa.gov>.
+
+=item * C<date_format> : Format for functions that return dates/timestamps.
+Can be C<unix> (unix timestamp), C<rfc> (for I<YYYY-MM-DD HH:mm:ssZ>) or C<iso> (for I<YYYY-MM-DDTHH:mm:ssZ>).
+Default: C<unix>.
+
+=item * C<timeout> : Timeout for requests in secs. Default: C<30>.
+
+=item * C<agent> : Customize the user agent string.
+
+=item * C<ua> : Pass your own L<LWP::UserAgent> to customise further.
+
+=back
+
+Note that the module base is L<Weather::API::Base>, so some additional parameters
+are inherited - see the base module for details.
+
+=head1 METHODS
+
+=head2 C<get_image>
+
+    my $image_data = $aurora->get_image(
+        hemisphere => $hem,
+        output     => $filename?
+    );
+
+Returns the latest aurora oval image for the specified hemisphere in jpg data.
+Optionally will save it to $filename.
+Function caches the results (see constructor).
+
+Optional parameters:
+
+=over 4
+
+=item * C<hemisphere> : C<north> or C<south> (accepts abbreviations). Default: C<north>.
+
+=item * C<output> : If specified will save to specified jpg file.
+
+=back
+
+=head2 C<get_probability>
+
+    my $probability = $aurora->get_probability(
+        lat  => $lat,
+        lon  => $lon,
+        hash => $return_hash?
+    );
+
+Fetches the aurora probability at a specific latitude and longitude if specified,
+otherwise will return all the globe. Can return the original NOAA JSON string, or
+decode it into a Perl hash of hashes:
+
+    {
+        $longitude1 => {$latitude1 => $prob},
+        ...
+    }
+
+Probability given as an integer percentage value (0-100). Granularity is 1 degree.
+In Perl hash mode, 0 probability locations will be ommitted from the response.
+
+The function caches the results (see constructor), so subsequent calls will not
+require downloading and decoding.
+
+Optional parameters:
+
+=over 4
+
+=item * C<hash> : If true, will return Perl hash instead of JSON.
+
+=back
+
+=head2 C<get_forecast>
+
+    my $forecast = $aurora->get_forecast(
+        format => $output?
+    );
+
+Retrieves NOAA's 3-day space forecast (preferred over the geomagnetic forecast due
+to more frequent / twice daily update) and by default returns an arrayref of hashes:
+
+    [{time => $timestamp, kp => $kp_value},...]
+
+The timestamp will be at the start of the 3h time range NOAA returns.
+
+Optional parameters:
+
+=over 4
+
+=item * C<format> : If C<'text'> is specified as the format, raw text output will be returned
+instead of an array with the timeseries.
+
+=back
+
+=head2 C<get_outlook>
+
+    my $outlook = $aurora->get_outlook(
+        format => $output?
+    );
+
+Retrieves NOAA's 27-day outlook with the forecasted daily values for the 10.7cm Solar
+radio flux, the Planetary A Index and the largest Kp index. By default returns an
+arrayref of hashes:
+
+ [
+   {
+     time => $timestamp,
+     flux => $flux_value,
+     ap   => $a_index,
+     kp   => $max_kp_value
+   }, ...
+ ]
+
+=over 4
+
+=item * C<format> : If C<'text'> is specified as the format, raw text output will be returned
+instead of an array with the timeseries.
+
+=back
+
+=head1 UTILITY FUNCTIONS
+
+=head2 C<kp_to_g>
+
+    my $g_index = kp_to_g($kp_index);
+
+Pass the Kp index and get the G-Index (Geomagnetic storm from G1 to G5) or 0 if
+the Kp is not indicative of a Geomagnetic Storm. Fractional kp is rounded half up
+(e.g. kp >= 4.5 -> G1).
+
+=head1 AUTHOR
+
+Dimitrios Kechagias, C<< <dkechag at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests either on L<GitHub|https://github.com/dkechag/NOAA-Aurora> (preferred), or on RT (via the email
+C<bug-noaa-aurora at rt.cpan.org> or L<web interface|https://rt.cpan.org/NoAuth/ReportBug.html?Queue=NOAA-Aurora>).
+
+=head1 GIT
+
+L<https://github.com/dkechag/NOAA-Aurora>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Dimitrios Kechagias.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

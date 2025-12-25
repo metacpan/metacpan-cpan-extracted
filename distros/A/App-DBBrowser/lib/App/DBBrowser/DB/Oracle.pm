@@ -9,8 +9,8 @@ use DBI qw();
 
 use Term::Choose qw( choose );
 
+use App::DBBrowser::Auxil;
 use App::DBBrowser::Credentials;
-use App::DBBrowser::Opt::DBGet;
 
 
 sub new {
@@ -29,64 +29,23 @@ sub get_db_driver {
 }
 
 
-sub env_variables {
-    my ( $sf ) = @_;
-    return [ qw( DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
-}
-
-
-sub read_login_data {
-    my ( $sf ) = @_;
-    return [
-        { name => 'host', secret => 0 },
-        { name => 'port', secret => 0 },
-        { name => 'user', secret => 0 },
-        { name => 'pass', secret => 1 },
-    ];
-}
-
-
-sub read_attributes {
-    my ( $sf ) = @_;
-    return [
-        { name => 'ora_charset', default => 'AL32UTF8' },
-        { name => 'LongReadLen', default => 80         },
-    ];
-}
-
-
-sub set_attributes {
-    my ( $sf ) = @_;
-    return [
-        { name => 'LongTruncOk', default => 0, values => [ 0, 1 ] },
-        { name => 'ChopBlanks',  default => 0, values => [ 0, 1 ] },
-        { name => 'AskIfSID',    default => 0, values => [ 0, 1 ] },
-    ];
-}
-
-
 sub get_db_handle {
     my ( $sf, $db ) = @_;
-    my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
-    my $db_opt         = $db_opt_get->read_db_config_files();
-    my $login_data     = $db_opt_get->get_login_data( $db, $db_opt );
-    my $env_var_yes    = $db_opt_get->enabled_env_vars( $db, $db_opt );
-    my $read_attributes = $db_opt_get->get_read_attributes( $db, $db_opt );
-    my $set_attributes  = $db_opt_get->get_set_attributes( $db, $db_opt );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
-    my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
     my $show_sofar = 'DB: '. $db;
-    my $host = $cred->get_login( 'host', $show_sofar, $settings );
+    my $host = $cred->get_login( 'host', $show_sofar );
     my $port;
     if ( length $host ) {
         $show_sofar .= "\n" . 'Host: ' . $host;
-        $port = $cred->get_login( 'port', $show_sofar, $settings );
+        $port = $cred->get_login( 'port', $show_sofar );
         if ( length $port ) {
             $show_sofar .= "\n" . 'Port: ' . $port;
         }
     }
-    my $ask_if_sid = delete $set_attributes->{AskIfSID};
-    my $dsn = "dbi:$sf->{i}{driver}:";
+    my $attr = $ax->clone_data( $sf->{o}{connect_attr} );
+    my $ask_if_sid = delete $attr->{AskIfSID};
+    my $dsn = "dbi:Oracle:";
     if ( $host ) {
         my $db_type;
         my $sid = 'SID';
@@ -119,16 +78,15 @@ sub get_db_handle {
     else {
         $dsn .= $db;
     }
-    my $user = $cred->get_login( 'user', $show_sofar, $settings );
+    my $user = $cred->get_login( 'user', $show_sofar );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;
-    my $passwd = $cred->get_login( 'pass', $show_sofar, $settings );
+    my $passwd = $cred->get_login( 'pass', $show_sofar );
     my $dbh = DBI->connect( $dsn, $user, $passwd, {
         PrintError => 0,
         RaiseError => 1,
         AutoCommit => 1,
         ShowErrorStatement => 1,
-        %$read_attributes,
-        %$set_attributes,
+        %{$attr//{}},
     } );
     return $dbh;
 }
@@ -140,8 +98,6 @@ sub get_databases {
     my @data_sources = DBI->data_sources( 'Oracle' );
     return [ map { s/^dbi:Oracle://; $_ } @data_sources ], [];
 }
-
-
 
 
 

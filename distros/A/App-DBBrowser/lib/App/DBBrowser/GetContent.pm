@@ -1,6 +1,5 @@
 package # hide from PAUSE
 App::DBBrowser::GetContent;
-
 use warnings;
 use strict;
 use 5.016;
@@ -15,7 +14,8 @@ use Term::Choose qw();
 use App::DBBrowser::GetContent::Filter;
 use App::DBBrowser::GetContent::Parse;
 use App::DBBrowser::GetContent::Source;
-use App::DBBrowser::Opt::Set;
+use App::DBBrowser::Options;
+use App::DBBrowser::Options::ReadWrite;
 
 use open ':encoding(locale)';
 
@@ -180,8 +180,10 @@ sub get_content {
                         $source->{old_idx_file} = $idx;
                     }
                     if ( $menu->[$idx]  eq $hidden ) {
-                        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                        $opt_set->set_options( 'import' );
+                        my $op = App::DBBrowser::Options->new( $sf->{i}, $sf->{o} );
+                        my $op_rw = App::DBBrowser::Options::ReadWrite->new( $sf->{i}, $sf->{o} );
+                        $op->config_groups( [ { name => 'group_import', text => "- Import" } ], $sf->{i}{plugin} );
+                        $op_rw->read_config_file( $sf->{i}{driver}, $sf->{i}{plugin} );
                         next FILE;
                     }
                     elsif ( $menu->[$idx] eq $change_dir ) {
@@ -279,8 +281,10 @@ sub get_content {
                             next FILE;
                         }
                         elsif ( $ok == -1 ) { # -1 -> REPARSE
-                            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                            $opt_set->set_options( 'import' );
+                            my $op = App::DBBrowser::Options->new( $sf->{i}, $sf->{o} );
+                            my $op_rw = App::DBBrowser::Options::ReadWrite->new( $sf->{i}, $sf->{o} );
+                            $op->config_groups( [ { name => 'group_import', text => "- Import" } ], $sf->{i}{plugin} );
+                            $op_rw->read_config_file( $sf->{i}{driver}, $sf->{i}{plugin} );
                             next PARSE;
                         }
                         return 1;

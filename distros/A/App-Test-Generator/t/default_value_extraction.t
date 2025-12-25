@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(extended);
 use Test::Most;
 use File::Temp qw(tempdir);
 use File::Spec;
@@ -32,7 +34,7 @@ sub create_extractor {
 	);
 }
 
-# Test 1: Basic default value patterns
+# Basic default value patterns
 subtest 'Basic Default Value Patterns' => sub {
 	my $module = <<'END_MODULE';
 package Test::Defaults;
@@ -123,7 +125,7 @@ END_BODY
 	done_testing();
 };
 
-# Test 2: Complex default value patterns
+# Complex default value patterns
 subtest 'Complex Default Value Patterns' => sub {
 	my $module = <<'END_MODULE';
 package Test::ComplexDefaults;
@@ -204,7 +206,7 @@ END_BODY
 	done_testing();
 };
 
-# Test 3: Default value cleaning
+# Default value cleaning
 subtest 'Default Value Cleaning' => sub {
 	my $extractor = create_extractor('package Dummy; sub dummy {}');
 
@@ -314,7 +316,7 @@ subtest 'Default Value Cleaning' => sub {
 	done_testing();
 };
 
-# Test 4: POD default value extraction
+# POD default value extraction
 subtest 'POD Default Value Extraction' => sub {
 	my $module = <<'END_MODULE';
 package Test::PODDefaults;
@@ -425,7 +427,7 @@ END_MODULE
 	done_testing();
 };
 
-# Test 5: Integrated parameter analysis with defaults
+# Integrated parameter analysis with defaults
 subtest 'Integrated Parameter Analysis with Defaults' => sub {
 	my $module = <<'END_MODULE';
 package Test::IntegratedDefaults;
@@ -562,7 +564,7 @@ END_MODULE
 	done_testing();
 };
 
-# Test 6: Edge cases and tricky patterns
+# Edge cases and tricky patterns
 subtest 'Edge Cases and Tricky Patterns' => sub {
 	my $module = <<'END_MODULE';
 package Test::EdgeCases;
@@ -667,7 +669,7 @@ is(
 	done_testing();
 };
 
-# Test 7: Real-world example
+# Real-world example
 subtest 'Real-World Example' => sub {
 	my $module = <<'END_MODULE';
 package Test::RealWorld;

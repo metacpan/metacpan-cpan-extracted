@@ -39,7 +39,10 @@ t/fuzz.t
 t/generate.t
 t/html_genealogy_map.t
 t/modern.t
+t/moosex_params_validate.t
 t/object_detection.t
+t/params_validate.t
+t/params_validate_strict.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-spelling.t
@@ -50,6 +53,7 @@ t/return.t
 t/schema_input.t
 t/test_extractor.t
 t/test_hints.t
+t/type_params.t
 t/unused.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

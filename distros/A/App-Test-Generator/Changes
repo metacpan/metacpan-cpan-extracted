@@ -1,5 +1,12 @@
 Revision history for App-Test-Generator
 
+0.23	Wed Dec 24 10:48:03 EST 2025
+	Fix https://www.cpantesters.org/cpan/report/079dba46-d92f-11f0-9642-dde56d8775ea
+	Don't give false negative that memberof isn't known
+	SchemaExtractor output files now end in .yml not .yaml
+	Ensure rand_str isn't called when memberof is set
+	When test_empty is set, do the right thing for memberof
+
 0.22	Sun Dec 21 20:59:58 EST 2025
 	Added better API to generate
 	Added parameter relationship detection (mutually exclusive, required groups, conditional requirements, dependencies, value constraints)

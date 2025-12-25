@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.630';
+our $VERSION = '0.631';
 
 use 5.020;
 use Moo;
@@ -238,6 +238,9 @@ sub combine ($self, $other, $swap) {
     ],
     output_format => $self->output_format,
     formatted_annotations => $self->formatted_annotations || $other->formatted_annotations,
+    $self->defaults || $other->defaults
+      ? (defaults => +{ ($self->defaults//{})->%*, ($other->defaults//{})->%* })
+      : (),
   );
 }
 
@@ -285,7 +288,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.630
+version 0.631
 
 =head1 SYNOPSIS
 

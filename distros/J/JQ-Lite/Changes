@@ -1,3 +1,20 @@
+1.57  2025-12-24
+
+    - Add opt-in contains_subset() providing jq-style array subset
+      containment (order-insensitive with multiset matching) while
+      preserving legacy contains() semantics for arrays.
+    - Document the new array subset helper and clarify default array
+      behavior for contains().
+    - Cover subset array matching and nested array/object combinations
+      with regression tests.
+
+1.56  2025-12-24
+
+    - Parse contains/inside arguments as literal JSON values so null
+      survives argument parsing and matches null inputs.
+    - Extend contains/inside containment checks to treat null inputs as
+      matching null containers and add coverage for the behavior.
+
 1.55  2025-12-21
 
     - Fix CLI smoke tests to reliably locate and execute jq-lite during
@@ -990,6 +1007,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

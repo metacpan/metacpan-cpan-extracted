@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.630';
+our $VERSION = '0.631';
 
 use 5.020;
 use Moo;
@@ -40,9 +40,9 @@ sub keywords ($class, $spec_version) {
     $spec_version ne 'draft4' ? 'const' : (),
     qw(multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
       maxLength minLength pattern maxItems minItems uniqueItems),
-    $spec_version !~ /^draft[467]$/ ? qw(maxContains minContains) : (),
+    $spec_version !~ /^draft[467]\z/ ? qw(maxContains minContains) : (),
     qw(maxProperties minProperties required),
-    $spec_version !~ /^draft[467]$/ ? 'dependentRequired' : (),
+    $spec_version !~ /^draft[467]\z/ ? 'dependentRequired' : (),
   );
 }
 
@@ -362,7 +362,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.630
+version 0.631
 
 =head1 DESCRIPTION
 

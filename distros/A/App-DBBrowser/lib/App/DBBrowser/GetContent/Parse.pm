@@ -18,7 +18,8 @@ use Term::Choose::Screen   qw( clear_screen );
 use Term::Choose::Util     qw( get_term_size unicode_sprintf insert_sep );
 use Term::Form             qw();
 
-use App::DBBrowser::Opt::Set;
+use App::DBBrowser::Options;
+use App::DBBrowser::Options::ReadWrite;
 
 
 sub new {
@@ -177,8 +178,10 @@ sub parse_with_template {
             $old_idx = $idx;
         }
         if ( $menu->[$idx] eq $reparse ) {
-            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-            $sf->{o} = $opt_set->set_options( 'import' );
+            my $op = App::DBBrowser::Options->new( $sf->{i}, $sf->{o} );
+            my $op_rw = App::DBBrowser::Options::ReadWrite->new( $sf->{i}, $sf->{o} );
+            $op->config_groups( [ { name => 'group_import', text => "- Import" } ], $sf->{i}{plugin} );
+            $op_rw->read_config_file( $sf->{i}{driver}, $sf->{i}{plugin} );
             return -1;
         }
         require String::Unescape;
@@ -318,7 +321,7 @@ sub parse_with_Spreadsheet_Read {
             $book = Spreadsheet::Read::ReadData( $file_fs, cells => 0, attr => 0, rc => 1, strip => 0 );
             1 }
         ) {
-            die "Read::Spreadsheet: $@";
+            die "Spreadsheet::Read: $@";
         }
         if ( ! defined $book ) {
             $tc->choose(

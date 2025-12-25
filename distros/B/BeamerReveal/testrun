@@ -1,0 +1,7 @@
+#!/bin/bash
+cd ../LaTeX-beamer-reveal
+l3build doc
+cp -r build/doc/beamer-reveal-example.{tex,pdf,rvl} build/doc/Media ../Perl-beamer-reveal
+cd ../Perl-beamer-reveal
+dzil run
+

@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Run" => "0.018",
     "Dist::Zilla::Plugin::TaskWeaver" => "0.101624",
     "Dist::Zilla::PluginBundle::Git" => "2.009",
+    "Dist::Zilla::PluginBundle::Git::VersionManager" => 0,
     "Pod::Elemental" => "0.102362",
     "Pod::Elemental::Transformer::List" => "0.101620",
     "Pod::Weaver" => "3.101638",
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.120",
+  "VERSION" => "0.202",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +65,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Run" => "0.018",
   "Dist::Zilla::Plugin::TaskWeaver" => "0.101624",
   "Dist::Zilla::PluginBundle::Git" => "2.009",
+  "Dist::Zilla::PluginBundle::Git::VersionManager" => 0,
   "Pod::Elemental" => "0.102362",
   "Pod::Elemental::Transformer::List" => "0.101620",
   "Pod::Weaver" => "3.101638",

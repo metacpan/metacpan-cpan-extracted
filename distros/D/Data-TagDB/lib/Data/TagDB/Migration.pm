@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -28,7 +27,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my %table_defs = (
     SQLite => {
@@ -211,7 +210,7 @@ sub include {
             require Data::Identifier;
             my Data::TagDB::Tag $uuid = $wk->uuid(1);
             my Data::TagDB::Tag $sid = $wk->small_identifier(1);
-            foreach my $identifier (Data::Identifier->wellknown) {
+            foreach my $identifier (Data::Identifier->known('wellknown')) {
                 my $identifier_sid = eval {$identifier->sid}; # sids in Data::Identifier are accurate (but may be undef).
                 $db->create_tag([
                         $uuid => $identifier->uuid,
@@ -219,7 +218,7 @@ sub include {
                         ]);
             }
         } elsif (($source =~ /::/ || $source =~ /^[A-Z]/) && $source->isa('Data::Identifier::Interface::Known')) {
-            foreach my $identifier (Data::Identifier->known(':all', as => 'Data::Identifier')) {
+            foreach my $identifier ($source->known(':all', as => 'Data::Identifier')) {
                 $db->create_tag($identifier);
             }
         } elsif ($source eq 'file') {
@@ -496,7 +495,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -630,11 +629,11 @@ C<tag-generator-hint>.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

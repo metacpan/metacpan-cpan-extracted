@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 =encoding utf-8
 
@@ -57,10 +57,6 @@ Set the grid layout.  For example, C<--grid=2x3> or C<--grid=2,3>
 creates a 2-column, 3-row layout (6-up).  This is equivalent to
 C<-C2 -R3>.
 
-=item B<--height>=I<N>
-
-Set the page height directly in lines.
-
 =item B<-S> I<N>, B<--pane-width>=I<N>
 
 Set the pane width in characters.  Default is 85.  When B<--pane> is
@@ -72,25 +68,11 @@ terminal width by this value.
 Set the border style for ansicolumn.  Default is C<heavy-box>.
 See L<App::ansicolumn> for available styles.
 
-=item B<--ls>=I<STYLE>, B<--line-style>=I<STYLE>
-
-Set the line style for ansicolumn.  Available styles are C<none>,
-C<truncate>, C<wrap>, and C<wordwrap>.  Default is C<wrap> (inherited
-from ansicolumn's document mode).
-
 =item B<-F>, B<--fold>
 
 Enable fold mode (disable page mode).  In fold mode, the entire
 content is split evenly across columns without pagination.  Page
 mode is the default.
-
-=item B<-H>, B<--filename>
-
-Show filename headers.  This is passed to ansicolumn.
-
-=item B<-V>, B<--parallel>
-
-Enable parallel view mode.  This is passed to ansicolumn.
 
 =item B<--pager>=I<COMMAND>
 
@@ -99,6 +81,15 @@ Set the pager command.  Default is C<$PAGER> or C<less>.
 =item B<--no-pager>
 
 Disable pager.  Output goes directly to stdout.
+
+=item Other options
+
+Any unrecognized options are passed through to L<App::ansicolumn>.
+For example, C<--cm> option can be used to set colormap:
+
+    optex -Mup --cm=BORDER=R -- command
+
+See L<App::ansicolumn> for available options.
 
 =back
 
@@ -192,28 +183,27 @@ sub term_size {
     @size;
 }
 
+sub shell_escape {
+    $_[0] =~ s/([<>&|;'"\$`\\ ])/\\$1/gr;
+}
+
 my $config = Getopt::EX::Config->new(
     'grid'         => undef,
     'pane-width'   => 85,
     'pane'         => undef,
     'row'          => undef,
-    'height'       => undef,
     'border-style' => 'heavy-box',
-    'line-style'   => undef,
     'fold'         => undef,
-    'filename'     => undef,
-    'parallel'     => undef,
     'pager'        => $ENV{PAGER} || 'less',
     'no-pager'     => undef,
 );
 
 sub finalize {
     my($mod, $argv) = @_;
-    $config->deal_with($argv,
-        'grid|G=s', 'pane-width|S=i', 'pane|C=i', 'row|R=i', 'height=i',
-        'border-style|bs=s', 'line-style|ls=s',
-        'fold|F', 'filename|H!', 'parallel|V!',
-        'pager:s', 'no-pager|nopager');
+    $config->configure('pass_through')->deal_with($argv,
+        'grid|G=s', 'pane-width|S=i', 'pane|C=i', 'row|R=i',
+        'border-style|bs=s', 'fold|F', 'pager:s', 'no-pager|nopager');
+    my @passthru = $config->argv;
 
     if (my $grid = $config->{grid}) {
         my($c, $r) = $grid =~ /^(\d+)[x,](\d+)$/
@@ -229,20 +219,16 @@ sub finalize {
     my $pane_width   = $config->{'pane-width'};
     my $cols         = $config->{pane} // max(1, int($term_width / $pane_width));
     my $rows         = $config->{row};
-    my $height       = $config->{height} //
-                       (defined $rows ? int(($term_height - 1) / $rows) : undef);
+    my $height       = defined $rows ? int(($term_height - 1) / $rows) : undef;
     my $border_style = $config->{'border-style'};
-    my $line_style   = $config->{'line-style'};
     my $pager        = $config->{pager};
     $pager .= ' -F +Gg' if $pager =~ /\bless\b/;
 
     # Build default ansicolumn options
     my @ac_opts = ("-w$term_width", "--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");
     push @ac_opts, "--height=$height" if defined $height;
-    push @ac_opts, "--ls=$line_style" if defined $line_style;
-    push @ac_opts, "--no-page"  if $config->{fold};
-    push @ac_opts, "--filename" if $config->{filename};
-    push @ac_opts, "--parallel" if $config->{parallel};
+    push @ac_opts, "--no-page"        if $config->{fold};
+    push @ac_opts, @passthru;
 
     # If command is ansicolumn, apply default options and pager
     if (@$argv && $argv->[0] eq 'ansicolumn') {
@@ -255,7 +241,7 @@ sub finalize {
         return;
     }
 
-    my $column = join ' ', 'ansicolumn', @ac_opts;
+    my $column = join ' ', 'ansicolumn', map { shell_escape($_) } @ac_opts;
     my $filter = ($config->{'no-pager'} || $pager eq '') ? $column : "$column|$pager";
     $mod->setopt(default => "-Mutil::filter --of='$filter' --ef='>&1'");
 }

@@ -10,7 +10,6 @@ use File::Find            qw( find );
 use File::Spec::Functions qw( catfile );
 
 use DBD::SQLite 1.74;    # sqlite 3.42.0
-use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
 use DBI            qw();
 use Encode::Locale qw();
 
@@ -18,7 +17,6 @@ use Term::Choose       qw();
 use Term::Choose::Util qw();
 
 use App::DBBrowser::Auxil;
-use App::DBBrowser::Opt::DBGet;
 
 
 sub new {
@@ -37,47 +35,20 @@ sub get_db_driver {
 }
 
 
-sub read_attributes {
-    my ( $sf ) = @_;
-    return [
-        { name => 'sqlite_busy_timeout', default => 30000 },
-    ];
-}
-
-
-sub set_attributes {
-    my ( $sf ) = @_;
-    my $values = [
-        DBD_SQLITE_STRING_MODE_PV               . ' DBD_SQLITE_STRING_MODE_PV',               # 0
-        DBD_SQLITE_STRING_MODE_BYTES            . ' DBD_SQLITE_STRING_MODE_BYTES',            # 1
-        DBD_SQLITE_STRING_MODE_UNICODE_NAIVE    . ' DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',    # 4
-        DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK', # 5
-        DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',   # 6
-    ];
-    return [
-        { name => 'sqlite_string_mode',         default => 3, values => $values }, # $values->[3] == DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK (5)
-        { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
-        { name => 'ChopBlanks',                 default => 0, values => [ 0, 1 ] },
-    ];
-}
-
-
 sub get_db_handle {
     my ( $sf, $db ) = @_;
-    my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
-    my $db_opt = $db_opt_get->read_db_config_files();
-    my $read_attributes = $db_opt_get->get_read_attributes( $db, $db_opt );
-    my $set_attributes = $db_opt_get->get_set_attributes( $db, $db_opt );
-    my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
+    my $busy_timeout = delete $sf->{o}{connect_attr}{sqlite_busy_timeout};
+    my $dsn = "dbi:SQLite:dbname=$db";
     my $dbh = DBI->connect( $dsn, '', '', {
         PrintError => 0,
         RaiseError => 1,
         AutoCommit => 1,
         ShowErrorStatement => 1,
-        %$set_attributes,
+        %{$sf->{o}{connect_attr}//{}}, ##
+
     } );
-    if ( DBI::looks_like_number( $read_attributes->{sqlite_busy_timeout} ) ) {
-        $dbh->sqlite_busy_timeout( 0 + $read_attributes->{sqlite_busy_timeout} );
+    if ( DBI::looks_like_number( $busy_timeout ) ) { ##
+        $dbh->sqlite_busy_timeout( 0 + $busy_timeout );
     }
     return $dbh;
 }
@@ -86,7 +57,7 @@ sub get_db_handle {
 sub get_databases {
     my ( $sf ) = @_;
     return \@ARGV if @ARGV;
-    my $cache_sqlite_files = catfile $sf->{i}{app_dir}, 'cache_SQLite_files.json';
+    my $cache_sqlite_files = sprintf $sf->{i}{db_cache_file_fmt}, $sf->{i}{plugin};
     my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $db_cache = $ax->read_json( $cache_sqlite_files ) // {};

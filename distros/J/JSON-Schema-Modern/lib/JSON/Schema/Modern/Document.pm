@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.630';
+our $VERSION = '0.631';
 
 use 5.020;
 use Moo;
@@ -54,7 +54,7 @@ has original_uri => (
 
 has metaschema_uri => (
   is => 'rwp',
-  isa => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
+  isa => InstanceOf['Mojo::URL'],
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
   predicate => '_has_metaschema_uri',
   # default not defined here, but might be defined in a subclass
@@ -227,6 +227,10 @@ sub validate ($class, @args) {
   my $evaluator = $args->{evaluator} // JSON::Schema::Modern->new(validate_formats => 1);
   my $eval_result = $evaluator->evaluate($document->schema, $document->metaschema_uri);
 
+  if (my ($missing_resource) = grep $_->error =~ /EXCEPTION: unable to find resource/, $eval_result->errors) {
+    $missing_resource->{error} .= ' (did you forget to provide "evaluator" to ->validate?)';
+  }
+
   return $doc_result & $eval_result;
 }
 
@@ -262,7 +266,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.630
+version 0.631
 
 =head1 SYNOPSIS
 

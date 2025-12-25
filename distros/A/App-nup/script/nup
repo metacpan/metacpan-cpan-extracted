@@ -20,27 +20,32 @@ nup - N-up multi-column paged output for commands and files
     nup [ options ] file ...
     nup -e [ options ] command ...
 
-    -h,   --help             show help
+      -h, --help             show help
           --version          show version
-    -d,   --debug            debug mode
-    -n,   --dryrun           dry-run mode
-    -e,   --exec             execute command mode
-    -V,   --parallel         parallel view mode
-    -F,   --fold             fold mode (disable page mode)
-    -H,   --filename         show filename headers (default: on)
-    -G,   --grid=#           grid layout (e.g., 2x3)
-    -C,   --pane=#           number of columns
-    -R,   --row=#            number of rows
-          --height=#         page height in lines
-    -S,   --pane-width=#     pane width (default: 85)
+      -d, --debug            debug mode
+      -n, --dryrun           dry-run mode
+      -e, --exec             execute command mode
+      -V, --parallel         parallel view mode
+      -F, --fold             fold mode (disable page mode)
+      -H, --filename         show filename headers (default: on)
+      -G, --grid=#           grid layout (e.g., 2x3)
+      -C, --pane=#           number of columns
+      -R, --row=#            number of rows
+      -P, --page=#           page height in lines
+      -S, --pane-width=#     pane width (default: 85)
     --bs, --border-style=#   border style (default: heavy-box)
     --ls, --line-style=#     line style (none/truncate/wrap/wordwrap)
+    --cm, --colormap=#       color mapping (LABEL=COLOR)
+          --white-board      black on white board
+          --black-board      white on black board
+          --green-board      white on green board
+          --slate-board      white on dark slate board
           --pager=#          pager command (empty to disable)
           --no-pager         disable pager
 
 =head1 VERSION
 
-Version 0.9902
+Version 0.9903
 
 =cut
 
@@ -65,21 +70,6 @@ if ((BASH_VERSINFO[0] < 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 3))); 
 fi
 
 ##############################################################################
-# Setup PATH for getoptlong.sh
-##############################################################################
-
-basedir="${0%/*/*}"
-if [[ -f $basedir/share/getoptlong/getoptlong.sh ]]; then
-    PATH="$basedir/share/getoptlong:$PATH"
-else
-    dist_dir() {
-        perl -MFile::Share=:all -E "say dist_dir '$1'" 2>/dev/null || true
-    }
-    share=$(dist_dir App-nup)
-    PATH="${share:+$share/getoptlong:}$PATH"
-fi
-
-##############################################################################
 # Option definitions
 ##############################################################################
 
@@ -94,22 +84,27 @@ declare -a up_opts=(--filename)  # up.pm options
 
 declare -A OPTS=(
     [&REQUIRE]=0.4 [&USAGE]="$USAGE" [&PERMUTE]=
-    [         help | h  ! # show help         ]=
-    [      version |    ! # show version      ]=
-    [        debug | d    # debug mode        ]=
-    [       dryrun | n    # dry-run mode      ]=
-    [         exec | e    # execute command   ]=
-    [        pager |   :! # pager command     ]=
+    [         help | h   !        # show help         ]=
+    [      version |     !        # show version      ]=
+    [        debug | d            # debug mode        ]=
+    [       dryrun | n            # dry-run mode      ]=
+    [         exec | e            # execute command   ]=
+    [        pager |    :!        # pager command     ]=
     [     parallel | V   >up_opts # parallel view     ]=
     [         fold | F   >up_opts # fold mode         ]=
     [     filename | H   >up_opts # show file headers ]=
     [         grid | G  :>up_opts # grid layout       ]=
     [         pane | C  :>up_opts # number of columns ]=
     [          row | R  :>up_opts # number of rows    ]=
-    [       height |    :>up_opts # page height       ]=
+    [         page | P  :>up_opts # page height       ]=
     [   pane-width | S  :>up_opts # pane width        ]=
     [ border-style | bs :>up_opts # border style      ]=
     [   line-style | ls :>up_opts # line style        ]=
+    [     colormap | cm :>up_opts # color mapping     ]=
+    [  white-board |     >up_opts # black on white    ]=
+    [  black-board |     >up_opts # white on black    ]=
+    [  green-board |     >up_opts # white on green    ]=
+    [  slate-board |     >up_opts # white on slate    ]=
 )
 
 ##############################################################################
@@ -256,7 +251,7 @@ Set the number of rows.
 
 Set grid layout. For example, C<-G2x3> creates 2 columns and 3 rows.
 
-=item B<--height>=I<N>
+=item B<-P> I<N>, B<--page>=I<N>
 
 Set the page height in lines.
 
@@ -270,13 +265,22 @@ Set the pane width in characters. Default is 85.
 
 =over 4
 
-=item B<--border-style>=I<STYLE>, B<--bs>=I<STYLE>
+=item B<--bs>=I<STYLE>, B<--border-style>=I<STYLE>
 
 Set the border style. Default is C<heavy-box>.
 
-=item B<--line-style>=I<STYLE>, B<--ls>=I<STYLE>
+=item B<--ls>=I<STYLE>, B<--line-style>=I<STYLE>
 
 Set the line style. Available: C<none>, C<truncate>, C<wrap>, C<wordwrap>.
+
+=item B<--cm>=I<SPEC>, B<--colormap>=I<SPEC>
+
+Set color mapping. Specify as C<LABEL=COLOR> (e.g., C<--cm=BORDER=R>).
+Available labels: C<TEXT>, C<BORDER>.
+
+=item B<--white-board>, B<--black-board>, B<--green-board>, B<--slate-board>
+
+Predefined color schemes for board-style display.
 
 =back
 

@@ -22,6 +22,7 @@ requires:
   DBD::SQLite: '1.74'
   DBD::SQLite::Constants: '0'
   DBI: '0'
+  DBI::Const::GetInfoType: '0'
   DateTime::Format::Strptime: '0'
   Encode: '0'
   Encode::Locale: '0'
@@ -56,5 +57,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/App-DBBrowser/issues
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.436'
+version: '2.438'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

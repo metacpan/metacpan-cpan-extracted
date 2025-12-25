@@ -58,7 +58,7 @@ YAML
 
   my $app = Mojolicious->new;
   $app->routes->post('/foo/:foo_id' => sub ($c) {
-    if ($c->stash('foo_id') =~ /^[a-z]+$/) {
+    if ($c->stash('foo_id') =~ /^[a-z]+\z/) {
       cmp_result(
         $openapi->validate_request($c->req)->TO_JSON,
         { valid => true },

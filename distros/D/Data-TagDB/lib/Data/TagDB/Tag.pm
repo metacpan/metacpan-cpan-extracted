@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -14,9 +13,11 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
-my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
+use parent 'Data::Identifier::Interface::Simple';
+
+use Data::Identifier v0.28;
 
 my %_key_to_data_identifier = (
     'small-identifier' => 'sid',
@@ -58,7 +59,7 @@ sub _get_id {
                 }
             }
             if (defined($id) && defined($backup_key)) {
-                if ($HAVE_DATA_IDENTIFIER && defined(my $type = $_key_to_data_identifier{$backup_key})) {
+                if (defined(my $type = $_key_to_data_identifier{$backup_key})) {
                     my $did = Data::Identifier->new($type => $id);
                     my $func = $did->can($_key_to_data_identifier{$key} // '');
                     if (defined $func) {
@@ -88,7 +89,7 @@ sub _get_id {
             return $value;
         } elsif ($as eq 'URI' && $curtype eq 'uri') {
             return $self->{$key.'_URI'} //= URI->new($value); # convert and cache.
-        } elsif ($as eq 'Data::Identifier' && $HAVE_DATA_IDENTIFIER && defined(my $type = $_key_to_data_identifier{$curtype})) {
+        } elsif ($as eq 'Data::Identifier' && defined(my $type = $_key_to_data_identifier{$curtype})) {
             return Data::Identifier->new($type => $value, displayname => sub { $self->displayname(default => undef) });
         } else {
             croak 'Unsupported as option: '.$as;
@@ -221,8 +222,9 @@ sub displayname {
 sub displaycolour {
     my ($self, %opts) = @_;
     if (exists $self->{displaycolour}) {
-        return $opts{default} if !defined($self->{displaycolour}) && exists $opts{default};
-        return $self->{displaycolour};
+        return $self->{displaycolour} if defined $self->{displaycolour};
+        return $opts{default} if exists $opts{default};
+        croak 'No value found';
     } else {
         my $db = $self->db;
         my $wk = $db->wk;
@@ -255,8 +257,9 @@ sub displaycolour {
             return $self->{displaycolour} = $colour if defined($colour);
         }
 
-        return $opts{default} if !defined($self->{displaycolour}) && exists $opts{default};
-        return $self->{displaycolour};
+        return $self->{displaycolour} if defined $self->{displaycolour};
+        return $opts{default} if exists $opts{default};
+        croak 'No value found';
     }
 }
 
@@ -264,8 +267,9 @@ sub displaycolour {
 sub icontext {
     my ($self, %opts) = @_;
     if (exists $self->{icontext}) {
-        return $opts{default} if !defined($self->{icontext}) && exists $opts{default};
-        return $self->{icontext};
+        return $self->{icontext} if defined $self->{icontext};
+        return $opts{default} if exists $opts{default};
+        croak 'No value found';
     } else {
         my $db = $self->db;
         my $wk = $db->wk;
@@ -298,8 +302,9 @@ sub icontext {
             }
         }
 
-        return $opts{default} if !defined($self->{icontext}) && exists $opts{default};
-        return $self->{icontext};
+        return $self->{icontext} if defined $self->{icontext};
+        return $opts{default} if exists $opts{default};
+        croak 'No value found';
     }
 }
 
@@ -307,8 +312,9 @@ sub icontext {
 sub description {
     my ($self, %opts) = @_;
     if (exists $self->{description}) {
-        return $opts{default} if !defined($self->{description}) && exists $opts{default};
-        return $self->{description};
+        return $self->{description} if defined $self->{description};
+        return $opts{default} if exists $opts{default};
+        croak 'No value found';
     } else {
         my $db = $self->db;
         my $wk = $db->wk;
@@ -324,8 +330,9 @@ sub description {
             last if defined $self->{description};
         }
 
-        return $opts{default} if !defined($self->{description}) && exists $opts{default};
-        return $self->{description};
+        return $self->{description} if defined $self->{description};
+        return $opts{default} if exists $opts{default};
+        croak 'No value found';
     }
 }
 
@@ -498,7 +505,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -507,6 +514,10 @@ version v0.10
     my $db = Data::TagDB->new(...);
 
     my Data::TagDB::Tag $tag = $db->tag_by_...(...);
+
+This package represents a single tag in the database.
+
+This package inherits from L<Data::Identifier::Interface::Simple> (since v0.11).
 
 =head1 UNIVERSAL OPTIONS
 
@@ -569,11 +580,11 @@ The following universal options are supported: L</default>, L</no_defaults>.
 
     my $displaycolour = $tag->displaycolour( [ %opts ] );
 
-Returns a colour that can be used to display the tag or C<undef>.
+Returns a colour that can be used to display the tag.
 This will return a decoded object, most likely (but not necessarily) an instance of L<Data::URIID::Colour>.
 Later versions of this module may allow to force a specific type.
 
-B<Note:> Future versions of this method will C<die> if no value can be found.
+This method C<die>s if no value can be found and no L</default> is given (since v0.11).
 
 The following universal options are supported: L</default>.
 The following universal options are ignored (without warning or error): L</no_defaults>.
@@ -582,13 +593,13 @@ The following universal options are ignored (without warning or error): L</no_de
 
     my $icontext = $tag->icontext( [ %opts ] );
 
-Returns a string or C<undef> that is a single unicode character that represents the tag.
+Returns a string that is a single unicode character that represents the tag.
 This can be used as a visual aid for the user.
 It is not well defined what single character means in this case. A single character may map
 to multiple unicode code points (such as a base and modifiers). If the application requies a
 specific definition of single character it must validate the value.
 
-B<Note:> Future versions of this method will C<die> if no value can be found.
+This method C<die>s if no value can be found and no L</default> is given (since v0.11).
 
 The following universal options are supported: L</default>.
 The following universal options are ignored (without warning or error): L</no_defaults>.
@@ -597,9 +608,9 @@ The following universal options are ignored (without warning or error): L</no_de
 
     my $description = $tag->description( [ %opts ] );
 
-Returns a description that can be used to display to the user or C<undef>.
+Returns a description that can be used to display to the user.
 
-B<Note:> Future versions of this method will C<die> if no value can be found.
+This method C<die>s if no value can be found and no L</default> is given (since v0.11).
 
 The following universal options are supported: L</default>.
 The following universal options are ignored (without warning or error): L</no_defaults>.
@@ -616,11 +627,11 @@ This method is experimental. It may change prototype, and behaviour or may be re
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

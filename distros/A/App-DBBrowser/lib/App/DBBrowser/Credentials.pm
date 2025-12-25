@@ -19,20 +19,19 @@ sub new {
 
 
 sub get_login {
-    my ( $sf, $key, $show_sofar, $settings ) = @_;
-    if ( ! exists $settings->{login_data}{$key} ) {
+    my ( $sf, $key, $show_sofar ) = @_;
+    if ( ! $sf->{o}{connect_data}{"${key}_required"} ) {
         return;
     }
-    my $default = $settings->{login_data}{$key}{default};
-    my $no_echo = $settings->{login_data}{$key}{secret};
     my $env_var = 'DBI_' . uc $key;
-    if ( $settings->{env_var_yes}{$env_var} && exists $ENV{$env_var} ) {
+    if ( length $sf->{o}{connect_data}{$key} ) {
+        return $sf->{o}{connect_data}{$key};
+    }
+    elsif ( $sf->{o}{connect_data}{"use_dbi_$key"} && exists $ENV{$env_var} ) {
         return $ENV{$env_var}; #
     }
-    elsif ( defined $default && length $default ) {
-        return $default;
-    }
     else {
+        my $no_echo = $key =~ /^(?:host|port|user)\z/ ? 0 : 1;
         my $prompt = ucfirst( $key ) . ': ';
         my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
         # Readline
@@ -43,6 +42,7 @@ sub get_login {
         return $new;
     }
 }
+
 
 
 

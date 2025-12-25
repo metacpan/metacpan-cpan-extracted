@@ -447,6 +447,9 @@ sub limit {
     }
     else {
         $sql->{limit_stmt} = "FETCH NEXT " . $limit . " ROWS ONLY";
+        if ( ! $sql->{offset_stmt} && $sf->{i}{dbms} eq 'MSSQL' ) {
+            $sql->{offset_stmt} =  "OFFSET 0 ROWS";
+        }
     }
     $sql->{bu_limit} = $limit;
     return 1;
@@ -487,10 +490,10 @@ sub offset {
     $sql->{bu_offset} = $offset;
     # Informix: no offset
     if ( ! $sql->{limit_stmt} ) {
-        my $driver = $sf->{i}{driver};
+        my $dbms = $sf->{i}{dbms};
         # SQLite/mysql/MariaDB: no offset without limit
-        $sql->{limit_stmt} = "LIMIT " . '9223372036854775807'  if $driver eq 'SQLite';   # 2 ** 63 - 1
-        $sql->{limit_stmt} = "LIMIT " . '18446744073709551615' if $driver =~ /^(?:mysql|MariaDB)\z/;    # 2 ** 64 - 1
+        $sql->{limit_stmt} = "LIMIT " . '9223372036854775807'  if $dbms eq 'SQLite';   # 2 ** 63 - 1
+        $sql->{limit_stmt} = "LIMIT " . '18446744073709551615' if $dbms =~ /^(?:mysql|MariaDB)\z/;    # 2 ** 64 - 1
         # MySQL 8.0 Reference Manual - SQL Statements/Data Manipulation Statements/Select Statement/Limit clause:
         #    SELECT * FROM tbl LIMIT 95,18446744073709551615;   -> all rows from the 95th to the last
     }
@@ -500,7 +503,7 @@ sub offset {
 
 sub __limit_and_offset_variables {
     my ( $sf ) = @_;
-    my $use_limit = $sf->{i}{driver} =~ /^(?:SQLite|mysql|MariaDB|Pg|Informix)\z/ ? 1 : 0;
+    my $use_limit = $sf->{i}{dbms} =~ /^(?:SQLite|mysql|MariaDB|Pg|DuckDB|Informix)\z/ ? 1 : 0;
     my $max_digits = 7;
     return $use_limit, $max_digits;
 }

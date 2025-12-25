@@ -1759,8 +1759,24 @@ sub apply {
 
         # support for contains(value)
         if ($part =~ /^contains\((.+)\)$/) {
-            my $needle = JQ::Lite::Util::_parse_string_argument($1);
+            my $needle = JQ::Lite::Util::_parse_literal_argument($1);
             @next_results = map { JQ::Lite::Util::_apply_contains($_, $needle) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for contains_subset(value)
+        if ($part =~ /^contains_subset\((.+)\)$/) {
+            my $needle = JQ::Lite::Util::_parse_literal_argument($1);
+            @next_results = map { JQ::Lite::Util::_apply_contains_subset($_, $needle) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for inside(container)
+        if ($part =~ /^inside\((.+)\)$/) {
+            my $container = JQ::Lite::Util::_parse_literal_argument($1);
+            @next_results = map { JQ::Lite::Util::_apply_inside($_, $container) } @results;
             @$out_ref = @next_results;
             return 1;
         }

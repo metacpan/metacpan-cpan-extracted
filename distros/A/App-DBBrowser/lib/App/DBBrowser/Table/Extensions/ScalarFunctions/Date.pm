@@ -56,14 +56,14 @@ sub function_date_subtract {
 
 sub __add_date_subtract_date {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
     my $args_data = [];
-    if ( $driver =~ /^(?:SQLite|Informix|Oracle)\z/ ) {
+    if ( $dbms =~ /^(?:SQLite|Informix|Oracle)\z/ ) {
         push @$args_data, { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ] };
     }
     else {
@@ -73,27 +73,33 @@ sub __add_date_subtract_date {
     my ( $unit, $amount ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     return if ! defined $amount || ! defined $unit;
     $unit = uc $unit;
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         return "DATETIME($col,'-' || $amount || ' $unit')" if $func eq 'DATE_SUBTRACT';
         return "DATETIME($col,$amount || ' $unit')";
     }
-    if ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+    if ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         return "DATE_SUB($col,INTERVAL $amount $unit)" if $func eq 'DATE_SUBTRACT';
         return "DATE_ADD($col,INTERVAL $amount $unit)";
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         return "$col - $amount * INTERVAL '1 $unit'" if $func eq 'DATE_SUBTRACT';
         return "$col + $amount * INTERVAL '1 $unit'";
     }
-    if ( $driver eq 'DB2' ) {
+
+    if ( $dbms eq 'DuckDB' ) {
+        return "DATE_ADD($col,INTERVAL '-$amount' $unit)" if $func eq 'DATE_SUBTRACT';
+        return "DATE_ADD($col,INTERVAL $amount $unit)";
+    }
+
+    if ( $dbms eq 'DB2' ) {
         return "ADD_${unit}S($col,-$amount)" if $func eq 'DATE_SUBTRACT';
         return "ADD_${unit}S($col,$amount)";
     }
-    if ( $driver eq 'Informix' ) {
+    if ( $dbms eq 'Informix' ) {
         return "$col - $amount UNITS $unit" if $func eq 'DATE_SUBTRACT';
         return "$col + $amount UNITS $unit";
     }
-    if ( $driver eq 'Oracle' ) {
+    if ( $dbms eq 'Oracle' ) {
         if ( $unit eq 'MONTH' ) {
             return "ADD_MONTHS($col,-$amount)" if $func eq 'DATE_SUBTRACT';
             return "ADD_MONTHS($col,$amount)";
@@ -112,23 +118,33 @@ sub __add_date_subtract_date {
 
 sub function_date_trunc {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    my $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MILLISECONDS MICROSECONDS DECADE CENTURY MILLENNIUM) ];
+    my $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MILLISECONDS MICROSECONDS) ]; ##
+    my $unquote;
+    if ( $dbms eq 'MSSQL' ) {
+        push @$history, qw(DAYOFYEAR ISO_WEEK);
+        $unquote = 1;
+    }
+    else {
+        push @$history, qw(DECADE CENTURY MILLENNIUM);
+        $unquote = 0;
+    }
     my $args_data = [
-        { prompt => 'Field: ', unquote => 0, history => $history },
+        { prompt => 'Field: ', unquote => $unquote, history => $history },
     ];
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         push @$args_data, { prompt => 'Time_zone:' };
     }
     my ( $field, $timezone ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     if ( ! defined $field ) {
         return;
     }
+    return "DATETRUNC($field,$col)"             if $dbms eq 'MSSQL';
     return "DATE_TRUNC($field,$col)"            if ! defined $timezone;
     return "DATE_TRUNC($field,$col,$timezone)";
 }
@@ -136,61 +152,69 @@ sub function_date_trunc {
 
 sub function_date_part {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    my $history;
-    if ( $driver eq 'Pg' ) {
-        $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MILLISECONDS MICROSECONDS EPOCH JULIAN
-                        DOW DOY TIMEZONE TIMEZONE_HOUR TIMEZONE_MINUTE ISODOW ISOYEAR DECADE CENTURY MILLENNIUM) ];
+    my $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MILLISECONDS MICROSECONDS) ];
+    my $unquote;
+    if ( $dbms =~ /^(?:Pg|DuckDB)\z/ ) {
+        push @$history, qw(EPOCH JULIAN DOW DOY TIMEZONE TIMEZONE_HOUR TIMEZONE_MINUTE ISODOW ISOYEAR DECADE CENTURY MILLENNIUM);
+        push @$history, qw(YEARWEEK ERA) if $dbms eq 'DuckDB';
+        $unquote = 0;
+    }
+    elsif ( $dbms eq 'MSSQL' ) {
+        push @$history, qw(NANOSECOND WEEKDAY DAYOFYEAR TZOFFSET ISO_WEEK);
+        $unquote = 1;
     }
     my $args_data = [
-        { prompt => 'Field: ', unquote => 0, history => $history },
+        { prompt => 'Field: ', unquote => $unquote, history => $history },
     ];
     my ( $field ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     if ( ! defined $field ) {
         return;
     }
     $field = uc $field;
+    return "DATEPART($field,$col)" if $dbms eq 'MSSQL';
     return "DATE_PART($field,$col)";
 }
 
 
 sub function_extract {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
     my $history;
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND DAYOFYEAR DAYOFWEEK WEEK_ISO DAYOFWEEK_ISO) ];
     }
-    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MICROSECOND YEAR_MONTH DAY_HOUR DAY_MINUTE
                         DAY_SECOND DAY_MICROSECOND HOUR_MINUTE HOUR_SECOND HOUR_MICROSECOND MINUTE_SECOND
                         MINUTE_MICROSECOND SECOND_MICROSECOND) ];
     }
-    elsif ( $driver eq 'Pg' ) {
+    elsif ( $dbms =~ /^(?:Pg|DuckDB)\z/ ) {
         $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MILLISECONDS MICROSECONDS EPOCH JULIAN
                         DOW DOY TIMEZONE TIMEZONE_HOUR TIMEZONE_MINUTE ISODOW ISOYEAR DECADE CENTURY MILLENNIUM) ];
+        push @$history, qw(YEARWEEK ERA) if $dbms eq 'DuckDB';
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'Firebird' ) {
         $history = [ qw(YEAR QUARTER MONTH WEEK DAY WEEKDAY YEARDAY HOUR MINUTE SECOND MILLISECOND) ]; # 4.0: TIMEZONE_HOUR TIMEZONE_MINUTE
     }
-    elsif ( $driver eq 'Informix' ) {
+    elsif ( $dbms eq 'Informix' ) {
         $history = [ qw(YEAR QUARTER MONTH DAY HOUR MINUTE SECOND DAYOFWEEK) ];
     }
-    elsif ( $driver eq 'DB2' ) {
+    elsif ( $dbms eq 'DB2' ) {
         $history = [ qw(EPOCH MILLENNIUM CENTURY DECADE YEAR QUARTER MONTH WEEK DAY DOW DOY HOUR MINUTE SECOND
                         MILLISECOND MICROSECOND) ];
     }
-    elsif ( $driver eq 'Oracle' ) {
+    elsif ( $dbms eq 'Oracle' ) {
         $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND DAYOFWEEK DAYOFYEAR WEEK_ISO YEAR_ISO
                         TIMEZONE_HOUR TIMEZONE_MINUTE TIMEZONE_REGION TIMEZONE_ABBR) ];
     }
@@ -202,7 +226,7 @@ sub function_extract {
         return;
     }
     $field = uc $field;
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         return "CEILING(strftime('%m',$col)/3.00)" if $field eq 'QUARTER';
         my %map = ( YEAR => '%Y', MONTH => '%m', WEEK => '%W', DAY => '%d', HOUR => '%H', MINUTE => '%M', SECOND => '%S',
                     DAYOFYEAR => '%j', DAYOFWEEK => '%w', WEEK_ISO => '%V', DAYOFWEEK_ISO => '%u',
@@ -212,15 +236,15 @@ sub function_extract {
         }
         return "strftime($field,$col)";
     }
-    elsif ( $driver eq 'Firebird' && $field eq 'QUARTER' ) {
+    elsif ( $dbms eq 'Firebird' && $field eq 'QUARTER' ) {
         return "CEILING(EXTRACT(MONTH FROM $col)/3.00)";
     }
-    elsif ( $driver eq 'Informix' ) {
+    elsif ( $dbms eq 'Informix' ) {
         return "EXTEND($col,$field to $field)" if $field =~ /^(?:HOUR|MINUTE|SECOND)\z/;
         return "WEEKDAY($col)"                 if $field eq 'DAYOFWEEK';
         return "$field($col)";
     }
-    elsif ( $driver eq 'Oracle' ) {
+    elsif ( $dbms eq 'Oracle' ) {
         return "to_char($col,'Q')"    if $field eq 'QUARTER';
         return "to_char($col,'WW')"   if $field eq 'WEEK';
         return "to_char($col,'IW')"   if $field eq 'WEEK_ISO';
@@ -246,32 +270,43 @@ sub function_time {
     return $sf->__sqlite_date_functions( $sql, $clause, $func, $cols, $r_data );
 }
 
+
 sub function_datetime {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
     return $sf->__sqlite_date_functions( $sql, $clause, $func, $cols, $r_data );
 }
 
-sub function_julianday {
-    my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    return $sf->__sqlite_date_functions( $sql, $clause, $func, $cols, $r_data );
-}
 
-sub function_unixepoch {
+sub function_julian_day {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    return $sf->__sqlite_date_functions( $sql, $clause, $func, $cols, $r_data );
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms eq 'SQLite' ) {
+        return $sf->__sqlite_date_functions( $sql, $clause, 'JULIANDAY', $cols, $r_data );
+    }
+    my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
+    if ( ! defined $col ) {
+        return;
+    }
+    elsif ( $dbms eq 'DuckDB' ) {
+        return "JULIAN($col)";
+    }
+    else {
+        return "JULIAN_DAY($col)";
+    }
 }
 
 
 sub __sqlite_date_functions {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
     my $modifiers;
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         $modifiers = $ga->sqlite_modifiers( $sql, $r_data );
     }
     return "$func($col)" if ! length $modifiers;
@@ -281,14 +316,14 @@ sub __sqlite_date_functions {
 
 sub function_week {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
     my $mode;
-    if ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+    if ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         my $history = [ 0 .. 7 ];
         my $args_data = [
             { prompt => 'Mode: ', is_numeric => 1, history => $history },
@@ -302,16 +337,21 @@ sub function_week {
 
 sub function_datediff {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my ( $start_date, $end_date ) = $sf->__start_date_end_date( $sql, $clause, $func, $cols, $r_data );
     if ( ! defined $start_date || ! defined $end_date ) {
         return;
     }
     my $args_data = [];
-    if ( $driver eq 'Firebird' ) {
+    if ( $dbms eq 'Firebird' ) {
         $args_data = [
             { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND MILLISECOND) ] }
+        ];
+    }
+    elsif ( $dbms eq 'DuckDB' ) {
+        $args_data = [
+            { prompt => 'Unit: ', unquote => 0, history => [ qw(YEAR QUARTER MONTH DAY HOUR MINUTE SECOND MILLISECOND MICROSECOND CENTURY DECADE MILLENNIUM) ] }
         ];
     }
     else {
@@ -324,7 +364,7 @@ sub function_datediff {
         return;
     }
     $unit = uc $unit;
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         my $year_diff = "strftime('%Y',$end_date) - strftime('%Y',$start_date)";
         my $day_diff = "JulianDay(DATE($end_date)) - JulianDay(DATE($start_date))";
         my $hour_diff = "($day_diff) * 24 + (strftime('%H',$end_date) - strftime('%H',$start_date))";
@@ -336,10 +376,10 @@ sub function_datediff {
         return $minute_diff                                                                    if $unit eq 'MINUTE';
         return "($minute_diff) * 60 + (strftime('%S',$end_date) - strftime('%S',$start_date))" if $unit eq 'SECOND';
     }
-    elsif ( $driver =~ /^(?:mysql|MariaDB|DB2)\z/ ) {
+    elsif ( $dbms =~ /^(?:mysql|MariaDB|DB2)\z/ ) {
         my $year_diff = "YEAR($end_date) - YEAR($start_date)";
         my $day_diff;
-        if ( $driver eq 'DB2' ) {
+        if ( $dbms eq 'DB2' ) {
             $day_diff = "DAYS($end_date) - DAYS($start_date)"
         }
         else {
@@ -354,7 +394,7 @@ sub function_datediff {
         return $minute_diff                                                      if $unit eq 'MINUTE';
         return "($minute_diff) * 60 + (SECOND($end_date) - SECOND($start_date))" if $unit eq 'SECOND';
     }
-    elsif ( $driver eq 'Pg' ) {
+    elsif ( $dbms eq 'Pg' ) {
         my $year_diff = "DATE_PART('YEAR',${end_date}::DATE) - DATE_PART('YEAR',${start_date}::DATE)";
         my $day_diff = "${end_date}::DATE - ${start_date}::DATE";
         my $hour_diff = "($day_diff) * 24 + (DATE_PART('HOUR',$end_date) - DATE_PART('HOUR',$start_date))";
@@ -367,10 +407,13 @@ sub function_datediff {
         return $minute_diff                                                                                                                         if $unit eq 'MINUTE';
         return "TRUNC(($minute_diff) * 60 + (DATE_PART('SECOND',$end_date) - DATE_PART('SECOND',$start_date)))"                                     if $unit eq 'SECOND';
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'DuckDB' ) {
+        return "DATE_DIFF($unit,$start_date,$end_date)";
+    }
+    elsif ( $dbms =~ /^(?:Firebird|MSSQL)\z/ ) {
         return "DATEDIFF($unit,$start_date,$end_date)";
     }
-    #elsif ( $driver eq 'Oracle' ) {
+    #elsif ( $dbms eq 'Oracle' ) {
     #    return "TO_DATE($end_date) - TO_DATE($start_date)";
     #    return "TO_TIMESTAMP($end_date) - TO_TIMESTAMP($start_date)";
     #    return "TO_TIMESTAMP_TZ($end_date) - TO_TIMESTAMP_TZ($start_date)";
@@ -425,7 +468,7 @@ sub function_age {
 
 sub __start_date_end_date {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
 
     while ( 1 ) {
@@ -438,7 +481,7 @@ sub __start_date_end_date {
         my $end_date = $ga->choose_a_column( $sql, $clause, $cols, $r_data, $prompt );
         if ( ! defined $end_date ) {
             return $start_date if $func eq 'AGE'; ##
-            if ( $driver eq 'Informix' ) {
+            if ( $dbms eq 'Informix' ) {
                 return $start_date, "CURRENT";
             }
             else {

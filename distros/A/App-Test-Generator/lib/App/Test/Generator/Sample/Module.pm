@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 NAME
 
@@ -50,14 +50,14 @@ Returns:
 =cut
 
 sub validate_email {
-    my ($self, $email) = @_;
+	my ($self, $email) = @_;
 
-    croak 'Email is required' unless defined $email;
-    croak "Email too short" unless length($email) >= 5;
-    croak "Email too long" unless length($email) <= 254;
-    croak "Invalid email format" unless $email =~ /^[^@]+@[^@]+\.[^@]+$/;
+	croak 'Email is required' unless defined $email;
+	croak "Email too short" unless length($email) >= 5;
+	croak "Email too long" unless length($email) <= 254;
+	croak "Invalid email format" unless $email =~ /^[^@]+@[^@]+\.[^@]+$/;
 
-    return 1;
+	return 1;
 }
 
 =head2 calculate_age($birth_year)

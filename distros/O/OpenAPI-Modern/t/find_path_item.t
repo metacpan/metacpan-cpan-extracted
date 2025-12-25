@@ -1051,7 +1051,7 @@ YAML
           error => 'no match found for request '.to_str(@request),
         }),
       ],
-      debug => { uri_patterns => [ '\/foo\/([^/?#]*)$' ] },
+      debug => { uri_patterns => [ '\/foo\/([^/?#]*)\z' ] },
     },
     'no match for URI against /paths',
   );
@@ -1701,7 +1701,7 @@ YAML
           instanceLocation => '/request',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri.'#/paths',
-          error => 'no match found for request '.to_str(@request) =~ s/\?.+$//r,
+          error => 'no match found for request '.to_str(@request) =~ s/\?.+\z//r,
         }),
       ],
     },
@@ -1725,9 +1725,9 @@ YAML
       operation_uri => str($doc_uri.'#/components/pathItems/foo-fooid/get'),
       errors => [],
       debug => { uri_patterns => [
-          '\/bad\/([^/?#]*)$',
-          '\/bar\/([^/?#]*)$',
-          '\/foo\/([^/?#]*)$',
+          '\/bad\/([^/?#]*)\z',
+          '\/bar\/([^/?#]*)\z',
+          '\/foo\/([^/?#]*)\z',
           '^http\:\/\/dev\.example\.com',
         ] },
     },
@@ -2282,7 +2282,7 @@ YAML
       errors => [],
       debug => {
         uri_patterns => [
-          '\/foo\/([^/?#]*)$',
+          '\/foo\/([^/?#]*)\z',
           '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/foo', # <-- we matched servers/0
         ],
       },
@@ -2307,7 +2307,7 @@ YAML
       errors => [],
       debug => {
         uri_patterns => [
-          '\/foo\/([^/?#]*)$',
+          '\/foo\/([^/?#]*)\z',
           '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/foo',
           '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/bar', # <-- we matched servers/1
         ],
@@ -2334,7 +2334,7 @@ YAML
       errors => [],
       debug => {
         uri_patterns => [
-          '\/foo\/([^/?#]*)$',
+          '\/foo\/([^/?#]*)\z',
           '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/foo',
           '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/bar',
           '^http\:\/\/([^/?#]*)\.example\.com\/([^/?#]*)\/([^/?#]*)',  # <-- we matched servers/2

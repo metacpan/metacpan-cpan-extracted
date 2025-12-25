@@ -3,14 +3,14 @@
 
 requires "Carp" => "1.35";
 requires "DBI" => "1.643";
-requires "Data::Identifier" => "v0.12.0";
-requires "Data::URIID" => "v0.8.0";
+requires "Data::Identifier" => "v0.28.0";
+requires "Data::URIID" => "v0.20.0";
 requires "Encode" => "3.06";
+requires "File::ValueFile::Simple::Reader" => "v0.10.0";
+requires "File::ValueFile::Simple::Writer" => "v0.10.0";
 requires "URI" => "1.5";
 requires "perl" => "v5.16.0";
 recommends "File::Spec" => "3.84";
-recommends "File::ValueFile::Simple::Reader" => "v0.2.0";
-recommends "File::ValueFile::Simple::Writer" => "v0.2.0";
 
 on 'test' => sub {
   requires "Test::Exception" => "0.30";

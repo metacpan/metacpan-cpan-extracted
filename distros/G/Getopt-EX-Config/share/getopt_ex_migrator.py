@@ -377,6 +377,8 @@ class MigrationGuide:
         guidance.append("• $REPLACE_UNDERSCORE=1でアンダースコア→ダッシュ変換")
         guidance.append("• Boolean値：! 付加で --no- 対応")
         guidance.append("• 後方互換性：既存の::set記法も継続利用可能")
+        guidance.append("• configure(): Getopt::Longの設定（pass_through等）")
+        guidance.append("• argv(): deal_with後の残り引数を取得")
         
         # 参考例
         guidance.append("\n=== App::Greple::pw の実例 ===")
@@ -761,6 +763,24 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
    • initialize()で$mod, $argvを保存
    • $config->{key}で設定値にアクセス
    • 既存のoption/set関数は削除可能
+
+7. configure()メソッド:
+   Getopt::Longの設定をオブジェクトに適用（グローバル設定を汚さない）
+   $config->configure('pass_through')->deal_with($argv, ...);
+   内部的にGetopt::Long::Parserを使用
+
+8. argv()メソッド:
+   deal_with()処理後の残り引数を取得
+   pass_through使用時に未知のオプションを他に渡す場合に有効
+   sub finalize {
+       $config->configure('pass_through')->deal_with($argv, 'width=i');
+       my @extra = $config->argv;  # 未知のオプション
+       push @ac_opts, @extra;      # 他のコマンドに渡す
+   }
+
+9. 設定キーの命名規則:
+   • キー名はアルファベットで始まる必要あり
+   • アンダースコアで始まるキーは内部予約
         """
         
             return [TextContent(type="text", text=patterns)]

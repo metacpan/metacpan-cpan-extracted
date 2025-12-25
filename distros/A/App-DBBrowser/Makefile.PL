@@ -47,6 +47,7 @@ WriteMakefile(
         'DBD::SQLite'                => '1.74',
         'DBD::SQLite::Constants'     => 0,
         'DBI'                        => 0,
+        'DBI::Const::GetInfoType'    => 0,
         'Encode'                     => 0,
         'Encode::Locale'             => 0,
         'File::Basename'             => 0,

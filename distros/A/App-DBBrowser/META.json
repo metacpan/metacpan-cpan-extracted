@@ -36,6 +36,7 @@
             "DBD::SQLite" : "1.74",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
+            "DBI::Const::GetInfoType" : "0",
             "DateTime::Format::Strptime" : "0",
             "Encode" : "0",
             "Encode::Locale" : "0",
@@ -81,6 +82,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.436",
+   "version" : "2.438",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -10,6 +10,7 @@ use Term::Choose::Util qw( insert_sep );
 use Term::TablePrint   qw();
 
 use App::DBBrowser::Auxil;
+use App::DBBrowser::Table;
 
 
 sub new {
@@ -88,12 +89,9 @@ sub __drop {
     }
     my $row_count;
     if ( ! eval {
-        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
-        $sth->execute();
-        my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
-        my $all_arrayref = $sth->fetchall_arrayref;
-        $row_count = @$all_arrayref;
-        unshift @$all_arrayref, $col_names;
+        my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $all_arrayref = $tbl->select_statement_results( $sql );
+        $row_count = @$all_arrayref - 1;
         my $prompt_pt = sprintf "The %s to be deleted:", $type;
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
         if ( ! $sf->{o}{G}{warnings_table_print} ) {

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More tests => 6;
-use Bit::Set     qw(:all);
+use Bit::Set qw(:all);     
 use Bit::Set::DB qw(:all);
 use FFI::Platypus::Buffer;    # added to facilitate buffer management
 

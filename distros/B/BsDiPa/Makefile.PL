@@ -34,9 +34,21 @@ sub have_xz{
 	}
 }
 
+sub have_bz2{
+	if(system 'bzip2 --help >/dev/null 2>&1' == 0){
+		print "Adding support for libbz2 (BZIP2)\n";
+		$ADDCCF .= ' -Ds__BSDIPA_BZ2=1 ';
+		$ADDLDF .= ' -lbz2 '
+	}else{
+		print "! Cannot find bzip2(1), skipping support for libbz2 (BZIP2)\n";
+		$ADDCCF .= ' -Ds__BSDIPA_BZ2=0 '
+	}
+}
+
 version_and_contact 'c-lib/configh.sh';
 system 'cd c-lib; ./configh.sh s_BSDIPA_32=y';
 have_xz;
+have_bz2;
 
 WriteMakefile(
 #	'OPTIMIZE' => '-g',

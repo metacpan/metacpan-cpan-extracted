@@ -138,6 +138,8 @@ sub add_condition {
 
 sub __add_operator_and_value {
     my ( $sf, $sql, $clause, $stmt, $col, $r_data ) = @_;
+    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @operators = @{$sf->{o}{G}{operators}};
@@ -146,16 +148,24 @@ sub __add_operator_and_value {
         $sql->{$stmt} =~ s/\s\z//;
         @operators = ( "EXISTS", "NOT EXISTS" );
     }
-    elsif ( $sf->{i}{driver} eq 'SQLite' ) {
+    elsif ( $dbms eq 'SQLite' ) {
         @operators = grep { ! /^(?:ANY|ALL)\z/ } @operators;
+        @operators = grep { ! /REGEXP/ } @operators if $driver eq 'ODBC';
     }
-    elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+    elsif ( $dbms eq 'Firebird' ) {
         @operators = uniq map { s/REGEXP(?:_i)?\z/SIMILAR TO/; $_ } @operators;
     }
-    elsif ( $sf->{i}{driver} eq 'Informix' ) {
+    elsif ( $dbms eq 'Informix' ) {
         @operators = uniq map { s/REGEXP(?:_i)?\z/MATCHES/; $_ } @operators;
     }
-    elsif ( $sf->{i}{driver} eq 'ODBC' ) {
+
+    elsif ( $dbms eq 'MSSQL' ) {
+        my $major_server_version = $ax->major_server_version();
+        if ( $major_server_version < 17 ) {
+            @operators = grep { ! /REGEXP/ } @operators;
+        }
+    }
+    elsif ( $dbms eq 'other' ) {
         @operators = grep { ! /REGEXP/ } @operators;
     }
     my $bu_stmt = $sql->{$stmt};
@@ -249,6 +259,7 @@ sub __info_add_condition {
 
 sub read_and_add_value {
     my ( $sf, $sql, $clause, $stmt, $col, $operator, $r_data ) = @_;
+    my $dbms = $sf->{i}{dbms};
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $is_numeric = $ax->is_numeric( $sql, $col );
@@ -323,10 +334,10 @@ sub read_and_add_value {
             $sql->{$stmt} =~ s/ \? (?=\sESCAPE\s'\\'\z) /$value/x;
         }
         elsif ( $operator =~ /REGEXP(?:_i)?\z/ ) {
-            if ( $sf->{i}{driver} eq 'SQLite' ) {
+            if ( $dbms eq 'SQLite' ) {
                 $sql->{$stmt} =~ s/ (?<=\sREGEXP\() \? (?=,\Q$col\E,[01]\)\z) /$value/x;
             }
-            elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
+            elsif ( $dbms =~ /^(?:DB2|Oracle|MSSQL)\z/ ) {
                 $sql->{$stmt} =~ s/ \?  (?=,'[ci]'\)\z) /$value/x;
             }
             else {
@@ -395,8 +406,8 @@ sub __choose_a_column {
 
 sub __pattern_match {
     my ( $sf, $sql, $col, $not_match, $case_sensitive ) = @_;
-    my $driver = $sf->{i}{driver};
-    if ( $driver eq 'SQLite' ) {
+    my $dbms = $sf->{i}{dbms};
+    if ( $dbms eq 'SQLite' ) {
         if ( $not_match ) {
             return sprintf " NOT REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
@@ -404,7 +415,7 @@ sub __pattern_match {
             return sprintf " REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
     }
-    elsif ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
+    elsif ( $dbms =~ /^(?:mysql|MariaDB)\z/ ) {
         if ( $not_match ) {
             return " $col NOT REGEXP"        if ! $case_sensitive;
             return " $col NOT REGEXP BINARY" if   $case_sensitive;
@@ -414,7 +425,7 @@ sub __pattern_match {
             return " $col REGEXP BINARY" if   $case_sensitive;
         }
     }
-    elsif ( $driver eq 'Pg' ) {
+    elsif ( $dbms eq 'Pg' ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $col = $ax->pg_column_to_text( $sql, $col );
         if ( $not_match ) {
@@ -426,7 +437,7 @@ sub __pattern_match {
             return " $col ~"  if   $case_sensitive;
         }
     }
-    elsif ( $driver eq 'Firebird' ) {
+    elsif ( $dbms eq 'Firebird' ) {
         if ( $not_match ) {
             return " $col NOT SIMILAR TO ? ESCAPE '\\'";
         }
@@ -434,7 +445,7 @@ sub __pattern_match {
             return " $col SIMILAR TO ? ESCAPE '\\'";
         }
     }
-    elsif ( $driver =~ /^(?:DB2|Oracle)\z/ ) {
+    elsif ( $dbms =~ /^(?:DB2|Oracle|MSSQL)\z/ ) {
         if ( $not_match ) {
             return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
             return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;

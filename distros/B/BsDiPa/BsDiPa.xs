@@ -39,20 +39,18 @@
 # include "c-lib/s-bsdipa-io.h"
 #endif
 /**/
+#if s__BSDIPA_BZ2
+# undef s_BSDIPA_IO
+# define s_BSDIPA_IO s_BSDIPA_IO_BZ2
+# include "c-lib/s-bsdipa-io.h"
+#endif
+/**/
 #undef s_BSDIPA_IO
 #define s_BSDIPA_IO s_BSDIPA_IO_RAW
 #include "c-lib/s-bsdipa-io.h"
 
 #include <c-lib/s-bsdiff.c>
 #include <c-lib/s-bspatch.c>
-
-#include <c-lib/libdivsufsort/divsufsort.c>
-#undef lg_table
-#define lg_table a_sssort_lg_table
-#include <c-lib/libdivsufsort/sssort.c>
-#undef lg_table
-#define lg_table a_trsort_lg_table
-#include <c-lib/libdivsufsort/trsort.c>
 
 union a_io_cookie{
 	void *ioc_vp;
@@ -62,9 +60,10 @@ union a_io_cookie{
 #endif
 };
 
-/* For testing purposes allow changes via _try_oneshot_set() */
 static IV a_try_oneshot = -1;
+static IV a_level = 0;
 static IV const a_have_xz = s__BSDIPA_XZ;
+static IV const a_have_bz2 = s__BSDIPA_BZ2;
 
 static void *a_alloc(size_t size);
 static void a_free(void *vp);
@@ -93,8 +92,8 @@ a_free(void *vp){
 
 static SV *
 a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_window, SV *is_equal_data, SV *io_cookie){
+	struct s_bsdipa_io_cookie ioc, *iocp;
 	struct s_bsdipa_diff_ctx d;
-	struct s_bsdipa_io_cookie *iocp;
 	SV *pref, *iseq;
 	enum s_bsdipa_state s;
 
@@ -131,9 +130,14 @@ a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_windo
 	else
 		iseq = SvRV(is_equal_data);
 
-	if(io_cookie == NULL || !SvIOK(io_cookie))
-		iocp = NULL;
-	else
+	if(io_cookie == NULL || !SvIOK(io_cookie)){
+		if(a_level == 0)
+			iocp = NULL;
+		else{
+			memset(iocp = &ioc, 0, sizeof(ioc));
+			iocp->ioc_level = a_level;
+		}
+	}else
 		iocp = INT2PTR(struct s_bsdipa_io_cookie*,SvIV(io_cookie));
 
 	d.dc_mem.mc_alloc = &a_alloc;
@@ -156,6 +160,10 @@ a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_windo
 #if s__BSDIPA_XZ
 	else if(what == s_BSDIPA_IO_XZ)
 		s = s_bsdipa_io_write_xz(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
+#endif
+#if s__BSDIPA_BZ2
+	else if(what == s_BSDIPA_IO_BZ2)
+		s = s_bsdipa_io_write_bz2(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
 #endif
 	else /*if(what == s_BSDIPA_IO_RAW)*/{
 		s_bsdipa_off_t x;
@@ -277,6 +285,10 @@ a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv, SV *max_allowe
 	else if(what == s_BSDIPA_IO_XZ)
 		s = s_bsdipa_io_read_xz(&p, iocp);
 #endif
+#if s__BSDIPA_BZ2
+	else if(what == s_BSDIPA_IO_BZ2)
+		s = s_bsdipa_io_read_bz2(&p, iocp);
+#endif
 	else /*if(what == s_BSDIPA_IO_RAW)*/
 		s = s_bsdipa_io_read_raw(&p, iocp);
 	if(s != s_BSDIPA_OK)
@@ -313,13 +325,6 @@ MODULE = BsDiPa PACKAGE = BsDiPa
 VERSIONCHECK: DISABLE
 PROTOTYPES: ENABLE
 
-void
-_try_oneshot_set(nval)
-	SV *nval
-CODE:
-	if(SvIOK(nval))
-		a_try_oneshot = SvIV(nval);
-
 SV *
 VERSION()
 CODE:
@@ -345,6 +350,13 @@ SV *
 HAVE_XZ()
 CODE:
 	RETVAL = newSViv(a_have_xz);
+OUTPUT:
+	RETVAL
+
+SV *
+HAVE_BZ2()
+CODE:
+	RETVAL = newSViv(a_have_bz2);
 OUTPUT:
 	RETVAL
 
@@ -375,6 +387,20 @@ CODE:
 	RETVAL = newSViv(s_BSDIPA_INVAL);
 OUTPUT:
 	RETVAL
+
+void
+core_try_oneshot_set(nval)
+	SV *nval
+CODE:
+	if(SvIOK(nval))
+		a_try_oneshot = SvIV(nval);
+
+void
+core_diff_level_set(nval)
+	SV *nval
+CODE:
+	if(SvIOK(nval))
+		a_level = SvIV(nval);
 
 SV *
 core_diff_raw(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
@@ -417,6 +443,21 @@ OUTPUT:
 	RETVAL
 #endif
 
+#if s__BSDIPA_BZ2
+SV *
+core_diff_bz2(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
+	SV *before_sv
+	SV *after_sv
+	SV *patch_sv
+	SV *magic_window
+	SV *is_equal_data
+	SV *io_cookie
+CODE:
+	RETVAL = a_core_diff(s_BSDIPA_IO_BZ2, before_sv, after_sv, patch_sv, magic_window, is_equal_data, io_cookie);
+OUTPUT:
+	RETVAL
+#endif
+
 SV *
 core_patch_raw(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_cookie=NULL)
 	SV *after_sv
@@ -451,6 +492,20 @@ core_patch_xz(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_c
 	SV *io_cookie
 CODE:
 	RETVAL = a_core_patch(s_BSDIPA_IO_XZ, after_sv, patch_sv, before_sv, max_allowed_restored_len, io_cookie);
+OUTPUT:
+	RETVAL
+#endif
+
+#if s__BSDIPA_BZ2
+SV *
+core_patch_bz2(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_cookie=NULL)
+	SV *after_sv
+	SV *patch_sv
+	SV *before_sv
+	SV *max_allowed_restored_len
+	SV *io_cookie
+CODE:
+	RETVAL = a_core_patch(s_BSDIPA_IO_BZ2, after_sv, patch_sv, before_sv, max_allowed_restored_len, io_cookie);
 OUTPUT:
 	RETVAL
 #endif

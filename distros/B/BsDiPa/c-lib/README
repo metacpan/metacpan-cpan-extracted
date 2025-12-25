@@ -5,30 +5,33 @@ Colin Percival's BSDiff, imported from FreeBSD and transformed into
 a library; please see header comment of s-bsdipa-lib.h for more:
 create or apply binary difference patch.  In general:
 
-- one includes s-bsdipa-lib.h and uses the all-in-memory s_bsdipa_diff()
+- One includes s-bsdipa-lib.h and uses the all-in-memory s_bsdipa_diff()
   and s_bsdipa_patch() functions to create and apply patches.
   Ie, (for example mmap(2)ed) memory in, (heap) memory out.
 
-- necessary compression / storage preparation can (could) be achieved
+- Necessary compression / storage preparation can (could) be achieved
   easily by including s-bsdipa-io.h after defining s_BSDIPA_IO as
   desired, followed by using the according s_bsdipa_io_write_*() and
   _read_*() functions; These still do not perform direct I/O, but call
   a supplied hook with fully prepared buffers or store in (heap) memory,
   respectively.  Multiple _IO methods are provided.
 
-- in general the lib/ directory of the source repository is self-
+- In general the lib/ directory of the source repository is self-
   contained, and may be copied for inclusion in other projects.
+  (If s_BSDIPA_SMALL approach is taken, lib/libdivsufsort/ and
+  lib/divsufsort.h may also be removed.)
 
-- please see the introductional header comments of s-bsdipa-lib.h and
+- Please see the introductional header comments of s-bsdipa-lib.h and
   s-bsdipa-io.h for more.
 
-- the directory s-bsdipa contains a self-contained (except for
+- The directory s-bsdipa contains a self-contained (except for
   compression libraries) (example) program which can create and apply
   patches (like a combined FreeBSD bsdiff and bspatch program).
   It times execution and tracks memory usage on stderr.
 
-- the directory perl contains the self-contained BsDiPa CPAN module.
-  (Perl ships with ZLIB, liblzma/XZ support is compile-time detected.)
+- The directory perl contains the self-contained BsDiPa CPAN module.
+  (Perl ships with ZLIB, liblzma/XZ and libz2/BZ2 support is
+  compile-time detected.)
 
 Licenses (full text included in s-bsdipa-lib.h):
   libdivsufsort(/LICENSE): MIT
@@ -43,8 +46,95 @@ Repository:
 
 Contact: steffen at sdaoden dot eu.
 
-RELEASES
---------
+1. s-bsdipa example
+2. Releases
+
+1. s-bsdipa example
+-------------------
+
+  $ file .A .B
+  .A: troff or preprocessor input, ASCII text
+  .B: troff or preprocessor input, ASCII text
+
+  $ ll .A .B
+  -rw-r----- 1 steffen steffen 397962 Dec 19 00:34 .A
+  -rw-r----- 1 steffen steffen 428420 Dec 19 00:34 .B
+
+  $ for c in -z -J -j; do
+      for b in 32 64; do
+        echo $b/$c
+        ./s-bsdipa$b $c diff .B .A .P$b$c
+        ./s-bsdipa$b patch .A .P$b$c .R$b$c
+      done
+    done
+  32/-z
+  # 71965 result bytes | 121 allocs: all=2734901 peek=2283441 curr=0
+  # Code 0:078 secs, ZLIB I/O 0:079 secs
+  # data: ctrl=54192 (4516 entries) diff=310890 extra=117530
+  # 428420 result bytes | 4 allocs: all=950961 peek=911033 curr=0
+  # Code 0:001 secs, ZLIB I/O 0:001 secs
+  64/-z
+  # 74426 result bytes | 121 allocs: all=4644533 peek=4138461 curr=0
+  # Code 0:079 secs, ZLIB I/O 0:140 secs
+  # data: ctrl=108384 (4516 entries) diff=310890 extra=117530
+  # 428420 result bytes | 4 allocs: all=1005153 peek=965225 curr=0
+  # Code 0:001 secs, ZLIB I/O 0:001 secs
+  32/-J
+  # 62920 result bytes | 130 allocs: all=51830824 peek=49975804 curr=0
+  # Code 0:077 secs, XZ I/O 0:055 secs
+  # data: ctrl=54192 (4516 entries) diff=310890 extra=117530
+  # 428420 result bytes | 11 allocs: all=5140969 peek=4712436 curr=0
+  # Code 0:001 secs, XZ I/O 0:003 secs
+  64/-J
+  # 64472 result bytes | 130 allocs: all=53740456 peek=50030416 curr=0
+  # Code 0:079 secs, XZ I/O 0:068 secs
+  # data: ctrl=108384 (4516 entries) diff=310890 extra=117530
+  # 428420 result bytes | 11 allocs: all=5195161 peek=4766628 curr=0
+  # Code 0:001 secs, XZ I/O 0:003 secs
+  32/-j
+  # 64711 result bytes | 120 allocs: all=9984857 peek=8129837 curr=0
+  # Code 0:076 secs, BZ2 I/O 0:014 secs
+  # data: ctrl=54192 (4516 entries) diff=310890 extra=117530
+  # 428420 result bytes | 4 allocs: all=4575177 peek=4146756 curr=0
+  # Code 0:001 secs, BZ2 I/O 0:008 secs
+  64/-j
+  # 64335 result bytes | 120 allocs: all=11894489 peek=8184449 curr=0
+  # Code 0:076 secs, BZ2 I/O 0:015 secs
+  # data: ctrl=108384 (4516 entries) diff=310890 extra=117530
+  # 428420 result bytes | 4 allocs: all=4629369 peek=4200948 curr=0
+  # Code 0:001 secs, BZ2 I/O 0:007 secs
+
+2. Releases
+-----------
+
+v0.9.0, 2025-12-24:
+  + Breaks backward compatibility of bsdipa_patch() as that assumes
+    patches satisfy content constraints that are only satisfied by
+    bsdipa_diff() of v0.9.0!!
+
+  + Import of Colin Percival's original qsufsort() algorithm; it was
+    replaced with libdivsufsort in FreeBSD, and Colin Percival pointed
+    me to this because of existing bugfixes.  The original variant is
+    smaller code, but suffers from a performance penalty on large files
+    (about 15% for unrelated 5 megabyte binaries) -- it is faster for
+    small files, however, so having it around is very beneficial.
+  ++ By default both algorithms are compiled in, their usage depends on
+     the data size.
+
+v0.8.1, 2025-12-20:
+  + Notes:
+    Not released, bsdipa_patch() includes a patch content constraint
+    test that is not satisfied before v0.9.0!
+  + Warning:
+    Miscompilations (of libdivsufsort) with gcc 15.2.0 and -O3 and above!
+    As well as in sanitizer compilations.
+    (clang 21.1.6 ok.)  (All on Linux.)
+  - Tighten tested constraints on patch content.
+  - Optimize away needless work when applying patch.
+  - Fix beflen!=0 aftlen==0 "algorithm error" in BSDiff resulting in SEGV.
+  - ZLIB I/O: allow compression config via cookie.
+  - perl: make official core_try_oneshot_set(), add core_diff_level_set().
+  - Add optional BZ2 (BZIP2, libbz2) _IO method support.
 
 v0.8.0, 2025-07-03:
   - ABI and API breakage.

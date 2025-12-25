@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.630';
+our $VERSION = '0.631';
 
 use 5.020;
 use Moo;
@@ -33,8 +33,8 @@ sub evaluation_order ($class) { 5 }
 sub keywords ($class, $spec_version) {
   return (
     qw(title description default),
-    $spec_version !~ /^draft[467]$/ ? 'deprecated' : (),
-    $spec_version !~ /^draft[46]$/ ? qw(readOnly writeOnly) : (),
+    $spec_version !~ /^draft[467]\z/ ? 'deprecated' : (),
+    $spec_version !~ /^draft[46]\z/ ? qw(readOnly writeOnly) : (),
     $spec_version ne 'draft4' ? 'examples' : (),
   );
 }
@@ -90,7 +90,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.630
+version 0.631
 
 =head1 DESCRIPTION
 

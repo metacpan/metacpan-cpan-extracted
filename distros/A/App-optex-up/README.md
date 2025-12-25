@@ -49,10 +49,6 @@ Module options must be specified before `--` separator.
     creates a 2-column, 3-row layout (6-up).  This is equivalent to
     `-C2 -R3`.
 
-- **--height**=_N_
-
-    Set the page height directly in lines.
-
 - **-S** _N_, **--pane-width**=_N_
 
     Set the pane width in characters.  Default is 85.  When **--pane** is
@@ -64,25 +60,11 @@ Module options must be specified before `--` separator.
     Set the border style for ansicolumn.  Default is `heavy-box`.
     See [App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn) for available styles.
 
-- **--ls**=_STYLE_, **--line-style**=_STYLE_
-
-    Set the line style for ansicolumn.  Available styles are `none`,
-    `truncate`, `wrap`, and `wordwrap`.  Default is `wrap` (inherited
-    from ansicolumn's document mode).
-
 - **-F**, **--fold**
 
     Enable fold mode (disable page mode).  In fold mode, the entire
     content is split evenly across columns without pagination.  Page
     mode is the default.
-
-- **-H**, **--filename**
-
-    Show filename headers.  This is passed to ansicolumn.
-
-- **-V**, **--parallel**
-
-    Enable parallel view mode.  This is passed to ansicolumn.
 
 - **--pager**=_COMMAND_
 
@@ -91,6 +73,15 @@ Module options must be specified before `--` separator.
 - **--no-pager**
 
     Disable pager.  Output goes directly to stdout.
+
+- Other options
+
+    Any unrecognized options are passed through to [App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn).
+    For example, `--cm` option can be used to set colormap:
+
+        optex -Mup --cm=BORDER=R -- command
+
+    See [App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn) for available options.
 
 # EXAMPLES
 

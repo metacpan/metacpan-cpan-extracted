@@ -5,7 +5,7 @@ use warnings;
 my @modules;
 
 BEGIN {
-    my @modules = qw(
+    @modules = qw(
         lib/App/DBBrowser.pm
         lib/App/DBBrowser/Auxil.pm
         lib/App/DBBrowser/CreateDropAttach.pm
@@ -34,10 +34,10 @@ BEGIN {
 
         lib/App/DBBrowser/GetContent/Parse.pm
         lib/App/DBBrowser/GetContent/Source.pm
-        lib/App/DBBrowser/Opt/DBGet.pm
-        lib/App/DBBrowser/Opt/DBSet.pm
-        lib/App/DBBrowser/Opt/Get.pm
-        lib/App/DBBrowser/Opt/Set.pm
+        lib/App/DBBrowser/Options.pm
+        lib/App/DBBrowser/Options/Defaults.pm
+        lib/App/DBBrowser/Options/Menus.pm
+        lib/App/DBBrowser/Options/ReadWrite.pm
         lib/App/DBBrowser/Table.pm
         lib/App/DBBrowser/Table/CommitWriteSQL.pm
         lib/App/DBBrowser/Table/Extensions.pm

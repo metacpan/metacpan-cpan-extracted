@@ -1,6 +1,5 @@
 package # hide from PAUSE
 App::DBBrowser::Table;
-
 use warnings;
 use strict;
 use 5.016;
@@ -18,7 +17,9 @@ use Term::Form::ReadLine qw();
 use Term::TablePrint     qw();
 
 use App::DBBrowser::Auxil;
-use App::DBBrowser::Opt::Set;
+use App::DBBrowser::Options;
+use App::DBBrowser::Options::ReadWrite;
+
 use App::DBBrowser::Table::Substatement;
 #use App::DBBrowser::Table::InsertUpdateDelete;     # required
 
@@ -135,7 +136,9 @@ sub browse_the_table {
                 my $write = App::DBBrowser::Table::InsertUpdateDelete->new( $sf->{i}, $sf->{o}, $sf->{d} );
                 my $backup_sql = $ax->clone_data( $sql );
                 $write->table_write_access( $sql );
-                for my $key ( keys %$backup_sql ) { ##
+                # reset $sql else 'bu_where_stmt' from a delete/update could remain in $sql
+                $ax->reset_sql( $sql );
+                for my $key ( keys %$backup_sql ) {
                     $sql->{$key} = $backup_sql->{$key};
                 }
                 1 }
@@ -170,7 +173,7 @@ sub browse_the_table {
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $all_arrayref;
             if ( ! eval {
-                $all_arrayref = $sf->__selected_statement_result( $sql );
+                $all_arrayref = $sf->select_statement_results( $sql );
                 1 }
             ) {
                 $ax->print_error_message( $@ );
@@ -189,7 +192,7 @@ sub browse_the_table {
 }
 
 
-sub __selected_statement_result {
+sub select_statement_results {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $statement = $ax->get_stmt( $sql, 'Select', 'prepare' );
@@ -200,17 +203,38 @@ sub __selected_statement_result {
     my $sth = $sf->{d}{dbh}->prepare( $statement );
     $sth->execute();
     my $col_names = $sth->{NAME}; # not quoted
+    my $col_types = $sth->{TYPE};
     my $all_arrayref = $sth->fetchall_arrayref;
     unshift @$all_arrayref, $col_names;
-
     if ( $sf->{i}{driver} eq 'DB2' && length $sf->{o}{G}{db2_encoding} ) {
         print 'Decoding: ...' . "\r"  if $sf->{o}{table}{progress_bar};
         my $encoding = Encode::find_encoding( $sf->{o}{G}{db2_encoding} );
         if ( ! ref $encoding ) {
             die qq(encoding "$sf->{o}{G}{db2_encoding}" not found);
         }
+        my $is_text = [ map { /^(?:1|12|2005|-15)\z/ ? 1 : 0 } @$col_types ];
+
         for my $row ( @$all_arrayref ) {
-            $_ = $encoding->decode( $_ ) for @$row;
+            for my $i ( 0 .. $#$row ) {
+                if ( $is_text->[$i] ) {
+                    $row->[$i] = $encoding->decode( $row->[$i] )
+                }
+            }
+        }
+    }
+    elsif ( $sf->{i}{driver} eq 'DuckDB' ) {
+        my $duckdb_encoding = 'UTF-8';
+        my $encoding = Encode::find_encoding( $duckdb_encoding );
+        if ( ! ref $encoding ) {
+            die qq(encoding "$duckdb_encoding" not found);
+        }
+        for my $row ( @$all_arrayref ) {
+            for my $i ( 0 .. $#$row ) {
+                if ( $col_types->[$i] == 12 ) {
+                    $row->[$i] = $encoding->decode( $row->[$i] );
+                    #Encode::_utf8_on( $row->[$i] );
+                }
+            }
         }
     }
     return $all_arrayref;
@@ -224,7 +248,7 @@ sub __export {
         return;
     }
     print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
-    my $all_arrayref = $sf->__selected_statement_result( $sql );
+    my $all_arrayref = $sf->select_statement_results( $sql );
     my $open_mode;
     if ( length $sf->{o}{export}{file_encoding} ) {
         $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
@@ -328,8 +352,10 @@ sub __get_filename_fs {
                 next FILE_NAME;
             }
             elsif ( $choice eq $hidden ) {
-                my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
-                $sf->{o} = $opt_set->set_options( 'export' );
+                my $op = App::DBBrowser::Options->new( $sf->{i}, $sf->{o} );
+                my $op_rw = App::DBBrowser::Options::ReadWrite->new( $sf->{i}, $sf->{o} );
+                $op->config_groups( [ { name => 'group_export', text => "- Export" } ], $sf->{i}{plugin} );
+                $op_rw->read_config_file( $sf->{i}{driver}, $sf->{i}{plugin} );
                 next FULL_FILE_NAME;
             }
             elsif ( $choice eq $no ) {

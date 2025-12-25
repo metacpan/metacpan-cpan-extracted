@@ -1,3 +1,12 @@
+v0.11  2025-12-24Z
+    - Improved documentation
+    - Support %port in addition to &port in SIRTX style parsing
+    - Updated requirements for Data::Identifier and Data::URIID
+    - Getters displaycolour, icontext, and description now die if no value could be found
+    - Updated dependency on File::ValueFile
+    - Let Data::TagDB::Tag inherit from Data::Identifier::Interface::Simple
+    - Let Data::TagDB::WellKnown inherit from Data::Identifier::Interface::Known
+
 v0.10  2025-10-19Z
     - Improved documentation
     - Added support for SIRTX function names via /name

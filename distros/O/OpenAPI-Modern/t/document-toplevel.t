@@ -227,7 +227,7 @@ YAML
     [
       {
         keywordLocation => '/$self',
-        error => re(qr/^\$self value is not a valid URI-reference$/i),
+        error => re(qr/^\$self value is not a valid URI-reference\z/i),
       },
     ],
     '$self must be a uri-reference',
@@ -262,7 +262,7 @@ YAML
       {
         keywordLocation => '/jsonSchemaDialect',
         absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
-        error => re(qr/^jsonSchemaDialect value is not a valid URI-reference$/i),
+        error => re(qr/^jsonSchemaDialect value is not a valid URI-reference\z/i),
       },
     ],
     'jsonSchemaDialect must be a uri-reference',
@@ -421,7 +421,7 @@ YAML
         path => '/components/schemas/Foo/properties/foo',
         specification_version => 'draft2019-09',
         document => shallow($doc),
-        vocabularies => bag(grep !/(Unevaluated|OpenAPI)$/, OAS_VOCABULARIES->@*),
+        vocabularies => bag(grep !/(Unevaluated|OpenAPI)\z/, OAS_VOCABULARIES->@*),
       },
       # the oas vocabulary, and the dialect that uses it
       DEFAULT_DIALECT->{+OAS_VERSION} => {

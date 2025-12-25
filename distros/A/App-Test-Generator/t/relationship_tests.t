@@ -224,13 +224,13 @@ subtest 'dependency method' => sub {
 
 	# Accept either dependency or conditional_requirement (they're semantically the same)
 	my @deps = grep { $_->{type} eq 'dependency' || $_->{type} eq 'conditional_requirement' }
-	           @{$schema->{relationships}};
+		@{$schema->{relationships}};
 	cmp_ok(scalar(@deps), '>=', 1, 'found dependency or conditional requirement');
 
 	if (@deps) {
 		my $rel = $deps[0];
 		ok($rel->{type} eq 'dependency' || $rel->{type} eq 'conditional_requirement',
-		   'correct type (dependency or conditional_requirement)');
+			'correct type (dependency or conditional_requirement)');
 
 		# Check the relationship makes sense
 		if ($rel->{type} eq 'dependency') {
@@ -318,8 +318,8 @@ subtest 'no_relationships method' => sub {
 my $schema_dir = File::Spec->catdir($tempdir, 'schemas');
 ok(-d $schema_dir, 'schema directory created');
 
-my $mutex_yaml = File::Spec->catfile($schema_dir, 'mutually_exclusive.yaml');
-ok(-f $mutex_yaml, 'mutually_exclusive.yaml file created');
+my $mutex_yaml = File::Spec->catfile($schema_dir, 'mutually_exclusive.yml');
+ok(-f $mutex_yaml, 'mutually_exclusive.yml file created');
 
 open my $yaml_fh, '<', $mutex_yaml or die "Can't read YAML: $!";
 my $yaml_content = do { local $/; <$yaml_fh> };
@@ -331,8 +331,7 @@ like($yaml_content, qr/file/, 'YAML contains first parameter');
 like($yaml_content, qr/content/, 'YAML contains second parameter');
 
 # Test comments include relationship info
-like($yaml_content, qr/Parameter relationships detected:/,
-     'YAML comments mention relationships');
+like($yaml_content, qr/Parameter relationships detected:/, 'YAML comments mention relationships');
 
 done_testing();
 

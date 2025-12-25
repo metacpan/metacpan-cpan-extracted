@@ -257,6 +257,7 @@ sub __pattern_history {
     if ( $in_out eq 'in' ) {
         my $in = [
             '%Y-%m-%d %H:%M:%S',
+            '%Y-%m-%dT%H:%M:%S',
             '%Y-%m-%d %H:%M:%S.%N%z',
             '%a %d %b %Y %I:%M:%S %P',
             '%d.%m.%Y %H:%M:%S',
@@ -275,7 +276,7 @@ sub __pattern_history {
         my $out = [
             '%Y-%m-%d %H:%M:%S',
             '%Y-%m-%d %H:%M:%S.%6N%z',
-            $sf->{i}{driver} eq 'Oracle' ? '%d-%b-%y %I.%M.%S.%6N %p %Z' : '%a %d %b %Y %I:%M:%S.%6N %p %Z'
+            $sf->{i}{dbms} eq 'Oracle' ? '%d-%b-%y %I.%M.%S.%6N %p %Z' : '%a %d %b %Y %I:%M:%S.%6N %p %Z'
         ];
         return $out;
     }

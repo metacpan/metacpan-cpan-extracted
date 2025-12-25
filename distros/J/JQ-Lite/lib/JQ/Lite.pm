@@ -9,7 +9,7 @@ use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '1.55';
+our $VERSION = '1.57';
 
 sub new {
     my ($class, %opts) = @_;
@@ -60,7 +60,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 1.55
+Version 1.57
 
 =head1 SYNOPSIS
 
@@ -508,6 +508,20 @@ Example:
   .title | contains("perl")     # => true
   .tags  | contains("json")     # => true
   .meta  | contains("lang")     # => true
+
+=item * contains_subset(value)
+
+Opt-in jq-style subset containment. Behaves like C<contains/1>, but when
+arrays are involved the right-hand array must be a multiset subset of the
+left-hand one. Order does not matter and duplicate elements are honoured.
+Nested arrays inside hashes are evaluated with the same subset rules.
+
+Examples:
+
+  [1,2,3] | contains_subset([2,3])            # => true
+  [1,2,3] | contains_subset([3,2])            # => true
+  [1,2,3] | contains_subset([4])              # => false
+  {"b":{"y":[1,2,3]}} | contains_subset({"b":{"y":[2]}})  # => true
 
 =item * test(pattern[, flags])
 

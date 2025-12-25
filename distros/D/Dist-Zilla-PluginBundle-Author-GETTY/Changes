@@ -1,444 +1,312 @@
-==================================================
-Changes from 1750-10-27 00:00:00 +0000 to present.
-==================================================
+0.202     2025-12-25 05:23:30Z
+
+ - Switch to Dist::Zilla::PluginBundle::Git::VersionManager
+
+=[ Old Changes ]===========================================
 
 ------------------------------------------
 version 0.120 at 2024-08-10 02:38:09 +0000
 ------------------------------------------
-
   Change: 9760915a2a60e2faee490e8a765c19e17f9c9e7b
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2024-08-10 04:37:39 +0000
-
     Fixing some details after hints of ether 
-
 ------------------------------------------
 version 0.117 at 2024-08-10 00:17:10 +0000
 ------------------------------------------
-
   Change: 37066a0e64cdb35bdb76aa766db9e482ded3f201
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2024-08-10 02:17:10 +0000
-
     Adding Encoding Plugin 
-
 ------------------------------------------
 version 0.116 at 2024-07-03 00:59:55 +0000
 ------------------------------------------
-
   Change: 57f5c2115b2684af3def6632ca983aa3707e971d
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2024-07-03 02:59:55 +0000
-
     Weaver Section Support added 
-
 ------------------------------------------
 version 0.115 at 2024-06-16 04:38:21 +0000
 ------------------------------------------
-
   Change: 9a7e15ca4e40e6f0e9ca05abf8b51da91739cd7b
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2024-06-16 06:38:21 +0000
-
     Removing TravisCI completely, removing BumpVersionFromGit 
-
 ------------------------------------------
 version 0.114 at 2023-05-22 21:45:41 +0000
 ------------------------------------------
-
   Change: 8066ec85b9f727178da7fb28049dc5ccfc8a3b09
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2023-05-22 23:45:41 +0000
-
     Added deprecated feature 
-
 ------------------------------------------
 version 0.113 at 2023-05-21 18:19:59 +0000
 ------------------------------------------
-
   Change: c7d87c488d7b64c4f8805b9790e52ed73c075058
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2023-05-21 20:19:59 +0000
-
     Adapting documentation 
-
   Change: 14eeb63a857cae41cc31699e9175041c0bf47b99
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2023-05-21 20:10:32 +0000
-
     Remove travis.yml, adding gather parameters 
-
 ------------------------------------------
 version 0.112 at 2021-10-23 14:44:59 +0000
 ------------------------------------------
-
   Change: e4c54ce07b6d26626a5c0790a2eddee98f7f2725
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2021-10-23 14:44:59 +0000
-
     Updated .travis.yml 
-
   Change: 66c506b3e08161e87951ba042f88554a560249ff
   Author: Torsten Raudssus <torsten@raudssus.de>
   Date : 2021-10-23 15:14:40 +0000
-
     Merge pull request #5 from yoe/master
-
     Alien: also support the version_check attribute 
-
   Change: 78dddbe3143f491bb4e55c4697cd1e66f8c79375
   Author: Wouter Verhelst <wouter.verhelst@zetes.com>
   Date : 2021-09-17 10:32:33 +0000
-
     Alien: also support the version_check attribute 
-
   Change: ab7635f3756d3b3a09ebf3aabfcd5591c01dc937
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2019-08-25 20:17:48 +0000
-
     Updated .travis.yml with newest version of TravisCI plugin 
-
   Change: 34f9073e6996e50165717c921724fa8bdbe947ab
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2019-08-25 19:33:40 +0000
-
     New travis configuration 
-
 ------------------------------------------
 version 0.111 at 2019-08-25 16:33:10 +0000
 ------------------------------------------
-
   Change: 3b24c3f7d735c431a12e14043f9a58217076f448
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2019-08-25 18:33:10 +0000
-
     Remove PruneCruft, updated doc 
-
   Change: e558958c11370aa7bcf6a912f52171808333768e
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2019-08-25 18:02:13 +0000
-
     Starting to add dotfiles in Git::Gathering 
-
 ------------------------------------------
 version 0.110 at 2015-02-05 04:36:52 +0000
 ------------------------------------------
-
   Change: 605c06b0ccaf5f02f5d3f4cd8822ade61718fd65
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2015-02-05 05:36:52 +0000
-
     New travis.yml 
-
   Change: 42e929520de12d9a2d0d021517b905d9ec0f83cc
   Author: Torsten Raudssus <github@raudssus.de>
   Date : 2015-02-05 05:36:03 +0000
-
     Merge pull request #4 from kentfredric/vregexp
-
     Attempt to resolve version regexp for changelog generation. 
-
   Change: a37cb1d18992606be3fd5d6e549e58f1069d4f5a
   Author: Torsten Raudssus <github@raudssus.de>
   Date : 2015-02-05 05:35:41 +0000
-
     Merge pull request #3 from plicease/bin_requires
-
     add support for [Alien] bin_requires 
-
   Change: 25997a4125d96ee57d6133f512a7f86bc594c34f
   Author: Kent Fredric <kentfredric@gmail.com>
   Date : 2015-01-19 00:46:25 +0000
-
     Attempt to resolve version regexp for changelog generation.
-
     This will permit tags that are versions but lack a 'v' prefix to be
     considered version tags, and will thus make the changelog actually
     make sense instead of being a continuous stream of garbage. 
-
   Change: 3f0abd43db6fa46936569ecb1ed7367b48c3b25a
   Author: Graham Ollis <perl@wdlabs.com>
   Date : 2014-10-09 20:08:39 +0000
-
     add support for [Alien] bin_requires 
-
 ------------------------------------------
 version 0.109 at 2015-02-05 04:22:14 +0000
 ------------------------------------------
-
   Change: 80de03b80cf46ea4aa3059f610810671a0a49567
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2015-02-05 05:22:14 +0000
-
     Fixed docs 
-
 ------------------------------------------
 version 0.108 at 2015-02-05 03:32:16 +0000
 ------------------------------------------
-
   Change: 993faf2b6fe9699525f5ba6421b6924a7d5ede25
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2015-02-05 04:32:16 +0000
-
     ok ok that back 
-
   Change: 4b86731fe3a16f906bb71cb8a633fda9b403a036
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2015-02-05 04:30:30 +0000
-
     XS functionality 
-
 ------------------------------------------
 version 0.107 at 2014-12-31 22:32:59 +0000
 ------------------------------------------
-
   Change: acc5f0e4ecb0e963d2b785585a1c7004ca45a12d
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-12-31 23:32:59 +0000
-
     GatherDir replaced with Git::GatherDir 
-
 ------------------------------------------
 version 0.106 at 2014-11-27 04:22:53 +0000
 ------------------------------------------
-
   Change: 72ba140dadea264c2c9a6a0867d4666e4f307a6c
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-11-27 05:22:53 +0000
-
     Fixed huge bug about travis and run integration, logical this gives
     also a new .travis.yml ;) 
-
 ------------------------------------------
 version 0.105 at 2014-11-25 16:13:47 +0000
 ------------------------------------------
-
   Change: ca257a1e99a1a3fc9bd030fd82944ad9f4319567
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-11-25 17:13:47 +0000
-
     Removed legacy, fixed the Repository<=>GithubMeta collide introduced
     by latest Dist::Zilla updates 
-
 ------------------------------------------
 version 0.104 at 2014-09-25 12:43:09 +0000
 ------------------------------------------
-
   Change: c79751110c8c3452409f3a159768ddb3452381ad
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-09-25 14:43:09 +0000
-
     Bootstrapme! kentnl++ 
-
 ------------------------------------------
 version 0.103 at 2014-09-22 18:11:23 +0000
 ------------------------------------------
-
   Change: 16682a41670949cc572fbd57ace5653e43952adc
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-09-22 20:11:23 +0000
-
     Bumped requirement of dzil alien plugin 
-
   Change: 056453214a4eda43d8d92ad95774124c300a60f6
   Author: Torsten Raudssus <github@raudssus.de>
   Date : 2014-09-22 20:09:29 +0000
-
     Merge pull request #2 from plicease/alien_0.005
-
     support for Alien::Base 0.005 features 
-
   Change: cfb8f84a99c1a8abdf0e6294f589e2258da6e3c5
   Author: Graham Ollis <plicease@cpan.org>
   Date : 2014-09-10 12:56:04 +0000
-
     support for Alien::Base 0.005 features 
-
 ------------------------------------------
 version 0.101 at 2014-07-05 19:20:21 +0000
 ------------------------------------------
-
   Change: 6284bead8b7551b633dde9a7e40696aa6bdac9e8
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-07-05 21:20:21 +0000
-
     Switched to Prereqs::FromCPANfile 
-
 ------------------------------------------
 version 0.016 at 2013-12-24 00:44:53 +0000
 ------------------------------------------
-
   Change: 45f49f500485a14879d5dd5ca653c81b4d2094cd
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-12-24 01:44:53 +0000
-
     Several changes involving adding more no_ parameter for non cpan
     distributions 
-
 ------------------------------------------
 version 0.015 at 2013-05-02 11:55:41 +0000
 ------------------------------------------
-
   Change: 7c2b309939dbde955477715edb052dc0a4987ee1
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-05-02 07:55:41 +0000
-
     Switched over to [TravisCI] 
-
 ------------------------------------------
 version 0.014 at 2013-04-21 00:01:41 +0000
 ------------------------------------------
-
   Change: 5b9bb160fec55739922028b871ce747d8eb61105
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-04-21 02:01:41 +0000
-
     Added switch to deactivate ChangelogFromGit in favour for NextRelease 
-
 ------------------------------------------
 version 0.013 at 2013-04-20 23:21:32 +0000
 ------------------------------------------
-
   Change: 5877f308a518ba2eedffdd5ec102c74391bffd21
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-04-21 01:21:32 +0000
-
     Now with working requirements 
-
 ------------------------------------------
 version 0.012 at 2013-04-20 23:19:59 +0000
 ------------------------------------------
-
   Change: de5f267d9baf724c06c946dfda22faa7b1c72535
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-04-21 01:19:59 +0000
-
     Added TravisYML 
-
   Change: 4455c30a8a26907bd63c72576dfe71735c265644
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-03-03 00:04:36 +0000
-
     Micro dcumentation flaw fixed (bad example distribution name) 
-
 ------------------------------------------
 version 0.011 at 2013-03-02 22:54:30 +0000
 ------------------------------------------
-
   Change: bc548ea4703ed028eabef9b0efb769a4726f03e7
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-03-02 23:54:30 +0000
-
     Bumped requirement versions, tuned documentation massivly 
-
 ------------------------------------------
 version 0.010 at 2013-03-02 19:21:42 +0000
 ------------------------------------------
-
   Change: 2ab7b9b1e78d35d93f184e2fdae63583138f6f04
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-03-02 20:21:42 +0000
-
     Option to directly add [Alien] for the test 
-
 ------------------------------------------
 version 0.009 at 2013-03-02 17:02:49 +0000
 ------------------------------------------
-
   Change: cfa7c792eaa374feea358c1ff4d9e6fca32f5d46
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-03-02 18:02:49 +0000
-
     Added Test::LoadAllModules to requirement base 
-
 ------------------------------------------
 version 0.008 at 2013-02-26 21:26:23 +0000
 ------------------------------------------
-
   Change: e6c852623009cc9a2380748e7dd14e567eec89d7
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-02-26 22:26:23 +0000
-
     Added new features to modify install release command (or deactivate
     it totally) 
-
 ------------------------------------------
 version 0.007 at 2013-02-26 01:46:49 +0000
 ------------------------------------------
-
   Change: 6ddd275592612a64b871d26f1aa2c3ca0f758adf
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-02-26 02:46:49 +0000
-
     Added no_makemaker flag 
-
 ------------------------------------------
 version 0.006 at 2013-02-08 00:20:20 +0000
 ------------------------------------------
-
   Change: bb1a445633e19bf28621710d29a45a7a9846df73
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-02-08 01:20:20 +0000
-
     Hups... fixed the new features ;) TRALALALALA 
-
   Change: 077d8f24231ef2514a222233d0be5218bb3fdab1
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-02-04 03:18:49 +0000
-
     Fixed small typo in SYNOPSIS 
-
 ------------------------------------------
 version 0.005 at 2013-02-04 02:10:04 +0000
 ------------------------------------------
-
   Change: 6c78010aa715064046951251162ef07d011d44c4
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-02-04 03:10:04 +0000
-
     Added several features like Dist::Zilla::Plugin::Run integration and
     duckpan / no_cpan / no_install options 
-
 ------------------------------------------
 version 0.004 at 2013-02-03 23:50:08 +0000
 ------------------------------------------
-
   Change: f09949ab9b8c386bec2b0211a930b670cfe6591c
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2013-02-04 00:50:08 +0000
-
     Added author and release_branch option for configuration 
-
 ------------------------------------------
 version 0.003 at 2012-10-01 01:37:30 +0000
 ------------------------------------------
-
   Change: 315f9d496cf227454d24b57c92604735fe7141f7
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2012-10-01 03:37:30 +0000
-
     Added Git::CheckFor::CorrectBranch 
-
 ------------------------------------------
 version 0.002 at 2012-07-05 12:37:17 +0000
 ------------------------------------------
-
   Change: e10b73aaf0c75f4331dbda6fa12b9f9f8f3676ab
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2012-07-05 08:37:17 +0000
-
     Missed adding ChangelogFromGit to the POD documentation 
-
 ------------------------------------------
 version 0.001 at 2012-07-05 11:48:31 +0000
 ------------------------------------------
-
   Change: 12b8777318e41936f635ff376aa450374c07b31a
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2012-07-05 07:48:31 +0000
-
     Initial commit, copy of old bundle + adding Changes from git 
-
 ================
 End of releases.
 ================

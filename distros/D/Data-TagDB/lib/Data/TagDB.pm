@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -25,7 +24,7 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 
 
@@ -92,7 +91,7 @@ sub tag_by_id {
 
         # Is $type === UUID?
         # TODO: Make this a better check.
-        if ($type == $type->type && $type->id eq '8be115d2-dc2f-4a98-91e1-a6e3075cbc31') {
+        if ($type->eq('uuid')) {
             $type = $self->tag_by_hint('uuid');
         } else {
             $type = $self->tag_by_id($type);
@@ -165,7 +164,7 @@ sub tag_by_specification {
             @candidates = ($self->tag_by_id($id));
         } elsif ($specification eq '\'') {
             @candidates = ($wk->zero);
-        } elsif ($specification =~ /^\&([0-9a-zA-Z_]+)$/) {
+        } elsif ($specification =~ /^[\&\%]([0-9a-zA-Z_]+)$/) {
             my $port_tag = $self->tag_by_specification($1, %opts);
             my $ports = $opts{sirtx_ports};
             my $len = scalar(@{$ports});
@@ -795,7 +794,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -856,7 +855,7 @@ It can for example be used to call L<DBI/ping> to keep the connection alive.
 
 If methods are called that depend on the state of the transaction logic
 (such as performing an SELECT or UPDATE) the state of the transaction B<must> be managed via
-this module. See </begin_work>.
+this module. See L</begin_work>.
 
 The same holds true for any open handle passed to L</new>. When passed the handle must
 not be in any active transaction and must not be used outside this module to change the transaction
@@ -922,7 +921,7 @@ Parsing interacts with options the same way as tagpool does.
 
 The given specification is in SIRTX format.
 Currently only I<*local>, I<'number>, I<logical>, and I<type:id> formats are supported.
-There is very limited support for I<&port>.
+There is very limited support for I<%port>, and I<&port>.
 Bracket-escape is only supported for top level.
 
 Supports the options C<sirtx_local_ids>, and C<sirtx_ports>.
@@ -1175,11 +1174,11 @@ Get a tag by hint. What hints are supported depends on what is stored in the dat
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

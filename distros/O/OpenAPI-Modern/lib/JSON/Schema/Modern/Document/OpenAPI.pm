@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use 5.020;
 use utf8;
@@ -79,7 +79,7 @@ sub operations_with_tag { ($_[0]->{_operation_tags}{$_[1]}//[])->@* }
 # the minor.major version of the OpenAPI specification used for this document
 has oas_version => (
   is => 'rwp',
-  isa => Str->where(q{/^[1-9]\.(?:0|[1-9][0-9]*)$/}),
+  isa => Str->where(q{/^[1-9]\.(?:0|[1-9][0-9]*)\z/}),
 );
 
 # list of /paths/* path templates, in canonical search order
@@ -141,7 +141,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   ()= E($state, 'missing openapi version'), return $state if not exists $schema->{openapi};
   ()= E($state, 'bad openapi version: "%s"', $schema->{openapi}//''), return $state
-    if ($schema->{openapi}//'') !~ /^[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
+    if ($schema->{openapi}//'') !~ /^\d+\.\d+\.\d+(-.+)?\z/a;
 
   my @oad_version = split /[.-]/, $schema->{openapi};
   $self->_set_oas_version(join('.', @oad_version[0..1]));
@@ -255,7 +255,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths, @bad_items_paths);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths, @bad_3_0_paths);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -279,8 +279,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
           if ($self->oas_version eq '3.0') {
             # strip '#/definitions/'; convert CamelCase to kebab-case
             if ($entity = lc join('-', split /(?=[A-Z])/, substr($schema->{'$ref'}, 14))) {
-              push @bad_items_paths, $state->{data_path}
+              push @bad_3_0_paths, [ items => $state->{data_path} ]
                 if $entity eq 'schema' and ($data->{type}//'') eq 'array' and not exists $data->{items};
+              push @bad_3_0_paths, [ minimum => $state->{data_path} ]
+                if $entity eq 'schema' and exists $data->{exclusiveMinimum} and not exists $data->{minimum};
+              push @bad_3_0_paths, [ maximum => $state->{data_path} ]
+                if $entity eq 'schema' and exists $data->{exclusiveMaximum} and not exists $data->{maximum};
 
               undef $entity if not grep $entity eq $_, __entities;
               # no need to push to @json_schema_paths, as all schema entities are already found
@@ -289,8 +293,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
           else {
             # we only need to special-case path-item, because this is the only entity that is
             # referenced in the schema without an -or-reference
-            ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)$}),
-                         ($schema->{'$ref'} =~ m{#/\$defs/(path-item)$}));
+            ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)\z}),
+                         ($schema->{'$ref'} =~ m{#/\$defs/(path-item)\z}));
           }
 
           $self->_add_entity_location($state->{data_path}, $entity) if $entity;
@@ -314,7 +318,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
           }
 
           # will contain duplicates; filter out later
-          push @servers_paths, ($state->{data_path} =~ s{/[0-9]+$}{}r)
+          push @servers_paths, ($state->{data_path} =~ s{/[0-9]+\z}{}r)
             if $schema->{'$ref'} eq '#/$defs/server';
 
           return 1;
@@ -344,8 +348,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   $self->_set_defaults($result->defaults) if $result->defaults;
 
-  ()= E({ %$state, keyword_path => $_ }, '"items" must be present if type is "array"')
-    foreach @bad_items_paths;
+  ()= E({ %$state, keyword_path => $_->[1] },
+      $_->[0] eq 'items' ? '"items" must be present if type is "array"'
+    : $_->[0] eq 'minimum' ? '"minimum" must be present when "exclusiveMinimum" is used'
+    : $_->[0] eq 'maximum' ? '"maximum" must be present when "exclusiveMaximum" is used'
+    : die
+  ) foreach @bad_3_0_paths;
 
   # v3.2.0 §4.8.1, "Patterned Fields": "When matching URLs, concrete (non-templated) paths would be
   # matched before their templated counterparts."
@@ -364,7 +372,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # see ABNF at v3.2.0 §4.8.2
     die "invalid path: $path" if substr($path, 0, 1) ne '/'; # schema validation catches this
     ()= E({ %$state, keyword_path => jsonp('/paths', $path) }, 'invalid path template "%s"', $path)
-      if grep !/^(?:\{[^{}]+\}|%[0-9A-F]{2}|[:@!\$&'()*+,;=A-Za-z0-9._~-]+)+$/,
+      if grep !/^(?:\{[^{}]+\}|%[0-9A-F]{2}|[:@!\$&'()*+,;=A-Za-z0-9._~-]+)+\z/,
         split('/', substr($path, 1)); # split by segment, omitting leading /
 
     my %seen_names;
@@ -402,7 +410,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       # see ABNF at v3.2.0 §4.6
       ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
           'invalid server url "%s"', $servers->[$server_idx]{url}), next
-        if $servers->[$server_idx]{url} !~ /^(?:\{[^{}]+\}|%[0-9A-F]{2}|[\x21\x24\x26-\x3B\x3D\x40-\x5B\x5D\x5F\x61-\x7A\x7E\xA0-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}])+$/;
+        if $servers->[$server_idx]{url} !~ /^(?:\{[^{}]+\}|%[0-9A-F]{2}|[\x21\x24\x26-\x3B\x3D\x40-\x5B\x5D\x5F\x61-\x7A\x7E\xA0-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}])+\z/;
 
       my $normalized = $servers->[$server_idx]{url} =~ s/\{[^{}]+\}/\x00/gr;
       my @url_variables = $servers->[$server_idx]{url} =~ /\{([^{}]+)\}/g;
@@ -515,6 +523,69 @@ sub validate ($class, %args) {
     errors => [ $document->errors ],
     $with_defaults ? (defaults => $document->defaults) : (),
   );
+}
+
+sub upgrade ($self, $to_version = SUPPORTED_OAD_VERSIONS->[-1]) {
+  croak 'cannot upgrade an invalid document' if $self->errors;
+
+  croak 'new openapi version must be a dotted tuple or triple'
+    if $to_version !~ /^(3\.[0-9]+)(?:\.[0-9]+)?\z/;
+  my $to_oas_version = $1;
+  croak 'requested upgrade to an unsupported version: ', $to_version
+    if not grep $to_oas_version eq $_, OAS_VERSIONS->@*;
+
+  ($to_version) = grep /^$to_version\./, SUPPORTED_OAD_VERSIONS->@* if $to_version =~  /^(3\.\d+)\z/a;
+
+  my $schema = $self->schema;
+
+  my $from_version = $schema->{openapi};
+  return $schema if $from_version eq $to_version;
+
+  my ($from_oas_version) = $schema->{openapi} =~ /^(3\.[0-9]+)\.[0-9]+\b/;
+  croak 'downgrading is not supported' if $from_oas_version > $to_oas_version;
+
+  $schema->{openapi} = $to_version;
+
+  return $schema if $from_oas_version eq $to_oas_version;
+
+  if ($from_oas_version eq '3.0') {
+    delete $schema->{paths} if not keys $schema->{paths}->%*;
+
+    foreach my $schema_path ($self->get_entity_locations('schema')) {
+      my $subschema = $self->get($schema_path);
+
+      if (exists $subschema->{nullable}) {
+        $subschema->{type} = [ $subschema->{type}, 'null' ]
+          if delete $subschema->{nullable} and exists $subschema->{type};
+      }
+
+      $subschema->{exclusiveMinimum} = delete $subschema->{minimum} if delete $subschema->{exclusiveMinimum};
+      $subschema->{exclusiveMaximum} = delete $subschema->{maximum} if delete $subschema->{exclusiveMaximum};
+
+      $subschema->{examples} = [ delete $subschema->{example} ] if exists $subschema->{example};
+
+      if (exists $subschema->{format}) {
+        if ($subschema->{format} eq 'binary') {
+          $subschema->{contentMediaType} = 'application/octet-stream';
+          delete $subschema->{format};
+        }
+        elsif ($subschema->{format} eq 'base64') {
+          $subschema->{contentEncoding} = 'base64';
+          delete $subschema->{format};
+        }
+      }
+    }
+  }
+
+  if ($to_oas_version eq '3.2') {
+    foreach my $schema_path ($self->get_entity_locations('response')) {
+      my $subschema = $self->get($schema_path);
+      delete $subschema->{description}
+        if exists $subschema->{description} and $subschema->{description} eq '';
+    }
+  }
+
+  return $schema;
 }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
@@ -633,7 +704,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.117
+version 0.118
 
 =head1 SYNOPSIS
 
@@ -741,6 +812,13 @@ L<OpenAPI::Modern> constructor.
 
 This class inherits all methods from L<JSON::Schema::Modern::Document>. In addition:
 
+=head2 upgrade
+
+  Mojo::File->new('new_openapi.yaml')->spew(YAML::PP->new->dump_string($doc->upgrade('3.2')));
+
+Generates the equivalent schema for your document, with syntax altered for the new OpenAPI version.
+Defaults to targeting the latest supported version, if not provided.
+
 =head2 retrieval_uri
 
 Also available as L<JSON::Schema::Modern::Document/original_uri>, this is known as the "retrieval
@@ -822,11 +900,11 @@ L<https://json-schema.org>
 
 =item *
 
-L<https://www.openapis.org/>
+L<https://www.openapis.org>
 
 =item *
 
-L<https://learn.openapis.org/>
+L<https://learn.openapis.org>
 
 =item *
 

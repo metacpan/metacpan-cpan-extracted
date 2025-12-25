@@ -5,11 +5,14 @@ use warnings;
 use strict;
 use 5.016;
 
+use Encode       qw( decode );
 use Scalar::Util qw( looks_like_number );
 #use Storable     qw();  # required
 
-use JSON::MaybeXS   qw( decode_json );
-use List::MoreUtils qw( none uniq );
+
+use DBI::Const::GetInfoType;
+use JSON::MaybeXS            qw( decode_json );
+use List::MoreUtils          qw( none );
 
 use Term::Choose            qw();
 use Term::Choose::Constants qw( EXTRA_W );
@@ -37,8 +40,9 @@ sub reset_sql {
         columns => $sql->{columns} // [],
         data_types => $sql->{data_types} // {},
     };
-    # reset/initialize:
+    # reset:
     delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
+    # initialize:
     my @string = qw( distinct_stmt set_stmt where_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
     my @array  = qw( group_by_cols selected_cols set_args order_by_cols
                      ct_column_definitions ct_table_constraints ct_table_options
@@ -351,20 +355,39 @@ sub get_sql_info {
 
 sub sql_limit {
     my ( $sf, $rows ) = @_;
-    if ( $sf->{i}{driver} =~ /^(?:SQLite|mysql|MariaDB|Pg)\z/ ) {
+    my $driver = $sf->{i}{driver}; # Use driver so that dbms remains optional.
+    if ( $driver =~ /^(?:SQLite|mysql|MariaDB|Pg|DuckDB)\z/ ) {
         return " LIMIT $rows";
     }
-    elsif ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+    elsif ( $driver =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
         return " FETCH NEXT $rows ROWS ONLY"
     }
     else {
         return "";
     }
 }
+#sub sql_limit {
+#    my ( $sf, $rows ) = @_;
+#    my $dbms = $sf->{i}{dbms};
+#    if ( $dbms =~ /^(?:SQLite|mysql|MariaDB|Pg|DuckDB)\z/ ) {
+#        return " LIMIT $rows";
+#    }
+#    elsif ( $dbms =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+#        return " FETCH NEXT $rows ROWS ONLY"
+#    }
+#    elsif ( $dbms eq 'MSSQL' ) {
+#        return " OFFSET 0 ROWS FETCH NEXT $rows ROWS ONLY"
+#    }
+#    else {
+#        return "";
+#    }
+#}
+
 
 
 sub column_names_and_types {
     my ( $sf, $table ) = @_;
+    my $driver = $sf->{i}{driver};
     # without `LIMIT 0` slower with big tables: mysql, MariaDB and Pg
     # no difference with SQLite, Firebird, DB2 and Informix
     my $column_names = [];
@@ -375,15 +398,9 @@ sub column_names_and_types {
         if ( defined $ctes ) {
             $stmt = $ctes;
         }
-        if ( $sf->{o}{G}{limit_fetch_col_names} ) { ##
-            $stmt .= "SELECT * FROM " . $table . $sf->sql_limit( 0 );
-        }
-        else {
-            $stmt .= "SELECT * FROM " . $table;
-        }
-        #$stmt .= "SELECT * FROM " . $table . $sf->sql_limit( 0 );
+        $stmt .= "SELECT * FROM " . $table . $sf->sql_limit( 0 );
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
-        if ( $sf->{i}{driver} eq 'SQLite' ) {
+        if ( $driver eq 'SQLite' ) {
             $column_names = [ @{$sth->{NAME}} ];
             if ( $sf->{d}{dbh}{sqlite_see_if_its_a_number} ) {
                 $column_types = [];
@@ -393,6 +410,11 @@ sub column_names_and_types {
                 $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
             }
         }
+        #elsif ( $driver eq 'DuckDB' ) {
+        #    $sth->execute();
+        #    $column_names = [ map { decode('UTF-8', $_) } @{$sth->{NAME}} ];
+        #    $column_types = [ @{$sth->{TYPE}} ];
+        #}
         else {
             $sth->execute();
             $column_names = [ @{$sth->{NAME}} ];
@@ -519,13 +541,23 @@ sub __quote_identifiers {
 
 sub qq_table {
     my ( $sf, $table_info ) = @_;
+    my $dbms = $sf->{i}{dbms};
+    # 0 = catalog, 1 = schema, 2 = table_name, 3 = table_type
     my @idx;
-    if ( $sf->{o}{G}{qualified_table_name} || ( $sf->{d}{db_attached} && ! defined $sf->{d}{schema} ) ) {
+    if ( $sf->{d}{db_attached} ) {
         # If a SQLite database has databases attached, the fully qualified table name is used in SQL code regardless of
         # the setting of the option 'qualified_table_name' because attached databases could have tables with the same
         # name.
+        if ( $dbms eq 'SQLite' ) {
+            @idx = ( 1, 2 );
+        }
+        elsif ( $dbms eq 'DuckDB' ) {
+            @idx = ( 0, 2 );
+        }
+        #@idx = ( 0, 1, 2 ); # both
+    }
+    elsif ( $sf->{o}{G}{qualified_table_name} ) {
         @idx = ( 1, 2 );
-        # 0 = catalog, 1 = schema, 2 = table_name, 3 = table_type
     }
     else {
         @idx = ( 2 );
@@ -600,7 +632,7 @@ sub unquote_constant {
     return if ! defined $constant;
     if ( $constant =~ /^'(.*)'\z/ ) {
         $constant = $1;
-        if ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        if ( $sf->{i}{dbms} =~ /^(?:mysql|MariaDB)\z/ ) {
             $constant =~ s/\\(.)/$1/g;
         }
         else {
@@ -614,7 +646,7 @@ sub unquote_constant {
 
 sub regex_quoted_literal {
     my ( $sf ) = @_;
-    if ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+    if ( $sf->{i}{dbms} =~ /^(?:mysql|MariaDB)\z/ ) {
         return qr/(?<!')'(?:[^\\']|\\'|\\\\)*'(?!')/;
     }
     else {
@@ -647,27 +679,29 @@ sub normalize_space_in_stmt {
 
 sub major_server_version {
     my ( $sf ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
+    my $dbh = $sf->{d}{dbh};
     my $major_server_version;
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Firebird' ) {
         eval {
-            my ( $pg_version ) = $sf->{d}{dbh}->selectrow_array( "SELECT version()" );
-            ( $major_server_version ) = $pg_version =~ /^\S+\s+(\d+)\./;
-        };
-    }
-    elsif ( $driver eq 'Firebird' ) {
-        eval {
-            my ( $firebird_version ) = $sf->{d}{dbh}->selectrow_array( "SELECT RDB\$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB\$DATABASE" );
+            my ( $firebird_version ) = $dbh->selectrow_array( "SELECT RDB\$GET_CONTEXT('SYSTEM', 'ENGINE_VERSION') FROM RDB\$DATABASE" );
             ( $major_server_version  ) = $firebird_version =~ /^(\d+)\./;
         };
+        return $major_server_version // 3;
     }
-    elsif ( $driver eq 'Oracle' ) {
-        eval {
-            my $ora_server_version = $sf->{d}{dbh}->func( 'ora_server_version' );
-            $major_server_version = $ora_server_version->[0];
-      };
+    else {
+        my $database_version  = $dbh->get_info( $GetInfoType{SQL_DBMS_VER} );
+        ( $major_server_version ) = $database_version =~ /^v?(\d+)\D/i;
+        if ( $dbms eq 'Pg' ) {
+            return $major_server_version // 10;
+        }
+        elsif ( $dbms eq 'Oracle' ) {
+            return $major_server_version // 12;
+        }
+        elsif ( $dbms eq 'MSSQL' ) {
+            return $major_server_version // 16;
+        }
     }
-    return $major_server_version // 1;
 }
 
 
@@ -703,10 +737,10 @@ sub print_error_message {
 
 sub write_json {
     my ( $sf, $file_fs, $ref ) = @_;
-    if ( ! defined $ref ) {
-        open my $fh, '>', $file_fs or die "$file_fs: $!";
-        print $fh;
-        close $fh;
+    if ( ! defined $ref ) { ##
+        #open my $fh, '>', $file_fs or die "$file_fs: $!";
+        #print $fh;
+        #close $fh;
         return;
     }
     my $json = JSON::MaybeXS->new->utf8->pretty->canonical->encode( $ref );
@@ -718,7 +752,7 @@ sub write_json {
 
 sub read_json {
     my ( $sf, $file_fs ) = @_;
-    if ( ! defined $file_fs || ! -e $file_fs ) {
+    if ( ! defined $file_fs || ! -f $file_fs ) {
         return;
     }
     open my $fh, '<', $file_fs or die "$file_fs: $!";

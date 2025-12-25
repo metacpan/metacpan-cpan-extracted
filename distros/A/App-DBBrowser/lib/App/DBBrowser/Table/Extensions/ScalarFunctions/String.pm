@@ -33,13 +33,13 @@ sub function_right {
 
 sub __left_rigtht {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         $col = $sf->__pg_col_to_text( $sql, $col );
     }
     my $args_data = [
@@ -49,29 +49,11 @@ sub __left_rigtht {
     if ( ! defined $length ) {
         return;
     }
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         return "SUBSTR($col,-$length)"   if $func eq 'RIGHT';
         return "SUBSTR($col,1,$length)";
     }
     return "$func($col,$length)";
-}
-
-
-sub function_locate {
-    my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
-    if ( ! defined $col ) {
-        return;
-    }
-    my $args_data = [
-        { prompt => 'Substring: ', empty_ok => 1 },
-        { prompt => 'Start: ', is_numeric => 1 }
-    ];
-    my ( $substring, $start ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
-    return                                   if ! defined $substring;
-    return "LOCATE($substring,$col)"         if ! defined $start;
-    return "LOCATE($substring,$col,$start)";
 }
 
 
@@ -89,14 +71,14 @@ sub function_rpad {
 
 sub __rpad_lpad {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         $col = $sf->__pg_col_to_text( $sql, $col );
     }
     my $args_data = [
@@ -107,7 +89,10 @@ sub __rpad_lpad {
     if ( ! defined $length ) {
         return;
     }
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'DuckDB' ) {
+        $fill = length $fill ? $fill : "' '";
+    }
+    if ( $dbms eq 'SQLite' ) {
         $fill = defined $fill ? $ax->unquote_constant( $fill ) : ' ';
         $fill = $sf->{d}{dbh}->quote( $fill x $length );
             return "SUBSTR($fill||$col,-$length,$length)" if $func eq 'LPAD';
@@ -122,65 +107,80 @@ sub __rpad_lpad {
 
 sub function_position {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
-    my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
-    if ( ! defined $col ) {
-        return;
-    }
-    if ( $driver eq 'Pg' ) {
-        $col = $sf->__pg_col_to_text( $sql, $col );
-    }
-    my $args_data = [
-        { prompt => 'Substring: ', empty_ok => 1 }
-    ];
-    if ( $driver eq 'Firebird' ) {
-        push @$args_data, { prompt => 'Start: ', is_numeric => 1 };
-    }
-    my ( $substring, $start ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
-    if ( ! defined $substring ) {
-        return;
-    }
-    if ( $driver eq 'Firebird' ) {
-        return "POSITION($substring,$col)"         if ! defined $start;
-        return "POSITION($substring,$col,$start)";
-    }
-    return "POSITION($substring IN $col)";
+    return $sf->__position_instr_locate_charindex( $sql, $clause, $func, $cols, $r_data );
 }
 
 
 sub function_instr {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    return $sf->__position_instr_locate_charindex( $sql, $clause, $func, $cols, $r_data );
+}
+
+
+sub function_locate {
+    my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
+    return $sf->__position_instr_locate_charindex( $sql, $clause, $func, $cols, $r_data );
+}
+
+
+sub function_charindex {
+    my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
+    return $sf->__position_instr_locate_charindex( $sql, $clause, $func, $cols, $r_data );
+}
+
+
+sub __position_instr_locate_charindex {
+    my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    my $args_data;
-    if ( $driver eq 'SQLite' ) {
-        $args_data = [
-            { prompt => 'Substring: ', empty_ok => 1 }
-        ];
+    if ( $dbms eq 'Pg' ) {
+        $col = $sf->__pg_col_to_text( $sql, $col );
     }
-    else {
-        # DB2, Informix, Oracle: INSTR(string, substring, start, count)
-        $args_data = [
-            { prompt => 'Substring: ', empty_ok => 1 },
-            { prompt => 'Start: ', is_numeric => 1 },
-            { prompt => 'Count: ', is_numeric => 1 }
-        ]
+    my $args_data = [
+        { prompt => 'Substring: ', empty_ok => 1 }
+    ];
+    if ( $func eq 'POSITION' ) {
+        if ( $dbms eq 'Firebird' ) {
+            push @$args_data, { prompt => 'Start: ', is_numeric => 1 };
+        }
+    }
+    elsif ( $func eq 'INSTR' ) {
+        if ( $dbms =~ /^(?:DB2|Informix|Oracle)\z/ ) {
+            push @$args_data, { prompt => 'Start: ', is_numeric => 1 }, { prompt => 'Count: ', is_numeric => 1 }; # 'Occurrence:'
+        }
+    }
+    elsif ( $func eq 'LOCATE' ) {
+        push @$args_data, { prompt => 'Start: ', is_numeric => 1 };
+    }
+    elsif ( $func eq 'CHARINDEX' ) {
+        push @$args_data, { prompt => 'Start: ', is_numeric => 1 }, { prompt => 'Count: ', is_numeric => 1 }; # 'Occurrence:'
     }
     my ( $substring, $start, $count ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     if ( ! defined $substring ) {
         return;
     }
-    if ( $driver eq 'SQLite' ) {
-        return "INSTR($col,$substring)";
+    if ( $func eq 'POSITION' ) {
+        return "$func($substring IN $col)"      if ! length $start;
+        return "$func($substring,$col,$start)";
     }
-    return "INSTR($col,$substring)"                if ! defined $start;
-    return "INSTR($col,$substring,$start)"         if ! defined $count;
-    return "INSTR($col,$substring,$start,$count)";
+    elsif ( $func eq 'INSTR' ) {
+        return "$func($col,$substring)"                if ! defined $start;
+        return "$func($col,$substring,$start)"         if ! defined $count;
+        return "$func($col,$substring,$start,$count)";
+    }
+    elsif ( $func eq 'LOCATE' ) {
+        return "$func($substring,$col)"         if ! defined $start;
+        return "$func($substring,$col,$start)";
+    }
+    elsif ( $func eq 'CHARINDEX' ) {
+        return "$func($substring,$col)"                if ! defined $start;
+        return "$func($substring,$col,$start)"         if ! defined $count;
+        return "$func($substring,$col,$start,$count)";
+    }
 }
 
 
@@ -197,13 +197,13 @@ sub function_substring {
 
 sub __substr_substring {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         $col = $sf->__pg_col_to_text( $sql, $col );
     }
     my $args_data = [
@@ -213,11 +213,17 @@ sub __substr_substring {
     my ( $startpos, $length ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     return if ! defined $startpos;
     if ( $func eq 'SUBSTRING' ) {
-        return "SUBSTRING($col FROM $startpos)"              if ! defined $length;
-        return "SUBSTRING($col FROM $startpos FOR $length)";
+        if ( $dbms eq 'Firebird' ) {
+            return "SUBSTRING($col FROM $startpos)" if ! defined $length;
+            return "SUBSTRING($col FROM $startpos FOR $length)";
+        }
+        else {
+            return "SUBSTRING($col, $startpos)" if ! defined $length;
+            return "SUBSTRING($col, $startpos, $length)";
+        }
     }
     else {
-        return "SUBSTR($col,$startpos)"          if ! defined $length;
+        return "SUBSTR($col,$startpos)" if ! defined $length;
         return "SUBSTR($col,$startpos,$length)";
     }
 }
@@ -225,13 +231,13 @@ sub __substr_substring {
 
 sub function_replace {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         $col = $sf->__pg_col_to_text( $sql, $col );
     }
     my $args_data = [
@@ -248,17 +254,17 @@ sub function_replace {
 
 sub function_trim {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col = $ga->choose_a_column( $sql, $clause, $cols, $r_data );
     if ( ! defined $col ) {
         return;
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         $col = $sf->__pg_col_to_text( $sql, $col );
     }
     my $args_data;
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         $args_data = [
             { prompt => 'What: ' }
         ];
@@ -270,7 +276,7 @@ sub function_trim {
         ];
     }
     my @args = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
-    if ( $driver eq 'SQLite' ) {
+    if ( $dbms eq 'SQLite' ) {
         my ( $what ) = @args;
         return "TRIM($col)"        if ! defined $what;
         return "TRIM($col,$what)";
@@ -286,13 +292,13 @@ sub function_trim {
 
 sub function_concat {
     my ( $sf, $sql, $clause, $func, $cols, $r_data ) = @_;
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $chosen_cols = $ga->choose_columns( $sql, $clause, $func, $cols, $r_data );
     if ( ! defined $chosen_cols ) {
         return;
     }
-    if ( $driver eq 'Pg' ) {
+    if ( $dbms eq 'Pg' ) {
         for my $col ( @$chosen_cols ) {
             $col = $sf->__pg_col_to_text( $sql, $col );
         }
@@ -311,7 +317,7 @@ sub function_concat {
     else {
         $arg = $chosen_cols
     }
-    return "CONCAT(" . join( ',', @$arg ) . ")"  if $driver =~ /^(?:mysql|MariaDB)\z/;
+    return "CONCAT(" . join( ',', @$arg ) . ")"  if $dbms =~ /^(?:mysql|MariaDB|MSSQL)\z/;
     return join( " || ", @$arg );  # ansi 2003
 }
 

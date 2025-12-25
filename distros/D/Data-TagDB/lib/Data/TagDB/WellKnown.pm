@@ -1,4 +1,3 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -13,9 +12,9 @@ use warnings;
 
 use Carp;
 
-use parent 'Data::TagDB::WeakBaseObject';
+use parent qw(Data::TagDB::WeakBaseObject Data::Identifier::Interface::Known);
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -216,6 +215,15 @@ my %wk_default_encoding = (
 );
 
 
+# ---- Implementation for Data::Identifier::Interface::Known ----
+
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    return ([values %wk_ise], rawtype => 'ise') if $class eq ':all';
+    croak 'Unsupported class';
+}
+
 # ---- Private helpers ----
 
 sub DESTROY {} # So it's not autoloaded.
@@ -276,7 +284,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -292,13 +300,15 @@ This package provides access to well known tags.
 
 See also L<Data::TagDB::Tutorial::WellKnown>.
 
+This package inherits from L<Data::Identifier::Interface::Known> (since v0.11).
+
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

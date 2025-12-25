@@ -16,12 +16,15 @@ use App::DBBrowser::Table::Extensions::ScalarFunctions::String;
 use App::DBBrowser::Table::Extensions::ScalarFunctions::To;
 use App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments;
 
+my $charindex          = 'CHARINDEX';
 my $char_length        = 'CHAR_LENGTH';
 my $concat             = 'CONCAT';
+my $datalength         = 'DATALENGTH';
 my $instr              = 'INSTR';
 my $left               = 'LEFT';
-my $lengthb            = 'LENGTHB';
+my $len                = 'LEN';
 my $length             = 'LENGTH';
+my $lengthb            = 'LENGTHB';
 my $locate             = 'LOCATE';
 my $lower              = 'LOWER';
 my $lpad               = 'LPAD';
@@ -42,9 +45,11 @@ my $upper              = 'UPPER';
 
 my $abs                = 'ABS';
 my $ceil               = 'CEIL';
+my $ceiling            = 'CEILING';
 my $exp                = 'EXP';
 my $floor              = 'FLOOR';
 my $ln                 = 'LN';
+my $log                = 'LOG';
 my $mod                = 'MOD';
 my $power              = 'POWER';
 my $rand               = 'RAND';
@@ -57,13 +62,13 @@ my $current            = 'CURRENT';
 my $current_date       = 'CURRENT_DATE';
 my $current_timestamp  = 'CURRENT_TIMESTAMP';
 my $current_time       = 'CURRENT_TIME';
-my $date_add           = 'DATE_ADD';
-my $date_trunc         = 'DATE_TRUNC';
 my $date               = 'DATE';
 my $datediff           = 'DATEDIFF';
+my $datetime           = 'DATETIME';
+my $date_add           = 'DATE_ADD';
 my $date_part          = 'DATE_PART';
 my $date_subtract      = 'DATE_SUBTRACT';
-my $datetime           = 'DATETIME';
+my $date_trunc         = 'DATE_TRUNC';
 my $day                = 'DAY';
 my $days               = 'DAYS';
 my $dayname            = 'DAYNAME';
@@ -71,7 +76,6 @@ my $dayofweek          = 'DAYOFWEEK';
 my $dayofweek_iso      = 'DAYOFWEEK_ISO';
 my $dayofyear          = 'DAYOFYEAR';
 my $extract            = 'EXTRACT';
-my $julianday          = 'JULIANDAY';
 my $julian_day         = 'JULIAN_DAY';
 my $last_day           = 'LAST_DAY';
 my $month              = 'MONTH';
@@ -82,7 +86,6 @@ my $quarter            = 'QUARTER';
 my $timediff           = 'TIMEDIFF';
 my $timestampdiff      = 'TIMESTAMPDIFF';
 my $time               = 'TIME';
-my $unixepoch          = 'UNIXEPOCH';
 my $week               = 'WEEK';
 my $weekday            = 'WEEKDAY';
 my $week_iso           = 'WEEK_ISO';
@@ -93,7 +96,9 @@ my $epoch_to_date      = 'EPOCH_TO_DATE';
 my $epoch_to_datetime  = 'EPOCH_TO_DATETIME';
 my $epoch_to_timestamp = 'EPOCH_TO_TIMESTAMP';
 my $format             = 'FORMAT';
+my $str                = 'STR';
 my $strftime           = 'STRFTIME';
+my $strptime           = 'STRPTIME';
 my $str_to_date        = 'STR_TO_DATE';
 my $to_char            = 'TO_CHAR';
 my $to_date            = 'TO_DATE';
@@ -101,6 +106,7 @@ my $to_epoch           = 'TO_EPOCH';
 my $to_number          = 'TO_NUMBER';
 my $to_timestamp       = 'TO_TIMESTAMP';
 my $to_timestamp_tz    = 'TO_TIMESTAMP_TZ';
+my $unixepoch          = 'UNIXEPOCH';
 
 my $cast               = 'CAST';
 my $coalesce           = 'COALESCE';
@@ -120,113 +126,122 @@ sub __available_functions {
     my ( $sf, $type ) = @_;
     my $functions = {
        string => {
-            $char_length        => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
-            $instr              => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ],
-            $concat             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $left               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
-            $length             => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ], # Pg
-            $lengthb            => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ],
-            $locate             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ], # DB2
-            $lower              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $lpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $ltrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
-            $octet_length       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
-            $position           => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 ,  000000  ],
-            $replace            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $reverse            => [  000000 , 'mysql', 'MariaDB', 'Pg', 'Firebird',  000 , 'Informix', 'Oracle' ],
-            $right              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix',  000000  ],
-            $rpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $rtrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
-            $substring          => [  000000 ,  00000 ,  0000000 ,  00 , 'Firebird',  000 ,  00000000 ,  000000  ], # mysql, MariaDB, Pg, DB2, Informix
-            $substr             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
-            $trim               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $upper              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $charindex          => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ],
+            $char_length        => [  undef  , 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix',  undef  ,  undef  ],
+            $concat             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $datalength         => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ],
+            $instr              => [ 'SQLite',  undef ,  undef   ,  undef,  undef  ,  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ], # DuckDB
+            $left               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix',  undef  , 'MSSQL' ],
+            $len                => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ],
+            $length             => [ 'SQLite',  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    , 'Oracle',  undef  ], # Pg, DuckDB
+            $lengthb            => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    , 'Oracle',  undef  ],
+            $locate             => [  undef  , 'mysql', 'MariaDB',  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  ,  undef  ], # DB2
+            $lower              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $lpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $ltrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB',  undef    , 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $octet_length       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  ,  undef  , 'Firebird', 'DB2' , 'Informix',  undef  ,  undef  ], # DuckDB: bit_length('abc')
+            $position           => [  undef  , 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $replace            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $reverse            => [  undef  , 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird',  undef, 'Informix', 'Oracle', 'MSSQL' ],
+            $right              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix',  undef  , 'MSSQL' ],
+            $rpad               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $rtrim              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB',  undef    , 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $substring          => [  undef  ,  undef ,  undef   ,  undef,  undef  , 'Firebird',  undef,  undef    ,  undef  , 'MSSQL' ], # mysql, MariaDB, Pg, DB2, Informix, DuckDB
+            $substr             => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB',  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $trim               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $upper              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
         },
         numeric => {
-            $abs                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $ceil               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $exp                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $floor              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $ln                 => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $mod                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $power              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $rand               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
-            $round              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $sign               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $sqrt               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $truncate           => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $trunc              => [ 'SQLite',  00000 ,  0000000 , 'Pg', 'Firebird',  000 , 'Informix', 'Oracle' ], # DB2
+            $abs                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $ceil               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $ceiling            => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ],
+            $exp                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $floor              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $ln                 => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $log                => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ],
+            $mod                => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $power              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $rand               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    , 'Oracle', 'MSSQL' ],
+            $round              => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $sign               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $sqrt               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $truncate           => [  undef  , 'mysql', 'MariaDB',  undef,  undef  ,  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $trunc              => [ 'SQLite',  undef ,  undef   , 'Pg'  , 'DuckDB', 'Firebird',  undef, 'Informix', 'Oracle', 'MSSQL' ], # DB2
         },
         date => {
-            $age                => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 , 'DB2',  00000000 ,  000000  ],
-            $current            => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 ,  000 , 'Informix',  000000  ],
-            $current_date       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
-            $current_time       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
-            $current_timestamp  => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
-            $date_add           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $datediff           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 ,  000000  ],
-            $date               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix',  000000  ],
-            $date_part          => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 ,  000 ,  00000000 ,  000000  ], # DB2
-            $date_subtract      => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $datetime           => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $date_trunc         => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 , 'DB2',  00000000 ,  000000  ],
-            $day                => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2', 'Informix',  000000  ],
-            $dayname            => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $dayofweek          => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $dayofweek_iso      => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $dayofyear          => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $days               => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $extract            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $julian_day         => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $julianday          => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $last_day           => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ], # firebird 4.0
-            $month              => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2', 'Informix',  000000  ],
-            $monthname          => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $months_between     => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2', 'Informix', 'Oracle' ],
-            $quarter            => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $timediff           => [ 'SQLite', 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $time               => [ 'SQLite', 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $timestampdiff      => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ], # DB2
-            $unixepoch          => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $week               => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $weekday            => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $week_iso           => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 , 'DB2',  00000000 ,  000000  ],
-            $year               => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 , 'DB2', 'Informix',  000000  ],
+            $age                => [  undef  ,  undef ,  undef   , 'Pg'  , 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $current            => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef, 'Informix',  undef  ,  undef  ],
+            $current_date       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    , 'Oracle', 'MSSQL' ],
+            $current_time       => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    , 'Oracle',  undef  ],
+            $current_timestamp  => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    , 'Oracle', 'MSSQL' ],
+            $date               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB',  undef    , 'DB2' , 'Informix',  undef  ,  undef  ],
+            $datediff           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    ,  undef  , 'MSSQL' ],
+            $datetime           => [ 'SQLite',  undef ,  undef   ,  undef,  undef  ,  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $date_add           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $date_part          => [  undef  ,  undef ,  undef   , 'Pg'  , 'DuckDB',  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ], # DB2
+            $date_subtract      => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $date_trunc         => [  undef  ,  undef ,  undef   , 'Pg'  , 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  , 'MSSQL' ],
+            $day                => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' , 'Informix',  undef  , 'MSSQL' ],
+            $dayname            => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $dayofweek          => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $dayofweek_iso      => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $dayofyear          => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $days               => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $extract            => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $julian_day         => [ 'SQLite',  undef ,  undef   ,  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $last_day           => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ], # firebird 4.0
+            $month              => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' , 'Informix',  undef  , 'MSSQL' ],
+            $monthname          => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $months_between     => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $quarter            => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $time               => [ 'SQLite', 'mysql', 'MariaDB',  undef,  undef  ,  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $timediff           => [ 'SQLite', 'mysql', 'MariaDB',  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  ,  undef  ],
+            $timestampdiff      => [  undef  , 'mysql', 'MariaDB',  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  ,  undef  ], # DB2
+            $week               => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $weekday            => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    ,  undef,  undef    ,  undef  ,  undef  ],
+            $week_iso           => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    , 'DB2' ,  undef    ,  undef  ,  undef  ],
+            $year               => [  undef  , 'mysql', 'MariaDB',  undef, 'DuckDB',  undef    , 'DB2' , 'Informix',  undef  , 'MSSQL' ],
         },
         to => {
-            $epoch_to_date      => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $epoch_to_datetime  => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $epoch_to_timestamp => [  000000 ,  00000 ,  0000000 , 'Pg', 'Firebird',  000 ,  00000000 , 'Oracle' ],
-            $to_char            => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ], # MariaDB
-            $to_date            => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ], # MariaDB
-            $to_timestamp       => [  000000 ,  00000 ,  0000000 , 'Pg',  00000000 ,  000 ,  00000000 , 'Oracle' ], # DB2
-            $to_timestamp_tz    => [  000000 ,  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 , 'Oracle' ],
-            $to_number          => [  000000 ,  00000 , 'MariaDB', 'Pg',  00000000 , 'DB2', 'Informix', 'Oracle' ],
-            $to_epoch           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2',  00000000 , 'Oracle' ],
-            $strftime           => [ 'SQLite',  00000 ,  0000000 ,  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $date_format        => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $format             => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
-            $str_to_date        => [  000000 , 'mysql', 'MariaDB',  00 ,  00000000 ,  000 ,  00000000 ,  000000  ],
+            $epoch_to_date      => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $epoch_to_datetime  => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ], ##
+            $epoch_to_timestamp => [  undef  ,  undef ,  undef   , 'Pg'  , 'DuckDB', 'Firebird',  undef,  undef    , 'Oracle', 'MSSQL' ],
+            $to_char            => [  undef  ,  undef ,  undef   , 'Pg'  ,  undef  ,  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ], # MariaDB
+            $to_date            => [  undef  ,  undef ,  undef   , 'Pg'  ,  undef  ,  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ], # MariaDB
+            $to_timestamp       => [  undef  ,  undef ,  undef   , 'Pg'  , 'DuckDB',  undef    ,  undef,  undef    , 'Oracle',  undef  ], # DB2 # DuckDB: epoch to timestamp
+            $to_timestamp_tz    => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    , 'Oracle',  undef  ],
+            $to_number          => [  undef  ,  undef , 'MariaDB', 'Pg'  ,  undef  ,  undef    , 'DB2' , 'Informix', 'Oracle',  undef  ],
+            $to_epoch           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' ,  undef    , 'Oracle', 'MSSQL' ],
+            $str                => [  undef  ,  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ],
+            $strftime           => [ 'SQLite',  undef ,  undef   ,  undef, 'DuckDB',  undef    ,  undef,  undef    ,  undef  ,  undef  ],
+            $strptime           => [  undef  ,  undef ,  undef   ,  undef, 'DuckDB',  undef    ,  undef,  undef    ,  undef  ,  undef  ],
+            $date_format        => [  undef  , 'mysql', 'MariaDB',  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  ,  undef  ],
+            $format             => [  undef  , 'mysql', 'MariaDB',  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  , 'MSSQL' ], # DuckDB: construct formatted strings
+            $str_to_date        => [  undef  , 'mysql', 'MariaDB',  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  ,  undef  ],
+            $unixepoch          => [ 'SQLite',  undef ,  undef   ,  undef,  undef  ,  undef    ,  undef,  undef    ,  undef  ,  undef  ],
         },
         other => {
-            $cast               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
-            $coalesce           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg', 'Firebird', 'DB2', 'Informix', 'Oracle' ],
+            $cast               => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
+            $coalesce           => [ 'SQLite', 'mysql', 'MariaDB', 'Pg'  , 'DuckDB', 'Firebird', 'DB2' , 'Informix', 'Oracle', 'MSSQL' ],
         },
     };
 
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $index = {
-        SQLite => 0, mysql => 1, MariaDB => 2, Pg => 3, Firebird => 4, DB2 => 5, Informix => 6, Oracle => 7
+        SQLite => 0, mysql => 1, MariaDB => 2, Pg => 3, DuckDB => 4, Firebird => 5, DB2 => 6, Informix => 7, Oracle => 8, MSSQL => 9,
     };
     my $avail_functions = [];
     for my $func ( sort keys %{$functions->{$type}} ) {
-        if ( ! exists $index->{$driver} ) {
+        if ( ! exists $index->{$dbms} ) {
             # return all functions
             push @$avail_functions, $func;
         }
-        elsif ( $functions->{$type}{$func}[$index->{$driver}] ) {
+        elsif ( $functions->{$type}{$func}[$index->{$dbms}] ) {
             push @$avail_functions, $func;
         }
+    }
+    if ( $sf->{i}{driver} eq 'ODBC' && $dbms eq 'SQLite' ) {
+        $avail_functions = [ grep { ! /^(?:$trunc|$octet_length)\z/ } @$avail_functions ]; # sqlite_create_functions
     }
     return $avail_functions;
 }
@@ -237,7 +252,7 @@ sub scalar_function {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{i}{driver};
+    my $dbms = $sf->{i}{dbms};
     my $hidden = 'Scalar functions:';
     my $info_sql = $ax->get_sql_info( $sql );
     my $old_idx_cat = 1;
@@ -330,7 +345,7 @@ sub scalar_function {
                     }
                     return;
                 }
-                if ( $driver eq 'Pg' && $type eq 'string' ) {
+                if ( $dbms eq 'Pg' && $type eq 'string' ) {
                     $col = $ax->pg_column_to_text( $sql, $col );
                 }
                 $function_stmt = uc( $func ) . "($col)";

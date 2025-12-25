@@ -1,0 +1,26 @@
+---
+title: "Habits"
+author: "John Doe"
+format: 
+  revealjs:
+    margin: 0.17
+---
+
+## Getting up
+
+- Turn off alarm
+- Get out of bed
+
+## Going to sleep
+
+- Get in bed
+- Count sheep
+
+## Abolute images
+
+
+![](image1.jpg){.absolute top=0 left=0 width="350" height="300"}
+
+![](image2.jpg){.absolute top=50 right=50 width="450" height="250"}
+
+![](image3.jpg){.absolute bottom=0 right=0 width="300" height="300"}
