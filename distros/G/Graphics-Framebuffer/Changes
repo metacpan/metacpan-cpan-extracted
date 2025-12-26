@@ -1,5 +1,10 @@
 Change log for Graphics::Framebuffer
 
+6.81   December 25, 2025
+
+       Minor documentation changes.
+	   Changes to testing.
+
 6.80   December 13, 2025
 
        More optimizations

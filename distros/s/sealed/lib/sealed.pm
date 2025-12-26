@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(8.5.6);
+  our $VERSION = qv(8.6.0);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -160,7 +160,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
       if ($op->name eq "pushmark") {
         no warnings 'uninitialized';
-	$tweaked                += eval {tweak $op, @lexical_varnames, @pads,@op_stack,
+	$tweaked                += eval {tweak $op, @lexical_varnames, @pads, @op_stack,
                                            $cv_obj, $pad_names, %processed_op};
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }
@@ -194,17 +194,14 @@ sub import {
   $DEBUG                         = $_[1];
   local $@;
   my $pkg                        = caller;
-  eval "package $pkg; use types; use class" if $DEBUG eq 'types'; # enable perl type system
+  eval "package $pkg; use types; use class"
+    if $DEBUG eq 'types'; # enable perl type system
   die $@ if $@;
   filter_add(bless []);
 }
 
-sub filter {
-  my ($self) = @_;
-  my $status = filter_read;
-  our %rcache;
-  my $pkg = caller;
-
+sub source_munger {
+  my $pkg = shift;
   # NEW in v8.x.y: handle signatures
   no warnings 'uninitialized';
   s(^
@@ -217,6 +214,7 @@ sub filter {
      local $_   = $3; # signature's arglist
      my $suffix = "";
      my $entry;
+     my $idx = 0;
      s{(\S*)\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
        $entry++ if length $1;
 
@@ -224,35 +222,41 @@ sub filter {
 
        tr!=!!d for my $default = $3;
        if (($default =~ tr!/!!d)==2) {
-         $suffix .= "shift // $default;";
+         $suffix .= "\$_[$idx] // $default;";
        }
        elsif (($default =~ tr!|!!d)==2) {
-         $suffix .= "shift || $default;";
+         $suffix .= "\$_[$idx] || $default;";
        }
        elsif ($default) {
-         $suffix .= "\@_ ? shift : $default;";
+         $suffix .= "\@_ > $idx ? \$_[$idx] : $default;";
        }
        else {
-         $suffix .= "shift;"
+         $suffix .= "\$_[$idx];"
        }
 
+       ++$idx;
        "$2$3$4" # drop the class/type info
     }gmse;
 
     if ($DEBUG eq "verify") {
-      $prefix .= " ($_,\@_dummy)";
+      $prefix .= " ($_, \@_dummy)";
       $suffix = "" unless $entry;
     }
 
 #    warn "$prefix { $suffix";
     "$prefix { no warnings qw/experimental shadow/; $suffix";
-  )gmsex if $status > 0;
+  )gmsex;
 
   # handle bare typed lexical declarations
-  s/(^|;)\s*my\s+(\w[\w:]*)\s+(\$\w+)(.)/$4 eq ";"
+  s/(^|;)\s*my\s+(\w[\w:]*)\s+(\$\w+)(?=(.))/$4 eq ";"
     ? qq($1BEGIN{local \$@; eval "require $2"} my $2 $3$4 {no strict qw!vars subs!; no warnings 'once'; $3 = $2})
-    : qq($1BEGIN{local \$@; eval "require $2"} my $2 $3$4)/gmse if $status > 0;
+    : qq($1BEGIN{local \$@; eval "require $2"} my $2 $3)/gmse;
+}
 
+sub filter {
+  my ($self) = @_;
+  my $status = filter_read;
+  source_munger scalar(caller) if $status;
   return $status;
 }
 
@@ -283,8 +287,6 @@ sealed - Subroutine attribute for compile-time method lookups on its typed lexic
     use sealed 'disabled';# disables all CV tweaks
     use sealed 'types';   # enables builtin Perl::Types type system optimizations
     use sealed;           # disables all warnings
-
-    NOTE: as of 8.5.0, import activates the Perl Type System automatically.
 
 =head1 BUGS
 

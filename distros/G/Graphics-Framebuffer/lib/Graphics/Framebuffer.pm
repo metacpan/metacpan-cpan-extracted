@@ -36,7 +36,7 @@ Methods requiring parameters require a hash (or anonymous hash) reference passed
 
 =head1 DESCRIPTION
 
-A (mostly) Perl graphics library for exclusive use in a Linux/FreeBSD/Unix console framebuffer environment.  It is written for simplicity, without the need for complex API's and drivers with "surfaces" and such.
+A (mostly) Perl graphics library for exclusive use in a Linux console framebuffer environment.  It is written for simplicity, without the need for complex API's and drivers with "surfaces" and such.
 
 Back in the old days, computers drew graphics this way, and it was simple and easy to do.  I was writing a console based media playing program, and was not satisfied with the limited abilities offered by the nCurses library, and I did not want the overhead of the X-Windows environment to get in the way.  My intention was to create a mobile media server.  In case you are wondering, that project has been quite successful, and I am still making improvements to it.  I may even include it in the "examples" directory on future versions.
 
@@ -351,6 +351,7 @@ use constant {
     FBIO_WAITFORVSYNC   => 0x4620,
     VT_GETSTATE         => 0x5603,
     KDSETMODE           => 0x4B3A,
+
     KD_GRAPHICS         => 1,
     KD_TEXT             => 0,
 
@@ -398,7 +399,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.80';
+    our $VERSION   = '6.81';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -485,7 +486,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.80
+   Version:  6.81
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -499,74 +500,71 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
    and that's good enough for me.
 */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <linux/kd.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
 #include <math.h>
-#include <string.h> /* for memcpy */
-#include <stdint.h> /* added for fixed width integer types */
-#include <stdbool.h> /* for bool */
+#include <stdbool.h>  /* for bool */
+#include <stdint.h>   /* added for fixed width integer types */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>   /* for memcpy */
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-#define NORMAL_MODE   0
-#define XOR_MODE      1
-#define OR_MODE       2
-#define AND_MODE      3
-#define MASK_MODE     4
-#define UNMASK_MODE   5
-#define ALPHA_MODE    6
-#define ADD_MODE      7
-#define SUBTRACT_MODE 8
-#define MULTIPLY_MODE 9
-#define DIVIDE_MODE   10
+#define NORMAL_MODE    0
+#define XOR_MODE       1
+#define OR_MODE        2
+#define AND_MODE       3
+#define MASK_MODE      4
+#define UNMASK_MODE    5
+#define ALPHA_MODE     6
+#define ADD_MODE       7
+#define SUBTRACT_MODE  8
+#define MULTIPLY_MODE  9
+#define DIVIDE_MODE    10
 
-#define RGB           0
-#define RBG           1
-#define BGR           2
-#define BRG           3
-#define GBR           4
-#define GRB           5
+#define RGB 0
+#define RBG 1
+#define BGR 2
+#define BRG 3
+#define GBR 4
+#define GRB 5
 
 #define integer_(X)  ((int)(X))
-#define round_(X)    ((int)(((double)(X))+0.5))
-#define decimal_(X)  (((double)(X))-(double)integer_(X))
-#define rdecimal_(X) (1.0-decimal_(X))
-#define swap_(a, b)  do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
+#define round_(X)    ((int)(((double)(X)) + 0.5))
+#define decimal_(X)  (((double)(X)) - (double)integer_(X))
+#define rdecimal_(X) (1.0 - decimal_(X))
+#define swap_(a, b)  \
+    do {             \
+        __typeof__(a) tmp; \
+        tmp = a;            \
+        a = b;              \
+        b = tmp;            \
+    } while (0)
 
 /* Global Structures */
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
-// Helper functions for Xiaolin Wu antialiased line algorithm.
-// These used to be nested inside c_line; moved here to file scope so they
-// compile under standard C and so XS wrappers can call them (they were
-// previously implicitly declared).
-double ipart(double x) {
-    return floor(x);
-}
+/* Helper functions for Xiaolin Wu antialiased line algorithm. */
+double ipart(double x) { return floor(x); }
 
-double roundd(double x) {
-    return floor(x + 0.5);
-}
+double roundd(double x) { return floor(x + 0.5); }
 
-double fpart(double x) {
-    return x - floor(x);
-}
+double fpart(double x) { return x - floor(x); }
 
-double rfpart(double x) {
-    return 1.0 - fpart(x);
-}
+double rfpart(double x) { return 1.0 - fpart(x); }
 
-// Forward declaration of c_plot so functions defined earlier (like plot_aa_pixel)
-// can call it without triggering implicit-declaration warnings/errors.
-// Signature must match the later definition of c_plot.
+/* Forward declaration of c_plot so functions can call it without warnings. */
 void c_plot(char *framebuffer,
-            short x, short y,
-            short x_clip, short y_clip, short xx_clip, short yy_clip,
+            short x,
+            short y,
+            short x_clip,
+            short y_clip,
+            short xx_clip,
+            short yy_clip,
             unsigned int color,
             unsigned int bcolor,
             unsigned char alpha,
@@ -574,11 +572,16 @@ void c_plot(char *framebuffer,
             unsigned char bytes_per_pixel,
             unsigned char bits_per_pixel,
             unsigned int bytes_per_line,
-            short xoffset, short yoffset);
+            short xoffset,
+            short yoffset);
 
 void c_fill(char *framebuffer,
-            short x, short y,
-            short x_clip, short y_clip, short xx_clip, short yy_clip,
+            short x,
+            short y,
+            short x_clip,
+            short y_clip,
+            short xx_clip,
+            short yy_clip,
             unsigned int color,
             unsigned int bcolor,
             unsigned char alpha,
@@ -586,11 +589,10 @@ void c_fill(char *framebuffer,
             unsigned char bytes_per_pixel,
             unsigned char bits_per_pixel,
             unsigned int bytes_per_line,
-            short xoffset, short yoffset);
+            short xoffset,
+            short yoffset);
 
-// Helper to plot one antialiased pixel. Moved out of c_line to file scope.
-// It accepts the required context as parameters (previously captured by nested
-// function).
+/* Helper to plot one antialiased pixel. */
 static void plot_aa_pixel(char *framebuffer,
                           unsigned int color,
                           unsigned int bcolor,
@@ -598,117 +600,180 @@ static void plot_aa_pixel(char *framebuffer,
                           unsigned char bytes_per_pixel,
                           unsigned char bits_per_pixel,
                           unsigned int bytes_per_line,
-                          short x_clip, short y_clip, short xx_clip, short yy_clip,
-                          short xoffset, short yoffset,
+                          short x_clip,
+                          short y_clip,
+                          short xx_clip,
+                          short yy_clip,
+                          short xoffset,
+                          short yoffset,
                           int steep,
-                          long xx, long yy, double intensity) {
-   if (intensity <= 0.0) return;
-   if (intensity > 1.0) intensity = 1.0;
-   unsigned char ia = (unsigned char)(intensity * 255.0 + 0.5);
+                          long xx,
+                          long yy,
+                          double intensity) {
+    if (intensity <= 0.0) return;
+    if (intensity > 1.0) intensity = 1.0;
+    unsigned char ia = (unsigned char)(intensity * 255.0 + 0.5);
 
-   if (bits_per_pixel == 32) {
-	  unsigned int col_with_a = ((unsigned int)ia << 24) | (color & 0x00FFFFFF);
-	  if (steep) {
-		 c_plot(framebuffer, (short)yy, (short)xx, x_clip, y_clip, xx_clip, yy_clip,
-				col_with_a, bcolor, 0, ALPHA_MODE, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-	  } else {
-		 c_plot(framebuffer, (short)xx, (short)yy, x_clip, y_clip, xx_clip, yy_clip,
-				col_with_a, bcolor, 0, ALPHA_MODE, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-	  }
-   } else {
-	  /* pass alpha via the alpha parameter for non-32bpp modes */
-	  if (steep) {
-		 c_plot(framebuffer, (short)yy, (short)xx, x_clip, y_clip, xx_clip, yy_clip,
-				color, bcolor, ia, ALPHA_MODE, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-	  } else {
-		 c_plot(framebuffer, (short)xx, (short)yy, x_clip, y_clip, xx_clip, yy_clip,
-				color, bcolor, ia, ALPHA_MODE, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-	  }
-   }
+    if (bits_per_pixel == 32) {
+        unsigned int col_with_a = ((unsigned int)ia << 24) | (color & 0x00FFFFFF);
+        if (steep) {
+            c_plot(framebuffer,
+                   (short)yy,
+                   (short)xx,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   col_with_a,
+                   bcolor,
+                   0,
+                   ALPHA_MODE,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+        } else {
+            c_plot(framebuffer,
+                   (short)xx,
+                   (short)yy,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   col_with_a,
+                   bcolor,
+                   0,
+                   ALPHA_MODE,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+        }
+    } else {
+        /* pass alpha via the alpha parameter for non-32bpp modes */
+        if (steep) {
+            c_plot(framebuffer,
+                   (short)yy,
+                   (short)xx,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   color,
+                   bcolor,
+                   ia,
+                   ALPHA_MODE,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+        } else {
+            c_plot(framebuffer,
+                   (short)xx,
+                   (short)yy,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   color,
+                   bcolor,
+                   ia,
+                   ALPHA_MODE,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+        }
+    }
 }
 
-// This gets the framebuffer info and populates the above structures, then sends them to Perl
+/* Get framebuffer info and populate global structures, then send them to Perl. */
 void c_get_screen_info(char *fb_file) {
-   int fbfd = open(fb_file,O_RDWR);
-   ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo); // Get the physical information
-   ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo); // Get the virtual console information
-   close(fbfd);
+    int fbfd = open(fb_file, O_RDWR);
+    ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
+    ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
+    close(fbfd);
 
-   // This monstrosity pushes the needed values on Perl's stack, like "return" does.
+    Inline_Stack_Vars;
+    Inline_Stack_Reset;
 
-   Inline_Stack_Vars;
-   Inline_Stack_Reset;
+    Inline_Stack_Push(sv_2mortal(newSVpvn(finfo.id, 16)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(finfo.smem_start)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.smem_len)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.type)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.type_aux)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.visual)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.xpanstep)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.ypanstep)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.ywrapstep)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.line_length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(finfo.mmio_start)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.mmio_len)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.accel)));
 
-   Inline_Stack_Push(sv_2mortal(newSVpvn(finfo.id,16)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(finfo.smem_start)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.smem_len)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.type)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.type_aux)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.visual)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.xpanstep)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.ypanstep)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.ywrapstep)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.line_length)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(finfo.mmio_start)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.mmio_len)));
-   Inline_Stack_Push(sv_2mortal(newSVuv(finfo.accel)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xres)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yres)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xres_virtual)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yres_virtual)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xoffset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yoffset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.bits_per_pixel)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.grayscale)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.nonstd)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.activate)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.height)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.accel_flags)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.pixclock)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.left_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.right_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.upper_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.lower_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.hsync_len)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.vsync_len)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.sync)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.vmode)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.rotate)));
 
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xres)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yres)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xres_virtual)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yres_virtual)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xoffset)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yoffset)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.bits_per_pixel)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.grayscale)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.offset)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.length)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.msb_right)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.offset)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.length)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.msb_right)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.offset)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.length)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.msb_right)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.offset)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.length)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.msb_right)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.nonstd)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.activate)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.height)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.accel_flags)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.pixclock)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.left_margin)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.right_margin)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.upper_margin)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.lower_margin)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.hsync_len)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.vsync_len)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.sync)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.vmode)));
-   Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.rotate)));
-
-   Inline_Stack_Done;
-   // Phew!
+    Inline_Stack_Done;
 }
 
-// Sets the framebuffer to text mode, which enables the cursor
+/* Sets the framebuffer to text mode, which enables the cursor. */
 void c_text_mode(char *tty_file) {
-   int tty_fd = open(tty_file,O_RDWR);
-   ioctl(tty_fd,KDSETMODE,KD_TEXT);
-   close(tty_fd);
+    int tty_fd = open(tty_file, O_RDWR);
+    ioctl(tty_fd, KDSETMODE, KD_TEXT);
+    close(tty_fd);
 }
 
-// Sets the framebuffer to graphics mode, which disables the cursor
+/* Sets the framebuffer to graphics mode, which disables the cursor. */
 void c_graphics_mode(char *tty_file) {
-   int tty_fd = open(tty_file,O_RDWR);
-   ioctl(tty_fd,KDSETMODE,KD_GRAPHICS);
-   close(tty_fd);
+    int tty_fd = open(tty_file, O_RDWR);
+    ioctl(tty_fd, KDSETMODE, KD_GRAPHICS);
+    close(tty_fd);
 }
 
 void c_fill(char *framebuffer,
-            short x, short y,
-            short x_clip, short y_clip, short xx_clip, short yy_clip,
+            short x,
+            short y,
+            short x_clip,
+            short y_clip,
+            short xx_clip,
+            short yy_clip,
             unsigned int color,
             unsigned int bcolor,
             unsigned char alpha,
@@ -716,289 +781,348 @@ void c_fill(char *framebuffer,
             unsigned char bytes_per_pixel,
             unsigned char bits_per_pixel,
             unsigned int bytes_per_line,
-            short xoffset, short yoffset) {
-   /* Flood fill (scanline) using c_plot for writes. Reads are done directly
-	from the framebuffer memory (matching c_plot's read layout). Supports
-	32, 24, and 16 bits per pixel. Respects clipping rectangle and x/y offsets. */
+            short xoffset,
+            short yoffset) {
+    /* Flood fill (scanline) using c_plot for writes. Reads are done directly
+       from the framebuffer memory (matching c_plot's read layout). Supports
+       32, 24, and 16 bits per pixel. Respects clipping rectangle and x/y offsets. */
 
-   /* quick sanity: start point must be inside clip */
-   if (!(x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip)) {
-	  return;
-   }
+    /* quick sanity: start point must be inside clip */
+    if (!(x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip)) {
+        return;
+    }
 
-   /* helper to read a pixel in the same packed format used elsewhere in this file */
-   uint32_t target32 = 0;
-   uint16_t target16 = 0;
-   uint8_t target8 = 0;
+    /* helper to read a pixel in the same packed format used elsewhere in this file */
+    uint32_t target32 = 0;
+    uint16_t target16 = 0;
+    uint8_t target8 = 0;
 
-auto_read_pixel:
-	 {
+auto_read_pixel : {
         unsigned int rx = (unsigned int)(x + xoffset);
         unsigned int ry = (unsigned int)(y + yoffset);
         unsigned int index = rx * (unsigned int)bytes_per_pixel + ry * bytes_per_line;
-        unsigned char *p = (unsigned char*)(framebuffer + index);
+        unsigned char *p = (unsigned char *)(framebuffer + index);
 
         if (bits_per_pixel == 32) {
-            target32 = *((uint32_t*)p);
+            target32 = *((uint32_t *)p);
         } else if (bits_per_pixel == 24) {
             /* pack 3 bytes into 24-bit value (low 24 bits) */
             target32 = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
         } else if (bits_per_pixel == 16) {
-            target16 = *((uint16_t*)p);
+            target16 = *((uint16_t *)p);
         } else if (bits_per_pixel == 8) {
             target8 = *p;
         } else {
             /* unsupported bpp for fill */
             return;
         }
-	 }
-
-   /* If drawing in NORMAL mode and the target pixel already equals the fill color,
-	no work to do (compare in the same packed representation). */
-   if (draw_mode == NORMAL_MODE) {
-	  if (bits_per_pixel == 32) {
-		 if (target32 == (uint32_t)color) return;
-	  } else if (bits_per_pixel == 24) {
-		 if (target32 == (uint32_t)(color & 0x00FFFFFF)) return;
-	  } else if (bits_per_pixel == 16) {
-		 if (target16 == (uint16_t)color) return;
-	  } else if (bits_per_pixel == 8) {
-		 if (target8 == (uint8_t)color) return;
-	  }
     }
 
-   /* Define a small point struct and a dynamic stack for spans */
-   typedef struct { short x, y; } Point;
-   size_t stack_capacity = 4096;
-   size_t stack_size = 0;
-   Point *stack = (Point*)malloc(stack_capacity * sizeof(Point));
-   if (!stack) return; /* allocation failed */
+    /* If drawing in NORMAL mode and the target pixel already equals the fill color,
+       no work to do (compare in the same packed representation). */
+    if (draw_mode == NORMAL_MODE) {
+        if (bits_per_pixel == 32) {
+            if (target32 == (uint32_t)color) return;
+        } else if (bits_per_pixel == 24) {
+            if (target32 == (uint32_t)(color & 0x00FFFFFF)) return;
+        } else if (bits_per_pixel == 16) {
+            if (target16 == (uint16_t)color) return;
+        } else if (bits_per_pixel == 8) {
+            if (target8 == (uint8_t)color) return;
+        }
+    }
 
-   /* push initial point */
-   stack[stack_size++] = (Point){ x, y };
+    /* Define a small point struct and a dynamic stack for spans */
+    typedef struct {
+        short x, y;
+    } Point;
+    size_t stack_capacity = 4096;
+    size_t stack_size = 0;
+    Point *stack = (Point *)malloc(stack_capacity * sizeof(Point));
+    if (!stack) return; /* allocation failed */
 
-   while (stack_size > 0) {
-	  /* pop */
-	  Point pt = stack[--stack_size];
-	  short sx = pt.x;
-	  short sy = pt.y;
+    /* push initial point */
+    stack[stack_size++] = (Point){x, y};
 
-	  /* move left from sx until pixel != target or left clip */
-	  short lx = sx;
-	  for (;; --lx) {
-		 if (lx < x_clip) { lx = x_clip; break; }
-		 /* read pixel at (lx,sy) */
-		 unsigned int rx = (unsigned int)(lx + xoffset);
-		 unsigned int ry = (unsigned int)(sy + yoffset);
-		 unsigned int index = rx * (unsigned int)bytes_per_pixel + ry * bytes_per_line;
-		 unsigned char *p = (unsigned char*)(framebuffer + index);
+    while (stack_size > 0) {
+        /* pop */
+        Point pt = stack[--stack_size];
+        short sx = pt.x;
+        short sy = pt.y;
 
-		 bool equal = false;
-		 if (bits_per_pixel == 32) {
-			uint32_t v = *((uint32_t*)p);
-			equal = (v == target32);
-		 } else if (bits_per_pixel == 24) {
-			uint32_t v = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
-			equal = (v == (target32 & 0x00FFFFFF));
-		 } else if (bits_per_pixel == 16) {
-			uint16_t v = *((uint16_t*)p);
-			equal = (v == target16);
-		 } else if (bits_per_pixel == 8) {
-			uint8_t v = *p;
-			equal = (v == target8);
-		 } else {
-			equal = false;
-		 }
+        /* move left from sx until pixel != target or left clip */
+        short lx = sx;
+        for (;; --lx) {
+            if (lx < x_clip) {
+                lx = x_clip;
+                break;
+            }
+            /* read pixel at (lx,sy) */
+            unsigned int rx = (unsigned int)(lx + xoffset);
+            unsigned int ry = (unsigned int)(sy + yoffset);
+            unsigned int index = rx * (unsigned int)bytes_per_pixel + ry * bytes_per_line;
+            unsigned char *p = (unsigned char *)(framebuffer + index);
 
-		 if (!equal) { lx++; break; }
-		 if (lx == x_clip) { break; }
-	  }
+            bool equal = false;
+            if (bits_per_pixel == 32) {
+                uint32_t v = *((uint32_t *)p);
+                equal = (v == target32);
+            } else if (bits_per_pixel == 24) {
+                uint32_t v = (uint32_t)p[0] |
+                             ((uint32_t)p[1] << 8) |
+                             ((uint32_t)p[2] << 16);
+                equal = (v == (target32 & 0x00FFFFFF));
+            } else if (bits_per_pixel == 16) {
+                uint16_t v = *((uint16_t *)p);
+                equal = (v == target16);
+            } else if (bits_per_pixel == 8) {
+                uint8_t v = *p;
+                equal = (v == target8);
+            } else {
+                equal = false;
+            }
 
-	  /* move right from sx until pixel != target or right clip */
-	  short rxp = sx;
-	  for (;; ++rxp) {
-		 if (rxp > xx_clip) { rxp = xx_clip; break; }
-		 unsigned int rxr = (unsigned int)(rxp + xoffset);
-		 unsigned int ryr = (unsigned int)(sy + yoffset);
-		 unsigned int indexr = rxr * (unsigned int)bytes_per_pixel + ryr * bytes_per_line;
-		 unsigned char *pr = (unsigned char*)(framebuffer + indexr);
+            if (!equal) {
+                lx++;
+                break;
+            }
+            if (lx == x_clip) {
+                break;
+            }
+        }
 
-		 bool equalr = false;
-		 if (bits_per_pixel == 32) {
-			uint32_t v = *((uint32_t*)pr);
-			equalr = (v == target32);
-		 } else if (bits_per_pixel == 24) {
-			uint32_t v = (uint32_t)pr[0] | ((uint32_t)pr[1] << 8) | ((uint32_t)pr[2] << 16);
-			equalr = (v == (target32 & 0x00FFFFFF));
-		 } else if (bits_per_pixel == 16) {
-			uint16_t v = *((uint16_t*)pr);
-			equalr = (v == target16);
-		 } else if (bits_per_pixel == 8) {
-			uint8_t v = *pr;
-			equalr = (v == target8);
-		 } else {
-			equalr = false;
-		 }
+        /* move right from sx until pixel != target or right clip */
+        short rxp = sx;
+        for (;; ++rxp) {
+            if (rxp > xx_clip) {
+                rxp = xx_clip;
+                break;
+            }
+            unsigned int rxr = (unsigned int)(rxp + xoffset);
+            unsigned int ryr = (unsigned int)(sy + yoffset);
+            unsigned int indexr = rxr * (unsigned int)bytes_per_pixel + ryr * bytes_per_line;
+            unsigned char *pr = (unsigned char *)(framebuffer + indexr);
 
-		 if (!equalr) { rxp--; break; }
-		 if (rxp == xx_clip) { break; }
-	  }
+            bool equalr = false;
+            if (bits_per_pixel == 32) {
+                uint32_t v = *((uint32_t *)pr);
+                equalr = (v == target32);
+            } else if (bits_per_pixel == 24) {
+                uint32_t v = (uint32_t)pr[0] |
+                             ((uint32_t)pr[1] << 8) |
+                             ((uint32_t)pr[2] << 16);
+                equalr = (v == (target32 & 0x00FFFFFF));
+            } else if (bits_per_pixel == 16) {
+                uint16_t v = *((uint16_t *)pr);
+                equalr = (v == target16);
+            } else if (bits_per_pixel == 8) {
+                uint8_t v = *pr;
+                equalr = (v == target8);
+            } else {
+                equalr = false;
+            }
 
-	  if (rxp < lx) continue; /* nothing to fill on this line */
+            if (!equalr) {
+                rxp--;
+                break;
+            }
+            if (rxp == xx_clip) {
+                break;
+            }
+        }
 
-	  /* fill the span from lx to rxp inclusive using c_plot */
-	  for (short fx = lx; fx <= rxp; ++fx) {
-		 c_plot(framebuffer, fx, sy, x_clip, y_clip, xx_clip, yy_clip,
-				color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-	  }
+        if (rxp < lx) continue; /* nothing to fill on this line */
 
-	  /* check the line above (sy - 1) for new spans */
-	  if (sy - 1 >= y_clip) {
-		 short scanx = lx;
-		 while (scanx <= rxp) {
-			bool inSpan = false;
-			/* advance until we find a pixel equal to target */
-			while (scanx <= rxp) {
-			   unsigned int rxs = (unsigned int)(scanx + xoffset);
-			   unsigned int rys = (unsigned int)(sy - 1 + yoffset);
-			   unsigned int idxs = rxs * (unsigned int)bytes_per_pixel + rys * bytes_per_line;
-			   unsigned char *ps = (unsigned char*)(framebuffer + idxs);
-			   bool equalu = false;
-			   if (bits_per_pixel == 32) {
-				  uint32_t v = *((uint32_t*)ps);
-				  equalu = (v == target32);
-			   } else if (bits_per_pixel == 24) {
-				  uint32_t v = (uint32_t)ps[0] | ((uint32_t)ps[1] << 8) | ((uint32_t)ps[2] << 16);
-				  equalu = (v == (target32 & 0x00FFFFFF));
-			   } else if (bits_per_pixel == 16) {
-				  uint16_t v = *((uint16_t*)ps);
-				  equalu = (v == target16);
-			   } else if (bits_per_pixel == 8) {
-				  uint8_t v = *ps;
-				  equalu = (v == target8);
-			   }
-			   if (!equalu) { scanx++; continue; }
-			   /* found span start */
-			   inSpan = true;
-			   short spanStart = scanx;
-			   /* find span end */
-			   while (scanx <= rxp) {
-				  unsigned int rxs2 = (unsigned int)(scanx + xoffset);
-				  unsigned int rys2 = (unsigned int)(sy - 1 + yoffset);
-				  unsigned int idxs2 = rxs2 * (unsigned int)bytes_per_pixel + rys2 * bytes_per_line;
-				  unsigned char *ps2 = (unsigned char*)(framebuffer + idxs2);
-				  bool equald = false;
-				  if (bits_per_pixel == 32) {
-					 uint32_t v = *((uint32_t*)ps2);
-					 equald = (v == target32);
-				  } else if (bits_per_pixel == 24) {
-					 uint32_t v = (uint32_t)ps2[0] | ((uint32_t)ps2[1] << 8) | ((uint32_t)ps2[2] << 16);
-					 equald = (v == (target32 & 0x00FFFFFF));
-				  } else if (bits_per_pixel == 16) {
-					 uint16_t v = *((uint16_t*)ps2);
-					 equald = (v == target16);
-				  } else if (bits_per_pixel == 8) {
-					 uint8_t v = *ps2;
-					 equald = (v == target8);
-				  }
-				  if (!equald) break;
-				  scanx++;
-			   }
-			   /* push the span start (one representative point) */
-			   if (stack_size + 1 >= stack_capacity) {
-				  size_t newcap = stack_capacity * 2;
-				  Point *newstack = (Point*)realloc(stack, newcap * sizeof(Point));
-				  if (!newstack) { free(stack); return; }
-				  stack = newstack;
-				  stack_capacity = newcap;
-			   }
-			   stack[stack_size++] = (Point){ spanStart, (short)(sy - 1) };
-			}
-			if (!inSpan) break;
-		 }
-	  }
+        /* fill the span from lx to rxp inclusive using c_plot */
+        for (short fx = lx; fx <= rxp; ++fx) {
+            c_plot(framebuffer,
+                   fx,
+                   sy,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   color,
+                   bcolor,
+                   alpha,
+                   draw_mode,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+        }
 
-	  /* check the line below (sy + 1) for new spans */
-	  if (sy + 1 <= yy_clip) {
-		 short scanx = lx;
-		 while (scanx <= rxp) {
-			bool inSpan = false;
-			/* advance until we find a pixel equal to target */
-			while (scanx <= rxp) {
-			   unsigned int rxs = (unsigned int)(scanx + xoffset);
-			   unsigned int rys = (unsigned int)(sy + 1 + yoffset);
-			   unsigned int idxs = rxs * (unsigned int)bytes_per_pixel + rys * bytes_per_line;
-			   unsigned char *ps = (unsigned char*)(framebuffer + idxs);
-			   bool equalu = false;
-			   if (bits_per_pixel == 32) {
-				  uint32_t v = *((uint32_t*)ps);
-				  equalu = (v == target32);
-			   } else if (bits_per_pixel == 24) {
-				  uint32_t v = (uint32_t)ps[0] | ((uint32_t)ps[1] << 8) | ((uint32_t)ps[2] << 16);
-				  equalu = (v == (target32 & 0x00FFFFFF));
-			   } else if (bits_per_pixel == 16) {
-				  uint16_t v = *((uint16_t*)ps);
-				  equalu = (v == target16);
-			   } else if (bits_per_pixel == 8) {
-				  uint8_t v = *ps;
-				  equalu = (v == target8);
-			   }
-			   if (!equalu) { scanx++; continue; }
-			   /* found span start */
-			   inSpan = true;
-			   short spanStart = scanx;
-			   /* find span end */
-			   while (scanx <= rxp) {
-				  unsigned int rxs2 = (unsigned int)(scanx + xoffset);
-				  unsigned int rys2 = (unsigned int)(sy + 1 + yoffset);
-				  unsigned int idxs2 = rxs2 * (unsigned int)bytes_per_pixel + rys2 * bytes_per_line;
-				  unsigned char *ps2 = (unsigned char*)(framebuffer + idxs2);
-				  bool equald = false;
-				  if (bits_per_pixel == 32) {
-					 uint32_t v = *((uint32_t*)ps2);
-					 equald = (v == target32);
-				  } else if (bits_per_pixel == 24) {
-					 uint32_t v = (uint32_t)ps2[0] | ((uint32_t)ps2[1] << 8) | ((uint32_t)ps2[2] << 16);
-					 equald = (v == (target32 & 0x00FFFFFF));
-				  } else if (bits_per_pixel == 16) {
-					 uint16_t v = *((uint16_t*)ps2);
-					 equald = (v == target16);
-				  } else if (bits_per_pixel == 8) {
-					 uint8_t v = *ps2;
-					 equald = (v == target8);
-				  }
-				  if (!equald) break;
-				  scanx++;
-			   }
-			   /* push the span start (one representative point) */
-			   if (stack_size + 1 >= stack_capacity) {
-				  size_t newcap = stack_capacity * 2;
-				  Point *newstack = (Point*)realloc(stack, newcap * sizeof(Point));
-				  if (!newstack) { free(stack); return; }
-				  stack = newstack;
-				  stack_capacity = newcap;
-			   }
-			   stack[stack_size++] = (Point){ spanStart, (short)(sy + 1) };
-			}
-			if (!inSpan) break;
-		 }
-	  }
-   } /* end while stack */
+        /* check the line above (sy - 1) for new spans */
+        if (sy - 1 >= y_clip) {
+            short scanx = lx;
+            while (scanx <= rxp) {
+                bool inSpan = false;
+                /* advance until we find a pixel equal to target */
+                while (scanx <= rxp) {
+                    unsigned int rxs = (unsigned int)(scanx + xoffset);
+                    unsigned int rys = (unsigned int)(sy - 1 + yoffset);
+                    unsigned int idxs = rxs * (unsigned int)bytes_per_pixel + rys * bytes_per_line;
+                    unsigned char *ps = (unsigned char *)(framebuffer + idxs);
+                    bool equalu = false;
+                    if (bits_per_pixel == 32) {
+                        uint32_t v = *((uint32_t *)ps);
+                        equalu = (v == target32);
+                    } else if (bits_per_pixel == 24) {
+                        uint32_t v = (uint32_t)ps[0] |
+                                     ((uint32_t)ps[1] << 8) |
+                                     ((uint32_t)ps[2] << 16);
+                        equalu = (v == (target32 & 0x00FFFFFF));
+                    } else if (bits_per_pixel == 16) {
+                        uint16_t v = *((uint16_t *)ps);
+                        equalu = (v == target16);
+                    } else if (bits_per_pixel == 8) {
+                        uint8_t v = *ps;
+                        equalu = (v == target8);
+                    }
+                    if (!equalu) {
+                        scanx++;
+                        continue;
+                    }
+                    /* found span start */
+                    inSpan = true;
+                    short spanStart = scanx;
+                    /* find span end */
+                    while (scanx <= rxp) {
+                        unsigned int rxs2 = (unsigned int)(scanx + xoffset);
+                        unsigned int rys2 = (unsigned int)(sy - 1 + yoffset);
+                        unsigned int idxs2 = rxs2 * (unsigned int)bytes_per_pixel + rys2 * bytes_per_line;
+                        unsigned char *ps2 = (unsigned char *)(framebuffer + idxs2);
+                        bool equald = false;
+                        if (bits_per_pixel == 32) {
+                            uint32_t v = *((uint32_t *)ps2);
+                            equald = (v == target32);
+                        } else if (bits_per_pixel == 24) {
+                            uint32_t v = (uint32_t)ps2[0] |
+                                         ((uint32_t)ps2[1] << 8) |
+                                         ((uint32_t)ps2[2] << 16);
+                            equald = (v == (target32 & 0x00FFFFFF));
+                        } else if (bits_per_pixel == 16) {
+                            uint16_t v = *((uint16_t *)ps2);
+                            equald = (v == target16);
+                        } else if (bits_per_pixel == 8) {
+                            uint8_t v = *ps2;
+                            equald = (v == target8);
+                        }
+                        if (!equald) break;
+                        scanx++;
+                    }
+                    /* push the span start (one representative point) */
+                    if (stack_size + 1 >= stack_capacity) {
+                        size_t newcap = stack_capacity * 2;
+                        Point *newstack = (Point *)realloc(stack, newcap * sizeof(Point));
+                        if (!newstack) {
+                            free(stack);
+                            return;
+                        }
+                        stack = newstack;
+                        stack_capacity = newcap;
+                    }
+                    stack[stack_size++] = (Point){spanStart, (short)(sy - 1)};
+                }
+                if (!inSpan) break;
+            }
+        }
 
-   free(stack);
+        /* check the line below (sy + 1) for new spans */
+        if (sy + 1 <= yy_clip) {
+            short scanx = lx;
+            while (scanx <= rxp) {
+                bool inSpan = false;
+                /* advance until we find a pixel equal to target */
+                while (scanx <= rxp) {
+                    unsigned int rxs = (unsigned int)(scanx + xoffset);
+                    unsigned int rys = (unsigned int)(sy + 1 + yoffset);
+                    unsigned int idxs = rxs * (unsigned int)bytes_per_pixel + rys * bytes_per_line;
+                    unsigned char *ps = (unsigned char *)(framebuffer + idxs);
+                    bool equalu = false;
+                    if (bits_per_pixel == 32) {
+                        uint32_t v = *((uint32_t *)ps);
+                        equalu = (v == target32);
+                    } else if (bits_per_pixel == 24) {
+                        uint32_t v = (uint32_t)ps[0] |
+                                     ((uint32_t)ps[1] << 8) |
+                                     ((uint32_t)ps[2] << 16);
+                        equalu = (v == (target32 & 0x00FFFFFF));
+                    } else if (bits_per_pixel == 16) {
+                        uint16_t v = *((uint16_t *)ps);
+                        equalu = (v == target16);
+                    } else if (bits_per_pixel == 8) {
+                        uint8_t v = *ps;
+                        equalu = (v == target8);
+                    }
+                    if (!equalu) {
+                        scanx++;
+                        continue;
+                    }
+                    /* found span start */
+                    inSpan = true;
+                    short spanStart = scanx;
+                    /* find span end */
+                    while (scanx <= rxp) {
+                        unsigned int rxs2 = (unsigned int)(scanx + xoffset);
+                        unsigned int rys2 = (unsigned int)(sy + 1 + yoffset);
+                        unsigned int idxs2 = rxs2 * (unsigned int)bytes_per_pixel + rys2 * bytes_per_line;
+                        unsigned char *ps2 = (unsigned char *)(framebuffer + idxs2);
+                        bool equald = false;
+                        if (bits_per_pixel == 32) {
+                            uint32_t v = *((uint32_t *)ps2);
+                            equald = (v == target32);
+                        } else if (bits_per_pixel == 24) {
+                            uint32_t v = (uint32_t)ps2[0] |
+                                         ((uint32_t)ps2[1] << 8) |
+                                         ((uint32_t)ps2[2] << 16);
+                            equald = (v == (target32 & 0x00FFFFFF));
+                        } else if (bits_per_pixel == 16) {
+                            uint16_t v = *((uint16_t *)ps2);
+                            equald = (v == target16);
+                        } else if (bits_per_pixel == 8) {
+                            uint8_t v = *ps2;
+                            equald = (v == target8);
+                        }
+                        if (!equald) break;
+                        scanx++;
+                    }
+                    /* push the span start (one representative point) */
+                    if (stack_size + 1 >= stack_capacity) {
+                        size_t newcap = stack_capacity * 2;
+                        Point *newstack = (Point *)realloc(stack, newcap * sizeof(Point));
+                        if (!newstack) {
+                            free(stack);
+                            return;
+                        }
+                        stack = newstack;
+                        stack_capacity = newcap;
+                    }
+                    stack[stack_size++] = (Point){spanStart, (short)(sy + 1)};
+                }
+                if (!inSpan) break;
+            }
+        }
+    } /* end while stack */
+
+    free(stack);
 }
 
-/* The other routines call this.  It handles all draw modes
+/* The other routines call this. It handles all draw modes.
  *
  * Normally I would add code to properly place the RGB values according to
  * color order, but in reality, that can be done solely when the color value
  * itself is defined, so the colors are in the correct order before even
  * arriving at this routine.
 */
-void c_plot(
-            char *framebuffer,
-            short x, short y,
-            short x_clip, short y_clip, short xx_clip, short yy_clip,
+void c_plot(char *framebuffer,
+            short x,
+            short y,
+            short x_clip,
+            short y_clip,
+            short xx_clip,
+            short yy_clip,
             unsigned int color,
             unsigned int bcolor,
             unsigned char alpha,
@@ -1006,186 +1130,266 @@ void c_plot(
             unsigned char bytes_per_pixel,
             unsigned char bits_per_pixel,
             unsigned int bytes_per_line,
-            short xoffset, short yoffset) {
-   if (!(x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip)) {
-	  return; // outside clip
-   }
+            short xoffset,
+            short yoffset) {
+    if (!(x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip)) {
+        return; /* outside clip */
+    }
 
-   x = x + xoffset;
-   y = y + yoffset;
+    x = x + xoffset;
+    y = y + yoffset;
 
-   unsigned int index = ((unsigned int)x * (unsigned int)bytes_per_pixel) + ((unsigned int)y * bytes_per_line);
-   unsigned char *p = (unsigned char*)(framebuffer + index);
+    unsigned int index =
+        ((unsigned int)x * (unsigned int)bytes_per_pixel) + ((unsigned int)y * bytes_per_line);
+    unsigned char *p = (unsigned char *)(framebuffer + index);
 
-   switch (bits_per_pixel) {
-	case 32:
-		{
-		   uint32_t fb = *((uint32_t*)p);
-		   uint32_t col = (uint32_t)color;
-		   uint32_t bcol = (uint32_t)bcolor;
-		   uint32_t res = fb;
-		   switch (draw_mode) {
-			case NORMAL_MODE:  res = col; break;
-			case XOR_MODE:     res = fb ^ col; break;
-			case OR_MODE:      res = fb | col; break;
-			case AND_MODE:     res = fb & col; break;
-			case MASK_MODE:    if ((fb & 0xFFFFFF00) != (bcol & 0xFFFFFF00)) res = col; break;
-			case UNMASK_MODE:  if ((fb & 0xFFFFFF00) == (bcol & 0xFFFFFF00)) res = col; break;
-			case ALPHA_MODE:
-				{
-				   unsigned char fb_r = fb & 0xFF;
-				   unsigned char fb_g = (fb >> 8) & 0xFF;
-				   unsigned char fb_b = (fb >> 16) & 0xFF;
-				   unsigned char R = col & 0xFF;
-				   unsigned char G = (col >> 8) & 0xFF;
-				   unsigned char B = (col >> 16) & 0xFF;
-				   unsigned char A = (col >> 24) & 0xFF;
-				   unsigned char invA = 255 - A;
-				   fb_r = ((R * A) + (fb_r * invA)) >> 8;
-				   fb_g = ((G * A) + (fb_g * invA)) >> 8;
-				   fb_b = ((B * A) + (fb_b * invA)) >> 8;
-				   res = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
-				}
-			  break;
-			case ADD_MODE:      res = fb + col; break;
-			case SUBTRACT_MODE: res = fb - col; break;
-			case MULTIPLY_MODE: res = fb * col; break;
-			case DIVIDE_MODE:   if (col != 0) res = fb / col; break;
-			default: break;
-		   }
-		   *((uint32_t*)p) = res;
-		   break;
-        }
-	case 24:
-		{
-		   /* pack 3 bytes into a 32-bit local (low 24 bits used) */
-		   uint32_t fb = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
-		   uint32_t col = color & 0x00FFFFFF;
-		   uint32_t bcol = bcolor & 0x00FFFFFF;
-		   uint32_t res = fb;
-		   switch (draw_mode)
-			 {
-			  case NORMAL_MODE:  res = col; break;
-			  case XOR_MODE:     res = fb ^ col; break;
-			  case OR_MODE:      res = fb | col; break;
-			  case AND_MODE:     res = fb & col; break;
-			  case MASK_MODE:    if ((fb & 0xFFFFFF00) != (bcol & 0xFFFFFF00)) res = col; break;
-			  case UNMASK_MODE:  if ((fb & 0xFFFFFF00) == (bcol & 0xFFFFFF00)) res = col; break;
-			  case ALPHA_MODE:
-				  {
-					 unsigned char fb_r = fb & 0xFF;
-					 unsigned char fb_g = (fb >> 8) & 0xFF;
-					 unsigned char fb_b = (fb >> 16) & 0xFF;
-					 unsigned char R = col & 0xFF;
-					 unsigned char G = (col >> 8) & 0xFF;
-					 unsigned char B = (col >> 16) & 0xFF;
-					 unsigned char invA = 255 - alpha;
-					 fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-					 fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-					 fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-					 res = (uint32_t)fb_r | ((uint32_t)fb_g << 8) | ((uint32_t)fb_b << 16);
-				  }
-				break;
-			  case ADD_MODE:      res = fb + col; break;
-			  case SUBTRACT_MODE: res = fb - col; break;
-			  case MULTIPLY_MODE: res = fb * col; break;
-			  case DIVIDE_MODE:
-				  {
-					 uint32_t c0 = col & 0xFF, c1 = (col >> 8) & 0xFF, c2 = (col >> 16) & 0xFF;
-					 uint32_t r0 = (c0 != 0) ? ((fb & 0xFF) / c0) : (fb & 0xFF);
-					 uint32_t r1 = (c1 != 0) ? (((fb >> 8) & 0xFF) / c1) : ((fb >> 8) & 0xFF);
-					 uint32_t r2 = (c2 != 0) ? (((fb >> 16) & 0xFF) / c2) : ((fb >> 16) & 0xFF);
-					 res = r0 | (r1 << 8) | (r2 << 16);
-				  }
-				break;
-			  default: break;
-			 }
-		   p[0] = res & 0xFF;
-		   p[1] = (res >> 8) & 0xFF;
-		   p[2] = (res >> 16) & 0xFF;
-		   break;
-        }
-	case 16:
-		{
-		   uint16_t fb = *((uint16_t*)p);
-		   uint16_t col16 = (uint16_t)color;
-		   uint16_t res16 = fb;
-		   switch (draw_mode)
-			 {
-			  case NORMAL_MODE:  res16 = col16; break;
-			  case XOR_MODE:     res16 = fb ^ col16; break;
-			  case OR_MODE:      res16 = fb | col16; break;
-			  case AND_MODE:     res16 = fb & col16; break;
-			  case MASK_MODE:    if (fb != (bcolor & 0xFFFF)) res16 = col16; break;
-			  case UNMASK_MODE:  if (fb == (bcolor & 0xFFFF)) res16 = col16; break;
-			  case ALPHA_MODE:
-				  {
-					 unsigned short rgb565 = fb;
-					 unsigned short fb_r = rgb565 & 31;
-					 unsigned short fb_g = (rgb565 >> 5) & 63;
-					 unsigned short fb_b = (rgb565 >> 11) & 31;
-					 unsigned short R = col16 & 31;
-					 unsigned short G = (col16 >> 5) & 63;
-					 unsigned short B = (col16 >> 11) & 31;
-					 unsigned char invA = 255 - alpha;
-					 fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-					 fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-					 fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-					 res16 = (fb_b << 11) | (fb_g << 5) | fb_r;
-				  }
-				break;
-			  case ADD_MODE:      res16 = fb + col16; break;
-			  case SUBTRACT_MODE: res16 = fb - col16; break;
-			  case MULTIPLY_MODE: res16 = fb * col16; break;
-			  case DIVIDE_MODE:   if (col16 != 0) res16 = fb / col16; break;
-			  default: break;
-			 }
-		   *((uint16_t*)p) = res16;
-		   break;
-        }
-	case 8:
-		{
-		   uint8_t fb = *p;
-		   uint8_t col8 = (uint8_t)color;
-		   uint8_t res8 = fb;
-		   switch (draw_mode)
-			 {
-			  case NORMAL_MODE:  res8 = col8; break;
-			  case XOR_MODE:     res8 = fb ^ col8; break;
-			  case OR_MODE:      res8 = fb | col8; break;
-			  case AND_MODE:     res8 = fb & col8; break;
-			  case MASK_MODE:    if (fb != (bcolor & 0xFF)) res8 = col8; break;
-			  case UNMASK_MODE:  if (fb == (bcolor & 0xFF)) res8 = col8; break;
-			  case ALPHA_MODE:
-				  {
-					 uint8_t invA = 255 - alpha;
-					 res8 = (uint8_t)((((uint32_t)col8 * alpha) + ((uint32_t)fb * invA)) >> 8);
-				  }
-				break;
-			  case ADD_MODE:      res8 = fb + col8; break;
-			  case SUBTRACT_MODE: res8 = fb - col8; break;
-			  case MULTIPLY_MODE: res8 = fb * col8; break;
-			  case DIVIDE_MODE:   if (col8 != 0) res8 = fb / col8; break;
-			  default: break;
-			 }
-		   *p = res8;
-		   break;
-		}
-	case 1:
-		{
-		   /* Not supported yet; no-op */
-		   break;
-        }
-	default:
-	  break;
-   }
+    switch (bits_per_pixel) {
+        case 32: {
+            uint32_t fb = *((uint32_t *)p);
+            uint32_t col = (uint32_t)color;
+            uint32_t bcol = (uint32_t)bcolor;
+            uint32_t res = fb;
+            switch (draw_mode) {
+                case NORMAL_MODE:
+                    res = col;
+                    break;
+                case XOR_MODE:
+                    res = fb ^ col;
+                    break;
+                case OR_MODE:
+                    res = fb | col;
+                    break;
+                case AND_MODE:
+                    res = fb & col;
+                    break;
+                case MASK_MODE:
+                    if ((fb & 0xFFFFFF00) != (bcol & 0xFFFFFF00)) res = col;
+                    break;
+                case UNMASK_MODE:
+                    if ((fb & 0xFFFFFF00) == (bcol & 0xFFFFFF00)) res = col;
+                    break;
+                case ALPHA_MODE: {
+                    unsigned char fb_r = fb & 0xFF;
+                    unsigned char fb_g = (fb >> 8) & 0xFF;
+                    unsigned char fb_b = (fb >> 16) & 0xFF;
+                    unsigned char R = col & 0xFF;
+                    unsigned char G = (col >> 8) & 0xFF;
+                    unsigned char B = (col >> 16) & 0xFF;
+                    unsigned char A = (col >> 24) & 0xFF;
+                    unsigned char invA = 255 - A;
+                    fb_r = ((R * A) + (fb_r * invA)) >> 8;
+                    fb_g = ((G * A) + (fb_g * invA)) >> 8;
+                    fb_b = ((B * A) + (fb_b * invA)) >> 8;
+                    res = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
+                } break;
+                case ADD_MODE:
+                    res = fb + col;
+                    break;
+                case SUBTRACT_MODE:
+                    res = fb - col;
+                    break;
+                case MULTIPLY_MODE:
+                    res = fb * col;
+                    break;
+                case DIVIDE_MODE:
+                    if (col != 0) res = fb / col;
+                    break;
+                default:
+                    break;
+            }
+            *((uint32_t *)p) = res;
+        } break;
+
+        case 24: {
+            /* pack 3 bytes into a 32-bit local (low 24 bits used) */
+            uint32_t fb =
+                (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
+            uint32_t col = color & 0x00FFFFFF;
+            uint32_t bcol = bcolor & 0x00FFFFFF;
+            uint32_t res = fb;
+            switch (draw_mode) {
+                case NORMAL_MODE:
+                    res = col;
+                    break;
+                case XOR_MODE:
+                    res = fb ^ col;
+                    break;
+                case OR_MODE:
+                    res = fb | col;
+                    break;
+                case AND_MODE:
+                    res = fb & col;
+                    break;
+                case MASK_MODE:
+                    if ((fb & 0xFFFFFF00) != (bcol & 0xFFFFFF00)) res = col;
+                    break;
+                case UNMASK_MODE:
+                    if ((fb & 0xFFFFFF00) == (bcol & 0xFFFFFF00)) res = col;
+                    break;
+                case ALPHA_MODE: {
+                    unsigned char fb_r = fb & 0xFF;
+                    unsigned char fb_g = (fb >> 8) & 0xFF;
+                    unsigned char fb_b = (fb >> 16) & 0xFF;
+                    unsigned char R = col & 0xFF;
+                    unsigned char G = (col >> 8) & 0xFF;
+                    unsigned char B = (col >> 16) & 0xFF;
+                    unsigned char invA = 255 - alpha;
+                    fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                    fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                    fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+                    res = (uint32_t)fb_r |
+                          ((uint32_t)fb_g << 8) |
+                          ((uint32_t)fb_b << 16);
+                } break;
+                case ADD_MODE:
+                    res = fb + col;
+                    break;
+                case SUBTRACT_MODE:
+                    res = fb - col;
+                    break;
+                case MULTIPLY_MODE:
+                    res = fb * col;
+                    break;
+                case DIVIDE_MODE: {
+                    uint32_t c0 = col & 0xFF,
+                             c1 = (col >> 8) & 0xFF,
+                             c2 = (col >> 16) & 0xFF;
+                    uint32_t r0 = (c0 != 0) ? ((fb & 0xFF) / c0) : (fb & 0xFF);
+                    uint32_t r1 =
+                        (c1 != 0) ? (((fb >> 8) & 0xFF) / c1) : ((fb >> 8) & 0xFF);
+                    uint32_t r2 =
+                        (c2 != 0) ? (((fb >> 16) & 0xFF) / c2) : ((fb >> 16) & 0xFF);
+                    res = r0 | (r1 << 8) | (r2 << 16);
+                } break;
+                default:
+                    break;
+            }
+            p[0] = res & 0xFF;
+            p[1] = (res >> 8) & 0xFF;
+            p[2] = (res >> 16) & 0xFF;
+        } break;
+
+        case 16: {
+            uint16_t fb = *((uint16_t *)p);
+            uint16_t col16 = (uint16_t)color;
+            uint16_t res16 = fb;
+            switch (draw_mode) {
+                case NORMAL_MODE:
+                    res16 = col16;
+                    break;
+                case XOR_MODE:
+                    res16 = fb ^ col16;
+                    break;
+                case OR_MODE:
+                    res16 = fb | col16;
+                    break;
+                case AND_MODE:
+                    res16 = fb & col16;
+                    break;
+                case MASK_MODE:
+                    if (fb != (bcolor & 0xFFFF)) res16 = col16;
+                    break;
+                case UNMASK_MODE:
+                    if (fb == (bcolor & 0xFFFF)) res16 = col16;
+                    break;
+                case ALPHA_MODE: {
+                    unsigned short rgb565 = fb;
+                    unsigned short fb_r = rgb565 & 31;
+                    unsigned short fb_g = (rgb565 >> 5) & 63;
+                    unsigned short fb_b = (rgb565 >> 11) & 31;
+                    unsigned short R = col16 & 31;
+                    unsigned short G = (col16 >> 5) & 63;
+                    unsigned short B = (col16 >> 11) & 31;
+                    unsigned char invA = 255 - alpha;
+                    fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                    fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                    fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+                    res16 = (fb_b << 11) | (fb_g << 5) | fb_r;
+                } break;
+                case ADD_MODE:
+                    res16 = fb + col16;
+                    break;
+                case SUBTRACT_MODE:
+                    res16 = fb - col16;
+                    break;
+                case MULTIPLY_MODE:
+                    res16 = fb * col16;
+                    break;
+                case DIVIDE_MODE:
+                    if (col16 != 0) res16 = fb / col16;
+                    break;
+                default:
+                    break;
+            }
+            *((uint16_t *)p) = res16;
+        } break;
+
+        case 8: {
+            uint8_t fb = *p;
+            uint8_t col8 = (uint8_t)color;
+            uint8_t res8 = fb;
+            switch (draw_mode) {
+                case NORMAL_MODE:
+                    res8 = col8;
+                    break;
+                case XOR_MODE:
+                    res8 = fb ^ col8;
+                    break;
+                case OR_MODE:
+                    res8 = fb | col8;
+                    break;
+                case AND_MODE:
+                    res8 = fb & col8;
+                    break;
+                case MASK_MODE:
+                    if (fb != (bcolor & 0xFF)) res8 = col8;
+                    break;
+                case UNMASK_MODE:
+                    if (fb == (bcolor & 0xFF)) res8 = col8;
+                    break;
+                case ALPHA_MODE: {
+                    uint8_t invA = 255 - alpha;
+                    res8 = (uint8_t)((((uint32_t)col8 * alpha) +
+                                      ((uint32_t)fb * invA)) >>
+                                     8);
+                } break;
+                case ADD_MODE:
+                    res8 = fb + col8;
+                    break;
+                case SUBTRACT_MODE:
+                    res8 = fb - col8;
+                    break;
+                case MULTIPLY_MODE:
+                    res8 = fb * col8;
+                    break;
+                case DIVIDE_MODE:
+                    if (col8 != 0) res8 = fb / col8;
+                    break;
+                default:
+                    break;
+            }
+            *p = res8;
+        } break;
+
+        case 1: {
+            /* Not supported yet; no-op */
+        } break;
+
+        default:
+            break;
+    }
 }
 
-// Draws a line
-void c_line(
-            char *framebuffer,
-            short x1, short y1, short x2, short y2,
-            short x_clip, short y_clip, short xx_clip, short yy_clip,
+/* Draws a line */
+void c_line(char *framebuffer,
+            short x1,
+            short y1,
+            short x2,
+            short y2,
+            short x_clip,
+            short y_clip,
+            short xx_clip,
+            short yy_clip,
             unsigned int color,
             unsigned int bcolor,
             unsigned char alpha,
@@ -1193,953 +1397,1196 @@ void c_line(
             unsigned char bytes_per_pixel,
             unsigned char bits_per_pixel,
             unsigned int bytes_per_line,
-            short xoffset, short yoffset,
+            short xoffset,
+            short yoffset,
             bool antialiased) {
-   /* If antialiasing is requested, use Xiaolin Wu's algorithm which blends
-	*        the endpoints and adjacent pixels using coverage (alpha) values.
-	*        Otherwise fallback to the previous integer-based Bresenham-like routine.
-	*     */
+    /* If antialiasing is requested, use Xiaolin Wu's algorithm... */
+    if (antialiased) {
+        double x0 = (double)x1;
+        double y0 = (double)y1;
+        double x1d = (double)x2;
+        double y1d = (double)y2;
 
-   if (antialiased) {
-	  double x0 = (double)x1;
-	  double y0 = (double)y1;
-	  double x1d = (double)x2;
-	  double y1d = (double)y2;
+        int steep = fabs(y1d - y0) > fabs(x1d - x0);
 
-	  int steep = fabs(y1d - y0) > fabs(x1d - x0);
+        if (steep) {
+            swap_(x0, y0);
+            swap_(x1d, y1d);
+        }
 
-	  if (steep) {
-		 swap_(x0, y0);
-		 swap_(x1d, y1d);
-	  }
+        if (x0 > x1d) {
+            swap_(x0, x1d);
+            swap_(y0, y1d);
+        }
 
-	  if (x0 > x1d) {
-		 swap_(x0, x1d);
-		 swap_(y0, y1d);
-	  }
+        double dx = x1d - x0;
+        double dy = y1d - y0;
+        double gradient = (dx == 0.0) ? 1.0 : dy / dx;
 
-	  double dx = x1d - x0;
-	  double dy = y1d - y0;
-	  double gradient = (dx == 0.0) ? 1.0 : dy / dx;
+        /* handle first endpoint */
+        double xend = roundd(x0);
+        double yend = y0 + gradient * (xend - x0);
+        double xgap = rfpart(x0 + 0.5);
+        long xpxl1 = (long)xend;
+        long ypxl1 = (long)floor(yend);
 
-	  /* handle first endpoint */
-	  double xend = roundd(x0);
-	  double yend = y0 + gradient * (xend - x0);
-	  double xgap = rfpart(x0 + 0.5);
-	  long xpxl1 = (long)xend;
-	  long ypxl1 = (long)floor(yend);
+        /* plot first endpoint */
+        double intery = yend + gradient; /* first y-intersection for the main loop */
 
-	  /* plot first endpoint */
-	  double intery = yend + gradient; /* first y-intersection for the main loop */
+        /* First endpoint pixels */
+        plot_aa_pixel(framebuffer,
+                      color,
+                      bcolor,
+                      alpha,
+                      bytes_per_pixel,
+                      bits_per_pixel,
+                      bytes_per_line,
+                      x_clip,
+                      y_clip,
+                      xx_clip,
+                      yy_clip,
+                      xoffset,
+                      yoffset,
+                      steep,
+                      xpxl1,
+                      ypxl1,
+                      rfpart(yend) * xgap);
+        plot_aa_pixel(framebuffer,
+                      color,
+                      bcolor,
+                      alpha,
+                      bytes_per_pixel,
+                      bits_per_pixel,
+                      bytes_per_line,
+                      x_clip,
+                      y_clip,
+                      xx_clip,
+                      yy_clip,
+                      xoffset,
+                      yoffset,
+                      steep,
+                      xpxl1,
+                      ypxl1 + 1,
+                      fpart(yend) * xgap);
 
-	  /* First endpoint pixels */
-	  plot_aa_pixel(framebuffer, color, bcolor, alpha, bytes_per_pixel, bits_per_pixel, bytes_per_line,
-					x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, steep, xpxl1, ypxl1, rfpart(yend) * xgap);
-	  plot_aa_pixel(framebuffer, color, bcolor, alpha, bytes_per_pixel, bits_per_pixel, bytes_per_line,
-					x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, steep, xpxl1, ypxl1 + 1, fpart(yend) * xgap);
-	  /* handle second endpoint */
-	  xend = roundd(x1d);
-	  yend = y1d + gradient * (xend - x1d);
-	  xgap = fpart(x1d + 0.5);
-	  long xpxl2 = (long)xend;
-	  long ypxl2 = (long)floor(yend);
+        /* handle second endpoint */
+        xend = roundd(x1d);
+        yend = y1d + gradient * (xend - x1d);
+        xgap = fpart(x1d + 0.5);
+        long xpxl2 = (long)xend;
+        long ypxl2 = (long)floor(yend);
 
-	  plot_aa_pixel(framebuffer, color, bcolor, alpha, bytes_per_pixel, bits_per_pixel, bytes_per_line,
-					x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, steep, xpxl2, ypxl2, rfpart(yend) * xgap);
-	  plot_aa_pixel(framebuffer, color, bcolor, alpha, bytes_per_pixel, bits_per_pixel, bytes_per_line,
-					x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, steep, xpxl2, ypxl2 + 1, fpart(yend) * xgap);
+        plot_aa_pixel(framebuffer,
+                      color,
+                      bcolor,
+                      alpha,
+                      bytes_per_pixel,
+                      bits_per_pixel,
+                      bytes_per_line,
+                      x_clip,
+                      y_clip,
+                      xx_clip,
+                      yy_clip,
+                      xoffset,
+                      yoffset,
+                      steep,
+                      xpxl2,
+                      ypxl2,
+                      rfpart(yend) * xgap);
+        plot_aa_pixel(framebuffer,
+                      color,
+                      bcolor,
+                      alpha,
+                      bytes_per_pixel,
+                      bits_per_pixel,
+                      bytes_per_line,
+                      x_clip,
+                      y_clip,
+                      xx_clip,
+                      yy_clip,
+                      xoffset,
+                      yoffset,
+                      steep,
+                      xpxl2,
+                      ypxl2 + 1,
+                      fpart(yend) * xgap);
 
-	  /* main loop */
-	  long x;
-	  if (xpxl1 + 1 <= xpxl2 - 1) {
-		 for (x = xpxl1 + 1; x <= xpxl2 - 1; x++) {
-			double iy = intery;
-			long yint = (long)floor(iy);
-			plot_aa_pixel(framebuffer, color, bcolor, alpha, bytes_per_pixel, bits_per_pixel, bytes_per_line,
-						  x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, steep, x, yint, rfpart(iy));
-			plot_aa_pixel(framebuffer, color, bcolor, alpha, bytes_per_pixel, bits_per_pixel, bytes_per_line,
-						  x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, steep, x, yint + 1, fpart(iy));
-			intery += gradient;
-		 }
-	  }
-	  return;
-   }
-   /* Original (non-antialiased) integer-based line drawing code follows */
-   short shortLen = y2 - y1;
-   short longLen  = x2 - x1;
-   int yLonger    = false;
+        /* main loop */
+        long x;
+        if (xpxl1 + 1 <= xpxl2 - 1) {
+            for (x = xpxl1 + 1; x <= xpxl2 - 1; x++) {
+                double iy = intery;
+                long yint = (long)floor(iy);
+                plot_aa_pixel(framebuffer,
+                              color,
+                              bcolor,
+                              alpha,
+                              bytes_per_pixel,
+                              bits_per_pixel,
+                              bytes_per_line,
+                              x_clip,
+                              y_clip,
+                              xx_clip,
+                              yy_clip,
+                              xoffset,
+                              yoffset,
+                              steep,
+                              x,
+                              yint,
+                              rfpart(iy));
+                plot_aa_pixel(framebuffer,
+                              color,
+                              bcolor,
+                              alpha,
+                              bytes_per_pixel,
+                              bits_per_pixel,
+                              bytes_per_line,
+                              x_clip,
+                              y_clip,
+                              xx_clip,
+                              yy_clip,
+                              xoffset,
+                              yoffset,
+                              steep,
+                              x,
+                              yint + 1,
+                              fpart(iy));
+                intery += gradient;
+            }
+        }
+        return;
+    }
 
-   if (abs(shortLen) > abs(longLen)) {
-	  short swap = shortLen;
-	  shortLen   = longLen;
-	  longLen    = swap;
-	  yLonger    = true;
-   }
-   int decInc;
-   if (longLen == 0) {
-	  decInc = 0;
-   } else {
-	  decInc = (shortLen << 16) / longLen;
-   }
-   int count;
-   if (yLonger) {
-	  if (longLen > 0) {
-		 longLen += y1;
-		 for (count = 0x8000 + (x1 << 16); y1 <= longLen; ++y1) {
-			c_plot(framebuffer, count >> 16, y1, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-			count += decInc;
-		 }
-		 return;
-	  }
-	  longLen += y1;
-	  for (count = 0x8000 + (x1 << 16); y1 >= longLen; --y1) {
-		 c_plot(framebuffer, count >> 16, y1, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-		 count -= decInc;
-	  }
-	  return;
-   }
-   if (longLen > 0) {
-	  longLen += x1;
-	  for (count = 0x8000 + (y1 << 16); x1 <= longLen; ++x1) {
-		 c_plot(framebuffer, x1, count >> 16, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-		 count += decInc;
-	  }
-	  return;
-   }
-   longLen += x1;
-   for (count = 0x8000 + (y1 << 16); x1 >= longLen; --x1) {
-	  c_plot(framebuffer, x1, count >> 16, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
-	  count -= decInc;
-   }
+    /* Original (non-antialiased) integer-based line drawing code */
+    short shortLen = y2 - y1;
+    short longLen = x2 - x1;
+    int yLonger = false;
+
+    if (abs(shortLen) > abs(longLen)) {
+        short swap = shortLen;
+        shortLen = longLen;
+        longLen = swap;
+        yLonger = true;
+    }
+    int decInc;
+    if (longLen == 0) {
+        decInc = 0;
+    } else {
+        decInc = (shortLen << 16) / longLen;
+    }
+    int count;
+    if (yLonger) {
+        if (longLen > 0) {
+            longLen += y1;
+            for (count = 0x8000 + (x1 << 16); y1 <= longLen; ++y1) {
+                c_plot(framebuffer,
+                       count >> 16,
+                       y1,
+                       x_clip,
+                       y_clip,
+                       xx_clip,
+                       yy_clip,
+                       color,
+                       bcolor,
+                       alpha,
+                       draw_mode,
+                       bytes_per_pixel,
+                       bits_per_pixel,
+                       bytes_per_line,
+                       xoffset,
+                       yoffset);
+                count += decInc;
+            }
+            return;
+        }
+        longLen += y1;
+        for (count = 0x8000 + (x1 << 16); y1 >= longLen; --y1) {
+            c_plot(framebuffer,
+                   count >> 16,
+                   y1,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   color,
+                   bcolor,
+                   alpha,
+                   draw_mode,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+            count -= decInc;
+        }
+        return;
+    }
+    if (longLen > 0) {
+        longLen += x1;
+        for (count = 0x8000 + (y1 << 16); x1 <= longLen; ++x1) {
+            c_plot(framebuffer,
+                   x1,
+                   count >> 16,
+                   x_clip,
+                   y_clip,
+                   xx_clip,
+                   yy_clip,
+                   color,
+                   bcolor,
+                   alpha,
+                   draw_mode,
+                   bytes_per_pixel,
+                   bits_per_pixel,
+                   bytes_per_line,
+                   xoffset,
+                   yoffset);
+            count += decInc;
+        }
+        return;
+    }
+    longLen += x1;
+    for (count = 0x8000 + (y1 << 16); x1 >= longLen; --x1) {
+        c_plot(framebuffer,
+               x1,
+               count >> 16,
+               x_clip,
+               y_clip,
+               xx_clip,
+               yy_clip,
+               color,
+               bcolor,
+               alpha,
+               draw_mode,
+               bytes_per_pixel,
+               bits_per_pixel,
+               bytes_per_line,
+               xoffset,
+               yoffset);
+        count -= decInc;
+    }
 }
 
-// Reads in rectangular screen data as a string to a previously allocated buffer
-void c_blit_read(
-				 char *framebuffer,
-				 short screen_width, short screen_height,
-				 unsigned int bytes_per_line,
-				 short xoffset, short yoffset,
-				 char *blit_data,
-				 short x, short y, short w, short h,
-				 unsigned char bytes_per_pixel,
-				 unsigned char draw_mode,
-				 unsigned char alpha,
-				 unsigned int bcolor,
-				 short x_clip, short y_clip, short xx_clip, short yy_clip) {
-   short fb_x = xoffset + x;
-   short fb_y = yoffset + y;
-   short xx   = x + w;
-   short yy   = y + h;
-   short horizontal;
-   short vertical;
-   unsigned int bline = w * bytes_per_pixel;
+/* Reads in rectangular screen data as a string to a previously allocated buffer */
+void c_blit_read(char *framebuffer,
+                 short screen_width,
+                 short screen_height,
+                 unsigned int bytes_per_line,
+                 short xoffset,
+                 short yoffset,
+                 char *blit_data,
+                 short x,
+                 short y,
+                 short w,
+                 short h,
+                 unsigned char bytes_per_pixel,
+                 unsigned char draw_mode,
+                 unsigned char alpha,
+                 unsigned int bcolor,
+                 short x_clip,
+                 short y_clip,
+                 short xx_clip,
+                 short yy_clip) {
+    short fb_x = xoffset + x;
+    short fb_y = yoffset + y;
+    short xx = x + w;
+    short yy = y + h;
+    short horizontal;
+    short vertical;
+    unsigned int bline = w * bytes_per_pixel;
 
-   for (vertical = 0; vertical < h; vertical++) {
-	  unsigned int vbl  = vertical * bline;
-	  unsigned short yv = fb_y + vertical;
-	  unsigned int yvbl = yv * bytes_per_line;
-	  if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
-		 for (horizontal = 0; horizontal < w; horizontal++) {
-			unsigned short xh = fb_x + horizontal;
-			unsigned int xhbp = xh * bytes_per_pixel;
-			if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
-			   unsigned int hzpixel   = horizontal * bytes_per_pixel;
-			   unsigned int vhz       = vbl + hzpixel;
-			   unsigned int yvhz      = yvbl + hzpixel;
-			   unsigned int xhbp_yvbl = xhbp + yvbl;
-			   if (bytes_per_pixel == 4) {
-				  *((unsigned int*)(blit_data + vhz)) = *((unsigned int*)(framebuffer + xhbp_yvbl));
-			   } else if (bytes_per_pixel == 3) {
-				  *(blit_data + vhz ) = *(framebuffer + xhbp_yvbl );
-				  *(blit_data + vhz  + 1) = *(framebuffer + xhbp_yvbl  + 1);
-				  *(blit_data + vhz  + 2) = *(framebuffer + xhbp_yvbl  + 2);
-			   } else {
-				  *((unsigned short*)(blit_data + vhz )) = *((unsigned short*)(framebuffer + xhbp_yvbl ));
-			   }
-			}
-		 }
-	  }
-   }
+    for (vertical = 0; vertical < h; vertical++) {
+        unsigned int vbl = vertical * bline;
+        unsigned short yv = fb_y + vertical;
+        unsigned int yvbl = yv * bytes_per_line;
+        if (yv >= (yoffset + y_clip) && yv <= (yoffset + yy_clip)) {
+            for (horizontal = 0; horizontal < w; horizontal++) {
+                unsigned short xh = fb_x + horizontal;
+                unsigned int xhbp = xh * bytes_per_pixel;
+                if (xh >= (xoffset + x_clip) && xh <= (xoffset + xx_clip)) {
+                    unsigned int hzpixel = horizontal * bytes_per_pixel;
+                    unsigned int vhz = vbl + hzpixel;
+                    unsigned int yvhz = yvbl + hzpixel;
+                    unsigned int xhbp_yvbl = xhbp + yvbl;
+                    if (bytes_per_pixel == 4) {
+                        *((unsigned int *)(blit_data + vhz)) =
+                            *((unsigned int *)(framebuffer + xhbp_yvbl));
+                    } else if (bytes_per_pixel == 3) {
+                        *(blit_data + vhz) = *(framebuffer + xhbp_yvbl);
+                        *(blit_data + vhz + 1) = *(framebuffer + xhbp_yvbl + 1);
+                        *(blit_data + vhz + 2) = *(framebuffer + xhbp_yvbl + 2);
+                    } else {
+                        *((unsigned short *)(blit_data + vhz)) =
+                            *((unsigned short *)(framebuffer + xhbp_yvbl));
+                    }
+                }
+            }
+        }
+    }
 }
 
-// Blits a rectangle of graphics to the screen using the specified draw mode
-void c_blit_write(
-				  char *framebuffer,
-				  short screen_width, short screen_height,
-				  unsigned int bytes_per_line,
-				  short xoffset, short yoffset,
-				  char *blit_data,
-				  short x, short y, short w, short h,
-				  unsigned char bytes_per_pixel,
-				  unsigned char bits_per_pixel,
-				  unsigned char draw_mode,
-				  unsigned char alpha,
-				  unsigned int bcolor,
-				  short x_clip, short y_clip, short xx_clip, short yy_clip) {
-   short fb_x = xoffset + x;
-   short fb_y = yoffset + y;
-   short xx   = x + w;
-   short yy   = y + h;
-   unsigned int bline = (unsigned int)w * (unsigned int)bytes_per_pixel;
+/* Blits a rectangle of graphics to the screen using the specified draw mode */
+void c_blit_write(char *framebuffer,
+                  short screen_width,
+                  short screen_height,
+                  unsigned int bytes_per_line,
+                  short xoffset,
+                  short yoffset,
+                  char *blit_data,
+                  short x,
+                  short y,
+                  short w,
+                  short h,
+                  unsigned char bytes_per_pixel,
+                  unsigned char bits_per_pixel,
+                  unsigned char draw_mode,
+                  unsigned char alpha,
+                  unsigned int bcolor,
+                  short x_clip,
+                  short y_clip,
+                  short xx_clip,
+                  short yy_clip) {
+    short fb_x = xoffset + x;
+    short fb_y = yoffset + y;
+    short xx = x + w;
+    short yy = y + h;
+    unsigned int bline = (unsigned int)w * (unsigned int)bytes_per_pixel;
 
-   /* Fastest is unclipped normal mode (keep original memcpy path) */
-   if (draw_mode == NORMAL_MODE && x >= x_clip && xx <= xx_clip && y >= y_clip && yy <= yy_clip) {
-	  unsigned char *source = (unsigned char*)blit_data;
-	  unsigned char *dest   = (unsigned char*)framebuffer + (fb_y * bytes_per_line) + (fb_x * bytes_per_pixel);
-	  unsigned int row_bytes = bline;
-	  unsigned short v;
-   for (v = 0; v < h; v++) {
-	  memcpy(dest, source, row_bytes);
-	  source += row_bytes;
-	  dest   += bytes_per_line;
-   }
-	  return;
-   }
+    /* Fastest is unclipped normal mode (keep original memcpy path) */
+    if (draw_mode == NORMAL_MODE && x >= x_clip && xx <= xx_clip && y >= y_clip && yy <= yy_clip) {
+        unsigned char *source = (unsigned char *)blit_data;
+        unsigned char *dest =
+            (unsigned char *)framebuffer + (fb_y * bytes_per_line) + (fb_x * bytes_per_pixel);
+        unsigned int row_bytes = bline;
+        unsigned short v;
+        for (v = 0; v < h; v++) {
+            memcpy(dest, source, row_bytes);
+            source += row_bytes;
+            dest += bytes_per_line;
+        }
+        return;
+    }
 
-   /* General clipped / non-normal modes: compute per-row bases and minimize per-pixel math */
-   unsigned short vertical, horizontal;
-   for (vertical = 0; vertical < h; vertical++) {
-	  unsigned short yv = fb_y + vertical;
-	  if (yv < (yoffset + y_clip) || yv > (yoffset + yy_clip)) continue;
+    /* General clipped / non-normal modes */
+    unsigned short vertical, horizontal;
+    for (vertical = 0; vertical < h; vertical++) {
+        unsigned short yv = fb_y + vertical;
+        if (yv < (yoffset + y_clip) || yv > (yoffset + yy_clip)) continue;
 
-	  unsigned char *dest_row = (unsigned char*)framebuffer + ((unsigned int)yv * bytes_per_line);
-	  unsigned char *src_row  = (unsigned char*)blit_data + ((unsigned int)vertical * bline);
+        unsigned char *dest_row = (unsigned char *)framebuffer + ((unsigned int)yv * bytes_per_line);
+        unsigned char *src_row = (unsigned char *)blit_data + ((unsigned int)vertical * bline);
 
-	  for (horizontal = 0; horizontal < w; horizontal++) {
-		 unsigned short xh = fb_x + horizontal;
-		 if (xh < (xoffset + x_clip) || xh > (xoffset + xx_clip)) continue;
+        for (horizontal = 0; horizontal < w; horizontal++) {
+            unsigned short xh = fb_x + horizontal;
+            if (xh < (xoffset + x_clip) || xh > (xoffset + xx_clip)) continue;
 
-		 unsigned char *dst = dest_row + ((unsigned int)xh * bytes_per_pixel);
-		 unsigned char *src = src_row  + ((unsigned int)horizontal * bytes_per_pixel);
+            unsigned char *dst = dest_row + ((unsigned int)xh * bytes_per_pixel);
+            unsigned char *src = src_row + ((unsigned int)horizontal * bytes_per_pixel);
 
-		 switch (bits_per_pixel) {
-		  case 32:
-			  {
-				 uint32_t s = *((uint32_t*)src);
-				 switch (draw_mode) {
-				  case NORMAL_MODE:      *((uint32_t*)dst) = s; break;
-				  case XOR_MODE:         *((uint32_t*)dst) ^= s; break;
-				  case OR_MODE:          *((uint32_t*)dst) |= s; break;
-				  case AND_MODE:         *((uint32_t*)dst) &= s; break;
-				  case MASK_MODE:
-					  {
-						 uint32_t fbv = *((uint32_t*)dst);
-						 if ((s & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) *((uint32_t*)dst) = s;
-					  }
-					break;
-				  case UNMASK_MODE:
-					  {
-						 uint32_t fbv = *((uint32_t*)dst);
-						 if ((fbv & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) *((uint32_t*)dst) = s;
-					  }
-					break;
-				  case ALPHA_MODE:
-					  {
-						 uint32_t fbv = *((uint32_t*)dst);
-						 unsigned char fb_r = fbv & 0xFF;
-						 unsigned char fb_g = (fbv >> 8) & 0xFF;
-						 unsigned char fb_b = (fbv >> 16) & 0xFF;
-						 unsigned char R = s & 0xFF;
-						 unsigned char G = (s >> 8) & 0xFF;
-						 unsigned char B = (s >> 16) & 0xFF;
-						 unsigned char A = (s >> 24) & 0xFF;
-						 unsigned char invA = 255 - A;
-						 fb_r = ((R * A) + (fb_r * invA)) >> 8;
-						 fb_g = ((G * A) + (fb_g * invA)) >> 8;
-						 fb_b = ((B * A) + (fb_b * invA)) >> 8;
-						 *((uint32_t*)dst) = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
-					  }
-					break;
-				  case ADD_MODE:          *((uint32_t*)dst) += s; break;
-				  case SUBTRACT_MODE:     *((uint32_t*)dst) -= s; break;
-				  case MULTIPLY_MODE:     *((uint32_t*)dst) *= s; break;
-				  case DIVIDE_MODE:       if (s != 0) *((uint32_t*)dst) /= s; break;
-				 }
-			  }
-			break;
+            switch (bits_per_pixel) {
+                case 32: {
+                    uint32_t s = *((uint32_t *)src);
+                    switch (draw_mode) {
+                        case NORMAL_MODE:
+                            *((uint32_t *)dst) = s;
+                            break;
+                        case XOR_MODE:
+                            *((uint32_t *)dst) ^= s;
+                            break;
+                        case OR_MODE:
+                            *((uint32_t *)dst) |= s;
+                            break;
+                        case AND_MODE:
+                            *((uint32_t *)dst) &= s;
+                            break;
+                        case MASK_MODE: {
+                            uint32_t fbv = *((uint32_t *)dst);
+                            if ((s & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) *((uint32_t *)dst) = s;
+                        } break;
+                        case UNMASK_MODE: {
+                            uint32_t fbv = *((uint32_t *)dst);
+                            if ((fbv & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) *((uint32_t *)dst) = s;
+                        } break;
+                        case ALPHA_MODE: {
+                            uint32_t fbv = *((uint32_t *)dst);
+                            unsigned char fb_r = fbv & 0xFF;
+                            unsigned char fb_g = (fbv >> 8) & 0xFF;
+                            unsigned char fb_b = (fbv >> 16) & 0xFF;
+                            unsigned char R = s & 0xFF;
+                            unsigned char G = (s >> 8) & 0xFF;
+                            unsigned char B = (s >> 16) & 0xFF;
+                            unsigned char A = (s >> 24) & 0xFF;
+                            unsigned char invA = 255 - A;
+                            fb_r = ((R * A) + (fb_r * invA)) >> 8;
+                            fb_g = ((G * A) + (fb_g * invA)) >> 8;
+                            fb_b = ((B * A) + (fb_b * invA)) >> 8;
+                            *((uint32_t *)dst) = fb_r | (fb_g << 8) | (fb_b << 16) | (A << 24);
+                        } break;
+                        case ADD_MODE:
+                            *((uint32_t *)dst) += s;
+                            break;
+                        case SUBTRACT_MODE:
+                            *((uint32_t *)dst) -= s;
+                            break;
+                        case MULTIPLY_MODE:
+                            *((uint32_t *)dst) *= s;
+                            break;
+                        case DIVIDE_MODE:
+                            if (s != 0) *((uint32_t *)dst) /= s;
+                            break;
+                    }
+                } break;
 
-		  case 24:
-			  {
-				 /* pack 3 bytes into 24-bit value */
-				 uint32_t s = (uint32_t)src[0] | ((uint32_t)src[1] << 8) | ((uint32_t)src[2] << 16);
-				 uint32_t fbv = (uint32_t)dst[0] | ((uint32_t)dst[1] << 8) | ((uint32_t)dst[2] << 16);
-				 uint32_t res = fbv;
-				 switch (draw_mode) {
-				  case NORMAL_MODE:  res = s; break;
-				  case XOR_MODE:     res = fbv ^ s; break;
-				  case OR_MODE:      res = fbv | s; break;
-				  case AND_MODE:     res = fbv & s; break;
-				  case MASK_MODE:    if ((s & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) res = s; break;
-				  case UNMASK_MODE:  if ((fbv & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) res = s; break;
-				  case ALPHA_MODE:
-					  {
-						 unsigned char fb_r = fbv & 0xFF;
-						 unsigned char fb_g = (fbv >> 8) & 0xFF;
-						 unsigned char fb_b = (fbv >> 16) & 0xFF;
-						 unsigned char R = s & 0xFF;
-						 unsigned char G = (s >> 8) & 0xFF;
-						 unsigned char B = (s >> 16) & 0xFF;
-						 unsigned char invA = 255 - alpha;
-						 fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-						 fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-						 fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-						 res = (uint32_t)fb_r | ((uint32_t)fb_g << 8) | ((uint32_t)fb_b << 16);
-					  }
-					break;
-				  case ADD_MODE:      res = fbv + s; break;
-				  case SUBTRACT_MODE: res = fbv - s; break;
-				  case MULTIPLY_MODE: res = fbv * s; break;
-				  case DIVIDE_MODE:
-					  {
-						 /* per-channel safe divide (skip division when denominator is zero) */
-						 unsigned char sc0 = s & 0xFF, sc1 = (s >> 8) & 0xFF, sc2 = (s >> 16) & 0xFF;
-						 unsigned char dc0 = fbv & 0xFF, dc1 = (fbv >> 8) & 0xFF, dc2 = (fbv >> 16) & 0xFF;
-						 unsigned char r0 = (sc0 != 0) ? (dc0 / sc0) : dc0;
-						 unsigned char r1 = (sc1 != 0) ? (dc1 / sc1) : dc1;
-						 unsigned char r2 = (sc2 != 0) ? (dc2 / sc2) : dc2;
-						 res = (uint32_t)r0 | ((uint32_t)r1 << 8) | ((uint32_t)r2 << 16);
-					  }
-					break;
-				 }
-				 dst[0] = res & 0xFF;
-				 dst[1] = (res >> 8) & 0xFF;
-				 dst[2] = (res >> 16) & 0xFF;
-			  }
-			break;
+                case 24: {
+                    /* pack 3 bytes into 24-bit value */
+                    uint32_t s =
+                        (uint32_t)src[0] | ((uint32_t)src[1] << 8) | ((uint32_t)src[2] << 16);
+                    uint32_t fbv =
+                        (uint32_t)dst[0] | ((uint32_t)dst[1] << 8) | ((uint32_t)dst[2] << 16);
+                    uint32_t res = fbv;
+                    switch (draw_mode) {
+                        case NORMAL_MODE:
+                            res = s;
+                            break;
+                        case XOR_MODE:
+                            res = fbv ^ s;
+                            break;
+                        case OR_MODE:
+                            res = fbv | s;
+                            break;
+                        case AND_MODE:
+                            res = fbv & s;
+                            break;
+                        case MASK_MODE:
+                            if ((s & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) res = s;
+                            break;
+                        case UNMASK_MODE:
+                            if ((fbv & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) res = s;
+                            break;
+                        case ALPHA_MODE: {
+                            unsigned char fb_r = fbv & 0xFF;
+                            unsigned char fb_g = (fbv >> 8) & 0xFF;
+                            unsigned char fb_b = (fbv >> 16) & 0xFF;
+                            unsigned char R = s & 0xFF;
+                            unsigned char G = (s >> 8) & 0xFF;
+                            unsigned char B = (s >> 16) & 0xFF;
+                            unsigned char invA = 255 - alpha;
+                            fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                            fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                            fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+                            res = (uint32_t)fb_r |
+                                  ((uint32_t)fb_g << 8) |
+                                  ((uint32_t)fb_b << 16);
+                        } break;
+                        case ADD_MODE:
+                            res = fbv + s;
+                            break;
+                        case SUBTRACT_MODE:
+                            res = fbv - s;
+                            break;
+                        case MULTIPLY_MODE:
+                            res = fbv * s;
+                            break;
+                        case DIVIDE_MODE: {
+                            /* per-channel safe divide (skip division when denominator is zero) */
+                            unsigned char sc0 = s & 0xFF,
+                                          sc1 = (s >> 8) & 0xFF,
+                                          sc2 = (s >> 16) & 0xFF;
+                            unsigned char dc0 = fbv & 0xFF,
+                                          dc1 = (fbv >> 8) & 0xFF,
+                                          dc2 = (fbv >> 16) & 0xFF;
+                            unsigned char r0 = (sc0 != 0) ? (dc0 / sc0) : dc0;
+                            unsigned char r1 = (sc1 != 0) ? (dc1 / sc1) : dc1;
+                            unsigned char r2 = (sc2 != 0) ? (dc2 / sc2) : dc2;
+                            res = (uint32_t)r0 |
+                                  ((uint32_t)r1 << 8) |
+                                  ((uint32_t)r2 << 16);
+                        } break;
+                    }
+                    dst[0] = res & 0xFF;
+                    dst[1] = (res >> 8) & 0xFF;
+                    dst[2] = (res >> 16) & 0xFF;
+                } break;
 
-		  case 16:
-			  {
-				 uint16_t s = *((uint16_t*)src);
-				 uint16_t fbv = *((uint16_t*)dst);
-				 uint16_t res = fbv;
-				 switch (draw_mode) {
-				  case NORMAL_MODE:  res = s; break;
-				  case XOR_MODE:     res = fbv ^ s; break;
-				  case OR_MODE:      res = fbv | s; break;
-				  case AND_MODE:     res = fbv & s; break;
-				  case MASK_MODE:    if (s != (bcolor & 0xFFFF)) res = s; break;
-				  case UNMASK_MODE:  if (fbv == (bcolor & 0xFFFF)) res = s; break;
-				  case ALPHA_MODE:
-					  {
-						 unsigned short rgb565 = fbv;
-						 unsigned short fb_r = rgb565 & 31;
-						 unsigned short fb_g = (rgb565 >> 5) & 63;
-						 unsigned short fb_b = (rgb565 >> 11) & 31;
-						 unsigned short R = s & 31;
-						 unsigned short G = (s >> 5) & 63;
-						 unsigned short B = (s >> 11) & 31;
-						 unsigned char invA = 255 - alpha;
-						 fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
-						 fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
-						 fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
-						 res = (fb_b << 11) | (fb_g << 5) | fb_r;
-					  }
-					break;
-				  case ADD_MODE:      res = fbv + s; break;
-				  case SUBTRACT_MODE: res = fbv - s; break;
-				  case MULTIPLY_MODE: res = fbv * s; break;
-				  case DIVIDE_MODE:   if (s != 0) res = fbv / s; break;
-				 }
-				 *((uint16_t*)dst) = res;
-			  }
-			break;
+                case 16: {
+                    uint16_t s = *((uint16_t *)src);
+                    uint16_t fbv = *((uint16_t *)dst);
+                    uint16_t res = fbv;
+                    switch (draw_mode) {
+                        case NORMAL_MODE:
+                            res = s;
+                            break;
+                        case XOR_MODE:
+                            res = fbv ^ s;
+                            break;
+                        case OR_MODE:
+                            res = fbv | s;
+                            break;
+                        case AND_MODE:
+                            res = fbv & s;
+                            break;
+                        case MASK_MODE:
+                            if (s != (bcolor & 0xFFFF)) res = s;
+                            break;
+                        case UNMASK_MODE:
+                            if (fbv == (bcolor & 0xFFFF)) res = s;
+                            break;
+                        case ALPHA_MODE: {
+                            unsigned short rgb565 = fbv;
+                            unsigned short fb_r = rgb565 & 31;
+                            unsigned short fb_g = (rgb565 >> 5) & 63;
+                            unsigned short fb_b = (rgb565 >> 11) & 31;
+                            unsigned short R = s & 31;
+                            unsigned short G = (s >> 5) & 63;
+                            unsigned short B = (s >> 11) & 31;
+                            unsigned char invA = 255 - alpha;
+                            fb_r = ((R * alpha) + (fb_r * invA)) >> 8;
+                            fb_g = ((G * alpha) + (fb_g * invA)) >> 8;
+                            fb_b = ((B * alpha) + (fb_b * invA)) >> 8;
+                            res = (fb_b << 11) | (fb_g << 5) | fb_r;
+                        } break;
+                        case ADD_MODE:
+                            res = fbv + s;
+                            break;
+                        case SUBTRACT_MODE:
+                            res = fbv - s;
+                            break;
+                        case MULTIPLY_MODE:
+                            res = fbv * s;
+                            break;
+                        case DIVIDE_MODE:
+                            if (s != 0) res = fbv / s;
+                            break;
+                    }
+                    *((uint16_t *)dst) = res;
+                } break;
 
-		  case 8:
-			  {
-				 uint8_t s = *src;
-				 uint8_t fbv = *dst;
-				 uint8_t res = fbv;
-				 switch (draw_mode)
-				   {
-					case NORMAL_MODE:  res = s; break;
-					case XOR_MODE:     res = fbv ^ s; break;
-					case OR_MODE:      res = fbv | s; break;
-					case AND_MODE:     res = fbv & s; break;
-					case MASK_MODE:    if (s != (bcolor & 0xFF)) res = s; break;
-					case UNMASK_MODE:  if (fbv == (bcolor & 0xFF)) res = s; break;
-					case ALPHA_MODE:
-						{
-						   uint8_t invA = 255 - alpha;
-						   res = (uint8_t)((((uint32_t)s * alpha) + ((uint32_t)fbv * invA)) >> 8);
-						}
-					  break;
-					case ADD_MODE:      res = fbv + s; break;
-					case SUBTRACT_MODE: res = fbv - s; break;
-					case MULTIPLY_MODE: res = fbv * s; break;
-					case DIVIDE_MODE:   if (s != 0) res = fbv / s; break;
-				   }
-				 *dst = res;
-			  }
-			break;
+                case 8: {
+                    uint8_t s = *src;
+                    uint8_t fbv = *dst;
+                    uint8_t res = fbv;
+                    switch (draw_mode) {
+                        case NORMAL_MODE:
+                            res = s;
+                            break;
+                        case XOR_MODE:
+                            res = fbv ^ s;
+                            break;
+                        case OR_MODE:
+                            res = fbv | s;
+                            break;
+                        case AND_MODE:
+                            res = fbv & s;
+                            break;
+                        case MASK_MODE:
+                            if (s != (bcolor & 0xFF)) res = s;
+                            break;
+                        case UNMASK_MODE:
+                            if (fbv == (bcolor & 0xFF)) res = s;
+                            break;
+                        case ALPHA_MODE: {
+                            uint8_t invA = 255 - alpha;
+                            res = (uint8_t)((((uint32_t)s * alpha) +
+                                             ((uint32_t)fbv * invA)) >>
+                                            8);
+                        } break;
+                        case ADD_MODE:
+                            res = fbv + s;
+                            break;
+                        case SUBTRACT_MODE:
+                            res = fbv - s;
+                            break;
+                        case MULTIPLY_MODE:
+                            res = fbv * s;
+                            break;
+                        case DIVIDE_MODE:
+                            if (s != 0) res = fbv / s;
+                            break;
+                    }
+                    *dst = res;
+                } break;
 
-		  case 1:
-			  {
-				 /* not supported */
-			  }
-			break;
-		 }
-		 /* end bits_per_pixel switch */
-	  }
-	  /* end horizontal loop */
-   }
-   /* end vertical loop */
+                case 1: {
+                    /* not supported */
+                } break;
+            }
+            /* end bits_per_pixel switch */
+        }
+        /* end horizontal loop */
+    }
+    /* end vertical loop */
 }
 
-// Fast rotate blit graphics data
-void c_rotate(
-			  char *image,
-			  char *new_img,
-			  short width, short height,
-			  unsigned short wh,
-			  double degrees,
-			  unsigned char bytes_per_pixel,
-			  unsigned char bits_per_pixel) {
-   unsigned int hwh        = floor(wh / 2 + 0.5);
-   unsigned int bbline     = wh * bytes_per_pixel;
-   unsigned int bline      = width * bytes_per_pixel;
-   unsigned short hwidth   = floor(width / 2 + 0.5);
-   unsigned short hheight  = floor(height / 2 + 0.5);
-   double sinma            = sin((degrees * M_PI) / 180);
-   double cosma            = cos((degrees * M_PI) / 180);
-   short x, y;
+/* Fast rotate blit graphics data */
+void c_rotate(char *image,
+              char *new_img,
+              short width,
+              short height,
+              unsigned short wh,
+              double degrees,
+              unsigned char bytes_per_pixel,
+              unsigned char bits_per_pixel) {
+    unsigned int hwh = floor(wh / 2 + 0.5);
+    unsigned int bbline = wh * bytes_per_pixel;
+    unsigned int bline = width * bytes_per_pixel;
+    unsigned short hwidth = floor(width / 2 + 0.5);
+    unsigned short hheight = floor(height / 2 + 0.5);
+    double sinma = sin((degrees * M_PI) / 180);
+    double cosma = cos((degrees * M_PI) / 180);
+    short x, y;
 
-   /* iterate rows (y) outer, columns (x) inner for better dest-row locality */
-   for (y = 0; y < wh; y++) {
-	  double yt = (double)y - (double)hwh;
-	  /* xs and ys for x == 0 */
-	  double xs = cosma * (0 - (double)hwh) - sinma * yt + (double)hwidth;
-	  double ys = sinma * (0 - (double)hwh) + cosma * yt + (double)hheight;
+    /* iterate rows (y) outer, columns (x) inner for better dest-row locality */
+    for (y = 0; y < wh; y++) {
+        double yt = (double)y - (double)hwh;
+        /* xs and ys for x == 0 */
+        double xs = cosma * (0 - (double)hwh) - sinma * yt + (double)hwidth;
+        double ys = sinma * (0 - (double)hwh) + cosma * yt + (double)hheight;
 
-	  unsigned char *dest_row = (unsigned char*)new_img + (unsigned int)y * bbline;
+        unsigned char *dest_row = (unsigned char *)new_img + (unsigned int)y * bbline;
 
-	  for (x = 0; x < wh; x++) {
-		 int xi = (int)xs;
-		 int yi = (int)ys;
+        for (x = 0; x < wh; x++) {
+            int xi = (int)xs;
+            int yi = (int)ys;
 
-		 if (xi >= 0 && xi < width && yi >= 0 && yi < height) {
-			unsigned char *src = (unsigned char*)image + (unsigned int)xi * bytes_per_pixel + (unsigned int)yi * bline;
-			unsigned char *dst = dest_row + (unsigned int)x * bytes_per_pixel;
+            if (xi >= 0 && xi < width && yi >= 0 && yi < height) {
+                unsigned char *src = (unsigned char *)image +
+                                     (unsigned int)xi * bytes_per_pixel +
+                                     (unsigned int)yi * bline;
+                unsigned char *dst = dest_row + (unsigned int)x * bytes_per_pixel;
 
-   switch (bits_per_pixel) {
-	case 32:
-	  *((unsigned int*)dst) = *((unsigned int*)src);
-	  break;
-	case 24:
-	  dst[0] = src[0];
-	  dst[1] = src[1];
-	  dst[2] = src[2];
-	  break;
-	case 16:
-	  *((unsigned short*)dst) = *((unsigned short*)src);
-	  break;
-	case 8:
-	  *dst = *src;
-	  break;
-	case 1:
-	  /* not supported */
-	  break;
-	default:
-	  break;
-   }
-		 }
+                switch (bits_per_pixel) {
+                    case 32:
+                        *((unsigned int *)dst) = *((unsigned int *)src);
+                        break;
+                    case 24:
+                        dst[0] = src[0];
+                        dst[1] = src[1];
+                        dst[2] = src[2];
+                        break;
+                    case 16:
+                        *((unsigned short *)dst) = *((unsigned short *)src);
+                        break;
+                    case 8:
+                        *dst = *src;
+                        break;
+                    case 1:
+                        /* not supported */
+                        break;
+                    default:
+                        break;
+                }
+            }
 
-		 /* incrementally update xs, ys for next x (adds are cheaper than multiplications) */
-		 xs += cosma;
-		 ys += sinma;
-	  }
-   }
+            /* incrementally update xs, ys for next x */
+            xs += cosma;
+            ys += sinma;
+        }
+    }
 }
 
-// Horizontally mirror blit graphics data
-void c_flip_horizontal(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
-   if (bytes_per_pixel == 0 || width <= 1 || height <= 0) return;
+/* Horizontally mirror blit graphics data */
+void c_flip_horizontal(char *pixels,
+                       short width,
+                       short height,
+                       unsigned char bytes_per_pixel) {
+    if (bytes_per_pixel == 0 || width <= 1 || height <= 0) return;
 
-   unsigned int bpl = (unsigned int)width * (unsigned int)bytes_per_pixel;
-   short hwidth = width / 2;
+    unsigned int bpl = (unsigned int)width * (unsigned int)bytes_per_pixel;
+    short hwidth = width / 2;
 
-   /* allocate a single temporary buffer once (VLA) */
-   unsigned char tmp[bytes_per_pixel];
+    /* allocate a single temporary buffer once (VLA) */
+    unsigned char tmp[bytes_per_pixel];
 
-   for (short y = 0; y < height; y++) {
-	  unsigned char *row = (unsigned char*)pixels + (unsigned int)y * bpl;
-	  for (short x = 0; x < hwidth; x++) {
-		 unsigned char *left  = row + ((unsigned int)x * bytes_per_pixel);
-		 unsigned char *right = row + ((unsigned int)(width - 1 - x) * bytes_per_pixel);
+    for (short y = 0; y < height; y++) {
+        unsigned char *row = (unsigned char *)pixels + (unsigned int)y * bpl;
+        for (short x = 0; x < hwidth; x++) {
+            unsigned char *left = row + ((unsigned int)x * bytes_per_pixel);
+            unsigned char *right =
+                row + ((unsigned int)(width - 1 - x) * bytes_per_pixel);
 
-		 /* swap whole pixel at once */
-		 memcpy(tmp, left, bytes_per_pixel);
-		 memcpy(left, right, bytes_per_pixel);
-		 memcpy(right, tmp, bytes_per_pixel);
-	  }
-   }
+            /* swap whole pixel at once */
+            memcpy(tmp, left, bytes_per_pixel);
+            memcpy(left, right, bytes_per_pixel);
+            memcpy(right, tmp, bytes_per_pixel);
+        }
+    }
 }
 
-// Vertically flip blit graphics data
-void c_flip_vertical(char *pixels, short width, short height, unsigned char bytes_per_pixel) {
-   if (bytes_per_pixel == 0 || width <= 0 || height <= 1 || pixels == NULL) return;
+/* Vertically flip blit graphics data */
+void c_flip_vertical(char *pixels,
+                     short width,
+                     short height,
+                     unsigned char bytes_per_pixel) {
+    if (bytes_per_pixel == 0 || width <= 0 || height <= 1 || pixels == NULL) return;
 
-   size_t bufsize = (size_t)width * (size_t)bytes_per_pixel;        // Bytes per line
-   size_t half = (size_t)height / 2;
+    size_t bufsize = (size_t)width * (size_t)bytes_per_pixel;  /* Bytes per line */
+    size_t half = (size_t)height / 2;
 
-   unsigned char *tmp = malloc(bufsize);                           // Allocate a temporary buffer once
-   if (!tmp) return; /* allocation failed, nothing we can do */
+    unsigned char *tmp = malloc(bufsize);  /* Allocate a temporary buffer once */
+    if (!tmp) return;                      /* allocation failed */
 
-   for (size_t i = 0; i < half; ++i) {
-	  unsigned char *low  = (unsigned char*)pixels + i * bufsize;
-	  unsigned char *high = (unsigned char*)pixels + ((size_t)(height - 1 - i)) * bufsize;
+    for (size_t i = 0; i < half; ++i) {
+        unsigned char *low = (unsigned char *)pixels + i * bufsize;
+        unsigned char *high =
+            (unsigned char *)pixels + ((size_t)(height - 1 - i)) * bufsize;
 
-	  memcpy(tmp, low,  bufsize);    // Make a copy of the lower line
-	  memcpy(low, high, bufsize);    // Copy the upper line to the lower
-	  memcpy(high, tmp, bufsize);    // Copy the saved copy to the upper line
-   }
+        memcpy(tmp, low, bufsize);   /* copy lower line */
+        memcpy(low, high, bufsize);  /* upper to lower */
+        memcpy(high, tmp, bufsize);  /* saved lower to upper */
+    }
 
-   free(tmp); // Release the temporary buffer
+    free(tmp); /* Release the temporary buffer */
 }
 
-// Horizontally and vertically flip blit graphics data
-void c_flip_both(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
-   c_flip_vertical(
-				   pixels,
-				   width,height,
-				   bytes_per_pixel
-				  );
-   c_flip_horizontal(
-					 pixels,
-					 width,height,
-					 bytes_per_pixel
-					);
+/* Horizontally and vertically flip blit graphics data */
+void c_flip_both(char *pixels,
+                 short width,
+                 short height,
+                 unsigned char bytes_per_pixel) {
+    c_flip_vertical(pixels, width, height, bytes_per_pixel);
+    c_flip_horizontal(pixels, width, height, bytes_per_pixel);
 }
 
 /* bitmap conversions */
 
-// Convert an RGB565 bitmap to an RGB888 bitmap
-void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned char color_order ) {
-   unsigned int loc16 = 0;
-   unsigned int loc24 = 0;
-   unsigned char r5;
-   unsigned char g6;
-   unsigned char b5;
+/* Convert an RGB565 bitmap to an RGB888 bitmap */
+void c_convert_16_24(char *buf16,
+                     unsigned int size16,
+                     char *buf24,
+                     unsigned char color_order) {
+    unsigned int loc16 = 0;
+    unsigned int loc24 = 0;
+    unsigned char r5;
+    unsigned char g6;
+    unsigned char b5;
 
-   while(loc16 < size16) {
-	  unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
-	  loc16 += 2;
-	  if (color_order == RGB) {
-		 b5 = (rgb565 & 0xf800) >> 11;
-		 r5 = (rgb565 & 0x001f);
-	  } else {
-		 r5 = (rgb565 & 0xf800) >> 11;
-		 b5 = (rgb565 & 0x001f);
-	  }
-	  g6 = (rgb565 & 0x07e0) >> 5;
-	  unsigned char r8 = (r5 * 527 + 23) >> 6;
-	  unsigned char g8 = (g6 * 259 + 33) >> 6;
-	  unsigned char b8 = (b5 * 527 + 23) >> 6;
-	  *((unsigned char*)(buf24 + loc24++)) = r8;
-	  *((unsigned char*)(buf24 + loc24++)) = g8;
-	  *((unsigned char*)(buf24 + loc24++)) = b8;
-   }
+    while (loc16 < size16) {
+        unsigned short rgb565 = *((unsigned short *)(buf16 + loc16));
+        loc16 += 2;
+        if (color_order == RGB) {
+            b5 = (rgb565 & 0xf800) >> 11;
+            r5 = (rgb565 & 0x001f);
+        } else {
+            r5 = (rgb565 & 0xf800) >> 11;
+            b5 = (rgb565 & 0x001f);
+        }
+        g6 = (rgb565 & 0x07e0) >> 5;
+        unsigned char r8 = (r5 * 527 + 23) >> 6;
+        unsigned char g8 = (g6 * 259 + 33) >> 6;
+        unsigned char b8 = (b5 * 527 + 23) >> 6;
+        *((unsigned char *)(buf24 + loc24++)) = r8;
+        *((unsigned char *)(buf24 + loc24++)) = g8;
+        *((unsigned char *)(buf24 + loc24++)) = b8;
+    }
 }
 
-// Convert an RGB565 bitmap to a RGB8888 bitmap
-void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned char color_order ) {
-   unsigned int loc16 = 0;
-   unsigned int loc32 = 0;
-   unsigned char r5;
-   unsigned char g6;
-   unsigned char b5;
+/* Convert an RGB565 bitmap to a RGB8888 bitmap */
+void c_convert_16_32(char *buf16,
+                     unsigned int size16,
+                     char *buf32,
+                     unsigned char color_order) {
+    unsigned int loc16 = 0;
+    unsigned int loc32 = 0;
+    unsigned char r5;
+    unsigned char g6;
+    unsigned char b5;
 
-   while(loc16 < size16) {
-	  unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
-	  loc16 += 2;
-	  if (color_order == 0) {
-		 b5 = (rgb565 & 0xf800) >> 11;
-		 r5 = (rgb565 & 0x001f);
-	  } else {
-		 r5 = (rgb565 & 0xf800) >> 11;
-		 b5 = (rgb565 & 0x001f);
-	  }
-	  g6 = (rgb565 & 0x07e0) >> 5;
-	  unsigned char r8 = (r5 * 527 + 23) >> 6;
-	  unsigned char g8 = (g6 * 259 + 33) >> 6;
-	  unsigned char b8 = (b5 * 527 + 23) >> 6;
-	  *((unsigned int*)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
-	  loc32 += 3;
-	  if (r8 == 0 && g8 == 0 && b8 ==0) {
-		 // Black is always treated as a clear mask
-		 *((unsigned char*)(buf32 + loc32++)) = 0;
-	  } else {
-		 // Anything but black is opague
-		 *((unsigned char*)(buf32 + loc32++)) = 255;
-	  }
-   }
+    while (loc16 < size16) {
+        unsigned short rgb565 = *((unsigned short *)(buf16 + loc16));
+        loc16 += 2;
+        if (color_order == 0) {
+            b5 = (rgb565 & 0xf800) >> 11;
+            r5 = (rgb565 & 0x001f);
+        } else {
+            r5 = (rgb565 & 0xf800) >> 11;
+            b5 = (rgb565 & 0x001f);
+        }
+        g6 = (rgb565 & 0x07e0) >> 5;
+        unsigned char r8 = (r5 * 527 + 23) >> 6;
+        unsigned char g8 = (g6 * 259 + 33) >> 6;
+        unsigned char b8 = (b5 * 527 + 23) >> 6;
+        *((unsigned int *)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
+        loc32 += 3;
+        if (r8 == 0 && g8 == 0 && b8 == 0) {
+            /* Black is always treated as a clear mask */
+            *((unsigned char *)(buf32 + loc32++)) = 0;
+        } else {
+            /* Anything but black is opaque */
+            *((unsigned char *)(buf32 + loc32++)) = 255;
+        }
+    }
 }
 
-// Convert a RGB888 bitmap to a RGB565 bitmap
-void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned char color_order) {
-   unsigned int loc16    = 0;
-   unsigned int loc24    = 0;
-   unsigned short rgb565 = 0;
-   while(loc24 < size24) {
-	  unsigned char r8 = *(buf24 + loc24++);
-	  unsigned char g8 = *(buf24 + loc24++);
-	  unsigned char b8 = *(buf24 + loc24++);
-	  unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
-	  unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
-	  unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-   if (color_order == RGB) {
-	  rgb565 = (b5 << 11) | (g6 << 5) | r5;
-   } else {
-	  rgb565 = (r5 << 11) | (g6 << 5) | b5;
-   }
-	  /* write 16-bit value at loc16 and advance by 2 bytes */
-	  *((unsigned short*)(buf16 + loc16)) = rgb565;
-	  loc16 += 2;
-   }
+/* Convert a RGB888 bitmap to a RGB565 bitmap */
+void c_convert_24_16(char *buf24,
+                     unsigned int size24,
+                     char *buf16,
+                     unsigned char color_order) {
+    unsigned int loc16 = 0;
+    unsigned int loc24 = 0;
+    unsigned short rgb565 = 0;
+    while (loc24 < size24) {
+        unsigned char r8 = *(buf24 + loc24++);
+        unsigned char g8 = *(buf24 + loc24++);
+        unsigned char b8 = *(buf24 + loc24++);
+        unsigned char r5 = (r8 * 249 + 1014) >> 11;
+        unsigned char g6 = (g8 * 253 + 505) >> 10;
+        unsigned char b5 = (b8 * 249 + 1014) >> 11;
+        if (color_order == RGB) {
+            rgb565 = (b5 << 11) | (g6 << 5) | r5;
+        } else {
+            rgb565 = (r5 << 11) | (g6 << 5) | b5;
+        }
+        /* write 16-bit value at loc16 and advance by 2 bytes */
+        *((unsigned short *)(buf16 + loc16)) = rgb565;
+        loc16 += 2;
+    }
 }
 
-// Convert a RGB8888 bitmap to a RGB565 bitmap
-void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned char color_order) {
-   unsigned int loc16    = 0;
-   unsigned int loc32    = 0;
-   unsigned short rgb565 = 0;
-   while(loc32 < size32) {
-	  unsigned int crgb = *((unsigned int*)(buf32 + loc32));
-	  unsigned char r8 = crgb & 255;
-	  unsigned char g8 = (crgb >> 8) & 255;
-	  unsigned char b8 = (crgb >> 16) & 255;
-	  loc32 += 4;
-	  unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
-	  unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
-	  unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-   if (color_order == RGB) {
-	  rgb565 = (b5 << 11) | (g6 << 5) | r5;
-   } else {
-	  rgb565 = (r5 << 11) | (g6 << 5) | b5;
-   }
-	  /* write 16-bit value and advance */
-	  *((unsigned short*)(buf16 + loc16)) = rgb565;
-	  loc16 += 2;
-   }
+/* Convert a RGB8888 bitmap to a RGB565 bitmap */
+void c_convert_32_16(char *buf32,
+                     unsigned int size32,
+                     char *buf16,
+                     unsigned char color_order) {
+    unsigned int loc16 = 0;
+    unsigned int loc32 = 0;
+    unsigned short rgb565 = 0;
+    while (loc32 < size32) {
+        unsigned int crgb = *((unsigned int *)(buf32 + loc32));
+        unsigned char r8 = crgb & 255;
+        unsigned char g8 = (crgb >> 8) & 255;
+        unsigned char b8 = (crgb >> 16) & 255;
+        loc32 += 4;
+        unsigned char r5 = (r8 * 249 + 1014) >> 11;
+        unsigned char g6 = (g8 * 253 + 505) >> 10;
+        unsigned char b5 = (b8 * 249 + 1014) >> 11;
+        if (color_order == RGB) {
+            rgb565 = (b5 << 11) | (g6 << 5) | r5;
+        } else {
+            rgb565 = (r5 << 11) | (g6 << 5) | b5;
+        }
+        /* write 16-bit value and advance */
+        *((unsigned short *)(buf16 + loc16)) = rgb565;
+        loc16 += 2;
+    }
 }
 
-// Convert a RGB888 bitmap to a RGB8888 bitmap
-void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned char color_order) {
-   unsigned int loc24 = 0;
-   unsigned int loc32 = 0;
-   while(loc32 < size32) {
-	  *(buf24 + loc24++) = *(buf32 + loc32++);
-	  *(buf24 + loc24++) = *(buf32 + loc32++);
-	  *(buf24 + loc24++) = *(buf32 + loc32++);
-	  loc32++; // Toss the alpha
-   }
+/* Convert a RGB888 bitmap to a RGB8888 bitmap */
+void c_convert_32_24(char *buf32,
+                     unsigned int size32,
+                     char *buf24,
+                     unsigned char color_order) {
+    unsigned int loc24 = 0;
+    unsigned int loc32 = 0;
+    while (loc32 < size32) {
+        *(buf24 + loc24++) = *(buf32 + loc32++);
+        *(buf24 + loc24++) = *(buf32 + loc32++);
+        *(buf24 + loc24++) = *(buf32 + loc32++);
+        loc32++; /* Toss the alpha */
+    }
 }
 
-// Convert a RGB8888 bitmap to a RGB888 bitmap
-void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned char color_order) {
-   unsigned int loc32 = 0;
-   unsigned int loc24 = 0;
-   while(loc24 < size24) {
-	  unsigned char r = *(buf24 + loc24++);
-	  unsigned char g = *(buf24 + loc24++);
-	  unsigned char b = *(buf24 + loc24++);
-	  *((unsigned int*)(buf32 + loc32)) = r | (g << 8) | (b << 16);
-	  loc32 += 3;
-	  if (r == 0 && g == 0 && b == 0) {
-		 *(buf32 + loc32++) = 0; // The background is transparent
-	  } else {
-		 *(buf32 + loc32++) = 255; // The foreground is opague
-	  }
-   }
+/* Convert a RGB8888 bitmap to a RGB888 bitmap */
+void c_convert_24_32(char *buf24,
+                     unsigned int size24,
+                     char *buf32,
+                     unsigned char color_order) {
+    unsigned int loc32 = 0;
+    unsigned int loc24 = 0;
+    while (loc24 < size24) {
+        unsigned char r = *(buf24 + loc24++);
+        unsigned char g = *(buf24 + loc24++);
+        unsigned char b = *(buf24 + loc24++);
+        *((unsigned int *)(buf32 + loc32)) = r | (g << 8) | (b << 16);
+        loc32 += 3;
+        if (r == 0 && g == 0 && b == 0) {
+            *(buf32 + loc32++) = 0; /* The background is transparent */
+        } else {
+            *(buf32 + loc32++) = 255; /* The foreground is opaque */
+        }
+    }
 }
 
-// These are not yet implemented, but they will likely incorporate conversion to/from monochrome
-void c_convert_32_8(char* buf32, unsigned int size32, char* buf8, unsigned char color_order) {
-   unsigned int loc32 = 0;
-   unsigned int loc8  = 0;
-   unsigned char m    = 0;
-   while(loc32 < size32) {
-	  unsigned int crgb = *((unsigned int*)(buf32 + loc32));
-	  loc32 += 4;
-	  unsigned char r = crgb & 255;
-	  unsigned char g = (crgb >> 8) & 255;
-	  unsigned char b = (crgb >> 16) & 255;
-	  m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
-	  *((unsigned char*)(buf8 + loc8++)) = m;
-   }
+/* Not yet fully implemented: conversion to/from monochrome */
+void c_convert_32_8(char *buf32,
+                    unsigned int size32,
+                    char *buf8,
+                    unsigned char color_order) {
+    unsigned int loc32 = 0;
+    unsigned int loc8 = 0;
+    unsigned char m = 0;
+    while (loc32 < size32) {
+        unsigned int crgb = *((unsigned int *)(buf32 + loc32));
+        loc32 += 4;
+        unsigned char r = crgb & 255;
+        unsigned char g = (crgb >> 8) & 255;
+        unsigned char b = (crgb >> 16) & 255;
+        m = (unsigned char)round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+        *((unsigned char *)(buf8 + loc8++)) = m;
+    }
 }
 
-void c_convert_24_8(char* buf24, unsigned int size24, char* buf8, unsigned char color_order) {
-   unsigned int loc8  = 0;
-   unsigned int loc24 = 0;
-   unsigned char m    = 0;
-   while(loc24 < size24) {
-	  unsigned int crgb = *((unsigned int*)(buf24 + loc24));
-	  loc24 += 3;
-	  unsigned char r = crgb & 255;
-	  unsigned char g = (crgb >> 8) & 255;
-	  unsigned char b = (crgb >> 16) & 255;
-	  m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
-	  *((unsigned char*)(buf8 + loc8++)) = m;
-   }
+void c_convert_24_8(char *buf24,
+                    unsigned int size24,
+                    char *buf8,
+                    unsigned char color_order) {
+    unsigned int loc8 = 0;
+    unsigned int loc24 = 0;
+    unsigned char m = 0;
+    while (loc24 < size24) {
+        unsigned int crgb = *((unsigned int *)(buf24 + loc24));
+        loc24 += 3;
+        unsigned char r = crgb & 255;
+        unsigned char g = (crgb >> 8) & 255;
+        unsigned char b = (crgb >> 16) & 255;
+        m = (unsigned char)round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+        *((unsigned char *)(buf8 + loc8++)) = m;
+    }
 }
 
-void c_convert_16_8(char* buf16, unsigned int size16, char* buf8, unsigned char color_order) {
-   unsigned int loc8  = 0;
-   unsigned int loc16 = 0;
-   unsigned char r5;
-   unsigned char g6;
-   unsigned char b5;
+void c_convert_16_8(char *buf16,
+                    unsigned int size16,
+                    char *buf8,
+                    unsigned char color_order) {
+    unsigned int loc8 = 0;
+    unsigned int loc16 = 0;
+    unsigned char r5;
+    unsigned char g6;
+    unsigned char b5;
 
-   while(loc16 < size16) {
-	  unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
-	  loc16 += 2;
-	  if (color_order == 0) {
-		 b5 = (rgb565 & 0xf800) >> 11;
-		 r5 = (rgb565 & 0x001f);
-	  } else {
-		 r5 = (rgb565 & 0xf800) >> 11;
-		 b5 = (rgb565 & 0x001f);
-	  }
-	  g6 = (rgb565 & 0x07e0) >> 5;
-	  unsigned char r8 = (r5 * 527 + 23) >> 6;
-	  unsigned char g8 = (g6 * 259 + 33) >> 6;
-	  unsigned char b8 = (b5 * 527 + 23) >> 6;
-	  *((unsigned char*)(buf8 + loc8++)) = (unsigned char) round(0.2126 * r8 + 0.7152 * g8 + 0.0722 * b8);
-   }
+    while (loc16 < size16) {
+        unsigned short rgb565 = *((unsigned short *)(buf16 + loc16));
+        loc16 += 2;
+        if (color_order == 0) {
+            b5 = (rgb565 & 0xf800) >> 11;
+            r5 = (rgb565 & 0x001f);
+        } else {
+            r5 = (rgb565 & 0xf800) >> 11;
+            b5 = (rgb565 & 0x001f);
+        }
+        g6 = (rgb565 & 0x07e0) >> 5;
+        unsigned char r8 = (r5 * 527 + 23) >> 6;
+        unsigned char g8 = (g6 * 259 + 33) >> 6;
+        unsigned char b8 = (b5 * 527 + 23) >> 6;
+        *((unsigned char *)(buf8 + loc8++)) =
+            (unsigned char)round(0.2126 * r8 + 0.7152 * g8 + 0.0722 * b8);
+    }
 }
 
-void c_convert_8_32(char* buf8, unsigned int size8, char* buf32, unsigned char color_order) {
-   unsigned int loc8  = 0;
-   unsigned int loc32 = 0;
+void c_convert_8_32(char *buf8,
+                    unsigned int size8,
+                    char *buf32,
+                    unsigned char color_order) {
+    unsigned int loc8 = 0;
+    unsigned int loc32 = 0;
 
-   while(loc8 < size8) {
-	  unsigned char m = *((unsigned char*)(buf8 + loc8++));
-	  *((unsigned int*)(buf32 + loc32)) = m | (m << 8) | (m << 16);
-	  loc32 += 3;
-	  if (m == 0) {
-		 // Black is always treated as a clear mask
-		 *((unsigned char*)(buf32 + loc32++)) = 0;
-	  } else {
-		 // Anything but black is opague
-		 *((unsigned char*)(buf32 + loc32++)) = 255;
-	  }
-   }
+    while (loc8 < size8) {
+        unsigned char m = *((unsigned char *)(buf8 + loc8++));
+        *((unsigned int *)(buf32 + loc32)) = m | (m << 8) | (m << 16);
+        loc32 += 3;
+        if (m == 0) {
+            /* Black is always treated as a clear mask */
+            *((unsigned char *)(buf32 + loc32++)) = 0;
+        } else {
+            /* Anything but black is opaque */
+            *((unsigned char *)(buf32 + loc32++)) = 255;
+        }
+    }
 }
 
-void c_convert_8_24(char* buf8, unsigned int size8, char* buf24, unsigned char color_order) {
-   unsigned int loc8  = 0;
-   unsigned int loc24 = 0;
+void c_convert_8_24(char *buf8,
+                    unsigned int size8,
+                    char *buf24,
+                    unsigned char color_order) {
+    unsigned int loc8 = 0;
+    unsigned int loc24 = 0;
 
-   while(loc8 < size8) {
-	  unsigned char m = *((unsigned char*)(buf8 + loc8++));
-	  /* write 3 bytes explicitly to avoid accidental 4-byte writes */
-	  *(buf24 + loc24++) = m;
-	  *(buf24 + loc24++) = m;
-	  *(buf24 + loc24++) = m;
-   }
+    while (loc8 < size8) {
+        unsigned char m = *((unsigned char *)(buf8 + loc8++));
+        /* write 3 bytes explicitly to avoid accidental 4-byte writes */
+        *(buf24 + loc24++) = m;
+        *(buf24 + loc24++) = m;
+        *(buf24 + loc24++) = m;
+    }
 }
 
-void c_convert_8_16(char* buf8, unsigned int size8, char* buf16, unsigned char color_order) {
-   unsigned int loc8     = 0;
-   unsigned int loc16    = 0;
-   unsigned short rgb565 = 0;
-   while(loc8 < size8) {
-	  unsigned char m = *(buf8 + loc8++);
-	  unsigned char r5 = ( m * 249 + 1014 ) >> 11;
-	  unsigned char g6 = ( m * 253 + 505  ) >> 10;
-	  unsigned char b5 = ( m * 249 + 1014 ) >> 11;
-   if (color_order == RGB) {
-	  rgb565 = (b5 << 11) | (g6 << 5) | r5;
-   } else {
-	  rgb565 = (r5 << 11) | (g6 << 5) | b5;
-   }
-	  *((unsigned short*)(buf16 + loc16)) = rgb565;
-	  loc16 += 2;
-   }
+void c_convert_8_16(char *buf8,
+                    unsigned int size8,
+                    char *buf16,
+                    unsigned char color_order) {
+    unsigned int loc8 = 0;
+    unsigned int loc16 = 0;
+    unsigned short rgb565 = 0;
+    while (loc8 < size8) {
+        unsigned char m = *(buf8 + loc8++);
+        unsigned char r5 = (m * 249 + 1014) >> 11;
+        unsigned char g6 = (m * 253 + 505) >> 10;
+        unsigned char b5 = (m * 249 + 1014) >> 11;
+        if (color_order == RGB) {
+            rgb565 = (b5 << 11) | (g6 << 5) | r5;
+        } else {
+            rgb565 = (r5 << 11) | (g6 << 5) | b5;
+        }
+        *((unsigned short *)(buf16 + loc16)) = rgb565;
+        loc16 += 2;
+    }
 }
 
-// Convert any type RGB bitmap to a monochrome bitmap of the same type
-void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, unsigned char bytes_per_pixel, unsigned char bits_per_pixel) {
-   unsigned int idx;
-   unsigned char r;
-   unsigned char g;
-   unsigned char b;
-   unsigned char m;
-   unsigned short rgb565;
-   unsigned char rgb8;
+/* Convert any type RGB bitmap to a monochrome bitmap of the same type */
+void c_monochrome(char *pixels,
+                  unsigned int size,
+                  unsigned char color_order,
+                  unsigned char bytes_per_pixel,
+                  unsigned char bits_per_pixel) {
+    unsigned int idx;
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char m;
+    unsigned short rgb565;
+    unsigned char rgb8;
 
-   for (idx = 0; idx < size; idx += bytes_per_pixel) {
-	  switch (bits_per_pixel) {
-	   case 32 :
-		 switch(color_order) {
-		  case RBG :  // RBG
-			  {
-				 r = *(pixels + idx);
-				 b = *(pixels + idx + 1);
-				 g = *(pixels + idx + 2);
-			  }
-			break;
-		  case BGR :  // BGR
-			  {
-				 b = *(pixels + idx);
-				 g = *(pixels + idx + 1);
-				 r = *(pixels + idx + 2);
-			  }
-			break;
-		  case BRG :  // BRG
-			  {
-				 b = *(pixels + idx);
-				 r = *(pixels + idx + 1);
-				 g = *(pixels + idx + 2);
-			  }
-			break;
-		  case GBR :  // GBR
-			  {
-				 g = *(pixels + idx);
-				 b = *(pixels + idx + 1);
-				 r = *(pixels + idx + 2);
-			  }
-			break;
-		  case GRB :  // GRB
-			  {
-				 g = *(pixels + idx);
-				 r = *(pixels + idx + 1);
-				 b = *(pixels + idx + 2);
-			  }
-			break;
-		  default : // RGB
-			  {
-				 r = *(pixels + idx);
-				 g = *(pixels + idx + 1);
-				 b = *(pixels + idx + 2);
-			  }
-			break;
-		 }
-		 m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
-		 break;
-	   case 24 :
-		 switch(color_order) {
-		  case RBG :  // RBG
-			  {
-				 r = *(pixels + idx);
-				 b = *(pixels + idx + 1);
-				 g = *(pixels + idx + 2);
-			  }
-			break;
-		  case BGR :  // BGR
-			  {
-				 b = *(pixels + idx);
-				 g = *(pixels + idx + 1);
-				 r = *(pixels + idx + 2);
-			  }
-			break;
-		  case BRG :  // BRG
-			  {
-				 b = *(pixels + idx);
-				 r = *(pixels + idx + 1);
-				 g = *(pixels + idx + 2);
-			  }
-			break;
-		  case GBR :  // GBR
-			  {
-				 g = *(pixels + idx);
-				 b = *(pixels + idx + 1);
-				 r = *(pixels + idx + 2);
-			  }
-			break;
-		  case GRB :  // GRB
-			  {
-				 g = *(pixels + idx);
-				 r = *(pixels + idx + 1);
-				 b = *(pixels + idx + 2);
-			  }
-			break;
-		  default : // RGB
-			  {
-				 r = *(pixels + idx);
-				 g = *(pixels + idx + 1);
-				 b = *(pixels + idx + 2);
-			  }
-			break;
-		 }
-		 m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
-		 break;
-	   case 16 :
-		   {
-			  rgb565 = *((unsigned short*)(pixels + idx));
-			  /* extract components consistent with other conversion routines */
-			  unsigned char r5;
-			  unsigned char g6;
-			  unsigned char b5;
-			  if (color_order == RGB) {
-				 b5 = (rgb565 & 0xf800) >> 11;
-				 r5 = (rgb565 & 0x001f);
-			  } else {
-				 r5 = (rgb565 & 0xf800) >> 11;
-				 b5 = (rgb565 & 0x001f);
-			  }
-			  g6 = (rgb565 & 0x07e0) >> 5;
-			  /* expand to 8-bit */
-			  unsigned char r8 = (r5 * 527 + 23) >> 6;
-			  unsigned char g8 = (g6 * 259 + 33) >> 6;
-			  unsigned char b8 = (b5 * 527 + 23) >> 6;
-			  unsigned char m8 = (unsigned char) round(0.2126 * r8 + 0.7152 * g8 + 0.0722 * b8);
-			  /* convert back to RGB565 components */
-			  unsigned char nr5 = ( m8 * 249 + 1014 ) >> 11;
-			  unsigned char ng6 = ( m8 * 253 + 505  ) >> 10;
-			  unsigned char nb5 = ( m8 * 249 + 1014 ) >> 11;
-			  if (color_order == RGB) {
-				 rgb565 = (nb5 << 11) | (ng6 << 5) | nr5;
-			  } else {
-				 rgb565 = (nr5 << 11) | (ng6 << 5) | nb5;
-			  }
-			  m = 0; /* will be set below when writing */
-		   }
-		 break;
-	   case 8 :
-		   { // No actual conversion since already monochrome
-			  rgb8 = *((unsigned char*)(pixels + idx));
-			  m    = rgb8;
-		   }
-		 break;
-	   case 1 :
-		   {
-		   }
-		 break;
-	  }
+    for (idx = 0; idx < size; idx += bytes_per_pixel) {
+        switch (bits_per_pixel) {
+            case 32:
+                switch (color_order) {
+                    case RBG: { /* RBG */
+                        r = *(pixels + idx);
+                        b = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                    } break;
+                    case BGR: { /* BGR */
+                        b = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                    } break;
+                    case BRG: { /* BRG */
+                        b = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                    } break;
+                    case GBR: { /* GBR */
+                        g = *(pixels + idx);
+                        b = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                    } break;
+                    case GRB: { /* GRB */
+                        g = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+                    } break;
+                    default: { /* RGB */
+                        r = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+                    } break;
+                }
+                m = (unsigned char)round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+                break;
 
-	  switch(bits_per_pixel) {
-	   case 32 :
-   if (m == 0) {
-	  *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16);
-   } else {
-	  *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16) | 0xFF000000;
-   }
-		 break;
-	   case 24 :
-		   {
-			  *(pixels + idx)     = m;
-			  *(pixels + idx + 1) = m;
-			  *(pixels + idx + 2) = m;
-		   }
-		 break;
-	   case 16 :
-		   {
-			  /* for 16-bit we've prepared rgb565 above */
-			  *((unsigned short*)(pixels + idx)) = rgb565;
-		   }
-		 break;
-	   case 8 :
-		   {
-			  *(pixels + idx)     = rgb8;
-		   }
-		 break;
-	   case 1 :
-		   {
-		   }
-		 break;
-	  }
-   }
+            case 24:
+                switch (color_order) {
+                    case RBG: { /* RBG */
+                        r = *(pixels + idx);
+                        b = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                    } break;
+                    case BGR: { /* BGR */
+                        b = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                    } break;
+                    case BRG: { /* BRG */
+                        b = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                    } break;
+                    case GBR: { /* GBR */
+                        g = *(pixels + idx);
+                        b = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                    } break;
+                    case GRB: { /* GRB */
+                        g = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+                    } break;
+                    default: { /* RGB */
+                        r = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+                    } break;
+                }
+                m = (unsigned char)round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+                break;
+
+            case 16: {
+                rgb565 = *((unsigned short *)(pixels + idx));
+                /* extract components consistent with other conversion routines */
+                unsigned char r5;
+                unsigned char g6;
+                unsigned char b5;
+                if (color_order == RGB) {
+                    b5 = (rgb565 & 0xf800) >> 11;
+                    r5 = (rgb565 & 0x001f);
+                } else {
+                    r5 = (rgb565 & 0xf800) >> 11;
+                    b5 = (rgb565 & 0x001f);
+                }
+                g6 = (rgb565 & 0x07e0) >> 5;
+                /* expand to 8-bit */
+                unsigned char r8 = (r5 * 527 + 23) >> 6;
+                unsigned char g8 = (g6 * 259 + 33) >> 6;
+                unsigned char b8 = (b5 * 527 + 23) >> 6;
+                unsigned char m8 =
+                    (unsigned char)round(0.2126 * r8 + 0.7152 * g8 + 0.0722 * b8);
+                /* convert back to RGB565 components */
+                unsigned char nr5 = (m8 * 249 + 1014) >> 11;
+                unsigned char ng6 = (m8 * 253 + 505) >> 10;
+                unsigned char nb5 = (m8 * 249 + 1014) >> 11;
+                if (color_order == RGB) {
+                    rgb565 = (nb5 << 11) | (ng6 << 5) | nr5;
+                } else {
+                    rgb565 = (nr5 << 11) | (ng6 << 5) | nb5;
+                }
+                m = 0; /* will be set below when writing */
+            } break;
+
+            case 8: { /* No actual conversion since already monochrome */
+                rgb8 = *((unsigned char *)(pixels + idx));
+                m = rgb8;
+            } break;
+
+            case 1: {
+                /* not handled */
+            } break;
+        }
+
+        switch (bits_per_pixel) {
+            case 32:
+                if (m == 0) {
+                    *((unsigned int *)(pixels + idx)) = m | (m << 8) | (m << 16);
+                } else {
+                    *((unsigned int *)(pixels + idx)) =
+                        m | (m << 8) | (m << 16) | 0xFF000000;
+                }
+                break;
+            case 24: {
+                *(pixels + idx) = m;
+                *(pixels + idx + 1) = m;
+                *(pixels + idx + 2) = m;
+            } break;
+            case 16: {
+                /* for 16-bit we've prepared rgb565 above */
+                *((unsigned short *)(pixels + idx)) = rgb565;
+            } break;
+            case 8: {
+                *(pixels + idx) = rgb8;
+            } break;
+            case 1: {
+                /* not handled */
+            } break;
+        }
+    }
 }
 
 
@@ -2199,8 +2646,6 @@ The following are names you can search to get to the desired method (sorted alph
 With the exception of "new" and some other methods that only expect one parameter, the methods expect a single hash reference to be passed.  This may seem unusual, but it was chosen for speed, and speed is important in a Perl graphics module.
 
 =cut
-
-sub new {
 
 =head2 B<new>
 
@@ -2356,6 +2801,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
 
 =cut
 
+sub new {
     my $class = shift;
 
     # I would have liked to make this a lot more organized, but over the years it
@@ -2643,30 +3089,32 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
                                                      # COLOR MAP:
                                                      #   start(32),length(32),red(16),green(16),blue(16),alpha(16)
                                                      # FLAGS
-            'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source.  Not Used
-            'FBINFO_HWACCEL_COPYAREA'  => 0x0100,
-            'FBINFO_HWACCEL_FILLRECT'  => 0x0200,
-            'FBINFO_HWACCEL_IMAGEBLIT' => 0x0400,
-            'FBINFO_HWACCEL_ROTATE'    => 0x0800,
-            'FBINFO_HWACCEL_XPAN'      => 0x1000,
-            'FBINFO_HWACCEL_YPAN'      => 0x2000,
-            'FBINFO_HWACCEL_YWRAP'     => 0x4000,
+            'FBINFO_HWACCEL_NONE'      => FBINFO_HWACCEL_NONE,      # 0x0000,    # These come from "fb.h" in the kernel source.  Not Used
+            'FBINFO_HWACCEL_COPYAREA'  => FBINFO_HWACCEL_COPYAREA,  # 0x0100,
+            'FBINFO_HWACCEL_FILLRECT'  => FBINFO_HWACCEL_FILLRECT,  # 0x0200,
+            'FBINFO_HWACCEL_IMAGEBLIT' => FBINFO_HWACCEL_IMAGEBLIT, # 0x0400,
+            'FBINFO_HWACCEL_ROTATE'    => FBINFO_HWACCEL_ROTATE,    # 0x0800,
+            'FBINFO_HWACCEL_XPAN'      => FBINFO_HWACCEL_XPAN,      # 0x1000,
+            'FBINFO_HWACCEL_YPAN'      => FBINFO_HWACCEL_YPAN,      # 0x2000,
+            'FBINFO_HWACCEL_YWRAP'     => FBINFO_HWACCEL_YWRAP,     # 0x4000,
+			'VT_GETSTATE'              => VT_GETSTATE,              # 0x5603,
+			'KDSETMODE'                => KDSETMODE,                # 0x4B3A,
 
             ## Set up the Framebuffer driver "constants" defaults
             # Commands
-            'FBIOPUT_VSCREENINFO' => 0x4601,
-            'FBIOGETCMAP'         => 0x4604,
-            'FBIOPUTCMAP'         => 0x4605,
-            'FBIOPAN_DISPLAY'     => 0x4606,
-            'FBIO_CURSOR'         => 0x4608,
-            'FBIOGET_CON2FBMAP'   => 0x460F,
-            'FBIOPUT_CON2FBMAP'   => 0x4610,
-            'FBIOBLANK'           => 0x4611,
-            'FBIOGET_VBLANK'      => 0x4612,
-            'FBIOGET_GLYPH'       => 0x4615,
-            'FBIOGET_HWCINFO'     => 0x4616,
-            'FBIOPUT_MODEINFO'    => 0x4617,
-            'FBIOGET_DISPINFO'    => 0x4618,
+            'FBIOPUT_VSCREENINFO' => FBIOPUT_VSCREENINFO, # 0x4601,
+            'FBIOGETCMAP'         => FBIOGETCMAP,         # 0x4604,
+            'FBIOPUTCMAP'         => FBIOPUTCMAP,         # 0x4605,
+            'FBIOPAN_DISPLAY'     => FBIOPAN_DISPLAY,     # 0x4606,
+            'FBIO_CURSOR'         => FBIO_CURSOR,         # 0x4608,
+            'FBIOGET_CON2FBMAP'   => FBIOGET_CON2FBMAP,   # 0x460F,
+            'FBIOPUT_CON2FBMAP'   => FBIOPUT_CON2FBMAP,   # 0x4610,
+            'FBIOBLANK'           => FBIOBLANK,           # 0x4611,
+            'FBIOGET_VBLANK'      => FBIOGET_VBLANK,      # 0x4612,
+            'FBIOGET_GLYPH'       => FBIOGET_GLYPH,       # 0x4615,
+            'FBIOGET_HWCINFO'     => FBIOGET_HWCINFO,     # 0x4616,
+            'FBIOPUT_MODEINFO'    => FBIOPUT_MODEINFO,    # 0x4617,
+            'FBIOGET_DISPINFO'    => FBIOGET_DISPINFO,    # 0x4618,
         };
         $self = { %{$self}, %{$garbage} };
     } ## end if ($self->{'GARBAGE'})
@@ -3078,7 +3526,6 @@ sub _fix_mapping {    # File::Map SHOULD make this obsolete
 } ## end sub _fix_mapping
 
 sub _color_order {
-
     # Determine the color order the video card uses
     my $self = shift;
 
@@ -3115,19 +3562,16 @@ sub _screen_close {
     delete($self->{'SCREEN'});
 } ## end sub _screen_close
 
-sub text_mode {
-
 =head2 text_mode
 
 Sets the TTY into text mode, where text can interfere with the display
 
 =cut
 
+sub text_mode {
     my $self = shift;
     c_text_mode($self->{'this_tty'}) if ($self->acceleration());
 } ## end sub text_mode
-
-sub graphics_mode {
 
 =head2 graphics_mode
 
@@ -3135,11 +3579,10 @@ Sets the TTY in exclusive graphics mode, where text and cursor cannot interfere 
 
 =cut
 
+sub graphics_mode {
     my $self = shift;
     c_graphics_mode($self->{'this_tty'}) if ($self->acceleration());
 } ## end sub graphics_mode
-
-sub screen_dimensions {
 
 =head2 screen_dimensions
 
@@ -3177,6 +3620,7 @@ When called in a scalar context, it returns a hash reference:
 
 =cut
 
+sub screen_dimensions {
     my $self = shift;
     if (wantarray) {
         return ($self->{'XRES'}, $self->{'YRES'}, $self->{'BITS'});
@@ -3213,8 +3657,6 @@ This is automatically displayed when this module is initialized, and the variabl
 
 =back
 =cut
-
-sub get_font_list {
 
 =head2 get_font_list
 
@@ -3253,6 +3695,7 @@ When passing a name, it will return a hash reference (if only one match), or an 
 
 =cut
 
+sub get_font_list {
     my $self = shift;
     my ($filter) = @_;
 
@@ -3271,8 +3714,6 @@ When passing a name, it will return a hash reference (if only one match), or an 
     } ## end if ($filter)
     return ($self->{'FONTS'});
 } ## end sub get_font_list
-
-sub draw_mode {
 
 =head2 draw_mode
 
@@ -3335,6 +3776,7 @@ Sets or returns the drawing mode, depending on how it is called.
 =back
 =cut
 
+sub draw_mode {
     my $self = shift;
     if (@_) {
         my $mode = int(shift);
@@ -3345,8 +3787,6 @@ Sets or returns the drawing mode, depending on how it is called.
         return ($self->{'DRAW_MODE'});
     }
 } ## end sub draw_mode
-
-sub normal_mode {
 
 =head2 normal_mode
 
@@ -3360,11 +3800,10 @@ This is an alias to draw_mode(NORMAL_MODE)
 
 =cut
 
+sub normal_mode {
     my $self = shift;
     $self->draw_mode(NORMAL_MODE);
 } ## end sub normal_mode
-
-sub xor_mode {
 
 =head2 xor_mode
 
@@ -3378,11 +3817,10 @@ This is an alias to draw_mode(XOR_MODE)
 
 =cut
 
+sub xor_mode {
     my $self = shift;
     $self->draw_mode(XOR_MODE);
 } ## end sub xor_mode
-
-sub or_mode {
 
 =head2 or_mode
 
@@ -3396,11 +3834,10 @@ This is an alias to draw_mode(OR_MODE)
 
 =cut
 
+sub or_mode {
     my $self = shift;
     $self->draw_mode(OR_MODE);
 } ## end sub or_mode
-
-sub alpha_mode {
 
 =head2 alpha_mode
 
@@ -3414,11 +3851,10 @@ This is an alias to draw_mode(ALPHA_MODE)
 
 =cut
 
+sub alpha_mode {
     my $self = shift;
     $self->draw_mode(ALPHA_MODE);
 } ## end sub alpha_mode
-
-sub and_mode {
 
 =head2 and_mode
 
@@ -3432,11 +3868,10 @@ This is an alias to draw_mode(AND_MODE)
 
 =cut
 
+sub and_mode {
     my $self = shift;
     $self->draw_mode(AND_MODE);
 } ## end sub and_mode
-
-sub mask_mode {
 
 =head2 mask_mode
 
@@ -3450,11 +3885,10 @@ This is an alias to draw_mode(MASK_MODE)
 
 =cut
 
+sub mask_mode {
     my $self = shift;
     $self->draw_mode(MASK_MODE);    # 16 bit mode may have issues with this
 } ## end sub mask_mode
-
-sub unmask_mode {
 
 =head2 unmask_mode
 
@@ -3468,11 +3902,10 @@ This is an alias to draw_mode(UNMASK_MODE)
 
 =cut
 
+sub unmask_mode {
     my $self = shift;
     $self->draw_mode(UNMASK_MODE);
 } ## end sub unmask_mode
-
-sub add_mode {
 
 =head2 add_mode
 
@@ -3486,11 +3919,10 @@ This is an alias to draw_mode(ADD_MODE)
 
 =cut
 
+sub add_mode {
     my $self = shift;
     $self->draw_mode(ADD_MODE);
 } ## end sub add_mode
-
-sub subtract_mode {
 
 =head2 subtract_mode
 
@@ -3504,11 +3936,10 @@ This is an alias to draw_mode(SUBTRACT_MODE)
 
 =cut
 
+sub subtract_mode {
     my $self = shift;
     $self->draw_mode(SUBTRACT_MODE);
 } ## end sub subtract_mode
-
-sub multiply_mode {    # I see no use for this, but it's here for use
 
 =head2 multiply_mode
 
@@ -3522,11 +3953,10 @@ This is an alias to draw_mode(MULTIPLY_MODE)
 
 =cut
 
+sub multiply_mode {    # I see no use for this, but it's here for use
     my $self = shift;
     $self->draw_mode(MULTIPLY_MODE);
 } ## end sub multiply_mode
-
-sub divide_mode {    # I see no use for this, but it's here for use
 
 =head2 divide_mode
 
@@ -3540,11 +3970,10 @@ This is an alias to draw_mode(DIVIDE_MODE)
 
 =cut
 
+sub divide_mode {    # I see no use for this, but it's here for use
     my $self = shift;
     $self->draw_mode(DIVIDE_MODE);
 } ## end sub divide_mode
-
-sub clear_screen {
 
 =head2 clear_screen
 
@@ -3562,6 +3991,7 @@ You can add an optional parameter to turn the console cursor on or off too.
 
 =cut
 
+sub clear_screen {
     # Fills the entire screen with the background color fast #
     my ($self, $cursor) = @_;
     $cursor ||= '';
@@ -3585,19 +4015,16 @@ You can add an optional parameter to turn the console cursor on or off too.
     $self->_flush_screen();
 } ## end sub clear_screen
 
-sub cls {
-
 =head2 cls
 
 This is an alias to 'clear_screen'
 
 =cut
 
+sub cls {
     my $self = shift;
     $self->clear_screen(@_);
 } ## end sub cls
-
-sub attribute_reset {
 
 =head2 attribute_reset
 
@@ -3611,6 +4038,7 @@ Resets the plot point at 0,0.  Resets clipping to the current screen size.  Rese
 
 =cut
 
+sub attribute_reset {
     my $self = shift;
 
     $self->{'X'} = 0;
@@ -3620,8 +4048,6 @@ Resets the plot point at 0,0.  Resets clipping to the current screen size.  Rese
     $self->set_b_color({ %{ $self->{'BACKGROUND'} } });
     $self->clip_reset;
 } ## end sub attribute_reset
-
-sub plot {
 
 =head2 plot
 
@@ -3640,6 +4066,7 @@ Set a single pixel in the set foreground color at position x,y with the given pi
 
 =cut
 
+sub plot {
     my ($self, $params) = @_;
 
     my $x = int($params->{'x'} || 0);    # Ignore decimals
@@ -3658,13 +4085,11 @@ Set a single pixel in the set foreground color at position x,y with the given pi
 
         # Only plot if the pixel is within the clipping region
         unless (($x > $xx_clip) || ($y > $yy_clip) || ($x < $x_clip) || ($y < $y_clip)) {
-
             # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
             # the history buffer.
             unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
                 $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
                 if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $bytes)) {
-
                     # Assumes the following lexicals are already computed above:
                     #   my ($x, $y, $index, $color_alpha, $color_alpha_int);
                     # And raw color bytes:
@@ -3684,7 +4109,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                     if ($draw_mode == NORMAL_MODE) {
                         substr($$screenref, $index, $bytes) = $raw_foreground_color;
                     } else {
-
                         # Read the current pixel once and reuse
                         my $cur = substr($$screenref, $index, $bytes) || chr(0) x $bytes;
                         my $c;
@@ -3697,7 +4121,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                             $c = ($cur & $raw_foreground_color);
                         } elsif ($draw_mode == MASK_MODE) {
                             if ($bits == 32) {
-
                                 # Compare RGB only
                                 my $fg3 = substr($raw_foreground_color, 0, 3);
                                 my $bg3 = substr($raw_background_color, 0, 3);
@@ -3714,7 +4137,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                                 $c = $raw_foreground_color if ($cur eq $raw_background_color);
                             }
                         } elsif ($draw_mode == ALPHA_MODE) {
-
                             # Prefer integer math for speed and to avoid float overhead
                             # color_alpha_int should be 0..255 (if you currently have 0..1, convert once: my $color_alpha_int = int(255 * $color_alpha + 0.5);)
                             my $A    = defined $color_alpha_int ? $color_alpha_int : int(255 * $color_alpha + 0.5);
@@ -3736,7 +4158,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                                 my $b = (($b2 * $A) + ($b1 * $invA)) >> 8;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
-
                                 # 16-bit RGB565 path (optional): do channel-wise integer blend
                                 # Example skeleton using 5/6-bit channels; you can replace with existing helpers:
                                 my $p1 = unpack('v', $cur);
@@ -3780,7 +4201,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                                 $b = 255 if $b > 255;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
-
                                 # 16-bit RGB565 add (saturate)
                                 my $p1 = unpack('v', $cur);
                                 my $p2 = unpack('v', $raw_foreground_color);
@@ -3841,7 +4261,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                                 $c = pack('v', $p);
                             } ## end else [ if ($bytes == 4) ]
                         } elsif ($draw_mode == MULTIPLY_MODE) {
-
                             # Per-channel multiply scaled back to 0..255
                             if ($bytes == 4) {
                                 my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
@@ -3859,7 +4278,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                                 my $b = ($b1 * $b2) >> 8;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
-
                                 # 16-bit approximate multiply: expand to 8-bit, multiply, compress back
                                 my $p1 = unpack('v', $cur);
                                 my $p2 = unpack('v', $raw_foreground_color);
@@ -3926,7 +4344,6 @@ Set a single pixel in the set foreground color at position x,y with the given pi
                                 $c = pack('v', $p);
                             } ## end else [ if ($bytes == 4) ]
                         } ## end elsif ($draw_mode == DIVIDE_MODE)
-
                         # If no branch set $c (e.g., MASK condition not met), keep current pixel
                         substr($$screenref, $index, $bytes) = defined $c ? $c : $cur;
                     } ## end else [ if ($draw_mode == NORMAL_MODE)]
@@ -3939,19 +4356,16 @@ Set a single pixel in the set foreground color at position x,y with the given pi
     $self->{'Y'} = $y;
 } ## end sub plot
 
-sub setpixel {
-
 =head2 setpixel
 
 An alias to plot.
 
 =cut
 
+sub setpixel {
     my $self = shift;
     $self->plot(shift);
 } ## end sub setpixel
-
-sub set_pixel {
 
 =head2 set_pixel
 
@@ -3959,11 +4373,10 @@ An alias to plot.
 
 =cut
 
+sub set_pixel {
     my $self = shift;
     $self->plot(shift);
 } ## end sub set_pixel
-
-sub pixel {
 
 =head2 pixel
 
@@ -3987,6 +4400,7 @@ $pixel is a hash reference in the form:
 =back
 =cut
 
+sub pixel {
     my ($self, $params) = @_;
 
     my $x     = int($params->{'x'});
@@ -4050,19 +4464,16 @@ $pixel is a hash reference in the form:
     return (undef);
 } ## end sub pixel
 
-sub getpixel {
-
 =head2 getpixel
 
 Alias for 'pixel'.
 
 =cut
 
+sub getpixel {
     my $self = shift;
     return ($self->pixel(shift));
 } ## end sub getpixel
-
-sub get_pixel {
 
 =head2 get_pixel
 
@@ -4070,11 +4481,10 @@ Alias for 'pixel'.
 
 =cut
 
+sub get_pixel {
     my $self = shift;
     return ($self->pixel(shift));
 } ## end sub get_pixel
-
-sub last_plot {
 
 =head2 last_plot
 
@@ -4107,14 +4517,13 @@ This returns the position as a two element array:
 
 =cut
 
+sub last_plot {
     my $self = shift;
     if (wantarray) {
         return ($self->{'X'}, $self->{'Y'});
     }
     return ({ 'x' => $self->{'X'}, 'y' => $self->{'Y'} });
 } ## end sub last_plot
-
-sub line {
 
 =head2 line
 
@@ -4134,6 +4543,7 @@ Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping 
 
 =cut
 
+sub line {
     my ($self, $params) = @_;
 
     $self->plot($params);
@@ -4141,8 +4551,6 @@ Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping 
     $params->{'y'} = $params->{'yy'};
     $self->drawto($params);
 } ## end sub line
-
-sub angle_line {
 
 =head2 angle_line
 
@@ -4164,6 +4572,7 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
 
 =cut
 
+sub angle_line {
     my ($self, $params) = @_;
 
     my ($dp_cos, $dp_sin);
@@ -4180,8 +4589,6 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
     $params->{'yy'} = int($params->{'y'} - ($params->{'radius'} * $dp_cos));
     $self->line($params);
 } ## end sub angle_line
-
-sub drawto {
 
 =head2 drawto
 
@@ -4201,6 +4608,7 @@ Draws a line, in the foreground color, from the last plotted position to the pos
 
 =cut
 
+sub drawto {
     ##########################################################################
     # For Perl, Perfectly horizontal line drawing is optimized by using the  #
     # BLIT functions.  This assists greatly with drawing filled objects.  In #
@@ -4354,9 +4762,9 @@ Draws a line, in the foreground color, from the last plotted position to the pos
 } ## end sub drawto
 
 sub _flush_screen {
-
     # Since the framebuffer is mappeed as a string device, Perl buffers the output, and this must be flushed.
     my $self = shift;
+
     unless ($self->{'DEVICE'} eq 'EMULATED') {
         select(STDERR);
         $| = 1;
@@ -4366,7 +4774,6 @@ sub _flush_screen {
 } ## end sub _flush_screen
 
 sub _adj_plot {
-
     # Part of antialiased drawing
     my ($self, $x, $y, $c, $s) = @_;
 
@@ -4426,8 +4833,6 @@ sub _draw_line_antialiased {
     $self->set_color($saved);
 } ## end sub _draw_line_antialiased
 
-sub bezier {
-
 =head2 bezier
 
 Draws a Bezier curve, based on a list of control points.
@@ -4462,6 +4867,7 @@ Draws a Bezier curve, based on a list of control points.
 
 =cut
 
+sub bezier {
     my ($self, $params) = @_;
 
     my $closed = $params->{'closed'} || 0;
@@ -4482,19 +4888,16 @@ Draws a Bezier curve, based on a list of control points.
     } ## end else [ if ($closed) ]
 } ## end sub bezier
 
-sub cubic_bezier {    # obsolete
-
 =head2 cubic_bezier
 
 DISCONTINUED, use 'bezier' instead (now just an alias to 'bezier')
 
 =cut
 
+sub cubic_bezier {    # obsolete
     my $self = shift;
     $self->bezier(shift);
 } ## end sub cubic_bezier
-
-sub draw_arc {
 
 =head2 draw_arc
 
@@ -4544,6 +4947,7 @@ Draws an arc/pie/poly arc of a circle at point x,y.
 
 =cut
 
+sub draw_arc {
     # This isn't exactly the fastest routine out there, hence the "granularity" parameter, but it is pretty neat.  Drawing lines between points smooths and compensates for high granularity settings.
     my ($self, $params) = @_;
 
@@ -4775,8 +5179,6 @@ Draws an arc/pie/poly arc of a circle at point x,y.
     } ## end else
 } ## end sub draw_arc
 
-sub arc {
-
 =head2 arc
 
 Draws an arc of a circle at point x,y.  This is an alias to draw_arc above, but no mode parameter needed.
@@ -4816,13 +5218,12 @@ Draws an arc of a circle at point x,y.  This is an alias to draw_arc above, but 
 
 =cut
 
+sub arc {
     my ($self, $params) = @_;
 
     $params->{'mode'} = ARC;
     $self->draw_arc($params);
 } ## end sub arc
-
-sub filled_pie {
 
 =head2 filled_pie
 
@@ -4879,13 +5280,12 @@ Draws a filled pie wedge at point x,y.  This is an alias to draw_arc above, but 
 
 =cut
 
+sub filled_pie {
     my ($self, $params) = @_;
 
     $params->{'mode'} = PIE;
     $self->draw_arc($params);
 } ## end sub filled_pie
-
-sub poly_arc {
 
 =head2 poly_arc
 
@@ -4926,13 +5326,12 @@ Draws a poly arc of a circle at point x,y.  This is an alias to draw_arc above, 
 
 =cut
 
+sub poly_arc {
     my ($self, $params) = @_;
 
     $params->{'mode'} = POLY_ARC;
     $self->draw_arc($params);
 } ## end sub poly_arc
-
-sub ellipse {
 
 =head2 ellipse
 
@@ -4976,6 +5375,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 
 =cut
 
+sub ellipse {
     # The routine even works properly for XOR mode when filled ellipses are drawn as well.  This was solved by drawing only if the X or Y position changed.
     my ($self, $params) = @_;
 
@@ -5179,8 +5579,6 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
     $self->{'RAW_FOREGROUND_COLOR'} = $saved;
 } ## end sub ellipse
 
-sub circle {
-
 =head2 circle
 
 Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid filled, or gradient filled.  Outlined circles can have any pixel size.
@@ -5218,6 +5616,7 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
 
     # This also doubles as the rounded box routine.
 
+sub circle {
     my ($self, $params) = @_;
 
     my $x0            = int($params->{'x'});
@@ -5334,7 +5733,6 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
                     $self->blit_write($params);
                 }
             } elsif ($gradient) {
-
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     $self->set_color({ 'red' => $rc[$ymy_i], 'green' => $gc[$ymy_i], 'blue' => $bc[$ymy_i] });
@@ -5359,7 +5757,6 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
                     $self->line($params);
                 }
             } else {
-
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     ($params->{'x'}, $params->{'y'}, $params->{'xx'}, $params->{'yy'}) = ($xmx, $ymy, $xpx, $ymy);
@@ -5385,7 +5782,6 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
             $lypy = $ypy;
             $lypx = $ypx;
         } else {
-
             # Top left
             ($params->{'x'}, $params->{'y'}) = ($xmx, $ymy);
             $self->plot($params);
@@ -5444,7 +5840,6 @@ Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid 
                 $self->box({ 'x' => $_x, 'y' => $y0, 'xx' => $_xx, 'yy' => $y1, 'filled' => 1 });
             }
         } else {
-
             # top
             $self->line({ 'x' => $x0, 'y' => $_y, 'xx' => $x1, 'yy' => $_y });
 
@@ -5469,8 +5864,6 @@ sub _fpart {
 sub _rfpart {
     return (1 - _fpart(shift));
 }
-
-sub polygon {
 
 =head2 polygon
 
@@ -5515,6 +5908,7 @@ It is up to you to make sure the coordinates are "sane".  Weird things can resul
 
 =cut
 
+sub polygon {
     my ($self, $params) = @_;
 
     my $aa         = $params->{'antialiased'} || 0;
@@ -5538,7 +5932,6 @@ It is up to you to make sure the coordinates are "sane".  Weird things can resul
 } ## end sub polygon
 
 sub _point_in_polygon {
-
     # Does point x,y fall inside the polygon described in coordinates?  Not yet used.
     my ($self, $params) = @_;
 
@@ -5803,8 +6196,6 @@ sub _generate_fill {
     return ($gradient);
 } ## end sub _generate_fill
 
-sub box {
-
 =head2 box
 
 Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 0, or as a filled block, if 'filled' is 1.  You may also add a gradient or texture.
@@ -5843,6 +6234,7 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
 
 =cut
 
+sub box {
     my ($self, $params) = @_;
 
     my $x      = int($params->{'x'});
@@ -5925,8 +6317,6 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
     }
 } ## end sub box
 
-sub rbox {
-
 =head2 rbox
 
 Draws a box at point x,y with the width 'width' and height 'height'.  It draws a frame if 'filled' is 0 or a filled box if 'filled' is 1. Filled boxes draw faster than frames. Gradients or textures are also allowed.
@@ -5965,6 +6355,7 @@ Draws a box at point x,y with the width 'width' and height 'height'.  It draws a
 
 =cut
 
+sub rbox {
     my ($self, $params) = @_;
 
     $params->{'xx'} = $params->{'x'} + $params->{'width'};
@@ -5972,19 +6363,16 @@ Draws a box at point x,y with the width 'width' and height 'height'.  It draws a
     $self->box($params);
 } ## end sub rbox
 
-sub rounded_box {
-
 =head2 rounded_box
 
 This is an alias to rbox
 
 =cut
 
+sub rounded_box {
     my $self = shift;
     $self->rbox(shift);
 } ## end sub rounded_box
-
-sub set_color {
 
 =head2 set_color
 
@@ -6004,6 +6392,7 @@ Even if you are in 16 bit color mode, use 8 bit values.  They will be automatica
 =back
 =cut
 
+sub set_color {
     my ($self, $params, $name) = @_;
     $name ||= 'RAW_FOREGROUND_COLOR';
 
@@ -6060,19 +6449,16 @@ Even if you are in 16 bit color mode, use 8 bit values.  They will be automatica
     }
 } ## end sub set_color
 
-sub setcolor {
-
 =head2 setcolor
 
 This is an alias to 'set_color'
 
 =cut
 
+sub setcolor {
     my $self = shift;
     $self->set_color(shift);
 } ## end sub setcolor
-
-sub set_foreground_color {
 
 =head2 set_foreground_color
 
@@ -6080,11 +6466,10 @@ This is an alias to 'set_color'
 
 =cut
 
+sub set_foreground_color {
     my $self = shift;
     $self->set_color(shift);
 } ## end sub set_foreground_color
-
-sub set_b_color {
 
 =head2 set_b_color
 
@@ -6104,11 +6489,10 @@ The same rules as set_color apply.
 =back
 =cut
 
+sub set_b_color {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 } ## end sub set_b_color
-
-sub setbcolor {
 
 =head2 setbcolor
 
@@ -6116,11 +6500,10 @@ This is an alias to 'set_b_color'
 
 =cut
 
+sub setbcolor {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 } ## end sub setbcolor
-
-sub set_background_color {
 
 =head2 set_background_color
 
@@ -6128,11 +6511,10 @@ This is an alias to 'set_b_color'
 
 =cut
 
+sub set_background_color {
     my $self = shift;
     $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 } ## end sub set_background_color
-
-sub fill {
 
 =head2 fill
 
@@ -6150,6 +6532,7 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
 
 =cut
 
+sub fill {
     my ($self, $params) = @_;
 
     my $x = int($params->{'x'});
@@ -6170,7 +6553,6 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
 
     return if ($back eq $self->{'RAW_FOREGROUND_COLOR'});
     unless ($self->{'ACCELERATED'}) {
-
         # This doesn't over-use the system stack.  While flood fill algorithms are famous being a stack memory hog, this one goes easy on it.
         # Optimized: avoid repeated shift() (O(n)), reduce method-call overhead by
         # caching small helpers, and use a queue with head index.
@@ -6320,8 +6702,6 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
     } ## end else
 } ## end sub fill
 
-sub replace_color {
-
 =head2 replace_color
 
 This replaces one color with another inside the clipping region.  Sort of like a fill without boundary checking.
@@ -6358,6 +6738,7 @@ This replaces one color with another inside the clipping region.  Sort of like a
 
 =cut
 
+sub replace_color {
     my ($self, $params) = @_;
 
     my $old_r = int($params->{'old'}->{'red'})   || 0;
@@ -6462,8 +6843,6 @@ This replaces one color with another inside the clipping region.  Sort of like a
     $self->{'DRAW_MODE'} = $old_mode;
 } ## end sub replace_color
 
-sub blit_copy {
-
 =head2 blit_copy
 
 Copies a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  It copies in the current drawing mode.
@@ -6483,12 +6862,11 @@ Copies a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  I
 
 =cut
 
+sub blit_copy {
     my ($self, $params) = @_;
 
     $self->blit_write({ %{ $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) }) }, 'x' => int($params->{'x_dest'}), 'y' => int($params->{'y_dest'}) });
 } ## end sub blit_copy
-
-sub blit_move {
 
 =head2 blit_move
 
@@ -6512,6 +6890,7 @@ It also returns the data moved like "blit_read"
 
 =cut
 
+sub blit_move {
     my ($self, $params) = @_;
 
     my $old_mode = $self->{'DRAW_MODE'};
@@ -6530,8 +6909,6 @@ It also returns the data moved like "blit_read"
     delete($image->{'y_dest'});
     return ($image);
 } ## end sub blit_move
-
-sub play_animation {
 
 =head2 play_animation
 
@@ -6558,6 +6935,7 @@ The animation will stop if "Q" is pressed
 
 =cut
 
+sub play_animation {
     my ($self, $image, $rate) = @_;
     $rate ||= 1;
 
@@ -6575,8 +6953,6 @@ The animation will stop if "Q" is pressed
     } ## end foreach my $frame (0 .. (scalar...))
     ReadMode 0;
 } ## end sub play_animation
-
-sub acceleration {
 
 =head2 acceleration
 
@@ -6609,6 +6985,7 @@ When called without parameters, it returns the current setting.
 
 =cut
 
+sub acceleration {
     my $self = shift;
     if (scalar(@_)) {
         my $set = shift;
@@ -6626,19 +7003,16 @@ When called without parameters, it returns the current setting.
     return ($self->{'ACCELERATED'});
 } ## end sub acceleration
 
-sub perl {
-
 =head2 perl
 
 This is an alias to "acceleration(PERL)"
 
 =cut
 
+sub perl {
     my $self = shift;
     $self->acceleration(PERL);
 } ## end sub perl
-
-sub software {
 
 =head2 software
 
@@ -6646,11 +7020,10 @@ This is an alias to "acceleration(SOFTWARE)"
 
 =cut
 
+sub software {
     my $self = shift;
     $self->acceleration(SOFTWARE);
 } ## end sub software
-
-sub hardware {
 
 =head2 hardware
 
@@ -6658,11 +7031,10 @@ This is an alias to "acceleration(HARDWARE)"
 
 =cut
 
+sub hardware {
     my $self = shift;
     $self->acceleration(HARDWARE);
 } ## end sub hardware
-
-sub blit_read {
 
 =head2 blit_read
 
@@ -6699,6 +7071,7 @@ All you have to do is change X and Y, and just pass it to "blit_write" and it wi
 
 =cut
 
+sub blit_read {
     my ($self, $params) = @_;
 
     my $x     = int($params->{'x'} || $self->{'X_CLIP'});
@@ -6730,8 +7103,6 @@ All you have to do is change X and Y, and just pass it to "blit_write" and it wi
     return ({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $scrn });
 } ## end sub blit_read
 
-sub blit_write {
-
 =head2 blit_write
 
 Writes a previously read block of screen data at x,y,width,height.
@@ -6752,6 +7123,7 @@ It takes a hash reference.  It draws in the current drawing mode.
 
 =cut
 
+sub blit_write {
     my ($self, $pparams) = @_;
     return unless (defined($pparams));
 
@@ -6905,7 +7277,6 @@ It takes a hash reference.  It draws in the current drawing mode.
 } ## end sub blit_write
 
 sub _blit_adjust_for_clipping {
-
     # Chops up the blit image to stay within the clipping (and screen) boundaries
     # This prevents nasty crashes
     my ($self, $pparams) = @_;
@@ -6969,8 +7340,6 @@ sub _blit_adjust_for_clipping {
     }
     return ($params);
 } ## end sub _blit_adjust_for_clipping
-
-sub blit_transform {
 
 =head2 blit_transform
 
@@ -7074,6 +7443,7 @@ It returns the transformed image in the same format the other BLIT methods use. 
 
 =cut
 
+sub blit_transform {
     my ($self, $params) = @_;
 
     my $width     = $params->{'blit_data'}->{'width'};
@@ -7327,8 +7697,6 @@ It returns the transformed image in the same format the other BLIT methods use. 
     } ## end elsif (exists($params->{'center'...}))
 } ## end sub blit_transform
 
-sub clip_reset {
-
 =head2 clip_reset
 
 Turns off clipping, and resets the clipping values to the full size of the screen.
@@ -7340,6 +7708,7 @@ Turns off clipping, and resets the clipping values to the full size of the scree
 =back
 =cut
 
+sub clip_reset {
     # Clipping is not really turned off.  It's just set to the screen borders.  To turn off clipping for real is asking for crashes.
     my $self = shift;
 
@@ -7353,19 +7722,16 @@ Turns off clipping, and resets the clipping values to the full size of the scree
     ## region is defined under the screen dimensions.
 } ## end sub clip_reset
 
-sub clip_off {
-
 =head2 clip_off
 
 This is an alias to 'clip_reset'
 
 =cut
 
+sub clip_off {
     my $self = shift;
     $self->clip_reset();
 } ## end sub clip_off
-
-sub clip_set {
 
 =head2 clip_set
 
@@ -7383,6 +7749,7 @@ Sets the clipping rectangle starting at the top left point x,y and ending at bot
 =back
 =cut
 
+sub clip_set {
     my ($self, $params) = @_;
 
     $self->{'X_CLIP'}  = abs(int($params->{'x'}));
@@ -7398,8 +7765,6 @@ Sets the clipping rectangle starting at the top left point x,y and ending at bot
     $self->{'H_CLIP'}  = $self->{'YY_CLIP'} - $self->{'Y_CLIP'};
     $self->{'CLIPPED'} = TRUE;
 } ## end sub clip_set
-
-sub clip_rset {
 
 =head2 clip_rset
 
@@ -7417,6 +7782,7 @@ Sets the clipping rectangle to point x,y,width,height
 =back
 =cut
 
+sub clip_rset {
     my ($self, $params) = @_;
 
     $params->{'xx'} = $params->{'x'} + $params->{'width'};
@@ -7424,8 +7790,6 @@ Sets the clipping rectangle to point x,y,width,height
 
     $self->clip_set($params);
 } ## end sub clip_rset
-
-sub monochrome {
 
 =head2 monochrome
 
@@ -7456,6 +7820,7 @@ It applies the following formula to calculate greyscale:
 
 =cut
 
+sub monochrome {
     ##########################################################################
     # This applies a well known set of blending constants to create a        #
     # monochrome representation of a color image                             #
@@ -7529,8 +7894,6 @@ It applies the following formula to calculate greyscale:
     return ($params->{'image'});
 } ## end sub monochrome
 
-sub ttf_print {
-
 =head2 ttf_print
 
 Prints TrueType text on the screen at point x,y in the rectangle width,height, using the color 'color', and the face 'face' (using the Imager library as its engine).
@@ -7590,6 +7953,7 @@ Failures of this method are usually due to it not being able to find the font.  
 
 =cut
 
+sub ttf_print {
     ##############################################################################
     # Yes, this is a "hack".                                                     #
     # -------------------------------------------------------------------------- #
@@ -7751,8 +8115,6 @@ Failures of this method are usually due to it not being able to find the font.  
     return ($params);
 } ## end sub ttf_print
 
-sub ttf_paragraph {
-
 =head2 ttf_paragraph
 
 Very similar to an ordinary Perl "print", but uses TTF fonts instead.  It will automatically wrap text like a terminal.
@@ -7797,6 +8159,7 @@ Text is started at "x" and wrapped to "x" for each line, no indentation.
 
 =cut
 
+sub ttf_paragraph {
     my ($self, $params) = @_;
 
     return ($params) unless (defined($params));
@@ -7931,8 +8294,6 @@ sub _gather_fonts {
     } ## end foreach my $file (@dir)
 } ## end sub _gather_fonts
 
-sub get_face_name {
-
 =head2 get_face_name
 
 Returns the TrueType face name based on the parameters passed.
@@ -7944,6 +8305,7 @@ Returns the TrueType face name based on the parameters passed.
 
 =cut
 
+sub get_face_name {
     my ($self, $params) = @_;
 
     my $file = $params->{'font_path'} . '/' . $params->{'face'};
@@ -7958,8 +8320,6 @@ Returns the TrueType face name based on the parameters passed.
     } ## end if ($face->can('face_name'...))
     return ($file);
 } ## end sub get_face_name
-
-sub load_image {
 
 =head2 load_image
 
@@ -8092,6 +8452,7 @@ If the image has multiple frames, then a reference to an array of hashes is retu
 
 =cut
 
+sub load_image {
     my ($self, $params) = @_;
 
     my @odata;
@@ -8340,8 +8701,6 @@ If the image has multiple frames, then a reference to an array of hashes is retu
     return (undef);    # Ouch
 } ## end sub load_image
 
-sub screen_dump {
-
 =head2 screen_dump
 
 Dumps the screen to a file given in 'file' in the format given in 'format'
@@ -8393,6 +8752,7 @@ The Tagged Image File Format.  Sort of an older version of PNG (but not the same
 
 =cut
 
+sub screen_dump {
     my ($self, $params) = @_;
 
     my $filename  = $params->{'file'} || 'screendump.jpg';
@@ -8692,8 +9052,6 @@ sub _convert_24_to_32 {
     return ($new_img);
 } ## end sub _convert_24_to_32
 
-sub RGB565_to_RGB888 {
-
 =head2 RGB565_to_RGB888
 
 Convert a 16 bit color value to a 24 bit color value.  This requires the color to be a two byte packed string.
@@ -8706,6 +9064,7 @@ Convert a 16 bit color value to a 24 bit color value.  This requires the color t
 
 =cut
 
+sub RGB565_to_RGB888 {
     my ($self, $params) = @_;
 
     my $rgb565 = unpack('S', $params->{'color'});
@@ -8756,8 +9115,6 @@ Convert a 16 bit color value to a 24 bit color value.  This requires the color t
     return ({ 'color' => $color });
 } ## end sub RGB565_to_RGB888
 
-sub RGB565_to_RGBA8888 {
-
 =head2 RGB565_to_RGB8888
 
 Convert a 16 bit color value to a 32 bit color value.  This requires the color to be a two byte packed string.  The alpha value is either a value passed in or the default 255.
@@ -8771,6 +9128,7 @@ Convert a 16 bit color value to a 32 bit color value.  This requires the color t
 
 =cut
 
+sub RGB565_to_RGBA8888 {
     my ($self, $params) = @_;
 
     my $rgb565      = unpack('S', $params->{'color'});
@@ -8822,8 +9180,6 @@ Convert a 16 bit color value to a 32 bit color value.  This requires the color t
     return ({ 'color' => $color });
 } ## end sub RGB565_to_RGBA8888
 
-sub RGB888_to_RGB565 {
-
 =head2 RGB888_to_RGB565
 
 Convert 24 bit color value to a 16 bit color value.  This requires a three byte packed string.
@@ -8838,6 +9194,7 @@ This simply does a bitshift, nothing more.
 
 =cut
 
+sub RGB888_to_RGB565 {
     my ($self, $params) = @_;
 
     my $big_data       = $params->{'color'};
@@ -8870,8 +9227,6 @@ This simply does a bitshift, nothing more.
     return ({ 'color' => $n_data });
 } ## end sub RGB888_to_RGB565
 
-sub RGBA8888_to_RGB565 {
-
 =head2 RGBA8888_to_RGB565
 
 Convert 32 bit color value to a 16 bit color value.  This requires a four byte packed string.
@@ -8886,6 +9241,7 @@ This simply does a bitshift, nothing more
 
 =cut
 
+sub RGBA8888_to_RGB565 {
     my ($self, $params) = @_;
 
     my $big_data       = $params->{'color'};
@@ -8922,8 +9278,6 @@ This simply does a bitshift, nothing more
     return ({ 'color' => $n_data });
 } ## end sub RGBA8888_to_RGB565
 
-sub RGB888_to_RGBA8888 {
-
 =head2 RGB888_to_RGBA8888
 
 Convert 24 bit color value to a 32 bit color value.  This requires a three byte packed string.  The alpha value is either a value passed in or the default 255.
@@ -8939,6 +9293,7 @@ This just simply adds an alpha value.  No actual color conversion is done.
 
 =cut
 
+sub RGB888_to_RGBA8888 {
     my ($self, $params) = @_;
 
     my $alpha    = (exists($params->{'alpha'})) ? $params->{'alpha'} : 255;
@@ -8952,8 +9307,6 @@ This just simply adds an alpha value.  No actual color conversion is done.
     }
     return ({ 'color' => $n_data });
 } ## end sub RGB888_to_RGBA8888
-
-sub RGBA8888_to_RGB888 {
 
 =head2 RGBA8888_to_RGB888
 
@@ -8969,6 +9322,7 @@ This just removes the alpha value.  No color conversion is actually done.
 
 =cut
 
+sub RGBA8888_to_RGB888 {
     my ($self, $params) = @_;
 
     my $big_data = $params->{'color'};
@@ -8982,8 +9336,6 @@ This just removes the alpha value.  No color conversion is actually done.
     return ({ 'color' => $n_data });
 } ## end sub RGBA8888_to_RGB888
 
-sub vsync {
-
 =head2 vsync
 
 Waits for vertical sync
@@ -8994,11 +9346,10 @@ Waits for the vertical blank before returning
 
 =cut
 
+sub vsync {
     my $self = shift;
     _set_ioctl(FBIO_WAITFORVSYNC, 'I', $self->{'FB'}, 0);
 } ## end sub vsync
-
-sub which_console {
 
 =head2 which_console
 
@@ -9008,14 +9359,13 @@ Returns the active console and the expected console
 
 =cut
 
+sub which_console {
     my $self = shift;
     chomp($self->{'THIS_CONSOLE'} = _slurp('/sys/class/tty/tty0/active'));
     $self->{'THIS_CONSOLE'} =~ s/\D+//gs;
     $self->{'THIS_CONSOLE'} += 0;    # Force numeric
     return ($self->{'THIS_CONSOLE'}, $self->{'CONSOLE'});
 } ## end sub which_console
-
-sub active_console {
 
 =head2 active_console
 
@@ -9027,6 +9377,7 @@ Indicates if the current console is the expected console.  It returns true or fa
 
 =cut
 
+sub active_console {
     my $self = shift;
     my ($current, $original) = $self->which_console();
     if ($current == $original) {
@@ -9034,8 +9385,6 @@ Indicates if the current console is the expected console.  It returns true or fa
     }
     return (FALSE);
 } ## end sub active_console
-
-sub wait_for_console {
 
 =head2 wait_for_console
 
@@ -9047,6 +9396,7 @@ If a TRUE or FALSE is passed to this, then you can enable or disable blocking fo
 
 =cut
 
+sub wait_for_console {
     my $self = shift;
     if (scalar(@_)) {
         $self->{'WAIT_FOR_CONSOLE'} = (shift =~ /^(true|on|1|enable)$/i) ? TRUE : FALSE;
@@ -9418,7 +9768,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.80 (Dec 13, 2025)
+Version 6.81 (Dec 25, 2025)
 
 =head1 THANKS
 

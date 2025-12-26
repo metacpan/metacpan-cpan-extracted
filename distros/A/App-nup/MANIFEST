@@ -5,6 +5,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+images/nup.png
 lib/App/nup.pm
 minil.toml
 script/nup

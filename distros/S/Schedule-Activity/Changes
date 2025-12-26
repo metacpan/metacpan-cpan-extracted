@@ -1,5 +1,10 @@
 Revision history for Schedule::Activity
 
+0.2.7 - 2025-12-25
+	- Per-activity goals
+	- Attribute report formatting tools
+	- Goal configuration validation
+
 0.2.6 - 2025-12-13
 	- NodeFilter value supports modulus
 	- NodeFilter elapsed supports modulus

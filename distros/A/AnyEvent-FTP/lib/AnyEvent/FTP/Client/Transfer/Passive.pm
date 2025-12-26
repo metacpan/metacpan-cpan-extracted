@@ -9,7 +9,7 @@ use AnyEvent::Socket qw( tcp_connect );
 extends 'AnyEvent::FTP::Client::Transfer';
 
 # ABSTRACT: Passive transfer class for asynchronous ftp client
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 sub BUILD
 {
@@ -87,7 +87,7 @@ AnyEvent::FTP::Client::Transfer::Passive - Passive transfer class for asynchrono
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 
@@ -103,7 +103,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017-2021 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

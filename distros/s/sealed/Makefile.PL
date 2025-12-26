@@ -8,7 +8,7 @@ WriteMakefile(
         LICENSE => "apache_2_0",
         PREREQ_PM => {
           'B::Generate' => 0,
-          'Perl::Types' => 0,
+          'Perl::Types' => "0.400",
         },
         test => { TESTS => "t/*.pl" },
         SIGN => 1,

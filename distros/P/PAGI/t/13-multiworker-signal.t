@@ -178,6 +178,23 @@ subtest 'Multi-worker terminates on SIGTERM' => sub {
 };
 
 subtest 'No zombie worker processes after shutdown' => sub {
+    # This test uses lsof which is unreliable across different environments:
+    # - Not installed on some systems (OpenBSD uses fstat, minimal containers lack it)
+    # - Permission issues in sandboxed/container environments
+    # - Different PATH configurations on CI systems
+    # Only run with RELEASE_TESTING - signal handling is already tested by subtests 1 & 2
+    unless ($ENV{RELEASE_TESTING}) {
+        plan skip_all => 'lsof-based test requires RELEASE_TESTING=1';
+        return;
+    }
+
+    my $has_lsof = `which lsof 2>/dev/null`;
+    chomp($has_lsof);
+    if (!$has_lsof) {
+        plan skip_all => 'lsof not available on this system';
+        return;
+    }
+
     my $port = 5500 + int(rand(100));
 
     # Fork a process to run the server

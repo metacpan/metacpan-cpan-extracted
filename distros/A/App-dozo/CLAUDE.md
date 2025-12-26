@@ -53,7 +53,7 @@ Note: The release process has hooks (in `minil.toml`) that:
 ### Core Components
 
 1. **script/dozo** - The main Bash script that does all the work
-   - Uses `getoptlong.sh` (from submodule in `share/getoptlong/`) for option parsing
+   - Uses `getoptlong.sh` (from `Getopt::Long::Bash` CPAN package) for option parsing
    - Implements container lifecycle management for persistent containers (`-L` flag)
    - Handles `.dozorc` configuration file loading from multiple locations
    - Auto-detects git repository and mounts git top directory by default
@@ -61,10 +61,6 @@ Note: The release process has hooks (in `minil.toml`) that:
 2. **lib/App/dozo.pm** - Minimal Perl module wrapper
    - Contains only version number and POD documentation
    - The POD is auto-generated from `script/dozo` during release
-
-3. **share/getoptlong/** - Git submodule
-   - Contains `getoptlong.sh` for advanced option parsing
-   - Script searches for this via Perl's `File::Share::dist_dir()` or in `$PATH`
 
 ### Key Design Patterns
 
@@ -109,18 +105,14 @@ Note: The release process has hooks (in `minil.toml`) that:
 
 **Runtime:**
 - Perl 5.24+ (for the module wrapper)
-- Bash (for the main script)
+- Bash 4.3+ (for the main script)
 - Docker (runtime requirement, not checked by tests)
-- getoptlong.sh (bundled as submodule)
+- Getopt::Long::Bash 0.6.0+ (provides `getoptlong.sh`)
 
 **Development:**
 - Minilla (build tool)
 - Test::More (testing)
 - Module::Build::Tiny (build backend)
-
-### Git Submodule
-
-The `share/getoptlong` directory is a git submodule pointing to https://github.com/tecolicom/getoptlong. The CI workflow cleans this submodule to keep only `getoptlong.sh`, removing other files to minimize distribution size.
 
 ### Documentation Synchronization
 
@@ -140,8 +132,6 @@ Release hooks keep these synchronized. When updating version, update `lib/App/do
 
 ### Relationship to App::Greple::xlate
 
-While Dôzo was originally developed as part of App::Greple::xlate for Docker-based translation workflows, it's designed to work standalone. The script can find `getoptlong.sh` either:
-1. Via `File::Share::dist_dir('App-dozo')` if installed
-2. In PATH as a fallback
+While Dôzo was originally developed as part of App::Greple::xlate for Docker-based translation workflows, it's designed to work standalone. The `getoptlong.sh` script is provided by the `Getopt::Long::Bash` CPAN package, which is installed as a dependency.
 
 This allows Dôzo to be used independently as a general-purpose Docker runner.

@@ -38,7 +38,7 @@ requires:
 resources:
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.202'
+version: '0.204'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -308,7 +308,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.202'
+          tag: '0.204'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

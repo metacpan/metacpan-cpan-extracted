@@ -17,4 +17,4 @@ hooks = [
 os = [ "MSWin32" ]
 
 [FileGatherer]
-exclude_match = [ '^images/.*', '^share/getoptlong/(?!getoptlong\.sh)' ]
+exclude_match = [ '^images/.*' ]

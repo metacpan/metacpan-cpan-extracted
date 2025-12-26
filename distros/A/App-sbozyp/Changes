@@ -1,3 +1,9 @@
+1.4.0  2025-12-25
+
+   - Added install/build -z flag to save sources (PR #22)
+   - Moved contributor list into CONTRIBUTORS file
+   - Move sbozyp package-specific files into package/ dir
+
 1.3.4  2025-12-08
 
    - Renamed non-interactive flags from -i to -y

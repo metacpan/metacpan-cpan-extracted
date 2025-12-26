@@ -1,6 +1,6 @@
 # 🧩 jq-lite — Lightweight jq in Pure Perl
 
-![JQ::Lite](./images/JQ_Lite_sm_2.png)
+![JQ::Lite](./images/jq-lite_jp_sm.png)
 
 [![MetaCPAN](https://img.shields.io/cpan/v/JQ-Lite.svg)](https://metacpan.org/release/JQ-Lite)
 [![Alpine Linux](https://img.shields.io/badge/Alpine-Linux%20community-0D597F?logo=alpinelinux\&logoColor=white)](https://pkgs.alpinelinux.org/package/edge/community/x86_64/jq-lite)
@@ -258,6 +258,10 @@ jq-lite '.users[].nickname? // .name' users.json
 ## 📜 License
 
 Same terms as Perl itself.
+
+
+
+
 
 
 

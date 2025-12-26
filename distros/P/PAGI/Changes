@@ -1,5 +1,12 @@
 # This file documents the revision history for Perl extension PAGI
 
+0.001008 - 2025-12-25
+  - Fixed 32-bit Perl compatibility in WebSocket test (pack 'Q' → 'NN')
+  - Fixed sendfile on non-blocking sockets for FreeBSD/BSD systems
+  - Added sendfile documentation and production recommendations
+  - Improved test reliability: skip lsof/timing-dependent tests by default
+  - Normalized test environment variables to use RELEASE_TESTING
+
 0.001007 - 2025-12-24
   - More broken dist metadata fixes (part 2)
 

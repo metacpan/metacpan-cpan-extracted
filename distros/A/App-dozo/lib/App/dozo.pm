@@ -1,6 +1,6 @@
 package App::dozo;
 
-our $VERSION = "0.9927";
+our $VERSION = "0.9928";
 
 1;
 =encoding utf-8
@@ -23,7 +23,7 @@ dozo -I IMAGE [ options ] [ command ... ]
     -n, --dryrun       dry-run mode
 
     -I, --image=#      Docker image (required unless -D)
-    -D, --default      use default image (DOZO_DEFAULT_IMAGE or tecolicom/xlate)
+    -D, --default      use default image
     -E, --env=#        environment variable to inherit (repeatable)
     -W, --mount-cwd    mount current working directory
     -H, --mount-home   mount home directory
@@ -40,7 +40,7 @@ dozo -I IMAGE [ options ] [ command ... ]
 
 =head1 VERSION
 
-Version 0.9927
+Version 0.9928
 
 =head1 USAGE
 
@@ -149,11 +149,10 @@ git top directory, and home directory.
 
 =item B<Standalone Operation>
 
-B<Dôzo> can operate independently of L<xlate>. The distribution includes
-C<getoptlong.sh> as a submodule in the C<share/getoptlong> directory.
-If the module is installed via CPAN, it searches for C<getoptlong.sh>
-via C<File::Share::dist_dir('App-dozo')>. Otherwise, it searches for
-C<getoptlong.sh> in the standard C<PATH>.
+B<Dôzo> can operate independently of L<xlate>. The C<getoptlong.sh>
+script is provided by the L<Getopt::Long::Bash> CPAN distribution,
+which is installed as a dependency. Alternatively, you can place
+C<getoptlong.sh> in your C<PATH> manually.
 
 =back
 

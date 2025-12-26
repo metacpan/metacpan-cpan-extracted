@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "generic module for extracting information from filesystems",
-  "AUTHOR" => "L\x{f6}wenfelsen UG (haftungsbeschr\x{e4}nkt) <support\@loewenfelsen.net>",
+  "AUTHOR" => "Philipp Schafft <lion\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -18,8 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "File::Information",
   "PREREQ_PM" => {
     "Carp" => "1.35",
-    "Data::Identifier" => "0.8.0",
-    "Data::Identifier::Interface::Known" => "0.13.0",
+    "Data::Identifier" => "0.28.0",
     "File::Spec" => "3.6301",
     "Scalar::Util" => "1.47",
     "Sys::Hostname" => "1.20"
@@ -29,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.15",
+  "VERSION" => "v0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +37,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
-  "Data::Identifier" => "0.8.0",
-  "Data::Identifier::Interface::Known" => "0.13.0",
+  "Data::Identifier" => "0.28.0",
   "File::Spec" => "3.6301",
   "Scalar::Util" => "1.47",
   "Sys::Hostname" => "1.20",

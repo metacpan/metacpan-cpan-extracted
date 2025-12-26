@@ -33,13 +33,17 @@ nup - N-up multi-column paged output for commands and files
 
 # VERSION
 
-Version 0.9902
+Version 0.9903
 
 # DESCRIPTION
 
 **nup** is a simple wrapper script for `optex -Mup`.  It provides a
 convenient way to view files or run commands with N-up output
 formatting using the [App::optex::up](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Aup) module.
+
+<div>
+    <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-nup/main/images/nup.png"></p>
+</div>
 
 **nup** automatically detects the mode based on the first argument:
 if it is an existing file, file view mode is used; if it is an
@@ -135,7 +139,9 @@ force command mode when needed.
 
 - **--pager**=_COMMAND_
 
-    Set the pager command. Default is `$PAGER` or `less`.
+    Set the pager command. Default is `NUP_PAGER` or `less -F +Gg`.
+    The `PAGER` variable is not used to avoid an infinite loop when
+    `PAGER` is set to `nup`.
     Use `--pager=` (empty) or `--no-pager` to disable pager.
 
 - **--no-pager**

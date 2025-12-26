@@ -1,9 +1,8 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.202';
+our $VERSION = '0.204';
 use Moose;
-use Moose::Autobox;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
@@ -350,8 +349,8 @@ sub configure {
 }
 
 __PACKAGE__->meta->make_immutable;
+
 no Moose;
-1;
 
 __END__
 
@@ -365,7 +364,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.202
+version 0.204
 
 =head1 SYNOPSIS
 

@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Share" : "0",
+            "Getopt::Long::Bash" : "v0.6.0",
             "perl" : "5.024"
          }
       },
@@ -55,7 +55,7 @@
    "provides" : {
       "App::dozo" : {
          "file" : "lib/App/dozo.pm",
-         "version" : "0.9927"
+         "version" : "0.9928"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/tecolicom/App-dozo"
       }
    },
-   "version" : "0.9927",
+   "version" : "0.9928",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

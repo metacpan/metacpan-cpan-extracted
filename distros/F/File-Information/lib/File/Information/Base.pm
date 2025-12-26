@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use Scalar::Util qw(blessed);
 use Data::Identifier v0.08;
 use File::Information;
 
-use parent 'Data::Identifier::Interface::Known';
+use parent qw(Data::Identifier::Interface::Known Data::Identifier::Interface::Simple);
 
 use constant { # Taken from Data::Identifier
     RE_UUID                         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -53,7 +53,7 @@ use constant { # Taken from Data::Identifier
     WK_TAGPOOL_POOL                 => '1f30649d-eb55-48cb-93d7-6d6fcba23909',
 };
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -70,13 +70,13 @@ our %_digest_name_converter = ( # stolen from Data::URIID::Result
 our %_digest_info_extra = (
     'md-5-128'      => {rfc9530 => 'md5',       openpgp =>  1},
     'ripemd-1-160'  => {                        openpgp =>  3},
-    'sha-1-160'     => {rfc9530 => 'sha',       openpgp =>  2},
+    'sha-1-160'     => {rfc9530 => 'sha',       openpgp =>  2, sni => 185},
     'sha-2-224'     => {                        openpgp => 11},
     'sha-2-256'     => {rfc9530 => 'sha-256',   openpgp =>  8},
     'sha-2-384'     => {                        openpgp =>  9},
     'sha-2-512'     => {rfc9530 => 'sha-512',   openpgp => 10},
     'sha-3-256'     => {                        openpgp => 12},
-    'sha-3-512'     => {                        openpgp => 14},
+    'sha-3-512'     => {                        openpgp => 14, sni => 186},
 );
 
 my %_important_digests = map {$_ => 1} qw(sha-1-160 sha-3-512);
@@ -1000,6 +1000,18 @@ sub _known_provider {
 }
 
 
+# --- Overrides for Data::Identifier::Interface::Simple ---
+
+sub as {
+    my ($self, $as, %opts) = @_;
+
+    if ($as eq 'Data::Identifier' && !scalar keys %opts) {
+        return Data::Identifier->new(ise => $self->ise);
+    } else {
+        return Data::Identifier->new(ise => $self->ise)->as($as, %opts);
+    }
+}
+
 1;
 
 __END__
@@ -1014,13 +1026,13 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
     use File::Information;
 
-B<Note:> This package inherits from L<Data::Identifier::Interface::Known>.
+B<Note:> This package inherits from L<Data::Identifier::Interface::Known>, and L<Data::Identifier::Interface::Simple> (experimental since v0.16).
 
 This is the base package for L<File::Information::Link>, L<File::Information::Inode>, and L<File::Information::Filesystem>.
 Common methods are documented in this file. Details (such as supported keys) are documented in the respective modules.
@@ -1452,11 +1464,11 @@ The specification for the format must be publically available.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

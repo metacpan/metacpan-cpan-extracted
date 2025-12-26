@@ -3,7 +3,7 @@ package PAGI;
 use strict;
 use warnings;
 
-our $VERSION = '0.001007';
+our $VERSION = '0.001008';
 
 1;
 
@@ -24,10 +24,6 @@ and pretty much everything I've released on CPAN over 20+ years would never
 have happened.
 
 Thank you, Matt. The Perl community misses you.
-
-=head1 VERSION
-
-Version 0.001002 (Beta)
 
 =head1 SYNOPSIS
 

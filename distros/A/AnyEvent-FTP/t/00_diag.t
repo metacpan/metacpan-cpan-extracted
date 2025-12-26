@@ -9,11 +9,9 @@ eval { require 'Test/More.pm' };
 my %modules;
 my $post_diag;
 
-BEGIN { eval q{ use EV; } }
 $modules{$_} = $_ for qw(
   AnyEvent
   Capture::Tiny
-  EV
   ExtUtils::MakeMaker
   File::ShareDir::Dist
   File::ShareDir::Install

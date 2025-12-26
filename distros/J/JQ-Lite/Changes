@@ -1,3 +1,23 @@
+1.60  2025-12-26
+
+    - Align jq-lite CLI error handling with documented prefixes and
+      exit codes, validating JSON input before execution and treating
+      empty query results as success.
+
+1.59  2025-12-26
+
+    - Split utility helpers into dedicated parsing, path, and transform
+      modules while keeping the main Util loader lightweight.
+
+1.58  2025-12-25
+
+    - Parse assignment right-hand sides using the expression evaluator
+      so jq variables and expressions resolve correctly when assigning
+      new values.
+    - Pass the jq instance into assignment resolution to allow
+      variable-aware evaluation and nested query execution.
+    - Add a regression test covering assignment from a jq variable.
+
 1.57  2025-12-24
 
     - Add opt-in contains_subset() providing jq-style array subset
@@ -1007,6 +1027,8 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
 
 
 

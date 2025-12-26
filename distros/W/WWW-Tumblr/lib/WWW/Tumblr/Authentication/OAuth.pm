@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Moose;
 
-use base 'WWW::Tumblr::Authentication';
+# Note: Extends WWW::Tumblr which already uses WWW::Tumblr::Authentication
 extends 'WWW::Tumblr';
 
 has 'authorize_url', is => 'rw', isa => 'Str', lazy => 1, default => sub {

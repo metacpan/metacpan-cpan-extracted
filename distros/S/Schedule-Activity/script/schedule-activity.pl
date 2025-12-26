@@ -7,6 +7,7 @@ use Getopt::Long;
 use JSON::XS qw/decode_json/;
 use Pod::Usage;
 use Schedule::Activity;
+use Schedule::Activity::Attribute::Report;
 
 sub load {
 	my ($fn)=@_;
@@ -70,62 +71,25 @@ sub materialize {
 	foreach my $entry (@materialized) { print join(' ',@$entry),"\n" }
 }
 
-# At this time these are redundant.  Plan is to move these into a support
-# module so they can be better tested, reduce redundancy, and reduce
-# clutter in the script.
 sub attrgrid {
 	my (%schedule)=@_;
-	my $tmmax=$schedule{_tmmax};
-	my $tmstep=int(0.5+$tmmax/10);
 	print "\n";
-	for(my $tm=0;$tm<=$tmmax;$tm+=$tmstep) { print "$tm\t" }; print "avg\tAttribute\n";
-	foreach my $name (sort keys %{$schedule{attributes}}) {
-		my $attr=$schedule{attributes}{$name}{xy};
-		my ($i,$y)=(-1);
-		for(my $tm=0;$tm<=$tmmax;$tm+=$tmstep) {
-			while(($i<$#$attr)&&($tm>=$$attr[$i+1][0])) { $i++ }
-			if($i<0)           { $y=0 }
-			elsif($i>=$#$attr) { $y=$$attr[$i][1] }
-			elsif($i==0)       { $y=$$attr[0][1] }
-			else {
-				my $p=($tm-$$attr[$i][0])/($$attr[$i+1][0]-$$attr[$i][0]);
-				$y=(1-$p)*$$attr[$i][1]+$p*$$attr[$i+1][1];
-			}
-			print sprintf("%0.4g\t",$y);
-		}
-		print sprintf('%0.4g',$schedule{attributes}{$name}{avg}//0),"\t$name\n";
-	}
+	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
+	my @rhs=@{$reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',format=>'table')//[]};
+	foreach my $row (@{$reporter->report(type=>'grid',values=>'y',header=>1,names=>0,fmt=>'%0.4g',format=>'table')//[]}) { print join("\t",@$row,@{shift(@rhs)//[]}),"\n" }
 }
-
 sub attravggrid {
 	my (%schedule)=@_;
-	my $tmmax=$schedule{_tmmax};
-	my $tmstep=int(0.5+$tmmax/10);
 	print "\n";
-	for(my $tm=0;$tm<=$tmmax;$tm+=$tmstep) { print "$tm\t" }; print "avg\tAttribute\n";
-	foreach my $name (sort keys %{$schedule{attributes}}) {
-		my $attr=$schedule{attributes}{$name}{xy};
-		my ($i,$y)=(-1);
-		for(my $tm=0;$tm<=$tmmax;$tm+=$tmstep) {
-			while(($i<$#$attr)&&($tm>=$$attr[$i+1][0])) { $i++ }
-			if($i<0)           { $y=0 }
-			elsif($i>=$#$attr) { $y=$$attr[$i][2] }
-			elsif($i==0)       { $y=$$attr[0][2] }
-			else {
-				my $p=($tm-$$attr[$i][0])/($$attr[$i+1][0]-$$attr[$i][0]);
-				$y=(1-$p)*$$attr[$i][2]+$p*$$attr[$i+1][2];
-			}
-			print sprintf("%0.4g\t",$y);
-		}
-		print sprintf('%0.4g',$schedule{attributes}{$name}{avg}//0),"\t$name\n";
-	}
+	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
+	my @rhs=@{$reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',format=>'table')//[]};
+	foreach my $row (@{$reporter->report(type=>'grid',values=>'avg',header=>1,names=>0,fmt=>'%0.4g',format=>'table')//[]}) { print join("\t",@$row,@{shift(@rhs)//[]}),"\n" }
 }
-
 sub attraverage {
 	my (%schedule)=@_;
 	print "\n";
-	print "Avg\tAttribute\n";
-	foreach my $name (sort keys %{$schedule{attributes}}) { print sprintf('%0.4g',$schedule{attributes}{$name}{avg}//0),"\t$name\n" }
+	my $reporter=Schedule::Activity::Attribute::Report->new(%schedule);
+	print $reporter->report(type=>'summary',values=>'avg',header=>1,names=>1,fmt=>'%0.4g',sep=>"\t",format=>'text')."\n";
 }
 
 my %opt=(
@@ -196,8 +160,12 @@ if($opt{activities}) { foreach my $pair (split(/;/,$opt{activities})) { push @{$
 if(!@{$opt{activity}}&&!$opt{after}) { die 'Activities are required' }
 for(my $i=0;$i<=$#{$opt{activity}};$i++) { $opt{activity}[$i]=[split(/,/,$opt{activity}[$i],2)] }
 
-my %schedule=$scheduler->schedule(goal=>\%goal,%after,activities=>$opt{activity},tensionslack=>$opt{tslack},tensionbuffer=>$opt{tbuffer});
-if($schedule{error}) { print STDERR join("\n",@{$schedule{error}}),"\n"; exit(1) }
+my %schedule=$scheduler->schedule(goal=>\%goal,%after,activities=>$opt{activity},tensionslack=>$opt{tslack},tensionbuffer=>$opt{tbuffer},nonote=>!$opt{notemerge});
+if($schedule{error}) {
+	if(!ref($schedule{error})) { $schedule{error}=[$schedule{error}] }
+	print STDERR join("\n",@{$schedule{error}}),"\n";
+	exit(1);
+}
 
 # Workaround.  Until other options are available, annotations canNOT be
 # materialized into the activity schedule.  Such nodes are unexpected
@@ -269,7 +237,7 @@ Comma-separated, one or more:  'grid' shows values over time and overall average
 
 =head2 --goal=(hash)
 
-Provide a Perl hash string of the form C<'cycles=E<gt>N,attribute=E<gt>{...}'> as described in L<Schedule::Activity/Goals> to enable attribute-based goal seeking.
+Provide a Perl hash string of the form C<'cycles=E<gt>N,attribute=E<gt>{...}'> as described in L<Schedule::Activity/Goals> to enable attribute-based goal seeking.  Run with C<--man> for details on per-activity goals.
 
 =head2 --unsafe
 
@@ -294,6 +262,10 @@ This permits buliding multiple, randomized schedules from the configuration into
 At each step, the schedule is output normally, including annotations unless C<nonotemerge> has been specified.
 
 Annotations are I<not> saved.  Annotations apply generally to all actions in a schedule, so incremental builds are not equivalent to a full schedule build.  While the annotations are shown with the output at each stage of construction, they are recomputed each time.
+
+=head1 PER-ACTIVITY GOALS
+
+Per-activity goals are not yet supported directly from the commandline, but can be achieved using incremental construction.  See L<Schedule::Activity/"Per-Activity Goals">.
 
 =head1 NOTES
 

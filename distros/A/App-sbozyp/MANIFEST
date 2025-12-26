@@ -2,14 +2,14 @@ bin/sbozyp
 lib/App/sbozyp.pm
 
 Changes
+CONTRIBUTORS
 LICENSE
 MANIFEST
 Makefile.PL
 cpanfile
 
-configs/sbozyp.conf
-
-completions/sbozyp.bash
-completions/sbozyp.zsh
+package/sbozyp.conf
+package/sbozyp.bash
+package/sbozyp.zsh
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

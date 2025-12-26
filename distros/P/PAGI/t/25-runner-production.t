@@ -87,6 +87,17 @@ subtest 'PID file with actual server process' => sub {
         # Write PID file before running
         $runner->_write_pid_file($pid_file);
 
+        # Install signal handlers for proper cleanup on ALRM or TERM
+        # Without these, alarm(2) kills the process before _remove_pid_file runs
+        local $SIG{ALRM} = sub {
+            $runner->_remove_pid_file;
+            exit(0);
+        };
+        local $SIG{TERM} = sub {
+            $runner->_remove_pid_file;
+            exit(0);
+        };
+
         # Run for a short time then exit
         alarm(2);  # Exit after 2 seconds
 
@@ -99,7 +110,7 @@ subtest 'PID file with actual server process' => sub {
             $loop->run;
         };
 
-        # Clean up PID file on exit
+        # Clean up PID file on exit (normal exit path)
         $runner->_remove_pid_file;
         exit(0);
     }

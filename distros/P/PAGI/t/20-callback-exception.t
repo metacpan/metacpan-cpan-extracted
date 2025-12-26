@@ -115,10 +115,12 @@ subtest 'Server handles WebSocket oversized payload exception' => sub {
         # Now send a malformed frame that claims a massive payload size
         # This WILL trigger Protocol::WebSocket::Frame to throw an exception
         # Frame format: opcode (text=0x81), extended length (0x7F = use 8 byte length)
-        # then 8 bytes indicating a payload of 0xFFFFFFFFFFFFFFFF (9223372036854775807 bytes)
+        # then 8 bytes indicating a payload of 0xFFFFFFFFFFFFFFFF (max 64-bit value)
         my $malicious_frame = pack('C', 0x81);  # Text frame
         $malicious_frame .= pack('C', 0x7F);    # Extended 64-bit length indicator
-        $malicious_frame .= pack('Q>', 0xFFFFFFFFFFFFFFFF);  # Absurdly large length
+        # Use pack('NN', ...) for portability - works on 32-bit Perl without use64bitint
+        # This packs two 32-bit values in network byte order to form the 64-bit length
+        $malicious_frame .= pack('NN', 0xFFFFFFFF, 0xFFFFFFFF);  # Absurdly large length
 
         print $sock $malicious_frame;
 

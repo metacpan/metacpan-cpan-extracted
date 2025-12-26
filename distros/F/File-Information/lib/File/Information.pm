@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -22,7 +22,7 @@ use File::Information::Tagpool;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -541,6 +541,13 @@ sub _known_provider {
         return ([$pkg->lifecycles], not_identifiers => 1);
     } elsif ($class eq 'digest_name') {
         return ([map {$_->{name}} $pkg->digest_info], not_identifiers => 1);
+    } elsif ($class eq 'digest') {
+        state $type = Data::Identifier->new(uuid => '8db88212-69df-40f3-a5cf-105dcd853d44')->register;
+        require Data::Identifier;
+        require Data::Identifier::Wellknown;
+        Data::Identifier::Wellknown->import('digest-algorithm');
+
+        return ([map {Data::Identifier->new($type => $_->{name})} $pkg->digest_info], rawtype => 'Data::Identifier');
     }
 
     return ([]) if $class eq ':all';
@@ -561,7 +568,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -852,6 +859,10 @@ The name of the algorithm as per RFC 9530 if any.
 
 The OpenPGP algorithm identifier.
 
+=item C<sni>
+
+The SIRTX numerical identifier.
+
 =back
 
 =head2 known
@@ -875,15 +886,23 @@ Returns the same values as L</lifecycles>.
 
 Returns the names known by L</digest_info>.
 
+=item C<digest>
+
+(experimental since v0.16)
+
+Returns the known digests as per L</digest_info> as identifiers.
+
+This currently requires to load L<Data::Identifier::Wellknown> with the corresponding class.
+
 =back
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

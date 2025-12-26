@@ -1,5 +1,6 @@
 package WWW::Tumblr::Blog;
 use Moose;
+use Carp;
 use Data::Dumper;
 use JSON;
 
@@ -94,7 +95,25 @@ sub post_reblog {
 
     Carp::croak "no id specified when trying to reblog a post!"
         unless $args{ id };
-    $self->_post( %args );
+    Carp::croak "no reblog_key specified when trying to reblog a post!"
+        unless $args{ reblog_key };
+
+    # Reblog doesn't go through _post() as it doesn't need a type
+    my $response = $self->_tumblr_api_request({
+        auth => 'oauth',
+        http_method => 'POST',
+        url_path => 'blog/' . $self->base_hostname . '/post/reblog',
+        extra_args => \%args,
+    });
+
+    if ( $response->is_success ) {
+        return decode_json( $response->decoded_content)->{response};
+    } else {
+        $self->error( WWW::Tumblr::ResponseError->new(
+            response => $response
+        ));
+        return;
+    }
 }
 
 sub blog { Carp::croak "Unsupported" }
@@ -157,9 +176,47 @@ WWW::Tumblr::Blog
                                                        # or $info
                                                        # or anything else
 
+  # Reblogging a post (photosets, text, anything):
+  # First get the post you want to reblog to obtain its reblog_key
+  my $source = $t->blog('someblog.tumblr.com');
+  my $posts = $source->posts(limit => 1);
+  my $original = $posts->{posts}[0];
+
+  # Then reblog it to your blog:
+  my $reblog = $blog->post_reblog(
+      id         => $original->{id},
+      reblog_key => $original->{reblog_key},
+      comment    => 'Nice post!',  # optional
+  );
+
 =head1 CAVEATS
 
+=over
+
+=item *
+
 I never really tried posting audios or videos.
+
+=item *
+
+B<Image format limitations:> This module uses Tumblr's legacy posting API which
+only supports B<JPEG, PNG, and GIF> images. Formats like B<WebP are not supported>
+by the legacy API. If you try to upload a webp file, you'll get:
+
+  Error 400: Mime type "image/webp" not supported from file
+
+This is a Tumblr API limitation, not a bug in this module. Tumblr's web interface
+uses their newer NPF (Neue Post Format) which supports more formats. NPF support
+would require significant changes to this module and is tracked as a future
+enhancement. See L<https://www.tumblr.com/docs/npf> for NPF documentation.
+
+=item *
+
+B<Video uploads:> Direct video file uploads have similar limitations. The legacy
+API primarily supports video via embed URLs (YouTube, Vimeo, etc.) rather than
+direct file uploads.
+
+=back
 
 =head1 BUGS
 

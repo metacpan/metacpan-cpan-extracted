@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use Carp;
 use Scalar::Util qw(weaken);
 use Fcntl qw(SEEK_SET);
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my %_PNG_colour_types = ( # namespace: 4c11d438-f6f3-417f-85e3-e56e46851dae
     0   => {ise => 'a3934b85-5bec-5cd7-a571-727e4cecfcb1', displayname => 'Greyscale'},
@@ -827,7 +827,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -858,11 +858,11 @@ Returns the parent that was used to create this object.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension App-nup
 
+0.9904 2025-12-26T03:39:07Z
+
+    - Use NUP_PAGER instead of PAGER to avoid infinite loop
+    - Add screenshot image to documentation
+    - Require App::optex::up 1.05
+
 0.9903 2025-12-24T16:20:11Z
 
     - Add --colormap and board style options

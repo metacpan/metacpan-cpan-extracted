@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 =encoding utf-8
 
@@ -29,12 +29,17 @@ terminal width divided by the pane width (default 85 characters).
 Both stdout and stderr are merged and passed through the filter, so
 error messages are also displayed in the multi-column paged output.
 
-The pager command is taken from the C<$PAGER> environment variable if
-set, otherwise defaults to C<less>.  When using C<less>, C<-F +Gg>
-options are automatically appended.  C<-F> causes C<less> to exit
-immediately if the output fits on one screen.  C<+Gg> causes C<less>
-to read all input before displaying, which may take time for large
-output, but prevents empty trailing pages from being shown.
+The pager command is taken from the C<NUP_PAGER> environment variable
+if set, otherwise defaults to C<less -F +Gg>.  The environment
+variable is named after the L<nup> command, a wrapper for this
+module.  The C<PAGER> variable is not used to avoid an infinite loop
+when C<PAGER> is set to C<nup>.  Use the C<--pager> option to specify
+a different pager on the command line.
+
+The C<-F> option causes C<less> to exit immediately if the output
+fits on one screen.  C<+Gg> causes C<less> to read all input before
+displaying, which may take time for large output, but prevents empty
+trailing pages from being shown.
 
 =head1 OPTIONS
 
@@ -76,7 +81,7 @@ mode is the default.
 
 =item B<--pager>=I<COMMAND>
 
-Set the pager command.  Default is C<$PAGER> or C<less>.
+Set the pager command.  Default is C<NUP_PAGER> or C<less -F +Gg>.
 
 =item B<--no-pager>
 
@@ -194,7 +199,7 @@ my $config = Getopt::EX::Config->new(
     'row'          => undef,
     'border-style' => 'heavy-box',
     'fold'         => undef,
-    'pager'        => $ENV{PAGER} || 'less',
+    'pager'        => $ENV{NUP_PAGER} || 'less -F +Gg',
     'no-pager'     => undef,
 );
 
@@ -222,7 +227,6 @@ sub finalize {
     my $height       = defined $rows ? int(($term_height - 1) / $rows) : undef;
     my $border_style = $config->{'border-style'};
     my $pager        = $config->{pager};
-    $pager .= ' -F +Gg' if $pager =~ /\bless\b/;
 
     # Build default ansicolumn options
     my @ac_opts = ("-w$term_width", "--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");

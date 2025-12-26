@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 
 sub new {
@@ -64,7 +64,7 @@ File::Information::Lock - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -103,11 +103,11 @@ Returns the parent that was used to create this object.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

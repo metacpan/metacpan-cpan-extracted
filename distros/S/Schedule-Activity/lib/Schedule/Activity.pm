@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.2.6';
+our $VERSION='0.2.7';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -342,6 +342,15 @@ sub scheduler {
 sub goalScheduling {
 	my ($self,%opt)=@_;
 	my %goal=%{delete($opt{goal})};
+	if(!is_hashref($goal{attribute})) { return (error=>'goal{attribute} must be hash') }
+	{ my $attr=$self->_attr();
+		foreach my $k (keys %{$goal{attribute}}) {
+			if(!defined($$attr{attr}{$k})) { return (error=>"goal-requested attribute does not exist:  $k") }
+			if(!defined($goal{attribute}{$k}{op})) { return (error=>"missing operator in goal $k") }
+			if(($goal{attribute}{$k}{op}//'')!~/^(?:max|min|eq|ne)$/) { return (error=>"invalid operator in goal $k") }
+			if(($goal{attribute}{$k}{op}=~/^(?:eq|ne)$/)&&!defined($goal{attribute}{$k}{value})) { return (error=>"missing value in goal $k") }
+		}
+	}
 	my $cycles=$goal{cycles}//10;
 	my %schedule;
 	eval { %schedule=$self->schedule(%opt) };
@@ -400,12 +409,34 @@ sub goalScheduling {
 	return %best;
 }
 
+sub incrementalScheduling {
+	my ($self,%opt)=@_;
+	my $activities=$opt{activities};
+	my $i=0;
+	my %after=();
+	my %schedule;
+	while($i<=$#$activities) {
+		my $j=$i;
+		while(($j<$#$activities)&&(!is_hashref($$activities[$j][2])||!defined($$activities[$j][2]{goal}))) { $j++ }
+		my @acts;
+		foreach my $activity (@$activities[$i..$j]) {
+			push @acts,[@$activity[0,1]];
+			if(is_hashref($$activity[2])) { push @{$acts[-1]},{map {$_=>$$activity[2]{$_}} grep {$_ ne 'goal'} keys(%{$$activity[2]})} }
+		}
+		%schedule=$self->schedule(%opt,%after,activities=>\@acts,goal=>$$activities[$j][2]{goal});
+		if($i<$#$activities) { %after=(after=>{%schedule}) }
+		$i=1+$j;
+	}
+	return %schedule;
+}
+
 sub schedule {
 	my ($self,%opt)=@_;
 	my %check=$self->compile(unsafe=>$opt{unsafe}//$$self{unsafe});
 	if($check{error})                  { return (error=>$check{error}) }
 	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
-	if($opt{goal}&&%{$opt{goal}}) { return $self->goalScheduling(%opt) }
+	if(grep {is_hashref($$_[2])&&defined($$_[2]{goal})} @{$opt{activities}}) { return $self->incrementalScheduling(%opt) }
+	if($opt{goal}&&%{$opt{goal}})      { return $self->goalScheduling(%opt) }
 	my $tmoffset=$opt{tmoffset}//0;
 	my %res=(stat=>{slack=>0,buffer=>0});
 	if($opt{after}) {
@@ -524,7 +555,7 @@ Schedule::Activity - Generate activity schedules
 
 =head1 VERSION
 
-Version 0.2.6
+Version 0.2.7
 
 =head1 SYNOPSIS
 
@@ -712,7 +743,7 @@ The scheduling configuration may also declare attribute names and starting value
     },
   )
 
-Boolean types must be declared in this section.  It is recommended to set any non-zero initial values in this fashion, since calling C<set> requires that activity to always be the first requested in the schedule.  
+Boolean types must be declared in this section.  It is recommended to set any non-zero initial values in this fashion, since calling C<set> requires that activity to always be the first requested in the schedule.
 
 Attributes within message alternate configurations and named messages are identified during configuration validation.  Together with activity/action configurations, attributes are verified before schedule construction, which will fail if an attribute name is referenced in a conflicting manner.
 
@@ -730,7 +761,9 @@ When an activity/action node and a selected message both contain attributes, the
 
 Attributes are always logged at the beginning and end of the completed schedule, so that all scheduled time affects the weighted average value calculation.  Activities may reset or fix attributes as needed in their beginning or final node; note that the final node is only the "end of the activity" when C<tmavg=0>.
 
-=head2 Recomputation
+=head2 Reporting
+
+The scheduling response contains a raw report of the C<schedule{attributes}> as defined in L<Schedule::Activity::Attribute/RESPONSE>.  The report can be reformatted as described in L<Schedule::Activity::Attribute::Report>.
 
 Any schedule of activities associated with the initial configuration can generate a standalone attribute report:
 
@@ -821,11 +854,11 @@ Attributes may be used for filtering during schedule construction.  When schedul
 
 Node filtering applies to the last recorded attributes, independent of any actions a candidate node may take on attributes.  Attribute averages values are updated to the "random current time", as if the attribute value was fixed between the last recorded entry and the random current time, prior to node filtering comparisons.
 
-After any filtering and random selection, each activity/action node will update attributes, after which any materialized message will update attributes.  
+After any filtering and random selection, each activity/action node will update attributes, after which any materialized message will update attributes.
 
 After reaching the target time for an activity, event times are updated based on the total slack/buffer time available.  The actual attribute history is constructed from those adjusted times, and will be visible to the next activity scheduled.  Filtering is evaluated as a I<single pass> only, so average values visible during filtering may be slightly different than averages after slack/buffer adjustments.
 
-Annotations are computed separately by groups.  Attributes arising from merged annotations do not affect attributes retroactively (nor, obviously, any node filtering).  See L</Recomputation>.
+Annotations are computed separately by groups.  Attributes arising from merged annotations do not affect attributes retroactively (nor, obviously, any node filtering).  See L</Reporting>.
 
 Scheduling proceeds stepwise, and "consistency" is defined as adherence to the computed values I<at that time>.  No recomputation occurs, except through full retries (such as goal seeking).  All of the following can create paradoxes that are avoided with this approach:  Slack/buffer adjustments can alter attribute average values leading to different node filtering/selection.  Slack/buffer adjustments can produce times that open other action branches that may have be unavailable during scheduling.  Annotations that are merged may adjust attributes such that the nodes they are annotating would disappear.  Nodes may adjust attributes such that the final node is unreachable.
 
@@ -836,11 +869,11 @@ For longer schedules with multiple activities, regenerating a full schedule beca
 Incremental schedules can be built using the C<after> and C<nonote> options:
 
   # Use nonote to avoid annotation build at this time
-  my $choiceA=$scheduler->schedule(nonote=>1, activities=>[[600,'activity1']);
-  my $choiceB=$scheduler->schedule(nonote=>1, activities=>[[600,'activity1']);
+  my %choiceA=$scheduler->schedule(nonote=>1, activities=>[[600,'activity1']]);
+  my %choiceB=$scheduler->schedule(nonote=>1, activities=>[[600,'activity1']]);
   #
   # two or more choices are reviewed and one is selected
-  my %res=$scheduler->schedule(after=>$choiceB, activities=>[[600,'activity2']);
+  my %res=$scheduler->schedule(after=>\%choiceB, activities=>[[600,'activity2']]);
 
 The schedule indicated via C<after> signals that the scheduler should build the activities and extend the schedule.  Attributes are automatically loaded from the earlier part of the schedule and affect node filtering normally.
 
@@ -869,6 +902,39 @@ Goal seeking retries schedule construction and finds the best, I<random> schedul
 One or more attributes may be included in the goal, and each of the C<cycles> (default 10) schedules will be scored based on the configured conditions.  The C<max> and C<min> operators seek the largest/smallest attribute I<average value> for the schedule.  The C<eq> and C<ne> operators score near/far from the provided C<value>.  Note that generated schedules may have a different number of activities, so some attribute goals may be equivalent to finding the shortest/longest action counts.
 
 Goal scheduling is experimental starting with 0.2.4.  Attributes currently have equal weighting and scores are linear.  If no schedule can be generated, the most recent error will raise via C<die()>.  Goals can be different during different invocations of incremental construction.
+
+=head2 Per-Activity Goals
+
+Scheduling goals may be specified per activity when calling C<schedule>:
+
+  my %schedule=$scheduler->schedule(activities=>[
+    [30,'Activity A'],
+    [30,'Activity B',{goal=>{cycles=>N,attribute=>{...}}],
+    [30,'Activity C'],
+    ...,
+  ]);
+
+Per-activity goals apply to all immediately-preceding activities following the previous goal.  In the above example, Activities A and B will be constructed I<together>, with the overall goal as specified in Activity B.  Then, scheduling will proceed to the chain starting with C, until it encounters another activity with a goal configuration, if any.  This mirrors the behavior of incremental construction:
+
+  my %scheduleAB =$scheduler->schedule(
+    activities=>[[30,'Activity A'],[30,'Activity B']],
+    goal      =>{...});
+  my %scheduleABC=$scheduler->schedule(
+    activities=>[[30,'Activity C']],
+    after     =>\%scheduleAB,
+    goal      =>undef);
+
+When per-activity scheduling is active, any goals specified in the call to C<schedule(goal=>{...})> are unused.  Only activities with (or preceding) a goal will be scheduled with goals.  Any activities after the last specified goal will not perform goal seeking.  Placing a per-activity goal in only the final activity is therefore equivalent to a schedule-wide goal:
+
+  my %schedule=$scheduler->schedule(
+    activities=>[[10,'A'],[10,'B'],...,[10,'Z',{goal=>{GOAL}}]]);
+  my %schedule=$scheduler->schedule(
+    activities=>[[10,'A'],[10,'B'],...,[10,'Z']],
+    goal=>{GOAL});
+
+Goal scheduling for an activity may be skipped with the goal C<{cycles=E<gt>1,attribute=E<gt>{}}>, or by calling incremental construction with goals only for the desired activities.
+
+Per-activity goal scheduling is experimental starting with 0.2.7.
 
 =head1 IMPORT MECHANISMS
 

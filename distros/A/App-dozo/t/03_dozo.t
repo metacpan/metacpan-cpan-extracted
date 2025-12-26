@@ -6,14 +6,6 @@ use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
 
-# Set PERL5LIB so child processes can find File::Share's dist_dir
-BEGIN {
-    my $blib = File::Spec->rel2abs('blib/lib');
-    if (-d $blib) {
-        $ENV{PERL5LIB} = join(':', $blib, $ENV{PERL5LIB} // '');
-    }
-}
-
 # Skip tests on platforms without bash or with old bash
 BEGIN {
     my $bash_check = `bash --version 2>&1`;
@@ -28,8 +20,15 @@ BEGIN {
     }
 }
 
+# Skip if getoptlong.sh is not available
+BEGIN {
+    my $check = `command -v getoptlong.sh 2>/dev/null`;
+    if ($? != 0) {
+        plan skip_all => 'getoptlong.sh is not available in PATH';
+    }
+}
+
 my $dozo = File::Spec->rel2abs('script/dozo');
-my $getoptlong = File::Spec->rel2abs('share/getoptlong/getoptlong.sh');
 
 # Use empty temp dir to avoid reading any .dozorc (HOME, git top, cwd)
 my $empty_home = tempdir(CLEANUP => 1);
@@ -38,9 +37,6 @@ chdir $empty_home or die "Cannot chdir to $empty_home: $!";
 
 # Check if dozo exists
 ok(-x $dozo, 'dozo is executable');
-
-# Check if getoptlong.sh exists
-ok(-f $getoptlong, 'getoptlong.sh exists');
 
 # Test: help option
 subtest 'help option' => sub {

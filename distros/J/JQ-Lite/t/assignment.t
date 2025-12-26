@@ -49,6 +49,15 @@ subtest 'assign within root array' => sub {
     is($result->[0]{value}, 9, 'first element updated');
 };
 
+subtest 'assignment from variable reference' => sub {
+    my $jq_with_var = JQ::Lite->new(vars => { greeting => 'hello' });
+    my $json       = encode_json({});
+
+    my ($result) = $jq_with_var->run_query($json, '.hello = $greeting');
+
+    is($result->{hello}, 'hello', 'variable reference resolved in assignment RHS');
+};
+
 subtest 'assign null literal' => sub {
     my $data = { spec => { replicas => 4 } };
     my ($result) = apply_query($data, '.spec.replicas = null');

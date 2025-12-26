@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Event interface for AnyEvent::FTP objects
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 sub define_events
@@ -51,7 +51,7 @@ AnyEvent::FTP::Role::Event - Event interface for AnyEvent::FTP objects
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017-2021 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

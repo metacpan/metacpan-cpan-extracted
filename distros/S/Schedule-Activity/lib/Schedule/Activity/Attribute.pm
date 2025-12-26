@@ -3,7 +3,7 @@ package Schedule::Activity::Attribute;
 use strict;
 use warnings;
 
-our $VERSION='0.2.6';
+our $VERSION='0.2.7';
 
 my %types=(
 	int=>{

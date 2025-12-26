@@ -1,5 +1,8 @@
 Revision history for AnyEvent-FTP
 
+0.20      2025-12-25 07:33:15 -0700
+  - Remove EV as a prereq (gh#36)
+
 0.19      2022-04-12 10:33:09 -0600
   - Fix prereq on autodie (gh#33)
   - Fix bug in where socket handle wasn't being properly

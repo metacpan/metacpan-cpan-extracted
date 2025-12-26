@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,7 +16,7 @@ use parent 'File::Information::Base';
 use Carp;
 use Fcntl qw(SEEK_SET);
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my %_properties = (
     chunk_cachehash     => {},
@@ -108,7 +108,7 @@ File::Information::Chunk - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -132,11 +132,11 @@ See there for details.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

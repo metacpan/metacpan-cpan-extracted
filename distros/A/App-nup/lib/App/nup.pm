@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "0.9903";
+our $VERSION = "0.9904";
 
 1;
 =encoding utf-8
@@ -39,7 +39,7 @@ nup - N-up multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 0.9903
+Version 0.9904
 
 =cut
 =head1 DESCRIPTION
@@ -47,6 +47,12 @@ Version 0.9903
 B<nup> is a simple wrapper script for C<optex -Mup>.  It provides a
 convenient way to view files or run commands with N-up output
 formatting using the L<App::optex::up> module.
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-nup/main/images/nup.png"></p>
+
+=end html
 
 B<nup> automatically detects the mode based on the first argument:
 if it is an existing file, file view mode is used; if it is an
@@ -156,7 +162,9 @@ Predefined color schemes for board-style display.
 
 =item B<--pager>=I<COMMAND>
 
-Set the pager command. Default is C<$PAGER> or C<less>.
+Set the pager command. Default is C<NUP_PAGER> or C<less -F +Gg>.
+The C<PAGER> variable is not used to avoid an infinite loop when
+C<PAGER> is set to C<nup>.
 Use C<--pager=> (empty) or C<--no-pager> to disable pager.
 
 =item B<--no-pager>

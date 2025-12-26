@@ -7,7 +7,7 @@ use 5.018;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "PAGI Reference Server Implementation",
+  "ABSTRACT" => "PAGI Specification, Utilities and Reference Server",
   "AUTHOR" => "John Napiorkowski <jjnapiork\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::Future::IO::Impl" => "0.14",
     "URI" => "1.60"
   },
-  "VERSION" => "0.001007",
+  "VERSION" => "0.001008",
   "test" => {
     "TESTS" => "t/*.t t/app/*.t t/endpoint/*.t t/middleware/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/util/*.t t/websocket/*.t"
   }

@@ -555,7 +555,7 @@ sub apply {
             my ($path, $value_spec, $operator) = JQ::Lite::Util::_parse_assignment_expression($part);
 
             @next_results = map {
-                JQ::Lite::Util::_apply_assignment($_, $path, $value_spec, $operator)
+                JQ::Lite::Util::_apply_assignment($self, $_, $path, $value_spec, $operator)
             } @results;
 
             @$out_ref = @next_results;

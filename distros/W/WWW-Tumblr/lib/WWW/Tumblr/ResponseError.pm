@@ -7,9 +7,37 @@ use JSON 'decode_json';
 has 'response', is => 'rw', isa => 'HTTP::Response';
 
 sub code    { $_[0]->response->code }
+
+sub is_rate_limited {
+    my $self = shift;
+    # Check for HTTP 429 (Too Many Requests) or 400 with rate limit error code
+    return 1 if $self->code == 429;
+    
+    if ($self->code == 400) {
+        my $content = $self->response->decoded_content;
+        my $j;
+        eval { $j = JSON::decode_json($content); };
+        return 0 if $@;
+        
+        # Check for Tumblr's rate limit error code 8004
+        if (ref $j eq 'HASH' && ref $j->{response} eq 'HASH' &&
+            ref $j->{response}{errors} eq 'ARRAY') {
+            for my $err (@{$j->{response}{errors}}) {
+                return 1 if ref $err eq 'HASH' && ($err->{code} || 0) == 8004;
+            }
+        }
+    }
+    return 0;
+}
 sub reasons  {
     my $self = $_[0];
-    my $j = decode_json( $_[0]->response->decoded_content);
+    my $content = $_[0]->response->decoded_content;
+    my $j;
+    eval { $j = decode_json($content); };
+    if ($@) {
+        # Response is not valid JSON, return HTTP message
+        return [ $self->response->message || 'Unknown error' ];
+    }
     if ( ref $j && ref $j eq 'HASH' ) {
         if ( ref $j->{response} && ref $j->{response} eq 'ARRAY' ) {
             unless ( scalar @{ $j->{response} }) {

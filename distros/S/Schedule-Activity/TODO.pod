@@ -24,9 +24,9 @@ The following are planned as part of the 0.3.0 release.
 
 =item Script attribute grid for averages (done)
 
-=item Per-activity goals (maybe)
+=item Per-activity goals (done)
 
-=item Script incremental build supports configuration overwrite (maybe)
+=item Script incremental build supports configuration overwrite (todo)
 
 =item Automatic attributes per node (maybe)
 
@@ -36,13 +36,9 @@ The following are planned as part of the 0.3.0 release.
 
 =head2 Goals
 
-Scheduling goals are available starting with 0.2.4.  Goals can specifyC<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=E<gt>'max|min'},name=E<gt>{op=E<gt>'eq|ne',value=E<gt>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based, average value goals seeking is planned at this time.
+Scheduling goals are available starting with 0.2.4.  Only attribute-based, average value goals seeking is planned at this time.
 
-Setting goals per activity is being considered with/before 0.3.0.  This may not include script support since this can already be achieved with incremental construction and there are potential parsing issues from the commandline.
-
-=head2 Documentation
-
-Rewrite in progress starting with 0.2.3.  The documentation in L<Schedule::Activity> is very thorough and complete, though some historical information is outdated.  Introductory and overview documentation is somewhat lacking.  That and better organization is the goal of the rewrite, as well as consistent terminology.
+Per-activity goals are experimental starting with 0.2.7.  Support from the commandline is being considered.
 
 =head2 Attributes
 
@@ -50,7 +46,7 @@ Attribute recomputation is supported starting with 0.2.2, primarily for merged a
 
 Attribute average values are available for goals starting with 0.2.5, which also cleaned up behavioral questions about initial average values, and averages during time overlaps.  See L<Schedule::Activity/Consistency>.
 
-Rudimentary attribute reporting from the commandline is supported starting with 0.2.2, with additional options in 0.2.6.
+Attribute reporting supports many different output formats starting in 0.2.7.  Support for all options from the commandline is still pending.
 
 JSON output from the script is being considered, and would include JSON renderings of the attribute outputs.
 
@@ -58,9 +54,7 @@ Attributes that are internal and automatic per node are being considered.  These
 
 =head2 Node filtering
 
-Average value filtering is available starting with 0.2.5.  The most recent value is always used as the "current value" for the attribute, and the rolling average is updated to the "random current time" when evaluating any NodeFilter.  This permits node activation based on "eventual activation" without explicit checkpointing/materialization of attributes.  The user may still fix the attribute to affect the averages with more granularity as desired.
-
-Floating-point modulus is available starting with 0.2.6.
+Average value filtering is available starting with 0.2.5.  Floating-point modulus is available starting with 0.2.6.
 
 =head2 Annotations
 
@@ -76,13 +70,11 @@ Weighting for the C<next> array is being considered.
 
 =head2 Tension configuration
 
-Rebuilt in 0.1.9 to provide better control over slack and buffer tensions separately.  Behavior is established based on mathematical distribution, which is uniform stepwise leading to a skewed distribution for overall schedules.  Tension settings affect path selection, but the scheduler will fail for the full path if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely additional tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.  See the distribution in C<samples/tension.png> and documentation in L<Schedule::Activity>.
-
 Tension should also be configurable in the outer scheduling step.  This would permit incrementally relaxing the scheduler in case of retries.  No timeline has been established.
 
 =head2 Tutorial
 
-A basic tutorial and sample configuration is provided starting with 0.2.0.  It may be extended.
+A basic tutorial and sample configuration is provided starting with 0.2.0.  It may be extended, but there is no timeline.
 
 =head2 Action limits
 
@@ -94,13 +86,7 @@ As an improvement, support passing slack/buffer ratios during configuration buil
 
 =head2 Pre-scheduling safety
 
-On by default in 0.1.9, but can be turned off with C<unsafe=1> and C<schedule-activity.pl --unsafe>.  More complex schedules may be difficult to interpret at a glance.  One particular annoyance is finding that the target time for an activity cannot be reached, or that there are too many actions to fit a smaller goal window.  Convenience functions find the minimum possible activity time (shortest path through the nodes, ultimately), if the activity can be completed at all (sorta easy to forget, and should be checked before attempting scheduling), and the maximum possible activity time (if defined).  Moreover, these checks are needed to avoid hanging nodes (that don't reach finish), or action nodes with zero times (that never make progress), orphans, etc.
-
-=head2 Script-based tooling
-
-Available in 0.1.8, basic C<schedule-activity.pl> script supports Dumper/JSON schedules and activity lists, compiling with/out safety checks.  Future support may provide for common schedule types:  Music playlists (high count, non-redundant nodes), exercise schedules (chunking, some repeats), chores/errands (small action count per activity/category), games (rounds, countdown reminders).
-
-In 0.1.9, some annotation handling is provided.  Incremental building is supported starting with 0.2.1.
+No known issues at this time.
 
 =head2 Markdown
 

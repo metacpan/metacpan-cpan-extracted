@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +24,10 @@ requires:
   JSON: '0'
   LWP::UserAgent: '0'
   Moose: '0'
-  Net::OAuth::Client: '0'
+  Net::OAuth::Client: '0.3'
 resources:
-  X_twitter: http://twitter.com/habanerd
   bugtracker: https://github.com/damog/www-tumblr/issues
-  homepage: http://github.com/damog/www-tumblr
-  repository: git://github.com/damog/www-tumblr.git
-version: '5.3'
+  homepage: https://github.com/damog/www-tumblr
+  repository: https://github.com/damog/www-tumblr.git
+version: '5.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

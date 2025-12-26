@@ -1,6 +1,7 @@
 package WWW::Tumblr::User;
 
 use Moose;
+use Carp;
 use strict;
 use warnings;
 

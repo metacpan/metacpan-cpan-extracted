@@ -39,6 +39,14 @@ plan skip_all => "Server integration tests not supported on Windows" if $^O eq '
 # =============================================================================
 
 subtest 'Active request should complete during shutdown' => sub {
+    # Only run with RELEASE_TESTING - this tests unimplemented behavior
+    # (graceful shutdown, see issue 2.4) and has timing assumptions that fail
+    # on slow/loaded systems like ARM smoke testers
+    unless ($ENV{RELEASE_TESTING}) {
+        plan skip_all => 'Timing-sensitive test requires RELEASE_TESTING=1';
+        return;
+    }
+
     # App that handles requests with configurable delay
     # Query param ?delay=N causes N second delay before response
     my $slow_app = async sub  {

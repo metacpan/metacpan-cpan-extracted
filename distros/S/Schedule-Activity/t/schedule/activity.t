@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>19;
+use Test::More tests=>20;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -975,5 +975,39 @@ subtest 'Goal seeking'=>sub {
 	eval { %schedule=$scheduler->schedule(goal=>{cycles=>20,attribute=>{bee=>{op=>'max'}}},activities=>[[11,'start']],tensionbuffer=>1,tensionslack=>1) };
 	like($@,qr/Excess exceeds/,'Goal scheduling raises last error if no schedule found');
 	#
+};
+
+subtest 'Per-activity goals'=>sub {
+	plan tests=>1;
+	my %config=(node=>{
+		actA=>{finish=>'finA',tmavg=>0,next=>[qw/AA AB/]},
+		finA=>{tmavg=>0},
+		AA=>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/AA AB finA/],attributes=>{attrA=>{incr=>1}}},
+		AB=>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/AA AB finA/],attributes=>{attrA=>{set=>0}}},
+		actB=>{finish=>'finB',tmavg=>0,next=>[qw/BA BB/]},
+		finB=>{tmavg=>0},
+		BA=>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/BA BB finB/],attributes=>{attrB=>{incr=>1}}},
+		BB=>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/BA BB finB/],attributes=>{attrB=>{set=>0}}},
+		actC=>{finish=>'finC',tmavg=>0,next=>[qw/CA CB/]},
+		finC=>{tmavg=>0},
+		CA=>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/CA CB finC/],attributes=>{attrC=>{incr=>1}}},
+		CB=>{tmmin=>1,tmavg=>1,tmmax=>1,next=>[qw/CA CB finC/],attributes=>{attrC=>{incr=>0}}},
+	});
+	# More difficult to see, but actA+actB must each achieve a sequence of five xA,
+	# so the failure probability per run is 1023/1024.
+	# Meanwhile, actC scheduling can only have an avg of zero if all 20 are CB, with probability 1/2^20=1e-6.
+	my ($pass,$steps,$maxouter)=(0,0,14141); # pfail<=1e-6
+	while($steps<$maxouter) {
+		my $cycles=int(20+rand(100));
+		$steps+=$cycles;
+		my $scheduler=Schedule::Activity->new(configuration=>\%config);
+		my %schedule=$scheduler->schedule(
+			activities=>[[5,'actA'],[5,'actB',{goal=>{cycles=>$cycles,attribute=>{attrA=>{op=>'max'},attrB=>{op=>'max'}}}}],[20,'actC']],
+			goal=>{cycles=>100,attribute=>{attrA=>{op=>"min"},attrB=>{op=>"min"},attrC=>{op=>"min"}}}, # this goal is never used with per-activity goals
+			tensionslack=>1,tensionbuffer=>1);
+		if(1+$#{$schedule{activities}}!=36) { next }
+		if(($schedule{attributes}{attrA}{y}>=5)&&($schedule{attributes}{attrB}{y}>=5)&&($schedule{attributes}{attrC}{avg}!=0)) { $pass=1; $maxouter=$steps }
+	}
+	ok($pass,"Optimized first two activities ($steps steps)");
 };
 

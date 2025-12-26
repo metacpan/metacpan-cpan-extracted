@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -1013,7 +1013,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -1107,18 +1107,18 @@ Also seeking on the returned handle as well as closing it will not have an effec
 Each returned handle is a fresh handle.
 
 B<Note:>
-If you want to read some data from the file consider to use L</peek> as it often porvides a better alternative.
+If you want to read some data from the file consider to use L</peek> as it often provides a better alternative.
 
 B<Note:>
 Availability depends on the operating system, the filesystem, and the current state.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

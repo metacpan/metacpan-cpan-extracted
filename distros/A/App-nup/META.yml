@@ -26,17 +26,17 @@ no_index:
 provides:
   App::nup:
     file: lib/App/nup.pm
-    version: '0.9903'
+    version: '0.9904'
 requires:
   App::optex: '0'
-  App::optex::up: '1.04'
+  App::optex::up: '1.05'
   Getopt::Long::Bash: v0.6.0
   perl: '5.016'
 resources:
   bugtracker: https://github.com/tecolicom/App-nup/issues
   homepage: https://github.com/tecolicom/App-nup
   repository: https://github.com/tecolicom/App-nup.git
-version: '0.9903'
+version: '0.9904'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

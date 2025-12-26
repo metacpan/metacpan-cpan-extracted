@@ -12,7 +12,7 @@ WriteMakefile(
         'Moose'                 => 0,
         'JSON'                  => 0,
         'LWP::UserAgent'        => 0,
-        'Net::OAuth::Client'    => 0,
+        'Net::OAuth::Client'    => 0.30,  # Security fix CVE-2025-22376
         'HTTP::Request::Common' => 0,
     },
 
@@ -23,9 +23,8 @@ WriteMakefile(
 
     META_MERGE => {
         resources => {
-            homepage   => 'http://github.com/damog/www-tumblr',
-            repository => 'git://github.com/damog/www-tumblr.git',
-            x_twitter => 'http://twitter.com/habanerd',
+            homepage   => 'https://github.com/damog/www-tumblr',
+            repository => 'https://github.com/damog/www-tumblr.git',
             bugtracker => 'https://github.com/damog/www-tumblr/issues',
         }
     },

@@ -1,5 +1,6 @@
 #!/usr/bin/env -S perl -Ilib -Iblib/arch
 use POSIX 'dup2';
+#dup2 fileno(STDERR), fileno(STDOUT); # something's up with Perl::Types
 POSIX::dup2 fileno(STDERR), fileno(STDOUT);
 use Test::More tests => 7;
 use v5.38;

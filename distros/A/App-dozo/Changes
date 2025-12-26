@@ -1,5 +1,10 @@
 Revision history for Perl extension App-dozo
 
+0.9928 2025-12-25T13:41:29Z
+
+    - use Getopt::Long::Bash CPAN package instead of bundled submodule
+    - require getoptlong.sh 0.6.0+
+
 0.9927 2025-12-19T03:55:03Z
 
     - require bash 4.3+ and document in INSTALLATION

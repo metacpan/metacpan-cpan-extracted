@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::PruneFiles" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.62",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
@@ -105,9 +105,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "EV" : "0"
-         },
          "requires" : {
             "AnyEvent" : "0",
             "Capture::Tiny" : "0",
@@ -125,7 +122,6 @@
       },
       "test" : {
          "requires" : {
-            "EV" : "0",
             "Test2::V0" : "0.000121",
             "perl" : "5.010"
          }
@@ -143,15 +139,15 @@
          "web" : "https://github.com/uperl/AnyEvent-FTP"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Ryo Okamoto",
       "Shlomi Fish",
       "Jos\u00e9 Joaqu\u00edn Atria"
    ],
-   "x_generated_by_perl" : "v5.35.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

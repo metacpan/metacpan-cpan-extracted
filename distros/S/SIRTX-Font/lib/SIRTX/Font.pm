@@ -1,4 +1,3 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
 # Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
@@ -92,7 +91,7 @@ my %_char_lists = (
 $_char_lists{'cp-858'} = [map {$_ == 0x0131 ? 0x20AC : $_} @{$_char_lists{'cp-850'}}];
 
 {
-    my %important = map {$_ => undef} (0xFFFD); # initial values
+    my %important = map {$_ => undef} (0x25B2, 0x25BC, 0xFFFC, 0xFFFD); # initial values
 
     foreach my $list (qw(ascii dec-mcs dec-sg sirtx-characters)) {
         $important{$_} = undef foreach @{$_char_lists{$list}};
@@ -177,7 +176,7 @@ $_default_alias_lists{'common-all'} = {
     0x00A0 => 0x0020, # NO-BREAK SPACE      -> SPACE
 };
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 
 
@@ -704,7 +703,7 @@ SIRTX::Font - module for working with SIRTX font files
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -1054,11 +1053,11 @@ Renders a text using the loaded font.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

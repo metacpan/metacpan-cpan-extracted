@@ -59,7 +59,7 @@
    "provides" : {
       "App::optex::up" : {
          "file" : "lib/App/optex/up.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-up"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

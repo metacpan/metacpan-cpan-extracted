@@ -23,12 +23,17 @@ terminal width divided by the pane width (default 85 characters).
 Both stdout and stderr are merged and passed through the filter, so
 error messages are also displayed in the multi-column paged output.
 
-The pager command is taken from the `$PAGER` environment variable if
-set, otherwise defaults to `less`.  When using `less`, `-F +Gg`
-options are automatically appended.  `-F` causes `less` to exit
-immediately if the output fits on one screen.  `+Gg` causes `less`
-to read all input before displaying, which may take time for large
-output, but prevents empty trailing pages from being shown.
+The pager command is taken from the `NUP_PAGER` environment variable
+if set, otherwise defaults to `less -F +Gg`.  The environment
+variable is named after the [nup](https://metacpan.org/pod/nup) command, a wrapper for this
+module.  The `PAGER` variable is not used to avoid an infinite loop
+when `PAGER` is set to `nup`.  Use the `--pager` option to specify
+a different pager on the command line.
+
+The `-F` option causes `less` to exit immediately if the output
+fits on one screen.  `+Gg` causes `less` to read all input before
+displaying, which may take time for large output, but prevents empty
+trailing pages from being shown.
 
 # OPTIONS
 
@@ -68,7 +73,7 @@ Module options must be specified before `--` separator.
 
 - **--pager**=_COMMAND_
 
-    Set the pager command.  Default is `$PAGER` or `less`.
+    Set the pager command.  Default is `NUP_PAGER` or `less -F +Gg`.
 
 - **--no-pager**
 

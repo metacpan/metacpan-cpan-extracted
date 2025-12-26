@@ -26,8 +26,8 @@ my $bad_stderr = do { local $/; <$bad_err> } // '';
 waitpid($bad_pid, 0);
 my $bad_exit = $? >> 8;
 
-is($bad_exit, 2, 'invalid --argjson input exits with code 2');
-like($bad_stderr, qr/Failed to parse JSON for --argjson cfg/i, 'error message is surfaced for invalid JSON');
+is($bad_exit, 5, 'invalid --argjson input exits with usage code');
+like($bad_stderr, qr/^\[USAGE\]\s*invalid JSON for --argjson cfg/i, 'error message is surfaced for invalid JSON');
 unlike($bad_stderr, qr/Unknown option\(s\)/i, 'no secondary unknown option errors are emitted');
 is($bad_stdout, '', 'no output is produced when --argjson fails');
 

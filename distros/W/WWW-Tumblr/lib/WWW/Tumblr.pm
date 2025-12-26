@@ -3,7 +3,7 @@ package WWW::Tumblr;
 use strict;
 use warnings;
 
-our $VERSION = '5.3';
+our $VERSION = '5.4';
 
 =pod
 
@@ -13,7 +13,7 @@ WWW::Tumblr - Perl bindings for the Tumblr API
 
 =head1 VERSION
 
-5.00
+5.4
 
 =head1 SYNOPSIS
 
@@ -167,6 +167,8 @@ Foundation at L<http://donate.perlfoundation.org/>.
 use Moose;
 use Carp;
 use Data::Dumper;
+use JSON 'decode_json';
+use Encode 'encode_utf8';
 use HTTP::Request::Common;
 use Net::OAuth::Client;
 use WWW::Tumblr::API;
@@ -191,9 +193,9 @@ has 'oauth',            is => 'rw', isa => 'Net::OAuth::Client', default => sub 
 	Net::OAuth::Client->new(
 		$self->consumer_key,
 		$self->secret_key,
-		request_token_path => 'http://www.tumblr.com/oauth/request_token',
-		authorize_path => 'http://www.tumblr.com/oauth/authorize',
-		access_token_path => 'http://www.tumblr.com/oauth/access_token',
+		request_token_path => 'https://www.tumblr.com/oauth/request_token',
+		authorize_path => 'https://www.tumblr.com/oauth/authorize',
+		access_token_path => 'https://www.tumblr.com/oauth/access_token',
 		callback => $self->callback,
 		session => sub { if (@_ > 1) { $self->_session($_[0] => $_[1]) }; return $self->_session($_[0]) },
 	);
@@ -226,12 +228,21 @@ sub tagged {
     my $self = shift;
     my $args = { @_ };
 
-    return $self->_tumblr_api_request({
+    my $response = $self->_tumblr_api_request({
         auth => 'apikey',
         http_method => 'GET',
         url_path => 'tagged',
         extra_args => $args,
     });
+
+    if ( $response->is_success ) {
+        return decode_json($response->decoded_content)->{response};
+    } else {
+        $self->error( WWW::Tumblr::ResponseError->new(
+            response => $response
+        ));
+        return;
+    }
 }
 
 sub oauth_tools {
@@ -267,7 +278,7 @@ sub _none_request {
             $method, $url_path, $params
         );
         $req = HTTP::Request->new(
-            $method => 'http://api.tumblr.com/v2/' . $url_path,
+            $method => 'https://api.tumblr.com/v2/' . $url_path,
             [ Accept => 'application/json', Authorization => $request->to_authorization_header ]
         );
 
@@ -293,7 +304,7 @@ sub _apikey_request {
     my $req; # request object
     if ( $method eq 'GET' ) {
         $req = HTTP::Request->new(
-            $method => 'http://api.tumblr.com/v2/' . $url_path . '?api_key='.$self->consumer_key . '&' .
+            $method => 'https://api.tumblr.com/v2/' . $url_path . '?api_key='.$self->consumer_key . '&' .
             ( join '&', map { $_ .'='. $params->{ $_} } keys %$params )
         );
     } elsif ( $method eq 'POST' ) {
@@ -315,7 +326,7 @@ sub _oauth_request_sign {
     my $request = $self->oauth->_make_request(
         'protected resource',
         request_method => uc $method,
-        request_url => 'http://api.tumblr.com/v2/' . $url_path,
+        request_url => 'https://api.tumblr.com/v2/' . $url_path,
         consumer_key => $self->consumer_key,
         consumer_secret => $self->secret_key,
         token => $self->token,
@@ -342,9 +353,14 @@ sub _oauth_request {
 
     my $message;
     if ( $method eq 'GET' ) {
-        $message = GET 'http://api.tumblr.com/v2/' . $url_path . '?' . $request->normalized_message_parameters, 'Authorization' => $authorization_header;
+        $message = GET 'https://api.tumblr.com/v2/' . $url_path . '?' . $request->normalized_message_parameters, 'Authorization' => $authorization_header;
     } elsif ( $method eq 'POST' ) {
-        $message = POST('http://api.tumblr.com/v2/' . $url_path,
+        # Encode string parameters to UTF-8 bytes (fixes UTF-8 posting, PR #15)
+        for my $key ( keys %$params ) {
+            next unless defined $params->{$key} && !ref($params->{$key});
+            $params->{$key} = encode_utf8($params->{$key});
+        }
+        $message = POST('https://api.tumblr.com/v2/' . $url_path,
             Content_Type => 'form-data',
             Authorization => $authorization_header,
             Content => [

@@ -1,3 +1,27 @@
+5.4 - Thu 26 Dec 2024
+  - Modernization and security updates:
+    - Changed all API URLs from HTTP to HTTPS
+    - Changed all OAuth URLs from HTTP to HTTPS
+    - Fixed POD version number mismatch
+    - Added proper Carp imports to Blog.pm and User.pm
+    - Fixed ResponseError to handle non-JSON responses gracefully
+    - Fixed Authentication::OAuth mixed inheritance (use base + extends)
+    - Updated test URLs: replaced dead lorempixel/quotesondesign APIs
+    - Updated metacpan API URL to fastapi.metacpan.org
+    - Fixed tagged() method to return decoded JSON instead of HTTP::Response
+    - Updated follow/unfollow tests to use staff.tumblr.com (old blog deleted)
+    - Fixed UTF-8 posting: encode params to bytes before POST (PR #15)
+    - Fixed post_reblog() - was broken, now works for all post types (issue #7)
+    - Added rate limit handling for CPAN Testers (issue #17):
+      - Added is_rate_limited() method to ResponseError
+      - Tests now gracefully skip when rate limit is hit
+      - Added TUMBLR_SKIP_POSTING_TESTS env var to skip posting tests
+      - Added TUMBLR_SKIP_LIVE_TESTS env var to skip all live API tests
+    - Documented image format limitations (issue #18):
+      - Legacy API only supports JPEG/PNG/GIF (not WebP)
+      - NPF support noted as future enhancement
+    - Security: Require Net::OAuth::Client >= 0.30 for CVE-2025-22376 (issue #19)
+
 5.3 - Sat 06 Apr 2019 03:31:37 PM CEST
   - Let's not get ahead ourselves.
   - Addressing changes on Tumblr API. Please see:

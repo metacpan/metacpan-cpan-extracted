@@ -13,7 +13,7 @@ use Capture::Tiny qw( capture );
 extends 'AnyEvent::FTP::Server::Context::FS';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::TransferPrep';
@@ -364,7 +364,7 @@ AnyEvent::FTP::Server::Context::FSRW - FTP Server client context class with full
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -430,7 +430,7 @@ José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017-2021 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

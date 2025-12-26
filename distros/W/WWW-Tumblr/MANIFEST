@@ -2,6 +2,7 @@ AUTHORS
 Changes
 examples/oauth_1.cgi
 examples/oauth_2.cgi
+examples/verify_api.pl
 lib/WWW/Tumblr.pm
 lib/WWW/Tumblr/API.pm
 lib/WWW/Tumblr/Authentication.pm
