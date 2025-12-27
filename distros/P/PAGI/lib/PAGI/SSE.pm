@@ -21,7 +21,12 @@ sub new {
     croak "PAGI::SSE requires scope type 'sse', got '$scope->{type}'"
         unless ($scope->{type} // '') eq 'sse';
 
-    return bless {
+    # Return existing SSE object if one was already created for this scope
+    # This ensures consistent state (is_started, is_closed, callbacks) if
+    # multiple code paths create SSE objects from the same scope.
+    return $scope->{'pagi.sse'} if $scope->{'pagi.sse'};
+
+    my $self = bless {
         scope     => $scope,
         receive   => $receive,
         send      => $send,
@@ -29,6 +34,12 @@ sub new {
         _on_close => [],
         _on_error => [],
     }, $class;
+
+    # Cache in scope for reuse (weakened to avoid circular reference leak)
+    $scope->{'pagi.sse'} = $self;
+    Scalar::Util::weaken($scope->{'pagi.sse'});
+
+    return $self;
 }
 
 # Scope property accessors
@@ -185,18 +196,18 @@ sub header {
     return $value;
 }
 
-# All headers as Hash::MultiValue (cached)
+# All headers as Hash::MultiValue (cached in scope)
 sub headers {
     my $self = shift;
-    return $self->{_headers} if $self->{_headers};
+    return $self->{scope}{'pagi.request.headers'} if $self->{scope}{'pagi.request.headers'};
 
     my @pairs;
     for my $pair (@{$self->{scope}{headers} // []}) {
         push @pairs, lc($pair->[0]), $pair->[1];
     }
 
-    $self->{_headers} = Hash::MultiValue->new(@pairs);
-    return $self->{_headers};
+    $self->{scope}{'pagi.request.headers'} = Hash::MultiValue->new(@pairs);
+    return $self->{scope}{'pagi.request.headers'};
 }
 
 # All values for a header
@@ -631,6 +642,12 @@ Creates a new SSE wrapper. Requires:
 =back
 
 Dies if scope type is not 'sse'.
+
+B<Singleton pattern:> The SSE object is cached in C<< $scope->{'pagi.sse'} >>.
+If you call C<new()> multiple times with the same scope, you get the same
+SSE object back. This ensures consistent state (is_started, is_closed,
+callbacks) across multiple code paths that may create SSE objects from
+the same scope.
 
 =head1 SCOPE ACCESSORS
 

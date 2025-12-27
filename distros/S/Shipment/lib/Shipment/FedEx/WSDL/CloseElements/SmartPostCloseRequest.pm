@@ -1,22 +1,22 @@
 
 package Shipment::FedEx::WSDL::CloseElements::SmartPostCloseRequest;
-$Shipment::FedEx::WSDL::CloseElements::SmartPostCloseRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::CloseElements::SmartPostCloseRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' }
+    sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
-__PACKAGE__->__set_name('SmartPostCloseRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest
-);
+    __PACKAGE__->__set_name('SmartPostCloseRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::CloseElements::SmartPostCloseRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

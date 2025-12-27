@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::BookingQuote;
-$Shipment::Temando::WSDL::Types::BookingQuote::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::BookingQuote::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,126 +24,114 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %totalPrice_of :ATTR(:get<totalPrice>);
-my %basePrice_of :ATTR(:get<basePrice>);
-my %tax_of :ATTR(:get<tax>);
-my %currency_of :ATTR(:get<currency>);
-my %deliveryMethod_of :ATTR(:get<deliveryMethod>);
-my %etaFrom_of :ATTR(:get<etaFrom>);
-my %etaTo_of :ATTR(:get<etaTo>);
-my %guaranteedEta_of :ATTR(:get<guaranteedEta>);
-my %carrierId_of :ATTR(:get<carrierId>);
-my %extras_of :ATTR(:get<extras>);
+    my %totalPrice_of     : ATTR(:get<totalPrice>);
+    my %basePrice_of      : ATTR(:get<basePrice>);
+    my %tax_of            : ATTR(:get<tax>);
+    my %currency_of       : ATTR(:get<currency>);
+    my %deliveryMethod_of : ATTR(:get<deliveryMethod>);
+    my %etaFrom_of        : ATTR(:get<etaFrom>);
+    my %etaTo_of          : ATTR(:get<etaTo>);
+    my %guaranteedEta_of  : ATTR(:get<guaranteedEta>);
+    my %carrierId_of      : ATTR(:get<carrierId>);
+    my %extras_of         : ATTR(:get<extras>);
 
-__PACKAGE__->_factory(
-    [ qw(        totalPrice
-        basePrice
-        tax
-        currency
-        deliveryMethod
-        etaFrom
-        etaTo
-        guaranteedEta
-        carrierId
-        extras
+    __PACKAGE__->_factory(
+        [   qw(        totalPrice
+              basePrice
+              tax
+              currency
+              deliveryMethod
+              etaFrom
+              etaTo
+              guaranteedEta
+              carrierId
+              extras
 
-    ) ],
-    {
-        'totalPrice' => \%totalPrice_of,
-        'basePrice' => \%basePrice_of,
-        'tax' => \%tax_of,
-        'currency' => \%currency_of,
-        'deliveryMethod' => \%deliveryMethod_of,
-        'etaFrom' => \%etaFrom_of,
-        'etaTo' => \%etaTo_of,
-        'guaranteedEta' => \%guaranteedEta_of,
-        'carrierId' => \%carrierId_of,
-        'extras' => \%extras_of,
-    },
-    {
-        'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'basePrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'tax' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'currency' => 'Shipment::Temando::WSDL::Types::CurrencyType',
-        'deliveryMethod' => 'Shipment::Temando::WSDL::Types::DeliveryMethod',
-        'etaFrom' => 'Shipment::Temando::WSDL::Types::Eta',
-        'etaTo' => 'Shipment::Temando::WSDL::Types::Eta',
-        'guaranteedEta' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'carrierId' => 'Shipment::Temando::WSDL::Types::CarrierId',
+            )
+        ],
+        {   'totalPrice'     => \%totalPrice_of,
+            'basePrice'      => \%basePrice_of,
+            'tax'            => \%tax_of,
+            'currency'       => \%currency_of,
+            'deliveryMethod' => \%deliveryMethod_of,
+            'etaFrom'        => \%etaFrom_of,
+            'etaTo'          => \%etaTo_of,
+            'guaranteedEta'  => \%guaranteedEta_of,
+            'carrierId'      => \%carrierId_of,
+            'extras'         => \%extras_of,
+        },
+        {   'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'basePrice'  => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'tax'        => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'currency'   => 'Shipment::Temando::WSDL::Types::CurrencyType',
+            'deliveryMethod' =>
+              'Shipment::Temando::WSDL::Types::DeliveryMethod',
+            'etaFrom'       => 'Shipment::Temando::WSDL::Types::Eta',
+            'etaTo'         => 'Shipment::Temando::WSDL::Types::Eta',
+            'guaranteedEta' => 'Shipment::Temando::WSDL::Types::YesNoOption',
+            'carrierId'     => 'Shipment::Temando::WSDL::Types::CarrierId',
 
-        'extras' => 'Shipment::Temando::WSDL::Types::BookingQuote::_extras',
-    },
-    {
+            'extras' =>
+              'Shipment::Temando::WSDL::Types::BookingQuote::_extras',
+        },
+        {
 
-        'totalPrice' => 'totalPrice',
-        'basePrice' => 'basePrice',
-        'tax' => 'tax',
-        'currency' => 'currency',
-        'deliveryMethod' => 'deliveryMethod',
-        'etaFrom' => 'etaFrom',
-        'etaTo' => 'etaTo',
-        'guaranteedEta' => 'guaranteedEta',
-        'carrierId' => 'carrierId',
-        'extras' => 'extras',
-    }
-);
+            'totalPrice'     => 'totalPrice',
+            'basePrice'      => 'basePrice',
+            'tax'            => 'tax',
+            'currency'       => 'currency',
+            'deliveryMethod' => 'deliveryMethod',
+            'etaFrom'        => 'etaFrom',
+            'etaTo'          => 'etaTo',
+            'guaranteedEta'  => 'guaranteedEta',
+            'carrierId'      => 'carrierId',
+            'extras'         => 'extras',
+        }
+    );
 
-} # end BLOCK
-
-
+}    # end BLOCK
 
 
 package Shipment::Temando::WSDL::Types::BookingQuote::_extras;
-$Shipment::Temando::WSDL::Types::BookingQuote::_extras::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::BookingQuote::_extras::VERSION = '3.11';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %extra_of :ATTR(:get<extra>);
-
-__PACKAGE__->_factory(
-    [ qw(        extra
-
-    ) ],
-    {
-        'extra' => \%extra_of,
-    },
-    {
-        'extra' => 'Shipment::Temando::WSDL::Types::Extra',
-    },
-    {
-
-        'extra' => 'extra',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %extra_of : ATTR(:get<extra>);
 
+        __PACKAGE__->_factory(
+            [   qw(        extra
+
+                )
+            ],
+            {'extra' => \%extra_of,},
+            {'extra' => 'Shipment::Temando::WSDL::Types::Extra',},
+            {
+
+                'extra' => 'extra',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
-
-
-
 
 
 1;
@@ -156,7 +148,7 @@ Shipment::Temando::WSDL::Types::BookingQuote
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

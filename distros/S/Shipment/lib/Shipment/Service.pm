@@ -1,5 +1,5 @@
 package Shipment::Service;
-$Shipment::Service::VERSION = '3.10';
+$Shipment::Service::VERSION = '3.11';
 use strict;
 use warnings;
 
@@ -7,53 +7,53 @@ use warnings;
 use Data::Currency;
 use Scalar::Util qw/blessed/;
 use Moo;
-use MooX::Types::MooseLike::Base qw(:all);
+use MooX::Types::MooseLike::Base     qw(:all);
 use MooX::Types::MooseLike::DateTime qw( DateAndTime );
-use Shipment::Base qw/coerce_datetime/;
+use Shipment::Base;
 use namespace::clean;
 
 
 has 'id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 has 'carrier_id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'name' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 has 'carrier_name' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 has 'service_name' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'package' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Package'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Package'],
 );
 
 
 has 'etd' => (
-  is => 'rw',
-  isa => Num,
+    is  => 'rw',
+    isa => Num,
 );
 
 has 'pickup_etd' => (
-  is => 'rw',
-  isa => Num,
+    is  => 'rw',
+    isa => Num,
 );
 
 
@@ -72,54 +72,54 @@ has 'eta' => (
 
 
 has 'guaranteed' => (
-  is => 'rw',
-  isa => Bool,
-  default => 0,
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 
 has 'cost' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 has 'base_cost' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 has 'tax' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 
 has 'extra_charges' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 has 'adjustments' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 
 has 'options' => (
-  is => 'rw',
-  isa => HashRef[Str],
+    is  => 'rw',
+    isa => HashRef [Str],
 );
 
 
 has 'extras' => (
-  is => 'rw',
-  isa => HashRef[InstanceOf['Shipment::Service']],
-  default => sub { {} },
+    is      => 'rw',
+    isa     => HashRef [InstanceOf ['Shipment::Service']],
+    default => sub { {} },
 );
 
 
@@ -143,7 +143,7 @@ Shipment::Service
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

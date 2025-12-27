@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityContent;
-$Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityContent::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityContent::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,39 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Description_of :ATTR(:get<Description>);
-my %Quantity_of :ATTR(:get<Quantity>);
-my %Options_of :ATTR(:get<Options>);
+    my %Description_of : ATTR(:get<Description>);
+    my %Quantity_of    : ATTR(:get<Quantity>);
+    my %Options_of     : ATTR(:get<Options>);
 
-__PACKAGE__->_factory(
-    [ qw(        Description
-        Quantity
-        Options
+    __PACKAGE__->_factory(
+        [   qw(        Description
+              Quantity
+              Options
 
-    ) ],
-    {
-        'Description' => \%Description_of,
-        'Quantity' => \%Quantity_of,
-        'Options' => \%Options_of,
-    },
-    {
-        'Description' => 'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityDescription',
-        'Quantity' => 'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityQuantityDetail',
-        'Options' => 'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityOptionDetail',
-    },
-    {
+            )
+        ],
+        {   'Description' => \%Description_of,
+            'Quantity'    => \%Quantity_of,
+            'Options'     => \%Options_of,
+        },
+        {   'Description' =>
+              'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityDescription',
+            'Quantity' =>
+              'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityQuantityDetail',
+            'Options' =>
+              'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityOptionDetail',
+        },
+        {
 
-        'Description' => 'Description',
-        'Quantity' => 'Quantity',
-        'Options' => 'Options',
-    }
-);
+            'Description' => 'Description',
+            'Quantity'    => 'Quantity',
+            'Options'     => 'Options',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +69,7 @@ Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityContent
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

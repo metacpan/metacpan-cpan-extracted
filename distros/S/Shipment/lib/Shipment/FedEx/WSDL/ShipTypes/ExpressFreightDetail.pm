@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ExpressFreightDetail;
-$Shipment::FedEx::WSDL::ShipTypes::ExpressFreightDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::ExpressFreightDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,39 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PackingListEnclosed_of :ATTR(:get<PackingListEnclosed>);
-my %ShippersLoadAndCount_of :ATTR(:get<ShippersLoadAndCount>);
-my %BookingConfirmationNumber_of :ATTR(:get<BookingConfirmationNumber>);
+    my %PackingListEnclosed_of       : ATTR(:get<PackingListEnclosed>);
+    my %ShippersLoadAndCount_of      : ATTR(:get<ShippersLoadAndCount>);
+    my %BookingConfirmationNumber_of : ATTR(:get<BookingConfirmationNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        PackingListEnclosed
-        ShippersLoadAndCount
-        BookingConfirmationNumber
+    __PACKAGE__->_factory(
+        [   qw(        PackingListEnclosed
+              ShippersLoadAndCount
+              BookingConfirmationNumber
 
-    ) ],
-    {
-        'PackingListEnclosed' => \%PackingListEnclosed_of,
-        'ShippersLoadAndCount' => \%ShippersLoadAndCount_of,
-        'BookingConfirmationNumber' => \%BookingConfirmationNumber_of,
-    },
-    {
-        'PackingListEnclosed' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'ShippersLoadAndCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'BookingConfirmationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'PackingListEnclosed'       => \%PackingListEnclosed_of,
+            'ShippersLoadAndCount'      => \%ShippersLoadAndCount_of,
+            'BookingConfirmationNumber' => \%BookingConfirmationNumber_of,
+        },
+        {   'PackingListEnclosed' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'ShippersLoadAndCount' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+            'BookingConfirmationNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'PackingListEnclosed' => 'PackingListEnclosed',
-        'ShippersLoadAndCount' => 'ShippersLoadAndCount',
-        'BookingConfirmationNumber' => 'BookingConfirmationNumber',
-    }
-);
+            'PackingListEnclosed'       => 'PackingListEnclosed',
+            'ShippersLoadAndCount'      => 'ShippersLoadAndCount',
+            'BookingConfirmationNumber' => 'BookingConfirmationNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +69,7 @@ Shipment::FedEx::WSDL::ShipTypes::ExpressFreightDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

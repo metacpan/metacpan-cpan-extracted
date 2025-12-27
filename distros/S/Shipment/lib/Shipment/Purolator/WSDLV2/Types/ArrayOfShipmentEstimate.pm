@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate::VERSION = '3.10';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,26 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ShipmentEstimate_of :ATTR(:get<ShipmentEstimate>);
+    my %ShipmentEstimate_of : ATTR(:get<ShipmentEstimate>);
 
-__PACKAGE__->_factory(
-    [ qw(        ShipmentEstimate
+    __PACKAGE__->_factory(
+        [   qw(        ShipmentEstimate
 
-    ) ],
-    {
-        'ShipmentEstimate' => \%ShipmentEstimate_of,
-    },
-    {
-        'ShipmentEstimate' => 'Shipment::Purolator::WSDLV2::Types::ShipmentEstimate',
-    },
-    {
+            )
+        ],
+        {'ShipmentEstimate' => \%ShipmentEstimate_of,},
+        {   'ShipmentEstimate' =>
+              'Shipment::Purolator::WSDLV2::Types::ShipmentEstimate',
+        },
+        {
 
-        'ShipmentEstimate' => 'ShipmentEstimate',
-    }
-);
+            'ShipmentEstimate' => 'ShipmentEstimate',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +56,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfShipmentEstimate
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::DestinationControlDetail;
-$Shipment::FedEx::WSDL::RateTypes::DestinationControlDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::DestinationControlDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,38 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %StatementTypes_of :ATTR(:get<StatementTypes>);
-my %DestinationCountries_of :ATTR(:get<DestinationCountries>);
-my %EndUser_of :ATTR(:get<EndUser>);
+    my %StatementTypes_of       : ATTR(:get<StatementTypes>);
+    my %DestinationCountries_of : ATTR(:get<DestinationCountries>);
+    my %EndUser_of              : ATTR(:get<EndUser>);
 
-__PACKAGE__->_factory(
-    [ qw(        StatementTypes
-        DestinationCountries
-        EndUser
+    __PACKAGE__->_factory(
+        [   qw(        StatementTypes
+              DestinationCountries
+              EndUser
 
-    ) ],
-    {
-        'StatementTypes' => \%StatementTypes_of,
-        'DestinationCountries' => \%DestinationCountries_of,
-        'EndUser' => \%EndUser_of,
-    },
-    {
-        'StatementTypes' => 'Shipment::FedEx::WSDL::RateTypes::DestinationControlStatementType',
-        'DestinationCountries' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'EndUser' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'StatementTypes'       => \%StatementTypes_of,
+            'DestinationCountries' => \%DestinationCountries_of,
+            'EndUser'              => \%EndUser_of,
+        },
+        {   'StatementTypes' =>
+              'Shipment::FedEx::WSDL::RateTypes::DestinationControlStatementType',
+            'DestinationCountries' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'EndUser' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'StatementTypes' => 'StatementTypes',
-        'DestinationCountries' => 'DestinationCountries',
-        'EndUser' => 'EndUser',
-    }
-);
+            'StatementTypes'       => 'StatementTypes',
+            'DestinationCountries' => 'DestinationCountries',
+            'EndUser'              => 'EndUser',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +68,7 @@ Shipment::FedEx::WSDL::RateTypes::DestinationControlDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

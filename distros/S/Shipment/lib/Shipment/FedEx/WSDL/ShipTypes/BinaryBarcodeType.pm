@@ -1,14 +1,13 @@
 package Shipment::FedEx::WSDL::ShipTypes::BinaryBarcodeType;
-$Shipment::FedEx::WSDL::ShipTypes::BinaryBarcodeType::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::BinaryBarcodeType::VERSION = '3.11';
 use strict;
 use warnings;
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9'};
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 # derivation by restriction
 use base qw(
-    SOAP::WSDL::XSD::Typelib::Builtin::string);
-
+  SOAP::WSDL::XSD::Typelib::Builtin::string);
 
 
 1;
@@ -25,7 +24,7 @@ Shipment::FedEx::WSDL::ShipTypes::BinaryBarcodeType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

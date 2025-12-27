@@ -5,16 +5,22 @@ use warnings;
 
 use Carp;
 use YAML::Syck;
-use File::Slurp;
 
 require Exporter;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 our @ISA = qw(Exporter);
 our @EXPORT = qw(mimetype);
 
-my $lines = read_file(\*DATA);
-my $yaml = Load($lines);
+# Lazy-loaded MIME type lookup table
+my $yaml;
+
+sub _load_mime_table {
+	return if $yaml;
+	local $/;
+	my $data = <DATA>;
+	$yaml = Load($data);
+}
 
 sub mimetype {
 	my ($filename) = shift;
@@ -22,12 +28,16 @@ sub mimetype {
 	croak "No filename passed to mimetype()" unless $filename;
 	croak "Unable to read file: $filename" if -d $filename or ! -r $filename;
 	
-	my $mimetype = q{}; #until proven otherwise!
+	my $mimetype;
 	# if platform -> windows
 	if($^O =~ m!MSWin32!i) {
 		return _find_mimetype_by_table($filename);
 	} else {
-    	$mimetype = `file --mime -br $filename`;
+    	# Use safe pipe open to avoid shell injection
+    	if (open(my $fh, '-|', 'file', '--mime', '-br', $filename)) {
+    		$mimetype = <$fh>;
+    		close($fh);
+    	}
 		unless($mimetype) {
 			return _find_mimetype_by_table($filename);
 		}
@@ -36,18 +46,17 @@ sub mimetype {
 	chomp $mimetype;
 	
 	$mimetype =~ s/[;,\s]+.*$//;
-	return $mimetype;
+	return $mimetype || undef;
 }
 
 sub _find_mimetype_by_table {
 	my($filename) = shift;
-	my $mimetype = q{};
-	# getting extension. this is SIMPLE implementation, isn't it? :)
-	my($ext) = $filename =~ /.+\.(.+?)$/;
-	# my $ext = pop @{[split /\./, $filename]};
-	return $mimetype unless $ext;
+	_load_mime_table();
+	# Extract extension: everything after the last dot
+	my($ext) = $filename =~ /\.([^.]+)$/;
+	return undef unless $ext;
 	return $yaml->{lc $ext} if(exists $yaml->{lc $ext});
-	return $mimetype;
+	return undef;
 }
 
 1;
@@ -74,15 +83,16 @@ inspired on Matt Aimonetti's mimetype-fu used on Ruby and the Rails world.
 =head2 mimetype( $filename )
 
 C<mimetype> is exported by default. It receives a parameter, the file
-path. It returns an string containing the mime type for the file.
+path. It returns a string containing the mime type for the file, or
+C<undef> if the type cannot be determined.
 
 =head1 AUTHOR
 
-David Moreno &lt;david@axiombox.com&gt;.
+David Moreno &lt;damog@damog.net&gt;.
 
 =head1 LICENSE
 
-Copyright 2009 David Moreno.
+Copyright 2009-2025 David Moreno.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
@@ -869,3 +879,45 @@ z: application/x-compressed
 zabw: application/x-abiword
 zip: application/zip
 zoo: application/x-zoo
+# Modern MIME types (added 2025)
+apng: image/apng
+avif: image/avif
+cjs: application/node
+cts: text/typescript
+eot: application/vnd.ms-fontobject
+flac: audio/flac
+geojson: application/geo+json
+heic: image/heic
+heif: image/heif
+jxl: image/jxl
+json: application/json
+jsonld: application/ld+json
+jsx: text/jsx
+kt: text/x-kotlin
+kts: text/x-kotlin
+m3u8: application/vnd.apple.mpegurl
+map: application/json
+markdown: text/markdown
+md: text/markdown
+mjs: text/javascript
+mkd: text/markdown
+mts: text/typescript
+opus: audio/opus
+otf: font/otf
+pptx: application/vnd.openxmlformats-officedocument.presentationml.presentation
+rs: text/rust
+scss: text/x-scss
+sass: text/x-sass
+svelte: text/x-svelte
+swift: text/x-swift
+toml: application/toml
+ts: text/typescript
+tsx: text/tsx
+vue: text/x-vue
+wasm: application/wasm
+webm: video/webm
+webp: image/webp
+woff: font/woff
+woff2: font/woff2
+xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+docx: application/vnd.openxmlformats-officedocument.wordprocessingml.document

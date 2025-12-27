@@ -1,5 +1,5 @@
 Name:           perl-Time-HiRes-Sleep-Until
-Version:        0.09
+Version:        0.10
 Release:        1%{?dist}
 Summary:        Perl library which provides common ways to sleep until
 License:        MIT

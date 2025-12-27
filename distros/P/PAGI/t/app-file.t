@@ -488,8 +488,10 @@ subtest 'Security: URL-encoded traversal blocked' => sub {
 # =============================================================================
 subtest 'Large file streaming' => sub {
     # Create a temp directory with a large file
+    # Size is 65KB - just over the 64KB sync_file_threshold to trigger async path
+    # Kept small to minimize buffer pressure on constrained CI environments (e.g., FreeBSD)
     my $test_dir = File::Temp::tempdir(CLEANUP => 1);
-    my $large_content = "X" x (256 * 1024);  # 256KB file
+    my $large_content = "X" x (65 * 1024);  # 65KB file (exceeds 64KB threshold)
     open my $fh, '>', "$test_dir/large.bin" or die;
     print $fh $large_content;
     close $fh;
@@ -515,8 +517,9 @@ subtest 'Large file streaming' => sub {
 # Test: Large file Range request streaming
 # =============================================================================
 subtest 'Large file Range request' => sub {
+    # Size is 65KB - just over the 64KB sync_file_threshold to trigger async path
     my $test_dir = File::Temp::tempdir(CLEANUP => 1);
-    my $large_content = "X" x (256 * 1024);  # 256KB file
+    my $large_content = "X" x (65 * 1024);  # 65KB file (exceeds 64KB threshold)
     open my $fh, '>', "$test_dir/large.bin" or die;
     print $fh $large_content;
     close $fh;
@@ -537,6 +540,55 @@ subtest 'Large file Range request' => sub {
     is(length($response->content), 1001, 'Partial content length correct');
     is($response->content, substr($large_content, 1000, 1001), 'Partial content matches');
     like($response->header('Content-Range'), qr/bytes 1000-2000\/\d+/, 'Has Content-Range header');
+
+    $loop->remove($http);
+    $server->shutdown->get;
+    $loop->remove($server);
+};
+
+# =============================================================================
+# Test: handle_ranges => 0 ignores Range header
+# =============================================================================
+subtest 'handle_ranges => 0 ignores Range header' => sub {
+    my $server = create_server(app_opts => { handle_ranges => 0 });
+    my $port = $server->port;
+
+    my $http = Net::Async::HTTP->new;
+    $loop->add($http);
+
+    # Send Range header, but should get full file (200) not partial (206)
+    my $response = $http->GET(
+        "http://127.0.0.1:$port/test.txt",
+        headers => ['Range' => 'bytes=0-4'],
+    )->get;
+
+    is($response->code, 200, 'With handle_ranges => 0, Range request returns 200 (not 206)');
+    ok(!$response->header('Content-Range'), 'No Content-Range header');
+    like($response->decoded_content, qr/Hello from PAGI/, 'Full file content returned');
+
+    $loop->remove($http);
+    $server->shutdown->get;
+    $loop->remove($server);
+};
+
+# =============================================================================
+# Test: handle_ranges => 1 (default) honors Range header
+# =============================================================================
+subtest 'handle_ranges => 1 (default) honors Range header' => sub {
+    my $server = create_server(app_opts => { handle_ranges => 1 });
+    my $port = $server->port;
+
+    my $http = Net::Async::HTTP->new;
+    $loop->add($http);
+
+    my $response = $http->GET(
+        "http://127.0.0.1:$port/test.txt",
+        headers => ['Range' => 'bytes=0-4'],
+    )->get;
+
+    is($response->code, 206, 'With handle_ranges => 1, Range request returns 206');
+    is($response->content, 'Hello', 'Returns first 5 bytes');
+    like($response->header('Content-Range'), qr/bytes 0-4\/\d+/, 'Has Content-Range header');
 
     $loop->remove($http);
     $server->shutdown->get;

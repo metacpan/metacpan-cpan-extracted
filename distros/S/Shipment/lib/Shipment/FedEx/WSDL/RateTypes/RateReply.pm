@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::RateReply;
-$Shipment::FedEx::WSDL::RateTypes::RateReply::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::RateReply::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,50 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %HighestSeverity_of :ATTR(:get<HighestSeverity>);
-my %Notifications_of :ATTR(:get<Notifications>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %RateReplyDetails_of :ATTR(:get<RateReplyDetails>);
+    my %HighestSeverity_of   : ATTR(:get<HighestSeverity>);
+    my %Notifications_of     : ATTR(:get<Notifications>);
+    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
+    my %Version_of           : ATTR(:get<Version>);
+    my %RateReplyDetails_of  : ATTR(:get<RateReplyDetails>);
 
-__PACKAGE__->_factory(
-    [ qw(        HighestSeverity
-        Notifications
-        TransactionDetail
-        Version
-        RateReplyDetails
+    __PACKAGE__->_factory(
+        [   qw(        HighestSeverity
+              Notifications
+              TransactionDetail
+              Version
+              RateReplyDetails
 
-    ) ],
-    {
-        'HighestSeverity' => \%HighestSeverity_of,
-        'Notifications' => \%Notifications_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'RateReplyDetails' => \%RateReplyDetails_of,
-    },
-    {
-        'HighestSeverity' => 'Shipment::FedEx::WSDL::RateTypes::NotificationSeverityType',
-        'Notifications' => 'Shipment::FedEx::WSDL::RateTypes::Notification',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::RateTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::RateTypes::VersionId',
-        'RateReplyDetails' => 'Shipment::FedEx::WSDL::RateTypes::RateReplyDetail',
-    },
-    {
+            )
+        ],
+        {   'HighestSeverity'   => \%HighestSeverity_of,
+            'Notifications'     => \%Notifications_of,
+            'TransactionDetail' => \%TransactionDetail_of,
+            'Version'           => \%Version_of,
+            'RateReplyDetails'  => \%RateReplyDetails_of,
+        },
+        {   'HighestSeverity' =>
+              'Shipment::FedEx::WSDL::RateTypes::NotificationSeverityType',
+            'Notifications' =>
+              'Shipment::FedEx::WSDL::RateTypes::Notification',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::RateTypes::VersionId',
+            'RateReplyDetails' =>
+              'Shipment::FedEx::WSDL::RateTypes::RateReplyDetail',
+        },
+        {
 
-        'HighestSeverity' => 'HighestSeverity',
-        'Notifications' => 'Notifications',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'RateReplyDetails' => 'RateReplyDetails',
-    }
-);
+            'HighestSeverity'   => 'HighestSeverity',
+            'Notifications'     => 'Notifications',
+            'TransactionDetail' => 'TransactionDetail',
+            'Version'           => 'Version',
+            'RateReplyDetails'  => 'RateReplyDetails',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +80,7 @@ Shipment::FedEx::WSDL::RateTypes::RateReply
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

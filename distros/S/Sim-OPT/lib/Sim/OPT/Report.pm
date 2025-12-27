@@ -1,9 +1,7 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti.
-# This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations, distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
 
 # use v5.20;
 use Exporter;
@@ -13,7 +11,7 @@ use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use Set::Intersection;
 use List::Compare;
 use IO::Tee;
@@ -24,6 +22,8 @@ use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
+use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 
 use Data::Dumper;
@@ -711,7 +711,8 @@ TTT
           }
         }
       }
-
+      
+      say $tee "IN RETRIEVE \$countinstance $countinstance";
       my @resfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] };
       if ( $retrievedata{$counttool} )
       {
@@ -761,7 +762,7 @@ TTT
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport];
                 @repdata = @$reportdata_ref; #say $tee "HERE REPDATA: " . dump( @repdata );
 
-
+                
                 my $countitem = 0;
                 foreach my $item ( @repdata )
                 {
@@ -782,7 +783,8 @@ TTT
                   my $howmuch = $datarep{howmuch};
                   my $where = $datarep{where};
                   my $what = $datarep{what};
-
+                  
+                  say $tee "IN RETRIEVE2 \$countinstance $countinstance";
                   $retstruct[$countcase][$countblock][ $countinstance ][$counttheme][$countreport][$countitem][$counttool] = $retfile;
                   print RETBLOCK "$retfile\n";
 
@@ -791,7 +793,9 @@ TTT
                     push ( @retcases, $retfile );
                     say RETLIST "$retfile";
                   }  @miditers = Sim::OPT::washn( @miditers );
-
+                  
+                  
+                  say $tee "IN RETRIEVE3 \$countinstance $countinstance";
                   if ( not ( $retfile ~~ @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
                   {
                     push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ,
@@ -1141,7 +1145,7 @@ sub newreport # This function retrieves the results of interest from the texts f
     push ( @repcases, $repfile );
     say REPLIST "$repfile";
   }
-
+  
   if ( not ( $repfile ~~ @{ $repstruct[$countcase][$countblock] } ) )
   {
     push ( @{ $repstruct[$countcase][$countblock] }, $repfile );
@@ -1219,6 +1223,7 @@ sub newreport # This function retrieves the results of interest from the texts f
       my $skip = $vals{$countvar}{$counttool}{skip};
       if ( not ( eval ( $skipsim{$counttool} )))
       {
+        say $tee "IN REPORT \$countinstance $countinstance";
         my $tooltype = $dowhat{simtools}{$counttool};
         foreach $ret_ref ( ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
         {
@@ -1239,6 +1244,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
           if ( $signalnewinstance == 1 )
           {
+            say $tee "IN REPORT2 \$countinstance $countinstance";
             push ( @{ $mergestruct[$countcase][$countblock][$countinstance] }, "$retfile " );
             $signalnewinstance--;
           }
@@ -1275,17 +1281,17 @@ sub newreport # This function retrieves the results of interest from the texts f
 
                 if ( $thisline =~ /^$textpattern/ )
                 {
-	          chomp $thisline;
+	                chomp $thisline;
 
                   $thisline =~ s/:\s/:/g;
                   $thisline =~ s/(\s+)/ /g;
                   $thisline =~ s/ /,/g;
-		  print REPFILE "$thisto,$thisline,";
-		  print $tee "SIMPLIFIEDREPORT: $thisto,$thisline,";
-		}
+		              print REPFILE "$thisto,$thisline,";
+		              print $tee "SIMPLIFIEDREPORT: $thisto,$thisline,";
+		            }
               }
 
-	      $line =~ s/^(\s+)//;
+	            $line =~ s/^(\s+)//;
               $line =~ s/:\s/:/g;
               $line =~ s/(\s+)/ /g;
               my @elts = split( " ", $line );
@@ -1331,6 +1337,7 @@ sub newreport # This function retrieves the results of interest from the texts f
                   chomp( $line );
                   if ( $foundhit == 0 )
                   {
+                    say $tee "IN REPORT3 \$countinstance $countinstance";
                     unless ( $reportstrategy eq "new" )
                     {
                       push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
@@ -1342,6 +1349,7 @@ sub newreport # This function retrieves the results of interest from the texts f
                   }
                   else
                   {
+                    say $tee "IN REPORT4 \$countinstance $countinstance";
                     unless ( $reportstrategy eq "new" )
                     {
                       push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
@@ -1451,6 +1459,7 @@ sub newreport # This function retrieves the results of interest from the texts f
     unless ( $dowhat{inactivateret} eq "y" )
     {
       my $count = 0;
+      say $tee "IN REPORT5 \$countinstance $countinstance";
       foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
       { #say $tee "IN REPORT looking into \$mergestruct $mergestruct \$countcase $countcase \$countblock $countblock \$countinstance $countinstance ";
         chomp $thing; 
@@ -1584,6 +1593,8 @@ Sim::OPT::Report.
 
 Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results. Sim::OPT::Report performs two kinds of action. The first, which is required only by certain simulation programs, is that of making the simulation program write the results in a user-specified text format. This functionality is platform-specific and is presently implemented only for ESP-r (EnergyPlus does not require that). The second functionality is that of collecting the results in a user-specified manner. That functionality is based on pattern-matching and is not simulation-program-specific.
 
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
+
 =head2 EXPORT
 
 "retrieve" "report".
@@ -1598,7 +1609,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

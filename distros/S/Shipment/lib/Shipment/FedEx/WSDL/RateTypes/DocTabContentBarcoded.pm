@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::DocTabContentBarcoded;
-$Shipment::FedEx::WSDL::RateTypes::DocTabContentBarcoded::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::DocTabContentBarcoded::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Symbology_of :ATTR(:get<Symbology>);
-my %Specification_of :ATTR(:get<Specification>);
+    my %Symbology_of     : ATTR(:get<Symbology>);
+    my %Specification_of : ATTR(:get<Specification>);
 
-__PACKAGE__->_factory(
-    [ qw(        Symbology
-        Specification
+    __PACKAGE__->_factory(
+        [   qw(        Symbology
+              Specification
 
-    ) ],
-    {
-        'Symbology' => \%Symbology_of,
-        'Specification' => \%Specification_of,
-    },
-    {
-        'Symbology' => 'Shipment::FedEx::WSDL::RateTypes::BarcodeSymbologyType',
-        'Specification' => 'Shipment::FedEx::WSDL::RateTypes::DocTabZoneSpecification',
-    },
-    {
+            )
+        ],
+        {   'Symbology'     => \%Symbology_of,
+            'Specification' => \%Specification_of,
+        },
+        {   'Symbology' =>
+              'Shipment::FedEx::WSDL::RateTypes::BarcodeSymbologyType',
+            'Specification' =>
+              'Shipment::FedEx::WSDL::RateTypes::DocTabZoneSpecification',
+        },
+        {
 
-        'Symbology' => 'Symbology',
-        'Specification' => 'Specification',
-    }
-);
+            'Symbology'     => 'Symbology',
+            'Specification' => 'Specification',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::RateTypes::DocTabContentBarcoded
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

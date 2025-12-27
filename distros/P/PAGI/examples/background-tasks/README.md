@@ -20,7 +20,7 @@ For network calls, database queries, file I/O using async libraries:
 fire_and_forget(send_welcome_email($email));
 ```
 
-Must call `->retain()` to prevent "lost future" warnings.
+Always use `->on_fail()` before `->retain()` to avoid silently swallowing errors.
 
 ### 2. Blocking/CPU Work (Subprocess)
 

@@ -5,6 +5,7 @@ use warnings;
 
 use Data::Dumper;
 use Test::Most;
+use Test::Returns;
 
 BEGIN { use_ok('XML::PP') }
 
@@ -14,6 +15,7 @@ my $xml = <<'XML';
 	<memory_cache>
 		<driver>Null</driver>
 	</memory_cache>
+	<!-- This comment should be ignored -->
 	<disc_cache>
 		<driver>Null</driver>
 	</disc_cache>
@@ -26,7 +28,7 @@ my $xml_pp = new_ok('XML::PP');
 
 my $tree = $xml_pp->collapse_structure($xml_pp->parse(\$xml));
 ok(defined($tree));
-ok(ref($tree) eq 'HASH');
+returns_is($tree, { type => 'hashref', min => 1, max => 1 }, 'Returns a hash of the corect size');
 
 diag(Data::Dumper->new([$tree])->Dump()) if($ENV{'TEST_VERBOSE'});
 

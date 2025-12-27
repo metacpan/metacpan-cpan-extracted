@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetServicesOptionsResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetServicesOptionsResponseContainer::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::GetServicesOptionsResponseContainer::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,43 +17,39 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::ResponseContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
-my %Services_of :ATTR(:get<Services>);
+    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
+    my %Services_of            : ATTR(:get<Services>);
 
-__PACKAGE__->_factory(
-    [ qw(        ResponseInformation
-        Services
+    __PACKAGE__->_factory(
+        [   qw(        ResponseInformation
+              Services
 
-    ) ],
-    {
-        'ResponseInformation' => \%ResponseInformation_of,
-        'Services' => \%Services_of,
-    },
-    {
-        'ResponseInformation' => 'Shipment::Purolator::WSDL::Types::ResponseInformation',
-        'Services' => 'Shipment::Purolator::WSDL::Types::ArrayOfService',
-    },
-    {
+            )
+        ],
+        {   'ResponseInformation' => \%ResponseInformation_of,
+            'Services'            => \%Services_of,
+        },
+        {   'ResponseInformation' =>
+              'Shipment::Purolator::WSDL::Types::ResponseInformation',
+            'Services' => 'Shipment::Purolator::WSDL::Types::ArrayOfService',
+        },
+        {
 
-        'ResponseInformation' => 'ResponseInformation',
-        'Services' => 'Services',
-    }
-);
+            'ResponseInformation' => 'ResponseInformation',
+            'Services'            => 'Services',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -70,7 +66,7 @@ Shipment::Purolator::WSDL::Types::GetServicesOptionsResponseContainer
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -62,27 +62,25 @@ sub _request {
     if (exists $opts{json}) {
         require JSON::MaybeXS;
         $opts{body} = JSON::MaybeXS::encode_json($opts{json});
-        $opts{headers} //= {};
-        $opts{headers}{'Content-Type'} //= 'application/json';
-        $opts{headers}{'Content-Length'} = length($opts{body});
+        _set_header(\$opts{headers}, 'Content-Type', 'application/json', 0);
+        _set_header(\$opts{headers}, 'Content-Length', length($opts{body}), 1);
     }
-    # Handle form option
+    # Handle form option (supports multi-value)
     elsif (exists $opts{form}) {
-        my @pairs;
-        for my $k (sort keys %{$opts{form}}) {
-            my $key = _url_encode($k);
-            my $val = _url_encode($opts{form}{$k} // '');
-            push @pairs, "$key=$val";
+        my $pairs = _normalize_pairs($opts{form});
+        my @encoded;
+        for my $pair (@$pairs) {
+            my $key = _url_encode($pair->[0]);
+            my $val = _url_encode($pair->[1] // '');
+            push @encoded, "$key=$val";
         }
-        $opts{body} = join('&', @pairs);
-        $opts{headers} //= {};
-        $opts{headers}{'Content-Type'} //= 'application/x-www-form-urlencoded';
-        $opts{headers}{'Content-Length'} = length($opts{body});
+        $opts{body} = join('&', @encoded);
+        _set_header(\$opts{headers}, 'Content-Type', 'application/x-www-form-urlencoded', 0);
+        _set_header(\$opts{headers}, 'Content-Length', length($opts{body}), 1);
     }
     # Add Content-Length for raw body if not already set
     elsif (defined $opts{body}) {
-        $opts{headers} //= {};
-        $opts{headers}{'Content-Length'} //= length($opts{body});
+        _set_header(\$opts{headers}, 'Content-Length', length($opts{body}), 0);
     }
 
     # Build scope
@@ -122,41 +120,21 @@ sub _build_scope {
         $query_string = $1;
     }
 
-    # Add query params if provided
+    # Add query params if provided (appended to path query string)
     if ($opts->{query}) {
-        my @pairs;
-        for my $k (sort keys %{$opts->{query}}) {
-            my $key = _url_encode($k);
-            my $val = _url_encode($opts->{query}{$k} // '');
-            push @pairs, "$key=$val";
+        my $pairs = _normalize_pairs($opts->{query});
+        my @encoded;
+        for my $pair (@$pairs) {
+            my $key = _url_encode($pair->[0]);
+            my $val = _url_encode($pair->[1] // '');
+            push @encoded, "$key=$val";
         }
-        my $new_params = join('&', @pairs);
+        my $new_params = join('&', @encoded);
         $query_string = $query_string ? "$query_string&$new_params" : $new_params;
     }
 
-    # Build headers
-    my @headers;
-
-    # Default headers
-    push @headers, ['host', 'testserver'];
-
-    # Merge in default client headers
-    for my $name (keys %{$self->{headers}}) {
-        push @headers, [lc($name), $self->{headers}{$name}];
-    }
-
-    # Merge in request-specific headers
-    if ($opts->{headers}) {
-        for my $name (keys %{$opts->{headers}}) {
-            push @headers, [lc($name), $opts->{headers}{$name}];
-        }
-    }
-
-    # Add cookies
-    if (keys %{$self->{cookies}}) {
-        my $cookie = join('; ', map { "$_=$self->{cookies}{$_}" } keys %{$self->{cookies}});
-        push @headers, ['cookie', $cookie];
-    }
+    # Build headers using helper
+    my $headers = $self->_build_headers($opts->{headers});
 
     my $scope = {
         type         => 'http',
@@ -167,7 +145,7 @@ sub _build_scope {
         path         => $path,
         query_string => $query_string,
         root_path    => '',
-        headers      => \@headers,
+        headers      => $headers,
         client       => ['127.0.0.1', 12345],
         server       => ['testserver', 80],
     };
@@ -214,9 +192,21 @@ sub _build_response {
 }
 
 sub websocket {
-    my ($self, $path, $callback) = @_;
+    my ($self, $path, @rest) = @_;
 
     require PAGI::Test::WebSocket;
+
+    # Handle both: websocket($path, $callback) and websocket($path, %opts)
+    # and websocket($path, %opts, $callback)
+    my ($callback, %opts);
+    if (@rest == 1 && ref($rest[0]) eq 'CODE') {
+        $callback = $rest[0];
+    } elsif (@rest % 2 == 0) {
+        %opts = @rest;
+    } elsif (@rest % 2 == 1 && ref($rest[-1]) eq 'CODE') {
+        $callback = pop @rest;
+        %opts = @rest;
+    }
 
     $path //= '/';
 
@@ -224,6 +214,35 @@ sub websocket {
     my $query_string = '';
     if ($path =~ s/\?(.*)$//) {
         $query_string = $1;
+    }
+
+    # Build headers
+    my @headers = (['host', 'testserver']);
+
+    # Add client default headers (normalized)
+    my $default_pairs = _normalize_pairs($self->{headers});
+    for my $pair (@$default_pairs) {
+        push @headers, [lc($pair->[0]), $pair->[1]];
+    }
+
+    # Add request-specific headers (normalized, replace by key)
+    if ($opts{headers}) {
+        my $request_pairs = _normalize_pairs($opts{headers});
+        my %replace_keys = map { lc($_->[0]) => 1 } @$request_pairs;
+
+        # Filter out replaced headers from existing
+        @headers = grep { !$replace_keys{$_->[0]} } @headers;
+
+        # Add request headers
+        for my $pair (@$request_pairs) {
+            push @headers, [lc($pair->[0]), $pair->[1]];
+        }
+    }
+
+    # Add cookies
+    if (keys %{$self->{cookies}}) {
+        my $cookie = join('; ', map { "$_=$self->{cookies}{$_}" } sort keys %{$self->{cookies}});
+        push @headers, ['cookie', $cookie];
     }
 
     my $scope = {
@@ -234,10 +253,10 @@ sub websocket {
         path         => $path,
         query_string => $query_string,
         root_path    => '',
-        headers      => [['host', 'testserver']],
+        headers      => \@headers,
         client       => ['127.0.0.1', 12345],
         server       => ['testserver', 80],
-        subprotocols => [],
+        subprotocols => $opts{subprotocols} // [],
     };
 
     $scope->{state} = $self->{state} if $self->{state};
@@ -257,9 +276,21 @@ sub websocket {
 }
 
 sub sse {
-    my ($self, $path, $callback) = @_;
+    my ($self, $path, @rest) = @_;
 
     require PAGI::Test::SSE;
+
+    # Handle both: sse($path, $callback) and sse($path, %opts)
+    # and sse($path, %opts, $callback)
+    my ($callback, %opts);
+    if (@rest == 1 && ref($rest[0]) eq 'CODE') {
+        $callback = $rest[0];
+    } elsif (@rest % 2 == 0) {
+        %opts = @rest;
+    } elsif (@rest % 2 == 1 && ref($rest[-1]) eq 'CODE') {
+        $callback = pop @rest;
+        %opts = @rest;
+    }
 
     $path //= '/';
 
@@ -267,6 +298,38 @@ sub sse {
     my $query_string = '';
     if ($path =~ s/\?(.*)$//) {
         $query_string = $1;
+    }
+
+    # Build headers (SSE requires Accept: text/event-stream)
+    my @headers = (
+        ['host', 'testserver'],
+        ['accept', 'text/event-stream'],
+    );
+
+    # Add client default headers (normalized)
+    my $default_pairs = _normalize_pairs($self->{headers});
+    for my $pair (@$default_pairs) {
+        push @headers, [lc($pair->[0]), $pair->[1]];
+    }
+
+    # Add request-specific headers (normalized, replace by key)
+    if ($opts{headers}) {
+        my $request_pairs = _normalize_pairs($opts{headers});
+        my %replace_keys = map { lc($_->[0]) => 1 } @$request_pairs;
+
+        # Filter out replaced headers from existing
+        @headers = grep { !$replace_keys{$_->[0]} } @headers;
+
+        # Add request headers
+        for my $pair (@$request_pairs) {
+            push @headers, [lc($pair->[0]), $pair->[1]];
+        }
+    }
+
+    # Add cookies
+    if (keys %{$self->{cookies}}) {
+        my $cookie = join('; ', map { "$_=$self->{cookies}{$_}" } sort keys %{$self->{cookies}});
+        push @headers, ['cookie', $cookie];
     }
 
     my $scope = {
@@ -277,12 +340,9 @@ sub sse {
         path         => $path,
         query_string => $query_string,
         root_path    => '',
-        headers      => [
-            ['host', 'testserver'],
-            ['accept', 'text/event-stream'],
-        ],
-        client => ['127.0.0.1', 12345],
-        server => ['testserver', 80],
+        headers      => \@headers,
+        client       => ['127.0.0.1', 12345],
+        server       => ['testserver', 80],
     };
 
     $scope->{state} = $self->{state} if $self->{state};
@@ -386,6 +446,121 @@ sub _url_encode {
     return $str;
 }
 
+# Normalize various input formats to arrayref of [key, value] pairs.
+# Supports:
+#   - Hash with scalar values: { key => 'value' }
+# Set a header on a headers structure (hashref or arrayref of pairs).
+# If $replace is true, replaces existing value. Otherwise only sets if not present.
+sub _set_header {
+    my ($headers_ref, $name, $value, $replace) = @_;
+    $replace //= 0;
+
+    if (!defined $$headers_ref) {
+        $$headers_ref = { $name => $value };
+        return;
+    }
+
+    if (ref($$headers_ref) eq 'HASH') {
+        if ($replace) {
+            $$headers_ref->{$name} = $value;
+        } else {
+            $$headers_ref->{$name} //= $value;
+        }
+    } elsif (ref($$headers_ref) eq 'ARRAY') {
+        # Check if header already exists (case-insensitive)
+        my $found_idx;
+        for my $i (0 .. $#{$$headers_ref}) {
+            if (lc($$headers_ref->[$i][0]) eq lc($name)) {
+                $found_idx = $i;
+                last;
+            }
+        }
+        if (defined $found_idx) {
+            $$headers_ref->[$found_idx][1] = $value if $replace;
+        } else {
+            push @{$$headers_ref}, [$name, $value];
+        }
+    }
+}
+
+#   - Hash with arrayref values: { key => ['v1', 'v2'] }
+#   - Arrayref of pairs: [['key', 'v1'], ['key', 'v2']]
+# Returns arrayref of [key, value] pairs.
+sub _normalize_pairs {
+    my ($input) = @_;
+    return [] unless defined $input;
+
+    # Arrayref of pairs: [['key', 'val'], ['key', 'val2']]
+    if (ref($input) eq 'ARRAY') {
+        # Validate it looks like pairs
+        for my $pair (@$input) {
+            croak "Expected arrayref of [key, value] pairs"
+                unless ref($pair) eq 'ARRAY' && @$pair == 2;
+        }
+        return $input;
+    }
+
+    # Hash (with scalar or arrayref values)
+    if (ref($input) eq 'HASH') {
+        my @pairs;
+        for my $key (sort keys %$input) {
+            my $val = $input->{$key};
+            if (ref($val) eq 'ARRAY') {
+                # Multiple values for this key
+                push @pairs, [$key, $_] for @$val;
+            } else {
+                # Single value
+                push @pairs, [$key, $val // ''];
+            }
+        }
+        return \@pairs;
+    }
+
+    croak "Expected hashref or arrayref of pairs, got " . ref($input);
+}
+
+# Build headers array, merging defaults with request-specific headers.
+# Request headers replace client defaults by key (case-insensitive).
+sub _build_headers {
+    my ($self, $request_headers) = @_;
+
+    my @headers;
+
+    # Default headers
+    push @headers, ['host', 'testserver'];
+
+    # Normalize client default headers
+    my $default_pairs = _normalize_pairs($self->{headers});
+
+    # Normalize request-specific headers
+    my $request_pairs = _normalize_pairs($request_headers);
+
+    # Build set of keys to replace (lowercase)
+    my %replace_keys;
+    for my $pair (@$request_pairs) {
+        $replace_keys{lc($pair->[0])} = 1;
+    }
+
+    # Add client defaults (skip if being replaced)
+    for my $pair (@$default_pairs) {
+        push @headers, [lc($pair->[0]), $pair->[1]]
+            unless $replace_keys{lc($pair->[0])};
+    }
+
+    # Add request-specific headers
+    for my $pair (@$request_pairs) {
+        push @headers, [lc($pair->[0]), $pair->[1]];
+    }
+
+    # Add cookies
+    if (keys %{$self->{cookies}}) {
+        my $cookie = join('; ', map { "$_=$self->{cookies}{$_}" } sort keys %{$self->{cookies}});
+        push @headers, ['cookie', $cookie];
+    }
+
+    return \@headers;
+}
+
 1;
 
 __END__
@@ -416,6 +591,22 @@ PAGI::Test::Client - Test client for PAGI applications
 
     # Custom headers
     my $res = $client->get('/api', headers => { Authorization => 'Bearer xyz' });
+
+    # Multiple values for same header/query/form field
+    my $res = $client->get('/search',
+        query   => { tag => ['perl', 'async'] },       # ?tag=perl&tag=async
+        headers => { Accept => ['text/html', 'application/json'] },
+    );
+
+    # Arrayref of pairs for explicit ordering
+    my $res = $client->get('/api',
+        headers => [['X-Custom', 'first'], ['X-Custom', 'second']],
+    );
+
+    # Multi-value form (checkboxes, multi-select)
+    my $res = $client->post('/survey',
+        form => { colors => ['red', 'blue', 'green'] },
+    );
 
     # Session cookies persist across requests
     $client->post('/login', form => { user => 'admin', pass => 'secret' });
@@ -450,8 +641,19 @@ The PAGI application coderef to test.
 
 =item headers
 
-Default headers to include in every request. Request-specific headers
-override these.
+Default headers to include in every request. Supports multiple formats:
+
+    # Simple hash (single values)
+    headers => { 'X-API-Key' => 'secret' }
+
+    # Hash with arrayref values (multiple values per header)
+    headers => { Accept => ['application/json', 'text/html'] }
+
+    # Arrayref of pairs (explicit ordering)
+    headers => [['Accept', 'application/json'], ['Accept', 'text/html']]
+
+Request-specific headers with the same name will B<replace> (not append to)
+these default headers.
 
 =item lifespan
 
@@ -496,21 +698,56 @@ All HTTP methods return a L<PAGI::Test::Response> object.
 
 =over 4
 
-=item headers => { ... }
+=item headers => { ... } or [ [...], [...] ]
 
-Additional headers for this request.
+Additional headers for this request. Supports multiple formats:
 
-=item query => { ... }
+    # Simple hash
+    headers => { Authorization => 'Bearer xyz' }
 
-Query string parameters. Appended to the path.
+    # Multiple values (arrayref in hash)
+    headers => { Accept => ['application/json', 'text/html'] }
+
+    # Arrayref of pairs (preserves order)
+    headers => [['X-Custom', 'first'], ['X-Custom', 'second']]
+
+Request headers with the same name as client default headers will B<replace>
+the defaults (not append).
+
+=item query => { ... } or [ [...], [...] ]
+
+Query string parameters. Supports multiple formats:
+
+    # Simple hash
+    query => { q => 'perl' }
+
+    # Multiple values
+    query => { tag => ['perl', 'async'] }  # ?tag=perl&tag=async
+
+    # Arrayref of pairs
+    query => [['tag', 'perl'], ['tag', 'async']]
+
+B<Note:> Query params are B<appended> to any existing query string in the path.
+To avoid duplicates, put all params either in the path or in the query option,
+not both with the same key.
 
 =item json => { ... }
 
 JSON request body. Automatically sets Content-Type to application/json.
 
-=item form => { ... }
+=item form => { ... } or [ [...], [...] ]
 
 Form-encoded request body. Sets Content-Type to application/x-www-form-urlencoded.
+Supports multiple formats:
+
+    # Simple hash
+    form => { user => 'admin', pass => 'secret' }
+
+    # Multiple values (checkboxes, multi-select)
+    form => { colors => ['red', 'blue', 'green'] }
+
+    # Arrayref of pairs
+    form => [['color', 'red'], ['color', 'blue']]
 
 =item body => $bytes
 
@@ -561,6 +798,18 @@ Clears all session cookies.
     is $ws->receive_text, 'echo: hello';
     $ws->close;
 
+    # With options
+    my $ws = $client->websocket('/ws',
+        headers      => { Authorization => 'Bearer xyz' },
+        subprotocols => ['chat', 'json'],
+    );
+
+    # Options with callback
+    $client->websocket('/ws', headers => { 'X-Token' => 'abc' }, sub {
+        my ($ws) = @_;
+        # ...
+    });
+
 See L<PAGI::Test::WebSocket> for the WebSocket connection API.
 
 =head1 SSE (Server-Sent Events)
@@ -578,6 +827,17 @@ See L<PAGI::Test::WebSocket> for the WebSocket connection API.
     my $sse = $client->sse('/events');
     my $event = $sse->receive_event;
     $sse->close;
+
+    # With headers (e.g., for reconnection)
+    my $sse = $client->sse('/events',
+        headers => { 'Last-Event-ID' => '42' },
+    );
+
+    # Options with callback
+    $client->sse('/events', headers => { Authorization => 'Bearer xyz' }, sub {
+        my ($sse) = @_;
+        # ...
+    });
 
 See L<PAGI::Test::SSE> for the SSE connection API.
 

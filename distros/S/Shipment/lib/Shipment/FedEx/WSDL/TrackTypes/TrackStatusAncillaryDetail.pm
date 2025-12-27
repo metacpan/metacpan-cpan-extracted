@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackStatusAncillaryDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackStatusAncillaryDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::TrackStatusAncillaryDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,41 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Reason_of :ATTR(:get<Reason>);
-my %ReasonDescription_of :ATTR(:get<ReasonDescription>);
-my %Action_of :ATTR(:get<Action>);
-my %ActionDescription_of :ATTR(:get<ActionDescription>);
+    my %Reason_of            : ATTR(:get<Reason>);
+    my %ReasonDescription_of : ATTR(:get<ReasonDescription>);
+    my %Action_of            : ATTR(:get<Action>);
+    my %ActionDescription_of : ATTR(:get<ActionDescription>);
 
-__PACKAGE__->_factory(
-    [ qw(        Reason
-        ReasonDescription
-        Action
-        ActionDescription
+    __PACKAGE__->_factory(
+        [   qw(        Reason
+              ReasonDescription
+              Action
+              ActionDescription
 
-    ) ],
-    {
-        'Reason' => \%Reason_of,
-        'ReasonDescription' => \%ReasonDescription_of,
-        'Action' => \%Action_of,
-        'ActionDescription' => \%ActionDescription_of,
-    },
-    {
-        'Reason' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ReasonDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Action' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ActionDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Reason'            => \%Reason_of,
+            'ReasonDescription' => \%ReasonDescription_of,
+            'Action'            => \%Action_of,
+            'ActionDescription' => \%ActionDescription_of,
+        },
+        {   'Reason'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ReasonDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Action'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ActionDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Reason' => 'Reason',
-        'ReasonDescription' => 'ReasonDescription',
-        'Action' => 'Action',
-        'ActionDescription' => 'ActionDescription',
-    }
-);
+            'Reason'            => 'Reason',
+            'ReasonDescription' => 'ReasonDescription',
+            'Action'            => 'Action',
+            'ActionDescription' => 'ActionDescription',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +71,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackStatusAncillaryDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,16 +1,11 @@
 #package Sim::OPT::Modish;
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
-#!/usr/bin/perl
-# Modish
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+
 use Switch::Back;
 
 $VERSION = '0.4.4';
-# Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
-# An intermediate version of the subroutine createconstrdbfile has been modified by ESRU (2038),
-# University of Strathclyde, Glasgow.
-# All rights reserved, 2015-25.
-# This is free software.  You can redistribute it and/or modify it under the terms of the
-# GNU General Public License, version 3, as published by the Free Software Foundation.
+
 
 # In version 0.287: added the possibility to decouple the diffuse resolution from the direct resolution.
 # In version 0.289 (13.03.2020): added the ability to work with ESP-r versions more recent than 13.3.2. Last version tested: 13.3.8.
@@ -35,7 +30,7 @@ use Math::Trig;
 use List::Util qw[ min max reduce shuffle any];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use Data::Dump qw(dump);
 use Regexp::Common;
 use Vector::Object3D::Polygon;
@@ -4237,27 +4232,41 @@ sub cleanblanks
 }
 
 
+
 sub createconstrdbfile
 { # THIS CREATES THE CONSTRUCTION DB FILE OF THE FICTITIOUS ESP-r MODELS.
+
   my ( $constrdbfile, $constrdbfile_f, $obscon_ref, $matdbfile, $calcprocedures_ref, $paths_ref, $modishlock ) = @_;
-  my @obscon = @ { $obscon_ref };
+
+  my @obscon         = @{ $obscon_ref };
   my @calcprocedures = @{ $calcprocedures_ref };
 
-  say MONITOR "OBSCON: " . dump ( @obscon );
+  say MONITOR "OBSCON: " . dump(@obscon);
 
   my ( @bigcopy, @updatedlines, %exportconstr );
 
-  open( DBFILE, "$constrdbfile" ) or die "Could not open file '\$constrdbfile': $constrdbfile, $!";
+
+##
+
+
+  open( DBFILE, "$constrdbfile" )
+    or die "Could not open file '\$constrdbfile': $constrdbfile, $!";
   my @lines = <DBFILE>;
   close DBFILE;
 
   my $countcat = 0;
-  open( MATFILE, "$matdbfile" ) or die "Could not open file '\$matdbfile': $matdbfile, $!";
+
+  open( MATFILE, "$matdbfile" )
+    or die "Could not open file '\$matdbfile': $matdbfile, $!";
   my @matlines = <MATFILE>;
   close MATFILE;
 
+
+##
+
+
   my @box;
-  foreach my $matline ( @matlines )
+  foreach my $matline (@matlines)
   {
     if ( $matline =~ /^\*item/ )
     {
@@ -4269,130 +4278,167 @@ sub createconstrdbfile
       $countcat++;
     }
   }
-  my $countm = max( @box );
+
+  my $countm = ( @box ? max(@box) : 0 );
 
   say MONITOR "COUNTMAT $countm";
   say MONITOR "COUNTCAT $countcat";
 
-  if ( $lines[0] =~ /\*CONSTRUCTIONS/ )
+  # ----------------------------
+  # 3) OLD OR NEW CONSTR DB?
+  # ----------------------------
+
+  if ( @lines && $lines[0] =~ /\*CONSTRUCTIONS/ )
   {
-    push ( @calcprocedures, "newconstrdb" );
+    push( @calcprocedures, "newconstrdb" );
   }
   else
   {
-    push ( @calcprocedures, "oldconstrdb" );
+    push( @calcprocedures, "oldconstrdb" );
   }
 
-  say MONITOR "\@calcprocedures: " . dump ( @calcprocedures );
+  say MONITOR "\@calcprocedures: " . dump(@calcprocedures);
 
-  foreach my $line ( @lines )
-  { # THIS PUSHES IN @UPDATEDLINES THE CONSTR DATABASE EXCEPTED THE FIRST LINES (HEADER LINES)
-    # This actually pushes all lines, including header lines, which explains the "if ( $countline > 2 )" below.
+
+##
+
+
+  $countline = 0;   # NOTE: keep your original package vars (no new scopes)
+
+  foreach my $line (@lines)
+  { # THIS PUSHES IN @UPDATEDLINES THE CONSTR DATABASE (INCLUDING HEADER LINES)
     chomp $line;
-    my @row = split( /\s+|,/ , $line);
-    @row = cleanblanks( @row );
-    my ( $oldnumber, $newnumber );
-    my $atline;
+
+    my @row = split( /\s+|,/, $line );
+    @row = cleanblanks(@row);
+
     if ( $line =~ /\# no of composites/ )
     {
-      $atline == $countline;
-      $oldnumber = $row[0];
-      say MONITOR "\@obscon: " . dump( @obscon );
-      $newnumber = ( $oldnumber + scalar( @obscon ) );
-      $line =~ s/$oldnumber/$newnumber/;
-      push ( @updatedlines, $line );
+      $atline = $countline;  # (you had this variable; make it an assignment)
+      my $oldnumber = $row[0];
+
+      say MONITOR "\@obscon: " . dump(@obscon);
+
+      my $newnumber = $oldnumber + scalar(@obscon);
+      $line =~ s/\b\Q$oldnumber\E\b/$newnumber/;
     }
-    else
-    {
-      push ( @updatedlines, $line );
-    }
+
+    push( @updatedlines, $line );
     $countline++;
   }
 
+
+##
+
+
   if ( grep { $_ eq "newconstrdb" } @calcprocedures )
   {
-    if ( $line =~ /^\*date,/ )
+    my $catline = "*Category,Modish_fict, Modish fictitious constructions, fictitious versions of existing constructions used for shading factor modifier script Modish";
+
+    my $already = grep { $_ =~ /^\*Category,\s*Modish_fict\b/ } @updatedlines;
+
+    if ( !$already )
     {
-      push ( @updatedlines, "*Category,Modish_fict, Modish fictitious constructions, fictitious versions of existing constructions used for shading factor modifier script Modish\n" );
+      for ( my $i = 0 ; $i < scalar(@updatedlines) ; $i++ )
+      {
+        if ( $updatedlines[$i] =~ /^\*date,/ )
+        {
+          splice( @updatedlines, $i + 1, 0, $catline );
+          last;
+        }
+      }
     }
   }
 
-  #say MONITOR "\@updatedlines: " . dump ( @updatedlines );
+
+##
+
 
   if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {
     # --- OLD CONSTR DATABASE ---
-    foreach my $el ( @obscon )
-    { #PUSHES EACH CONSTRUCTION USED IN THE OBSTRUCTIONS IN @COPY, AND PUSHES EACH [ @COPY ] IN @BIGCOPY
+    foreach my $el (@obscon)
+    { # PUSH EACH CONSTRUCTION USED IN OBSTRUCTIONS INTO @COPY; PUSH [@COPY] INTO @BIGCOPY
       my @copy;
       my $semaphore = 0;
-      $countel = 0;
-      $countline = 0;
-      foreach my $line ( @updatedlines )
-      {
-        my @row = split( /\s+|,/ , $line);
-        @row = cleanblanks( @row );
 
-        if ( $el eq $row[1] )
+      $countel   = 0;
+      $countline = 0;
+
+      foreach my $line (@updatedlines)
+      {
+        my @row = split( /\s+|,/, $line );
+        @row = cleanblanks(@row);
+
+        if ( defined $row[1] && $el eq $row[1] )
         {
           $semaphore = 1;
         }
 
-        if ( ( $semaphore == 1 ) and ( $countel == 0) )
+        if ( ( $semaphore == 1 ) and ( $countel == 0 ) )
         {
-          push ( @copy, "# layers  description   optics name   symmetry tag" );
-          push ( @copy, $line );
+          push( @copy, "# layers  description   optics name   symmetry tag" );
+          push( @copy, $line );
           $countel++;
         }
-        elsif ( ( $semaphore == 1 ) and ( $countel > 0) )
+        elsif ( ( $semaphore == 1 ) and ( $countel > 0 ) )
         {
-          push ( @copy, $line );
-          if (  ( $row[0] eq "#" ) and ( $row[1] eq "layers" ) and ( $row[2] eq "description" )  )
+          push( @copy, $line );
+
+          # STOP WHEN THE NEXT HEADER STARTS
+          if ( ( $row[0] eq "#" ) and ( $row[1] eq "layers" ) and ( $row[2] eq "description" ) )
           {
             pop(@copy);
             $semaphore = 0;
           }
+
           $countel++;
         }
+
         $countline++;
       }
-      say MONITOR "COPY: " . dump ( @copy );
-      push ( @bigcopy, [ @copy ] );
-    } # --- END OLD CONSTR DATABASE ---
-    say MONITOR "BIGCOPY: " . dump ( @bigcopy );
+
+      say MONITOR "COPY: " . dump(@copy);
+      push( @bigcopy, [@copy] );
+    }
+    # --- END OLD CONSTR DATABASE ---
+
+    say MONITOR "BIGCOPY: " . dump(@bigcopy);
   }
-  elsif ( not ( grep { $_ eq "oldconstrdb" } @calcprocedures ) )
+  elsif ( not( grep { $_ eq "oldconstrdb" } @calcprocedures ) )
   {
     # --- NEW CONSTR DATABASE ---
-    # If there are obstruction constructions, loop through each @updatedlines.
-    # If an obstruction construction is found, push this into @copy, and push each [ @copy ] into @bigcopy.
     my @copy;
-    my $semaphore = 0;
-    my $nummatches = 0;
+    my $semaphore    = 0;
+    my $nummatches   = 0;
     my $numobsconstr = scalar @obscon;
-    say MONITOR "\$numobsconstr : " . dump ( $numobsconstr );
-    say MONITOR "\%obsinf " . dump ( %obsinf );
 
-    if
-    ( $numobsconstr > 0 )
+    say MONITOR "\$numobsconstr : " . dump($numobsconstr);
+    say MONITOR "\%obsinf " . dump(%obsinf);
+
+    if ( $numobsconstr > 0 )
     {
-      foreach my $line ( @updatedlines )
+      foreach my $line (@updatedlines)
       {
-        my @row = split( /,/ , $line);
-        @row = cleanblanks( @row );
-        if ( ( $semaphore == 0 ) and ( $row[0] == "*item" ) and ( any { $_ eq $row[1] } @obscon ) )
+        my @row = split( /,/, $line );
+        @row = cleanblanks(@row);
+
+        if ( ( $semaphore == 0 )
+          and ( defined $row[0] && $row[0] eq "*item" )
+          and ( any { $_ eq $row[1] } @obscon ) )
         {
           $semaphore = 1;
         }
+
         if ( $semaphore == 1 )
         {
-          push ( @copy, $line );
+          push( @copy, $line );
 
-          if ( $row[0] =~ /\*end_item/ )
+          if ( defined $row[0] && $row[0] =~ /\*end_item/ )
           {
             $semaphore = 0;
-            push ( @bigcopy, [ @copy ] );
-            undef ( @copy );
+            push( @bigcopy, [@copy] );
+            @copy = ();
             $nummatches++;
             if ( $nummatches == $numobsconstr ) { last; }
           }
@@ -4401,350 +4447,369 @@ sub createconstrdbfile
     }
   }
 
-  #say MONITOR "BIGCOPY  " .dump ( @bigcopy );
+
+##
+
 
   my ( @newbigcopy, @materials, @newmaterials, @materialnums );
+
   if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
-  {  # --- OLD CONSTR DATABASE ---
-     my ( $newmatinssurf, $newmatextsurf );
-     foreach my $copyref ( @bigcopy )
-     {
-       my @newcopy;
-       my @constrlines = @$copyref;
-
-       my $onlyonelayer = 0;
-       if ( scalar( @constrlines ) == 4 )
-       {
-         $onlyonelayer = 1;
-       }
-
-       my $firstrow = $constrlines[1];
-       my @row = split ( /\s+|,/ , $firstrow );
-       @row = cleanblanks( @row );
-       my $constrname = $row[1];
-       my $newconstrname = $constrname;
-
-
-        chop  $newconstrname;
-	chop $newconstrname;
-	$newconstrname = "f_" . "$newconstrname";
-
-
-       my $intlayer = $constrlines[3];
-       my @row = split ( /\s+|,/ , $intlayer );
-       @row = cleanblanks( @row );
-
-
-	my $matintlayer = $row[2];
-	my $newmatintlayer = $matintlayer;
-	my $matintlayernum = $row[0];
-
-
-	$newmatintlayer = "f_" . "$newmatintlayer";
-
-       my $extlayer = $constrlines[$#constrlines];
-       my @row = split ( /\s+|,/ , $extlayer );
-       @row = cleanblanks( @row );
-
-        my $matextlayer = $row[2];
-        my $newmatextlayer = $matextlayer;
-        my $matextlayernum = $row[0];
-
-
-        $newmatextlayer = "f_" . "$newmatextlayer";
-
-	if ( ( not( grep { $_ eq $matintlayer } @materials ) ) and ( $matintlayer ne "" ) and ( not ( $matintlayer =~ /^f_/ ) ) )
-        {
-	   push ( @materials, $matintlayer );
-	   push ( @materialnums, $matintlayernum );
-        }
-
-	if ( ( not( grep { $_ eq $matextlayer } @materials ) ) and ( $matextlayer ne "" ) and ( not ( $matextlayer =~ /^f_/ ) ) )
-        {
-	   push ( @materials, $matextlayer );
-	   push ( @materialnums, $matextlayernum );
-        }
-
-	 if ( ( not( grep { $_ eq $newmatintlayer } @newmaterials ) ) and ( $newmatintlayer ne "" ) and ( $newmatintlayer =~ /^f_/ ) )
-         {
-	    push ( @newmaterials, $newmatintlayer );
-	 }
-
-	 if ( ( not( grep { $_ eq $newmatextlayer } @newmaterials ) ) and ( $newmatextlayer ne "" ) and ( $newmatextlayer =~ /^f_/ ) )
-         {
-	    push ( @newmaterials, $newmatextlayer );
-         }
-
-
-       $constrlines[1] =~ s/$constrname/$newconstrname/g;
-
-       unless ( $onlyonelayer == 1 )
-       {
-         $constrlines[3] =~ s/$matintlayer/$newmatintlayer/g;
-       }
-
-       my @intels = split( /\s+/, $constrlines[3] ); say MONITOR "INTELS " . dump( @intels );
-       @intels = cleanblanks( @intels ); say MONITOR "CLEANED-INTELS " . dump( @intels );
-       my $intoldmat = $intels[0]; say MONITOR "\$intoldmat-INTELS " . dump( $intoldmat );
-
-       $constrlines[$#constrlines] =~ s/$matextlayer/$newmatextlayer/g;
-
-	my @extels = split( /\s+/, $constrlines[$#constrlines] ); say MONITOR "\@extels " . dump( @extels );
-	@extels = cleanblanks( @extels ); say MONITOR "CLEANED-extels " . dump( @extels );
-	my $extoldmat = $extels[0]; say MONITOR "\$extoldmat-INTELS " . dump( $extoldmat );
-
-       foreach my $line ( @constrlines )
-       {
-         push ( @newcopy, $line );
-       }
-       push ( @newbigcopy, [ @newcopy ] );
-
-       if ( $newmatextlayer ne "" )
-       {
-         $exportconstr{ $newconstrname }{ extnewlayername } = $newmatextlayer;
-       }
-
-       if ( $matextlayer ne "" )
-       {
-         $exportconstr{ $newconstrname }{ extoldlayername } = $matextlayer;
-       }
-
-       if ( $extoldmat ne "" )
-       {
-         $exportconstr{ $newconstrname }{ extoldlayernum } = $extoldmat;
-       }
-
-       if ( $newmatintlayer ne "" )
-       {
-         $exportconstr{ $newconstrname }{ intnewlayername } = $newmatintlayer;
-       }
-
-       if ( $matintlayer ne "" )
-       {
-         $exportconstr{ $newconstrname }{ intoldlayername } = $matintlayer;
-       }
-
-       if ( $intoldmat ne "" )
-       {
-         $exportconstr{ $newconstrname }{ intoldlayernum } = $intoldmat;
-       }
-     } # --- END OLD CONSTR DATABASE ---
-  }
-  elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
-  {
-    # --- NEW CONSTR DATABASE ---
-    # In each [ @copy ], modify the:
-    # construction name and documentation,
-    # category,
-    # internal material name, and
-    # external material name.
-    # Store the old and new material names, and form a hash relating new materials to the new constructions.
+  { 
+ ##
 
     my ( $newmatinssurf, $newmatextsurf );
-    foreach my $copyref ( @bigcopy )
+
+    foreach my $copyref (@bigcopy)
     {
       my @newcopy;
-      my @constrlines = @{ $copyref };
+      my @constrlines = @$copyref;
 
       my $onlyonelayer = 0;
-      if ( scalar( @constrlines ) == 6 )
-      {
-        $onlyonelayer = 1;
-      }
+      if ( scalar(@constrlines) == 4 ) { $onlyonelayer = 1; }
 
-      my $firstrow = $constrlines[0];
-      my @row = split ( /,/ , $firstrow );
-      @row = cleanblanks( @row );
-      my $constrname = $row[1];
+      my $firstrow = $constrlines[1];
+      my @row = split( /\s+|,/, $firstrow );
+      @row = cleanblanks(@row);
+
+      my $constrname    = $row[1];
       my $newconstrname = $constrname;
 
       chop $newconstrname;
       chop $newconstrname;
-
       $newconstrname = "f_" . "$newconstrname";
 
-      my $intlayer = $constrlines[4];
-      my @row = split ( / : |,/ , $intlayer );
-      @row = cleanblanks( @row );
-      my $matintlayer = $row[3];
-      my $newmatintlayer = $matintlayer;
-      my $matintlayernum = $row[1];
+      my $intlayer = $constrlines[3];
+      my @row = split( /\s+|,/, $intlayer );
+      @row = cleanblanks(@row);
 
-      chop $newmatintlayer ;
-      chop $newmatintlayer ;
+      my $matintlayer    = $row[2];
+      my $newmatintlayer = $matintlayer;
+      my $matintlayernum = $row[0];
 
       $newmatintlayer = "f_" . "$newmatintlayer";
 
+      my $extlayer = $constrlines[$#constrlines];
+      my @row = split( /\s+|,/, $extlayer );
+      @row = cleanblanks(@row);
 
-      my $extlayer = $constrlines[$#constrlines-1];
-      my @row = split ( / : |,/ , $extlayer );
-      @row = cleanblanks( @row );
-
-
-      my $matextlayer = $row[3];
+      my $matextlayer    = $row[2];
       my $newmatextlayer = $matextlayer;
-      my $matextlayernum = $row[1];
-
-      chop $newmatextlayer ;
-      chop $newmatextlayer ;
+      my $matextlayernum = $row[0];
 
       $newmatextlayer = "f_" . "$newmatextlayer";
 
-       if ( ( not( grep { $_ eq $matintlayer } @materials ) ) and ( $matintlayer ne "" ) and ( not ( $matintlayer =~ /^f_/ ) ) )
-        {
-	   push ( @materials, $matintlayer );
-	   push ( @materialnums, $matintlayernum );
-        }
+      if ( ( not( grep { $_ eq $matintlayer } @materials ) )
+        and ( $matintlayer ne "" )
+        and ( not( $matintlayer =~ /^f_/ ) ) )
+      {
+        push( @materials,    $matintlayer );
+        push( @materialnums, $matintlayernum );
+      }
 
-	if ( ( not( grep { $_ eq $matextlayer } @materials ) ) and ( $matextlayer ne "" ) and ( not ( $matextlayer =~ /^f_/ ) ) )
-        {
-	   push ( @materials, $matextlayer );
-	   push ( @materialnums, $matextlayernum );
-        }
+      if ( ( not( grep { $_ eq $matextlayer } @materials ) )
+        and ( $matextlayer ne "" )
+        and ( not( $matextlayer =~ /^f_/ ) ) )
+      {
+        push( @materials,    $matextlayer );
+        push( @materialnums, $matextlayernum );
+      }
 
-	 if ( ( not( grep { $_ eq $newmatintlayer } @newmaterials ) ) and ( $newmatintlayer ne "" ) and ( $newmatintlayer =~ /^f_/ ) )
-         {
-	    push ( @newmaterials, $newmatintlayer );
-	 }
+      if ( ( not( grep { $_ eq $newmatintlayer } @newmaterials ) )
+        and ( $newmatintlayer ne "" )
+        and ( $newmatintlayer =~ /^f_/ ) )
+      {
+        push( @newmaterials, $newmatintlayer );
+      }
 
-	 if ( ( not( grep { $_ eq $newmatextlayer } @newmaterials ) ) and ( $newmatextlayer ne "" ) and ( $newmatextlayer =~ /^f_/ ) )
-         {
-	    push ( @newmaterials, $newmatextlayer );
-         }
+      if ( ( not( grep { $_ eq $newmatextlayer } @newmaterials ) )
+        and ( $newmatextlayer ne "" )
+        and ( $newmatextlayer =~ /^f_/ ) )
+      {
+        push( @newmaterials, $newmatextlayer );
+      }
 
-      $constrlines[0] =~ s/$constrname/$newconstrname/;
+      $constrlines[1] =~ s/\Q$constrname\E/$newconstrname/g;
+
+      unless ( $onlyonelayer == 1 )
+      {
+        $constrlines[3] =~ s/\Q$matintlayer\E/$newmatintlayer/g;
+      }
+
+      my @intels = split( /\s+/, $constrlines[3] );      say MONITOR "INTELS " . dump(@intels);
+      @intels = cleanblanks(@intels);                   say MONITOR "CLEANED-INTELS " . dump(@intels);
+      my $intoldmat = $intels[0];                       say MONITOR "\$intoldmat-INTELS " . dump($intoldmat);
+
+      $constrlines[$#constrlines] =~ s/\Q$matextlayer\E/$newmatextlayer/g;
+
+      my @extels = split( /\s+/, $constrlines[$#constrlines] ); say MONITOR "\@extels " . dump(@extels);
+      @extels = cleanblanks(@extels);                           say MONITOR "CLEANED-extels " . dump(@extels);
+      my $extoldmat = $extels[0];                               say MONITOR "\$extoldmat-INTELS " . dump($extoldmat);
+
+      foreach my $line (@constrlines)
+      {
+        push( @newcopy, $line );
+      }
+      push( @newbigcopy, [@newcopy] );
+
+      if ( $newmatextlayer ne "" )
+      {
+        $exportconstr{$newconstrname}{extnewlayername} = $newmatextlayer;
+      }
+      if ( $matextlayer ne "" )
+      {
+        $exportconstr{$newconstrname}{extoldlayername} = $matextlayer;
+      }
+      if ( $extoldmat ne "" )
+      {
+        $exportconstr{$newconstrname}{extoldlayernum} = $extoldmat;
+      }
+
+      if ( $newmatintlayer ne "" )
+      {
+        $exportconstr{$newconstrname}{intnewlayername} = $newmatintlayer;
+      }
+      if ( $matintlayer ne "" )
+      {
+        $exportconstr{$newconstrname}{intoldlayername} = $matintlayer;
+      }
+      if ( $intoldmat ne "" )
+      {
+        $exportconstr{$newconstrname}{intoldlayernum} = $intoldmat;
+      }
+    }
+    # --- END OLD CONSTR DATABASE ---
+  }
+  elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
+  {
+
+##
+
+    my ( $newmatinssurf, $newmatextsurf );
+
+    foreach my $copyref (@bigcopy)
+    {
+      my @newcopy;
+      my @constrlines = @{$copyref};
+
+      my $onlyonelayer = 0;
+      if ( scalar(@constrlines) == 6 ) { $onlyonelayer = 1; }
+
+      my $firstrow = $constrlines[0];
+      my @row = split( /,/, $firstrow );
+      @row = cleanblanks(@row);
+
+      my $constrname    = $row[1];
+      my $newconstrname = $constrname;
+
+      chop $newconstrname;
+      chop $newconstrname;
+      $newconstrname = "f_" . "$newconstrname";
+
+      my $intlayer = $constrlines[4];
+      my @row = split( / : |,/, $intlayer );
+      @row = cleanblanks(@row);
+
+      my $matintlayer    = $row[3];
+      my $newmatintlayer = $matintlayer;
+      my $matintlayernum = $row[1];
+
+      chop $newmatintlayer;
+      chop $newmatintlayer;
+      $newmatintlayer = "f_" . "$newmatintlayer";
+
+      my $extlayer = $constrlines[$#constrlines - 1];
+      my @row = split( / : |,/, $extlayer );
+      @row = cleanblanks(@row);
+
+      my $matextlayer    = $row[3];
+      my $newmatextlayer = $matextlayer;
+      my $matextlayernum = $row[1];
+
+      chop $newmatextlayer;
+      chop $newmatextlayer;
+      $newmatextlayer = "f_" . "$newmatextlayer";
+
+      if ( ( not( grep { $_ eq $matintlayer } @materials ) )
+        and ( $matintlayer ne "" )
+        and ( not( $matintlayer =~ /^f_/ ) ) )
+      {
+        push( @materials,    $matintlayer );
+        push( @materialnums, $matintlayernum );
+      }
+
+      if ( ( not( grep { $_ eq $matextlayer } @materials ) )
+        and ( $matextlayer ne "" )
+        and ( not( $matextlayer =~ /^f_/ ) ) )
+      {
+        push( @materials,    $matextlayer );
+        push( @materialnums, $matextlayernum );
+      }
+
+      if ( ( not( grep { $_ eq $newmatintlayer } @newmaterials ) )
+        and ( $newmatintlayer ne "" )
+        and ( $newmatintlayer =~ /^f_/ ) )
+      {
+        push( @newmaterials, $newmatintlayer );
+      }
+
+      if ( ( not( grep { $_ eq $newmatextlayer } @newmaterials ) )
+        and ( $newmatextlayer ne "" )
+        and ( $newmatextlayer =~ /^f_/ ) )
+      {
+        push( @newmaterials, $newmatextlayer );
+      }
+
+      $constrlines[0] =~ s/\Q$constrname\E/$newconstrname/;
       $constrlines[1] = "*itemdoc,fictitious version of construction " . $constrname . " created by the Modish procedure";
       $constrlines[2] = "*incat,Modish_fict";
 
       unless ( $onlyonelayer == 1 )
       {
-         $constrlines[4] =~ s/$matintlayer/$newmatintlayer/;
+        $constrlines[4] =~ s/\Q$matintlayer\E/$newmatintlayer/;
       }
 
-      my @intels = split( /,/, $constrlines[4] ); say MONITOR "INTELS " . dump( @intels );
-      @intels = cleanblanks( @intels ); say MONITOR "CLEANED-INTELS " . dump( @intels );
-      my $intoldmat = $intels[1]; say MONITOR "\$intoldmat-INTELS " . dump( $intoldmat );
+      my @intels = split( /,/, $constrlines[4] );  say MONITOR "INTELS " . dump(@intels);
+      @intels = cleanblanks(@intels);             say MONITOR "CLEANED-INTELS " . dump(@intels);
+      my $intoldmat = $intels[1];                 say MONITOR "\$intoldmat-INTELS " . dump($intoldmat);
 
-       $constrlines[$#constrlines-1] =~ s/$matextlayer/$newmatextlayer/;
+      $constrlines[$#constrlines - 1] =~ s/\Q$matextlayer\E/$newmatextlayer/;
 
-       my @extels = split( /,/, $constrlines[$#constrlines-1] ); say MONITOR "\@extels " . dump( @extels );
-       @extels = cleanblanks( @extels ); say MONITOR "CLEANED-extels " . dump( @extels );
-       my $extoldmat = $extels[1]; say MONITOR "\$extoldmat-INTELS " . dump( $extoldmat );
+      my @extels = split( /,/, $constrlines[$#constrlines - 1] ); say MONITOR "\@extels " . dump(@extels);
+      @extels = cleanblanks(@extels);                             say MONITOR "CLEANED-extels " . dump(@extels);
+      my $extoldmat = $extels[1];                                 say MONITOR "\$extoldmat-INTELS " . dump($extoldmat);
 
-      foreach my $line ( @constrlines )
+      foreach my $line (@constrlines)
       {
-        push ( @newcopy, $line );
+        push( @newcopy, $line );
       }
-      push ( @newbigcopy, [ @newcopy ] );
+      push( @newbigcopy, [@newcopy] );
 
       if ( $newmatextlayer ne "" )
       {
-        $exportconstr{ $newconstrname }{ extnewlayername } = $newmatextlayer;
+        $exportconstr{$newconstrname}{extnewlayername} = $newmatextlayer;
       }
-
       if ( $matextlayer ne "" )
       {
-        $exportconstr{ $newconstrname }{ extoldlayername } = $matextlayer;
+        $exportconstr{$newconstrname}{extoldlayername} = $matextlayer;
       }
-
       if ( $extoldmat ne "" )
       {
-        $exportconstr{ $newconstrname }{ extoldlayernum } = $extoldmat;
+        $exportconstr{$newconstrname}{extoldlayernum} = $extoldmat;
       }
 
       if ( $newmatintlayer ne "" )
       {
-        $exportconstr{ $newconstrname }{ intnewlayername } = $newmatintlayer;
+        $exportconstr{$newconstrname}{intnewlayername} = $newmatintlayer;
       }
-
       if ( $matintlayer ne "" )
       {
-        $exportconstr{ $newconstrname }{ intoldlayername } = $matintlayer;
+        $exportconstr{$newconstrname}{intoldlayername} = $matintlayer;
       }
-
       if ( $intoldmat ne "" )
       {
-        $exportconstr{ $newconstrname }{ intoldlayernum } = $intoldmat;
+        $exportconstr{$newconstrname}{intoldlayernum} = $intoldmat;
       }
     }
   }
 
-  my @oldmaterials =  @materials;
-  say MONITOR "\@newmaterials " . dump( @newmaterials );
-  say MONITOR "\@oldmaterials " . dump( @oldmaterials );
-  @newmaterials = uniq( @newmaterials ); say MONITOR "CLEANED \@newmaterials " . dump( @newmaterials );
-  @oldmaterials = uniq( @oldmaterials ); say MONITOR "CLEANED \@oldmaterials " . dump( @oldmaterials );
 
-  my $newclass = $countcat + 1;
+##
+
+
+  my @oldmaterials = @materials;
+
+  say MONITOR "\@newmaterials " . dump(@newmaterials);
+  say MONITOR "\@oldmaterials " . dump(@oldmaterials);
+
+  @newmaterials = uniq(@newmaterials);  say MONITOR "CLEANED \@newmaterials " . dump(@newmaterials);
+  @oldmaterials = uniq(@oldmaterials);  say MONITOR "CLEANED \@oldmaterials " . dump(@oldmaterials);
+
+  my $newclass   = $countcat + 1;
+  my $oldcountm  = $countm;
+
+
+##
+
 
   my %newms;
-  my $oldcountm = $countm;
-  foreach my $newmat ( @newmaterials )
+  foreach my $newmat (@newmaterials)
   {
     $newms{$newmat}{num} = $countm++;
   }
 
+##
+
+
   my %conv;
+
   foreach $newconstrname ( sort { $a <=> $b } ( keys %exportconstr ) )
   {
     if ( $newconstrname ne "" )
     {
-      if ( $newms{$exportconstr{ $newconstrname }{intnewlayername}}{num} ne "" )
+      if ( $newms{ $exportconstr{$newconstrname}{intnewlayername} }{num} ne "" )
       {
-	if ( $exportconstr{ $newconstrname }{intnewlayername} =~ /^f_/ )
-	{
-          $exportconstr{ $newconstrname }{ intnewlayernum } = $newms{$exportconstr{ $newconstrname }{intnewlayername}}{num};
-	}
+        if ( $exportconstr{$newconstrname}{intnewlayername} =~ /^f_/ )
+        {
+          $exportconstr{$newconstrname}{intnewlayernum} =
+            $newms{ $exportconstr{$newconstrname}{intnewlayername} }{num};
+        }
       }
 
-      if ( $newms{$exportconstr{ $newconstrname }{extnewlayername}}{num} ne "" )
+      if ( $newms{ $exportconstr{$newconstrname}{extnewlayername} }{num} ne "" )
       {
-	if ( $exportconstr{ $newconstrname }{extnewlayername} =~ /^f_/ )
-	{
-	 $exportconstr{ $newconstrname }{ extnewlayernum } = $newms{$exportconstr{ $newconstrname }{extnewlayername}}{num};
-	}
+        if ( $exportconstr{$newconstrname}{extnewlayername} =~ /^f_/ )
+        {
+          $exportconstr{$newconstrname}{extnewlayernum} =
+            $newms{ $exportconstr{$newconstrname}{extnewlayername} }{num};
+        }
       }
 
-
-      if ( $exportconstr{ $newconstrname }{ intoldlayernum } ne "" )
+      if ( $exportconstr{$newconstrname}{intoldlayernum} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ intnewlayernum }}{num} = $exportconstr{ $newconstrname }{ intoldlayernum };
+        $conv{ $exportconstr{$newconstrname}{intnewlayernum} }{num} =
+          $exportconstr{$newconstrname}{intoldlayernum};
       }
 
-      if ( $exportconstr{ $newconstrname }{ extoldlayernum } ne "" )
+      if ( $exportconstr{$newconstrname}{extoldlayernum} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ extnewlayernum }}{num} = $exportconstr{ $newconstrname }{ extoldlayernum };
+        $conv{ $exportconstr{$newconstrname}{extnewlayernum} }{num} =
+          $exportconstr{$newconstrname}{extoldlayernum};
       }
 
-      if ( $exportconstr{ $newconstrname }{ intnewlayernum } ne "" )
+      if ( $exportconstr{$newconstrname}{intnewlayernum} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ intoldlayernum }}{num} = $exportconstr{ $newconstrname }{ intnewlayernum };
+        $conv{ $exportconstr{$newconstrname}{intoldlayernum} }{num} =
+          $exportconstr{$newconstrname}{intnewlayernum};
       }
 
-      if ( $exportconstr{ $newconstrname }{ extnewlayernum } ne "" )
+      if ( $exportconstr{$newconstrname}{extnewlayernum} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ extoldlayernum }}{num} = $exportconstr{ $newconstrname }{ extnewlayernum };
+        $conv{ $exportconstr{$newconstrname}{extoldlayernum} }{num} =
+          $exportconstr{$newconstrname}{extnewlayernum};
       }
 
-
-      if ( $exportconstr{ $newconstrname }{ intoldlayername } ne "" )
+      if ( $exportconstr{$newconstrname}{intoldlayername} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ intnewlayernum }}{name} = $exportconstr{ $newconstrname }{ intoldlayername };
+        $conv{ $exportconstr{$newconstrname}{intnewlayernum} }{name} =
+          $exportconstr{$newconstrname}{intoldlayername};
       }
 
-      if ( $exportconstr{ $newconstrname }{ extoldlayername } ne "" )
+      if ( $exportconstr{$newconstrname}{extoldlayername} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ extnewlayernum }}{name} = $exportconstr{ $newconstrname }{ extoldlayername };
+        $conv{ $exportconstr{$newconstrname}{extnewlayernum} }{name} =
+          $exportconstr{$newconstrname}{extoldlayername};
       }
 
-      if ( $exportconstr{ $newconstrname }{ intnewlayername } ne "" )
+      if ( $exportconstr{$newconstrname}{intnewlayername} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ intoldlayernum }}{name} = $exportconstr{ $newconstrname }{ intnewlayername };
+        $conv{ $exportconstr{$newconstrname}{intoldlayernum} }{name} =
+          $exportconstr{$newconstrname}{intnewlayername};
       }
 
-      if ( $exportconstr{ $newconstrname }{ extnewlayername } ne "" )
+      if ( $exportconstr{$newconstrname}{extnewlayername} ne "" )
       {
-        $conv{$exportconstr{ $newconstrname }{ extoldlayernum }}{name} = $exportconstr{ $newconstrname }{ extnewlayername };
+        $conv{ $exportconstr{$newconstrname}{extoldlayernum} }{name} =
+          $exportconstr{$newconstrname}{extnewlayername};
       }
     }
   }
@@ -4752,155 +4817,182 @@ sub createconstrdbfile
   my %throwaway;
   foreach my $key ( keys %conv )
   {
-      unless ( $key eq "" )
-      {
-          $throwaway{$key} = $conv{$key};
-      }
-   }
-   %conv = %throwaway;
-   say MONITOR "CONV " . dump( \%conv );
+    unless ( $key eq "" )
+    {
+      $throwaway{$key} = $conv{$key};
+    }
+  }
+  %conv = %throwaway;
+
+  say MONITOR "CONV " . dump( \%conv );
+
+
+##
+
 
   my @oldmatnums = @materialnums;
-  say MONITOR "\@oldmatnums " . dump( @oldmatnums );
-  @oldmatnums = uniq( @oldmatnums ); say MONITOR "CLEANED \@oldmatnums " . dump( @oldmatnums );
 
-  say MONITOR "NEWBIGCOPY  " .dump ( @newbigcopy );
-  say MONITOR "\%exportconstr " .dump ( \%exportconstr );
+  say MONITOR "\@oldmatnums " . dump(@oldmatnums);
 
-  my  @newmatnums;
-  foreach my $oldmatnum ( @oldmatnums )
+  @oldmatnums = uniq(@oldmatnums);
+
+  say MONITOR "CLEANED \@oldmatnums " . dump(@oldmatnums);
+
+  say MONITOR "NEWBIGCOPY  " . dump(@newbigcopy);
+  say MONITOR "\%exportconstr " . dump( \%exportconstr );
+
+  my @newmatnums;
+  foreach my $oldmatnum (@oldmatnums)
   {
-     push( @newmatnums, $conv{$oldmatnum}{num} );
+    push( @newmatnums, $conv{$oldmatnum}{num} );
   }
-  say MONITOR "\@newmatnums " . dump( @newmatnums );
-  @newmatnums = uniq( @newmatnums ); say MONITOR "CLEANED \@newmatnums " . dump( @newmatnums );
 
-  my ( @lastcopy );
+  say MONITOR "\@newmatnums " . dump(@newmatnums);
+
+  @newmatnums = uniq(@newmatnums);
+
+  say MONITOR "CLEANED \@newmatnums " . dump(@newmatnums);
+
+
+##
+
+  my @lastcopy;
+
   if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {
-     foreach my $copyref ( @newbigcopy )
-     {
-       my @constrlines = @{ $copyref };
+    foreach my $copyref (@newbigcopy)
+    {
+      my @constrlines = @{$copyref};
 
-       my $onlyonelayer = 0;
-       if ( scalar( @constrlines ) == 4 ) { $onlyonelayer = 1 }
+      my $onlyonelayer = 0;
+      if ( scalar(@constrlines) == 4 ) { $onlyonelayer = 1; }
 
-       unless ( $onlyonelayer == 1)
-       {
-         my $intlayer = $constrlines[3];
-         my @row = split ( /\s+/ , $intlayer ); say MONITOR "\@row INT " .dump( @row );
-         @row = cleanblanks( @row ); say MONITOR "\@row CLEANED " .dump( @row ); say MONITOR "\@row0 " .dump( $row[0] );
-         $row[0] = $conv{ $row[0] }{num}; say MONITOR "\@row0 CONVERTED " .dump( $row[0] );
+      unless ( $onlyonelayer == 1 )
+      {
+        my $intlayer = $constrlines[3];
+        my @row = split( /\s+/, $intlayer );  say MONITOR "\@row INT " . dump(@row);
+        @row = cleanblanks(@row);             say MONITOR "\@row CLEANED " . dump(@row);
+        say MONITOR "\@row0 " . dump( $row[0] );
 
-         if ( length( $row[0] ) == 1 )
-         {
-           $row[0] = "    " . $row[0] . "   ";
-           $row[1] = $row[1] . " ";
-           $constrlines[3] = join( " ", @row)
-         }
-         elsif ( length( $row[0] ) == 2 )
-         {
-           $row[0] = "   " . $row[0] . "   ";
-           $row[1] = $row[1] . " ";
-           $constrlines[3] = join( " ", @row )
-         }
-         elsif ( length( $row[0] ) == 3 )
-         {
-           $row[0] = "  " . $row[0] . "   ";
-           $row[1] = $row[1] . " ";
-           $constrlines[3] = join( " ", @row)
-         }
-         elsif ( length( $row[0] ) == 4 )
-         {
-           $row[0] = " " . $row[0] . "   ";
-           $row[1] = $row[1] . " ";
-           $constrlines[3] = join( " ", @row)
-         }
-       }
+        $row[0] = $conv{ $row[0] }{num};      say MONITOR "\@row0 CONVERTED " . dump( $row[0] );
 
-       my $extlayer = $constrlines[$#constrlines];
-       my @row = split ( /\s+/ , $extlayer ); say MONITOR "\@row EXT " .dump( @row );
-       @row = cleanblanks( @row ); say MONITOR "\@row CLEANED " .dump( @row ); say MONITOR "\@row0 " .dump( $row[0] );
-       $row[0] = $conv{ $row[0] }{num}; say MONITOR "\@row0 CONVERTED " .dump( $row[0] );
+        if ( length( $row[0] ) == 1 )
+        {
+          $row[0] = "    " . $row[0] . "   ";
+          $row[1] = $row[1] . " ";
+          $constrlines[3] = join( " ", @row );
+        }
+        elsif ( length( $row[0] ) == 2 )
+        {
+          $row[0] = "   " . $row[0] . "   ";
+          $row[1] = $row[1] . " ";
+          $constrlines[3] = join( " ", @row );
+        }
+        elsif ( length( $row[0] ) == 3 )
+        {
+          $row[0] = "  " . $row[0] . "   ";
+          $row[1] = $row[1] . " ";
+          $constrlines[3] = join( " ", @row );
+        }
+        elsif ( length( $row[0] ) == 4 )
+        {
+          $row[0] = " " . $row[0] . "   ";
+          $row[1] = $row[1] . " ";
+          $constrlines[3] = join( " ", @row );
+        }
+      }
 
-       if ( length( $row[0] ) == 1 )
-       {
-         $row[0] = "    " . $row[0] . "   ";
-         $row[1] = $row[1] . " ";
-         $constrlines[$#constrlines] = join( " ", @row)
-       }
-       elsif ( length( $row[0] ) == 2 )
-       {
-         $row[0] = "   " . $row[0] . "   ";
-         $row[1] = $row[1] . " ";
-         $constrlines[$#constrlines] = join( " ", @row)
-       }
-       elsif ( length( $row[0] ) == 3 )
-       {
-         $row[0] = "  " . $row[0] . "   ";
-         $row[1] = $row[1] . " ";
-         $constrlines[$#constrlines] = join( " ", @row)
-       }
-       elsif ( length( $row[0] ) == 4 )
-       {
-         $row[0] = " " . $row[0] . "   ";
-         $row[1] = $row[1] . " ";
-         $constrlines[$#constrlines] = join( " ", @row)
-       }
-       push ( @lastcopy, @constrlines );
-     }
+      my $extlayer = $constrlines[$#constrlines];
+      my @row = split( /\s+/, $extlayer );  say MONITOR "\@row EXT " . dump(@row);
+      @row = cleanblanks(@row);             say MONITOR "\@row CLEANED " . dump(@row);
+      say MONITOR "\@row0 " . dump( $row[0] );
+
+      $row[0] = $conv{ $row[0] }{num};      say MONITOR "\@row0 CONVERTED " . dump( $row[0] );
+
+      if ( length( $row[0] ) == 1 )
+      {
+        $row[0] = "    " . $row[0] . "   ";
+        $row[1] = $row[1] . " ";
+        $constrlines[$#constrlines] = join( " ", @row );
+      }
+      elsif ( length( $row[0] ) == 2 )
+      {
+        $row[0] = "   " . $row[0] . "   ";
+        $row[1] = $row[1] . " ";
+        $constrlines[$#constrlines] = join( " ", @row );
+      }
+      elsif ( length( $row[0] ) == 3 )
+      {
+        $row[0] = "  " . $row[0] . "   ";
+        $row[1] = $row[1] . " ";
+        $constrlines[$#constrlines] = join( " ", @row );
+      }
+      elsif ( length( $row[0] ) == 4 )
+      {
+        $row[0] = " " . $row[0] . "   ";
+        $row[1] = $row[1] . " ";
+        $constrlines[$#constrlines] = join( " ", @row );
+      }
+
+      push( @lastcopy, @constrlines );
+    }
   }
   elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
   { # --- NEW CONSTR DATABASE ---
-    foreach my $copyref ( @newbigcopy )
+
+    foreach my $copyref (@newbigcopy)
     {
-      my @constrlines = @{ $copyref };
+      my @constrlines = @{$copyref};
 
       $onlyonelayer = 0;
-      if ( scalar( @constrlines ) == 6 )
-      {
-        $onlyonelayer = 1;
-      }
+      if ( scalar(@constrlines) == 6 ) { $onlyonelayer = 1; }
 
-      unless ( $onlyonelayer == 1)
+      unless ( $onlyonelayer == 1 )
       {
-
         my $intlayer = $constrlines[4];
-        my @row = split ( /,/ , $intlayer );
-        @row = cleanblanks( @row );
-        $row[1] = $conv{ $row[1] }{num}; say MONITOR "\@row0 CONVERTED " .dump( $row[1] );
+        my @row = split( /,/, $intlayer );
+        @row = cleanblanks(@row);
 
-        $constrlines[4] = join( ",", @row);
+        $row[1] = $conv{ $row[1] }{num};   say MONITOR "\@row0 CONVERTED " . dump( $row[1] );
+
+        $constrlines[4] = join( ",", @row );
       }
 
-      my $extlayer = $constrlines[$#constrlines-1];
-      my @row = split ( /,/ , $extlayer ); say MONITOR "\@row EXT " .dump( @row );
-      @row = cleanblanks( @row ); say MONITOR "\@row CLEANED " .dump( @row ); say MONITOR "\@row0 " .dump( $row[0] );
-      $row[1] = $conv{ $row[1] }{num}; say MONITOR "\@row1 CONVERTED " . dump( $row[1] );
+      my $extlayer = $constrlines[$#constrlines - 1];
+      my @row = split( /,/, $extlayer );  say MONITOR "\@row EXT " . dump(@row);
+      @row = cleanblanks(@row);           say MONITOR "\@row CLEANED " . dump(@row);
+      say MONITOR "\@row0 " . dump( $row[0] );
 
-      $constrlines[$#constrlines-1] = join( ",", @row);
+      $row[1] = $conv{ $row[1] }{num};    say MONITOR "\@row1 CONVERTED " . dump( $row[1] );
 
-      push ( @lastcopy, @constrlines );
+      $constrlines[$#constrlines - 1] = join( ",", @row );
+
+      push( @lastcopy, @constrlines );
     }
   }
 
-  say MONITOR "LASTCOPY " .dump ( @lastcopy );
-  push ( @updatedlines, @lastcopy );
+  say MONITOR "LASTCOPY " . dump(@lastcopy);
 
-  open( CONSTRDBFILE_F, ">$constrdbfile_f" ) or die "Could not open file '\$constrdbfile_f': $constrdbfile_f, $!";
+  push( @updatedlines, @lastcopy );
+
+
+##
+
+  open( CONSTRDBFILE_F, ">$constrdbfile_f" )
+    or die "Could not open file '\$constrdbfile_f': $constrdbfile_f, $!";
 
   if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {
-    foreach ( @updatedlines )
+    foreach (@updatedlines)
     {
       say CONSTRDBFILE_F $_;
     }
   }
   elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
   {
-    foreach ( @updatedlines )
+    foreach (@updatedlines)
     {
-      unless( $_ =~ /\*db_end/ )
+      unless ( $_ =~ /\*db_end/ )
       {
         say CONSTRDBFILE_F $_;
       }
@@ -4909,9 +5001,13 @@ sub createconstrdbfile
   }
 
   close CONSTRDBFILE_F;
-  return ( \@oldmaterials, \@newmaterials, \%exportconstr, \%conv,
-    $countm, $oldcountm, $newclass, \@oldmatnums, \@newmatnums );
+
+  return (
+    \@oldmaterials, \@newmaterials, \%exportconstr, \%conv,
+    $countm, $oldcountm, $newclass, \@oldmatnums, \@newmatnums
+  );
 }
+
 
 
 sub compareirrs
@@ -9121,7 +9217,7 @@ For the program to work correctly, the ESP-r model materials, construction and o
 
 Included in the example folder there is there is an example of configuration file "modish_defaults.pl". Explanations are written in the comments at the beginning of the source code.
 
-
+For reasons of ease of distribution with other software of mine, this module is dual-licensed, open-source (GPL v3) and proprietary. 
 
 =head2 EXPORT
 
@@ -9129,10 +9225,10 @@ Included in the example folder there is there is an example of configuration fil
 
 =head1 AUTHOR
 
-Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>. The subroutine "createconstrdbfile" has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
+Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

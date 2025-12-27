@@ -7,8 +7,6 @@ use Future::AsyncAwait;
 use File::Spec;
 use Digest::MD5 'md5_hex';
 use Fcntl ':mode';
-use IO::Async::Loop;
-use PAGI::Util::AsyncFile;
 
 =head1 NAME
 
@@ -55,6 +53,28 @@ Array of index file names to try for directory requests.
 =item * encoding (default: undef)
 
 If set, look for pre-compressed files with this extension (e.g., 'gz' for .gz files).
+
+=item * handle_ranges (default: 1)
+
+When enabled (default), the middleware processes Range request headers and returns
+206 Partial Content responses. Set to 0 to ignore Range headers and always
+return the full file.
+
+B<When to disable Range handling:>
+
+When using L<PAGI::Middleware::XSendfile> with a reverse proxy (Nginx, Apache),
+you should disable range handling. The proxy will handle Range requests more
+efficiently using its native sendfile implementation:
+
+    my $app = builder {
+        enable 'XSendfile',
+            type    => 'X-Accel-Redirect',
+            mapping => { '/var/www/files/' => '/protected/' };
+        enable 'Static',
+            root          => '/var/www/files',
+            handle_ranges => 0;  # Let proxy handle Range requests
+        $my_app;
+    };
 
 =back
 
@@ -107,11 +127,12 @@ my %MIME_TYPES = (
 sub _init {
     my ($self, $config) = @_;
 
-    $self->{root}         = $config->{root} // die "Static middleware requires 'root' option";
-    $self->{path}         = $config->{path} // qr{^/};
-    $self->{pass_through} = $config->{pass_through} // 0;
-    $self->{index}        = $config->{index} // ['index.html', 'index.htm'];
-    $self->{encoding}     = $config->{encoding};
+    $self->{root}          = $config->{root} // die "Static middleware requires 'root' option";
+    $self->{path}          = $config->{path} // qr{^/};
+    $self->{pass_through}  = $config->{pass_through} // 0;
+    $self->{index}         = $config->{index} // ['index.html', 'index.htm'];
+    $self->{encoding}      = $config->{encoding};
+    $self->{handle_ranges} = $config->{handle_ranges} // 1;
 
     # Normalize root path
     $self->{root} = File::Spec->rel2abs($self->{root});
@@ -212,8 +233,8 @@ sub wrap {
         # Get MIME type
         my $content_type = $self->_get_mime_type($file_path);
 
-        # Check for Range request
-        my $range_header = $self->_get_header($scope, 'range');
+        # Check for Range request (only if handle_ranges is enabled)
+        my $range_header = $self->{handle_ranges} ? $self->_get_header($scope, 'range') : undef;
         my ($start, $end, $is_range) = $self->_parse_range($range_header, $size);
 
         if ($is_range && !defined $start) {
@@ -261,49 +282,21 @@ sub wrap {
             return;
         }
 
-        # Read and send file content using async I/O via IO::Async::Loop singleton
-        my $chunk_size = 64 * 1024;  # 64KB chunks
-        my $loop = IO::Async::Loop->new;
-
-        if (!$is_range) {
-            # Use non-blocking async file I/O for full file reads (chunked)
-            my $bytes_sent = 0;
-            eval {
-                await PAGI::Util::AsyncFile->read_file_chunked(
-                    $loop, $file_path,
-                    async sub  {
-        my ($chunk) = @_;
-                        $bytes_sent += length($chunk);
-                        my $more = $bytes_sent < $body_size ? 1 : 0;
-                        await $send->({
-                            type => 'http.response.body',
-                            body => $chunk,
-                            more => $more,
-                        });
-                    },
-                    chunk_size => $chunk_size
-                );
-            };
-            if ($@) {
-                await $self->_send_error($send, 500, 'Cannot read file');
-                return;
-            }
+        # Use file response for efficient streaming (sendfile or worker pool)
+        # This also enables XSendfile middleware to intercept the response
+        if ($is_range) {
+            await $send->({
+                type   => 'http.response.body',
+                file   => $file_path,
+                offset => $start,
+                length => $body_size,
+            });
         }
         else {
-            # For range requests, read full file async and slice
-            eval {
-                my $full_content = await PAGI::Util::AsyncFile->read_file($loop, $file_path);
-                my $content = substr($full_content, $start, $body_size);
-                await $send->({
-                    type => 'http.response.body',
-                    body => $content,
-                    more => 0,
-                });
-            };
-            if ($@) {
-                await $self->_send_error($send, 500, 'Cannot read file');
-                return;
-            }
+            await $send->({
+                type => 'http.response.body',
+                file => $file_path,
+            });
         }
     };
 }

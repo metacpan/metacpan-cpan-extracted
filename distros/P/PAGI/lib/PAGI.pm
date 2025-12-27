@@ -3,7 +3,7 @@ package PAGI;
 use strict;
 use warnings;
 
-our $VERSION = '0.001008';
+our $VERSION = '0.001010';
 
 1;
 
@@ -77,7 +77,7 @@ See L<PAGI::Spec>
 
 =item B<Stable: PAGI::Server>
 
-The reference server has been validated against L<PAGI::Compliance> and handles
+The reference server has been validated against L<PAGI::Server::Compliance> and handles
 HTTP/1.1, WebSocket, and SSE correctly. However, it has not been battle-tested
 in production. B<Recommendation:> Run behind a reverse proxy like nginx, Apache,
 or Caddy for production deployments.

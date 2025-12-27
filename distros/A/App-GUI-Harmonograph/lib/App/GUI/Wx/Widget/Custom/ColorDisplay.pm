@@ -52,11 +52,6 @@ sub get_color {
 
 sub get_nr { $_[0]->{'nr'} }
 
-sub SetCallBack {
-    my ( $self, $code) = @_;
-    return unless ref $code eq 'CODE';
-    $self->{'callback'} = $code;
-}
 
 1;
 

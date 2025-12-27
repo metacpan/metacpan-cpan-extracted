@@ -1,15 +1,14 @@
 package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
-# Author: Gian Luca Brunetti. (gianluca.brunetti@polimi.it)
-# Copyright reserved.  2018-2024.
-# GPL License 3.0 or newer.
-# This is a program for filling a design space multivariate discrete dataseries
-# through a strategy entailing distance-weighting the nearest-neihbouring gradients.
+# Interlinear is a program for filling a design space multivariate discrete dataseries # through a strategy entailing distance-weighting the nearest-neihbouring gradients.
+# Interliner is distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright Gian Luca Brunetti 2018-2025, gianluca.brunetti@gmail.com. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+
+
 use Math::Round;
 use List::Util qw( min max reduce shuffle any );
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use List::Compare;
 use Set::Intersection;
 use List::MoreUtils qw(uniq);
@@ -28,6 +27,8 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
+use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE ABOVE "use Sim::OPT..." lines should be deleted or commented.
 
@@ -407,7 +408,7 @@ sub calcdist
       my @elts = split( "-", $el );
       push( @da2, $elts[0] );
       push( @da2par, $elts[1] );
-    } # say $tee "YES, I AIM.";
+    } # say $tee "YES, Sim::OPTcueIM.";
 
     my $c = 0;
     foreach my $e ( @da1par )
@@ -2431,6 +2432,7 @@ The minimal operations for utilizing a data series which is incomplete as regard
 6) when asked, specify the name (with relative path) of the Sim::OPT configuration file. For example:
 ./filename.pl .
 
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
 
 =head2 EXPORT
 
@@ -2448,7 +2450,7 @@ Gian Luca Brunetti (2018-24) E<lt>gianluca.brunetti@polimi.itE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 
-Copyright (C) 2018-22 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 or newer.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

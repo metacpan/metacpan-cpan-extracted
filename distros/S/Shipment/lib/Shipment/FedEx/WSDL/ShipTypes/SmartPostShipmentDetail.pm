@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,44 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Indicia_of :ATTR(:get<Indicia>);
-my %AncillaryEndorsement_of :ATTR(:get<AncillaryEndorsement>);
-my %HubId_of :ATTR(:get<HubId>);
-my %CustomerManifestId_of :ATTR(:get<CustomerManifestId>);
+    my %Indicia_of              : ATTR(:get<Indicia>);
+    my %AncillaryEndorsement_of : ATTR(:get<AncillaryEndorsement>);
+    my %HubId_of                : ATTR(:get<HubId>);
+    my %CustomerManifestId_of   : ATTR(:get<CustomerManifestId>);
 
-__PACKAGE__->_factory(
-    [ qw(        Indicia
-        AncillaryEndorsement
-        HubId
-        CustomerManifestId
+    __PACKAGE__->_factory(
+        [   qw(        Indicia
+              AncillaryEndorsement
+              HubId
+              CustomerManifestId
 
-    ) ],
-    {
-        'Indicia' => \%Indicia_of,
-        'AncillaryEndorsement' => \%AncillaryEndorsement_of,
-        'HubId' => \%HubId_of,
-        'CustomerManifestId' => \%CustomerManifestId_of,
-    },
-    {
-        'Indicia' => 'Shipment::FedEx::WSDL::ShipTypes::SmartPostIndiciaType',
-        'AncillaryEndorsement' => 'Shipment::FedEx::WSDL::ShipTypes::SmartPostAncillaryEndorsementType',
-        'HubId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CustomerManifestId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Indicia'              => \%Indicia_of,
+            'AncillaryEndorsement' => \%AncillaryEndorsement_of,
+            'HubId'                => \%HubId_of,
+            'CustomerManifestId'   => \%CustomerManifestId_of,
+        },
+        {   'Indicia' =>
+              'Shipment::FedEx::WSDL::ShipTypes::SmartPostIndiciaType',
+            'AncillaryEndorsement' =>
+              'Shipment::FedEx::WSDL::ShipTypes::SmartPostAncillaryEndorsementType',
+            'HubId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CustomerManifestId' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Indicia' => 'Indicia',
-        'AncillaryEndorsement' => 'AncillaryEndorsement',
-        'HubId' => 'HubId',
-        'CustomerManifestId' => 'CustomerManifestId',
-    }
-);
+            'Indicia'              => 'Indicia',
+            'AncillaryEndorsement' => 'AncillaryEndorsement',
+            'HubId'                => 'HubId',
+            'CustomerManifestId'   => 'CustomerManifestId',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +74,7 @@ Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

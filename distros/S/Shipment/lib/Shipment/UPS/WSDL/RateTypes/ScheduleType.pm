@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::ScheduleType;
-$Shipment::UPS::WSDL::RateTypes::ScheduleType::VERSION = '3.10';
+$Shipment::UPS::WSDL::RateTypes::ScheduleType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PickupDay_of :ATTR(:get<PickupDay>);
-my %Method_of :ATTR(:get<Method>);
+    my %PickupDay_of : ATTR(:get<PickupDay>);
+    my %Method_of    : ATTR(:get<Method>);
 
-__PACKAGE__->_factory(
-    [ qw(        PickupDay
-        Method
+    __PACKAGE__->_factory(
+        [   qw(        PickupDay
+              Method
 
-    ) ],
-    {
-        'PickupDay' => \%PickupDay_of,
-        'Method' => \%Method_of,
-    },
-    {
-        'PickupDay' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Method' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'PickupDay' => \%PickupDay_of,
+            'Method'    => \%Method_of,
+        },
+        {   'PickupDay' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Method'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'PickupDay' => 'PickupDay',
-        'Method' => 'Method',
-    }
-);
+            'PickupDay' => 'PickupDay',
+            'Method'    => 'Method',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::UPS::WSDL::RateTypes::ScheduleType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

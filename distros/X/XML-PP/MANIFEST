@@ -1,3 +1,4 @@
+bin/xmlpp-cli
 Changes
 lib/XML/PP.pm
 LICENSE
@@ -5,6 +6,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+scripts/generate_index.pl
 t/30-basics.t
 t/collapse.t
 t/entities.t

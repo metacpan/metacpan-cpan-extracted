@@ -92,9 +92,10 @@ sub new {
     my $abs_root = Cwd::realpath($root) // $root;
 
     my $self = bless {
-        root         => $abs_root,
-        default_type => $args{default_type} // 'application/octet-stream',
-        index        => $args{index} // ['index.html', 'index.htm'],
+        root          => $abs_root,
+        default_type  => $args{default_type} // 'application/octet-stream',
+        index         => $args{index} // ['index.html', 'index.htm'],
+        handle_ranges => $args{handle_ranges} // 1,
     }, $class;
     return $self;
 }
@@ -189,8 +190,8 @@ sub to_app {
         my ($ext) = $file_path =~ /\.([^.]+)$/;
         my $content_type = $MIME_TYPES{lc($ext // '')} // $self->{default_type};
 
-        # Check for Range request
-        my $range = $self->_get_header($scope, 'range');
+        # Check for Range request (only if handle_ranges is enabled)
+        my $range = $self->{handle_ranges} ? $self->_get_header($scope, 'range') : undef;
         if ($range && $range =~ /bytes=(\d*)-(\d*)/) {
             my ($start, $end) = ($1, $2);
             $start = 0 if $start eq '';
@@ -289,6 +290,33 @@ __END__
 =item * default_type - Default MIME type (default: application/octet-stream)
 
 =item * index - Index file names (default: [index.html, index.htm])
+
+=item * handle_ranges - Process Range headers (default: 1)
+
+When enabled (default), the app processes Range request headers and returns
+206 Partial Content responses. Set to 0 to ignore Range headers and always
+return the full file.
+
+B<When to disable Range handling:>
+
+When using L<PAGI::Middleware::XSendfile> with a reverse proxy (Nginx, Apache),
+you should disable range handling. The proxy will handle Range requests more
+efficiently using its native sendfile implementation:
+
+    my $app = PAGI::App::File->new(
+        root          => '/var/www/files',
+        handle_ranges => 0,  # Let proxy handle Range requests
+    )->to_app;
+
+    my $wrapped = builder {
+        enable 'XSendfile',
+            type    => 'X-Accel-Redirect',
+            mapping => { '/var/www/files/' => '/protected/' };
+        $app;
+    };
+
+With this setup, your app always sends the full file path via X-Sendfile header,
+and Nginx handles Range requests natively (which is faster than doing it in Perl).
 
 =back
 

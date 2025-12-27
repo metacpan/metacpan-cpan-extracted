@@ -14,7 +14,7 @@ use Carp;
 
 use parent qw(Data::TagDB::WeakBaseObject Data::Identifier::Interface::Known);
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -112,9 +112,10 @@ my %wk_ise = (
 
 
     # SIRTX:
-    sirtx_logical               => '5e80c7b7-215e-4154-b310-a5387045c336', # sid=113,sni=10
-    sirtx_function_number       => 'd73b6550-5309-46ad-acc9-865c9261065b',
-    sirtx_function_name         => 'd690772e-de18-4714-aa4e-73fd35e8efc9',
+    sirtx_logical               => '5e80c7b7-215e-4154-b310-a5387045c336', # sni=129
+    sirtx_numerical_identifier  => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sid=113,sni=10
+    sirtx_function_number       => 'd73b6550-5309-46ad-acc9-865c9261065b', # sni=127
+    sirtx_function_name         => 'd690772e-de18-4714-aa4e-73fd35e8efc9', # sni=128
 
 
     # Chat 0:
@@ -145,6 +146,12 @@ my %wk_tagname = (
         qw(icon fetch_file_uri),
         qw(has_colour_value also_shares_colour primary_colour displaycolour),
         qw(proto_file),
+
+        # SIRTX:
+        qw(sirtx_numerical_identifier sirtx_logical sirtx_function_number sirtx_function_name),
+
+        # Chat 0:
+        qw(chat_0_word_identifier),
     )
 );
 
@@ -178,14 +185,27 @@ my %wk_sid = (
     # roaraudio-error-number        26
     small_identifier            =>  27,
     also_has_role               =>  28,
-    #unassigned                     29
-    #unassigned                     30
+    # also-has-comment              29
+    # also-has-description          30
     #unassigned                     31
     final_file_encoding         =>  32,
     final_file_hash             =>  33,
     # ...
     false                       =>  45,
     true                        =>  46,
+    # ...
+    chat_0_word_identifier      => 112,
+    sirtx_numerical_identifier  => 113,
+);
+
+my %wk_logical = (
+    uuid                        => 'uuid',
+    tagname                     => 'tagname',
+    uri                         => 'uri',
+    oid                         => 'oid',
+    wikidata_identifier         => 'wd',
+    small_identifier            => 'sid',
+    sirtx_numerical_identifier  => 'sni',
 );
 
 my %wk_default_type = (
@@ -252,6 +272,7 @@ sub _info {
     $info{ise}              = $wk_ise{$name};
     $info{tagname}          = $wk_tagname{$name};
     $info{sid}              = $wk_sid{$name};
+    $info{logical}          = $wk_logical{$name};
     $info{default_type}     = $wk_default_type{$name};
     $info{default_encoding} = $wk_default_encoding{$name};
 
@@ -284,7 +305,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

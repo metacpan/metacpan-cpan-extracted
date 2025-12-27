@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ClientDetail;
-$Shipment::FedEx::WSDL::RateTypes::ClientDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::ClientDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,46 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %AccountNumber_of :ATTR(:get<AccountNumber>);
-my %MeterNumber_of :ATTR(:get<MeterNumber>);
-my %IntegratorId_of :ATTR(:get<IntegratorId>);
-my %Region_of :ATTR(:get<Region>);
-my %Localization_of :ATTR(:get<Localization>);
+    my %AccountNumber_of : ATTR(:get<AccountNumber>);
+    my %MeterNumber_of   : ATTR(:get<MeterNumber>);
+    my %IntegratorId_of  : ATTR(:get<IntegratorId>);
+    my %Region_of        : ATTR(:get<Region>);
+    my %Localization_of  : ATTR(:get<Localization>);
 
-__PACKAGE__->_factory(
-    [ qw(        AccountNumber
-        MeterNumber
-        IntegratorId
-        Region
-        Localization
+    __PACKAGE__->_factory(
+        [   qw(        AccountNumber
+              MeterNumber
+              IntegratorId
+              Region
+              Localization
 
-    ) ],
-    {
-        'AccountNumber' => \%AccountNumber_of,
-        'MeterNumber' => \%MeterNumber_of,
-        'IntegratorId' => \%IntegratorId_of,
-        'Region' => \%Region_of,
-        'Localization' => \%Localization_of,
-    },
-    {
-        'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'MeterNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'IntegratorId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Region' => 'Shipment::FedEx::WSDL::RateTypes::ExpressRegionCode',
-        'Localization' => 'Shipment::FedEx::WSDL::RateTypes::Localization',
-    },
-    {
+            )
+        ],
+        {   'AccountNumber' => \%AccountNumber_of,
+            'MeterNumber'   => \%MeterNumber_of,
+            'IntegratorId'  => \%IntegratorId_of,
+            'Region'        => \%Region_of,
+            'Localization'  => \%Localization_of,
+        },
+        {   'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'MeterNumber'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'IntegratorId'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Region' => 'Shipment::FedEx::WSDL::RateTypes::ExpressRegionCode',
+            'Localization' => 'Shipment::FedEx::WSDL::RateTypes::Localization',
+        },
+        {
 
-        'AccountNumber' => 'AccountNumber',
-        'MeterNumber' => 'MeterNumber',
-        'IntegratorId' => 'IntegratorId',
-        'Region' => 'Region',
-        'Localization' => 'Localization',
-    }
-);
+            'AccountNumber' => 'AccountNumber',
+            'MeterNumber'   => 'MeterNumber',
+            'IntegratorId'  => 'IntegratorId',
+            'Region'        => 'Region',
+            'Localization'  => 'Localization',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +76,7 @@ Shipment::FedEx::WSDL::RateTypes::ClientDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

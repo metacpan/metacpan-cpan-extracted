@@ -1,27 +1,27 @@
-# 🧩 jq-lite — Lightweight jq in Pure Perl
+# jq-lite — Lightweight jq
 
-![JQ::Lite](./images/jq-lite_jp_sm.png)
+![JQ::Lite](./images/jq-lite_sm.png)
 
 [![MetaCPAN](https://img.shields.io/cpan/v/JQ-Lite.svg)](https://metacpan.org/release/JQ-Lite)
 [![Alpine Linux](https://img.shields.io/badge/Alpine-Linux%20community-0D597F?logo=alpinelinux\&logoColor=white)](https://pkgs.alpinelinux.org/package/edge/community/x86_64/jq-lite)
 [![Perl](https://img.shields.io/badge/Perl-5.14%2B-39457E?logo=perl\&logoColor=white)](https://www.perl.org/)
 
-🌐 [Project homepage](https://kawamurashingo.github.io/JQ-Lite/index-en.html)
+頁 [Project homepage](https://kawamurashingo.github.io/JQ-Lite/)
 
 ---
 
-## ✨ What is jq-lite?
+## 概 What is jq-lite?
 
-**jq-lite** is a **pure-Perl JSON query engine** inspired by [`jq`](https://stedolan.github.io/jq/).
+**jq-lite** is a **Pure Perl JSON query engine** inspired by `jq`.
 
 It lets you **query and transform JSON using jq-like syntax**
 — **without external binaries, native libraries, or compilation**.
 
-> ✅ **Official Alpine Linux package**
->
-> ```bash
-> apk add jq-lite
-> ```
+正 **Official Alpine Linux package**
+
+```bash
+apk add jq-lite
+````
 
 JQ::Lite is designed for **minimal environments** such as:
 
@@ -33,26 +33,23 @@ where **simplicity, readability, and low dependency footprint** matter.
 
 ---
 
-## 🚀 Why jq-lite (in one glance)
+## 要 Why jq-lite
 
-* 🪶 **Pure Perl** — no XS, no C, no shared libraries
-* 🔍 **jq-style filters**: `.users[].name`, `select(...)`, `map(...)`
-* 🔢 **Arithmetic & conditionals**: `if ... then ... else ... end`
-* 🔧 **CLI tool**: `jq-lite`
+* 軽 **Pure Perl** — no XS, no C, no shared libraries
+* 探 **jq-style filters**: `.users[].name`, `select(...)`, `map(...)`
+* 算 **Arithmetic & conditionals**: `if ... then ... else ... end`
+* 具 **CLI tool**: `jq-lite`
 
   * `--null-input`, `--slurp`, `--from-file`
-  * `--yaml`, `--arg`, `--rawfile`, `--argjson`, `--ascii-output`
-* 📊 **100+ built-in jq functions**
-  → see [`FUNCTIONS.md`](FUNCTIONS.md)
-* 💻 **Interactive mode** for exploring JSON
-* 🧰 **JSON & YAML input**
-* 🌐 **Runs almost anywhere Perl runs**
-  → even legacy or air-gapped systems
-  → see [`DESIGN.md`](DESIGN.md)
+  * `--yaml`, `--arg`, `--rawfile`, `--argfile`, `--argjson`, `--ascii-output`
+* 術 **100+ built-in jq functions**
+* 対 **Interactive mode**
+* 材 **JSON & YAML input**
+* 域 **Runs almost anywhere Perl runs**
 
 ---
 
-## ⚡ Quick Start (CLI)
+## 試 Quick Start (CLI)
 
 ```bash
 jq-lite '.users[].name' users.json
@@ -68,48 +65,40 @@ jq-lite users.json
 
 ---
 
-## 🧱 Environment Support
+## 境 Environment Support
 
 | Environment          | jq | jq-lite |
 | -------------------- | -- | ------- |
-| Legacy CentOS / RHEL | ❌  | ✅       |
-| Alpine Linux         | ⚠️ | ✅       |
-| Air-gapped systems   | ❌  | ✅       |
-| No root privilege    | ⚠️ | ✅       |
+| Legacy CentOS / RHEL | 不X  | 可O  |
+| Alpine Linux         | 条△  | 可O  |
+| Air-gapped systems   | 不X  | 可O  |
+| No root privilege    | 条△  | 可O  |
 
-✅ **Runs on Perl ≥ 5.14**
-(e.g. CentOS 6, Debian 7 via `perlbrew` or local install)
+可 **Runs on Perl ≥ 5.14**
+(e.g. CentOS 6, Debian 7 via perlbrew or local install)
 
 ---
 
-## 💡 Why Pure Perl?
+## 理 Why Pure Perl?
 
-### 🧩 Portability
+### 携 Portability
 
 No compilation, no shared libraries.
 If Perl runs, jq-lite runs.
 
-Perfect for:
-
-* minimal containers
-* legacy servers
-* restricted or offline environments
-
 ---
 
-### 🧰 Extensibility
+### 拡 Extensibility
 
 Extend jq-like behavior **directly in Perl**.
 
-You can integrate CPAN modules such as:
-
-* `LWP` (HTTP / APIs)
-* `DBI` (databases)
-* filesystem or OS tools
+* LWP
+* DBI
+* filesystem / OS tools
 
 ---
 
-### 🧱 Seamless Perl Integration
+### 融 Seamless Perl Integration
 
 ```perl
 use JQ::Lite;
@@ -123,25 +112,25 @@ No parsing of CLI output.
 
 ---
 
-### ⚙️ Lightweight Installation
+### 軽 Lightweight Installation
 
 * No XS / C toolchain
-* No system-wide install required
-* Ideal for CI/CD or user-local installs
+* No system-wide install
+* Ideal for CI/CD
 
 ---
 
-### 🔍 Maintainability
+### 保 Maintainability
 
 * Faster iteration than C-based jq
 * Easier debugging
-* Community contributions are simpler
+* Simple contributions
 
 ---
 
-## ⚙️ Installation
+## 入 Installation
 
-### 🛠 From CPAN
+### 配 CPAN
 
 ```bash
 cpanm JQ::Lite
@@ -149,7 +138,7 @@ cpanm JQ::Lite
 
 ---
 
-### 🐧 Alpine Linux (Official)
+### 林 Alpine Linux
 
 ```bash
 apk add jq-lite
@@ -157,7 +146,7 @@ apk add jq-lite
 
 ---
 
-### 🍺 Homebrew (macOS)
+### 麦 Homebrew (macOS)
 
 ```bash
 brew tap kawamurashingo/jq-lite
@@ -166,38 +155,21 @@ brew install --HEAD jq-lite
 
 ---
 
-## 🐳 Containers (Recommended)
-
-**Alpine-based image**
+## 容 Containers
 
 ```dockerfile
 FROM alpine
 RUN apk add --no-cache jq-lite
 ```
 
-jq-lite is ideal as a **container-standard JSON tool**:
-
-* tiny footprint
-* predictable behavior
-* no native dependencies
+jq-lite is ideal as a **container-standard JSON tool**.
 
 ---
 
-## 🐧 Portable Installer (Online → Offline)
-
-For **air-gapped or offline systems**:
-
-1. **Download (on connected machine)**
+## 移 Portable Installer (Offline)
 
 ```bash
-./download.sh [-v <version>] [-o /path/to/usb]
-```
-
-2. **Transfer** `JQ-Lite-<version>.tar.gz`
-
-3. **Install**
-
-```bash
+./download.sh [-v <version>] [-o /path]
 ./install.sh [-p <prefix>] [--skip-tests] JQ-Lite-<version>.tar.gz
 ```
 
@@ -207,60 +179,44 @@ Default:
 $HOME/.local
 ```
 
-Environment setup:
-
-```bash
-export PATH="$HOME/.local/bin:$PATH"
-export PERL5LIB="$HOME/.local/lib/perl5/site_perl:$PERL5LIB"
-```
-
 ---
 
-## 🪟 Windows (PowerShell)
+## 窓 Windows (PowerShell)
 
 ```powershell
 .\install-jq-lite.ps1 [-Prefix <path>] [--SkipTests] JQ-Lite-<version>.tar.gz
 ```
 
-Verify:
-
-```powershell
-jq-lite -v
-```
-
 ---
 
-## 🔍 Example Queries
+## 例 Example Queries
 
 ```bash
-jq-lite '.users[] | select(.profile.active) | .name' users.json
-jq-lite '.users | sort_by(.age) | map(.name) | join(", ")' users.json
-jq-lite '.users[].nickname? // .name' users.json
+jq-lite '.users[] | select(.profile.active) | .name'
+jq-lite '.users | sort_by(.age) | map(.name) | join(", ")'
+jq-lite '.users[].nickname? // .name'
 ```
 
 ---
 
-## 📚 Documentation
+## 書 Documentation
 
-* 📘 **Functions**: [`FUNCTIONS.md`](FUNCTIONS.md)
-* 🧭 **Design**: [`DESIGN.md`](DESIGN.md)
-* 📦 **MetaCPAN**: [https://metacpan.org/pod/JQ::Lite](https://metacpan.org/pod/JQ::Lite)
-
----
-
-## 👤 Author
-
-**川村慎吾 (Shingo Kawamura)**
-📧 [pannakoota1@gmail.com](mailto:pannakoota1@gmail.com)
+* [`FUNCTIONS.md`](FUNCTIONS.md)
+* [`DESIGN.md`](DESIGN.md)
+* [`CPAN`](https://metacpan.org/pod/JQ::Lite)
 
 ---
 
-## 📜 License
+## 作 Author
+
+川村慎吾 (Shingo Kawamura)
+[pannakoota1@gmail.com](mailto:pannakoota1@gmail.com)
+
+---
+
+## 許 License
 
 Same terms as Perl itself.
-
-
-
 
 
 

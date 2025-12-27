@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::RoutingDetail;
-$Shipment::FedEx::WSDL::ShipTypes::RoutingDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::RoutingDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ShipmentRoutingDetail_of :ATTR(:get<ShipmentRoutingDetail>);
-my %AstraDetails_of :ATTR(:get<AstraDetails>);
+    my %ShipmentRoutingDetail_of : ATTR(:get<ShipmentRoutingDetail>);
+    my %AstraDetails_of          : ATTR(:get<AstraDetails>);
 
-__PACKAGE__->_factory(
-    [ qw(        ShipmentRoutingDetail
-        AstraDetails
+    __PACKAGE__->_factory(
+        [   qw(        ShipmentRoutingDetail
+              AstraDetails
 
-    ) ],
-    {
-        'ShipmentRoutingDetail' => \%ShipmentRoutingDetail_of,
-        'AstraDetails' => \%AstraDetails_of,
-    },
-    {
-        'ShipmentRoutingDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ShipmentRoutingDetail',
-        'AstraDetails' => 'Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail',
-    },
-    {
+            )
+        ],
+        {   'ShipmentRoutingDetail' => \%ShipmentRoutingDetail_of,
+            'AstraDetails'          => \%AstraDetails_of,
+        },
+        {   'ShipmentRoutingDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ShipmentRoutingDetail',
+            'AstraDetails' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RoutingAstraDetail',
+        },
+        {
 
-        'ShipmentRoutingDetail' => 'ShipmentRoutingDetail',
-        'AstraDetails' => 'AstraDetails',
-    }
-);
+            'ShipmentRoutingDetail' => 'ShipmentRoutingDetail',
+            'AstraDetails'          => 'AstraDetails',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::ShipTypes::RoutingDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

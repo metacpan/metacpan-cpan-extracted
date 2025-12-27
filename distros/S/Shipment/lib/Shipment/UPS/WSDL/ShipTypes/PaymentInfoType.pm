@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::PaymentInfoType;
-$Shipment::UPS::WSDL::ShipTypes::PaymentInfoType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::PaymentInfoType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ShipmentCharge_of :ATTR(:get<ShipmentCharge>);
-my %SplitDutyVATIndicator_of :ATTR(:get<SplitDutyVATIndicator>);
+    my %ShipmentCharge_of        : ATTR(:get<ShipmentCharge>);
+    my %SplitDutyVATIndicator_of : ATTR(:get<SplitDutyVATIndicator>);
 
-__PACKAGE__->_factory(
-    [ qw(        ShipmentCharge
-        SplitDutyVATIndicator
+    __PACKAGE__->_factory(
+        [   qw(        ShipmentCharge
+              SplitDutyVATIndicator
 
-    ) ],
-    {
-        'ShipmentCharge' => \%ShipmentCharge_of,
-        'SplitDutyVATIndicator' => \%SplitDutyVATIndicator_of,
-    },
-    {
-        'ShipmentCharge' => 'Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType',
-        'SplitDutyVATIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'ShipmentCharge'        => \%ShipmentCharge_of,
+            'SplitDutyVATIndicator' => \%SplitDutyVATIndicator_of,
+        },
+        {   'ShipmentCharge' =>
+              'Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType',
+            'SplitDutyVATIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'ShipmentCharge' => 'ShipmentCharge',
-        'SplitDutyVATIndicator' => 'SplitDutyVATIndicator',
-    }
-);
+            'ShipmentCharge'        => 'ShipmentCharge',
+            'SplitDutyVATIndicator' => 'SplitDutyVATIndicator',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::UPS::WSDL::ShipTypes::PaymentInfoType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

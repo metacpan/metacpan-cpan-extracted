@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 27;
+use Test::More tests => 26;
 use Time::HiRes qw{time};
 use Test::Number::Delta; #delta_within
 use POSIX qw{fmod};
@@ -28,7 +28,7 @@ my $skip=0;
 }
   
 SKIP: {
-  skip "Your machine cannot sleep reliably so we won't even try to run our tests", 25 if $skip;
+  skip "Your machine cannot sleep reliably so we won't even try to run our tests", 24 if $skip;
   
   {
     diag("sleep 5 seconds");
@@ -119,11 +119,4 @@ SKIP: {
     my $time   = $su->time;
     delta_within($time,  $before, $tolerance, 'time');
   }
-  
-  {
-    diag("sleep wrapper");
-    my $slept = $su->sleep(0.5);
-    delta_within($slept, 0.5, $tolerance, 'time');
-  }
-  
 }

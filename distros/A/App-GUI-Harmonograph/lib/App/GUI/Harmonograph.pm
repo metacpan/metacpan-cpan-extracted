@@ -8,7 +8,7 @@ use Wx;
 use utf8;
 use FindBin;
 our $NAME = __PACKAGE__;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-App::GUI::Harmonograph - drawing by lateral and rotary pendula
+App::GUI::Harmonograph - drawing with 4 lateral and 2 rotary pendula
 
 =head1 SYNOPSIS
 

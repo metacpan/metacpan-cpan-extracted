@@ -1,19 +1,13 @@
 package Sim::OPT::Descend;
-# Copyright (C) 2008-2022 by Gian Luca Brunetti.
-# This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations, distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
-# use v5.20;
-
-use Exporter;
-use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
 use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use Set::Intersection;
 use Storable qw(lock_store lock_nstore lock_retrieve dclone);
 use Data::Dump qw(dump);
@@ -28,6 +22,7 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 
 $Data::Dumper::Indent = 0;
@@ -2107,6 +2102,8 @@ Sim::OPT::Descent is a module collaborating with the Sim::OPT module for perform
 
 The objective function for rating the performances of the candidate solutions can be obtained by the weighting of objective functions (performance indicators) performed by the Sim::OPT::Report module, which follows user-specified criteria.
 
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
+
 =head2 EXPORT
 
 "descend".
@@ -2121,7 +2118,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

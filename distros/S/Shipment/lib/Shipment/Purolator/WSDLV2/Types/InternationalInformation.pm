@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::InternationalInformation;
-$Shipment::Purolator::WSDLV2::Types::InternationalInformation::VERSION = '3.10';
+$Shipment::Purolator::WSDLV2::Types::InternationalInformation::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,66 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %DocumentsOnlyIndicator_of :ATTR(:get<DocumentsOnlyIndicator>);
-my %ContentDetails_of :ATTR(:get<ContentDetails>);
-my %BuyerInformation_of :ATTR(:get<BuyerInformation>);
-my %PreferredCustomsBroker_of :ATTR(:get<PreferredCustomsBroker>);
-my %DutyInformation_of :ATTR(:get<DutyInformation>);
-my %ImportExportType_of :ATTR(:get<ImportExportType>);
-my %CustomsInvoiceDocumentIndicator_of :ATTR(:get<CustomsInvoiceDocumentIndicator>);
+    my %DocumentsOnlyIndicator_of : ATTR(:get<DocumentsOnlyIndicator>);
+    my %ContentDetails_of         : ATTR(:get<ContentDetails>);
+    my %BuyerInformation_of       : ATTR(:get<BuyerInformation>);
+    my %PreferredCustomsBroker_of : ATTR(:get<PreferredCustomsBroker>);
+    my %DutyInformation_of        : ATTR(:get<DutyInformation>);
+    my %ImportExportType_of       : ATTR(:get<ImportExportType>);
+    my %CustomsInvoiceDocumentIndicator_of :
+      ATTR(:get<CustomsInvoiceDocumentIndicator>);
 
-__PACKAGE__->_factory(
-    [ qw(        DocumentsOnlyIndicator
-        ContentDetails
-        BuyerInformation
-        PreferredCustomsBroker
-        DutyInformation
-        ImportExportType
-        CustomsInvoiceDocumentIndicator
+    __PACKAGE__->_factory(
+        [   qw(        DocumentsOnlyIndicator
+              ContentDetails
+              BuyerInformation
+              PreferredCustomsBroker
+              DutyInformation
+              ImportExportType
+              CustomsInvoiceDocumentIndicator
 
-    ) ],
-    {
-        'DocumentsOnlyIndicator' => \%DocumentsOnlyIndicator_of,
-        'ContentDetails' => \%ContentDetails_of,
-        'BuyerInformation' => \%BuyerInformation_of,
-        'PreferredCustomsBroker' => \%PreferredCustomsBroker_of,
-        'DutyInformation' => \%DutyInformation_of,
-        'ImportExportType' => \%ImportExportType_of,
-        'CustomsInvoiceDocumentIndicator' => \%CustomsInvoiceDocumentIndicator_of,
-    },
-    {
-        'DocumentsOnlyIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'ContentDetails' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfContentDetail',
-        'BuyerInformation' => 'Shipment::Purolator::WSDLV2::Types::BuyerInformation',
-        'PreferredCustomsBroker' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DutyInformation' => 'Shipment::Purolator::WSDLV2::Types::DutyInformation',
-        'ImportExportType' => 'Shipment::Purolator::WSDLV2::Types::ImportExportType',
-        'CustomsInvoiceDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-    },
-    {
+            )
+        ],
+        {   'DocumentsOnlyIndicator'          => \%DocumentsOnlyIndicator_of,
+            'ContentDetails'                  => \%ContentDetails_of,
+            'BuyerInformation'                => \%BuyerInformation_of,
+            'PreferredCustomsBroker'          => \%PreferredCustomsBroker_of,
+            'DutyInformation'                 => \%DutyInformation_of,
+            'ImportExportType'                => \%ImportExportType_of,
+            'CustomsInvoiceDocumentIndicator' =>
+              \%CustomsInvoiceDocumentIndicator_of,
+        },
+        {   'DocumentsOnlyIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'ContentDetails' =>
+              'Shipment::Purolator::WSDLV2::Types::ArrayOfContentDetail',
+            'BuyerInformation' =>
+              'Shipment::Purolator::WSDLV2::Types::BuyerInformation',
+            'PreferredCustomsBroker' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DutyInformation' =>
+              'Shipment::Purolator::WSDLV2::Types::DutyInformation',
+            'ImportExportType' =>
+              'Shipment::Purolator::WSDLV2::Types::ImportExportType',
+            'CustomsInvoiceDocumentIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        },
+        {
 
-        'DocumentsOnlyIndicator' => 'DocumentsOnlyIndicator',
-        'ContentDetails' => 'ContentDetails',
-        'BuyerInformation' => 'BuyerInformation',
-        'PreferredCustomsBroker' => 'PreferredCustomsBroker',
-        'DutyInformation' => 'DutyInformation',
-        'ImportExportType' => 'ImportExportType',
-        'CustomsInvoiceDocumentIndicator' => 'CustomsInvoiceDocumentIndicator',
-    }
-);
+            'DocumentsOnlyIndicator'          => 'DocumentsOnlyIndicator',
+            'ContentDetails'                  => 'ContentDetails',
+            'BuyerInformation'                => 'BuyerInformation',
+            'PreferredCustomsBroker'          => 'PreferredCustomsBroker',
+            'DutyInformation'                 => 'DutyInformation',
+            'ImportExportType'                => 'ImportExportType',
+            'CustomsInvoiceDocumentIndicator' =>
+              'CustomsInvoiceDocumentIndicator',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +96,7 @@ Shipment::Purolator::WSDLV2::Types::InternationalInformation
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::EdtExciseCondition;
-$Shipment::FedEx::WSDL::ShipTypes::EdtExciseCondition::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::EdtExciseCondition::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Category_of :ATTR(:get<Category>);
-my %Value_of :ATTR(:get<Value>);
+    my %Category_of : ATTR(:get<Category>);
+    my %Value_of    : ATTR(:get<Value>);
 
-__PACKAGE__->_factory(
-    [ qw(        Category
-        Value
+    __PACKAGE__->_factory(
+        [   qw(        Category
+              Value
 
-    ) ],
-    {
-        'Category' => \%Category_of,
-        'Value' => \%Value_of,
-    },
-    {
-        'Category' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Category' => \%Category_of,
+            'Value'    => \%Value_of,
+        },
+        {   'Category' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Value'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Category' => 'Category',
-        'Value' => 'Value',
-    }
-);
+            'Category' => 'Category',
+            'Value'    => 'Value',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::EdtExciseCondition
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

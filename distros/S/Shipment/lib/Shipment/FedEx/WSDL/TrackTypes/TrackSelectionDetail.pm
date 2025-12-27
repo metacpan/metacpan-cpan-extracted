@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,82 +20,89 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CarrierCode_of :ATTR(:get<CarrierCode>);
-my %OperatingCompany_of :ATTR(:get<OperatingCompany>);
-my %PackageIdentifier_of :ATTR(:get<PackageIdentifier>);
-my %TrackingNumberUniqueIdentifier_of :ATTR(:get<TrackingNumberUniqueIdentifier>);
-my %ShipDateRangeBegin_of :ATTR(:get<ShipDateRangeBegin>);
-my %ShipDateRangeEnd_of :ATTR(:get<ShipDateRangeEnd>);
-my %ShipmentAccountNumber_of :ATTR(:get<ShipmentAccountNumber>);
-my %SecureSpodAccount_of :ATTR(:get<SecureSpodAccount>);
-my %Destination_of :ATTR(:get<Destination>);
-my %PagingDetail_of :ATTR(:get<PagingDetail>);
-my %CustomerSpecifiedTimeOutValueInMilliseconds_of :ATTR(:get<CustomerSpecifiedTimeOutValueInMilliseconds>);
+    my %CarrierCode_of       : ATTR(:get<CarrierCode>);
+    my %OperatingCompany_of  : ATTR(:get<OperatingCompany>);
+    my %PackageIdentifier_of : ATTR(:get<PackageIdentifier>);
+    my %TrackingNumberUniqueIdentifier_of :
+      ATTR(:get<TrackingNumberUniqueIdentifier>);
+    my %ShipDateRangeBegin_of    : ATTR(:get<ShipDateRangeBegin>);
+    my %ShipDateRangeEnd_of      : ATTR(:get<ShipDateRangeEnd>);
+    my %ShipmentAccountNumber_of : ATTR(:get<ShipmentAccountNumber>);
+    my %SecureSpodAccount_of     : ATTR(:get<SecureSpodAccount>);
+    my %Destination_of           : ATTR(:get<Destination>);
+    my %PagingDetail_of          : ATTR(:get<PagingDetail>);
+    my %CustomerSpecifiedTimeOutValueInMilliseconds_of :
+      ATTR(:get<CustomerSpecifiedTimeOutValueInMilliseconds>);
 
-__PACKAGE__->_factory(
-    [ qw(        CarrierCode
-        OperatingCompany
-        PackageIdentifier
-        TrackingNumberUniqueIdentifier
-        ShipDateRangeBegin
-        ShipDateRangeEnd
-        ShipmentAccountNumber
-        SecureSpodAccount
-        Destination
-        PagingDetail
-        CustomerSpecifiedTimeOutValueInMilliseconds
+    __PACKAGE__->_factory(
+        [   qw(        CarrierCode
+              OperatingCompany
+              PackageIdentifier
+              TrackingNumberUniqueIdentifier
+              ShipDateRangeBegin
+              ShipDateRangeEnd
+              ShipmentAccountNumber
+              SecureSpodAccount
+              Destination
+              PagingDetail
+              CustomerSpecifiedTimeOutValueInMilliseconds
 
-    ) ],
-    {
-        'CarrierCode' => \%CarrierCode_of,
-        'OperatingCompany' => \%OperatingCompany_of,
-        'PackageIdentifier' => \%PackageIdentifier_of,
-        'TrackingNumberUniqueIdentifier' => \%TrackingNumberUniqueIdentifier_of,
-        'ShipDateRangeBegin' => \%ShipDateRangeBegin_of,
-        'ShipDateRangeEnd' => \%ShipDateRangeEnd_of,
-        'ShipmentAccountNumber' => \%ShipmentAccountNumber_of,
-        'SecureSpodAccount' => \%SecureSpodAccount_of,
-        'Destination' => \%Destination_of,
-        'PagingDetail' => \%PagingDetail_of,
-        'CustomerSpecifiedTimeOutValueInMilliseconds' => \%CustomerSpecifiedTimeOutValueInMilliseconds_of,
-    },
-    {
-        'CarrierCode' => 'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
-        'OperatingCompany' => 'Shipment::FedEx::WSDL::TrackTypes::OperatingCompanyType',
-        'PackageIdentifier' => 'Shipment::FedEx::WSDL::TrackTypes::TrackPackageIdentifier',
-        'TrackingNumberUniqueIdentifier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ShipDateRangeBegin' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'ShipDateRangeEnd' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'ShipmentAccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SecureSpodAccount' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Destination' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'PagingDetail' => 'Shipment::FedEx::WSDL::TrackTypes::PagingDetail',
-        'CustomerSpecifiedTimeOutValueInMilliseconds' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-    },
-    {
+            )
+        ],
+        {   'CarrierCode'                    => \%CarrierCode_of,
+            'OperatingCompany'               => \%OperatingCompany_of,
+            'PackageIdentifier'              => \%PackageIdentifier_of,
+            'TrackingNumberUniqueIdentifier' =>
+              \%TrackingNumberUniqueIdentifier_of,
+            'ShipDateRangeBegin'    => \%ShipDateRangeBegin_of,
+            'ShipDateRangeEnd'      => \%ShipDateRangeEnd_of,
+            'ShipmentAccountNumber' => \%ShipmentAccountNumber_of,
+            'SecureSpodAccount'     => \%SecureSpodAccount_of,
+            'Destination'           => \%Destination_of,
+            'PagingDetail'          => \%PagingDetail_of,
+            'CustomerSpecifiedTimeOutValueInMilliseconds' =>
+              \%CustomerSpecifiedTimeOutValueInMilliseconds_of,
+        },
+        {   'CarrierCode' =>
+              'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
+            'OperatingCompany' =>
+              'Shipment::FedEx::WSDL::TrackTypes::OperatingCompanyType',
+            'PackageIdentifier' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackPackageIdentifier',
+            'TrackingNumberUniqueIdentifier' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ShipDateRangeBegin' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'ShipDateRangeEnd'   => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'ShipmentAccountNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SecureSpodAccount' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Destination'  => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'PagingDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::PagingDetail',
+            'CustomerSpecifiedTimeOutValueInMilliseconds' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        },
+        {
 
-        'CarrierCode' => 'CarrierCode',
-        'OperatingCompany' => 'OperatingCompany',
-        'PackageIdentifier' => 'PackageIdentifier',
-        'TrackingNumberUniqueIdentifier' => 'TrackingNumberUniqueIdentifier',
-        'ShipDateRangeBegin' => 'ShipDateRangeBegin',
-        'ShipDateRangeEnd' => 'ShipDateRangeEnd',
-        'ShipmentAccountNumber' => 'ShipmentAccountNumber',
-        'SecureSpodAccount' => 'SecureSpodAccount',
-        'Destination' => 'Destination',
-        'PagingDetail' => 'PagingDetail',
-        'CustomerSpecifiedTimeOutValueInMilliseconds' => 'CustomerSpecifiedTimeOutValueInMilliseconds',
-    }
-);
+            'CarrierCode'                    => 'CarrierCode',
+            'OperatingCompany'               => 'OperatingCompany',
+            'PackageIdentifier'              => 'PackageIdentifier',
+            'TrackingNumberUniqueIdentifier' =>
+              'TrackingNumberUniqueIdentifier',
+            'ShipDateRangeBegin'    => 'ShipDateRangeBegin',
+            'ShipDateRangeEnd'      => 'ShipDateRangeEnd',
+            'ShipmentAccountNumber' => 'ShipmentAccountNumber',
+            'SecureSpodAccount'     => 'SecureSpodAccount',
+            'Destination'           => 'Destination',
+            'PagingDetail'          => 'PagingDetail',
+            'CustomerSpecifiedTimeOutValueInMilliseconds' =>
+              'CustomerSpecifiedTimeOutValueInMilliseconds',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -112,7 +119,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -3,6 +3,7 @@
 
 
 package BeamerReveal::TemplateStore;
+our $VERSION = '20251226.2107'; # VERSION
 
 use parent 'Exporter';
 use Carp;
@@ -53,14 +54,17 @@ sub _readTemplate {
   
   my $home = $^O eq 'MSWin32' ? $ENV{'userprofile'} : $ENV{'HOME'};
   my $configDir = $ENV{'BEAMERREVEAL_CONFIG'}
-    // File::Spec->catfile( $home, '.config', 'BeamerReveal' );
-  my $templateFileName = File::Spec->catfile( $configDir,
-					      'templates', $library,
-					      $fileName );
-  $templateFileName = File::Spec->catfile( File::ShareDir::dist_dir( 'BeamerReveal' ),
-					   'templates', $library,
-					   $fileName )
+    // "$home/.config/BeamerReveal";
+  my $templateFileName = "$configDir/templates/$library/$fileName";
+  $templateFileName = File::ShareDir::dist_dir( 'BeamerReveal' ) . "/templates/$library/$fileName"
     if ( ! -r $templateFileName );
+  # my $templateFileName = File::Spec->catfile( $configDir,
+  # 					      'templates', $library,
+  # 					      $fileName );
+  # $templateFileName = File::Spec->catfile( File::ShareDir::dist_dir( 'BeamerReveal' ),
+  # 					   'templates', $library,
+  # 					   $fileName )
+  #   if ( ! -r $templateFileName );
   
   my $templateFile = IO::File->new();
   $templateFile->open( "<$templateFileName" )
@@ -84,7 +88,7 @@ BeamerReveal::TemplateStore - TemplateStore
 
 =head1 VERSION
 
-version 20251224.1500
+version 20251226.2107
 
 =head1 SYNOPSIS
 

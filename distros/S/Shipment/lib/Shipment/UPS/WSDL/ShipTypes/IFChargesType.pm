@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::IFChargesType;
-$Shipment::UPS::WSDL::ShipTypes::IFChargesType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::IFChargesType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %MonetaryValue_of :ATTR(:get<MonetaryValue>);
+    my %MonetaryValue_of : ATTR(:get<MonetaryValue>);
 
-__PACKAGE__->_factory(
-    [ qw(        MonetaryValue
+    __PACKAGE__->_factory(
+        [   qw(        MonetaryValue
 
-    ) ],
-    {
-        'MonetaryValue' => \%MonetaryValue_of,
-    },
-    {
-        'MonetaryValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {'MonetaryValue' => \%MonetaryValue_of,},
+        {'MonetaryValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
+        {
 
-        'MonetaryValue' => 'MonetaryValue',
-    }
-);
+            'MonetaryValue' => 'MonetaryValue',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::UPS::WSDL::ShipTypes::IFChargesType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

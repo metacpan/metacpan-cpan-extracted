@@ -9,6 +9,7 @@ use lib 'lib';
 use PAGI::WebSocket;
 
 # Helper to create connected WebSocket with message queue
+# Each call creates a fresh scope to avoid singleton caching issues
 sub create_ws {
     my (%opts) = @_;
     my @sent;
@@ -20,6 +21,7 @@ sub create_ws {
         return Future->done;
     };
 
+    # Fresh scope for each call (important for singleton caching)
     my $scope = { type => 'websocket', headers => [] };
     my $receive = sub {
         if ($msg_idx == 0) {
@@ -146,7 +148,7 @@ subtest 'on() returns $self for chaining' => sub {
     my ($ws) = create_ws();
 
     my $result = $ws->on(message => sub { });
-    is($result, $ws, 'returns self for chaining');
+    ok($result == $ws, 'returns self for chaining');
 
     # Chain test
     $ws->on(message => sub { })

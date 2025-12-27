@@ -79,7 +79,6 @@ sub paint {
     #~ $cr->($dc);
 
     my $code_ref = App::GUI::Harmonograph::Compute::Drawing::compile( $self->{'draw_args'}, $Cr );
-say "fresh drawing ", $code_ref;
     $code_ref->( $dc, $Cx, $Cy ) if ref $code_ref;
     delete $self->{'draw_args'};
     $dc;

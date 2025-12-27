@@ -27,28 +27,28 @@ no_index:
 provides:
   BeamerReveal:
     file: lib/BeamerReveal.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::FrameConverter:
     file: lib/BeamerReveal/FrameConverter.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::IPC::Run:
     file: lib/BeamerReveal/IPC/Run.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::MediaManager:
     file: lib/BeamerReveal/MediaManager.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::Object:
     file: lib/BeamerReveal/Object.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::Object::BeamerFrame:
     file: lib/BeamerReveal/Object/BeamerFrame.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::Object::Presentation:
     file: lib/BeamerReveal/Object/Presentation.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
   BeamerReveal::TemplateStore:
     file: lib/BeamerReveal/TemplateStore.pm
-    version: '20251224.1500'
+    version: '20251226.2107'
 requires:
   Carp: '0'
   Config::Tiny: '0'
@@ -63,17 +63,19 @@ requires:
   File::ShareDir: '0'
   File::Spec: '0'
   File::Which: '0'
+  File::chdir: '0'
   Getopt::Long: '0'
   IO::File: '0'
   IPC::Run: '0'
-  IPC::System::Simple: '0'
+  MCE: '0'
+  MCE::Loop: '0'
+  MCE::Util: '0'
   POSIX: '0'
-  Parallel::ForkManager: '0'
   Pod::Usage: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '20251224.1500'
+version: '20251226.2107'
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -308,6 +310,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::AutoVersion
       name: AutoVersion
       version: '6.036'
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: OurPkgVersion
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: PodVersion

@@ -1,5 +1,5 @@
 package Shipment::Generic;
-$Shipment::Generic::VERSION = '3.10';
+$Shipment::Generic::VERSION = '3.11';
 use strict;
 use warnings;
 
@@ -9,67 +9,67 @@ extends 'Shipment::Base';
 
 
 sub _build_services {
-  { 
-    generic => 
-      Shipment::Service->new(
-        id => 'generic',
-        name => 'Generic Service',
-      ),
-  }
+    {   generic => Shipment::Service->new(
+            id   => 'generic',
+            name => 'Generic Service',
+        ),
+    }
 }
 
 
 sub rate {
-  my ( $self, $service_id, $rate ) = @_;
+    my ($self, $service_id, $rate) = @_;
 
-  $service_id ||= 'generic';
-  $rate ||= 0;
+    $service_id ||= 'generic';
+    $rate       ||= 0;
 
-      use Data::Currency;
-      use Shipment::Service;
-      $self->service( 
-         Shipment::Service->new( 
-          id        => $service_id,
-          name      => $service_id,
-          cost      => Data::Currency->new($rate, $self->currency),
+    use Data::Currency;
+    use Shipment::Service;
+    $self->service(
+        Shipment::Service->new(
+            id   => $service_id,
+            name => $service_id,
+            cost => Data::Currency->new($rate, $self->currency),
         )
-      );
+    );
 
 }
 
 
 sub ship {
-  my ( $self, $service_id, $tracking_id, $rate ) = @_;
+    my ($self, $service_id, $tracking_id, $rate) = @_;
 
-  $self->rate($service_id, $rate);
+    $self->rate($service_id, $rate);
 
-  if (!$tracking_id) {
-    foreach (@{ $self->packages }) {
-      $tracking_id = $_->tracking_id if $_->tracking_id;
-      last if $_->tracking_id;
+    if (!$tracking_id) {
+        foreach (@{$self->packages}) {
+            $tracking_id = $_->tracking_id if $_->tracking_id;
+            last                           if $_->tracking_id;
+        }
     }
-  }
 
-  $tracking_id ||= 'n/a';
+    $tracking_id ||= 'n/a';
 
-  $self->tracking_id( $tracking_id );
+    $self->tracking_id($tracking_id);
 
-  use Shipment::Label;
+    use Shipment::Label;
 
-  foreach (@{ $self->packages }) { 
-    $_->tracking_id( $tracking_id ) if !$_->tracking_id;
-    $_->label(
-      Shipment::Label->new(
-        {
-          tracking_id => $_->tracking_id,
-          content_type => 'text/plain',
-          data => qq|
+    foreach (@{$self->packages}) {
+        $_->tracking_id($tracking_id) if !$_->tracking_id;
+        $_->label(
+            Shipment::Label->new(
+                {   tracking_id  => $_->tracking_id,
+                    content_type => 'text/plain',
+                    data         => qq|
 FROM:
 | . $self->from_address->name . qq|
 | . $self->from_address->company . qq|
 | . $self->from_address->address1 . qq|
 | . $self->from_address->address2 . qq|
-| . $self->from_address->city . qq|, | . $self->from_address->province_code . qq| | . $self->from_address->postal_code . qq|
+|
+                      . $self->from_address->city . qq|, |
+                      . $self->from_address->province_code . qq| |
+                      . $self->from_address->postal_code . qq|
 | . $self->from_address->country_code . qq|
 | . $self->from_address->phone . qq|
 
@@ -78,23 +78,26 @@ TO:
 | . $self->to_address->company . qq|
 | . $self->to_address->address1 . qq|
 | . $self->to_address->address2 . qq|
-| . $self->to_address->city . qq|, | . $self->to_address->province_code . qq| | . $self->to_address->postal_code . qq|
+|
+                      . $self->to_address->city . qq|, |
+                      . $self->to_address->province_code . qq| |
+                      . $self->to_address->postal_code . qq|
 | . $self->to_address->country_code . qq|
 | . $self->to_address->phone . qq|
 |,
-          file_name => $_->tracking_id . '.txt',
-        },
-      )
-    );
-  }
+                    file_name => $_->tracking_id . '.txt',
+                },
+            )
+        );
+    }
 
 }
 
 
 sub cancel {
-  my $self = shift;
+    my $self = shift;
 
-  return 'success';
+    return 'success';
 }
 
 
@@ -112,7 +115,7 @@ Shipment::Generic
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

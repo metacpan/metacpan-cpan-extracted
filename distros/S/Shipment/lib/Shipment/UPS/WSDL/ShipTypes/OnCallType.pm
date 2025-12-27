@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::OnCallType;
-$Shipment::UPS::WSDL::ShipTypes::OnCallType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::OnCallType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,26 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PickupDetails_of :ATTR(:get<PickupDetails>);
+    my %PickupDetails_of : ATTR(:get<PickupDetails>);
 
-__PACKAGE__->_factory(
-    [ qw(        PickupDetails
+    __PACKAGE__->_factory(
+        [   qw(        PickupDetails
 
-    ) ],
-    {
-        'PickupDetails' => \%PickupDetails_of,
-    },
-    {
-        'PickupDetails' => 'Shipment::UPS::WSDL::ShipTypes::PickupDetailsType',
-    },
-    {
+            )
+        ],
+        {'PickupDetails' => \%PickupDetails_of,},
+        {   'PickupDetails' =>
+              'Shipment::UPS::WSDL::ShipTypes::PickupDetailsType',
+        },
+        {
 
-        'PickupDetails' => 'PickupDetails',
-    }
-);
+            'PickupDetails' => 'PickupDetails',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +56,7 @@ Shipment::UPS::WSDL::ShipTypes::OnCallType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

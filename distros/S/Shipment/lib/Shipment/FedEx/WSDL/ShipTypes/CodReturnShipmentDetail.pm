@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,77 +20,75 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CollectionAmount_of :ATTR(:get<CollectionAmount>);
-my %Handling_of :ATTR(:get<Handling>);
-my %ServiceTypeDescription_of :ATTR(:get<ServiceTypeDescription>);
-my %PackagingDescription_of :ATTR(:get<PackagingDescription>);
-my %SecuredDescription_of :ATTR(:get<SecuredDescription>);
-my %Remitter_of :ATTR(:get<Remitter>);
-my %CodRecipient_of :ATTR(:get<CodRecipient>);
-my %CodRoutingDetail_of :ATTR(:get<CodRoutingDetail>);
-my %Barcodes_of :ATTR(:get<Barcodes>);
-my %Label_of :ATTR(:get<Label>);
+    my %CollectionAmount_of       : ATTR(:get<CollectionAmount>);
+    my %Handling_of               : ATTR(:get<Handling>);
+    my %ServiceTypeDescription_of : ATTR(:get<ServiceTypeDescription>);
+    my %PackagingDescription_of   : ATTR(:get<PackagingDescription>);
+    my %SecuredDescription_of     : ATTR(:get<SecuredDescription>);
+    my %Remitter_of               : ATTR(:get<Remitter>);
+    my %CodRecipient_of           : ATTR(:get<CodRecipient>);
+    my %CodRoutingDetail_of       : ATTR(:get<CodRoutingDetail>);
+    my %Barcodes_of               : ATTR(:get<Barcodes>);
+    my %Label_of                  : ATTR(:get<Label>);
 
-__PACKAGE__->_factory(
-    [ qw(        CollectionAmount
-        Handling
-        ServiceTypeDescription
-        PackagingDescription
-        SecuredDescription
-        Remitter
-        CodRecipient
-        CodRoutingDetail
-        Barcodes
-        Label
+    __PACKAGE__->_factory(
+        [   qw(        CollectionAmount
+              Handling
+              ServiceTypeDescription
+              PackagingDescription
+              SecuredDescription
+              Remitter
+              CodRecipient
+              CodRoutingDetail
+              Barcodes
+              Label
 
-    ) ],
-    {
-        'CollectionAmount' => \%CollectionAmount_of,
-        'Handling' => \%Handling_of,
-        'ServiceTypeDescription' => \%ServiceTypeDescription_of,
-        'PackagingDescription' => \%PackagingDescription_of,
-        'SecuredDescription' => \%SecuredDescription_of,
-        'Remitter' => \%Remitter_of,
-        'CodRecipient' => \%CodRecipient_of,
-        'CodRoutingDetail' => \%CodRoutingDetail_of,
-        'Barcodes' => \%Barcodes_of,
-        'Label' => \%Label_of,
-    },
-    {
-        'CollectionAmount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'Handling' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ServiceTypeDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PackagingDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SecuredDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Remitter' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
-        'CodRecipient' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
-        'CodRoutingDetail' => 'Shipment::FedEx::WSDL::ShipTypes::RoutingDetail',
-        'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
-        'Label' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
-    },
-    {
+            )
+        ],
+        {   'CollectionAmount'       => \%CollectionAmount_of,
+            'Handling'               => \%Handling_of,
+            'ServiceTypeDescription' => \%ServiceTypeDescription_of,
+            'PackagingDescription'   => \%PackagingDescription_of,
+            'SecuredDescription'     => \%SecuredDescription_of,
+            'Remitter'               => \%Remitter_of,
+            'CodRecipient'           => \%CodRecipient_of,
+            'CodRoutingDetail'       => \%CodRoutingDetail_of,
+            'Barcodes'               => \%Barcodes_of,
+            'Label'                  => \%Label_of,
+        },
+        {   'CollectionAmount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'Handling'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ServiceTypeDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PackagingDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SecuredDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Remitter'         => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+            'CodRecipient'     => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+            'CodRoutingDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RoutingDetail',
+            'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
+            'Label'    => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
+        },
+        {
 
-        'CollectionAmount' => 'CollectionAmount',
-        'Handling' => 'Handling',
-        'ServiceTypeDescription' => 'ServiceTypeDescription',
-        'PackagingDescription' => 'PackagingDescription',
-        'SecuredDescription' => 'SecuredDescription',
-        'Remitter' => 'Remitter',
-        'CodRecipient' => 'CodRecipient',
-        'CodRoutingDetail' => 'CodRoutingDetail',
-        'Barcodes' => 'Barcodes',
-        'Label' => 'Label',
-    }
-);
+            'CollectionAmount'       => 'CollectionAmount',
+            'Handling'               => 'Handling',
+            'ServiceTypeDescription' => 'ServiceTypeDescription',
+            'PackagingDescription'   => 'PackagingDescription',
+            'SecuredDescription'     => 'SecuredDescription',
+            'Remitter'               => 'Remitter',
+            'CodRecipient'           => 'CodRecipient',
+            'CodRoutingDetail'       => 'CodRoutingDetail',
+            'Barcodes'               => 'Barcodes',
+            'Label'                  => 'Label',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -107,7 +105,7 @@ Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -414,11 +414,12 @@ CODE:
     sv->pvlen       = pvlen;
     sv->ourstash_at = ourstash_at;
 
-    if(flags & 0x04)
+    if(flags & 0x04) {
       if(SvNOK(nv))
         sv->nv = SvNV(nv);
       else
         sv->flags &= ~0x04;
+    }
 
     if(flags & 0x08) {
       sv->pv_strlen = SvCUR(pv);
@@ -723,7 +724,7 @@ CODE:
     hv->n_values    = n;
 
     Newx(hv->values_at, n, struct pmat_hval);
-    for(i = 0; ent = hv_iternext(values_at); i++) {
+    for(i = 0; (ent = hv_iternext(values_at)); i++) {
       I32 klen;
       const char *key = hv_iterkey(ent, &klen);
 

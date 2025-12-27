@@ -1,127 +1,122 @@
 
 package Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest;
-$Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1'}
 
-__PACKAGE__->__set_name('VoidShipmentRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('VoidShipmentRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Request_of :ATTR(:get<Request>);
-my %VoidShipment_of :ATTR(:get<VoidShipment>);
-
-__PACKAGE__->_factory(
-    [ qw(        Request
-        VoidShipment
-
-    ) ],
-    {
-        'Request' => \%Request_of,
-        'VoidShipment' => \%VoidShipment_of,
-    },
-    {
-        'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
-
-
-        'VoidShipment' => 'Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment',
-    },
-    {
-
-        'Request' => '',
-        'VoidShipment' => 'VoidShipment',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Request_of      : ATTR(:get<Request>);
+        my %VoidShipment_of : ATTR(:get<VoidShipment>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Request
+                  VoidShipment
+
+                )
+            ],
+            {   'Request'      => \%Request_of,
+                'VoidShipment' => \%VoidShipment_of,
+            },
+            {   'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
 
 
+                'VoidShipment' =>
+                  'Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment',
+            },
+            {
+
+                'Request'      => '',
+                'VoidShipment' => 'VoidShipment',
+            }
+        );
+
+    }    # end BLOCK
 
 
-package Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment;
-$Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment::VERSION = '3.10';
-use strict;
-use warnings;
-{
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1' }
-
-my %ShipmentIdentificationNumber_of :ATTR(:get<ShipmentIdentificationNumber>);
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-
-__PACKAGE__->_factory(
-    [ qw(        ShipmentIdentificationNumber
-        TrackingNumber
-
-    ) ],
+    package Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment;
+    $Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest::_VoidShipment::VERSION
+      = '3.11';
+    use strict;
+    use warnings;
     {
-        'ShipmentIdentificationNumber' => \%ShipmentIdentificationNumber_of,
-        'TrackingNumber' => \%TrackingNumber_of,
-    },
-    {
-        'ShipmentIdentificationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+        our $XML_ATTRIBUTE_CLASS;
+        undef $XML_ATTRIBUTE_CLASS;
 
-        'ShipmentIdentificationNumber' => 'ShipmentIdentificationNumber',
-        'TrackingNumber' => 'TrackingNumber',
+        sub __get_attr_class {
+            return $XML_ATTRIBUTE_CLASS;
+        }
+
+        use Class::Std::Fast::Storable constructor => 'none';
+        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+        Class::Std::initialize();
+
+        {    # BLOCK to scope variables
+
+            sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1'}
+
+            my %ShipmentIdentificationNumber_of :
+              ATTR(:get<ShipmentIdentificationNumber>);
+            my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
+
+            __PACKAGE__->_factory(
+                [   qw(        ShipmentIdentificationNumber
+                      TrackingNumber
+
+                    )
+                ],
+                {   'ShipmentIdentificationNumber' =>
+                      \%ShipmentIdentificationNumber_of,
+                    'TrackingNumber' => \%TrackingNumber_of,
+                },
+                {   'ShipmentIdentificationNumber' =>
+                      'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                    'TrackingNumber' =>
+                      'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                },
+                {
+
+                    'ShipmentIdentificationNumber' =>
+                      'ShipmentIdentificationNumber',
+                    'TrackingNumber' => 'TrackingNumber',
+                }
+            );
+
+        }    # end BLOCK
+
+
     }
-);
-
-} # end BLOCK
 
 
-
-
-
-
-}
-
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -138,7 +133,7 @@ Shipment::UPS::WSDL::ShipElements::VoidShipmentRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

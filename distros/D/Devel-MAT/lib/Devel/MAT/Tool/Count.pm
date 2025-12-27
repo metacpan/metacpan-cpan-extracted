@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Count 0.53;
+package Devel::MAT::Tool::Count 0.54;
 
 use v5.14;
 use warnings;
@@ -103,7 +103,8 @@ sub count_svs
    my %counts_per_package;
 
    foreach my $sv ( $self->df->heap ) {
-      my $c = $counts{ref $sv} //= Counts( ( 0 ) x 4 );
+      my $kind = $sv->type;
+      my $c = $counts{$kind} //= Counts( ( 0 ) x 4 );
       my $bytes = $sv->$size_meth;
 
       $c->svs++;
@@ -139,9 +140,8 @@ sub count_svs
 
    my @table;
 
-   foreach ( sort keys %counts ) {
-      my $kind = $_ =~ s/^Devel::MAT::SV:://r;
-      my $c = $counts{$_};
+   foreach my $kind ( sort keys %counts ) {
+      my $c = $counts{$kind};
 
       push @table, [ $kind,
             $emit_count->( $kind, 0, $c->svs ),

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest;
-$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,92 +20,92 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-my %MultiPiece_of :ATTR(:get<MultiPiece>);
-my %PagingToken_of :ATTR(:get<PagingToken>);
-my %TrackingNumberUniqueId_of :ATTR(:get<TrackingNumberUniqueId>);
-my %ShipDateRangeBegin_of :ATTR(:get<ShipDateRangeBegin>);
-my %ShipDateRangeEnd_of :ATTR(:get<ShipDateRangeEnd>);
-my %SenderEMailAddress_of :ATTR(:get<SenderEMailAddress>);
-my %SenderContactName_of :ATTR(:get<SenderContactName>);
-my %NotificationDetail_of :ATTR(:get<NotificationDetail>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of            : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of       : ATTR(:get<TransactionDetail>);
+    my %Version_of                 : ATTR(:get<Version>);
+    my %TrackingNumber_of          : ATTR(:get<TrackingNumber>);
+    my %MultiPiece_of              : ATTR(:get<MultiPiece>);
+    my %PagingToken_of             : ATTR(:get<PagingToken>);
+    my %TrackingNumberUniqueId_of  : ATTR(:get<TrackingNumberUniqueId>);
+    my %ShipDateRangeBegin_of      : ATTR(:get<ShipDateRangeBegin>);
+    my %ShipDateRangeEnd_of        : ATTR(:get<ShipDateRangeEnd>);
+    my %SenderEMailAddress_of      : ATTR(:get<SenderEMailAddress>);
+    my %SenderContactName_of       : ATTR(:get<SenderContactName>);
+    my %NotificationDetail_of      : ATTR(:get<NotificationDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        TrackingNumber
-        MultiPiece
-        PagingToken
-        TrackingNumberUniqueId
-        ShipDateRangeBegin
-        ShipDateRangeEnd
-        SenderEMailAddress
-        SenderContactName
-        NotificationDetail
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              TrackingNumber
+              MultiPiece
+              PagingToken
+              TrackingNumberUniqueId
+              ShipDateRangeBegin
+              ShipDateRangeEnd
+              SenderEMailAddress
+              SenderContactName
+              NotificationDetail
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'TrackingNumber' => \%TrackingNumber_of,
-        'MultiPiece' => \%MultiPiece_of,
-        'PagingToken' => \%PagingToken_of,
-        'TrackingNumberUniqueId' => \%TrackingNumberUniqueId_of,
-        'ShipDateRangeBegin' => \%ShipDateRangeBegin_of,
-        'ShipDateRangeEnd' => \%ShipDateRangeEnd_of,
-        'SenderEMailAddress' => \%SenderEMailAddress_of,
-        'SenderContactName' => \%SenderContactName_of,
-        'NotificationDetail' => \%NotificationDetail_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::TrackTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'MultiPiece' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TrackingNumberUniqueId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ShipDateRangeBegin' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'ShipDateRangeEnd' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'SenderEMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SenderContactName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'NotificationDetail' => 'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationDetail',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'TrackingNumber'          => \%TrackingNumber_of,
+            'MultiPiece'              => \%MultiPiece_of,
+            'PagingToken'             => \%PagingToken_of,
+            'TrackingNumberUniqueId'  => \%TrackingNumberUniqueId_of,
+            'ShipDateRangeBegin'      => \%ShipDateRangeBegin_of,
+            'ShipDateRangeEnd'        => \%ShipDateRangeEnd_of,
+            'SenderEMailAddress'      => \%SenderEMailAddress_of,
+            'SenderContactName'       => \%SenderContactName_of,
+            'NotificationDetail'      => \%NotificationDetail_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail',
+            'ClientDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
+            'Version'        => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
+            'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'MultiPiece'     => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'PagingToken'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TrackingNumberUniqueId' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ShipDateRangeBegin' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'ShipDateRangeEnd'   => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'SenderEMailAddress' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SenderContactName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'NotificationDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationDetail',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'TrackingNumber' => 'TrackingNumber',
-        'MultiPiece' => 'MultiPiece',
-        'PagingToken' => 'PagingToken',
-        'TrackingNumberUniqueId' => 'TrackingNumberUniqueId',
-        'ShipDateRangeBegin' => 'ShipDateRangeBegin',
-        'ShipDateRangeEnd' => 'ShipDateRangeEnd',
-        'SenderEMailAddress' => 'SenderEMailAddress',
-        'SenderContactName' => 'SenderContactName',
-        'NotificationDetail' => 'NotificationDetail',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'TrackingNumber'          => 'TrackingNumber',
+            'MultiPiece'              => 'MultiPiece',
+            'PagingToken'             => 'PagingToken',
+            'TrackingNumberUniqueId'  => 'TrackingNumberUniqueId',
+            'ShipDateRangeBegin'      => 'ShipDateRangeBegin',
+            'ShipDateRangeEnd'        => 'ShipDateRangeEnd',
+            'SenderEMailAddress'      => 'SenderEMailAddress',
+            'SenderContactName'       => 'SenderContactName',
+            'NotificationDetail'      => 'NotificationDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -122,7 +122,7 @@ Shipment::FedEx::WSDL::TrackTypes::SendNotificationsRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

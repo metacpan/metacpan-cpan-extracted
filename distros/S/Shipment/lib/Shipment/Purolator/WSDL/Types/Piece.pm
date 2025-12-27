@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::Piece;
-$Shipment::Purolator::WSDL::Types::Piece::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::Piece::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Weight_of :ATTR(:get<Weight>);
-my %Length_of :ATTR(:get<Length>);
-my %Width_of :ATTR(:get<Width>);
-my %Height_of :ATTR(:get<Height>);
-my %Options_of :ATTR(:get<Options>);
+    my %Weight_of  : ATTR(:get<Weight>);
+    my %Length_of  : ATTR(:get<Length>);
+    my %Width_of   : ATTR(:get<Width>);
+    my %Height_of  : ATTR(:get<Height>);
+    my %Options_of : ATTR(:get<Options>);
 
-__PACKAGE__->_factory(
-    [ qw(        Weight
-        Length
-        Width
-        Height
-        Options
+    __PACKAGE__->_factory(
+        [   qw(        Weight
+              Length
+              Width
+              Height
+              Options
 
-    ) ],
-    {
-        'Weight' => \%Weight_of,
-        'Length' => \%Length_of,
-        'Width' => \%Width_of,
-        'Height' => \%Height_of,
-        'Options' => \%Options_of,
-    },
-    {
-        'Weight' => 'Shipment::Purolator::WSDL::Types::Weight',
-        'Length' => 'Shipment::Purolator::WSDL::Types::Dimension',
-        'Width' => 'Shipment::Purolator::WSDL::Types::Dimension',
-        'Height' => 'Shipment::Purolator::WSDL::Types::Dimension',
-        'Options' => 'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
-    },
-    {
+            )
+        ],
+        {   'Weight'  => \%Weight_of,
+            'Length'  => \%Length_of,
+            'Width'   => \%Width_of,
+            'Height'  => \%Height_of,
+            'Options' => \%Options_of,
+        },
+        {   'Weight'  => 'Shipment::Purolator::WSDL::Types::Weight',
+            'Length'  => 'Shipment::Purolator::WSDL::Types::Dimension',
+            'Width'   => 'Shipment::Purolator::WSDL::Types::Dimension',
+            'Height'  => 'Shipment::Purolator::WSDL::Types::Dimension',
+            'Options' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
+        },
+        {
 
-        'Weight' => 'Weight',
-        'Length' => 'Length',
-        'Width' => 'Width',
-        'Height' => 'Height',
-        'Options' => 'Options',
-    }
-);
+            'Weight'  => 'Weight',
+            'Length'  => 'Length',
+            'Width'   => 'Width',
+            'Height'  => 'Height',
+            'Options' => 'Options',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +77,7 @@ Shipment::Purolator::WSDL::Types::Piece
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

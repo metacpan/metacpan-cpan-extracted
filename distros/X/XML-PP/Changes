@@ -1,5 +1,14 @@
 Revision history for XML-PP
 
+0.07	Fri Dec 26 21:32:41 EST 2025
+	Use Return::Set to verify correct output type
+	Ignore comments in the XML
+	Added bib/xmlpp-cli, and command line program to parse XML files
+	Improved attribute parsing
+	Accept single-quoted attributes
+	Normalize whitespace between attributes
+	Added testing dashboard
+
 0.06	Thu May 22 13:44:50 EDT 2025
 	Use positional parameters when parsing children
 
@@ -21,4 +30,4 @@ Revision history for XML-PP
 	Added collapse_structure()
 
 0.01	Sat Apr 26 07:46:49 EDT 2025
-        First draft
+	First draft

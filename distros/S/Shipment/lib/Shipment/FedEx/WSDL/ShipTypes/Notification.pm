@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::Notification;
-$Shipment::FedEx::WSDL::ShipTypes::Notification::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::Notification::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,53 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Severity_of :ATTR(:get<Severity>);
-my %Source_of :ATTR(:get<Source>);
-my %Code_of :ATTR(:get<Code>);
-my %Message_of :ATTR(:get<Message>);
-my %LocalizedMessage_of :ATTR(:get<LocalizedMessage>);
-my %MessageParameters_of :ATTR(:get<MessageParameters>);
+    my %Severity_of          : ATTR(:get<Severity>);
+    my %Source_of            : ATTR(:get<Source>);
+    my %Code_of              : ATTR(:get<Code>);
+    my %Message_of           : ATTR(:get<Message>);
+    my %LocalizedMessage_of  : ATTR(:get<LocalizedMessage>);
+    my %MessageParameters_of : ATTR(:get<MessageParameters>);
 
-__PACKAGE__->_factory(
-    [ qw(        Severity
-        Source
-        Code
-        Message
-        LocalizedMessage
-        MessageParameters
+    __PACKAGE__->_factory(
+        [   qw(        Severity
+              Source
+              Code
+              Message
+              LocalizedMessage
+              MessageParameters
 
-    ) ],
-    {
-        'Severity' => \%Severity_of,
-        'Source' => \%Source_of,
-        'Code' => \%Code_of,
-        'Message' => \%Message_of,
-        'LocalizedMessage' => \%LocalizedMessage_of,
-        'MessageParameters' => \%MessageParameters_of,
-    },
-    {
-        'Severity' => 'Shipment::FedEx::WSDL::ShipTypes::NotificationSeverityType',
-        'Source' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Code' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Message' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'LocalizedMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'MessageParameters' => 'Shipment::FedEx::WSDL::ShipTypes::NotificationParameter',
-    },
-    {
+            )
+        ],
+        {   'Severity'          => \%Severity_of,
+            'Source'            => \%Source_of,
+            'Code'              => \%Code_of,
+            'Message'           => \%Message_of,
+            'LocalizedMessage'  => \%LocalizedMessage_of,
+            'MessageParameters' => \%MessageParameters_of,
+        },
+        {   'Severity' =>
+              'Shipment::FedEx::WSDL::ShipTypes::NotificationSeverityType',
+            'Source'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Code'              => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Message'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'LocalizedMessage'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'MessageParameters' =>
+              'Shipment::FedEx::WSDL::ShipTypes::NotificationParameter',
+        },
+        {
 
-        'Severity' => 'Severity',
-        'Source' => 'Source',
-        'Code' => 'Code',
-        'Message' => 'Message',
-        'LocalizedMessage' => 'LocalizedMessage',
-        'MessageParameters' => 'MessageParameters',
-    }
-);
+            'Severity'          => 'Severity',
+            'Source'            => 'Source',
+            'Code'              => 'Code',
+            'Message'           => 'Message',
+            'LocalizedMessage'  => 'LocalizedMessage',
+            'MessageParameters' => 'MessageParameters',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +83,7 @@ Shipment::FedEx::WSDL::ShipTypes::Notification
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

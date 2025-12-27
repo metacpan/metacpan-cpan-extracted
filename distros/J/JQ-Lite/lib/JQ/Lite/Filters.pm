@@ -527,7 +527,15 @@ sub apply {
         # support for keys
         if ($part eq 'keys') {
             @next_results = map {
-                ref $_ eq 'HASH' ? [ sort keys %$_ ] : undef
+                if (ref $_ eq 'HASH') {
+                    [ sort keys %$_ ];
+                }
+                elsif (ref $_ eq 'ARRAY') {
+                    [ 0 .. $#{$_} ];
+                }
+                else {
+                    die 'keys(): argument must be an object or array';
+                }
             } @results;
             @$out_ref = @next_results;
             return 1;

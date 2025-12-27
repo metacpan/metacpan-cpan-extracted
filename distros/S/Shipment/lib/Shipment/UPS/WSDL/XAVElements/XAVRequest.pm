@@ -1,81 +1,78 @@
 
 package Shipment::UPS::WSDL::XAVElements::XAVRequest;
-$Shipment::UPS::WSDL::XAVElements::XAVRequest::VERSION = '3.10';
+$Shipment::UPS::WSDL::XAVElements::XAVRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0'}
 
-__PACKAGE__->__set_name('XAVRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('XAVRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Request_of :ATTR(:get<Request>);
-my %RegionalRequestIndicator_of :ATTR(:get<RegionalRequestIndicator>);
-my %MaximumCandidateListSize_of :ATTR(:get<MaximumCandidateListSize>);
-my %AddressKeyFormat_of :ATTR(:get<AddressKeyFormat>);
-
-__PACKAGE__->_factory(
-    [ qw(        Request
-        RegionalRequestIndicator
-        MaximumCandidateListSize
-        AddressKeyFormat
-
-    ) ],
-    {
-        'Request' => \%Request_of,
-        'RegionalRequestIndicator' => \%RegionalRequestIndicator_of,
-        'MaximumCandidateListSize' => \%MaximumCandidateListSize_of,
-        'AddressKeyFormat' => \%AddressKeyFormat_of,
-    },
-    {
-        'Request' => 'Shipment::UPS::WSDL::XAVElements::Request',
-
-        'RegionalRequestIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'MaximumCandidateListSize' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AddressKeyFormat' => 'Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType',
-    },
-    {
-
-        'Request' => '',
-        'RegionalRequestIndicator' => 'RegionalRequestIndicator',
-        'MaximumCandidateListSize' => 'MaximumCandidateListSize',
-        'AddressKeyFormat' => 'AddressKeyFormat',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Request_of                  : ATTR(:get<Request>);
+        my %RegionalRequestIndicator_of : ATTR(:get<RegionalRequestIndicator>);
+        my %MaximumCandidateListSize_of : ATTR(:get<MaximumCandidateListSize>);
+        my %AddressKeyFormat_of         : ATTR(:get<AddressKeyFormat>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Request
+                  RegionalRequestIndicator
+                  MaximumCandidateListSize
+                  AddressKeyFormat
+
+                )
+            ],
+            {   'Request'                  => \%Request_of,
+                'RegionalRequestIndicator' => \%RegionalRequestIndicator_of,
+                'MaximumCandidateListSize' => \%MaximumCandidateListSize_of,
+                'AddressKeyFormat'         => \%AddressKeyFormat_of,
+            },
+            {   'Request' => 'Shipment::UPS::WSDL::XAVElements::Request',
+
+                'RegionalRequestIndicator' =>
+                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                'MaximumCandidateListSize' =>
+                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                'AddressKeyFormat' =>
+                  'Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType',
+            },
+            {
+
+                'Request'                  => '',
+                'RegionalRequestIndicator' => 'RegionalRequestIndicator',
+                'MaximumCandidateListSize' => 'MaximumCandidateListSize',
+                'AddressKeyFormat'         => 'AddressKeyFormat',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -92,7 +89,7 @@ Shipment::UPS::WSDL::XAVElements::XAVRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

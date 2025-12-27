@@ -14,7 +14,7 @@ use ExtUtils::MakeMaker;
 use Term::ReadKey;
 use Term::ANSIColor;
 
-my $line = '-' x 33 . ' ansi-encode ' . '-' x 33;
+my $line = '-' x 30 . ' Term::ANSIEncode ' . '-' x 30;
 if (-e 'Makefile') {
     `make veryclean;reset`;
 }
@@ -62,12 +62,12 @@ WriteMakefile(
     },
 );
 
-print colored(['blue on_blue'],            $line),              "\n";
-print colored(['bright_white on_magenta'], ' Building    -> '), colored(['bright_green'], '     make'), "\n";
-print colored(['bright_white on_magenta'], ' Testing     -> '), colored(['bright_green'], '     make'), " test\n";
-print colored(['bright_white on_magenta'], ' Installing  -> '), colored(['red'],          'sudo '),     colored(['bright_green'], 'make'), " install\n";
-print colored(['bright_white on_magenta'], ' Cleaning Up -> '), colored(['bright_green'], '     make'), " veryclean\n";
-print colored(['blue on_blue'],            $line),              "\n";
+print colored(['blue on_blue'], $line . "\e[0K"), "\n";
+print colored(['bright_white on_magenta'], ' Building    -> '), colored(['bright_green'], '      make'), "\n";
+print colored(['bright_white on_magenta'], ' Testing     -> '), colored(['bright_green'], '      make'), " test\n";
+print colored(['bright_white on_magenta'], ' Installing  -> '), colored(['red'],          ' sudo '),     colored(['bright_green'], 'make'), " install\n";
+print colored(['bright_white on_magenta'], ' Cleaning Up -> '), colored(['bright_green'], '      make'), " veryclean\n";
+print colored(['blue on_blue'], $line . "\e[0K"), "\n";
 
 exit(0);
 

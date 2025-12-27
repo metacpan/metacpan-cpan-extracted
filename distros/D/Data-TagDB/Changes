@@ -1,3 +1,9 @@
+v0.12  2025-12-26Z
+    - Updated list of well known tags
+    - Do not prepare() queries for the wrong DBD
+    - Improved loading of Data::Identifier::Interface::Known based modules into the database
+    - Improved documentation
+
 v0.11  2025-12-24Z
     - Improved documentation
     - Support %port in addition to &port in SIRTX style parsing

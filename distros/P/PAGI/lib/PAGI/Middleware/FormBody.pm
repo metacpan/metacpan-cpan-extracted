@@ -200,7 +200,8 @@ The raw request body string.
 =head1 MULTIPART FORMS
 
 This middleware only handles C<application/x-www-form-urlencoded> bodies.
-For multipart form data (file uploads), use L<PAGI::Middleware::MultipartForm>.
+For multipart form data (file uploads), use L<PAGI::Request> which has built-in
+multipart parsing via L<PAGI::Request::MultiPartHandler>.
 
 =head1 SEE ALSO
 

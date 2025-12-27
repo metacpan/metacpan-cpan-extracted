@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomLabelBoxEntry;
-$Shipment::FedEx::WSDL::ShipTypes::CustomLabelBoxEntry::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::CustomLabelBoxEntry::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TopLeftCorner_of :ATTR(:get<TopLeftCorner>);
-my %BottomRightCorner_of :ATTR(:get<BottomRightCorner>);
+    my %TopLeftCorner_of     : ATTR(:get<TopLeftCorner>);
+    my %BottomRightCorner_of : ATTR(:get<BottomRightCorner>);
 
-__PACKAGE__->_factory(
-    [ qw(        TopLeftCorner
-        BottomRightCorner
+    __PACKAGE__->_factory(
+        [   qw(        TopLeftCorner
+              BottomRightCorner
 
-    ) ],
-    {
-        'TopLeftCorner' => \%TopLeftCorner_of,
-        'BottomRightCorner' => \%BottomRightCorner_of,
-    },
-    {
-        'TopLeftCorner' => 'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
-        'BottomRightCorner' => 'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
-    },
-    {
+            )
+        ],
+        {   'TopLeftCorner'     => \%TopLeftCorner_of,
+            'BottomRightCorner' => \%BottomRightCorner_of,
+        },
+        {   'TopLeftCorner' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
+            'BottomRightCorner' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
+        },
+        {
 
-        'TopLeftCorner' => 'TopLeftCorner',
-        'BottomRightCorner' => 'BottomRightCorner',
-    }
-);
+            'TopLeftCorner'     => 'TopLeftCorner',
+            'BottomRightCorner' => 'BottomRightCorner',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomLabelBoxEntry
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

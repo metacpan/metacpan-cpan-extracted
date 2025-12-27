@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageResultsType;
-$Shipment::UPS::WSDL::ShipTypes::PackageResultsType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::PackageResultsType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,53 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-my %ServiceOptionsCharges_of :ATTR(:get<ServiceOptionsCharges>);
-my %SurePostDasCharges_of :ATTR(:get<SurePostDasCharges>);
-my %ShippingLabel_of :ATTR(:get<ShippingLabel>);
-my %ShippingReceipt_of :ATTR(:get<ShippingReceipt>);
-my %USPSPICNumber_of :ATTR(:get<USPSPICNumber>);
+    my %TrackingNumber_of        : ATTR(:get<TrackingNumber>);
+    my %ServiceOptionsCharges_of : ATTR(:get<ServiceOptionsCharges>);
+    my %SurePostDasCharges_of    : ATTR(:get<SurePostDasCharges>);
+    my %ShippingLabel_of         : ATTR(:get<ShippingLabel>);
+    my %ShippingReceipt_of       : ATTR(:get<ShippingReceipt>);
+    my %USPSPICNumber_of         : ATTR(:get<USPSPICNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        TrackingNumber
-        ServiceOptionsCharges
-        SurePostDasCharges
-        ShippingLabel
-        ShippingReceipt
-        USPSPICNumber
+    __PACKAGE__->_factory(
+        [   qw(        TrackingNumber
+              ServiceOptionsCharges
+              SurePostDasCharges
+              ShippingLabel
+              ShippingReceipt
+              USPSPICNumber
 
-    ) ],
-    {
-        'TrackingNumber' => \%TrackingNumber_of,
-        'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
-        'SurePostDasCharges' => \%SurePostDasCharges_of,
-        'ShippingLabel' => \%ShippingLabel_of,
-        'ShippingReceipt' => \%ShippingReceipt_of,
-        'USPSPICNumber' => \%USPSPICNumber_of,
-    },
-    {
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ServiceOptionsCharges' => 'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
-        'SurePostDasCharges' => 'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
-        'ShippingLabel' => 'Shipment::UPS::WSDL::ShipTypes::LabelType',
-        'ShippingReceipt' => 'Shipment::UPS::WSDL::ShipTypes::ReceiptType',
-        'USPSPICNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'TrackingNumber'        => \%TrackingNumber_of,
+            'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
+            'SurePostDasCharges'    => \%SurePostDasCharges_of,
+            'ShippingLabel'         => \%ShippingLabel_of,
+            'ShippingReceipt'       => \%ShippingReceipt_of,
+            'USPSPICNumber'         => \%USPSPICNumber_of,
+        },
+        {   'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ServiceOptionsCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
+            'SurePostDasCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
+            'ShippingLabel'   => 'Shipment::UPS::WSDL::ShipTypes::LabelType',
+            'ShippingReceipt' => 'Shipment::UPS::WSDL::ShipTypes::ReceiptType',
+            'USPSPICNumber'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'TrackingNumber' => 'TrackingNumber',
-        'ServiceOptionsCharges' => 'ServiceOptionsCharges',
-        'SurePostDasCharges' => 'SurePostDasCharges',
-        'ShippingLabel' => 'ShippingLabel',
-        'ShippingReceipt' => 'ShippingReceipt',
-        'USPSPICNumber' => 'USPSPICNumber',
-    }
-);
+            'TrackingNumber'        => 'TrackingNumber',
+            'ServiceOptionsCharges' => 'ServiceOptionsCharges',
+            'SurePostDasCharges'    => 'SurePostDasCharges',
+            'ShippingLabel'         => 'ShippingLabel',
+            'ShippingReceipt'       => 'ShippingReceipt',
+            'USPSPICNumber'         => 'USPSPICNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +83,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageResultsType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

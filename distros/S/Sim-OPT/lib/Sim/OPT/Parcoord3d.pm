@@ -1,10 +1,8 @@
 package Sim::OPT::Parcoord3d;
-# Copyright (C) 2015 by Gian Luca Brunetti.
 # This is Sim::OPT::Parcoord3d, a program that can receive as input the data for a bi-dimensional parallel coordinate plot in cvs format to produce as output an Autolisp file that can be used from Autocad or Intellicad-based 3D CAD programs to obtain 3D parallel coordinate plots.
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# Sim::OPT::Parcoord3d is distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
-# use v5.20;
 use Exporter;
 use parent 'Exporter'; # imports and subclasses Exporter
 
@@ -15,7 +13,7 @@ use Math::Round 'nlowmult';
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use IO::Tee;
 use File::Copy qw( move copy );
 use Set::Intersection;
@@ -36,7 +34,8 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
-
+use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
@@ -511,6 +510,7 @@ The objective function to be represented through colours in the parallel coordin
 
 The variables to be specified in the configuration file are described in the comments in the "Sim::OPT" configuration file included in the "examples" folder in this distribution ("des.pl", for instance - then search for "Parcoord3d").
 
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
 
 =head2 EXPORT
 
@@ -526,7 +526,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

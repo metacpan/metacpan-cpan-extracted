@@ -57,6 +57,17 @@ WebSocket close code when closing due to rate limit (Policy Violation).
 
 Close reason message.
 
+=item * on_error (optional)
+
+Callback invoked when a send operation fails. Receives C<($error, $event)>
+where C<$event> is the event hash that failed to send. Default behavior
+is to warn to STDERR.
+
+    on_error => sub {
+        my ($error, $event) = @_;
+        $logger->warn("RateLimit close send failed: $error");
+    }
+
 =back
 
 =cut
@@ -70,6 +81,10 @@ sub _init {
     $self->{on_limit_exceeded} = $config->{on_limit_exceeded};
     $self->{close_code} = $config->{close_code} // 1008;
     $self->{close_reason} = $config->{close_reason} // 'Rate limit exceeded';
+    $self->{on_error} = $config->{on_error} // sub {
+        my ($error, $event) = @_;
+        warn "WebSocket::RateLimit send failed: $error\n";
+    };
 }
 
 sub wrap {
@@ -182,10 +197,15 @@ sub _handle_limit_exceeded {
 
     if ($should_close) {
         # Send close frame
-        $send->({
+        my $close_event = {
             type   => 'websocket.close',
             code   => $self->{close_code},
             reason => $self->{close_reason},
+        };
+        my $on_error = $self->{on_error};
+        $send->($close_event)->on_fail(sub {
+            my ($error) = @_;
+            $on_error->($error, $close_event);
         })->retain;
     }
 

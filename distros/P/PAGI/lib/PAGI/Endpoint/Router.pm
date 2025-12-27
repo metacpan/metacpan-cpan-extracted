@@ -139,7 +139,7 @@ sub _wrap_http_handler {
             require PAGI::Response;
 
             my $req = PAGI::Request->new($scope, $receive);
-            my $res = PAGI::Response->new($send, $scope);
+            my $res = PAGI::Response->new($scope, $send);
 
             await $endpoint->$method($req, $res);
         };
@@ -153,7 +153,7 @@ sub _wrap_http_handler {
         require PAGI::Response;
 
         my $req = PAGI::Request->new($scope, $receive);
-        my $res = PAGI::Response->new($send, $scope);
+        my $res = PAGI::Response->new($scope, $send);
 
         await $handler->($req, $res);
     };
@@ -264,7 +264,7 @@ sub _wrap_middleware {
             require PAGI::Response;
 
             my $req = PAGI::Request->new($scope, $receive);
-            my $res = PAGI::Response->new($send, $scope);
+            my $res = PAGI::Response->new($scope, $send);
 
             await $endpoint->$method($req, $res, $next);
         };

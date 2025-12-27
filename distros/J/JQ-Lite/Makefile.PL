@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $resources = {
-    homepage => 'https://kawamurashingo.github.io/JQ-Lite/index-en.html',
+    homepage => 'https://kawamurashingo.github.io/JQ-Lite/',
     repository => {
         type => 'git',
         url  => 'https://github.com/kawamurashingo/JQ-Lite.git',
@@ -45,3 +45,4 @@ WriteMakefile(
         resources => $resources,
     },
 );
+

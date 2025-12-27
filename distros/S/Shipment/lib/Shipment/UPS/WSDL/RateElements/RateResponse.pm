@@ -1,71 +1,66 @@
 
 package Shipment::UPS::WSDL::RateElements::RateResponse;
-$Shipment::UPS::WSDL::RateElements::RateResponse::VERSION = '3.10';
+$Shipment::UPS::WSDL::RateElements::RateResponse::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
-__PACKAGE__->__set_name('RateResponse');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('RateResponse');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Response_of :ATTR(:get<Response>);
-my %RatedShipment_of :ATTR(:get<RatedShipment>);
-
-__PACKAGE__->_factory(
-    [ qw(        Response
-        RatedShipment
-
-    ) ],
-    {
-        'Response' => \%Response_of,
-        'RatedShipment' => \%RatedShipment_of,
-    },
-    {
-        'Response' => 'Shipment::UPS::WSDL::RateElements::Response',
-
-        'RatedShipment' => 'Shipment::UPS::WSDL::RateTypes::RatedShipmentType',
-    },
-    {
-
-        'Response' => '',
-        'RatedShipment' => 'RatedShipment',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Response_of      : ATTR(:get<Response>);
+        my %RatedShipment_of : ATTR(:get<RatedShipment>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Response
+                  RatedShipment
+
+                )
+            ],
+            {   'Response'      => \%Response_of,
+                'RatedShipment' => \%RatedShipment_of,
+            },
+            {   'Response' => 'Shipment::UPS::WSDL::RateElements::Response',
+
+                'RatedShipment' =>
+                  'Shipment::UPS::WSDL::RateTypes::RatedShipmentType',
+            },
+            {
+
+                'Response'      => '',
+                'RatedShipment' => 'RatedShipment',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -82,7 +77,7 @@ Shipment::UPS::WSDL::RateElements::RateResponse
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

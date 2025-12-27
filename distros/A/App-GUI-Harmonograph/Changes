@@ -1,7 +1,14 @@
+1.02 2025-12-26  lichtkind
+-------
+    * = minor fix release = 2 fixes
+    * ! painted dots obey thickness value
+    * ! line thickness of 2 corrected
+    * & removed debug output
+
 1.01 2025-09-03  lichtkind
 -------
     * = minor fix release = 3 fixes
-    * + added supergolden ration constant
+    * + added supergolden ratio constant
     * ? POD fixes
     * & adapt to new GTC 1.9 API
     * / remove some dead code

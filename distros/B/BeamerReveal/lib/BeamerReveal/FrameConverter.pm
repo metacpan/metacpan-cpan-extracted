@@ -3,6 +3,7 @@
 
 
 package BeamerReveal::FrameConverter;
+our $VERSION = '20251226.2107'; # VERSION
 
 use strict;
 use warnings;
@@ -33,8 +34,9 @@ sub new {
     or die( "Error: your setup is incomplete, I cannot find pdftoppm (part of the poppler library)\n" .
 	    "Install 'Poppler-utils' and make sure pdftoppm is accessible in a directory on your PATH list variable\n" );
 
-  $self->{slides} = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
-
+  #  $self->{slides} = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
+  $self->{slides} = "$self->{base}/media/Slides";
+  
   for my $item ( qw(slides) ) {
     File::Path::rmtree( $self->{$item} );
     File::Path::make_path( $self->{$item} );
@@ -53,9 +55,9 @@ sub toJPG {
 	      "$self->{slides}/slide",
 	      '-jpeg',
 	      '-jpegopt',
-	      'optimize=y,quality=50',
-	      '-scale-to-x', @{[4*$self->{xres}/3]},
-	      '-scale-to-y', @{[4*$self->{yres}/3]} ];
+	      'optimize=y,quality=85',
+	      '-scale-to-x', @{[1.5*$self->{xres}]},
+	      '-scale-to-y', @{[1.5*$self->{yres}]} ];
   BeamerReveal::IPC::Run::run( $cmd, 0, 2 );
 }
 
@@ -73,7 +75,7 @@ BeamerReveal::FrameConverter - FrameConverter
 
 =head1 VERSION
 
-version 20251224.1500
+version 20251226.2107
 
 =head1 SYNOPSIS
 

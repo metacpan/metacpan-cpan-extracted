@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType;
-$Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,36 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %CurrencyCode_of :ATTR(:get<CurrencyCode>);
-my %MonetaryValue_of :ATTR(:get<MonetaryValue>);
+    my %Type_of          : ATTR(:get<Type>);
+    my %CurrencyCode_of  : ATTR(:get<CurrencyCode>);
+    my %MonetaryValue_of : ATTR(:get<MonetaryValue>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        CurrencyCode
-        MonetaryValue
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              CurrencyCode
+              MonetaryValue
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'CurrencyCode' => \%CurrencyCode_of,
-        'MonetaryValue' => \%MonetaryValue_of,
-    },
-    {
-        'Type' => 'Shipment::UPS::WSDL::ShipTypes::DeclaredValueType',
-        'CurrencyCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'MonetaryValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Type'          => \%Type_of,
+            'CurrencyCode'  => \%CurrencyCode_of,
+            'MonetaryValue' => \%MonetaryValue_of,
+        },
+        {   'Type' => 'Shipment::UPS::WSDL::ShipTypes::DeclaredValueType',
+            'CurrencyCode'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'MonetaryValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Type' => 'Type',
-        'CurrencyCode' => 'CurrencyCode',
-        'MonetaryValue' => 'MonetaryValue',
-    }
-);
+            'Type'          => 'Type',
+            'CurrencyCode'  => 'CurrencyCode',
+            'MonetaryValue' => 'MonetaryValue',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +66,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

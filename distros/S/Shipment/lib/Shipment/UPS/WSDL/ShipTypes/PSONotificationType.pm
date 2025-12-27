@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::PSONotificationType;
-$Shipment::UPS::WSDL::ShipTypes::PSONotificationType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::PSONotificationType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %NotificationCode_of :ATTR(:get<NotificationCode>);
-my %EMail_of :ATTR(:get<EMail>);
+    my %NotificationCode_of : ATTR(:get<NotificationCode>);
+    my %EMail_of            : ATTR(:get<EMail>);
 
-__PACKAGE__->_factory(
-    [ qw(        NotificationCode
-        EMail
+    __PACKAGE__->_factory(
+        [   qw(        NotificationCode
+              EMail
 
-    ) ],
-    {
-        'NotificationCode' => \%NotificationCode_of,
-        'EMail' => \%EMail_of,
-    },
-    {
-        'NotificationCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'EMail' => 'Shipment::UPS::WSDL::ShipTypes::EmailDetailsType',
-    },
-    {
+            )
+        ],
+        {   'NotificationCode' => \%NotificationCode_of,
+            'EMail'            => \%EMail_of,
+        },
+        {   'NotificationCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'EMail' => 'Shipment::UPS::WSDL::ShipTypes::EmailDetailsType',
+        },
+        {
 
-        'NotificationCode' => 'NotificationCode',
-        'EMail' => 'EMail',
-    }
-);
+            'NotificationCode' => 'NotificationCode',
+            'EMail'            => 'EMail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::PSONotificationType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

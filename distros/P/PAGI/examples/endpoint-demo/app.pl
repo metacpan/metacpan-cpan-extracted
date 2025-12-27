@@ -153,7 +153,7 @@ my $require_json = async sub {
         }
 
         unless ($content_type =~ m{application/json}i) {
-            my $res = PAGI::Response->new($send);
+            my $res = PAGI::Response->new($scope, $send);
             await $res->status(415)->json({
                 error => 'Content-Type must be application/json'
             });

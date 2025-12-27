@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ForwardAgentType;
-$Shipment::UPS::WSDL::ShipTypes::ForwardAgentType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::ForwardAgentType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CompanyName_of :ATTR(:get<CompanyName>);
-my %TaxIdentificationNumber_of :ATTR(:get<TaxIdentificationNumber>);
-my %Address_of :ATTR(:get<Address>);
+    my %CompanyName_of             : ATTR(:get<CompanyName>);
+    my %TaxIdentificationNumber_of : ATTR(:get<TaxIdentificationNumber>);
+    my %Address_of                 : ATTR(:get<Address>);
 
-__PACKAGE__->_factory(
-    [ qw(        CompanyName
-        TaxIdentificationNumber
-        Address
+    __PACKAGE__->_factory(
+        [   qw(        CompanyName
+              TaxIdentificationNumber
+              Address
 
-    ) ],
-    {
-        'CompanyName' => \%CompanyName_of,
-        'TaxIdentificationNumber' => \%TaxIdentificationNumber_of,
-        'Address' => \%Address_of,
-    },
-    {
-        'CompanyName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TaxIdentificationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Address' => 'Shipment::UPS::WSDL::ShipTypes::AddressType',
-    },
-    {
+            )
+        ],
+        {   'CompanyName'             => \%CompanyName_of,
+            'TaxIdentificationNumber' => \%TaxIdentificationNumber_of,
+            'Address'                 => \%Address_of,
+        },
+        {   'CompanyName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TaxIdentificationNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Address' => 'Shipment::UPS::WSDL::ShipTypes::AddressType',
+        },
+        {
 
-        'CompanyName' => 'CompanyName',
-        'TaxIdentificationNumber' => 'TaxIdentificationNumber',
-        'Address' => 'Address',
-    }
-);
+            'CompanyName'             => 'CompanyName',
+            'TaxIdentificationNumber' => 'TaxIdentificationNumber',
+            'Address'                 => 'Address',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::ForwardAgentType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

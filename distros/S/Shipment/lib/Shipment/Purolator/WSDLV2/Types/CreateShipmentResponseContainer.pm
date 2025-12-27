@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer::VERSION = '3.10';
+$Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,58 +17,55 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDLV2::Types::ResponseContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
-my %ShipmentPIN_of :ATTR(:get<ShipmentPIN>);
-my %PiecePINs_of :ATTR(:get<PiecePINs>);
-my %ReturnShipmentPINs_of :ATTR(:get<ReturnShipmentPINs>);
-my %ExpressChequePIN_of :ATTR(:get<ExpressChequePIN>);
+    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
+    my %ShipmentPIN_of         : ATTR(:get<ShipmentPIN>);
+    my %PiecePINs_of           : ATTR(:get<PiecePINs>);
+    my %ReturnShipmentPINs_of  : ATTR(:get<ReturnShipmentPINs>);
+    my %ExpressChequePIN_of    : ATTR(:get<ExpressChequePIN>);
 
-__PACKAGE__->_factory(
-    [ qw(        ResponseInformation
-        ShipmentPIN
-        PiecePINs
-        ReturnShipmentPINs
-        ExpressChequePIN
+    __PACKAGE__->_factory(
+        [   qw(        ResponseInformation
+              ShipmentPIN
+              PiecePINs
+              ReturnShipmentPINs
+              ExpressChequePIN
 
-    ) ],
-    {
-        'ResponseInformation' => \%ResponseInformation_of,
-        'ShipmentPIN' => \%ShipmentPIN_of,
-        'PiecePINs' => \%PiecePINs_of,
-        'ReturnShipmentPINs' => \%ReturnShipmentPINs_of,
-        'ExpressChequePIN' => \%ExpressChequePIN_of,
-    },
-    {
-        'ResponseInformation' => 'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
-        'ShipmentPIN' => 'Shipment::Purolator::WSDLV2::Types::PIN',
-        'PiecePINs' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfPIN',
-        'ReturnShipmentPINs' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfPIN',
-        'ExpressChequePIN' => 'Shipment::Purolator::WSDLV2::Types::PIN',
-    },
-    {
+            )
+        ],
+        {   'ResponseInformation' => \%ResponseInformation_of,
+            'ShipmentPIN'         => \%ShipmentPIN_of,
+            'PiecePINs'           => \%PiecePINs_of,
+            'ReturnShipmentPINs'  => \%ReturnShipmentPINs_of,
+            'ExpressChequePIN'    => \%ExpressChequePIN_of,
+        },
+        {   'ResponseInformation' =>
+              'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
+            'ShipmentPIN' => 'Shipment::Purolator::WSDLV2::Types::PIN',
+            'PiecePINs'   => 'Shipment::Purolator::WSDLV2::Types::ArrayOfPIN',
+            'ReturnShipmentPINs' =>
+              'Shipment::Purolator::WSDLV2::Types::ArrayOfPIN',
+            'ExpressChequePIN' => 'Shipment::Purolator::WSDLV2::Types::PIN',
+        },
+        {
 
-        'ResponseInformation' => 'ResponseInformation',
-        'ShipmentPIN' => 'ShipmentPIN',
-        'PiecePINs' => 'PiecePINs',
-        'ReturnShipmentPINs' => 'ReturnShipmentPINs',
-        'ExpressChequePIN' => 'ExpressChequePIN',
-    }
-);
+            'ResponseInformation' => 'ResponseInformation',
+            'ShipmentPIN'         => 'ShipmentPIN',
+            'PiecePINs'           => 'PiecePINs',
+            'ReturnShipmentPINs'  => 'ReturnShipmentPINs',
+            'ExpressChequePIN'    => 'ExpressChequePIN',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -85,7 +82,7 @@ Shipment::Purolator::WSDLV2::Types::CreateShipmentResponseContainer
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem;
-$Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,87 +20,91 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %SequenceNumber_of :ATTR(:get<SequenceNumber>);
-my %GroupNumber_of :ATTR(:get<GroupNumber>);
-my %GroupPackageCount_of :ATTR(:get<GroupPackageCount>);
-my %VariableHandlingChargeDetail_of :ATTR(:get<VariableHandlingChargeDetail>);
-my %InsuredValue_of :ATTR(:get<InsuredValue>);
-my %Weight_of :ATTR(:get<Weight>);
-my %Dimensions_of :ATTR(:get<Dimensions>);
-my %PhysicalPackaging_of :ATTR(:get<PhysicalPackaging>);
-my %ItemDescription_of :ATTR(:get<ItemDescription>);
-my %CustomerReferences_of :ATTR(:get<CustomerReferences>);
-my %SpecialServicesRequested_of :ATTR(:get<SpecialServicesRequested>);
-my %ContentRecords_of :ATTR(:get<ContentRecords>);
+    my %SequenceNumber_of    : ATTR(:get<SequenceNumber>);
+    my %GroupNumber_of       : ATTR(:get<GroupNumber>);
+    my %GroupPackageCount_of : ATTR(:get<GroupPackageCount>);
+    my %VariableHandlingChargeDetail_of :
+      ATTR(:get<VariableHandlingChargeDetail>);
+    my %InsuredValue_of             : ATTR(:get<InsuredValue>);
+    my %Weight_of                   : ATTR(:get<Weight>);
+    my %Dimensions_of               : ATTR(:get<Dimensions>);
+    my %PhysicalPackaging_of        : ATTR(:get<PhysicalPackaging>);
+    my %ItemDescription_of          : ATTR(:get<ItemDescription>);
+    my %CustomerReferences_of       : ATTR(:get<CustomerReferences>);
+    my %SpecialServicesRequested_of : ATTR(:get<SpecialServicesRequested>);
+    my %ContentRecords_of           : ATTR(:get<ContentRecords>);
 
-__PACKAGE__->_factory(
-    [ qw(        SequenceNumber
-        GroupNumber
-        GroupPackageCount
-        VariableHandlingChargeDetail
-        InsuredValue
-        Weight
-        Dimensions
-        PhysicalPackaging
-        ItemDescription
-        CustomerReferences
-        SpecialServicesRequested
-        ContentRecords
+    __PACKAGE__->_factory(
+        [   qw(        SequenceNumber
+              GroupNumber
+              GroupPackageCount
+              VariableHandlingChargeDetail
+              InsuredValue
+              Weight
+              Dimensions
+              PhysicalPackaging
+              ItemDescription
+              CustomerReferences
+              SpecialServicesRequested
+              ContentRecords
 
-    ) ],
-    {
-        'SequenceNumber' => \%SequenceNumber_of,
-        'GroupNumber' => \%GroupNumber_of,
-        'GroupPackageCount' => \%GroupPackageCount_of,
-        'VariableHandlingChargeDetail' => \%VariableHandlingChargeDetail_of,
-        'InsuredValue' => \%InsuredValue_of,
-        'Weight' => \%Weight_of,
-        'Dimensions' => \%Dimensions_of,
-        'PhysicalPackaging' => \%PhysicalPackaging_of,
-        'ItemDescription' => \%ItemDescription_of,
-        'CustomerReferences' => \%CustomerReferences_of,
-        'SpecialServicesRequested' => \%SpecialServicesRequested_of,
-        'ContentRecords' => \%ContentRecords_of,
-    },
-    {
-        'SequenceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'GroupNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'GroupPackageCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'VariableHandlingChargeDetail' => 'Shipment::FedEx::WSDL::ShipTypes::VariableHandlingChargeDetail',
-        'InsuredValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'Weight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-        'Dimensions' => 'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
-        'PhysicalPackaging' => 'Shipment::FedEx::WSDL::ShipTypes::PhysicalPackagingType',
-        'ItemDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CustomerReferences' => 'Shipment::FedEx::WSDL::ShipTypes::CustomerReference',
-        'SpecialServicesRequested' => 'Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested',
-        'ContentRecords' => 'Shipment::FedEx::WSDL::ShipTypes::ContentRecord',
-    },
-    {
+            )
+        ],
+        {   'SequenceNumber'               => \%SequenceNumber_of,
+            'GroupNumber'                  => \%GroupNumber_of,
+            'GroupPackageCount'            => \%GroupPackageCount_of,
+            'VariableHandlingChargeDetail' =>
+              \%VariableHandlingChargeDetail_of,
+            'InsuredValue'             => \%InsuredValue_of,
+            'Weight'                   => \%Weight_of,
+            'Dimensions'               => \%Dimensions_of,
+            'PhysicalPackaging'        => \%PhysicalPackaging_of,
+            'ItemDescription'          => \%ItemDescription_of,
+            'CustomerReferences'       => \%CustomerReferences_of,
+            'SpecialServicesRequested' => \%SpecialServicesRequested_of,
+            'ContentRecords'           => \%ContentRecords_of,
+        },
+        {   'SequenceNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+            'GroupNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'GroupPackageCount' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'VariableHandlingChargeDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::VariableHandlingChargeDetail',
+            'InsuredValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'Weight'       => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+            'Dimensions'   => 'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
+            'PhysicalPackaging' =>
+              'Shipment::FedEx::WSDL::ShipTypes::PhysicalPackagingType',
+            'ItemDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CustomerReferences' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomerReference',
+            'SpecialServicesRequested' =>
+              'Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested',
+            'ContentRecords' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ContentRecord',
+        },
+        {
 
-        'SequenceNumber' => 'SequenceNumber',
-        'GroupNumber' => 'GroupNumber',
-        'GroupPackageCount' => 'GroupPackageCount',
-        'VariableHandlingChargeDetail' => 'VariableHandlingChargeDetail',
-        'InsuredValue' => 'InsuredValue',
-        'Weight' => 'Weight',
-        'Dimensions' => 'Dimensions',
-        'PhysicalPackaging' => 'PhysicalPackaging',
-        'ItemDescription' => 'ItemDescription',
-        'CustomerReferences' => 'CustomerReferences',
-        'SpecialServicesRequested' => 'SpecialServicesRequested',
-        'ContentRecords' => 'ContentRecords',
-    }
-);
+            'SequenceNumber'               => 'SequenceNumber',
+            'GroupNumber'                  => 'GroupNumber',
+            'GroupPackageCount'            => 'GroupPackageCount',
+            'VariableHandlingChargeDetail' => 'VariableHandlingChargeDetail',
+            'InsuredValue'                 => 'InsuredValue',
+            'Weight'                       => 'Weight',
+            'Dimensions'                   => 'Dimensions',
+            'PhysicalPackaging'            => 'PhysicalPackaging',
+            'ItemDescription'              => 'ItemDescription',
+            'CustomerReferences'           => 'CustomerReferences',
+            'SpecialServicesRequested'     => 'SpecialServicesRequested',
+            'ContentRecords'               => 'ContentRecords',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -117,7 +121,7 @@ Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -64,7 +64,7 @@ async sub with_server {
 subtest 'text response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->text("Hello World");
     };
 
@@ -82,7 +82,7 @@ subtest 'text response' => sub {
 subtest 'html response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->html("<h1>Hello</h1>");
     };
 
@@ -99,7 +99,7 @@ subtest 'html response' => sub {
 subtest 'json response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->json({ message => 'Hello', count => 42 });
     };
 
@@ -119,7 +119,7 @@ subtest 'json response' => sub {
 subtest 'custom status and headers' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->status(201)
                   ->header('X-Custom' => 'value')
                   ->header('X-Request-Id' => '12345')
@@ -139,7 +139,7 @@ subtest 'custom status and headers' => sub {
 subtest 'redirect response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->redirect('/new-location');
     };
 
@@ -160,7 +160,7 @@ subtest 'redirect response' => sub {
 subtest 'redirect with custom status' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->redirect('/permanent', 301);
     };
 
@@ -179,7 +179,7 @@ subtest 'redirect with custom status' => sub {
 subtest 'empty response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->empty();
     };
 
@@ -210,7 +210,7 @@ subtest 'empty response' => sub {
 subtest 'json error response pattern' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->status(400)->json({ error => 'Bad Request', field => 'email' });
     };
 
@@ -230,7 +230,7 @@ subtest 'json error response pattern' => sub {
 subtest 'cookie response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->cookie('session' => 'abc123', path => '/', httponly => 1)
                   ->text('OK');
     };
@@ -250,7 +250,7 @@ subtest 'cookie response' => sub {
 subtest 'streaming response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->content_type('text/plain')
                   ->stream(async sub {
                       my ($writer) = @_;
@@ -277,7 +277,7 @@ subtest 'send_file response' => sub {
 
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->send_file($filename);
     };
 
@@ -298,7 +298,7 @@ subtest 'send_file with attachment' => sub {
 
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->send_file($filename, filename => 'document.pdf');
     };
 
@@ -315,7 +315,7 @@ subtest 'send_file with attachment' => sub {
 subtest 'UTF-8 text response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->text("Hello, 世界! Привет! 🌍");
     };
 
@@ -331,7 +331,7 @@ subtest 'UTF-8 text response' => sub {
 subtest 'CORS headers' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->cors(
             origin      => 'https://example.com',
             credentials => 1,
@@ -354,7 +354,7 @@ subtest 'CORS headers' => sub {
 subtest 'CORS preflight response' => sub {
     my $app = async sub {
         my ($scope, $receive, $send) = @_;
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         await $res->cors(
             origin    => 'https://example.com',
             methods   => [qw(GET POST PUT)],

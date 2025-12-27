@@ -58,4 +58,8 @@ ok(!defined $non_array[0], 'getpath returns undef when traversing non-container 
 my @multi_literal = $jq->run_query($json, '.profile | getpath([["name"], ["age"]])');
 is_deeply($multi_literal[0], ['Alice', 30], 'getpath returns arrayref when multiple literal paths supplied');
 
+my $error = eval { $jq->run_query($json, '.profile | getpath("name")'); 1 };
+ok(!$error, 'getpath throws on non-array path argument');
+like($@, qr/^getpath\(\): path must be an array/, 'error message indicates array requirement');
+
 done_testing;

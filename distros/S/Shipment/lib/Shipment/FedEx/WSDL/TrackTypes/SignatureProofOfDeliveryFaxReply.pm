@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply;
-$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,50 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %HighestSeverity_of :ATTR(:get<HighestSeverity>);
-my %Notifications_of :ATTR(:get<Notifications>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %FaxConfirmationNumber_of :ATTR(:get<FaxConfirmationNumber>);
+    my %HighestSeverity_of       : ATTR(:get<HighestSeverity>);
+    my %Notifications_of         : ATTR(:get<Notifications>);
+    my %TransactionDetail_of     : ATTR(:get<TransactionDetail>);
+    my %Version_of               : ATTR(:get<Version>);
+    my %FaxConfirmationNumber_of : ATTR(:get<FaxConfirmationNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        HighestSeverity
-        Notifications
-        TransactionDetail
-        Version
-        FaxConfirmationNumber
+    __PACKAGE__->_factory(
+        [   qw(        HighestSeverity
+              Notifications
+              TransactionDetail
+              Version
+              FaxConfirmationNumber
 
-    ) ],
-    {
-        'HighestSeverity' => \%HighestSeverity_of,
-        'Notifications' => \%Notifications_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'FaxConfirmationNumber' => \%FaxConfirmationNumber_of,
-    },
-    {
-        'HighestSeverity' => 'Shipment::FedEx::WSDL::TrackTypes::NotificationSeverityType',
-        'Notifications' => 'Shipment::FedEx::WSDL::TrackTypes::Notification',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
-        'FaxConfirmationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'HighestSeverity'       => \%HighestSeverity_of,
+            'Notifications'         => \%Notifications_of,
+            'TransactionDetail'     => \%TransactionDetail_of,
+            'Version'               => \%Version_of,
+            'FaxConfirmationNumber' => \%FaxConfirmationNumber_of,
+        },
+        {   'HighestSeverity' =>
+              'Shipment::FedEx::WSDL::TrackTypes::NotificationSeverityType',
+            'Notifications' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Notification',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
+            'FaxConfirmationNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'HighestSeverity' => 'HighestSeverity',
-        'Notifications' => 'Notifications',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'FaxConfirmationNumber' => 'FaxConfirmationNumber',
-    }
-);
+            'HighestSeverity'       => 'HighestSeverity',
+            'Notifications'         => 'Notifications',
+            'TransactionDetail'     => 'TransactionDetail',
+            'Version'               => 'Version',
+            'FaxConfirmationNumber' => 'FaxConfirmationNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +80,7 @@ Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxReply
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -26,7 +26,7 @@
 @@BeamerFrame: 
 -parameters:rawpage={12},truepage={12},overlay={1},transition={none},title={Placing videos}
 @@BeamerFrame: 
--video:width={0.75},height={0.675},fit={contain},background={yellow},autoplay={},x={0.125},y={0.225},file={Videos/test.mp4}
+-video:width={0.75},height={0.675},fit={contain},background={yellow},autoplay={},x={0.125},y={0.225},file={Media/beamer-reveal-testvideo.mp4}
 -parameters:rawpage={13},truepage={12},overlay={2},transition={none},title={Placing videos}
 @@BeamerFrame: 
 -image:width={0.33},height={0.528},fit={contain},background={white},x={0.535},y={0.136},file={Media/beamer-reveal-AnimatedPendulum.gif}

@@ -37,9 +37,10 @@ my %WriteMakefileArgs = (
     "Net::Async::WebSocket::Client" => "0.14",
     "Test2::V0" => "0.000159",
     "Test::Future::IO::Impl" => "0.14",
+    "Time::HiRes" => "1.9764",
     "URI" => "1.60"
   },
-  "VERSION" => "0.001008",
+  "VERSION" => "0.001010",
   "test" => {
     "TESTS" => "t/*.t t/app/*.t t/endpoint/*.t t/middleware/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/util/*.t t/websocket/*.t"
   }
@@ -61,6 +62,7 @@ my %FallbackPrereqs = (
   "Protocol::WebSocket" => "0.26",
   "Test2::V0" => "0.000159",
   "Test::Future::IO::Impl" => "0.14",
+  "Time::HiRes" => "1.9764",
   "URI" => "1.60",
   "URI::Escape" => "5.09"
 );

@@ -3,6 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
+our $VERSION = '20251226.2107'; # VERSION
 
 use strict;
 use warnings;
@@ -20,22 +21,20 @@ use Data::UUID;
 
 use IO::File;
 
-use IPC::System::Simple qw(system);
-
-use Parallel::ForkManager;
+use MCE;
+use MCE::Loop;
+use MCE::Util;
 
 use BeamerReveal::TemplateStore;
 use BeamerReveal::IPC::Run;
-
 
 sub min { $_[$_[0] > $_[1] ] }
 sub nofdigits { length( "$_[0]" ) }
 
 
-
 sub new {
   my $class = shift;
-  my ( $jobname, $base, $config, $presentationprms ) = @_;
+  my ( $jobname, $base, $presentationprms ) = @_;
 
   my $self = {
 	      jobname => $jobname,
@@ -44,14 +43,20 @@ sub new {
   $class = (ref $class ? ref $class : $class );
   bless $self, $class;
 
-  $self->{videos}     = File::Spec->catfile( $self->{base}, 'media', 'Videos' );
-  $self->{audios}     = File::Spec->catfile( $self->{base}, 'media', 'Audios' );	
-  $self->{images}     = File::Spec->catfile( $self->{base}, 'media', 'Images' );	
-  $self->{animations} = File::Spec->catfile( $self->{base}, 'media', 'Animations' );	
-  $self->{iframes}    = File::Spec->catfile( $self->{base}, 'media', 'Iframes' );	
-  $self->{slides}     = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
-  $self->{reveal}     = File::Spec->catfile( $self->{base}, 'libs' );
-  $self->{config} = $config;
+  $self->{videos}     = "$self->{base}/media/Videos";
+  $self->{audios}     = "$self->{base}/media/Audios";	
+  $self->{images}     = "$self->{base}/media/Images";	
+  $self->{animations} = "$self->{base}/media/Animations";	
+  $self->{iframes}    = "$self->{base}/media/Iframes";	
+  $self->{slides}     = "$self->{base}/media/Slides";
+  $self->{reveal}     = "$self->{base}/libs";
+  # $self->{videos}     = "$self->{base}, 'media', 'Videos' );
+  # $self->{audios}     = File::Spec->catfile( $self->{base}, 'media', 'Audios' );	
+  # $self->{images}     = File::Spec->catfile( $self->{base}, 'media', 'Images' );	
+  # $self->{animations} = File::Spec->catfile( $self->{base}, 'media', 'Animations' );	
+  # $self->{iframes}    = File::Spec->catfile( $self->{base}, 'media', 'Iframes' );	
+  # $self->{slides}     = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
+  # $self->{reveal}     = File::Spec->catfile( $self->{base}, 'libs' );
   $self->{presentationparameters} = $presentationprms;
   
   # create animations, but don't remove them
@@ -107,8 +112,9 @@ sub new {
 sub revealToStore {
   my $self = shift;
 
-  my $revealTree = File::Spec->catfile( File::ShareDir::dist_dir( 'BeamerReveal' ),
-					'libs' );
+#  my $revealTree = File::Spec->catfile( File::ShareDir::dist_dir( 'BeamerReveal' ),
+#					'libs' );
+  my $revealTree = File::ShareDir::dist_dir( 'BeamerReveal' ) . '/libs';
   my $destTree = $self->{reveal};
 
   File::Copy::Recursive::dircopy( $revealTree, $destTree );
@@ -120,7 +126,8 @@ sub slideFromStore {
   my ( $slide ) = @_;
   
   # copy file
-  my $fullpathid = File::Spec->catfile( $self->{slides}, $slide );
+#  my $fullpathid = File::Spec->catfile( $self->{slides}, $slide );
+  my $fullpathid = "$self->{slides}/$slide";
   # return store id
   return $fullpathid;
 }
@@ -131,7 +138,8 @@ sub animationToStore {
   my ( $animation ) = @_;
 
   my $animid  = Digest::SHA::hmac_sha256_hex( $animation->{tex} );
-  my $animdir = File::Spec->catfile( $self->{animations}, $animid );
+  #  my $animdir = File::Spec->catfile( $self->{animations}, $animid );
+  my $animdir = "$self->{animations}/$animid";
   my $fullpathid = $animdir . ".mp4";
   unless ( -r $fullpathid ) {
     File::Path::make_path( $animdir );
@@ -148,7 +156,7 @@ sub animationToStore {
     my $fileContent = BeamerReveal::TemplateStore::stampTemplate( $tTemplate, $tStamps );
 
     my $nofFrames = floor( $animation->{framerate} * $animation->{duration} );
-    my $nofCores  = $self->{config}->{hardware}->{numberofcores};
+    my $nofCores  = ceil( MCE::Util::get_ncpu() / 2 );
     my $sliceSize = ceil( $nofFrames / $nofCores );
 
     say STDERR "      - Preparing media generation of $nofFrames frames in $nofCores threads at $sliceSize frames per thread";
@@ -159,7 +167,9 @@ sub animationToStore {
     for( my $core = 0; $core < $nofCores; ++$core ) {
       # make plan for core
       my $plan = { nstart => $frameCounter,
-		   nstop  => min( $frameCounter + $sliceSize, $nofFrames )};
+		   nstop  => min( $frameCounter + $sliceSize, $nofFrames ),
+		   nr     => $core
+		 };
       $plan->{slicestart} = 1;
       $plan->{slicestop}  = $plan->{nstop} - $plan->{nstart};
       $plan->{nstop}      -= 1;
@@ -171,24 +181,14 @@ sub animationToStore {
       $frameCounter += $sliceSize;
     }
 
-    my $manager = Parallel::ForkManager->new( $nofCores );
-    my $nofFailedChildren = 0;
-    $manager->run_on_finish
-      (
-       sub {
-	 my ( $pid, $exit_code, $ident, $exit_signal, $core_dump ) = @_;
-	 if ( $exit_code != 0 || $exit_signal ) {
-	   ++$nofFailedChildren;
-	 }
-       }
-      );
-    
     my $cmd;
-    $planning->[-1]->{slicestop} = 9;
-    for( my $core = 0; $core < @$planning; ++$core ) {
-      my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $core );
+    MCE::Loop::init { max_workers => $nofCores, chunk_size  => 1 };
+    
+    mce_loop {
+      my ( $mce, $chunk_ref, $chunk_id ) = @_;
+      my $plan = $chunk_ref->[0];
+      my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $plan->{nr} );
       # generate TeX -file
-      my $plan = $planning->[$core];
       my $perCoreContent = BeamerReveal::TemplateStore::stampTemplate
 	( $fileContent,
 	  {
@@ -197,21 +197,19 @@ sub animationToStore {
 	   NSTART      => $plan->{nstart},
 	  }
 	);
-      
-      my $texFileName = File::Spec->catfile( $animdir, "animation-$coreId.tex" );
+
+      my $texFileName = "$animdir/animation-$coreId.tex";
       my $texFile = IO::File->new();
       $texFile->open( ">$texFileName" )
 	or die( "Error: cannot open animation file '$texFileName' for writing\n" );
       print $texFile $perCoreContent;
       $texFile->close();
 
-      $manager->start() and next;
-      
       # run TeX
       $cmd = [ $self->{compiler},
 	       "--output-directory=$animdir", "$texFileName" ];
       BeamerReveal::IPC::Run::run( $cmd, $coreId, 8 );
-      
+
       # run pdfcrop
       $cmd = [ $self->{pdfcrop}, '--margins', '-2', "animation-$coreId.pdf" ];
       BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
@@ -225,30 +223,23 @@ sub animationToStore {
 	       '-scale-to-y', "$yrange",
 	       "animation-$coreId-crop.pdf", "./frame-$coreId", '-jpeg' ];
       BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
-      
+
       # correct for too short slicesize in filenames coming from pdftoppm
       my $currentDigitCnt = nofdigits( $plan->{slicestop} );
       my $desiredDigitCnt = nofdigits( $sliceSize );
       if ( $currentDigitCnt < $desiredDigitCnt ) {
 	for( my $i = 1; $i <= $plan->{slicestop}; ++$i ) {
-	  my $src = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $currentDigitCnt . 'd.jpg', $i ) );
-	  my $dst = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $desiredDigitCnt . 'd.jpg', $i ) );
+#	  my $src = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $currentDigitCnt . 'd.jpg', $i ) );
+#	  my $dst = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $desiredDigitCnt . 'd.jpg', $i ) );
+	  my $src = sprintf( "$animdir/frame-$coreId-%0${currentDigitCnt}d.jpg", $i );
+	  my $dst = sprintf( "$animdir/frame-$coreId-%0${desiredDigitCnt}d.jpg", $i );
 	  File::Copy::move( $src, $dst );
 	}
       }
-      $manager->finish();
-    }
-    
-    $manager->wait_all_children();
 
-    if ( $nofFailedChildren ) {
-      die( "Error: animation generation failed; check the log files in $animdir\n" );
-    }
-    else {
-      say STDERR "        - returning to single-threaded operation";
-    }
+    } @$planning;
 
-    
+    say STDERR "        - returning to single-threaded operation";
     
     # rename all files in order
     my $framecounter = 0;
@@ -257,8 +248,10 @@ sub animationToStore {
       my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $core );
       for( my $frameno = $plan->{slicestart}; $frameno <= $plan->{slicestop}; ++$frameno ) {
 	my $frameId = sprintf( '%0' . nofdigits( $sliceSize ) . 'd', $frameno );
-	my $src = File::Spec->catfile( $animdir, "frame-$coreId-$frameId.jpg" );
-	my $dst = File::Spec->catfile( $animdir, sprintf( "frame-%06d.jpg", $framecounter++ ) );
+	# my $src = File::Spec->catfile( $animdir, "frame-$coreId-$frameId.jpg" );
+	# my $dst = File::Spec->catfile( $animdir, sprintf( "frame-%06d.jpg", $framecounter++ ) );
+	my $src = "$animdir/frame-$coreId-$frameId.jpg";
+	my $dst = sprintf( "$animdir/frame-%06d.jpg", $framecounter++ );
 	File::Copy::move( $src, $dst );
       }
     }
@@ -266,8 +259,8 @@ sub animationToStore {
     # run ffmpeg or avconv
     $cmd = [ $self->{ffmpeg}, '-r', "$animation->{framerate}", '-i', 'frame-%06d.jpg', 'animation.mp4' ];
     BeamerReveal::IPC::Run::run( $cmd, 0, 8, $animdir );
-    File::Copy::move( File::Spec->catfile( $animdir, 'animation.mp4' ),
-		      File::Spec->catfile( $animdir, '..', "$animid.mp4" ) );
+    File::Copy::move( "$animdir/animation.mp4",
+		      "$animdir/../$animid.mp4" );
 
     File::Path::rmtree( $animdir );
     
@@ -322,16 +315,17 @@ sub _toStore {
   my $fullpathid;
   do {
     my $uuid = $id->create();
-    $fullpathid = File::Spec->catfile( $self->{base}, 'media', $type, $id->to_string( $uuid ) . $ext );
+    #$fullpathid = File::Spec->catfile( $self->{base}, 'media', $type, $id->to_string( $uuid ) . $ext );
+    $fullpathid = "$self->{base}/media/$type/@{[$id->to_string( $uuid )]}$ext";
   } until( ! -e $fullpathid );
   
   # copy file
+  die( "Error: cannot find media file '$file'\n" ) unless( -r $file );
   File::Copy::cp( $file, $fullpathid );
 
   # return store id
   return $fullpathid;
 }
-
 
 1;
 
@@ -347,7 +341,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20251224.1500
+version 20251226.2107
 
 =head1 SYNOPSIS
 
@@ -365,7 +359,7 @@ we reuse the generated video file. If the source data has changed, we regenerate
 
 =head2 new()
 
-  $mm = BeamerReveal::MediaManager->new( $jobname, $base, $config, $presoparams )
+  $mm = BeamerReveal::MediaManager->new( $jobname, $base, $presoparams )
 
 The constructor sets up the manager.
 
@@ -385,11 +379,6 @@ we can read the preamble for reuse in the TikZ animations.
 
 directory in shiche the media will reside. Typically, this is the base name of the final HTML
 file, followed by the suffix '_files'.
-
-=item . C<$config>
-
-configuration object that can be queried for settings. At this moment this is not very heavily
-used.
 
 =item . C<$presoparams>
 

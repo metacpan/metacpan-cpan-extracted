@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::Tax;
-$Shipment::FedEx::WSDL::RateTypes::Tax::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::Tax::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,36 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TaxType_of :ATTR(:get<TaxType>);
-my %Description_of :ATTR(:get<Description>);
-my %Amount_of :ATTR(:get<Amount>);
+    my %TaxType_of     : ATTR(:get<TaxType>);
+    my %Description_of : ATTR(:get<Description>);
+    my %Amount_of      : ATTR(:get<Amount>);
 
-__PACKAGE__->_factory(
-    [ qw(        TaxType
-        Description
-        Amount
+    __PACKAGE__->_factory(
+        [   qw(        TaxType
+              Description
+              Amount
 
-    ) ],
-    {
-        'TaxType' => \%TaxType_of,
-        'Description' => \%Description_of,
-        'Amount' => \%Amount_of,
-    },
-    {
-        'TaxType' => 'Shipment::FedEx::WSDL::RateTypes::TaxType',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Amount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-    },
-    {
+            )
+        ],
+        {   'TaxType'     => \%TaxType_of,
+            'Description' => \%Description_of,
+            'Amount'      => \%Amount_of,
+        },
+        {   'TaxType'     => 'Shipment::FedEx::WSDL::RateTypes::TaxType',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Amount'      => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        },
+        {
 
-        'TaxType' => 'TaxType',
-        'Description' => 'Description',
-        'Amount' => 'Amount',
-    }
-);
+            'TaxType'     => 'TaxType',
+            'Description' => 'Description',
+            'Amount'      => 'Amount',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +66,7 @@ Shipment::FedEx::WSDL::RateTypes::Tax
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

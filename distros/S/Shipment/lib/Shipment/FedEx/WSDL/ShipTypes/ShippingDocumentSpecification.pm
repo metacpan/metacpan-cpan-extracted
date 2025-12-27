@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification;
-$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,72 +20,82 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ShippingDocumentTypes_of :ATTR(:get<ShippingDocumentTypes>);
-my %CertificateOfOrigin_of :ATTR(:get<CertificateOfOrigin>);
-my %CommercialInvoiceDetail_of :ATTR(:get<CommercialInvoiceDetail>);
-my %CustomPackageDocumentDetail_of :ATTR(:get<CustomPackageDocumentDetail>);
-my %CustomShipmentDocumentDetail_of :ATTR(:get<CustomShipmentDocumentDetail>);
-my %GeneralAgencyAgreementDetail_of :ATTR(:get<GeneralAgencyAgreementDetail>);
-my %NaftaCertificateOfOriginDetail_of :ATTR(:get<NaftaCertificateOfOriginDetail>);
-my %Op900Detail_of :ATTR(:get<Op900Detail>);
-my %FreightAddressLabelDetail_of :ATTR(:get<FreightAddressLabelDetail>);
+    my %ShippingDocumentTypes_of   : ATTR(:get<ShippingDocumentTypes>);
+    my %CertificateOfOrigin_of     : ATTR(:get<CertificateOfOrigin>);
+    my %CommercialInvoiceDetail_of : ATTR(:get<CommercialInvoiceDetail>);
+    my %CustomPackageDocumentDetail_of :
+      ATTR(:get<CustomPackageDocumentDetail>);
+    my %CustomShipmentDocumentDetail_of :
+      ATTR(:get<CustomShipmentDocumentDetail>);
+    my %GeneralAgencyAgreementDetail_of :
+      ATTR(:get<GeneralAgencyAgreementDetail>);
+    my %NaftaCertificateOfOriginDetail_of :
+      ATTR(:get<NaftaCertificateOfOriginDetail>);
+    my %Op900Detail_of               : ATTR(:get<Op900Detail>);
+    my %FreightAddressLabelDetail_of : ATTR(:get<FreightAddressLabelDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        ShippingDocumentTypes
-        CertificateOfOrigin
-        CommercialInvoiceDetail
-        CustomPackageDocumentDetail
-        CustomShipmentDocumentDetail
-        GeneralAgencyAgreementDetail
-        NaftaCertificateOfOriginDetail
-        Op900Detail
-        FreightAddressLabelDetail
+    __PACKAGE__->_factory(
+        [   qw(        ShippingDocumentTypes
+              CertificateOfOrigin
+              CommercialInvoiceDetail
+              CustomPackageDocumentDetail
+              CustomShipmentDocumentDetail
+              GeneralAgencyAgreementDetail
+              NaftaCertificateOfOriginDetail
+              Op900Detail
+              FreightAddressLabelDetail
 
-    ) ],
-    {
-        'ShippingDocumentTypes' => \%ShippingDocumentTypes_of,
-        'CertificateOfOrigin' => \%CertificateOfOrigin_of,
-        'CommercialInvoiceDetail' => \%CommercialInvoiceDetail_of,
-        'CustomPackageDocumentDetail' => \%CustomPackageDocumentDetail_of,
-        'CustomShipmentDocumentDetail' => \%CustomShipmentDocumentDetail_of,
-        'GeneralAgencyAgreementDetail' => \%GeneralAgencyAgreementDetail_of,
-        'NaftaCertificateOfOriginDetail' => \%NaftaCertificateOfOriginDetail_of,
-        'Op900Detail' => \%Op900Detail_of,
-        'FreightAddressLabelDetail' => \%FreightAddressLabelDetail_of,
-    },
-    {
-        'ShippingDocumentTypes' => 'Shipment::FedEx::WSDL::ShipTypes::RequestedShippingDocumentType',
-        'CertificateOfOrigin' => 'Shipment::FedEx::WSDL::ShipTypes::CertificateOfOriginDetail',
-        'CommercialInvoiceDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CommercialInvoiceDetail',
-        'CustomPackageDocumentDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail',
-        'CustomShipmentDocumentDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail',
-        'GeneralAgencyAgreementDetail' => 'Shipment::FedEx::WSDL::ShipTypes::GeneralAgencyAgreementDetail',
-        'NaftaCertificateOfOriginDetail' => 'Shipment::FedEx::WSDL::ShipTypes::NaftaCertificateOfOriginDetail',
-        'Op900Detail' => 'Shipment::FedEx::WSDL::ShipTypes::Op900Detail',
-        'FreightAddressLabelDetail' => 'Shipment::FedEx::WSDL::ShipTypes::FreightAddressLabelDetail',
-    },
-    {
+            )
+        ],
+        {   'ShippingDocumentTypes'        => \%ShippingDocumentTypes_of,
+            'CertificateOfOrigin'          => \%CertificateOfOrigin_of,
+            'CommercialInvoiceDetail'      => \%CommercialInvoiceDetail_of,
+            'CustomPackageDocumentDetail'  => \%CustomPackageDocumentDetail_of,
+            'CustomShipmentDocumentDetail' =>
+              \%CustomShipmentDocumentDetail_of,
+            'GeneralAgencyAgreementDetail' =>
+              \%GeneralAgencyAgreementDetail_of,
+            'NaftaCertificateOfOriginDetail' =>
+              \%NaftaCertificateOfOriginDetail_of,
+            'Op900Detail'               => \%Op900Detail_of,
+            'FreightAddressLabelDetail' => \%FreightAddressLabelDetail_of,
+        },
+        {   'ShippingDocumentTypes' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RequestedShippingDocumentType',
+            'CertificateOfOrigin' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CertificateOfOriginDetail',
+            'CommercialInvoiceDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CommercialInvoiceDetail',
+            'CustomPackageDocumentDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail',
+            'CustomShipmentDocumentDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail',
+            'GeneralAgencyAgreementDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::GeneralAgencyAgreementDetail',
+            'NaftaCertificateOfOriginDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::NaftaCertificateOfOriginDetail',
+            'Op900Detail' => 'Shipment::FedEx::WSDL::ShipTypes::Op900Detail',
+            'FreightAddressLabelDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::FreightAddressLabelDetail',
+        },
+        {
 
-        'ShippingDocumentTypes' => 'ShippingDocumentTypes',
-        'CertificateOfOrigin' => 'CertificateOfOrigin',
-        'CommercialInvoiceDetail' => 'CommercialInvoiceDetail',
-        'CustomPackageDocumentDetail' => 'CustomPackageDocumentDetail',
-        'CustomShipmentDocumentDetail' => 'CustomShipmentDocumentDetail',
-        'GeneralAgencyAgreementDetail' => 'GeneralAgencyAgreementDetail',
-        'NaftaCertificateOfOriginDetail' => 'NaftaCertificateOfOriginDetail',
-        'Op900Detail' => 'Op900Detail',
-        'FreightAddressLabelDetail' => 'FreightAddressLabelDetail',
-    }
-);
+            'ShippingDocumentTypes'          => 'ShippingDocumentTypes',
+            'CertificateOfOrigin'            => 'CertificateOfOrigin',
+            'CommercialInvoiceDetail'        => 'CommercialInvoiceDetail',
+            'CustomPackageDocumentDetail'    => 'CustomPackageDocumentDetail',
+            'CustomShipmentDocumentDetail'   => 'CustomShipmentDocumentDetail',
+            'GeneralAgencyAgreementDetail'   => 'GeneralAgencyAgreementDetail',
+            'NaftaCertificateOfOriginDetail' =>
+              'NaftaCertificateOfOriginDetail',
+            'Op900Detail'               => 'Op900Detail',
+            'FreightAddressLabelDetail' => 'FreightAddressLabelDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -102,7 +112,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

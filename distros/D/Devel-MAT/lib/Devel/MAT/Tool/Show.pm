@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.53;
+package Devel::MAT::Tool::Show 0.54;
 
 use v5.14;
 use warnings;
@@ -152,7 +152,7 @@ sub show_GLOB
 
    if( $gv->name ) {
       Devel::MAT::Cmd->printf( "  name=%s\n", $gv->name );
-      Devel::MAT::Cmd->printf( "  name_hek=%s\n", Devel::MAT::Cmd->format_value( $gv->name_hek_at, addr => 1 ) ) if $gv->name_hek_at;
+      Devel::MAT::Cmd->printf( "  name_hek=%s\n", Devel::MAT::Cmd->format_value( $gv->name_hek, addr => 1 ) ) if $gv->name_hek;
    }
 
    say_with_sv '  stash=', $gv->stash if $gv->stash;

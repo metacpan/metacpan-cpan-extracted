@@ -1,0 +1,161 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+use XML::PP;
+
+# Command line options
+my %opts = (
+	help => 0,
+	man => 0,
+	strict => 0,
+	warn => 0,
+	collapse => 0,
+	indent => 2,
+);
+
+GetOptions(
+	'help|h|?' => \$opts{help},
+	'man'		 => \$opts{man},
+	'strict|s' => \$opts{strict},
+	'warn|w' => \$opts{warn},
+	'collapse|c' => \$opts{collapse},
+	'indent|i=i' => \$opts{indent},
+) or pod2usage(2);
+
+pod2usage(1) if $opts{help};
+pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
+
+# Check for input file
+my $xml_file = shift @ARGV;
+unless ($xml_file) {
+	pod2usage("Error: No XML file specified\n");
+}
+
+unless (-f $xml_file && -r $xml_file) {
+	die "Error: Cannot read file '$xml_file': $!\n";
+}
+
+# Read the XML file
+my $xml_content;
+{
+	local $/;
+	open my $fh, '<', $xml_file or die "Error: Cannot open file '$xml_file': $!\n";
+	$xml_content = <$fh>;
+	close $fh;
+}
+
+# Create XML::PP parser with options
+my $parser = XML::PP->new(
+	strict	 => $opts{strict},
+	warn_on_error => $opts{warn},
+);
+
+# Parse the XML
+my $parsed_xml;
+eval {
+	$parsed_xml = $parser->parse($xml_content);
+};
+
+if ($@) {
+	die "Error parsing XML: $@\n";
+}
+
+# Configure Data::Dumper
+$Data::Dumper::Indent = $opts{indent};
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Terse = 1;
+
+# Output the result
+if ($opts{collapse}) {
+	my $collapsed = $parser->collapse_structure($parsed_xml);
+	print "Collapsed structure:\n";
+	print Dumper($collapsed);
+} else {
+	print "Parsed XML structure:\n";
+	print Dumper($parsed_xml);
+}
+
+__END__
+
+=head1 NAME
+
+xmlpp-cli - Command line XML parser using XML::PP
+
+=head1 SYNOPSIS
+
+xmlpp-cli [options] <xml-file>
+
+ Options:
+   -h, --help		Show brief help message
+   --man			 Show full manual page
+   -s, --strict	  Enable strict parsing mode (die on errors)
+   -w, --warn		Enable warnings for parsing errors
+   -c, --collapse	Use collapse_structure to simplify output
+   -i, --indent=N	Set Data::Dumper indent level (default: 2)
+
+=head1 DESCRIPTION
+
+This program reads an XML file and parses it using the XML::PP module,
+then outputs the parsed structure using Data::Dumper for inspection.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the full manual page and exit.
+
+=item B<-s, --strict>
+
+Enable strict parsing mode. The parser will die when it encounters
+unknown entities or unescaped ampersands.
+
+=item B<-w, --warn>
+
+Enable warnings for unknown or malformed XML entities during parsing.
+
+=item B<-c, --collapse>
+
+Use the collapse_structure method to simplify the output into a more
+XML::Simple-like format.
+
+=item B<-i, --indent=N>
+
+Set the indentation level for Data::Dumper output (default: 2).
+
+=back
+
+=head1 EXAMPLES
+
+Parse a simple XML file:
+  xmlpp-cli example.xml
+
+Parse with strict error checking:
+  xmlpp-cli --strict --warn example.xml
+
+Parse and collapse the structure:
+  xmlpp-cli --collapse example.xml
+
+Parse with custom indentation:
+  xmlpp-cli --indent=4 example.xml
+
+=head1 AUTHOR
+
+CLI wrapper for XML::PP module
+
+=head1 SEE ALSO
+
+L<XML::PP>, L<Data::Dumper>
+
+=cut

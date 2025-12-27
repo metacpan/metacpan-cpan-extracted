@@ -1,244 +1,288 @@
 package Shipment::FedEx::WSDL::CloseInterfaces::CloseService::CloseServicePort;
-$Shipment::FedEx::WSDL::CloseInterfaces::CloseService::CloseServicePort::VERSION = '3.10';
+$Shipment::FedEx::WSDL::CloseInterfaces::CloseService::CloseServicePort::VERSION = '3.11';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
 use Scalar::Util qw(blessed);
-use base qw(SOAP::WSDL::Client::Base);
+use base         qw(SOAP::WSDL::Client::Base);
 
 
 # only load if it hasn't been loaded before
 require Shipment::FedEx::WSDL::CloseTypemaps::CloseService
-    if not Shipment::FedEx::WSDL::CloseTypemaps::CloseService->can('get_class');
+  if not Shipment::FedEx::WSDL::CloseTypemaps::CloseService->can('get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'wsbeta.fedex.com:443';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/close') if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/close')
+      if not $_[2]->{proxy};
 
-    $_[0]->set_class_resolver('Shipment::FedEx::WSDL::CloseTypemaps::CloseService')
-        if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver(
+        'Shipment::FedEx::WSDL::CloseTypemaps::CloseService')
+      if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub smartPostClose {
     my ($self, $body, $header) = @_;
-    die "smartPostClose must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'smartPostClose',
-        soap_action => 'smartPostClose',
-        style => 'document',
-        body => {
-            
+    die "smartPostClose must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'smartPostClose',
+            soap_action => 'smartPostClose',
+            style       => 'document',
+            body        => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::SmartPostCloseRequest )],
-        },
-        header => {
-            
-        },
-        headerfault => {
-            
-        },
-        response => {
+
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::FedEx::WSDL::CloseElements::SmartPostCloseRequest )
+                ],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::SmartPostCloseReply )],
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::FedEx::WSDL::CloseElements::SmartPostCloseReply )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub groundClose {
     my ($self, $body, $header) = @_;
-    die "groundClose must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'groundClose',
-        soap_action => 'groundClose',
-        style => 'document',
-        body => {
-            
+    die "groundClose must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'groundClose',
+            soap_action => 'groundClose',
+            style       => 'document',
+            body        => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseRequest )],
-        },
-        header => {
-            
-        },
-        headerfault => {
-            
-        },
-        response => {
+
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseRequest )
+                ],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseReply )],
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseReply )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub groundCloseReportsReprint {
     my ($self, $body, $header) = @_;
-    die "groundCloseReportsReprint must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'groundCloseReportsReprint',
-        soap_action => 'groundCloseReportsReprint',
-        style => 'document',
-        body => {
-            
+    die
+      "groundCloseReportsReprint must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'groundCloseReportsReprint',
+            soap_action => 'groundCloseReportsReprint',
+            style       => 'document',
+            body        => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintRequest )],
-        },
-        header => {
-            
-        },
-        headerfault => {
-            
-        },
-        response => {
+
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintRequest )
+                ],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintReply )],
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseReportsReprintReply )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub groundCloseWithDocuments {
     my ($self, $body, $header) = @_;
-    die "groundCloseWithDocuments must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'groundCloseWithDocuments',
-        soap_action => 'groundCloseWithDocuments',
-        style => 'document',
-        body => {
-            
+    die
+      "groundCloseWithDocuments must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'groundCloseWithDocuments',
+            soap_action => 'groundCloseWithDocuments',
+            style       => 'document',
+            body        => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseWithDocumentsRequest )],
-        },
-        header => {
-            
-        },
-        headerfault => {
-            
-        },
-        response => {
+
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseWithDocumentsRequest )
+                ],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseDocumentsReply )],
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseDocumentsReply )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub reprintGroundCloseDocuments {
     my ($self, $body, $header) = @_;
-    die "reprintGroundCloseDocuments must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'reprintGroundCloseDocuments',
-        soap_action => 'reprintGroundCloseDocuments',
-        style => 'document',
-        body => {
-            
+    die
+      "reprintGroundCloseDocuments must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'reprintGroundCloseDocuments',
+            soap_action => 'reprintGroundCloseDocuments',
+            style       => 'document',
+            body        => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::ReprintGroundCloseDocumentsRequest )],
-        },
-        header => {
-            
-        },
-        headerfault => {
-            
-        },
-        response => {
+
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::FedEx::WSDL::CloseElements::ReprintGroundCloseDocumentsRequest )
+                ],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseDocumentsReply )],
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::FedEx::WSDL::CloseElements::GroundCloseDocumentsReply )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
-
-
-
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-              'attribute' => 'Shipment::FedEx::WSDL::CloseAttributes',
-              'typemap' => 'Shipment::FedEx::WSDL::CloseTypemaps',
-              'interface' => 'Shipment::FedEx::WSDL::CloseInterfaces',
-              'type' => 'Shipment::FedEx::WSDL::CloseTypes',
-              'server' => 'Shipment::FedEx::WSDL::CloseServer',
-              'element' => 'Shipment::FedEx::WSDL::CloseElements'
-            };
+        'attribute' => 'Shipment::FedEx::WSDL::CloseAttributes',
+        'typemap'   => 'Shipment::FedEx::WSDL::CloseTypemaps',
+        'interface' => 'Shipment::FedEx::WSDL::CloseInterfaces',
+        'type'      => 'Shipment::FedEx::WSDL::CloseTypes',
+        'server'    => 'Shipment::FedEx::WSDL::CloseServer',
+        'element'   => 'Shipment::FedEx::WSDL::CloseElements'
+    };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
-        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
-            namespace_prefix_map => {
-                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
-            },
-            namespace_map => {
-            },
-            prefix => $prefix_1,
-        })
-    });
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
+        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
+                {   namespace_prefix_map => {
+                        'http://www.w3.org/2001/XMLSchema' =>
+                          'SOAP::WSDL::XSD::Typelib::Builtin',
+                    },
+                    namespace_map => {},
+                    prefix        => $prefix_1,
+                }
+            )
+        }
+    );
 }
 
 1;
@@ -255,7 +299,7 @@ Shipment::FedEx::WSDL::CloseInterfaces::CloseService::CloseServicePort
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

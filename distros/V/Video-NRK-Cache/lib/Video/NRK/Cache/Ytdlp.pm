@@ -2,8 +2,8 @@ use v5.37.9;
 use feature 'class';
 no warnings 'experimental::class';
 
-package Video::NRK::Cache::Ytdlp;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::Ytdlp::VERSION = '3.01';
+package Video::NRK::Cache::Ytdlp 3.02;  # Dist::Zilla doesn't know about class yet
+
 class Video::NRK::Cache::Ytdlp :isa(Video::NRK::Cache::Store) {
 # ABSTRACT: Store NRK Video on Demand cache using yt-dlp
 
@@ -15,6 +15,7 @@ field @ytdlp_args = qw(
 	--write-sub
 	--all-subs
 	--abort-on-unavailable-fragment
+	--compat-options no-direct-merge
 );
 
 # :reader

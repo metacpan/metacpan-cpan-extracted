@@ -41,6 +41,17 @@ The comment text to send. Will be prefixed with ': '.
 
 IO::Async::Loop instance for scheduling.
 
+=item * on_error (optional)
+
+Callback invoked when a send operation fails. Receives C<($error, $event)>
+where C<$event> is the event hash that failed to send. Default behavior
+is to warn to STDERR.
+
+    on_error => sub {
+        my ($error, $event) = @_;
+        $logger->warn("SSE heartbeat send failed: $error");
+    }
+
 =back
 
 =cut
@@ -51,6 +62,10 @@ sub _init {
     $self->{interval} = $config->{interval} // 15;
     $self->{comment} = $config->{comment} // 'keepalive';
     $self->{loop} = $config->{loop};
+    $self->{on_error} = $config->{on_error} // sub {
+        my ($error, $event) = @_;
+        warn "SSE::Heartbeat send failed: $error\n";
+    };
 }
 
 sub wrap {
@@ -67,6 +82,7 @@ sub wrap {
         my $loop = $self->{loop} // $self->_get_loop();
         my $interval = $self->{interval};
         my $comment = $self->{comment};
+        my $on_error = $self->{on_error};
 
         my $closed = 0;
         my $heartbeat_timer;
@@ -79,9 +95,13 @@ sub wrap {
                 return if $closed;
 
                 # Send comment as heartbeat
-                $send->({
+                my $heartbeat_event = {
                     type    => 'sse.send',
                     comment => $comment,
+                };
+                $send->($heartbeat_event)->on_fail(sub {
+                    my ($error) = @_;
+                    $on_error->($error, $heartbeat_event);
                 })->retain;
 
                 # Schedule next heartbeat

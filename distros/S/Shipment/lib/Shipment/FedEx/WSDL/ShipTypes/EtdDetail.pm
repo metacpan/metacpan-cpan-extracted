@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::EtdDetail;
-$Shipment::FedEx::WSDL::ShipTypes::EtdDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::EtdDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %RequestedDocumentCopies_of :ATTR(:get<RequestedDocumentCopies>);
-my %DocumentReferences_of :ATTR(:get<DocumentReferences>);
+    my %RequestedDocumentCopies_of : ATTR(:get<RequestedDocumentCopies>);
+    my %DocumentReferences_of      : ATTR(:get<DocumentReferences>);
 
-__PACKAGE__->_factory(
-    [ qw(        RequestedDocumentCopies
-        DocumentReferences
+    __PACKAGE__->_factory(
+        [   qw(        RequestedDocumentCopies
+              DocumentReferences
 
-    ) ],
-    {
-        'RequestedDocumentCopies' => \%RequestedDocumentCopies_of,
-        'DocumentReferences' => \%DocumentReferences_of,
-    },
-    {
-        'RequestedDocumentCopies' => 'Shipment::FedEx::WSDL::ShipTypes::RequestedShippingDocumentType',
-        'DocumentReferences' => 'Shipment::FedEx::WSDL::ShipTypes::UploadDocumentReferenceDetail',
-    },
-    {
+            )
+        ],
+        {   'RequestedDocumentCopies' => \%RequestedDocumentCopies_of,
+            'DocumentReferences'      => \%DocumentReferences_of,
+        },
+        {   'RequestedDocumentCopies' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RequestedShippingDocumentType',
+            'DocumentReferences' =>
+              'Shipment::FedEx::WSDL::ShipTypes::UploadDocumentReferenceDetail',
+        },
+        {
 
-        'RequestedDocumentCopies' => 'RequestedDocumentCopies',
-        'DocumentReferences' => 'DocumentReferences',
-    }
-);
+            'RequestedDocumentCopies' => 'RequestedDocumentCopies',
+            'DocumentReferences'      => 'DocumentReferences',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::ShipTypes::EtdDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

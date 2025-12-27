@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType;
-$Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %BeginDate_of :ATTR(:get<BeginDate>);
-my %EndDate_of :ATTR(:get<EndDate>);
+    my %BeginDate_of : ATTR(:get<BeginDate>);
+    my %EndDate_of   : ATTR(:get<EndDate>);
 
-__PACKAGE__->_factory(
-    [ qw(        BeginDate
-        EndDate
+    __PACKAGE__->_factory(
+        [   qw(        BeginDate
+              EndDate
 
-    ) ],
-    {
-        'BeginDate' => \%BeginDate_of,
-        'EndDate' => \%EndDate_of,
-    },
-    {
-        'BeginDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'EndDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'BeginDate' => \%BeginDate_of,
+            'EndDate'   => \%EndDate_of,
+        },
+        {   'BeginDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'EndDate'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'BeginDate' => 'BeginDate',
-        'EndDate' => 'EndDate',
-    }
-);
+            'BeginDate' => 'BeginDate',
+            'EndDate'   => 'EndDate',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

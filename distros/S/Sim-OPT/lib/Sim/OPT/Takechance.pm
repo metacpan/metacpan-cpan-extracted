@@ -1,13 +1,12 @@
 package Sim::OPT::Takechance;
-# Copyright (C) 2014-2015 by Gian Luca Brunetti.
 # This is "Sim::OPT::Takechance", a program that can produce efficient search structures for block coordinate descent given some initialization blocks (subspaces).
 # Its strategy is based on making a search path more efficient than the average randomly chosen ones, by selecting the search moves
 # so that (a) the search wake is fresher than the average random ones and (b) the search moves are more novel than the average random ones.
 # The rationale for the selection of the seach path is explained in detail (with algorithms) in my paper at the following web address: http://arxiv.org/abs/1407.5615 .
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# Sim::OPT::Takechance is distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
-# use v5.20;
+
 use Exporter;
 use parent 'Exporter'; # imports and subclasses Exporter
 
@@ -17,7 +16,7 @@ use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use IO::Tee;
 use File::Copy qw( move copy );
 use Set::Intersection;
@@ -42,7 +41,8 @@ use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
-
+use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 
 our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
@@ -845,6 +845,8 @@ Other variables which are necessary to define in the configuration file for desc
 
 The response produced by the "Sim::OPT::Takechance" module will be written in a long-name file in the work folder: "./search_structure_that_may_be_adopted.txt".
 
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
+
 =head2 EXPORT
 
 "takechance".
@@ -859,7 +861,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

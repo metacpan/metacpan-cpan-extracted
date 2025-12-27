@@ -8,7 +8,7 @@ use v5.36;
 use Video::NRK::Cache;
 use Video::NRK::Cache::Store;
 
-use Getopt::Long 2.33 qw( :config posix_default gnu_getopt auto_version auto_help );
+use Getopt::Long 2.33 qw( :config posix_default gnu_getopt auto_version );
 use Pod::Usage qw( pod2usage );
 
 
@@ -21,13 +21,13 @@ my %options = (
 GetOptions(
 	'comment|c=s' => \$options{comment},  # ignored!
 	'coreaudio' => \$options{coreaudio},
-	'man' => \$options{man},
+	'help|man|?' => \$options{help},
 	'nice|n+' => \$options{nice},
 	'no-nice' => \$options{not_nice},
 	'not-nice' => \$options{not_nice},  # legacy syntax
 	'quality|q=i' => \$options{quality},
 ) or pod2usage(2);
-pod2usage(-exitstatus => 0, -verbose => 2) if $options{man};
+pod2usage(-verbose => 2) if $options{help};
 pod2usage(2) unless @ARGV;
 utf8::decode $_ for @ARGV;
 
@@ -53,13 +53,13 @@ nrkcache - Cache NRK Video on Demand broadcasts for offline viewing
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 
  nrkcache https://tv.nrk.no/program/DVFJ64001010
  nrkcache -n -q2 DVFJ64001010
- nrkcache --help|--version|--man
+ nrkcache --help
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,18 @@ For network transport, this script requires YT-dlp.
 Norwegian subtitles and metadata are retrieved from NRK as well.
 The data is muxed into a single MP4 file, which requires FFmpeg.
 
+Each invocation of this script will only cache a single program
+or episode. To loop through multiple episodes, either use the
+backend class L<Video::NRK::Cache> directly or a shell loop:
+
+ for (( e=1 ; e <= 14 ; ++e ))
+ do
+   program_id=$( printf 'MUHH5000%02i23' $e )
+   nrkcache "https://tv.nrk.no/serie/nytt-paa-nytt/2023/$program_id"
+   # Or something like "https://tv.nrk.no/serie/foobar/sesong/1/episode/$e"
+   # for simpler URLs that use the season/episode structure.
+ done
+
 =head1 OPTIONS
 
 =over
@@ -83,13 +95,9 @@ Recode the audio track using Apple Core Audio (C<aac_at>). Useful
 to avoid audible artifacts during playback on certain Apple devices,
 such as ancient iPads. Only supported on the Mac. Experimental.
 
-=item --help, -?
+=item --help, --man, -?
 
-Display a help message and exit.
-
-=item --man
-
-Print the manual page and exit.
+Display this manual page.
 
 =item --nice, -n
 
@@ -131,10 +139,7 @@ For known limitations and prerequisites, see L<Video::NRK::Cache>.
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

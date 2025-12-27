@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ActivityType;
-$Shipment::UPS::WSDL::TrackTypes::ActivityType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::ActivityType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,59 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %AlternateTrackingInfo_of :ATTR(:get<AlternateTrackingInfo>);
-my %ActivityLocation_of :ATTR(:get<ActivityLocation>);
-my %Status_of :ATTR(:get<Status>);
-my %Date_of :ATTR(:get<Date>);
-my %Time_of :ATTR(:get<Time>);
-my %Document_of :ATTR(:get<Document>);
-my %AdditionalAttribute_of :ATTR(:get<AdditionalAttribute>);
+    my %AlternateTrackingInfo_of : ATTR(:get<AlternateTrackingInfo>);
+    my %ActivityLocation_of      : ATTR(:get<ActivityLocation>);
+    my %Status_of                : ATTR(:get<Status>);
+    my %Date_of                  : ATTR(:get<Date>);
+    my %Time_of                  : ATTR(:get<Time>);
+    my %Document_of              : ATTR(:get<Document>);
+    my %AdditionalAttribute_of   : ATTR(:get<AdditionalAttribute>);
 
-__PACKAGE__->_factory(
-    [ qw(        AlternateTrackingInfo
-        ActivityLocation
-        Status
-        Date
-        Time
-        Document
-        AdditionalAttribute
+    __PACKAGE__->_factory(
+        [   qw(        AlternateTrackingInfo
+              ActivityLocation
+              Status
+              Date
+              Time
+              Document
+              AdditionalAttribute
 
-    ) ],
-    {
-        'AlternateTrackingInfo' => \%AlternateTrackingInfo_of,
-        'ActivityLocation' => \%ActivityLocation_of,
-        'Status' => \%Status_of,
-        'Date' => \%Date_of,
-        'Time' => \%Time_of,
-        'Document' => \%Document_of,
-        'AdditionalAttribute' => \%AdditionalAttribute_of,
-    },
-    {
-        'AlternateTrackingInfo' => 'Shipment::UPS::WSDL::TrackTypes::AlternateTrackingInfoType',
-        'ActivityLocation' => 'Shipment::UPS::WSDL::TrackTypes::ActivityLocationType',
-        'Status' => 'Shipment::UPS::WSDL::TrackTypes::StatusType',
-        'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Time' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Document' => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
-        'AdditionalAttribute' => 'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescriptionValueType',
-    },
-    {
+            )
+        ],
+        {   'AlternateTrackingInfo' => \%AlternateTrackingInfo_of,
+            'ActivityLocation'      => \%ActivityLocation_of,
+            'Status'                => \%Status_of,
+            'Date'                  => \%Date_of,
+            'Time'                  => \%Time_of,
+            'Document'              => \%Document_of,
+            'AdditionalAttribute'   => \%AdditionalAttribute_of,
+        },
+        {   'AlternateTrackingInfo' =>
+              'Shipment::UPS::WSDL::TrackTypes::AlternateTrackingInfoType',
+            'ActivityLocation' =>
+              'Shipment::UPS::WSDL::TrackTypes::ActivityLocationType',
+            'Status'   => 'Shipment::UPS::WSDL::TrackTypes::StatusType',
+            'Date'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Time'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Document' => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
+            'AdditionalAttribute' =>
+              'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescriptionValueType',
+        },
+        {
 
-        'AlternateTrackingInfo' => 'AlternateTrackingInfo',
-        'ActivityLocation' => 'ActivityLocation',
-        'Status' => 'Status',
-        'Date' => 'Date',
-        'Time' => 'Time',
-        'Document' => 'Document',
-        'AdditionalAttribute' => 'AdditionalAttribute',
-    }
-);
+            'AlternateTrackingInfo' => 'AlternateTrackingInfo',
+            'ActivityLocation'      => 'ActivityLocation',
+            'Status'                => 'Status',
+            'Date'                  => 'Date',
+            'Time'                  => 'Time',
+            'Document'              => 'Document',
+            'AdditionalAttribute'   => 'AdditionalAttribute',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +89,7 @@ Shipment::UPS::WSDL::TrackTypes::ActivityType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

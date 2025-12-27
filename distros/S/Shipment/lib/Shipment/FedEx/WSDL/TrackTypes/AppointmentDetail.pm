@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail;
-$Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Date_of :ATTR(:get<Date>);
-my %WindowDetails_of :ATTR(:get<WindowDetails>);
+    my %Date_of          : ATTR(:get<Date>);
+    my %WindowDetails_of : ATTR(:get<WindowDetails>);
 
-__PACKAGE__->_factory(
-    [ qw(        Date
-        WindowDetails
+    __PACKAGE__->_factory(
+        [   qw(        Date
+              WindowDetails
 
-    ) ],
-    {
-        'Date' => \%Date_of,
-        'WindowDetails' => \%WindowDetails_of,
-    },
-    {
-        'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'WindowDetails' => 'Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail',
-    },
-    {
+            )
+        ],
+        {   'Date'          => \%Date_of,
+            'WindowDetails' => \%WindowDetails_of,
+        },
+        {   'Date'          => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'WindowDetails' =>
+              'Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail',
+        },
+        {
 
-        'Date' => 'Date',
-        'WindowDetails' => 'WindowDetails',
-    }
-);
+            'Date'          => 'Date',
+            'WindowDetails' => 'WindowDetails',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

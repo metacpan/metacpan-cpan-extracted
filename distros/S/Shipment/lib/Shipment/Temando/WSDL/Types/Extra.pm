@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::Extra;
-$Shipment::Temando::WSDL::Types::Extra::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::Extra::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,106 +24,93 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %summary_of :ATTR(:get<summary>);
-my %details_of :ATTR(:get<details>);
-my %totalPrice_of :ATTR(:get<totalPrice>);
-my %basePrice_of :ATTR(:get<basePrice>);
-my %tax_of :ATTR(:get<tax>);
-my %adjustments_of :ATTR(:get<adjustments>);
+    my %summary_of     : ATTR(:get<summary>);
+    my %details_of     : ATTR(:get<details>);
+    my %totalPrice_of  : ATTR(:get<totalPrice>);
+    my %basePrice_of   : ATTR(:get<basePrice>);
+    my %tax_of         : ATTR(:get<tax>);
+    my %adjustments_of : ATTR(:get<adjustments>);
 
-__PACKAGE__->_factory(
-    [ qw(        summary
-        details
-        totalPrice
-        basePrice
-        tax
-        adjustments
+    __PACKAGE__->_factory(
+        [   qw(        summary
+              details
+              totalPrice
+              basePrice
+              tax
+              adjustments
 
-    ) ],
-    {
-        'summary' => \%summary_of,
-        'details' => \%details_of,
-        'totalPrice' => \%totalPrice_of,
-        'basePrice' => \%basePrice_of,
-        'tax' => \%tax_of,
-        'adjustments' => \%adjustments_of,
-    },
-    {
-        'summary' => 'Shipment::Temando::WSDL::Types::ExtraSummary',
-        'details' => 'Shipment::Temando::WSDL::Types::ExtraDetails',
-        'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'basePrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'tax' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            )
+        ],
+        {   'summary'     => \%summary_of,
+            'details'     => \%details_of,
+            'totalPrice'  => \%totalPrice_of,
+            'basePrice'   => \%basePrice_of,
+            'tax'         => \%tax_of,
+            'adjustments' => \%adjustments_of,
+        },
+        {   'summary'    => 'Shipment::Temando::WSDL::Types::ExtraSummary',
+            'details'    => 'Shipment::Temando::WSDL::Types::ExtraDetails',
+            'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'basePrice'  => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'tax'        => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
 
-        'adjustments' => 'Shipment::Temando::WSDL::Types::Extra::_adjustments',
-    },
-    {
+            'adjustments' =>
+              'Shipment::Temando::WSDL::Types::Extra::_adjustments',
+        },
+        {
 
-        'summary' => 'summary',
-        'details' => 'details',
-        'totalPrice' => 'totalPrice',
-        'basePrice' => 'basePrice',
-        'tax' => 'tax',
-        'adjustments' => 'adjustments',
-    }
-);
+            'summary'     => 'summary',
+            'details'     => 'details',
+            'totalPrice'  => 'totalPrice',
+            'basePrice'   => 'basePrice',
+            'tax'         => 'tax',
+            'adjustments' => 'adjustments',
+        }
+    );
 
-} # end BLOCK
-
-
+}    # end BLOCK
 
 
 package Shipment::Temando::WSDL::Types::Extra::_adjustments;
-$Shipment::Temando::WSDL::Types::Extra::_adjustments::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::Extra::_adjustments::VERSION = '3.11';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %adjustment_of :ATTR(:get<adjustment>);
-
-__PACKAGE__->_factory(
-    [ qw(        adjustment
-
-    ) ],
-    {
-        'adjustment' => \%adjustment_of,
-    },
-    {
-        'adjustment' => 'Shipment::Temando::WSDL::Types::Adjustment',
-    },
-    {
-
-        'adjustment' => 'adjustment',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %adjustment_of : ATTR(:get<adjustment>);
 
+        __PACKAGE__->_factory(
+            [   qw(        adjustment
+
+                )
+            ],
+            {'adjustment' => \%adjustment_of,},
+            {'adjustment' => 'Shipment::Temando::WSDL::Types::Adjustment',},
+            {
+
+                'adjustment' => 'adjustment',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
-
-
-
 
 
 1;
@@ -136,7 +127,7 @@ Shipment::Temando::WSDL::Types::Extra
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

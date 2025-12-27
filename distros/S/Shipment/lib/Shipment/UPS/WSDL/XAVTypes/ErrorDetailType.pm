@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::XAVTypes::ErrorDetailType;
-$Shipment::UPS::WSDL::XAVTypes::ErrorDetailType::VERSION = '3.10';
+$Shipment::UPS::WSDL::XAVTypes::ErrorDetailType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Severity_of :ATTR(:get<Severity>);
-my %PrimaryErrorCode_of :ATTR(:get<PrimaryErrorCode>);
-my %MinimumRetrySeconds_of :ATTR(:get<MinimumRetrySeconds>);
-my %Location_of :ATTR(:get<Location>);
-my %SubErrorCode_of :ATTR(:get<SubErrorCode>);
+    my %Severity_of            : ATTR(:get<Severity>);
+    my %PrimaryErrorCode_of    : ATTR(:get<PrimaryErrorCode>);
+    my %MinimumRetrySeconds_of : ATTR(:get<MinimumRetrySeconds>);
+    my %Location_of            : ATTR(:get<Location>);
+    my %SubErrorCode_of        : ATTR(:get<SubErrorCode>);
 
-__PACKAGE__->_factory(
-    [ qw(        Severity
-        PrimaryErrorCode
-        MinimumRetrySeconds
-        Location
-        SubErrorCode
+    __PACKAGE__->_factory(
+        [   qw(        Severity
+              PrimaryErrorCode
+              MinimumRetrySeconds
+              Location
+              SubErrorCode
 
-    ) ],
-    {
-        'Severity' => \%Severity_of,
-        'PrimaryErrorCode' => \%PrimaryErrorCode_of,
-        'MinimumRetrySeconds' => \%MinimumRetrySeconds_of,
-        'Location' => \%Location_of,
-        'SubErrorCode' => \%SubErrorCode_of,
-    },
-    {
-        'Severity' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PrimaryErrorCode' => 'Shipment::UPS::WSDL::XAVTypes::CodeType',
-        'MinimumRetrySeconds' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Location' => 'Shipment::UPS::WSDL::XAVTypes::LocationType',
-        'SubErrorCode' => 'Shipment::UPS::WSDL::XAVTypes::CodeType',
-    },
-    {
+            )
+        ],
+        {   'Severity'            => \%Severity_of,
+            'PrimaryErrorCode'    => \%PrimaryErrorCode_of,
+            'MinimumRetrySeconds' => \%MinimumRetrySeconds_of,
+            'Location'            => \%Location_of,
+            'SubErrorCode'        => \%SubErrorCode_of,
+        },
+        {   'Severity'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PrimaryErrorCode' => 'Shipment::UPS::WSDL::XAVTypes::CodeType',
+            'MinimumRetrySeconds' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Location'     => 'Shipment::UPS::WSDL::XAVTypes::LocationType',
+            'SubErrorCode' => 'Shipment::UPS::WSDL::XAVTypes::CodeType',
+        },
+        {
 
-        'Severity' => 'Severity',
-        'PrimaryErrorCode' => 'PrimaryErrorCode',
-        'MinimumRetrySeconds' => 'MinimumRetrySeconds',
-        'Location' => 'Location',
-        'SubErrorCode' => 'SubErrorCode',
-    }
-);
+            'Severity'            => 'Severity',
+            'PrimaryErrorCode'    => 'PrimaryErrorCode',
+            'MinimumRetrySeconds' => 'MinimumRetrySeconds',
+            'Location'            => 'Location',
+            'SubErrorCode'        => 'SubErrorCode',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +77,7 @@ Shipment::UPS::WSDL::XAVTypes::ErrorDetailType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

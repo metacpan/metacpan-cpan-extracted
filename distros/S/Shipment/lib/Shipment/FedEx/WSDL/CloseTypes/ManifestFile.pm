@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::ManifestFile;
-$Shipment::FedEx::WSDL::CloseTypes::ManifestFile::VERSION = '3.10';
+$Shipment::FedEx::WSDL::CloseTypes::ManifestFile::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' };
+sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %FileName_of :ATTR(:get<FileName>);
-my %File_of :ATTR(:get<File>);
+    my %FileName_of : ATTR(:get<FileName>);
+    my %File_of     : ATTR(:get<File>);
 
-__PACKAGE__->_factory(
-    [ qw(        FileName
-        File
+    __PACKAGE__->_factory(
+        [   qw(        FileName
+              File
 
-    ) ],
-    {
-        'FileName' => \%FileName_of,
-        'File' => \%File_of,
-    },
-    {
-        'FileName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'File' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-    },
-    {
+            )
+        ],
+        {   'FileName' => \%FileName_of,
+            'File'     => \%File_of,
+        },
+        {   'FileName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'File'     => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+        },
+        {
 
-        'FileName' => 'FileName',
-        'File' => 'File',
-    }
-);
+            'FileName' => 'FileName',
+            'File'     => 'File',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::CloseTypes::ManifestFile
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

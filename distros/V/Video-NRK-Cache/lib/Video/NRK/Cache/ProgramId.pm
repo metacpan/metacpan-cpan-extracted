@@ -3,8 +3,8 @@ use feature 'class';
 no warnings 'experimental::class';
 use utf8;
 
-package Video::NRK::Cache::ProgramId;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::ProgramId::VERSION = '3.01';
+package Video::NRK::Cache::ProgramId 3.02;  # Dist::Zilla doesn't know about class yet
+
 class Video::NRK::Cache::ProgramId;
 # ABSTRACT: NRK on-demand "PRF" program ID
 
@@ -116,7 +116,7 @@ Video::NRK::Cache::ProgramId - NRK on-demand "PRF" program ID
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ Calls the C<parse()> method with the value provided. Optional.
 =item psapi_base
 
 The NRK PSAPI base URL to use. If not provided, by default
-C<https://psapi.nrk.no> will be attempted first, before at
+C<https://psapi.nrk.no> will be attempted first, before an
 attempt is undertaken to determine the correct API base from
 NRK's web site. Optional.
 
@@ -214,10 +214,7 @@ in Perl is more complete.
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

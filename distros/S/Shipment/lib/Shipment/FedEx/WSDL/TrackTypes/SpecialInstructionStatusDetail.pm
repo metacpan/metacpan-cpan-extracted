@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail;
-$Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Status_of :ATTR(:get<Status>);
-my %StatusCreateTime_of :ATTR(:get<StatusCreateTime>);
+    my %Status_of           : ATTR(:get<Status>);
+    my %StatusCreateTime_of : ATTR(:get<StatusCreateTime>);
 
-__PACKAGE__->_factory(
-    [ qw(        Status
-        StatusCreateTime
+    __PACKAGE__->_factory(
+        [   qw(        Status
+              StatusCreateTime
 
-    ) ],
-    {
-        'Status' => \%Status_of,
-        'StatusCreateTime' => \%StatusCreateTime_of,
-    },
-    {
-        'Status' => 'Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionsStatusCode',
-        'StatusCreateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-    },
-    {
+            )
+        ],
+        {   'Status'           => \%Status_of,
+            'StatusCreateTime' => \%StatusCreateTime_of,
+        },
+        {   'Status' =>
+              'Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionsStatusCode',
+            'StatusCreateTime' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        },
+        {
 
-        'Status' => 'Status',
-        'StatusCreateTime' => 'StatusCreateTime',
-    }
-);
+            'Status'           => 'Status',
+            'StatusCreateTime' => 'StatusCreateTime',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

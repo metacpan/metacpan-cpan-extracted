@@ -1,10 +1,7 @@
 package Sim::OPT;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-
-use v5.14;
-# use v5.20;
+# Sim::OPT is distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 use Exporter;
 use parent 'Exporter';
@@ -15,7 +12,7 @@ use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use Storable qw(store retrieve lock_store lock_nstore lock_retrieve dclone);
 use IO::Tee;
 use File::Copy qw( move copy );
@@ -37,8 +34,9 @@ use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
-use Sim::OPT::Parcoord3d;
 use Sim::OPT::Interlinear;
+use Sim::OPT::Parcoord3d;
+eval { use Sim::OPTcue; 1 };
 
 
 our @ISA = qw( Exporter );
@@ -64,7 +62,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.769';
+$VERSION = '0.777';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -157,7 +155,7 @@ sub getnear
 
 sub define_random_file
 {
-  my ( $newname, $mids_r, $countcase, $baseinsts_r, $dowhat_r, $fire, $instn ) = @_;
+  my ( $newname, $mids_r, $countcase, $baseinsts_r, $dowhat_r, $fire, $instn, $pairs_r ) = @_;
 
   my %mids      = %{ $mids_r };
   my @baseinsts = @{ $baseinsts_r };
@@ -165,6 +163,8 @@ sub define_random_file
 
   # Take the last base instance as template (same as setpickinst does with pop)
   my $ins_r = shift( @baseinsts );
+  my @pairs = @$pairs_r; say $tee "IN DEFINE_RANDOM_FILE, \@pairs: " . dump( @pairs );
+
   my %b     = %{ $ins_r };
 
   my $countblock   = $b{countblock};
@@ -199,6 +199,19 @@ sub define_random_file
 	{
 		$stamp = encrypt0( $newname );
 	}
+
+  my ( @vars, @levs );
+  foreach $pair ( @pairs )
+  {
+    my ( $var, $lev ) = split( "-", $pair );
+    push( @vars, $var );
+    push( @levs, $lev );
+  }
+  say $tee "IN DEFINE_RANDOM_FILE, \@vars: " . dump( @vars );
+  say $tee "IN DEFINE_RANDOM_FILE, \@levs: " . dump( @levs );
+
+  my $varstring = join( "-", @vars ); say $tee "IN DEFINE_RANDOM_FILE, \$varstring: " . dump( $varstring );
+  my $levstring = join( "-", @levs ); say $tee "IN DEFINE_RANDOM_FILE, \$varstring: " . dump( $varstring );
 
   # Origin = current configuration; in setpickinst this is usually giveback(%mids)
   my $origin = giveback( \%mids );
@@ -252,8 +265,6 @@ sub define_random_file
 
   my @newinstance;
 
-  $instn++;
-
   push( @newinstance,
   {
     countcase     => $countcase,
@@ -265,8 +276,8 @@ sub define_random_file
 
     to            => \%to,
     orig          => \%orig,
-    countvar      => $countvar,
-    countstep     => $countstep,
+    countvar      => $varstring,
+    countstep     => $levstring,
 
     sweeps        => \@sweeps,
     sourcesweeps  => \@sourcesweeps,
@@ -278,7 +289,7 @@ sub define_random_file
     varnums       => \%varnums,
     carrier       => \%carrier,        # as in your original
 
-    countinstance => $cn,
+    countinstance => $instn,
     origin        => $origin,
     instn         => $instn,
     is            => $is,
@@ -831,7 +842,7 @@ sub genstring
   my %varnums   = %{ $varnums_r }; #say "\%varnums: " . dump ( \%varnums );  # max levels for each parameter
   my @blockelts = @{ $blockelts_r }; #say "\@blockelts: " . dump ( @blockelts ); # variables active in this block
   my @frags = split( "_", $from ); #say "\$from: $from"; say "\@frags: " . dump ( @frags );
-  my @bowl;
+  my ( @bowl, @bowlmax );
 
   foreach my $frag ( @frags ) 
   {
@@ -848,7 +859,7 @@ sub genstring
     }
   }
   my $obtained = ( join "_", @bowl ); #say "\@obtained: " . dump ( @obtained );
-  return ( $obtained );
+  return ( $obtained, \@bowl );
 }
 
 
@@ -2222,7 +2233,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	@varnumbers = Sim::OPT::washn( @varnumbers );
 
 
-	if ( ( $countcase > $#sweeps ) and ( $dirfiles{pierce} ne "yes" ) ) # NUMBER OF CASES OF THE CURRENT PROBLEM
+	if ( $countcase > $#sweeps )   # NUMBER OF CASES OF THE CURRENT PROBLEM
   {
 		if ( $dirfiles{checksensitivity} eq "y" )
 		{
@@ -2365,6 +2376,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	}
 
 
+  
 	if ( $sourceblockelts[0] =~ /ù/ )
 	{
 		$dirfiles{ga} = "y";
@@ -2591,7 +2603,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			@box = ();
 		}
 
-    unless ( $dirfiles{randompick} eq "y" )
+    unless ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) )
     {
       foreach my $var ( @blockelts )
 			{
@@ -2892,7 +2904,13 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	my %datastruc = %{ $d{datastruc} };
 	my @varnumbers = @{ $d{varnumbers} };
 	my %dowhat = %{ $d{dowhat} };
+
 	my $instn = $d{instn};
+  if ( !$instn )
+  {
+    $instn = $dirfiles{countinst};
+  }
+
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 
@@ -2917,68 +2935,65 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 		my $countstep = $$elt[2];
 		my $oldpars = $$elt[3];
     
-    $instn = $dirfiles{countinst};
-    $dirfiles{countinst}++;
+    $dirfiles{countinst} = $instn ;
     
 		my %to = %{ extractcase( \%inst, \%dowhat, $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
 
-		{
-			my %orig = %{ extractcase( \%inst, \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "obtained \$instn: $instn, countinstance: $count, from: $from, \$to: $to, \%orig: " . dump( \%orig ) . ", \%carrier: " . dump( \%carrier );
-			my $origin = $orig{cleanto};
-			my $from = $origin;
-	  	my $c = $$elt[4];
+		my %orig = %{ extractcase( \%inst, \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "obtained \$instn: $instn, countinstance: $count, from: $from, \$to: $to, \%orig: " . dump( \%orig ) . ", \%carrier: " . dump( \%carrier );
+		my $origin = $orig{cleanto};
+		my $from = $origin;
+  	my $c = $$elt[4];
 
-			$inst{$to{cleanto}} = $to{cleancrypto};
-		  $inst{$to{crypto}} = $to{to};
-		  $inst{$to{cleancrypto}} = $to{cleanto};
-		  $inst{$to{to}} = $to{crypto};
-		  $inst{$orig{cleanto}} = $orig{cleancrypto};
-		  $inst{$orig{crypto}} = $orig{to};
-		  $inst{$orig{cleancrypto}} = $orig{cleanto};
-		  $inst{$orig{to}} = $orig{crypto};
+		$inst{$to{cleanto}} = $to{cleancrypto};
+	  $inst{$to{crypto}} = $to{to};
+	  $inst{$to{cleancrypto}} = $to{cleanto};
+	  $inst{$to{to}} = $to{crypto};
+	  $inst{$orig{cleanto}} = $orig{cleancrypto};
+	  $inst{$orig{crypto}} = $orig{to};
+	  $inst{$orig{cleancrypto}} = $orig{cleanto};
+	  $inst{$orig{to}} = $orig{crypto};
 
-			%inst = cleaninst( %inst );
-			#unless ( $dirfiles{ga} eq "y" )
-			#{
-				#
-        if ( not ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) )
+		%inst = cleaninst( %inst );
+		#unless ( $dirfiles{ga} eq "y" )
+		#{
+			#
+      if ( not ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) )
+			{
+				unless ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) )
 				{
-					unless ( $dirfiles{randompick} eq "y" )
-					{
-						push( @{ $dirfiles{dones} }, $to{cleanto} );
-					}
+					push( @{ $dirfiles{dones} }, $to{cleanto} );
+				}
 
-					push( @instances,
-					{
-						countcase => $countcase, countblock => $countblock,
-						miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
-						to => \%to, countvar => $countvar, countstep => $countstep, orig => \%orig,
-						sweeps => \@sweeps, dowhat => \%dowhat,
-						sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-						varnumbers => \@varnumbers, blocks => \@blocks,
-						blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-						countinstance => $count, carrier => \%carrier, origin => $origin,
-						instn => $instn, is => $to{cleanto}, vehicles => \%vehicles,
-					} );
-				}
-        else
+				push( @instances,
 				{
-					push( @precedents,
-					{
-						countcase => $countcase, countblock => $countblock,
-						miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
-						to => \%to, countvar => $countvar, countstep => $countstep, orig => \%orig,
-						sweeps => \@sweeps, dowhat => \%dowhat,
-						sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-						varnumbers => \@varnumbers, blocks => \@blocks,
-						blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-						countinstance => $count, carrier => \%carrier, origin => $origin,
-						instn => $instn, is => $to{cleanto}, vehicles => \%vehicles,
-					} );
-				}
-			#}
-			$instn++;
-		}
+					countcase => $countcase, countblock => $countblock,
+					miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
+					to => \%to, countvar => $countvar, countstep => $countstep, orig => \%orig,
+					sweeps => \@sweeps, dowhat => \%dowhat,
+					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+					varnumbers => \@varnumbers, blocks => \@blocks,
+					blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+					countinstance => instn, carrier => \%carrier, origin => $origin,
+					instn => $instn, is => $to{cleanto}, vehicles => \%vehicles, dirfiles => \%dirfiles,
+				} );
+			}
+      else
+			{
+				push( @precedents,
+				{
+					countcase => $countcase, countblock => $countblock,
+					miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
+					to => \%to, countvar => $countvar, countstep => $countstep, orig => \%orig,
+					sweeps => \@sweeps, dowhat => \%dowhat,
+					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+					varnumbers => \@varnumbers, blocks => \@blocks,
+					blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+					countinstance => $instn, carrier => \%carrier, origin => $origin,
+					instn => $instn, is => $to{cleanto}, vehicles => \%vehicles, dirfiles => \%dirfiles,
+				} );
+			}
+		#}
+    $instn++;
 		$count++;
 	}
 	exe( { instances => \@instances, dirfiles => \%dirfiles, inst => \%inst, precedents => \@precedents, mypath => $mypath, file => $file,
@@ -3015,6 +3030,7 @@ sub exe
 	my %orig = %{ $d{orig} };
 	my $countvar = $d{countvar};
 	my $countstep = $d{countstep};
+  my $origin = $d{origin};
   
 	my @blockelts = @{ $d{blockelts} };
 	my @sourceblockelts = @{ $d{blockelts} };
@@ -3044,275 +3060,46 @@ sub exe
 	{
 		push( @{ $vehicles{cumulateall} }, @instances );
 	}
+	
 
-	# say $tee "BEFORE PROCESSING, INSTANCES: " . dump ( @instances ); # YOU MAY UNCOMMENT THIS.
 
-	if ( $dirfiles{ga} eq "y" )
+	###################################################################################################
+	elsif ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) or ( $dirfiles{OLDrandompick} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
 	{
-		#say $tee "SHOW \@instances: " . dump ( @instances ); # use Storable;
-		say $tee "#Calling GAs on morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-
-		my $basestore = "./basestore-$countcase-$countblock";
-		my $dowhatstore = "./dowhat-$countcase-$countblock";
-    my $dirfilesstore = "./dirfiles-$countcase-$countblock";
-
-		my %carrier = reconstruct( $origin );
-		my $starttarget = giveback( \%mids ); ##say "STARTTARGET $starttarget";
-    
-    my ( $startcrypt, $crypto, $cryptor );
-
-    if ( $dowhat{names} eq "short" )
+    if ( checkOPTcue() )
     {
-    	$startcrypt = encrypt1( $starttarget );
-      $crypto = encrypt1( $starttarget );
-		  $cryptor = encrypt1( $starttarget );
+      @fulls = Sim::OPTcue::expand(
+      {
+        tee        => $tee,
+        configfile => $configfile,
+        precious   => $precious,
+
+        instances  => \@instances,
+        dirfiles   => \%dirfiles,
+        inst       => \%inst,
+        precedents => \@precedents,
+
+        dowhat     => \%dowhat,
+        vehicles   => \%vehicles,
+        mids       => \%mids,
+        varnums    => \%varnums,
+        carrier    => \%carrier,
+
+        blockelts  => \@blockelts,
+        from       => $from,
+        origin   => $d{origin}, 
+        mypath     => $mypath,
+        file       => $file,
+        countcase  => $countcase,
+        countblock => $countblock,
+      });
     }
-		elsif ( $dowhat{names} eq "medium" )
+    else 
     {
-    	$startcrypt = encrypt0( $starttarget );
-      $crypto = encrypt0( $starttarget );
-		  $cryptor = encrypt0( $starttarget );
+      say $tee "OPTcue is not installed and this operation is not possible without it.";
     }
-
-		#%obtained = map { $_{is} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{origin} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{from} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{to}{cleanto} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{orig} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{orig}{cleanto} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{to}{to} = $starttarget } %{ $instances[$#instances] };
-		#%obtained = map { $_{orig}{to} = $starttarget } %{ $instances[$#instances] };
-
-
-		my $count = 0;
-		foreach $i ( @instances )
-		{
-			my %in = %{ $i };
-			if ( $count == 0 )
-			{
-				$in{is} = $starttarget;
-				$in{origin} = $starttarget;
-				$in{from} = $starttarget;
-				$to{cleanto} = $starttarget;
-				$orig{cleanto} = $starttarget;
-			  $to{to} = "$mypath/$file" . "_" . "$starttarget";
-				$orig{to} = "$mypath/$file" . "_" . "$starttarget";
-
-				if ( $dowhat{names} eq "short" )
-			  {
-			    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
-			    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
-			    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
-			    $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
-			  }
-			  elsif ( $dowhat{names} eq "medium" )
-			  {
-			    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
-			    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
-			    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
-			    $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
-			  }
-			  else
-			  {
-			    $to{crypto} = "$mypath/$file" . "_" . "$starttarget";  ### TAKE CARE!!! REASSIGNIMENT!!!
-			    $to{cleancrypto} = $starttarget; ### TAKE CARE!!! REASSIGNIMENT!!!
-			    $orig{crypto} = "$mypath/$file" . "_" . "$starttarget"; ### TAKE CARE!!! REASSIGNIMENT!!!
-			    $orig{cleancrypto} = $starttarget; ### TAKE CARE!!! REASSIGNIMENT!!!
-			  }
-
-				$inst{$to{cleanto}} = $to{cleancrypto};
-			  $inst{$to{crypto}} = $to{to};
-			  $inst{$to{cleancrypto}} = $to{cleanto};
-			  $inst{$to{to}} = $to{crypto};
-			  $inst{$orig{cleanto}} = $orig{cleancrypto};
-			  $inst{$orig{crypto}} = $orig{to};
-			  $inst{$orig{cleancrypto}} = $orig{cleanto};
-			  $inst{$orig{to}} = $orig{crypto};
-				%inst = cleaninst( %inst );
-
-			}
-
-			$count++;
-		}
-
-
-		my @juggle;
-		my @prov = @instances; #say $tee "BEFORE, INSTANCES: " . dump ( @instances );
-		my $pop = pop( @prov );
-		my %instance = %{ $pop };
-
-		say $tee `rm -f $basestore`;
-		say $tee `rm -f $dowhatstore`;
-		say $tee `rm -f $dirfilesstore`;
-		say $tee `rm -f $basestore-return`;
-		say $tee `rm -f ./$relate.txt`;
-		say $tee `rm -f ./$report.txt`;
-
-
-		store \%instance, "$basestore";
-		store \%dowhat, "$dowhatstore"; # ATTENTION. use Storable;
-		store \%dirfiles, "$dirfilesstore"; # ATTENTION. use Storable;
-
-
-		#say $tee "python $dowhat{ga} $configfile $starttarget $countcase $basestore $dowhatstore $dirfilesstore $dirfiles{ganum}";
-		my @returns = `python $dowhat{ga} $configfile $starttarget $countcase $basestore $dowhatstore $dirfilesstore $dirfiles{ganum}`; #HERE FLOWS THE ACTION
-		#say  "RETURNED!: " . dump ( @returns );
-
-
-    my @selecteds;
-
-
-    #say  "\%mids!: " . dump ( \%mids ); say  "\$countcase!: " . dump ( $countcase );
-		#say  "\@juggle!: " . dump ( @juggle ); say  "\%dowhat!: " . dump ( \%dowhat );
-		foreach my $name ( @returns )
-		{
-			chomp $name; #say  "\$name!: " . dump ( $name );
-			my $inss_r = setpickinst( $name, \%mids, $countcase, \@juggle, \%dowhat );
-			my @inss = @{ $inss_r }; chomp $name; #say  "\@inss!: " . dump ( @inss );
-			my $pickedins = $inss[$#inss];
-      push ( @selecteds, $pickedins );
-		}
-		#say  "SELECTEDS!: " . dump ( @selecteds );
-
-		my @instances = @selecteds;
-
-		foreach my $inst_r ( @instances )
-		{
-		  my %i = %{ $inst_r };
-			my %inst = %{ $i{inst} };
-			my %to = %{ $i{to} }; #say RELATE "out of setpickinst \%to " .dump ( %to );
-			my %orig = %{ $i{orig} }; #say RELATE "out of \%orig \$crypto " .dump ( %orig );
-			my $is = $i{is}; #say RELATE "out of setpickinst \$is " .dump ( $is );
-		  my $origin = $i{origin}; #say RELATE "out of setpickinst \$origin " .dump ( $origin );
-
-			#my $crypto = int( ( scalar( keys %inst ) ) / 5 * 6 );
-			#my $cryptor = $crypto + 1;
-      my ( $crypto, $cryptor );
-      if ( $dowhat{names} eq "short" )
-		  {
-			  $crypto = Sim::OPT::encrypt1( $is ); #say RELATE "out of setpickinst \$crypto " .dump ( $crypto );
-	      $cryptor = Sim::OPT::encrypt1( $origin ); #say RELATE "out of setpickinst \$cryptor " .dump ( $cryptor );
-      }
-      elsif ( $dowhat{names} eq "medium" )
-		  {
-			  $crypto = Sim::OPT::encrypt0( $is ); #say RELATE "out of setpickinst \$crypto " .dump ( $crypto );
-	      $cryptor = Sim::OPT::encrypt0( $origin ); #say RELATE "out of setpickinst \$cryptor " .dump ( $cryptor );
-      }
-
-	    $to{to} = "$mypath/$file" . "_" . "$is";  ### TAKE CARE!!! REASSIGNIMENT!!!
-	    $to{cleanto} = "$is"; ### TAKE CARE!!! REASSIGNIMENT!!!
-	    $orig{to} = "$mypath/$file" . "_" . "$origin"; ### TAKE CARE!!! REASSIGNIMENT!!!
-	    $orig{cleanto} = "$origin"; ### TAKE CARE!!! REASSIGNIMENT!!!
-
-			if ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) )
-		  {
-		    $to{crypto} = "$mypath/$file" . "_" . "$crypto";  ###DDD!!! FINISH THIS.
-		    $to{cleancrypto} = $crypto;  ###DDD!!! FINISH THIS.
-		    $orig{crypto} = "$mypath/$file" . "_" . "$cryptor";  ###DDD!!! FINISH THIS.
-		    $orig{cleancrypto} = $cryptor; ###DDD!!! FINISH THIS.
-		  }
-		  else
-		  {
-		    $to{crypto} = $to{to};  ### TAKE CARE!!! REASSIGNIMENT!!!
-		    $to{cleancrypto} = $to{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-		    $orig{crypto} = $orig{to}; ### TAKE CARE!!! REASSIGNIMENT!!!
-		    $orig{cleancrypto} = $orig{cleanto}; ### TAKE CARE!!! REASSIGNIMENT!!!
-		  }
-
-			$inst{$to{cleanto}} = $to{cleancrypto};
-		  $inst{$to{crypto}} = $to{to};
-		  $inst{$to{cleancrypto}} = $to{cleanto};
-		  $inst{$to{to}} = $to{crypto};
-		  $inst{$orig{cleanto}} = $orig{cleancrypto};
-		  $inst{$orig{crypto}} = $orig{to};
-		  $inst{$orig{cleancrypto}} = $orig{cleanto};
-		  $inst{$orig{to}} = $orig{crypto};
-			%inst = cleaninst( %inst );
-		}
-
-		#say $tee "HAVE! INST " . dump( \%inst );
-
-		my $cryptolinks = "$mypath/$file" . "_" . "$countcase" . "_cryptolinks.pl";
-		open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
-		say CRYPTOLINKS "" . dump( \%inst );
-		close CRYPTOLINKS;
-    #say $tee "ARRIVED 1 ";
-		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
-		{
-      #say $tee "ARRIVED 2 ";
-			say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			 ( my $simcases_ref, my $simstruct_ref, my $repcases_ref, my $repstruct_ref,
-		    my $mergestruct_ref, my $mergecases_ref, $csim ) = Sim::OPT::Sim::sim(
-					{ instances => \@instances, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles,
-					  inst => \%inst, precedents => \@precedents, postproc => "y" } ); # CHECK IF: fire => "y is needed" 
-					$dirfiles{simcases} = $simcases_ref;
-					$dirfiles{simstruct} = $simstruct_ref;
-					$dirfiles{repcases} = $repcases_ref;
-					$dirfiles{repstruct} = $repstruct_ref;
-					$dirfiles{mergestruct} = $mergestruct_ref;
-					$dirfiles{mergecases} = $mergecases_ref;
-		}
-    #say $tee "ARRIVED 3 ";
-
-		if ( $dowhat{metamodel} eq "y" )
-		{
-			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; #say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
-			$bit = $file . "_";
-			@bag =( $bit );
-			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
-			@fulls = uniq( map { $_->[0] } @fills );
-		}
 	}
 
-	
-	
-  elsif ( $dirfiles{OLDrandompick} eq "y" ) #DDD
-	{
-		say $tee "#Calling randomly picked morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-
-		my @pool = @instances ;
-		say $tee "\pool: " . dump( @pool );
-		@reds = shuffle( @pool );
-		say $tee "REDS1: " . dump( @reds );
-		@reds = @reds[0..($dirfiles{randompicknum}-1)];
-		say $tee "REDS2: " . dump( @reds );
-
-		@instances = @reds;
-
-
-		if ( $dowhat{morph} eq "y" )
-		{
-			say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles, \%inst, \@precedents );
-			$dirfiles{morphcases} = $result[0];
-			$dirfiles{morphstruct} = $result[1];
-			#%inst = %{ $result[2] };
-		}
-
-		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
-		{
-
-			say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			 ( my $simcases_ref, my $simstruct_ref, my $repcases_ref, my $repstruct_ref,
-		    my $mergestruct_ref, my $mergecases_ref, $csim ) = Sim::OPT::Sim::sim(
-					{ instances => \@instances, dirfiles => \%dirfiles, dowhat => \%dowhat, vehicles => \%vehicles,
-					  inst => \%inst, precedents => \@precedents } );
-					$dirfiles{simcases} = $simcases_ref;
-					$dirfiles{simstruct} = $simstruct_ref;
-					$dirfiles{repcases} = $repcases_ref;
-					$dirfiles{repstruct} = $repstruct_ref;
-					$dirfiles{mergestruct} = $mergestruct_ref;
-					$dirfiles{mergecases} = $mergecases_ref;
-		}
-		if ( $dowhat{metamodel} eq "y" )
-		{
-			$tmpblankfile = "$mypath/$file" . "_tmp_gen_blank.csv"; #say $tee "IN LATINHYPERCUBE \$tmpblankfile: " . dump( $tmpblankfile );
-			$bit = $file . "_";
-			@bag =( $bit );
-			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
-			@fulls = uniq( map { $_->[0] } @fills );
-		}
-	}
 	else
 	{
 		if ( $dowhat{morph} eq "y" )
@@ -3457,6 +3244,23 @@ sub opt
 	{
 		$dowhat{mypath} = $mypath;
 	}
+
+
+  sub checkOPTcue 
+  {
+     if( defined( $checkOPTcue ) )
+     {
+        return( $checkOPTcue );
+     }
+
+    my $checkOPTcue = eval 
+    {
+      use Sim::OPTcue;
+      1;
+    } ? 1 : 0;
+    return( $checkOPTcue );
+  }
+
 
 	if ( scalar( @miditers == 0 ) )
 	{
@@ -3837,8 +3641,7 @@ For specifying in a Sim::OPT configuration file that a certain block has to be s
 
 OPT can perform variance-based preliminary sensitivity analyses on the basis of metamodels.
 
-OPT works under Linux.
-
+OPT works under Linux. This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
 =head2 EXPORT
 
 "opt".
@@ -3853,7 +3656,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2024 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

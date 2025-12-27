@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetQuickEstimateRequestContainer;
-$Shipment::Purolator::WSDL::Types::GetQuickEstimateRequestContainer::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::GetQuickEstimateRequestContainer::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,58 +17,55 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::RequestContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %BillingAccountNumber_of :ATTR(:get<BillingAccountNumber>);
-my %SenderPostalCode_of :ATTR(:get<SenderPostalCode>);
-my %ReceiverAddress_of :ATTR(:get<ReceiverAddress>);
-my %PackageType_of :ATTR(:get<PackageType>);
-my %TotalWeight_of :ATTR(:get<TotalWeight>);
+    my %BillingAccountNumber_of : ATTR(:get<BillingAccountNumber>);
+    my %SenderPostalCode_of     : ATTR(:get<SenderPostalCode>);
+    my %ReceiverAddress_of      : ATTR(:get<ReceiverAddress>);
+    my %PackageType_of          : ATTR(:get<PackageType>);
+    my %TotalWeight_of          : ATTR(:get<TotalWeight>);
 
-__PACKAGE__->_factory(
-    [ qw(        BillingAccountNumber
-        SenderPostalCode
-        ReceiverAddress
-        PackageType
-        TotalWeight
+    __PACKAGE__->_factory(
+        [   qw(        BillingAccountNumber
+              SenderPostalCode
+              ReceiverAddress
+              PackageType
+              TotalWeight
 
-    ) ],
-    {
-        'BillingAccountNumber' => \%BillingAccountNumber_of,
-        'SenderPostalCode' => \%SenderPostalCode_of,
-        'ReceiverAddress' => \%ReceiverAddress_of,
-        'PackageType' => \%PackageType_of,
-        'TotalWeight' => \%TotalWeight_of,
-    },
-    {
-        'BillingAccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SenderPostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ReceiverAddress' => 'Shipment::Purolator::WSDL::Types::ShortAddress',
-        'PackageType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TotalWeight' => 'Shipment::Purolator::WSDL::Types::TotalWeight',
-    },
-    {
+            )
+        ],
+        {   'BillingAccountNumber' => \%BillingAccountNumber_of,
+            'SenderPostalCode'     => \%SenderPostalCode_of,
+            'ReceiverAddress'      => \%ReceiverAddress_of,
+            'PackageType'          => \%PackageType_of,
+            'TotalWeight'          => \%TotalWeight_of,
+        },
+        {   'BillingAccountNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SenderPostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ReceiverAddress'  =>
+              'Shipment::Purolator::WSDL::Types::ShortAddress',
+            'PackageType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TotalWeight' => 'Shipment::Purolator::WSDL::Types::TotalWeight',
+        },
+        {
 
-        'BillingAccountNumber' => 'BillingAccountNumber',
-        'SenderPostalCode' => 'SenderPostalCode',
-        'ReceiverAddress' => 'ReceiverAddress',
-        'PackageType' => 'PackageType',
-        'TotalWeight' => 'TotalWeight',
-    }
-);
+            'BillingAccountNumber' => 'BillingAccountNumber',
+            'SenderPostalCode'     => 'SenderPostalCode',
+            'ReceiverAddress'      => 'ReceiverAddress',
+            'PackageType'          => 'PackageType',
+            'TotalWeight'          => 'TotalWeight',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -85,7 +82,7 @@ Shipment::Purolator::WSDL::Types::GetQuickEstimateRequestContainer
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

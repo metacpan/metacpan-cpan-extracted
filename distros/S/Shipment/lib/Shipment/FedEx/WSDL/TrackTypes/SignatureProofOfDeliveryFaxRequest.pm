@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxRequest;
-$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,67 +20,68 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %QualifiedTrackingNumber_of :ATTR(:get<QualifiedTrackingNumber>);
-my %AdditionalComments_of :ATTR(:get<AdditionalComments>);
-my %FaxSender_of :ATTR(:get<FaxSender>);
-my %FaxRecipient_of :ATTR(:get<FaxRecipient>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of            : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of       : ATTR(:get<TransactionDetail>);
+    my %Version_of                 : ATTR(:get<Version>);
+    my %QualifiedTrackingNumber_of : ATTR(:get<QualifiedTrackingNumber>);
+    my %AdditionalComments_of      : ATTR(:get<AdditionalComments>);
+    my %FaxSender_of               : ATTR(:get<FaxSender>);
+    my %FaxRecipient_of            : ATTR(:get<FaxRecipient>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        QualifiedTrackingNumber
-        AdditionalComments
-        FaxSender
-        FaxRecipient
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              QualifiedTrackingNumber
+              AdditionalComments
+              FaxSender
+              FaxRecipient
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'QualifiedTrackingNumber' => \%QualifiedTrackingNumber_of,
-        'AdditionalComments' => \%AdditionalComments_of,
-        'FaxSender' => \%FaxSender_of,
-        'FaxRecipient' => \%FaxRecipient_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::TrackTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
-        'QualifiedTrackingNumber' => 'Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber',
-        'AdditionalComments' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'FaxSender' => 'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
-        'FaxRecipient' => 'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'QualifiedTrackingNumber' => \%QualifiedTrackingNumber_of,
+            'AdditionalComments'      => \%AdditionalComments_of,
+            'FaxSender'               => \%FaxSender_of,
+            'FaxRecipient'            => \%FaxRecipient_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail',
+            'ClientDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
+            'QualifiedTrackingNumber' =>
+              'Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber',
+            'AdditionalComments' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FaxSender' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
+            'FaxRecipient' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'QualifiedTrackingNumber' => 'QualifiedTrackingNumber',
-        'AdditionalComments' => 'AdditionalComments',
-        'FaxSender' => 'FaxSender',
-        'FaxRecipient' => 'FaxRecipient',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'QualifiedTrackingNumber' => 'QualifiedTrackingNumber',
+            'AdditionalComments'      => 'AdditionalComments',
+            'FaxSender'               => 'FaxSender',
+            'FaxRecipient'            => 'FaxRecipient',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -97,7 +98,7 @@ Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryFaxRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

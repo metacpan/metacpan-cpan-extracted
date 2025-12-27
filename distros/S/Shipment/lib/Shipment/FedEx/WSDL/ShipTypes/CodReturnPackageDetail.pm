@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,41 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CollectionAmount_of :ATTR(:get<CollectionAmount>);
-my %Electronic_of :ATTR(:get<Electronic>);
-my %Barcodes_of :ATTR(:get<Barcodes>);
-my %Label_of :ATTR(:get<Label>);
+    my %CollectionAmount_of : ATTR(:get<CollectionAmount>);
+    my %Electronic_of       : ATTR(:get<Electronic>);
+    my %Barcodes_of         : ATTR(:get<Barcodes>);
+    my %Label_of            : ATTR(:get<Label>);
 
-__PACKAGE__->_factory(
-    [ qw(        CollectionAmount
-        Electronic
-        Barcodes
-        Label
+    __PACKAGE__->_factory(
+        [   qw(        CollectionAmount
+              Electronic
+              Barcodes
+              Label
 
-    ) ],
-    {
-        'CollectionAmount' => \%CollectionAmount_of,
-        'Electronic' => \%Electronic_of,
-        'Barcodes' => \%Barcodes_of,
-        'Label' => \%Label_of,
-    },
-    {
-        'CollectionAmount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'Electronic' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
-        'Label' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
-    },
-    {
+            )
+        ],
+        {   'CollectionAmount' => \%CollectionAmount_of,
+            'Electronic'       => \%Electronic_of,
+            'Barcodes'         => \%Barcodes_of,
+            'Label'            => \%Label_of,
+        },
+        {   'CollectionAmount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'Electronic'       => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
+            'Label'    => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
+        },
+        {
 
-        'CollectionAmount' => 'CollectionAmount',
-        'Electronic' => 'Electronic',
-        'Barcodes' => 'Barcodes',
-        'Label' => 'Label',
-    }
-);
+            'CollectionAmount' => 'CollectionAmount',
+            'Electronic'       => 'Electronic',
+            'Barcodes'         => 'Barcodes',
+            'Label'            => 'Label',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +71,7 @@ Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

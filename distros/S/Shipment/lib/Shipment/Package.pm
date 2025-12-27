@@ -1,5 +1,5 @@
 package Shipment::Package;
-$Shipment::Package::VERSION = '3.10';
+$Shipment::Package::VERSION = '3.11';
 use strict;
 use warnings;
 
@@ -12,70 +12,70 @@ use namespace::clean;
 
 
 has 'id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'type' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'name' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'notes' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'fragile' => (
-  is => 'rw',
-  isa => Bool,
-  default => 0,
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 
 has 'weight' => (
-  is => 'rw',
-  isa => Num,
+    is  => 'rw',
+    isa => Num,
 );
 
 
 has 'length' => (
-  is => 'rw',
-  isa => Num,
+    is  => 'rw',
+    isa => Num,
 );
 
 has 'width' => (
-  is => 'rw',
-  isa => Num,
+    is  => 'rw',
+    isa => Num,
 );
 
 has 'height' => (
-  is => 'rw',
-  isa => Num,
+    is  => 'rw',
+    isa => Num,
 );
 
 
 has 'insured_value' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) }, 
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 
 has 'goods_value' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  lazy => 1,
-  builder => 1,
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    lazy    => 1,
+    builder => 1,
 );
 
 sub _build_goods_value {
@@ -84,29 +84,29 @@ sub _build_goods_value {
 
 
 has 'label' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Label'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Label'],
 );
 
 
 has 'tracking_id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'cost' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  default => sub { Data::Currency->new(0) },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    default => sub { Data::Currency->new(0) },
 );
 
 
 has 'items' => (
-  handles_via => 'Array',
-  is => 'rw',
-  isa => ArrayRef[HashRef],
-  default => sub { [] }
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef [HashRef],
+    default     => sub { [] }
 );
 
 
@@ -124,7 +124,7 @@ Shipment::Package
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

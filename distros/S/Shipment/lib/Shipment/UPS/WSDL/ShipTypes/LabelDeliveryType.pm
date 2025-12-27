@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType;
-$Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %EMail_of :ATTR(:get<EMail>);
-my %LabelLinksIndicator_of :ATTR(:get<LabelLinksIndicator>);
+    my %EMail_of               : ATTR(:get<EMail>);
+    my %LabelLinksIndicator_of : ATTR(:get<LabelLinksIndicator>);
 
-__PACKAGE__->_factory(
-    [ qw(        EMail
-        LabelLinksIndicator
+    __PACKAGE__->_factory(
+        [   qw(        EMail
+              LabelLinksIndicator
 
-    ) ],
-    {
-        'EMail' => \%EMail_of,
-        'LabelLinksIndicator' => \%LabelLinksIndicator_of,
-    },
-    {
-        'EMail' => 'Shipment::UPS::WSDL::ShipTypes::EmailDetailsType',
-        'LabelLinksIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'EMail'               => \%EMail_of,
+            'LabelLinksIndicator' => \%LabelLinksIndicator_of,
+        },
+        {   'EMail' => 'Shipment::UPS::WSDL::ShipTypes::EmailDetailsType',
+            'LabelLinksIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'EMail' => 'EMail',
-        'LabelLinksIndicator' => 'LabelLinksIndicator',
-    }
-);
+            'EMail'               => 'EMail',
+            'LabelLinksIndicator' => 'LabelLinksIndicator',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

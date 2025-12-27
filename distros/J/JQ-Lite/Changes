@@ -1,3 +1,37 @@
+1.66  2025-12-27
+
+    - Enforce jq-style runtime errors when getpath is called with a
+      non-array path argument.
+
+1.65  2025-12-27
+
+    - Align `keys` with jq by returning array indices and raising runtime
+      errors on non-array/non-object inputs.
+
+1.64  2025-12-27
+
+    - Add jq-compatible --argfile CLI support, decoding JSON files into
+      variables with usage errors for invalid JSON and input errors for
+      unreadable files.
+
+1.63  2025-12-27
+
+    - Promote release to version 1.63 adding jq-compatible --slurpfile
+      support that decodes JSON files into array-wrapped variables with
+      consistent usage error handling for missing files and invalid JSON.
+
+1.62  2025-12-27
+
+    - Improved CLI error handling:
+      Getopt::Long diagnostics are now captured and re-emitted
+      with consistent [USAGE] prefixes and exit code 5,
+      preventing raw warnings from leaking to stderr.
+
+1.61  2025-12-27
+
+    - Bump version to document the compile-error handling improvements
+      for empty pipeline segments in jq-lite CLI queries.
+
 1.60  2025-12-26
 
     - Align jq-lite CLI error handling with documented prefixes and
@@ -1027,6 +1061,9 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
+
 
 
 

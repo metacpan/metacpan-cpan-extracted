@@ -1,114 +1,106 @@
 
 package Shipment::Temando::WSDL::Elements::getLocationsResponse;
-$Shipment::Temando::WSDL::Elements::getLocationsResponse::VERSION = '3.10';
+$Shipment::Temando::WSDL::Elements::getLocationsResponse::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
-
-__PACKAGE__->__set_name('getLocationsResponse');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
-
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %locations_of :ATTR(:get<locations>);
-
-__PACKAGE__->_factory(
-    [ qw(        locations
-
-    ) ],
-    {
-        'locations' => \%locations_of,
-    },
-    {
-
-        'locations' => 'Shipment::Temando::WSDL::Elements::getLocationsResponse::_locations',
-    },
-    {
-
-        'locations' => 'locations',
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
     }
-);
 
-} # end BLOCK
+    __PACKAGE__->__set_name('getLocationsResponse');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-
-package Shipment::Temando::WSDL::Elements::getLocationsResponse::_locations;
-$Shipment::Temando::WSDL::Elements::getLocationsResponse::_locations::VERSION = '3.10';
-use strict;
-use warnings;
-{
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %location_of :ATTR(:get<location>);
-
-__PACKAGE__->_factory(
-    [ qw(        location
-
-    ) ],
-    {
-        'location' => \%location_of,
-    },
-    {
-        'location' => 'Shipment::Temando::WSDL::Types::Location',
-    },
-    {
-
-        'location' => 'location',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %locations_of : ATTR(:get<locations>);
+
+        __PACKAGE__->_factory(
+            [   qw(        locations
+
+                )
+            ],
+            {'locations' => \%locations_of,},
+            {
+
+                'locations' =>
+                  'Shipment::Temando::WSDL::Elements::getLocationsResponse::_locations',
+            },
+            {
+
+                'locations' => 'locations',
+            }
+        );
+
+    }    # end BLOCK
 
 
+    package Shipment::Temando::WSDL::Elements::getLocationsResponse::_locations;
+    $Shipment::Temando::WSDL::Elements::getLocationsResponse::_locations::VERSION
+      = '3.11';
+    use strict;
+    use warnings;
+    {
+        our $XML_ATTRIBUTE_CLASS;
+        undef $XML_ATTRIBUTE_CLASS;
+
+        sub __get_attr_class {
+            return $XML_ATTRIBUTE_CLASS;
+        }
+
+        use Class::Std::Fast::Storable constructor => 'none';
+        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+        Class::Std::initialize();
+
+        {    # BLOCK to scope variables
+
+            my %location_of : ATTR(:get<location>);
+
+            __PACKAGE__->_factory(
+                [   qw(        location
+
+                    )
+                ],
+                {'location' => \%location_of,},
+                {'location' => 'Shipment::Temando::WSDL::Types::Location',},
+                {
+
+                    'location' => 'location',
+                }
+            );
+
+        }    # end BLOCK
 
 
+    }
 
 
-}
-
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -125,7 +117,7 @@ Shipment::Temando::WSDL::Elements::getLocationsResponse
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentChargesType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentChargesType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentChargesType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,38 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TransportationCharges_of :ATTR(:get<TransportationCharges>);
-my %ServiceOptionsCharges_of :ATTR(:get<ServiceOptionsCharges>);
-my %TotalCharges_of :ATTR(:get<TotalCharges>);
+    my %TransportationCharges_of : ATTR(:get<TransportationCharges>);
+    my %ServiceOptionsCharges_of : ATTR(:get<ServiceOptionsCharges>);
+    my %TotalCharges_of          : ATTR(:get<TotalCharges>);
 
-__PACKAGE__->_factory(
-    [ qw(        TransportationCharges
-        ServiceOptionsCharges
-        TotalCharges
+    __PACKAGE__->_factory(
+        [   qw(        TransportationCharges
+              ServiceOptionsCharges
+              TotalCharges
 
-    ) ],
-    {
-        'TransportationCharges' => \%TransportationCharges_of,
-        'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
-        'TotalCharges' => \%TotalCharges_of,
-    },
-    {
-        'TransportationCharges' => 'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
-        'ServiceOptionsCharges' => 'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
-        'TotalCharges' => 'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
-    },
-    {
+            )
+        ],
+        {   'TransportationCharges' => \%TransportationCharges_of,
+            'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
+            'TotalCharges'          => \%TotalCharges_of,
+        },
+        {   'TransportationCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
+            'ServiceOptionsCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
+            'TotalCharges' => 'Shipment::UPS::WSDL::ShipTypes::ShipChargeType',
+        },
+        {
 
-        'TransportationCharges' => 'TransportationCharges',
-        'ServiceOptionsCharges' => 'ServiceOptionsCharges',
-        'TotalCharges' => 'TotalCharges',
-    }
-);
+            'TransportationCharges' => 'TransportationCharges',
+            'ServiceOptionsCharges' => 'ServiceOptionsCharges',
+            'TotalCharges'          => 'TotalCharges',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +68,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentChargesType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::ShipmentType;
-$Shipment::UPS::WSDL::RateTypes::ShipmentType::VERSION = '3.10';
+$Shipment::UPS::WSDL::RateTypes::ShipmentType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,77 +20,76 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Shipper_of :ATTR(:get<Shipper>);
-my %ShipTo_of :ATTR(:get<ShipTo>);
-my %ShipFrom_of :ATTR(:get<ShipFrom>);
-my %FRSPaymentInformation_of :ATTR(:get<FRSPaymentInformation>);
-my %Service_of :ATTR(:get<Service>);
-my %DocumentsOnlyIndicator_of :ATTR(:get<DocumentsOnlyIndicator>);
-my %Package_of :ATTR(:get<Package>);
-my %ShipmentServiceOptions_of :ATTR(:get<ShipmentServiceOptions>);
-my %ShipmentRatingOptions_of :ATTR(:get<ShipmentRatingOptions>);
-my %InvoiceLineTotal_of :ATTR(:get<InvoiceLineTotal>);
+    my %Shipper_of                : ATTR(:get<Shipper>);
+    my %ShipTo_of                 : ATTR(:get<ShipTo>);
+    my %ShipFrom_of               : ATTR(:get<ShipFrom>);
+    my %FRSPaymentInformation_of  : ATTR(:get<FRSPaymentInformation>);
+    my %Service_of                : ATTR(:get<Service>);
+    my %DocumentsOnlyIndicator_of : ATTR(:get<DocumentsOnlyIndicator>);
+    my %Package_of                : ATTR(:get<Package>);
+    my %ShipmentServiceOptions_of : ATTR(:get<ShipmentServiceOptions>);
+    my %ShipmentRatingOptions_of  : ATTR(:get<ShipmentRatingOptions>);
+    my %InvoiceLineTotal_of       : ATTR(:get<InvoiceLineTotal>);
 
-__PACKAGE__->_factory(
-    [ qw(        Shipper
-        ShipTo
-        ShipFrom
-        FRSPaymentInformation
-        Service
-        DocumentsOnlyIndicator
-        Package
-        ShipmentServiceOptions
-        ShipmentRatingOptions
-        InvoiceLineTotal
+    __PACKAGE__->_factory(
+        [   qw(        Shipper
+              ShipTo
+              ShipFrom
+              FRSPaymentInformation
+              Service
+              DocumentsOnlyIndicator
+              Package
+              ShipmentServiceOptions
+              ShipmentRatingOptions
+              InvoiceLineTotal
 
-    ) ],
-    {
-        'Shipper' => \%Shipper_of,
-        'ShipTo' => \%ShipTo_of,
-        'ShipFrom' => \%ShipFrom_of,
-        'FRSPaymentInformation' => \%FRSPaymentInformation_of,
-        'Service' => \%Service_of,
-        'DocumentsOnlyIndicator' => \%DocumentsOnlyIndicator_of,
-        'Package' => \%Package_of,
-        'ShipmentServiceOptions' => \%ShipmentServiceOptions_of,
-        'ShipmentRatingOptions' => \%ShipmentRatingOptions_of,
-        'InvoiceLineTotal' => \%InvoiceLineTotal_of,
-    },
-    {
-        'Shipper' => 'Shipment::UPS::WSDL::RateTypes::ShipperType',
-        'ShipTo' => 'Shipment::UPS::WSDL::RateTypes::ShipToType',
-        'ShipFrom' => 'Shipment::UPS::WSDL::RateTypes::ShipFromType',
-        'FRSPaymentInformation' => 'Shipment::UPS::WSDL::RateTypes::FRSPaymentInfoType',
-        'Service' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
-        'DocumentsOnlyIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Package' => 'Shipment::UPS::WSDL::RateTypes::PackageType',
-        'ShipmentServiceOptions' => 'Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType',
-        'ShipmentRatingOptions' => 'Shipment::UPS::WSDL::RateTypes::ShipmentRatingOptionsType',
-        'InvoiceLineTotal' => 'Shipment::UPS::WSDL::RateTypes::InvoiceLineTotalType',
-    },
-    {
+            )
+        ],
+        {   'Shipper'                => \%Shipper_of,
+            'ShipTo'                 => \%ShipTo_of,
+            'ShipFrom'               => \%ShipFrom_of,
+            'FRSPaymentInformation'  => \%FRSPaymentInformation_of,
+            'Service'                => \%Service_of,
+            'DocumentsOnlyIndicator' => \%DocumentsOnlyIndicator_of,
+            'Package'                => \%Package_of,
+            'ShipmentServiceOptions' => \%ShipmentServiceOptions_of,
+            'ShipmentRatingOptions'  => \%ShipmentRatingOptions_of,
+            'InvoiceLineTotal'       => \%InvoiceLineTotal_of,
+        },
+        {   'Shipper'  => 'Shipment::UPS::WSDL::RateTypes::ShipperType',
+            'ShipTo'   => 'Shipment::UPS::WSDL::RateTypes::ShipToType',
+            'ShipFrom' => 'Shipment::UPS::WSDL::RateTypes::ShipFromType',
+            'FRSPaymentInformation' =>
+              'Shipment::UPS::WSDL::RateTypes::FRSPaymentInfoType',
+            'Service' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
+            'DocumentsOnlyIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Package' => 'Shipment::UPS::WSDL::RateTypes::PackageType',
+            'ShipmentServiceOptions' =>
+              'Shipment::UPS::WSDL::RateTypes::ShipmentServiceOptionsType',
+            'ShipmentRatingOptions' =>
+              'Shipment::UPS::WSDL::RateTypes::ShipmentRatingOptionsType',
+            'InvoiceLineTotal' =>
+              'Shipment::UPS::WSDL::RateTypes::InvoiceLineTotalType',
+        },
+        {
 
-        'Shipper' => 'Shipper',
-        'ShipTo' => 'ShipTo',
-        'ShipFrom' => 'ShipFrom',
-        'FRSPaymentInformation' => 'FRSPaymentInformation',
-        'Service' => 'Service',
-        'DocumentsOnlyIndicator' => 'DocumentsOnlyIndicator',
-        'Package' => 'Package',
-        'ShipmentServiceOptions' => 'ShipmentServiceOptions',
-        'ShipmentRatingOptions' => 'ShipmentRatingOptions',
-        'InvoiceLineTotal' => 'InvoiceLineTotal',
-    }
-);
+            'Shipper'                => 'Shipper',
+            'ShipTo'                 => 'ShipTo',
+            'ShipFrom'               => 'ShipFrom',
+            'FRSPaymentInformation'  => 'FRSPaymentInformation',
+            'Service'                => 'Service',
+            'DocumentsOnlyIndicator' => 'DocumentsOnlyIndicator',
+            'Package'                => 'Package',
+            'ShipmentServiceOptions' => 'ShipmentServiceOptions',
+            'ShipmentRatingOptions'  => 'ShipmentRatingOptions',
+            'InvoiceLineTotal'       => 'InvoiceLineTotal',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -107,7 +106,7 @@ Shipment::UPS::WSDL::RateTypes::ShipmentType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

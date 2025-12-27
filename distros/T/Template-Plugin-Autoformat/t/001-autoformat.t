@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use lib qw( ../lib );
-use Template qw( :status );
+use Template;
 use Test::More tests => 25;
 use POSIX qw( localeconv );
 

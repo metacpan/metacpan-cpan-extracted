@@ -1,5 +1,12 @@
 Revision history for Devel-MAT
 
+0.54    2025-12-26
+        [BUGFIXES]
+         * Fix to `show` command on GLOBs with name_heks
+         * Slight C-level fixes to avoid some clang warnings (thanks ilmari)
+         * Fix `counts` tool to account for the SV rebless operations that
+           Devel::MAT::Tool::Object::Pad performs on internals
+
 0.53    2024-03-07
         [CHANGES]
          * Read PMAT file format 0.6 with its shared HEK pointer additions

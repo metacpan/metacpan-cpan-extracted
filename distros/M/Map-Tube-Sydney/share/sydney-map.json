@@ -1,0 +1,885 @@
+{
+  "lines": {
+    "line": [
+      { "id": "T1", "name": "T1", "color": "#f99d1c" },
+      { "id": "T2", "name": "T2", "color": "#0098cd" },
+      { "id": "T3", "name": "T3", "color": "#f37021" },
+      { "id": "T4", "name": "T4", "color": "#005aa3" },
+      { "id": "T5", "name": "T5", "color": "#c4258f" },
+      { "id": "T6", "name": "T6", "color": "#7d3f21" },
+      { "id": "T7", "name": "T7", "color": "#6f818e" },
+      { "id": "T8", "name": "T8", "color": "#00954c" },
+      { "id": "T9", "name": "T9", "color": "#d11f2f" },
+      { "id": "M1", "name": "M1", "color": "#168388" },
+      { "id": "L1", "name": "L1", "color": "#be1622" },
+      { "id": "L2", "name": "L2", "color": "#dd1e25" },
+      { "id": "L3", "name": "L3", "color": "#781140" },
+      { "id": "L4", "name": "L4", "color": "#e4022d" },
+      { "id": "Walk1", "name": "Walk1", "color": "#000000" },
+      { "id": "Walk2", "name": "Walk2", "color": "#000000" },
+      { "id": "Walk3", "name": "Walk3", "color": "#000000" },
+      { "id": "Walk4", "name": "Walk4", "color": "#000000" },
+      { "id": "Walk5", "name": "Walk5", "color": "#000000" }
+    ]
+  },
+  "name": "Sydney Rail Network",
+  "stations": {
+    "station": [
+      {
+        "id": "L101",
+        "name": "Central Grand Concourse",
+        "line": "L1,Walk1",
+        "link": "L102,T124"
+      },
+      {
+        "id": "L102",
+        "name": "Capitol Square",
+        "line": "L1,Walk2",
+        "link": "L101,L103,L203"
+      },
+      {
+        "id": "L103",
+        "name": "Paddy's Markets",
+        "line": "L1",
+        "link": "L102,L104"
+      },
+      {
+        "id": "L104",
+        "name": "Exhibition Centre",
+        "line": "L1",
+        "link": "L103,L105"
+      },
+      {
+        "id": "L105",
+        "name": "Convention Centre",
+        "line": "L1",
+        "link": "L104,L106"
+      },
+      {
+        "id": "L106",
+        "name": "Pyrmont Bay",
+        "line": "L1",
+        "link": "L105,L107"
+      },
+      { "id": "L107", "name": "The Star", "line": "L1", "link": "L106,L108" },
+      {
+        "id": "L108",
+        "name": "John Street Square",
+        "line": "L1",
+        "link": "L107,L109"
+      },
+      {
+        "id": "L109",
+        "name": "Fish Market",
+        "line": "L1",
+        "link": "L108,L110"
+      },
+      {
+        "id": "L110",
+        "name": "Wentworth Park",
+        "line": "L1",
+        "link": "L109,L111"
+      },
+      { "id": "L111", "name": "Glebe", "line": "L1", "link": "L110,L112" },
+      {
+        "id": "L112",
+        "name": "Jubilee Park",
+        "line": "L1",
+        "link": "L111,L113"
+      },
+      {
+        "id": "L113",
+        "name": "Rozelle Bay",
+        "line": "L1",
+        "link": "L112,L114"
+      },
+      { "id": "L114", "name": "Lilyfield", "line": "L1", "link": "L113,L115" },
+      {
+        "id": "L115",
+        "name": "Leichhardt North",
+        "line": "L1",
+        "link": "L114,L116"
+      },
+      { "id": "L116", "name": "Hawthorne", "line": "L1", "link": "L115,L117" },
+      { "id": "L117", "name": "Marion", "line": "L1", "link": "L116,L118" },
+      {
+        "id": "L118",
+        "name": "Taverners Hill",
+        "line": "L1",
+        "link": "L117,L119"
+      },
+      {
+        "id": "L119",
+        "name": "Lewisham West",
+        "line": "L1,Walk3",
+        "link": "L118,L120,T208"
+      },
+      {
+        "id": "L120",
+        "name": "Waratah Mills",
+        "line": "L1",
+        "link": "L119,L121"
+      },
+      { "id": "L121", "name": "Arlington", "line": "L1", "link": "L120,L122" },
+      {
+        "id": "L122",
+        "name": "Dulwich Grove",
+        "line": "L1",
+        "link": "L121,M118"
+      },
+      {
+        "id": "L201",
+        "name": "Bridge Street",
+        "line": "L2,L3",
+        "link": "T203,T122"
+      },
+      { "id": "L202", "name": "QVB", "line": "L2,L3", "link": "T122,T123" },
+      {
+        "id": "L203",
+        "name": "Chinatown",
+        "line": "L2,L3,Walk2",
+        "link": "T123,L204,L102"
+      },
+      {
+        "id": "L204",
+        "name": "Haymarket",
+        "line": "L2,L3",
+        "link": "L203,L205"
+      },
+      {
+        "id": "L205",
+        "name": "Central Chalmers Street",
+        "line": "L2,L3,Walk4",
+        "link": "L204,L206,T124"
+      },
+      {
+        "id": "L206",
+        "name": "Surry Hills",
+        "line": "L2,L3",
+        "link": "L205,L207"
+      },
+      {
+        "id": "L207",
+        "name": "Moore Park",
+        "line": "L2,L3",
+        "link": "L206,L208,L301"
+      },
+      {
+        "id": "L208",
+        "name": "Royal Randwick",
+        "line": "L2",
+        "link": "L207,L209"
+      },
+      {
+        "id": "L209",
+        "name": "Wansey Road",
+        "line": "L2",
+        "link": "L208,L210"
+      },
+      {
+        "id": "L210",
+        "name": "UNSW High Street",
+        "line": "L2",
+        "link": "L209,L211"
+      },
+      { "id": "L211", "name": "Randwick", "line": "L2", "link": "L210" },
+      { "id": "L301", "name": "ES Marks", "line": "L3", "link": "L207,L302" },
+      { "id": "L302", "name": "Kensington", "line": "L3", "link": "L301,L303" },
+      {
+        "id": "L303",
+        "name": "UNSW Anzac Parade",
+        "line": "L3",
+        "link": "L302,L304"
+      },
+      { "id": "L304", "name": "Kingsford", "line": "L3", "link": "L303,L305" },
+      {
+        "id": "L305",
+        "name": "Juniors Kingsford",
+        "line": "L3",
+        "link": "L304"
+      },
+      {
+        "id": "L401",
+        "name": "Westmead Hospital",
+        "line": "L4",
+        "link": "T129,L402"
+      },
+      {
+        "id": "L402",
+        "name": "Childrens Hospital",
+        "line": "L4",
+        "link": "L401,L403"
+      },
+      { "id": "L403", "name": "Ngara", "line": "L4", "link": "L402,L404" },
+      {
+        "id": "L404",
+        "name": "Benaud Oval",
+        "line": "L4",
+        "link": "L403,L405"
+      },
+      {
+        "id": "L405",
+        "name": "Fennell Street",
+        "line": "L4",
+        "link": "L404,L406"
+      },
+      {
+        "id": "L406",
+        "name": "Prince Alfred Square",
+        "line": "L4",
+        "link": "L405,L407"
+      },
+      {
+        "id": "L407",
+        "name": "Church Street",
+        "line": "L4",
+        "link": "L406,L408"
+      },
+      {
+        "id": "L408",
+        "name": "Parramatta Square",
+        "line": "L4,Walk5",
+        "link": "L407,L409,T128"
+      },
+      {
+        "id": "L409",
+        "name": "Robin Thomas",
+        "line": "L4",
+        "link": "L408,L410"
+      },
+      {
+        "id": "L410",
+        "name": "Tramway Avenue",
+        "line": "L4",
+        "link": "L409,L411"
+      },
+      {
+        "id": "L411",
+        "name": "Rosehill Gardens",
+        "line": "L4",
+        "link": "L410,L412"
+      },
+      { "id": "L412", "name": "Yallamundi", "line": "L4", "link": "L411,L413" },
+      { "id": "L413", "name": "Dundas", "line": "L4", "link": "L412,L414" },
+      { "id": "L414", "name": "Telopea", "line": "L4", "link": "L413,L415" },
+      { "id": "L415", "name": "Carlingford", "line": "L4", "link": "L414" },
+      { "id": "M101", "name": "Tallawong", "line": "M1", "link": "M102" },
+      { "id": "M102", "name": "Rouse Hill", "line": "M1", "link": "M101,M103" },
+      { "id": "M103", "name": "Kellyville", "line": "M1", "link": "M102,M104" },
+      {
+        "id": "M104",
+        "name": "Bella Vista",
+        "line": "M1",
+        "link": "M103,M105"
+      },
+      { "id": "M105", "name": "Norwest", "line": "M1", "link": "M104,M106" },
+      {
+        "id": "M106",
+        "name": "Hills Showground",
+        "line": "M1",
+        "link": "M105,M107"
+      },
+      {
+        "id": "M107",
+        "name": "Castle Hill",
+        "line": "M1",
+        "link": "M106,M108"
+      },
+      {
+        "id": "M108",
+        "name": "Cherrybrook",
+        "line": "M1",
+        "link": "M107,T908"
+      },
+      {
+        "id": "M109",
+        "name": "Macquarie University",
+        "line": "M1",
+        "link": "T908,M110"
+      },
+      {
+        "id": "M110",
+        "name": "Macquarie Park",
+        "line": "M1",
+        "link": "M109,M111"
+      },
+      { "id": "M111", "name": "North Ryde", "line": "M1", "link": "M110,T115" },
+      { "id": "M112", "name": "Crows Nest", "line": "M1", "link": "T115,M113" },
+      {
+        "id": "M113",
+        "name": "Victoria Cross",
+        "line": "M1",
+        "link": "M112,M114"
+      },
+      { "id": "M114", "name": "Barangaroo", "line": "M1", "link": "M113,T404" },
+      { "id": "M115", "name": "Gadigal", "line": "M1", "link": "T404,T124" },
+      { "id": "M116", "name": "Waterloo", "line": "M1", "link": "T124,T405" },
+      { "id": "M118", "name": "Dulwich Hill", "line": "L1", "link": "L122" },
+      { "id": "T101", "name": "Berowra", "line": "T1", "link": "T102" },
+      {
+        "id": "T102",
+        "name": "Mount Kuring-gai",
+        "line": "T1",
+        "link": "T101,T103"
+      },
+      {
+        "id": "T103",
+        "name": "Mount Colah",
+        "line": "T1",
+        "link": "T102,T104"
+      },
+      { "id": "T104", "name": "Asquith", "line": "T1", "link": "T103,T105" },
+      {
+        "id": "T105",
+        "name": "Hornsby",
+        "line": "T1,T9",
+        "link": "T104,T106,T913"
+      },
+      { "id": "T106", "name": "Waitara", "line": "T1", "link": "T105,T107" },
+      { "id": "T107", "name": "Wahroonga", "line": "T1", "link": "T106,T108" },
+      { "id": "T108", "name": "Warrawee", "line": "T1", "link": "T107,T109" },
+      { "id": "T109", "name": "Turramurra", "line": "T1", "link": "T108,T110" },
+      { "id": "T110", "name": "Pymble", "line": "T1", "link": "T109,T111" },
+      { "id": "T111", "name": "Gordon", "line": "T1,T9", "link": "T110,T112" },
+      { "id": "T112", "name": "Killara", "line": "T1,T9", "link": "T111,T113" },
+      {
+        "id": "T113",
+        "name": "Lindfield",
+        "line": "T1,T9",
+        "link": "T112,T114"
+      },
+      {
+        "id": "T114",
+        "name": "Roseville",
+        "line": "T1,T9",
+        "link": "T113,T115"
+      },
+      {
+        "id": "T115",
+        "name": "Chatswood",
+        "line": "T1,T9,M1",
+        "link": "T114,T116,M111,M112"
+      },
+      {
+        "id": "T116",
+        "name": "Artarmon",
+        "line": "T1,T9",
+        "link": "T115,T117"
+      },
+      {
+        "id": "T117",
+        "name": "St Leonards",
+        "line": "T1,T9",
+        "link": "T116,T118"
+      },
+      {
+        "id": "T118",
+        "name": "Wollstonecraft",
+        "line": "T1,T9",
+        "link": "T117,T119"
+      },
+      {
+        "id": "T119",
+        "name": "Waverton",
+        "line": "T1,T9",
+        "link": "T118,T120"
+      },
+      {
+        "id": "T120",
+        "name": "North Sydney",
+        "line": "T1,T9",
+        "link": "T119,T121"
+      },
+      {
+        "id": "T121",
+        "name": "Milsons Point",
+        "line": "T1,T9",
+        "link": "T120,T122"
+      },
+      {
+        "id": "T122",
+        "name": "Wynyard",
+        "line": "T1,T2,T3,T8,T9,L2,L3",
+        "link": "T121,T123,T203,L201,L202"
+      },
+      {
+        "id": "T123",
+        "name": "Town Hall",
+        "line": "T1,T2,T3,T4,T8,T9,L2,L3",
+        "link": "T122,T124,T404,L202,L203"
+      },
+      {
+        "id": "T124",
+        "name": "Central",
+        "line": "T1,T2,T3,T4,T8,T9,M1,Walk1,Walk4",
+        "link": "T123,T125,T201,T803,M115,M116,L101,L205"
+      },
+      {
+        "id": "T125",
+        "name": "Redfern",
+        "line": "T1,T2,T3,T4,T8,T9",
+        "link": "T124,T126,T204,T212,T405,T801"
+      },
+      {
+        "id": "T126",
+        "name": "Strathfield",
+        "line": "T1,T2,T3,T9",
+        "link": "T125,T127,T212,T213,T901"
+      },
+      {
+        "id": "T127",
+        "name": "Lidcombe",
+        "line": "T1,T2,T3,T6,T7",
+        "link": "T126,T215,T214,T301,T701"
+      },
+      {
+        "id": "T128",
+        "name": "Parramatta",
+        "line": "T1,T2,T5,Walk5",
+        "link": "T218,T129,L408"
+      },
+      {
+        "id": "T129",
+        "name": "Westmead",
+        "line": "T1,T5,L4",
+        "link": "T128,T130,L401"
+      },
+      {
+        "id": "T130",
+        "name": "Wentworthville",
+        "line": "T1,T5",
+        "link": "T129,T131"
+      },
+      {
+        "id": "T131",
+        "name": "Pendle Hill",
+        "line": "T1,T5",
+        "link": "T130,T132"
+      },
+      {
+        "id": "T132",
+        "name": "Toongabbie",
+        "line": "T1,T5",
+        "link": "T131,T133"
+      },
+      {
+        "id": "T133",
+        "name": "Seven Hills",
+        "line": "T1,T5",
+        "link": "T132,T134"
+      },
+      {
+        "id": "T134",
+        "name": "Blacktown",
+        "line": "T1,T5",
+        "link": "T133,T135,T143"
+      },
+      { "id": "T135", "name": "Doonside", "line": "T1", "link": "T134,T136" },
+      { "id": "T136", "name": "Rooty Hill", "line": "T1", "link": "T135,T137" },
+      {
+        "id": "T137",
+        "name": "Mount Druitt",
+        "line": "T1",
+        "link": "T136,T138"
+      },
+      { "id": "T138", "name": "St Marys", "line": "T1", "link": "T137,T139" },
+      { "id": "T139", "name": "Werrington", "line": "T1", "link": "T138,T140" },
+      { "id": "T140", "name": "Kingswood", "line": "T1", "link": "T139,T141" },
+      { "id": "T141", "name": "Penrith", "line": "T1", "link": "T140,T142" },
+      { "id": "T142", "name": "Emu Plains", "line": "T1", "link": "T141" },
+      {
+        "id": "T143",
+        "name": "Marayong",
+        "line": "T1,T5",
+        "link": "T134,T144"
+      },
+      {
+        "id": "T144",
+        "name": "Quakers Hill",
+        "line": "T1,T5",
+        "link": "T143,T145"
+      },
+      {
+        "id": "T145",
+        "name": "Schofields",
+        "line": "T1,T5",
+        "link": "T144,T146"
+      },
+      {
+        "id": "T146",
+        "name": "Riverstone",
+        "line": "T1,T5",
+        "link": "T145,T147"
+      },
+      {
+        "id": "T147",
+        "name": "Vineyard",
+        "line": "T1,T5",
+        "link": "T146,T148"
+      },
+      {
+        "id": "T148",
+        "name": "Mulgrave",
+        "line": "T1,T5",
+        "link": "T147,T149"
+      },
+      { "id": "T149", "name": "Windsor", "line": "T1,T5", "link": "T148,T150" },
+      {
+        "id": "T150",
+        "name": "Clarendon",
+        "line": "T1,T5",
+        "link": "T149,T151"
+      },
+      {
+        "id": "T151",
+        "name": "East Richmond",
+        "line": "T1,T5",
+        "link": "T150,T152"
+      },
+      { "id": "T152", "name": "Richmond", "line": "T1,T5", "link": "T151" },
+      {
+        "id": "T201",
+        "name": "Museum",
+        "line": "T2,T3,T8",
+        "link": "T202,T124"
+      },
+      {
+        "id": "T202",
+        "name": "St James",
+        "line": "T2,T3,T8",
+        "link": "T201,T203"
+      },
+      {
+        "id": "T203",
+        "name": "Circular Quay",
+        "line": "T2,T3,T8,L2,L3",
+        "link": "T202,T122,L201"
+      },
+      {
+        "id": "T204",
+        "name": "Macdonaldtown",
+        "line": "T2,T3",
+        "link": "T125,T205"
+      },
+      { "id": "T205", "name": "Newtown", "line": "T2,T3", "link": "T204,T206" },
+      {
+        "id": "T206",
+        "name": "Stanmore",
+        "line": "T2,T3",
+        "link": "T205,T207"
+      },
+      {
+        "id": "T207",
+        "name": "Petersham",
+        "line": "T2,T3",
+        "link": "T206,T208"
+      },
+      {
+        "id": "T208",
+        "name": "Lewisham",
+        "line": "T2,T3,Walk3",
+        "link": "T207,T209,L119"
+      },
+      {
+        "id": "T209",
+        "name": "Summer Hill",
+        "line": "T2,T3",
+        "link": "T208,T210"
+      },
+      {
+        "id": "T210",
+        "name": "Ashfield",
+        "line": "T2,T3",
+        "link": "T209,T211"
+      },
+      { "id": "T211", "name": "Croydon", "line": "T2,T3", "link": "T210,T212" },
+      {
+        "id": "T212",
+        "name": "Burwood",
+        "line": "T2,T3,T9",
+        "link": "T211,T126,T125"
+      },
+      {
+        "id": "T213",
+        "name": "Homebush",
+        "line": "T2,T3",
+        "link": "T126,T214"
+      },
+      {
+        "id": "T214",
+        "name": "Flemington",
+        "line": "T2,T3",
+        "link": "T213,T127"
+      },
+      { "id": "T215", "name": "Auburn", "line": "T1,T2", "link": "T127,T216" },
+      { "id": "T216", "name": "Clyde", "line": "T1,T2", "link": "T215,T217" },
+      {
+        "id": "T217",
+        "name": "Granville",
+        "line": "T1,T2",
+        "link": "T216,T218,T219"
+      },
+      {
+        "id": "T218",
+        "name": "Harris Park",
+        "line": "T1,T2,T5",
+        "link": "T217,T128,T219"
+      },
+      {
+        "id": "T219",
+        "name": "Merrylands",
+        "line": "T2,T5",
+        "link": "T217,T220,T218"
+      },
+      {
+        "id": "T220",
+        "name": "Guildford",
+        "line": "T2,T5",
+        "link": "T219,T221"
+      },
+      { "id": "T221", "name": "Yennora", "line": "T2,T5", "link": "T220,T222" },
+      {
+        "id": "T222",
+        "name": "Fairfield",
+        "line": "T2,T5",
+        "link": "T221,T223"
+      },
+      {
+        "id": "T223",
+        "name": "Canley Vale",
+        "line": "T2,T5",
+        "link": "T222,T224"
+      },
+      {
+        "id": "T224",
+        "name": "Cabramatta",
+        "line": "T2,T3,T5",
+        "link": "T223,T225,T307"
+      },
+      {
+        "id": "T225",
+        "name": "Warwick Farm",
+        "line": "T2,T3,T5",
+        "link": "T224,T226"
+      },
+      {
+        "id": "T226",
+        "name": "Liverpool",
+        "line": "T2,T3,T5",
+        "link": "T225,T227"
+      },
+      { "id": "T227", "name": "Casula", "line": "T2,T5", "link": "T226,T228" },
+      {
+        "id": "T228",
+        "name": "Glenfield",
+        "line": "T2,T5,T8",
+        "link": "T227,T229,T818,T819"
+      },
+      {
+        "id": "T229",
+        "name": "Edmondson Park",
+        "line": "T2,T5",
+        "link": "T228,T230"
+      },
+      { "id": "T230", "name": "Leppington", "line": "T2,T5", "link": "T229" },
+      { "id": "T301", "name": "Berala", "line": "T3,T6", "link": "T127,T302" },
+      {
+        "id": "T302",
+        "name": "Regents Park",
+        "line": "T3,T6",
+        "link": "T301,T303,T603"
+      },
+      { "id": "T303", "name": "Sefton", "line": "T3", "link": "T302,T304" },
+      {
+        "id": "T304",
+        "name": "Chester Hill",
+        "line": "T3",
+        "link": "T303,T305"
+      },
+      {
+        "id": "T305",
+        "name": "Leightonfield",
+        "line": "T3",
+        "link": "T304,T306"
+      },
+      {
+        "id": "T306",
+        "name": "Villawood",
+        "line": "T3",
+        "link": "T305,T307"
+      },
+      {
+        "id": "T307",
+        "name": "Carramar",
+        "line": "T3",
+        "link": "T306,T224"
+      },
+      { "id": "T401", "name": "Bondi Junction", "line": "T4", "link": "T402" },
+      { "id": "T402", "name": "Edgecliff", "line": "T4", "link": "T401,T403" },
+      {
+        "id": "T403",
+        "name": "Kings Cross",
+        "line": "T4",
+        "link": "T402,T404"
+      },
+      {
+        "id": "T404",
+        "name": "Martin Place",
+        "line": "T4,M1",
+        "link": "T403,T123,M114,M115"
+      },
+      {
+        "id": "T405",
+        "name": "Sydenham",
+        "line": "T4,T8,M1",
+        "link": "T125,T406,T802,T807,M116"
+      },
+      { "id": "T406", "name": "Tempe", "line": "T4", "link": "T405,T407" },
+      {
+        "id": "T407",
+        "name": "Wolli Creek",
+        "line": "T4,T8",
+        "link": "T406,T408,T806,T807"
+      },
+      { "id": "T408", "name": "Arncliffe", "line": "T4", "link": "T407,T409" },
+      { "id": "T409", "name": "Banksia", "line": "T4", "link": "T408,T410" },
+      { "id": "T410", "name": "Rockdale", "line": "T4", "link": "T409,T411" },
+      { "id": "T411", "name": "Kogarah", "line": "T4", "link": "T410,T412" },
+      { "id": "T412", "name": "Carlton", "line": "T4", "link": "T411,T413" },
+      { "id": "T413", "name": "Allawah", "line": "T4", "link": "T412,T414" },
+      { "id": "T414", "name": "Hurstville", "line": "T4", "link": "T413,T415" },
+      { "id": "T415", "name": "Penshurst", "line": "T4", "link": "T414,T416" },
+      { "id": "T416", "name": "Mortdale", "line": "T4", "link": "T415,T417" },
+      { "id": "T417", "name": "Oatley", "line": "T4", "link": "T416,T418" },
+      { "id": "T418", "name": "Como", "line": "T4", "link": "T417,T419" },
+      { "id": "T419", "name": "Jannali", "line": "T4", "link": "T418,T420" },
+      {
+        "id": "T420",
+        "name": "Sutherland",
+        "line": "T4",
+        "link": "T419,T421,T425"
+      },
+      { "id": "T421", "name": "Loftus", "line": "T4", "link": "T420,T422" },
+      { "id": "T422", "name": "Engadine", "line": "T4", "link": "T421,T423" },
+      { "id": "T423", "name": "Heathcote", "line": "T4", "link": "T422,T424" },
+      { "id": "T424", "name": "Waterfall", "line": "T4", "link": "T423" },
+      { "id": "T425", "name": "Kirrawee", "line": "T4", "link": "T420,T426" },
+      { "id": "T426", "name": "Gymea", "line": "T4", "link": "T425,T427" },
+      { "id": "T427", "name": "Miranda", "line": "T4", "link": "T426,T428" },
+      { "id": "T428", "name": "Caringbah", "line": "T4", "link": "T427,T429" },
+      { "id": "T429", "name": "Woolooware", "line": "T4", "link": "T428,T430" },
+      { "id": "T430", "name": "Cronulla", "line": "T4", "link": "T429" },
+      { "id": "T601", "name": "Bankstown", "line": "T6", "link": "T602" },
+      { "id": "T602", "name": "Yagoona", "line": "T6", "link": "T601,T603" },
+      { "id": "T603", "name": "Birrong", "line": "T6", "link": "T602,T302" },
+      { "id": "T701", "name": "Olympic Park", "line": "T7", "link": "T127" },
+      {
+        "id": "T801",
+        "name": "Erskineville",
+        "line": "T8",
+        "link": "T125,T802"
+      },
+      { "id": "T802", "name": "St Peters", "line": "T8", "link": "T801,T405" },
+      {
+        "id": "T803",
+        "name": "Green Square",
+        "line": "T8",
+        "link": "T124,T804"
+      },
+      { "id": "T804", "name": "Mascot", "line": "T8", "link": "T803,T805" },
+      {
+        "id": "T805",
+        "name": "Domestic Airport",
+        "line": "T8",
+        "link": "T804,T806"
+      },
+      {
+        "id": "T806",
+        "name": "International Airport",
+        "line": "T8",
+        "link": "T805,T407"
+      },
+      {
+        "id": "T807",
+        "name": "Turrella",
+        "line": "T8",
+        "link": "T405,T808,T407"
+      },
+      {
+        "id": "T808",
+        "name": "Bardwell Park",
+        "line": "T8",
+        "link": "T807,T809"
+      },
+      {
+        "id": "T809",
+        "name": "Bexley North",
+        "line": "T8",
+        "link": "T808,T810"
+      },
+      { "id": "T810", "name": "Kingsgrove", "line": "T8", "link": "T809,T811" },
+      {
+        "id": "T811",
+        "name": "Beverly Hills",
+        "line": "T8",
+        "link": "T810,T812"
+      },
+      { "id": "T812", "name": "Narwee", "line": "T8", "link": "T811,T813" },
+      { "id": "T813", "name": "Riverwood", "line": "T8", "link": "T812,T814" },
+      { "id": "T814", "name": "Padstow", "line": "T8", "link": "T813,T815" },
+      { "id": "T815", "name": "Revesby", "line": "T8", "link": "T814,T816" },
+      { "id": "T816", "name": "Panania", "line": "T8", "link": "T815,T817" },
+      { "id": "T817", "name": "East Hills", "line": "T8", "link": "T816,T818" },
+      { "id": "T818", "name": "Holsworthy", "line": "T8", "link": "T817,T228" },
+      {
+        "id": "T819",
+        "name": "Macquarie Fields",
+        "line": "T8",
+        "link": "T228,T820"
+      },
+      { "id": "T820", "name": "Ingleburn", "line": "T8", "link": "T819,T821" },
+      { "id": "T821", "name": "Minto", "line": "T8", "link": "T820,T822" },
+      { "id": "T822", "name": "Leumeah", "line": "T8", "link": "T821,T823" },
+      {
+        "id": "T823",
+        "name": "Campbelltown",
+        "line": "T8",
+        "link": "T822,T824"
+      },
+      { "id": "T824", "name": "Macarthur", "line": "T8", "link": "T823" },
+      {
+        "id": "T901",
+        "name": "North Strathfield",
+        "line": "T9",
+        "link": "T126,T902"
+      },
+      {
+        "id": "T902",
+        "name": "Concord West",
+        "line": "T9",
+        "link": "T901,T903"
+      },
+      { "id": "T903", "name": "Rhodes", "line": "T9", "link": "T902,T904" },
+      { "id": "T904", "name": "Meadowbank", "line": "T9", "link": "T903,T905" },
+      { "id": "T905", "name": "West Ryde", "line": "T9", "link": "T904,T906" },
+      { "id": "T906", "name": "Denistone", "line": "T9", "link": "T905,T907" },
+      { "id": "T907", "name": "Eastwood", "line": "T9", "link": "T906,T908" },
+      {
+        "id": "T908",
+        "name": "Epping",
+        "line": "T9,M1",
+        "link": "T907,T909,M108,M109"
+      },
+      { "id": "T909", "name": "Cheltenham", "line": "T9", "link": "T908,T910" },
+      { "id": "T910", "name": "Beecroft", "line": "T9", "link": "T909,T911" },
+      {
+        "id": "T911",
+        "name": "Pennant Hills",
+        "line": "T9",
+        "link": "T910,T912"
+      },
+      { "id": "T912", "name": "Thornleigh", "line": "T9", "link": "T911,T913" },
+      { "id": "T913", "name": "Normanhurst", "line": "T9", "link": "T912,T105" }
+    ]
+  }
+}

@@ -15,7 +15,7 @@ WriteMakefile(
 			'List::MoreUtils' => '0',
 			'List::Compare'  => '0',
 			'Moose'  => '0',
-			'Statistics::Basic'  => '0',
+			#'Statistics::Basic'  => '0',
 			'IO::Tee'  => '0',
 			'Set::Intersection'  => '0',
 			'Storable'  => '0',

@@ -251,7 +251,7 @@ sub compile {
     push @compute_coor_code, '  $x += $Cx', '  $y += $Cy';
 
 
-    my $pen_size = $set->{'visual'}{'line_thickness'} - .5;
+    my $pen_size = $set->{'visual'}{'line_thickness'} == 1 ? 0 : $set->{'visual'}{'line_thickness'};
     my $wxpen_style = { dotted => &Wx::wxPENSTYLE_DOT,        short_dash => &Wx::wxPENSTYLE_SHORT_DASH,
                         solid => &Wx::wxPENSTYLE_SOLID,       vertical => &Wx::wxPENSTYLE_VERTICAL_HATCH,
                         horizontal => &Wx::wxPENSTYLE_HORIZONTAL_HATCH, cross => &Wx::wxPENSTYLE_CROSS_HATCH,
@@ -290,7 +290,7 @@ sub compile {
                  '  if ($x < 0 or $x > $board_size or $y < 0 or $y > $board_size) {$line_broke++; next}',
                 '  $dc->DrawLine( $x_old, $y_old, $x, $y)',
                 '  ($x_old, $y_old) = ($x, $y)' )
-              : '  $dc->DrawPoint( $x, $y )');
+              : ($pen_size ? '  $dc->DrawCircle( $x, $y,$pen_size / 2 )' : '  $dc->DrawPoint( $x, $y )'));
     push @code, '}';
     push @code, '$progress_bar->add_percentage( 100, [$first_color->values] )' unless exists $args->{'sketch'} or $color_swap_time ;
 

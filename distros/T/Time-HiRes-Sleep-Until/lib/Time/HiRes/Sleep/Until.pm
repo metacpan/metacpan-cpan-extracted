@@ -5,7 +5,7 @@ use base qw{Package::New};
 use Time::HiRes qw{};
 use Math::Round qw{}; 
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -137,7 +137,7 @@ Method to access Time::HiRes sleep without another import.
 
 sub sleep {
   my $self = shift;
-  return Time::HiRes::sleep(@_);
+  return @_ ? Time::HiRes::sleep($_[0]) : CORE::sleep();
 }
 
 =head1 LIMITATIONS
@@ -156,7 +156,7 @@ Please log on GitHub
 
 MIT License
 
-Copyright (c) 2023 Michael R. Davis
+Copyright (c) 2025 Michael R. Davis
 
 =head1 SEE ALSO
 

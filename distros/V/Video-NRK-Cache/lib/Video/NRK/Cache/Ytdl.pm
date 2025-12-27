@@ -2,8 +2,8 @@ use v5.37.9;
 use feature 'class';
 no warnings 'experimental::class';
 
-package Video::NRK::Cache::Ytdl;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::Ytdl::VERSION = '3.01';
+package Video::NRK::Cache::Ytdl 3.02;  # Dist::Zilla doesn't know about class yet
+
 class Video::NRK::Cache::Ytdl :isa(Video::NRK::Cache::Store) {
 # ABSTRACT: Store NRK Video on Demand cache using youtube-dl
 

@@ -1,45 +1,68 @@
-# CLI Contract (Stable)
+# Stable CLI Contract
 
 This document defines the **stable CLI contract** for `jq-lite`.
-Anything described here is treated as a compatibility promise: changes MUST be
-backward-compatible or require a major version bump.
+
+Anything described here is treated as a **compatibility promise**:
+any incompatible change **MUST** require a major version bump
+(or an explicit compatibility mode, which is discouraged).
+
+This contract is **test-backed** and enforced by automated tests.
+
+---
 
 ## Goals
 
-- Shell scripts must be stable: `if jq-lite ...; then ...; fi` should not break across releases.
-- Follow `jq` expectations where practical.
-- Distinguish errors by category via exit codes and stderr prefixes.
-- Keep stdout clean on errors.
+- Shell scripts and CI must be stable  
+  (`if jq-lite ...; then ...; fi` must not break)
+- Follow `jq` expectations where practical
+- Distinguish error categories via **exit codes** and **stderr prefixes**
+- Keep **stdout clean on errors**
+
+---
+
+## Compatibility Guarantee
+
+- This contract is **stable**
+- All behaviors documented here are **backward-compatible**
+- Breaking changes require:
+  - a **major version bump**, or
+  - an explicit compatibility flag (not recommended)
+
+---
 
 ## Exit Codes
 
 `jq-lite` returns one of the following exit codes:
 
 | Code | Meaning |
-|------|---------|
+|------|--------|
 | 0 | Success |
-| 1 | `-e/--exit-status` was specified and the final result was `false`, `null`, or **no output** (empty) |
-| 2 | **Compile error**: query/filter parse error |
-| 3 | **Runtime error**: evaluation failed while executing a valid query |
-| 4 | **Input error**: failed to read or decode input (JSON/YAML/etc.) |
-| 5 | **Usage error**: invalid CLI arguments/options, invalid `--argjson` value, incompatible flags |
+| 1 | `-e/--exit-status` specified and result is `false`, `null`, or **empty output** |
+| 2 | **Compile error** (query / filter parse error) |
+| 3 | **Runtime error** (evaluation failed) |
+| 4 | **Input error** (failed to read or decode input) |
+| 5 | **Usage error** (invalid CLI arguments, invalid `--argjson`, etc.) |
 
 ### Notes
 
-- Without `-e`, empty output is still considered success (exit `0`).
-- `-e` only affects the exit code; it should not change stdout formatting rules.
+- Without `-e`, empty output is still considered success (`exit 0`)
+- `-e` affects **only the exit code**, never stdout formatting
 
-## Error Flow (stdout / stderr)
+---
+
+## stdout / stderr Rules
 
 ### stdout
 
-- On success (exit `0` or `1`), `jq-lite` may write results to **stdout** as normal.
-- On errors (exit `2`–`5`), `jq-lite` MUST NOT write partial/diagnostic output to stdout.
+- On success (exit `0` or `1`):  
+  output may be written to **stdout**
+- On errors (exit `2`–`5`):  
+  **stdout MUST remain empty**
 
 ### stderr
 
-- On errors (exit `2`–`5`), `jq-lite` writes a diagnostic message to **stderr**.
-- The first line MUST start with a stable, machine-friendly prefix:
+- On errors (exit `2`–`5`), a diagnostic message is written to **stderr**
+- The **first line MUST start with a stable prefix**
 
 | Category | Prefix | Exit |
 |----------|--------|------|
@@ -48,69 +71,97 @@ backward-compatible or require a major version bump.
 | Input | `[INPUT]` | 4 |
 | Usage | `[USAGE]` | 5 |
 
-#### Example
+#### Examples
 
-- `[COMPILE]unexpected token at ...`
-- `[RUNTIME]cannot add number and string at ...`
-- `[INPUT]failed to parse JSON input: ...`
-- `[USAGE]invalid JSON for --argjson foo`
+```
+
+[COMPILE]unexpected token at ...
+[RUNTIME]cannot add number and string at ...
+[INPUT]failed to parse JSON input: ...
+[USAGE]invalid JSON for --argjson x
+
+````
+
+---
 
 ## `-e / --exit-status` Semantics
 
 When `-e/--exit-status` is specified, `jq-lite` returns:
 
-- `0` if the final result is **truthy**
-- `1` if the final result is `false`, `null`, or **empty (no output)**
+| Result | Exit |
+|------|------|
+| truthy | 0 |
+| false / null / empty | 1 |
 
-Truthiness rules (aligned with `jq` conventions):
+### Truthiness Rules (jq-compatible intent)
 
-- `false` → non-truthy
-- `null` → non-truthy
-- empty (no output) → non-truthy
+- `false` → falsey
+- `null` → falsey
+- empty (no output) → falsey
 - everything else (`0`, `""`, `{}`, `[]`, etc.) → truthy
 
-## `--arg` and `--argjson`
+> NOTE:  
+> Current jq-lite behavior treats `0` as falsey.  
+> This is a **known deviation** and will be fixed in a future release.
+
+---
+
+## `--arg`, `--argjson`, and `--argfile`
 
 ### `--arg name value`
 
-- Always binds `$name` as a **string**.
-- Errors only occur for missing arguments (usage error).
+- Always binds `$name` as a **string**
+- Errors occur only for missing arguments (usage error)
 
 ### `--argjson name json`
 
-- Decodes `json` as JSON and binds to `$name`.
-- Scalar JSON values are allowed (e.g. `1`, `"x"`, `true`, `null`).
+- Decodes `json` as JSON and binds to `$name`
+- Scalar JSON values are allowed
+  (`1`, `"x"`, `true`, `null`)
 - Invalid JSON for `--argjson` MUST be treated as a **usage error**:
   - stderr prefix: `[USAGE]`
   - exit code: `5`
 
+### `--argfile name file`
+
+- Reads `file` contents, decodes as JSON, and binds to `$name`
+- Missing or unreadable `file` MUST be treated as a **usage error**:
+  - stderr prefix: `[USAGE]`
+  - exit code: `5`
+- Invalid JSON for `--argfile` MUST be treated as a **usage error**:
+  - stderr prefix: `[USAGE]`
+  - exit code: `5`
+
+---
+
 ## Broken Pipe (SIGPIPE / EPIPE)
 
-When downstream closes the pipe early (e.g. `jq-lite ... | head`):
+When downstream closes the pipe early:
 
-- `SIGPIPE` / `EPIPE` MUST NOT be treated as a fatal error.
-- `jq-lite` should exit `0` (or follow `-e` rules if applicable), without printing an error.
+```sh
+jq-lite '.' | head
+````
 
-Rationale: this commonly occurs in pipelines and should not break scripts/CI.
+* `SIGPIPE` / `EPIPE` MUST NOT be treated as a fatal error
+* `jq-lite` should exit `0` (or follow `-e` rules)
+* No error message should be printed to stderr
 
-## Compatibility Policy
+**Rationale**:
+This commonly occurs in pipelines and must not break scripts or CI.
 
-- This contract is **stable**.
-- Any behavior change that violates this document requires:
-  - a major version bump, **or**
-  - an explicit compatibility mode flag (discouraged; default must remain stable).
+---
 
 ## Examples
 
-### Compile error
+### Compile Error
 
 ```sh
-jq-lite '.['
+jq-lite '.[
 # stderr: [COMPILE]...
 # exit: 2
-````
+```
 
-### Runtime error
+### Runtime Error
 
 ```sh
 printf '{"x":"a"}\n' | jq-lite '.x + 1'
@@ -118,7 +169,7 @@ printf '{"x":"a"}\n' | jq-lite '.x + 1'
 # exit: 3
 ```
 
-### Input error
+### Input Error
 
 ```sh
 printf '{broken}\n' | jq-lite '.'
@@ -134,10 +185,46 @@ printf 'false\n' | jq-lite -e '.'
 # exit: 1
 ```
 
-### `--argjson` invalid JSON
+---
+
+## Test-backed Guarantee
+
+This contract is **enforced by automated tests**.
+
+* Contract test:
+
+  ```
+  t/cli_contract.t
+  ```
+
+Run locally:
 
 ```sh
-jq-lite --argjson x '{broken}' '.'
-# stderr: [USAGE]invalid JSON for --argjson x
-# exit: 5
+prove -lv t/cli_contract.t
 ```
+
+Any change that violates this contract will fail CI.
+
+---
+
+## Known Deviations / TODO
+
+The following items are **explicitly tracked** and will be improved:
+
+* Compile should occur before input parsing
+* `-e` truthiness should fully match jq (`0` should be truthy)
+* `-n / --null-input` support
+
+These do **not** invalidate the stability of the contract itself.
+
+---
+
+## Summary
+
+* `jq-lite` provides a **stable, predictable CLI**
+* Compatibility is **documented, intentional, and tested**
+* Scripts, CI, and downstream tools can rely on this behavior
+
+This file, together with `t/cli_contract.t`, defines the CLI contract.
+
+---

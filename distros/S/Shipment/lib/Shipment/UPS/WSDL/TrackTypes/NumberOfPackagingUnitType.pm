@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::NumberOfPackagingUnitType;
-$Shipment::UPS::WSDL::TrackTypes::NumberOfPackagingUnitType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::NumberOfPackagingUnitType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %Value_of :ATTR(:get<Value>);
+    my %Type_of  : ATTR(:get<Type>);
+    my %Value_of : ATTR(:get<Value>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        Value
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              Value
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'Value' => \%Value_of,
-    },
-    {
-        'Type' => 'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
-        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Type'  => \%Type_of,
+            'Value' => \%Value_of,
+        },
+        {   'Type' =>
+              'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
+            'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Type' => 'Type',
-        'Value' => 'Value',
-    }
-);
+            'Type'  => 'Type',
+            'Value' => 'Value',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::NumberOfPackagingUnitType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

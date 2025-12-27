@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::Commodity;
-$Shipment::FedEx::WSDL::TrackTypes::Commodity::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::Commodity::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,117 +20,119 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CommodityId_of :ATTR(:get<CommodityId>);
-my %Name_of :ATTR(:get<Name>);
-my %NumberOfPieces_of :ATTR(:get<NumberOfPieces>);
-my %Description_of :ATTR(:get<Description>);
-my %CountryOfManufacture_of :ATTR(:get<CountryOfManufacture>);
-my %HarmonizedCode_of :ATTR(:get<HarmonizedCode>);
-my %Weight_of :ATTR(:get<Weight>);
-my %Quantity_of :ATTR(:get<Quantity>);
-my %QuantityUnits_of :ATTR(:get<QuantityUnits>);
-my %AdditionalMeasures_of :ATTR(:get<AdditionalMeasures>);
-my %UnitPrice_of :ATTR(:get<UnitPrice>);
-my %CustomsValue_of :ATTR(:get<CustomsValue>);
-my %ExciseConditions_of :ATTR(:get<ExciseConditions>);
-my %ExportLicenseNumber_of :ATTR(:get<ExportLicenseNumber>);
-my %ExportLicenseExpirationDate_of :ATTR(:get<ExportLicenseExpirationDate>);
-my %CIMarksAndNumbers_of :ATTR(:get<CIMarksAndNumbers>);
-my %PartNumber_of :ATTR(:get<PartNumber>);
-my %NaftaDetail_of :ATTR(:get<NaftaDetail>);
+    my %CommodityId_of          : ATTR(:get<CommodityId>);
+    my %Name_of                 : ATTR(:get<Name>);
+    my %NumberOfPieces_of       : ATTR(:get<NumberOfPieces>);
+    my %Description_of          : ATTR(:get<Description>);
+    my %CountryOfManufacture_of : ATTR(:get<CountryOfManufacture>);
+    my %HarmonizedCode_of       : ATTR(:get<HarmonizedCode>);
+    my %Weight_of               : ATTR(:get<Weight>);
+    my %Quantity_of             : ATTR(:get<Quantity>);
+    my %QuantityUnits_of        : ATTR(:get<QuantityUnits>);
+    my %AdditionalMeasures_of   : ATTR(:get<AdditionalMeasures>);
+    my %UnitPrice_of            : ATTR(:get<UnitPrice>);
+    my %CustomsValue_of         : ATTR(:get<CustomsValue>);
+    my %ExciseConditions_of     : ATTR(:get<ExciseConditions>);
+    my %ExportLicenseNumber_of  : ATTR(:get<ExportLicenseNumber>);
+    my %ExportLicenseExpirationDate_of :
+      ATTR(:get<ExportLicenseExpirationDate>);
+    my %CIMarksAndNumbers_of : ATTR(:get<CIMarksAndNumbers>);
+    my %PartNumber_of        : ATTR(:get<PartNumber>);
+    my %NaftaDetail_of       : ATTR(:get<NaftaDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        CommodityId
-        Name
-        NumberOfPieces
-        Description
-        CountryOfManufacture
-        HarmonizedCode
-        Weight
-        Quantity
-        QuantityUnits
-        AdditionalMeasures
-        UnitPrice
-        CustomsValue
-        ExciseConditions
-        ExportLicenseNumber
-        ExportLicenseExpirationDate
-        CIMarksAndNumbers
-        PartNumber
-        NaftaDetail
+    __PACKAGE__->_factory(
+        [   qw(        CommodityId
+              Name
+              NumberOfPieces
+              Description
+              CountryOfManufacture
+              HarmonizedCode
+              Weight
+              Quantity
+              QuantityUnits
+              AdditionalMeasures
+              UnitPrice
+              CustomsValue
+              ExciseConditions
+              ExportLicenseNumber
+              ExportLicenseExpirationDate
+              CIMarksAndNumbers
+              PartNumber
+              NaftaDetail
 
-    ) ],
-    {
-        'CommodityId' => \%CommodityId_of,
-        'Name' => \%Name_of,
-        'NumberOfPieces' => \%NumberOfPieces_of,
-        'Description' => \%Description_of,
-        'CountryOfManufacture' => \%CountryOfManufacture_of,
-        'HarmonizedCode' => \%HarmonizedCode_of,
-        'Weight' => \%Weight_of,
-        'Quantity' => \%Quantity_of,
-        'QuantityUnits' => \%QuantityUnits_of,
-        'AdditionalMeasures' => \%AdditionalMeasures_of,
-        'UnitPrice' => \%UnitPrice_of,
-        'CustomsValue' => \%CustomsValue_of,
-        'ExciseConditions' => \%ExciseConditions_of,
-        'ExportLicenseNumber' => \%ExportLicenseNumber_of,
-        'ExportLicenseExpirationDate' => \%ExportLicenseExpirationDate_of,
-        'CIMarksAndNumbers' => \%CIMarksAndNumbers_of,
-        'PartNumber' => \%PartNumber_of,
-        'NaftaDetail' => \%NaftaDetail_of,
-    },
-    {
-        'CommodityId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'NumberOfPieces' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CountryOfManufacture' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Weight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
-        'Quantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        'QuantityUnits' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AdditionalMeasures' => 'Shipment::FedEx::WSDL::TrackTypes::Measure',
-        'UnitPrice' => 'Shipment::FedEx::WSDL::TrackTypes::Money',
-        'CustomsValue' => 'Shipment::FedEx::WSDL::TrackTypes::Money',
-        'ExciseConditions' => 'Shipment::FedEx::WSDL::TrackTypes::EdtExciseCondition',
-        'ExportLicenseNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ExportLicenseExpirationDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'CIMarksAndNumbers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PartNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'NaftaDetail' => 'Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail',
-    },
-    {
+            )
+        ],
+        {   'CommodityId'                 => \%CommodityId_of,
+            'Name'                        => \%Name_of,
+            'NumberOfPieces'              => \%NumberOfPieces_of,
+            'Description'                 => \%Description_of,
+            'CountryOfManufacture'        => \%CountryOfManufacture_of,
+            'HarmonizedCode'              => \%HarmonizedCode_of,
+            'Weight'                      => \%Weight_of,
+            'Quantity'                    => \%Quantity_of,
+            'QuantityUnits'               => \%QuantityUnits_of,
+            'AdditionalMeasures'          => \%AdditionalMeasures_of,
+            'UnitPrice'                   => \%UnitPrice_of,
+            'CustomsValue'                => \%CustomsValue_of,
+            'ExciseConditions'            => \%ExciseConditions_of,
+            'ExportLicenseNumber'         => \%ExportLicenseNumber_of,
+            'ExportLicenseExpirationDate' => \%ExportLicenseExpirationDate_of,
+            'CIMarksAndNumbers'           => \%CIMarksAndNumbers_of,
+            'PartNumber'                  => \%PartNumber_of,
+            'NaftaDetail'                 => \%NaftaDetail_of,
+        },
+        {   'CommodityId'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Name'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'NumberOfPieces' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CountryOfManufacture' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Weight'         => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
+            'Quantity'       => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+            'QuantityUnits'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AdditionalMeasures' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Measure',
+            'UnitPrice'        => 'Shipment::FedEx::WSDL::TrackTypes::Money',
+            'CustomsValue'     => 'Shipment::FedEx::WSDL::TrackTypes::Money',
+            'ExciseConditions' =>
+              'Shipment::FedEx::WSDL::TrackTypes::EdtExciseCondition',
+            'ExportLicenseNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ExportLicenseExpirationDate' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'CIMarksAndNumbers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PartNumber'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'NaftaDetail'       =>
+              'Shipment::FedEx::WSDL::TrackTypes::NaftaCommodityDetail',
+        },
+        {
 
-        'CommodityId' => 'CommodityId',
-        'Name' => 'Name',
-        'NumberOfPieces' => 'NumberOfPieces',
-        'Description' => 'Description',
-        'CountryOfManufacture' => 'CountryOfManufacture',
-        'HarmonizedCode' => 'HarmonizedCode',
-        'Weight' => 'Weight',
-        'Quantity' => 'Quantity',
-        'QuantityUnits' => 'QuantityUnits',
-        'AdditionalMeasures' => 'AdditionalMeasures',
-        'UnitPrice' => 'UnitPrice',
-        'CustomsValue' => 'CustomsValue',
-        'ExciseConditions' => 'ExciseConditions',
-        'ExportLicenseNumber' => 'ExportLicenseNumber',
-        'ExportLicenseExpirationDate' => 'ExportLicenseExpirationDate',
-        'CIMarksAndNumbers' => 'CIMarksAndNumbers',
-        'PartNumber' => 'PartNumber',
-        'NaftaDetail' => 'NaftaDetail',
-    }
-);
+            'CommodityId'                 => 'CommodityId',
+            'Name'                        => 'Name',
+            'NumberOfPieces'              => 'NumberOfPieces',
+            'Description'                 => 'Description',
+            'CountryOfManufacture'        => 'CountryOfManufacture',
+            'HarmonizedCode'              => 'HarmonizedCode',
+            'Weight'                      => 'Weight',
+            'Quantity'                    => 'Quantity',
+            'QuantityUnits'               => 'QuantityUnits',
+            'AdditionalMeasures'          => 'AdditionalMeasures',
+            'UnitPrice'                   => 'UnitPrice',
+            'CustomsValue'                => 'CustomsValue',
+            'ExciseConditions'            => 'ExciseConditions',
+            'ExportLicenseNumber'         => 'ExportLicenseNumber',
+            'ExportLicenseExpirationDate' => 'ExportLicenseExpirationDate',
+            'CIMarksAndNumbers'           => 'CIMarksAndNumbers',
+            'PartNumber'                  => 'PartNumber',
+            'NaftaDetail'                 => 'NaftaDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -147,7 +149,7 @@ Shipment::FedEx::WSDL::TrackTypes::Commodity
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -3,8 +3,9 @@ package XML::PP;
 use strict;
 use warnings;
 
-use Params::Get 0.04;
+use Params::Get 0.13;
 use Scalar::Util;
+use Return::Set;
 
 =head1 NAME
 
@@ -12,11 +13,11 @@ XML::PP - A simple XML parser
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -31,9 +32,10 @@ our $VERSION = '0.06';
 
 =head1 DESCRIPTION
 
-You almost certainly do not need this module,
-for most tasks use L<XML::Simple> or L<XML::LibXML>.
-C<XML::PP> exists only for the most lightweight of scenarios where you can't get one of the above modules to install,
+You almost certainly do not need this module.
+For most tasks,
+use L<XML::Simple> or L<XML::LibXML>.
+C<XML::PP> exists only for the most lightweight scenarios where you can't get one of the above modules to install,
 for example,
 CI/CD machines running Windows that get stuck with L<https://stackoverflow.com/questions/11468141/cant-load-c-strawberry-perl-site-lib-auto-xml-libxml-libxml-dll-for-module-x>.
 
@@ -141,6 +143,7 @@ sub parse
 		return {};
 	}
 
+	$xml_string =~ s/<!--.*?-->//sg;	# Ignore comments
 	$xml_string =~ s/<\?xml.+\?>//;	# Ignore the header
 
 	$xml_string =~ s/^\s+|\s+$//g;	# Trim whitespace
@@ -298,6 +301,9 @@ sub _parse_node {
 	my ($self, $xml_ref, $nsmap) = @_;
 
 	if(!defined($xml_ref)) {
+		if($self->{'logger'}) {
+			$self->{'logger'}->fatal('BUG: _parse_node, xml_ref not defined');
+		}
 		die 'BUG: _parse_node, xml_ref not defined';
 	}
 
@@ -310,13 +316,13 @@ sub _parse_node {
 	my ($raw_tag, $attr_string, $self_close) = ($1, $2 || '', $3);
 
 	# Check for malformed self-closing tags
-	if ($self_close && $$xml_ref !~ /^\s*<\/(?:\w+:)?$raw_tag\s*>/) {
+	if($self_close && $$xml_ref !~ /^\s*<\/(?:\w+:)?$raw_tag\s*>/) {
 		$self->_handle_error("Malformed self-closing tag for <$raw_tag>");
 		return;
 	}
 
 	# Handle possible trailing slash like <line break="yes"/>
-	if ($attr_string =~ s{/\s*$}{}) {
+	if($attr_string =~ s{/\s*$}{}) {
 		$self_close = 1;
 	}
 
@@ -336,13 +342,34 @@ sub _parse_node {
 		}
 	}
 
+	# Normalize whitespace between attributes but not inside quotes
+	# - Collapse run of whitespace to one space
+	# - Remove leading/trailing whitespace
+	# - Preserve quoted attribute values
+	{
+		my $tmp = $attr_string;
+
+		# Replace all whitespace sequences outside of quotes with a single space
+		# This works because it alternates: quoted | non-quoted
+		my @parts = $tmp =~ /"[^"]*"|'[^']*'|[^\s"'']+/g;
+
+		# Rejoin non-quoted segments with a single space
+		$attr_string = join(' ', @parts);
+	}
+
 	my %attributes;
 	pos($attr_string) = 0;
-	while ($attr_string =~ /(\w+)(?::(\w+))?="([^"]*)"/g) {
-		my ($k1, $k2, $v) = ($1, $2, $3);
-		next if $k1 eq 'xmlns';
-		my $attr_name = defined $k2 ? "$k1:$k2" : $k1;
-		$attributes{$attr_name} = $self->_decode_entities($v);
+
+	# Accept name="value" and name='value' (value captured lazily, same quote used to open/close)
+	# Attribute name follows XML Name-ish rules: start with letter/underscore/colon, then letters/digits/._:-
+	while ($attr_string =~ /([A-Za-z_:][-A-Za-z0-9_.:]*)\s*=\s*(['"])(.*?)\2/g) {
+		my ($attr, $quote, $v) = ($1, $2, $3);
+
+		# Skip xmlns declarations (already handled)
+		next if $attr =~ /^xmlns(?::|$)/;
+
+		# Decode XML entities inside attribute values
+		$attributes{$attr} = $self->_decode_entities($v);
 	}
 
 	my $node = {
@@ -372,7 +399,7 @@ sub _parse_node {
 	# Consume closing tag
 	$$xml_ref =~ s{^\s*</(?:\w+:)?$tag\s*>}{}s;
 
-	return $node;
+	return Return::Set::set_return($node, { 'type' => 'hashref', 'min' => 1 });
 }
 
 # Internal helper to decode XML entities
@@ -418,19 +445,19 @@ sub _handle_error {
 	if($self->{strict}) {
 		# Throws an error if strict mode is enabled
 		if($self->{'logger'}) {
-			$self->fatal($error_message);
+			$self->{'logger'}->fatal($error_message);
 		}
 		die $error_message;
 	} elsif ($self->{warn_on_error}) {
 		# Otherwise, just warn
 		if($self->{'logger'}) {
-			$self->warn($error_message);
+			$self->{'logger'}->warn($error_message);
 		} else {
 			warn $error_message;
 		}
 	} else {
 		if($self->{'logger'}) {
-			$self->notice($error_message);
+			$self->{'logger'}->notice($error_message);
 		} else {
 			print STDERR "Warning: $error_message\n";
 		}
@@ -444,6 +471,8 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 =head1 SEE ALSO
 
 =over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/XML-PP/coverage/>
 
 =item * L<XML::LibXML>
 

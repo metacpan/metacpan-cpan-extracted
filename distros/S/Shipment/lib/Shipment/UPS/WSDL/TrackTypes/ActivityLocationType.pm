@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ActivityLocationType;
-$Shipment::UPS::WSDL::TrackTypes::ActivityLocationType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::ActivityLocationType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Address_of :ATTR(:get<Address>);
-my %TransportFacility_of :ATTR(:get<TransportFacility>);
-my %Code_of :ATTR(:get<Code>);
-my %Description_of :ATTR(:get<Description>);
-my %SignedForByName_of :ATTR(:get<SignedForByName>);
+    my %Address_of           : ATTR(:get<Address>);
+    my %TransportFacility_of : ATTR(:get<TransportFacility>);
+    my %Code_of              : ATTR(:get<Code>);
+    my %Description_of       : ATTR(:get<Description>);
+    my %SignedForByName_of   : ATTR(:get<SignedForByName>);
 
-__PACKAGE__->_factory(
-    [ qw(        Address
-        TransportFacility
-        Code
-        Description
-        SignedForByName
+    __PACKAGE__->_factory(
+        [   qw(        Address
+              TransportFacility
+              Code
+              Description
+              SignedForByName
 
-    ) ],
-    {
-        'Address' => \%Address_of,
-        'TransportFacility' => \%TransportFacility_of,
-        'Code' => \%Code_of,
-        'Description' => \%Description_of,
-        'SignedForByName' => \%SignedForByName_of,
-    },
-    {
-        'Address' => 'Shipment::UPS::WSDL::TrackTypes::AddressType',
-        'TransportFacility' => 'Shipment::UPS::WSDL::TrackTypes::TransportFacilityType',
-        'Code' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SignedForByName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Address'           => \%Address_of,
+            'TransportFacility' => \%TransportFacility_of,
+            'Code'              => \%Code_of,
+            'Description'       => \%Description_of,
+            'SignedForByName'   => \%SignedForByName_of,
+        },
+        {   'Address' => 'Shipment::UPS::WSDL::TrackTypes::AddressType',
+            'TransportFacility' =>
+              'Shipment::UPS::WSDL::TrackTypes::TransportFacilityType',
+            'Code'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Description'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SignedForByName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Address' => 'Address',
-        'TransportFacility' => 'TransportFacility',
-        'Code' => 'Code',
-        'Description' => 'Description',
-        'SignedForByName' => 'SignedForByName',
-    }
-);
+            'Address'           => 'Address',
+            'TransportFacility' => 'TransportFacility',
+            'Code'              => 'Code',
+            'Description'       => 'Description',
+            'SignedForByName'   => 'SignedForByName',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +77,7 @@ Shipment::UPS::WSDL::TrackTypes::ActivityLocationType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

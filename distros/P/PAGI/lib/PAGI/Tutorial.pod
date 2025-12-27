@@ -378,7 +378,7 @@ Let's do the math:
 
 =item * With a blocking operation, each connection is stuck for 100ms
 
-=item * 1,000 connections × 100ms = 100 seconds of total blocked time
+=item * 1,000 connections x 100ms = 100 seconds of total blocked time
 
 =item * With async operations, all 1,000 queries can be in-flight simultaneously
 
@@ -431,11 +431,9 @@ Offload blocking operations to a subprocess via L<IO::Async::Function>:
 
 B<Note:> IO::Async::Function uses C<fork()> to create worker processes. If you're already running the server in worker mode (C<--workers 4>), each server worker may fork additional Function workers. Be mindful of total process count - too many forks leads to memory pressure and context-switching overhead. For high-volume blocking work, consider a dedicated job queue (Redis, RabbitMQ) instead.
 
-=item 3. B<Use Worker Mode>
-
-Run L<PAGI::Server> with multiple worker processes (see section 1.5).
-
 =back
+
+B<What about worker mode?> Running with C<--workers N> does NOT solve blocking for individual connections. If a worker has a WebSocket connection and does a blocking operation, that WebSocket will freeze until the operation completes. Worker mode only means other connections on other workers aren't affected. See section 1.5 for when worker mode is actually useful.
 
 =head2 1.5 Worker Mode
 
@@ -461,18 +459,19 @@ L<PAGI::Server> supports two deployment modes: single-process and multi-worker.
     +-- [Worker 3] (handles connections)
     +-- [Worker 4] (handles connections)
 
-  Good for: apps with blocking operations, high CPU usage, multi-core utilization
+  Good for: multi-core utilization, crash isolation, high traffic
 
 =head3 When to Use Worker Mode
 
   Scenario                           | Single Process | Worker Mode
   -----------------------------------|----------------|-------------
   Pure async app (no blocking)       | Yes            | Yes
-  App uses some blocking operations  | No             | Yes
-  High CPU usage per request         | No             | Yes
+  Multi-core server in production    | Wastes cores   | Yes
+  Crash isolation needed             | No             | Yes
   WebSocket/SSE with shared state    | Yes            | Needs PubSub
   Development/testing                | Yes            | Optional
-  Production (multi-core server)     | Optional       | Yes
+
+B<Important:> Worker mode does NOT fix blocking operations. Each worker still runs a single-threaded event loop. If you do a blocking operation in a worker, ALL connections on that worker freeze (including any WebSocket or SSE connections). To avoid blocking, use async libraries or L<IO::Async::Function> as described in section 1.4.
 
 =head3 Running with Workers
 
@@ -575,7 +574,7 @@ Use a shared backend for state:
 
   \&app;
 
-For WebSocket applications that need to broadcast messages across workers, use L<PAGI::Middleware::PubSub> with a Redis backend.
+For WebSocket applications that need to broadcast messages across workers, use an external message broker like Redis pub/sub.
 
 =head1 PART 2: UNDERSTANDING RAW PAGI
 
@@ -681,6 +680,15 @@ For WebSocket, you receive messages and disconnect events:
       # OR
       bytes => "\x00\x01\x02",    # For binary messages
   }
+
+B<Why separate C<text> and C<bytes> keys?> The WebSocket protocol itself
+distinguishes text frames (must be valid UTF-8) from binary frames (arbitrary
+bytes) at the wire level. Having separate keys provides three benefits: (1) you
+can use both on the same connection - e.g., text for JSON commands, binary for
+audio streams; (2) type safety - you know exactly what you received without
+ambiguity; (3) you can't accidentally mishandle encoding. If you don't care
+about the distinction: C<my $data = $event-E<gt>{text} // $event-E<gt>{bytes}>.
+The L<PAGI::WebSocket> helper class abstracts this for most use cases.
 
   # Connection closed
   {
@@ -1343,7 +1351,7 @@ L<PAGI::Request> and L<PAGI::Response> handle UTF-8 encoding/decoding automatica
       die "Expected http scope" unless $scope->{type} eq 'http';
 
       my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
+      my $res = PAGI::Response->new($scope, $send);
 
       # Path is already decoded
       my $path = $req->path;
@@ -1382,2124 +1390,47 @@ In Part 3, we'll cover:
 
 =over 4
 
-=item * Using L<PAGI::Request> and L<PAGI::Response> for easier request/response handling
+=item * Middleware concepts and the L<PAGI::Middleware::Builder> DSL
 
-=item * Routing with L<PAGI::Endpoint::Router>
+=item * Essential middleware for logging, security, and sessions
 
-=item * Working with middleware
-
-=item * Sessions, cookies, and authentication
+=item * Writing custom middleware
 
 =back
 
-=head1 PART 3: THE HELPER CLASSES
-
-In Part 2, we worked directly with the raw PAGI protocol (C<$scope>, C<$receive>, C<$send>). While powerful, this low-level approach requires a lot of boilerplate code for common tasks.
-
-PAGI provides four helper classes that make web development much easier:
-
-=over 4
-
-=item * L<PAGI::Response> - Fluent response builder
-
-=item * L<PAGI::Request> - Request parser with body handling
-
-=item * L<PAGI::WebSocket> - WebSocket helper
-
-=item * L<PAGI::SSE> - Server-Sent Events helper
-
-=back
-
-These classes handle UTF-8 encoding/decoding, body parsing, cookie handling, and more automatically.
-
-=head2 3.1 PAGI::Response - Fluent Response Builder
-
-L<PAGI::Response> provides a fluent interface for building HTTP responses. Instead of manually constructing C<http.response.start> and C<http.response.body> events, you use chainable methods.
-
-=head3 Creating a Response
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      # Create a response builder
-      my $res = PAGI::Response->new($send);
-
-      # Use it to send responses
-      await $res->text('Hello, World!');
-  }
-
-  \&app;
-
-The C<new()> method takes the C<$send> callback from your PAGI app.
-
-=head3 Simple Responses
-
-L<PAGI::Response> provides methods for common response types:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $res = PAGI::Response->new($send);
-      my $path = $scope->{path};
-
-      # Plain text
-      if ($path eq '/text') {
-          await $res->text('Hello, World!');
-      }
-      # HTML
-      elsif ($path eq '/html') {
-          await $res->html('<h1>Hello, World!</h1>');
-      }
-      # JSON
-      elsif ($path eq '/json') {
-          await $res->json({ message => 'Hello, World!' });
-      }
-      # Empty response (204 No Content)
-      elsif ($path eq '/empty') {
-          await $res->empty();
-      }
-      else {
-          await $res->text('Unknown path');
-      }
-  }
-
-  \&app;
-
-Key points:
-
-=over 4
-
-=item * C<text()> sets Content-Type to text/plain; charset=utf-8
-
-=item * C<html()> sets Content-Type to text/html; charset=utf-8
-
-=item * C<json()> sets Content-Type to application/json; charset=utf-8
-
-=item * All methods automatically encode strings to UTF-8 bytes
-
-=back
-
-=head3 Status and Headers
-
-Use chainable methods to set status and headers before sending:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $res = PAGI::Response->new($send);
-
-      # Fluent chaining: set status and headers, then send
-      await $res->status(201)
-                ->header('X-Request-ID', '12345')
-                ->header('X-Custom', 'value')
-                ->content_type('application/json')
-                ->json({ created => 1 });
-  }
-
-  \&app;
-
-Chainable methods:
-
-=over 4
-
-=item * C<status($code)> - Set HTTP status (default: 200)
-
-=item * C<header($name, $value)> - Add a response header
-
-=item * C<content_type($type)> - Set Content-Type header
-
-=item * C<cookie($name, $value, %opts)> - Set a cookie
-
-=back
-
-=head3 Cookies
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $res = PAGI::Response->new($send);
-
-      # Set a simple cookie
-      $res->cookie('session_id', 'abc123');
-
-      # Set a cookie with options
-      $res->cookie('user_pref', 'dark_mode',
-          expires  => time + 86400,      # 1 day from now
-          path     => '/',
-          domain   => '.example.com',
-          secure   => 1,                 # HTTPS only
-          httponly => 1,                 # No JavaScript access
-          samesite => 'Strict',          # CSRF protection
-      );
-
-      # Delete a cookie
-      $res->delete_cookie('old_session');
-
-      await $res->text('Cookies set!');
-  }
-
-  \&app;
-
-=head3 Redirects
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $res = PAGI::Response->new($send);
-      my $path = $scope->{path};
-
-      # Temporary redirect (302 Found - default)
-      if ($path eq '/old-page') {
-          await $res->redirect('/new-page');
-      }
-      # Permanent redirect (301 Moved Permanently)
-      elsif ($path eq '/legacy') {
-          await $res->redirect('/modern', 301);
-      }
-      # See Other (303 - used after POST)
-      elsif ($path eq '/after-post') {
-          await $res->redirect('/success', 303);
-      }
-      else {
-          await $res->text('No redirect needed');
-      }
-  }
-
-  \&app;
-
-B<Note:> C<redirect()> sends the response immediately but does NOT stop Perl execution. Code after it still runs. Use C<return> after redirect if you have more code below, or use control flow (if/elsif) as shown above.
-
-=head3 Errors
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $res = PAGI::Response->new($send);
-      my $path = $scope->{path};
-
-      # Simple error
-      if ($path eq '/gone') {
-          await $res->status(404)->json({ error => 'Not Found' });
-      }
-      # Error with extra data
-      elsif ($path eq '/invalid') {
-          await $res->status(422)->json({
-              error => 'Validation Failed',
-              errors => [
-                  { field => 'email', message => 'Invalid format' },
-                  { field => 'age', message => 'Must be >= 18' },
-              ],
-          });
-      }
-      # Internal server error
-      elsif ($path eq '/error') {
-          await $res->status(500)->json({ error => 'Internal Server Error' });
-      }
-      else {
-          await $res->text('OK');
-      }
-  }
-
-  \&app;
-
-The pattern C<< $res->status(N)->json({...}) >> gives you full control over
-the error response structure, which is especially useful for APIs.
-
-=head3 Streaming Responses
-
-For large responses or real-time data, use C<stream()>:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use IO::Async::Loop;
-  use IO::Async::Timer::Countdown;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $loop = IO::Async::Loop->new;
-      my $res = PAGI::Response->new($send);
-
-      # Stream response chunks
-      await $res->stream(async sub {
-          my ($writer) = @_;
-
-          for my $i (1..5) {
-              await $writer->write("Chunk $i\n");
-
-              # Wait 1 second between chunks
-              my $timer = IO::Async::Timer::Countdown->new(
-                  delay => 1,
-                  on_expire => sub { },
-              );
-              $loop->add($timer);
-              $timer->start;
-              await $timer->future;
-          }
-
-          # Close the stream
-          await $writer->close();
-      });
-  }
-
-  \&app;
-
-The writer object has three methods:
-
-=over 4
-
-=item * C<write($chunk)> - Send a chunk (returns a Future)
-
-=item * C<close()> - Close the stream (returns a Future)
-
-=item * C<bytes_written()> - Get total bytes written so far
-
-=back
-
-See C<examples/02-streaming-response/> for complete examples.
-
-=head3 File Downloads
-
-Send files efficiently without loading them into memory:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $res = PAGI::Response->new($send);
-
-      # Send file with auto-detected MIME type
-      await $res->send_file('/path/to/document.pdf');
-
-      # Or with custom filename for download
-      # await $res->send_file('/path/to/report.pdf',
-      #     filename => 'Q4-Report.pdf',
-      # );
-
-      # Or display inline (in browser)
-      # await $res->send_file('/path/to/image.jpg',
-      #     inline => 1,
-      # );
-  }
-
-  \&app;
-
-L<PAGI::Response> uses the PAGI protocol's C<file> key, which allows L<PAGI::Server> to use efficient zero-copy mechanisms like C<sendfile()>.
-
-=head2 3.2 PAGI::Request - Request Parsing
-
-L<PAGI::Request> parses HTTP requests and provides convenient accessors for headers, query parameters, cookies, and request bodies.
-
-=head3 Creating a Request
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      # Create request and response objects
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      await $res->text("You requested: " . $req->path);
-  }
-
-  \&app;
-
-The C<new()> method takes both C<$scope> and C<$receive> from your PAGI app.
-
-=head3 Basic Properties
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      my $info = join "\n", (
-          "Method: " . $req->method,
-          "Path: " . $req->path,
-          "Query: " . $req->query_string,
-          "Scheme: " . $req->scheme,
-          "HTTP Version: " . $req->http_version,
-          "Client: " . join(':', @{$req->client}),
-      );
-
-      await $res->text($info);
-  }
-
-  \&app;
-
-Available methods:
-
-=over 4
-
-=item * C<method()> - HTTP method (GET, POST, etc.)
-
-=item * C<path()> - URL path (decoded UTF-8)
-
-=item * C<raw_path()> - URL path (raw bytes)
-
-=item * C<query_string()> - Query string (raw bytes)
-
-=item * C<scheme()> - 'http' or 'https'
-
-=item * C<http_version()> - HTTP version (e.g., '1.1')
-
-=item * C<client()> - Client address and port arrayref
-
-=item * C<host()> - Host header value
-
-=back
-
-=head3 Headers
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Get single header (case-insensitive)
-      my $user_agent = $req->header('user-agent') // 'Unknown';
-
-      # Get content type
-      my $ct = $req->content_type;  # Just the type, without charset
-
-      # Get content length
-      my $len = $req->content_length;
-
-      # Check authorization header
-      my $auth = $req->header('authorization');
-
-      # Get bearer token from Authorization: Bearer <token>
-      my $token = $req->bearer_token;
-
-      await $res->text("User-Agent: $user_agent");
-  }
-
-  \&app;
-
-=head3 Query Parameters
-
-Query parameters are automatically decoded from URL encoding and UTF-8:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Get single parameter
-      my $page = $req->query('page') // '1';
-      my $search = $req->query('q') // '';
-
-      # Get all parameters as Hash::MultiValue
-      my $params = $req->query_params;
-      my @tags = $params->get_all('tag');  # For ?tag=foo&tag=bar
-
-      # Get all as hashref (last value wins for duplicates)
-      my $hash = $params->as_hashref;
-
-      await $res->json({
-          page => $page,
-          search => $search,
-          tags => \@tags,
-      });
-  }
-
-  \&app;
-
-Test it:
-
-  curl 'http://localhost:5000/?page=2&q=hello&tag=perl&tag=async'
-
-=head3 Cookies
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Get single cookie
-      my $session_id = $req->cookie('session_id') // 'none';
-
-      # Get all cookies as hashref
-      my $cookies = $req->cookies;
-
-      await $res->json({
-          session_id => $session_id,
-          all_cookies => $cookies,
-      });
-  }
-
-  \&app;
-
-=head3 Body Parsing
-
-L<PAGI::Request> provides async methods for parsing different body types:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Read entire body as raw bytes
-      if ($req->path eq '/raw') {
-          my $bytes = await $req->body;
-          await $res->text("Received " . length($bytes) . " bytes");
-      }
-      # Parse JSON body
-      elsif ($req->path eq '/json' && $req->is_json) {
-          my $data = await $req->json;
-          await $res->json({
-              received => $data,
-          });
-      }
-      # Parse URL-encoded form
-      elsif ($req->path eq '/form' && $req->is_form) {
-          my $form = await $req->form;
-          my $name = $form->get('name');
-          my $email = $form->get('email');
-
-          await $res->json({
-              name => $name,
-              email => $email,
-          });
-      }
-      else {
-          await $res->text('Send POST data to /json or /form');
-      }
-  }
-
-  \&app;
-
-Available body methods:
-
-=over 4
-
-=item * C<body()> - Raw bytes (entire body)
-
-=item * C<json()> - Parse as JSON, returns hashref/arrayref
-
-=item * C<form()> - Parse as application/x-www-form-urlencoded or multipart/form-data, returns L<Hash::MultiValue>
-
-=back
-
-Content-type predicates:
-
-=over 4
-
-=item * C<is_json()> - True if Content-Type is application/json
-
-=item * C<is_form()> - True if form data (urlencoded or multipart)
-
-=item * C<is_multipart()> - True if multipart/form-data
-
-=back
-
-Test JSON:
-
-  curl -X POST http://localhost:5000/json \
-    -H 'Content-Type: application/json' \
-    -d '{"name":"Alice","age":30}'
-
-Test form:
-
-  curl -X POST http://localhost:5000/form \
-    -d 'name=Bob&email=bob@example.com'
-
-See C<examples/03-request-body/> for complete examples.
-
-=head3 File Uploads
-
-L<PAGI::Request> handles multipart file uploads:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      return await $res->text('Send POST to /upload')
-          unless $req->method eq 'POST' && $req->path eq '/upload';
-
-      # Get single upload
-      my $file = await $req->upload('avatar');
-
-      if ($file && !$file->is_empty) {
-          # Get upload metadata
-          my $filename = $file->filename;
-          my $content_type = $file->content_type;
-          my $size = $file->size;
-
-          # Save to disk
-          await $file->save_to("/tmp/uploads/$filename");
-
-          # Or get content in memory (careful with large files!)
-          # my $content = await $file->content;
-
-          await $res->json({
-              uploaded => 1,
-              filename => $filename,
-              type => $content_type,
-              size => $size,
-          });
-      } else {
-          await $res->status(400)->json({ error => 'No file uploaded' });
-      }
-  }
-
-  \&app;
-
-For multiple files:
-
-  # Get all uploads for a field
-  my @files = await $req->upload_all('attachments');
-
-  for my $file (@files) {
-      next if $file->is_empty;
-      my $name = $file->filename;
-      await $file->save_to("/tmp/uploads/$name");
-  }
-
-Upload object methods (L<PAGI::Request::Upload>):
-
-=over 4
-
-=item * C<filename()> - Original filename
-
-=item * C<content_type()> - MIME type
-
-=item * C<size()> - File size in bytes
-
-=item * C<is_empty()> - True if no file was uploaded
-
-=item * C<content()> - Get content as bytes (async)
-
-=item * C<save_to($path)> - Save to disk (async)
-
-=back
-
-See C<examples/13-contact-form/> for a complete file upload example.
-
-=head3 Request Stash
-
-The stash is a per-request storage area for sharing data between middleware and handlers:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected http scope" unless $scope->{type} eq 'http';
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Store data in stash (e.g., from authentication middleware)
-      $req->stash->{user} = { id => 123, name => 'Alice' };
-
-      # Retrieve data later
-      my $user = $req->stash->{user};
-
-      await $res->json($user);
-  }
-
-  \&app;
-
-The stash lives in C<$scope-E<gt>{'pagi.stash'}> and flows through middleware and subrouters.
-
-=head2 3.3 PAGI::WebSocket - WebSocket Helper
-
-L<PAGI::WebSocket> simplifies WebSocket connections. Instead of manually handling C<websocket.accept>, C<websocket.receive>, and C<websocket.send> events, you use high-level methods.
-
-=head3 Creating a WebSocket
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      # Create WebSocket helper
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-
-      # Accept the connection
-      await $ws->accept;
-
-      # Now you can send and receive messages
-      await $ws->send_text("Welcome!");
-  }
-
-  \&app;
-
-=head3 Echo Server
-
-A simple echo server that receives text messages and sends them back:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-      await $ws->accept;
-
-      # Receive messages in a loop
-      # NOTE: This loop does NOT block! The 'await' yields to the event
-      # loop while waiting, allowing other connections to be processed.
-      while (1) {
-          my $message = await $ws->receive;
-
-          # Check if connection closed
-          last unless defined $message;
-
-          # Echo back
-          await $ws->send_text("Echo: $message");
-      }
-  }
-
-  \&app;
-
-See C<examples/04-websocket-echo/> and C<examples/websocket-echo-v2/> for complete examples.
-
-=head3 Send and Receive
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-      await $ws->accept;
-
-      # Send text message
-      await $ws->send_text("Hello!");
-
-      # Send binary message
-      await $ws->send_bytes("\x00\x01\x02");
-
-      # Receive any message (text or binary)
-      my $msg = await $ws->receive;
-
-      # Receive specifically text (waits for text message)
-      my $text = await $ws->receive_text;
-
-      # Receive specifically binary
-      my $bytes = await $ws->receive_bytes;
-
-      await $ws->close(1000, 'Goodbye');
-  }
-
-  \&app;
-
-=head3 JSON Messages
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-      await $ws->accept;
-
-      # Send JSON
-      await $ws->send_json({ type => 'greeting', message => 'Hello!' });
-
-      # Receive and parse JSON
-      my $data = await $ws->receive_json;
-
-      # $data is a hashref/arrayref
-      my $type = $data->{type};
-      my $payload = $data->{payload};
-
-      await $ws->close(1000);
-  }
-
-  \&app;
-
-=head3 Message Loop with Callbacks
-
-Process each message with a callback:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-      await $ws->accept;
-
-      # Process each text message
-      await $ws->each_text(async sub {
-          my ($text) = @_;
-
-          # Handle message
-          warn "Received: $text\n";
-
-          # Send response
-          await $ws->send_text("Got: $text");
-      });
-
-      # Loop exits when connection closes
-  }
-
-  \&app;
-
-=head3 Close Handling
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-
-      # Register close callback
-      $ws->on_close(sub {
-          my ($code, $reason) = @_;
-          warn "Connection closed: $code - $reason\n";
-      });
-
-      # Register error callback
-      $ws->on_error(sub {
-          my ($error) = @_;
-          warn "WebSocket error: $error\n";
-      });
-
-      await $ws->accept;
-
-      # Your message handling code (await yields, doesn't block)
-      while (1) {
-          my $msg = await $ws->receive;
-          last unless defined $msg;
-          # ...
-      }
-  }
-
-  \&app;
-
-=head3 WebSocket Stash
-
-Like L<PAGI::Request>, WebSocket has a stash for per-connection data:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::WebSocket;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected websocket scope" unless $scope->{type} eq 'websocket';
-
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-      await $ws->accept;
-
-      # Store connection-specific data
-      $ws->stash->{user_id} = 123;
-      $ws->stash->{room} = 'lobby';
-
-      # Use it later
-      my $user_id = $ws->stash->{user_id};
-
-      # Your message handling...
-      await $ws->close(1000);
-  }
-
-  \&app;
-
-See C<examples/websocket-chat-v2/> for a complete chat application using WebSocket stash.
-
-=head2 3.4 PAGI::SSE - Server-Sent Events Helper
-
-L<PAGI::SSE> simplifies Server-Sent Events (SSE) for server-to-client streaming. SSE is perfect for live updates, dashboards, and notifications.
-
-=head3 Creating an SSE Stream
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::SSE;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      # Create SSE helper
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-
-      # Start the SSE response
-      await $sse->start;
-
-      # Send events
-      await $sse->send_event("Hello from server!");
-  }
-
-  \&app;
-
-=head3 Sending Events
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::SSE;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-      await $sse->start;
-
-      # Simple event (data only)
-      await $sse->send_event("Server time: " . scalar(localtime));
-
-      # Event with type and ID
-      await $sse->send_event(
-          "User Alice logged in",
-          event => 'user_login',    # Event type
-          id => '42',                # Event ID
-      );
-
-      # Multiple lines of data
-      await $sse->send_event(
-          "Line 1\nLine 2\nLine 3",
-          event => 'multiline',
-      );
-  }
-
-  \&app;
-
-The browser receives these events:
-
-  const eventSource = new EventSource('/events');
-
-  // Listen for all events
-  eventSource.onmessage = (e) => {
-      console.log('Data:', e.data);
-      console.log('ID:', e.lastEventId);
-  };
-
-  // Listen for specific event type
-  eventSource.addEventListener('user_login', (e) => {
-      console.log('User logged in:', e.data);
-  });
-
-=head3 JSON Events
-
-Send structured data as JSON:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::SSE;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-      await $sse->start;
-
-      # Send JSON data
-      await $sse->send_json({
-          type => 'notification',
-          message => 'You have a new message',
-          count => 3,
-      }, event => 'notification');
-  }
-
-  \&app;
-
-Browser:
-
-  eventSource.addEventListener('notification', (e) => {
-      const data = JSON.parse(e.data);
-      console.log('Notifications:', data.count);
-  });
-
-=head3 Periodic Updates
-
-Send events on a schedule using C<every()>:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::SSE;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-      await $sse->start;
-
-      # Send updates every 2 seconds
-      await $sse->every(2, async sub {
-          my $time = scalar(localtime);
-          await $sse->send_json({
-              time => $time,
-              random => int(rand(100)),
-          }, event => 'update');
-      });
-
-      # This never returns (keeps sending until client disconnects)
-  }
-
-  \&app;
-
-See C<examples/05-sse-broadcaster/> and C<examples/sse-dashboard/> for complete examples.
-
-=head3 Keepalive
-
-Keep connections alive by sending periodic comments:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::SSE;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-      await $sse->start;
-
-      # Send keepalive comment every 15 seconds
-      $sse->keepalive(15);
-
-      # Your event sending code...
-      await $sse->every(5, async sub {
-          await $sse->send_event("Update: " . time);
-      });
-  }
-
-  \&app;
-
-Keepalive prevents proxy timeouts on idle connections.
-
-=head3 Close Detection
-
-Detect when the client disconnects:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::SSE;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      die "Expected sse scope" unless $scope->{type} eq 'sse';
-
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-
-      # Register close callback
-      $sse->on_close(sub {
-          warn "Client disconnected\n";
-      });
-
-      await $sse->start;
-
-      # Send events...
-      await $sse->every(1, async sub {
-          # This stops when client disconnects
-          await $sse->send_event("tick: " . time);
-      });
-  }
-
-  \&app;
-
-=head1 PART 4: ROUTING
-
-In Parts 1-3, we built PAGI applications using raw protocol handlers and helper classes. While these work well for simple applications, real-world applications need routing to handle multiple endpoints, path parameters, and different HTTP methods.
-
-PAGI provides two routing approaches:
-
-=over 4
-
-=item * L<PAGI::App::Router> - Functional routing with explicit route registration
-
-=item * L<PAGI::Endpoint::Router> - Class-based routing with method handlers
-
-=back
-
-Both routers support HTTP, WebSocket, and SSE routing in a unified interface.
-
-=head2 4.1 PAGI::App::Router - Functional Routing
-
-L<PAGI::App::Router> provides a lightweight functional approach to routing. You create a router instance, register routes, and convert it to a PAGI app.
-
-=head3 Creating a Router
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  # Create router instance
-  my $router = PAGI::App::Router->new;
-
-  # Add routes
-  $router->get('/' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-      await $res->text('Welcome!');
-  });
-
-  # Convert to PAGI app
-  my $app = $router->to_app;
-
-  # Return from app.pl
-  $app;
-
-=head3 HTTP Method Routing
-
-L<PAGI::App::Router> provides methods for all standard HTTP verbs:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # GET /users
-  $router->get('/users' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-      await $res->json([
-          { id => 1, name => 'Alice' },
-          { id => 2, name => 'Bob' },
-      ]);
-  });
-
-  # POST /users
-  $router->post('/users' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      my $data = await $req->json;
-      # ... create user ...
-
-      await $res->status(201)->json({ id => 3, name => $data->{name} });
-  });
-
-  # PUT /users/:id
-  $router->put('/users/:id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      # ... update user ...
-  });
-
-  # PATCH /users/:id
-  $router->patch('/users/:id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      # ... partial update ...
-  });
-
-  # DELETE /users/:id
-  $router->delete('/users/:id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      # ... delete user ...
-  });
-
-  # HEAD /users/:id
-  $router->head('/users/:id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      # ... return headers only ...
-  });
-
-  # OPTIONS /users/:id
-  $router->options('/users/:id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      # ... return allowed methods ...
-  });
-
-  $router->to_app;
-
-Available methods: C<get()>, C<post()>, C<put()>, C<patch()>, C<delete()>, C<head()>, C<options()>.
-
-=head3 Path Parameters
-
-Use C<:param> syntax for named parameters in routes:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Single parameter
-  $router->get('/users/:id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Access path parameter via $req->path_param()
-      my $id = $req->path_param('id');
-
-      await $res->json({ id => $id, name => 'User ' . $id });
-  });
-
-  # Multiple parameters
-  $router->get('/posts/:post_id/comments/:comment_id' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      my $post_id = $req->path_param('post_id');
-      my $comment_id = $req->path_param('comment_id');
-
-      await $res->json({
-          post_id => $post_id,
-          comment_id => $comment_id,
-      });
-  });
-
-  $router->to_app;
-
-Parameters are stored in C<$scope-E<gt>{path_params}> and accessed via C<$req-E<gt>path_param($name)>.
-
-=head3 Wildcard Routes
-
-Use C<*name> syntax to capture multiple path segments:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Wildcard captures everything after /files/
-  $router->get('/files/*path' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Access wildcard via $req->path_param()
-      my $path = $req->path_param('path');
-
-      # /files/docs/readme.txt -> path = 'docs/readme.txt'
-      # /files/images/logo.png -> path = 'images/logo.png'
-
-      await $res->text("File path: $path");
-  });
-
-  $router->to_app;
-
-Wildcards match one or more path segments, while named parameters (C<:param>) match a single segment.
-
-=head3 WebSocket Routes
-
-Route WebSocket connections by path:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::WebSocket;
-
-  my $router = PAGI::App::Router->new;
-
-  # WebSocket echo server
-  $router->websocket('/ws' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-
-      await $ws->accept;
-
-      await $ws->each_text(async sub {
-          my ($text) = @_;
-          await $ws->send_text("Echo: $text");
-      });
-  });
-
-  # WebSocket with path parameters
-  $router->websocket('/ws/chat/:room' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-
-      # Access room parameter
-      my $room = $ws->stash->{'pagi.params'}{room};
-
-      await $ws->accept;
-      await $ws->send_text("Joined room: $room");
-
-      # ... chat logic ...
-  });
-
-  $router->to_app;
-
-=head3 SSE Routes
-
-Route Server-Sent Events by path:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::SSE;
-
-  my $router = PAGI::App::Router->new;
-
-  # SSE clock
-  $router->sse('/events' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-
-      await $sse->start;
-
-      await $sse->every(1, async sub {
-          await $sse->send_event("Time: " . time);
-      });
-  });
-
-  # SSE with path parameters
-  $router->sse('/events/:channel' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-
-      # Access channel parameter
-      my $channel = $sse->stash->{'pagi.params'}{channel};
-
-      await $sse->start;
-      await $sse->send_event("Subscribed to: $channel");
-
-      # ... streaming logic ...
-  });
-
-  $router->to_app;
-
-=head3 Route-Level Middleware
-
-Apply middleware to specific routes by passing an arrayref:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Define middleware
-  my $auth_mw = async sub {
-      my ($scope, $receive, $send, $next) = @_;
-
-      # Check authorization
-      my $token = '';
-      for my $h (@{$scope->{headers}}) {
-          if (lc($h->[0]) eq 'authorization') {
-              $token = $h->[1];
-              last;
-          }
-      }
-
-      unless ($token eq 'Bearer secret123') {
-          my $res = PAGI::Response->new($send);
-          await $res->status(401)->json({ error => 'Unauthorized' });
-          return;  # Don't call $next->()
-      }
-
-      # Authorized - continue to handler
-      await $next->();
-  };
-
-  # Apply middleware to specific routes
-  $router->get('/admin' => [$auth_mw] => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-      await $res->text('Admin panel');
-  });
-
-  # Multiple middleware
-  my $log_mw = async sub {
-      my ($scope, $receive, $send, $next) = @_;
-      warn "Request: $scope->{method} $scope->{path}\n";
-      await $next->();
-  };
-
-  $router->post('/admin/users' => [$log_mw, $auth_mw] => async sub {
-      my ($scope, $receive, $send) = @_;
-      # ... handler ...
-  });
-
-  $router->to_app;
-
-Middleware are executed in order (C<$log_mw> runs before C<$auth_mw> in the example above).
-
-=head3 Mounting Sub-Applications
-
-Use C<mount()> to attach sub-applications or routers at a prefix:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  # Create API router
-  my $api_router = PAGI::App::Router->new;
-  $api_router->get('/users' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-      await $res->json([{ id => 1, name => 'Alice' }]);
-  });
-
-  # Create main router
-  my $main_router = PAGI::App::Router->new;
-
-  # Mount API router at /api prefix
-  # /api/users will be handled by $api_router
-  $main_router->mount('/api' => $api_router->to_app);
-
-  # Mount with middleware (applies to all sub-routes)
-  my $cors_mw = async sub {
-      my ($scope, $receive, $send, $next) = @_;
-      # Add CORS headers...
-      await $next->();
-  };
-
-  $main_router->mount('/api' => [$cors_mw] => $api_router->to_app);
-
-  $main_router->to_app;
-
-See C<examples/endpoint-demo/> for a complete routing example using L<PAGI::App::Router>.
-
-=head2 4.2 PAGI::Endpoint::Router - Class-Based Routing
-
-L<PAGI::Endpoint::Router> provides an object-oriented approach to routing. You define a class that extends C<PAGI::Endpoint::Router>, implement a C<routes()> method, and use method names as handlers.
-
-=head3 Basic Router Class
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  # Define routes
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/' => 'home');
-      $r->get('/about' => 'about');
-      $r->post('/contact' => 'contact');
-  }
-
-  # Handler methods receive ($self, $req, $res) for HTTP
-  async sub home {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Welcome!</h1>');
-  }
-
-  async sub about {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>About Us</h1>');
-  }
-
-  async sub contact {
-      my ($self, $req, $res) = @_;
-      my $data = await $req->json;
-      # ... process contact form ...
-      await $res->json({ success => 1 });
-  }
-
-  1;
-
-  # In app.pl:
-  # use MyApp;
-  # MyApp->to_app;
-
-Handler methods are called with:
-
-=over 4
-
-=item * C<$self> - Router instance (access C<$self-E<gt>state> for per-instance data)
-
-=item * C<$req> - L<PAGI::Request> object (already constructed)
-
-=item * C<$res> - L<PAGI::Response> object (already constructed)
-
-=back
-
-=head3 Path Parameters
-
-Access path parameters via C<$req-E<gt>param()>:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/users/:id' => 'get_user');
-      $r->get('/posts/:post_id/comments/:comment_id' => 'get_comment');
-  }
-
-  async sub get_user {
-      my ($self, $req, $res) = @_;
-
-      my $id = $req->path_param('id');
-
-      await $res->json({
-          id => $id,
-          name => "User $id",
-      });
-  }
-
-  async sub get_comment {
-      my ($self, $req, $res) = @_;
-
-      my $post_id = $req->path_param('post_id');
-      my $comment_id = $req->path_param('comment_id');
-
-      await $res->json({
-          post_id => $post_id,
-          comment_id => $comment_id,
-      });
-  }
-
-  1;
-
-=head3 WebSocket Handlers
-
-WebSocket handlers receive C<($self, $ws)>:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/' => 'home');
-      $r->websocket('/ws' => 'handle_ws');
-      $r->websocket('/ws/chat/:room' => 'handle_chat');
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Home</h1>');
-  }
-
-  # WebSocket handler receives ($self, $ws)
-  async sub handle_ws {
-      my ($self, $ws) = @_;
-
-      await $ws->accept;
-
-      await $ws->each_text(async sub {
-          my ($text) = @_;
-          await $ws->send_text("Echo: $text");
-      });
-  }
-
-  # WebSocket with path parameters
-  async sub handle_chat {
-      my ($self, $ws) = @_;
-
-      # Access path parameter via $ws->path_param()
-      my $room = $ws->path_param('room');
-
-      await $ws->accept;
-      await $ws->send_text("Joined room: $room");
-
-      # ... chat logic ...
-  }
-
-  1;
-
-=head3 SSE Handlers
-
-SSE handlers receive C<($self, $sse)>:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/' => 'home');
-      $r->sse('/events' => 'handle_events');
-      $r->sse('/events/:channel' => 'handle_channel');
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Home</h1>');
-  }
-
-  # SSE handler receives ($self, $sse)
-  async sub handle_events {
-      my ($self, $sse) = @_;
-
-      await $sse->start;
-
-      await $sse->every(1, async sub {
-          await $sse->send_event("Time: " . time);
-      });
-  }
-
-  # SSE with path parameters
-  async sub handle_channel {
-      my ($self, $sse) = @_;
-
-      # Access path parameter
-      my $channel = $sse->scope->{'pagi.params'}{channel};
-
-      await $sse->start;
-      await $sse->send_event("Channel: $channel");
-
-      # ... streaming logic ...
-  }
-
-  1;
-
-=head3 Lifecycle Hooks
-
-Override C<on_startup> and C<on_shutdown> for application lifecycle management:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  # Called when application starts
-  async sub on_startup {
-      my ($self) = @_;
-
-      # Initialize resources
-      $self->state->{db} = DBI->connect('dbi:SQLite:dbname=app.db');
-      $self->state->{started_at} = time();
-
-      warn "Application started\n";
-  }
-
-  # Called when application shuts down
-  async sub on_shutdown {
-      my ($self) = @_;
-
-      # Clean up resources
-      $self->state->{db}->disconnect if $self->state->{db};
-
-      warn "Application shut down\n";
-  }
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/' => 'home');
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-
-      # Access state initialized in on_startup
-      my $db = $self->state->{db};
-      my $uptime = time() - $self->state->{started_at};
-
-      await $res->json({
-          uptime => $uptime,
-          database => defined($db) ? 'connected' : 'disconnected',
-      });
-  }
-
-  1;
-
-Note: C<$self-E<gt>state> is per-worker in multi-worker mode. For shared state, use an external store (Redis, database, etc.).
-
-=head3 Per-Instance State
-
-Use C<$self-E<gt>state> to store data that persists across requests:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  async sub on_startup {
-      my ($self) = @_;
-
-      # Initialize per-instance state
-      $self->state->{request_count} = 0;
-      $self->state->{config} = {
-          app_name => 'MyApp',
-          version => '1.0',
-      };
-  }
-
-  sub routes {
-      my ($self, $r) = @_;
-      $r->get('/' => 'home');
-      $r->get('/stats' => 'stats');
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-
-      # Increment counter
-      $self->state->{request_count}++;
-
-      await $res->html('<h1>Welcome!</h1>');
-  }
-
-  async sub stats {
-      my ($self, $req, $res) = @_;
-
-      await $res->json({
-          config => $self->state->{config},
-          requests => $self->state->{request_count},
-      });
-  }
-
-  1;
-
-State is also available via C<$req-E<gt>state>, C<$ws-E<gt>state>, and C<$sse-E<gt>state> in handlers.
-
-=head3 Route-Level Middleware with Method Names
-
-Define middleware methods and reference them by name:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/' => 'home');
-
-      # Apply middleware by method name
-      $r->get('/admin' => ['require_auth'] => 'admin_page');
-
-      # Multiple middleware
-      $r->post('/admin/users' => ['log_request', 'require_auth'] => 'create_user');
-  }
-
-  # Middleware method signature: ($self, $req, $res, $next)
-  async sub require_auth {
-      my ($self, $req, $res, $next) = @_;
-
-      my $token = $req->header('authorization');
-
-      unless ($token && $token eq 'Bearer secret123') {
-          await $res->status(401)->json({ error => 'Unauthorized' });
-          return;  # Don't call $next->()
-      }
-
-      # Authorized - continue to handler
-      await $next->();
-  }
-
-  async sub log_request {
-      my ($self, $req, $res, $next) = @_;
-
-      warn "Request: " . $req->method . " " . $req->path . "\n";
-
-      await $next->();
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Home</h1>');
-  }
-
-  async sub admin_page {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Admin Panel</h1>');
-  }
-
-  async sub create_user {
-      my ($self, $req, $res) = @_;
-      my $data = await $req->json;
-      # ... create user ...
-      await $res->status(201)->json({ success => 1 });
-  }
-
-  1;
-
-Middleware methods receive C<($self, $req, $res, $next)> and must call C<await $next-E<gt>()> to continue to the handler.
-
-=head3 Mounting Sub-Routers
-
-Create modular applications by mounting sub-routers:
-
-  # lib/MyApp/API.pm
-  package MyApp::API;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/users' => 'list_users');
-      $r->get('/users/:id' => 'get_user');
-      $r->post('/users' => 'create_user');
-  }
-
-  async sub list_users {
-      my ($self, $req, $res) = @_;
-      await $res->json([
-          { id => 1, name => 'Alice' },
-          { id => 2, name => 'Bob' },
-      ]);
-  }
-
-  async sub get_user {
-      my ($self, $req, $res) = @_;
-      my $id = $req->path_param('id');
-      await $res->json({ id => $id, name => "User $id" });
-  }
-
-  async sub create_user {
-      my ($self, $req, $res) = @_;
-      my $data = await $req->json;
-      await $res->status(201)->json({ id => 3, name => $data->{name} });
-  }
-
-  1;
-
-  # lib/MyApp.pm
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use MyApp::API;
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      $r->get('/' => 'home');
-
-      # Mount API router at /api prefix
-      $r->mount('/api' => MyApp::API->to_app);
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Home</h1>');
-  }
-
-  1;
-
-  # app.pl
-  # use MyApp;
-  # MyApp->to_app;
-
-Now C</api/users> and C</api/users/:id> are handled by C<MyApp::API>.
-
-See C<examples/endpoint-router-demo/> for a comprehensive class-based routing example.
-
-=head3 Complete Example
-
-Here's a complete working example demonstrating all features:
-
-  package MyApp;
-  use parent 'PAGI::Endpoint::Router';
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-
-  async sub on_startup {
-      my ($self) = @_;
-      $self->state->{started} = time();
-      $self->state->{users} = [
-          { id => 1, name => 'Alice' },
-          { id => 2, name => 'Bob' },
-      ];
-  }
-
-  sub routes {
-      my ($self, $r) = @_;
-
-      # HTTP routes
-      $r->get('/' => 'home');
-      $r->get('/users' => 'list_users');
-      $r->get('/users/:id' => 'get_user');
-      $r->post('/users' => 'create_user');
-
-      # Protected route
-      $r->get('/admin' => ['require_auth'] => 'admin');
-
-      # WebSocket
-      $r->websocket('/ws' => 'ws_echo');
-
-      # SSE
-      $r->sse('/events' => 'events');
-  }
-
-  async sub require_auth {
-      my ($self, $req, $res, $next) = @_;
-      my $token = $req->header('authorization');
-      return await $res->status(401)->json({ error => 'Unauthorized' })
-          unless $token && $token eq 'Bearer secret';
-      await $next->();
-  }
-
-  async sub home {
-      my ($self, $req, $res) = @_;
-      await $res->html('<h1>Welcome to MyApp</h1>');
-  }
-
-  async sub list_users {
-      my ($self, $req, $res) = @_;
-      await $res->json($self->state->{users});
-  }
-
-  async sub get_user {
-      my ($self, $req, $res) = @_;
-      my $id = $req->path_param('id');
-      my ($user) = grep { $_->{id} == $id } @{$self->state->{users}};
-      return await $res->status(404)->json({ error => 'Not found' })
-          unless $user;
-      await $res->json($user);
-  }
-
-  async sub create_user {
-      my ($self, $req, $res) = @_;
-      my $data = await $req->json;
-      my $user = { id => scalar(@{$self->state->{users}}) + 1, name => $data->{name} };
-      push @{$self->state->{users}}, $user;
-      await $res->status(201)->json($user);
-  }
-
-  async sub admin {
-      my ($self, $req, $res) = @_;
-      await $res->json({ message => 'Admin access granted' });
-  }
-
-  async sub ws_echo {
-      my ($self, $ws) = @_;
-      await $ws->accept;
-      await $ws->each_text(async sub {
-          my ($text) = @_;
-          await $ws->send_text("Echo: $text");
-      });
-  }
-
-  async sub events {
-      my ($self, $sse) = @_;
-      await $sse->start;
-      await $sse->every(1, async sub {
-          await $sse->send_json({ time => time });
-      });
-  }
-
-  1;
-
-Run it:
-
-  # app.pl
-  use MyApp;
-  MyApp->to_app;
-
-  # Terminal:
-  pagi-server app.pl --port 5000
-
-Test it:
-
-  # HTTP
-  curl http://localhost:5000/
-  curl http://localhost:5000/users
-  curl http://localhost:5000/users/1
-  curl -X POST http://localhost:5000/users -H 'Content-Type: application/json' -d '{"name":"Charlie"}'
-
-  # Protected route
-  curl http://localhost:5000/admin
-  curl -H 'Authorization: Bearer secret' http://localhost:5000/admin
-
-  # WebSocket (JavaScript)
-  const ws = new WebSocket('ws://localhost:5000/ws');
-  ws.onmessage = (e) => console.log(e.data);
-  ws.send('Hello!');
-
-  # SSE (JavaScript)
-  const sse = new EventSource('http://localhost:5000/events');
-  sse.onmessage = (e) => console.log(JSON.parse(e.data));
-
-=head1 PART 5: MIDDLEWARE
+=head1 PART 3: MIDDLEWARE
 
 Middleware provides reusable functionality that wraps your application handlers. PAGI includes 30+ middleware components for logging, security, compression, sessions, and more.
 
-=head2 5.1 Using Middleware with Builder
+=head2 3.1 How Middleware Works
+
+Middleware wraps your application, intercepting requests and responses. Each middleware can:
+
+=over 4
+
+=item * Modify the request before passing it to the next handler
+
+=item * Short-circuit the request and return early
+
+=item * Modify the response on the way back
+
+=item * Add side effects like logging
+
+=back
+
+The pattern:
+
+  sub wrap {
+      my ($self, $app) = @_;
+      return async sub {
+          my ($scope, $receive, $send) = @_;
+          # Before: modify $scope, check conditions, etc.
+          await $app->($scope, $receive, $send);
+          # After: response already sent, but can log, etc.
+      };
+  }
+
+=head2 3.2 Using Middleware with Builder
 
 The L<PAGI::Middleware::Builder> DSL lets you compose middleware into your application.
 
@@ -3550,50 +1481,7 @@ Middleware executes in order: AccessLog -> CORS -> GZip -> app.
       $router->to_app;
   };
 
-=head2 5.2 Route-Level Middleware
-
-Apply middleware to specific routes only:
-
-  use PAGI::App::Router;
-  use PAGI::Middleware::RateLimit;
-
-  my $router = PAGI::App::Router->new;
-
-  my $rate_limit = PAGI::Middleware::RateLimit->new(
-      rate   => 10,
-      period => 60,
-  );
-
-  # Apply rate limiting only to this route
-  $router->get('/api/heavy' => [$rate_limit] => async sub {
-      my ($scope, $receive, $send) = @_;
-      await $send->({
-          type    => 'http.response.start',
-          status  => 200,
-          headers => [['content-type', 'text/plain']],
-      });
-      await $send->({
-          type => 'http.response.body',
-          body => 'Heavy resource',
-      });
-  });
-
-  my $app = $router->to_app;
-
-You can stack multiple middleware per route:
-
-  use PAGI::Middleware::CSRF;
-  use PAGI::Middleware::Session;
-
-  my $session = PAGI::Middleware::Session->new(secret => 'secret-key');
-  my $csrf = PAGI::Middleware::CSRF->new;
-
-  $router->post('/admin/delete' => [$session, $csrf] => async sub {
-      # Handler has session and CSRF protection
-      ...
-  });
-
-=head2 5.3 Essential Middleware Reference
+=head2 3.3 Essential Middleware Reference
 
 =head3 Logging & Debugging
 
@@ -3733,7 +1621,7 @@ Catch and format errors:
 
 =back
 
-=head2 5.4 Writing Custom Middleware
+=head2 3.4 Writing Custom Middleware
 
 Create reusable middleware by extending L<PAGI::Middleware>:
 
@@ -3862,35 +1750,277 @@ Return early without calling inner app:
 
 =back
 
-=head1 PART 6: BUILT-IN APPLICATIONS
+=head1 PART 4: THE HELPER CLASSES
 
-PAGI ships with several ready-to-use applications for common tasks. These can be mounted with routers or used standalone.
+In Part 2, we worked directly with the raw PAGI protocol (C<$scope>, C<$receive>, C<$send>). While powerful, this low-level approach requires a lot of boilerplate code for common tasks.
 
-=head2 6.1 PAGI::App::File - Static Files
+PAGI provides four helper classes that make web development much easier:
 
-L<PAGI::App::File> serves static files with security, caching, and streaming.
+=over 4
+
+=item * L<PAGI::Response> - Fluent response builder
+
+=item * L<PAGI::Request> - Request parser with body handling
+
+=item * L<PAGI::WebSocket> - WebSocket helper
+
+=item * L<PAGI::SSE> - Server-Sent Events helper
+
+=back
+
+These classes handle UTF-8 encoding/decoding, body parsing, cookie handling, and more automatically.
+
+=head2 4.1 PAGI::Response - Fluent Response Builder
+
+L<PAGI::Response> provides a fluent interface for building HTTP responses. Instead of manually constructing C<http.response.start> and C<http.response.body> events, you use chainable methods.
+
+=head3 Creating a Response
 
   use strict;
   use warnings;
   use Future::AsyncAwait;
+  use PAGI::Response;
+
+  async sub app {
+      my ($scope, $receive, $send) = @_;
+
+      die "Expected http scope" unless $scope->{type} eq 'http';
+
+      # Create a response builder
+      my $res = PAGI::Response->new($scope, $send);
+
+      # Use it to send responses
+      await $res->text('Hello, World!');
+  }
+
+  \&app;
+
+=head3 Simple Responses
+
+L<PAGI::Response> provides methods for common response types:
+
+  my $res = PAGI::Response->new($scope, $send);
+
+  # Plain text
+  await $res->text('Hello, World!');
+
+  # HTML
+  await $res->html('<h1>Hello, World!</h1>');
+
+  # JSON
+  await $res->json({ message => 'Hello, World!' });
+
+  # Empty response (204 No Content)
+  await $res->empty();
+
+Key points:
+
+=over 4
+
+=item * C<text()> sets Content-Type to text/plain; charset=utf-8
+
+=item * C<html()> sets Content-Type to text/html; charset=utf-8
+
+=item * C<json()> sets Content-Type to application/json; charset=utf-8
+
+=item * All methods automatically encode strings to UTF-8 bytes
+
+=back
+
+=head3 Status and Headers
+
+Use chainable methods to set status and headers before sending:
+
+  await $res->status(201)
+            ->header('X-Request-ID', '12345')
+            ->header('X-Custom', 'value')
+            ->content_type('application/json')
+            ->json({ created => 1 });
+
+Chainable methods:
+
+=over 4
+
+=item * C<status($code)> - Set HTTP status (default: 200)
+
+=item * C<header($name, $value)> - Add a response header
+
+=item * C<content_type($type)> - Set Content-Type header
+
+=item * C<cookie($name, $value, %opts)> - Set a cookie
+
+=back
+
+=head3 Redirects
+
+  # Temporary redirect (302 Found - default)
+  await $res->redirect('/new-page');
+
+  # Permanent redirect (301 Moved Permanently)
+  await $res->redirect('/modern', 301);
+
+  # See Other (303 - used after POST)
+  await $res->redirect('/success', 303);
+
+B<Note:> C<redirect()> sends the response immediately but does NOT stop Perl execution. Use C<return> after redirect if you have more code below.
+
+=head2 4.2 PAGI::Request - Request Parsing
+
+L<PAGI::Request> parses HTTP requests and provides convenient accessors for headers, query parameters, cookies, and request bodies.
+
+=head3 Creating a Request
+
+  my $req = PAGI::Request->new($scope, $receive);
+  my $res = PAGI::Response->new($scope, $send);
+
+  await $res->text("You requested: " . $req->path);
+
+=head3 Basic Properties
+
+  $req->method         # HTTP method (GET, POST, etc.)
+  $req->path           # URL path (decoded UTF-8)
+  $req->query_string   # Query string (raw bytes)
+  $req->scheme         # 'http' or 'https'
+  $req->host           # Host header value
+
+=head3 Headers
+
+  # Get single header (case-insensitive)
+  my $user_agent = $req->header('user-agent') // 'Unknown';
+
+  # Get content type
+  my $ct = $req->content_type;
+
+  # Get bearer token from Authorization: Bearer <token>
+  my $token = $req->bearer_token;
+
+=head3 Query Parameters
+
+  # Get single parameter
+  my $page = $req->query('page') // '1';
+
+  # Get all parameters as Hash::MultiValue
+  my $params = $req->query_params;
+  my @tags = $params->get_all('tag');  # For ?tag=foo&tag=bar
+
+=head3 Body Parsing
+
+  # Read entire body as raw bytes
+  my $bytes = await $req->body;
+
+  # Parse JSON body
+  my $data = await $req->json;
+
+  # Parse URL-encoded form
+  my $form = await $req->form;
+  my $name = $form->get('name');
+
+Content-type predicates:
+
+=over 4
+
+=item * C<is_json()> - True if Content-Type is application/json
+
+=item * C<is_form()> - True if form data (urlencoded or multipart)
+
+=back
+
+=head2 4.3 PAGI::WebSocket - WebSocket Helper
+
+L<PAGI::WebSocket> simplifies WebSocket connections:
+
+  my $ws = PAGI::WebSocket->new($scope, $receive, $send);
+  await $ws->accept;
+
+  # Send and receive
+  await $ws->send_text("Hello!");
+  my $msg = await $ws->receive;
+
+  # JSON messages
+  await $ws->send_json({ type => 'greeting' });
+  my $data = await $ws->receive_json;
+
+  # Message loop
+  await $ws->each_text(async sub {
+      my ($text) = @_;
+      await $ws->send_text("Echo: $text");
+  });
+
+  await $ws->close(1000, 'Goodbye');
+
+=head2 4.4 PAGI::SSE - Server-Sent Events Helper
+
+L<PAGI::SSE> simplifies Server-Sent Events:
+
+  my $sse = PAGI::SSE->new($scope, $receive, $send);
+  await $sse->start;
+
+  # Send events
+  await $sse->send_event("Hello!");
+  await $sse->send_event("User logged in", event => 'login', id => '42');
+
+  # Send JSON
+  await $sse->send_json({ count => 5 }, event => 'update');
+
+  # Periodic updates
+  await $sse->every(1, async sub {
+      await $sse->send_event("Time: " . time);
+  });
+
+  # Keepalive to prevent proxy timeouts
+  $sse->keepalive(15);
+
+=head1 PART 5: BUILT-IN APPLICATIONS
+
+PAGI ships with several ready-to-use applications for common tasks. These can be mounted with routers or used standalone.
+
+=head2 5.1 PAGI::App::Router - Basic Routing
+
+L<PAGI::App::Router> provides lightweight functional routing:
+
   use PAGI::App::Router;
-  use PAGI::App::File;
+  use PAGI::Response;
 
   my $router = PAGI::App::Router->new;
 
-  # Serve static files from ./public directory
-  my $static = PAGI::App::File->new(root => './public');
-  $router->mount('/static' => $static->to_app);
-
-  # Your API routes
-  $router->get('/api/hello' => async sub {
+  # HTTP routes
+  $router->get('/' => async sub {
       my ($scope, $receive, $send) = @_;
-      require PAGI::Response;
-      my $res = PAGI::Response->new($send);
-      await $res->json({ message => 'Hello!' });
+      my $res = PAGI::Response->new($scope, $send);
+      await $res->text('Home');
   });
 
+  $router->post('/users' => async sub {
+      my ($scope, $receive, $send) = @_;
+      my $res = PAGI::Response->new($scope, $send);
+      await $res->status(201)->json({ created => 1 });
+  });
+
+  # Path parameters
+  $router->get('/users/:id' => async sub {
+      my ($scope, $receive, $send) = @_;
+      my $req = PAGI::Request->new($scope, $receive);
+      my $res = PAGI::Response->new($scope, $send);
+      my $id = $req->path_param('id');
+      await $res->json({ id => $id });
+  });
+
+  # WebSocket and SSE
+  $router->websocket('/ws' => async sub { ... });
+  $router->sse('/events' => async sub { ... });
+
   $router->to_app;
+
+For advanced routing patterns (nested routers, route-level middleware, class-based routing), see L<PAGI::Cookbook>.
+
+=head2 5.2 PAGI::App::File - Static Files
+
+L<PAGI::App::File> serves static files with security, caching, and streaming:
+
+  use PAGI::App::File;
+
+  my $static = PAGI::App::File->new(root => './public');
+  $router->mount('/static' => $static->to_app);
 
 Features:
 
@@ -3904,702 +2034,75 @@ Features:
 
 =item * Automatic MIME type detection
 
-=item * Security: path traversal protection, symlink escape detection
-
-=item * Index files (index.html) for directories
+=item * Security: path traversal protection
 
 =back
 
-Configuration options:
+=head2 5.3 PAGI::App::Healthcheck - Health Endpoints
 
-  my $static = PAGI::App::File->new(
-      root         => './public',               # Root directory
-      default_type => 'application/octet-stream', # Fallback MIME type
-      index        => ['index.html', 'index.htm'], # Index file names
-  );
+L<PAGI::App::Healthcheck> creates health check endpoints:
 
-See C<examples/sse-dashboard/> for a real-world example using L<PAGI::App::File>.
-
-=head2 6.2 PAGI::App::Healthcheck - Health Endpoints
-
-L<PAGI::App::Healthcheck> creates health check endpoints for load balancers and monitoring.
-
-  use strict;
-  use warnings;
-  use PAGI::App::Router;
   use PAGI::App::Healthcheck;
 
-  my $router = PAGI::App::Router->new;
-
-  # Simple health endpoint
   my $health = PAGI::App::Healthcheck->new(
       version => '1.0.0',
       checks => {
-          database => sub {
-              # Return true if healthy, false if not
-              return $db && $db->ping;
-          },
-          cache => sub {
-              return $redis && $redis->ping;
-          },
+          database => sub { $db && $db->ping },
+          cache    => sub { $redis && $redis->ping },
       },
   );
 
   $router->mount('/health' => $health->to_app);
 
-  $router->to_app;
+=head2 5.4 PAGI::App::URLMap - Mount Applications
 
-Response format (JSON):
+L<PAGI::App::URLMap> routes requests to different apps based on URL prefix:
 
-  # 200 OK when all checks pass:
-  {
-      "status": "ok",
-      "timestamp": 1703318400,
-      "uptime": 86400,
-      "version": "1.0.0",
-      "checks": {
-          "database": { "status": "ok" },
-          "cache": { "status": "ok" }
-      }
-  }
-
-  # 503 Service Unavailable when any check fails:
-  {
-      "status": "error",
-      "checks": {
-          "database": { "status": "error", "message": "Connection refused" }
-      }
-  }
-
-=head2 6.3 PAGI::App::URLMap - Mount Applications
-
-L<PAGI::App::URLMap> routes requests to different apps based on URL prefix.
-
-  use strict;
-  use warnings;
   use PAGI::App::URLMap;
-  use PAGI::App::File;
 
-  # Create applications
-  my $api_app = require './api.pl';
-  my $admin_app = require './admin.pl';
-  my $static = PAGI::App::File->new(root => './public')->to_app;
-
-  # Mount at different paths
   my $urlmap = PAGI::App::URLMap->new;
   $urlmap->mount('/api' => $api_app);
   $urlmap->mount('/admin' => $admin_app);
   $urlmap->mount('/static' => $static);
-
-  # Default handler for unmatched paths
-  $urlmap->mount('/' => sub {
-      my ($scope, $receive, $send) = @_;
-      # ...serve homepage
-  });
-
   $urlmap->to_app;
 
-Key features:
+=head2 5.5 PAGI::App::Cascade - Try Apps in Sequence
 
-=over 4
+L<PAGI::App::Cascade> tries apps in order until one returns a non-404:
 
-=item * Path prefixes are stripped before passing to mounted apps
-
-=item * C<script_name> is set so apps know their mount point
-
-=item * Longest prefix matches first
-
-=back
-
-Alternative syntax with hashref:
-
-  $urlmap->map({
-      '/api'    => $api_app,
-      '/admin'  => $admin_app,
-      '/'       => $main_app,
-  });
-
-=head2 6.4 PAGI::App::Cascade - Try Apps in Sequence
-
-L<PAGI::App::Cascade> tries apps in order until one returns a non-404 response.
-
-  use strict;
-  use warnings;
   use PAGI::App::Cascade;
-  use PAGI::App::File;
 
-  my $static = PAGI::App::File->new(root => './public')->to_app;
-  my $api = require './api.pl';
-  my $fallback = require './fallback.pl';
-
-  # Try static files first, then API, then fallback
   my $app = PAGI::App::Cascade->new(
       apps => [$static, $api, $fallback],
-      catch => [404, 405],  # Status codes to try next app on
+      catch => [404, 405],
   );
 
-  $app->to_app;
+=head2 5.6 PAGI::App::Proxy - Reverse Proxy
 
-Use cases:
+L<PAGI::App::Proxy> forwards requests to backend servers:
 
-=over 4
-
-=item * Serve static files if they exist, otherwise route to dynamic handler
-
-=item * Try multiple microservices until one handles the request
-
-=item * Implement feature flags (new handler with old handler fallback)
-
-=back
-
-=head2 6.5 PAGI::App::Proxy - Reverse Proxy
-
-L<PAGI::App::Proxy> forwards requests to backend servers.
-
-  use strict;
-  use warnings;
-  use PAGI::App::Router;
   use PAGI::App::Proxy;
 
-  my $router = PAGI::App::Router->new;
-
-  # Proxy all /api requests to backend
   my $proxy = PAGI::App::Proxy->new(
       backend => 'http://localhost:8080',
       timeout => 30,
-      headers => {
-          'X-Request-ID' => 'generated-id',
-      },
   );
-
   $router->mount('/api' => $proxy->to_app);
 
-  $router->to_app;
+=head2 5.7 PAGI::App::WrapPSGI - Use Existing PSGI Apps
 
-The proxy automatically adds:
+L<PAGI::App::WrapPSGI> lets you use existing PSGI applications:
 
-=over 4
-
-=item * X-Forwarded-For (client IP)
-
-=item * X-Forwarded-Proto (http/https)
-
-=back
-
-=head2 6.6 PAGI::App::WrapPSGI - Use Existing PSGI Apps
-
-L<PAGI::App::WrapPSGI> lets you use existing PSGI applications with PAGI.
-
-  use strict;
-  use warnings;
-  use PAGI::App::Router;
   use PAGI::App::WrapPSGI;
 
-  # Your existing PSGI app (or from a framework like Dancer2)
-  my $legacy_psgi = sub {
-      my ($env) = @_;
-      return [200, ['Content-Type' => 'text/plain'], ['Hello from PSGI!']];
-  };
-
-  # Wrap it for PAGI
-  my $wrapped = PAGI::App::WrapPSGI->new(
-      psgi_app => $legacy_psgi,
-  );
-
-  my $router = PAGI::App::Router->new;
+  my $wrapped = PAGI::App::WrapPSGI->new(psgi_app => $legacy_app);
   $router->mount('/legacy' => $wrapped->to_app);
 
-  $router->to_app;
+Useful for incremental migration from PSGI to PAGI.
 
-This is useful for:
+=head1 PART 6: REFERENCE
 
-=over 4
-
-=item * Migrating from PSGI to PAGI incrementally
-
-=item * Using existing PSGI middleware or frameworks
-
-=item * Running legacy apps alongside new PAGI endpoints
-
-=back
-
-=head1 PART 7: REAL-WORLD PATTERNS
-
-=head2 7.1 Background Tasks
-
-Web requests should respond quickly. Long-running work should be done in the background.
-
-=head3 Pattern 1: Fire-and-Forget Async I/O
-
-For non-blocking operations (async HTTP calls, async database queries), use C<< ->retain() >> to prevent "lost future" warnings:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Simulated async email service
-  async sub send_welcome_email {
-      my ($email) = @_;
-      # In reality: await $http_client->post_async($email_api, ...);
-      await IO::Async::Loop->new->delay_future(after => 2);
-      warn "Email sent to $email\n";
-  }
-
-  $router->post('/signup' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-
-      # Respond immediately
-      await $res->status(201)->json({ status => 'created' });
-
-      # Fire-and-forget: retain() prevents GC and warnings
-      send_welcome_email('user@example.com')->retain();
-  });
-
-  $router->to_app;
-
-=head3 Pattern 2: CPU-Bound Work in Subprocess
-
-For blocking or CPU-intensive work, use L<IO::Async::Function> to run in a child process:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use IO::Async::Function;
-  use IO::Async::Loop;
-  use PAGI::App::Router;
-  use PAGI::Response;
-
-  my $loop = IO::Async::Loop->new;
-
-  # Worker runs code in subprocess
-  my $pdf_worker = IO::Async::Function->new(
-      code => sub {
-          my ($data) = @_;
-          # This blocking code runs in a CHILD PROCESS
-          # It doesn't block the main event loop
-          sleep 5;  # Simulate heavy work
-          return "PDF generated for $data";
-      },
-  );
-  $loop->add($pdf_worker);
-
-  my $router = PAGI::App::Router->new;
-
-  $router->post('/generate-pdf' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-
-      # Option A: Wait for result (blocks this request only)
-      my $result = await $pdf_worker->call(args => ['report']);
-      await $res->json({ result => $result });
-
-      # Option B: Fire-and-forget (respond immediately)
-      # my $f = $pdf_worker->call(args => ['report']);
-      # $f->on_done(sub { warn "PDF ready: $_[0]\n" });
-      # $f->on_fail(sub { warn "PDF failed: $_[0]\n" });
-      # $f->retain();
-      # await $res->json({ status => 'processing' });
-  });
-
-  $router->to_app;
-
-B<Warning:> IO::Async::Function forks child processes. If running with C<--workers N>, each server worker forks its own Function workers. With 4 server workers and 2 Function workers each, you have 12 processes. For high-volume CPU work, consider a dedicated job queue instead.
-
-See C<examples/background-tasks/> for complete working examples.
-
-=head2 7.2 Form Handling
-
-=head3 URL-Encoded Forms
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      if ($req->method eq 'POST') {
-          my $form = await $req->form;
-          my $username = $form->{username};
-          my $password = $form->{password};
-
-          # Validate and process...
-          await $res->redirect('/dashboard');
-      }
-      else {
-          await $res->html(<<'HTML');
-  <form method="POST">
-      <input name="username" placeholder="Username">
-      <input name="password" type="password" placeholder="Password">
-      <button type="submit">Login</button>
-  </form>
-  HTML
-      }
-  }
-
-  \&app;
-
-=head3 File Uploads (Multipart)
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  async sub app {
-      my ($scope, $receive, $send) = @_;
-
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      if ($req->method eq 'POST') {
-          my $uploads = await $req->uploads;
-
-          for my $upload (@$uploads) {
-              my $filename = $upload->filename;
-              my $size = $upload->size;
-              my $type = $upload->content_type;
-
-              # Save to disk
-              $upload->save_to('/uploads/' . $filename);
-
-              # Or read content
-              # my $content = $upload->content;
-          }
-
-          await $res->json({ uploaded => scalar(@$uploads) });
-      }
-      else {
-          await $res->html(<<'HTML');
-  <form method="POST" enctype="multipart/form-data">
-      <input type="file" name="file" multiple>
-      <button type="submit">Upload</button>
-  </form>
-  HTML
-      }
-  }
-
-  \&app;
-
-See C<examples/10-forms-and-uploads/> for complete examples.
-
-=head2 7.3 Sessions
-
-Use L<PAGI::Middleware::Session> for session management:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Middleware::Session;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Add session middleware
-  $router->use(PAGI::Middleware::Session->new(
-      secret => 'your-secret-key-here',
-      cookie_name => 'session_id',
-      expires => 86400,  # 1 day
-  ));
-
-  $router->get('/login' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Set session data
-      $req->session->{user_id} = 123;
-      $req->session->{username} = 'alice';
-
-      await $res->text('Logged in!');
-  });
-
-  $router->get('/profile' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Read session data
-      my $username = $req->session->{username} // 'Guest';
-
-      await $res->text("Hello, $username!");
-  });
-
-  $router->get('/logout' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # Clear session
-      $req->session({});
-
-      await $res->text('Logged out!');
-  });
-
-  $router->to_app;
-
-=head2 7.4 Authentication
-
-=head3 Basic Auth
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Middleware::BasicAuth;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Protect routes with Basic Auth
-  $router->use(PAGI::Middleware::BasicAuth->new(
-      realm => 'Admin Area',
-      authenticator => sub {
-          my ($username, $password) = @_;
-          return $username eq 'admin' && $password eq 'secret';
-      },
-  ));
-
-  $router->get('/' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $res = PAGI::Response->new($send);
-      await $res->text('Protected content');
-  });
-
-  $router->to_app;
-
-=head3 Bearer Token (JWT)
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::Middleware::Auth::Bearer;
-  use PAGI::Request;
-  use PAGI::Response;
-
-  my $router = PAGI::App::Router->new;
-
-  # Verify JWT tokens
-  $router->use(PAGI::Middleware::Auth::Bearer->new(
-      validate => sub {
-          my ($token) = @_;
-          # Return user data if valid, undef if not
-          return decode_jwt($token);  # Your JWT decode logic
-      },
-  ));
-
-  $router->get('/api/me' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $req = PAGI::Request->new($scope, $receive);
-      my $res = PAGI::Response->new($send);
-
-      # User data from validated token
-      my $user = $req->stash->{user};
-
-      await $res->json({ user => $user });
-  });
-
-  $router->to_app;
-
-=head2 7.5 PubSub for WebSocket
-
-For real-time features with multiple WebSocket clients:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::WebSocket;
-  use PAGI::Server::PubSub;
-
-  my $pubsub = PAGI::Server::PubSub->new;
-  my $router = PAGI::App::Router->new;
-
-  $router->websocket('/chat/:room' => async sub {
-      my ($scope, $receive, $send) = @_;
-      my $ws = PAGI::WebSocket->new($scope, $receive, $send);
-      my $room = $scope->{'pagi.params'}{room};
-
-      await $ws->accept;
-
-      # Subscribe to room
-      my $sub = $pubsub->subscribe($room, sub {
-          my ($message) = @_;
-          $ws->try_send_text($message);
-      });
-
-      # Broadcast received messages
-      await $ws->each_text(sub {
-          my ($text) = @_;
-          $pubsub->publish($room, $text);
-      });
-
-      # Unsubscribe on disconnect
-      $pubsub->unsubscribe($room, $sub);
-  });
-
-  $router->to_app;
-
-B<Important:> L<PAGI::Server::PubSub> is in-memory only and works within a single process. For multi-worker or multi-server deployments, use Redis pub/sub or a message broker.
-
-See C<examples/websocket-chat/> for a complete chat application example.
-
-=head2 7.6 SSE Dashboard
-
-Server-Sent Events are ideal for real-time dashboards:
-
-  use strict;
-  use warnings;
-  use Future::AsyncAwait;
-  use PAGI::App::Router;
-  use PAGI::SSE;
-
-  my $router = PAGI::App::Router->new;
-
-  $router->get('/events' => async sub {
-      my ($scope, $receive, $send) = @_;
-
-      my $sse = PAGI::SSE->new($scope, $receive, $send);
-      await $sse->start;
-
-      # Enable keepalive to prevent timeout
-      $sse->keepalive(15);
-
-      # Send updates every second
-      await $sse->every(1, async sub {
-          await $sse->send_json({
-              cpu => rand(100),
-              memory => rand(100),
-              requests => int(rand(1000)),
-              timestamp => time(),
-          }, event => 'metrics');
-      });
-  });
-
-  $router->to_app;
-
-JavaScript client:
-
-  const events = new EventSource('/events');
-
-  events.addEventListener('metrics', (e) => {
-      const data = JSON.parse(e.data);
-      document.getElementById('cpu').textContent = data.cpu.toFixed(1) + '%';
-      document.getElementById('memory').textContent = data.memory.toFixed(1) + '%';
-  });
-
-See C<examples/sse-dashboard/> for a complete dashboard example.
-
-=head2 7.7 TLS/HTTPS
-
-L<PAGI::Server> supports TLS natively:
-
-  pagi-server app.pl --port 443 \
-      --tls-cert /path/to/cert.pem \
-      --tls-key /path/to/key.pem
-
-For development, generate a self-signed certificate:
-
-  openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem \
-      -days 365 -nodes -subj '/CN=localhost'
-
-  pagi-server app.pl --port 3443 \
-      --tls-cert cert.pem --tls-key key.pem
-
-Then access via C<https://localhost:3443> (browser will warn about self-signed cert).
-
-See C<examples/11-tls-https/> for more TLS configuration options.
-
-=head2 7.8 Testing PAGI Applications
-
-Test PAGI apps directly without a running server:
-
-  use strict;
-  use warnings;
-  use Test2::V0;
-  use Future::AsyncAwait;
-
-  # Load your app
-  my $app = require './app.pl';
-
-  # Test helper to create scope and capture response
-  async sub test_request {
-      my (%opts) = @_;
-
-      my $scope = {
-          type         => 'http',
-          method       => $opts{method} // 'GET',
-          path         => $opts{path} // '/',
-          query_string => $opts{query} // '',
-          headers      => $opts{headers} // [],
-      };
-
-      my @body_parts = defined $opts{body} ? ($opts{body}) : ();
-      my $body_sent = 0;
-
-      my $receive = async sub {
-          if (@body_parts) {
-              return {
-                  type => 'http.request',
-                  body => shift @body_parts,
-                  more => scalar(@body_parts) > 0,
-              };
-          }
-          return { type => 'http.disconnect' };
-      };
-
-      my %response = (status => undef, headers => [], body => '');
-      my $send = async sub {
-          my ($event) = @_;
-          if ($event->{type} eq 'http.response.start') {
-              $response{status} = $event->{status};
-              $response{headers} = $event->{headers};
-          }
-          elsif ($event->{type} eq 'http.response.body') {
-              $response{body} .= $event->{body} // '';
-          }
-      };
-
-      await $app->($scope, $receive, $send);
-      return \%response;
-  }
-
-  # Tests
-  subtest 'GET /' => async sub {
-      my $res = await test_request(path => '/');
-      is $res->{status}, 200, 'status is 200';
-      like $res->{body}, qr/Hello/, 'body contains Hello';
-  };
-
-  subtest 'POST /api/users' => async sub {
-      my $res = await test_request(
-          method => 'POST',
-          path => '/api/users',
-          headers => [['content-type', 'application/json']],
-          body => '{"name":"Alice"}',
-      );
-      is $res->{status}, 201, 'status is 201';
-  };
-
-  done_testing;
-
-=head1 PART 8: REFERENCE
-
-=head2 8.1 Scope Reference
+=head2 6.1 Scope Reference
 
 The C<$scope> hashref contains connection metadata:
 
@@ -4610,7 +2113,7 @@ The event loop is B<not> part of C<$scope>. To access it, use the L<IO::Async::L
   use IO::Async::Loop;
   my $loop = IO::Async::Loop->new;  # Returns cached singleton
 
-This works because L<IO::Async::Loop> caches the loop instance - calling C<< ->new >> always returns the same loop that the server created at startup.
+This works because L<IO::Async::Loop> caches the loop instance.
 
 =head3 Common Fields (All Types)
 
@@ -4650,7 +2153,7 @@ This works because L<IO::Async::Loop> caches the loop instance - calling C<< ->n
 
   $scope->{type}         # 'lifespan'
 
-=head2 8.2 Event Reference
+=head2 6.2 Event Reference
 
 =head3 HTTP Events
 
@@ -4712,6 +2215,8 @@ You've covered the essentials! For more information:
 
 =over 4
 
+=item * L<PAGI::Cookbook> - Recipes for routing, authentication, real-time patterns, and more
+
 =item * Browse C<examples/> for complete working applications
 
 =item * Check individual module documentation (L<PAGI::Response>, L<PAGI::WebSocket>, etc.)
@@ -4726,13 +2231,17 @@ You've covered the essentials! For more information:
 
 =item * L<PAGI> - Main PAGI documentation
 
+=item * L<PAGI::Cookbook> - Recipes for common tasks
+
 =item * L<PAGI::Server> - Reference async HTTP server
 
 =item * L<PAGI::Request> - Request object with automatic UTF-8 handling
 
 =item * L<PAGI::Response> - Response object with automatic UTF-8 handling
 
-=item * L<PAGI::Endpoint::Router> - High-level routing framework
+=item * L<PAGI::App::Router> - Functional routing
+
+=item * L<PAGI::Endpoint::Router> - Class-based routing framework
 
 =item * L<PAGI::WebSocket> - WebSocket utilities
 
@@ -4741,10 +2250,6 @@ You've covered the essentials! For more information:
 =item * L<Future::AsyncAwait> - Async/await syntax for Perl
 
 =item * L<IO::Async::Loop> - Event loop implementation
-
-=item * L<IO::Async::Function> - Running blocking code in worker processes
-
-=item * L<Encode> - UTF-8 encoding/decoding
 
 =back
 

@@ -1,5 +1,5 @@
 package Shipment::Activity;
-$Shipment::Activity::VERSION = '3.10';
+$Shipment::Activity::VERSION = '3.11';
 use strict;
 use warnings;
 
@@ -7,15 +7,15 @@ use warnings;
 use Shipment::Address;
 use Scalar::Util qw/blessed/;
 use Moo;
-use MooX::Types::MooseLike::Base qw(:all);
+use MooX::Types::MooseLike::Base     qw(:all);
 use MooX::Types::MooseLike::DateTime qw( DateAndTime );
-use Shipment::Base qw/coerce_datetime/;
+use Shipment::Base;
 use namespace::clean;
 
 
 has 'description' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
@@ -27,10 +27,9 @@ has 'date' => (
 
 
 has 'location' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Address'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Address'],
 );
-
 
 
 1;
@@ -47,7 +46,7 @@ Shipment::Activity
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

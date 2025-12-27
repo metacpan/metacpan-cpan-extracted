@@ -245,9 +245,10 @@ The `body`, `file`, and `fh` keys are **mutually exclusive** - exactly one MUST 
 
 When `file` or `fh` is provided, servers MUST stream the file contents efficiently:
 
-- Servers SHOULD use `sendfile()` or similar zero-copy mechanisms when available
-- Servers MAY fall back to chunked read/write if `sendfile()` is unavailable or inappropriate
+- Servers SHOULD stream large files in chunks to avoid memory bloat
+- Servers MAY use zero-copy mechanisms (sendfile, splice) when appropriate
 - The `offset` and `length` keys enable range request support (e.g., HTTP 206 Partial Content)
+- For production file serving, consider using XSendfile middleware to delegate to a reverse proxy
 - When using `file`, the server opens the file, streams it, and closes it
 - When using `fh`, the application retains ownership and **MUST** close the handle after the `$send->()` Future completes
 

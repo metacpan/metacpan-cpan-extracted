@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::Option;
-$Shipment::Purolator::WSDL::Types::Option::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::Option::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,54 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ID_of :ATTR(:get<ID>);
-my %Description_of :ATTR(:get<Description>);
-my %ValueType_of :ATTR(:get<ValueType>);
-my %AvailableForPieces_of :ATTR(:get<AvailableForPieces>);
-my %PossibleValues_of :ATTR(:get<PossibleValues>);
-my %ChildServiceOptions_of :ATTR(:get<ChildServiceOptions>);
+    my %ID_of                  : ATTR(:get<ID>);
+    my %Description_of         : ATTR(:get<Description>);
+    my %ValueType_of           : ATTR(:get<ValueType>);
+    my %AvailableForPieces_of  : ATTR(:get<AvailableForPieces>);
+    my %PossibleValues_of      : ATTR(:get<PossibleValues>);
+    my %ChildServiceOptions_of : ATTR(:get<ChildServiceOptions>);
 
-__PACKAGE__->_factory(
-    [ qw(        ID
-        Description
-        ValueType
-        AvailableForPieces
-        PossibleValues
-        ChildServiceOptions
+    __PACKAGE__->_factory(
+        [   qw(        ID
+              Description
+              ValueType
+              AvailableForPieces
+              PossibleValues
+              ChildServiceOptions
 
-    ) ],
-    {
-        'ID' => \%ID_of,
-        'Description' => \%Description_of,
-        'ValueType' => \%ValueType_of,
-        'AvailableForPieces' => \%AvailableForPieces_of,
-        'PossibleValues' => \%PossibleValues_of,
-        'ChildServiceOptions' => \%ChildServiceOptions_of,
-    },
-    {
-        'ID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ValueType' => 'Shipment::Purolator::WSDL::Types::ValueType',
-        'AvailableForPieces' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'PossibleValues' => 'Shipment::Purolator::WSDL::Types::ArrayOfOptionValue',
-        'ChildServiceOptions' => 'Shipment::Purolator::WSDL::Types::ArrayOfOption',
-    },
-    {
+            )
+        ],
+        {   'ID'                  => \%ID_of,
+            'Description'         => \%Description_of,
+            'ValueType'           => \%ValueType_of,
+            'AvailableForPieces'  => \%AvailableForPieces_of,
+            'PossibleValues'      => \%PossibleValues_of,
+            'ChildServiceOptions' => \%ChildServiceOptions_of,
+        },
+        {   'ID'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ValueType'   => 'Shipment::Purolator::WSDL::Types::ValueType',
+            'AvailableForPieces' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'PossibleValues' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfOptionValue',
+            'ChildServiceOptions' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfOption',
+        },
+        {
 
-        'ID' => 'ID',
-        'Description' => 'Description',
-        'ValueType' => 'ValueType',
-        'AvailableForPieces' => 'AvailableForPieces',
-        'PossibleValues' => 'PossibleValues',
-        'ChildServiceOptions' => 'ChildServiceOptions',
-    }
-);
+            'ID'                  => 'ID',
+            'Description'         => 'Description',
+            'ValueType'           => 'ValueType',
+            'AvailableForPieces'  => 'AvailableForPieces',
+            'PossibleValues'      => 'PossibleValues',
+            'ChildServiceOptions' => 'ChildServiceOptions',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +84,7 @@ Shipment::Purolator::WSDL::Types::Option
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

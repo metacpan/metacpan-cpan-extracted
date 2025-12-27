@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest;
-$Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,59 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %ShipTimestamp_of :ATTR(:get<ShipTimestamp>);
-my %TrackingId_of :ATTR(:get<TrackingId>);
-my %DeletionControl_of :ATTR(:get<DeletionControl>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of            : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of       : ATTR(:get<TransactionDetail>);
+    my %Version_of                 : ATTR(:get<Version>);
+    my %ShipTimestamp_of           : ATTR(:get<ShipTimestamp>);
+    my %TrackingId_of              : ATTR(:get<TrackingId>);
+    my %DeletionControl_of         : ATTR(:get<DeletionControl>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        ShipTimestamp
-        TrackingId
-        DeletionControl
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              ShipTimestamp
+              TrackingId
+              DeletionControl
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'ShipTimestamp' => \%ShipTimestamp_of,
-        'TrackingId' => \%TrackingId_of,
-        'DeletionControl' => \%DeletionControl_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::ShipTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::ShipTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::ShipTypes::VersionId',
-        'ShipTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'TrackingId' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
-        'DeletionControl' => 'Shipment::FedEx::WSDL::ShipTypes::DeletionControlType',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'ShipTimestamp'           => \%ShipTimestamp_of,
+            'TrackingId'              => \%TrackingId_of,
+            'DeletionControl'         => \%DeletionControl_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::WebAuthenticationDetail',
+            'ClientDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::TransactionDetail',
+            'Version'       => 'Shipment::FedEx::WSDL::ShipTypes::VersionId',
+            'ShipTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'TrackingId'    => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
+            'DeletionControl' =>
+              'Shipment::FedEx::WSDL::ShipTypes::DeletionControlType',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'ShipTimestamp' => 'ShipTimestamp',
-        'TrackingId' => 'TrackingId',
-        'DeletionControl' => 'DeletionControl',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'ShipTimestamp'           => 'ShipTimestamp',
+            'TrackingId'              => 'TrackingId',
+            'DeletionControl'         => 'DeletionControl',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +89,7 @@ Shipment::FedEx::WSDL::ShipTypes::DeleteShipmentRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

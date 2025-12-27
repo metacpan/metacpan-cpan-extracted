@@ -292,7 +292,7 @@ subtest 'Single-worker mode graceful shutdown' => sub {
         # In current code, this should abort the request
         # After fix, request should complete
 
-        $server->shutdown->retain;
+        $server->adopt_future($server->shutdown);
 
         # Give the server time to process
         my $timeout = time() + 3;

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria;
-$Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ManifestDate_of :ATTR(:get<ManifestDate>);
+    my %ManifestDate_of : ATTR(:get<ManifestDate>);
 
-__PACKAGE__->_factory(
-    [ qw(        ManifestDate
+    __PACKAGE__->_factory(
+        [   qw(        ManifestDate
 
-    ) ],
-    {
-        'ManifestDate' => \%ManifestDate_of,
-    },
-    {
-        'ManifestDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {'ManifestDate' => \%ManifestDate_of,},
+        {'ManifestDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
+        {
 
-        'ManifestDate' => 'ManifestDate',
-    }
-);
+            'ManifestDate' => 'ManifestDate',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ShipmentManifestDocumentCriteria
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

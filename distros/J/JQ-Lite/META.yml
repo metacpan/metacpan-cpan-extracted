@@ -33,7 +33,7 @@ requires:
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kawamurashingo/JQ-Lite/issues
-  homepage: https://kawamurashingo.github.io/JQ-Lite/index-en.html
+  homepage: https://kawamurashingo.github.io/JQ-Lite/
   repository: https://github.com/kawamurashingo/JQ-Lite.git
-version: '1.60'
+version: '1.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

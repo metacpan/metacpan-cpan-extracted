@@ -20,7 +20,7 @@ PAGI::Response - Fluent response builder for PAGI applications
 
     # Basic usage in a raw PAGI app
     async sub app ($scope, $receive, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         # Fluent chaining - set status, headers, then send
         await $res->status(200)
@@ -64,12 +64,27 @@ Attempting to call a finisher method twice will throw an error.
 
 =head2 new
 
-    my $res = PAGI::Response->new($send);
-    my $res = PAGI::Response->new($send, $scope);
+    my $res = PAGI::Response->new($scope, $send);
 
-Creates a new response builder. The C<$send> parameter must be a coderef
-(the PAGI send callback). The optional C<$scope> parameter is the PAGI
-scope hashref, needed for route parameter access.
+Creates a new response builder.
+
+=over 4
+
+=item C<$send> - Required. The PAGI send callback (coderef).
+
+=item C<$scope> - Required. The PAGI scope hashref.
+
+=back
+
+The scope is required because PAGI::Response stores the "response sent" flag
+in C<< $scope->{'pagi.response.sent'} >>. This ensures that if multiple
+Response objects are created from the same scope (e.g., in middleware chains),
+they all share the same "sent" state and prevent double-sending responses.
+
+B<Note:> Per-object state like C<status> and C<headers> is NOT shared between
+Response objects. Only the "sent" flag is shared via scope. This matches the
+ASGI pattern where middleware wraps the C<$send> callable to intercept/modify
+responses, and Response objects build their own status/headers before sending.
 
 =head1 CHAINABLE METHODS
 
@@ -308,8 +323,9 @@ with C<write($chunk)>, C<close()>, and C<bytes_written()> methods.
     );
 
 Send a file as the response. This method uses the PAGI protocol's C<file>
-key, enabling efficient server-side streaming via C<sendfile()> or similar
-zero-copy mechanisms. The file is B<not> read into memory.
+key for efficient server-side streaming. The file is B<not> read into memory.
+For production, use L<PAGI::Middleware::XSendfile> to delegate file serving
+to your reverse proxy.
 
 B<Options:>
 
@@ -329,7 +345,7 @@ B<Range Request Example:>
 
     # Manual range request handling
     async sub handle_video ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         my $path = '/videos/movie.mp4';
         my $size = -s $path;
 
@@ -370,7 +386,7 @@ use L<PAGI::App::File> instead:
             if $scope->{type} eq 'lifespan';
 
         my $req = PAGI::Request->new($scope, $receive);
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         if ($req->method eq 'GET' && $req->path eq '/') {
             return await $res->html('<h1>Welcome</h1>');
@@ -390,7 +406,7 @@ use L<PAGI::App::File> instead:
 =head2 Form Validation with Error Response
 
     async sub handle_contact ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         my $form = await $req->form;
 
         my @errors;
@@ -413,7 +429,7 @@ use L<PAGI::App::File> instead:
 =head2 Authentication with Cookies
 
     async sub handle_login ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         my $data = await $req->json;
 
         my $user = authenticate($data->{email}, $data->{password});
@@ -435,7 +451,7 @@ use L<PAGI::App::File> instead:
     }
 
     async sub handle_logout ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         return await $res->delete_cookie('session', path => '/')
                          ->json({ logged_out => 1 });
@@ -444,7 +460,7 @@ use L<PAGI::App::File> instead:
 =head2 File Download
 
     async sub handle_download ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         my $file_id = $req->path_param('id');
 
         my $file = get_file($file_id); # Be sure to clean $file
@@ -460,7 +476,7 @@ use L<PAGI::App::File> instead:
 =head2 Streaming Large Data
 
     async sub handle_export ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         await $res->content_type('text/csv')
                   ->header('Content-Disposition' => 'attachment; filename="export.csv"')
@@ -479,7 +495,7 @@ use L<PAGI::App::File> instead:
 =head2 Server-Sent Events Style Streaming
 
     async sub handle_events ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         await $res->content_type('text/event-stream')
                   ->header('Cache-Control' => 'no-cache')
@@ -494,7 +510,7 @@ use L<PAGI::App::File> instead:
 =head2 Conditional Responses
 
     async sub handle_resource ($req, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
         my $etag = '"abc123"';
 
         # Check If-None-Match for caching
@@ -512,7 +528,7 @@ use L<PAGI::App::File> instead:
 
     # Simple CORS - allow all origins
     async sub handle_api ($scope, $receive, $send) {
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         return await $res->cors->json({ status => 'ok' });
     }
@@ -520,7 +536,7 @@ use L<PAGI::App::File> instead:
     # CORS with credentials (e.g., cookies, auth headers)
     async sub handle_api_with_auth ($scope, $receive, $send) {
         my $req = PAGI::Request->new($scope, $receive);
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         # Get the Origin header from request
         my $origin = $req->header('Origin');
@@ -537,7 +553,7 @@ use L<PAGI::App::File> instead:
     # Handle OPTIONS preflight requests
     async sub app ($scope, $receive, $send) {
         my $req = PAGI::Request->new($scope, $receive);
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         # Handle preflight
         if ($req->method eq 'OPTIONS') {
@@ -569,7 +585,7 @@ use L<PAGI::App::File> instead:
 
     async sub handle_api ($scope, $receive, $send) {
         my $req = PAGI::Request->new($scope, $receive);
-        my $res = PAGI::Response->new($send);
+        my $res = PAGI::Response->new($scope, $send);
 
         my $request_origin = $req->header('Origin') // '';
 
@@ -626,14 +642,26 @@ on what kind of work you're doing:
 =head3 Pattern 1: Fire-and-Forget Async I/O (Non-Blocking)
 
 For async operations (HTTP calls, database queries using async drivers),
-call them without C<await> and use C<< ->retain() >> to prevent the
-"lost future" warning:
+call them without C<await>, add C<< ->on_fail() >> for error handling,
+then C<< ->retain() >> to prevent the "lost future" warning:
 
     await $res->json({ status => 'queued' });
 
-    # Fire-and-forget: retain() prevents GC warning
-    send_async_email($user)->retain();
-    log_to_analytics($event)->retain();
+    # Fire-and-forget with error handling
+    # IMPORTANT: Always add on_fail() before retain() to avoid silent failures
+    send_async_email($user)
+        ->on_fail(sub { warn "Email failed: @_" })
+        ->retain();
+    log_to_analytics($event)
+        ->on_fail(sub { warn "Analytics failed: @_" })
+        ->retain();
+
+B<Warning:> Using C<< ->retain() >> alone silently swallows errors.
+
+B<Note:> If you're writing middleware or server extensions that inherit from
+L<IO::Async::Notifier>, prefer C<< $self->adopt_future($f) >> instead of
+C<< ->retain() >>. The C<adopt_future> method properly tracks futures and
+propagates errors to the notifier's error handling.
 
 =head3 Pattern 2: Blocking/CPU Work (IO::Async::Function)
 
@@ -687,7 +715,8 @@ PAGI Contributors
 =cut
 
 sub new {
-    my ($class, $send, $scope) = @_;
+    my ($class, $scope, $send) = @_;
+    croak("scope is required") unless $scope && ref($scope) eq 'HASH';
     croak("send is required") unless $send;
     croak("send must be a coderef") unless ref($send) eq 'CODE';
 
@@ -696,7 +725,6 @@ sub new {
         scope   => $scope,
         _status => 200,
         _headers => [],
-        _sent   => 0,
     }, $class;
 
     return $self;
@@ -764,13 +792,18 @@ sub stash {
 
 sub is_sent {
     my ($self) = @_;
-    return $self->{_sent} ? 1 : 0;
+    return $self->{scope}{'pagi.response.sent'} ? 1 : 0;
+}
+
+sub _mark_sent {
+    my ($self) = @_;
+    croak("Response already sent") if $self->{scope}{'pagi.response.sent'};
+    $self->{scope}{'pagi.response.sent'} = 1;
 }
 
 async sub send_raw {
     my ($self, $body) = @_;
-    croak("Response already sent") if $self->{_sent};
-    $self->{_sent} = 1;
+    $self->_mark_sent;
 
     # Send start
     await $self->{send}->({
@@ -964,8 +997,7 @@ package PAGI::Response;
 
 async sub stream {
     my ($self, $callback) = @_;
-    croak("Response already sent") if $self->{_sent};
-    $self->{_sent} = 1;
+    $self->_mark_sent;
 
     # Send start
     await $self->{send}->({
@@ -1055,8 +1087,7 @@ async sub send_file {
     }
     $self->header('content-disposition', $disposition) if $disposition;
 
-    croak("Response already sent") if $self->{_sent};
-    $self->{_sent} = 1;
+    $self->_mark_sent;
 
     # Send response start
     await $self->{send}->({
@@ -1066,7 +1097,6 @@ async sub send_file {
     });
 
     # Use PAGI file protocol for efficient server-side streaming
-    # Server will use sendfile() or similar zero-copy mechanism
     my $body_event = {
         type => 'http.response.body',
         file => $path,

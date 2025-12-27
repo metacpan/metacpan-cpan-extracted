@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType;
-$Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,56 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CarrierId_of :ATTR(:get<CarrierId>);
-my %Description_of :ATTR(:get<Description>);
-my %Status_of :ATTR(:get<Status>);
-my %Arrival_of :ATTR(:get<Arrival>);
-my %Departure_of :ATTR(:get<Departure>);
-my %OriginPort_of :ATTR(:get<OriginPort>);
-my %DestinationPort_of :ATTR(:get<DestinationPort>);
+    my %CarrierId_of       : ATTR(:get<CarrierId>);
+    my %Description_of     : ATTR(:get<Description>);
+    my %Status_of          : ATTR(:get<Status>);
+    my %Arrival_of         : ATTR(:get<Arrival>);
+    my %Departure_of       : ATTR(:get<Departure>);
+    my %OriginPort_of      : ATTR(:get<OriginPort>);
+    my %DestinationPort_of : ATTR(:get<DestinationPort>);
 
-__PACKAGE__->_factory(
-    [ qw(        CarrierId
-        Description
-        Status
-        Arrival
-        Departure
-        OriginPort
-        DestinationPort
+    __PACKAGE__->_factory(
+        [   qw(        CarrierId
+              Description
+              Status
+              Arrival
+              Departure
+              OriginPort
+              DestinationPort
 
-    ) ],
-    {
-        'CarrierId' => \%CarrierId_of,
-        'Description' => \%Description_of,
-        'Status' => \%Status_of,
-        'Arrival' => \%Arrival_of,
-        'Departure' => \%Departure_of,
-        'OriginPort' => \%OriginPort_of,
-        'DestinationPort' => \%DestinationPort_of,
-    },
-    {
-        'CarrierId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Status' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Arrival' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-        'Departure' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-        'OriginPort' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DestinationPort' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'CarrierId'       => \%CarrierId_of,
+            'Description'     => \%Description_of,
+            'Status'          => \%Status_of,
+            'Arrival'         => \%Arrival_of,
+            'Departure'       => \%Departure_of,
+            'OriginPort'      => \%OriginPort_of,
+            'DestinationPort' => \%DestinationPort_of,
+        },
+        {   'CarrierId'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Status'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Arrival'     => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+            'Departure'   => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+            'OriginPort'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DestinationPort' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'CarrierId' => 'CarrierId',
-        'Description' => 'Description',
-        'Status' => 'Status',
-        'Arrival' => 'Arrival',
-        'Departure' => 'Departure',
-        'OriginPort' => 'OriginPort',
-        'DestinationPort' => 'DestinationPort',
-    }
-);
+            'CarrierId'       => 'CarrierId',
+            'Description'     => 'Description',
+            'Status'          => 'Status',
+            'Arrival'         => 'Arrival',
+            'Departure'       => 'Departure',
+            'OriginPort'      => 'OriginPort',
+            'DestinationPort' => 'DestinationPort',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +86,7 @@ Shipment::UPS::WSDL::TrackTypes::CarrierActivityInformationType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

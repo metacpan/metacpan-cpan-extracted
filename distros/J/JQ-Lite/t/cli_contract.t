@@ -79,6 +79,17 @@ sub assert_err_contract {
     );
 }
 
+# Compile error: empty filter segment
+{
+    my $res = run_cmd(cmd => [$BIN, '.foo |'], stdin => "{}\n");
+    assert_err_contract(
+        res    => $res,
+        rc     => 2,
+        prefix => '[COMPILE]',
+        name   => 'compile error: empty filter segment',
+    );
+}
+
 # Runtime error
 {
     my $res = run_cmd(
@@ -90,6 +101,20 @@ sub assert_err_contract {
         rc     => 3,
         prefix => '[RUNTIME]',
         name   => 'runtime error',
+    );
+}
+
+# Runtime error: keys on scalar
+{
+    my $res = run_cmd(
+        cmd   => [$BIN, 'keys'],
+        stdin => qq|null\n|,
+    );
+    assert_err_contract(
+        res    => $res,
+        rc     => 3,
+        prefix => '[RUNTIME]',
+        name   => 'runtime error: keys on scalar',
     );
 }
 
@@ -117,6 +142,22 @@ sub assert_err_contract {
         rc     => 5,
         prefix => '[USAGE]',
         name   => 'usage error: invalid --argjson',
+    );
+}
+
+# Usage error: unknown option
+{
+    my $res = run_cmd(cmd => [$BIN, '--bogus-option']);
+    assert_err_contract(
+        res    => $res,
+        rc     => 5,
+        prefix => '[USAGE]',
+        name   => 'usage error: unknown option',
+    );
+    like(
+        $res->{err},
+        qr/\[USAGE\]Unknown option: bogus-option\b/,
+        'usage error: unknown option message is prefixed and concise'
     );
 }
 

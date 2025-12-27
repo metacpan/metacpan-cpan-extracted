@@ -1,164 +1,164 @@
 
 package Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse;
-$Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::VERSION = '3.10';
+$Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
-
-__PACKAGE__->__set_name('makeBookingByRequestResponse');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
-
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %requestId_of :ATTR(:get<requestId>);
-my %bookingNumber_of :ATTR(:get<bookingNumber>);
-my %consignmentNumber_of :ATTR(:get<consignmentNumber>);
-my %consignmentDocument_of :ATTR(:get<consignmentDocument>);
-my %consignmentDocumentType_of :ATTR(:get<consignmentDocumentType>);
-my %labelDocument_of :ATTR(:get<labelDocument>);
-my %labelDocumentType_of :ATTR(:get<labelDocumentType>);
-my %anytime_of :ATTR(:get<anytime>);
-my %quote_of :ATTR(:get<quote>);
-my %manifestNumber_of :ATTR(:get<manifestNumber>);
-my %articles_of :ATTR(:get<articles>);
-
-__PACKAGE__->_factory(
-    [ qw(        requestId
-        bookingNumber
-        consignmentNumber
-        consignmentDocument
-        consignmentDocumentType
-        labelDocument
-        labelDocumentType
-        anytime
-        quote
-        manifestNumber
-        articles
-
-    ) ],
-    {
-        'requestId' => \%requestId_of,
-        'bookingNumber' => \%bookingNumber_of,
-        'consignmentNumber' => \%consignmentNumber_of,
-        'consignmentDocument' => \%consignmentDocument_of,
-        'consignmentDocumentType' => \%consignmentDocumentType_of,
-        'labelDocument' => \%labelDocument_of,
-        'labelDocumentType' => \%labelDocumentType_of,
-        'anytime' => \%anytime_of,
-        'quote' => \%quote_of,
-        'manifestNumber' => \%manifestNumber_of,
-        'articles' => \%articles_of,
-    },
-    {
-        'requestId' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'bookingNumber' => 'Shipment::Temando::WSDL::Types::BookingNumber',
-        'consignmentNumber' => 'Shipment::Temando::WSDL::Types::ConsignmentNumber',
-        'consignmentDocument' => 'Shipment::Temando::WSDL::Types::ConsignmentDocument',
-        'consignmentDocumentType' => 'Shipment::Temando::WSDL::Types::ConsignmentDocumentType',
-        'labelDocument' => 'Shipment::Temando::WSDL::Types::LabelDocument',
-        'labelDocumentType' => 'Shipment::Temando::WSDL::Types::LabelDocumentType',
-        'anytime' => 'Shipment::Temando::WSDL::Types::Anytime',
-        'quote' => 'Shipment::Temando::WSDL::Types::AvailableQuote',
-        'manifestNumber' => 'Shipment::Temando::WSDL::Types::ManifestNumber',
-
-        'articles' => 'Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles',
-    },
-    {
-
-        'requestId' => 'requestId',
-        'bookingNumber' => 'bookingNumber',
-        'consignmentNumber' => 'consignmentNumber',
-        'consignmentDocument' => 'consignmentDocument',
-        'consignmentDocumentType' => 'consignmentDocumentType',
-        'labelDocument' => 'labelDocument',
-        'labelDocumentType' => 'labelDocumentType',
-        'anytime' => 'anytime',
-        'quote' => 'quote',
-        'manifestNumber' => 'manifestNumber',
-        'articles' => 'articles',
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
     }
-);
 
-} # end BLOCK
+    __PACKAGE__->__set_name('makeBookingByRequestResponse');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-
-package Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles;
-$Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles::VERSION = '3.10';
-use strict;
-use warnings;
-{
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %article_of :ATTR(:get<article>);
-
-__PACKAGE__->_factory(
-    [ qw(        article
-
-    ) ],
-    {
-        'article' => \%article_of,
-    },
-    {
-        'article' => 'Shipment::Temando::WSDL::Types::Article',
-    },
-    {
-
-        'article' => 'article',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %requestId_of               : ATTR(:get<requestId>);
+        my %bookingNumber_of           : ATTR(:get<bookingNumber>);
+        my %consignmentNumber_of       : ATTR(:get<consignmentNumber>);
+        my %consignmentDocument_of     : ATTR(:get<consignmentDocument>);
+        my %consignmentDocumentType_of : ATTR(:get<consignmentDocumentType>);
+        my %labelDocument_of           : ATTR(:get<labelDocument>);
+        my %labelDocumentType_of       : ATTR(:get<labelDocumentType>);
+        my %anytime_of                 : ATTR(:get<anytime>);
+        my %quote_of                   : ATTR(:get<quote>);
+        my %manifestNumber_of          : ATTR(:get<manifestNumber>);
+        my %articles_of                : ATTR(:get<articles>);
+
+        __PACKAGE__->_factory(
+            [   qw(        requestId
+                  bookingNumber
+                  consignmentNumber
+                  consignmentDocument
+                  consignmentDocumentType
+                  labelDocument
+                  labelDocumentType
+                  anytime
+                  quote
+                  manifestNumber
+                  articles
+
+                )
+            ],
+            {   'requestId'               => \%requestId_of,
+                'bookingNumber'           => \%bookingNumber_of,
+                'consignmentNumber'       => \%consignmentNumber_of,
+                'consignmentDocument'     => \%consignmentDocument_of,
+                'consignmentDocumentType' => \%consignmentDocumentType_of,
+                'labelDocument'           => \%labelDocument_of,
+                'labelDocumentType'       => \%labelDocumentType_of,
+                'anytime'                 => \%anytime_of,
+                'quote'                   => \%quote_of,
+                'manifestNumber'          => \%manifestNumber_of,
+                'articles'                => \%articles_of,
+            },
+            {   'requestId' =>
+                  'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+                'bookingNumber' =>
+                  'Shipment::Temando::WSDL::Types::BookingNumber',
+                'consignmentNumber' =>
+                  'Shipment::Temando::WSDL::Types::ConsignmentNumber',
+                'consignmentDocument' =>
+                  'Shipment::Temando::WSDL::Types::ConsignmentDocument',
+                'consignmentDocumentType' =>
+                  'Shipment::Temando::WSDL::Types::ConsignmentDocumentType',
+                'labelDocument' =>
+                  'Shipment::Temando::WSDL::Types::LabelDocument',
+                'labelDocumentType' =>
+                  'Shipment::Temando::WSDL::Types::LabelDocumentType',
+                'anytime' => 'Shipment::Temando::WSDL::Types::Anytime',
+                'quote'   => 'Shipment::Temando::WSDL::Types::AvailableQuote',
+                'manifestNumber' =>
+                  'Shipment::Temando::WSDL::Types::ManifestNumber',
+
+                'articles' =>
+                  'Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles',
+            },
+            {
+
+                'requestId'               => 'requestId',
+                'bookingNumber'           => 'bookingNumber',
+                'consignmentNumber'       => 'consignmentNumber',
+                'consignmentDocument'     => 'consignmentDocument',
+                'consignmentDocumentType' => 'consignmentDocumentType',
+                'labelDocument'           => 'labelDocument',
+                'labelDocumentType'       => 'labelDocumentType',
+                'anytime'                 => 'anytime',
+                'quote'                   => 'quote',
+                'manifestNumber'          => 'manifestNumber',
+                'articles'                => 'articles',
+            }
+        );
+
+    }    # end BLOCK
 
 
+    package Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles;
+    $Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse::_articles::VERSION
+      = '3.11';
+    use strict;
+    use warnings;
+    {
+        our $XML_ATTRIBUTE_CLASS;
+        undef $XML_ATTRIBUTE_CLASS;
+
+        sub __get_attr_class {
+            return $XML_ATTRIBUTE_CLASS;
+        }
+
+        use Class::Std::Fast::Storable constructor => 'none';
+        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+        Class::Std::initialize();
+
+        {    # BLOCK to scope variables
+
+            my %article_of : ATTR(:get<article>);
+
+            __PACKAGE__->_factory(
+                [   qw(        article
+
+                    )
+                ],
+                {'article' => \%article_of,},
+                {'article' => 'Shipment::Temando::WSDL::Types::Article',},
+                {
+
+                    'article' => 'article',
+                }
+            );
+
+        }    # end BLOCK
 
 
+    }
 
 
-}
-
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -175,7 +175,7 @@ Shipment::Temando::WSDL::Elements::makeBookingByRequestResponse
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

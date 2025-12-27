@@ -1,5 +1,23 @@
 # This file documents the revision history for Perl extension PAGI
 
+0.001010 - 2025-12-26
+  - BREAKING: Removed sendfile() from PAGI::Server - use PAGI::Middleware::XSendfile
+    with nginx/Apache X-Sendfile/X-Accel-Redirect instead for large file serving
+  - Added handle_ranges option to PAGI::App::File for byte-range request support
+  - Added FreeBSD CI testing
+  - Documentation fixes for phantom module references
+
+0.001009 - 2025-12-26
+  - BREAKING: PAGI::Response constructor now takes ($scope, $send) instead of ($send, $scope)
+    for consistency with Request, SSE, and WebSocket APIs
+  - Added request_timeout for stalled requests, ws_idle_timeout and sse_idle_timeout
+    for idle connection cleanup (all disabled by default for performance)
+  - Test::Client: multi-value headers/query/form support, fixed arrayref headers with form/json
+  - Scope-based caching for Request, Response, SSE, WebSocket objects
+  - Replace retain() with adopt_future() for proper async error handling
+  - Added on_error callback to heartbeat and rate limit middleware
+  - Restructured Tutorial, added Cookbook for advanced patterns
+
 0.001008 - 2025-12-25
   - Fixed 32-bit Perl compatibility in WebSocket test (pack 'Q' → 'NN')
   - Fixed sendfile on non-blocking sockets for FreeBSD/BSD systems

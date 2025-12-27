@@ -4,13 +4,13 @@
       "Michael R. Davis (mdavis@stopllc.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Time-HiRes-Sleep-Until",
    "no_index" : {
@@ -52,5 +52,6 @@
          "web" : "https://github.com/mrdvt92/perl-Time-HiRes-Sleep-Until.git"
       }
    },
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

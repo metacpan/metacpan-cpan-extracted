@@ -1,81 +1,77 @@
 
 package Shipment::UPS::WSDL::RateElements::RateRequest;
-$Shipment::UPS::WSDL::RateElements::RateRequest::VERSION = '3.10';
+$Shipment::UPS::WSDL::RateElements::RateRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
-__PACKAGE__->__set_name('RateRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('RateRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Request_of :ATTR(:get<Request>);
-my %PickupType_of :ATTR(:get<PickupType>);
-my %CustomerClassification_of :ATTR(:get<CustomerClassification>);
-my %Shipment_of :ATTR(:get<Shipment>);
-
-__PACKAGE__->_factory(
-    [ qw(        Request
-        PickupType
-        CustomerClassification
-        Shipment
-
-    ) ],
-    {
-        'Request' => \%Request_of,
-        'PickupType' => \%PickupType_of,
-        'CustomerClassification' => \%CustomerClassification_of,
-        'Shipment' => \%Shipment_of,
-    },
-    {
-        'Request' => 'Shipment::UPS::WSDL::RateElements::Request',
-
-        'PickupType' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
-        'CustomerClassification' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
-        'Shipment' => 'Shipment::UPS::WSDL::RateTypes::ShipmentType',
-    },
-    {
-
-        'Request' => '',
-        'PickupType' => 'PickupType',
-        'CustomerClassification' => 'CustomerClassification',
-        'Shipment' => 'Shipment',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Request_of                : ATTR(:get<Request>);
+        my %PickupType_of             : ATTR(:get<PickupType>);
+        my %CustomerClassification_of : ATTR(:get<CustomerClassification>);
+        my %Shipment_of               : ATTR(:get<Shipment>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Request
+                  PickupType
+                  CustomerClassification
+                  Shipment
+
+                )
+            ],
+            {   'Request'                => \%Request_of,
+                'PickupType'             => \%PickupType_of,
+                'CustomerClassification' => \%CustomerClassification_of,
+                'Shipment'               => \%Shipment_of,
+            },
+            {   'Request' => 'Shipment::UPS::WSDL::RateElements::Request',
+
+                'PickupType' =>
+                  'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
+                'CustomerClassification' =>
+                  'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
+                'Shipment' => 'Shipment::UPS::WSDL::RateTypes::ShipmentType',
+            },
+            {
+
+                'Request'                => '',
+                'PickupType'             => 'PickupType',
+                'CustomerClassification' => 'CustomerClassification',
+                'Shipment'               => 'Shipment',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -92,7 +88,7 @@ Shipment::UPS::WSDL::RateElements::RateRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

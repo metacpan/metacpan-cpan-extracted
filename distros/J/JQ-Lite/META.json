@@ -53,13 +53,13 @@
       "bugtracker" : {
          "web" : "https://github.com/kawamurashingo/JQ-Lite/issues"
       },
-      "homepage" : "https://kawamurashingo.github.io/JQ-Lite/index-en.html",
+      "homepage" : "https://kawamurashingo.github.io/JQ-Lite/",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/kawamurashingo/JQ-Lite.git",
          "web" : "https://github.com/kawamurashingo/JQ-Lite"
       }
    },
-   "version" : "1.60",
+   "version" : "1.66",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

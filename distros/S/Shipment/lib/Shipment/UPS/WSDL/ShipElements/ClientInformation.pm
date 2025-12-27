@@ -1,22 +1,22 @@
 
 package Shipment::UPS::WSDL::ShipElements::ClientInformation;
-$Shipment::UPS::WSDL::ShipElements::ClientInformation::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipElements::ClientInformation::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0'}
 
-__PACKAGE__->__set_name('ClientInformation');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::UPS::WSDL::ShipTypes::ClientInformationType
-);
+    __PACKAGE__->__set_name('ClientInformation');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::UPS::WSDL::ShipTypes::ClientInformationType
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::UPS::WSDL::ShipElements::ClientInformation
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

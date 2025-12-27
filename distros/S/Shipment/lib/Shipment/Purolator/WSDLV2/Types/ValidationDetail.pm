@@ -1,12 +1,14 @@
 package Shipment::Purolator::WSDLV2::Types::ValidationDetail;
-$Shipment::Purolator::WSDLV2::Types::ValidationDetail::VERSION = '3.10';
+$Shipment::Purolator::WSDLV2::Types::ValidationDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://schemas.datacontract.org/2004/07/Microsoft.Practices.EnterpriseLibrary.Validation.Integration.WCF' };
+sub get_xmlns {
+    'http://schemas.datacontract.org/2004/07/Microsoft.Practices.EnterpriseLibrary.Validation.Integration.WCF';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +22,36 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Key_of :ATTR(:get<Key>);
-my %Message_of :ATTR(:get<Message>);
-my %Tag_of :ATTR(:get<Tag>);
+    my %Key_of     : ATTR(:get<Key>);
+    my %Message_of : ATTR(:get<Message>);
+    my %Tag_of     : ATTR(:get<Tag>);
 
-__PACKAGE__->_factory(
-    [ qw(        Key
-        Message
-        Tag
+    __PACKAGE__->_factory(
+        [   qw(        Key
+              Message
+              Tag
 
-    ) ],
-    {
-        'Key' => \%Key_of,
-        'Message' => \%Message_of,
-        'Tag' => \%Tag_of,
-    },
-    {
-        'Key' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Message' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Tag' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Key'     => \%Key_of,
+            'Message' => \%Message_of,
+            'Tag'     => \%Tag_of,
+        },
+        {   'Key'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Message' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Tag'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Key' => 'Key',
-        'Message' => 'Message',
-        'Tag' => 'Tag',
-    }
-);
+            'Key'     => 'Key',
+            'Message' => 'Message',
+            'Tag'     => 'Tag',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +68,7 @@ Shipment::Purolator::WSDLV2::Types::ValidationDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

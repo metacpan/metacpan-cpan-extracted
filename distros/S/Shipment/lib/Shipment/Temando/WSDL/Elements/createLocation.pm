@@ -1,70 +1,68 @@
 
 package Shipment::Temando::WSDL::Elements::createLocation;
-$Shipment::Temando::WSDL::Elements::createLocation::VERSION = '3.10';
+$Shipment::Temando::WSDL::Elements::createLocation::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
-
-__PACKAGE__->__set_name('createLocation');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
-
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %clientId_of :ATTR(:get<clientId>);
-my %location_of :ATTR(:get<location>);
-
-__PACKAGE__->_factory(
-    [ qw(        clientId
-        location
-
-    ) ],
-    {
-        'clientId' => \%clientId_of,
-        'location' => \%location_of,
-    },
-    {
-        'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
-        'location' => 'Shipment::Temando::WSDL::Types::Location',
-    },
-    {
-
-        'clientId' => 'clientId',
-        'location' => 'location',
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
     }
-);
 
-} # end BLOCK
+    __PACKAGE__->__set_name('createLocation');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
+
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
+
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
+    }
+
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %clientId_of : ATTR(:get<clientId>);
+        my %location_of : ATTR(:get<location>);
+
+        __PACKAGE__->_factory(
+            [   qw(        clientId
+                  location
+
+                )
+            ],
+            {   'clientId' => \%clientId_of,
+                'location' => \%location_of,
+            },
+            {   'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
+                'location' => 'Shipment::Temando::WSDL::Types::Location',
+            },
+            {
+
+                'clientId' => 'clientId',
+                'location' => 'location',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -81,7 +79,7 @@ Shipment::Temando::WSDL::Elements::createLocation
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

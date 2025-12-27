@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+SPLITPLAN.md
 bin/pagi-server
 cpanfile
 dist.ini
@@ -111,6 +112,7 @@ lib/PAGI/App/WebSocket/Chat.pm
 lib/PAGI/App/WebSocket/Echo.pm
 lib/PAGI/App/WrapCGI.pm
 lib/PAGI/App/WrapPSGI.pm
+lib/PAGI/Cookbook.pod
 lib/PAGI/Endpoint/HTTP.pm
 lib/PAGI/Endpoint/Router.pm
 lib/PAGI/Endpoint/SSE.pm
@@ -154,6 +156,7 @@ lib/PAGI/Middleware/TrustedHosts.pm
 lib/PAGI/Middleware/WebSocket/Compression.pm
 lib/PAGI/Middleware/WebSocket/Heartbeat.pm
 lib/PAGI/Middleware/WebSocket/RateLimit.pm
+lib/PAGI/Middleware/XSendfile.pm
 lib/PAGI/Request.pm
 lib/PAGI/Request/BodyStream.pm
 lib/PAGI/Request/MultiPartHandler.pm
@@ -204,6 +207,11 @@ t/23-connection-cleanup.t
 t/24-security-headers.t
 t/25-runner-production.t
 t/26-max-requests.t
+t/30-error-propagation.t
+t/31-memory-leak.t
+t/32-middleware-on-error.t
+t/32-request-timeout.t
+t/33-ws-sse-idle-timeout.t
 t/40-connection-limiting.t
 t/41-connection-limiting-stress.t
 t/42-file-response.t
@@ -252,6 +260,7 @@ t/middleware/11-url-handling.t
 t/middleware/12-protocol-specific.t
 t/middleware/13-development.t
 t/middleware/14-websocket-advanced.t
+t/middleware/15-xsendfile.t
 t/multipart-limits.t
 t/request-body-stream.t
 t/request-negotiate.t
@@ -299,6 +308,7 @@ t/test-client/03-websocket.t
 t/test-client/04-sse.t
 t/test-client/05-lifespan.t
 t/test-client/06-integration.t
+t/test-client/07-multi-value.t
 t/tls-optional.t
 t/utf8/01-raw-utf8.t
 t/util/01-async-file.t

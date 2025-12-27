@@ -14,7 +14,7 @@ use Carp;
 
 use Data::TagDB::Iterator;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 
 
@@ -102,7 +102,7 @@ Data::TagDB::Cloudlet - Work with Tag databases
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

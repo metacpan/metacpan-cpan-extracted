@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::TrackTypes::TrackDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,402 +20,484 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Notification_of :ATTR(:get<Notification>);
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-my %Barcode_of :ATTR(:get<Barcode>);
-my %TrackingNumberUniqueIdentifier_of :ATTR(:get<TrackingNumberUniqueIdentifier>);
-my %StatusDetail_of :ATTR(:get<StatusDetail>);
-my %CustomerExceptionRequests_of :ATTR(:get<CustomerExceptionRequests>);
-my %Reconciliation_of :ATTR(:get<Reconciliation>);
-my %ServiceCommitMessage_of :ATTR(:get<ServiceCommitMessage>);
-my %DestinationServiceArea_of :ATTR(:get<DestinationServiceArea>);
-my %DestinationServiceAreaDescription_of :ATTR(:get<DestinationServiceAreaDescription>);
-my %CarrierCode_of :ATTR(:get<CarrierCode>);
-my %OperatingCompany_of :ATTR(:get<OperatingCompany>);
-my %OperatingCompanyOrCarrierDescription_of :ATTR(:get<OperatingCompanyOrCarrierDescription>);
-my %CartageAgentCompanyName_of :ATTR(:get<CartageAgentCompanyName>);
-my %ProductionLocationContactAndAddress_of :ATTR(:get<ProductionLocationContactAndAddress>);
-my %OtherIdentifiers_of :ATTR(:get<OtherIdentifiers>);
-my %FormId_of :ATTR(:get<FormId>);
-my %Service_of :ATTR(:get<Service>);
-my %PackageWeight_of :ATTR(:get<PackageWeight>);
-my %PackageDimensions_of :ATTR(:get<PackageDimensions>);
-my %PackageDimensionalWeight_of :ATTR(:get<PackageDimensionalWeight>);
-my %ShipmentWeight_of :ATTR(:get<ShipmentWeight>);
-my %Packaging_of :ATTR(:get<Packaging>);
-my %PackagingType_of :ATTR(:get<PackagingType>);
-my %PackageSequenceNumber_of :ATTR(:get<PackageSequenceNumber>);
-my %PackageCount_of :ATTR(:get<PackageCount>);
-my %Charges_of :ATTR(:get<Charges>);
-my %NickName_of :ATTR(:get<NickName>);
-my %Notes_of :ATTR(:get<Notes>);
-my %Attributes_of :ATTR(:get<Attributes>);
-my %ShipmentContents_of :ATTR(:get<ShipmentContents>);
-my %PackageContents_of :ATTR(:get<PackageContents>);
-my %ClearanceLocationCode_of :ATTR(:get<ClearanceLocationCode>);
-my %Commodities_of :ATTR(:get<Commodities>);
-my %ReturnDetail_of :ATTR(:get<ReturnDetail>);
-my %CustomsOptionDetails_of :ATTR(:get<CustomsOptionDetails>);
-my %AdvanceNotificationDetail_of :ATTR(:get<AdvanceNotificationDetail>);
-my %SpecialHandlings_of :ATTR(:get<SpecialHandlings>);
-my %Shipper_of :ATTR(:get<Shipper>);
-my %PossessionStatus_of :ATTR(:get<PossessionStatus>);
-my %ShipperAddress_of :ATTR(:get<ShipperAddress>);
-my %OriginLocationAddress_of :ATTR(:get<OriginLocationAddress>);
-my %OriginStationId_of :ATTR(:get<OriginStationId>);
-my %EstimatedPickupTimestamp_of :ATTR(:get<EstimatedPickupTimestamp>);
-my %ShipTimestamp_of :ATTR(:get<ShipTimestamp>);
-my %TotalTransitDistance_of :ATTR(:get<TotalTransitDistance>);
-my %DistanceToDestination_of :ATTR(:get<DistanceToDestination>);
-my %SpecialInstructions_of :ATTR(:get<SpecialInstructions>);
-my %Recipient_of :ATTR(:get<Recipient>);
-my %LastUpdatedDestinationAddress_of :ATTR(:get<LastUpdatedDestinationAddress>);
-my %DestinationAddress_of :ATTR(:get<DestinationAddress>);
-my %HoldAtLocationContact_of :ATTR(:get<HoldAtLocationContact>);
-my %HoldAtLocationAddress_of :ATTR(:get<HoldAtLocationAddress>);
-my %DestinationStationId_of :ATTR(:get<DestinationStationId>);
-my %DestinationLocationAddress_of :ATTR(:get<DestinationLocationAddress>);
-my %DestinationLocationType_of :ATTR(:get<DestinationLocationType>);
-my %DestinationLocationTimeZoneOffset_of :ATTR(:get<DestinationLocationTimeZoneOffset>);
-my %CommitmentTimestamp_of :ATTR(:get<CommitmentTimestamp>);
-my %AppointmentDeliveryTimestamp_of :ATTR(:get<AppointmentDeliveryTimestamp>);
-my %EstimatedDeliveryTimestamp_of :ATTR(:get<EstimatedDeliveryTimestamp>);
-my %ActualDeliveryTimestamp_of :ATTR(:get<ActualDeliveryTimestamp>);
-my %ActualDeliveryAddress_of :ATTR(:get<ActualDeliveryAddress>);
-my %OfficeOrderDeliveryMethod_of :ATTR(:get<OfficeOrderDeliveryMethod>);
-my %DeliveryLocationType_of :ATTR(:get<DeliveryLocationType>);
-my %DeliveryLocationDescription_of :ATTR(:get<DeliveryLocationDescription>);
-my %DeliveryAttempts_of :ATTR(:get<DeliveryAttempts>);
-my %DeliverySignatureName_of :ATTR(:get<DeliverySignatureName>);
-my %PieceCountVerificationDetails_of :ATTR(:get<PieceCountVerificationDetails>);
-my %TotalUniqueAddressCountInConsolidation_of :ATTR(:get<TotalUniqueAddressCountInConsolidation>);
-my %AvailableImages_of :ATTR(:get<AvailableImages>);
-my %Signature_of :ATTR(:get<Signature>);
-my %NotificationEventsAvailable_of :ATTR(:get<NotificationEventsAvailable>);
-my %SplitShipmentParts_of :ATTR(:get<SplitShipmentParts>);
-my %DeliveryOptionEligibilityDetails_of :ATTR(:get<DeliveryOptionEligibilityDetails>);
-my %Events_of :ATTR(:get<Events>);
+    my %Notification_of   : ATTR(:get<Notification>);
+    my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
+    my %Barcode_of        : ATTR(:get<Barcode>);
+    my %TrackingNumberUniqueIdentifier_of :
+      ATTR(:get<TrackingNumberUniqueIdentifier>);
+    my %StatusDetail_of              : ATTR(:get<StatusDetail>);
+    my %CustomerExceptionRequests_of : ATTR(:get<CustomerExceptionRequests>);
+    my %Reconciliation_of            : ATTR(:get<Reconciliation>);
+    my %ServiceCommitMessage_of      : ATTR(:get<ServiceCommitMessage>);
+    my %DestinationServiceArea_of    : ATTR(:get<DestinationServiceArea>);
+    my %DestinationServiceAreaDescription_of :
+      ATTR(:get<DestinationServiceAreaDescription>);
+    my %CarrierCode_of      : ATTR(:get<CarrierCode>);
+    my %OperatingCompany_of : ATTR(:get<OperatingCompany>);
+    my %OperatingCompanyOrCarrierDescription_of :
+      ATTR(:get<OperatingCompanyOrCarrierDescription>);
+    my %CartageAgentCompanyName_of : ATTR(:get<CartageAgentCompanyName>);
+    my %ProductionLocationContactAndAddress_of :
+      ATTR(:get<ProductionLocationContactAndAddress>);
+    my %OtherIdentifiers_of          : ATTR(:get<OtherIdentifiers>);
+    my %FormId_of                    : ATTR(:get<FormId>);
+    my %Service_of                   : ATTR(:get<Service>);
+    my %PackageWeight_of             : ATTR(:get<PackageWeight>);
+    my %PackageDimensions_of         : ATTR(:get<PackageDimensions>);
+    my %PackageDimensionalWeight_of  : ATTR(:get<PackageDimensionalWeight>);
+    my %ShipmentWeight_of            : ATTR(:get<ShipmentWeight>);
+    my %Packaging_of                 : ATTR(:get<Packaging>);
+    my %PackagingType_of             : ATTR(:get<PackagingType>);
+    my %PackageSequenceNumber_of     : ATTR(:get<PackageSequenceNumber>);
+    my %PackageCount_of              : ATTR(:get<PackageCount>);
+    my %Charges_of                   : ATTR(:get<Charges>);
+    my %NickName_of                  : ATTR(:get<NickName>);
+    my %Notes_of                     : ATTR(:get<Notes>);
+    my %Attributes_of                : ATTR(:get<Attributes>);
+    my %ShipmentContents_of          : ATTR(:get<ShipmentContents>);
+    my %PackageContents_of           : ATTR(:get<PackageContents>);
+    my %ClearanceLocationCode_of     : ATTR(:get<ClearanceLocationCode>);
+    my %Commodities_of               : ATTR(:get<Commodities>);
+    my %ReturnDetail_of              : ATTR(:get<ReturnDetail>);
+    my %CustomsOptionDetails_of      : ATTR(:get<CustomsOptionDetails>);
+    my %AdvanceNotificationDetail_of : ATTR(:get<AdvanceNotificationDetail>);
+    my %SpecialHandlings_of          : ATTR(:get<SpecialHandlings>);
+    my %Shipper_of                   : ATTR(:get<Shipper>);
+    my %PossessionStatus_of          : ATTR(:get<PossessionStatus>);
+    my %ShipperAddress_of            : ATTR(:get<ShipperAddress>);
+    my %OriginLocationAddress_of     : ATTR(:get<OriginLocationAddress>);
+    my %OriginStationId_of           : ATTR(:get<OriginStationId>);
+    my %EstimatedPickupTimestamp_of  : ATTR(:get<EstimatedPickupTimestamp>);
+    my %ShipTimestamp_of             : ATTR(:get<ShipTimestamp>);
+    my %TotalTransitDistance_of      : ATTR(:get<TotalTransitDistance>);
+    my %DistanceToDestination_of     : ATTR(:get<DistanceToDestination>);
+    my %SpecialInstructions_of       : ATTR(:get<SpecialInstructions>);
+    my %Recipient_of                 : ATTR(:get<Recipient>);
+    my %LastUpdatedDestinationAddress_of :
+      ATTR(:get<LastUpdatedDestinationAddress>);
+    my %DestinationAddress_of         : ATTR(:get<DestinationAddress>);
+    my %HoldAtLocationContact_of      : ATTR(:get<HoldAtLocationContact>);
+    my %HoldAtLocationAddress_of      : ATTR(:get<HoldAtLocationAddress>);
+    my %DestinationStationId_of       : ATTR(:get<DestinationStationId>);
+    my %DestinationLocationAddress_of : ATTR(:get<DestinationLocationAddress>);
+    my %DestinationLocationType_of    : ATTR(:get<DestinationLocationType>);
+    my %DestinationLocationTimeZoneOffset_of :
+      ATTR(:get<DestinationLocationTimeZoneOffset>);
+    my %CommitmentTimestamp_of : ATTR(:get<CommitmentTimestamp>);
+    my %AppointmentDeliveryTimestamp_of :
+      ATTR(:get<AppointmentDeliveryTimestamp>);
+    my %EstimatedDeliveryTimestamp_of : ATTR(:get<EstimatedDeliveryTimestamp>);
+    my %ActualDeliveryTimestamp_of    : ATTR(:get<ActualDeliveryTimestamp>);
+    my %ActualDeliveryAddress_of      : ATTR(:get<ActualDeliveryAddress>);
+    my %OfficeOrderDeliveryMethod_of  : ATTR(:get<OfficeOrderDeliveryMethod>);
+    my %DeliveryLocationType_of       : ATTR(:get<DeliveryLocationType>);
+    my %DeliveryLocationDescription_of :
+      ATTR(:get<DeliveryLocationDescription>);
+    my %DeliveryAttempts_of      : ATTR(:get<DeliveryAttempts>);
+    my %DeliverySignatureName_of : ATTR(:get<DeliverySignatureName>);
+    my %PieceCountVerificationDetails_of :
+      ATTR(:get<PieceCountVerificationDetails>);
+    my %TotalUniqueAddressCountInConsolidation_of :
+      ATTR(:get<TotalUniqueAddressCountInConsolidation>);
+    my %AvailableImages_of : ATTR(:get<AvailableImages>);
+    my %Signature_of       : ATTR(:get<Signature>);
+    my %NotificationEventsAvailable_of :
+      ATTR(:get<NotificationEventsAvailable>);
+    my %SplitShipmentParts_of : ATTR(:get<SplitShipmentParts>);
+    my %DeliveryOptionEligibilityDetails_of :
+      ATTR(:get<DeliveryOptionEligibilityDetails>);
+    my %Events_of : ATTR(:get<Events>);
 
-__PACKAGE__->_factory(
-    [ qw(        Notification
-        TrackingNumber
-        Barcode
-        TrackingNumberUniqueIdentifier
-        StatusDetail
-        CustomerExceptionRequests
-        Reconciliation
-        ServiceCommitMessage
-        DestinationServiceArea
-        DestinationServiceAreaDescription
-        CarrierCode
-        OperatingCompany
-        OperatingCompanyOrCarrierDescription
-        CartageAgentCompanyName
-        ProductionLocationContactAndAddress
-        OtherIdentifiers
-        FormId
-        Service
-        PackageWeight
-        PackageDimensions
-        PackageDimensionalWeight
-        ShipmentWeight
-        Packaging
-        PackagingType
-        PackageSequenceNumber
-        PackageCount
-        Charges
-        NickName
-        Notes
-        Attributes
-        ShipmentContents
-        PackageContents
-        ClearanceLocationCode
-        Commodities
-        ReturnDetail
-        CustomsOptionDetails
-        AdvanceNotificationDetail
-        SpecialHandlings
-        Shipper
-        PossessionStatus
-        ShipperAddress
-        OriginLocationAddress
-        OriginStationId
-        EstimatedPickupTimestamp
-        ShipTimestamp
-        TotalTransitDistance
-        DistanceToDestination
-        SpecialInstructions
-        Recipient
-        LastUpdatedDestinationAddress
-        DestinationAddress
-        HoldAtLocationContact
-        HoldAtLocationAddress
-        DestinationStationId
-        DestinationLocationAddress
-        DestinationLocationType
-        DestinationLocationTimeZoneOffset
-        CommitmentTimestamp
-        AppointmentDeliveryTimestamp
-        EstimatedDeliveryTimestamp
-        ActualDeliveryTimestamp
-        ActualDeliveryAddress
-        OfficeOrderDeliveryMethod
-        DeliveryLocationType
-        DeliveryLocationDescription
-        DeliveryAttempts
-        DeliverySignatureName
-        PieceCountVerificationDetails
-        TotalUniqueAddressCountInConsolidation
-        AvailableImages
-        Signature
-        NotificationEventsAvailable
-        SplitShipmentParts
-        DeliveryOptionEligibilityDetails
-        Events
+    __PACKAGE__->_factory(
+        [   qw(        Notification
+              TrackingNumber
+              Barcode
+              TrackingNumberUniqueIdentifier
+              StatusDetail
+              CustomerExceptionRequests
+              Reconciliation
+              ServiceCommitMessage
+              DestinationServiceArea
+              DestinationServiceAreaDescription
+              CarrierCode
+              OperatingCompany
+              OperatingCompanyOrCarrierDescription
+              CartageAgentCompanyName
+              ProductionLocationContactAndAddress
+              OtherIdentifiers
+              FormId
+              Service
+              PackageWeight
+              PackageDimensions
+              PackageDimensionalWeight
+              ShipmentWeight
+              Packaging
+              PackagingType
+              PackageSequenceNumber
+              PackageCount
+              Charges
+              NickName
+              Notes
+              Attributes
+              ShipmentContents
+              PackageContents
+              ClearanceLocationCode
+              Commodities
+              ReturnDetail
+              CustomsOptionDetails
+              AdvanceNotificationDetail
+              SpecialHandlings
+              Shipper
+              PossessionStatus
+              ShipperAddress
+              OriginLocationAddress
+              OriginStationId
+              EstimatedPickupTimestamp
+              ShipTimestamp
+              TotalTransitDistance
+              DistanceToDestination
+              SpecialInstructions
+              Recipient
+              LastUpdatedDestinationAddress
+              DestinationAddress
+              HoldAtLocationContact
+              HoldAtLocationAddress
+              DestinationStationId
+              DestinationLocationAddress
+              DestinationLocationType
+              DestinationLocationTimeZoneOffset
+              CommitmentTimestamp
+              AppointmentDeliveryTimestamp
+              EstimatedDeliveryTimestamp
+              ActualDeliveryTimestamp
+              ActualDeliveryAddress
+              OfficeOrderDeliveryMethod
+              DeliveryLocationType
+              DeliveryLocationDescription
+              DeliveryAttempts
+              DeliverySignatureName
+              PieceCountVerificationDetails
+              TotalUniqueAddressCountInConsolidation
+              AvailableImages
+              Signature
+              NotificationEventsAvailable
+              SplitShipmentParts
+              DeliveryOptionEligibilityDetails
+              Events
 
-    ) ],
-    {
-        'Notification' => \%Notification_of,
-        'TrackingNumber' => \%TrackingNumber_of,
-        'Barcode' => \%Barcode_of,
-        'TrackingNumberUniqueIdentifier' => \%TrackingNumberUniqueIdentifier_of,
-        'StatusDetail' => \%StatusDetail_of,
-        'CustomerExceptionRequests' => \%CustomerExceptionRequests_of,
-        'Reconciliation' => \%Reconciliation_of,
-        'ServiceCommitMessage' => \%ServiceCommitMessage_of,
-        'DestinationServiceArea' => \%DestinationServiceArea_of,
-        'DestinationServiceAreaDescription' => \%DestinationServiceAreaDescription_of,
-        'CarrierCode' => \%CarrierCode_of,
-        'OperatingCompany' => \%OperatingCompany_of,
-        'OperatingCompanyOrCarrierDescription' => \%OperatingCompanyOrCarrierDescription_of,
-        'CartageAgentCompanyName' => \%CartageAgentCompanyName_of,
-        'ProductionLocationContactAndAddress' => \%ProductionLocationContactAndAddress_of,
-        'OtherIdentifiers' => \%OtherIdentifiers_of,
-        'FormId' => \%FormId_of,
-        'Service' => \%Service_of,
-        'PackageWeight' => \%PackageWeight_of,
-        'PackageDimensions' => \%PackageDimensions_of,
-        'PackageDimensionalWeight' => \%PackageDimensionalWeight_of,
-        'ShipmentWeight' => \%ShipmentWeight_of,
-        'Packaging' => \%Packaging_of,
-        'PackagingType' => \%PackagingType_of,
-        'PackageSequenceNumber' => \%PackageSequenceNumber_of,
-        'PackageCount' => \%PackageCount_of,
-        'Charges' => \%Charges_of,
-        'NickName' => \%NickName_of,
-        'Notes' => \%Notes_of,
-        'Attributes' => \%Attributes_of,
-        'ShipmentContents' => \%ShipmentContents_of,
-        'PackageContents' => \%PackageContents_of,
-        'ClearanceLocationCode' => \%ClearanceLocationCode_of,
-        'Commodities' => \%Commodities_of,
-        'ReturnDetail' => \%ReturnDetail_of,
-        'CustomsOptionDetails' => \%CustomsOptionDetails_of,
-        'AdvanceNotificationDetail' => \%AdvanceNotificationDetail_of,
-        'SpecialHandlings' => \%SpecialHandlings_of,
-        'Shipper' => \%Shipper_of,
-        'PossessionStatus' => \%PossessionStatus_of,
-        'ShipperAddress' => \%ShipperAddress_of,
-        'OriginLocationAddress' => \%OriginLocationAddress_of,
-        'OriginStationId' => \%OriginStationId_of,
-        'EstimatedPickupTimestamp' => \%EstimatedPickupTimestamp_of,
-        'ShipTimestamp' => \%ShipTimestamp_of,
-        'TotalTransitDistance' => \%TotalTransitDistance_of,
-        'DistanceToDestination' => \%DistanceToDestination_of,
-        'SpecialInstructions' => \%SpecialInstructions_of,
-        'Recipient' => \%Recipient_of,
-        'LastUpdatedDestinationAddress' => \%LastUpdatedDestinationAddress_of,
-        'DestinationAddress' => \%DestinationAddress_of,
-        'HoldAtLocationContact' => \%HoldAtLocationContact_of,
-        'HoldAtLocationAddress' => \%HoldAtLocationAddress_of,
-        'DestinationStationId' => \%DestinationStationId_of,
-        'DestinationLocationAddress' => \%DestinationLocationAddress_of,
-        'DestinationLocationType' => \%DestinationLocationType_of,
-        'DestinationLocationTimeZoneOffset' => \%DestinationLocationTimeZoneOffset_of,
-        'CommitmentTimestamp' => \%CommitmentTimestamp_of,
-        'AppointmentDeliveryTimestamp' => \%AppointmentDeliveryTimestamp_of,
-        'EstimatedDeliveryTimestamp' => \%EstimatedDeliveryTimestamp_of,
-        'ActualDeliveryTimestamp' => \%ActualDeliveryTimestamp_of,
-        'ActualDeliveryAddress' => \%ActualDeliveryAddress_of,
-        'OfficeOrderDeliveryMethod' => \%OfficeOrderDeliveryMethod_of,
-        'DeliveryLocationType' => \%DeliveryLocationType_of,
-        'DeliveryLocationDescription' => \%DeliveryLocationDescription_of,
-        'DeliveryAttempts' => \%DeliveryAttempts_of,
-        'DeliverySignatureName' => \%DeliverySignatureName_of,
-        'PieceCountVerificationDetails' => \%PieceCountVerificationDetails_of,
-        'TotalUniqueAddressCountInConsolidation' => \%TotalUniqueAddressCountInConsolidation_of,
-        'AvailableImages' => \%AvailableImages_of,
-        'Signature' => \%Signature_of,
-        'NotificationEventsAvailable' => \%NotificationEventsAvailable_of,
-        'SplitShipmentParts' => \%SplitShipmentParts_of,
-        'DeliveryOptionEligibilityDetails' => \%DeliveryOptionEligibilityDetails_of,
-        'Events' => \%Events_of,
-    },
-    {
-        'Notification' => 'Shipment::FedEx::WSDL::TrackTypes::Notification',
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Barcode' => 'Shipment::FedEx::WSDL::TrackTypes::StringBarcode',
-        'TrackingNumberUniqueIdentifier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StatusDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TrackStatusDetail',
-        'CustomerExceptionRequests' => 'Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail',
-        'Reconciliation' => 'Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation',
-        'ServiceCommitMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DestinationServiceArea' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DestinationServiceAreaDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CarrierCode' => 'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
-        'OperatingCompany' => 'Shipment::FedEx::WSDL::TrackTypes::OperatingCompanyType',
-        'OperatingCompanyOrCarrierDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CartageAgentCompanyName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ProductionLocationContactAndAddress' => 'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
-        'OtherIdentifiers' => 'Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail',
-        'FormId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Service' => 'Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail',
-        'PackageWeight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
-        'PackageDimensions' => 'Shipment::FedEx::WSDL::TrackTypes::Dimensions',
-        'PackageDimensionalWeight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
-        'ShipmentWeight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
-        'Packaging' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PackagingType' => 'Shipment::FedEx::WSDL::TrackTypes::PackagingType',
-        'PackageSequenceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'PackageCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'Charges' => 'Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail',
-        'NickName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Notes' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Attributes' => 'Shipment::FedEx::WSDL::TrackTypes::TrackDetailAttributeType',
-        'ShipmentContents' => 'Shipment::FedEx::WSDL::TrackTypes::ContentRecord',
-        'PackageContents' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ClearanceLocationCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Commodities' => 'Shipment::FedEx::WSDL::TrackTypes::Commodity',
-        'ReturnDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail',
-        'CustomsOptionDetails' => 'Shipment::FedEx::WSDL::TrackTypes::CustomsOptionDetail',
-        'AdvanceNotificationDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail',
-        'SpecialHandlings' => 'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling',
-        'Shipper' => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
-        'PossessionStatus' => 'Shipment::FedEx::WSDL::TrackTypes::TrackPossessionStatusType',
-        'ShipperAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'OriginLocationAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'OriginStationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'EstimatedPickupTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'ShipTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'TotalTransitDistance' => 'Shipment::FedEx::WSDL::TrackTypes::Distance',
-        'DistanceToDestination' => 'Shipment::FedEx::WSDL::TrackTypes::Distance',
-        'SpecialInstructions' => 'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction',
-        'Recipient' => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
-        'LastUpdatedDestinationAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'DestinationAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'HoldAtLocationContact' => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
-        'HoldAtLocationAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'DestinationStationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DestinationLocationAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'DestinationLocationType' => 'Shipment::FedEx::WSDL::TrackTypes::FedExLocationType',
-        'DestinationLocationTimeZoneOffset' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CommitmentTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'AppointmentDeliveryTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'EstimatedDeliveryTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'ActualDeliveryTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'ActualDeliveryAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-        'OfficeOrderDeliveryMethod' => 'Shipment::FedEx::WSDL::TrackTypes::OfficeOrderDeliveryMethodType',
-        'DeliveryLocationType' => 'Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryLocationType',
-        'DeliveryLocationDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DeliveryAttempts' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'DeliverySignatureName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PieceCountVerificationDetails' => 'Shipment::FedEx::WSDL::TrackTypes::PieceCountVerificationDetail',
-        'TotalUniqueAddressCountInConsolidation' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'AvailableImages' => 'Shipment::FedEx::WSDL::TrackTypes::AvailableImageType',
-        'Signature' => 'Shipment::FedEx::WSDL::TrackTypes::SignatureImageDetail',
-        'NotificationEventsAvailable' => 'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationEventType',
-        'SplitShipmentParts' => 'Shipment::FedEx::WSDL::TrackTypes::TrackSplitShipmentPart',
-        'DeliveryOptionEligibilityDetails' => 'Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail',
-        'Events' => 'Shipment::FedEx::WSDL::TrackTypes::TrackEvent',
-    },
-    {
+            )
+        ],
+        {   'Notification'                   => \%Notification_of,
+            'TrackingNumber'                 => \%TrackingNumber_of,
+            'Barcode'                        => \%Barcode_of,
+            'TrackingNumberUniqueIdentifier' =>
+              \%TrackingNumberUniqueIdentifier_of,
+            'StatusDetail'              => \%StatusDetail_of,
+            'CustomerExceptionRequests' => \%CustomerExceptionRequests_of,
+            'Reconciliation'            => \%Reconciliation_of,
+            'ServiceCommitMessage'      => \%ServiceCommitMessage_of,
+            'DestinationServiceArea'    => \%DestinationServiceArea_of,
+            'DestinationServiceAreaDescription' =>
+              \%DestinationServiceAreaDescription_of,
+            'CarrierCode'                          => \%CarrierCode_of,
+            'OperatingCompany'                     => \%OperatingCompany_of,
+            'OperatingCompanyOrCarrierDescription' =>
+              \%OperatingCompanyOrCarrierDescription_of,
+            'CartageAgentCompanyName' => \%CartageAgentCompanyName_of,
+            'ProductionLocationContactAndAddress' =>
+              \%ProductionLocationContactAndAddress_of,
+            'OtherIdentifiers'              => \%OtherIdentifiers_of,
+            'FormId'                        => \%FormId_of,
+            'Service'                       => \%Service_of,
+            'PackageWeight'                 => \%PackageWeight_of,
+            'PackageDimensions'             => \%PackageDimensions_of,
+            'PackageDimensionalWeight'      => \%PackageDimensionalWeight_of,
+            'ShipmentWeight'                => \%ShipmentWeight_of,
+            'Packaging'                     => \%Packaging_of,
+            'PackagingType'                 => \%PackagingType_of,
+            'PackageSequenceNumber'         => \%PackageSequenceNumber_of,
+            'PackageCount'                  => \%PackageCount_of,
+            'Charges'                       => \%Charges_of,
+            'NickName'                      => \%NickName_of,
+            'Notes'                         => \%Notes_of,
+            'Attributes'                    => \%Attributes_of,
+            'ShipmentContents'              => \%ShipmentContents_of,
+            'PackageContents'               => \%PackageContents_of,
+            'ClearanceLocationCode'         => \%ClearanceLocationCode_of,
+            'Commodities'                   => \%Commodities_of,
+            'ReturnDetail'                  => \%ReturnDetail_of,
+            'CustomsOptionDetails'          => \%CustomsOptionDetails_of,
+            'AdvanceNotificationDetail'     => \%AdvanceNotificationDetail_of,
+            'SpecialHandlings'              => \%SpecialHandlings_of,
+            'Shipper'                       => \%Shipper_of,
+            'PossessionStatus'              => \%PossessionStatus_of,
+            'ShipperAddress'                => \%ShipperAddress_of,
+            'OriginLocationAddress'         => \%OriginLocationAddress_of,
+            'OriginStationId'               => \%OriginStationId_of,
+            'EstimatedPickupTimestamp'      => \%EstimatedPickupTimestamp_of,
+            'ShipTimestamp'                 => \%ShipTimestamp_of,
+            'TotalTransitDistance'          => \%TotalTransitDistance_of,
+            'DistanceToDestination'         => \%DistanceToDestination_of,
+            'SpecialInstructions'           => \%SpecialInstructions_of,
+            'Recipient'                     => \%Recipient_of,
+            'LastUpdatedDestinationAddress' =>
+              \%LastUpdatedDestinationAddress_of,
+            'DestinationAddress'         => \%DestinationAddress_of,
+            'HoldAtLocationContact'      => \%HoldAtLocationContact_of,
+            'HoldAtLocationAddress'      => \%HoldAtLocationAddress_of,
+            'DestinationStationId'       => \%DestinationStationId_of,
+            'DestinationLocationAddress' => \%DestinationLocationAddress_of,
+            'DestinationLocationType'    => \%DestinationLocationType_of,
+            'DestinationLocationTimeZoneOffset' =>
+              \%DestinationLocationTimeZoneOffset_of,
+            'CommitmentTimestamp'          => \%CommitmentTimestamp_of,
+            'AppointmentDeliveryTimestamp' =>
+              \%AppointmentDeliveryTimestamp_of,
+            'EstimatedDeliveryTimestamp'  => \%EstimatedDeliveryTimestamp_of,
+            'ActualDeliveryTimestamp'     => \%ActualDeliveryTimestamp_of,
+            'ActualDeliveryAddress'       => \%ActualDeliveryAddress_of,
+            'OfficeOrderDeliveryMethod'   => \%OfficeOrderDeliveryMethod_of,
+            'DeliveryLocationType'        => \%DeliveryLocationType_of,
+            'DeliveryLocationDescription' => \%DeliveryLocationDescription_of,
+            'DeliveryAttempts'            => \%DeliveryAttempts_of,
+            'DeliverySignatureName'       => \%DeliverySignatureName_of,
+            'PieceCountVerificationDetails' =>
+              \%PieceCountVerificationDetails_of,
+            'TotalUniqueAddressCountInConsolidation' =>
+              \%TotalUniqueAddressCountInConsolidation_of,
+            'AvailableImages'             => \%AvailableImages_of,
+            'Signature'                   => \%Signature_of,
+            'NotificationEventsAvailable' => \%NotificationEventsAvailable_of,
+            'SplitShipmentParts'          => \%SplitShipmentParts_of,
+            'DeliveryOptionEligibilityDetails' =>
+              \%DeliveryOptionEligibilityDetails_of,
+            'Events' => \%Events_of,
+        },
+        {   'Notification' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Notification',
+            'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Barcode' => 'Shipment::FedEx::WSDL::TrackTypes::StringBarcode',
+            'TrackingNumberUniqueIdentifier' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StatusDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackStatusDetail',
+            'CustomerExceptionRequests' =>
+              'Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail',
+            'Reconciliation' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackReconciliation',
+            'ServiceCommitMessage' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DestinationServiceArea' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DestinationServiceAreaDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CarrierCode' =>
+              'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
+            'OperatingCompany' =>
+              'Shipment::FedEx::WSDL::TrackTypes::OperatingCompanyType',
+            'OperatingCompanyOrCarrierDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CartageAgentCompanyName' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ProductionLocationContactAndAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ContactAndAddress',
+            'OtherIdentifiers' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackOtherIdentifierDetail',
+            'FormId'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Service' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackServiceDescriptionDetail',
+            'PackageWeight'     => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
+            'PackageDimensions' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Dimensions',
+            'PackageDimensionalWeight' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Weight',
+            'ShipmentWeight' => 'Shipment::FedEx::WSDL::TrackTypes::Weight',
+            'Packaging'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PackagingType'  =>
+              'Shipment::FedEx::WSDL::TrackTypes::PackagingType',
+            'PackageSequenceNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'PackageCount' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'Charges' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail',
+            'NickName'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Notes'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Attributes' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackDetailAttributeType',
+            'ShipmentContents' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ContentRecord',
+            'PackageContents' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ClearanceLocationCode' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Commodities'  => 'Shipment::FedEx::WSDL::TrackTypes::Commodity',
+            'ReturnDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackReturnDetail',
+            'CustomsOptionDetails' =>
+              'Shipment::FedEx::WSDL::TrackTypes::CustomsOptionDetail',
+            'AdvanceNotificationDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail',
+            'SpecialHandlings' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling',
+            'Shipper'          => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
+            'PossessionStatus' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackPossessionStatusType',
+            'ShipperAddress' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'OriginLocationAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'OriginStationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'EstimatedPickupTimestamp' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'ShipTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'TotalTransitDistance' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Distance',
+            'DistanceToDestination' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Distance',
+            'SpecialInstructions' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction',
+            'Recipient' => 'Shipment::FedEx::WSDL::TrackTypes::Contact',
+            'LastUpdatedDestinationAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'DestinationAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'HoldAtLocationContact' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Contact',
+            'HoldAtLocationAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'DestinationStationId' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DestinationLocationAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'DestinationLocationType' =>
+              'Shipment::FedEx::WSDL::TrackTypes::FedExLocationType',
+            'DestinationLocationTimeZoneOffset' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CommitmentTimestamp' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'AppointmentDeliveryTimestamp' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'EstimatedDeliveryTimestamp' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'ActualDeliveryTimestamp' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'ActualDeliveryAddress' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Address',
+            'OfficeOrderDeliveryMethod' =>
+              'Shipment::FedEx::WSDL::TrackTypes::OfficeOrderDeliveryMethodType',
+            'DeliveryLocationType' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryLocationType',
+            'DeliveryLocationDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DeliveryAttempts' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'DeliverySignatureName' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PieceCountVerificationDetails' =>
+              'Shipment::FedEx::WSDL::TrackTypes::PieceCountVerificationDetail',
+            'TotalUniqueAddressCountInConsolidation' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'AvailableImages' =>
+              'Shipment::FedEx::WSDL::TrackTypes::AvailableImageType',
+            'Signature' =>
+              'Shipment::FedEx::WSDL::TrackTypes::SignatureImageDetail',
+            'NotificationEventsAvailable' =>
+              'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationEventType',
+            'SplitShipmentParts' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackSplitShipmentPart',
+            'DeliveryOptionEligibilityDetails' =>
+              'Shipment::FedEx::WSDL::TrackTypes::DeliveryOptionEligibilityDetail',
+            'Events' => 'Shipment::FedEx::WSDL::TrackTypes::TrackEvent',
+        },
+        {
 
-        'Notification' => 'Notification',
-        'TrackingNumber' => 'TrackingNumber',
-        'Barcode' => 'Barcode',
-        'TrackingNumberUniqueIdentifier' => 'TrackingNumberUniqueIdentifier',
-        'StatusDetail' => 'StatusDetail',
-        'CustomerExceptionRequests' => 'CustomerExceptionRequests',
-        'Reconciliation' => 'Reconciliation',
-        'ServiceCommitMessage' => 'ServiceCommitMessage',
-        'DestinationServiceArea' => 'DestinationServiceArea',
-        'DestinationServiceAreaDescription' => 'DestinationServiceAreaDescription',
-        'CarrierCode' => 'CarrierCode',
-        'OperatingCompany' => 'OperatingCompany',
-        'OperatingCompanyOrCarrierDescription' => 'OperatingCompanyOrCarrierDescription',
-        'CartageAgentCompanyName' => 'CartageAgentCompanyName',
-        'ProductionLocationContactAndAddress' => 'ProductionLocationContactAndAddress',
-        'OtherIdentifiers' => 'OtherIdentifiers',
-        'FormId' => 'FormId',
-        'Service' => 'Service',
-        'PackageWeight' => 'PackageWeight',
-        'PackageDimensions' => 'PackageDimensions',
-        'PackageDimensionalWeight' => 'PackageDimensionalWeight',
-        'ShipmentWeight' => 'ShipmentWeight',
-        'Packaging' => 'Packaging',
-        'PackagingType' => 'PackagingType',
-        'PackageSequenceNumber' => 'PackageSequenceNumber',
-        'PackageCount' => 'PackageCount',
-        'Charges' => 'Charges',
-        'NickName' => 'NickName',
-        'Notes' => 'Notes',
-        'Attributes' => 'Attributes',
-        'ShipmentContents' => 'ShipmentContents',
-        'PackageContents' => 'PackageContents',
-        'ClearanceLocationCode' => 'ClearanceLocationCode',
-        'Commodities' => 'Commodities',
-        'ReturnDetail' => 'ReturnDetail',
-        'CustomsOptionDetails' => 'CustomsOptionDetails',
-        'AdvanceNotificationDetail' => 'AdvanceNotificationDetail',
-        'SpecialHandlings' => 'SpecialHandlings',
-        'Shipper' => 'Shipper',
-        'PossessionStatus' => 'PossessionStatus',
-        'ShipperAddress' => 'ShipperAddress',
-        'OriginLocationAddress' => 'OriginLocationAddress',
-        'OriginStationId' => 'OriginStationId',
-        'EstimatedPickupTimestamp' => 'EstimatedPickupTimestamp',
-        'ShipTimestamp' => 'ShipTimestamp',
-        'TotalTransitDistance' => 'TotalTransitDistance',
-        'DistanceToDestination' => 'DistanceToDestination',
-        'SpecialInstructions' => 'SpecialInstructions',
-        'Recipient' => 'Recipient',
-        'LastUpdatedDestinationAddress' => 'LastUpdatedDestinationAddress',
-        'DestinationAddress' => 'DestinationAddress',
-        'HoldAtLocationContact' => 'HoldAtLocationContact',
-        'HoldAtLocationAddress' => 'HoldAtLocationAddress',
-        'DestinationStationId' => 'DestinationStationId',
-        'DestinationLocationAddress' => 'DestinationLocationAddress',
-        'DestinationLocationType' => 'DestinationLocationType',
-        'DestinationLocationTimeZoneOffset' => 'DestinationLocationTimeZoneOffset',
-        'CommitmentTimestamp' => 'CommitmentTimestamp',
-        'AppointmentDeliveryTimestamp' => 'AppointmentDeliveryTimestamp',
-        'EstimatedDeliveryTimestamp' => 'EstimatedDeliveryTimestamp',
-        'ActualDeliveryTimestamp' => 'ActualDeliveryTimestamp',
-        'ActualDeliveryAddress' => 'ActualDeliveryAddress',
-        'OfficeOrderDeliveryMethod' => 'OfficeOrderDeliveryMethod',
-        'DeliveryLocationType' => 'DeliveryLocationType',
-        'DeliveryLocationDescription' => 'DeliveryLocationDescription',
-        'DeliveryAttempts' => 'DeliveryAttempts',
-        'DeliverySignatureName' => 'DeliverySignatureName',
-        'PieceCountVerificationDetails' => 'PieceCountVerificationDetails',
-        'TotalUniqueAddressCountInConsolidation' => 'TotalUniqueAddressCountInConsolidation',
-        'AvailableImages' => 'AvailableImages',
-        'Signature' => 'Signature',
-        'NotificationEventsAvailable' => 'NotificationEventsAvailable',
-        'SplitShipmentParts' => 'SplitShipmentParts',
-        'DeliveryOptionEligibilityDetails' => 'DeliveryOptionEligibilityDetails',
-        'Events' => 'Events',
-    }
-);
+            'Notification'                   => 'Notification',
+            'TrackingNumber'                 => 'TrackingNumber',
+            'Barcode'                        => 'Barcode',
+            'TrackingNumberUniqueIdentifier' =>
+              'TrackingNumberUniqueIdentifier',
+            'StatusDetail'                      => 'StatusDetail',
+            'CustomerExceptionRequests'         => 'CustomerExceptionRequests',
+            'Reconciliation'                    => 'Reconciliation',
+            'ServiceCommitMessage'              => 'ServiceCommitMessage',
+            'DestinationServiceArea'            => 'DestinationServiceArea',
+            'DestinationServiceAreaDescription' =>
+              'DestinationServiceAreaDescription',
+            'CarrierCode'                          => 'CarrierCode',
+            'OperatingCompany'                     => 'OperatingCompany',
+            'OperatingCompanyOrCarrierDescription' =>
+              'OperatingCompanyOrCarrierDescription',
+            'CartageAgentCompanyName'             => 'CartageAgentCompanyName',
+            'ProductionLocationContactAndAddress' =>
+              'ProductionLocationContactAndAddress',
+            'OtherIdentifiers'              => 'OtherIdentifiers',
+            'FormId'                        => 'FormId',
+            'Service'                       => 'Service',
+            'PackageWeight'                 => 'PackageWeight',
+            'PackageDimensions'             => 'PackageDimensions',
+            'PackageDimensionalWeight'      => 'PackageDimensionalWeight',
+            'ShipmentWeight'                => 'ShipmentWeight',
+            'Packaging'                     => 'Packaging',
+            'PackagingType'                 => 'PackagingType',
+            'PackageSequenceNumber'         => 'PackageSequenceNumber',
+            'PackageCount'                  => 'PackageCount',
+            'Charges'                       => 'Charges',
+            'NickName'                      => 'NickName',
+            'Notes'                         => 'Notes',
+            'Attributes'                    => 'Attributes',
+            'ShipmentContents'              => 'ShipmentContents',
+            'PackageContents'               => 'PackageContents',
+            'ClearanceLocationCode'         => 'ClearanceLocationCode',
+            'Commodities'                   => 'Commodities',
+            'ReturnDetail'                  => 'ReturnDetail',
+            'CustomsOptionDetails'          => 'CustomsOptionDetails',
+            'AdvanceNotificationDetail'     => 'AdvanceNotificationDetail',
+            'SpecialHandlings'              => 'SpecialHandlings',
+            'Shipper'                       => 'Shipper',
+            'PossessionStatus'              => 'PossessionStatus',
+            'ShipperAddress'                => 'ShipperAddress',
+            'OriginLocationAddress'         => 'OriginLocationAddress',
+            'OriginStationId'               => 'OriginStationId',
+            'EstimatedPickupTimestamp'      => 'EstimatedPickupTimestamp',
+            'ShipTimestamp'                 => 'ShipTimestamp',
+            'TotalTransitDistance'          => 'TotalTransitDistance',
+            'DistanceToDestination'         => 'DistanceToDestination',
+            'SpecialInstructions'           => 'SpecialInstructions',
+            'Recipient'                     => 'Recipient',
+            'LastUpdatedDestinationAddress' => 'LastUpdatedDestinationAddress',
+            'DestinationAddress'            => 'DestinationAddress',
+            'HoldAtLocationContact'         => 'HoldAtLocationContact',
+            'HoldAtLocationAddress'         => 'HoldAtLocationAddress',
+            'DestinationStationId'          => 'DestinationStationId',
+            'DestinationLocationAddress'    => 'DestinationLocationAddress',
+            'DestinationLocationType'       => 'DestinationLocationType',
+            'DestinationLocationTimeZoneOffset' =>
+              'DestinationLocationTimeZoneOffset',
+            'CommitmentTimestamp'           => 'CommitmentTimestamp',
+            'AppointmentDeliveryTimestamp'  => 'AppointmentDeliveryTimestamp',
+            'EstimatedDeliveryTimestamp'    => 'EstimatedDeliveryTimestamp',
+            'ActualDeliveryTimestamp'       => 'ActualDeliveryTimestamp',
+            'ActualDeliveryAddress'         => 'ActualDeliveryAddress',
+            'OfficeOrderDeliveryMethod'     => 'OfficeOrderDeliveryMethod',
+            'DeliveryLocationType'          => 'DeliveryLocationType',
+            'DeliveryLocationDescription'   => 'DeliveryLocationDescription',
+            'DeliveryAttempts'              => 'DeliveryAttempts',
+            'DeliverySignatureName'         => 'DeliverySignatureName',
+            'PieceCountVerificationDetails' => 'PieceCountVerificationDetails',
+            'TotalUniqueAddressCountInConsolidation' =>
+              'TotalUniqueAddressCountInConsolidation',
+            'AvailableImages'             => 'AvailableImages',
+            'Signature'                   => 'Signature',
+            'NotificationEventsAvailable' => 'NotificationEventsAvailable',
+            'SplitShipmentParts'          => 'SplitShipmentParts',
+            'DeliveryOptionEligibilityDetails' =>
+              'DeliveryOptionEligibilityDetails',
+            'Events' => 'Events',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -432,7 +514,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

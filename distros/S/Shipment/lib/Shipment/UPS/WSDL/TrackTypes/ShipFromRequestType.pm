@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ShipFromRequestType;
-$Shipment::UPS::WSDL::TrackTypes::ShipFromRequestType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::ShipFromRequestType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Address_of :ATTR(:get<Address>);
+    my %Address_of : ATTR(:get<Address>);
 
-__PACKAGE__->_factory(
-    [ qw(        Address
+    __PACKAGE__->_factory(
+        [   qw(        Address
 
-    ) ],
-    {
-        'Address' => \%Address_of,
-    },
-    {
-        'Address' => 'Shipment::UPS::WSDL::TrackTypes::AddressRequestType',
-    },
-    {
+            )
+        ],
+        {'Address' => \%Address_of,},
+        {'Address' => 'Shipment::UPS::WSDL::TrackTypes::AddressRequestType',},
+        {
 
-        'Address' => 'Address',
-    }
-);
+            'Address' => 'Address',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::UPS::WSDL::TrackTypes::ShipFromRequestType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

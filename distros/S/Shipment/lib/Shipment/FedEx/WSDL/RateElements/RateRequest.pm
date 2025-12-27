@@ -1,22 +1,22 @@
 
 package Shipment::FedEx::WSDL::RateElements::RateRequest;
-$Shipment::FedEx::WSDL::RateElements::RateRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateElements::RateRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' }
+    sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
-__PACKAGE__->__set_name('RateRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::FedEx::WSDL::RateTypes::RateRequest
-);
+    __PACKAGE__->__set_name('RateRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::FedEx::WSDL::RateTypes::RateRequest
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::RateElements::RateRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

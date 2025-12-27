@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfTax;
-$Shipment::Purolator::WSDL::Types::ArrayOfTax::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::ArrayOfTax::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Tax_of :ATTR(:get<Tax>);
+    my %Tax_of : ATTR(:get<Tax>);
 
-__PACKAGE__->_factory(
-    [ qw(        Tax
+    __PACKAGE__->_factory(
+        [   qw(        Tax
 
-    ) ],
-    {
-        'Tax' => \%Tax_of,
-    },
-    {
-        'Tax' => 'Shipment::Purolator::WSDL::Types::Tax',
-    },
-    {
+            )
+        ],
+        {'Tax' => \%Tax_of,},
+        {'Tax' => 'Shipment::Purolator::WSDL::Types::Tax',},
+        {
 
-        'Tax' => 'Tax',
-    }
-);
+            'Tax' => 'Tax',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfTax
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

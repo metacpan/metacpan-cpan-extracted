@@ -2,8 +2,8 @@ use v5.37.9;
 use feature 'class';
 no warnings 'experimental::class';
 
-package Video::NRK::Cache;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::VERSION = '3.01';
+package Video::NRK::Cache 3.02;  # Dist::Zilla doesn't know about class yet
+
 class Video::NRK::Cache;
 # ABSTRACT: Cache NRK Video on Demand broadcasts for offline viewing
 
@@ -98,7 +98,7 @@ Video::NRK::Cache - Cache NRK Video on Demand broadcasts for offline viewing
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 
@@ -233,10 +233,7 @@ L<https://psapi.nrk.no/documentation/redoc/programsider-tv/>
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

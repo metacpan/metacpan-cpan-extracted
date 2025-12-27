@@ -3,15 +3,15 @@ use feature 'class';
 no warnings 'experimental::class';
 use open qw( :utf8 :std );
 
-package Video::NRK::Cache::Store;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::Store::VERSION = '3.01';
+package Video::NRK::Cache::Store 3.02;  # Dist::Zilla doesn't know about class yet
+
 class Video::NRK::Cache::Store;
 # ABSTRACT: Store NRK Video on Demand cache on disk (abstract base class)
 
 
 use Carp qw( croak );
 use Cwd qw( cwd );
-use Path::Tiny qw( path );
+use Path::Tiny 0.125 qw( path );
 use List::Util qw( max );
 
 
@@ -59,6 +59,7 @@ ADJUST {
 	$dir_sub{nb_nor} = $dir->child("$program_id.nb-nor.vtt");
 	$dir_sub{nn_ttv} = $dir->child("$program_id.nn-ttv.vtt");
 	$dir_sub{nn_nor} = $dir->child("$program_id.nn-nor.vtt");
+	$dir_sub{ffmpeg} = $dir->child("$program_id.ffmpeg.vtt");
 }
 
 
@@ -78,7 +79,7 @@ method rate () {
 
 method prep () {
 	croak "File exists: $file" if $file->exists;
-	$dir->mkpath;
+	$dir->mkdir;
 }
 
 
@@ -94,8 +95,15 @@ method ffmpeg () {
 		$dir_sub{nn_nor}->exists ? $dir_sub{nn_nor} :
 		undef;
 	if ($dir_sub) {
+		
+		# As of 2025, many NRK subs lack a space after </i>. It's a problem
+		# with the original data: The NRK web player is affected, too.
+		my $sub = path($dir_sub)->slurp_raw;
+		$sub =~ s{</i>(?=\w)}{</i> }g;
+		path($dir_sub{ffmpeg})->spew_raw($sub);
+		
 		@codecs = (
-			-f => 'srt', -i => "$dir_sub",
+			-f => 'srt', -i => "$dir_sub{ffmpeg}",
 			qw( -map 0:0 -map 0:1 -map 1:0 ), @codecs, qw( -c:s mov_text ),
 		);
 		# https://trac.ffmpeg.org/wiki/Map
@@ -146,7 +154,7 @@ Video::NRK::Cache::Store - Store NRK Video on Demand cache on disk (abstract bas
 
 =head1 VERSION
 
-version 3.01
+version 3.02
 
 =head1 SYNOPSIS
 
@@ -254,7 +262,7 @@ cache store directory as a L<Path::Tiny> object.
 
 Return the (temporary) location of the video subtitle cache files
 inside the cache store directory as a hash of L<Path::Tiny> objects.
-Has entries for the keys C<nb_ttv>, C<nb_nor>, C<nn_ttv>, C<nn_nor>.
+Has entries for the keys C<nb_ttv>, C<nb_nor>, C<nn_ttv>, C<nn_nor>, C<ffmpeg>.
 Each of these files may or may not actually exist, depending on the
 subtitles offered for the particular video.
 
@@ -381,10 +389,7 @@ in Perl is more complete.
 
 =head1 AUTHOR
 
-Arne Johannessen <ajnn@cpan.org>
-
-If you contact me by email, please make sure you include the word
-"Perl" in your subject header to help beat the spam filters.
+Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =head1 COPYRIGHT AND LICENSE
 

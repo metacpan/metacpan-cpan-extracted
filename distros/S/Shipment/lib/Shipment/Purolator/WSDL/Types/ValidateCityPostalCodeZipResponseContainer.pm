@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer;
-$Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,43 +17,40 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::ResponseContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
-my %SuggestedAddresses_of :ATTR(:get<SuggestedAddresses>);
+    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
+    my %SuggestedAddresses_of  : ATTR(:get<SuggestedAddresses>);
 
-__PACKAGE__->_factory(
-    [ qw(        ResponseInformation
-        SuggestedAddresses
+    __PACKAGE__->_factory(
+        [   qw(        ResponseInformation
+              SuggestedAddresses
 
-    ) ],
-    {
-        'ResponseInformation' => \%ResponseInformation_of,
-        'SuggestedAddresses' => \%SuggestedAddresses_of,
-    },
-    {
-        'ResponseInformation' => 'Shipment::Purolator::WSDL::Types::ResponseInformation',
-        'SuggestedAddresses' => 'Shipment::Purolator::WSDL::Types::ArrayOfSuggestedAddress',
-    },
-    {
+            )
+        ],
+        {   'ResponseInformation' => \%ResponseInformation_of,
+            'SuggestedAddresses'  => \%SuggestedAddresses_of,
+        },
+        {   'ResponseInformation' =>
+              'Shipment::Purolator::WSDL::Types::ResponseInformation',
+            'SuggestedAddresses' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfSuggestedAddress',
+        },
+        {
 
-        'ResponseInformation' => 'ResponseInformation',
-        'SuggestedAddresses' => 'SuggestedAddresses',
-    }
-);
+            'ResponseInformation' => 'ResponseInformation',
+            'SuggestedAddresses'  => 'SuggestedAddresses',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -70,7 +67,7 @@ Shipment::Purolator::WSDL::Types::ValidateCityPostalCodeZipResponseContainer
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(8.6.0);
+  our $VERSION = qv(8.6.2);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -215,16 +215,16 @@ sub source_munger {
      my $suffix = "";
      my $entry;
      my $idx = 0;
-     s{(\S*)\s*(\$\w+)(\s*\S*=\s*[^,]+)?(\s*,\s*)?}{ # comma-separated sig args
+     s{([\w:]*)\s*(\$\w+)\s*?([/|]{0,2}=\s*[^,]+)?(\s*,\s*|\s*$)}{ # comma-separated sig args
        $entry++ if length $1;
 
        $suffix .= "my $1 $2 = ";
 
        tr!=!!d for my $default = $3;
-       if (($default =~ tr!/!!d)==2) {
+       if ((substr($default,0,2) =~ tr!/!!d)==2) {
          $suffix .= "\$_[$idx] // $default;";
        }
-       elsif (($default =~ tr!|!!d)==2) {
+       elsif ((substr($default,0,2) =~ tr!|!!d)==2) {
          $suffix .= "\$_[$idx] || $default;";
        }
        elsif ($default) {
@@ -268,7 +268,6 @@ __END__
 
 sealed - Subroutine attribute for compile-time method lookups on its typed lexicals.
 
-
 =head1 SYNOPSIS
 
     use base 'sealed';
@@ -295,7 +294,6 @@ because this op-tree walker isn't as robust as it needs to be.
 For example, any "branching" done in the target method's argument
 stack, eg by using the '?:' ternary operator, will break this logic
 (pushmark ops are processed linearly, by $op->next walking, in tweak()).
-
 
 =head2 Compiling perl v5.30+ for functional mod_perl2 w/ithreads and httpd 2.4.x w/event mpm
 

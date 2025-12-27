@@ -20,7 +20,7 @@ subtest 'param and params read from scope' => sub {
         type => 'http',
         path_params => { id => '42', action => 'edit' },
     };
-    my $res = PAGI::Response->new($send, $scope_with_params);
+    my $res = PAGI::Response->new($scope_with_params, $send);
 
     is($res->path_param('id'), '42', 'param returns route param from scope');
     is($res->path_param('action'), 'edit', 'param returns another param');
@@ -29,29 +29,9 @@ subtest 'param and params read from scope' => sub {
 };
 
 subtest 'param returns undef when no route params' => sub {
-    my $res = PAGI::Response->new($send, $scope);
+    my $res = PAGI::Response->new($scope, $send);
     is($res->path_param('anything'), undef, 'param returns undef when no params');
     is($res->path_params, {}, 'params returns empty hash');
-};
-
-subtest 'param returns undef when no scope provided' => sub {
-    my $res = PAGI::Response->new($send);
-    is($res->path_param('anything'), undef, 'param returns undef when no scope');
-    is($res->path_params, {}, 'params returns empty hash when no scope');
-};
-
-subtest 'backward compatibility - constructor works without scope' => sub {
-    my $res = PAGI::Response->new($send);
-    isa_ok $res, 'PAGI::Response';
-
-    # Should still be able to use all other methods
-    @sent = ();
-    $res->status(200)->header('X-Test' => 'value');
-    $res->text("Hello")->get;
-
-    is scalar(@sent), 2, 'response sent successfully';
-    is $sent[0]->{status}, 200, 'status set';
-    is $sent[1]->{body}, encode('UTF-8', 'Hello'), 'body sent';
 };
 
 subtest 'params with complex route params' => sub {
@@ -63,7 +43,7 @@ subtest 'params with complex route params' => sub {
             format  => 'json',
         },
     };
-    my $res = PAGI::Response->new($send, $scope_complex);
+    my $res = PAGI::Response->new($scope_complex, $send);
 
     is($res->path_param('user_id'), '123', 'user_id param');
     is($res->path_param('post_id'), '456', 'post_id param');
@@ -79,7 +59,7 @@ subtest 'params when path_params key missing' => sub {
     my $scope_no_params = {
         type => 'http',
     };
-    my $res = PAGI::Response->new($send, $scope_no_params);
+    my $res = PAGI::Response->new($scope_no_params, $send);
 
     is($res->path_param('anything'), undef, 'param returns undef');
     is($res->path_params, {}, 'params returns empty hash');
@@ -89,7 +69,7 @@ subtest 'stash accessor' => sub {
     my $scope_with_stash = {
         type => 'http',
     };
-    my $res = PAGI::Response->new($send, $scope_with_stash);
+    my $res = PAGI::Response->new($scope_with_stash, $send);
 
     # Default stash is empty hashref
     is($res->stash, {}, 'stash returns empty hashref by default');
@@ -117,7 +97,7 @@ subtest 'stash shared with Request' => sub {
     $req->stash->{user} = { id => 42, role => 'admin' };
 
     # Response should see the same stash
-    my $res = PAGI::Response->new($send, $shared_scope);
+    my $res = PAGI::Response->new($shared_scope, $send);
     is($res->stash->{user}{id}, 42, 'Response sees stash set by Request');
     is($res->stash->{user}{role}, 'admin', 'full structure accessible');
 
@@ -133,7 +113,7 @@ subtest 'stash survives scope shallow copy' => sub {
     };
 
     # Set stash on original scope
-    my $res1 = PAGI::Response->new($send, $original_scope);
+    my $res1 = PAGI::Response->new($original_scope, $send);
     $res1->stash->{user} = 'alice';
 
     # Middleware creates shallow copy (what PAGI middleware does)
@@ -143,17 +123,12 @@ subtest 'stash survives scope shallow copy' => sub {
     };
 
     # New Response on copied scope should see the same stash
-    my $res2 = PAGI::Response->new($send, $new_scope);
+    my $res2 = PAGI::Response->new($new_scope, $send);
     is($res2->stash->{user}, 'alice', 'stash survives shallow copy');
 
     # They share the same stash reference
     $res2->stash->{role} = 'admin';
     is($res1->stash->{role}, 'admin', 'stash modifications visible across copies');
-};
-
-subtest 'stash returns empty hash when no scope' => sub {
-    my $res = PAGI::Response->new($send);
-    is($res->stash, {}, 'stash returns empty hash when no scope');
 };
 
 done_testing;

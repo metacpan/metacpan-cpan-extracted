@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfInformationalMessage;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfInformationalMessage::VERSION = '3.10';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfInformationalMessage::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,26 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %InformationalMessage_of :ATTR(:get<InformationalMessage>);
+    my %InformationalMessage_of : ATTR(:get<InformationalMessage>);
 
-__PACKAGE__->_factory(
-    [ qw(        InformationalMessage
+    __PACKAGE__->_factory(
+        [   qw(        InformationalMessage
 
-    ) ],
-    {
-        'InformationalMessage' => \%InformationalMessage_of,
-    },
-    {
-        'InformationalMessage' => 'Shipment::Purolator::WSDLV2::Types::InformationalMessage',
-    },
-    {
+            )
+        ],
+        {'InformationalMessage' => \%InformationalMessage_of,},
+        {   'InformationalMessage' =>
+              'Shipment::Purolator::WSDLV2::Types::InformationalMessage',
+        },
+        {
 
-        'InformationalMessage' => 'InformationalMessage',
-    }
-);
+            'InformationalMessage' => 'InformationalMessage',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +56,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfInformationalMessage
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

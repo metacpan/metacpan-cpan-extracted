@@ -57,7 +57,7 @@ subtest 'basic accessors' => sub {
     is($sse->path, '/events', 'path accessor');
     is($sse->query_string, 'token=abc', 'query_string accessor');
     is($sse->scheme, 'https', 'scheme accessor');
-    is($sse->scope, $scope, 'scope accessor returns hashref');
+    ok($sse->scope == $scope, 'scope accessor returns same hashref');
     ref_ok($sse->stash, 'HASH', 'stash returns hashref');
 };
 

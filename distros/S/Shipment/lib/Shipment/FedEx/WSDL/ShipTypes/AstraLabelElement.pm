@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement;
-$Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Number_of :ATTR(:get<Number>);
-my %Content_of :ATTR(:get<Content>);
+    my %Number_of  : ATTR(:get<Number>);
+    my %Content_of : ATTR(:get<Content>);
 
-__PACKAGE__->_factory(
-    [ qw(        Number
-        Content
+    __PACKAGE__->_factory(
+        [   qw(        Number
+              Content
 
-    ) ],
-    {
-        'Number' => \%Number_of,
-        'Content' => \%Content_of,
-    },
-    {
-        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-        'Content' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Number'  => \%Number_of,
+            'Content' => \%Content_of,
+        },
+        {   'Number'  => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'Content' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Number' => 'Number',
-        'Content' => 'Content',
-    }
-);
+            'Number'  => 'Number',
+            'Content' => 'Content',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

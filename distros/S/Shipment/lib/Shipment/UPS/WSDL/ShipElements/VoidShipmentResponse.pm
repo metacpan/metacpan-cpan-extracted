@@ -1,125 +1,116 @@
 
 package Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse;
-$Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Void/v1.1'}
 
-__PACKAGE__->__set_name('VoidShipmentResponse');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('VoidShipmentResponse');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Response_of :ATTR(:get<Response>);
-my %SummaryResult_of :ATTR(:get<SummaryResult>);
-my %PackageLevelResult_of :ATTR(:get<PackageLevelResult>);
-
-__PACKAGE__->_factory(
-    [ qw(        Response
-        SummaryResult
-        PackageLevelResult
-
-    ) ],
-    {
-        'Response' => \%Response_of,
-        'SummaryResult' => \%SummaryResult_of,
-        'PackageLevelResult' => \%PackageLevelResult_of,
-    },
-    {
-        'Response' => 'Shipment::UPS::WSDL::ShipElements::Response',
-
-
-        'SummaryResult' => 'Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::_SummaryResult',
-        'PackageLevelResult' => 'Shipment::UPS::WSDL::ShipTypes::PackageLevelResult',
-    },
-    {
-
-        'Response' => '',
-        'SummaryResult' => 'SummaryResult',
-        'PackageLevelResult' => 'PackageLevelResult',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Response_of           : ATTR(:get<Response>);
+        my %SummaryResult_of      : ATTR(:get<SummaryResult>);
+        my %PackageLevelResult_of : ATTR(:get<PackageLevelResult>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Response
+                  SummaryResult
+                  PackageLevelResult
+
+                )
+            ],
+            {   'Response'           => \%Response_of,
+                'SummaryResult'      => \%SummaryResult_of,
+                'PackageLevelResult' => \%PackageLevelResult_of,
+            },
+            {   'Response' => 'Shipment::UPS::WSDL::ShipElements::Response',
 
 
+                'SummaryResult' =>
+                  'Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::_SummaryResult',
+                'PackageLevelResult' =>
+                  'Shipment::UPS::WSDL::ShipTypes::PackageLevelResult',
+            },
+            {
+
+                'Response'           => '',
+                'SummaryResult'      => 'SummaryResult',
+                'PackageLevelResult' => 'PackageLevelResult',
+            }
+        );
+
+    }    # end BLOCK
 
 
-package Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::_SummaryResult;
-$Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::_SummaryResult::VERSION = '3.10';
-use strict;
-use warnings;
-{
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Status_of :ATTR(:get<Status>);
-
-__PACKAGE__->_factory(
-    [ qw(        Status
-
-    ) ],
+    package Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::_SummaryResult;
+    $Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse::_SummaryResult::VERSION
+      = '3.11';
+    use strict;
+    use warnings;
     {
-        'Status' => \%Status_of,
-    },
-    {
-        'Status' => 'Shipment::UPS::WSDL::ShipTypes::CodeDescriptionType',
-    },
-    {
+        our $XML_ATTRIBUTE_CLASS;
+        undef $XML_ATTRIBUTE_CLASS;
 
-        'Status' => 'Status',
+        sub __get_attr_class {
+            return $XML_ATTRIBUTE_CLASS;
+        }
+
+        use Class::Std::Fast::Storable constructor => 'none';
+        use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+        Class::Std::initialize();
+
+        {    # BLOCK to scope variables
+
+            my %Status_of : ATTR(:get<Status>);
+
+            __PACKAGE__->_factory(
+                [   qw(        Status
+
+                    )
+                ],
+                {'Status' => \%Status_of,},
+                {   'Status' =>
+                      'Shipment::UPS::WSDL::ShipTypes::CodeDescriptionType',
+                },
+                {
+
+                    'Status' => 'Status',
+                }
+            );
+
+        }    # end BLOCK
+
+
     }
-);
-
-} # end BLOCK
 
 
-
-
-
-
-}
-
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -136,7 +127,7 @@ Shipment::UPS::WSDL::ShipElements::VoidShipmentResponse
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

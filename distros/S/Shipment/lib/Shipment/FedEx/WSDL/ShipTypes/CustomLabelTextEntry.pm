@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomLabelTextEntry;
-$Shipment::FedEx::WSDL::ShipTypes::CustomLabelTextEntry::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::CustomLabelTextEntry::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Position_of :ATTR(:get<Position>);
-my %Format_of :ATTR(:get<Format>);
-my %DataFields_of :ATTR(:get<DataFields>);
-my %ThermalFontId_of :ATTR(:get<ThermalFontId>);
-my %FontName_of :ATTR(:get<FontName>);
-my %FontSize_of :ATTR(:get<FontSize>);
+    my %Position_of      : ATTR(:get<Position>);
+    my %Format_of        : ATTR(:get<Format>);
+    my %DataFields_of    : ATTR(:get<DataFields>);
+    my %ThermalFontId_of : ATTR(:get<ThermalFontId>);
+    my %FontName_of      : ATTR(:get<FontName>);
+    my %FontSize_of      : ATTR(:get<FontSize>);
 
-__PACKAGE__->_factory(
-    [ qw(        Position
-        Format
-        DataFields
-        ThermalFontId
-        FontName
-        FontSize
+    __PACKAGE__->_factory(
+        [   qw(        Position
+              Format
+              DataFields
+              ThermalFontId
+              FontName
+              FontSize
 
-    ) ],
-    {
-        'Position' => \%Position_of,
-        'Format' => \%Format_of,
-        'DataFields' => \%DataFields_of,
-        'ThermalFontId' => \%ThermalFontId_of,
-        'FontName' => \%FontName_of,
-        'FontSize' => \%FontSize_of,
-    },
-    {
-        'Position' => 'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
-        'Format' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DataFields' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ThermalFontId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'FontName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'FontSize' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-    },
-    {
+            )
+        ],
+        {   'Position'      => \%Position_of,
+            'Format'        => \%Format_of,
+            'DataFields'    => \%DataFields_of,
+            'ThermalFontId' => \%ThermalFontId_of,
+            'FontName'      => \%FontName_of,
+            'FontSize'      => \%FontSize_of,
+        },
+        {   'Position' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
+            'Format'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DataFields'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ThermalFontId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FontName'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FontSize' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+        },
+        {
 
-        'Position' => 'Position',
-        'Format' => 'Format',
-        'DataFields' => 'DataFields',
-        'ThermalFontId' => 'ThermalFontId',
-        'FontName' => 'FontName',
-        'FontSize' => 'FontSize',
-    }
-);
+            'Position'      => 'Position',
+            'Format'        => 'Format',
+            'DataFields'    => 'DataFields',
+            'ThermalFontId' => 'ThermalFontId',
+            'FontName'      => 'FontName',
+            'FontSize'      => 'FontSize',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +82,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomLabelTextEntry
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

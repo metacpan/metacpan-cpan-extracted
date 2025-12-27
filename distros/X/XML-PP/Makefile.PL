@@ -15,23 +15,29 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME         => 'XML::PP',
+	NAME => 'XML::PP',
 	VERSION_FROM => 'lib/XML/PP.pm',
-	AUTHOR       => 'Nigel Horne <njh@nigelhorne.com>',
+	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, ((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
+	EXE_FILES => [ 'bin/xmlpp-cli' ],
+	clean => { FILES => 'XML-PP-*' },
 	dist => $dist,
 	PREREQ_PM => {
-		'Params::Get' => 0.04,
+		'Getopt::Long' => 0,
+		'Params::Get' => 0.13,
+		'Pod::Usage' => 0,
+		'Return::Set' => 0,
 		'Scalar::Util' => 0
 	}, TEST_REQUIRES => {
 		'Data::Dumper' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
-		'Test::Needs' => 0
+		'Test::Needs' => 0,
+		'Test::Returns' => 0
 	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
@@ -42,11 +48,12 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/XML-PP'
 			}, bugtracker => {
 				mailto => 'bug-XML-PP@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/XML-PP/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=XML-PP',
-				web => 'https://github.com/nigelhorne/XML-PP/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=XML-PP',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=XML-PP',
+				# url => 'https://github.com/nigelhorne/XML-PP/issues',
+				# web => 'https://github.com/nigelhorne/XML-PP/issues'
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION => '5.008'
 );

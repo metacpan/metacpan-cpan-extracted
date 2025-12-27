@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::PendingShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::PendingShipmentDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::PendingShipmentDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %ExpirationDate_of :ATTR(:get<ExpirationDate>);
-my %EmailLabelDetail_of :ATTR(:get<EmailLabelDetail>);
+    my %Type_of             : ATTR(:get<Type>);
+    my %ExpirationDate_of   : ATTR(:get<ExpirationDate>);
+    my %EmailLabelDetail_of : ATTR(:get<EmailLabelDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        ExpirationDate
-        EmailLabelDetail
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              ExpirationDate
+              EmailLabelDetail
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'ExpirationDate' => \%ExpirationDate_of,
-        'EmailLabelDetail' => \%EmailLabelDetail_of,
-    },
-    {
-        'Type' => 'Shipment::FedEx::WSDL::ShipTypes::PendingShipmentType',
-        'ExpirationDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'EmailLabelDetail' => 'Shipment::FedEx::WSDL::ShipTypes::EMailLabelDetail',
-    },
-    {
+            )
+        ],
+        {   'Type'             => \%Type_of,
+            'ExpirationDate'   => \%ExpirationDate_of,
+            'EmailLabelDetail' => \%EmailLabelDetail_of,
+        },
+        {   'Type' => 'Shipment::FedEx::WSDL::ShipTypes::PendingShipmentType',
+            'ExpirationDate'   => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'EmailLabelDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::EMailLabelDetail',
+        },
+        {
 
-        'Type' => 'Type',
-        'ExpirationDate' => 'ExpirationDate',
-        'EmailLabelDetail' => 'EmailLabelDetail',
-    }
-);
+            'Type'             => 'Type',
+            'ExpirationDate'   => 'ExpirationDate',
+            'EmailLabelDetail' => 'EmailLabelDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::PendingShipmentDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

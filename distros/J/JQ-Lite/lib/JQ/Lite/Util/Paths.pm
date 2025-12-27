@@ -473,6 +473,14 @@ sub _apply_leaf_paths {
     return \@paths;
 }
 
+sub _validate_path_array {
+    my ($path) = @_;
+
+    die 'getpath(): path must be an array' if ref($path) ne 'ARRAY';
+
+    return [ @$path ];
+}
+
 sub _apply_getpath {
     my ($self, $value, $expr) = @_;
 
@@ -488,14 +496,16 @@ sub _apply_getpath {
     if (!$@ && defined $decoded) {
         if (ref $decoded eq 'ARRAY') {
             if (@$decoded && ref $decoded->[0] eq 'ARRAY') {
-                push @paths, map { [ @$_ ] } @$decoded;
+                for my $path (@$decoded) {
+                    push @paths, _validate_path_array($path);
+                }
             }
             else {
-                push @paths, [ @$decoded ];
+                push @paths, _validate_path_array($decoded);
             }
         }
         else {
-            push @paths, [ $decoded ];
+            die 'getpath(): path must be an array';
         }
     }
 
@@ -506,14 +516,16 @@ sub _apply_getpath {
 
             if (ref $output eq 'ARRAY') {
                 if (@$output && ref $output->[0] eq 'ARRAY') {
-                    push @paths, grep { ref $_ eq 'ARRAY' } @$output;
+                    for my $path (@$output) {
+                        push @paths, _validate_path_array($path);
+                    }
                 }
-                elsif (!@$output || !ref $output->[0]) {
-                    push @paths, [ @$output ];
+                else {
+                    push @paths, _validate_path_array($output);
                 }
             }
-            elsif (!ref $output || ref($output) eq 'JSON::PP::Boolean') {
-                push @paths, [ $output ];
+            else {
+                die 'getpath(): path must be an array';
             }
         }
     }

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::RequestType;
-$Shipment::UPS::WSDL::RateTypes::RequestType::VERSION = '3.10';
+$Shipment::UPS::WSDL::RateTypes::RequestType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %RequestOption_of :ATTR(:get<RequestOption>);
-my %TransactionReference_of :ATTR(:get<TransactionReference>);
+    my %RequestOption_of        : ATTR(:get<RequestOption>);
+    my %TransactionReference_of : ATTR(:get<TransactionReference>);
 
-__PACKAGE__->_factory(
-    [ qw(        RequestOption
-        TransactionReference
+    __PACKAGE__->_factory(
+        [   qw(        RequestOption
+              TransactionReference
 
-    ) ],
-    {
-        'RequestOption' => \%RequestOption_of,
-        'TransactionReference' => \%TransactionReference_of,
-    },
-    {
-        'RequestOption' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TransactionReference' => 'Shipment::UPS::WSDL::RateTypes::TransactionReferenceType',
-    },
-    {
+            )
+        ],
+        {   'RequestOption'        => \%RequestOption_of,
+            'TransactionReference' => \%TransactionReference_of,
+        },
+        {   'RequestOption' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TransactionReference' =>
+              'Shipment::UPS::WSDL::RateTypes::TransactionReferenceType',
+        },
+        {
 
-        'RequestOption' => 'RequestOption',
-        'TransactionReference' => 'TransactionReference',
-    }
-);
+            'RequestOption'        => 'RequestOption',
+            'TransactionReference' => 'TransactionReference',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::UPS::WSDL::RateTypes::RequestType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

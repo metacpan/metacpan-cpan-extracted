@@ -15,21 +15,6 @@ use PAGI::Util::AsyncFile;
 
 use constant FILE_CHUNK_SIZE => 65536;  # 64KB chunks for file streaming
 
-# Try to load Sys::Sendfile for zero-copy file transfers
-# Falls back to chunked reads if not available
-my $HAS_SENDFILE;
-BEGIN {
-    eval {
-        require Sys::Sendfile;
-        Sys::Sendfile->import('sendfile');
-        $HAS_SENDFILE = 1;
-    };
-    $HAS_SENDFILE //= 0;
-}
-
-# Class method to check if sendfile is available at the system level
-sub has_sendfile { return $HAS_SENDFILE }
-
 # =============================================================================
 # Header Validation (CRLF Injection Prevention)
 # =============================================================================
@@ -119,12 +104,14 @@ sub new {
         state         => $args{state} // {},
         tls_enabled   => $args{tls_enabled} // 0,
         timeout       => $args{timeout} // 60,  # Idle timeout in seconds
+        request_timeout => $args{request_timeout} // 0,  # Request stall timeout in seconds (0 = disabled, default for performance)
+        ws_idle_timeout => $args{ws_idle_timeout} // 0,   # WebSocket idle timeout (0 = disabled)
+        sse_idle_timeout => $args{sse_idle_timeout} // 0,  # SSE idle timeout (0 = disabled)
         max_body_size     => $args{max_body_size},  # 0 = unlimited
         access_log        => $args{access_log},     # Filehandle for access logging
         max_receive_queue => $args{max_receive_queue} // 1000,  # Max WebSocket receive queue size
         max_ws_frame_size => $args{max_ws_frame_size} // 65536,  # Max WebSocket frame size in bytes
-        disable_sendfile  => $args{disable_sendfile} // 0,  # Disable sendfile even if available
-        sync_file_threshold => $args{sync_file_threshold} // 65536,  # Threshold for sync file reads (0=always async)
+        sync_file_threshold => $args{sync_file_threshold} // 65536,  # Threshold for sync file reads (default 64KB)
         tls_info      => undef,  # Populated on first request if TLS
         buffer        => '',
         closed        => 0,
@@ -132,6 +119,9 @@ sub new {
         response_status  => undef,  # Track response status for logging
         request_start    => undef,  # Track request start time for logging
         idle_timer    => undef,  # IO::Async::Timer for idle timeout
+        stall_timer   => undef,  # IO::Async::Timer for request stall timeout
+        ws_idle_timer => undef,  # IO::Async::Timer for WebSocket idle timeout
+        sse_idle_timer => undef, # IO::Async::Timer for SSE idle timeout
         # Event queue for $receive
         receive_queue   => [],
         receive_pending => undef,
@@ -214,6 +204,9 @@ sub start {
             # Reset idle timer on any read activity
             $weak_self->_reset_idle_timer;
 
+            # Reset stall timer on read activity (if handling a request)
+            $weak_self->_reset_stall_timer if $weak_self->{handling_request};
+
             $weak_self->{buffer} .= $$buffref;
             $$buffref = '';
 
@@ -276,6 +269,145 @@ sub _stop_idle_timer {
     $self->{idle_timer} = undef;
 }
 
+# Request stall timeout - closes connection if no I/O activity during request processing
+sub _start_stall_timer {
+    my ($self) = @_;
+
+    return unless $self->{request_timeout} && $self->{request_timeout} > 0;
+    return unless $self->{server};
+    return if $self->{stall_timer};  # Already running
+
+    weaken(my $weak_self = $self);
+
+    my $timer = IO::Async::Timer::Countdown->new(
+        delay => $self->{request_timeout},
+        on_expire => sub {
+            return unless $weak_self;
+            return if $weak_self->{closed};
+            # Log the timeout
+            if ($weak_self->{server} && $weak_self->{server}->can('_log')) {
+                $weak_self->{server}->_log(warn =>
+                    "Request stall timeout ($weak_self->{request_timeout}s) - closing connection");
+            }
+            $weak_self->_close;
+        },
+    );
+    $self->{stall_timer} = $timer;
+    $self->{server}->add_child($timer);
+    $timer->start;
+}
+
+sub _reset_stall_timer {
+    my ($self) = @_;
+
+    return unless $self->{stall_timer};
+    $self->{stall_timer}->reset;
+    $self->{stall_timer}->start unless $self->{stall_timer}->is_running;
+}
+
+sub _stop_stall_timer {
+    my ($self) = @_;
+
+    return unless $self->{stall_timer};
+    $self->{stall_timer}->stop if $self->{stall_timer}->is_running;
+    if ($self->{server}) {
+        $self->{server}->remove_child($self->{stall_timer});
+    }
+    $self->{stall_timer} = undef;
+}
+
+# WebSocket idle timeout - closes connection if no activity
+sub _start_ws_idle_timer {
+    my ($self) = @_;
+
+    return unless $self->{ws_idle_timeout} && $self->{ws_idle_timeout} > 0;
+    return unless $self->{server};
+    return if $self->{ws_idle_timer};
+
+    weaken(my $weak_self = $self);
+
+    my $timer = IO::Async::Timer::Countdown->new(
+        delay => $self->{ws_idle_timeout},
+        on_expire => sub {
+            return unless $weak_self;
+            return if $weak_self->{closed};
+            if ($weak_self->{server} && $weak_self->{server}->can('_log')) {
+                $weak_self->{server}->_log(warn =>
+                    "WebSocket idle timeout ($weak_self->{ws_idle_timeout}s) - closing connection");
+            }
+            $weak_self->_close;
+        },
+    );
+    $self->{ws_idle_timer} = $timer;
+    $self->{server}->add_child($timer);
+    $timer->start;
+}
+
+sub _reset_ws_idle_timer {
+    my ($self) = @_;
+
+    return unless $self->{ws_idle_timer};
+    $self->{ws_idle_timer}->reset;
+    $self->{ws_idle_timer}->start unless $self->{ws_idle_timer}->is_running;
+}
+
+sub _stop_ws_idle_timer {
+    my ($self) = @_;
+
+    return unless $self->{ws_idle_timer};
+    $self->{ws_idle_timer}->stop if $self->{ws_idle_timer}->is_running;
+    if ($self->{server}) {
+        $self->{server}->remove_child($self->{ws_idle_timer});
+    }
+    $self->{ws_idle_timer} = undef;
+}
+
+# SSE idle timeout - closes connection if no activity
+sub _start_sse_idle_timer {
+    my ($self) = @_;
+
+    return unless $self->{sse_idle_timeout} && $self->{sse_idle_timeout} > 0;
+    return unless $self->{server};
+    return if $self->{sse_idle_timer};
+
+    weaken(my $weak_self = $self);
+
+    my $timer = IO::Async::Timer::Countdown->new(
+        delay => $self->{sse_idle_timeout},
+        on_expire => sub {
+            return unless $weak_self;
+            return if $weak_self->{closed};
+            if ($weak_self->{server} && $weak_self->{server}->can('_log')) {
+                $weak_self->{server}->_log(warn =>
+                    "SSE idle timeout ($weak_self->{sse_idle_timeout}s) - closing connection");
+            }
+            $weak_self->_close;
+        },
+    );
+    $self->{sse_idle_timer} = $timer;
+    $self->{server}->add_child($timer);
+    $timer->start;
+}
+
+sub _reset_sse_idle_timer {
+    my ($self) = @_;
+
+    return unless $self->{sse_idle_timer};
+    $self->{sse_idle_timer}->reset;
+    $self->{sse_idle_timer}->start unless $self->{sse_idle_timer}->is_running;
+}
+
+sub _stop_sse_idle_timer {
+    my ($self) = @_;
+
+    return unless $self->{sse_idle_timer};
+    $self->{sse_idle_timer}->stop if $self->{sse_idle_timer}->is_running;
+    if ($self->{server}) {
+        $self->{server}->remove_child($self->{sse_idle_timer});
+    }
+    $self->{sse_idle_timer} = undef;
+}
+
 sub _try_handle_request {
     my ($self) = @_;
 
@@ -322,12 +454,14 @@ sub _try_handle_request {
     } elsif ($is_sse) {
         $self->{request_future} = $self->_handle_sse_request($request);
     } else {
+        # Start stall timer for HTTP requests (WebSocket/SSE have their own handling)
+        $self->_start_stall_timer;
         $self->{request_future} = $self->_handle_request($request);
     }
 
-    # Retain the future to prevent warning if connection is destroyed
-    # while request is still being processed
-    $self->{request_future}->retain;
+    # Use adopt_future for proper error tracking instead of retain
+    # This ensures errors are propagated to the server's error handling
+    $self->{server}->adopt_future($self->{request_future});
 }
 
 sub _is_websocket_upgrade {
@@ -409,6 +543,9 @@ async sub _handle_request {
 
     # Notify server that request completed (for max_requests tracking)
     $self->{server}->_on_request_complete if $self->{server};
+
+    # Stop stall timer - request completed successfully
+    $self->_stop_stall_timer;
 
     # Determine if we should keep the connection alive
     my $keep_alive = $self->_should_keep_alive($request);
@@ -718,6 +855,9 @@ sub _create_send {
         return Future->done unless $weak_self;
         return Future->done if $weak_self->{closed};
 
+        # Reset stall timer on write activity
+        $weak_self->_reset_stall_timer;
+
         my $type = $event->{type} // '';
 
         if ($type eq 'http.response.start') {
@@ -997,6 +1137,13 @@ sub _close {
     # Stop idle timer
     $self->_stop_idle_timer;
 
+    # Stop stall timer
+    $self->_stop_stall_timer;
+
+    # Stop WS/SSE idle timers
+    $self->_stop_ws_idle_timer;
+    $self->_stop_sse_idle_timer;
+
     # Complete any pending receive with disconnect
     $self->_handle_disconnect;
 
@@ -1190,6 +1337,7 @@ async sub _handle_sse_request {
 
     $self->{sse_mode} = 1;
     $self->_stop_idle_timer;  # SSE connections are long-lived
+    $self->_start_sse_idle_timer;  # Start SSE-specific idle timer if configured
 
     my $scope = $self->_create_sse_scope($request);
     my $receive = $self->_create_sse_receive($request);
@@ -1208,7 +1356,9 @@ async sub _handle_sse_request {
     }
 
     # Send chunked terminator if SSE was started (uses chunked encoding)
-    if ($self->{sse_started} && !$self->{closed}) {
+    # Check both closed flag and that stream is still writable
+    if ($self->{sse_started} && !$self->{closed} &&
+        $self->{stream} && $self->{stream}->write_handle) {
         $self->{stream}->write("0\r\n\r\n");
     }
 
@@ -1307,6 +1457,9 @@ sub _create_sse_send {
         my ($event) = @_;
         return Future->done unless $weak_self;
         return Future->done if $weak_self->{closed};
+
+        # Reset SSE idle timer on send activity
+        $weak_self->_reset_sse_idle_timer;
 
         my $type = $event->{type} // '';
 
@@ -1423,6 +1576,7 @@ async sub _handle_websocket_request {
     my ($self, $request) = @_;
 
     $self->_stop_idle_timer;  # WebSocket connections are long-lived
+    $self->_start_ws_idle_timer;  # Start WebSocket-specific idle timer if configured
 
     my $scope = $self->_create_websocket_scope($request);
     my $receive = $self->_create_websocket_receive($request);
@@ -1577,6 +1731,9 @@ sub _create_websocket_send {
         return Future->done unless $weak_self;
         return Future->done if $weak_self->{closed};
 
+        # Reset WebSocket idle timer on send activity
+        $weak_self->_reset_ws_idle_timer;
+
         my $type = $event->{type} // '';
 
         if ($type eq 'websocket.accept') {
@@ -1693,6 +1850,9 @@ sub _process_websocket_frames {
 
     return unless $self->{websocket_mode};
     return if $self->{closed};
+
+    # Reset WebSocket idle timer on receive activity
+    $self->_reset_ws_idle_timer;
 
     my $frame = $self->{websocket_frame};
 
@@ -1849,72 +2009,9 @@ sub _process_websocket_frames {
     }
 }
 
-# Check if we can use sendfile() for this connection
-sub _can_use_sendfile {
-    my ($self, $chunked) = @_;
-
-    return 0 unless $HAS_SENDFILE;
-    return 0 if $self->{disable_sendfile};  # Explicitly disabled
-    return 0 if $self->{tls_enabled};       # Can't sendfile over TLS
-    return 0 if $chunked;                   # Can't sendfile with chunked encoding (need headers)
-    return 1;
-}
-
-# Wait for socket to become writable (non-blocking, with timeout)
-# Used by sendfile loop when socket buffer is full (EAGAIN condition)
-# Returns a Future that resolves when socket is writable or fails on timeout/error
-use constant SENDFILE_WRITE_TIMEOUT => 30;  # seconds
-
-sub _wait_for_writable {
-    my ($self, $socket) = @_;
-
-    my $loop = $self->{server} ? $self->{server}->loop : undef;
-    die "No event loop available for _wait_for_writable" unless $loop;
-
-    # Check if connection is already closed
-    return Future->fail('Connection closed') if $self->{closed};
-
-    my $write_ready_f = $loop->new_future;
-    my $watching = 0;
-
-    # Set up write readiness watch
-    $loop->watch_io(
-        handle => $socket,
-        on_write_ready => sub {
-            return unless $watching;  # Guard against double-fire
-            $watching = 0;
-            $loop->unwatch_io(handle => $socket, on_write_ready => 1);
-            $write_ready_f->done unless $write_ready_f->is_ready;
-        },
-    );
-    $watching = 1;
-
-    # Set up timeout to prevent infinite wait
-    my $timeout_f = $loop->delay_future(after => SENDFILE_WRITE_TIMEOUT)->then(sub {
-        Future->fail('sendfile write timeout after ' . SENDFILE_WRITE_TIMEOUT . ' seconds');
-    });
-
-    # Race between write ready and timeout
-    my $result_f = Future->wait_any($write_ready_f, $timeout_f);
-
-    # Ensure cleanup on completion (success, failure, or cancellation)
-    $result_f->on_ready(sub {
-        if ($watching) {
-            $watching = 0;
-            eval { $loop->unwatch_io(handle => $socket, on_write_ready => 1) };
-        }
-        # Cancel whichever future didn't complete
-        $write_ready_f->cancel unless $write_ready_f->is_ready;
-        $timeout_f->cancel unless $timeout_f->is_ready;
-    });
-
-    return $result_f;
-}
-
 # Async file response - prioritizes speed based on file size:
 #   1. Small files (<=64KB): direct in-process read (fastest for small files)
-#   2. Large files with sendfile: zero-copy kernel transfer (fastest for large files)
-#   3. Large files without sendfile: worker pool (non-blocking fallback)
+#   2. Large files: async chunked reads via worker pool (non-blocking)
 async sub _send_file_response {
     my ($self, $file, $offset, $length, $chunked) = @_;
 
@@ -1923,9 +2020,11 @@ async sub _send_file_response {
     die "Cannot stat file $file: $!" unless defined $file_size;
     $length //= $file_size - $offset;
 
+    my $stream = $self->{stream};
+
     if ($self->{sync_file_threshold} > 0 && $length <= $self->{sync_file_threshold}) {
-        # Small file fast path: read directly in-process (no syscall/IPC overhead)
-        # For files <= 64KB, a simple read() beats sendfile() due to syscall overhead
+        # Small file fast path: read directly in-process
+        # For files <= 64KB, a simple read() is fast and avoids async overhead
         open my $fh, '<:raw', $file or die "Cannot open file $file: $!";
         seek($fh, $offset, 0) if $offset;
         my $bytes_read = read($fh, my $data, $length);
@@ -1933,7 +2032,6 @@ async sub _send_file_response {
 
         die "Failed to read file $file: $!" unless defined $bytes_read;
 
-        my $stream = $self->{stream};
         if ($chunked) {
             my $len = sprintf("%x", length($data));
             $stream->write("$len\r\n$data\r\n");
@@ -1943,68 +2041,15 @@ async sub _send_file_response {
             $stream->write($data);
         }
     }
-    elsif ($self->_can_use_sendfile($chunked)) {
-        # Large file sendfile path: zero-copy kernel transfer
-        # Ensure headers are flushed before sendfile (sendfile bypasses IO::Async buffer)
-        await $self->{stream}->write('');
-
-        open my $fh, '<:raw', $file or die "Cannot open file $file: $!";
-        my $socket = $self->{stream}->write_handle;
-
-        # sendfile may not send all bytes in one call, loop until done
-        # Sys::Sendfile expects filehandles, not file descriptor numbers
-        # On non-blocking sockets, sendfile returns 0 when buffer is full (EAGAIN)
-        my $sent = 0;
-        my $sendfile_error;
-
-        while ($sent < $length) {
-            # Check if connection was closed during transfer
-            if ($self->{closed}) {
-                $sendfile_error = "Connection closed during sendfile";
-                last;
-            }
-
-            my $to_send = $length - $sent;
-            my $current_offset = $offset + $sent;
-            my $result = sendfile($socket, $fh, $to_send, $current_offset);
-
-            if (!defined $result || $result < 0) {
-                $sendfile_error = "sendfile failed: $!";
-                last;
-            }
-
-            $sent += $result;
-
-            # Handle EAGAIN: sendfile returned 0 but we haven't sent everything
-            # This happens on non-blocking sockets when the send buffer is full
-            # Wait for socket to become writable before retrying (with timeout)
-            if ($result == 0 && $sent < $length) {
-                my $wait_ok = eval { await $self->_wait_for_writable($socket); 1 };
-                if (!$wait_ok) {
-                    $sendfile_error = $@ || "Failed waiting for socket writability";
-                    last;
-                }
-                next;
-            }
-
-            last if $result == 0;  # True EOF (shouldn't happen if length is correct)
-        }
-
-        close $fh;
-        die $sendfile_error if $sendfile_error;
-    }
     else {
-        # Worker pool path - non-blocking chunked reads for large files
-        # Used when sendfile unavailable (TLS, chunked encoding, no Sys::Sendfile)
+        # Large file path: async chunked reads via worker pool
         my $loop = $self->{server} ? $self->{server}->loop : undef;
         die "No event loop available for async file I/O" unless $loop;
 
-        my $stream = $self->{stream};
-
         await PAGI::Util::AsyncFile->read_file_chunked(
             $loop, $file,
-            sub  {
-        my ($chunk) = @_;
+            sub {
+                my ($chunk) = @_;
                 if ($chunked) {
                     my $len = sprintf("%x", length($chunk));
                     $stream->write("$len\r\n$chunk\r\n");

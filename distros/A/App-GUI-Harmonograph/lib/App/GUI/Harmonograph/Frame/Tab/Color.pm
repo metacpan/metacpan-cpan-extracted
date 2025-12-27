@@ -1,12 +1,11 @@
 
 # color selection page
 
+package App::GUI::Harmonograph::Frame::Tab::Color;
+use base qw/Wx::Panel/;
 use v5.12;
 use warnings;
 use Wx;
-
-package App::GUI::Harmonograph::Frame::Tab::Color;
-use base qw/Wx::Panel/;
 use App::GUI::Wx::Widget::Custom::ColorDisplay;
 use App::GUI::Wx::Widget::Custom::PositionMarker;
 use App::GUI::Harmonograph::Frame::Panel::ColorBrowser;
@@ -251,7 +250,5 @@ sub update_config {
     $self->{'config'}->set_value('color',     $self->{'picker'}->get_config);
     $self->{'config'}->set_value('color_set', $self->{'setpicker'}->get_config);
 }
-
-
 
 1;

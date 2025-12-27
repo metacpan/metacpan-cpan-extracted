@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::EmailDetailsType;
-$Shipment::UPS::WSDL::ShipTypes::EmailDetailsType::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipTypes::EmailDetailsType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %EMailAddress_of :ATTR(:get<EMailAddress>);
-my %UndeliverableEMailAddress_of :ATTR(:get<UndeliverableEMailAddress>);
-my %FromEMailAddress_of :ATTR(:get<FromEMailAddress>);
-my %FromName_of :ATTR(:get<FromName>);
-my %Memo_of :ATTR(:get<Memo>);
-my %Subject_of :ATTR(:get<Subject>);
-my %SubjectCode_of :ATTR(:get<SubjectCode>);
+    my %EMailAddress_of              : ATTR(:get<EMailAddress>);
+    my %UndeliverableEMailAddress_of : ATTR(:get<UndeliverableEMailAddress>);
+    my %FromEMailAddress_of          : ATTR(:get<FromEMailAddress>);
+    my %FromName_of                  : ATTR(:get<FromName>);
+    my %Memo_of                      : ATTR(:get<Memo>);
+    my %Subject_of                   : ATTR(:get<Subject>);
+    my %SubjectCode_of               : ATTR(:get<SubjectCode>);
 
-__PACKAGE__->_factory(
-    [ qw(        EMailAddress
-        UndeliverableEMailAddress
-        FromEMailAddress
-        FromName
-        Memo
-        Subject
-        SubjectCode
+    __PACKAGE__->_factory(
+        [   qw(        EMailAddress
+              UndeliverableEMailAddress
+              FromEMailAddress
+              FromName
+              Memo
+              Subject
+              SubjectCode
 
-    ) ],
-    {
-        'EMailAddress' => \%EMailAddress_of,
-        'UndeliverableEMailAddress' => \%UndeliverableEMailAddress_of,
-        'FromEMailAddress' => \%FromEMailAddress_of,
-        'FromName' => \%FromName_of,
-        'Memo' => \%Memo_of,
-        'Subject' => \%Subject_of,
-        'SubjectCode' => \%SubjectCode_of,
-    },
-    {
-        'EMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'UndeliverableEMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'FromEMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'FromName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Memo' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Subject' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SubjectCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'EMailAddress'              => \%EMailAddress_of,
+            'UndeliverableEMailAddress' => \%UndeliverableEMailAddress_of,
+            'FromEMailAddress'          => \%FromEMailAddress_of,
+            'FromName'                  => \%FromName_of,
+            'Memo'                      => \%Memo_of,
+            'Subject'                   => \%Subject_of,
+            'SubjectCode'               => \%SubjectCode_of,
+        },
+        {   'EMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'UndeliverableEMailAddress' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FromEMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FromName'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Memo'             => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Subject'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SubjectCode'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'EMailAddress' => 'EMailAddress',
-        'UndeliverableEMailAddress' => 'UndeliverableEMailAddress',
-        'FromEMailAddress' => 'FromEMailAddress',
-        'FromName' => 'FromName',
-        'Memo' => 'Memo',
-        'Subject' => 'Subject',
-        'SubjectCode' => 'SubjectCode',
-    }
-);
+            'EMailAddress'              => 'EMailAddress',
+            'UndeliverableEMailAddress' => 'UndeliverableEMailAddress',
+            'FromEMailAddress'          => 'FromEMailAddress',
+            'FromName'                  => 'FromName',
+            'Memo'                      => 'Memo',
+            'Subject'                   => 'Subject',
+            'SubjectCode'               => 'SubjectCode',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +87,7 @@ Shipment::UPS::WSDL::ShipTypes::EmailDetailsType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -27,6 +27,7 @@ t/aggregate.t
 t/all.t
 t/any.t
 t/arg_option.t
+t/argfile_cli.t
 t/argjson_cli.t
 t/arithmetic.t
 t/array_constructor.t
@@ -81,6 +82,7 @@ t/inside.t
 t/is_empty.t
 t/join.t
 t/json_formatter.t
+t/keys.t
 t/keys_unsorted.t
 t/leaf_paths.t
 t/length.t
@@ -120,6 +122,7 @@ t/select_stream.t
 t/setpath.t
 t/slice.t
 t/slurp_cli.t
+t/slurpfile_cli.t
 t/smoke_cli.t
 t/sort_by.t
 t/sort_desc.t

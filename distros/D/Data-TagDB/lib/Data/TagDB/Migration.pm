@@ -27,7 +27,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 my %table_defs = (
     SQLite => {
@@ -186,11 +186,13 @@ sub include {
             my Data::TagDB::Tag $sid = $wk->small_identifier(1);
             my Data::TagDB::Tag $default_type = $wk->default_type(1);
             my Data::TagDB::Tag $default_encoding = $wk->default_encoding(1);
+            my Data::TagDB::Tag $sirtx_logical = $wk->sirtx_logical(1);
             foreach my $name ($wk->_list) {
                 my Data::TagDB::Tag $tag = $wk->_call($name, 1);
                 my $info = $wk->_info($name);
-                $db->create_metadata(tag => $tag, relation => $asi, type => $tagname, data_raw => $info->{tagname}) if defined $info->{tagname};
-                $db->create_metadata(tag => $tag, relation => $asi, type => $sid,     data_raw => $info->{sid})     if defined $info->{sid};
+                $db->create_metadata(tag => $tag, relation => $asi, type => $tagname,       data_raw => $info->{tagname}) if defined $info->{tagname};
+                $db->create_metadata(tag => $tag, relation => $asi, type => $sid,           data_raw => $info->{sid})     if defined $info->{sid};
+                $db->create_metadata(tag => $tag, relation => $asi, type => $sirtx_logical, data_raw => $info->{logical}) if defined $info->{logical};
                 $db->create_relation(tag => $tag, relation => $default_type,     related => $wk->_call($info->{default_type},     1)) if defined $info->{default_type};
                 $db->create_relation(tag => $tag, relation => $default_encoding, related => $wk->_call($info->{default_encoding}, 1)) if defined $info->{default_encoding};
             }
@@ -218,8 +220,20 @@ sub include {
                         ]);
             }
         } elsif (($source =~ /::/ || $source =~ /^[A-Z]/) && $source->isa('Data::Identifier::Interface::Known')) {
+            my Data::TagDB::Tag $uuid = $wk->uuid(1);
+            my %types;
+
             foreach my $identifier ($source->known(':all', as => 'Data::Identifier')) {
-                $db->create_tag($identifier);
+                my $as_uuid = $identifier->uuid(default => undef);
+                my $type = $identifier->type;
+
+                $types{$type->uuid} //= do { $db->create_tag($type) };
+
+                if (defined $as_uuid) {
+                    $db->create_tag([$uuid => $as_uuid], $identifier);
+                } else {
+                    $db->create_tag($identifier);
+                }
             }
         } elsif ($source eq 'file') {
             $self->_ingest_file($entry->{handle} // $entry->{filename}, %{$entry});
@@ -495,7 +509,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -562,6 +576,10 @@ B<Note:>
 This function should be called inside a transaction (see L<Data::TagDB/begin_work>).
 Runing this inside a transaction will result in a speedup often ranging between 10 and 100 times.
 It is safe to mix this function with any other function within a single transaction.
+
+B<Note:>
+If a module is used as a source that module needs to be loaded using L<perlfunc/use> or L<perlfunc/require> first.
+Future versions might relax this rule.
 
 If the source is C<file> the following options are supported:
 

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::Address;
-$Shipment::Purolator::WSDL::Types::Address::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::Address::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,117 +20,111 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Name_of :ATTR(:get<Name>);
-my %Company_of :ATTR(:get<Company>);
-my %Department_of :ATTR(:get<Department>);
-my %StreetNumber_of :ATTR(:get<StreetNumber>);
-my %StreetSuffix_of :ATTR(:get<StreetSuffix>);
-my %StreetName_of :ATTR(:get<StreetName>);
-my %StreetType_of :ATTR(:get<StreetType>);
-my %StreetDirection_of :ATTR(:get<StreetDirection>);
-my %Suite_of :ATTR(:get<Suite>);
-my %Floor_of :ATTR(:get<Floor>);
-my %StreetAddress2_of :ATTR(:get<StreetAddress2>);
-my %StreetAddress3_of :ATTR(:get<StreetAddress3>);
-my %City_of :ATTR(:get<City>);
-my %Province_of :ATTR(:get<Province>);
-my %Country_of :ATTR(:get<Country>);
-my %PostalCode_of :ATTR(:get<PostalCode>);
-my %PhoneNumber_of :ATTR(:get<PhoneNumber>);
-my %FaxNumber_of :ATTR(:get<FaxNumber>);
+    my %Name_of            : ATTR(:get<Name>);
+    my %Company_of         : ATTR(:get<Company>);
+    my %Department_of      : ATTR(:get<Department>);
+    my %StreetNumber_of    : ATTR(:get<StreetNumber>);
+    my %StreetSuffix_of    : ATTR(:get<StreetSuffix>);
+    my %StreetName_of      : ATTR(:get<StreetName>);
+    my %StreetType_of      : ATTR(:get<StreetType>);
+    my %StreetDirection_of : ATTR(:get<StreetDirection>);
+    my %Suite_of           : ATTR(:get<Suite>);
+    my %Floor_of           : ATTR(:get<Floor>);
+    my %StreetAddress2_of  : ATTR(:get<StreetAddress2>);
+    my %StreetAddress3_of  : ATTR(:get<StreetAddress3>);
+    my %City_of            : ATTR(:get<City>);
+    my %Province_of        : ATTR(:get<Province>);
+    my %Country_of         : ATTR(:get<Country>);
+    my %PostalCode_of      : ATTR(:get<PostalCode>);
+    my %PhoneNumber_of     : ATTR(:get<PhoneNumber>);
+    my %FaxNumber_of       : ATTR(:get<FaxNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        Name
-        Company
-        Department
-        StreetNumber
-        StreetSuffix
-        StreetName
-        StreetType
-        StreetDirection
-        Suite
-        Floor
-        StreetAddress2
-        StreetAddress3
-        City
-        Province
-        Country
-        PostalCode
-        PhoneNumber
-        FaxNumber
+    __PACKAGE__->_factory(
+        [   qw(        Name
+              Company
+              Department
+              StreetNumber
+              StreetSuffix
+              StreetName
+              StreetType
+              StreetDirection
+              Suite
+              Floor
+              StreetAddress2
+              StreetAddress3
+              City
+              Province
+              Country
+              PostalCode
+              PhoneNumber
+              FaxNumber
 
-    ) ],
-    {
-        'Name' => \%Name_of,
-        'Company' => \%Company_of,
-        'Department' => \%Department_of,
-        'StreetNumber' => \%StreetNumber_of,
-        'StreetSuffix' => \%StreetSuffix_of,
-        'StreetName' => \%StreetName_of,
-        'StreetType' => \%StreetType_of,
-        'StreetDirection' => \%StreetDirection_of,
-        'Suite' => \%Suite_of,
-        'Floor' => \%Floor_of,
-        'StreetAddress2' => \%StreetAddress2_of,
-        'StreetAddress3' => \%StreetAddress3_of,
-        'City' => \%City_of,
-        'Province' => \%Province_of,
-        'Country' => \%Country_of,
-        'PostalCode' => \%PostalCode_of,
-        'PhoneNumber' => \%PhoneNumber_of,
-        'FaxNumber' => \%FaxNumber_of,
-    },
-    {
-        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Company' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Department' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetSuffix' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetDirection' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Suite' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Floor' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetAddress2' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StreetAddress3' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'City' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Province' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Country' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PhoneNumber' => 'Shipment::Purolator::WSDL::Types::PhoneNumber',
-        'FaxNumber' => 'Shipment::Purolator::WSDL::Types::PhoneNumber',
-    },
-    {
+            )
+        ],
+        {   'Name'            => \%Name_of,
+            'Company'         => \%Company_of,
+            'Department'      => \%Department_of,
+            'StreetNumber'    => \%StreetNumber_of,
+            'StreetSuffix'    => \%StreetSuffix_of,
+            'StreetName'      => \%StreetName_of,
+            'StreetType'      => \%StreetType_of,
+            'StreetDirection' => \%StreetDirection_of,
+            'Suite'           => \%Suite_of,
+            'Floor'           => \%Floor_of,
+            'StreetAddress2'  => \%StreetAddress2_of,
+            'StreetAddress3'  => \%StreetAddress3_of,
+            'City'            => \%City_of,
+            'Province'        => \%Province_of,
+            'Country'         => \%Country_of,
+            'PostalCode'      => \%PostalCode_of,
+            'PhoneNumber'     => \%PhoneNumber_of,
+            'FaxNumber'       => \%FaxNumber_of,
+        },
+        {   'Name'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Company'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Department'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetNumber'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetSuffix'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetName'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetType'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetDirection' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Suite'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Floor'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetAddress2'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StreetAddress3'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'City'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Province'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Country'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PostalCode'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PhoneNumber' => 'Shipment::Purolator::WSDL::Types::PhoneNumber',
+            'FaxNumber'   => 'Shipment::Purolator::WSDL::Types::PhoneNumber',
+        },
+        {
 
-        'Name' => 'Name',
-        'Company' => 'Company',
-        'Department' => 'Department',
-        'StreetNumber' => 'StreetNumber',
-        'StreetSuffix' => 'StreetSuffix',
-        'StreetName' => 'StreetName',
-        'StreetType' => 'StreetType',
-        'StreetDirection' => 'StreetDirection',
-        'Suite' => 'Suite',
-        'Floor' => 'Floor',
-        'StreetAddress2' => 'StreetAddress2',
-        'StreetAddress3' => 'StreetAddress3',
-        'City' => 'City',
-        'Province' => 'Province',
-        'Country' => 'Country',
-        'PostalCode' => 'PostalCode',
-        'PhoneNumber' => 'PhoneNumber',
-        'FaxNumber' => 'FaxNumber',
-    }
-);
+            'Name'            => 'Name',
+            'Company'         => 'Company',
+            'Department'      => 'Department',
+            'StreetNumber'    => 'StreetNumber',
+            'StreetSuffix'    => 'StreetSuffix',
+            'StreetName'      => 'StreetName',
+            'StreetType'      => 'StreetType',
+            'StreetDirection' => 'StreetDirection',
+            'Suite'           => 'Suite',
+            'Floor'           => 'Floor',
+            'StreetAddress2'  => 'StreetAddress2',
+            'StreetAddress3'  => 'StreetAddress3',
+            'City'            => 'City',
+            'Province'        => 'Province',
+            'Country'         => 'Country',
+            'PostalCode'      => 'PostalCode',
+            'PhoneNumber'     => 'PhoneNumber',
+            'FaxNumber'       => 'FaxNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -147,7 +141,7 @@ Shipment::Purolator::WSDL::Types::Address
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

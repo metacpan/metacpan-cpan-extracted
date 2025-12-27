@@ -1,9 +1,8 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti
-# This is the module Sim::OPT::Morph of Sim::OPT.
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# This is the module Sim::OPT::Morph of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
@@ -11,7 +10,7 @@ use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use Set::Intersection;
 use List::Compare;
 use IO::Tee;
@@ -20,12 +19,13 @@ use File::Copy qw( move copy );
 use Data::Dumper;
 use Switch::Back;
 
-
 use Sim::OPT;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
+use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 use Data::Dump qw(dump);
 use feature 'say';
@@ -48,7 +48,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr genmodnew
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.171'; # our $VERSION = '';
+$VERSION = '0.173'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -1150,13 +1150,13 @@ sub morph
 	my $outfile = $main::outfile;
 	my $tofile = $main::tofile;
 	my $simnetwork = $main::simnetwork;
-        my $max_processes = $main::max_processes;
+    my $max_processes = $main::max_processes;
 
 	my %simtitles = %main::simtitles;
 	my %retrievedata = %main::retrievedata;
 	my @keepcolumns = @main::keepcolumns;
 	my @weights = @main::weights;
-        my @weighttransforms = @main::weighttransforms;
+    my @weighttransforms = @main::weighttransforms;
 	my @weightsaim = @main::weightsaim;
 	my @varthemes_report = @main::varthemes_report;
 	my @varthemes_variations = @main::varthemes_variations;
@@ -1426,7 +1426,7 @@ sub morph
 		my %d = %{ $instance };
 		my $instance_after = $instances[ $counti + 1];
 		my %d_after = %{ $instance_after };
-
+        
 		my $countcase = $d{countcase};
 		my $countblock = $d{countblock};
 		my %datastruc = %{ $d{datastruc} };
@@ -1434,15 +1434,29 @@ sub morph
 		my @miditers = @{ $d{miditers} };
 		my @winneritems = @{ $d{winneritems} };
 		my $countvar = $d{countvar};
+        my $countstep = $d{countstep};
+        my $wascountvar = $countvar;
 
 		if ( $d{treated} eq "treated" )
 		{
 			#print $tee "TREATED!: $d{treated}";
 		};
 		#say $tee "ARRIVED IN MORPH 1";
+        
+        my $laxmode = "n";
+        my ( @countvars, @countsteps );
+        if ( Sim::OPT::checkOPTcue() )
+        {
+          my ( $countvars_r, $countsteps_r, $laxmod ) = Sim::OPTcue::relax ( $countvar, $countstep );
+          @countvars = @$countvars_r;
+          @countsteps = @$countsteps_r;
+          $laxmode = $laxmod;
+        }        
+		else 
+        {
+          say $tee "OPTcue is not installed and this operation is not possible without it.";
+        }
 
-		my @countvars;
-		push( @countvars, $countvar );
 		my $countvar_after = $d_after{countvar};
 		my $countstep = $d{countstep};
 		my $countinstance = ( $d{instn} );
@@ -1474,15 +1488,32 @@ sub morph
 		my $countcaseplus1 = ( $countcase + 1 );
 		my $countblockplus1 = ( $countblock + 1 );
 
-		my $countmorphing = 1;
 		my $numberof_morphings = scalar( keys %{ $dowhat{simtools} } );
 
 		my ( $orig, $target );
 
 		my $i == 0;
+
+        my $countp = 0; #HERE I.
+        my $cntv = 0; #HERE I.
 		foreach my $countvar ( @countvars )
 		{
-			while ( $countmorphing <= $numberof_morphings )
+            say $tee "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say $tee " \$cntv: " . dump( $cntv );
+
+            if ( Sim::OPT::checkOPTcue() )
+            {
+               $countstep = checkstep( $laxmode, $countstep, $cntv );
+            }
+            else 
+            {
+              say $tee "OPTcue is not installed and this operation is not possible without it.";
+            }
+
+            my $stepsvar = $varnums{$countvar};
+            $cntv++;
+
+            my $countmorphing = 1;
+            #while (  $countmorphing  <= $numberof_morphings )
 			{
 				if ( not (defined ( $vals{$countmorphing}{$countvar}{general_variables} ) ) )
 				{
@@ -1583,7 +1614,7 @@ sub morph
 
 						print MORPHLIST "$to{cleanto}\n";
 
-						unless ($exeonfiles eq "n")
+						unless ( ( $exeonfiles eq "n") or ( ( $laxmode = "y" ) and ( $countp > 0 ) ) ) #HERE I.
 						{
 							if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
 							{
@@ -1699,7 +1730,7 @@ sub morph
 
 							}
 
-							if ( ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{latinhypercube} eq "y" ) )
+							if ( ( not ( $dirfiles{randompick} eq "y" ) ) and ( not ( $dirfiles{newrandompick} eq "y" ) ) and ( not ( $dirfiles{latinhypercube} eq "y" ) )
 							 and ( not ( $dirfiles{ga} eq "y" ) ) )
 							{
 								$orig;
@@ -1720,7 +1751,7 @@ sub morph
 									#say $tee "HERE 3 COUNTBLOCK: $countblock, \$countstep: $countstep, \$orig: $orig, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 									print $tee "LEVEL 1g: cp -R $orig $target \n\n";
 									#print  "LEVEL 1g: cp -R $orig $target \n\n";
-                }
+                                }
 							}
 						}
 
@@ -1759,12 +1790,14 @@ sub morph
 
 								`cd $to`;
 								say $tee "cd $to\n";
-                #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 9 ";
+                                #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 9 ";
 								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; #say $tee "SO, LAUNCHLINE! " . dump( $launchline );
 
-								if ( ( $stepsvar > 1 ) and ( not ( eval ( $skip ) ) ) )
+								#if ( ( ( ( $stepsvar > 1 ) and ( not ( eval ( $skip ) ) ) ) and ( not( $wascountvar =~ /-/ ) ) ) and 
+                                #( ( ( not ( eval ( $skip ) ) ) and ( $wascountvar =~ /-/ ) ) ) )
+                                if ( not ( eval ( $skip ) ) )
 								{
-
+                                    say $tee "IN MORPH. I AM IN";
 									##########################################
 									my @mods;
 									if ( not( ref( $modification_type ) ) )
@@ -1775,10 +1808,12 @@ sub morph
 									{
 										push( @mods, @{ $modification_type } );
 									}
+                                    say $tee "IN MORPH. \@mods: " . dump( @mods );
 									#########################################
-                  #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 10 ";
+                                    #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 10 ";
 									foreach my $modtype ( @mods )
 									{
+                                        say $tee "IN MORPH. \$modtype: " . dump( $modtype );
 										if ( $modtype eq "change_groundreflectance" )#
 										{
 											change_groundreflectance
@@ -1887,7 +1922,7 @@ sub morph
 											die( "$!" );
 										}
 									}
-                  #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 11 ";
+                                     #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 11 ";
 
 
 									push ( @{ $done_instances[ $countvar ] }, $instance );
@@ -2018,7 +2053,7 @@ sub morph
 											}
 										}
 									}
-                  #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 12 ";
+                                    #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 12 ";
 
 									if ( ( $countvar_after > $countvar )
 										or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
@@ -2227,15 +2262,14 @@ sub morph
 								}
 								$countop++;
 								print `cd $mypath`;
-								#print $tee "cd $mypath\n\n";
 							}
 						}
 					}
 				}
 				#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 13, EXECUTING ";
-				$countmorphing++;
+                #$countmorphing++;
 			} #########
-
+            $countp++; #HERE I.
 		}########
 		close MORPHLIST;
 		close MORPHBLOCK;
@@ -4965,6 +4999,429 @@ sub pin_obstructions
 	}
 	close NEWFILE;
 } # END SUB pin_obstructions
+
+
+
+
+
+sub genmodnew
+{
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genmodnew_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
+
+    say $tee "IN GENMODNEW \$stepsvar: " . dump ( $stepsvar );
+    say $tee "IN GENMODNEW \$countstep: " . dump ( $countstep );
+    say $tee "IN GENMODNEW \$countvar: " . dump ( $countvar );
+    say $tee "IN GENMODNEW \$to: " . dump ( $to );
+    say $tee "IN GENMODNEW \$countop: " . dump ( $countop );
+
+
+	my @applytype = @$applytype_ref;
+	my @genmodnew = @ {$genmodnew_ref };
+    my $cntinst = $countinstance ;
+	say $tee "Applying constraints with genmodnew for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+
+	my @sourcefiles = @{ $genmodnew[$countop][0] }; #say $tee "OUTER \@sourcefiles: " - dump ( @sourcefiles );
+	my @numberfiles = @{ $genmodnew[$countop][1] }; #say $tee "OUTER \@numberfiles: " - dump ( @numberfiles );
+	my @configfiles = @{ $genmodnew[$countop][2] }; #say $tee "OUTER \@configfiles: " - dump ( @configfiles );
+	my @incrs = @{ $genmodnew[$countop][3] };  #say $tee "OUTER \@incrs: " - dump ( @incrs );
+	my @subtypes = @{ $genmodnew[$countop][4] }; #say $tee "OUTER \@subtypes: " - dump ( @subtypes );
+	my @vertpairs = @{ $genmodnew[$countop][5] }; #say $tee "OUTER \@vertpairs: " - dump ( @vertpairs );
+	my @vertstomoves = @{ $genmodnew[$countop][6] }; #say $tee "OUTER \@vertstomoves: " - dump ( @vertstomoves );
+	
+    my ( %ver, %obs, %oldver, %oldobs, %eds );
+    
+	my $countfile = 0;
+    foreach my $sourcefile ( @sourcefiles )
+	{
+
+		my $sourceaddress = "$to$sourcefile";  #say $tee "INSIDE FIRST \$sourceaddress: " . dump( $sourceaddress );
+
+		open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
+		my @lines = <SOURCEFILE>;
+		close SOURCEFILE;
+		my $num = $numberfiles[$countfile]; #say $tee "INSIDE FIRST \$num: " . dump( $num );
+        
+		my $vertnum = 0;
+        my $obsnum = 0;
+		foreach my $line ( @lines )
+		{
+			$line =~ s/^\s+//;
+			my @rowelts = split(/\s+|,/, $line);
+			{
+
+				if   ($rowelts[0] eq "*vertex" )
+				{ 
+					$vertnum++;
+					#say "foundvert $vertnum";
+					@{ $ver{$num}{$vertnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3] );
+				}
+		        if   ($rowelts[0] eq "*obs" )
+				{ 
+					$obsnum++;
+					#say "foundobs $obsnum";
+					@{ $obs{$num}{$obsnum} } = ( $rowelts[0], $rowelts[1], $rowelts[2], $rowelts[3],
+		            $rowelts[4], $rowelts[5], $rowelts[6], $rowelts[7], $rowelts[8], $rowelts[9], $rowelts[10], $rowelts[13] ) ;
+				}
+			}
+        }
+
+        %oldver = %{ dclone(\%ver) };
+        %oldobs = %{ dclone(\%obs) };
+
+
+        my $cn = 0;
+        foreach my $line ( @lines )
+        {
+            chomp $line;
+            if ( $line =~ /#&&/ )
+            {
+                $line =~ s/^\s+//;
+                $line =~ s/\s+/ /;
+                my @transitional = split(/#&&/, $line);
+                my $leftpart = $transitional[0]; #say $tee "AAAPPLY_CONSTRAINTS \$leftpart: " . dump( $leftpart );
+                my @elts = split(/\s+|,/, $leftpart); #say $tee "AAAPPLY_CONSTRAINTS \@elts: " . dump( @elts );
+
+                my $rightpart = $transitional[1]; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartA: " . dump( $rightpart );
+                $rightpart =~ s/^\s+//; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartB: " . dump( $rightpart );
+                $rightpart =~ s/\s+$//; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartC: " . dump( $rightpart );
+                $rightpart =~ s/\s+/ /; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartD: " . dump( $rightpart );
+                my @ins = split(/\s+|,/, $rightpart); #say $tee "AAAPPLY_CONSTRAINTS \@ins: " . dump( @ins );
+
+                foreach my $in ( @ins )
+                {
+                    unless ( ( $in eq undef ) or ( $leftpart eq undef ) or ( $rightpart eq undef ) )
+                    {
+                        my @elements = split(/-/, $in); #say $tee "AAAPPLY_CONSTRAINTS \@elements: " . dump( @elements );
+                        my $name = $elements[0];
+                        my $position = $elements[1];
+                        $eds{$name}{file} = $sourcefile; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{file}: " . dump( $eds{$name}{file} );
+                        $eds{$name}{line} = $cn; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{line}: " . dump( $eds{$name}{line} );
+                        $eds{$name}{position} = $position; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{position}: " . dump( $eds{$name}{position} );
+                        $eds{$name}{value} = $elts[$position];  #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{value}: " . dump( $eds{$name}{value} );
+                        my $length = length($in); #say $tee "AAAPPLY_CONSTRAINTS \$length: " . dump( $length );
+                        $eds{$name}{length} = $length; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{length}: " . dump( $eds{$name}{length} );
+                        my $beginning = index($line, $in);
+                        $eds{$name}{beginning} = $beginning; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{beginning}: " . dump( $eds{$name}{beginning} );
+                        my $end = $beginning + $length;
+                        $eds{$name}{end} = $end; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{end}: " . dump( $eds{$name}{end} );
+                        $eds{$name}{rightpart} = $rightpart; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{rightpart}: " . dump( $eds{$name}{rightpart} );
+                    }
+                }
+            }
+            $cn++;
+        }
+       
+        my $countype = 0;
+        foreach my $subtype ( @subtypes )
+        {
+        	my $incr = $incrs[$countype]; #say $tee "INSIDE FIRST IN FIRST \$incr: " . dump( $incr );
+    	    my @vertpair = @{ $vertpairs[$countype] }; #say $tee "INSIDE FIRST IN FIRST \@vertpair: " . dump( @vertpair );
+    	    my ( $firstvert, $secondvert ) = @vertpair; #say $tee "INSIDE FIRST IN FIRST \$firstvert, \$secondvert: " . dump( $firstvert, $secondvert );
+    	    my @vertstomove = @{ $vertstomoves[$countype] }; #say $tee "INSIDE FIRST IN FIRST \@vertstomove: " . dump( @vertstomove );
+
+    	    if ( "all" ~~ @vertstomove )
+    	    {
+    	    	@vertstomove = ( 1 .. $vertnum );
+    	    } #say $tee "AFTER all PROCESSING \@vertstomove: " . dump( @vertstomove );
+
+    	    my ( $swing, $base, $pace, $val, $myval );
+    		my $count = 0;
+    		  
+    		if ( ref ( $incr ) )
+    		{
+    			my $min = $incr->[0];
+    			my $max = $incr->[1];
+    			$swing->[$countype] = ( $max - $min );
+    			$base->[$countype] = ( 0 - $min );
+    		}
+    		else
+    		{
+    			$swing->[$countype] = ( 2 * $incr ); 
+    			$base->[$countype] = ( 0 - $incr );
+    		}
+
+    		$pace->[$countype] = ( $swing->[$countype] / ( $stepsvar - 1 ) );
+    		$val->[$countype] = ( $base->[$countype] + ( $pace->[$countype] * ( $countstep - 1 ) ) ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
+            $myval = $val->[$countype]; #say $tee "INSIDE FIRST IN FIRST \$myval: " . dump( $myval );
+    	    
+    	    
+        	if ( ( $subtype eq "pairedmove" ) or ( $subtype eq "pairedobsmove" ) or ( $subtype eq "rotation" ) or ( $subtype eq "obsrotation" ) )
+        	{   #say $tee "\%ver: " . dump ( \%ver );
+        	    #say $tee "\%obs: " . dump ( \%obs );
+        	    my ( $vert1, $vert2 );
+        	    unless ( ref( $firstvert ) )
+        	    {
+        	      $vert1 = $ver{$num}{$firstvert}; #say $tee "INSIDE SECOND \$num: $num, \$firstvert: " . dump ($firstvert) ;
+        	    }
+        	    else
+        	    {
+                  $vert1 = $firstvert; #say $tee "INSIDE SECOND ISREF \$num: $num, \$firstvert: " . dump ($firstvert) ;
+        	    }
+
+        	    unless ( ref( $secondvert ) )
+        	    {
+        	      $vert2 = $ver{$num}{$secondvert}; #say $tee "INSIDE SECOND \$num: $num, \$secondvert: " . dump($secondvert);
+        	    }
+        	    else
+        	    {
+                   $vert2 = $secondvert; #say $tee "INSIDE SECOND ISREF \$num: $num, \$secondvert: " . dump($secondvert);
+        	    }
+	    	
+
+	    	    my $xdiff = - ( $vert1->[0] - $vert2->[0] ); #say $tee "INSIDE SECOND \$xdiff: " . dump( $xdiff );
+	    	    my $ydiff = - ( $vert1->[1] - $vert2->[1] ); #say $tee "INSIDE SECOND \$ydiff: " . dump( $ydiff );
+	    	    my $zdiff = - ( $vert1->[2] - $vert2->[2] ); #say $tee "INSIDE SECOND \$zdiff: " . dump( $zdiff );
+
+	    	    my $dist = sqrt ( ( $xdiff ** 2 ) + ( $ydiff ** 2 ) + ( $zdiff ** 2 ) ); #say $tee "INSIDE SECOND \$dist: " . dump( $dist );
+
+	    	    my ($demult, $xdemult, $ydemult, $zdemult, $xadd, $yadd, $zadd );
+
+	    	    if ( $dist != 0 )
+	    	    {
+		           $demult = ( 1 / $dist ); #say $tee "INSIDE SECOND \$demult: " . dump( $demult );
+
+		           $xdemult = ( $xdiff * $demult ); #say $tee "INSIDE SECOND \$xdemult: " . dump( $xdemult );
+		           $ydemult = ( $ydiff * $demult ); #say $tee "INSIDE SECOND \$ydemult: " . dump( $ydemult );
+		           $zdemult = ( $zdiff * $demult ); #say $tee "INSIDE SECOND \$zdemult: " . dump( $zdemult );
+		        }
+		        else 
+		        {
+                   $xdemult = 0; #say $tee "INSIDE SECOND \$xdemult: " . dump( $xdemult );
+		           $ydemult = 0; #say $tee "INSIDE SECOND \$ydemult: " . dump( $ydemult );
+		           $zdemult = 0; #say $tee "INSIDE SECOND \$zdemult: " . dump( $zdemult );
+		        }
+
+		        $xadd = ( $xdemult * $myval ); #say $tee "INSIDE SECOND \$xadd: " . dump( $xadd );
+		        $yadd = ( $ydemult * $myval ); #say $tee "INSIDE SECOND \$yadd: " . dump( $yadd );
+		        $zadd = ( $zdemult * $myval ); #say $tee "INSIDE SECOND \$zadd: " . dump( $zadd );
+        
+        
+                if ( $subtype eq "pairedmove" ) 
+                {
+                	foreach my $v ( @vertstomove )
+        		      {
+        		      	$ver{$num}{$v}->[0] = ( $ver{$num}{$v}->[0] + $xadd );
+        		      	$ver{$num}{$v}->[1] = ( $ver{$num}{$v}->[1] + $yadd );
+        		        $ver{$num}{$v}->[2] = ( $ver{$num}{$v}->[2] + $zadd );
+        		      }
+                }
+        
+
+                if ( $subtype eq "pairedobsmove" ) 
+                {
+                	foreach my $v ( @vertstomove )
+        		      {
+        		      	$obs{$num}{$v}->[1] = ( $obs{$num}{$v}->[1] + $xadd );
+        		      	$obs{$num}{$v}->[2] = ( $obs{$num}{$v}->[2] + $yadd );
+        		        $obs{$num}{$v}->[3] = ( $obs{$num}{$v}->[3] + $zadd );
+        		      }
+                }
+
+
+                if ( ( $subtype eq "rotation" ) or ( $subtype eq "obsrotation" ) )
+                {
+                	if ( $vert2->[0] eq "" )
+                	{
+                		$vert2->[0] = $vert1->[0];
+                		$vert2->[1] = $vert1->[1];
+                		$vert2->[2] = ( $vert1->[2] + 1 );
+                	}
+                } say $tee "\$vert1: " . dump( $vert1 ); #say $tee "\$vert2: " . dump( $vert2 );
+
+                if ( $subtype eq "rotation" ) 
+                {
+                  foreach my $v ( @vertstomove )
+                  {
+                  	( $ver{$num}{$v}->[0], $ver{$num}{$v}->[1], $ver{$num}{$v}->[2] ) = 
+                  	rotateabout( $ver{$num}{$v}->[0], $ver{$num}{$v}->[1], $ver{$num}{$v}->[2],       # point to rotate (P)
+          						$vert1->[0], $vert1->[1], $vert1->[2],     # point D on axis
+          						$vert2->[0], $vert2->[1], $vert2->[2],     # point E on axis
+          						$myval 
+          					);
+                  }
+                }
+
+                if ( $subtype eq "obsrotation" ) 
+                {
+                  foreach my $v ( @vertstomove )
+                  {
+                  	( $obs{$num}{$v}->[1], $obs{$num}{$v}->[2], $obs{$num}{$v}->[3] ) = 
+                  	  rotateabout( $obs{$num}{$v}->[1], $obs{$num}{$v}->[2], $obs{$num}{$v}->[3],       # point to rotate (P)
+          			  $vert1->[0], $vert1->[1], $vert1->[2],     # point D on axis
+          			  $vert2->[0], $vert2->[1], $vert2->[2],     # point E on axis
+          			  $myval 
+          			);
+  					$obs{$num}{$v}->[7] = ( $obs{$num}{$v}->[7] + $myval );
+  					if ( $obs{$num}{$v}->[7] > 360 )
+  					{
+  						$obs{$num}{$v}->[7] = ( $obs{$num}{$v}->[7] - 360 );
+  					}
+  					elsif ( $obs{$num}{$v}->[7] < 0 )
+  					{
+  						$obs{$num}{$v}->[7] = ( $obs{$num}{$v}->[7] + 360 );
+  					}
+                  }
+                }
+    	    }
+    		$countype++;
+    	}
+    	$countfile++;
+    }
+
+
+	my ( $swing, $base, $pace, $val );
+    my $count = 0;
+    foreach $incr ( @incrs )
+    {
+    	if ( ref ( $incr ) )
+    	{
+    		my $min = $incr->[0];
+    		my $max = $incr->[1];
+    		$swing->[$count] = ( $max - $min );
+    		$base->[$count] = ( 0 - $min );
+    	}
+    	else
+    	{
+    		$swing->[$count] = ( 2 * $incr );
+    		$base->[$count] = ( 0 - $incr );
+    	}
+
+    	$pace->[$count] = ( $swing->[$count] / ( $stepsvar - 1 ) );
+    	$val->[$count] = ( $base->[$count] + ( $pace->[$count] * ( $countstep - 1 ) ) ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
+    	$count++;
+    }
+
+	  
+    foreach my $configfile ( @configfiles )
+    {
+        my $configaddress = "$to$configfile";
+        if ( defined ( $configaddress ) )
+    	{
+    		if ( -e $configaddress )
+    		{
+    		    #do $configaddress;
+    			eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED.
+    			if ($@) { print $tee "ERROR in $configaddress:\n$@"; die; }
+    		}
+    		else
+    		{
+    			say $tee "$configaddress does not exist. Exiting." and die;
+    		}
+    	}
+    }
+
+    my $countfile = 0;
+    foreach my $sourcefile ( @sourcefiles )
+	{
+        my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
+
+		open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
+		my @lines = <SOURCEFILE>;
+		close SOURCEFILE;
+		my $old = $sourceaddress . ".old" ;
+        print $tee `mv $sourceaddress $old `;
+
+		my $num = $numberfiles[$countfile];
+
+		open( SOURCEFILE, ">$sourceaddress" ) or die "Can't open $sourceaddress: $!\n";
+    
+        my $countline = 0;
+        my $countv = 0;
+        my $countob = 0;
+        foreach my $lin ( @lines )
+        {
+        	chomp $lin;
+        	if ( $lin =~ /^\*vertex/ )
+        	{
+             $countv++;
+             my $ve = $ver{$num}{$countv};
+             $ve->[0] = sprintf("%.5f", $ve->[0]);
+             $ve->[1] = sprintf("%.5f", $ve->[1]);
+             $ve->[2] = sprintf("%.5f", $ve->[2]);
+         	   print SOURCEFILE "*vertex  $ve->[0]  $ve->[1]  $ve->[2]   #   $countv\n";
+          }
+          elsif ( $lin =~ /^\*obs/ )
+          {
+            $countob++;
+            my $ob = $obs{$num}{$countob};
+            print SOURCEFILE "*obs,$ob->[1],$ob->[2],$ob->[3],$ob->[4],$ob->[5],$ob->[6],$ob->[7],$ob->[8],$ob->[9] $ob->[10]  #   block  $countob\n";
+          }
+          else
+        	{
+             print SOURCEFILE "$lin\n";
+        	}
+        	$countline++;
+        }
+        $countfile++;
+        close SOURCEFILE;
+    }
+    
+    unless ( !%eds )
+    {
+        foreach my $sourcefile ( @sourcefiles )
+        {
+            my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
+
+            open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
+            my @lines = <SOURCEFILE>;
+            close SOURCEFILE;
+            my $old = $sourceaddress . ".oldnew" ;
+            print $tee `mv $sourceaddress $oldnew `;
+
+            my $cnt = 0;
+            foreach my $lin ( @lines )
+            {
+                if ( $lin =~ /#&&/ )
+                {   #say $tee "APPLY_CONSTRAINTS \$lin: " . dump( $lin );
+                    $lin =~ s/ +/ /;
+                    my @splits = split( "$separator", $lin ); #say $tee "APPLY_CONSTRAINTS \@splits: " . dump( @splits );
+
+                    my @transitional = split( /#&&/, $lin );
+                    my $rightpart = $transitional[1];
+                    $rightpart =~ s/^ +//;
+                    $rightpart =~ s/ +/ /; #say $tee "APPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
+                    my @elms = split( / /, $rightpart ); #say $tee "APPLY_CONSTRAINTS \@elms: " . dump( @elms );
+
+                    foreach my $elm ( @elms )
+                    {
+                        chomp $elm;
+                        my ( $name, $number ) = split( "-", $elm );
+
+                        #say $tee "APPLY_CONSTRAINTS \$name: " . dump( $name );
+                        if ( $eds{$name}{file} eq $sourcefile )
+                        {
+                            #if ( $eds{$name}{line} eq $cnt )
+                            #{
+                                $splits[$eds{$name}{position}] = $eds{$name}{newvalue};
+
+                                #$line = ( substr( $line, 0, $eds{$name}{beginning} ) ) . ( substr( $line, $eds{$name}{end} ) ); say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
+                                #substr( $line, $eds{$name}{beginning}, 0) = $eds{$name}{newvalue}; say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
+
+                                #unless ( $line =~ /#&&/ )
+                                #{
+                                # $line . " $rightpart";
+                                #}
+                            #}
+                        }
+                    }
+
+                    my $novelline;
+                    foreach my $split ( @splits )
+                    {
+                        $split = $split . "$separator";
+                        $novelline = $novelline . $split;
+                    }
+                    $line = $novelline . "\n";
+                }
+                $line =~ s/\\00//g ;
+                print SOURCEFILE $line;
+                $cnt++;
+            }
+            close SOURCEFILE;
+        }
+    }
+    say $tee "#Tranlating vertices while applying constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\n";
+}   # END SUB genmodnew
 
 
 
@@ -7766,6 +8223,8 @@ The morphing instructions must be written in a configuration file whose name wil
 
 Propagation of constraints can target the model configuration files and/or, in the case of ESP-r, trigger modification operations performed through the shell and regarding geometry, solar shadings, mass/flow network and controls.
 
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
+
 =head2 EXPORT
 
 "morph".
@@ -7780,7 +8239,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

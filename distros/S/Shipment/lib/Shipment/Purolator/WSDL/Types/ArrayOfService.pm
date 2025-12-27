@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfService;
-$Shipment::Purolator::WSDL::Types::ArrayOfService::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::ArrayOfService::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Service_of :ATTR(:get<Service>);
+    my %Service_of : ATTR(:get<Service>);
 
-__PACKAGE__->_factory(
-    [ qw(        Service
+    __PACKAGE__->_factory(
+        [   qw(        Service
 
-    ) ],
-    {
-        'Service' => \%Service_of,
-    },
-    {
-        'Service' => 'Shipment::Purolator::WSDL::Types::Service',
-    },
-    {
+            )
+        ],
+        {'Service' => \%Service_of,},
+        {'Service' => 'Shipment::Purolator::WSDL::Types::Service',},
+        {
 
-        'Service' => 'Service',
-    }
-);
+            'Service' => 'Service',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfService
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@
 # Demonstrates different patterns for running work after sending a response.
 #
 # IMPORTANT: Understand the difference between:
-#   1. Async I/O (non-blocking) - Use fire-and-forget Futures with ->retain
+#   1. Async I/O (non-blocking) - Use fire-and-forget Futures with on_fail + retain
 #   2. Blocking/CPU work - Use IO::Async::Function (runs in subprocess)
 #
 # Run: pagi-server examples/background-tasks/app.pl --port 5000
@@ -32,8 +32,8 @@ use PAGI::Request;
 # async libraries. These yield control back to the event
 # loop while waiting, so they don't block other requests.
 #
-# IMPORTANT: Call ->retain() on fire-and-forget Futures
-# to prevent "lost future" warnings.
+# IMPORTANT: Always add ->on_fail() before ->retain() on fire-and-forget
+# Futures. Bare retain() silently swallows errors!
 #---------------------------------------------------------
 
 # Simulated async email API (would use async HTTP client in practice)
@@ -59,9 +59,11 @@ async sub log_to_analytics {
 # Helper to fire-and-forget an async sub properly
 sub fire_and_forget {
     my ($future) = @_;
-    # retain() prevents the Future from being garbage collected
-    # and suppresses the "lost future" warning
-    $future->retain();
+    # on_fail() logs errors, retain() keeps future alive
+    $future->on_fail(sub {
+        my ($error) = @_;
+        warn "Background task failed: $error\n";
+    })->retain();
 }
 
 #---------------------------------------------------------
@@ -135,7 +137,7 @@ my $router = PAGI::App::Router->new;
 # Index page
 $router->get('/' => async sub {
     my ($scope, $receive, $send) = @_;
-    my $res = PAGI::Response->new($send);
+    my $res = PAGI::Response->new($scope, $send);
 
     await $res->html(<<'HTML');
 <!DOCTYPE html>
@@ -178,7 +180,7 @@ HTML
 # GOOD: Fire-and-forget async I/O
 $router->get('/async' => async sub {
     my ($scope, $receive, $send) = @_;
-    my $res = PAGI::Response->new($send);
+    my $res = PAGI::Response->new($scope, $send);
 
     # Response goes out immediately
     await $res->json({
@@ -186,7 +188,7 @@ $router->get('/async' => async sub {
         message => 'Response sent! Async tasks running in background.',
     });
 
-    # Fire-and-forget: must call ->retain() to avoid "lost future" warning
+    # Fire-and-forget with error logging (on_fail + retain pattern)
     fire_and_forget(send_welcome_email('user@example.com'));
     fire_and_forget(log_to_analytics('page_view', { path => '/' }));
 
@@ -199,7 +201,7 @@ $router->get('/async' => async sub {
 # GOOD: CPU-bound work in subprocess
 $router->get('/blocking' => async sub {
     my ($scope, $receive, $send) = @_;
-    my $res = PAGI::Response->new($send);
+    my $res = PAGI::Response->new($scope, $send);
 
     # Response goes out immediately
     await $res->json({
@@ -216,7 +218,7 @@ $router->get('/blocking' => async sub {
 $router->post('/signup' => async sub {
     my ($scope, $receive, $send) = @_;
     my $req = PAGI::Request->new($scope, $receive);
-    my $res = PAGI::Response->new($send);
+    my $res = PAGI::Response->new($scope, $send);
 
     my $data = await $req->json;
     my $email = $data->{email} // 'unknown@example.com';

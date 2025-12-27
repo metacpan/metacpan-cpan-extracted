@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::PackageType;
-$Shipment::UPS::WSDL::TrackTypes::PackageType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::PackageType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,92 +20,93 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-my %DeliveryDetail_of :ATTR(:get<DeliveryDetail>);
-my %PackageAddress_of :ATTR(:get<PackageAddress>);
-my %PackageServiceOption_of :ATTR(:get<PackageServiceOption>);
-my %COD_of :ATTR(:get<COD>);
-my %Activity_of :ATTR(:get<Activity>);
-my %Message_of :ATTR(:get<Message>);
-my %PackageWeight_of :ATTR(:get<PackageWeight>);
-my %ReferenceNumber_of :ATTR(:get<ReferenceNumber>);
-my %AlternateTrackingNumber_of :ATTR(:get<AlternateTrackingNumber>);
-my %AlternateTrackingInfo_of :ATTR(:get<AlternateTrackingInfo>);
-my %Document_of :ATTR(:get<Document>);
-my %AdditionalAttribute_of :ATTR(:get<AdditionalAttribute>);
+    my %TrackingNumber_of          : ATTR(:get<TrackingNumber>);
+    my %DeliveryDetail_of          : ATTR(:get<DeliveryDetail>);
+    my %PackageAddress_of          : ATTR(:get<PackageAddress>);
+    my %PackageServiceOption_of    : ATTR(:get<PackageServiceOption>);
+    my %COD_of                     : ATTR(:get<COD>);
+    my %Activity_of                : ATTR(:get<Activity>);
+    my %Message_of                 : ATTR(:get<Message>);
+    my %PackageWeight_of           : ATTR(:get<PackageWeight>);
+    my %ReferenceNumber_of         : ATTR(:get<ReferenceNumber>);
+    my %AlternateTrackingNumber_of : ATTR(:get<AlternateTrackingNumber>);
+    my %AlternateTrackingInfo_of   : ATTR(:get<AlternateTrackingInfo>);
+    my %Document_of                : ATTR(:get<Document>);
+    my %AdditionalAttribute_of     : ATTR(:get<AdditionalAttribute>);
 
-__PACKAGE__->_factory(
-    [ qw(        TrackingNumber
-        DeliveryDetail
-        PackageAddress
-        PackageServiceOption
-        COD
-        Activity
-        Message
-        PackageWeight
-        ReferenceNumber
-        AlternateTrackingNumber
-        AlternateTrackingInfo
-        Document
-        AdditionalAttribute
+    __PACKAGE__->_factory(
+        [   qw(        TrackingNumber
+              DeliveryDetail
+              PackageAddress
+              PackageServiceOption
+              COD
+              Activity
+              Message
+              PackageWeight
+              ReferenceNumber
+              AlternateTrackingNumber
+              AlternateTrackingInfo
+              Document
+              AdditionalAttribute
 
-    ) ],
-    {
-        'TrackingNumber' => \%TrackingNumber_of,
-        'DeliveryDetail' => \%DeliveryDetail_of,
-        'PackageAddress' => \%PackageAddress_of,
-        'PackageServiceOption' => \%PackageServiceOption_of,
-        'COD' => \%COD_of,
-        'Activity' => \%Activity_of,
-        'Message' => \%Message_of,
-        'PackageWeight' => \%PackageWeight_of,
-        'ReferenceNumber' => \%ReferenceNumber_of,
-        'AlternateTrackingNumber' => \%AlternateTrackingNumber_of,
-        'AlternateTrackingInfo' => \%AlternateTrackingInfo_of,
-        'Document' => \%Document_of,
-        'AdditionalAttribute' => \%AdditionalAttribute_of,
-    },
-    {
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DeliveryDetail' => 'Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType',
-        'PackageAddress' => 'Shipment::UPS::WSDL::TrackTypes::PackageAddressType',
-        'PackageServiceOption' => 'Shipment::UPS::WSDL::TrackTypes::ServiceOptionType',
-        'COD' => 'Shipment::UPS::WSDL::TrackTypes::CODType',
-        'Activity' => 'Shipment::UPS::WSDL::TrackTypes::ActivityType',
-        'Message' => 'Shipment::UPS::WSDL::TrackTypes::MessageType',
-        'PackageWeight' => 'Shipment::UPS::WSDL::TrackTypes::WeightType',
-        'ReferenceNumber' => 'Shipment::UPS::WSDL::TrackTypes::ReferenceNumberType',
-        'AlternateTrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AlternateTrackingInfo' => 'Shipment::UPS::WSDL::TrackTypes::AlternateTrackingInfoType',
-        'Document' => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
-        'AdditionalAttribute' => 'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescriptionValueType',
-    },
-    {
+            )
+        ],
+        {   'TrackingNumber'          => \%TrackingNumber_of,
+            'DeliveryDetail'          => \%DeliveryDetail_of,
+            'PackageAddress'          => \%PackageAddress_of,
+            'PackageServiceOption'    => \%PackageServiceOption_of,
+            'COD'                     => \%COD_of,
+            'Activity'                => \%Activity_of,
+            'Message'                 => \%Message_of,
+            'PackageWeight'           => \%PackageWeight_of,
+            'ReferenceNumber'         => \%ReferenceNumber_of,
+            'AlternateTrackingNumber' => \%AlternateTrackingNumber_of,
+            'AlternateTrackingInfo'   => \%AlternateTrackingInfo_of,
+            'Document'                => \%Document_of,
+            'AdditionalAttribute'     => \%AdditionalAttribute_of,
+        },
+        {   'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DeliveryDetail' =>
+              'Shipment::UPS::WSDL::TrackTypes::DeliveryDetailType',
+            'PackageAddress' =>
+              'Shipment::UPS::WSDL::TrackTypes::PackageAddressType',
+            'PackageServiceOption' =>
+              'Shipment::UPS::WSDL::TrackTypes::ServiceOptionType',
+            'COD'           => 'Shipment::UPS::WSDL::TrackTypes::CODType',
+            'Activity'      => 'Shipment::UPS::WSDL::TrackTypes::ActivityType',
+            'Message'       => 'Shipment::UPS::WSDL::TrackTypes::MessageType',
+            'PackageWeight' => 'Shipment::UPS::WSDL::TrackTypes::WeightType',
+            'ReferenceNumber' =>
+              'Shipment::UPS::WSDL::TrackTypes::ReferenceNumberType',
+            'AlternateTrackingNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AlternateTrackingInfo' =>
+              'Shipment::UPS::WSDL::TrackTypes::AlternateTrackingInfoType',
+            'Document' => 'Shipment::UPS::WSDL::TrackTypes::DocumentType',
+            'AdditionalAttribute' =>
+              'Shipment::UPS::WSDL::TrackTypes::AdditionalCodeDescriptionValueType',
+        },
+        {
 
-        'TrackingNumber' => 'TrackingNumber',
-        'DeliveryDetail' => 'DeliveryDetail',
-        'PackageAddress' => 'PackageAddress',
-        'PackageServiceOption' => 'PackageServiceOption',
-        'COD' => 'COD',
-        'Activity' => 'Activity',
-        'Message' => 'Message',
-        'PackageWeight' => 'PackageWeight',
-        'ReferenceNumber' => 'ReferenceNumber',
-        'AlternateTrackingNumber' => 'AlternateTrackingNumber',
-        'AlternateTrackingInfo' => 'AlternateTrackingInfo',
-        'Document' => 'Document',
-        'AdditionalAttribute' => 'AdditionalAttribute',
-    }
-);
+            'TrackingNumber'          => 'TrackingNumber',
+            'DeliveryDetail'          => 'DeliveryDetail',
+            'PackageAddress'          => 'PackageAddress',
+            'PackageServiceOption'    => 'PackageServiceOption',
+            'COD'                     => 'COD',
+            'Activity'                => 'Activity',
+            'Message'                 => 'Message',
+            'PackageWeight'           => 'PackageWeight',
+            'ReferenceNumber'         => 'ReferenceNumber',
+            'AlternateTrackingNumber' => 'AlternateTrackingNumber',
+            'AlternateTrackingInfo'   => 'AlternateTrackingInfo',
+            'Document'                => 'Document',
+            'AdditionalAttribute'     => 'AdditionalAttribute',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -122,7 +123,7 @@ Shipment::UPS::WSDL::TrackTypes::PackageType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

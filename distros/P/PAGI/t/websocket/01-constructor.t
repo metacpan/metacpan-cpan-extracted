@@ -31,9 +31,9 @@ subtest 'constructor accepts scope, receive, send' => sub {
     is($ws->{_close_code}, undef, 'close_code starts undefined');
     is($ws->{_close_reason}, undef, 'close_reason starts undefined');
     is($ws->{_on_close}, [], 'on_close callbacks start empty');
-    is($ws->{scope}, $scope, 'scope is stored');
-    is($ws->{receive}, $receive, 'receive is stored');
-    is($ws->{send}, $send, 'send is stored');
+    ok($ws->{scope} == $scope, 'scope is stored');
+    ok($ws->{receive} == $receive, 'receive is stored');
+    ok($ws->{send} == $send, 'send is stored');
 };
 
 subtest 'dies on non-websocket scope type' => sub {
@@ -120,7 +120,7 @@ subtest 'scope property accessors' => sub {
     is($ws->subprotocols, ['chat', 'json'], 'subprotocols accessor');
     is($ws->client, ['192.168.1.1', 54321], 'client accessor');
     is($ws->server, ['example.com', 443], 'server accessor');
-    is($ws->scope, $scope, 'scope returns raw scope');
+    ok($ws->scope == $scope, 'scope returns raw scope');
 };
 
 subtest 'header accessors' => sub {

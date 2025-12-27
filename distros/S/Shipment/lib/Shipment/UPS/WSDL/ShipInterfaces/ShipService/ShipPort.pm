@@ -1,183 +1,212 @@
 package Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort;
-$Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort::VERSION = '3.10';
+$Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort::VERSION = '3.11';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
 use Scalar::Util qw(blessed);
-use base qw(SOAP::WSDL::Client::Base);
+use base         qw(SOAP::WSDL::Client::Base);
 
 
 # only load if it hasn't been loaded before
 require Shipment::UPS::WSDL::ShipTypemaps::ShipService
-    if not Shipment::UPS::WSDL::ShipTypemaps::ShipService->can('get_class');
+  if not Shipment::UPS::WSDL::ShipTypemaps::ShipService->can('get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'wwwcie.ups.com';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/webservices/Ship') if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/webservices/Ship')
+      if not $_[2]->{proxy};
 
     $_[0]->set_class_resolver('Shipment::UPS::WSDL::ShipTypemaps::ShipService')
-        if not $_[2]->{class_resolver};
+      if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub ProcessShipment {
     my ($self, $body, $header) = @_;
-    die "ProcessShipment must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'ProcessShipment',
-        soap_action => 'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
-        style => 'document',
-        body => {
-            
+    die "ProcessShipment must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'ProcessShipment',
+            soap_action =>
+              'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
+            style => 'document',
+            body  => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::ShipElements::ShipmentRequest )],
-        },
-        header => {
-            
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
-        },
-        headerfault => {
-            
-        },
-        response => {
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         =>
+                  [qw( Shipment::UPS::WSDL::ShipElements::ShipmentRequest )],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::ShipElements::ShipmentResponse )],
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         =>
+                  [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
+
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::UPS::WSDL::ShipElements::ShipmentResponse )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub ProcessShipConfirm {
     my ($self, $body, $header) = @_;
-    die "ProcessShipConfirm must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'ProcessShipConfirm',
-        soap_action => 'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
-        style => 'document',
-        body => {
-            
+    die
+      "ProcessShipConfirm must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'ProcessShipConfirm',
+            soap_action =>
+              'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
+            style => 'document',
+            body  => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::ShipElements::ShipConfirmRequest )],
-        },
-        header => {
-            
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
-        },
-        headerfault => {
-            
-        },
-        response => {
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::UPS::WSDL::ShipElements::ShipConfirmRequest )
+                ],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::ShipElements::ShipConfirmResponse )],
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         =>
+                  [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
+
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::UPS::WSDL::ShipElements::ShipConfirmResponse )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub ProcessShipAccept {
     my ($self, $body, $header) = @_;
-    die "ProcessShipAccept must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'ProcessShipAccept',
-        soap_action => 'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
-        style => 'document',
-        body => {
-            
+    die "ProcessShipAccept must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'ProcessShipAccept',
+            soap_action =>
+              'http://onlinetools.ups.com/webservices/ShipBinding/v1.0',
+            style => 'document',
+            body  => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest )],
-        },
-        header => {
-            
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
 
-        },
-        headerfault => {
-            
-        },
-        response => {
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         =>
+                  [qw( Shipment::UPS::WSDL::ShipElements::ShipAcceptRequest )],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::ShipElements::ShipAcceptResponse )],
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         =>
+                  [qw( Shipment::UPS::WSDL::ShipElements::UPSSecurity )],
+
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::UPS::WSDL::ShipElements::ShipAcceptResponse )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
-
-
-
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-              'attribute' => 'Shipment::UPS::WSDL::ShipAttributes',
-              'typemap' => 'Shipment::UPS::WSDL::ShipTypemaps',
-              'interface' => 'Shipment::UPS::WSDL::ShipInterfaces',
-              'type' => 'Shipment::UPS::WSDL::ShipTypes',
-              'server' => 'Shipment::UPS::WSDL::ShipServer',
-              'element' => 'Shipment::UPS::WSDL::ShipElements'
-            };
+        'attribute' => 'Shipment::UPS::WSDL::ShipAttributes',
+        'typemap'   => 'Shipment::UPS::WSDL::ShipTypemaps',
+        'interface' => 'Shipment::UPS::WSDL::ShipInterfaces',
+        'type'      => 'Shipment::UPS::WSDL::ShipTypes',
+        'server'    => 'Shipment::UPS::WSDL::ShipServer',
+        'element'   => 'Shipment::UPS::WSDL::ShipElements'
+    };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
-        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
-            namespace_prefix_map => {
-                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
-            },
-            namespace_map => {
-            },
-            prefix => $prefix_1,
-        })
-    });
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
+        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
+                {   namespace_prefix_map => {
+                        'http://www.w3.org/2001/XMLSchema' =>
+                          'SOAP::WSDL::XSD::Typelib::Builtin',
+                    },
+                    namespace_map => {},
+                    prefix        => $prefix_1,
+                }
+            )
+        }
+    );
 }
 
 1;
@@ -194,7 +223,7 @@ Shipment::UPS::WSDL::ShipInterfaces::ShipService::ShipPort
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ XML::PP - A simple XML parser
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -19,9 +19,10 @@ Version 0.06
 
 # DESCRIPTION
 
-You almost certainly do not need this module,
-for most tasks use [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple) or [XML::LibXML](https://metacpan.org/pod/XML%3A%3ALibXML).
-`XML::PP` exists only for the most lightweight of scenarios where you can't get one of the above modules to install,
+You almost certainly do not need this module.
+For most tasks,
+use [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple) or [XML::LibXML](https://metacpan.org/pod/XML%3A%3ALibXML).
+`XML::PP` exists only for the most lightweight scenarios where you can't get one of the above modules to install,
 for example,
 CI/CD machines running Windows that get stuck with [https://stackoverflow.com/questions/11468141/cant-load-c-strawberry-perl-site-lib-auto-xml-libxml-libxml-dll-for-module-x](https://stackoverflow.com/questions/11468141/cant-load-c-strawberry-perl-site-lib-auto-xml-libxml-libxml-dll-for-module-x).
 
@@ -169,6 +170,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # SEE ALSO
 
+- Test coverage report: [https://nigelhorne.github.io/XML-PP/coverage/](https://nigelhorne.github.io/XML-PP/coverage/)
 - [XML::LibXML](https://metacpan.org/pod/XML%3A%3ALibXML)
 - [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple)
 

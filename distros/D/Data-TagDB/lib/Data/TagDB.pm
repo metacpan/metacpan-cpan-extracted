@@ -24,13 +24,31 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
+
+my %_queries = (
+    _default => {
+        tag_by_hint         => 'SELECT tag FROM hint WHERE name = ?',
+        _tag_simple_identifier => 'SELECT data FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = (SELECT tag FROM hint WHERE name = ?) AND context = 0 AND encoding = 0 AND tag = ? ORDER BY data DESC',
+        _tag_by_dbid_type_and_data => 'SELECT tag FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = ? AND context = 0 AND encoding = 0 AND data = ?',
+        _create_tag         => 'INSERT INTO tag DEFAULT VALUES',
+        _create_metadata    => 'INSERT OR IGNORE INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?)',
+        _create_relation    => 'INSERT OR IGNORE INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?)',
+    },
+    Pg => {
+        _create_tag         => 'INSERT INTO tag DEFAULT VALUES RETURNING id',
+        _create_metadata    => 'INSERT INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?) ON CONFLICT DO NOTHING',
+        _create_relation    => 'INSERT INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?) ON CONFLICT DO NOTHING',
+    },
+);
 
 
 
 sub new {
     my ($pkg, $first, @rest) = @_;
+    my $DBI_name;
     my $dbh;
+    my %query;
 
     croak 'No dsn or dbh given to new' unless defined $first;
 
@@ -40,28 +58,20 @@ sub new {
         $dbh = DBI->connect($first, @rest) or croak 'Cannot connect to database';
     }
 
+    $DBI_name = $dbh->{Driver}{Name};
+    foreach my $name (keys %{$_queries{_default}}) {
+        $query{$name} = $dbh->prepare($_queries{$DBI_name}{$name} // $_queries{_default}{$name});
+    }
+
     return bless {
         dbh => $dbh,
+        _DBI_name => $DBI_name,
         cache_tag => {},
         cache_ise => {},
         cache_default_type => {},
         cache_default_encoding => {},
         backup_type => {},
-        query => {
-            _default => {
-                tag_by_hint => $dbh->prepare('SELECT tag FROM hint WHERE name = ?'),
-                _tag_simple_identifier => $dbh->prepare('SELECT data FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = (SELECT tag FROM hint WHERE name = ?) AND context = 0 AND encoding = 0 AND tag = ? ORDER BY data DESC'),
-                _tag_by_dbid_type_and_data => $dbh->prepare('SELECT tag FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = ? AND context = 0 AND encoding = 0 AND data = ?'),
-                _create_tag => $dbh->prepare('INSERT INTO tag DEFAULT VALUES'),
-                _create_metadata => $dbh->prepare('INSERT OR IGNORE INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?)'),
-                _create_relation => $dbh->prepare('INSERT OR IGNORE INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?)'),
-            },
-            Pg => {
-                _create_tag => $dbh->prepare('INSERT INTO tag DEFAULT VALUES RETURNING id'),
-                _create_metadata => $dbh->prepare('INSERT INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?) ON CONFLICT DO NOTHING'),
-                _create_relation => $dbh->prepare('INSERT INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?) ON CONFLICT DO NOTHING'),
-            },
-        },
+        query => \%query,
     }, $pkg;
 }
 
@@ -606,13 +616,13 @@ sub _get_decoder {
 
 sub _DBI_name {
     my ($self) = @_;
-    return $self->{_DBI_name} //= $self->dbh->{Driver}{Name}
+    return $self->{_DBI_name} //= $self->dbh->{Driver}{Name};
 }
 
 sub _query {
     my ($self, $name) = @_;
     $self->assert_connected;
-    return $self->{query}{$self->_DBI_name}{$name} // $self->{query}{_default}{$name} // confess 'No such query: '.$name;
+    return $self->{query}{$name} // confess 'No such query: '.$name;
 }
 
 sub _get_data {
@@ -763,7 +773,7 @@ sub AUTOLOAD {
     my ($self, @args) = @_;
     our $AUTOLOAD;
     my $function = $AUTOLOAD =~ s/^.*:://r;
-    my $query = $self->{query}{$self->_DBI_name}{$function} // $self->{query}{_default}{$function} // confess 'Bad function: '.$function;
+    my $query = $self->{query}{$function} // confess 'Bad function: '.$function;
 
     if ($function =~ /^tag_by_/) {
         my $row;
@@ -794,7 +804,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

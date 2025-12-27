@@ -24,9 +24,6 @@ use BeamerReveal::FrameConverter;
 
 sub dieExit;
 
-my $version = 0.9;
-my $author  = 'Walter Daems <walter.daems@uantwerpen.be>';
-
 ######################################
 # Read command-line options/arguments
 ####################################
@@ -54,43 +51,30 @@ pod2usage( -message => "Incorrect number of arguments",
 					  or
 					  defined( $argument ) );
 
-###################
-# Read config file
-#################
-# use 1. specific location if BEAMERREVEAL_CONFIG is set,
-#     2. else, home configuration folder,
-#     3. or else, distribution folder
-my $home = $^O eq 'MSWin32' ? $ENV{'userprofile'} : $ENV{'HOME'};
-my $configDir = $ENV{'BEAMERREVEAL_CONFIG'}
-  // File::Spec->catfile( $home, '.config', 'BeamerReveal' );
-my $configFileName = File::Spec->catfile( $configDir, 'config.ini' );
-$configFileName =
-  File::Spec->catfile( File::ShareDir::dist_dir( 'BeamerReveal' ) ,
-		       'config.ini' ) if ( ! -r $configFileName );
-dieExit( 13, "Error: cannot find config file" )
-  unless( -r $configFileName );
-my $config = Config::Tiny->read( $configFileName )
-  or dieExit( 14, $Config::Tiny::errstr . "\nin file '$configFileName'\n" );
-
 ########################
 # generate opening line
 ######################
-my $openingline = "beamer-reveal.pl - v$version - $author";
-say STDERR $openingline . "\n" .
-  ("=" x length( $openingline ) );
+my $openinglines =
+  [
+   '**************************************************************************',
+   "* beamer-reveal.pl                                        v${BeamerReveal::VERSION} *",
+   '* (C) 2026 by Walter Daems <walter.daems@uantwerpen.be>            GPLv3 *',
+   '**************************************************************************',
+  ];
 
-say STDERR "- Reading configuration file from $configFileName";
-
-if( $opt_showconfig ) {
-  say STDERR Data::Dumper->Dump( [ $config ], [ qw(Configuration) ] );
-  exit(0);
+foreach my $line ( @$openinglines ) {
+  say STDERR $line;
 }
 
 ###################
 # do the hard work
 #################
 
+# fetch the jobname and get rid of these nasty windows backslashes...
 my ( $jobname ) = @ARGV;
+$jobname =~ s/\\/\//g;
+
+# fetch the reveal file
 my $rvlFileName = $jobname . ".rvl";
 say STDERR "- Reading driver file $rvlFileName";
 my $rvlFile = IO::File->new();
@@ -141,7 +125,6 @@ eval {
 my $mediaManager =
   BeamerReveal::MediaManager->new( $jobname,
 				   "${jobname}_files",
-				   $config,
 				   $presentation->{parameters} );
 
 # storing the reveal framework
@@ -187,8 +170,8 @@ $oFile->close();
 # finally let's create an index.html link
 my $symlink_exists = eval { symlink("",""); 1 };
 if ( $symlink_exists ) {
-  say STDERR "  - Creating index.html symlink";
-  symlink( "$oFileName", "index.html" );
+  say STDERR "  - Creating index.html link";
+  link( "$oFileName", "index.html" );
 }
 
 ########################
@@ -216,7 +199,7 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20251224.1500
+version 20251226.2107
 
 =head1 SYNOPSIS
 

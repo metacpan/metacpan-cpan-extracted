@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightBaseCharge;
-$Shipment::FedEx::WSDL::RateTypes::FreightBaseCharge::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::FreightBaseCharge::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,67 +20,64 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %FreightClass_of :ATTR(:get<FreightClass>);
-my %RatedAsClass_of :ATTR(:get<RatedAsClass>);
-my %NmfcCode_of :ATTR(:get<NmfcCode>);
-my %Description_of :ATTR(:get<Description>);
-my %Weight_of :ATTR(:get<Weight>);
-my %ChargeRate_of :ATTR(:get<ChargeRate>);
-my %ChargeBasis_of :ATTR(:get<ChargeBasis>);
-my %ExtendedAmount_of :ATTR(:get<ExtendedAmount>);
+    my %FreightClass_of   : ATTR(:get<FreightClass>);
+    my %RatedAsClass_of   : ATTR(:get<RatedAsClass>);
+    my %NmfcCode_of       : ATTR(:get<NmfcCode>);
+    my %Description_of    : ATTR(:get<Description>);
+    my %Weight_of         : ATTR(:get<Weight>);
+    my %ChargeRate_of     : ATTR(:get<ChargeRate>);
+    my %ChargeBasis_of    : ATTR(:get<ChargeBasis>);
+    my %ExtendedAmount_of : ATTR(:get<ExtendedAmount>);
 
-__PACKAGE__->_factory(
-    [ qw(        FreightClass
-        RatedAsClass
-        NmfcCode
-        Description
-        Weight
-        ChargeRate
-        ChargeBasis
-        ExtendedAmount
+    __PACKAGE__->_factory(
+        [   qw(        FreightClass
+              RatedAsClass
+              NmfcCode
+              Description
+              Weight
+              ChargeRate
+              ChargeBasis
+              ExtendedAmount
 
-    ) ],
-    {
-        'FreightClass' => \%FreightClass_of,
-        'RatedAsClass' => \%RatedAsClass_of,
-        'NmfcCode' => \%NmfcCode_of,
-        'Description' => \%Description_of,
-        'Weight' => \%Weight_of,
-        'ChargeRate' => \%ChargeRate_of,
-        'ChargeBasis' => \%ChargeBasis_of,
-        'ExtendedAmount' => \%ExtendedAmount_of,
-    },
-    {
-        'FreightClass' => 'Shipment::FedEx::WSDL::RateTypes::FreightClassType',
-        'RatedAsClass' => 'Shipment::FedEx::WSDL::RateTypes::FreightClassType',
-        'NmfcCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Weight' => 'Shipment::FedEx::WSDL::RateTypes::Weight',
-        'ChargeRate' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-        'ChargeBasis' => 'Shipment::FedEx::WSDL::RateTypes::FreightChargeBasisType',
-        'ExtendedAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-    },
-    {
+            )
+        ],
+        {   'FreightClass'   => \%FreightClass_of,
+            'RatedAsClass'   => \%RatedAsClass_of,
+            'NmfcCode'       => \%NmfcCode_of,
+            'Description'    => \%Description_of,
+            'Weight'         => \%Weight_of,
+            'ChargeRate'     => \%ChargeRate_of,
+            'ChargeBasis'    => \%ChargeBasis_of,
+            'ExtendedAmount' => \%ExtendedAmount_of,
+        },
+        {   'FreightClass' =>
+              'Shipment::FedEx::WSDL::RateTypes::FreightClassType',
+            'RatedAsClass' =>
+              'Shipment::FedEx::WSDL::RateTypes::FreightClassType',
+            'NmfcCode'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Weight'      => 'Shipment::FedEx::WSDL::RateTypes::Weight',
+            'ChargeRate'  => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'ChargeBasis' =>
+              'Shipment::FedEx::WSDL::RateTypes::FreightChargeBasisType',
+            'ExtendedAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        },
+        {
 
-        'FreightClass' => 'FreightClass',
-        'RatedAsClass' => 'RatedAsClass',
-        'NmfcCode' => 'NmfcCode',
-        'Description' => 'Description',
-        'Weight' => 'Weight',
-        'ChargeRate' => 'ChargeRate',
-        'ChargeBasis' => 'ChargeBasis',
-        'ExtendedAmount' => 'ExtendedAmount',
-    }
-);
+            'FreightClass'   => 'FreightClass',
+            'RatedAsClass'   => 'RatedAsClass',
+            'NmfcCode'       => 'NmfcCode',
+            'Description'    => 'Description',
+            'Weight'         => 'Weight',
+            'ChargeRate'     => 'ChargeRate',
+            'ChargeBasis'    => 'ChargeBasis',
+            'ExtendedAmount' => 'ExtendedAmount',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -97,7 +94,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightBaseCharge
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

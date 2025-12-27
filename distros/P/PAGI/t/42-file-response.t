@@ -30,8 +30,9 @@ open $fh, '>:raw', $binary_file or die;
 print $fh $binary_content;
 close $fh;
 
-# Large file for chunked transfer / worker pool testing
-my $large_content = "X" x (128 * 1024);  # 128KB to exceed chunk size
+# Large file for async I/O testing
+# Size is 65KB - just over the 64KB sync_file_threshold to trigger async path
+my $large_content = "X" x (65 * 1024);  # 65KB to exceed sync threshold
 my $large_file = "$tempdir/large.bin";
 open $fh, '>:raw', $large_file or die;
 print $fh $large_content;
@@ -83,7 +84,7 @@ sub with_server {
     die $err if $err;
 }
 
-subtest 'file response sends full file (with Content-Length - sendfile path)' => sub {
+subtest 'file response sends full file with Content-Length' => sub {
     with_server(
         async sub  {
         my ($scope, $receive, $send) = @_;
@@ -110,8 +111,8 @@ subtest 'file response sends full file (with Content-Length - sendfile path)' =>
     );
 };
 
-subtest 'file response with chunked encoding (worker pool path)' => sub {
-    # No Content-Length = chunked encoding = can't use sendfile = worker pool
+subtest 'file response with chunked encoding' => sub {
+    # No Content-Length = chunked encoding
     with_server(
         async sub  {
         my ($scope, $receive, $send) = @_;
@@ -434,6 +435,81 @@ subtest 'zero-length file works' => sub {
             is($response->code, 200, 'got 200 response');
             is($response->content, '', 'empty file returns empty content');
             is(length($response->content), 0, 'content length is 0');
+        }
+    );
+};
+
+# =============================================================================
+# Test: Threshold boundary behavior
+# =============================================================================
+# These tests verify that files at exactly the threshold use sync path,
+# and files just over the threshold use async path.
+# Default sync_file_threshold is 64KB (65536 bytes).
+
+subtest 'file at exact threshold uses sync path' => sub {
+    # Create a file exactly at 64KB threshold
+    my $threshold_content = "Y" x 65536;  # Exactly 64KB
+    my $threshold_file = "$tempdir/threshold.bin";
+    open my $tfh, '>:raw', $threshold_file or die;
+    print $tfh $threshold_content;
+    close $tfh;
+
+    with_server(
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            await $send->({
+                type => 'http.response.start',
+                status => 200,
+                headers => [
+                    ['content-type', 'application/octet-stream'],
+                    ['content-length', length($threshold_content)],
+                ],
+            });
+            await $send->({
+                type => 'http.response.body',
+                file => $threshold_file,
+            });
+        },
+        sub {
+            my ($port, $server) = @_;
+            my $response = $http->GET("http://127.0.0.1:$port/threshold.bin")->get;
+            is($response->code, 200, 'got 200 response');
+            is(length($response->content), 65536, 'threshold file length correct');
+            is($response->content, $threshold_content, 'threshold file content matches');
+        }
+    );
+};
+
+subtest 'file just over threshold uses async path' => sub {
+    # Create a file 1 byte over threshold
+    my $over_threshold_content = "Z" x 65537;  # 64KB + 1 byte
+    my $over_threshold_file = "$tempdir/over_threshold.bin";
+    open my $ofh, '>:raw', $over_threshold_file or die;
+    print $ofh $over_threshold_content;
+    close $ofh;
+
+    with_server(
+        async sub {
+            my ($scope, $receive, $send) = @_;
+            await $send->({
+                type => 'http.response.start',
+                status => 200,
+                headers => [
+                    ['content-type', 'application/octet-stream'],
+                    ['content-length', length($over_threshold_content)],
+                ],
+            });
+            await $send->({
+                type => 'http.response.body',
+                file => $over_threshold_file,
+            });
+        },
+        sub {
+            my ($port, $server) = @_;
+            my $response = $http->GET("http://127.0.0.1:$port/over_threshold.bin")->get;
+            is($response->code, 200, 'got 200 response');
+            is(length($response->content), 65537, 'over-threshold file length correct');
+            is($response->content, $over_threshold_content, 'over-threshold file content matches');
         }
     );
 };

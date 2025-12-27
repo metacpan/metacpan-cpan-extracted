@@ -1,0 +1,15 @@
+lib/File/MimeInfo/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/001_load.t
+t/002_files.t
+t/003_security.t
+t/004_extension.t
+t/005_modern_mimetypes.t
+t/006_undef_return.t
+t/files/image.jpg
+t/files/plaintext.txt
+t/files/sample.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

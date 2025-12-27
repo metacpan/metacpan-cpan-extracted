@@ -1,11 +1,8 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2023 by Gian Luca Brunetti.
-# This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
-# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+# This is the module Sim::OPT::Sim of Sim::OPT, distributed under a dual licence, open-source (GPL v3) and proprietary.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
 
-# use v5.20;
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
@@ -13,7 +10,7 @@ use Math::Round;
 use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
-use Statistics::Basic qw(:all);
+use Sim::OPT::Stats qw(:all);
 use Set::Intersection;
 use List::Compare;
 use IO::Tee;
@@ -31,6 +28,8 @@ use Sim::OPT::Morph;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
+use Sim::OPT::Interlinear;
+eval { use Sim::OPTcue; 1 };
 
 no strict;
 no warnings;
@@ -294,6 +293,7 @@ sub sim
                   if ( $simnetwork eq "y" )
                   {
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: writing $resfile and $flfile." ;
+                    say $tee "#Simulating \$simelt $simelt";
                     my $printthis;
                     if ( $step > 1 )
                     {                    
@@ -310,7 +310,7 @@ $step
 y
 s
 $simnetwork
-Results! for $simelt-$dates_to_sim
+Res! $simelt
 y
 y
 -
@@ -335,7 +335,7 @@ $before
 $step
 s
 y
-Results! for $simelt-$dates_to_sim
+Res! $simelt
 y
 y
 -
@@ -348,6 +348,7 @@ XXX
                     }
 
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\ $printthis";
+                    say $tee "#Simulating \$simelt $simelt";
                     if ($exeonfiles eq "y")
                     {
                       say $tee `$printthis`;
@@ -358,6 +359,7 @@ XXX
                   else #  if ( $simnetwork eq "n" )
                   {
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: writing $resfile. " ;
+                    say $tee "#Simulating \$simelt $simelt";
                     my $printthis =
 "$launchline<<XXX
 
@@ -370,7 +372,7 @@ $step
 y
 s
 $simnetwork
-Results! for $simelt-$dates_to_sim
+Res! $simelt
 y
 y
 -
@@ -648,6 +650,7 @@ Sim::OPT::Sim.
 =head1 DESCRIPTION
 
 Sim::OPT::Sim is the module used by Sim::OPT to launch the simulations once the models have been built. Sim::OPT::Sim's presently existing functionalities can be used to launch simulations in ESP-r and EnergyPlus. The possibility to call simulation programs other than the cited two may be pursued through modifications of the code dedicated to EnergyPlus (which is actually meant as an example of a generic case). This code portion may be actually constituted by the single line launching the simulation program through the shell.
+This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
 
 =head2 EXPORT
 
@@ -663,7 +666,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-
+Copyright (C) 2008-2025 by Gian Luca Brunetti, gianluca.brunetti@gmail.com. This software is distributed under a dual licence, open-source (GPL v3) and proprietary. The present copy is GPL. By consequence, this is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

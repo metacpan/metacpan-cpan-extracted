@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges;
-$Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges::VERSION = '3.10';
+$Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %VariableHandlingCharge_of :ATTR(:get<VariableHandlingCharge>);
-my %TotalCustomerCharge_of :ATTR(:get<TotalCustomerCharge>);
+    my %VariableHandlingCharge_of : ATTR(:get<VariableHandlingCharge>);
+    my %TotalCustomerCharge_of    : ATTR(:get<TotalCustomerCharge>);
 
-__PACKAGE__->_factory(
-    [ qw(        VariableHandlingCharge
-        TotalCustomerCharge
+    __PACKAGE__->_factory(
+        [   qw(        VariableHandlingCharge
+              TotalCustomerCharge
 
-    ) ],
-    {
-        'VariableHandlingCharge' => \%VariableHandlingCharge_of,
-        'TotalCustomerCharge' => \%TotalCustomerCharge_of,
-    },
-    {
-        'VariableHandlingCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'TotalCustomerCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-    },
-    {
+            )
+        ],
+        {   'VariableHandlingCharge' => \%VariableHandlingCharge_of,
+            'TotalCustomerCharge'    => \%TotalCustomerCharge_of,
+        },
+        {   'VariableHandlingCharge' =>
+              'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'TotalCustomerCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+        },
+        {
 
-        'VariableHandlingCharge' => 'VariableHandlingCharge',
-        'TotalCustomerCharge' => 'TotalCustomerCharge',
-    }
-);
+            'VariableHandlingCharge' => 'VariableHandlingCharge',
+            'TotalCustomerCharge'    => 'TotalCustomerCharge',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

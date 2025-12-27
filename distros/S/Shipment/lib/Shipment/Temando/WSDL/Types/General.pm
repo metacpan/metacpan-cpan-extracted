@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::General;
-$Shipment::Temando::WSDL::Types::General::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::General::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +24,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %goodsValue_of :ATTR(:get<goodsValue>);
+    my %goodsValue_of : ATTR(:get<goodsValue>);
 
-__PACKAGE__->_factory(
-    [ qw(        goodsValue
+    __PACKAGE__->_factory(
+        [   qw(        goodsValue
 
-    ) ],
-    {
-        'goodsValue' => \%goodsValue_of,
-    },
-    {
-        'goodsValue' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-    },
-    {
+            )
+        ],
+        {'goodsValue' => \%goodsValue_of,},
+        {'goodsValue' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',},
+        {
 
-        'goodsValue' => 'goodsValue',
-    }
-);
+            'goodsValue' => 'goodsValue',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +58,7 @@ Shipment::Temando::WSDL::Types::General
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

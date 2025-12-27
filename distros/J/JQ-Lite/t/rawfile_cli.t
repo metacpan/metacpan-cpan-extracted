@@ -32,8 +32,8 @@ my $missing_stderr = do { local $/; <$missing_err> } // '';
 waitpid($missing_pid, 0);
 my $missing_exit = $? >> 8;
 
-isnt($missing_exit, 0, '--rawfile exits non-zero when the file cannot be opened');
-like($missing_stderr, qr/Cannot open file 'nonexistent\.raw'/i, 'error message includes the missing filename');
+is($missing_exit, 5, '--rawfile exits with usage code when the file cannot be opened');
+like($missing_stderr, qr/^\[USAGE\]\s*Cannot open file 'nonexistent\.raw'/i, 'error message includes the usage prefix and filename');
 is($missing_stdout, '', 'no output is produced when --rawfile fails');
 
 done_testing;

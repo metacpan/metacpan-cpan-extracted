@@ -1,14 +1,19 @@
 package Shipment::Temando::WSDL::Types::AvailableQuote;
-$Shipment::Temando::WSDL::Types::AvailableQuote::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::AvailableQuote::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
-our $XML_ATTRIBUTE_CLASS = 'Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr';
+our $XML_ATTRIBUTE_CLASS =
+  'Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr';
 
 sub __get_attr_class {
     return $XML_ATTRIBUTE_CLASS;
@@ -19,410 +24,392 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %generated_of :ATTR(:get<generated>);
-my %accepted_of :ATTR(:get<accepted>);
-my %bookingNumber_of :ATTR(:get<bookingNumber>);
-my %consignmentNumber_of :ATTR(:get<consignmentNumber>);
-my %consignmentDocument_of :ATTR(:get<consignmentDocument>);
-my %consignmentDocumentType_of :ATTR(:get<consignmentDocumentType>);
-my %labelDocument_of :ATTR(:get<labelDocument>);
-my %labelDocumentType_of :ATTR(:get<labelDocumentType>);
-my %manifestNumber_of :ATTR(:get<manifestNumber>);
-my %articles_of :ATTR(:get<articles>);
-my %trackingStatus_of :ATTR(:get<trackingStatus>);
-my %trackingStatusOccurred_of :ATTR(:get<trackingStatusOccurred>);
-my %trackingLastChecked_of :ATTR(:get<trackingLastChecked>);
-my %trackingFurtherDetails_of :ATTR(:get<trackingFurtherDetails>);
-my %totalPrice_of :ATTR(:get<totalPrice>);
-my %basePrice_of :ATTR(:get<basePrice>);
-my %tax_of :ATTR(:get<tax>);
-my %currency_of :ATTR(:get<currency>);
-my %deliveryMethod_of :ATTR(:get<deliveryMethod>);
-my %usingGeneralRail_of :ATTR(:get<usingGeneralRail>);
-my %usingGeneralRoad_of :ATTR(:get<usingGeneralRoad>);
-my %usingGeneralSea_of :ATTR(:get<usingGeneralSea>);
-my %usingExpressAir_of :ATTR(:get<usingExpressAir>);
-my %usingExpressRoad_of :ATTR(:get<usingExpressRoad>);
-my %etaFrom_of :ATTR(:get<etaFrom>);
-my %etaTo_of :ATTR(:get<etaTo>);
-my %guaranteedEta_of :ATTR(:get<guaranteedEta>);
-my %adjustments_of :ATTR(:get<adjustments>);
-my %inclusions_of :ATTR(:get<inclusions>);
-my %extras_of :ATTR(:get<extras>);
-my %carrier_of :ATTR(:get<carrier>);
-my %originatingDepot_of :ATTR(:get<originatingDepot>);
-my %destinationDepot_of :ATTR(:get<destinationDepot>);
+    my %generated_of               : ATTR(:get<generated>);
+    my %accepted_of                : ATTR(:get<accepted>);
+    my %bookingNumber_of           : ATTR(:get<bookingNumber>);
+    my %consignmentNumber_of       : ATTR(:get<consignmentNumber>);
+    my %consignmentDocument_of     : ATTR(:get<consignmentDocument>);
+    my %consignmentDocumentType_of : ATTR(:get<consignmentDocumentType>);
+    my %labelDocument_of           : ATTR(:get<labelDocument>);
+    my %labelDocumentType_of       : ATTR(:get<labelDocumentType>);
+    my %manifestNumber_of          : ATTR(:get<manifestNumber>);
+    my %articles_of                : ATTR(:get<articles>);
+    my %trackingStatus_of          : ATTR(:get<trackingStatus>);
+    my %trackingStatusOccurred_of  : ATTR(:get<trackingStatusOccurred>);
+    my %trackingLastChecked_of     : ATTR(:get<trackingLastChecked>);
+    my %trackingFurtherDetails_of  : ATTR(:get<trackingFurtherDetails>);
+    my %totalPrice_of              : ATTR(:get<totalPrice>);
+    my %basePrice_of               : ATTR(:get<basePrice>);
+    my %tax_of                     : ATTR(:get<tax>);
+    my %currency_of                : ATTR(:get<currency>);
+    my %deliveryMethod_of          : ATTR(:get<deliveryMethod>);
+    my %usingGeneralRail_of        : ATTR(:get<usingGeneralRail>);
+    my %usingGeneralRoad_of        : ATTR(:get<usingGeneralRoad>);
+    my %usingGeneralSea_of         : ATTR(:get<usingGeneralSea>);
+    my %usingExpressAir_of         : ATTR(:get<usingExpressAir>);
+    my %usingExpressRoad_of        : ATTR(:get<usingExpressRoad>);
+    my %etaFrom_of                 : ATTR(:get<etaFrom>);
+    my %etaTo_of                   : ATTR(:get<etaTo>);
+    my %guaranteedEta_of           : ATTR(:get<guaranteedEta>);
+    my %adjustments_of             : ATTR(:get<adjustments>);
+    my %inclusions_of              : ATTR(:get<inclusions>);
+    my %extras_of                  : ATTR(:get<extras>);
+    my %carrier_of                 : ATTR(:get<carrier>);
+    my %originatingDepot_of        : ATTR(:get<originatingDepot>);
+    my %destinationDepot_of        : ATTR(:get<destinationDepot>);
 
-__PACKAGE__->_factory(
-    [ qw(        generated
-        accepted
-        bookingNumber
-        consignmentNumber
-        consignmentDocument
-        consignmentDocumentType
-        labelDocument
-        labelDocumentType
-        manifestNumber
-        articles
-        trackingStatus
-        trackingStatusOccurred
-        trackingLastChecked
-        trackingFurtherDetails
-        totalPrice
-        basePrice
-        tax
-        currency
-        deliveryMethod
-        usingGeneralRail
-        usingGeneralRoad
-        usingGeneralSea
-        usingExpressAir
-        usingExpressRoad
-        etaFrom
-        etaTo
-        guaranteedEta
-        adjustments
-        inclusions
-        extras
-        carrier
-        originatingDepot
-        destinationDepot
+    __PACKAGE__->_factory(
+        [   qw(        generated
+              accepted
+              bookingNumber
+              consignmentNumber
+              consignmentDocument
+              consignmentDocumentType
+              labelDocument
+              labelDocumentType
+              manifestNumber
+              articles
+              trackingStatus
+              trackingStatusOccurred
+              trackingLastChecked
+              trackingFurtherDetails
+              totalPrice
+              basePrice
+              tax
+              currency
+              deliveryMethod
+              usingGeneralRail
+              usingGeneralRoad
+              usingGeneralSea
+              usingExpressAir
+              usingExpressRoad
+              etaFrom
+              etaTo
+              guaranteedEta
+              adjustments
+              inclusions
+              extras
+              carrier
+              originatingDepot
+              destinationDepot
 
-    ) ],
-    {
-        'generated' => \%generated_of,
-        'accepted' => \%accepted_of,
-        'bookingNumber' => \%bookingNumber_of,
-        'consignmentNumber' => \%consignmentNumber_of,
-        'consignmentDocument' => \%consignmentDocument_of,
-        'consignmentDocumentType' => \%consignmentDocumentType_of,
-        'labelDocument' => \%labelDocument_of,
-        'labelDocumentType' => \%labelDocumentType_of,
-        'manifestNumber' => \%manifestNumber_of,
-        'articles' => \%articles_of,
-        'trackingStatus' => \%trackingStatus_of,
-        'trackingStatusOccurred' => \%trackingStatusOccurred_of,
-        'trackingLastChecked' => \%trackingLastChecked_of,
-        'trackingFurtherDetails' => \%trackingFurtherDetails_of,
-        'totalPrice' => \%totalPrice_of,
-        'basePrice' => \%basePrice_of,
-        'tax' => \%tax_of,
-        'currency' => \%currency_of,
-        'deliveryMethod' => \%deliveryMethod_of,
-        'usingGeneralRail' => \%usingGeneralRail_of,
-        'usingGeneralRoad' => \%usingGeneralRoad_of,
-        'usingGeneralSea' => \%usingGeneralSea_of,
-        'usingExpressAir' => \%usingExpressAir_of,
-        'usingExpressRoad' => \%usingExpressRoad_of,
-        'etaFrom' => \%etaFrom_of,
-        'etaTo' => \%etaTo_of,
-        'guaranteedEta' => \%guaranteedEta_of,
-        'adjustments' => \%adjustments_of,
-        'inclusions' => \%inclusions_of,
-        'extras' => \%extras_of,
-        'carrier' => \%carrier_of,
-        'originatingDepot' => \%originatingDepot_of,
-        'destinationDepot' => \%destinationDepot_of,
-    },
-    {
-        'generated' => 'Shipment::Temando::WSDL::Types::GeneratedType',
-        'accepted' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'bookingNumber' => 'Shipment::Temando::WSDL::Types::BookingNumber',
-        'consignmentNumber' => 'Shipment::Temando::WSDL::Types::ConsignmentNumber',
-        'consignmentDocument' => 'Shipment::Temando::WSDL::Types::ConsignmentDocument',
-        'consignmentDocumentType' => 'Shipment::Temando::WSDL::Types::ConsignmentDocumentType',
-        'labelDocument' => 'Shipment::Temando::WSDL::Types::LabelDocument',
-        'labelDocumentType' => 'Shipment::Temando::WSDL::Types::LabelDocumentType',
-        'manifestNumber' => 'Shipment::Temando::WSDL::Types::ManifestNumber',
+            )
+        ],
+        {   'generated'               => \%generated_of,
+            'accepted'                => \%accepted_of,
+            'bookingNumber'           => \%bookingNumber_of,
+            'consignmentNumber'       => \%consignmentNumber_of,
+            'consignmentDocument'     => \%consignmentDocument_of,
+            'consignmentDocumentType' => \%consignmentDocumentType_of,
+            'labelDocument'           => \%labelDocument_of,
+            'labelDocumentType'       => \%labelDocumentType_of,
+            'manifestNumber'          => \%manifestNumber_of,
+            'articles'                => \%articles_of,
+            'trackingStatus'          => \%trackingStatus_of,
+            'trackingStatusOccurred'  => \%trackingStatusOccurred_of,
+            'trackingLastChecked'     => \%trackingLastChecked_of,
+            'trackingFurtherDetails'  => \%trackingFurtherDetails_of,
+            'totalPrice'              => \%totalPrice_of,
+            'basePrice'               => \%basePrice_of,
+            'tax'                     => \%tax_of,
+            'currency'                => \%currency_of,
+            'deliveryMethod'          => \%deliveryMethod_of,
+            'usingGeneralRail'        => \%usingGeneralRail_of,
+            'usingGeneralRoad'        => \%usingGeneralRoad_of,
+            'usingGeneralSea'         => \%usingGeneralSea_of,
+            'usingExpressAir'         => \%usingExpressAir_of,
+            'usingExpressRoad'        => \%usingExpressRoad_of,
+            'etaFrom'                 => \%etaFrom_of,
+            'etaTo'                   => \%etaTo_of,
+            'guaranteedEta'           => \%guaranteedEta_of,
+            'adjustments'             => \%adjustments_of,
+            'inclusions'              => \%inclusions_of,
+            'extras'                  => \%extras_of,
+            'carrier'                 => \%carrier_of,
+            'originatingDepot'        => \%originatingDepot_of,
+            'destinationDepot'        => \%destinationDepot_of,
+        },
+        {   'generated'     => 'Shipment::Temando::WSDL::Types::GeneratedType',
+            'accepted'      => 'Shipment::Temando::WSDL::Types::YesNoOption',
+            'bookingNumber' => 'Shipment::Temando::WSDL::Types::BookingNumber',
+            'consignmentNumber' =>
+              'Shipment::Temando::WSDL::Types::ConsignmentNumber',
+            'consignmentDocument' =>
+              'Shipment::Temando::WSDL::Types::ConsignmentDocument',
+            'consignmentDocumentType' =>
+              'Shipment::Temando::WSDL::Types::ConsignmentDocumentType',
+            'labelDocument' => 'Shipment::Temando::WSDL::Types::LabelDocument',
+            'labelDocumentType' =>
+              'Shipment::Temando::WSDL::Types::LabelDocumentType',
+            'manifestNumber' =>
+              'Shipment::Temando::WSDL::Types::ManifestNumber',
 
-        'articles' => 'Shipment::Temando::WSDL::Types::AvailableQuote::_articles',
-        'trackingStatus' => 'Shipment::Temando::WSDL::Types::TrackingStatus',
-        'trackingStatusOccurred' => 'Shipment::Temando::WSDL::Types::Datetime',
-        'trackingLastChecked' => 'Shipment::Temando::WSDL::Types::Datetime',
-        'trackingFurtherDetails' => 'Shipment::Temando::WSDL::Types::TrackingFurtherDetails',
-        'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'basePrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'tax' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-        'currency' => 'Shipment::Temando::WSDL::Types::CurrencyType',
-        'deliveryMethod' => 'Shipment::Temando::WSDL::Types::DeliveryMethod',
-        'usingGeneralRail' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'usingGeneralRoad' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'usingGeneralSea' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'usingExpressAir' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'usingExpressRoad' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'etaFrom' => 'Shipment::Temando::WSDL::Types::Eta',
-        'etaTo' => 'Shipment::Temando::WSDL::Types::Eta',
-        'guaranteedEta' => 'Shipment::Temando::WSDL::Types::YesNoOption',
+            'articles' =>
+              'Shipment::Temando::WSDL::Types::AvailableQuote::_articles',
+            'trackingStatus' =>
+              'Shipment::Temando::WSDL::Types::TrackingStatus',
+            'trackingStatusOccurred' =>
+              'Shipment::Temando::WSDL::Types::Datetime',
+            'trackingLastChecked' =>
+              'Shipment::Temando::WSDL::Types::Datetime',
+            'trackingFurtherDetails' =>
+              'Shipment::Temando::WSDL::Types::TrackingFurtherDetails',
+            'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'basePrice'  => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'tax'        => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+            'currency'   => 'Shipment::Temando::WSDL::Types::CurrencyType',
+            'deliveryMethod' =>
+              'Shipment::Temando::WSDL::Types::DeliveryMethod',
+            'usingGeneralRail' =>
+              'Shipment::Temando::WSDL::Types::YesNoOption',
+            'usingGeneralRoad' =>
+              'Shipment::Temando::WSDL::Types::YesNoOption',
+            'usingGeneralSea' => 'Shipment::Temando::WSDL::Types::YesNoOption',
+            'usingExpressAir' => 'Shipment::Temando::WSDL::Types::YesNoOption',
+            'usingExpressRoad' =>
+              'Shipment::Temando::WSDL::Types::YesNoOption',
+            'etaFrom'       => 'Shipment::Temando::WSDL::Types::Eta',
+            'etaTo'         => 'Shipment::Temando::WSDL::Types::Eta',
+            'guaranteedEta' => 'Shipment::Temando::WSDL::Types::YesNoOption',
 
-        'adjustments' => 'Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments',
+            'adjustments' =>
+              'Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments',
 
-        'inclusions' => 'Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions',
+            'inclusions' =>
+              'Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions',
 
-        'extras' => 'Shipment::Temando::WSDL::Types::AvailableQuote::_extras',
-        'carrier' => 'Shipment::Temando::WSDL::Types::Carrier',
-        'originatingDepot' => 'Shipment::Temando::WSDL::Types::Depot',
-        'destinationDepot' => 'Shipment::Temando::WSDL::Types::Depot',
-    },
-    {
+            'extras' =>
+              'Shipment::Temando::WSDL::Types::AvailableQuote::_extras',
+            'carrier'          => 'Shipment::Temando::WSDL::Types::Carrier',
+            'originatingDepot' => 'Shipment::Temando::WSDL::Types::Depot',
+            'destinationDepot' => 'Shipment::Temando::WSDL::Types::Depot',
+        },
+        {
 
-        'generated' => 'generated',
-        'accepted' => 'accepted',
-        'bookingNumber' => 'bookingNumber',
-        'consignmentNumber' => 'consignmentNumber',
-        'consignmentDocument' => 'consignmentDocument',
-        'consignmentDocumentType' => 'consignmentDocumentType',
-        'labelDocument' => 'labelDocument',
-        'labelDocumentType' => 'labelDocumentType',
-        'manifestNumber' => 'manifestNumber',
-        'articles' => 'articles',
-        'trackingStatus' => 'trackingStatus',
-        'trackingStatusOccurred' => 'trackingStatusOccurred',
-        'trackingLastChecked' => 'trackingLastChecked',
-        'trackingFurtherDetails' => 'trackingFurtherDetails',
-        'totalPrice' => 'totalPrice',
-        'basePrice' => 'basePrice',
-        'tax' => 'tax',
-        'currency' => 'currency',
-        'deliveryMethod' => 'deliveryMethod',
-        'usingGeneralRail' => 'usingGeneralRail',
-        'usingGeneralRoad' => 'usingGeneralRoad',
-        'usingGeneralSea' => 'usingGeneralSea',
-        'usingExpressAir' => 'usingExpressAir',
-        'usingExpressRoad' => 'usingExpressRoad',
-        'etaFrom' => 'etaFrom',
-        'etaTo' => 'etaTo',
-        'guaranteedEta' => 'guaranteedEta',
-        'adjustments' => 'adjustments',
-        'inclusions' => 'inclusions',
-        'extras' => 'extras',
-        'carrier' => 'carrier',
-        'originatingDepot' => 'originatingDepot',
-        'destinationDepot' => 'destinationDepot',
-    }
-);
+            'generated'               => 'generated',
+            'accepted'                => 'accepted',
+            'bookingNumber'           => 'bookingNumber',
+            'consignmentNumber'       => 'consignmentNumber',
+            'consignmentDocument'     => 'consignmentDocument',
+            'consignmentDocumentType' => 'consignmentDocumentType',
+            'labelDocument'           => 'labelDocument',
+            'labelDocumentType'       => 'labelDocumentType',
+            'manifestNumber'          => 'manifestNumber',
+            'articles'                => 'articles',
+            'trackingStatus'          => 'trackingStatus',
+            'trackingStatusOccurred'  => 'trackingStatusOccurred',
+            'trackingLastChecked'     => 'trackingLastChecked',
+            'trackingFurtherDetails'  => 'trackingFurtherDetails',
+            'totalPrice'              => 'totalPrice',
+            'basePrice'               => 'basePrice',
+            'tax'                     => 'tax',
+            'currency'                => 'currency',
+            'deliveryMethod'          => 'deliveryMethod',
+            'usingGeneralRail'        => 'usingGeneralRail',
+            'usingGeneralRoad'        => 'usingGeneralRoad',
+            'usingGeneralSea'         => 'usingGeneralSea',
+            'usingExpressAir'         => 'usingExpressAir',
+            'usingExpressRoad'        => 'usingExpressRoad',
+            'etaFrom'                 => 'etaFrom',
+            'etaTo'                   => 'etaTo',
+            'guaranteedEta'           => 'guaranteedEta',
+            'adjustments'             => 'adjustments',
+            'inclusions'              => 'inclusions',
+            'extras'                  => 'extras',
+            'carrier'                 => 'carrier',
+            'originatingDepot'        => 'originatingDepot',
+            'destinationDepot'        => 'destinationDepot',
+        }
+    );
 
-} # end BLOCK
-
-
+}    # end BLOCK
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments::VERSION =
+  '3.11';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %adjustment_of :ATTR(:get<adjustment>);
-
-__PACKAGE__->_factory(
-    [ qw(        adjustment
-
-    ) ],
-    {
-        'adjustment' => \%adjustment_of,
-    },
-    {
-        'adjustment' => 'Shipment::Temando::WSDL::Types::Adjustment',
-    },
-    {
-
-        'adjustment' => 'adjustment',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %adjustment_of : ATTR(:get<adjustment>);
 
+        __PACKAGE__->_factory(
+            [   qw(        adjustment
+
+                )
+            ],
+            {'adjustment' => \%adjustment_of,},
+            {'adjustment' => 'Shipment::Temando::WSDL::Types::Adjustment',},
+            {
+
+                'adjustment' => 'adjustment',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_articles;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_articles::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_articles::VERSION = '3.11';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %article_of :ATTR(:get<article>);
-
-__PACKAGE__->_factory(
-    [ qw(        article
-
-    ) ],
-    {
-        'article' => \%article_of,
-    },
-    {
-        'article' => 'Shipment::Temando::WSDL::Types::Article',
-    },
-    {
-
-        'article' => 'article',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %article_of : ATTR(:get<article>);
 
+        __PACKAGE__->_factory(
+            [   qw(        article
+
+                )
+            ],
+            {'article' => \%article_of,},
+            {'article' => 'Shipment::Temando::WSDL::Types::Article',},
+            {
+
+                'article' => 'article',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_extras;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_extras::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_extras::VERSION = '3.11';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %extra_of :ATTR(:get<extra>);
-
-__PACKAGE__->_factory(
-    [ qw(        extra
-
-    ) ],
-    {
-        'extra' => \%extra_of,
-    },
-    {
-        'extra' => 'Shipment::Temando::WSDL::Types::Extra',
-    },
-    {
-
-        'extra' => 'extra',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %extra_of : ATTR(:get<extra>);
 
+        __PACKAGE__->_factory(
+            [   qw(        extra
+
+                )
+            ],
+            {'extra' => \%extra_of,},
+            {'extra' => 'Shipment::Temando::WSDL::Types::Extra',},
+            {
+
+                'extra' => 'extra',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions::VERSION = '3.11';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %inclusion_of :ATTR(:get<inclusion>);
-
-__PACKAGE__->_factory(
-    [ qw(        inclusion
-
-    ) ],
-    {
-        'inclusion' => \%inclusion_of,
-    },
-    {
-        'inclusion' => 'Shipment::Temando::WSDL::Types::Inclusion',
-    },
-    {
-
-        'inclusion' => 'inclusion',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %inclusion_of : ATTR(:get<inclusion>);
 
+        __PACKAGE__->_factory(
+            [   qw(        inclusion
+
+                )
+            ],
+            {'inclusion' => \%inclusion_of,},
+            {'inclusion' => 'Shipment::Temando::WSDL::Types::Inclusion',},
+            {
+
+                'inclusion' => 'inclusion',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr::VERSION = '3.10';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr::VERSION
+  = '3.11';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %id_of :ATTR(:get<id>);
+    my %id_of : ATTR(:get<id>);
 
-__PACKAGE__->_factory(
-    [ qw(
-        id
-    ) ],
-    {
+    __PACKAGE__->_factory(
+        [   qw(
+              id
+            )
+        ],
+        {
 
-        id => \%id_of,
-    },
-    {
-        id => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-    }
-);
+            id => \%id_of,
+        },
+        {id => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',}
+    );
 
-} # end BLOCK
-
+}    # end BLOCK
 
 
 1;
@@ -439,7 +426,7 @@ Shipment::Temando::WSDL::Types::AvailableQuote
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::RatedShipmentType;
-$Shipment::UPS::WSDL::RateTypes::RatedShipmentType::VERSION = '3.10';
+$Shipment::UPS::WSDL::RateTypes::RatedShipmentType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,77 +20,79 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Service_of :ATTR(:get<Service>);
-my %RatedShipmentAlert_of :ATTR(:get<RatedShipmentAlert>);
-my %BillingWeight_of :ATTR(:get<BillingWeight>);
-my %TransportationCharges_of :ATTR(:get<TransportationCharges>);
-my %FRSShipmentData_of :ATTR(:get<FRSShipmentData>);
-my %ServiceOptionsCharges_of :ATTR(:get<ServiceOptionsCharges>);
-my %TotalCharges_of :ATTR(:get<TotalCharges>);
-my %NegotiatedRateCharges_of :ATTR(:get<NegotiatedRateCharges>);
-my %GuaranteedDelivery_of :ATTR(:get<GuaranteedDelivery>);
-my %RatedPackage_of :ATTR(:get<RatedPackage>);
+    my %Service_of               : ATTR(:get<Service>);
+    my %RatedShipmentAlert_of    : ATTR(:get<RatedShipmentAlert>);
+    my %BillingWeight_of         : ATTR(:get<BillingWeight>);
+    my %TransportationCharges_of : ATTR(:get<TransportationCharges>);
+    my %FRSShipmentData_of       : ATTR(:get<FRSShipmentData>);
+    my %ServiceOptionsCharges_of : ATTR(:get<ServiceOptionsCharges>);
+    my %TotalCharges_of          : ATTR(:get<TotalCharges>);
+    my %NegotiatedRateCharges_of : ATTR(:get<NegotiatedRateCharges>);
+    my %GuaranteedDelivery_of    : ATTR(:get<GuaranteedDelivery>);
+    my %RatedPackage_of          : ATTR(:get<RatedPackage>);
 
-__PACKAGE__->_factory(
-    [ qw(        Service
-        RatedShipmentAlert
-        BillingWeight
-        TransportationCharges
-        FRSShipmentData
-        ServiceOptionsCharges
-        TotalCharges
-        NegotiatedRateCharges
-        GuaranteedDelivery
-        RatedPackage
+    __PACKAGE__->_factory(
+        [   qw(        Service
+              RatedShipmentAlert
+              BillingWeight
+              TransportationCharges
+              FRSShipmentData
+              ServiceOptionsCharges
+              TotalCharges
+              NegotiatedRateCharges
+              GuaranteedDelivery
+              RatedPackage
 
-    ) ],
-    {
-        'Service' => \%Service_of,
-        'RatedShipmentAlert' => \%RatedShipmentAlert_of,
-        'BillingWeight' => \%BillingWeight_of,
-        'TransportationCharges' => \%TransportationCharges_of,
-        'FRSShipmentData' => \%FRSShipmentData_of,
-        'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
-        'TotalCharges' => \%TotalCharges_of,
-        'NegotiatedRateCharges' => \%NegotiatedRateCharges_of,
-        'GuaranteedDelivery' => \%GuaranteedDelivery_of,
-        'RatedPackage' => \%RatedPackage_of,
-    },
-    {
-        'Service' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
-        'RatedShipmentAlert' => 'Shipment::UPS::WSDL::RateTypes::RatedShipmentInfoType',
-        'BillingWeight' => 'Shipment::UPS::WSDL::RateTypes::BillingWeightType',
-        'TransportationCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'FRSShipmentData' => 'Shipment::UPS::WSDL::RateTypes::FRSShipmentType',
-        'ServiceOptionsCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'TotalCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'NegotiatedRateCharges' => 'Shipment::UPS::WSDL::RateTypes::TotalChargeType',
-        'GuaranteedDelivery' => 'Shipment::UPS::WSDL::RateTypes::GuaranteedDeliveryType',
-        'RatedPackage' => 'Shipment::UPS::WSDL::RateTypes::RatedPackageType',
-    },
-    {
+            )
+        ],
+        {   'Service'               => \%Service_of,
+            'RatedShipmentAlert'    => \%RatedShipmentAlert_of,
+            'BillingWeight'         => \%BillingWeight_of,
+            'TransportationCharges' => \%TransportationCharges_of,
+            'FRSShipmentData'       => \%FRSShipmentData_of,
+            'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
+            'TotalCharges'          => \%TotalCharges_of,
+            'NegotiatedRateCharges' => \%NegotiatedRateCharges_of,
+            'GuaranteedDelivery'    => \%GuaranteedDelivery_of,
+            'RatedPackage'          => \%RatedPackage_of,
+        },
+        {   'Service' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
+            'RatedShipmentAlert' =>
+              'Shipment::UPS::WSDL::RateTypes::RatedShipmentInfoType',
+            'BillingWeight' =>
+              'Shipment::UPS::WSDL::RateTypes::BillingWeightType',
+            'TransportationCharges' =>
+              'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'FRSShipmentData' =>
+              'Shipment::UPS::WSDL::RateTypes::FRSShipmentType',
+            'ServiceOptionsCharges' =>
+              'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'TotalCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'NegotiatedRateCharges' =>
+              'Shipment::UPS::WSDL::RateTypes::TotalChargeType',
+            'GuaranteedDelivery' =>
+              'Shipment::UPS::WSDL::RateTypes::GuaranteedDeliveryType',
+            'RatedPackage' =>
+              'Shipment::UPS::WSDL::RateTypes::RatedPackageType',
+        },
+        {
 
-        'Service' => 'Service',
-        'RatedShipmentAlert' => 'RatedShipmentAlert',
-        'BillingWeight' => 'BillingWeight',
-        'TransportationCharges' => 'TransportationCharges',
-        'FRSShipmentData' => 'FRSShipmentData',
-        'ServiceOptionsCharges' => 'ServiceOptionsCharges',
-        'TotalCharges' => 'TotalCharges',
-        'NegotiatedRateCharges' => 'NegotiatedRateCharges',
-        'GuaranteedDelivery' => 'GuaranteedDelivery',
-        'RatedPackage' => 'RatedPackage',
-    }
-);
+            'Service'               => 'Service',
+            'RatedShipmentAlert'    => 'RatedShipmentAlert',
+            'BillingWeight'         => 'BillingWeight',
+            'TransportationCharges' => 'TransportationCharges',
+            'FRSShipmentData'       => 'FRSShipmentData',
+            'ServiceOptionsCharges' => 'ServiceOptionsCharges',
+            'TotalCharges'          => 'TotalCharges',
+            'NegotiatedRateCharges' => 'NegotiatedRateCharges',
+            'GuaranteedDelivery'    => 'GuaranteedDelivery',
+            'RatedPackage'          => 'RatedPackage',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -107,7 +109,7 @@ Shipment::UPS::WSDL::RateTypes::RatedShipmentType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

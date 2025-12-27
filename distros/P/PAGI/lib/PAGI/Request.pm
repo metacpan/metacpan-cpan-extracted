@@ -42,7 +42,6 @@ sub new {
     return bless {
         scope   => $scope,
         receive => $receive,
-        _body_read => 0,
     }, $class;
 }
 
@@ -113,18 +112,18 @@ sub header {
     return $value;
 }
 
-# All headers as Hash::MultiValue (cached, case-insensitive keys)
+# All headers as Hash::MultiValue (cached in scope, case-insensitive keys)
 sub headers {
     my $self = shift;
-    return $self->{_headers} if $self->{_headers};
+    return $self->{scope}{'pagi.request.headers'} if $self->{scope}{'pagi.request.headers'};
 
     my @pairs;
     for my $pair (@{$self->{scope}{headers} // []}) {
         push @pairs, lc($pair->[0]), $pair->[1];
     }
 
-    $self->{_headers} = Hash::MultiValue->new(@pairs);
-    return $self->{_headers};
+    $self->{scope}{'pagi.request.headers'} = Hash::MultiValue->new(@pairs);
+    return $self->{scope}{'pagi.request.headers'};
 }
 
 # All values for a header
@@ -133,7 +132,7 @@ sub header_all {
     return $self->headers->get_all(lc($name));
 }
 
-# Query params as Hash::MultiValue (cached)
+# Query params as Hash::MultiValue (cached in scope)
 # Options: strict => 1 (croak on invalid UTF-8), raw => 1 (skip UTF-8 decoding)
 sub query_params {
     my ($self, %opts) = @_;
@@ -141,8 +140,8 @@ sub query_params {
     my $raw    = delete $opts{raw}    // 0;
     croak("Unknown options to query_params: " . join(', ', keys %opts)) if %opts;
 
-    my $cache_key = $raw ? '_query_params_raw' : ($strict ? '_query_params_strict' : '_query_params');
-    return $self->{$cache_key} if $self->{$cache_key};
+    my $cache_key = $raw ? 'pagi.request.query.raw' : ($strict ? 'pagi.request.query.strict' : 'pagi.request.query');
+    return $self->{scope}{$cache_key} if $self->{scope}{$cache_key};
 
     my $qs = $self->query_string;
     my @pairs;
@@ -164,8 +163,8 @@ sub query_params {
         push @pairs, $key_final, $val_final;
     }
 
-    $self->{$cache_key} = Hash::MultiValue->new(@pairs);
-    return $self->{$cache_key};
+    $self->{scope}{$cache_key} = Hash::MultiValue->new(@pairs);
+    return $self->{scope}{$cache_key};
 }
 
 # Raw query params (no UTF-8 decoding)
@@ -186,14 +185,14 @@ sub raw_query {
     return $self->query($name, raw => 1);
 }
 
-# All cookies as hashref (cached)
+# All cookies as hashref (cached in scope)
 sub cookies {
     my $self = shift;
-    return $self->{_cookies} if exists $self->{_cookies};
+    return $self->{scope}{'pagi.request.cookies'} if exists $self->{scope}{'pagi.request.cookies'};
 
     my $cookie_header = $self->header('cookie') // '';
-    $self->{_cookies} = crush_cookie($cookie_header);
-    return $self->{_cookies};
+    $self->{scope}{'pagi.request.cookies'} = crush_cookie($cookie_header);
+    return $self->{scope}{'pagi.request.cookies'};
 }
 
 # Single cookie value
@@ -335,10 +334,10 @@ sub state {
 sub body_stream {
     my ($self, %opts) = @_;
 
-    croak "Body already consumed; streaming not available" if $self->{_body_read};
-    croak "Body streaming already started" if $self->{_body_stream_created};
+    croak "Body already consumed; streaming not available" if $self->{scope}{'pagi.request.body.read'};
+    croak "Body streaming already started" if $self->{scope}{'pagi.request.body.stream.created'};
 
-    $self->{_body_stream_created} = 1;
+    $self->{scope}{'pagi.request.body.stream.created'} = 1;
 
     my $max_bytes = $opts{max_bytes};
     my $limit_name = defined $max_bytes ? 'max_bytes' : undef;
@@ -359,15 +358,15 @@ sub body_stream {
     );
 }
 
-# Read raw body bytes (async, cached)
+# Read raw body bytes (async, cached in scope)
 async sub body {
     my $self = shift;
 
     croak "Body streaming already started; buffered helpers unavailable"
-        if $self->{_body_stream_created};
+        if $self->{scope}{'pagi.request.body.stream.created'};
 
     # Return cached body if already read
-    return $self->{_body} if $self->{_body_read};
+    return $self->{scope}{'pagi.request.body'} if $self->{scope}{'pagi.request.body.read'};
 
     my $receive = $self->{receive};
     die "No receive callback provided" unless $receive;
@@ -382,8 +381,8 @@ async sub body {
         last unless $message->{more};
     }
 
-    $self->{_body} = $body;
-    $self->{_body_read} = 1;
+    $self->{scope}{'pagi.request.body'} = $body;
+    $self->{scope}{'pagi.request.body.read'} = 1;
     return $body;
 }
 
@@ -405,7 +404,7 @@ async sub json {
     return decode_json($body);
 }
 
-# Parse URL-encoded form body (async, returns Hash::MultiValue)
+# Parse URL-encoded form body (async, returns Hash::MultiValue, cached in scope)
 # Options: strict => 1 (croak on invalid UTF-8), raw => 1 (skip UTF-8 decoding)
 async sub form {
     my ($self, %opts) = @_;
@@ -419,16 +418,16 @@ async sub form {
     }
     croak("Unknown options to form: " . join(', ', keys %opts)) if %opts;
 
-    my $cache_key = $raw ? '_form_raw' : ($strict ? '_form_strict' : '_form');
+    my $cache_key = $raw ? 'pagi.request.form.raw' : ($strict ? 'pagi.request.form.strict' : 'pagi.request.form');
 
     # Return cached if available
-    return $self->{$cache_key} if $self->{$cache_key};
+    return $self->{scope}{$cache_key} if $self->{scope}{$cache_key};
 
     # For multipart, delegate to uploads handling
     if ($self->is_multipart) {
         # Multipart always parses to default cache, then copy
         my $form = await $self->_parse_multipart_form(%multipart_opts);
-        $self->{$cache_key} = $form;
+        $self->{scope}{$cache_key} = $form;
         return $form;
     }
 
@@ -453,8 +452,8 @@ async sub form {
         push @pairs, $key_final, $val_final;
     }
 
-    $self->{$cache_key} = Hash::MultiValue->new(@pairs);
-    return $self->{$cache_key};
+    $self->{scope}{$cache_key} = Hash::MultiValue->new(@pairs);
+    return $self->{scope}{$cache_key};
 }
 
 # Raw form params (no UTF-8 decoding)
@@ -463,12 +462,13 @@ async sub raw_form {
     return await $self->form(%opts, raw => 1);
 }
 
-# Parse multipart form (internal)
+# Parse multipart form (internal, cached in scope)
 async sub _parse_multipart_form {
     my ($self, %opts) = @_;
 
     # Already parsed?
-    return $self->{_form} if $self->{_form} && $self->{_uploads};
+    return $self->{scope}{'pagi.request.form'}
+        if $self->{scope}{'pagi.request.form'} && $self->{scope}{'pagi.request.uploads'};
 
     # Extract boundary from content-type
     my $ct = $self->header('content-type') // '';
@@ -490,27 +490,27 @@ async sub _parse_multipart_form {
 
     my ($form, $uploads) = await $handler->parse;
 
-    $self->{_form} = $form;
-    $self->{_uploads} = $uploads;
-    $self->{_body_read} = 1;  # Body has been consumed
+    $self->{scope}{'pagi.request.form'} = $form;
+    $self->{scope}{'pagi.request.uploads'} = $uploads;
+    $self->{scope}{'pagi.request.body.read'} = 1;  # Body has been consumed
 
     return $form;
 }
 
-# Get all uploads as Hash::MultiValue
+# Get all uploads as Hash::MultiValue (cached in scope)
 async sub uploads {
     my ($self, %opts) = @_;
 
-    return $self->{_uploads} if $self->{_uploads};
+    return $self->{scope}{'pagi.request.uploads'} if $self->{scope}{'pagi.request.uploads'};
 
     if ($self->is_multipart) {
         await $self->_parse_multipart_form(%opts);
-        return $self->{_uploads};
+        return $self->{scope}{'pagi.request.uploads'};
     }
 
     # Not multipart - return empty
-    $self->{_uploads} = Hash::MultiValue->new();
-    return $self->{_uploads};
+    $self->{scope}{'pagi.request.uploads'} = Hash::MultiValue->new();
+    return $self->{scope}{'pagi.request.uploads'};
 }
 
 # Get single upload by field name

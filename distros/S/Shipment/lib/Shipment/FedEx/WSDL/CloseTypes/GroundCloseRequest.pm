@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' };
+sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,53 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %TimeUpToWhichShipmentsAreToBeClosed_of :ATTR(:get<TimeUpToWhichShipmentsAreToBeClosed>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of            : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of       : ATTR(:get<TransactionDetail>);
+    my %Version_of                 : ATTR(:get<Version>);
+    my %TimeUpToWhichShipmentsAreToBeClosed_of :
+      ATTR(:get<TimeUpToWhichShipmentsAreToBeClosed>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        TimeUpToWhichShipmentsAreToBeClosed
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              TimeUpToWhichShipmentsAreToBeClosed
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'TimeUpToWhichShipmentsAreToBeClosed' => \%TimeUpToWhichShipmentsAreToBeClosed_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
-        'TimeUpToWhichShipmentsAreToBeClosed' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'TimeUpToWhichShipmentsAreToBeClosed' =>
+              \%TimeUpToWhichShipmentsAreToBeClosed_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
+            'ClientDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+            'TimeUpToWhichShipmentsAreToBeClosed' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'TimeUpToWhichShipmentsAreToBeClosed' => 'TimeUpToWhichShipmentsAreToBeClosed',
-    }
-);
+            'WebAuthenticationDetail'             => 'WebAuthenticationDetail',
+            'ClientDetail'                        => 'ClientDetail',
+            'TransactionDetail'                   => 'TransactionDetail',
+            'Version'                             => 'Version',
+            'TimeUpToWhichShipmentsAreToBeClosed' =>
+              'TimeUpToWhichShipmentsAreToBeClosed',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +83,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

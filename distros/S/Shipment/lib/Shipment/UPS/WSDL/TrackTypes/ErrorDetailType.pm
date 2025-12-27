@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ErrorDetailType;
-$Shipment::UPS::WSDL::TrackTypes::ErrorDetailType::VERSION = '3.10';
+$Shipment::UPS::WSDL::TrackTypes::ErrorDetailType::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,53 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Severity_of :ATTR(:get<Severity>);
-my %PrimaryErrorCode_of :ATTR(:get<PrimaryErrorCode>);
-my %MinimumRetrySeconds_of :ATTR(:get<MinimumRetrySeconds>);
-my %Location_of :ATTR(:get<Location>);
-my %SubErrorCode_of :ATTR(:get<SubErrorCode>);
-my %AdditionalInformation_of :ATTR(:get<AdditionalInformation>);
+    my %Severity_of              : ATTR(:get<Severity>);
+    my %PrimaryErrorCode_of      : ATTR(:get<PrimaryErrorCode>);
+    my %MinimumRetrySeconds_of   : ATTR(:get<MinimumRetrySeconds>);
+    my %Location_of              : ATTR(:get<Location>);
+    my %SubErrorCode_of          : ATTR(:get<SubErrorCode>);
+    my %AdditionalInformation_of : ATTR(:get<AdditionalInformation>);
 
-__PACKAGE__->_factory(
-    [ qw(        Severity
-        PrimaryErrorCode
-        MinimumRetrySeconds
-        Location
-        SubErrorCode
-        AdditionalInformation
+    __PACKAGE__->_factory(
+        [   qw(        Severity
+              PrimaryErrorCode
+              MinimumRetrySeconds
+              Location
+              SubErrorCode
+              AdditionalInformation
 
-    ) ],
-    {
-        'Severity' => \%Severity_of,
-        'PrimaryErrorCode' => \%PrimaryErrorCode_of,
-        'MinimumRetrySeconds' => \%MinimumRetrySeconds_of,
-        'Location' => \%Location_of,
-        'SubErrorCode' => \%SubErrorCode_of,
-        'AdditionalInformation' => \%AdditionalInformation_of,
-    },
-    {
-        'Severity' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PrimaryErrorCode' => 'Shipment::UPS::WSDL::TrackTypes::CodeType',
-        'MinimumRetrySeconds' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Location' => 'Shipment::UPS::WSDL::TrackTypes::LocationType',
-        'SubErrorCode' => 'Shipment::UPS::WSDL::TrackTypes::CodeType',
-        'AdditionalInformation' => 'Shipment::UPS::WSDL::TrackTypes::AdditionalInfoType',
-    },
-    {
+            )
+        ],
+        {   'Severity'              => \%Severity_of,
+            'PrimaryErrorCode'      => \%PrimaryErrorCode_of,
+            'MinimumRetrySeconds'   => \%MinimumRetrySeconds_of,
+            'Location'              => \%Location_of,
+            'SubErrorCode'          => \%SubErrorCode_of,
+            'AdditionalInformation' => \%AdditionalInformation_of,
+        },
+        {   'Severity'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PrimaryErrorCode' => 'Shipment::UPS::WSDL::TrackTypes::CodeType',
+            'MinimumRetrySeconds' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Location'     => 'Shipment::UPS::WSDL::TrackTypes::LocationType',
+            'SubErrorCode' => 'Shipment::UPS::WSDL::TrackTypes::CodeType',
+            'AdditionalInformation' =>
+              'Shipment::UPS::WSDL::TrackTypes::AdditionalInfoType',
+        },
+        {
 
-        'Severity' => 'Severity',
-        'PrimaryErrorCode' => 'PrimaryErrorCode',
-        'MinimumRetrySeconds' => 'MinimumRetrySeconds',
-        'Location' => 'Location',
-        'SubErrorCode' => 'SubErrorCode',
-        'AdditionalInformation' => 'AdditionalInformation',
-    }
-);
+            'Severity'              => 'Severity',
+            'PrimaryErrorCode'      => 'PrimaryErrorCode',
+            'MinimumRetrySeconds'   => 'MinimumRetrySeconds',
+            'Location'              => 'Location',
+            'SubErrorCode'          => 'SubErrorCode',
+            'AdditionalInformation' => 'AdditionalInformation',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +83,7 @@ Shipment::UPS::WSDL::TrackTypes::ErrorDetailType
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

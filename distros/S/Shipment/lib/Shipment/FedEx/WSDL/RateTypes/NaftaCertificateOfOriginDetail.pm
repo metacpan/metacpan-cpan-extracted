@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::NaftaCertificateOfOriginDetail;
-$Shipment::FedEx::WSDL::RateTypes::NaftaCertificateOfOriginDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::NaftaCertificateOfOriginDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,60 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Format_of :ATTR(:get<Format>);
-my %BlanketPeriod_of :ATTR(:get<BlanketPeriod>);
-my %ImporterSpecification_of :ATTR(:get<ImporterSpecification>);
-my %SignatureContact_of :ATTR(:get<SignatureContact>);
-my %ProducerSpecification_of :ATTR(:get<ProducerSpecification>);
-my %Producers_of :ATTR(:get<Producers>);
-my %CustomerImageUsages_of :ATTR(:get<CustomerImageUsages>);
+    my %Format_of                : ATTR(:get<Format>);
+    my %BlanketPeriod_of         : ATTR(:get<BlanketPeriod>);
+    my %ImporterSpecification_of : ATTR(:get<ImporterSpecification>);
+    my %SignatureContact_of      : ATTR(:get<SignatureContact>);
+    my %ProducerSpecification_of : ATTR(:get<ProducerSpecification>);
+    my %Producers_of             : ATTR(:get<Producers>);
+    my %CustomerImageUsages_of   : ATTR(:get<CustomerImageUsages>);
 
-__PACKAGE__->_factory(
-    [ qw(        Format
-        BlanketPeriod
-        ImporterSpecification
-        SignatureContact
-        ProducerSpecification
-        Producers
-        CustomerImageUsages
+    __PACKAGE__->_factory(
+        [   qw(        Format
+              BlanketPeriod
+              ImporterSpecification
+              SignatureContact
+              ProducerSpecification
+              Producers
+              CustomerImageUsages
 
-    ) ],
-    {
-        'Format' => \%Format_of,
-        'BlanketPeriod' => \%BlanketPeriod_of,
-        'ImporterSpecification' => \%ImporterSpecification_of,
-        'SignatureContact' => \%SignatureContact_of,
-        'ProducerSpecification' => \%ProducerSpecification_of,
-        'Producers' => \%Producers_of,
-        'CustomerImageUsages' => \%CustomerImageUsages_of,
-    },
-    {
-        'Format' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentFormat',
-        'BlanketPeriod' => 'Shipment::FedEx::WSDL::RateTypes::DateRange',
-        'ImporterSpecification' => 'Shipment::FedEx::WSDL::RateTypes::NaftaImporterSpecificationType',
-        'SignatureContact' => 'Shipment::FedEx::WSDL::RateTypes::Contact',
-        'ProducerSpecification' => 'Shipment::FedEx::WSDL::RateTypes::NaftaProducerSpecificationType',
-        'Producers' => 'Shipment::FedEx::WSDL::RateTypes::NaftaProducer',
-        'CustomerImageUsages' => 'Shipment::FedEx::WSDL::RateTypes::CustomerImageUsage',
-    },
-    {
+            )
+        ],
+        {   'Format'                => \%Format_of,
+            'BlanketPeriod'         => \%BlanketPeriod_of,
+            'ImporterSpecification' => \%ImporterSpecification_of,
+            'SignatureContact'      => \%SignatureContact_of,
+            'ProducerSpecification' => \%ProducerSpecification_of,
+            'Producers'             => \%Producers_of,
+            'CustomerImageUsages'   => \%CustomerImageUsages_of,
+        },
+        {   'Format' =>
+              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentFormat',
+            'BlanketPeriod' => 'Shipment::FedEx::WSDL::RateTypes::DateRange',
+            'ImporterSpecification' =>
+              'Shipment::FedEx::WSDL::RateTypes::NaftaImporterSpecificationType',
+            'SignatureContact' => 'Shipment::FedEx::WSDL::RateTypes::Contact',
+            'ProducerSpecification' =>
+              'Shipment::FedEx::WSDL::RateTypes::NaftaProducerSpecificationType',
+            'Producers' => 'Shipment::FedEx::WSDL::RateTypes::NaftaProducer',
+            'CustomerImageUsages' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomerImageUsage',
+        },
+        {
 
-        'Format' => 'Format',
-        'BlanketPeriod' => 'BlanketPeriod',
-        'ImporterSpecification' => 'ImporterSpecification',
-        'SignatureContact' => 'SignatureContact',
-        'ProducerSpecification' => 'ProducerSpecification',
-        'Producers' => 'Producers',
-        'CustomerImageUsages' => 'CustomerImageUsages',
-    }
-);
+            'Format'                => 'Format',
+            'BlanketPeriod'         => 'BlanketPeriod',
+            'ImporterSpecification' => 'ImporterSpecification',
+            'SignatureContact'      => 'SignatureContact',
+            'ProducerSpecification' => 'ProducerSpecification',
+            'Producers'             => 'Producers',
+            'CustomerImageUsages'   => 'CustomerImageUsages',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +90,7 @@ Shipment::FedEx::WSDL::RateTypes::NaftaCertificateOfOriginDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

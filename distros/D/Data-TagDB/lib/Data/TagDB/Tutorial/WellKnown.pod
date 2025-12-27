@@ -17,7 +17,7 @@ Data::TagDB::Tutorial::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 Overview
 

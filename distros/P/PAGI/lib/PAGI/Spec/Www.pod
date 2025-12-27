@@ -502,17 +502,22 @@ When C<file> or C<fh> is provided, servers MUST stream the file contents efficie
 
 =item -
 
-Servers SHOULD use C<sendfile()> or similar zero-copy mechanisms when available
+Servers SHOULD stream large files in chunks to avoid memory bloat
 
 
 =item -
 
-Servers MAY fall back to chunked read/write if C<sendfile()> is unavailable or inappropriate
+Servers MAY use zero-copy mechanisms (sendfile, splice) when appropriate
 
 
 =item -
 
 The C<offset> and C<length> keys enable range request support (e.g., HTTP 206 Partial Content)
+
+
+=item -
+
+For production file serving, consider using XSendfile middleware to delegate to a reverse proxy
 
 
 =item -

@@ -1,27 +1,32 @@
 ---
 abstract: 'Simple implementation to determine file type'
 author:
-  - 'David Moreno &lt;david@axiombox.com&gt;.'
+  - 'David Moreno <damog@damog.net>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.92'
-license: MIT
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: File-MimeInfo-Simple
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  File::Slurp: 0
-  YAML::Syck: 0
-  perl: 5.005
+  Carp: '0'
+  Exporter: '0'
+  YAML::Syck: '0'
+  perl: '5.006'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.7
+  bugtracker: https://github.com/damog/File-MimeInfo-Simple/issues
+  repository: https://github.com/damog/File-MimeInfo-Simple.git
+version: '0.8'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

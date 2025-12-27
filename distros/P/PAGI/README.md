@@ -34,7 +34,7 @@ This distribution has different stability levels:
 # Install dependencies
 cpanm --installdeps .
 
-# For best performance (fast JSON, zero-copy sendfile, TLS support):
+# For best performance (fast JSON, TLS support):
 cpanm --installdeps . --with-recommends
 
 # Run tests
@@ -63,7 +63,6 @@ cpanm Cpanel::JSON::XS
 ```
 
 Other optional dependencies:
-- **Sys::Sendfile** - Zero-copy file transfers for static file serving
 - **IO::Async::SSL** + **IO::Socket::SSL** - TLS/HTTPS support (see below)
 
 ## Optional TLS/HTTPS Support

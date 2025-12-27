@@ -43,6 +43,7 @@ on 'test' => sub {
     requires 'Net::Async::HTTP', '0.49';
     requires 'Net::Async::WebSocket::Client', '0.14';
     requires 'URI', '1.60';
+    requires 'Time::HiRes', '1.9764';  # Core module, for timing-sensitive tests
 };
 
 # Development

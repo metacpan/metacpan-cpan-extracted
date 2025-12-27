@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::InternalTools 0.53;
+package Devel::MAT::InternalTools 0.54;
 
 use v5.14;
 use warnings;

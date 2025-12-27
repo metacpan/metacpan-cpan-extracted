@@ -66,7 +66,8 @@ subtest 'Static middleware serves HTML with correct MIME type' => sub {
         }
     }
     is $ct, 'text/html', 'Content-Type is text/html';
-    like $sent[1]{body}, qr/<html>/, 'body contains HTML content';
+    # Middleware now uses file => instead of body => for server to handle
+    like $sent[1]{file}, qr/index\.html$/, 'file path points to index.html';
 };
 
 subtest 'Static middleware serves JavaScript with correct MIME type' => sub {
@@ -183,7 +184,8 @@ subtest 'Static middleware allows valid subdirectory access' => sub {
     });
 
     is $sent[0]{status}, 200, 'status is 200 for valid subdirectory';
-    like $sent[1]{body}, qr/Subdir file/, 'correct file content returned';
+    # Middleware now uses file => instead of body => for server to handle
+    like $sent[1]{file}, qr/subdir\/file\.txt$/, 'file path points to subdir/file.txt';
 };
 
 # =============================================================================
@@ -300,7 +302,10 @@ subtest 'Static middleware supports Range requests' => sub {
     ok $content_range, 'Content-Range header present';
     like $content_range, qr/^bytes 0-4\//, 'Content-Range format is correct';
     is $content_length, 5, 'Content-Length is 5 bytes';
-    is $sent[1]{body}, 'Hello', 'body is first 5 characters';
+    # Middleware now uses file => with offset/length for server to handle range
+    like $sent[1]{file}, qr/hello\.txt$/, 'file path points to hello.txt';
+    is $sent[1]{offset}, 0, 'offset is 0';
+    is $sent[1]{length}, 5, 'length is 5 bytes';
 };
 
 subtest 'Static middleware handles suffix range' => sub {
@@ -426,7 +431,8 @@ subtest 'Static middleware serves index file for directory' => sub {
     });
 
     is $sent[0]{status}, 200, 'status is 200 for directory with index';
-    like $sent[1]{body}, qr/<html>/, 'index.html content returned';
+    # Middleware now uses file => instead of body => for server to handle
+    like $sent[1]{file}, qr/index\.html$/, 'file path points to index.html';
 };
 
 subtest 'Static middleware handles HEAD requests' => sub {
@@ -492,6 +498,106 @@ subtest 'Static middleware skips non-GET/HEAD requests' => sub {
 
     ok $app_called, 'inner app called for POST';
     is $sent[1]{body}, 'POST handled', 'POST passed through to app';
+};
+
+# =============================================================================
+# Test: handle_ranges option
+# =============================================================================
+
+subtest 'Static middleware handle_ranges => 0 ignores Range header' => sub {
+    my $mw = PAGI::Middleware::Static->new(root => $test_root, handle_ranges => 0);
+
+    my $app = async sub { };
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            {
+                type    => 'http',
+                path    => '/hello.txt',
+                method  => 'GET',
+                headers => [['range', 'bytes=0-4']],
+            },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    is $sent[0]{status}, 200, 'status is 200 (not 206) when handle_ranges => 0';
+
+    # Verify no Content-Range header
+    my $content_range;
+    for my $h (@{$sent[0]{headers}}) {
+        $content_range = $h->[1] if lc($h->[0]) eq 'content-range';
+    }
+    ok !$content_range, 'No Content-Range header when handle_ranges => 0';
+
+    # Verify full file is returned (no offset/length)
+    ok !defined $sent[1]{offset}, 'No offset in file response';
+    ok !defined $sent[1]{length}, 'No length in file response';
+    like $sent[1]{file}, qr/hello\.txt$/, 'Full file path returned';
+};
+
+subtest 'Static middleware handle_ranges => 1 (default) honors Range header' => sub {
+    my $mw = PAGI::Middleware::Static->new(root => $test_root, handle_ranges => 1);
+
+    my $app = async sub { };
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            {
+                type    => 'http',
+                path    => '/hello.txt',
+                method  => 'GET',
+                headers => [['range', 'bytes=0-4']],
+            },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    is $sent[0]{status}, 206, 'status is 206 when handle_ranges => 1';
+
+    my $content_range;
+    for my $h (@{$sent[0]{headers}}) {
+        $content_range = $h->[1] if lc($h->[0]) eq 'content-range';
+    }
+    ok $content_range, 'Content-Range header present';
+    like $content_range, qr/^bytes 0-4\//, 'Content-Range format is correct';
+
+    # Verify partial file with offset/length
+    is $sent[1]{offset}, 0, 'offset is 0';
+    is $sent[1]{length}, 5, 'length is 5 bytes';
+};
+
+subtest 'Static middleware default handle_ranges honors Range header' => sub {
+    # No handle_ranges specified - should default to 1
+    my $mw = PAGI::Middleware::Static->new(root => $test_root);
+
+    my $app = async sub { };
+    my $wrapped = $mw->wrap($app);
+
+    my @sent;
+    run_async(async sub {
+        await $wrapped->(
+            {
+                type    => 'http',
+                path    => '/hello.txt',
+                method  => 'GET',
+                headers => [['range', 'bytes=0-4']],
+            },
+            async sub { { type => 'http.disconnect' } },
+            async sub  {
+        my ($event) = @_; push @sent, $event },
+        );
+    });
+
+    is $sent[0]{status}, 206, 'default behavior honors Range header (206)';
 };
 
 done_testing;

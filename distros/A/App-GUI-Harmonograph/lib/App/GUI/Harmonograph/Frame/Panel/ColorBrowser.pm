@@ -2,16 +2,13 @@
 # panel with sliders to select a color
 
 package App::GUI::Harmonograph::Frame::Panel::ColorBrowser;
+use base qw/Wx::Panel/;
 use v5.12;
 use warnings;
 use Wx;
-use base qw/Wx::Panel/;
 use App::GUI::Wx::Widget::Custom::SliderCombo;
 use App::GUI::Wx::Widget::Custom::ColorDisplay;
 use Graphics::Toolkit::Color qw/color/;
-
-my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
-my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
 
 sub new {
     my ( $class, $parent, $type, $init_color ) = @_;
@@ -73,7 +70,6 @@ sub new {
     $self->{'widget'}{'sat'}->SetCallBack( $hsl2rgb );
     $self->{'widget'}{'light'}->SetCallBack( $hsl2rgb );
 
-
     my $attr  = &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_HORIZONTAL | &Wx::wxGROW;
     my $sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $sizer->AddSpacer(5);
@@ -96,21 +92,21 @@ sub get_data { {  red => $_[0]->{'widget'}{'red'}->GetValue,
                  blue => $_[0]->{'widget'}{'blue'}->GetValue, } }
 
 sub set_data {
-    my ( $self, $color, $silent ) = @_;
-    return unless ref $color eq 'HASH'
-        and exists $color->{'red'} and exists $color->{'green'} and exists $color->{'blue'};
+    my ( $self, $data, $silent ) = @_;
+    return unless ref $data eq 'HASH'
+        and exists $data->{'red'} and exists $data->{'green'} and exists $data->{'blue'};
 
-    $self->{'widget'}{'red'}->SetValue( $color->{'red'}, 1);
-    $self->{'widget'}{'green'}->SetValue( $color->{'green'}, 1);
-    $self->{'widget'}{'blue'}->SetValue( $color->{'blue'}, 1 );
-    my @hsl = color($color)->values('HSL');
+    $self->{'widget'}{'red'}->SetValue( $data->{'red'}, 1);
+    $self->{'widget'}{'green'}->SetValue( $data->{'green'}, 1);
+    $self->{'widget'}{'blue'}->SetValue( $data->{'blue'}, 1 );
+    my @hsl = color( $data )->values('HSL');
     $self->{'widget'}{'hue'}->SetValue( $hsl[0], 1 );
     $self->{'widget'}{'sat'}->SetValue( $hsl[1], 1 );
     $self->{'widget'}{'light'}->SetValue( $hsl[2], 1 );
 }
 
 sub SetCallBack {
-    my ( $self, $code) = @_;
+    my ($self, $code) = @_;
     return unless ref $code eq 'CODE';
     $self->{'call_back'} = $code;
 }

@@ -1,22 +1,22 @@
 
 package Shipment::Purolator::WSDLV2::Elements::ConsolidateRequestContainer;
-$Shipment::Purolator::WSDLV2::Elements::ConsolidateRequestContainer::VERSION = '3.10';
+$Shipment::Purolator::WSDLV2::Elements::ConsolidateRequestContainer::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' }
+    sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
-__PACKAGE__->__set_name('ConsolidateRequestContainer');
-__PACKAGE__->__set_nillable(1);
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::Purolator::WSDLV2::Types::ConsolidateRequestContainer
-);
+    __PACKAGE__->__set_name('ConsolidateRequestContainer');
+    __PACKAGE__->__set_nillable(1);
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::Purolator::WSDLV2::Types::ConsolidateRequestContainer
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDLV2::Elements::ConsolidateRequestContainer
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

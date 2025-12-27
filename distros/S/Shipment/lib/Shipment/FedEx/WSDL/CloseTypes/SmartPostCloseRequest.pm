@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest;
-$Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest::VERSION = '3.10';
+$Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' };
+sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,67 +20,67 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %HubId_of :ATTR(:get<HubId>);
-my %CustomerManifestId_of :ATTR(:get<CustomerManifestId>);
-my %DestinationCountryCode_of :ATTR(:get<DestinationCountryCode>);
-my %PickUpCarrier_of :ATTR(:get<PickUpCarrier>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of            : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of       : ATTR(:get<TransactionDetail>);
+    my %Version_of                 : ATTR(:get<Version>);
+    my %HubId_of                   : ATTR(:get<HubId>);
+    my %CustomerManifestId_of      : ATTR(:get<CustomerManifestId>);
+    my %DestinationCountryCode_of  : ATTR(:get<DestinationCountryCode>);
+    my %PickUpCarrier_of           : ATTR(:get<PickUpCarrier>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        HubId
-        CustomerManifestId
-        DestinationCountryCode
-        PickUpCarrier
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              HubId
+              CustomerManifestId
+              DestinationCountryCode
+              PickUpCarrier
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'HubId' => \%HubId_of,
-        'CustomerManifestId' => \%CustomerManifestId_of,
-        'DestinationCountryCode' => \%DestinationCountryCode_of,
-        'PickUpCarrier' => \%PickUpCarrier_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
-        'HubId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CustomerManifestId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DestinationCountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PickUpCarrier' => 'Shipment::FedEx::WSDL::CloseTypes::CarrierCodeType',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'HubId'                   => \%HubId_of,
+            'CustomerManifestId'      => \%CustomerManifestId_of,
+            'DestinationCountryCode'  => \%DestinationCountryCode_of,
+            'PickUpCarrier'           => \%PickUpCarrier_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
+            'ClientDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+            'HubId'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CustomerManifestId' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DestinationCountryCode' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PickUpCarrier' =>
+              'Shipment::FedEx::WSDL::CloseTypes::CarrierCodeType',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'HubId' => 'HubId',
-        'CustomerManifestId' => 'CustomerManifestId',
-        'DestinationCountryCode' => 'DestinationCountryCode',
-        'PickUpCarrier' => 'PickUpCarrier',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'HubId'                   => 'HubId',
+            'CustomerManifestId'      => 'CustomerManifestId',
+            'DestinationCountryCode'  => 'DestinationCountryCode',
+            'PickUpCarrier'           => 'PickUpCarrier',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -97,7 +97,7 @@ Shipment::FedEx::WSDL::CloseTypes::SmartPostCloseRequest
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

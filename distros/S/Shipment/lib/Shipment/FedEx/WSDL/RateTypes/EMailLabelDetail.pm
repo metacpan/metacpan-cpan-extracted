@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::EMailLabelDetail;
-$Shipment::FedEx::WSDL::RateTypes::EMailLabelDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::EMailLabelDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %NotificationEMailAddress_of :ATTR(:get<NotificationEMailAddress>);
-my %NotificationMessage_of :ATTR(:get<NotificationMessage>);
+    my %NotificationEMailAddress_of : ATTR(:get<NotificationEMailAddress>);
+    my %NotificationMessage_of      : ATTR(:get<NotificationMessage>);
 
-__PACKAGE__->_factory(
-    [ qw(        NotificationEMailAddress
-        NotificationMessage
+    __PACKAGE__->_factory(
+        [   qw(        NotificationEMailAddress
+              NotificationMessage
 
-    ) ],
-    {
-        'NotificationEMailAddress' => \%NotificationEMailAddress_of,
-        'NotificationMessage' => \%NotificationMessage_of,
-    },
-    {
-        'NotificationEMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'NotificationMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'NotificationEMailAddress' => \%NotificationEMailAddress_of,
+            'NotificationMessage'      => \%NotificationMessage_of,
+        },
+        {   'NotificationEMailAddress' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'NotificationMessage' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'NotificationEMailAddress' => 'NotificationEMailAddress',
-        'NotificationMessage' => 'NotificationMessage',
-    }
-);
+            'NotificationEMailAddress' => 'NotificationEMailAddress',
+            'NotificationMessage'      => 'NotificationMessage',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::RateTypes::EMailLabelDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

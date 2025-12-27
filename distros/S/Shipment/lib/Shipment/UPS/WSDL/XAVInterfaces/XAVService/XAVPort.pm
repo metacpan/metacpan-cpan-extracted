@@ -1,97 +1,103 @@
 package Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort;
-$Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort::VERSION = '3.10';
+$Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort::VERSION = '3.11';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
 use Scalar::Util qw(blessed);
-use base qw(SOAP::WSDL::Client::Base);
+use base         qw(SOAP::WSDL::Client::Base);
 
 
 # only load if it hasn't been loaded before
 require Shipment::UPS::WSDL::XAVTypemaps::XAVService
-    if not Shipment::UPS::WSDL::XAVTypemaps::XAVService->can('get_class');
+  if not Shipment::UPS::WSDL::XAVTypemaps::XAVService->can('get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'wwwcie.ups.com';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/webservices/XAV') if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/webservices/XAV')
+      if not $_[2]->{proxy};
 
     $_[0]->set_class_resolver('Shipment::UPS::WSDL::XAVTypemaps::XAVService')
-        if not $_[2]->{class_resolver};
+      if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub ProcessXAV {
     my ($self, $body, $header) = @_;
-    die "ProcessXAV must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'ProcessXAV',
-        soap_action => 'http://onlinetools.ups.com/webservices/XAVBinding/v1.0',
-        style => 'document',
-        body => {
-            
+    die "ProcessXAV must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'ProcessXAV',
+            soap_action =>
+              'http://onlinetools.ups.com/webservices/XAVBinding/v1.0',
+            style => 'document',
+            body  => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::XAVElements::XAVRequest )],
-        },
-        header => {
-            
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::UPS::WSDL::XAVElements::UPSSecurity )],
 
-        },
-        headerfault => {
-            
-        },
-        response => {
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts => [qw( Shipment::UPS::WSDL::XAVElements::XAVRequest )],
+            },
             header => {
-                
-            },
-            body => {
-                
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::UPS::WSDL::XAVElements::XAVResponse )],
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts => [qw( Shipment::UPS::WSDL::XAVElements::UPSSecurity )],
+
             },
-        }
-    }, $body, $header);
+            headerfault => {
+
+            },
+            response => {
+                header => {
+
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         =>
+                      [qw( Shipment::UPS::WSDL::XAVElements::XAVResponse )],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
-
-
-
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-              'attribute' => 'Shipment::UPS::WSDL::XAVAttributes',
-              'typemap' => 'Shipment::UPS::WSDL::XAVTypemaps',
-              'interface' => 'Shipment::UPS::WSDL::XAVInterfaces',
-              'type' => 'Shipment::UPS::WSDL::XAVTypes',
-              'server' => 'Shipment::UPS::WSDL::XAVServer',
-              'element' => 'Shipment::UPS::WSDL::XAVElements'
-            };
+        'attribute' => 'Shipment::UPS::WSDL::XAVAttributes',
+        'typemap'   => 'Shipment::UPS::WSDL::XAVTypemaps',
+        'interface' => 'Shipment::UPS::WSDL::XAVInterfaces',
+        'type'      => 'Shipment::UPS::WSDL::XAVTypes',
+        'server'    => 'Shipment::UPS::WSDL::XAVServer',
+        'element'   => 'Shipment::UPS::WSDL::XAVElements'
+    };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
-        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
-            namespace_prefix_map => {
-                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
-            },
-            namespace_map => {
-            },
-            prefix => $prefix_1,
-        })
-    });
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
+        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
+                {   namespace_prefix_map => {
+                        'http://www.w3.org/2001/XMLSchema' =>
+                          'SOAP::WSDL::XSD::Typelib::Builtin',
+                    },
+                    namespace_map => {},
+                    prefix        => $prefix_1,
+                }
+            )
+        }
+    );
 }
 
 1;
@@ -108,7 +114,7 @@ Shipment::UPS::WSDL::XAVInterfaces::XAVService::XAVPort
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

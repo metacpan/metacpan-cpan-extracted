@@ -1,44 +1,44 @@
 
 package Shipment::Temando::WSDL::Elements::updateClientResponse;
-$Shipment::Temando::WSDL::Elements::updateClientResponse::VERSION = '3.10';
+$Shipment::Temando::WSDL::Elements::updateClientResponse::VERSION = '3.11';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
+    }
 
-__PACKAGE__->__set_name('updateClientResponse');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('updateClientResponse');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
+    }
 
 
 # There's no variety - empty complexType
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
-__PACKAGE__->_factory();
-
-
+    __PACKAGE__->_factory();
 
 
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -55,7 +55,7 @@ Shipment::Temando::WSDL::Elements::updateClientResponse
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

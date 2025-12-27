@@ -80,7 +80,7 @@ sub to_app {
 
         my $endpoint = $class->new;
         my $req = $req_class->new($scope, $receive);
-        my $res = $res_class->new($send);
+        my $res = $res_class->new($scope, $send);
 
         await $endpoint->dispatch($req, $res);
     };

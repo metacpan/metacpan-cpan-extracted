@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer::VERSION = '3.10';
+$Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,48 +17,46 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::ResponseContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
-my %ShipmentEstimates_of :ATTR(:get<ShipmentEstimates>);
-my %ReturnShipmentEstimates_of :ATTR(:get<ReturnShipmentEstimates>);
+    my %ResponseInformation_of     : ATTR(:get<ResponseInformation>);
+    my %ShipmentEstimates_of       : ATTR(:get<ShipmentEstimates>);
+    my %ReturnShipmentEstimates_of : ATTR(:get<ReturnShipmentEstimates>);
 
-__PACKAGE__->_factory(
-    [ qw(        ResponseInformation
-        ShipmentEstimates
-        ReturnShipmentEstimates
+    __PACKAGE__->_factory(
+        [   qw(        ResponseInformation
+              ShipmentEstimates
+              ReturnShipmentEstimates
 
-    ) ],
-    {
-        'ResponseInformation' => \%ResponseInformation_of,
-        'ShipmentEstimates' => \%ShipmentEstimates_of,
-        'ReturnShipmentEstimates' => \%ReturnShipmentEstimates_of,
-    },
-    {
-        'ResponseInformation' => 'Shipment::Purolator::WSDL::Types::ResponseInformation',
-        'ShipmentEstimates' => 'Shipment::Purolator::WSDL::Types::ArrayOfShipmentEstimate',
-        'ReturnShipmentEstimates' => 'Shipment::Purolator::WSDL::Types::ArrayOfShipmentEstimate',
-    },
-    {
+            )
+        ],
+        {   'ResponseInformation'     => \%ResponseInformation_of,
+            'ShipmentEstimates'       => \%ShipmentEstimates_of,
+            'ReturnShipmentEstimates' => \%ReturnShipmentEstimates_of,
+        },
+        {   'ResponseInformation' =>
+              'Shipment::Purolator::WSDL::Types::ResponseInformation',
+            'ShipmentEstimates' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfShipmentEstimate',
+            'ReturnShipmentEstimates' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfShipmentEstimate',
+        },
+        {
 
-        'ResponseInformation' => 'ResponseInformation',
-        'ShipmentEstimates' => 'ShipmentEstimates',
-        'ReturnShipmentEstimates' => 'ReturnShipmentEstimates',
-    }
-);
+            'ResponseInformation'     => 'ResponseInformation',
+            'ShipmentEstimates'       => 'ShipmentEstimates',
+            'ReturnShipmentEstimates' => 'ReturnShipmentEstimates',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -75,7 +73,7 @@ Shipment::Purolator::WSDL::Types::GetFullEstimateResponseContainer
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

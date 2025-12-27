@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail;
-$Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail::VERSION = '3.10';
+$Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail::VERSION = '3.11';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,55 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %LineNumber_of :ATTR(:get<LineNumber>);
-my %CustomerReference_of :ATTR(:get<CustomerReference>);
-my %DocumentProducer_of :ATTR(:get<DocumentProducer>);
-my %DocumentType_of :ATTR(:get<DocumentType>);
-my %FileName_of :ATTR(:get<FileName>);
-my %DocumentContent_of :ATTR(:get<DocumentContent>);
+    my %LineNumber_of        : ATTR(:get<LineNumber>);
+    my %CustomerReference_of : ATTR(:get<CustomerReference>);
+    my %DocumentProducer_of  : ATTR(:get<DocumentProducer>);
+    my %DocumentType_of      : ATTR(:get<DocumentType>);
+    my %FileName_of          : ATTR(:get<FileName>);
+    my %DocumentContent_of   : ATTR(:get<DocumentContent>);
 
-__PACKAGE__->_factory(
-    [ qw(        LineNumber
-        CustomerReference
-        DocumentProducer
-        DocumentType
-        FileName
-        DocumentContent
+    __PACKAGE__->_factory(
+        [   qw(        LineNumber
+              CustomerReference
+              DocumentProducer
+              DocumentType
+              FileName
+              DocumentContent
 
-    ) ],
-    {
-        'LineNumber' => \%LineNumber_of,
-        'CustomerReference' => \%CustomerReference_of,
-        'DocumentProducer' => \%DocumentProducer_of,
-        'DocumentType' => \%DocumentType_of,
-        'FileName' => \%FileName_of,
-        'DocumentContent' => \%DocumentContent_of,
-    },
-    {
-        'LineNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'CustomerReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DocumentProducer' => 'Shipment::FedEx::WSDL::RateTypes::UploadDocumentProducerType',
-        'DocumentType' => 'Shipment::FedEx::WSDL::RateTypes::UploadDocumentType',
-        'FileName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DocumentContent' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-    },
-    {
+            )
+        ],
+        {   'LineNumber'        => \%LineNumber_of,
+            'CustomerReference' => \%CustomerReference_of,
+            'DocumentProducer'  => \%DocumentProducer_of,
+            'DocumentType'      => \%DocumentType_of,
+            'FileName'          => \%FileName_of,
+            'DocumentContent'   => \%DocumentContent_of,
+        },
+        {   'LineNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'CustomerReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DocumentProducer'  =>
+              'Shipment::FedEx::WSDL::RateTypes::UploadDocumentProducerType',
+            'DocumentType' =>
+              'Shipment::FedEx::WSDL::RateTypes::UploadDocumentType',
+            'FileName'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DocumentContent' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+        },
+        {
 
-        'LineNumber' => 'LineNumber',
-        'CustomerReference' => 'CustomerReference',
-        'DocumentProducer' => 'DocumentProducer',
-        'DocumentType' => 'DocumentType',
-        'FileName' => 'FileName',
-        'DocumentContent' => 'DocumentContent',
-    }
-);
+            'LineNumber'        => 'LineNumber',
+            'CustomerReference' => 'CustomerReference',
+            'DocumentProducer'  => 'DocumentProducer',
+            'DocumentType'      => 'DocumentType',
+            'FileName'          => 'FileName',
+            'DocumentContent'   => 'DocumentContent',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +85,7 @@ Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

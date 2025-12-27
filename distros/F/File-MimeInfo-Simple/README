@@ -16,13 +16,14 @@ DESCRIPTION
 FUNCTIONS
   mimetype( $filename )
     "mimetype" is exported by default. It receives a parameter, the file
-    path. It returns an string containing the mime type for the file.
+    path. It returns a string containing the mime type for the file, or
+    undef if the type cannot be determined.
 
 AUTHOR
-    David Moreno &lt;david@axiombox.com&gt;.
+    David Moreno <damog@damog.net>.
 
 LICENSE
-    Copyright 2009 David Moreno.
+    Copyright 2009-2025 David Moreno.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

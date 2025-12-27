@@ -43,6 +43,17 @@ Seconds to wait for pong response before considering connection dead.
 
 IO::Async::Loop instance for scheduling.
 
+=item * on_error (optional)
+
+Callback invoked when a send operation fails. Receives C<($error, $event)>
+where C<$event> is the event hash that failed to send. Default behavior
+is to warn to STDERR.
+
+    on_error => sub {
+        my ($error, $event) = @_;
+        $logger->warn("Heartbeat send failed: $error");
+    }
+
 =back
 
 =cut
@@ -53,6 +64,10 @@ sub _init {
     $self->{interval} = $config->{interval} // 30;
     $self->{timeout} = $config->{timeout} // 10;
     $self->{loop} = $config->{loop};
+    $self->{on_error} = $config->{on_error} // sub {
+        my ($error, $event) = @_;
+        warn "WebSocket::Heartbeat send failed: $error\n";
+    };
 }
 
 sub wrap {
@@ -69,6 +84,7 @@ sub wrap {
         my $loop = $self->{loop} // $self->_get_loop();
         my $interval = $self->{interval};
         my $timeout = $self->{timeout};
+        my $on_error = $self->{on_error};
 
         my $closed = 0;
         my $waiting_pong = 0;
@@ -85,9 +101,13 @@ sub wrap {
 
                 # Send ping
                 $waiting_pong = 1;
-                $send->({
+                my $ping_event = {
                     type => 'websocket.send',
                     ping => 1,
+                };
+                $send->($ping_event)->on_fail(sub {
+                    my ($error) = @_;
+                    $on_error->($error, $ping_event);
                 })->retain;
 
                 # Start timeout timer
@@ -96,10 +116,14 @@ sub wrap {
 
                     # No pong received, close connection
                     $closed = 1;
-                    $send->({
+                    my $close_event = {
                         type   => 'websocket.close',
                         code   => 1001,
                         reason => 'Heartbeat timeout',
+                    };
+                    $send->($close_event)->on_fail(sub {
+                        my ($error) = @_;
+                        $on_error->($error, $close_event);
                     })->retain;
                 })->retain;
 
