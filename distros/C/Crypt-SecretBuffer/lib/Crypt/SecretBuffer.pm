@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.015';
+$Crypt::SecretBuffer::VERSION = '0.016';
 
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.015';
+$Crypt::SecretBuffer::Exports::VERSION = '0.016';
 use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret unmask_secrets_to memcmp
@@ -57,6 +57,22 @@ sub stringify_mask {
       return $self;
    }
    $self->{stringify_mask}
+}
+
+
+sub append_console_line {
+   my ($self, $handle, %options)= @_;
+   my $echo_off= Crypt::SecretBuffer::ConsoleState->maybe_new(
+      handle => $handle,
+      echo => 0,
+      auto_restore => 1
+   );
+   if (defined(my $prompt= delete $options{prompt})) {
+      my $prompt_fh= delete $options{prompt_fh} || $handle;
+      $prompt_fh->print($prompt);
+      $prompt_fh->flush;
+   }
+   return $self->_append_console_line($handle);
 }
 
 
@@ -463,7 +479,11 @@ of bytes and never blocks.
 
 =head2 append_console_line
 
-  $bool= $buf->append_console_line(STDIN);
+  $bool= $buf->append_console_line($handle);
+  $bool= $buf->append_console_line($handle,
+    prompt => "Enter Password: ",
+    prompt_fh => $alternate_handle,   # optional
+  );
 
 This turns off TTY echo (if the handle is a Unix TTY or Windows Console) and reads and appends
 characters until newline or EOF (and does not store the \r or \n characters).
@@ -474,6 +494,10 @@ There may also be no characters added when it returns true, if the user just hit
 When possible, this reads directly from the OS to avoid buffering the secret in libc or Perl,
 but reads from the buffer if you already have input data in one of those buffers, or if the
 file handle is a virtual Perl handle not backed by the OS.
+
+If you specify a prompt (new in version 0.016), the TTY echo is disabled before printing the
+prompt.  This helps prevent a race condition where a scripted interaction could start typing a
+password in response to the prompt before the echo was disabled.
 
 =head2 append_sysread
 
@@ -712,7 +736,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 AUTHOR
 

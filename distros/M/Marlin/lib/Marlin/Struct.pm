@@ -6,7 +6,7 @@ use utf8;
 package Marlin::Struct;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008000';
+our $VERSION   = '0.009000';
 
 use Marlin ();
 
@@ -47,7 +47,7 @@ sub import {
 		my @exportables = @{ $type->exportables };
 		for my $e ( @exportables ) {
 			Eval::TypeTiny::set_subname( $me . '::' . $e->{name}, $e->{code} );
-			$marlin->_lexport( $e->{name}, $e->{code} );
+			$marlin->lexport( $e->{name}, $e->{code} );
 		}
 	}
 }

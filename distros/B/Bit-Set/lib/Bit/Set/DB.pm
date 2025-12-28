@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB;
-$Bit::Set::DB::VERSION = '0.09';
+$Bit::Set::DB::VERSION = '0.10';
 use strict;
 use warnings;
 use FFI::Platypus::Record;
@@ -9,7 +9,7 @@ use FFI::Platypus::Record;
 {
 
     package Bit::Set::DB::SETOP_COUNT_OPTS;
-$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.09';
+$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.10';
 use FFI::Platypus::Record;
     record_layout_1(
         'int'  => 'num_cpu_threads',
@@ -406,7 +406,7 @@ Bit::Set::DB - Perl procedural interface for bitset containers from the C<Bit> C
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -900,29 +900,25 @@ counts of the intersection of these bitsets to find the maximum popcount via
 
 In the Xeon E-2697v4 I used for this work, I obtained the following benchmarks:
 
-=over 5
-
-=item Test Description             | Time (ns)    | Searches/sec | Threads | Result | Speedup
-=item ---------------------------- | ------------ | ------------ | ------- | ------ | -------
-=item Bit::Set operations - Rep1   | 388,479,000  | 2.57         | 1       | 512    | 1.00
-=item Bit::Set operations - Rep2   | 389,512,000  | 2.57         | 1       | 512    | 1.00
-=item Bit::Set operations - Rep3   | 389,775,000  | 2.57         | 1       | 512    | 1.00
-=item Container - CPU              | 82,856,000   | 12.07        | 1       | 512    | 4.69
-=item Container - CPU              | 62,179,000   | 16.08        | 2       | 512    | 6.25
-=item Container - CPU              | 59,269,000   | 16.87        | 3       | 512    | 6.55
-=item Container - CPU              | 61,368,000   | 16.30        | 4       | 512    | 6.33
-=item Container - GPU              | 261,441,000  | 3.82         | GPU     | 512    | 1.49
-=item Container - GPU              | 62,523,000   | 15.99        | GPU     | 512    | 6.21
-=item Container - GPU              | 61,467,000   | 16.27        | GPU     | 512    | 6.32
-=item Container - CPU - PDL        | 12,559,000   | 79.62        | 1       | 512    | 30.93
-=item Container - CPU - PDL        | 9,313,000    | 107.38       | 2       | 512    | 41.71
-=item Container - CPU - PDL        | 5,441,000    | 183.79       | 3       | 512    | 71.40
-=item Container - CPU - PDL        | 4,457,000    | 224.37       | 4       | 512    | 87.16
-=item Container - GPU with PDL     | 10,763,000   | 92.91        | GPU     | 512    | 36.09
-=item Container - GPU with PDL     | 8,662,000    | 115.45       | GPU     | 512    | 44.85
-=item Container - GPU with PDL     | 8,247,000    | 121.26       | GPU     | 512    | 47.11
-
-=back
+    Test Description             | Time (ns)    | Searches/sec | Threads | Result | Speedup
+    ---------------------------- | ------------ | ------------ | ------- | ------ | -------
+    Bit::Set operations - Rep1   | 388,479,000  | 2.57         | 1       | 512    | 1.00
+    Bit::Set operations - Rep2   | 389,512,000  | 2.57         | 1       | 512    | 1.00
+    Bit::Set operations - Rep3   | 389,775,000  | 2.57         | 1       | 512    | 1.00
+    Container - CPU              | 82,856,000   | 12.07        | 1       | 512    | 4.69
+    Container - CPU              | 62,179,000   | 16.08        | 2       | 512    | 6.25
+    Container - CPU              | 59,269,000   | 16.87        | 3       | 512    | 6.55
+    Container - CPU              | 61,368,000   | 16.30        | 4       | 512    | 6.33
+    Container - GPU              | 261,441,000  | 3.82         | GPU     | 512    | 1.49
+    Container - GPU              | 62,523,000   | 15.99        | GPU     | 512    | 6.21
+    Container - GPU              | 61,467,000   | 16.27        | GPU     | 512    | 6.32
+    Container - CPU - PDL        | 12,559,000   | 79.62        | 1       | 512    | 30.93
+    Container - CPU - PDL        | 9,313,000    | 107.38       | 2       | 512    | 41.71
+    Container - CPU - PDL        | 5,441,000    | 183.79       | 3       | 512    | 71.40
+    Container - CPU - PDL        | 4,457,000    | 224.37       | 4       | 512    | 87.16
+    Container - GPU with PDL     | 10,763,000   | 92.91        | GPU     | 512    | 36.09
+    Container - GPU with PDL     | 8,662,000    | 115.45       | GPU     | 512    | 44.85
+    Container - GPU with PDL     | 8,247,000    | 121.26       | GPU     | 512    | 47.11
 
 The table clearly illustrates the significant speed up of the containerized 
 operations over the C<Bit::Set>, but also the overhead of using Perl arrays to
@@ -1406,6 +1402,10 @@ This distribution provides the library Bit so that it can be used by other Perl
 distributions that are on CPAN. It will download Bit from Github and will build 
 the (static and dynamic) versions of the library for use by other Perl modules.
 
+=item L<benchmarking-bits|https://github.com/chrisarg/benchmarking-bits>
+
+A collection of benchmarking scripts for various bitset libraries in C and Perl.
+
 =item L<Bit|https://github.com/chrisarg/Bit>
 
 Bit is a high-performance, uncompressed bitset implementation in C, optimized 
@@ -1433,6 +1433,14 @@ Object Oriented interface to the Bit::Set module.
 =item L<Bit::Set::DB::OO|https://metacpan.org/pod/Bit::Set::DB::OO>
 
 Object Oriented interface to the Bit::Set::DB module.
+
+=item L<Bit::Vector|https://metacpan.org/pod/Bit::Vector>
+
+Efficient bit vector, set of integers and "big int" math library
+
+=item L<Lucy::Object::BitVector|https://metacpan.org/dist/Lucy/view/lib/Lucy/Object/BitVector.pod>
+
+Bit vector implementation used in the L<Lucy|https://metacpan.org/pod/Lucy> search engine library.
 
 =back
 

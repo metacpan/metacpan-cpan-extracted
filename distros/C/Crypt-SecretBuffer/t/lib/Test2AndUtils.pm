@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test2::V0 '!subtest';
 use Test2::Tools::Subtest 'subtest_streamed';
+use Time::HiRes 'sleep';
 use IO::Handle;
 use parent 'Test2::V0';
 
@@ -96,23 +97,25 @@ sub setup_tty_helper {
          close $parent_read;
          close $parent_write;
          close $tty;
+         my $in_buf= '';
          while (<$child_read>) {
             my ($action, $data) = unpack_msg($_);
-            if ($action eq 'test_echo') {
-               $pty->print("test\r");
-               sysread($pty, my $buffer = '', 4096);
-               warn "# Echo not working: " . escape_nonprintable($buffer)
-                  unless $buffer eq "test\r\n";
+            if ($action eq 'wait_for') {
+               do {
+                  sysread($pty, $in_buf, 1, length($in_buf))
+                     or sleep(.75), warn "# sysread: $!";
+               } while (index($in_buf, $data) == -1);
+            } elsif ($action eq 'sleep') {
+               sleep $data;
             } elsif ($action eq 'type') {
                for (split //, $data) {
                   syswrite($pty, $_) or warn "# syswrite: $!";
                   sleep 0.05;
                }
-            } elsif ($action eq 'sleep') {
-               sleep $data;
             } elsif ($action eq 'read_pty') {
-               sysread($pty, my $buffer = '', 4096);
-               $child_write->print(pack_msg(read => $buffer));
+               sysread($pty, $in_buf, 4096, length($in_buf)) or warn "# sysread: $!";
+               $child_write->print(pack_msg(read_pty => $in_buf));
+               $in_buf= '';
             } elsif ($action eq 'exit') {
                POSIX::_exit(0);
             }
@@ -121,8 +124,8 @@ sub setup_tty_helper {
       warn "# child error: $@" if $@;
       POSIX::_exit(2);
    } else {
-      local $SIG{ALRM} = sub { die "parent timeout" };
-      alarm 20;
+      local $SIG{ALRM} = sub { kill TERM => $pid; die "parent timeout" };
+      alarm 14;
       close $child_read;
       close $child_write;
       close $pty;

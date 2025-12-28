@@ -45,6 +45,7 @@ BEGIN {
         Import::Into
         List::Util
         Module::Runtime
+        Path::Tiny
         Readonly
         Term::ANSIColor
         Term::ReadKey
@@ -59,7 +60,6 @@ BEGIN {
         ExtUtils::Manifest
         File::Compare
         File::Path
-        FindBin
         Socket
         Test2
         Test2::Tools::Ref

@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20251226.2107'; # VERSION
+our $VERSION = '20251227.1426'; # VERSION
 
 use strict;
 use warnings;
@@ -21,8 +21,7 @@ use Data::UUID;
 
 use IO::File;
 
-use MCE;
-use MCE::Loop;
+use MCE::Hobo;
 use MCE::Util;
 
 use BeamerReveal::TemplateStore;
@@ -156,9 +155,19 @@ sub animationToStore {
     my $fileContent = BeamerReveal::TemplateStore::stampTemplate( $tTemplate, $tStamps );
 
     my $nofFrames = floor( $animation->{framerate} * $animation->{duration} );
-    my $nofCores  = ceil( MCE::Util::get_ncpu() / 2 );
+    my $nofCores  = MCE::Util::get_ncpu();
+    if ( $nofCores > 4 ) {
+      $nofCores = ceil( $nofCores / 2 );
+    }
+    
+    # I cannot get multithreading/multiprocessing to work reliably on MS-Windows
+    if ( $^O eq 'MSWin32' ) {
+      $nofCores = 1;
+    }
     my $sliceSize = ceil( $nofFrames / $nofCores );
 
+
+    
     say STDERR "      - Preparing media generation of $nofFrames frames in $nofCores threads at $sliceSize frames per thread";
 
     # make planning
@@ -181,65 +190,28 @@ sub animationToStore {
       $frameCounter += $sliceSize;
     }
 
-    my $cmd;
-    MCE::Loop::init { max_workers => $nofCores, chunk_size  => 1 };
-    
-    mce_loop {
-      my ( $mce, $chunk_ref, $chunk_id ) = @_;
-      my $plan = $chunk_ref->[0];
-      my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $plan->{nr} );
-      # generate TeX -file
-      my $perCoreContent = BeamerReveal::TemplateStore::stampTemplate
-	( $fileContent,
-	  {
-	   SLICESTART  => $plan->{slicestart},
-	   SLICESTOP   => $plan->{slicestop},
-	   NSTART      => $plan->{nstart},
-	  }
-	);
-
-      my $texFileName = "$animdir/animation-$coreId.tex";
-      my $texFile = IO::File->new();
-      $texFile->open( ">$texFileName" )
-	or die( "Error: cannot open animation file '$texFileName' for writing\n" );
-      print $texFile $perCoreContent;
-      $texFile->close();
-
-      # run TeX
-      $cmd = [ $self->{compiler},
-	       "--output-directory=$animdir", "$texFileName" ];
-      BeamerReveal::IPC::Run::run( $cmd, $coreId, 8 );
-
-      # run pdfcrop
-      $cmd = [ $self->{pdfcrop}, '--margins', '-2', "animation-$coreId.pdf" ];
-      BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
-
-      # run pdftoppm
-      my $xrange = 2 * int( $self->{presentationparameters}->{canvaswidth} * $animation->{width} );
-      my $yrange = 2 * int( $self->{presentationparameters}->{canvasheight} * $animation->{height} );
-
-      $cmd = [ $self->{pdftoppm},
-	       '-scale-to-x', "$xrange",
-	       '-scale-to-y', "$yrange",
-	       "animation-$coreId-crop.pdf", "./frame-$coreId", '-jpeg' ];
-      BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
-
-      # correct for too short slicesize in filenames coming from pdftoppm
-      my $currentDigitCnt = nofdigits( $plan->{slicestop} );
-      my $desiredDigitCnt = nofdigits( $sliceSize );
-      if ( $currentDigitCnt < $desiredDigitCnt ) {
-	for( my $i = 1; $i <= $plan->{slicestop}; ++$i ) {
-#	  my $src = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $currentDigitCnt . 'd.jpg', $i ) );
-#	  my $dst = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $desiredDigitCnt . 'd.jpg', $i ) );
-	  my $src = sprintf( "$animdir/frame-$coreId-%0${currentDigitCnt}d.jpg", $i );
-	  my $dst = sprintf( "$animdir/frame-$coreId-%0${desiredDigitCnt}d.jpg", $i );
-	  File::Copy::move( $src, $dst );
-	}
+    # I cannot get multithreading/multiprocessing to work reliably on MS-Windows
+    if ( $^O eq 'MSWin32' ) {
+      # single-threaded
+      for( my $i = 0; $i < @$planning; ++$i ) {
+	_animWork( $planning->[$i], $nofCores, $fileContent, $animdir, $self, $animation, $sliceSize );
       }
-
-    } @$planning;
-
-    say STDERR "        - returning to single-threaded operation";
+    }
+    else {
+      my @hobos;
+      # multi-threaded
+      for( my $i = 0; $i < @$planning; ++$i ) {
+	push @hobos, MCE::Hobo->create
+	  (
+	   sub {
+	     _animWork( @_ )
+	   }, ( $planning->[$i], $nofCores, $fileContent, $animdir, $self, $animation, $sliceSize )
+	  );
+      }
+      
+      $_->join for @hobos;
+      say STDERR "        - returning to single-threaded operation";
+    }
     
     # rename all files in order
     my $framecounter = 0;
@@ -257,7 +229,7 @@ sub animationToStore {
     }
     
     # run ffmpeg or avconv
-    $cmd = [ $self->{ffmpeg}, '-r', "$animation->{framerate}", '-i', 'frame-%06d.jpg', 'animation.mp4' ];
+    my $cmd = [ $self->{ffmpeg}, '-r', "$animation->{framerate}", '-i', 'frame-%06d.jpg', 'animation.mp4' ];
     BeamerReveal::IPC::Run::run( $cmd, 0, 8, $animdir );
     File::Copy::move( "$animdir/animation.mp4",
 		      "$animdir/../$animid.mp4" );
@@ -327,6 +299,72 @@ sub _toStore {
   return $fullpathid;
 }
 
+sub _animWork {
+  my ( $plan, $nofCores, $fileContent, $animdir, $self, $animation, $sliceSize ) = @_;
+  my $cmd;
+  my $logFile = IO::File->new();
+  my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $plan->{nr} );
+  my $logFileName = "$animdir/animation-$coreId-overall.log";
+  $logFile->open( ">$logFileName" )
+    or die( "Error: cannot open logfile $logFileName" );
+
+  say $logFile "- Generating TeX file";
+  # generate TeX -file
+  my $perCoreContent = BeamerReveal::TemplateStore::stampTemplate
+    ( $fileContent,
+      {
+       SLICESTART  => $plan->{slicestart},
+       SLICESTOP   => $plan->{slicestop},
+       NSTART      => $plan->{nstart},
+      }
+    );
+	   
+  my $texFileName = "$animdir/animation-$coreId.tex";
+  my $texFile = IO::File->new();
+  $texFile->open( ">$texFileName" )
+    or die( "Error: cannot open animation file '$texFileName' for writing\n" );
+  print $texFile $perCoreContent;
+  $texFile->close();
+
+  say $logFile "- Running TeX";
+  # run TeX
+  $cmd = [ $self->{compiler},
+	   "--output-directory=$animdir", "$texFileName" ];
+  BeamerReveal::IPC::Run::run( $cmd, $coreId, 8 );
+
+  say $logFile "- Cropping PDF file";
+  # run pdfcrop
+  $cmd = [ $self->{pdfcrop}, '--margins', '-2', "animation-$coreId.pdf" ];
+  BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
+
+  # run pdftoppm
+  my $xrange = 2 * int( $self->{presentationparameters}->{canvaswidth} * $animation->{width} );
+  my $yrange = 2 * int( $self->{presentationparameters}->{canvasheight} * $animation->{height} );
+	   
+  say $logFile "- Generating jpg files";
+  $cmd = [ $self->{pdftoppm},
+	   '-scale-to-x', "$xrange",
+	   '-scale-to-y', "$yrange",
+	   "animation-$coreId-crop.pdf", "./frame-$coreId", '-jpeg' ];
+  BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
+
+  # correct for too short slicesize in filenames coming from pdftoppm
+  say $logFile "- Cleaning up jpg files";
+  my $currentDigitCnt = nofdigits( $plan->{slicestop} );
+  my $desiredDigitCnt = nofdigits( $sliceSize );
+  if ( $currentDigitCnt < $desiredDigitCnt ) {
+    for ( my $i = 1; $i <= $plan->{slicestop}; ++$i ) {
+      #	  my $src = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $currentDigitCnt . 'd.jpg', $i ) );
+      #	  my $dst = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $desiredDigitCnt . 'd.jpg', $i ) );
+      my $src = sprintf( "$animdir/frame-$coreId-%0${currentDigitCnt}d.jpg", $i );
+      my $dst = sprintf( "$animdir/frame-$coreId-%0${desiredDigitCnt}d.jpg", $i );
+      File::Copy::move( $src, $dst );
+    }
+  }
+  $logFile->close();
+}
+
+    
 1;
 
 __END__
@@ -341,7 +379,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20251226.2107
+version 20251227.1426
 
 =head1 SYNOPSIS
 

@@ -40,6 +40,8 @@ if ($^O eq 'MSWin32') {
    $test->feature(HAVE_GETRANDOM => 'getrandom', { h => 'sys/random.h' });
 }
 
+$test->header('stdint.h');
+
 $test->header('stdbool.h');
 $test->feature(HAVE_BOOL      => 'bool x= true; return x == false;');
 

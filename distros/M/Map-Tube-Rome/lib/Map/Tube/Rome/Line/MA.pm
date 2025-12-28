@@ -1,6 +1,6 @@
 package Map::Tube::Rome::Line::MA;
 
-$Map::Tube::Rome::Line::MA::VERSION   = '1.01';
+$Map::Tube::Rome::Line::MA::VERSION   = '1.03';
 $Map::Tube::Rome::Line::MA::AUTHORITY = 'cpan:GDT';
 
 use 5.010;
@@ -30,7 +30,7 @@ Rome Subway Map: Linea A
     | Furio Camillo                            | Colli Albani - Parco Appia Antica, Ponte Lungo                             |
     | Ponte Lungo                              | Furio Camillo, Re di Roma                                                  |
     | Re di Roma                               | Ponte Lungo, San Giovanni                                                  |
-    | San Giovanni                             | Re di Roma, Manzoni, Lodi                                                  |
+    | San Giovanni                             | Re di Roma, Manzoni, Lodi, Porta Metronia                                  |
     | Manzoni                                  | San Giovanni, Vittorio Emanuele                                            |
     | Vittorio Emanuele                        | Manzoni, Termini                                                           |
     | Termini                                  | Vittorio Emanuele, Repubblica - Teatro dell'Opera, Castro Pretorio, Cavour |

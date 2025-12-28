@@ -15,8 +15,10 @@ Alan
 Alders
 Alessandro
 Berry
+BooK
 Brad
 Bright
+Bruhat
 CA
 CGI
 Chris
@@ -25,6 +27,7 @@ Claes
 Clinton
 Cook
 Craig
+Dan
 David
 Davis
 Dean
@@ -67,6 +70,7 @@ Michael
 Mike
 Mitchell
 Miyagawa
+Mueller
 Nehren
 Nicolas
 Olaf
@@ -74,6 +78,7 @@ Olivier
 Palmquist
 Pearce
 Petr
+Philippe
 Písař
 RFC7230
 RFC7231
@@ -82,6 +87,7 @@ RFC7233
 RFC7234
 RFC7235
 Raspass
+Rob
 Robinson
 Rochelemagne
 Serguei
@@ -89,6 +95,7 @@ Shoichi
 Sinan
 SkyMarshal
 Steve
+Stevens
 Stig
 Syohei
 Sören
@@ -108,6 +115,7 @@ Zborowski
 al3xbio
 apeiron
 bgills
+book
 brian
 carlson
 castaway
@@ -125,6 +133,7 @@ ether
 felipe
 gardner
 git
+grinnz
 haarg
 jkeenan
 jmates
@@ -132,6 +141,7 @@ jraspass
 kennedy
 leklund
 lib
+michael
 miyagawa
 mjegh
 mlbright
@@ -141,6 +151,7 @@ olaf
 pearce
 ppisar
 proxying
+robm
 rochelemagne
 sandals
 sanjay

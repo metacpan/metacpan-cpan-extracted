@@ -31,8 +31,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
-                                      'Test::Version' => '1',
-                                      'perl' => '5.006'
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {
@@ -48,6 +47,7 @@ do { my $x = {
                                       'IO::Socket' => '0',
                                       'MIME::Base64' => '0',
                                       'Socket' => '0',
+                                      'Time::HiRes' => '0',
                                       'Time::Local' => '0',
                                       'bytes' => '0',
                                       'perl' => '5.006',

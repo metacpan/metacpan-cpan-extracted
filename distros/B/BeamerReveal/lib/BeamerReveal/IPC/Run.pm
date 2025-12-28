@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::IPC::Run;
-our $VERSION = '20251226.2107'; # VERSION
+our $VERSION = '20251227.1426'; # VERSION
 
 use strict;
 use warnings;
@@ -14,15 +14,15 @@ use File::chdir;
 
 sub run {
   my ( $cmd, $coreId, $indent, $dir ) = @_;
-  my ( $in, $out, $err );
+  my ( $out, $err );
   my $r;
   eval {
     if( defined $dir ) {
       local $CWD = $dir;
-      $r = IPC::Run::run( $cmd, \$in, \$out, \$err );
+      $r = IPC::Run::run( $cmd, \undef, \$out, \$err );
     }
     else {
-      $r = IPC::Run::run( $cmd, \$in, \$out, \$err );
+      $r = IPC::Run::run( $cmd, \undef, \$out, \$err );
     }
   };
     
@@ -53,7 +53,7 @@ BeamerReveal::IPC::Run - IPC::Run
 
 =head1 VERSION
 
-version 20251226.2107
+version 20251227.1426
 
 =head1 SYNOPSIS
 

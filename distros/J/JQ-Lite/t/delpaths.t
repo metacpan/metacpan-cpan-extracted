@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More;
 use JQ::Lite;
 
 my $jq = JQ::Lite->new;
@@ -57,4 +57,22 @@ my $json_scalar = '{"keep": true}';
 my @result_null = $jq->run_query($json_scalar, '. | delpaths([[]])');
 
 ok(!defined $result_null[0], 'delpaths with empty path removes the entire value');
+
+my $error = eval { $jq->run_query($json_object, '.profile | delpaths("password")'); 1 };
+ok(!$error, 'delpaths throws on non-array paths argument');
+like(
+    $@,
+    qr/^delpaths\(\): paths must be an array of path arrays/,
+    'delpaths error message indicates array-of-array requirement'
+);
+
+$error = eval { $jq->run_query($json_object, '.profile | delpaths(["password"])'); 1 };
+ok(!$error, 'delpaths throws when paths list is not an array of arrays');
+like(
+    $@,
+    qr/^delpaths\(\): paths must be an array of path arrays/,
+    'delpaths rejects paths arrays containing non-array entries'
+);
+
+done_testing;
 

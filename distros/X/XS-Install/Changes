@@ -1,4 +1,7 @@
-1.4.0    xx.xx.2024
+1.5.0    12.27.2025
+           - freeze ExtUtils::ParseXS inside as that ancient piece of shit will never stop breaking this module
+           - while not having any interface to override and extend its functionality
+1.4.0    14.03.2025
            - adopt for ExtUtils::ParseXS version >= 3.53 (perl 5.41)
            - support BUILD_DEP for CLIB
 1.3.5    09.11.2021

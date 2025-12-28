@@ -1,6 +1,6 @@
 package Test::WWW::Mechanize::Driver::Util;
 use strict; use warnings;
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 require Exporter;
 our @ISA = qw(Exporter);

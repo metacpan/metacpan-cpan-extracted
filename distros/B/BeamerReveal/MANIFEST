@@ -112,10 +112,10 @@ beamer-reveal-example_files/libs/revealjs/plugin/zoom/plugin.js
 beamer-reveal-example_files/libs/revealjs/plugin/zoom/zoom.esm.js
 beamer-reveal-example_files/libs/revealjs/plugin/zoom/zoom.js
 beamer-reveal-example_files/media/Animations/592b2d2bc6385eb73b3aeaa1dcad644782cdcf0a2f86c59f1f18e150bf27d41a.mp4
-beamer-reveal-example_files/media/Audios/E0989E98-E29D-11F0-85CF-CCE460DF8F94.ogg
-beamer-reveal-example_files/media/Iframes/E0987B52-E29D-11F0-A205-A53729436854.html
-beamer-reveal-example_files/media/Images/E0985A14-E29D-11F0-B282-B24F2F615E8B.gif
-beamer-reveal-example_files/media/Images/E0986C02-E29D-11F0-AAC9-D66FBD45728B.png
+beamer-reveal-example_files/media/Audios/DB946444-E32F-11F0-9EB9-D0969C2849FC.ogg
+beamer-reveal-example_files/media/Iframes/DB943F32-E32F-11F0-9901-EF6B08696C31.html
+beamer-reveal-example_files/media/Images/DB941CF0-E32F-11F0-B64A-8F6D49626948.gif
+beamer-reveal-example_files/media/Images/DB942FE2-E32F-11F0-9550-C8E177646D13.png
 beamer-reveal-example_files/media/Slides/slide-01.jpg
 beamer-reveal-example_files/media/Slides/slide-02.jpg
 beamer-reveal-example_files/media/Slides/slide-03.jpg
@@ -135,7 +135,7 @@ beamer-reveal-example_files/media/Slides/slide-16.jpg
 beamer-reveal-example_files/media/Slides/slide-17.jpg
 beamer-reveal-example_files/media/Slides/slide-18.jpg
 beamer-reveal-example_files/media/Slides/slide-19.jpg
-beamer-reveal-example_files/media/Videos/E0979F16-E29D-11F0-BACC-A77EA6216AF2.mp4
+beamer-reveal-example_files/media/Videos/DB935BA8-E32F-11F0-B21F-8921396EB59B.mp4
 bin/beamer-reveal.pl
 bin/beamer-reveal.pl~
 dist.ini
@@ -143,7 +143,9 @@ index.html
 lib/BeamerReveal.pm
 lib/BeamerReveal/FrameConverter.pm
 lib/BeamerReveal/IPC/Run.pm
+lib/BeamerReveal/IPC/Run.pm~
 lib/BeamerReveal/MediaManager.pm
+lib/BeamerReveal/MediaManager.pm~
 lib/BeamerReveal/Object.pm
 lib/BeamerReveal/Object/BeamerFrame.pm
 lib/BeamerReveal/Object/Presentation.pm

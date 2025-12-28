@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::PEM;
 # VERSION
 # ABSTRACT: Parse PEM format from a SecretBuffer
-$Crypt::SecretBuffer::PEM::VERSION = '0.015';
+$Crypt::SecretBuffer::PEM::VERSION = '0.016';
 use strict;
 use warnings;
 use Carp;
@@ -228,7 +228,7 @@ falling back to the L</headers> hashref.
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 AUTHOR
 

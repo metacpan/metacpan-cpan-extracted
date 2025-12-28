@@ -1,0 +1,58 @@
+{
+   "abstract" : "DBIx::Quick - Object Relational Mapping for the lazy programmer",
+   "author" : [
+      "Sergio Iglesias <sergioxz@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Quick",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Import::Into" : "0",
+            "Moo" : "0",
+            "SQL::Abstract::More" : "0",
+            "perl" : "v5.16.3"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Quick" : {
+         "file" : "lib/DBIx/Quick.pm",
+         "version" : "0.4"
+      },
+      "DBIx::Quick::Role" : {
+         "file" : "lib/DBIx/Quick/Role.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sergiotarxz/Perl-DBIx-Quick/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/sergiotarxz/Perl-DBIx-Quick"
+      }
+   },
+   "version" : "0.4",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

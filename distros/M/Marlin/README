@@ -510,16 +510,9 @@ DESCRIPTION
           }
 
         If you've only got one parent class (fairly normal situation!) you can
-        use a scalarref instead of an arrayref:
+        use a string instead of an arrayref:
 
           package Employee {
-            use Marlin -base => \'Person', qw( employee_id payroll_number );
-          }
-
-        A non-reference string is not supported:
-
-          package Employee {
-            # THIS WILL DIE
             use Marlin -base => 'Person', qw( employee_id payroll_number );
           }
 
@@ -564,7 +557,7 @@ DESCRIPTION
             use Marlin 'name!';
           }
   
-          use Marlin -this => \'Person', 'name!';
+          use Marlin -this => 'Person', 'name!';
 
         The main difference is what scope any lexical subs Marlin creates will
         end up in. (And if your version of Perl is too old to support lexical
@@ -575,7 +568,7 @@ DESCRIPTION
         Tells Marlin to use a constructor name other than `new`:
 
           package Person {
-            use Marlin -constructor => \'create', 'name!';
+            use Marlin -constructor => 'create', 'name!';
           }
   
           my $bob = Person->create( name => 'Bob' );
@@ -599,6 +592,30 @@ DESCRIPTION
         Exports the `before`, `after`, `around`, and `fresh` method modifiers
         from Class::Method::Modifiers, but lexical versions of them.
 
+   Marlin Extensions
+    Strings in the `use Marlin` line which start with a colon are used to load
+    Marlin extensions.
+
+    For example:
+
+      package Local::Foobar {
+        use Marlin qw( foo bar :Clone );
+      }
+
+    Will create a class called Local::Foobar with attributes "foo" and "bar",
+    but use the Marlin extension Marlin::X::Clone. (This module is bundled
+    with Marlin as a demonstration of how to create extensions.)
+
+    Extensions can be followed by a hashref of arguments for the extension:
+
+      package Local::Foobar {
+        use Marlin qw( foo bar ), ':Clone' => { try => 1 };
+      }
+
+    The `try` argument is special. By setting it to true, it tells Marlin to
+    only *try* to use that extension, but carry on if the extension cannot be
+    loaded.
+
    Other Features
     `BUILD` and `DEMOLISH` are supported.
 
@@ -610,10 +627,6 @@ DESCRIPTION
 
         You can work around this by naming your constructor something other
         than `new`, then wrapping it.
-
-    *   Extensibility.
-
-        Marlin doesn't offer any official API for building extensions.
 
     *   The metaobject protocol.
 
@@ -698,6 +711,8 @@ BUGS
 SEE ALSO
     Marlin::Role, Marlin::Struct, Marlin::Util, Marlin::Manual::Principles,
     Marlin::Manual::Comparison.
+
+    Marlin::X::Clone.
 
     Class::XSAccessor, Class::XSConstructor, Types::Common, Type::Params, and
     Sub::HandlesVia.

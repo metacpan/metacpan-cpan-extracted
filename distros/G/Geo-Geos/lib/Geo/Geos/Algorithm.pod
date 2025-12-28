@@ -72,7 +72,7 @@ Geo::Geos::Algorithm - Fundamental computational geometry algorithms.
     distanceLineLine($c1, $c2, $c3, $c4);              # => 2
 
     signedArea($coords_ring);                           # => 8
-    Geo::Geos::Algorithm::length([$c1, $c2, $c3, $c4]);      # => 8
+    Geo::Geos::Algorithm::length([$c1, $c2, $c3, $c4]);      # => 10
 
     # CentralEndpointIntersector
     getIntersection($c1, $c2, $c3, $c4); # => isa 'Geo::Geos::Coordinate'

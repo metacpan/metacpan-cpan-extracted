@@ -97,7 +97,7 @@
         "id": "SAN_GIOVANNI",
         "name": "San Giovanni",
         "line": "MA,MC",
-        "link": "RE_DI_ROMA,MANZONI,LODI"
+        "link": "RE_DI_ROMA,MANZONI,LODI,PORTA_METRONIA"
       },
       {
         "id": "MANZONI",
@@ -275,9 +275,9 @@
       },
       {
         "id": "COLOSSEO",
-        "name": "Colosseo",
-        "line": "MB",
-        "link": "CAVOUR,CIRCO_MASSIMO"
+        "name": "Colosseo - Fori Imperiali",
+        "line": "MB,MC",
+        "link": "CAVOUR,CIRCO_MASSIMO,PORTA_METRONIA"
       },
       {
         "id": "CIRCO_MASSIMO",
@@ -458,6 +458,12 @@
         "name": "Lodi",
         "line": "MC",
         "link": "PIGNETO,SAN_GIOVANNI"
+      },
+      {
+        "id": "PORTA_METRONIA",
+        "name": "Porta Metronia",
+        "line": "MC",
+        "link": "SAN_GIOVANNI,COLOSSEO"
       }
     ]
   }

@@ -20,7 +20,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(8.6.2);
+  our $VERSION = qv(8.7.0);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -138,6 +138,16 @@ sub tweak :prototype($\@\@\@$$\%) {
   return ($op, $tweaked);
 }
 
+sub all {
+  my $pkg = caller;
+  no strict 'refs';
+  eval "BEGIN {
+  while (my (undef, \$v) = each %{$pkg\::}) {
+    MODIFY_CODE_ATTRIBUTES(\$pkg, *\$v{CODE}, \"sealed\") if ref(*\$v{CODE});
+  }
+  }";
+}
+
 sub MODIFY_CODE_ATTRIBUTES {
   my ($class, $rv, @attrs)       = @_;
   local $@;
@@ -196,6 +206,10 @@ sub import {
   my $pkg                        = caller;
   eval "package $pkg; use types; use class"
     if $DEBUG eq 'types'; # enable perl type system
+
+  eval "package $pkg; CHECK { package $pkg; sealed::all() }"
+    if $DEBUG eq 'all';
+
   die $@ if $@;
   filter_add(bless []);
 }
@@ -205,9 +219,9 @@ sub source_munger {
   # NEW in v8.x.y: handle signatures
   no warnings 'uninitialized';
   s(^
-    ([^\n]*sub\s+(\w[\w:]*)?\s*                               #sub declaration and name
-      (?::\s*\w+(?:\(.*?\))?)*\s*:\s*[Ss]ealed\s*(?::\s*\w+(?:\(.*?\))?)#unspaced attrs
-      *\s*(?:\(\S+\))?\s*)\((.*?)\)\s+\{         #prototype, signature and open bracket
+    ([^\n]*sub\s+(\w[\w:]*)?\s*           # sub declaration and name
+      (?::\s*\w+(?:\(.*?\))?)*            # unspaced attrs
+      \s*(?:\(\S+\))?\s*)\((.*?)\)\s+\{   # prototype, signature and open bracket
    )(
      my $prefix = $1; # everything preceding the signature's arglist
      my $name   = $2; # sub name
@@ -285,6 +299,7 @@ sealed - Subroutine attribute for compile-time method lookups on its typed lexic
     use sealed 'verify';  # verifies all CV tweaks
     use sealed 'disabled';# disables all CV tweaks
     use sealed 'types';   # enables builtin Perl::Types type system optimizations
+    use sealed 'all';     # enables :Sealed on all subs
     use sealed;           # disables all warnings
 
 =head1 BUGS

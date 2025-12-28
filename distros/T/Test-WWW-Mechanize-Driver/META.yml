@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,22 +19,22 @@ name: Test-WWW-Mechanize-Driver
 provides:
   ApplyTemplate:
     file: lib/Test/WWW/Mechanize/Driver/MagicValues.pm
-    version: '1.0'
+    version: '1.1'
   FileContents:
     file: lib/Test/WWW/Mechanize/Driver/MagicValues.pm
-    version: '1.0'
+    version: '1.1'
   Stacked:
     file: lib/Test/WWW/Mechanize/Driver/MagicValues.pm
-    version: '1.0'
+    version: '1.1'
   Test::WWW::Mechanize::Driver:
     file: lib/Test/WWW/Mechanize/Driver.pm
-    version: '1.0'
+    version: '1.1'
   Test::WWW::Mechanize::Driver::Util:
     file: lib/Test/WWW/Mechanize/Driver/Util.pm
-    version: '1.0'
+    version: '1.1'
   Test::WWW::Mechanize::Driver::YAMLLoader:
     file: lib/Test/WWW/Mechanize/Driver/YAMLLoader.pm
-    version: '1.0'
+    version: '1.1'
 recommends:
   DateTime: '0'
   Template: '0'
@@ -50,5 +50,5 @@ requires:
 resources:
   homepage: https://github.com/duelafn/Test-WWW-Mechanize-Driver
   repository: https://github.com/duelafn/Test-WWW-Mechanize-Driver
-version: '1.0'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

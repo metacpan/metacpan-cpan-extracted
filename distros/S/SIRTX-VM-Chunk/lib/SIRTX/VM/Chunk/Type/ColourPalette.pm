@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use Data::URIID::Colour;
 
 use parent 'SIRTX::VM::Chunk::Type';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 sub offset {
@@ -125,8 +125,6 @@ sub _render {
     my $type_data = $self->{type_data};
     my $str = join('', map {substr($_->rgb, 1)} @{$type_data->{colours}});
 
-    use Data::Dumper;
-    warn Dumper($type_data, $str);
     $str = pack('nH*', $type_data->{offset}, $str);
 
     open(my $fh, '<:raw', \$str);
@@ -147,7 +145,7 @@ SIRTX::VM::Chunk::Type::ColourPalette - module for interacting with SIRTX VM chu
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -218,11 +216,11 @@ The types and ranges used by this method are subject to change.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

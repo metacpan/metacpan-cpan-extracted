@@ -33,7 +33,7 @@ use warnings;
 
 
 use $];
-use Dist::Build 0.001;
+use Dist::Build 0.019;
 Build_PL(\\\@ARGV, \\\%ENV);
 
 END
@@ -43,7 +43,7 @@ is($base->child('Build.PL')->slurp, $expected, 'Build.PL is exactly like expecte
 
 my $meta = CPAN::Meta->load_file($base->child('META.json'), { lazy_validation => 0 });
 my $configure_requires = $meta->effective_prereqs->requirements_for('configure', 'requires')->as_string_hash;
-is_deeply($configure_requires, { 'Dist::Build' => '0.001' }, 'configure requires' );
+is_deeply($configure_requires, { 'Dist::Build' => '0.019' }, 'configure requires' );
 
 done_testing;
 

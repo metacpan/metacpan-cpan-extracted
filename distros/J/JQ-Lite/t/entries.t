@@ -62,4 +62,64 @@ is_deeply(
     'with_entries filters entries before reconstruction'
 );
 
+my $non_array_ok = eval {
+    $jq->run_query('"oops"', 'from_entries');
+    1;
+};
+my $non_array_err = $@;
+ok(!$non_array_ok, 'from_entries throws runtime error on non-array input');
+like(
+    $non_array_err,
+    qr/^from_entries\(\): argument must be an array/,
+    'runtime error message mentions array input'
+);
+
+my $bad_entry_ok = eval {
+    $jq->run_query('[1]', 'from_entries');
+    1;
+};
+my $bad_entry_err = $@;
+ok(!$bad_entry_ok, 'from_entries throws runtime error when entry is not object/tuple');
+like(
+    $bad_entry_err,
+    qr/^from_entries\(\): entry must be an object or \[key, value\] tuple/,
+    'runtime error message mentions entry type'
+);
+
+my $bad_key_ok = eval {
+    $jq->run_query('[ [{"nested":true}, 2] ]', 'from_entries');
+    1;
+};
+my $bad_key_err = $@;
+ok(!$bad_key_ok, 'from_entries throws runtime error when key is not string');
+like(
+    $bad_key_err,
+    qr/^from_entries\(\): key must be a string/,
+    'runtime error message mentions string key'
+);
+
+my $numeric_key_ok = eval {
+    $jq->run_query('[ {"key": 1, "value": "x"} ]', 'from_entries');
+    1;
+};
+my $numeric_key_err = $@;
+ok(!$numeric_key_ok, 'from_entries throws runtime error when key is numeric');
+like(
+    $numeric_key_err,
+    qr/^from_entries\(\): key must be a string/,
+    'runtime error message rejects non-string numeric key'
+);
+
+my $missing_value_ok = eval {
+    $jq->run_query('[ {"key": "name"} ]', 'from_entries');
+    1;
+};
+my $missing_value_err = $@;
+ok(!$missing_value_ok, 'from_entries throws runtime error when value is missing');
+like(
+    $missing_value_err,
+    qr/^from_entries\(\): entry is missing value/,
+    'runtime error message mentions missing value'
+);
+
 done_testing;

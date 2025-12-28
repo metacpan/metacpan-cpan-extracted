@@ -6,13 +6,13 @@ my $pod = 'lib/WWW/WWWJDIC.pod';
 my $repo = 'https://github.com/benkasminbullock/WWW-WWWJDIC';
 WriteMakefile (
     NAME => 'WWW::WWWJDIC',
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     VERSION_FROM => $pm,
     ABSTRACT_FROM => $pod,
     LICENSE => 'perl',
     PREREQ_PM => {
-	'URI::Escape' => '3.31',
-	'JSON::Parse' => '0.49',
+	'URI::Escape' => '5.28',
+	'JSON::Parse' => '0.62',
     },
     META_MERGE => {
         'meta-spec' => {

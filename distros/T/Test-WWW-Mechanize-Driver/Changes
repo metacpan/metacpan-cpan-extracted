@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::WWW::Mechanize::Driver.
 
+1.1  Sat Dec 27 2025
+   - Fix "undefined import method" error, Closes #172451
+
 1.0  Wed Jul 8 2020
    - Switch to Module::Build
    - Address all Kwalitee warnings

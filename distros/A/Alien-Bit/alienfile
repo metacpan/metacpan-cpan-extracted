@@ -147,7 +147,8 @@ share {
         # Define test executable names based on platform
         my $test_exe   = $^O eq 'MSWin32' ? 'test_bit.exe'   : 'test_bit';
         my $bench_exe  = $^O eq 'MSWin32' ? 'benchmark.exe'  : 'benchmark';
-        my $openmp_exe = $^O eq 'MSWin32' ? 'openmp_bit.exe' : 'openmp_bit';
+        my $gpu_bench = (uc $ENV{GPU} eq 'NONE') ? "_nogpu" : "";
+        my $openmp_exe = $^O eq 'MSWin32' ? "openmp_bit${gpu_bench}.exe" : "openmp_bit${gpu_bench}";
 
         # Get full paths
         my $test_path   = $lib_dir->child($test_exe);

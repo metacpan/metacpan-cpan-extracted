@@ -5,11 +5,14 @@ use warnings;
 use feature 'state';
 no warnings 'redefine';
 use ExtUtils::ParseXS;
-use ExtUtils::ParseXS::Eval;
-use ExtUtils::ParseXS::Utilities;
+use XS::Install::FrozenShit::ParseXS;
+use XS::Install::FrozenShit::ParseXS::Eval;
+use XS::Install::FrozenShit::ParseXS::Utilities;
 use ExtUtils::Typemaps;
 use ExtUtils::Typemaps::InputMap;
 use ExtUtils::Typemaps::OutputMap;
+
+*ExtUtils::ParseXS::new = *XS::Install::FrozenShit::ParseXS::new;
 
 my (@pre_callbacks, @no_typemap_callbacks);
 our ($top_typemaps, $cur_typemaps);
@@ -23,7 +26,7 @@ my $re_ignored = qr/(?:$re_quot|$re_comment_single|$re_comment_multi)/ms;
 my $re_braces = qr#(?<braces>\{(?>[^/"'{}]+|$re_ignored|(?&braces)|/)*\})#ms;
 our $re_xsub = qr/(XS_EUPXS\(XS_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms;
 our $re_boot = qr/(XS_EXTERNAL\(boot_[a-zA-Z0-9_]+\))[^{]+($re_braces)/ms; 
-my $new_parsexs = $ExtUtils::ParseXS::VERSION >= 3.53;
+my $new_parsexs = $XS::Install::FrozenShit::ParseXS::VERSION >= 3.53;
 
 sub add_pre_callback        { push @pre_callbacks, shift; }
 sub add_post_callback       { push @CatchEnd::post_callbacks, shift; }
@@ -75,17 +78,19 @@ sub insert_code_bottom {
     splice(@$linno, $idx, 0, $linno->[$idx] // $linno->[-1]);
 }
 
-my $orig_new = \&ExtUtils::ParseXS::new;
-*ExtUtils::ParseXS::new = sub {
-    my $self = $orig_new->(@_);
+my $orig_new = \&XS::Install::FrozenShit::ParseXS::new;
+*XS::Install::FrozenShit::ParseXS::new = sub {
+    my $class = shift;
+    $class = 'XS::Install::FrozenShit::ParseXS';
+    my $self = $orig_new->($class, @_);
     if ($new_parsexs) {
         Hash::Util::unlock_keys(%$self);
     };
     return $self;
 };
 
-my $orig_pmxl = \&ExtUtils::ParseXS::_process_module_xs_line;
-*ExtUtils::ParseXS::_process_module_xs_line = sub {
+my $orig_pmxl = \&XS::Install::FrozenShit::ParseXS::_process_module_xs_line;
+*XS::Install::FrozenShit::ParseXS::_process_module_xs_line = sub {
     my ($self, $module, $pkg, $prefix) = @_;
 	$orig_pmxl->(@_);
     $self->{xsi}{package} = $pkg;
@@ -99,8 +104,8 @@ sub get_mode {
 }
 
 # pre process XS function
-my $orig_fetch_para = \&ExtUtils::ParseXS::fetch_para;
-*ExtUtils::ParseXS::fetch_para = sub {
+my $orig_fetch_para = \&XS::Install::FrozenShit::ParseXS::fetch_para;
+*XS::Install::FrozenShit::ParseXS::fetch_para = sub {
     my $self = shift;
     $DB::single=1;
     my $ret = $orig_fetch_para->($self, @_);
@@ -319,9 +324,9 @@ my $orig_fetch_para = \&ExtUtils::ParseXS::fetch_para;
 };
 
 if ($new_parsexs) {
-    my $orig_node_param_as_code = \&ExtUtils::ParseXS::Node::Param::as_code;
-    *ExtUtils::ParseXS::Node::Param::as_code = sub {
-        my ExtUtils::ParseXS::Node::Param $self = shift;
+    my $orig_node_param_as_code = \&XS::Install::FrozenShit::ParseXS::Node::Param::as_code;
+    *XS::Install::FrozenShit::ParseXS::Node::Param::as_code = sub {
+        my XS::Install::FrozenShit::ParseXS::Node::Param $self = shift;
         return '' if $self->{var} =~ /^_____unused/;
         return $orig_node_param_as_code->($self, @_);
     };
@@ -369,7 +374,7 @@ sub default_constructor {
 
 {
     # remove ugly default behaviour, it always overrides typemaps in xsubpp's command line
-    *ExtUtils::ParseXS::Utilities::standard_typemap_locations = sub {
+    *XS::Install::FrozenShit::ParseXS::Utilities::standard_typemap_locations = sub {
         my $inc = shift;
         my @ret;
         push @ret, 'typemap' if -e 'typemap';
@@ -410,10 +415,10 @@ sub default_constructor {
 
 {
 	package #hide from CPAN
-            ExtUtils::ParseXS;
+            XS::Install::FrozenShit::ParseXS;
 	my $END = "!End!\n\n";
-	my $BLOCK_regexp = '\s*(' . $ExtUtils::ParseXS::Constants::XSKeywordsAlternation . "|$END)\\s*:";
-    # copy-paste from ExtUtils::ParseXS to fix Typemaps with references (&). ParseXS was simply removing it from type
+	my $BLOCK_regexp = '\s*(' . $XS::Install::FrozenShit::ParseXS::Constants::XSKeywordsAlternation . "|$END)\\s*:";
+    # copy-paste from XS::Install::FrozenShit::ParseXS to fix Typemaps with references (&). ParseXS was simply removing it from type
     # only one line changed with regexp
     # my ($var_type, $var_addr, $var_name) = /^(.*?[^&\s])\s*(\&?)\s*\b(\w+)$/s
     *INPUT_handler = sub {

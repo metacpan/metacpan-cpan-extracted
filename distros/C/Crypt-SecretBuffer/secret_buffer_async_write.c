@@ -46,17 +46,23 @@ static secret_buffer_async_result* secret_buffer_async_result_from_magic(SV *obj
 }
 
 static secret_buffer_async_result *secret_buffer_async_result_new(int fd, secret_buffer *buf, size_t ofs, size_t count) {
-   secret_buffer_async_result *result= (secret_buffer_async_result *)
-      malloc(sizeof(secret_buffer_async_result) + count);
-   Zero(((char*)result), sizeof(secret_buffer_async_result) + count, char);
 #ifdef WIN32
+   /* On Win32, Perl redefines 'malloc' and 'free' to call methods on the perl thread instance
+    * which would be bad when a thread which perl is not aware of is the one calling 'free'.
+    * So use Win32 API GlobalAlloc/GlobalFree.
+    */
+   secret_buffer_async_result *result= (secret_buffer_async_result *)
+      GlobalAlloc(GMEM_FIXED|GMEM_ZEROINIT, sizeof(secret_buffer_async_result) + count);
+   if (!result)
+      croak_with_syserror("malloc(sizeof(secret_buffer_async_result) + count)", GetLastError());
+   Zero(((char*)result), sizeof(secret_buffer_async_result) + count, char);
    InitializeCriticalSection(&result->cs);
    /* Duplicate the file handle for the thread */
    if (fd >= 0) {
       if (!DuplicateHandle(GetCurrentProcess(), (HANDLE)_get_osfhandle(fd), GetCurrentProcess(), &result->fd, 
             0, FALSE, DUPLICATE_SAME_ACCESS)
       ) {
-         free(result);
+         GlobalFree(result);
          croak_with_syserror("DuplicateHandle", GetLastError());
       }
    } else {
@@ -67,10 +73,13 @@ static secret_buffer_async_result *secret_buffer_async_result_new(int fd, secret
    if (result->readyEvent == NULL || result->startEvent == NULL) {
       if (result->readyEvent) CloseHandle(result->readyEvent);
       CloseHandle(result->fd);
-      free(result);
+      GlobalFree(result);
       croak_with_syserror("CreateEvent", GetLastError());
    }
 #else /* POSIX */
+   secret_buffer_async_result *result= (secret_buffer_async_result *)
+      malloc(sizeof(secret_buffer_async_result) + count);
+   Zero(((char*)result), sizeof(secret_buffer_async_result) + count, char);
    result->fd= fd >= 0? dup(fd) : -1;
    if (result->fd < 0) {
       free(result);
@@ -136,11 +145,12 @@ static void secret_buffer_async_result_release(secret_buffer_async_result *resul
       CloseHandle(result->readyEvent);
       if (result->fd != INVALID_HANDLE_VALUE)
          CloseHandle(result->fd);
+      GlobalFree(result);
 #else
       pthread_mutex_destroy(&result->mutex);
       pthread_cond_destroy(&result->cond);
-#endif
       free(result);
+#endif
    }
 }
 

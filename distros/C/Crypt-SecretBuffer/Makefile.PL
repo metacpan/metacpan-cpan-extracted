@@ -49,6 +49,8 @@ if ($^O eq 'MSWin32') {
    $test->feature(HAVE_GETRANDOM => 'getrandom', { h => 'sys/random.h' });
 }
 
+$test->header('stdint.h');
+
 $test->header('stdbool.h');
 $test->feature(HAVE_BOOL      => 'bool x= true; return x == false;');
 
@@ -118,7 +120,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }

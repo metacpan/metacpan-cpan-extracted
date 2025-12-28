@@ -3,6 +3,12 @@ lib/XS/Install.pm
 lib/XS/Install.pod
 lib/XS/Install/CMake.pm
 lib/XS/Install/Deps.pm
+lib/XS/Install/FrozenShit/ParseXS.pm
+lib/XS/Install/FrozenShit/ParseXS/Constants.pm
+lib/XS/Install/FrozenShit/ParseXS/CountLines.pm
+lib/XS/Install/FrozenShit/ParseXS/Eval.pm
+lib/XS/Install/FrozenShit/ParseXS/Node.pm
+lib/XS/Install/FrozenShit/ParseXS/Utilities.pm
 lib/XS/Install/ParseXS.pm
 lib/XS/Install/Payload.pm
 lib/XS/Install/Payload.pod

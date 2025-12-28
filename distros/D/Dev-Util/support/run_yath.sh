@@ -18,6 +18,7 @@ while [[ "$#" -gt 0 ]]; do
   elif [[ "$1" == '--single' ]]; then
     yath_start_args+=' --no-job-count --no-slots-per-job '
   elif [[ "$1" == '--author' ]]; then
+    export AUTHOR_TESTING=1
     yath_dirs+='xt '
   fi
   shift

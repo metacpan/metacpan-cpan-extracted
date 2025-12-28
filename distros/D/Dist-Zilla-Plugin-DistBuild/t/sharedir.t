@@ -28,7 +28,7 @@ is(
 
 my $base = path($tzil->built_in);
 my $expected = <<'EOF';
-load_module('Dist::Build::ShareDir');
+load_extension('Dist::Build::ShareDir');
 module_sharedir('share/foo', 'Foo');
 EOF
 is($base->child('planner/sharedir.pl')->slurp, $expected, 'sharedir.pl is exactly like expected');

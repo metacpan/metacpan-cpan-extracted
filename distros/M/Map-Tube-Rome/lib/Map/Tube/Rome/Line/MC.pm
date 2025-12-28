@@ -1,6 +1,6 @@
 package Map::Tube::Rome::Line::MC;
 
-$Map::Tube::Rome::Line::MC::VERSION   = '1.01';
+$Map::Tube::Rome::Line::MC::VERSION   = '1.03';
 $Map::Tube::Rome::Line::MC::AUTHORITY = 'cpan:GDT';
 
 use 5.010;
@@ -15,32 +15,34 @@ Map::Tube::Rome::Line::MC - Rome Subway Map: Linea C.
 
 Rome Subway Map: Linea C
 
-    .-----------------------------------------------------------------------.
-    | Station Name                | Connected To                            |
-    +-----------------------------+-----------------------------------------+
-    | Monte Compatri-Pantano      | Graniti                                 |
-    | Graniti                     | Monte Compatri-Pantano, Finocchio       |
-    | Finocchio                   | Graniti, Bolognetta                     |
-    | Bolognetta                  | Finocchio, Borghesiana                  |
-    | Borghesiana                 | Bolognetta, Due Leoni - Fontana Candida |
-    | Due Leoni - Fontana Candida | Borghesiana, Grotte Celoni              |
-    | Grotte Celoni               | Due Leoni - Fontana Candida, Torre Gaia |
-    | Torre Gaia                  | Grotte Celoni, Torre Angela             |
-    | Torre Angela                | Torre Gaia, Torrenova                   |
-    | Torrenova                   | Torre Angela, Giardinetti               |
-    | Giardinetti                 | Torrenova, Torre Maura                  |
-    | Torre Maura                 | Giardinetti, Torre Spaccata             |
-    | Torre Spaccata              | Torre Maura, Alessandrino               |
-    | Alessandrino                | Torre Spaccata, Parco di Centocelle     |
-    | Parco di Centocelle         | Alessandrino, Mirti                     |
-    | Mirti                       | Parco di Centocelle, Gardenie           |
-    | Gardenie                    | Mirti, Teano                            |
-    | Teano                       | Gardenie, Malatesta                     |
-    | Malatesta                   | Teano, Pigneto                          |
-    | Pigneto                     | Malatesta, Lodi                         |
-    | Lodi                        | Pigneto, San Giovanni                   |
-    | San Giovanni                | Re di Roma, Manzoni, Lodi               |
-    '-----------------------------+-----------------------------------------'
+    .-------------------------------------------------------------------------.
+    | Station Name                | Connected To                              |
+    +-----------------------------+-------------------------------------------+
+    | Monte Compatri-Pantano      | Graniti                                   |
+    | Graniti                     | Monte Compatri-Pantano, Finocchio         |
+    | Finocchio                   | Graniti, Bolognetta                       |
+    | Bolognetta                  | Finocchio, Borghesiana                    |
+    | Borghesiana                 | Bolognetta, Due Leoni - Fontana Candida   |
+    | Due Leoni - Fontana Candida | Borghesiana, Grotte Celoni                |
+    | Grotte Celoni               | Due Leoni - Fontana Candida, Torre Gaia   |
+    | Torre Gaia                  | Grotte Celoni, Torre Angela               |
+    | Torre Angela                | Torre Gaia, Torrenova                     |
+    | Torrenova                   | Torre Angela, Giardinetti                 |
+    | Giardinetti                 | Torrenova, Torre Maura                    |
+    | Torre Maura                 | Giardinetti, Torre Spaccata               |
+    | Torre Spaccata              | Torre Maura, Alessandrino                 |
+    | Alessandrino                | Torre Spaccata, Parco di Centocelle       |
+    | Parco di Centocelle         | Alessandrino, Mirti                       |
+    | Mirti                       | Parco di Centocelle, Gardenie             |
+    | Gardenie                    | Mirti, Teano                              |
+    | Teano                       | Gardenie, Malatesta                       |
+    | Malatesta                   | Teano, Pigneto                            |
+    | Pigneto                     | Malatesta, Lodi                           |
+    | Lodi                        | Pigneto, San Giovanni                     |
+    | San Giovanni                | Re di Roma, Manzoni, Lodi, Porta Metronia |
+    | Porta Metronia              | San Giovanni, Colosseo - Fori Imperiali   |
+    | Colosseo - Fori Imperiali   | Porta Metronia, Cavour, Circo Massimo     |
+    '-----------------------------+-------------------------------------------'
 
 =head1 NOTE
 
@@ -48,6 +50,9 @@ Rome Subway Map: Linea C
 
 =item * The station "San Giovanni" is also part of
           L<Linea A|Map::Tube::Rome::Line::MA>.
+
+=item * The station "Colosseo - Fori Imperiali" is also part of
+          L<Linea B|Map::Tube::Rome::Line::MB>.
 
 =back
 

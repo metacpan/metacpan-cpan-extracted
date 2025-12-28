@@ -19,13 +19,13 @@ produces output
     http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?QMUJ%E6%97%A5%E6%9C%AC_3
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-WWWJDIC-0.005/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-WWWJDIC-0.008/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents WWW::WWWJDIC version 0.005
-corresponding to git commit L<d12f085ac5039c3b3fec766b36c7995a022ce383|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/d12f085ac5039c3b3fec766b36c7995a022ce383> released on Tue Feb 13 09:32:00 2018 +0900.
+This documents WWW::WWWJDIC version 0.008
+corresponding to git commit L<210e10312cc767217b4c3f713dece990502ca406|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/210e10312cc767217b4c3f713dece990502ca406> released on Sun Dec 28 14:47:46 2025 +0900.
 
 =head1 DESCRIPTION
 
@@ -43,14 +43,6 @@ following sites are available:
 
 =over
 
-=item australia
-
-L<http://nihongo.monash.edu/cgi-bin/wwwjdic>
-
-=item canada
-
-L<http://www.ottix.net/cgi-bin/wwwjdic/wwwjdic>
-
 =item germany
 
 L<http://wwwjdic.biz/cgi-bin/wwwjdic>
@@ -61,7 +53,7 @@ L<http://wwwjdic.se/cgi-bin/wwwjdic.cgi>
 
 =item usa
 
-L<http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic>
+L<https://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic>
 
 =back
 
@@ -95,7 +87,7 @@ not part of the CPAN distribution.
     my $url = $wwwjdic->lookup_url ($key);
 
 Make a lookup url (the "backdoor URL") which links to a WWWJDIC
-page. As of version 0.005, this URL goes to the combined
+page. As of version 0.008, this URL goes to the combined
 dictionary page.
 
 =head1 SEE ALSO
@@ -163,12 +155,12 @@ University and "gengo.com" mirrors.
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2009-2018
+2009-2025
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

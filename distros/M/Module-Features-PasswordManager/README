@@ -1,0 +1,130 @@
+NAME
+    Module::Features::PasswordManager
+
+VERSION
+    This document describes version 0.001 of
+    Module::Features::PasswordManager (from Perl distribution
+    Module-Features-PasswordManager), released on 2025-01-19.
+
+DESCRIPTION
+    Password manager is a tool that lets you input, store, and retrieve
+    individual passwords securely.
+
+DEFINED FEATURES
+    Features defined by this module:
+
+    *   can_add_custom_fields
+
+        Optional. Type: bool. When adding a password, can add custom fields.
+
+    *   can_add_note
+
+        Optional. Type: bool. When adding a password, can add a note field.
+
+    *   can_add_password
+
+        Optional. Type: bool. Provide an interface to add a password into
+        its database.
+
+    *   can_delete_password
+
+        Optional. Type: bool. Provide an interface to delete existing
+        password.
+
+    *   can_dump_passwords
+
+        Optional. Type: bool. Provide an interface to dump all/several
+        passwords from database.
+
+    *   can_edit_password
+
+        Optional. Type: bool. Provide an interface to edit existing
+        password.
+
+    *   can_encrypt_label
+
+        Optional. Type: bool. Whether password labels are stored encrypted
+        in the database.
+
+    *   can_encrypt_other_fields
+
+        Optional. Type: bool. Whether fields other than the password and
+        label are stored encrypted in the database.
+
+    *   can_encrypt_password
+
+        Optional. Type: bool. Whether passwords are stored encrypted in the
+        database.
+
+    *   can_record_edit_history
+
+        Optional. Type: bool. When editing password, record previous data or
+        change history.
+
+    *   can_retrieve_password
+
+        Optional. Type: bool. Provide an interface to retrieve a single
+        password from database.
+
+    *   database_format
+
+        Optional. Type: str. Database format.
+
+    *   database_format_is_open_standard
+
+        Optional. Type: bool. Whether database format is an open standard.
+
+    *   encryption_format
+
+        Optional. Type: str. Database encryption format.
+
+    *   encryption_format_is_open_standard
+
+        Optional. Type: bool. Whether encryption format is an open standard.
+
+    For more details on module features, see Module::Features.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Features-PasswordManager>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Features-PasswordManager>.
+
+SEE ALSO
+    Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Features-Passw
+    ordManager>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

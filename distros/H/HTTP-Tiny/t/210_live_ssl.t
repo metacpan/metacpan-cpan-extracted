@@ -8,11 +8,11 @@ use IO::Socket::INET;
 
 use HTTP::Tiny;
 
-plan skip_all => 'Only run for $ENV{AUTOMATED_TESTING}'
-  unless $ENV{AUTOMATED_TESTING};
+plan 'skip_all' => "Only run for \$ENV{AUTOMATED_TESTING} or \$ENV{RELEASE_TESTING}"
+  unless $ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING};
 
 plan skip_all => "Only run if HTTP::Tiny->can_ssl()"
-  unless HTTP::Tiny->can_ssl();
+  unless $ENV{RELEASE_TESTING} || HTTP::Tiny->can_ssl();
 
 delete $ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT};
 

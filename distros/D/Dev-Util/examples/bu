@@ -19,7 +19,7 @@ use Dev::Util qw(::Backup);
 use File::Basename;
 use Term::ANSIColor;
 
-Readonly my $VERSION => version->declare("v2.19.29");
+Readonly my $VERSION => version->declare("v2.19.33");
 
 $Term::ANSIColor::AUTORESET = 1;
 

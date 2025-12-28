@@ -3,7 +3,7 @@ package Dev::Util::Const;
 use Dev::Util::Syntax;
 use Exporter qw(import);
 
-our $VERSION = version->declare("v2.19.29");
+our $VERSION = version->declare("v2.19.33");
 
 our %EXPORT_TAGS = (
                      named_constants => [ qw(
@@ -47,7 +47,7 @@ Dev::Util::Const - Defines named constants as Readonly.
 
 =head1 VERSION
 
-Version v2.19.29
+Version v2.19.33
 
 =head1 SYNOPSIS
 

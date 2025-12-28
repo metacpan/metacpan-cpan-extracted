@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.090
+    version 0.092
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -56,6 +56,9 @@ METHODS
     *   "keep_alive" â Whether to reuse the last connection (if for the same
         scheme, host and port) (defaults to 1)
 
+    *   "keep_alive_timeout" â How many seconds to keep a connection
+        available for after a request (defaults to 0, unlimited)
+
     *   "max_redirect" â Maximum number of redirects allowed (defaults to 5)
 
     *   "max_size" â Maximum response size in bytes (only when not using a
@@ -106,6 +109,12 @@ METHODS
     change, the persistent connection will be dropped. If you want
     persistent connections across multiple destinations, use multiple
     HTTP::Tiny objects.
+
+    The "keep_alive_timeout" parameter allows you to control how long a keep
+    alive connection will be considered for reuse. By setting this lower
+    than the server keep alive time, this allows you to avoid race
+    conditions where the server closes the connection while preparing to
+    write the request on a reused persistent connection.
 
     See "TLS/SSL SUPPORT" for more on the "verify_SSL" and "SSL_options"
     attributes.
@@ -172,8 +181,8 @@ METHODS
     characters escaped and international domain names encoded.
 
     NOTE: Method names are case-sensitive per the HTTP/1.1 specification.
-    Don't use "get" when you really want "GET". See LIMITATIONS for how this
-    applies to redirection.
+    Don't use "get" when you really want "GET". See "LIMITATIONS" for how
+    this applies to redirection.
 
     If the URL includes a "user:password" stanza, they will be used for
     Basic-style authorization headers. (Authorization headers will not be
@@ -533,6 +542,8 @@ CONTRIBUTORS
 
     *   Craig A. Berry <craigberry@mac.com>
 
+    *   Dan <grinnz@gmail.com>
+
     *   David Golden <xdg@xdg.me>
 
     *   David Mitchell <davem@iabyn.com>
@@ -567,6 +578,8 @@ CONTRIBUTORS
 
     *   Michael R. Davis <mrdvt92@users.noreply.github.com>
 
+    *   Michael Stevens <michael.stevens@dianomi.com>
+
     *   Mike Doherty <doherty@cpan.org>
 
     *   Nicolas Rochelemagne <rochelemagne@cpanel.net>
@@ -576,6 +589,10 @@ CONTRIBUTORS
     *   Olivier MenguÃ© <dolmen@cpan.org>
 
     *   Petr PÃ­saÅ <ppisar@redhat.com>
+
+    *   Philippe Bruhat (BooK) <book@cpan.org>
+
+    *   Rob Mueller <robm@fastmailteam.com>
 
     *   sanjay-cpu <snjkmr32@gmail.com>
 
@@ -602,7 +619,7 @@ CONTRIBUTORS
     *   Xavier Guimard <yadd@debian.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by Christian Hansen.
+    This software is copyright (c) 2025 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

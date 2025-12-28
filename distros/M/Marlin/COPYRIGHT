@@ -10,6 +10,7 @@ Files: README
  lib/Marlin/Role.pm
  lib/Marlin/Struct.pm
  lib/Marlin/Util.pm
+ lib/Marlin/X/Clone.pm
  t/00start.t
  t/01basic.t
  t/integration/comparison-example.t
@@ -18,6 +19,7 @@ Files: README
  t/integration/destructors.t
  t/integration/moo-inherit.t
  t/integration/moose-inherit.t
+ t/integration/plugin.t
  t/integration/roles.t
  t/integration/storage.t
  t/integration/struct.t

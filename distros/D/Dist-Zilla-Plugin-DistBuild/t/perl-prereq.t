@@ -30,7 +30,7 @@ use warnings;
 
 
 use 5.010;
-use Dist::Build 0.001;
+use Dist::Build 0.019;
 Build_PL(\\\@ARGV, \\\%ENV);
 
 END

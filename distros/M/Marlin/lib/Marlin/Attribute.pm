@@ -5,7 +5,7 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008000';
+our $VERSION   = '0.009000';
 
 use parent 'Sub::Accessor::Small';
 
@@ -246,7 +246,7 @@ sub install_coderef {
 	
 	if ( $target =~ /^my\s+(.+)$/ ) {
 		my $lexname = $1;
-		$me->{_marlin}->_lexport( $lexname, $coderef );
+		$me->{_marlin}->lexport( $lexname, $coderef );
 	}
 	
 	return $me->SUPER::install_coderef( @_ );

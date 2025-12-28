@@ -62,13 +62,12 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.777';
+$VERSION = '0.779';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
 # Sim::OPT
 #################################################################################
-# list of proprietary functions: sub genmodnew
 
 
 our %cryptc;
@@ -3262,6 +3261,8 @@ sub opt
   }
 
 
+
+
 	if ( scalar( @miditers == 0 ) )
 	{
 		@miditers = @mediumiters;
@@ -3295,6 +3296,18 @@ sub opt
 
 	say $tee "\nNow in Sim::OPT. \n";
 	$dowhat{file} = $file;
+
+  if ( !checkOPTcue() )
+  {
+    say $tee "THERE IS NO OPTCUE INSTALLED. SO, HALTING.";
+    die;
+  }
+  else 
+  {
+    {
+    say "OPTCUE OK.";
+    }
+  }
 
 	if ( $dowhat{justchecksensitivity} ne "" )
 	{
@@ -3641,7 +3654,7 @@ For specifying in a Sim::OPT configuration file that a certain block has to be s
 
 OPT can perform variance-based preliminary sensitivity analyses on the basis of metamodels.
 
-OPT works under Linux. This module is dual-licensed, open-source and proprietary. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). A proprietary distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
+OPT works under Linux. This module is dual-licensed, open-source and proprietary, with the exception of Modish, which is only open-source. The open-source distribution is available on CPAN (https://metacpan.org/dist/Sim-OPT ). The closed-source distribution, including additional modules (OPTcue), is available from the author’s website (https://sites.google.com/view/bioclimatic-design/home/software ).
 =head2 EXPORT
 
 "opt".

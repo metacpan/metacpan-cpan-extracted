@@ -6,7 +6,7 @@ use strict; use warnings;
 use lib qw/ t /;
 
 use MyMechanize;
-use Test::WWW::Mechanize::Driver qw/ Stacked FileContents ApplyTemplate /;
+use Test::WWW::Mechanize::Driver;
 use Test::More;
 $YAML::LoadBlessed = 1;
 

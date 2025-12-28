@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,7 +16,7 @@ use Scalar::Util qw(blessed);
 
 use parent 'SIRTX::VM::Chunk::Type';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 sub attach_data {
     my ($self, @opts) = @_;
@@ -72,7 +72,7 @@ SIRTX::VM::Chunk::Type::OctetStream - module for interacting with SIRTX VM chunk
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -101,11 +101,11 @@ Currently only L<String::Super> is supported.
 
 =head1 AUTHOR
 
-Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

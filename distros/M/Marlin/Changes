@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.009000	2025-12-28
+
+ - Added: Marlin::X::Clone is bundled as a demonstration of the extension
+   API (and because it can be useful).
+ - Marlin now provides a rudimentary API for extension modules.
+ - Stop using `mkopt` to parse parameters; do it more manually to allow
+   some options to take a simple string as their value instead of requiring
+   a reference.
+
 0.008000	2025-12-23
 
  [ Documentation ]

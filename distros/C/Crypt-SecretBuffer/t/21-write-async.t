@@ -19,7 +19,9 @@ subtest 'write_async to pipe' => sub {
 };
 
 subtest 'write_async with PTY' => sub {
-    skip_all('IO::Pty required') unless eval { require IO::Pty; IO::Pty->new(); 1 };
+   # Skip tests if IO::Pty is not available
+   skip_all("IO::Pty required for TTY tests")
+      unless eval { require POSIX; require IO::Pty; IO::Pty->new(); 1 };
     setup_tty_helper(sub{
         my ($send,$recv,$tty)=@_;
         my $buf = Crypt::SecretBuffer->new('pty secret');
@@ -27,7 +29,7 @@ subtest 'write_async with PTY' => sub {
         $send->(sleep => .1);
         $send->('read_pty');
         my ($act,$data) = $recv->();
-        is([$act,$data],[read=>'pty secret'],'data received');
+        is([$act,$data],[read_pty=>'pty secret'],'data received');
         if (ref $res) { my ($w,$e)=$res->wait(5); is $w,length('pty secret'),'all written'; is $e,0,'no err'; }
     });
 };

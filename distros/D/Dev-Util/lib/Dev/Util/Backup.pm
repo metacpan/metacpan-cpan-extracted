@@ -10,7 +10,7 @@ use File::Find;
 use IO::File;
 use Archive::Tar;
 
-our $VERSION = version->declare("v2.19.29");
+our $VERSION = version->declare("v2.19.33");
 
 our @EXPORT_OK = qw(
     backup
@@ -220,7 +220,7 @@ Dev::Util::Backup - Simple backup functions for files and dirs
 
 =head1 VERSION
 
-Version v2.19.29
+Version v2.19.33
 
 =head1 SYNOPSIS
 

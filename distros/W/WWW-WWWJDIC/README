@@ -12,7 +12,7 @@
                                                         
 
 
-This is the README for WWW::WWWJDIC version 0.005.
+This is the README for WWW::WWWJDIC version 0.008.
 
 WWW::WWWJDIC is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -39,12 +39,11 @@ Get information about the WWWJDIC online Japanese dictionaries.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?WWW::WWWJDIC
     * http://metacpan.org/release/WWW-WWWJDIC
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -65,11 +64,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm WWW::WWWJDIC
 
-To install the module from the source file, WWW-WWWJDIC-0.005.tar.gz,
+To install the module from the source file, WWW-WWWJDIC-0.008.tar.gz,
 follow this sequence of commands:
 
-    tar xfz WWW-WWWJDIC-0.005.tar.gz
-    cd WWW-WWWJDIC-0.005
+    tar xfz WWW-WWWJDIC-0.008.tar.gz
+    cd WWW-WWWJDIC-0.008
     perl Makefile.PL
     make
     make install
@@ -82,8 +81,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can
-report a bug at 
+<benkasminbullock@gmail.com>. If you think there is a problem in the
+module, you can report a bug at 
 
 <https://github.com/benkasminbullock/WWW-WWWJDIC/issues>,
 
@@ -94,6 +93,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Feb 13 09:32:36 2018.
+This README was written on Sun Dec 28 14:48:08 2025.
 
 -----------------------------------------------------------------------------

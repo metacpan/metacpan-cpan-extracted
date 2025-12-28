@@ -18,6 +18,7 @@ inc/ExtUtils/CFeatureTest.pm
 inc/ExtUtils/Depends.pm
 lib/Crypt/SecretBuffer.pm
 lib/Crypt/SecretBuffer/AsyncResult.pm
+lib/Crypt/SecretBuffer/ConsoleState.pm
 lib/Crypt/SecretBuffer/INI.pm
 lib/Crypt/SecretBuffer/PEM.pm
 lib/Crypt/SecretBuffer/Span.pm
@@ -41,7 +42,7 @@ t/12-sysread.t
 t/13-syswrite.t
 t/14-read.t
 t/15-random.t
-t/20-textline.t
+t/20-console.t
 t/21-write-async.t
 t/22-as_pipe.t
 t/30-span.t

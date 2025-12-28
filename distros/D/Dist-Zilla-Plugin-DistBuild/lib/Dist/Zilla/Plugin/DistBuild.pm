@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::DistBuild;
-$Dist::Zilla::Plugin::DistBuild::VERSION = '0.002';
+$Dist::Zilla::Plugin::DistBuild::VERSION = '0.003';
 use Moose;
 with qw/
 	Dist::Zilla::Role::BuildPL
@@ -7,6 +7,7 @@ with qw/
 	Dist::Zilla::Role::PrereqSource
 	Dist::Zilla::Role::FileGatherer
 /;
+use namespace::autoclean;
 
 use experimental 'signatures', 'postderef';
 
@@ -52,7 +53,7 @@ has version => (
 		if ($self->version_method eq 'installed') {
 			return Module::Metadata->new_from_module('Dist::Build')->version->stringify;
 		} else {
-			return '0.001';
+			return '0.019';
 		}
 	},
 );
@@ -203,19 +204,32 @@ sub gather_files($self) {
 }
 
 sub setup_installer($self) {
-	my $sharedir_file = '';
+	my @sharedir;
 
 	for my $map (map { $_->share_dir_map } $self->zilla->plugins_with(-ShareDir)->@*) {
-		$sharedir_file .= sprintf "dist_sharedir('%s');\n", quotemeta $map->{dist} if defined $map->{dist};
+		push @sharedir, sprintf "dist_sharedir('%s');", quotemeta $map->{dist} if defined $map->{dist};
 		for my $module (keys %{ $map->{module} }) {
-			$sharedir_file .= sprintf "module_sharedir('%s', '%s');\n", $map->{module}{$module} =~ s{[\\']}{\\$1}gr, $module;
+			push @sharedir, sprintf "module_sharedir('%s', '%s');", $map->{module}{$module} =~ s{[\\']}{\\$1}gr, $module;
 		}
 	}
 
-	if (length $sharedir_file) {
+	if (@sharedir) {
+		unshift @sharedir, "load_extension('Dist::Build::ShareDir');";
+		my $content = join '', map "$_\n", @sharedir;
 		my $file = Dist::Zilla::File::InMemory->new({
 			name    => 'planner/sharedir.pl',
-			content => "load_module('Dist::Build::ShareDir');\n" . $sharedir_file,
+			content => $content,
+		});
+		$self->add_file($file);
+	}
+
+	my @exedir = map { sprintf "script_dir('%s');", $_->dir } $self->zilla->plugins_with(-ExecFiles)->@*;
+	if (@exedir) {
+		unshift @exedir, "load_extension('Dist::Build::Core');";
+		my $content = join '', map "$_\n", @exedir;
+		my $file = Dist::Zilla::File::InMemory->new({
+			name    => 'planner/scriptdir.pl',
+			content => $content,
 		});
 		$self->add_file($file);
 	}
@@ -239,8 +253,7 @@ sub setup_installer($self) {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
+
 1;
 
 # ABSTRACT: Build a Build.PL that uses Dist::Build
@@ -260,7 +273,7 @@ Dist::Zilla::Plugin::DistBuild - Build a Build.PL that uses Dist::Build
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

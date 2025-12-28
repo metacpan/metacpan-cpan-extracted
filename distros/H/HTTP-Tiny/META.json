@@ -5,7 +5,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,8 +58,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.17",
-            "Test::Version" : "1",
-            "perl" : "5.006"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -75,6 +74,7 @@
             "IO::Socket" : "0",
             "MIME::Base64" : "0",
             "Socket" : "0",
+            "Time::HiRes" : "0",
             "Time::Local" : "0",
             "bytes" : "0",
             "perl" : "5.006",
@@ -107,7 +107,7 @@
    "provides" : {
       "HTTP::Tiny" : {
          "file" : "lib/HTTP/Tiny.pm",
-         "version" : "0.090"
+         "version" : "0.092"
       }
    },
    "release_status" : "stable",
@@ -122,7 +122,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny"
       }
    },
-   "version" : "0.090",
+   "version" : "0.092",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alan Gardner <gardner@pythian.com>",
@@ -135,6 +135,7 @@
       "Claes Jakobsson <claes@surfar.nu>",
       "Clinton Gormley <clint@traveljury.com>",
       "Craig A. Berry <craigberry@mac.com>",
+      "Dan <grinnz@gmail.com>",
       "David Golden <xdg@xdg.me>",
       "David Mitchell <davem@iabyn.com>",
       "Dean Pearce <pearce@pythian.com>",
@@ -152,11 +153,14 @@
       "Martin-Louis Bright <mlbright@gmail.com>",
       "Matthew Horsfall <wolfsage@gmail.com>",
       "Michael R. Davis <mrdvt92@users.noreply.github.com>",
+      "Michael Stevens <michael.stevens@dianomi.com>",
       "Mike Doherty <doherty@cpan.org>",
       "Nicolas Rochelemagne <rochelemagne@cpanel.net>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "Olivier Mengu\u00e9 <dolmen@cpan.org>",
       "Petr P\u00edsa\u0159 <ppisar@redhat.com>",
+      "Philippe Bruhat (BooK) <book@cpan.org>",
+      "Rob Mueller <robm@fastmailteam.com>",
       "sanjay-cpu <snjkmr32@gmail.com>",
       "Serguei Trouchelle <stro@cpan.org>",
       "Shoichi Kaji <skaji@cpan.org>",
@@ -170,8 +174,8 @@
       "Tony Cook <tony@develop-help.com>",
       "Xavier Guimard <yadd@debian.org>"
    ],
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

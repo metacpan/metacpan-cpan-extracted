@@ -1,3 +1,14 @@
+1.68  2025-12-27
+
+    - Enforce jq-style runtime errors when setpath or delpaths receive
+      non-array path arguments.
+    - Verified the full test suite passes after path validation changes.
+
+1.67  2025-12-27
+
+    - Enforce jq-style runtime errors in from_entries for non-array inputs,
+      malformed entries, missing values, and non-string keys.
+
 1.66  2025-12-27
 
     - Enforce jq-style runtime errors when getpath is called with a

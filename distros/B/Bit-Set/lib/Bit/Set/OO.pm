@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::OO;
-$Bit::Set::OO::VERSION = '0.09';
+$Bit::Set::OO::VERSION = '0.10';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ use FFI::Platypus;
 use Scalar::Util qw(blessed);
 
 package Bit::Set {
-$Bit::Set::VERSION = '0.09';
+$Bit::Set::VERSION = '0.10';
     # Creation and Destruction
     sub new {
         my ( $class, $length ) = @_;
@@ -179,7 +179,7 @@ Bit::Set::OO - Perl Object Oriented (OO) interface to the 'bit' C library
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -433,6 +433,9 @@ This distribution provides the library Bit so that it can be used by other Perl
 distributions that are on CPAN. It will download Bit from Github and will build 
 the (static and dynamic) versions of the library for use by other Perl modules.
 
+=item L<benchmarking-bits|https://github.com/chrisarg/benchmarking-bits>
+
+A collection of benchmarking scripts for various bitset libraries in C and Perl.
 
 =item L<Bit|https://github.com/chrisarg/Bit>
 
@@ -459,6 +462,14 @@ Procedural interface to the containerized operations of the Bit library.
 =item L<Bit::Set::DB::OO|https://metacpan.org/pod/Bit::Set::DB::OO>
 
 Object Oriented interface to the Bit::Set::DB module.
+
+=item L<Bit::Vector|https://metacpan.org/pod/Bit::Vector>
+
+Efficient bit vector, set of integers and "big int" math library
+
+=item L<Lucy::Object::BitVector|https://metacpan.org/dist/Lucy/view/lib/Lucy/Object/BitVector.pod>
+
+Bit vector implementation used in the L<Lucy|https://metacpan.org/pod/Lucy> search engine library.
 
 =back
 

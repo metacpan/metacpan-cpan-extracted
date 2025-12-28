@@ -11,6 +11,7 @@ my $extutils_dir = $INC{'ExtUtils/ParseXS.pm'};
 $extutils_dir =~ s/ParseXS\.pm$//;
 my $xsubpp = $extutils_dir.'xsubpp';
 my $deftm  = $extutils_dir.'typemap';
+$deftm =~ s/site_perl\///;
 
 plan skip_all => 'xsubpp not found' unless -f $xsubpp;
 plan skip_all => 'default typemap not found' unless -f $deftm;

@@ -1,3 +1,12 @@
+Version 0.016 - 2025-12-27
+  - New append_console_line(prompt => $txt) feature resolves race condition
+    between printing prompt and disabling echo
+  - New Crypt::SecretBuffer::ConsoleState utility class lets users disable
+    TTY echo more flexibly
+  - Fix bug where ->sysread was actually calling the ->read implementation
+  - Fix Win32 compatibility (compile errors in 0.013 - 0.015)
+  - Fix TTY tests on BSD (race condition in append_console_line)
+
 Version 0.015 - 2025-12-22
   - Fix 5.8 and C89 compatibility
 

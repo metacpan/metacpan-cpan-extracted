@@ -122,26 +122,23 @@ subtest 'TTY functionality' => sub {
    # Skip tests if IO::Pty is not available
    skip_all("IO::Pty required for TTY tests")
       unless eval { require POSIX; require IO::Pty; IO::Pty->new(); 1 };
-   skip_all("Test not working on freebsd yet, but feature does...")
-      if $^O =~ /bsd/i;
 
    # Test 1: Basic TTY input - read until newline
    subtest "input until newline" => sub {
       setup_tty_helper(sub{
          my ($send_msg, $recv_msg, $tty)= @_;
          my $buf= secret();
-         $tty->print("Enter Password: ");
-         $send_msg->(sleep => .1);
+         $send_msg->(wait_for => ':');
          $send_msg->(type => "password123\n");
-         is( $buf->append_console_line($tty), T, 'received full line' );
-         is( $buf->length, 11, 'got 11 chars' );
-         is( do { local $buf->{stringify_mask}= undef; "$buf" }, "password123", 'got password' );
+         is( $buf->append_console_line($tty, prompt => 'Enter Password: '), T, 'received full line' );
+         is( $buf->memcmp("password123"), 0, 'got password' )
+            or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
          $send_msg->('read_pty');
-         is( [ $recv_msg->() ], ['read', "Enter Password: "], 'Saw prompt, and no echo' );
+         is( [ $recv_msg->() ], ['read_pty', "Enter Password: "], 'Saw prompt, and no echo' );
          $send_msg->(type => "x\r");
          $send_msg->(sleep => .1);
          $send_msg->('read_pty');
-         is( [ $recv_msg->() ], ['read', "x\r\n"], 'Echo resumed' );
+         is( [ $recv_msg->() ], ['read_pty', "x\r\n"], 'Echo resumed' );
       });
       done_testing;
    };

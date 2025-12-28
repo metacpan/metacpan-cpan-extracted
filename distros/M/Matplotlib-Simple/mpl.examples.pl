@@ -1349,13 +1349,12 @@ colored_table({
 	set_title     => 'Bond Dissociation Energy'
 });
 plt({
-	'output.file' => 'output.images/tab.multiple.png',
 	execute       => 0,
 	fh            => $fh,
+	'output.file' => 'output.images/single.bonds.png',
 	plots         => [
 		{
 			data          => \%bond_dissociation,
-			'output.file' => '/tmp/single.bonds.svg',
 			'plot.type'   => 'colored_table',
 			set_title     => 'No other options'
 		},
@@ -1364,7 +1363,6 @@ plt({
 			cblabel       => 'Average Dissociation Energy (kJ/mol)',
 			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
 			mirror        => 1,
-			'output.file' => '/tmp/single.bonds.svg',
 			'plot.type'   => 'colored_table',
 			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
 			'show.numbers'=> 1,
@@ -1375,7 +1373,6 @@ plt({
 			cblabel       => 'Average Dissociation Energy (kJ/mol)',
 			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
 			mirror        => 1,
-			'output.file' => '/tmp/single.bonds.svg',
 			'plot.type'   => 'colored_table',
 			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
 			'show.numbers'=> 1,
@@ -1401,6 +1398,86 @@ plt({
 	'output.file' => 'output.images/hlines.png',
 	set_xlim      => "$x[0],$x[-1]",
 	'show.legend' => 0
+});
+plt({
+	cbpad       => 0.01,          # default 0.05 is too big
+	data        => [              # imshow gets a 2D array
+		[' ', ' ', ' ', ' ', 'G'], # bottom
+		['S', 'I', 'T', 'E', 'H'], # top
+	],
+	execute     => 0,
+	fh          => $fh,
+	'plot.type' => 'imshow',
+	stringmap   => {
+		'H' => 'Alpha helix',
+		'B' => 'Residue in isolated β-bridge',
+		'E' => 'Extended strand, participates in β ladder',
+		'G' => '3-helix (3/10 helix)',
+		'I' => '5 helix (pi helix)',
+		'T' => 'hydrogen bonded turn',
+		'S' => 'bend',
+		' ' => 'Loops and irregular elements'
+	},
+	'output.file' => 'output.images/dssp.single.png',
+	scalex        => 2.4,
+	set_ylim      => '0, 1',
+	title         => 'Dictionary of Secondary Structure in Proteins (DSSP)',
+	xlabel        => 'xlabel',
+	ylabel        => 'ylabel'
+});
+plt({
+	cbpad       => 0.01,          # default 0.05 is too big
+	plots       => [
+		{ # 1st plot
+			data 	=> [
+				[' ', ' ', ' ', ' ', 'G'], # bottom
+				['S', 'I', 'T', 'E', 'H'], # top
+			],
+			'plot.type' => 'imshow',
+			set_xticklabels=> '[]', # remove x-axis labels
+			set_ylim    => '0, 1',
+			stringmap   => {
+				'H' => 'Alpha helix',
+				'B' => 'Residue in isolated β-bridge',
+				'E' => 'Extended strand, participates in β ladder',
+				'G' => '3-helix (3/10 helix)',
+				'I' => '5 helix (pi helix)',
+				'T' => 'hydrogen bonded turn',
+				'S' => 'bend',
+				' ' => 'Loops and irregular elements'
+			},
+			title         => 'top plot',
+			ylabel        => 'ylabel'
+		},
+		{ # 2nd plot
+			data 	=> [
+				[' ', ' ', ' ', ' ', 'G'], # bottom
+				['S', 'I', 'T', 'E', 'H'], # top
+			],
+			'plot.type' => 'imshow',
+			set_ylim    => '0, 1',
+			stringmap   => {
+				'H' => 'Alpha helix',
+				'B' => 'Residue in isolated β-bridge',
+				'E' => 'Extended strand, participates in β ladder',
+				'G' => '3-helix (3/10 helix)',
+				'I' => '5 helix (pi helix)',
+				'T' => 'hydrogen bonded turn',
+				'S' => 'bend',
+				' ' => 'Loops and irregular elements'
+			},
+			title         => 'bottom plot',
+			xlabel        => 'xlabel',
+			ylabel        => 'ylabel'
+		}
+	],
+	execute           => 0,
+	fh                => $fh,
+	nrows             => 2,
+	'output.file'     => 'output.images/dssp.multiple.png',
+	scalex            => 2.4,
+	'shared.colorbar' => [0,1], # plots 0 and 1 share a colorbar
+	suptitle          => 'Dictionary of Secondary Structure in Proteins (DSSP)',
 });
 plt({
 	fh                => $fh,

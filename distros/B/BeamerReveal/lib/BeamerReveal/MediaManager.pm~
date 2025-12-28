@@ -1,0 +1,511 @@
+# -*- cperl -*-
+# ABSTRACT: MediaManager
+
+=head1 SYNOPSIS
+
+Worker object to manage the media files generated for the Reveal HTML presentation.
+Sometimes the management is just a matter of copying files (videos, images, iframe material)
+in the media store under a unique ID.
+Sometimes the file still needs to be generated (TikZ animations).
+The former operations are cheap. Therefore they are copied at every invocation and stored under a unique ID.
+The latter are expensive to generate. Therefore they are stored under an ID that is a secure hash value (SHA-standard)
+based on the source data that is used to generate the animation.
+This makes sure that whenever the animation does not change in between different runs,
+we reuse the generated video file. If the source data has changed, we regenerate it.
+
+=cut
+
+package BeamerReveal::MediaManager;
+# VERSION
+
+use strict;
+use warnings;
+
+use Carp;
+
+use POSIX;
+
+use File::Which;
+use File::Path;
+use File::Copy;
+use File::Basename;
+
+use Data::UUID;
+
+use IO::File;
+
+use MCE;
+use MCE::Loop;
+use MCE::Util;
+
+use BeamerReveal::TemplateStore;
+use BeamerReveal::IPC::Run;
+
+sub min { $_[$_[0] > $_[1] ] }
+sub nofdigits { length( "$_[0]" ) }
+
+=method new()
+
+  $mm = BeamerReveal::MediaManager->new( $jobname, $base, $presoparams )
+
+The constructor sets up the manager.
+
+This involves: (a) the directory structure of the filesystemtree in which all objects will be
+stored; we cal this the "media store", (b) reading the preamble of the original source file,
+(c) checking whether all the auxiliary tools (your latex compiler, pdfcrop, pdftoppm, ffmpeg)
+are available.
+
+=over 4
+
+=item . C<$jobname>
+
+name of the job that can lead us back to the original LaTeX source file, such that
+we can read the preamble for reuse in the TikZ animations.
+
+=item . C<$base>
+
+directory in shiche the media will reside. Typically, this is the base name of the final HTML
+file, followed by the suffix '_files'.
+
+=item . C<$presoparams>
+
+parameters of the presentation. This is required to know the compiler and the resolution of the
+presentation
+
+=item . C<$mm>
+
+mediamanager object that can be used to manage the media of the presentation.
+
+=back
+
+=cut
+
+sub new {
+  my $class = shift;
+  my ( $jobname, $base, $presentationprms ) = @_;
+
+  my $self = {
+	      jobname => $jobname,
+	      base    => $base
+	     };
+  $class = (ref $class ? ref $class : $class );
+  bless $self, $class;
+
+  $self->{videos}     = "$self->{base}/media/Videos";
+  $self->{audios}     = "$self->{base}/media/Audios";	
+  $self->{images}     = "$self->{base}/media/Images";	
+  $self->{animations} = "$self->{base}/media/Animations";	
+  $self->{iframes}    = "$self->{base}/media/Iframes";	
+  $self->{slides}     = "$self->{base}/media/Slides";
+  $self->{reveal}     = "$self->{base}/libs";
+  # $self->{videos}     = "$self->{base}, 'media', 'Videos' );
+  # $self->{audios}     = File::Spec->catfile( $self->{base}, 'media', 'Audios' );	
+  # $self->{images}     = File::Spec->catfile( $self->{base}, 'media', 'Images' );	
+  # $self->{animations} = File::Spec->catfile( $self->{base}, 'media', 'Animations' );	
+  # $self->{iframes}    = File::Spec->catfile( $self->{base}, 'media', 'Iframes' );	
+  # $self->{slides}     = File::Spec->catfile( $self->{base}, 'media', 'Slides' );
+  # $self->{reveal}     = File::Spec->catfile( $self->{base}, 'libs' );
+  $self->{presentationparameters} = $presentationprms;
+  
+  # create animations, but don't remove them
+  File::Path::make_path( $self->{animations} );
+
+  # create all the rest, but also clean them
+  for my $item ( qw(reveal videos audios iframes images) ) {
+    File::Path::rmtree( $self->{$item} );
+    File::Path::make_path( $self->{$item} );
+  }
+
+  # read the relevant part of the preamble of the job
+  my $texFileName = $self->{jobname};
+  my $realTexFileName;
+  foreach my $ext ( qw(tex ltx latex) ) {
+    $realTexFileName = $texFileName . ".$ext";
+    last if ( -r $realTexFileName );
+  }
+  
+  my $texFile = IO::File->new();
+  $texFile->open( "<$realTexFileName" )
+    or die( "Error: could not open your original LaTeX source file '$realTexFileName'\n" );
+  $self->{preamble} = '';
+  my $line;
+  do { $line = <$texFile> } until( $line =~ /\\usepackage[^{]*{beamer-reveal}/ );
+  $line = "%% Preamble excerpt taken from $realTexFileName\n";
+  until ( $line =~ /\\begin\{document\}/ ) {
+    $self->{preamble} .= $line;
+    $line = <$texFile>;
+  }
+  $texFile->close();
+  $self->{preamble} .= "%% End of preamble excerpt\n";
+
+  $self->{compiler} = File::Which::which( $self->{presentationparameters}->{compiler} )
+    or die( "Error: your setup is incomplete, I cannot find your $self->{presentationparameters}->{compiler } compiler (should be part of your TeX installation)\n" .
+	    "Make sure it is accessible in a directory on your PATH list variable\n" );
+  
+  $self->{pdftoppm} = File::Which::which( 'pdftoppm' )
+    or die( "Error: your setup is incomplete, I cannot find pdftoppm (part of the poppler library)\n" .
+	    "Install 'Poppler-utils' and make sure pdftoppm is accessible in a directory on your PATH list variable\n" );
+
+  $self->{pdfcrop} = File::Which::which( 'pdfcrop' )
+    or die( "Error: your setup is incomplete, I cannot find pdfcrop (should be part of your TeX installation)\n" .
+	    "Make sure it is accessible in a directory on your PATH list variable\n" );
+  $self->{ffmpeg} = File::Which::which( 'ffmpeg' )
+    or die( "Error: your setup is incomplete, I cannot find ffmpeg\n" .
+	    "Install 'FFmpeg' (from www.ffmpeg.org) and make sure ffmpeg is accessible in a directory on your PATH list variable\n" );
+
+  return $self;
+}
+
+=method revealToStore()
+
+  $mm->revealToStore()
+
+Fetches the original reveal support files and copies them into the media store.
+
+=cut
+
+sub revealToStore {
+  my $self = shift;
+
+#  my $revealTree = File::Spec->catfile( File::ShareDir::dist_dir( 'BeamerReveal' ),
+#					'libs' );
+  my $revealTree = File::ShareDir::dist_dir( 'BeamerReveal' ) . '/libs';
+  my $destTree = $self->{reveal};
+
+  File::Copy::Recursive::dircopy( $revealTree, $destTree );
+}
+
+=method slideFromStore()
+
+  $path = $mm->slideFromStore( $slide )
+
+Fetches the media store pathname of $slide. Slides have been entered into the store by the
+C<Frameconverter>.
+
+=over 4
+
+=item . C<$slide>
+
+the slide to fetch
+
+=item . C<$path>
+
+the path of the slide (in the media store)
+
+=back
+
+=cut
+
+sub slideFromStore {
+  my $self = shift;
+  my ( $slide ) = @_;
+  
+  # copy file
+#  my $fullpathid = File::Spec->catfile( $self->{slides}, $slide );
+  my $fullpathid = "$self->{slides}/$slide";
+  # return store id
+  return $fullpathid;
+}
+
+=method animationToStore()
+
+  $path = $mm->animationToStore( $animation )
+
+Generates the animation with content C<$animation> in the media store and returns the media store
+path to the animation. The generation is done in parallel using multithreading. If the method fails
+the temporary files are kept, otherwise they are removed.
+
+=over 4
+
+=item . C<$animation>
+
+the $animation object as it was read from the C<.rvl> file.
+
+=item . C<$path>
+
+the path of the animation (in the media store)
+
+=back
+
+=cut
+
+sub animationToStore {
+  my $self = shift;
+  my ( $animation ) = @_;
+
+  my $animid  = Digest::SHA::hmac_sha256_hex( $animation->{tex} );
+  #  my $animdir = File::Spec->catfile( $self->{animations}, $animid );
+  my $animdir = "$self->{animations}/$animid";
+  my $fullpathid = $animdir . ".mp4";
+  unless ( -r $fullpathid ) {
+    File::Path::make_path( $animdir );
+
+    my $templateStore = BeamerReveal::TemplateStore->new();
+    my $tTemplate = $templateStore->fetch( 'tex', 'animation.tex' );
+    my $tStamps =
+      {
+       'PREAMBLE'  => $self->{preamble},
+       'FRAMERATE' => $animation->{framerate},
+       'DURATION'  => $animation->{duration},
+       'ANIMATION' => $animation->{tex},
+      };
+    my $fileContent = BeamerReveal::TemplateStore::stampTemplate( $tTemplate, $tStamps );
+
+    my $nofFrames = floor( $animation->{framerate} * $animation->{duration} );
+    my $nofCores  = ceil( MCE::Util::get_ncpu() / 2 );
+    my $sliceSize = ceil( $nofFrames / $nofCores );
+
+    say STDERR "      - Preparing media generation of $nofFrames frames in $nofCores threads at $sliceSize frames per thread";
+
+    # make planning
+    my $frameCounter = 0;
+    my $planning = [];
+    for( my $core = 0; $core < $nofCores; ++$core ) {
+      # make plan for core
+      my $plan = { nstart => $frameCounter,
+		   nstop  => min( $frameCounter + $sliceSize, $nofFrames ),
+		   nr     => $core
+		 };
+      $plan->{slicestart} = 1;
+      $plan->{slicestop}  = $plan->{nstop} - $plan->{nstart};
+      $plan->{nstop}      -= 1;
+
+      # register plan
+      push @$planning, $plan;
+
+      # prepare for next core
+      $frameCounter += $sliceSize;
+    }
+
+    my $cmd;
+    MCE::Loop::init { max_workers => $nofCores, chunk_size  => 1 };
+    
+    mce_loop {
+      my ( $mce, $chunk_ref, $chunk_id ) = @_;
+      my $plan = $chunk_ref->[0];
+      my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $plan->{nr} );
+      # generate TeX -file
+      my $perCoreContent = BeamerReveal::TemplateStore::stampTemplate
+	( $fileContent,
+	  {
+	   SLICESTART  => $plan->{slicestart},
+	   SLICESTOP   => $plan->{slicestop},
+	   NSTART      => $plan->{nstart},
+	  }
+	);
+
+      my $texFileName = "$animdir/animation-$coreId.tex";
+      my $texFile = IO::File->new();
+      $texFile->open( ">$texFileName" )
+	or die( "Error: cannot open animation file '$texFileName' for writing\n" );
+      print $texFile $perCoreContent;
+      $texFile->close();
+
+      # run TeX
+      $cmd = [ $self->{compiler},
+	       "--output-directory=$animdir", "$texFileName" ];
+      BeamerReveal::IPC::Run::run( $cmd, $coreId, 8 );
+
+      # run pdfcrop
+      $cmd = [ $self->{pdfcrop}, '--margins', '-2', "animation-$coreId.pdf" ];
+      BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
+
+      # run pdftoppm
+      my $xrange = 2 * int( $self->{presentationparameters}->{canvaswidth} * $animation->{width} );
+      my $yrange = 2 * int( $self->{presentationparameters}->{canvasheight} * $animation->{height} );
+
+      $cmd = [ $self->{pdftoppm},
+	       '-scale-to-x', "$xrange",
+	       '-scale-to-y', "$yrange",
+	       "animation-$coreId-crop.pdf", "./frame-$coreId", '-jpeg' ];
+      BeamerReveal::IPC::Run::run( $cmd, $coreId, 8, $animdir );
+
+      # correct for too short slicesize in filenames coming from pdftoppm
+      my $currentDigitCnt = nofdigits( $plan->{slicestop} );
+      my $desiredDigitCnt = nofdigits( $sliceSize );
+      if ( $currentDigitCnt < $desiredDigitCnt ) {
+	for( my $i = 1; $i <= $plan->{slicestop}; ++$i ) {
+#	  my $src = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $currentDigitCnt . 'd.jpg', $i ) );
+#	  my $dst = File::Spec->catfile( $animdir, sprintf( "frame-$coreId-%0" . $desiredDigitCnt . 'd.jpg', $i ) );
+	  my $src = sprintf( "$animdir/frame-$coreId-%0${currentDigitCnt}d.jpg", $i );
+	  my $dst = sprintf( "$animdir/frame-$coreId-%0${desiredDigitCnt}d.jpg", $i );
+	  File::Copy::move( $src, $dst );
+	}
+      }
+
+    } @$planning;
+
+    say STDERR "        - returning to single-threaded operation";
+    
+    # rename all files in order
+    my $framecounter = 0;
+    for( my $core = 0; $core < @$planning; ++$core ) {
+      my $plan = $planning->[$core];
+      my $coreId = sprintf( '%0' . nofdigits( $nofCores ) . 'd', $core );
+      for( my $frameno = $plan->{slicestart}; $frameno <= $plan->{slicestop}; ++$frameno ) {
+	my $frameId = sprintf( '%0' . nofdigits( $sliceSize ) . 'd', $frameno );
+	# my $src = File::Spec->catfile( $animdir, "frame-$coreId-$frameId.jpg" );
+	# my $dst = File::Spec->catfile( $animdir, sprintf( "frame-%06d.jpg", $framecounter++ ) );
+	my $src = "$animdir/frame-$coreId-$frameId.jpg";
+	my $dst = sprintf( "$animdir/frame-%06d.jpg", $framecounter++ );
+	File::Copy::move( $src, $dst );
+      }
+    }
+    
+    # run ffmpeg or avconv
+    $cmd = [ $self->{ffmpeg}, '-r', "$animation->{framerate}", '-i', 'frame-%06d.jpg', 'animation.mp4' ];
+    BeamerReveal::IPC::Run::run( $cmd, 0, 8, $animdir );
+    File::Copy::move( "$animdir/animation.mp4",
+		      "$animdir/../$animid.mp4" );
+
+    File::Path::rmtree( $animdir );
+    
+    ### issues:
+    # - automatic derivation of dimensions (needs to be multiple of 2)
+  }
+
+  return $fullpathid;
+}
+
+
+=method imageToStore()
+
+  $path = $mm->imageToStore( $image )
+
+Copies the C<$image> to the store under a unique ID and returns that ID (the filename of the oject
+in the media store).
+ 
+=over 4
+
+=item . C<$image>
+
+the $image file to store in the media store.
+
+=item . C<$path>
+
+the path to the image (in the media store)
+
+=back
+
+=cut
+
+sub imageToStore {
+  my $self = shift;
+  my ( $image ) = @_;
+  return $self->_toStore( 'Images', $image );
+}
+
+=method videoToStore()
+
+  $path = $mm->videoToStore( $video )
+
+Copies the C<$video> to the store under a unique ID and returns that ID (the filename of the oject
+in the media store).
+ 
+=over 4
+
+=item . C<$video>
+
+the $video file to store in the media store.
+
+=item . C<$path>
+
+the path to the video (in the media store)
+
+=back
+
+=cut
+
+sub videoToStore {
+  my $self = shift;
+  my ( $video ) = @_;
+  return $self->_toStore( 'Videos', $video );
+}
+
+=method iframeToStore()
+
+  $path = $mm->iframeToStore( $iframe )
+
+Copies the C<$iframe> to the store under a unique ID and returns that ID (the filename of the oject
+in the media store).
+ 
+=over 4
+
+=item . C<$iframe>
+
+the $iframe file to store in the media store.
+
+=item . C<$path>
+
+the path to the iframe (in the media store)
+
+=back
+
+=cut
+
+sub iframeToStore {
+  my $self = shift;
+  my ( $iframe ) = @_;
+  return $self->_toStore( 'Iframes', $iframe );
+}
+
+=method audioToStore()
+
+  $path = $mm->audioToStore( $audio )
+
+Copies the C<$audio> to the store under a unique ID and returns that ID (the filename of the oject
+in the media store).
+ 
+=over 4
+
+=item . C<$audio>
+
+the $audio file to store in the media store.
+
+=item . C<$path>
+
+the path to the audio (in the media store)
+
+=back
+
+=cut
+
+
+sub audioToStore {
+  my $self = shift;
+  my ( $audio ) = @_;
+  return $self->_toStore( 'Audios', $audio );
+}
+
+=method _toStore()
+
+Do not use directly.
+
+=cut
+
+sub _toStore {
+  my $self = shift;
+  my ( $type, $file ) = @_;
+
+  # find extension
+  my ( undef, undef, $ext ) = File::Basename::fileparse( $file, qr/\.[^.]+$/ );
+
+  
+  # create store id
+  my $id = Data::UUID->new();
+  my $fullpathid;
+  do {
+    my $uuid = $id->create();
+    #$fullpathid = File::Spec->catfile( $self->{base}, 'media', $type, $id->to_string( $uuid ) . $ext );
+    $fullpathid = "$self->{base}/media/$type/@{[$id->to_string( $uuid )]}$ext";
+  } until( ! -e $fullpathid );
+  
+  # copy file
+  die( "Error: cannot find media file '$file'\n" ) unless( -r $file );
+  File::Copy::cp( $file, $fullpathid );
+
+  # return store id
+  return $fullpathid;
+}
+
+1;

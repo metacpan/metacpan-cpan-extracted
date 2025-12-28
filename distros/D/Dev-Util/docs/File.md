@@ -4,7 +4,7 @@ Dev::Util::File - General utility functions for files and directories.
 
 # VERSION
 
-Version v2.19.29
+Version v2.19.33
 
 # SYNOPSIS
 

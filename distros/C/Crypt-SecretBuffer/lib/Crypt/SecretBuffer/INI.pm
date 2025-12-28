@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::INI;
 # VERSION
 # ABSTRACT: Parse INI format from a SecretBuffer
-$Crypt::SecretBuffer::INI::VERSION = '0.015';
+$Crypt::SecretBuffer::INI::VERSION = '0.016';
 use strict;
 use warnings;
 use Carp;
@@ -405,7 +405,7 @@ This function dies on any parse errors.
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 AUTHOR
 

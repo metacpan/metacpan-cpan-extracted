@@ -52,7 +52,7 @@
          "web" : "https://github.com/giterlizzi/perl-Map-Tube-Rome"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_purl" : "pkg:cpan/GDT/Map-Tube-Rome",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

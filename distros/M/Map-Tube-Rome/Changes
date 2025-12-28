@@ -1,5 +1,10 @@
 Change history for Map::Tube::Rome
 
+1.03 2025-12-27
+    - Added "Porta Metronia" MC station
+    - Renamed "Colosseo" to "Colosseo - Fori Imperiali" (MB, MC)
+    - Connected MB <--> MC (Colosseo - Fori Imperiali)
+
 1.02 2025-08-21
     - Updated the name of "Giulio Agricola" station
     in "Giulio Agricola - Parco degli Acquedotti"

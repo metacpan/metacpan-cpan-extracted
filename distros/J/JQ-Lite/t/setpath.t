@@ -117,4 +117,8 @@ subtest 'original inputs untouched' => sub {
     is($output->{foo}{baz}, 7, 'new path applied to result');
 };
 
+my $error = eval { $jq->run_query($json, 'setpath("details"; 1)'); 1 };
+ok(!$error, 'setpath throws on non-array path argument');
+like($@, qr/^setpath\(\): path must be an array/, 'setpath error message indicates array requirement');
+
 done_testing;

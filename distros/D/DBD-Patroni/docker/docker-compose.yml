@@ -1,0 +1,132 @@
+services:
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.17
+    hostname: etcd
+    command:
+      - etcd
+      - --name=etcd
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+      - --initial-cluster=etcd=http://etcd:2380
+      - --initial-cluster-state=new
+      - --initial-cluster-token=patroni-cluster
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - patroni-network
+
+  patroni1:
+    image: ghcr.io/zalando/spilo-16:3.3-p1
+    hostname: patroni1
+    environment:
+      - SCOPE=test-cluster
+      - ETCD3_HOSTS=etcd:2379
+      - PGPASSWORD_SUPERUSER=postgres
+      - PGPASSWORD_ADMIN=admin
+      - PGPASSWORD_STANDBY=standby
+      - ALLOW_NOSSL=true
+      - POST_INIT=/scripts/init-db.sh
+      - 'SPILO_CONFIGURATION={"postgresql":{"pg_hba":["local all all trust","host all all 0.0.0.0/0 md5","host replication standby 0.0.0.0/0 md5"]}}'
+    volumes:
+      - patroni1_data:/home/postgres/pgdata
+      - ./init-db.sh:/scripts/init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - patroni-network
+    depends_on:
+      etcd:
+        condition: service_healthy
+
+  patroni2:
+    image: ghcr.io/zalando/spilo-16:3.3-p1
+    hostname: patroni2
+    environment:
+      - SCOPE=test-cluster
+      - ETCD3_HOSTS=etcd:2379
+      - PGPASSWORD_SUPERUSER=postgres
+      - PGPASSWORD_ADMIN=admin
+      - PGPASSWORD_STANDBY=standby
+      - ALLOW_NOSSL=true
+      - POST_INIT=/scripts/init-db.sh
+      - 'SPILO_CONFIGURATION={"postgresql":{"pg_hba":["local all all trust","host all all 0.0.0.0/0 md5","host replication standby 0.0.0.0/0 md5"]}}'
+    volumes:
+      - patroni2_data:/home/postgres/pgdata
+      - ./init-db.sh:/scripts/init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - patroni-network
+    depends_on:
+      etcd:
+        condition: service_healthy
+
+  patroni3:
+    image: ghcr.io/zalando/spilo-16:3.3-p1
+    hostname: patroni3
+    environment:
+      - SCOPE=test-cluster
+      - ETCD3_HOSTS=etcd:2379
+      - PGPASSWORD_SUPERUSER=postgres
+      - PGPASSWORD_ADMIN=admin
+      - PGPASSWORD_STANDBY=standby
+      - ALLOW_NOSSL=true
+      - POST_INIT=/scripts/init-db.sh
+      - 'SPILO_CONFIGURATION={"postgresql":{"pg_hba":["local all all trust","host all all 0.0.0.0/0 md5","host replication standby 0.0.0.0/0 md5"]}}'
+    volumes:
+      - patroni3_data:/home/postgres/pgdata
+      - ./init-db.sh:/scripts/init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - patroni-network
+    depends_on:
+      etcd:
+        condition: service_healthy
+
+  test-runner:
+    image: perl:5.40
+    hostname: test-runner
+    working_dir: /app
+    volumes:
+      - ..:/app
+      - ./wait-for-cluster.sh:/wait-for-cluster.sh:ro
+    environment:
+      - PATRONI_URLS=http://patroni1:8008/cluster,http://patroni2:8008/cluster,http://patroni3:8008/cluster
+      - PGUSER=testuser
+      - PGPASSWORD=testpass
+      - PGDATABASE=testdb
+    command: >
+      bash -c "
+        apt-get update && apt-get install -y libpq-dev postgresql-client curl jq &&
+        cpanm --notest DBI DBD::Pg LWP::UserAgent JSON Test::More &&
+        chmod +x /wait-for-cluster.sh &&
+        /wait-for-cluster.sh &&
+        cd /app && prove -v -Ilib t/
+      "
+    networks:
+      - patroni-network
+
+volumes:
+  patroni1_data:
+  patroni2_data:
+  patroni3_data:
+
+networks:
+  patroni-network:
+    driver: bridge

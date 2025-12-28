@@ -1,7 +1,7 @@
   use strict;
   use warnings;
   package Alien::Bit;
-$Alien::Bit::VERSION = '0.08';
+$Alien::Bit::VERSION = '0.09';
 use parent qw( Alien::Base );
 
 =head1 NAME
@@ -10,7 +10,7 @@ Alien::Bit - Find or install the Bit library
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -118,6 +118,27 @@ sub assert_err_contract {
     );
 }
 
+# Runtime error: delpaths requires array of path arrays
+{
+    my $res = run_cmd(
+        cmd   => [$BIN, 'delpaths(["a"])'],
+        stdin => qq|{"a":1}\n|,
+    );
+
+    assert_err_contract(
+        res    => $res,
+        rc     => 3,
+        prefix => '[RUNTIME]',
+        name   => 'runtime error: delpaths array-of-arrays enforcement',
+    );
+
+    like(
+        $res->{err},
+        qr/paths must be an array of path arrays/,
+        'runtime error message mentions array of path arrays',
+    );
+}
+
 # Input error
 {
     my $res = run_cmd(

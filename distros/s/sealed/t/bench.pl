@@ -15,15 +15,15 @@ sub bar    { 1 }
 sub reentrant;
 BEGIN {
   package Foo;
-  use base 'sealed';
-  use sealed 'deparse';
+  use sealed 'all';
   sub foo { shift }
   my $n;
-  sub _foo :Sealed { my main $x = shift; $n++ ? $x->bar : $x->reentrant }
+  sub _foo { my main $x = shift; $n++ ? $x->bar : $x->reentrant }
 }
 sub func   {Foo::foo($x)}
 
 BEGIN {our @ISA=qw/Foo/}
+use base 'sealed';
 use sealed 'deparse';
 
 my main $y; #sealed src filter transforms this into: my main $y = 'main';

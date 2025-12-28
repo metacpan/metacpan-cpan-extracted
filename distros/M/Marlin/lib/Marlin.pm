@@ -6,16 +6,16 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008000';
+our $VERSION   = '0.009000';
 
-use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct );
+use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins );
 use B::Hooks::AtRuntime   qw( at_runtime after_runtime );
 use Class::XSAccessor     { getters => [ _ATTRS ] };
 use Class::XSConstructor  [ undef, '_new' ], _ATTRS;
 use Class::XSDestructor;
-use Exporter::Tiny        qw( mkopt _croak );
+use Exporter::Tiny        qw( _croak );
 use List::Util 1.45       qw( any uniqstr );
-use Module::Runtime       qw( use_package_optimistically module_notional_filename );
+use Module::Runtime       qw( use_package_optimistically module_notional_filename require_module );
 use Scalar::Util          qw( blessed weaken );
 use Types::Common         qw( -is );
 
@@ -321,7 +321,6 @@ my $_parse_attribute = sub {
 
 sub new {
 	my $class   = shift;
-	my $optlist = mkopt( \@_ );
 	
 	my %arg = (
 		parents      => [],
@@ -330,29 +329,40 @@ sub new {
 		strict       => !!1,
 		modifiers    => !!0,
 		constructor  => 'new',
+		plugins      => [],
 	);
-	for my $pair ( @$optlist ) {
-		my ( $k, $v ) = @$pair;
+	
+	while ( @_ ) {
+		my ( $k, $v, $has_v ) = ( shift );
+		if ( ref $_[0] or not defined $_[0] ) {
+			( $v, $has_v ) = ( shift, !!1 );
+		}
+		
 		if ( $k =~ /^-(?:base|isa|parent|parents|extends)$/ ) {
+			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
 			_croak("Expected arrayref or hashref of parent classes") unless $v;
 			push @{ $arg{parents} }, $class->$_parse_package_list( $v );
 		}
 		elsif ( $k =~ /^-(?:with|does|role|roles)$/ ) {
+			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
 			_croak("Expected arrayref or hashref of roles") unless $v;
 			push @{ $arg{roles} }, $class->$_parse_package_list( $v );
 		}
 		elsif ( $k =~ /^-(?:class|self|this)$/ ) {
+			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
 			_croak("Expected scalarref to this class name") unless $v;
 			my @got = $class->$_parse_package_list( $v );
 			_croak("This class must have exactly one name") if @got != 1 || exists $arg{this};
 			$arg{this} = $got[0][0];
 		}
 		elsif ( $k =~ /^-(?:caller)$/ ) {
+			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
 			my @got = $class->$_parse_package_list( $v );
 			_croak("Can be only one caller") if @got != 1 || exists $arg{caller};
 			$arg{caller} = $got[0][0];
 		}
 		elsif ( $k =~ /^-(?:constructor)$/ ) {
+			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
 			my @got = $class->$_parse_package_list( $v );
 			$arg{constructor} = $got[0][0];
 		}
@@ -366,8 +376,13 @@ sub new {
 			$arg{modifiers} = !!1;
 		}
 		elsif ( $k =~ /^-(?:requires?)$/ ) {
+			( $v, $has_v ) = ( shift, !!1 ) unless $has_v;
 			_croak("Expected arrayref of required method names") unless is_ArrayRef $v;
 			$arg{requires} = $v;
+		}
+		elsif ( $k =~ /^:(.+)$/ ) {
+			my $plugin = "Marlin::X::$1";
+			push @{ $arg{plugins} }, [ $plugin, $v ];
 		}
 		else {
 			push @{ $arg{attributes} }, $class->$_parse_attribute( $k, $v );
@@ -388,7 +403,38 @@ sub new {
 sub do_setup {
 	my $me = shift;
 	
-	$me->$_ for $me->setup_steps;
+	my $steps = [ $me->setup_steps ];
+	my %handled;
+	
+	for my $pair ( @{ $me->plugins } ) {
+		my ( $plugin, $opts ) = @$pair;
+		$handled{$plugin} ? next : ( $handled{$plugin} = $pair );
+		if ( is_HashRef $opts and $opts->{try} ) {
+			use_package_optimistically( $plugin );
+			$pair->[2] = undef;
+			if ( $plugin->can('new') ) {
+				$pair->[2] = $plugin->new( %$opts, marlin => $me );
+				$pair->[2]->adjust_setup_steps( $steps );
+			}
+		}
+		else {
+			require_module( $plugin );
+			$pair->[2] = $plugin->new(
+				is_HashRef($opts) ? ( %$opts ) : (),
+				marlin => $me,
+			);
+			$pair->[2]->adjust_setup_steps( $steps );
+		}
+	}
+	
+	for my $step ( @$steps ) {
+		my @args;
+		if ( $step =~ /^(.+)::(\w+)$/ ) {
+			my $plugin = $1;
+			push @args, $handled{$plugin}[2];
+		}
+		$me->$step( @args );
+	}
 	
 	return $me;
 }
@@ -521,11 +567,7 @@ sub setup_constructor {
 	my $attr = $me->attributes_with_inheritance;
 	if ( any { $_->requires_pp_constructor } @$attr ) {
 		my $code = $me->build_pp_constructor( $attr );
-		my $coderef = $code->finalize->compile;
-		my $subname = sprintf('%s::%s', $me->this, $me->constructor);
-		no strict 'refs';
-		require Eval::TypeTiny;
-		*$subname = Eval::TypeTiny::set_subname( $subname, $coderef );
+		$me->export( $me->constructor, $code->finalize->compile );
 	}
 	else {
 		my @dfn = map {
@@ -580,12 +622,26 @@ sub setup_imports {
 		);
 	}
 	
-	$me->_lexport( @imports );
+	$me->lexport( @imports );
 	
 	return $me;
 }
 
-sub _lexport {
+sub export {
+	my $me = shift;
+	my $pkg = $me->this;
+	
+	require Eval::TypeTiny;
+	no strict 'refs';
+	no warnings 'redefine';
+	while ( @_ ) {
+		my ( $name, $coderef ) = splice( @_, 0, 2 );
+		my $fqname = "$pkg\::$name";
+		*$fqname = Eval::TypeTiny::set_subname( $fqname, $coderef );
+	}
+}
+
+sub lexport {
 	my $me = shift;
 	my $caller;
 	
@@ -1370,16 +1426,9 @@ You can include version numbers:
   }
 
 If you've only got one parent class (fairly normal situation!) you can
-use a scalarref instead of an arrayref:
+use a string instead of an arrayref:
 
   package Employee {
-    use Marlin -base => \'Person', qw( employee_id payroll_number );
-  }
-
-A non-reference string is not supported:
-
-  package Employee {
-    # THIS WILL DIE
     use Marlin -base => 'Person', qw( employee_id payroll_number );
   }
 
@@ -1426,7 +1475,7 @@ The following are roughly equivalent:
     use Marlin 'name!';
   }
   
-  use Marlin -this => \'Person', 'name!';
+  use Marlin -this => 'Person', 'name!';
 
 The main difference is what scope any lexical subs Marlin creates will end
 up in. (And if your version of Perl is too old to support lexical subs,
@@ -1437,7 +1486,7 @@ the "scope" they will be installed in is actually the caller package!)
 Tells Marlin to use a constructor name other than C<new>:
 
   package Person {
-    use Marlin -constructor => \'create', 'name!';
+    use Marlin -constructor => 'create', 'name!';
   }
   
   my $bob = Person->create( name => 'Bob' );
@@ -1466,6 +1515,31 @@ from L<Class::Method::Modifiers>, but lexical versions of them.
 
 =back
 
+=head3 Marlin Extensions
+
+Strings in the C<< use Marlin >> line which start with a colon are used to
+load Marlin extensions.
+
+For example:
+
+  package Local::Foobar {
+    use Marlin qw( foo bar :Clone );
+  }
+
+Will create a class called Local::Foobar with attributes "foo" and "bar",
+but use the Marlin extension L<Marlin::X::Clone>. (This module is bundled
+with Marlin as a demonstration of how to create extensions.)
+
+Extensions can be followed by a hashref of arguments for the extension:
+
+  package Local::Foobar {
+    use Marlin qw( foo bar ), ':Clone' => { try => 1 };
+  }
+
+The C<try> argument is special. By setting it to true, it tells Marlin to
+only I<try> to use that extension, but carry on if the extension cannot
+be loaded.
+
 =head3 Other Features
 
 C<BUILD> and C<DEMOLISH> are supported.
@@ -1483,12 +1557,6 @@ Support for C<BUILDARGS>.
 
 You can work around this by naming your constructor something other than
 C<new>, then wrapping it.
-
-=item *
-
-Extensibility.
-
-Marlin doesn't offer any official API for building extensions.
 
 =item *
 
@@ -1602,6 +1670,8 @@ L<Marlin::Struct>,
 L<Marlin::Util>,
 L<Marlin::Manual::Principles>,
 L<Marlin::Manual::Comparison>.
+
+L<Marlin::X::Clone>.
 
 L<Class::XSAccessor>, L<Class::XSConstructor>, L<Types::Common>,
 L<Type::Params>, and L<Sub::HandlesVia>.

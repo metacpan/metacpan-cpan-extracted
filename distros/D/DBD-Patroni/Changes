@@ -1,0 +1,11 @@
+Revision history for DBD-Patroni
+
+0.02  2024-12-27
+    - Convert to real DBI driver
+
+0.01  2024-12-27
+    - Initial release
+    - Automatic leader/replica routing based on query type
+    - Patroni REST API cluster discovery
+    - Configurable load balancing (round_robin, random, leader_only)
+    - Automatic failover with retry on connection errors

@@ -1,0 +1,8 @@
+0.1 Sat Dec 27 03:46:13 PM CET 2025
+    - Initial version
+0.2 Sat Dec 27 04:50:34 PM CET 2025
+    - Documenting fetch_again and dbh in instance.
+0.3 Sat Dec 27 06:39:05 PM CET 2025
+    - Fixing doc typo
+0.4 Sat Dec 27 06:43:00 PM CET 2025
+    - Improving doc refererences to other modules.

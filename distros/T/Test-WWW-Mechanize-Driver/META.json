@@ -4,7 +4,7 @@
       "dean@serenevy.net"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "unrestricted"
    ],
@@ -47,27 +47,27 @@
    "provides" : {
       "ApplyTemplate" : {
          "file" : "lib/Test/WWW/Mechanize/Driver/MagicValues.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "FileContents" : {
          "file" : "lib/Test/WWW/Mechanize/Driver/MagicValues.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "Stacked" : {
          "file" : "lib/Test/WWW/Mechanize/Driver/MagicValues.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "Test::WWW::Mechanize::Driver" : {
          "file" : "lib/Test/WWW/Mechanize/Driver.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "Test::WWW::Mechanize::Driver::Util" : {
          "file" : "lib/Test/WWW/Mechanize/Driver/Util.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "Test::WWW::Mechanize::Driver::YAMLLoader" : {
          "file" : "lib/Test/WWW/Mechanize/Driver/YAMLLoader.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "url" : "https://github.com/duelafn/Test-WWW-Mechanize-Driver"
       }
    },
-   "version" : "1.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

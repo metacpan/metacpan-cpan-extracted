@@ -5,9 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   ExtUtils::Manifest: '0'
-  File::Compare: '1.1008'
+  File::Compare: '1.1006'
   File::Path: '2.18'
-  FindBin: '1.54'
+  Path::Tiny: '0.148'
   Socket: '2.04'
   Test2::Require::AuthorTesting: '1.302219'
   Test2::Require::Module: '1.302219'
@@ -59,5 +59,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/mattmartini/Dev-Util.git
-version: v2.19.29
+version: v2.19.33
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

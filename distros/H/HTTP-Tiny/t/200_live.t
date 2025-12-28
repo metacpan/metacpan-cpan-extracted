@@ -11,11 +11,11 @@ my $test_host = "google.com";
 my $test_url  = "http://www.google.com/";
 my $test_re   = qr/google/;
 
-plan 'skip_all' => "Only run for \$ENV{AUTOMATED_TESTING}"
-  unless $ENV{AUTOMATED_TESTING};
+plan 'skip_all' => "Only run for \$ENV{AUTOMATED_TESTING} or \$ENV{RELEASE_TESTING}"
+  unless $ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING};
 
 plan 'skip_all' => "Internet connection timed out"
-  unless IO::Socket::INET->new(
+  unless $ENV{RELEASE_TESTING} || IO::Socket::INET->new(
     PeerHost  => $test_host,
     PeerPort  => 80,
     Proto     => 'tcp',

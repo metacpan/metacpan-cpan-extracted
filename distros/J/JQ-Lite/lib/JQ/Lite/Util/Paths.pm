@@ -474,9 +474,11 @@ sub _apply_leaf_paths {
 }
 
 sub _validate_path_array {
-    my ($path) = @_;
+    my ($path, $caller) = @_;
 
-    die 'getpath(): path must be an array' if ref($path) ne 'ARRAY';
+    $caller //= 'getpath';
+
+    die "$caller(): path must be an array" if ref($path) ne 'ARRAY';
 
     return [ @$path ];
 }
@@ -496,12 +498,12 @@ sub _apply_getpath {
     if (!$@ && defined $decoded) {
         if (ref $decoded eq 'ARRAY') {
             if (@$decoded && ref $decoded->[0] eq 'ARRAY') {
-                for my $path (@$decoded) {
-                    push @paths, _validate_path_array($path);
-                }
+                    for my $path (@$decoded) {
+                        push @paths, _validate_path_array($path, 'getpath');
+                    }
             }
             else {
-                push @paths, _validate_path_array($decoded);
+                push @paths, _validate_path_array($decoded, 'getpath');
             }
         }
         else {
@@ -517,11 +519,11 @@ sub _apply_getpath {
             if (ref $output eq 'ARRAY') {
                 if (@$output && ref $output->[0] eq 'ARRAY') {
                     for my $path (@$output) {
-                        push @paths, _validate_path_array($path);
+                        push @paths, _validate_path_array($path, 'getpath');
                     }
                 }
                 else {
-                    push @paths, _validate_path_array($output);
+                    push @paths, _validate_path_array($output, 'getpath');
                 }
             }
             else {
@@ -552,7 +554,6 @@ sub _apply_setpath {
     my $result      = $value;
 
     for my $path (@paths) {
-        next unless ref $path eq 'ARRAY';
         $result = _set_value_at_path($result, [@$path], $replacement);
     }
 
@@ -574,14 +575,14 @@ sub _resolve_paths_from_expr {
     if (!$@ && defined $decoded) {
         if (ref $decoded eq 'ARRAY') {
             if (@$decoded && ref $decoded->[0] eq 'ARRAY') {
-                push @paths, map { [ @$_ ] } @$decoded;
+                push @paths, map { _validate_path_array($_, 'setpath') } @$decoded;
             }
             else {
-                push @paths, [ @$decoded ];
+                push @paths, _validate_path_array($decoded, 'setpath');
             }
         }
         else {
-            push @paths, [ $decoded ];
+            die 'setpath(): path must be an array';
         }
     }
 
@@ -592,14 +593,14 @@ sub _resolve_paths_from_expr {
 
             if (ref $output eq 'ARRAY') {
                 if (@$output && ref $output->[0] eq 'ARRAY') {
-                    push @paths, grep { ref $_ eq 'ARRAY' } @$output;
+                    push @paths, map { _validate_path_array($_, 'setpath') } @$output;
                 }
                 elsif (!@$output || !ref $output->[0]) {
-                    push @paths, [ @$output ];
+                    push @paths, _validate_path_array($output, 'setpath');
                 }
             }
             elsif (!ref $output || ref($output) eq 'JSON::PP::Boolean') {
-                push @paths, [ $output ];
+                die 'setpath(): path must be an array';
             }
         }
     }

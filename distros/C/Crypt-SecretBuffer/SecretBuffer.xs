@@ -120,7 +120,7 @@ static void* memmem(
    const void *needle, size_t needlelen
 ) {
    if (!needle || !needlelen) {
-      return haystack;
+      return (void*) haystack;
    }
    else if (!haystack || !haystacklen) {
       return NULL;
@@ -379,6 +379,9 @@ static IV parse_alloc_flags(pTHX_ SV *sv) {
 /* for typemap to automatically convert flags */
 typedef int secret_buffer_io_flags;
 typedef int secret_buffer_alloc_flags;
+
+typedef sb_console_state maybe_console_state;
+typedef sb_console_state auto_console_state;
 
 /**********************************************************************************************\
  * Debug helpers
@@ -694,7 +697,7 @@ append_sysread(buf, handle, count)
    INIT:
       IV got;
    PPCODE:
-      got= secret_buffer_append_read(buf, handle, count);
+      got= secret_buffer_append_sysread(buf, handle, count);
       ST(0)= (got < 0)? &PL_sv_undef : sv_2mortal(newSViv(got));
       XSRETURN(1);
 
@@ -711,7 +714,7 @@ append_read(buf, handle, count)
       XSRETURN(1);
 
 void
-append_console_line(buf, handle)
+_append_console_line(buf, handle)
    auto_secret_buffer buf
    PerlIO *handle
    INIT:
@@ -852,6 +855,105 @@ wait(result, timeout=-1)
       } else {
          XSRETURN(0);
       }
+
+MODULE = Crypt::SecretBuffer           PACKAGE = Crypt::SecretBuffer::ConsoleState
+
+void
+new(pkg, ...)
+   const char *pkg;
+   ALIAS:
+      maybe_new = 1
+   INIT:
+      sb_console_state cstate, *magic_cstate;
+      PerlIO *handle= NULL;
+      SV *auto_restore= NULL;
+      SV *set_echo= NULL;
+      SV *objref;
+      if (items == 2) {
+         IO *io = sv_2io(ST(1));
+         handle= io? IoIFP(io) : NULL;
+      } else if (items > 2) {
+         int i= 1;
+         if ((items - 1) & 1)
+            croak("expected even-length key/value attribute list");
+         for (; i < items; i+= 2) {
+            STRLEN len;
+            const char *name= SvPV(ST(i), len);
+            if (len == 4 && memcmp(name, "echo", 4) == 0) {
+               set_echo= ST(i+1);
+            }
+            else if (len == 6 && memcmp(name, "handle", 6) == 0) {
+               IO *io = sv_2io(ST(i+1));
+               handle= io? IoIFP(io) : NULL;
+            }
+            else if (len == 12 && memcmp(name, "auto_restore", 12) == 0) {
+               auto_restore= ST(i+1);
+            }
+            else {
+               croak("Unknown option '%s'", name);
+            }
+         }
+      }
+      if (!handle)
+         croak("'handle' is required");
+   PPCODE:
+      ST(0)= &PL_sv_undef;
+      /* if it fails to initialize, return undef for 'maybe_new', else die */
+      if (!sb_console_state_init(aTHX_ &cstate, handle)) {
+         if (ix == 0)
+            croak("Can't read console/tty state");
+         XSRETURN(1);
+      }
+      if (auto_restore)
+         cstate.auto_restore= SvTRUE(auto_restore);
+      if (set_echo && SvOK(set_echo)) {
+         /* if user called 'maybe_new' and echo state aready matches requested
+            state, return undef. */
+         if (ix == 1 && sb_console_state_get_echo(&cstate) == (bool)SvTRUE(set_echo))
+            XSRETURN(1);
+         if (!sb_console_state_set_echo(&cstate, SvTRUE(set_echo)))
+            croak("set echo = %d failed", (int)(SvTRUE(set_echo)));
+      }
+      /* new blessed ConsoleState object */
+      ST(0)= objref= sv_2mortal(newRV_noinc(&PL_sv_yes));
+      newSVrv(objref, pkg);
+      /* move cstate into MAGIC on object */
+      magic_cstate= secret_buffer_console_state_from_magic(objref, SECRET_BUFFER_MAGIC_AUTOCREATE);
+      *magic_cstate= cstate;
+      /* duplicate file handle in case user closes it */
+      sb_console_state_dup_fd(magic_cstate);
+      XSRETURN(1);
+
+bool
+echo(cstate, enable=NULL)
+   sb_console_state *cstate
+   SV *enable
+   CODE:
+      if (enable != NULL)
+         sb_console_state_set_echo(cstate, SvTRUE(enable));
+      RETVAL= sb_console_state_get_echo(cstate);
+   OUTPUT:
+      RETVAL
+
+bool
+auto_restore(cstate, enable=NULL)
+   sb_console_state *cstate
+   SV *enable
+   CODE:
+      if (enable != NULL)
+         cstate->auto_restore= SvTRUE(enable);
+      RETVAL= cstate->auto_restore;
+   OUTPUT:
+      RETVAL
+
+bool
+restore(cstate)
+   sb_console_state *cstate
+   CODE:
+      RETVAL= sb_console_state_restore(cstate);
+      cstate->auto_restore= false; /* no longer run restore on destructor */
+   OUTPUT:
+      RETVAL
 
 MODULE = Crypt::SecretBuffer           PACKAGE = Crypt::SecretBuffer::Span
 
@@ -1159,6 +1261,7 @@ cmp(lhs, rhs, reverse=false)
          croak("%s", rhs_parse.error);
    CODE:
       RETVAL= sb_parse_codepointcmp(&lhs_parse, &rhs_parse);
+      RETVAL= RETVAL < 0? -1 : RETVAL > 0? 1 : 0;
       if (reverse)
          RETVAL= -RETVAL;
    OUTPUT:

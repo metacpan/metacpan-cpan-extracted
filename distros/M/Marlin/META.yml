@@ -29,22 +29,25 @@ optional_features: {}
 provides:
   Marlin:
     file: lib/Marlin.pm
-    version: '0.008000'
+    version: '0.009000'
   Marlin::Attribute:
     file: lib/Marlin/Attribute.pm
-    version: '0.008000'
+    version: '0.009000'
   Marlin::Role:
     file: lib/Marlin/Role.pm
-    version: '0.008000'
+    version: '0.009000'
   Marlin::Struct:
     file: lib/Marlin/Struct.pm
-    version: '0.008000'
+    version: '0.009000'
   Marlin::TypeConstraint:
     file: lib/Marlin/TypeConstraint.pm
-    version: '0.008000'
+    version: '0.009000'
   Marlin::Util:
     file: lib/Marlin/Util.pm
-    version: '0.008000'
+    version: '0.009000'
+  Marlin::X::Clone:
+    file: lib/Marlin/X/Clone.pm
+    version: '0.009000'
 requires:
   B::Hooks::AtRuntime: '0'
   Class::Method::Modifiers: '0'
@@ -66,5 +69,5 @@ resources:
   homepage: https://metacpan.org/release/Marlin
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-marlin.git
-version: '0.008000'
+version: '0.009000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

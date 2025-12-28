@@ -1,6 +1,6 @@
 package Map::Tube::Rome::Line::MB;
 
-$Map::Tube::Rome::Line::MB::VERSION   = '1.01';
+$Map::Tube::Rome::Line::MB::VERSION   = '1.03';
 $Map::Tube::Rome::Line::MB::AUTHORITY = 'cpan:GDT';
 
 use 5.010;
@@ -15,36 +15,36 @@ Map::Tube::Rome::Line::MB - Rome Subway Map: Linea B.
 
 Rome Subway Map: Linea B
 
-    .-------------------------------------------------------------------------------------------------------.
-    | Station Name             | Connected To                                                               |
-    +--------------------------+----------------------------------------------------------------------------+
-    | Rebibbia                 | Ponte Mammolo                                                              |
-    | Ponte Mammolo            | Santa Maria del Soccorso, Rebibbia                                         |
-    | Santa Maria del Soccorso | Ponte Mammolo, Pietralata                                                  |
-    | Pietralata               | Santa Maria del Soccorso, Monti Tiburtini                                  |
-    | Monti Tiburtini          | Pietralata, Quintiliani                                                    |
-    | Quintiliani              | Monti Tiburtini, Tiburtina                                                 |
-    | Tiburtina                | Quintiliani, Bologna                                                       |
-    | Bologna                  | Policlinico, Tiburtina, Sant'Agnese/Annibaliano                            |
-    | Policlinico              | Castro Pretorio, Bologna                                                   |
-    | Castro Pretorio          | Termini, Policlinico                                                       |
-    | Jonio                    | Conca d'Oro                                                                |
-    | Conca d'Oro              | Jonio, Libia                                                               |
-    | Libia                    | Conca d'Oro, Sant'Agnese/Annibaliano                                       |
-    | Sant'Agnese/Annibaliano  | Libia, Bologna                                                             |
-    | Termini                  | Vittorio Emanuele, Repubblica - Teatro dell'Opera, Castro Pretorio, Cavour |
-    | Cavour                   | Termini, Colosseo                                                          |
-    | Colosseo                 | Cavour, Circo Massimo                                                      |
-    | Circo Massimo            | Colosseo, Piramide                                                         |
-    | Piramide                 | Circo Massimo, Garbatella                                                  |
-    | Garbatella               | Piramide, Basilica San Paolo                                               |
-    | Basilica San Paolo       | Garbatella, Marconi                                                        |
-    | Marconi                  | Basilica San Paolo, EUR Magliana                                           |
-    | EUR Magliana             | Marconi, EUR Palasport                                                     |
-    | EUR Palasport            | EUR Magliana, EUR Fermi                                                    |
-    | EUR Fermi                | EUR Palasport, Laurentina                                                  |
-    | Laurentina               | EUR Fermi                                                                  |
-    '--------------------------+----------------------------------------------------------------------------'
+    .--------------------------------------------------------------------------------------------------------.
+    | Station Name              | Connected To                                                               |
+    +---------------------------+----------------------------------------------------------------------------+
+    | Rebibbia                  | Ponte Mammolo                                                              |
+    | Ponte Mammolo             | Santa Maria del Soccorso, Rebibbia                                         |
+    | Santa Maria del Soccorso  | Ponte Mammolo, Pietralata                                                  |
+    | Pietralata                | Santa Maria del Soccorso, Monti Tiburtini                                  |
+    | Monti Tiburtini           | Pietralata, Quintiliani                                                    |
+    | Quintiliani               | Monti Tiburtini, Tiburtina                                                 |
+    | Tiburtina                 | Quintiliani, Bologna                                                       |
+    | Bologna                   | Policlinico, Tiburtina, Sant'Agnese/Annibaliano                            |
+    | Policlinico               | Castro Pretorio, Bologna                                                   |
+    | Castro Pretorio           | Termini, Policlinico                                                       |
+    | Jonio                     | Conca d'Oro                                                                |
+    | Conca d'Oro               | Jonio, Libia                                                               |
+    | Libia                     | Conca d'Oro, Sant'Agnese/Annibaliano                                       |
+    | Sant'Agnese/Annibaliano   | Libia, Bologna                                                             |
+    | Termini                   | Vittorio Emanuele, Repubblica - Teatro dell'Opera, Castro Pretorio, Cavour |
+    | Cavour                    | Termini, Colosseo                                                          |
+    | Colosseo - Fori Imperiali | Cavour, Circo Massimo, Porta Metronia                                      |
+    | Circo Massimo             | Colosseo, Piramide                                                         |
+    | Piramide                  | Circo Massimo, Garbatella                                                  |
+    | Garbatella                | Piramide, Basilica San Paolo                                               |
+    | Basilica San Paolo        | Garbatella, Marconi                                                        |
+    | Marconi                   | Basilica San Paolo, EUR Magliana                                           |
+    | EUR Magliana              | Marconi, EUR Palasport                                                     |
+    | EUR Palasport             | EUR Magliana, EUR Fermi                                                    |
+    | EUR Fermi                 | EUR Palasport, Laurentina                                                  |
+    | Laurentina                | EUR Fermi                                                                  |
+    '---------------------------+----------------------------------------------------------------------------'
 
 =head1 NOTE
 
@@ -52,6 +52,9 @@ Rome Subway Map: Linea B
 
 =item * The station "Termini" is also part of
           L<Linea A|Map::Tube::Rome::Line::MA>.
+
+=item * The station "Colosseo - Fori Imperiali" is also part of
+          L<Linea C|Map::Tube::Rome::Line::MC>.
 
 =back
 

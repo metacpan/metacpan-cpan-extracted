@@ -8,7 +8,7 @@ use File::ShareDir qw(dist_file);
 use Moo;
 use namespace::autoclean;
 
-$Map::Tube::Rome::VERSION   = '1.02';
+$Map::Tube::Rome::VERSION   = '1.03';
 $Map::Tube::Rome::AUTHORITY = 'cpan:GDT';
 
 has json => (is => 'ro', default => sub { dist_file('Map-Tube-Rome', 'rome-map.json') });
@@ -26,10 +26,6 @@ __END__
 =head1 NAME
 
 Map::Tube::Rome - Interface to the Rome tube map
-
-=head1 VERSION
-
-version 1.00
 
 =head1 SYNOPSIS
 

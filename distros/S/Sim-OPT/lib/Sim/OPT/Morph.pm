@@ -45,7 +45,7 @@ calc_newctl checkfile constrain_controls read_controls read_control_constraints 
 apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
 vary_net read_net apply_node_changes readobsfile obs_modify
 decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
-gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr genmodnew
+gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr 
 ); # our @EXPORT = qw( );
 
 $VERSION = '0.173'; # our $VERSION = '';
@@ -1452,10 +1452,6 @@ sub morph
           @countsteps = @$countsteps_r;
           $laxmode = $laxmod;
         }        
-		else 
-        {
-          say $tee "OPTcue is not installed and this operation is not possible without it.";
-        }
 
 		my $countvar_after = $d_after{countvar};
 		my $countstep = $d{countstep};
@@ -1877,7 +1873,14 @@ sub morph
 										}
 										elsif ( $modtype eq "genmodnew" )
 										{
-											genmodnew( $to, $stepsvar, $countop, $countstep, \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
+                                            if ( Sim::OPT::checkOPTcue() )
+                                            {
+                                              Sim::OPTcue::genmodnew( $to, $stepsvar, $countop, $countstep, \@applytype, \@genmodnew, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance, $tee );
+                                            }
+                                            else 
+                                            {
+                                                say $tee "TO PERFORM THE OPERATION REQUESTED (genmodnew), OPTcue must be installed, but isn't. So, quitting.";
+                                            }
 										}
 										elsif ( $modtype eq "change_thickness" )
 										{
@@ -2259,7 +2262,34 @@ sub morph
 											}
 										}
 									}
+                                    
 								}
+
+                                say $tee "PREFOUNDIT \$laxmode $laxmode";
+                                say $tee "PREFOUNDIT \$countvar $countvar \$blockelts->[-1] $blockelts->[-1] \$blockelts[-1] $blockelts[-1] \@blockelts " . dump ( @blockelts );
+                                say $tee "PREFOUNDIT \$countstep $countstep \$varnums{\$countvar} $varnums{$countvar} "; 
+                                say $tee "PREFOUNDIT \$countop $countop \$#applytype $#applytype \@applytype ";
+                                say $tee "PREFOUNDIT \$dowhat{shadeupdate} $dowhat{shadeupdate}";
+                                if( $laxmode eq "n" )
+                                {
+                                  if ( ( ( $countvar == $blockelts[-1] ) ) and ( $countstep == $varnums{$countvar} ) and ( $countop == $#applytype ) and ( $dowhat{shadeupdate} eq "y" ) )
+                                  {
+                                    recalculateish( $to, $stepsvar, $countop, 
+                                        $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
+                                        \@menus, $countinstance, \%dowhat );
+                                        #say $tee "FOUNDIT";
+                                  }
+                                }
+                                elsif( $laxmode eq "y" )
+                                {
+                                 if ( ( $countvar == $blockelts[-1] ) and ( $countop == $#applytype ) and ( $dowhat{shadeupdate} eq "y" ) )
+                                 {
+                                    recalculateish( $to, $stepsvar, $countop, 
+                                        $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
+                                        \@menus, $countinstance, \%dowhat );
+                                        #say $tee "FOUNDIT";
+                                  }
+                                }
 								$countop++;
 								print `cd $mypath`;
 							}
@@ -3668,9 +3698,11 @@ sub change_thickness
 	
 	my ( $entry_to_change, $countstrata, $stratum_to_change, $min, $max, $change_stratum, $enter_change_entry, $swing, $pace, $thickness );
 	my ( @strata_to_change, @min_max_values , @change_strata, @change_entries, @change_entries_with_thicknesses, $grouplisting );
-	my $thiscount = 0;
-    if ( $stepsvar > 1 )
+	
+
+    #if ( $stepsvar > 1 )
 	{
+        my $thiscount = 0;
 		foreach my $entrypair_to_change ( @entries_to_change )
 		{
 			if ( not( ref( $entrypair_to_change ) ) )
@@ -3679,14 +3711,15 @@ sub change_thickness
 			}
 			else
 			{
-				my $group_to_change = $entrypair_to_change->[0];
-				my $entry_to_change = $entrypair_to_change->[1];
+				$group_to_change = $entrypair_to_change->[0];
+				$entry_to_change = $entrypair_to_change->[1];
 			}
             
             $grouplisting = $grouplistings[$thiscount];
 			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] };
             @min_max_values_refs = @{ $groups_of_couples_of_min_max_values[$thiscount] };
-			$countstrata = 0;
+			
+            $countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
 			{
                 my @min_max_values = @{ $min_max_values_refs[$countstrata] };
@@ -3697,9 +3730,7 @@ sub change_thickness
 				my $thickness = $min + ( $pace * ( $countstep - 1 ) );
 				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
-
-        my $printthis;
-
+                my $printthis;
 				if ( not( ref( $entrypair_to_change ) ) )
 				{
                                  $printthis =
@@ -3716,6 +3747,7 @@ $thickness
 -
 >
 y
+-
 -
 -
 -
@@ -3754,6 +3786,7 @@ $thickness
 -
 >
 y
+-
 -
 -
 -
@@ -4109,13 +4142,14 @@ sub obs_modify
 
 sub recalculateish
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance, $dowhat_r ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my $recalculateish = $recalculateish_ref->[ $countop ];
 	my @things = @$recalculateish;
 	my $whatto = shift( @things );
+    my %dowhat = %$dowhat_r;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -4179,6 +4213,27 @@ YYY
 
 	  }
 	}
+    elsif ( $dowhat{shadeupdate} eq "y" )
+    {
+      $printthis =
+"cd $to/cfg/
+prj -file $fileconfig -mode script<<YYY
+m
+c
+f
+c
+*
+b
+a
+-
+-
+-
+-
+-
+-
+YYY
+";
+    }
 
 
 	unless ($exeonfiles eq "n")
@@ -5000,428 +5055,6 @@ sub pin_obstructions
 	close NEWFILE;
 } # END SUB pin_obstructions
 
-
-
-
-
-sub genmodnew
-{
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genmodnew_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
-
-    say $tee "IN GENMODNEW \$stepsvar: " . dump ( $stepsvar );
-    say $tee "IN GENMODNEW \$countstep: " . dump ( $countstep );
-    say $tee "IN GENMODNEW \$countvar: " . dump ( $countvar );
-    say $tee "IN GENMODNEW \$to: " . dump ( $to );
-    say $tee "IN GENMODNEW \$countop: " . dump ( $countop );
-
-
-	my @applytype = @$applytype_ref;
-	my @genmodnew = @ {$genmodnew_ref };
-    my $cntinst = $countinstance ;
-	say $tee "Applying constraints with genmodnew for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my @sourcefiles = @{ $genmodnew[$countop][0] }; #say $tee "OUTER \@sourcefiles: " - dump ( @sourcefiles );
-	my @numberfiles = @{ $genmodnew[$countop][1] }; #say $tee "OUTER \@numberfiles: " - dump ( @numberfiles );
-	my @configfiles = @{ $genmodnew[$countop][2] }; #say $tee "OUTER \@configfiles: " - dump ( @configfiles );
-	my @incrs = @{ $genmodnew[$countop][3] };  #say $tee "OUTER \@incrs: " - dump ( @incrs );
-	my @subtypes = @{ $genmodnew[$countop][4] }; #say $tee "OUTER \@subtypes: " - dump ( @subtypes );
-	my @vertpairs = @{ $genmodnew[$countop][5] }; #say $tee "OUTER \@vertpairs: " - dump ( @vertpairs );
-	my @vertstomoves = @{ $genmodnew[$countop][6] }; #say $tee "OUTER \@vertstomoves: " - dump ( @vertstomoves );
-	
-    my ( %ver, %obs, %oldver, %oldobs, %eds );
-    
-	my $countfile = 0;
-    foreach my $sourcefile ( @sourcefiles )
-	{
-
-		my $sourceaddress = "$to$sourcefile";  #say $tee "INSIDE FIRST \$sourceaddress: " . dump( $sourceaddress );
-
-		open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
-		my @lines = <SOURCEFILE>;
-		close SOURCEFILE;
-		my $num = $numberfiles[$countfile]; #say $tee "INSIDE FIRST \$num: " . dump( $num );
-        
-		my $vertnum = 0;
-        my $obsnum = 0;
-		foreach my $line ( @lines )
-		{
-			$line =~ s/^\s+//;
-			my @rowelts = split(/\s+|,/, $line);
-			{
-
-				if   ($rowelts[0] eq "*vertex" )
-				{ 
-					$vertnum++;
-					#say "foundvert $vertnum";
-					@{ $ver{$num}{$vertnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3] );
-				}
-		        if   ($rowelts[0] eq "*obs" )
-				{ 
-					$obsnum++;
-					#say "foundobs $obsnum";
-					@{ $obs{$num}{$obsnum} } = ( $rowelts[0], $rowelts[1], $rowelts[2], $rowelts[3],
-		            $rowelts[4], $rowelts[5], $rowelts[6], $rowelts[7], $rowelts[8], $rowelts[9], $rowelts[10], $rowelts[13] ) ;
-				}
-			}
-        }
-
-        %oldver = %{ dclone(\%ver) };
-        %oldobs = %{ dclone(\%obs) };
-
-
-        my $cn = 0;
-        foreach my $line ( @lines )
-        {
-            chomp $line;
-            if ( $line =~ /#&&/ )
-            {
-                $line =~ s/^\s+//;
-                $line =~ s/\s+/ /;
-                my @transitional = split(/#&&/, $line);
-                my $leftpart = $transitional[0]; #say $tee "AAAPPLY_CONSTRAINTS \$leftpart: " . dump( $leftpart );
-                my @elts = split(/\s+|,/, $leftpart); #say $tee "AAAPPLY_CONSTRAINTS \@elts: " . dump( @elts );
-
-                my $rightpart = $transitional[1]; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartA: " . dump( $rightpart );
-                $rightpart =~ s/^\s+//; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartB: " . dump( $rightpart );
-                $rightpart =~ s/\s+$//; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartC: " . dump( $rightpart );
-                $rightpart =~ s/\s+/ /; #say $tee "AAAPPLY_CONSTRAINTS \$rightpartD: " . dump( $rightpart );
-                my @ins = split(/\s+|,/, $rightpart); #say $tee "AAAPPLY_CONSTRAINTS \@ins: " . dump( @ins );
-
-                foreach my $in ( @ins )
-                {
-                    unless ( ( $in eq undef ) or ( $leftpart eq undef ) or ( $rightpart eq undef ) )
-                    {
-                        my @elements = split(/-/, $in); #say $tee "AAAPPLY_CONSTRAINTS \@elements: " . dump( @elements );
-                        my $name = $elements[0];
-                        my $position = $elements[1];
-                        $eds{$name}{file} = $sourcefile; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{file}: " . dump( $eds{$name}{file} );
-                        $eds{$name}{line} = $cn; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{line}: " . dump( $eds{$name}{line} );
-                        $eds{$name}{position} = $position; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{position}: " . dump( $eds{$name}{position} );
-                        $eds{$name}{value} = $elts[$position];  #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{value}: " . dump( $eds{$name}{value} );
-                        my $length = length($in); #say $tee "AAAPPLY_CONSTRAINTS \$length: " . dump( $length );
-                        $eds{$name}{length} = $length; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{length}: " . dump( $eds{$name}{length} );
-                        my $beginning = index($line, $in);
-                        $eds{$name}{beginning} = $beginning; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{beginning}: " . dump( $eds{$name}{beginning} );
-                        my $end = $beginning + $length;
-                        $eds{$name}{end} = $end; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{end}: " . dump( $eds{$name}{end} );
-                        $eds{$name}{rightpart} = $rightpart; #say $tee "AAAPPLY_CONSTRAINTS \$eds{\$name}{rightpart}: " . dump( $eds{$name}{rightpart} );
-                    }
-                }
-            }
-            $cn++;
-        }
-       
-        my $countype = 0;
-        foreach my $subtype ( @subtypes )
-        {
-        	my $incr = $incrs[$countype]; #say $tee "INSIDE FIRST IN FIRST \$incr: " . dump( $incr );
-    	    my @vertpair = @{ $vertpairs[$countype] }; #say $tee "INSIDE FIRST IN FIRST \@vertpair: " . dump( @vertpair );
-    	    my ( $firstvert, $secondvert ) = @vertpair; #say $tee "INSIDE FIRST IN FIRST \$firstvert, \$secondvert: " . dump( $firstvert, $secondvert );
-    	    my @vertstomove = @{ $vertstomoves[$countype] }; #say $tee "INSIDE FIRST IN FIRST \@vertstomove: " . dump( @vertstomove );
-
-    	    if ( "all" ~~ @vertstomove )
-    	    {
-    	    	@vertstomove = ( 1 .. $vertnum );
-    	    } #say $tee "AFTER all PROCESSING \@vertstomove: " . dump( @vertstomove );
-
-    	    my ( $swing, $base, $pace, $val, $myval );
-    		my $count = 0;
-    		  
-    		if ( ref ( $incr ) )
-    		{
-    			my $min = $incr->[0];
-    			my $max = $incr->[1];
-    			$swing->[$countype] = ( $max - $min );
-    			$base->[$countype] = ( 0 - $min );
-    		}
-    		else
-    		{
-    			$swing->[$countype] = ( 2 * $incr ); 
-    			$base->[$countype] = ( 0 - $incr );
-    		}
-
-    		$pace->[$countype] = ( $swing->[$countype] / ( $stepsvar - 1 ) );
-    		$val->[$countype] = ( $base->[$countype] + ( $pace->[$countype] * ( $countstep - 1 ) ) ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
-            $myval = $val->[$countype]; #say $tee "INSIDE FIRST IN FIRST \$myval: " . dump( $myval );
-    	    
-    	    
-        	if ( ( $subtype eq "pairedmove" ) or ( $subtype eq "pairedobsmove" ) or ( $subtype eq "rotation" ) or ( $subtype eq "obsrotation" ) )
-        	{   #say $tee "\%ver: " . dump ( \%ver );
-        	    #say $tee "\%obs: " . dump ( \%obs );
-        	    my ( $vert1, $vert2 );
-        	    unless ( ref( $firstvert ) )
-        	    {
-        	      $vert1 = $ver{$num}{$firstvert}; #say $tee "INSIDE SECOND \$num: $num, \$firstvert: " . dump ($firstvert) ;
-        	    }
-        	    else
-        	    {
-                  $vert1 = $firstvert; #say $tee "INSIDE SECOND ISREF \$num: $num, \$firstvert: " . dump ($firstvert) ;
-        	    }
-
-        	    unless ( ref( $secondvert ) )
-        	    {
-        	      $vert2 = $ver{$num}{$secondvert}; #say $tee "INSIDE SECOND \$num: $num, \$secondvert: " . dump($secondvert);
-        	    }
-        	    else
-        	    {
-                   $vert2 = $secondvert; #say $tee "INSIDE SECOND ISREF \$num: $num, \$secondvert: " . dump($secondvert);
-        	    }
-	    	
-
-	    	    my $xdiff = - ( $vert1->[0] - $vert2->[0] ); #say $tee "INSIDE SECOND \$xdiff: " . dump( $xdiff );
-	    	    my $ydiff = - ( $vert1->[1] - $vert2->[1] ); #say $tee "INSIDE SECOND \$ydiff: " . dump( $ydiff );
-	    	    my $zdiff = - ( $vert1->[2] - $vert2->[2] ); #say $tee "INSIDE SECOND \$zdiff: " . dump( $zdiff );
-
-	    	    my $dist = sqrt ( ( $xdiff ** 2 ) + ( $ydiff ** 2 ) + ( $zdiff ** 2 ) ); #say $tee "INSIDE SECOND \$dist: " . dump( $dist );
-
-	    	    my ($demult, $xdemult, $ydemult, $zdemult, $xadd, $yadd, $zadd );
-
-	    	    if ( $dist != 0 )
-	    	    {
-		           $demult = ( 1 / $dist ); #say $tee "INSIDE SECOND \$demult: " . dump( $demult );
-
-		           $xdemult = ( $xdiff * $demult ); #say $tee "INSIDE SECOND \$xdemult: " . dump( $xdemult );
-		           $ydemult = ( $ydiff * $demult ); #say $tee "INSIDE SECOND \$ydemult: " . dump( $ydemult );
-		           $zdemult = ( $zdiff * $demult ); #say $tee "INSIDE SECOND \$zdemult: " . dump( $zdemult );
-		        }
-		        else 
-		        {
-                   $xdemult = 0; #say $tee "INSIDE SECOND \$xdemult: " . dump( $xdemult );
-		           $ydemult = 0; #say $tee "INSIDE SECOND \$ydemult: " . dump( $ydemult );
-		           $zdemult = 0; #say $tee "INSIDE SECOND \$zdemult: " . dump( $zdemult );
-		        }
-
-		        $xadd = ( $xdemult * $myval ); #say $tee "INSIDE SECOND \$xadd: " . dump( $xadd );
-		        $yadd = ( $ydemult * $myval ); #say $tee "INSIDE SECOND \$yadd: " . dump( $yadd );
-		        $zadd = ( $zdemult * $myval ); #say $tee "INSIDE SECOND \$zadd: " . dump( $zadd );
-        
-        
-                if ( $subtype eq "pairedmove" ) 
-                {
-                	foreach my $v ( @vertstomove )
-        		      {
-        		      	$ver{$num}{$v}->[0] = ( $ver{$num}{$v}->[0] + $xadd );
-        		      	$ver{$num}{$v}->[1] = ( $ver{$num}{$v}->[1] + $yadd );
-        		        $ver{$num}{$v}->[2] = ( $ver{$num}{$v}->[2] + $zadd );
-        		      }
-                }
-        
-
-                if ( $subtype eq "pairedobsmove" ) 
-                {
-                	foreach my $v ( @vertstomove )
-        		      {
-        		      	$obs{$num}{$v}->[1] = ( $obs{$num}{$v}->[1] + $xadd );
-        		      	$obs{$num}{$v}->[2] = ( $obs{$num}{$v}->[2] + $yadd );
-        		        $obs{$num}{$v}->[3] = ( $obs{$num}{$v}->[3] + $zadd );
-        		      }
-                }
-
-
-                if ( ( $subtype eq "rotation" ) or ( $subtype eq "obsrotation" ) )
-                {
-                	if ( $vert2->[0] eq "" )
-                	{
-                		$vert2->[0] = $vert1->[0];
-                		$vert2->[1] = $vert1->[1];
-                		$vert2->[2] = ( $vert1->[2] + 1 );
-                	}
-                } say $tee "\$vert1: " . dump( $vert1 ); #say $tee "\$vert2: " . dump( $vert2 );
-
-                if ( $subtype eq "rotation" ) 
-                {
-                  foreach my $v ( @vertstomove )
-                  {
-                  	( $ver{$num}{$v}->[0], $ver{$num}{$v}->[1], $ver{$num}{$v}->[2] ) = 
-                  	rotateabout( $ver{$num}{$v}->[0], $ver{$num}{$v}->[1], $ver{$num}{$v}->[2],       # point to rotate (P)
-          						$vert1->[0], $vert1->[1], $vert1->[2],     # point D on axis
-          						$vert2->[0], $vert2->[1], $vert2->[2],     # point E on axis
-          						$myval 
-          					);
-                  }
-                }
-
-                if ( $subtype eq "obsrotation" ) 
-                {
-                  foreach my $v ( @vertstomove )
-                  {
-                  	( $obs{$num}{$v}->[1], $obs{$num}{$v}->[2], $obs{$num}{$v}->[3] ) = 
-                  	  rotateabout( $obs{$num}{$v}->[1], $obs{$num}{$v}->[2], $obs{$num}{$v}->[3],       # point to rotate (P)
-          			  $vert1->[0], $vert1->[1], $vert1->[2],     # point D on axis
-          			  $vert2->[0], $vert2->[1], $vert2->[2],     # point E on axis
-          			  $myval 
-          			);
-  					$obs{$num}{$v}->[7] = ( $obs{$num}{$v}->[7] + $myval );
-  					if ( $obs{$num}{$v}->[7] > 360 )
-  					{
-  						$obs{$num}{$v}->[7] = ( $obs{$num}{$v}->[7] - 360 );
-  					}
-  					elsif ( $obs{$num}{$v}->[7] < 0 )
-  					{
-  						$obs{$num}{$v}->[7] = ( $obs{$num}{$v}->[7] + 360 );
-  					}
-                  }
-                }
-    	    }
-    		$countype++;
-    	}
-    	$countfile++;
-    }
-
-
-	my ( $swing, $base, $pace, $val );
-    my $count = 0;
-    foreach $incr ( @incrs )
-    {
-    	if ( ref ( $incr ) )
-    	{
-    		my $min = $incr->[0];
-    		my $max = $incr->[1];
-    		$swing->[$count] = ( $max - $min );
-    		$base->[$count] = ( 0 - $min );
-    	}
-    	else
-    	{
-    		$swing->[$count] = ( 2 * $incr );
-    		$base->[$count] = ( 0 - $incr );
-    	}
-
-    	$pace->[$count] = ( $swing->[$count] / ( $stepsvar - 1 ) );
-    	$val->[$count] = ( $base->[$count] + ( $pace->[$count] * ( $countstep - 1 ) ) ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
-    	$count++;
-    }
-
-	  
-    foreach my $configfile ( @configfiles )
-    {
-        my $configaddress = "$to$configfile";
-        if ( defined ( $configaddress ) )
-    	{
-    		if ( -e $configaddress )
-    		{
-    		    #do $configaddress;
-    			eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED.
-    			if ($@) { print $tee "ERROR in $configaddress:\n$@"; die; }
-    		}
-    		else
-    		{
-    			say $tee "$configaddress does not exist. Exiting." and die;
-    		}
-    	}
-    }
-
-    my $countfile = 0;
-    foreach my $sourcefile ( @sourcefiles )
-	{
-        my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
-
-		open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
-		my @lines = <SOURCEFILE>;
-		close SOURCEFILE;
-		my $old = $sourceaddress . ".old" ;
-        print $tee `mv $sourceaddress $old `;
-
-		my $num = $numberfiles[$countfile];
-
-		open( SOURCEFILE, ">$sourceaddress" ) or die "Can't open $sourceaddress: $!\n";
-    
-        my $countline = 0;
-        my $countv = 0;
-        my $countob = 0;
-        foreach my $lin ( @lines )
-        {
-        	chomp $lin;
-        	if ( $lin =~ /^\*vertex/ )
-        	{
-             $countv++;
-             my $ve = $ver{$num}{$countv};
-             $ve->[0] = sprintf("%.5f", $ve->[0]);
-             $ve->[1] = sprintf("%.5f", $ve->[1]);
-             $ve->[2] = sprintf("%.5f", $ve->[2]);
-         	   print SOURCEFILE "*vertex  $ve->[0]  $ve->[1]  $ve->[2]   #   $countv\n";
-          }
-          elsif ( $lin =~ /^\*obs/ )
-          {
-            $countob++;
-            my $ob = $obs{$num}{$countob};
-            print SOURCEFILE "*obs,$ob->[1],$ob->[2],$ob->[3],$ob->[4],$ob->[5],$ob->[6],$ob->[7],$ob->[8],$ob->[9] $ob->[10]  #   block  $countob\n";
-          }
-          else
-        	{
-             print SOURCEFILE "$lin\n";
-        	}
-        	$countline++;
-        }
-        $countfile++;
-        close SOURCEFILE;
-    }
-    
-    unless ( !%eds )
-    {
-        foreach my $sourcefile ( @sourcefiles )
-        {
-            my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
-
-            open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
-            my @lines = <SOURCEFILE>;
-            close SOURCEFILE;
-            my $old = $sourceaddress . ".oldnew" ;
-            print $tee `mv $sourceaddress $oldnew `;
-
-            my $cnt = 0;
-            foreach my $lin ( @lines )
-            {
-                if ( $lin =~ /#&&/ )
-                {   #say $tee "APPLY_CONSTRAINTS \$lin: " . dump( $lin );
-                    $lin =~ s/ +/ /;
-                    my @splits = split( "$separator", $lin ); #say $tee "APPLY_CONSTRAINTS \@splits: " . dump( @splits );
-
-                    my @transitional = split( /#&&/, $lin );
-                    my $rightpart = $transitional[1];
-                    $rightpart =~ s/^ +//;
-                    $rightpart =~ s/ +/ /; #say $tee "APPLY_CONSTRAINTS \$rightpart: " . dump( $rightpart );
-                    my @elms = split( / /, $rightpart ); #say $tee "APPLY_CONSTRAINTS \@elms: " . dump( @elms );
-
-                    foreach my $elm ( @elms )
-                    {
-                        chomp $elm;
-                        my ( $name, $number ) = split( "-", $elm );
-
-                        #say $tee "APPLY_CONSTRAINTS \$name: " . dump( $name );
-                        if ( $eds{$name}{file} eq $sourcefile )
-                        {
-                            #if ( $eds{$name}{line} eq $cnt )
-                            #{
-                                $splits[$eds{$name}{position}] = $eds{$name}{newvalue};
-
-                                #$line = ( substr( $line, 0, $eds{$name}{beginning} ) ) . ( substr( $line, $eds{$name}{end} ) ); say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
-                                #substr( $line, $eds{$name}{beginning}, 0) = $eds{$name}{newvalue}; say $tee "APPPLY_CONSTRAINTS \$line!: " . dump( $line );
-
-                                #unless ( $line =~ /#&&/ )
-                                #{
-                                # $line . " $rightpart";
-                                #}
-                            #}
-                        }
-                    }
-
-                    my $novelline;
-                    foreach my $split ( @splits )
-                    {
-                        $split = $split . "$separator";
-                        $novelline = $novelline . $split;
-                    }
-                    $line = $novelline . "\n";
-                }
-                $line =~ s/\\00//g ;
-                print SOURCEFILE $line;
-                $cnt++;
-            }
-            close SOURCEFILE;
-        }
-    }
-    say $tee "#Tranlating vertices while applying constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\n";
-}   # END SUB genmodnew
 
 
 
@@ -8195,6 +7828,11 @@ sub vary_net
 	apply_component_changes(\@new_components);
 
 } # END SUB vary_net.
+
+
+
+
+
 ######################################################### END OF SECTION DEDICATED TO NET VARIATION
 
 1;
