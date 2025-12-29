@@ -1,0 +1,15 @@
+Revision history for IO-Async-Pg
+
+0.001001  2025-12-28
+    - Initial public release (BETA - API subject to change)
+    - Async PostgreSQL client built on IO::Async and DBD::Pg
+    - Connection pooling with min/max connections, idle timeout, queue management
+    - Async query execution with positional ($1, $2) and named (:name) placeholders
+    - Transaction support with automatic commit/rollback
+    - Nested transactions via PostgreSQL SAVEPOINTs
+    - Isolation level support (serializable, repeatable read, etc.)
+    - Streaming cursors for memory-efficient large result set processing
+    - LISTEN/NOTIFY pub/sub for real-time messaging
+    - Fork safety detection
+    - Comprehensive error hierarchy with SQLSTATE mapping
+    - 8 examples demonstrating all major features

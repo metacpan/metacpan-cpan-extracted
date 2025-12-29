@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.034';
+$ExtUtils::Builder::Conf::VERSION = '0.035';
 use strict;
 use warnings;
 
@@ -100,7 +100,7 @@ sub add_methods {
 			extra_args   => \@extra_linker_flags,
 		);
 
-		my $exe_file = $inner->exe_file($basename, $dir);
+		my $exe_file = $inner->executable_file($basename, $dir);
 		$inner->link([ $o_file ], $exe_file, %link_args);
 
 		my $run = $args{run} // 1;
@@ -243,7 +243,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

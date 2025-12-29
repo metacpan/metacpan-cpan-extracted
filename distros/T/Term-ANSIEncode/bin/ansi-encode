@@ -132,23 +132,28 @@ VERSION
     
     $ansi->ansi_output($text);
 } elsif ($ansi_modes) {
-    my $out = "[% BRIGHT WHITE %]-------- [% BRIGHT YELLOW %]Modes supported [% BRIGHT WHITE %]----------[% RESET %]\n";
-    if ($c16) {
-        $out .= "           ANSI 16:  [% GREEN %]Supported[% RESET %]\n";
+    my $out = "[% B_YELLOW %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
+    if ($c8) {
+        $out .= "     ANSI 3 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "           ANSI 16:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "     ANSI 3 BIT:  [% RED %]Not Supported[% RESET %]\n";
+    }
+    if ($c16) {
+        $out .= "     ANSI 4 BIT:  [% GREEN %]Supported[% RESET %]\n";
+    } else {
+        $out .= "     ANSI 4 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($c256) {
-        $out .= "          ANSI 256:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "     ANSI 8 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "          ANSI 256:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "     ANSI 8 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
     if ($crgb) {
-        $out .= "    ANSI TrueColor:  [% GREEN %]Supported[% RESET %]\n";
+        $out .= "    ANSI 24 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
-        $out .= "    ANSI TrueColor:  [% RED %]Not Supported[% RESET %]\n";
+        $out .= "    ANSI 24 BIT:  [% RED %]Not Supported[% RESET %]\n";
     }
-    $out .= "[% BRIGHT WHITE %]-----------------------------------[% RESET %]\n";
+    $out .= "[% B_YELLOW %]                                 [% RESET %]\n";
     $ansi->ansi_output($out);
 } elsif ($help) {
     $ansi->ansi_output(help_text());
@@ -163,70 +168,73 @@ features.
 
 NOTE:  [% ITALIC %]Use "less -r" to view ANSI in "less"[% RESET %]
 
-[% BRIGHT GREEN %]╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮[% RESET %]
+[% BRIGHT GREEN %]╭─────────────────────────────────────────────────────────────────────────────────────────────╮[% RESET %]
 TOKENS
 ###
-    $to .= "$bar                     ▄▄▄▄▄▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄   ▄    ▄   ▄▄▄▄▄▄▄▄▄▄▄   ▄▄        ▄   ▄▄▄▄▄▄▄▄▄▄▄                         $bar\n";
-    $to .= "$bar                    ▐[% RED %]░░░░░░░░░░░[% RESET %]▌ ▐[% RED %]░░░░░░░░░░░[% RESET %]▌ ▐[% RED %]░[% RESET %]▌  ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░░░░░░░░░░░[% RESET %]▌ ▐[% RED %]░░[% RESET %]▌      ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░░░░░░░░░░░[% RESET %]▌                        $bar\n";
-    $to .= "$bar                     ▀▀▀▀█[% RED %]░[% RESET %]█▀▀▀▀  ▐[% RED %]░[% RESET %]█▀▀▀▀▀▀▀█[% RED %]░[% RESET %]▌ ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░[% RESET %]▌  ▐[% RED %]░[% RESET %]█▀▀▀▀▀▀▀▀▀  ▐[% RED %]░[% RESET %]▌[% RED %]░[% RESET %]▌     ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░[% RESET %]█▀▀▀▀▀▀▀▀▀                         $bar\n";
-    $to .= "$bar                         ▐[% YELLOW %]░[% RESET %]▌      ▐[% YELLOW %]░[% RESET %]▌       ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌▐[% YELLOW %]░[% RESET %]▌   ▐[% YELLOW %]░[% RESET %]▌           ▐[% YELLOW %]░[% RESET %]▌▐[% YELLOW %]░[% RESET %]▌    ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌                                  $bar\n";
-    $to .= "$bar                         ▐[% YELLOW %]░[% RESET %]▌      ▐[% YELLOW %]░[% RESET %]▌       ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌[% YELLOW %]░[% RESET %]▌    ▐[% YELLOW %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌   ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]█▄▄▄▄▄▄▄▄▄                         $bar\n";
-    $to .= "$bar                         ▐[% GREEN %]░[% RESET %]▌      ▐[% GREEN %]░[% RESET %]▌       ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░░[% RESET %]▌     ▐[% GREEN %]░░░░░░░░░░░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌  ▐[% GREEN %]░[% RESET %]▌  ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░░░░░░░░░░░[% RESET %]▌                        $bar\n";
-    $to .= "$bar                         ▐[% GREEN %]░[% RESET %]▌      ▐[% GREEN %]░[% RESET %]▌       ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌[% GREEN %]░[% RESET %]▌    ▐[% GREEN %]░[% RESET %]█▀▀▀▀▀▀▀▀▀  ▐[% GREEN %]░[% RESET %]▌   ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌  ▀▀▀▀▀▀▀▀▀█[% GREEN %]░[% RESET %]▌                        $bar\n";
-    $to .= "$bar                         ▐[% CYAN %]░[% RESET %]▌      ▐[% CYAN %]░[% RESET %]▌       ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌▐[% CYAN %]░[% RESET %]▌   ▐[% CYAN %]░[% RESET %]▌           ▐[% CYAN %]░[% RESET %]▌    ▐[% CYAN %]░[% RESET %]▌▐[% CYAN %]░[% RESET %]▌           ▐[% CYAN %]░[% RESET %]▌                        $bar\n";
-    $to .= "$bar                         ▐[% CYAN %]░[% RESET %]▌      ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌  ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% CYAN %]░[% RESET %]▌     ▐[% CYAN %]░[% RESET %]▐[% CYAN %]░[% RESET %]▌  ▄▄▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌                        $bar\n";
-    $to .= "$bar                         ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌  ▐[% BLUE %]░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌                        $bar\n";
-    $to .= "$bar                          ▀        ▀▀▀▀▀▀▀▀▀▀▀   ▀    ▀   ▀▀▀▀▀▀▀▀▀▀▀   ▀        ▀▀   ▀▀▀▀▀▀▀▀▀▀▀                         $bar\n";
+    $to .= "$bar        ▄▄▄▄▄▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄   ▄    ▄   ▄▄▄▄▄▄▄▄▄▄▄   ▄▄        ▄   ▄▄▄▄▄▄▄▄▄▄▄         $bar\n";
+    $to .= "$bar       ▐[% RED %]░░░░░░░░░░░[% RESET %]▌ ▐[% RED %]░░░░░░░░░░░[% RESET %]▌ ▐[% RED %]░[% RESET %]▌  ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░░░░░░░░░░░[% RESET %]▌ ▐[% RED %]░░[% RESET %]▌      ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░░░░░░░░░░░[% RESET %]▌        $bar\n";
+    $to .= "$bar        ▀▀▀▀█[% RED %]░[% RESET %]█▀▀▀▀  ▐[% RED %]░[% RESET %]█▀▀▀▀▀▀▀█[% RED %]░[% RESET %]▌ ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░[% RESET %]▌  ▐[% RED %]░[% RESET %]█▀▀▀▀▀▀▀▀▀  ▐[% RED %]░[% RESET %]▌[% RED %]░[% RESET %]▌     ▐[% RED %]░[% RESET %]▌ ▐[% RED %]░[% RESET %]█▀▀▀▀▀▀▀▀▀         $bar\n";
+    $to .= "$bar            ▐[% YELLOW %]░[% RESET %]▌      ▐[% YELLOW %]░[% RESET %]▌       ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌▐[% YELLOW %]░[% RESET %]▌   ▐[% YELLOW %]░[% RESET %]▌           ▐[% YELLOW %]░[% RESET %]▌▐[% YELLOW %]░[% RESET %]▌    ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌                  $bar\n";
+    $to .= "$bar            ▐[% YELLOW %]░[% RESET %]▌      ▐[% YELLOW %]░[% RESET %]▌       ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌[% YELLOW %]░[% RESET %]▌    ▐[% YELLOW %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]▌   ▐[% YELLOW %]░[% RESET %]▌ ▐[% YELLOW %]░[% RESET %]█▄▄▄▄▄▄▄▄▄         $bar\n";
+    $to .= "$bar            ▐[% GREEN %]░[% RESET %]▌      ▐[% GREEN %]░[% RESET %]▌       ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░░[% RESET %]▌     ▐[% GREEN %]░░░░░░░░░░░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌  ▐[% GREEN %]░[% RESET %]▌  ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░░░░░░░░░░░[% RESET %]▌        $bar\n";
+    $to .= "$bar            ▐[% GREEN %]░[% RESET %]▌      ▐[% GREEN %]░[% RESET %]▌       ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌[% GREEN %]░[% RESET %]▌    ▐[% GREEN %]░[% RESET %]█▀▀▀▀▀▀▀▀▀  ▐[% GREEN %]░[% RESET %]▌   ▐[% GREEN %]░[% RESET %]▌ ▐[% GREEN %]░[% RESET %]▌  ▀▀▀▀▀▀▀▀▀█[% GREEN %]░[% RESET %]▌        $bar\n";
+    $to .= "$bar            ▐[% CYAN %]░[% RESET %]▌      ▐[% CYAN %]░[% RESET %]▌       ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌▐[% CYAN %]░[% RESET %]▌   ▐[% CYAN %]░[% RESET %]▌           ▐[% CYAN %]░[% RESET %]▌    ▐[% CYAN %]░[% RESET %]▌▐[% CYAN %]░[% RESET %]▌           ▐[% CYAN %]░[% RESET %]▌        $bar\n";
+    $to .= "$bar            ▐[% CYAN %]░[% RESET %]▌      ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌  ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% CYAN %]░[% RESET %]▌     ▐[% CYAN %]░[% RESET %]▐[% CYAN %]░[% RESET %]▌  ▄▄▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌        $bar\n";
+    $to .= "$bar            ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌  ▐[% BLUE %]░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌        $bar\n";
+    $to .= "$bar             ▀        ▀▀▀▀▀▀▀▀▀▀▀   ▀    ▀   ▀▀▀▀▀▀▀▀▀▀▀   ▀        ▀▀   ▀▀▀▀▀▀▀▀▀▀▀         $bar\n";
 
-    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]CLEAR [% RESET %][% BRIGHT GREEN %]' . '═' x 56 . '╤' . '═' x 56 . '╡[% RESET %]' . "\n";
+    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]CLEAR [% RESET %][% BRIGHT GREEN %]' . '═' x 27 . '╤' . '═' x 56 . '╡[% RESET %]' . "\n";
 
     {
         my @names = (sort(keys %{$ansi->{'ansi_meta'}->{'clear'}}));
         while(scalar(@names)) {
             my $name = shift(@names);
-            $to .= sprintf('%s %-63s %s %-54s %s',$bar, $name, $bar, $ansi->ansi_description('clear',$name), $bar) . "\n";
+            $to .= sprintf('%s %-34s %s %-54s %s',$bar, $name, $bar, $ansi->ansi_description('clear',$name), $bar) . "\n";
         }
     }
 
-    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]CURSOR [% RESET %][% BRIGHT GREEN %]' . '═' x 55 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]CURSOR [% RESET %][% BRIGHT GREEN %]' . '═' x 26 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
 
     {
         my @names = (sort(keys %{$ansi->{'ansi_meta'}->{'cursor'}}));
         while(scalar(@names)) {
             my $name = shift(@names);
-            $to .= sprintf('%s %-63s %s %-54s %s',$bar, $name, $bar, $ansi->ansi_description('cursor',$name), $bar) . "\n";
+            $to .= sprintf('%s %-34s %s %-54s %s',$bar, $name, $bar, $ansi->ansi_description('cursor',$name), $bar) . "\n";
         }
-        $to .= sprintf('%s %-63s %s %-54s %s', $bar, 'LOCATE column,row', $bar, 'Sets the cursor location', $bar) . "\n";
-        $to .= sprintf('%s %-63s %s %-54s %s', $bar, 'SCROLL UP count', $bar, 'Scrolls the screen up by "count" lines', $bar) . "\n";
-        $to .= sprintf('%s %-63s %s %-54s %s', $bar, 'SCROLL DOWN count', $bar, 'Scrolls the screen down by "count" lines', $bar) . "\n";
+        $to .= sprintf('%s %-34s %s %-54s %s', $bar, 'LOCATE column,row', $bar, 'Sets the cursor location', $bar) . "\n";
+        $to .= sprintf('%s %-34s %s %-54s %s', $bar, 'SCROLL UP count', $bar, 'Scrolls the screen up by "count" lines', $bar) . "\n";
+        $to .= sprintf('%s %-34s %s %-54s %s', $bar, 'SCROLL DOWN count', $bar, 'Scrolls the screen down by "count" lines', $bar) . "\n";
     }
 
-    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]ATTRIBUTES [% RESET %][% BRIGHT GREEN %]' . '═' x 51 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]ATTRIBUTES [% RESET %][% BRIGHT GREEN %]' . '═' x 22 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
 
     {
         my @names = grep(!/FONT \d/,(sort(keys %{$ansi->{'ansi_meta'}->{'attributes'}})));
         while(scalar(@names)) {
             my $name = shift(@names);
             if ($name =~ /FONT|HIDE|RING BELL|UNDERLINE COLOR/) {
-                $to .= "$bar " . sprintf('%-63s',$name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s',$ansi->ansi_description('attributes',$name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
-                $to .= "$bar " . sprintf('%-63s','FONT 1-9') . " $bar " . sprintf('%-54s','Set specific font (1-9)') . " $bar" . "\n" if ($name =~ /FONT DEFAULT/);
+                $to .= "$bar " . sprintf('%-34s',$name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s',$ansi->ansi_description('attributes',$name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+                $to .= "$bar " . sprintf('%-34s','FONT 1-9') . " $bar " . sprintf('%-54s','Set specific font (1-9)') . " $bar" . "\n" if ($name =~ /FONT DEFAULT/);
             } else {
-                $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-63s',$name) . ' [% RESET %]' . "$bar " . sprintf('%-54s',$ansi->ansi_description('attributes',$name)) . " $bar\n";
+                $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-34s',$name) . ' [% RESET %]' . "$bar " . sprintf('%-54s',$ansi->ansi_description('attributes',$name)) . " $bar\n";
             }
         }
-        $to .= "$bar " . sprintf('%-63s','UNDERLINE COLOR color') . "$bar " . sprintf('%-54s','Set the underline color using color token.') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s','UNDERLINE COLOR color') . "$bar " . sprintf('%-54s','Set the underline color using color token.') . " $bar\n";
     }
 
     {
         my $f;
         my $b;
+		$to .= '[% BRIGHT GREEN %]╞' . '═' x 36 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+		$to .= "$bar [% CYAN %]COLORS, START BACKGROUND WITH 'B_' $bar [% CYAN %]DESCRIPTION                                            $bar\n";
+
         foreach my $code ('ANSI 3 BIT','ANSI 4 BIT','ANSI 8 BIT','ANSI 24 BIT') {
             if (($code eq 'ANSI 3 BIT' && $c8) || ($code eq 'ANSI 4 BIT' && $c16) || ($code eq 'ANSI 8 BIT' && $c256) || ($code eq 'ANSI 24 BIT' && $crgb)) {
-                if ($code eq 'ANSI 3 BIT') {
-                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╤' . '═' x 33 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
-                } else {
-                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╪' . '═' x 33 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
-                }
+				if ($code eq 'ANSI 3 BIT') {
+					$to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╤' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+				} else {
+					$to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╪' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+				}
                 my @names = grep(!/^(DEFAULT|COLOR|GRAY)/,(sort(keys %{$ansi->{'ansi_meta'}->{'foreground'}})));
                 unshift(@names,'DEFAULT');
                 if ($code eq 'ANSI 8 BIT') {
@@ -238,42 +246,43 @@ TOKENS
                     }
                 }
                 foreach my $name (@names) {
-                    if (type($ansi->{'ansi_meta'}->{'foreground'}->{$name}->{'out'}) ne $code) {
-			    		if ($name =~ /^(DEFAULT|NAVY|COLOR 16|BLACK)$/) {
-				    		$to .= $bar . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]' . sprintf(' %-31s ', "B_${name}") . '[% RESET %]│' . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
+                    if (type($ansi->{'ansi_meta'}->{'foreground'}->{$name}->{'out'}) eq $code) {
+			    		if ($name =~ /^(DEFAULT|NAVY|COLOR 16|COLOR 17|BLACK|MEDIUM BLUE|ARMY GREEN|BISTRE|BULGARIAN ROSE|CHARCOAL|COOL BLACK|DARK BLUE|DARK GREEN|DARK JUNGLE GREEN|DARK MIDNIGHT BLUE|DUKE BLUE|EGYPTIAN BLUE|MEDIUM JUNGLE GREEN|MIDNIGHT BLUE|NAVY BLUE|ONYX|OXFORD BLUE|PHTHALO BLUE|PHTHALO GREEN|PRUSSIAN BLUE|SAINT PATRICK BLUE|SEAL BROWN|SMOKEY BLACK|ULTRAMARINE|ZINNWALDITE BROWN)$/) {
+				    		$to .= $bar . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]│' . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
 					    } else {
-    						$to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% BLACK %][% B_' . $name . ' %]' . sprintf(' %-31s ', "B_${name}") . '[% RESET %]' . $bar . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
+    						$to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]' . $bar . sprintf(' %-54s ',$ansi->ansi_description('foreground',$name)) . "$bar\n";
 	    				}
 		    		}
                 }
             }
         }
         if ($crgb) {
-            $to .= $bar . sprintf(' %-29s ','RGB red,green,blue') . '[% RESET %]' . $bar . sprintf(' %-31s ', 'B_RGB red,green,blue') . '[% RESET %]' . $bar . sprintf(' %-54s ','Set color to a value 0-255 per primary color.') . "$bar\n";
+            $to .= $bar . sprintf(' %-29s ','RGB red,green,blue') . '[% RESET %]' . $bar . '[% B_RED %] [% B_GREEN %] [% B_BLUE %] [% B_MAGENTA %] [% RESET %]' . $bar . sprintf(' %-54s ','Set color to a value 0-255 per primary color.') . "$bar\n";
         }
     }
 
-    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]SPECIAL [% RESET %][% BRIGHT GREEN %]' . '═' x 20 . '╧' . '═' x 33 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
+    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]SPECIAL [% RESET %][% BRIGHT GREEN %]' . '═' x 20 . '╧' . '═' x 4 . '╪' . '═' x 56 . '╡[% RESET %]' . "\n";
 
     {
         my @names = (sort(keys %{$ansi->{'ansi_meta'}->{'special'}}));
         while(scalar(@names)) {
             my $name = shift(@names);
-            $to .= '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-63s',$name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s',$ansi->ansi_description('special',$name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+            $to .= '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-34s',$name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s',$ansi->ansi_description('special',$name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
         }
-        $to .= '[% BRIGHT GREEN %]│ ' . '─' x 63 . ' │ ' . '─' x 54 . ' │[% RESET %]' . "\n";
-        $to .= "$bar " . sprintf('%-63s', 'HORIZONTAL RULE color') . " $bar " . sprintf('%-54s','Horizontal rule the width of the screen in the') . " $bar\n";
-        $to .= '[% BRIGHT GREEN %]│[% RESET %]                                                                 [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-54s','specified color.') . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
-        $to .= '[% BRIGHT GREEN %]│ ' . '─' x 63 . ' │ ' . '─' x 54 . ' │[% RESET %]' . "\n";
-        $to .= "$bar " . sprintf('%-63s','BOX color,column,row,width,height,type') . " $bar " . sprintf('%-54s', 'Shows framed text box in the selected frame type and') . " $bar\n";
-        $to .= "$bar " . sprintf('%-63s',' ') . " $bar " . sprintf('%-54s', 'color.  Text goes between the BOX and ENDBOX token') . " $bar\n";
-        $to .= "$bar " . sprintf('%-63s','    types:') . " $bar " . sprintf('%-54s', 'See the "frames" option') . " $bar\n";
-        $to .= "$bar " . sprintf('%63s','DOUBLE, THIN, THICK, CIRCLE, ROUNDED, BLOCK, WEDGE') . " $bar " . sprintf('%-54s', ' ') . " $bar\n";
-        $to .= "$bar " . sprintf('%63s','BIG WEDGE, DOTS, DIAMOND, STAR, SQUARE, DITHERED, NOTES') . " $bar " . sprintf('%-54s', ' ') . " $bar\n";
-        $to .= "$bar " . sprintf('%63s','HEARTS, CHRISTIAN, ARROWS, BIG ARROWS, PARALLELOGRAM') . " $bar " . sprintf('%-54s', ' ') . " $bar\n";
-        $to .= "$bar " . sprintf('%-63s','ENDBOX') . " $bar " . sprintf('%-54s', 'Ends the BOX token function') . " $bar\n";
+        $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 54 . ' │[% RESET %]' . "\n";
+        $to .= "$bar " . sprintf('%-34s', 'HORIZONTAL RULE color') . " $bar " . sprintf('%-54s','Horizontal rule the width of the screen in the') . " $bar\n";
+        $to .= "$bar                                    $bar " . sprintf('%-54s','specified color.') . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+        $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 54 . ' │[% RESET %]' . "\n";
+        $to .= "$bar " . sprintf('%-34s','BOX color,col,row,width,hght,type  ') . "$bar " . sprintf('%-54s', 'Shows framed text box in the selected frame type and') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-54s', 'color.  Text goes between the BOX and ENDBOX token') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-54s', '') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s','types:') . " $bar " . sprintf('%-54s', 'DOUBLE, THIN, THICK, CIRCLE, WEDGE, BIG WEDGE, DOTS,') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-54s',       'DIAMOND, STAR, SQUARE, DITHERED, NOTES, BIG ARROWS,') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-54s',       'CHRISTIAN, ARROWS, HEARTS, PARALLELOGRAM, ROUNDED') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-54s', '') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s','ENDBOX') . " $bar " . sprintf('%-54s', 'Ends the BOX token function') . " $bar\n";
     }
-    $to .= '[% BRIGHT GREEN %]╰' . '─' x 65 . '┴' . '─' x 56 . '╯[% RESET %]' . "\n";
+    $to .= '[% BRIGHT GREEN %]╰' . '─' x 36 . '┴' . '─' x 56 . '╯[% RESET %]' . "\n";
 
     { # Post processing
         my $new = 'UNDERLINE COLOR [% UNDERLINE %][% UNDERLINE COLOR RED %][% FAINT %][% ITALIC %]co[% RESET %][% UNDERLINE %][% UNDERLINE COLOR GREEN %][% FAINT %][% ITALIC %]l[% RESET %][% UNDERLINE %][% UNDERLINE COLOR BLUE %][% FAINT %][% ITALIC %]or[% RESET %]';
@@ -291,8 +300,8 @@ TOKENS
         $new = ' [% FAINT %][% ITALIC %]column[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %] ';
         $to =~ s/ column,row /$new/gs;
 
-        $new = ' [% FAINT %][% ITALIC %]color[% RESET %],[% FAINT %][% ITALIC %]column[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %],[% FAINT %][% ITALIC %]width[% RESET %],[% FAINT %][% ITALIC %]height[% RESET %],[% FAINT %][% ITALIC %]type[% RESET %] ';
-        $to =~ s/ color,column,row,width,height,type /$new/gs;
+        $new = ' [% FAINT %][% ITALIC %]color[% RESET %],[% FAINT %][% ITALIC %]col[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %],[% FAINT %][% ITALIC %]width[% RESET %],[% FAINT %][% ITALIC %]hght[% RESET %],[% FAINT %][% ITALIC %]type[% RESET %]';
+        $to =~ s/ color,col,row,width,hght,type/$new/gs;
     }
 
 	$ansi->ansi_output($to);

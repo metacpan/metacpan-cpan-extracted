@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.118';
+our $VERSION = '0.119';
 
 use 5.020;
 use utf8;
@@ -253,6 +253,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     vocabularies => $state->{vocabularies}, # reference, not copy
   };
 
+  my $metaschema_doc;
+
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
   my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths, @bad_3_0_paths);
@@ -279,15 +281,33 @@ sub traverse ($self, $evaluator, $config_override = {}) {
           if ($self->oas_version eq '3.0') {
             # strip '#/definitions/'; convert CamelCase to kebab-case
             if ($entity = lc join('-', split /(?=[A-Z])/, substr($schema->{'$ref'}, 14))) {
-              push @bad_3_0_paths, [ items => $state->{data_path} ]
-                if $entity eq 'schema' and ($data->{type}//'') eq 'array' and not exists $data->{items};
-              push @bad_3_0_paths, [ minimum => $state->{data_path} ]
-                if $entity eq 'schema' and exists $data->{exclusiveMinimum} and not exists $data->{minimum};
-              push @bad_3_0_paths, [ maximum => $state->{data_path} ]
-                if $entity eq 'schema' and exists $data->{exclusiveMaximum} and not exists $data->{maximum};
+              if ($entity eq 'schema') {
+                push @bad_3_0_paths, [ items => $state->{data_path} ]
+                  if ($data->{type}//'') eq 'array' and not exists $data->{items};
 
+                push @bad_3_0_paths, [ minimum => $state->{data_path} ]
+                  if exists $data->{exclusiveMinimum} and not exists $data->{minimum};
+
+                push @bad_3_0_paths, [ maximum => $state->{data_path} ]
+                  if exists $data->{exclusiveMaximum} and not exists $data->{maximum};
+              }
+
+              if ($entity eq 'reference') {
+                $metaschema_doc //= $evaluator->_get_resource($self->metaschema_uri)->{document};
+
+                # in the 3.0 metaschema, entities are identified via:
+                # "oneOf": [ { "$ref": "#/definitions/Foo" }, { "$ref": "#/definitions/Reference" } ]
+                my $schema_path = ($state->{initial_schema_uri}->fragment//'').$state->{keyword_path};
+                if ($schema_path =~ s{/oneOf/\K([01])\z}{$1 ^ 1}e) {
+                  $entity = lc join('-', split /(?=[A-Z])/, substr($metaschema_doc->get($schema_path)->{'$ref'}, 14));
+                }
+              }
+
+              $entity .= 's' if $entity eq 'callback';
               undef $entity if not grep $entity eq $_, __entities;
+
               # no need to push to @json_schema_paths, as all schema entities are already found
+              # via $refs above, and there are no embedded identifiers to be identified
             }
           }
           else {
@@ -529,7 +549,7 @@ sub upgrade ($self, $to_version = SUPPORTED_OAD_VERSIONS->[-1]) {
   croak 'cannot upgrade an invalid document' if $self->errors;
 
   croak 'new openapi version must be a dotted tuple or triple'
-    if $to_version !~ /^(3\.[0-9]+)(?:\.[0-9]+)?\z/;
+    if $to_version !~ /^(3\.\d+)(?:\.\d+)?\z/a;
   my $to_oas_version = $1;
   croak 'requested upgrade to an unsupported version: ', $to_version
     if not grep $to_oas_version eq $_, OAS_VERSIONS->@*;
@@ -541,7 +561,7 @@ sub upgrade ($self, $to_version = SUPPORTED_OAD_VERSIONS->[-1]) {
   my $from_version = $schema->{openapi};
   return $schema if $from_version eq $to_version;
 
-  my ($from_oas_version) = $schema->{openapi} =~ /^(3\.[0-9]+)\.[0-9]+\b/;
+  my ($from_oas_version) = $schema->{openapi} =~ /^(3\.\d+)\.\d+\b/a;
   croak 'downgrading is not supported' if $from_oas_version > $to_oas_version;
 
   $schema->{openapi} = $to_version;
@@ -704,7 +724,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.118
+version 0.119
 
 =head1 SYNOPSIS
 

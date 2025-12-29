@@ -2,7 +2,7 @@ package PAGI::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001005';
 
 use parent 'IO::Async::Notifier';
 use IO::Async::Listener;
@@ -867,6 +867,96 @@ See the C<ssl> option in L</CONSTRUCTOR> for details on:
 
 =back
 
+=head1 SIGNAL HANDLING
+
+PAGI::Server responds to Unix signals for process management. Signal behavior
+differs between single-worker and multi-worker modes.
+
+=head2 Supported Signals
+
+=over 4
+
+=item B<SIGTERM> - Graceful shutdown
+
+Initiates graceful shutdown. The server stops accepting new connections,
+waits for active requests to complete (up to C<shutdown_timeout> seconds),
+then exits. In multi-worker mode, SIGTERM is forwarded to all workers.
+
+    kill -TERM <pid>
+
+=item B<SIGINT> - Graceful shutdown (Ctrl-C)
+
+Same behavior as SIGTERM. Triggered by Ctrl-C in the terminal. In multi-worker
+mode, the parent process catches SIGINT and coordinates shutdown of all workers
+to ensure proper lifespan.shutdown handling.
+
+    kill -INT <pid>
+    # or press Ctrl-C in terminal
+
+=item B<SIGHUP> - Graceful restart (multi-worker only)
+
+Performs a zero-downtime restart by spawning new workers before terminating
+old ones. Useful for deploying new code without dropping connections.
+
+    kill -HUP <pid>
+
+In single-worker mode, SIGHUP is logged but ignored (no graceful restart
+possible without multiple workers).
+
+=item B<SIGTTIN> - Increase worker count (multi-worker only)
+
+Spawns an additional worker process. Use this to scale up capacity dynamically.
+
+    kill -TTIN <pid>
+
+=item B<SIGTTOU> - Decrease worker count (multi-worker only)
+
+Gracefully terminates one worker process. The minimum worker count is 1;
+sending SIGTTOU when only one worker remains has no effect.
+
+    kill -TTOU <pid>
+
+=back
+
+=head2 Signal Handling in Multi-Worker Mode
+
+When running with C<< workers => N >> (where N > 1):
+
+=over 4
+
+=item * Parent process manages the worker pool
+
+=item * Workers handle requests; parent handles signals
+
+=item * SIGTERM/SIGINT to parent triggers coordinated shutdown of all workers
+
+=item * Each worker runs lifespan.shutdown before exiting
+
+=item * Workers that crash are automatically respawned
+
+=back
+
+=head2 Examples
+
+B<Zero-downtime deployment:>
+
+    # Deploy new code, then signal graceful restart
+    kill -HUP $(cat /var/run/pagi.pid)
+
+B<Scale workers based on load:>
+
+    # Add workers during peak hours
+    kill -TTIN $(cat /var/run/pagi.pid)
+    kill -TTIN $(cat /var/run/pagi.pid)
+
+    # Remove workers during quiet periods
+    kill -TTOU $(cat /var/run/pagi.pid)
+
+B<Graceful shutdown for maintenance:>
+
+    # Stop accepting new connections, drain existing ones
+    kill -TERM $(cat /var/run/pagi.pid)
+
 =cut
 
 sub _init {
@@ -1257,26 +1347,23 @@ sub _listen_multiworker {
     my $tls_status = $self->_tls_status_string;
     $self->_log(info => "PAGI Server (multi-worker, $mode) listening on $scheme://$self->{host}:$self->{bound_port}/ with $workers workers (loop: $loop_class, max_conn: $max_conn/worker, tls: $tls_status)");
 
-    # Set up signal handlers using IO::Async's watch_signal (replaces _setup_parent_signals)
-    # Note: Windows doesn't support Unix signals, so this is skipped there
-    # (Multi-worker mode won't work on Windows anyway due to fork() limitations)
     my $loop = $self->loop;
+
+    # Fork the workers FIRST, before setting up signal handlers.
+    # This prevents children from inheriting the parent's sigpipe setup,
+    # which can cause issues with Ctrl-C signal delivery on macOS.
+    for my $i (1 .. $workers) {
+        $self->_spawn_worker($listen_socket, $i);
+    }
+
+    # Set up signal handlers for parent process AFTER forking
+    # Note: Windows doesn't support Unix signals, so this is skipped there
     unless (WIN32) {
         $loop->watch_signal(TERM => sub { $self->_initiate_multiworker_shutdown });
         $loop->watch_signal(INT  => sub { $self->_initiate_multiworker_shutdown });
-        # HUP = graceful restart (replace all workers)
         $loop->watch_signal(HUP => sub { $self->_graceful_restart });
-
-        # TTIN = increase workers by 1
         $loop->watch_signal(TTIN => sub { $self->_increase_workers });
-
-        # TTOU = decrease workers by 1
         $loop->watch_signal(TTOU => sub { $self->_decrease_workers });
-    }
-
-    # Fork the workers
-    for my $i (1 .. $workers) {
-        $self->_spawn_worker($listen_socket, $i);
     }
 
     # Store the socket for cleanup during shutdown (only in traditional mode)
@@ -1366,16 +1453,21 @@ sub _spawn_worker {
     my $loop = $self->loop;
     weaken(my $weak_self = $self);
 
-    # Use $loop->fork() instead of POSIX fork() to properly:
-    # 1. Clear $ONE_TRUE_LOOP in child (so child gets fresh loop)
-    # 2. Reset signal handlers in child
-    # 3. Call post_fork() for loop backends that need it (epoll, kqueue)
+    # Set IGNORE before fork - child inherits it. IO::Async only resets
+    # CODE refs, so 'IGNORE' (a string) survives. Child must NOT call
+    # watch_signal(INT) or it will overwrite the IGNORE.
+    my $old_sigint = $SIG{INT};
+    $SIG{INT} = 'IGNORE' unless WIN32;
+
     my $pid = $loop->fork(
         code => sub {
             $self->_run_as_worker($listen_socket, $worker_num);
-            return 0;  # Exit code (may not be reached if worker calls exit())
+            return 0;
         },
     );
+
+    # Restore parent's SIGINT handler
+    $SIG{INT} = $old_sigint unless WIN32;
 
     die "Fork failed" unless defined $pid;
 
@@ -1419,8 +1511,9 @@ sub _spawn_worker {
 sub _run_as_worker {
     my ($self, $listen_socket, $worker_num) = @_;
 
-    # Note: Signal handlers already reset by $loop->fork() (keep_signals defaults to false)
     # Note: $ONE_TRUE_LOOP already cleared by $loop->fork(), so this creates a fresh loop
+    # Note: $SIG{INT} = 'IGNORE' inherited from parent - do NOT call watch_signal(INT)
+    #       or it will overwrite the IGNORE with a CODE ref!
     my $loop = IO::Async::Loop->new;
 
     # In reuseport mode, each worker creates its own listening socket
@@ -1465,6 +1558,8 @@ sub _run_as_worker {
     # Set up graceful shutdown on SIGTERM using IO::Async's signal watching
     # (raw $SIG handlers don't work reliably when the loop is running)
     # Note: Windows doesn't support Unix signals, so this is skipped there
+    # Note: We do NOT set up watch_signal(INT) here - workers inherit $SIG{INT}='IGNORE'
+    #       from parent, so they ignore SIGINT (including Ctrl-C). Parent sends SIGTERM.
     unless (WIN32) {
         my $shutdown_triggered = 0;
         $loop->watch_signal(TERM => sub {

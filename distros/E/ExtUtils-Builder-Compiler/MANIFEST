@@ -11,6 +11,7 @@ dist.ini
 lib/ExtUtils/Builder/ArgumentCollector.pm
 lib/ExtUtils/Builder/AutoDetect/C.pm
 lib/ExtUtils/Builder/Binary.pm
+lib/ExtUtils/Builder/BuildTools/Base.pm
 lib/ExtUtils/Builder/BuildTools/FromPerl.pm
 lib/ExtUtils/Builder/Compiler.pm
 lib/ExtUtils/Builder/Compiler/MSVC.pm

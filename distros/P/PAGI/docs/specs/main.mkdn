@@ -178,6 +178,32 @@ async sub application ($scope, $recv, $send) {
 
 Each application is called per-connection, and remains active until the connection closes and cleanup completes.
 
+### Application Completion Contract
+
+**The application's returned Future represents request completion.** When this Future resolves, the server considers the response finished and may close the connection, write access logs, or handle the next request.
+
+Applications **must** await all `$send` calls before their Future completes:
+
+```perl
+# CORRECT: await all sends
+async sub app ($scope, $recv, $send) {
+    await $send->({ type => 'http.response.start', status => 200, headers => [] });
+    await $send->({ type => 'http.response.body', body => 'Hello' });
+}
+
+# WRONG: sends happen after app Future resolves
+async sub app ($scope, $recv, $send) {
+    $loop->delay_future(after => 1)->then(sub {
+        $send->({ type => 'http.response.body', body => 'Hello' });
+    })->retain;
+    return;  # App Future resolves immediately, but send hasn't happened!
+}
+```
+
+Work scheduled via `->retain` or other fire-and-forget patterns will race with connection cleanup and produce undefined behavior. The server has no visibility into retained Futures - they exist outside the application's Future tree.
+
+**Use `PAGI::Middleware::Lint`** during development to detect incomplete responses.
+
 ### Legacy Applications
 
 Legacy (PSGI) applications are not async and follow a synchronous interface. Support for these can be implemented via a compatibility adapter.

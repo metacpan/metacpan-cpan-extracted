@@ -4,7 +4,7 @@ use warnings;
 
 use PAGI::Runner;
 
-PAGI::Runner->new->run(@ARGV);
+PAGI::Runner->run(@ARGV);
 
 __END__
 
@@ -12,7 +12,7 @@ __END__
 
 =head1 NAME
 
-pagi-server - PAGI Reference Server CLI
+pagi-server - PAGI application server
 
 =head1 SYNOPSIS
 
@@ -26,261 +26,229 @@ pagi-server - PAGI Reference Server CLI
 
     # Run a PAGI app file
     pagi-server ./app.pl
-    pagi-server --app app.pl        # legacy syntax
+
+    # With environment modes
+    pagi-server -E development app.pl  # Lint middleware enabled
+    pagi-server -E production app.pl   # No auto-middleware
 
     # With options
     pagi-server -p 8080 PAGI::App::Directory root=/var/www
-    pagi-server -w 4 ./myapp.pl
+    pagi-server --workers 4 ./myapp.pl
 
 =head1 DESCRIPTION
 
 pagi-server is the command-line interface for running PAGI applications.
-It can load apps from files or from installed C<PAGI::App::*> modules.
+It uses L<PAGI::Runner> for application loading and server orchestration,
+and L<PAGI::Server> as the default server backend.
 
-=head1 OPTIONS
+=head1 ENVIRONMENT MODES
+
+pagi-server supports environment modes similar to Plack's C<-E> flag:
 
 =over 4
 
-=item --lib, -I PATH
+=item B<development>
+
+Auto-enables L<PAGI::Middleware::Lint> with strict mode. This catches
+specification violations early and provides helpful error messages.
+
+This is the B<default when running interactively> (TTY detected).
+
+=item B<production>
+
+No middleware is auto-enabled, and access logging is disabled for maximum
+performance. Use C<--access-log FILE> to enable logging in production.
+
+This is the B<default when running non-interactively> (no TTY, e.g.,
+systemd, docker, cron).
+
+=item B<none>
+
+Explicit opt-out of all auto-middleware, regardless of TTY detection.
+
+=back
+
+Mode is determined by (in order of precedence):
+
+    1. -E / --env command line flag
+    2. PAGI_ENV environment variable
+    3. Auto-detection: TTY = development, no TTY = production
+
+=head1 OPTIONS
+
+=head2 Common Options
+
+These are handled by L<PAGI::Runner> and work with any server backend.
+
+=over 4
+
+=item B<-I>, B<--lib> PATH
 
 Add PATH to C<@INC> before loading the app. Can be specified multiple
-times to add multiple paths, similar to C<perl -I>.
+times, similar to C<perl -I>.
 
     pagi-server -I ./lib -I ./vendor/lib ./app.pl
 
-=item --app, -a FILE
+=item B<-a>, B<--app> FILE
 
 Path to .pl/.psgi file returning PAGI app coderef. Legacy option for
 backward compatibility; you can also just pass the file as an argument.
 
-=item --host, -h HOST
+=item B<-e> CODE
+
+Inline app code, like C<perl -e>. Must return a PAGI app coderef.
+
+    # Using a PAGI::App module
+    pagi-server -MPAGI::App::File -e 'PAGI::App::File->new(root => ".")->to_app'
+
+=item B<-M> MODULE
+
+Load MODULE before evaluating C<-e> code, like C<perl -M>. Can be
+specified multiple times. Supports C<Module=import,args> syntax.
+
+    pagi-server -MPAGI::App::File -e 'PAGI::App::File->new(root => ".")->to_app'
+
+=item B<-o>, B<--host> HOST
 
 Bind address (default: 127.0.0.1, localhost only)
 
 The default only accepts connections from localhost, which is B<secure by
-default> for development. For headless servers or production deployments
-where remote clients need to connect:
+default> for development. For remote access:
 
-    # Bind to all IPv4 interfaces
-    pagi-server --host 0.0.0.0 ./app.pl
+    pagi-server --host 0.0.0.0 ./app.pl    # All IPv4 interfaces
 
-    # Bind to specific interface
-    pagi-server --host 192.168.1.100 ./app.pl
-
-=item --port, -p PORT
+=item B<-p>, B<--port> PORT
 
 Bind port (default: 5000)
 
-=item --workers, -w NUM
+=item B<-s>, B<--server> CLASS
 
-Number of worker processes (default: 1)
+Server class to use (default: PAGI::Server). Reserved for future use
+with pluggable server backends.
 
-=item --max-requests NUM
+=item B<-E>, B<--env> MODE
 
-Maximum number of requests a worker process will handle before restarting.
-After serving this many requests, the worker gracefully shuts down and the
-parent spawns a replacement.
+Environment mode: development, production, or none.
 
-B<Default:> 0 (disabled - workers run indefinitely)
-
-B<When to use:> Long-running deployments where gradual memory growth is a
-concern, or applications with known memory leaks.
-
-B<Note:> Only applies in multi-worker mode (C<--workers> > 1). In single-worker
-mode, this setting is ignored.
-
-=item --max-connections NUM
-
-Maximum number of concurrent connections per worker before returning
-HTTP 503 Service Unavailable. This prevents "Too many open files" crashes.
-
-B<Default:> 0 (auto-detect from ulimit - 50)
-
-B<Behavior:> When at capacity, new connections receive a 503 response with
-a C<Retry-After: 5> header. The TCP backlog queues additional connections.
-
-B<When to adjust:>
-
-=over 4
-
-=item * Getting 503s under load? Increase ulimit or set higher limit
-
-=item * Want predictable capacity? Set explicit limit matching your ulimit
-
-=item * Memory constrained? Lower the limit to reduce concurrent request memory
-
-=back
-
-B<Note:> In multi-worker mode, this limit applies per-worker. With
-C<--workers 4 --max-connections 100>, total capacity is 400 connections.
-
-=item --max-body-size NUM
-
-Maximum request body size in bytes. Requests exceeding this limit receive
-HTTP 413 (Payload Too Large).
-
-B<Default:> 10,000,000 (10MB)
-
-B<Special value:> 0 means unlimited (not recommended for public servers).
-
-B<When to adjust:>
-
-=over 4
-
-=item * File uploads? Increase to 50-100MB as needed
-
-=item * API with large JSON? Increase to match expected payload sizes
-
-=item * Behind reverse proxy? Can set to 0 if proxy enforces its own limit
-
-=back
-
-=item --log-level LEVEL
-
-Set the logging verbosity level. Messages below this level are suppressed.
-
-B<Levels:> debug, info, warn, error
-
-B<Default:> info
-
-=back
-
-=head2 Production Options
-
-=over 4
-
-=item B<-D>, B<--daemonize>
-
-Fork to background and run as a daemon. Errors during startup (including
-binding to port) are reported before daemonizing.
-
-=item B<--pid> FILE
-
-Write the process ID to FILE. The file is removed on clean shutdown.
-Useful for init scripts: C<kill $(cat /var/run/pagi.pid)>
-
-=item B<--user> USER
-
-After binding to the port, drop privileges to run as USER. Requires
-starting the server as root. Commonly used with privileged ports (80, 443).
-
-=item B<--group> GROUP
-
-After binding to the port, drop privileges to run as GROUP. If not
-specified but --user is, uses the user's primary group.
-
-=back
-
-=over 4
-
-=item --listener_backlog -b
-
-Listener queue size. No default, if left blank then the
-server sets a default that is rational for itself.
-
-=item --timeout
-
-Seconds before we timeout the request. If left blank will
-default to whatever is default for the server.
-
-=item --loop, -l BACKEND
+=item B<-l>, B<--loop> BACKEND
 
 Event loop backend (Poll, EV, Epoll, UV). Default is auto-detect.
 
-=item --ssl-cert FILE
-
-Path to SSL certificate (enables HTTPS)
-
-=item --ssl-key FILE
-
-Path to SSL private key
-
-=item --access-log FILE
+=item B<--access-log> FILE
 
 Path to access log file (default: STDERR)
 
-=item --no-access-log
+=item B<--no-access-log>
 
-Disable access logging entirely. Eliminates per-request I/O overhead,
-improving throughput by 5-15% depending on workload. Useful for
-benchmarking or when access logs are handled by a reverse proxy.
+Disable access logging entirely. Improves throughput by 5-15%.
 
-=item --reuseport
+=item B<-D>, B<--daemonize>
 
-Enable SO_REUSEPORT mode for multi-worker servers. Each worker creates
-its own listening socket with SO_REUSEPORT.
+Fork to background and run as a daemon.
 
-B<Linux 3.9+>: The kernel load-balances incoming connections across workers,
-reducing accept() contention and improving p99 latency under high concurrency.
+=item B<--pid> FILE
 
-B<macOS/BSD>: SO_REUSEPORT allows binding but does NOT provide kernel load
-balancing. May actually decrease performance - benchmark before using.
+Write the process ID to FILE.
 
-=item --max-receive-queue NUM
+=item B<--user> USER
 
-Maximum number of messages in the WebSocket receive queue before the
-connection is closed with code 1008 (Policy Violation). This is a DoS
-protection mechanism to prevent memory exhaustion from slow consumers.
+After binding, drop privileges to run as USER. Requires root.
 
-B<Default:> 1000 messages
+=item B<--group> GROUP
 
-B<Unit:> Message count, not bytes. Each WebSocket frame counts as one message.
+After binding, drop privileges to run as GROUP.
 
-B<Tuning:> Lower to 100-500 for slow message processing. Raise to 5000-10000
-for trusted high-throughput clients. Memory risk per connection is approximately
-max_receive_queue × average_message_size.
+=item B<-q>, B<--quiet>
 
-=item --max-ws-frame-size NUM
+Suppress startup banner and development mode message.
 
-Maximum size in bytes for a single WebSocket frame payload. When a client
-sends a frame larger than this limit, the connection is closed.
+=item B<--no-default-middleware>
 
-B<Default:> 65536 bytes (64KB)
+Disable auto-middleware even in development mode.
 
-B<Unit:> Bytes (not messages). This controls individual frame size.
+=item B<-v>, B<--version>
 
-B<Tuning:> For chat/control messages, default 64KB is sufficient. For file
-uploads via WebSocket, increase to 1-16MB. Memory impact: each connection
-can buffer up to this amount during frame parsing.
+Show version info.
 
-=item --quiet, -q
+=item B<--help>
 
-Suppress startup banner
-
-=item --help
-
-Show this help
+Show help.
 
 =back
 
-=head2 Signal Handling
+=head2 PAGI::Server Options
+
+These options are passed through to L<PAGI::Server>.
 
 =over 4
 
-=item B<TERM>, B<INT>
+=item B<-w>, B<--workers> NUM
 
-Graceful shutdown. Stops accepting new connections, waits for existing
-requests to complete, then exits.
+Number of worker processes (default: 1, single-process mode)
 
-=item B<HUP>
+=item B<--reuseport>
 
-Graceful restart (multi-worker mode only). Terminates all current workers
-and spawns fresh replacements. Useful for config/code changes.
+Enable SO_REUSEPORT mode for multi-worker servers.
 
-=item B<TTIN>
+=item B<--ssl-cert> FILE, B<--ssl-key> FILE
 
-Increase worker count by 1 (multi-worker mode only).
+Enable HTTPS with the specified certificate and key files.
 
-=item B<TTOU>
+=item B<--max-requests> NUM
 
-Decrease worker count by 1 (multi-worker mode only). Maintains at least
-1 worker.
+Maximum requests per worker before restart (default: 0, unlimited)
+
+=item B<--max-connections> NUM
+
+Maximum concurrent connections per worker (default: auto-detect)
+
+=item B<--max-body-size> NUM
+
+Maximum request body size in bytes (default: 10MB)
+
+=item B<--timeout> NUM
+
+Connection idle timeout in seconds (default: 60)
+
+=item B<--shutdown-timeout> NUM
+
+Graceful shutdown timeout in seconds (default: 30)
+
+=item B<--log-level> LEVEL
+
+Log verbosity: debug, info, warn, error (default: info)
+
+=item B<-b>, B<--listener-backlog> NUM
+
+Listen queue size (default: 2048)
+
+=item B<--max-receive-queue> NUM
+
+Maximum WebSocket receive queue size (default: 1000)
+
+=item B<--max-ws-frame-size> NUM
+
+Maximum WebSocket frame size in bytes (default: 65536)
+
+=item B<--request-timeout> NUM
+
+Request stall timeout in seconds (default: 0, disabled)
+
+=item B<--ws-idle-timeout> NUM
+
+WebSocket idle timeout in seconds (default: 0, disabled)
+
+=item B<--sse-idle-timeout> NUM
+
+SSE idle timeout in seconds (default: 0, disabled)
+
+=item B<--sync-file-threshold> NUM
+
+Sync file read threshold in bytes (default: 65536)
 
 =back
 
 =head1 APP SPECIFICATION
-
-The app can be specified in three ways:
 
 =head2 Module Name
 
@@ -288,15 +256,13 @@ If the argument contains C<::>, it's treated as a Perl module name:
 
     pagi-server PAGI::App::Directory root=/var/www
 
-The module must have C<new()> and C<to_app()> methods. Constructor
-arguments are passed as C<key=value> pairs.
+The module must have C<new()> and C<to_app()> methods.
 
 =head2 File Path
 
 If the argument contains C</> or ends with C<.pl>/C<.psgi>:
 
     pagi-server ./app.pl
-    pagi-server /path/to/myapp.psgi
 
 The file must return a PAGI app coderef.
 
@@ -307,156 +273,62 @@ If no app is specified, serves the current directory:
     pagi-server
     # equivalent to: pagi-server PAGI::App::Directory root=.
 
-=head1 EXAMPLES
-
-    # Serve current directory on default port
-    pagi-server
-
-    # Serve /var/www on port 8080
-    pagi-server -p 8080 PAGI::App::Directory root=/var/www
-
-    # Run an app file with HTTPS
-    pagi-server -a myapp.pl -p 3000 --ssl-cert cert.pem --ssl-key key.pem
-
-    # Run with multiple workers
-    pagi-server -w 4 ./myapp.pl
-
-    # Headless server / remote access (bind to all interfaces)
-    pagi-server --host 0.0.0.0 -p 8080 ./myapp.pl
-
-    # Production: all interfaces, workers, daemonized
-    pagi-server --host 0.0.0.0 -p 80 -w 4 -D --pid /var/run/pagi.pid ./myapp.pl
-
-    # Add library paths (like perl -I)
-    pagi-server -I ./lib -I ./local/lib ./myapp.pl
-
-    # Use EV event loop for better performance
-    pagi-server --loop EV ./myapp.pl
-
-    # Maximum performance (no access logging)
-    pagi-server --no-access-log -w 8 ./myapp.pl
-
-    # Optimal macOS performance (EV + kqueue)
-    LIBEV_FLAGS=8 pagi-server --loop EV --no-access-log ./myapp.pl
-
-    # High concurrency with SO_REUSEPORT (reduces accept contention)
-    pagi-server --reuseport -w 8 ./myapp.pl
-
-    # Workers restart after 10k requests (prevents memory growth)
-    pagi-server -w 4 --max-requests 10000 ./myapp.pl
-
-    # Limit max connections (prevents FD exhaustion)
-    pagi-server --max-connections 200 ./myapp.pl
-
-    # Enable debug logging
-    pagi-server --log-level debug ./myapp.pl
-
-    # Or via environment variable
-    IO_ASYNC_LOOP=EV pagi-server ./myapp.pl
-
-    # Run a proxy app
-    pagi-server PAGI::App::Proxy target=http://backend:3000
-
-    # Directory listing with hidden files
-    pagi-server PAGI::App::Directory root=/home show_hidden=1
-
-=head1 BUNDLED APPS
-
-The following C<PAGI::App::*> modules are available:
+=head1 SIGNAL HANDLING
 
 =over 4
 
-=item PAGI::App::Directory
+=item B<TERM>, B<INT>
 
-Serve static files with directory listings.
+Graceful shutdown.
 
-    pagi-server PAGI::App::Directory root=/var/www
+=item B<HUP>
 
-=item PAGI::App::File
+Graceful restart (multi-worker mode only).
 
-Serve static files (no directory listings).
+=item B<TTIN>, B<TTOU>
 
-    pagi-server PAGI::App::File root=/var/www
-
-=item PAGI::App::Proxy
-
-HTTP reverse proxy.
-
-    pagi-server PAGI::App::Proxy target=http://backend:3000
-
-=item PAGI::App::Redirect
-
-URL redirector.
-
-    pagi-server PAGI::App::Redirect location=https://example.com
-
-=item PAGI::App::URLMap
-
-Mount multiple apps at different paths.
-
-=item PAGI::App::Cascade
-
-Try multiple apps in sequence.
+Increase/decrease worker count (multi-worker mode only).
 
 =back
 
-See individual module documentation for available options.
+=head1 EXAMPLES
+
+    # Development (auto-detected from TTY)
+    pagi-server ./app.pl
+
+    # Explicit production mode
+    pagi-server -E production ./app.pl
+    PAGI_ENV=production pagi-server ./app.pl
+
+    # Multi-worker production
+    pagi-server --host 0.0.0.0 -p 80 --workers 4 -E production ./app.pl
+
+    # With HTTPS
+    pagi-server --ssl-cert cert.pem --ssl-key key.pem ./app.pl
+
+    # Maximum performance
+    pagi-server --no-access-log --workers 8 -E production ./app.pl
+
+    # Using EV event loop
+    pagi-server --loop EV ./app.pl
 
 =head1 ENVIRONMENT
 
 =over 4
 
-=item IO_ASYNC_LOOP
+=item B<PAGI_ENV>
 
-Specifies which IO::Async::Loop backend to use. The default is auto-detection.
-For better performance, especially with many concurrent connections:
+Default environment mode if C<-E> is not specified and no TTY detected.
 
-    IO_ASYNC_LOOP=EV pagi-server ./myapp.pl      # Cross-platform (libev)
-    IO_ASYNC_LOOP=Epoll pagi-server ./myapp.pl   # Linux-specific
+=item B<IO_ASYNC_LOOP>
 
-The C<--loop> option takes precedence over this environment variable.
-
-=item LIBEV_FLAGS
-
-When using the EV backend, this controls which libev backend is used internally.
-By default, EV may choose a suboptimal backend (select instead of kqueue on macOS).
-
-    # Force kqueue on macOS for optimal performance (~6% faster)
-    LIBEV_FLAGS=8 pagi-server --loop EV ./myapp.pl
-
-Values: 1=select, 2=poll, 4=epoll (Linux), 8=kqueue (macOS/BSD)
-
-=back
-
-=head1 EVENT LOOP BACKENDS
-
-=over 4
-
-=item Poll
-
-Default fallback. Uses poll() system call. Works everywhere but slower
-with many connections.
-
-=item EV
-
-High-performance backend using libev. Recommended for production.
-Install: C<cpanm IO::Async::Loop::EV EV>
-
-=item Epoll
-
-Linux-specific backend using epoll. O(1) complexity.
-Install: C<cpanm IO::Async::Loop::Epoll>
-
-=item UV
-
-Backend using libuv (Node.js's event library). Cross-platform.
-Install: C<cpanm IO::Async::Loop::UV UV>
+Preferred IO::Async loop backend.
 
 =back
 
 =head1 SEE ALSO
 
-L<PAGI::Runner>, L<PAGI::Server>, L<PAGI::App::Directory>
+L<PAGI::Runner>, L<PAGI::Server>, L<PAGI::Middleware::Lint>
 
 =head1 AUTHOR
 

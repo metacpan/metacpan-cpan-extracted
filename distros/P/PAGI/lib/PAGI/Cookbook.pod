@@ -890,6 +890,9 @@ For real-time features with multiple WebSocket clients:
 
       await $ws->accept;
 
+      # Keep connection alive through proxies/NAT (sends JSON ping every 25s)
+      $ws->start_heartbeat(25);
+
       # Join room
       $rooms{$room}{$client_id} = $ws;
 
@@ -1142,6 +1145,84 @@ See C<examples/background-tasks/> for complete working examples.
 
 See C<examples/10-forms-and-uploads/> for complete examples.
 
+=head1 COMMAND-LINE RECIPES
+
+=head2 Environment Modes
+
+pagi-server auto-detects development vs production mode based on whether
+you're running in an interactive terminal:
+
+  # Development mode (TTY detected) - Lint middleware + access logging
+  pagi-server app.pl
+
+  # Production mode (no TTY, e.g., systemd/docker) - no middleware, no logging
+  # This happens automatically when running as a daemon
+
+  # Explicit mode selection
+  pagi-server -E production app.pl
+  pagi-server -E development app.pl
+  pagi-server -E none app.pl  # Disable all auto-middleware
+
+  # Via environment variable
+  PAGI_ENV=production pagi-server app.pl
+
+  # Enable logging in production (writes to file)
+  pagi-server -E production --access-log /var/log/pagi.log app.pl
+
+  # Disable auto-middleware even in development
+  pagi-server --no-default-middleware app.pl
+
+=head2 Inline Apps with -e
+
+Like C<perl -e>, you can run inline PAGI apps. This is useful for quick
+tests or one-liners:
+
+  # Quick static file server
+  pagi-server -MPAGI::App::Directory \
+      -e 'PAGI::App::Directory->new(root => "/var/www")->to_app'
+
+  # Serve a single file
+  pagi-server -MPAGI::App::File \
+      -e 'PAGI::App::File->new(root => ".")->to_app'
+
+  # Quick redirect
+  pagi-server -MPAGI::App::Redirect \
+      -e 'PAGI::App::Redirect->new(location => "https://example.com")->to_app'
+
+=head2 Loading Modules with -M
+
+The C<-M> flag loads modules before C<-e> code runs, like C<perl -M>:
+
+  # Load multiple modules
+  pagi-server -MPAGI::App::File -MPAGI::Middleware::Builder \
+      -e 'use PAGI::Middleware::Builder; builder { enable "GZip"; PAGI::App::File->new(root => ".")->to_app }'
+
+  # Cuddled form (no space after -M)
+  pagi-server -MPAGI::App::File -e 'PAGI::App::File->new(root => ".")->to_app'
+
+=head2 Common pagi-server Patterns
+
+  # Development with verbose logging
+  pagi-server --log-level debug app.pl
+
+  # Production multi-worker deployment
+  pagi-server -E production --host 0.0.0.0 -p 80 --workers 4 app.pl
+
+  # With custom library paths
+  pagi-server -I ./lib -I ./local/lib app.pl
+
+  # HTTPS with TLS
+  pagi-server --ssl-cert cert.pem --ssl-key key.pem -p 443 app.pl
+
+  # Daemonized with PID file
+  pagi-server -D --pid /var/run/pagi.pid app.pl
+
+  # Maximum performance (no access logging)
+  pagi-server --no-access-log --workers 8 -E production app.pl
+
+  # Using EV event loop for better performance
+  pagi-server --loop EV app.pl
+
 =head1 DEPLOYMENT
 
 =head2 TLS/HTTPS
@@ -1292,9 +1373,12 @@ Enable mod_xsendfile and whitelist your file directory:
 =head3 Filehandle Support
 
 The middleware also works with filehandle responses, but only if the
-filehandle object has a C<path()> method:
+filehandle object has a C<path()> method. L<IO::File::WithPath> from CPAN
+is an easy drop-in for this:
 
-  # This works - blessed fh with path method
+  use IO::File::WithPath;
+
+  # This works - IO::File::WithPath provides the path method
   my $fh = IO::File::WithPath->new('/path/to/file.bin', 'r');
   await $send->({ type => 'http.response.body', fh => $fh });
 
@@ -1302,82 +1386,57 @@ filehandle object has a C<path()> method:
   open my $plain_fh, '<', '/path/to/file.bin';
   await $send->({ type => 'http.response.body', fh => $plain_fh });
 
-For plain filehandles, either use C<file =E<gt> $path> directly, or add a
-C<path> method to your filehandle class. See L<PAGI::Middleware::XSendfile>
-for details.
+For plain filehandles, either use C<file =E<gt> $path> directly, or use
+L<IO::File::WithPath>. See L<PAGI::Middleware::XSendfile> for details.
 
 =head1 TESTING
 
-Test PAGI apps directly without a running server:
+Use L<PAGI::Test::Client> to test apps directly without a running server:
 
   use strict;
   use warnings;
   use Test2::V0;
-  use Future::AsyncAwait;
+  use PAGI::Test::Client;
 
   # Load your app
   my $app = require './app.pl';
+  my $client = PAGI::Test::Client->new(app => $app);
 
-  # Test helper to create scope and capture response
-  async sub test_request {
-      my (%opts) = @_;
-
-      my $scope = {
-          type         => 'http',
-          method       => $opts{method} // 'GET',
-          path         => $opts{path} // '/',
-          query_string => $opts{query} // '',
-          headers      => $opts{headers} // [],
-      };
-
-      my @body_parts = defined $opts{body} ? ($opts{body}) : ();
-      my $body_sent = 0;
-
-      my $receive = async sub {
-          if (@body_parts) {
-              return {
-                  type => 'http.request',
-                  body => shift @body_parts,
-                  more => scalar(@body_parts) > 0,
-              };
-          }
-          return { type => 'http.disconnect' };
-      };
-
-      my %response = (status => undef, headers => [], body => '');
-      my $send = async sub {
-          my ($event) = @_;
-          if ($event->{type} eq 'http.response.start') {
-              $response{status} = $event->{status};
-              $response{headers} = $event->{headers};
-          }
-          elsif ($event->{type} eq 'http.response.body') {
-              $response{body} .= $event->{body} // '';
-          }
-      };
-
-      await $app->($scope, $receive, $send);
-      return \%response;
-  }
-
-  # Tests
-  subtest 'GET /' => async sub {
-      my $res = await test_request(path => '/');
-      is $res->{status}, 200, 'status is 200';
-      like $res->{body}, qr/Hello/, 'body contains Hello';
+  subtest 'GET /' => sub {
+      my $res = $client->get('/');
+      is $res->status, 200, 'status is 200';
+      like $res->text, qr/Hello/, 'body contains Hello';
   };
 
-  subtest 'POST /api/users' => async sub {
-      my $res = await test_request(
-          method => 'POST',
-          path => '/api/users',
-          headers => [['content-type', 'application/json']],
-          body => '{"name":"Alice"}',
+  subtest 'POST /api/users' => sub {
+      my $res = $client->post('/api/users',
+          json => { name => 'Alice' },
       );
-      is $res->{status}, 201, 'status is 201';
+      is $res->status, 201, 'status is 201';
+      is $res->json->{id}, 1, 'returns user id';
+  };
+
+  subtest 'form submission' => sub {
+      my $res = $client->post('/login',
+          form => { user => 'admin', pass => 'secret' },
+      );
+      is $res->status, 302, 'redirects after login';
+
+      # Session cookies persist across requests
+      my $dashboard = $client->get('/dashboard');
+      is $dashboard->status, 200, 'authenticated access';
+  };
+
+  subtest 'custom headers' => sub {
+      my $res = $client->get('/api/data',
+          headers => { Authorization => 'Bearer token123' },
+      );
+      is $res->status, 200;
   };
 
   done_testing;
+
+See L<PAGI::Test::Client> for the full API including WebSocket and SSE testing.
 
 =head1 SEE ALSO
 
@@ -1394,6 +1453,8 @@ Test PAGI apps directly without a running server:
 =item * L<PAGI::App::WebSocket::Chat> - Multi-room chat application
 
 =item * L<PAGI::Middleware::XSendfile> - Delegate file serving to reverse proxy
+
+=item * L<PAGI::Test::Client> - Test apps without a running server
 
 =back
 

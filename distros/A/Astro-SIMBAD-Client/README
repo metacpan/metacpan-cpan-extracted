@@ -1,4 +1,4 @@
-Astro-SIMBAD-Client is Copyright (C) 2005-2023 by Thomas R. Wyant, III
+Astro-SIMBAD-Client is Copyright (C) 2005-2025 by Thomas R. Wyant, III
 
 DESCRIPTION
 
@@ -69,7 +69,7 @@ LICENSING INFORMATION
 
 This package is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files LICENSE-Artistic and LICENSE-GNU.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

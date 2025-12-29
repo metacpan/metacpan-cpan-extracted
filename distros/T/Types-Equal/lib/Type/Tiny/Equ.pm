@@ -1,9 +1,8 @@
 package Type::Tiny::Equ;
-use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use parent qw( Type::Tiny );
 

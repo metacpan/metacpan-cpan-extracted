@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,29 +26,29 @@ no_index:
 provides:
   Type::Tiny::Eq:
     file: lib/Type/Tiny/Eq.pm
-    version: '0.02'
+    version: '0.03'
   Type::Tiny::Equ:
     file: lib/Type/Tiny/Equ.pm
-    version: '0.02'
+    version: '0.03'
   Type::Tiny::NumEq:
     file: lib/Type/Tiny/NumEq.pm
-    version: '0.02'
+    version: '0.03'
   Type::Tiny::NumEqu:
     file: lib/Type/Tiny/NumEqu.pm
-    version: '0.02'
+    version: '0.03'
   Types::Equal:
     file: lib/Types/Equal.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Type::Tiny: '0'
-  perl: '5.008001'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/kfly8/Type-Equal/issues
   homepage: https://github.com/kfly8/Type-Equal
   repository: https://github.com/kfly8/Type-Equal.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:KFLY
 x_contributors:
   - 'kobaken <kentafly88@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

@@ -10,7 +10,7 @@ plan(skip_all => 'No dynamic linking') if not $Config{usedl};
 use Cwd 'getcwd';
 use ExtUtils::Builder::Planner 0.007;
 use File::Basename qw/basename dirname/;
-use File::Spec::Functions qw/catfile/;
+use File::Spec::Functions qw/catfile curdir/;
 use File::Temp 'tempdir';
 
 my $olddir = getcwd;
@@ -19,12 +19,11 @@ my $dir = tempdir(CLEANUP => 1);
 chdir $dir;
 
 my $planner = ExtUtils::Builder::Planner->new;
-$planner->load_extension('ExtUtils::Builder::AutoDetect::C', undef,
+$planner->load_extension('ExtUtils::Builder::BuildTools::FromPerl', undef,
 	profile => '@Perl', type => 'loadable-object',
 );
 
-mkdir 't';
-my $source_file = File::Spec->catfile('t', 'compilet.c');
+my $source_file = 'compilet.c';
 {
 	open my $fh, '>', $source_file or die "Can't create $source_file: $!";
 	my $content = <<END;
@@ -67,10 +66,11 @@ END
 }
 ok(-e $source_file, "source file '$source_file' created");
 
-my $object_file = catfile(dirname($source_file), basename($source_file, '.c') . $Config{obj_ext});
+my $basename = basename($source_file, '.c');
+my $object_file = $planner->object_file($basename);
 $planner->compile($source_file, $object_file);
 
-my $lib_file = catfile(dirname($source_file), basename($object_file, $Config{obj_ext}) . ".$Config{dlext}");
+my $lib_file = $planner->loadable_file($basename);
 $planner->link([$object_file], $lib_file, dl_name => 'compilet');
 
 my $plan = $planner->materialize;
@@ -82,7 +82,7 @@ ok(-e $object_file, "object file $object_file has been created");
 ok(-e $lib_file, "lib file $lib_file has been created");
 
 require DynaLoader;
-my $libref = DynaLoader::dl_load_file($lib_file, 0);
+my $libref = DynaLoader::dl_load_file(catfile(curdir, $lib_file), 0);
 ok($libref, 'libref is defined');
 my $symref = DynaLoader::dl_find_symbol($libref, "boot_compilet");
 ok($symref, 'symref is defined');

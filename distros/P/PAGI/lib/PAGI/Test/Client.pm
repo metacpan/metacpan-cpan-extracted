@@ -14,11 +14,12 @@ sub new {
     croak "app is required" unless $args{app};
 
     return bless {
-        app      => $args{app},
-        headers  => $args{headers} // {},
-        cookies  => {},
-        lifespan => $args{lifespan} // 0,
-        started  => 0,
+        app                  => $args{app},
+        headers              => $args{headers} // {},
+        cookies              => {},
+        lifespan             => $args{lifespan} // 0,
+        raise_app_exceptions => $args{raise_app_exceptions} // 0,
+        started              => 0,
     }, $class;
 }
 
@@ -104,8 +105,32 @@ sub _request {
         push @events, $event;
     };
 
-    # Call app
-    $self->{app}->($scope, $receive, $send)->get;
+    # Call app (with exception handling like real server)
+    my $exception;
+    eval {
+        $self->{app}->($scope, $receive, $send)->get;
+    };
+    if ($@) {
+        $exception = $@;
+        if ($self->{raise_app_exceptions}) {
+            die $exception;
+        }
+        # Mimic server behavior: return 500 response
+        return PAGI::Test::Response->new(
+            status    => 500,
+            headers   => [['content-type', 'text/plain']],
+            body      => 'Internal Server Error',
+            exception => $exception,
+        );
+    }
+
+    # Check for incomplete response (common async mistake)
+    my $has_response_start = grep { $_->{type} eq 'http.response.start' } @events;
+    unless ($has_response_start) {
+        die "App returned without sending response. "
+          . "Did you forget to 'await' your \$send calls? "
+          . "See PAGI::Tutorial section on async patterns.\n";
+    }
 
     # Parse response from captured events
     return $self->_build_response(\@events);
@@ -659,6 +684,27 @@ these default headers.
 
 If true, the client will send lifespan.startup when started and
 lifespan.shutdown when stopped. Default is false (most tests don't need it).
+
+=item raise_app_exceptions
+
+Controls how application exceptions are handled. Default is B<false>.
+
+When B<false> (default): Exceptions are trapped and converted to a 500 response,
+mimicking how a real server behaves. The exception is available via
+C<< $response->exception >>:
+
+    my $res = $client->get('/broken');
+    is $res->status, 500;
+    like $res->exception, qr/Can't call method/;
+
+When B<true>: Exceptions propagate to the test, useful for debugging:
+
+    my $client = PAGI::Test::Client->new(
+        app => $app,
+        raise_app_exceptions => 1,
+    );
+    # This will die with the actual exception
+    my $res = $client->get('/broken');
 
 =back
 

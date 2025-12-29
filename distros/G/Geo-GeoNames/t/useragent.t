@@ -13,8 +13,8 @@ ok ! eval { Geo::GeoNames->new( ua => IO::Handle->new, username => 'fakename' );
 
 subtest 'Mojo::UserAgent' => sub {
     SKIP: {
-        skip 'Skip tests if Mojo::UserAgent is not installed', 4 unless eval { require Mojo::UserAgent; };
-        my $mua = Mojo::UserAgent->new;
+        skip 'Skip tests if Mojo::UserAgent is not installed', 5 unless eval { require Mojo::UserAgent; };
+        my $mua = new_ok('Mojo::UserAgent');
         ok Geo::GeoNames->new( ua => $mua, username => 'fakename' ), 'Instantiates fine with proper object';
 
         skip 'Need $ENV{GEONAMES_USER} to test actual results work with provided Mojo::UserAgent', 3  unless $ENV{GEONAMES_USER};
@@ -28,9 +28,9 @@ subtest 'Mojo::UserAgent' => sub {
 
 subtest 'LWP::UserAgent' => sub {
     SKIP: {
-        skip 'Skip tests if LWP::UserAgent is not installed', 4 unless eval { require LWP::UserAgent };
+        skip 'Skip tests if LWP::UserAgent is not installed', 5 unless eval { require LWP::UserAgent };
 
-        my $lwp = LWP::UserAgent->new;
+        my $lwp = new_ok('LWP::UserAgent');
         ok Geo::GeoNames->new( ua => $lwp, username => 'fakename' ), 'Instantiates fine with proper object';
 
         skip 'Need $ENV{GEONAMES_USER} to test actual results work with provided LWP::UserAgent', 3 unless $ENV{GEONAMES_USER};

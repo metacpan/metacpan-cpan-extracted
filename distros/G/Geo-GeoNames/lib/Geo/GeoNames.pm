@@ -1,5 +1,5 @@
 package Geo::GeoNames;
-use utf8;
+# use utf8;
 use v5.10;
 use strict;
 use warnings;
@@ -16,13 +16,59 @@ Geo::GeoNames - Perform geographical queries using GeoNames Web Services
 
 =head1 VERSION
 
-Version 1.14
+Version 1.15
 
 =cut
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
-use vars qw($DEBUG $CACHE);
+=head1 SYNOPSIS
+
+	use Geo::GeoNames;
+	my $geo = Geo::GeoNames->new(username => $ENV{'GEONAME_USER'});
+
+	# make a query based on placename
+	my $result = $geo->search(q => 'Fredrikstad', maxRows => 2);
+
+	# print the first result
+	print ' Name: ', $result->[0]->{name}, "\n";
+	print ' Longitude: ', $result->[0]->{lng}, "\n";
+	print ' Latitude: ', $result->[0]->{lat}, "\n";
+
+	# Make a query based on postcode
+	$result = $geo->postalcode_search(
+		postalcode => '1630', maxRows => 3, style => 'FULL'
+	);
+
+=head1 DESCRIPTION
+
+Before you start, get a free GeoNames account and enable it for
+access to the free web service:
+
+=over 4
+
+=item * Get an account
+
+Go to L<http://www.geonames.org/login>
+
+=item * Respond to the email
+
+=item * Login and enable your account for free access
+
+L<http://www.geonames.org/enablefreewebservice>
+
+=back
+
+Provides a perl interface to the webservices found at
+L<http://api.geonames.org>. That is, given a given placename or
+postalcode, the module will look it up and return more information
+(longitude, latitude, etc) for the given placename or postalcode.
+Wikipedia lookups are also supported. If more than one match is found,
+a list of locations will be returned.
+
+=cut
+
+# use vars qw($DEBUG $CACHE);
 
 our %searches = (
 	cities                              => 'cities?',
@@ -73,7 +119,7 @@ our %valid_parameters = (
 		isNameRequired    => 'o',
 		tag    => 'o',
 		username => 'r',
-		name_startsWith => 'o',
+		name_startsWith => 'o',	# TODO - should this be rc?
 		countryBias => 'o',
 		cities => 'om',
 		operator => 'o',
@@ -195,7 +241,7 @@ our %valid_parameters = (
 		east            => 'r',
 		west            => 'r',
 		date            => 'o',
-		minMagnutide    => 'o',
+		minMagnitude    => 'o',
 		maxRows         => 'o',
 		username        => 'r',
 		},
@@ -218,28 +264,41 @@ our %valid_parameters = (
 	);
 
 sub new {
-	my( $class, %hash ) = @_;
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	my $self = bless { _functions => \%searches }, $class;
+	if(!defined($class)) {
+		# Using Geo::GeoNames->new(), not Geo::GeoNames::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
 
-	croak <<"HERE" unless length $hash{username};
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
+
+	croak <<"HERE" unless length $args{username};
 You must specify a GeoNames username to use Geo::GeoNames.
 See http://www.geonames.org/export/web-services.html
 HERE
 
-	$self->username( $hash{username} );
-	$self->url( $hash{url} // $self->default_url );
+	my $self = bless { _functions => \%searches, %args }, $class;
+
+	# $self->username( $args{username} );
+	$self->url( $args{url} // $self->default_url() );
 
 	croak 'Illegal ua object, needs either a Mojo::UserAgent or an LWP::UserAgent derived object'
-	   if exists $hash{ua} && !(ref $hash{ua} && blessed($hash{ua}) && ( $hash{ua}->isa('Mojo::UserAgent') || $hash{ua}->isa('LWP::UserAgent') ) );
-	$self->ua($hash{ua} || $self->default_ua );
+	   if exists $args{ua} && !(ref $args{ua} && blessed($args{ua}) && ( $args{ua}->isa('Mojo::UserAgent') || $args{ua}->isa('LWP::UserAgent') ) );
+	$self->ua($args{ua} || $self->default_ua );
 
-	(exists($hash{debug})) ? $DEBUG = $hash{debug} : 0;
-	(exists($hash{cache})) ? $CACHE = $hash{cache} : 0;
-	$self->{_functions} = \%searches;
+	# (exists($args{debug})) ? $DEBUG = $args{debug} : 0;
+	# (exists($args{cache})) ? $CACHE = $args{cache} : 0;
+	# $self->{_functions} = \%searches;
 
 	return $self;
-	}
+}
 
 sub username {
 	my( $self, $username ) = @_;
@@ -247,7 +306,7 @@ sub username {
 	$self->{username} = $username if @_ == 2;
 
 	$self->{username};
-	}
+}
 
 =head2 ua
 
@@ -272,11 +331,13 @@ sub ua {
 	$self->{ua};
 }
 
-sub default_ua {
-	my $ua = Mojo::UserAgent->new;
+sub default_ua
+{
+	my $ua = Mojo::UserAgent->new();
 	$ua->on( error => sub { carp "Can't get request" } );
-	$ua;
-	}
+	return $ua;
+}
+
 sub default_url { 'http://api.geonames.org' }
 
 sub url {
@@ -285,7 +346,7 @@ sub url {
 	$self->{url} = $url if @_ == 2;
 
 	$self->{url};
-	}
+}
 
 sub _build_request_url {
 	my( $self, $request, @args ) = @_;
@@ -337,17 +398,17 @@ sub _parse_xml_result {
 	my $xml = $xmlsimple->XMLin( $geonamesresponse, KeyAttr => [], ForceArray => 1 );
 
 	if ($xml->{'status'}) {
-		carp "GeoNames error: " . $xml->{'status'}->[0]->{message};
+		carp 'GeoNames error: ', $xml->{'status'}->[0]->{message};
 		return [];
-		}
+	}
 
 	$xml = { geoname => [ $xml ], totalResultsCount => '1' } if $single_result;
 
 	my $i = 0;
 	foreach my $element (keys %{$xml}) {
-		next if (ref($xml->{$element}) ne "ARRAY");
+		next if (ref($xml->{$element}) ne 'ARRAY');
 		foreach my $list (@{$xml->{$element}}) {
-			next if (ref($list) ne "HASH");
+			next if (ref($list) ne 'HASH');
 			foreach my $attribute (%{$list}) {
 				next if !defined($list->{$attribute}->[0]);
 				$result[$i]->{$attribute} = (scalar @{$list->{$attribute}} == 1 ? $list->{$attribute}->[0] : $list->{$attribute});
@@ -359,80 +420,116 @@ sub _parse_xml_result {
 	}
 
 sub _parse_json_result {
-	require JSON;
+	require JSON::MaybeXS;
 	my( $self, $geonamesresponse ) = @_;
-	my @result;
-	return JSON->new->utf8->decode($geonamesresponse);
-	}
+
+	return JSON::MaybeXS->new->utf8->decode($geonamesresponse);
+}
 
 sub _parse_text_result {
 	my( $self, $geonamesresponse ) = @_;
 	my @result;
 	$result[0]->{Result} = $geonamesresponse;
 	return \@result;
-	}
+}
 
 sub _request {
-	my( $self, $request_url ) = @_;
+	my ($self, $request_url) = @_;
 
-	my $res = $self->{ua}->get( $request_url );
-	return $res->can('res') ? $res->res : $res;
+	if($self->{'logger'}) {
+		$self->{'logger'}->trace('> ', ref($self), ": _request: $request_url");
 	}
+	my $res = $self->{ua}->get($request_url);
+
+	# Handle Mojo::UserAgent response
+	if($res->can('res')) {
+		my $response = $res->res();
+		unless($response->is_success) {
+			my $code = $response->code() || 'unknown';
+			my $message = $response->message() || 'HTTP request failed';
+			carp "HTTP request failed: $code $message for URL: $request_url";
+			return undef;
+		}
+		return $response;
+	}
+
+	# Handle LWP::UserAgent response
+	unless ($res->is_success()) {
+		my $code = $res->code() || 'unknown';
+		my $message = $res->message() || 'HTTP request failed';
+		carp "HTTP request failed: $code $message for URL: $request_url";
+		return undef;
+	}
+
+	return $res->can('res') ? $res->res() : $res;
+}
 
 sub _do_search {
 	my( $self, $searchtype, @args ) = @_;
 
 	my $request_url = $self->_build_request_url( $searchtype, @args );
-	my $response = $self->_request( $request_url );
+	my $response = $self->_request($request_url);
+
+	# Return empty array if request failed
+	return [] unless defined $response;
+
+	# Verify HTTP status code
+	my $status_code = $response->code();
+	unless ($status_code >= 200 && $status_code < 300) {
+		carp "HTTP error: received status code $status_code for URL: $request_url";
+		return [];
+	}
 
 	# check mime-type to determine which parse method to use.
 	# we accept text/xml, text/plain (how do see if it is JSON or not?)
 	my $mime_type = $response->headers->content_type || '';
 
-	my $body = '';
-	if ($response->can('body')) {
-		$body = $response->body;
-		}
-	else {
-		$body = $response->content;
+	# Extract just the base MIME type without parameters (e.g., charset)
+	my $base_mime_type = $mime_type;
+	$base_mime_type =~ s/;.*$//;	# Remove everything after semicolon
+	$base_mime_type =~ s/^\s+|\s+$//g;	# Trim whitespace
+
+	my $body = $response->can('body') ? $response->body() : $response->content;
+
+	# Check for XML response
+	if($base_mime_type eq 'text/xml' || $base_mime_type eq 'application/xml') {
+		return $self->_parse_xml_result( $body, $searchtype eq 'get' );
 	}
 
-	if($mime_type =~ m(\Atext/xml;?) ) {
-		return $self->_parse_xml_result( $body, $searchtype eq 'get' );
-		}
-	if($mime_type =~ m(\Aapplication/json;?) ) {
+	# Check for JSON response
+	if($base_mime_type eq 'application/json') {
 		# a JSON object always start with a left-brace {
 		# according to http://json.org/
 		if( $body =~ m/\A\{/ ) {
-		    if ($response->can('json')) {
+			if ($response->can('json')) {
 				return $response->json;
-				}
-			else {
+			} else {
 				return $self->_parse_json_result( $body );
 			}
-		}
-		else {
+		} else {
 			return $self->_parse_text_result( $body );
-			}
 		}
+	}
 
-	if($mime_type eq 'text/plain') {
-		carp 'Invalid mime type [text/plain]. ', $response->content();
+	# Unexpected MIME type
+	if($base_mime_type eq 'text/plain') {
+		carp "Unexpected mime type [text/plain]. Response body: ", substr($body, 0, 200);
+	} elsif($base_mime_type eq 'text/html') {
+		carp "Received HTML response instead of expected data format. This may indicate an error page or service unavailability.";
 	} else {
-		carp "Invalid mime type [$mime_type]. Maybe you aren't connected.";
+		carp "Unsupported mime type [$mime_type]. Expected text/xml or application/json.";
 	}
-
-	return [];
-	}
+}
 
 sub geocode {
 	my( $self, $q ) = @_;
 	$self->search( 'q' => $q );
-	}
+}
 
 sub AUTOLOAD {
 	my $self = shift;
-	my $type = ref($self) || croak "$self is not an object";
+	# my $type = ref($self) || croak "$self is not an object";
+	ref($self) || croak "$self is not an object";
 	my $name = our $AUTOLOAD;
 	$name =~ s/.*://;
 
@@ -441,7 +538,7 @@ sub AUTOLOAD {
 		}
 
 	return($self->_do_search($name, @_));
-	}
+}
 
 sub DESTROY { 1 }
 
@@ -449,72 +546,20 @@ sub DESTROY { 1 }
 
 __END__
 
-=head1 SYNOPSIS
-
-	use Geo::GeoNames;
-	my $geo = Geo::GeoNames->new( username => $username );
-
-	# make a query based on placename
-	my $result = $geo->search(q => 'Fredrikstad', maxRows => 2);
-
-	# print the first result
-	print " Name: " . $result->[0]->{name};
-	print " Longitude: " . $result->[0]->{lng};
-	print " Lattitude: " . $result->[0]->{lat};
-
-	# Make a query based on postcode
-	my $result = $geo->postalcode_search(
-		postalcode => "1630", maxRows => 3, style => "FULL"
-		);
-
-=head1 DESCRIPTION
-
-Before you start, get a free GeoNames account and enable it for
-access to the free web service:
-
-=over 4
-
-=item * Get an account
-
-Go to L<http://www.geonames.org/login>
-
-=item * Respond to the email
-
-=item * Login and enable your account for free access
-
-L<http://www.geonames.org/enablefreewebservice>
-
-=back
-
-Provides a perl interface to the webservices found at
-L<http://api.geonames.org>. That is, given a given placename or
-postalcode, the module will look it up and return more information
-(longitude, latitude, etc) for the given placename or postalcode.
-Wikipedia lookups are also supported. If more than one match is found,
-a list of locations will be returned.
-
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =over 4
 
 =item new
 
-	$geo = Geo::GeoNames->new( username => '...' )
-	$geo = Geo::GeoNames->new( username => '...', url => $url )
+	$geo = Geo::GeoNames->new( username => '...' );
+	$geo = Geo::GeoNames->new( username => '...', url => $url );
 
 Constructor for Geo::GeoNames. It returns a reference to an
 Geo::GeoNames object. You may also pass the url of the webservices to
 use. The default value is L<http://api.geonames.org> and is the only url,
 to my knowledge, that provides the services needed by this module. The
 username parameter is required.
-
-=item ua( $ua )
-
-With a single argument, set the UserAgent to be used by all API calls
-and return that UserAgent object. Supports L<Mojo::UserAgent> and
- L<LWP::UserAgent> derivatives.
-
-With no arguments, return the current UserAgent used.
 
 =item username( $username )
 
@@ -712,7 +757,7 @@ Both B<lat> and B<lng> must be supplied to this method.
 For a thorough description of the arguments, see
 L<http://www.geonames.org/export>
 
-=item find_nearby_wikipediaby_postalcode(arg => $arg)
+=item find_nearby_wikipedia_by_postalcode(arg => $arg)
 
 Reverse lookup for Wikipedia articles. Valid names for B<arg> are as
 follows:
@@ -835,7 +880,7 @@ B<geonamesId> must be supplied to this method. B<lang> and B<style> are optional
 For a thorough description of the arguments, see
 L<http://www.geonames.org/export>
 
-=item hiearchy(arg => $arg)
+=item hierarchy(arg => $arg)
 
 Returns all GeoNames higher up in the hierarchy of a place based on a geonameId.
 
@@ -907,10 +952,11 @@ find_nearest_intersection(), and find_nearby_streets().
 
 =head1 BUGS
 
+This module is provided as-is without any warranty.
+
 Not a bug, but the GeoNames services expects placenames to be UTF-8
-encoded, and all data received from the webservices are also UTF-8
-encoded. So make sure that strings are encoded/decoded based on the
-correct encoding.
+encoded, and all data received from the webservices are also UTF-8 encoded.
+So make sure that strings are encoded/decoded based on the correct encoding.
 
 Please report any bugs found or feature requests through GitHub issues
 L<https://github.com/nigelhorne/Geo-GeoNames/issues>.
@@ -924,6 +970,8 @@ automatically be notified of progress on your bug as I make changes.
 =head1 SEE ALSO
 
 =over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/Geo-GeoNames/coverage/>
 
 =item * L<http://www.geonames.org/export>
 
@@ -943,12 +991,12 @@ Per Henrik Johansen, C<< <per.henrik.johansen@gmail.com> >>.
 Previously maintained by brian d foy, C<< <brian.d.foy@gmail.com> >>
 and Nicolas Mendoza, C<< <mendoza@pvv.ntnu.no> >>
 
-Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Maintained by Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021 by Per Henrik Johansen
-Copyright © 2022 by Nigel Horne
+Copyright (C) 2007-2021 by Per Henrik Johansen
+Copyright (C) 2022-2023 by Nigel Horne
 
 This library is available under the Artistic License 2.0.
 

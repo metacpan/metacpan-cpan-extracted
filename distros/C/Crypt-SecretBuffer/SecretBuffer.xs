@@ -672,7 +672,9 @@ memcmp(lhs, rhs, reverse=false)
       PERL_UNUSED_VAR(ix);
    CODE:
       RETVAL= memcmp(lhs_buf, rhs_buf, (lhs_len < rhs_len? lhs_len : rhs_len));
-      if (RETVAL == 0 && lhs_len != rhs_len)
+      if (RETVAL < 0) RETVAL= -1;
+      else if (RETVAL > 0) RETVAL= 1;
+      else if (RETVAL == 0 && lhs_len != rhs_len)
          RETVAL= lhs_len < rhs_len? -1 : 1;
       if (reverse)
          RETVAL= -RETVAL;
@@ -868,7 +870,9 @@ new(pkg, ...)
       PerlIO *handle= NULL;
       SV *auto_restore= NULL;
       SV *set_echo= NULL;
+      SV *set_line_input= NULL;
       SV *objref;
+      bool already_set= true;
       if (items == 2) {
          IO *io = sv_2io(ST(1));
          handle= io? IoIFP(io) : NULL;
@@ -885,6 +889,9 @@ new(pkg, ...)
             else if (len == 6 && memcmp(name, "handle", 6) == 0) {
                IO *io = sv_2io(ST(i+1));
                handle= io? IoIFP(io) : NULL;
+            }
+            else if (len == 10 && memcmp(name, "line_input", 10) == 0) {
+               set_line_input= ST(i+1);
             }
             else if (len == 12 && memcmp(name, "auto_restore", 12) == 0) {
                auto_restore= ST(i+1);
@@ -907,13 +914,25 @@ new(pkg, ...)
       if (auto_restore)
          cstate.auto_restore= SvTRUE(auto_restore);
       if (set_echo && SvOK(set_echo)) {
-         /* if user called 'maybe_new' and echo state aready matches requested
-            state, return undef. */
-         if (ix == 1 && sb_console_state_get_echo(&cstate) == (bool)SvTRUE(set_echo))
-            XSRETURN(1);
-         if (!sb_console_state_set_echo(&cstate, SvTRUE(set_echo)))
-            croak("set echo = %d failed", (int)(SvTRUE(set_echo)));
+         bool enable= SvTRUE(set_echo);
+         if (sb_console_state_get_echo(&cstate) != enable) {
+            already_set= false;
+            if (!sb_console_state_set_echo(&cstate, enable))
+               croak("set echo = %d failed", (int)enable);
+         }
       }
+      if (set_line_input && SvOK(set_line_input)) {
+         bool enable= SvTRUE(set_line_input);
+         if (sb_console_state_get_line_input(&cstate) != enable) {
+            already_set= false;
+            if (!sb_console_state_set_line_input(&cstate, enable))
+               croak("set echo = %d failed", (int)enable);
+         }
+      }
+      /* if user called 'maybe_new' and echo state aready matches requested
+         state, return undef. */
+      if (ix == 1 && already_set)
+         XSRETURN(1);
       /* new blessed ConsoleState object */
       ST(0)= objref= sv_2mortal(newRV_noinc(&PL_sv_yes));
       newSVrv(objref, pkg);
@@ -932,6 +951,17 @@ echo(cstate, enable=NULL)
       if (enable != NULL)
          sb_console_state_set_echo(cstate, SvTRUE(enable));
       RETVAL= sb_console_state_get_echo(cstate);
+   OUTPUT:
+      RETVAL
+
+bool
+line_input(cstate, enable=NULL)
+   sb_console_state *cstate
+   SV *enable
+   CODE:
+      if (enable != NULL)
+         sb_console_state_set_line_input(cstate, SvTRUE(enable));
+      RETVAL= sb_console_state_get_line_input(cstate);
    OUTPUT:
       RETVAL
 
@@ -1086,6 +1116,31 @@ encoding(span, newval_sv= NULL)
       if (!enc_const || !SvOK(enc_const))
          croak("BUG");
       PUSHs(enc_const);
+
+void
+set_up_us_the_bom(self)
+   SV *self
+   ALIAS:
+      consume_bom = 1
+   INIT:
+      secret_buffer_span *span= secret_buffer_span_from_magic(self, SECRET_BUFFER_MAGIC_OR_DIE);
+      secret_buffer_parse p;
+      if (!secret_buffer_parse_init_from_sv(&p, self))
+         croak("%s", p.error);
+   PPCODE:
+      if (p.lim - p.pos >= 3 && p.pos[0] == 0xEF && p.pos[1] == 0xBB && p.pos[2] == 0xBF) {
+         span->encoding= SECRET_BUFFER_ENCODING_UTF8;
+         span->pos += 3;
+      }
+      else if (p.lim - p.pos >= 2 && p.pos[0] == 0xFF && p.pos[1] == 0xFE) {
+         span->encoding= SECRET_BUFFER_ENCODING_UTF16LE;
+         span->pos += 2;
+      }
+      else if (p.lim - p.pos >= 2 && p.pos[0] == 0xFE && p.pos[1] == 0xFF) {
+         span->encoding= SECRET_BUFFER_ENCODING_UTF16BE;
+         span->pos += 2;
+      }
+      XSRETURN(1);
 
 void
 scan(self, pattern=NULL, flags= 0)

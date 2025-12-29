@@ -432,7 +432,7 @@ YAML
     metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION},  # needed to override $schema
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
-  schemas:
+  schemas:                  # entity 0
     beta_schema:
       $id: beta
       not:
@@ -442,7 +442,13 @@ components:
       $anchor: anchor1
     anchor2:
       $anchor: anchor2
-  parameters:
+  responses:                # entity 1
+    my_response4:
+      content:
+        text/plain:
+          schema:
+            $comment: nothing to see here
+  parameters:               # entity 2
     my_param1:
       name: param1
       in: query
@@ -452,24 +458,44 @@ components:
           foo:
             $anchor: anchor3
         additionalProperties: false
+      examples:
+        my_example:
+          $ref: '#/components/examples/my_example'
     my_param2:
       name: param2
       in: query
       content:
-        media_type_0:
-          schema:
-            $id: parameter2_id
+        text/plain:
+          $ref: '#/components/mediaTypes/media_type_0'
     my_param3:
       name: param3
       in: query
       schema: false
-  responses:
-    my_response4:
+  examples:                 # entity 3
+    my_example:
+      summary: an example
+      value: foo
+  requestBodies:            # entity 4
+    my_body:
       content:
-        media_type_4:
+        text/plain:
           schema:
-            $comment: nothing to see here
-  pathItems:
+            $id: pathItem0_get_requestBody_id
+  headers:                  # entity 5
+    my_header:
+      schema: {}
+  securitySchemes:          # entity 6
+    my_security:
+      type: http
+      scheme: bearer
+  links:                    # entity 7
+    my_link:
+      operationId: my_operation
+  callbacks:                # entity 8
+    my_callback:
+      '{$request.query.queryUrl}':
+        $ref: '#/components/pathItems/path0'
+  pathItems:                # entity 9
     path0:
       parameters:
         - name: param0
@@ -484,25 +510,25 @@ components:
             schema:
               $id: pathItem0_get_param_id
         requestBody:
-          content:
-            media_type_1:
-              schema:
-                $id: pathItem0_get_requestBody_id
+          $ref: '#/components/requestBodies/my_body'
         responses:
           200:
             content:
-              media_type_2:
+              text/plain:
                 schema:
                   $id: pathItem0_get_responses2_id
-              media_type_3:
-                schema:
-                  $id: pathItem0_get_responses3_id
+              application/json:
+                schema: {}
           default:
             $ref: '#/components/responses/my_response4'
         callbacks:
           my_callback:
             '{$request.query.queryUrl}':
               post: {}
+  mediaTypes:               # entity 10
+    media_type_0:
+      schema:
+        $id: parameter2_id
 paths:
   /foo/alpha: {}
   /foo/beta: {}
@@ -557,7 +583,7 @@ YAML
         },
       },
       'http://localhost:1234/parameter2_id' => {
-        path => '/components/parameters/my_param2/content/media_type_0/schema',
+        path => '/components/mediaTypes/media_type_0/schema',
         canonical_uri => str('http://localhost:1234/parameter2_id'),
         specification_version => 'draft2020-12',
         vocabularies => bag(OAS_VOCABULARIES->@*),
@@ -575,17 +601,17 @@ YAML
         vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       'http://localhost:1234/pathItem0_get_requestBody_id' => {
-        path => '/components/pathItems/path0/get/requestBody/content/media_type_1/schema',
+        path => '/components/requestBodies/my_body/content/text~1plain/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_requestBody_id'),
         specification_version => 'draft2020-12',
         vocabularies => bag(OAS_VOCABULARIES->@*),
       },
-      map +('http://localhost:1234/pathItem0_get_responses'.$_.'_id' => {
-        path => '/components/pathItems/path0/get/responses/200/content/media_type_'.$_.'/schema',
-        canonical_uri => str('http://localhost:1234/pathItem0_get_responses'.$_.'_id'),
+      'http://localhost:1234/pathItem0_get_responses2_id' => {
+        path => '/components/pathItems/path0/get/responses/200/content/text~1plain/schema',
+        canonical_uri => str('http://localhost:1234/pathItem0_get_responses2_id'),
         specification_version => 'draft2020-12',
         vocabularies => bag(OAS_VOCABULARIES->@*),
-      }), 2..3,
+      },
     },
     'subschema resources are correctly identified in the document',
   );
@@ -593,42 +619,52 @@ YAML
   cmp_result(
     $doc->_entities,
     {
-      '/components/parameters/my_param1' => 2,
+      '/components/headers/my_header/schema' => 0,
+      '/components/mediaTypes/media_type_0/schema' => 0,
       '/components/parameters/my_param1/schema' => 0,
-      '/components/parameters/my_param1/schema/properties/foo' => 0,
       '/components/parameters/my_param1/schema/additionalProperties' => 0,
-      '/components/parameters/my_param2' => 2,
-      '/components/parameters/my_param2/content/media_type_0' => 10,
-      '/components/parameters/my_param2/content/media_type_0/schema' => 0,
-      '/components/parameters/my_param3' => 2,
+      '/components/parameters/my_param1/schema/properties/foo' => 0,
       '/components/parameters/my_param3/schema' => 0,
-      '/components/pathItems/path0' => 9,
-      '/components/pathItems/path0/get/callbacks/my_callback' => 8,
-      '/components/pathItems/path0/get/callbacks/my_callback/{$request.query.queryUrl}' => 9,
-      '/components/pathItems/path0/get/parameters/0' => 2,
       '/components/pathItems/path0/get/parameters/0/schema' => 0,
-      '/components/pathItems/path0/get/requestBody' => 4,
-      '/components/pathItems/path0/get/requestBody/content/media_type_1' => 10,
-      '/components/pathItems/path0/get/requestBody/content/media_type_1/schema' => 0,
-      '/components/pathItems/path0/get/responses/200' => 1,
-      '/components/pathItems/path0/get/responses/200/content/media_type_2' => 10,
-      '/components/pathItems/path0/get/responses/200/content/media_type_2/schema' => 0,
-      '/components/pathItems/path0/get/responses/200/content/media_type_3' => 10,
-      '/components/pathItems/path0/get/responses/200/content/media_type_3/schema' => 0,
-      '/components/pathItems/path0/get/responses/default' => 1,
-      '/components/pathItems/path0/parameters/0' => 2,
+      '/components/pathItems/path0/get/responses/200/content/text~1plain/schema' => 0,
+      '/components/pathItems/path0/get/responses/200/content/application~1json/schema' => 0,
       '/components/pathItems/path0/parameters/0/schema' => 0,
-      '/components/responses/my_response4' => 1,
-      '/components/responses/my_response4/content/media_type_4' => 10,
-      '/components/responses/my_response4/content/media_type_4/schema' => 0,
+      '/components/requestBodies/my_body/content/text~1plain/schema' => 0,
+      '/components/responses/my_response4/content/text~1plain/schema' => 0,
       '/components/schemas/anchor1' => 0,
       '/components/schemas/anchor2' => 0,
       '/components/schemas/beta_schema' => 0,
       '/components/schemas/beta_schema/not' => 0,
+      '/components/pathItems/path0/get/responses/200' => 1,
+      '/components/pathItems/path0/get/responses/default' => 1,
+      '/components/responses/my_response4' => 1,
+      '/components/parameters/my_param1' => 2,
+      '/components/parameters/my_param2' => 2,
+      '/components/parameters/my_param3' => 2,
+      '/components/pathItems/path0/get/parameters/0' => 2,
+      '/components/pathItems/path0/parameters/0' => 2,
+      '/components/examples/my_example' => 3,
+      '/components/parameters/my_param1/examples/my_example' => 3,
+      '/components/pathItems/path0/get/requestBody' => 4,
+      '/components/requestBodies/my_body' => 4,
+      '/components/headers/my_header' => 5,
+      '/components/securitySchemes/my_security' => 6,
+      '/components/links/my_link' => 7,
+      '/components/callbacks/my_callback' => 8,
+      '/components/pathItems/path0/get/callbacks/my_callback' => 8,
+      '/components/callbacks/my_callback/{$request.query.queryUrl}' => 9,
+      '/components/pathItems/path0' => 9,
+      '/components/pathItems/path0/get/callbacks/my_callback/{$request.query.queryUrl}' => 9,
       '/paths/~1foo~1alpha' => 9,
       '/paths/~1foo~1beta' => 9,
       '/webhooks/bar' => 9,
       '/webhooks/foo' => 9,
+      '/components/mediaTypes/media_type_0' => 10,
+      '/components/parameters/my_param2/content/text~1plain' => 10,
+      '/components/pathItems/path0/get/responses/200/content/text~1plain' => 10,
+      '/components/pathItems/path0/get/responses/200/content/application~1json' => 10,
+      '/components/requestBodies/my_body/content/text~1plain' => 10,
+      '/components/responses/my_response4/content/text~1plain' => 10,
     },
     'all entity locations are identified',
   );
@@ -1168,14 +1204,60 @@ info:
   title: Test API
   version: 1.2.3
 components:
-  schemas:
+  schemas:                  # entity 0
     OAS_3.0_schema:
       type: array
       items:
         type: string
         nullable: true
+    schema1:
+      $ref: '#/components/schemas/OAS_3.0_schema'
+  responses:                # entity 1
+    response0:
+      description: foo
+    response1:
+      $ref: '#/components/responses/response0'
+  parameters:               # entity 2
+    parameter0:
+      name: q
+      in: query
+      schema: {}
+    parameter1:
+      $ref: '#/components/parameters/parameter0'
+  examples:                  # entity 3
+    example0: {}
+    example1:
+      $ref: '#/components/examples/example0'
+  requestBodies:            # entity 4
+    request0:
+      content:
+        text/plain:
+          schema: {}
+    request1:
+      $ref: '#/components/requestBodies/request0'
+  headers:                  # entity 5
+    header0:
+      schema: {}
+    header1:
+      $ref: '#/components/headers/header0'
+  securitySchemes:          # entity 6
+    scheme0:
+      type: http
+      scheme: bearer
+    scheme1:
+      $ref: '#/components/securitySchemes/scheme0'
+  links:                    # entity 7
+    link0: {}
+    link1:
+      $ref: '#/components/links/link0'
+  callbacks:                # entity 8
+    callback0:
+      '{$request.query.queryUrl}':
+        $ref: '#/paths/~1foo~1bar'
+    callback1:
+      $ref: '#/components/callbacks/callback0'
 paths:
-  /foo/bar:
+  /foo/bar:                 # entity 9
     get:
       operationId: foobar
       parameters:
@@ -1189,6 +1271,8 @@ paths:
           content:
             application/json:
               schema: {}
+  /ref:
+    $ref: '#/paths/~1foo~1bar'
 YAML
 
   cmp_result([ $doc->errors ], [], 'no errors in a 3.0 OAD');
@@ -1196,14 +1280,38 @@ YAML
   cmp_result(
     $doc->_entities,
     {
+      '/components/headers/header0/schema' => 0,
+      '/components/headers/header0/schema' => 0,
+      '/components/parameters/parameter0/schema' => 0,
+      '/components/requestBodies/request0/content/text~1plain/schema' => 0,
       '/components/schemas/OAS_3.0_schema' => 0,
       '/components/schemas/OAS_3.0_schema/items' => 0,
-      '/paths/~1foo~1bar' => 9,
-      '/paths/~1foo~1bar/get/parameters/0' => 2,
+      '/components/schemas/schema1' => 0,
       '/paths/~1foo~1bar/get/parameters/0/schema' => 0,
-      '/paths/~1foo~1bar/get/responses/2XX' => 1,
-      '/paths/~1foo~1bar/get/responses/2XX/content/application~1json' => 10,
       '/paths/~1foo~1bar/get/responses/2XX/content/application~1json/schema' => 0,
+      '/components/responses/response0' => 1,
+      '/components/responses/response1' => 1,
+      '/paths/~1foo~1bar/get/responses/2XX' => 1,
+      '/components/parameters/parameter0' => 2,
+      '/components/parameters/parameter1' => 2,
+      '/paths/~1foo~1bar/get/parameters/0' => 2,
+      '/components/examples/example0' => 3,
+      '/components/examples/example1' => 3,
+      '/components/requestBodies/request0' => 4,
+      '/components/requestBodies/request1' => 4,
+      '/components/headers/header0' => 5,
+      '/components/headers/header1' => 5,
+      '/components/securitySchemes/scheme0' => 6,
+      '/components/securitySchemes/scheme1' => 6,
+      '/components/links/link0' => 7,
+      '/components/links/link1' => 7,
+      '/components/callbacks/callback0' => 8,
+      '/components/callbacks/callback1' => 8,
+      '/components/callbacks/callback0/{$request.query.queryUrl}' => 9,
+      '/paths/~1foo~1bar' => 9,
+      '/paths/~1ref' => 9,
+      '/components/requestBodies/request0/content/text~1plain' => 10,
+      '/paths/~1foo~1bar/get/responses/2XX/content/application~1json' => 10,
     },
     'all entities are identified in the document',
   );

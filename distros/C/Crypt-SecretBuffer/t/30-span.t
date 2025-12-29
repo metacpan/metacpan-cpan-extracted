@@ -246,6 +246,27 @@ subtest trim => sub {
       'rtrim';
 };
 
+subtest bom => sub {
+   is secret("\xFE\xFF\x001\x002\x003")->span->set_up_us_the_bom,
+      object {
+         call [ cmp => "123" ], 0;
+         call encoding => "UTF-16BE";
+      },
+      'UTF16BE';
+   is secret("\xFF\xFE1\x002\x003\x00")->span->set_up_us_the_bom,
+      object {
+         call [ cmp => "123" ], 0;
+         call encoding => "UTF-16LE";
+      },
+      'UTF16LE';
+   is secret("\xEF\xBB\xBF123")->span->set_up_us_the_bom,
+      object {
+         call [ cmp => "123" ], 0;
+         call encoding => "UTF-8";
+      },
+      'UTF8';
+};
+
 subtest copy_iso8859 => sub {
    my $s= secret("abcdef")->span;
    is $s->copy,

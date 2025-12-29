@@ -12,7 +12,7 @@ SYNOPSIS
       version = 0.001
   
       [@Starter::Git]      ; all that is needed to start
-      revision = 5         ; always defaults to revision 3
+      revision = 6         ; always defaults to revision 3
   
       ; configuring examples
       installer = ModuleBuildTiny
@@ -40,11 +40,11 @@ DESCRIPTION
 OPTIONS
     "[@Starter::Git]" inherits the options from [@Starter], and can
     similarly be further configured by the composed roles, as in
-    "CONFIGURING".
+    "CONFIGURING" in Dist::Zilla::PluginBundle::Starter.
 
   revision
       [@Starter::Git]
-      revision = 5
+      revision = 6
 
     As in "revision" in Dist::Zilla::PluginBundle::Starter, but defaults to
     revision 3. "[@Starter::Git]" requires at least revision 3.
@@ -65,9 +65,9 @@ OPTIONS
 REVISIONS
     The "[@Starter::Git]" plugin bundle supports the following revisions.
 
-  Revision 3
-    Revision 3 is the default and is equivalent to using the following
-    plugins:
+  Revision 6
+    Revision 6 is the current set of best practices, equivalent to using the
+    following plugins if not configured further:
 
     [Git::GatherDir]
     [MetaYAML]
@@ -82,15 +82,15 @@ REVISIONS
     [MakeMaker]
     [Manifest]
     [PruneCruft]
+    [PruneFiles]
+        filename = README.pod
+
     [ManifestSkip]
     [RunExtraTests]
     [Git::Check]
         allow_dirty = dist.ini
         allow_dirty = Changes
 
-    [TestRelease]
-    [ConfirmRelease]
-    [UploadToCPAN]
     [Git::Commit / Release_Commit]
         allow_dirty = dist.ini
         allow_dirty = Changes
@@ -102,7 +102,11 @@ REVISIONS
         tag_message = %v
 
     [Git::Push]
-    [MetaConfig]
+    [TestRelease]
+    [ConfirmRelease]
+    [UploadToCPAN]
+    [MetaMergeFile]
+    [PrereqsFile]
     [MetaNoIndex]
         directory = t
         directory = xt
@@ -117,20 +121,25 @@ REVISIONS
     [ShareDir]
     [ExecDir]
 
-    This revision differs from Revision 3 in [@Starter] as follows:
+    Revision 6 has no specific differences from Revision 5 beyond the
+    changes in Revision 6 in [@Starter].
+
+  Revision 5
+    Revision 5 has no specific differences from Revision 4 beyond the
+    changes in Revision 5 in [@Starter].
+
+  Revision 4
+    Revision 4 has no specific differences from Revision 3 beyond the
+    changes in Revision 4 in [@Starter].
+
+  Revision 3
+    Revision 3 is the default if no revision is specified, and differs from
+    Revision 3 in [@Starter] as follows:
 
     * Uses [Git::GatherDir] instead of [GatherDir].
 
     * Includes the following additional plugins: [Git::Check],
       [Git::Commit], [Git::Tag], [Git::Push].
-
-  Revision 4
-    Revision 4 has no specific differences beyond the changes in Revision 4
-    in [@Starter].
-
-  Revision 5
-    Revision 5 has no specific differences beyond the changes in Revision 5
-    in [@Starter].
 
 BUGS
     Report any issues on the public bugtracker.

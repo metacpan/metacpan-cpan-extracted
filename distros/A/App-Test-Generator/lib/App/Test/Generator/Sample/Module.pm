@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 NAME
 

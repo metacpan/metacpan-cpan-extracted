@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::ELF::GCC;
-$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.034';
+$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.035';
 use strict;
 use warnings;
 

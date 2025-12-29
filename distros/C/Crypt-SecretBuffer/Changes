@@ -1,3 +1,9 @@
+Version 0.017 - 2025-12-28
+  - New features for append_console_line: char_mask, char_count, char_class
+  - New attribute 'line_input' for ConsoleState toggles line buffering
+  - New method Span->set_up_us_the_bom processes byte-order-marks
+  - Return value of memcmp is now normalized to -1/0/1
+
 Version 0.016 - 2025-12-27
   - New append_console_line(prompt => $txt) feature resolves race condition
     between printing prompt and disabling echo

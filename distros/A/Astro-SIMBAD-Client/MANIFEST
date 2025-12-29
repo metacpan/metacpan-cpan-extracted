@@ -16,14 +16,15 @@ inc/My/Module/Recommend/None.pm
 inc/My/Module/Test.pm
 lib/Astro/SIMBAD/Client.pm
 lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
 META.yml
 README
 script/simbadc
+SECURITY
 t/arcturus.simple
 t/arcturus.vo
 t/arcturus.yaml

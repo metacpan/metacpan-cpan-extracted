@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kfly8/Type-Equal/actions/workflows/test.yml/badge.svg)](https://github.com/kfly8/Type-Equal/actions) [![Coverage Status](https://img.shields.io/coveralls/kfly8/Type-Equal/main.svg?style=flat)](https://coveralls.io/r/kfly8/Type-Equal?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/Types-Equal.svg)](https://metacpan.org/release/Types-Equal)
+[![Actions Status](https://github.com/kfly8/Type-Equal/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kfly8/Type-Equal/actions?workflow=test) [![Coverage Status](https://img.shields.io/coveralls/kfly8/Type-Equal/main.svg?style=flat)](https://coveralls.io/r/kfly8/Type-Equal?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/Types-Equal.svg)](https://metacpan.org/release/Types-Equal)
 # NAME
 
 Types::Equal - type constraints for single value equality

@@ -4,7 +4,7 @@
       "kobaken <kentafly88@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.21",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Acme::Onion" : {
          "file" : "lib/Acme/Onion.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -69,8 +69,8 @@
          "web" : "https://github.com/kfly8/Acme-Onion"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KFLY",
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

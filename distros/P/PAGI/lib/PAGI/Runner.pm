@@ -2,14 +2,13 @@ package PAGI::Runner;
 
 use strict;
 use warnings;
-use Getopt::Long qw(GetOptionsFromArray :config pass_through no_auto_abbrev);
+use Getopt::Long qw(GetOptionsFromArray :config pass_through no_auto_abbrev no_ignore_case);
 use Pod::Usage;
 use File::Spec;
 use POSIX qw(setsid);
 use IO::Async::Loop;
 
 use PAGI;
-use PAGI::Server;
 
 
 =head1 NAME
@@ -23,26 +22,57 @@ PAGI::Runner - PAGI application loader and server runner
     pagi-server ./app.pl -p 8080
     pagi-server                        # serves current directory
 
+    # With environment modes
+    pagi-server -E development app.pl  # enable Lint middleware
+    pagi-server -E production app.pl   # no auto-middleware
+    PAGI_ENV=production pagi-server app.pl
+
     # Programmatic usage
     use PAGI::Runner;
 
-    my $runner = PAGI::Runner->new;
-    $runner->parse_options(@ARGV);
-    $runner->run;
-
-    # Or all-in-one
-    PAGI::Runner->new->run(@ARGV);
-
-    # For testing
-    my $runner = PAGI::Runner->new(port => 0, quiet => 1);
-    $runner->load_app('PAGI::App::Directory', root => '.');
-    my $server = $runner->prepare_server;
+    PAGI::Runner->run(@ARGV);
 
 =head1 DESCRIPTION
 
 PAGI::Runner is a loader and runner for PAGI applications, similar to
 L<Plack::Runner> for PSGI. It handles CLI argument parsing, app loading
-(from files or modules), and server orchestration.
+(from files or modules), environment modes, and server orchestration.
+
+The runner is designed to be server-agnostic. Common options like host,
+port, and daemonize are handled by the runner, while server-specific
+options are passed through to the server backend.
+
+=head1 ENVIRONMENT MODES
+
+PAGI::Runner supports environment modes similar to Plack's C<-E> flag:
+
+=over 4
+
+=item development
+
+Auto-enables L<PAGI::Middleware::Lint> with strict mode to catch
+specification violations early. This is the default when running
+interactively (TTY detected).
+
+=item production
+
+No middleware is auto-enabled. This is the default when running
+non-interactively (no TTY, e.g., systemd, docker, cron).
+
+=item none
+
+Explicit opt-out of all auto-middleware, regardless of TTY detection.
+
+=back
+
+Mode is determined by (in order of precedence):
+
+    1. -E / --env command line flag
+    2. PAGI_ENV environment variable
+    3. Auto-detection: TTY = development, no TTY = production
+
+Use C<--no-default-middleware> to disable auto-middleware while keeping
+the mode for other purposes.
 
 =head1 APP LOADING
 
@@ -73,136 +103,20 @@ If no app is specified, defaults to serving the current directory:
 
     pagi-server                        # same as: PAGI::App::Directory root=.
 
-=head1 CONSTRUCTOR ARGUMENTS
-
-Arguments after the app specifier are parsed as C<key=value> pairs
-and passed to the module constructor:
-
-    pagi-server PAGI::App::Directory root=/var/www show_hidden=1
-
-Becomes:
-
-    PAGI::App::Directory->new(root => '/var/www', show_hidden => 1)->to_app
-
 =head1 METHODS
+
+=head2 run
+
+    PAGI::Runner->run(@ARGV);
+
+Class method that creates a runner, parses options, loads the app,
+and runs the server. This is the main entry point for CLI usage.
 
 =head2 new
 
     my $runner = PAGI::Runner->new(%options);
 
-Creates a new runner instance. Options:
-
-=over 4
-
-=item host => $host
-
-Bind address. Default: C<'127.0.0.1'> (localhost only)
-
-The default is secure - it only accepts local connections. For headless
-servers or deployments requiring remote access, use C<'0.0.0.0'> to bind
-to all IPv4 interfaces. See L<PAGI::Server> for detailed documentation
-
-=item port => $port
-
-Bind port. Default: 5000
-
-=item workers => $num
-
-Number of worker processes. Default: 1
-
-=item listener_backlog => $num
-
-Listener queue size. No default, if left blank then the
-server sets a default that is rational for itself.
-
-=item timeout => $num
-
-Seconds before we timeout the request. If left blank will
-default to whatever is default for the server.
-
-=item quiet => $bool
-
-Suppress startup messages. Default: 0
-
-=item loop => $loop_type
-
-Event loop backend (EV, Epoll, UV, Poll). Default: auto-detect
-
-=item ssl_cert => $path
-
-Path to SSL certificate file.
-
-=item ssl_key => $path
-
-Path to SSL private key file.
-
-=item access_log => $path
-
-Path to access log file. Default: STDERR
-
-=item no_access_log => $bool
-
-Disable access logging entirely. Eliminates per-request I/O overhead,
-which can improve throughput by 5-15% depending on workload. Default: 0
-
-=item log_level => $level
-
-Controls the verbosity of server log messages. Valid levels from least
-to most verbose: 'error', 'warn', 'info', 'debug'. Default: 'info'
-
-=item reuseport => $bool
-
-Enable SO_REUSEPORT mode for multi-worker servers. Each worker creates its
-own listening socket, allowing the kernel to distribute connections. Reduces
-accept() contention and can improve p99 latency under high concurrency.
-Default: 0
-
-=item max_receive_queue => $count
-
-Maximum WebSocket receive queue size (message count). When exceeded, connection
-is closed with code 1008. DoS protection for slow consumers. Default: 1000
-
-=item max_ws_frame_size => $bytes
-
-Maximum WebSocket frame payload size in bytes. When a client sends a frame
-larger than this limit, the connection is closed. Default: 65536 (64KB)
-
-=item max_requests => $count
-
-Maximum requests per worker before restart. Default: 0 (unlimited)
-
-=item max_connections => $count
-
-Maximum concurrent connections per worker. Default: 0 (auto-detect).
-See L<PAGI::Server/max_connections> for details.
-
-=item max_body_size => $bytes
-
-Maximum request body size in bytes. Default: 10,000,000 (10MB).
-Set to 0 for unlimited. See L<PAGI::Server/max_body_size> for details.
-
-=item libs => \@paths
-
-Additional library paths to add to @INC before loading the app.
-Similar to C<perl -I>. Default: []
-
-=item daemonize => $bool
-
-Fork to background and detach from terminal. Default: 0
-
-=item pid_file => $path
-
-Write process ID to this file. Useful for init scripts and process managers.
-
-=item user => $username
-
-Drop privileges to this user after binding to port. Requires starting as root.
-
-=item group => $groupname
-
-Drop privileges to this group after binding to port. Requires starting as root.
-
-=back
+Creates a new runner instance. Most users should use C<run()> instead.
 
 =cut
 
@@ -210,185 +124,282 @@ sub new {
     my ($class, %args) = @_;
 
     return bless {
-        host              => $args{host}              // '127.0.0.1',
-        port              => $args{port}              // 5000,
-        workers           => $args{workers}           // 1,
+        # Runner options (common to all servers)
+        host              => $args{host},
+        port              => $args{port},
+        server            => $args{server},
+        env               => $args{env},
         quiet             => $args{quiet}             // 0,
-        loop              => $args{loop}              // undef,
-        ssl_cert          => $args{ssl_cert}          // undef,
-        ssl_key           => $args{ssl_key}           // undef,
-        access_log        => $args{access_log}        // undef,
+        loop              => $args{loop},
+        access_log        => $args{access_log},
         no_access_log     => $args{no_access_log}     // 0,
-        log_level         => $args{log_level}         // undef,
-        timeout           => $args{timeout}           // undef,
-        listener_backlog  => $args{listener_backlog}  // undef,
-        reuseport         => $args{reuseport}         // 0,
-        max_receive_queue => $args{max_receive_queue} // undef,
-        max_ws_frame_size => $args{max_ws_frame_size} // undef,
-        max_requests      => $args{max_requests}      // undef,
-        max_connections       => $args{max_connections}       // 0,
         daemonize         => $args{daemonize}         // 0,
-        pid_file          => $args{pid_file}          // undef,
-        user              => $args{user}              // undef,
-        group             => $args{group}             // undef,
+        pid_file          => $args{pid_file},
+        user              => $args{user},
+        group             => $args{group},
         libs              => $args{libs}              // [],
+        modules           => $args{modules}           // [],
+        eval              => $args{eval},
+        default_middleware => $args{default_middleware},
+
+        # Internal state
         app               => undef,
         app_spec          => undef,
         app_args          => {},
+        server_options    => [],
+        argv              => [],
     }, $class;
 }
 
 =head2 parse_options
 
-    my @remaining = $runner->parse_options(@args);
+    $runner->parse_options(@args);
 
-Parses CLI options from the argument list. Known options are extracted
-and stored in the runner object. Returns remaining arguments (app specifier
-and constructor args).
+Parses CLI options from the argument list. Common options are stored
+in the runner object. Server-specific options (those not recognized)
+are collected for pass-through to the server.
 
-Supported options:
+=head3 Common Options (handled by Runner)
 
-    -I, --lib       Add path to @INC (repeatable, like perl -I)
-    -a, --app       App file path (legacy, for backward compatibility)
-    -h, --host      Bind address
-    -p, --port      Bind port
-    -w, --workers   Number of workers
-    -l, --loop      Event loop backend
-    --ssl-cert      SSL certificate path
-    --ssl-key       SSL key path
-    --access-log    Access log path
-    --no-access-log Disable access logging (for max performance)
-    --log-level     Log verbosity: debug, info, warn, error (default: info)
-    --reuseport     Enable SO_REUSEPORT for multi-worker scaling
-    --max-requests  Requests per worker before restart (default: unlimited)
-    -q, --quiet     Suppress output
-    --help          Show help
+    -a, --app FILE      Load app from file (legacy option)
+    -e CODE             Inline app code (like perl -e)
+    -M MODULE           Load MODULE before -e (repeatable, like perl -M)
+    -o, --host HOST     Bind address (default: 127.0.0.1)
+    -p, --port PORT     Bind port (default: 5000)
+    -s, --server CLASS  Server class (default: PAGI::Server)
+    -E, --env MODE      Environment mode (development, production, none)
+    -I, --lib PATH      Add PATH to @INC (repeatable)
+    -l, --loop BACKEND  Event loop backend (EV, Epoll, UV, Poll)
+    -D, --daemonize     Run as background daemon
+    --access-log FILE   Access log file (default: STDERR)
+    --no-access-log     Disable access logging
+    --pid FILE          Write PID to file
+    --user USER         Run as specified user (after binding)
+    --group GROUP       Run as specified group (after binding)
+    -q, --quiet         Suppress startup messages
+    --default-middleware  Toggle mode middleware (default: on)
+    -v, --version       Show version info
+    --help              Show help
+
+Example with C<-e> and C<-M>:
+
+    pagi-server -MPAGI::App::File -e 'PAGI::App::File->new(root => ".")->to_app'
+
+=head3 Server-Specific Options (passed through)
+
+All unrecognized options starting with C<-> are passed to the server.
+For PAGI::Server, these include:
+
+    -w, --workers       Number of worker processes
+    --reuseport         Enable SO_REUSEPORT mode
+    --ssl-cert, --ssl-key  TLS configuration
+    --max-requests, --max-connections, --max-body-size
+    --timeout, --log-level, etc.
+
+See L<PAGI::Server> for the full list of server-specific options.
 
 =cut
 
 sub parse_options {
     my ($self, @args) = @_;
 
-    my %opts;
-    my ($help, $version);
+    # Pre-process cuddled options like -MModule or -e"code" → -M Module, -e "code"
+    # This matches Plack::Runner behavior for perl-like flags
+    @args = map { /^(-[IMMe])(.+)/ ? ($1, $2) : $_ } @args;
 
-    # Use pass_through to leave unknown options for the app
+    my %opts;
     my @libs;
+    my @modules;
+
+    # Parse runner options, pass through unknown for server
     GetOptionsFromArray(
         \@args,
-        'I|lib=s'               => \@libs,
-        'app|a=s'               => \$opts{app},
-        'host|h=s'              => \$opts{host},
-        'port|p=i'              => \$opts{port},
-        'workers|w=i'           => \$opts{workers},
-        'listener_backlog|b=i'  => \$opts{listener_backlog},
-        'timeout=i'             => \$opts{timeout},
-        'loop|l=s'              => \$opts{loop},
-        'ssl-cert=s'            => \$opts{ssl_cert},
-        'ssl-key=s'             => \$opts{ssl_key},
-        'access-log=s'          => \$opts{access_log},
-        'no-access-log'         => \$opts{no_access_log},
-        'log-level=s'           => \$opts{log_level},
-        'reuseport'             => \$opts{reuseport},
-        'max-receive-queue=i'   => \$opts{max_receive_queue},
-        'max-ws-frame-size=i'   => \$opts{max_ws_frame_size},
-        'sync-file-threshold=i' => \$opts{sync_file_threshold},
-        'max-requests=i'        => \$opts{max_requests},
-        'max-connections=i'     => \$opts{max_connections},
-        'max-body-size=i'       => \$opts{max_body_size},
-        'daemonize|D'           => \$opts{daemonize},
-        'pid=s'                 => \$opts{pid_file},
-        'user=s'                => \$opts{user},
-        'group=s'               => \$opts{group},
-        'quiet|q'               => \$opts{quiet},
-        'help'                  => \$help,
-        'version|v'             => \$version,
+        # App loading
+        'a|app=s'             => \$opts{app},
+        'e=s'                 => \$opts{eval},
+        'I|lib=s'             => \@libs,
+        'M=s'                 => \@modules,
+
+        # Network
+        'o|host=s'            => \$opts{host},
+        'p|port=i'            => \$opts{port},
+
+        # Server selection (future: pluggable servers)
+        's|server=s'          => \$opts{server},
+
+        # Environment/mode
+        'E|env=s'             => \$opts{env},
+
+        # Event loop
+        'l|loop=s'            => \$opts{loop},
+
+        # Logging
+        'access-log=s'        => \$opts{access_log},
+        'no-access-log'       => \$opts{no_access_log},
+
+        # Daemon/process
+        'D|daemonize'         => \$opts{daemonize},
+        'pid=s'               => \$opts{pid_file},
+        'user=s'              => \$opts{user},
+        'group=s'             => \$opts{group},
+
+        # Output
+        'q|quiet'             => \$opts{quiet},
+        'default-middleware!' => \$opts{default_middleware},
+
+        # Help/version
+        'help'                => \$opts{help},
+        'v|version'           => \$opts{version},
     ) or die "Error parsing options\n";
 
-    if ($version) {
+    # Handle help/version flags
+    if ($opts{version}) {
         $self->{show_version} = 1;
-        return @args;
+        return;
     }
-
-    if ($help) {
+    if ($opts{help}) {
         $self->{show_help} = 1;
-        return @args;
+        return;
     }
 
     # Apply parsed options
-    $self->{host}             = $opts{host}                   if defined $opts{host};
-    $self->{port}             = $opts{port}                   if defined $opts{port};
-    $self->{workers}          = $opts{workers}                if defined $opts{workers};
-    $self->{loop}             = $opts{loop}                   if defined $opts{loop};
-    $self->{ssl_cert}         = $opts{ssl_cert}               if defined $opts{ssl_cert};
-    $self->{ssl_key}          = $opts{ssl_key}                if defined $opts{ssl_key};
-    $self->{access_log}       = $opts{access_log}             if defined $opts{access_log};
-    $self->{no_access_log}    = $opts{no_access_log}          if $opts{no_access_log};
-    $self->{log_level}        = $opts{log_level}              if defined $opts{log_level};
-    $self->{listener_backlog} = $opts{listener_backlog}       if defined $opts{listener_backlog};
-    $self->{timeout}          = $opts{timeout}                if defined $opts{timeout};
-    $self->{reuseport}        = $opts{reuseport}              if $opts{reuseport};
-    $self->{max_receive_queue} = $opts{max_receive_queue}    if defined $opts{max_receive_queue};
-    $self->{max_ws_frame_size} = $opts{max_ws_frame_size}    if defined $opts{max_ws_frame_size};
-    $self->{max_requests}      = $opts{max_requests}          if defined $opts{max_requests};
-    $self->{max_connections}   = $opts{max_connections}       if defined $opts{max_connections};
-    $self->{max_body_size}     = $opts{max_body_size}         if defined $opts{max_body_size};
-    $self->{sync_file_threshold} = $opts{sync_file_threshold} if defined $opts{sync_file_threshold};
-    $self->{daemonize}        = $opts{daemonize}              if $opts{daemonize};
-    $self->{pid_file}         = $opts{pid_file}               if defined $opts{pid_file};
-    $self->{user}             = $opts{user}                   if defined $opts{user};
-    $self->{group}            = $opts{group}                  if defined $opts{group};
-    $self->{quiet}            = $opts{quiet}                  if $opts{quiet};
+    $self->{host}       = $opts{host}       if defined $opts{host};
+    $self->{port}       = $opts{port}       if defined $opts{port};
+    $self->{server}     = $opts{server}     if defined $opts{server};
+    $self->{env}        = $opts{env}        if defined $opts{env};
+    $self->{loop}       = $opts{loop}       if defined $opts{loop};
+    $self->{access_log} = $opts{access_log} if defined $opts{access_log};
+    $self->{no_access_log} = $opts{no_access_log} if $opts{no_access_log};
+    $self->{daemonize}  = $opts{daemonize}  if $opts{daemonize};
+    $self->{pid_file}   = $opts{pid_file}   if defined $opts{pid_file};
+    $self->{user}       = $opts{user}       if defined $opts{user};
+    $self->{group}      = $opts{group}      if defined $opts{group};
+    $self->{quiet}      = $opts{quiet}      if $opts{quiet};
+    $self->{default_middleware} = $opts{default_middleware}
+        if defined $opts{default_middleware};
 
-    # Add library paths (can be specified multiple times)
+    # Add library paths
     push @{$self->{libs}}, @libs if @libs;
 
-    # Legacy --app flag takes precedence
+    # Store -M modules for loading
+    push @{$self->{modules}}, @modules if @modules;
+
+    # Store -e eval code
+    $self->{eval} = $opts{eval} if defined $opts{eval};
+
+    # Legacy --app flag
     if (defined $opts{app}) {
         $self->{app_spec} = $opts{app};
     }
 
-    return @args;
+    # Separate remaining args: options for server vs app spec/args
+    # Need to keep option values with their options
+    my $i = 0;
+    while ($i < @args) {
+        my $arg = $args[$i];
+        if ($arg =~ /^-/) {
+            push @{$self->{server_options}}, $arg;
+            # If next arg is a value (doesn't start with - and isn't =), keep it with the option
+            if ($i + 1 < @args && $args[$i + 1] !~ /^-/ && $arg !~ /=/) {
+                push @{$self->{server_options}}, $args[++$i];
+            }
+        } else {
+            push @{$self->{argv}}, $arg;
+        }
+        $i++;
+    }
+}
+
+=head2 mode
+
+    my $mode = $runner->mode;
+
+Returns the current environment mode. Determines mode by checking
+(in order): explicit C<-E> flag, C<PAGI_ENV> environment variable,
+or auto-detection based on TTY.
+
+=cut
+
+sub mode {
+    my ($self) = @_;
+
+    return $self->{env} if defined $self->{env};
+    return $ENV{PAGI_ENV} if defined $ENV{PAGI_ENV};
+    return -t STDIN ? 'development' : 'production';
 }
 
 =head2 load_app
 
-    my $app = $runner->load_app();
-    my $app = $runner->load_app($app_spec);
-    my $app = $runner->load_app($app_spec, %constructor_args);
+    my $app = $runner->load_app;
 
-Loads a PAGI application. If no app_spec is provided and one was set
-via C<parse_options>, uses that. If still no app_spec, defaults to
-C<PAGI::App::Directory> with C<root> set to current directory.
-
-Returns the loaded app coderef and stores it in the runner.
+Loads the PAGI application based on the app specifier from command
+line arguments. Returns the app coderef.
 
 =cut
 
 sub load_app {
-    my ($self, $app_spec, %args) = @_;
-    $app_spec //= undef;
+    my ($self) = @_;
 
     # Add library paths to @INC before loading
     if (@{$self->{libs}}) {
         unshift @INC, @{$self->{libs}};
     }
 
-    # Use provided spec, or fall back to one from parse_options, or default
-    $app_spec //= $self->{app_spec};
+    # Load -M modules before evaluating -e code
+    for my $module (@{$self->{modules}}) {
+        # Handle Module=import,args syntax like perl -M
+        my ($mod, $imports) = split /=/, $module, 2;
+        eval "require $mod";
+        die "Cannot load module $mod: $@\n" if $@;
+        if (defined $imports) {
+            my @imports = split /,/, $imports;
+            $mod->import(@imports);
+        } else {
+            $mod->import;
+        }
+    }
+
+    # Handle -e inline code
+    if (defined $self->{eval}) {
+        my $code = $self->{eval};
+        my $app = eval $code;
+        die "Error evaluating -e code: $@\n" if $@;
+        die "-e code must return a coderef, got " . (ref($app) || 'non-reference') . "\n"
+            unless ref $app eq 'CODE';
+        $self->{app_spec} = '-e';
+        $self->{app} = $app;
+        return $app;
+    }
+
+    # Get app spec from argv if not set via --app
+    my @argv = @{$self->{argv}};
+    if (!$self->{app_spec} && @argv) {
+        my $first = $argv[0];
+        # Check if first arg looks like an app spec (not a key=value)
+        if ($first !~ /=/) {
+            $self->{app_spec} = shift @argv;
+            $self->{argv} = \@argv;
+        }
+    }
+
+    my $app_spec = $self->{app_spec};
 
     # Default: serve current directory
+    my %app_args;
     if (!defined $app_spec) {
         $app_spec = 'PAGI::App::Directory';
-        %args = (root => '.') unless %args;
+        %app_args = (root => '.');
+    } else {
+        # Parse constructor args (key=value pairs) from remaining argv
+        %app_args = $self->_parse_app_args(@{$self->{argv}});
     }
 
     $self->{app_spec} = $app_spec;
-    $self->{app_args} = \%args;
+    $self->{app_args} = \%app_args;
 
     my $app;
     if ($self->_is_module_name($app_spec)) {
-        $app = $self->_load_module($app_spec, %args);
+        $app = $self->_load_module($app_spec, %app_args);
     }
     elsif ($self->_is_file_path($app_spec)) {
         $app = $self->_load_file($app_spec);
@@ -399,7 +410,7 @@ sub load_app {
             $app = $self->_load_file($app_spec);
         }
         else {
-            $app = $self->_load_module($app_spec, %args);
+            $app = $self->_load_module($app_spec, %app_args);
         }
     }
 
@@ -407,35 +418,148 @@ sub load_app {
     return $app;
 }
 
-=head2 prepare_server
+=head2 prepare_app
 
-    my $server = $runner->prepare_server;
+    my $app = $runner->prepare_app;
 
-Creates and configures a L<PAGI::Server> instance based on the runner's
-settings. The app must be loaded first via C<load_app>.
-
-Returns the server instance (not yet started).
+Loads the app and wraps it with mode-appropriate middleware.
+In development mode (with default_middleware enabled), wraps
+with L<PAGI::Middleware::Lint>.
 
 =cut
 
-sub prepare_server {
+sub prepare_app {
     my ($self) = @_;
 
-    die "No app loaded. Call load_app first.\n" unless $self->{app};
+    my $app = $self->load_app;
 
-    # Validate SSL options
-    if ($self->{ssl_cert} || $self->{ssl_key}) {
-        die "--ssl-cert and --ssl-key must be specified together\n"
-            unless $self->{ssl_cert} && $self->{ssl_key};
+    # Wrap with mode middleware unless disabled
+    my $use_middleware = $self->{default_middleware} // 1;
 
-        # Check TLS modules are installed
-        my $tls_available = eval {
-            require IO::Async::SSL;
-            require IO::Socket::SSL;
-            1;
-        };
-        unless ($tls_available) {
-            die <<"END_TLS_ERROR";
+    if ($use_middleware && $self->mode eq 'development') {
+        require PAGI::Middleware::Lint;
+        $app = PAGI::Middleware::Lint->new(strict => 1)->wrap($app);
+
+        warn "PAGI development mode - Lint middleware enabled\n"
+            unless $self->{quiet};
+    }
+
+    $self->{app} = $app;
+    return $app;
+}
+
+=head2 load_server
+
+    my $server = $runner->load_server;
+
+Creates the server instance with the prepared app and configuration.
+Parses server-specific options and passes them to the server constructor.
+
+=cut
+
+sub load_server {
+    my ($self) = @_;
+
+    my $server_class = $self->{server} // 'PAGI::Server';
+
+    # Load server class
+    my $server_file = $server_class;
+    $server_file =~ s{::}{/}g;
+    $server_file .= '.pm';
+
+    eval { require $server_file };
+    if ($@) {
+        die "Cannot load server '$server_class': $@\n";
+    }
+
+    # Parse server-specific options
+    my %server_opts = $self->_parse_server_options($server_class);
+
+    # Handle access log
+    # Production mode disables logging by default for performance
+    # Use --access-log to explicitly enable in production
+    my $access_log;
+    my $disable_log = 0;
+
+    if ($self->{no_access_log}) {
+        # Explicit --no-access-log
+        $disable_log = 1;
+    }
+    elsif ($self->{access_log}) {
+        # Explicit --access-log FILE
+        open $access_log, '>>', $self->{access_log}
+            or die "Cannot open access log $self->{access_log}: $!\n";
+    }
+    elsif ($self->mode eq 'production') {
+        # Production mode: disable logging by default
+        $disable_log = 1;
+    }
+    # else: development mode uses server default (STDERR)
+
+    # Build server
+    return $server_class->new(
+        app        => $self->{app},
+        host       => $self->{host} // '127.0.0.1',
+        port       => $self->{port} // 5000,
+        quiet      => $self->{quiet} // 0,
+        (defined $access_log || $disable_log
+            ? (access_log => $access_log) : ()),
+        %server_opts,
+    );
+}
+
+sub _parse_server_options {
+    my ($self, $server_class) = @_;
+
+    my @args = @{$self->{server_options} // []};
+    my %opts;
+
+    if ($server_class eq 'PAGI::Server') {
+        GetOptionsFromArray(
+            \@args,
+            # Workers/scaling
+            'w|workers=i'           => \$opts{workers},
+            'reuseport'             => \$opts{reuseport},
+            'max-requests=i'        => \$opts{max_requests},
+            'max-connections=i'     => \$opts{max_connections},
+
+            # TLS
+            'ssl-cert=s'            => \$opts{_ssl_cert},
+            'ssl-key=s'             => \$opts{_ssl_key},
+
+            # Timeouts
+            'timeout=i'             => \$opts{timeout},
+            'shutdown-timeout=i'    => \$opts{shutdown_timeout},
+            'request-timeout=i'     => \$opts{request_timeout},
+            'ws-idle-timeout=i'     => \$opts{ws_idle_timeout},
+            'sse-idle-timeout=i'    => \$opts{sse_idle_timeout},
+
+            # Limits
+            'max-body-size=i'       => \$opts{max_body_size},
+            'max-header-size=i'     => \$opts{max_header_size},
+            'max-header-count=i'    => \$opts{max_header_count},
+            'max-receive-queue=i'   => \$opts{max_receive_queue},
+            'max-ws-frame-size=i'   => \$opts{max_ws_frame_size},
+            'b|listener-backlog=i'  => \$opts{listener_backlog},
+
+            # Misc
+            'log-level=s'           => \$opts{log_level},
+            'sync-file-threshold=i' => \$opts{sync_file_threshold},
+        );
+
+        # Build ssl hash if certs provided
+        if ($opts{_ssl_cert} || $opts{_ssl_key}) {
+            die "--ssl-cert and --ssl-key must be specified together\n"
+                unless $opts{_ssl_cert} && $opts{_ssl_key};
+
+            # Check TLS modules are installed
+            my $tls_available = eval {
+                require IO::Async::SSL;
+                require IO::Socket::SSL;
+                1;
+            };
+            unless ($tls_available) {
+                die <<"END_TLS_ERROR";
 --ssl-cert/--ssl-key require TLS modules which are not installed.
 
 To enable HTTPS/TLS support, install:
@@ -447,109 +571,51 @@ Or on Debian/Ubuntu:
     apt-get install libio-socket-ssl-perl
 
 END_TLS_ERROR
+            }
+
+            die "SSL cert not found: $opts{_ssl_cert}\n"
+                unless -f $opts{_ssl_cert};
+            die "SSL key not found: $opts{_ssl_key}\n"
+                unless -f $opts{_ssl_key};
+
+            $opts{ssl} = {
+                cert_file => delete $opts{_ssl_cert},
+                key_file  => delete $opts{_ssl_key},
+            };
         }
+        delete $opts{_ssl_cert};
+        delete $opts{_ssl_key};
 
-        die "SSL cert not found: $self->{ssl_cert}\n" unless -f $self->{ssl_cert};
-        die "SSL key not found: $self->{ssl_key}\n" unless -f $self->{ssl_key};
+        # Handle workers (0 for single-process, >1 for multi-worker)
+        if (defined $opts{workers}) {
+            $opts{workers} = $opts{workers} > 1 ? $opts{workers} : 0;
+        }
     }
 
-    # Build server options
-    my %server_opts = (
-        app     => $self->{app},
-        host    => $self->{host},
-        port    => $self->{port},
-        quiet   => $self->{quiet} ? 1 : 0,
-        workers => $self->{workers} > 1 ? $self->{workers} : 0,
-     );
-
-    # Add SSL config if provided
-    if ($self->{ssl_cert} && $self->{ssl_key}) {
-        $server_opts{ssl} = {
-            cert_file => $self->{ssl_cert},
-            key_file  => $self->{ssl_key},
-        };
-    }
-
-    # Add access log configuration
-    if ($self->{no_access_log}) {
-        # Explicitly disable access logging
-        $server_opts{access_log} = undef;
-    }
-    elsif ($self->{access_log}) {
-        # Log to specified file
-        open my $log_fh, '>>', $self->{access_log}
-            or die "Cannot open access log $self->{access_log}: $!\n";
-        $server_opts{access_log} = $log_fh;
-    }
-    # else: let server use its default (STDERR)
-
-    # Add log_level if provided
-    if (defined $self->{log_level}) {
-        $server_opts{log_level} = $self->{log_level};
-    }
-
-    # Add listener_backlog is provided, otherwise let the server decide
-    if ($self->{listener_backlog}) {
-        $server_opts{listener_backlog} = $self->{listener_backlog};
-    }
-
-    # Add timeout is provided, otherwise let the server decide
-    if ($self->{timeout}) {
-        $server_opts{timeout} = $self->{timeout};
-    }
-
-    # Add reuseport if enabled
-    if ($self->{reuseport}) {
-        $server_opts{reuseport} = 1;
-    }
-
-    # Add max_receive_queue if provided
-    if (defined $self->{max_receive_queue}) {
-        $server_opts{max_receive_queue} = $self->{max_receive_queue};
-    }
-
-    # Add max_ws_frame_size if provided
-    if (defined $self->{max_ws_frame_size}) {
-        $server_opts{max_ws_frame_size} = $self->{max_ws_frame_size};
-    }
-
-    # Add max_requests if provided
-    if (defined $self->{max_requests}) {
-        $server_opts{max_requests} = $self->{max_requests};
-    }
-
-    # Add max_connections if provided
-    if (defined $self->{max_connections}) {
-        $server_opts{max_connections} = $self->{max_connections};
-    }
-
-    # Add max_body_size if provided
-    if (defined $self->{max_body_size}) {
-        $server_opts{max_body_size} = $self->{max_body_size};
-    }
-
-    # Add sync_file_threshold if provided
-    if (defined $self->{sync_file_threshold}) {
-        $server_opts{sync_file_threshold} = $self->{sync_file_threshold};
-    }
-
-    return PAGI::Server->new(%server_opts);
+    # Return only defined options
+    return map { $_ => $opts{$_} } grep { defined $opts{$_} } keys %opts;
 }
 
 =head2 run
 
-    $runner->run(@args);
+    PAGI::Runner->run(@ARGV);
+    $runner->run(@ARGV);
 
-Convenience method that parses options, loads the app, creates the server,
-and runs the event loop. This is the main entry point for CLI usage.
+Main entry point. Parses options, loads the app, creates the server,
+and runs the event loop.
 
 =cut
 
 sub run {
-    my ($self, @args) = @_;
+    my $self = shift;
 
-    # Parse CLI options
-    @args = $self->parse_options(@args);
+    # Support both class and instance method
+    unless (ref $self) {
+        $self = $self->new;
+    }
+
+    # Parse options
+    $self->parse_options(@_);
 
     # Handle --version
     if ($self->{show_version}) {
@@ -563,41 +629,28 @@ sub run {
         return;
     }
 
-    # Process remaining args: first is app spec (if not set via --app),
-    # rest are constructor args
-    if (@args && !$self->{app_spec}) {
-        my $first = $args[0];
-        # Check if first arg looks like an app spec (not a key=value)
-        if ($first !~ /=/) {
-            $self->{app_spec} = shift @args;
-        }
-    }
+    # Prepare app (load + wrap with middleware)
+    $self->prepare_app;
 
-    # Parse constructor args (key=value pairs)
-    my %app_args = $self->_parse_app_args(@args);
-    
-    # Load the app
-    $self->load_app($self->{app_spec}, %app_args);
-
-    # Create and configure server
-    my $server = $self->prepare_server;
+    # Create server
+    my $server = $self->load_server;
 
     # Create event loop
     my $loop = $self->_create_loop;
-
     $loop->add($server);
 
     # Start listening with proper error handling
+    my $port = $self->{port} // 5000;
     eval {
         $server->listen->get;
     };
     if ($@) {
         my $error = $@;
         if ($error =~ /Cannot bind\(\).*Address already in use/i) {
-            die "Error: Port $self->{port} is already in use\n";
+            die "Error: Port $port is already in use\n";
         }
         elsif ($error =~ /Cannot bind\(\).*Permission denied/i) {
-            die "Error: Permission denied to bind to port $self->{port}\n";
+            die "Error: Permission denied to bind to port $port\n";
         }
         elsif ($error =~ /Cannot bind\(\)/) {
             $error =~ s/\s+at\s+\S+\s+line\s+\d+.*//s;
@@ -631,9 +684,10 @@ sub run {
         });
     }
 
-    # HUP handling for single-worker: log and ignore (no graceful restart in single mode)
-    # Multi-worker mode handles HUP in Server.pm
-    if (!$self->{workers} || $self->{workers} <= 1) {
+    # HUP handling for single-worker: log and ignore
+    my $workers = $self->{server_options} ?
+        (grep { /^--?w(?:orkers)?$/ } @{$self->{server_options}}) : 0;
+    if (!$workers) {
         $loop->watch_signal(HUP => sub {
             warn "Received HUP signal (graceful restart only works in multi-worker mode)\n"
                 unless $self->{quiet};
@@ -648,13 +702,11 @@ sub run {
 
 sub _is_module_name {
     my ($self, $spec) = @_;
-
     return $spec =~ /::/;
 }
 
 sub _is_file_path {
     my ($self, $spec) = @_;
-
     return $spec =~ m{/} || $spec =~ /\.(?:pl|psgi)$/i;
 }
 
@@ -662,7 +714,8 @@ sub _load_module {
     my ($self, $module, %args) = @_;
 
     # Validate module name (basic security check)
-    die "Invalid module name: $module\n" unless $module =~ /^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/;
+    die "Invalid module name: $module\n"
+        unless $module =~ /^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/;
 
     # Try to load the module
     my $file = $module;
@@ -737,8 +790,9 @@ sub _create_loop {
 
     if ($self->{loop}) {
         my $loop_class = "IO::Async::Loop::$self->{loop}";
-        eval "require $loop_class" or die "Error: Cannot load loop backend '$self->{loop}': $@\n" .
-            "Install it with: cpanm $loop_class\n";
+        eval "require $loop_class"
+            or die "Error: Cannot load loop backend '$self->{loop}': $@\n" .
+                   "Install it with: cpanm $loop_class\n";
         return $loop_class->new;
     }
     return IO::Async::Loop->new;
@@ -750,32 +804,40 @@ sub _show_help {
     print <<'HELP';
 Usage: pagi-server [options] [app] [key=value ...]
 
-Options:
+Common Options:
     -I, --lib PATH      Add PATH to @INC (repeatable, like perl -I)
     -a, --app FILE      Load app from file (legacy option)
-    -h, --host HOST     Bind address (default: 127.0.0.1)
+    -o, --host HOST     Bind address (default: 127.0.0.1)
     -p, --port PORT     Bind port (default: 5000)
-    -w, --workers NUM   Number of worker processes (default: 1)
+    -s, --server CLASS  Server class (default: PAGI::Server)
+    -E, --env MODE      Environment mode (development, production, none)
     -l, --loop BACKEND  Event loop backend (EV, Epoll, UV, Poll)
-    --ssl-cert FILE     SSL certificate file
-    --ssl-key FILE      SSL private key file
     --access-log FILE   Access log file (default: STDERR)
-    --no-access-log     Disable access logging (improves throughput)
-    --reuseport         SO_REUSEPORT mode (reduces accept contention)
-    --max-receive-queue NUM  Max WebSocket receive queue size (default: 1000)
-    --max-ws-frame-size NUM  Max WebSocket frame size in bytes (default: 65536)
-    --sync-file-threshold NUM  Sync file read threshold in bytes (0=always async, default: 65536)
-    --max-requests NUM  Requests per worker before restart (default: unlimited)
-    --max-connections N   Max concurrent connections (0=auto, default)
-    --max-body-size NUM   Max request body size in bytes (0=unlimited, default: 10MB)
-    --log-level LEVEL   Log verbosity: debug, info, warn, error (default: info)
+    --no-access-log     Disable access logging
     -D, --daemonize     Run as background daemon
     --pid FILE          Write PID to file
     --user USER         Run as specified user (after binding)
     --group GROUP       Run as specified group (after binding)
     -q, --quiet         Suppress startup messages
+    --no-default-middleware  Disable mode-based middleware
     -v, --version       Show version info
     --help              Show this help
+
+PAGI::Server Options (pass-through):
+    -w, --workers NUM   Number of worker processes (default: 1)
+    --ssl-cert FILE     SSL certificate file
+    --ssl-key FILE      SSL private key file
+    --reuseport         SO_REUSEPORT mode (reduces accept contention)
+    --max-requests NUM  Requests per worker before restart
+    --max-connections N Max concurrent connections (0=auto)
+    --max-body-size NUM Max request body size (default: 10MB)
+    --timeout NUM       Connection idle timeout in seconds
+    --log-level LEVEL   Log verbosity: debug, info, warn, error
+
+Environment Modes:
+    development    Auto-enable Lint middleware (default if TTY)
+    production     No auto-middleware (default if no TTY)
+    none           Explicit opt-out of all auto-middleware
 
 App can be:
     Module name:    pagi-server PAGI::App::Directory root=/var/www
@@ -784,9 +846,9 @@ App can be:
 
 Examples:
     pagi-server                                    # Serve current directory
+    pagi-server -E production ./app.pl            # Production mode
+    pagi-server -p 8080 --workers 4 ./myapp.pl    # Custom port + workers
     pagi-server PAGI::App::Directory root=/tmp    # Serve /tmp
-    pagi-server -p 8080 ./myapp.pl                # Run app on port 8080
-    pagi-server -w 4 PAGI::App::Proxy target=http://backend:3000
 
 HELP
 }
@@ -794,6 +856,8 @@ HELP
 sub _show_version {
     my ($self) = @_;
 
+    require PAGI;
+    require PAGI::Server;
     print "pagi-server (PAGI $PAGI::VERSION, PAGI::Server $PAGI::Server::VERSION)\n";
 }
 
@@ -890,9 +954,26 @@ sub _drop_privileges {
 
 __END__
 
+=head1 BREAKING CHANGES
+
+As of version 1.0, PAGI::Runner has been refactored to be server-agnostic:
+
+=over 4
+
+=item * Server-specific options are now passed through to the server
+
+=item * The C<prepare_server()> method has been replaced by C<load_server()>
+
+=item * Development mode now auto-enables Lint middleware
+
+=back
+
+The CLI interface is unchanged - existing command-line usage continues
+to work as before.
+
 =head1 SEE ALSO
 
-L<PAGI::Server>, L<Plack::Runner>
+L<PAGI::Server>, L<PAGI::Middleware::Lint>, L<Plack::Runner>
 
 =head1 AUTHOR
 

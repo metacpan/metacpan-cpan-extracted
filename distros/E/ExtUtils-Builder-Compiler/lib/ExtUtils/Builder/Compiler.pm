@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.034';
+$ExtUtils::Builder::Compiler::VERSION = '0.035';
 use strict;
 use warnings;
 
-use ExtUtils::Builder::Util qw/command/;
+use ExtUtils::Builder::Util qw/command require_module/;
 use ExtUtils::Builder::Node;
 
 use parent qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
@@ -54,6 +54,15 @@ sub add_defines {
 	return;
 }
 
+sub add_profile {
+	my ($self, $profile, %args) = @_;
+	if (not ref($profile)) {
+		$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
+		require_module($profile);
+	}
+	return $profile->process_compiler($self, \%args);
+}
+
 sub default_define_ranking {
 	return 40;
 }
@@ -95,7 +104,7 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 DESCRIPTION
 

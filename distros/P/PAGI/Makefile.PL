@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "bin/pagi-server"
   ],
-  "LICENSE" => "perl",
+  "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "PAGI",
   "PREREQ_PM" => {
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "1.9764",
     "URI" => "1.60"
   },
-  "VERSION" => "0.001010",
+  "VERSION" => "0.001011",
   "test" => {
     "TESTS" => "t/*.t t/app/*.t t/endpoint/*.t t/middleware/*.t t/request/*.t t/sse/*.t t/test-client/*.t t/utf8/*.t t/util/*.t t/websocket/*.t"
   }

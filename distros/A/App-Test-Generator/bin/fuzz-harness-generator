@@ -45,7 +45,7 @@ Call C<prove> on the output file.
 
 C<fuzz-harness-generator -r t/conf/data_text_append.conf> will, therefore, dynamically create and run tests on the C<append> method of L<Data::Text>
 
-=item V<--version>
+=item B<--version>
 
 Prints the version of L<App::Test::Generator>
 

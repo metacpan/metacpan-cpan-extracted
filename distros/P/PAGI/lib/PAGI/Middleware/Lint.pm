@@ -119,10 +119,18 @@ sub wrap {
         # Post-completion checks
         if ($scope->{type} eq 'http') {
             if (!$response_started) {
-                $self->_warn("HTTP app completed without sending http.response.start");
+                $self->_warn(
+                    "HTTP app completed without sending http.response.start. "
+                  . "This usually means you forgot to 'await' your \$send calls, "
+                  . "or used ->retain for response-affecting work. "
+                  . "See PAGI::Tutorial for correct async patterns."
+                );
             }
             if ($response_started && !$response_finished) {
-                $self->_warn("HTTP app completed without sending final http.response.body (more=0)");
+                $self->_warn(
+                    "HTTP app completed without sending final http.response.body (more=0). "
+                  . "Did you forget to 'await' the final \$send call?"
+                );
             }
         }
 
@@ -203,9 +211,8 @@ sub _lint_response_start {
 sub _lint_response_body {
     my ($self, $event) = @_;
 
-    unless (defined $event->{more}) {
-        $self->_warn("http.response.body should have 'more' key");
-    }
+    # 'more' key is optional - defaults to 0 (false) per PAGI spec
+    # No validation needed here
 }
 
 sub _warn {

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.034';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.035';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

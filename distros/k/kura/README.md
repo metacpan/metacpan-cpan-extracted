@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kfly8/kura/actions/workflows/test.yml/badge.svg)](https://github.com/kfly8/kura/actions) [![Coverage Status](https://img.shields.io/coveralls/kfly8/kura/main.svg?style=flat)](https://coveralls.io/r/kfly8/kura?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/kura.svg)](https://metacpan.org/release/kura)
+[![Actions Status](https://github.com/kfly8/kura/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kfly8/kura/actions?workflow=test) [![Coverage Status](https://img.shields.io/coveralls/kfly8/kura/main.svg?style=flat)](https://coveralls.io/r/kfly8/kura?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/kura.svg)](https://metacpan.org/release/kura)
 # NAME
 
 kura - Store constraints for Data::Checks, Type::Tiny, Moose, and more.

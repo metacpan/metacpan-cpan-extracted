@@ -7,9 +7,10 @@ use warnings;
 sub new {
     my ($class, %args) = @_;
     return bless {
-        status  => $args{status} // 200,
-        headers => $args{headers} // [],
-        body    => $args{body} // '',
+        status    => $args{status} // 200,
+        headers   => $args{headers} // [],
+        body      => $args{body} // '',
+        exception => $args{exception},
     }, $class;
 }
 
@@ -46,6 +47,9 @@ sub headers {
 sub is_success  { my $s = shift->status; $s >= 200 && $s < 300 }
 sub is_redirect { my $s = shift->status; $s >= 300 && $s < 400 }
 sub is_error    { my $s = shift->status; $s >= 400 }
+
+# Exception from app (if trapped)
+sub exception { shift->{exception} }
 
 # Parse body as JSON
 sub json {
@@ -130,6 +134,18 @@ True if status is 3xx.
     if ($res->is_error) { ... }
 
 True if status is 4xx or 5xx.
+
+=head2 exception
+
+    if (my $err = $res->exception) {
+        like $err, qr/Can't call method/;
+    }
+
+Returns the exception that was thrown by the application, if any.
+This is only populated when the test client traps an exception
+(the default behavior). See L<PAGI::Test::Client/raise_app_exceptions>.
+
+Returns undef if no exception occurred.
 
 =head1 HEADER METHODS
 

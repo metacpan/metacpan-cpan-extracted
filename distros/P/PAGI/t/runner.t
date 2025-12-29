@@ -15,9 +15,8 @@ use PAGI::Runner;
 subtest 'constructor with defaults' => sub {
     my $runner = PAGI::Runner->new;
 
-    is($runner->{host}, '127.0.0.1', 'default host');
-    is($runner->{port}, 5000, 'default port');
-    is($runner->{workers}, 1, 'default workers');
+    ok(!defined $runner->{host}, 'host undef (defaults applied in load_server)');
+    ok(!defined $runner->{port}, 'port undef (defaults applied in load_server)');
     is($runner->{quiet}, 0, 'default quiet');
     ok(!defined $runner->{app}, 'no app initially');
 };
@@ -27,43 +26,39 @@ subtest 'constructor with options' => sub {
     my $runner = PAGI::Runner->new(
         host    => '0.0.0.0',
         port    => 8080,
-        workers => 4,
         quiet   => 1,
     );
 
     is($runner->{host}, '0.0.0.0', 'custom host');
     is($runner->{port}, 8080, 'custom port');
-    is($runner->{workers}, 4, 'custom workers');
     is($runner->{quiet}, 1, 'custom quiet');
 };
 
-# Test 3: Parse CLI options
-subtest 'parse CLI options' => sub {
+# Test 3: Parse CLI options (runner options)
+subtest 'parse runner CLI options' => sub {
     my $runner = PAGI::Runner->new;
-    my @remaining = $runner->parse_options(
+    $runner->parse_options(
         '-p', '8080',
-        '-w', '4',
-        '-h', '0.0.0.0',
+        '-o', '0.0.0.0',
         '-q',
         'PAGI::App::Directory',
         'root=/tmp',
     );
 
     is($runner->{port}, 8080, 'port parsed');
-    is($runner->{workers}, 4, 'workers parsed');
     is($runner->{host}, '0.0.0.0', 'host parsed');
     is($runner->{quiet}, 1, 'quiet parsed');
-    is(scalar @remaining, 2, 'two args remain');
-    is($remaining[0], 'PAGI::App::Directory', 'app spec remains');
-    is($remaining[1], 'root=/tmp', 'app arg remains');
+    # App spec and args are now in argv
+    is(scalar @{$runner->{argv}}, 2, 'two args in argv');
+    is($runner->{argv}[0], 'PAGI::App::Directory', 'app spec in argv');
+    is($runner->{argv}[1], 'root=/tmp', 'app arg in argv');
 };
 
 # Test 4: Parse long CLI options
 subtest 'parse long CLI options' => sub {
     my $runner = PAGI::Runner->new;
-    my @remaining = $runner->parse_options(
+    $runner->parse_options(
         '--port', '9000',
-        '--workers', '2',
         '--host', '192.168.1.1',
         '--quiet',
         '--loop', 'EV',
@@ -71,11 +66,10 @@ subtest 'parse long CLI options' => sub {
     );
 
     is($runner->{port}, 9000, 'port parsed');
-    is($runner->{workers}, 2, 'workers parsed');
     is($runner->{host}, '192.168.1.1', 'host parsed');
     is($runner->{quiet}, 1, 'quiet parsed');
     is($runner->{loop}, 'EV', 'loop parsed');
-    is($remaining[0], 'app.pl', 'app file remains');
+    is($runner->{argv}[0], 'app.pl', 'app file in argv');
 };
 
 # Test 5: Legacy --app flag
@@ -121,22 +115,20 @@ subtest 'parse app args' => sub {
 # Test 9: Load app from file
 subtest 'load app from file' => sub {
     my $runner = PAGI::Runner->new;
-    my $app_path = "$FindBin::Bin/../examples/01-hello-http/app.pl";
+    $runner->{app_spec} = "$FindBin::Bin/../examples/01-hello-http/app.pl";
 
-    my $app = $runner->load_app($app_path);
+    my $app = $runner->load_app;
 
     ok(ref $app eq 'CODE', 'loaded app is coderef');
     is($runner->{app}, $app, 'app stored in runner');
-    # Normalize paths for cross-platform comparison (/ vs \)
-    my $expected = File::Spec->canonpath(File::Spec->rel2abs($app_path));
-    my $got = File::Spec->canonpath($runner->{app_spec});
-    is($got, $expected, 'app_spec stored (absolute)');
 };
 
 # Test 10: Load app from module
 subtest 'load app from module' => sub {
     my $runner = PAGI::Runner->new;
-    my $app = $runner->load_app('PAGI::App::Directory', root => '.');
+    $runner->{argv} = ['PAGI::App::Directory', 'root=.'];
+
+    my $app = $runner->load_app;
 
     ok(ref $app eq 'CODE', 'loaded app is coderef');
     is($runner->{app}, $app, 'app stored in runner');
@@ -147,7 +139,7 @@ subtest 'load app from module' => sub {
 # Test 11: Default app (no arguments)
 subtest 'default app loads Directory' => sub {
     my $runner = PAGI::Runner->new;
-    my $app = $runner->load_app();
+    my $app = $runner->load_app;
 
     ok(ref $app eq 'CODE', 'default app is coderef');
     is($runner->{app_spec}, 'PAGI::App::Directory', 'default is Directory');
@@ -157,9 +149,10 @@ subtest 'default app loads Directory' => sub {
 # Test 12: Error on missing file
 subtest 'error on missing file' => sub {
     my $runner = PAGI::Runner->new;
+    $runner->{app_spec} = 'nonexistent_file_12345.pl';
 
     like(
-        dies { $runner->load_app('nonexistent_file_12345.pl') },
+        dies { $runner->load_app },
         qr/not found/i,
         'dies on missing file'
     );
@@ -168,9 +161,10 @@ subtest 'error on missing file' => sub {
 # Test 13: Error on invalid module
 subtest 'error on invalid module' => sub {
     my $runner = PAGI::Runner->new;
+    $runner->{argv} = ['PAGI::App::NonExistent12345'];
 
     like(
-        dies { $runner->load_app('PAGI::App::NonExistent12345') },
+        dies { $runner->load_app },
         qr/Cannot find module/i,
         'dies on invalid module'
     );
@@ -187,31 +181,32 @@ subtest 'error on non-coderef file' => sub {
     close $fh;
 
     my $runner = PAGI::Runner->new;
+    $runner->{app_spec} = $bad_app;
 
     like(
-        dies { $runner->load_app($bad_app) },
+        dies { $runner->load_app },
         qr/must return a coderef/i,
         'dies on non-coderef'
     );
 };
 
-# Test 15: prepare_server creates PAGI::Server
-subtest 'prepare_server creates server' => sub {
+# Test 15: load_server creates PAGI::Server
+subtest 'load_server creates server' => sub {
     my $runner = PAGI::Runner->new(port => 0, quiet => 1);
-    $runner->load_app('PAGI::App::Directory', root => '.');
+    $runner->prepare_app;  # Load and prepare app
 
-    my $server = $runner->prepare_server;
+    my $server = $runner->load_server;
 
     ok($server->isa('PAGI::Server'), 'returns PAGI::Server');
 };
 
-# Test 16: prepare_server dies without app
-subtest 'prepare_server dies without app' => sub {
+# Test 16: load_server dies without app
+subtest 'load_server dies without app' => sub {
     my $runner = PAGI::Runner->new;
 
     like(
-        dies { $runner->prepare_server },
-        qr/No app loaded/i,
+        dies { $runner->load_server },
+        qr/app/i,
         'dies without app'
     );
 };
@@ -221,8 +216,10 @@ subtest 'integration: server responds to requests' => sub {
     my $loop = IO::Async::Loop->new;
 
     my $runner = PAGI::Runner->new(port => 0, quiet => 1);
-    $runner->load_app("$FindBin::Bin/../examples/01-hello-http/app.pl");
-    my $server = $runner->prepare_server;
+    $runner->{app_spec} = "$FindBin::Bin/../examples/01-hello-http/app.pl";
+    $runner->{default_middleware} = 0;  # Disable Lint for test
+    $runner->prepare_app;
+    my $server = $runner->load_server;
 
     $loop->add($server);
     $server->listen->get;
@@ -254,8 +251,10 @@ subtest 'integration: module-based app serves files' => sub {
     close $fh;
 
     my $runner = PAGI::Runner->new(port => 0, quiet => 1);
-    $runner->load_app('PAGI::App::File', root => $tmpdir);
-    my $server = $runner->prepare_server;
+    $runner->{argv} = ['PAGI::App::File', "root=$tmpdir"];
+    $runner->{default_middleware} = 0;  # Disable Lint for test
+    $runner->prepare_app;
+    my $server = $runner->load_server;
 
     $loop->add($server);
     $server->listen->get;
@@ -275,13 +274,14 @@ subtest 'integration: module-based app serves files' => sub {
     $loop->remove($http);
 };
 
-# Test 19: SSL options validation
+# Test 19: SSL options validation (via server_options)
 subtest 'SSL options validation' => sub {
-    my $runner = PAGI::Runner->new(ssl_cert => '/nonexistent/cert.pem');
-    $runner->load_app('PAGI::App::Directory', root => '.');
+    my $runner = PAGI::Runner->new;
+    $runner->{server_options} = ['--ssl-cert', '/nonexistent/cert.pem'];
+    $runner->prepare_app;  # Load default app
 
     like(
-        dies { $runner->prepare_server },
+        dies { $runner->load_server },
         qr/--ssl-cert and --ssl-key must be specified together/,
         'dies without both SSL options'
     );
@@ -298,7 +298,7 @@ subtest 'help flag sets show_help' => sub {
 # Test 21: production CLI options parsing
 subtest 'production CLI options parsing' => sub {
     my $runner = PAGI::Runner->new;
-    my @remaining = $runner->parse_options(
+    $runner->parse_options(
         '-D',
         '--pid', '/tmp/test.pid',
         '--user', 'nobody',
@@ -383,6 +383,106 @@ subtest '_drop_privileges validation' => sub {
 subtest '_drop_privileges method exists' => sub {
     my $runner = PAGI::Runner->new;
     ok($runner->can('_drop_privileges'), '_drop_privileges method exists');
+};
+
+# Test 24: mode() method
+subtest 'mode detection' => sub {
+    # Test explicit env
+    my $runner1 = PAGI::Runner->new(env => 'production');
+    is($runner1->mode, 'production', 'explicit env wins');
+
+    # Test PAGI_ENV
+    local $ENV{PAGI_ENV} = 'development';
+    my $runner2 = PAGI::Runner->new;
+    is($runner2->mode, 'development', 'PAGI_ENV used when no explicit env');
+
+    # With explicit env, PAGI_ENV is ignored
+    my $runner3 = PAGI::Runner->new(env => 'none');
+    is($runner3->mode, 'none', 'explicit env overrides PAGI_ENV');
+};
+
+# Test 25: -E flag parsing
+subtest '-E flag parsing' => sub {
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options('-E', 'production', 'app.pl');
+
+    is($runner->{env}, 'production', '-E parsed');
+    is($runner->mode, 'production', 'mode returns production');
+};
+
+# Test 26: server options pass-through
+subtest 'server options pass-through' => sub {
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options(
+        '-p', '8080',
+        '--workers', '4',
+        '--reuseport',
+        '--max-requests', '1000',
+        'app.pl',
+    );
+
+    is($runner->{port}, 8080, 'runner option parsed');
+    # Server options should be in server_options (with their values)
+    my $server_opts = join(' ', @{$runner->{server_options}});
+    like($server_opts, qr/--workers/, '--workers in server_options');
+    like($server_opts, qr/4/, 'workers value in server_options');
+    like($server_opts, qr/--reuseport/, '--reuseport in server_options');
+    like($server_opts, qr/--max-requests/, '--max-requests in server_options');
+};
+
+# Test 27: --no-default-middleware flag
+subtest '--no-default-middleware flag' => sub {
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options('--no-default-middleware', 'app.pl');
+
+    is($runner->{default_middleware}, 0, '--no-default-middleware sets to 0');
+};
+
+# Test 28: -e inline code
+subtest '-e inline code' => sub {
+    my $runner = PAGI::Runner->new;
+    # Use a proper PAGI-style app signature
+    my $code = 'sub { my ($scope, $receive, $send) = @_; $send->({type => "http.response.start", status => 200, headers => []}); $send->({type => "http.response.body", body => "Hello"}) }';
+    $runner->parse_options('-e', $code);
+
+    is($runner->{eval}, $code, '-e code stored');
+
+    my $app = $runner->load_app;
+    ok(ref $app eq 'CODE', '-e returns coderef');
+    is($runner->{app_spec}, '-e', 'app_spec is -e');
+};
+
+# Test 29: -M module loading
+subtest '-M module loading' => sub {
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options('-M', 'PAGI::App::File', '-e', 'PAGI::App::File->new(root => ".")->to_app');
+
+    is(scalar @{$runner->{modules}}, 1, 'one module stored');
+    is($runner->{modules}[0], 'PAGI::App::File', 'correct module');
+
+    my $app = $runner->load_app;
+    ok(ref $app eq 'CODE', '-M/-e returns coderef');
+};
+
+# Test 30: cuddled -M option
+subtest 'cuddled -M option' => sub {
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options('-MPAGI::App::File', '-e', 'PAGI::App::File->new(root => ".")->to_app');
+
+    is(scalar @{$runner->{modules}}, 1, 'cuddled module parsed');
+    is($runner->{modules}[0], 'PAGI::App::File', 'correct cuddled module');
+};
+
+# Test 31: -e error handling
+subtest '-e error handling' => sub {
+    my $runner = PAGI::Runner->new;
+    $runner->parse_options('-e', '{ not => "a coderef" }');
+
+    like(
+        dies { $runner->load_app },
+        qr/must return a coderef/,
+        '-e dies if not coderef'
+    );
 };
 
 done_testing;

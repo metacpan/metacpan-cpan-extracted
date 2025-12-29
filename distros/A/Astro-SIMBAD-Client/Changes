@@ -1,3 +1,13 @@
+0.048		2025-12-28	T. R. Wyant
+    Repackage licenses so that GitHub can find them. Thanks to Mikko
+    Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Add SECURITY policy.
+
+    No known functional changes.
+
 0.047		2023-01-07	T. R. Wyant
     Make XML::DoubleEncodedEntities optional.  Add test entities_test,
     without this module but with all others, to prove it is not needed

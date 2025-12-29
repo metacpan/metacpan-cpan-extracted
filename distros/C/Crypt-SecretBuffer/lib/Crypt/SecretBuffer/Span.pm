@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::Span;
 # VERSION
 # ABSTRACT: Reference a span of bytes within a SecretBuffer
-$Crypt::SecretBuffer::Span::VERSION = '0.016';
+$Crypt::SecretBuffer::Span::VERSION = '0.017';
 use strict;
 use warnings;
 use Crypt::SecretBuffer; # loads XS methods into this package
@@ -184,6 +184,35 @@ Only remove from the end of the Span
 
 =back
 
+=head2 set_up_us_the_bom
+
+  # On a buffer which may begin with a BOM:
+  $something->set_up_us_the_bom->cmp("All your base");
+
+Look for an optional L<Byte-Order-Mark|https://en.wikipedia.org/wiki/Byte_order_mark> at the
+start of the span, and if found, change the encoding and advance the span start to the next
+character.
+
+  First bytes       Encoding
+  FE FF             UTF16BE
+  FF FE             UTF16LE
+  EF BB BF          UTF8
+
+This returns the original Span object, with C<pos> and C<encoding> modified if a BOM was found.
+This allows you to chain methods on a span object while conveniently processing the BOM.
+
+This does not work if another encoding is being used to see those bytes, such as decoding BASE64.
+A Span can have only one encoding, so if you need to decode BASE64 and then process a BOM, you
+need to use L</copy> to create a new SecretBuffer of raw bytes, then decode the BOM.
+
+=over
+
+=item consume_bom
+
+Provided as an alias, for anyone too embarrassed to put Zero Wing jokes in their code.
+
+=back
+
 =head2 starts_with
 
   $bool= $span->starts_with($pattern);
@@ -247,7 +276,7 @@ This is B<not> a locale-aware comparison.
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 AUTHOR
 

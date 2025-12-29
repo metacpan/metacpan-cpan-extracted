@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   kura:
     file: lib/kura.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Sub::Util: '1.40'
   perl: '5.016000'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/kfly8/kura/issues
   homepage: https://github.com/kfly8/kura
   repository: https://github.com/kfly8/kura.git
-version: '0.09'
+version: '0.10'
 x_authority: cpan:KFLY
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

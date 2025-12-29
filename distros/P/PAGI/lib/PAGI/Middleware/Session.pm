@@ -35,6 +35,11 @@ PAGI::Middleware::Session - Session management middleware
 PAGI::Middleware::Session provides server-side session management with
 cookie-based session IDs. Sessions are stored in memory by default.
 
+B<Warning:> The default in-memory store is suitable for development and
+single-process deployments only. Sessions are not shared between workers
+and are lost on restart. For production multi-worker deployments, provide
+a C<store> object backed by Redis, a database, or another shared storage.
+
 =head1 CONFIGURATION
 
 =over 4
@@ -55,11 +60,59 @@ Options for the session cookie.
 
 Session expiration time in seconds.
 
-=item * store (default: in-memory)
+=item * store (default: in-memory hash)
 
-Session store object. Must implement get($id), set($id, $data), delete($id).
+Session store object for production use. Must implement C<get($id)>,
+C<set($id, $data)>, C<delete($id)>. See warning above about the default
+in-memory store.
 
 =back
+
+=head1 CUSTOM STORES
+
+For production multi-worker deployments, implement a store class with three
+methods. Here's a Redis example:
+
+    package MyApp::Session::Redis;
+    use Redis;
+    use JSON::MaybeXS qw(encode_json decode_json);
+
+    sub new {
+        my ($class, %opts) = @_;
+        return bless {
+            redis  => Redis->new(server => $opts{server} // '127.0.0.1:6379'),
+            prefix => $opts{prefix} // 'session:',
+            expire => $opts{expire} // 3600,
+        }, $class;
+    }
+
+    sub get {
+        my ($self, $id) = @_;
+        my $data = $self->{redis}->get($self->{prefix} . $id);
+        return $data ? decode_json($data) : undef;
+    }
+
+    sub set {
+        my ($self, $id, $session) = @_;
+        my $key = $self->{prefix} . $id;
+        $self->{redis}->setex($key, $self->{expire}, encode_json($session));
+    }
+
+    sub delete {
+        my ($self, $id) = @_;
+        $self->{redis}->del($self->{prefix} . $id);
+    }
+
+    1;
+
+Then use it:
+
+    enable 'Session',
+        secret => $ENV{SESSION_SECRET},
+        store  => MyApp::Session::Redis->new(
+            server => 'redis.example.com:6379',
+            expire => 7200,
+        );
 
 =cut
 

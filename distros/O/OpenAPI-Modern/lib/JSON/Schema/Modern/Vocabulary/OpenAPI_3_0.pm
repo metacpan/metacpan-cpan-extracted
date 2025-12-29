@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI_3_0;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI 3.0 pseudo-vocabulary
 
-our $VERSION = '0.118';
+our $VERSION = '0.119';
 
 use 5.020;
 use utf8;
@@ -109,15 +109,17 @@ foreach my $vocabulary (keys %$vocabulary_mapping) {
     # schema keywords' syntax, and this saves us from having to implement custom methods for every
     # keyword that uses a subset of normal draft4 syntax (see v3.0.4 §4.7.24.1).
 
+    my $k = $keyword =~ s/^\$//r;
+
     no strict 'refs';
-    *{__PACKAGE__.'::_traverse_keyword_'.$keyword} = sub { 1 };
+    *{__PACKAGE__.'::_traverse_keyword_'.$k} = sub { 1 };
 
     next if $keyword eq 'type';
 
     # these keywords are no-ops
     next if $vocabulary eq 'MetaData' or $vocabulary eq 'Other';
 
-    my $name = '_eval_keyword_'.$keyword;
+    my $name = '_eval_keyword_'.$k;
     *{__PACKAGE__.'::'.$name} = *{'JSON::Schema::Modern::Vocabulary::'.$vocabulary.'::'.$name};
   }
 }
@@ -136,7 +138,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI_3_0 - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.118
+version 0.119
 
 =head1 DESCRIPTION
 

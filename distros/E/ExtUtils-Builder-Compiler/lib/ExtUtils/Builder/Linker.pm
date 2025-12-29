@@ -1,12 +1,12 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.034';
+$ExtUtils::Builder::Linker::VERSION = '0.035';
 use strict;
 use warnings;
 
 use parent qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
 use ExtUtils::Builder::Node;
-use ExtUtils::Builder::Util qw/command function/;
+use ExtUtils::Builder::Util qw/command function require_module/;
 
 use Carp ();
 use File::Basename 'dirname';
@@ -80,6 +80,15 @@ sub add_option_filter {
 	return;
 }
 
+sub add_profile {
+	my ($self, $profile, %args) = @_;
+	if (not ref($profile)) {
+		$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
+		require_module($profile);
+	}
+	return $profile->process_linker($self, \%args);
+}
+
 my %key_for = (
 	dl_vars      => 'DL_VARS',
 	dl_funcs     => 'DL_FUNCS',
@@ -92,6 +101,7 @@ my %key_for = (
 sub pre_action  {
 	my ($self, $from, $to, %opts) = @_;
 	my @result;
+	push @result, $self->_mkdir_for($to) if $opts{mkdir};
 	if ($self->export eq 'some') {
 		my %args = map { $key_for{$_} => $opts{$_} } grep { exists $key_for{$_} } keys %opts;
 		push @result, function(
@@ -102,7 +112,6 @@ sub pre_action  {
 			exports   => 1,
 		);
 	}
-	push @result, $self->_mkdir_for($to) if $opts{mkdir};
 	return @result;
 }
 sub post_action { }
@@ -134,7 +143,7 @@ ExtUtils::Builder::Linker - An interface around different linkers.
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 METHODS
 

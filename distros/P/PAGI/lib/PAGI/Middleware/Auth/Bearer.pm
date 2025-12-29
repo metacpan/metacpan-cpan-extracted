@@ -296,23 +296,40 @@ Hashref with authentication info:
 
 =head1 JWT SUPPORT
 
-Currently supported algorithms:
+The built-in JWT validation is intentionally minimal, suitable for simple
+use cases and development.
 
-=over 4
+B<Supported algorithms:> HS256 (HMAC-SHA256) only
 
-=item * HS256 (HMAC-SHA256)
+B<Claims checked:> C<exp> (expiration), C<nbf> (not before)
 
-=back
+B<Not checked:> C<iss> (issuer), C<aud> (audience), C<iat> (issued at),
+C<jti> (JWT ID for replay protection)
 
-Standard JWT claims checked:
+B<Not supported:> Asymmetric algorithms (RS256, ES256), JWKS key fetching,
+key rotation, clock skew tolerance
 
-=over 4
+For production systems requiring full JWT validation, use the C<validator>
+option with L<Crypt::JWT>:
 
-=item * exp - Expiration time
+    use Crypt::JWT qw(decode_jwt);
 
-=item * nbf - Not before time
+    enable 'Auth::Bearer',
+        validator => sub {
+            my ($token) = @_;
+            my $claims = eval {
+                decode_jwt(
+                    token   => $token,
+                    key     => $secret,
+                    verify_iss => 'https://auth.example.com',
+                    verify_aud => 'my-api',
+                );
+            };
+            return $@ ? undef : $claims;
+        };
 
-=back
+See L<Crypt::JWT> for complete JWT/JWS/JWE support including RS256, ES256,
+JWKS, and all standard claim validations.
 
 =head1 SEE ALSO
 

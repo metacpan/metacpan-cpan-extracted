@@ -71,7 +71,7 @@
    "provides" : {
       "App::cpm" : {
          "file" : "lib/App/cpm.pm",
-         "version" : "0.998002"
+         "version" : "0.998003"
       },
       "App::cpm::Builder::Static" : {
          "file" : "lib/App/cpm/Builder/Static.pm"
@@ -81,6 +81,9 @@
       },
       "App::cpm::CircularDependency" : {
          "file" : "lib/App/cpm/CircularDependency.pm"
+      },
+      "App::cpm::Context" : {
+         "file" : "lib/App/cpm/Context.pm"
       },
       "App::cpm::DistNotation" : {
          "file" : "lib/App/cpm/DistNotation.pm"
@@ -167,7 +170,7 @@
          "web" : "https://github.com/skaji/cpm"
       }
    },
-   "version" : "0.998002",
+   "version" : "0.998003",
    "x_contributors" : [
       "Andrew Rodland <andrew@cleverdomain.org>",
       "Dave Rolsky <autarch@urth.org>",

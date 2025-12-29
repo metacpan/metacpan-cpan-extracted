@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use Dist::Zilla::App::Tester;
 use Git::Wrapper;
 use Path::Tiny;
 use Test::More;

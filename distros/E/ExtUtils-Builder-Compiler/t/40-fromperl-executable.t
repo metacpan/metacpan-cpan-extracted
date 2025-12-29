@@ -26,14 +26,13 @@ my $olddir = getcwd;
 my $dir = tempdir(CLEANUP => 1);
 
 chdir $dir;
-mkdir 't';
 
 my $planner = ExtUtils::Builder::Planner->new;
-$planner->load_extension('ExtUtils::Builder::AutoDetect::C', undef,
+$planner->load_extension('ExtUtils::Builder::BuildTools::FromPerl', undef,
 	type => 'executable',
 );
 
-my $source_file = catfile('t', 'executable.c');
+my $source_file = 'executable.c';
 {
 	open my $fh, '>', $source_file or die "Can't create $source_file: $!";
 	my $content = <<END;
@@ -50,10 +49,11 @@ END
 
 ok(-e $source_file, "source file '$source_file' created");
 
-my $object_file = catfile(dirname($source_file), basename($source_file, '.c') . $Config{obj_ext});
+my $basename = basename($source_file, '.c');
+my $object_file = $planner->obj_file($basename);
 $planner->compile($source_file, $object_file);
 
-my $exe_file = catfile(dirname($source_file), basename($object_file, $Config{obj_ext}) . $Config{exe_ext});
+my $exe_file = $planner->executable_file($basename);
 $planner->link([$object_file], $exe_file);
 
 my $plan = $planner->materialize;
@@ -62,7 +62,7 @@ ok $plan;
 ok eval { $plan->run($exe_file, logger => \&note); 1 } or diag "Got exception: $@";
 
 ok(-e $object_file, "object file $object_file has been created");
-ok(-e $exe_file, "lib file $exe_file has been created");
+ok(-e $exe_file, "exe file $exe_file has been created");
 
 my $output = eval { capturex($exe_file) };
 is ($output, "Dubrovnik\n", 'Output is "Dubrovnik"') or diag("Error: $@");
@@ -70,4 +70,3 @@ is ($output, "Dubrovnik\n", 'Output is "Dubrovnik"') or diag("Error: $@");
 chdir $olddir;
 
 done_testing;
-

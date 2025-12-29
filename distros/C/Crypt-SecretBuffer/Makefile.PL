@@ -101,6 +101,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
+    "IO::Handle" => 0,
     "Scalar::Util" => 0,
     "overload" => 0,
     "parent" => 0,
@@ -111,7 +112,6 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Encode" => 0,
     "FindBin" => 0,
-    "IO::Handle" => 0,
     "MIME::Base64" => 0,
     "POSIX" => 0,
     "Test2::Suite" => "0.000139",
@@ -120,7 +120,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }

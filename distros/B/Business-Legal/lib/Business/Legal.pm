@@ -1,7 +1,7 @@
 package Business::Legal;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use URI::Escape;
 use JSON;
@@ -49,6 +49,7 @@ sub extract_aoh_from_html_content{
 sub get_hashref_from_trow{
 	my $trow = shift;
 	my ($current_state)     = $trow =~ /<td class="current-state-col d-table-cell">([^<]+)<\/td>/g;
+	my ($state)             = $trow =~ /<td class="state-col d-none d-sm-table-cell"><a href=[^<]+>([^<]+)<\/a><\/td>/g; # new
 	my ($name)              = $trow =~ /<td class="name-col d-none d-sm-table-cell">([^<]+)<\/td>/g;
 	my ($date)              = $trow =~ /<td class="date-col d-none d-sm-table-cell">([^<]+)<\/td>/g;
 	my ($rep_id, $rep_name)              = $trow =~ /<td class="rep-col d-none d-lg-table-cell"><a href="\/\w+\/(\d*)">([^<]*)<\/a><\/td>/ ? ($1, $2) : ('', '');
@@ -57,6 +58,7 @@ sub get_hashref_from_trow{
 	my $hashref = {
 		current_state => $current_state,
 		name => $name,
+		state=> $state,
 		date => $date,
 		rep_id => $rep_id,
 		rep_name => $rep_name,
@@ -148,13 +150,15 @@ sub get_aoh_from_range_of_jsons{
 	
     opendir(D, "$whole_data_subfolder") || die "Can't open directory $whole_data_subfolder: $!\n";
     my @file_list = readdir(D);
+    my @cumulative_aoh;
     foreach my $f (@file_list) {
 		next if ( -d $f or $f !~ /\.json\.txt$/g);
 		my @aoh = get_aoh_from_one_json($whole_data_subfolder, $f);
 		printf "%d ", scalar @aoh;
+		push @cumulative_aoh, @aoh;
 		# print "$f ";
 	}
-	return;
+	return @cumulative_aoh;
 }
 
 1;

@@ -40,8 +40,17 @@ use File::Spec::Functions qw(catfile);
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/nigelhorne/Geo-GeoNames';
+my $github    = "https://github.com/nigelhorne/$dist";
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
+
+my $tar = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$tar->{'TAR'} = 'gtar';
+}
 
 my %WriteMakefile = (
 	'MIN_PERL_VERSION' => '5.010',
@@ -50,7 +59,7 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM'    => $main_file,
 	'VERSION_FROM'     => $main_file,
 	# 'AUTHOR'           => 'Per Henrik Johansen <per.henrik.johansen@gmail.com>',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	'LICENSE'          => 'perl',
 
 	'CONFIGURE_REQUIRES' => {
@@ -60,13 +69,16 @@ my %WriteMakefile = (
 
 	'BUILD_REQUIRES' => { },
 	'TEST_REQUIRES' => {
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
+		'Test::NoWarnings' => 0,
+		'Test::RequiresInternet' => 0
 	}, 'PREREQ_PM'      => {
 		'XML::Simple'     => '2.13',
 		'Mojo::UserAgent' => '0',
-		'JSON'            => '1.14',
-		},
-
+		'JSON::MaybeXS'	  => 0,
+	},
 	'META_MERGE' => {
 		'meta-spec' => { version => 2 },
 		keywords => [ qw(geo geonames) ],
@@ -84,6 +96,7 @@ my %WriteMakefile = (
 		},
 
 	clean => { FILES => "$dist-*" },
+	dist => $tar,
 	);
 
 sub arguments { \%WriteMakefile }
@@ -114,8 +127,7 @@ HERE
 	eval "require $minimum_perl;" or die $@;
 
 	WriteMakefile( %$arguments );
-	}
-
+}
 
 no warnings;
 __PACKAGE__;

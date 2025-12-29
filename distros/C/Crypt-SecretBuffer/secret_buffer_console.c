@@ -21,6 +21,10 @@ static bool sb_console_state_init(pTHX_ sb_console_state *state, PerlIO *stream)
 static bool sb_console_state_get_echo(sb_console_state *state);
 /* write console state with echo bit enabled or disabled */
 static bool sb_console_state_set_echo(sb_console_state *state, bool enable);
+/* return status of "line input" bit (ICANON mode on Posix) */
+static bool sb_console_state_get_line_input(sb_console_state *state);
+/* write console state with new value for line-input */
+static bool sb_console_state_set_line_input(sb_console_state *state, bool enable);
 /* Make a copy of the file descriptor to guarantee that we can restore it later even if the
  * user interfered with the original file descriptor */
 static bool sb_console_state_dup_fd(sb_console_state *state);
@@ -187,6 +191,20 @@ static bool sb_console_state_set_echo(sb_console_state *state, bool enable) {
    return false;
 }
 
+static bool sb_console_state_get_line_input(sb_console_state *state) {
+   return state->mode & ENABLE_LINE_INPUT;
+}
+
+static bool sb_console_state_set_line_input(sb_console_state *state, bool enable) {
+   DWORD mode= enable? (state->mode | ENABLE_LINE_INPUT)
+                     : (state->mode & ~ENABLE_LINE_INPUT);
+   if (SetConsoleMode(state->hdl, mode)) {
+      state->mode= mode;
+      return true;
+   }
+   return false;
+}
+
 static bool sb_console_state_restore(sb_console_state *state) {
    if (SetConsoleMode(state->hdl, state->orig_mode)) {
       state->mode= state->orig_mode;
@@ -244,6 +262,23 @@ static bool sb_console_state_set_echo(sb_console_state *state, bool enable) {
    struct termios new_st= state->cur_state;
    new_st.c_lflag= enable? (new_st.c_lflag | ECHO)
                          : (new_st.c_lflag & ~ECHO);
+   if (tcsetattr(state->fd, TCSANOW, &new_st) == 0) {
+      state->cur_state= new_st;
+      return true;
+   }
+   else return false;
+}
+
+static bool sb_console_state_get_line_input(sb_console_state *state) {
+   return state->cur_state.c_lflag & ICANON;
+}
+
+static bool sb_console_state_set_line_input(sb_console_state *state, bool enable) {
+   struct termios new_st= state->cur_state;
+   /* to keep this similar to disabling *only* the line buffering of Win32,
+      enable ISIG so that ^C is still handled by the OS */
+   new_st.c_lflag= enable? ((new_st.c_lflag | ICANON) & ~(tcflag_t)ISIG)
+                         : ((new_st.c_lflag & ~(tcflag_t)ICANON) | ISIG);
    if (tcsetattr(state->fd, TCSANOW, &new_st) == 0) {
       state->cur_state= new_st;
       return true;

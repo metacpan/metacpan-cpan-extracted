@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v5.0.2';
+our $VERSION = 'v6.0.1';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -128,9 +128,36 @@ my %revisions = (
     'ShareDir',
     sub { $_[0]->pluginset_execdir },
   ],
+  6 => [
+    sub { $_[0]->pluginset_gatherer },
+    'MetaYAML',
+    'MetaJSON',
+    'License',
+    'Pod2Readme',
+    'PodSyntaxTests',
+    'Test::ReportPrereqs',
+    ['Test::Compile' => { xt_mode => 1 }],
+    sub { $_[0]->pluginset_installer },
+    'Manifest',
+    'PruneCruft',
+    ['PruneFiles' => { filename => ['README.pod'] }],
+    'ManifestSkip',
+    'RunExtraTests',
+    sub { $_[0]->pluginset_release_management }, # before test/confirm for before-release verification
+    'TestRelease',
+    'ConfirmRelease',
+    sub { $_[0]->pluginset_releaser },
+    'MetaMergeFile',
+    'PrereqsFile',
+    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
+    sub { $_[0]->pluginset_metaprovides },
+    'ShareDir',
+    sub { $_[0]->pluginset_execdir },
+  ],
 );
 
 my %allowed_installers = (
+  DistBuild => 1,
   MakeMaker => 1,
   'MakeMaker::Awesome' => 1,
   ModuleBuild => 1,
@@ -268,7 +295,7 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   version = 0.001
   
   [@Starter]           ; all that is needed to start
-  revision = 5         ; always defaults to revision 1
+  revision = 6         ; always defaults to revision 1
   
   ; configuring examples
   installer = ModuleBuildTiny
@@ -278,7 +305,7 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
   [@Starter::Git]      ; drop-in variant bundle for git workflows
-  revision = 5         ; requires/defaults to revision 3
+  revision = 6         ; requires/defaults to revision 3
 
 =head1 DESCRIPTION
 
@@ -331,7 +358,7 @@ configured by the composed roles, as in L</"CONFIGURING">.
 =head2 revision
 
   [@Starter]
-  revision = 5
+  revision = 6
 
 Selects the revision to use, from L</"REVISIONS">. Defaults to revision 1.
 
@@ -352,6 +379,11 @@ Requires revision 2 or higher.
   revision = 5
   installer = ModuleBuild
   ModuleBuild.mb_class = My::Module::Builder
+
+  [@Starter]
+  revision = 6
+  installer = DistBuild
+  DistBuild.auto_plugin_requires = 1
 
 The default installer is L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker>, which
 works with no extra configuration for most cases. The C<installer> option can
@@ -379,6 +411,9 @@ Since revision 5, L<[ModuleBuild]|Dist::Zilla::Plugin::ModuleBuild> is
 supported as an installer, and will generate a F<Build.PL> that uses
 L<Module::Build>. This is not generally recommended unless converting a
 distribution that is already using a L<Module::Build> subclass.
+
+Since revision 6, L<[DistBuild]|Dist::Zilla::Plugin::DistBuild> is supported
+as an installer, and will generate a F<Build.PL> that uses L<Dist::Build>.
 
 =head2 managed_versions
 
@@ -436,9 +471,10 @@ L<< C<dzil regenerate>|Dist::Zilla::App::Command::regenerate >>.
 
 The C<[@Starter]> plugin bundle supports the following revisions.
 
-=head2 Revision 1
+=head2 Revision 6
 
-Revision 1 is the default and is equivalent to using the following plugins:
+Revision 6 is the current set of best practices, equivalent to using the
+following plugins if not configured further:
 
 =over 2
 
@@ -450,7 +486,7 @@ Revision 1 is the default and is equivalent to using the following plugins:
 
 =item L<[License]|Dist::Zilla::Plugin::License>
 
-=item L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod>
+=item L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::Pod2Readme>
 
 =item L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>
 
@@ -466,6 +502,10 @@ Revision 1 is the default and is equivalent to using the following plugins:
 
 =item L<[PruneCruft]|Dist::Zilla::Plugin::PruneCruft>
 
+=item L<[PruneFiles]|Dist::Zilla::Plugin::PruneFiles>
+
+  filename = README.pod
+
 =item L<[ManifestSkip]|Dist::Zilla::Plugin::ManifestSkip>
 
 =item L<[RunExtraTests]|Dist::Zilla::Plugin::RunExtraTests>
@@ -476,7 +516,9 @@ Revision 1 is the default and is equivalent to using the following plugins:
 
 =item L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
 
-=item L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>
+=item L<[MetaMergeFile]|Dist::Zilla::Plugin::MetaMergeFile>
+
+=item L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>
 
 =item L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>
 
@@ -489,14 +531,102 @@ Revision 1 is the default and is equivalent to using the following plugins:
 
 =item L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>
 
+  inherit_version = 0
+
 =item L<[ShareDir]|Dist::Zilla::Plugin::ShareDir>
 
 =item L<[ExecDir]|Dist::Zilla::Plugin::ExecDir>
 
 =back
 
-This revision differs from L<[@Basic]|Dist::Zilla::PluginBundle::Basic> as
-follows:
+Revision 6 differs from Revision 5 as follows:
+
+=over 2
+
+=item *
+
+Includes an instance of the L<[MetaMergeFile]|Dist::Zilla::Plugin::MetaMergeFile>
+and L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile> plugins to allow specifying
+arbitrary CPAN metadata in F<metamerge.yml>/F<metamerge.json> and distribution
+prerequisites in F<prereqs.yml>/F<prereqs.json>. These plugins have no effect if
+the corresponding files are not present in the source tree.
+
+=item *
+
+The L</"installer"> option now supports C<DistBuild>.
+
+=back
+
+=head2 Revision 5
+
+Revision 5 differs from Revision 4 as follows:
+
+=over 2
+
+=item *
+
+Includes an instance of the L<[PruneFiles]|Dist::Zilla::Plugin::PruneFiles>
+plugin to remove F<README.pod> from the distribution build if present. The CPAN
+toolchain expects C<.pod> files to be documentation and installs them alongside
+the module files, sometimes even if they are outside the F<lib/> subdirectory,
+due to historical distribution layouts. But this is not the purpose of
+F<README.pod>, so it is excluded from the build to avoid cluttering users'
+install locations and confusing MetaCPAN and similar documentation indexes.
+F<README.pod> files generated in the source tree using
+L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod> (with
+C<location = root>) are already automatically excluded from the build by that
+plugin.
+
+=item *
+
+The L</"installer"> option now supports C<ModuleBuild>.
+
+=back
+
+=head2 Revision 4
+
+Revision 4 differs from Revision 3 by removing the
+L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig> plugin, because it adds
+significant clutter to the generated META files without much benefit. It can
+easily be added to the F<dist.ini> if desired.
+
+=head2 Revision 3
+
+Revision 3 differs from Revision 2 in that it additionally supports the
+L</"managed_versions"> and L</"regenerate"> options, and variant bundles like
+L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
+
+=head2 Revision 2
+
+Revision 2 differs from Revision 1 as follows:
+
+=over 2
+
+=item *
+
+Sets the option
+L<"inherit_version" in [MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package/"inherit_version">
+to 0 by default, so that C<provides> metadata will use individual module
+versions if they differ from the distribution version.
+
+=item *
+
+L<[Pod2Readme]|Dist::Zilla::Plugin::Pod2Readme> is used instead of
+L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod> to generate the
+plaintext F<README>, as it is a simpler plugin for this purpose. It takes the
+same C<filename> and C<source_filename> options, but does not allow further
+configuration, and does not automatically use a C<.pod> file as the source.
+
+=item *
+
+The L</"installer"> option is now supported to change the installer plugin.
+
+=back
+
+=head2 Revision 1
+
+Revision 1 is the default if no revision is specified, and differs from
+L<[@Basic]|Dist::Zilla::PluginBundle::Basic> as follows:
 
 =over 2
 
@@ -523,72 +653,6 @@ L<[MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package>.
 
 =back
 
-=head2 Revision 2
-
-Revision 2 is similar to Revision 1, with these differences:
-
-=over 2
-
-=item *
-
-Sets the option
-L<"inherit_version" in [MetaProvides::Package]|Dist::Zilla::Plugin::MetaProvides::Package/"inherit_version">
-to 0 by default, so that C<provides> metadata will use individual module
-versions if they differ from the distribution version.
-
-=item *
-
-L<[Pod2Readme]|Dist::Zilla::Plugin::Pod2Readme> is used instead of
-L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod> to generate the
-plaintext F<README>, as it is a simpler plugin for this purpose. It takes the
-same C<filename> and C<source_filename> options, but does not allow further
-configuration, and does not automatically use a C<.pod> file as the source.
-
-=item *
-
-The L</"installer"> option is now supported to change the installer plugin.
-
-=back
-
-=head2 Revision 3
-
-Revision 3 is similar to Revision 2, but additionally supports the
-L</"managed_versions"> and L</"regenerate"> options, and variant bundles like
-L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
-
-=head2 Revision 4
-
-Revision 4 is similar to Revision 3, but removes the
-L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig> plugin because it adds
-significant clutter to the generated META files without much benefit. It can
-easily be added to the F<dist.ini> if desired.
-
-=head2 Revision 5
-
-Revision 5 is similar to Revision 4, with these differences:
-
-=over 2
-
-=item *
-
-Includes an instance of the L<[PruneFiles]|Dist::Zilla::Plugin::PruneFiles>
-plugin to remove F<README.pod> from the distribution build if present. The CPAN
-toolchain expects C<.pod> files to be documentation and installs them alongside
-the module files, sometimes even if they are outside the F<lib/> subdirectory,
-due to historical distribution layouts. But this is not the purpose of
-F<README.pod>, so it is excluded from the build to avoid cluttering users'
-install locations and confusing MetaCPAN and similar documentation indexes.
-F<README.pod> files generated in the source tree using
-L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod> (with
-C<location = root>) are already automatically excluded from the build by that
-plugin.
-
-=item *
-
-The L</"installer"> option now supports C<ModuleBuild>.
-
-=back
-
 =head1 EXAMPLES
 
 Some example F<dist.ini> configurations to get started with.
@@ -603,7 +667,7 @@ Some example F<dist.ini> configurations to get started with.
   version = 1.00
 
   [@Starter]
-  revision = 5
+  revision = 6
 
   [Prereqs / RuntimeRequires]
   perl = 5.010001
@@ -622,7 +686,7 @@ Some example F<dist.ini> configurations to get started with.
   copyright_year   = 2019
 
   [@Starter::Git]
-  revision = 5
+  revision = 6
   managed_versions = 1
   regenerate = Makefile.PL
   regenerate = META.json
@@ -643,7 +707,7 @@ Some example F<dist.ini> configurations to get started with.
   plugin = ReadmeAnyFromPod
 
   [@Starter::Git]
-  revision = 5
+  revision = 6
   installer = ModuleBuildTiny
   managed_versions = 1
   regenerate = Build.PL
@@ -825,6 +889,10 @@ To automatically set resource metadata from an associated GitHub repository,
 use L<[GithubMeta]|Dist::Zilla::Plugin::GithubMeta>. To set resource metadata
 manually, use L<[MetaResources]|Dist::Zilla::Plugin::MetaResources>.
 
+Since L</"Revision 6"> or by including L<[MetaMergeFile]|Dist::Zilla::Plugin::MetaMergeFile>
+with an earlier revision, resource metadata and other arbitrary metadata can be
+specified in a F<metamerge.json> or F<metamerge.yml>.
+
 =head2 Prereqs
 
 To specify distribution prereqs in a L<cpanfile>, use
@@ -834,6 +902,9 @@ L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>. To specify prereqs in
 F<dist.ini>, use L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>. To automatically
 guess the distribution's prereqs by parsing the code, use
 L<[AutoPrereqs]|Dist::Zilla::Plugin::AutoPrereqs>.
+
+Since L</"Revision 6">, L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile> is
+enabled by default, but prereqs can still be specified with any other method.
 
 =head1 ENVIRONMENT
 

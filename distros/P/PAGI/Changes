@@ -1,5 +1,18 @@
 # This file documents the revision history for Perl extension PAGI
 
+0.001011 - 2025-12-28
+  - Switch license from Perl_5 to Artistic_2_0 (cleaner language, OSI recommended)
+  - Fix Ctrl-C signal handling for multi-worker mode: lifespan.shutdown now runs
+    for all workers ensuring proper cleanup
+  - Add -e and -M flags to Runner for inline apps (like perl -e/-M)
+  - Add .pl and .md to MIME types in PAGI::App::File
+  - Add exception trapping to PAGI::Test::Client (default behavior)
+  - Add SIGNAL HANDLING documentation to PAGI::Server POD
+  - Add SECURITY.md and CONTRIBUTING.md to repository
+  - Document async completion contract and detect missing responses
+  - Cookbook improvements: JWT validation, Redis sessions, redirect behavior,
+    WebSocket heartbeat example, IO::File::WithPath for filehandles
+
 0.001010 - 2025-12-26
   - BREAKING: Removed sendfile() from PAGI::Server - use PAGI::Middleware::XSendfile
     with nginx/Apache X-Sendfile/X-Accel-Redirect instead for large file serving

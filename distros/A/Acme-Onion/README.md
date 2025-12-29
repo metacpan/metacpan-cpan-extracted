@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kfly8/Acme-Onion/actions/workflows/test.yml/badge.svg)](https://github.com/kfly8/Acme-Onion/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Acme-Onion.svg)](https://metacpan.org/release/Acme-Onion)
+[![Actions Status](https://github.com/kfly8/Acme-Onion/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kfly8/Acme-Onion/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Acme-Onion.svg)](https://metacpan.org/release/Acme-Onion)
 # NAME
 
 Acme::Onion - .🧅 file extension in Perl.

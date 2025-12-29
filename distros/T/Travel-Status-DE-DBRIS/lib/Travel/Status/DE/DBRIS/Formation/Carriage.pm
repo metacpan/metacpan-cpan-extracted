@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 Travel::Status::DE::DBRIS::Formation::Carriage->mk_ro_accessors(
 	qw(class_type is_closed is_dosto is_locomotive is_powercar
 	  number model section uic_id type
@@ -49,7 +49,10 @@ sub new {
 	$ref->{section}       = $json{platformPosition}{sector};
 	$ref->{type}          = $json{type}{constructionType};
 
-	$ref->{model} =~ s{^.....(...)....(?:-.)?$}{$1} or $ref->{model} = undef;
+	if ( defined $ref->{model} ) {
+		$ref->{model} =~ s{^.....(...)....(?:-.)?$}{$1}
+		  or $ref->{model} = undef;
+	}
 
 	my $self = bless( $ref, $obj );
 
@@ -95,22 +98,35 @@ sub new {
 
 	$ref->{start_meters} = $pos->{start};
 	$ref->{end_meters}   = $pos->{end};
-	$ref->{start_percent}
-	  = ( $pos->{start} - $platform->{start} ) * 100 / $platform_length;
-	$ref->{end_percent}
-	  = ( $pos->{end} - $platform->{start} ) * 100 / $platform_length;
-	if ( defined $pos->{start} and defined $pos->{end} ) {
-		$ref->{length_meters} = $pos->{start} - $pos->{end};
+	if (    defined $pos->{start}
+		and defined $platform->{start}
+		and $platform_length )
+	{
+		$ref->{start_percent}
+		  = ( $pos->{start} - $platform->{start} ) * 100 / $platform_length;
 	}
-	$ref->{length_percent} = $ref->{end_percent} - $ref->{start_percent};
+	if (    defined $pos->{end}
+		and defined $platform->{start}
+		and $platform_length )
+	{
+		$ref->{end_percent}
+		  = ( $pos->{end} - $platform->{start} ) * 100 / $platform_length;
+	}
 
-	if (   $pos->{start} eq ''
+	if (   not defined $pos->{start}
+		or not defined $pos->{end}
+		or $pos->{start} eq ''
 		or $pos->{end} eq '' )
 	{
 		$ref->{position}{valid} = 0;
 	}
 	else {
 		$ref->{position}{valid} = 1;
+		$ref->{length_meters} = $pos->{start} - $pos->{end};
+	}
+
+	if ( defined $ref->{start_percent} and defined $ref->{end_percent} ) {
+		$ref->{length_percent} = $ref->{end_percent} - $ref->{start_percent};
 	}
 
 	return $self;

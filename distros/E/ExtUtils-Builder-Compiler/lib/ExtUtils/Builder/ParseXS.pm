@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ParseXS;
-$ExtUtils::Builder::ParseXS::VERSION = '0.034';
+$ExtUtils::Builder::ParseXS::VERSION = '0.035';
 use strict;
 use warnings;
 
@@ -102,7 +102,7 @@ ExtUtils::Builder::ParseXS - Essential functions for implementing XS in a Plan
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

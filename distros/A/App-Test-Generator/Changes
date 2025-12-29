@@ -1,5 +1,21 @@
 Revision history for App-Test-Generator
 
+0.24	Sun Dec 28 15:10:09 EST 2025
+	Return chances of false positive file path semantics
+	If the type of an variable can't be determined, guess at string, but lower the confidence level
+	Error Message Extraction:
+		Capture error messages from die/croak/confess
+		Use them to understand what makes input invalid die "Age must be positive" if $age <= 0;
+		Store that a negative/zero age is invalid
+	Use test of scalar(@_) to check for number of optional/mandatory args
+	Throw a float at a routine that only takes integers - it should error
+	Added example extraction 
+		Parse POD for example calls and extract valid parameter combinations =head2 SYNOPSIS my $obj = Module->new(foo => 'bar', count => 5);
+		Store these as known-good test values
+	Corpus bool testing now uses ok rather than is
+	Ensure new doesn't refer to other packages
+	Set the isa property in the new function
+
 0.23	Wed Dec 24 10:48:03 EST 2025
 	Fix https://www.cpantesters.org/cpan/report/079dba46-d92f-11f0-9642-dde56d8775ea
 	Don't give false negative that memberof isn't known

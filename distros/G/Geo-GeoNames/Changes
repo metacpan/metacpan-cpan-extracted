@@ -1,5 +1,16 @@
 Revision history for Perl module Geo::GeoNames
 
+1.15	Sun Dec 28 16:02:17 EST 2025
+	Use JSON::MaybeXS instead of JSON
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+	Use Test::DescribeMe to simplify tests
+	Use Test::RequiresInternet
+	Fixed typo (minMagnutide now says minMagnitude)
+	Check that the HTTP request was successful before attempting to parse the result
+	Verify HTTP code before attempting to parse the result
+	Improve the MIME type validation to be more strict and precise
+	Added test dashboard
+
 1.14	Fri Jun 10 05:08:22 EDT 2022
 	Start to use Test::Most
 
@@ -35,9 +46,9 @@ Revision history for Perl module Geo::GeoNames
 1.06 - 2015-12-07
 	* Nicolas Mendoza
 	* alternateName and other multi-element xml values were simply trimmed so 
-	that only one element survived.
-	This change should return them as an arrayref, but still return a single
-	entry as a hashref.
+		that only one element survived
+		This change should return them as an arrayref, but still return a single
+		entry as a hashref
 
 1.05 - 2015-11-26
 	* Nicolas Mendoza

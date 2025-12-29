@@ -4,38 +4,25 @@ Geo::GeoNames - Perform geographical queries using GeoNames Web Services
 
 # VERSION
 
-Version 1.14
-
-## ua
-
-Accessor method to get and set UserAgent object used internally. You
-can call _env\_proxy_ for example, to get the proxy information from
-environment variables:
-
-    $geo_coder->ua()->env_proxy(1);
-
-You can also set your own User-Agent object:
-
-    use LWP::UserAgent::Throttled;
-    $geo_coder->ua(LWP::UserAgent::Throttled->new());
+Version 1.15
 
 # SYNOPSIS
 
         use Geo::GeoNames;
-        my $geo = Geo::GeoNames->new( username => $username );
+        my $geo = Geo::GeoNames->new(username => $ENV{'GEONAME_USER'});
 
         # make a query based on placename
         my $result = $geo->search(q => 'Fredrikstad', maxRows => 2);
 
         # print the first result
-        print " Name: " . $result->[0]->{name};
-        print " Longitude: " . $result->[0]->{lng};
-        print " Lattitude: " . $result->[0]->{lat};
+        print ' Name: ', $result->[0]->{name}, "\n";
+        print ' Longitude: ', $result->[0]->{lng}, "\n";
+        print ' Latitude: ', $result->[0]->{lat}, "\n";
 
         # Make a query based on postcode
-        my $result = $geo->postalcode_search(
-                postalcode => "1630", maxRows => 3, style => "FULL"
-                );
+        $result = $geo->postalcode_search(
+                postalcode => '1630', maxRows => 3, style => 'FULL'
+        );
 
 # DESCRIPTION
 
@@ -58,26 +45,31 @@ postalcode, the module will look it up and return more information
 Wikipedia lookups are also supported. If more than one match is found,
 a list of locations will be returned.
 
-# METHODS
+## ua
+
+Accessor method to get and set UserAgent object used internally. You
+can call _env\_proxy_ for example, to get the proxy information from
+environment variables:
+
+    $geo_coder->ua()->env_proxy(1);
+
+You can also set your own User-Agent object:
+
+    use LWP::UserAgent::Throttled;
+    $geo_coder->ua(LWP::UserAgent::Throttled->new());
+
+# SUBROUTINES/METHODS
 
 - new
 
-            $geo = Geo::GeoNames->new( username => '...' )
-            $geo = Geo::GeoNames->new( username => '...', url => $url )
+            $geo = Geo::GeoNames->new( username => '...' );
+            $geo = Geo::GeoNames->new( username => '...', url => $url );
 
     Constructor for Geo::GeoNames. It returns a reference to an
     Geo::GeoNames object. You may also pass the url of the webservices to
     use. The default value is [http://api.geonames.org](http://api.geonames.org) and is the only url,
     to my knowledge, that provides the services needed by this module. The
     username parameter is required.
-
-- ua( $ua )
-
-    With a single argument, set the UserAgent to be used by all API calls
-    and return that UserAgent object. Supports [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) and
-     [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) derivatives.
-
-    With no arguments, return the current UserAgent used.
 
 - username( $username )
 
@@ -275,7 +267,7 @@ a list of locations will be returned.
     For a thorough description of the arguments, see
     [http://www.geonames.org/export](http://www.geonames.org/export)
 
-- find\_nearby\_wikipediaby\_postalcode(arg => $arg)
+- find\_nearby\_wikipedia\_by\_postalcode(arg => $arg)
 
     Reverse lookup for Wikipedia articles. Valid names for **arg** are as
     follows:
@@ -398,7 +390,7 @@ a list of locations will be returned.
     For a thorough description of the arguments, see
     [http://www.geonames.org/export](http://www.geonames.org/export)
 
-- hiearchy(arg => $arg)
+- hierarchy(arg => $arg)
 
     Returns all GeoNames higher up in the hierarchy of a place based on a geonameId.
 
@@ -468,10 +460,11 @@ find\_nearest\_intersection(), and find\_nearby\_streets().
 
 # BUGS
 
+This module is provided as-is without any warranty.
+
 Not a bug, but the GeoNames services expects placenames to be UTF-8
-encoded, and all data received from the webservices are also UTF-8
-encoded. So make sure that strings are encoded/decoded based on the
-correct encoding.
+encoded, and all data received from the webservices are also UTF-8 encoded.
+So make sure that strings are encoded/decoded based on the correct encoding.
 
 Please report any bugs found or feature requests through GitHub issues
 [https://github.com/nigelhorne/Geo-GeoNames/issues](https://github.com/nigelhorne/Geo-GeoNames/issues).
@@ -484,6 +477,7 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
+- Test coverage report: [https://nigelhorne.github.io/Geo-GeoNames/coverage/](https://nigelhorne.github.io/Geo-GeoNames/coverage/)
 - [http://www.geonames.org/export](http://www.geonames.org/export)
 - [http://www.geonames.org/export/ws-overview.html](http://www.geonames.org/export/ws-overview.html)
 
@@ -499,11 +493,11 @@ Per Henrik Johansen, `<per.henrik.johansen@gmail.com>`.
 Previously maintained by brian d foy, `<brian.d.foy@gmail.com>`
 and Nicolas Mendoza, `<mendoza@pvv.ntnu.no>`
 
-Maintained by Nigel Horne, `<njh at bandsman.co.uk>`
+Maintained by Nigel Horne, `<njh at nigelhorne.com>`
 
 # COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021 by Per Henrik Johansen
-Copyright © 2022 by Nigel Horne
+Copyright (C) 2007-2021 by Per Henrik Johansen
+Copyright (C) 2022-2023 by Nigel Horne
 
 This library is available under the Artistic License 2.0.

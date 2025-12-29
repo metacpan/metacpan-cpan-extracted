@@ -3,7 +3,7 @@ package Dist::Zilla::Starter;
 use strict;
 use warnings;
 
-our $VERSION = 'v5.0.2';
+our $VERSION = 'v6.0.1';
 
 1;
 
@@ -148,9 +148,9 @@ later.)
 
 While this is traditionally implemented by a module called
 L<ExtUtils::MakeMaker>, a slightly different process was conceived using a
-module called L<Module::Build> (and later L<Module::Build::Tiny>), in which a
-F<Build.PL> is provided which generates a perl script named F<Build> to perform
-these tasks instead.
+module called L<Module::Build> (and later L<Module::Build::Tiny> and
+L<Dist::Build>), in which a F<Build.PL> is provided which generates a perl
+script named F<Build> to perform these tasks instead.
 
 While both methods have been extended and improved using different modules, for
 Dist::Zilla authors the details of user-side installation are largely
@@ -262,7 +262,7 @@ but Module::Build is still used by some who prefer its interface over
 ExtUtils::MakeMaker, or who have complicated compilation requirements that are
 easier to customize in Module::Build.
 
-=head2 Module::Build::Tiny
+=head2 Module::Build::Tiny and Dist::Build
 
   $ mbtiny test --release
   $ mbtiny upload
@@ -273,6 +273,10 @@ significant reason for its simplicity is that unlike the previously mentioned
 tools, it is B<only> an install tool; it does not provide any authoring
 features. A separate tool called L<mbtiny> provides these features in a minimal
 package, or it works great with dedicated authoring tools like Dist::Zilla.
+
+L<Dist::Build> is a more extensible and customizable install-only
+implementation of the F<Build.PL> spec, and similarly leaves authoring features
+up to tools like Dist::Zilla.
 
 =head2 Dist::Zilla
 

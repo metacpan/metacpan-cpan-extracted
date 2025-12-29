@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -56,11 +56,11 @@
    "provides" : {
       "Astro::SIMBAD::Client" : {
          "file" : "lib/Astro/SIMBAD/Client.pm",
-         "version" : "0.047"
+         "version" : "0.048"
       },
       "Astro::SIMBAD::Client::WSQueryInterfaceService" : {
          "file" : "lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm",
-         "version" : "0.047"
+         "version" : "0.048"
       }
    },
    "release_status" : "stable",
@@ -78,6 +78,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SIMBAD-Client"
       }
    },
-   "version" : "0.047",
+   "version" : "0.048",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

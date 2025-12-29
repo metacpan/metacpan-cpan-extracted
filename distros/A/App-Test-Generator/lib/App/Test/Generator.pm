@@ -34,7 +34,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use constant {
 	DEFAULT_ITERATIONS => 50,
@@ -49,7 +49,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =head1 SYNOPSIS
 
@@ -1488,6 +1488,9 @@ sub generate
 			$setup_code .= "\nmy \$obj = new_ok('$module' => [ { $new_code } ] );";
 		}
 		$call_code = "\$result = \$obj->$function(\$input);";
+		if($output{'returns_self'}) {
+			$call_code .= "ok(\$result eq \$obj, \"$function returns self\")";
+		}
 		$position_code = "\$result = \$obj->$function(\@alist);";
 	} elsif(defined($module)) {
 		$call_code = "\$result = $module\->$function(\$input);";
@@ -1544,7 +1547,17 @@ sub generate
 						perl_quote(join(', ', map { $_ // '' } @$inputs )),
 						$expected_str
 					);
-					$corpus_code .= "is(\$obj->$function($input_str), $expected_str, " . q_wrap($desc) . ");\n";
+					if($output{'type'} eq 'boolean') {
+						if($expected_str eq '1') {
+							$corpus_code .= "ok(\$obj->$function($input_str), " . q_wrap($desc) . ");\n";
+						} elsif($expected_str eq '0') {
+							$corpus_code .= "ok(!\$obj->$function($input_str), " . q_wrap($desc) . ");\n";
+						} else {
+							croak("Boolean is expected to return $expected_str");
+						}
+					} else {
+						$corpus_code .= "is(\$obj->$function($input_str), $expected_str, " . q_wrap($desc) . ");\n";
+					}
 				}
 			} else {
 				if($status eq 'DIES') {
@@ -1558,7 +1571,17 @@ sub generate
 						perl_quote((ref $inputs eq 'ARRAY') ? (join(', ', map { $_ // '' } @{$inputs})) : $inputs),
 						$expected_str
 					);
-					$corpus_code .= "is($module\::$function($input_str), $expected_str, 'Corpus $expected works');\n";
+					if($output{'type'} eq 'boolean') {
+						if($expected_str eq '1') {
+							$corpus_code .= "ok(\$obj->$function($input_str), " . q_wrap($desc) . ");\n";
+						} elsif($expected_str eq '0') {
+							$corpus_code .= "ok(!\$obj->$function($input_str), " . q_wrap($desc) . ");\n";
+						} else {
+							croak("Boolean is expected to return $expected_str");
+						}
+					} else {
+						$corpus_code .= "is(\$obj->$function($input_str), $expected_str, " . q_wrap($desc) . ");\n";
+					}
 				}
 			}
 		}
@@ -1930,8 +1953,12 @@ sub render_arrayref_map {
 }
 
 # Robustly quote a string (GitHub#1)
-sub q_wrap {
+sub q_wrap
+{
 	my $s = $_[0];
+
+	return "''" if(!defined($s));
+
 	for my $p ( ['{','}'], ['(',')'], ['[',']'], ['<','>'] ) {
 		my ($l, $r) = @$p;
 		return "q$l$s$r" unless $s =~ /\Q$l\E|\Q$r\E/;
@@ -1942,7 +1969,6 @@ sub q_wrap {
 	(my $esc = $s) =~ s/'/\\'/g;
 	return "'$esc'";
 }
-
 
 =head2 _generate_transform_properties
 
@@ -2107,8 +2133,7 @@ sub _process_custom_properties {
 				carp "Unknown built-in property '$prop_name', skipping";
 				next;
 			}
-		}
-		elsif (ref($prop_def) eq 'HASH') {
+		} elsif (ref($prop_def) eq 'HASH') {
 			# Custom property with code
 			$prop_name = $prop_def->{name} || 'custom_property';
 			$prop_code = $prop_def->{code};

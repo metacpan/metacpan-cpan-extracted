@@ -34,6 +34,7 @@ t/conf/uc.conf
 t/default_value_extraction.t
 t/eof.t
 t/eol.t
+t/error_constraints.t
 t/errors.t
 t/fuzz.t
 t/generate.t
@@ -55,6 +56,7 @@ t/test_extractor.t
 t/test_hints.t
 t/type_params.t
 t/unused.t
+t/valid_inputs.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

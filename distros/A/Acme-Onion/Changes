@@ -1,5 +1,8 @@
 Revision history for Perl extension Acme-Onion
 
+0.04 2025-12-29T05:44:57Z
+    - Test on Perl 5.42 #2
+
 0.03 2023-05-06T10:44:01Z
     - Eat .🧅
 

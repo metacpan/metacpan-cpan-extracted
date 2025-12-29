@@ -150,7 +150,7 @@ The generated YAML files have the following structure:
       - Any warnings or suggestions
     input:
       param_name:
-        type: string|integer|number|boolean|arrayref|hashref
+        type: string|integer|number|boolean|arrayref|hashref|object
         min: 5
         max: 100
         optional: 0

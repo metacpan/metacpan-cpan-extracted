@@ -1,10 +1,10 @@
 {
    "abstract" : "Perform geographical queries using GeoNames Web Services",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "geo",
       "geonames"
@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "1.14",
+            "JSON::MaybeXS" : "0",
             "Mojo::UserAgent" : "0",
             "XML::Simple" : "2.13",
             "perl" : "5.010"
@@ -43,7 +43,11 @@
       },
       "test" : {
          "requires" : {
-            "Test::Most" : "0"
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::RequiresInternet" : "0"
          }
       }
    },
@@ -59,6 +63,6 @@
          "web" : "https://github.com/nigelhorne/Geo-GeoNames"
       }
    },
-   "version" : "1.14",
-   "x_serialization_backend" : "JSON::PP version 4.09"
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

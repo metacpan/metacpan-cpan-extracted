@@ -1,5 +1,13 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.035     2025-12-28 15:16:05+01:00 Europe/Brussels
+          - Fix mkdir order in Linker
+          - Rename obj_file/exe_file to object_file/executable_file in BuildTools
+          - Add lib prefix to library files on Unix
+          - Add make_compiler and make_linker to BuildTools
+          - Add ExtUtils::Builder::BuildTools::Base
+          - Refactor profile handling code into Compiler/Linker
+
 0.034     2025-12-22 17:02:29+01:00 Europe/Brussels
           - Rename EUB::AutoDetect::C to EUB::BuildTools::FromPerl
           - Add standard option to compilers

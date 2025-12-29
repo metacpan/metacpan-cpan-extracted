@@ -1,5 +1,8 @@
 Revision history for Perl extension Types-Equal
 
+0.03 2025-12-29T05:54:33Z
+    - Test on Perl 5.42 #4
+
 0.02 2023-08-14T03:27:51Z
     - add type constraints NumEq and NumEqu #1
 

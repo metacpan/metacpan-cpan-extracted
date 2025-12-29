@@ -135,10 +135,55 @@ subtest 'TTY functionality' => sub {
             or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
          $send_msg->('read_pty');
          is( [ $recv_msg->() ], ['read_pty', "Enter Password: "], 'Saw prompt, and no echo' );
+         # test that echo was restored
          $send_msg->(type => "x\r");
          $send_msg->(sleep => .1);
          $send_msg->('read_pty');
          is( [ $recv_msg->() ], ['read_pty', "x\r\n"], 'Echo resumed' );
+         is( $tty->getline, "x\n" );
+         # test with char_max
+         $buf->clear;
+         $send_msg->(wait_for => ':');
+         $send_msg->(type => "really-really-long-password\n");
+         is( $buf->append_console_line($tty, prompt => 'Enter Password: ', char_max => 20), T, 'received line' );
+         is( $buf->memcmp("really-really-long-p"), 0, 'got password' )
+            or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
+         $send_msg->('read_pty');
+         is( [ $recv_msg->() ], ['read_pty', "Enter Password: "], 'Saw prompt, and no echo' );
+      });
+      done_testing;
+   };
+
+   subtest 'char-by-char processing' => sub {
+      setup_tty_helper(sub{
+         my ($send_msg, $recv_msg, $tty)= @_;
+         my $buf= secret("some data already");
+
+         # Read TTY limited to 6 decimal digits
+         $send_msg->(wait_for => ': ');
+         $send_msg->(type => "0123qwerty\b456");
+         is $buf->append_console_line($tty, prompt => 'Enter PIN: ', char_mask => '* ', char_count => 6, char_class => qr/[0-9]/),
+            T, 'append_console_line returned true';
+         is $buf->memcmp("some data already012456"), 0, 'got expected digits'
+            or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
+         $send_msg->('read_pty');
+         is( [ $recv_msg->() ], ['read_pty', "Enter PIN: * * * * \b\b  \b\b* * * "], 'Saw prompt, and char_mask' );
+         # test that echo was restored
+         $send_msg->(type => "x\r");
+         $send_msg->(sleep => .1);
+         $send_msg->('read_pty');
+         is( [ $recv_msg->() ], ['read_pty', "x\r\n"], 'Echo resumed' );
+         is( $tty->getline, "x\n" );
+         # test char_max
+         $buf= secret("-");
+         $send_msg->(wait_for => ': ');
+         $send_msg->(type => "1234567890\n");
+         is $buf->append_console_line($tty, prompt => 'Enter PIN: ', char_mask => '*', char_max => 6),
+            T, 'append_console_line returned true';
+         is $buf->memcmp("-123456"), 0, 'got expected digits'
+            or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
+         $send_msg->('read_pty');
+         is( [ $recv_msg->() ], ['read_pty', "Enter PIN: ******"], 'Saw prompt, and char_mask' );
       });
       done_testing;
    };

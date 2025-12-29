@@ -2,7 +2,7 @@ runtime:
   requires:
     perl: '5.010001'
     Dist::Zilla: 0
-    Dist::Zilla::PluginBundle::Starter: 'v5.0.0'
+    Dist::Zilla::PluginBundle::Starter: 'v6.0.0'
     Dist::Zilla::Plugin::Git::Check: 0
     Dist::Zilla::Plugin::Git::Commit: 0
     Dist::Zilla::Plugin::Git::GatherDir: 0
@@ -13,6 +13,7 @@ runtime:
     namespace::clean: 0
 test:
   requires:
+    Git::Wrapper: 0
     Path::Tiny: '0.079' # relative method algorithm
     Test::DZil: 0
     Test::More: '0.88' # done_testing

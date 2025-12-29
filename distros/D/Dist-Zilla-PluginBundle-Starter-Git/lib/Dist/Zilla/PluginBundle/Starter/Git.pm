@@ -4,7 +4,7 @@ use Moose;
 extends 'Dist::Zilla::PluginBundle::Starter';
 use namespace::clean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 has '+revision' => (
   default => sub { $_[0]->payload->{revision} // 3 },
@@ -61,7 +61,7 @@ Dist::Zilla::PluginBundle::Starter::Git - A minimal Dist::Zilla plugin bundle fo
   version = 0.001
   
   [@Starter::Git]      ; all that is needed to start
-  revision = 5         ; always defaults to revision 3
+  revision = 6         ; always defaults to revision 3
   
   ; configuring examples
   installer = ModuleBuildTiny
@@ -92,12 +92,13 @@ L<Dist::Zilla::MintingProfile::Starter::Git>.
 
 C<[@Starter::Git]> inherits the options from
 L<[@Starter]|Dist::Zilla::PluginBundle::Starter>, and can similarly be further
-configured by the composed roles, as in L</"CONFIGURING">.
+configured by the composed roles, as in
+L<Dist::Zilla::PluginBundle::Starter/"CONFIGURING">.
 
 =head2 revision
 
   [@Starter::Git]
-  revision = 5
+  revision = 6
 
 As in L<Dist::Zilla::PluginBundle::Starter/"revision">, but defaults to
 revision 3. C<[@Starter::Git]> requires at least revision 3.
@@ -122,9 +123,10 @@ the copied files to be committed in the C<Release_Commit>.
 
 The C<[@Starter::Git]> plugin bundle supports the following revisions.
 
-=head2 Revision 3
+=head2 Revision 6
 
-Revision 3 is the default and is equivalent to using the following plugins:
+Revision 6 is the current set of best practices, equivalent to using the
+following plugins if not configured further:
 
 =over 2
 
@@ -152,6 +154,10 @@ Revision 3 is the default and is equivalent to using the following plugins:
 
 =item L<[PruneCruft]|Dist::Zilla::Plugin::PruneCruft>
 
+=item L<[PruneFiles]|Dist::Zilla::Plugin::PruneFiles>
+
+  filename = README.pod
+
 =item L<[ManifestSkip]|Dist::Zilla::Plugin::ManifestSkip>
 
 =item L<[RunExtraTests]|Dist::Zilla::Plugin::RunExtraTests>
@@ -160,12 +166,6 @@ Revision 3 is the default and is equivalent to using the following plugins:
 
   allow_dirty = dist.ini
   allow_dirty = Changes
-
-=item L<[TestRelease]|Dist::Zilla::Plugin::TestRelease>
-
-=item L<[ConfirmRelease]|Dist::Zilla::Plugin::ConfirmRelease>
-
-=item L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
 
 =item L<[Git::Commit E<sol> Release_Commit]|Dist::Zilla::Plugin::Git::Commit>
 
@@ -181,7 +181,15 @@ Revision 3 is the default and is equivalent to using the following plugins:
 
 =item L<[Git::Push]|Dist::Zilla::Plugin::Git::Push>
 
-=item L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig>
+=item L<[TestRelease]|Dist::Zilla::Plugin::TestRelease>
+
+=item L<[ConfirmRelease]|Dist::Zilla::Plugin::ConfirmRelease>
+
+=item L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
+
+=item L<[MetaMergeFile]|Dist::Zilla::Plugin::MetaMergeFile>
+
+=item L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>
 
 =item L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>
 
@@ -202,8 +210,24 @@ Revision 3 is the default and is equivalent to using the following plugins:
 
 =back
 
-This revision differs from L<Revision 3 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 3">
-as follows:
+Revision 6 has no specific differences from Revision 5 beyond the changes in
+L<Revision 6 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 6">.
+
+=head2 Revision 5
+
+Revision 5 has no specific differences from Revision 4 beyond the changes in
+L<Revision 5 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 5">.
+
+=head2 Revision 4
+
+Revision 4 has no specific differences from Revision 3 beyond the changes in
+L<Revision 4 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 4">.
+
+=head2 Revision 3
+
+Revision 3 is the default if no revision is specified, and differs from
+L<Revision 3 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 3"> as
+follows:
 
 =over 2
 
@@ -221,16 +245,6 @@ L<[Git::Tag]|Dist::Zilla::Plugin::Git::Tag>,
 L<[Git::Push]|Dist::Zilla::Plugin::Git::Push>.
 
 =back
-
-=head2 Revision 4
-
-Revision 4 has no specific differences beyond the changes in
-L<Revision 4 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 4">.
-
-=head2 Revision 5
-
-Revision 5 has no specific differences beyond the changes in
-L<Revision 5 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 5">.
 
 =head1 BUGS
 

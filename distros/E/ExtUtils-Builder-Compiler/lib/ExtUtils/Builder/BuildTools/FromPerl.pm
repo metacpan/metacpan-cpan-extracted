@@ -1,47 +1,18 @@
 package ExtUtils::Builder::BuildTools::FromPerl;
-$ExtUtils::Builder::BuildTools::FromPerl::VERSION = '0.034';
+$ExtUtils::Builder::BuildTools::FromPerl::VERSION = '0.035';
 use strict;
 use warnings;
 
-use parent 'ExtUtils::Builder::Planner::Extension';
+use parent 'ExtUtils::Builder::BuildTools::Base';
 
 use Carp 'croak';
 use ExtUtils::Config 0.007;
-use ExtUtils::Builder::Util 0.018 'split_like_shell';
-use File::Spec::Functions 'catfile';
+use ExtUtils::Builder::Util 0.018 qw/require_module split_like_shell/;
 use Perl::OSType 'is_os_type';
-
-sub _split_conf {
-	my ($config, $name) = @_;
-	return split_like_shell($config->get($name));
-}
-
-sub _make_command {
-	my ($module, $argument, $command, %options) = @_;
-	require_module($module);
-	my @command = ref $command ? @{$command} : split_like_shell($command);
-	return $module->new($argument => \@command, %options);
-}
 
 sub _is_gcc {
 	my ($config, $cc, $opts) = @_;
 	return $config->get('gccversion') || $cc =~ / ^ (?: gcc | g[+]{2} | clang (?: [+]{2} ) ) /ix;
-}
-
-sub _filter_args {
-	my ($opts, @names) = @_;
-	return map { $_ => $opts->{$_} } grep { exists $opts->{$_} } @names;
-}
-
-sub _get_compiler {
-	my ($self, $opts) = @_;
-	my $os = $opts->{config}->get('osname');
-	my $cc = $opts->{config}->get('cc');
-	my ($module, %extra) = is_os_type('Unix', $os) || _is_gcc($opts->{config}, $cc) ? 'Unixy' : is_os_type('Windows', $os) ? ('MSVC', language => 'C') : croak 'Your platform is not supported yet';
-	$extra{$_} = $opts->{$_} for grep { exists $opts->{$_} } qw/language type/;
-	$extra{cccdlflags} = [ _split_conf($opts->{config}, 'cccdlflags') ];
-	my $module_name = "ExtUtils::Builder::Compiler::$module";
-	return ($module_name, $cc, %extra);
 }
 
 my %gpp_map = (
@@ -51,61 +22,30 @@ my %gpp_map = (
 );
 my %is_gpp = reverse %gpp_map;
 
-sub require_module {
-	my $module = shift;
-	(my $filename = "$module.pm") =~ s{::}{/}g;
-	require $filename;
-	return $module;
-}
+sub make_compiler {
+	my ($self, $opts) = @_;
+	my $os = $opts->{config}->get('osname');
+	my $raw_cc = $opts->{config}->get('cc');
+	my ($cc, @cc_extra) = ref $raw_cc ? @{$raw_cc} : split_like_shell($raw_cc);
+	my ($module, %command) = is_os_type('Unix', $os) || _is_gcc($opts->{config}, $cc) ? 'Unixy' : is_os_type('Windows', $os) ? ('MSVC', language => 'C') : croak 'Your platform is not supported yet';
+	$command{$_} = $opts->{$_} for grep { exists $opts->{$_} } qw/language type/;
+	$command{cccdlflags} = [ split_like_shell($opts->{config}->get('cccdlflags')) ];
+	my $module_name = "ExtUtils::Builder::Compiler::$module";
 
-sub add_compiler {
-	my ($self, $planner, %opts) = @_;
-	my $as = $opts{as} // 'compile';
-	return $planner->add_delegate($as, sub {
-		my ($planner, $from, $to, %extra) = @_;
-		my %args = (%opts, %extra);
+	my $language = $opts->{language} // 'C';
+	if (uc $language eq 'C++') {
+		if ($module_name->isa('ExtUtils::Builder::Compiler::Unixy')) {
+			push @{ $command{extra_flags} }, qw/-xc++/ if _is_gcc($opts->{config}, $cc);
+			$cc = $gpp_map{$cc} // croak "Don't know C++ compiler for $cc" unless $is_gpp{$cc};
+		} elsif (!$module_name->isa('ExtUtils::Builder::Compiler::MSVC')) {
+			croak "Can't find C++ compiler for your platform"
+		}
+	} elsif (uc $language ne 'C') {
+		croak "Unknown language $language";
+	}
 
-		my ($module_name, $cc, %command) = $self->_get_compiler(\%args);
-		my $language = $args{language} // 'C';
-		if (uc $language eq 'C++') {
-			if ($module_name->isa('ExtUtils::Builder::Compiler::Unixy')) {
-				push @{ $command{extra_flags} }, qw/-xc++/ if _is_gcc($opts{config}, $cc);
-				$cc = $gpp_map{$cc} // croak "Don't know C++ compiler for $cc" unless $is_gpp{$cc};
-			} elsif (!$module_name->isa('ExtUtils::Builder::Compiler::MSVC')) {
-				croak "Can't find C++ compiler for your platform"
-			}
-		} elsif (uc $language ne 'C') {
-			croak "Unknown language $language";
-		}
-		my $compiler = _make_command($module_name, cc => $cc, %command);
-
-		$args{profiles} = [ delete $args{profile} ] if $args{profile} and not $args{profiles};
-		if (my $profiles = $args{profiles}) {
-			for my $profile (@$profiles) {
-				if (not ref($profile)) {
-					$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
-					require_module($profile);
-				}
-				$profile->process_compiler($compiler, \%args);
-			}
-		}
-
-		if (my $include_dirs = $args{include_dirs}) {
-			$compiler->add_include_dirs($include_dirs);
-		}
-		if (my $defines = $args{defines}) {
-			$compiler->add_defines($defines);
-		}
-		if (my $extra = $args{extra_args}) {
-			$compiler->add_argument(value => $extra);
-		}
-		if (my $standard = $args{standard}) {
-			$compiler->set_standard($standard);
-		}
-
-		my $node = $compiler->compile($from, $to, %args);
-		$planner->add_node($node);
-	});
+	require_module($module_name);
+	return $module_name->new(cc => [$cc, @cc_extra], %command);
 }
 
 sub _unix_flags {
@@ -113,128 +53,68 @@ sub _unix_flags {
 	return $opts->{lddlflags} if defined $opts->{lddlflags};
 	my $lddlflags = $opts->{config}->get('lddlflags');
 	my $optimize = $opts->{config}->get('optimize');
-	$lddlflags =~ s/ ?\Q$optimize// if not $self->{auto_optimize};
-	my %ldflags = map { ($_ => 1) } _split_conf($opts->{config}, 'ldflags');
+	$lddlflags =~ s/ ?\Q$optimize// if not $opts->{auto_optimize};
+	my %ldflags = map { ($_ => 1) } split_like_shell($opts->{config}->get('ldflags'));
 	my @lddlflags = grep { not $ldflags{$_} } split_like_shell($lddlflags);
 	return (lddlflags => \@lddlflags )
 }
 
-sub _get_linker {
+sub make_linker {
 	my ($self, $opts) = @_;
 	my $os = $opts->{config}->get('osname');
-	my $cc = $opts->{config}->get('cc');
-	my $ld = $opts->{config}->get('ld');
-	my $eff_ld = $opts->{type} eq 'executable' ? $cc : $ld;
-	my ($module, $link, %command) =
+	my $raw_cc = $opts->{config}->get('cc');
+	my ($cc, @cc_extra) = ref $raw_cc ? @{$raw_cc} : split_like_shell($raw_cc);
+	my $raw_ld = $opts->{config}->get('ld');
+	my ($ld, @ld_extra) = ref $raw_ld ? @{$raw_ld} : split_like_shell($raw_ld);
+	my ($eff_ld, @eff_extra) = ($opts->{type} eq 'executable') ? ($cc, @cc_extra) : ($ld, @ld_extra);
+	my ($module, $link, $extra, %command) =
 		$opts->{type} eq 'static-library' ? ('Ar', $opts->{config}->get('ar')) :
-		$os eq 'darwin' ? ('Mach::GCC', $eff_ld) :
+		$os eq 'darwin' ? ('Mach::GCC', $eff_ld, \@eff_extra) :
 		_is_gcc($opts->{config}, $ld) ?
-		$os eq 'MSWin32' ? ('PE::GCC', $cc) : ('ELF::GCC', $eff_ld) :
-		$os eq 'aix' ? ('XCOFF', $cc) :
-		is_os_type('Unix', $os) ? ('ELF::Any', $eff_ld, $self->_unix_flags($opts)) :
-		$os eq 'MSWin32' ? ('PE::MSVC', $ld) :
+		$os eq 'MSWin32' ? ('PE::GCC', $cc, \@cc_extra) : ('ELF::GCC', $eff_ld, \@eff_extra) :
+		$os eq 'aix' ? ('XCOFF', $cc, \@cc_extra) :
+		is_os_type('Unix', $os) ? ('ELF::Any', $eff_ld, \@eff_extra, $self->_unix_flags($opts)) :
+		$os eq 'MSWin32' ? ('PE::MSVC', $ld, \@ld_extra) :
 		croak 'Linking is not supported yet on your platform';
 	$command{$_} = $opts->{$_} for grep { exists $opts->{$_} } qw/exports language type/;
 	my $module_name = "ExtUtils::Builder::Linker::$module";
-	return ($module_name, $link, %command);
-}
 
-sub add_linker {
-	my ($self, $planner, %opts) = @_;
-	my $as = $opts{as} // 'link';
-	return $planner->add_delegate($as, sub {
-		my ($planner, $from, $to, %extra) = @_;
-		my %args = (%opts, %extra);
-
-		my ($module, $link, %command) = $self->_get_linker(\%args);
-
-		my $language = $args{language} // 'C';
-		if (uc $language eq 'C++') {
-			my $prefix = 'ExtUtils::Builder::Linker:';
-			if ($module->isa("$prefix:ELF::GCC") || $module->isa("$prefix:Mach::GCC") || $module->isa("$prefix:PE::GCC")) {
-				$link = $gpp_map{$link} // croak "Don't know C++ compiler for $link" unless $is_gpp{$link};
-			} elsif (!$module->isa("$prefix:PE::MSVC") && !$module->isa("$prefix:Ar")) {
-				croak "Can't find C++ linker for your platform"
-			}
-		} elsif (uc $language ne 'C') {
-			croak "Unknown language $language";
+	my $language = $opts->{language} // 'C';
+	if (uc $language eq 'C++') {
+		my $prefix = 'ExtUtils::Builder::Linker:';
+		if ($module->isa("$prefix:ELF::GCC") || $module->isa("$prefix:Mach::GCC") || $module->isa("$prefix:PE::GCC")) {
+			$link = $gpp_map{$link} // croak "Don't know C++ compiler for $link" unless $is_gpp{$link};
+		} elsif (!$module->isa("$prefix:PE::MSVC") && !$module->isa("$prefix:Ar")) {
+			croak "Can't find C++ linker for your platform"
 		}
+	} elsif (uc $language ne 'C') {
+		croak "Unknown language $language";
+	}
 
-		my $linker = _make_command($module, ld => $link, %command);
-
-		$args{profiles} = [ delete $args{profile} ] if $args{profile} and not $args{profiles};
-		if (my $profiles = $args{profiles}) {
-			for my $profile (@$profiles) {
-				if (ref($profile)) {
-
-				} else {
-					$profile =~ s/ \A @ /ExtUtils::Builder::Profile::/xms;
-					require_module($profile);
-					$profile->process_linker($linker, \%args);
-				}
-			}
-		}
-
-		if (my $library_dirs = $args{library_dirs}) {
-			$linker->add_library_dirs($library_dirs);
-		}
-		if (my $libraries = $args{libraries}) {
-			$linker->add_libraries($libraries);
-		}
-		if (my $extra_args = $args{extra_args}) {
-			$linker->add_argument(ranking => 85, value => [ @{$extra_args} ]);
-		}
-
-		my $node = $linker->link($from, $to, %args);
-		$planner->add_node($node);
-	});
+	require_module($module_name);
+	return $module_name->new(ld => [ $link, @{$extra} ], %command);
 }
 
 sub add_methods {
 	my ($class, $planner, %opts) = @_;
 
 	$opts{config} //= $planner->can('config') ? $planner->config : ExtUtils::Config->new;
-	$opts{type} //= 'executable';
+	my $os = $opts{config}->get('osname');
+	my $lib_prefix = is_os_type('Unix', $os) ? 'lib' : '';
 
-	my $as_compiler = delete $opts{as_compiler};
-	$class->add_compiler($planner, %opts, as => $as_compiler);
+	$class->SUPER::add_methods($planner,
+		object_file         => '%s' . $opts{config}->get('_o'),
+		library_file        => "$lib_prefix%s." . $opts{config}->get('so'),
+		static_library_file => "$lib_prefix%s" . $opts{config}->get('_a'),
+		loadable_file       => '%s.' . $opts{config}->get('dlext'),
+		executable_file     => '%s' . $opts{config}->get('_exe'),
+		%opts,
+	);
 
-	my $as_linker = delete $opts{as_linker};
-	$class->add_linker($planner, %opts, as => $as_linker);
-
-	my $o = $opts{config}->get('_o');
+	# backwards compatability
 	$planner->add_delegate('obj_file', sub {
-		my ($planner, $file, $dir) = @_;
-		my $filename = "$file$o";
-		return defined $dir ? catfile($dir, $filename) : $filename;
-	});
-
-	my $a = $opts{config}->get('_a');
-	$planner->add_delegate('static_library_file', sub {
-		my ($planner, $file, $dir) = @_;
-		my $filename = "$file$a";
-		return defined $dir ? catfile($dir, $filename) : $filename;
-	});
-
-	my $dlext = $opts{config}->get('dlext');
-	$planner->add_delegate('loadable_file', sub {
-		my ($planner, $file, $dir) = @_;
-		my $filename = "$file.$dlext";
-		return defined $dir ? catfile($dir, $filename) : $filename;
-	});
-
-	my $so = $opts{config}->get('so');
-	$planner->add_delegate('library_file', sub {
-		my ($planner, $file, $dir) = @_;
-		my $filename = "$file.$so";
-		return defined $dir ? catfile($dir, $filename) : $filename;
-	});
-
-	my $exe = $opts{config}->get('_exe');
-	$planner->add_delegate('exe_file', sub {
-		my ($planner, $file, $dir) = @_;
-		my $filename = "$file$exe";
-		return defined $dir ? catfile($dir, $filename) : $filename;
+		my ($this, @args) = @_;
+		return $this->object_file(@args);
 	});
 
 	return;
@@ -256,23 +136,24 @@ ExtUtils::Builder::BuildTools::FromPerl - compiler configuration, derived from p
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 
  my $planner = ExtUtils::Builder::Planner->new;
- $planner->load_extension('ExtUtils::Builder::BuildTools::FromPerl', '0.034',
-	profiles => ['@Perl'],
-	type     => 'loadable-object',
+ $planner->load_extension('ExtUtils::Builder::BuildTools::FromPerl', 0.034,
+	 config => $config,
  );
- $planner->compile('foo.c', 'foo.o', include_dirs => ['.']);
- $planner->link([ 'foo.o' ], 'foo.so', libraries => ['foo']);
+ my $foo_o = $planner->object_name('foo');
+ $planner->compile('foo.c', $foo_o, include_dirs => ['.']);
+ my $foo_exe = $planner->executable_name('foo');
+ $planner->link([ 'foo.o' ], $foo_exe, libraries => ['foo']);
  my $plan = $planner->materialize;
- $plan->run(['foo.so']);
+ $plan->run($foo_exe);
 
 =head1 DESCRIPTION
 
-This module is a L<ExtUtils::Builder::Planner::Extension|ExtUtils::Builder::Planner::Extension> that facilitates compiling object.
+This module is a L<ExtUtils::Builder::Planner::Extension|ExtUtils::Builder::Planner::Extension> that facilitates compiling object. It takes one named argument: C<config>, an L<ExtUtils::Config> (compatible) object.
 
 =head1 METHODS
 
@@ -284,99 +165,25 @@ If your C<$planner> has a C<config> delegate, that will be used as default value
 
 This is usually not called directly, but through L<ExtUtils::Builder::Planner|ExtUtils::Builder::Planner>'s C<load_extension> method.
 
-=head2 link(\@sources, $target, %options)
-
-=over 4
-
-=item type
-
-This works the same as with C<compile>.
-
-=item config
-
-This works the same as with C<compile>.
-
-=item profile
-
-This works the same as with C<compile>.
-
-=item language
-
-This works the same as with C<compile>.
-
-=item libraries
-
-A list of libraries to link to. E.g. C<['z']>.
-
-=item library_dirs
-
-A list of directories to find libraries in. E.g. C<['/opt/my-app/lib/']>.
-
-=item extra_args
-
-A list of additional arguments to the linker.
-
-=back
-
 =head1 DELEGATES
 
-=head2 compile($source, $target, %options)
-
-This compiles C<$source> to C<$target>. It takes the following optional arguments:
+It inherits the following delegates from L<ExtUtils::Builder::BuildTools::Base>.
 
 =over 4
 
-=item type
+=item compile($source, $target, %options)
 
-The type of the final product. This must be one of:
+=item link(\@sources, $target, %options)
 
-=over 4
+=item object_file($basename, $dir = undef)
 
-=item * executable
+=item library_file($basename, $dir = undef)
 
-An executable to be run. This is the default.
+=item static_library_file($basename, $dir = undef)
 
-=item * static-library
+=item loadable_file($basename, $dir = undef)
 
-A static library to link against.
-
-=item * dynamic-library
-
-A dynamic library to link against.
-
-=item * loadable-object
-
-A loadable extension. On most platforms this is the same as a dynamic library, but some (Mac) make a distinction between these two.
-
-=back
-
-=item config
-
-A Perl configuration to take hints from, must be an C<ExtUtils::Config> compatible object.
-
-=item profiles
-
-A list of profile that can be used when compiling and linking. One profile comes with this distribution: C<'@Perl'>, which sets up the appropriate things to compile/link with C<libperl>.
-
-=item include_dirs
-
-A list of directories to add to the include path, e.g. C<['include', '.']>.
-
-=item define
-
-A hash of preprocessor defines, e.g. C<< {DEBUG => 1, HAVE_FEATURE => 0 } >>
-
-=item language
-
-The language to use for compilation. Valid values are C<"C"> or C<"C++">.
-
-=item standard
-
-The language standard to use, e.g. C<"c99">, C<"c11">.
-
-=item extra_args
-
-A list of additional arguments to the compiler.
+=item executable_file($basename, $dir = undef)
 
 =back
 

@@ -11,7 +11,7 @@ SYNOPSIS
       version = 0.001
   
       [@Starter]           ; all that is needed to start
-      revision = 5         ; always defaults to revision 1
+      revision = 6         ; always defaults to revision 1
   
       ; configuring examples
       installer = ModuleBuildTiny
@@ -21,7 +21,7 @@ SYNOPSIS
       regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
       [@Starter::Git]      ; drop-in variant bundle for git workflows
-      revision = 5         ; requires/defaults to revision 3
+      revision = 6         ; requires/defaults to revision 3
 
 DESCRIPTION
     The "[@Starter]" plugin bundle for Dist::Zilla is designed to do the
@@ -71,7 +71,7 @@ OPTIONS
 
   revision
       [@Starter]
-      revision = 5
+      revision = 6
 
     Selects the revision to use, from "REVISIONS". Defaults to revision 1.
 
@@ -91,6 +91,11 @@ OPTIONS
       revision = 5
       installer = ModuleBuild
       ModuleBuild.mb_class = My::Module::Builder
+
+      [@Starter]
+      revision = 6
+      installer = DistBuild
+      DistBuild.auto_plugin_requires = 1
 
     The default installer is [MakeMaker], which works with no extra
     configuration for most cases. The "installer" option can be used to
@@ -118,6 +123,9 @@ OPTIONS
     generate a Build.PL that uses Module::Build. This is not generally
     recommended unless converting a distribution that is already using a
     Module::Build subclass.
+
+    Since revision 6, [DistBuild] is supported as an installer, and will
+    generate a Build.PL that uses Dist::Build.
 
   managed_versions
     Requires revision 3 or higher.
@@ -171,9 +179,9 @@ OPTIONS
 REVISIONS
     The "[@Starter]" plugin bundle supports the following revisions.
 
-  Revision 1
-    Revision 1 is the default and is equivalent to using the following
-    plugins:
+  Revision 6
+    Revision 6 is the current set of best practices, equivalent to using the
+    following plugins if not configured further:
 
     [GatherDir]
     [MetaYAML]
@@ -188,12 +196,16 @@ REVISIONS
     [MakeMaker]
     [Manifest]
     [PruneCruft]
+    [PruneFiles]
+        filename = README.pod
+
     [ManifestSkip]
     [RunExtraTests]
     [TestRelease]
     [ConfirmRelease]
     [UploadToCPAN]
-    [MetaConfig]
+    [MetaMergeFile]
+    [PrereqsFile]
     [MetaNoIndex]
         directory = t
         directory = xt
@@ -203,47 +215,23 @@ REVISIONS
         directory = examples
 
     [MetaProvides::Package]
+        inherit_version = 0
+
     [ShareDir]
     [ExecDir]
 
-    This revision differs from [@Basic] as follows:
+    Revision 6 differs from Revision 5 as follows:
 
-    * Uses [ReadmeAnyFromPod] instead of [Readme].
+    * Includes an instance of the [MetaMergeFile] and [PrereqsFile] plugins
+      to allow specifying arbitrary CPAN metadata in
+      metamerge.yml/metamerge.json and distribution prerequisites in
+      prereqs.yml/prereqs.json. These plugins have no effect if the
+      corresponding files are not present in the source tree.
 
-    * Uses [RunExtraTests] instead of [ExtraTests].
-
-    * Includes the following additional plugins: [MetaJSON],
-      [PodSyntaxTests], [Test::ReportPrereqs], [Test::Compile],
-      [MetaConfig], [MetaNoIndex], [MetaProvides::Package].
-
-  Revision 2
-    Revision 2 is similar to Revision 1, with these differences:
-
-    * Sets the option "inherit_version" in [MetaProvides::Package] to 0 by
-      default, so that "provides" metadata will use individual module
-      versions if they differ from the distribution version.
-
-    * [Pod2Readme] is used instead of [ReadmeAnyFromPod] to generate the
-      plaintext README, as it is a simpler plugin for this purpose. It takes
-      the same "filename" and "source_filename" options, but does not allow
-      further configuration, and does not automatically use a ".pod" file as
-      the source.
-
-    * The "installer" option is now supported to change the installer
-      plugin.
-
-  Revision 3
-    Revision 3 is similar to Revision 2, but additionally supports the
-    "managed_versions" and "regenerate" options, and variant bundles like
-    [@Starter::Git].
-
-  Revision 4
-    Revision 4 is similar to Revision 3, but removes the [MetaConfig] plugin
-    because it adds significant clutter to the generated META files without
-    much benefit. It can easily be added to the dist.ini if desired.
+    * The "installer" option now supports "DistBuild".
 
   Revision 5
-    Revision 5 is similar to Revision 4, with these differences:
+    Revision 5 differs from Revision 4 as follows:
 
     * Includes an instance of the [PruneFiles] plugin to remove README.pod
       from the distribution build if present. The CPAN toolchain expects
@@ -258,6 +246,44 @@ REVISIONS
 
     * The "installer" option now supports "ModuleBuild".
 
+  Revision 4
+    Revision 4 differs from Revision 3 by removing the [MetaConfig] plugin,
+    because it adds significant clutter to the generated META files without
+    much benefit. It can easily be added to the dist.ini if desired.
+
+  Revision 3
+    Revision 3 differs from Revision 2 in that it additionally supports the
+    "managed_versions" and "regenerate" options, and variant bundles like
+    [@Starter::Git].
+
+  Revision 2
+    Revision 2 differs from Revision 1 as follows:
+
+    * Sets the option "inherit_version" in [MetaProvides::Package] to 0 by
+      default, so that "provides" metadata will use individual module
+      versions if they differ from the distribution version.
+
+    * [Pod2Readme] is used instead of [ReadmeAnyFromPod] to generate the
+      plaintext README, as it is a simpler plugin for this purpose. It takes
+      the same "filename" and "source_filename" options, but does not allow
+      further configuration, and does not automatically use a ".pod" file as
+      the source.
+
+    * The "installer" option is now supported to change the installer
+      plugin.
+
+  Revision 1
+    Revision 1 is the default if no revision is specified, and differs from
+    [@Basic] as follows:
+
+    * Uses [ReadmeAnyFromPod] instead of [Readme].
+
+    * Uses [RunExtraTests] instead of [ExtraTests].
+
+    * Includes the following additional plugins: [MetaJSON],
+      [PodSyntaxTests], [Test::ReportPrereqs], [Test::Compile],
+      [MetaConfig], [MetaNoIndex], [MetaProvides::Package].
+
 EXAMPLES
     Some example dist.ini configurations to get started with.
 
@@ -270,7 +296,7 @@ EXAMPLES
       version = 1.00
 
       [@Starter]
-      revision = 5
+      revision = 6
 
       [Prereqs / RuntimeRequires]
       perl = 5.010001
@@ -288,7 +314,7 @@ EXAMPLES
       copyright_year   = 2019
 
       [@Starter::Git]
-      revision = 5
+      revision = 6
       managed_versions = 1
       regenerate = Makefile.PL
       regenerate = META.json
@@ -308,7 +334,7 @@ EXAMPLES
       plugin = ReadmeAnyFromPod
 
       [@Starter::Git]
-      revision = 5
+      revision = 6
       installer = ModuleBuildTiny
       managed_versions = 1
       regenerate = Build.PL
@@ -468,12 +494,19 @@ EXTENDING
     repository, use [GithubMeta]. To set resource metadata manually, use
     [MetaResources].
 
+    Since "Revision 6" or by including [MetaMergeFile] with an earlier
+    revision, resource metadata and other arbitrary metadata can be
+    specified in a metamerge.json or metamerge.yml.
+
   Prereqs
     To specify distribution prereqs in a cpanfile, use
     [Prereqs::FromCPANfile]. To specify prereqs in a prereqs.json or
     prereqs.yml, use [PrereqsFile]. To specify prereqs in dist.ini, use
     [Prereqs]. To automatically guess the distribution's prereqs by parsing
     the code, use [AutoPrereqs].
+
+    Since "Revision 6", [PrereqsFile] is enabled by default, but prereqs can
+    still be specified with any other method.
 
 ENVIRONMENT
     The "FAKE_RELEASE" environment variable is supported as in Dist::Milla

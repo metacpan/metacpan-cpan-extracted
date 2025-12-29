@@ -31,9 +31,19 @@ openapi: 3.0.3
 info:
   title: Test API
   version: 1.2.3
+components:
+  schemas:
+    basic_subschema:
+      type: string
+      enum: [ 20 ]
 paths:
   /foo:
     post:
+      parameters:
+        - name: q
+          in: query
+          schema:
+            $ref: '#/components/schemas/basic_subschema'
       requestBody:
         required: true
         content:
@@ -55,13 +65,19 @@ paths:
           description: success
 YAML
 
-  my $request = request('POST', 'http://example.com/foo',
+  my $request = request('POST', 'http://example.com/foo?q=1',
     [ 'Content-Type' => 'application/json' ], '{"nullable":1,"not_nullable":null}');
   cmp_result(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
       errors => [
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0 schema $ref enum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/basic_subschema/enum')->to_string,
+          error => 'value does not match',
+        },
         {
           instanceLocation => '/request/body/not_nullable',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties not_nullable type)),

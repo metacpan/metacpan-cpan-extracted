@@ -28,7 +28,7 @@ subtest 'PID file creation and cleanup' => sub {
             port => 0,  # Random port
             quiet => 1,
         );
-        $runner->load_app('PAGI::App::Directory', root => '.');
+        $runner->prepare_app;  # Load default app
 
         # Just test PID file writing, don't run server
         $runner->_write_pid_file($pid_file);
@@ -82,7 +82,9 @@ subtest 'PID file with actual server process' => sub {
             quiet => 1,
             pid_file => $pid_file,
         );
-        $runner->load_app("$FindBin::Bin/../examples/01-hello-http/app.pl");
+        $runner->{app_spec} = "$FindBin::Bin/../examples/01-hello-http/app.pl";
+        $runner->{default_middleware} = 0;  # Disable Lint for test
+        $runner->prepare_app;
 
         # Write PID file before running
         $runner->_write_pid_file($pid_file);
@@ -102,7 +104,7 @@ subtest 'PID file with actual server process' => sub {
         alarm(2);  # Exit after 2 seconds
 
         eval {
-            my $server = $runner->prepare_server;
+            my $server = $runner->load_server;
             require IO::Async::Loop;
             my $loop = IO::Async::Loop->new;
             $loop->add($server);
@@ -210,7 +212,7 @@ subtest 'CLI option parsing - user and group' => sub {
 
 subtest 'CLI option parsing - all production options together' => sub {
     my $runner = PAGI::Runner->new;
-    my @remaining = $runner->parse_options(
+    $runner->parse_options(
         '-D',
         '--pid', '/var/run/pagi.pid',
         '--user', 'www-data',
@@ -224,8 +226,8 @@ subtest 'CLI option parsing - all production options together' => sub {
     is($runner->{user}, 'www-data', 'user parsed');
     is($runner->{group}, 'www-data', 'group parsed');
     is($runner->{port}, 8080, 'port also parsed');
-    is(scalar @remaining, 1, 'app.pl remains');
-    is($remaining[0], 'app.pl', 'correct app arg');
+    # argv now contains app.pl
+    is($runner->{argv}[0], 'app.pl', 'app.pl in argv');
 };
 
 subtest 'Daemonize integration test' => sub {

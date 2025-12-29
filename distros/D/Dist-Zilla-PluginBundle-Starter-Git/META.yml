@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Git::Wrapper: '0'
   Path::Tiny: '0.079'
   Test::DZil: '0'
   Test::File::ShareDir::Module: '0'
@@ -13,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,10 +32,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Starter::Git:
     file: lib/Dist/Zilla/MintingProfile/Starter/Git.pm
-    version: v5.0.1
+    version: v6.0.0
   Dist::Zilla::PluginBundle::Starter::Git:
     file: lib/Dist/Zilla/PluginBundle/Starter/Git.pm
-    version: v5.0.1
+    version: v6.0.0
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::Git::Check: '0'
@@ -43,7 +44,7 @@ requires:
   Dist::Zilla::Plugin::Git::Init: '0'
   Dist::Zilla::Plugin::Git::Push: '0'
   Dist::Zilla::Plugin::Git::Tag: '0'
-  Dist::Zilla::PluginBundle::Starter: v5.0.0
+  Dist::Zilla::PluginBundle::Starter: v6.0.0
   Moose: '0'
   namespace::clean: '0'
   perl: '5.010001'
@@ -52,9 +53,9 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter-Git/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Starter::Git
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter-Git.git
-version: v5.0.1
+version: v6.0.0
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

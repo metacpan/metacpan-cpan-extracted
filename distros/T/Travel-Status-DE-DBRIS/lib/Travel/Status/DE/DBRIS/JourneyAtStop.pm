@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 Travel::Status::DE::DBRIS::JourneyAtStop->mk_ro_accessors(
 	qw(type dep sched_dep rt_dep delay is_cancelled line stop_eva id platform rt_platform destination via_last

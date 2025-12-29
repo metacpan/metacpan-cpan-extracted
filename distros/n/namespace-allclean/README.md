@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kfly8/p5-namespace-allclean/workflows/test/badge.svg)](https://github.com/kfly8/p5-namespace-allclean/actions) [![Coverage Status](https://img.shields.io/coveralls/kfly8/p5-namespace-allclean/master.svg?style=flat)](https://coveralls.io/r/kfly8/p5-namespace-allclean?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/namespace-allclean.svg)](https://metacpan.org/release/namespace-allclean)
+[![Actions Status](https://github.com/kfly8/p5-namespace-allclean/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kfly8/p5-namespace-allclean/actions?workflow=test) [![Coverage Status](https://img.shields.io/coveralls/kfly8/p5-namespace-allclean/main.svg?style=flat)](https://coveralls.io/r/kfly8/p5-namespace-allclean?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/namespace-allclean.svg)](https://metacpan.org/release/namespace-allclean)
 # NAME
 
 namespace::allclean - Avoid imports all subroutines into your namespace
