@@ -62,7 +62,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.779';
+$VERSION = '0.785';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -152,6 +152,28 @@ sub getnear
 }
 
 
+sub washblockelts
+{
+  my @blockelts = @_;
+  my @bag;
+  foreach my $elt ( @blockelts )
+  {  my ( @bin, $newelt );
+     if ( $elt =~ /(>|<|£|§|à|°|§|ù)/ )
+     {
+       @bin = split( ">|<|£|§|à|°|§|ù", $elt );
+       $newelt = $bin[1];
+       $newelt =~ s/(ù|ç)// ;
+       push( @bag, $newelt );
+     }
+     else 
+     {
+       push( @bag, $elt );
+     }
+  }
+  return( @bag );
+}
+
+
 sub define_random_file
 {
   my ( $newname, $mids_r, $countcase, $baseinsts_r, $dowhat_r, $fire, $instn, $pairs_r ) = @_;
@@ -180,7 +202,7 @@ sub define_random_file
   my $countstep = $b{countstep};
 
   my @winneritems  = @{ $b{winneritems} }      if exists $b{winneritems};
-  my %datastruc    = %{ $b{datastruc} }        if exists $b{datastruc};
+  my %incumbents    = %{ $b{incumbents} }        if exists $b{incumbents};
   my %vehicles     = %{ $b{vehicles} }         if exists $b{vehicles};
   my $c            = $b{c}                     if exists $b{c};
   my $from         = $b{from}                  if exists $b{from};
@@ -280,7 +302,7 @@ sub define_random_file
 
     sweeps        => \@sweeps,
     sourcesweeps  => \@sourcesweeps,
-    datastruc     => \%datastruc,
+    incumbents     => \%incumbents,
     varnumbers    => \@varnumbers,
     blocks        => \@blocks,
     blockelts     => \@blockelts,
@@ -483,7 +505,7 @@ sub setpickinst
   				miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
   				to => \%to, countvar => $countvar, countstep => $countstep,
   				sweeps => \@sweeps, orig => \%orig,
-  				sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+  				sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
   				varnumbers => \@varnumbers, blocks => \@blocks,
   				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
   				countinstance => $cn, carrier => \%carrier, origin => $origin,
@@ -500,7 +522,7 @@ sub setpickinst
   				miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
   				to => \%to, countvar => $countvar, countstep => $countstep,
   				sweeps => \@sweeps, orig => \%orig,
-  				sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+  				sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
   				varnumbers => \@varnumbers, blocks => \@blocks,
   				blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
   				countinstance => $cn, carrier => \%mids, origin => $origin,
@@ -570,7 +592,7 @@ sub setpickinst
 			miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
 			to => \%to, countvar => $countvar, countstep => $countstep,
 			sweeps => \@sweeps, dowhat => \%dowhat, orig => \%orig,
-			sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+			sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
 			varnumbers => \@varnumbers, blocks => \@blocks,
 			blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
 			countinstance => $cn, carrier => \%mids, origin => $origin,
@@ -2224,12 +2246,13 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	@miditers = Sim::OPT::washn( @miditers );
 	my @winneritems = @{ $d{winneritems} };
 	my %dirfiles = %{ $d{dirfiles} };
-	my %datastruc = %{ $d{datastruc} };
+	my %incumbents = %{ $d{incumbents} };
 	my %dowhat = %{ $d{dowhat} };
 	my @varnumbers = @{ $d{varnumbers} };
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 	@varnumbers = Sim::OPT::washn( @varnumbers );
+  say $tee "IN CALLBLOCK EXE \$dirfiles{randompicknum} $dirfiles{randompicknum}";
 
 
 	if ( $countcase > $#sweeps )   # NUMBER OF CASES OF THE CURRENT PROBLEM
@@ -2352,6 +2375,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{latinhypercube} = "n";
 		$dirfiles{latinhypercubenum} = "";
 	}
+  
 
 	if ( $sourceblockelts[0] =~ /°/ )
 	{
@@ -2374,8 +2398,30 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{randompicknum} = "";
 	}
 
+  say $tee "IN OPT JUST AFTER ASSIGNMENT \$dirfiles{randompicknum} $dirfiles{randompicknum}";
 
-  
+  if ( $sourceblockelts[0] =~ /à/ )
+  {
+    $dirfiles{newrandompick} = "y";
+    $sourceblockelts[0] =~ /^(\d+)à/ ;
+    $dirfiles{newrandompicknum} = $1;
+
+    if ( $sourceblockelts[0] =~ /ç/ )
+    {
+      $sourceblockelts[0] =~ /^(\d+)°(\d+)ç/ ;
+      $dirfiles{slicenum} = $2;
+      $dirfiles{pushsupercycle} = "y";
+      $dirfiles{nestclock} = $dirfiles{nestclock} + 1;
+      push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
+    }
+  }
+  else
+  {
+    $dirfiles{newrandompick} = "n";
+    $dirfiles{newrandompicknum} = "";
+  }
+
+
 	if ( $sourceblockelts[0] =~ /ù/ )
 	{
 		$dirfiles{ga} = "y";
@@ -2396,7 +2442,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{ga} = "n";
 		$dirfiles{ganum} = "";
 	}
-
+  
 
 	if ( $sourceblockelts[0] =~ /</ )
 	{
@@ -2415,6 +2461,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	{
 		$dirfiles{factorial} = "n";
 	}
+
 
 	if ( $sourceblockelts[0] =~ /£/ )
 	{
@@ -2443,9 +2490,10 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{facecentered} = "n";
 	}
 
+
 	if ( $sourceblockelts[0] =~ /ç/ )
 	{
-		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§|ù)(\d+)ç/ ;
+		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|à|°|§|ù)(\d+)ç/ ;
 		$dirfiles{slicenum} = $3;
 		if ( $3 eq "" )
 		{
@@ -2459,9 +2507,10 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
 	}
 
+
 	if ( $sourceblockelts[0] =~ /é/ )
 	{
-		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§|ù)(\d+)é/ ;
+		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|à|°|§|ù)(\d+)é/ ;
 		$dirfiles{revealnum} = $3;
 		#say $tee "REVEALNUM! " . dump( $dirfiles{revealnum} );
 		$dirfiles{popsupercycle} = "y";
@@ -2471,11 +2520,14 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 		$dirfiles{popsupercycle} = "";
 	}
 
+
+  @blockelts = washblockelts( @blockelts ); say $tee "WASHED BLOCKELTS " . dump( @blockelts );
+
 	my @blocks = getblocks( \@sweeps, $countcase );
   ###DDDTHIS
 	my $toitem = getitem( \@winneritems, $countcase, $countblock );
 
-
+  say $tee "IN OPT A BIT LATER 6 \$dirfiles{randompicknum} $dirfiles{randompicknum}";
 
 	$toitem = clean( $toitem, $mypath, $file );
 
@@ -2500,9 +2552,6 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	$from = clean( $from, $mypath, $file );
 
 	my %carrier = %{ takewinning( $toitem ) };
-
-
-
 
 
 
@@ -2537,15 +2586,16 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	$dirfiles{morphblock} = "$mypath/$file-morphblock--$countcase-$countblock";
 	$dirfiles{retblock} = "$mypath/$file-retblock--$countcase-$countblock";
 	$dirfiles{repblock} = "$mypath/$file-repblock--$countcase-$countblock"; # # FOR RETRIEVAL
-	$dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv";
+	$dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv"; say $tee "IN OPT ASSIGN \$countblock $countblock \$dirfiles{repblock} $dirfiles{repblock} to DIRFILES.";
 	$dirfiles{sortmixed} = "$dirfiles{repfile}" . "_sortm.csv";
 	$dirfiles{totres} = "$mypath/$file-$countcase" . "_totres.csv";
 	$dirfiles{ordres} = "$mypath/$file-$countcase" . "_ordres.csv";
+  
 
 	deffiles( {	countcase => $countcase, countblock => $countblock,
 		miditers => \@miditers,  winneritems => \@winneritems,
 		dirfiles => \%dirfiles, from => $from,
-		sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+		sweeps => \@sweeps, sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
 		dowhat => \%dowhat, varnumbers => \@varnumbers,
 		mids => \%mids, varnums => \%varnums, carrier => \%carrier,
 		carrier => \%carrier, sourceblockelts => \@sourceblockelts,
@@ -2564,11 +2614,11 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	my @miditers = @{ $d{miditers} };
 	my @winneritems = @{ $d{winneritems} };
 	my %dirfiles = %{ $d{dirfiles} };
-	my %datastruc = %{ $d{datastruc} };
+	my %incumbents = %{ $d{incumbents} };
 	my @varnumbers = @{ $d{varnumbers} };
 	my %dowhat = %{ $d{dowhat} };
 
-	my @blockelts = @{ $d{blockelts} };
+	my @blockelts = @{ $d{blockelts} }; say $tee "IN DEFFILES \@blockelts " . dump( @blockelts );
 	my @sourceblockelts = @{ $d{blockelts} };
 	my @blocks = @{ $d{blocks} };
 	my $from = $d{from};
@@ -2882,10 +2932,10 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		miditers => \@miditers,  winneritems => \@winneritems,
 		dirfiles => \%dirfiles, basket => \@finalbox,
 		sweeps => \@sweeps, sourcesweeps => \@sourcesweeps,
-		datastruc => \%datastruc, dowhat => \%dowhat,
+		incumbents => \%incumbents, dowhat => \%dowhat,
 		varnumbers => \@varnumbers,
 		mids => \%mids, varnums => \%varnums,
-		carrier => \%carrier, instn => $instn, inst => \%inst, vehicles => \%vehicles
+		carrier => \%carrier, instn => $instn, inst => \%inst, vehicles => \%vehicles, blockelts => \@blockelts
 	} );
 }
 
@@ -2900,9 +2950,10 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	my @winneritems = @{ $d{winneritems} };
 	my %dirfiles = %{ $d{dirfiles} };
 	my @basket = @{ $d{basket} };
-	my %datastruc = %{ $d{datastruc} };
+	my %incumbents = %{ $d{incumbents} };
 	my @varnumbers = @{ $d{varnumbers} };
 	my %dowhat = %{ $d{dowhat} };
+  my @blockelts = @{ $d{blockelts} };
 
 	my $instn = $d{instn};
   if ( !$instn )
@@ -2913,7 +2964,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 
-	my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) };
+	#my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) };
 	my @blocks = getblocks( \@sweeps, $countcase );
 
 	my %varnums = %{ $d{varnums} };
@@ -2969,7 +3020,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 					miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
 					to => \%to, countvar => $countvar, countstep => $countstep, orig => \%orig,
 					sweeps => \@sweeps, dowhat => \%dowhat,
-					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+					sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
 					varnumbers => \@varnumbers, blocks => \@blocks,
 					blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
 					countinstance => instn, carrier => \%carrier, origin => $origin,
@@ -2984,7 +3035,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 					miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
 					to => \%to, countvar => $countvar, countstep => $countstep, orig => \%orig,
 					sweeps => \@sweeps, dowhat => \%dowhat,
-					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+					sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
 					varnumbers => \@varnumbers, blocks => \@blocks,
 					blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
 					countinstance => $instn, carrier => \%carrier, origin => $origin,
@@ -3023,7 +3074,7 @@ sub exe
 	my %varnums = %{ $dat{varnums} };
 
 	my %d = %{ $instances[0] };
-	my %datastruc = %{ $d{datastruc} };
+	my %incumbents = %{ $d{incumbents} };
 	my $from = $d{from};
 	my %to = %{ $d{to} };
 	my %orig = %{ $d{orig} };
@@ -3039,7 +3090,7 @@ sub exe
 
 	my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} };
-	my ( @simcases, @simstruct );
+	my ( @packet );
 	say $tee "#Performing a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
   #say $tee "NOW!!! ENTERING EXE \%inst: " . dump (\%inst);
@@ -3065,6 +3116,7 @@ sub exe
 	###################################################################################################
 	elsif ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) or ( $dirfiles{OLDrandompick} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
 	{
+    say $tee "IN OPT EXE \$dirfiles{randompicknum} $dirfiles{randompicknum}";
     if ( checkOPTcue() )
     {
       @fulls = Sim::OPTcue::expand(
@@ -3104,26 +3156,22 @@ sub exe
 		if ( $dowhat{morph} eq "y" )
 		{
 			say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles, \%inst, \@precedents );
-			$dirfiles{morphcases} = $result[0];
-			$dirfiles{morphstruct} = $result[1];
+			my ( $dirfiles_r ) = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles, \%inst, \@precedents );
+      %dirfiles = %$dirfiles_r;
 			#%inst = %{ $result[2] };
 		}
 
+    my ( $packet_r, $dirfiles_r ); say $tee "IN DESCENT FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
 		if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
 		{
 
 			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			( my $simcases_ref, my $simstruct_ref, my $repcases_ref, my $repstruct_ref,
-			 my $mergestruct_ref, my $mergecases_ref, $csim ) = Sim::OPT::Sim::sim(
+			( $packet_r, $dirfiles_r, $csim,  ) = Sim::OPT::Sim::sim(
 					{ instances => \@instances, dowhat => \%dowhat, dirfiles => \%dirfiles,
 					  vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, onlyrep => "y" } );
-			$dirfiles{simcases} = $simcases_ref;
-			$dirfiles{simstruct} = $simstruct_ref;
-			$dirfiles{repcases} = $repcases_ref;
-			$dirfiles{repstruct} = $repstruct_ref;
-			$dirfiles{mergestruct} = $mergestruct_ref;
-			$dirfiles{mergecases} = $mergecases_ref;
+
+      @packet = uniq( @$packet_r ); say $tee "RECEIVED PACKET " . dump( @packet );
+      %dirfiles = %$dirfiles_r;
 			say $tee "#Performed simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 		}
 	}
@@ -3134,7 +3182,7 @@ sub exe
 	{
 		say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 		Sim::OPT::Descend::descend(	{ instances => \@instances, dowhat => \%dowhat,
-		 dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents } );
+		 dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, packet => \@packet } );
 		say $tee "#Performed descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 	}
 
@@ -3470,7 +3518,7 @@ sub opt
 
 		my $countcase = 0;
 		my $countblock = 0;
-		my %datastruc;
+		my %incumbents;
 
 		my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
 
@@ -3482,7 +3530,7 @@ sub opt
 			push ( @arr, $elt );
 			$count++;
 		}
-		$datastruc{pinwinneritem} = [ @arr ];
+		$incumbents{pinwinneritem} = [ @arr ];
 
 		my ( @gencentres, @genextremes, @genpoints, $genextremes_ref, $gencentres_ref );
 
@@ -3548,7 +3596,7 @@ sub opt
 
 				callblock( { countcase => $countcase, countblock => $countblock,
 					miditers => \@miditers, varnumbers => \@varnumbers, winneritems => \@winneritems, sweeps => \@sweeps,
-					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc, dirfiles => \%dirfiles,
+					sourcesweeps => \@sourcesweeps, incumbents => \%incumbents, dirfiles => \%dirfiles,
 					dowhat => \%dowhat, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
 					$countstring++;
 					$dirfiles{countstring} = $countstring;
@@ -3576,7 +3624,7 @@ sub opt
 
 			my $countcase = 0;
 			my $countblock = 0;
-			my %datastruc;
+			my %incumbents;
 
 			my @winneritems = populatewinners( \@rootnames, $countcase, $countblock );
 
@@ -3588,14 +3636,14 @@ sub opt
 				push ( @arr, $elt );
 				$count++;
 			}
-			$datastruc = [ @arr ];
+			$incumbents = [ @arr ];
 
 			$dirfiles{nestclock} = 0;
 			callblock
 			(	{ countcase => $countcase, countblock => $countblock,
 					miditers => \@miditers, varnumbers => \@varnumbers, winneritems => \@winneritems,
 					sweeps => \@sweeps, sourcesweeps => \@sourcesweeps,
-					datastruc => \%datastruc, dowhat => \%dowhat,
+					incumbents => \%incumbents, dowhat => \%dowhat,
 					dirfiles => \%dirfiles, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
 		}
 	}

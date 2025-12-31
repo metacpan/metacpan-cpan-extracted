@@ -21,12 +21,12 @@ my %WriteMakefileArgs = (
     "Moo" => 2,
     "Mooish::AttributeBuilder" => "1.002",
     "Type::Tiny" => 2,
-    "namespace::autoclean" => 0
+    "namespace::autoclean" => "0.16"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %FallbackPrereqs = (
   "Mooish::AttributeBuilder" => "1.002",
   "Test2::V0" => 0,
   "Type::Tiny" => 2,
-  "namespace::autoclean" => 0
+  "namespace::autoclean" => "0.16"
 );
 
 

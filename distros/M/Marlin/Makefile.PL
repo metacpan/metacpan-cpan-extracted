@@ -28,6 +28,7 @@ my $meta = {
                                          "Clone"                    => 0,
                                          "Exporter::Tiny"           => 1.006002,
                                          "List::Util"               => 1.45,
+                                         "LV"                       => 0,
                                          "Module::Runtime"          => 0,
                                          "perl"                     => 5.008008,
                                          "Role::Tiny"               => 0,
@@ -48,13 +49,19 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Marlin"                 => { file => "lib/Marlin.pm", version => "0.009000" },
-                        "Marlin::Attribute"      => { file => "lib/Marlin/Attribute.pm", version => "0.009000" },
-                        "Marlin::Role"           => { file => "lib/Marlin/Role.pm", version => "0.009000" },
-                        "Marlin::Struct"         => { file => "lib/Marlin/Struct.pm", version => "0.009000" },
-                        "Marlin::TypeConstraint" => { file => "lib/Marlin/TypeConstraint.pm", version => "0.009000" },
-                        "Marlin::Util"           => { file => "lib/Marlin/Util.pm", version => "0.009000" },
-                        "Marlin::X::Clone"       => { file => "lib/Marlin/X/Clone.pm", version => "0.009000" },
+                        "Marlin"                          => { file => "lib/Marlin.pm", version => "0.010000" },
+                        "Marlin::Attribute"               => { file => "lib/Marlin/Attribute.pm", version => "0.010000" },
+                        "Marlin::Role"                    => { file => "lib/Marlin/Role.pm", version => "0.010000" },
+                        "Marlin::Struct"                  => { file => "lib/Marlin/Struct.pm", version => "0.010000" },
+                        "Marlin::TypeConstraint"          => { file => "lib/Marlin/TypeConstraint.pm", version => "0.010000" },
+                        "Marlin::Util"                    => { file => "lib/Marlin/Util.pm", version => "0.010000" },
+                        "Marlin::X::Clone"                => { file => "lib/Marlin/X/Clone.pm", version => "0.010000" },
+                        "Marlin::XAttribute::Alias"       => { file => "lib/Marlin/XAttribute/Alias.pm", version => "0.010000" },
+                        "Marlin::XAttribute::LocalWriter" => {
+                                                               file => "lib/Marlin/XAttribute/LocalWriter.pm",
+                                                               version => "0.010000",
+                                                             },
+                        "Marlin::XAttribute::Lvalue"      => { file => "lib/Marlin/XAttribute/Lvalue.pm", version => "0.010000" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -68,7 +75,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Marlin/project",
                       },
-  "version"        => "0.009000",
+  "version"        => "0.010000",
 };
 
 my %dynamic_config;

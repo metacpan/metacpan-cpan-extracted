@@ -47,3 +47,5 @@ Revision history for Data-HexConverter
     - Emit the active SIMD implementation once per run to mirror the original benchmark output (benchmark-multiline.c:135).
 	 - hexsimd.c optimizations
 
+0.65 2025-12-29
+    - added benchmark.sh

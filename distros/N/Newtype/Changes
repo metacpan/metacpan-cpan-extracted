@@ -6,4 +6,13 @@ Home page:    <https://metacpan.org/release/Newtype>
 Bug tracker:  <https://github.com/tobyink/p5-newtype/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.002000	2025-12-30
+
+ [ Packaging ]
+ - Switch to six decimal digit version numbers.
+
+ [ Other ]
+ - Override Type::Tiny's exportables method.
+ - Support defining coercions for newtypes.
+
 0.001	2022-12-04	Initial release

@@ -18,15 +18,13 @@ SYNOPSIS
         );
     
         sub introduction ( $self, $arg ) {
-          say "Hi " . $arg->audience . "!" if $arg->has_audience;
+          say "Hi " . $arg->audience->name . "!" if $arg->has_audience;
           say "My name is " . $self->name . ".";
         }
       }
   
       package Employee {
-        use Marlin
-          -base =>  [ 'Person' ],
-          'employee_id!';
+        use Marlin -base => 'Person', 'employee_id!';
       }
   
       my $alice = Person->new( name => 'Alice Whotfia' );
@@ -149,6 +147,23 @@ DESCRIPTION
           'postal_code==?'     => Str,
           ;
       }
+
+    Marlin can *almost* be used as a drop-in replacement for Class::Tiny.
+    Examples from the Class::Tiny SYNOPSIS:
+
+      # Person.pm
+      package Person;
+      use Marlin qw( name );
+      1;
+  
+      # Employee.pm
+      package Employee;
+      use parent 'Person';
+      use Marlin qw( ssn ), timestamp => sub { time };
+      1;
+
+    The only change was to remove the hashref which wrapped `timestamp => sub
+    { time }`.
 
    Supported Features for Attributes
     The following Moose/Moo-like features are supported for attributes:
@@ -616,6 +631,15 @@ DESCRIPTION
     only *try* to use that extension, but carry on if the extension cannot be
     loaded.
 
+    It is also possible to write attribute-specific extensions.
+
+      package Local::Foobar {
+        use Marlin foo => { is => 'rw', ':Frobnicate' => {...} };
+      }
+
+    This will apply a role "Marlin::XAttribute::Frobnicate" to the
+    Marlin::Attribute object that is used to generate accessors, etc.
+
    Other Features
     `BUILD` and `DEMOLISH` are supported.
 
@@ -712,12 +736,13 @@ SEE ALSO
     Marlin::Role, Marlin::Struct, Marlin::Util, Marlin::Manual::Principles,
     Marlin::Manual::Comparison.
 
-    Marlin::X::Clone.
+    Example extensions: Marlin::X::Clone, Marlin::XAttribute::Alias,
+    Marlin::XAttribute::LocalWriter, Marlin::XAttribute::Lvalue.
 
-    Class::XSAccessor, Class::XSConstructor, Types::Common, Type::Params, and
-    Sub::HandlesVia.
+    Modules that Marlin exposes the functionality of: Class::XSAccessor,
+    Class::XSConstructor, Types::Common, Type::Params, and Sub::HandlesVia.
 
-    Moose and Moo.
+    Inspirations: Moose and Moo.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

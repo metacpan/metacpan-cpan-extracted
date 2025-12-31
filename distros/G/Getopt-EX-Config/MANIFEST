@@ -11,5 +11,6 @@ share/README.md
 share/getopt_ex_migrator.py
 t/00_compile.t
 t/01_underscore_dash.t
+t/02_lock_keys.t
 META.yml
 MANIFEST

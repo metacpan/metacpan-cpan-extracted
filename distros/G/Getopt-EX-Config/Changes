@@ -1,5 +1,14 @@
 Revision history for Perl extension Getopt-EX-Config
 
+1.0201 2025-12-31T05:49:11Z
+
+    - Filter out internal keys in getopt() to avoid Getopt::Long errors
+
+1.02 2025-12-31T05:24:59Z
+
+    - Initialize internal keys (_argv, _configure) in new() for
+      lock_keys compatibility
+
 1.01 2025-12-24T12:11:21Z
 
     - Add configure() method for Getopt::Long configuration

@@ -14,8 +14,9 @@ my %COLUMNS;
 my %FIELDS;
 my %FIXED;
 my %PRIMARY_KEYS;
+my %CONVERTERS;
 
-our $VERSION = "0.4";
+our $VERSION = "0.7";
 
 sub import {
     my $caller          = caller;
@@ -183,7 +184,11 @@ sub _values_from_instance {
     my %columns = %{ $COLUMNS{$caller} };
     my %final_hash;
     for my $field ( keys %columns ) {
-        $final_hash{ $columns{$field} } = $instance->can($field)->($instance);
+        my $value = $instance->can($field)->($instance);
+        if ( defined $CONVERTERS{$caller}{$field} ) {
+            $value = $CONVERTERS{$caller}{$field}->to_db($value);
+        }
+        $final_hash{ $columns{$field} } = $value;
     }
     return \%final_hash;
 }
@@ -196,9 +201,10 @@ sub _check_fixed {
 sub _advanced_search {
     my ( $caller, $object, %search_params ) = @_;
     _check_fixed($caller);
-    my $dbh     = $object->dbh;
-    my $sqla    = SQL::Abstract::More->new;
-    my @columns = sort {$a cmp $b} map { $TABLES{$caller} . '.' . $COLUMNS{$caller}{$_} }
+    my $dbh  = $object->dbh;
+    my $sqla = SQL::Abstract::More->new;
+    my @columns =
+      sort { $a cmp $b } map { $TABLES{$caller} . '.' . $COLUMNS{$caller}{$_} }
       keys %{ $COLUMNS{$caller} };
     if ( defined delete $search_params{'-from'} ) {
         warn '-from not supported in free search use -join';
@@ -209,10 +215,10 @@ sub _advanced_search {
           . ' with SQL::Abstract::More you can have all this module querying features.';
     }
     my $join = delete $search_params{'-join'} // [];
-    if ('ARRAY' ne ref $join) {
-	    die '-join must be an arrayref';
+    if ( 'ARRAY' ne ref $join ) {
+        die '-join must be an arrayref';
     }
-    my @joins = @{ $join };
+    my @joins = @{$join};
     my ( $sql, @bind ) = $sqla->select(
         -columns => [@columns],
         -from    => [ -join => $TABLES{$caller}, (@joins) ],
@@ -225,9 +231,10 @@ sub _advanced_search {
 sub _search {
     my ( $caller, $object, %search_params ) = @_;
     _check_fixed($caller);
-    my $dbh     = $object->dbh;
-    my $sqla    = SQL::Abstract::More->new;
-    my @columns = sort {$a cmp $b} map { $TABLES{$caller} . '.' . $COLUMNS{$caller}{$_} }
+    my $dbh  = $object->dbh;
+    my $sqla = SQL::Abstract::More->new;
+    my @columns =
+      sort { $a cmp $b } map { $TABLES{$caller} . '.' . $COLUMNS{$caller}{$_} }
       keys %{ $COLUMNS{$caller} };
     my %final_search;
     for my $param_key ( keys %search_params ) {
@@ -258,7 +265,11 @@ sub _row_to_instance {
     my %final_hash;
     for my $column ( keys %$row ) {
         my $field = $FIELDS{$caller}{$column};
-        $final_hash{$field} = $row->{$column};
+        my $value = $row->{$column};
+        if ( defined $CONVERTERS{$caller}{$field} ) {
+            $value = $CONVERTERS{$caller}{$field}->from_db($value);
+        }
+        $final_hash{$field} = $value;
     }
     return ( $caller . '::Instance' )->new( %final_hash, dbh => $object->dbh );
 }
@@ -270,6 +281,14 @@ sub _field_sub {
     my $fk         = delete $params{fk};
     my $column     = delete $params{column} // $field;
     my $pk         = delete $params{pk};
+    my $converter  = delete $params{converter};
+    if ( defined $converter ) {
+        if ( !eval { $converter->does('DBIx::Quick::Converter') } ) {
+            die
+"$field converter must implement the DBIx::Quick::Converter Role and be a Moo class";
+        }
+        $CONVERTERS{$caller}{$field} = $converter;
+    }
     $COLUMNS{$caller}{$field} = $column;
     $FIELDS{$caller}{$column} = $field;
 
@@ -334,6 +353,7 @@ sub _mark_searchable {
     }
 }
 1;
+
 =pod
 
 =encoding utf-8
@@ -358,6 +378,7 @@ DBIx::Quick - Object Relational Mapping for the lazy programmer
  field id => (is => 'ro', search => 1, pk => 1);
  field username => (is => 'rw', search => 1, required => 1, column => 'user_name');
  field id_address => (is => 'rw', search => 1, fk => ['MyApp::DAO::Addresses', 'id', 'addresses', 'users']);
+ field timestamp => (is => 'rw', search => 1, converter => MyApp::DB::Converters::DateTime->new);
 
  fix;
 
@@ -388,6 +409,8 @@ This module is preliminar, meaning the syntax is probably not the definitive one
 making full blown applications feel free to join the development with suggestions or patches.
 
 If you are needing too fancy autocomplete or templates just to be productive maybe you instead need L<DBIx::Quick>.
+
+To check an example project that uses this code you can check L<https://github.com/sergiotarxz/Perl-App-RSS-Social>.
 
 =head1 DAO DECLARATIONS
 
@@ -425,6 +448,10 @@ Allows to change the destination column by default it would be called as the fie
 =head3 fk
 
 Takes four arguments: The destination class, the destination field, the method to represent in our model the remote class and optionally the remote instance method to represent our own class.
+
+=head3 converter
+
+See L<DBIx::Quick::Converter>
 
 =head2 fix
 

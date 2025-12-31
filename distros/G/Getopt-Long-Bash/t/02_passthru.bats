@@ -402,3 +402,75 @@ load test_helper.bash
     assert_line --index 2 "arr_1:--no-feature"
     assert_line --index 3 "arr_2:--feature"
 }
+
+# Test: Passthru - negated short alias --no-v
+@test "getoptlong: passthru - negated short alias --no-v" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([verbose|v+>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse --no-v
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_0:${pass_array[0]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:1"
+    assert_line --index 1 "arr_0:--no-v"
+}
+
+# Test: Passthru - negated single-char alias --no-D
+@test "getoptlong: passthru - negated single-char alias --no-D" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([document|D+>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse --no-D
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_0:${pass_array[0]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:1"
+    assert_line --index 1 "arr_0:--no-D"
+}
+
+# Test: Passthru - short alias without negation -v
+@test "getoptlong: passthru - short alias without negation -v" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([verbose|v+>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse -v
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_0:${pass_array[0]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:1"
+    assert_line --index 1 "arr_0:-v"
+}
+
+# Test: Passthru - mixed short alias and negation
+@test "getoptlong: passthru - mixed short alias -v and --no-v" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([verbose|v+>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse -v --no-v -v
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_0:${pass_array[0]}"
+        echo "arr_1:${pass_array[1]}"
+        echo "arr_2:${pass_array[2]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:3"
+    assert_line --index 1 "arr_0:-v"
+    assert_line --index 2 "arr_1:--no-v"
+    assert_line --index 3 "arr_2:-v"
+}

@@ -15,9 +15,9 @@
 # this line defines the fields
 #   
 #   username          SomeUser
+#   algorithm         6                      $6
+#   salt              pCt6qNtCYsozKMDu       $pCt6qNtCYsozKMDu
 #   hashed password   $6$pCt6qNtCYsozKMDu$3yHSXCHigXoKFSpDn8rDKMowvZktB7my1kvBYalkSu9Q1gHU.00lqM2bD27vISCdkG/G2cMJ9F39f7rZQdzIf1
-#     algorithm        6
-#     salt               pCt6qNtCYsozKMDu
 #   last change       18329
 #   minimum days      0
 #   maximum days      99999
@@ -26,7 +26,7 @@
 #   expire   days     9   
 #
 # algorithms and its verification code
-#   
+#
 #   6   SHA-512   -> openssl supported       openssl passwd -6 -salt pCt6qNtCYsozKMDu SomePassword
 #   5   SHA-256   -> openssl supported       openssl passwd -5 -salt pCt6qNtCYsozKMDu SomePassword
 #   1   md5       -> openssl supported       openssl passwd -1 -salt pCt6qNtCYsozKMDu SomePassword
@@ -40,7 +40,7 @@
 #   openssl passwd -6         -salt pCt6qNtCYsozKMDu SomePassword
 #
 # Othelse you must call the crypt(3) from Perl or Python3 e.g.
-
+#
 #   perl -le 'print [ getpwnam("SomeUser") ]->[0]'   # SomeUser
 #   perl -le 'print [ getpwnam("SomeUser") ]->[1]'   # $y$j9T$TMK5KZZg4Z6ivQ7PLCRMF1$fG5Ru6aU8rJRvcE4YHJL75PxH.iKo3mChw8M/UiJrA9
 #   perl -le 'print crypt("password", q[$y$j9T$TMK5KZZg4Z6ivQ7PLCRMF1$fG5Ru6aU8rJRvcE4YHJL75PxH.iKo3mChw8M/UiJrA9)'

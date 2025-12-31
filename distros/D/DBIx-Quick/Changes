@@ -6,3 +6,9 @@
     - Fixing doc typo
 0.4 Sat Dec 27 06:43:00 PM CET 2025
     - Improving doc refererences to other modules.
+0.5 Mon Dec 29 06:56:54 PM CET 2025
+    - Adding an example project to the docs.
+0.6 Mon Dec 29 10:50:46 PM CET 2025
+    - Adding converter role and option in field.
+0.7 Tue Dec 30 07:50:13 PM CET 2025
+    - Adding missing converter role to manifest.

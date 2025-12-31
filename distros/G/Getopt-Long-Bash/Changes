@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Bash
 
+0.7.0 2025-12-30T12:52:21Z
+
+    - Fix passthru negation with short option aliases (--no-v was becoming -v)
+
 0.6.0 2025-12-24T07:22:23Z
 
     - Allow whitespace around mark character keys for alignment

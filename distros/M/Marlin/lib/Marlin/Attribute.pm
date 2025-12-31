@@ -5,20 +5,51 @@ use warnings;
 package Marlin::Attribute;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.009000';
+our $VERSION   = '0.010000';
 
 use parent 'Sub::Accessor::Small';
 
 use B ();
 use Class::XSAccessor ();
-use Scalar::Util ();
 use Marlin ();
+use Scalar::Util ();
+use Types::Common ();
 
 sub new {
 	my $class = shift;
-	my $me    = $class->SUPER::new( @_ );
+	my $me = $class->SUPER::new( @_ );
+	$me->_auto_apply_roles;
 	Scalar::Util::weaken( $me->{marlin} );
 	return $me;
+}
+
+sub _auto_apply_roles {
+	my $me = shift;
+	
+	my @roles = grep { /\A:/ } sort keys %$me or return;
+	
+	require Module::Runtime;
+	require Role::Tiny;
+	
+	my @with;
+	for my $role ( @roles ) {
+		my $pkg  = "Marlin::XAttribute:$role";
+		my $opts = $me->{$role};
+		
+		if ( Types::Common::is_HashRef( $opts ) and $opts->{try} ) {
+			Module::Runtime::use_package_optimistically( $pkg );
+			push @with, $pkg if Role::Tiny->is_role( $pkg );
+		}
+		else {
+			Module::Runtime::require_module( $pkg );
+			push @with, $pkg;
+		}
+	}
+	
+	if ( @with ) {
+		Role::Tiny->apply_roles_to_object( $me, @with );
+		$me->canonicalize_opts;
+	}
 }
 
 sub _croaker {

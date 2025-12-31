@@ -8,7 +8,6 @@ build_requires:
   Test2::Require::Module: '0'
   Test2::Tools::Spec: '0'
   Test2::V0: '0'
-  Type::Registry: '2.000000'
   Types::Common: '2.000000'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
@@ -31,13 +30,14 @@ optional_features: {}
 provides:
   Newtype:
     file: lib/Newtype.pm
-    version: '0.001'
+    version: '0.002000'
 requires:
   Eval::TypeTiny: '2.000000'
   Sub::HandlesVia: '0.045'
   Sub::Util: '1.40'
+  Type::Registry: '2.000000'
   Type::Tiny::Class: '2.000000'
-  Types::Common: '2.000000'
+  Types::Common: '2.00000'
   namespace::autoclean: '0'
   perl: '5.014'
 resources:
@@ -46,6 +46,6 @@ resources:
   homepage: https://metacpan.org/release/Newtype
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-newtype.git
-version: '0.001'
+version: '0.002000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

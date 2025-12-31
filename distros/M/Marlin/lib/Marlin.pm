@@ -6,7 +6,7 @@ use utf8;
 package Marlin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.009000';
+our $VERSION   = '0.010000';
 
 use constant _ATTRS => qw( caller this parents roles attributes strict constructor modifiers inhaled_from short_name is_struct plugins setup_steps_with_plugins );
 use B::Hooks::AtRuntime   qw( at_runtime after_runtime );
@@ -911,15 +911,13 @@ Marlin - 🐟 pretty fast class builder with most Moo/Moose features 🐟
     );
     
     sub introduction ( $self, $arg ) {
-      say "Hi " . $arg->audience . "!" if $arg->has_audience;
+      say "Hi " . $arg->audience->name . "!" if $arg->has_audience;
       say "My name is " . $self->name . ".";
     }
   }
   
   package Employee {
-    use Marlin
-      -base =>  [ 'Person' ],
-      'employee_id!';
+    use Marlin -base => 'Person', 'employee_id!';
   }
   
   my $alice = Person->new( name => 'Alice Whotfia' );
@@ -1046,6 +1044,23 @@ use:
       'postal_code==?'     => Str,
       ;
   }
+
+Marlin can I<almost> be used as a drop-in replacement for L<Class::Tiny>.
+Examples from the Class::Tiny SYNOPSIS:
+
+  # Person.pm
+  package Person;
+  use Marlin qw( name );
+  1;
+  
+  # Employee.pm
+  package Employee;
+  use parent 'Person';
+  use Marlin qw( ssn ), timestamp => sub { time };
+  1;
+
+The only change was to remove the hashref which wrapped
+C<< timestamp => sub { time } >>.
 
 =head3 Supported Features for Attributes
 
@@ -1540,6 +1555,15 @@ The C<try> argument is special. By setting it to true, it tells Marlin to
 only I<try> to use that extension, but carry on if the extension cannot
 be loaded.
 
+It is also possible to write attribute-specific extensions.
+
+  package Local::Foobar {
+    use Marlin foo => { is => 'rw', ':Frobnicate' => {...} };
+  }
+
+This will apply a role "Marlin::XAttribute::Frobnicate" to the
+L<Marlin::Attribute> object that is used to generate accessors, etc.
+
 =head3 Other Features
 
 C<BUILD> and C<DEMOLISH> are supported.
@@ -1671,11 +1695,17 @@ L<Marlin::Util>,
 L<Marlin::Manual::Principles>,
 L<Marlin::Manual::Comparison>.
 
-L<Marlin::X::Clone>.
+Example extensions:
+L<Marlin::X::Clone>,
+L<Marlin::XAttribute::Alias>,
+L<Marlin::XAttribute::LocalWriter>,
+L<Marlin::XAttribute::Lvalue>.
 
+Modules that Marlin exposes the functionality of:
 L<Class::XSAccessor>, L<Class::XSConstructor>, L<Types::Common>,
 L<Type::Params>, and L<Sub::HandlesVia>.
 
+Inspirations:
 L<Moose> and L<Moo>.
 
 =head1 AUTHOR

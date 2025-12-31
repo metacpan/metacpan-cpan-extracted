@@ -1,5 +1,5 @@
 package Mooish::Base;
-$Mooish::Base::VERSION = '1.001';
+$Mooish::Base::VERSION = '1.002';
 use v5.10;
 use strict;
 use warnings;

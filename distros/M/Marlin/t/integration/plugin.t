@@ -19,9 +19,8 @@ the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
+use Data::Dumper;
 
 {
 	package Local::Foo;
@@ -36,7 +35,7 @@ use Test::More;
 my $bar1 = Local::Bar->new( foo => 1, quux => 2, bar => 3 );
 my $bar2 = $bar1->clone( bar => 4 );
 
-is_deeply( $bar1, bless( { foo => 1, quux => 2, bar => 3 }, 'Local::Bar' ) ) or diag explain( $bar1 );
-is_deeply( $bar2, bless( { foo => 1, quux => 2, bar => 4 }, 'Local::Bar' ) ) or diag explain( $bar2 );
+is( $bar1, bless( { foo => 1, quux => 2, bar => 3 }, 'Local::Bar' ) ) or diag Dumper( $bar1 );
+is( $bar2, bless( { foo => 1, quux => 2, bar => 4 }, 'Local::Bar' ) ) or diag Dumper( $bar2 );
 
 done_testing;

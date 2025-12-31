@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Marlin>
 Bug tracker:  <https://github.com/tobyink/p5-marlin/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.010000	2025-12-29
+
+ [ Documentation ]
+ - Show how easy it is to switch from Class::Tiny to Marlin.
+
+ [ Other ]
+ - Added: Marlin::XAttribute::Alias is bundled as a demonstration of the
+   extension API (and because it can be useful).
+ - Added: Marlin::XAttribute::LocalWriter is bundled as a demonstration of
+   the extension API (and because it can be useful).
+ - Added: Marlin::XAttribute::Lvalue is bundled as a demonstration of the
+   extension API (and because it can be useful).
+ - Marlin now provides a rudimentary API for attribute extension modules.
+
 0.009000	2025-12-28
 
  - Added: Marlin::X::Clone is bundled as a demonstration of the extension

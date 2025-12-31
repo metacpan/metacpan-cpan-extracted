@@ -15,7 +15,7 @@
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [
 		doap-deps:on "B::Hooks::AtRuntime"^^doap-deps:CpanId;
-	], [
+	], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Tiny 2.008000"^^doap-deps:CpanId;
 	], [ doap-deps:on "Type::Tiny::XS"^^doap-deps:CpanId ], [
 		doap-deps:on "Sub::HandlesVia 0.052000"^^doap-deps:CpanId;
@@ -29,7 +29,7 @@
 		doap-deps:on "Class::XSConstructor 0.015002"^^doap-deps:CpanId;
 	], [ doap-deps:on "Clone"^^doap-deps:CpanId ], [
 		doap-deps:on "Exporter::Tiny 1.006002"^^doap-deps:CpanId;
-	], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ];
+	], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [ doap-deps:on "LV"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
 		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
 	], [
@@ -46,7 +46,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Marlin";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002002>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002003>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002004>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-002005>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-004000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-005000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-006001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-007001>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-008000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-009000>, <http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-marlin>;
@@ -344,6 +344,32 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.009000.tar.gz>;
 	doap:revision        "0.009000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Marlin/v_0-010000>
+	a                    doap:Version;
+	dc:identifier        "Marlin-0.010000"^^xsd:string;
+	dc:issued            "2025-12-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Marlin now provides a rudimentary API for attribute extension modules.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Marlin::XAttribute::Alias is bundled as a demonstration of the extension API (and because it can be useful).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Marlin::XAttribute::LocalWriter is bundled as a demonstration of the extension API (and because it can be useful).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Marlin::XAttribute::Lvalue is bundled as a demonstration of the extension API (and because it can be useful).";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Show how easy it is to switch from Class::Tiny to Marlin.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Marlin-0.010000.tar.gz>;
+	doap:revision        "0.010000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

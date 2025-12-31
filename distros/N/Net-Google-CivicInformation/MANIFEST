@@ -8,6 +8,7 @@ Makefile.PL
 README.md
 cpanfile
 lib/Net/Google/CivicInformation.pm
+lib/Net/Google/CivicInformation/Divisions.pm
 lib/Net/Google/CivicInformation/Representatives.pm
 t/001-load.t
 t/002-init.t

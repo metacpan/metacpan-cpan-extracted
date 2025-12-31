@@ -1,6 +1,6 @@
 package Net::Google::CivicInformation::Representatives;
 
-our $VERSION = '1.03';
+our $VERSION = '1.9901';
 
 use strict;
 use warnings;
@@ -88,7 +88,7 @@ __END__
 
 =head1 VERSION
 
-version 1.03
+version 1.9901
 
 =encoding utf8
 

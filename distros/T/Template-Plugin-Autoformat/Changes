@@ -1,5 +1,8 @@
 Revision history for Template-Plugin-Autoformat
 
+2.79 2025-12-30
+ - fix for https://github.com/karpet/template-plugin-autoformat/pull/10
+
 2.78 2025-12-26
  - fix for Perl 5.42: https://github.com/karpet/template-plugin-autoformat/pull/9
 

@@ -1,9 +1,19 @@
 Revision history for DBD-Patroni
 
-0.02  2024-12-27
+0.03  2025-12-30
+    - Split monolithic Patroni.pm into separate modules:
+      - DBD::Patroni::dr (Driver class)
+      - DBD::Patroni::db (Database handle class)
+      - DBD::Patroni::st (Statement handle class)
+    - Add _build_dsn helper for proper DSN manipulation
+    - Use refaddr() for object comparison instead of string comparison
+    - Add null guards for transaction and fetch/bind methods
+    - Fix Docker test infrastructure for CI
+
+0.02  2025-12-27
     - Convert to real DBI driver
 
-0.01  2024-12-27
+0.01  2025-12-27
     - Initial release
     - Automatic leader/replica routing based on query type
     - Patroni REST API cluster discovery

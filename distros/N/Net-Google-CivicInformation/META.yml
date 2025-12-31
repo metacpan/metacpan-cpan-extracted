@@ -20,10 +20,13 @@ name: Net-Google-CivicInformation
 provides:
   Net::Google::CivicInformation:
     file: lib/Net/Google/CivicInformation.pm
-    version: '1.03'
+    version: '1.9901'
+  Net::Google::CivicInformation::Divisions:
+    file: lib/Net/Google/CivicInformation/Divisions.pm
+    version: '1.9901'
   Net::Google::CivicInformation::Representatives:
     file: lib/Net/Google/CivicInformation/Representatives.pm
-    version: '1.03'
+    version: '1.9901'
 requires:
   Carp: '0'
   Function::Parameters: '0'
@@ -36,7 +39,7 @@ requires:
 resources:
   bugtracker: https://github.com/1nickt/p5-Net-Google-CivicInformation/issues
   repository: git://github.com/1nickt/p5-Net-Google-CivicInformation.git
-version: '1.03'
+version: '1.9901'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

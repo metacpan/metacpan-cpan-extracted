@@ -14,17 +14,17 @@ DESCRIPTION
 
     With the extension installed, perform your search, then click anywhere
     in the ticket row in the search results. The history for that ticket
-    will be displayed at the bottom of the page. With RT 5, if you have
-    inline edit enabled for some search fields, click anywhere outside the
-    inline edit fields. You'll see the pencil icon appear if you are in an
-    inline edit area.
+    will be displayed at the bottom of the page. If you have inline edit
+    enabled for some search fields, click anywhere outside the inline edit
+    fields. You'll see the pencil icon appear if you are in an inline edit
+    area.
 
     To make it easier to see the ticket history with less scrolling, you can
     set the Rows per page setting on the search to a smaller number. A
     "$SideBySidePreview" mode is also available.
 
 RT VERSIONS
-    Works with RT 4.2, 4.4, 5.0
+    Works with RT 6.0. Install the latest 0.* version for older RTs.
 
 INSTALLATION
     perl Makefile.PL
@@ -32,18 +32,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Patch RT
-        For RT 5 prior to 5.0.6, apply the patches:
-
-            patch -d /opt/rt5 -p1 < 0001-Add-ModifyPaths-Callback.patch
-
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin( "RT::Extension::PreviewInSearch" );
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 

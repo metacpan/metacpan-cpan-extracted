@@ -20,19 +20,19 @@
 	], [
 		doap-deps:on "Sub::HandlesVia 0.045"^^doap-deps:CpanId;
 	], [ doap-deps:on "Sub::Util 1.40"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Registry 2.000000"^^doap-deps:CpanId;
+	], [
 		doap-deps:on "Type::Tiny::Class 2.000000"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Types::Common 2.000000"^^doap-deps:CpanId;
+		doap-deps:on "Types::Common 2.00000"^^doap-deps:CpanId;
 	];
-	doap-deps:test-requirement [
+	doap-deps:test-requirement [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
 		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Type::Registry 2.000000"^^doap-deps:CpanId;
-	], [
 		doap-deps:on "Types::Common 2.000000"^^doap-deps:CpanId;
-	], [ doap-deps:on "Moo 2.000000"^^doap-deps:CpanId ], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Moo 2.000000"^^doap-deps:CpanId ], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-newtype/issues>;
 	doap:created         "2022-12-03"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -42,7 +42,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Newtype";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Newtype/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Newtype/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Newtype/v_0-002000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-newtype>;
@@ -57,6 +57,26 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Newtype-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Newtype/v_0-002000>
+	a                    doap:Version;
+	dc:identifier        "Newtype-0.002000"^^xsd:string;
+	dc:issued            "2025-12-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to six decimal digit version numbers.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Support defining coercions for newtypes.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Override Type::Tiny's exportables method.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Newtype-0.002000.tar.gz>;
+	doap:revision        "0.002000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

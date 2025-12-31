@@ -40,8 +40,9 @@
             "Eval::TypeTiny" : "2.000000",
             "Sub::HandlesVia" : "0.045",
             "Sub::Util" : "1.40",
+            "Type::Registry" : "2.000000",
             "Type::Tiny::Class" : "2.000000",
-            "Types::Common" : "2.000000",
+            "Types::Common" : "2.00000",
             "namespace::autoclean" : "0",
             "perl" : "5.014"
          }
@@ -53,7 +54,6 @@
             "Test2::Require::Module" : "0",
             "Test2::Tools::Spec" : "0",
             "Test2::V0" : "0",
-            "Type::Registry" : "2.000000",
             "Types::Common" : "2.000000"
          }
       }
@@ -61,7 +61,7 @@
    "provides" : {
       "Newtype" : {
          "file" : "lib/Newtype.pm",
-         "version" : "0.001"
+         "version" : "0.002000"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Newtype/project"
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 4.09",
+   "version" : "0.002000",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

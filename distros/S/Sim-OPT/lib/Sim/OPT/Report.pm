@@ -43,7 +43,7 @@ use Switch::Back;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.121';
+$VERSION = '0.123';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -103,6 +103,9 @@ sub newretrieve
   my $precious = $dt{precious};
   my %inst = %{ $dt{inst} };
   my %dowhat = %{ $dt{dowhat} };
+
+  my $repfile = $dirfiles{repfile}; say $tee "IN RETRIEVE FROM DIRFILES \$repfile $repfile";
+
   #my $csim = $dt{csim};
 
   @{ $dirfiles{dones} } = uniq( @{ $dirfiles{dones} } );
@@ -111,39 +114,13 @@ sub newretrieve
   %inst = %{ $inst_ref }; # REASSIGNMENT!!!!!!
 
 
-
-  my @simcases = @{ $dirfiles{simcases} }; ######
-  my @simstruct = @{ $dirfiles{simstruct} }; ######
-  my @morphcases = @{ $dirfiles{morphcases} };
-  my @morphstruct = @{ $dirfiles{morphstruct} };
-  my @retcases = @{ $dirfiles{retcases} };
-  my @retstruct = @{ $dirfiles{retstruct} };
-  my @repcases = @{ $dirfiles{repcases} };
-  my @repstruct = @{ $dirfiles{repstruct} };
-  my @mergecases = @{ $dirfiles{mergecases} };
-  my @mergestruct = @{ $dirfiles{mergestruct} };
-  my @descendcases = @{ $dirfiles{descendcases} };
-  my @descendstruct = @{ $dirfiles{descendstruct} };
-
-  my $morphlist = $dirfiles{morphlist};
-  my $morphblock = $dirfiles{morphblock};
-  my $simlist = $dirfiles{simlist};
-  my $simblock = $dirfiles{simblock};
-  my $retlist = $dirfiles{retlist};
-  my $retblock = $dirfiles{retblock};
-  my $replist = $dirfiles{replist};
-  my $repblock = $dirfiles{repblock};
-  my $descendlist = $dirfiles{descendlist};
-  my $descendblock = $dirfiles{descendblock};
-
-
   my %d = %{ $dt{instance} };
 
   my $countinstance = $d{instn}; #say $tee "HERE IN NEWRETRIEVE \$countinstance: " . dump( $countinstance );
   my $instn = $d{instn};
   my $countcase = $d{countcase}; #say $tee "HERE IN NEWRETRIEVE \$countcase: " . dump( $countcase );
   my $countblock = $d{countblock}; #say $tee "HERE IN NEWRETRIEVE \$countblock: " . dump( $countblock );
-  my %datastruc = %{ $d{datastruc} }; #say $tee "HERE IN NEWRETRIEVE \%datastruc: " . dump( \%datastruc );
+  my %incumbents = %{ $d{incumbents} }; #say $tee "HERE IN NEWRETRIEVE \%incumbents: " . dump( \%incumbents );
   my @varnumbers = @{ $d{varnumbers} };
   @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "HERE IN NEWRETRIEVE \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
@@ -157,11 +134,15 @@ sub newretrieve
   my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
-  my %notecases;
 
   my @winneritems = @{ $d{winneritems} }; #say $tee "HERE IN NEWRETRIEVE \@winneritems: " . dump( @winneritems );
   my $countvar = $d{countvar}; #say $tee "HERE IN NEWRETRIEVE \$countvar: " . dump( $countvar );
   my $countstep = $d{countstep}; #say $tee "HERE IN NEWRETRIEVE \$countstep: " . dump( $countstep );
+
+  #my $retlist = $dirfiles{retlist};####!!!
+  #my $retblock = $dirfiles{retblock};
+  #my $replist = $dirfiles{replist};
+  #my $repblock = $dirfiles{repblock};
 
   my %to = %{ $d{to} }; #say $tee "HERE IN NEWRETRIEVE \%to: " . dump( %to );
   #####my $thisto = $to{to}; #say $tee "\$thisto: $thisto";!!!!!
@@ -713,7 +694,13 @@ TTT
       }
       
       say $tee "IN RETRIEVE \$countinstance $countinstance";
-      my @resfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] };
+
+     if ( !@{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} } )
+      {
+        @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} } = ();
+      }
+      @{ $dirfiles{resfiles} } = @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} };
+      
       if ( $retrievedata{$counttool} )
       {
         if ( $tooltype eq "esp-r" )
@@ -755,9 +742,9 @@ TTT
                 $targetprov =~ s/$mypath\///;
                 my $result = "$mypath/" . "$targetprov";
 
-                open( RETLIST, ">>$retlist"); # or die;
+                #open( RETLIST, ">>$retlist"); # or die;
 
-                open( RETBLOCK, ">>$retblock"); # or die;
+                #open( RETBLOCK, ">>$retblock"); # or die;
 
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport];
                 @repdata = @$reportdata_ref; #say $tee "HERE REPDATA: " . dump( @repdata );
@@ -785,20 +772,26 @@ TTT
                   my $what = $datarep{what};
                   
                   say $tee "IN RETRIEVE2 \$countinstance $countinstance";
-                  $retstruct[$countcase][$countblock][ $countinstance ][$counttheme][$countreport][$countitem][$counttool] = $retfile;
-                  print RETBLOCK "$retfile\n";
 
-                  if ( not ($retfile ~~ @retcases ) )
+                  $dirfiles{retstruct}{$countcase}{$countblock}{$countinstance}{$counttheme}{$countreport}{$countitem}{$counttool} = $retfile;
+                  #print RETBLOCK "$retfile\n";
+
+                  if ( not ( $retfile ~~ @{ $dirfiles{retcases} } ) )
                   {
-                    push ( @retcases, $retfile );
-                    say RETLIST "$retfile";
+                    push ( @{ $dirfiles{retcases} }, $retfile );
+                    #say RETLIST "$retfile";
                   }  @miditers = Sim::OPT::washn( @miditers );
                   
                   
                   say $tee "IN RETRIEVE3 \$countinstance $countinstance";
-                  if ( not ( $retfile ~~ @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
+
+                  if ( not ( $retfile ~~ @{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } ) )
                   {
-                    push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ,
+                    if ( !@{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } )
+                    {
+                      @{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } = ();
+                    }
+                    push ( @{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } ,
                       {
                         retfile => $retfile,
                         reporttitle => $reporttitle,
@@ -835,7 +828,7 @@ TTT
                     }
                     elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) or  ( $themereport eq "dhs"  ) or ( $themereport eq "surfflow"  )) )
                     {
-                      say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, $shortresfile. \@retrdata @retrdata, \$reporttitle $reporttitle, \$themereport $themereport, \$counttheme $counttheme, \$countrep$shortresfile, ort $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2, \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines, \$howmuch $howmuch, \$where $where, \$what $what";
+                      #say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, $shortresfile. \@retrdata @retrdata, \$reporttitle $reporttitle, \$themereport $themereport, \$counttheme $counttheme, \$countrep$shortresfile, ort $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2, \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines, \$howmuch $howmuch, \$where $where, \$what $what";
                       retrieve_stats_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme,
                             $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines, $howmuch, $where, $what );
                     }
@@ -862,8 +855,8 @@ TTT
         elsif ( ( $tooltype eq "generic" ) or ( $tooltype eq "energyplus" ) )
         {  #use warnings; use strict;
 
-          my @retfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] };
-          $retstruct[$countcase][$countblock][$countinstance][$counttool]  = $simstruct[$countcase][$countblock][$countinstance][$counttool] ;
+          @{ $dirfiles{retfiles} } = @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} };
+          $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool}  = $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} ;
           my $counttheme = 0;
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
           {
@@ -883,17 +876,17 @@ TTT
               {
                 @retrdata = @$retrievedataref;
 
-                open( RETLIST, ">>$retlist"); # or die;
-                open( RETBLOCK, ">>$retblock"); # or die;
+                #open( RETLIST, ">>$retlist"); # or die;
+                #open( RETBLOCK, ">>$retblock"); # or die;
 
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport];
                 @repdata = @$reportdata_ref;
-                @retcases = uniq( @retcases );
+                @{ $dirfiles{retcases} } = uniq( @{ $dirfiles{retcases} } );
                 my $retfile = $resfile;
-                if ( not ($retfile ~~ @retcases ) )
+                if ( not ($retfile ~~ @{ $dirfiles{retcases} } ) )
                 {
-                  push ( @retcases, $retfile );
-                  say RETLIST "$retfile";
+                  push ( @{ $dirfiles{retcases} }, $retfile );
+                  #say RETLIST "$retfile";
                 }
                 my @provbag;
 
@@ -916,24 +909,28 @@ TTT
                   my $column = $datarep{column};
                   my $reportstrategy = $datarep{reportstrategy};
 
-                  print RETBLOCK "$retfile\n";
+                  #print RETBLOCK "$retfile\n";
 
-                  push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ,
-                                    {
-                                      retfile => $retfile,
-                                      reporttitle => $reporttitle,
-                                      themereport => $themereport,
-                                      semaphorego => $semaphorego,
-                                      semaphorego1 => $semaphorego1,
-                                      semaphorego2 => $semaphorego2,
-                                      semaphorestop => $semaphorestop,
-                                      semaphorestop1 => $semaphorestop1,
-                                      semaphorestop2 => $semaphorestop2,
-                                      textpattern => $textpattern,
-                                      afterlines => $afterlines,
-                                      column => $column,
-                                      reportstrategy => $reportstrategy,
-                                    } );
+                  if ( !@{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } )
+                  {
+                    @{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } = ();
+                  }
+                  push ( @{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } ,
+                    {
+                      retfile => $retfile,
+                      reporttitle => $reporttitle,
+                      themereport => $themereport,
+                      semaphorego => $semaphorego,
+                      semaphorego1 => $semaphorego1,
+                      semaphorego2 => $semaphorego2,
+                      semaphorestop => $semaphorestop,
+                      semaphorestop1 => $semaphorestop1,
+                      semaphorestop2 => $semaphorestop2,
+                      textpattern => $textpattern,
+                      afterlines => $afterlines,
+                      column => $column,
+                      reportstrategy => $reportstrategy,
+                    } );
                   say $tee "IN RETRIEVE WORKING FOR \$resfile $resfile at iteration $countinstance";
                   $countitem++;
                 }
@@ -958,8 +955,8 @@ TTT
   #print $tee "rm -f $mypath/*.par\n";
   close OUTFILE;
   close TOFILE;
-  close RETLIST;
-  close RETBLOCK;
+  #close RETLIST;
+  #close RETBLOCK;
   
 
   if ( $dowhat{neweraseres} eq "y" )
@@ -977,7 +974,7 @@ TTT
     }
   }
 
-  return ( \@retcases, \@retstruct, \@notecases );
+  return ( \%dirfiles );
 }  # END SUB NEWRETRIEVE
 
 
@@ -1012,9 +1009,9 @@ sub newreport # This function retrieves the results of interest from the texts f
   my @base_columns = @main::base_columns;
   my @maketabledata = @main::maketabledata;
   my @filter_columns = @main::filter_columns;
-  my %notecases = %main::notecases;
   my $winline;
   my @winbag;
+  my $instant;
 
 	if ( $tofile eq "" )
 	{
@@ -1026,6 +1023,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   say $tee "\nNow in Sim::OPT::Report::newreport\n";
 
   my %dt = %{ $_[0] };
+  
 
   my %dirfiles = %{ $dt{dirfiles} };
   my $resfile = $dt{resfile}; #say $tee "BEGINNING REPORT: RESFILE $resfile";
@@ -1034,45 +1032,20 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $precious = $dt{precious};
   my %inst = %{ $dt{inst} };
 
+
+
   my %dowhat = %{ $dt{dowhat} };
   my $postproc = $dt{postproc};
   #my $csim = $dt{csim};
 
-  my @simcases = @{ $dirfiles{simcases} };
-  my @simstruct = @{ $dirfiles{simstruct} };
-  my @INREPORT = @{ $dirfiles{morphcases} };
-  my @morphstruct = @{ $dirfiles{morphstruct} };
-  my @retcases = @{ $dirfiles{retcases} };
-  my @retstruct = @{ $dirfiles{retstruct} };
-  my @repcases = @{ $dirfiles{repcases} };
-  my @repstruct = @{ $dirfiles{repstruct} };
-  my @mergecases = @{ $dirfiles{mergecases} };
-  my @mergestruct = @{ $dirfiles{mergestruct} };
-  my @descendcases = @{ $dirfiles{descendcases} };
-  my @descendstruct = @{ $dirfiles{descendstruct} };
-  my @notecases = @{ $dirfiles{notecases} };
-  my $repfile = $dirfiles{repfile};
-
-  my $morphlist = $dirfiles{morphlist};
-  my $morphblock = $dirfiles{morphblock};
-  my $simlist = $dirfiles{simlist};
-  my $simblock = $dirfiles{simblock};
-  my $retlist = $dirfiles{retlist};
-  my $retblock = $dirfiles{retblock};
-  my $replist = $dirfiles{replist};
-  my $repblock = $dirfiles{repblock};
-  my $descendlist = $dirfiles{descendlist};
-  my $descendblock = $dirfiles{descendblock};
-
+  
   my %d = %{ $dt{instance} };
 
   my $countcase = $d{countcase};
   my $countblock = $d{countblock};
-  my %datastruc = %{ $d{datastruc} }; ######
+  my %incumbents = %{ $d{incumbents} }; ######
   my $countinstance = $d{instn};
 
-  my @simcases = @{ $d{simcases} }; #####
-  my @simstruct = @{ $d{simstruct} }; ######
   my $c = $d{c};
   my $fire = $d{fire};
   my $stamp = $d{stamp};
@@ -1094,10 +1067,17 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $is = $d{is};
   my $double;
 
+  if ( !$dirfiles{repfile} )
+  {
+    $dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv";
+  }
+  my $repfile = $dirfiles{repfile}; say $tee "IN REPORT FROM DIRFILES \$repfile $repfile";
+
+
   if ( $fire eq "y" )
   {
     $double = $repfile;
-    $repfile = $dirfiles{repfile} . "-fire-$stamp.csv";
+    $repfile = $repfile . "-fire-$stamp.csv";
   }
 
   my $origin = $d{origin};
@@ -1123,10 +1103,12 @@ sub newreport # This function retrieves the results of interest from the texts f
   my ( @repfilemem, @linecontent, @convey );
   $" = " ";
 
+  my $bring;
+
   say $tee "#Processing reports for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1);
 
-  open( REPLIST, ">>$replist" ) or die( "$!" );
-  open( REPBLOCK, ">>$repblock" ) or die( "$!" );
+  #open( REPLIST, ">>$replist" ) or die( "$!" );
+  #open( REPBLOCK, ">>$repblock" ) or die( "$!" );
 
   my $divert;
   if ( $dirfiles{launching} eq "y" )
@@ -1135,20 +1117,28 @@ sub newreport # This function retrieves the results of interest from the texts f
     $divert = $repfile . ".revealnum.csv";
     open( DIVERT, ">>$divert") or die "Can't open $repfile $!";
   }
-
-  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!";
-  @repcases = uniq( @repcases );
-
-  say REPBLOCK "$repfile";
-  if ( not ( $repfile ~~ @repcases ) )
+  
+  if ( $dowhat{dumpfiles} eq "y" )
   {
-    push ( @repcases, $repfile );
-    say REPLIST "$repfile";
+    open( REPFILE, ">>$repfile") or die "Can't open $repfile $!";
   }
   
-  if ( not ( $repfile ~~ @{ $repstruct[$countcase][$countblock] } ) )
+  @{ $dirfiles{repcases} } = uniq( @{ $dirfiles{repcases} } );
+
+  #say REPBLOCK "$repfile";
+  if ( not ( $repfile ~~ @{ $dirfiles{repcases} } ) )
   {
-    push ( @{ $repstruct[$countcase][$countblock] }, $repfile );
+    push ( @{ $dirfiles{repcases} }, $repfile );
+    #say REPLIST "$repfile";
+  }
+  
+  if ( not ( $repfile ~~ @{ $dirfiles{repstruct}{$countcase}{$countblock} } ) )
+  {
+    if ( !@{ $dirfiles{repstruct}{$countcase}{$countblock} } )
+    {
+      @{ $dirfiles{repstruct}{$countcase}{$countblock} } = ();
+    }
+    push ( @{ $dirfiles{repstruct}{$countcase}{$countblock} }, $repfile );
   }
   my $signalnewinstance = 1;
 
@@ -1199,11 +1189,17 @@ sub newreport # This function retrieves the results of interest from the texts f
 
     if ( $fire eq "y" )
     {
-      open( REPFILE, ">$repfile" );
+      if ( $dowhat{dumpfiles} eq "y" )
+      {
+        open( REPFILE, ">$repfile" );
+      }
     }
     elsif ( $dowhat{reportbasics} eq "y" )
     {
-      open( REPFILE, ">>$repfile" );
+      if ( $dowhat{dumpfiles} eq "y" )
+      {
+          open( REPFILE, ">>$repfile" );
+      }
     }
 
     print REPFILE "$result\n";
@@ -1216,7 +1212,6 @@ sub newreport # This function retrieves the results of interest from the texts f
   elsif ( ( ( $fire eq "" ) or ( $dowhat{reportbasics} eq "" ) ) and ( $precomputed eq "" ) ) #NEW, TAKE CARE.###########################
   {
     my $numberof_simtools = scalar( keys %{ $dowhat{simtools} } );
-    #my @mergestruct;
     my $counttool = 1;
     while ( $counttool <= $numberof_simtools )
     {
@@ -1225,7 +1220,8 @@ sub newreport # This function retrieves the results of interest from the texts f
       {
         say $tee "IN REPORT \$countinstance $countinstance";
         my $tooltype = $dowhat{simtools}{$counttool};
-        foreach $ret_ref ( ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
+        
+        foreach $ret_ref ( @{ $dirfiles{notecases}{$countcase}{$countblock}{$counttool}{$countinstance} } )
         {
           %retitem = %$ret_ref;
           my $retfile = $retitem{retfile}; say $tee "IN NEWREPORT 1 \$retfile $retfile";
@@ -1245,7 +1241,12 @@ sub newreport # This function retrieves the results of interest from the texts f
           if ( $signalnewinstance == 1 )
           {
             say $tee "IN REPORT2 \$countinstance $countinstance";
-            push ( @{ $mergestruct[$countcase][$countblock][$countinstance] }, "$retfile " );
+
+            if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+            {
+              @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+            }
+            push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$retfile " );
             $signalnewinstance--;
           }
 
@@ -1264,10 +1265,10 @@ sub newreport # This function retrieves the results of interest from the texts f
             my $countlin = 0;
             my $countli = 0;
 
-	    if ( $dowhat{simplifiedreport} eq "y" )
+	          if ( $dowhat{simplifiedreport} eq "y" )
             {
-	      say $tee "EXECUTING ON simplifiedreport. Now looking for _ $textpattern _ in $retfile.";
-	    }
+	            say $tee "EXECUTING ON simplifiedreport. Now looking for _ $textpattern _ in $retfile.";
+	          }
 
             foreach my $line ( @lines )
             {
@@ -1340,11 +1341,19 @@ sub newreport # This function retrieves the results of interest from the texts f
                     say $tee "IN REPORT3 \$countinstance $countinstance";
                     unless ( $reportstrategy eq "new" )
                     {
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
+                      if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                      {
+                        @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                      }
+                      push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$line" );
                     }
                     else
                     { say $tee "NEWSTRATEGY";
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$elt" );
+                      if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                      {
+                        @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                      }
+                      push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$elt" );
                     }
                   }
                   else
@@ -1352,11 +1361,15 @@ sub newreport # This function retrieves the results of interest from the texts f
                     say $tee "IN REPORT4 \$countinstance $countinstance";
                     unless ( $reportstrategy eq "new" )
                     {
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                      if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                      {
+                        @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                      }
+                      push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, $line );
                     }
                     else
                     { say $tee "NEWSTRATEGY";
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $elt );
+                      push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, $elt );
                     }
                   }
                   $foundhit++;
@@ -1378,11 +1391,19 @@ sub newreport # This function retrieves the results of interest from the texts f
                     {
                       unless ( $reportstrategy eq "new" )
                       {
-                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
+                        if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                        {
+                          @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                        }
+                        push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$line" );
                       }
                       else
                       {
-                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$elt" );
+                        if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                        {
+                          @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                        }
+                        push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$elt" );
                       }
                       $countli++;
                     }
@@ -1417,22 +1438,38 @@ sub newreport # This function retrieves the results of interest from the texts f
                           {
                             unless ( $reportstrategy eq "new" )
                             {
-                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
+                              if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                              {
+                                @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                              }
+                              push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$line" );
                             }
                             else
                             {
-                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$elt" );
+                              if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                              {
+                                @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                              }
+                              push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, "$elt" );
                             }
                           }
                           else
                           {
                             unless ( $reportstrategy eq "new" )
                             {
-                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                              if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                              {
+                                @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                              }
+                              push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, $line );
                             }
                             else
                             {
-                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $elt );
+                              if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+                              {
+                                @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+                              }
+                              push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, $elt );
                             }
                           }
                         }
@@ -1458,10 +1495,11 @@ sub newreport # This function retrieves the results of interest from the texts f
 
     unless ( $dowhat{inactivateret} eq "y" )
     {
+      my $string;
       my $count = 0;
       say $tee "IN REPORT5 \$countinstance $countinstance";
-      foreach my $thing ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] } )
-      { #say $tee "IN REPORT looking into \$mergestruct $mergestruct \$countcase $countcase \$countblock $countblock \$countinstance $countinstance ";
+      foreach my $thing ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+      { 
         chomp $thing; 
         $thing =~ s/\s+/,/g ; #say $tee "IN REPORT \$thing $thing ";
         if ( $count == 0 )
@@ -1477,15 +1515,27 @@ sub newreport # This function retrieves the results of interest from the texts f
           }
         }
         push ( @winbag, $thing );
+
+        $string = $string . $thing;
         print REPFILE $thing;
-        print REPFILE ",";
+        
+        unless ( $count == $#{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+        {
+          $string = $string . ",";
+          print REPFILE ",";
+        }
+
         if ( $dirfiles{launching} eq "y" )
         {
           print DIVERT $thing;
-          print DIVERT ",";
+          unless ( $count == $#{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+          {
+            print DIVERT ",";
+          }
         }
         $count++;
       }
+      
       print REPFILE "\n";
       if ( $dirfiles{launching} eq "y" )
       {
@@ -1513,9 +1563,15 @@ sub newreport # This function retrieves the results of interest from the texts f
         shift( @row );
         unshift( @row, $cleanto );
         $line = join( ",", @row );
-        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+
+        if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+        {
+          @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+        }
+        push ( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} }, $line );
         push( @box, $line );
         $winline = $line;
+
         last;
       }
     }
@@ -1544,7 +1600,12 @@ sub newreport # This function retrieves the results of interest from the texts f
     `rm -f $mypath/*.grt` ;
     #print $tee "rm -f $mypath/*.grt";
   }
-  if (not( -e $repfile ) ){ die; };
+
+  if ( ( $dowhat{dumpfiles} eq "y" ) and (not( -e $repfile ) ) )
+  {
+    die;
+  }
+  
 
   if ( $dirfiles{launching} eq "y" )
   {
@@ -1552,16 +1613,54 @@ sub newreport # This function retrieves the results of interest from the texts f
     next;
   }
 
+
+  say $tee "IN REPORT \@{ \$dirfiles{mergestruct}{\$countcase}{\$countblock}{\$countinstance} } " . dump( @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } );
+  
+  if ( !@{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } )
+  {
+    @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} } = ();
+  }
+  my @elts = @{ $dirfiles{mergestruct}{$countcase}{$countblock}{$countinstance} };
+  my @bag;
+  foreach my $elt ( @elts )
+  {
+    $elt =~ s/,?//;
+    $elt =~ s/,?//;
+    push( @bag, $elt );
+  }
+  my $newln = join( ",", @bag );
+  
+  my $rid = Sim::OPT::instid( $newln, $file ); say $tee "IN REPORT \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+  if ( defined($rid) and $rid ne "" )
+  {
+    $dirfiles{reps}{$rid} = $newln; say $tee "IN REPORT  \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps2}{$rid} );# NOT $repfile
+    
+    if ( !@{ $dirfiles{repsblocks}{$countcase}{$countblock} } )
+    {
+      @{ $dirfiles{repsblocks}{$countcase}{$countblock} } = ();
+    }
+    push ( @{ $dirfiles{repsblocks}{$countcase}{$countblock} }, $newln ); #!!!!!
+
+    $dirfiles{repsingles}{$countcase}{$countblock}{$countinstance} = $newln; #!!!!!
+    
+    $instant = $newln; #!!!!!
+    $dirfiles{instant} = $newln; #!!!!!
+  }
+
+
   if ( $precious eq "" )
   {
-    return ( \@repcases, \@repstruct, $repfile, \@mergestruct, \@mergecases );
+    return ( \%dirfiles, $instant );
   }
   else
   {
     if ( $precomputed eq "" )
     {
+      #say $tee "RETURNING $newln";
+      #$dirfiles{instant} = $newln;
       say $tee "RETURNING $winbag[-1]";
-      return ( $winbag[-1] );
+      $dirfiles{instant} = $winbag[-1];
+      return ( \%dirfiles, $instant );
     }
     else
     {
@@ -1570,7 +1669,8 @@ sub newreport # This function retrieves the results of interest from the texts f
       $winline =~ s/(,+)$// ;
       my @elts = split( ",", $winline );
       say $tee "RETURNING $elts[-1]";
-      return ( $elts[-1] );
+      $dirfiles{instant} = $elts[-1];
+      return ( \%dirfiles, $instant );
     }
   }
 } # END SUB NEWREPORT;

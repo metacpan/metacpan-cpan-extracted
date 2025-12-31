@@ -34,6 +34,23 @@ is( scalar keys %$params,    0,                            'No patroni params ex
 is( $clean_dsn,             'dbname=test',                             'DSN with comma-separated URLs' );
 is( $params->{patroni_url}, 'http://a:8008/cluster,http://b:8008/cluster', 'comma-separated URLs preserved' );
 
+# Test _build_dsn function
+my $dsn;
+$dsn = DBD::Patroni::_build_dsn( 'dbname=test', 'newhost', 5433 );
+is( $dsn, 'dbname=test;host=newhost;port=5433', '_build_dsn adds host and port' );
+
+$dsn = DBD::Patroni::_build_dsn( 'dbname=test;host=oldhost;port=5432', 'newhost', 5433 );
+is( $dsn, 'dbname=test;host=newhost;port=5433', '_build_dsn replaces existing host/port' );
+
+$dsn = DBD::Patroni::_build_dsn( 'host=oldhost;dbname=test;port=5432', 'newhost', 5433 );
+is( $dsn, 'dbname=test;host=newhost;port=5433', '_build_dsn handles host/port at start' );
+
+$dsn = DBD::Patroni::_build_dsn( 'dbname=test;;', 'newhost', 5433 );
+is( $dsn, 'dbname=test;host=newhost;port=5433', '_build_dsn cleans up multiple semicolons' );
+
+$dsn = DBD::Patroni::_build_dsn( ';dbname=test;', 'newhost', 5433 );
+is( $dsn, 'dbname=test;host=newhost;port=5433', '_build_dsn cleans leading/trailing semicolons' );
+
 # Test _is_readonly function
 is( DBD::Patroni::_is_readonly('SELECT * FROM users'), 1,
     'SELECT is readonly' );

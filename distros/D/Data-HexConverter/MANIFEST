@@ -7,6 +7,8 @@ Makefile.PL
 make-dist.mk
 probe_isa.c
 benchmark.pl
+benchmark.sh
+TEST.md
 benchmark-multiline.pl
 benchmark.c
 benchmark-multiline.c

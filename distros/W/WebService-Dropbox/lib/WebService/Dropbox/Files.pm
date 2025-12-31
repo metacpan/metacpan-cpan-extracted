@@ -51,6 +51,34 @@ sub delete {
     });
 }
 
+# https://www.dropbox.com/developers/documentation/http/documentation#files-delete_batch
+sub delete_batch {
+    my ($self, $paths) = @_;
+
+    my $params = {
+        entries => [map {+{path => $_}} @$paths],
+    };
+
+    $self->api({
+        url => 'https://api.dropboxapi.com/2/files/delete_batch',
+        params => $params,
+    });
+}
+
+# https://www.dropbox.com/developers/documentation/http/documentation#files-delete_batch-check
+sub delete_batch_check {
+    my ($self, $job_id) = @_;
+
+    my $params = {
+        async_job_id => $job_id,
+    };
+
+    $self->api({
+        url => 'https://api.dropboxapi.com/2/files/delete_batch/check',
+        params => $params,
+    });
+}
+
 # https://www.dropbox.com/developers/documentation/http/documentation#files-download
 sub download {
     my ($self, $path, $output, $opts) = @_;

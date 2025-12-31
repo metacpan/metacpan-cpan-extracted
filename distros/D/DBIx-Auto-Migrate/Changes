@@ -1,0 +1,12 @@
+0.1 Mon Dec 29 02:11:55 PM CET 2025
+	- Initial version
+0.2 Mon Dec 29 04:04:30 PM CET 2025
+	- Fixing multiple typos in docs.
+0.3 Mon Dec 29 06:08:52 PM CET 2025
+	- Fixing extra typo in the docs
+0.4 Mon Dec 29 06:53:18 PM CET 2025
+	- Adding an example project using this code.
+0.5 Tue Dec 30 08:43:48 PM CET 2025
+	- DBD::Pg is needed for tests.
+0.6 Wed Dec 31 07:03:22 AM CET 2025
+	- Skipping tests if no postgresql

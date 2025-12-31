@@ -1,0 +1,33 @@
+# Avoid version control files
+\B\.git\b
+\B\.gitignore\b
+^\.github/
+^docker/
+
+# Avoid IDE/editor files
+\.vscode\b
+\.claude\b
+\.idea\b
+~$
+\.swp$
+\.swo$
+
+# Avoid build artifacts
+^MYMETA\.
+^Makefile$
+^blib/
+^pm_to_blib$
+^blibdirs\.ts$
+
+# Avoid backup files
+\.bak$
+\.old$
+\.orig$
+
+# Avoid temp files
+\.tmp$
+\.temp$
+
+# Avoid OS files
+\.DS_Store$
+Thumbs\.db$

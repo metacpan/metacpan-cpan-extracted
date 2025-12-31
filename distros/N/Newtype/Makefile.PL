@@ -26,8 +26,9 @@ my $meta = {
                                            "perl"                 => 5.014,
                                            "Sub::HandlesVia"      => 0.045,
                                            "Sub::Util"            => "1.40",
+                                           "Type::Registry"       => "2.000000",
                                            "Type::Tiny::Class"    => "2.000000",
-                                           "Types::Common"        => "2.000000",
+                                           "Types::Common"        => "2.00000",
                                          },
                                        },
                           test      => {
@@ -37,12 +38,11 @@ my $meta = {
                                            "Test2::Require::Module" => 0,
                                            "Test2::Tools::Spec" => 0,
                                            "Test2::V0" => 0,
-                                           "Type::Registry" => "2.000000",
                                            "Types::Common" => "2.000000",
                                          },
                                        },
                         },
-  "provides"         => { Newtype => { file => "lib/Newtype.pm", version => 0.001 } },
+  "provides"         => { Newtype => { file => "lib/Newtype.pm", version => "0.002000" } },
   "release_status"   => "stable",
   "resources"        => {
                           bugtracker   => { web => "https://github.com/tobyink/p5-newtype/issues" },
@@ -55,7 +55,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Newtype/project",
                         },
-  "version"          => 0.001,
+  "version"          => "0.002000",
   "x_static_install" => 1,
 };
 

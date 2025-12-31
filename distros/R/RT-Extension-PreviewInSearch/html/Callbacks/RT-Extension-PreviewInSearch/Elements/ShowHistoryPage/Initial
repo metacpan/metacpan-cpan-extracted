@@ -1,0 +1,13 @@
+<%ARGS>
+$ARGSRef
+</%ARGS>
+<%INIT>
+my $ShowHistory = RT->Config->Get("ShowHistory", $session{'CurrentUser'});
+if ($ShowHistory eq "scroll") {
+    # if scrolling history the paths assume you are on Ticket/Display.html
+    # eg AttachmentPath is set to Attachment instead of the full path
+    # this means the paths do not work for the search preview
+    # fix the paths to be full paths so they work
+    $ARGSRef->{PathPrefix} = RT->Config->Get('WebPath') . '/Ticket/';
+}
+</%INIT>

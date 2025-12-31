@@ -14,7 +14,7 @@ use WebService::Dropbox::Files::UploadSession;
 use WebService::Dropbox::Sharing;
 use WebService::Dropbox::Users;
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 __PACKAGE__->mk_accessors(qw/
     timeout
@@ -565,6 +565,26 @@ A successful response indicates that the file or folder was deleted. The returne
     my $result = $dropbox->delete($path);
 
 L<https://www.dropbox.com/developers/documentation/http/documentation#files-delete>
+
+=head3 delete_batch($paths)
+
+Delete the files or folders at a list of given paths. The list is provided as the first arg in an arrayref.
+
+A successful response indicates that the files or folders were queued for async deletion. The returned object will include the async_job_id.
+
+    my $result = $dropbox->delete_batch($paths);
+
+L<https://www.dropbox.com/developers/documentation/http/documentation#files-delete_batch>
+
+=head3 delete_batch_check($async_job_id)
+
+Fetch the status of a asynchronous job for a delete_batch call.
+
+Returns a status tag .tag with possible values 'in_progress', 'complete' and 'failed'. If success, also returns list of result for each entry.
+
+    my $result = $dropbox->delete_batch_check($async_job_id);
+
+L<https://www.dropbox.com/developers/documentation/http/documentation#files-delete_batch-check>
 
 =head3 download($path, $output [, \%opts])
 

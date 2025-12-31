@@ -123,6 +123,7 @@ t/20-modules/Type-Coercion-FromMoose/basic.t
 t/20-modules/Type-Coercion-FromMoose/errors.t
 t/20-modules/Type-Coercion-Union/basic.t
 t/20-modules/Type-Coercion/basic.t
+t/20-modules/Type-Coercion/check-coerce.t
 t/20-modules/Type-Coercion/esoteric.t
 t/20-modules/Type-Coercion/frozen.t
 t/20-modules/Type-Coercion/inlining.t
@@ -176,9 +177,11 @@ t/20-modules/Type-Params/v2-defaults.t
 t/20-modules/Type-Params/v2-delayed-compilation.t
 t/20-modules/Type-Params/v2-exceptions.t
 t/20-modules/Type-Params/v2-fallback.t
+t/20-modules/Type-Params/v2-hooks.t
 t/20-modules/Type-Params/v2-listtonamed.t
 t/20-modules/Type-Params/v2-multi.t
 t/20-modules/Type-Params/v2-named-backcompat.t
+t/20-modules/Type-Params/v2-named-methods.t
 t/20-modules/Type-Params/v2-named-plus-slurpy.t
 t/20-modules/Type-Params/v2-named.t
 t/20-modules/Type-Params/v2-positional-backcompat.t
@@ -186,6 +189,9 @@ t/20-modules/Type-Params/v2-positional-plus-slurpy.t
 t/20-modules/Type-Params/v2-positional.t
 t/20-modules/Type-Params/v2-returns.t
 t/20-modules/Type-Params/v2-shortcuts.t
+t/20-modules/Type-Params/v2-subname-custom.t
+t/20-modules/Type-Params/v2-subname-renamed.t
+t/20-modules/Type-Params/v2-subname-standard.t
 t/20-modules/Type-Params/v2-warnings.t
 t/20-modules/Type-Params/v2-wrap-inherited-method.t
 t/20-modules/Type-Params/wrap.t
@@ -193,6 +199,7 @@ t/20-modules/Type-Parser/basic.t
 t/20-modules/Type-Parser/moosextypes.t
 t/20-modules/Type-Registry/automagic.t
 t/20-modules/Type-Registry/basic.t
+t/20-modules/Type-Registry/lexical.t
 t/20-modules/Type-Registry/methods.t
 t/20-modules/Type-Registry/moosextypes.t
 t/20-modules/Type-Registry/mousextypes.t
@@ -245,6 +252,7 @@ t/20-modules/Type-Tiny-_HalfOp/extra-params.t
 t/20-modules/Type-Tiny-_HalfOp/overload-precedence.t
 t/20-modules/Type-Tiny/arithmetic.t
 t/20-modules/Type-Tiny/basic.t
+t/20-modules/Type-Tiny/check-coerce.t
 t/20-modules/Type-Tiny/cmp.t
 t/20-modules/Type-Tiny/coercion-modifiers.t
 t/20-modules/Type-Tiny/constraint-strings.t

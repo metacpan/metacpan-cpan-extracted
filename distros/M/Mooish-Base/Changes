@@ -1,5 +1,8 @@
 Revision history for Mooish-Base
 
+1.002 - 2025-12-30
+	- Use the version of namespace::autoclean suggested by Moo docs
+
 1.001 - 2025-12-04
 	- Changed -standard flag to always import Moo, regardless of the environment
 

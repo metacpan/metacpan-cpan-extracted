@@ -1,5 +1,9 @@
 Changelog for Dist-Zilla-PluginBundle-CPANTesters
 
+0.003     2025-12-29 12:58:01-06:00 America/Chicago
+
+  - Fixed all the missing dependencies in this module.
+
 0.002     2025-06-01 10:36:08-05:00 America/Chicago
 
   - Added a clean up for the release tarballs after a release is cut

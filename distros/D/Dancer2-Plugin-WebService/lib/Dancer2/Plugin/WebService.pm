@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our $VERSION = '4.8.1';
+our $VERSION = '4.8.3';
 if ( $^O =~/(?i)MSWin/ ) { CORE::warn "\nOperating system is not supported\n"; CORE::exit 1 }
 
 use strict;
@@ -206,11 +206,11 @@ closedir DIR;
 print STDOUT "\n";
 
 
-#print Dumper( $app ) ;exit;
-#print Dumper( $plg->config->{Routes} ) ;exit;
-#print Dumper( $plg->auth_config )      ;exit;
-#print Dumper  \%TokenDB; exit;
-#print "---------\n*".  $plg->dir_session  ."*\n---------\n";
+#print STDERR Dumper( $app ) ;exit;
+#print STDERR Dumper( $plg->config->{Routes} ) ;exit;
+#print STDERR Dumper( $plg->auth_config )      ;exit;
+#print STDERR Dumper  \%TokenDB; exit;
+#print STDERR "---------\n*".  $plg->dir_session  ."*\n---------\n";
 
 ## Catch hard errors 
 #  $app->add_hook(
@@ -388,11 +388,18 @@ print STDOUT "\n";
     }
 
 	# Check if the user is member to all the Groups of the route
+  $tmp=0;
 
     foreach (@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) {
 
-      unless (exists $TokenDB{ $plg->token }->{control}->{groups}->{$_} ) {
-      $plg->error('Required route groups are '. join(',',@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) .' your groups are '. join(',', sort keys %{$TokenDB{ $plg->token }->{control}->{groups}})); $plg->reply
+      if (exists $TokenDB{ $plg->token }->{control}->{groups}->{$_} ) {
+      $tmp=1;
+      last
+      }
+
+      unless ($tmp) {
+      $plg->error('Required route groups are '. join(',',@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) .' your groups are '. join(',', sort keys %{$TokenDB{ $plg->token }->{control}->{groups}}));
+      $plg->reply
       }
     }
 
@@ -756,29 +763,33 @@ my $plg=shift;
     if (defined $plg->token) {
   
       if ( ! exists $TokenDB{ $plg->token } ) {
-      $plg->error('Invalid token'); $plg->reply
+      $plg->error('Invalid token');
+      $plg->reply
       }
     }
     else {
-    $plg->error('You need a token via login route for saving session data'); $plg->reply
+    $plg->error('You need a token via login route for saving session data');
+    $plg->reply
     }
   }
   else {
-  $plg->error('Sessions are disabled at application config.yml'); $plg->reply
+  $plg->error('Sessions are disabled at application config.yml');
+  $plg->reply
   }
 
 @_ = %{$_[0]} if (1 == @_) && ('HASH' eq ref $_[0]);
 @keys=();
 
+  # $_[$k] is the key
+  # $_[$v] is the value
   for (my ($k,$v)=(0,1); $k<$#_-(@_ % 2); $k+=2,$v+=2) {
   next if 'token' eq $_[$k];
   push @keys, $_[$k];
-  $tmp = Encode::decode 'utf8', $_[$k];
-
   $TokenDB{$plg->token}->{data}->{$tmp} = $_[$v];
 
-    unless ( Storable::lock_store ref $_[$v] ? $_[$v] : \$_[$v],  "$plg->{dir_session}/". $plg->token  ."/data/$tmp" ) {
-    $plg->error("Could not store session key $tmp because $!"); $plg->reply
+    unless ( Storable::lock_store ref $_[$v] ? $_[$v] : \$_[$v],  "$plg->{dir_session}/". $plg->token  ."/data/$_[$k]" ) {
+    $plg->error("Could not store session key $_[$k] because $!");
+    $plg->reply
     }
 	}
 
@@ -800,30 +811,33 @@ my $plg	= shift;
     if (defined $plg->token) {
 
       if (! exists $TokenDB{$plg->token}) {
-      $plg->error('Invalid token'); $plg->reply
+      $plg->error('Invalid token');
+      $plg->reply
       }
     }
     else {
-    $plg->error('You need a token via login route for reading session data'); $plg->reply
+    $plg->error('You need a token via login route for reading session data');
+    $plg->reply
     }
   }
   else {
-  $plg->error('Sessions are disabled at application config.yml'); $plg->reply
+  $plg->error('Sessions are disabled at application config.yml');
+  $plg->reply
   }
 
 	if (0 == scalar @_) {
   # all records
-	map { Encode::encode('utf8',$_) , $TokenDB{$plg->token}->{data}->{$_}} keys %{$TokenDB{$plg->token}->{data}}
+	map { $_ , $TokenDB{$plg->token}->{data}->{$_}} keys %{$TokenDB{$plg->token}->{data}}
 	}
 	elsif ((1 == scalar @_)) {
   # one record
 
 		if ('ARRAY' eq ref $_[0]) {
 		# At new Perl versions hash slice  %{$TokenDB{ $plg->token }->{data}}{@{$_[0]}}
-    map { exists $TokenDB{$plg->token}->{data}->{$_} ? ( Encode::encode('utf8',$_) , $TokenDB{$plg->token}->{data}->{$_} ) : () } @{$_[0]}
+    map { exists $TokenDB{$plg->token}->{data}->{$_} ? ( $_ , $TokenDB{$plg->token}->{data}->{$_} ) : () } @{$_[0]}
 		}
 		else {
-         exists $TokenDB{$plg->token}->{data}->{$_[0]} ? ( Encode::encode('utf8',$_[0]) , $TokenDB{$plg->token}->{data}->{$_[0]} ) : ()
+         exists $TokenDB{$plg->token}->{data}->{$_[0]} ? ( $_[0] , $TokenDB{$plg->token}->{data}->{$_[0]} ) : ()
 		}
 	}
 	else {
@@ -850,15 +864,18 @@ my $plg	= shift;
     if (defined $plg->token) {
 
       if ( ! exists $TokenDB{$plg->token} ) {
-      $plg->error('Invalid token'); $plg->reply
+      $plg->error('Invalid token');
+      $plg->reply
       }
     }
     else {
-    $plg->error('You need a token via login route for deleting session data'); $plg->reply
+    $plg->error('You need a token via login route for deleting session data');
+    $plg->reply
     }
   }
   else {
-  $plg->error('Sessions are disabled at application config.yml'); $plg->reply
+  $plg->error('Sessions are disabled at application config.yml');
+  $plg->reply
   }
 
 $dir = $plg->dir_session.'/'.$plg->token;
@@ -868,11 +885,9 @@ $dir = $plg->dir_session.'/'.$plg->token;
   @_ = @{$_[0]} if (1 == @_) && ('ARRAY' eq ref $_[0]);
 
     foreach (@_) {
-    $_ = Encode::decode 'utf8', $_;
 
       if (exists $TokenDB{$plg->token}->{data}->{$_}) {
       delete     $TokenDB{$plg->token}->{data}->{$_};
-      $_ = Encode::encode 'utf8', $_;
       push @keys, $_;
       unlink "$dir/data/$_" if -f "$dir/data/$_"
       }
@@ -882,7 +897,6 @@ $dir = $plg->dir_session.'/'.$plg->token;
 
 		foreach (keys %{$TokenDB{$plg->token}->{data}}) {
     delete          $TokenDB{$plg->token}->{data}->{$_};
-    $_ = Encode::encode 'utf8', $_;
     push @keys, $_;
     unlink "$dir/data/$_" if -f "$dir/data/$_"
 		}
@@ -911,7 +925,7 @@ Dancer2::Plugin::WebService - Rest APIs with login, persistent data, multiple in
 
 =head1 VERSION
 
-version 4.8.1
+version 4.8.3
 
 =head1 SYNOPSIS
 
@@ -1088,12 +1102,7 @@ This file customize the I<application name>, I<version>, I<securrity>, I<routes>
   layout                  : main
   charset                 : UTF-8
   template                : template_toolkit
-  engines:
-    template:
-      template_toolkit:
-        EVAL_PERL         : 0
-        start_tag         : '<%'
-        end_tag           : '%>'
+  engines                 : {template: {template_toolkit: {EVAL_PERL: 0, start_tag: '[%', end_tag: '%]' }}}
   plugins:
     WebService:
       Session enable      : true

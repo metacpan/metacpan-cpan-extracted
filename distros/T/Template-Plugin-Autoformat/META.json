@@ -51,6 +51,6 @@
          "url" : "https://github.com/karpet/template-plugin-autoformat"
       }
    },
-   "version" : "2.78",
+   "version" : "2.79",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

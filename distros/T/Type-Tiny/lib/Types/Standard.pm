@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '2.008006';
+	$Types::Standard::VERSION   = '2.010000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -1282,6 +1282,10 @@ typeglobs and vstrings.)
 
 Other customers also bought: B<< StringLike >> from L<Types::TypeTiny>.
 
+Notice: future versions of Types::Standard might introduce
+coercions to B<Str> from B<< HasMethods['__TO_STRING__'] >> and
+from B<StringLike>.
+
 =item *
 
 B<< Num >>
@@ -1355,6 +1359,10 @@ length can be given:
 
 Other customers also bought: B<< ArrayLike >> from L<Types::TypeTiny>.
 
+Notice: future versions of Types::Standard might introduce
+coercions to B<ArrayRef> from B<< HasMethods['__TO_ARRAYREF__'] >> and
+from B<ArrayLike>.
+
 =item *
 
 B<< HashRef[`a] >>
@@ -1369,6 +1377,10 @@ constrain the hash values.
 
 Other customers also bought: B<< HashLike >> from L<Types::TypeTiny>.
 
+Notice: future versions of Types::Standard might introduce
+coercions to B<HashRef> from B<< HasMethods['__TO_HASHREF__'] >> and
+from B<HashLike>.
+
 =item *
 
 B<< CodeRef >>
@@ -1376,6 +1388,10 @@ B<< CodeRef >>
 A value where C<< ref($value) eq "CODE" >>.
 
 Other customers also bought: B<< CodeLike >> from L<Types::TypeTiny>.
+
+Notice: future versions of Types::Standard might introduce
+coercions to B<CodeRef> from B<< HasMethods['__TO_CODEREF__'] >> and
+from B<CodeLike>.
 
 =item *
 

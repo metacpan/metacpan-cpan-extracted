@@ -1,5 +1,9 @@
 Changes file for Net::Google::CivicInformation
 
+1.9901    2025-12-30 07:51:19-05:00 America/New_York
+
+  - First version of Net::Google::CivicInformation::Divisions
+
 1.03      2025-06-13 08:50:08-04:00 America/New_York
 
   - Deprecate Net::Google::CivicInformation::Representatives

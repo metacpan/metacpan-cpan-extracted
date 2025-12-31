@@ -270,6 +270,30 @@ my $result = $dropbox->delete($path);
 
 [https://www.dropbox.com/developers/documentation/http/documentation#files-delete](https://www.dropbox.com/developers/documentation/http/documentation#files-delete)
 
+### delete\_batch($paths)
+
+Delete the files or folders at a list of given paths. The list is provided as the first arg in an arrayref.
+
+A successful response indicates that the files or folders were queued for async deletion. The returned object will include the async\_job\_id.
+
+```perl
+my $result = $dropbox->delete_batch($paths);
+```
+
+[https://www.dropbox.com/developers/documentation/http/documentation#files-delete\_batch](https://www.dropbox.com/developers/documentation/http/documentation#files-delete_batch)
+
+### delete\_batch\_check($async\_job\_id)
+
+Fetch the status of a asynchronous job for a delete\_batch call.
+
+Returns a status tag .tag with possible values 'in\_progress', 'complete' and 'failed'. If success, also returns list of result for each entry.
+
+```perl
+my $result = $dropbox->delete_batch_check($async_job_id);
+```
+
+[https://www.dropbox.com/developers/documentation/http/documentation#files-delete\_batch-check](https://www.dropbox.com/developers/documentation/http/documentation#files-delete_batch-check)
+
 ### download($path, $output \[, \\%opts\])
 
 Download a file from a user's Dropbox.
@@ -711,7 +735,9 @@ my $result = $dropbox->get_space_usage;
 
 [https://www.dropbox.com/developers/documentation/http/documentation#users-get\_space\_usage](https://www.dropbox.com/developers/documentation/http/documentation#users-get_space_usage)
 
-### create\_shared\_link\_with\_settings(\$path, \$settings)
+## Sharing
+
+### create\_shared\_link\_with\_settings($path, $settings)
 
 Create a shared link with custom settings. If no settings are given then the default visibility is RequestedVisibility.public (The resolved visibility, though, may depend on other aspects such as team and shared folder settings).
 
@@ -721,11 +747,11 @@ my $result = $dropbox->create_shared_link_with_settings($path, $settings);
 
 [https://www.dropbox.com/developers/documentation/http/documentation#sharing-create\_shared\_link\_with\_settings](https://www.dropbox.com/developers/documentation/http/documentation#sharing-create_shared_link_with_settings)
 
-### list\_shared\_links(\$path)
+### list\_shared\_links($path)
 
 List shared links of this user.
 If no path is given, returns a list of all shared links for the current user. For members of business teams using team space and member folders, returns all shared links in the team member's home folder unless the team space ID is specified in the request header. For more information, refer to the Namespace Guide.
-If a non-empty path is given, returns a list of all shared links that allow access to the given path - direct links to the given path and links to parent folders of the given path. Links to parent folders can be suppressed by setting direct_only to true.
+If a non-empty path is given, returns a list of all shared links that allow access to the given path - direct links to the given path and links to parent folders of the given path. Links to parent folders can be suppressed by setting direct\_only to true.
 
 ```perl
 my $result = $dropbox->list_shared_links($path);
@@ -733,10 +759,10 @@ my $result = $dropbox->list_shared_links($path);
 
 [https://www.dropbox.com/developers/documentation/http/documentation#sharing-list\_shared\_links](https://www.dropbox.com/developers/documentation/http/documentation#sharing-list_shared_links)
 
-### modify\_shared\_link\_settings(\$path, \$settings, \$remove_expiration)
+### modify\_shared\_link\_settings($path, $settings, $remove\_expiration)
 
 Modify the shared link's settings.
-If the requested visibility conflict with the shared links policy of the team or the shared folder (in case the linked file is part of a shared folder) then the LinkPermissions.resolved_visibility of the returned SharedLinkMetadata will reflect the actual visibility of the shared link and the LinkPermissions.requested_visibility will reflect the requested visibility.
+If the requested visibility conflict with the shared links policy of the team or the shared folder (in case the linked file is part of a shared folder) then the LinkPermissions.resolved\_visibility of the returned SharedLinkMetadata will reflect the actual visibility of the shared link and the LinkPermissions.requested\_visibility will reflect the requested visibility.
 
 ```perl
 my $result = $dropbox->modify_shared_link_settings($path, $settings, $remove_expiration);
@@ -744,10 +770,10 @@ my $result = $dropbox->modify_shared_link_settings($path, $settings, $remove_exp
 
 [https://www.dropbox.com/developers/documentation/http/documentation#sharing-modify\_shared\_link\_settings](https://www.dropbox.com/developers/documentation/http/documentation#sharing-modify_shared_link_settings)
 
-### revoke\_shared\_link(\$url)
+### revoke\_shared\_link($url)
 
 Revoke a shared link.
-Note that even after revoking a shared link to a file, the file may be accessible if there are shared links leading to any of the file parent folders. To list all shared links that enable access to a specific file, you can use the list_shared_links with the file as the ListSharedLinksArg.path argument.
+Note that even after revoking a shared link to a file, the file may be accessible if there are shared links leading to any of the file parent folders. To list all shared links that enable access to a specific file, you can use the list\_shared\_links with the file as the ListSharedLinksArg.path argument.
 
 ```perl
 my $result = $dropbox->revoke_shared_link($url);

@@ -4,7 +4,7 @@ use warnings;
 
 package RT::Extension::PreviewInSearch;
 
-our $VERSION = '0.06';
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -25,9 +25,9 @@ ticket page.
 
 With the extension installed, perform your search, then click anywhere in the
 ticket row in the search results. The history for that ticket will be displayed
-at the bottom of the page. With RT 5, if you have inline edit enabled for
-some search fields, click anywhere outside the inline edit fields. You'll
-see the pencil icon appear if you are in an inline edit area.
+at the bottom of the page. If you have inline edit enabled for some search
+fields, click anywhere outside the inline edit fields. You'll see the pencil
+icon appear if you are in an inline edit area.
 
 To make it easier to see the ticket history with less scrolling, you can set
 the Rows per page setting on the search to a smaller number. A L</$SideBySidePreview>
@@ -35,7 +35,7 @@ mode is also available.
 
 =head1 RT VERSIONS
 
-Works with RT 4.2, 4.4, 5.0
+Works with RT 6.0. Install the latest 0.* version for older RTs.
 
 =head1 INSTALLATION
 
@@ -49,13 +49,7 @@ Works with RT 4.2, 4.4, 5.0
 
 May need root permissions
 
-=item Patch RT
-
-For RT 5 prior to 5.0.6, apply the patches:
-
-    patch -d /opt/rt5 -p1 < 0001-Add-ModifyPaths-Callback.patch
-
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -63,7 +57,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -79,6 +73,26 @@ Set this option to divide the search results page in half and
 display the selected ticket history on the right of search results.
 
     Set($SideBySidePreview, 1);
+
+=cut
+
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'PreviewInSearch',
+        Content => [
+            {
+                Name => 'SideBySidePreview',
+                Help => 'https://metacpan.org/pod/RT::Extension::PreviewInSearch#%24SideBySidePreview',
+            },
+        ],
+        Meta    => {
+            SideBySidePreview => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+        }
+    );
+}
 
 =head1 AUTHOR
 

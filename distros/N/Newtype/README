@@ -98,8 +98,11 @@ DESCRIPTION
         Counter, Hash, Number, Object, and String. Usually Newtype will be
         able to guess based on `inner` though.
 
+    `coerce`
+        See "Coercions" below.
+
   Creating values belonging to the newtype
-    When you import a newtype Foo, you import a function `Foo()` into your
+    When you import a newtype Foo, you import a function Foo() into your
     namespace. You can create instances of the newtype using:
 
       Foo( $inner_value )
@@ -114,13 +117,13 @@ DESCRIPTION
       my $ua = UA( HTTP::Tiny->new );
 
     *Note:* you also get `is_Foo`, `assert_Foo`, and `to_Foo` functions
-    imported! `is_Foo( $x )` checks if $x is a Foo object and returns a
-    boolean. `assert_Foo( $x )` does the same, but dies if it fails. `to_Foo(
-    $x )` attempts to coerce $x to a Foo object.
+    imported! is_Foo( $x ) checks if $x is a Foo object and returns a boolean.
+    assert_Foo( $x ) does the same, but dies if it fails. to_Foo( $x )
+    attempts to coerce $x to a Foo object.
 
   Integration with Moose, Mouse, and Moo
-    If your imported newtype is Foo, then calling `Foo()` with no arguments
-    will return a Type::Tiny type constraint for the newtype.
+    If your imported newtype is Foo, then calling Foo() with no arguments will
+    return a Type::Tiny type constraint for the newtype.
 
       use HTTP::Tiny;
       use Newtype UA => { inner => 'HTTP::Tiny' };
@@ -154,9 +157,32 @@ DESCRIPTION
     `MyNewtype->kind`
         The kind of delegation being used.
 
-    The object returned by `MyNewtype()` is also a Type::Tiny object, so you
-    can call any method from Type::Tiny, such as `MyNewtype->check( $value )`
-    or `MyNewtype->coerce( $value )`.
+    The object returned by MyNewtype() is also a Type::Tiny object, so you can
+    call any method from Type::Tiny, such as `MyNewtype->check( $value )` or
+    `MyNewtype->coerce( $value )`.
+
+  Coercions
+    It is possible to include some coercion definitions when importing
+    newtypes.
+
+      use Types::Common 'Num';
+      use Newtype
+        DegC => {
+          inner  => Num,
+          coerce => [ DegF => sub { DegC( ( $_ - 32 ) / 1.8 ) } ],
+        },
+        DegF => {
+          inner  => Num,
+          coerce => [ DegC => sub { DegF( ( $_ * 1.8 ) + 32 ) } ],
+        };
+  
+      # Both of these are 180 degrees Celsius.
+      my $x1 = DegC( 180 );
+      my $x2 = to_DegC( DegF( 356 ) );
+
+    The `coerce` arrayref is a list of type-coderef pairs, suitable for
+    passing to `add_type_coercions` from Type::Coercion. Any strings used as
+    types are assumed to be other newtypes being defined in the same import.
 
 EXAMPLES
   Using newtypes instead of named parameters

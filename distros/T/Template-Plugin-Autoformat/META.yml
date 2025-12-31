@@ -26,5 +26,5 @@ resources:
   homepage: https://github.com/karpet/template-plugin-autoformat
   license: http://dev.perl.org/licenses/
   repository: https://github.com/karpet/template-plugin-autoformat
-version: '2.78'
+version: '2.79'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

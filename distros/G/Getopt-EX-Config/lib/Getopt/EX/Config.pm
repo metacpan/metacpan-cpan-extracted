@@ -3,7 +3,7 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.0201';
 
 our $REPLACE_UNDERSCORE = 1;
 
@@ -33,6 +33,9 @@ sub new {
     for my $key (keys %$config) {
         $key =~ /^[a-zA-Z]/ or die "$key: config key must start with a letter\n";
     }
+    # Initialize internal keys for lock_keys compatibility
+    $config->{_argv} = [];
+    $config->{_configure} = [];
     my $caller = caller;
     $CONFIG{$caller} = bless $config, $class;
     $config;
@@ -71,6 +74,9 @@ sub getopt {
     my $obj = shift;
     my $argv = shift // [];
     return if @{ $argv } == 0;
+
+    # Filter out internal keys (must start with a letter)
+    @_ = grep { ref($_) || /^[a-zA-Z]/ } @_;
 
     # Convert underscore options to underscore|dash format
     @_ = map { ref($_) ? $_ : s/^(\w*_[\w_]*)/"$1|" . ($1 =~ s:_:-:gr)/er } @_
@@ -165,7 +171,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 1.01
+Version 1.0201
 
 =head1 DESCRIPTION
 
@@ -318,6 +324,7 @@ Or call with hash reference.
     my $config = Getopt::EX::Config->new(\%config);
 
 In this case, C<\%config> and C<$config> should be identical.
+Do not apply C<lock_keys> to the hash before calling C<new>.
 
 Config keys must start with a letter (a-z, A-Z).  Keys starting with
 underscore or other characters are reserved for internal use.

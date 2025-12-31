@@ -24,6 +24,6 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-previewinsearch.git
-version: '0.06'
-x_module_install_rtx_version: '0.43'
-x_requires_rt: 4.0.0
+version: '1.00'
+x_module_install_rtx_version: '0.44'
+x_requires_rt: 6.0.0

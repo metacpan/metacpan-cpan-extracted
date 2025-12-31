@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Dropbox
 
+2.10 2025-12-29T23:25:29Z
+	- Add support for delete_batch and delete_batch_check
+
 2.09 2021-06-15T07:56:02Z
         - Add shared for README.md
 

@@ -1,0 +1,54 @@
+{
+   "abstract" : "DBIx::Auto::Migrate - Wrap your database connections and automatically apply db migrations",
+   "author" : [
+      "Sergio Iglesias <sergioxz@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Auto-Migrate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "perl" : "v5.16.3"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::Pg" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::PostgreSQL" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Auto::Migrate" : {
+         "file" : "lib/DBIx/Auto/Migrate.pm",
+         "version" : "0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sergiotarxz/Perl-DBIx-Auto-Migrate/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/sergiotarxz/Perl-DBIx-Auto-Migrate"
+      }
+   },
+   "version" : "0.6",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

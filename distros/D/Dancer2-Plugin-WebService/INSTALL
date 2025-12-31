@@ -6,6 +6,11 @@ It must have a home directory to install there the deployed applications
   getent passwd dancer >/dev/null || useradd -g dancer -l -m -c "Dancer2 WebService" -s $(/usr/bin/which nologin) dancer
   lslogins      dancer
 
+For linux native authentication we need to create a user, lets call him  joe
+
+  getent passwd joe > /dev/null || useradd -m  -c 'I am a dancer' joe
+  usermod --password $(openssl passwd -6 -salt pCt6qNtCYsozKMDu SomePassword) joe    # Now joe's password is SomePassword
+
 Create the Persistent session data and log directories. You can change them later if needed
 
   i=/var/lib/WebService; [ -d $i ] || { /usr/bin/mkdir $i; /usr/bin/chown -R dancer:dancer $i; }

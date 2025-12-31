@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '2.008006';
+	$Type::Params::VERSION   = '2.010000';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -46,6 +46,24 @@ our %EXPORT_TAGS = (
 	v1       => [ qw( compile compile_named ) ],      # Old default
 	v2       => [ qw( signature signature_for ) ],    # New recommendation
 );
+
+BEGIN {
+	my $pfx = $ENV{'PERL_TYPE_PARAMS_SUBNAME_PREFIX'};
+	eval sprintf(
+		'sub SIGNATURE_SUBNAME_PREFIX () { %s }',
+		B::perlstring(
+			( defined $pfx and $pfx =~ /::\z/ ) ? $pfx : $pfx ? 'SIGNATURE_FOR::' : '',
+		)
+	);
+
+	my $sfx = $ENV{'PERL_TYPE_PARAMS_SUBNAME_SUFFIX'};
+	eval sprintf(
+		'sub SIGNATURE_SUBNAME_SUFFIX () { %s }',
+		B::perlstring(
+			( defined $sfx and $sfx =~ /\A_/ ) ? $sfx : $sfx ? '_SIGNATURE' : '',
+		)
+	);
+};
 
 {
 	my $Invocant;
@@ -161,14 +179,25 @@ sub signature_for {
 		
 		no strict 'refs';
 		no warnings 'redefine';
-		*$fullname = set_subname( $fullname, $compiled );
+		*$fullname = set_subname( SIGNATURE_SUBNAME_PREFIX . $fullname . SIGNATURE_SUBNAME_SUFFIX, $compiled );
 		
 		goto( $compiled );
 	};
 
+	our ( %PRE_INSTALL, %POST_INSTALL );
+	if ( my $cb = $PRE_INSTALL{$package} ) {
+		Types::Standard::assert_ArrayRef( $cb );
+		$_->( $sig ) for @$cb;
+	}
+
 	no strict 'refs';
 	no warnings 'redefine';
-	*$fullname = set_subname( $fullname, $coderef );
+	*$fullname = set_subname( SIGNATURE_SUBNAME_PREFIX . $fullname . SIGNATURE_SUBNAME_SUFFIX, $coderef );
+
+	if ( my $cb = $POST_INSTALL{$package} ) {
+		Types::Standard::assert_ArrayRef( $cb );
+		$_->( $sig ) for @$cb;
+	}
 
 	return $sig;
 }
@@ -586,6 +615,46 @@ function as a single parameter object:
  say add_numbers(   num1 => 2, num2 => 3   );   # says 5
  say add_numbers( { num1 => 2, num2 => 3 } );   # also says 5
 
+Since Type::Params 2.009_000 the C<< $arg >> object has methods called
+C<< __TO_LIST__ >>, C<< __TO_ARRAYREF__ >>, and C<< __TO_HASHREF__ >>.
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my ( $num1, $num2 ) = $arg->__TO_LIST__;
+   return $num1 + $num2;
+ }
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my $nums = $arg->__TO_ARRAYREF__;
+   return $nums->[0] + $nums->[1];
+ }
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my $nums = $arg->__TO_HASHREF__;
+   return $nums->{num1} + $nums->{num2};
+ }
+
+Each of these can be given an optional arrayref indicating which fields to
+return.
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my ( $num2, $num1 ) = $arg->__TO_LIST__( [ qw/ num2 num1 / ] );
+   return $num1 + $num2;
+ }
+
+The arrayref accepts aliases (see C<alias>) but methods may throw an
+exception if the arrayref contains unknown field names. (See
+C<strictness> to control whether an exception is thrown.)
+
+These methods start and end with double underscores to reduce the chance
+that they'll conflict with the name of a named parameter, however they are
+considered part of the public, supported API.
+
+The object overloads C<< @{} >> to call C<< __TO_ARRAYREF__ >>.
+
 =head4 C<< named_to_list >> B<< ArrayRef|Bool >>
 
 The C<named_to_list> option is ignored for signatures using positional
@@ -807,7 +876,7 @@ the default will be fine.
 
 This allows you to add signatures to functions in other packages:
 
- signature_for foo => ( package "Some::Package", ... );
+ signature_for foo => ( package => "Some::Package", ... );
 
 If C<method> is true and Some::Package doesn't contain a sub called "foo",
 then Type::Params will traverse the inheritance heirarchy, looking for "foo".
@@ -816,7 +885,7 @@ If any type constraints are specified as strings, Type::Params will look
 for types imported by this package.
 
  # Expects the MyInt type to be known by Some::Package.
- signature_for foo => ( package "Some::Package", pos => [ 'MyInt' ] );
+ signature_for foo => ( package => "Some::Package", pos => [ 'MyInt' ] );
 
 This is also supported:
 
@@ -1953,6 +2022,12 @@ C<ArgsObject> is not exported unless requested by name.
 
 Recommendation: use B<Object> from L<Types::Standard> instead.
 
+=head1 CONSTANTS
+
+The constants C<SIGNATURE_SUBNAME_PREFIX> and C<SIGNATURE_SUBNAME_SUFFIX>
+exist. They normally return the empty string, but can be influenced by
+environment variables. (See below.) They are not exportable.
+
 =head1 ENVIRONMENT
 
 =over
@@ -1966,7 +2041,72 @@ environment variable does not exist, will use Class::XSAccessor.
 If Class::XSAccessor is not installed or is too old, pure Perl will always
 be used as a fallback.
 
+=item C<PERL_TYPE_PARAMS_SUBNAME_PREFIX> and C<PERL_TYPE_PARAMS_SUBNAME_SUFFIX>
+
+Each Perl subroutines has an idea of its fully-qualified subname, which is
+distinct from how it is actually called. For example:
+
+  package Foo;
+  *bar = sub { return "foobar" };
+
+The subroutine can be called as C<< Foo::bar() >>, however the subroutine
+still "thinks" it is an anonymous coderef because that is how it was
+initially created. That is how it will show up in stack traces, profiling
+tools, etc. These names can be manipulated with L<Sub::Util>.
+
+By default, if you use C<signature_for> to define a signature for
+C<< YourModule::yourfunc() >>, then the wrapper function it creates
+will also give itself the subname of C<< YourModule::yourfunc() >>.
+This is normally helpful.
+
+However, if you are debugging or profiling and wish to give the wrapper subs
+a different subname in stack traces or profiling reports, these environment
+variables allow you to control that. They have will have a global effect on
+your application.
+
+C<PERL_TYPE_PARAMS_SUBNAME_PREFIX> can be set to true to tell Type::Params
+to add "SIGNATURE_FOR::" to the start of the wrapper function's subname.
+Or it can be set to any string ending "::" to specify an alternative prefix.
+
+C<PERL_TYPE_PARAMS_SUBNAME_SUFFIX> can be set to true to tell Type::Params
+to add "_SIGNATURE" to the end of the wrapper function's subname.
+Or it can be set to any string starting "_" to specify an alternative suffix.
+
+There's usually no reason to apply both a prefix I<and> a suffix.
+
+Suffixes may play nicer with utilities like L<namespace::autoclean>.
+
+=for highlighter language=Bash
+
+Example usage:
+
+  export PERL_TYPE_PARAMS_SUBNAME_SUFFIX=1
+  perl -d:NYTProf some_perl.pl
+
+=for highlighter language=Perl
+
 =back
+
+=head1 HOOKS
+
+You can install coderefs which will be called whenever C<signature_for>,
+C<signature_for_func>, or C<signature_for_method> are used to wrap a
+function or method. They are ignored by C<signature> and by the pre-v2 API.
+
+  push @{ $Type::Params::POST_INSTALL{'My::Package'} ||= [] }, sub {
+    my $signature = shift;
+    ...;
+  };
+
+  push @{ $Type::Params::PRE_INSTALL{'My::Package'} ||= [] }, sub {
+    my $signature = shift;
+    ...;
+  };
+
+The C<< $signature >> will be a blessed L<Type::Params::Signature> object.
+
+The intention for this is to allow for future extensions to expose signature
+data as metadata. 
 
 =head1 BUGS
 

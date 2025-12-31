@@ -5,7 +5,7 @@ use warnings;
 package Newtype;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002000';
 
 use Type::Tiny::Class 2.000000;
 use parent 'Type::Tiny::Class';
@@ -14,6 +14,24 @@ use B qw( perlstring );
 use Eval::TypeTiny qw( eval_closure set_subname );
 use Types::Common qw( -types -is );
 use namespace::autoclean;
+
+sub import {
+	my $class = shift;
+	my $global_opts = +{ @_ && ref($_[0]) eq q(HASH) ? %{+shift} : () };
+
+	if ( defined $global_opts->{into} and $global_opts->{into} eq '-lexical' ) {
+		$global_opts->{lexical} = 1;
+		delete $global_opts->{into};
+	}
+	if ( not defined $global_opts->{into} ) {
+		$global_opts->{into} = caller;
+	}
+	
+	my %newtypes;
+	$global_opts->{Newtype} = \%newtypes;
+	$class->SUPER::import( $global_opts, @_ );
+	$class->_setup_delayed_coercions( \%newtypes, $global_opts->{into} );
+}
 
 sub _exporter_fail {
 	my ( $class, $name, $opts, $globals ) = @_;
@@ -29,7 +47,9 @@ sub _exporter_fail {
 		: ( $Type::Registry::DELAYED{$caller}{$type->name} = $type )
 		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
 
-	return map +( $_->{name} => $_->{code} ), @{ $type->_newtype_exportables };
+	$globals->{Newtype}{$name} = $type;
+
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
 }
 
 sub new {
@@ -50,6 +70,10 @@ sub new {
 	}
 
 	$opts{class} = $class->_make_newclass_name( \%opts );
+
+	if ( $opts{coerce} ) {
+		$opts{delayed_coercions} = delete $opts{coerce};
+	}
 
 	return $class
 		->SUPER::new( %opts )
@@ -78,10 +102,10 @@ sub _build_kind {
 	die "Could not determine kind of inner type. Specify 'kind' option";
 }
 
-sub _newtype_exportables {
+sub exportables {
 	my $self = shift;
 	my $inner_type = $self->inner_type;
-	my @exportables = @{ $self->exportables( @_ ) };
+	my @exportables = @{ $self->SUPER::exportables( @_ ) };
 	for my $e ( @exportables ) {
 		if ( $e->{tags}[0] eq 'types' ) {
 			$e->{code} = sub (;$) {
@@ -135,7 +159,10 @@ sub _make_newclass_basics {
 		source => q{
 			sub {
 				my ( $class, $inner_value ) = @_;
-				bless( \$inner_value, $class );
+				if ( Scalar::Util::blessed($inner_value) eq $class ) {
+					return $inner_value;
+				}
+				return bless( \$inner_value, $class );
 			}
 		},
 	);
@@ -387,6 +414,31 @@ sub _make_coercions {
 	return $self;
 }
 
+sub _setup_delayed_coercions {
+	my ( $class, $newtypes, $into ) = @_;
+	
+	for my $type ( values %$newtypes ) {
+		if ( my $c = delete $type->{delayed_coercions} ) {
+			require Type::Registry;
+			my $reg = Type::Registry->for_class( $into );
+			while ( @$c ) {
+				my ( $from_type, $code ) = splice @$c, 0, 2;
+				if ( is_Str $from_type ) {
+					if ( my $lookup = $newtypes->{$from_type} ) {
+						$from_type = $lookup;
+					}
+					else {
+						$from_type = $reg->lookup( $into );
+					}
+				}
+				is_TypeTiny $from_type
+					or die "Unexpected entry in coercion list: $from_type";
+				$type->coercion->add_type_coercions( $from_type, $code );
+			}
+		}
+	}
+}
+
 1;
 
 __END__
@@ -504,6 +556,10 @@ value. Supported kinds (case-sensitive) are: Array, Bool, Code, Counter,
 Hash, Number, Object, and String. Usually Newtype will be able to guess
 based on C<inner> though.
 
+=item C<coerce>
+
+See L</Coercions> below.
+
 =back
 
 =head2 Creating values belonging to the newtype
@@ -577,6 +633,29 @@ The kind of delegation being used.
 The object returned by C<< MyNewtype() >> is also a L<Type::Tiny> object,
 so you can call any method from L<Type::Tiny>, such as
 C<< MyNewtype->check( $value ) >> or C<< MyNewtype->coerce( $value ) >>.
+
+=head2 Coercions
+
+It is possible to include some coercion definitions when importing newtypes.
+
+  use Types::Common 'Num';
+  use Newtype
+    DegC => {
+      inner  => Num,
+      coerce => [ DegF => sub { DegC( ( $_ - 32 ) / 1.8 ) } ],
+    },
+    DegF => {
+      inner  => Num,
+      coerce => [ DegC => sub { DegF( ( $_ * 1.8 ) + 32 ) } ],
+    };
+  
+  # Both of these are 180 degrees Celsius.
+  my $x1 = DegC( 180 );
+  my $x2 = to_DegC( DegF( 356 ) );
+
+The C<coerce> arrayref is a list of type-coderef pairs, suitable for passing
+to C<add_type_coercions> from L<Type::Coercion>. Any strings used as types
+are assumed to be other newtypes being defined in the same import.
 
 =head1 EXAMPLES
 

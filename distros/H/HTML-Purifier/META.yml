@@ -1,0 +1,38 @@
+---
+abstract: 'Basic HTML purification'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Compile: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Purifier
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: '6.64'
+  HTML::Entities: '0'
+  HTML::Parser: '0'
+  Params::Get: '0'
+  Params::Validate::Strict: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/HTML-Purifier/issues
+  homepage: https://metacpan.org/pod/HTML::Purifier
+  repository: git://github.com/nigelhorne/HTML-Purifier.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

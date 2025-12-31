@@ -40,7 +40,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.097'; # our $VERSION = '';
+$VERSION = '0.099'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -98,7 +98,17 @@ sub sim
   my %inst = %{ $dat{inst} };
   my @precedents = @{ $dat{precedents} };
   my $postproc = $dat{postproc};
+  my $pierce = $dat{pierce};
+  my $last = $dat{last};
+  my @bomb = @{ $dat{bomb} };
   my $winningvalue;
+  my ( @pocket );
+
+  #my $retlist = $dirfiles{retlist};####!!!
+  #my $retblock = $dirfiles{retblock};
+  #my $simlist = $dirfiles{simlist};
+  #my $simblock = $dirfiles{simblock};
+
 
 	if ( $tofile eq "" )
 	{
@@ -110,39 +120,19 @@ sub sim
 
  #say $tee "RECEIVED DATA IN SIM: " . dump( @_ );
 
-  my @simcases = @{ $dirfiles{simcases} };
-  my @simstruct = @{ $dirfiles{simstruct} };
-  my @morphcases = @{ $dirfiles{morphcases} };
-  my @morphstruct = @{ $dirfiles{morphstruct} };
-  my @retcases = @{ $dirfiles{retcases} };
-  my @retstruct = @{ $dirfiles{retstruct} };
-  my @repcases = @{ $dirfiles{repcases} };
-  my @repstruct = @{ $dirfiles{repstruct} };
-  my @mergecases = @{ $dirfiles{mergecases} };
-  my @mergestruct = @{ $dirfiles{mergestruct} };
-  my @descendcases = @{ $dirfiles{descendcases} };
-  my @descendstruct = @{ $dirfiles{descendstruct} };
-
-  my $morphlist = $dirfiles{morphlist};
-  my $morphblock = $dirfiles{morphblock};
-  my $simlist = $dirfiles{simlist};
-  my $simblock = $dirfiles{simblock};
-  my $retlist = $dirfiles{retlist};
-  my $repfile = $dirfiles{repfile};
-  my $retblock = $dirfiles{retblock};
-  my $replist = $dirfiles{replist};
-  my $repblock = $dirfiles{repblock};
-  my $descendlist = $dirfiles{descendlist};
-  my $descendblock = $dirfiles{descendblock};
-
+  
   my %d = %{ $instances[0] };
 
   my $countcase = $d{countcase};
   my $countblock = $d{countblock};
-  my %datastruc = %{ $d{datastruc} }; ######
+  my %incumbents = %{ $d{incumbents} }; ######
   my @varnumbers = @{ $d{varnumbers} };
   my @miditers = @{ $d{miditers} };
   my @sweeps = @{ $d{sweeps} };
+  my $from = $d{from};
+  my @blockelts = @{ $d{blockelts} }; #say $tee "HERE IN SIM \@blockelts: " . dump( @blockelts );
+  my %varnums = %{ $d{varnums} };
+  my $repfile;
 
 
   #if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
@@ -157,7 +147,8 @@ sub sim
   my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
-  my %notecases;
+
+  my @pocket;
 
   my @trieds; #say $tee "HERE IN SIM \@precedents: " . dump( \@precedents );
   foreach $prec_r ( @precedents )
@@ -186,7 +177,7 @@ sub sim
     my $instn = $dt{instn}; #say $tee "HERE IN SIM \$instn: " . dump( $instn );
 
     my $origin = $dt{origin};
-    my $from = $origin;
+    
     my $is = $dt{is};
     my $stamp = $dt{stamp};
 
@@ -199,9 +190,15 @@ sub sim
     my $fire = $dt{fire};
     my $gaproc = $dt{gaproc};
 
+    if ( !$dirfiles{repfile} )
+    {
+      $dirfiles{repfile} = "$mypath/$file-report-$countcase-$countblock.csv";
+    }
+    $repfile = $dirfiles{repfile}; say $tee "IN SIM FROM DIRFILES, \$countblock $countblock, \$repfile $repfile";
+
     if ( ( $fire eq "y" ) and ( $precious ne "" ) )
     {
-      $repfile = $dirfiles{repfile} . "-fire-$is.csv";###DDD!!!
+      $repfile = $repfile . "-fire-$is.csv";###DDD!!!
     }
 
     my $skip = $dowhat{$countvar}{skip}; #########################################
@@ -264,32 +261,47 @@ sub sim
                 $shortflfile = "$fileconfigroot.fl";
               }
 
-              open( SIMLIST, ">$simlist") or die( "$!" );
+              #open( SIMLIST, ">$simlist") or die( "$!" );
 
-              if (not (-e $simblock ) )
+              #if (not (-e $simblock ) )
+              #{
+              #  if ( $countblock == 0 )
+              #  {
+              #    open( SIMBLOCK, ">$simblock"); # or die;
+              #  }
+              #  else
+              #  {
+              #    open( SIMBLOCK, ">$simblock"); # or die;
+              #  }
+              #}
+
+              if ( !@{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} } )
               {
-                if ( $countblock == 0 )
-                {
-                  open( SIMBLOCK, ">$simblock"); # or die;
-                }
-                else
-                {
-                  open( SIMBLOCK, ">$simblock"); # or die;
-                }
+                @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} } = ();
               }
-
-
-              push ( @{ $simstruct[ $countcase ][ $countblock ][ $countinstance ][$counttool] }, $resfile );
+              push ( @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} }, $resfile );
               print SIMBLOCK "$resfile\n";
 
-              if ( ( not ( $resfile ~~ @simcases ) ) and ( not ( -e $resfile ) ) and ( $dowhat{simulate} eq "y")
+              if ( ( not ( $resfile ~~ @{ $dirfiles{simcases} } ) ) and ( not ( -e $resfile ) ) and ( $dowhat{simulate} eq "y")
                 and ( not ( $to{cleanto} ~~ ( @trieds ) ) ) )
               {
-                push ( @simcases, $resfile );
-                print SIMLIST "$resfile\n";
+                push ( @{ $dirfiles{simcases} } , $resfile );
+                #print SIMLIST "$resfile\n";
 
                 unless ( ( $preventsim eq "y" ) or ( $dowhat{inactivatesim} eq "y" ) or ( $dowhat{simulate} eq "n" ) or ( $postproc eq "y") )
                 {
+
+                  say $tee "IN SIM, FOR INSOLATION \$countvar $countvar \$blockelts->[-1] $blockelts->[-1] \$blockelts[-1] $blockelts[-1] \@blockelts " . dump ( @blockelts );
+                  say $tee "IN SIM, FOR INSOLATION  \$countstep $countstep \$varnums{\$countvar} $varnums{$countvar} "; 
+                  say $tee "IN SIM, FOR INSOLATION  \$countop $countop \$#applytype $#applytype \@applytype ";
+                  say $tee "IN SIM, FOR INSOLATION  \$dowhat{shadeupdate} $dowhat{shadeupdate}";
+                  if ( $dowhat{shadeupdate} eq "y" )
+                  {
+                    my $done = Sim::OPT::Morph::recalculateish( $to, $stepsvar, $countop, 
+                        $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
+                        \@menus, $countinstance, \%dowhat );
+                  }
+
                   if ( $simnetwork eq "y" )
                   {
                     say $tee "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: writing $resfile and $flfile." ;
@@ -471,51 +483,53 @@ XXX
               $resfile = "$simelt/$epresroot$resfiletype";
 
 
-              unless ( $dowhat{inactivatesim} eq "y" )
+              #unless ( $dowhat{inactivatesim} eq "y" )
+              #{
+
+                #if (not ( -e $simblock ) )
+                #{
+                  #if ( $countblock == 0 )
+                  #{
+                   # open( SIMBLOCK, ">$simblock"); # or die;
+                  #}
+                  #else
+                  #{
+                  #  open( SIMBLOCK, ">$simblock"); # or die;
+                  #}
+                #}
+
+                #if (not (-e $retblock ) )
+                #{
+                 # if ( $countblock == 0 )
+                #  {
+                 #   open( RETBLOCK, ">$retblock"); # or die;
+                 # }
+                 # else
+                #  {
+                #    open( RETBLOCK, ">$retblock"); # or die;
+                #  }
+               # }
+              #}
+              
+              if ( !@{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} } )
               {
-
-                if (not ( -e $simblock ) )
-                {
-                  if ( $countblock == 0 )
-                  {
-                    open( SIMBLOCK, ">$simblock"); # or die;
-                  }
-                  else
-                  {
-                    open( SIMBLOCK, ">$simblock"); # or die;
-                  }
-                }
-
-                if (not (-e $retblock ) )
-                {
-                  if ( $countblock == 0 )
-                  {
-                    open( RETBLOCK, ">$retblock"); # or die;
-                  }
-                  else
-                  {
-                    open( RETBLOCK, ">$retblock"); # or die;
-                  }
-                }
+                @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} } = ();
               }
+              push ( @{ $dirfiles{simstruct}{$countcase}{$countblock}{$countinstance}{$counttool} }, $resfile );
 
-              push ( @{ $simstruct[ $countcase ][ $countblock ][ $countinstance ][ $counttool ] }, $resfile );
-              push ( @{ $retstruct[ $countcase ][ $countblock ][ $countinstance ][ $counttool ] }, $resfile );
+              #unless ( $dowhat{inactivatesim} eq "y" )
+              #{
+              #  print SIMBLOCK "$resfile\n";
+              #}
 
-              unless ( $dowhat{inactivatesim} eq "y" )
+              if ( ( not ( $resfile ~~ @{ $dirfiles{retcases} } ) ) and ( not ( -e $resfile ) ) )
               {
-                print SIMBLOCK "$resfile\n";
-              }
-
-              if ( ( not ( $resfile ~~ @retcases ) ) and ( not ( -e $resfile ) ) )
-              {
-                push ( @simcases, $resfile );
-                push ( @retcases, $resfile );
+                push ( @{ $dirfiles{simcases} } , $resfile );
 
                 unless ( $dowhat{inactivatesim} eq "y" )
                 {
-                  print SIMLIST "$resfile\n";
-                  print RETLIST "$resfile\n";
+                  #print SIMLIST "$resfile\n";
+                  #print RETLIST "$resfile\n";
                 }
 
                 unless ( ( $preventsim eq "y" ) or ( $dowhat{inactivatesim} eq "y" ) )
@@ -573,34 +587,31 @@ XXX
     {
       unless ( ( $postproc eq "y") )
       {
-        my @resultretrieve = Sim::OPT::Report::newretrieve(
+        my ( $dirfiles_r ) = Sim::OPT::Report::newretrieve(
         {
           instance => $instance, dirfiles => \%dirfiles,
           resfile => $resfile, flfile => $flfile,
           vehicles => \%vehicles, precious => $precious, inst => \%inst,
           dowhat => \%dowhat
         } );
-        $dirfiles{retcases} = $resultretrieve[0];
-        $dirfiles{retstruct} = $resultretrieve[1];
-        $dirfiles{notecases} = $resultretrieve[2];
+        %dirfiles = %$dirfiles_r;
       }
-
     }
-
+    
+    my $dirfiles_r;
     if ( $dowhat{newreport} eq "y" )
     {
-      my @resultreport = Sim::OPT::Report::newreport(
+      ( $dirfiles_r, $instant ) = Sim::OPT::Report::newreport(
       {
         instance => $instance, dirfiles => \%dirfiles,
         resfile => $resfile, flfile => $flfile,
         vehicles => \%vehicles, precious => $precious, inst => \%inst,
-        dowhat => \%dowhat,  #csim => $csim,
-        stamp => $stamp,
+        dowhat => \%dowhat,  csim => $csim,
+        stamp => $stamp
       } );
-      $dirfiles{repcases} = $resultreport[0];
-      $dirfiles{repstruct} = $resultreport[1];
-      $dirfiles{mergestruct} = $resultreport[3];
-      $dirfiles{mergecases} = $resultreport[4];
+      
+      %dirfiles = %$dirfiles_r;
+      push( @pocket, $instant );
     }
 
     #if ( $dowhat{newreport} eq "y" )
@@ -617,14 +628,352 @@ XXX
 
     $csim++;
   }
-  close SIMLIST;
-  close SIMBLOCK;
+  #close SIMLIST;
+  #close SIMBLOCK;
+  
 
 
-  return( \@simcases, \@simstruct, $dirfiles{repcases}, $dirfiles{repstruct},
-      $dirfiles{mergestruct}, $dirfiles{mergecases}, $csim );
+  ########################################################################################################################
 
-  say $tee "LEAVING SIMULATION MODULE";
+  my @newbowl; 
+  my $expected_r;
+
+  unless ( $pierce eq "y" )
+  {
+    $expected_r = Sim::OPT::enumerate( \%varnums, \@blockelts, $from ); say $tee "IN POSTSIM \@blockelts " . dump( @blockelts ) . " \$expected_r " . dump( $expected_r );
+    #say $tee "IN POSTSIM  \$from $from  \$expected_r  " . dump( $expected_r ) . " \%varnums " . dump( \%varnums ) . "\@blockelts " . dump( @blockelts );
+
+
+### @pocket = uniiq( @pocket );
+    @{ $dirfiles{repsblocks}{$countcase}{$countblock} } = uniq( @{ $dirfiles{repsblocks}{$countcase}{$countblock} } );
+    #say $tee "IN DESCEND \@{ \$dirfiles{repsblocks}{\$countcase}{\$countblock} }: " . dump( @{ $dirfiles{repsblocks}{$countcase}{$countblock} } );
+  
+### foreach my $ln ( @pocket )
+    foreach my $ln ( @{ $dirfiles{repsblocks}{$countcase}{$countblock} } )
+    {
+      chomp $ln;
+      next if $ln =~ /^\s*$/;
+
+      my $rid = Sim::OPT::instid( $ln, $file ); #say $tee "IN POSTSIM \$file $file \$ln $ln \$countblock $countblock \$rid " . dump( $rid );# NOT $repfile
+      if ( defined($rid) and $rid ne "" )
+      {
+        push( @newbowl , $ln );
+        #$dirfiles{reps}{$rid} = $ln; say $tee "IN POSTSIM WRITING \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
+        $present{$rid} = 1; #say $tee "IN POSTSIM \$countblock $countblock \$present{\$rid} \$present{$rid} " . dump( $present{$rid} );# NOT $repfile
+        #say $tee "IN POSTSIM CHECKING: \$rid $rid \$dirfiles{reps}{\$rid}: " . dump( $dirfiles{reps}{$rid} );
+      }
+    }
+    
+
+    my %present;
+    foreach my $rid ( @{ $expected_r } )
+    {
+      next if $present{$rid};
+
+      if ( exists $dirfiles{reps}{$rid} )
+      {
+        push( @newbowl, $dirfiles{reps}{$rid} );
+        say $tee "IN POSTSIM EXISTS \$countblock $countblock \$dirfiles{reps}{\$rid} \$dirfiles{reps}{$rid} " . dump( $dirfiles{reps}{$rid} );# NOT $repfile
+      }
+    }
+  }
+  
+  
+  if ( ( $pierce eq "y" ) and ( $last ) )
+  {
+    push ( @bomb, $instant );
+  }
+
+
+  my @newgo;
+
+
+  if ( not ( $pierce eq "y" ) )
+  {
+    @newgo = @newbowl; say $tee "IN POSTSIM \@newgo " . dump( @newgo );
+  }
+  elsif ( ( $pierce eq "y" ) and ( $last ) )
+  {
+    @newgo = @bomb; say $tee "IN POSTSIM \@newgo " . dump( @newgo );
+  }
+
+
+  unless ( ( $pierce eq "y" ) and ( !$last ) )
+  {
+    @newgo = uniq( @newgo );
+    if ( $dowhat{dumpfiles} eq "y" )
+    {
+      my $repline = $repfile;
+      $repline =~ s/\.csv?/-incharge\.csv/;
+      open( REPFILE, ">$repline" ) or die;
+      foreach my $line ( @newgo )
+      {
+        say REPFILE $line;
+      }
+      close REPFILE;
+    }
+  }
+
+
+
+  my @selectbag;
+
+  unless ( ( $pierce eq "y" ) and ( !$last ) )
+  {
+
+    if ( $dowhat{precomputed} eq "" )
+    { 
+      foreach my $line ( @newgo )
+      {
+        my $lin;
+        if ( ( $line ne "" ) and ( $line ne " " ) and ( $line ne "\n" ) )
+        {
+          chomp $line;
+          $line =~ s/\n/°/g;
+          $line =~ s/°/\n/g;
+          $line =~ s/[()%]//g;
+          $line =~ s/,?//;
+          $line =~ s/,?//;
+          $line =~ s/,?//;
+          $line =~ s/ ?//;
+          $line =~ s/ ?//;
+
+          my @elts = split(/,/, $line); 
+          my $touse = $elts[0];
+
+          $touse = Sim::OPT::clean( $touse, $mypath, $file );
+
+          if ( ( ( $dowhat{names} eq "short" ) or ( $dowhat{names} eq "medium" ) ) and ( $touse =~ /^\d+$/ ) )
+          {
+            my $clear = $inst_r->{$touse};
+
+            if ( ( !defined($clear) ) or ( $clear eq "" ) )
+            {
+              my $k = "$mypath/$file" . "_" . $touse;
+              $clear = $inst_r->{$k};
+            }
+
+
+            if ( ( !defined($clear) ) or ( $clear eq "" ) )
+            {
+              die "Cannot map crypto id '$touse' to clear instance (names=short)";
+            }
+            $touse = $clear;
+          }
+
+          my ( @elements, @names, @obtaineds, @newnames ); #say $tee "\@keepcolumns: " . dump( @keepcolumns );
+          foreach my $elm_ref (@keepcolumns)
+          {
+            my @cols = @{ $elm_ref };
+            my $name = $cols[0];
+            my $number = $cols[1];
+            push ( @elements, $elts[$number] ); #say $tee "\PUSH \$elts[\$number]: " . dump( $elts[$number] );
+            #say $tee "\$elts: $elts, \$number: $number";
+            push ( @names, $name );
+          } #say $tee "ELEMENTS: ". dump( @elements ); say $tee "NAMES: ". dump( @names );
+
+          if ( not ( scalar( @weighttransforms ) == 0 ) )
+          {
+            my $coun = 0;
+            foreach my $elt_ref ( @weighttransforms )
+            {
+              my @els = @{ $elt_ref };
+              my $newname = $els[0];
+              my $transform = $els[1];
+              my $obtained = eval ( $transform ); #say $tee "HERE \$transform: $transform, \$obtained: $obtained";
+              push ( @obtaineds, $obtained );
+              push ( @newnames, $newname );
+              $coun++;
+            }
+          }
+          else
+          {
+            @obtaineds = @elements;
+            @newnames = @names;
+          }
+          #say $tee "ELEMENTS: ". dump( @elements ); #say $tee "\@obtaineds: ". dump( @obtaineds );
+          #say $tee "NAMES: ". dump( @names ); #say $tee "NEWNAMES: ". dump( @newnames );
+
+          if ( !defined( $dirfiles{countnettotrowlength}  ) ) #THIS SWITCHES OFF AFTER THE FIRST PASS
+          {
+            $dirfiles{totrowlength} = ( scalar( @obtaineds ) * 2 );
+            $dirfiles{countnettotrowlength}++; #THIS CALCULATES THE LENGTH OF THE ROW AND STORES IT
+          }
+          
+          say $tee "IN SIM \$dowhat{discard} $dowhat{discard}";
+          unless ( $obtaineds[-1] eq $dowhat{discard} )
+          {
+            $lin =  "$touse,";
+
+            my $coun = 0; #say $tee "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
+            foreach my $elt ( @obtaineds )
+            {
+              $lin = $lin . "$newnames[$coun],";
+              unless ( $coun == $#obtaineds )
+              {
+                $lin = $lin . "$elt,";
+              }
+              else 
+              {
+                $lin = $lin . "$elt";
+              }
+              $coun++;
+            }
+            push( @selectbag, $lin );
+          }
+        }
+      }
+    }
+    say $tee "IN POSTSIM \@selectbag " . dump( @selectbag );
+  }
+  
+
+  my @weightbag;
+
+  unless ( ( $pierce eq "y" ) and ( !$last ) )
+  {
+    if ( $dowhat{precomputed} eq "" )
+    {
+      my $counterline = 0;
+      my ( @containerone, @containernames, @containertitles, @containertwo, @containerthree, @maxes, @mins );
+      foreach my $line ( @selectbag) 
+      {
+        chomp $line;
+        my @elts = split( ",", $line );
+        my $touse = shift( @elts ); # IT CHOPS AWAY THE FIRST ELEMENT DESTRUCTIVELY
+        my $countel = 0;
+        my $countcol = 0;
+        my $countcn = 0;
+        foreach my $elt ( @elts )
+        {
+          if ( Sim::OPT::Descend::odd( $countel ) )
+          {
+            push ( @{ $containerone[ $countcol ] }, $elt );
+            $countcol++;
+          }
+          else
+          {
+            push ( @{ $containernames[$countcn] }, $elt );
+            $countcn++;
+          }
+          $countel++;
+        }
+        push ( @containertitles, $touse );
+      }
+
+
+      my $countcolm = 0;
+      foreach my $colref ( @containerone )
+      {
+        my @column = @{ $colref }; # DEREFERENCE
+      
+        if ( max( @column ) != 0) # FILLS THE UNTRACTABLE VALUES
+        {
+          push ( @maxes, max( @column ) );
+        }
+        else
+        {
+          push ( @maxes, "NOTHING1" );
+        }
+      
+        push ( @mins, min( @column ) );
+      
+        foreach my $el ( @column )
+        {
+          my $eltrans;
+          if ( $maxes[ $countcolm ] != 0 )
+          {
+            $eltrans = ( $el / $maxes[$countcolm] ) ;
+          }
+          else
+          {
+            $eltrans = "NOTHING2" ;
+          }
+          push ( @{ $containertwo[$countcolm] }, $eltrans) ; #print $tee "ELTRANS: $eltrans\n";
+        }
+        $countcolm++;
+      }
+      
+      my $countrow = 0;
+      foreach ( @selectbag )
+      {
+        my $growlin;
+        my ( @c1row, @c2row, @cnamesrow );
+
+        foreach my $c1_ref ( @containerone )
+        {
+          my @c1col = @{ $c1_ref };
+          push( @c1row, $c1col[ $countrow ] );
+        }
+
+        foreach my $cnames_ref ( @containernames )
+        {
+          my @cnamescol = @{ $cnames_ref };
+          push( @cnamesrow, $cnamescol[$countrow] );
+        }
+
+        foreach my $c2_ref ( @containertwo )
+        {
+          my @c2col = @{ $c2_ref };
+          push( @c2row, $c2col[$countrow] );
+        }
+
+
+        my ( $numberels, $scalar_keepcolumns );
+        if ( not ( scalar( @weighttransforms ) == 0 ) )
+        {
+          $numberels = scalar( @weighttransforms );
+          $scalar_keepcolumns = scalar( @weighttransforms );
+        }
+        else
+        {
+          $numberels = scalar( @keepcolumns );
+          $scalar_keepcolumns = scalar( @keepcolumns );
+        }
+
+
+        my $wsum = 0; # WEIGHTED SUM
+        my $counterin = 0;
+        foreach my $elt ( @c2row )
+        {
+          my $newelt = ( $elt * abs( $weights[$counterin] ) );
+          $wsum = ( $wsum + $newelt ) ;
+          $counterin++;
+        }
+
+        $growlin = $growlin . "$containertitles[ $countrow ],";
+
+        $countel = 0;
+        foreach my $el ( @c1row )
+        {
+          $growlin = $growlin . "$cnamesrow[$countel],";
+          $growlin = $growlin . "$el,";
+
+          $countel++;
+        }
+
+        foreach my $el ( @c2row )
+        {
+          $growlin = $growlin . "$el,";
+        }
+
+        $growlin = $growlin . "$wsum";
+        push( @weightbag, $growlin );
+        $countrow++;
+      }
+    }  say $tee "IN POSTSIM \@weightbag " . dump( @weightbag );
+  }
+  
+  @weightbag = uniq( @weightbag ); 
+  if ( not ( $pierce eq "y" ) )
+  {
+    return( \@weightbag, \%dirfiles, $csim );
+  }
+  else 
+  {
+    return( \@weightbag, \%dirfiles, $csim, $instant, \@bomb );
+  }
+
   close TOFILE;
   close OUTFILE;
 

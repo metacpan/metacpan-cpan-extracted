@@ -48,7 +48,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr 
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.173'; # our $VERSION = '';
+$VERSION = '0.175'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -1093,7 +1093,7 @@ sub setpickedinsts
                     miditers => \@miditers,  winneritems => \@winneritems, c => $c, from => $from,
                     to => \%to, countvar => $countvar, countstep => $countstep,
                     sweeps => \@sweeps, dowhat => \%dowhat, orig => \%orig,
-                    sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+                    sourcesweeps => \@sourcesweeps, incumbents => \%incumbents,
                     varnumbers => \@varnumbers, blocks => \@blocks,
                     blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
                     countinstance => $count, carrier => \%carrier, origin => $origin,
@@ -1187,29 +1187,7 @@ sub morph
 	if ( not ( $preventsim ) ) { $preventsim = "n"; }
 	if ( not ( $report ) ) { $report = "$mypath/$file-report.txt"; }
 
-	my @simcases = @{ $dirfiles{simcases} };
-	my @simstruct = @{ $dirfiles{simstruct} };
-	my @morphcases = @{ $dirfiles{morphcases} };
-	my @morphstruct = @{ $dirfiles{morphstruct} };
-	my @retcases = @{ $dirfiles{retcases} };
-	my @retstruct = @{ $dirfiles{retstruct} };
-	my @repcases = @{ $dirfiles{repcases} };
-	my @repstruct = @{ $dirfiles{repstruct} };
-	my @mergecases = @{ $dirfiles{mergecases} };
-	my @mergestruct = @{ $dirfiles{mergestruct} };
-	my @descendcases = @{ $dirfiles{descendcases} };
-	my @descendstruct = @{ $dirfiles{descendstruct} };
 
-	my $morphlist = $dirfiles{morphlist};
-	my $morphblock = $dirfiles{morphblock};
-	my $simlist = $dirfiles{simlist};
-	my $simblock = $dirfiles{simblock};
-	my $retlist = $dirfiles{retlist};
-	my $retblock = $dirfiles{retblock};
-	my $replist = $dirfiles{replist};
-	my $repblock = $dirfiles{repblock};
-	my $descendlist = $dirfiles{descendlist};
-	my $descendblock = $dirfiles{descendblock};
 
 	my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
@@ -1408,7 +1386,7 @@ sub morph
 		%dirfiles = %{ $dirfiles_ref };
 	}
 
-    say $tee "NOWMORPH!!! \@instances: " . dump( @instances );
+    #say $tee "NOWMORPH!!! \@instances: " . dump( @instances );
     #say $tee "NOWMORPH!!! \%inst: " . dump( \%inst );
     #say $tee "NOWMORPH!!! \%dirfiles: " . dump( \%dirfiles );
 
@@ -1429,7 +1407,7 @@ sub morph
         
 		my $countcase = $d{countcase};
 		my $countblock = $d{countblock};
-		my %datastruc = %{ $d{datastruc} };
+		my %incumbents = %{ $d{incumbents} };
 		my @rescontainer = @{ $d{rescontainer} };
 		my @miditers = @{ $d{miditers} };
 		my @winneritems = @{ $d{winneritems} };
@@ -1494,7 +1472,7 @@ sub morph
         my $cntv = 0; #HERE I.
 		foreach my $countvar ( @countvars )
 		{
-            say $tee "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say $tee " \$cntv: " . dump( $cntv );
+            #say $tee "IN MORPH FOREACH \$countvar: " . dump( $countvar ); say $tee " \$cntv: " . dump( $cntv );
 
             if ( Sim::OPT::checkOPTcue() )
             {
@@ -1597,22 +1575,19 @@ sub morph
 				#if ( ( ( ( $countblock > 0 ) and ( $countstep > 1 ) ) and ( not ( ( $dirfiles{randompick} eq "y" ) and ( $dirfiles{ga} eq "y" ) ) ) )
 				#  or ( ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{ga} eq "y" ) ) ) )
 				{
-					unless ( $gaproc eq "y" )
-					{
-						open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
-					}
-					push ( @{ $morphstruct[$countcase][$countblock] }, $to{cleanto} );
 
-					#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
+					push ( @{ $dirfiles{morphstruct}[$countcase][$countblock] }, $to{cleanto} );
+
 					if ( ( $dowhat{actonmodels} eq "y" ) and ( not ( $dowhat{inactivatemorph} eq "y" ) ) )
 					{ #say $tee "HERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$is: $is \$from: $from, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
-						push ( @morphcases, $is );
+						push ( @{ $dirfiles{morphcases} }, $is );
 
 						print MORPHLIST "$to{cleanto}\n";
 
-						unless ( ( $exeonfiles eq "n") or ( ( $laxmode = "y" ) and ( $countp > 0 ) ) ) #HERE I.
+						unless ( ( $exeonfiles eq "n") or ( ( $laxmode eq "y" ) and ( $countp > 0 ) ) ) #HERE I.
 						{
-							if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
+							if ( ( $dirfiles{randompick} eq "y" ) or ( $dirfiles{newrandompick} eq "y" ) 
+                               or ( $dirfiles{latinhypercube} eq "y" ) or ( $dirfiles{ga} eq "y" ) )
 							{
 								if ( ( "begin" ~~ @whatto ) and ( not ( "end" ~~ @whatto ) ) and ( $dowhat{jumpinst} eq "y" ) )
 								{
@@ -1793,7 +1768,7 @@ sub morph
                                 #( ( ( not ( eval ( $skip ) ) ) and ( $wascountvar =~ /-/ ) ) ) )
                                 if ( not ( eval ( $skip ) ) )
 								{
-                                    say $tee "IN MORPH. I AM IN";
+                                    #say $tee "IN MORPH. I AM IN";
 									##########################################
 									my @mods;
 									if ( not( ref( $modification_type ) ) )
@@ -1804,12 +1779,12 @@ sub morph
 									{
 										push( @mods, @{ $modification_type } );
 									}
-                                    say $tee "IN MORPH. \@mods: " . dump( @mods );
+                                    #say $tee "IN MORPH. \@mods: " . dump( @mods );
 									#########################################
                                     #if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 10 ";
 									foreach my $modtype ( @mods )
 									{
-                                        say $tee "IN MORPH. \$modtype: " . dump( $modtype );
+                                        #say $tee "IN MORPH. \$modtype: " . dump( $modtype );
 										if ( $modtype eq "change_groundreflectance" )#
 										{
 											change_groundreflectance
@@ -2265,14 +2240,11 @@ sub morph
                                     
 								}
 
-                                say $tee "PREFOUNDIT \$laxmode $laxmode";
-                                say $tee "PREFOUNDIT \$countvar $countvar \$blockelts->[-1] $blockelts->[-1] \$blockelts[-1] $blockelts[-1] \@blockelts " . dump ( @blockelts );
-                                say $tee "PREFOUNDIT \$countstep $countstep \$varnums{\$countvar} $varnums{$countvar} "; 
-                                say $tee "PREFOUNDIT \$countop $countop \$#applytype $#applytype \@applytype ";
-                                say $tee "PREFOUNDIT \$dowhat{shadeupdate} $dowhat{shadeupdate}";
+
                                 if( $laxmode eq "n" )
                                 {
-                                  if ( ( ( $countvar == $blockelts[-1] ) ) and ( $countstep == $varnums{$countvar} ) and ( $countop == $#applytype ) and ( $dowhat{shadeupdate} eq "y" ) )
+                                  if ( ( ( $countvar == $blockelts[-1] ) ) and ( $countstep == $varnums{$countvar} ) 
+                                       and ( $countop == $#applytype ) and ( $dowhat{shadeupdate} eq "y" ) )
                                   {
                                     recalculateish( $to, $stepsvar, $countop, 
                                         $countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, 
@@ -2302,14 +2274,12 @@ sub morph
             $countp++; #HERE I.
 		}########
 		close MORPHLIST;
-		close MORPHBLOCK;
 		$counti++;
 	}
 	close TOFILE;
 	close OUTFILE;
 	#if ( $d{treated} eq "treated" ){ print $tee "TREATED: $d{treated} "; }; say $tee "ARRIVED IN MORPH 14, EXITING ";
-	#return ( \@morphcases, \@morphsruct, \%inst );
-	return ( \@morphcases, \@morphsruct );
+	return ( \%dirfiles );
 }    # END SUB morph
 
 
@@ -4160,7 +4130,7 @@ sub recalculateish
 	say $tee "Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $printthis;
-	if ( $whatto eq "y" )
+	if ( ( $whatto eq "y" ) or ( $dowhat{shadeupdate} eq "y" ) )
 	{
 	  $printthis =
 "cd $to/cfg/
@@ -4243,6 +4213,7 @@ YYY
 
 	print $tee "#Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
+  return( "done" );
 } #END SUB RECALCULATEISH
 
 

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Basic HTML purification",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Purifier",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-HTML-Purifier@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/HTML-Purifier/issues",
+         "x_url" : "https://github.com/nigelhorne/HTML-Purifier/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/HTML::Purifier",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/HTML-Purifier.git",
+         "web" : "https://github.com/nigelhorne/HTML-Purifier",
+         "x_repository" : "https://github.com/nigelhorne/HTML-Purifier"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

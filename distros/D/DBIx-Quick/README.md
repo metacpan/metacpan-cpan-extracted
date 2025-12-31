@@ -18,6 +18,7 @@ DBIx::Quick - Object Relational Mapping for the lazy programmer
     field id => (is => 'ro', search => 1, pk => 1);
     field username => (is => 'rw', search => 1, required => 1, column => 'user_name');
     field id_address => (is => 'rw', search => 1, fk => ['MyApp::DAO::Addresses', 'id', 'addresses', 'users']);
+    field timestamp => (is => 'rw', search => 1, converter => MyApp::DB::Converters::DateTime->new);
 
     fix;
 
@@ -48,6 +49,8 @@ This module is preliminar, meaning the syntax is probably not the definitive one
 making full blown applications feel free to join the development with suggestions or patches.
 
 If you are needing too fancy autocomplete or templates just to be productive maybe you instead need [DBIx::Quick](https://metacpan.org/pod/DBIx%3A%3AQuick).
+
+To check an example project that uses this code you can check [https://github.com/sergiotarxz/Perl-App-RSS-Social](https://github.com/sergiotarxz/Perl-App-RSS-Social).
 
 # DAO DECLARATIONS
 
@@ -85,6 +88,10 @@ Allows to change the destination column by default it would be called as the fie
 ### fk
 
 Takes four arguments: The destination class, the destination field, the method to represent in our model the remote class and optionally the remote instance method to represent our own class.
+
+### converter
+
+See [DBIx::Quick::Converter](https://metacpan.org/pod/DBIx%3A%3AQuick%3A%3AConverter)
 
 ## fix
 

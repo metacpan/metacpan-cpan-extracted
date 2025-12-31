@@ -8,7 +8,7 @@ configure_requires:
   Module::Build: '0'
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   WebService::Dropbox:
     file: lib/WebService/Dropbox.pm
-    version: '2.09'
+    version: '2.10'
   WebService::Dropbox::Auth:
     file: lib/WebService/Dropbox/Auth.pm
   WebService::Dropbox::Files:
@@ -59,13 +59,14 @@ requires:
 resources:
   bugtracker: https://github.com/s-aska/p5-WebService-Dropbox/issues
   homepage: https://github.com/s-aska/p5-WebService-Dropbox
-  repository: git://github.com/s-aska/p5-WebService-Dropbox.git
-version: '2.09'
+  repository: https://github.com/s-aska/p5-WebService-Dropbox.git
+version: '2.10'
 x_authority: cpan:ASKADNA
 x_contributors:
   - 'Dondi Michael Stroma <dstroma@gmail.com>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'Greg Youngblood <47649208+softwrx@users.noreply.github.com>'
+  - 'Nick Tonkin <nick.tonkin@newfold.com>'
   - 'Rostislav Georgiev <pisaro@mail.bg>'
   - 'Shinichiro Aska <s.aska.org@gmail.com>'
   - 'aska <aska@linecorp.com>'

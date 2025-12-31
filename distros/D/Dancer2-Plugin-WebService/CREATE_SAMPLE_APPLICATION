@@ -132,22 +132,14 @@ Write your TestService code at the file /home/dancer/TestService/lib/TestService
 
   dance;
 
-
 Define the routes, their security and the authentication method at the file /home/dancer/TestService/config.yml
-
 
 appname                 : TestService
 appversion              : 1.0.0
 environment             : development
 layout                  : main
 charset                 : UTF-8
-template                : template_toolkit
-engines:
-  template:
-    template_toolkit:
-      EVAL_PERL         : 0
-      start_tag         : '<%'
-      end_tag           : '%>'
+engines                 : {template: {template_toolkit: {EVAL_PERL: 0, start_tag: '[%', end_tag: '%]' }}}
 plugins:
   WebService:
     Session enable      : true
@@ -209,7 +201,7 @@ Start the TestService manual from the command line.
 As first step we must Define the plackup fullpath
 
   plackup=$(/usr/bin/find /usr/bin -name plackup -type f)
-  [ -x "$plackup" ] && echo ok || echo Could not found the plackup utility. Check the INSTALL document and try again
+  [ -x "$plackup" ] && "$plackup" --version || echo Could not found the plackup utility. Check the INSTALL document and try again
 
   # For development using the HTTP::Server::PSGI or HTTP::Server::Simple
   sudo -u dancer $plackup --host 0.0.0.0 --port 3000 --env development --app /home/dancer/TestService/bin/app.psgi --server HTTP::Server::PSGI
@@ -224,8 +216,7 @@ As first step we must Define the plackup fullpath
 Open an other UTF8 console and export the url and header variables
 
   export url=http://127.0.0.1:3000 H="Content-Type: application/json"
-  alias curl="$(/usr/bin/which curl) --silent --user-agent Perl"
-  alias curl
+  alias curl="$(/usr/bin/which curl) --silent --user-agent Perl"  
 
 Built-in WebService routes
 
@@ -242,9 +233,9 @@ Built-in WebService routes
 
 User function "Mirror" using json data
 
-  curl "$url/mirror?from=json&to=json&k1=a&k2=b" -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
   curl  $url/mirror                              -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
   curl "$url/mirror?to=json&pretty=false"        -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+  curl "$url/mirror?from=json&to=json&k1=a&k2=b" -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
   curl "$url/mirror?to=yaml"                     -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
   curl "$url/mirror?to=xml&pretty=true"          -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
   curl "$url/mirror?to=perl"                     -H "$H" -d '{"SomeKey": ["one","two","three"]}'
@@ -301,9 +292,9 @@ More user functions
 The protected routes needs an authorization token
 Login to obtain a valid token
 
-  curl -X POST $url/login -H "$H" -d '{"username": "user1", "password": "s3cr3T+PA55sW0rD"}'
+  curl -X POST $url/login -H "$H" -d '{"username": "joe", "password": "SomePassword"}'
 
-  export token=1761911379-77fdf06ee8f31bc7f35ebea9-0
+  export token=1767129791-9f1ea721ca4050bd8aa484dd-0
 
   curl $url/git/commit?token=$token
   curl $url/Protected
@@ -314,13 +305,13 @@ Login to obtain a valid token
   curl $url/Protected_text_ref?token=$token
 
 Store persistent data
-  
-  
 
-  curl $url/session_save?token=$token   -H "$H" -X POST   -d '{"k1":"v1", "k2":"δύο", "k3":"three"}'
+  curl $url/session_save?token=$token   -H "$H" -X POST   -d '{"k1":"v1", "k2":"δύο", "k3":"τρία"}'
+  curl $url/session_save?token=$token   -H "$H" -X POST   -d '{ "Latin":"Hello world", "Ελληνικά":"Γειά σου κόσμε", "한국":"안녕 세계" }'
   curl $url/session_read?token=$token
-  curl $url/session_delete?token=$token -H "$H" -X DELETE -d '["k1", "k2", "k8","k9"]'
-  curl $url/session_read?token=$token
+  curl $url/session_read?token=$token   -H "$H" -X POST   -d '["k1","k2","Ελληνικά"]'
+  curl $url/session_delete?token=$token -H "$H" -X DELETE -d '["k1", "k2", "Ελληνικά", "한국"]'
+
   curl $url/logout?token=$token
   curl $url/logout -H "$H" -X POST -d "{\"token\":\"$token\"}"
 

@@ -17,14 +17,13 @@ This software is copyright (c) 2022 by Toby Inkster.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-
 =cut
 
 use Test2::V0 -target => 'Newtype';
 use Test2::Tools::Spec;
 use Data::Dumper;
 
-use Types::Common qw( HashRef Int );
+use Types::Common -types;
 use Type::Registry ();
 
 $Data::Dumper::Deparse = 1;
@@ -77,7 +76,7 @@ describe "method `_exporter_fail`" => sub {
 		};
 
 		subtest 'is_TestHash( $thing ) seems to work' => sub {
-			lives { $func{assert_TestHash}->( $func{TestHash}->( {} ) ) };
+			lives { $func{assert_TestHash}->( $func{TestHash}->( {} ) ) } or fail;
 			my $e = dies { $func{assert_TestHash}->( {} ) };
 			like $e, qr/did not pass type constraint/;
 		};
@@ -201,7 +200,7 @@ describe "method `new`" => sub {
 			$expected_return,
 			defined( $expected_return ) ? 'expected return value' : 'no return value',
 		);
-		
+
 		$also->() if $also;
 	};
 };
@@ -240,6 +239,222 @@ describe "attribute `kind`" => sub {
 	};
 };
 
-# TODO: need to test underscore methods too!
+describe "method `_build_kind`" => sub {
+
+	my ( $input, $expected, $expected_e );
+
+	case 'with ArrayRef' => sub {
+		$input      = ArrayRef;
+		$expected   = 'Array';
+		$expected_e = undef;
+	};
+
+	case 'with subtype of ArrayRef[HashRef[Int]]' => sub {
+		$input      = ArrayRef->of( HashRef->of(Int) )->where( q{ 1 } );
+		$expected   = 'Array';
+		$expected_e = undef;
+	};
+
+	case 'with Bool' => sub {
+		$input      = Bool;
+		$expected   = 'Bool';
+		$expected_e = undef;
+	};
+
+	case 'with CodeRef' => sub {
+		$input      = CodeRef;
+		$expected   = 'Code';
+		$expected_e = undef;
+	};
+
+	case 'with Int' => sub {
+		$input      = Int;
+		$expected   = 'Counter';
+		$expected_e = undef;
+	};
+
+	case 'with PositiveInt' => sub {
+		$input      = PositiveInt;
+		$expected   = 'Counter';
+		$expected_e = undef;
+	};
+
+	case 'with HashRef' => sub {
+		$input      = HashRef;
+		$expected   = 'Hash';
+		$expected_e = undef;
+	};
+
+	case 'with Num' => sub {
+		$input      = Num;
+		$expected   = 'Number';
+		$expected_e = undef;
+	};
+
+	case 'with LaxNum' => sub {
+		$input      = LaxNum;
+		$expected   = 'Number';
+		$expected_e = undef;
+	};
+
+	case 'with StrictNum' => sub {
+		$input      = StrictNum;
+		$expected   = 'Number';
+		$expected_e = undef;
+	};
+
+	case 'with Str' => sub {
+		$input      = Str;
+		$expected   = 'String';
+		$expected_e = undef;
+	};
+
+	case 'with StrMatch[qr//]' => sub {
+		$input      = StrMatch[qr//];
+		$expected   = 'String';
+		$expected_e = undef;
+	};
+
+	case 'with NonEmptyStr' => sub {
+		$input      = NonEmptyStr;
+		$expected   = 'String';
+		$expected_e = undef;
+	};
+
+	case 'with Object' => sub {
+		$input      = Object;
+		$expected   = 'Object';
+		$expected_e = undef;
+	};
+
+	case 'with InstanceOf["Foo"]' => sub {
+		$input      = InstanceOf["Foo"];
+		$expected   = 'Object';
+		$expected_e = undef;
+	};
+
+	case 'with HasMethods["foo"]' => sub {
+		$input      = HasMethods["foo"];
+		$expected   = 'Object';
+		$expected_e = undef;
+	};
+
+	case 'with Any' => sub {
+		$input      = Any;
+		$expected   = undef;
+		$expected_e = match( qr/^Could not determine kind of inner type/ );
+	};
+
+	case 'with Item' => sub {
+		$input      = Item;
+		$expected   = undef;
+		$expected_e = match( qr/^Could not determine kind of inner type/ );
+	};
+
+	case 'with Ref' => sub {
+		$input      = Ref;
+		$expected   = undef;
+		$expected_e = match( qr/^Could not determine kind of inner type/ );
+	};
+
+	tests 'it works' => sub {
+
+		local $SIG{__WARN__} = sub {}; # :(
+		my $obj = bless( { inner => $input }, $CLASS );
+		my $got;
+		my $got_e = dies { $got = $obj->_build_kind };
+
+		is(
+			$got_e,
+			$expected_e,
+			defined( $expected_e )
+				? 'got expected exception'
+				: 'got no exception',
+		);
+		is(
+			$got,
+			$expected,
+			'got expected kind',
+		) if defined $expected;
+	};
+};
+
+# TODO: exportables
+
+describe "method `_make_newclass_name`" => sub {
+
+	tests 'it works' => sub {
+		is(
+			$CLASS->_make_newclass_name( { caller => 'ABC', name => 'XYZ' } ),
+			'ABC::Newtype::XYZ',
+			'expected class name',
+		);
+	};
+};
+
+# TODO: _make_newclass
+# TODO: _make_newclass_basics
+# TODO: _make_newclass_overloading
+# TODO: _make_newclass_metamethods
+# TODO: _make_newclass_metamethods_for_known_class
+# TODO: _make_newclass_metamethods_for_generic_object
+# TODO: _make_newclass_metamethods_for_kind
+# TODO: _make_newclass_native_methods
+# TODO: _make_newclass_custom_methods
+
+describe "method `_kind_default`" => sub {
+
+	my ( $input, $expected );
+
+	case 'with Array' => sub {
+		$input    = 'Array';
+		$expected = array { end() };
+	};
+
+	case 'with Bool' => sub {
+		$input    = 'Bool';
+		$expected = F();
+	};
+
+	case 'with Code' => sub {
+		$input    = 'Code';
+		$expected = D();
+	};
+
+	case 'with Counter' => sub {
+		$input    = 'Counter';
+		$expected = number 0;
+	};
+
+	case 'with Hash' => sub {
+		$input    = 'Hash';
+		$expected = hash { end() };
+	};
+
+	case 'with Number' => sub {
+		$input    = 'Number';
+		$expected = number 0;
+	};
+
+	case 'with String' => sub {
+		$input    = 'String';
+		$expected = string '';
+	};
+
+	tests 'it works' => sub {
+
+		local $SIG{__WARN__} = sub {}; # :(
+		my $obj = bless( { kind => $input }, $CLASS );
+		my $got = $obj->_kind_default->();
+
+		is(
+			$got,
+			$expected,
+			'got expected default',
+		);
+	};
+};
+
+# TODO: _make_coercions
 
 done_testing;

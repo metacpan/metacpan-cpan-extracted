@@ -1,3 +1,11 @@
+4.8.3  2025-12-31
+
+  - Changes at saved session data file names
+
+4.8.2  2025-12-30
+
+  - Fix a group membership check bug
+
 4.8.1  2025-11-03
 
   - Use the YAML::XS instead of the YAML::Syck

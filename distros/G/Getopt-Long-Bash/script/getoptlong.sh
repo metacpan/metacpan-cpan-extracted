@@ -4,7 +4,7 @@
 # GetOptLong: Getopt Library for Bash Script
 # Copyright 2025 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=0.6.0}
+: ${GOL_VERSION:=0.7.0}
 ###############################################################################
 # Check for nameref support (bash 4.3+)
 declare -n > /dev/null 2>&1 || { echo "Does not support ${BASH_VERSION}" >&2 ; exit 1 ; }
@@ -143,7 +143,7 @@ gol_optstring_() { local _key _string ;
     echo "${_SILENT:+:}${_string:- }-:"
 }
 gol_getopts () { _gol_redirect "$@" ; }
-gol_getopts_() { local _non _optname _val _vtype _vname _name _callback _trigger _pass ;
+gol_getopts_() { local _non= _optname _val _vtype _vname _name _callback _trigger _pass ;
     local _opt="$1"; shift;
     case $_opt in
 	[:?]) _callback=$(_gol_hook "$_opt") && [[ $_callback ]] && $_callback "$OPTARG"
@@ -218,7 +218,7 @@ _gol_getopts_store() { local _vals _v ;
 }
 _gol_getopts_passthru() { local _options=() ;
     local _option=${_optname-$_opt}
-    (( ${#_option} > 1 )) && _options=(--${_non-}$_option) || _options=(-$_option)
+    (( ${#_option} > 1 || ${#_non} )) && _options=(--${_non-}$_option) || _options=(-$_option)
     [[ $_vtype =~ [$_IS_REQ] ]] && _options+=($_val)
     _gol_add_array $_vname "${_options[@]}"
 }

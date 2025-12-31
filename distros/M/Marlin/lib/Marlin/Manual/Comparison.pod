@@ -365,20 +365,20 @@ should allow.
   
   package Local::Example::Marlin::Person {
     use Marlin
-      -extends => [ 'Local::Example::Marlin::NamedThing' ],
-      -with    => [ 'Local::Example::Marlin::DoesIntro' ],
+      -extends => 'Local::Example::Marlin::NamedThing',
+      -with    => 'Local::Example::Marlin::DoesIntro',
       qw( age? );
   }
   
   package Local::Example::Marlin::Employee {
     use Marlin
-      -extends => [ 'Local::Example::Marlin::Person' ],
+      -extends => 'Local::Example::Marlin::Person',
       qw( employee_id! );
   }
   
   package Local::Example::Marlin::Employee::Developer {
     use Marlin
-      -extends => [ 'Local::Example::Marlin::Employee' ],
+      -extends => 'Local::Example::Marlin::Employee',
       -modifiers,
       _languages => {
         is          => lazy,
