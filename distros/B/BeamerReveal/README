@@ -5,11 +5,11 @@ NAME
 
 VERSION
 
-    version 20251227.1426
+    version 20251230.2042
 
 SYNOPSIS
 
-    beamer-reveal.pl [--help | -h] [--man|-m] [--test|-t] <jobname>
+    beamer-reveal.pl [--help | -h] [--man|-m] <jobname>
 
 DESCRIPTION
 
@@ -22,9 +22,11 @@ DESCRIPTION
 
  The .rvl file
 
-    blabla
+    The syntax will be documented as soon as it reaches stability.
 
  The configuration file
+
+    There is not configuration file.
 
 NAME
 
@@ -49,27 +51,9 @@ ARGUMENT
 
 RETURN VALUE
 
-    0 if no errors occurred
-
-    1 if a command-line syntax error occurred
-
-    100 if the help message was invoked (e.g., using '-h')
-
-    101 if the man page was invoked (e.g., using '-m')
-
-    13 insufficient read permissions for the config file
-
-    14 parsing the config file failed
-
-    15 rvl syntax error
-
-    16 cannot open output file
-
-    20 cannot open rvl file
-
-    21 unknown chunk
-
-    99 installation incomplete (missing template files)
+    The return value is not meaningful. The project is not mature enough
+    and its use mode is unsufficiently known to implement the appropriate
+    return value strategy.
 
 BUGS
 
@@ -78,8 +62,9 @@ BUGS
 
     - what you were trying;
 
-    - enough data such that I can reproduce your attempt (.spelidx file,
-    .aux file and the contents of your spel directory)
+    - enough data such that I can reproduce your attempt (.tex file, .rvl
+    file, .brlog file and the jobname_files directory created by the
+    script;
 
     - what strange behavior you observed;
 

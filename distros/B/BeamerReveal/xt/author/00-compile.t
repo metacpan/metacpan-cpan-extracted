@@ -6,12 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11;
+plan tests => 13;
 
 my @module_files = (
     'BeamerReveal.pm',
     'BeamerReveal/FrameConverter.pm',
     'BeamerReveal/IPC/Run.pm',
+    'BeamerReveal/Log.pm',
+    'BeamerReveal/Log/Ansi.pm',
+    'BeamerReveal/Log/Win32.pm',
     'BeamerReveal/MediaManager.pm',
     'BeamerReveal/Object.pm',
     'BeamerReveal/Object/BeamerFrame.pm',
@@ -20,8 +23,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/beamer-reveal.pl',
-    'bin/beamer-reveal.pl~'
+    'bin/beamer-reveal.pl'
 );
 
 # no fake home requested

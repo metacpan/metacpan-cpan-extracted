@@ -3,10 +3,12 @@
 
 
 package BeamerReveal::TemplateStore;
-our $VERSION = '20251227.1426'; # VERSION
+our $VERSION = '20251230.2042'; # VERSION
 
 use parent 'Exporter';
 use Carp;
+
+use BeamerReveal::Log;
 
 my $store = undef;
 
@@ -50,8 +52,6 @@ sub stampTemplate {
 sub _readTemplate {
   my ( $library, $fileName ) = @_;
 
-  say STDERR "    - reading $fileName template";
-  
   my $home = $^O eq 'MSWin32' ? $ENV{'userprofile'} : $ENV{'HOME'};
   my $configDir = $ENV{'BEAMERREVEAL_CONFIG'}
     // "$home/.config/BeamerReveal";
@@ -68,7 +68,7 @@ sub _readTemplate {
   
   my $templateFile = IO::File->new();
   $templateFile->open( "<$templateFileName" )
-    or die( "Error: installation incomplete - cannot find the template file '$fileName'\n" );
+    or $BeamerReveal::Log::logger->fatal( "Error: installation incomplete - cannot find the template file '$fileName'" );
   my $content = do { local $/; <$templateFile> };
   return $content;
 }
@@ -88,7 +88,7 @@ BeamerReveal::TemplateStore - TemplateStore
 
 =head1 VERSION
 
-version 20251227.1426
+version 20251230.2042
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,6 @@ use Test::More;
 use Data::Dumper;
 
 sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Deepcopy(1)->Dump }
-use Hash::Merge qw/merge/;
 
 use strict;
 
@@ -103,18 +102,34 @@ my @arr_c = (
 );
 
 
+ok (60 == scalar Array::Join::join_arrays(\@arr_b, \@arr_c, {
+							     on => [ sub { shift()->{color} }, sub { shift()->{color} } ],
+							     type => "inner"
+							    }), "size");
 
-ok (60 == scalar Array::Join::join_arrays(\@arr_b, \@arr_c, sub { shift()->{color} }, sub { shift()->{color} }, { type => "inner" }), "size");
-ok ("ARRAY" eq ref [ Array::Join::join_arrays(\@arr_b, \@arr_c, sub { shift()->{color} }, sub { shift()->{color} }, { type => "inner" })]->[0], "result type");
-    
+ok ("ARRAY" eq ref [ Array::Join::join_arrays(\@arr_b, \@arr_c, {
+								 on => [ sub { shift()->{color} }, sub { shift()->{color} } ], type => "inner"
+								}
+					     ) ]->[0], "result type");
+
 is_deeply(
 	  [qw/color country desc key/],
-	  [ sort keys [ Array::Join::join_arrays(\@arr_b, \@arr_c, sub { shift()->{color} }, sub { shift()->{color} }, { type => "inner", merge => 1 }) ]->[0]->%* ],
+	  [ sort keys [ Array::Join::join_arrays(\@arr_b, \@arr_c,
+						 {
+						  on => [ sub { shift()->{color} }, sub { shift()->{color} } ],
+						  type => "inner", merge => 1
+						 }
+						) ]->[0]->%* ],
 	  "merge keys"
 	 );
 is_deeply(
 	  [qw/a.color a.desc a.key b.color b.country/],
-	  [ sort keys [ Array::Join::join_arrays(\@arr_b, \@arr_c, sub { shift()->{color} }, sub { shift()->{color} }, { type => "inner", merge => [qw/a b/] }) ]->[0]->%* ],
+	  [ sort keys [ Array::Join::join_arrays(\@arr_b, \@arr_c,
+						 {
+						  on => [ sub { shift()->{color} }, sub { shift()->{color} } ],
+						  type => "inner", merge => [qw/a b/]
+						 }
+						) ]->[0]->%* ],
 	  "tag keys"
 	 );
 

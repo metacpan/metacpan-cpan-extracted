@@ -1,5 +1,9 @@
 Changes file for Dancer2::Logger::LogAny
 
+2.00      2025-12-29 08:54:16-05:00 America/New_York
+
+  - Update tests for Dancer2 v2
+
 0.9912    2017-11-12 15:39:21-05:00 America/New_York
 
   - Require minimum v1.049 for Log::Any::Adapter

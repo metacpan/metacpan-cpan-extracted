@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::Presentation;
-our $VERSION = '20251227.1426'; # VERSION
+our $VERSION = '20251230.2042'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -11,11 +11,14 @@ use Carp;
 use Data::Dumper;
 
 use BeamerReveal::TemplateStore;
+use BeamerReveal::Log;
 
 
 sub new {
   my $class = shift;
   my ( $chunkData, $lines, $lineCtr ) = @_;
+
+  my $logger = $BeamerReveal::Log::logger;
   
   $class = (ref $class ? ref $class : $class );
   my $self = {};
@@ -25,12 +28,12 @@ sub new {
   foreach my $line ( @$lines ) {
     ++$lineCtr;
     ( $line =~ /^-(?<command>\w+):(?<payload>.*)$/ )
-      or die( "Error: syntax incorrect in rvl file on line $lineCtr '$line'\n" );
+      or $logger->fatal( "Error: syntax incorrect in rvl file on line $lineCtr '$line'\n" );
     if ( $+{command} eq 'parameters' ) {
       $self->{parameters} = BeamerReveal::Object::readParameterLine( $+{payload} );
     }
     else {
-      die( "Error: unknown Presentation data on line $lineCtr '$line'\n" );
+      $logger->fatal( "Error: unknown Presentation data on line $lineCtr '$line'\n" );
     }
   }
 
@@ -50,7 +53,7 @@ BeamerReveal::Object::Presentation - Presentation object
 
 =head1 VERSION
 
-version 20251227.1426
+version 20251230.2042
 
 =head1 SYNOPSIS
 

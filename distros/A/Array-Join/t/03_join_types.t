@@ -1,4 +1,4 @@
-use Array::Join;
+use Array::Join::OO;
 use Test::More;
 use List::MoreUtils qw/uniq/;
 
@@ -103,19 +103,32 @@ my @arr_c = (
 );
 
 
-my $lookup_a = Array::Join::make_lookup(\@arr_a, sub { shift->{key} });
-my $lookup_b = Array::Join::make_lookup(\@arr_b, sub { shift->{key} });
-
-my $outer = ["apple","banana","carrot","cherry","date","eggplant","elder","fig","grape","honey","iceberg","jalapeno","kiwi","lemon","mango","nectar",
+my $outer_keys = ["apple","banana","carrot","cherry","date","eggplant","elder","fig","grape","honey","iceberg","jalapeno","kiwi","lemon","mango","nectar",
 	     "olive","onion","peach","quince","radish","rasp","straw","tang","tomato","ugli","voav"];
-my $left  = ["apple","banana","cherry","date","elder","fig","grape","honey","kiwi","lemon","mango","nectar","olive","peach","quince","rasp","straw","tang","ugli","voav"];
-my $right = ["apple","banana","carrot","date","eggplant","fig","grape","honey","iceberg","jalapeno","kiwi","lemon","mango","nectar","onion","peach",
+my $left_keys  = ["apple","banana","cherry","date","elder","fig","grape","honey","kiwi","lemon","mango","nectar","olive","peach","quince","rasp","straw","tang","ugli","voav"];
+my $right_keys = ["apple","banana","carrot","date","eggplant","fig","grape","honey","iceberg","jalapeno","kiwi","lemon","mango","nectar","onion","peach",
 	     "quince","radish","straw","tomato"];
-my $inner = ["apple","banana","date","fig","grape","honey","kiwi","lemon","mango","nectar","peach","quince","straw"];
+my $inner_keys = ["apple","banana","date","fig","grape","honey","kiwi","lemon","mango","nectar","peach","quince","straw"];
 
-is_deeply([ sort (Array::Join::make_keys($lookup_a, $lookup_b, { type => "outer" })) ], $outer, "outer");
-is_deeply([ sort (Array::Join::make_keys($lookup_a, $lookup_b, { type => "inner" })) ], $inner, "inner");
-is_deeply([ sort (Array::Join::make_keys($lookup_a, $lookup_b, { type => "left" })) ], $left, "left");
-is_deeply([ sort (Array::Join::make_keys($lookup_a, $lookup_b, { type => "right" })) ], $right, "right");
+my ($inner, $outer, $left, $right) = map {
+    Array::Join::OO->new(
+			 \@arr_a,
+			 \@arr_b,
+			 {
+			  on => [
+				 sub { $_->{key} },
+				 sub { $_->{key} },
+				],
+			  type  => $_,
+			  merge => [ 'a', 'b' ],
+			 }
+			);
+} qw/inner outer left right/;
+
+
+is_deeply($inner->keys, $inner_keys, "inner");
+is_deeply($outer->keys, $outer_keys, "outer");
+is_deeply($left->keys,  $left_keys,  "left");
+is_deeply($right->keys, $right_keys, "right");
 
 done_testing()

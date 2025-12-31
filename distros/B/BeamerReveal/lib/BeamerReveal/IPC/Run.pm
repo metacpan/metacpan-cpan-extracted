@@ -3,18 +3,22 @@
 
 
 package BeamerReveal::IPC::Run;
-our $VERSION = '20251227.1426'; # VERSION
+our $VERSION = '20251230.2042'; # VERSION
 
 use strict;
 use warnings;
 
-use IPC::Run;
+use IPC::Run qw(harness start pump finish);
+
 use File::chdir;
 
 
 sub run {
   my ( $cmd, $coreId, $indent, $dir ) = @_;
   my ( $out, $err );
+
+  my $logger = $BeamerReveal::Log::logger;
+  
   my $r;
   eval {
     if( defined $dir ) {
@@ -27,16 +31,41 @@ sub run {
   };
     
   if ( !defined( $r ) ) {
-    die( "Error: $@\n" );
+    $logger->fatal( "Error: $@\n" );
   }
   else {
     if ( $r ) {
-      say STDERR "@{[' ' x $indent]}- $cmd->[0] run in thread no $coreId finished";
+      $logger->log( $indent, "- $cmd->[0] run in thread no $coreId finished" );
     }
     else {
-      die( "@{[' ' x $indent]}- $cmd->[0] run in thread no $coreId failed (check log file)\n" );
+      $logger->fatal( "- $cmd->[0] run in thread no $coreId failed (check log file)\n" );
     }
   }
+}
+
+sub runsmart {
+  my ( $cmd, $mode, $regexp, $subroutine, $coreId, $indent, $dir ) = @_;
+  my ( $in, $out, $err ) = ( '', undef, undef );
+
+  # the stream to read the progress info from is set by $mode
+  my $progress = ( $mode == 2 ) ? \$err : \$out;
+
+  # get the logger
+  my $logger = $BeamerReveal::Log::logger;
+
+  # run the process until finish
+  local $CWD = $dir if defined( $dir );
+  my $h = harness $cmd, \$in, \$out, \$err;
+  start $h;
+  while( $h->pumpable ) {
+    pump $h;
+    my @matches = $$progress =~ $regexp;
+    if ( scalar @matches ) {
+      $subroutine->( @matches );
+      $$progress = '';
+    }
+  }
+  finish $h or $logger->fatal( 0, "Error: subprocess $cmd->[0] returned $?" );
 }
 
 1;
@@ -53,7 +82,7 @@ BeamerReveal::IPC::Run - IPC::Run
 
 =head1 VERSION
 
-version 20251227.1426
+version 20251230.2042
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 10.00
+Version 10.01
 
 # SYNOPSIS
 
@@ -662,6 +662,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         greple -f pattern_file --select 2,7:9
 
+**Related options:**
+**--inside**/**--outside**/**--include**/**--exclude** (["REGIONS"](#regions)),
+**--block** (["BLOCKS"](#blocks))
+
 ## STYLES
 
 - **-l**
@@ -823,8 +827,8 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         --format BLOCK='%s:'
 
-    Format string is passed to `sprintf` function.  Tab character can be
-    expressed as `\t`.
+    Format string is passed to `sprintf` function.  Escape sequences
+    `\t`, `\n`, `\r`, and `\f` are recognized.
 
     Next example will show line numbers in five digits with tab space:
 
@@ -837,6 +841,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     Print surrounding frames before and after each block.  `top` frame is
     printed at the beginning, `bottom` frame at the end, `middle` frame
     between blocks.
+
+**Related options:**
+**--block**/**-p** (["BLOCKS"](#blocks)),
+**--color**/**--colormap** (["COLORS"](#colors))
 
 ## FILES
 
@@ -1180,6 +1188,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 
         greple --face =
 
+**Related options:**
+**-o** (["STYLES"](#styles)),
+**--inside**/**--outside**/**--include**/**--exclude** (["REGIONS"](#regions))
+
 ## BLOCKS
 
 - **-p**, **--paragraph**
@@ -1241,13 +1253,19 @@ If you don't want these conversion, use `-E` (or `--re`) option.
 - **--blockend**=_string_
 
     Change the end mark displayed after `-pABC` or `--block` options.
-    Default value is "--".
+    Default value is "--".  Escape sequences `\t`, `\n`, `\r`, and
+    `\f` are recognized.
 
 - **--join-blocks**
 
     Join consecutive blocks together.  Logical operation is done for each
     individual blocks, but if the results are back-to-back connected, make
     them single block for final output.
+
+**Related options:**
+**-b**/**--block-number** (["STYLES"](#styles)),
+**-A**/**-B**/**-C** (["STYLES"](#styles)),
+**--inside**/**--outside**/**--include**/**--exclude** (["REGIONS"](#regions))
 
 ## REGIONS
 
@@ -1330,6 +1348,11 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     searching, say, `' PATTERN '` with this condition.  Matched area
     includes surrounding spaces, and satisfies both conditions partially.
     This match does not occur when option `--strict` is given, either.
+
+**Related options:**
+**--block** (["BLOCKS"](#blocks)),
+**--regioncolor** (["COLORS"](#colors)),
+**-e**/**-v** (["PATTERNS"](#patterns))
 
 ## CHARACTER CODE
 

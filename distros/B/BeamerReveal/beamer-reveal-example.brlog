@@ -1,0 +1,65 @@
+----------------------------------------------------------------------------
+  beamer-reveal.pl                                          v20251230.2041  
+  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                    GPLv3  
+----------------------------------------------------------------------------
+
+- Reading driver file beamer-reveal-example.rvl
+- Installing quarto/reveal.js boilerplate
+- Processing the presentation
+  - making slide 1
+  - making slide 2
+  - making slide 3
+  - making slide 4
+  - making slide 5
+  - making slide 6
+  - making slide 7
+  - making slide 8
+  - making slide 9
+  - making slide 10
+  - making slide 11
+  - making slide 12
+  - making slide 13
+    - adding video
+  - making slide 14
+    - adding image
+    - adding image
+  - making slide 15
+    - adding iframe
+  - making slide 16
+  - making slide 17
+    - adding audio
+  - making slide 18
+  - making slide 19
+    - adding animation
+- Generating the images
+      - Preparing media generation of 187 frames in 12 threads at 16 frames per thread
+        - /usr/bin/pdfcrop run in thread no 11 finished
+        - /usr/bin/pdfcrop run in thread no 00 finished
+        - /usr/bin/pdfcrop run in thread no 02 finished
+        - /usr/bin/pdfcrop run in thread no 01 finished
+        - /usr/bin/pdfcrop run in thread no 06 finished
+        - /usr/bin/pdfcrop run in thread no 05 finished
+        - /usr/bin/pdfcrop run in thread no 04 finished
+        - /usr/bin/pdfcrop run in thread no 09 finished
+        - /usr/bin/pdfcrop run in thread no 10 finished
+        - /usr/bin/pdfcrop run in thread no 07 finished
+        - /usr/bin/pdfcrop run in thread no 08 finished
+        - /usr/bin/pdfcrop run in thread no 03 finished
+        - /usr/bin/pdftoppm run in thread no 11 finished
+        - /usr/bin/pdftoppm run in thread no 00 finished
+        - /usr/bin/pdftoppm run in thread no 02 finished
+        - /usr/bin/pdftoppm run in thread no 06 finished
+        - /usr/bin/pdftoppm run in thread no 01 finished
+        - /usr/bin/pdftoppm run in thread no 05 finished
+        - /usr/bin/pdftoppm run in thread no 04 finished
+        - /usr/bin/pdftoppm run in thread no 09 finished
+        - /usr/bin/pdftoppm run in thread no 07 finished
+        - /usr/bin/pdftoppm run in thread no 08 finished
+        - /usr/bin/pdftoppm run in thread no 10 finished
+        - /usr/bin/pdftoppm run in thread no 03 finished
+      - returning to single-threaded operation
+        - /usr/bin/ffmpeg run in thread no 0 finished
+- Producing presentation
+  - Writing beamer-reveal-example.html
+  - Creating index.html link
+Done

@@ -1,6 +1,6 @@
 package Dancer2::Logger::LogAny;
 
-our $VERSION = '0.9912';
+our $VERSION = '2.00';
 
 use strict; use warnings;
 #use Dancer2 qw/ !log !debug !info !notice !warning !error /;
@@ -41,7 +41,7 @@ __END__
 
 =head1 VERSION
 
-version 0.9912
+version 2.00
 
 =head1 NAME
 
@@ -90,7 +90,7 @@ Nick Tonkin <tonkin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Nick Tonkin.
+This software is copyright (c) 2025 by Nick Tonkin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

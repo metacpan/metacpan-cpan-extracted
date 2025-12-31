@@ -2,13 +2,21 @@ use strict;
 use warnings;
 use Test::More;
 use File::Spec;
+use Config;
 
-# Set PERL5LIB so child processes can find File::Share's dist_dir
+# Set PERL5LIB and PATH so child processes can find dependencies
 BEGIN {
     my $blib = File::Spec->rel2abs('blib/lib');
     if (-d $blib) {
         $ENV{PERL5LIB} = join(':', $blib, $ENV{PERL5LIB} // '');
     }
+    # Add Perl's bin directories to PATH for getoptlong.sh
+    my @bindirs = grep { defined && -d } (
+        $Config{installsitebin},
+        $Config{installvendorbin},
+        $Config{installbin},
+    );
+    $ENV{PATH} = join(':', @bindirs, $ENV{PATH} // '');
 }
 
 # Skip tests on platforms without bash or with old bash

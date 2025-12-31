@@ -4,10 +4,11 @@ MANIFEST
 META.yml
 Makefile.PL
 README
-annotations/part_000000.json
 dist.ini
 lib/Array/Join.pm
-t/01_lookup.t
-t/02_crossproduct.t
+lib/Array/Join/OO.pm
+t/01_new.t
+t/02_simple.t
+t/03_join_oo.t
 t/03_join_types.t
 t/04_join.t

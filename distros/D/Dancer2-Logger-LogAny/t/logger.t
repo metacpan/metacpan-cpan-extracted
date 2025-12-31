@@ -54,9 +54,13 @@ test_psgi $testapp, sub {
 
         my $messages = $log->msgs;
 
-        pop @{ $messages }; # hook core.app.after_request 
+        my @entries = grep { $_->{message} eq $message } @{ $messages };
+
+        ok( @entries, '... found the log entry with the message' );
+        is( scalar(@entries), 1, '... exactly one matching log entry' );
+
         is_deeply(
-            pop @{ $messages },
+            $entries[0],
             {
                 category => 'Testeroo',
                 level    => ( $level eq 'core' ? 'info' : $level ),

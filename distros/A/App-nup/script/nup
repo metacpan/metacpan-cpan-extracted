@@ -27,6 +27,7 @@ nup - N-up multi-column paged output for commands and files
      -e  --exec             execute command mode
          --alias=CMD=OPTS   set command alias
      -V  --parallel         parallel view mode
+     -D  --document         document mode (default: on)
      -F  --fold             fold mode (disable page mode)
      -H  --filename         show filename headers (default: on)
      -G  --grid=#           grid layout (e.g., 2x3)
@@ -46,7 +47,7 @@ nup - N-up multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 0.9905
+Version 0.9906
 
 =cut
 
@@ -83,15 +84,16 @@ END
 
 declare -a up_opts=(--filename)  # up.pm options
 
-# Default command aliases (command-specific options)
+# Default command aliases (command and options)
 declare -A alias=(
-    [bat]="--style=plain --color=always"
-    [rg]="--color=always"
-    [tree]="-C"
+    [bat]="bat --style=plain --color=always"
+    [batcat]="batcat --style=plain --color=always"
+    [rg]="rg --color=always"
+    [tree]="tree -C"
 )
 
 declare -A OPTS=(
-    [&REQUIRE]=0.4 [&USAGE]="$USAGE" [&PERMUTE]=
+    [&REQUIRE]=0.6 [&USAGE]="$USAGE" [&PERMUTE]= [&DELIM]=
     [         help | h   !        # show help         ]=
     [      version |     !        # show version      ]=
     [        debug | d            # debug mode        ]=
@@ -100,6 +102,7 @@ declare -A OPTS=(
     [        alias | %            # command aliases   ]=
     [        pager |    :!        # pager command     ]=
     [     parallel | V   >up_opts # parallel view     ]=
+    [     document | D   >up_opts # document mode     ]=
     [         fold | F   >up_opts # fold mode         ]=
     [     filename | H   >up_opts # show file headers ]=
     [         grid | G  :>up_opts # grid layout       ]=
@@ -169,18 +172,22 @@ is_command_mode() {
     command -v "${1:-}" >/dev/null 2>&1
 }
 
-# Get alias options for a command
-get_alias_opts() {
+# Expand command alias (command name + options)
+expand_alias() {
     local cmd_name="${1##*/}"  # basename
-    [[ -v alias[$cmd_name] ]] && echo "${alias[$cmd_name]}"
+    if [[ -v alias[$cmd_name] ]]; then
+        echo "${alias[$cmd_name]}"
+    else
+        echo "$1"
+    fi
 }
 
 if is_command_mode "$@"; then
     # Command mode: use optex -Mup
     local_cmd="$1"; shift
-    declare -a alias_opts
-    read -ra alias_opts <<< "$(get_alias_opts "$local_cmd")"
-    declare -a cmd=(optex -Mup "${up_opts[@]}" -- "$local_cmd" "${alias_opts[@]}" "$@")
+    declare -a expanded_cmd
+    read -ra expanded_cmd <<< "$(expand_alias "$local_cmd")"
+    declare -a cmd=(optex -Mup "${up_opts[@]}" -- "${expanded_cmd[@]}" "$@")
 else
     # File view mode: use ansicolumn via optex -Mup
     declare -a cmd=(optex -Mup "${up_opts[@]}" -- ansicolumn "$@")
@@ -238,21 +245,23 @@ Dry-run mode. Show the command without executing.
 Force command execution mode. Normally the mode is auto-detected,
 but use this option when you want to execute a file as a command.
 
-=item B<--alias>=I<CMD>=I<OPTS>
+=item B<--alias>=I<NAME>=I<CMD> I<OPTS>...
 
-Set command-specific options. When a command matches I<CMD>, the
-specified I<OPTS> are automatically added to the command line.
+Define command alias. When a command matches I<NAME>, it is replaced
+by I<CMD> with specified I<OPTS>.  This can be used to add default
+options or to substitute a different command.
 Multiple C<--alias> options can be specified.
 
 Default aliases:
 
-    bat    --style=plain --color=always
-    rg     --color=always
-    tree   -C
+    bat     bat --style=plain --color=always
+    batcat  batcat --style=plain --color=always
+    rg      rg --color=always
+    tree    tree -C
 
 Example:
 
-    nup --alias='grep=--color=always' grep pattern file
+    nup --alias='grep=ggrep --color=always' grep pattern file
 
 =item B<-V>, B<--parallel>
 
@@ -261,6 +270,12 @@ is displayed in its own column without pagination, similar to
 C<--fold>.  Automatically enabled when multiple files are
 specified.  Single file or stdin input results in single column
 output.
+
+=item B<-D>, B<--document>
+
+Enable document mode for ansicolumn.  This mode is optimized for
+viewing documents with page-based layout.  Enabled by default.
+Use C<--no-document> to disable.
 
 =item B<-F>, B<--fold>
 

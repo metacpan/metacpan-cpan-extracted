@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "App::ansicolumn" : "1.48",
             "App::optex" : "1.05",
             "App::optex::up" : "1.05",
             "Getopt::Long::Bash" : "v0.6.0",
@@ -57,7 +58,7 @@
    "provides" : {
       "App::nup" : {
          "file" : "lib/App/nup.pm",
-         "version" : "0.9905"
+         "version" : "0.9906"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/tecolicom/App-nup"
       }
    },
-   "version" : "0.9905",
+   "version" : "0.9906",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

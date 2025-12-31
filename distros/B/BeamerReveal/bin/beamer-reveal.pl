@@ -22,7 +22,7 @@ use BeamerReveal;
 use BeamerReveal::TemplateStore;
 use BeamerReveal::FrameConverter;
 
-sub dieExit;
+use BeamerReveal::Log;
 
 ######################################
 # Read command-line options/arguments
@@ -30,13 +30,10 @@ sub dieExit;
 
 my $opt_help;
 my $opt_man;
-my $opt_showconfig = 0;
-
 
 my $result = 
   GetOptions( "help"       => \$opt_help,
 	      "man"        => \$opt_man,
-	      "showconfig" => \$opt_showconfig,
 	    )
   || pod2usage( -exitval => 1,
 		-output  => \*STDERR );
@@ -47,24 +44,7 @@ my $argument = $ARGV[0] if( @ARGV == 1 );
 
 pod2usage( -message => "Incorrect number of arguments",
 	   -exitval => 1,
-	   -output  => \*STDERR ) unless( $opt_showconfig
-					  or
-					  defined( $argument ) );
-
-########################
-# generate opening line
-######################
-my $openinglines =
-  [
-   '**************************************************************************',
-   "* beamer-reveal.pl                                        v${BeamerReveal::VERSION} *",
-   '* (C) 2026 by Walter Daems <walter.daems@uantwerpen.be>            GPLv3 *',
-   '**************************************************************************',
-  ];
-
-foreach my $line ( @$openinglines ) {
-  say STDERR $line;
-}
+	   -output  => \*STDERR ) unless( defined( $argument ) );
 
 ###################
 # do the hard work
@@ -74,12 +54,53 @@ foreach my $line ( @$openinglines ) {
 my ( $jobname ) = @ARGV;
 $jobname =~ s/\\/\//g;
 
+my $openinglines =
+  [
+   '-|-',
+   "  beamer-reveal.pl|v${BeamerReveal::VERSION}  ",
+   '  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>|GPLv3  ',
+   '-|-',
+  ];
+my $closinglines = [ '-|-' ];
+my $logger = BeamerReveal::Log->new( opening       => $openinglines,
+				     closing       => $closinglines,
+				     logfilename   => "$jobname.brlog",
+				     labelsize     => 21,
+				     activitysize  => 25 );
+
+my $proc_id =
+  $logger->registerTask( label    => "Slide processing",
+			 progress => 0,
+			 total    => 1 );
+my $fc_id =
+  $logger->registerTask( label    => "Frame conversion",
+			 progress => 0,
+			 total    => 1 );
+my $mmcop_id =
+  $logger->registerTask( label    => "Media copying",
+			 progress => 0,
+			 total    => 1 );
+my $mmgen_id =
+  $logger->registerTask( label    => "Animation generation",
+			 progress => 0,
+			 total    => 1 );
+my $overall_id =
+  $logger->registerTask( label    => "Overall progress",
+			 progress => 0,
+			 total    => 5 );
+
+$logger->activate();
+
+##################
+# Read input file
+$logger->progress( $overall_id, 0, 'reading driver file' );
+
 # fetch the reveal file
 my $rvlFileName = $jobname . ".rvl";
-say STDERR "- Reading driver file $rvlFileName";
+$logger->log( 0, "- Reading driver file $rvlFileName" );
 my $rvlFile = IO::File->new();
 $rvlFile->open( "<$rvlFileName" )
-  or dieExit( 20, "Error: cannot read reveal file '$rvlFileName'\n" );
+  or $logger->fatal( 0, "Error: cannot read reveal file '$rvlFileName'\n" );
 
 # skip first comment lines
 my $lineCtr = 0;
@@ -100,7 +121,10 @@ for( my $i = 0; $i < @chunks; ++$i ) {
   $chunksLineNrs[$i+1] = $lineCtr;
 }
 
+#################
 # parse the file
+$logger->progress( $overall_id, 1, 'parsing driver file' );
+
 my $factory = BeamerReveal->new();
 
 ## the first chunk needs to be a presentation chunk
@@ -113,14 +137,14 @@ eval {
     my $object = $factory->createFromChunk( $chunks[$i], $chunksLineNrs[$i] );
     push @$slides, $object;
   }
-  
   1;
-  
 } or do {
-  dieExit( 15, "$@" );
+  $logger->fatal( 0, "$@" );
 };
 
-# say STDERR Data::Dumper->Dump( [ $slides], [ qw(slides) ] );
+######################
+# process the content
+$logger->progress( $overall_id, 2, 'processing driver file' );
 
 my $mediaManager =
   BeamerReveal::MediaManager->new( $jobname,
@@ -128,36 +152,57 @@ my $mediaManager =
 				   $presentation->{parameters} );
 
 # storing the reveal framework
-say STDERR "- Installing quarto/reveal.js boilerplate";
+$logger->log( 0, "- Installing quarto/reveal.js boilerplate" );
 $mediaManager->revealToStore();
 
 # generateing the content
-say STDERR "- Processing the presentation";
+$logger->log( 0, "- Processing the presentation" );
 
 my $slideCollection;
+my $i = 0;
+my $nofSlides = @$slides;
 foreach my $slide ( @$slides ) {
-  $slideCollection .= $slide->makeSlide( $mediaManager );
+  $logger->progress( $proc_id, $i++, "slide $i/$nofSlides", $nofSlides );
+  $slideCollection .= $slide->makeSlide( $i, $mediaManager );
 }
+$logger->progress( $proc_id, $i );
 
+######################
 # generate all images
-say STDERR "- Generating the images";
+$logger->progress( $overall_id, 3, 'generating backgrounds' );
+
+$logger->log( 0, "- Generating the images" );
 my $convertor = BeamerReveal::FrameConverter->new( "${jobname}_files",
 						   "$jobname.pdf",
 						   $presentation->{parameters}->{canvaswidth},
-						   $presentation->{parameters}->{canvasheight} );
+						   $presentation->{parameters}->{canvasheight},
+						   $fc_id );
 $convertor->toJPG();
 
+################################
+# generate the copy back-orders
+$logger->progress( $overall_id, 4, 'media copying' );
+$mediaManager->processCopyBackOrders( $mmcop_id );
+
+################################
+# generate the generation back-orders
+$logger->progress( $overall_id, 4, 'animation generation' );
+$mediaManager->processConstructionBackOrders( $mmgen_id );
+
+######################
 # write the main file
-say STDERR "- Producing presentation";
+$logger->progress( $overall_id, 4, 'writing presentation file' );
+
+$logger->log( 0, "- Producing presentation" );
 
 my $store = BeamerReveal::TemplateStore->new();
 my $mainTemplate = $store->fetch( 'html', 'main.html' );
 
 my $oFileName = "$jobname.html";
-say STDERR "  - Writing $oFileName";
+$logger->log( 2, "- Writing $oFileName" );
 my $oFile = IO::File->new();
 $oFile->open( ">$oFileName" )
-  or dieExit( 16, "Error: cannot write to '$oFileName'" );
+  or $logger->fatal( 0, "Error: cannot write to '$oFileName'" );
 print $oFile
   BeamerReveal::TemplateStore::stampTemplate( $mainTemplate,
 					      { TITLE => 'presentation',
@@ -168,24 +213,16 @@ print $oFile
 $oFile->close();
 
 # finally let's create an index.html link
-my $symlink_exists = eval { symlink("",""); 1 };
-if ( $symlink_exists ) {
-  say STDERR "  - Creating index.html link";
-  link( "$oFileName", "index.html" );
-}
+$logger->log( 2, "- Creating index.html link" );
+link( "$oFileName", "index.html" );
+$logger->progress( $overall_id, 5, 'done' );
 
 ########################
 # generate closing line
 ######################
-say STDERR "Done.";
+$logger->finalize();
 
 #########################################################
-
-sub dieExit {
-  my ( $code, $message ) = @_;
-  say STDERR $message;
-  exit( $code );
-}
 
 __END__
 
@@ -199,11 +236,11 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20251227.1426
+version 20251230.2042
 
 =head1 SYNOPSIS
 
-beamer-reveal.pl [--help | -h] [--man|-m] [--test|-t] <jobname>
+beamer-reveal.pl [--help | -h] [--man|-m] <jobname>
 
 =head1 DESCRIPTION
 
@@ -216,9 +253,11 @@ We recommend reading this documentation after that.
 
 =head2 The F<.rvl> file
 
-blabla
+The syntax will be documented as soon as it reaches stability.
 
 =head2 The configuration file
+
+There is not configuration file.
 
 =head1 NAME
 
@@ -251,44 +290,21 @@ to find the F<.aux> file and the F<.spelidx> file.
 
 =head1 RETURN VALUE
 
-=over 32
-
-=item 0 if no errors occurred
-
-=item 1 if a command-line syntax error occurred
-
-=item 100 if the help message was invoked (e.g., using '-h')
-
-=item 101 if the man page was invoked (e.g., using '-m')
-
-=item 13 insufficient read permissions for the config file
-
-=item 14 parsing the config file failed
-
-=item 15 rvl syntax error
-
-=item 16 cannot open output file
-
-=item 20 cannot open rvl file
-
-=item 21 unknown chunk
-
-=item 99 installation incomplete (missing template files)
-
-=back
+The return value is not meaningful. The project is not mature enough and its use
+mode is unsufficiently known to implement the appropriate return value strategy.
 
 =head1 BUGS
 
 No bugs have been reported so far. If you find any, please,
 send an e-mail to the author containing:
 
-=over 32
+=over 4
 
 =item - what you were trying;
 
 =item - enough data such that I can reproduce your attempt
-(F<.spelidx> file, F<.aux> file and the contents of your F<spel>
-directory)
+(F<.tex> file, F<.rvl> file, F<.brlog> file and the F<jobname_files>
+ directory created by the script;
 
 =item - what strange behavior you observed;
 
@@ -298,7 +314,7 @@ directory)
 
 =head1 LINKS
 
-=over 32
+=over 4
 
 =item https://metacpan.org/pod/beamer-reveal
 

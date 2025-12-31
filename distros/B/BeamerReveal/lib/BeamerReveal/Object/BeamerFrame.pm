@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::BeamerFrame;
-our $VERSION = '20251227.1426'; # VERSION
+our $VERSION = '20251230.2042'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -12,6 +12,8 @@ use Data::Dumper;
 
 use BeamerReveal::TemplateStore;
 use BeamerReveal::MediaManager;
+
+use BeamerReveal::Log;
 
 use Digest::SHA;
 
@@ -27,6 +29,8 @@ sub new {
   my $self = {};
   bless $self, $class;
 
+  my $logger = $BeamerReveal::Log::logger;
+  
   $self->{videos}     = [];
   $self->{audios}     = [];
   $self->{images}     = [];
@@ -35,7 +39,7 @@ sub new {
   ++$lineCtr;
   for( my $i = 0; $i < @$lines; ++$i ) {
     ( $lines->[$i] =~ /^-(?<command>\w+):(?<payload>.*)$/ )
-      or die( "Error: syntax incorrect in rvl file on line $lineCtr '$lines->[$i]'\n" );
+      or $logger->fatal( "Error: syntax incorrect in rvl file on line $lineCtr '$lines->[$i]'\n" );
     if ( $+{command} eq 'parameters' ) {
       $self->{parameters} = BeamerReveal::Object::readParameterLine( $+{payload} );
     }
@@ -56,7 +60,7 @@ sub new {
       $self->{animations}->[-1]->{tex} = $lines->[++$i];
     }
     else {
-      die( "Error: unknown BeamerFrame data on line @{[ $lineCtr + $i ]} '$lines->[$i]'\n" );
+      $logger->fatal( "Error: unknown BeamerFrame data on line @{[ $lineCtr + $i ]} '$lines->[$i]'\n" );
     }
   }
 
@@ -69,10 +73,10 @@ sub new {
 
 sub makeSlide {
   my $self = shift;
-  my ( $mediaManager ) = @_;
-  
-  say STDERR "  - making slide";
+  my ( $i, $mediaManager ) = @_;
 
+  my $logger = $BeamerReveal::Log::logger;
+  $logger->log( 2, "- making slide $i" );
   
   my $templateStore = BeamerReveal::TemplateStore->new();
   my $content = '';
@@ -80,14 +84,14 @@ sub makeSlide {
   #############################
   # process all video material
   foreach my $video (@{$self->{videos}}) {
+    $logger->log( 4, "- adding video" );
     my $vTemplate = $templateStore->fetch( 'html', 'video.html' );
-    say STDERR "    - adding video";
     my $vStamps =
       { X => _topercent( $video->{x} ),
 	Y => _topercent( $video->{y} ),
 	W => _topercent( $video->{width} ),
 	H => _topercent( $video->{height} ),
-	VIDEO => $mediaManager->videoToStore( $video->{file} ),
+	VIDEO => $mediaManager->videoFromStore( $video->{file} ),
 	FIT => $video->{fit},
 	AUTOPLAY => exists $video->{autoplay} ? 'data-autoplay' : '',
 	CONTROLS => exists $video->{controls} ? 'controls' : '',
@@ -100,14 +104,14 @@ sub makeSlide {
   #############################
   # process all audio material
   foreach my $audio (@{$self->{audios}}) {
+    $logger->log( 4, "- adding audio" );
     my $aTemplate = $templateStore->fetch( 'html', 'audio.html' );
-    say STDERR "    - adding audio";
     my $aStamps =
       { X => _topercent( $audio->{x} ),
 	Y => _topercent( $audio->{y} ),
 	W => _topercent( $audio->{width} ),
 	H => _topercent( $audio->{height} ),
-	AUDIO => $mediaManager->audioToStore( $audio->{file} ),
+	AUDIO => $mediaManager->audioFromStore( $audio->{file} ),
 	FIT => $audio->{fit},
 	AUTOPLAY => exists $audio->{autoplay} ? 'data-autoplay' : '',
 	CONTROLS => exists $audio->{controls} ? 'controls' : '',
@@ -120,14 +124,14 @@ sub makeSlide {
   #############################
   # process all image material
   foreach my $image (@{$self->{images}}) {
+    $logger->log( 4, "- adding image" );
     my $iTemplate = $templateStore->fetch( 'html', 'image.html' );
-    say STDERR "    - adding image";
     my $iStamps =
       { X => _topercent( $image->{x} ),
 	Y => _topercent( $image->{y} ),
 	W => _topercent( $image->{width} ),
 	H => _topercent( $image->{height} ),
-	IMAGE => $mediaManager->imageToStore( $image->{file} ),
+	IMAGE => $mediaManager->imageFromStore( $image->{file} ),
 	FIT => $image->{fit}
       };
     $content .= BeamerReveal::TemplateStore::stampTemplate( $iTemplate,
@@ -137,14 +141,14 @@ sub makeSlide {
   #############################
   # process all iframe material
   foreach my $iframe (@{$self->{iframes}}) {
+    $logger->log( 4, "- adding iframe" );
     my $iTemplate = $templateStore->fetch( 'html', 'iframe.html' );
-    say STDERR "    - adding iframe";
     my $iStamps =
       { X => _topercent( $iframe->{x} ),
 	Y => _topercent( $iframe->{y} ),
 	W => _topercent( $iframe->{width} ),
 	H => _topercent( $iframe->{height} ),
-	IFRAME => $mediaManager->iframeToStore( $iframe->{file} ),
+	IFRAME => $mediaManager->iframeFromStore( $iframe->{file} ),
 	FIT => $iframe->{fit}
       };
     $content .= BeamerReveal::TemplateStore::stampTemplate( $iTemplate,
@@ -154,12 +158,13 @@ sub makeSlide {
   #########################
   # process all animations
   foreach my $animation (@{$self->{animations}}) {
+    $logger->log( 4, "- adding animation" );
+
     # 1. Generate the animation
-    my $file = $mediaManager->animationToStore( $animation );
+    my $file = $mediaManager->animationFromStore( $animation );
     
     # 2. Embed it into the html
     my $aTemplate = $templateStore->fetch( 'html', 'animation.html' );
-    say STDERR "    - adding animation";
     my $aStamps =
       { X => _topercent( $animation->{x} ),
 	Y => _topercent( $animation->{y} ),
@@ -192,7 +197,7 @@ sub makeSlide {
       $menuTitle = "<span class='menu-subsection'>&SmallCircle; %s</span>";
     }
     else {
-      die( "Error: invalid toc parameter in rvl file" );
+      $logger->fatal( "Error: invalid toc parameter in rvl file" );
     }
   }
   else {
@@ -229,7 +234,7 @@ BeamerReveal::Object::BeamerFrame - BeamerFrame object
 
 =head1 VERSION
 
-version 20251227.1426
+version 20251230.2042
 
 =head1 SYNOPSIS
 
